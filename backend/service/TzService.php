@@ -400,24 +400,27 @@ class TzService extends BaseService {
 
 
     /**
-     * @desc 更新时时彩开奖时间
+     * @desc 更新时时彩开奖时间 6、3分 7、5分彩 8、10分彩 5、1.5分彩
      */
-    public static function insertSscDataTime(){
-        $actionNo = 59;
+    public static function insertSscDataTime($type = 7){
+        $typeArr = [6=>3, 7=>5, 8=>10, 5=>1.5];
+        $time_int = 24 * 3600;
+        $actionNums = $time_int / ($typeArr[$type]*60);
+        //p($actionNums);
         $setData = [];
-        $dateTime = strtotime('2019-02-15 00:10:00');
-        for ($i=1; $i<=$actionNo; $i++){
-            $setData['type'] = 1;
+        $dateTime = strtotime('2019-02-15 00:00:00');
+        for ($i=1; $i<=$actionNums; $i++){
+            $setData['type'] = $type;
             $setData['actionNo'] = $i;
-            $where = ['type'=>1, 'actionNo'=>$i];
+            $where = ['type'=>$type, 'actionNo'=>$i];
             //p(date('Y-m-d H:i:s', $dateTime), 0);
             if(!$DataTime = DataTime::findOne($where)){
                 $DataTime = new DataTime();
             }
             if($i==9) {
-                $dateTime = $dateTime + 4 * 60 * 60 + 20 * 60;
+                $dateTime = $dateTime + 4 * 60 * 60 + $typeArr[$type] * 60;
             }else{
-                $dateTime = $dateTime + 20 * 60;
+                $dateTime = $dateTime + $typeArr[$type] * 60;
             }
             //p($dateTime);
             $HIS = date('H:i:s', $dateTime);
@@ -427,7 +430,7 @@ class TzService extends BaseService {
             $DataTime->setAttributes($setData);
             $rst = $DataTime->save();
         }
-        return ['status'=>200, 'msg'=>'更新时时彩开奖', 'rst'=>$rst];
+        return ['status'=>200, 'msg'=>'更新时时彩开奖', 'rst'=>$rst, 'nums'=>$actionNums];
     }
 
 

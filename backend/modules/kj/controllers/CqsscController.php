@@ -50,4 +50,14 @@ class CqsscController extends Controller
         $data = CqsscSevenDay::getLottery99($type);
         return $data;
     }
+
+    /**
+     * @desc 希腊3分彩
+     * @return array
+     */
+    public function actionXlThree($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = CqsscKcw::getLotteryNoXlThree($type);
+        return $data;
+    }
 }

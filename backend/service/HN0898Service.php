@@ -1145,7 +1145,7 @@ class HN0898Service extends BaseTZService {
      * @param int $type
      * @return string
      */
-    public static function getQihao($type = 1){
+    public static function getQihao($type = 6){
         $db = Yii::$app->db;
         //$date = date('Y-m-d');
         $time = date("H:i:s");

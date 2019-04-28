@@ -218,6 +218,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = HN0898Service::getQihao(); p($rst);
+        $rst = TzService::insertSscDataTime(); p($rst);
         $rst = StaticService::allHzStaticProfitsPerdate();p($rst);# 循环计算每天每个和值利润统计
         $rst = StaticService::staticSdHzProfitsPerdate(); p($rst); # 每天每个和值利润统计
         $rst = NumService::getCodesArise(['38','78']);p($rst); //2+3+1+2+2
@@ -282,7 +284,6 @@ class IndexController extends Controller
         $qihao = HN0898Service::getQihao();
         $mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$qihao;
         $r = $m->set($mkey, 1, 10*60);
-        $rst = TzService::insertSscDataTime(); p($rst);
         //$rst = StaticService::staticSDProfits();p($rst); # 利润统计
         $rst = StaticService::staticProfits($playway = 3, 3600 * 3, 0);p($rst);
         $rst = StaticService::staticProfits($playway = 3, 3600 * 3, 0);p($rst);
