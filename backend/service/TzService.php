@@ -1,0 +1,445 @@
+<?php
+
+/**
+ * Created by PhpStorm.
+ * User: wangyegao
+ * Date: 2018/02/06
+ * Time: 09:40
+ */
+
+namespace backend\service;
+use backend\models\DataTime;
+use backend\models\SscKjData;
+use backend\models\SysPlansCodes;
+use backend\models\SystemConfig;
+use backend\models\TzSystemsAuth;
+use backend\models\UserCustomPlans;
+use common\tools\KjDataGet;
+use common\tools\Tool_Common;
+use backend\models\User;
+use backend\models\UserFollowData;
+use backend\models\TzSystems;
+use backend\models\UserSysPlans;
+use  yii;
+
+class TzService extends BaseService {
+
+
+    /**
+     * @decription Yii 控制器初始化方法
+     */
+    public static function _init(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $time = date("H:i");
+        if(\Yii::$app->params['ssc_kj_time_start'] < $time && $time < \Yii::$app->params['ssc_kj_time_start'] ){
+            $rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
+            return $rst;
+        }
+    }
+
+    /**
+     * @desc 1.1 投注：投注之前业务逻辑判断
+     * @param $qihao
+     * @param string $lottery_type
+     */
+    public static function beforeTz($lottery_type = 'ssc'){
+        $m = Yii::$app->cache;
+        $rst = ['status'=>200, 'msg'=>'可以投注~'];
+        $qihao = HN0898Service::getQihao();
+        switch ($lottery_type){
+            case 'ssc':
+                $mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$qihao;
+                $tzStatus = $m->get($mkey);
+
+                # 判断当期开奖数据处理是否完成，未完成则不能下一期的投注
+                if(!$tzStatus){
+                    $rst = ['status'=>300, 'msg'=>'投注开关未开启，有未处理完成的数据~','mkey'=>$mkey,'tzStatus'=>$tzStatus];
+                    Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/0898tzCron','INFO','0898投注记录', $rst);
+                }
+                break;
+            default:
+                break;
+        }
+        return $rst;
+    }
+    /**
+     * @desc 系统自动化投注方法，投注号码为表：lt_sys_plans_codes，正买status=1 、自主研发公式模拟投注
+     * @return array
+     */
+    public static function tz(){
+        # 4、期号 qihao
+        $qihao = HN0898Service::getQihao();
+
+        if($plans = UserSysPlans::find()->where(['uid'=>0,'status'=>1])->groupBy('playway,tz_type')->all()) {
+            // 1、投注前判断
+            $tzStatus = TzService::beforeTz();
+            if ($tzStatus['status'] != 200) {
+                return $tzStatus;
+            }
+            foreach ($plans as $plan){
+                # 0898体系投注号码，系统正买按照0898格式下单
+                $codes = BetService::getPlansAllCodesType1($plan->tz_type, 1, $plan->nums, $plan->sel_same, $plan->hz_Arr);
+                //$codes = $plan->code;
+
+                # 2、倍数
+                $single = $plan->single;
+
+                # 3、玩法 playway
+                $playway = $plan->playway;
+
+                //p([$playway, $codes, $single, $qihao]);
+                # 0898体系最终投注
+                $HN0898Service = new HN0898Service();
+                $rst = $HN0898Service->betting($playway, $codes, $single, $qihao);
+            }
+        }
+        $logArr = ['tzStatus'=>$tzStatus,'codes'=>$codes, 'postRst'=>$rst];
+        Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/bet','INFO','投注记录(系统正买)', $logArr);
+        TzService::afterTz($qihao);
+        return ['status'=>200, 'msg'=>'系统定制化模拟正买投注完成~'];
+    }
+
+    /**
+     * @desc 投注完成之后业务处理
+     */
+    public static function afterTz($qihao){
+        if(!$qihao) return false;
+        $m = \Yii::$app->cache;
+
+        $next_qihao = KjDataGet::getNextQihaoByQihao($qihao);
+        $next_mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$next_qihao;
+        $pkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$qihao;
+        $time = 20 * 60;
+        if(substr($next_qihao,6) == '001') $time = 40 * 60; # 四十分钟
+        if(substr($next_qihao,6) == '009') $time = 60 * 60 * 4; # 十小时
+        $m->set($next_mkey,0,$time); # 投注完成下一期的投注关闭
+        $m->set($pkey,0,$time); # 投注完成下一期的投注关闭
+        return true;
+    }
+
+    public static function beforeRunSysPlans($qihao){
+        $m = Yii::$app->cache;
+        $pkey = \Yii::$app->params['PLAN_SWITCH_KEY'].'_'.$qihao;
+        if($planStatus = $m->get($pkey)){
+            return ['status'=>300, 'pkey'=>$pkey, 'msg'=>'投注计划已经处理过了~'];
+        }
+
+        return ['status'=>200, 'msg'=>'系统计划可以处理'];
+    }
+    /**
+     * @desc 处理系统投注计划
+     * @return array|bool
+     */
+    public static function opSystemBetPlans(){
+        self::_init();
+        $rst = ['status'=>200, 'msg'=>'操作成功!'];
+
+        $qihao = KjDataGet::getEndQihao();
+        $statusRst = self::beforeRunSysPlans($qihao);
+        if($statusRst['status'] != 200){
+            return $statusRst;
+        }
+
+        # 1、处理系统投注计划号码
+        $rst['opSystemCodesService'] = OpSystemCodesService::sysPlansCodes($qihao);
+
+        for ($i=0;$i<2;$i++){
+            # 1、定位和值
+            $rst['heZhiStatics'] = SscDataService::heZhiStatics(); // 更新定位和值汇总表
+            $rst['updateHeZhiYL'] = SscDataService::updateHeZhiYL(); // 更新定位和值遗漏表
+
+            # 2、单双
+            $rst['updateDs'] = SscDataService::updateDsData(); // 每期开奖遗漏
+            $rst['updateDsYL'] = SscDataService::updateDsYL(); // 单双遗漏
+
+            # 3、三字现
+            $rst['update3NumData'] = SscDataService::update3NumData(); // 每期开奖遗漏
+            $rst['update3NumYL'] = SscDataService::update3NumYL();
+
+            # 4、四定和值遗漏
+            $rst['updateDsYL'] = SscDataService::updateSdHzYl(); // 单双遗漏
+
+            //$rst['tz'] = TzService::tz(); // 计划投注
+            //$rst['synUsersBalance'] = HN0898Service::synBalance(); // 同步用户的余额
+            sleep(1);
+        }
+
+        self::afterRunSysPlans($qihao); # 开关的开启或关闭
+
+        return $rst;
+    }
+
+    /**
+     * @desc 系统计划处理后，开关的开启或关闭
+     * @param $qihao
+     */
+    public static function afterRunSysPlans($qihao){
+        $m = Yii::$app->cache;
+        $next_qihao = KjDataGet::getNextQihaoByQihao($qihao);
+
+        # 处理完计划后,下一期投注开关开启(value:1) start
+        $next_mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$next_qihao;
+        $next_simulate_mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$next_qihao;
+
+        $next_time = \Yii::$app->params['TZ_LOCK_TIME'];
+        $rst11 = $m->set($next_mkey,1,$next_time); # 真实
+        $rst10 = $m->set($next_simulate_mkey,1,$next_time); # 模拟
+        # 处理完计划后,下一期投注开关开启(value:1) end
+
+        # 计划任务是否处理完成后锁住(value:1)，避免重复处理 start
+        $pkey = \Yii::$app->params['PLAN_SWITCH_KEY'].'_'.$qihao;
+        //$simulate_pkey = \Yii::$app->params['PLAN_SWITCH_SIMULATE_KEY'].'_'.$qihao;
+        $time = 1200;
+        if(substr($qihao,6) == '010') $time = 60*60*4; # 4小时
+        $rst21 = $m->set($pkey,1,$time);
+        //$rst20 = $m->set($simulate_pkey,1,$time);
+        # 计划任务是否处理完成后锁住(value:1)，避免重复处理 end
+
+        $logData = [['pkey'=>$pkey,'rst10'=>$rst10, 'rst11'=>$rst11], ['next_key'=>$next_mkey, 'rst20'=>$rst20, 'rst21'=>$rst21]];
+        Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/afterRunSysPlans','INFO','系统计划处理后', $logData);
+
+        return true;
+    }
+
+    /**
+     * @param $plans_id
+     */
+    public static function getCustomPlansTzStatus($plans_id){
+        $UserCustomPlan = UserCustomPlans::findOne($plans_id);
+        $status = $UserCustomPlan->status;
+        $codes = $UserCustomPlan->codes;
+        if($status){
+            $playway = $UserCustomPlan->playway;
+            $threshold_open = $UserCustomPlan->threshold_open; // 开启遗漏阈值
+            $threshold_close = $UserCustomPlan->threshold_close; // 关闭遗漏阈值
+            # 判断遗漏是否大于阈值，如果大于等于阈值，则开启投注
+            $m = \Yii::$app->cache;
+            switch ($playway){
+                # 计算出各种投注方式的当前遗漏
+                case 1: //  二字定
+                    break;
+                case 2:
+                case 3:
+                    $current_miss = BaseNumService::getCodesYL($codes, $playway);
+                    //if($threshold_open <= $current_miss && $current_miss <= $threshold_close){
+                    if(in_array($current_miss, [0,1,2,3,4,5,6,7])){
+                        $status = 1;
+                    }else{
+                        $status = 0;
+                    }
+                    break;
+                case 10:
+                    break;
+                default:
+                    $status = $UserCustomPlan->status;
+            }
+        }
+
+        return $status;
+    }
+
+
+    /**
+     * @desc 号码投注状态
+     * @param int $playway
+     * @param $codes
+     * @return int
+     */
+    public static function getSysTemPlansBetStatus($playway = 2, $codes){
+        switch ($playway){
+            # 计算出各种投注方式的当前遗漏
+            case 1: //  二字定
+                break;
+            case 2:
+            case 3:
+                $current_miss = BaseNumService::getCodesYL($codes, $playway);
+                //if($threshold_open <= $current_miss && $current_miss <= $threshold_close){
+                # system_config 配置：playway_yl_2_3
+                $system_config= SystemConfig::findOne(['key'=>'playway_yl_2_3'])->value;
+                $values = explode(',',$system_config);
+                if(in_array($current_miss, $values)){ # [0,1,2,3,4,5,6,7] ,频率最高：0,1,2
+                    $status = 1;
+                }else{
+                    $status = 0;
+                }
+                break;
+            case 10:
+                break;
+            default:
+                $status = 0;
+        }
+
+        return $status;
+    }
+
+    /**
+     * @description 某组合的一个或多个一定区间出现次数动态数值
+     * @param string $positions
+     * @param string $hezhis
+     * @param int $interval
+     * @return int
+     */
+    public static function getTimesByQishus($positions = '1,2|1,3|1,4|2,3|2,4|3,4', $hezhis='8,9', $interval = 20){
+        //p([$positions,$hezhis,$interval],0);
+        $positionsArr = explode('|',$positions);
+        $fields = ['id'];
+        foreach ($positionsArr as $position){
+            $fields[] = 'code_'.str_replace(',','_',$position);
+        }
+        $last = SscKjData::find()->select(['max(id) as last_id'])->asArray()->one();
+        $max_id = $last['last_id'] - $interval;
+        $hezhisArr = explode(',',$hezhis);
+        $times = 0;
+        foreach ($hezhisArr as $key=>$zhi){
+            $SscKjDatas = SscKjData::find()->select($fields)->where('id>'.$max_id)->orderBy('id DESC')->limit($interval)->asArray()->all();
+            //p($SscKjDatas,0);
+            foreach ($SscKjDatas as $sscKjData){
+                foreach ($fields as $k=>$field){
+                    if($field == 'id') continue;
+                    if($sscKjData[$field] == $zhi){
+                        $times += 1;
+                    }
+                }
+            }
+        }
+
+        return $times;
+    }
+
+    /**
+     * @description 获取投注状态
+     */
+    public static function getTzStatus(){
+
+    }
+
+    /**
+     * @description 定制化表预处理计划表数据
+     * @param $UserCustomPlanId
+     * @return array
+     */
+    public static function opPreUserFollowData($UserCustomPlanId){
+        $UserCustomPlan = UserCustomPlans::findOne($UserCustomPlanId);
+        $playway = $UserCustomPlan->playway;
+        $account = $UserCustomPlan->account;
+        $single = $UserCustomPlan->single;
+        $positions = $UserCustomPlan->positions;
+        $codes = $UserCustomPlan->codes;
+        $is_simulate = $UserCustomPlan->is_simulate;
+        $opData = [
+            'position' => $positions,
+            'playway' => $playway,
+            'account' => $account,
+            'single'=>$single,
+            'code' => $codes,
+            'is_simulate' => $is_simulate,
+            'plan_type' => 3,
+            'from_id'=>$UserCustomPlan->id,
+        ];
+        switch ($playway){
+            case 1:
+                $hezhis = $UserCustomPlan->hezhis;
+                $opData['codes_hezhi'] = $hezhis;
+                break;
+            case 2:
+                break;
+            default:;
+        }
+        return $opData;
+    }
+
+    /**
+     * @description 新添加计划是否存在
+     * @param $account
+     * @param string $positions
+     * @param string $hezhis
+     */
+    public static function customPlanIsExist($account, $positions = '2,3', $hezhis = '8,9'){
+        $where = ['account'=>$account,'positions'=>$positions, 'hezhis'=>$hezhis];
+        $UserCustomPlans = UserCustomPlans::findOne($where);
+        if($UserCustomPlans){
+            return true;
+        }
+        return false;
+    }
+
+    public static function filterTz($account = 'gaozi2017'){
+        $HN0898Service = new HN0898Service($account);
+        $data = [ 'code'=>$code, 'qihao'=>$qihao, 'playway'=>$playway, 'single'=>$single, 'is_simulate'=>$is_simulate,'order_type'=>$order_type,'position'=>$position ];
+        $rst = $HN0898Service->tz($data);
+    }
+
+    /**
+     * @desc 获取投注系统
+     * @return mixed
+     */
+    public static function getTzSites($admin_id = ''){
+        $where = ['status'=>1];
+        if($admin_id){
+            $tz_systems_ids = TzSystemsAuth::findOne(['uid'=>$admin_id])->tz_systems_ids;
+            $tz_systems_ids_Arr['id'] = explode(',', $tz_systems_ids);
+            $where = array_merge($where, $tz_systems_ids_Arr);
+        }
+        //p([$where,$uid]);
+        $sites = TzSystems::find()->where($where)->asArray()->all();
+        $tz_sites = [];
+        foreach ($sites as $key=>$site){
+            $tz_sites[$site['id']] = $site['name'];
+        }
+
+
+        return $tz_sites;
+    }
+
+    /**
+     * @desc 开启、关闭用户计划投注状态
+     */
+    public static function switchStatus(){
+
+    }
+
+
+    /**
+     * @desc 更新时时彩开奖时间
+     */
+    public static function insertSscDataTime(){
+        $actionNo = 59;
+        $setData = [];
+        $dateTime = strtotime('2019-02-15 00:10:00');
+        for ($i=1; $i<=$actionNo; $i++){
+            $setData['type'] = 1;
+            $setData['actionNo'] = $i;
+            $where = ['type'=>1, 'actionNo'=>$i];
+            //p(date('Y-m-d H:i:s', $dateTime), 0);
+            if(!$DataTime = DataTime::findOne($where)){
+                $DataTime = new DataTime();
+            }
+            if($i==9) {
+                $dateTime = $dateTime + 4 * 60 * 60 + 20 * 60;
+            }else{
+                $dateTime = $dateTime + 20 * 60;
+            }
+            //p($dateTime);
+            $HIS = date('H:i:s', $dateTime);
+            $setData['actionTime'] = $HIS;
+            $setData['stopTime'] = $HIS;
+            //p($i.'='.$HI, 0);
+            $DataTime->setAttributes($setData);
+            $rst = $DataTime->save();
+        }
+        return ['status'=>200, 'msg'=>'更新时时彩开奖', 'rst'=>$rst];
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+}

@@ -1,0 +1,1166 @@
+<?php
+
+/**
+ * Created by PhpStorm.
+ * User: wangyegao
+ * Date: 2018/02/06
+ * Time: 09:40
+ */
+
+namespace backend\service;
+use backend\models\BettingRecords;
+use backend\models\Num4Type;
+use backend\models\Ssc2numsVal;
+use backend\models\Ssc2numsYl;
+use backend\models\SscKjData;
+use backend\models\SscKjData3num;
+use backend\models\SscKjDataDs;
+use backend\models\Static3numArisePerdate;
+use backend\models\Static4dProfits;
+use backend\models\Static4dProfitsPerdate;
+use backend\models\StaticHzProfits;
+use backend\models\StaticHzProfitsPerdate;
+use backend\models\StaticPerHzPerdateProfits;
+use backend\models\StaticProfits;
+use yii\helpers\ArrayHelper;
+use  yii;
+
+class StaticService extends BaseService {
+
+    public static $typeArr = [
+        0 => ['1111', '1112', '1121', '1122', '1211', '1212', '1221', '1222', '2111', '2112', '2121', '2122', '2211', '2212', '2221', '2222' ],
+        1 => ['1112', '1121', '1211', '2111', '1222', '2122', '2212', '2221'],
+        2 => ['1122', '1212', '1221', '2112', '2121', '2211'],
+        3 => ['1111', '2222'],
+        4 => ['1222', '2122', '2212', '2221'],
+        5 => ['2111', '1211', '1121', '1112'],
+        6 => ['1222', '2122', '2212', '2221', '2222'],
+        7 => ['2111', '1211', '1121', '1112', '1111'],
+        8 => ['2222'],
+        9 => ['1111'],
+        10 => [1],
+        11 => [2],
+        12 => ['1222', '2122', '2212', '2221', '1111'],
+        13 => ['2111', '1211', '1121', '1112', '2222'],
+        14 => ['1222', '2122', '2212', '2221', '1111', '2222'],
+        15 => ['2111', '1211', '1121', '1112', '2222', '1111'],
+    ];
+
+    # 单双类型 ：tz_type
+    public static  $kArr = [0=>'所有', 1=>'一双三单、一单三双', 2=>'两双两单', 3=>'四双四单', 4=>'一单三双', 5=>'一双三单', 6=>'一单三双|四双', 7=>'一双三单|四单', 8=>'四双', 9=>'四单', 10=>'单数量', 11=>'双数量', 12=>'一单三双|四单', 13=>'一双三单|四双', 14=>'一单三双|四单|四双', 15=>'一双三单|四单|四双', 20=>'四定和值', 21=>'和值范围四定', 22=>'单双'];
+
+    # 和值类型
+    public static $typeHzArr = [
+        'hz_0_4' => [0, 1, 2, 3, 4],
+        'hz_5_10' => [5, 6, 7, 8, 9, 10],
+        'hz_11_15' => [11, 12, 13, 14, 15],
+        'hz_16_19' => [16, 17, 18, 19],
+        'hz_20_24' => [20, 21, 22, 23, 24],
+        'hz_25_29' => [25, 26, 27, 28, 29],
+        'hz_30_35' => [30, 31, 32, 33, 34, 35],
+    ];
+
+
+
+    /**
+     * @decription Yii 控制器初始化方法
+     */
+    public static function _init(){
+        set_time_limit(0);
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $time = date("H:i");
+        if(\Yii::$app->params['ssc_kj_time_start'] < $time && $time < \Yii::$app->params['ssc_kj_time_start'] ){
+            $rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
+            return $rst;
+        }
+    }
+
+    /**
+     * @desc 利润统计
+     */
+    public static function opStaticProfits(){
+        $m = \Yii::$app->cache;
+        $mkey = 'OP_STATIC_PROFITS_ID_19';
+        if(!$id = $m->get($mkey)) $id = 0;
+        $BettingRecords = BettingRecords::find()->where("id>$id")->orderBy(['id'=>SORT_ASC])->limit(50)->all();
+        foreach ($BettingRecords as $bettingRecord){
+            //sleep(2);
+            $upData = $where = ['uid'=>(int)$bettingRecord->uid, 'qihao'=>$bettingRecord->qihao, 'playway'=>$bettingRecord->playway];
+            if(!$StaticProfits = StaticProfits::findOne($where)){
+                $StaticProfits = new StaticProfits();
+                $upData['created_at'] = time();
+                $upData['updated_at'] = time();
+                $upData['tz_time'] = $bettingRecord['create_time'];
+                $upData['tz_money'] = $bettingRecord->betting_money; # 投注金额
+                $upData['profits'] = $bettingRecord->profits; # 利润
+                $upData['zj_bouns'] = $bettingRecord->bonus; # 中奖金额
+                //p($bettingRecord->attributes,0);
+
+                # 上一期记录
+                $where = ['uid'=>(int)$bettingRecord->uid, 'playway'=>$bettingRecord->playway];
+                $LastStaticProfits = StaticProfits::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+                //p([$where, $LastStaticProfits],0);
+
+                $upData['cut_profits'] = floatval($LastStaticProfits->cut_profits) + floatval($bettingRecord->profits); # 截止利润
+                $StaticProfits->setAttributes($upData);
+                //if($bettingRecord->profits){
+                $StaticProfits->save();
+                //}
+            }
+            $time = 10 * 60; # 10分钟
+            if(substr($bettingRecord->qihao,6) == '023') $time = 60*60*10; # 十小时
+            $m->set($mkey, $bettingRecord->id, $time);
+            //d($StaticProfits->getFirstErrors());
+
+        }
+
+        return ['status'=>200, 'msg'=>'处理成功opStaticProfits！'];
+    }
+
+    /**
+     * @desc 历史统计利润
+     * @param int $num
+     * @param int $type 0:全部 1:一单三双或一双三单 2:两双两单 3:四单\四双 4:一单三双 5:一双三单
+     * @return array|mixed
+     */
+    public static function staticProfits($playway, $num = 20, $fx = 0){
+        $num = $num + 1;
+        self::_init();
+        switch ($playway){
+            case 1: # 二字定
+                break;
+            case 2: # 三字定
+                break;
+            case 3: # 四字定
+                $profits = self::static4DProfits($num, $fx);
+                break;
+        }
+
+        return ['status'=>200, 'profits'=>$profits];
+    }
+
+    /**
+     * @desc 四定利润统计
+     */
+    public static function static4DProfits($num = 101, $fx = 0)
+    {
+        $m = \Yii::$app->cache;
+        $mkey = 'mkey_staticSDProfits';
+        if (!$staticId = $m->get($mkey)) {
+            $id = 1;
+        }
+        $where = ['>=', 'id', $id];
+        $SscKjDatas = SscKjData::find()->where($where)->limit($num)->all();
+        $allCost = 0.00; # 成本
+        $allZjBouns = 0.00; # 中奖金额
+        $allProfits = 0.00; # 利润
+        $zjCount = 0;
+        foreach ($SscKjDatas as $codeKey => $SscKjData) {
+            if ($codeKey == ($num - 1)) break;
+            //$kjData = $SscKjData->code_str;
+            $kjData = $SscKjData->kj_code;
+            if ($fx == 0) {
+                $resultCodes = self::getDiffCodes($kjData);
+            } else {
+                $resultCodes = self::getSameCodes($kjData, 1);
+            }
+            $kjCodes = substr($SscKjDatas[$codeKey + 1]['code_str'], 0, 7);
+            $rst = OpKjService::opKjData4($resultCodes, $kjCodes);
+            //p([$kjData, $resultCodes, $kjCodes, $rst],0); //p($rst);
+
+            $cost = 9 * 62.5;
+            $zjBouns = 999.5 * $rst['data']['zjTimes'];
+            if ($zjBouns > 0) $zjCount = $zjCount + 1;
+            $profits = $zjBouns - $cost;
+
+            $allCost += $cost;
+            $allZjBouns += $zjBouns;
+            $allProfits += $profits;
+        }
+        p(['staticQihao'=>$SscKjData->qihao, 'zjCount'=>$zjCount, 'allCost'=>$allCost, 'allZjBouns'=>$allZjBouns, 'allProfits'=>$allProfits]);
+    }
+
+    /**
+     * @desc 计算指定日期的四定单双利润 - 以月份为维度
+     * @param string $date
+     * @param int $num
+     * @param int $type
+     * @return array|mixed
+     */
+    public static function staticSDProfits($month = '2018-11', $type = 0){
+        $m = \Yii::$app->cache;
+        $mkey = 'MONTH_STATIC_DATA_'.$month;
+        $typeArr = self::$typeArr;
+        if($month != date('Y-m') && $allStatic = $m->get($mkey)){
+            return $allStatic;
+        }
+        $where = ['AND',['>=', 'date', $month.'-01'], ['<=', 'date', $month.'-31']];
+        $static = [ 0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0, 6=>0, 7=>0, 8=>0, 9=>0, 10=>0, 11=>0]; # 统计每种组合出现次数
+        //$SscKjDatas = SscKjData::find()->where($where)->limit($num)->all();
+        $SscKjDataDs = SscKjDataDs::find()->where($where)->orderBy(['id'=>SORT_DESC])->all();
+        $num = count($SscKjDataDs);
+        //p($SscKjDataDs);
+        foreach ($SscKjDataDs as $SscKjData){
+            $ds = $SscKjData->code_1_2_3_4; # 四定单双值
+            $oneCodes = [$SscKjData->code_1, $SscKjData->code_2, $SscKjData->code_3, $SscKjData->code_4];
+            foreach ($typeArr as $key=>$types){
+                if(in_array($ds, $types)){
+                    $static[$key] = $static[$key] + 1;# 统计每种组合出现次数
+                }
+                foreach ($oneCodes as $code){
+                    in_array($code, $types) && $static[$key] = $static[$key] + 1;# 统计每种组合出现次数
+                }
+            }
+        }
+        //p([$static, count($SscKjDataDs)]);
+
+        if($type && $static[$type]) return $static[$type];
+        $allStatic = [];
+        foreach ($typeArr as $k=>$arr){
+            $profits = $static[$k] * 999.5 - $num * count($arr) * 62.5;
+            if(in_array($arr, [[1], [2]])) $profits = $static[$k] * 0.95 - $num * 0.1 * 4;
+            $allStatic[$k] = [
+                'name' => StaticService::$kArr[$k],
+                'zjZhus' => $static[$k],
+                'qs' => $num,
+                'count' => count($arr),
+                //'code' => $arr,
+                'profits' => $profits
+            ];
+        }
+        if($month != date('Y-m')){
+            $m->set($mkey, $allStatic, 6*30*24*60*60);
+        }
+
+        //echo $date.'月份：';
+        return $allStatic;
+    }
+
+    /**
+     * @desc 计算指定日期的四定和值利润 - 以月份为维度
+     * @param string $date
+     * @param int $num
+     * @param int $type
+     * @return array|mixed
+     */
+    public static function staticSdHzProfits($month = '2018-11', $type = 0){
+        $m = \Yii::$app->cache;
+        $mkey = 'MONTH_STATIC_DATA_01_'.$month;
+        $typeArr = self::$typeHzArr;
+        if($month != date('Y-m') && $allStatic = $m->get($mkey)){
+            return $allStatic;
+        }
+        $where = ['LEFT(date, 7)'=>$month];
+        $allCounts = SscKjData::find()->select(['month'=>'LEFT(date, 7)', 'nums'=>'COUNT(id)'])->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->count();
+        //p($SscKjData);
+        /*
+        $num = count($SscKjDatas);
+        //p($SscKjDataDs);
+        foreach ($SscKjDatas as $SscKjData){
+            $ds = $SscKjData->code_1_2_3_4; # 四定单双值
+            $oneCodes = [$SscKjData->code_1, $SscKjData->code_2, $SscKjData->code_3, $SscKjData->code_4];
+            foreach ($typeArr as $key=>$types){
+                if(in_array($ds, $types)){
+                    $static[$key] = $static[$key] + 1;# 统计每种组合出现次数
+                }
+                foreach ($oneCodes as $code){
+                    in_array($code, $types) && $static[$key] = $static[$key] + 1;# 统计每种组合出现次数
+                }
+            }
+        }
+        */
+        //p([$static, count($SscKjDataDs)]);
+
+        $allStatic = [];
+        foreach ($typeArr as $k=>$hzArr){
+
+            $where = ['LEFT(date, 7)'=>$month, 'codes_4nums_hz'=> $hzArr];
+            $zJcounts = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->count(); # 中奖次数
+            $where = ['codes_hz'=>$hzArr];
+            $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count(); # 期数
+
+            $profits = $zJcounts * 995 - $allCounts * $NumCounts * 0.1;
+            //p([$zJcounts, $allCounts, $NumCounts, $profits]);
+
+            $allStatic[$k] = [
+                'month' => $month,
+                'name' => $k,
+                'zjZhus' => $zJcounts,
+                'qs' => $allCounts,
+                'count' => $NumCounts,
+                'profits' => $profits,
+            ];
+        }
+        if($month != date('Y-m')){
+            $m->set($mkey, $allStatic, 6*30*24*60*60);
+        }
+
+        //echo $date.'月份：';
+        return $allStatic;
+    }
+
+        /**
+     * @desc 计算指定日期的四定单双利润 - 以每天日期为单位
+     * @param string $date
+     * @param int $num
+     * @param int $type
+     * @return array|mixed
+     */
+    public static function staticSDPerDateProfits($date = '2018-08-05', $type = 0){
+        $m = \Yii::$app->cache;
+        $mkey = 'DATE_STATIC_DATA_'.$date;
+        $typeArr = self::$typeArr;
+        $where = ['date' => $date];
+        $static = [ 0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0, 6=>0, 7=>0, 8=>0, 9=>0, 10=>0, 10=>0]; # 统计每种组合出现次数
+        //$SscKjDatas = SscKjData::find()->where($where)->limit($num)->all();
+        $SscKjDataDs = SscKjDataDs::find()->where($where)->orderBy(['id'=>SORT_ASC])->all();
+        $num = count($SscKjDataDs);
+        foreach ($SscKjDataDs as $SscKjData){
+            $ds = $SscKjData->code_1_2_3_4; # 四定单双值
+            $oneCodes = [$SscKjData->code_1, $SscKjData->code_2, $SscKjData->code_3, $SscKjData->code_4];
+            foreach ($typeArr as $key=>$types){
+                if(in_array($ds, $types)){
+                    $static[$key] = $static[$key] + 1;# 统计每种组合出现次数
+                }
+                foreach ($oneCodes as $code){
+                    in_array($code, $types) && $static[$key] = $static[$key] + 1;# 统计每种组合出现次数
+                }
+            }
+        }
+        //p([$static, count($SscKjDataDs)]);
+
+        if($type && $static[$type]) return $static[$type];
+        $allStatic = [];
+        foreach ($typeArr as $k=>$arr){
+            $profits = $static[$k] * 999.5 - $num * count($arr) * 62.5;
+            if(in_array($arr, [[1], [2]])) $profits = $static[$k] * 0.95 - $num * 0.1 * 4;
+            $allStatic[$k] = [
+                'name' => StaticService::$kArr[$k],
+                'zjZhus' => $static[$k],
+                'qs' => $num,
+                'count' => count($arr),
+                //'code' => $arr,
+                'profits' => $profits
+            ];
+        }
+        if($date != date('Y-m-d')){
+            $m->set($mkey, $allStatic, 6*30*24*60*60);
+        }
+
+        //echo $date.'月份：';
+        return $allStatic;
+    }
+
+    /**
+     * @desc 计算指定日期的四定和值利润 - 以每天日期为单位
+     * @param string $date
+     * @param int $num
+     * @param int $type
+     * @return array|mixed
+     */
+    public static function staticHzPerDateProfits($date = '2018-08-05'){
+        $m = \Yii::$app->cache;
+        $mkey = 'DATE_STATIC_HZ_DATA_'.$date;
+        $typeArr = self::$typeHzArr;
+
+        if($allStatic = $m->get($mkey)) return $allStatic;
+
+        $allCounts = SscKjData::find()->where(['date'=>$date])->orderBy(['id'=>SORT_ASC])->count();
+        $allStatic = [];
+        foreach ($typeArr as $k=>$hzArr){
+            $where = ['date' => $date, 'codes_4nums_hz'=> $hzArr];
+            $zJcounts = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->count(); # 中奖次数
+            $where = ['codes_hz'=>$hzArr];
+            $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count();
+
+            $profits = $zJcounts * 999.5 - $allCounts * $NumCounts * 0.1;
+            //p([$zJcounts, $NumCounts, $profits]);
+            $allStatic[$k] = [
+                'date' => $date,
+                'name' => $k,
+                'zjZhus' => $zJcounts,
+                'qs' => $allCounts,
+                'count' => count($hzArr),
+                //'code' => $arr,
+                'profits' => $profits
+            ];
+        }
+        //p($allStatic);
+        if($date != date('Y-m-d')){
+            $m->set($mkey, $allStatic, 6*30*24*60*60);
+        }
+
+        return $allStatic;
+    }
+
+    /**
+     * @desc 每个和值出现每天利润统计 add at 2019-04-27
+     * @return array
+     */
+    public static function staticSdHzProfitsPerdate($date = '2019-02-11'){
+        $hzArr = [];
+        for ($i=1; $i<=36; $i++){
+            $hzArr[$i] = 0;
+        }
+
+        $m = \Yii::$app->cache;
+        $mkey = 'PERDATE_STATIC_HZ_DATA_'.$date;
+
+        if($allStatic = $m->get($mkey)) return $allStatic;
+
+        //$allCounts = SscKjData::find()->where(['date'=>$date])->orderBy(['id'=>SORT_ASC])->count();
+        $SscKjDatas = SscKjData::find()->where(['date'=>$date])->orderBy(['id'=>SORT_ASC])->all(); # 中奖次数
+        $allQishus = count($SscKjDatas);
+        $allStatic = [];
+        foreach ($SscKjDatas as $SscKjData){
+            if(!isset($allStatic[$SscKjData->codes_4nums_hz]) OR !$allStatic[$SscKjData->codes_4nums_hz]){
+                //$hzArr[$SscKjData->codes_4nums_hz] = 0;
+            }
+            $hzArr[$SscKjData->codes_4nums_hz]++;
+        }
+        //p($hzArr);
+        foreach ($hzArr as $hz=>$zjCounts){
+            $where = ['codes_hz'=>$hz];
+            $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count(); # 该和值号码组数
+
+            $tzMoney = $allQishus * $NumCounts * 0.1; # 投注本金
+            $profits = $zjCounts * 999.5 - $tzMoney; # 利润/天
+            //p([$zJcounts, $NumCounts, $profits]);
+            $allStatic[$hz] = [
+                'date' => $date,
+                'name' => $hz,
+                'zjZhus' => $zjCounts,
+                'qs' => $allQishus,
+                'count' => $NumCounts,
+                'tzMoney' => $tzMoney,
+                //'code' => $arr,
+                'profits' => $profits
+            ];
+        }
+        //p($allStatic);
+        if($date != date('Y-m-d')){
+            $m->set($mkey, $allStatic, 6*30*24*60*60);
+        }
+
+        return $allStatic;
+    }
+
+    /**
+     * @desc 所有月份4定利润统计
+     * @return array
+     */
+    public static function allMonthStaticProfits(){
+        $months = [];
+        for ($i=3; $i>=0; $i--){
+            $months[] = date('Y-m', strtotime('-'.$i.' months'));
+        }
+        $allStatic = [];
+        foreach ($months as $month){
+            $statics = self::staticSDProfits($month);
+            foreach ($statics as $k=>$staticData){
+                $kArr = self::$kArr;
+                $kName = $kArr[$k];
+                $allStatic[$kName][$month] = $staticData['profits'];
+                if(in_array($k, [10, 11])){
+                    $allStatic[$kName][$month] = $staticData['zjZhus'];
+                }
+            }
+        }
+
+        return $allStatic;
+    }
+
+    /**
+     * @desc 所有月份4定和值利润统计
+     * @return array
+     */
+    public static function allMonthSdHzStaticProfits(){
+        $months = [];
+        for ($i=3; $i>=0; $i--){
+            $months[] = date('Y-m', strtotime('-'.$i.' months'));
+        }
+        $allStatic = [];
+        foreach ($months as $month){
+            $statics = self::staticSdHzProfits($month);
+            foreach ($statics as $k=>$staticData){
+                $allStatic[$k][$month] = $staticData['profits'];
+            }
+        }
+
+        return $allStatic;
+    }
+
+    /**
+     * @desc 获取有一组相同的组合号码
+     * @param array $codesArr1
+     * @param array $codesArr2
+     * @return string
+     */
+    public static function getSameCodes($kjData = '1234', $self = 0){
+        $codes1 = '';
+        $codes2 = '';
+        $first2 = [$kjData[0], $kjData[1]];
+        $after2 = [$kjData[2], $kjData[3]];
+
+        $f2OtherCodes = self::getOtherCodes($after2);
+        foreach ($f2OtherCodes as $code){
+            $tmpCodes1 = '';
+            $tmpCodes1 .= ($first2[0] % 2 == 0) ? '02468' : '13579';
+            $tmpCodes1 .= ($first2[1] % 2 == 0) ? ',02468' : ',13579';
+
+            $codes1 .= $tmpCodes1.','.$code.'@';
+        }
+        $codes1 = trim($codes1, '@');
+
+        //p($f2OtherCodes);
+        $a2OtherCodes = self::getOtherCodes($first2);
+        foreach ($a2OtherCodes as $code){
+            $tmpCodes2 = '';
+            $tmpCodes2 .= ($after2[0] % 2 == 0) ? '02468' : '13579';
+            $tmpCodes2 .= ($after2[1] % 2 == 0) ? ',02468' : ',13579';
+
+            $codes2 .= $code.','.$tmpCodes2.'@';
+        }
+        $codes2 = trim($codes2, '@');
+
+        return $codes1.'@'.$codes2;
+    }
+
+    /**
+     * @desc 获取前两位或者后两位不一样的四定组合
+     * @param string $kjData
+     * @return string
+     */
+    public static function getDiffCodes($kjData = '1234'){
+
+        $first2 = [$kjData[0], $kjData[1]];
+        $f2Codes = self::getOtherCodes($first2);
+        $after2 = [$kjData[2], $kjData[3]];
+        $a2Codes = self::getOtherCodes($after2);
+        //p([$f2Codes, $a2Codes]);
+        $resultCodes = '';
+        foreach ($f2Codes as $f2){
+            foreach ($a2Codes as $a2){
+                $resultCodes .= $f2.','.$a2.'@';
+            }
+        }
+        $resultCodes = trim($resultCodes,'@');
+
+        return $resultCodes;
+    }
+
+
+    /**
+     * @desc 获取给定的值其它单双组合, 默认取与前两位或者后两位的相反的号码组合
+     * @param array $codesArr
+     * @param integer $fx
+     */
+    public static function getOtherCodes($codesArr = [3,6], $fx = 0){
+        if(empty($codesArr)) return false;
+        $tmp = [];
+        $ds_Arr = [[1,1], [1,2], [2,1], [2,2]];
+        foreach ($codesArr as $code){
+            $tmp[] = $code % 2 == 0 ? 2 : 1;
+        }
+
+        foreach ($ds_Arr as $key=>$Arr) {
+            if($Arr == $tmp) unset($ds_Arr[$key]);
+        }
+        $codes = [];
+        foreach ($ds_Arr as $ds){
+            $c1 = ($ds[0] == 1) ? '13579' : '02468';
+            $c2 = ($ds[1] == 1) ? '13579' : '02468';
+            $codes[] = $c1.','.$c2;
+        }
+
+        //p([$codesArr, $ds_Arr, $codes]);
+        return $codes;
+    }
+
+    /**
+     * @desc 记录每天的四定统计 - 写表
+     * @return array
+     */
+    public static function static4dPerDateProfits(){
+        $rst = ['status'=>200, 'msg'=>'处理成功'];
+        $allStaticProfits = self::allDateStaticProfits();
+        $tmpProfits = [];
+        foreach ($allStaticProfits as $key=>$allStaticProfit){
+            $tmpProfits[] = $allStaticProfit;
+        }
+
+        foreach ($tmpProfits as $tmpProfit){
+            foreach ($tmpProfit as $date=>$tmp){
+                if($date != date('Y-m-d')) continue;
+                if($date <= '2019-02-10') continue;
+                $setData = [];
+                if(!$Static4dProfits = Static4dProfitsPerdate::findOne(['date'=>$date])){
+                    $Static4dProfits = new Static4dProfitsPerdate();
+                    $setData['created_at'] = time();
+                }
+                $setData['updated_at'] = time();
+                $setData['date'] = $date;
+                $setData['codes_4d_all'] = $tmpProfits[0][$date]; # 所有号码
+                $setData['codes_13_31'] = $tmpProfits[1][$date]; # 一双三单||一单三双
+                $setData['codes_22_22'] = $tmpProfits[2][$date]; # 两双两单
+                $setData['codes_1111_2222'] = $tmpProfits[3][$date]; # 四双四单
+                $setData['codes_13'] = $tmpProfits[4][$date]; # 一单三双
+                $setData['codes_31'] = $tmpProfits[5][$date]; # 一双三单
+                $setData['codes_13_2222'] = $tmpProfits[6][$date]; # 一单三双||四双
+                $setData['codes_31_1111'] = $tmpProfits[7][$date]; # 一双三单||四单
+                $setData['codes_2222'] = $tmpProfits[8][$date]; # 四双
+                $setData['codes_1111'] = $tmpProfits[9][$date]; # 四单
+                $setData['codes_13_1111'] = $tmpProfits[12][$date]; # 一单三双||四单
+                $setData['codes_31_2222'] = $tmpProfits[13][$date]; # 一双三单||四双
+                $setData['codes_13_1111_2222'] = $tmpProfits[14][$date]; # 一单三双||四单
+                $setData['codes_31_2222_1111'] = $tmpProfits[15][$date]; # 一双三单||四双
+                $setData['codes_1_nums'] = $tmpProfits[10][$date]; # 单数量
+                $setData['codes_2_nums'] = $tmpProfits[11][$date]; # 双数量
+                $Static4dProfits->setAttributes($setData);
+
+                $rst = $Static4dProfits->save();
+            }
+        }
+
+        return ['status'=>200, 'data'=>$setData, 'rst'=>$rst];
+    }
+
+    /**
+     * @desc 记录每天四定和值利润统计 - 写表
+     * @return array
+     */
+    public static function staticSDHzPerDateProfits(){
+        $rst = ['status'=>200, 'msg'=>'处理成功'];
+        $allStaticProfits = self::allDateHzStaticProfits();
+
+        $tmpProfits = $allStaticProfits;
+
+        foreach ($tmpProfits as $key=>$tmpProfit){
+            foreach ($tmpProfit as $k=>$tmp){
+                $date = $k;
+                if($date != date('Y-m-d')) continue;
+                if($date <= '2019-02-10') continue;
+                $setData = [];
+                if(!$Static4dProfits = StaticHzProfitsPerdate::findOne(['date'=>$date])){
+                    $Static4dProfits = new StaticHzProfitsPerdate();
+                    $setData['created_at'] = time();
+                }
+                $setData['updated_at'] = time();
+                $setData['date'] = $date;
+                $setData['hz_0_4'] = $tmpProfits['hz_0_4'][$date]; # 0-4 和值
+                $setData['hz_5_10'] = $tmpProfits['hz_5_10'][$date]; # 5-10 和值
+                $setData['hz_11_15'] = $tmpProfits['hz_11_15'][$date]; # 11 - 15
+                $setData['hz_16_19'] = $tmpProfits['hz_16_19'][$date]; # 16 - 19
+                $setData['hz_20_24'] = $tmpProfits['hz_20_24'][$date]; # 20 - 24
+                $setData['hz_25_29'] = $tmpProfits['hz_25_29'][$date]; # 25 - 29
+                $setData['hz_30_35'] = $tmpProfits['hz_30_35'][$date]; # 30 - 35
+                $Static4dProfits->setAttributes($setData);
+
+                $rst = $Static4dProfits->save();
+            }
+
+        }
+
+        return ['status'=>200, 'data'=>$setData, 'rst'=>$rst];
+    }
+
+    /**
+     * @desc 所有月份4定利润统计
+     * @return array
+     */
+    public static function allDateStaticProfits(){
+        $m = \Yii::$app->cache;
+        $mkey = 'allDateStaticProfits_PERDATE_19';
+
+        $allStatic = [];
+        for($s=0; $s<5; $s++){
+            if(!$time = $m->get($mkey)) {
+                $time = strtotime('2019-02-11');
+            }else{
+                $time = $time + 24 * 3600;
+            }
+
+            $date = date('Y-m-d', $time);
+            $date = min([date('Y-m-d'), $date]);
+            if($date>date('Y-m-d')) break;
+            if($statics = self::staticSDPerDateProfits($date)){
+                foreach ($statics as $k=>$staticData){
+                    $kArr = self::$kArr;
+                    $kName = $kArr[$k];
+                    $allStatic[$kName][$date] = $staticData['profits'];
+                    if(in_array($k, [10, 11])){
+                        $allStatic[$kName][$date] = $staticData['zjZhus'];
+                    }
+                }
+            }
+            $m->set($mkey, $time, 7*24*3600);
+        }
+
+        return $allStatic;
+    }
+
+    /**
+     * @desc 所有月份4定利润统计
+     * @return array
+     */
+    public static function allDateHzStaticProfits(){
+        $m = \Yii::$app->cache;
+        $mkey = 'allDateHzStaticProfits_PERDATE_08';
+
+        $allStatic = [];
+        for($s=0; $s<5; $s++){
+            if(!$time = $m->get($mkey)) {
+                $time = strtotime('2019-02-11');
+            }else{
+                $time = $time + 24 * 3600;
+            }
+
+            $date = date('Y-m-d', $time);
+            $date = min([date('Y-m-d'), $date]);
+            if($date>date('Y-m-d')) break;
+            if($statics = self::staticHzPerDateProfits($date)){
+                foreach ($statics as $k=>$staticData){
+                    $allStatic[$k][$date] = $staticData['profits'];
+                }
+            }
+            if($date != date('Y-m-d')){
+                $m->set($mkey, $time, 7*24*3600);
+            }
+        }
+
+        return $allStatic;
+    }
+
+    /**
+     * @desc 记录每个月的四定统计 - 写表
+     * @return array
+     */
+    public static function static4dMonthsProfits(){
+        $rst = ['status'=>200, 'msg'=>'处理成功'];
+        $allMonthStaticProfits = self::allMonthStaticProfits();
+        $tmpProfits = [];
+        foreach ($allMonthStaticProfits as $key=>$allMonthStaticProfit){
+            $tmpProfits[] = $allMonthStaticProfit;
+        }
+
+        foreach ($tmpProfits as $tmpProfit){
+            foreach ($tmpProfit as $month=>$tmp){
+                if($month != date('Y-m')) continue;
+                $setData = [];
+                if(!$Static4dProfits = Static4dProfits::findOne(['month'=>$month])){
+                    $Static4dProfits = new Static4dProfits();
+                    $setData['created_at'] = time();
+                }
+                $setData['updated_at'] = time();
+                $setData['month'] = $month;
+                $setData['codes_4d_all'] = $tmpProfits[0][$month]; # 所有号码
+                $setData['codes_13_31'] = $tmpProfits[1][$month]; # 一双三单||一单三双
+                $setData['codes_22_22'] = $tmpProfits[2][$month]; # 两双两单
+                $setData['codes_1111_2222'] = $tmpProfits[3][$month]; # 四双四单
+                $setData['codes_13'] = $tmpProfits[4][$month]; # 一单三双
+                $setData['codes_31'] = $tmpProfits[5][$month]; # 一双三单
+                $setData['codes_13_2222'] = $tmpProfits[6][$month]; # 一单三双||四双
+                $setData['codes_31_1111'] = $tmpProfits[7][$month]; # 一双三单||四单
+                $setData['codes_13_1111'] = $tmpProfits[12][$month]; # 一单三双||四单
+                $setData['codes_31_2222'] = $tmpProfits[13][$month]; # 一双三单||四双
+                $setData['codes_13_1111_2222'] = $tmpProfits[14][$month]; # 一单三双||四单||四双
+                $setData['codes_31_2222_1111'] = $tmpProfits[15][$month]; # 一双三单||四双||四单
+                $setData['codes_2222'] = $tmpProfits[8][$month]; # 四双
+                $setData['codes_1111'] = $tmpProfits[9][$month]; # 四单
+                $setData['codes_1_nums'] = $tmpProfits[10][$month]; # 单数量
+                $setData['codes_2_nums'] = $tmpProfits[11][$month]; # 双数量
+                $Static4dProfits->setAttributes($setData);
+
+                $rst = $Static4dProfits->save();
+            }
+
+        }
+
+        return ['status'=>200, 'data'=>$setData, 'rst'=>$rst];
+    }
+
+   /**
+    * @desc 记录每个月的四定和值统计 - 写表
+    * @return array
+    */
+   public static function staticHzMonthsProfits(){
+       $rst = ['status'=>200, 'msg'=>'处理成功'];
+       $allMonthStaticProfits = self::allMonthSdHzStaticProfits();
+
+       $tmpProfits = $allMonthStaticProfits;
+
+       foreach ($tmpProfits as $tmpProfit){
+           foreach ($tmpProfit as $month=>$tmp){
+               if($month != date('Y-m')) continue;
+               $setData = [];
+               if(!$StaticHzProfits = StaticHzProfits::findOne(['month'=>$month])){
+                   $StaticHzProfits = new StaticHzProfits();
+                   $setData['created_at'] = time();
+               }
+               $setData['updated_at'] = time();
+               $setData['month'] = $month;
+               $setData['hz_0_4'] = $tmpProfits['hz_0_4'][$month]; # 0-4 和值
+               $setData['hz_5_10'] = $tmpProfits['hz_5_10'][$month]; # 5-10 和值
+               $setData['hz_11_15'] = $tmpProfits['hz_11_15'][$month]; # 11 - 15
+               $setData['hz_16_19'] = $tmpProfits['hz_16_19'][$month]; # 16 - 19
+               $setData['hz_20_24'] = $tmpProfits['hz_20_24'][$month]; # 20 - 24
+               $setData['hz_25_29'] = $tmpProfits['hz_25_29'][$month]; # 25 - 29
+               $setData['hz_30_35'] = $tmpProfits['hz_30_35'][$month]; # 30 - 35
+
+               $StaticHzProfits->setAttributes($setData);
+
+               $rst = $StaticHzProfits->save();
+           }
+
+       }
+
+        return ['status'=>200, 'data'=>$setData, 'rst'=>$rst];
+    }
+
+
+    /**
+     * @desc 记录上次四定单双值， 主要针对当前四定组合排除最近一期的号码
+     */
+    public static function static4DdsLastTime(){
+        $SscKjDataDs = SscKjDataDs::find()->orderBy(['id'=>SORT_DESC])->limit(90)->asArray()->all();
+        $SscKjDataDs = array_reverse($SscKjDataDs);
+        $m = \Yii::$app->cache;
+        foreach ($SscKjDataDs as $key=>$dsData){
+            if(in_array($key, [0, 10, 11])) continue;
+            foreach (self::$typeArr as $k=>$Arr){
+                if(in_array($dsData['code_1_2_3_4'], $Arr)){
+                    $mkey = 'SD_LAST_TIME_RECORD_'.$k;
+                    $m->set($mkey, $dsData['code_1_2_3_4'], 4*60*60);
+                }
+            }
+        }
+        //p($SscKjDataDs);
+        $LastTime = [];
+        foreach (self::$typeArr as $k=>$Arr){
+            if(in_array($k, [0, 8, 9, 10, 11])) continue;
+            $mkey = 'SD_LAST_TIME_RECORD_'.$k;
+            $LastTime[$k] = $m->get($mkey);
+        }
+
+        return ['status'=>200, 'data'=>$LastTime];
+    }
+
+
+    /**
+     * @desc 统计4定和值排查利润:按照类型排查和值利润
+     */
+    public static function static4DHzProfits($start_date = '2019-03-01', $end_date = '2019-03-29', $nums = 5){
+
+        $profits = [];
+        $dateArr = self::getStartAndEndDate($start_date, $end_date);
+
+        $codesArr = NumService::get2bCodeArr();
+        $countsNum = count($codesArr);
+
+        //echo '<pre>';
+        foreach ($dateArr as $date){
+            $profits[$date] = 0;
+            //$SscKjDatas = SscKjData::find()->select(['qihao','codes_4nums_hz', 'LEFT(code_str, 7) AS code'])->where(['=','date',$date])->asArray()->all();
+            $SscKjDatas = self::getMcCode($date);
+            //p($SscKjDatas);
+            $counts = 0;
+            foreach ($SscKjDatas as $key=>$data){
+                //if($data['qihao'] == '190301023') p([$data,$codesArr]);
+                //if(in_array($data['codes_4nums_hz'], $rst)){ # 判断和值不准确
+                if(in_array($data['code'], $codesArr)){ # 判断号码准确
+                    $profits[$date] += 995;
+                }else{
+                    $profits[$date] = $profits[$date] - $countsNum * 0.1;
+                }
+                $counts += $countsNum;
+                p(['nums'=>$nums, 'rst'=>$codesArr, 'qihao'=>$data['qihao'], 'counts'=>$countsNum, 'data'=>$data, 'profits'=>$profits[$date]],0);
+            }
+            //p($counts);
+            //$profits[$date] = $profits[$date] - $counts * 0.1;
+        }
+        //p($profits);
+
+        return $profits;
+    }
+
+    /**
+     * @desc 每天每个和值利润统计 add at 2019-04-27
+     * @return array
+     */
+    public static function allHzStaticProfitsPerdate(){
+        $m = \Yii::$app->cache;
+        $mkey = 'allHzStaticProfitsPerdate_01';
+
+        $allStatic = [];
+        for($s=0; $s<5; $s++){
+            if(!$time = $m->get($mkey)) {
+                $time = strtotime('2019-02-11');
+            }else{
+                $time = $time + 24 * 3600;
+            }
+
+            $date = date('Y-m-d', $time);
+            $date = min([date('Y-m-d'), $date]);
+            if($date>date('Y-m-d')) break;
+            if($statics = self::staticSdHzProfitsPerdate($date)){
+                //p(['statics'=>$statics]);
+                $setData = ['date'=>$date];
+                foreach ($statics as $k=>$staticData) {
+                    //$tzMoney = $staticData['tzMoney'];
+                    $setData['codes_' . $staticData['name']] = $staticData['profits'];
+                }
+                if(!$StaticPerHzPerdateProfits = StaticPerHzPerdateProfits::findOne(['date'=>$date])){
+                    $StaticPerHzPerdateProfits = new StaticPerHzPerdateProfits();
+                    $setData['created_at'] = time();
+                }
+                $setData['updated_at'] = time();
+                $StaticPerHzPerdateProfits->setAttributes($setData);
+
+                $rst = $StaticPerHzPerdateProfits->save();
+                //p($StaticPerHzPerdateProfits->getFirstErrors());
+            }
+            $m->set($mkey, $time, 7*24*3600);
+        }
+
+        return $allStatic;
+    }
+
+
+    /**
+     * @desc 获取开奖号码缓存数据
+     * @param $date
+     * @return array|SscKjData[]|bool
+     */
+    public static function getMcCode($date){
+        $m = \Yii::$app->cache;
+        $mkey = 'MC_KJ_CODE_'.$date;
+        if($SscKjDatas = $m->get($mkey) && $date >= date('Y-m-d')) return $SscKjDatas;
+
+        $SscKjDatas = SscKjData::find()->select(['qihao','codes_4nums_hz', 'LEFT(code_str, 7) AS code'])->where(['=','date',$date])->asArray()->all();
+
+        $m->set($mkey, $SscKjDatas, 7*24*60*60);
+
+
+        return $SscKjDatas;
+    }
+
+
+    /**
+     * @desc 给定开始和结束日期，返回区间日期
+     * @param string $start_date
+     * @param string $end_date
+     * @return array
+     */
+    public static function getStartAndEndDate($start_date = '2019-03-01', $end_date = '2019-03-30'){
+         $dateArr = [$start_date];
+        for ($i=1; $i<=100; $i++){
+            $d = date('Y-m-d', strtotime($start_date)+$i*86400);
+            $dateArr[] = $d;
+            if($d>=$end_date) break;
+        }
+
+        return $dateArr;
+
+    }
+
+    /**
+     * @desc 每天三字现出现次数
+     * @param string $date
+     * @return array
+     */
+    public static function staticKj3NumCounts($date = '2019-02-11'){
+        $m = \Yii::$app->cache;
+        $mkey = 'staticKj3NumCounts_'.$date;
+
+        if($staticDatas = $m->get($mkey)) return $staticDatas;
+        $SscKjData3nums = SscKjData3num::find()->where(['date'=>$date])->orderBy(['id'=>SORT_DESC])->limit(20000)->all();
+        $staticDatas = [];
+        foreach ($SscKjData3nums as $key=>$SscKjData3num){
+            if(!$SscKjData3num->code_3n) continue;
+            $codes3Nums = explode(',', $SscKjData3num->code_3n);
+            foreach ($codes3Nums as $nums){
+                if(!isset($staticDatas[$nums])) $staticDatas[$nums] = 0;
+                $staticDatas[(string)$nums] += 1;
+            }
+        }
+
+        $tmpData = [];
+        foreach ($staticDatas as $key=>$data){
+            if($data>220 OR in_array($key,['014', '147', '124'])){
+                $tmpData[$key] = $data;
+            }
+        }
+        arsort($staticDatas);
+
+        if($date != date('Y-m-d')){
+            $m->set($mkey, $staticDatas, 7*24*3600);
+        }
+
+        return $staticDatas;
+    }
+
+    /**
+     * @desc 每天三字现热码
+     * @return array
+     */
+    public static function allDateStatic3NumsPerDate(){
+        $m = \Yii::$app->cache;
+        $mkey = 'allDateStatic3Nums_PERDATE_02';
+
+        $allStatic = [];
+        for($s=0; $s<5; $s++){
+            if(!$time = $m->get($mkey)) {
+                $time = strtotime('2019-02-11');
+            }else{
+                $time = $time + 24 * 3600;
+            }
+
+            $date = date('Y-m-d', $time);
+            $date = min([date('Y-m-d'), $date]);
+            if($date>date('Y-m-d')) break;
+            if($statics = self::staticKj3NumCounts($date)){
+                $setData = [];
+                foreach ($statics as $key=>$static){
+                    $setData['codes_'.$key] = $static;
+                }
+                if(!$Static3numArisePerdate = Static3numArisePerdate::findOne(['date'=>$date])){
+                    $Static3numArisePerdate = new Static3numArisePerdate();
+                    $setData['created_at'] = time();
+                }
+                $setData = array_merge($setData, [
+                    'date' => $date,
+                    'updated_at' => time(),
+                ]);
+
+                $Static3numArisePerdate->setAttributes($setData);
+                //p($Static3numArisePerdate->attributes);
+                $Static3numArisePerdate->save();
+
+            }
+            $m->set($mkey, $time, 7*24*3600);
+        }
+
+        return $allStatic;
+    }
+
+
+   public static function sort_with_keyName($arr,$orderby='desc'){
+   //在内存的另一处 $a 复制内容与 $arr 一样的数组
+       foreach($arr as $key => $value)
+           $a[$key]=$value;
+       if($orderby== 'asc'){//对数组 $arr 进行排序
+           asort($arr);
+       }else{
+           arsort($arr);
+       }
+       /*创建一个以原始数组的键名为元素值 (键值) 的
+        *数组 $b, 其元素 (键值) 顺序，与排好序的数组 $arr 一致。
+       */
+       $index=0;
+       foreach ($arr as $keys => $values) //按排序后数组的顺序
+           foreach($a as $key => $value) //在备份数组中寻找键值
+               if ($values==$value)//如果找到键值
+                   $b[$index++]=$key; // 则将数组 $b 的元素值，设置成备份数组 $a 的键名
+   //返回用数组 $b 的键值作为键名,数组 $arr 的键值作为键值,所组成的数组
+       return array_combine($b, $arr);
+   }
+
+
+    /**
+     * @desc 二字现遗漏，主要双重、对数、两兄弟
+     * @return array
+     */
+   public static function static2NumsYl(){
+       $rst = ['status'=>200, 'msg'=>'操作成功~'];
+
+       $Ssc2numsVals = Ssc2numsVal::find()->where('1=1')->asArray()->all();
+       //p($Ssc2numsVals);
+       foreach ($Ssc2numsVals as $key=>$Ssc2numsVal){
+           $setData = [];
+           if(!$Ssc2numsYl = Ssc2numsYl::findOne(['val'=>$Ssc2numsVal['val']])){
+               $Ssc2numsYl = new Ssc2numsYl();
+               $setData['created_at'] = time();
+           }
+           $val = $Ssc2numsVal['val'];
+           $yl_records = StaticService::get2NumsYlRecords($val);
+           $setData = array_merge($setData, [
+               'val' => $val,
+               'current_miss' => $yl_records['current_miss'],
+               'last_time_miss' => $yl_records['last_time_miss'],
+               'last_time_miss_range' => $yl_records['last_time_miss_range'],
+               'max_miss' => $yl_records['max_miss'],
+               'yl_records' => $yl_records['current_miss'].$yl_records['yl_records'],
+               'max_range' => $yl_records['max_range'],
+               'history_max_miss' => max($Ssc2numsYl->history_max_miss, $yl_records['max_miss']),
+               'updated_at' => time(),
+           ]);
+
+           $Ssc2numsYl->setAttributes($setData);
+           //p($Ssc2numsYl->attributes);
+           $Ssc2numsYl->save();
+       }
+
+        return $rst;
+   }
+
+    /**
+     * @desc 二字现遗漏记录
+     * @param $nums
+     * @param int $limit
+     * @return array
+     */
+   public static function get2NumsYlRecords($nums, $limit = 600){
+       if(strlen($nums) != 2) return [];
+
+       $last_id = SscDataService::getKjDataLastId(); # 表记录最后一条id
+       $limit_id = $last_id - $limit;
+
+       $codes = [$nums[0], $nums[1]];
+       $where = [
+            'OR',
+            ['like', 'LEFT(code_str,7)', '%'.$codes[0].','.$codes[1].'%', false],
+            ['like', 'LEFT(code_str,7)', '%'.$codes[0].'%'.$codes[1].'%', false],
+
+            ['like', 'LEFT(code_str,7)', '%'.$codes[1].','.$codes[0].'%', false],
+            ['like', 'LEFT(code_str,7)', '%'.$codes[1].'%'.$codes[0].'%', false],
+        ];
+       $SscKjDatas = SscKjData::find()->select(['id','kj_code','qihao'])->where($where)->andWhere('id>='.$limit_id)->limit($limit)->orderBy(['id'=>SORT_DESC])->asArray()->all();
+       //p($SscKjDatas);
+
+       $yl_records = '';
+       $max_miss = 0;
+       foreach ($SscKjDatas as $k=>$SscKjData){
+           if($k == 0) continue;
+           $yl = $SscKjDatas[$k-1]['id']-$SscKjData['id'];
+           $yl_records .= '-'.$yl;
+           if($k == 1) {
+               $last_time_miss = $yl;
+               $last_time_miss_range = $SscKjDatas[$k-1]['qihao'].'-'.$SscKjData['qihao'];
+           }
+           $max_miss = max($max_miss, $yl);
+           if($yl == $max_miss){
+               $max_range = $SscKjDatas[$k-1]['qihao'].'-'.$SscKjData['qihao'];
+           }
+       }
+
+       //p($yl_records);
+       $rstData = [
+           'current_miss' => $last_id - $SscKjDatas[0]['id'],
+           'yl_records' =>$yl_records,
+           'last_time_miss' => $last_time_miss,
+           'max_miss' => $max_miss,
+           'last_time_miss_range' => $last_time_miss_range,
+           'max_range' => $max_range,
+       ];
+       //p($rstData);
+
+       return $rstData;
+   }
+
+
+
+
+
+
+
+}

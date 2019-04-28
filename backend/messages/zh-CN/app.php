@@ -1,0 +1,72 @@
+<?php
+
+return [
+    'edit' => '编辑',
+    'Create Follow Datas' => '添加计划',
+    'playway 10' => '定位胆',
+    'playway 1' => '二字定',
+    'Create playway 1 plan' => '添加二字定计划',
+    'Update playway 1 plan' => '更新二字定计划',
+    'Create playway 2 plan' => '添加三字定计划',
+    'Update playway 2 plan' => '更新三字定计划',
+    'Create playway 3 plan' => '添加四字定计划',
+    'Update playway 3 plan' => '更新四字定计划',
+    'Create playway 10 plan' => '添加定位胆计划',
+    'Update playway 10 plan' => '更新定位胆计划',
+    'User Follow Datas' => '跟投计划',
+    'Create tz plans' => '添加投注计划',
+    'Update Balance' => '更新余额',
+
+    'Ssc Dw Hz Yls' => '遗漏分析',
+    'Ssc Kj Datas' => '历史开奖',
+    'My Infomation' => '个人信息',
+    'Betting Records' => '投注记录',
+    'System Betting Records' => '系统投注',
+
+    'Ssc Dw Hz Statics' => '二定和值统计',
+    'tz now' => '立即投注',
+    'plan type 1' => '用户',
+    'plan type 2' => '大数据',
+    'plan type 3' => '定制化',
+    'Create custom tz' => '添加定制化投注',
+    'User Custom Plans' => '定制化投注',
+    'playway 1 Plans'=> '二字定',
+    'playway 2 Plans'=> '三字定',
+    'playway 3 Plans'=> '四字定',
+    'playway 10 Plans'=> '定位胆',
+    'Ssc Ds Yls' => '单双遗漏',
+    'User Sys Plans' => '投注计划',
+    'Create User Sys Plans 2d' => '添加3d计划',
+    'Create User Sys Plans 3d' => '添加4d计划',
+    'Create User Sys Plans 3d hz' => '添加4d和值计划',
+    'Create User Sys Plans 3d ds' => '添加4d单双计划',
+    'Create User Sys Plans 6d' => '添加三字现计划',
+
+    'User Sys Plans 2d' => '3d计划',
+    'User Sys Plans 3d' => '4d计划',
+    'User Sys Plans 3d hz' => '4d和值计划',
+    'User Sys Plans 3d ds' => '4d单双计划',
+    'User Sys Plans 6d' => '三字现计划',
+    'User Sys Plans 23d' => '上奖玩法',
+
+    'Pre Date Profits' => '系统投注利润统计',
+    'Update User Sys Plans' => '编辑投注计划',
+
+    'Weixin Login' => '登录',
+    'Wx Friends' => '微信好友',
+    'Create Wx Msg Types' => '新建消息类型',
+
+    'Static4d Profits Perdates' => '每天四定利润统计',
+    'Static4d Profits' => '每月四定利润统计',
+
+    'Static Hz Profits Perdates' => '每天四定和值利润统计',
+    'Static Hz Profits' => '每月四定和值利润统计',
+
+    'Ssc Sd Hz Yls' => '四定和值遗漏',
+    'Create Tz Systems' => '开通投注系统权限',
+
+    'Static3num Arise Perdates' => '三字现热码(Day)',
+    'Ssc2nums Yls' => '二字现遗漏',
+    'Ssc3nums Yls' => '三字现遗漏',
+    'Static Per Hz Perdate Profits' => '每个和值每天利润统计',
+];

@@ -1,0 +1,31 @@
+网址:http://qxhy13.lixin505.com/Home/Main#$1
+    A、Genneral
+    B、Request Headers
+    C、Form Data
+
+1、二字定
+
+    A、Genneral
+        Request URL: http://qxhy13.lixin505.com/FixTwo/SetMemberBet
+        Request Method: POST
+        Status Code: 200 OK
+        Remote Address: 171.111.154.207:80
+        Referrer Policy: no-referrer-when-downgrade
+    B、Request Headers
+        Accept: */*
+        Accept-Encoding: gzip, deflate
+        Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+        Connection: keep-alive
+        Content-Length: 311
+        Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+        Cookie: ASP.NET_SessionId=1htyfdjgodqtasuaca0u01qo; kangle_runat=1; UserId=335613; LoginName=happy16888; NickName=happy16888; DefaultCredit=0; UsedCredit=0; SuperCompanyName=sscmg; IsEnter=false; IsShowLottory=false; IsOddsUse=false; IsSingleBack=false; IsInheritTrading=false; IsInheritComm=false; SubNickName=888; PlayType=0; UserNo=78d7c9ef27354def9dd9d226befe9e79; SecondStopEarly=0; CancelBet=2; PeriodsNumber=20180714031; PeriodsID=15392; PeriodsStatus=1; StopTime=0
+        Host: qxhy13.lixin505.com
+        Origin: http://qxhy13.lixin505.com
+        Referer: http://qxhy13.lixin505.com/Home/Main
+        User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.62 Safari/537.36
+        X-Requested-With: XMLHttpRequest
+    C、Form Data
+        listbet: [{"BetNumber":"44XX","BetType":2,"Odds":99},{"BetNumber":"36XX","BetType":2,"Odds":99},{"BetNumber":"63XX","BetType":2,"Odds":99},{"BetNumber":"76XX","BetType":2,"Odds":99}]
+
+2、三字定
+    

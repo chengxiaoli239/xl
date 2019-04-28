@@ -1,0 +1,171 @@
+1、开(POST)
+    A、General
+        Request URL:https://www.700056.com/ssc/ajax.aspx
+        Request Method:POST
+        Status Code:200 OK
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    B、Response Headers
+        Cache-Control:private
+        Content-Length:42
+        Content-Type:text/html; charset=utf-8
+        Date:Mon, 12 Feb 2018 03:10:59 GMT
+        Server:Microsoft-IIS/6.0
+        X-AspNet-Version:2.0.50727
+        X-Powered-By:ASP.NET
+    C、Request Headers
+        Accept:*/*
+        Accept-Encoding:gzip, deflate, br
+        Accept-Language:zh-CN,zh;q=0.9,en;q=0.8
+        Connection:keep-alive
+        Content-Length:13
+        Content-Type:application/x-www-form-urlencoded
+        Cookie:ASP.NET_SessionId=woh4v445d2kzkg55wdc3il55
+        Host:www.700056.com
+        Origin:https://www.700056.com
+        Referer:https://www.700056.com/ssc/
+        User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36
+        X-Requested-With:XMLHttpRequest
+
+    D、Form Data
+        act:getlastkj
+
+2、获取金额(POST)
+    A、General
+        Request URL:https://www.700056.com/user/ajax.aspx
+        Request Method:POST
+        Status Code:200 OK
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    B、Response Headers
+        Cache-Control:private
+        Content-Length:4
+        Content-Type:text/html; charset=utf-8
+        Date:Mon, 12 Feb 2018 03:21:08 GMT
+        Server:Microsoft-IIS/6.0
+        X-AspNet-Version:2.0.50727
+        X-Powered-By:ASP.NET
+    C、Request Headers
+        Accept:*/*
+        Accept-Encoding:gzip, deflate, br
+        Accept-Language:zh-CN,zh;q=0.9,en;q=0.8
+        Connection:keep-alive
+        Content-Length:11
+        Content-Type:application/x-www-form-urlencoded
+        Cookie:ASP.NET_SessionId=woh4v445d2kzkg55wdc3il55
+        Host:www.700056.com
+        Origin:https://www.700056.com
+        Referer:https://www.700056.com/ssc/
+        User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36
+        X-Requested-With:XMLHttpRequest
+    D、Form Data
+        act:balance
+        
+3、投注(POST)
+    A、General
+        Request URL:https://www.700056.com/ssc/ajax.aspx
+        Request Method:POST
+        Status Code:200 OK
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    B、Response Headers
+        Cache-Control:private
+        Content-Length:251
+        Content-Type:text/html; charset=utf-8
+        Date:Mon, 12 Feb 2018 03:28:42 GMT
+        Server:Microsoft-IIS/6.0
+        X-AspNet-Version:2.0.50727
+        X-Powered-By:ASP.NET
+    C、Request Headers
+        Accept:*/*
+        Accept-Encoding:gzip, deflate, br
+        Accept-Language:zh-CN,zh;q=0.9,en;q=0.8
+        Connection:keep-alive
+        Content-Length:68
+        Content-Type:application/x-www-form-urlencoded
+        Cookie:ASP.NET_SessionId=woh4v445d2kzkg55wdc3il55
+        Host:www.700056.com
+        Origin:https://www.700056.com
+        Referer:https://www.700056.com/ssc/
+        User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36
+        X-Requested-With:XMLHttpRequest
+    D、Form Data
+        act:postsn
+        code:,,0,0,0@0,0,,,
+        playway:10
+        single:0.1
+        qihao:180212033
+
+4、Get访问
+    A、General
+        Request URL:https://www.700056.com/ssc/
+        Request Method:GET
+        Status Code:200 OK
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    B、Response Headers
+        Cache-Control:private
+        Content-Length:38779
+        Content-Type:text/html; charset=utf-8
+        Date:Mon, 12 Feb 2018 03:25:02 GMT
+        Server:Microsoft-IIS/6.0
+        X-AspNet-Version:2.0.50727
+        X-Powered-By:ASP.NET
+    C、Request Headers
+        Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+        Accept-Encoding:gzip, deflate, br
+        Accept-Language:zh-CN,zh;q=0.9,en;q=0.8
+        Cache-Control:max-age=0
+        Connection:keep-alive
+        Cookie:ASP.NET_SessionId=woh4v445d2kzkg55wdc3il55
+        Host:www.700056.com
+        Upgrade-Insecure-Requests:1
+        User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36
+
+
+5、登陆
+    A、General
+        Request URL:https://700056.com/ssc/index.aspx
+        Request Method:POST
+        Status Code:302 Found
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    B、Response Headers
+        Cache-Control:private
+        Content-Length:136
+        Content-Type:text/html; charset=utf-8
+        Date:Tue, 13 Feb 2018 08:14:33 GMT
+        Location:/ssc/index.aspx
+        Server:Microsoft-IIS/6.0
+        X-AspNet-Version:2.0.50727
+        X-Powered-By:ASP.NET
+    C、Request Headers
+        Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+        Accept-Encoding:gzip, deflate, br
+        Accept-Language:zh-CN,zh;q=0.9,en;q=0.8
+        Cache-Control:max-age=0
+        Connection:keep-alive
+        Content-Length:1515
+        Content-Type:application/x-www-form-urlencoded
+        Cookie:ASP.NET_SessionId=pb0mpq452szgzivkanmyxbib
+        Host:700056.com
+        Origin:https://700056.com
+        Referer:https://700056.com/ssc/index.aspx
+        Upgrade-Insecure-Requests:1
+        User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36
+
+
+        Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+        Accept-Encoding:gzip, deflate, br
+        Accept-Language:zh-CN,zh;q=0.9,en;q=0.8
+        Cache-Control:max-age=0
+        Connection:keep-alive
+            Content-Length:1514
+        Content-Type:application/x-www-form-urlencoded
+        Cookie:ASP.NET_SessionId=ybrfbh45ehbnmd55lgkaqa55
+        Host:700056.com
+            Origin:https://700056.com
+            Referer:https://700056.com/ssc/index.aspx
+        Upgrade-Insecure-Requests:1
+        User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36
+

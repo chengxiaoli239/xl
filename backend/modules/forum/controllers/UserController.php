@@ -1,0 +1,232 @@
+<?php
+
+namespace backend\modules\forum\controllers;
+
+use backend\models\TzSystemsAuth;
+use backend\models\TzSystemsUsers;
+use backend\service\BetService;
+use backend\service\UserService;
+use common\service\CommonService;
+use Yii;
+use backend\models\User;
+use backend\models\searchs\User as UserSearch;
+use backend\controllers\BaseController;
+use yii\web\NotFoundHttpException;
+use yii\filters\VerbFilter;
+use backend\service\HN0898Service;
+
+/**
+ * UserController implements the CRUD actions for User model.
+ */
+class UserController extends BaseController
+{
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Lists all User models.
+     * @return mixed
+     */
+    public function actionIndex()
+    {
+        $searchModel = new UserSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    public function actionOpenSystems($uid){
+
+        if(!$model = TzSystemsAuth::findOne(['uid'=>$uid])){
+            $model = new TzSystemsAuth();
+        }
+        UserService::preOpenData($this->_post, $uid);
+
+        if ($model->load($this->_post) && $model->save()) {
+            UserService::saveTzSystemUsers(explode(',', $this->_post['TzSystemsAuth']['tz_systems_ids']), $uid);
+            return $this->redirect(['index']);
+        }
+
+        $model->tz_systems_ids = explode(',', $model->tz_systems_ids);
+        $model->tz_types = explode(',', $model->tz_types);
+
+        $allSystems = CommonService::getAllSystems();
+        $allTzTypes = CommonService::getAllTzTypes();
+
+        return $this->render('open-systems', [
+            'model' => $model,
+            'uid' => $uid,
+            'allSystems' => $allSystems,
+            'allTzTypes' => $allTzTypes,
+        ]);
+    }
+
+    /**
+     * Displays a single User model.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionView()
+    {
+        $uid = \Yii::$app->user->id;
+        BetService::synUserAllBalance($uid);
+        return $this->render('view', [
+            //'model' => $this->findModel($uid),
+            'models' => $this->findAllModel($uid),
+        ]);
+    }
+
+    /**
+     * Creates a new User model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate()
+    {
+        $model = new User();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Updates an existing User model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            //UserService::saveTzSystemUsers(explode(',', $this->_post['TzSystemsAuth']['tz_systems_ids']), $uid);
+            return $this->redirect(['index', 'id' => $model->id]);
+        }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Deletes an existing User model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionDelete($id)
+    {
+        $this->findModel($id)->delete();
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Updates an existing user model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionSetCookie(){
+        $model = $this->findModel();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view']);
+        }
+
+        return $this->render('set-cookie', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * @description 同步余额
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionSynBalance(){
+        $model = $this->findModel();
+
+        $rst = HN0898Service::synBalance($model->id);
+        if($rst['status'] == 200){
+            return $this->redirect(['view']);
+
+        }
+        return $this->redirect(['view']);
+    }
+
+    /**
+     * @desc 同步单个系统余额
+     * @return array
+     */
+    public function actionSyncOneBalance(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $tz_system_user_id = $post['tz_system_user_id'];
+
+        $system_user_id = TzSystemsUsers::findOne($tz_system_user_id)->tz_system_id;
+
+        //$rst = HN0898Service::synBalance($tz_system_user_id);
+        $rst = BetService::synBalance($this->_user_id,$system_user_id);
+        return $rst;
+    }
+
+    /**
+     * Finds the User model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return User the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel()
+    {
+        $admin_id = \Yii::$app->user->id;
+        if (($model = User::findOne(['admin_id'=>$admin_id])) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+    }
+
+    /**
+     * Finds the User model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return User the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findAllModel()
+    {
+        $uid = \Yii::$app->user->id;
+        $model = TzSystemsUsers::find()->where(['uid'=>$uid])->orderBy(['balance'=>SORT_DESC])->all();
+        if ($model !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+    }
+}

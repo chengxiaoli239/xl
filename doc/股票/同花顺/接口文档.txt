@@ -1,0 +1,52 @@
+1、登录
+General:
+    Request URL: http://upass.10jqka.com.cn/login
+    Request Method: POST
+    Status Code: 302 Found
+    Remote Address: 121.201.70.251:80
+    Referrer Policy: no-referrer-when-downgrade
+Response Header:
+    Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+    Connection: keep-alive
+    Content-Type: text/html
+    Date: Mon, 09 Jul 2018 01:53:32 GMT
+    Expires: Thu, 19 Nov 1981 08:52:00 GMT
+    Location: http://www.10jqka.com.cn
+    P3P: CP="CURa ADMa DEVa PSAo PSDo OUR BUS UNI PUR INT DEM STA PRE COM NAV OTC NOI DSP COR"
+    Pragma: no-cache
+    Server: nginx/1.6.1
+    Set-Cookie: userid=115376844; expires=Wed, 11-Jul-2018 17:00:00 GMT; Max-Age=227188; path=/; domain=.10jqka.com.cn
+    Set-Cookie: escapename=gaozi2011; expires=Wed, 11-Jul-2018 17:00:00 GMT; Max-Age=227188; path=/; domain=.10jqka.com.cn
+    Set-Cookie: ticket=531cfefc5ead6c2ace0001bc5f227ab3; expires=Wed, 11-Jul-2018 17:00:00 GMT; Max-Age=227188; path=/; domain=.10jqka.com.cn
+    Set-Cookie: user=MDpnYW96aTIwMTE6Ok5vbmU6NTAwOjEyNTM3Njg0NDoxLDEwMDAsNDA7MiwxLDQwOzMsMSw0MDs1LDEsNDA7OCwwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMTAwMDAsNDA7NywxMTExMTExMTExMSw0MDs0NCwxMSw0MDs2LDEsNDA6MjU6OjoxMTUzNzY4NDQ6MTUzMTEwMTIxMjo6OjEzMjA0MjY3MjA6MjI3MTg4OjA6MTFhMjM2ZmEzMjFkMzM5NWEzNTgzNjA5ODNmZjkyZDliOmRlZmF1bHRfMjow; expires=Wed, 11-Jul-2018 17:00:00 GMT; Max-Age=227188; path=/; domain=.10jqka.com.cn
+    Set-Cookie: ths_login_uname=gaozi2011; expires=Mon, 16-Jul-2018 01:53:32 GMT; Max-Age=604800
+    Set-Cookie: u_name=gaozi2011; expires=Wed, 11-Jul-2018 17:00:00 GMT; Max-Age=227188; path=/; domain=.10jqka.com.cn
+    Transfer-Encoding: chunked
+    Via: 1.1 bs96.10jqka.com.cn (squid/3.5.20), 1.1 cachezs1 (squid/3.5.20)
+    X-Cache: MISS from bs96.10jqka.com.cn
+    X-Cache: MISS from cachezs1
+
+Requerst Header:
+    Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+    Accept-Encoding: gzip, deflate
+    Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+    Cache-Control: max-age=0
+    Connection: keep-alive
+    Content-Length: 515
+    Content-Type: application/x-www-form-urlencoded
+    Cookie: __utma=86410076.967187505.1526345976.1526345976.1526345976.1; __utmz=86410076.1526345976.1.1.utmcsr=i.10jqka.com.cn|utmccn=(referral)|utmcmd=referral|utmcct=/115376844/infocenter; uaid=acfecb5e4cb2b97c995f6a42348e1dc5; Hm_lvt_78c58f01938e4d85eaf619eae71b4ed1=1531099065; spversion=20130314; historystock=002596%7C*%7C300033; PHPSESSID=ujflg68ocbtc65373cu36fap51; ths_login_uname=gaozi2011; Hm_lpvt_78c58f01938e4d85eaf619eae71b4ed1=1531101151; v=AuExwd-7HvJTvLKGc33qtt2-8Kb4jlWifwP5lEO22Q5Hjg_Qi95lUA9SCT_Q
+    Host: upass.10jqka.com.cn
+    Origin: http://upass.10jqka.com.cn
+    Referer: http://upass.10jqka.com.cn/login?redir=HTTP_REFERER
+    Upgrade-Insecure-Requests: 1
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36
+
+From Data
+    act: login_submit
+    redir: http://www.10jqka.com.cn
+    uname: I1f0DBA4SRjhsI15EAw0wm4v3XKya6U0KyWhazWdSpdLl3QRlb22JPuZ3c8GJEPWITOfvh9lBBEu5nSxYcm7D/puIjYOEFVfCG4XxQqkoOQPwNF/JS17m6IQJh+9pnWCO7YhAn4bQC0XdlCKwNUGI0z6I7WjxZ/cnEfDn27xxEU=
+    passwd: c4yRoTozP4/XKUrcuZsnnW6KClckynPxStyrVkotz7+R9AzAKnUh5ARU9VBd9cWfmDODQ8sIbT/LixiBRYWst9ZqLSY0OoxsBbBk+hBPx21nAlvULoZrDLUDi4g1K5FMu4hdINc7tRojjtxrilAw7EG9eNKT0RSfKLHTFVuuM0M=
+    captchaCode: 
+    longLogin: on
+    rsa_version: default_2
+    submit: 登　录

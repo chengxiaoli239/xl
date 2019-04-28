@@ -1,0 +1,199 @@
+<?php
+
+namespace backend\modules\forum\controllers;
+
+use backend\models\searchs\VPerdateProfits as VPerdateProfitsSearch;
+use backend\service\BetService;
+use backend\service\HN0898Service;
+use backend\service\StaticService;
+use Yii;
+use backend\models\BettingRecords;
+use backend\models\searchs\BettingRecords as BettingRecordsSearch;
+use backend\controllers\BaseController;
+use yii\web\NotFoundHttpException;
+use yii\filters\VerbFilter;
+
+/**
+ * BettingRecordsController implements the CRUD actions for BettingRecords model.
+ */
+class BettingRecordsController extends BaseController
+{
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Lists all BettingRecords models.
+     * @return mixed
+     */
+    public function actionIndex()
+    {
+        $searchModel = new BettingRecordsSearch();
+        $queryParams = Yii::$app->request->queryParams;
+        //$queryParams['BettingRecords']['uid'] = $this->_user_id;
+        $queryParams['BettingRecords']['account'] = $this->_account;
+        //p([$this->_account,$queryParams]);
+        $dataProvider = $searchModel->search($queryParams);
+        $qihao = HN0898Service::getQihao();
+
+        return $this->render('index', [
+            'qihao' => $qihao,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Lists all BettingRecords models.
+     * @return mixed
+     */
+    public function actionSysTzList()
+    {
+        $searchModel = new BettingRecordsSearch();
+        $queryParams = Yii::$app->request->queryParams;
+        $queryParams['BettingRecords']['account'] = 'admin';
+        $dataProvider = $searchModel->search($queryParams);
+
+        $qihao = HN0898Service::getQihao();
+        return $this->render('sys-tz-list', [
+            'qihao' => $qihao,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Lists all BettingRecords models.
+     * @return mixed
+     */
+    public function actionPreDateProfits()
+    {
+        $searchModel = new VPerdateProfitsSearch();
+        $queryParams = Yii::$app->request->queryParams;
+        $dataProvider = $searchModel->search($queryParams);
+
+        return $this->render('pre-date-profits', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+
+    /**
+     * Displays a single BettingRecords model.
+     * @param string $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionView($id)
+    {
+        return $this->render('view', [
+            'model' => $this->findModel($id),
+        ]);
+    }
+
+    /**
+     * Creates a new BettingRecords model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate()
+    {
+        $model = new BettingRecords();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     *@desc 投注列表- 立即投注(正买)
+     */
+    public function actionTzNow($id){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $rst = BetService::tzNowBetRecord($this->_user_id, $id);
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     *@desc 投注列表 - 立即投注(反买)
+     */
+    public function actionReverseTzNow($id){
+        $rst = BetService::reverseTzNowBetRecord($this->_user_id, $id);
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Updates an existing BettingRecords model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param string $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Deletes an existing BettingRecords model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param string $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionDelete($id)
+    {
+        $this->findModel($id)->delete();
+
+        return $this->redirect(['index']);
+    }
+
+    public function actionCancelOrder($bet_id){
+
+        $rst = BetService::cancelOrder($this->_user_id, $bet_id);
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Finds the BettingRecords model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $id
+     * @return BettingRecords the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = BettingRecords::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+}

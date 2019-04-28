@@ -1,0 +1,279 @@
+一、整单退码1
+	1、General：
+		Request URL: http://f2.cq911611.xyz/Member/GetBetsBySerialNo?serial_no=377435095000038364&_=1552479335363
+	2、Request Header
+		Accept: application/json, text/javascript, */*; q=0.01
+		Accept-Encoding: gzip, deflate
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Cookie: SevenStarHFDirector15Frontend15=ws1xo1hyy5ha2p5vxhmjiece; Akamai_Cookie=2802846218.12917.0000; visid_incap_1712594=TJYtIEdvTxesm7W0UXw0TI/piFwAAAAAQUIPAAAAAABd1gJErV/iiwjE+BLVEQo7; nlbi_1712594=lWt0XpwWiXL3Iwu5E3SBeAAAAABwTw7kpIuJnJnFhOAXagZm; incap_ses_428_1712594=kNWZFs5rMRMZ1vfGA5HwBY/piFwAAAAAzjbaM6ZCX4QnJRNVf8dUyg==; __cfduid=dbf20636cb1bc384d5d9f3988e543d4d61552476560; first_visit=1; NOTICE_LOGIN_IN=1; robot3=6RWnbUltGLGtHHFhBfP3A7GbCrnkJOpYEdNX6oLXwRA=
+		Host: f2.cq911611.xyz
+		Referer: http://f2.cq911611.xyz/App/Index?_=636881049365852238
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+	3、Query String Parameter
+		ids={377445406790480364}|4&period_no=20190313050
+	
+一、整单退2：
+	1、General：
+		Request URL: http://f2.cq911611.xyz/Member/CancelMemberBet
+	2、Request Header
+		Accept: application/json, text/javascript, */*; q=0.01
+		Accept-Encoding: gzip, deflate
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Content-Length: 54
+		Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+		Cookie: SevenStarHFDirector15Frontend15=ws1xo1hyy5ha2p5vxhmjiece; Akamai_Cookie=2802846218.12917.0000; visid_incap_1712594=TJYtIEdvTxesm7W0UXw0TI/piFwAAAAAQUIPAAAAAABd1gJErV/iiwjE+BLVEQo7; nlbi_1712594=lWt0XpwWiXL3Iwu5E3SBeAAAAABwTw7kpIuJnJnFhOAXagZm; incap_ses_428_1712594=kNWZFs5rMRMZ1vfGA5HwBY/piFwAAAAAzjbaM6ZCX4QnJRNVf8dUyg==; __cfduid=dbf20636cb1bc384d5d9f3988e543d4d61552476560; first_visit=1; NOTICE_LOGIN_IN=1; robot3=6RWnbUltGLGtHHFhBfP3A7GbCrnkJOpYEdNX6oLXwRA=
+		Host: f2.cq911611.xyz
+		Origin: http://f2.cq911611.xyz
+		Referer: http://f2.cq911611.xyz/App/Index?_=636881049365852238
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+	3、Query String Parameter
+
+二、四定投注
+	1、General：
+		Request URL: http://f2.cq911611.xyz/Member/MultipleBet
+		Request Method: POST
+		Status Code: 200 OK
+		Remote Address: 150.117.121.200:80
+		Referrer Policy: no-referrer-when-downgrade
+	2、Request Header
+		Accept: application/json, text/javascript, */*; q=0.01
+		Accept-Encoding: gzip, deflate
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Content-Length: 1606
+		Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+		Cookie: SevenStarHFDirector15Frontend15=ws1xo1hyy5ha2p5vxhmjiece; Akamai_Cookie=2802846218.12917.0000; visid_incap_1712594=TJYtIEdvTxesm7W0UXw0TI/piFwAAAAAQUIPAAAAAABd1gJErV/iiwjE+BLVEQo7; nlbi_1712594=lWt0XpwWiXL3Iwu5E3SBeAAAAABwTw7kpIuJnJnFhOAXagZm; incap_ses_428_1712594=kNWZFs5rMRMZ1vfGA5HwBY/piFwAAAAAzjbaM6ZCX4QnJRNVf8dUyg==; __cfduid=dbf20636cb1bc384d5d9f3988e543d4d61552476560; first_visit=1; NOTICE_LOGIN_IN=1; robot3=6RWnbUltGLGtHHFhBfP3A7GbCrnkJOpYEdNX6oLXwRA=
+		Host: f2.cq911611.xyz
+		Origin: http://f2.cq911611.xyz
+		Referer: http://f2.cq911611.xyz/App/Index?_=636881049365852238
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+		
+		-----------------
+		Accept: application/json, text/javascript, */*; q=0.01
+		Accept-Encoding: gzip, deflate
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Content-Length: 1606
+		Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+		Cookie: SevenStarHFDirector15Frontend15=ws1xo1hyy5ha2p5vxhmjiece; Akamai_Cookie=2802846218.12917.0000; visid_incap_1712594=TJYtIEdvTxesm7W0UXw0TI/piFwAAAAAQUIPAAAAAABd1gJErV/iiwjE+BLVEQo7; nlbi_1712594=lWt0XpwWiXL3Iwu5E3SBeAAAAABwTw7kpIuJnJnFhOAXagZm; incap_ses_428_1712594=kNWZFs5rMRMZ1vfGA5HwBY/piFwAAAAAzjbaM6ZCX4QnJRNVf8dUyg==; __cfduid=dbf20636cb1bc384d5d9f3988e543d4d61552476560; first_visit=1; NOTICE_LOGIN_IN=1; robot3=6RWnbUltGLGtHHFhBfP3A7GbCrnkJOpYEdNX6oLXwRA=
+		Host: f2.cq911611.xyz
+		Origin: http://f2.cq911611.xyz
+		Referer: http://f2.cq911611.xyz/App/Index?_=636881049365852238
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+		-----------------
+	3、Query String Parameter
+		bet_number: 1245,1345,2245,2345
+		bet_money: 0.1
+		bet_way: 102
+		is_xian: 0
+		number_type: 40
+		bet_log: [四定位]，定位置“[取]”：千=[12]，百=[23]，十=[4]，个=[5]
+		guid: d6af68f8-c2a0-4d2d-8bf1-1d6a061ab1fb
+		is_package: 0
+		period_no: 20190313049
+		operation_condition: {"symbol":"X","isXian":0,"firstNumber":"12","secondNumber":"23","thirdNumber":"4","fourthNumber":"5","fifthNumber":"","numberType":40,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[0,0,0,0],"symbolPositions":[],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}
+		
+三、投注明细
+	1、General：
+		Request URL: http://f2.cq911611.xyz/Member/GetMemberBetList?_=1552480471840
+	2、Request Header
+		Accept: application/json, text/javascript, */*; q=0.01
+		Accept-Encoding: gzip, deflate
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Cookie: SevenStarHFDirector15Frontend15=ws1xo1hyy5ha2p5vxhmjiece; Akamai_Cookie=2802846218.12917.0000; visid_incap_1712594=TJYtIEdvTxesm7W0UXw0TI/piFwAAAAAQUIPAAAAAABd1gJErV/iiwjE+BLVEQo7; nlbi_1712594=lWt0XpwWiXL3Iwu5E3SBeAAAAABwTw7kpIuJnJnFhOAXagZm; incap_ses_428_1712594=kNWZFs5rMRMZ1vfGA5HwBY/piFwAAAAAzjbaM6ZCX4QnJRNVf8dUyg==; __cfduid=dbf20636cb1bc384d5d9f3988e543d4d61552476560; first_visit=1; NOTICE_LOGIN_IN=1; robot3=6RWnbUltGLGtHHFhBfP3A7GbCrnkJOpYEdNX6oLXwRA=
+		Host: f2.cq911611.xyz
+		Referer: http://f2.cq911611.xyz/App/Index?_=636881049365852238
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+	3、Query String Parameter
+		_: 1552480471840
+		
+四、登陆流程：
+	A、预登录
+	1、General
+		Request URL: http://f2.cq911611.xyz/Member/Login?_=1553505541491
+		Request Method: GET
+		Status Code: 200 OK
+		Remote Address: 210.71.189.253:80
+		Referrer Policy: no-referrer-when-downgrade
+	2、Response Header
+		Cache-Control: private
+		Connection: keep-alive
+		Content-Encoding: gzip
+		Content-Length: 3471
+		Content-Type: text/html; charset=utf-8
+		Date: Mon, 25 Mar 2019 09:19:35 GMT
+		Server: Jws
+		Set-Cookie: SevenStarHFDirector15Frontend15=sxfwvhty1tyttp1wse5rlfsu; path=/; HttpOnly
+		Vary: Accept-Encoding
+		X-Content-Type-Options: nosniff
+		X-Frame-Options: SAMEORIGIN
+		X-XSS-Protection: 1; mode=block
+	3、Request Header
+		Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
+		Accept-Encoding: gzip, deflate
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Cache-Control: max-age=0
+		Connection: keep-alive
+		Host: f2.cq911611.xyz
+		Upgrade-Insecure-Requests: 1
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36
+	B:登录
+	1、General：
+		Request URL: http://f1.cq911611.xyz/Member/DoLogin?_=1552837187821
+		Request Method: POST
+		Status Code: 200 OK
+		Remote Address: 47.52.193.214:80
+		Referrer Policy: no-referrer-when-downgrade
+	
+	2、Request Header
+		Accept: application/json, text/javascript, */*; q=0.01
+		Accept-Encoding: gzip, deflate
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Content-Length: 32
+		Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+		Cookie: SevenStarHFDirector15Frontend15=ovlzy2keo0b2k1kblkblwsyr; Akamai_Cookie=2635074058.12917.0000; first_visit=1; visid_incap_1712594=bXVNWWeESJaxsGlh90557ctpjlwAAAAAQUIPAAAAAADYEt9fzyeqfywiYSslt2NE; incap_ses_570_1712594=0uo2IutiQF5gHsX69ibpB8tpjlwAAAAAkyFfW+bNctiuqn0yKip+TQ==; __cfduid=dd308c706a96bba0fd67198d9033a21041552837068
+		Host: f1.cq911611.xyz
+		Origin: http://f1.cq911611.xyz
+		Referer: http://f1.cq911611.xyz/Member/Login?_=1552837150080
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+	3、Form Data
+		Account: wu221
+		Password: aaaa67890		
+	
+	B、同意协议
+		1、General：
+			Request URL: http://f1.cq911611.xyz/Member/AcceptAgreement?_=1552837188540
+			Request Method: GET
+			Status Code: 200 OK
+			Remote Address: 47.52.193.214:80
+			Referrer Policy: no-referrer-when-downgrade
+		2、Request
+			Accept: application/json, text/javascript, */*; q=0.01
+			Accept-Encoding: gzip, deflate
+			Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+			Connection: keep-alive
+			Cookie: SevenStarHFDirector15Frontend15=ovlzy2keo0b2k1kblkblwsyr; Akamai_Cookie=2635074058.12917.0000; first_visit=1; visid_incap_1712594=bXVNWWeESJaxsGlh90557ctpjlwAAAAAQUIPAAAAAADYEt9fzyeqfywiYSslt2NE; incap_ses_570_1712594=0uo2IutiQF5gHsX69ibpB8tpjlwAAAAAkyFfW+bNctiuqn0yKip+TQ==; __cfduid=dd308c706a96bba0fd67198d9033a21041552837068; robot3=WxPYs3GE4w9wuPkSRS4InitfWmMsI12DmLdTg152Nq4=
+			Host: f1.cq911611.xyz
+			Referer: http://f1.cq911611.xyz/Member/Agreement
+			User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+			X-Requested-With: XMLHttpRequest
+		3、Form
+			_: 1552837188540
+				
+	
+	
+	
+	
+	
+	
+	
+四、首页：
+	1、General：
+		Request URL: http://f2.cq911611.xyz/App/Index?_=1553507013165
+		Request Method: GET
+		Status Code: 200 OK
+		Remote Address: 210.71.189.253:80
+		Referrer Policy: no-referrer-when-downgrade
+	
+	2、Request header
+		Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
+		Accept-Encoding: gzip, deflate
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Cache-Control: max-age=0
+		Connection: keep-alive
+		Cookie: SevenStarHFDirector15Frontend15=sxfwvhty1tyttp1wse5rlfsu; visid_incap_1712594=wujAMgPbROKGNQIh4ybDXaeimFwAAAAAQUIPAAAAAABrJjPf4yvapwIbfPhplnLH; nlbi_1712594=y8AxGtPheEE2nmpjE3SBeAAAAAAT6b+RVbZWibJshn5+9lxO; incap_ses_1204_1712594=ddVvI+K3W1IboEDts3e1EKeimFwAAAAAY11fB4Fcesl0dT4XOCUMtA==; first_visit=1; __cfduid=dfca099274dab4a3862e618546adad21f1553506984; Akamai_Cookie=2802846218.12917.0000; robot3=6RWnbUltGLGtHHFhBfP3A6I+vqb+Xj1jfn5UPAbluxA=; NOTICE_LOGIN_IN=1
+		Host: f2.cq911611.xyz
+		Upgrade-Insecure-Requests: 1
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36
+	3、Form Data
+		_: 1553507013165	
+	
+五、四定快译
+	dict_no_type_id=11;
+	1、General：
+		Request URL:http://f3.cq6988.xyz/Member/BatchBet
+	2、Request header
+		Accept: application/json, text/javascript, */*; q=0.01
+		Accept-Encoding: gzip, deflate
+		Accept-Language: zh-CN,zh;q=0.9
+		Connection: keep-alive
+		Content-Length: 2393
+		Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+		Cookie: visid_incap_1712594=wYAgsXUvQA+YTJBysUNUPQtHYVwAAAAAQUIPAAAAAACBhOUePQjGfTkSntEA6AYH; __cfduid=d641cd300e4e967806dc321c5bf288ff51550024047; SevenStarHFDirector24Frontend24=xblykp5eoy01h0uu4j0yxjv4; GCLB=CIjB_7LgpeP3xQE; nlbi_1712594=5ZSQK7sYcF6rvUYoE3SBeAAAAAAfufuf5pTq8a7DTuyQlMj0; incap_ses_627_1712594=tZKwAhBVchA+gUg/Mo2zCIzpmlwAAAAAYfLdbQZfm9uuKWQDRG2WFA==; robot3=fAY1yVHkSQWSF093Sss0lTfBk4CA5OnZikBhJpF5PoM=; NOTICE_LOGIN_IN=1; Akamai_Cookie=2752514570.15221.0000
+		Host: f3.cq6988.xyz
+		Origin: http://f3.cq6988.xyz
+		Referer: http://f3.cq6988.xyz/App/Index?_=1553656214262
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+	3、Form
+		totalCount: 24
+		totalBetMoney: 2.4
+		bets: [{"bet_money":"0.1","bet_no":"1234","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"1243","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"1324","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"1342","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"1423","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"1432","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"2134","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"2143","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"2314","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"2341","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"2413","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"2431","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"3124","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"3142","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"3214","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"3241","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"3412","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"3421","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"4123","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"4132","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"4213","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"4231","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"4312","dict_no_type_id":11},{"bet_money":"0.1","bet_no":"4321","dict_no_type_id":11}]
+		way: 108
+		period_no: 20190327022
+		bet_log: 1324%E5%85%A8%E5%80%92%E5%9B%9B%E5%AE%9A%E5%90%840.1
+六、三定快译
+	case "千百十":
+		dict_no_type_id=7;
+	case "千十个":
+		dict_no_type_id=9;
+	case "百十个":
+		dict_no_type_id=10;
+	case "千百个":
+		dict_no_type_id=8;
+	
+七、二定快译
+	case "千百":
+		dict_no_type_id =1;
+	break;
+	case "千十":
+		dict_no_type_id =2;
+	break;
+	case "千个":
+		dict_no_type_id =3;
+	break;
+	case "百十":
+		dict_no_type_id =5;
+	break;
+	case "百个":
+		dict_no_type_id =4;
+	break;
+	case "十个":
+		dict_no_type_id =6;
+	break;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+		

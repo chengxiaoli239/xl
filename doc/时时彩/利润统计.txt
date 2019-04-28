@@ -1,0 +1,366 @@
+四字定利润统计：
+2018-08月份：
+Array
+(
+    [0] => Array
+        (
+            [zjZhus] => 3269
+            [nums] => 3269
+            [count] => 16
+            [profits] => -1634.5
+        )
+
+    [1] => Array
+        (
+            [zjZhus] => 1666
+            [nums] => 3269
+            [count] => 8
+            [profits] => 30667
+        )
+
+    [2] => Array
+        (
+            [zjZhus] => 1199
+            [nums] => 3269
+            [count] => 6
+            [profits] => -27474.5
+        )
+
+    [3] => Array
+        (
+            [zjZhus] => 404
+            [nums] => 3269
+            [count] => 2
+            [profits] => -4827
+        )
+
+    [4] => Array
+        (
+            [zjZhus] => 824
+            [nums] => 3269
+            [count] => 4
+            [profits] => 6338
+        )
+
+    [5] => Array
+        (
+            [zjZhus] => 842
+            [nums] => 3269
+            [count] => 4
+            [profits] => 24329
+        )
+
+)
+
+2018-09月份：
+<pre>Array
+(
+    [0] => Array
+        (
+            [zjZhus] => 3595
+            [nums] => 3595
+            [count] => 16
+            [profits] => -1797.5
+        )
+
+    [1] => Array
+        (
+            [zjZhus] => 1788
+            [nums] => 3595
+            [count] => 8
+            [profits] => -10394
+        )
+
+    [2] => Array
+        (
+            [zjZhus] => 1318
+            [nums] => 3595
+            [count] => 6
+            [profits] => -30784
+        )
+
+    [3] => Array
+        (
+            [zjZhus] => 489
+            [nums] => 3595
+            [count] => 2
+            [profits] => 39380.5
+        )
+
+    [4] => Array
+        (
+            [zjZhus] => 955
+            [nums] => 3595
+            [count] => 4
+            [profits] => 55772.5
+        )
+
+    [5] => Array
+        (
+            [zjZhus] => 833
+            [nums] => 3595
+            [count] => 4
+            [profits] => -66166.5
+        )
+
+)
+2018-10月份：
+<pre>Array
+(
+    [0] => Array
+        (
+            [zjZhus] => 3720
+            [nums] => 3720
+            [count] => 16
+            [profits] => -1860
+        )
+
+    [1] => Array
+        (
+            [zjZhus] => 1875
+            [nums] => 3720
+            [count] => 8
+            [profits] => 14062.5
+        )
+
+    [2] => Array
+        (
+            [zjZhus] => 1403
+            [nums] => 3720
+            [count] => 6
+            [profits] => 7298.5
+        )
+
+    [3] => Array
+        (
+            [zjZhus] => 442
+            [nums] => 3720
+            [count] => 2
+            [profits] => -23221
+        )
+
+    [4] => Array
+        (
+            [zjZhus] => 961
+            [nums] => 3720
+            [count] => 4
+            [profits] => 30519.5
+        )
+
+    [5] => Array
+        (
+            [zjZhus] => 914
+            [nums] => 3720
+            [count] => 4
+            [profits] => -16457
+        )
+
+)
+2018-11月份：
+<pre>Array
+(
+    [0] => Array
+        (
+            [zjZhus] => 3588
+            [nums] => 3589
+            [count] => 16
+            [profits] => -2794
+        )
+
+    [1] => Array
+        (
+            [zjZhus] => 1778
+            [nums] => 3589
+            [count] => 8
+            [profits] => -17389
+        )
+
+    [2] => Array
+        (
+            [zjZhus] => 1370
+            [nums] => 3589
+            [count] => 6
+            [profits] => 23440
+        )
+
+    [3] => Array
+        (
+            [zjZhus] => 440
+            [nums] => 3589
+            [count] => 2
+            [profits] => -8845
+        )
+
+    [4] => Array
+        (
+            [zjZhus] => 868
+            [nums] => 3589
+            [count] => 4
+            [profits] => -29684
+        )
+
+    [5] => Array
+        (
+            [zjZhus] => 910
+            [nums] => 3589
+            [count] => 4
+            [profits] => 12295
+        )
+
+)
+2018-12月份：
+<pre>Array
+(
+    [0] => Array
+        (
+            [zjZhus] => 3682
+            [nums] => 3682
+            [count] => 16
+            [profits] => -1841
+        )
+
+    [1] => Array
+        (
+            [zjZhus] => 1850
+            [nums] => 3682
+            [count] => 8
+            [profits] => 8075
+        )
+
+    [2] => Array
+        (
+            [zjZhus] => 1408
+            [nums] => 3682
+            [count] => 6
+            [profits] => 26546
+        )
+
+    [3] => Array
+        (
+            [zjZhus] => 424
+            [nums] => 3682
+            [count] => 2
+            [profits] => -36462
+        )
+
+    [4] => Array
+        (
+            [zjZhus] => 919
+            [nums] => 3682
+            [count] => 4
+            [profits] => -1959.5
+        )
+
+    [5] => Array
+        (
+            [zjZhus] => 931
+            [nums] => 3682
+            [count] => 4
+            [profits] => 10034.5
+        )
+
+)
+2019-01月份：
+<pre>Array
+(
+    [0] => Array
+        (
+            [zjZhus] => 3710
+            [nums] => 3710
+            [count] => 16
+            [profits] => -1855
+        )
+
+    [1] => Array
+        (
+            [zjZhus] => 1859
+            [nums] => 3710
+            [count] => 8
+            [profits] => 3070.5
+        )
+
+    [2] => Array
+        (
+            [zjZhus] => 1367
+            [nums] => 3710
+            [count] => 6
+            [profits] => -24933.5
+        )
+
+    [3] => Array
+        (
+            [zjZhus] => 484
+            [nums] => 3710
+            [count] => 2
+            [profits] => 20008
+        )
+
+    [4] => Array
+        (
+            [zjZhus] => 883
+            [nums] => 3710
+            [count] => 4
+            [profits] => -44941.5
+        )
+
+    [5] => Array
+        (
+            [zjZhus] => 976
+            [nums] => 3710
+            [count] => 4
+            [profits] => 48012
+        )
+
+)
+2019-02月份：
+<pre>Array
+(
+    [0] => Array
+        (
+            [zjZhus] => 360
+            [nums] => 360
+            [count] => 16
+            [profits] => -180
+        )
+
+    [1] => Array
+        (
+            [zjZhus] => 172
+            [nums] => 360
+            [count] => 8
+            [profits] => -8086
+        )
+
+    [2] => Array
+        (
+            [zjZhus] => 137
+            [nums] => 360
+            [count] => 6
+            [profits] => 1931.5
+        )
+
+    [3] => Array
+        (
+            [zjZhus] => 51
+            [nums] => 360
+            [count] => 2
+            [profits] => 5974.5
+        )
+
+    [4] => Array
+        (
+            [zjZhus] => 93
+            [nums] => 360
+            [count] => 4
+            [profits] => 2953.5
+        )
+
+    [5] => Array
+        (
+            [zjZhus] => 79
+            [nums] => 360
+            [count] => 4
+            [profits] => -11039.5
+        )
+
+)

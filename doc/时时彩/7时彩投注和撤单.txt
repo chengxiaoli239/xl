@@ -1,0 +1,205 @@
+1.1、下注之后抓取方案号
+Request URL: http://k3.cq691111.xyz/Member/GetMemberPrint?_=1555000599483
+Request Method: GET
+Status Code: 200 OK
+Remote Address: 35.227.214.201:80
+Referrer Policy: no-referrer-when-downgrade
+Cache-Control: private
+Content-Length: 1798
+Content-Type: text/html; charset=utf-8
+Date: Thu, 11 Apr 2019 16:36:42 GMT
+Server: Jws
+Vary: Accept-Encoding
+Via: 1.1 google
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Cookie: SevenStarHFDirector37Frontend37=bq51vbith4fnxex03h3u1od0; GCLB=CPL8ovmgoarx7wE; Akamai_Cookie=672139786.14453.0000; visid_incap_1712594=iXTOQ/rPShKOksA5Osk75Ydnr1wAAAAAQUIPAAAAAAB1BcX+snl5mlHqUhcplv7P; nlbi_1712594=gDTcfgbvJyn0vsJKE3SBeAAAAAA7QAI0we6hyuGadCJRtNes; incap_ses_627_1712594=ZXJ0WjoKlAJ1avM2OY2zCIdnr1wAAAAAWeKLfSkA63wa4MY129LUZg==; __cfduid=d18bcfdb32dab13cab5b92bb6cad5c4481554999176; first_visit=1; cf_clearance=e724f661e71185b699e9b29e5b320ff16f0d04b8-1555000566-1800-150; robot3=q79CI53loTYTh63FGg/WALxdIguL9Tj5+sNdhJIYsBc=; NOTICE_LOGIN_IN=1
+Host: k3.cq691111.xyz
+Referer: http://k3.cq691111.xyz/App/Index?_=1555000599067
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+X-Requested-With: XMLHttpRequest
+_: 1555000599483
+
+1.2其次抓取下单列表html页面投注id，多个号码就是有多个: http://k8.cq691111.xyz/App/Index?_=1554999190623#!kuaida
+
+
+
+
+退单一：
+Request URL: http://k8.cq691111.xyz/Member/GetMemberPrint?_=1554999191862
+Request Method: GET
+Status Code: 200 OK
+Remote Address: 137.116.160.48:80
+Referrer Policy: no-referrer-when-downgrade
+Cache-Control: private
+Connection: keep-alive
+Content-Encoding: gzip
+Content-Length: 759
+Content-Type: text/html; charset=utf-8
+Date: Thu, 11 Apr 2019 16:14:21 GMT
+Server: Jws
+Vary: Accept-Encoding
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Cookie: SevenStarHFDirector37Frontend37=wytlpcijw45jkjb3tit0btv2; visid_incap_1712594=iXTOQ/rPShKOksA5Osk75Ydnr1wAAAAAQUIPAAAAAAB1BcX+snl5mlHqUhcplv7P; nlbi_1712594=gDTcfgbvJyn0vsJKE3SBeAAAAAA7QAI0we6hyuGadCJRtNes; incap_ses_627_1712594=ZXJ0WjoKlAJ1avM2OY2zCIdnr1wAAAAAWeKLfSkA63wa4MY129LUZg==; __cfduid=d18bcfdb32dab13cab5b92bb6cad5c4481554999176; Akamai_Cookie=789580298.14453.0000; robot3=YbDk7v1hLVjNWuHmNihJTKEURbf8GZpwaeYrpuBspSM=; NOTICE_LOGIN_IN=1
+Host: k8.cq691111.xyz
+Referer: http://k8.cq691111.xyz/App/Index?_=1554999190623
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+X-Requested-With: XMLHttpRequest
+_: 1554999191862
+GetMemberPrint?_=1554999191862	GetCurrentPeriodStatus?_=1554999191863	GetCurrentPeriodStatus?_=1554999191864	
+
+
+
+
+真实退单
+案例一：
+Request URL: http://k8.cq691111.xyz/Member/CancelMemberBet
+Request Method: POST
+Status Code: 200 OK
+Remote Address: 137.116.160.48:80
+Referrer Policy: no-referrer-when-downgrade
+Cache-Control: private
+Connection: keep-alive
+Content-Encoding: gzip
+Content-Length: 205
+Content-Type: text/html; charset=utf-8
+Date: Thu, 11 Apr 2019 16:15:02 GMT
+Server: Jws
+Vary: Accept-Encoding
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Content-Length: 49
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Cookie: SevenStarHFDirector37Frontend37=wytlpcijw45jkjb3tit0btv2; visid_incap_1712594=iXTOQ/rPShKOksA5Osk75Ydnr1wAAAAAQUIPAAAAAAB1BcX+snl5mlHqUhcplv7P; nlbi_1712594=gDTcfgbvJyn0vsJKE3SBeAAAAAA7QAI0we6hyuGadCJRtNes; incap_ses_627_1712594=ZXJ0WjoKlAJ1avM2OY2zCIdnr1wAAAAAWeKLfSkA63wa4MY129LUZg==; __cfduid=d18bcfdb32dab13cab5b92bb6cad5c4481554999176; Akamai_Cookie=789580298.14453.0000; robot3=YbDk7v1hLVjNWuHmNihJTKEURbf8GZpwaeYrpuBspSM=; NOTICE_LOGIN_IN=1
+Host: k8.cq691111.xyz
+Origin: http://k8.cq691111.xyz
+Referer: http://k8.cq691111.xyz/App/Index?_=1554999190623
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+X-Requested-With: XMLHttpRequest
+ids: 117010|1,117011|1
+period_no: 20190412001
+
+案例二：
+Request URL: http://k8.cq691111.xyz/Member/CancelMemberBet
+Request Method: POST
+Status Code: 200 OK
+Remote Address: 137.116.160.48:80
+Referrer Policy: no-referrer-when-downgrade
+Cache-Control: private
+Connection: keep-alive
+Content-Encoding: gzip
+Content-Length: 267
+Content-Type: text/html; charset=utf-8
+Date: Thu, 11 Apr 2019 16:20:12 GMT
+Server: Jws
+Vary: Accept-Encoding
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Content-Length: 75
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Cookie: SevenStarHFDirector37Frontend37=wytlpcijw45jkjb3tit0btv2; visid_incap_1712594=iXTOQ/rPShKOksA5Osk75Ydnr1wAAAAAQUIPAAAAAAB1BcX+snl5mlHqUhcplv7P; nlbi_1712594=gDTcfgbvJyn0vsJKE3SBeAAAAAA7QAI0we6hyuGadCJRtNes; incap_ses_627_1712594=ZXJ0WjoKlAJ1avM2OY2zCIdnr1wAAAAAWeKLfSkA63wa4MY129LUZg==; __cfduid=d18bcfdb32dab13cab5b92bb6cad5c4481554999176; Akamai_Cookie=789580298.14453.0000; robot3=YbDk7v1hLVjNWuHmNihJTKEURbf8GZpwaeYrpuBspSM=; NOTICE_LOGIN_IN=1
+Host: k8.cq691111.xyz
+Origin: http://k8.cq691111.xyz
+Referer: http://k8.cq691111.xyz/App/Index?_=1554999190623
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+X-Requested-With: XMLHttpRequest
+ids: 514330|1,514333|1,514334|1,514385|1
+period_no: 20190412001
+
+
+
+
+# 快打记录
+http://k5.cq691111.xyz/Member/GetKuaidaList?_=1555052366600
+Request Method: GET
+Accept: application/json, text/javascript, */*; q=0.01
+Referer: http://k5.cq691111.xyz/App/Index?_=1555052353639
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36
+X-Requested-With: XMLHttpRequest
+
+_: 1555052477064
+
+返回：
+{"Status":1,"Data":{"Info":{"is_period_open":1,"period_number":20190412033,"current_time":"2019-04-12 15:01:17"},"List":[{"lottery":"重庆7时彩","show_frontend":"0","member_id":"40430","serial_no":"403163058665244684","package_id":"0","bet_id":"50186664","dict_no_type_id":"11","bet_no":"0609","bet_datetime":"2019/4/12 14:58:26","no_cancel":"0","is_cancel":"0","bet_money":"0.1","odds":"9970","odds_status":"5","BetCount":"1"},{"lottery":"重庆7时彩","show_frontend":"0","member_id":"40430","serial_no":"403163058665244684","package_id":"0","bet_id":"50186665","dict_no_type_id":"11","bet_no":"2514","bet_datetime":"2019/4/12 14:58:26","no_cancel":"0","is_cancel":"0","bet_money":"0.1","odds":"9990","odds_status":"0","BetCount":"1"}]}}
+
+
+和值范围投注：
+1、Genenral
+Request URL: http://k5.cq691111.xyz/Member/MultipleBet
+Request Method: POST
+Status Code: 200 OK
+Remote Address: 35.194.159.12:80
+Referrer Policy: no-referrer-when-downgrade
+
+2、Requerst Header
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Content-Length: 2933
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Cookie: SevenStarHFDirector37Frontend37=hr0tucqsugnhkkwjnfhld3ot; visid_incap_1712594=iXTOQ/rPShKOksA5Osk75Ydnr1wAAAAAQUIPAAAAAAB1BcX+snl5mlHqUhcplv7P; nlbi_1712594=gDTcfgbvJyn0vsJKE3SBeAAAAAA7QAI0we6hyuGadCJRtNes; __cfduid=d18bcfdb32dab13cab5b92bb6cad5c4481554999176; Akamai_Cookie=789580298.14453.0000; incap_ses_627_1712594=rBJWTrNgXWSkLnM3OY2zCCC6sFwAAAAAWoRvgRt6rlzNuzLw57Kgog==; robot3=NFlyshr6od8agkshnLt501Vm2vMlGiT8AJNu8q0g9ZM=; first_visit=1; NOTICE_LOGIN_IN=1
+Host: k5.cq691111.xyz
+Origin: http://k5.cq691111.xyz
+Referer: http://k5.cq691111.xyz/App/Index?_=1555087280317
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+
+<pre>Array
+(
+    [bet_number] => 3999,4899,4989,4998,4999,5799,5889,5898,5899,5979,5988,5989,5997,5998,5999,6699,6789,6798,6799,6879,6888,6889,6897,6898,6899,6969,6978,6979,6987,6988,6989,6996,6997,6998,6999,7599,7689,7698,7699,7779,7788,7789,7797,7798,7799,7869,7878,7879,7887,7888,7889,7896,7897,7898,7899,7959,7968,7969,7977,7978,7979,7986,7987,7988,7989,7995,7996,7997,7998,7999,8499,8589,8598,8599,8679,8688,8689,8697,8698,8699,8769,8778,8779,8787,8788,8789,8796,8797,8798,8799,8859,8868,8869,8877,8878,8879,8886,8887,8889,8895,8896,8897,8898,8899,8949,8958,8959,8967,8968,8969,8976,8977,8978,8979,8985,8986,8987,8988,8989,8994,8995,8996,8997,8998,8999,9399,9489,9498,9499,9579,9588,9589,9597,9598,9599,9669,9678,9679,9687,9688,9689,9696,9697,9698,9699,9759,9768,9769,9777,9778,9779,9786,9787,9788,9789,9795,9796,9797,9798,9799,9849,9858,9859,9867,9868,9869,9876,9877,9878,9879,9885,9886,9887,9888,9889,9894,9895,9896,9897,9898,9899,9939,9948,9949,9957,9958,9959,9966,9967,9968,9969,9975,9976,9977,9978,9979,9984,9985,9986,9987,9988,9989,9993,9994,9995,9996,9997,9998
+    [bet_money] => 0.1
+    [bet_way] => 102
+    [is_xian] => 0
+    [number_type] => 40
+    [guid] => 3e1752e5-e455-4075-b657-0fd13b90d65d
+    [bet_log] => [四定位]，合分值范围：[30-35]
+    [is_package] => 0
+    [period_no] => 20190413005
+    [operation_condition] => {"symbol":"X","isXian":0,"firstNumber":"","secondNumber":"","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":40,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[30,35],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[0,0,0,0],"symbolPositions":[],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}
+)
+
+3、Form Data
+bet_number: 3999,4899,4989,4998,4999,5799,5889,5898,5899,5979,5988,5989,5997,5998,5999,6699,6789,6798,6799,6879,6888,6889,6897,6898,6899,6969,6978,6979,6987,6988,6989,6996,6997,6998,6999,7599,7689,7698,7699,7779,7788,7789,7797,7798,7799,7869,7878,7879,7887,7888,7889,7896,7897,7898,7899,7959,7968,7969,7977,7978,7979,7986,7987,7988,7989,7995,7996,7997,7998,7999,8499,8589,8598,8599,8679,8688,8689,8697,8698,8699,8769,8778,8779,8787,8788,8789,8796,8797,8798,8799,8859,8868,8869,8877,8878,8879,8886,8887,8888,8889,8895,8896,8897,8898,8899,8949,8958,8959,8967,8968,8969,8976,8977,8978,8979,8985,8986,8987,8988,8989,8994,8995,8996,8997,8998,8999,9399,9489,9498,9499,9579,9588,9589,9597,9598,9599,9669,9678,9679,9687,9688,9689,9696,9697,9698,9699,9759,9768,9769,9777,9778,9779,9786,9787,9788,9789,9795,9796,9797,9798,9799,9849,9858,9859,9867,9868,9869,9876,9877,9878,9879,9885,9886,9887,9888,9889,9894,9895,9896,9897,9898,9899,9939,9948,9949,9957,9958,9959,9966,9967,9968,9969,9975,9976,9977,9978,9979,9984,9985,9986,9987,9988,9989,9993,9994,9995,9996,9997,9998
+bet_money: 0.1
+bet_way: 102
+is_xian: 0
+number_type: 40
+bet_log: [四定位]，合分值范围：[30-35]
+guid: 3e1752e5-e455-4075-b657-0fd13b90d65d
+is_package: 0
+period_no: 20190413002
+operation_condition: {"symbol":"X","isXian":0,"firstNumber":"","secondNumber":"","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":40,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[30,35],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[0,0,0,0],"symbolPositions":[],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

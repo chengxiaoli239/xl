@@ -1,0 +1,352 @@
+<?php
+
+/**
+ * Created by PhpStorm.
+ * User: wangyegao
+ * Date: 2018/02/06
+ * Time: 09:40
+ */
+
+namespace backend\service;
+use backend\models\BettingRecords;
+use backend\models\SscKjData;
+use backend\models\User;
+use backend\models\UserFollowData;
+use common\service\CommonService;
+use common\tools\Tool_Common;
+use  yii;
+
+class OpKjService extends BaseService {
+
+    /**
+     * @description 处理开奖数据
+     * 投注方式，具体见 CommonService::getOdds( ) 方法
+     * @return array
+     */
+    public static function opSscKjData(){
+
+        $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
+
+        $m = \Yii::$app->cache;
+        $data = SscKjData::find()->select('qihao')->orderBy('id DESC')->limit(20)->asArray()->all();
+        $qihaos = [];
+        foreach ($data as $v){
+            $qihaos[] = $v['qihao'];
+        }
+        //p($qihaos);
+        $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0,'qihao'=>$qihaos])->orderBy('bet.qihao ASC')->limit(20)->all();
+        if(!$bettingRecords) return $rst;
+        foreach ($bettingRecords as $bettingRecord){
+            $is_simulate = $bettingRecord['is_simulate'];
+            $qihao = $bettingRecord->qihao;
+            $account = $bettingRecord['account'];
+            $single = $bettingRecord['single'];
+            $playway = $bettingRecord['playway'];
+            $codes = $bettingRecord['codes'];
+            $plan_id = $bettingRecord['plan_id'];
+            $mkey_qihao = '0898tz_'.$account.'_'.$plan_id;
+            $m->delete($mkey_qihao);
+
+            # 开奖数据 start
+            $kjData = SscKjData::find()->where(['qihao'=>$qihao])->asArray()->one()['code_str'];
+            if(!$kjData){
+                $kjData = CommonService::getAwardNumberByQihao($qihao); // 3,4,5,6,7
+            }
+            # 开奖数据 end
+            if(!$kjData){
+                return $rst = ['status'=>300, 'msg'=>$qihao.'期未开奖!'];
+            }
+
+            //$fun = 'opKjData'.$bettingRecord['playway']; // opKjData1、opKjData4、opKjData10
+            switch ($bettingRecord['playway']){
+                case 1: // 二字定
+                case 2: // 三字定
+                    /*
+                    $kjData_n = substr($kjData, 0,7); // 开奖截取前4位号码
+                    $zjResult = OpKjService::opKjData1($codes, $kjData_n);
+                    break;
+                    */
+                case 3: // 四字定
+                    $kjData_n = substr($kjData, 0,7); // 开奖截取前4位号码
+                    $zjResult = OpKjService::opKjData4($codes, $kjData_n);
+                    break;
+                case 10:
+                    $zjResult = OpKjService::opKjData10($codes, $kjData, $groupSplit = '@', $codeSplit = ',',$nullCode = '');
+                    break;
+                default:;
+            }
+            if($zjResult['status'] == 200){
+                $times = $zjResult['data']['zjTimes'];
+            }
+            # 中奖金额 = 赔率 * 倍数 * 注数
+            $bouns = CommonService::getOdds($playway) * $bettingRecord['single'] * $times;
+            # 利润 = 中奖金额 - 投注金额
+            $profits = $bouns - $bettingRecord['betting_money'];
+
+            $updateData = [
+                'bonus' => $bouns,
+                'profits' => $profits,
+                'kj_codes' => $kjData,
+                'updated_at' => time(),
+                'status' => 1
+            ];
+            //if($bettingRecord->cancel_status == 1){
+            //    $updateData['bonus'] = 0.00;
+            //}
+            $bettingRecord->setAttributes($updateData);
+            $status = $bettingRecord->save();
+            $logArr = [
+                'qihao'=>$qihao,
+                'opRst'=>$status,'playway'=>$playway,'codes'=>$codes,'is_simulate'=>$is_simulate,
+                'kjData'=>$kjData, 'single'=>$single,'zjResult'=>$zjResult,'bouns'=>$bouns, 'profits'=>$profits,
+            ];
+            # 中奖则更换投注号码
+            if($bouns > 0){
+                $m = \Yii::$app->cache;
+                $mkey = 'USER_TZ_STATUS_'.$bettingRecord['account'];
+                $m->set($mkey, 0, 90*60);
+            }
+
+            Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/opSscKjData','INFO','0898投注记录', $logArr);
+        }
+
+        return $rst;
+    }
+
+    /**
+     * @desc 投注号码变更
+     * @param string $account
+     * @param int $playway
+     * @param int $is_simulate 是否是模拟投注
+     * @return array
+     */
+    public static function changeTzCodes($recently_qihao = '',$account = 'gaozi2017', $playway = 1, $is_simulate = 1){
+        $rst = ['status'=>200, 'msg'=>'号码变更处理完成!'];
+        $UserFollowData = UserFollowData::findOne(['account'=>$account,'playway'=>$playway, 'is_simulate'=>$is_simulate]);
+        //p(['account'=>$account,'playway'=>$playway, 'is_simulate'=>$is_simulate,$UserFollowData]);
+        $reference_codes = $UserFollowData->reference_codes;
+        $newTzCodes = self::getBestTzCodes($recently_qihao,$UserFollowData->position,$reference_codes);
+        $UserFollowData->code = $newTzCodes['newTzCodes'];
+        $UserFollowData->codes_hezhi = $newTzCodes['hezhi'];
+        $UserFollowData->single = 0.2;
+        $UserFollowDataUpStatus = $UserFollowData->save(false);
+        $logArr = [
+            'recently_qihao'=>$recently_qihao,
+            'playway'=>$playway,
+            'account'=>$account,
+            'is_simulate'=>$is_simulate,
+            'position'=>$UserFollowData->position,
+            'reference_codes'=>$reference_codes,
+            'newTzCodes'=>$newTzCodes,
+            'UserFollowDataUpStatus'=>$UserFollowDataUpStatus
+        ];
+        Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/opChangTzCodes','INFO','0898投注记录', $logArr);
+
+        if(!$UserFollowDataUpStatus)
+            $rst = ['status'=>300, 'msg'=>'号码变更异常'.current($UserFollowData->getErrors())];
+
+        return $rst;
+    }
+
+    /**
+     * @desc 返回最佳投注二字定号码
+     * @param string $qihao
+     * @param string $position
+     * @param string $reference_codes
+     * @return array|bool
+     */
+    public static function getBestTzCodes($qihao = '',$position = '1,3', $reference_codes = '8,9,10,11,13'){
+        if(!$qihao) return false;
+        $rst = [];
+        //$zuHes = [ '1,2', '1,3', '1,4', '2,3', '2,4', '3,4' ]; // 目前暂时支持这几种定位组合投注
+        $zuHe = explode(',',$position); // array, 1、3位：[1,3]
+        $fields = 'code_'.str_replace(',','_',$position);
+        if(!$reference_codes)
+            $heZhis = [8,9,10,11,12,13];
+        else
+            $heZhis = explode(',',$reference_codes);
+
+        $heZhi_huizong = BaseNumService::getHeZhiByPositionTotal(120,$zuHe,$heZhis)['data']; // 在近xxx期期间和值汇总
+        $mixNums = end($heZhi_huizong)[$fields]; // 120期出现概率最小的
+
+        $kjData = SscKjData::findOne(['qihao'=>$qihao]);
+        $recentlyHeZhi = $kjData->$fields;
+
+        $heZhi_yilou = BaseNumService::getHeZhiYL($zuHe,$heZhis)['data']; // 和值为8、9在200期里边遗漏期数
+        arsort($heZhi_yilou);
+        $unsetArr = [$mixNums, $recentlyHeZhi];
+        self::unsetArrEle($heZhis,$unsetArr);
+
+        # 去除遗漏最大的数 start #
+        if(count($heZhis) > 2){
+            $max =  max($heZhi_yilou);
+            $maxKey = array_search($max, $heZhi_yilou);
+            $min =  min($heZhi_yilou);
+            $minKey = array_search($min, $heZhi_yilou);
+            $unsetArr = [$maxKey,$minKey];
+            self::unsetArrEle($heZhis,$unsetArr);
+        }
+        # 去除遗漏最大的数 end #
+
+        $maxZhi =  current($heZhis);
+
+        $is_rand = 0;
+        if(!$maxZhi){
+            $is_rand = 1;
+            $maxZhi = rand(8,12);
+        }
+        $newTzCodes = BaseNumService::dwZuHe($zuHe,[$maxZhi]); // 某两个位置组合 ，dwZuHe() 这个方法做成分析得出结果
+        $logArr = [
+            'unsetArr'=>$unsetArr,
+            'kjData'=>$kjData->code_str,
+            'qihao'=>$qihao,
+            'zuHe'=>$zuHe,
+            'fields'=>$fields,
+            'maxZhi'=>$maxZhi,
+            'is_rand'=>$is_rand,
+            'newTzCodes'=>$newTzCodes
+        ];
+        Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/getBestTzCodes','INFO','获取最佳投注号码', $logArr);
+
+        return ['postion'=>$position,'hezhi'=>$maxZhi,'newTzCodes'=>$newTzCodes];
+    }
+
+    /**
+     * @description 判断是否中奖，如果中奖则返回中奖金额，二、三、四字定，playway:1
+     * @param int $playway  投注方式，具体见 CommonService::getOdds( ) 方法
+     * @param string $codes 投注号码 0,X,8,X@0,X,8,X@1,X,7,X@1,X,7,X@2,X,6,X@2,X,6,X@3,X,5,X@3,X,5,X@4,X,4,X
+     * @param string $kjData   开奖号码 3,4,5,6,7
+     * @param float $single 投注倍数
+     * @param int $dw 定位数，默认二字定
+     * @return array
+     */
+    public static function opKjData1($codes = '', $kjData, $groupSplit = '@', $codeSplit=',', $nullCode='X'){
+        $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
+        $zjTimes = 0;   // 中奖倍数、次数
+        $tzCodes = CommonService::genDw($codes, $groupSplit, $nullCode);
+        foreach ($tzCodes as $tzCode){
+            $tmpKeys = [];
+            $tmpKjData = explode($codeSplit,$kjData);
+            # 1、去除空号码的字符
+            foreach ($tzCode as $key=>$code){
+                if($code == $nullCode){
+                    $tmpKeys[] = $key;
+                }
+            }
+
+            # 2、开奖号码临时处理上面去除的key
+            foreach ($tmpKeys as $key){
+                $tmpKjData[$key] = $nullCode;
+            }
+
+            # 3、匹配上面两步的号码，相等则中奖
+            if($tzCode == $tmpKjData){
+                $zjTimes += 1;
+            }
+        }
+        $rst['data'] = ['zjTimes'=>$zjTimes];
+
+        return $rst;
+    }
+
+    /**
+     * @desc 开奖处理，主要判断四字定位
+     * @param string $codes
+     * @param $kjData
+     * @return array
+     */
+    public static function opKjData4($codes = '', $kjData, $zhuSplit = '@'){
+        $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
+        $tzCodesArr = self::explodeCodes($codes);
+        $kjCodesArr = explode(',', $kjData);
+        $zjTimes = 0;
+        foreach ($tzCodesArr as $codesArr){
+            $flag = 1;
+            foreach ($codesArr as $key=>$code){
+                if($code == 'X') continue;
+                if(strpos($code, $kjCodesArr[$key]) === false){
+                    $flag = 0;
+                }
+            }
+            if($flag) $zjTimes += 1;
+        }
+        $rst['data'] = ['zjTimes'=>$zjTimes];
+
+        return $rst;
+    }
+
+    /**
+     * @desc 拆分投注号码，str -> array (01234,01234,56789,56789、01234,01234,56789,56789@01234,01234,56789,X)
+     * @param $codes
+     * @param $split
+     * @return array
+     */
+    public static function explodeCodes($codes, $split = ',', $zhuSplit = '@'){
+        $codesArr = [];
+
+        $codesArr0 = explode($zhuSplit, $codes);
+        foreach ($codesArr0 as $key=>$codes){
+            $codesArr[$key] = explode($split, $codes);
+        }
+
+        return $codesArr;
+    }
+
+    /**@desc 删除数组中某个元素
+     * @param $array
+     * @param array $unsetEle
+     * @return bool
+     */
+    public static function unsetArrEle(&$array, $unsetEle = []){
+        if(!$array OR !$unsetEle) return false;
+
+        foreach ($unsetEle as $key=>$ele){
+            $key = array_search($ele, $array);
+            unset($array[$key]);
+        }
+    }
+
+
+    /**
+     * @description 判断是否中奖，如果中奖则返回中奖金额，定位胆，playway:10
+     * @param int $playway  投注方式，具体见 CommonService::getOdds( ) 方法
+     * @param string $codes 投注号码 0,X,8,X@0,X,8,X@1,X,7,X@1,X,7,X@2,X,6,X@2,X,6,X@3,X,5,X@3,X,5,X@4,X,4,X
+     * @param string $kjData   开奖号码 3,4,5,6,7
+     * @param float $single 投注倍数
+     * @param int $dw 定位数，默认二字定
+     * @return array
+     */
+    public static function opKjData10($codes = '', $kjData, $groupSplit = '@', $codeSplit=',', $nullCode='X'){
+        $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
+        $zjTimes = 0;   // 中奖倍数、次数
+        $tzCodes = CommonService::genDw10($codes, $groupSplit, $codeSplit, $nullCode);
+        foreach ($tzCodes as $tzCode){
+            $tmpKeys = [];
+            $tmpKjData = explode($codeSplit,$kjData);
+
+            //p([$tzCodes,$tmpKjData,$codeSplit,$kjData]);
+            # 1、去除空号码的字符
+            foreach ($tzCode as $key=>$code){
+                if($code == $nullCode){
+                    $tmpKeys[] = $key;
+                }
+            }
+
+            # 2、开奖号码临时处理上面去除的key
+            foreach ($tmpKeys as $key){
+                $tmpKjData[$key] = $nullCode;
+            }
+
+            # 3、匹配上面两步的号码，相等则中奖
+            if($tzCode == $tmpKjData){
+                $zjTimes += 1;
+            }
+        }
+        $rst['data'] = ['zjTimes'=>$zjTimes];
+
+        return $rst;
+    }
+
+
+
+}

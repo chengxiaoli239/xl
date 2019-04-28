@@ -1,0 +1,441 @@
+﻿域名：
+    https://10080001.com/index.aspx
+    https://10080002.com/index.aspx
+    https://700731.com/
+
+
+投注方式：playway
+投注倍数：single
+投注期号：qihao:
+    A、General
+    C、Request Headers
+    D、Form Data
+1、定位胆
+    A、General
+        Request URL:https://700056.com/ssc/ajax.aspx
+        Request Method:POST
+        Status Code:200 OK
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    C、Request Headers
+        Accept:*/*
+        Accept-Encoding:gzip, deflate, br
+        Accept-Language:zh-CN,zh;q=0.9,en;q=0.8
+        Connection:keep-alive
+        Content-Length:13
+        Content-Type:application/x-www-form-urlencoded
+        Cookie:ASP.NET_SessionId=woh4v445d2kzkg55wdc3il55
+        Host:www.700056.com
+        Origin:https://www.700056.com
+        Referer:https://www.700056.com/ssc/
+        User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36
+        X-Requested-With:XMLHttpRequest
+    D、Form Data
+        act:postsn
+        code:0,,0,,0
+        playway:10
+        single:0.1
+        qihao:
+2、前二
+    A、General
+        Request URL:https://700056.com/ssc/ajax.aspx
+        Request Method:POST
+        Status Code:200 OK
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    C、Request Headers
+        Accept:*/*
+        Accept-Encoding:gzip, deflate, br
+        Accept-Language:zh-CN,zh;q=0.9,en;q=0.8
+        Connection:keep-alive
+        Content-Length:52
+        Content-Type:application/x-www-form-urlencoded
+        Cookie:ASP.NET_SessionId=ybrfbh45ehbnmd55lgkaqa55
+        Host:700056.com
+        Origin:https://700056.com
+        Referer:https://700056.com/ssc/
+        User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36
+        X-Requested-With:XMLHttpRequest
+    D、Form Data
+        act:postsn
+        code:13,246,,,
+        playway:14
+        single:1
+        qihao:
+3、前三
+    A、General
+        Request URL:https://700056.com/ssc/ajax.aspx
+        Request Method:POST
+        Status Code:200 OK
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    C、Request Headers
+    D、Form Data
+        act:postsn
+        code:2478,2468,23678,,  或者：2478,2468,23678,,@458,457,48,,
+        playway:15
+        single:1
+        qihao:
+4、后二
+    A、General
+    C、Request Headers
+    D、Form Data
+        act:postsn
+        code:,,,256,246@,,,23,246
+        playway:11
+        single:1
+        qihao:
+5、后三
+    A、General
+    C、Request Headers
+    D、Form Data
+        act:postsn
+        code:,,13,1236,1256
+        playway:12
+        single:1
+    
+6、大小单双
+    A、General
+    C、Request Headers
+    D、Form Data
+        act:postsn
+        code:小双,小单双@单,单双
+        playway:13
+        single:1
+        qihao:
+
+7、组三
+    A、General
+    C、Request Headers
+    D、Form Data
+        act:postsn
+        code:23568
+        playway:16
+        single:1
+        qihao:
+8、组六
+    A、General
+    C、Request Headers
+    D、Form Data
+        ct:postsn
+        code:13579
+        playway:17
+        single:1
+        qihao:
+
+===========================更多玩法====================
+9、两字定
+    A、General
+        Request URL:https://700056.com/ssc_qmode/ajax.aspx
+        Request Method:POST
+        Status Code:200 OK
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    C、Request Headers
+		Accept: */*
+		Accept-Encoding: gzip, deflate, br
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Content-Length: 90
+		Content-Type: application/x-www-form-urlencoded
+		Cookie: ASP.NET_SessionId=xpejtt45l2tqsleqdmxfvc55; firstEnterUrlInSession=https%3A//9900001.com/; VisitorCapacity=1; pageReferrInSession=https%3A//9900001.com/
+		Host: 9900001.com
+		Origin: https://9900001.com
+		Referer: https://9900001.com/ssc_qmode/index.aspx
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+    D、Form Data
+        act:postsn
+        code:25,36,X,X@4,X,4,X@3567,X,X,2357
+        playway:1
+        single:1
+        qihao:
+10、三字定
+    A、General
+        Request URL:https://700056.com/ssc_qmode/ajax.aspx
+        Request Method:POST
+        Status Code:200 OK
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    C、Request Headers
+		Accept: */*
+		Accept-Encoding: gzip, deflate, br
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Content-Length: 90
+		Content-Type: application/x-www-form-urlencoded
+		Cookie: ASP.NET_SessionId=xpejtt45l2tqsleqdmxfvc55; firstEnterUrlInSession=https%3A//9900001.com/; VisitorCapacity=1; pageReferrInSession=https%3A//9900001.com/
+		Host: 9900001.com
+		Origin: https://9900001.com
+		Referer: https://9900001.com/ssc_qmode/index.aspx
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+    D、Form Data
+        act:postsn
+        code:578,368,359,X
+        playway:2
+        single:1
+        qihao:
+        
+11、四字定
+    A、General
+        Request URL:https://700056.com/ssc_qmode/ajax.aspx
+        Request Method:POST
+        Status Code:200 OK
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    C、Request Headers
+		Accept: */*
+		Accept-Encoding: gzip, deflate, br
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Content-Length: 90
+		Content-Type: application/x-www-form-urlencoded
+		Cookie: ASP.NET_SessionId=xpejtt45l2tqsleqdmxfvc55; firstEnterUrlInSession=https%3A//9900001.com/; VisitorCapacity=1; pageReferrInSession=https%3A//9900001.com/
+		Host: 9900001.com
+		Origin: https://9900001.com
+		Referer: https://9900001.com/ssc_qmode/index.aspx
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+    D、Form Data
+        act:postsn
+        code:478,4679,469,4678
+        playway:3
+        single:1
+        qihao:180727070
+
+12、一定位
+    A、General
+        Request URL:https://700056.com/ssc_qmode/ajax.aspx
+        Request Method:POST
+        Status Code:200 OK
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    C、Request Headers
+		Accept: */*
+		Accept-Encoding: gzip, deflate, br
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Content-Length: 90
+		Content-Type: application/x-www-form-urlencoded
+		Cookie: ASP.NET_SessionId=xpejtt45l2tqsleqdmxfvc55; firstEnterUrlInSession=https%3A//9900001.com/; VisitorCapacity=1; pageReferrInSession=https%3A//9900001.com/
+		Host: 9900001.com
+		Origin: https://9900001.com
+		Referer: https://9900001.com/ssc_qmode/index.aspx
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+    D、Form Data
+        act:postsn
+        code:24,237,125,2346
+        playway:4
+        single:1
+        qihao:
+
+13、二字现
+    A、General
+        Request URL:https://700056.com/ssc_qmode/ajax.aspx
+        Request Method:POST
+        Status Code:200 OK
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    C、Request Headers
+		Accept: */*
+		Accept-Encoding: gzip, deflate, br
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Content-Length: 90
+		Content-Type: application/x-www-form-urlencoded
+		Cookie: ASP.NET_SessionId=xpejtt45l2tqsleqdmxfvc55; firstEnterUrlInSession=https%3A//9900001.com/; VisitorCapacity=1; pageReferrInSession=https%3A//9900001.com/
+		Host: 9900001.com
+		Origin: https://9900001.com
+		Referer: https://9900001.com/ssc_qmode/index.aspx
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+    D、Form Data
+        act:postsn
+        code:28@46@78@23
+        playway:5
+        single:4
+        qihao:
+        
+7、三字现
+    A、General
+        Request URL:https://700056.com/ssc_qmode/ajax.aspx
+        Request Method:POST
+        Status Code:200 OK
+        Remote Address:199.119.140.168:443
+        Referrer Policy:no-referrer-when-downgrade
+    C、Request Headers
+		Accept: */*
+		Accept-Encoding: gzip, deflate, br
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Content-Length: 90
+		Content-Type: application/x-www-form-urlencoded
+		Cookie: ASP.NET_SessionId=xpejtt45l2tqsleqdmxfvc55; firstEnterUrlInSession=https%3A//9900001.com/; VisitorCapacity=1; pageReferrInSession=https%3A//9900001.com/
+		Host: 9900001.com
+		Origin: https://9900001.com
+		Referer: https://9900001.com/ssc_qmode/index.aspx
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+    D、Form Data
+        act:postsn
+        code:345@258
+        playway:6
+        single:6
+        qihao:
+
+
+
+投注成功放回结果：
+Array
+(
+    [sn] => SSC1803070134291164965042
+    [type] => 投注
+    [singleprice] => 1.0
+    [playway] => 10
+    [state] => 0
+    [msg] => 投注成功！
+    [codes] => ,,,,04689
+    [tzcount] => 5
+    [err] => 0
+    [lotteryclass] => ssc
+    [userid] => 116496
+    [qihao] => 180307019
+    [totalmoney] => 5.00
+)
+
+
+#######撤单#############：
+A、General
+    Request URL: https://700056.com/api/data.aspx
+    Request Method: POST
+    Status Code: 200 OK
+    Remote Address: 199.119.140.168:443
+    Referrer Policy: no-referrer-when-downgrade
+
+Request Headers
+    Accept: */*
+    Accept-Encoding: gzip, deflate, br
+    Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+    Connection: keep-alive
+    Content-Length: 34
+    Content-Type: application/x-www-form-urlencoded
+    Cookie: ASP.NET_SessionId=epercc454wqgwtb5i53mr02f
+    Host: 700056.com
+    Origin: https://700056.com
+    Referer: https://700056.com/ssc/
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36
+    X-Requested-With: XMLHttpRequest
+
+Form Data
+    act: cancelsn
+    lot: ssc
+    snid: 32194772
+
+###########时时彩首页###################
+general:
+    Request URL: https://700056.com/ssc/
+    Request Method: GET
+    Status Code: 200 OK
+    Remote Address: 199.119.140.168:443
+    Referrer Policy: no-referrer-when-downgrade
+
+Request Headers
+    Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+    Accept-Encoding: gzip, deflate, br
+    Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+    Cache-Control: max-age=0
+    Connection: keep-alive
+    Cookie: ASP.NET_SessionId=epercc454wqgwtb5i53mr02f
+    Host: 700056.com
+    Upgrade-Insecure-Requests: 1
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36
+
+
+	
+提款：
+第一步：请求https://9900001.com/user/tikuan.aspx，获取隐藏域：
+	__EVENTTARGET、__EVENTARGUMENT、__VIEWSTATE、__VIEWSTATEGENERATOR、__EVENTVALIDATION 
+A、General
+	Request URL: https://700056.com/user/tikuan.aspx
+	Request Method: POST
+	Status Code: 200 OK
+	Remote Address: 199.119.140.168:443
+	Referrer Policy: no-referrer-when-downgrade
+B、Request Headers
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Cache-Control: max-age=0
+	Connection: keep-alive
+	Content-Length: 1758
+	Content-Type: application/x-www-form-urlencoded
+	Cookie: ASP.NET_SessionId=zflf5iuns1xjem2qsllycyap
+	Host: 700056.com
+	Origin: https://700056.com
+	Referer: https://700056.com/user/tikuan.aspx
+	Upgrade-Insecure-Requests: 1
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36
+C、Form Data
+	__EVENTTARGET: 
+	__EVENTARGUMENT: 
+	__VIEWSTATE: /wEPDwULLTE5NDMzOTE3NTUPZBYCZg9kFgICAw9kFgoCAQ8WAh4HVmlzaWJsZWhkAgMPFgIfAGdkAgUPFgIeC18hSXRlbUNvdW50AgEWAmYPZBYCZg8VAgI0NK0E5rip6aao5o+Q56S677ya572R56uZ5paw5aKe5be06KW/5b2p44CB5paw6KW/5YWw5YiG5YiG5b2p44CB5paw6KW/5YWw5LqU5YiG5b2p5LiU5a6Y5pa5572R5Z2A5Y+v5Lul5q2j5bi45omT5byA44CCMDg5OOaKleazqOe9kei1lOeOh+WFqOmDqOaPkOWNh+S4lOabtOaWsOabtOWkmueOqeazle+8jOasoui/juWSqOivouS4i+azqOOAgui/keacn+W+iOWkmuS8muWRmOWPjeaYoOaIkeWPuOmAmui/h1FR44CB5b6u5L+h562J56S+5Lqk6L2v5Lu26YCa55+l5byA5oi36LWg6YCB5b2p6YeR44CB5YWF5YC86LWg6YCB5LyY5oOg44CB5YWs5Y+45ZCI5bm244CB5YWs5Y+45o2i572R56uZ562J6ZSZ6K+v5raI5oGv5Lyg6YCS77yM5Z2H5Li66aqX5a2Q5YCf55So5oiR5Y+45L+h6KqJ6L+b6KGM6aqX6ZKx44CC6K+35omA5pyJ5Lya5ZGY5o+Q6auY6K2m5oOV77yB5bey5pyJ5Lya5ZGY6KKr6aqX77yB5aaC5pyJ55aR6Zeu5qyi6L+O5ZKo6K+iMjTlsI/ml7bmiJHlj7jlrpjmlrnmjIflrppRUeWuouacjeOAkDg5NDQ0MDQ444CBIDMzMTIyMjnjgIEgOTgyNjIzMzMz44CBMzMzNTY5MjjjgJFkAgcPZBYOAgMPDxYCHgRUZXh0BQE1ZGQCBQ8PFgIfAgUM5YWJ5aSn6ZO26KGMZGQCBw8PFgIfAgUQNjIyNjY2MTEwMDI4NzcwOWRkAgkPDxYCHwIFDOWFieWkp+mTtuihjGRkAgsPDxYCHwIFCeeOi+S4mumrmGRkAhgPPCsADQEADxYEHgtfIURhdGFCb3VuZGcfAWZkZAIaDw8WAh4LUmVjb3JkY291bnRmZGQCCQ8WAh8BAgUWCmYPZBYCZg8VAgExDOWFs+S6juaIkeS7rGQCAQ9kFgJmDxUCATIM5a2Y5qy+5biu5YqpZAICD2QWAmYPFQIBMwzlj5bmrL7luK7liqlkAgMPZBYCZg8VAgE0DOW4uOingemXrumimGQCBA9kFgJmDxUCATUM6IGU57uc5oiR5LusZBgBBSNjdGwwMCRDb250ZW50UGxhY2VIb2xkZXIxJEdyaWRWaWV3MQ88KwAKAQhmZHOWb2AiMoKPyrmFJ5yqql70dNvr
+	__VIEWSTATEGENERATOR: 75313CF7
+	__EVENTVALIDATION: /wEWBQLj0N/LBQKeidcLAtDZ84cNAsTb9r4CAqjR4D1k1VpBQuz7m9WGjcL+wMHXLGeWEg==
+	ctl00$ContentPlaceHolder1$txttk: 1000
+	ctl00$ContentPlaceHolder1$txtpwd: 0654321
+	ctl00$ContentPlaceHolder1$btnok: 确定
+
+
+查看元素页面：view-source:https://700056.com/user/tikuan.aspx
+playway:1二字定2三字定3四字定
+
+
+登录请求记录：
+A、General
+Request URL: https://0898091.com/index.aspx
+Request Method: POST
+Status Code: 302 Found
+Remote Address: 45.116.178.29:443
+Referrer Policy: no-referrer-when-downgrade
+
+B、Request Headers
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Cache-Control: max-age=0
+Connection: keep-alive
+Content-Length: 2802
+Content-Type: application/x-www-form-urlencoded
+Cookie: ASP.NET_SessionId=nyimh4z32sen55jfuaa0tx45
+Host: 0898091.com
+Origin: https://0898091.com
+Referer: https://0898091.com/index.aspx
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Mobile Safari/537.36
+
+
+C、Form Data
+__VIEWSTATE: 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
+__VIEWSTATEGENERATOR: 90059987
+__EVENTVALIDATION: /wEWBgKx8L/ADgLevKzxCALVzJXYCgLf4efgCALnrI/6DgK/+pH/BwUzjtM2WZO434w+ybSitp60o0Z4
+ctl00$txtUser: TedGod
+ctl00$txtPwd: 0654321
+ctl00$txtcode: 9027
+ctl00$btnlogin.x: 31
+ctl00$btnlogin.y: 11
+
+
+
+
+
+
+
+
+
+
+
+
+
+
