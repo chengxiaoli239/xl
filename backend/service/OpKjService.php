@@ -107,7 +107,7 @@ class OpKjService extends BaseService {
                 $m->set($mkey, 0, 90*60);
             }
 
-            Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/opSscKjData','INFO','0898投注记录', $logArr);
+            Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/opSscKjData','INFO','0898投注记录', $logArr);
         }
 
         return $rst;
@@ -140,7 +140,7 @@ class OpKjService extends BaseService {
             'newTzCodes'=>$newTzCodes,
             'UserFollowDataUpStatus'=>$UserFollowDataUpStatus
         ];
-        Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/opChangTzCodes','INFO','0898投注记录', $logArr);
+        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/opChangTzCodes','INFO','0898投注记录', $logArr);
 
         if(!$UserFollowDataUpStatus)
             $rst = ['status'=>300, 'msg'=>'号码变更异常'.current($UserFollowData->getErrors())];
@@ -206,7 +206,7 @@ class OpKjService extends BaseService {
             'is_rand'=>$is_rand,
             'newTzCodes'=>$newTzCodes
         ];
-        Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/getBestTzCodes','INFO','获取最佳投注号码', $logArr);
+        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/getBestTzCodes','INFO','获取最佳投注号码', $logArr);
 
         return ['postion'=>$position,'hezhi'=>$maxZhi,'newTzCodes'=>$newTzCodes];
     }

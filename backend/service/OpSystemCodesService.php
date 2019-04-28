@@ -41,7 +41,7 @@ class OpSystemCodesService extends BaseService {
                 $rst_desc = '成功';
                 $logData = ['qihao'=>$qihao,'msg'=>'处理成功','status'=>$status, 'opData'=>$opData, 'sys_plans_id'=>$plansCode->id,'i'=>$i];
             }
-            Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/opSystemBetPlans','INFO','定制化投注计划-'.$rst_desc, $logData);
+            Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/opSystemBetPlans','INFO','定制化投注计划-'.$rst_desc, $logData);
         }
 
         return $rst;

@@ -147,7 +147,7 @@ class SscDataService extends BaseService {
                 $logArr = ['id'=>$id, [$interval, $new_qihao, $id]];
                 $flag = SscDataService::insertSscDwsHzNums($interval, $new_qihao, $id);
                 $logArr['flag'] = $flag;
-                Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/SscDwsHzNums','INFO','统计区间某和值出现次数', $logArr);
+                Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/SscDwsHzNums','INFO','统计区间某和值出现次数', $logArr);
                 $m->set($mkey, $id, 60*60);
             }
         }
@@ -229,7 +229,7 @@ class SscDataService extends BaseService {
                 $logArr = ['opData'=>$opData, 'rst'=>$rst,'nums'=>$nums, 'where'=>$where, 'id'=>$id];
                 if(!$rst){
                     $logArr['msg'] = $SscDwsHzNums->getErrors();
-                    Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/static_SscDwsHzNums','INFO','统计区间某个号码出现的次数', $logArr);
+                    Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/static_SscDwsHzNums','INFO','统计区间某个号码出现的次数', $logArr);
                 }
             }
         }
@@ -363,7 +363,7 @@ class SscDataService extends BaseService {
                 $rst = $SscDwHzYl->save();
                 if(!$rst){
                     $logArr = ['attributes'=>$SscDwHzYl->attributes, 'msg'=>$SscDwHzYl->getErrors()];
-                    Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/static_SscDwsHzNums','INFO','统计号码出现次数', $logArr);
+                    Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/static_SscDwsHzNums','INFO','统计号码出现次数', $logArr);
                 }
             }
 
@@ -507,7 +507,7 @@ class SscDataService extends BaseService {
                     }
                     if(!$rst){
                         $logArr = ['attributes'=>$SscDsYl->attributes, 'msg'=>$SscDsYl->getErrors()];
-                        Tool_Common::log('/WORK/LOG/lottery/'.date('Y-m-d').'/static_SscDwsDsNums','INFO','统计号码出现次数', $logArr);
+                        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Y-m-d').'/static_SscDwsDsNums','INFO','统计号码出现次数', $logArr);
                     }
                 }
 
@@ -550,7 +550,7 @@ class SscDataService extends BaseService {
             $rst = $Ssc3numYl->save();
             if(!$rst){
                 $logArr = ['attributes'=>$Ssc3numYl->attributes, 'msg'=>$Ssc3numYl->getErrors()];
-                Tool_Common::log('/WORK/LOG/lottery/static_Ssc3Nums','INFO','统计号码出现次数', $logArr);
+                Tool_Common::log('/WORK/LOG/lottery_xl/static_Ssc3Nums','INFO','统计号码出现次数', $logArr);
             }
         }
 
@@ -819,7 +819,7 @@ class SscDataService extends BaseService {
         //p([$tmpData,$SscKjDataDs->attributes,$SscKjDataDs->getErrors()],0);
         if(!$rst){
             $logArr = ['attributes'=>$SscKjDataDs->attributes, 'msg'=>$SscKjDataDs->getErrors()];
-            Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/insertSscKjDataDs','INFO','统计号码出现次数', $logArr);
+            Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/insertSscKjDataDs','INFO','统计号码出现次数', $logArr);
         }
 
         return $rst;
@@ -852,7 +852,7 @@ class SscDataService extends BaseService {
         //p([$opData,$SscKjData3Num->attributes,$SscKjData3Num->getErrors()],0);
         if(!$rst){
             $logArr = ['attributes'=>$SscKjData3Num->attributes, 'msg'=>$SscKjData3Num->getErrors()];
-            Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/insertSscKjData3Num','INFO','统计号码出现次数', $logArr);
+            Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/insertSscKjData3Num','INFO','统计号码出现次数', $logArr);
         }
 
         return $rst;
@@ -1169,7 +1169,7 @@ class SscDataService extends BaseService {
             if(!$rst){
                 $logArr = ['attributes'=>$SscSdHzYl->attributes, 'msg'=>$SscSdHzYl->getErrors()];
                 p($logArr);
-                Tool_Common::log('/WORK/LOG/lottery/'.date('Y-m-d').'/static_SscDwsDsNums','INFO','统计号码出现次数', $logArr);
+                Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Y-m-d').'/static_SscDwsDsNums','INFO','统计号码出现次数', $logArr);
             }
 
         }

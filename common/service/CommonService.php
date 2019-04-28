@@ -120,7 +120,7 @@ class  CommonService{
                 ];
 
                 $logArr = ['url'=>$url, 'post_data'=>$post_data, 'returnData'=>$data,'lottery_type'=>'qxc'];
-                Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/getAwardNumberByQihaoQxc', 'INFO', '开奖日志记录', $logArr);
+                Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/getAwardNumberByQihaoQxc', 'INFO', '开奖日志记录', $logArr);
 
                 /*
                 # 2、0898投注网，返回最近开奖号码

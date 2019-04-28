@@ -63,7 +63,7 @@ class CurlService extends BaseService{
         if(strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
 
         //if(strpos($url, 'BatchBet')){ p(['url'=>$url, 'header'=>$header,'post_data'=>$post_data,'rstData'=>$data,curl_close($ch),$errno]); }

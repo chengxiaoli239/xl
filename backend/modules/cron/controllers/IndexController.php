@@ -222,7 +222,7 @@ class IndexController extends Controller
             $end_time = microtime(true);
             $time_consume = ($end_time-$start_time).'s';
             $logArr = ['start_time'=>$start_time,'end_time'=>$end_time, 'time_consume'=>$time_consume];
-            Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/actionInsertSscDwsHzNums','INFO','统计区间某和值出现次数-执行时间', $logArr);
+            Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/actionInsertSscDwsHzNums','INFO','统计区间某和值出现次数-执行时间', $logArr);
         }
 
         return $rst;

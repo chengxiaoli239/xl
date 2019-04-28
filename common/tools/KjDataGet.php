@@ -142,7 +142,7 @@ class KjDataGet
             if(!$m->get($mkey) ){
                 $logArr['url'] = $url;
                 $logArr['mkey'] = $mkey;
-                Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
+                Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
                 $m->set($mkey, 1, $cache_time);
                 $m->set($mkey_qihao, 1, $cache_time);
             }
@@ -219,7 +219,7 @@ class KjDataGet
         if (!$SscKjData->save()) {
             $msg = current($SscKjData->getErrors());
             $logArr = ['msg'=>$msg, 'qihao'=>$qihao, 'kjData'=>$kjData];
-            Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
+            Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
             return ['status' => 300, 'msg' => $msg];
         }
     }
@@ -260,7 +260,7 @@ class KjDataGet
         if (!$QxcKjData->save()) {
             $msg = current($QxcKjData->getErrors());
             $logArr = ['msg'=>$msg, 'qihao'=>$qihao, 'kjData'=>$kjData];
-            Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
+            Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
             return ['status' => 300, 'msg' => $msg];
         }
     }

@@ -32,7 +32,7 @@ class CaptchaCodeService{
 
         $rstData = json_decode($response, true);
         $logData = ['post_data'=>$data, 'rst'=>$response,'filename'=>$file, 'consume_time'=>$consume_time, 'rstData'=>$rstData];
-        Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/getCaptchaCode','INFO','调用验证码[聚合]接口', $logData);
+        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/getCaptchaCode','INFO','调用验证码[聚合]接口', $logData);
         if($rstData['error_code'] != 0)
             return ['status'=>300, 'code'=>$rstData['reason']];
 
@@ -89,7 +89,7 @@ class CaptchaCodeService{
             $rst = ['status'=>200, 'code'=>$rstData['showapi_res_body']['Result']];
         }
         $logData = ['file'=>$file, 'url'=>$url, 'consume_time'=>$consume_time, 'rstData'=>$rstData];
-        Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/getCaptchaCode','INFO','调用验证码[万维易源]接口', $logData);
+        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/getCaptchaCode','INFO','调用验证码[万维易源]接口', $logData);
 
         return $rst;
     }
