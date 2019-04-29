@@ -31,6 +31,7 @@ use Yii;
  * @property int $order_type 订单来源：1跟投订单 2大数据订单 3系统计划订单
  * @property int $tz_system_id 投注系统tz_systems.id
  * @property string $lotteryclass 彩种
+ * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
  * @property int $createtime
  * @property string $create_time 投注时间
  * @property int $updated_at 更新时间
@@ -53,7 +54,7 @@ class BettingRecords extends \common\models\base\BaseModel
     {
         return [
             [['codes', 'snid'], 'string'],
-            [['uid', 'playway', 'tz_type', 'status', 'cancel_status', 'plan_id', 'buy_type', 'is_simulate', 'order_type', 'tz_system_id', 'createtime', 'updated_at', 'created_at'], 'integer'],
+            [['uid', 'playway', 'tz_type', 'status', 'cancel_status', 'plan_id', 'buy_type', 'is_simulate', 'order_type', 'tz_system_id', 'lottery_type', 'createtime', 'updated_at', 'created_at'], 'integer'],
             [['betting_money', 'bonus', 'single', 'profits'], 'number'],
             [['account', 'sn'], 'string', 'max' => 255],
             [['playway_name', 'create_time'], 'string', 'max' => 32],
@@ -70,34 +71,35 @@ class BettingRecords extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'codes' => Yii::t('app', '投注号码'),
-            'uid' => Yii::t('app', '用户id'),
-            'account' => Yii::t('app', 'Account'),
-            'playway' => Yii::t('app', '投注方式：10定位胆'),
-            'tz_type' => Yii::t('app', '投注类型'),
-            'playway_name' => Yii::t('app', '投注方式'),
-            'betting_money' => Yii::t('app', '投注金额'),
-            'bonus' => Yii::t('app', '中奖金额'),
-            'single' => Yii::t('app', '倍数(元)'),
-            'profits' => Yii::t('app', '利润'),
-            'qihao' => Yii::t('app', '期号'),
-            'kj_codes' => Yii::t('app', '开奖号码'),
-            'position' => Yii::t('app', '定位位置'),
-            'status' => Yii::t('app', '中奖状态：0:正常、1:中奖、2:未中奖'),
-            'cancel_status' => Yii::t('app', '撤单状态：0未撤单1已撤单'),
-            'sn' => Yii::t('app', '方案号'),
-            'snid' => Yii::t('app', '订单号'),
-            'plan_id' => Yii::t('app', '计划id'),
-            'buy_type' => Yii::t('app', '购买方向:0反买1正买'),
-            'is_simulate' => Yii::t('app', '是否模拟投注'),
-            'order_type' => Yii::t('app', '订单来源：1跟投订单 2大数据订单 3系统计划订单'),
-            'tz_system_id' => Yii::t('app', '投注系统tz_systems.id'),
-            'lotteryclass' => Yii::t('app', '彩种'),
-            'createtime' => Yii::t('app', 'Createtime'),
-            'create_time' => Yii::t('app', '投注时间'),
-            'updated_at' => Yii::t('app', '更新时间'),
-            'created_at' => Yii::t('app', '创建时间'),
+            'id' => 'ID',
+            'codes' => '投注号码',
+            'uid' => '用户id',
+            'account' => 'Account',
+            'playway' => '投注方式：10定位胆',
+            'tz_type' => '投注类型',
+            'playway_name' => '投注方式',
+            'betting_money' => '投注金额',
+            'bonus' => '中奖金额',
+            'single' => '倍数(元)',
+            'profits' => '利润',
+            'qihao' => '期号',
+            'kj_codes' => '开奖号码',
+            'position' => '定位位置',
+            'status' => '中奖状态：0:正常、1:中奖、2:未中奖',
+            'cancel_status' => '撤单状态：0未撤单1已撤单',
+            'sn' => '方案号',
+            'snid' => '订单号',
+            'plan_id' => '计划id',
+            'buy_type' => '购买方向:0反买1正买',
+            'is_simulate' => '是否模拟投注',
+            'order_type' => '订单来源：1跟投订单 2大数据订单 3系统计划订单',
+            'tz_system_id' => '投注系统tz_systems.id',
+            'lotteryclass' => '彩种',
+            'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分',
+            'createtime' => 'Createtime',
+            'create_time' => '投注时间',
+            'updated_at' => '更新时间',
+            'created_at' => '创建时间',
         ];
     }
 
