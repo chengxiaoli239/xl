@@ -26,15 +26,11 @@ class OpKjService extends BaseService {
     public static function opSscKjData(){
 
         $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
+        $lotteryTypeArr = [1,2,3,4]; # 彩票类型：彩种类型：1:1.5分 2:3分 3:5分 4:10分
 
         $m = \Yii::$app->cache;
-        $data = SscKjData::find()->select('qihao')->orderBy('id DESC')->limit(20)->asArray()->all();
-        $qihaos = [];
-        foreach ($data as $v){
-            $qihaos[] = $v['qihao'];
-        }
         //p($qihaos);
-        $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0,'qihao'=>$qihaos])->orderBy('bet.qihao ASC')->limit(20)->all();
+        $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0])->orderBy('bet.qihao DESC')->limit(20)->all();
         if(!$bettingRecords) return $rst;
         foreach ($bettingRecords as $bettingRecord){
             $is_simulate = $bettingRecord['is_simulate'];
@@ -48,7 +44,7 @@ class OpKjService extends BaseService {
             $m->delete($mkey_qihao);
 
             # 开奖数据 start
-            $kjData = SscKjData::find()->where(['qihao'=>$qihao])->asArray()->one()['code_str'];
+            $kjData = SscKjData::find()->where(['qihao'=>$qihao, 'lottery_type'=>$bettingRecord->lottery_type])->asArray()->one()['code_str'];
             if(!$kjData){
                 $kjData = CommonService::getAwardNumberByQihao($qihao); // 3,4,5,6,7
             }

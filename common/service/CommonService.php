@@ -82,53 +82,23 @@ class  CommonService{
     /**
      * @decripion 获取时时彩开奖号码
      * @param $qihao
-     * @param string $lottery_type ssc:时时彩、qxc:七星彩
-     * @param string $api_type 360:360网站、yiyuan:易源
+     * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return bool
      */
-    public static function getAwardNumberByQihao($qihao, $lottery_type = 'ssc'){
+    public static function getAwardNumberByQihao($qihao, $lottery_type = 2){
         if(!$qihao) return false;
         $m = \Yii::$app->cache;
 
         $mkey = 'KJ_DATA_2_'.$lottery_type.'_'.$qihao;
         if(!$kjData = $m->get($mkey)){
-            if($lottery_type == 'ssc'){
-                $kjData = SscKjData::findOne(['qihao'=>$qihao])->code_str;
+            $kjData = SscKjData::findOne(['qihao'=>$qihao])->code_str;
 
-                if(!$kjData){
-                    return false;
-                }
-
-                if($kjData) $m->set($mkey,$kjData, 2*60*60);
-            }elseif($lottery_type == 'qxc'){
-                # 1、七星彩抓取
-                $url = 'http://route.showapi.com/44-3';
-                $post_data = [
-                    'showapi_appid'=> \Yii::$app->params['SHOW_API_APPID'],
-                    'showapi_sign'=>\Yii::$app->params['SHOW_API_SIGN'],
-                    'code' => 'qxc',
-                    'expect'=>$qihao
-                ];
-                $data = CurlService::httpPost($url,$post_data); // {"showapi_res_error":"","showapi_res_code":0,"showapi_res_body":{"result":{"expect":"2018016","timestamp":1517920300,"time":"2018-02-06 20:31:40","name":"七星彩","code":"qxc","openCode":"6,9,3,3,9,4,7"},"ret_code":0}}
-                $tmpKjData = $data['showapi_res_body']['result'];
-                if($tmpKjData['openCode']) $m->set($mkey,$tmpKjData, 2*60*60);
-                $kjData = [
-                    'qihao'=>$tmpKjData['expect'],
-                    'time' => $tmpKjData['timestamp'],
-                    'date_time' =>$tmpKjData['time'],
-                    'kj_code' => $tmpKjData['openCode'],
-                ];
-
-                $logArr = ['url'=>$url, 'post_data'=>$post_data, 'returnData'=>$data,'lottery_type'=>'qxc'];
-                Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/getAwardNumberByQihaoQxc', 'INFO', '开奖日志记录', $logArr);
-
-                /*
-                # 2、0898投注网，返回最近开奖号码
-                $url = 'https://700056.com/qxc/ajax.aspx?act=getlastkj';
-                $data = CurlService::httpGet($url);
-                $kjData = $data[0]['code'];
-                */
+            if(!$kjData){
+                return false;
             }
+
+            if($kjData) $m->set($mkey,$kjData, 2*60*60);
+
         }
         $m->set($mkey, $kjData,7*24*60*60);
 

@@ -121,12 +121,12 @@ class KjDataGet
                 $mkey = 'KJ_LOG_KEY_BATCH_0_'.$kjConfig->lottery_type;
                 $kjData = isset($data['opencode']) ? $data['opencode'] : [];
                 if($kjData){
-                    if($kjConfig->lottery_type == 1){
+                    if(in_array($kjConfig->lottery_type, [1,2,3,4])){
                         $qihao = substr($data['expect'],2,6).substr($data['expect'],9);
                         # ssc
-                        $rst = KjDataGet::insertKjData($qihao, $kjData);
+                        $rst = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData);
                         $cache_time = 5;
-                    }elseif($kjConfig->lottery_type == 2){
+                    }elseif($kjConfig->lottery_type == 99){
                         $qihao = $data['expect'];
                         $date = date('Y-m-d',$data['opentime']);
                         # qxc
@@ -173,9 +173,11 @@ class KjDataGet
     /**
      * @desc ssc开奖data
      * @param $qihao 1811200
+     * @param int $lottery_type 彩票类型1:1.5彩2:3分彩3:5分彩4:10分彩
      * @param $kjDatas
+     * @return array|bool
      */
-    public static function insertKjData($qihao, $kjData){
+    public static function insertKjData($qihao, $lottery_type = 6, $kjData){
         $kjDatas = str_replace(',', '', $kjData);
         if(!$qihao OR !$kjDatas) return false;
         $kjDatasArr = explode(',',$kjData);
@@ -208,6 +210,7 @@ class KjDataGet
             'type_3b' => CommonService::isCodeType3b($codes), # 是否三兄弟
             'type_4b' => CommonService::isCodeType4b($codes), # 是否四兄弟
             'type_4ds' => CommonService::isCodeType4ds($codes), # 是否四单双：0非四单四双1四单2四双
+            'lottery_type' => $lottery_type,
             'date' => date('Y-m-d',strtotime($tmpDate)),
         ];
 

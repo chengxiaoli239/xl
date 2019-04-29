@@ -52,12 +52,42 @@ class CqsscController extends Controller
     }
 
     /**
+     * @desc 希腊1.5分彩
+     * @return array
+     */
+    public function actionXlOneFive($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = CqsscKcw::getLotteryNoXl(5);
+        return $data;
+    }
+
+    /**
      * @desc 希腊3分彩
      * @return array
      */
     public function actionXlThree($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = CqsscKcw::getLotteryNoXlThree($type);
+        $data = CqsscKcw::getLotteryNoXl(6);
+        return $data;
+    }
+
+    /**
+     * @desc 希腊5分彩
+     * @return array
+     */
+    public function actionXlFive($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = CqsscKcw::getLotteryNoXl(7);
+        return $data;
+    }
+
+    /**
+     * @desc 希腊10分彩
+     * @return array
+     */
+    public function actionXlTen($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = CqsscKcw::getLotteryNoXl(8);
         return $data;
     }
 }

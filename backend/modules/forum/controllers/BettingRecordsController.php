@@ -42,7 +42,7 @@ class BettingRecordsController extends BaseController
         $searchModel = new BettingRecordsSearch();
         $queryParams = Yii::$app->request->queryParams;
         //$queryParams['BettingRecords']['uid'] = $this->_user_id;
-        $queryParams['BettingRecords']['account'] = $this->_account;
+        $queryParams['BettingRecords']['uid'] = $this->_user_id;
         //p([$this->_account,$queryParams]);
         $dataProvider = $searchModel->search($queryParams);
         $qihao = HN0898Service::getQihao();

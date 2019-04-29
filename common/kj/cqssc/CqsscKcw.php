@@ -8,6 +8,7 @@ use common\tools\Tool_Common;
 use  yii;
 
 class CqsscKcw extends BaseKj {
+
     public static $lotteryTypeArr = [
         5 => 1, # 5:1.5分
         6 => 2, # 6:3分
@@ -15,16 +16,16 @@ class CqsscKcw extends BaseKj {
         8 => 4, # 8:10分
     ];
 
-    public static function getLotteryNo($returnType = 'json', $type = 6){
+    public static function getLotteryNo($returnType = 'json'){
 
         if(!$kjData = self::getCurrentKjData()) {
             sleep(3);
-            $lotteryId = self::$lotteryTypeArr[$type];
-            $url = 'http://greeceloto.com/home/GetNumbers?lotteryId='.$lotteryId.'&pageNmuber=1&number=5&_=1556344774304';
+            $url = 'http://wd.apiplus.net/tef05c6c66079ff29k/cqssc-3.json';
             //$content = file_get_contents($url);
             $content = CurlService::httpGet($url);
             //$data = json_decode($content,320);
             $data = $content;
+            //p($data);
 
             if (!$data OR !isset($data['data']) OR !$kjData = $data['data'][0]) return false;
             if (!$kjData) return false;
@@ -53,29 +54,34 @@ class CqsscKcw extends BaseKj {
     }
 
     /**
-     * @desc 希腊3分彩
+     * @desc 希腊ssc
      * @param string $returnType
+     * @param int $type
      * @return array|bool
      */
-    public static function getLotteryNoXlThree($returnType = 'json', $type = 2){
+    public static function getLotteryNoXl($type = 6, $returnType = 'json' ){
 
         //if(!$kjData = self::getCurrentKjData()) {
+        if(true) {
             sleep(3);
-            $url = 'http://wd.apiplus.net/tef05c6c66079ff29k/cqssc-3.json';
+            $lotteryId = self::$lotteryTypeArr[$type];
+            $url = 'http://greeceloto.com/home/GetNumbers?lotteryId='.$lotteryId.'&pageNmuber=1&number=3&_=1556344774304';
             //$content = file_get_contents($url);
             $content = CurlService::httpGet($url);
             //$data = json_decode($content,320);
             $data = $content;
+            //p($content);
 
-            if (!$data OR !isset($data['data']) OR !$kjData = $data['data'][0]) return false;
+            if (!$data OR !isset($data['LsPeridos']) OR !$kjData = $data['LsPeridos'][0]) return false;
             if (!$kjData) return false;
             $str = substr($kjData['expect'], 0, 8);
             $kjData['expect'] = str_replace($str, $str . '-', $kjData['expect']);
             //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
-        //}
-        $opencode = $kjData['opencode'];
-        $opentime = $kjData['opentime'];
-        $expect = $kjData['expect'];
+        }
+        $opencode = $kjData['ResultNumber'];
+        preg_match('/\d+/', $kjData['DrawDt'], $matches);
+        $opentime = date('Y-m-d H:i:s', $matches[0]/1000);
+        $expect = $kjData['PeriodsNumber'];
 
         self::setKjDataCache($expect, $kjData);
 
@@ -92,6 +98,7 @@ class CqsscKcw extends BaseKj {
 
         return $rst;
     }
+
 
 
 }

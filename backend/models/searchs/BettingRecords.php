@@ -63,7 +63,7 @@ class BettingRecords extends BettingRecordsModel
         $query->andFilterWhere([
             'id' => $this->id,
             'playway' => $this->playway,
-            'uid' => $this->uid,
+            'uid' => $params['BettingRecords']['uid'],
             'betting_money' => $this->betting_money,
             'bonus' => $this->bonus,
             'single' => $this->single,
