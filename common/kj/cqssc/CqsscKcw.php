@@ -15,6 +15,12 @@ class CqsscKcw extends BaseKj {
         7 => 3, # 7:5分
         8 => 4, # 8:10分
     ];
+    public static $lotteryNameArr = [
+        1 => '希腊1.5分', # 5:1.5分
+        2 => '希腊3分', # 6:3分
+        3 => '希腊5分', # 7:5分
+        4 => '希腊10分', # 8:10分
+    ];
 
     public static function getLotteryNo($returnType = 'json'){
 

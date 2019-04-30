@@ -14,6 +14,7 @@ use backend\models\SscKjData;
 use backend\models\UserFollowData;
 use backend\service\SscDataService;
 use backend\service\TzService;
+use common\kj\cqssc\CqsscKcw;
 use common\service\CommonService;
 use common\service\ssc\QihaoService;
 use backend\service\CurlService;
@@ -124,18 +125,18 @@ class KjDataGet
                     if(in_array($kjConfig->lottery_type, [1,2,3,4])){
                         $qihao = substr($data['expect'],2,6).substr($data['expect'],9);
                         # ssc
-                        $rst = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData);
+                        $msg = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData);
                         $cache_time = 5;
                     }elseif($kjConfig->lottery_type == 99){
                         $qihao = $data['expect'];
                         $date = date('Y-m-d',$data['opentime']);
                         # qxc
                         //p($kjConfig);
-                        $rst = KjDataGet::insertQxcKjData($qihao, $kjData, $date);
+                        $msg = KjDataGet::insertQxcKjData($qihao, $kjData, $date);
                         $cache_time = 30*60;
                     }
                 }
-                $logArr = ['data'=>$data, 'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$rst];
+                $logArr = ['data'=>$data, 'lottery_type'=>$kjConfig->lottery_type, 'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$msg, 'lottery'=>CqsscKcw::$lotteryNameArr[$kjConfig->lottery_type]];
             }
             $mkey_qihao = 'KJ_LOG_QIHAO_'.$qihao;
             //if(!$m->get($mkey) OR ($kjConfig->lottery_type == 1 && !$m->get($mkey_qihao))){
@@ -221,7 +222,7 @@ class KjDataGet
         $SscKjData->setAttributes($insertData);
         if (!$SscKjData->save()) {
             $msg = current($SscKjData->getErrors());
-            $logArr = ['msg'=>$msg, 'qihao'=>$qihao, 'kjData'=>$kjData];
+            $logArr = ['msg'=>$msg, 'qihao'=>$qihao, 'kjData'=>$kjData, 'lottery'=>CqsscKcw::$lotteryTypeArr[$lottery_type]];
             Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
             return ['status' => 300, 'msg' => $msg];
         }

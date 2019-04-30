@@ -218,6 +218,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = OpKjService::opSscKjData(); p($rst); # 处理投注数据
+        $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0])->distinct('qihao')->orderBy('bet.qihao ASC')->limit(20)->all();p($bettingRecords);
+        $rst = CqsscKcw::getLotteryNoXlThree();p($rst);
         $rst = HN0898Service::getQihao(); p($rst);
         $rst = TzService::insertSscDataTime(); p($rst);
         $rst = StaticService::allHzStaticProfitsPerdate();p($rst);# 循环计算每天每个和值利润统计
