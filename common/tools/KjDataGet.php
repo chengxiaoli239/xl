@@ -12,6 +12,7 @@ use backend\models\KjConfig;
 use backend\models\QxcKjData;
 use backend\models\SscKjData;
 use backend\models\UserFollowData;
+use backend\service\BetService;
 use backend\service\SscDataService;
 use backend\service\TzService;
 use common\kj\cqssc\CqsscKcw;
@@ -405,9 +406,10 @@ class KjDataGet
     /**
      * @desc 获取给定期号的下一期
      * @param string $qihao
+     * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return bool|int|string
      */
-    public static function getNextQihaoByQihao($qihao = '180101001', $lottery_type = 'ssc'){
+    public static function getNextQihaoByQihao($qihao = '180101001', $lottery_type = 2){
         if($lottery_type == 'qxc'){
             # 未完
         }else{
@@ -415,10 +417,12 @@ class KjDataGet
             $year = '20'.substr($qihao,0,2);
             $date = '20'.substr($qihao,0,6);
             $qihao = substr($qihao,6,3);
-            if($date == $year.'1231' && $qihao >=59){
+            $maxQihaoArr = BetService::$maxQihaoArr;
+            $maxQihao = $maxQihaoArr[$lottery_type];
+            if($date == $year.'1231' && $qihao >=$maxQihao){
                 $nextQihao = ($year+1).'0101001';
             //}elseif($qihao >= 120){
-            }elseif($qihao >= 59){
+            }elseif($qihao >= $maxQihao){
                 $nextQihao = ltrim(Tools::getNextDate($date),'20').'001';
             }
         }
@@ -429,9 +433,10 @@ class KjDataGet
     /**
      * @desc 获取给定期号的上一期
      * @param string $qihao
+     * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return bool|int|string
      */
-    public static function getBeforeQihaoByQihao($qihao = '180101001', $lottery_type = 'ssc'){
+    public static function getBeforeQihaoByQihao($qihao = '180101001', $lottery_type = 2){
         if($lottery_type == 'qxc'){
             # 未完
         }else{
@@ -439,11 +444,14 @@ class KjDataGet
             $year = '20'.substr($qihao,0,2);
             $date = '20'.substr($qihao,0,6);
             $qihao = substr($qihao,6,3);
+            $maxQihaoArr = BetService::$maxQihaoArr;
+            $maxQihao = $maxQihaoArr[$lottery_type];
+            //$maxQihao = sprintf("%03d", $maxQihaoArr[$lottery_type]);
             if($date == $year.'0101' && $qihao <= 1){
-                $beforeQihao = substr(($year-1).'1231059', 2,9);
+                $beforeQihao = substr(($year-1).'1231'.$maxQihao, 2,9);
             //}elseif($qihao >= 120){
             }elseif($qihao <= 001){
-                $beforeQihao = substr(Tools::getBeforeDate($date),2,9).'059';
+                $beforeQihao = substr(Tools::getBeforeDate($date),2,9).$maxQihao;
             }
         }
 
@@ -453,10 +461,10 @@ class KjDataGet
 
     /**
      * @desc 获取最后表中一期期号
-     * @param string $lottery_type
+     * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return string
      */
-    public static function getEndQihao($lottery_type = 'ssc'){
+    public static function getEndQihao($lottery_type = 2){
 
         if($lottery_type == 'qxc'){
 

@@ -65,12 +65,12 @@ class CqsscKcw extends BaseKj {
      * @param int $type
      * @return array|bool
      */
-    public static function getLotteryNoXl($type = 6, $returnType = 'json' ){
+    public static function getLotteryNoXl($lotteryId = 2, $returnType = 'json' ){
 
         //if(!$kjData = self::getCurrentKjData()) {
         if(true) {
             sleep(3);
-            $lotteryId = self::$lotteryTypeArr[$type];
+            //$lotteryId = self::$lotteryTypeArr[$type];
             $url = 'http://greeceloto.com/home/GetNumbers?lotteryId='.$lotteryId.'&pageNmuber=1&number=3&_=1556344774304';
             //$content = file_get_contents($url);
             $content = CurlService::httpGet($url);

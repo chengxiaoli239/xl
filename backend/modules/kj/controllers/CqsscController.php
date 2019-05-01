@@ -57,7 +57,7 @@ class CqsscController extends Controller
      */
     public function actionXlOneFive($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = CqsscKcw::getLotteryNoXl(5);
+        $data = CqsscKcw::getLotteryNoXl(1);
         return $data;
     }
 
@@ -67,7 +67,7 @@ class CqsscController extends Controller
      */
     public function actionXlThree($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = CqsscKcw::getLotteryNoXl(6);
+        $data = CqsscKcw::getLotteryNoXl(2);
         return $data;
     }
 
@@ -77,7 +77,7 @@ class CqsscController extends Controller
      */
     public function actionXlFive($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = CqsscKcw::getLotteryNoXl(7);
+        $data = CqsscKcw::getLotteryNoXl(3);
         return $data;
     }
 
@@ -87,7 +87,7 @@ class CqsscController extends Controller
      */
     public function actionXlTen($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = CqsscKcw::getLotteryNoXl(8);
+        $data = CqsscKcw::getLotteryNoXl(4);
         return $data;
     }
 }

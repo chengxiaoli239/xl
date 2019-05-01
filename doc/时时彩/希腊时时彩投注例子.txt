@@ -1,0 +1,140 @@
+投注之前获取期号相关信息[期号、期号id]
+A、General
+	Request URL: http://hg.hy.zhxt3.685yq.com:900/api/Periods/GetPeriodsQuery?lottery=6
+	Request Method: GET
+	Status Code: 200 OK
+	Remote Address: 183.134.58.46:900
+	Referrer Policy: no-referrer-when-downgrade
+B、Request Headers
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Cookie: kangle_runat=2; ValidateToken=929c95ad02de22a429d3812ce0711849; Token=VmwB1UGH1t5qxkJ2Wb6D46Hamyb%2bDofr8%2b8A2QeHSGg%3d
+	Host: hg.hy.zhxt3.685yq.com:900
+	Referer: http://hg.hy.zhxt3.685yq.com:900/
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36
+C、Form
+	lottery: 6
+返回：
+{"Status":true,"Info":"操作成功","Data":{"list":[{"CloseDt":"2019/4/30 17:26:30","CompanyName":"hg888","CreateDt":"2019/4/28 4:54:44","DrawDt":"2019/4/30 17:27:00","OpenDt":"2019/4/30 17:24:00","PeriodsID":774135,"PeriodsNumber":"20190430349","PeriodsStatus":1,"UpdateDt":"2019/4/28 4:54:44"}],"ServerTime":"2019/4/30 17:24:23","waterLs":[{"c_t":"20190430347","c_d":"2019/4/30 17:21:00","c_r":"2,5,4,8,1"}]},"IsCheckOut":false}
+
+1、一字定
+A、General:
+	Request URL: http://hg.hy.zhxt3.685yq.com:900/api/betType
+	Request Method: POST
+	Status Code: 200 OK
+	Remote Address: 183.134.58.62:900
+	Referrer Policy: no-referrer-when-downgrade
+B、Request Headers
+	Accept: application/json, text/plain, */*
+	Connection: keep-alive
+	Content-Length: 99
+	Content-Type: application/x-www-form-urlencoded
+	Cookie: kangle_runat=2; ValidateToken=929c95ad02de22a429d3812ce0711849; Token=VmwB1UGH1t5qxkJ2Wb6D46Hamyb%2bDofr8%2b8A2QeHSGg%3d
+	Host: hg.hy.zhxt3.685yq.com:900
+	Origin: http://hg.hy.zhxt3.685yq.com:900
+	Referer: http://hg.hy.zhxt3.685yq.com:900/
+	Token: VmwB1UGH1t5qxkJ2Wb6D46Hamyb+Dofr8+8A2QeHSGg=
+	type: 6
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36
+C、Form Data
+	PeriodId: 774126
+	LotteryId: 6	# 备注：5:1.5分、6:3分、7:5分、8:10分
+	BetNumber: X1XX,X6XX
+	BetAmt: 0.1
+	BetTypeId: 19
+	BetWayId: 5
+	UserName: ffe89
+2、二字定
+A、General
+	Request URL: http://hg.hy.zhxt3.685yq.com:900/api/betType
+	Request Method: POST
+	Status Code: 200 OK
+	Remote Address: 183.134.58.62:900
+	Referrer Policy: no-referrer-when-downgrade
+B、Request Headers
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 105
+	Content-Type: application/x-www-form-urlencoded
+	Cookie: kangle_runat=2; ValidateToken=929c95ad02de22a429d3812ce0711849; Token=VmwB1UGH1t5qxkJ2Wb6D46Hamyb%2bDofr8%2b8A2QeHSGg%3d
+	Host: hg.hy.zhxt3.685yq.com:900
+	Origin: http://hg.hy.zhxt3.685yq.com:900
+	Referer: http://hg.hy.zhxt3.685yq.com:900/
+	Token: VmwB1UGH1t5qxkJ2Wb6D46Hamyb+Dofr8+8A2QeHSGg=
+	type: 6
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36
+C、Form
+	PeriodId: 774129
+	LotteryId: 6	# 备注：5:1.5分、6:3分、7:5分、8:10分
+	BetNumber: 23XX,45XX,54XX
+	BetAmt: 0.1
+	BetTypeId: 1
+	BetWayId: 0
+	UserName: ffe89
+	
+3、快打
+A、General
+	Request URL: http://hg.hy.zhxt3.685yq.com:900/api/betType
+	Request Method: POST
+	Status Code: 200 OK
+	Remote Address: 183.134.58.62:900
+	Referrer Policy: no-referrer-when-downgrade
+B、Request
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 92
+	Content-Type: application/x-www-form-urlencoded
+	Cookie: kangle_runat=2; ValidateToken=929c95ad02de22a429d3812ce0711849; Token=VmwB1UGH1t5qxkJ2Wb6D46Hamyb%2bDofr8%2b8A2QeHSGg%3d
+	Host: hg.hy.zhxt3.685yq.com:900
+	Origin: http://hg.hy.zhxt3.685yq.com:900
+	Referer: http://hg.hy.zhxt3.685yq.com:900/
+	Token: VmwB1UGH1t5qxkJ2Wb6D46Hamyb+Dofr8+8A2QeHSGg=
+	type: 6
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36
+C、Form
+	PeriodId: 774132
+	LotteryId: 6
+	BetNumber: 3444
+	BetWayId: 2
+	BetAmt: 0.1
+	BetTypeId: 13
+	UserName: ffe89
+4、快译[例如：千2345百34578十3457个5478]
+A、General
+	Request URL: http://hg.hy.zhxt3.685yq.com:900/api/betNumber
+	Request Method: POST
+	Status Code: 200 OK
+	Remote Address: 183.134.58.46:900
+	Referrer Policy: no-referrer-when-downgrade
+B、Request
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 2899
+	Content-Type: application/x-www-form-urlencoded
+	Cookie: kangle_runat=2; ValidateToken=929c95ad02de22a429d3812ce0711849; Token=VmwB1UGH1t5qxkJ2Wb6D46Hamyb%2bDofr8%2b8A2QeHSGg%3d
+	Host: hg.hy.zhxt3.685yq.com:900
+	Origin: http://hg.hy.zhxt3.685yq.com:900
+	Referer: http://hg.hy.zhxt3.685yq.com:900/
+	Token: VmwB1UGH1t5qxkJ2Wb6D46Hamyb+Dofr8+8A2QeHSGg=
+	type: 6
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36
+C、Form
+	PeriodId: 774137
+	LotteryId: 6
+	BetNumber: 7483#5,7489#5,7485#5,7487#5,7403#5,7409#5,7405#5,7407#5,7443#5,7449#5,7445#5,7447#5,7463#5,7469#5,7465#5,7467#5,7683#5,7689#5,7685#5,7687#5,7603#5,7609#5,7605#5,7607#5,7643#5,7649#5,7645#5,7647#5,7663#5,7669#5,7665#5,7667#5,7383#5,7389#5,7385#5,7387#5,7303#5,7309#5,7305#5,7307#5,7343#5,7349#5,7345#5,7347#5,7363#5,7369#5,7365#5,7367#5,7983#5,7989#5,7985#5,7987#5,7903#5,7909#5,7905#5,7907#5,7943#5,7949#5,7945#5,7947#5,7963#5,7969#5,7965#5,7967#5,6483#5,6489#5,6485#5,6487#5,6403#5,6409#5,6405#5,6407#5,6443#5,6449#5,6445#5,6447#5,6463#5,6469#5,6465#5,6467#5,6683#5,6689#5,6685#5,6687#5,6603#5,6609#5,6605#5,6607#5,6643#5,6649#5,6645#5,6647#5,6663#5,6669#5,6665#5,6667#5,6383#5,6389#5,6385#5,6387#5,6303#5,6309#5,6305#5,6307#5,6343#5,6349#5,6345#5,6347#5,6363#5,6369#5,6365#5,6367#5,6983#5,6989#5,6985#5,6987#5,6903#5,6909#5,6905#5,6907#5,6943#5,6949#5,6945#5,6947#5,6963#5,6969#5,6965#5,6967#5,4483#5,4489#5,4485#5,4487#5,4403#5,4409#5,4405#5,4407#5,4443#5,4449#5,4445#5,4447#5,4463#5,4469#5,4465#5,4467#5,4683#5,4689#5,4685#5,4687#5,4603#5,4609#5,4605#5,4607#5,4643#5,4649#5,4645#5,4647#5,4663#5,4669#5,4665#5,4667#5,4383#5,4389#5,4385#5,4387#5,4303#5,4309#5,4305#5,4307#5,4343#5,4349#5,4345#5,4347#5,4363#5,4369#5,4365#5,4367#5,4983#5,4989#5,4985#5,4987#5,4903#5,4909#5,4905#5,4907#5,4943#5,4949#5,4945#5,4947#5,4963#5,4969#5,4965#5,4967#5,0483#5,0489#5,0485#5,0487#5,0403#5,0409#5,0405#5,0407#5,0443#5,0449#5,0445#5,0447#5,0463#5,0469#5,0465#5,0467#5,0683#5,0689#5,0685#5,0687#5,0603#5,0609#5,0605#5,0607#5,0643#5,0649#5,0645#5,0647#5,0663#5,0669#5,0665#5,0667#5,0383#5,0389#5,0385#5,0387#5,0303#5,0309#5,0305#5,0307#5,0343#5,0349#5,0345#5,0347#5,0363#5,0369#5,0365#5,0367#5,0983#5,0989#5,0985#5,0987#5,0903#5,0909#5,0905#5,0907#5,0943#5,0949#5,0945#5,0947#5,0963#5,0969#5,0965#5,0967#5
+	BetAmt: 5
+	BetTypeId: 13
+	BetWayId: 4
+	UserName: ffe89
+	
+	
+	
+	

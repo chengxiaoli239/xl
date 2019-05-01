@@ -24,7 +24,7 @@ use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
 
-class SevenService extends BaseTZService {
+class XlService extends BaseTZService {
     public static $username = '';
     public static $password = '';
     public static $baseUrl =  '';
@@ -62,7 +62,7 @@ class SevenService extends BaseTZService {
         self::$account = $User->account;
         self::$tz_system_id = $tz_system_id;
         self::$username = $User->username;
-        self::$tzSiteInfo = SevenService::getTzSiteInfo($tz_system_id);
+        self::$tzSiteInfo = self::getTzSiteInfo($tz_system_id);
         //self::unitHeaders('Cookie'); # 去除重复的headers，主要是Cookie
 
         self::$baseUrl = self::$tzSiteInfo['baseUrl'];
@@ -114,6 +114,7 @@ class SevenService extends BaseTZService {
             'ORDER_TZ' => $baseUrl.'/Member/BatchBet',
             'SSC_INDEX' => $baseUrl,
             'MULBET_URL' => $baseUrl.'/Member/MultipleBet',
+            'GetPeriodsQuery' => $baseUrl.'/api/Periods/GetPeriodsQuery',
             'INDEX' => $baseUrl.'/index.aspx',
             'GET_BALANCE' => Yii::$app->params['ajaxUrlRouteUser'],
             'CAPTCHA_CODE' => $TzSystemUser->ssc_domain.'/code2.aspx',
@@ -325,42 +326,31 @@ class SevenService extends BaseTZService {
         $single = $plan->single ? $plan->single : 0.1;
         $tz_type = $plan->tz_type ? $plan->tz_type : 0;
         $buy_type = $plan->buy_type ? $plan->buy_type : 1;
+        $lottery_type = $plan->lottery_type;
         //$codesArr = self::getMySiteCodesStyle($codes, $playway);
         //p(['playway'=>$playway, 'totalCount'=>count($codes), 'single'=>$single, 'qihao'=>$qihao, 'tz_type'=>$tz_type, 'buy_type'=>$buy_type,'codes'=>$codes]);
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
+        $qihaoInfo = self::getPreTz(self::$user_id, self::$tz_system_id, $lottery_type);
 
         # 验证
-        $rst = self::validateBettingContent($playway,$codes);
+        $rst = self::validateBettingContent($playway,$codes); # codes:13579,,13579,,@13579,,13579,,
         if($rst['status'] != 200){
             $data = ['status'=>300, 'msg'=>$qihao.$rst['msg']];
         }
-        $totalCount = count($codes); # 注数
-        $totalBetMoney = $totalCount * $single; # 投注总金额
-        $way = self::getWay($tz_type);
 
-        $bet_codes = $codes;
-        $isBigNumsBet = BetService::isBigNumsBet($tz_type);
-        if($isBigNumsBet){
-            $bet_codes = str_replace(',','',$bet_codes);
-            $bet_codes = str_replace('@',',',$bet_codes);
-        }
+        //$bet_codes = $codes;
+        $bet_codes = self::formCodesStyle($codes, $playway);
 
         //$post_data = ['totalCount'=>$totalCount, 'totalBetMoney'=>$totalBetMoney, 'bets'=>json_encode($codes), 'way'=>$way, 'period_no'=>'20'.$qihao, 'bet_log'=>urlencode('投注：'.$totalCount.'/'.$single.'注,总共：'.$totalBetMoney.'元'), ];
         $post_data = [
-            'bet_number'=>$bet_codes,
-            'bet_money'=>$single,
-            'bet_way'=>$way,
-            'is_xian'=>0,
-            'number_type'=>40,
-            'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
-            'bet_log'=>'[四定位]，合分值范围：[30-35]',
-            'is_package' => 0,
-            'period_no'=>'20'.$qihao,
-            'operation_condition' => self::getOperationCondition(),
-
-            //'totalBetMoney'=>$totalBetMoney,
-            //'bets'=>json_encode($codes),
+            'PeriodId' => $qihaoInfo['PeriodsID'],
+            'LotteryId' => $lottery_type,	# 备注：5:1.5分、6:3分、7:5分、8:10分
+            'BetNumber' => $bet_codes,
+            'BetAmt'=> $single,
+            'BetTypeId' => 19,
+            'BetWayId' => 5,
+            'UserName' => ffe89,
         ];
 
         $data['code'] = $codes;
@@ -411,9 +401,6 @@ class SevenService extends BaseTZService {
         //$position = UserFollowData::findOne(self::$plan_id)->position;
         //$position = $position ? $position : self::$position;
 
-        if(!$isBigNumsBet){
-            $codes = implode('@', self::getMySiteCodesStyle($codes, $playway));
-        }
 
         $n = count(explode('@',$codes));
         if(in_array($playway, [2, 3]) && $tz_type != 20){
@@ -512,11 +499,11 @@ class SevenService extends BaseTZService {
 
     /**
      * @desc 获取本站号码存储格式
-     * @param $codes
+     * @param $codes # codes:13579,,13579,,@13579,,13579,,
      * @param $playway
-     * @return array
+     * @return string X1XX,X6XX
      */
-    public static function getMySiteCodesStyle($codes, $playway){
+    public static function formCodesStyle($codes, $playway){
         /*
         $codes = [
             ['bet_no'=>'15', 'dict_no_type_id'=>4],
@@ -547,7 +534,7 @@ class SevenService extends BaseTZService {
             $codesArr[] = implode(',',$tmp);
         }
 
-        return $codesArr;
+        return implode(',', $codesArr);
     }
 
     /**
@@ -797,7 +784,7 @@ class SevenService extends BaseTZService {
                 break;
             case 3: // 四字定 code:478,4679,469,4678
                 break;
-            case 4: // 一字定 code:24,237,125,2346
+            case 4: // 一字定 code:24,237,125,2346 或者 13579,,13579,,@13579,,13579,,
                 break;
             case 5: // 二字现 code:28@46@78@23
                 break;
@@ -1428,6 +1415,49 @@ class SevenService extends BaseTZService {
         if(!$playway OR !$lotteries[$playway]) return $lotteries;
 
         return $lotteries[$playway];
+    }
+
+    /**
+     * @desc 投注之前获取期号相关信息
+     */
+    public static function getQihaoInfo($uid, $tz_system_id, $lottery_type = 6){
+        self::__init($uid, $tz_system_id);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+
+        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
+        $_t = microtime(true) * 10000;
+        $url = self::getTzSiteInfo($tz_system_id,'GetPeriodsQuery').'?lottery='.$lottery_type;
+        $headers = [
+            "Accept: application/json, text/plain, */*",
+            "Cookie: ".trim($TzSystemsUsers->cookie),
+            //"Origin:".str_replace('www.','',self::$baseUrl),
+            "Host:".str_replace('www.','',self::$domain),
+            "Referer:".$TzSystemsUsers->ssc_domain.'/',
+        ];
+
+        $data = CurlService::httpGet($url, $headers);
+        //sleep(10);
+        //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
+        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
+        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+
+        return $data;
+    }
+
+    /**
+     * @desc 获取即将投注的期号、期号id
+     * @param $uid
+     * @param $tz_system_id
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function getPreTz($uid, $tz_system_id, $lottery_type = 6){
+
+        $qihaoInfo = self::getQihaoInfo($uid, $tz_system_id, $lottery_type);
+        if($qihaoInfo['Status'] != 1) return ['status'=>302, '当前期暂停投注'];
+        $data = $qihaoInfo['Data']['list'];
+
+        return ['status'=>200, 'PeriodsID' => $data[0]['PeriodsID'], 'PeriodsNumber'=>$data[0]['PeriodsNumber']];
     }
 
 }

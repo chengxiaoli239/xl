@@ -24,6 +24,7 @@ abstract class BetService extends BaseBetService {
     protected $_nowTime = null;    // 当前时间戳
     protected $_operateTime = null;    // 当前时间戳的格式
     protected $_baseUrl = '';    // 当前时间戳的格式
+    public static $maxQihaoArr = [1=>960, 2=>480, 3=>288, 4=>144]; # $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
 
     protected function __construct() {
         parent::__construct();
@@ -47,6 +48,10 @@ abstract class BetService extends BaseBetService {
                 # 7时彩体系最终投注
                 $BetService = new SevenService($uid, $tz_system_id);
                 break;
+            case 3:
+                # 希腊时时彩
+                $BetService = new XlService($uid, $tz_system_id);
+                break;
             default:
                 break;
         }
@@ -65,10 +70,12 @@ abstract class BetService extends BaseBetService {
      * @param array $hz_Arr
      * @return string
      */
-    public static function getCodes($system_type_id, $playway, $tz_type, $buy_type, $single = 0.1, $sel_same = 1, $hz_Arr = []){
+    public static function getCodes($system_type_id, $tz_type, $buy_type, $single = 0.1, $sel_same = 1, $hz_Arr = []){
+        //p([$system_type_id, $tz_type, $buy_type, $single, $sel_same, $hz_Arr]);
         switch ($system_type_id){ # system_type_id = lt_system_type.id
-            case 1:
-                $codes = BetService::getPlansAllCodesType1($tz_type, $buy_type, $single, $sel_same, $hz_Arr);
+            case 1: # 重庆0898 系统
+            case 3: # 希腊彩系统
+                $codes = BetService::getPlansAllCodesType1($tz_type, $buy_type, $sel_same, $hz_Arr);
                 break;
             case 2:
                 # 7时彩
@@ -83,16 +90,16 @@ abstract class BetService extends BaseBetService {
     /**
      * @desc 1.1 投注：投注之前业务逻辑判断
      * @param $qihao
-     * @param string $lottery_type
+     * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      */
     //public static function beforeBet($qihao, $tz_system_id, $playway, $account = 'gaozi2017', $lottery_type = 'ssc'){
-    public static function beforeBet($qihao, $lottery_type = 'ssc'){
+    public static function beforeBet($qihao, $lottery_type = 2){
         $m = \Yii::$app->cache;
         $rst = ['status'=>200, 'msg'=>'可以投注~'];
         switch ($lottery_type){
-            case 'ssc':
+            case 1:
                 //$mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$qihao.'_'.$tz_system_id.'_'.$playway.'_'.$account;
-                $mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$qihao;
+                $mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$lottery_type.'_'.$qihao;
                 $tzStatus = $m->get($mkey);
 
                 # 判断当期开奖数据处理是否完成，未完成则不能下一期的投注
@@ -111,35 +118,20 @@ abstract class BetService extends BaseBetService {
      * @desc 用户投注基本入口
      */
     public static function bet(){
-        # 4、期号 qihao
-        $qihao = HN0898Service::getQihao();
-        # 1、投注前判断
-        $tzStatus = BetService::beforeBet($qihao);
-        if($tzStatus['status'] != 200) return $tzStatus;
 
         $plans = UserSysPlans::find()->where(['AND', ['=', 'status', 1], ['>', 'uid', 0]])->all();
         if($plans){
             foreach ($plans as $key=>$plan){
+                # 1、期号 qihao
+                $qihao = HN0898Service::getQihao($plan->lottery_type);
+
+                # 2、投注前判断
+                $tzStatus = BetService::beforeBet($qihao, $plan->lottery_type);
+                if($tzStatus['status'] != 200) return $tzStatus;
 
                 $tz_sites = explode(',', $plan->tz_sites);
                 foreach ($tz_sites as $tz_system_id){
                     $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
-
-                    # 三定购买方向智能切换，思路：系统正买：全错->全对->全错->用户下一期切换为正买方向
-                    if($plan->playway == 2 && $plan->is_custom == 1){
-                        $qihao1 = KjDataGet::getBeforeQihaoByQihao($qihao); # 前一期
-                        $bouns1 = BettingRecords::findOne(['playway'=>$plan->playway, 'qihao'=>$qihao1, 'uid'=>0])->bonus;
-
-                        $qihao2 = KjDataGet::getBeforeQihaoByQihao($qihao1); # 前第二期
-                        $bouns2 = BettingRecords::findOne(['playway'=>$plan->playway, 'qihao'=>$qihao2, 'uid'=>0])->bonus;
-
-                        $qihao3 = KjDataGet::getBeforeQihaoByQihao($qihao2); # 前第三期
-                        $bouns3 = BettingRecords::findOne(['playway'=>$plan->playway, 'qihao'=>$qihao3, 'uid'=>0])->bonus;
-                        if(!$bouns1 && $bouns3 == 390){
-                            $plan->buy_type = 1;
-                        }
-
-                    }
 
                     # 1、玩法 playway
                     $playway = $plan->playway;
@@ -148,12 +140,15 @@ abstract class BetService extends BaseBetService {
                     $single = $plan->single;
 
                     # 3、投注号码 codes
-                    $codes = self::getCodes($system_type_id, $playway, $plan->tz_type, $plan->buy_type, $single, $plan->sel_same, $plan->hz_Arr);
+                    $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $single, $plan->sel_same, $plan->hz_Arr);
 
                     # 4、投注请求
                     $BetService = self::getBetObj($plan->uid, $system_type_id, $tz_system_id);
                     //$rst = $BetService->bet($playway, $codes, $single, $qihao, $plan->tz_type, $plan->buy_type);
                     $rst = $BetService->bet($qihao, $plan->id, $codes);
+
+                    # 下注完成
+                    BetService::afterBet($qihao, $plan->lottery_type);
 
                     BetService::synBalance($plan->uid, $tz_system_id);
                 }
@@ -162,8 +157,6 @@ abstract class BetService extends BaseBetService {
             }
         }
 
-        # 下注完成
-        BetService::afterBet($qihao);
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
     }
 
@@ -191,18 +184,22 @@ abstract class BetService extends BaseBetService {
 
     /**
      * @desc 投注完成之后业务处理
+     * @param int $lottery_type
+     * @return bool
      */
-    //public static function afterBet($qihao, $tz_system_id, $playway, $account = 'gaozi2017', $lottery_type = 'ssc'){
-    public static function afterBet($qihao, $lottery_type = 'ssc'){
+    public static function afterBet($qihao, $lottery_type = 2){
         if(!$qihao) return false;
         $m = \Yii::$app->cache;
 
         switch ($lottery_type){
-            case 'ssc':
-                $next_qihao = KjDataGet::getNextQihaoByQihao($qihao);
-                $next_mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$next_qihao;
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
+                $next_mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$lottery_type.'_'.$next_qihao;
                 //$next_mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$next_qihao.'_'.$tz_system_id.'_'.$playway.'_'.$account;
-                $pkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$qihao;
+                $pkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$lottery_type.'_'.$qihao;
                 //$pkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$qihao.'_'.$tz_system_id.'_'.$playway.'_'.$account;
 
                 $time = \Yii::$app->params['TZ_LOCK_TIME'];  # 4小时
@@ -226,7 +223,7 @@ abstract class BetService extends BaseBetService {
      * @param $sel_same 是否排除上一次中奖的相同组合, 主要针对四字定
      * @return string
      */
-    public static function getPlansAllCodesType1($tz_type = 1, $buy_type = 1, $single = 0.1, $sel_same = 0, $codes_hz = ''){
+    public static function getPlansAllCodesType1($tz_type = 1, $buy_type = 1, $sel_same = 0, $codes_hz = ''){
         $playway = BetService::getPlaywayByTzType($tz_type);
         $m = \Yii::$app->cache;
         $qihao = HN0898Service::getQihao();
@@ -236,7 +233,7 @@ abstract class BetService extends BaseBetService {
         switch ($playway){
             case 1:
                 break;
-            case 2:
+            case 2: # 三字定
                 $params = ['playway'=>$playway, 'tz_type'=>$tz_type, 'status'=>$buy_type];
                 $SysPlansCodes = SysPlansCodes::find()->where($params)->orderBy(['rand()' => SORT_DESC])->asArray()->all(); # ->limit($limit) 限制数量去掉
                 $codesArr = [];
@@ -244,7 +241,7 @@ abstract class BetService extends BaseBetService {
                     $codesArr[] = $plan['code'];
                 }
                 break;
-            case 3:
+            case 3: # 四字定
                 if($tz_type == 20) {  # 四定和值
                     # 四定和值选号，默认排除：双双重、三重、四重、四兄弟、四单四双
                     //$where = ['codes_hz'=>explode(',', $codes_hz), 'type_22'=>0, 'type_3'=>0, 'type_4'=>0, 'type_4b'=>0, 'type_4ds'=>0];
@@ -257,6 +254,12 @@ abstract class BetService extends BaseBetService {
                     $codesArr = NumService::getCodesByDs(explode(',',$codes_hz));
                 }elseif($tz_type == 23){ # 上奖
                     $codesArr = NumService::getCodesArise(explode(',',$codes_hz));
+                }elseif($tz_type == 24){ # 直码
+                    $codesArr = [];
+                    $tmpArr = explode(',',$codes_hz);
+                    foreach ($tmpArr as $arr){
+                        $codesArr[] = $arr[0].','.$arr[1].','.$arr[2].','.$arr[3];
+                    }
                 }else{
                     $params = ['playway'=>$playway, 'tz_type'=>$tz_type];
                     $SysPlansCodes = SysPlansCodes::find()->where($params)->orderBy(['rand()' => SORT_DESC])->asArray()->all();
@@ -305,8 +308,8 @@ abstract class BetService extends BaseBetService {
      * @param $codes_hz
      * @return string
      */
-    public static function getHzCodes($tz_type, $codes_hz, $single = 0.1){
-        return self::getPlansAllCodesType1($tz_type, $buy_type = 1, $single, $sel_same = 0, $codes_hz);
+    public static function getHzCodes($tz_type, $codes_hz){
+        return self::getPlansAllCodesType1($tz_type, $buy_type = 1, $sel_same = 0, $codes_hz);
     }
 
     /**
@@ -317,12 +320,12 @@ abstract class BetService extends BaseBetService {
      * @param $limit int 默认获取注数
      * @return string
      */
-    public static function getPlansAllCodesType2($tz_type = 1, $buy_type = 1, $single = 0.1, $sel_same = 1, $codes_hz = ''){
+    public static function getPlansAllCodesType2($tz_type = 1, $buy_type = 1, $sel_same = 1, $codes_hz = ''){
         $m = \Yii::$app->cache;
 
         $playway = TzTypes::findOne(['type'=>$tz_type])->playway;
         $qihao = HN0898Service::getQihao();
-        $codes = self::getPlansAllCodesType1($tz_type, $buy_type, $single, $sel_same, $codes_hz);
+        $codes = self::getPlansAllCodesType1($tz_type, $buy_type, $sel_same, $codes_hz);
         //$codesDatas = explode('@', $codes);
 
         switch ($playway) {
@@ -339,11 +342,7 @@ abstract class BetService extends BaseBetService {
         $dict_no_type_id = self::get_dict_no_type_id($position);
 
         //$codes = '13579,02468,,@,23456,23465,';
-        $isBigNumsBet = self::isBigNumsBet($tz_type);
-        if(!$isBigNumsBet){ # 和值范围
-            $tzCodes = CommonService::genDw($codes, '@', '');
-            $codes = self::getEndCodes($tzCodes, $single, $dict_no_type_id);
-        }
+
         $mkey = 'getPlansAllCodesType1_'.$playway.'_'.$tz_type.'_'.$buy_type.'_'.$qihao;
         //if($codes = $m->get($mkey)) return $codes;
 
@@ -493,7 +492,7 @@ abstract class BetService extends BaseBetService {
            $single = $plan->single;
 
            # 3、投注号码 codes
-           $codes = self::getCodes($system_type_id, $playway, $plan->tz_type, $plan->buy_type, $single, $plan->sel_same, $plan->hz_Arr);
+           $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $single, $plan->sel_same, $plan->hz_Arr);
 
            # 4、投注类型，详见staticService::$kArr
            $tz_type = $plan->tz_type;

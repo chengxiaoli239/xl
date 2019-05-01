@@ -16,7 +16,8 @@ use  yii;
 class CurlService extends BaseService{
 
     public static $postHeaders = [
-        'User-Agent: Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Mobile Safari/537.36',
+        //'User-Agent: Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Mobile Safari/537.36',
+        'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36',
         //'Accept-Language:zh-CN,zh;q=0.9,en;q=0.8',
         'Accept-Language:zh-CN,zh;q=0.9',
         'Connection:keep-alive',
@@ -85,7 +86,7 @@ class CurlService extends BaseService{
      */
     public static function httpGet($url,$header=[],$timeout = 30){
         $header = array_merge(self::$postHeaders,$header);
-        //if(strpos($url, 'GetMemberPrint')){ p([$url, $header]); }
+        //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);

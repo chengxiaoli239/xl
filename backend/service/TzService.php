@@ -400,15 +400,15 @@ class TzService extends BaseService {
 
 
     /**
-     * @desc 更新时时彩开奖时间 6、3分 7、5分彩 8、10分彩 5、1.5分彩
+     * @desc 更新时时彩开奖时间 1、1.5分彩 2、3分 3、5分彩 4、10分彩
      */
-    public static function insertSscDataTime($type = 7){
-        $typeArr = [6=>3, 7=>5, 8=>10, 5=>1.5];
+    public static function insertSscDataTime($type = 1){
+        $typeArr = [1=>1.5, 2=>3, 3=>5, 4=>10];
         $time_int = 24 * 3600;
         $actionNums = $time_int / ($typeArr[$type]*60);
         //p($actionNums);
         $setData = [];
-        $dateTime = strtotime('2019-02-15 00:00:00');
+        $dateTime = strtotime('2019-04-30 00:00:00');
         for ($i=1; $i<=$actionNums; $i++){
             $setData['type'] = $type;
             $setData['actionNo'] = $i;
@@ -417,11 +417,14 @@ class TzService extends BaseService {
             if(!$DataTime = DataTime::findOne($where)){
                 $DataTime = new DataTime();
             }
+            $dateTime = $dateTime + $typeArr[$type] * 60;
+            /*
             if($i==9) {
                 $dateTime = $dateTime + 4 * 60 * 60 + $typeArr[$type] * 60;
             }else{
                 $dateTime = $dateTime + $typeArr[$type] * 60;
             }
+            */
             //p($dateTime);
             $HIS = date('H:i:s', $dateTime);
             $setData['actionTime'] = $HIS;
