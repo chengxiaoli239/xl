@@ -40,26 +40,21 @@ class TzService extends BaseService {
     /**
      * @desc 1.1 投注：投注之前业务逻辑判断
      * @param $qihao
-     * @param string $lottery_type
+     * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      */
-    public static function beforeTz($lottery_type = 'ssc'){
+    public static function beforeTz($lottery_type = 2){
         $m = Yii::$app->cache;
         $rst = ['status'=>200, 'msg'=>'可以投注~'];
         $qihao = HN0898Service::getQihao();
-        switch ($lottery_type){
-            case 'ssc':
-                $mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$qihao;
-                $tzStatus = $m->get($mkey);
+        $mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$lottery_type.'_'.$qihao;
+        $tzStatus = $m->get($mkey);
 
-                # 判断当期开奖数据处理是否完成，未完成则不能下一期的投注
-                if(!$tzStatus){
-                    $rst = ['status'=>300, 'msg'=>'投注开关未开启，有未处理完成的数据~','mkey'=>$mkey,'tzStatus'=>$tzStatus];
-                    Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/0898tzCron','INFO','0898投注记录', $rst);
-                }
-                break;
-            default:
-                break;
+        # 判断当期开奖数据处理是否完成，未完成则不能下一期的投注
+        if(!$tzStatus){
+            $rst = ['status'=>300, 'msg'=>'投注开关未开启，有未处理完成的数据~','mkey'=>$mkey,'tzStatus'=>$tzStatus];
+            Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/0898tzCron','INFO','0898投注记录', $rst);
         }
+
         return $rst;
     }
     /**
@@ -74,11 +69,11 @@ class TzService extends BaseService {
             // 1、投注前判断
             $tzStatus = TzService::beforeTz();
             if ($tzStatus['status'] != 200) {
-                return $tzStatus;
+                //return $tzStatus;
             }
             foreach ($plans as $plan){
                 # 0898体系投注号码，系统正买按照0898格式下单
-                $codes = BetService::getPlansAllCodesType1($plan->tz_type, 1, $plan->nums, $plan->sel_same, $plan->hz_Arr);
+                $codes = BetService::getPlansAllCodesType1($plan->tz_type, 1, $plan->sel_same, $plan->hz_Arr);
                 //$codes = $plan->code;
 
                 # 2、倍数
@@ -90,13 +85,13 @@ class TzService extends BaseService {
                 //p([$playway, $codes, $single, $qihao]);
                 # 0898体系最终投注
                 $HN0898Service = new HN0898Service();
-                $rst = $HN0898Service->betting($playway, $codes, $single, $qihao);
+                $rst = $HN0898Service->betting($qihao, $plan->id, $codes);
             }
         }
         $logArr = ['tzStatus'=>$tzStatus,'codes'=>$codes, 'postRst'=>$rst];
         Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/bet','INFO','投注记录(系统正买)', $logArr);
         TzService::afterTz($qihao);
-        return ['status'=>200, 'msg'=>'系统定制化模拟正买投注完成~'];
+        return ['status'=>200, 'msg'=>'系统定制化模拟正买投注完成~', $rst];
     }
 
     /**

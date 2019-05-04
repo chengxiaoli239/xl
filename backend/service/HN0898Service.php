@@ -233,19 +233,26 @@ class HN0898Service extends BaseTZService {
      * @param $order_type 1、计划投注订单 2、大数据订单 3、定制化
      * @return array
      */
-    public function betting($playway = 1, $code, $single, $qihao, $is_simulate = 1, $order_type = 1){
+    public function betting($qihao, $plan_id, $codes){
         self::__init();
+        $plan = UserSysPlans::findOne($plan_id);
+        $playway = $plan->playway ? $plan->playway : 3;
+        $single = $plan->single ? $plan->single : 0.1;
+        $tz_type = $plan->tz_type ? $plan->tz_type : 0;
+        $buy_type = $plan->buy_type ? $plan->buy_type : 1;
+        $lottery_type = $plan->lottery_type;
+        //p([$playway , $code, $single, $qihao]);
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
 
         # 验证
-        $rst = self::validateBettingContent($playway,$code);
+        $rst = self::validateBettingContent($playway,$codes);
         if($rst['status'] != 200){
             $data = ['status'=>300, 'msg'=>$qihao.$rst['msg']];
         }
 
-        $post_data = [ 'act' => 'postsn', 'playway' => $playway, 'single' => $single, 'qihao' => $qihao, 'code' => $code, ];
+        $post_data = [ 'act' => 'postsn', 'playway' => $playway, 'single' => $single, 'qihao' => $qihao, 'codes' => $codes, ];
 
-        $data['code'] = $code;
+        $data['code'] = $codes;
         $header = [
             'Content-Length:'.strlen(http_build_query($post_data)),
         ];
@@ -253,23 +260,26 @@ class HN0898Service extends BaseTZService {
         $headers = array_merge(self::$headers,$header);
         //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
 
-        $n = count(explode('@',$code));
+        $n = count(explode('@',$codes));
         if(in_array($playway, [2, 3])){
-            $totalmoney = SscDataService::calTzTotalMoney($code, $single, $playway);
+            $totalmoney = SscDataService::calTzTotalMoney($codes, $single, $playway);
         }else{
             $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
         }
         $snid = '88888888';
         $insertData = [
             'playway'=> $playway,  // 投注方式
-            'codes' => $code,  // 投注号码
+            'codes' => $codes,  // 投注号码
             'qihao' => $qihao,  // 投注期号
             'snid'=>$snid,
-            'buy_type' => 1,
+            'tz_type' => $tz_type,
+            'lottery_type' => $lottery_type,
+            'plan_id' => $plan_id,
+            'buy_type' => $buy_type,
             'uid'=>0, # 系统模拟，uid=0
             'account'=>'admin', # 系统模拟，admin
-            'order_type'=>$order_type,
-            'is_simulate' => $is_simulate,  // 是否模拟投注
+            'order_type'=>0,
+            'is_simulate' => 0,  // 是否模拟投注
             'single' => $single,  // 投注倍数
             'betting_money'=> $totalmoney,  // 投注金额
         ];

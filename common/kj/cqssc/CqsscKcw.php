@@ -100,6 +100,7 @@ class CqsscKcw extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
+        $logArr['lottery'] = CqsscKcw::$lotteryNameArr[$lotteryId];
         Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/cqssc_kcw', 'INFO', '号码抓取-kcw', $logArr);
 
         return $rst;

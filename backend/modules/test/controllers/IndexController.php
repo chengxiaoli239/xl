@@ -21,6 +21,7 @@ use backend\service\StaticService;
 use backend\service\TestService;
 use backend\service\UserCustomPlansService;
 use backend\service\WxService;
+use backend\service\XlService;
 use common\kj\cqssc\CqsscKcw;
 use common\kj\cqssc\CqsscSevenDay;
 use common\service\CommonService;
@@ -218,11 +219,21 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+
+        $rst = TzService::tz(); p($rst);// 计划投注
+        $rst = BetService::tzByPlanId(1);p($rst);
+        $rst = XlService::formCodesStyle('13579,X,X,X@02468,X,X,X', 4); p($rst); # 格式化希腊号码
+        $rst = BetService::bet(); p($rst);// 用户新计划投注，可正买可反买
+        $rst = XlService::formCodesStyle('13579,,13579,,@13579,,13579,,', 1); p($rst); # 格式化希腊号码
+        $rst = XlService::getQihaoInfo(10, 5);p($rst);
+        $rst = HN0898Service::getQihao(2);p($rst);
+        $rst = KjDataGet::getBeforeQihaoByQihao('191231960',2);p($rst);
+        $rst = KjDataGet::getNextQihaoByQihao('191231960', 1);p($rst);
+        $rst = TzService::insertSscDataTime(4); p($rst);
         $rst = OpKjService::opSscKjData(); p($rst); # 处理投注数据
         $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0])->distinct('qihao')->orderBy('bet.qihao ASC')->limit(20)->all();p($bettingRecords);
-        $rst = CqsscKcw::getLotteryNoXlThree();p($rst);
+        $rst = CqsscKcw::getLotteryNoXl();p($rst);
         $rst = HN0898Service::getQihao(); p($rst);
-        $rst = TzService::insertSscDataTime(); p($rst);
         $rst = StaticService::allHzStaticProfitsPerdate();p($rst);# 循环计算每天每个和值利润统计
         $rst = StaticService::staticSdHzProfitsPerdate(); p($rst); # 每天每个和值利润统计
         $rst = NumService::getCodesArise(['38','78']);p($rst); //2+3+1+2+2
@@ -274,7 +285,6 @@ class IndexController extends Controller
         $rst = StaticService::static4DdsLastTime();p($rst);
         $rst = StaticService::opStaticProfits();p($rst);
         $post = \Yii::$app->request->post();
-        $rst = KjDataGet::getBeforeQihaoByQihao('191231001');p($rst);
         $rst = SscDataService::getSDYL();p($rst);
         $rst = SscDataService::updateDsYL();p($rst);
         $rst = SscDataService::countZj();p($rst);

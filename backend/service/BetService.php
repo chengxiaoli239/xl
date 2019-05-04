@@ -67,10 +67,10 @@ abstract class BetService extends BaseBetService {
      * @param $buy_type
      * @param float $single
      * @param $sel_same
-     * @param array $hz_Arr
+     * @param array|string $hz_Arr
      * @return string
      */
-    public static function getCodes($system_type_id, $tz_type, $buy_type, $single = 0.1, $sel_same = 1, $hz_Arr = []){
+    public static function getCodes($system_type_id, $tz_type, $buy_type, $sel_same = 1, $hz_Arr = []){
         //p([$system_type_id, $tz_type, $buy_type, $single, $sel_same, $hz_Arr]);
         switch ($system_type_id){ # system_type_id = lt_system_type.id
             case 1: # 重庆0898 系统
@@ -79,7 +79,7 @@ abstract class BetService extends BaseBetService {
                 break;
             case 2:
                 # 7时彩
-                $codes = BetService::getPlansAllCodesType2($tz_type, $buy_type, $single, $sel_same, $hz_Arr);
+                $codes = BetService::getPlansAllCodesType2($tz_type, $buy_type, $sel_same, $hz_Arr);
                 break;
             default: break;
         }
@@ -225,13 +225,15 @@ abstract class BetService extends BaseBetService {
      */
     public static function getPlansAllCodesType1($tz_type = 1, $buy_type = 1, $sel_same = 0, $codes_hz = ''){
         $playway = BetService::getPlaywayByTzType($tz_type);
+        //p([$tz_type, $buy_type, $sel_same, $codes_hz, $playway]);
         $m = \Yii::$app->cache;
         $qihao = HN0898Service::getQihao();
         $mkey = 'getPlansAllCodesType1_'.$playway.'_'.$tz_type.'_'.$buy_type.'_'.$qihao;
         //if($codes = $m->get($mkey)) return $codes;
 
         switch ($playway){
-            case 1:
+            case 4: # 一字定
+                $codesArr = explode('@', $codes_hz);
                 break;
             case 2: # 三字定
                 $params = ['playway'=>$playway, 'tz_type'=>$tz_type, 'status'=>$buy_type];
@@ -492,7 +494,7 @@ abstract class BetService extends BaseBetService {
            $single = $plan->single;
 
            # 3、投注号码 codes
-           $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $single, $plan->sel_same, $plan->hz_Arr);
+           $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr);
 
            # 4、投注类型，详见staticService::$kArr
            $tz_type = $plan->tz_type;

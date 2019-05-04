@@ -339,10 +339,8 @@ class XlService extends BaseTZService {
             $data = ['status'=>300, 'msg'=>$qihao.$rst['msg']];
         }
 
-        //$bet_codes = $codes;
         $bet_codes = self::formCodesStyle($codes, $playway);
 
-        //$post_data = ['totalCount'=>$totalCount, 'totalBetMoney'=>$totalBetMoney, 'bets'=>json_encode($codes), 'way'=>$way, 'period_no'=>'20'.$qihao, 'bet_log'=>urlencode('投注：'.$totalCount.'/'.$single.'注,总共：'.$totalBetMoney.'元'), ];
         $post_data = [
             'PeriodId' => $qihaoInfo['PeriodsID'],
             'LotteryId' => $lottery_type,	# 备注：5:1.5分、6:3分、7:5分、8:10分
@@ -368,9 +366,8 @@ class XlService extends BaseTZService {
 
         # 缓存锁
         $m = \Yii::$app->cache;
-        //$betKey = BetService::buildBetKey($account, self::$tz_system_id, $qihao, $playway, $tz_type);
         $betKey = BetService::buildBetKey($account, self::$tz_system_id, $qihao, $playway, $tz_type);
-        if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
+        //if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
         if(in_array($tz_type, [20,23])){
             # 和值投注反应时间比较久，无需返回直接锁住
@@ -391,16 +388,11 @@ class XlService extends BaseTZService {
                 $tzRst['code'] = $codes;
             }
             Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
-            return $tzRst;
+            //return $tzRst;
         }
         $time = 600;
         if(substr($qihao,6) == '023') $time = 60 * 60 * 10; # 十小时
         $m->set($betKey, 1, $time);
-
-        //p($rst,0);
-        //$position = UserFollowData::findOne(self::$plan_id)->position;
-        //$position = $position ? $position : self::$position;
-
 
         $n = count(explode('@',$codes));
         if(in_array($playway, [2, 3]) && $tz_type != 20){
@@ -409,7 +401,7 @@ class XlService extends BaseTZService {
             $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
         }
         # 获取方案号，记录id, 用于撤单
-        $snInfo = SevenService::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+        //$snInfo = SevenService::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
 
         $insertData = [
             'playway'=> $playway,  // 投注方式
@@ -498,88 +490,53 @@ class XlService extends BaseTZService {
     }
 
     /**
-     * @desc 获取本站号码存储格式
-     * @param $codes # codes:13579,,13579,,@13579,,13579,,
+     * @desc 希腊站点号码格式化成本站号码存储格式
+     * @param $codes # codes:13579,,13579,,@13579,,,13579,      -- playway:10
+     * @param $codes # codes:13579,X,13579,X@13579,X,X,13579   -- playway:4
      * @param $playway
-     * @return string X1XX,X6XX
+     * @return string  格式：X1XX,X6XX
      */
-    public static function formCodesStyle($codes, $playway){
-        /*
-        $codes = [
-            ['bet_no'=>'15', 'dict_no_type_id'=>4],
-            ['bet_no'=>'178', 'dict_no_type_id'=>9],
-            ['bet_no'=>'609', 'dict_no_type_id'=>10],
-        ];
-        */
+    public static function formCodesStyle($codes, $playway = 10){
+        //p([$codes, $playway]);
+        $codes = explode('@', $codes);
+        //p($codes, 0);
 
         $codesArr = [];
-
-        foreach ($codes as $data){
-
-            $dict_no_type_id = $data['dict_no_type_id'];
-            $code = $data['bet_no'];
-            $positions = self::getPositionByTypeId($dict_no_type_id);
-
-            $tmp = [];
-            $i = 0;
-            foreach ($positions as $key=>$position){
-                if($position == 'X'){
-                    $tmp[$key] = 'X';
-                }else{
-                    $tmp[$key] = $code[$i];
-                    $i++;
-                }
+        foreach ($codes as $code){
+            $tmpArr = explode(',', $code);
+            //p($tmpArr);
+            switch ($playway) {
+                case 4:
+                case 10: # playway 一字定 2357,2468,X,X
+                    foreach ($tmpArr as $key => $str) {
+                        $len = strlen($str);
+                        if ($len > 0) {
+                            for ($i = 0; $i < $len; $i++) {
+                                if($str[$i] == 'X') continue;
+                                if ($key == 0) {
+                                    $codesArr[] = $str[$i] . 'XXX';
+                                } elseif ($key == 1) {
+                                    $codesArr[] = 'X' . $str[$i] . 'XX';
+                                } elseif ($key == 2) {
+                                    $codesArr[] = 'XX' . $str[$i] . 'X';
+                                } elseif ($key == 3) {
+                                    $codesArr[] = 'XXX' . $str[$i];
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 1: # 二字定 2357,2468,X,X
+                    break;
+                case 2: # 三字定
+                    break;
+                case 3: # 四字定
+                    break;
             }
-            //p(['code'=>$code, 'positions'=>$positions, 'dict_no_type_id'=>$dict_no_type_id, 'codes'=>$tmp]);
-            $codesArr[] = implode(',',$tmp);
+
         }
 
         return implode(',', $codesArr);
-    }
-
-    /**
-     * @desc 根据dict_no_type_id判断位置  1千2百3十4个
-     * @param $dict_no_type_id
-     * @return array
-     */
-    public static function getPositionByTypeId($dict_no_type_id){
-        switch ($dict_no_type_id){
-            case 1: # 千百
-                $position = [1,2,'X','X'];
-                break;
-            case 2: # 千十
-                $position = [1,'X',3,'X'];
-                break;
-            case 3: # 千个
-                $position = [1,'X','X',4];
-                break;
-            case 4: # 百个
-                $position = ['X',2,'X',4];
-                break;
-            case 5: # 百十
-                $position = ['X',2,3,'X'];
-                break;
-            case 6: # 十个
-                $position = ['X','X',3,4];
-                break;
-            case 7: # 千百十
-                $position = [1,2,3,'X'];
-                break;
-            case 8: # 千百个
-                $position = [1,2,'X',4];
-                break;
-            case 9: # 千十个
-                $position = [1,'X',3,4];
-                break;
-            case 10: # 百十个
-                $position = ['X',2,3,4];
-                break;
-            case 11: # 千百十个
-                $position = [1,2,3,4];
-                break;
-        }
-
-        return $position;
     }
 
     /**
