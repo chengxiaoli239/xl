@@ -123,7 +123,7 @@ class KjDataGet
                 $mkey = 'KJ_LOG_KEY_BATCH_0_'.$kjConfig->lottery_type;
                 $kjData = isset($data['opencode']) ? $data['opencode'] : [];
                 if($kjData){
-                    if(in_array($kjConfig->lottery_type, [1,2,3,4])){
+                    if($kjConfig->lottery_type != 99){
                         $qihao = substr($data['expect'],2,6).substr($data['expect'],9);
                         # ssc
                         $msg = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData);
@@ -139,7 +139,7 @@ class KjDataGet
                 }
                 $logArr = ['data'=>$data, 'lottery_type'=>$kjConfig->lottery_type, 'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$msg, 'lottery'=>CqsscKcw::$lotteryNameArr[$kjConfig->lottery_type]];
             }
-            $mkey_qihao = 'KJ_LOG_QIHAO_'.$qihao;
+            $mkey_qihao = 'KJ_LOG_QIHAO_'.$kjConfig->lottery_type.'_'.$qihao;
             //if(!$m->get($mkey) OR ($kjConfig->lottery_type == 1 && !$m->get($mkey_qihao))){
             if(!$m->get($mkey) ){
                 $logArr['url'] = $url;
@@ -148,10 +148,10 @@ class KjDataGet
                 $m->set($mkey, 1, $cache_time);
                 $m->set($mkey_qihao, 1, $cache_time);
             }
+            /* 处理系统投注计划 add 2019-01-21 */
+            KjDataGet::afterKj($kjConfig->lottery_type); # 处理系统投注计划，更新统计数据
+            /* 处理系统投注计划 add 2019-01-21 */
         }
-        /* 处理系统投注计划 add 2019-01-21 */
-        KjDataGet::afterKj(); # 处理系统投注计划，更新统计数据
-        /* 处理系统投注计划 add 2019-01-21 */
 
 
         return $msg;
