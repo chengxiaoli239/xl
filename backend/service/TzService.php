@@ -117,14 +117,15 @@ class TzService extends BaseService {
     }
     /**
      * @desc 处理系统投注计划
+     * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return array|bool
      */
-    public static function opSystemBetPlans(){
+    public static function opSystemBetPlans($lottery_type = 2){
         self::_init();
         $rst = ['status'=>200, 'msg'=>'操作成功!'];
 
-        $qihao = KjDataGet::getEndQihao();
-        $statusRst = self::beforeRunSysPlans($qihao);
+        $qihao = KjDataGet::getEndQihao($lottery_type);
+        $statusRst = self::beforeRunSysPlans($qihao, $lottery_type);
         if($statusRst['status'] != 200){
             return $statusRst;
         }

@@ -395,17 +395,16 @@ abstract class BetService extends BaseBetService {
      * @desc 生成投注key, 用做缓存锁
      * @param $qihao
      * @param $tz_system_id
-     * @param int $playway
+     * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @param string $account
      * @param int $tz_type 三定：投注类型:1大小单双三字定2大小三字定3单双三字定    四定：详见staticServices::$kArr
      * @return string
      */
-    public static function buildBetKey($account = 'gaozi2017', $tz_system_id, $qihao, $playway = 2, $tz_type = 0, $plan_id = 0){
-        $mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$qihao.'_'.$tz_system_id.'_'.$playway.'_'.$tz_type.'_'.$plan_id.'_'.$account;
+    public static function buildBetKey($account = 'gaozi2017', $tz_system_id, $lottery_type = 2, $qihao, $plan_id = 0){
+        $mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$account.'_'.$tz_system_id.'_'.$lottery_type.'_'.$qihao.'_'.$plan_id;
 
         return $mkey;
     }
-
 
     /**
      * @desc 计划任务列表立即投注
@@ -500,7 +499,7 @@ abstract class BetService extends BaseBetService {
            $tz_type = $plan->tz_type;
 
            # 5、投注请求
-           BetService::beforeBetNow($plan->account, $tz_system_id, $qihao, $playway, $tz_type, $plan->id);
+           BetService::beforeBetNow($plan->account, $tz_system_id, $qihao, $plan->id);
            $BetService = self::getBetObj($plan->uid, $system_type_id, $tz_system_id);
            //$rst = $BetService->bet($playway, $codes, $single, $qihao, $plan->tz_type, $plan->buy_type);
            $rst = $BetService->bet($qihao, $plan->id, $codes);
@@ -520,11 +519,12 @@ abstract class BetService extends BaseBetService {
      * @param $account
      * @param $tz_system_id
      * @param $qihao
-     * @param $playway
+     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
+     * @param $plan_id
      */
-    public static function beforeBetNow($account, $tz_system_id, $qihao, $playway, $tz_type = 3, $plan_id = 0){
+    public static function beforeBetNow($account, $tz_system_id, $lottery_type = 2, $qihao, $plan_id = 0){
         $m = \Yii::$app->cache;
-        $mkey = BetService::buildBetKey($account, $tz_system_id, $qihao, $playway, $tz_type, $plan_id);
+        $mkey = BetService::buildBetKey($account, $tz_system_id, $lottery_type, $qihao, $plan_id);
         $m->delete($mkey);
 
         $pkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$qihao;

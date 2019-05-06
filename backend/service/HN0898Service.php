@@ -286,7 +286,7 @@ class HN0898Service extends BaseTZService {
 
         # 缓存锁
         $m = \Yii::$app->cache;
-        $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $qihao, $playway);
+        $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
         $insertRst = BetService::_logRecords($insertData);
 
@@ -321,6 +321,7 @@ class HN0898Service extends BaseTZService {
         $single = $plan->single ? $plan->single : 0.1;
         $tz_type = $plan->tz_type ? $plan->tz_type : 0;
         $buy_type = $plan->buy_type ? $plan->buy_type : 1;
+        $lottery_type = $plan->lottery_type;
         //$TzSystemsUsers = TzSystemsUsers::findOne(['tz_system_id'=>$tz_system_id, 'account'=>$account]);
         //p([$site_id,$account, $playway, $code, $single, $qihao, $is_simulate]);
         //self::__init($account);
@@ -350,7 +351,7 @@ class HN0898Service extends BaseTZService {
 
         # 缓存锁
         $m = \Yii::$app->cache;
-        $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $qihao, $playway, $tz_type, $plan_id);
+        $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
         if(in_array($tz_type, [20,23])){
@@ -523,23 +524,6 @@ class HN0898Service extends BaseTZService {
         return $rst;
     }
 
-
-    /**
-     * @desc 立即投注之前清除缓存锁
-     * @param $account
-     * @param $tz_system_id
-     * @param $qihao
-     * @param $playway
-     */
-    public static function beforeBetNow($account, $tz_system_id, $qihao, $playway, $tz_type = 3, $plan_id = 0){
-        $m = \Yii::$app->cache;
-        $mkey = BetService::buildBetKey($account, $tz_system_id, $qihao, $playway, $tz_type, $plan_id);
-        $m->delete($mkey);
-
-        $pkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$qihao;
-        $m->delete($pkey);
-    }
-
     /**
      * @desc 立即投注之后设置缓存锁
      * @param $qihao
@@ -575,8 +559,7 @@ class HN0898Service extends BaseTZService {
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
 
        //p([$qihao, $BettingRecords->plan_id, $codes]);
-       BetService::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $qihao, $playway, $BettingRecords->tz_type, $BettingRecords->plan_id);
-       //$rst = $HN0898Service->bet($playway, $codes, $single, $qihao, $BettingRecords->tz_type, $BettingRecords->buy_type);
+       BetService::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id);
        $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
        BetService::afterBetNow($qihao);
 
@@ -601,7 +584,6 @@ class HN0898Service extends BaseTZService {
        $oldCodesArr = explode('@', $oldCodes);
        $qihao = HN0898Service::getQihao();
        $playway = $BettingRecords->playway;
-       $single = $BettingRecords->single;
 
        $codes = '';
        $SysPlansCodes = SysPlansCodes::find()->where(['AND',['NOT IN','code', $oldCodesArr], ['=', 'playway', $playway]])->all();
@@ -615,8 +597,7 @@ class HN0898Service extends BaseTZService {
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了'];
 
        $account = User::findOne($uid)->account;
-       BetService::beforeBetNow($account, $BettingRecords->tz_system_id, $qihao, $playway, $BettingRecords->tz_type);
-       //$rst = $HN0898Service->bet($playway, $codes, $single, $qihao, $BettingRecords->tz_type, $BettingRecords->buy_type?0:1);
+       BetService::beforeBetNow($account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id);
        $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
        BetService::afterBetNow($qihao);
 
@@ -1155,13 +1136,13 @@ class HN0898Service extends BaseTZService {
      * @param int $type
      * @return string
      */
-    public static function getQihao($type = 2){
+    public static function getQihao($lottery_type = 2){
         $db = Yii::$app->db;
         //$date = date('Y-m-d');
         $time = date("H:i:s");
-        $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$type ORDER BY id ASC";
+        $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC";
         $rst = $db->createCommand($sql)->queryOne();
-        if(!$rst && $type == 1) {
+        if(!$rst && $lottery_type == 1) {
             $rst['actionNo'] = 001; // 大于 23:56  -> null  设置为120期
             $qihao = date("ymd", strtotime('+1 day')) . sprintf("%03d", $rst['actionNo']);
         }elseif ('03:10:00'<$time && $time<'07:30:00'){

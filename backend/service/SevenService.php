@@ -216,95 +216,6 @@ class SevenService extends BaseTZService {
     }
 
     /**
-     * @decription 投注接受方法
-     * @param $data
-     */
-    public function tz($data){
-        $qihao = $data['qihao'];
-        $code = $data['code'];
-        $is_simulate = $data['is_simulate'];
-        $single = $data['single'];
-        $playway = $data['playway'];
-        $order_type = $data['order_type'];
-        self::$position = $data['position'];
-
-        //p(['account'=>self::$account,'playway'=>$playway, 'code'=>$code, 'single'=>$single, 'qihao'=>$qihao,'is_simulate'=>$is_simulate,'order_type'=>$order_type,'headers'=>self::$headers]);
-        $rst = self::betting($playway, $code, $single, $qihao, $is_simulate, $order_type);
-
-        return $rst;
-    }
-
-    /**
-     * @decription 投注
-     *
-     * @param $account
-     * @param int $playway
-     * @param $code
-     * @param $single
-     * @param $qihao
-     * @param $is_simulate
-     * @param $order_type 1、计划投注订单 2、大数据订单 3、定制化
-     * @return array
-     */
-    public function betting($playway = 1, $code, $single, $qihao, $is_simulate = 1, $order_type = 1){
-        self::__init();
-        $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
-
-        # 验证
-        $rst = self::validateBettingContent($playway,$code);
-        if($rst['status'] != 200){
-            $data = ['status'=>300, 'msg'=>$qihao.$rst['msg']];
-        }
-
-        $post_data = [ 'act' => 'postsn', 'playway' => $playway, 'single' => $single, 'qihao' => $qihao, 'code' => $code, ];
-
-        $data['code'] = $code;
-        $header = [
-            'Content-Length:'.strlen(http_build_query($post_data)),
-        ];
-
-        $headers = array_merge(self::$headers,$header);
-        //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
-
-        $n = count(explode('@',$code));
-        if(in_array($playway, [2, 3])){
-            $totalmoney = SscDataService::calTzTotalMoney($code, $single, $playway);
-        }else{
-            $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
-        }
-        $snid = '88888888';
-        $insertData = [
-            'playway'=> $playway,  // 投注方式
-            'codes' => $code,  // 投注号码
-            'qihao' => $qihao,  // 投注期号
-            'snid'=>$snid,
-            'buy_type' => 1,
-            'uid'=>0, # 系统模拟，uid=0
-            'account'=>'admin', # 系统模拟，admin
-            'order_type'=>$order_type,
-            'is_simulate' => $is_simulate,  // 是否模拟投注
-            'single' => $single,  // 投注倍数
-            'betting_money'=> $totalmoney,  // 投注金额
-        ];
-
-        # 缓存锁
-        $m = \Yii::$app->cache;
-        $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $qihao, $playway);
-        if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
-        //$insertRst = self::_logRecords($insertData);
-        $insertRst = BetService::_logRecords($insertData);
-
-        $time = \Yii::$app->params['TZ_LOCK_TIME'];
-        $m->set($betKey, 1, $time);
-        self::$headers = [];
-
-        $logArr = ['post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/betting','INFO','0898模拟投注记录-插入记录', $logArr);
-
-        return $data;
-    }
-
-    /**
      * @decription 新版投注，真实投注入口， 未完待续 2018.12.23
      *
      * @param $tz_system_id
@@ -318,14 +229,13 @@ class SevenService extends BaseTZService {
      * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
      * @return array
      */
-    //public function bet($playway = 1, $codes, $single, $qihao, $tz_type = 0, $buy_type = 1){
     public function bet($qihao, $plan_id, $codes){
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
         $tz_type = $plan->tz_type ? $plan->tz_type : 0;
         $buy_type = $plan->buy_type ? $plan->buy_type : 1;
-        //$codesArr = self::getMySiteCodesStyle($codes, $playway);
+        $lottery_type = $plan->lottery_type;
         //p(['playway'=>$playway, 'totalCount'=>count($codes), 'single'=>$single, 'qihao'=>$qihao, 'tz_type'=>$tz_type, 'buy_type'=>$buy_type,'codes'=>$codes]);
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
@@ -378,8 +288,7 @@ class SevenService extends BaseTZService {
 
         # 缓存锁
         $m = \Yii::$app->cache;
-        //$betKey = BetService::buildBetKey($account, self::$tz_system_id, $qihao, $playway, $tz_type);
-        $betKey = BetService::buildBetKey($account, self::$tz_system_id, $qihao, $playway, $tz_type);
+        $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
         if(in_array($tz_type, [20,23])){
@@ -658,22 +567,6 @@ class SevenService extends BaseTZService {
     }
 
     /**
-     * @desc 立即投注之前清除缓存锁
-     * @param $account
-     * @param $tz_system_id
-     * @param $qihao
-     * @param $playway
-     */
-    public static function beforeBetNow($account, $tz_system_id, $qihao, $playway, $tz_type = 3){
-        $m = \Yii::$app->cache;
-        $mkey = BetService::buildBetKey($account, $tz_system_id, $qihao, $playway, $tz_type);
-        $m->delete($mkey);
-
-        $pkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$qihao;
-        $m->delete($pkey);
-    }
-
-    /**
      * @desc 立即投注之后设置缓存锁
      * @param $qihao
      * @return bool
@@ -693,30 +586,29 @@ class SevenService extends BaseTZService {
      * @param $plan_id
      * @return array
      */
-   /*
    public static function tzNowBetRecord($uid, $BetRecordId){
-       $qihao = HN0898Service::getQihao();
        $BettingRecords = BettingRecords::findOne($BetRecordId);
+       $lottery_type = $BettingRecords->lottery_type;
+       $qihao = HN0898Service::getQihao($lottery_type);
        $playway = $BettingRecords->playway;
        if(!$BettingRecords) return ['status'=>300, 'msg'=>'找不到投注计划记录'];
        $tz_system_id = $BettingRecords->tz_system_id ? $BettingRecords->tz_system_id : 2;
-       $HN0898Service = new HN0898Service($uid, $tz_system_id);
+       $BetService = new self($uid, $tz_system_id);
        $codes = $BettingRecords->codes;
-       $single = $BettingRecords->single;
+       $plan_id = $BettingRecords->plan_id;
 
        $m = \Yii::$app->cache;
        $mkey = 'tzNowBetRecord_'.$uid.'_'.$qihao.'_'.$playway;
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
 
-       HN0898Service::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $qihao, $playway, $BettingRecords->tz_type);
-       $rst = $HN0898Service->bet($playway, $codes, $single, $qihao, $BettingRecords->tz_type, $BettingRecords->buy_type);
-       HN0898Service::afterBetNow($qihao);
+       BetService::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id);
+       $rst = $BetService->bet($qihao, $plan_id, $codes);
+       BetService::afterBetNow($qihao);
 
        $m->set($mkey, 1, 10);
 
        return $rst;
    }
-   */
 
     /**
      * @desc 计划任务列表立即投注
@@ -738,48 +630,6 @@ class SevenService extends BaseTZService {
 
        return $rst;
     }
-
-   /**
-     * @desc 立即反买
-     * @param $account
-     * @param $plan_id
-     * @return array
-     */
-   /*
-   public static function reverseTzNowBetRecord($uid, $BetRecordId){
-       $BettingRecords = BettingRecords::findOne($BetRecordId);
-       if(!$BettingRecords) return ['status'=>300, 'msg'=>'找不到投注计划记录'];
-
-       $tz_system_id = $BettingRecords->tz_system_id ? $BettingRecords->tz_system_id : 2;  # 默认99网
-       $HN0898Service = new HN0898Service($uid, $tz_system_id);
-       $oldCodes = $BettingRecords->codes;
-       $oldCodesArr = explode('@', $oldCodes);
-       $qihao = HN0898Service::getQihao();
-       $playway = $BettingRecords->playway;
-       $single = $BettingRecords->single;
-
-       $codes = '';
-       $SysPlansCodes = SysPlansCodes::find()->where(['AND',['NOT IN','code', $oldCodesArr], ['=', 'playway', $playway]])->all();
-       foreach ($SysPlansCodes as $sysPlansCode){
-           $codes .= $sysPlansCode->code.'@';
-       }
-       $codes = trim($codes, '@');
-
-       $m = \Yii::$app->cache;
-       $mkey = 'reverseTzNowBetRecord_'.$qihao.'_'.$playway;
-       if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了'];
-
-       $account = User::findOne($uid)->account;
-       BetService::beforeBetNow($account, $BettingRecords->tz_system_id, $qihao, $playway, $BettingRecords->tz_type);
-       $rst = $HN0898Service->bet($playway, $codes, $single, $qihao, $BettingRecords->tz_type, $BettingRecords->buy_type?0:1);
-       BetService::afterBetNow($qihao);
-
-       $m->set($mkey, 1, 5);
-
-       return $rst;
-   }
-   */
-
 
     /**
      * @decription 验证投注格式是否正确，待完善 2018.0220

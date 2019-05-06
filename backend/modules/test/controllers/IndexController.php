@@ -219,7 +219,6 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-
         $rst = TzService::tz(); p($rst);// 计划投注
         $rst = BetService::tzByPlanId(1);p($rst);
         $rst = XlService::formCodesStyle('13579,X,X,X@02468,X,X,X', 4); p($rst); # 格式化希腊号码
