@@ -220,6 +220,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = KjDataGet::grabOne();p($rst);
+        $rst = OpKjService::opSscKjData(2); p($rst); # 处理投注数据
         $rst = TzService::tz(); p($rst);// 计划投注
         $captchaCodeRst = Tools::getCaptchaCode(10, 5, '2x2tdrnawlpbli554jlsuf2c');p($captchaCodeRst); # 真实调用验证码接口，收费
         $rst = XlService::login(10, 5);p($rst); # 7时登录
@@ -233,7 +235,6 @@ class IndexController extends Controller
         $rst = KjDataGet::getBeforeQihaoByQihao('191231960',2);p($rst);
         $rst = KjDataGet::getNextQihaoByQihao('191231960', 1);p($rst);
         $rst = TzService::insertSscDataTime(4); p($rst);
-        $rst = OpKjService::opSscKjData(); p($rst); # 处理投注数据
         $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0])->distinct('qihao')->orderBy('bet.qihao ASC')->limit(20)->all();p($bettingRecords);
         $rst = CqsscKcw::getLotteryNoXl();p($rst);
         $rst = HN0898Service::getQihao(); p($rst);

@@ -31,7 +31,8 @@ class OpKjService extends BaseService {
 
         $m = \Yii::$app->cache;
         //p($qihaos);
-        $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0, 'lottery_type'=>$lottery_type])->orderBy('bet.qihao DESC')->limit(20)->all();
+        $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0, 'lottery_type'=>$lottery_type])->orderBy('bet.qihao ASC')->limit(20)->all();
+        //p(['bet.status'=>0, 'lottery_type'=>$lottery_type,$bettingRecords]);
         if(!$bettingRecords) return $rst;
         foreach ($bettingRecords as $bettingRecord){
             $is_simulate = $bettingRecord['is_simulate'];
@@ -46,6 +47,7 @@ class OpKjService extends BaseService {
 
             # 开奖数据 start
             $kjData = SscKjData::find()->where(['qihao'=>$qihao, 'lottery_type'=>$bettingRecord->lottery_type])->asArray()->one()['code_str'];
+            //p(['qihao'=>$qihao, 'lottery_type'=>$bettingRecord->lottery_type, 'kjData'=>$kjData]);
             if(!$kjData){
                 $kjData = CommonService::getAwardNumberByQihao($qihao); // 3,4,5,6,7
             }

@@ -262,7 +262,7 @@ class HN0898Service extends BaseTZService {
         //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
 
         $n = count(explode('@',$codes));
-        if(in_array($playway, [2, 3])){
+        if(in_array($playway, [2, 3, 4])){ # 三、四定
             $totalmoney = SscDataService::calTzTotalMoney($codes, $single, $playway);
         }else{
             $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数

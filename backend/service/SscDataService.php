@@ -921,18 +921,25 @@ class SscDataService extends BaseService {
     /**
      * @desc 计算投注金额
      * @param $codes 2三子定：13579,X,02468,02468   3四字定：01234,01234,56789,56789
-     * @param int $playway
+     * @param int $playway 2:三字定 3四字定 4:一字定
      * @param float $single
      * @return float
      */
     public static function calTzTotalMoney($codes, $single = 0.1, $playway = 2, $zhuSplit = '@', $codeSplit = ','){
         $zhuNums = explode($zhuSplit, $codes);
         $all_moneys = 0.00;
+
         foreach ($zhuNums as $key=>$codes){
             $codes = explode($codeSplit, $codes);
-            if($playway == 2){
+            if($playway == 2){  # 三字定
                 $key = array_search('X',$codes);
                 unset($codes[$key]);
+            }
+            if($playway == 4 OR $playway == 2){
+                for ($i=0; $i<3; $i++){
+                    $key = array_search('X',$codes);
+                    unset($codes[$key]);
+                }
             }
 
             $zhus = 1;

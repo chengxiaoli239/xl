@@ -58,7 +58,6 @@ class SscKjData extends \common\models\base\BaseModel
             [['date', 'update_time'], 'safe'],
             [['kj_code'], 'string', 'max' => 8],
             [['code_str'], 'string', 'max' => 24],
-            [['qihao'], 'unique'],
         ];
     }
 

@@ -58,7 +58,6 @@ class IndexController extends Controller
         }else{
             for ($i = 1; $i<5; $i++) {
                 $rst['kj'] = KjDataGet::grabOne();
-                sleep(4);
             }
         }
 
@@ -240,7 +239,7 @@ class IndexController extends Controller
             $rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
             return $rst;
         }
-        for ($lottery_type=0; $lottery_type<5; $lottery_type++) {
+        for ($lottery_type=2; $lottery_type<5; $lottery_type++) {
             $rst = OpKjService::opSscKjData($lottery_type); # 在抓取完开奖数据已经调用 KjDataGet::grabOne
             sleep(2);
         }
