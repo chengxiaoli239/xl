@@ -9,7 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property int $is_parent 是否是父id
- * @property int $children_plan_id 子计划id
+ * @property string $children_plan_id 子计划id
  * @property int $uid 用户id
  * @property string $account 账号名称
  * @property int $playway 投注方式:1二字定2三字定3四字定
@@ -43,10 +43,11 @@ class UserSysPlans extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['is_parent', 'children_plan_id', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['uid', 'account', 'created_at', 'updated_at'], 'required'],
             [['single'], 'number'],
             [['update_time'], 'safe'],
+            [['children_plan_id'], 'string', 'max' => 255],
             [['account', 'tz_sites'], 'string', 'max' => 24],
             [['hz_Arr'], 'string', 'max' => 120],
         ];
