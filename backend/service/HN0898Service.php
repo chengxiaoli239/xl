@@ -20,6 +20,7 @@ use backend\models\User;
 use backend\models\UserCustomPlans;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
+use backend\tools\Tools;
 use common\service\CaptchaCodeService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -234,7 +235,7 @@ class HN0898Service extends BaseTZService {
      * @return array
      */
     public function betting($qihao, $plan_id, $codes){
-        self::__init();
+        self::__init(1,1);
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
@@ -1035,7 +1036,7 @@ class HN0898Service extends BaseTZService {
         HN0898Service::downLoadCodeImg($uid, $tz_system_id, $cookie_key);
         # 第三步：调验证码接口获取验证码
         //$captchaCode = '888888'; $rst = self::loginRemote($uid, $tz_system_id,$captchaCode); p($rst);  # 测试
-        $captchaCodeRst = HN0898Service::getCaptchaCode($uid, $tz_system_id, $cookie_key); # 真实调用验证码接口，收费
+        $captchaCodeRst = Tools::getCaptchaCode($uid, $tz_system_id, $cookie_key); # 真实调用验证码接口，收费
         //$code = $captchaCode['result'];
         if($captchaCodeRst['status'] == 200){
             $code = $captchaCodeRst['code'];

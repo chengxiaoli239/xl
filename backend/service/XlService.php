@@ -19,6 +19,7 @@ use backend\models\User;
 use backend\models\UserCustomPlans;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
+use backend\tools\Tools;
 use common\service\CaptchaCodeService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -816,7 +817,7 @@ class XlService extends BaseTZService {
         self::downLoadCodeImg($uid, $tz_system_id, $cookie_key);
         # 第三步：调验证码接口获取验证码
         //$captchaCode = '888888'; $rst = self::loginRemote($uid, $tz_system_id,$captchaCode); p($rst);  # 测试
-        $captchaCodeRst = self::getCaptchaCode($uid, $tz_system_id, $cookie_key); # 真实调用验证码接口，收费
+        $captchaCodeRst = Tools::getCaptchaCode($uid, $tz_system_id, $cookie_key); # 真实调用验证码接口，收费
         //$code = $captchaCode['result'];
         if($captchaCodeRst['status'] == 200){
             $code = $captchaCodeRst['code'];

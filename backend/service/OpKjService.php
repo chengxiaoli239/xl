@@ -21,16 +21,17 @@ class OpKjService extends BaseService {
     /**
      * @description 处理开奖数据
      * 投注方式，具体见 CommonService::getOdds( ) 方法
+     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return array
      */
-    public static function opSscKjData(){
+    public static function opSscKjData($lottery_type = 2){
 
         $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
         $lotteryTypeArr = [1,2,3,4]; # 彩票类型：彩种类型：1:1.5分 2:3分 3:5分 4:10分
 
         $m = \Yii::$app->cache;
         //p($qihaos);
-        $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0])->orderBy('bet.qihao DESC')->limit(20)->all();
+        $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0, 'lottery_type'=>$lottery_type])->orderBy('bet.qihao DESC')->limit(20)->all();
         if(!$bettingRecords) return $rst;
         foreach ($bettingRecords as $bettingRecord){
             $is_simulate = $bettingRecord['is_simulate'];

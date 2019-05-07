@@ -65,7 +65,7 @@ class TzService extends BaseService {
         # 4、期号 qihao
         $tzStatus = TzService::beforeTz();
         if ($tzStatus['status'] != 200) {
-            return $tzStatus;
+            //return $tzStatus;
         }
 
         if($plans = UserSysPlans::find()->where(['uid'=>0,'status'=>1])->groupBy('playway,tz_type')->all()) {
@@ -106,9 +106,15 @@ class TzService extends BaseService {
         return true;
     }
 
-    public static function beforeRunSysPlans($qihao){
+    /**
+     * @desc 执行计划前判断
+     * @param $qihao
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function beforeRunSysPlans($qihao, $lottery_type = 2){
         $m = Yii::$app->cache;
-        $pkey = \Yii::$app->params['PLAN_SWITCH_KEY'].'_'.$qihao;
+        $pkey = \Yii::$app->params['PLAN_SWITCH_KEY'].'_'.$lottery_type.'_'.$qihao;
         if($planStatus = $m->get($pkey)){
             return ['status'=>300, 'pkey'=>$pkey, 'msg'=>'投注计划已经处理过了~'];
         }
@@ -163,13 +169,13 @@ class TzService extends BaseService {
      * @desc 系统计划处理后，开关的开启或关闭
      * @param $qihao
      */
-    public static function afterRunSysPlans($qihao){
+    public static function afterRunSysPlans($qihao, $lottery_type = 2){
         $m = Yii::$app->cache;
-        $next_qihao = KjDataGet::getNextQihaoByQihao($qihao);
+        $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
 
         # 处理完计划后,下一期投注开关开启(value:1) start
-        $next_mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$next_qihao;
-        $next_simulate_mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$next_qihao;
+        $next_mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$lottery_type.'_'.$next_qihao;
+        $next_simulate_mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$lottery_type.'_'.$next_qihao;
 
         $next_time = \Yii::$app->params['TZ_LOCK_TIME'];
         $rst11 = $m->set($next_mkey,1,$next_time); # 真实
@@ -177,7 +183,7 @@ class TzService extends BaseService {
         # 处理完计划后,下一期投注开关开启(value:1) end
 
         # 计划任务是否处理完成后锁住(value:1)，避免重复处理 start
-        $pkey = \Yii::$app->params['PLAN_SWITCH_KEY'].'_'.$qihao;
+        $pkey = \Yii::$app->params['PLAN_SWITCH_KEY'].'_'.$lottery_type.'_'.$qihao;
         //$simulate_pkey = \Yii::$app->params['PLAN_SWITCH_SIMULATE_KEY'].'_'.$qihao;
         $time = 1200;
         if(substr($qihao,6) == '010') $time = 60*60*4; # 4小时

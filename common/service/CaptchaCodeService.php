@@ -206,7 +206,7 @@ class CaptchaCodeService{
         $end_time = microtime(true);
         $consume_time = ($end_time-$start_time).'s';
         $logData = ['file'=>$file, 'url'=>$url, 'consume_time'=>$consume_time, 'rstData'=>$rstData, 'code'=>$rstData['pic_str']];
-        Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/getCaptchaCode','INFO','验证码接口-超级鹰', $logData);
+        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/getCaptchaCode','INFO','验证码接口-超级鹰', $logData);
 
         return $rst ;
     }

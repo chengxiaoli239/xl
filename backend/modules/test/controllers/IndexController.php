@@ -22,6 +22,7 @@ use backend\service\TestService;
 use backend\service\UserCustomPlansService;
 use backend\service\WxService;
 use backend\service\XlService;
+use backend\tools\Tools;
 use common\kj\cqssc\CqsscKcw;
 use common\kj\cqssc\CqsscSevenDay;
 use common\service\CommonService;
@@ -219,10 +220,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $captchaCodeRst = XlService::getCaptchaCode(10, 5, $cookie_key); # 真实调用验证码接口，收费
+        $rst = TzService::tz(); p($rst);// 计划投注
+        $captchaCodeRst = Tools::getCaptchaCode(10, 5, '2x2tdrnawlpbli554jlsuf2c');p($captchaCodeRst); # 真实调用验证码接口，收费
         $rst = XlService::login(10, 5);p($rst); # 7时登录
         $rst = HN0898Service::login(10, 5);p($rst); # 7时登录
-        $rst = TzService::tz(); p($rst);// 计划投注
         $rst = BetService::tzByPlanId(1);p($rst);
         $rst = XlService::formCodesStyle('13579,X,X,X@02468,X,X,X', 4); p($rst); # 格式化希腊号码
         $rst = BetService::bet(); p($rst);// 用户新计划投注，可正买可反买
