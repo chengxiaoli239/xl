@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "{{%user_sys_plans}}".
  *
  * @property int $id
+ * @property int $is_parent 是否是父id
  * @property int $parent_plan_id 父计划id
  * @property int $uid 用户id
  * @property string $account 账号名称
@@ -42,7 +43,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['parent_plan_id', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['is_parent', 'parent_plan_id', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['uid', 'account', 'created_at', 'updated_at'], 'required'],
             [['single'], 'number'],
             [['update_time'], 'safe'],
@@ -58,6 +59,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     {
         return [
             'id' => 'ID',
+            'is_parent' => '是否是父id',
             'parent_plan_id' => '父计划id',
             'uid' => '用户id',
             'account' => '账号名称',
