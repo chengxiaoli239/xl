@@ -810,16 +810,20 @@ class XlService extends BaseTZService {
         $rst = false;
 
         # 第一步：获取cookie
-        $rst = SevenService::getCookie($uid,$tz_system_id);
-        p($rst);
-        if(isset($rst['status']) && $rst['status'] == 300) return $rst;
-        # 第二步：账号、验证码登录
-        $rst = self::loginRemote($uid, $tz_system_id);
-        # 第三步：同意
-        $rst = self::acceptAgreement($uid, $tz_system_id);
+        $cookie_key = self::getCookie($uid,$tz_system_id);
+        if(isset($cookie_key['status']) && $cookie_key['status'] == 300) return $cookie_key;
+        # 第二步：下载验证码图片
+        self::downLoadCodeImg($uid, $tz_system_id, $cookie_key);
+        # 第三步：调验证码接口获取验证码
+        //$captchaCode = '888888'; $rst = self::loginRemote($uid, $tz_system_id,$captchaCode); p($rst);  # 测试
+        $captchaCodeRst = self::getCaptchaCode($uid, $tz_system_id, $cookie_key); # 真实调用验证码接口，收费
+        //$code = $captchaCode['result'];
+        if($captchaCodeRst['status'] == 200){
+            $code = $captchaCodeRst['code'];
+            # 第四步：账号、验证码登录
+            $rst = self::loginRemote($uid, $tz_system_id, $code);
+        }
 
-        # 获取用户信息
-        $rst = SevenService::userInfo($uid, $tz_system_id);
         return $rst;
     }
 
@@ -874,24 +878,28 @@ class XlService extends BaseTZService {
      * @desc 登陆
      * @param $uid
      * @param $tz_system_id
+     * @param $code
      * @return mixed|string
      */
-    private static function loginRemote($uid, $tz_system_id){
+    private static function loginRemote($uid, $tz_system_id, $code){
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        $post_data['Account'] = $TzSystemsUsers->account;
-        $post_data['Password'] = $TzSystemsUsers->password;
+        $htmlData = self::getCodesAndFormData($uid, $tz_system_id);
+        //p($htmlData);
+        $post_data = $htmlData['htmlArr']['inputs'];
+        $post_data['ctl00$txtUser'] = $TzSystemsUsers->account;
+        $post_data['ctl00$txtPwd'] = $TzSystemsUsers->password;
+        $post_data['ctl00$txtcode'] = $code;
         //p($post_data);
 
-        if(!$post_data['Account'] OR !$post_data['Password']) return ['status'=>300, 'msg'=>'账号或者密码不能为空'];
-
-        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
-        $_t = microtime(true) * 10000;
-        $url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/DoLogin'.'?_'.$_t;
+        $url = self::getTzSiteInfo($tz_system_id, 'INDEX');
+        if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'url'=>$url];
         $post_data = http_build_query($post_data);
         $headers = [
             "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+            //"Accept-Encoding: gzip, deflate, br", # gunzip 防止乱码
+            //"Accept-Encoding: gunzip, deflate, br", # gunzip 防止乱码
             "Cache-Control:max-age=0",
             "Upgrade-Insecure-Requests:1",
             "Content-Length:".strlen($post_data),
@@ -901,11 +909,13 @@ class XlService extends BaseTZService {
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain,
         ];
+        //p(self::$headers);
+        //$headers = array_unique(array_merge($headers,self::$headers));
 
         $data = CurlService::httpPost($url,$post_data, $headers);
         //sleep(10);
-        HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
-        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
+        self::synBalance($TzSystemsUsers->id); # 同步余额
+        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'code'=>$code, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
         Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
         return $data;

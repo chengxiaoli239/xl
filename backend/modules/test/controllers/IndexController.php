@@ -219,6 +219,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $captchaCodeRst = XlService::getCaptchaCode(10, 5, $cookie_key); # 真实调用验证码接口，收费
+        $rst = XlService::login(10, 5);p($rst); # 7时登录
+        $rst = HN0898Service::login(10, 5);p($rst); # 7时登录
         $rst = TzService::tz(); p($rst);// 计划投注
         $rst = BetService::tzByPlanId(1);p($rst);
         $rst = XlService::formCodesStyle('13579,X,X,X@02468,X,X,X', 4); p($rst); # 格式化希腊号码
@@ -301,10 +304,6 @@ class IndexController extends Controller
         $rst = StaticService::staticProfits($playway = 3, 3600 * 3, 0);p($rst);
         $rst = OpKjService::opKjData4('01234,56789,56789,56789@01234,45678,56789,56789','3,4,5,7');p($rst);
         $rst = WxService::sendMsg();p($rst); # 群发微信消息
-        $num = -1;
-        $s = 5;
-        $s = $s + $num;
-        p($s);
         $rst = CqsscKcw::getLotteryNo();p($rst);
         $rst = HN0898Service::getQihao();p($rst);
         $rst = HN0898Service::getCurrentQihao();p($rst);
