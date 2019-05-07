@@ -69,6 +69,7 @@ class OpKjService extends BaseService {
                     $kjData_n = substr($kjData, 0,7); // 开奖截取前4位号码
                     $zjResult = OpKjService::opKjData4($codes, $kjData_n);
                     break;
+                case 4: # 一字定
                 case 10:
                     $zjResult = OpKjService::opKjData10($codes, $kjData, $groupSplit = '@', $codeSplit = ',',$nullCode = '');
                     break;
