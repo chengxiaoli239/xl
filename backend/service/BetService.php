@@ -119,9 +119,18 @@ abstract class BetService extends BaseBetService {
      */
     public static function bet(){
 
-        $plans = UserSysPlans::find()->where(['AND', ['=', 'status', 1], ['>', 'uid', 0]])->all();
+        $plans = UserSysPlans::find()->where(['AND', ['=', 'status', 1], ['>', 'uid', 0], ['=', 'is_parent', 0]])->all();
         if($plans){
             foreach ($plans as $key=>$plan){
+                if($plan->children_plan_id>0){
+                    $ids = explode(',', $plan->children_plan_id);
+                    foreach ($ids as $id){
+                        $tzRst[$id] = self::tzByPlanId($id);
+                    }
+                }else{
+                    $tzRst[$plan->id] = self::tzByPlanId($plan->id);
+                }
+                /*
                 # 1、期号 qihao
                 $qihao = HN0898Service::getQihao($plan->lottery_type);
 
@@ -154,8 +163,11 @@ abstract class BetService extends BaseBetService {
                 }
                 $logArr = ['tzStatus'=>$tzStatus,'tz_sites'=>$tz_sites,'codes'=>$codes, 'postRst'=>$rst];
                 Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/cron_bet','INFO','计划任务执行', $logArr);
+                */
             }
         }
+        $logArr = ['tzRst'=>$tzRst];
+        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/bet','INFO','用户真实投注', $logArr);
 
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
     }
@@ -486,26 +498,15 @@ abstract class BetService extends BaseBetService {
        foreach ($tz_sites as $tz_system_id){
            $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
 
-           # 1、玩法 playway
-           $playway = $plan->playway;
-
-           # 2、倍数
-           $single = $plan->single;
-
-           # 3、投注号码 codes
+           # 4、投注号码 codes
            $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr);
-
-           # 4、投注类型，详见staticService::$kArr
-           $tz_type = $plan->tz_type;
 
            # 5、投注请求
            BetService::beforeBetNow($plan->account, $tz_system_id, $qihao, $plan->id);
            $BetService = self::getBetObj($plan->uid, $system_type_id, $tz_system_id);
-           //$rst = $BetService->bet($playway, $codes, $single, $qihao, $plan->tz_type, $plan->buy_type);
            $rst = $BetService->bet($qihao, $plan->id, $codes);
            BetService::afterBetNow($qihao);
 
-           //HN0898Service::synBalance(2); # 同步余额
            BetService::synBalance($plan->uid, $tz_system_id);
        }
        $logArr = ['tz_sites'=>$tz_sites,'codes'=>$codes, 'postRst'=>$rst];

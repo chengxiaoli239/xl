@@ -226,7 +226,7 @@ class IndexController extends Controller
         $captchaCodeRst = Tools::getCaptchaCode(10, 5, '2x2tdrnawlpbli554jlsuf2c');p($captchaCodeRst); # 真实调用验证码接口，收费
         $rst = XlService::login(10, 5);p($rst); # 7时登录
         $rst = HN0898Service::login(10, 5);p($rst); # 7时登录
-        $rst = BetService::tzByPlanId(1);p($rst);
+        $rst = BetService::tzByPlanId(1);p($rst); # 投注
         $rst = XlService::formCodesStyle('13579,X,X,X@02468,X,X,X', 4); p($rst); # 格式化希腊号码
         $rst = BetService::bet(); p($rst);// 用户新计划投注，可正买可反买
         $rst = XlService::formCodesStyle('13579,,13579,,@13579,,13579,,', 1); p($rst); # 格式化希腊号码

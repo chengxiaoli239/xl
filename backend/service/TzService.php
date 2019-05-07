@@ -62,30 +62,45 @@ class TzService extends BaseService {
      * @return array
      */
     public static function tz(){
-        # 4、期号 qihao
-        $tzStatus = TzService::beforeTz();
-        if ($tzStatus['status'] != 200) {
-            //return $tzStatus;
-        }
 
-        if($plans = UserSysPlans::find()->where(['uid'=>0,'status'=>1])->groupBy('playway,tz_type')->all()) {
+        $where = ['AND', ['=', 'status', 1], ['=', 'uid', 0], ['=', 'is_parent', 0]];
+        if($plans = UserSysPlans::find()->where($where)->groupBy('playway,tz_type')->all()) {
             // 1、投注前判断
             foreach ($plans as $plan){
-                # 0898体系投注号码，系统正买按照0898格式下单
-                $codes = BetService::getPlansAllCodesType1($plan->tz_type, 1, $plan->sel_same, $plan->hz_Arr);
-
-                # 期号
-                $qihao = HN0898Service::getQihao($plan->lottery_type);
-
-                # 0898体系最终投注
-                $HN0898Service = new HN0898Service();
-                $rst = $HN0898Service->betting($qihao, $plan->id, $codes);
+                if($plan->children_plan_id>0){
+                    $ids = explode(',', $plan->children_plan_id);
+                    foreach ($ids as $id){
+                        $tzRst[$id] = self::tzByPlanId($id);
+                    }
+                }else{
+                    $tzRst[$plan->id] = self::tzByPlanId($plan->id);
+                }
             }
         }
-        TzService::afterTz($qihao);
-        $logArr = ['tzStatus'=>$tzStatus,'codes'=>$codes, 'postRst'=>$rst];
-        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/bet','INFO','投注记录(系统正买)', $logArr);
-        return ['status'=>200, 'msg'=>'系统定制化模拟正买投注完成~', $rst];
+        $logArr = ['tzRst'=>$tzRst];
+        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/tz','INFO','投注记录(系统正买)', $logArr);
+        return ['status'=>200, 'msg'=>'系统定制化模拟正买投注完成~', $tzRst];
+    }
+
+    /**
+     * @desc 投注计划 by plan_id
+     * @param $plan_id
+     * @return array
+     */
+    public static function tzByPlanId($plan_id){
+
+        $plan = UserSysPlans::findOne($plan_id);
+        # 0898体系投注号码，系统正买按照0898格式下单
+        $codes = BetService::getPlansAllCodesType1($plan->tz_type, 1, $plan->sel_same, $plan->hz_Arr);
+
+        # 期号
+        $qihao = HN0898Service::getQihao($plan->lottery_type);
+
+        # 0898体系最终投注
+        $HN0898Service = new HN0898Service();
+        $rst = $HN0898Service->betting($qihao, $plan->id, $codes);
+
+        return $rst;
     }
 
     /**
