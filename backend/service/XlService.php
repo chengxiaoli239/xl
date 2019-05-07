@@ -811,6 +811,7 @@ class XlService extends BaseTZService {
 
         # 第一步：获取cookie
         $rst = SevenService::getCookie($uid,$tz_system_id);
+        p($rst);
         if(isset($rst['status']) && $rst['status'] == 300) return $rst;
         # 第二步：账号、验证码登录
         $rst = self::loginRemote($uid, $tz_system_id);
