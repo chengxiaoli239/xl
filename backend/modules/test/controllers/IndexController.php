@@ -220,6 +220,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst['updateDsYL'] = SscDataService::updateDsYL(1);p($rst); // 单双遗漏
+        $rst = HN0898Service::insertDsYl();p($rst);
         $rst = BetService::bet(); p($rst);// 用户新计划投注，可正买可反买
         $rst = OpKjService::opSscKjData(2); p($rst); # 处理投注数据
         $rst = TzService::tz(); p($rst);// 计划投注
@@ -247,7 +249,6 @@ class IndexController extends Controller
         //$rst = NumService::getCodesArise_bak(['12345']);p($rst);
         $rst = StaticService::staticKj3NumCounts();p($rst);
         $arr = [['reach_val'=>100, 'reduce_val'=>10], ['reach_val'=>300, 'reduce_val'=>50]];p(json_encode($arr));
-        $rst['updateDsYL'] = SscDataService::updateDsYL();p($rst); // 单双遗漏
         for ($i=0;$i<5; $i++){
             $rst = SscDataService::updateDsData();//p($rst); // 每期开奖单双
         }
@@ -290,7 +291,6 @@ class IndexController extends Controller
         $rst = StaticService::opStaticProfits();p($rst);
         $post = \Yii::$app->request->post();
         $rst = SscDataService::getSDYL();p($rst);
-        $rst = SscDataService::updateDsYL();p($rst);
         $rst = SscDataService::countZj();p($rst);
         $rst = SscDataService::countCodes();p($rst);
         $rst = UserCustomPlansService::insertSDPlans(); p($rst);
@@ -315,7 +315,6 @@ class IndexController extends Controller
         $rst = TzService::tz();p($rst); // 计划投注
         $rst = SscDataService::calTzTotalMoney('02468,X,13579,13579', 0.1, 2); p($rst);
         $rst = UserCustomPlansService::joinDs3DwPlans();p($rst);
-        $rst = SscDataService::updateDsYL();p($rst);
         $rst = CommonService::getAwardNumberByQihao('181106022'); p($rst);
         $rst = SscDataService::getSscKjData0898('181106021');p($rst); // 每期开奖遗漏
         $m = \Yii::$app->cache;
@@ -339,7 +338,6 @@ class IndexController extends Controller
         $nums = [4,5,6,6];
         $rst = CommonService::get3x($nums);p($rst);
         $rst = CommonService::get3x($nums);p($rst);
-        $rst = SscDataService::updateDsYL();p($rst);
         $rst = SscDataService::insertSscKjDataDs('180808115');p($rst);
         $interval = 20;
         $rst[$interval] = SscDataService::dsYLStatic($interval);p($rst);

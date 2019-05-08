@@ -11,6 +11,7 @@ namespace backend\service;
 use backend\models\BettingRecords;
 use backend\models\DataTime;
 use backend\models\Num4Type;
+use backend\models\SscDsYl;
 use backend\models\SscKjData;
 use backend\models\SysPlansCodes;
 use backend\models\SystemConfig;
@@ -1330,4 +1331,24 @@ class HN0898Service extends BaseTZService {
         return $lotteries[$playway];
     }
 
+    /**
+     * @desc 插入单双遗漏
+     */
+    public static function insertDsYl(){
+        $SscDsYls = SscDsYl::find()->where(['lottery_type'=>2])->all();
+        for ($i=1; $i<=6; $i++){
+            foreach ($SscDsYls as $SscDsYl){
+                $setData = $SscDsYl->attributes;
+                $setData['lottery_type'] = $i;
+                $where = ['lottery_type'=>$i, 'zhi'=>$setData['zhi'], 'positions'=>$setData['positions']];
+                if(!$record = SscDsYl::findOne($where)){
+                    $record = new SscDsYl();
+                }
+                $record->setAttributes($setData);
+                $rst = $record->save();
+            }
+        }
+
+        return $rst;
+    }
 }

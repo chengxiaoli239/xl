@@ -293,7 +293,7 @@ class BaseNumService extends BaseService {
      * @param $codes
      * @return int
      */
-    public static function getCodesYL($codes, $playway = 2){
+    public static function getCodesYL($codes, $playway = 2, $lottery_type = 2){
         $tmpArr = explode(',',$codes);
         //p([$codes, $playway]);
         $p_1 = SscDataService::justDataSingleOrDouble($tmpArr[0]);
@@ -325,7 +325,7 @@ class BaseNumService extends BaseService {
         if($tmpZhi)
             $zhi = implode('',$tmpZhi);
         if($zhi){
-            $current_miss = \backend\models\SscDsYl::findOne(['positions'=>$position,'zhi'=>$zhi])['current_miss'];
+            $current_miss = \backend\models\SscDsYl::findOne(['positions'=>$position,'zhi'=>$zhi, 'lottery_type'=>$lottery_type])['current_miss'];
         }
 
         return $current_miss ? $current_miss : '';

@@ -160,19 +160,20 @@ class TzService extends BaseService {
             //$rst['updateHeZhiYL'] = SscDataService::updateHeZhiYL(); // 更新定位和值遗漏表
 
             # 2、单双
-            $rst['updateDs'] = SscDataService::updateDsData(); // 每期开奖遗漏
-            $rst['updateDsYL'] = SscDataService::updateDsYL(); // 单双遗漏
+            $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖遗漏
+            $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏
 
             # 3、三字现
-            $rst['update3NumData'] = SscDataService::update3NumData(); // 每期开奖遗漏
-            $rst['update3NumYL'] = SscDataService::update3NumYL();
+            $rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏
+            $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type);
 
             # 4、四定和值遗漏
-            $rst['updateDsYL'] = SscDataService::updateSdHzYl(); // 单双遗漏
+            $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏
 
             //$rst['tz'] = TzService::tz(); // 计划投注
             //$rst['synUsersBalance'] = HN0898Service::synBalance(); // 同步用户的余额
-            sleep(1);
+
+
         }
 
         self::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
@@ -264,7 +265,7 @@ class TzService extends BaseService {
                 break;
             case 2:
             case 3:
-                $current_miss = BaseNumService::getCodesYL($codes, $playway);
+                $current_miss = BaseNumService::getCodesYL($codes, $playway, $lottery_type);
                 //if($threshold_open <= $current_miss && $current_miss <= $threshold_close){
                 # system_config 配置：playway_yl_2_3
                 $system_config= SystemConfig::findOne(['key'=>'playway_yl_2_3'])->value;
