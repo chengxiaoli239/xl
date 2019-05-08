@@ -25,6 +25,7 @@ use Yii;
  * @property string $codes_1111 四单
  * @property int $codes_1_nums 单数量
  * @property int $codes_2_nums 双数量
+ * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -46,7 +47,7 @@ class Static4dProfits extends \common\models\base\BaseModel
     {
         return [
             [['codes_4d_all', 'codes_13_31', 'codes_22_22', 'codes_1111_2222', 'codes_13', 'codes_31', 'codes_13_2222', 'codes_31_1111', 'codes_31_2222', 'codes_13_1111', 'codes_31_2222_1111', 'codes_13_1111_2222', 'codes_2222', 'codes_1111'], 'number'],
-            [['codes_1_nums', 'codes_2_nums', 'created_at', 'updated_at'], 'integer'],
+            [['codes_1_nums', 'codes_2_nums', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['month'], 'string', 'max' => 10],
@@ -59,27 +60,28 @@ class Static4dProfits extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'month' => Yii::t('app', '月份'),
-            'codes_4d_all' => Yii::t('app', '所有号码'),
-            'codes_13_31' => Yii::t('app', '一双三单||一单三双'),
-            'codes_22_22' => Yii::t('app', '两双两单'),
-            'codes_1111_2222' => Yii::t('app', '四双四单'),
-            'codes_13' => Yii::t('app', '一单三双'),
-            'codes_31' => Yii::t('app', '一双三单'),
-            'codes_13_2222' => Yii::t('app', '一单三双||四双'),
-            'codes_31_1111' => Yii::t('app', '一双三单||四单'),
-            'codes_31_2222' => Yii::t('app', '一双三单||四双'),
-            'codes_13_1111' => Yii::t('app', '一单三双||四单'),
-            'codes_31_2222_1111' => Yii::t('app', '一双三单||四双||四单'),
-            'codes_13_1111_2222' => Yii::t('app', '一单三双||四单||四双'),
-            'codes_2222' => Yii::t('app', '四双'),
-            'codes_1111' => Yii::t('app', '四单'),
-            'codes_1_nums' => Yii::t('app', '单数量'),
-            'codes_2_nums' => Yii::t('app', '双数量'),
-            'created_at' => Yii::t('app', '创建时间'),
-            'updated_at' => Yii::t('app', '更新时间'),
-            'update_time' => Yii::t('app', '更新时间'),
+            'id' => 'ID',
+            'month' => '月份',
+            'codes_4d_all' => '所有号码',
+            'codes_13_31' => '一双三单||一单三双',
+            'codes_22_22' => '两双两单',
+            'codes_1111_2222' => '四双四单',
+            'codes_13' => '一单三双',
+            'codes_31' => '一双三单',
+            'codes_13_2222' => '一单三双||四双',
+            'codes_31_1111' => '一双三单||四单',
+            'codes_31_2222' => '一双三单||四双',
+            'codes_13_1111' => '一单三双||四单',
+            'codes_31_2222_1111' => '一双三单||四双||四单',
+            'codes_13_1111_2222' => '一单三双||四单||四双',
+            'codes_2222' => '四双',
+            'codes_1111' => '四单',
+            'codes_1_nums' => '单数量',
+            'codes_2_nums' => '双数量',
+            'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
+            'created_at' => '创建时间',
+            'updated_at' => '更新时间',
+            'update_time' => '更新时间',
         ];
     }
 
