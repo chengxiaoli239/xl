@@ -63,7 +63,7 @@ class TzService extends BaseService {
      */
     public static function tz(){
 
-        $where = ['AND', ['=', 'status', 1], ['=', 'uid', 0], ['=', 'is_parent', 0]];
+        $where = ['AND', ['=', 'status', 1], ['=', 'uid', 0], ['=', 'is_parent', 1]];
         if($plans = UserSysPlans::find()->where($where)->groupBy('playway,tz_type')->all()) {
             // 1、投注前判断
             foreach ($plans as $plan){
@@ -79,7 +79,7 @@ class TzService extends BaseService {
         }
         $logArr = ['tzRst'=>$tzRst];
         Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/tz','INFO','投注记录(系统正买)', $logArr);
-        return ['status'=>200, 'msg'=>'系统定制化模拟正买投注完成~', $tzRst];
+        return ['status'=>200, 'msg'=>'系统定制化模拟正买投注完成~', 'tzRst'=>$tzRst];
     }
 
     /**
@@ -138,7 +138,7 @@ class TzService extends BaseService {
     }
     /**
      * @desc 处理系统投注计划
-     * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
+     * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array|bool
      */
     public static function opSystemBetPlans($lottery_type = 2){
@@ -156,8 +156,8 @@ class TzService extends BaseService {
 
         for ($i=0;$i<2;$i++){
             # 1、定位和值
-            $rst['heZhiStatics'] = SscDataService::heZhiStatics(); // 更新定位和值汇总表
-            $rst['updateHeZhiYL'] = SscDataService::updateHeZhiYL(); // 更新定位和值遗漏表
+            //$rst['heZhiStatics'] = SscDataService::heZhiStatics(); // 更新定位和值汇总表
+            //$rst['updateHeZhiYL'] = SscDataService::updateHeZhiYL(); // 更新定位和值遗漏表
 
             # 2、单双
             $rst['updateDs'] = SscDataService::updateDsData(); // 每期开奖遗漏
@@ -175,7 +175,7 @@ class TzService extends BaseService {
             sleep(1);
         }
 
-        self::afterRunSysPlans($qihao); # 开关的开启或关闭
+        self::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
 
         return $rst;
     }

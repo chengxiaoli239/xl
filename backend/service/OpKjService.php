@@ -27,7 +27,7 @@ class OpKjService extends BaseService {
     public static function opSscKjData($lottery_type = 2){
 
         $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
-        $lotteryTypeArr = [1,2,3,4]; # 彩票类型：彩种类型：1:1.5分 2:3分 3:5分 4:10分
+        //$lotteryTypeArr = [1,2,3,4]; # 彩票类型：彩种类型：1:1.5分 2:3分 3:5分 4:10分
 
         $m = \Yii::$app->cache;
         //p($qihaos);
@@ -47,13 +47,13 @@ class OpKjService extends BaseService {
 
             # 开奖数据 start
             $kjData = SscKjData::find()->where(['qihao'=>$qihao, 'lottery_type'=>$bettingRecord->lottery_type])->asArray()->one()['code_str'];
-            //p(['qihao'=>$qihao, 'lottery_type'=>$bettingRecord->lottery_type, 'kjData'=>$kjData]);
             if(!$kjData){
                 $kjData = CommonService::getAwardNumberByQihao($qihao); // 3,4,5,6,7
             }
             # 开奖数据 end
             if(!$kjData){
-                return $rst = ['status'=>300, 'msg'=>$qihao.'期未开奖!'];
+                //return $rst = ['status'=>300, 'msg'=>$qihao.'期未开奖!'];
+                continue;
             }
 
             //$fun = 'opKjData'.$bettingRecord['playway']; // opKjData1、opKjData4、opKjData10

@@ -287,7 +287,7 @@ class HN0898Service extends BaseTZService {
 
         # 缓存锁
         $m = \Yii::$app->cache;
-        $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
+        $betKey = BetService::buildBetKey('admin', self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
         $insertRst = BetService::_logRecords($insertData);
 
@@ -1134,7 +1134,7 @@ class HN0898Service extends BaseTZService {
 
     /**
      * @decription 获取即将开奖的期号
-     * @param int $type
+     * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return string
      */
     public static function getQihao($lottery_type = 2){
@@ -1143,13 +1143,33 @@ class HN0898Service extends BaseTZService {
         $time = date("H:i:s");
         $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC";
         $rst = $db->createCommand($sql)->queryOne();
-        if(!$rst && $lottery_type == 1) {
-            $rst['actionNo'] = 001; // 大于 23:56  -> null  设置为120期
-            $qihao = date("ymd", strtotime('+1 day')) . sprintf("%03d", $rst['actionNo']);
-        }elseif ('03:10:00'<$time && $time<'07:30:00'){
-            $qihao = date("ymd").sprintf("%03d", 10);
-        }else{
-            $qihao = date("ymd").sprintf("%03d", $rst['actionNo']);
+        switch ($lottery_type){
+            case 1: # 希腊1.5分彩
+                //break;
+            case 2: # 希腊3分彩
+                //break;
+            case 3: # 希腊5分彩
+                //break;
+            case 4: # 希腊10分彩
+                if(!$rst) {
+                    $rst['actionNo'] = 001; // 大于 23:56  -> null  设置为120期
+                    $qihao = date("ymd", strtotime('+1 day')) . sprintf("%03d", $rst['actionNo']);
+                }else{
+                    $qihao = date("ymd").sprintf("%03d", $rst['actionNo']);
+                }
+                break;
+            case 5: # 5:重庆ssc
+                if(!$rst && $lottery_type == 1) {
+                    $rst['actionNo'] = 001; // 大于 23:56  -> null  设置为120期
+                    $qihao = date("ymd", strtotime('+1 day')) . sprintf("%03d", $rst['actionNo']);
+                }elseif ('03:10:00'<$time && $time<'07:30:00'){
+                    $qihao = date("ymd").sprintf("%03d", 10);
+                }else{
+                    $qihao = date("ymd").sprintf("%03d", $rst['actionNo']);
+                }
+                break;
+            case 6: # 新疆ssc
+                break;
         }
 
         return $qihao;

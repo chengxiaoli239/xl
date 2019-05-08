@@ -21,6 +21,7 @@ use backend\models\SscSdHzYl;
 use backend\models\SystemConfig;
 use backend\models\ThreeNum;
 use common\service\CommonService;
+use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use backend\models\SscDwHzYl;
 use  yii;
@@ -78,10 +79,11 @@ class SscDataService extends BaseService {
 
     /**
      * @desc 更新单双
+     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return bool
      */
-    public static function updateDsData(){
-        $mkey = 'DS_COUNT_NUMS_09';
+    public static function updateDsData($lottery_type = 2){
+        $mkey = 'DS_COUNT_NUMS_'.$lottery_type.'_01';
         $m = \Yii::$app->cache;
         if(!$id = $m->get($mkey)){
             $id = 51592; // 2019-02-03
@@ -92,7 +94,7 @@ class SscDataService extends BaseService {
 
         if($id<=$last_id){
             $new_qihao = SscKjData::findOne($id)->qihao;
-            $flag = SscDataService::insertSscKjDataDs($new_qihao);
+            $flag = SscDataService::insertSscKjDataDs($new_qihao, $lottery_type);
             $rst = $m->set($mkey, $id, 24*60*60);
 
             //p([$last_id, $new_qihao, $rst, $id]);
@@ -104,20 +106,29 @@ class SscDataService extends BaseService {
     }
     /**
      * @desc 更新单双
+     * @param $lottery_type  彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return bool
      */
-    public static function update3NumData(){
+    public static function update3NumData($lottery_type = 2){
         $mkey = 'CODE_COUNT_3NUMS_2';
         $m = \Yii::$app->cache;
-        for ($i=0;$i<10;$i++){
+        for ($i=0;$i<5;$i++){
             if(!$id = $m->get($mkey)){
-                $id = 47920; // 2019-02-03
+                $qihaoArr = [
+                    1=>'190507030',
+                    2=>'190507030',
+                    3=>'190507030',
+                    4=>'190507030',
+                    5=>'190507030',
+                    6=>'190507030',
+                ];
+                $qihao = $qihaoArr[$lottery_type];
             }
-            $id = $id + 1;
-            $last_id = SscDataService::getKjDataLastId();
+            $next_qihao = KjDataGet::getNextQihaoByQihao($qihao);
+            $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
 
-            if($id<=$last_id){
-                $new_qihao = SscKjData::findOne($id)->qihao;
+            if($next_qihao<=$last_qihao){
+                $new_qihao = SscKjData::find()->where($next_qihao)->one()->qihao;
                 $flag = SscDataService::insertSscKjData3Num($new_qihao);
                 $m->set($mkey, $id, 7*24*3600);
             }
@@ -259,6 +270,17 @@ class SscDataService extends BaseService {
         $last_id = SscKjData::find()->select(['max(id) as last_id'])->asArray()->one()['last_id'];
 
         return $last_id;
+    }
+
+    /**
+     * @description 给定期数获取起始id
+     * @param $lottery_type
+     * @param int $interval
+     */
+    public static function getKjDataLastQihao($lottery_type = 2){
+        $last_qihao = SscKjData::find()->select(['max(qihao) as last_qihao'])->where(['lottery_type'=>$lottery_type])->asArray()->one()['last_qihao'];
+
+        return $last_qihao;
     }
 
     /**
@@ -753,10 +775,11 @@ class SscDataService extends BaseService {
 
     /**
      * @desc 每期开奖单双记录-已完成
+     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @param string $qihao
      */
-    public static function insertSscKjDataDs($qihao = ''){
-        $SscKjData = SscKjData::findOne(['qihao'=>$qihao]);
+    public static function insertSscKjDataDs($qihao = '', $lottery_type = 2){
+        $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
         $data = explode(',',$SscKjData['code_str']);
         $m = \Yii::$app->cache;
         $mkey = 'InsertSscKjDataDs_'.$qihao;
@@ -774,7 +797,7 @@ class SscDataService extends BaseService {
         $opData = [];
         $opData['updated_at'] = time();
         $opData['updated_time'] = date('Y-m-d H:i:s');
-        $SscKjDataDs = SscKjDataDs::findOne(['qihao'=>$qihao]);
+        $SscKjDataDs = SscKjDataDs::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
         if(!$SscKjDataDs){
             $SscKjDataDs = new SscKjDataDs();
             $opData['created_at'] = time();
@@ -826,9 +849,10 @@ class SscDataService extends BaseService {
     }
 /**
      * @desc 每期开奖三字现记录-已完成
+     * @param $lottery_type  彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @param string $qihao
      */
-    public static function insertSscKjData3Num($qihao = ''){
+    public static function insertSscKjData3Num($qihao = '', $lottery_type = 2){
         $SscKjData = SscKjData::findOne(['qihao'=>$qihao]);
         $data = explode(',',$SscKjData['code_str']);
         array_pop($data);
@@ -838,13 +862,14 @@ class SscDataService extends BaseService {
         $opData['code_3n'] = implode(',', $nums);
         $opData['updated_at'] = time();
         $opData['updated_time'] = date('Y-m-d H:i:s');
-        $SscKjData3Num = SscKjData3num::findOne(['qihao'=>$qihao]);
+        $SscKjData3Num = SscKjData3num::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
         if(!$SscKjData3Num){
             $SscKjData3Num = new SscKjData3num();
             $opData['created_at'] = time();
         }
 
         $opData['qihao'] = $qihao;
+        $opData['lottery_type'] = $lottery_type;
         $opData['code_str'] = $SscKjData['code_str'];
         $opData['date'] = $SscKjData['date'];
         $SscKjData3Num->setAttributes($opData);

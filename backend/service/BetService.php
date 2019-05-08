@@ -119,51 +119,17 @@ abstract class BetService extends BaseBetService {
      */
     public static function bet(){
 
-        $plans = UserSysPlans::find()->where(['AND', ['=', 'status', 1], ['>', 'uid', 0], ['=', 'is_parent', 0]])->all();
+        $plans = UserSysPlans::find()->where(['AND', ['=', 'status', 1], ['>', 'uid', 0], ['=', 'is_parent', 1]])->all();
         if($plans){
             foreach ($plans as $key=>$plan){
                 if($plan->children_plan_id>0){
                     $ids = explode(',', $plan->children_plan_id);
-                    foreach ($ids as $id){
-                        $tzRst[$id] = self::tzByPlanId($id);
-                    }
                 }else{
-                    $tzRst[$plan->id] = self::tzByPlanId($plan->id);
+                    $ids[] = $plan->id;
                 }
-                /*
-                # 1、期号 qihao
-                $qihao = HN0898Service::getQihao($plan->lottery_type);
-
-                # 2、投注前判断
-                $tzStatus = BetService::beforeBet($qihao, $plan->lottery_type);
-                if($tzStatus['status'] != 200) return $tzStatus;
-
-                $tz_sites = explode(',', $plan->tz_sites);
-                foreach ($tz_sites as $tz_system_id){
-                    $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
-
-                    # 1、玩法 playway
-                    $playway = $plan->playway;
-
-                    # 2、倍数
-                    $single = $plan->single;
-
-                    # 3、投注号码 codes
-                    $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $single, $plan->sel_same, $plan->hz_Arr);
-
-                    # 4、投注请求
-                    $BetService = self::getBetObj($plan->uid, $system_type_id, $tz_system_id);
-                    //$rst = $BetService->bet($playway, $codes, $single, $qihao, $plan->tz_type, $plan->buy_type);
-                    $rst = $BetService->bet($qihao, $plan->id, $codes);
-
-                    # 下注完成
-                    BetService::afterBet($qihao, $plan->lottery_type);
-
-                    BetService::synBalance($plan->uid, $tz_system_id);
+                foreach ($ids as $id){
+                    $tzRst[$id] = self::tzByPlanId($id);
                 }
-                $logArr = ['tzStatus'=>$tzStatus,'tz_sites'=>$tz_sites,'codes'=>$codes, 'postRst'=>$rst];
-                Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/cron_bet','INFO','计划任务执行', $logArr);
-                */
             }
         }
         $logArr = ['tzRst'=>$tzRst];
@@ -494,7 +460,7 @@ abstract class BetService extends BaseBetService {
             return ['status'=>300, 'msg'=>'找不到对应记录'];
        }
        $tz_sites = explode(',', $plan->tz_sites);
-       $qihao = HN0898Service::getQihao();
+       $qihao = HN0898Service::getQihao($plan->lottery_type);
        foreach ($tz_sites as $tz_system_id){
            $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
 
