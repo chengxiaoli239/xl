@@ -87,12 +87,12 @@ class SscDataService extends BaseService {
         $m = \Yii::$app->cache;
         if(!$qihao = $m->get($mkey)){
             $qihaoArr = [
-                1=>'190507030',
-                2=>'190507030',
-                3=>'190507030',
-                4=>'190507030',
-                5=>'190507030',
-                6=>'190507030',
+                1=>'190508030',
+                2=>'190508030',
+                3=>'190508030',
+                4=>'190508030',
+                5=>'190508030',
+                6=>'190508030',
             ];
             $qihao = $qihaoArr[$lottery_type];
         }
@@ -100,13 +100,10 @@ class SscDataService extends BaseService {
         $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
 
         if($next_qihao<=$last_qihao){
-            $new_qihao = SscKjData::findOne($id)->qihao;
+            $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
             $flag = SscDataService::insertSscKjDataDs($new_qihao, $lottery_type);
-            $rst = $m->set($mkey, $qihao, 24*60*60);
-
-            //p([$last_id, $new_qihao, $rst, $id]);
+            $m->set($mkey, $new_qihao, 24*60*60);
         }
-        //p([$last_id, $new_qihao, $rst, $id]);
 
         return $flag;
 
@@ -122,12 +119,12 @@ class SscDataService extends BaseService {
         for ($i=0;$i<5;$i++){
             if(!$qihao = $m->get($mkey)){
                 $qihaoArr = [
-                    1=>'190507030',
-                    2=>'190507030',
-                    3=>'190507030',
-                    4=>'190507030',
-                    5=>'190507030',
-                    6=>'190507030',
+                    1=>'190508030',
+                    2=>'190508030',
+                    3=>'190508030',
+                    4=>'190508030',
+                    5=>'190508030',
+                    6=>'190508030',
                 ];
                 $qihao = $qihaoArr[$lottery_type];
             }
@@ -135,9 +132,9 @@ class SscDataService extends BaseService {
             $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
 
             if($next_qihao<=$last_qihao){
-                $new_qihao = SscKjData::find()->where($next_qihao)->one()->qihao;
+                $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
                 $flag = SscDataService::insertSscKjData3Num($new_qihao);
-                $m->set($mkey, $qihao, 7*24*3600);
+                $m->set($mkey, $new_qihao, 7*24*3600);
             }
         }
 
