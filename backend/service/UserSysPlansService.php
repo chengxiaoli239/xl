@@ -9,10 +9,12 @@
 
 namespace backend\service;
 use backend\models\SscDsYl;
+use backend\models\SscKjData;
 use backend\models\SysPlansCodes;
 use backend\models\TzSystemsAuth;
 use backend\models\TzTypes;
 use backend\models\UserCustomPlans;
+use backend\models\UserSysPlans;
 use common\models\AdminModel;
 use yii\helpers\ArrayHelper;
 use  yii;
@@ -225,6 +227,31 @@ class UserSysPlansService extends BaseService {
         }
 
         return $nums;
+    }
+
+    /**
+     * @desc 计划方案倍数、投注号码或者投注状态修改
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function userSysPlanChange($lottery_type = 2){
+        $rst = ['status'=>300, 'msg'=>'投注方案修改成功'];
+        $kjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one();
+        $qihao = $kjData->qihao;
+
+        $UserSysPlans = UserSysPlans::find()->where(['tz_type'=>18, 'status'=>1, 'is_parent'=>1])->all(); # 一字定 倍数切换方案
+        foreach ($UserSysPlans as $UserSysPlan){
+            $plan_id = $UserSysPlan->id;
+            if($UserSysPlan->children_plan_id){
+                $ids = explode(',', $UserSysPlan->children_plan_id);
+            }else{
+                $ids[] = $UserSysPlan->id;
+            }
+        }
+
+        //p($kjData);
+
+        return $rst;
     }
 
 }

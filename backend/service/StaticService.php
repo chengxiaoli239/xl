@@ -23,6 +23,7 @@ use backend\models\StaticHzProfitsPerdate;
 use backend\models\StaticPerHzPerdateProfits;
 use backend\models\StaticProfits;
 use backend\models\SystemConfig;
+use backend\models\TzTypes;
 use yii\helpers\ArrayHelper;
 use  yii;
 
@@ -1224,6 +1225,34 @@ class StaticService extends BaseService {
        $lottery_typesArr = explode(',', $lottery_types);
 
        return $lottery_typesArr;
+   }
+
+    /**
+     * @desc 给定号码计算遗漏 未完待续 -- 2019.05.09
+     * @param $codes
+     * @param int $lottery_type
+     * @param int $playway
+     * @param $tz_type 一字定倍数切换方案
+     * @return int
+     */
+   public static function getYlByCodes($codes, $lottery_type = 2, $tz_type = 18){
+       $yl = 0;
+       $tzTypes = TzTypes::findOne(['type'=>$tz_type]);
+       $playway = $tzTypes->playway;
+
+       switch ($playway){
+           case 1: # 二字定
+               break;
+           case 2: # 三字定
+               break;
+           case 3: # 四字定
+               break;
+           case 4: # 一字定
+           case 10:
+               break;
+       }
+
+       return $yl;
    }
 
 
