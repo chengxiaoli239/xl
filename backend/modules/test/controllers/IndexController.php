@@ -220,7 +220,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst['updateDs'] = SscDataService::updateDsData(2); p($rst);// 每期开奖遗漏
+        $rst['updateDs'] = SscDataService::updateDsData(3); p($rst);// 每期开奖遗漏
         $rst['updateDsYL'] = SscDataService::updateDsYL(2);p($rst); // 单双遗漏
         $rst = HN0898Service::insertDsYl();p($rst);
         $rst = BetService::bet(); p($rst);// 用户新计划投注，可正买可反买

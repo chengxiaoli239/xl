@@ -125,6 +125,10 @@ class IndexController extends Controller
         self::_init();
         for ($i = 0; $i<10; $i++){
             $rst = KjDataGet::updateNullCode();
+            for($lottery_type = 1; $lottery_type<=4; $lottery_type++){
+                $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖遗漏 - 临时
+                $rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏 - 临时
+            }
             sleep(2);
         }
 

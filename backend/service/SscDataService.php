@@ -57,7 +57,6 @@ class SscDataService extends BaseService {
             $last = SscKjDataDs::find()->select(['max(id) as last_id'])->asArray()->one();
             $start_id = $last['last_id'] - $interval;
             $data = SscKjDataDs::find()->select($field.',COUNT(id) AS num')->where('id>'.$start_id)->groupBy($field)->orderBy('id DESC')->limit($interval)->asArray()->all();
-            p($data);
             $updateData = ['positions'=>implode(',',$zuHe),'max_qihao'=>$max_qihao];
             $zhi = [11,12,21,22]; // 单单、单双、双单、双双
             foreach ($data as $k=>$v){
@@ -83,30 +82,33 @@ class SscDataService extends BaseService {
      * @return bool
      */
     public static function updateDsData($lottery_type = 2){
-        $mkey = 'DS_COUNT_NUMS_'.$lottery_type.'_01';
+        $mkey = 'DS_COUNT_NUMS_'.$lottery_type.'_05';
         $m = \Yii::$app->cache;
         if(!$qihao = $m->get($mkey)){
-            $qihaoArr = [
-                1=>'190508030',
-                2=>'190508030',
-                3=>'190508030',
-                4=>'190508030',
-                5=>'190508030',
-                6=>'190508030',
-            ];
-            $qihao = $qihaoArr[$lottery_type];
+            $qihao = self::getMinStaticQihao($lottery_type);
         }
-        $next_qihao = KjDataGet::getNextQihaoByQihao($qihao);
+
+        $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
         $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
 
         if($next_qihao<=$last_qihao){
             $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
-            $flag = SscDataService::insertSscKjDataDs($new_qihao, $lottery_type);
+            if($new_qihao){
+                $flag = SscDataService::insertSscKjDataDs($new_qihao, $lottery_type);
+            }
             $m->set($mkey, $new_qihao, 24*60*60);
         }
+        p([$new_qihao, $next_qihao, $last_qihao, $lottery_type],0);
 
         return $flag;
 
+    }
+
+    public static function getMinStaticQihao($lottery_type = 2, $recently = 120){
+        $last_id = SscDataService::getKjDataLastId($lottery_type);
+        $qihao = SscKjData::find()->where(['AND',['=', 'lottery_type', $lottery_type], ['>', 'id', $last_id-$recently]])->one()->qihao;
+
+        return $qihao;
     }
     /**
      * @desc 更新单双
@@ -114,28 +116,19 @@ class SscDataService extends BaseService {
      * @return bool
      */
     public static function update3NumData($lottery_type = 2){
-        $mkey = 'CODE_COUNT_3NUMS_2';
+        $mkey = 'CODE_COUNT_3NUMS_'.$lottery_type.'_04';
         $m = \Yii::$app->cache;
-        for ($i=0;$i<5;$i++){
-            if(!$qihao = $m->get($mkey)){
-                $qihaoArr = [
-                    1=>'190508030',
-                    2=>'190508030',
-                    3=>'190508030',
-                    4=>'190508030',
-                    5=>'190508030',
-                    6=>'190508030',
-                ];
-                $qihao = $qihaoArr[$lottery_type];
-            }
-            $next_qihao = KjDataGet::getNextQihaoByQihao($qihao);
-            $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
+        if(!$qihao = $m->get($mkey)){
+            $qihao = self::getMinStaticQihao($lottery_type);
+        }
 
-            if($next_qihao<=$last_qihao){
-                $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
-                $flag = SscDataService::insertSscKjData3Num($new_qihao);
-                $m->set($mkey, $new_qihao, 7*24*3600);
-            }
+        $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
+        $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
+
+        if($next_qihao<=$last_qihao){
+            $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
+            $flag = SscDataService::insertSscKjData3Num($new_qihao, $lottery_type);
+            $m->set($mkey, $new_qihao, 7*24*3600);
         }
 
         return $flag;
@@ -267,11 +260,11 @@ class SscDataService extends BaseService {
     }
 
     /**
-     * @description 给定期数获取起始id
+     * @description 最后id
      * @param int $interval
      */
-    public static function getKjDataLastId(){
-        $last_id = SscKjData::find()->select(['max(id) as last_id'])->asArray()->one()['last_id'];
+    public static function getKjDataLastId($lottery_type = 2){
+        $last_id = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['max(id) as last_id'])->asArray()->one()['last_id'];
 
         return $last_id;
     }
@@ -782,7 +775,7 @@ class SscDataService extends BaseService {
         $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
         $data = explode(',',$SscKjData['code_str']);
         $m = \Yii::$app->cache;
-        $mkey = 'InsertSscKjDataDs_'.$qihao;
+        $mkey = 'InsertSscKjDataDs_'.$lottery_type.'_'.$qihao;
         if($r = $m->get($mkey)) return ['status'=>'300', 'msg'=>'已经处理完成...'];
         //array_pop($data);
         $tmpData = [];
@@ -832,6 +825,7 @@ class SscDataService extends BaseService {
         $opData['code_str'] = $SscKjData['code_str'];
         $opData['date'] = $SscKjData['date'];
         $opData['updated_at'] = time();
+        $opData['lottery_type'] = $lottery_type;
         $opData['update_time'] = date('Y-m-d H:i:s');
         $SscKjDataDs->setAttributes($opData);
         $rst =$SscKjDataDs->save();
@@ -842,7 +836,7 @@ class SscDataService extends BaseService {
         //p([$tmpData,$SscKjDataDs->attributes,$SscKjDataDs->getErrors()],0);
         if(!$rst){
             $logArr = ['attributes'=>$SscKjDataDs->attributes, 'msg'=>$SscKjDataDs->getErrors()];
-            Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/insertSscKjDataDs','INFO','统计号码出现次数', $logArr);
+            Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/insertSscKjDataDsError','INFO','每期开奖单双记录-插入失败', $logArr);
         }
 
         return $rst;
@@ -853,7 +847,7 @@ class SscDataService extends BaseService {
      * @param string $qihao
      */
     public static function insertSscKjData3Num($qihao = '', $lottery_type = 2){
-        $SscKjData = SscKjData::findOne(['qihao'=>$qihao]);
+        $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
         $data = explode(',',$SscKjData['code_str']);
         array_pop($data);
         $nums = CommonService::get3x($data);
@@ -872,6 +866,7 @@ class SscDataService extends BaseService {
         $opData['lottery_type'] = $lottery_type;
         $opData['code_str'] = $SscKjData['code_str'];
         $opData['date'] = $SscKjData['date'];
+        $opData['lottery_type'] = $lottery_type;
         $SscKjData3Num->setAttributes($opData);
         $rst = $SscKjData3Num->save();
         //p([$opData,$SscKjData3Num->attributes,$SscKjData3Num->getErrors()],0);

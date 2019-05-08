@@ -966,14 +966,15 @@ class StaticService extends BaseService {
     /**
      * @desc 每天三字现出现次数
      * @param string $date
+     * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
-    public static function staticKj3NumCounts($date = '2019-02-11'){
+    public static function staticKj3NumCounts($date = '2019-02-11', $lottery_type = 2){
         $m = \Yii::$app->cache;
-        $mkey = 'staticKj3NumCounts_'.$date;
+        $mkey = 'staticKj3NumCounts_'.$lottery_type.'_'.$date;
 
         if($staticDatas = $m->get($mkey)) return $staticDatas;
-        $SscKjData3nums = SscKjData3num::find()->where(['date'=>$date])->orderBy(['id'=>SORT_DESC])->limit(20000)->all();
+        $SscKjData3nums = SscKjData3num::find()->where(['date'=>$date, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(20000)->all();
         $staticDatas = [];
         foreach ($SscKjData3nums as $key=>$SscKjData3num){
             if(!$SscKjData3num->code_3n) continue;
@@ -1001,11 +1002,12 @@ class StaticService extends BaseService {
 
     /**
      * @desc 每天三字现热码
+     * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
-    public static function allDateStatic3NumsPerDate(){
+    public static function allDateStatic3NumsPerDate( $lottery_type = 2){
         $m = \Yii::$app->cache;
-        $mkey = 'allDateStatic3Nums_PERDATE_02';
+        $mkey = 'allDateStatic3Nums_PERDATE_02_'.$lottery_type;
 
         $allStatic = [];
         for($s=0; $s<5; $s++){
@@ -1018,12 +1020,12 @@ class StaticService extends BaseService {
             $date = date('Y-m-d', $time);
             $date = min([date('Y-m-d'), $date]);
             if($date>date('Y-m-d')) break;
-            if($statics = self::staticKj3NumCounts($date)){
+            if($statics = self::staticKj3NumCounts($date, $lottery_type)){
                 $setData = [];
                 foreach ($statics as $key=>$static){
                     $setData['codes_'.$key] = $static;
                 }
-                if(!$Static3numArisePerdate = Static3numArisePerdate::findOne(['date'=>$date])){
+                if(!$Static3numArisePerdate = Static3numArisePerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
                     $Static3numArisePerdate = new Static3numArisePerdate();
                     $setData['created_at'] = time();
                 }
