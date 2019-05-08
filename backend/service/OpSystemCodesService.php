@@ -15,7 +15,9 @@ use  yii;
 class OpSystemCodesService extends BaseService {
 
     /**
-     * @desc 处理系统投注计划号码
+     * @desc 处理系统三定投注计划号码
+     * @param string $qihao
+     * @return array
      */
     public static function sysPlansCodes($qihao = ''){
 

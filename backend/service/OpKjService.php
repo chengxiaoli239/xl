@@ -56,32 +56,11 @@ class OpKjService extends BaseService {
                 continue;
             }
 
-            //$fun = 'opKjData'.$bettingRecord['playway']; // opKjData1、opKjData4、opKjData10
-            switch ($bettingRecord['playway']){
-                case 1: // 二字定
-                case 2: // 三字定
-                    /*
-                    $kjData_n = substr($kjData, 0,7); // 开奖截取前4位号码
-                    $zjResult = OpKjService::opKjData1($codes, $kjData_n);
-                    break;
-                    */
-                case 3: // 四字定
-                    $kjData_n = substr($kjData, 0,7); // 开奖截取前4位号码
-                    $zjResult = OpKjService::opKjData4($codes, $kjData_n);
-                    break;
-                case 4: # 一字定
-                case 10:
-                    $zjResult = OpKjService::opKjData10($codes, $kjData, $groupSplit = '@', $codeSplit = ',',$nullCode = '');
-                    break;
-                default:;
-            }
-            if($zjResult['status'] == 200){
-                $times = $zjResult['data']['zjTimes'];
-            }
-            # 中奖金额 = 赔率 * 倍数 * 注数
-            $bouns = CommonService::getOdds($playway) * $bettingRecord['single'] * $times;
-            # 利润 = 中奖金额 - 投注金额
+            $profitsData = self::calcuProfits($playway, $codes, $kjData, $single);
+
+            $bouns = $profitsData['bouns'];
             $profits = $bouns - $bettingRecord['betting_money'];
+            $zjResult = $profitsData['zjResult'];
 
             $updateData = [
                 'bonus' => $bouns,
@@ -90,9 +69,6 @@ class OpKjService extends BaseService {
                 'updated_at' => time(),
                 'status' => 1
             ];
-            //if($bettingRecord->cancel_status == 1){
-            //    $updateData['bonus'] = 0.00;
-            //}
             $bettingRecord->setAttributes($updateData);
             $status = $bettingRecord->save();
             $logArr = [
@@ -209,6 +185,59 @@ class OpKjService extends BaseService {
         Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/getBestTzCodes','INFO','获取最佳投注号码', $logArr);
 
         return ['postion'=>$position,'hezhi'=>$maxZhi,'newTzCodes'=>$newTzCodes];
+    }
+
+    /**
+     * @desc 计算开奖利润数据 2019-05-04
+     * @param $playway
+     * @param $codes
+     * @param string $kjData
+     * @return array
+     */
+    public static function calcuProfits($playway, $codes, $kjData = '', $single = 0.1){
+        if(!$kjData) return [];
+        $rstData = [];
+        # 开奖数据 start
+
+        //$fun = 'opKjData'.$bettingRecord['playway']; // opKjData1、opKjData4、opKjData10
+        switch ($playway){
+            case 1: // 二字定
+            case 2: // 三字定
+                /*
+                $kjData_n = substr($kjData, 0,7); // 开奖截取前4位号码
+                $zjResult = OpKjService::opKjData1($codes, $kjData_n);
+                break;
+                */
+            case 3: // 四字定
+                $kjData_n = substr($kjData, 0,7); // 开奖截取前4位号码
+                $zjResult = OpKjService::opKjData4($codes, $kjData_n);
+                break;
+            case 10:
+            case 4:
+                $zjResult = OpKjService::opKjData10($codes, $kjData, $groupSplit = '@', $codeSplit = ',',$nullCode = '');
+                break;
+            default:;
+        }
+        if($zjResult['status'] == 200){
+            $times = $zjResult['data']['zjTimes'];
+        }
+        //$n = count(explode('@',$codes));
+        $betting_money = SscDataService::calTzTotalMoney($codes, $single, $playway);
+
+        # 投注号码
+        $rstData['codes'] = $codes;
+        # 开奖号码
+        $rstData['kjCodes'] = $kjData;
+        # 投注金额
+        $rstData['betting_money'] = $betting_money;
+        # 中奖金额 = 赔率 * 倍数 * 注数
+        $rstData['bouns'] = CommonService::getOdds($playway) * $single * $times;
+        # 利润 = 中奖金额 - 投注金额
+        $rstData['profits'] = $rstData['bouns'] - $betting_money;
+        $rstData['zjResult'] = $zjResult;
+
+
+        return $rstData;
     }
 
     /**
@@ -346,7 +375,5 @@ class OpKjService extends BaseService {
 
         return $rst;
     }
-
-
 
 }

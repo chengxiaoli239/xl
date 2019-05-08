@@ -254,9 +254,10 @@ class TzService extends BaseService {
      * @desc 号码投注状态
      * @param int $playway
      * @param $codes
+     * @param $lottery_type
      * @return int
      */
-    public static function getSysTemPlansBetStatus($playway = 2, $codes){
+    public static function getSysTemPlansBetStatus($playway = 2, $codes, $lottery_type = 2){
         switch ($playway){
             # 计算出各种投注方式的当前遗漏
             case 1: //  二字定
