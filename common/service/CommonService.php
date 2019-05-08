@@ -91,7 +91,7 @@ class  CommonService{
 
         $mkey = 'KJ_DATA_2_'.$lottery_type.'_'.$qihao;
         if(!$kjData = $m->get($mkey)){
-            $kjData = SscKjData::findOne(['qihao'=>$qihao])->code_str;
+            $kjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type])->code_str;
 
             if(!$kjData){
                 return false;

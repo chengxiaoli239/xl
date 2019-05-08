@@ -105,7 +105,7 @@ abstract class BetService extends BaseBetService {
                 # 判断当期开奖数据处理是否完成，未完成则不能下一期的投注
                 if(!$tzStatus){
                     $rst = ['status'=>300, 'msg'=>'投注开关未开启，有未处理完成的数据~','mkey'=>$mkey,'tzStatus'=>$tzStatus];
-                    Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/tzCron','INFO','0898投注记录', $rst);
+                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzCron','INFO','0898投注记录', $rst);
                 }
                 break;
             default:
@@ -133,7 +133,7 @@ abstract class BetService extends BaseBetService {
             }
         }
         $logArr = ['tzRst'=>$tzRst];
-        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/bet','INFO','用户真实投注', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','用户真实投注', $logArr);
 
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
     }
@@ -476,7 +476,7 @@ abstract class BetService extends BaseBetService {
            BetService::synBalance($plan->uid, $tz_system_id);
        }
        $logArr = ['tz_sites'=>$tz_sites,'codes'=>$codes, 'postRst'=>$rst];
-       Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/plan_bet','INFO','0898投注记录', $logArr);
+       Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/plan_bet','INFO','0898投注记录', $logArr);
 
        return $rst;
     }

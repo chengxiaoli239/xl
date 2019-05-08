@@ -31,8 +31,8 @@ class OpKjService extends BaseService {
 
         $m = \Yii::$app->cache;
         //p($qihaos);
-        $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0, 'lottery_type'=>$lottery_type])->orderBy('bet.qihao ASC')->limit(20)->all();
-        //p(['bet.status'=>0, 'lottery_type'=>$lottery_type,$bettingRecords]);
+        $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type])->orderBy('id ASC')->limit(30)->all();
+        //p(['status'=>0, 'lottery_type'=>$lottery_type,'bettingRecords'=>$bettingRecords]);
         if(!$bettingRecords) return $rst;
         foreach ($bettingRecords as $bettingRecord){
             $is_simulate = $bettingRecord['is_simulate'];
@@ -46,9 +46,10 @@ class OpKjService extends BaseService {
             $m->delete($mkey_qihao);
 
             # 开奖数据 start
-            $kjData = SscKjData::find()->where(['qihao'=>$qihao, 'lottery_type'=>$bettingRecord->lottery_type])->asArray()->one()['code_str'];
+            $where = ['qihao'=>$qihao, 'lottery_type'=>$bettingRecord->lottery_type];
+            $kjData = SscKjData::find()->where($where)->asArray()->one()['code_str'];
             if(!$kjData){
-                $kjData = CommonService::getAwardNumberByQihao($qihao); // 3,4,5,6,7
+                $kjData = CommonService::getAwardNumberByQihao($qihao, $bettingRecord->lottery_type); // 3,4,5,6,7
             }
             # 开奖数据 end
             if(!$kjData){
@@ -83,7 +84,7 @@ class OpKjService extends BaseService {
                 $m->set($mkey, 0, 90*60);
             }
 
-            Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/opSscKjData','INFO','0898投注记录', $logArr);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/opSscKjData','INFO','投注记录', $logArr);
         }
 
         return $rst;
@@ -116,7 +117,7 @@ class OpKjService extends BaseService {
             'newTzCodes'=>$newTzCodes,
             'UserFollowDataUpStatus'=>$UserFollowDataUpStatus
         ];
-        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/opChangTzCodes','INFO','0898投注记录', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/opChangTzCodes','INFO','0898投注记录', $logArr);
 
         if(!$UserFollowDataUpStatus)
             $rst = ['status'=>300, 'msg'=>'号码变更异常'.current($UserFollowData->getErrors())];
@@ -182,7 +183,7 @@ class OpKjService extends BaseService {
             'is_rand'=>$is_rand,
             'newTzCodes'=>$newTzCodes
         ];
-        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/getBestTzCodes','INFO','获取最佳投注号码', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBestTzCodes','INFO','获取最佳投注号码', $logArr);
 
         return ['postion'=>$position,'hezhi'=>$maxZhi,'newTzCodes'=>$newTzCodes];
     }
