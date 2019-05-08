@@ -220,6 +220,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::opAllStaitcProfits();p($rst);
         $rst['updateDs'] = SscDataService::updateDsData(3); p($rst);// 每期开奖遗漏
         $rst['updateDsYL'] = SscDataService::updateDsYL(2);p($rst); // 单双遗漏
         $rst = HN0898Service::insertDsYl();p($rst);

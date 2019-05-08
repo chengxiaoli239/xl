@@ -8,6 +8,7 @@
 
 namespace backend\modules\cron\controllers;
 
+use backend\models\SystemConfig;
 use backend\models\SystemType;
 use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
@@ -29,8 +30,10 @@ use backend\service\StaticService;
 
 class IndexController extends Controller
 {
+    private static $staticStatus = 0;
     private static function _init()
     {
+        self::$staticStatus = SystemConfig::findOne(['key'=>'static_status'])->value;
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
     }
 
@@ -68,11 +71,11 @@ class IndexController extends Controller
      * @desc 系统投注利润统计
      * @return array
      */
-    public function actionOpStaticProfits(){
+    public function actionOpStatic(){
         self::_init();
-        $rst[] = StaticService::opStaticProfits(); # 利润统计
-        $rst[] = StaticService::allDateStatic3NumsPerDate(); # 上奖三字现
-        $rst[] = StaticService::static2NumsYl();
+        if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
+        $rst[] = StaticService::opAllStaticProfits(); # 利润统计
+        $rst[] = StaticService::staticAll2NumsYl(); # 统计所有二字现遗漏
 
         return $rst;
     }
@@ -83,8 +86,9 @@ class IndexController extends Controller
      */
     public function actionStaticSdProfits(){
         self::_init();
-        $rst[] = StaticService::static4dMonthsProfits(); # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
-        $rst[] = StaticService::static4dPerDateProfits(); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
+        if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
+
+        $rst = StaticService::opAllStaitcProfits();
 
         return $rst;
     }
@@ -95,6 +99,7 @@ class IndexController extends Controller
      */
     public function actionStaticHzProfits(){
         self::_init();
+        if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
 
         $rst[] = StaticService::staticSDHzPerDateProfits(); # 每天四定和值利润统计
         $rst[] = StaticService::staticHzMonthsProfits(); # 每月四定和值利润统计
