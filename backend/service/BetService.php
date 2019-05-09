@@ -211,6 +211,7 @@ abstract class BetService extends BaseBetService {
 
         switch ($playway){
             case 4: # 一字定
+            case 10: # 一字定
                 $codesArr = explode('@', $codes_hz);
                 break;
             case 2: # 三字定

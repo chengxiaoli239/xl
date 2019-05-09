@@ -174,9 +174,7 @@ class TzService extends BaseService {
             //$rst['synUsersBalance'] = HN0898Service::synBalance(); // 同步用户的余额
 
             # 计划方案倍数、投注号码或者投注状态修改
-            //$rst['userSysPlanChange'] = UserSysPlansService::userSysPlanChange($lottery_type);
-
-
+            $rst['userSysPlanChange'] = UserSysPlansService::userSysPlanChange($lottery_type);
         }
 
         self::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭

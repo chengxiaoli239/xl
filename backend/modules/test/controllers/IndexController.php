@@ -222,6 +222,7 @@ class IndexController extends Controller
 
     public function actionDw(){
         $rst = UserSysPlansService::userSysPlanChange(2);p($rst);
+        $rst = StaticService::getYlByCodes('02468,13579,X,X', 2, 18);p($rst);
         $rst = StaticService::opAllStaitcProfits();p($rst);
         $rst['updateDs'] = SscDataService::updateDsData(3); p($rst);// 每期开奖遗漏
         $rst['updateDsYL'] = SscDataService::updateDsYL(2);p($rst); // 单双遗漏

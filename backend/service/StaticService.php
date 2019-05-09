@@ -1249,12 +1249,48 @@ class StaticService extends BaseService {
                break;
            case 4: # 一字定
            case 10:
-               break;
+               $where = ['OR'];
+               $codesArr = explode('@', $codes);
+               foreach ($codesArr as $str){
+                   $codesStrArr = explode(',', $str);
+                   foreach ($codesStrArr as $key=>$arrStr){
+                       if($arrStr == 'X') continue;
+                       $codeKey = 'code'.($key+1);
+                       $len = strlen($arrStr);
+                       $tmpCodesArr = [];
+                       for($i=0; $i<$len; $i++){
+                           $tmpCodesArr[] = $arrStr[$i];
+                       }
+                       $where = array_merge($where,[[ 'IN', $codeKey, $tmpCodesArr]]);
+                   }
+                }
+                $record = SscKjData::find()->select(['qihao','code_str'])->where($where)->andWhere(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+                $last_Qihao = SscDataService::getKjDataLastQihao($lottery_type); # 表记录最后一条id
+                $yl = self::qihaoSpace($record['qihao'], $last_Qihao);
+                break;
        }
+       //p(['codes'=>$codes, $record, $last_Qihao, 'yl'=>$yl]);
 
        return $yl;
    }
 
+    /**
+     * @desc 期号之间的距离期数
+     * @param string $start_qihao
+     * @param $end_qihao
+     * @return int|string
+     */
+   public static function qihaoSpace($start_qihao = '', $end_qihao){
+       $space = 0;
+
+       $startDate = strstr($start_qihao, 0, 6);
+       $endDate = strstr($end_qihao, 0, 6);
+       if($startDate == $endDate){
+           $space = $end_qihao - $start_qihao;
+       }
+
+       return $space;
+   }
 
 
 
