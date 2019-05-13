@@ -242,7 +242,7 @@ class UserSysPlansService extends BaseService {
         $qihao = HN0898Service::getQihao($lottery_type);
         $m = \Yii::$app->cache;
         $mkey = 'userSysPlanChange_'.$lottery_type.'_'.$qihao;
-        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'倍数修改计划已经处理完成[lottery_type:'.$lottery_type.',期号:'.$qihao.']'];
+        //if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'倍数修改计划已经处理完成[lottery_type:'.$lottery_type.',期号:'.$qihao.']'];
 
         $UserSysPlans = UserSysPlans::find()->where(['tz_type'=>18, 'status'=>1, 'is_parent'=>1, 'lottery_type'=>$lottery_type])->all(); # 一字定 倍数切换方案
         foreach ($UserSysPlans as $UserSysPlan){
@@ -264,7 +264,7 @@ class UserSysPlansService extends BaseService {
                 ['id'=>4, 'yl'=>0, 'old_yl'=>0, 'current_single'=>1],
             ];
             */
-            //p($yls,0);
+            p($yls,0);
 
             # 比如：02579头14683头，每盘两组都买,不中哪组就翻倍买;翻倍那组中了就从头两组都买1块 或 连续翻倍不中8盘,两组就重新开始1块钱起步
             if(
@@ -279,8 +279,8 @@ class UserSysPlansService extends BaseService {
             //}elseif (($yls[0]['yl']==0 && $yls[0]['old_yl']>0) OR ($yls[1]['yl']==0 && $yls[1]['old_yl']>0)){ # 翻倍那组中了就从头两组都买1块
             }elseif ($yls[0]['yl']==0 && $yls[1]['yl']>=1){
                 //p('yyyyyyyyyyy');
-                $key = array_search($yls[1]['current_single'], $singleArr);
-                $key_s = $key;
+                //$key = array_search($yls[1]['current_single'], $singleArr);
+                $key_s = $yls[1]['yl'];
                 $single = $singleArr[$key_s];
                 $rows = [
                     ['id'=>$yls[0]['id'], 'single'=>$singleArr[0]],
@@ -288,9 +288,9 @@ class UserSysPlansService extends BaseService {
                 ];
             }elseif ($yls[1]['yl']==0 && $yls[0]['yl']>=1) {
                 //p('lllllllllllllll');
-                $key = array_search($yls[0]['current_single'], $singleArr);
+                //$key = array_search($yls[0]['current_single'], $singleArr);
                 //p([$yls[1]['current_single'], $key,$singleArr], 0);
-                $key_s = $key;
+                $key_s = $yls[0]['yl'];
                 $single = $singleArr[$key_s];
                 $rows = [
                     ['id' => $yls[0]['id'], 'single'=>$single],
@@ -305,11 +305,16 @@ class UserSysPlansService extends BaseService {
             }
             //p($rows);
 
+            $hz_Arr_str = '';
             foreach ($rows as $row){
                 $plan = UserSysPlans::findOne($row['id']);
                 $plan->single = $row['single'];
+                $hz_Arr_str .= $plan->hz_Arr.':'.$plan->single.'|';
                 $plan->save();
             }
+
+            $UserSysPlan->hz_Arr = rtrim($hz_Arr_str, '|');
+            $UserSysPlan->save();
         }
         $rst['rows'] = $rows;
         $m->set($mkey, 1, 60);
