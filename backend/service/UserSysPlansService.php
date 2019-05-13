@@ -259,13 +259,20 @@ class UserSysPlansService extends BaseService {
 
                 $yls[] = ['id'=>$id, 'yl'=>$yl, 'old_yl'=>$key, 'current_single'=>$plan->single];
             }
+            /*
+            $yls = [
+                ['id'=>3, 'yl'=>3, 'old_yl'=>4, 'current_single'=>4],
+                ['id'=>4, 'yl'=>0, 'old_yl'=>0, 'current_single'=>1],
+            ];
+            */
+            //p($yls,0);
 
             # 比如：02579头14683头，每盘两组都买,不中哪组就翻倍买;翻倍那组中了就从头两组都买1块 或 连续翻倍不中8盘,两组就重新开始1块钱起步
             if(
                 $yls[0]['yl']>=8 OR $yls[1]['yl']>=8 # 连续翻倍不中8盘,两组就重新开始1块钱起步
                 OR ( ($yls[0]['yl']==0 && $yls[0]['old_yl']>0) OR ($yls[1]['yl']==0 && $yls[1]['old_yl']>0) ) # 翻倍那组中了就从头两组都买1块
             ){
-                p('xxx');
+                //p('sklfjadslf');
                 $rows = [];
                 foreach ($yls as $key=>$yl8){
                     $rows[] = ['id'=>$yl8['id'], 'single'=>1];
@@ -274,55 +281,29 @@ class UserSysPlansService extends BaseService {
             //}elseif (($yls[0]['yl']==0 && $yls[0]['old_yl']>0) OR ($yls[1]['yl']==0 && $yls[1]['old_yl']>0)){ # 翻倍那组中了就从头两组都买1块
             }elseif ($yls[0]['yl']==0 && $yls[1]['yl']>=1){
                 //p('yyyyyyyyyyy');
-                $key = array_search($yls[1]['single'], $singleArr);
+                $key = array_search($yls[1]['current_single'], $singleArr);
                 $single = $singleArr[$key+1];
                 $rows = [
-                    ['id'=>$yls[0]['id'], 'single'=>1],
+                    ['id'=>$yls[0]['id'], 'single'=>$singleArr[0]],
                     ['id'=>$yls[1]['id'], 'single'=>$single],
                 ];
             }elseif ($yls[1]['yl']==0 && $yls[0]['yl']>=1) {
                 //p('lllllllllllllll');
-                $key = array_search($yls[1]['single'], $singleArr);
+                $key = array_search($yls[0]['current_single'], $singleArr);
+                //p([$yls[1]['current_single'], $key,$singleArr], 0);
                 $single = $singleArr[$key + 1];
                 $rows = [
                     ['id' => $yls[0]['id'], 'single'=>$single],
                     ['id' => $yls[1]['id'], 'single'=>$singleArr[0]],
                 ];
             }else{
+                //p('kkkkkkkkkk',0);
                 $rows = [
                     ['id' => $yls[0]['id'], 'single'=>$singleArr[0]],
                     ['id' => $yls[1]['id'], 'single'=>$singleArr[0]],
                 ];
             }
-
-            /*
-            foreach ($yls as $key=>$ylRecord){
-                # 比如：02579头14683头，每盘两组都买,不中哪组就翻倍买;翻倍那组中了就从头两组都买1块 或 连续翻倍不中8盘,两组就重新开始1块钱起步
-                if($ylRecord['yl']>1 && $ylRecord['old_yl']>1) {
-                    # 每盘两组都买,不中哪组就翻倍买
-
-                }elseif ($ylRecord['yl']>=8){
-                    # 连续翻倍不中8盘,两组就重新开始1块钱起步
-                    $tmpArr = [];
-                    foreach ($yls as $key=>$yl8){
-                        $tmpArr[] = ['id'=>$yl8['id'], 'single'=>1];
-                    }
-                    $rows = $tmpArr;
-                    break;
-                }elseif($ylRecord['yl']>1 && $ylRecord['old_yl']>1) {
-                    # 翻倍那组中了就从头两组都买1块
-                    foreach ($yls as $key=>$yl8){
-                        $rows[] = ['id'=>$yl8['id'], 'single'=>1];
-                    }
-                    break;
-                }else{
-                    foreach ($yls as $key=>$yl8){
-                        $rows[] = ['id'=>$yl8['id'], 'single'=>1];
-                    }
-                    break;
-                }
-            }
-            */
+            //p($rows);
 
             foreach ($rows as $row){
                 $plan = UserSysPlans::findOne($row['id']);
@@ -330,6 +311,7 @@ class UserSysPlansService extends BaseService {
                 $plan->save();
             }
         }
+        $rst['rows'] = $rows;
 
         //p($kjData);
         return $rst;
