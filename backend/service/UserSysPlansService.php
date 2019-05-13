@@ -242,7 +242,7 @@ class UserSysPlansService extends BaseService {
         $qihao = HN0898Service::getQihao($lottery_type);
         $m = \Yii::$app->cache;
         $mkey = 'userSysPlanChange_'.$lottery_type.'_'.$qihao;
-        //if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'倍数修改计划已经处理完成[lottery_type:'.$lottery_type.',期号:'.$qihao.']'];
+        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'倍数修改计划已经处理完成[lottery_type:'.$lottery_type.',期号:'.$qihao.']'];
 
         $UserSysPlans = UserSysPlans::find()->where(['tz_type'=>18, 'status'=>1, 'is_parent'=>1, 'lottery_type'=>$lottery_type])->all(); # 一字定 倍数切换方案
         foreach ($UserSysPlans as $UserSysPlan){
@@ -260,7 +260,7 @@ class UserSysPlansService extends BaseService {
             }
             /*
             $yls = [
-                ['id'=>3, 'yl'=>3, 'old_yl'=>4, 'current_single'=>4],
+                ['id'=>3, 'yl'=>6, 'old_yl'=>5, 'current_single'=>6],
                 ['id'=>4, 'yl'=>0, 'old_yl'=>0, 'current_single'=>1],
             ];
             */
@@ -280,7 +280,8 @@ class UserSysPlansService extends BaseService {
             }elseif ($yls[0]['yl']==0 && $yls[1]['yl']>=1){
                 //p('yyyyyyyyyyy');
                 $key = array_search($yls[1]['current_single'], $singleArr);
-                $single = $singleArr[$key+1];
+                $key_s = $key;
+                $single = $singleArr[$key_s];
                 $rows = [
                     ['id'=>$yls[0]['id'], 'single'=>$singleArr[0]],
                     ['id'=>$yls[1]['id'], 'single'=>$single],
@@ -289,7 +290,8 @@ class UserSysPlansService extends BaseService {
                 //p('lllllllllllllll');
                 $key = array_search($yls[0]['current_single'], $singleArr);
                 //p([$yls[1]['current_single'], $key,$singleArr], 0);
-                $single = $singleArr[$key + 1];
+                $key_s = $key;
+                $single = $singleArr[$key_s];
                 $rows = [
                     ['id' => $yls[0]['id'], 'single'=>$single],
                     ['id' => $yls[1]['id'], 'single'=>$singleArr[0]],
@@ -310,8 +312,9 @@ class UserSysPlansService extends BaseService {
             }
         }
         $rst['rows'] = $rows;
+        $m->set($mkey, 1, 60);
 
-        //p($kjData);
+        //p($rows);
         return $rst;
     }
 
