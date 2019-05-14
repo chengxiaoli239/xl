@@ -46,7 +46,9 @@ class UserService extends BaseService {
                 $User->setAttributes($insertData);
                 $rst = $User->save();
 
-                $AuthAssignment = new AuthAssignment();
+                if(!$AuthAssignment = AuthAssignment::findOne(['user_id'=>$admin_id])){
+                    $AuthAssignment = new AuthAssignment();
+                }
                 $insertData = [
                     'item_name' => $role,
                     'user_id'=>$admin_id,

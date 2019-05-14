@@ -4,6 +4,7 @@
  */
 
 namespace common\service;
+use Yii;
 use common\tools\Tool_Common;
 use backend\service\CurlService;
 class CaptchaCodeService{

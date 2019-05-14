@@ -221,6 +221,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = TzService::insertSscDataTime(5); p($rst);
         $rst = UserSysPlansService::userSysPlanChange(2);p($rst);
         $rst = StaticService::getYlByCodes('02468,13579,X,X', 2, 18);p($rst);
         $rst = StaticService::opAllStaitcProfits();p($rst);
@@ -234,14 +235,13 @@ class IndexController extends Controller
         $captchaCodeRst = Tools::getCaptchaCode(10, 5, '2x2tdrnawlpbli554jlsuf2c');p($captchaCodeRst); # 真实调用验证码接口，收费
         $rst = XlService::login(10, 5);p($rst); # 7时登录
         $rst = HN0898Service::login(10, 5);p($rst); # 7时登录
-        $rst = BetService::tzByPlanId(1);p($rst); # 投注
+        $rst = BetService::tzByPlanId(1, 0);p($rst); # 投注
         $rst = XlService::formCodesStyle('13579,X,X,X@02468,X,X,X', 4); p($rst); # 格式化希腊号码
         $rst = XlService::formCodesStyle('13579,,13579,,@13579,,13579,,', 1); p($rst); # 格式化希腊号码
         $rst = XlService::getQihaoInfo(10, 5);p($rst);
         $rst = HN0898Service::getQihao(2);p($rst);
         $rst = KjDataGet::getBeforeQihaoByQihao('191231960',2);p($rst);
         $rst = KjDataGet::getNextQihaoByQihao('191231960', 1);p($rst);
-        $rst = TzService::insertSscDataTime(4); p($rst);
         $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0])->distinct('qihao')->orderBy('bet.qihao ASC')->limit(20)->all();p($bettingRecords);
         $rst = CqsscKcw::getLotteryNoXl();p($rst);
         $rst = HN0898Service::getQihao(); p($rst);
@@ -300,7 +300,6 @@ class IndexController extends Controller
         $rst = SscDataService::countCodes();p($rst);
         $rst = UserCustomPlansService::insertSDPlans(); p($rst);
         //$rst = StaticService::allMonthStaticProfits();p($rst); # 利润统计
-        $rst = BetService::bet();p($rst); // 投注
         $rst = SscDataService::insert4dDsZHData();p($rst);
         $m = \Yii::$app->cache;
         $qihao = HN0898Service::getQihao();
@@ -316,7 +315,6 @@ class IndexController extends Controller
         $rst = HN0898Service::getCurrentQihao();p($rst);
         $rst = HN0898Service::synBalance(1);p($rst);
         $rst = SscDataService::calcDsProfit();p($rst); // 单双遗漏计算
-        $rst = BetService::bet();p($rst); // 计划投注
         $rst = TzService::tz();p($rst); // 计划投注
         $rst = SscDataService::calTzTotalMoney('02468,X,13579,13579', 0.1, 2); p($rst);
         $rst = UserCustomPlansService::joinDs3DwPlans();p($rst);

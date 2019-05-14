@@ -8,6 +8,8 @@
 
 namespace backend\service;
 
+use backend\models\User;
+use Yii;
 use backend\models\BettingRecords;
 use backend\models\Num4Type;
 use backend\models\SysPlansCodes;
@@ -395,12 +397,12 @@ abstract class BetService extends BaseBetService {
            return ['status'=>300, 'msg'=>'找不到对应记录'];
        }
        $m = \Yii::$app->cache;
-       $qihao = HN0898Service::getQihao();
+       $qihao = HN0898Service::getQihao($UserSysPlans->lottery_type);
        $mkey = 'userSysPlansTzNow_'.$uid.'_'.$id.'_'.$qihao.'_'.$UserSysPlans->playway;
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
 
 
-       $rst = self::tzByPlanId($id);
+       $rst = self::tzByPlanId($id, 0);
        $m->set($mkey, 1, 10);
 
        return $rst;
@@ -454,9 +456,10 @@ abstract class BetService extends BaseBetService {
     /**
      * @desc 根据计划id投注 - 立即投注
      * @param $planId
+     * @param $isAuto 是否自动,默认自动
      * @return array
      */
-    public static function tzByPlanId($planId){
+    public static function tzByPlanId($planId, $isAuto = 1){
        if(!$plan = UserSysPlans::findOne($planId)){
             return ['status'=>300, 'msg'=>'找不到对应记录'];
        }
@@ -467,12 +470,13 @@ abstract class BetService extends BaseBetService {
 
            # 4、投注号码 codes
            $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr);
+           $uid = User::findOne(['admin_id'=>$plan->uid])->id;
 
            # 5、投注请求
-           BetService::beforeBetNow($plan->account, $tz_system_id, $qihao, $plan->id);
-           $BetService = self::getBetObj($plan->uid, $system_type_id, $tz_system_id);
+           $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $qihao, $plan->id);
+           $BetService = self::getBetObj($uid, $system_type_id, $tz_system_id);
            $rst = $BetService->bet($qihao, $plan->id, $codes);
-           BetService::afterBetNow($qihao);
+           $isAuto == 0 && BetService::afterBetNow($qihao);
 
            BetService::synBalance($plan->uid, $tz_system_id);
        }

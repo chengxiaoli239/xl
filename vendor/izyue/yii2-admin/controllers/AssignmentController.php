@@ -3,6 +3,7 @@
 namespace izyue\admin\controllers;
 
 use backend\models\SignupForm;
+use backend\service\UserService;
 use izyue\admin\components\MenuHelper;
 use Yii;
 use izyue\admin\models\searchs\Assignment as AssignmentSearch;
@@ -265,6 +266,7 @@ class AssignmentController extends Controller
 
             if ($model->save()) {
                 //MenuHelper::invalidate();
+                $rst = UserService::opUser($id, 'add', '收费会员');
                 return $this->redirect(['index']);
             } else {
                 return $this->render('update', [

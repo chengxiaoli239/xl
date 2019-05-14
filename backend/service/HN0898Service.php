@@ -101,7 +101,7 @@ class HN0898Service extends BaseTZService {
      */
     public static function getTzSiteInfo($tz_system_id, $url_key = ''){
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
-        //p(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id,$TzSystemUser->attributes]);
+        p(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id,$TzSystemUser->attributes]);
         $baseUrl = $TzSystemUser->ssc_domain;
         self::$cookie = $TzSystemUser->cookie;
         \Yii::$app->params['baseUrl']  = $TzSystemUser->ssc_domain;
@@ -353,7 +353,7 @@ class HN0898Service extends BaseTZService {
 
         # 缓存锁
         $m = \Yii::$app->cache;
-        $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
+        $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
         if(in_array($tz_type, [20,23])){
@@ -1160,7 +1160,7 @@ class HN0898Service extends BaseTZService {
                 }
                 break;
             case 5: # 5:重庆ssc
-                if(!$rst && $lottery_type == 1) {
+                if(!$rst && $lottery_type == 5) {
                     $rst['actionNo'] = 001; // 大于 23:56  -> null  设置为120期
                     $qihao = date("ymd", strtotime('+1 day')) . sprintf("%03d", $rst['actionNo']);
                 }elseif ('03:10:00'<$time && $time<'07:30:00'){

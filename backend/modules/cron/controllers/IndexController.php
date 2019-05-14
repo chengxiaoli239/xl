@@ -179,7 +179,7 @@ class IndexController extends Controller
         # 第一步：开奖后处理完预投注
         //$rst['customTz'] = TzService::opSystemBetPlans(); // 处理系统投注计划
 
-        return $rst;
+        //return $rst;
     }
 
     /**

@@ -90,15 +90,19 @@ class TzService extends BaseService {
     public static function tzByPlanId($plan_id){
 
         $plan = UserSysPlans::findOne($plan_id);
+
         # 0898体系投注号码，系统正买按照0898格式下单
         $codes = BetService::getPlansAllCodesType1($plan->tz_type, 1, $plan->sel_same, $plan->hz_Arr);
 
         # 期号
         $qihao = HN0898Service::getQihao($plan->lottery_type);
 
-        # 0898体系最终投注
-        $HN0898Service = new HN0898Service();
-        $rst = $HN0898Service->betting($qihao, $plan->id, $codes);
+        $rst = BetService::beforeBet($qihao, $plan->lottery_type);
+        if($rst['status'] == 200){
+            # 0898体系最终投注
+            $HN0898Service = new HN0898Service();
+            $rst = $HN0898Service->betting($qihao, $plan->id, $codes);
+        }
 
         return $rst;
     }
@@ -417,30 +421,67 @@ class TzService extends BaseService {
 
     /**
      * @desc 更新时时彩开奖时间 1、1.5分彩 2、3分 3、5分彩 4、10分彩
+     * @param $lottery_type
      */
-    public static function insertSscDataTime($type = 1){
-        $typeArr = [1=>1.5, 2=>3, 3=>5, 4=>10];
-        $time_int = 24 * 3600;
-        $actionNums = $time_int / ($typeArr[$type]*60);
-        //p($actionNums);
+    public static function insertSscDataTime($lottery_type = 1){
+
+        switch ($lottery_type){
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                $typeArr = [1=>1.5, 2=>3, 3=>5, 4=>10];
+                $time_int = 24 * 3600;
+                $actionNums = $time_int / ($typeArr[$lottery_type]*60);
+                //p($actionNums);
+                $setData = [];
+                $dateTime = strtotime('2019-04-30 00:00:00');
+                for ($i=1; $i<=$actionNums; $i++){
+                    $setData['type'] = $lottery_type;
+                    $setData['actionNo'] = $i;
+                    $where = ['type'=>$lottery_type, 'actionNo'=>$i];
+                    //p(date('Y-m-d H:i:s', $dateTime), 0);
+                    if(!$DataTime = DataTime::findOne($where)){
+                        $DataTime = new DataTime();
+                    }
+                    $dateTime = $dateTime + $typeArr[$lottery_type] * 60;
+
+                    $HIS = date('H:i:s', $dateTime);
+                    $setData['actionTime'] = $HIS;
+                    $setData['stopTime'] = $HIS;
+                    //p($i.'='.$HI, 0);
+                    $DataTime->setAttributes($setData);
+                    $rst = $DataTime->save();
+                }
+                break;
+            case 5:
+                $rst = self::insertCqSscDataTime();
+                break;
+        }
+        return ['status'=>200, 'msg'=>'更新时时彩开奖', 'rst'=>$rst, 'nums'=>$actionNums];
+    }
+
+
+    /**
+     * @desc 更新时时彩开奖时间
+     */
+    public static function insertCqSscDataTime(){
+        $actionNo = 59;
         $setData = [];
-        $dateTime = strtotime('2019-04-30 00:00:00');
-        for ($i=1; $i<=$actionNums; $i++){
-            $setData['type'] = $type;
+        $dateTime = strtotime('2019-02-15 00:10:00');
+        for ($i=1; $i<=$actionNo; $i++){
+            $setData['type'] = 5;  # lottery_type 5 重庆时时彩
             $setData['actionNo'] = $i;
-            $where = ['type'=>$type, 'actionNo'=>$i];
+            $where = ['type'=>5, 'actionNo'=>$i];
             //p(date('Y-m-d H:i:s', $dateTime), 0);
             if(!$DataTime = DataTime::findOne($where)){
                 $DataTime = new DataTime();
             }
-            $dateTime = $dateTime + $typeArr[$type] * 60;
-            /*
             if($i==9) {
-                $dateTime = $dateTime + 4 * 60 * 60 + $typeArr[$type] * 60;
+                $dateTime = $dateTime + 4 * 60 * 60 + 20 * 60;
             }else{
-                $dateTime = $dateTime + $typeArr[$type] * 60;
+                $dateTime = $dateTime + 20 * 60;
             }
-            */
             //p($dateTime);
             $HIS = date('H:i:s', $dateTime);
             $setData['actionTime'] = $HIS;
@@ -449,7 +490,7 @@ class TzService extends BaseService {
             $DataTime->setAttributes($setData);
             $rst = $DataTime->save();
         }
-        return ['status'=>200, 'msg'=>'更新时时彩开奖', 'rst'=>$rst, 'nums'=>$actionNums];
+        return ['status'=>200, 'msg'=>'更新时时彩开奖', 'rst'=>$rst];
     }
 
 
