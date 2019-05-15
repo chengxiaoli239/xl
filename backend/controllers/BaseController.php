@@ -3,6 +3,7 @@ namespace backend\controllers;
 
 use backend\models\User;
 use backend\service\HN0898Service;
+use common\models\AdminModel;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -29,15 +30,8 @@ class BaseController extends Controller
     }
 
     public function _initData(){
-        $User = User::findOne(['admin_id'=>$this->_user_id]);
-        $this->_account = $User->account;
-        Yii::$app->params['baseUrl']  = $User->ssc_domain;
-        Yii::$app->params['domain']  = str_replace('https://','',$User->ssc_domain);
-        Yii::$app->params['ajaxUrlRouteUser']  = $User->ssc_domain.Yii::$app->params['ajaxUrlRouteUser_key'];
-        Yii::$app->params['sscUrlRoute']  = $User->ssc_domain.Yii::$app->params['sscUrlRoute_key'];
-        Yii::$app->params['ajaxUrlRouteLot']  = $User->ssc_domain.Yii::$app->params['ajaxUrlRouteLot_key'];
-        Yii::$app->params['ajaxUrlRouteLotDw']  = $User->ssc_domain.Yii::$app->params['ajaxUrlRouteLotDw_key'];
-        //HN0898Service::synBalanceByUserId($this->_user_id);
+        $User = AdminModel::findOne($this->_user_id);
+        $this->_account = $User->username;
     }
 
     /**

@@ -243,8 +243,8 @@ class UserSysPlansService extends BaseService {
         $m = \Yii::$app->cache;
         $mkey = 'userSysPlanChange_'.$lottery_type.'_'.$qihao;
         if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'倍数修改计划已经处理完成[lottery_type:'.$lottery_type.',期号:'.$qihao.']'];
-
         $UserSysPlans = UserSysPlans::find()->where(['tz_type'=>18, 'status'=>1, 'is_parent'=>1, 'lottery_type'=>$lottery_type])->all(); # 一字定 倍数切换方案
+
         foreach ($UserSysPlans as $UserSysPlan){
             if(!$UserSysPlan->children_plan_id) continue;
             $ids = explode(',', $UserSysPlan->children_plan_id);
@@ -277,7 +277,7 @@ class UserSysPlansService extends BaseService {
                     $rows[] = ['id'=>$yl8['id'], 'single'=>$singleArr[0]];
                 }
             //}elseif (($yls[0]['yl']==0 && $yls[0]['old_yl']>0) OR ($yls[1]['yl']==0 && $yls[1]['old_yl']>0)){ # 翻倍那组中了就从头两组都买1块
-            }elseif ($yls[0]['yl']==0 && $yls[1]['yl']>=1){
+            }elseif ($yls[0]['yl']==0 && $yls[1]['yl']>1){
                 //p('yyyyyyyyyyy');
                 //$key = array_search($yls[1]['current_single'], $singleArr);
                 $key_s = $yls[1]['yl'];
@@ -286,7 +286,7 @@ class UserSysPlansService extends BaseService {
                     ['id'=>$yls[0]['id'], 'single'=>$singleArr[0]],
                     ['id'=>$yls[1]['id'], 'single'=>$yls[0]['old_yl']>=1?1:$single],
                 ];
-            }elseif ($yls[1]['yl']==0 && $yls[0]['yl']>=1) {
+            }elseif ($yls[1]['yl']==0 && $yls[0]['yl']>1) {
                 //p('lllllllllllllll');
                 //$key = array_search($yls[0]['current_single'], $singleArr);
                 //p([$yls[1]['current_single'], $key,$singleArr], 0);

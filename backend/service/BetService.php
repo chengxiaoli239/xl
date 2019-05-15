@@ -470,11 +470,10 @@ abstract class BetService extends BaseBetService {
 
            # 4、投注号码 codes
            $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr);
-           $uid = User::findOne(['admin_id'=>$plan->uid])->id;
 
            # 5、投注请求
-           $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $qihao, $plan->id);
-           $BetService = self::getBetObj($uid, $system_type_id, $tz_system_id);
+           $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id);
+           $BetService = self::getBetObj($plan->uid, $system_type_id, $tz_system_id);
            $rst = $BetService->bet($qihao, $plan->id, $codes);
            $isAuto == 0 && BetService::afterBetNow($qihao);
 
@@ -561,6 +560,7 @@ abstract class BetService extends BaseBetService {
             'single' => $data['single'],  // 投注期号
             'betting_money'=> $data['betting_money'],  // 投注金额
             'tz_system_id'=> $data['tz_system_id'],  // 投注系统tz_systems .id
+            'lottery_type'=> $data['lottery_type'],  // 彩种
             'lotteryclass'=> 'ssc',  // 彩种
             'is_simulate' => $data['is_simulate'],  // 是否模拟投注
             'position' => $data['position'],  // 是否模拟投注

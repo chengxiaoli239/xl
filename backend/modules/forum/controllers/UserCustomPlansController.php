@@ -5,6 +5,7 @@ namespace backend\modules\forum\controllers;
 use backend\models\TzSystems;
 use backend\service\TzService;
 use backend\service\UserCustomPlansService;
+use common\models\AdminModel;
 use Yii;
 use backend\models\UserCustomPlans;
 use backend\models\searchs\UserCustomPlans as UserCustomPlansSearch;
@@ -42,7 +43,7 @@ class UserCustomPlansController extends BaseController
      */
     public function actionIndex()
     {
-        $account = User::findOne(['admin_id'=>Yii::$app->user->id])['account'];
+        $account =AdminModel::findOne(Yii::$app->user->id)['account'];
         $searchModel = new UserCustomPlansSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         if($account != ''){

@@ -19,6 +19,7 @@ use backend\models\User;
 use backend\models\UserCustomPlans;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
+use common\models\AdminModel;
 use common\service\CaptchaCodeService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -57,9 +58,10 @@ class SevenService extends BaseTZService {
     }
 
     private static function __init($uid = 1, $tz_system_id = 2){
-        $User = User::findOne($uid);
+        //$User = User::findOne($uid);
+        $User = AdminModel::findOne(Yii::$app->user->id);
         self::$user_id = $uid;
-        self::$account = $User->account;
+        self::$account = $User->username;
         self::$tz_system_id = $tz_system_id;
         self::$username = $User->username;
         self::$tzSiteInfo = SevenService::getTzSiteInfo($tz_system_id);
@@ -197,25 +199,6 @@ class SevenService extends BaseTZService {
     }
 
     /**
-     * @description 还有未结单的用户不能继续投注
-     * @param $account
-     * @param $is_simulate 是否模拟
-     * @return int
-     */
-    public static function isCanedTz($account, $plan_id, $is_simulate = 0){
-        $isCaned = 1;
-        if($rst = BettingRecords::findOne(['status'=>0, 'plan_id'=>$plan_id])){
-            //$isCaned = 0; # 缓存控制开关，暂不依据投注记录表
-        }
-        $balance = User::findOne(['account'=>$account])->balance;
-        if($is_simulate == 0 && $balance < 0.50){
-            $isCaned = 0;
-        }
-
-        return $isCaned;
-    }
-
-    /**
      * @decription 新版投注，真实投注入口， 未完待续 2018.12.23
      *
      * @param $tz_system_id
@@ -283,7 +266,7 @@ class SevenService extends BaseTZService {
         //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
         $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL').'?'.http_build_query($post_data);
 
-        $account = User::findOne(['admin_id'=>self::$user_id])->account;  # 投注用户账号
+        $account = AdminModel::findOne(self::$user_id)->username;  # 投注用户账号
         //p(['headers'=>$headers, 'url'=>$url, 'account'=>$account, 'post_data'=>$post_data]);
 
         # 缓存锁
@@ -777,35 +760,6 @@ class SevenService extends BaseTZService {
         $inputs['ctl00$btnlogin.y'] = rand(10,99);
 
         return ['action'=>$form['action'],'inputs'=>$inputs];
-    }
-
-    /**
-     * @desc 获取用户的url 数组
-     * @param $user_id
-     * @param string $url_key
-     * @return array|mixed
-     */
-    public static function getUserUrlArr($user_id, $url_key =''){
-        $User = User::findOne(['admin_id'=>$user_id]);
-        $baseUrl = $User->ssc_domain;
-        \Yii::$app->params['baseUrl']  = $User->ssc_domain;
-        \Yii::$app->params['domain']  = str_replace('https://','',$User->ssc_domain);
-        \Yii::$app->params['ajaxUrlRouteUser']  = $User->ssc_domain.Yii::$app->params['ajaxUrlRouteUser_key'];
-        \Yii::$app->params['sscUrlRoute']  = $User->ssc_domain.Yii::$app->params['sscUrlRoute_key'];
-        \Yii::$app->params['ajaxUrlRouteLot']  = $User->ssc_domain.Yii::$app->params['ajaxUrlRouteLot_key'];
-        \Yii::$app->params['ajaxUrlRouteLotDw']  = $User->ssc_domain.Yii::$app->params['ajaxUrlRouteLotDw_key'];
-        $urlArr = [
-            'baseUrl' => $User->ssc_domain,
-            'domain' => \Yii::$app->params['domain'],
-            'CANCEL_ORDER' => $baseUrl.'/api/data.aspx',
-            'ORDER_TZ' => str_replace('www.','',Yii::$app->params['ajaxUrlRouteLotDw']),
-            'SSC_INDEX' => $baseUrl.'/ssc/index.aspx',
-            'GET_BALANCE' => Yii::$app->params['ajaxUrlRouteUser'],
-            'CAPTCHA_CODE' => $User->ssc_domain.'/code2.aspx',
-        ];
-        if($url_key && $urlArr[$url_key]) return $urlArr[$url_key];
-
-        return $urlArr;
     }
 
     public static function getZjByInterval(){

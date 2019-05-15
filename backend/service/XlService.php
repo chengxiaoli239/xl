@@ -322,6 +322,7 @@ class XlService extends BaseTZService {
             'buy_type'=> $buy_type,  // 购买方向类型
             'uid'=> self::$user_id,  // 投注账号id
             'account' => $account,
+            'lottery_type' => $lottery_type, # 彩种
             'plan_id' => $plan_id, # 计划id
             'codes' => (string)$codes,  // 投注号码
             'qihao' => $qihao,  // 投注期号

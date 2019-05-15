@@ -36,12 +36,21 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'id',
                         //'admin_id',
                         //'username',
-                        'account',
-                        'expire_time:datetime',
+                        ['attribute' => 'username','label'=>'账号', # 'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model){
+                                return $model->username;
+                            }
+                        ],
+                        //'updated_at:datetime',
+                        ['attribute' => 'id','label'=>'更新时间', # 'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model){
+                                return date('Y-m-d H:i:s', $model->updated_at);
+                            }
+                        ],
                         ['attribute' => 'id','label'=>'投注系统权限', # 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                $url = "/forum/user/open-systems?uid=".$model->admin_id; #
+                                $url = "/forum/user/open-systems?uid=".$model->id; #
                                 return Html::a('添加/编辑', $url, ['title' => '开通系统权限','alt'=>$model->id]);
                             }
                         ],

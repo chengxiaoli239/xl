@@ -39,16 +39,6 @@ class IndexController extends BaseController
         ];
     }
 
-   /**
-     * 登录获取页面信息
-     */
-    public function actionGetRemoteData(){
-        //$cookie = \Yii::$app->request->get('cookie');
-        $cookie = User::findOne(['account'=>'gaozi2017'])['cookie'];
-        $html_data = HN0898Service::getRemoteHtmlContent($cookie); // 1、登录： cookie 传值  2、未登录 为空
-        p($html_data);
-    }
-
     public function actionTz(){
         p('xxxxxxxxxx');
 

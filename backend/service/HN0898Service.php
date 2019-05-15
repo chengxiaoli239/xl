@@ -22,6 +22,7 @@ use backend\models\UserCustomPlans;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
 use backend\tools\Tools;
+use common\models\AdminModel;
 use common\service\CaptchaCodeService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -60,9 +61,10 @@ class HN0898Service extends BaseTZService {
     }
 
     private static function __init($uid = 1, $tz_system_id = 2){
-        $User = User::findOne($uid);
+        //$User = User::findOne($uid);
+        $User = AdminModel::findOne($uid);
         self::$user_id = $uid;
-        self::$account = $User->account;
+        self::$account = $User->username;
         self::$tz_system_id = $tz_system_id;
         self::$username = $User->username;
         self::$tzSiteInfo = HN0898Service::getTzSiteInfo($tz_system_id);
@@ -101,7 +103,7 @@ class HN0898Service extends BaseTZService {
      */
     public static function getTzSiteInfo($tz_system_id, $url_key = ''){
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
-        p(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id,$TzSystemUser->attributes]);
+        //p(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id,$TzSystemUser->attributes]);
         $baseUrl = $TzSystemUser->ssc_domain;
         self::$cookie = $TzSystemUser->cookie;
         \Yii::$app->params['baseUrl']  = $TzSystemUser->ssc_domain;
@@ -196,7 +198,7 @@ class HN0898Service extends BaseTZService {
         if($rst = BettingRecords::findOne(['status'=>0, 'plan_id'=>$plan_id])){
             //$isCaned = 0; # 缓存控制开关，暂不依据投注记录表
         }
-        $balance = User::findOne(['account'=>$account])->balance;
+        $balance = AdminModel::findOne(['username'=>$account])->balance;
         if($is_simulate == 0 && $balance < 0.50){
             $isCaned = 0;
         }
@@ -275,7 +277,7 @@ class HN0898Service extends BaseTZService {
             'qihao' => $qihao,  // 投注期号
             'snid'=>$snid,
             'tz_type' => $tz_type,
-            'lottery_type' => $lottery_type,
+            'lottery_type' => $lottery_type, # 彩种
             'plan_id' => $plan_id,
             'buy_type' => $buy_type,
             'uid'=>0, # 系统模拟，uid=0
@@ -349,11 +351,11 @@ class HN0898Service extends BaseTZService {
         $url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ');
 
         //$account = User::findOne(self::$user_id)->account;  # 投注用户账号
-        $account = User::findOne(['admin_id'=>self::$user_id])->account;  # 投注用户账号
+        //$account = User::findOne(['admin_id'=>self::$user_id])->account;  # 投注用户账号
 
         # 缓存锁
         $m = \Yii::$app->cache;
-        $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
+        $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
         if(in_array($tz_type, [20,23])){
@@ -398,7 +400,8 @@ class HN0898Service extends BaseTZService {
             'tz_type'=> $tz_type,  // 投注类型
             'buy_type'=> $buy_type,  // 购买方向类型
             'uid'=> self::$user_id,  // 投注账号id
-            'account' => $account,
+            'lottery_type' => $lottery_type, # 彩种
+            'account' => self::$account,
             'codes' => $code,  // 投注号码
             'qihao' => $qihao,  // 投注期号
             'plan_id' => $plan_id,  // 计划id
@@ -598,7 +601,7 @@ class HN0898Service extends BaseTZService {
        $mkey = 'reverseTzNowBetRecord_'.$qihao.'_'.$playway;
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了'];
 
-       $account = User::findOne($uid)->account;
+       $account = AdminModel::findOne(Yii::$app->user->id)['account'];
        BetService::beforeBetNow($account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id);
        $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
        BetService::afterBetNow($qihao);
@@ -844,7 +847,7 @@ class HN0898Service extends BaseTZService {
             }
             $cancel_status = ['正常'=>0, '已撤单'=>1];
 
-            $account = User::findOne($uid)->account;  # 投注用户账号
+            $account = AdminModel::findOne(Yii::$app->user->id)['account'];
             $codesArr = explode('@', $list['codes']);
             $single = $list['totalmoney'] / count($codesArr);
             $setData = array_merge($setData,[
@@ -912,35 +915,6 @@ class HN0898Service extends BaseTZService {
 
         if(!$key) return $urlArr;
         return $urlArr[$key];
-    }
-
-    /**
-     * @desc 获取用户的url 数组
-     * @param $user_id
-     * @param string $url_key
-     * @return array|mixed
-     */
-    public static function getUserUrlArr($user_id, $url_key =''){
-        $User = User::findOne(['admin_id'=>$user_id]);
-        $baseUrl = $User->ssc_domain;
-        \Yii::$app->params['baseUrl']  = $User->ssc_domain;
-        \Yii::$app->params['domain']  = str_replace('https://','',$User->ssc_domain);
-        \Yii::$app->params['ajaxUrlRouteUser']  = $User->ssc_domain.Yii::$app->params['ajaxUrlRouteUser_key'];
-        \Yii::$app->params['sscUrlRoute']  = $User->ssc_domain.Yii::$app->params['sscUrlRoute_key'];
-        \Yii::$app->params['ajaxUrlRouteLot']  = $User->ssc_domain.Yii::$app->params['ajaxUrlRouteLot_key'];
-        \Yii::$app->params['ajaxUrlRouteLotDw']  = $User->ssc_domain.Yii::$app->params['ajaxUrlRouteLotDw_key'];
-        $urlArr = [
-            'baseUrl' => $User->ssc_domain,
-            'domain' => \Yii::$app->params['domain'],
-            'CANCEL_ORDER' => $baseUrl.'/api/data.aspx',
-            'ORDER_TZ' => str_replace('www.','',Yii::$app->params['ajaxUrlRouteLotDw']),
-            'SSC_INDEX' => $baseUrl.'/ssc/index.aspx',
-            'GET_BALANCE' => Yii::$app->params['ajaxUrlRouteUser'],
-            'CAPTCHA_CODE' => $User->ssc_domain.'/code2.aspx',
-        ];
-        if($url_key && $urlArr[$url_key]) return $urlArr[$url_key];
-
-        return $urlArr;
     }
 
     public static function getZjByInterval(){

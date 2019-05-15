@@ -20,6 +20,8 @@ class CqsscKcw extends BaseKj {
         2 => '希腊3分', # 6:3分
         3 => '希腊5分', # 7:5分
         4 => '希腊10分', # 8:10分
+        5 => '重庆时时彩', # 20分
+        6 => '新疆时时彩', # 20分
     ];
 
     public static function getLotteryNo($returnType = 'json'){
@@ -87,7 +89,7 @@ class CqsscKcw extends BaseKj {
         $opencode = $kjData['ResultNumber'];
         preg_match('/\d+/', $kjData['DrawDt'], $matches);
         $opentime = date('Y-m-d H:i:s', $matches[0]/1000);
-        $expect = $kjData['PeriodsNumber'];
+        $expect = substr($kjData['PeriodsNumber'], 0,8).'-'.substr($kjData['PeriodsNumber'], 8);
 
         self::setKjDataCache($expect, $kjData);
 

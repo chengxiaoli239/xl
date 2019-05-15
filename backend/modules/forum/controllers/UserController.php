@@ -6,10 +6,12 @@ use backend\models\TzSystemsAuth;
 use backend\models\TzSystemsUsers;
 use backend\service\BetService;
 use backend\service\UserService;
+use common\models\AdminModel;
 use common\service\CommonService;
 use Yii;
 use backend\models\User;
-use backend\models\searchs\User as UserSearch;
+//use backend\models\searchs\User as UserSearch;
+use backend\models\searchs\Admin as UserSearch;
 use backend\controllers\BaseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -86,6 +88,7 @@ class UserController extends BaseController
     {
         $uid = \Yii::$app->user->id;
         BetService::synUserAllBalance($uid);
+
         return $this->render('view', [
             //'model' => $this->findModel($uid),
             'models' => $this->findAllModel($uid),
@@ -205,7 +208,7 @@ class UserController extends BaseController
     protected function findModel()
     {
         $admin_id = \Yii::$app->user->id;
-        if (($model = User::findOne(['admin_id'=>$admin_id])) !== null) {
+        if (($model = AdminModel::findOne($admin_id)) !== null) {
             return $model;
         }
 

@@ -29,56 +29,39 @@ class UserService extends BaseService {
     }
 
     public static function opUser($admin_id, $action, $role){
-        $model = User::findOne(['admin_id'=>$admin_id]);
         if($action == 'add'){
-            # 添加赔率记录
-            if(!$model){
-                $User = new User();
-                $AdminModel = AdminModel::findOne($admin_id);
-                $insertData = [
-                    'admin_id'=>$admin_id,
-                    'email'=>$AdminModel->email,
-                    'account'=>$AdminModel->username,
-                    'username'=>$AdminModel->username,
-                    'created_at'=> time(),
-                    'updated_at'=> time(),
-                ];
-                $User->setAttributes($insertData);
-                $rst = $User->save();
-
-                if(!$AuthAssignment = AuthAssignment::findOne(['user_id'=>$admin_id])){
-                    $AuthAssignment = new AuthAssignment();
-                }
-                $insertData = [
-                    'item_name' => $role,
-                    'user_id'=>$admin_id,
-                    'created_at'=>time(),
-                ];
-                $AuthAssignment->setAttributes($insertData);
-                $rst = $AuthAssignment->save(false);
-
-                /*
-                $TzSystems = TzSystems::findAll([1=>1]);
-                foreach ($TzSystems as $TzSystem){
-                    $TzSystemsUsers = new TzSystemsUsers();
-                    $insertData = [
-                        'uid' => $admin_id,
-                        'tz_system_id' => $TzSystem->id,
-                        'account' => $AdminModel->username,
-                        'sys_name' => $TzSystem->name,
-                        'status' => 3, # 0 禁用 1启用 3隐藏
-                        'updated_at' => time(),
-                        'created_at' => time(),
-                    ];
-                    $TzSystemsUsers->setAttributes($insertData);
-                    $TzSystemsUsers->save();
-                }
-                */
-                //p([$insertData,$AuthAssignment->attributes,$rst,$AuthAssignment->getErrors()]);
+            if(!$AuthAssignment = AuthAssignment::findOne(['user_id'=>$admin_id])){
+                $AuthAssignment = new AuthAssignment();
             }
+            $insertData = [
+                'item_name' => $role,
+                'user_id'=>$admin_id,
+                'created_at'=>time(),
+            ];
+            $AuthAssignment->setAttributes($insertData);
+            $rst = $AuthAssignment->save(false);
+
+            /*
+            $TzSystems = TzSystems::findAll([1=>1]);
+            foreach ($TzSystems as $TzSystem){
+                $TzSystemsUsers = new TzSystemsUsers();
+                $insertData = [
+                    'uid' => $admin_id,
+                    'tz_system_id' => $TzSystem->id,
+                    'account' => $AdminModel->username,
+                    'sys_name' => $TzSystem->name,
+                    'status' => 3, # 0 禁用 1启用 3隐藏
+                    'updated_at' => time(),
+                    'created_at' => time(),
+                ];
+                $TzSystemsUsers->setAttributes($insertData);
+                $TzSystemsUsers->save();
+            }
+            */
+            //p([$insertData,$AuthAssignment->attributes,$rst,$AuthAssignment->getErrors()]);
         }else{
             # 删除用户记录
-            $rst = User::deleteRecord(['admin_id'=>$admin_id]);
+            //$rst = User::deleteRecord(['admin_id'=>$admin_id]);
             //d($rst);
         }
 

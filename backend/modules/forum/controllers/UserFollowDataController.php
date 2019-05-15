@@ -41,7 +41,7 @@ class UserFollowDataController extends BaseController
      */
     public function actionIndex()
     {
-        $account = User::findOne(['admin_id'=>Yii::$app->user->id])['account'];
+        $account = AdminModel::findOne(Yii::$app->user->id)['account'];
         //p([$account,Yii::$app->user->id]);
         $queryParams = Yii::$app->request->queryParams;
         if($account != ''){
