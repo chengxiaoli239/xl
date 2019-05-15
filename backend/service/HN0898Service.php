@@ -378,7 +378,7 @@ class HN0898Service extends BaseTZService {
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','0898投注记录-投注失败', $tzRst);
             return $tzRst;
         }
-        $time = 600;
+        $time = 1200;
         if(substr($qihao,6) == '010') $time = 60 * 60 * 10; # 十小时
         $m->set($betKey, 1, $time);
         //p($rst,0);
