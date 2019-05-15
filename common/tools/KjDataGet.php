@@ -142,7 +142,7 @@ class KjDataGet
             }
             $mkey_qihao = 'KJ_LOG_QIHAO_'.$kjConfig->lottery_type.'_'.$qihao;
             //if(!$m->get($mkey) OR ($kjConfig->lottery_type == 1 && !$m->get($mkey_qihao))){
-            if(!$m->get($mkey) ){
+            if(!$m->get($mkey_qihao) ){
                 $logArr['url'] = $url;
                 $logArr['mkey'] = $mkey;
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);

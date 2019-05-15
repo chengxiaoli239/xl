@@ -106,7 +106,7 @@ class UserService extends BaseService {
                 $setData['updated_at'] = time();
                 $setData = array_merge($setData,[
                     'uid' => $uid,
-                    'ssc_domain' => $TzSystems->ssc_domain,
+                    //'ssc_domain' => $TzSystems->ssc_domain,
                     'tz_system_id' => $tz_system_id,
                     'sys_name' => $TzSystems->name,
                     ''
