@@ -191,8 +191,8 @@ class OpKjService extends BaseService {
     /**
      * @desc 计算开奖利润数据 2019-05-04
      * @param $playway
-     * @param $codes
-     * @param string $kjData
+     * @param $codes 格式： 01234,01234,56789,56789@01234,01234,56789,X
+     * @param string $kjData 格式：3,6,3,3,5
      * @return array
      */
     public static function calcuProfits($playway, $codes, $kjData = '', $single = 0.1){
@@ -281,7 +281,7 @@ class OpKjService extends BaseService {
 
     /**
      * @desc 开奖处理，主要判断四字定位
-     * @param string $codes
+     * @param string $codes 格式： 01234,01234,56789,56789@01234,01234,56789,X
      * @param $kjData
      * @return array
      */

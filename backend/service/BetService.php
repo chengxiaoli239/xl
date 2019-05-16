@@ -8,6 +8,7 @@
 
 namespace backend\service;
 
+use backend\models\LotteryType;
 use backend\models\User;
 use Yii;
 use backend\models\BettingRecords;
@@ -700,6 +701,35 @@ abstract class BetService extends BaseBetService {
         !$playway && $playway = 3;
 
         return $playway;
+    }
+
+    /**
+     * @desc 获取投注缓存时间，一般为开奖时间频率
+     * @param int $lottery_type
+     * @param $qihao
+     * @return float|int|string
+     */
+    public static function getBetCacheTime($lottery_type = 2, $qihao){
+        $lottery = LotteryType::findOne(['lottery_type'=>$lottery_type]);
+        $cacheTime = $lottery->data_ftime;
+        switch ($lottery_type){
+            case 1: # 希腊1.5分彩
+                break;
+            case 2: # 希腊3分彩
+                break;
+            case 3: # 希腊5分彩
+                break;
+            case 4: # 希腊10分彩
+                break;
+                if(substr($qihao,6) == '01') $cacheTime = 60 * 60 * 8 + 10 * 60; # 8小时20分
+            case 5: # 重庆时时彩
+                if(substr($qihao,6) == '010') $cacheTime = 60 * 60 * 4; # 4小时
+                break;
+            case 6: # 新疆时时彩
+                break;
+        }
+
+        return $cacheTime ? $cacheTime : 1200;
     }
 
     /**

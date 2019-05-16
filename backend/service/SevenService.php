@@ -276,8 +276,7 @@ class SevenService extends BaseTZService {
 
         if(in_array($tz_type, [20,23])){
             # 和值投注反应时间比较久，无需返回直接锁住
-            $time = 60*18;
-            if(substr($qihao,6) == '010') $time = 60 * 60 * 4; # 十小时
+            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);
         }
         # 真实投注
@@ -295,8 +294,8 @@ class SevenService extends BaseTZService {
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
             return $tzRst;
         }
-        $time = 1200;
-        if(substr($qihao,6) == '023') $time = 60 * 60 * 10; # 十小时
+
+        $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
         $m->set($betKey, 1, $time);
 
         //p($rst,0);

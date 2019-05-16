@@ -221,6 +221,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::calculate2bProfits(); p($rst);
+        $rst = NumService::filterLaterCodesAnd2bcode(5, $qihao = '190516056');p($rst);
+        $rst = NumService::getRecentlyCodes(5);p($rst);
         $rst = TzService::insertSscDataTime(5); p($rst);
         $rst = UserSysPlansService::userSysPlanChange(2);p($rst);
         $rst = StaticService::getYlByCodes('02468,13579,X,X', 2, 18);p($rst);

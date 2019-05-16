@@ -1293,6 +1293,37 @@ class StaticService extends BaseService {
    }
 
 
+    /**
+     * @desc 计算两兄弟利润
+     * @param int $lottery_type
+     * @return float
+     */
+   public static function calculate2bProfits($lottery_type = 5, $start_date = '2019-03-20', $end_date = '2019-03-30', $filterNums = 1000){
+       $profits = 0.00;
+
+       $m = \Yii::$app->cache;
+       $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>=', 'date', $start_date], ['<=', 'date', $end_date]];
+       $SscKjDatas = SscKjData::find()->where($where)->orderBy(['id'=>SORT_DESC])->all();
+       foreach ($SscKjDatas as $SscKjData){
+           $qihao = $SscKjData->qihao;
+           $mkey_profits = 'PROFITS_2B_'.$lottery_type.'_'.$qihao.'_'.$filterNums;
+           if(!$profitsData = $m->get($mkey_profits)){
+               $mkey_buyCodes = 'buyCodes_'.$lottery_type.'_'.$qihao;
+               if(!$buyCodes = $m->get($mkey_buyCodes)){
+                   $buyCodes = NumService::filterLaterCodesAnd2bcode($lottery_type, $qihao, $filterNums);
+                   $m->set($mkey_buyCodes, $buyCodes, 30*24*3600);
+               }
+               $codes = implode('@', $buyCodes);
+
+               $profitsData = OpKjService::calcuProfits(3, $codes, $SscKjData->code_str, 0.1);
+               $m->set($mkey_profits, $profitsData, 30*24*3600);
+           }
+           $profits += $profitsData['profits'];
+       }
+
+       return $profits;
+   }
+
 
 
 
