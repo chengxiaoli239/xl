@@ -36,16 +36,16 @@ class BaseKj{
     }
 
     /**
-     * @param $qihao 格式：20190125-030
+     * @param $qihao string 格式：20190125-030
      * @param $kjData
      */
-    public static function setKjDataCache($qihao, $kjData){
+    public static function setKjDataCache($lottery_type = 2, $qihao, $kjData){
         $m = \Yii::$app->cache;
 
         $str = substr($qihao, 2, 10);
         $setQihao = str_replace('-', '',$str);
         if($kjData['opencode']){
-            $mkey = 'KJ_DATA_QIHAO_KEY_'.$setQihao;
+            $mkey = 'KJ_DATA_QIHAO_KEY_'.$lottery_type.'_'.$setQihao;
             $m->set($mkey, $kjData, 10*60);
         }
 

@@ -359,6 +359,7 @@ class HN0898Service extends BaseTZService {
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
         if(in_array($tz_type, [20,23])){
+
             # 和值投注反应时间比较久，无需返回直接锁住
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);

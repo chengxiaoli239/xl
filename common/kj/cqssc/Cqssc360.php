@@ -28,7 +28,7 @@ class Cqssc360 extends BaseKj {
         $opencode = $kjData['opencode'];
 
         # 设置开奖数据缓存
-        self::setKjDataCache($expect, $kjData);
+        self::setKjDataCache($lotter_type =5, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");

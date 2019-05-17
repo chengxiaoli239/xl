@@ -12,7 +12,7 @@ class CqsscSevenDay extends BaseKj {
     public static function getLotteryNo($returnType = 'json'){
 
         if(!$kjData = self::getCurrentKjData()){
-            $url='https://7t15.com/kaijiang/list.aspx?lot=ssc';
+            $url='https://7t32.com/kaijiang/list.aspx?lot=ssc';
             //$content = file_get_contents($url);
             $content = CurlService::httpGet($url);
             $preg = "/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/ism"; // 这里是表达式，大神看看
@@ -35,7 +35,7 @@ class CqsscSevenDay extends BaseKj {
         $expect = $kjData['expect'];
 
         # 设置开奖数据缓存
-        self::setKjDataCache($expect, $kjData);
+        self::setKjDataCache($lottery_type = 5, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
@@ -76,7 +76,7 @@ class CqsscSevenDay extends BaseKj {
         $expect = $kjData['expect'];
 
         # 设置开奖数据缓存
-        self::setKjDataCache($expect, $kjData);
+        self::setKjDataCache($lottery_type = 5, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");

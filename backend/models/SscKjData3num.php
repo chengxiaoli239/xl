@@ -36,7 +36,6 @@ class SscKjData3num extends \common\models\base\BaseModel
             [['qihao', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
             [['code_str', 'code_3n'], 'string', 'max' => 24],
-            [['qihao'], 'unique'],
         ];
     }
 

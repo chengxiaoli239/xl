@@ -27,7 +27,7 @@ abstract class BetService extends BaseBetService {
     protected $_nowTime = null;    // 当前时间戳
     protected $_operateTime = null;    // 当前时间戳的格式
     protected $_baseUrl = '';    // 当前时间戳的格式
-    public static $maxQihaoArr = [1=>960, 2=>480, 3=>288, 4=>144]; # $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
+    public static $maxQihaoArr = [1=>960, 2=>480, 3=>288, 4=>144, 5=>59, 6=>48]; # $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
 
     protected function __construct() {
         parent::__construct();

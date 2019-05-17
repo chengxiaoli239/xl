@@ -45,7 +45,7 @@ class CqsscKcw extends BaseKj {
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
 
-        self::setKjDataCache($expect, $kjData);
+        self::setKjDataCache($lottery_type = 5, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
@@ -69,9 +69,8 @@ class CqsscKcw extends BaseKj {
      */
     public static function getLotteryNoXl($lotteryId = 2, $returnType = 'json' ){
 
-        //if(!$kjData = self::getCurrentKjData()) {
-        if(true) {
-            sleep(3);
+        if(!$kjData = self::getCurrentKjData()) {
+            //sleep(3);
             //$lotteryId = self::$lotteryTypeArr[$type];
             $url = 'http://greeceloto.com/home/GetNumbers?lotteryId='.$lotteryId.'&pageNmuber=1&number=3&_=1556344774304';
             //$content = file_get_contents($url);
@@ -91,7 +90,8 @@ class CqsscKcw extends BaseKj {
         $opentime = date('Y-m-d H:i:s', $matches[0]/1000);
         $expect = substr($kjData['PeriodsNumber'], 0,8).'-'.substr($kjData['PeriodsNumber'], 8);
 
-        self::setKjDataCache($expect, $kjData);
+        $lottery_type = $lotteryId;
+        self::setKjDataCache($lottery_type, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");

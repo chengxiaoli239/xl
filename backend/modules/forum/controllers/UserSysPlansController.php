@@ -126,7 +126,7 @@ class UserSysPlansController extends BaseController
             $this->_post['UserSysPlans']['updated_at'] = time();
         }
         if ($model->load($this->_post) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
         $model->tz_sites = explode(',', $model->tz_sites);

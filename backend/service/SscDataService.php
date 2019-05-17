@@ -78,7 +78,7 @@ class SscDataService extends BaseService {
 
     /**
      * @desc 更新单双
-     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
+     * @param $lottery_type integer 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return bool
      */
     public static function updateDsData($lottery_type = 2){
@@ -125,9 +125,12 @@ class SscDataService extends BaseService {
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
         $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
 
+        //p([$next_qihao, $last_qihao, $qihao, $lottery_type],0);
+
         if($next_qihao<=$last_qihao){
             $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
             $flag = SscDataService::insertSscKjData3Num($new_qihao, $lottery_type);
+            p($flag);
             $m->set($mkey, $new_qihao, 7*24*3600);
         }
 
@@ -202,13 +205,13 @@ class SscDataService extends BaseService {
      * @desc 添加和值区间统计记录
      * @param int $interval
      */
-    public static function insertSscDwsHzNums($interval = 20, $qihao = '', $id = ''){
+    public static function insertSscDwsHzNums($lottery_type = 2, $interval = 20, $qihao = '', $id = ''){
         //p([$interval, $qihao, $id],0);
         $zuHes = [ [1,2], [1,3], [1,4], [2,3], [2,4], [3,4] ];
         # 每期记录前多少期的和值统计
         $numsArr = [6,7,8,9,10,11,12];  // [8,9,10,11,12,13];  // 和值
         //$newRecord = SscKjData::find()->select(['qihao','code_str'])->orderBy('id DESC')->asArray()->limit(1)->one();
-        $last_id = SscDataService::getKjDataStartId($interval, $qihao);
+        $last_id = SscDataService::getKjDataStartId($lottery_type, $interval, $qihao);
         //p($last_id,0);
         foreach ($zuHes as $key => $zuHe) {
             $position = implode(',', $zuHe);
@@ -248,11 +251,11 @@ class SscDataService extends BaseService {
      * @description 给定期数获取起始id
      * @param int $interval
      */
-    public static function getKjDataStartId($interval = 200, $qihao = ''){
+    public static function getKjDataStartId($lottery_type = 2, $interval = 200, $qihao = ''){
         if($qihao){
-            $last_id = SscKjData::find()->select(['id'])->where(['qihao'=>$qihao])->asArray()->one()['id'];
+            $last_id = SscKjData::find()->select(['id'])->where(['qihao'=>$qihao, 'lottery_type'=>$lottery_type])->asArray()->one()['id'];
         }else{
-            $last_id = SscKjData::find()->select(['max(id) as last_id'])->asArray()->one()['last_id'];
+            $last_id = SscKjData::find()->select(['max(index_id) as last_id', 'lottery_type'=>$lottery_type])->asArray()->one()['last_id'];
         }
         $start_id = $last_id - $interval;
 
@@ -265,6 +268,16 @@ class SscDataService extends BaseService {
      */
     public static function getKjDataLastId($lottery_type = 2){
         $last_id = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['max(id) as last_id'])->asArray()->one()['last_id'];
+
+        return $last_id;
+    }
+
+    /**
+     * @description 最后顺序id
+     * @param int $interval
+     */
+    public static function getKjDataLastIndexId($lottery_type = 2){
+        $last_id = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['max(index_id) as index_id'])->asArray()->one()['index_id'];
 
         return $last_id;
     }
@@ -401,11 +414,11 @@ class SscDataService extends BaseService {
     public static function getDwHistoryMiss($num, $position, $recently = 200){
         $times = 0;
         $field = 'code_'.str_replace(',','_',$position);
-        $last = SscKjData::find()->select(['max(id) as last_id'])->asArray()->one();
+        $last = SscKjData::find()->select(['max(index_id) as last_id'])->asArray()->one();
         $min_id = $last['last_id'] - $recently - 1;
         $where = ['AND',['=',$field,$num],['>','id', $min_id]];
         //$where = "$field=$num AND id>$min_id";
-        $SscKjData = SscKjData::find()->select(['id','qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
+        $SscKjData = SscKjData::find()->select(['id', 'index_id','qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
         if(count($SscKjData)>1){
             $times = $SscKjData[0]->id - $SscKjData[1]->id - 1;  // 上次遗漏次数
         }
@@ -415,7 +428,7 @@ class SscDataService extends BaseService {
         if(count($tmpKjData) > 2){
             foreach($tmpKjData as $key=>$r){
                 if($key == 0) continue;
-                $range[$tmpKjData[$key-1]['id']."_".$tmpKjData[$key]['id']] = $tmpKjData[$key-1]['id'] - $tmpKjData[$key]['id'] - 1;
+                $range[$tmpKjData[$key-1]['index_id']."_".$tmpKjData[$key]['index_id']] = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
             }
 
             $max_miss = max($range);
@@ -588,7 +601,7 @@ class SscDataService extends BaseService {
     public static function getDsHistoryMiss($num, $position, $lottery_type = 2, $recently = 472){
         //if(!is_array($num)) $num = [ $num ];
         $last_times = 0;
-        $last = SscKjDataDs::find()->where(['lottery_type'=>$lottery_type])->select(['max(id) as last_id'])->asArray()->one();
+        $last = SscKjDataDs::find()->where(['lottery_type'=>$lottery_type])->select(['max(index_id) as last_id'])->asArray()->one();
         $min_id = $last['last_id'] - $recently - 1;
 
         $field = 'code_'.str_replace(',','_',$position);
@@ -598,9 +611,9 @@ class SscDataService extends BaseService {
             $where = ['AND', ['=', $field, $num],['>', 'id', $min_id], ['=', 'lottery_type', $lottery_type]];
         }
         //$where = "$field=$num AND id>$min_id";
-        $SscKjDataDs = SscKjDataDs::find()->select(['id','qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
+        $SscKjDataDs = SscKjDataDs::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
         if(count($SscKjDataDs)>1){
-            $last_times = $SscKjDataDs[0]->id - $SscKjDataDs[1]->id - 1;  // 上次遗漏次数
+            $last_times = $SscKjDataDs[0]->index_id - $SscKjDataDs[1]->index_id - 1;  // 上次遗漏次数
         }
 
         # 最大遗漏期间计算 start
@@ -608,7 +621,7 @@ class SscDataService extends BaseService {
         if(count($tmpKjData) > 2){
             foreach($tmpKjData as $key=>$r){
                 if($key == 0) continue;
-                $range[$tmpKjData[$key-1]['id']."_".$tmpKjData[$key]['id']] = $tmpKjData[$key-1]['id'] - $tmpKjData[$key]['id'] - 1;
+                $range[$tmpKjData[$key-1]['index_id']."_".$tmpKjData[$key]['index_id']] = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
             }
 
             $max_miss = max($range);
@@ -649,14 +662,14 @@ class SscDataService extends BaseService {
      */
     public static function getSdHzYlHistoryMiss($zuHes, $lottery_type = 2, $recently = 250){
         $last_times = 0;
-        $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['max(id) as last_id'])->asArray()->one();
+        $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['max(index_id) as last_id'])->asArray()->one();
         $min_id = $last['last_id'] - $recently - 1;
 
         $where = ['AND', ['IN', 'codes_4nums_hz', $zuHes], ['>=', 'id', $min_id]];
-        $SscKjData = SscKjData::find()->select(['id','qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
+        $SscKjData = SscKjData::find()->select(['id','index_id','qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
         //p([$zuHes, $last, $SscKjData[0]->id, $SscKjData[1]->id]);
         if(count($SscKjData)>1){
-            $last_times = $SscKjData[0]->id - $SscKjData[1]->id - 1;  // 上次遗漏次数
+            $last_times = $SscKjData[0]->index_id - $SscKjData[1]->index_id - 1;  // 上次遗漏次数
         }
         //p($SscKjData);
 
@@ -665,7 +678,7 @@ class SscDataService extends BaseService {
         if(count($tmpKjData) > 2){
             foreach($tmpKjData as $key=>$r){
                 if($key == 0) continue;
-                $range[$tmpKjData[$key-1]['id']."_".$tmpKjData[$key]['id']] = $tmpKjData[$key-1]['id'] - $tmpKjData[$key]['id'] - 1;
+                $range[$tmpKjData[$key-1]['index_id']."_".$tmpKjData[$key]['index_id']] = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
             }
 
             $max_miss = max($range);
@@ -709,7 +722,7 @@ class SscDataService extends BaseService {
      */
     public static function get3NumHistoryMiss($num, $lottery_type = 1, $recently = 1000){
         $last_times = 0;
-        $last = SscKjData3num::find()->where(['lottery_type'=>$lottery_type])->select(['max(id) as last_id'])->asArray()->one();
+        $last = SscKjData3num::find()->where(['lottery_type'=>$lottery_type])->select(['max(index_id) as last_id'])->asArray()->one();
         $min_id = $last['last_id'] - $recently - 1;
         $m = \Yii::$app->cache;
         $key = 'get3NumHistoryMiss_ID_'.$min_id;
@@ -863,7 +876,6 @@ class SscDataService extends BaseService {
         }
 
         $opData['qihao'] = $qihao;
-        $opData['lottery_type'] = $lottery_type;
         $opData['code_str'] = $SscKjData['code_str'];
         $opData['date'] = $SscKjData['date'];
         $opData['lottery_type'] = $lottery_type;
@@ -1167,7 +1179,7 @@ class SscDataService extends BaseService {
         //$rst[$interval] = SscDataService::dsYLStatic($interval);
         foreach ($updateDsDatas as $Data){
             $zuHes = explode(',', $Data['val']);
-            $where = ['val'=>$Data['val'], 'lottery_type'=>$lottery_type];
+            $where = [ 'AND',[ '=', 'val', $Data['val']], ['=', 'lottery_type', $lottery_type] ];
 
             if(!$SscSdHzYl = SscSdHzYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->one()){
                 $SscSdHzYl = new SscSdHzYl();
@@ -1180,7 +1192,7 @@ class SscDataService extends BaseService {
             //$SscDsYl->zhi = (string)$num;
             $qishu = SscDataService::getQishus();
             $SscSdHzYl->theory_nums_perdate = (string)round(($Num4Type['count']*$qishu*0.1) / 995, 2); # 理论次数/天
-            $SscSdHzYl->today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where(['date'=>date('Y-m-d'),'codes_4nums_hz'=>$zuHes])->asArray()->one()['nums'];
+            $SscSdHzYl->today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where(['date'=>date('Y-m-d'),'codes_4nums_hz'=>$zuHes, 'lottery_type'=>$lottery_type])->asArray()->one()['nums'];
 
             $SscSdHzYl->updated_at = time();
             $miss = SscDataService::getSdHzYlHistoryMiss($zuHes, $lottery_type, $SscSdHzYl->static_nums);
@@ -1193,6 +1205,7 @@ class SscDataService extends BaseService {
             $SscSdHzYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
             $SscSdHzYl->history_max_miss = max($miss['current_times'],$SscSdHzYl->max_miss,$SscSdHzYl->history_max_miss); // 6、历史最大遗漏
             $SscSdHzYl->status = $Data['status']; // 7、前台显示状态
+            $SscSdHzYl->lottery_type = $lottery_type; // 彩种类型
             $SscSdHzYl->update_time = date('Y-m-d H:i:s');
             $rst = $SscSdHzYl->save();
             if(!$rst){

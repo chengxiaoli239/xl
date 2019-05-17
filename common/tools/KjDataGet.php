@@ -218,7 +218,10 @@ class KjDataGet
 
         if(!$kjDatas) return false;
         if (!$SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type])) {
+            $lastIndexId = SscDataService::getKjDataLastIndexId($lottery_type);
             $SscKjData = new SscKjData();
+            $index_id = $lastIndexId + 1;
+            $insertData = array_merge($insertData, ['index_id'=>$index_id]);
         }
         $insertRst = $SscKjData->setAttributes($insertData);
         if (!$SscKjData->save()) {

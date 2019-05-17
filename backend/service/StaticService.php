@@ -97,7 +97,8 @@ class StaticService extends BaseService {
      */
     public static function opStaticProfits($lottery_type = 2 ){
         $m = \Yii::$app->cache;
-        $mkey = 'OP_STATIC_PROFITS_ID_19_'.$lottery_type;
+        $qihao = HN0898Service::getQihao($lottery_type);
+        $mkey = 'OP_STATIC_PROFITS_ID_19_'.$lottery_type.'_'.$qihao;
         if(!$id = $m->get($mkey)) $id = 0;
         $where = ['AND', ['>', 'id', $id], ['=', 'lottery_type', $lottery_type]];
         $BettingRecords = BettingRecords::find()->where($where)->orderBy(['id'=>SORT_ASC])->limit(50)->all();
@@ -128,6 +129,7 @@ class StaticService extends BaseService {
             }
             $time = 10 * 60; # 10分钟
             if(substr($bettingRecord->qihao,6) == '023') $time = 60*60*10; # 十小时
+            //$cacheTime = BetService::
             $m->set($mkey, $bettingRecord->id, $time);
         }
 
