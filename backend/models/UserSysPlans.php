@@ -7,7 +7,9 @@ use Yii;
 /**
  * This is the model class for table "{{%user_sys_plans}}".
  *
- * @property string $id
+ * @property int $id
+ * @property int $is_parent 是否是父id
+ * @property string $children_plan_id 子计划id
  * @property int $uid 用户id
  * @property string $account 账号名称
  * @property int $playway 投注方式:1二字定2三字定3四字定
@@ -20,6 +22,7 @@ use Yii;
  * @property int $nums 默认投注注数
  * @property int $sel_same 是否含上次一样的号码
  * @property int $is_custom 是否智能切换购买方向
+ * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -47,10 +50,11 @@ class UserSysPlans extends \common\models\base\BaseModel
     public function rules()
     {
         return [
+            [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['uid', 'account', 'created_at', 'updated_at'], 'required'],
-            [['uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'created_at', 'updated_at'], 'integer'],
             [['single'], 'number'],
             [['update_time'], 'safe'],
+            [['children_plan_id'], 'string', 'max' => 255],
             [['account', 'tz_sites'], 'string', 'max' => 24],
             [['hz_Arr'], 'string', 'max' => 120],
         ];
@@ -62,22 +66,25 @@ class UserSysPlans extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'uid' => Yii::t('app', '用户id'),
-            'account' => Yii::t('app', '账号名称'),
-            'playway' => Yii::t('app', '投注方式:1二字定2三字定3四字定'),
-            'status' => Yii::t('app', '状态:0关闭1开启'),
-            'single' => Yii::t('app', '投注倍数(元/注)'),
-            'tz_type' => Yii::t('app', '投注类型:1大小单双三字定2大小三字定3单双三字定'),
-            'buy_type' => Yii::t('app', '购买方向:0反买1正买'),
-            'tz_sites' => Yii::t('app', '计划投注站点，lt_tz_systems.id'),
-            'hz_Arr' => Yii::t('app', '扩展【部分投注】'),
-            'nums' => Yii::t('app', '默认投注注数'),
-            'sel_same' => Yii::t('app', '是否含上次一样的号码'),
-            'is_custom' => Yii::t('app', '是否智能切换购买方向'),
-            'created_at' => Yii::t('app', '创建时间'),
-            'updated_at' => Yii::t('app', '更新时间'),
-            'update_time' => Yii::t('app', '更新时间'),
+            'id' => 'ID',
+            'is_parent' => '是否是父id',
+            'children_plan_id' => '子计划id',
+            'uid' => '用户id',
+            'account' => '账号名称',
+            'playway' => '投注方式:1二字定2三字定3四字定',
+            'status' => '状态:0关闭1开启',
+            'single' => '投注倍数(元/注)',
+            'tz_type' => '投注类型:1大小单双三字定2大小三字定3单双三字定',
+            'buy_type' => '购买方向:0反买1正买',
+            'tz_sites' => '计划投注站点，lt_tz_systems.id',
+            'hz_Arr' => '扩展【部分投注】',
+            'nums' => '默认投注注数',
+            'sel_same' => '是否含上次一样的号码',
+            'is_custom' => '是否智能切换购买方向',
+            'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分',
+            'created_at' => '创建时间',
+            'updated_at' => '更新时间',
+            'update_time' => '更新时间',
         ];
     }
 
@@ -90,3 +97,4 @@ class UserSysPlans extends \common\models\base\BaseModel
         return new UserSysPlansQuery(get_called_class());
     }
 }
+

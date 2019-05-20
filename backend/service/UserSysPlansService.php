@@ -9,12 +9,10 @@
 
 namespace backend\service;
 use backend\models\SscDsYl;
-use backend\models\SscKjData;
 use backend\models\SysPlansCodes;
 use backend\models\TzSystemsAuth;
 use backend\models\TzTypes;
 use backend\models\UserCustomPlans;
-use backend\models\UserSysPlans;
 use common\models\AdminModel;
 use yii\helpers\ArrayHelper;
 use  yii;
@@ -36,12 +34,55 @@ class UserSysPlansService extends BaseService {
             $playway = BetService::getPlaywayByTzType($tz_type);
             $post['UserSysPlans']['playway'] = $playway;
         }
+        //p($post);
         //p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id]);
         $User = AdminModel::findOne($user_id);
         $post['UserSysPlans']['tz_sites'] = implode(',',$post['UserSysPlans']['tz_sites']);
         //p($post['UserSysPlans']['hz_Arr']);
-        if($playway == 6){
+        if($playway == 6) {
             $post['UserSysPlans']['hz_Arr'] = str_replace('，', ',', $post['UserSysPlans']['hz_Arr']);
+        }elseif ($tz_type == 25){
+            # 快选过滤
+            $UserSysPlans = $post['UserSysPlans'];
+            # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
+            $tmpFilter = [];
+            # 1、双重
+            if($UserSysPlans['type_2'] && count($UserSysPlans['type_2']) == 1){
+                $tmpFilter['type_2'] = $UserSysPlans['type_2'][0];
+            }
+            unset($post['UserSysPlans']['type_2']);
+            # 2、三重
+            if($UserSysPlans['type_3'] && count($UserSysPlans['type_3']) == 1){
+                $tmpFilter['type_3'] = $UserSysPlans['type_3'][0];
+            }
+            unset($post['UserSysPlans']['type_3']);
+            # 3、四重
+            if($UserSysPlans['type_4'] && count($UserSysPlans['type_4']) == 1){
+                $tmpFilter['type_4'] = $UserSysPlans['type_4'][0];
+            }
+            unset($post['UserSysPlans']['type_4']);
+            # 4、双双重
+            if($UserSysPlans['type_22'] && count($UserSysPlans['type_22']) == 1){
+                $tmpFilter['type_22'] = $UserSysPlans['type_22'][0];
+            }
+            unset($post['UserSysPlans']['type_22']);
+            # 5、两兄弟
+            if($UserSysPlans['type_2b'] && count($UserSysPlans['type_2b']) == 1){
+                $tmpFilter['type_2b'] = $UserSysPlans['type_2b'][0];
+            }
+            unset($post['UserSysPlans']['type_2b']);
+            # 6、三兄弟
+            if($UserSysPlans['type_3b'] && count($UserSysPlans['type_3b']) == 1){
+                $tmpFilter['type_3b'] = $UserSysPlans['type_3b'][0];
+            }
+            unset($post['UserSysPlans']['type_3b']);
+            # 7、四兄弟
+            if($UserSysPlans['type_4b'] && count($UserSysPlans['type_4b']) == 1){
+                $tmpFilter['type_4b'] = $UserSysPlans['type_4b'][0];
+            }
+            unset($post['UserSysPlans']['type_4b']);
+            $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
+            //p($post);
         }else{
             $hz_Arr = $post['UserSysPlans']['hz_Arr'];
             if(is_array($hz_Arr)) { # Array 和值打法，多个和值
@@ -227,100 +268,6 @@ class UserSysPlansService extends BaseService {
         }
 
         return $nums;
-    }
-
-    /**
-     * @desc 计划方案倍数、投注号码或者投注状态修改
-     * @param int $lottery_type
-     * @return array
-     */
-    public static function userSysPlanChange($lottery_type = 2){
-        $rst = ['status'=>300, 'msg'=>'投注方案修改成功'];
-        //$kjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one();
-        //$qihao = $kjData->qihao;
-        $singleArr = [0=>1, 1=>2, 2=>3, 3=>4, 4=>5, 5=>6, 6=>7, 7=>8, 8=>9];
-        $qihao = HN0898Service::getQihao($lottery_type);
-        $m = \Yii::$app->cache;
-        $mkey = 'userSysPlanChange_'.$lottery_type.'_'.$qihao;
-        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'倍数修改计划已经处理完成[lottery_type:'.$lottery_type.',期号:'.$qihao.']'];
-        $UserSysPlans = UserSysPlans::find()->where(['tz_type'=>18, 'status'=>1, 'is_parent'=>1, 'lottery_type'=>$lottery_type])->all(); # 一字定 倍数切换方案
-
-        foreach ($UserSysPlans as $UserSysPlan){
-            if(!$UserSysPlan->children_plan_id) continue;
-            $ids = explode(',', $UserSysPlan->children_plan_id);
-
-            $yls = [];
-            foreach ($ids as $id){
-                $plan = UserSysPlans::findOne($id);
-                $codes = BetService::getPlansAllCodesType1($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr);
-                $yl = StaticService::getYlByCodes($codes, $lottery_type, $plan->tz_type);
-                $key = array_search($plan->single, $singleArr);
-
-                $yls[] = ['id'=>$id, 'yl'=>$yl, 'codes'=>$codes, 'old_yl'=>$key, 'current_single'=>$plan->single];
-            }
-            /*
-            $yls = [
-                ['id'=>3, 'yl'=>6, 'old_yl'=>5, 'current_single'=>6],
-                ['id'=>4, 'yl'=>0, 'old_yl'=>0, 'current_single'=>1],
-            ];
-            */
-            //p($yls,0);
-
-            # 比如：02579头14683头，每盘两组都买,不中哪组就翻倍买;翻倍那组中了就从头两组都买1块 或 连续翻倍不中8盘,两组就重新开始1块钱起步
-            if(
-                ($yls[0]['yl']>=8 OR $yls[1]['yl']>=8) # 连续翻倍不中8盘,两组就重新开始1块钱起步
-                OR ( ($yls[0]['yl']==0 && $yls[0]['old_yl']>0) OR ($yls[1]['yl']==0 && $yls[1]['old_yl']>0) ) # 翻倍那组中了就从头两组都买1块
-            ){
-                //p('sklfjadslf');
-                $rows = [];
-                foreach ($yls as $key=>$yl8){
-                    $rows[] = ['id'=>$yl8['id'], 'single'=>$singleArr[0]];
-                }
-            //}elseif (($yls[0]['yl']==0 && $yls[0]['old_yl']>0) OR ($yls[1]['yl']==0 && $yls[1]['old_yl']>0)){ # 翻倍那组中了就从头两组都买1块
-            }elseif ($yls[0]['yl']==0 && $yls[1]['yl']>1){
-                //p('yyyyyyyyyyy');
-                //$key = array_search($yls[1]['current_single'], $singleArr);
-                $key_s = $yls[1]['yl'];
-                $single = $singleArr[$key_s];
-                $rows = [
-                    ['id'=>$yls[0]['id'], 'single'=>$singleArr[0]],
-                    ['id'=>$yls[1]['id'], 'single'=>$yls[0]['old_yl']>=1?1:$single],
-                ];
-            }elseif ($yls[1]['yl']==0 && $yls[0]['yl']>1) {
-                //p('lllllllllllllll');
-                //$key = array_search($yls[0]['current_single'], $singleArr);
-                //p([$yls[1]['current_single'], $key,$singleArr], 0);
-                $key_s = $yls[0]['yl'];
-                $single = $singleArr[$key_s];
-                $rows = [
-                    ['id' => $yls[0]['id'], 'single'=>$yls[1]['old_yl']>=1?1:$single],
-                    ['id' => $yls[1]['id'], 'single'=>$singleArr[0]],
-                ];
-            }else{
-                //p('kkkkkkkkkk',0);
-                $rows = [
-                    ['id' => $yls[0]['id'], 'single'=>$singleArr[0]],
-                    ['id' => $yls[1]['id'], 'single'=>$singleArr[0]],
-                ];
-            }
-            //p($rows,0);
-
-            $hz_Arr_str = '';
-            foreach ($rows as $row){
-                $plan = UserSysPlans::findOne($row['id']);
-                $plan->single = $row['single'];
-                $hz_Arr_str .= $plan->hz_Arr.':'.$plan->single.'|';
-                $plan->save();
-            }
-
-            $UserSysPlan->hz_Arr = rtrim($hz_Arr_str, '|');
-            $UserSysPlan->save();
-        }
-        $rst['rows'] = $rows;
-        $m->set($mkey, 1, 60);
-
-        //p($rows);
-        return $rst;
     }
 
 }
