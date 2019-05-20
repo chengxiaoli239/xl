@@ -116,6 +116,8 @@ class UserSysPlansController extends BaseController
     {
         $model = $this->findModel($id);
 
+        UserSysPlansService::preOpData($this->_post, $this->_user_id);
+        /*
         if($this->_post){
             $this->_post['UserSysPlans']['tz_sites'] = implode(',',$this->_post['UserSysPlans']['tz_sites']);
             if(is_array($this->_post['UserSysPlans']['hz_Arr'])){
@@ -125,13 +127,20 @@ class UserSysPlansController extends BaseController
             }
             $this->_post['UserSysPlans']['updated_at'] = time();
         }
+        */
         if ($model->load($this->_post) && $model->save()) {
+            //return $this->redirect(['view', 'id' => $model->id]);
             return $this->redirect(['index']);
         }
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
         $model->tz_sites = explode(',', $model->tz_sites);
         if(in_array($model->tz_type, [20, 22])){ # 和值、四定单双
             $model->hz_Arr = explode(',', $model->hz_Arr);
+        }elseif ($model->tz_type == 25){
+            $hz_Arr_Data = json_decode($model->hz_Arr, true);
+            foreach ($hz_Arr_Data as $key=>$val){
+                $model->$key[] = $val;
+            }
         }
 
         $data =  [
@@ -168,7 +177,6 @@ class UserSysPlansController extends BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $rst = BetService::userSysPlansTzNow($id, $this->_user_id);
-        //p($rst);
 
         return $this->redirect(['/forum/betting-records/index']);
     }
