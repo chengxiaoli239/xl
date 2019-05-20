@@ -18,7 +18,7 @@ use Yii;
  * @property string $shortName
  * @property string $info
  * @property string $onGetNoed 请求当前期号时后置事件函数
- * @property string $data_ftime 开奖前停止下注时间
+ * @property int $data_ftime 开奖时间频率(s)
  * @property int $defaultViewGroup 默认显示哪个玩法组
  * @property int $android
  * @property int $num 彩种期数
@@ -57,22 +57,31 @@ class LotteryType extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'type' => Yii::t('app', '1重庆时时彩2七星彩3排列三4排列五5福彩3D'),
-            'enable' => Yii::t('app', 'Enable'),
-            'isDelete' => Yii::t('app', 'Is Delete'),
-            'sort' => Yii::t('app', 'Sort'),
-            'name' => Yii::t('app', 'Name'),
-            'codeList' => Yii::t('app', '彩票可选号码列表，用半角逗号分隔'),
-            'title' => Yii::t('app', 'Title'),
-            'shortName' => Yii::t('app', 'Short Name'),
-            'info' => Yii::t('app', 'Info'),
-            'onGetNoed' => Yii::t('app', '请求当前期号时后置事件函数'),
-            'data_ftime' => Yii::t('app', '开奖前停止下注时间'),
-            'defaultViewGroup' => Yii::t('app', '默认显示哪个玩法组'),
-            'android' => Yii::t('app', 'Android'),
-            'num' => Yii::t('app', '彩种期数'),
-            'typeGroupName' => Yii::t('app', '彩种分类名称'),
+            'id' => 'ID',
+            'type' => '1重庆时时彩2七星彩3排列三4排列五5福彩3D',
+            'enable' => 'Enable',
+            'isDelete' => 'Is Delete',
+            'sort' => 'Sort',
+            'name' => 'Name',
+            'codeList' => '彩票可选号码列表，用半角逗号分隔',
+            'title' => 'Title',
+            'shortName' => 'Short Name',
+            'info' => 'Info',
+            'onGetNoed' => '请求当前期号时后置事件函数',
+            'data_ftime' => '开奖时间频率(s)',
+            'defaultViewGroup' => '默认显示哪个玩法组',
+            'android' => 'Android',
+            'num' => '彩种期数',
+            'typeGroupName' => '彩种分类名称',
         ];
+    }
+
+    /**
+     * @inheritdoc
+     * @return LotteryTypeQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new LotteryTypeQuery(get_called_class());
     }
 }
