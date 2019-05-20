@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "{{%ssc_kj_data_ds}}".
  *
  * @property int $id
+ * @property int $index_id 顺序id
  * @property string $code_str 开奖号码str
  * @property int $code_1 1位
  * @property int $code_2 2位
@@ -47,7 +48,7 @@ class SscKjDataDs extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['code_1', 'code_2', 'code_3', 'code_4', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'code_1_2_3', 'code_1_2_4', 'code_1_3_4', 'code_2_3_4', 'code_1_2_3_4', 'lottery_type', 'qihao', 'created_at', 'updated_at'], 'integer'],
+            [['index_id', 'code_1', 'code_2', 'code_3', 'code_4', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'code_1_2_3', 'code_1_2_4', 'code_1_3_4', 'code_2_3_4', 'code_1_2_3_4', 'lottery_type', 'qihao', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
             [['code_str'], 'string', 'max' => 24],
         ];
@@ -60,6 +61,7 @@ class SscKjDataDs extends \common\models\base\BaseModel
     {
         return [
             'id' => 'ID',
+            'index_id' => '顺序id',
             'code_str' => '开奖号码str',
             'code_1' => '1位',
             'code_2' => '2位',
