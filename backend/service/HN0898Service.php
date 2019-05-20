@@ -1109,7 +1109,7 @@ class HN0898Service extends BaseTZService {
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return string
      */
-    public static function getQihao($lottery_type = 2){
+    public static function getQihao($lottery_type = 5){
         $db = Yii::$app->db;
         //$date = date('Y-m-d');
         $time = date("H:i:s");

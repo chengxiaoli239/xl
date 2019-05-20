@@ -28,7 +28,7 @@ use backend\service\StaticService;
 use yii;
 class KjDataGet
 {
-    public static function _init($lottery_type = 2){
+    public static function _init($lottery_type = 5){
         set_time_limit(0);
 
         $time = date("H:i");
@@ -160,7 +160,7 @@ class KjDataGet
     /**
      * @desc 开奖后处理的数据
      */
-    public static function afterKj($lottery_type = 2){
+    public static function afterKj($lottery_type = 5){
         OpKjService::opSscKjData($lottery_type); # 处理投注数据
         TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
         //StaticService::opStaticProfits(); # 投注利润统计
@@ -179,7 +179,7 @@ class KjDataGet
      * @param $kjDatas
      * @return array|bool
      */
-    public static function insertKjData($qihao, $lottery_type = 2, $kjData){
+    public static function insertKjData($qihao, $lottery_type = 5, $kjData){
         $kjDatas = str_replace(',', '', $kjData);
         if(!$qihao OR !$kjDatas) return false;
         $kjDatasArr = explode(',',$kjData);
@@ -415,7 +415,7 @@ class KjDataGet
      * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return bool|int|string
      */
-    public static function getNextQihaoByQihao($qihao = '180101001', $lottery_type = 2){
+    public static function getNextQihaoByQihao($qihao = '180101001', $lottery_type = 5){
         if($lottery_type == 'qxc'){
             # 未完
         }else{
@@ -442,7 +442,7 @@ class KjDataGet
      * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return bool|int|string
      */
-    public static function getBeforeQihaoByQihao($qihao = '180101001', $lottery_type = 2){
+    public static function getBeforeQihaoByQihao($qihao = '180101001', $lottery_type = 5){
         if($lottery_type == 'qxc'){
             # 未完
         }else{
@@ -470,7 +470,7 @@ class KjDataGet
      * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return string
      */
-    public static function getEndQihao($lottery_type = 2){
+    public static function getEndQihao($lottery_type = 5){
 
         if($lottery_type == 'qxc'){
 

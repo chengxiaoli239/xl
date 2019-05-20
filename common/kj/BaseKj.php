@@ -39,7 +39,7 @@ class BaseKj{
      * @param $qihao string 格式：20190125-030
      * @param $kjData
      */
-    public static function setKjDataCache($lottery_type = 2, $qihao, $kjData){
+    public static function setKjDataCache($lottery_type = 5, $qihao, $kjData){
         $m = \Yii::$app->cache;
 
         $str = substr($qihao, 2, 10);
