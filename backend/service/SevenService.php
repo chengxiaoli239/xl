@@ -585,7 +585,7 @@ class SevenService extends BaseTZService {
 
        BetService::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id);
        $rst = $BetService->bet($qihao, $plan_id, $codes);
-       BetService::afterBetNow($qihao);
+       BetService::afterBetNow($BettingRecords->lottery_type, $qihao);
 
        $m->set($mkey, 1, 10);
 

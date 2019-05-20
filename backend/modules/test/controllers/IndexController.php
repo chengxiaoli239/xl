@@ -221,6 +221,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BetService::tzByPlanId(7, 1);p($rst); # 投注
+        $qihao = HN0898Service::getQihao(5);
+        $rst = BetService::getBetCacheTime($lottery_type = 5, $qihao); p($rst);# 投注之后缓存时间
         $rst = TzService::opSystemBetPlans(5);p($rst);
         $qihao = HN0898Service::getQihao(5);p($qihao);
         $rst['update3NumData'] = SscDataService::update3NumData(5);p($rst); // 每期开奖遗漏
@@ -244,7 +247,6 @@ class IndexController extends Controller
         $captchaCodeRst = Tools::getCaptchaCode(10, 5, '2x2tdrnawlpbli554jlsuf2c');p($captchaCodeRst); # 真实调用验证码接口，收费
         $rst = XlService::login(10, 5);p($rst); # 7时登录
         $rst = HN0898Service::login(10, 5);p($rst); # 7时登录
-        $rst = BetService::tzByPlanId(1, 0);p($rst); # 投注
         $rst = XlService::formCodesStyle('13579,X,X,X@02468,X,X,X', 4); p($rst); # 格式化希腊号码
         $rst = XlService::formCodesStyle('13579,,13579,,@13579,,13579,,', 1); p($rst); # 格式化希腊号码
         $rst = XlService::getQihaoInfo(10, 5);p($rst);

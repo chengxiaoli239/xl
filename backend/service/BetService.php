@@ -480,7 +480,7 @@ abstract class BetService extends BaseBetService {
            $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id);
            $BetService = self::getBetObj($plan->uid, $system_type_id, $tz_system_id);
            $rst[] = $BetService->bet($qihao, $plan->id, $codes);
-           $isAuto == 0 && BetService::afterBetNow($qihao);
+           $isAuto == 0 && BetService::afterBetNow($plan->lottery_type, $qihao);
 
            BetService::synBalance($plan->uid, $tz_system_id);
        }
@@ -503,7 +503,7 @@ abstract class BetService extends BaseBetService {
         $mkey = BetService::buildBetKey($account, $tz_system_id, $lottery_type, $qihao, $plan_id);
         $m->delete($mkey);
 
-        $pkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$qihao;
+        $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao);
         $m->delete($pkey);
     }
 
@@ -512,13 +512,26 @@ abstract class BetService extends BaseBetService {
      * @param $qihao
      * @return bool
      */
-    public static function afterBetNow($qihao){
+    public static function afterBetNow($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao){
         $m = \Yii::$app->cache;
 
-        $pkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$qihao;
+        $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao);
         $rst = $m->set($pkey, 0, 5);
 
         return $rst;
+    }
+
+    /**
+     * @desc 生成投注前后缓存key
+     * @param int $lottery_type
+     * @param $qihao
+     * @return string
+     */
+    public static function buildBeforeAndAfterBetKey($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao){
+
+        $pkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$lottery_type.'_'.$qihao;
+
+        return $pkey;
     }
 
     /**

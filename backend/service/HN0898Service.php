@@ -358,8 +358,8 @@ class HN0898Service extends BaseTZService {
         $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
-        if(in_array($tz_type, [20,23])){
-
+        $isBigNumsBet = BetService::isBigNumsBet($tz_type);
+        if($isBigNumsBet){
             # 和值投注反应时间比较久，无需返回直接锁住
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);
@@ -563,7 +563,7 @@ class HN0898Service extends BaseTZService {
        //p([$qihao, $BettingRecords->plan_id, $codes]);
        BetService::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id);
        $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
-       BetService::afterBetNow($qihao);
+       BetService::afterBetNow($BettingRecords->lottery_type, $qihao);
 
        $m->set($mkey, 1, 10);
 
@@ -601,7 +601,7 @@ class HN0898Service extends BaseTZService {
        $account = AdminModel::findOne(Yii::$app->user->id)['account'];
        BetService::beforeBetNow($account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id);
        $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
-       BetService::afterBetNow($qihao);
+       BetService::afterBetNow($BettingRecords->lottery_type, $qihao);
 
        $m->set($mkey, 1, 5);
 
