@@ -135,7 +135,8 @@ abstract class BetService extends BaseBetService {
                 }
             }
         }
-        $logArr = ['tzRst'=>$tzRst];
+        $count = count($plans);
+        $logArr = ['tzRst'=>$tzRst, 'msg'=>$count == 0 ? '无投注计划' : $count.'条计划'];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','用户真实投注', $logArr);
 
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
@@ -468,6 +469,7 @@ abstract class BetService extends BaseBetService {
        }
        $tz_sites = explode(',', $plan->tz_sites);
        $qihao = HN0898Service::getQihao($plan->lottery_type);
+       $rst = [];
        foreach ($tz_sites as $tz_system_id){
            $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
 
@@ -477,7 +479,7 @@ abstract class BetService extends BaseBetService {
            # 5、投注请求
            $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id);
            $BetService = self::getBetObj($plan->uid, $system_type_id, $tz_system_id);
-           $rst = $BetService->bet($qihao, $plan->id, $codes);
+           $rst[] = $BetService->bet($qihao, $plan->id, $codes);
            $isAuto == 0 && BetService::afterBetNow($qihao);
 
            BetService::synBalance($plan->uid, $tz_system_id);

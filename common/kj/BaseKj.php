@@ -8,7 +8,7 @@ class BaseKj{
     private static $currentQihao = '190125023';
     private static $tblEndQihao = '190125023';
 
-    public static function _init($lotteryType = 'ssc'){
+    public static function _init($lotteryType = DEFAULT_LOTTERY_TYPE){
         self::$currentQihao = HN0898Service::getCurrentQihao();
         $status = true;
         if($lotteryType == 'qxc'){
