@@ -42,7 +42,7 @@ class TzService extends BaseService {
      * @param $qihao
      * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      */
-    public static function beforeTz($lottery_type = 5){
+    public static function beforeTz($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = Yii::$app->cache;
         $rst = ['status'=>200, 'msg'=>'可以投注~'];
         $qihao = HN0898Service::getQihao();
@@ -131,7 +131,7 @@ class TzService extends BaseService {
      * @param int $lottery_type
      * @return array
      */
-    public static function beforeRunSysPlans($qihao, $lottery_type = 5){
+    public static function beforeRunSysPlans($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = Yii::$app->cache;
         $pkey = \Yii::$app->params['PLAN_SWITCH_KEY'].'_'.$lottery_type.'_'.$qihao;
         if($planStatus = $m->get($pkey)){
@@ -145,7 +145,7 @@ class TzService extends BaseService {
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array|bool
      */
-    public static function opSystemBetPlans($lottery_type = 5){
+    public static function opSystemBetPlans($lottery_type = DEFAULT_LOTTERY_TYPE){
         self::_init();
         $rst = ['status'=>200, 'msg'=>'操作成功!'];
 
@@ -192,7 +192,7 @@ class TzService extends BaseService {
      * @desc 系统计划处理后，开关的开启或关闭
      * @param $qihao
      */
-    public static function afterRunSysPlans($qihao, $lottery_type = 5){
+    public static function afterRunSysPlans($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = Yii::$app->cache;
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
 
@@ -265,7 +265,7 @@ class TzService extends BaseService {
      * @param $lottery_type
      * @return int
      */
-    public static function getSysTemPlansBetStatus($playway = 2, $codes, $lottery_type = 5){
+    public static function getSysTemPlansBetStatus($playway = 2, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE){
         switch ($playway){
             # 计算出各种投注方式的当前遗漏
             case 1: //  二字定

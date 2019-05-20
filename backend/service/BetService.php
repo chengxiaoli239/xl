@@ -96,7 +96,7 @@ abstract class BetService extends BaseBetService {
      * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      */
     //public static function beforeBet($qihao, $tz_system_id, $playway, $account = 'gaozi2017', $lottery_type = 'ssc'){
-    public static function beforeBet($qihao, $lottery_type = 5){
+    public static function beforeBet($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
         $rst = ['status'=>200, 'msg'=>'可以投注~'];
         switch ($lottery_type){
@@ -168,7 +168,7 @@ abstract class BetService extends BaseBetService {
      * @param int $lottery_type
      * @return bool
      */
-    public static function afterBet($qihao, $lottery_type = 5){
+    public static function afterBet($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
         if(!$qihao) return false;
         $m = \Yii::$app->cache;
 
@@ -382,7 +382,7 @@ abstract class BetService extends BaseBetService {
      * @param int $tz_type 三定：投注类型:1大小单双三字定2大小三字定3单双三字定    四定：详见staticServices::$kArr
      * @return string
      */
-    public static function buildBetKey($account = 'gaozi2017', $tz_system_id, $lottery_type = 5, $qihao, $plan_id = 0){
+    public static function buildBetKey($account = 'gaozi2017', $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE, $qihao, $plan_id = 0){
         $mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$account.'_'.$tz_system_id.'_'.$lottery_type.'_'.$qihao.'_'.$plan_id;
 
         return $mkey;
@@ -494,7 +494,7 @@ abstract class BetService extends BaseBetService {
      * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @param $plan_id
      */
-    public static function beforeBetNow($account, $tz_system_id, $lottery_type = 5, $qihao, $plan_id = 0){
+    public static function beforeBetNow($account, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE, $qihao, $plan_id = 0){
         $m = \Yii::$app->cache;
         $mkey = BetService::buildBetKey($account, $tz_system_id, $lottery_type, $qihao, $plan_id);
         $m->delete($mkey);
@@ -709,7 +709,7 @@ abstract class BetService extends BaseBetService {
      * @param $qihao
      * @return float|int|string
      */
-    public static function getBetCacheTime($lottery_type = 5, $qihao){
+    public static function getBetCacheTime($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao){
         $lottery = LotteryType::findOne(['lottery_type'=>$lottery_type]);
         $cacheTime = $lottery->data_ftime;
         switch ($lottery_type){

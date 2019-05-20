@@ -225,7 +225,7 @@ class IndexController extends Controller
         $rst['update3NumData'] = SscDataService::update3NumData(5);p($rst); // 每期开奖遗漏
         $rst = SscDataService::updateSdHzYl(5); p($rst);// 四定和值遗漏
         $rst = NumService::getCodesArise(['1234589']);p(count($rst));
-        $rst = StaticService::calculate2bProfits($lottery_type = 5, $start_date = '2019-03-20', $end_date = '2019-03-30'); p($rst);
+        $rst = StaticService::calculate2bProfits($lottery_type = DEFAULT_LOTTERY_TYPE, $start_date = '2019-03-20', $end_date = '2019-03-30'); p($rst);
 
         $rst = NumService::filterLaterCodesAnd2bcode(5, $qihao = '190516056');p($rst);
         $rst = NumService::getRecentlyCodes(5);p($rst);

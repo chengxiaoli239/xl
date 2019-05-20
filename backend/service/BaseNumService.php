@@ -293,7 +293,7 @@ class BaseNumService extends BaseService {
      * @param $codes
      * @return int
      */
-    public static function getCodesYL($codes, $playway = 2, $lottery_type = 5){
+    public static function getCodesYL($codes, $playway = 2, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $tmpArr = explode(',',$codes);
         //p([$codes, $playway]);
         $p_1 = SscDataService::justDataSingleOrDouble($tmpArr[0]);

@@ -95,7 +95,7 @@ class StaticService extends BaseService {
      * @desc 利润统计
      * @param  int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      */
-    public static function opStaticProfits($lottery_type = 5 ){
+    public static function opStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE ){
         $m = \Yii::$app->cache;
         $qihao = HN0898Service::getQihao($lottery_type);
         $mkey = 'OP_STATIC_PROFITS_ID_19_'.$lottery_type.'_'.$qihao;
@@ -206,7 +206,7 @@ class StaticService extends BaseService {
      * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array|mixed
      */
-    public static function staticSDProfits($month = '2018-11', $lottery_type = 5){
+    public static function staticSDProfits($month = '2018-11', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
         $mkey = 'MONTH_STATIC_DATA_'.$lottery_type.'_'.$month;
         $typeArr = self::$typeArr;
@@ -325,7 +325,7 @@ class StaticService extends BaseService {
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array|mixed
      */
-    public static function staticSDPerDateProfits($date = '2018-08-05', $lottery_type = 5){
+    public static function staticSDPerDateProfits($date = '2018-08-05', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
         $mkey = 'DATE_STATIC_DATA_'.$date;
         $typeArr = self::$typeArr;
@@ -469,7 +469,7 @@ class StaticService extends BaseService {
      * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
-    public static function allMonthStaticProfits($lottery_type = 5){
+    public static function allMonthStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $months = [];
         for ($i=0; $i>=0; $i--){
             $months[] = date('Y-m', strtotime('-'.$i.' months'));
@@ -603,7 +603,7 @@ class StaticService extends BaseService {
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
-    public static function static4dPerDateProfits($lottery_type = 5){
+    public static function static4dPerDateProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $rst = ['status'=>200, 'msg'=>'处理成功'];
         $allStaticProfits = self::allDateStaticProfits($lottery_type);
         $tmpProfits = [];
@@ -692,7 +692,7 @@ class StaticService extends BaseService {
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
-    public static function allDateStaticProfits($lottery_type = 5){
+    public static function allDateStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
         $mkey = 'allDateStaticProfits_PERDATE_'.$lottery_type.'_19';
 
@@ -760,7 +760,7 @@ class StaticService extends BaseService {
      * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
-    public static function static4dMonthsProfits( $lottery_type = 5){
+    public static function static4dMonthsProfits( $lottery_type = DEFAULT_LOTTERY_TYPE){
         $rst = ['status'=>200, 'msg'=>'处理成功'];
         $allMonthStaticProfits = self::allMonthStaticProfits($lottery_type);
         $tmpProfits = [];
@@ -995,7 +995,7 @@ class StaticService extends BaseService {
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
-    public static function staticKj3NumCounts($date = '2019-02-11', $lottery_type = 5){
+    public static function staticKj3NumCounts($date = '2019-02-11', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
         $mkey = 'staticKj3NumCounts_'.$lottery_type.'_'.$date;
 
@@ -1032,7 +1032,7 @@ class StaticService extends BaseService {
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
-    public static function allDateStatic3NumsPerDate( $lottery_type = 5){
+    public static function allDateStatic3NumsPerDate( $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
         $mkey = 'allDateStatic3Nums_PERDATE_02_'.$lottery_type;
 
@@ -1114,7 +1114,7 @@ class StaticService extends BaseService {
      * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
-   public static function static2NumsYl($lottery_type = 5){
+   public static function static2NumsYl($lottery_type = DEFAULT_LOTTERY_TYPE){
        $rst = ['status'=>200, 'msg'=>'操作成功~'];
 
        $Ssc2numsVals = Ssc2numsVal::find()->where('1=1')->asArray()->all();
@@ -1155,7 +1155,7 @@ class StaticService extends BaseService {
      * @param int $limit
      * @return array
      */
-   public static function get2NumsYlRecords($nums, $lottery_type = 5, $limit = 600){
+   public static function get2NumsYlRecords($nums, $lottery_type = DEFAULT_LOTTERY_TYPE, $limit = 600){
        if(strlen($nums) != 2) return [];
 
        $last_id = SscDataService::getKjDataLastId($lottery_type); # 表记录最后一条id
@@ -1237,7 +1237,7 @@ class StaticService extends BaseService {
      * @param $tz_type 一字定倍数切换方案
      * @return int
      */
-   public static function getYlByCodes($codes, $lottery_type = 5, $tz_type = 18){
+   public static function getYlByCodes($codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $tz_type = 18){
        $yl = 0;
        $tzTypes = TzTypes::findOne(['type'=>$tz_type]);
        $playway = $tzTypes->playway;
@@ -1300,7 +1300,7 @@ class StaticService extends BaseService {
      * @param int $lottery_type
      * @return float
      */
-   public static function calculate2bProfits($lottery_type = 5, $start_date = '2019-03-20', $end_date = '2019-03-30', $filterNums = 1000){
+   public static function calculate2bProfits($lottery_type = DEFAULT_LOTTERY_TYPE, $start_date = '2019-03-20', $end_date = '2019-03-30', $filterNums = 1000){
        $profits = 0.00;
 
        $m = \Yii::$app->cache;

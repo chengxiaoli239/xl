@@ -24,7 +24,7 @@ class OpKjService extends BaseService {
      * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return array
      */
-    public static function opSscKjData($lottery_type = 5){
+    public static function opSscKjData($lottery_type = DEFAULT_LOTTERY_TYPE){
 
         $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
         //$lotteryTypeArr = [1,2,3,4]; # 彩票类型：彩种类型：1:1.5分 2:3分 3:5分 4:10分

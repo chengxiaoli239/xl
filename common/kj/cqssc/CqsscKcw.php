@@ -45,7 +45,7 @@ class CqsscKcw extends BaseKj {
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
 
-        self::setKjDataCache($lottery_type = 5, $expect, $kjData);
+        self::setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");

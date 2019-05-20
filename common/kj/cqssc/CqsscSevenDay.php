@@ -35,7 +35,7 @@ class CqsscSevenDay extends BaseKj {
         $expect = $kjData['expect'];
 
         # 设置开奖数据缓存
-        self::setKjDataCache($lottery_type = 5, $expect, $kjData);
+        self::setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
@@ -76,7 +76,7 @@ class CqsscSevenDay extends BaseKj {
         $expect = $kjData['expect'];
 
         # 设置开奖数据缓存
-        self::setKjDataCache($lottery_type = 5, $expect, $kjData);
+        self::setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
