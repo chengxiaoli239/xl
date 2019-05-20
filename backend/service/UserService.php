@@ -29,39 +29,54 @@ class UserService extends BaseService {
     }
 
     public static function opUser($admin_id, $action, $role){
+        $model = User::findOne(['admin_id'=>$admin_id]);
         if($action == 'add'){
-            if(!$AuthAssignment = AuthAssignment::findOne(['user_id'=>$admin_id])){
-                $AuthAssignment = new AuthAssignment();
-            }
-            $insertData = [
-                'item_name' => $role,
-                'user_id'=>$admin_id,
-                'created_at'=>time(),
-            ];
-            $AuthAssignment->setAttributes($insertData);
-            $rst = $AuthAssignment->save(false);
-
-            /*
-            $TzSystems = TzSystems::findAll([1=>1]);
-            foreach ($TzSystems as $TzSystem){
-                $TzSystemsUsers = new TzSystemsUsers();
+            # 添加赔率记录
+            if(!$model){
+                $User = new User();
+                $AdminModel = AdminModel::findOne($admin_id);
                 $insertData = [
-                    'uid' => $admin_id,
-                    'tz_system_id' => $TzSystem->id,
-                    'account' => $AdminModel->username,
-                    'sys_name' => $TzSystem->name,
-                    'status' => 3, # 0 禁用 1启用 3隐藏
-                    'updated_at' => time(),
-                    'created_at' => time(),
+                    'admin_id'=>$admin_id,
+                    'email'=>$AdminModel->email,
+                    'account'=>$AdminModel->username,
+                    'username'=>$AdminModel->username,
+                    'created_at'=> time(),
+                    'updated_at'=> time(),
                 ];
-                $TzSystemsUsers->setAttributes($insertData);
-                $TzSystemsUsers->save();
+                $User->setAttributes($insertData);
+                $rst = $User->save();
+
+                $AuthAssignment = new AuthAssignment();
+                $insertData = [
+                    'item_name' => $role,
+                    'user_id'=>$admin_id,
+                    'created_at'=>time(),
+                ];
+                $AuthAssignment->setAttributes($insertData);
+                $rst = $AuthAssignment->save(false);
+
+                /*
+                $TzSystems = TzSystems::findAll([1=>1]);
+                foreach ($TzSystems as $TzSystem){
+                    $TzSystemsUsers = new TzSystemsUsers();
+                    $insertData = [
+                        'uid' => $admin_id,
+                        'tz_system_id' => $TzSystem->id,
+                        'account' => $AdminModel->username,
+                        'sys_name' => $TzSystem->name,
+                        'status' => 3, # 0 禁用 1启用 3隐藏
+                        'updated_at' => time(),
+                        'created_at' => time(),
+                    ];
+                    $TzSystemsUsers->setAttributes($insertData);
+                    $TzSystemsUsers->save();
+                }
+                */
+                //p([$insertData,$AuthAssignment->attributes,$rst,$AuthAssignment->getErrors()]);
             }
-            */
-            //p([$insertData,$AuthAssignment->attributes,$rst,$AuthAssignment->getErrors()]);
         }else{
             # 删除用户记录
-            //$rst = User::deleteRecord(['admin_id'=>$admin_id]);
+            $rst = User::deleteRecord(['admin_id'=>$admin_id]);
             //d($rst);
         }
 
@@ -91,8 +106,14 @@ class UserService extends BaseService {
     }
 
 
+    /**
+     * @desc 添加系统和投注方式等权限
+     * @param $tz_systems_ids_Arr
+     * @param $uid
+     * @param string $opType
+     */
     public static function saveTzSystemUsers($tz_systems_ids_Arr, $uid, $opType = 'add'){
-        //p([$tz_systems_ids_Arr, $uid, $opType]);
+        //p([$tz_systems_ids_Arr, $uid, $opType],0);
 
         foreach ($tz_systems_ids_Arr as $tz_system_id){
             if($opType == 'add' OR $opType == 'update'){
@@ -114,12 +135,11 @@ class UserService extends BaseService {
 
                 $TzSystemsUsers->setAttributes($setData);
                 $rst = $TzSystemsUsers->save();
-
-            }else{
-                TzSystemsUsers::deleteAll([['=', 'uid', $uid], ['not in', 'tz_system_id'=>$tz_systems_ids_Arr]]);
-
             }
         }
-
+        $where = ['and', ['=', 'uid', $uid], ['not in', 'tz_system_id', $tz_systems_ids_Arr]];
+        //TzSystemsUsers::deleteAll($where); # 逻辑删除
+        TzSystemsUsers::deleteRecord($where); # 物理删
+        return $rst;
     }
 }
