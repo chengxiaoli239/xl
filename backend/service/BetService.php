@@ -244,6 +244,8 @@ abstract class BetService extends BaseBetService {
                     foreach ($tmpArr as $arr){
                         $codesArr[] = $arr[0].','.$arr[1].','.$arr[2].','.$arr[3];
                     }
+                }elseif($tz_type == 25){ # 过滤
+                    $codesArr = NumService::getCodesKuaixuan(json_decode($codes_hz, true));
                 }else{
                     $params = ['playway'=>$playway, 'tz_type'=>$tz_type];
                     $SysPlansCodes = SysPlansCodes::find()->where($params)->orderBy(['rand()' => SORT_DESC])->asArray()->all();

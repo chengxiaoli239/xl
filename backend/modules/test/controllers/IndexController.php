@@ -221,6 +221,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = TzService::opSystemBetPlans(5);p($rst);
         $qihao = HN0898Service::getQihao(5);p($qihao);
         $rst['update3NumData'] = SscDataService::update3NumData(5);p($rst); // 每期开奖遗漏
         $rst = SscDataService::updateSdHzYl(5); p($rst);// 四定和值遗漏

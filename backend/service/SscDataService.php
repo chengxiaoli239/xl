@@ -98,7 +98,7 @@ class SscDataService extends BaseService {
             }
             $m->set($mkey, $new_qihao, 24*60*60);
         }
-        p([$new_qihao, $next_qihao, $last_qihao, $lottery_type],0);
+        //p([$new_qihao, $next_qihao, $last_qihao, $lottery_type],0);
 
         return $flag;
 
