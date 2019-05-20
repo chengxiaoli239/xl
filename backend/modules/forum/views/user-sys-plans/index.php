@@ -75,7 +75,7 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                                     //投注类型:1大小单双三字定2大小三字定3单双三字定
                                     $tz_type_Arr = [1=>'大小单双三字定', 2=>'大小三字定', 3=>'单双三字定'];
                                     $typeName = $tz_type_Arr[$model->tz_type];
-                                }elseif(in_array($model->playway,[1,3])){
+                                }elseif($model->playway == 3){
                                     $typeName = \backend\service\BetService::getTypeNameByTzType($model->tz_type);
                                 }
                                 return $typeName;
@@ -139,7 +139,17 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                             }
                         ],
                         //'nums',
-                        'hz_Arr',
+                        //'hz_Arr',
+                        ['attribute' => 'hz_Arr','label'=>'扩展【部分投注】',#'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                if($model->tz_type == 25){
+                                    $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
+                                }else{
+                                    $str = $model->hz_Arr;
+                                }
+                                return $str;
+                            }
+                        ],
                         /*
                         ['attribute' => 'nums','headerOptions'=>['width'=>'5%'],'label'=>'描述',
                             'value' => function($model) {

@@ -187,7 +187,7 @@ class NumService extends BaseService {
         # 是否随机过滤和值号码
         $filter_hz_code_status = SystemConfig::findOne(['key'=>'filter_hz_code_status'])->value;
         $filter_hz_nums = SystemConfig::findOne(['key'=>'filter_hz_nums'])->value;
-        if($filter_hz_code_status == 1){
+        if($filter_hz_code_status){
             /* 随机剔除 */
             for ($i=1; $i<=$filter_hz_nums; $i++){
                 $v = rand($heZhiArr[0], end($heZhiArr));
@@ -202,52 +202,8 @@ class NumService extends BaseService {
         $Num4Types = Num4Type::find()->where($where);
         $codes = $Num4Types->asArray()->all();
         $codesArr = ArrayHelper::getColumn($codes, 'code');
-
         # 和值范围 end
         $m->set($mkey, $codesArr, 7*24*3600);
-
-        return $codesArr;
-    }
-
-    /**
-     * @desc 取两兄弟后剔除最近出现的多少期号码
-     * @param int $lottery_type
-     */
-    public static function filterLaterCodesAnd2bcode($lottery_type = 5, $qihao = '190516056', $nums = 1000){
-
-        //$filter_hz_code_status = SystemConfig::findOne(['key'=>'filter_hz_code_status'])->value;
-        $filterCodes = self::getRecentlyCodes($lottery_type, $qihao, $nums); # 最近 $nums 期号码
-
-        $codesArr = self::get2bCodeArr();
-        //p(count($codesArr));
-        foreach ($filterCodes as $filterCode){
-            $filterKey = array_search($filterCode, $codesArr);
-            if($filterKey !== false){
-                $tmpCode[$filterKey] = $codesArr[$filterKey];
-                unset($codesArr[$filterKey]);
-            }
-        }
-        //p($tmpCode);
-
-        return $codesArr;
-    }
-
-    /**
-     * @desc 最近出现的号码
-     * @param int $lottery_type
-     * @param int $nums
-     * @return array
-     */
-    public static function getRecentlyCodes($lottery_type = 5, $qihao = '190516056', $nums = 500){
-        $limit = $nums + ceil($nums * 0.3);
-        $SscKjDatas = SscKjData::find()->where(['AND', ['=', 'lottery_type', $lottery_type], ['<', 'qihao', $qihao]])->orderBy(['id'=>SORT_DESC])->limit($limit)->all();
-        $codesArr = [];
-        foreach ($SscKjDatas as $SscKjData){
-            $codesArr[] = substr($SscKjData->code_str, 0,7);
-            //$codesArr = array_unique($codesArr);
-
-            //if(count($codesArr) == $nums) break;
-        }
 
         return $codesArr;
     }
@@ -562,4 +518,136 @@ class NumService extends BaseService {
 
         return $codesArr;
     }
+
+
+    /**
+     * @desc 快选功能过滤
+     * @param $codes_hz
+     * @return array
+     */
+    public static function getCodesKuaixuan($codes_hz) {
+        //p($codes_hz,0);
+        if(empty($codes_hz)) return [];
+        $where = ['OR'];
+        # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
+        # 1、双重
+        if(isset($codes_hz['type_2'])){
+            $where = array_merge($where, [['=', 'type_2', $codes_hz['type_2']]]);
+        }
+        # 2、三重
+        if(isset($codes_hz['type_3'])){
+            $where = array_merge($where, [['=', 'type_3', $codes_hz['type_3']]]);
+        }
+        # 3、四重
+        if(isset($codes_hz['type_4'])){
+            $where = array_merge($where, [['=', 'type_4', $codes_hz['type_4']]]);
+        }
+        # 4、双双重
+        if(isset($codes_hz['type_22'])){
+            $where = array_merge($where, [['=', 'type_22', $codes_hz['type_22']]]);
+        }
+        # 5、两兄弟
+        if(isset($codes_hz['type_2b'])){
+            $where = array_merge($where, [['=', 'type_2b', $codes_hz['type_2b']]]);
+        }
+        # 6、三兄弟
+        if(isset($codes_hz['type_3b'])){
+            $where = array_merge($where, [['=', 'type_3b', $codes_hz['type_3b']]]);
+        }
+        # 7、四兄弟
+        if(isset($codes_hz['type_4b'])){
+            $where = array_merge($where, [['=', 'type_4b', $codes_hz['type_4b']]]);
+        }
+
+        $Num4Types = Num4Type::find()->where($where)->asArray()->all();
+        $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+        //p($codesArr);
+
+        return array_unique($codesArr);
+    }
+
+    public static function getDescByKuaixuan($hz_Arr){
+        //p($hz_Arr,0);
+        # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
+        $desc = '[快选] ';
+        $filter0 = []; # 除
+        $filter1 = []; # 取
+        # 1、双重
+        if(isset($hz_Arr['type_2'])){
+            if($hz_Arr['type_2'] == 1) $filter1['type_2'] = 1; else $filter0['type_22'] = 0;
+        }
+        # 2、三重
+        if(isset($hz_Arr['type_3'])){
+            if($hz_Arr['type_3'] == 1) $filter1['type_3'] = 1; else $filter0['type_3'] = 0;
+        }
+        # 3、四重
+        if(isset($hz_Arr['type_4'])){
+            if($hz_Arr['type_4'] == 1) $filter1['type_4'] = 1; else $filter0['type_4'] = 0;
+        }
+        # 4、双双重
+        if(isset($hz_Arr['type_22'])){
+            if($hz_Arr['type_22'] == 1) $filter1['type_22'] = 1; else $filter0['type_22'] = 0;
+        }
+        # 5、两兄弟
+        if(isset($hz_Arr['type_2b'])){
+            if($hz_Arr['type_2b'] == 1) $filter1['type_2b'] = 1; else $filter0['type_2b'] = 0;
+        }
+        # 6、三兄弟
+        if(isset($hz_Arr['type_3b'])){
+            if($hz_Arr['type_3b'] == 1) $filter1['type_3b'] = 1; else $filter0['type_3b'] = 0;
+        }
+        # 7、四兄弟
+        if(isset($hz_Arr['type_4b'])){
+            if($hz_Arr['type_4b'] == 1) $filter1['type_4b'] = 1; else $filter0['type_4b'] = 0;
+        }
+        //p([$filter0, $filter1]);
+
+        $typesArr = self::getNameByCodesType();
+        if(!empty($filter1)){
+            $desc .= '取:';
+            foreach ($filter1 as $key1=>$v1){
+                $desc .= $typesArr[$key1].'、';
+            }
+            $desc = trim($desc, '、').' ';
+        }
+        if(!empty($filter0)){
+            $desc .= '除:';
+            foreach ($filter0 as $key0=>$v0){
+                $desc .= $typesArr[$key0].'、';
+            }
+            $desc = trim($desc, '、').' ';
+        }
+
+        return $desc;
+    }
+
+    /**
+     * @desc 返回筛选名称
+     * @param string $type
+     * @return array|mixed
+     */
+    public static function getNameByCodesType($type = ''){
+        $typeArr = [
+            'type_2'=>'双重',
+            'type_3'=>'三重',
+            'type_4'=>'四重',
+            'type_22'=>'双双重',
+            'type_2b'=>'两兄弟',
+            'type_3b'=>'三兄弟',
+            'type_4b'=>'四兄弟',
+        ];
+
+        if($typeArr[$type]) return $typeArr[$type];
+
+        return $typeArr;
+    }
+
+
+
+
+
+
+
+
+
 }
