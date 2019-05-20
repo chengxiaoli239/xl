@@ -124,22 +124,44 @@ abstract class BetService extends BaseBetService {
 
         $plans = UserSysPlans::find()->where(['AND', ['=', 'status', 1], ['>', 'uid', 0], ['=', 'is_parent', 1]])->all();
         if($plans){
+            $datas = [];
             foreach ($plans as $key=>$plan){
-                if($plan->children_plan_id>0){
-                    $ids = explode(',', $plan->children_plan_id);
-                }else{
-                    $ids[] = $plan->id;
+                $qihao = HN0898Service::getQihao($plan->lottery_type);
+                if(!$tzStatus = BetService::isCanBet($plan->lottery_type)) {
+                    //return ['status'=>300, 'msg'=>'当前期投注任务已经完成~'];
+                    if($plan->children_plan_id>0){
+                        $ids = explode(',', $plan->children_plan_id);
+                    }else{
+                        $ids[] = $plan->id;
+                    }
+                    foreach ($ids as $id){
+                        $tzRst[$id] = self::tzByPlanId($id);
+                    }
                 }
-                foreach ($ids as $id){
-                    $tzRst[$id] = self::tzByPlanId($id);
-                }
+                $datas[] = ['qihao'=>$qihao, 'lottery_type'=>$plan->lottery_type];
             }
         }
         $count = count($plans);
-        $logArr = ['tzRst'=>$tzRst, 'msg'=>$count == 0 ? '无投注计划' : $count.'条计划'];
+        $logArr = ['tzRst'=>$tzRst, 'msg'=>$count == 0 ? '无投注计划' : $count.'条计划', 'datas'=>$datas];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','用户真实投注', $logArr);
 
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
+    }
+
+    /**
+     * @desc 判断当前期是否可以投注
+     * @param int $lottery_type
+     * @return mixed
+     */
+    public static function isCanBet($lottery_type = DEFAULT_LOTTERY_TYPE){
+
+        $qihao = HN0898Service::getQihao($lottery_type);
+        $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao);
+
+        $m = \Yii::$app->cache;
+        $status = $m->get($pkey);
+
+        return $status;
     }
 
     /**
