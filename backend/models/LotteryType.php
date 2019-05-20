@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "{{%lottery_type}}".
  *
  * @property int $id
- * @property int $type 1重庆时时彩2七星彩3排列三4排列五5福彩3D
+ * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property int $enable
  * @property int $isDelete
  * @property int $sort
@@ -40,8 +40,8 @@ class LotteryType extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['type', 'name', 'title', 'info', 'num'], 'required'],
-            [['type', 'enable', 'isDelete', 'sort', 'data_ftime', 'defaultViewGroup', 'android', 'num'], 'integer'],
+            [['lottery_type', 'enable', 'isDelete', 'sort', 'data_ftime', 'defaultViewGroup', 'android', 'num'], 'integer'],
+            [['name', 'title', 'info', 'num'], 'required'],
             [['name'], 'string', 'max' => 32],
             [['codeList'], 'string', 'max' => 125],
             [['title', 'onGetNoed'], 'string', 'max' => 64],
@@ -58,7 +58,7 @@ class LotteryType extends \common\models\base\BaseModel
     {
         return [
             'id' => 'ID',
-            'type' => '1重庆时时彩2七星彩3排列三4排列五5福彩3D',
+            'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
             'enable' => 'Enable',
             'isDelete' => 'Is Delete',
             'sort' => 'Sort',
