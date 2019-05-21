@@ -100,10 +100,7 @@ class IndexController extends Controller
     public function actionStaticHzProfits(){
         self::_init();
         if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
-
-        $rst[] = StaticService::staticSDHzPerDateProfits(); # 每天四定和值利润统计
-        $rst[] = StaticService::staticHzMonthsProfits(); # 每月四定和值利润统计
-        $rst[] = StaticService::allHzStaticProfitsPerdate();//p($rst);# 循环计算每天每个和值利润统计
+        $rst = StaticService::opStatic(); # 和值、四定利润统计
 
         return $rst;
     }
@@ -179,7 +176,7 @@ class IndexController extends Controller
         # 第一步：开奖后处理完预投注
         //$rst['customTz'] = TzService::opSystemBetPlans(); // 处理系统投注计划
 
-        //return $rst;
+        return $rst;
     }
 
     /**

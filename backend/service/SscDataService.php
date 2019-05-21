@@ -130,7 +130,7 @@ class SscDataService extends BaseService {
         if($next_qihao<=$last_qihao){
             $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
             $flag = SscDataService::insertSscKjData3Num($new_qihao, $lottery_type);
-            p($flag);
+            //p($flag);
             $m->set($mkey, $new_qihao, 7*24*3600);
         }
 
@@ -807,6 +807,7 @@ class SscDataService extends BaseService {
         if(!$SscKjDataDs){
             $SscKjDataDs = new SscKjDataDs();
             $opData['created_at'] = time();
+            $opData['index_id'] = $SscKjData->index_id;
         }
 
         # 1、一定
@@ -876,6 +877,7 @@ class SscDataService extends BaseService {
         }
 
         $opData['qihao'] = $qihao;
+        $opData['index_id'] = $SscKjData->index_id;
         $opData['code_str'] = $SscKjData['code_str'];
         $opData['date'] = $SscKjData['date'];
         $opData['lottery_type'] = $lottery_type;

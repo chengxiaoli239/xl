@@ -221,6 +221,13 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::allHzStaticProfitsPerdate();p($rst);# 循环计算每天每个和值利润统计
+        $rst = StaticService::staticSdHzProfitsPerdate(); p($rst); # 每天每个和值利润统计
+        $rst = StaticService::calculate2bProfits($lottery_type = DEFAULT_LOTTERY_TYPE, $start_date = '2019-05-01', $end_date = '2019-05-15'); p($rst);
+        for($i=0;$i<100;$i++){
+            $rst['update3NumData'] = SscDataService::update3NumData($lottery_type=5);
+        }
+        p($rst); // 每期开奖遗漏
         $rst = BetService::tzByPlanId(7, 1);p($rst); # 投注
         $qihao = HN0898Service::getQihao(5);
         $rst = BetService::getBetCacheTime($lottery_type = 5, $qihao); p($rst);# 投注之后缓存时间
@@ -229,7 +236,6 @@ class IndexController extends Controller
         $rst['update3NumData'] = SscDataService::update3NumData(5);p($rst); // 每期开奖遗漏
         $rst = SscDataService::updateSdHzYl(5); p($rst);// 四定和值遗漏
         $rst = NumService::getCodesArise(['1234589']);p(count($rst));
-        $rst = StaticService::calculate2bProfits($lottery_type = DEFAULT_LOTTERY_TYPE, $start_date = '2019-03-20', $end_date = '2019-03-30'); p($rst);
 
         $rst = NumService::filterLaterCodesAnd2bcode(5, $qihao = '190516056');p($rst);
         $rst = NumService::getRecentlyCodes(5);p($rst);
@@ -256,8 +262,6 @@ class IndexController extends Controller
         $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0])->distinct('qihao')->orderBy('bet.qihao ASC')->limit(20)->all();p($bettingRecords);
         $rst = CqsscKcw::getLotteryNoXl();p($rst);
         $rst = HN0898Service::getQihao(); p($rst);
-        $rst = StaticService::allHzStaticProfitsPerdate();p($rst);# 循环计算每天每个和值利润统计
-        $rst = StaticService::staticSdHzProfitsPerdate(); p($rst); # 每天每个和值利润统计
         $rst = NumService::getCodesArise(['38','78']);p($rst); //2+3+1+2+2
         //$rst = NumService::getCodesArise(['289','125','046','456','589','467']);p($rst); //2+3+1+2+2
         $rst = StaticService::get2NumsYlRecords('12');p($rst);

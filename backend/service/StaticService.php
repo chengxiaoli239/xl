@@ -377,17 +377,17 @@ class StaticService extends BaseService {
      * @param int $type
      * @return array|mixed
      */
-    public static function staticHzPerDateProfits($date = '2018-08-05'){
+    public static function staticHzPerDateProfits($date = '2018-08-05', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'DATE_STATIC_HZ_DATA_'.$date;
+        $mkey = 'DATE_STATIC_HZ_DATA_'.$lottery_type.'_'.$date;
         $typeArr = self::$typeHzArr;
 
         if($allStatic = $m->get($mkey)) return $allStatic;
 
-        $allCounts = SscKjData::find()->where(['date'=>$date])->orderBy(['id'=>SORT_ASC])->count();
+        $allCounts = SscKjData::find()->where(['date'=>$date, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_ASC])->count();
         $allStatic = [];
         foreach ($typeArr as $k=>$hzArr){
-            $where = ['date' => $date, 'codes_4nums_hz'=> $hzArr];
+            $where = ['date' => $date, 'lottery_type'=>$lottery_type, 'codes_4nums_hz'=> $hzArr];
             $zJcounts = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->count(); # 中奖次数
             $where = ['codes_hz'=>$hzArr];
             $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count();
@@ -399,6 +399,7 @@ class StaticService extends BaseService {
                 'name' => $k,
                 'zjZhus' => $zJcounts,
                 'qs' => $allCounts,
+                'lottery_type' => $lottery_type,
                 'count' => count($hzArr),
                 //'code' => $arr,
                 'profits' => $profits
@@ -416,19 +417,19 @@ class StaticService extends BaseService {
      * @desc 每个和值出现每天利润统计 add at 2019-04-27
      * @return array
      */
-    public static function staticSdHzProfitsPerdate($date = '2019-02-11'){
+    public static function staticSdHzProfitsPerdate($date = '2019-02-11', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $hzArr = [];
         for ($i=1; $i<=36; $i++){
             $hzArr[$i] = 0;
         }
 
         $m = \Yii::$app->cache;
-        $mkey = 'PERDATE_STATIC_HZ_DATA_'.$date;
+        $mkey = 'PERDATE_STATIC_HZ_DATA_'.$lottery_type.'_'.$date;
 
         if($allStatic = $m->get($mkey)) return $allStatic;
 
         //$allCounts = SscKjData::find()->where(['date'=>$date])->orderBy(['id'=>SORT_ASC])->count();
-        $SscKjDatas = SscKjData::find()->where(['date'=>$date])->orderBy(['id'=>SORT_ASC])->all(); # 中奖次数
+        $SscKjDatas = SscKjData::find()->where(['date'=>$date, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_ASC])->all(); # 中奖次数
         $allQishus = count($SscKjDatas);
         $allStatic = [];
         foreach ($SscKjDatas as $SscKjData){
@@ -451,6 +452,7 @@ class StaticService extends BaseService {
                 'zjZhus' => $zjCounts,
                 'qs' => $allQishus,
                 'count' => $NumCounts,
+                'lottery_type' => $lottery_type,
                 'tzMoney' => $tzMoney,
                 //'code' => $arr,
                 'profits' => $profits
@@ -649,12 +651,27 @@ class StaticService extends BaseService {
     }
 
     /**
+     * @desc 利润统计
+     * @return array
+     */
+    public static function opStatic(){
+        $lottery_types = StaticService::getLotteryTypes();
+        foreach ($lottery_types as $lottery_type) {
+            $rst[] = StaticService::staticSDHzPerDateProfits($lottery_type); # 每天四定和值利润统计
+            $rst[] = StaticService::staticHzMonthsProfits($lottery_type); # 每月四定和值利润统计
+            $rst[] = StaticService::allHzStaticProfitsPerdate($lottery_type);//p($rst);# 循环计算每天每个和值利润统计
+        }
+
+        return $rst;
+    }
+
+    /**
      * @desc 记录每天四定和值利润统计 - 写表
      * @return array
      */
-    public static function staticSDHzPerDateProfits(){
+    public static function staticSDHzPerDateProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $rst = ['status'=>200, 'msg'=>'处理成功'];
-        $allStaticProfits = self::allDateHzStaticProfits();
+        $allStaticProfits = self::allDateHzStaticProfits($lottery_type);
 
         $tmpProfits = $allStaticProfits;
 
@@ -664,9 +681,10 @@ class StaticService extends BaseService {
                 if($date != date('Y-m-d')) continue;
                 if($date <= '2019-02-10') continue;
                 $setData = [];
-                if(!$Static4dProfits = StaticHzProfitsPerdate::findOne(['date'=>$date])){
+                if(!$Static4dProfits = StaticHzProfitsPerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
                     $Static4dProfits = new StaticHzProfitsPerdate();
                     $setData['created_at'] = time();
+                    $setData['lottery_type'] = $lottery_type;
                 }
                 $setData['updated_at'] = time();
                 $setData['date'] = $date;
@@ -727,9 +745,9 @@ class StaticService extends BaseService {
      * @desc 所有月份4定利润统计
      * @return array
      */
-    public static function allDateHzStaticProfits(){
+    public static function allDateHzStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'allDateHzStaticProfits_PERDATE_08';
+        $mkey = 'allDateHzStaticProfits_PERDATE_08_'.$lottery_type;
 
         $allStatic = [];
         for($s=0; $s<5; $s++){
@@ -742,7 +760,7 @@ class StaticService extends BaseService {
             $date = date('Y-m-d', $time);
             $date = min([date('Y-m-d'), $date]);
             if($date>date('Y-m-d')) break;
-            if($statics = self::staticHzPerDateProfits($date)){
+            if($statics = self::staticHzPerDateProfits($date, $lottery_type)){
                 foreach ($statics as $k=>$staticData){
                     $allStatic[$k][$date] = $staticData['profits'];
                 }
@@ -809,9 +827,9 @@ class StaticService extends BaseService {
     * @desc 记录每个月的四定和值统计 - 写表
     * @return array
     */
-   public static function staticHzMonthsProfits(){
+   public static function staticHzMonthsProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
        $rst = ['status'=>200, 'msg'=>'处理成功'];
-       $allMonthStaticProfits = self::allMonthSdHzStaticProfits();
+       $allMonthStaticProfits = self::allMonthSdHzStaticProfits($lottery_type);
 
        $tmpProfits = $allMonthStaticProfits;
 
@@ -819,9 +837,10 @@ class StaticService extends BaseService {
            foreach ($tmpProfit as $month=>$tmp){
                if($month != date('Y-m')) continue;
                $setData = [];
-               if(!$StaticHzProfits = StaticHzProfits::findOne(['month'=>$month])){
+               if(!$StaticHzProfits = StaticHzProfits::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
                    $StaticHzProfits = new StaticHzProfits();
                    $setData['created_at'] = time();
+                   $setData['lottery_type'] = $lottery_type;
                }
                $setData['updated_at'] = time();
                $setData['month'] = $month;
@@ -913,9 +932,9 @@ class StaticService extends BaseService {
      * @desc 每天每个和值利润统计 add at 2019-04-27
      * @return array
      */
-    public static function allHzStaticProfitsPerdate(){
+    public static function allHzStaticProfitsPerdate($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'allHzStaticProfitsPerdate_01';
+        $mkey = 'allHzStaticProfitsPerdate_01_'.$lottery_type;
 
         $allStatic = [];
         for($s=0; $s<5; $s++){
@@ -928,14 +947,14 @@ class StaticService extends BaseService {
             $date = date('Y-m-d', $time);
             $date = min([date('Y-m-d'), $date]);
             if($date>date('Y-m-d')) break;
-            if($statics = self::staticSdHzProfitsPerdate($date)){
+            if($statics = self::staticSdHzProfitsPerdate($date, $lottery_type)){
                 //p(['statics'=>$statics]);
-                $setData = ['date'=>$date];
+                $setData = ['date'=>$date, 'lottery_type'=>$lottery_type];
                 foreach ($statics as $k=>$staticData) {
                     //$tzMoney = $staticData['tzMoney'];
                     $setData['codes_' . $staticData['name']] = $staticData['profits'];
                 }
-                if(!$StaticPerHzPerdateProfits = StaticPerHzPerdateProfits::findOne(['date'=>$date])){
+                if(!$StaticPerHzPerdateProfits = StaticPerHzPerdateProfits::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
                     $StaticPerHzPerdateProfits = new StaticPerHzPerdateProfits();
                     $setData['created_at'] = time();
                 }
@@ -1306,22 +1325,27 @@ class StaticService extends BaseService {
        $m = \Yii::$app->cache;
        $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>=', 'date', $start_date], ['<=', 'date', $end_date]];
        $SscKjDatas = SscKjData::find()->where($where)->orderBy(['id'=>SORT_DESC])->all();
+       $logArr = [];
        foreach ($SscKjDatas as $SscKjData){
            $qihao = $SscKjData->qihao;
            $mkey_profits = 'PROFITS_2B_'.$lottery_type.'_'.$qihao.'_'.$filterNums;
-           if(!$profitsData = $m->get($mkey_profits)){
+           if($profitsData = $m->get($mkey_profits)){
                $mkey_buyCodes = 'buyCodes_'.$lottery_type.'_'.$qihao;
-               if(!$buyCodes = $m->get($mkey_buyCodes)){
+               if($buyCodes = $m->get($mkey_buyCodes)){
                    $buyCodes = NumService::filterLaterCodesAnd2bcode($lottery_type, $qihao, $filterNums);
                    $m->set($mkey_buyCodes, $buyCodes, 30*24*3600);
                }
                $codes = implode('@', $buyCodes);
 
                $profitsData = OpKjService::calcuProfits(3, $codes, $SscKjData->code_str, 0.1);
+               unset($profitsData['codes']);
+               $logArr[] = [/*'codes'=>$codes, */'qihao'=>$qihao, 'counts'=>count($buyCodes), 'profitsData'=>$profitsData];
                $m->set($mkey_profits, $profitsData, 30*24*3600);
            }
            $profits += $profitsData['profits'];
        }
+       $logArr['profits'] = $profits;
+       p($logArr);
 
        return $profits;
    }

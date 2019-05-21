@@ -209,6 +209,50 @@ class NumService extends BaseService {
     }
 
     /**
+     * @desc 取两兄弟后剔除最近出现的多少期号码
+     * @param int $lottery_type
+     */
+    public static function filterLaterCodesAnd2bcode($lottery_type = 5, $qihao = '190516056', $nums = 1000){
+
+        //$filter_hz_code_status = SystemConfig::findOne(['key'=>'filter_hz_code_status'])->value;
+        $filterCodes = self::getRecentlyCodes($lottery_type, $qihao, $nums); # 最近 $nums 期号码
+
+        $codesArr = self::get2bCodeArr();
+        //p(count($codesArr));
+        foreach ($filterCodes as $filterCode){
+            $filterKey = array_search($filterCode, $codesArr);
+            if($filterKey !== false){
+                $tmpCode[$filterKey] = $codesArr[$filterKey];
+                unset($codesArr[$filterKey]);
+            }
+        }
+        //p($tmpCode);
+
+        return $codesArr;
+    }
+
+    /**
+     * @desc 最近出现的号码
+     * @param int $lottery_type
+     * @param int $nums
+     * @return array
+     */
+    public static function getRecentlyCodes($lottery_type = 5, $qihao = '190516056', $nums = 500){
+        $limit = $nums + ceil($nums * 0.3);
+        $SscKjDatas = SscKjData::find()->where(['AND', ['=', 'lottery_type', $lottery_type], ['<', 'qihao', $qihao]])->orderBy(['id'=>SORT_DESC])->limit($limit)->all();
+        $codesArr = [];
+        foreach ($SscKjDatas as $SscKjData){
+            $codesArr[] = substr($SscKjData->code_str, 0,7);
+            //$codesArr = array_unique($codesArr);
+
+            //if(count($codesArr) == $nums) break;
+        }
+
+        return $codesArr;
+    }
+
+
+    /**
      * @desc 根据四定单双1122返回号码组合
      * @param $codesArr
      */

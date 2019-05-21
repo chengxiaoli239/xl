@@ -223,15 +223,15 @@ class KjDataGet
             $index_id = $lastIndexId + 1;
             $insertData = array_merge($insertData, ['index_id'=>$index_id]);
         }
-        $insertRst = $SscKjData->setAttributes($insertData);
-        if (!$SscKjData->save()) {
+        $SscKjData->setAttributes($insertData);
+        if (!$insertRst = $SscKjData->save()) {
             $msg = current($SscKjData->getErrors());
             $logArr = ['msg'=>$msg, 'qihao'=>$qihao, 'kjData'=>$kjData, 'lottery'=>CqsscKcw::$lotteryTypeArr[$lottery_type]];
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录-错误', $logArr);
             return ['status' => 300, 'msg' => $msg];
         }
 
-        return ['status'=>200, 'msg'=>'开奖数据写入成功', 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'insertRst'=>$insertRst, 'msg'=>$SscKjData->getFirstErrors()];
+        return ['status'=>200, 'msg'=>'开奖数据写入成功', 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'insertData'=>$insertData, 'insertRst'=>$insertRst, 'msg'=>$SscKjData->getFirstErrors()];
     }
 
     /**
