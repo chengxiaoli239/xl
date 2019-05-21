@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "{{%ssc_sd_hz_yl}}".
  *
  * @property int $id
+ * @property int $index_id 顺序id
  * @property string $val 和值范围
  * @property int $current_miss 本期遗漏
  * @property int $last_time_miss 上次遗漏
@@ -42,7 +43,7 @@ class SscSdHzYl extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'lottery_type', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['index_id', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'lottery_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['yl_records'], 'string'],
             [['update_time'], 'safe'],
             [['val', 'last_time_miss_range', 'max_range'], 'string', 'max' => 64],
@@ -57,6 +58,7 @@ class SscSdHzYl extends \common\models\base\BaseModel
     {
         return [
             'id' => 'ID',
+            'index_id' => '顺序id',
             'val' => '和值范围',
             'current_miss' => '本期遗漏',
             'last_time_miss' => '上次遗漏',
