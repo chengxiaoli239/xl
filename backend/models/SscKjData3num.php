@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "{{%ssc_kj_data_3num}}".
  *
  * @property int $id
+ * @property int $index_id 顺序id
  * @property string $code_str 开奖号码str
  * @property string $code_3n 三字现号码
  * @property int $qihao 期号
@@ -33,7 +34,7 @@ class SscKjData3num extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['qihao', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['index_id', 'qihao', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
             [['code_str', 'code_3n'], 'string', 'max' => 24],
         ];
@@ -46,6 +47,7 @@ class SscKjData3num extends \common\models\base\BaseModel
     {
         return [
             'id' => 'ID',
+            'index_id' => '顺序id',
             'code_str' => '开奖号码str',
             'code_3n' => '三字现号码',
             'qihao' => '期号',
