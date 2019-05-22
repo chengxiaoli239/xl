@@ -218,8 +218,8 @@ class KjDataGet
 
         if(!$kjDatas) return false;
         if (!$SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type])) {
-            $lastIndexId = SscDataService::getKjDataLastIndexId($lottery_type);
             $SscKjData = new SscKjData();
+            $lastIndexId = SscDataService::getKjDataLastIndexId($lottery_type);
             $index_id = $lastIndexId + 1;
             $insertData = array_merge($insertData, ['index_id'=>$index_id]);
         }
@@ -230,6 +230,13 @@ class KjDataGet
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录-错误', $logArr);
             return ['status' => 300, 'msg' => $msg];
         }
+
+        # index_id
+        $lastIndexId = SscDataService::getKjDataLastIndexId($lottery_type);
+        $index_id = $lastIndexId + 1;
+        $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
+        $SscKjData->index_id = $index_id;
+        $SscKjData->save();
 
         return ['status'=>200, 'msg'=>'开奖数据写入成功', 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'insertData'=>$insertData, 'insertRst'=>$insertRst, 'msg'=>$SscKjData->getFirstErrors()];
     }
