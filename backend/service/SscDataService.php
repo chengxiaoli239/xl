@@ -663,7 +663,7 @@ class SscDataService extends BaseService {
      */
     public static function getSdHzYlHistoryMiss($zuHes, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 250){
         $last_times = 0;
-        $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['max(index_id) as last_id'])->asArray()->one();
+        $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->one();
         $min_id = $last['last_id'] - $recently - 1;
 
         $where = ['AND', ['IN', 'codes_4nums_hz', $zuHes], ['>=', 'id', $min_id]];
@@ -672,7 +672,6 @@ class SscDataService extends BaseService {
         if(count($SscKjData)>1){
             $last_times = $SscKjData[0]->index_id - $SscKjData[1]->index_id - 1;  // 上次遗漏次数
         }
-        //p($SscKjData);
 
         # 遗漏期间计算 start
         $tmpKjData = $SscKjData;
@@ -699,7 +698,8 @@ class SscDataService extends BaseService {
             $max_range = $SscKjData[1]['qihao'] ."-". $SscKjData[0]['qihao'];
         }
         $last_time_miss_range = $SscKjData[1]['qihao'] ."-". $SscKjData[0]['qihao'];
-        $current_times = $last['last_id'] - $SscKjData[0]->id;
+        $current_times = $last['last_id'] - $SscKjData[0]->index_id;
+        //p([$last['last_id'] , $SscKjData[0]]);
 
         $rstData = [
             'current_times' => $current_times,    // 当前遗漏次数
@@ -708,6 +708,7 @@ class SscDataService extends BaseService {
             'max_miss' => $max_miss,   // 近200期内的最大遗漏
             'max_range' => $max_range,   // 近200期内的最大遗漏范围
             'yl_str' => $yl_str,
+            'zihes' => $zuHes,
         ];
         //p($rstData);
 
@@ -1193,7 +1194,7 @@ class SscDataService extends BaseService {
             $SscSdHzYl->count = $Num4Type['count']; # 组合总共组数
             $SscSdHzYl->updated_at = time();
             //$SscDsYl->zhi = (string)$num;
-            $qishu = SscDataService::getQishus();
+            $qishu = SscDataService::getQishus($lottery_type);
             $SscSdHzYl->theory_nums_perdate = (string)round(($Num4Type['count']*$qishu*0.1) / 995, 2); # 理论次数/天
             $SscSdHzYl->today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where(['date'=>date('Y-m-d'),'codes_4nums_hz'=>$zuHes, 'lottery_type'=>$lottery_type])->asArray()->one()['nums'];
 
@@ -1210,6 +1211,7 @@ class SscDataService extends BaseService {
             $SscSdHzYl->status = $Data['status']; // 7、前台显示状态
             $SscSdHzYl->lottery_type = $lottery_type; // 彩种类型
             $SscSdHzYl->update_time = date('Y-m-d H:i:s');
+            //p($SscSdHzYl);
             $rst = $SscSdHzYl->save();
             if(!$rst){
                 $logArr = ['attributes'=>$SscSdHzYl->attributes, 'msg'=>$SscSdHzYl->getErrors()];
@@ -1226,11 +1228,11 @@ class SscDataService extends BaseService {
      * @param string $type
      * @return mixed|string
      */
-    public static function getQishus($type = 'ssc'){
+    public static function getQishus($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'QISHU_PERDATE_'.$type;
+        $mkey = 'QISHU_PERDATE_'.$lottery_type;
         if(!$qishu = $m->get($mkey)){
-            $key = $type.'_qishus_perdate';
+            $key = 'ssc_'.$lottery_type.'_qishus_perdate';
             $qishu = SystemConfig::find()->where(['key'=>$key])->one()->value;
 
             $m->set($mkey, $qishu, 7*24*3600);
