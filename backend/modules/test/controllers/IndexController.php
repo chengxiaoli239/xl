@@ -222,10 +222,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = SscDataService::updateSdHzYl(5); p($rst);// 四定和值遗漏
         $rst['updateDsYL'] = SscDataService::updateDsYL(5);p($rst); // 单双遗漏
-        $account = AdminModel::findOne(11)['username'];p($account);
         $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type=5);p($rst);
+        $rst = SscDataService::updateSdHzYl(5); p($rst);// 四定和值遗漏
+        $account = AdminModel::findOne(11)['username'];p($account);
         $rst = StaticService::allHzStaticProfitsPerdate();p($rst);# 循环计算每天每个和值利润统计
         $rst = StaticService::staticSdHzProfitsPerdate(); p($rst); # 每天每个和值利润统计
         $rst = StaticService::calculate2bProfits($lottery_type = DEFAULT_LOTTERY_TYPE, $start_date = '2019-05-01', $end_date = '2019-05-15'); p($rst);
