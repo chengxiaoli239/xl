@@ -255,7 +255,7 @@ class SscDataService extends BaseService {
         if($qihao){
             $last_id = SscKjData::find()->select(['id'])->where(['qihao'=>$qihao, 'lottery_type'=>$lottery_type])->asArray()->one()['id'];
         }else{
-            $last_id = SscKjData::find()->select(['max(index_id) as last_id', 'lottery_type'=>$lottery_type])->asArray()->one()['last_id'];
+            $last_id = SscKjData::find()->select(['last_id'=>'index_id', 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one()['last_id'];
         }
         $start_id = $last_id - $interval;
 
