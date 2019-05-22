@@ -18,7 +18,7 @@ class SscSdHzYl extends SscSdHzYlModel
     public function rules()
     {
         return [
-            [['id', 'index_id', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'lottery_type', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'lottery_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['val', 'last_time_miss_range', 'max_range', 'yl_records', 'theory_nums_perdate', 'update_time'], 'safe'],
         ];
     }
@@ -60,7 +60,6 @@ class SscSdHzYl extends SscSdHzYlModel
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'index_id' => $this->index_id,
             'current_miss' => $this->current_miss,
             'last_time_miss' => $this->last_time_miss,
             'max_miss' => $this->max_miss,
