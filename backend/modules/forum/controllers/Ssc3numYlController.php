@@ -36,7 +36,9 @@ class Ssc3numYlController extends BaseController
     public function actionIndex()
     {
         $searchModel = new Ssc3numYlSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        $queryParams['Ssc3numYl']['lottery_type'] = DEFAULT_LOTTERY_TYPE;
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,

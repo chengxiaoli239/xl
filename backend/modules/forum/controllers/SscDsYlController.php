@@ -36,7 +36,9 @@ class SscDsYlController extends BaseController
     public function actionIndex()
     {
         $searchModel = new SscDsYlSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        $queryParams['SscDsYl']['lottery_type'] = DEFAULT_LOTTERY_TYPE;
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,

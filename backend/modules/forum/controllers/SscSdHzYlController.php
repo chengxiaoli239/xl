@@ -36,7 +36,9 @@ class SscSdHzYlController extends BaseController
     public function actionIndex()
     {
         $searchModel = new SscSdHzYlSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        $queryParams['SscSdHzYl']['status'] = 1;
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,

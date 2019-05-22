@@ -221,6 +221,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type=5);p($rst);
         $rst = StaticService::allHzStaticProfitsPerdate();p($rst);# 循环计算每天每个和值利润统计
         $rst = StaticService::staticSdHzProfitsPerdate(); p($rst); # 每天每个和值利润统计
         $rst = StaticService::calculate2bProfits($lottery_type = DEFAULT_LOTTERY_TYPE, $start_date = '2019-05-01', $end_date = '2019-05-15'); p($rst);

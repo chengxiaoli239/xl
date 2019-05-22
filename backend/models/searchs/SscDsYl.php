@@ -47,6 +47,10 @@ class SscDsYl extends SscDsYlModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=> ['defaultOrder' => ['id'=>SORT_DESC]],
+            'pagination' => [
+                'pageSize' => 16,
+            ],
         ]);
 
         $this->load($params);

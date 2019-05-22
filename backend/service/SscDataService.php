@@ -564,6 +564,7 @@ class SscDataService extends BaseService {
             //p(['zhi'=>$num]);
             if(!$Ssc3numYl = Ssc3numYl::findOne(['zhi'=>$num, 'lottery_type'=>$lottery_type])){
                 $Ssc3numYl = new Ssc3numYl();
+                $Ssc3numYl->lottery_type = $lottery_type;
             }
 
             $Ssc3numYl->zhi = $num;

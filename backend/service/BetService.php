@@ -144,7 +144,7 @@ abstract class BetService extends BaseBetService {
                         }
                     }
                 }
-                $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$plan->lottery_type]];
+                $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type]];
                 BetService::afterBetNow($plan->lottery_type, $qihao); # 彩种投注结束锁
             }
         }
