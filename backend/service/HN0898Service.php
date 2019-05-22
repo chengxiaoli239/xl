@@ -844,7 +844,8 @@ class HN0898Service extends BaseTZService {
             }
             $cancel_status = ['正常'=>0, '已撤单'=>1];
 
-            $account = AdminModel::findOne(Yii::$app->user->id)['account'];
+            $account = AdminModel::findOne($uid)->username;
+            if($uid == 11)p(['account'=>$account]);
             $codesArr = explode('@', $list['codes']);
             $single = $list['totalmoney'] / count($codesArr);
             $setData = array_merge($setData,[
@@ -856,6 +857,7 @@ class HN0898Service extends BaseTZService {
                 'uid' => $uid,
                 'playway' => 3,
                 'tz_system_id' => $tz_system_id,
+                'lottery_type' => DEFAULT_LOTTERY_TYPE,
                 'tz_type' => 21,
                 'single' => $single,
                 'playway_name' => '四字定',

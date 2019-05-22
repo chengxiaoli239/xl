@@ -26,6 +26,7 @@ use backend\service\XlService;
 use backend\tools\Tools;
 use common\kj\cqssc\CqsscKcw;
 use common\kj\cqssc\CqsscSevenDay;
+use common\models\AdminModel;
 use common\service\CommonService;
 use common\tools\KjDataGet;
 use backend\service\BaseNumService;
@@ -221,6 +222,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $account = AdminModel::findOne(11)['username'];p($account);
         $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type=5);p($rst);
         $rst = StaticService::allHzStaticProfitsPerdate();p($rst);# 循环计算每天每个和值利润统计
         $rst = StaticService::staticSdHzProfitsPerdate(); p($rst); # 每天每个和值利润统计

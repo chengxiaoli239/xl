@@ -127,7 +127,8 @@ class IndexController extends Controller
         self::_init();
         for ($i = 0; $i<10; $i++){
             $rst = KjDataGet::updateNullCode();
-            for($lottery_type = 1; $lottery_type<=4; $lottery_type++){
+            $lottery_types = StaticService::getLotteryTypes();
+            foreach ($lottery_types as $lottery_type) {
                 $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖遗漏 - 临时
                 $rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏 - 临时
             }
@@ -245,7 +246,8 @@ class IndexController extends Controller
             $rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
             return $rst;
         }
-        for ($lottery_type=2; $lottery_type<5; $lottery_type++) {
+        $lottery_types = StaticService::getLotteryTypes();
+        foreach ($lottery_types as $lottery_type) {
             $rst = OpKjService::opSscKjData($lottery_type); # 在抓取完开奖数据已经调用 KjDataGet::grabOne
             sleep(2);
         }
