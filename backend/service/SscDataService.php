@@ -637,7 +637,7 @@ class SscDataService extends BaseService {
             $max_range = $tmpArr[1].'-'.$tmpArr[0];  // 近200期内最大遗漏
             $yl_str = implode('-',$range);
             # 最大遗漏期间计算 end
-            //p([$field=>$num,$min_id,'times'=>$times,$SscKjData[0]->id, $SscKjData[1]->id,$max_range]);
+            //p([$field=>$num,$min_id, $SscKjData[1]->id,$max_range]);
         }else{
             $max_range = $SscKjDataDs[1]['qihao'] ."-". $SscKjDataDs[0]['qihao'];
         }

@@ -222,6 +222,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst['updateDsYL'] = SscDataService::updateDsYL(5);p($rst); // 单双遗漏
         $account = AdminModel::findOne(11)['username'];p($account);
         $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type=5);p($rst);
         $rst = StaticService::allHzStaticProfitsPerdate();p($rst);# 循环计算每天每个和值利润统计
@@ -247,7 +248,6 @@ class IndexController extends Controller
         $rst = StaticService::getYlByCodes('02468,13579,X,X', 2, 18);p($rst);
         $rst = StaticService::opAllStaitcProfits();p($rst);
         $rst['updateDs'] = SscDataService::updateDsData(3); p($rst);// 每期开奖遗漏
-        $rst['updateDsYL'] = SscDataService::updateDsYL(2);p($rst); // 单双遗漏
         $rst = HN0898Service::insertDsYl();p($rst);
         $rst = BetService::bet(); p($rst);// 用户新计划投注，可正买可反买
         $rst = OpKjService::opSscKjData(2); p($rst); # 处理投注数据

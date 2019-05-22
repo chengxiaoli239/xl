@@ -845,7 +845,7 @@ class HN0898Service extends BaseTZService {
             $cancel_status = ['正常'=>0, '已撤单'=>1];
 
             $account = AdminModel::findOne($uid)->username;
-            if($uid == 11)p(['account'=>$account]);
+            //if($uid == 11)p(['account'=>$account]);
             $codesArr = explode('@', $list['codes']);
             $single = $list['totalmoney'] / count($codesArr);
             $setData = array_merge($setData,[
