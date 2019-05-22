@@ -18,7 +18,7 @@ class Ssc2numsYl extends Ssc2numsYlModel
     public function rules()
     {
         return [
-            [['id', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['val', 'last_time_miss_range', 'max_range', 'yl_records', 'update_time'], 'safe'],
         ];
     }
@@ -64,6 +64,7 @@ class Ssc2numsYl extends Ssc2numsYlModel
             'last_time_miss' => $this->last_time_miss,
             'max_miss' => $this->max_miss,
             'history_max_miss' => $this->history_max_miss,
+            'lottery_type' => $this->lottery_type,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,

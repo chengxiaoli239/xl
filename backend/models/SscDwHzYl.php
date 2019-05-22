@@ -7,7 +7,7 @@ use Yii;
 /**
  * This is the model class for table "{{%ssc_dw_hz_yl}}".
  *
- * @property string $id
+ * @property int $id
  * @property string $positions 位置
  * @property int $zhi 和值
  * @property int $current_miss 本期遗漏
@@ -50,18 +50,18 @@ class SscDwHzYl extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'positions' => Yii::t('app', '位置'),
-            'zhi' => Yii::t('app', '和值'),
-            'current_miss' => Yii::t('app', '本期遗漏'),
-            'last_time_miss' => Yii::t('app', '上次遗漏'),
-            'last_time_miss_range' => Yii::t('app', '上次遗漏范围'),
-            'max_miss' => Yii::t('app', '最大遗漏(近200期)'),
-            'max_range' => Yii::t('app', '最大遗漏范围(近200期)'),
-            'yl_records' => Yii::t('app', '遗漏记录'),
-            'history_max_miss' => Yii::t('app', '历史最大遗漏'),
-            'updated_at' => Yii::t('app', '更新时间'),
-            'update_time' => Yii::t('app', 'Update Time'),
+            'id' => 'ID',
+            'positions' => '位置',
+            'zhi' => '和值',
+            'current_miss' => '本期遗漏',
+            'last_time_miss' => '上次遗漏',
+            'last_time_miss_range' => '上次遗漏范围',
+            'max_miss' => '最大遗漏(近200期)',
+            'max_range' => '最大遗漏范围(近200期)',
+            'yl_records' => '遗漏记录',
+            'history_max_miss' => '历史最大遗漏',
+            'updated_at' => '更新时间',
+            'update_time' => 'Update Time',
         ];
     }
 

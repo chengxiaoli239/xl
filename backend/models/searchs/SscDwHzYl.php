@@ -19,7 +19,7 @@ class SscDwHzYl extends SscDwHzYlModel
     {
         return [
             [['id', 'zhi', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'updated_at'], 'integer'],
-            [['positions', 'last_time_miss_range', 'max_range', 'update_time'], 'safe'],
+            [['positions', 'last_time_miss_range', 'max_range', 'yl_records', 'update_time'], 'safe'],
         ];
     }
 
@@ -48,10 +48,6 @@ class SscDwHzYl extends SscDwHzYlModel
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
-        $hezhis = $params['SscDwHzYl']['zhi'];
-        $positions = $params['SscDwHzYl']['positions'];
-        unset($params['SscDwHzYl']['zhi']);
-        unset($params['SscDwHzYl']['positions']);
 
         $this->load($params);
 
@@ -64,7 +60,7 @@ class SscDwHzYl extends SscDwHzYlModel
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            //'zhi' => $this->zhi,
+            'zhi' => $this->zhi,
             'current_miss' => $this->current_miss,
             'last_time_miss' => $this->last_time_miss,
             'max_miss' => $this->max_miss,
@@ -75,11 +71,8 @@ class SscDwHzYl extends SscDwHzYlModel
 
         $query->andFilterWhere(['like', 'positions', $this->positions])
             ->andFilterWhere(['like', 'last_time_miss_range', $this->last_time_miss_range])
-            ->andFilterWhere(['like', 'max_range', $this->max_range]);
-        if($hezhis)
-            $query->andWhere(['zhi'=>$hezhis]);
-        if($positions)
-            $query->andWhere(['positions'=>$positions]);
+            ->andFilterWhere(['like', 'max_range', $this->max_range])
+            ->andFilterWhere(['like', 'yl_records', $this->yl_records]);
 
         return $dataProvider;
     }

@@ -18,8 +18,8 @@ class SscDsYl extends SscDsYlModel
     public function rules()
     {
         return [
-            [['id', 'value', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'updated_at'], 'integer'],
-            [['positions', 'last_time_miss_range', 'max_range', 'yl_records', 'update_time'], 'safe'],
+            [['id', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'type', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['positions', 'zhi', 'last_time_miss_range', 'max_range', 'yl_records', 'update_time'], 'safe'],
         ];
     }
 
@@ -47,10 +47,6 @@ class SscDsYl extends SscDsYlModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['id'=>SORT_DESC]],
-            'pagination' => [
-                'pageSize' => 16,
-            ],
         ]);
 
         $this->load($params);
@@ -64,16 +60,19 @@ class SscDsYl extends SscDsYlModel
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'value' => $this->value,
             'current_miss' => $this->current_miss,
             'last_time_miss' => $this->last_time_miss,
             'max_miss' => $this->max_miss,
             'history_max_miss' => $this->history_max_miss,
+            'type' => $this->type,
+            'lottery_type' => $this->lottery_type,
+            'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,
         ]);
 
         $query->andFilterWhere(['like', 'positions', $this->positions])
+            ->andFilterWhere(['like', 'zhi', $this->zhi])
             ->andFilterWhere(['like', 'last_time_miss_range', $this->last_time_miss_range])
             ->andFilterWhere(['like', 'max_range', $this->max_range])
             ->andFilterWhere(['like', 'yl_records', $this->yl_records]);
