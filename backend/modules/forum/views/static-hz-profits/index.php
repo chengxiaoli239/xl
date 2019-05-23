@@ -35,6 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'id',
                         'month',
                         'hz_0_4',
+                        'hz_1_6',
                         'hz_5_10',
                         'hz_11_15',
                         'hz_16_19',

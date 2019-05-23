@@ -18,9 +18,9 @@ class StaticHzProfitsPerdate extends StaticHzProfitsPerdateModel
     public function rules()
     {
         return [
-            [['id', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
-            [['hz_0_4', 'hz_5_10', 'hz_11_15', 'hz_16_19', 'hz_20_24', 'hz_25_29', 'hz_30_35'], 'number'],
+            [['hz_0_4', 'hz_1_6', 'hz_5_10', 'hz_11_15', 'hz_16_19', 'hz_20_24', 'hz_25_29', 'hz_30_35'], 'number'],
         ];
     }
 
@@ -63,12 +63,14 @@ class StaticHzProfitsPerdate extends StaticHzProfitsPerdateModel
         $query->andFilterWhere([
             'id' => $this->id,
             'hz_0_4' => $this->hz_0_4,
+            'hz_1_6' => $this->hz_1_6,
             'hz_5_10' => $this->hz_5_10,
             'hz_11_15' => $this->hz_11_15,
             'hz_16_19' => $this->hz_16_19,
             'hz_20_24' => $this->hz_20_24,
             'hz_25_29' => $this->hz_25_29,
             'hz_30_35' => $this->hz_30_35,
+            'lottery_type' => $this->lottery_type,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,
@@ -79,3 +81,4 @@ class StaticHzProfitsPerdate extends StaticHzProfitsPerdateModel
         return $dataProvider;
     }
 }
+

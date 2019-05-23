@@ -346,9 +346,9 @@ class StaticService extends BaseService {
                 }
             }
         }
-        //p([$static, count($SscKjDataDs)]);
+        //p([$static, count($SscKjDataDs), $lottery_type, $static[$lottery_type]]);
 
-        if($lottery_type && $static[$lottery_type]) return $static[$lottery_type];
+        //if($lottery_type && $static[$lottery_type]) return $static[$lottery_type];
         $allStatic = [];
         foreach ($typeArr as $k=>$arr){
             $profits = $static[$k] * 999.5 - $num * count($arr) * 62.5;
@@ -365,6 +365,7 @@ class StaticService extends BaseService {
         if($date != date('Y-m-d')){
             $m->set($mkey, $allStatic, 6*30*24*60*60);
         }
+        //p($allStatic);
 
         //echo $date.'月份：';
         return $allStatic;
@@ -673,6 +674,8 @@ class StaticService extends BaseService {
         $rst = ['status'=>200, 'msg'=>'处理成功'];
         $allStaticProfits = self::allDateHzStaticProfits($lottery_type);
 
+        //p($allStaticProfits);
+
         $tmpProfits = $allStaticProfits;
 
         foreach ($tmpProfits as $key=>$tmpProfit){
@@ -689,6 +692,7 @@ class StaticService extends BaseService {
                 $setData['updated_at'] = time();
                 $setData['date'] = $date;
                 $setData['hz_0_4'] = $tmpProfits['hz_0_4'][$date]; # 0-4 和值
+                $setData['hz_1_6'] = $tmpProfits['hz_1_6'][$date]; # 1-6 和值
                 $setData['hz_5_10'] = $tmpProfits['hz_5_10'][$date]; # 5-10 和值
                 $setData['hz_11_15'] = $tmpProfits['hz_11_15'][$date]; # 11 - 15
                 $setData['hz_16_19'] = $tmpProfits['hz_16_19'][$date]; # 16 - 19
@@ -960,6 +964,7 @@ class StaticService extends BaseService {
                 }
                 $setData['updated_at'] = time();
                 $StaticPerHzPerdateProfits->setAttributes($setData);
+                //p($StaticPerHzPerdateProfits->attributes);
 
                 $rst = $StaticPerHzPerdateProfits->save();
                 //p($StaticPerHzPerdateProfits->getFirstErrors());
