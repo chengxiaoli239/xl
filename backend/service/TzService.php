@@ -457,6 +457,9 @@ class TzService extends BaseService {
             case 5:
                 $rst = self::insertCqSscDataTime();
                 break;
+            case 6:
+                $rst = self::insertXjSscDataTime();
+                break;
         }
         return ['status'=>200, 'msg'=>'更新时时彩开奖', 'rst'=>$rst, 'nums'=>$actionNums];
     }
@@ -465,14 +468,14 @@ class TzService extends BaseService {
     /**
      * @desc 更新时时彩开奖时间
      */
-    public static function insertCqSscDataTime(){
+    public static function insertCqSscDataTime($lottery_type = 6){
         $actionNo = 59;
         $setData = [];
         $dateTime = strtotime('2019-02-15 00:10:00');
         for ($i=1; $i<=$actionNo; $i++){
-            $setData['type'] = 5;  # lottery_type 5 重庆时时彩
+            $setData['type'] = $lottery_type;  # lottery_type 5 重庆时时彩
             $setData['actionNo'] = $i;
-            $where = ['type'=>5, 'actionNo'=>$i];
+            $where = ['type'=>$lottery_type, 'actionNo'=>$i];
             //p(date('Y-m-d H:i:s', $dateTime), 0);
             if(!$DataTime = DataTime::findOne($where)){
                 $DataTime = new DataTime();
@@ -488,6 +491,35 @@ class TzService extends BaseService {
             $setData['stopTime'] = $HIS;
             //p($i.'='.$HI, 0);
             $DataTime->setAttributes($setData);
+            $rst = $DataTime->save();
+        }
+        return ['status'=>200, 'msg'=>'更新时时彩开奖', 'rst'=>$rst];
+    }
+
+    /**
+     * @desc 更新时时彩开奖时间
+     */
+    public static function insertXjSscDataTime($lottery_type = 6){
+        $actionNo = 48;
+        $setData = [];
+        $dateTime = strtotime('2019-02-15 10:00:00');
+        for ($i=1; $i<=$actionNo; $i++){
+            $setData['type'] = $lottery_type;  # lottery_type 5 重庆时时彩
+            $setData['actionNo'] = $i;
+            $where = ['type'=>$lottery_type, 'actionNo'=>$i];
+            //p(date('Y-m-d H:i:s', $dateTime), 0);
+            if(!$DataTime = DataTime::findOne($where)){
+                $DataTime = new DataTime();
+            }
+
+            $dateTime = $dateTime + 20 * 60;
+            //p($dateTime);
+            $HIS = date('H:i:s', $dateTime);
+            $setData['actionTime'] = $HIS;
+            $setData['stopTime'] = $HIS;
+            //p($i.'='.$HI, 0);
+            $DataTime->setAttributes($setData);
+            //p($DataTime->attributes);
             $rst = $DataTime->save();
         }
         return ['status'=>200, 'msg'=>'更新时时彩开奖', 'rst'=>$rst];

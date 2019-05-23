@@ -3,7 +3,7 @@
 return [
     'ajaxUrlRouteUser_key' => '/user/ajax.aspx', // 用户信息 route，例如：获取余额接口、
     'sscUrlRoute_key' => '/ssc/index.aspx', // 时时彩首页、登录请求路由
-    'ajaxUrlRouteLot_key' => '/ssc/ajax.aspx', // 彩票、开奖异步路由
+    'ajaxUrlRouteLot_key' => '/ssc/ajax.aspx',
     'ajaxUrlRouteLotDw_key' => '/ssc_qmode/ajax.aspx', // 定位接口
     'username' => 'gaozi2017',
     'password' => '0654321',

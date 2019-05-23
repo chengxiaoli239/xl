@@ -101,27 +101,40 @@ class HN0898Service extends BaseTZService {
      * @param $uid
      * @param $tz_system_id
      */
-    public static function getTzSiteInfo($tz_system_id, $url_key = ''){
+    public static function getTzSiteInfo($tz_system_id, $url_key = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
         //p(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id,$TzSystemUser->attributes]);
         $baseUrl = $TzSystemUser->ssc_domain;
         self::$cookie = $TzSystemUser->cookie;
         \Yii::$app->params['baseUrl']  = $TzSystemUser->ssc_domain;
         \Yii::$app->params['domain']  = str_replace('https://','',$TzSystemUser->ssc_domain);
-        \Yii::$app->params['ajaxUrlRouteUser']  = $TzSystemUser->ssc_domain.Yii::$app->params['ajaxUrlRouteUser_key'];
+        \Yii::$app->params['ajaxUrlRouteUser']  = $TzSystemUser->ssc_domain.'/user/ajax.aspx';
         \Yii::$app->params['sscUrlRoute']  = $TzSystemUser->ssc_domain.Yii::$app->params['sscUrlRoute_key'];
-        \Yii::$app->params['ajaxUrlRouteLot']  = $TzSystemUser->ssc_domain.Yii::$app->params['ajaxUrlRouteLot_key'];
-        \Yii::$app->params['ajaxUrlRouteLotDw']  = $TzSystemUser->ssc_domain.Yii::$app->params['ajaxUrlRouteLotDw_key'];
         $tzSiteInfo = [
             'baseUrl' => $TzSystemUser->ssc_domain,
             'domain' => \Yii::$app->params['domain'],
             'CANCEL_ORDER' => $baseUrl.'/api/data.aspx',
-            'ORDER_TZ' => str_replace('www.','',Yii::$app->params['ajaxUrlRouteLotDw']),
-            'SSC_INDEX' => $baseUrl.'/ssc/index.aspx',
+            //'ORDER_TZ' => str_replace('www.','',Yii::$app->params['ajaxUrlRouteLotDw']),
+            //'SSC_INDEX' => $baseUrl.'/ssc/index.aspx',
             'INDEX' => $baseUrl.'/index.aspx',
-            'GET_BALANCE' => Yii::$app->params['ajaxUrlRouteUser'],
+            'GET_BALANCE' => $TzSystemUser->ssc_domain.'/user/ajax.aspx',
             'CAPTCHA_CODE' => $TzSystemUser->ssc_domain.'/code2.aspx',
         ];
+
+        switch ($lottery_type){
+            case 5: # 重庆
+                $tzSiteInfo = array_merge($tzSiteInfo,[
+                    'ORDER_TZ' => str_replace('www.','',$TzSystemUser->ssc_domain).'/ssc_qmode/ajax.aspx',
+                    'SSC_INDEX' => $baseUrl.'/ssc/index.aspx',
+                ]);
+                break;
+            case 6: # 新疆
+                $tzSiteInfo = array_merge($tzSiteInfo,[
+                    'ORDER_TZ' => str_replace('www.','',$TzSystemUser->ssc_domain).'/jxssc_qmode/ajax.aspx',
+                    'SSC_INDEX' => $baseUrl.'/jxssc/index.aspx',
+                ]);
+                break;
+        }
         if($url_key && $tzSiteInfo[$url_key]) return $tzSiteInfo[$url_key];
 
         return $tzSiteInfo;
@@ -348,7 +361,7 @@ class HN0898Service extends BaseTZService {
         $headers = array_merge(self::$headers,$header);
         //p($headers);
         //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
-        $url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ');
+        $url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ', $lottery_type);
 
         //$account = User::findOne(self::$user_id)->account;  # 投注用户账号
         //$account = User::findOne(['admin_id'=>self::$user_id])->account;  # 投注用户账号
@@ -431,11 +444,12 @@ class HN0898Service extends BaseTZService {
         $uid = $BettingRecords->uid;
         $snid = $BettingRecords->snid;
         self::__init($uid, $tz_system_id);
+        $lot = $BettingRecords->lottery_type == 6 ? 'jxssc' : 'ssc';
 
         $rst = ['status'=>300, 'msg'=>'操作成功'];
         //$url = HN0898Service::getUserUrlArr(self::$user_id,'CANCEL_ORDER');
         $url = HN0898Service::getTzSiteInfo($tz_system_id,'CANCEL_ORDER');
-        $post_data = [ 'act' => 'cancelsn', 'lot' => 'ssc', 'snid'=> $snid ];
+        $post_data = [ 'act' => 'cancelsn', 'lot' => $lot, 'snid'=> $snid ];
         $headers = self::$headers;
 
         $rstData = CurlService::httpPost($url,http_build_query($post_data), $headers);
@@ -898,24 +912,6 @@ class HN0898Service extends BaseTZService {
         return ['action'=>$form['action'],'inputs'=>$inputs];
     }
 
-    /**
-     * @description 获取接口地址
-     * @param string $key
-     * @return array|mixed
-     */
-    public static function getUrlByKey($key =  'ORDER_TZ'){
-        $user_id = Yii::$app->user->id;
-        $urlArr = [
-            'CANCEL_ORDER' => self::$baseUrl.'/api/data.aspx',
-            'ORDER_TZ' => str_replace('www.','',Yii::$app->params['ajaxUrlRouteLotDw']),
-            'SSC_INDEX' => self::$baseUrl.'/ssc/',
-            'GET_BALANCE' => Yii::$app->params['ajaxUrlRouteUser'],
-        ];
-
-        if(!$key) return $urlArr;
-        return $urlArr[$key];
-    }
-
     public static function getZjByInterval(){
         $times = 0;
 
@@ -1117,7 +1113,7 @@ class HN0898Service extends BaseTZService {
         $time = date("H:i:s");
         $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC";
         $rst = $db->createCommand($sql)->queryOne();
-        switch ($lottery_type){
+        switch ($lottery_type) {
             case 1: # 希腊1.5分彩
                 //break;
             case 2: # 希腊3分彩
@@ -1125,24 +1121,36 @@ class HN0898Service extends BaseTZService {
             case 3: # 希腊5分彩
                 //break;
             case 4: # 希腊10分彩
-                if(!$rst) {
+                if (!$rst) {
                     $rst['actionNo'] = 001; // 大于 23:56  -> null  设置为120期
                     $qihao = date("ymd", strtotime('+1 day')) . sprintf("%03d", $rst['actionNo']);
-                }else{
-                    $qihao = date("ymd").sprintf("%03d", $rst['actionNo']);
+                } else {
+                    $qihao = date("ymd") . sprintf("%03d", $rst['actionNo']);
                 }
                 break;
             case 5: # 5:重庆ssc
-                if(!$rst && $lottery_type == 5) {
+                if (!$rst && $lottery_type == 5) {
                     $rst['actionNo'] = 001; // 大于 23:56  -> null  设置为120期
                     $qihao = date("ymd", strtotime('+1 day')) . sprintf("%03d", $rst['actionNo']);
-                }elseif ('03:10:00'<$time && $time<'07:30:00'){
-                    $qihao = date("ymd").sprintf("%03d", 10);
-                }else{
-                    $qihao = date("ymd").sprintf("%03d", $rst['actionNo']);
+                } elseif ('03:10:00' < $time && $time < '07:30:00') {
+                    $qihao = date("ymd") . sprintf("%03d", 10);
+                } else {
+                    $qihao = date("ymd") . sprintf("%03d", $rst['actionNo']);
                 }
                 break;
             case 6: # 新疆ssc
+                if ('23:40:00'<$time && $time<'23:59:55'){
+                    $rst['actionNo'] = 42;
+                }elseif('00:00:00'<$time && $time<'02:00:00'){
+                    $where = ['AND',['=','type', $lottery_type],['>=', 'actionTime', $time],['between', 'actionTime','00:00:00','02:00:00']];
+                    $rst = DataTime::find($where)->where($where)->asArray()->one();
+                    $date = '20'.date("ymd") - 1;
+                    $qihao = $date.sprintf("%02d", $rst['actionNo']);
+                }else{
+                    $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '" . $time . "' AND type=$lottery_type ORDER BY id ASC";
+                    $rst = $db->createCommand($sql)->queryOne();
+                    $qihao = '20'.date("ymd").sprintf("%02d", $rst['actionNo']);
+                }
                 break;
         }
 

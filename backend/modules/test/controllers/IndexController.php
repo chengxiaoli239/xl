@@ -222,6 +222,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $qihao = HN0898Service::getQihao($lottery_type = 6);p($qihao);
+        $rst = TzService::insertSscDataTime(6); p($rst);
         $rst = StaticService::allHzStaticProfitsPerdate();p($rst);# 循环计算每天每个和值利润统计
         $rst[] = StaticService::static4dPerDateProfits();p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst = StaticService::staticSdHzProfitsPerdate(); p($rst); # 每天每个和值利润统计
@@ -247,7 +249,6 @@ class IndexController extends Controller
 
         $rst = NumService::filterLaterCodesAnd2bcode(5, $qihao = '190516056');p($rst);
         $rst = NumService::getRecentlyCodes(5);p($rst);
-        $rst = TzService::insertSscDataTime(5); p($rst);
         $rst = UserSysPlansService::userSysPlanChange(2);p($rst);
         $rst = StaticService::getYlByCodes('02468,13579,X,X', 2, 18);p($rst);
         $rst = StaticService::opAllStaitcProfits();p($rst);

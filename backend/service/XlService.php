@@ -97,17 +97,13 @@ class XlService extends BaseTZService {
      * @param $uid
      * @param $tz_system_id
      */
-    public static function getTzSiteInfo($tz_system_id, $url_key = ''){
+    public static function getTzSiteInfo($tz_system_id, $url_key = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
         //p(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id,$TzSystemUser->attributes]);
         $baseUrl = $TzSystemUser->ssc_domain;
         self::$cookie = $TzSystemUser->cookie;
         \Yii::$app->params['baseUrl']  = $TzSystemUser->ssc_domain;
         \Yii::$app->params['domain']  = str_replace('http://','',$TzSystemUser->ssc_domain);
-        \Yii::$app->params['ajaxUrlRouteUser']  = $TzSystemUser->ssc_domain.Yii::$app->params['ajaxUrlRouteUser_key'];
-        \Yii::$app->params['sscUrlRoute']  = $TzSystemUser->ssc_domain.Yii::$app->params['sscUrlRoute_key'];
-        \Yii::$app->params['ajaxUrlRouteLot']  = $TzSystemUser->ssc_domain.Yii::$app->params['ajaxUrlRouteLot_key'];
-        \Yii::$app->params['ajaxUrlRouteLotDw']  = $TzSystemUser->ssc_domain.Yii::$app->params['ajaxUrlRouteLotDw_key'];
         $tzSiteInfo = [
             'baseUrl' => $TzSystemUser->ssc_domain,
             'domain' => \Yii::$app->params['domain'],
@@ -117,7 +113,7 @@ class XlService extends BaseTZService {
             'MULBET_URL' => $baseUrl.'/Member/MultipleBet',
             'GetPeriodsQuery' => $baseUrl.'/api/Periods/GetPeriodsQuery',
             'INDEX' => $baseUrl.'/index.aspx',
-            'GET_BALANCE' => Yii::$app->params['ajaxUrlRouteUser'],
+            'GET_BALANCE' => $baseUrl.'/user/ajax.aspx',
             'CAPTCHA_CODE' => $TzSystemUser->ssc_domain.'/code2.aspx',
         ];
         if($url_key && $tzSiteInfo[$url_key]) return $tzSiteInfo[$url_key];
@@ -698,36 +694,7 @@ class XlService extends BaseTZService {
         return ['action'=>$form['action'],'inputs'=>$inputs];
     }
 
-    /**
-     * @desc 获取用户的url 数组
-     * @param $user_id
-     * @param string $url_key
-     * @return array|mixed
-     */
-    public static function getUserUrlArr($user_id, $url_key =''){
-        $User = User::findOne(['admin_id'=>$user_id]);
-        $baseUrl = $User->ssc_domain;
-        \Yii::$app->params['baseUrl']  = $User->ssc_domain;
-        \Yii::$app->params['domain']  = str_replace('https://','',$User->ssc_domain);
-        \Yii::$app->params['ajaxUrlRouteUser']  = $User->ssc_domain.Yii::$app->params['ajaxUrlRouteUser_key'];
-        \Yii::$app->params['sscUrlRoute']  = $User->ssc_domain.Yii::$app->params['sscUrlRoute_key'];
-        \Yii::$app->params['ajaxUrlRouteLot']  = $User->ssc_domain.Yii::$app->params['ajaxUrlRouteLot_key'];
-        \Yii::$app->params['ajaxUrlRouteLotDw']  = $User->ssc_domain.Yii::$app->params['ajaxUrlRouteLotDw_key'];
-        $urlArr = [
-            'baseUrl' => $User->ssc_domain,
-            'domain' => \Yii::$app->params['domain'],
-            'CANCEL_ORDER' => $baseUrl.'/api/data.aspx',
-            'ORDER_TZ' => str_replace('www.','',Yii::$app->params['ajaxUrlRouteLotDw']),
-            'SSC_INDEX' => $baseUrl.'/ssc/index.aspx',
-            'GET_BALANCE' => Yii::$app->params['ajaxUrlRouteUser'],
-            'CAPTCHA_CODE' => $User->ssc_domain.'/code2.aspx',
-        ];
-        if($url_key && $urlArr[$url_key]) return $urlArr[$url_key];
-
-        return $urlArr;
-    }
-
-    public static function getZjByInterval(){
+   public static function getZjByInterval(){
         $times = 0;
 
         return $times;

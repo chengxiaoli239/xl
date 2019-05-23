@@ -75,7 +75,7 @@ class CurlService extends BaseService{
             return 'ok';
         }
         $rstData = json_decode($data, TRUE);
-        //p([$data, $rstData]);
+        //p([$data, $rstData, $post_data, $header]);
 
         return $rstData;
     }
