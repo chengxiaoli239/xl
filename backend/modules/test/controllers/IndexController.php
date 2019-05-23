@@ -222,8 +222,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst[] = StaticService::static4dPerDateProfits();p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst = StaticService::allHzStaticProfitsPerdate();p($rst);# 循环计算每天每个和值利润统计
+        $rst[] = StaticService::static4dPerDateProfits();p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst = StaticService::staticSdHzProfitsPerdate(); p($rst); # 每天每个和值利润统计
         $rst = StaticService::staticSDHzPerDateProfits(); p($rst);
         $rst[] = StaticService::opAllStaticProfits(); p($rst);# 利润统计

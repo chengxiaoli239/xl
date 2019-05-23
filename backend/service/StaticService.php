@@ -54,6 +54,7 @@ class StaticService extends BaseService {
     # 和值类型
     public static $typeHzArr = [
         'hz_0_4' => [0, 1, 2, 3, 4],
+        'hz_1_6' => [1, 2, 3, 4, 5, 6],
         'hz_5_10' => [5, 6, 7, 8, 9, 10],
         'hz_11_15' => [11, 12, 13, 14, 15],
         'hz_16_19' => [16, 17, 18, 19],
@@ -262,14 +263,14 @@ class StaticService extends BaseService {
      * @param int $type
      * @return array|mixed
      */
-    public static function staticSdHzProfits($month = '2018-11', $type = 0){
+    public static function staticSdHzProfits($month = '2018-11', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'MONTH_STATIC_DATA_01_'.$month;
+        $mkey = 'MONTH_STATIC_DATA_01_'.$lottery_type.'_'.$month;
         $typeArr = self::$typeHzArr;
         if($month != date('Y-m') && $allStatic = $m->get($mkey)){
             return $allStatic;
         }
-        $where = ['LEFT(date, 7)'=>$month];
+        $where = ['LEFT(date, 7)'=>$month, 'lottery_type'=>$lottery_type];
         $allCounts = SscKjData::find()->select(['month'=>'LEFT(date, 7)', 'nums'=>'COUNT(id)'])->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->count();
         //p($SscKjData);
         /*
@@ -293,7 +294,7 @@ class StaticService extends BaseService {
         $allStatic = [];
         foreach ($typeArr as $k=>$hzArr){
 
-            $where = ['LEFT(date, 7)'=>$month, 'codes_4nums_hz'=> $hzArr];
+            $where = ['LEFT(date, 7)'=>$month, 'codes_4nums_hz'=> $hzArr, 'lottery_type'=>$lottery_type];
             $zJcounts = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->count(); # 中奖次数
             $where = ['codes_hz'=>$hzArr];
             $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count(); # 期数
@@ -498,14 +499,14 @@ class StaticService extends BaseService {
      * @desc 所有月份4定和值利润统计
      * @return array
      */
-    public static function allMonthSdHzStaticProfits(){
+    public static function allMonthSdHzStaticProfits($lottery = DEFAULT_LOTTERY_TYPE){
         $months = [];
         for ($i=3; $i>=0; $i--){
             $months[] = date('Y-m', strtotime('-'.$i.' months'));
         }
         $allStatic = [];
         foreach ($months as $month){
-            $statics = self::staticSdHzProfits($month);
+            $statics = self::staticSdHzProfits($month, $lottery);
             foreach ($statics as $k=>$staticData){
                 $allStatic[$k][$month] = $staticData['profits'];
             }
@@ -844,11 +845,12 @@ class StaticService extends BaseService {
                if(!$StaticHzProfits = StaticHzProfits::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
                    $StaticHzProfits = new StaticHzProfits();
                    $setData['created_at'] = time();
-                   $setData['lottery_type'] = $lottery_type;
                }
+               $setData['lottery_type'] = $lottery_type;
                $setData['updated_at'] = time();
                $setData['month'] = $month;
                $setData['hz_0_4'] = $tmpProfits['hz_0_4'][$month]; # 0-4 和值
+               $setData['hz_1_6'] = $tmpProfits['hz_1_6'][$month]; # 1-6 和值
                $setData['hz_5_10'] = $tmpProfits['hz_5_10'][$month]; # 5-10 和值
                $setData['hz_11_15'] = $tmpProfits['hz_11_15'][$month]; # 11 - 15
                $setData['hz_16_19'] = $tmpProfits['hz_16_19'][$month]; # 16 - 19
@@ -962,11 +964,15 @@ class StaticService extends BaseService {
                     $StaticPerHzPerdateProfits = new StaticPerHzPerdateProfits();
                     $setData['created_at'] = time();
                 }
+                $setData['lottery_type'] = $lottery_type;
                 $setData['updated_at'] = time();
                 $StaticPerHzPerdateProfits->setAttributes($setData);
                 //p($StaticPerHzPerdateProfits->attributes);
 
                 $rst = $StaticPerHzPerdateProfits->save();
+                if($rst){
+                    $allStatic[$date] = $StaticPerHzPerdateProfits->attributes;
+                }
                 //p($StaticPerHzPerdateProfits->getFirstErrors());
             }
             $m->set($mkey, $time, 7*24*3600);
