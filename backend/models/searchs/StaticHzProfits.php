@@ -20,7 +20,7 @@ class StaticHzProfits extends StaticHzProfitsModel
         return [
             [['id', 'created_at', 'updated_at'], 'integer'],
             [['month', 'update_time'], 'safe'],
-            [['hz_0_4', 'hz_5_10', 'hz_11_15', 'hz_16_19', 'hz_20_24', 'hz_25_29', 'hz_30_35'], 'number'],
+            [['hz_0_4', 'hz_1_6', 'hz_5_10', 'hz_11_15', 'hz_16_19', 'hz_20_24', 'hz_25_29', 'hz_30_35'], 'number'],
         ];
     }
 
@@ -63,6 +63,7 @@ class StaticHzProfits extends StaticHzProfitsModel
         $query->andFilterWhere([
             'id' => $this->id,
             'hz_0_4' => $this->hz_0_4,
+            'hz_1_6' => $this->hz_1_6,
             'hz_5_10' => $this->hz_5_10,
             'hz_11_15' => $this->hz_11_15,
             'hz_16_19' => $this->hz_16_19,

@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string $month 月份
  * @property string $hz_0_4 0到4
+ * @property string $hz_1_6 1到6
  * @property string $hz_5_10 5到10
  * @property string $hz_11_15 11到15
  * @property string $hz_16_19 16到19
@@ -37,7 +38,7 @@ class StaticHzProfits extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['hz_0_4', 'hz_5_10', 'hz_11_15', 'hz_16_19', 'hz_20_24', 'hz_25_29', 'hz_30_35'], 'number'],
+            [['hz_0_4', 'hz_1_6', 'hz_5_10', 'hz_11_15', 'hz_16_19', 'hz_20_24', 'hz_25_29', 'hz_30_35'], 'number'],
             [['lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
@@ -54,6 +55,7 @@ class StaticHzProfits extends \common\models\base\BaseModel
             'id' => 'ID',
             'month' => '月份',
             'hz_0_4' => '0到4',
+            'hz_1_6' => '1到6',
             'hz_5_10' => '5到10',
             'hz_11_15' => '11到15',
             'hz_16_19' => '16到19',
