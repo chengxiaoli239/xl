@@ -32,26 +32,31 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
-                        'val',
+                        //'id',
+                        //'val',
+                        ['attribute' => 'val','headerOptions'=>['width'=>'5%'],'label'=>'当前遗漏',
+                            'value' => function($model) {
+                                return \backend\service\SscDataService::getStaticNameByType($model->val);
+                            }
+                        ],
                         'current_miss',
-                        'last_time_miss:datetime',
-                        'last_time_miss_range',
-                        //'max_miss',
+                        'last_time_miss',
+                        //'last_time_miss_range',
+                        'max_miss',
                         //'max_range',
-                        //'yl_records:ntext',
-                        //'history_max_miss',
-                        //'count',
+                        'yl_records:ntext',
+                        'history_max_miss',
+                        'count',
                         //'static_nums',
-                        //'theory_nums_perdate',
-                        //'today_nums',
+                        'theory_nums_perdate',
+                        'today_nums',
                         //'lottery_type',
                         //'status',
                         //'created_at',
                         //'updated_at',
                         //'update_time',
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
             </div>

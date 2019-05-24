@@ -562,11 +562,15 @@ class SscDataService extends BaseService {
             if(!$SscStaticYl = SscStaticYl::findOne(['lottery_type'=>$lottery_type, 'val'=>$dsData['val']])){
                 $SscStaticYl = new SscStaticYl();
                 $SscStaticYl->created_at = time();
+                $SscStaticYl->static_nums = 250;
             }
+            $vals = explode(',', $dsData['val']);
+            $count = SscDataService::getNumCounts($vals);
+            //p([$count, $dsData['val']]);
             $SscStaticYl->lottery_type = $lottery_type;
             $SscStaticYl->updated_at = time();
             $SscStaticYl->val = $dsData['val'];
-            $miss = SscDataService::getCodeTypeHistoryMiss($dsData['val'], $lottery_type); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+            $miss = SscDataService::getCodeTypeHistoryMiss($dsData['val'], $lottery_type, $SscStaticYl->static_nums); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
             //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
             $SscStaticYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
             $SscStaticYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
@@ -575,10 +579,20 @@ class SscDataService extends BaseService {
             $SscStaticYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
             $SscStaticYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
             $SscStaticYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
-            $SscStaticYl->count = '';
-            //p($updateData);
-            //if($YL_data[$num] > $SscStaticYl->max_miss && $YL_data[$num] > $SscStaticYl->history_max_miss){
-            //}
+            $SscStaticYl->count = $count;
+
+            $qishu = SscDataService::getQishus($lottery_type);
+            $where = ['AND'];
+            foreach ($vals as $val){
+                $where  = array_merge($where, [['=', $val, 1]]);
+            }
+            $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where($where)->asArray()->one();
+            $SscStaticYl->theory_nums_perdate = (string)round(($Num4Type['count']*$qishu*0.1) / 995, 2); # 理论次数/天
+            $today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', date('Y-m-d')]]);
+            //$today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', '2019-05-24']]);
+            $today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($today_nums_where)->asArray()->all()[0]['nums'];
+            $SscStaticYl->today_nums = $today_nums;
+
             $SscStaticYl->history_max_miss = max($miss['current_times'],$SscStaticYl->max_miss,$SscStaticYl->history_max_miss); // 6、历史最大遗漏
             $SscStaticYl->update_time = date('Y-m-d H:i:s');
             //p($SscStaticYl->attributes);
@@ -590,6 +604,26 @@ class SscDataService extends BaseService {
         }
 
         return $rst;
+    }
+
+    /**
+     * @desc 返回记录数，组数
+     * @param $vals
+     * @return int
+     */
+    public static function getNumCounts($vals){
+
+        if(count($vals) == 1){
+            $where = ['=', $vals[0], 1];
+        }else{
+            $where = ['AND'];
+            foreach ($vals as $val){
+                $where = array_merge($where, [ ['=', $val, 1] ]);
+            }
+        }
+        $Num4Type = Num4Type::find()->where($where)->all();
+
+        return count($Num4Type);
     }
 
     /**
@@ -1284,6 +1318,28 @@ class SscDataService extends BaseService {
         p($SscDsYls);
     }
 
+    /**
+     * @desc 根据统计type 返回名称
+     * @param string $type
+     * @return mixed
+     */
+    public static function getStaticNameByType($type = 'type_2'){
+
+        $m = \Yii::$app->cache;
+        $mkey = 'mkey_StaticNameByType';
+        if(!$StaticNamesArr = $m->get($mkey)){
+            $StaticNamesArr = [];
+            $SscStaticVals = SscStaticVal::find()->all();
+            foreach ($SscStaticVals as $sscStaticVal){
+                $StaticNamesArr[$sscStaticVal->val] = $sscStaticVal->name;
+            }
+            $m->set($mkey, $StaticNamesArr, 300);
+        }
+
+        if($type && isset($StaticNamesArr[$type])) return $StaticNamesArr[$type];
+
+        return $StaticNamesArr;
+    }
 
     /**
      * @desc 四定和值遗漏统计 add 2019-03-24
