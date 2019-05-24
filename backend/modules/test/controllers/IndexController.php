@@ -8,12 +8,6 @@
 
 namespace backend\modules\test\controllers;
 
-use backend\models\DataTime;
-use backend\models\SscDsYl;
-use backend\models\SscDwsHzNums;
-use backend\models\SscKjDataDs;
-use backend\models\SysPlansCodes;
-use backend\models\TzSystems;
 use backend\service\BetService;
 use backend\service\NumService;
 use backend\service\SevenService;
@@ -53,80 +47,6 @@ class IndexController extends Controller
         header("Content-type: text/html; charset=utf-8");
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
     }
-    public function actionTestGp(){
-        $host = "https://jisucpkj.market.alicloudapi.com";
-        $type = 3;
-        $appcode = "b99d5f811dae455e9d13e01665fd8ff7";
-        $method = "GET";
-
-        $curl = curl_init();
-        if($type == 1){
-            $path = "/caipiao/class";
-            $headers = array();
-            array_push($headers, "Authorization:APPCODE " . $appcode);
-            $querys = "";
-            $bodys = "";
-            $url = $host . $path;
-        }elseif ($type == 2){
-            $path = "/caipiao/query";
-            $headers = array();
-            array_push($headers, "Authorization:APPCODE " . $appcode);
-            $querys = "caipiaoid=73&issueno=18082223";
-            $bodys = "";
-            $url = $host . $path . "?" . $querys;
-        }elseif ($type == 3){
-            $host =  'https://stock.api51.cn/real';
-            $url =  $host.'/en_prod_code=50';
-            $headers = [];
-        }
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-        curl_setopt($curl, CURLOPT_URL, $url);
-        //curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_FAILONERROR, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, false);
-        curl_setopt($curl, CURLOPT_HEADER, true);
-        $data = curl_exec($curl);
-        return $data;
-    }
-    public function actionTest(){
-        //$html_data = HN0898Service::getRemoteHtmlContent('gaozi2017'); // 1、登录： cookie 传值  2、未登录 为空 p($html_data);
-        $rst = HN0898Service::login();
-        $cookiefile = \Yii::$app->basePath . "/runtime/captcha/cookie_file.txt";
-        $url = 'https://700056.com/code2.aspx';
-        $cookie = 'onogihbgsbgnqo45xkatfjrl';
-        $headers = [
-            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            'Accept-Encoding: gunzip, deflate, br',
-            'Cookie: ASP.NET_SessionId='.$cookie,
-            'Host: 700056.com',
-            'Upgrade-Insecure-Requests: 1',
-        ];
-        $rst = CurlService::curl_get_cookie($url,$headers, $cookiefile);
-        p($rst);
-        $imageData = CurlService::httpGet($url, $headers);
-        $filename = Yii::$app->basePath . "/runtime/captcha/".$cookie.".png";
-        $tp = fopen($filename,"w");
-        fwrite($tp, $imageData);
-        fclose($tp);
-
-        exit;
-        header("Content-type:text/html;charset=utf-8");
-        $ch = curl_init('http://op.juhe.cn/vercode/index');
-        $cfile = curl_file_create($filename, 'image/png', 'pic.png');
-        $data = array(
-            'key' => '44cf1005dc909ddf8ec8c1a08479347a', //请替换成您自己的key
-            'codeType' => '6001', // 验证码类型代码，请在https://www.juhe.cn/docs/api/id/60/aid/352查询
-            'image' => $cfile,
-        );
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        $response = curl_exec($ch);
-        $curl_errno = curl_errno($ch);
-        $curl_error = curl_error($ch);
-        curl_close($ch);
-        //var_dump($response);
-
-    }
 
     public function actionGetmoney(){
         p(rand());
@@ -134,51 +54,7 @@ class IndexController extends Controller
         p($cookie);
     }
 
-    public function actionError()
-    {
-
-        $exception = Yii::$app->errorHandler->exception;
-        if ($exception !== null) {
-            return $this->render('error.html', ['exception' => $exception]);
-        }
-    }
-
-    public function actionGetinfo(){
-        $data = HNService::http_request();
-        p($data);
-    }
-
-    /**
-     * @decription 登陆接口
-     */
-    public function actionLogin()
-    {
-        $type = $this->_post['type'];
-        switch ($type){
-            case '0898':
-                $LoginService = new HNLoginService();
-                $LoginService->login();
-                break;
-            default:;
-
-        }
-    }
-
-    public function actionThsLogin(){
-        //$url = 'http://upass.10jqka.com.cn/login?redir=http://i.10jqka.com.cn';
-        $url = 'http://t.10jqka.com.cn/newcircle/user/userPersonal/?from=finance&tab=zxs';
-        $headers = [
-            'Accept'=>'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            'Host'=>'t.10jqka.com.cn',
-            'Upgrade-Insecure-Requests'=>1,
-            'Cookie'=>'historystock=300128; spversion=20130314; Hm_lvt_78c58f01938e4d85eaf619eae71b4ed1=1531665461,1531929858,1532006687; Hm_lpvt_78c58f01938e4d85eaf619eae71b4ed1=1532121963; v=AoJO-1RIbQ_JO3HTWFX9pEtu04PnU4ZtOFd6kcybrvWgHyw1tOPWfQjn_6uf; user=MDpnYW96aTIwMTE6Ok5vbmU6NTAwOjEyNTM3Njg0NDoxLDEwMDAsNDA7MiwxLDQwOzMsMSw0MDs1LDEsNDA7OCwwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMTAwMDAsNDA7NywxMTExMTExMTExMSw0MDs0NCwxMSw0MDs2LDEsNDA6MjU6OjoxMTUzNzY4NDQ6MTUzMjg0ODA1NDo6OjEzMjA0MjY3MjA6MjI5OTQ2OjA6MWZiNGMzOThiNWMyYjViZjZiMTVmMjZjMTAwZWFjNDM0OmRlZmF1bHRfMjow; userid=115376844; u_name=gaozi2011; escapename=gaozi2011; ticket=1a838a08fdcf44c71432dcddbd5108a7',
-            'refer'=>'http://i.10jqka.com.cn/115376844/infocenter',
-        ];
-        $data = CurlService::httpGet($url,$headers);
-        p($data);
-    }
-
-    /**
+   /**
      * @description 0-9选3个数，三字现
      */
     public function actionTestNum()
@@ -222,6 +98,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::updateCodeTypeYL();p($rst);
+        $rst = NumService::getCodesArise(['9377']);p(count($rst));
+        $arr = ['type_2b'=>1, 'hz'=>[11,12,13,14,15,16,24]]; p(json_encode($arr));
+        $rst = NumService::getCodesKuaiXuan(['type_2b'=>1, 'hz'=>[11,24], 'hz_v'=>1]);p($rst);
+        $rst = NumService::getCodesKuaiXuan(['type_2'=>1, 'hz'=>[8,28]]);p($rst);
         $qihao = HN0898Service::getQihao($lottery_type = 6);p($qihao);
         $rst = TzService::insertSscDataTime(6); p($rst);
         $rst = StaticService::allHzStaticProfitsPerdate();p($rst);# 循环计算每天每个和值利润统计

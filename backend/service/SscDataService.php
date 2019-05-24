@@ -18,6 +18,8 @@ use backend\models\SscKjData3num;
 use backend\models\SscKjDataDs;
 use backend\models\SscSdHzVal;
 use backend\models\SscSdHzYl;
+use backend\models\SscStaticVal;
+use backend\models\SscStaticYl;
 use backend\models\SystemConfig;
 use backend\models\ThreeNum;
 use common\service\CommonService;
@@ -549,6 +551,48 @@ class SscDataService extends BaseService {
     }
 
     /**
+     * @desc 双重、三重、双双重遗漏统计
+     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     */
+    public static function updateCodeTypeYL($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $rst = [];
+
+        $SscStaticVals = SscStaticVal::find()->asArray()->all();
+        foreach ($SscStaticVals as $dsData){
+            if(!$SscStaticYl = SscStaticYl::findOne(['lottery_type'=>$lottery_type, 'val'=>$dsData['val']])){
+                $SscStaticYl = new SscStaticYl();
+                $SscStaticYl->created_at = time();
+            }
+            $SscStaticYl->lottery_type = $lottery_type;
+            $SscStaticYl->updated_at = time();
+            $SscStaticYl->val = $dsData['val'];
+            $miss = SscDataService::getCodeTypeHistoryMiss($dsData['val'], $lottery_type); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+            //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
+            $SscStaticYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+            $SscStaticYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
+            $SscStaticYl->last_time_miss = $miss['last_times']; // 2、上次遗漏
+            $SscStaticYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
+            $SscStaticYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
+            $SscStaticYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
+            $SscStaticYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
+            $SscStaticYl->count = '';
+            //p($updateData);
+            //if($YL_data[$num] > $SscStaticYl->max_miss && $YL_data[$num] > $SscStaticYl->history_max_miss){
+            //}
+            $SscStaticYl->history_max_miss = max($miss['current_times'],$SscStaticYl->max_miss,$SscStaticYl->history_max_miss); // 6、历史最大遗漏
+            $SscStaticYl->update_time = date('Y-m-d H:i:s');
+            //p($SscStaticYl->attributes);
+            $rst = $SscStaticYl->save();
+            if(!$rst){
+                $logArr = ['attributes'=>$SscStaticYl->attributes, 'msg'=>$SscStaticYl->getErrors()];
+                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/updateCodeTypeYL','INFO','统计号码出现次数', $logArr);
+            }
+        }
+
+        return $rst;
+    }
+
+    /**
      * @desc 三字现遗漏统计
      * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      */
@@ -644,6 +688,74 @@ class SscDataService extends BaseService {
         }
         $last_time_miss_range = $SscKjDataDs[1]['qihao'] ."-". $SscKjDataDs[0]['qihao'];
         $current_times = $last['last_id'] - $SscKjDataDs[0]->index_id;
+
+        $rstData = [
+            'current_times' => $current_times,    // 当前遗漏次数
+            'last_times' => $last_times,    // 上次遗漏次数
+            'last_time_miss_range' => $last_time_miss_range,    // 上次遗漏范围
+            'max_miss' => $max_miss,   // 近200期内的最大遗漏
+            'max_range' => $max_range,   // 近200期内的最大遗漏范围
+            'yl_str' => $yl_str,
+        ];
+        return $rstData;
+    }
+
+    /**
+     * @description 返回号码单双类型遗漏
+     * @param $num
+     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     * @param $recently 多少期内，默认为
+     * @return array
+     */
+    public static function getCodeTypeHistoryMiss($vals, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 472){
+        //if(!is_array($num)) $num = [ $num ];
+        $last_times = 0;
+        $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+        $min_id = $last['last_id'] - $recently - 1;
+
+        $valArr = explode(',', $vals);
+        if(count($valArr) == 1){
+            $where = ['AND', ['IN', $valArr[0], 1],['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
+            $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
+        }else{
+            $where = ['OR'];
+            foreach ($valArr as $val){
+                $where = array_merge($where,[['=', $val, 1]]);
+            }
+            $query = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where);
+            $SscKjDatas = $query->andWhere(['lottery_type'=>$lottery_type])->orderBy('id DESC')->limit($recently)->all();
+        }
+        //$where = "$field=$num AND id>$min_id";
+        if(count($SscKjDatas)>1){
+            $last_times = $SscKjDatas[0]->index_id - $SscKjDatas[1]->index_id - 1;  // 上次遗漏次数
+        }
+
+        # 最大遗漏期间计算 start
+        $tmpKjData = $SscKjDatas;
+        if(count($tmpKjData) > 2){
+            foreach($tmpKjData as $key=>$r){
+                if($key == 0) continue;
+                $range[$tmpKjData[$key-1]['index_id']."_".$tmpKjData[$key]['index_id']] = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
+            }
+
+            $max_miss = max($range);
+            $maxKey = array_search($max_miss, $range);
+            $keyArr = explode('_',$maxKey);
+            $tmpArr = [];
+            foreach($tmpKjData as $key=>$r){
+                if(in_array($r['index_id'], $keyArr)){
+                    $tmpArr[] = $r['qihao'];
+                }
+            }
+            $max_range = $tmpArr[1].'-'.$tmpArr[0];  // 近200期内最大遗漏
+            $yl_str = implode('-',$range);
+            # 最大遗漏期间计算 end
+            //p([$field=>$num,$min_id, $SscKjData[1]->id,$max_range]);
+        }else{
+            $max_range = $SscKjDatas[1]['qihao'] ."-". $SscKjDatas[0]['qihao'];
+        }
+        $last_time_miss_range = $SscKjDatas[1]['qihao'] ."-". $SscKjDatas[0]['qihao'];
+        $current_times = $last['last_id'] - $SscKjDatas[0]->index_id;
 
         $rstData = [
             'current_times' => $current_times,    // 当前遗漏次数

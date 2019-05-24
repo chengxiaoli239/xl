@@ -98,7 +98,7 @@ class SevenService extends BaseTZService {
      * @param $uid
      * @param $tz_system_id
      */
-    public static function getTzSiteInfo($tz_system_id, $url_key = ''){
+    public static function getTzSiteInfo($tz_system_id, $url_key = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
         //p(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id,$TzSystemUser->attributes]);
         $baseUrl = $TzSystemUser->ssc_domain;

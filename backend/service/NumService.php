@@ -569,9 +569,10 @@ class NumService extends BaseService {
      * @param $codes_hz
      * @return array
      */
-    public static function getCodesKuaixuan($codes_hz) {
+    public static function getCodesKuaiXuan($codes_hz) {
         //p($codes_hz,0);
         if(empty($codes_hz)) return [];
+
         $where = ['OR'];
         # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
         # 1、双重
@@ -603,7 +604,14 @@ class NumService extends BaseService {
             $where = array_merge($where, [['=', 'type_4b', $codes_hz['type_4b']]]);
         }
 
-        $Num4Types = Num4Type::find()->where($where)->asArray()->all();
+        $query = Num4Type::find()->where($where);
+        # 和值
+        if(isset($codes_hz['hz'])){
+            $andWhere = ['IN', 'codes_hz', $codes_hz['hz'][0], $codes_hz['hz'][1]];
+            $query->andWhere($andWhere);
+        }
+
+        $Num4Types = $query->asArray()->all();
         $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
         //p($codesArr);
 
@@ -616,6 +624,7 @@ class NumService extends BaseService {
         $desc = '[快选] ';
         $filter0 = []; # 除
         $filter1 = []; # 取
+        $filter2 = []; # 和值
         # 1、双重
         if(isset($hz_Arr['type_2'])){
             if($hz_Arr['type_2'] == 1) $filter1['type_2'] = 1; else $filter0['type_22'] = 0;
@@ -646,7 +655,15 @@ class NumService extends BaseService {
         }
         //p([$filter0, $filter1]);
 
+        # 8、和值
+        if(isset($hz_Arr['hz'])){
+            $filter2['hz'] = implode(',',$hz_Arr['hz']);
+        }
+
         $typesArr = self::getNameByCodesType();
+        if(!empty($filter2['hz'])){
+            $desc .= '和值:'.yii\helpers\BaseStringHelper::truncate($filter2['hz'],10).' ';
+        }
         if(!empty($filter1)){
             $desc .= '取:';
             foreach ($filter1 as $key1=>$v1){
