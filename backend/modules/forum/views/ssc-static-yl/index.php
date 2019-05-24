@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\searchs\SscStaticYl */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Ssc Static Yls';
+$this->title = Yii::t('app', 'Ssc Static Yls');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <section class="ssc-static-yl-index wrapper site-min-height">
@@ -18,11 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <div class="clearfix">
+                <!--div class="clearfix">
                     <div class="btn-group">
                         <?= Html::a('Create Ssc Static Yl', ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
-                </div>
+                </div-->
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -50,6 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'static_nums',
                         'theory_nums_perdate',
                         'today_nums',
+                        'ytd_nums',
                         //'lottery_type',
                         //'status',
                         //'created_at',

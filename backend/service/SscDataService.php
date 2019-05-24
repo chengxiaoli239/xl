@@ -593,6 +593,11 @@ class SscDataService extends BaseService {
             $today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($today_nums_where)->asArray()->all()[0]['nums'];
             $SscStaticYl->today_nums = $today_nums;
 
+            # 昨日出现次数
+            $ytd_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', date('Y-m-d',strtotime("-1 day") )]]);
+            $ytd_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($ytd_nums_where)->asArray()->all()[0]['nums'];
+            $SscStaticYl->ytd_nums = $ytd_nums;
+
             $SscStaticYl->history_max_miss = max($miss['current_times'],$SscStaticYl->max_miss,$SscStaticYl->history_max_miss); // 6、历史最大遗漏
             $SscStaticYl->update_time = date('Y-m-d H:i:s');
             //p($SscStaticYl->attributes);
