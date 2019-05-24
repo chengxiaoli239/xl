@@ -20,6 +20,7 @@ use Yii;
  * @property int $static_nums 默认统计期数
  * @property string $theory_nums_perdate 理论次数/天
  * @property int $today_nums 今日出现
+ * @property int $ytd_nums 昨日出现次数
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property int $status 是否显示:0不显示1显示
  * @property int $created_at 创建时间
@@ -42,7 +43,7 @@ class SscStaticYl extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'lottery_type', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'ytd_nums', 'lottery_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['yl_records'], 'string'],
             [['update_time'], 'safe'],
             [['val', 'last_time_miss_range', 'max_range'], 'string', 'max' => 64],
@@ -69,6 +70,7 @@ class SscStaticYl extends \common\models\base\BaseModel
             'static_nums' => '默认统计期数',
             'theory_nums_perdate' => '理论次数/天',
             'today_nums' => '今日出现',
+            'ytd_nums' => '昨日出现次数',
             'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
             'status' => '是否显示:0不显示1显示',
             'created_at' => '创建时间',

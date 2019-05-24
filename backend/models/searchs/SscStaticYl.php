@@ -18,7 +18,7 @@ class SscStaticYl extends SscStaticYlModel
     public function rules()
     {
         return [
-            [['id', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'lottery_type', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'ytd_nums', 'lottery_type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['val', 'last_time_miss_range', 'max_range', 'yl_records', 'theory_nums_perdate', 'update_time'], 'safe'],
         ];
     }
@@ -67,6 +67,7 @@ class SscStaticYl extends SscStaticYlModel
             'count' => $this->count,
             'static_nums' => $this->static_nums,
             'today_nums' => $this->today_nums,
+            'ytd_nums' => $this->ytd_nums,
             'lottery_type' => $this->lottery_type,
             'status' => $this->status,
             'created_at' => $this->created_at,
