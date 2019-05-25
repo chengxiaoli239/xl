@@ -127,7 +127,6 @@ abstract class BetService extends BaseBetService {
             $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['>', 'uid', 0], ['=', 'is_parent', 1]];
             $plans = UserSysPlans::find()->where($where)->all();
             $qihao = HN0898Service::getQihao($lottery_type);
-
             if ($plans) {
                 $datas = [];
                 $tzStatus = BetService::isCanBet($lottery_type);

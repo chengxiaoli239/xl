@@ -177,7 +177,7 @@ class TzService extends BaseService {
             //$rst['synUsersBalance'] = HN0898Service::synBalance(); // 同步用户的余额
 
             # 计划方案倍数、投注号码或者投注状态修改
-            $rst['userSysPlanChange'] = UserSysPlansService::userSysPlanChange($lottery_type);
+            //$rst['userSysPlanChange'] = UserSysPlansService::userSysPlanChange($lottery_type);
 
             # 号码类型：双重、双双重、四重、三兄弟、四兄弟
             $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL();
