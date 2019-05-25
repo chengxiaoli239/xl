@@ -8,7 +8,7 @@ use yii\data\ActiveDataProvider;
 use backend\models\Admin as AdminModel;
 
 /**
- * User represents the model behind the search form of `backend\models\User`.
+ * Admin represents the model behind the search form of `backend\models\Admin`.
  */
 class Admin extends AdminModel
 {
@@ -19,7 +19,7 @@ class Admin extends AdminModel
     {
         return [
             [['id', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'email'], 'safe'],
+            [['username', 'auth_key', 'password_hash', 'password_reset_token', 'email', 'pay_time', 'desc'], 'safe'],
         ];
     }
 
@@ -47,7 +47,6 @@ class Admin extends AdminModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['id'=>SORT_DESC]],
         ]);
 
         $this->load($params);
@@ -61,14 +60,18 @@ class Admin extends AdminModel
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'pay_time' => $this->pay_time,
             'status' => $this->status,
-            'email' => $this->email,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'username', $this->username])
-            ->andFilterWhere(['like', 'email', $this->email]);
+            ->andFilterWhere(['like', 'auth_key', $this->auth_key])
+            ->andFilterWhere(['like', 'password_hash', $this->password_hash])
+            ->andFilterWhere(['like', 'password_reset_token', $this->password_reset_token])
+            ->andFilterWhere(['like', 'email', $this->email])
+            ->andFilterWhere(['like', 'desc', $this->desc]);
 
         return $dataProvider;
     }
