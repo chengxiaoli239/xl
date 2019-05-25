@@ -183,6 +183,7 @@ class TzService extends BaseService {
             $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL();
         }
 
+        $rst['qihao'] = $qihao;
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/opSystemBetPlans','INFO','处理系统投注计划', $rst);
 
         self::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭

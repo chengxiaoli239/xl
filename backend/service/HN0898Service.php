@@ -426,7 +426,7 @@ class HN0898Service extends BaseTZService {
         $insertRst = BetService::_logRecords($insertData);
         self::$headers = [];
 
-        $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume,'insertData'=>$insertData, 'insertRst'=>$insertRst];
+        $logArr = ['uid'=>self::$user_id,'account'=>self::$account,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume,/*'insertData'=>$insertData,*/ 'insertRst'=>$insertRst];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','0898插入记录-真实投注', $logArr);
 
         return $data;
