@@ -117,6 +117,7 @@ class UserSysPlansController extends BaseController
         $model = $this->findModel($id);
 
         UserSysPlansService::preOpData($this->_post, $this->_user_id);
+        //p($this->_post);
         /*
         if($this->_post){
             $this->_post['UserSysPlans']['tz_sites'] = implode(',',$this->_post['UserSysPlans']['tz_sites']);
@@ -139,7 +140,11 @@ class UserSysPlansController extends BaseController
         }elseif ($model->tz_type == 25){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
             foreach ($hz_Arr_Data as $key=>$val){
-                $model->$key[] = $val;
+                if($key == 'hz'){
+                    $model->$key = $val;
+                }else{
+                    $model->$key[] = $val;
+                }
             }
         }
 

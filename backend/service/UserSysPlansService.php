@@ -84,6 +84,9 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['type_4b'] = $UserSysPlans['type_4b'][0];
             }
             unset($post['UserSysPlans']['type_4b']);
+            if(isset($post['UserSysPlans']['hz'])){
+                $tmpFilter['hz'] = $post['UserSysPlans']['hz'];
+            }
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
             //p($post);
         }else{
@@ -214,13 +217,13 @@ class UserSysPlansService extends BaseService {
                 $kArr = StaticService::$kArr;
                 unset($kArr[0], $kArr[1], $kArr[10], $kArr[11], $kArr[21], $kArr[22]);
                 $data['kArr'] = $kArr;
-            }elseif ($tz_type == 20){
+            }elseif ($tz_type == 20){ # 四定和值
                 $hzArr = [];
                 for ($i=1; $i<=36; $i++){
                     $hzArr[$i] = $i;
                 }
                 $data['hzArr'] = $hzArr;
-            }elseif ($tz_type == 22){
+            }elseif ($tz_type == 22){ # 四字定单双
                 $SscDsYls = SscDsYl::find()->select(['id', 'positions', 'zhi'])->where(['type'=>4, 'LENGTH(zhi)'=>4])->asArray()->all();
                 $hzArr = ArrayHelper::getColumn($SscDsYls, 'zhi', false);
                 $tmpData = [];
@@ -228,6 +231,12 @@ class UserSysPlansService extends BaseService {
                     $tmpData[$zhi] = $zhi;
                 }
                 $data['hzArr'] = $tmpData;
+            }elseif ($tz_type == 25){ # 快选
+                $hzArr = [];
+                for ($i=1; $i<=36; $i++){
+                    $hzArr[$i] = $i;
+                }
+                $data['hzArr'] = $hzArr;
             }
         }
 

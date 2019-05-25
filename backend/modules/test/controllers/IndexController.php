@@ -98,10 +98,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::updateCodeTypeYL();p($rst);
+        $miss = SscDataService::getCodeTypeHistoryMiss('type_2,type_2b', $lottery_type = 5, $static_nums = 80);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         p('xxx');
         $rst['updateDs'] = SscDataService::updateDsData($lottery_type=5); // 每期开奖遗漏
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=5); // 单双遗漏
-        $rst = SscDataService::updateCodeTypeYL();p($rst);
         $rst = TzService::opSystemBetPlans(5);p($rst);
         $rst = KjDataGet::getNextQihaoByQihao('190525039',5);p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL(); // 单双遗漏

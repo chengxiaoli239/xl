@@ -43,6 +43,8 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
+                    <?= $form->field($model, 'hz')->checkboxList($hzArr)->label('投注类型(和值)') ?>
+
                     <!--?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?-->
                     <?= $form->field($model, 'type_2')->checkBoxList([
                         0=>'除',

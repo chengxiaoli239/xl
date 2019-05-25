@@ -757,7 +757,7 @@ class SscDataService extends BaseService {
             $where = ['AND', ['IN', $valArr[0], 1],['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
             $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
         }else{
-            $where = ['OR'];
+            $where = ['AND'];
             foreach ($valArr as $val){
                 $where = array_merge($where,[['=', $val, 1]]);
             }
