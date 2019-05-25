@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\models\Admin;
 use backend\models\TzSystemsAuth;
 use backend\models\TzSystemsUsers;
 use backend\service\BetService;
@@ -122,7 +123,7 @@ class UserController extends BaseController
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $model = $this->findUserModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             //UserService::saveTzSystemUsers(explode(',', $this->_post['TzSystemsAuth']['tz_systems_ids']), $uid);
@@ -196,6 +197,23 @@ class UserController extends BaseController
         //$rst = HN0898Service::synBalance($tz_system_user_id);
         $rst = BetService::synBalance($this->_user_id,$system_user_id);
         return $rst;
+    }
+
+    /**
+     * Finds the User model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id 新用户表
+     * @return User the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findUserModel($id)
+    {
+        //$admin_id = \Yii::$app->user->id;
+        if (($model = Admin::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 
     /**

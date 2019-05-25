@@ -157,7 +157,6 @@ class TzService extends BaseService {
 
         # 1、处理系统投注计划号码
         $rst['opSystemCodesService'] = OpSystemCodesService::sysPlansCodes($qihao);
-
         for ($i=0;$i<2;$i++){
             # 1、定位和值
             //$rst['heZhiStatics'] = SscDataService::heZhiStatics(); // 更新定位和值汇总表
@@ -200,7 +199,7 @@ class TzService extends BaseService {
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
 
         # 处理完计划后,下一期投注开关开启(value:1) start
-        $next_mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$lottery_type.'_'.$next_qihao;
+        $next_mkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $next_qihao);
         $next_simulate_mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$lottery_type.'_'.$next_qihao;
 
         $next_time = \Yii::$app->params['TZ_LOCK_TIME'];
@@ -209,7 +208,7 @@ class TzService extends BaseService {
         # 处理完计划后,下一期投注开关开启(value:1) end
 
         # 计划任务是否处理完成后锁住(value:1)，避免重复处理 start
-        $pkey = \Yii::$app->params['PLAN_SWITCH_KEY'].'_'.$lottery_type.'_'.$qihao;
+        $pkey = BetService::buildPlanSwitchKey($lottery_type, $qihao);
         //$simulate_pkey = \Yii::$app->params['PLAN_SWITCH_SIMULATE_KEY'].'_'.$qihao;
         $time = 1200;
         if(substr($qihao,6) == '010') $time = 60*60*4; # 4小时

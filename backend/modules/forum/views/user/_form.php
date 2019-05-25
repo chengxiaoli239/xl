@@ -16,29 +16,31 @@ use yii\widgets\ActiveForm;
             </header>
             <div class="panel-body">
                 <?php $form = ActiveForm::begin(); ?>
-                    <?= $form->field($model, 'admin_id')->textInput() ?>
+                    <!--?= $form->field($model, 'admin_id')->textInput() ?-->
 
                     <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
 
-                    <?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?>
+                    <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'balance')->textInput(['maxlength' => true]) ?>
+                    <!--?= $form->field($model, 'balance')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'simulate_balance')->textInput(['maxlength' => true]) ?>
+                    <!--?= $form->field($model, 'simulate_balance')->textInput(['maxlength' => true]) ?-->
 
                     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
-                    <?= $form->field($model, 'tz_password')->textInput(['maxlength' => true]) ?>
+                    <!--?= $form->field($model, 'tz_password')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'cookie')->textInput(['maxlength' => true]) ?>
+                    <!--?= $form->field($model, 'cookie')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'cookie2')->textInput(['maxlength' => true]) ?>
+                    <?= $form->field($model, 'pay_time')->textInput() ?>
 
-                    <?= $form->field($model, 'status')->textInput() ?>
+                    <?= $form->field($model, 'desc')->textInput(['maxlength' => true]) ?>
 
-                    <?= $form->field($model, 'created_at')->textInput() ?>
+                    <!--?= $form->field($model, 'status')->textInput() ?-->
 
-                    <?= $form->field($model, 'updated_at')->textInput() ?>
+                    <!--?= $form->field($model, 'created_at')->textInput() ?-->
+
+                    <!--?= $form->field($model, 'updated_at')->textInput() ?-->
 
                     <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">

@@ -54,6 +54,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a('添加/编辑', $url, ['title' => '开通系统权限','alt'=>$model->id]);
                             }
                         ],
+                        'email',
+                        'pay_time',
+                        'desc',
                         /*
                         ['attribute' => 'id','label'=>'投注方式', # 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',

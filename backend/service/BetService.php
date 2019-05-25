@@ -566,6 +566,19 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
+     * @desc 投注计划缓存key
+     * @param int $lottery_type
+     * @param $qihao
+     * @return string
+     */
+    public static function buildPlanSwitchKey($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao){
+
+        $pkey = \Yii::$app->params['PLAN_SWITCH_KEY'].'_'.$lottery_type.'_'.$qihao;
+
+        return $pkey;
+    }
+
+    /**
      * @description 更新计划表状态
      * @param $id
      * @param $account
