@@ -384,7 +384,7 @@ class HN0898Service extends BaseTZService {
         $end_time = microtime(true);
         $time_consume = ($end_time - $start_time). 's';
         if($rst['err'] == -1 OR !$rst){
-            $tzRst = ['uid'=>self::$user_id,'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
+            $tzRst = ['uid'=>self::$user_id, 'account'=>self::$account, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
             if($tz_type != 20){
                 $tzRst['code'] = $code;
             }

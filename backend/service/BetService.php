@@ -130,7 +130,7 @@ abstract class BetService extends BaseBetService {
             if ($plans) {
                 $datas = [];
                 $tzStatus = BetService::isCanBet($lottery_type);
-                if ($tzStatus) {
+                //if ($tzStatus) {
                     foreach ($plans as $key => $plan) {
                         //return ['status'=>300, 'msg'=>'当前期投注任务已经完成~'];
                         if ($plan->children_plan_id > 0) {
@@ -142,7 +142,7 @@ abstract class BetService extends BaseBetService {
                             $tzRst[$id] = self::tzByPlanId($id);
                         }
                     }
-                }
+                //}
                 $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type]];
                 BetService::afterBetNow($plan->lottery_type, $qihao); # 彩种投注结束锁
             }
