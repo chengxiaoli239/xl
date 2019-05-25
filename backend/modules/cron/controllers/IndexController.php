@@ -222,6 +222,8 @@ class IndexController extends Controller
      * @return bool
      */
     public function actionInsertSscDwsHzNums(){
+        exit; # 二字定数据太多，禁用
+
         for ($i=0;$i<1;$i++) {
             $start_time = microtime(true);
             $rst = SscDataService::sscDwsHzNums();

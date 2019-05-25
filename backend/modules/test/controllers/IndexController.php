@@ -98,7 +98,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = SscDataService::updateCodeTypeYL();p($rst);
+        $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
+        $rst['updateDsYL'] = SscDataService::updateSdHzYl(); p($rst);// 单双遗漏
         $miss = SscDataService::getCodeTypeHistoryMiss('type_2,type_2b', $lottery_type = 5, $static_nums = 80);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         p('xxx');
         $rst['updateDs'] = SscDataService::updateDsData($lottery_type=5); // 每期开奖遗漏
