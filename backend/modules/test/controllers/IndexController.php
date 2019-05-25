@@ -98,7 +98,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = TzService::opSystemBetPlans(5);p($rst);
+        $rst = KjDataGet::getNextQihaoByQihao('190525039',5);p($rst);
+        $rst['updateDsYL'] = SscDataService::updateDsYL(); // 单双遗漏
         $rst = SscDataService::updateCodeTypeYL();p($rst);
+        $beforeQihao = KjDataGet::getBeforeQihaoByQihao('190525001');p($beforeQihao);
         $rst = NumService::getCodesArise(['9377']);p(count($rst));
         $arr = ['type_2b'=>1, 'hz'=>[11,12,13,14,15,16,24]]; p(json_encode($arr));
         $rst = NumService::getCodesKuaiXuan(['type_2b'=>1, 'hz'=>[11,24], 'hz_v'=>1]);p($rst);
@@ -110,10 +114,6 @@ class IndexController extends Controller
         $rst = StaticService::staticSdHzProfitsPerdate(); p($rst); # 每天每个和值利润统计
         $rst = StaticService::staticSDHzPerDateProfits(); p($rst);
         $rst[] = StaticService::opAllStaticProfits(); p($rst);# 利润统计
-        $rst[] = StaticService::staticAll2NumsYl(); # 统计所有二字现遗漏
-        $rst['updateDsYL'] = SscDataService::updateDsYL(5);p($rst); // 单双遗漏
-        $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type=5);p($rst);
-        $rst = SscDataService::updateSdHzYl(5); p($rst);// 四定和值遗漏
         $account = AdminModel::findOne(11)['username'];p($account);
         $rst = StaticService::calculate2bProfits($lottery_type = DEFAULT_LOTTERY_TYPE, $start_date = '2019-05-01', $end_date = '2019-05-15'); p($rst);
         for($i=0;$i<100;$i++){
@@ -123,7 +123,6 @@ class IndexController extends Controller
         $rst = BetService::tzByPlanId(7, 1);p($rst); # 投注
         $qihao = HN0898Service::getQihao(5);
         $rst = BetService::getBetCacheTime($lottery_type = 5, $qihao); p($rst);# 投注之后缓存时间
-        $rst = TzService::opSystemBetPlans(5);p($rst);
         $qihao = HN0898Service::getQihao(5);p($qihao);
         $rst['update3NumData'] = SscDataService::update3NumData(5);p($rst); // 每期开奖遗漏
         $rst = NumService::getCodesArise(['1234589']);p(count($rst));
@@ -147,7 +146,6 @@ class IndexController extends Controller
         $rst = XlService::getQihaoInfo(10, 5);p($rst);
         $rst = HN0898Service::getQihao(2);p($rst);
         $rst = KjDataGet::getBeforeQihaoByQihao('191231960',2);p($rst);
-        $rst = KjDataGet::getNextQihaoByQihao('191231960', 1);p($rst);
         $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0])->distinct('qihao')->orderBy('bet.qihao ASC')->limit(20)->all();p($bettingRecords);
         $rst = CqsscKcw::getLotteryNoXl();p($rst);
         $rst = HN0898Service::getQihao(); p($rst);
