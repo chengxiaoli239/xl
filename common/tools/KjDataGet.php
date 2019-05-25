@@ -137,7 +137,7 @@ class KjDataGet
                         $cache_time = 30*60;
                     }
                 }
-                $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$msg, 'lottery'=>CqsscKcw::$lotteryNameArr[$kjConfig->lottery_type]];
+                $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'kjData'=>$kjData, /*'insertRst'=>$msg,*/ 'lottery'=>CqsscKcw::$lotteryNameArr[$kjConfig->lottery_type]];
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
             }
             $mkey_qihao = 'KJ_LOG_QIHAO_'.$kjConfig->lottery_type.'_'.$qihao;
@@ -465,7 +465,7 @@ class KjDataGet
                 $beforeQihao = substr(($year-1).'1231'.$maxQihao, 2,9);
             //}elseif($qihao >= 120){
             }elseif($qihao <= 001){
-                $beforeQihao = substr(Tools::getBeforeDate($date),2,9).$maxQihao;
+                $beforeQihao = substr(Tools::getBeforeDate($date),2,9).'0'.$maxQihao;
             }
         }
 
