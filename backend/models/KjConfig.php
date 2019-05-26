@@ -13,7 +13,7 @@ use Yii;
  * @property string $host 接口域名
  * @property string $path 路由
  * @property int $is_batch 是否批量
- * @property int $lottery_type 彩票类型1重庆时时彩2江西3新疆4七星彩5排列三6排列五7福彩3D、lt_lottery_type.id
+ * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property string $method 请求方式:GET/POST
  * @property string $post_data post数据
  * @property string $data_type 数据类型
@@ -52,19 +52,19 @@ class KjConfig extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'title' => Yii::t('app', '标题'),
-            'name' => Yii::t('app', '类型名称'),
-            'host' => Yii::t('app', '接口域名'),
-            'path' => Yii::t('app', '路由'),
-            'is_batch' => Yii::t('app', '是否批量'),
-            'lottery_type' => Yii::t('app', '彩票类型1重庆时时彩2江西3新疆4七星彩5排列三6排列五7福彩3D、lt_lottery_type.id'),
-            'method' => Yii::t('app', '请求方式:GET/POST'),
-            'post_data' => Yii::t('app', 'post数据'),
-            'data_type' => Yii::t('app', '数据类型'),
-            'enable' => Yii::t('app', '开关0关闭1开启'),
-            'created_at' => Yii::t('app', '创建时间'),
-            'updated_at' => Yii::t('app', '更新时间'),
+            'id' => 'ID',
+            'title' => '标题',
+            'name' => '类型名称',
+            'host' => '接口域名',
+            'path' => '路由',
+            'is_batch' => '是否批量',
+            'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
+            'method' => '请求方式:GET/POST',
+            'post_data' => 'post数据',
+            'data_type' => '数据类型',
+            'enable' => '开关0关闭1开启',
+            'created_at' => '创建时间',
+            'updated_at' => '更新时间',
         ];
     }
 }
