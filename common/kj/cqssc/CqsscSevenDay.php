@@ -13,11 +13,11 @@ class CqsscSevenDay extends BaseKj {
 
         if(!$kjData = self::getCurrentKjData()){
             $url='https://7t31.com/kaijiang/list.aspx?lot=ssc';
-            //$content = file_get_contents($url);
-            $content = CurlService::httpGet($url);
+            $content = file_get_contents($url);
+            //$content = CurlService::httpGet($url);
             $preg = "/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/ism"; // 这里是表达式，大神看看
             preg_match_all($preg,$content,$matches);
-            //p('xxx');
+            //p($content);
 
             $tdData = $matches[0][0];
 
