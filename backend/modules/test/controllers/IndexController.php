@@ -98,12 +98,13 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
+        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=5); p($rst);// 单双遗漏
+        $rst = NumService::getCodesArise(['38','78']);p($rst); //2+3+1+2+2
         $rst['updateDsYL'] = SscDataService::updateSdHzYl(); p($rst);// 单双遗漏
+        $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
         $miss = SscDataService::getCodeTypeHistoryMiss('type_2,type_2b', $lottery_type = 5, $static_nums = 80);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         p('xxx');
         $rst['updateDs'] = SscDataService::updateDsData($lottery_type=5); // 每期开奖遗漏
-        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=5); // 单双遗漏
         $rst = TzService::opSystemBetPlans(5);p($rst);
         $rst = KjDataGet::getNextQihaoByQihao('190525039',5);p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL(); // 单双遗漏
@@ -154,7 +155,6 @@ class IndexController extends Controller
         $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status'=>0])->distinct('qihao')->orderBy('bet.qihao ASC')->limit(20)->all();p($bettingRecords);
         $rst = CqsscKcw::getLotteryNoXl();p($rst);
         $rst = HN0898Service::getQihao(); p($rst);
-        $rst = NumService::getCodesArise(['38','78']);p($rst); //2+3+1+2+2
         //$rst = NumService::getCodesArise(['289','125','046','456','589','467']);p($rst); //2+3+1+2+2
         $rst = StaticService::get2NumsYlRecords('12');p($rst);
         $rst = StaticService::static2NumsYl();p($rst);

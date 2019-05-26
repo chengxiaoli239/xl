@@ -12,7 +12,7 @@ class CqsscSevenDay extends BaseKj {
     public static function getLotteryNo($returnType = 'json'){
 
         if(!$kjData = self::getCurrentKjData()){
-            $url='https://7t32.com/kaijiang/list.aspx?lot=ssc';
+            $url='https://7t31.com/kaijiang/list.aspx?lot=ssc';
             //$content = file_get_contents($url);
             $content = CurlService::httpGet($url);
             $preg = "/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/ism"; // 这里是表达式，大神看看
