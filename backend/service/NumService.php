@@ -656,7 +656,7 @@ class NumService extends BaseService {
         //p([$filter0, $filter1]);
 
         # 8、和值
-        if(isset($hz_Arr['hz'])){
+        if(isset($hz_Arr['hz']) && !empty($hz_Arr['hz'])){
             $filter2['hz'] = implode(',',$hz_Arr['hz']);
         }
 
