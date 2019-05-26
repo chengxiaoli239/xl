@@ -1,5 +1,6 @@
 <?php
 namespace common\kj;
+use backend\models\KjConfig;
 use backend\service\HN0898Service;
 use  yii;
 use common\tools\KjDataGet;
@@ -50,6 +51,16 @@ class BaseKj{
         }
 
         return true;
+    }
+
+    /**
+     * @param $id
+     * @return string
+     */
+    public static function getApiHost($id){
+        $domain = KjConfig::findOne($id)->api_host;
+
+        return $domain;
     }
 
 

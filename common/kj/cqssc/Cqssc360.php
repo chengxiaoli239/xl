@@ -10,7 +10,8 @@ class Cqssc360 extends BaseKj {
     public static function getLotteryNo($returnType = 'json'){
 
         if(!$kjData = self::getCurrentKjData()){
-            $url='https://chart.cp.360.cn/zst/qkj/?lotId=255401';
+            $domain = BaseKj::getApiHost(5);
+            $url = $domain.'/zst/qkj/?lotId=255401';
             $content=file_get_contents($url);
             //$content = CurlService::httpGet($url);
             $kjData = json_decode($content,320);

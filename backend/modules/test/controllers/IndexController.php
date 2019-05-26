@@ -18,6 +18,7 @@ use backend\service\UserSysPlansService;
 use backend\service\WxService;
 use backend\service\XlService;
 use backend\tools\Tools;
+use common\kj\BaseKj;
 use common\kj\cqssc\CqsscKcw;
 use common\kj\cqssc\CqsscSevenDay;
 use common\models\AdminModel;
@@ -98,6 +99,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $domain = BaseKj::getApiHost(8);p($domain);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=5); p($rst);// 单双遗漏
         $rst = NumService::getCodesArise(['38','78']);p($rst); //2+3+1+2+2
         $rst['updateDsYL'] = SscDataService::updateSdHzYl(); p($rst);// 单双遗漏

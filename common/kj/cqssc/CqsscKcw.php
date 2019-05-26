@@ -1,6 +1,7 @@
 <?php
 # 开彩网
 namespace common\kj\cqssc;
+use backend\models\KjConfig;
 use backend\service\CurlService;
 use common\kj\BaseKj;
 use backend\service\HN0898Service;
@@ -27,8 +28,9 @@ class CqsscKcw extends BaseKj {
     public static function getLotteryNo($returnType = 'json'){
 
         if(!$kjData = self::getCurrentKjData()) {
+            $domain = BaseKj::getApiHost(6);
             sleep(3);
-            $url = 'http://wd.apiplus.net/tef05c6c66079ff29k/cqssc-3.json';
+            $url = $domain.'/tef05c6c66079ff29k/cqssc-3.json';
             //$content = file_get_contents($url);
             $content = CurlService::httpGet($url);
             //$data = json_decode($content,320);
@@ -72,7 +74,8 @@ class CqsscKcw extends BaseKj {
         if(!$kjData = self::getCurrentKjData()) {
             //sleep(3);
             //$lotteryId = self::$lotteryTypeArr[$type];
-            $url = 'http://greeceloto.com/home/GetNumbers?lotteryId='.$lotteryId.'&pageNmuber=1&number=3&_=1556344774304';
+            $domain = BaseKj::getApiHost($lotteryId);
+            $url = $domain.'/home/GetNumbers?lotteryId='.$lotteryId.'&pageNmuber=1&number=3&_=1556344774304';
             //$content = file_get_contents($url);
             $content = CurlService::httpGet($url);
             //$data = json_decode($content,320);

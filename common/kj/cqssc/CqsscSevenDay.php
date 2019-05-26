@@ -12,7 +12,8 @@ class CqsscSevenDay extends BaseKj {
     public static function getLotteryNo($returnType = 'json'){
 
         if(!$kjData = self::getCurrentKjData()){
-            $url='https://7t31.com/kaijiang/list.aspx?lot=ssc';
+            $domain = BaseKj::getApiHost(7);
+            $url = $domain.'/kaijiang/list.aspx?lot=ssc';
             $content = file_get_contents($url);
             //$content = CurlService::httpGet($url);
             $preg = "/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/ism"; // 这里是表达式，大神看看
@@ -55,7 +56,8 @@ class CqsscSevenDay extends BaseKj {
     public static function getLottery99($returnType = 'json'){
 
         if(!$kjData = self::getCurrentKjData()){
-            $url = 'https://9900001.com/kaijiang/list.aspx?lot=ssc';
+            $domain = BaseKj::getApiHost(8);
+            $url = $domain.'/kaijiang/list.aspx?lot=ssc';
             $content = CurlService::httpGet($url);
             $preg = "/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/ism"; // 这里是表达式，大神看看
             preg_match_all($preg,$content,$matches);
