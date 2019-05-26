@@ -340,7 +340,7 @@ class HN0898Service extends BaseTZService {
         $buy_type = $plan->buy_type ? $plan->buy_type : 1;
         $lottery_type = $plan->lottery_type;
         //$TzSystemsUsers = TzSystemsUsers::findOne(['tz_system_id'=>$tz_system_id, 'account'=>$account]);
-        //p([$site_id,$account, $playway, $code, $single, $qihao, $is_simulate]);
+        //p([$playway, $code, $single, $qihao]);
         //self::__init($account);
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];

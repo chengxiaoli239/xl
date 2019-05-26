@@ -503,6 +503,7 @@ abstract class BetService extends BaseBetService {
 
            # 4、投注号码 codes
            $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr);
+           //p([$system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $codes]);
 
            # 5、投注请求
            $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id);

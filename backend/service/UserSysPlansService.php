@@ -84,7 +84,7 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['type_4b'] = $UserSysPlans['type_4b'][0];
             }
             unset($post['UserSysPlans']['type_4b']);
-            if(isset($post['UserSysPlans']['hz'])){
+            if(isset($post['UserSysPlans']['hz']) && $post['UserSysPlans']['hz']){
                 $tmpFilter['hz'] = $post['UserSysPlans']['hz'];
             }
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
