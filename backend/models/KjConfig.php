@@ -10,7 +10,8 @@ use Yii;
  * @property int $id
  * @property string $title 标题
  * @property string $name 类型名称
- * @property string $host 接口域名
+ * @property string $host 本系统接口域名
+ * @property string $api_host 第三方接口地址
  * @property string $path 路由
  * @property int $is_batch 是否批量
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
@@ -41,6 +42,7 @@ class KjConfig extends \common\models\base\BaseModel
             [['updated_at'], 'safe'],
             [['title', 'name'], 'string', 'max' => 64],
             [['host', 'path', 'post_data'], 'string', 'max' => 255],
+            [['api_host'], 'string', 'max' => 128],
             [['method'], 'string', 'max' => 11],
             [['data_type'], 'string', 'max' => 12],
         ];
@@ -55,7 +57,8 @@ class KjConfig extends \common\models\base\BaseModel
             'id' => 'ID',
             'title' => '标题',
             'name' => '类型名称',
-            'host' => '接口域名',
+            'host' => '本系统接口域名',
+            'api_host' => '第三方接口地址',
             'path' => '路由',
             'is_batch' => '是否批量',
             'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
