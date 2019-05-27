@@ -486,7 +486,7 @@ class KjDataGet
             $data = CurlService::httpGet($url);
             $endQihao = '20'.$data[0]['qihao'];
         }else{
-            $KjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->asArray()->one();
+            $KjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->limit(1)->asArray()->one();
             if(!$KjData) $KjData['qihao'] = '20180101000';
             $endQihao = $KjData['qihao'];
         }

@@ -8,6 +8,7 @@
 
 namespace backend\modules\test\controllers;
 
+use backend\models\SscKjData;
 use backend\service\BetService;
 use backend\service\NumService;
 use backend\service\SevenService;
@@ -99,6 +100,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $last = SscKjData::find()->where(['lottery_type'=>5])->select(['last_id'=>'MAX(index_idx)'])->orderBy(['id'=>SORT_DESC])->asArray()->one();p($last);
+        $last_id = SscKjData::find()->select(['last_id'=>'index_id', 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one()['last_id'];p($last_id);
         $rst = StaticService::staticAll2NumsYl();p($rst); # 统计所有二字现遗漏
         $rst = StaticService::static4dMonthsProfits();p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
         $domain = BaseKj::getApiHost(8);p($domain);

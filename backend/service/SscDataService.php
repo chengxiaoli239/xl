@@ -269,7 +269,7 @@ class SscDataService extends BaseService {
      * @param int $interval
      */
     public static function getKjDataLastId($lottery_type = DEFAULT_LOTTERY_TYPE){
-        $last_id = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['max(id) as last_id'])->asArray()->one()['last_id'];
+        $last_id = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['max(id) as last_id'])->limit(1)->asArray()->one()['last_id'];
 
         return $last_id;
     }
