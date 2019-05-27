@@ -56,7 +56,7 @@ class SscDataService extends BaseService {
         $zuHes = [ [1,2], [2,3], [3,4], [1,4] ];
         foreach ($zuHes as $key=>$zuHe){
             $field = 'code_'.implode('_',$zuHe);
-            $last = SscKjDataDs::find()->select(['max(id) as last_id'])->asArray()->one();
+            $last = SscKjDataDs::find()->select(['max(id) as last_id'])->limit(1)->asArray()->one();
             $start_id = $last['last_id'] - $interval;
             $data = SscKjDataDs::find()->select($field.',COUNT(id) AS num')->where('id>'.$start_id)->groupBy($field)->orderBy('id DESC')->limit($interval)->asArray()->all();
             $updateData = ['positions'=>implode(',',$zuHe),'max_qihao'=>$max_qihao];
@@ -685,7 +685,7 @@ class SscDataService extends BaseService {
     public static function getDsHistoryMiss($num, $position, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 472){
         //if(!is_array($num)) $num = [ $num ];
         $last_times = 0;
-        $last = SscKjDataDs::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+        $last = SscKjDataDs::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
         $min_id = $last['last_id'] - $recently - 1;
 
         $field = 'code_'.str_replace(',','_',$position);

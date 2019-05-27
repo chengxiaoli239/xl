@@ -5,7 +5,7 @@ use yii\grid\GridView;
 use yii\widgets\Pjax;
 use backend\models\SscKjData;
 $newRecord = SscKjData::find()->select(['qihao','code_str'])->orderBy('id DESC')->asArray()->limit(1)->one();
-$newTime = \backend\models\SscKjDataDs::find()->select(['max(update_time) as update_time'])->asArray()->one()['update_time'];
+$newTime = \backend\models\SscKjDataDs::find()->select(['max(update_time) as update_time'])->asArray()->limit(1)->one()['update_time'];
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\searchs\SscDsYl */
 /* @var $dataProvider yii\data\ActiveDataProvider */
