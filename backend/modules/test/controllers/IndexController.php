@@ -102,7 +102,7 @@ class IndexController extends Controller
     public function actionDw(){
         $newTime = \backend\models\SscKjDataDs::find()->select(['max(update_time) as update_time'])->limit(1)->asArray()->one()['update_time'];p($newTime);
         $last = SscKjData::find()->where(['lottery_type'=>5])->select(['last_id'=>'MAX(index_idx)'])->orderBy(['id'=>SORT_DESC])->asArray()->one();p($last);
-        $last_id = SscKjData::find()->select(['last_id'=>'index_id', 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one()['last_id'];p($last_id);
+        $last_id = SscKjData::find()->select(['last_id'=>'index_id', 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one()['last_id'];p($last_id);
         $rst = StaticService::staticAll2NumsYl();p($rst); # 统计所有二字现遗漏
         $rst = StaticService::static4dMonthsProfits();p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
         $domain = BaseKj::getApiHost(8);p($domain);
