@@ -1232,7 +1232,7 @@ class StaticService extends BaseService {
        $lottery_types = self::getLotteryTypes();
        foreach ($lottery_types as $lottery_type){
            if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllStaticProfits')) continue;
-           $rst['opStaticProfits'] = StaticService::opStaticProfits($lottery_type);
+           //$rst['opStaticProfits'] = StaticService::opStaticProfits($lottery_type);
            $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type); # 上奖三字现
 
            $rst['static4dMonthsProfits'] = StaticService::static4dMonthsProfits($lottery_type); # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr

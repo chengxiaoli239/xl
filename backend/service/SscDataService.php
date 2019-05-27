@@ -108,7 +108,7 @@ class SscDataService extends BaseService {
 
     public static function getMinStaticQihao($lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 120){
         $last_id = SscDataService::getKjDataLastId($lottery_type);
-        $qihao = SscKjData::find()->where(['AND',['=', 'lottery_type', $lottery_type], ['>', 'id', $last_id-$recently]])->one()->qihao;
+        $qihao = SscKjData::find()->where(['AND',['=', 'lottery_type', $lottery_type], ['>', 'id', $last_id-$recently]])->limit(1)->one()->qihao;
 
         return $qihao;
     }
