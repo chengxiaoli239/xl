@@ -15,6 +15,7 @@ return [
     'TZ_SWITCH_KEY' => 'TZ_SWITCH_STATUS', # 全局投注开关 - 真实
     'PLAN_SWITCH_KEY' => 'PLAN_SWITCH_STATUS', # 全局跑计划开关 - 真实
     'TZ_SWITCH_SIMULATE_KEY' => 'TZ_SWITCH_SIMULATE_KEY', # 全局投注开关 - 模拟
+    'DATA_STATIC_KEY' => 'DATA_STATIC_KEY', # 数据统计基本key
 
     'TZ_LOCK_TIME' => 4 * 60 * 60,
 

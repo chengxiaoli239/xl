@@ -13,6 +13,7 @@ use backend\models\SystemType;
 use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
 use backend\models\User;
+use backend\service\McKeyService;
 use backend\service\SevenService;
 use backend\service\SscDataService;
 use backend\service\TzService;
@@ -68,14 +69,17 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 系统投注利润统计
+     * @desc 统计
      * @return array
      */
     public function actionOpStatic(){
         self::_init();
         if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
-        $rst[] = StaticService::opAllStaticProfits(); # 利润统计
+        $start_time = microtime(true);
         $rst[] = StaticService::staticAll2NumsYl(); # 统计所有二字现遗漏
+        $log_time = microtime(true);
+
+        $rst['consume_time'] = ($log_time - $start_time).'s';
 
         return $rst;
     }
@@ -88,7 +92,7 @@ class IndexController extends Controller
         self::_init();
         if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
 
-        $rst = StaticService::opAllStaitcProfits();
+        $rst = StaticService::opAllStaticProfits();
 
         return $rst;
     }
@@ -155,28 +159,6 @@ class IndexController extends Controller
                 default:;
             }
         }
-        return $rst;
-    }
-
-    /**
-     * @desc 更新code_str字段
-     * @return array
-     */
-    public function actionUpdateCode(){
-        set_time_limit(0);
-        self::_init();
-        $time = date("H:i");
-        if(\Yii::$app->params['ssc_kj_time_start'] < $time && $time < \Yii::$app->params['ssc_kj_time_end'] ){
-            $rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
-            return $rst;
-        }
-        //$rst['updateCodeStr'] = KjDataGet::updateCodeStr(); // 空code_str补全
-        //$rst['updateCodeHeZhi'] = KjDataGet::updateCodeHeZhi(); // 更新和值
-        //$rst['updateUserFollowRefrenceCodes'] = KjDataGet::updateUserFollowRefrenceCodes(); // 更新用户投注参考码
-        //$rst['updateSnid'] = KjDataGet::updateSnid(); // 更新用户投注参考码
-        # 第一步：开奖后处理完预投注
-        //$rst['customTz'] = TzService::opSystemBetPlans(); // 处理系统投注计划
-
         return $rst;
     }
 

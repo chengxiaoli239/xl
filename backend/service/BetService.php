@@ -153,7 +153,7 @@ abstract class BetService extends BaseBetService {
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
     }
 
-    /**
+   /**
      * @desc 判断当前期是否可以投注
      * @param int $lottery_type
      * @return mixed

@@ -99,6 +99,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::staticAll2NumsYl();p($rst); # 统计所有二字现遗漏
+        $rst = StaticService::static4dMonthsProfits();p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
         $domain = BaseKj::getApiHost(8);p($domain);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=5); p($rst);// 单双遗漏
         $rst = NumService::getCodesArise(['38','78']);p($rst); //2+3+1+2+2
@@ -166,7 +168,6 @@ class IndexController extends Controller
         for ($i=0;$i<5; $i++){
             $rst = SscDataService::updateDsData();//p($rst); // 每期开奖单双
         }
-        $rst[] = StaticService::static4dMonthsProfits();p($rst); # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
         $codes = BetService::getCodes(2, 3, 20, 1, 0.1, 1, '35,36');p($codes);
         $rst = SevenService::sscIndex(3, 3);p($rst); # 用户信息
         $rst = BetService::userSysPlansTzNow(81, 3); p($rst);
@@ -196,7 +197,6 @@ class IndexController extends Controller
         $rst = BetService::getPlansAllCodesType1(3, 14); p($rst);
         $rst = BetService::getHzCodes(20, '25,26');p($rst);
         $rst = StaticService::staticSDPerDateProfits(date('Y-m-d'));p($rst);
-        $rst = StaticService::static4dMonthsProfits(); p($rst); # 4定每个月的利润统计，有点慢
         $rst = StaticService::static4DdsLastTime();p($rst);
         $rst = StaticService::opStaticProfits();p($rst);
         $post = \Yii::$app->request->post();

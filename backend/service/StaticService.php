@@ -79,20 +79,6 @@ class StaticService extends BaseService {
     }
 
     /**
-     * @desc 统计所有利润
-     * @return array
-     */
-    public static function opAllStaticProfits(){
-
-        $lottery_types = self::getLotteryTypes();
-        foreach ($lottery_types as $lottery_type) {
-            $rst[] = self::opStaticProfits($lottery_type);
-        }
-
-        return $rst;
-    }
-
-    /**
      * @desc 利润统计
      * @param  int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      */
@@ -659,9 +645,11 @@ class StaticService extends BaseService {
     public static function opStatic(){
         $lottery_types = StaticService::getLotteryTypes();
         foreach ($lottery_types as $lottery_type) {
+            if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opStatic')) continue;
             $rst[] = StaticService::staticSDHzPerDateProfits($lottery_type); # 每天四定和值利润统计
             $rst[] = StaticService::staticHzMonthsProfits($lottery_type); # 每月四定和值利润统计
             $rst[] = StaticService::allHzStaticProfitsPerdate($lottery_type);//p($rst);# 循环计算每天每个和值利润统计
+            StaticService::afterOpStatic($lottery_type, 'opStatic');
         }
 
         return $rst;
@@ -1131,9 +1119,12 @@ class StaticService extends BaseService {
      */
    public static function staticAll2NumsYl(){
 
+       $rst = ['status'=>200, 'msg'=>'处理完成'];
        $lottery_types = self::getLotteryTypes();
        foreach ($lottery_types as $lottery_type) {
-           $rst[] = StaticService::static2NumsYl($lottery_type);
+           if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'staticAll2NumsYll')) continue;
+           $rst['static2NumsYl'] = StaticService::static2NumsYl($lottery_type);
+           StaticService::afterOpStatic($lottery_type, 'staticAll2NumsYll');
        }
 
        return $rst;
@@ -1237,12 +1228,17 @@ class StaticService extends BaseService {
     /**
      * @desc 处理统计数据
      */
-   public static function opAllStaitcProfits(){
+   public static function opAllStaticProfits(){
        $lottery_types = self::getLotteryTypes();
        foreach ($lottery_types as $lottery_type){
-           $rst['static4dMonthsProfits'] = StaticService::static4dMonthsProfits($lottery_type); # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
+           if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllStaticProfits')) continue;
+           $rst['opStaticProfits'] = StaticService::opStaticProfits($lottery_type);
            $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type); # 上奖三字现
+
+           $rst['static4dMonthsProfits'] = StaticService::static4dMonthsProfits($lottery_type); # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
            $rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
+
+           StaticService::afterOpStatic($lottery_type, 'opAllStaticProfits');
        }
 
        return $rst;
@@ -1360,6 +1356,39 @@ class StaticService extends BaseService {
 
        return $profits;
    }
+
+   /**
+     * @desc 判断当前期是否需要统计
+     * @param int $lottery_type
+     * @return mixed
+     */
+    public static function isCanOpStatic($lottery_type = DEFAULT_LOTTERY_TYPE, $key = 'opAllStaticProfits'){
+
+        $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
+        $m = \Yii::$app->cache;
+        $status = $m->get($mkey); # 为true或1则不能再往下执行统计
+
+        return !$status;
+    }
+
+    /**
+     * @desc 处理完统计数据锁住（设置为true或1）、防止数据做没必要对的重复统计
+     * @param int $lottery_type
+     * @return mixed
+     */
+    public static function afterOpStatic($lottery_type = DEFAULT_LOTTERY_TYPE, $key = 'opAllStaticProfits'){
+
+        $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
+        $m = \Yii::$app->cache;
+        $qihao = HN0898Service::getQihao($lottery_type);
+        $cacheTime = BetService::getBetCacheTime($lottery_type, $qihao);
+        $rst = $m->set($mkey, true, $cacheTime);
+
+        return $rst;
+    }
+
+
+
 
 
 
