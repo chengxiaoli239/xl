@@ -566,7 +566,7 @@ class SscDataService extends BaseService {
             }
             $vals = explode(',', $dsData['val']);
             $count = SscDataService::getNumCounts($vals);
-            //p([$count, $dsData['val']]);
+            //if($dsData['val'] == 'type_2,type_3b') p([$count, $dsData['val']]);
             $SscStaticYl->lottery_type = $lottery_type;
             $SscStaticYl->updated_at = time();
             $SscStaticYl->val = $dsData['val'];
@@ -757,12 +757,12 @@ class SscDataService extends BaseService {
             $where = ['AND', ['IN', $valArr[0], 1],['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
             $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
         }else{
-            $where = ['AND'];
+            $where = ['AND',['>', 'index_id', $min_id], ['=','lottery_type',$lottery_type]];
             foreach ($valArr as $val){
                 $where = array_merge($where,[['=', $val, 1]]);
             }
             $query = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where);
-            $SscKjDatas = $query->andWhere(['lottery_type'=>$lottery_type])->orderBy('id DESC')->limit($recently)->all();
+            $SscKjDatas = $query->orderBy('id DESC')->all();
         }
         //$where = "$field=$num AND id>$min_id";
         if(count($SscKjDatas)>1){
@@ -804,6 +804,7 @@ class SscDataService extends BaseService {
             'max_range' => $max_range,   // 近200期内的最大遗漏范围
             'yl_str' => $yl_str,
         ];
+        //if($vals == 'type_2,type_3b')p($rstData);
         return $rstData;
     }
 

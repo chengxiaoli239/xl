@@ -100,13 +100,13 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
+        $rst = NumService::getCodesArise(['0039','0339','0399']);p($rst); //2+3+1+2+2
         $rst = StaticService::staticAll2NumsYl();p($rst); # 统计所有二字现遗漏
         $rst = StaticService::static4dMonthsProfits();p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
         $domain = BaseKj::getApiHost(8);p($domain);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=5); p($rst);// 单双遗漏
-        $rst = NumService::getCodesArise(['38','78']);p($rst); //2+3+1+2+2
         $rst['updateDsYL'] = SscDataService::updateSdHzYl(); p($rst);// 单双遗漏
-        $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
         $miss = SscDataService::getCodeTypeHistoryMiss('type_2,type_2b', $lottery_type = 5, $static_nums = 80);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         p('xxx');
         $rst['updateDs'] = SscDataService::updateDsData($lottery_type=5); // 每期开奖遗漏
