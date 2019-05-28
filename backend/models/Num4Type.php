@@ -9,6 +9,10 @@ use Yii;
  *
  * @property int $id
  * @property string $code 彩种
+ * @property int $code_1
+ * @property int $code_2
+ * @property int $code_3
+ * @property int $code_4
  * @property int $type_2 是否双重
  * @property int $type_22 是否双双重
  * @property int $type_3 是否三重
@@ -38,7 +42,7 @@ class Num4Type extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'codes_hz', 'created_at', 'updated_at'], 'integer'],
+            [['code_1', 'code_2', 'code_3', 'code_4', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'codes_hz', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
             [['code'], 'string', 'max' => 8],
         ];
@@ -50,29 +54,24 @@ class Num4Type extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'code' => Yii::t('app', '彩种'),
-            'type_2' => Yii::t('app', '是否双重'),
-            'type_22' => Yii::t('app', '是否双双重'),
-            'type_3' => Yii::t('app', '是否三重'),
-            'type_4' => Yii::t('app', '是否四重'),
-            'type_2b' => Yii::t('app', '是否两兄弟'),
-            'type_3b' => Yii::t('app', '是否三兄弟'),
-            'type_4b' => Yii::t('app', '是否四兄弟'),
-            'type_4ds' => Yii::t('app', '单双：0非四单四双1四单2四双'),
-            'codes_hz' => Yii::t('app', '号码和值'),
-            'created_at' => Yii::t('app', '创建时间'),
-            'updated_at' => Yii::t('app', '更新时间'),
-            'update_time' => Yii::t('app', '更新时间'),
+            'id' => 'ID',
+            'code' => '彩种',
+            'code_1' => 'Code 1',
+            'code_2' => 'Code 2',
+            'code_3' => 'Code 3',
+            'code_4' => 'Code 4',
+            'type_2' => '是否双重',
+            'type_22' => '是否双双重',
+            'type_3' => '是否三重',
+            'type_4' => '是否四重',
+            'type_2b' => '是否两兄弟',
+            'type_3b' => '是否三兄弟',
+            'type_4b' => '是否四兄弟',
+            'type_4ds' => '单双：0非四单四双1四单2四双',
+            'codes_hz' => '号码和值',
+            'created_at' => '创建时间',
+            'updated_at' => '更新时间',
+            'update_time' => '更新时间',
         ];
-    }
-
-    /**
-     * @inheritdoc
-     * @return Num4TypeQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new Num4TypeQuery(get_called_class());
     }
 }
