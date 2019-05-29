@@ -355,7 +355,7 @@ class NumService extends BaseService {
     }
 
     /**
-     * @desc 上奖 - 返回匹配含号码的组合 -- 已完完 2019-04-22
+     * @desc 上奖 - 返回匹配含号码的组合 -- 已完成 2019-04-22
      * @param array $codesArr
      */
     public static function getCodesArise($codesArr = [], $isUnique = 1){

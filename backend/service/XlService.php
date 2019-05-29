@@ -603,7 +603,7 @@ class XlService extends BaseTZService {
             $balance = $rst['Data']['credit_balance'];
         }
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','7时彩-用户余额', $rst);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','希腊-用户余额', $rst);
 
         return $balance;
     }

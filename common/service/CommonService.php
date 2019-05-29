@@ -409,6 +409,8 @@ class  CommonService{
         $codesArr = explode(',', $codes);
         $codesArr = array_unique($codesArr);
         if(count($codesArr)==2) $flag = 1;
+        $flag = self::isCodeType3($codes) == 1 ? 0 : $flag; # 三重不属于双双重
+        $flag = self::isCodeType4($codes) == 1 ? 1 : $flag; # 四重属于双双重
 
         return $flag;
     }
@@ -492,6 +494,8 @@ class  CommonService{
             '5,6,7',
             '6,7,8',
             '7,8,9',
+            '0,8,9',
+            '0,1,9',
         ];
         foreach ($bArrs as $bArr){
             if(strpos($codes_str, $bArr) !== false) $flag = 1;
@@ -518,6 +522,9 @@ class  CommonService{
             '4,5,6,7',
             '5,6,7,8',
             '6,7,8,9',
+            '0,7,8,9',
+            '0,1,8,9',
+            '0,1,2,9',
         ];
         foreach ($bArrs as $bArr){
             if(strpos($codes_str, $bArr) !== false) $flag = 1;

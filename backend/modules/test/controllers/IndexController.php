@@ -100,8 +100,13 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::insertCodeType();p($rst);
+        $rst = SevenService::login(12, 3);p($rst); # 7时登录
+        $rst = SevenService::synBalance(15);p($rst);
+
+        $rst = StaticService::staticAll2NumsYl();p($rst); # 统计所有二字现遗漏
         $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
-        $rst = NumService::getCodesArise(['0039','0339','0399']);p($rst); //2+3+1+2+2
+        $rst = NumService::getCodesArise(['003']);p($rst); //2+3+1+2+2
         $rst = StaticService::staticAll2NumsYl();p($rst); # 统计所有二字现遗漏
         $rst = StaticService::static4dMonthsProfits();p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
         $domain = BaseKj::getApiHost(8);p($domain);
@@ -142,7 +147,7 @@ class IndexController extends Controller
         $rst = NumService::getRecentlyCodes(5);p($rst);
         $rst = UserSysPlansService::userSysPlanChange(2);p($rst);
         $rst = StaticService::getYlByCodes('02468,13579,X,X', 2, 18);p($rst);
-        $rst = StaticService::opAllStaitcProfits();p($rst);
+        $rst = StaticService::opAllStaticProfits();p($rst);
         $rst['updateDs'] = SscDataService::updateDsData(3); p($rst);// 每期开奖遗漏
         $rst = HN0898Service::insertDsYl();p($rst);
         $rst = BetService::bet(); p($rst);// 用户新计划投注，可正买可反买
@@ -173,7 +178,6 @@ class IndexController extends Controller
         $rst = SevenService::sscIndex(3, 3);p($rst); # 用户信息
         $rst = BetService::userSysPlansTzNow(81, 3); p($rst);
         $rst = SevenService::getSn(3, 3);p($rst); # 用户信息
-        $rst = SevenService::login(3, 3);p($rst); # 7时登录
         $rst = HN0898Service::getRemoteHzRecords(3, 2);p($rst);
         $rst = CqsscSevenDay::getLotteryNo(); p($rst);
         $rst = StaticService::staticHzPerDateProfits('2019-04-09'); p($rst);
@@ -194,7 +198,6 @@ class IndexController extends Controller
             $rst[$i] = NumService::getRemoveCodes($i,2000);
         }
         p($rst);
-        $rst = SscDataService::insertCodeType();p($rst);
         $rst = BetService::getPlansAllCodesType1(3, 14); p($rst);
         $rst = BetService::getHzCodes(20, '25,26');p($rst);
         $rst = StaticService::staticSDPerDateProfits(date('Y-m-d'));p($rst);

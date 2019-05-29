@@ -320,6 +320,7 @@ class SevenService extends BaseTZService {
             'tz_type'=> $tz_type,  // 投注类型
             'buy_type'=> $buy_type,  // 购买方向类型
             'uid'=> self::$user_id,  // 投注账号id
+            'lottery_type' => $lottery_type, # 彩种
             'account' => $account,
             'plan_id' => $plan_id, # 计划id
             'codes' => (string)$codes,  // 投注号码
@@ -1038,7 +1039,7 @@ class SevenService extends BaseTZService {
         $_t = microtime(true) * 10000;
         //$url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/App/Index'.'?_'.$_t;
         $url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/GetMemberPrint?_='.$_t;
-        if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'url'=>$url];
+        if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
         $headers = [
             "Accept: application/json, text/javascript, */*; q=0.01",
             "Cookie: ".trim($TzSystemsUsers->cookie),
@@ -1155,6 +1156,7 @@ class SevenService extends BaseTZService {
         $insertData = [
             'sn' => $data['sn'],  // 方案号
             'snid'=>$data['snid'],
+            'lottery_type' => $data['lottery_type'], # 彩种
             'playway'=> $data['playway'],  // 投注方式
             'tz_type'=> $data['tz_type'],  // 投注类型
             'account'=> $data['account'],  // 投注账号

@@ -1199,7 +1199,10 @@ class SscDataService extends BaseService {
     public static function insertCodeType(){
         set_time_limit(0);
 
-        for($i = 15000; $i<=19999; $i++){
+        //for($i = 10000; $i<=19999; $i++){
+        for($i = 10000; $i<=13501; $i++){
+        //for($i = 13500; $i<=16501; $i++){
+        //for($i = 16500; $i<=19999; $i++){
             $code = substr($i, 1,4);
             $codes = $code[0].','.$code[1].','.$code[2].','.$code[3];
             if(!$Num4Type = Num4Type::findOne(['code'=>$codes])){
@@ -1210,6 +1213,10 @@ class SscDataService extends BaseService {
 
             $setData = [
                 'code' => $codes, # 号码
+                'code_1' => $code[0], # 第一个号码
+                'code_2' => $code[1], # 第二个号码
+                'code_3' => $code[2], # 第三个号码
+                'code_4' => $code[3], # 第四个号码
                 'type_2' => CommonService::isCodeType2($codes), # 是否双重
                 'type_22' => CommonService::isCodeType22($codes), # 是否双双重
                 'type_3' => CommonService::isCodeType3($codes), # 是否三重
