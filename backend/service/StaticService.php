@@ -1122,9 +1122,10 @@ class StaticService extends BaseService {
        $rst = ['status'=>200, 'msg'=>'处理完成'];
        $lottery_types = self::getLotteryTypes();
        foreach ($lottery_types as $lottery_type) {
-           if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'staticAll2NumsYl')) continue;
+           $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'staticAll2NumsYll');
+           if(!$status) continue;
            $rst['static2NumsYl'] = StaticService::static2NumsYl($lottery_type);
-           StaticService::afterOpStatic($lottery_type, 'staticAll2NumsYl');
+           StaticService::afterOpStatic($lottery_type, 'staticAll2NumsYll');
        }
 
        return $rst;
