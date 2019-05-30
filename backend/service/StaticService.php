@@ -1122,10 +1122,10 @@ class StaticService extends BaseService {
        $rst = ['status'=>200, 'msg'=>'处理完成'];
        $lottery_types = self::getLotteryTypes();
        foreach ($lottery_types as $lottery_type) {
-           $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'staticAll2NumsYll');
+           $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'staticAll2NumsYl_0');
            if(!$status) continue;
            $rst['static2NumsYl'] = StaticService::static2NumsYl($lottery_type);
-           StaticService::afterOpStatic($lottery_type, 'staticAll2NumsYll');
+           StaticService::afterOpStatic($lottery_type, 'staticAll2NumsYl_0');
        }
 
        return $rst;
@@ -1363,17 +1363,11 @@ class StaticService extends BaseService {
      * @return mixed
      */
     public static function isCanOpStatic($lottery_type = DEFAULT_LOTTERY_TYPE, $key = 'opAllStaticProfits'){
-
-        $qihao = HN0898Service::getQihao($lottery_type);
+        $m = \Yii::$app->cache;
         $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
-        if($SscKjData = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao])){
-            $m = \Yii::$app->cache;
-            $status = $m->get($mkey); # 为true或1则不能再往下执行统计
-            return !$status;
-        }else{
-            return false;
-        }
 
+        $status = $m->get($mkey); # 为true或1则不能再往下执行统计
+        return !$status;
     }
 
     /**
@@ -1386,8 +1380,9 @@ class StaticService extends BaseService {
 
         $qihao = HN0898Service::getQihao($lottery_type);
         if($SscKjData = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao])) {
-            $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
             $m = \Yii::$app->cache;
+            $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
+
             $qihao = HN0898Service::getQihao($lottery_type);
             $cacheTime = BetService::getBetCacheTime($lottery_type, $qihao);
             $rst = $m->set($mkey, true, $cacheTime);
