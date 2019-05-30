@@ -100,14 +100,13 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::staticAll2NumsYl();p($rst); # 统计所有二字现遗漏
         $rst = SscDataService::insertCodeType();p($rst);
         $rst = SevenService::login(12, 3);p($rst); # 7时登录
         $rst = SevenService::synBalance(15);p($rst);
 
-        $rst = StaticService::staticAll2NumsYl();p($rst); # 统计所有二字现遗漏
         $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
         $rst = NumService::getCodesArise(['003']);p($rst); //2+3+1+2+2
-        $rst = StaticService::staticAll2NumsYl();p($rst); # 统计所有二字现遗漏
         $rst = StaticService::static4dMonthsProfits();p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
         $domain = BaseKj::getApiHost(8);p($domain);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=5); p($rst);// 单双遗漏

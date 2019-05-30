@@ -1122,9 +1122,9 @@ class StaticService extends BaseService {
        $rst = ['status'=>200, 'msg'=>'处理完成'];
        $lottery_types = self::getLotteryTypes();
        foreach ($lottery_types as $lottery_type) {
-           if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'staticAll2NumsYll')) continue;
+           if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'staticAll2NumsYl')) continue;
            $rst['static2NumsYl'] = StaticService::static2NumsYl($lottery_type);
-           StaticService::afterOpStatic($lottery_type, 'staticAll2NumsYll');
+           StaticService::afterOpStatic($lottery_type, 'staticAll2NumsYl');
        }
 
        return $rst;
@@ -1364,9 +1364,12 @@ class StaticService extends BaseService {
      */
     public static function isCanOpStatic($lottery_type = DEFAULT_LOTTERY_TYPE, $key = 'opAllStaticProfits'){
 
+        $qihao = HN0898Service::getQihao($lottery_type);
         $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
-        $m = \Yii::$app->cache;
-        $status = $m->get($mkey); # 为true或1则不能再往下执行统计
+        if($SscKjData = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao])){
+            $m = \Yii::$app->cache;
+            $status = $m->get($mkey); # 为true或1则不能再往下执行统计
+        }
 
         return !$status;
     }
