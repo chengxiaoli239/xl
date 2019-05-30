@@ -278,7 +278,7 @@ class KjDataGet
         if (!$QxcKjData->save()) {
             $msg = current($QxcKjData->getErrors());
             $logArr = ['msg'=>$msg, 'qihao'=>$qihao, 'kjData'=>$kjData];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertQxcKjData', 'INFO', '开奖号码记录', $logArr);
             return ['status' => 300, 'msg' => $msg];
         }
         return ['status'=>200, 'msg'=>'开奖数据写入成功', 'insertRst'=>$insertRst];
