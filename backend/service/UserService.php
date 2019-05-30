@@ -123,10 +123,11 @@ class UserService extends BaseService {
                     $setData['created_at'] = time();
                 }
                 $TzSystems = TzSystems::findOne($tz_system_id);
-                //$user = AdminModel::findOne($uid);
+                $user = AdminModel::findOne($uid);
                 $setData['updated_at'] = time();
                 $setData = array_merge($setData,[
                     'uid' => $uid,
+                    'username' => $user->username,
                     //'ssc_domain' => $TzSystems->ssc_domain,
                     'tz_system_id' => $tz_system_id,
                     'sys_name' => $TzSystems->name,
