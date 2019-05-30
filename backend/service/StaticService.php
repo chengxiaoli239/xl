@@ -1369,9 +1369,11 @@ class StaticService extends BaseService {
         if($SscKjData = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao])){
             $m = \Yii::$app->cache;
             $status = $m->get($mkey); # 为true或1则不能再往下执行统计
+            return !$status;
+        }else{
+            return false;
         }
 
-        return !$status;
     }
 
     /**
