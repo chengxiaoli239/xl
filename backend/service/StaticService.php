@@ -1352,7 +1352,6 @@ class StaticService extends BaseService {
            $profits += $profitsData['profits'];
        }
        $logArr['profits'] = $profits;
-       p($logArr);
 
        return $profits;
    }
@@ -1369,7 +1368,7 @@ class StaticService extends BaseService {
         if($SscKjData = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao])){
             $m = \Yii::$app->cache;
             $status = $m->get($mkey); # 为true或1则不能再往下执行统计
-            return $status;
+            return !$status;
         }else{
             return false;
         }
@@ -1382,12 +1381,16 @@ class StaticService extends BaseService {
      * @return mixed
      */
     public static function afterOpStatic($lottery_type = DEFAULT_LOTTERY_TYPE, $key = 'opAllStaticProfits'){
+        $rst = true;
 
-        $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
-        $m = \Yii::$app->cache;
         $qihao = HN0898Service::getQihao($lottery_type);
-        $cacheTime = BetService::getBetCacheTime($lottery_type, $qihao);
-        $rst = $m->set($mkey, true, $cacheTime);
+        if($SscKjData = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao])) {
+            $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
+            $m = \Yii::$app->cache;
+            $qihao = HN0898Service::getQihao($lottery_type);
+            $cacheTime = BetService::getBetCacheTime($lottery_type, $qihao);
+            $rst = $m->set($mkey, true, $cacheTime);
+        }
 
         return $rst;
     }
