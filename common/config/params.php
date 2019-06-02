@@ -4,7 +4,7 @@ return [
     'supportEmail' => 'support@example.com',
     'user.passwordResetTokenExpire' => 3600,
     'ssc_kj_time_start' => '03:00',
-    'ssc_kj_time_end' => '07:10',
+    'ssc_kj_time_end' => '07:15',
     'AIP_API_ID' => '11617584',    // 百度AI APP ID
     'AIP_API_KEY' => 'YzH6ouHBfApZpGBzcauRCGst',    // 百度AI APP KEY
     'AIP_SECRET_KEY' => 'st2syHNBIjapDAXnZIG77ndnqo6LwI1B',    // 百度AI APP SECRET KEY
