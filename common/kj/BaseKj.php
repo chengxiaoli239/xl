@@ -10,12 +10,12 @@ class BaseKj{
     private static $tblEndQihao = '190125023';
 
     public static function _init($lotteryType = DEFAULT_LOTTERY_TYPE){
-        self::$currentQihao = HN0898Service::getCurrentQihao();
+        self::$currentQihao = HN0898Service::getCurrentQihao($lotteryType);
         $status = true;
         if($lotteryType == 'qxc'){
         }else{
-            self::$tblEndQihao = KjDataGet::getEndQihao();
-            self::$currentQihao = HN0898Service::getCurrentQihao();
+            self::$tblEndQihao = KjDataGet::getEndQihao($lotteryType);
+            self::$currentQihao = HN0898Service::getCurrentQihao($lotteryType);
             if(self::$tblEndQihao >= self::$currentQihao){
                 $status = false;
             }
@@ -27,11 +27,11 @@ class BaseKj{
     /**
      * @desc 获取当前开奖数据，如果有则返回
      */
-    public static function getCurrentKjData(){
+    public static function getCurrentKjData($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
 
-        $qihao = HN0898Service::getCurrentQihao();
-        $mkey = 'KJ_DATA_QIHAO_KEY_'.$qihao;
+        $qihao = HN0898Service::getCurrentQihao($lottery_type);
+        $mkey = 'KJ_DATA_QIHAO_KEY_'.$lottery_type.'_'.$qihao;
 
         return $m->get($mkey);
     }

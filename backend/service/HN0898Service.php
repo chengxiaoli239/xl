@@ -1162,13 +1162,13 @@ class HN0898Service extends BaseTZService {
      * @param int $type
      * @return string
      */
-    public static function getCurrentQihao($type = 'ssc'){
-        $qihao = HN0898Service::getQihao();
+    public static function getCurrentQihao($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $qihao = HN0898Service::getQihao($lottery_type);
         $strRQ = substr($qihao, 0, 6);
         $qihao_n = str_replace($strRQ, '', $qihao);
 
-        switch ($type){
-            case 'ssc':
+        switch ($lottery_type){
+            case 5:
                 if($qihao_n == '001') $actionNo = '120';
                 else $actionNo = $qihao_n - 1;
                 break;

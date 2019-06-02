@@ -483,6 +483,7 @@ class  CommonService{
     public static function isCodeType3b($codes){
         $flag = 0;
         $codesArr = explode(',', $codes);
+        $codesArr = array_unique($codesArr);
         asort($codesArr);
         $codes_str = implode(',', $codesArr);
         $bArrs = [
