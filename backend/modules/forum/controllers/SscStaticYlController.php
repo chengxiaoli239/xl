@@ -36,7 +36,9 @@ class SscStaticYlController extends BaseController
     public function actionIndex()
     {
         $searchModel = new SscStaticYlSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        $queryParams['SscStaticYl']['status'] = 1;
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
