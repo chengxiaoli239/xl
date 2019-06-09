@@ -291,7 +291,7 @@ class SevenService extends BaseTZService {
             if($tz_type != 20){
                 $tzRst['code'] = $codes;
             }
-            if($rst['Status'] == 5 && strpos($rst['Data'], '请登录') !== false){
+            if($rst['Status'] == 5 && strpos($rst['Data'], '登录') !== false){ # 您的状态已经超时，请重新登录、请登录
                 # 投注失败提示登陆：执行登陆并且再次投注
                 $rst = SevenService::login(self::$user_id, self::$tz_system_id);
                 # 投注

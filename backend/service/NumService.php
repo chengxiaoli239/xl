@@ -703,6 +703,10 @@ class NumService extends BaseService {
         return $typeArr;
     }
 
+    public static function gendouble3Nums(){
+
+    }
+
 
 
 
