@@ -61,7 +61,7 @@ class CurlService extends BaseService{
 
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
-        if(strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
+        if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);

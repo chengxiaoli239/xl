@@ -291,6 +291,12 @@ class SevenService extends BaseTZService {
             if($tz_type != 20){
                 $tzRst['code'] = $codes;
             }
+            if($rst['Status'] == 5 && strpos($rst['Data'], '请登录') !== false){
+                # 投注失败提示登陆：执行登陆并且再次投注
+                $rst = SevenService::login(self::$user_id, self::$tz_system_id);
+                # 投注
+                BetService::tzByPlanId($plan_id, 1);
+            }
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
             return $tzRst;
         }
