@@ -169,7 +169,7 @@ class IndexController extends Controller
     public function actionBet(){
         self::_init();
         $time = date("H:i");
-        if(\Yii::$app->params['ssc_kj_time_start'] < $time && $time < \Yii::$app->params['ssc_kj_time_end'] ){
+        if(\Yii::$app->params['ssc_kj_time_start'] <= $time && $time <= \Yii::$app->params['ssc_kj_time_end'] ){
             $rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
             return $rst;
         }
