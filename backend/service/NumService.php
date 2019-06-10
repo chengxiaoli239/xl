@@ -573,7 +573,7 @@ class NumService extends BaseService {
         //p($codes_hz,0);
         if(empty($codes_hz)) return [];
 
-        $where = ['OR'];
+        $where = ['AND'];
         # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
         # 1、双重
         if(isset($codes_hz['type_2'])){
@@ -604,12 +604,34 @@ class NumService extends BaseService {
             $where = array_merge($where, [['=', 'type_4b', $codes_hz['type_4b']]]);
         }
 
-        $query = Num4Type::find()->where($where);
         # 和值
         if(isset($codes_hz['hz'])){
-            $andWhere = ['IN', 'codes_hz', $codes_hz['hz'][0], $codes_hz['hz'][1]];
-            $query->andWhere($andWhere);
+            $where = array_merge($where, [ ['IN', 'codes_hz', $codes_hz['hz']] ]);
+            //$query->andWhere($andWhere);
         }
+
+        # 第1位
+        if(isset($codes_hz['p1']) && !empty($codes_hz['p1'])){
+            $p1_codes = explode(',', $codes_hz['p1']);
+            $where = array_merge($where, [ ['IN', 'code_1', $p1_codes] ]);
+        }
+        # 第2位
+        if(isset($codes_hz['p2']) && !empty($codes_hz['p2'])){
+            $p2_codes = explode(',', $codes_hz['p2']);
+            $where = array_merge($where, [ ['IN', 'code_2', $p2_codes] ]);
+        }
+        # 第3位
+        if(isset($codes_hz['p3']) && !empty($codes_hz['p3'])){
+            $p3_codes = explode(',', $codes_hz['p3']);
+            $where = array_merge($where, [ ['IN', 'code_3', $p3_codes] ]);
+        }
+        # 第4位
+        if(isset($codes_hz['p4']) && !empty($codes_hz['p4'])){
+            $p4_codes = explode(',', $codes_hz['p4']);
+            $where = array_merge($where, [ ['IN', 'code_4', $p4_codes] ]);
+        }
+
+        $query = Num4Type::find()->where($where);
 
         $Num4Types = $query->asArray()->all();
         $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
