@@ -1056,7 +1056,7 @@ class StaticService extends BaseService {
      */
     public static function staticHzCounts($date = '2019-02-11', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'staticCodeTypeCounts_'.$lottery_type.'_'.$date;
+        $mkey = 'staticHzCounts_'.$lottery_type.'_'.$date;
 
         //if($staticDatas = $m->get($mkey)) return $staticDatas;
         $codeTypes = StaticService::getAllCodeTypes($type = 1); # 统计基础号码类型筛选,类型：1和值2号码类型[例如:双双重、三重]
