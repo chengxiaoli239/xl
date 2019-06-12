@@ -1187,7 +1187,7 @@ class StaticService extends BaseService {
             $StaticTables = StaticCodeTypeArisePerdate::find()->all();
             $flag = count($StaticTables);
             if(!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
-            if($beforeDays == 120 && !$time = $m->get($mkey)) {
+            if($beforeDays == 120 OR !$time = $m->get($mkey)) {
                 $time = strtotime('-'.$beforeDays.' day');
             }else{
                 $time = $time + 24 * 3600;
@@ -1237,7 +1237,7 @@ class StaticService extends BaseService {
             $StaticTables = StaticHzArisePerdate::find()->all();
             $flag = count($StaticTables);
             if(!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
-            if($beforeDays == 120 && !$time = $m->get($mkey)) {
+            if($beforeDays == 120 OR !$time = $m->get($mkey)) {
                 $time = strtotime('-'.$beforeDays.' day');
             }else{
                 $time = $time + 24 * 3600;
