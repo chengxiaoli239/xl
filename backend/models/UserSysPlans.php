@@ -37,6 +37,11 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $type_3b; # 三兄弟
     public $type_4b; # 四兄弟
     public $hz; # 四兄弟
+    public $arise; # 上奖
+    public $p1; # 第1位
+    public $p2; # 第2位
+    public $p3; # 第3位
+    public $p4; # 第4位
     /**
      * @inheritdoc
      */
@@ -57,7 +62,7 @@ class UserSysPlans extends \common\models\base\BaseModel
             [['update_time'], 'safe'],
             [['children_plan_id'], 'string', 'max' => 255],
             [['account', 'tz_sites'], 'string', 'max' => 24],
-            [['hz_Arr'], 'string', 'max' => 120],
+            [['hz_Arr'], 'string', 'max' => 640],
         ];
     }
 
