@@ -1200,9 +1200,9 @@ class SscDataService extends BaseService {
         set_time_limit(0);
 
         //for($i = 10000; $i<=19999; $i++){
-        for($i = 10000; $i<=13501; $i++){
+        //for($i = 10000; $i<=13501; $i++){
         //for($i = 13500; $i<=16501; $i++){
-        //for($i = 16500; $i<=19999; $i++){
+        for($i = 16500; $i<=19999; $i++){
             $code = substr($i, 1,4);
             $codes = $code[0].','.$code[1].','.$code[2].','.$code[3];
             if(!$Num4Type = Num4Type::findOne(['code'=>$codes])){

@@ -99,24 +99,28 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['p1'] = $UserSysPlans['p1'];
             }
             unset($post['UserSysPlans']['p1']);
-            # 11、第1位
+            # 11、第2位
             if(isset($UserSysPlans['p2']) && $UserSysPlans['p2']){
                 $tmpFilter['p2'] = $UserSysPlans['p2'];
             }
             unset($post['UserSysPlans']['p2']);
-            # 12、第1位
+            # 12、第3位
             if(isset($UserSysPlans['p3']) && $UserSysPlans['p3']){
                 $tmpFilter['p3'] = $UserSysPlans['p3'];
             }
             unset($post['UserSysPlans']['p3']);
-            # 13、第1位
+            # 13、第4位
             if(isset($UserSysPlans['p4']) && $UserSysPlans['p4']){
                 $tmpFilter['p4'] = $UserSysPlans['p4'];
             }
             unset($post['UserSysPlans']['p4']);
+            # 13、四单四双
+            if(isset($UserSysPlans['type_4ds']) && $UserSysPlans['type_4ds'] && count($UserSysPlans['type_4ds']) == 1){
+                $tmpFilter['type_4ds'] = $UserSysPlans['type_4ds'][0];
+            }
+            unset($post['UserSysPlans']['type_4ds']);
 
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
-            //p($post);
         }else{
             $hz_Arr = $post['UserSysPlans']['hz_Arr'];
             if(is_array($hz_Arr)) { # Array 和值打法，多个和值

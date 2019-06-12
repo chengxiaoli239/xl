@@ -395,6 +395,7 @@ class  CommonService{
         $codesArr = explode(',', $codes);
         $codesArr = array_unique($codesArr);
         if(count($codesArr)<=3) $flag = 1;
+        $flag = self::isCodeType4($codes) == 1 ? 1 : $flag; # 四重属于双重
 
         return $flag;
     }

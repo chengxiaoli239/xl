@@ -637,6 +637,13 @@ class NumService extends BaseService {
             $where = array_merge($where, [ ['IN', 'code_4', $p4_codes] ]);
         }
 
+        # 四单四双
+        if(isset($codes_hz['type_4ds']) && !empty($codes_hz['type_4ds'])){
+            $where = array_merge($where, [['=', 'type_4ds', $codes_hz['type_4ds']]]);
+        }
+
+
+
         $query = Num4Type::find()->where($where);
 
         $Num4Types = $query->asArray()->all();
@@ -677,10 +684,17 @@ class NumService extends BaseService {
     public static function getDescByKuaixuan($hz_Arr){
         //p($hz_Arr,0);
         # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
-        $desc = '[快选] ';
+        //$desc = '[快选] ';
+        $desc = '';
+        $desc_detail = '';
         $filter0 = []; # 除
         $filter1 = []; # 取
         $filter2 = []; # 和值
+        $filter3 = []; # 上奖
+        # 0、上奖
+        if(isset($hz_Arr['arise'])){
+            if($hz_Arr['arise']) $filter3['arise'] = $hz_Arr['arise'];// else $filter0['arise'] = 0;
+        }
         # 1、双重
         if(isset($hz_Arr['type_2'])){
             if($hz_Arr['type_2'] == 1) $filter1['type_2'] = 1; else $filter0['type_22'] = 0;
@@ -715,15 +729,24 @@ class NumService extends BaseService {
         if(isset($hz_Arr['hz']) && !empty($hz_Arr['hz'])){
             $filter2['hz'] = implode(',',$hz_Arr['hz']);
         }
+        # 9、四单四双
+        if(isset($hz_Arr['type_4ds'])){
+            if($hz_Arr['type_4ds']) $filter1['type_4ds'] = $hz_Arr['type_4ds']; //else $filter0['type_4ds'] = 0;
+        }
 
         $typesArr = self::getNameByCodesType();
         if(!empty($filter2['hz'])){
-            $desc .= '和值:'.yii\helpers\BaseStringHelper::truncate($filter2['hz'],10).' ';
+            //$desc .= '和值:'.yii\helpers\BaseStringHelper::truncate($filter2['hz'],10).' ';
+            $desc .= '和值:'.$filter2['hz'].' ';
         }
         if(!empty($filter1)){
             $desc .= '取:';
             foreach ($filter1 as $key1=>$v1){
-                $desc .= $typesArr[$key1].'、';
+                if($key1 == 'type_4ds'){
+                    $desc .= $typesArr[$key1.'_'.$v1].'、';
+                }else{
+                    $desc .= $typesArr[$key1].'、';
+                }
             }
             $desc = trim($desc, '、').' ';
         }
@@ -734,6 +757,14 @@ class NumService extends BaseService {
             }
             $desc = trim($desc, '、').' ';
         }
+        if(!empty($filter3)){
+            $desc .= '上奖:';
+            foreach ($filter3 as $key3=>$v3){
+                $desc .= $v3.'、';
+            }
+            $desc = trim($desc, '、').' ';
+        }
+
 
         return $desc;
     }
@@ -752,6 +783,9 @@ class NumService extends BaseService {
             'type_2b'=>'两兄弟',
             'type_3b'=>'三兄弟',
             'type_4b'=>'四兄弟',
+            'type_4ds_1'=>'四单',
+            'type_4ds_2'=>'四双',
+            'arise'=>'上奖',
         ];
 
         if($typeArr[$type]) return $typeArr[$type];

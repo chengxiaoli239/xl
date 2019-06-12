@@ -84,6 +84,11 @@ use yii\widgets\ActiveForm;
                         0=>'除',
                         1=>'取'
                     ])->label('四兄弟') ?>
+                    <?= $form->field($model, 'type_4ds')->checkBoxList([
+                        //0=>'非四单四双',
+                        1=>'四单',
+                        2=>'四双',
+                    ])->label('四单四双') ?>
 
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
 
