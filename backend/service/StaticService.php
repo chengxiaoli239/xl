@@ -1247,7 +1247,6 @@ class StaticService extends BaseService {
             $date = min([date('Y-m-d'), $date]);
             if($date>date('Y-m-d')) break;
             if($statics = StaticService::staticHzCounts($date, $lottery_type)){
-                p($statics,0);
                 $setData = [];
                 foreach ($statics as $key=>$static){
                     $setData[$key] = $static;
