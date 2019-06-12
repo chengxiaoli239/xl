@@ -1118,7 +1118,7 @@ class StaticService extends BaseService {
         $SscStaticVals = SscStaticVal::find()->where(['status'=>1, 'type'=>$type])->asArray()->all();
         $m = \Yii::$app->cache;
 
-        $mkey = 'getAllCodeTypes_01_'.$type;
+        $mkey = 'getAllCodeTypes_02_'.$type;
         if($codeTypes = $m->get($mkey)) return $codeTypes;
         $codeTypes = ArrayHelper::getColumn($SscStaticVals, 'val');
 
@@ -1180,7 +1180,7 @@ class StaticService extends BaseService {
      */
     public static function allDateStaticCodeTypePerDate( $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'allDateStaticCodeType_PERDATE_02_'.$lottery_type;
+        $mkey = 'allDateStaticCodeType_PERDATE_05_'.$lottery_type;
 
         $allStatic = [];
         for($s=0; $s<5; $s++){
@@ -1230,7 +1230,7 @@ class StaticService extends BaseService {
      */
     public static function allDateStaticHzPerDate( $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'allDateStaticHz_PERDATE_04_'.$lottery_type;
+        $mkey = 'allDateStaticHz_PERDATE_05_'.$lottery_type;
 
         $allStatic = [];
         for($s=0; $s<5; $s++){
