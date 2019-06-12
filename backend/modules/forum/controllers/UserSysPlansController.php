@@ -133,6 +133,7 @@ class UserSysPlansController extends BaseController
             //return $this->redirect(['view', 'id' => $model->id]);
             return $this->redirect(['index']);
         }
+        //p($this->_post);
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
         $model->tz_sites = explode(',', $model->tz_sites);
         if(in_array($model->tz_type, [20, 22])){ # 和值、四定单双
@@ -140,7 +141,7 @@ class UserSysPlansController extends BaseController
         }elseif ($model->tz_type == 25){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
             foreach ($hz_Arr_Data as $key=>$val){
-                if($key == 'hz'){
+                if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'arise'])){
                     $model->$key = $val;
                 }else{
                     $model->$key[] = $val;
@@ -155,6 +156,7 @@ class UserSysPlansController extends BaseController
             'tz_sites_Arr' => $tz_sites_Arr,
         ];
         $data = array_merge($data, UserSysPlansService::getSysPlansTypeDatas($model->playway, $model->tz_type));
+        //p($model->getErrors());
         //p($data);
 
         return $this->render('update',$data);

@@ -421,4 +421,36 @@ class BaseNumService extends BaseService {
         p($codesArr);
     }
 
+    /**
+     * @desc 获取三字现，双重加一码
+     * @return array
+     */
+    public static function getRepeat3Codes($repeat = 0){
+        $repeatCodes = ['00', '11', '22', '33', '44', '55', '66', '77', '88', '99']; # 双重数组
+        $singleCodes = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        $threeCodesArr = [];
+        foreach ($repeatCodes as $repeatCode){
+            foreach ($singleCodes as $singleCode){
+                $flag = strstr($repeatCode, $singleCode) !== false;
+                if(!$repeat && $flag){
+                    continue;
+                }
+                $threeCodesArr[] = $repeatCode.$singleCode;
+            }
+        }
+        $codesArr = $threeCodesArr;
+
+        return $codesArr;
+    }
+
+    /**
+     * @desc 获取四字现
+     * @return array
+     */
+    public static function get4Codes(){
+        $codesArr = [];
+
+        return $codesArr;
+    }
+
 }

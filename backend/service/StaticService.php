@@ -15,9 +15,11 @@ use backend\models\Ssc2numsYl;
 use backend\models\SscKjData;
 use backend\models\SscKjData3num;
 use backend\models\SscKjDataDs;
+use backend\models\SscStaticVal;
 use backend\models\Static3numArisePerdate;
 use backend\models\Static4dProfits;
 use backend\models\Static4dProfitsPerdate;
+use backend\models\StaticCodeTypeArisePerdate;
 use backend\models\StaticHzProfits;
 use backend\models\StaticHzProfitsPerdate;
 use backend\models\StaticPerHzPerdateProfits;
@@ -1046,6 +1048,54 @@ class StaticService extends BaseService {
     }
 
     /**
+     * @desc 每天号码类型数量统计:双重、三重、双双重、两兄弟、三兄弟、四兄弟、双重&两兄弟、双重&三兄弟
+     * @param string $date
+     * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     * @return array
+     */
+    public static function staticCodeTypeCounts($date = '2019-02-11', $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $m = \Yii::$app->cache;
+        $mkey = 'staticCodeTypeCounts_'.$lottery_type.'_'.$date;
+
+        //if($staticDatas = $m->get($mkey)) return $staticDatas;
+        $codeTypes = StaticService::getAllCodeTypes();
+
+        $staticDatas = [];
+        foreach ($codeTypes as $codeType) {
+            $where = ['date'=>$date, 'lottery_type'=>$lottery_type];
+            $codeTypeFields = explode(',', $codeType);
+            foreach ($codeTypeFields as $codeTypeField){
+                $where[$codeTypeField] = 1;
+            }
+            $SscKjDatas = SscKjData::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(2000)->all();
+            $staticDatas[str_replace(',', '_', $codeType)]  = count($SscKjDatas);
+        }
+
+        if($date != date('Y-m-d')){
+            $m->set($mkey, $staticDatas, 7*24*3600);
+        }
+
+        return $staticDatas;
+    }
+
+    /**
+     * @desc 返回号码类型
+     * @return array
+     */
+    public static function getAllCodeTypes(){
+        $SscStaticVals = SscStaticVal::find()->where(['status'=>1])->asArray()->all();
+        $m = \Yii::$app->cache;
+
+        $mkey = 'getAllCodeTypes_01';
+        if($codeTypes = $m->get($mkey)) return $codeTypes;
+        $codeTypes = ArrayHelper::getColumn($SscStaticVals, 'val');
+
+        $m->set($mkey, $codeTypes, \Yii::$app->params['BASE_DATA_CACHE_TIME']);
+
+        return $codeTypes;
+    }
+
+    /**
      * @desc 每天三字现热码
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
@@ -1083,6 +1133,54 @@ class StaticService extends BaseService {
                 $Static3numArisePerdate->setAttributes($setData);
                 //p($Static3numArisePerdate->attributes);
                 $rst = $Static3numArisePerdate->save();
+                //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
+            }
+            $m->set($mkey, $time, 7*24*3600);
+        }
+
+        return $allStatic;
+    }
+
+    /**
+     * @desc 每天号码类型数量统计
+     * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     * @return array
+     */
+    public static function allDateStaticCodeTypePerDate( $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $m = \Yii::$app->cache;
+        $mkey = 'allDateStaticCodeType_PERDATE_01_'.$lottery_type;
+
+        $allStatic = [];
+        for($s=0; $s<5; $s++){
+            $StaticTables = StaticCodeTypeArisePerdate::find()->all();
+            if(count($StaticTables) == 0) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
+            if(!$time = $m->get($mkey)) {
+                $time = strtotime('-'.$beforeDays.' day');
+            }else{
+                $time = $time + 24 * 3600;
+            }
+
+            $date = date('Y-m-d', $time);
+            $date = min([date('Y-m-d'), $date]);
+            if($date>date('Y-m-d')) break;
+            if($statics = StaticService::staticCodeTypeCounts($date, $lottery_type)){
+                $setData = [];
+                foreach ($statics as $key=>$static){
+                    $setData[$key] = $static;
+                }
+                if(!$StaticTables = StaticCodeTypeArisePerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
+                    $StaticTables = new StaticCodeTypeArisePerdate();
+                    $setData['created_at'] = time();
+                }
+                $setData = array_merge($setData, [
+                    'date' => $date,
+                    'lottery_type' => $lottery_type,
+                    'updated_at' => time(),
+                ]);
+                $allStatic[] = $setData;
+
+                $StaticTables->setAttributes($setData);
+                $StaticTables->save();
                 //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
             }
             $m->set($mkey, $time, 7*24*3600);
@@ -1238,6 +1336,8 @@ class StaticService extends BaseService {
 
            $rst['static4dMonthsProfits'] = StaticService::static4dMonthsProfits($lottery_type); # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
            $rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
+
+           $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type); # 号码类型每天数量统计
 
            StaticService::afterOpStatic($lottery_type, 'opAllStaticProfits');
        }

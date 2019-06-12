@@ -84,9 +84,37 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['type_4b'] = $UserSysPlans['type_4b'][0];
             }
             unset($post['UserSysPlans']['type_4b']);
+            # 8、和值
             if(isset($post['UserSysPlans']['hz']) && $post['UserSysPlans']['hz']){
                 $tmpFilter['hz'] = $post['UserSysPlans']['hz'];
             }
+            unset($post['UserSysPlans']['hz']);
+            # 9、上奖
+            if(isset($UserSysPlans['arise']) && $UserSysPlans['arise']){
+                $tmpFilter['arise'] = $UserSysPlans['arise'];
+            }
+            unset($post['UserSysPlans']['arise']);
+            # 10、第1位
+            if(isset($UserSysPlans['p1']) && $UserSysPlans['p1']){
+                $tmpFilter['p1'] = $UserSysPlans['p1'];
+            }
+            unset($post['UserSysPlans']['p1']);
+            # 11、第1位
+            if(isset($UserSysPlans['p2']) && $UserSysPlans['p2']){
+                $tmpFilter['p2'] = $UserSysPlans['p2'];
+            }
+            unset($post['UserSysPlans']['p2']);
+            # 12、第1位
+            if(isset($UserSysPlans['p3']) && $UserSysPlans['p3']){
+                $tmpFilter['p3'] = $UserSysPlans['p3'];
+            }
+            unset($post['UserSysPlans']['p3']);
+            # 13、第1位
+            if(isset($UserSysPlans['p4']) && $UserSysPlans['p4']){
+                $tmpFilter['p4'] = $UserSysPlans['p4'];
+            }
+            unset($post['UserSysPlans']['p4']);
+
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
             //p($post);
         }else{
