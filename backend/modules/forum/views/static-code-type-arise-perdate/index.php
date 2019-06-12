@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\searchs\StaticCodeTypeArisePerdate */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Static Code Type Arise Perdates';
+$this->title = Yii::t('app', 'Static Code Type Arise Perdates');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <section class="static-code-type-arise-perdate-index wrapper site-min-height">
@@ -18,11 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <div class="clearfix">
+                <!--div class="clearfix">
                     <div class="btn-group">
                         <?= Html::a('Create Static Code Type Arise Perdate', ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
-                </div>
+                </div-->
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -32,22 +32,22 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
+                        //'id',
                         'date',
                         'type_2',
                         'type_3',
                         'type_22',
-                        //'type_2b',
-                        //'type_3b',
-                        //'type_4b',
-                        //'type_2_type_2b',
-                        //'type_2_type_3b',
+                        'type_2b',
+                        'type_3b',
+                        'type_4b',
+                        'type_2_type_2b',
+                        'type_2_type_3b',
                         //'lottery_type',
                         //'created_at',
                         //'updated_at',
                         //'update_time',
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
             </div>

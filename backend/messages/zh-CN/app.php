@@ -72,4 +72,5 @@ return [
 
     'Ssc Static Yls' => '号码类型遗漏统计',
     'Ssc3num Yls' => '三字现遗漏',
+    'Static Code Type Arise Perdates' => '号码类型出现次数(Day)',
 ];

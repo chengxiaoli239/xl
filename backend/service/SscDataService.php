@@ -1238,6 +1238,11 @@ class SscDataService extends BaseService {
         return $rst;
     }
 
+    public static function insert3Code(){
+
+        $codes = BaseNumService::getRepeat3Codes();
+    }
+
     /**
      * @desc 获取条件号码个数
      * @param $data
