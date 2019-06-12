@@ -67,4 +67,13 @@ class StaticCodeTypeArisePerdate extends \common\models\base\BaseModel
             'update_time' => '更新时间',
         ];
     }
+
+    /**
+     * @inheritdoc
+     * @return StaticCodeTypeArisePerdateQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new StaticCodeTypeArisePerdateQuery(get_called_class());
+    }
 }
