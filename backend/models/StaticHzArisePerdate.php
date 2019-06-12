@@ -9,13 +9,13 @@ use Yii;
  *
  * @property int $id
  * @property string $date 日期
- * @property string $hz_0_6 0到6
- * @property string $hz_5_10 5到10
- * @property string $hz_11_15 11到15
- * @property string $hz_16_19 16到19
- * @property string $hz_20_24 20到24
- * @property string $hz_25_29 25到29
- * @property string $hz_30_36 30到36
+ * @property int $hz_0_6 0到6
+ * @property int $hz_5_10 5到10
+ * @property int $hz_11_15 11到15
+ * @property int $hz_16_19 16到19
+ * @property int $hz_20_24 20到24
+ * @property int $hz_25_29 25到29
+ * @property int $hz_30_36 30到36
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
@@ -37,8 +37,7 @@ class StaticHzArisePerdate extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['hz_0_6', 'hz_5_10', 'hz_11_15', 'hz_16_19', 'hz_20_24', 'hz_25_29', 'hz_30_36'], 'number'],
-            [['lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['hz_0_6', 'hz_5_10', 'hz_11_15', 'hz_16_19', 'hz_20_24', 'hz_25_29', 'hz_30_36', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['date'], 'string', 'max' => 10],
