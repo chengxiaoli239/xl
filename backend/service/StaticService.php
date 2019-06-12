@@ -1229,7 +1229,7 @@ class StaticService extends BaseService {
      */
     public static function allDateStaticHzPerDate( $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'allDateStaticHz_PERDATE_02_'.$lottery_type;
+        $mkey = 'allDateStaticHz_PERDATE_03_'.$lottery_type;
 
         $allStatic = [];
         for($s=0; $s<5; $s++){
@@ -1264,7 +1264,7 @@ class StaticService extends BaseService {
 
                 $StaticTables->setAttributes($setData);
                 $rst = $StaticTables->save();
-                //p($rst); p($StaticTables->attributes);
+                //p($rst,0); p($StaticTables->attributes);
                 //p(['date'=>$date, 'lottery_type'=>$lottery_type, $StaticTables, $rst]);
             }
             $m->set($mkey, $time, 7*24*3600);
