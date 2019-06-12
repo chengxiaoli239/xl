@@ -612,22 +612,28 @@ class NumService extends BaseService {
 
         # 第1位
         if(isset($codes_hz['p1']) && !empty($codes_hz['p1'])){
-            $p1_codes = explode(',', $codes_hz['p1']);
+            //$p1_codes = explode(',', $codes_hz['p1']);
+            $p1_codes = self::getCodesArrByStr($codes_hz['p1']);
             $where = array_merge($where, [ ['IN', 'code_1', $p1_codes] ]);
         }
         # 第2位
         if(isset($codes_hz['p2']) && !empty($codes_hz['p2'])){
-            $p2_codes = explode(',', $codes_hz['p2']);
+            //$p2_codes = explode(',', $codes_hz['p2']);
+            $p2_codes = self::getCodesArrByStr($codes_hz['p2']);
             $where = array_merge($where, [ ['IN', 'code_2', $p2_codes] ]);
         }
         # 第3位
         if(isset($codes_hz['p3']) && !empty($codes_hz['p3'])){
-            $p3_codes = explode(',', $codes_hz['p3']);
+            //$p3_codes = explode(',', $codes_hz['p3']);
+            //$tmpArise = self::getCodesArrByStr($codes_hz['arise']);
+            $p3_codes = self::getCodesArrByStr($codes_hz['p3']);
             $where = array_merge($where, [ ['IN', 'code_3', $p3_codes] ]);
         }
         # 第4位
         if(isset($codes_hz['p4']) && !empty($codes_hz['p4'])){
-            $p4_codes = explode(',', $codes_hz['p4']);
+            //$p4_codes = explode(',', $codes_hz['p4']);
+            //$tmpArise = self::getCodesArrByStr($codes_hz['arise']);
+            $p4_codes = self::getCodesArrByStr($codes_hz['p4']);
             $where = array_merge($where, [ ['IN', 'code_4', $p4_codes] ]);
         }
 
@@ -635,11 +641,39 @@ class NumService extends BaseService {
 
         $Num4Types = $query->asArray()->all();
         $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+
+         # 上奖
+        if(isset($codes_hz['arise']) && !empty($codes_hz['arise'])){
+            //$tmpArise = self::getCodesArrByStr($codes_hz['arise']);
+
+            $codesArr_arise = self::getCodesArise([$codes_hz['arise']]);
+            $codesArr = array_intersect($codesArr, $codesArr_arise);
+        }
         //p($codesArr);
 
         return array_unique($codesArr);
     }
 
+    /**
+     * @desc 根据codestr转换为array
+     * @param $codes_str 34567
+     * @return array [3,4,5,6,7]
+     */
+    public static function getCodesArrByStr($codes_str){
+        $strlen = strlen($codes_str);
+        $codes_Arr = [];
+        for ($i=0; $i<$strlen; $i++){
+            $codes_Arr[] = $codes_str[$i];
+        }
+
+        return $codes_Arr;
+    }
+
+    /**
+     * @desc 快选计划描述转换
+     * @param $hz_Arr
+     * @return string
+     */
     public static function getDescByKuaixuan($hz_Arr){
         //p($hz_Arr,0);
         # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
