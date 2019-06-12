@@ -1065,12 +1065,12 @@ class StaticService extends BaseService {
         foreach ($codeTypes as $codeType) {
             $where = ['date'=>$date, 'lottery_type'=>$lottery_type];
             $codeTypeFields = explode(',', $codeType);
-            foreach ($codeTypeFields as $codeTypeField){
-                $where[$codeTypeField] = 1;
-            }
+            $where['codes_4nums_hz'] = $codeTypeFields;
+
             $SscKjDatas = SscKjData::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(2000)->all();
-            $staticDatas[str_replace(',', '_', $codeType)]  = count($SscKjDatas);
+            $staticDatas['hz_'.$codeTypeFields[0].'_'.end($codeTypeFields)]  = count($SscKjDatas);
         }
+        $staticDatas['date'] = $date;
 
         if($date != date('Y-m-d')){
             $m->set($mkey, $staticDatas, 7*24*3600);
@@ -1223,7 +1223,7 @@ class StaticService extends BaseService {
 
 
     /**
-     * @desc 每天号码类型数量统计
+     * @desc 每天和值范围数量统计
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
@@ -1233,7 +1233,7 @@ class StaticService extends BaseService {
 
         $allStatic = [];
         for($s=0; $s<5; $s++){
-            $StaticTables = StaticHzArisePerdate::find()->where(['type'=>1])->all();
+            $StaticTables = StaticHzArisePerdate::find()->all();
             if(count($StaticTables) == 0) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
             if(!$time = $m->get($mkey)) {
                 $time = strtotime('-'.$beforeDays.' day');
@@ -1249,8 +1249,8 @@ class StaticService extends BaseService {
                 foreach ($statics as $key=>$static){
                     $setData[$key] = $static;
                 }
-                if(!$StaticTables = StaticCodeTypeArisePerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
-                    $StaticTables = new StaticCodeTypeArisePerdate();
+                if(!$StaticTables = StaticHzArisePerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
+                    $StaticTables = new StaticHzArisePerdate();
                     $setData['created_at'] = time();
                 }
                 $setData = array_merge($setData, [
@@ -1419,6 +1419,8 @@ class StaticService extends BaseService {
            $rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
 
            $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type); # 号码类型每天数量统计
+
+           $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type); # 号码类型每天数量统计
 
            StaticService::afterOpStatic($lottery_type, 'opAllStaticProfits');
        }
