@@ -7,7 +7,8 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\searchs\StaticHzArisePerdate */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Static Hz Arise Perdates';
+//$this->title = 'Static Hz Arise Perdates';
+$this->title = Yii::t('app', 'Static Hz Arise Perdates');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <section class="static-hz-arise-perdate-index wrapper site-min-height">
@@ -18,11 +19,11 @@ $this->params['breadcrumbs'][] = $this->title;
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <div class="clearfix">
+                <!--div class="clearfix">
                     <div class="btn-group">
                         <?= Html::a('Create Static Hz Arise Perdate', ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
-                </div>
+                </div-->
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -32,21 +33,21 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
+                        //'id',
                         'date',
                         'hz_0_6',
                         'hz_5_10',
                         'hz_11_15',
-                        //'hz_16_19',
-                        //'hz_20_24',
-                        //'hz_25_29',
-                        //'hz_30_36',
+                        'hz_16_19',
+                        'hz_20_24',
+                        'hz_25_29',
+                        'hz_30_36',
                         //'lottery_type',
                         //'created_at',
                         //'updated_at',
                         //'update_time',
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
             </div>
