@@ -1118,7 +1118,7 @@ class StaticService extends BaseService {
         $SscStaticVals = SscStaticVal::find()->where(['status'=>1, 'type'=>$type])->asArray()->all();
         $m = \Yii::$app->cache;
 
-        $mkey = 'getAllCodeTypes_01';
+        $mkey = 'getAllCodeTypes_01_'.$type;
         if($codeTypes = $m->get($mkey)) return $codeTypes;
         $codeTypes = ArrayHelper::getColumn($SscStaticVals, 'val');
 
