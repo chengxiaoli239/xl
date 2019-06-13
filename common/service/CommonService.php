@@ -235,6 +235,56 @@ class  CommonService{
     }
 
     /**
+     * @desc 返回三字现，含双重或者不含
+     * @param $codesArr [3, 6, 7, 8] 或者 [3, 4, 4, 6] 或者 [3, 3, 3, 7] 或者 [3,3,3,3] 必须四个号码
+     * @return array
+     */
+    public static function get3n($codesArr){
+        if(count($codesArr) != 4) return [];
+        sort($codesArr);
+        $data = [
+            $codesArr[0] . $codesArr[1] . $codesArr[2],
+            $codesArr[0] . $codesArr[1] . $codesArr[3],
+
+            //$codesArr[0] . $codesArr[2] . $codesArr[1],
+            $codesArr[0] . $codesArr[2] . $codesArr[3],
+
+            //$codesArr[0] . $codesArr[3] . $codesArr[1],
+            //$codesArr[0] . $codesArr[3] . $codesArr[2],
+
+            //$codesArr[1] . $codesArr[0] . $codesArr[2],
+            //$codesArr[1] . $codesArr[0] . $codesArr[3],
+
+            //$codesArr[1] . $codesArr[2] . $codesArr[0],
+            $codesArr[1] . $codesArr[2] . $codesArr[3],
+
+            //$codesArr[1] . $codesArr[3] . $codesArr[0],
+            //$codesArr[1] . $codesArr[3] . $codesArr[2],
+
+            //$codesArr[2] . $codesArr[0] . $codesArr[1],
+            //$codesArr[2] . $codesArr[0] . $codesArr[3],
+
+            //$codesArr[2] . $codesArr[1] . $codesArr[0],
+            //$codesArr[2] . $codesArr[1] . $codesArr[3],
+
+            //$codesArr[2] . $codesArr[3] . $codesArr[0],
+            //$codesArr[2] . $codesArr[3] . $codesArr[2],
+
+            //$codesArr[3] . $codesArr[0] . $codesArr[1],
+            //$codesArr[3] . $codesArr[0] . $codesArr[2],
+
+            //$codesArr[3] . $codesArr[1] . $codesArr[0],
+            //$codesArr[3] . $codesArr[1] . $codesArr[2],
+
+            //$codesArr[3] . $codesArr[2] . $codesArr[0],
+            //$codesArr[3] . $codesArr[2] . $codesArr[1],
+        ];
+        $data = array_unique($data);
+
+        return $data;
+    }
+
+    /**
      * @desc 给定所有投注字符串生成定位所有组合 二字定、三字定、四字定生成
      * @param $codes 投注号码，格式：0,X,8,X@0,X,8,X@1,X,7,X@1,X,7,X@2,X,6,X@2,X,6,X@3,X,5,X@3,X,5,X@4,X,4,X
      * @param string $split 分割字符：@

@@ -499,12 +499,14 @@ class KjDataGet
      */
     public static function updateNullCode( $times = 100){
         $msg = ['status'=>200, 'msg'=>'操作成功！'];
-        $kjDatas = SscKjData::find()->where(['type_2'=>null])->orderBy('id DESC')->asArray()->limit($times)->all();
+        $kjDatas = SscKjData::find()->where(['code_3n'=>null])->orderBy('id DESC')->asArray()->limit($times)->all();
         foreach ($kjDatas as $kjData){
             $sumArr = explode(',',$kjData['code_str']);
-            unset($sumArr[4]);
-            $codes = $sumArr[0].','.$sumArr[1].','.$sumArr[2].','.$sumArr[3];
+            $codesArr = [$sumArr[0],$sumArr[1],$sumArr[2],$sumArr[3]];
+            sort($codesArr);
+            $code_3n = CommonService::get3n($codesArr);
             $updateData = [
+                'code_3n' => implode(',', $code_3n),
                 /*
                 'code1'=>$kjData['kj_code'][0],
                 'code2'=>$kjData['kj_code'][1],
@@ -513,6 +515,7 @@ class KjDataGet
                 'code5'=>$kjData['kj_code'][4],
                 'codes_4nums_hz'=> array_sum($sumArr)
                 */
+                /*
                 'type_2' => CommonService::isCodeType2($codes), # 是否双重
                 'type_22' => CommonService::isCodeType22($codes), # 是否双双重
                 'type_3' => CommonService::isCodeType3($codes), # 是否三重
@@ -521,6 +524,7 @@ class KjDataGet
                 'type_3b' => CommonService::isCodeType3b($codes), # 是否三兄弟
                 'type_4b' => CommonService::isCodeType4b($codes), # 是否四兄弟
                 'type_4ds' => CommonService::isCodeType4ds($codes), # 是否四单双：0非四单四双1四单2四双
+                */
             ];
             $sscKjData = SscKjData::findOne(['qihao'=>$kjData['qihao']]);
             $sscKjData->setAttributes($updateData);
