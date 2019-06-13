@@ -507,7 +507,7 @@ class KjDataGet
             $code_3n = CommonService::get3n($codesArr);
             $updateData = [
                 'code_3n' => implode(',', $code_3n),
-                'code_4n' => implode(',', $codesArr),
+                'code_4n' => implode('', $codesArr),
                 /*
                 'code1'=>$kjData['kj_code'][0],
                 'code2'=>$kjData['kj_code'][1],
