@@ -41,7 +41,7 @@ class Log extends ActiveRecord
         return [
             [['route', 'url', 'user_agent', 'admin_email', 'ip'], 'string', 'min' => 0, 'max' => 255],
             [['admin_id', 'route', 'url'], 'required'],
-            [['admin_id'], 'integer', 'min' => 0, 'max' => 2147483647],
+            [['admin_id', 'created_at'], 'integer', 'min' => 0, 'max' => 2147483647],
         ];
     }
 
