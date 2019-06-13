@@ -26,6 +26,7 @@ use Yii;
  * @property int $code_3_4 3、4位和值
  * @property int $qihao 期号
  * @property string $date 开奖日期
+ * @property string $code_3n 上奖三字现
  * @property int $type_2 是否双重
  * @property int $type_22 是否双双重
  * @property int $type_3 是否三重
@@ -58,7 +59,7 @@ class SscKjData extends \common\models\base\BaseModel
             [['index_id', 'codes_hz', 'codes_4nums_hz', 'code1', 'code2', 'code3', 'code4', 'code5', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'qihao', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
             [['kj_code'], 'string', 'max' => 8],
-            [['code_str'], 'string', 'max' => 24],
+            [['code_str', 'code_3n'], 'string', 'max' => 24],
             [['qihao'], 'unique'],
         ];
     }
@@ -88,6 +89,7 @@ class SscKjData extends \common\models\base\BaseModel
             'code_3_4' => '3、4位和值',
             'qihao' => '期号',
             'date' => '开奖日期',
+            'code_3n' => '上奖三字现',
             'type_2' => '是否双重',
             'type_22' => '是否双双重',
             'type_3' => '是否三重',
