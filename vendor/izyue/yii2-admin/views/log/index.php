@@ -54,6 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ]),
                         ],
                         'admin_email',
+                        'created_at:datetime',
                         'ip',
                         [
                             'class' => 'yii\grid\ActionColumn',
