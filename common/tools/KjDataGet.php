@@ -499,7 +499,7 @@ class KjDataGet
      */
     public static function updateNullCode( $times = 100){
         $msg = ['status'=>200, 'msg'=>'操作成功！'];
-        $kjDatas = SscKjData::find()->where(['code_3n'=>null])->orderBy('id DESC')->asArray()->limit($times)->all();
+        $kjDatas = SscKjData::find()->where(['OR',['=', 'code_3n', null], ['=', 'code_4n', null]])->orderBy('id DESC')->asArray()->limit($times)->all();
         foreach ($kjDatas as $kjData){
             $sumArr = explode(',',$kjData['code_str']);
             $codesArr = [$sumArr[0],$sumArr[1],$sumArr[2],$sumArr[3]];
@@ -507,6 +507,7 @@ class KjDataGet
             $code_3n = CommonService::get3n($codesArr);
             $updateData = [
                 'code_3n' => implode(',', $code_3n),
+                'code_4n' => implode(',', $codesArr),
                 /*
                 'code1'=>$kjData['kj_code'][0],
                 'code2'=>$kjData['kj_code'][1],
