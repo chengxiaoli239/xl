@@ -422,7 +422,7 @@ class BaseNumService extends BaseService {
     }
 
     /**
-     * @desc 获取三字现，双重加一码
+     * @desc 获取三字现，双重加一码、不含三重
      * @return array
      */
     public static function getRepeat3Codes($repeat = 0){
@@ -435,10 +435,47 @@ class BaseNumService extends BaseService {
                 if(!$repeat && $flag){
                     continue;
                 }
-                $threeCodesArr[] = $repeatCode.$singleCode;
+                $tmp3Code = $repeatCode.$singleCode;
+                $tmp3CodeArr = [$tmp3Code[0],$tmp3Code[1],$tmp3Code[2]];
+                sort($tmp3CodeArr);
+                $threeCodesArr[] = implode('', $tmp3CodeArr);
             }
         }
         $codesArr = $threeCodesArr;
+        sort($codesArr);
+
+        return $codesArr;
+    }
+
+    /**
+     * @desc 获取四字现，双重加两码、不含三重
+     * @return array
+     */
+    public static function getRepeat4Codes($repeat = 0){
+        $all3Codes = self::getAll3Num();
+        $singleCodes = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        $threeCodesArr = [];
+        foreach ($all3Codes as $all3Code){
+            foreach ($singleCodes as $singleCode){
+                //p([$all3Code, $singleCode]);
+                $flag = strstr($all3Code, $singleCode) !== false;
+                if($repeat && $flag){
+                    # 重复（带双重）
+                    $tmp3Code = $all3Code.$singleCode;
+                }elseif(!$repeat && !$flag){
+                    # 不带双重
+                    $tmp3Code = $all3Code.$singleCode;
+                }else{
+                    continue;
+                }
+                $tmp3CodeArr = [$tmp3Code[0], $tmp3Code[1], $tmp3Code[2], $tmp3Code[3]];
+                sort($tmp3CodeArr);
+                $threeCodesArr[] = implode('', $tmp3CodeArr);
+            }
+        }
+        $codesArr = $threeCodesArr;
+        $codesArr = array_unique($codesArr);
+        sort($codesArr);
 
         return $codesArr;
     }

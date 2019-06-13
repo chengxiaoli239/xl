@@ -612,6 +612,68 @@ class SscDataService extends BaseService {
     }
 
     /**
+     * @desc 三字现带双重遗漏统计 未完待续 2019.06.13
+     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     */
+    public static function update3CodeRepeatYL($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $rst = [];
+
+        $SscStaticVals = SscStaticVal::find()->where(['type'=>3])->asArray()->all();
+        foreach ($SscStaticVals as $dsData){
+            if(!$SscStaticYl = SscStaticYl::findOne(['lottery_type'=>$lottery_type, 'val'=>$dsData['val']])){
+                $SscStaticYl = new SscStaticYl();
+                $SscStaticYl->created_at = time();
+                $SscStaticYl->static_nums = 250;
+            }
+            $vals = explode(',', $dsData['val']);
+            $count = SscDataService::getNumCounts($vals);
+            //if($dsData['val'] == 'type_2,type_3b') p([$count, $dsData['val']]);
+            $SscStaticYl->lottery_type = $lottery_type;
+            $SscStaticYl->updated_at = time();
+            $SscStaticYl->val = $dsData['val'];
+            //$miss = SscDataService::getCodeTypeHistoryMiss($dsData['val'], $lottery_type, $SscStaticYl->static_nums); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+            $miss = SscDataService::get3CodeRepeatHistoryMiss($dsData['val'], $lottery_type, $SscStaticYl->static_nums); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+            //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
+            $SscStaticYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+            $SscStaticYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
+            $SscStaticYl->last_time_miss = $miss['last_times']; // 2、上次遗漏
+            $SscStaticYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
+            $SscStaticYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
+            $SscStaticYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
+            $SscStaticYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
+            $SscStaticYl->count = $count;
+
+            $qishu = SscDataService::getQishus($lottery_type);
+            $where = ['AND'];
+            foreach ($vals as $val){
+                $where  = array_merge($where, [['=', $val, 1]]);
+            }
+            $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where($where)->asArray()->one();
+            $SscStaticYl->theory_nums_perdate = (string)round(($Num4Type['count']*$qishu*0.1) / 995, 2); # 理论次数/天
+            $today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', date('Y-m-d')]]);
+            //$today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', '2019-05-24']]);
+            $today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($today_nums_where)->asArray()->all()[0]['nums'];
+            $SscStaticYl->today_nums = $today_nums;
+
+            # 昨日出现次数
+            $ytd_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', date('Y-m-d',strtotime("-1 day") )]]);
+            $ytd_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($ytd_nums_where)->asArray()->all()[0]['nums'];
+            $SscStaticYl->ytd_nums = $ytd_nums;
+
+            $SscStaticYl->history_max_miss = max($miss['current_times'],$SscStaticYl->max_miss,$SscStaticYl->history_max_miss); // 6、历史最大遗漏
+            $SscStaticYl->update_time = date('Y-m-d H:i:s');
+            //p($SscStaticYl->attributes);
+            $rst = $SscStaticYl->save();
+            if(!$rst){
+                $logArr = ['attributes'=>$SscStaticYl->attributes, 'msg'=>$SscStaticYl->getErrors()];
+                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/updateCodeTypeYL','INFO','统计号码出现次数', $logArr);
+            }
+        }
+
+        return $rst;
+    }
+
+    /**
      * @desc 返回记录数，组数
      * @param $vals
      * @return int
@@ -747,6 +809,75 @@ class SscDataService extends BaseService {
      * @return array
      */
     public static function getCodeTypeHistoryMiss($vals, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 472){
+        //if(!is_array($num)) $num = [ $num ];
+        $last_times = 0;
+        $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+        $min_id = $last['last_id'] - $recently - 1;
+
+        $valArr = explode(',', $vals);
+        if(count($valArr) == 1){
+            $where = ['AND', ['IN', $valArr[0], 1],['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
+            $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
+        }else{
+            $where = ['AND',['>', 'index_id', $min_id], ['=','lottery_type',$lottery_type]];
+            foreach ($valArr as $val){
+                $where = array_merge($where,[['=', $val, 1]]);
+            }
+            $query = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where);
+            $SscKjDatas = $query->orderBy('id DESC')->all();
+        }
+        //$where = "$field=$num AND id>$min_id";
+        if(count($SscKjDatas)>1){
+            $last_times = $SscKjDatas[0]->index_id - $SscKjDatas[1]->index_id - 1;  // 上次遗漏次数
+        }
+
+        # 最大遗漏期间计算 start
+        $tmpKjData = $SscKjDatas;
+        if(count($tmpKjData) > 2){
+            foreach($tmpKjData as $key=>$r){
+                if($key == 0) continue;
+                $range[$tmpKjData[$key-1]['index_id']."_".$tmpKjData[$key]['index_id']] = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
+            }
+
+            $max_miss = max($range);
+            $maxKey = array_search($max_miss, $range);
+            $keyArr = explode('_',$maxKey);
+            $tmpArr = [];
+            foreach($tmpKjData as $key=>$r){
+                if(in_array($r['index_id'], $keyArr)){
+                    $tmpArr[] = $r['qihao'];
+                }
+            }
+            $max_range = $tmpArr[1].'-'.$tmpArr[0];  // 近200期内最大遗漏
+            $yl_str = implode('-',$range);
+            # 最大遗漏期间计算 end
+            //p([$field=>$num,$min_id, $SscKjData[1]->id,$max_range]);
+        }else{
+            $max_range = $SscKjDatas[1]['qihao'] ."-". $SscKjDatas[0]['qihao'];
+        }
+        $last_time_miss_range = $SscKjDatas[1]['qihao'] ."-". $SscKjDatas[0]['qihao'];
+        $current_times = $last['last_id'] - $SscKjDatas[0]->index_id;
+
+        $rstData = [
+            'current_times' => $current_times,    // 当前遗漏次数
+            'last_times' => $last_times,    // 上次遗漏次数
+            'last_time_miss_range' => $last_time_miss_range,    // 上次遗漏范围
+            'max_miss' => $max_miss,   // 近200期内的最大遗漏
+            'max_range' => $max_range,   // 近200期内的最大遗漏范围
+            'yl_str' => $yl_str,
+        ];
+        //if($vals == 'type_2,type_3b')p($rstData);
+        return $rstData;
+    }
+
+    /**
+     * @description 三字现带双重遗漏 未完待续 2019.06.13
+     * @param $num
+     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     * @param $recently 多少期内，默认为
+     * @return array
+     */
+    public static function get3CodeRepeatHistoryMiss($vals, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 472){
         //if(!is_array($num)) $num = [ $num ];
         $last_times = 0;
         $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
@@ -1238,9 +1369,51 @@ class SscDataService extends BaseService {
         return $rst;
     }
 
-    public static function insert3Code(){
+    /**
+     * @desc 三字现
+     * @param int $isDouble 0不带双重1带双重
+     * @param $type # 类型：1和值2号码类型[例如:双双重、三重]3三字现带双重4四字现带双重5四字现不带双重
+     * @return bool
+     */
+    public static function insertCode($type = 3){
+        if($type<3) return false;
 
-        $codes = BaseNumService::getRepeat3Codes();
+        $setData = [];
+        switch ($type){
+            case 3:
+                $codes = BaseNumService::getRepeat3Codes($isRepeat = 1);
+                break;
+            case 4:
+                $codes = BaseNumService::getRepeat4Codes($isRepeat = 1);
+                break;
+            case 5:
+                $codes = BaseNumService::getRepeat4Codes($isRepeat = 0);
+                break;
+        }
+        foreach ($codes as $code){
+            $where = ['val'=>$code, 'type'=>$type];
+            if(!$SscStaticVal = SscStaticVal::findOne($where)){
+                $SscStaticVal = new SscStaticVal();
+                $setData = [
+                    'created_at' => time(),
+                    'updated_at' => time(),
+                ];
+            }
+            $setData = array_merge($setData,[
+                    'type' => $type,
+                    'val' => $code,
+                    'name' => $code,
+                    'status' => 1,
+            ]);
+
+            $SscStaticVal->setAttributes($setData);
+            //p($SscStaticVal->attributes);
+            $SscStaticVal->save();
+
+        }
+        p($codes);
+
+        return true;
     }
 
     /**
