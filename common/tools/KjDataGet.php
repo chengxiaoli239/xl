@@ -497,9 +497,9 @@ class KjDataGet
     /**
      * @desc 自动更新 万千百十个数据
      */
-    public static function updateNullCode( $times = 100){
+    public static function updateNullCode( $times = 500){
         $msg = ['status'=>200, 'msg'=>'操作成功！'];
-        $kjDatas = SscKjData::find()->where(['OR',['=', 'code_3n', null], ['=', 'code_4n', null]])->orderBy('id DESC')->asArray()->limit($times)->all();
+        $kjDatas = SscKjData::find()->where(['OR',['=', 'code_4n', null], ['=', 'code_3n', null]])->orderBy('id DESC')->asArray()->limit($times)->all();
         foreach ($kjDatas as $kjData){
             $sumArr = explode(',',$kjData['code_str']);
             $codesArr = [$sumArr[0],$sumArr[1],$sumArr[2],$sumArr[3]];
