@@ -180,7 +180,13 @@ class TzService extends BaseService {
             //$rst['userSysPlanChange'] = UserSysPlansService::userSysPlanChange($lottery_type);
 
             # 号码类型：双重、双双重、四重、三兄弟、四兄弟
-            $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL();
+            $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2);
+            # 三字现带双重
+            $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3);
+            # 四字现带双重
+            $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4);
+            # 四字现不带双重
+            $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5);
         }
 
         $rst['qihao'] = $qihao;
