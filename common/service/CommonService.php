@@ -551,6 +551,10 @@ class  CommonService{
         ];
         foreach ($bArrs as $bArr){
             if(strpos($codes_str, $bArr) !== false) $flag = 1;
+            if(in_array($bArr, ['0,8,9', '0,1,9'])){
+                $bArrCodes = explode(',', $bArr);
+                if(strpos($codes_str, $bArrCodes[0]) !== false && strpos($codes_str, $bArrCodes[1]) !== false && strpos($codes_str, $bArrCodes[2]) !== false) $flag = 1;
+            }
         }
 
         return $flag;
