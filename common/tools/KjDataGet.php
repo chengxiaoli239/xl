@@ -187,6 +187,9 @@ class KjDataGet
 
         $codes = $kjDatasArr[0].','.$kjDatasArr[1].','.$kjDatasArr[2].','.$kjDatasArr[3];
         $tmpDate = '20'.substr($qihao,0,6).' '.'00:00:00';
+        $codesArr = [$kjDatasArr[0],$kjDatasArr[1],$kjDatasArr[2],$kjDatasArr[3]];
+        sort($codesArr);
+        $code_3n = CommonService::get3n($codesArr);
         $insertData = [
             'kj_code' => $kjDatas,
             'qihao' => $qihao,
@@ -204,6 +207,8 @@ class KjDataGet
             'code_2_3'=>$kjDatasArr[1]+$kjDatasArr[2],
             'code_2_4'=>$kjDatasArr[1]+$kjDatasArr[3],
             'code_3_4'=>$kjDatasArr[2]+$kjDatasArr[3],
+            'code_3n' => implode(',', $code_3n),
+            'code_4n' => implode('', $codesArr),
             'type_2' => CommonService::isCodeType2($codes), # 是否双重
             'type_22' => CommonService::isCodeType22($codes), # 是否双双重
             'type_3' => CommonService::isCodeType3($codes), # 是否三重
