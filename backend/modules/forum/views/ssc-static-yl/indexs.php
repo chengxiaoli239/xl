@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\searchs\SscStaticYl */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Ssc Static Yls');
+$this->title = Yii::t('app', 'Ssc Static Yls').' [ '.\backend\service\StaticService::getCodeTypeName(current($dataProvider->models)->type).' ]';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <section class="ssc-static-yl-index wrapper site-min-height">
@@ -68,7 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'status',
                         //'created_at',
                         //'updated_at',
-                        //'update_time',
+                        'update_time',
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],

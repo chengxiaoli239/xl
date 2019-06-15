@@ -1466,6 +1466,23 @@ class StaticService extends BaseService {
    }
 
     /**
+     * @desc 返回号码类型名称
+     * @param int $type
+     * @return array|mixed
+     */
+   public static function getCodeTypeName($type = 2){
+       $codeTypes = [
+           2 => '号码类型',
+           3 => '三现带双重',
+           4 => '四现带双重',
+           5 => '四现不带双重',
+       ];
+       if(!$type OR !isset($codeTypes[$type])) return $codeTypes;
+
+       return $codeTypes[$type];
+   }
+
+    /**
      * @desc 给定号码计算遗漏 未完待续 -- 2019.05.09
      * @param $codes
      * @param int $lottery_type
