@@ -682,7 +682,7 @@ class SscDataService extends BaseService {
     public static function updateCodeTypeYLs($type, $lottery_type = DEFAULT_LOTTERY_TYPE){
         if(!in_array($type, [3, 4, 5])) return false;
         $rst = [];
-        $SscStaticVals = SscStaticVal::find()->where(['type'=>$type])->asArray()->all();
+        $SscStaticVals = SscStaticVal::find()->where(['type'=>$type, 'status'=>1])->asArray()->all();
         foreach ($SscStaticVals as $dsData){
             if(!$SscStaticYl = SscStaticYl::findOne(['lottery_type'=>$lottery_type, 'val'=>$dsData['val']])){
                 $SscStaticYl = new SscStaticYl();
@@ -707,6 +707,7 @@ class SscDataService extends BaseService {
             $SscStaticYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
             $SscStaticYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
             $SscStaticYl->count = $count;
+            $SscStaticYl->status = 1; # 前台显示
 
             $qishu = SscDataService::getQishus($lottery_type);
 
