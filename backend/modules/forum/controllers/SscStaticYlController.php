@@ -38,7 +38,7 @@ class SscStaticYlController extends BaseController
         $searchModel = new SscStaticYlSearch();
         $queryParams = Yii::$app->request->queryParams;
         $queryParams['SscStaticYl']['status'] = 1;
-        $type = $queryParams['SscStaticYl']['status'] ? $queryParams['SscStaticYl']['status'] : 2;
+        $type = $queryParams['SscStaticYl']['type'] ? $queryParams['SscStaticYl']['type'] : 2;
         $dataProvider = $searchModel->search($queryParams);
 
         $view = $type == 2 ? 'index' : 'indexs';

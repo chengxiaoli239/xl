@@ -98,6 +98,19 @@ class IndexController extends Controller
     }
 
     /**
+     * @desc 号码类型遗漏更新
+     * @return array|mixed
+     */
+    public function actionUpdateCodeTypeYl(){
+        self::_init();
+        if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
+
+        $rst = StaticService::opAllCodeTypeYl();
+
+        return $rst;
+    }
+
+    /**
      * @desc 四定和值利润统计
      * @return array
      */

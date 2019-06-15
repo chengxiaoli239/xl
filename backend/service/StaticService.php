@@ -1433,6 +1433,28 @@ class StaticService extends BaseService {
    }
 
     /**
+     * @desc 号码类型遗漏更新
+     * @return mixed
+     */
+   public static function opAllCodeTypeYl(){
+       $lottery_types = self::getLotteryTypes();
+       foreach ($lottery_types as $lottery_type) {
+           if (!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl')) continue;
+
+           # 号码类型：双重、双双重、四重、三兄弟、四兄弟
+           $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
+           # 三字现带双重
+           $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type);
+           # 四字现带双重
+           $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type);
+           # 四字现不带双重
+           $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type);
+       }
+
+       return $rst;
+   }
+
+    /**
      * @desc 需要处理的猜中
      * @return array
      */

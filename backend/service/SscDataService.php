@@ -955,8 +955,7 @@ class SscDataService extends BaseService {
 
     /**
      * @description 返回类型遗漏
-     * @param $num
-     * @param $type 3三字现带双重4四字现带双重5四字现不带双重
+     * @param $value 例如：001[type:3] 或者 1223[type:4] 或者 1234[type:5] === 3三字现带双重4四字现带双重5四字现不带双重
      * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @param $recently 多少期内，默认为
      * @return array
