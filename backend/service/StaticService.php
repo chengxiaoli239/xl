@@ -284,9 +284,9 @@ class StaticService extends BaseService {
         foreach ($typeArr as $k=>$hzArr){
 
             $where = ['LEFT(date, 7)'=>$month, 'codes_4nums_hz'=> $hzArr, 'lottery_type'=>$lottery_type];
-            $zJcounts = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->count(); # 中奖次数
+            $zJcounts = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 中奖次数
             $where = ['codes_hz'=>$hzArr];
-            $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count(); # 期数
+            $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 期数
 
             $profits = $zJcounts * 995 - $allCounts * $NumCounts * 0.1;
             //p([$zJcounts, $allCounts, $NumCounts, $profits]);

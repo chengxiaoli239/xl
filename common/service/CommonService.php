@@ -113,7 +113,7 @@ class  CommonService{
         $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
 
         $where = ['status'=>0];
-        $bettingRecords = BettingRecords::find()->where($where)->all();
+        $bettingRecords = BettingRecords::find()->where($where)->orderBy(['id'=>SORT_DESC])->all();
         foreach ($bettingRecords as $bettingRecord){
             # 开奖数据 start
             $kjData = self::getAwardNumberByQihao($bettingRecord['qihao']);
