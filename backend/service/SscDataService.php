@@ -976,7 +976,7 @@ class SscDataService extends BaseService {
             # 四字现
             $field = 'code_4n';
         }
-        $where = ['AND', ['LIKE', $field, $value],['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
+        $where = ['AND', ['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type],['LIKE', $field, $value]];
         $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->where($where)->orderBy('id DESC')->limit($recently)->all();
         //p($SscKjDatas);
         //$where = "$field=$num AND id>$min_id";
