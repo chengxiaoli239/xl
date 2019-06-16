@@ -1183,12 +1183,12 @@ class StaticService extends BaseService {
         $mkey = 'allDateStaticCodeType_PERDATE_05_'.$lottery_type;
 
         $allStatic = [];
-        for($s=0; $s<5; $s++){
+        for($s=0; $s<10; $s++){
             $StaticTables = StaticCodeTypeArisePerdate::find()->all();
             $flag = count($StaticTables);
             if(!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
             if($beforeDays == 120 OR !$time = $m->get($mkey)) {
-                $time = strtotime('-'.$beforeDays.' day');
+                $time = strtotime('-'.$beforeDays.' days');
             }else{
                 $time = $time + 24 * 3600;
             }
@@ -1233,17 +1233,18 @@ class StaticService extends BaseService {
         $mkey = 'allDateStaticHz_PERDATE_05_'.$lottery_type;
 
         $allStatic = [];
-        for($s=0; $s<5; $s++){
+        for($s=0; $s<100; $s++){
             $StaticTables = StaticHzArisePerdate::find()->all();
             $flag = count($StaticTables);
             if(!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
             if($beforeDays == 120 OR !$time = $m->get($mkey)) {
-                $time = strtotime('-'.$beforeDays.' day');
+                $time = strtotime('-'.$beforeDays.' days');
             }else{
                 $time = $time + 24 * 3600;
             }
 
             $date = date('Y-m-d', $time);
+            p([$date,$time]);
             $date = min([date('Y-m-d'), $date]);
             if($date>date('Y-m-d')) break;
             if($statics = StaticService::staticHzCounts($date, $lottery_type)){
@@ -1424,7 +1425,7 @@ class StaticService extends BaseService {
 
            $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type); # 号码类型每天数量统计
 
-           $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type); # 号码类型每天数量统计
+           $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type); # 和值每天数量统计
 
            StaticService::afterOpStatic($lottery_type, 'opAllStaticProfits');
        }
