@@ -1055,6 +1055,10 @@ class SscDataService extends BaseService {
      * @return array
      */
     public static function getCodeTypeYlByTab($value, $lottery_type = DEFAULT_LOTTERY_TYPE, $type = 3){
+        $m = \Yii::$app->cache;
+        $qihao = HN0898Service::getQihao($lottery_type);
+        $mkey = 'getCodeTypeYlByTab_'.$lottery_type.'_'.$value;
+        if($m->get($mkey)) return false;
 
         if(!$SscStaticYl = SscStaticYl::findOne(['val'=>$value, 'type'=>$type, 'lottery_type'=>$lottery_type])){
             return [];
@@ -1077,6 +1081,8 @@ class SscDataService extends BaseService {
             'max_range' => $max_range,   // 近200期内的最大遗漏范围
             'yl_str' => $yl_str,
         ];
+        $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+        $m->set($mkey, 1, $time);
         //p($rstData);
         return $rstData;
     }
