@@ -19,7 +19,7 @@ class McKeyService{
      */
     public static function buildStaticMKey($key, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
-        $qihao = HN0898Service::getQihao($lottery_type);
+        $qihao = HN0898Service::getCurrentQihao($lottery_type);
         $mkey = \Yii::$app->params['DATA_STATIC_KEY'].'_'.$qihao.'_'.$key;
 
         return $mkey;

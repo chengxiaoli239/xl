@@ -1439,6 +1439,7 @@ class StaticService extends BaseService {
      */
    public static function opAllCodeTypeYl(){
        $lottery_types = self::getLotteryTypes();
+       $rst = ['status'=>200, 'msg'=>'数据处理成功'];
        foreach ($lottery_types as $lottery_type) {
            if (!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl')) continue;
 
@@ -1606,12 +1607,11 @@ class StaticService extends BaseService {
     public static function afterOpStatic($lottery_type = DEFAULT_LOTTERY_TYPE, $key = 'opAllStaticProfits'){
         $rst = true;
 
-        $qihao = HN0898Service::getQihao($lottery_type);
+        $qihao = HN0898Service::getCurrentQihao($lottery_type);
         if($SscKjData = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao])) {
             $m = \Yii::$app->cache;
             $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
 
-            $qihao = HN0898Service::getQihao($lottery_type);
             $cacheTime = BetService::getBetCacheTime($lottery_type, $qihao);
             $rst = $m->set($mkey, true, $cacheTime);
         }

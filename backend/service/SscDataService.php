@@ -680,12 +680,11 @@ class SscDataService extends BaseService {
      * @return array|bool
      */
     public static function updateCodeTypeYLs($type, $lottery_type = DEFAULT_LOTTERY_TYPE){
-        return false;
         if(!in_array($type, [3, 4, 5])) return false;
         $rst = [];
         $SscStaticVals = SscStaticVal::find()->where(['type'=>$type, 'status'=>1])->asArray()->all();
         foreach ($SscStaticVals as $dsData){
-            if(!$SscStaticYl = SscStaticYl::findOne(['lottery_type'=>$lottery_type, 'val'=>$dsData['val']])){
+            if(!$SscStaticYl = SscStaticYl::findOne(['lottery_type'=>$lottery_type, 'type'=>$type, 'val'=>$dsData['val']])){
                 $SscStaticYl = new SscStaticYl();
                 $SscStaticYl->created_at = time();
                 $SscStaticYl->static_nums = 250;
