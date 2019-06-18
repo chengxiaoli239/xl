@@ -1763,6 +1763,7 @@ class SscDataService extends BaseService {
         $updateDsDatas = SscSdHzVal::find()->asArray()->All();
         //$rst[$interval] = SscDataService::dsYLStatic($interval);
         foreach ($updateDsDatas as $Data){
+            //if($Data['id'] != 61) continue;
             $zuHes = explode(',', $Data['val']);
             $where = [ 'AND',[ '=', 'val', $Data['val']], ['=', 'lottery_type', $lottery_type] ];
 
