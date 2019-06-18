@@ -1070,7 +1070,10 @@ class SscDataService extends BaseService {
         //$yl_records[0] = $current_times;
         $last_times = $SscStaticYl->last_time_miss;
         $max_range = $SscStaticYl->max_range;
+
+        unset($yl_records[0]);
         $yl_str = implode('-', $yl_records);
+
         $max_miss = max($yl_records);
 
         $rstData = [
