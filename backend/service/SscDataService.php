@@ -706,6 +706,7 @@ class SscDataService extends BaseService {
             }else{
                 # 遗漏本表数据做计算，不中的情况执行这里
                 $miss = SscDataService::getCodeTypeYlByTab($dsData['val'], $lottery_type, $type);
+                if(!$miss) continue;
             }
             if($miss['current_times'])
             //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
