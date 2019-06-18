@@ -1063,7 +1063,7 @@ class SscDataService extends BaseService {
         $last_time_miss_range = $SscStaticYl->last_time_miss_range;
         $yl_records = explode('-', $SscStaticYl->yl_records);
         $current_times = $SscStaticYl->current_miss + 1;
-        $yl_records[0] = $current_times;
+        //$yl_records[0] = $current_times;
         $last_times = $SscStaticYl->last_time_miss;
         $max_range = $SscStaticYl->max_range;
         $yl_str = implode('-', $yl_records);
