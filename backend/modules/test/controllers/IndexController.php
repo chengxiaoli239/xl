@@ -102,6 +102,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type=5);p($rst);
+        $miss = SscDataService::getCodeTypeYlByTab('0026', $lottery_type = 5, $type = 4); p($miss);
+        $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
+        $miss = SscDataService::getCodeTypeYlHistoryMiss('0013', $lottery_type = 5, 4000);p($miss);
         $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type = DEFAULT_LOTTERY_TYPE); p($rst);# 号码类型每天数量统计
         $rst = StaticService::staticCodeTypeCounts('2019-06-14', $lottery_type = 5); p($rst);
         $rst = SscDataService::insertCodeType();p($rst);
@@ -113,7 +117,6 @@ class IndexController extends Controller
         $rst = SevenService::login(12, 3);p($rst); # 7时登录
         $rst = SevenService::synBalance(15);p($rst);
 
-        $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
         $rst = StaticService::static4dMonthsProfits();p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
         $domain = BaseKj::getApiHost(8);p($domain);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=5); p($rst);// 单双遗漏

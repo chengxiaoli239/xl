@@ -696,8 +696,18 @@ class SscDataService extends BaseService {
             $SscStaticYl->updated_at = time();
             $SscStaticYl->val = $dsData['val'];
             $SscStaticYl->type = $type;
-            $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums']); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
-            //p($miss);
+            $getDataType = SscDataService::staticGetDataType();
+            $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->orderBy('id DESC')->limit(1)->one();
+            $field = strlen($dsData['val']) == 3 ? 'code_3n' : 'code_4n';
+            $flag = strpos($SscKjDatas->$field, $dsData['val']) !== false;
+            if(in_array($type, [ 3 ]) OR $getDataType == 0 OR $flag){
+                # 中的执行这里
+                $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums']);
+            }else{
+                # 遗漏本表数据做计算，不中的情况执行这里
+                $miss = SscDataService::getCodeTypeYlByTab($dsData['val'], $lottery_type, $type);
+            }
+            if($miss['current_times'])
             //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
             $SscStaticYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
             $SscStaticYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
@@ -707,7 +717,7 @@ class SscDataService extends BaseService {
             $SscStaticYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
             $SscStaticYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
             $SscStaticYl->count = $count;
-            $SscStaticYl->status = 1; # 前台显示
+            $SscStaticYl->status = $miss['current_times'] > $dsData['static_nums'] ? 0 : 1; # 前台显示
 
             $qishu = SscDataService::getQishus($lottery_type);
 
@@ -757,6 +767,17 @@ class SscDataService extends BaseService {
         $Num4Type = Num4Type::find()->where($where)->all();
 
         return count($Num4Type);
+    }
+
+    /**
+     * @desc 计算遗漏获取数据类型 1取本表数据做变更0扫表重新计算数据（比如：遗漏、数量等统计）
+     * @return int
+     */
+    public static function staticGetDataType(){
+
+        $status = SystemConfig::findOne(['key'=>'getDataType'])->value;
+
+        return $status;
     }
 
     /**
@@ -979,6 +1000,7 @@ class SscDataService extends BaseService {
         $where = ['AND', ['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type],['LIKE', $field, $value]];
         $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->where($where)->orderBy('id DESC')->limit($recently)->all();
         //p($SscKjDatas);
+        //if($value == '0026') p([$rstData, $SscKjDatas]);
         //$where = "$field=$num AND id>$min_id";
         if(count($SscKjDatas)>1){
             $last_times = $SscKjDatas[0]->index_id - $SscKjDatas[1]->index_id - 1;  // 上次遗漏次数
@@ -1010,6 +1032,42 @@ class SscDataService extends BaseService {
         }
         $last_time_miss_range = $SscKjDatas[1]['qihao'] ."-". $SscKjDatas[0]['qihao'];
         $current_times = $last['last_id'] - $SscKjDatas[0]->index_id;
+        if(empty($yl_str)) $yl_str = $last_times;
+
+        $rstData = [
+            'current_times' => $current_times,    // 当前遗漏次数
+            'last_times' => $last_times,    // 上次遗漏次数
+            'last_time_miss_range' => $last_time_miss_range,    // 上次遗漏范围
+            'max_miss' => $max_miss ? $max_miss : $last_times,   // 近200期内的最大遗漏
+            'max_range' => $max_range,   // 近200期内的最大遗漏范围
+            'yl_str' => $yl_str,
+        ];
+        //p($rstData);
+        //if($vals == 'type_2,type_3b')p($rstData);
+        return $rstData;
+    }
+
+    /**
+     * @description 返回遗漏数据 by 本表
+     * @param $value 例如：001[type:3] 或者 1223[type:4] 或者 1234[type:5] === 3三字现带双重4四字现带双重5四字现不带双重
+     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     * @param $type 1和值2号码类型[例如:双双重、三重]3三字现带双重4四字现带双重5四字现不带双重, 目前暂支持4、5
+     * @return array
+     */
+    public static function getCodeTypeYlByTab($value, $lottery_type = DEFAULT_LOTTERY_TYPE, $type = 3){
+
+        if(!$SscStaticYl = SscStaticYl::findOne(['val'=>$value, 'type'=>$type, 'lottery_type'=>$lottery_type])){
+            return [];
+        }
+
+        $last_time_miss_range = $SscStaticYl->last_time_miss_range;
+        $yl_records = explode('-', $SscStaticYl->yl_records);
+        $current_times = $SscStaticYl->current_miss + 1;
+        $yl_records[0] = $current_times;
+        $last_times = $SscStaticYl->last_time_miss;
+        $max_range = $SscStaticYl->max_range;
+        $yl_str = implode('-', $yl_records);
+        $max_miss = max($yl_records);
 
         $rstData = [
             'current_times' => $current_times,    // 当前遗漏次数
@@ -1020,7 +1078,6 @@ class SscDataService extends BaseService {
             'yl_str' => $yl_str,
         ];
         //p($rstData);
-        //if($vals == 'type_2,type_3b')p($rstData);
         return $rstData;
     }
 
