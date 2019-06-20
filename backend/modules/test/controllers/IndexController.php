@@ -102,9 +102,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = NumService::getCodesKuaiXuan([ 'type_22'=>0, 'arise'=>'55', 'type_4ds'=>1]);p($rst);
+        $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type=5);p($rst);
         $miss = SscDataService::getCodeTypeYlByTab('0026', $lottery_type = 5, $type = 4); p($miss);
-        $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
         $miss = SscDataService::getCodeTypeYlHistoryMiss('0013', $lottery_type = 5, 4000);p($miss);
         $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type = DEFAULT_LOTTERY_TYPE); p($rst);# 号码类型每天数量统计
         $rst = StaticService::staticCodeTypeCounts('2019-06-14', $lottery_type = 5); p($rst);
@@ -130,7 +131,6 @@ class IndexController extends Controller
         $beforeQihao = KjDataGet::getBeforeQihaoByQihao('190525001');p($beforeQihao);
         $rst = NumService::getCodesArise(['9377']);p(count($rst));
         $arr = ['type_2b'=>1, 'hz'=>[11,12,13,14,15,16,24]]; p(json_encode($arr));
-        $rst = NumService::getCodesKuaiXuan(['type_2b'=>1, 'hz'=>[11,24], 'hz_v'=>1]);p($rst);
         $rst = NumService::getCodesKuaiXuan(['type_2'=>1, 'hz'=>[8,28]]);p($rst);
         $qihao = HN0898Service::getQihao($lottery_type = 6);p($qihao);
         $rst = TzService::insertSscDataTime(6); p($rst);

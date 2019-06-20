@@ -648,11 +648,12 @@ class StaticService extends BaseService {
     public static function opStatic(){
         $lottery_types = StaticService::getLotteryTypes();
         foreach ($lottery_types as $lottery_type) {
-            if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opStatic')) continue;
-            $rst[] = StaticService::staticSDHzPerDateProfits($lottery_type); # 每天四定和值利润统计
-            $rst[] = StaticService::staticHzMonthsProfits($lottery_type); # 每月四定和值利润统计
-            $rst[] = StaticService::allHzStaticProfitsPerdate($lottery_type);//p($rst);# 循环计算每天每个和值利润统计
-            StaticService::afterOpStatic($lottery_type, 'opStatic');
+            if($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opStatic')) {
+                $rst['staticSDHzPerDateProfits'] = StaticService::staticSDHzPerDateProfits($lottery_type); # 每天四定和值利润统计
+                $rst['staticHzMonthsProfits'] = StaticService::staticHzMonthsProfits($lottery_type); # 每月四定和值利润统计
+                $rst[''] = StaticService::allHzStaticProfitsPerdate($lottery_type);//p($rst);# 循环计算每天每个和值利润统计
+                StaticService::afterOpStatic($lottery_type, 'opStatic');
+            }
         }
 
         return $rst;
@@ -1306,10 +1307,10 @@ class StaticService extends BaseService {
        $rst = ['status'=>200, 'msg'=>'处理完成'];
        $lottery_types = self::getLotteryTypes();
        foreach ($lottery_types as $lottery_type) {
-           $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'staticAll2NumsYl_0');
-           if(!$status) continue;
-           $rst['static2NumsYl'] = StaticService::static2NumsYl($lottery_type);
-           StaticService::afterOpStatic($lottery_type, 'staticAll2NumsYl_0');
+           if($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'staticAll2NumsYl_0')){
+               $rst['static2NumsYl'] = StaticService::static2NumsYl($lottery_type);
+               StaticService::afterOpStatic($lottery_type, 'staticAll2NumsYl_0');
+           }
        }
 
        return $rst;
@@ -1416,18 +1417,19 @@ class StaticService extends BaseService {
    public static function opAllStaticProfits(){
        $lottery_types = self::getLotteryTypes();
        foreach ($lottery_types as $lottery_type){
-           if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllStaticProfits')) continue;
-           $rst['opStaticProfits'] = StaticService::opStaticProfits($lottery_type);
-           $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type); # 上奖三字现
+           if($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllStaticProfits')){
+               $rst['opStaticProfits'] = StaticService::opStaticProfits($lottery_type);
+               $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type); # 上奖三字现
 
-           $rst['static4dMonthsProfits'] = StaticService::static4dMonthsProfits($lottery_type); # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
-           $rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
+               $rst['static4dMonthsProfits'] = StaticService::static4dMonthsProfits($lottery_type); # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
+               $rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
 
-           $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type); # 号码类型每天数量统计
+               $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type); # 号码类型每天数量统计
 
-           $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type); # 和值每天数量统计
+               $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type); # 和值每天数量统计
 
-           StaticService::afterOpStatic($lottery_type, 'opAllStaticProfits');
+               StaticService::afterOpStatic($lottery_type, 'opAllStaticProfits');
+           }
        }
 
        return $rst;
@@ -1441,17 +1443,17 @@ class StaticService extends BaseService {
        $lottery_types = self::getLotteryTypes();
        $rst = ['status'=>200, 'msg'=>'数据处理成功'];
        foreach ($lottery_types as $lottery_type) {
-           if (!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl')) continue;
-
-           # 号码类型：双重、双双重、四重、三兄弟、四兄弟
-           $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
-           # 三字现带双重
-           $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type);
-           # 四字现带双重
-           $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type);
-           # 四字现不带双重
-           $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type);
-           StaticService::afterOpStatic($lottery_type, 'opAllCodeTypeYl');
+           if ($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl')) {
+               # 号码类型：双重、双双重、四重、三兄弟、四兄弟
+               $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
+               # 三字现带双重
+               $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type);
+               # 四字现带双重
+               $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type);
+               # 四字现不带双重
+               $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type);
+               StaticService::afterOpStatic($lottery_type, 'opAllCodeTypeYl');
+           }
        }
 
        return $rst;
@@ -1596,7 +1598,13 @@ class StaticService extends BaseService {
         $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
 
         $status = $m->get($mkey); # 为true或1则不能再往下执行统计
-        return !$status;
+        $flag = !$status;
+
+        $qihao = HN0898Service::getCurrentQihao($lottery_type);
+        if(!$status && $SscKjData = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao])) {
+            $flag = true;
+        }
+        return $flag;
     }
 
     /**
