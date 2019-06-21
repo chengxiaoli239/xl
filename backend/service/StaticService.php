@@ -744,12 +744,12 @@ class StaticService extends BaseService {
      */
     public static function allDateHzStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'allDateHzStaticProfits_PERDATE_08_'.$lottery_type;
+        $mkey = 'allDateHzStaticProfits_PERDATE_09_'.$lottery_type;
 
         $allStatic = [];
         for($s=0; $s<5; $s++){
             if(!$time = $m->get($mkey)) {
-                $time = strtotime('-1 day');
+                $time = strtotime('-6 day');
             }else{
                 $time = $time + 24 * 3600;
             }
@@ -1139,8 +1139,11 @@ class StaticService extends BaseService {
 
         $allStatic = [];
         for($s=0; $s<5; $s++){
-            if(!$time = $m->get($mkey)) {
-                $time = strtotime('-1 day');
+            $Static3numArisePerdate = Static3numArisePerdate::find()->all();
+            $flag = count($Static3numArisePerdate);
+            if(!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
+            if($beforeDays == 120 OR !$time = $m->get($mkey)) {
+                $time = strtotime('-120 days');
             }else{
                 $time = $time + 24 * 3600;
             }
@@ -1189,7 +1192,7 @@ class StaticService extends BaseService {
             $flag = count($StaticTables);
             if(!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
             if($beforeDays == 120 OR !$time = $m->get($mkey)) {
-                $time = strtotime('-'.$beforeDays.' days');
+                $time = strtotime('-120 days');
             }else{
                 $time = $time + 24 * 3600;
             }
@@ -1239,13 +1242,12 @@ class StaticService extends BaseService {
             $flag = count($StaticTables);
             if(!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
             if($beforeDays == 120 OR !$time = $m->get($mkey)) {
-                $time = strtotime('-'.$beforeDays.' days');
+                $time = strtotime('-120 days');
             }else{
                 $time = $time + 24 * 3600;
             }
 
             $date = date('Y-m-d', $time);
-            p([$date,$time]);
             $date = min([date('Y-m-d'), $date]);
             if($date>date('Y-m-d')) break;
             if($statics = StaticService::staticHzCounts($date, $lottery_type)){
