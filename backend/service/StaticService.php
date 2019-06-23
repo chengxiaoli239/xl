@@ -24,6 +24,7 @@ use backend\models\StaticHzArisePerdate;
 use backend\models\StaticHzProfits;
 use backend\models\StaticHzProfitsPerdate;
 use backend\models\StaticPerHzPerdateProfits;
+use backend\models\StaticPerHzProfits;
 use backend\models\StaticProfits;
 use backend\models\SystemConfig;
 use backend\models\TzTypes;
@@ -458,6 +459,96 @@ class StaticService extends BaseService {
     }
 
     /**
+     * @desc 计算指定月份的四定和值利润
+     * @param string $month
+     * @param int $num
+     * @param int $type
+     * @return array|mixed
+     */
+    public static function staticPerHzProfits($month = '2018-11', $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $m = \Yii::$app->cache;
+        $mkey = 'staticPerHzProfits_01_'.$lottery_type.'_'.$month;
+        $hzArr = [];
+        for ($i=1; $i<=36; $i++){
+            $hzArr[$i] = 0;
+        }
+        if($month != date('Y-m') && $allStatic = $m->get($mkey)){
+            //return $allStatic;
+        }
+        $where = ['LEFT(date, 7)'=>$month, 'lottery_type'=>$lottery_type];
+        $allCounts = SscKjData::find()->select(['month'=>'LEFT(date, 7)', 'nums'=>'COUNT(id)'])->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->count();
+
+        $allStatic = [];
+        foreach ($hzArr as $k=>$hz){
+
+            $where = ['LEFT(date, 7)'=>$month, 'codes_4nums_hz'=> $k, 'lottery_type'=>$lottery_type];
+            $zJcounts = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 中奖次数
+            $where = ['codes_hz'=>$k];
+            $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 期数
+
+            $profits = $zJcounts * 995 - $allCounts * $NumCounts * 0.1;
+            //p([$zJcounts, $allCounts, $NumCounts, $profits],0);
+
+            $allStatic[$k] = [
+                'month' => $month,
+                'name' => $k,
+                'zjZhus' => $zJcounts,
+                'qs' => $allCounts,
+                'count' => $NumCounts,
+                'profits' => $profits,
+            ];
+        }
+        if($month != date('Y-m')){
+            $m->set($mkey, $allStatic, 6*30*24*60*60);
+        }
+
+        //echo $date.'月份：';
+        return $allStatic;
+    }
+
+    /**
+     * @desc 每月每个和值利润统计 add at 2019-06-23
+     * @return array
+     */
+    public static function allHzStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $m = \Yii::$app->cache;
+        $mkey = 'allHzStaticProfits_01_'.$lottery_type;
+
+        $months = [];
+        for ($i= 0; $i>=0; $i--){
+            $months[] = date('Y-m', strtotime('-'.$i.' months'));
+        }
+
+        foreach ($months as $month){
+            if($statics = self::staticPerHzProfits($month, $lottery_type)){
+                //p(['statics'=>$statics]);
+                $setData = ['month'=>$month, 'lottery_type'=>$lottery_type];
+                foreach ($statics as $k=>$staticData) {
+                    //$tzMoney = $staticData['tzMoney'];
+                    $setData['codes_' . $staticData['name']] = $staticData['profits'];
+                }
+                if(!$StaticPerHzProfits = StaticPerHzProfits::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
+                    $StaticPerHzProfits = new StaticPerHzProfits();
+                    $setData['created_at'] = time();
+                }
+                $setData['lottery_type'] = $lottery_type;
+                $setData['updated_at'] = time();
+                $StaticPerHzProfits->setAttributes($setData);
+
+                $rst = $StaticPerHzProfits->save();
+                if($rst){
+                    $allStatic[$month] = $StaticPerHzProfits->attributes;
+                }
+                //p($StaticPerHzPerdateProfits->getFirstErrors());
+            }
+            if(date('Y-m') != $month) $m->set($mkey, $allStatic, 7*24*3600);
+        }
+
+        return $allStatic;
+    }
+
+
+    /**
      * @desc 所有月份4定利润统计
      * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
@@ -651,7 +742,8 @@ class StaticService extends BaseService {
             if($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opStatic')) {
                 $rst['staticSDHzPerDateProfits'] = StaticService::staticSDHzPerDateProfits($lottery_type); # 每天四定和值利润统计
                 $rst['staticHzMonthsProfits'] = StaticService::staticHzMonthsProfits($lottery_type); # 每月四定和值利润统计
-                $rst[''] = StaticService::allHzStaticProfitsPerdate($lottery_type);//p($rst);# 循环计算每天每个和值利润统计
+                $rst['allHzStaticProfits'] = StaticService::allHzStaticProfits($lottery_type); # 每个月份每个和值利润统计
+                $rst['allHzStaticProfitsPerdate'] = StaticService::allHzStaticProfitsPerdate($lottery_type);//p($rst);# 循环计算每天每个和值利润统计
                 StaticService::afterOpStatic($lottery_type, 'opStatic');
             }
         }
@@ -1423,12 +1515,14 @@ class StaticService extends BaseService {
                $rst['opStaticProfits'] = StaticService::opStaticProfits($lottery_type);
                $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type); # 上奖三字现
 
-               $rst['static4dMonthsProfits'] = StaticService::static4dMonthsProfits($lottery_type); # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
-               $rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
-
-               $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type); # 号码类型每天数量统计
-
-               $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type); # 和值每天数量统计
+               # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
+               $rst['static4dMonthsProfits'] = StaticService::static4dMonthsProfits($lottery_type);
+               # 每天四定利润统计，四定类型详见：StaticService::$typeArr
+               $rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type);
+               # 号码类型每天数量统计
+               $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type);
+               # 和值每天数量统计
+               $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type);
 
                StaticService::afterOpStatic($lottery_type, 'opAllStaticProfits');
            }
@@ -1603,7 +1697,8 @@ class StaticService extends BaseService {
         $flag = !$status;
 
         $qihao = HN0898Service::getCurrentQihao($lottery_type);
-        if(!$status && $SscKjData = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao])) {
+        $isExists = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao]);
+        if(!$status && $isExists) {
             $flag = true;
         }
         return $flag;

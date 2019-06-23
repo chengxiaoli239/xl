@@ -559,6 +559,16 @@ class SscDataService extends BaseService {
         $rst = [];
 
         $SscStaticVals = SscStaticVal::find()->where(['type'=>$type])->asArray()->all();
+		/*
+        $SscStaticVals = array_merge($SscStaticVals, [
+            [ # 三兄弟&隔1
+            'val'=>'0124,0128,0139,1235,1239,2346,0234,3457,1345,4568,2456,5679,3567,4678,5789,1789,1039',
+            'name' => '三兄弟&隔1',
+            'static_nums' => 472,
+            ]
+        ]);
+        //p($SscStaticVals);
+		*/
         foreach ($SscStaticVals as $dsData){
             if(!$SscStaticYl = SscStaticYl::findOne(['lottery_type'=>$lottery_type, 'val'=>$dsData['val']])){
                 $SscStaticYl = new SscStaticYl();
