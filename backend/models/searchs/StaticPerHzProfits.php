@@ -48,6 +48,7 @@ class StaticPerHzProfits extends StaticPerHzProfitsModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=> ['defaultOrder' => ['month'=>SORT_DESC]],
         ]);
 
         $this->load($params);

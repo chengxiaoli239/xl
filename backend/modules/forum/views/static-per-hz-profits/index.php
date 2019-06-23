@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\searchs\StaticPerHzProfits */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Static Per Hz Profits';
+$this->title = Yii::t('app', 'Static Per Hz Profits');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <section class="static-per-hz-profits-index wrapper site-min-height">
@@ -18,11 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <div class="clearfix">
+                <!--div class="clearfix">
                     <div class="btn-group">
                         <?= Html::a('Create Static Per Hz Profits', ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
-                </div>
+                </div-->
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -32,21 +32,21 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
+                        //'id',
                         'month',
-                        'codes_1',
-                        'codes_2',
+                        //'codes_1',
+                        //'codes_2',
                         'codes_3',
                         //'codes_4',
-                        //'codes_5',
-                        //'codes_6',
-                        //'codes_7',
-                        //'codes_8',
+                        'codes_5',
+                        'codes_6',
+                        'codes_7',
+                        'codes_8',
                         //'codes_9',
-                        //'codes_10',
-                        //'codes_11',
+                        'codes_10',
+                        'codes_11',
                         //'codes_12',
-                        //'codes_13',
+                        'codes_13',
                         //'codes_14',
                         //'codes_15',
                         //'codes_16',
@@ -55,27 +55,27 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'codes_19',
                         //'codes_20',
                         //'codes_21',
-                        //'codes_22',
+                        'codes_22',
                         //'codes_23',
                         //'codes_24',
                         //'codes_25',
                         //'codes_26',
                         //'codes_27',
-                        //'codes_28',
-                        //'codes_29',
-                        //'codes_30',
-                        //'codes_31',
+                        'codes_28',
+                        'codes_29',
+                        'codes_30',
+                        'codes_31',
                         //'codes_32',
-                        //'codes_33',
-                        //'codes_34',
-                        //'codes_35',
+                        'codes_33',
+                        'codes_34',
+                        'codes_35',
                         //'codes_36',
                         //'lottery_type',
                         //'created_at',
                         //'updated_at',
-                        //'update_time',
+                        'update_time',
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
             </div>

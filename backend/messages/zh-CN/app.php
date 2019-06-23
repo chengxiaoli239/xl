@@ -69,6 +69,7 @@ return [
     'Ssc2nums Yls' => '二字现遗漏',
     'Ssc3nums Yls' => '三字现遗漏',
     'Static Per Hz Perdate Profits' => '每个和值每天利润统计',
+    'Static Per Hz Profits' => '每个和值每月利润统计',
 
     'Ssc Static Yls' => '号码类型遗漏统计',
     'Ssc3num Yls' => '三字现遗漏',
