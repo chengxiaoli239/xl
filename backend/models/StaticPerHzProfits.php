@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "{{%static_per_hz_profits}}".
  *
  * @property int $id
- * @property string $month 日期
+ * @property string $month 月份
  * @property string $codes_1 1
  * @property string $codes_2 2
  * @property string $codes_3 3
@@ -81,7 +81,7 @@ class StaticPerHzProfits extends \common\models\base\BaseModel
     {
         return [
             'id' => 'ID',
-            'month' => '日期',
+            'month' => '月份',
             'codes_1' => '1',
             'codes_2' => '2',
             'codes_3' => '3',
