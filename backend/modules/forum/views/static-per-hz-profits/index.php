@@ -9,12 +9,13 @@ use yii\grid\GridView;
 
 $this->title = Yii::t('app', 'Static Per Hz Profits');
 $this->params['breadcrumbs'][] = $this->title;
+$update_time = \backend\models\searchs\StaticPerHzPerdateProfits::find()->select(['max(update_time) AS update_time'])->one()['update_time'];
 ?>
 <section class="static-per-hz-profits-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title) ?>
+            <?= Html::encode($this->title).'[更新时间：'.$update_time.']' ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
@@ -73,7 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'lottery_type',
                         //'created_at',
                         //'updated_at',
-                        'update_time',
+                        //'update_time',
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
