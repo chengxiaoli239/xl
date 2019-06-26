@@ -1699,12 +1699,13 @@ class StaticService extends BaseService {
         $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
 
         $status = $m->get($mkey); # 为true或1则不能再往下执行统计
-        $flag = !$status;
 
         $qihao = HN0898Service::getCurrentQihao($lottery_type);
         $isExists = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao]);
         if(!$status && $isExists) {
             $flag = true;
+        }else{
+            $flag = false;
         }
         return $flag;
     }
