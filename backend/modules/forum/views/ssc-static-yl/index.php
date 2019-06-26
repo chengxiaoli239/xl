@@ -36,6 +36,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="btn-group">
                     <?= Html::a('四现不带双重', ['index', 'SscStaticYl[type]'=>5], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                 </div>
+                ||
+                <div class="btn-group">
+                    <?= Html::a('三现带双热码', ['index', 'SscStaticYl[type]'=>91], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                </div>
+                <div class="btn-group">
+                    <?= Html::a('四现带双热码', ['index', 'SscStaticYl[type]'=>92], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                </div>
+                <div class="btn-group">
+                    <?= Html::a('四现不带双热码', ['index', 'SscStaticYl[type]'=>93], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                </div>
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 

@@ -49,6 +49,9 @@ class SscStaticYl extends SscStaticYlModel
             'query' => $query,
         ]);
 
+        if(in_array($this->type, [ 91, 92, 93])){
+            unset($params['SscStaticYl']['val']);
+        }
         $this->load($params);
 
         if (!$this->validate()) {
@@ -58,7 +61,7 @@ class SscStaticYl extends SscStaticYlModel
         }
 
         // grid filtering conditions
-        $query->andFilterWhere([
+        $whereFilter = [
             'id' => $this->id,
             'current_miss' => $this->current_miss,
             'last_time_miss' => $this->last_time_miss,
@@ -74,10 +77,17 @@ class SscStaticYl extends SscStaticYlModel
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,
-        ]);
+        ];
+        if(in_array($this->type, [91, 92, 93])){
+            unset($whereFilter['type']);
+            $whereFilter = ['val'=>$params['SscStaticYl']['val']];
+        }else{
+            $query->andFilterWhere(['like', 'val', $this->val]);
+        }
 
-        $query->andFilterWhere(['like', 'val', $this->val])
-            ->andFilterWhere(['like', 'last_time_miss_range', $this->last_time_miss_range])
+        $query->andFilterWhere($whereFilter);
+
+        $query->andFilterWhere(['like', 'last_time_miss_range', $this->last_time_miss_range])
             ->andFilterWhere(['like', 'max_range', $this->max_range])
             ->andFilterWhere(['like', 'yl_records', $this->yl_records])
             ->andFilterWhere(['like', 'theory_nums_perdate', $this->theory_nums_perdate]);

@@ -514,8 +514,12 @@ class StaticService extends BaseService {
         $m = \Yii::$app->cache;
         $mkey = 'allHzStaticProfits_01_'.$lottery_type;
 
+        $where = ['lottery_type'=>$lottery_type];
+        $count = StaticPerHzProfits::find()->where($where)->count('id');
+        $i = !$count ? 12 : 0;
+
         $months = [];
-        for ($i= 0; $i>=0; $i--){
+        for ($i; $i>=0; $i--){
             $months[] = date('Y-m', strtotime('-'.$i.' months'));
         }
 
@@ -1577,6 +1581,7 @@ class StaticService extends BaseService {
            3 => '三现带双重',
            4 => '四现带双重',
            5 => '四现不带双重',
+           99 => '三四现热码',
        ];
        if(!$type OR !isset($codeTypes[$type])) return $codeTypes;
 
