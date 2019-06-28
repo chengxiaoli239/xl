@@ -18,7 +18,7 @@ class SscKjData extends SscKjDataModel
     public function rules()
     {
         return [
-            [['id', 'code1', 'code2', 'code3', 'code4', 'code5', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'codes_4nums_hz', 'codes_hz', 'qihao'], 'integer'],
+            [['id', 'code1', 'code2', 'code3', 'code4', 'code5', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'code_3n', 'code_4n', 'codes_4nums_hz', 'codes_hz', 'qihao'], 'integer'],
             [['kj_code', 'code_str', 'date', 'update_time'], 'safe'],
         ];
     }

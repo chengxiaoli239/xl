@@ -39,6 +39,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         'code_str',
                         //'codes_hz',
                         'codes_4nums_hz',
+                        'code_3n',
+                        'code_4n',
                         //'code1',
                         //'code2',
                         //'code3',
