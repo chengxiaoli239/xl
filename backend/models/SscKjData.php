@@ -28,14 +28,14 @@ use Yii;
  * @property string $date 开奖日期
  * @property string $code_3n 上奖三字现
  * @property string $code_4n 四字现
- * @property int $type_2 是否双重
- * @property int $type_22 是否双双重
- * @property int $type_3 是否三重
- * @property int $type_4 是否四重
- * @property int $type_2b 是否双重
- * @property int $type_3b 是否三兄弟
- * @property int $type_4b 是否四兄弟
- * @property int $type_4ds 单双：0非四单四双1四单2四双
+ * @property int $type_2 双重
+ * @property int $type_22 双双重
+ * @property int $type_3 三重
+ * @property int $type_4 四重
+ * @property int $type_2b 两兄弟
+ * @property int $type_3b 三兄弟
+ * @property int $type_4b 四兄弟
+ * @property int $type_4ds 四单四双
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property int $created_at 创建时间
  * @property string $update_time 创建时间
@@ -92,14 +92,14 @@ class SscKjData extends \common\models\base\BaseModel
             'date' => '开奖日期',
             'code_3n' => '上奖三字现',
             'code_4n' => '四字现',
-            'type_2' => '是否双重',
-            'type_22' => '是否双双重',
-            'type_3' => '是否三重',
-            'type_4' => '是否四重',
-            'type_2b' => '是否双重',
-            'type_3b' => '是否三兄弟',
-            'type_4b' => '是否四兄弟',
-            'type_4ds' => '单双：0非四单四双1四单2四双',
+            'type_2' => '双重',
+            'type_22' => '双双重',
+            'type_3' => '三重',
+            'type_4' => '四重',
+            'type_2b' => '两兄弟',
+            'type_3b' => '三兄弟',
+            'type_4b' => '四兄弟',
+            'type_4ds' => '四单四双',
             'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
             'created_at' => '创建时间',
             'update_time' => '创建时间',
