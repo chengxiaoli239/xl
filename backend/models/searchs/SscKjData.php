@@ -18,8 +18,8 @@ class SscKjData extends SscKjDataModel
     public function rules()
     {
         return [
-            [['id', 'code1', 'code2', 'code3', 'code4', 'code5', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'code_3n', 'code_4n', 'codes_4nums_hz', 'codes_hz', 'qihao'], 'integer'],
-            [['kj_code', 'code_str', 'date', 'update_time'], 'safe'],
+            [['id', 'index_id', 'codes_hz', 'codes_4nums_hz', 'code1', 'code2', 'code3', 'code4', 'code5', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'qihao', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['kj_code', 'code_str', 'date', 'code_3n', 'code_4n', 'update_time'], 'safe'],
         ];
     }
 
@@ -47,7 +47,6 @@ class SscKjData extends SscKjDataModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['id'=>SORT_DESC]],
         ]);
 
         $this->load($params);
