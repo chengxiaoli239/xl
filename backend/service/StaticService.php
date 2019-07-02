@@ -1241,7 +1241,7 @@ class StaticService extends BaseService {
             if($beforeDays == 120 OR !$time = $m->get($mkey)) {
                 $time = strtotime('-120 days');
             }else{
-                $time = $time + 24 * 3600;
+                $time = $time + 24 * 3600 - 10 * 60;
             }
 
             $date = date('Y-m-d', $time);
