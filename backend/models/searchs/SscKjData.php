@@ -47,7 +47,6 @@ class SscKjData extends SscKjDataModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['id'=>SORT_DESC]]
         ]);
 
         $this->load($params);
@@ -61,13 +60,14 @@ class SscKjData extends SscKjDataModel
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'index_id' => $this->index_id,
+            'codes_hz' => $this->codes_hz,
+            'codes_4nums_hz' => $this->codes_4nums_hz,
             'code1' => $this->code1,
             'code2' => $this->code2,
             'code3' => $this->code3,
             'code4' => $this->code4,
             'code5' => $this->code5,
-            'codes_hz' => $this->codes_hz,
-            'codes_4nums_hz' => $this->codes_4nums_hz,
             'code_1_2' => $this->code_1_2,
             'code_1_3' => $this->code_1_3,
             'code_1_4' => $this->code_1_4,
@@ -76,11 +76,24 @@ class SscKjData extends SscKjDataModel
             'code_3_4' => $this->code_3_4,
             'qihao' => $this->qihao,
             'date' => $this->date,
+            'type_2' => $this->type_2,
+            'type_22' => $this->type_22,
+            'type_3' => $this->type_3,
+            'type_4' => $this->type_4,
+            'type_2b' => $this->type_2b,
+            'type_3b' => $this->type_3b,
+            'type_4b' => $this->type_4b,
+            'type_4ds' => $this->type_4ds,
+            'lottery_type' => $this->lottery_type,
+            'created_at' => $this->created_at,
             'update_time' => $this->update_time,
+            'updated_at' => $this->updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'kj_code', $this->kj_code])
-            ->andFilterWhere(['like', 'code_str', $this->code_str]);
+            ->andFilterWhere(['like', 'code_str', $this->code_str])
+            ->andFilterWhere(['like', 'code_3n', $this->code_3n])
+            ->andFilterWhere(['like', 'code_4n', $this->code_4n]);
 
         return $dataProvider;
     }
