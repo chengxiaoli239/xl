@@ -45,14 +45,16 @@ class SscStaticYl extends SscStaticYlModel
 
         // add conditions that should always apply here
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
-
-        if(in_array($this->type, [ 91, 92, 93])){
-            unset($params['SscStaticYl']['val']);
-        }
         $this->load($params);
+        $queryWhere = [ 'query' => $query, ];
+        if(in_array($params['SscStaticYl']['type'], [ 91, 92, 93])){
+            $queryWhere = array_merge($queryWhere,[
+                'pagination' => [
+                    'pageSize' => 20,
+                ],
+            ]);
+        }
+        $dataProvider = new ActiveDataProvider($queryWhere);
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
@@ -79,10 +81,12 @@ class SscStaticYl extends SscStaticYlModel
             'update_time' => $this->update_time,
         ];
         if(in_array($this->type, [91, 92, 93])){
-            unset($whereFilter['type']);
-            $whereFilter = ['val'=>$params['SscStaticYl']['val']];
+            $tmpArr = [91=>3, 92=>4, 93=>5];
+            $whereFilter = ['type' => $tmpArr[$this->type]];
+            $query->orderBy(['LENGTH(yl_records)'=>SORT_DESC]);
         }else{
-            $query->andFilterWhere(['like', 'val', $this->val]);
+            if($this->val)
+                $query->andFilterWhere(['like', 'val', $this->val]);
         }
 
         $query->andFilterWhere($whereFilter);

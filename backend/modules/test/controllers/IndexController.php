@@ -102,7 +102,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = NumService::getCodesKuaiXuan([ 'type_22'=>0, 'arise'=>'55', 'type_4ds'=>1]);p($rst);
+        $a = '2019-06-24T19:02:10+08:00';
+        $rst = self::dealTime($a);p($rst);
+        $rst = NumService::getCodesKuaiXuan([ 'arise'=>'77', 'type_4ds'=>1, 'type_4']);p($rst);
+        $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type=5);p($rst);
         $miss = SscDataService::getCodeTypeYlByTab('0026', $lottery_type = 5, $type = 4); p($miss);
@@ -300,6 +303,17 @@ class IndexController extends Controller
         p($data);
     }
 
+    public static function dealTime($a){
+        $time = strtotime($a);
+        return $time;
+        $year = substr($a,0,4);
+        $month = substr($a,4,2);
+        $day = substr($a,6,2);
+        $hour = substr($a,8,2);
+        $min = substr($a,10,2);
+        $sec = substr($a,12,2);
+        return mktime($hour,$min,$sec,$month,$day,$year);
+    }
 
 
 
