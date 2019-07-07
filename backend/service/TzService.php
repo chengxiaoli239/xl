@@ -161,6 +161,8 @@ class TzService extends BaseService {
             # 1、定位和值
             //$rst['heZhiStatics'] = SscDataService::heZhiStatics(); // 更新定位和值汇总表
             //$rst['updateHeZhiYL'] = SscDataService::updateHeZhiYL(); // 更新定位和值遗漏表
+            # 每天四定利润统计，四定类型详见：StaticService::$typeArr
+            $rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type);
 
             # 2、单双
             $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖遗漏

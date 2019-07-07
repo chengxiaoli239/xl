@@ -1522,7 +1522,7 @@ class StaticService extends BaseService {
                # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
                $rst['static4dMonthsProfits'] = StaticService::static4dMonthsProfits($lottery_type);
                # 每天四定利润统计，四定类型详见：StaticService::$typeArr
-               $rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type);
+               //$rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type);
                # 号码类型每天数量统计
                $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type);
                # 和值每天数量统计
