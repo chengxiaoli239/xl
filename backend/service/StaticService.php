@@ -805,12 +805,12 @@ class StaticService extends BaseService {
      */
     public static function allDateStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'allDateStaticProfits_PERDATE_'.$lottery_type.'_19';
+        $mkey = 'allDateStaticProfits_PERDATE_'.$lottery_type.'_21';
 
         $allStatic = [];
         for($s=0; $s<5; $s++){
             if(!$time = $m->get($mkey)) {
-                $time = strtotime('-1 day');
+                $time = strtotime('-2 day');
             }else{
                 $time = $time + 24 * 3600;
             }
