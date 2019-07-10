@@ -24,6 +24,7 @@ use Yii;
  * @property int $code_2_3 2、3位和值
  * @property int $code_2_4 2、4位和值
  * @property int $code_3_4 3、4位和值
+ * @property string $code_1_2_3_4 四定单双
  * @property int $qihao 期号
  * @property string $date 开奖日期
  * @property string $code_3n 上奖三字现
@@ -61,6 +62,7 @@ class SscKjData extends \common\models\base\BaseModel
             [['date', 'update_time'], 'safe'],
             [['kj_code', 'code_4n'], 'string', 'max' => 8],
             [['code_str', 'code_3n'], 'string', 'max' => 24],
+            [['code_1_2_3_4'], 'string', 'max' => 4],
             [['qihao'], 'unique'],
         ];
     }
@@ -88,6 +90,7 @@ class SscKjData extends \common\models\base\BaseModel
             'code_2_3' => '2、3位和值',
             'code_2_4' => '2、4位和值',
             'code_3_4' => '3、4位和值',
+            'code_1_2_3_4' => '四定单双',
             'qihao' => '期号',
             'date' => '开奖日期',
             'code_3n' => '上奖三字现',
