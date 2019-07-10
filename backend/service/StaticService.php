@@ -805,7 +805,7 @@ class StaticService extends BaseService {
      */
     public static function allDateStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'allDateStaticProfits_PERDATE_'.$lottery_type.'_21';
+        $mkey = 'allDateStaticProfits_PERDATE_'.$lottery_type.'_22';
 
         $allStatic = [];
         for($s=0; $s<5; $s++){

@@ -1373,7 +1373,8 @@ class SscDataService extends BaseService {
 
         return $rst;
     }
-/**
+
+    /**
      * @desc 每期开奖三字现记录-已完成
      * @param $lottery_type  彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @param string $qihao
@@ -1408,6 +1409,31 @@ class SscDataService extends BaseService {
         }
 
         return $rst;
+    }
+
+    /**
+     * @desc 获取开奖单双 by kj_str
+     * @param $codes 例如：1,2,3,4,5
+     * @return string 1212
+     */
+    public static function getCodesDS($codes){
+        $str = '';
+        $data = explode(',',$codes);
+        if($codes){
+            $tmpData = [];
+            foreach ($data as $key=>$v){
+                $pos = $key + 1;
+                if($v%2 == 0){
+                    $tmpData[$pos] = 2; // 双
+                }else{
+                    $tmpData[$pos] = 1; // 单
+                }
+            }
+            $str = $tmpData[1].$tmpData[2].$tmpData[3].$tmpData[4];
+
+        }
+
+        return $str;
     }
 
     /**
