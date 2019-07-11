@@ -75,4 +75,7 @@ return [
     'Ssc3num Yls' => '三字现遗漏',
     'Static Code Type Arise Perdates' => '号码类型出现次数(Day)',
     'Static Hz Arise Perdates' => '和值范围出现次数(Day)',
+
+    'Static4d Profits Months' => '单双利润统计(month)',
+    'Static4d Profits Days' => '单双利润统计(Day)',
 ];
