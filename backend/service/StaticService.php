@@ -922,8 +922,6 @@ class StaticService extends BaseService {
                 $rst['staticHzMonthsProfits'] = StaticService::staticHzMonthsProfits($lottery_type); # 每月四定和值利润统计
                 $rst['allHzStaticProfits'] = StaticService::allHzStaticProfits($lottery_type); # 每个月份每个和值利润统计
                 $rst['allHzStaticProfitsPerdate'] = StaticService::allHzStaticProfitsPerdate($lottery_type);//p($rst);# 循环计算每天每个和值利润统计
-                $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); # 单双利润统计(month)
-                $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay(); # 单双利润统计(day)
                 StaticService::afterOpStatic($lottery_type, 'opStatic');
             }
         }

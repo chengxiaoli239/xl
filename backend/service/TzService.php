@@ -175,6 +175,8 @@ class TzService extends BaseService {
             # 4、四定和值遗漏
             $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏
 
+            $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); # 单双利润统计(month)
+            $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay(); # 单双利润统计(day)
             //$rst['tz'] = TzService::tz(); // 计划投注
             //$rst['synUsersBalance'] = HN0898Service::synBalance(); // 同步用户的余额
 
