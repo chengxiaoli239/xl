@@ -412,7 +412,7 @@ class StaticService extends BaseService {
             }
             $tmpCodeCounts[$SscKjData->code_1_2_3_4] = $tmpCodeCounts[$SscKjData->code_1_2_3_4] + 1;
         }
-        $allDs = \Yii::$app->params['ALL_DS'];
+        $allDs = explode(',',\Yii::$app->params['ALL_DS']);
         foreach ($allDs as $ds){
             if(!isset($tmpCodeCounts[$ds])) $tmpCodeCounts[$ds] = 0;
         }
@@ -450,7 +450,7 @@ class StaticService extends BaseService {
             }
             $tmpCodeCounts[$SscKjData->code_1_2_3_4] = $tmpCodeCounts[$SscKjData->code_1_2_3_4] + 1;
         }
-        $allDs = \Yii::$app->params['ALL_DS'];
+        $allDs = explode(',',\Yii::$app->params['ALL_DS']);
         foreach ($allDs as $ds){
             if(!isset($tmpCodeCounts[$ds])) $tmpCodeCounts[$ds] = 0;
         }
