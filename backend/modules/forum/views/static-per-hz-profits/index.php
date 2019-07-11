@@ -51,7 +51,7 @@ $update_time = \backend\models\searchs\StaticPerHzPerdateProfits::find()->select
                         //'codes_14',
                         //'codes_15',
                         //'codes_16',
-                        //'codes_17',
+                        'codes_17',
                         //'codes_18',
                         //'codes_19',
                         'codes_20',
