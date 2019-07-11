@@ -102,6 +102,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::opStaticSdProfitsMonth();p($rst);
+        $rst = StaticService::opStaticSdProfitsDay();p($rst);
+        $rst = StaticService::staticAllSdProfitsDay(date('Y-m-d'));p($rst);
+        $rst = StaticService::staticAllSdProfitsMonth(date('Y-m'));p($rst);
         $a = '2019-06-24T19:02:10+08:00';
         $rst = self::dealTime($a);p($rst);
         $rst = NumService::getCodesKuaiXuan([ 'arise'=>'77', 'type_4ds'=>1, 'type_4']);p($rst);

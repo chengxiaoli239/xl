@@ -18,6 +18,8 @@ use backend\models\SscKjDataDs;
 use backend\models\SscStaticVal;
 use backend\models\Static3numArisePerdate;
 use backend\models\Static4dProfits;
+use backend\models\Static4dProfitsDay;
+use backend\models\Static4dProfitsMonth;
 use backend\models\Static4dProfitsPerdate;
 use backend\models\StaticCodeTypeArisePerdate;
 use backend\models\StaticHzArisePerdate;
@@ -125,6 +127,102 @@ class StaticService extends BaseService {
         }
 
         return ['status'=>200, 'msg'=>'处理成功opStaticProfits！'];
+    }
+
+    /**
+     * @desc 每天单双利润统计
+     * @param int $lottery_type
+     * @return bool
+     * @Time 2019-07-11
+     */
+    public static function opStaticSdProfitsDay($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $rst = true;
+        $m = \Yii::$app->cache;
+        $mkey = 'opStaticSdProfitsDay_'.$lottery_type;
+
+        for($s=0; $s<50; $s++) {
+            $StaticTables = Static4dProfitsDay::find()->all();
+            $flag = count($StaticTables);
+            if (!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
+            if ($beforeDays == 120 OR !$time = $m->get($mkey)) {
+                $time = strtotime('-120 days');
+            } else {
+                $time = $time + 24 * 3600;
+            }
+
+            $date = date('Y-m-d', $time);
+            $date = min([date('Y-m-d'), $date]);
+            if ($date > date('Y-m-d')) break;
+            if ($statics = StaticService::staticAllSdProfitsDay($date, $lottery_type)) {
+                $setData = [];
+                if(!$Static4dProfitsDay = Static4dProfitsDay::find()->where(['lottery_type'=>$lottery_type, 'date'=>$date])->one()){
+                    $Static4dProfitsDay = new Static4dProfitsDay();
+                    $setData = array_merge($setData,[
+                        'date' => $date,
+                        'created_at' => time(),
+                        'lottery_type' => $lottery_type,
+                    ]);
+                }
+                $setData['updated_at'] = time();
+                foreach ($statics as $key=>$profits){
+                    $setData['codes_'.$key] = $profits;
+                }
+
+                $Static4dProfitsDay->setAttributes($setData);
+                $rst = $Static4dProfitsDay->save();
+            }
+            $m->set($mkey, $time, 7*24*3600);
+        }
+
+        return $rst;
+    }
+
+    /**
+     * @desc 每月单双利润统计
+     * @param int $lottery_type
+     * @return bool
+     * @Time 2019-07-11
+     */
+    public static function opStaticSdProfitsMonth($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $rst = true;
+        $m = \Yii::$app->cache;
+        $mkey = 'opStaticSdProfitsMonth_'.$lottery_type;
+
+        for($s=0; $s<50; $s++) {
+            $StaticTables = Static4dProfitsMonth::find()->all();
+            $flag = count($StaticTables);
+            if (!$flag) $beforeDays = 12; # 数据表为空时默认统计前120前的数据
+            if ($beforeDays == 12 OR !$time = $m->get($mkey)) {
+                $time = strtotime('-12 months');
+            } else {
+                $time = strtotime('+1 months', $time);
+            }
+
+            $date = date('Y-m', $time);
+            $date = min([date('Y-m'), $date]);
+            if ($date > date('Y-m')) break;
+            if ($statics = StaticService::staticAllSdProfitsMonth($date, $lottery_type)) {
+                $setData = [];
+                if(!$Static4dProfitsMonth = Static4dProfitsMonth::find()->where(['lottery_type'=>$lottery_type, 'month'=>$date])->one()){
+                    $Static4dProfitsMonth = new Static4dProfitsMonth();
+                    $setData = array_merge($setData,[
+                        'month' => $date,
+                        'created_at' => time(),
+                        'lottery_type' => $lottery_type,
+                    ]);
+                }
+                $setData['updated_at'] = time();
+                foreach ($statics as $key=>$profits){
+                    $setData['codes_'.$key] = $profits;
+                }
+
+                $Static4dProfitsMonth->setAttributes($setData);
+                $rst = $Static4dProfitsMonth->save();
+            }
+            $m->set($mkey, $time, 30*24*3600);
+        }
+
+        return $rst;
     }
 
     /**
@@ -263,23 +361,6 @@ class StaticService extends BaseService {
         $where = ['LEFT(date, 7)'=>$month, 'lottery_type'=>$lottery_type];
         $allCounts = SscKjData::find()->select(['month'=>'LEFT(date, 7)', 'nums'=>'COUNT(id)'])->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->count();
         //p($SscKjData);
-        /*
-        $num = count($SscKjDatas);
-        //p($SscKjDataDs);
-        foreach ($SscKjDatas as $SscKjData){
-            $ds = $SscKjData->code_1_2_3_4; # 四定单双值
-            $oneCodes = [$SscKjData->code_1, $SscKjData->code_2, $SscKjData->code_3, $SscKjData->code_4];
-            foreach ($typeArr as $key=>$types){
-                if(in_array($ds, $types)){
-                    $static[$key] = $static[$key] + 1;# 统计每种组合出现次数
-                }
-                foreach ($oneCodes as $code){
-                    in_array($code, $types) && $static[$key] = $static[$key] + 1;# 统计每种组合出现次数
-                }
-            }
-        }
-        */
-        //p([$static, count($SscKjDataDs)]);
 
         $allStatic = [];
         foreach ($typeArr as $k=>$hzArr){
@@ -309,7 +390,100 @@ class StaticService extends BaseService {
         return $allStatic;
     }
 
-        /**
+    /**
+     * @desc 每天四定单双利润
+     * @param string $date
+     * @param $code 利润：2112
+     * @return array
+     */
+    public static function staticAllSdProfitsDay($date = '2019-07-11', $lottery_type = DEFAULT_LOTTERY_TYPE){
+
+        $key = 'staticAllSdProfitsMonth_'.$date;
+        $m = \Yii::$app->cache;
+        if($data = $m->get($key)) return $data;
+
+        $count = StaticService::getQishuCounts($date, $lottery_type); # 当日开奖期数
+        $where = ['date'=>$date, 'lottery_type'=>$lottery_type];
+        $SscKjDatas  = SscKjData::find()->where($where)->all();
+        $tmpCodeCounts = [];
+        foreach ($SscKjDatas as $SscKjData){
+            if(!$tmpCodeCounts[$SscKjData->code_1_2_3_4]){
+                $tmpCodeCounts[$SscKjData->code_1_2_3_4] = 0;
+            }
+            $tmpCodeCounts[$SscKjData->code_1_2_3_4] = $tmpCodeCounts[$SscKjData->code_1_2_3_4] + 1;
+        }
+        $allDs = \Yii::$app->params['ALL_DS'];
+        foreach ($allDs as $ds){
+            if(!isset($tmpCodeCounts[$ds])) $tmpCodeCounts[$ds] = 0;
+        }
+        $data = [];
+        foreach ($tmpCodeCounts as $key=>$tmpCodeCount){
+            $profits = $tmpCodeCount * 995 - $count * 62.5;
+            $data[$key] = $profits;
+        }
+        if($date != date('Y-m-d')){
+            $m->set($key, $data, 7*24*3600);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @desc 每月四定单双利润
+     * @param string $date
+     * @param $code 利润：2112
+     * @return array
+     */
+    public static function staticAllSdProfitsMonth($Month = '2019-07', $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $count = StaticService::getQishuCounts($Month, $lottery_type); # 当月开奖期数
+
+        $key = 'staticAllSdProfitsMonth_'.$Month;
+        $m = \Yii::$app->cache;
+        if($data = $m->get($key)) return $data;
+
+        $where = ['AND', ['LIKE', 'LEFT(date,7)',$Month], ['=', 'lottery_type', $lottery_type]];
+        $SscKjDatas  = SscKjData::find()->where($where)->all();
+        $tmpCodeCounts = [];
+        foreach ($SscKjDatas as $SscKjData){
+            if(!$tmpCodeCounts[$SscKjData->code_1_2_3_4]){
+                $tmpCodeCounts[$SscKjData->code_1_2_3_4] = 0;
+            }
+            $tmpCodeCounts[$SscKjData->code_1_2_3_4] = $tmpCodeCounts[$SscKjData->code_1_2_3_4] + 1;
+        }
+        $allDs = \Yii::$app->params['ALL_DS'];
+        foreach ($allDs as $ds){
+            if(!isset($tmpCodeCounts[$ds])) $tmpCodeCounts[$ds] = 0;
+        }
+        $data = [];
+        foreach ($tmpCodeCounts as $key=>$tmpCodeCount){
+            $profits = $tmpCodeCount * 995 - $count * 62.5;
+            $data[$key] = $profits;
+        }
+        if($Month != date('Y-m')){
+            $m->set($key, $data, 7*24*3600);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @desc 返回总期数
+     * @param string $date
+     * @param int $lottery_type
+     * @return int|string
+     */
+    public static function getQishuCounts($date = '2019-07-11', $lottery_type = DEFAULT_LOTTERY_TYPE){
+        if(strlen($date) == 10){
+            $where = ['date'=>$date, 'lottery_type'=>$lottery_type];
+        }else{
+            $where = ['AND', ['LIKE', 'LEFT(date,7)', $date ], ['=', 'lottery_type', $lottery_type]];
+        }
+        $counts = SscKjData::find()->where($where)->count('id'); # 总期数
+
+        return $counts;
+    }
+
+    /**
      * @desc 计算指定日期的四定单双利润 - 以每天日期为单位
      * @param string $date
      * @param int $num
@@ -321,7 +495,7 @@ class StaticService extends BaseService {
         $mkey = 'DATE_STATIC_DATA_'.$date;
         $typeArr = self::$typeArr;
         $where = ['lottery_type'=>$lottery_type, 'date' => $date];
-        $static = [ 0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0, 6=>0, 7=>0, 8=>0, 9=>0, 10=>0, 10=>0]; # 统计每种组合出现次数
+        $static = [ 0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0, 6=>0, 7=>0, 8=>0, 9=>0, 10=>0, 11=>0]; # 统计每种组合出现次数
         //$SscKjDatas = SscKjData::find()->where($where)->limit($num)->all();
         $SscKjDataDs = SscKjDataDs::find()->where($where)->orderBy(['id'=>SORT_ASC])->all();
         $num = count($SscKjDataDs);
@@ -687,7 +861,7 @@ class StaticService extends BaseService {
     }
 
     /**
-     * @desc 记录每天的四定统计 - 写表
+     * @desc 记录每天的四定利润统计 - 写表
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
@@ -1333,7 +1507,7 @@ class StaticService extends BaseService {
         $mkey = 'allDateStaticHz_PERDATE_05_'.$lottery_type;
 
         $allStatic = [];
-        for($s=0; $s<100; $s++){
+        for($s=0; $s<5; $s++){
             $StaticTables = StaticHzArisePerdate::find()->all();
             $flag = count($StaticTables);
             if(!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
