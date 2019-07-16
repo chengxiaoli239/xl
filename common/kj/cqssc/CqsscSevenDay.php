@@ -5,6 +5,7 @@ use backend\service\CurlService;
 use backend\service\HN0898Service;
 use backend\service\SscDataService;
 use common\kj\BaseKj;
+use common\tools\Tool_Common;
 use  yii;
 
 class CqsscSevenDay extends BaseKj {
@@ -44,8 +45,10 @@ class CqsscSevenDay extends BaseKj {
             echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
             ob_end_flush();exit;
         }else{
-            return ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
+        $logArr = $rst;
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_seven', 'INFO', '号码抓取-7天', $logArr);
     }
 
     /**

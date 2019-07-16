@@ -3,6 +3,7 @@
 namespace common\kj\cqssc;
 use backend\service\CurlService;
 use common\kj\BaseKj;
+use common\tools\Tool_Common;
 use  yii;
 
 class Cqssc360 extends BaseKj {
@@ -37,8 +38,11 @@ class Cqssc360 extends BaseKj {
             echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
             ob_end_flush();exit;
         }else{
-            return ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
+        $logArr = $rst;
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_360', 'INFO', '号码抓取-360', $logArr);
+        return $rst;
     }
 
 }

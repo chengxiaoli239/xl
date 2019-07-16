@@ -58,6 +58,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
+                <tbody>
+                <tr data-key="1"><td>13</td><td>2018-07</td><td>-7630.00</td><td>3315.00</td><td>12270.00</td><td>13265.00</td><td>26200.00</td><td>-16585.00</td><td>-42455.00</td><td>-7630.00</td><td>-8625.00</td><td>26200.00</td><td>9285.00</td><td>-3650.00</td><td>-10615.00</td><td>-665.00</td><td>-12605.00</td><td>1325.00</td></tr>
+                </tbody>
             </div>
         </div>
     </section>
