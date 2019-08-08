@@ -24,6 +24,7 @@ use backend\models\Static4dProfitsPerdate;
 use backend\models\StaticCodeTypeArisePerdate;
 use backend\models\StaticHzArisePerdate;
 use backend\models\StaticHzProfits;
+use backend\models\SscStaticYl;
 use backend\models\StaticHzProfitsPerdate;
 use backend\models\StaticPerHzPerdateProfits;
 use backend\models\StaticPerHzProfits;
@@ -140,7 +141,7 @@ class StaticService extends BaseService {
         $m = \Yii::$app->cache;
         $mkey = 'opStaticSdProfitsDay_'.$lottery_type;
 
-        for($s=0; $s<50; $s++) {
+        for($s=0; $s<1; $s++) {
             $StaticTables = Static4dProfitsDay::find()->all();
             $flag = count($StaticTables);
             if (!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
@@ -188,7 +189,7 @@ class StaticService extends BaseService {
         $m = \Yii::$app->cache;
         $mkey = 'opStaticSdProfitsMonth_'.$lottery_type;
 
-        for($s=0; $s<50; $s++) {
+        for($s=0; $s<1; $s++) {
             $StaticTables = Static4dProfitsMonth::find()->all();
             $flag = count($StaticTables);
             if (!$flag) $beforeDays = 12; # 数据表为空时默认统计前120前的数据
@@ -922,6 +923,9 @@ class StaticService extends BaseService {
                 $rst['staticHzMonthsProfits'] = StaticService::staticHzMonthsProfits($lottery_type); # 每月四定和值利润统计
                 $rst['allHzStaticProfits'] = StaticService::allHzStaticProfits($lottery_type); # 每个月份每个和值利润统计
                 $rst['allHzStaticProfitsPerdate'] = StaticService::allHzStaticProfitsPerdate($lottery_type);//p($rst);# 循环计算每天每个和值利润统计
+
+                $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); # 单双利润统计(month)
+                $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay(); # 单双利润统计(day)
                 StaticService::afterOpStatic($lottery_type, 'opStatic');
             }
         }
@@ -1905,6 +1909,31 @@ class StaticService extends BaseService {
     }
 
 
+    /**
+     * @desc 最优号码
+     * @param int $type 1和值2号码类型[例如:双双重、三重]3三字现带双重4四字现带双重5四字现不带双重
+     * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     * @return array
+     */
+    public static function getNiceCodes($type = 3, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $codesArr = [];
+        $SscStaticYls = SscStaticYl::findAll(['type'=>$type, 'lottery_type'=>$lottery_type]);
+
+        foreach ($SscStaticYls as $SscStaticYl){
+            $yl_recodes = $SscStaticYl->yl_records;
+            $ylArr = explode('-', $yl_recodes);
+
+            $f3 = $ylArr[2]; # 上上次遗漏
+            $f2 = $ylArr[1]; # 上次遗漏
+            $f1 = $ylArr[0]; # 当前遗漏
+
+            if($f3>570 && $f2>150 && $f2<260 && $f1>80 && $f1<260){
+                $codesArr[] = $SscStaticYl->val;
+            }
+        }
+
+        return $codesArr;
+    }
 
 
 

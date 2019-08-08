@@ -157,7 +157,7 @@ class TzService extends BaseService {
 
         # 1、处理系统投注计划号码
         $rst['opSystemCodesService'] = OpSystemCodesService::sysPlansCodes($qihao);
-        for ($i=0;$i<2;$i++){
+        ///for ($i=0;$i<2;$i++){
             # 1、定位和值
             //$rst['heZhiStatics'] = SscDataService::heZhiStatics(); // 更新定位和值汇总表
             //$rst['updateHeZhiYL'] = SscDataService::updateHeZhiYL(); // 更新定位和值遗漏表
@@ -175,14 +175,16 @@ class TzService extends BaseService {
             # 4、四定和值遗漏
             $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏
 
-            $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); # 单双利润统计(month)
-            $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay(); # 单双利润统计(day)
+
+            //$rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); # 单双利润统计(month)
+            //$rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay(); # 单双利润统计(day)
             //$rst['tz'] = TzService::tz(); // 计划投注
+
             //$rst['synUsersBalance'] = HN0898Service::synBalance(); // 同步用户的余额
 
             # 计划方案倍数、投注号码或者投注状态修改
             //$rst['userSysPlanChange'] = UserSysPlansService::userSysPlanChange($lottery_type);
-        }
+        //}
 
         $rst['qihao'] = $qihao;
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/opSystemBetPlans','INFO','处理系统投注计划', $rst);
