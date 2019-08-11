@@ -37,13 +37,13 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
 
-                    <!--?= $form->field($model, 'p1')->textInput()->label('第1位') ?-->
+                    <?= $form->field($model, 'p1')->textInput()->label('第1位') ?>
 
-                    <!--?= $form->field($model, 'p2')->textInput()->label('第2位') ?-->
+                    <?= $form->field($model, 'p2')->textInput()->label('第2位') ?>
 
-                    <!--?= $form->field($model, 'p3')->textInput()->label('第3位') ?-->
+                    <?= $form->field($model, 'p3')->textInput()->label('第3位') ?>
 
-                    <!--?= $form->field($model, 'p4')->textInput()->label('第4位') ?-->
+                    <?= $form->field($model, 'p4')->textInput()->label('第4位') ?>
 
                     <!--?= $form->field($model, 'tz_type')->textInput() ?-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->

@@ -764,6 +764,18 @@ class NumService extends BaseService {
             }
             $desc = trim($desc, '、').' ';
         }
+        if(!empty($hz_Arr['p1'])){
+            $desc .= ' p1:'.$hz_Arr['p1'];
+        }
+        if(!empty($hz_Arr['p2'])){
+            $desc .= ' p2:'.$hz_Arr['p2'];
+        }
+        if(!empty($hz_Arr['p3'])){
+            $desc .= ' p3:'.$hz_Arr['p3'];
+        }
+        if(!empty($hz_Arr['p4'])){
+            $desc .= ' p4:'.$hz_Arr['p4'];
+        }
 
 
         return $desc;
