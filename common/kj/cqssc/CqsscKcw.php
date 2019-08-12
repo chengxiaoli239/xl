@@ -128,9 +128,8 @@ class CqsscKcw extends BaseKj {
                 'EndDt'=> '2019-08-12',
                 'pageSize'=> 20,
                 'PageNum'=> 1,
-                'token' => 'vltiZRPDuN4WyNisDWRNrHUEIsaNbLh6N4Opvp6oBhQ%3d',
             ];
-            $url = $domain.'/api/Periods/GetTopEightPeriodsNumber?'.http_build_query($post_data);
+            $url = $domain.'/api/MemberDesk/GetPeriodsResult?'.http_build_query($post_data);
 
             # 测试 start
             //$domain = BaseKj::getApiHost($lotteryId = 2);
@@ -140,22 +139,27 @@ class CqsscKcw extends BaseKj {
             $headers = [
                 'Accept: application/json, text/plain, */*',
                 'Referer: '.$domain.'/',
-                //'token:vltiZRPDuN4WyNisDWRNrHUEIsaNbLh6N4Opvp6oBhQ%3d',
+                'Cookie:ValidateToken=b95368fe60b92f40bd1c7aece31b05d0; Token=dkYJk9obCtyab0XgXCyBD64sYPmvT2LXqHP0uGauUgU%3d',
+                'Host: '.str_replace('http://', '',$domain),
             ];
             $content = CurlService::httpGet($url, $headers);
-            //$data = json_decode($content,320);
-            $data = $content;
-            p([$url, $headers,$post_data, $data]);
 
-            if (!$data OR !isset($data['data']) OR !$kjData = $data['data'][0]) return false;
+            $data = $content;
+            //p($data);
+            //p([$url, $headers,$post_data, $data]);
+
+            if (!$data OR !isset($data['Data']) OR !$kjData = $data['Data']['List'][0]) return false;
             if (!$kjData) return false;
             $str = substr($kjData['expect'], 0, 8);
-            $kjData['expect'] = str_replace($str, $str . '-', $kjData['expect']);
+            $kjData['expect'] = str_replace($str, $str . '-', $kjData['periodsNumber']);
+            $kjData['opencode'] = $kjData['resultNumber'];
+            $kjData['opentime'] = str_replace('/', '-',$kjData['drawDt']);
             //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
         }
         $opencode = $kjData['opencode'];
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
+        //p([DEFAULT_LOTTERY_TYPE,$expect, $kjData]);
 
         self::setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $expect, $kjData);
 

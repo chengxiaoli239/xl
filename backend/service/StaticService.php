@@ -90,6 +90,7 @@ class StaticService extends BaseService {
      * @param  int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      */
     public static function opStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE ){
+        exit; # 暂时不统计投注利润
         $m = \Yii::$app->cache;
         $qihao = HN0898Service::getQihao($lottery_type);
         $mkey = 'OP_STATIC_PROFITS_ID_19_'.$lottery_type.'_'.$qihao;
@@ -1694,7 +1695,7 @@ class StaticService extends BaseService {
        $lottery_types = self::getLotteryTypes();
        foreach ($lottery_types as $lottery_type){
            if($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllStaticProfits')){
-               $rst['opStaticProfits'] = StaticService::opStaticProfits($lottery_type);
+               #$rst['opStaticProfits'] = StaticService::opStaticProfits($lottery_type); # 暂停统计利润
                $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type); # 上奖三字现
 
                # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr

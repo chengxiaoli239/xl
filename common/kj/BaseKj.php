@@ -43,8 +43,12 @@ class BaseKj{
     public static function setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao, $kjData){
         $m = \Yii::$app->cache;
 
-        $str = substr($qihao, 2, 10);
-        $setQihao = str_replace('-', '',$str);
+        if($lottery_type == 5){
+            $str = substr($qihao, 2, 10);
+            $setQihao = str_replace('-', '',$str);
+        }else{
+            $setQihao = $qihao;
+        }
         if($kjData['opencode']){
             $mkey = 'KJ_DATA_QIHAO_KEY_'.$lottery_type.'_'.$setQihao;
             $m->set($mkey, $kjData, 10*60);

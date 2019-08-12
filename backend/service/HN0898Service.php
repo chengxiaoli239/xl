@@ -1177,6 +1177,9 @@ class HN0898Service extends BaseTZService {
                     $qihao = '20'.date("ymd").sprintf("%02d", $rst['actionNo']);
                 }
                 break;
+            case 7: # 北京快乐8
+                $qihao = 967589 + self::getDifferentDays() * 179 + self::getDifferentNums();
+                break;
         }
 
         return $qihao;
@@ -1196,12 +1199,46 @@ class HN0898Service extends BaseTZService {
             case 5:
                 if($qihao_n == '001') $actionNo = '120';
                 else $actionNo = $qihao_n - 1;
+
+
+                $qihao = date("ymd").sprintf("%03d", $actionNo);
+                break;
+            case 7: # 北京快乐8
+                $qihao = 967589 + self::getDifferentDays() * 179 + self::getDifferentNums();
                 break;
         }
 
-        $qihao = date("ymd").sprintf("%03d", $actionNo);
 
         return $qihao;
+    }
+
+    /**
+     * @desc 计算当前日期距离2019-08-10天数 - 北京快乐8
+     * @param string $end_date
+     * @return float|int
+     */
+    public static function getDifferentDays($end_date = '2019-08-12'){
+        $start_date = '2019-08-10';
+
+        $start = strtotime($start_date);
+        $end = strtotime($end_date);
+
+        $nums = ( $end - $start ) / (24 * 3600);
+
+        return $nums;
+    }
+
+    /**
+     * @desc 北京快乐8 计算当前要开奖期号序号
+     * @return float
+     */
+    public static function getDifferentNums(){
+        $time = time();
+        $start_time = strtotime(date('Y-m-d').' 09:04');
+        //p([$time, $start_time]);
+        $nums = floor(($time - $start_time)/(5*60));
+
+        return $nums;
     }
 
     /**
