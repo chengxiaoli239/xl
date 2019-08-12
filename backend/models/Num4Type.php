@@ -21,6 +21,7 @@ use Yii;
  * @property int $type_3b 是否三兄弟
  * @property int $type_4b 是否四兄弟
  * @property int $type_4ds 单双：0非四单四双1四单2四双
+ * @property int $type_log 是否对数
  * @property int $codes_hz 号码和值
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
@@ -42,7 +43,7 @@ class Num4Type extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['code_1', 'code_2', 'code_3', 'code_4', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'codes_hz', 'created_at', 'updated_at'], 'integer'],
+            [['code_1', 'code_2', 'code_3', 'code_4', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_log', 'codes_hz', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
             [['code'], 'string', 'max' => 8],
         ];
@@ -68,10 +69,20 @@ class Num4Type extends \common\models\base\BaseModel
             'type_3b' => '是否三兄弟',
             'type_4b' => '是否四兄弟',
             'type_4ds' => '单双：0非四单四双1四单2四双',
+            'type_log' => '是否对数',
             'codes_hz' => '号码和值',
             'created_at' => '创建时间',
             'updated_at' => '更新时间',
             'update_time' => '更新时间',
         ];
+    }
+
+    /**
+     * @inheritdoc
+     * @return Num4TypeQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new Num4TypeQuery(get_called_class());
     }
 }
