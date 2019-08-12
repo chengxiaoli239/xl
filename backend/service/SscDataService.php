@@ -1588,9 +1588,9 @@ class SscDataService extends BaseService {
         set_time_limit(0);
 
         //for($i = 10000; $i<=19999; $i++){
-        for($i = 10000; $i<=13501; $i++){
+        //for($i = 10000; $i<=13501; $i++){
         //for($i = 13500; $i<=16501; $i++){
-        //for($i = 16500; $i<=19999; $i++){
+        for($i = 16500; $i<=19999; $i++){
             $code = substr($i, 1,4);
             $codes = $code[0].','.$code[1].','.$code[2].','.$code[3];
             if(!$Num4Type = Num4Type::findOne(['code'=>$codes])){
@@ -1613,6 +1613,7 @@ class SscDataService extends BaseService {
                 'type_3b' => CommonService::isCodeType3b($codes), # 是否三兄弟
                 'type_4b' => CommonService::isCodeType4b($codes), # 是否四兄弟
                 'type_4ds' => CommonService::isCodeType4ds($codes), # 是否四单双：0非四单四双1四单2四双
+                'type_log' => CommonService::isCodeTypeLog($codes), # 是否对数
                 'codes_hz' => array_sum([$code[0],$code[1],$code[2],$code[3]]),
                 'updated_at' => time(),
                 'created_at' => time(),
