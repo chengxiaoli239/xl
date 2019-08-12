@@ -56,6 +56,10 @@ abstract class BetService extends BaseBetService {
                 # 希腊时时彩
                 $BetService = new XlService($uid, $tz_system_id);
                 break;
+            case 4:
+                # 北京快乐8
+                $BetService = new KuaiLe8Service($uid, $tz_system_id);
+                break;
             default:
                 break;
         }

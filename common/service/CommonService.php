@@ -615,6 +615,39 @@ class  CommonService{
     }
 
     /**
+     * @desc 是否对数
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeTypeLog($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        asort($codesArr);
+
+        if(in_array(0, $codesArr) && in_array(5, $codesArr)){
+            $flag = 1;
+        }
+
+        if(in_array(1, $codesArr) && in_array(6, $codesArr)){
+            $flag = 1;
+        }
+
+        if(in_array(2, $codesArr) && in_array(7, $codesArr)){
+            $flag = 1;
+        }
+
+        if(in_array(3, $codesArr) && in_array(8, $codesArr)){
+            $flag = 1;
+        }
+
+        if(in_array(4, $codesArr) && in_array(9, $codesArr)){
+            $flag = 1;
+        }
+
+        return $flag;
+    }
+
+    /**
      * @desc 所有投注系统
      * @param int $status
      * @return array
