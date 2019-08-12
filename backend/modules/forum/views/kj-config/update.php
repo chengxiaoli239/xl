@@ -14,6 +14,7 @@ $this->params['breadcrumbs'][] = 'Update';
 
     <?= $this->render('_form', [
         'model' => $model,
+        'lottery_type_arr' => $lottery_type_arr,
     ]) ?>
 
 </section>

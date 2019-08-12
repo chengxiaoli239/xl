@@ -23,6 +23,7 @@ class CqsscKcw extends BaseKj {
         4 => '希腊10分', # 8:10分
         5 => '重庆时时彩', # 20分
         6 => '新疆时时彩', # 20分
+        7 => '北京快乐8', # 5分
     ];
 
     public static function getLotteryNo($returnType = 'json'){
@@ -111,6 +112,65 @@ class CqsscKcw extends BaseKj {
         return $rst;
     }
 
+    /**
+     * @desc 北京快乐8
+     * @param string $returnType
+     * @return array|bool
+     */
+    public static function getLotteryKuaiLe8($returnType = 'json', $lottery = 18){
 
+        if(!$kjData = self::getCurrentKjData()) {
+            $domain = BaseKj::getApiHost(10);
+            sleep(3);
+            $post_data = [
+                'lottery' => $lottery,
+                'BeginDt'=> '2019-08-12',
+                'EndDt'=> '2019-08-12',
+                'pageSize'=> 20,
+                'PageNum'=> 1,
+                'token' => 'vltiZRPDuN4WyNisDWRNrHUEIsaNbLh6N4Opvp6oBhQ%3d',
+            ];
+            $url = $domain.'/api/Periods/GetTopEightPeriodsNumber?'.http_build_query($post_data);
+
+            # 测试 start
+            //$domain = BaseKj::getApiHost($lotteryId = 2);
+            //$url = $domain.'/home/GetNumbers?lotteryId='.$lotteryId.'&pageNmuber=1&number=3&_=1556344774304';
+            # 测试 end
+            //$content = file_get_contents($url);
+            $headers = [
+                'Accept: application/json, text/plain, */*',
+                'Referer: '.$domain.'/',
+                //'token:vltiZRPDuN4WyNisDWRNrHUEIsaNbLh6N4Opvp6oBhQ%3d',
+            ];
+            $content = CurlService::httpGet($url, $headers);
+            //$data = json_decode($content,320);
+            $data = $content;
+            p([$url, $headers,$post_data, $data]);
+
+            if (!$data OR !isset($data['data']) OR !$kjData = $data['data'][0]) return false;
+            if (!$kjData) return false;
+            $str = substr($kjData['expect'], 0, 8);
+            $kjData['expect'] = str_replace($str, $str . '-', $kjData['expect']);
+            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
+        }
+        $opencode = $kjData['opencode'];
+        $opentime = $kjData['opentime'];
+        $expect = $kjData['expect'];
+
+        self::setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kcw', 'INFO', '号码抓取-kcw', $logArr);
+
+        return $rst;
+    }
 
 }

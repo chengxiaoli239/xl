@@ -103,7 +103,7 @@ class CurlService extends BaseService{
         curl_setopt($ch, CURLOPT_HEADER,0);
 
         $data = curl_exec($ch);
-        //if(strpos($url, 'AcceptAgreement') !== false){ p([$header, $url, $data]); }
+        //if(strpos($url, 'GetTopEightPeriodsNumber') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
         if(curl_close($ch)) {
             echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
         }

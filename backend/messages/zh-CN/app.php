@@ -78,4 +78,7 @@ return [
 
     'Static4d Profits Months' => '单双利润统计(month)',
     'Static4d Profits Days' => '单双利润统计(Day)',
+
+    'Create Kj Config' => '开奖配置新增',
+    'Kj Configs' => '开奖配置列表',
 ];

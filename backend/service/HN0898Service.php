@@ -10,6 +10,7 @@
 namespace backend\service;
 use backend\models\BettingRecords;
 use backend\models\DataTime;
+use backend\models\KjConfig;
 use backend\models\Num4Type;
 use backend\models\SscDsYl;
 use backend\models\SscKjData;
@@ -536,6 +537,30 @@ class HN0898Service extends BaseTZService {
         $m->set($mkey, 1, 10);
 
         $rst = $UserSysPlans->save(false);
+
+        return $rst;
+    }
+
+    /**
+     * @description 更新计划表状态
+     * @param $id
+     * @param $account
+     * @return array
+     */
+    public static function updateKjConfigStatus($id, $status, $uid = '')
+    {
+        if(!$uid) return ['status'=>300, 'msg'=>'用户id为空'];
+        $m = \Yii::$app->cache;
+        $mkey = 'updateKjConfigStatus_'.$id.'_'.$status;
+        if($rst = $m->get($mkey)) return false;
+
+        $data = KjConfig::findOne($id);
+        $data->enable = (int)$status;
+        $data->updated_at = date('Y-m-d H:i:s');
+
+        $m->set($mkey, 1, 10);
+
+        $rst = $data->save(false);
 
         return $rst;
     }

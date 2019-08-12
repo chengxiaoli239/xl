@@ -102,13 +102,17 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); p($rst);# 单双利润统计(month)
+        //$s = 'a:1:{i:1;s:64:"http://img1.kuajing0898.com/c8e6cf95f033c477dc718649e4989e77.jpg";}'; p(unserialize($s));
+        $a = '["8b\/d0\/b8\/8bd0b8ba4bd033ff472ec39978f8ffbf.jpg","7f\/14\/da\/7f14dac33a5af63e9d23f84ed586c379.jpg","","","",""]'; p(json_decode($a));
+        $rst = max(0.53,0.45);p($rst);
+        $rst = NumService::getCodesKuaiXuan([ 'arise'=>'9', 'hz'=>[30]]);p($rst);
         $rst = StaticService::opStaticSdProfitsMonth();p($rst);
         $rst = StaticService::opStaticSdProfitsDay();p($rst);
         $rst = StaticService::staticAllSdProfitsDay(date('Y-m-d'));p($rst);
         $rst = StaticService::staticAllSdProfitsMonth(date('Y-m'));p($rst);
         $a = '2019-06-24T19:02:10+08:00';
         $rst = self::dealTime($a);p($rst);
-        $rst = NumService::getCodesKuaiXuan([ 'arise'=>'77', 'type_4ds'=>1, 'type_4']);p($rst);
         $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type=5);p($rst);

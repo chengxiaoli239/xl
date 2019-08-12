@@ -2,6 +2,8 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\HN0898Service;
+use common\kj\cqssc\CqsscKcw;
 use Yii;
 use backend\models\KjConfig;
 use backend\models\searchs\KjConfig as KjConfigSearch;
@@ -67,11 +69,12 @@ class KjConfigController extends BaseController
         $model = new KjConfig();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('create', [
             'model' => $model,
+            'lottery_type_arr' => CqsscKcw::$lotteryNameArr,
         ]);
     }
 
@@ -87,12 +90,26 @@ class KjConfigController extends BaseController
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [
             'model' => $model,
+            'lottery_type_arr' => CqsscKcw::$lotteryNameArr,
         ]);
+    }
+
+    /**
+     * @desc 更新投注状态
+     * @param $id
+     * @param $status
+     * @return \yii\web\Response
+     */
+    public function actionSwitchStatus($id,$status){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        HN0898Service::updateKjConfigStatus($id, $status, $this->_user_id);
+
+        return $this->redirect(['index']);
     }
 
     /**

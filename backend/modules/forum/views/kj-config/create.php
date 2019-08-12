@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model backend\models\KjConfig */
 
-$this->title = 'Create Kj Config';
+$this->title = Yii::t('app', 'Create Kj Config');
 $this->params['breadcrumbs'][] = ['label' => 'Kj Configs', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -14,6 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $this->render('_form', [
         'model' => $model,
+        'lottery_type_arr' => $lottery_type_arr,
     ]) ?>
 
 </div>
