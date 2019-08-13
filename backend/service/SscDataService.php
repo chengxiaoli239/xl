@@ -1867,8 +1867,10 @@ class SscDataService extends BaseService {
     public static function clearDataTables(){
         $rst = ['status'=>200, 'msg'=>'处理成功！'];
 
-        $sqls = "show tables";
-        $tables = \Yii::$app->db->createCommand($sqls)->queryAll();// p($tables);
+        //$sqls = "show tables";
+        //$tables = \Yii::$app->db->createCommand($sqls)->queryAll();// p($tables);
+        $val = SystemConfig::findOne(['key'=>'clearDataTables'])->value;
+        if($val != 1) return ['status'=>300, 'msg'=>'全局数据清理开关未开启'];
 
         $tables = [
             'lt_admin_log', 'lt_betting_records' , 'lt_ssc_ds_static', 'lt_ssc_dw_hz_static', 'lt_ssc_dws_hz_nums','lt_ssc_he9_data', 'lt_ssc_kj_data', 'lt_ssc_kj_data_3num',
@@ -1879,7 +1881,7 @@ class SscDataService extends BaseService {
 
         foreach ($tables as $table){
             $sql = 'TRUNCATE TABLE '.$table;
-            //$rst = \Yii::$app->db->createCommand($sql)->execute();p($rst);
+            $rst = \Yii::$app->db->createCommand($sql)->execute();p($rst);
         }
 
         return $rst;
