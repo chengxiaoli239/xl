@@ -2,6 +2,7 @@
 # 开彩网
 namespace common\kj\cqssc;
 use backend\models\KjConfig;
+use backend\models\TzSystemsUsers;
 use backend\service\CurlService;
 use common\kj\BaseKj;
 use backend\service\HN0898Service;
@@ -129,14 +130,18 @@ class CqsscKcw extends BaseKj {
                 'PageNum'=> 1,
             ];
             $url = $domain.'/api/MemberDesk/GetPeriodsResult?'.http_build_query($post_data);
+            $cookie = TzSystemsUsers::findOne(5)->cookie;
 
             $headers = [
                 'Accept: application/json, text/plain, */*',
                 'Referer: '.$domain.'/',
-                'Cookie:ValidateToken=7e078323c5b5ef23197621d25ac95d58; Token=4GuaAP94kXCQN83fHLDz3BJZqNZW01Z3vFoR8dJXYbk%3d',
+                //'Cookie:ValidateToken=7e078323c5b5ef23197621d25ac95d58; Token=4GuaAP94kXCQN83fHLDz3BJZqNZW01Z3vFoR8dJXYbk%3d',
+                'Cookie:'.$cookie,
                 'Host: '.str_replace('http://', '',$domain),
             ];
             $content = CurlService::httpGet($url, $headers);
+            $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$content];
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kl8', 'INFO', '号码抓取-kcw', $logArr);
 
             $data = $content;
             //p($data);
@@ -166,7 +171,7 @@ class CqsscKcw extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kcw', 'INFO', '号码抓取-kcw', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kl8', 'INFO', '号码抓取-kcw', $logArr);
 
         return $rst;
     }

@@ -83,6 +83,7 @@ abstract class BetService extends BaseBetService {
         switch ($system_type_id){ # system_type_id = lt_system_type.id
             case 1: # 重庆0898 系统
             case 3: # 希腊彩系统
+            case 4: # 北京快乐8
                 $codes = BetService::getPlansAllCodesType1($tz_type, $buy_type, $sel_same, $hz_Arr);
                 break;
             case 2:
@@ -125,7 +126,6 @@ abstract class BetService extends BaseBetService {
      * @desc 用户投注基本入口
      */
     public static function bet(){
-
         $lottery_types = StaticService::getLotteryTypes();
         foreach ($lottery_types as $lottery_type) {
             $qihao = HN0898Service::getQihao($lottery_type);
@@ -135,18 +135,19 @@ abstract class BetService extends BaseBetService {
             $plans = UserSysPlans::find()->where($where)->all();
             if ($plans) {
                 $datas = [];
-                    foreach ($plans as $key => $plan) {
-                        //return ['status'=>300, 'msg'=>'当前期投注任务已经完成~'];
-                        if ($plan->children_plan_id > 0) {
-                            $ids = explode(',', $plan->children_plan_id);
-                        } else {
-                            $ids[] = $plan->id;
-                        }
-                        foreach ($ids as $id) {
-                            $tzRst[$id] = self::tzByPlanId($id);
-                        }
+                foreach ($plans as $key => $plan) {
+                    //return ['status'=>300, 'msg'=>'当前期投注任务已经完成~'];
+                    if ($plan->children_plan_id > 0) {
+                        $ids = explode(',', $plan->children_plan_id);
+                    } else {
+                        $ids[] = $plan->id;
                     }
-                $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type]];
+                    foreach ($ids as $id) {
+                        $tzRst[$id] = self::tzByPlanId($id);
+                    }
+                }
+                $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
+                //p($datas);
                 BetService::afterBetNow($plan->lottery_type, $qihao); # 彩种投注结束锁
             }
         }

@@ -12,6 +12,7 @@ use backend\models\Admin;
 use backend\models\SscKjData;
 use backend\models\TzSystemsUsers;
 use backend\service\BetService;
+use backend\service\KuaiLe8Service;
 use backend\service\NumService;
 use backend\service\SevenService;
 use backend\service\StaticService;
@@ -102,6 +103,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = KuaiLe8Service::login(19, 6);p($rst);
+        $rst['bet'] = BetService::bet();p($rst); // 用户新计划投注，可正买可反买
         $rst = SscDataService::clearDataTables();p($rst);
         $rst1 = HN0898Service::getQihao( 7 );
         $rst2 = HN0898Service::getCurrentQihao( 7 );p(['rst1'=>$rst1, 'rst2'=>$rst2]);
@@ -109,7 +112,6 @@ class IndexController extends Controller
         $rst = HN0898Service::getDifferentNums();p($rst);
         $rst = TzService::insertKuaiLe8DataTime();p($rst);
         $rst = TzService::opSystemBetPlans();p($rst); // 定制化投注计划
-        $rst['bet'] = BetService::bet();p($rst); // 用户新计划投注，可正买可反买
         $qihao = HN0898Service::getQihao($lottery_type=5);p($qihao);
         $rst = StaticService::getNiceCodes(5);p(['最优号码[四现不带双]'=>$rst]);
         $rst = NumService::getCodesKuaiXuan(['arise'=>'0','hz'=>[4]]);p($rst);

@@ -230,6 +230,7 @@ class KuaiLe8Service extends BaseTZService {
      */
     //public function bet($playway = 1, $codes, $single, $qihao, $tz_type = 0, $buy_type = 1){
     public function bet($qihao, $plan_id, $codes){
+        //p([$qihao, $plan_id, 'codes'=>$codes]);
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
@@ -241,6 +242,7 @@ class KuaiLe8Service extends BaseTZService {
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
         $qihaoInfo = self::getPreTz(self::$user_id, self::$tz_system_id, $lottery_type);
+        p([self::$user_id, self::$tz_system_id, $lottery_type, $qihaoInfo]);
 
         # 验证
         $rst = self::validateBettingContent($playway,$codes); # codes:13579,,13579,,@13579,,13579,,
@@ -288,7 +290,7 @@ class KuaiLe8Service extends BaseTZService {
         $start_time = microtime(true);
         $rst = CurlService::httpPost($url, $post_data, $headers);
         //$rst = json_encode($rst);
-        //p([$rst,$url,$post_data, $headers]);
+        p([$rst,$url,$post_data, $headers]);
         $end_time = microtime(true);
         $time_consume = ($end_time - $start_time). 's';
         if($rst['Status'] != 1 OR !$rst){
@@ -714,15 +716,16 @@ class KuaiLe8Service extends BaseTZService {
             //p(HN0898Service::getTzSiteInfo($tz_system_id));
             # 1、预登录
             $_t = microtime(true) * 10000;
-            $url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/Login'.'?_'.$_t;
+            $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/Home/MemberLogin'.'?_'.$_t;
             if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
             $headers = [
                 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                 'Upgrade-Insecure-Requests: 1',
-                'Host: '.SevenService::getTzSiteInfo($tz_system_id,'domain'),
+                'Host: '.self::getTzSiteInfo($tz_system_id,'domain'),
                 //'Referer: '.$url,
             ];
             $cookie = CurlService::curl_get_cookie($url, $headers);
+            //p(['url'=>$url, 'headers'=>$headers, 'cookie'=>$cookie]);
             $cookieData = $cookie;
             if($cookieData){
                 $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
@@ -1199,7 +1202,7 @@ class KuaiLe8Service extends BaseTZService {
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getQihaoInfo','INFO','快乐8登陆前', $logArr);
 
         return $data;
     }

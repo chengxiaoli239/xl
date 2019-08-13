@@ -13,6 +13,7 @@ use backend\models\SystemType;
 use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
 use backend\models\User;
+use backend\service\KuaiLe8Service;
 use backend\service\McKeyService;
 use backend\service\SevenService;
 use backend\service\SscDataService;
@@ -295,6 +296,9 @@ class IndexController extends Controller
                     $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     break;
                 case 3:
+                    break;
+                case 4:
+                    $rst = KuaiLe8Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     break;
             }
         }

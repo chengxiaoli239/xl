@@ -442,16 +442,20 @@ class KjDataGet
             # 未完
         }else{
             $nextQihao = $qihao + 1;
-            $year = '20'.substr($qihao,0,2);
-            $date = '20'.substr($qihao,0,6);
-            $qihao = substr($qihao,6,3);
-            $maxQihaoArr = BetService::$maxQihaoArr;
-            $maxQihao = $maxQihaoArr[$lottery_type];
-            if($date == $year.'1231' && $qihao >=$maxQihao){
-                $nextQihao = ($year+1).'0101001';
-            //}elseif($qihao >= 120){
-            }elseif($qihao >= $maxQihao){
-                $nextQihao = ltrim(Tools::getNextDate($date),'20').'001';
+            switch ($lottery_type){
+                case 5:
+                    $year = '20'.substr($qihao,0,2);
+                    $date = '20'.substr($qihao,0,6);
+                    $qihao = substr($qihao,6,3);
+                    $maxQihaoArr = BetService::$maxQihaoArr;
+                    $maxQihao = $maxQihaoArr[$lottery_type];
+                    if($date == $year.'1231' && $qihao >=$maxQihao){
+                        $nextQihao = ($year+1).'0101001';
+                    //}elseif($qihao >= 120){
+                    }elseif($qihao >= $maxQihao){
+                        $nextQihao = ltrim(Tools::getNextDate($date),'20').'001';
+                    }
+                break;
             }
         }
 

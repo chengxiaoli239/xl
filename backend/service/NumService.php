@@ -618,21 +618,16 @@ class NumService extends BaseService {
         }
         # 第2位
         if(isset($codes_hz['p2']) && !empty($codes_hz['p2'])){
-            //$p2_codes = explode(',', $codes_hz['p2']);
             $p2_codes = self::getCodesArrByStr($codes_hz['p2']);
             $where = array_merge($where, [ ['IN', 'code_2', $p2_codes] ]);
         }
         # 第3位
         if(isset($codes_hz['p3']) && !empty($codes_hz['p3'])){
-            //$p3_codes = explode(',', $codes_hz['p3']);
-            //$tmpArise = self::getCodesArrByStr($codes_hz['arise']);
             $p3_codes = self::getCodesArrByStr($codes_hz['p3']);
             $where = array_merge($where, [ ['IN', 'code_3', $p3_codes] ]);
         }
         # 第4位
         if(isset($codes_hz['p4']) && !empty($codes_hz['p4'])){
-            //$p4_codes = explode(',', $codes_hz['p4']);
-            //$tmpArise = self::getCodesArrByStr($codes_hz['arise']);
             $p4_codes = self::getCodesArrByStr($codes_hz['p4']);
             $where = array_merge($where, [ ['IN', 'code_4', $p4_codes] ]);
         }
@@ -642,7 +637,10 @@ class NumService extends BaseService {
             $where = array_merge($where, [['=', 'type_4ds', $codes_hz['type_4ds']]]);
         }
 
-
+        # 对数
+        if(isset($codes_hz['type_log']) && !empty($codes_hz['type_log'])){
+            $where = array_merge($where, [['=', 'type_log', $codes_hz['type_log']]]);
+        }
 
         $query = Num4Type::find()->where($where);
 
@@ -795,6 +793,7 @@ class NumService extends BaseService {
             'type_2b'=>'两兄弟',
             'type_3b'=>'三兄弟',
             'type_4b'=>'四兄弟',
+            'type_log'=>'对数',
             'type_4ds_1'=>'四单',
             'type_4ds_2'=>'四双',
             'arise'=>'上奖',

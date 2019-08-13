@@ -109,8 +109,13 @@ class CurlService extends BaseService{
         if(!self::is_json($data)){
             return $data;
         }
+        $data = json_decode($data, true);
 
-        return json_decode($data, true);
+        if($data['Status'] == false){
+            $data['headers'] = $header;
+        }
+
+        return $data;
     }
 
    /**
@@ -219,7 +224,7 @@ class CurlService extends BaseService{
 
         $content = curl_exec($curl);
         preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
-        //p(['content'=>$content, 'errno'=>curl_error($curl)]);
+        p(['content'=>$content, 'errno'=>curl_error($curl)]);
         $cookie = $matches[1];
         $logArr = ['content'=>$content, 'cookie'=>$cookie];
         if(curl_error($curl)>0){
