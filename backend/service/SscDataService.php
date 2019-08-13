@@ -1881,7 +1881,7 @@ class SscDataService extends BaseService {
 
         foreach ($tables as $table){
             $sql = 'TRUNCATE TABLE '.$table;
-            $r = \Yii::$app->db->createCommand($sql)->execute();p($rst);
+            $r = \Yii::$app->db->createCommand($sql)->execute();//p($rst);
         }
 
         return $rst;
