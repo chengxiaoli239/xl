@@ -18,6 +18,7 @@ use Yii;
  * @property int $status 系统开启状态
  * @property string $ssc_domain 网盘地址
  * @property string $cookie 登陆cookie
+ * @property string $user_agent 浏览器代理
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -44,7 +45,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             [['update_time'], 'safe'],
             [['username', 'sys_name', 'account', 'ssc_domain'], 'string', 'max' => 64],
             [['password'], 'string', 'max' => 20],
-            [['cookie'], 'string', 'max' => 640],
+            [['cookie', 'user_agent'], 'string', 'max' => 640],
         ];
     }
 
@@ -65,6 +66,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'status' => '系统开启状态',
             'ssc_domain' => '网盘地址',
             'cookie' => '登陆cookie',
+            'user_agent' => '浏览器代理',
             'created_at' => '创建时间',
             'updated_at' => '更新时间',
             'update_time' => '更新时间',
