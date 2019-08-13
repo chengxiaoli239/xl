@@ -119,7 +119,6 @@ class IndexController extends Controller
         $rst = StaticService::staticSDPerDateProfits(date('Y-m-d'));p($rst);
         $rst = KjDataGet::updateNullCode();p($rst);
         $rst = SscDataService::getCodesDS('1,2,3,4,5');p($rst);
-        $rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type = 5);
         $rst = StaticService::opStatic();p($rst); # 和值、四定利润统计
         $rst[] = StaticService::static4dPerDateProfits();p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 5);p($rst); # 上奖三字现

@@ -30,6 +30,7 @@ class ToolsController extends \backend\controllers\BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if($this->_user_id != 1) return ['stauts'=>'300', 'msg'=>'不是管理员无权限'];
         $rst = SscDataService::clearDataTables();
+        if($rst['status'] != 200) p($rst);
 
         return $this->redirect(['index']);
     }
