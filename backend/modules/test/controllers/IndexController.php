@@ -103,11 +103,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = KuaiLe8Service::login(19, 6);p($rst);
+        $rst = HN0898Service::getCurrentQihao( 7 );p($rst);
+        $rst = HN0898Service::getQihao( 7 );p($rst);
         $rst['bet'] = BetService::bet();p($rst); // 用户新计划投注，可正买可反买
+        $rst = KuaiLe8Service::login(19, 6);p($rst);
         $rst = SscDataService::clearDataTables();p($rst);
-        $rst1 = HN0898Service::getQihao( 7 );
-        $rst2 = HN0898Service::getCurrentQihao( 7 );p(['rst1'=>$rst1, 'rst2'=>$rst2]);
         $rst = SscDataService::insertCodeType();p($rst);
         $rst = HN0898Service::getDifferentNums();p($rst);
         $rst = TzService::insertKuaiLe8DataTime();p($rst);

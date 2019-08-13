@@ -621,7 +621,7 @@ abstract class BetService extends BaseBetService {
             'uid' => $data['uid'],  // 投注用户id
             'buy_type'=> $data['buy_type'],  // 购买方向类型
             'codes' => $data['codes'],  // 投注号码
-            'qihao' => $data['qihao'],  // 投注期号
+            'qihao' => (string)$data['qihao'],  // 投注期号
             'plan_id' => $data['plan_id'],  // 计划id
             'single' => $data['single'],  // 投注期号
             'betting_money'=> $data['betting_money'],  // 投注金额
