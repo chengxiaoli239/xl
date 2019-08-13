@@ -8,6 +8,7 @@
  */
 
 namespace backend\service;
+use backend\models\AdminLog;
 use backend\models\Num4Type;
 use backend\models\searchs\SscDwsHzNums;
 use backend\models\Ssc3numYl;
@@ -22,10 +23,12 @@ use backend\models\SscStaticVal;
 use backend\models\SscStaticYl;
 use backend\models\SystemConfig;
 use backend\models\ThreeNum;
+use backend\models\WxFriends;
 use common\service\CommonService;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use backend\models\SscDwHzYl;
+use izyue\admin\models\Log;
 use  yii;
 
 class SscDataService extends BaseService {
@@ -1859,6 +1862,27 @@ class SscDataService extends BaseService {
         }
 
         return $qishu;
+    }
+
+    public static function clearDataTables(){
+        $rst = ['status'=>200, 'msg'=>'处理成功！'];
+
+        $sqls = "show tables";
+        $tables = \Yii::$app->db->createCommand($sqls)->queryAll();// p($tables);
+
+        $tables = [
+            'lt_admin_log', 'lt_betting_records' , 'lt_ssc_ds_static', 'lt_ssc_dw_hz_static', 'lt_ssc_dws_hz_nums','lt_ssc_he9_data', 'lt_ssc_kj_data', 'lt_ssc_kj_data_3num',
+            'lt_ssc_kj_data_ds','lt_ssc_sd_hz_yl','lt_ssc_static_yl','lt_static_3num_arise_perdate','lt_static_4d_profits','lt_static_4d_profits_day','lt_static_4d_profits_month',
+            'lt_static_4d_profits_perdate','lt_static_code_type_arise_perdate','lt_static_hz_arise_perdate','lt_static_hz_profits','lt_static_hz_profits_perdate',
+            'lt_static_per_hz_perdate_profits','lt_static_per_hz_profits','lt_static_profits','lt_user_custom_plans','lt_user_sys_plans','lt_wx_friends','lt_wx_msg_status','lt_wx_msg_types'
+        ];
+
+        foreach ($tables as $table){
+            $sql = 'TRUNCATE TABLE '.$table;
+            //$rst = \Yii::$app->db->createCommand($sql)->execute();p($rst);
+        }
+
+        return $rst;
     }
 
 

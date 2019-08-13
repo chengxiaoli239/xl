@@ -121,25 +121,19 @@ class CqsscKcw extends BaseKj {
 
         if(!$kjData = self::getCurrentKjData()) {
             $domain = BaseKj::getApiHost(10);
-            sleep(3);
             $post_data = [
                 'lottery' => $lottery,
-                'BeginDt'=> '2019-08-12',
-                'EndDt'=> '2019-08-12',
+                'BeginDt'=> date('Y-m-d'),
+                'EndDt'=> date('Y-m-d'),
                 'pageSize'=> 20,
                 'PageNum'=> 1,
             ];
             $url = $domain.'/api/MemberDesk/GetPeriodsResult?'.http_build_query($post_data);
 
-            # 测试 start
-            //$domain = BaseKj::getApiHost($lotteryId = 2);
-            //$url = $domain.'/home/GetNumbers?lotteryId='.$lotteryId.'&pageNmuber=1&number=3&_=1556344774304';
-            # 测试 end
-            //$content = file_get_contents($url);
             $headers = [
                 'Accept: application/json, text/plain, */*',
                 'Referer: '.$domain.'/',
-                'Cookie:ValidateToken=b95368fe60b92f40bd1c7aece31b05d0; Token=dkYJk9obCtyab0XgXCyBD64sYPmvT2LXqHP0uGauUgU%3d',
+                'Cookie:ValidateToken=7e078323c5b5ef23197621d25ac95d58; Token=4GuaAP94kXCQN83fHLDz3BJZqNZW01Z3vFoR8dJXYbk%3d',
                 'Host: '.str_replace('http://', '',$domain),
             ];
             $content = CurlService::httpGet($url, $headers);

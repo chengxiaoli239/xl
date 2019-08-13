@@ -102,11 +102,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-<<<<<<< .mine
-        $sqls = "show tables";
-        $datebase = \YII::$app->db->createCommand($sqls)->queryAll();p($datebase);
+        $rst = SscDataService::clearDataTables();p($rst);
+        $rst1 = HN0898Service::getQihao( 7 );
+        $rst2 = HN0898Service::getCurrentQihao( 7 );p(['rst1'=>$rst1, 'rst2'=>$rst2]);
         $rst = SscDataService::insertCodeType();p($rst);
-        $rst = HN0898Service::getCurrentQihao( 7 );p($rst);
         $rst = HN0898Service::getDifferentNums();p($rst);
         $rst = TzService::insertKuaiLe8DataTime();p($rst);
         $rst = TzService::opSystemBetPlans();p($rst); // 定制化投注计划
@@ -160,52 +159,7 @@ class IndexController extends Controller
         $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type = 5);p($rst); # 号码类型每天数量统计
         //$data = '{"type_3":"1","type_22":"0","type_2b":"1","type_4b":"1","arise":"12345","p1":"3456","p2":"345679","p3":"89734","p4":"56092"}';
         //$rst = NumService::getCodesKuaiXuan(['type_2'=>1, 'type_3'=>1, 'hz'=>[30,31,32,33,34,35]]);p($rst);
-||||||| .r144
-=======
-        $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); p($rst);# 单双利润统计(month)
-        //$s = 'a:1:{i:1;s:64:"http://img1.kuajing0898.com/c8e6cf95f033c477dc718649e4989e77.jpg";}'; p(unserialize($s));
-        $a = '["8b\/d0\/b8\/8bd0b8ba4bd033ff472ec39978f8ffbf.jpg","7f\/14\/da\/7f14dac33a5af63e9d23f84ed586c379.jpg","","","",""]'; p(json_decode($a));
-        $rst = max(0.53,0.45);p($rst);
-        $rst = NumService::getCodesKuaiXuan([ 'arise'=>'9', 'hz'=>[30]]);p($rst);
-        $rst = StaticService::opStaticSdProfitsMonth();p($rst);
-        $rst = StaticService::opStaticSdProfitsDay();p($rst);
-        $rst = StaticService::staticAllSdProfitsDay(date('Y-m-d'));p($rst);
-        $rst = StaticService::staticAllSdProfitsMonth(date('Y-m'));p($rst);
-        $a = '2019-06-24T19:02:10+08:00';
-        $rst = self::dealTime($a);p($rst);
-        $rst = StaticService::opAllCodeTypeYl();p($rst);
-        $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
-        $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type=5);p($rst);
-        $miss = SscDataService::getCodeTypeYlByTab('0026', $lottery_type = 5, $type = 4); p($miss);
-        $miss = SscDataService::getCodeTypeYlHistoryMiss('0013', $lottery_type = 5, 4000);p($miss);
-        $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type = DEFAULT_LOTTERY_TYPE); p($rst);# 号码类型每天数量统计
-        $rst = StaticService::staticCodeTypeCounts('2019-06-14', $lottery_type = 5); p($rst);
-        $rst = SscDataService::insertCodeType();p($rst);
-        $rst = NumService::getCodesArise(['003']);p($rst); //2+3+1+2+2
-        $rst = SscDataService::insertCode();p($rst);
-        $rst = BaseNumService::getRepeat3Codes();p($rst);
-        $rst = '0'; $str = '100'; $flag = strstr($str, $rst);d($flag);
->>>>>>> .r262
-        $rst = StaticService::staticAll2NumsYl();p($rst); # 统计所有二字现遗漏
-<<<<<<< .mine
-        $rst = NumService::getCodesArise(['3','4','5','6']);p($rst); //2+3+1+2+2
-        $rst = StaticService::staticAll2NumsYl();p($rst); # 统计所有二字现遗漏
-||||||| .r144
-        $rst = SscDataService::insertCodeType();p($rst);
-=======
->>>>>>> .r262
-        $rst = SevenService::login(12, 3);p($rst); # 7时登录
-        $rst = SevenService::synBalance(15);p($rst);
-
-<<<<<<< .mine
-        $rst = StaticService::staticAll2NumsYl();p($rst); # 统计所有二字现遗漏
-        $rst = StaticService::staticAll2NumsYl();p($rst); # 统计所有二字现遗漏
-||||||| .r144
-        $rst = SscDataService::updateCodeTypeYL();p($rst); # 号码类型遗漏
-        $rst = NumService::getCodesArise(['003']);p($rst); //2+3+1+2+2
-=======
->>>>>>> .r262
-        $rst = StaticService::static4dMonthsProfits();p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
+       $rst = StaticService::static4dMonthsProfits();p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
         $domain = BaseKj::getApiHost(8);p($domain);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=5); p($rst);// 单双遗漏
         $miss = SscDataService::getCodeTypeHistoryMiss('type_2,type_2b', $lottery_type = 5, $static_nums = 80);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
