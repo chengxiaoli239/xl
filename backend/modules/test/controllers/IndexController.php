@@ -103,6 +103,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = KuaiLe8Service::synBalance(8);p($rst);
         $rst = HN0898Service::getCurrentQihao( 7 );p($rst);
         $rst = HN0898Service::getQihao( 7 );p($rst);
         $rst['bet'] = BetService::bet();p($rst); // 用户新计划投注，可正买可反买

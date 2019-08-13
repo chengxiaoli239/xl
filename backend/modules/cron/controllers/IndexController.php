@@ -274,6 +274,9 @@ class IndexController extends Controller
                     break;
                 case 3:
                     break;
+                case 4:
+                    $rst = KuaiLe8Service::synBalance($TzSystemsUser->id);
+                    break;
             }
         }
         return $rst;

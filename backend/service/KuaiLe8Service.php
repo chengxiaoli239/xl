@@ -130,7 +130,6 @@ class KuaiLe8Service extends BaseTZService {
     public static function synBalance($tz_system_user_id){
         $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);
         $balance = self::getBalance($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
-        //p($balance);
         $msg = ['status'=>200, 'msg'=>'金额同步成功~','tz_system_user_id'=>$tz_system_user_id, 'balance'=>$balance ];
 
         $TzSystemsUsers->balance = $balance;
@@ -602,10 +601,10 @@ class KuaiLe8Service extends BaseTZService {
      */
     public static function getBalance($uid, $tz_system_id){
         self::__init($uid, $tz_system_id);
-        $rst = SevenService::userInfo($uid, $tz_system_id);
+        $rst = self::userInfo($uid, $tz_system_id);
         $balance = '';
         if(isset($rst['Status']) && $rst['Status'] == 1){
-            $balance = $rst['Data']['credit_balance'];
+            $balance = $rst['Data']['List'][0]['cashAmount'];
         }
 
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','希腊-用户余额', $rst);
@@ -987,7 +986,7 @@ class KuaiLe8Service extends BaseTZService {
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
         $_t = microtime(true) * 10000;
         //$url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/App/Index'.'?_'.$_t;
-        $url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/GetMemberPrint?_='.$_t;
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetInfoByName?lottery=18';
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'url'=>$url];
         $headers = [
             "Accept: application/json, text/javascript, */*; q=0.01",
