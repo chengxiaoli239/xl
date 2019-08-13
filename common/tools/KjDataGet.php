@@ -123,7 +123,11 @@ class KjDataGet
                 $kjData = isset($data['opencode']) ? $data['opencode'] : [];
                 if($kjData){
                     if($kjConfig->lottery_type != 99){
-                        $qihao = substr($data['expect'],2,6).substr($data['expect'],9,3);
+                        if($kjConfig->lottery_type == 5){
+                            $qihao = substr($data['expect'],2,6).substr($data['expect'],9,3);
+                        }else{
+                            $qihao = $data['expect'];
+                        }
                         # ssc
                         $msg = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData);
                         //if($kjConfig->lottery_type ==2) p([$qihao, $kjConfig->lottery_type, $kjData, $msg]);
@@ -186,7 +190,11 @@ class KjDataGet
         $codes_4nums = $kjDatasArr; unset($codes_4nums[4]);
 
         $codes = $kjDatasArr[0].','.$kjDatasArr[1].','.$kjDatasArr[2].','.$kjDatasArr[3];
-        $tmpDate = '20'.substr($qihao,0,6).' '.'00:00:00';
+        if($lottery_type == 5){
+            $tmpDate = '20'.substr($qihao,0,6).' 00:00:00';
+        }else{
+            $tmpDate = date('Y-m-d 00:00:00');
+        }
         $codesArr = [$kjDatasArr[0],$kjDatasArr[1],$kjDatasArr[2],$kjDatasArr[3]];
         sort($codesArr);
         $code_3n = CommonService::get3n($codesArr);
