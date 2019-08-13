@@ -85,9 +85,10 @@ class TzSystemsUsersController extends BaseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $post = Yii::$app->request->post();
+        $post['TzSystemsUsers']['user_agent'] = 'User-Agent: '.$_SERVER['HTTP_USER_AGENT'];
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            //return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load($post) && $model->save()) {
             return $this->redirect(['/forum/user/view.html']);
         }
 

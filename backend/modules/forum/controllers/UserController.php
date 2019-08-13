@@ -124,8 +124,9 @@ class UserController extends BaseController
     public function actionUpdate($id)
     {
         $model = $this->findUserModel($id);
+        $post = Yii::$app->request->post();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load($post) && $model->save()) {
             //UserService::saveTzSystemUsers(explode(',', $this->_post['TzSystemsAuth']['tz_systems_ids']), $uid);
             return $this->redirect(['index', 'id' => $model->id]);
         }

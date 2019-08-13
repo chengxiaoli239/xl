@@ -248,6 +248,8 @@ class KuaiLe8Service extends BaseTZService {
             $data = ['status'=>300, 'msg'=>$qihao.$rst['msg']];
         }
 
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id]);
+
         $bet_codes = self::formCodesStyle($codes, $playway, $plan->single);
         $bet_codes = '5678#0.1'; # 测试
 
@@ -259,7 +261,7 @@ class KuaiLe8Service extends BaseTZService {
             'BetAmt'=> $single,
             'BetTypeId' => 1,
             'BetWayId' => 4,
-            'UserName' => TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id])->account,
+            'UserName' => $TzSystemsUsers->account,
         ];
 
         $data['code'] = $codes;
@@ -267,7 +269,7 @@ class KuaiLe8Service extends BaseTZService {
             'type: 18',
         ];
 
-        $headers = array_merge(self::$headers,$header);
+        $headers = array_merge(self::$headers, $header);
         //p($headers);
         //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
         $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL'); # .'?'.http_build_query($post_data);
