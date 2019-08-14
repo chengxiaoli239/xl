@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\models\TzSystemsAuth;
 use backend\service\BetService;
 use backend\service\HN0898Service;
 use backend\service\StaticService;
@@ -92,7 +93,8 @@ class UserSysPlansController extends BaseController
         $model->single = 0.1;
         $model->tz_type = $tz_type;
         $model->buy_type = 0;
-        $model->tz_sites = [2];
+        $defaultSiteIds = explode(',',TzSystemsAuth::findOne(['uid'=>$this->_user_id])->tz_systems_ids);
+        $model->tz_sites = [$defaultSiteIds[0]];
 
         $data =  [
             'model' => $model,
