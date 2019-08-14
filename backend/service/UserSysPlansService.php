@@ -119,6 +119,11 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['type_4ds'] = $UserSysPlans['type_4ds'][0];
             }
             unset($post['UserSysPlans']['type_4ds']);
+            # 14、对数
+            if($UserSysPlans['type_log'] && count($UserSysPlans['type_log']) == 1){
+                $tmpFilter['type_log'] = $UserSysPlans['type_log'][0];
+            }
+            unset($post['UserSysPlans']['type_log']);
 
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
         }else{

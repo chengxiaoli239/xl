@@ -638,7 +638,7 @@ class NumService extends BaseService {
         }
 
         # 对数
-        if(isset($codes_hz['type_log']) && !empty($codes_hz['type_log'])){
+        if(isset($codes_hz['type_log'])){
             $where = array_merge($where, [['=', 'type_log', $codes_hz['type_log']]]);
         }
 
@@ -722,6 +722,10 @@ class NumService extends BaseService {
             if($hz_Arr['type_4b'] == 1) $filter1['type_4b'] = 1; else $filter0['type_4b'] = 0;
         }
         //p([$filter0, $filter1]);
+        # 7、对数
+        if(isset($hz_Arr['type_log'])){
+            if($hz_Arr['type_log'] == 1) $filter1['type_log'] = 1; else $filter0['type_log'] = 0;
+        }
 
         # 8、和值
         if(isset($hz_Arr['hz']) && !empty($hz_Arr['hz'])){

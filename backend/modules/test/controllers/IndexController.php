@@ -104,6 +104,7 @@ class IndexController extends Controller
 
     public function actionDw(){
 
+        $rst = NumService::getCodesKuaiXuan(['type_log'=>'1']);p($rst);
         $rst = KuaiLe8Service::synBalance(9);p($rst);
         for ($i=0;$i<5; $i++){
             $rst = SscDataService::updateDsData();//p($rst); // 每期开奖单双
@@ -122,7 +123,6 @@ class IndexController extends Controller
         $rst = TzService::opSystemBetPlans();p($rst); // 定制化投注计划
         $qihao = HN0898Service::getQihao($lottery_type=5);p($qihao);
         $rst = StaticService::getNiceCodes(5);p(['最优号码[四现不带双]'=>$rst]);
-        $rst = NumService::getCodesKuaiXuan(['arise'=>'0','hz'=>[4]]);p($rst);
         $rst['updateDsYL'] = SscDataService::updateSdHzYl(); p($rst);// 更新和值遗漏
         $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay();p($rst); # 单双利润统计(day)
         $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); # 单双利润统计(month)
