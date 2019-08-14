@@ -50,8 +50,8 @@ class KuaiLe8Service extends BaseTZService {
     public function __construct($uid = 1, $tz_system_id = 1){
         self::$headers = [
             //'Accept:*/*',
-            'Accept: application/json, text/javascript, */*; q=0.01',
-            'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+            'Accept: application/json, text/plain, */*',
+            'Content-Type: application/x-www-form-urlencoded',
             //'X-Requested-With:XMLHttpRequest',
         ];
         self::__init($uid, $tz_system_id);
@@ -69,10 +69,10 @@ class KuaiLe8Service extends BaseTZService {
         self::$baseUrl = self::$tzSiteInfo['baseUrl'];
         self::$domain = self::$tzSiteInfo['domain'];
         $headers = [
-            "Cookie:".trim(self::$cookie),
-            "Origin:".str_replace('www.','',self::$baseUrl),
-            "Host:".str_replace('www.','',self::$domain),
-            "Referer:".str_replace('www.','',self::$baseUrl),
+            "Token: ".trim(self::$cookie),
+            "Origin: ".str_replace('www.','',self::$baseUrl),
+            //"Host:".str_replace('www.','',self::$domain),
+            "Referer: ".str_replace('www.','',self::$baseUrl).'/',
         ];
         self::$headers = array_unique(array_merge(self::$headers,$headers));
     }
@@ -241,6 +241,7 @@ class KuaiLe8Service extends BaseTZService {
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
         $qihaoInfo = self::getPreTz(self::$user_id, self::$tz_system_id, $lottery_type);
         //p([self::$user_id, self::$tz_system_id, $lottery_type, $qihaoInfo]);
+        if($qihaoInfo['status'] != 200) return $qihaoInfo;
 
         # 验证
         $rst = self::validateBettingContent($playway, $codes); # codes:13579,,13579,,@13579,,13579,,
@@ -249,17 +250,19 @@ class KuaiLe8Service extends BaseTZService {
         }
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id]);
+        $account = User::findOne(['admin_id'=>self::$user_id])->account;  # 投注用户账号
 
         $bet_codes = self::formCodesStyle($codes, $playway, $plan->single);
-        $bet_codes = '5678#0.1'; # 测试
+        if($account == 'aa888'){
+            $bet_codes = '5678#0.1'; # 测试
+        }
 
-        $account = User::findOne(['admin_id'=>self::$user_id])->account;  # 投注用户账号
         $post_data = [
             'PeriodId' => $qihaoInfo['PeriodsID'],
             'LotteryId' => 18,	# 备注：18 快乐8
             'BetNumber' => $bet_codes,
             'BetAmt'=> $single,
-            'BetTypeId' => 1,
+            'BetTypeId' => 13,
             'BetWayId' => 4,
             'UserName' => $TzSystemsUsers->account,
         ];
@@ -267,10 +270,10 @@ class KuaiLe8Service extends BaseTZService {
         $data['code'] = $codes;
         $header = [
             'type: 18',
+            $TzSystemsUsers->user_agent,
         ];
 
         $headers = array_merge(self::$headers, $header);
-        //p($headers);
         //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
         $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL'); # .'?'.http_build_query($post_data);
 
@@ -289,7 +292,7 @@ class KuaiLe8Service extends BaseTZService {
         }
         # 真实投注
         $start_time = microtime(true);
-        $rst = CurlService::httpPost($url, $post_data, $headers);
+        $rst = CurlService::postCurl($url, http_build_query($post_data), $headers);
         //$rst = json_encode($rst);
         //p([$rst,$url,$post_data, $headers]);
         $end_time = microtime(true);
@@ -338,7 +341,6 @@ class KuaiLe8Service extends BaseTZService {
         self::$headers = [];
 
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时插入记录-真实投注', $logArr);
 
         return $data;
@@ -992,7 +994,7 @@ class KuaiLe8Service extends BaseTZService {
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'url'=>$url];
         $headers = [
             "Accept: application/json, text/javascript, */*; q=0.01",
-            "Cookie: ".trim($TzSystemsUsers->cookie),
+            "Cookie: Token=".urlencode($TzSystemsUsers->cookie),
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
@@ -1197,7 +1199,7 @@ class KuaiLe8Service extends BaseTZService {
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetTheLastThree?lottery='.$lottery;
         $headers = [
             "Accept: application/json, text/plain, */*",
-            "Cookie: ".trim($TzSystemsUsers->cookie),
+            "Cookie: Token=".urlencode($TzSystemsUsers->cookie),
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/',
@@ -1231,7 +1233,7 @@ class KuaiLe8Service extends BaseTZService {
 
         $qihaoInfo = self::getQihaoInfo($uid, $tz_system_id, $lottery_type);
         $data = $qihaoInfo['Data']['List'];
-        if($qihaoInfo['Status'] != 1 OR $data[0]['periodsStatus'] != 1) return ['status'=>302, '当前期暂停投注'];
+        if($qihaoInfo['Status'] != 1 OR $data[0]['periodsStatus'] != 1) return ['status'=>302, 'msg'=>$qihaoInfo['Info']];
 
         $rst = ['status'=>200, 'PeriodsID' => $data[0]['periodsID'], 'PeriodsNumber'=>$data[0]['periodsNumber']];
 

@@ -9,6 +9,7 @@
 namespace backend\service;
 
 use backend\models\LotteryType;
+use backend\models\SystemConfig;
 use backend\models\User;
 use common\kj\cqssc\CqsscKcw;
 use Yii;
@@ -170,6 +171,14 @@ abstract class BetService extends BaseBetService {
 
         $m = \Yii::$app->cache;
         $status = $m->get($pkey);
+
+        if($lottery_type == 7){
+            # 北京快乐8
+            $tz_systems_users_id = SystemConfig::findOne(['key'=>'kuaile8_get_kj_user_id'])->value;
+            $TzSystemsUsers = TzSystemsUsers::findOne($tz_systems_users_id);
+            $qihaoInfo = KuaiLe8Service::getPreTz($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $lottery_type);
+            if($qihaoInfo['status'] != 200) $status = false;
+        }
 
         return $status;
     }

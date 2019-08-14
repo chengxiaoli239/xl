@@ -86,7 +86,10 @@ class TzSystemsUsersController extends BaseController
     {
         $model = $this->findModel($id);
         $post = Yii::$app->request->post();
-        $post['TzSystemsUsers']['user_agent'] = 'User-Agent: '.$_SERVER['HTTP_USER_AGENT'];
+        if($post){
+            $post['TzSystemsUsers']['user_agent'] = 'User-Agent: '.$_SERVER['HTTP_USER_AGENT'];
+            $post['TzSystemsUsers']['cookie'] = urldecode($post['TzSystemsUsers']['cookie']);
+        }
 
         if ($model->load($post) && $model->save()) {
             return $this->redirect(['/forum/user/view.html']);

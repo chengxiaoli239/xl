@@ -138,7 +138,7 @@ class CqsscKcw extends BaseKj {
                 'Accept: application/json, text/plain, */*',
                 'Referer: '.$domain.'/',
                 //'Cookie:ValidateToken=7e078323c5b5ef23197621d25ac95d58; Token=4GuaAP94kXCQN83fHLDz3BJZqNZW01Z3vFoR8dJXYbk%3d',
-                'Cookie:'.$cookie,
+                'Cookie: Token='.urlencode($cookie),
                 'Host: '.str_replace('http://', '',$domain),
             ];
             $start_time = microtime(true);
@@ -149,7 +149,6 @@ class CqsscKcw extends BaseKj {
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kl8', 'INFO', '号码抓取-kcw', $logArr);
 
             $data = $content;
-            //p($data);
             //p([$url, $headers,$post_data, $data]);
 
             if (!$data OR !isset($data['Data']) OR !$kjData = $data['Data']['List'][0]) return false;
@@ -160,7 +159,6 @@ class CqsscKcw extends BaseKj {
             $kjData['opentime'] = str_replace('/', '-',$kjData['drawDt']);
             //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
         }
-        p('9999999999999');
         $opencode = $kjData['opencode'];
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];

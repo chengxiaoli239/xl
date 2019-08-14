@@ -103,9 +103,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=7); p($rst);// 单双遗漏
         $rst = HN0898Service::getQihao( 7 );p($rst);
         $rst = HN0898Service::getCurrentQihao( 7 );p($rst);
+        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=7); p($rst);// 单双遗漏
         $rst = KuaiLe8Service::synBalance(8);p($rst);
         $rst['bet'] = BetService::bet();p($rst); // 用户新计划投注，可正买可反买
         $rst = KuaiLe8Service::login(19, 6);p($rst);
