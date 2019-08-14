@@ -103,11 +103,16 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+
+        $rst = KuaiLe8Service::synBalance(9);p($rst);
+        for ($i=0;$i<5; $i++){
+            $rst = SscDataService::updateDsData();//p($rst); // 每期开奖单双
+        }
+        p($rst);
         $rst = SscDataService::updateCodeTypeYL($type = 2);p($rst); # 号码类型遗漏
         $rst = HN0898Service::getCurrentQihao( 7 );p($rst);
         $rst = HN0898Service::getQihao( 7 );p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=7); p($rst);// 单双遗漏
-        $rst = KuaiLe8Service::synBalance(8);p($rst);
         $rst['bet'] = BetService::bet();p($rst); // 用户新计划投注，可正买可反买
         $rst = KuaiLe8Service::login(19, 6);p($rst);
         $rst = SscDataService::clearDataTables();p($rst);
@@ -216,9 +221,6 @@ class IndexController extends Controller
         //$rst = NumService::getCodesArise_bak(['12345']);p($rst);
         $rst = StaticService::staticKj3NumCounts();p($rst);
         $arr = [['reach_val'=>100, 'reduce_val'=>10], ['reach_val'=>300, 'reduce_val'=>50]];p(json_encode($arr));
-        for ($i=0;$i<5; $i++){
-            $rst = SscDataService::updateDsData();//p($rst); // 每期开奖单双
-        }
         $codes = BetService::getCodes(2, 3, 20, 1, 0.1, 1, '35,36');p($codes);
         $rst = SevenService::sscIndex(3, 3);p($rst); # 用户信息
         $rst = BetService::userSysPlansTzNow(81, 3); p($rst);

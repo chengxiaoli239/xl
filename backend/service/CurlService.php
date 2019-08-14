@@ -150,7 +150,48 @@ class CurlService extends BaseService{
         curl_setopt($ch, CURLOPT_HEADER,0);
 
         $data = curl_exec($ch);
-        //if(strpos($url, 'GetPeriodsResult') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
+        //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
+        if(curl_close($ch)) {
+            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+        }
+        if(!self::is_json($data)){
+            return $data;
+        }
+        $data = json_decode($data, true);
+
+        if($data['Status'] == false){
+            $data['headers'] = $header;
+        }
+
+        return $data;
+    }
+
+
+    /**
+     * @decription 获取远程html内容
+     * @param $url
+     */
+    public static function getCurl($url,$header=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        //$header = array_merge(self::$postHeaders,$header);
+        //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+
+        $data = curl_exec($ch);
+        //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
         if(curl_close($ch)) {
             echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
         }

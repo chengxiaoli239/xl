@@ -994,14 +994,18 @@ class KuaiLe8Service extends BaseTZService {
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetInfoByName?lottery=18';
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'url'=>$url];
         $headers = [
-            "Accept: application/json, text/javascript, */*; q=0.01",
+            "Accept: application/json, text/plain, */*",
+            "Accept-Encoding: gzip, deflate",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
             "Cookie: Token=".urlencode($TzSystemsUsers->cookie),
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
-            "Referer:".$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+            "Referer:".$TzSystemsUsers->ssc_domain.'/',
+            $TzSystemsUsers->user_agent,
         ];
 
-        $data = CurlService::httpGet($url, $headers);
+        $data = CurlService::getCurl($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];

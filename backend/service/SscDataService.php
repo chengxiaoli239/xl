@@ -95,6 +95,7 @@ class SscDataService extends BaseService {
 
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
         $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
+        //p([$qihao, $next_qihao, $last_qihao]);
 
         if($next_qihao<=$last_qihao){
             $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;

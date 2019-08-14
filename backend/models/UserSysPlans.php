@@ -43,6 +43,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $p3; # 第3位
     public $p4; # 第4位
     public $type_4ds; # 四单四双
+    public $type_log; # 对数
     /**
      * @inheritdoc
      */
