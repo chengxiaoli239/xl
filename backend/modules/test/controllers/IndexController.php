@@ -103,6 +103,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::updateCodeTypeYL($type = 2);p($rst); # 号码类型遗漏
         $rst = HN0898Service::getCurrentQihao( 7 );p($rst);
         $rst = HN0898Service::getQihao( 7 );p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=7); p($rst);// 单双遗漏
@@ -137,7 +138,6 @@ class IndexController extends Controller
         $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type = 5); p($rst);# 和值每天数量统计
         $rst = StaticService::staticSDHzPerDateProfits(); p($rst);
         $rst = StaticService::staticSdHzProfitsPerdate(); p($rst); # 每天每个和值利润统计
-        $rst = SscDataService::updateCodeTypeYL($type = 2);p($rst); # 号码类型遗漏
 
         # 号码类型：双重、双双重、四重、三兄弟、四兄弟
         $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst);

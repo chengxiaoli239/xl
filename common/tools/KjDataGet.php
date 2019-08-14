@@ -473,17 +473,21 @@ class KjDataGet
             # 未完
         }else{
             $beforeQihao = $qihao - 1;
-            $year = '20'.substr($qihao,0,2);
-            $date = '20'.substr($qihao,0,6);
-            $qihao = substr($qihao,6,3);
-            $maxQihaoArr = BetService::$maxQihaoArr;
-            $maxQihao = $maxQihaoArr[$lottery_type];
-            //$maxQihao = sprintf("%03d", $maxQihaoArr[$lottery_type]);
-            if($date == $year.'0101' && $qihao <= 1){
-                $beforeQihao = substr(($year-1).'1231'.$maxQihao, 2,9);
-            //}elseif($qihao >= 120){
-            }elseif($qihao <= 001){
-                $beforeQihao = substr(Tools::getBeforeDate($date),2,9).'0'.$maxQihao;
+            if($lottery_type == 5){
+                $year = '20'.substr($qihao,0,2);
+                $date = '20'.substr($qihao,0,6);
+                $qihao = substr($qihao,6,3);
+                $maxQihaoArr = BetService::$maxQihaoArr;
+                $maxQihao = $maxQihaoArr[$lottery_type];
+                //$maxQihao = sprintf("%03d", $maxQihaoArr[$lottery_type]);
+                if($date == $year.'0101' && $qihao <= 1){
+                    $beforeQihao = substr(($year-1).'1231'.$maxQihao, 2,9);
+                //}elseif($qihao >= 120){
+                }elseif($qihao <= 001){
+                    $beforeQihao = substr(Tools::getBeforeDate($date),2,9).'0'.$maxQihao;
+                }
+            }else{
+                $beforeQihao = $beforeQihao;
             }
         }
 
