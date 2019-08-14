@@ -2,6 +2,7 @@
 # 开彩网
 namespace common\kj\cqssc;
 use backend\models\KjConfig;
+use backend\models\SystemConfig;
 use backend\models\TzSystemsUsers;
 use backend\service\CurlService;
 use common\kj\BaseKj;
@@ -130,7 +131,8 @@ class CqsscKcw extends BaseKj {
                 'PageNum'=> 1,
             ];
             $url = $domain.'/api/MemberDesk/GetPeriodsResult?'.http_build_query($post_data);
-            $cookie = TzSystemsUsers::findOne(5)->cookie;
+            $tz_systems_users_id = SystemConfig::findOne(['key'=>'kuaile8_get_kj_user_id'])->value;
+            $cookie = TzSystemsUsers::findOne($tz_systems_users_id)->cookie;
 
             $headers = [
                 'Accept: application/json, text/plain, */*',

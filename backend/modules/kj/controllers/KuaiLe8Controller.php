@@ -9,10 +9,11 @@ use yii\web\Controller;
 class KuaiLe8Controller extends Controller
 {
    /**
-     * @desc 希腊5分彩
+     * @desc 北京快乐8
      * @return array
      */
     public function actionIndex($type = 'json'){
+        p('asdkljfadskljf');
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $data = CqsscKcw::getLotteryKuaiLe8();
         return $data;

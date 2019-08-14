@@ -501,6 +501,7 @@ class SscDataService extends BaseService {
             /*
             */
         ];
+        //p($updateDsDatas);
         //$rst[$interval] = SscDataService::dsYLStatic($interval);
         foreach ($updateDsDatas as $dsData){
             foreach ($dsData['zuHes'] as $key => $zuHe) {
@@ -513,14 +514,22 @@ class SscDataService extends BaseService {
                         $zhi = implode(',',$num);
                         $where = ['positions'=>$position, 'zhi'=>$zhi, 'lottery_type'=>$lottery_type];
                         $SscDsYl = SscDsYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+                        $type = 4;
                         //if(!$SscDsYl)p([$zhi, $position, $SscDsYl]);
-                        $SscDsYl->zhi = (string)$zhi;
-                        $SscDsYl->positions = $position;
-                        $SscDsYl->type = 4;
                     }else{
+                        $zhi = $num;
                         $where = ['AND', ['=', 'positions', $position], ['=','zhi', $num], ['=', 'lottery_type', $lottery_type], ['=', 'LENGTH(zhi)', strlen($num)]];
                         $SscDsYl = SscDsYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+                        $type = 3;
                     }
+                    if(empty($SscDsYl)){
+                        $SscDsYl = new SscDsYl();
+                        $SscDsYl->lottery_type = $lottery_type;
+                        $SscDsYl->zhi = (string)$zhi;
+                        $SscDsYl->positions = $position;
+                        $SscDsYl->type = $type;
+                    }
+
                     $SscDsYl->updated_at = time();
                     $miss = SscDataService::getDsHistoryMiss($num, $position, $lottery_type); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
                     //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
