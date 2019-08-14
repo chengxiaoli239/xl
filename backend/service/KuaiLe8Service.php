@@ -306,7 +306,8 @@ class KuaiLe8Service extends BaseTZService {
             //return $tzRst;
         }
         $time = 600;
-        if(substr($qihao,6) == '023') $time = 60 * 60 * 10; # 十小时
+        //if(substr($qihao,6) == '023') $time = 60 * 60 * 10; # 十小时
+        if('00:00'<date('H:i') && date('H:i')<'09:00') $time = 60 * 60 * 10; # 十小时
         $m->set($betKey, 1, $time);
 
         $n = count(explode('@',$codes));
