@@ -127,6 +127,8 @@ class CqsscKcw extends BaseKj {
                 'lottery' => $lottery,
                 'BeginDt'=> date('Y-m-d'),
                 'EndDt'=> date('Y-m-d'),
+                //'BeginDt'=> '2019-08-14',
+                //'EndDt'=> '2019-08-14',
                 'pageSize'=> 20,
                 'PageNum'=> 1,
             ];
