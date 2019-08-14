@@ -13,7 +13,7 @@ class KuaiLe8Controller extends Controller
      * @return array
      */
     public function actionIndex($type = 'json'){
-        p('asdkljfadskljf');
+        p('asdklfjadsklfjkald');
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $data = CqsscKcw::getLotteryKuaiLe8();
         return $data;

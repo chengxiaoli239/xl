@@ -224,7 +224,7 @@ class CurlService extends BaseService{
 
         $content = curl_exec($curl);
         preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
-        p(['content'=>$content, 'errno'=>curl_error($curl)]);
+        //p(['content'=>$content, 'errno'=>curl_error($curl)]);
         $cookie = $matches[1];
         $logArr = ['content'=>$content, 'cookie'=>$cookie];
         if(curl_error($curl)>0){
