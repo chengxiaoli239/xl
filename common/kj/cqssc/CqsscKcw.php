@@ -141,8 +141,11 @@ class CqsscKcw extends BaseKj {
                 'Cookie:'.$cookie,
                 'Host: '.str_replace('http://', '',$domain),
             ];
+            $start_time = microtime(true);
             $content = CurlService::httpGet($url, $headers);
-            $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$content];
+            $end_time = microtime(true);
+            $time_consume = ($end_time-$start_time).'s';
+            $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$content, 'time_consume'=>$time_consume];
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kl8', 'INFO', '号码抓取-kcw', $logArr);
 
             $data = $content;
@@ -157,6 +160,7 @@ class CqsscKcw extends BaseKj {
             $kjData['opentime'] = str_replace('/', '-',$kjData['drawDt']);
             //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
         }
+        p('9999999999999');
         $opencode = $kjData['opencode'];
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
