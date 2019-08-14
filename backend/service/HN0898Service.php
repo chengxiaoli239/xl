@@ -1206,7 +1206,7 @@ class HN0898Service extends BaseTZService {
             case 7: # 北京快乐8
                 $days = self::getDifferentDays();
                 $nums = self::getDifferentNums();
-                $qihao = 967767 + $days * 179 + $nums - 1; # 967767为2019-08-10最后一期期号
+                $qihao = 967767 + $days * 179 + $nums; # 967767为2019-08-10最后一期期号
                 break;
         }
 
@@ -1238,8 +1238,8 @@ class HN0898Service extends BaseTZService {
     public static function getDifferentNums(){
         $time = time();
         $date_time = date('H:i');
-        $start_time = strtotime(date('Y-m-d').' 09:02');
-        if('00:00'<$date_time && $date_time<'09:02') $time = $start_time;
+        $start_time = strtotime(date('Y-m-d').' 09:05');
+        if('00:00'<$date_time && $date_time<'09:05') $time = $start_time;
         //p([$time, $start_time]);
         $nums = floor(($time - $start_time)/(5*60));
 
