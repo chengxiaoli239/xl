@@ -570,7 +570,7 @@ class SscDataService extends BaseService {
     public static function updateCodeTypeYL($type = 2, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $rst = [];
 
-        $SscStaticVals = SscStaticVal::find()->where(['type'=>$type])->asArray()->all();
+        $SscStaticVals = SscStaticVal::find()->where(['type'=>$type, 'status'=>0])->asArray()->all();
 		/*
         $SscStaticVals = array_merge($SscStaticVals, [
             [ # 三兄弟&隔1
