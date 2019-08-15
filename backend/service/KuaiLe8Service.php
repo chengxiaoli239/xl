@@ -391,7 +391,7 @@ class KuaiLe8Service extends BaseTZService {
 
         $url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER').'?'.http_build_query($post_data);
 
-        $rst = CurlService::httpPost($url,$post_data, $headers);
+        $rst = CurlService::postCurl($url,$post_data, $headers);
         if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
             $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
             $BettingRecords->cancel_status = 1;
@@ -767,7 +767,7 @@ class KuaiLe8Service extends BaseTZService {
             'Upgrade-Insecure-Requests: 1',
         ];
         $url = HN0898Service::getTzSiteInfo($TzSystemsUsers->tz_system_id,'CAPTCHA_CODE');
-        $imageData = CurlService::httpGet($url, $headers);
+        $imageData = CurlService::getCurl($url, $headers);
         $filename = Yii::$app->basePath . "/runtime/captcha/".$uid.'_'.$tz_system_id.'_'.$cookie_key.".png";
         //$filename = Yii::$app->basePath . "/runtime/captcha/".$cookie.".png";
         $tp = fopen($filename,"w");
@@ -891,7 +891,7 @@ class KuaiLe8Service extends BaseTZService {
         //p(self::$headers);
         //$headers = array_unique(array_merge($headers,self::$headers));
 
-        $data = CurlService::httpPost($url,$post_data, $headers);
+        $data = CurlService::postCurl($url,$post_data, $headers);
         //sleep(10);
         self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'code'=>$code, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
@@ -922,7 +922,7 @@ class KuaiLe8Service extends BaseTZService {
             "Host:".str_replace('www.','',self::$domain),
         ];
 
-        $data = CurlService::httpGet($url, $headers);
+        $data = CurlService::getCurl($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
@@ -967,9 +967,10 @@ class KuaiLe8Service extends BaseTZService {
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+            $TzSystemsUsers->user_agent,
         ];
 
-        $data = CurlService::httpGet($url, $headers);
+        $data = CurlService::getCurl($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
