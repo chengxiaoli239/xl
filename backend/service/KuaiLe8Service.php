@@ -1208,9 +1208,10 @@ class KuaiLe8Service extends BaseTZService {
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/',
+            $TzSystemsUsers->user_agent,
         ];
 
-        $data = CurlService::httpGet($url, $headers);
+        $data = CurlService::getCurl($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
