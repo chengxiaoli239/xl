@@ -286,8 +286,8 @@ class KuaiLe8Service extends BaseTZService {
 
         if(in_array($tz_type, [20,23])){
             # 和值投注反应时间比较久，无需返回直接锁住
-            $time = 60*18;
-            if(substr($qihao,6) == '010') $time = 60 * 60 * 4; # 十小时
+            $time = 60*5;
+            //if(substr($qihao,6) == '010') $time = 60 * 60 * 4; # 十小时
             $m->set($betKey, 1, $time);
         }
         # 真实投注
