@@ -262,8 +262,9 @@ class KuaiLe8Service extends BaseTZService {
             'LotteryId' => 18,	# 备注：18 快乐8
             'BetNumber' => $bet_codes,
             'BetAmt'=> $single,
-            'BetTypeId' => 13,
-            'BetWayId' => 4,
+            //'BetTypeId' => 13,
+            //'BetWayId' => 4,
+            'BetWayId' => 1,
             'UserName' => $TzSystemsUsers->account,
         ];
 
