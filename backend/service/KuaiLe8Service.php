@@ -254,7 +254,7 @@ class KuaiLe8Service extends BaseTZService {
 
         $bet_codes = self::formCodesStyle($codes, $playway, $plan->single);
         if($account == 'aa888'){
-            $bet_codes = '5678#0.1'; # 测试
+            //$bet_codes = '5678#0.1'; # 测试
         }
 
         $post_data = [
@@ -284,7 +284,7 @@ class KuaiLe8Service extends BaseTZService {
         $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
-        if(in_array($tz_type, [20,23])){
+        if(in_array($tz_type, [20,23,25])){
             # 和值投注反应时间比较久，无需返回直接锁住
             $time = 60*5;
             //if(substr($qihao,6) == '010') $time = 60 * 60 * 4; # 十小时
