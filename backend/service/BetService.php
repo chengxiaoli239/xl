@@ -8,6 +8,7 @@
 
 namespace backend\service;
 
+use backend\huiYuan\service\HuiYuanService5;
 use backend\models\LotteryType;
 use backend\models\SystemConfig;
 use backend\models\User;
@@ -38,31 +39,37 @@ abstract class BetService extends BaseBetService {
     /**
      * @desc 获取对象
      * @param $uid
-     * @param int $system_type_id
-     * @param $tz_system_id
-     * @return HN0898Service|SevenService
+     * @param $tz_system_id 表lt_tz_systems.id
+     * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     * @return HN0898Service|KuaiLe8Service|SevenService|XlService
      */
-    public static function getBetObj($uid, $system_type_id = 1, $tz_system_id){
+    public static function getBetObj($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
-        switch ($system_type_id){
-            case 1:
-                # 0898体系最终投注
+        if(in_array($tz_system_id, [1,2])){
+            # 1、0898投注、2、99彩票网
+            if($lottery_type == 5){ # 0898体系重庆
                 $BetService = new HN0898Service($uid, $tz_system_id);
-                break;
-            case 2:
-                # 7时彩体系最终投注
+            }
+        }elseif(in_array($tz_system_id, [3])){
+            # 3、重庆7时彩网
+            if($lottery_type == 5){ # 7时彩重庆
                 $BetService = new SevenService($uid, $tz_system_id);
-                break;
-            case 3:
-                # 希腊时时彩
+            }
+        }elseif(in_array($tz_system_id, [4])){
+            # 4、7天彩票网
+        }elseif(in_array($tz_system_id, [5])){
+            # 5、希腊网
+            if($lottery_type == 3) { # 希腊网 5分彩
                 $BetService = new XlService($uid, $tz_system_id);
-                break;
-            case 4:
-                # 北京快乐8
+            }
+        }elseif(in_array($tz_system_id, [6])){
+            # 6、会员网
+            if($lottery_type == 5) { # 重庆时时彩
+                $BetService = new HuiYuanService5($uid, $tz_system_id);
+            }elseif($lottery_type == 7){ # 北京快乐8
                 $BetService = new KuaiLe8Service($uid, $tz_system_id);
-                break;
-            default:
-                break;
+            }
+
         }
 
         return $BetService;
@@ -523,7 +530,7 @@ abstract class BetService extends BaseBetService {
 
            # 5、投注请求
            $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id);
-           $BetService = self::getBetObj($plan->uid, $system_type_id, $tz_system_id);
+           $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
            $rst[] = $BetService->bet($qihao, $plan->id, $codes);
            $isAuto == 0 && BetService::afterBetNow($plan->lottery_type, $qihao); # 手动无需锁
 
