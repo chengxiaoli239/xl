@@ -8,7 +8,7 @@
 
 namespace backend\service;
 
-use backend\huiyuan\service\HuiYuanService5;
+use backend\service\huiyuan\HuiYuanService5;
 use backend\models\LotteryType;
 use backend\models\SystemConfig;
 use backend\models\User;
