@@ -7,7 +7,7 @@
  * Time: 09:40
  */
 
-namespace backend\huiYuan\service;
+namespace backend\service\huiyuan;
 use backend\models\BettingRecords;
 use backend\models\SscKjData;
 use backend\models\SystemConfig;
