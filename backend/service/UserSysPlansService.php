@@ -132,6 +132,7 @@ class UserSysPlansService extends BaseService {
                 $hz_Arr = implode(',', $hz_Arr); # 和值打法
             }else{ # 四定上奖玩法 string
                 $hz_Arr = str_replace('，', ',', $hz_Arr);
+                $hz_Arr = str_replace(' ', ',', $hz_Arr);
             }
             $post['UserSysPlans']['hz_Arr'] && $post['UserSysPlans']['hz_Arr'] = $hz_Arr;
         }
