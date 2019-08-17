@@ -678,20 +678,35 @@ abstract class BetService extends BaseBetService {
         if(!$BettingRecords) return ['status'=>300, 'msg'=>'非法操作'];
         $m = \Yii::$app->cache;
         $mkey = 'ORDER_CANCEL_'.$bet_id;
-        if($isCanceled = $m->get($mkey)) return ['status'=>300, 'msg'=>'正在推单请稍等~'];
-        $TzSystems = TzSystems::findOne($BettingRecords->tz_system_id);
-        switch ($TzSystems->system_type_id){
-            case 1:
-                //$rst = HN0898Service::synBalance($TzSystemsUser->id);
+        if($isCanceled = $m->get($mkey)) return ['status'=>300, 'msg'=>'正在退单请稍等~'];
+
+        $tz_system_id = $BettingRecords->tz_system_id;
+        $lottery_type = $BettingRecords->lottery_type;
+        if(in_array($tz_system_id, [1,2])){
+            # 1、0898投注、2、99彩票网
+            if($lottery_type == 5){ # 0898体系重庆
                 $rst = HN0898Service::cancelOrder($bet_id, $BettingRecords->tz_system_id);
-                break;
-            case 2:
-                //$rst = SevenService::synBalance($TzSystemsUser->id);
+            }
+        }elseif(in_array($tz_system_id, [3])){
+            # 3、重庆7时彩网
+            if($lottery_type == 5){ # 7时彩重庆
                 $rst = SevenService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
-                break;
-            case 3:
-                break;
+            }
+        }elseif(in_array($tz_system_id, [4])){
+            # 4、7天彩票网
+        }elseif(in_array($tz_system_id, [5])){
+            # 5、希腊网
+            if($lottery_type == 3) { # 希腊网 5分彩
+            }
+        }elseif(in_array($tz_system_id, [6])){
+            # 6、会员网
+            if($lottery_type == 5) { # 重庆时时彩
+                $rst = HuiYuanService5::cancelOrder($bet_id, $BettingRecords->tz_system_id);
+            }elseif($lottery_type == 7){ # 北京快乐8
+            }
+
         }
+
         if($rst['status'] == 200){
             $m->set($mkey, 1, 5);
         }

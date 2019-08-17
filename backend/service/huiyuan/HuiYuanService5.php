@@ -19,6 +19,7 @@ use backend\models\UserSysPlans;
 use backend\service\BaseTZService;
 use backend\service\BetService;
 use backend\service\CurlService;
+use backend\service\HN0898Service;
 use backend\service\SscDataService;
 use backend\tools\Tools;
 use common\service\CaptchaCodeService;
@@ -384,13 +385,13 @@ class HuiYuanService5 extends BaseTZService {
         $snid = $BettingRecords->snid;
         self::__init($uid, $tz_system_id);
 
-        $qihao = HN0898Service::getQihao();
+        $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
         $post_data = [ 'ids'=>$snid, 'period_no' => '20'.$qihao];
         $headers = self::$headers;
 
         $url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER').'?'.http_build_query($post_data);
 
-        $rst = CurlService::postCurl($url,$post_data, $headers);
+        $rst = CurlService::postCurl($url, $post_data, $headers);
         if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
             $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
             $BettingRecords->cancel_status = 1;
