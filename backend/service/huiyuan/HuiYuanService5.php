@@ -214,19 +214,12 @@ class HuiYuanService5 extends BaseTZService {
         return $isCaned;
     }
 
-
     /**
      * @decription 新版投注，真实投注入口， 未完待续 2018.12.23
      *
-     * @param $tz_system_id
-     * @param $account
-     * @param int $playway
-     * @param $code
-     * @param $single
      * @param $qihao
-     * @param $tz_type
-     * @param $buy_type
-     * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
+     * @param $plan_id
+     * @param $codes
      * @return array
      */
     public function bet($qihao, $plan_id, $codes){
@@ -263,13 +256,13 @@ class HuiYuanService5 extends BaseTZService {
             'LotteryId' => 2,	# 备注：2重庆时时彩、18快乐8
             'BetNumber' => $bet_codes,
             'BetAmt'=> $single,
-            'BetWayId' => 1,
+            'BetWayId' => self::getWayId($playway),
             'UserName' => $TzSystemsUsers->account,
         ];
 
         $data['code'] = $codes;
         $header = [
-            'type: 18',
+            'type: 2',
             $TzSystemsUsers->user_agent,
         ];
 
@@ -352,15 +345,15 @@ class HuiYuanService5 extends BaseTZService {
      * @param int $tz_type
      * @return array|mixed
      */
-    public static function getWay($tz_type = 20){
+    public static function getWayId($playway = ''){
         $rstData = [
-            20 => 102,
+            4 => 1,
+            3 => 3,
         ];
 
-        if(isset($rstData[$tz_type])) return $rstData[$tz_type];
+        if(!empty($playway) && isset($rstData[$playway])) return $rstData[$playway];
 
-        return 108;
-        //return $rstData;
+        return $rstData;
     }
 
     /**

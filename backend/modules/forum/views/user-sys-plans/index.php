@@ -35,18 +35,6 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                         <?= Html::a($typeData['type_name'], ['create', 'tz_type'=>$typeData['tz_type']], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
                     <?endforeach;?>
-                    <!--div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'User Sys Plans 3d hz'), ['create', 'tz_type'=>20], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-                    </div>
-                    <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'User Sys Plans 3d ds'), ['create', 'tz_type'=>22], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-                    </div>
-                    <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'User Sys Plans 6d'), ['create', 'tz_type'=>17], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-                    </div>
-                    <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'User Sys Plans 23d'), ['create', 'tz_type'=>23], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-                    </div-->
                 </div>
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
