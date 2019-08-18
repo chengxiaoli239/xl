@@ -260,13 +260,20 @@ class UserSysPlansService extends BaseService {
                     'plan_id' => $plan_id,
                 ]);
             }
-            $codes = trim($codes);
-            $codes = str_replace('  ', ',', $codes);
-            $codes = str_replace(' ', ',', $codes);
+            $codesData = trim($codes);
+            $codesData = str_replace('  ', ',', $codesData);
+            $codesData = str_replace(' ', ',', $codesData);
+            $codesArr = explode(',', $codesData);
+            $insertCodes = [];
+            foreach ($codesArr as $tmpCodes){
+                $insertCodes[] = strtoupper($tmpCodes[0]).','.strtoupper($tmpCodes[1]).','.strtoupper($tmpCodes[2]).','.strtoupper($tmpCodes[3]);
+            }
+
+            $insertCodesData = implode('@', $insertCodes);
 
             $setData = array_merge($setData, [
                 'updated_at' => time(),
-                'codes' => $codes,
+                'codes' => $insertCodesData,
             ]);
             $ImportPlanCodes->setAttributes($setData);
             $flag = $ImportPlanCodes->save();

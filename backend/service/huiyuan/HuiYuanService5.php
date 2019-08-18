@@ -449,7 +449,7 @@ class HuiYuanService5 extends BaseTZService {
                 case 1: # 二字定 2357,2468,X,X
                     break;
                 case 2: # 三字定
-                    $codesArr[] = str_replace(',','',$code).'#'.$single;
+                    $codesArr[] = str_replace(',','',strtolower($code)).'#'.$single;
                     break;
                 case 3: # 四字定
                     $codesArr[] = str_replace(',','',$code).'#'.$single;
