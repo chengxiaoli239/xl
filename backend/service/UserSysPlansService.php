@@ -290,7 +290,7 @@ class UserSysPlansService extends BaseService {
     public static function getImportCodes($plan_id){
         $data = ImportPlanCodes::findOne(['plan_id'=>$plan_id]);
 
-        $codes = explode(',',$data->codes);
+        $codes = explode('@',$data->codes);
 
         return $codes;
     }

@@ -247,6 +247,7 @@ class HuiYuanService5 extends BaseTZService {
         $account = User::findOne(['admin_id'=>self::$user_id])->account;  # 投注用户账号
 
         $bet_codes = self::formCodesStyle($codes, $playway, $plan->single);
+        //p(['codes'=>$codes, 'bet_codes'=>$bet_codes]);
         if($account == 'aa888'){
             //$bet_codes = '5678#0.1'; # 测试
         }

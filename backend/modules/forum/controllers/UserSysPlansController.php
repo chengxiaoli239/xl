@@ -124,17 +124,7 @@ class UserSysPlansController extends BaseController
 
         UserSysPlansService::preOpData($this->_post, $this->_user_id);
         //p($this->_post);
-        /*
-        if($this->_post){
-            $this->_post['UserSysPlans']['tz_sites'] = implode(',',$this->_post['UserSysPlans']['tz_sites']);
-            if(is_array($this->_post['UserSysPlans']['hz_Arr'])){
-                $this->_post['UserSysPlans']['hz_Arr'] = implode(',',$this->_post['UserSysPlans']['hz_Arr']);
-            }else { # 四定上奖玩法 string
-                $this->_post['UserSysPlans']['hz_Arr'] = str_replace('，', ',', $this->_post['UserSysPlans']['hz_Arr']);
-            }
-            $this->_post['UserSysPlans']['updated_at'] = time();
-        }
-        */
+
         if ($model->load($this->_post) && $model->save()) {
             //return $this->redirect(['view', 'id' => $model->id]);
             if(in_array($this->_post['UserSysPlans']['tz_type'], \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
@@ -149,7 +139,7 @@ class UserSysPlansController extends BaseController
             $model->hz_Arr = explode(',', $model->hz_Arr);
         }elseif (in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
             $codes = ImportPlanCodes::findOne(['uid'=>$this->_user_id, 'plan_id'=>$model])->codes;
-            $model->import_codes_txt = $codes;
+            $model->import_codes_txt = str_replace('@', ' ', str_replace(',', '', $codes));
         }elseif ($model->tz_type == 25){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
             foreach ($hz_Arr_Data as $key=>$val){
