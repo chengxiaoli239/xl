@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\helpers\BaseStringHelper;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\searchs\UserSysPlans */
@@ -59,11 +60,11 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                         //'tz_type',
                         ['attribute' => 'tz_type','label'=>'购买类型', # 'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
-                                if($model->playway == 2){
+                                if($model->playway == 2 && in_array($model->tz_type, [1,2,3])){
                                     //投注类型:1大小单双三字定2大小三字定3单双三字定
                                     $tz_type_Arr = [1=>'大小单双三字定', 2=>'大小三字定', 3=>'单双三字定'];
                                     $typeName = $tz_type_Arr[$model->tz_type];
-                                }elseif($model->playway == 3){
+                                }elseif($model->playway == 3 OR in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                     $typeName = \backend\service\BetService::getTypeNameByTzType($model->tz_type);
                                 }
                                 return $typeName;
@@ -129,11 +130,18 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                         //'nums',
                         //'hz_Arr',
                         ['attribute' => 'hz_Arr','label'=>'扩展【部分投注】',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
                             'value' => function($model) {
-                                if($model->tz_type == 25){
+                                if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
+                                    $str = \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
+                                    $txt = BaseStringHelper::truncate($str,25);
+                                    $str = Html::a($txt, '#', ['title' => $str,'alt'=>$str]);
+                                }elseif($model->tz_type == 25){
                                     $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
                                 }else{
                                     $str = $model->hz_Arr;
+                                    $txt = BaseStringHelper::truncate($str,25);
+                                    $str = Html::a($txt, '#', ['title' => $str,'alt'=>$str]);
                                 }
                                 return $str;
                             }

@@ -264,6 +264,13 @@ class HuiYuanService5 extends BaseTZService {
         $header = [
             'type: 2',
             $TzSystemsUsers->user_agent,
+            'Accept-Encoding: gzip, deflate',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Connection: keep-alive',
+            //'Content-Length:'.strlen($post_data),
+            'Content-Length:'.strlen(http_build_query($post_data)),
+            "Host:".str_replace('www.','',self::$domain),
+            'Cookie: Token='.$TzSystemsUsers->cookie,
         ];
 
         $headers = array_merge(self::$headers, $header);
@@ -277,7 +284,7 @@ class HuiYuanService5 extends BaseTZService {
         $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
-        if(in_array($tz_type, [20,23,25])){
+        if(in_array($tz_type, [20,23,25,19])){
             # 和值投注反应时间比较久，无需返回直接锁住
             $time = 60*18;
             if(substr($qihao,6) == '010') $time = 60 * 60 * 4; # 十小时
@@ -285,6 +292,7 @@ class HuiYuanService5 extends BaseTZService {
         }
         # 真实投注
         $start_time = microtime(true);
+        //p([$url,$post_data, $headers, $playway]);
         $rst = CurlService::postCurl($url, http_build_query($post_data), $headers);
         //$rst = json_encode($rst);
         //p([$rst,$url,$post_data, $headers]);
@@ -341,14 +349,15 @@ class HuiYuanService5 extends BaseTZService {
     }
 
     /**
-     * @desc 根据playway、tz_type 获取投注方式
+     * @desc 根据playway 2二定3四定 获取投注方式
      * @param int $tz_type
      * @return array|mixed
      */
     public static function getWayId($playway = ''){
         $rstData = [
             4 => 1,
-            3 => 3,
+            3 => 3, # 四字定
+            2 => 3, # 三字定 1快选 3导入
         ];
 
         if(!empty($playway) && isset($rstData[$playway])) return $rstData[$playway];
@@ -408,7 +417,7 @@ class HuiYuanService5 extends BaseTZService {
      * @return string  格式：X1XX,X6XX
      */
     public static function formCodesStyle($codes, $playway = 10, $single = 0.1){
-        //p([$codes, $playway]);
+        //p([$codes, $playway, $single]);
         $codes = explode('@', $codes);
         //p($codes, 0);
 
@@ -440,6 +449,7 @@ class HuiYuanService5 extends BaseTZService {
                 case 1: # 二字定 2357,2468,X,X
                     break;
                 case 2: # 三字定
+                    $codesArr[] = str_replace(',','',$code).'#'.$single;
                     break;
                 case 3: # 四字定
                     $codesArr[] = str_replace(',','',$code).'#'.$single;

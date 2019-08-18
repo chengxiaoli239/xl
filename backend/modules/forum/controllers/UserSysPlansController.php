@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\models\ImportPlanCodes;
 use backend\models\TzSystemsAuth;
 use backend\service\BetService;
 use backend\service\HN0898Service;
@@ -83,6 +84,9 @@ class UserSysPlansController extends BaseController
 
         UserSysPlansService::preOpData($this->_post, $this->_user_id);
         if ($model->load($this->_post) && $model->save()) {
+            if(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
+                UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txt'], $this->_user_id);
+            }
             return $this->redirect(['index']);
         }
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
@@ -133,6 +137,9 @@ class UserSysPlansController extends BaseController
         */
         if ($model->load($this->_post) && $model->save()) {
             //return $this->redirect(['view', 'id' => $model->id]);
+            if(in_array($this->_post['UserSysPlans']['tz_type'], \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
+                UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txt'], $this->_user_id);
+            }
             return $this->redirect(['index']);
         }
         //p($this->_post);
@@ -140,6 +147,9 @@ class UserSysPlansController extends BaseController
         $model->tz_sites = explode(',', $model->tz_sites);
         if(in_array($model->tz_type, [20, 22])){ # 和值、四定单双
             $model->hz_Arr = explode(',', $model->hz_Arr);
+        }elseif (in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
+            $codes = ImportPlanCodes::findOne(['uid'=>$this->_user_id, 'plan_id'=>$model])->codes;
+            $model->import_codes_txt = $codes;
         }elseif ($model->tz_type == 25){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
             foreach ($hz_Arr_Data as $key=>$val){

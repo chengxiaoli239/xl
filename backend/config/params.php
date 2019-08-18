@@ -20,5 +20,8 @@ return [
 
     'TZ_LOCK_TIME' => 4 * 60 * 60,
 
+    # 导入号码投注类型
+    'IMPORT_CODES_TYPES' => [ 19 ],
+
 ];
 

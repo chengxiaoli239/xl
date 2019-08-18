@@ -8,6 +8,7 @@
  */
 
 namespace backend\service;
+use backend\models\ImportPlanCodes;
 use backend\models\SscDsYl;
 use backend\models\SysPlansCodes;
 use backend\models\TzSystemsAuth;
@@ -37,7 +38,7 @@ class UserSysPlansService extends BaseService {
             $post['UserSysPlans']['playway'] = $playway;
         }
         $post['UserSysPlans']['lottery_type'] = $lottery_type;
-        //p($post);
+        //p($post,0);
         //p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id]);
         $User = AdminModel::findOne($user_id);
         $post['UserSysPlans']['tz_sites'] = implode(',',$post['UserSysPlans']['tz_sites']);
@@ -241,6 +242,53 @@ class UserSysPlansService extends BaseService {
     }
 
     /**
+     * @desc 保存导入方案号码
+     * @param $plan_id
+     * @param $codes
+     * @param $uid
+     */
+    public static function saveImportCodesTxt($plan_id, $codes, $uid){
+        $setData = [];
+
+        $flag = false;
+        if($plan_id){
+            if(!$ImportPlanCodes = ImportPlanCodes::findOne(['uid'=>$uid, 'plan_id'=>$plan_id])){
+                $ImportPlanCodes = new ImportPlanCodes();
+                $setData = array_merge($setData, [
+                    'created_at' => time(),
+                    'uid' => $uid,
+                    'plan_id' => $plan_id,
+                ]);
+            }
+            $codes = trim($codes);
+            $codes = str_replace('  ', ',', $codes);
+            $codes = str_replace(' ', ',', $codes);
+
+            $setData = array_merge($setData, [
+                'updated_at' => time(),
+                'codes' => $codes,
+            ]);
+            $ImportPlanCodes->setAttributes($setData);
+            $flag = $ImportPlanCodes->save();
+        }
+
+        return $flag;
+    }
+
+    /**
+     * @desc 导入方案号码表数据
+     * @param $plan_id
+     * @return string
+     */
+    public static function getImportCodes($plan_id){
+        $data = ImportPlanCodes::findOne(['plan_id'=>$plan_id]);
+
+        $codes = explode(',',$data->codes);
+
+        return $codes;
+    }
+
+    /**
      * @desc 添加投注类型对应表单数据
      * @param int $playway
      * @param $tz_type
@@ -343,7 +391,7 @@ class UserSysPlansService extends BaseService {
             $yls = [];
             foreach ($ids as $id){
                 $plan = UserSysPlans::findOne($id);
-                $codes = BetService::getPlansAllCodesType1($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr);
+                $codes = BetService::getPlansAllCodesType1($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
                 $yl = StaticService::getYlByCodes($codes, $lottery_type, $plan->tz_type);
                 $key = array_search($plan->single, $singleArr);
 

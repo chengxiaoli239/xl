@@ -34,24 +34,19 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'single')->textInput() ?>
 
-                    <!--?= $form->field($model, 'tz_type')->textInput() ?-->
+                    <?= $form->field($model, 'import_codes_txt')->textInput()->label('上奖号码(三个数字一组)，多组英文逗号或者空格隔开') ?>
+                    <input type="hidden" name="UserSysPlans[tz_type]" value="19"><!--三定导入-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
-                    <?= $form->field($model, 'tz_type')->radioList([
-                        //'1'=>'大小单双三字定',
-                        //'2'=>'大小三字定',
-                        '3'=>'单双三字定',
-                    ])->label('投注类型') ?>
+                    <!--?= $form->field($model, 'tz_type')->radioList([ //'1'=>'大小单双三字定', //'2'=>'大小三字定', '3'=>'单双三字定', ])->label('投注类型') ?-->
 
                     <!--?= $form->field($model, 'buy_type')->textInput() ?-->
-                    <?= $form->field($model, 'buy_type')->radioList([
-                        '0'=>'反买',
-                        '1'=>'正买',
-                    ])->label('购买方向') ?>
+                    <!--?= $form->field($model, 'buy_type')->radioList([ '0'=>'反买', '1'=>'正买',])->label('购买方向') ?-->
+
+                    <!--?= $form->field($model, 'nums')->textInput() ?-->
 
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
 
-                    <?= $form->field($model, 'nums')->textInput() ?>
 
                     <!--?= $form->field($model, 'created_at')->textInput() ?-->
 
