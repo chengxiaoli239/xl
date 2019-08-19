@@ -306,7 +306,7 @@ class HuiYuanService5 extends BaseTZService {
                 $tzRst['code'] = $codes;
             }
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
-            if($strLen<1000) return $tzRst;
+            return $tzRst;
         }
         $time = 600;
         //if(substr($qihao,6) == '023') $time = 60 * 60 * 10; # 十小时
