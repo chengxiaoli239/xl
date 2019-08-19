@@ -262,6 +262,7 @@ class HuiYuanService5 extends BaseTZService {
         ];
 
         $data['code'] = $codes;
+        $strLen = strlen(http_build_query($post_data));
         $header = [
             'type: 2',
             $TzSystemsUsers->user_agent,
@@ -269,7 +270,7 @@ class HuiYuanService5 extends BaseTZService {
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
             'Connection: keep-alive',
             //'Content-Length:'.strlen($post_data),
-            'Content-Length:'.strlen(http_build_query($post_data)),
+            'Content-Length:'.$strLen,
             "Host:".str_replace('www.','',self::$domain),
             'Cookie: Token='.$TzSystemsUsers->cookie,
         ];
@@ -305,7 +306,7 @@ class HuiYuanService5 extends BaseTZService {
                 $tzRst['code'] = $codes;
             }
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
-            //return $tzRst;
+            if($strLen<1000) return $tzRst;
         }
         $time = 600;
         //if(substr($qihao,6) == '023') $time = 60 * 60 * 10; # 十小时
