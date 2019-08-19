@@ -632,9 +632,26 @@ class NumService extends BaseService {
             $where = array_merge($where, [ ['IN', 'code_4', $p4_codes] ]);
         }
 
-        # 四单四双
-        if(isset($codes_hz['type_4ds']) && !empty($codes_hz['type_4ds'])){
-            $where = array_merge($where, [['=', 'type_4ds', $codes_hz['type_4ds']]]);
+        # 四单
+        if(isset($codes_hz['type_4d']) && !empty($codes_hz['type_4d'])){
+            if($codes_hz['type_4d'] == 1){
+                # 取
+                $where = array_merge($where, [['=', 'type_4ds', 1]]);
+            }else{
+                # 除
+                $where = array_merge($where, [['IN', 'type_4ds', [0,2]]]);
+            }
+        }
+
+        # 四双
+        if(isset($codes_hz['type_4s']) && !empty($codes_hz['type_4s'])){
+            if($codes_hz['type_4s'] == 1){
+                # 取
+                $where = array_merge($where, [['=', 'type_4ds', 2]]);
+            }else{
+                # 除
+                $where = array_merge($where, [['IN', 'type_4ds', [0,1]]]);
+            }
         }
 
         # 对数

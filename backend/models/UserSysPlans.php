@@ -42,7 +42,8 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $p2; # 第2位
     public $p3; # 第3位
     public $p4; # 第4位
-    public $type_4ds; # 四单四双
+    public $type_4d; # 四单
+    public $type_4s; # 四双
     public $type_log; # 对数
     public $import_codes_txt; # 导入号码
     //public $type_3_txt; # 三定-导入

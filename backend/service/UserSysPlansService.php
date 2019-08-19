@@ -126,6 +126,17 @@ class UserSysPlansService extends BaseService {
             }
             unset($post['UserSysPlans']['type_log']);
 
+            # 15、四单
+            if($UserSysPlans['type_4d'] && count($UserSysPlans['type_4d']) == 1){
+                $tmpFilter['type_4d'] = $UserSysPlans['type_4d'][0];
+            }
+            unset($post['UserSysPlans']['type_4d']);
+            # 1l、四双
+            if($UserSysPlans['type_4s'] && count($UserSysPlans['type_4s']) == 1){
+                $tmpFilter['type_4s'] = $UserSysPlans['type_4s'][0];
+            }
+            unset($post['UserSysPlans']['type_4s']);
+
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
         }else{
             $hz_Arr = $post['UserSysPlans']['hz_Arr'];

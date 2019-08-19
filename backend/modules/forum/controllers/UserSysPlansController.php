@@ -133,6 +133,7 @@ class UserSysPlansController extends BaseController
             return $this->redirect(['index']);
         }
         //p($this->_post);
+        //d(\Yii::$app->params['IMPORT_CODES_TYPES']);
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
         $model->tz_sites = explode(',', $model->tz_sites);
         if(in_array($model->tz_type, [20, 22])){ # 和值、四定单双
@@ -143,7 +144,7 @@ class UserSysPlansController extends BaseController
         }elseif ($model->tz_type == 25){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
             foreach ($hz_Arr_Data as $key=>$val){
-                if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'arise', 'type_4ds'])){
+                if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'arise', 'type_4d', 'type_4s'])){
                     $model->$key = $val;
                 }else{
                     $model->$key[] = $val;
