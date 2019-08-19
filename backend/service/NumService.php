@@ -748,9 +748,13 @@ class NumService extends BaseService {
         if(isset($hz_Arr['hz']) && !empty($hz_Arr['hz'])){
             $filter2['hz'] = implode(',',$hz_Arr['hz']);
         }
-        # 9、四单四双
-        if(isset($hz_Arr['type_4ds'])){
-            if($hz_Arr['type_4ds']) $filter1['type_4ds'] = $hz_Arr['type_4ds']; //else $filter0['type_4ds'] = 0;
+        # 9、四单
+        if(isset($hz_Arr['type_4d'])){
+            if($hz_Arr['type_4d'] == 1) $filter1['type_4d'] = 1; else $filter0['type_4d'] = 0;
+        }
+        # 10、四双
+        if(isset($hz_Arr['type_4s'])){
+            if($hz_Arr['type_4s'] == 1) $filter1['type_4s'] = 1; else $filter0['type_4s'] = 0;
         }
 
         $typesArr = self::getNameByCodesType();
@@ -815,8 +819,8 @@ class NumService extends BaseService {
             'type_3b'=>'三兄弟',
             'type_4b'=>'四兄弟',
             'type_log'=>'对数',
-            'type_4ds_1'=>'四单',
-            'type_4ds_2'=>'四双',
+            'type_4d'=>'四单',
+            'type_4s'=>'四双',
             'arise'=>'上奖',
         ];
 

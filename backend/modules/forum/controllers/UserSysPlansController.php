@@ -133,7 +133,6 @@ class UserSysPlansController extends BaseController
             return $this->redirect(['index']);
         }
         //p($this->_post);
-        //d(\Yii::$app->params['IMPORT_CODES_TYPES']);
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
         $model->tz_sites = explode(',', $model->tz_sites);
         if(in_array($model->tz_type, [20, 22])){ # 和值、四定单双
