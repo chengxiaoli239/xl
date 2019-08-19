@@ -632,25 +632,41 @@ class NumService extends BaseService {
             $where = array_merge($where, [ ['IN', 'code_4', $p4_codes] ]);
         }
 
-        # 四单
-        if(isset($codes_hz['type_4d']) && !empty($codes_hz['type_4d'])){
-            if($codes_hz['type_4d'] == 1){
-                # 取
-                $where = array_merge($where, [['=', 'type_4ds', 1]]);
-            }else{
-                # 除
-                $where = array_merge($where, [['IN', 'type_4ds', [0,2]]]);
-            }
-        }
 
-        # 四双
-        if(isset($codes_hz['type_4s']) && !empty($codes_hz['type_4s'])){
-            if($codes_hz['type_4s'] == 1){
-                # 取
-                $where = array_merge($where, [['=', 'type_4ds', 2]]);
-            }else{
-                # 除
-                $where = array_merge($where, [['IN', 'type_4ds', [0,1]]]);
+
+        if( isset($codes_hz['type_4d']) && isset($codes_hz['type_4s'])){
+
+            if(($codes_hz['type_4s'] == 0 && $codes_hz['type_4d'] == 0) OR ($codes_hz['type_4s'] == 1 && $codes_hz['type_4d'] == 1) ){
+                # 同时除、取四单四双
+                if($codes_hz['type_4s'] == 0 && $codes_hz['type_4d'] == 0){
+                    # 除
+                    $where = array_merge($where, [['=', 'type_4ds', 0]]);
+                }else{
+                    # 取
+                    $where = array_merge($where, [['IN', 'type_4ds', [1,2]]]);
+                }
+
+            } else {
+                # 四单
+                if (isset($codes_hz['type_4d']) && !empty($codes_hz['type_4d'])) {
+                    if ($codes_hz['type_4d'] == 1) {
+                        # 取
+                        $where = array_merge($where, [['=', 'type_4ds', 1]]);
+                    } else {
+                        # 除
+                        $where = array_merge($where, [['IN', 'type_4ds', [0, 2]]]);
+                    }
+                }
+                # 四双
+                if (isset($codes_hz['type_4s']) && !empty($codes_hz['type_4s'])) {
+                    if ($codes_hz['type_4s'] == 1) {
+                        # 取
+                        $where = array_merge($where, [['=', 'type_4ds', 2]]);
+                    } else {
+                        # 除
+                        $where = array_merge($where, [['IN', 'type_4ds', [0, 1]]]);
+                    }
+                }
             }
         }
 
@@ -671,7 +687,7 @@ class NumService extends BaseService {
             $codesArr_arise = self::getCodesArise([$codes_hz['arise']]);
             $codesArr = array_intersect($codesArr, $codesArr_arise);
         }
-        //p($codesArr);
+        p($codesArr);
 
         return array_unique($codesArr);
     }
