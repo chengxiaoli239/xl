@@ -12,6 +12,7 @@ use backend\models\Admin;
 use backend\models\SscKjData;
 use backend\models\TzSystemsUsers;
 use backend\service\BetService;
+use backend\service\huiyuan\HuiYuanService5;
 use backend\service\KuaiLe8Service;
 use backend\service\NumService;
 use backend\service\SevenService;
@@ -104,6 +105,7 @@ class IndexController extends Controller
 
     public function actionDw(){
 
+        $rst = HuiYuanService5::login(18, 6);p($rst);
         $rst = NumService::getCodesKuaiXuan(['type_log'=>'1']);p($rst);
         $rst = KuaiLe8Service::synBalance(9);p($rst);
         for ($i=0;$i<5; $i++){
@@ -115,7 +117,6 @@ class IndexController extends Controller
         $rst = HN0898Service::getQihao( 7 );p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=7); p($rst);// 单双遗漏
         $rst['bet'] = BetService::bet();p($rst); // 用户新计划投注，可正买可反买
-        $rst = KuaiLe8Service::login(19, 6);p($rst);
         $rst = SscDataService::clearDataTables();p($rst);
         $rst = SscDataService::insertCodeType();p($rst);
         $rst = HN0898Service::getDifferentNums();p($rst);

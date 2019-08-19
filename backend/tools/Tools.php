@@ -62,7 +62,7 @@ class Tools
                 $codeRst = CaptchaCodeService::jianjiao($filename); # 尖叫数据
                 break;
             case 4:
-                $codeType = $tz_system_id == 5 ? '6001' : '1902';
+                $codeType = in_array($tz_system_id, [5, 6]) ? '6001' : '1902';
                 $codeRst = CaptchaCodeService::chaojiying($filename, $codeType); # 超级鹰
                 break;
             default:break;

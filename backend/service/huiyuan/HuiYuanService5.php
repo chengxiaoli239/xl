@@ -727,7 +727,7 @@ class HuiYuanService5 extends BaseTZService {
         //if(!$cookie = $m->get($mkey)){
             //p(HN0898Service::getTzSiteInfo($tz_system_id));
             # 1、预登录
-            $_t = microtime(true) * 10000;
+            $_t = microtime(true) * 1000;
             $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/Home/GetValidateCode'.'?_'.$_t;
             if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
             $headers = [
@@ -742,14 +742,15 @@ class HuiYuanService5 extends BaseTZService {
             if($cookieData){
                 $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
                 $TzSystemsUsers->cookie = trim($cookieData);
+                $TzSystemsUsers->user_agent = 'User-Agent: '.$_SERVER['HTTP_USER_AGENT'];
                 $TzSystemsUsers->cookie = str_replace('; path=/; HttpOnly','', $TzSystemsUsers->cookie);
                 $TzSystemsUsers->save();
             }
             self::$headers = [];
             $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
-            $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
-            $cookie = str_replace('; path=/; HttpOnly','',$cookie);
+            $cookie = str_replace(' ValidateToken=','',$cookie);
+            $cookie = str_replace('; path=/','',$cookie);
             $m->set($mkey, $cookie, 180);
         //}
         return $cookie;
@@ -765,16 +766,20 @@ class HuiYuanService5 extends BaseTZService {
     public static function downLoadCodeImg($uid, $tz_system_id, $cookie_key){
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $headers = [
-            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            //'Accept-Encoding: gunzip, deflate, br',
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'Accept-Encoding: gzip, deflate',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Cache-Control: max-age=0',
+            'Connection: keep-alive',
             'Cookie: '.$TzSystemsUsers->cookie,
-            'Host: '.HN0898Service::getTzSiteInfo($TzSystemsUsers->tz_system_id,'domain'),
+            'Host: '.str_replace('http://', '', self::getTzSiteInfo($TzSystemsUsers->tz_system_id,'SSC_INDEX')),
             'Upgrade-Insecure-Requests: 1',
+            $TzSystemsUsers->user_agent,
         ];
-        $url = HN0898Service::getTzSiteInfo($TzSystemsUsers->tz_system_id,'CAPTCHA_CODE');
+        $_t = microtime(true) * 10000;
+        $url = self::getTzSiteInfo($TzSystemsUsers->tz_system_id,'SSC_INDEX').'/api/home/GetValidateCode?_='.$_t;
         $imageData = CurlService::getCurl($url, $headers);
         $filename = Yii::$app->basePath . "/runtime/captcha/".$uid.'_'.$tz_system_id.'_'.$cookie_key.".png";
-        //$filename = Yii::$app->basePath . "/runtime/captcha/".$cookie.".png";
         $tp = fopen($filename,"w");
         fwrite($tp, $imageData);
         fclose($tp);
@@ -798,6 +803,7 @@ class HuiYuanService5 extends BaseTZService {
         if(isset($cookie_key['status']) && $cookie_key['status'] == 300) return $cookie_key;
         # 第二步：下载验证码图片
         self::downLoadCodeImg($uid, $tz_system_id, $cookie_key);
+        //p([$uid, $tz_system_id, $cookie_key]);
         # 第三步：调验证码接口获取验证码
         //$captchaCode = '888888'; $rst = self::loginRemote($uid, $tz_system_id,$captchaCode); p($rst);  # 测试
         $captchaCodeRst = Tools::getCaptchaCode($uid, $tz_system_id, $cookie_key); # 真实调用验证码接口，收费
