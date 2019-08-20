@@ -268,7 +268,7 @@ class HuiYuanService5 extends BaseTZService {
             'Accept-Encoding: gzip, deflate',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
             'Connection: keep-alive',
-            'Content-Length:'.strlen(json_encode($post_data)),
+            'Content-Length:'.$strLen,
             'Content-Type: application/x-www-form-urlencoded',
             'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
             'Cookie: '.$TzSystemsUsers->cookie,
@@ -279,7 +279,7 @@ class HuiYuanService5 extends BaseTZService {
             $TzSystemsUsers->user_agent,
         ];
 
-        $headers = array_merge(self::$headers, $headers);
+        //$headers = array_merge(self::$headers, $headers);
         //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
         $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL'); # .'?'.http_build_query($post_data);
 
@@ -288,7 +288,7 @@ class HuiYuanService5 extends BaseTZService {
         # 缓存锁
         $m = \Yii::$app->cache;
         $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
-        if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
+        //if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
         if(in_array($tz_type, [20,23,25,19])){
             # 和值投注反应时间比较久，无需返回直接锁住
@@ -298,10 +298,10 @@ class HuiYuanService5 extends BaseTZService {
         }
         # 真实投注
         $start_time = microtime(true);
-        p([$url,$post_data, $headers, $playway]);
+        //p([$url,$post_data, $headers, $playway]);
         $rst = CurlService::postCurl($url, http_build_query($post_data), $headers);
         //$rst = json_encode($rst);
-        //p([$rst,$url,$post_data, $headers]);
+        //p([$playway, $rst,$url,$post_data, $headers]);
         $end_time = microtime(true);
         $time_consume = ($end_time - $start_time). 's';
         if($rst['Status'] != 1 OR !$rst){
@@ -1238,13 +1238,11 @@ class HuiYuanService5 extends BaseTZService {
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
-        $_t = microtime(true) * 10000;
         $lottery = self::getSiteLottery($lottery_type);
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetTheLastThree?lottery='.$lottery;
         $headers = [
             "Accept: application/json, text/plain, */*",
-            "Cookie: Token=".urlencode($TzSystemsUsers->cookie),
+            "Cookie:".$TzSystemsUsers->cookie,
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/',
@@ -1252,13 +1250,13 @@ class HuiYuanService5 extends BaseTZService {
         ];
 
         $data = CurlService::getCurl($url, $headers);
-        //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getQihaoInfo','INFO','快乐8登陆前', $logArr);
 
         return $data;
     }
+
 
     private static function getSiteLottery($lottery_type = DEFAULT_LOTTERY_TYPE){
         $lottery = [

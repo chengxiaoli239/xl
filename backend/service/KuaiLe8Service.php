@@ -269,12 +269,13 @@ class KuaiLe8Service extends BaseTZService {
         ];
 
         $data['code'] = $codes;
+        $strLen = strlen(http_build_query($post_data));
         $headers = [
             'Accept: application/json, text/plain, */*',
             'Accept-Encoding: gzip, deflate',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
             'Connection: keep-alive',
-            'Content-Length:'.strlen(json_encode($post_data)),
+            'Content-Length:'.$strLen,
             'Content-Type: application/x-www-form-urlencoded',
             'Cookie: '.$TzSystemsUsers->cookie,
             'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
@@ -1027,11 +1028,11 @@ class KuaiLe8Service extends BaseTZService {
             "Accept-Encoding: gzip, deflate",
             "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
             "Connection: keep-alive",
-            "Cookie:".trim($TzSystemsUsers->cookie),
+            "Cookie: ".trim($TzSystemsUsers->cookie),
             //'Token:'.self::getCookieDataByKey($TzSystemsUsers->cookie, 'Token'),
             //"Origin:".str_replace('www.','',self::$baseUrl),
-            "Host:".str_replace('www.','',self::$domain),
-            "Referer:".$TzSystemsUsers->ssc_domain.'/',
+            "Host: ".str_replace('www.','',self::$domain),
+            "Referer: ".$TzSystemsUsers->ssc_domain.'/',
             $TzSystemsUsers->user_agent,
         ];
 
@@ -1039,8 +1040,8 @@ class KuaiLe8Service extends BaseTZService {
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','7时彩-登陆记录', $logArr);
+        //p($logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','会员网-用户信息', $logArr);
         return $data;
     }
 
