@@ -250,7 +250,7 @@ class KuaiLe8Service extends BaseTZService {
         }
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id]);
-        $account = User::findOne(['admin_id'=>self::$user_id])->account;  # 投注用户账号
+        $account = $TzSystemsUsers->username;  # 投注用户账号，自动化平台账号
 
         $bet_codes = self::formCodesStyle($codes, $playway, $plan->single);
         if($account == 'aa888'){

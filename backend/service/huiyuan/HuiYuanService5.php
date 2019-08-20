@@ -244,13 +244,10 @@ class HuiYuanService5 extends BaseTZService {
         }
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id]);
-        $account = User::findOne(['admin_id'=>self::$user_id])->account;  # 投注用户账号
+        $account = $TzSystemsUsers->username;  # 投注用户账号，自动化平台账号
 
         $bet_codes = self::formCodesStyle($codes, $playway, $plan->single);
         //p(['codes'=>$codes, 'bet_codes'=>$bet_codes]);
-        if($account == 'aa888'){
-            //$bet_codes = '5678#0.1'; # 测试
-        }
 
         $post_data = [
             'PeriodId' => $qihaoInfo['PeriodsID'],
@@ -288,7 +285,9 @@ class HuiYuanService5 extends BaseTZService {
         # 缓存锁
         $m = \Yii::$app->cache;
         $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
-        if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
+        if($betLock = $m->get($betKey)){
+            return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
+        }
 
         if(in_array($tz_type, [20,23,25,19])){
             # 和值投注反应时间比较久，无需返回直接锁住
