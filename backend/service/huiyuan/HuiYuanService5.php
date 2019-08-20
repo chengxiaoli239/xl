@@ -288,7 +288,7 @@ class HuiYuanService5 extends BaseTZService {
         # 缓存锁
         $m = \Yii::$app->cache;
         $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
-        //if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
+        if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
         if(in_array($tz_type, [20,23,25,19])){
             # 和值投注反应时间比较久，无需返回直接锁住
