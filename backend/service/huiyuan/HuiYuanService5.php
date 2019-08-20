@@ -736,7 +736,7 @@ class HuiYuanService5 extends BaseTZService {
                 'Host: '.self::getTzSiteInfo($tz_system_id,'domain'),
                 //'Referer: '.$url,
             ];
-            $cookie = CurlService::curl_get_cookie($url, $headers);
+            $cookie = CurlService::curlGetCookie($url, $headers);
             //p(['url'=>$url, 'headers'=>$headers, 'cookie'=>$cookie]);
             $cookieData = $cookie;
             if($cookieData){
@@ -769,9 +769,9 @@ class HuiYuanService5 extends BaseTZService {
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
             'Accept-Encoding: gzip, deflate',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Cache-Control: max-age=0',
+            //'Cache-Control: max-age=0',
             'Connection: keep-alive',
-            'Cookie: '.$TzSystemsUsers->cookie,
+            //'Cookie: '.$TzSystemsUsers->cookie,
             'Host: '.str_replace('http://', '', self::getTzSiteInfo($TzSystemsUsers->tz_system_id,'SSC_INDEX')),
             'Upgrade-Insecure-Requests: 1',
             $TzSystemsUsers->user_agent,
@@ -807,12 +807,16 @@ class HuiYuanService5 extends BaseTZService {
         # 第三步：调验证码接口获取验证码
         //$captchaCode = '888888'; $rst = self::loginRemote($uid, $tz_system_id,$captchaCode); p($rst);  # 测试
         $captchaCodeRst = Tools::getCaptchaCode($uid, $tz_system_id, $cookie_key); # 真实调用验证码接口，收费
+        //p($captchaCodeRst);
         //$code = $captchaCode['result'];
         if($captchaCodeRst['status'] == 200){
             $code = $captchaCodeRst['code'];
             # 第四步：账号、验证码登录
             $rst = self::loginRemote($uid, $tz_system_id, $code);
         }
+
+        # 第四步：同意
+        $rst = self::acceptAgreement($uid, $tz_system_id);
 
         return $rst;
     }
@@ -875,39 +879,36 @@ class HuiYuanService5 extends BaseTZService {
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        $htmlData = self::getCodesAndFormData($uid, $tz_system_id);
-        //p($htmlData);
-        $post_data = $htmlData['htmlArr']['inputs'];
-        $post_data['ctl00$txtUser'] = $TzSystemsUsers->account;
-        $post_data['ctl00$txtPwd'] = $TzSystemsUsers->password;
-        $post_data['ctl00$txtcode'] = $code;
-        //p($post_data);
+        $post_data = [
+            'Username' => $TzSystemsUsers->account,
+            'Password' => $TzSystemsUsers->password,
+            'NECaptchaValidate' => $code,
+        ];
 
-        $url = self::getTzSiteInfo($tz_system_id, 'INDEX');
+        $url = self::getTzSiteInfo($tz_system_id, 'SSC_INDEX').'/api/Home/MemberLogin';
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'url'=>$url];
-        $post_data = http_build_query($post_data);
         $headers = [
-            "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-            //"Accept-Encoding: gzip, deflate, br", # gunzip 防止乱码
-            //"Accept-Encoding: gunzip, deflate, br", # gunzip 防止乱码
-            "Cache-Control:max-age=0",
-            "Upgrade-Insecure-Requests:1",
-            "Content-Length:".strlen($post_data),
-            "Content-Type: application/x-www-form-urlencoded",
-            "Cookie: ".trim($TzSystemsUsers->cookie),
-            "Origin:".str_replace('www.','',self::$baseUrl),
-            "Host:".str_replace('www.','',self::$domain),
-            "Referer:".$TzSystemsUsers->ssc_domain,
+            'Accept: application/json, text/plain, */*',
+            'Accept-Encoding: gzip, deflate',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Connection: keep-alive',
+            'Content-Length: '.strlen(json_encode($post_data)),
+            'Content-Type: application/json;charset=UTF-8',
+            'Cookie: '.str_replace('; path=/', '',$TzSystemsUsers->cookie),
+            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+            'Origin: '.$TzSystemsUsers->ssc_domain,
+            'Referer: '.$TzSystemsUsers->ssc_domain.'/login.html',
+            $TzSystemsUsers->user_agent,
         ];
         //p(self::$headers);
         //$headers = array_unique(array_merge($headers,self::$headers));
 
-        $data = CurlService::postCurl($url,$post_data, $headers);
+        $data = CurlService::postCurl($url,json_encode($post_data), $headers);
         //sleep(10);
         self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'code'=>$code, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
-        //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        p($logArr);
         return $data;
     }
 
@@ -918,13 +919,15 @@ class HuiYuanService5 extends BaseTZService {
      * @return mixed|string
      */
     private static function acceptAgreement($uid, $tz_system_id){
+        $rst = CurlService::getCurl('http://zhxtimght.miandianjiameng.com/static/js/0.8c65143ce3ef6da23e77.js');
+        return $rst;
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
         $_t = microtime(true) * 10000;
         //$url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/App/Index'.'?_'.$_t;
-        $url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/AcceptAgreement'.'?_'.$_t;
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/AcceptAgreement'.'?_'.$_t;
         $headers = [
             "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
             "Cache-Control:max-age=0",

@@ -1,7 +1,7 @@
 会员网登陆流程
 1、获取下载验证码图片顺带设置ValidateToken
 General
-	Request URL: http://zhxthy1t.58gocm.com/api/home/GetValidateCode?_=1566237445668
+	Request URL: http://zhxthy1t.58gocm.com/api/home/GetValidateCode?_=1566237445668 
 	Request Method: GET
 	Status Code: 200 OK
 	Remote Address: 58.215.145.134:80
@@ -83,8 +83,6 @@ Request Headers
 
 Request Payload
 	{"Username":"ssp558","Password":"cq111111","NECaptchaValidate":"16"}
-
-1566238256054
 
 
 

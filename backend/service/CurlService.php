@@ -325,4 +325,34 @@ class CurlService extends BaseService{
 
         return $cookie;
     }
+
+    /**
+     *curl get请求
+     */
+    public static function curlGetCookie($url, $header = []){
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($curl, CURLOPT_SSLVERSION, 3);
+
+        $content = curl_exec($curl);
+        preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
+        //p(['content'=>$content, 'errno'=>curl_error($curl)]);
+        $cookie = $matches[1];
+        $logArr = ['content'=>$content, 'cookie'=>$cookie];
+        if(curl_error($curl)>0){
+            $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
+            Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
+        }
+        //$cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
+        //$cookie = str_replace('; path=/; HttpOnly','',$cookie);
+
+        return $cookie;
+    }
 }
