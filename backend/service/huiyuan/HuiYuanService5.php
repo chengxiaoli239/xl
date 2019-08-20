@@ -263,19 +263,23 @@ class HuiYuanService5 extends BaseTZService {
 
         $data['code'] = $codes;
         $strLen = strlen(http_build_query($post_data));
-        $header = [
-            'type: 2',
-            $TzSystemsUsers->user_agent,
+        $headers = [
+            'Accept: application/json, text/plain, */*',
             'Accept-Encoding: gzip, deflate',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
             'Connection: keep-alive',
-            //'Content-Length:'.strlen($post_data),
-            'Content-Length:'.$strLen,
-            "Host:".str_replace('www.','',self::$domain),
-            'Cookie: Token='.$TzSystemsUsers->cookie,
+            'Content-Length:'.strlen(json_encode($post_data)),
+            'Content-Type: application/x-www-form-urlencoded',
+            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+            'Cookie: '.$TzSystemsUsers->cookie,
+            'Origin: '.$TzSystemsUsers->ssc_domain,
+            'Referer: '.$TzSystemsUsers->ssc_domain.'/',
+            'Token:'.self::getCookieDataByKey($TzSystemsUsers->cookie, 'Token'),
+            'type: 2',
+            $TzSystemsUsers->user_agent,
         ];
 
-        $headers = array_merge(self::$headers, $header);
+        $headers = array_merge(self::$headers, $headers);
         //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
         $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL'); # .'?'.http_build_query($post_data);
 
@@ -294,7 +298,7 @@ class HuiYuanService5 extends BaseTZService {
         }
         # 真实投注
         $start_time = microtime(true);
-        //p([$url,$post_data, $headers, $playway]);
+        p([$url,$post_data, $headers, $playway]);
         $rst = CurlService::postCurl($url, http_build_query($post_data), $headers);
         //$rst = json_encode($rst);
         //p([$rst,$url,$post_data, $headers]);
@@ -409,6 +413,25 @@ class HuiYuanService5 extends BaseTZService {
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
 
         return $rst;
+    }
+
+    /**
+     * @desc cookie中提取某个值
+     * @param string $cookie
+     * @param string $key
+     * @return mixed|string
+     */
+    public static function getCookieDataByKey($cookie = '', $key = 'Token'){
+        if(!$cookie) return '';
+
+        $cookies =explode(';', $cookie);
+        $cookieArr = [];
+        foreach ($cookies as $cookie){
+            $tmpVal = trim($cookie);
+            $tmpData = explode('=', $tmpVal);
+            $cookieArr[$tmpData[0]] = $tmpData[1];
+        }
+        if(isset($key) && !empty($key)) return $cookieArr[$key];
     }
 
     /**
@@ -727,28 +750,33 @@ class HuiYuanService5 extends BaseTZService {
         //if(!$cookie = $m->get($mkey)){
             //p(HN0898Service::getTzSiteInfo($tz_system_id));
             # 1、预登录
-            $_t = microtime(true) * 1000;
-            $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/Home/GetValidateCode'.'?_'.$_t;
+            $_t = floor(microtime(true) * 100);
+            $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/home/GetValidateCode'.'?_'.$_t;
             if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
+            $user_agent = 'User-Agent: '.$_SERVER['HTTP_USER_AGENT'];
+            $domain = self::getTzSiteInfo($tz_system_id,'domain');
             $headers = [
-                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+                'Accept-Encoding: gzip, deflate',
+                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                'Connection: keep-alive',
+                'Host: '.$domain,
+                //'Referer: '.self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/login.html',
                 'Upgrade-Insecure-Requests: 1',
-                'Host: '.self::getTzSiteInfo($tz_system_id,'domain'),
-                //'Referer: '.$url,
+                $user_agent,
             ];
             $cookie = CurlService::curlGetCookie($url, $headers);
-            //p(['url'=>$url, 'headers'=>$headers, 'cookie'=>$cookie]);
             $cookieData = $cookie;
             if($cookieData){
                 $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
                 $TzSystemsUsers->cookie = trim($cookieData);
-                $TzSystemsUsers->user_agent = 'User-Agent: '.$_SERVER['HTTP_USER_AGENT'];
-                $TzSystemsUsers->cookie = str_replace('; path=/; HttpOnly','', $TzSystemsUsers->cookie);
+                $TzSystemsUsers->user_agent = $user_agent;
+                $TzSystemsUsers->cookie = str_replace('; path=/','', $TzSystemsUsers->cookie);
                 $TzSystemsUsers->save();
             }
-            self::$headers = [];
             $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
+            //p(['url'=>$url, 'headers'=>$headers, 'cookie'=>$cookie],0);
             $cookie = str_replace(' ValidateToken=','',$cookie);
             $cookie = str_replace('; path=/','',$cookie);
             $m->set($mkey, $cookie, 180);
@@ -766,17 +794,17 @@ class HuiYuanService5 extends BaseTZService {
     public static function downLoadCodeImg($uid, $tz_system_id, $cookie_key){
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $headers = [
-            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'Accept: image/webp,image/apng,image/*,*/*;q=0.8',
             'Accept-Encoding: gzip, deflate',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            //'Cache-Control: max-age=0',
             'Connection: keep-alive',
-            //'Cookie: '.$TzSystemsUsers->cookie,
+            'Cookie: '.$TzSystemsUsers->cookie,
             'Host: '.str_replace('http://', '', self::getTzSiteInfo($TzSystemsUsers->tz_system_id,'SSC_INDEX')),
-            'Upgrade-Insecure-Requests: 1',
+            'Referer: '.$TzSystemsUsers->ssc_domain.'/login.html',
+            //'Upgrade-Insecure-Requests: 1',
             $TzSystemsUsers->user_agent,
         ];
-        $_t = microtime(true) * 10000;
+        $_t = floor(microtime(true) * 1000);
         $url = self::getTzSiteInfo($TzSystemsUsers->tz_system_id,'SSC_INDEX').'/api/home/GetValidateCode?_='.$_t;
         $imageData = CurlService::getCurl($url, $headers);
         $filename = Yii::$app->basePath . "/runtime/captcha/".$uid.'_'.$tz_system_id.'_'.$cookie_key.".png";
@@ -784,7 +812,7 @@ class HuiYuanService5 extends BaseTZService {
         fwrite($tp, $imageData);
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
-        //p($logData);
+        //p($logData,0);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return true;
@@ -888,19 +916,19 @@ class HuiYuanService5 extends BaseTZService {
         $url = self::getTzSiteInfo($tz_system_id, 'SSC_INDEX').'/api/Home/MemberLogin';
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'url'=>$url];
         $headers = [
-            'Accept: application/json, text/plain, */*',
-            'Accept-Encoding: gzip, deflate',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Connection: keep-alive',
-            'Content-Length: '.strlen(json_encode($post_data)),
-            'Content-Type: application/json;charset=UTF-8',
-            'Cookie: '.str_replace('; path=/', '',$TzSystemsUsers->cookie),
-            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
-            'Origin: '.$TzSystemsUsers->ssc_domain,
-            'Referer: '.$TzSystemsUsers->ssc_domain.'/login.html',
+            'Accept:application/json, text/plain, */*',
+            'Accept-Encoding:gzip, deflate',
+            'Accept-Language:zh-CN,zh;q=0.9,en;q=0.8',
+            'Connection:keep-alive',
+            'Content-Length:'.strlen(json_encode($post_data)),
+            'Content-Type:application/json;charset=UTF-8',
+            'Cookie:'.str_replace('; path=/', '',$TzSystemsUsers->cookie),
+            'Host:'.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+            'Origin:'.$TzSystemsUsers->ssc_domain,
+            'Referer:'.$TzSystemsUsers->ssc_domain.'/login.html',
             $TzSystemsUsers->user_agent,
         ];
-        //p(self::$headers);
+
         //$headers = array_unique(array_merge($headers,self::$headers));
 
         $data = CurlService::postCurl($url,json_encode($post_data), $headers);
@@ -908,7 +936,7 @@ class HuiYuanService5 extends BaseTZService {
         self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'code'=>$code, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
-        p($logArr);
+        //p($logArr);
         return $data;
     }
 
@@ -1003,23 +1031,19 @@ class HuiYuanService5 extends BaseTZService {
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
-        $_t = microtime(true) * 10000;
-        //$url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/App/Index'.'?_'.$_t;
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetInfoByName?lottery=18';
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetInfoByName?Lottery=2';
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'url'=>$url];
         $headers = [
             "Accept: application/json, text/plain, */*",
             "Accept-Encoding: gzip, deflate",
             "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
             "Connection: keep-alive",
-            "Cookie: Token=".urlencode($TzSystemsUsers->cookie),
+            "Cookie:".trim($TzSystemsUsers->cookie),
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/',
             $TzSystemsUsers->user_agent,
         ];
-
         $data = CurlService::getCurl($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
@@ -1028,6 +1052,7 @@ class HuiYuanService5 extends BaseTZService {
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','7时彩-登陆记录', $logArr);
         return $data;
     }
+
 
     /**
      * @decription 获取即将开奖的期号

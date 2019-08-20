@@ -1,0 +1,94 @@
+撤单
+1、Genaral
+	Request URL: http://zhxthy1t.58gocm.com/api/backOperator
+	Request Method: POST
+	Status Code: 200 OK
+	Remote Address: 58.218.208.11:80
+	Referrer Policy: no-referrer-when-downgrade
+
+2、Request Headers
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 140
+	Content-Type: application/x-www-form-urlencoded
+	Cookie: ValidateToken=423dcf910a57ee6b0c4b584a969e9df8; Token=y6Fsd6o0vgvUbwC%2fVeSAHH4ZLv30X1pd%2btIdgNaKEIw%3d
+	Host: zhxthy1t.58gocm.com
+	Origin: http://zhxthy1t.58gocm.com
+	Referer: http://zhxthy1t.58gocm.com/
+	Token: y6Fsd6o0vgvUbwC/VeSAHH4ZLv30X1pd+tIdgNaKEIw=
+	type: 2
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+
+3、FormData
+	PeriodId: 1972979
+	LotteryId: 2
+	BetNumber: 35319574#0001,35319574#0010,35319574#0100,35319574#1000,35319586#9999
+	UserName: tj00
+
+
+四定：
+Request URL: http://zhxthy1t.58gocm.com/api/betNumber
+Request Method: POST
+Status Code: 200 OK
+Remote Address: 122.246.20.202:80
+Referrer Policy: no-referrer-when-downgrade
+
+
+Accept: application/json, text/plain, */*
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Content-Length: 87
+Content-Type: application/x-www-form-urlencoded
+Cookie: ValidateToken=423dcf910a57ee6b0c4b584a969e9df8; Token=%2bBFzjqkkG4Xj2o%2bPfJgUm9%2bKZIyOlRs8ePYdJ32H1YU%3d
+Host: zhxthy1t.58gocm.com
+Origin: http://zhxthy1t.58gocm.com
+Referer: http://zhxthy1t.58gocm.com/
+Token: +BFzjqkkG4Xj2o+PfJgUm9+KZIyOlRs8ePYdJ32H1YU=
+type: 2
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+
+
+PeriodId: 1972963
+LotteryId: 2
+BetNumber: 1126#0.1,1166#0.1
+BetWayId: 1
+UserName: tj00
+
+三定：
+Request URL: http://zhxthy1t.58gocm.com/api/betNumber
+Request Method: POST
+Status Code: 200 OK
+Remote Address: 122.228.95.185:80
+Referrer Policy: no-referrer-when-downgrade
+
+Accept: application/json, text/plain, */*
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Content-Length: 87
+Content-Type: application/x-www-form-urlencoded
+Cookie: ValidateToken=b0c1ecb06c98f212f72ccc58cd7bff1f; Token=l9T5Fc%2fce7V9vLBj1HMMQzMHJTcgl3%2fJ0XITXZ1%2brHc%3d
+Host: zhxthy1t.58gocm.com
+Origin: http://zhxthy1t.58gocm.com
+Referer: http://zhxthy1t.58gocm.com/
+Token: l9T5Fc/ce7V9vLBj1HMMQzMHJTcgl3/J0XITXZ1+rHc=
+type: 2
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+
+PeriodId: 1983147
+LotteryId: 2
+BetNumber: 000x#100,002x#100,003x#100,004x#100,005x#100,006x#100,007x#100,008x#100,009x#100,020x#100
+BetAmt: 100
+BetTypeId: 8
+BetWayId: 3
+UserName: tj00
+
+
+PeriodId: 1983151
+LotteryId: 2
+BetNumber: 612X#100,611X#100
+BetWayId: 1
+UserName: ssp558

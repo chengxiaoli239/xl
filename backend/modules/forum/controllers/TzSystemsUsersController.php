@@ -88,7 +88,7 @@ class TzSystemsUsersController extends BaseController
         $post = Yii::$app->request->post();
         if($post){
             $post['TzSystemsUsers']['user_agent'] = 'User-Agent: '.$_SERVER['HTTP_USER_AGENT'];
-            $post['TzSystemsUsers']['cookie'] = urldecode($post['TzSystemsUsers']['cookie']);
+            $post['TzSystemsUsers']['cookie'] = $post['TzSystemsUsers']['cookie'];
         }
 
         if ($model->load($post) && $model->save()) {

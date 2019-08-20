@@ -69,10 +69,10 @@ class KuaiLe8Service extends BaseTZService {
         self::$baseUrl = self::$tzSiteInfo['baseUrl'];
         self::$domain = self::$tzSiteInfo['domain'];
         $headers = [
-            "Token: ".trim(self::$cookie),
-            "Origin: ".str_replace('www.','',self::$baseUrl),
+            "Cookie:".trim(self::$cookie),
+            "Origin:".str_replace('www.','',self::$baseUrl),
             //"Host:".str_replace('www.','',self::$domain),
-            "Referer: ".str_replace('www.','',self::$baseUrl).'/',
+            "Referer:".str_replace('www.','',self::$baseUrl).'/',
         ];
         self::$headers = array_unique(array_merge(self::$headers,$headers));
     }
@@ -269,12 +269,23 @@ class KuaiLe8Service extends BaseTZService {
         ];
 
         $data['code'] = $codes;
-        $header = [
+        $headers = [
+            'Accept: application/json, text/plain, */*',
+            'Accept-Encoding: gzip, deflate',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Connection: keep-alive',
+            'Content-Length:'.strlen(json_encode($post_data)),
+            'Content-Type: application/x-www-form-urlencoded',
+            'Cookie: '.$TzSystemsUsers->cookie,
+            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+            'Origin: '.$TzSystemsUsers->ssc_domain,
+            'Referer: '.$TzSystemsUsers->ssc_domain.'/',
+            'Token:'.self::getCookieDataByKey($TzSystemsUsers->cookie, 'Token'),
             'type: 18',
             $TzSystemsUsers->user_agent,
         ];
 
-        $headers = array_merge(self::$headers, $header);
+        //$headers = array_merge(self::$headers, $header);
         //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
         $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL'); # .'?'.http_build_query($post_data);
 
@@ -304,7 +315,7 @@ class KuaiLe8Service extends BaseTZService {
                 $tzRst['code'] = $codes;
             }
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
-            //return $tzRst;
+            return $tzRst;
         }
         $time = 600;
         //if(substr($qihao,6) == '023') $time = 60 * 60 * 10; # 十小时
@@ -406,6 +417,25 @@ class KuaiLe8Service extends BaseTZService {
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
 
         return $rst;
+    }
+
+    /**
+     * @desc cookie中提取某个值
+     * @param string $cookie
+     * @param string $key
+     * @return mixed|string
+     */
+    public static function getCookieDataByKey($cookie = '', $key = 'Token'){
+        if(!$cookie) return '';
+
+        $cookies =explode(';', $cookie);
+        $cookieArr = [];
+        foreach ($cookies as $cookie){
+            $tmpVal = trim($cookie);
+            $tmpData = explode('=', $tmpVal);
+            $cookieArr[$tmpData[0]] = $tmpData[1];
+        }
+        if(isset($key) && !empty($key)) return $cookieArr[$key];
     }
 
     /**
@@ -990,17 +1020,15 @@ class KuaiLe8Service extends BaseTZService {
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
-        $_t = microtime(true) * 10000;
-        //$url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/App/Index'.'?_'.$_t;
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetInfoByName?lottery=18';
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetInfoByName?Lottery=18';
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'url'=>$url];
         $headers = [
             "Accept: application/json, text/plain, */*",
             "Accept-Encoding: gzip, deflate",
             "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
             "Connection: keep-alive",
-            "Cookie: Token=".urlencode($TzSystemsUsers->cookie),
+            "Cookie:".trim($TzSystemsUsers->cookie),
+            //'Token:'.self::getCookieDataByKey($TzSystemsUsers->cookie, 'Token'),
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/',
@@ -1011,7 +1039,7 @@ class KuaiLe8Service extends BaseTZService {
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        //p($logArr);
+        p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','7时彩-登陆记录', $logArr);
         return $data;
     }
@@ -1206,7 +1234,7 @@ class KuaiLe8Service extends BaseTZService {
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetTheLastThree?lottery='.$lottery;
         $headers = [
             "Accept: application/json, text/plain, */*",
-            "Cookie: Token=".urlencode($TzSystemsUsers->cookie),
+            "Cookie:".$TzSystemsUsers->cookie,
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/',
@@ -1214,6 +1242,7 @@ class KuaiLe8Service extends BaseTZService {
         ];
 
         $data = CurlService::getCurl($url, $headers);
+        //p($data);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];

@@ -1,0 +1,64 @@
+﻿General
+Response Headers
+Request Headers
+Query String Parameters
+
+
+会员网登陆流程
+一、四定投注
+1、General
+Request URL: http://zhxthy1t.58gocm.com/api/betNumber
+Request Method: POST
+Status Code: 200 OK
+Remote Address: 58.215.145.134:80
+Referrer Policy: no-referrer-when-downgrade
+
+2、Response Headers
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Origin: http://zhxthy1t.58gocm.com
+Ali-Swift-Global-Savetime: 1566315453
+Connection: keep-alive
+Content-Length: 51
+Content-Type: text/json; charset=utf-8
+Date: Tue, 20 Aug 2019 15:36:15 GMT
+EagleId: 3ad7912215663154533601527e
+Server: Tengine
+Timing-Allow-Origin: *
+Vary: Origin
+Via: cache44.l2cn1821[89,200-0,M], cache44.l2cn1821[90,0], kunlun4.cn190[99,200-0,M], kunlun4.cn190[100,0]
+X-Cache: MISS TCP_MISS dirn:-2:-2
+X-Swift-CacheTime: 0
+X-Swift-SaveTime: Tue, 20 Aug 2019 15:37:33 GMT
+	
+3、Request Headers
+Accept: application/json, text/plain, */*
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Content-Length: 88
+Content-Type: application/x-www-form-urlencoded
+Cookie: ValidateToken=aaab552aca93cb029c3fe08f4ac21106; Token=PsyNFTnu%2bUirv93QNJDzEKnQu7pLvEOLJAS9hLS5h7I%3d
+Host: zhxthy1t.58gocm.com
+Origin: http://zhxthy1t.58gocm.com
+Referer: http://zhxthy1t.58gocm.com/
+Token: PsyNFTnu+Uirv93QNJDzEKnQu7pLvEOLJAS9hLS5h7I=
+type: 18
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+	
+5、Form Data
+PeriodId: 2003771
+LotteryId: 18
+BetNumber: 1126#0.1,1166#0.1
+BetWayId: 1
+UserName: tj00
+
+
+
+
+
+
+
+
+
+
+

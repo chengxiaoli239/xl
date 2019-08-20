@@ -290,19 +290,20 @@ class IndexController extends Controller
         $TzSystemsUsers = TzSystemsUsers::find()->where(['AND',['=', 'status', 1], ['<>', 'ssc_domain', '']])->all();
 
         foreach ($TzSystemsUsers as $TzSystemsUser){
-            $TzSystems = TzSystems::findOne($TzSystemsUser->tz_system_id);
-            switch ($TzSystems->system_type_id){
-                case 1:
-                    $rst = HN0898Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-                    break;
-                case 2:
-                    $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    $rst = KuaiLe8Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-                    break;
+            $tz_system_id = $TzSystemsUser->tz_system_id;
+            if(in_array($tz_system_id, [1,2])){
+                # 1、0898投注、2、99彩票网
+                $rst = HN0898Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+            }elseif(in_array($tz_system_id, [3])){
+                # 3、重庆7时彩网
+                $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+            }elseif(in_array($tz_system_id, [4])){
+                # 4、7天彩票网
+            }elseif(in_array($tz_system_id, [5])){
+                # 5、希腊网
+            }elseif(in_array($tz_system_id, [6])){
+                # 6、会员网 暂未对接完成，暂停自动登陆
+                //$rst = KuaiLe8Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             }
         }
         return $rst;

@@ -196,20 +196,21 @@ abstract class BetService extends BaseBetService {
      * @param $tz_system_id
      */
     public static function synBalance($uid, $tz_system_id){
-        $TzSystems = TzSystems::findOne($tz_system_id);
         $TzSystemsUser = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        switch ($TzSystems->system_type_id){
-            case 1:
-                $rst = HN0898Service::synBalance($TzSystemsUser->id);
-                break;
-            case 2:
-                $rst = SevenService::synBalance($TzSystemsUser->id);
-                break;
-            case 3:
-                break;
-            case 4:
-                $rst = KuaiLe8Service::synBalance($TzSystemsUser->id);
-                break;
+
+        if(in_array($tz_system_id, [1,2])){
+            # 1、0898投注、2、99彩票网
+            $rst = HN0898Service::synBalance($TzSystemsUser->id);
+        }elseif(in_array($tz_system_id, [3])){
+            # 3、重庆7时彩网
+            $rst = SevenService::synBalance($TzSystemsUser->id);
+        }elseif(in_array($tz_system_id, [4])){
+            # 4、7天彩票网
+        }elseif(in_array($tz_system_id, [5])){
+            # 5、希腊网
+        }elseif(in_array($tz_system_id, [6])){
+            # 6、会员网
+            $rst = KuaiLe8Service::synBalance($TzSystemsUser->id);
         }
 
         return $rst;

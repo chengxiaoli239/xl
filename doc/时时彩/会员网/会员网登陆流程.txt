@@ -1,0 +1,158 @@
+﻿会员网登陆流程
+1、获取下载验证码图片顺带设置ValidateToken
+General
+	Request URL: http://zhxthy1t.58gocm.com/api/home/GetValidateCode?_=1566237445668 
+	Request Method: GET
+	Status Code: 200 OK
+	Remote Address: 58.215.145.134:80
+	Referrer Policy: no-referrer-when-downgrade
+	
+Response Headers
+	Ali-Swift-Global-Savetime: 1566237488
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Length: 3124
+	Content-Type: image/png
+	Date: Mon, 19 Aug 2019 17:56:50 GMT
+	EagleId: 3ad7912015662374879901234e
+	Expires: -1
+	Pragma: no-cache
+	Server: Tengine
+	Set-Cookie: ValidateToken=f995c92382aec1e7aa4652ede317e5ca; path=/
+	Timing-Allow-Origin: *
+	Via: cache50.l2cn1821[47,200-0,M], cache43.l2cn1821[47,0], kunlun8.cn190[57,200-0,M], kunlun2.cn190[58,0]
+	X-AspNet-Version: 4.0.30319
+	X-Cache: MISS TCP_MISS dirn:-2:-2
+	X-Swift-CacheTime: 0
+	X-Swift-SaveTime: Mon, 19 Aug 2019 17:58:08 GMT
+	
+Request Headers
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Host: zhxthy1t.58gocm.com
+	Upgrade-Insecure-Requests: 1
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+	
+Query String Parameters
+	_: 1566237445668
+	
+	
+2、账号密码登陆
+General
+	Request URL: http://zhxthy1t.58gocm.com/api/Home/MemberLogin
+	Request Method: POST
+	Status Code: 200 OK
+	Remote Address: 58.215.145.134:80
+	Referrer Policy: no-referrer-when-downgrade
+	
+Response Headers
+	Access-Control-Allow-Credentials: true
+	Access-Control-Allow-Origin: http://zhxthy1t.58gocm.com
+	Ali-Swift-Global-Savetime: 1566237597
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Length: 1583
+	Content-Type: text/plain; charset=utf-8
+	Date: Mon, 19 Aug 2019 17:58:39 GMT
+	EagleId: 3ad7912015662375976351971e
+	Expires: -1
+	Pragma: no-cache
+	Server: Tengine
+	Set-Cookie: Token=mx8U8IvbCrjYDhFKXIHgG1DFQbSHNa7mJZ9UEtC7UI8%3d; path=/; httponly
+	Timing-Allow-Origin: *
+	Via: cache27.l2cn1821[85,200-0,M], cache27.l2cn1821[86,0], kunlun2.cn190[128,200-0,M], kunlun2.cn190[129,0]
+	X-AspNet-Version: 4.0.30319
+	X-Cache: MISS TCP_MISS dirn:-2:-2
+	X-Swift-CacheTime: 0
+	X-Swift-SaveTime: Mon, 19 Aug 2019 17:59:57 GMT
+	
+Request Headers
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 68
+	Content-Type: application/json;charset=UTF-8
+	Cookie: ValidateToken=f995c92382aec1e7aa4652ede317e5ca
+	Host: zhxthy1t.58gocm.com
+	Origin: http://zhxthy1t.58gocm.com
+	Referer: http://zhxthy1t.58gocm.com/login.html
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+
+Request Payload
+	{"Username":"ssp558","Password":"cq111111","NECaptchaValidate":"16"}
+
+
+
+
+
+==================================== 北京快乐8 ====================================
+一、开奖号码抓取
+1、General
+	Request URL: http://zhxthy1t.58gocm.com/api/MemberDesk/GetPeriodsResult?Lottery=18&BeginDt=2019-08-20&EndDt=2019-08-20&pageSize=20&PageNum=1
+	Request Method: GET
+2、Request Headers
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate
+	Accept-Language:zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Cookie:	ValidateToken=f995c92382aec1e7aa4652ede317e5ca; Token=%2bZzOVe198iFxmN03dagwKjaldsC16xgKRsFf5LwQ%2bBw%3d
+	Host:zhxthy1t.58gocm.com
+	Referer:http://zhxthy1t.58gocm.com/
+	User-Agent:	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+Query String Parameters
+	Lottery: 18
+	BeginDt: 2019-08-20
+	EndDt: 2019-08-20
+	pageSize: 20
+	PageNum: 1
+
+
+
+=====================================
+一、用户信息获取
+1、General
+	Request URL: http://zhxthy1t.58gocm.com/api/MemberDesk/GetInfoByName?Lottery=2
+	Request Method: GET
+	Status Code: 200 OK
+	Remote Address: 122.246.20.202:80
+	Referrer Policy: no-referrer-when-downgrade
+	
+2、Response Headers
+
+3、Request Headers
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Cookie: ValidateToken=aaab552aca93cb029c3fe08f4ac21106; Token=eSVrOcujptxXljnv%2bCJrTnH0tsk4VsJvCWGLVXatphY%3d
+	Host: zhxthy1t.58gocm.com
+	Referer: http://zhxthy1t.58gocm.com/
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+
+4、Query String Parameters
+	Lottery: 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
