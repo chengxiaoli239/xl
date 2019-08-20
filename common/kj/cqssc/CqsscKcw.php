@@ -127,31 +127,32 @@ class CqsscKcw extends BaseKj {
                 'lottery' => $lottery,
                 'BeginDt'=> date('Y-m-d'),
                 'EndDt'=> date('Y-m-d'),
-                //'BeginDt'=> '2019-08-14',
-                //'EndDt'=> '2019-08-14',
                 'pageSize'=> 20,
                 'PageNum'=> 1,
             ];
             $url = $domain.'/api/MemberDesk/GetPeriodsResult?'.http_build_query($post_data);
             $tz_systems_users_id = SystemConfig::findOne(['key'=>'kuaile8_get_kj_user_id'])->value;
-            $cookie = TzSystemsUsers::findOne($tz_systems_users_id)->cookie;
+            $TzSystemsUsers = TzSystemsUsers::findOne($tz_systems_users_id);
 
             $headers = [
                 'Accept: application/json, text/plain, */*',
-                'Referer: '.$domain.'/',
-                //'Cookie:ValidateToken=7e078323c5b5ef23197621d25ac95d58; Token=4GuaAP94kXCQN83fHLDz3BJZqNZW01Z3vFoR8dJXYbk%3d',
-                'Cookie: Token='.urlencode($cookie),
+                'Accept-Encoding: gzip, deflate',
+                'Accept-Language:zh-CN,zh;q=0.9,en;q=0.8',
+                'Connection: keep-alive',
+                'Cookie: Token='.urlencode($TzSystemsUsers->cookie),
                 'Host: '.str_replace('http://', '',$domain),
+                'Referer:'.$domain,
+                $TzSystemsUsers->user_agent,
             ];
             $start_time = microtime(true);
-            $content = CurlService::httpGet($url, $headers);
+            $content = CurlService::getCurl($url, $headers);
             $end_time = microtime(true);
             $time_consume = ($end_time-$start_time).'s';
             $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$content, 'time_consume'=>$time_consume];
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kl8', 'INFO', '号码抓取-kcw', $logArr);
 
             $data = $content;
-            //p([$url, $headers,$post_data, $data]);
+            //p(['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rstData'=>$data]);
 
             if (!$data OR !isset($data['Data']) OR !$kjData = $data['Data']['List'][0]) return false;
             if (!$kjData) return false;

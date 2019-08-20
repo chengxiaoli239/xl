@@ -687,7 +687,7 @@ class NumService extends BaseService {
             $codesArr_arise = self::getCodesArise([$codes_hz['arise']]);
             $codesArr = array_intersect($codesArr, $codesArr_arise);
         }
-        p($codesArr);
+        //p($codesArr);
 
         return array_unique($codesArr);
     }
