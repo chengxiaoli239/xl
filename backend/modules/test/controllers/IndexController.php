@@ -104,8 +104,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = HuiYuanService5::synBalance(13);p($rst);
         $rst = HuiYuanService5::login(18, 6);p($rst);
+        $rst = HuiYuanService5::synBalance(9);p($rst);
+        $rst = HuiYuanService5::loginNew(18, 6);p($rst);
         $rst = NumService::getCodesKuaiXuan(['type_log'=>'1']);p($rst);
         $rst = KuaiLe8Service::synBalance(9);p($rst);
         for ($i=0;$i<5; $i++){

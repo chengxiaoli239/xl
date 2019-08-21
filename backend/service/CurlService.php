@@ -83,7 +83,7 @@ class CurlService extends BaseService{
      * @decription post请求根据，接受传递的header头
      * @param $url
      */
-    public static function postCurl($url,$post_data = [],$header=[]){
+    public static function postCurl($url,$post_data = [],$headers=[]){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         if(!$timeout) $timeout = 15;
 
@@ -91,7 +91,7 @@ class CurlService extends BaseService{
         curl_setopt($ch, CURLOPT_URL, $url);
 
         // 设置浏览器的特定header
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -108,7 +108,7 @@ class CurlService extends BaseService{
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
         if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
-            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
@@ -121,7 +121,49 @@ class CurlService extends BaseService{
             return 'ok';
         }
         $rstData = json_decode($data, TRUE);
-        //p([$data, $rstData, $post_data, $header]);
+        //p(['url'=>$url, 'rstData'=>$data, 'post_data'=>$post_data, 'headers'=>$headers]);
+
+        return $rstData;
+    }
+
+    /**
+     * @decription post请求根据，接受传递的header头
+     * @param $url
+     */
+    public static function kl8PostCurlLogin($url,$post_data = [],$headers=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        if(!$timeout) $timeout = 15;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        curl_setopt($ch, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HEADER, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+
+        $data = curl_exec($ch);
+        d(['data'=>$data]);
+        $errno = curl_errno( $ch );
+        if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+            //p($logArr);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+        }
+
+        //if(strpos($url, 'betNumber')){ p(['url'=>$url, 'header'=>$header,'post_data'=>$post_data,'rstData'=>$data,curl_close($ch),$errno]); }
+        if(curl_close($ch)) {
+            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+        }
+        if($data == 'ok'){
+            return 'ok';
+        }
+        $rstData = json_decode($data, TRUE);
+        //p(['url'=>$url, 'rstData'=>$data, 'post_data'=>$post_data, 'headers'=>$headers]);
 
         return $rstData;
     }
