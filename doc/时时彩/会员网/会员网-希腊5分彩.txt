@@ -1,0 +1,99 @@
+一、投注前期号id获取
+	1、General
+		Request URL: http://zhxthy1t.58gocm.com/api/Periods/GetPeriodsQuery?lottery=7
+		Request Method: GET
+	2、Response Headers
+	3、Request Headers
+		Accept: application/json, text/plain, */*
+		Accept-Encoding: gzip, deflate
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Cookie: ValidateToken=12da4c46be7e14e74a25122573f935aa; Token=QB0PCqe7wDR%2bzso0CNzpaNkrnbgC0SAyOXunxCORgHg%3d
+		Host: zhxthy1t.58gocm.com
+		Referer: http://zhxthy1t.58gocm.com/
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+	4、Query String Parameters
+	lottery: 7
+二、投注：
+	1、General
+		Request URL: http://zhxthy1t.58gocm.com/api/betNumber
+		Request Method: POST
+	2、Response Headers
+	3、Request Headers
+		Accept: application/json, text/plain, */*
+		Accept-Encoding: gzip, deflate
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Content-Length: 89
+		Content-Type: application/x-www-form-urlencoded
+		Cookie: ValidateToken=12da4c46be7e14e74a25122573f935aa; Token=QB0PCqe7wDR%2bzso0CNzpaNkrnbgC0SAyOXunxCORgHg%3d
+		Host: zhxthy1t.58gocm.com
+		Origin: http://zhxthy1t.58gocm.com
+		Referer: http://zhxthy1t.58gocm.com/
+		Token: QB0PCqe7wDR+zso0CNzpaNkrnbgC0SAyOXunxCORgHg=
+		type: 7
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+	4、Query String Parameters
+		PeriodId: 2034484
+		LotteryId: 7
+		BetNumber: 3231#0.1,3251#0.1
+		BetWayId: 1
+		UserName: ssp558
+三、获取投注记录ID用于撤单
+	1、General
+		Request URL: http://zhxthy1t.58gocm.com/api/MemberDesk/GetBetForLeft?betInfoID=0&betDetailID=0&PageSize=500&PageNum=1&Lottery=7
+		Request Method: GET
+	2、Response Headers
+	3、Request Headers
+		Accept: application/json, text/plain, */*
+		Accept-Encoding: gzip, deflate
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Cookie: ValidateToken=12da4c46be7e14e74a25122573f935aa; Token=QB0PCqe7wDR%2bzso0CNzpaNkrnbgC0SAyOXunxCORgHg%3d
+		Host: zhxthy1t.58gocm.com
+		Referer: http://zhxthy1t.58gocm.com/
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+	4、Query String Parameters
+		betInfoID: 0
+		betDetailID: 0
+		PageSize: 500
+		PageNum: 1
+		Lottery: 7
+
+四、撤单
+	1、General
+		Request URL: http://zhxthy1t.58gocm.com/api/backOperator
+		Request Method: POST
+	2、Response Headers
+	3、Request Headers
+		Accept: application/json, text/plain, */*
+		Accept-Encoding: gzip, deflate
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Content-Length: 88
+		Content-Type: application/x-www-form-urlencoded
+		Cookie: ValidateToken=12da4c46be7e14e74a25122573f935aa; Token=QB0PCqe7wDR%2bzso0CNzpaNkrnbgC0SAyOXunxCORgHg%3d
+		Host: zhxthy1t.58gocm.com
+		Origin: http://zhxthy1t.58gocm.com
+		Referer: http://zhxthy1t.58gocm.com/
+		Token: QB0PCqe7wDR+zso0CNzpaNkrnbgC0SAyOXunxCORgHg=
+		type: 7
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+	4、From Data
+		PeriodId: 2034484
+		LotteryId: 7
+		BetNumber: 36184549#3231,36184549#3251
+		UserName: ssp558
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

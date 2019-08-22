@@ -27,16 +27,9 @@ use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
 
-class HuiYuanService5 extends HuiYuanBaseService {
-    public static $username = '';
-    public static $password = '';
+class HuiYuanBaseService extends BaseTZService {
     public static $baseUrl =  '';
     public static $domain =  '';
-    public static $user_id =  '';
-    public static $cookie = '';
-    public static $account = '';
-    public static $position = '';
-    public static $is_simulate = 1;
     public static $tzSiteInfo = [];
     public static $tz_system_id = ''; # 投注系统id
     public static $user_agent = '';
@@ -51,12 +44,7 @@ class HuiYuanService5 extends HuiYuanBaseService {
      * @param int $is_simulate 默认为模拟投注
      */
     public function __construct($uid = 1, $tz_system_id = 1){
-        self::$headers = [
-            //'Accept:*/*',
-            'Accept: application/json, text/plain, */*',
-            'Content-Type: application/x-www-form-urlencoded',
-            //'X-Requested-With:XMLHttpRequest',
-        ];
+
         self::__init($uid, $tz_system_id);
     }
 
@@ -96,6 +84,35 @@ class HuiYuanService5 extends HuiYuanBaseService {
         return true;
     }
 
+    /**
+     * @desc 投注站点信息，未完
+     * @param $uid
+     * @param $tz_system_id
+     */
+    public static function getTzSiteInfo($tz_system_id, $url_key = ''){
+        $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
+        //p(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id,$TzSystemUser->attributes]);
+        $baseUrl = $TzSystemUser->ssc_domain;
+        self::$cookie = $TzSystemUser->cookie;
+        \Yii::$app->params['baseUrl']  = $TzSystemUser->ssc_domain;
+        \Yii::$app->params['domain']  = str_replace('http://','',$TzSystemUser->ssc_domain);
+        $tzSiteInfo = [
+            'baseUrl' => $TzSystemUser->ssc_domain,
+            'domain' => \Yii::$app->params['domain'],
+            'CANCEL_ORDER' => $baseUrl.'/Member/CancelMemberBet',
+            'ORDER_TZ' => $baseUrl.'/Member/BatchBet',
+            'SSC_INDEX' => $baseUrl,
+            'MULBET_URL' => $baseUrl.'/api/betNumber', # 下注接口
+            'GetPeriodsQuery' => $baseUrl.'/api/Periods/GetPeriodsQuery',
+            'INDEX' => $baseUrl.'/index.aspx',
+            'GET_BALANCE' => $baseUrl.'/user/ajax.aspx',
+            'CAPTCHA_CODE' => $TzSystemUser->ssc_domain.'/code2.aspx',
+        ];
+        if($url_key && $tzSiteInfo[$url_key]) return $tzSiteInfo[$url_key];
+
+        return $tzSiteInfo;
+
+    }
 
     /**
      * @decription 同步用户余额 by account
@@ -324,6 +341,33 @@ class HuiYuanService5 extends HuiYuanBaseService {
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时插入记录-真实投注', $logArr);
 
         return $data;
+    }
+
+    /**
+     * @desc 根据playway 2二定3四定 获取投注方式
+     * @param int $tz_type
+     * @return array|mixed
+     */
+    public static function getWayId($playway = ''){
+        $rstData = [
+            4 => 1,
+            3 => 3, # 四字定
+            2 => 3, # 三字定 1快选 3导入
+        ];
+
+        if(!empty($playway) && isset($rstData[$playway])) return $rstData[$playway];
+
+        return $rstData;
+    }
+
+    /**
+     * @desc 返回和值投注
+     * @return string
+     */
+    public static function getOperationCondition(){
+        $json = '{"symbol":"X","isXian":0,"firstNumber":"","secondNumber":"","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":40,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[30,35],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[0,0,0,0],"symbolPositions":[],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}';
+
+        return $json;
     }
 
     /**
@@ -591,6 +635,35 @@ class HuiYuanService5 extends HuiYuanBaseService {
     }
 
     /**
+     * @decription 获取远程网页表单
+     * @param string $cookie
+     * @param string $vsid
+     * @return mixed
+     */
+    public static function getRemoteHtmlContent($uid = 1,$tz_system_id = 1, $vsid = '292p133GRw48'){
+        self::__init($uid, $tz_system_id);
+        //$User = User::findOne(['account'=>$account]);
+        $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
+        $headers = [
+            "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+            //"Accept-Encoding: gunzip,deflate, br", # gunzip 防止抓取页面内容返回乱码
+            "Upgrade-Insecure-Requests: 1",
+            "Origin:".self::$baseUrl,
+            "Host:".self::$domain,
+            //"Cookie:".$TzSystemUser->cookie.';vsid='.$vsid,
+            "Cookie:".$TzSystemUser->cookie,
+        ];
+        $url = HN0898Service::getTzSiteInfo($tz_system_id, 'INDEX');
+        $logArr = ['url'=>$url, 'headers'=>$headers, ];
+        $htmlData = RemoteHtmlService::getRemoteHtmlContent($url, $headers);
+        //p([$logArr,$htmlData]);
+
+        $htmlData = str_replace('/code2.aspx',self::$baseUrl.'/code2.aspx', $htmlData); // 验证码链接
+
+        return $htmlData;
+    }
+
+    /**
      * @desc 获取订单号
      * @param $sn 方案号
      * @return mixed
@@ -623,6 +696,34 @@ class HuiYuanService5 extends HuiYuanBaseService {
         }
 
         return $snid;
+    }
+
+    /**
+     * @decription 获取登录表单
+     * @param $formData
+     * @return array
+     */
+    private static function getLoginForm($formData){
+        $form = $formData[0];
+        $filterField = ['__VIEWSTATE','__EVENTVALIDATION','__VIEWSTATEGENERATOR','ctl00$txtUser', 'ctl00$txtPwd', 'ctl00$txtcode'];
+        $inputs = [];
+        foreach ($form['inputs'] as $key=>$item){
+            $field = $item['name'];
+            if(!in_array($field, $filterField)) continue;
+            $value = $item['value'];
+
+            $inputs[$field] = $value;
+        }
+        $inputs['ctl00$btnlogin.x'] = rand(10,99);
+        $inputs['ctl00$btnlogin.y'] = rand(10,99);
+
+        return ['action'=>$form['action'],'inputs'=>$inputs];
+    }
+
+   public static function getZjByInterval(){
+        $times = 0;
+
+        return $times;
     }
 
     /**
@@ -921,7 +1022,9 @@ class HuiYuanService5 extends HuiYuanBaseService {
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
+        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
         $_t = microtime(true) * 10000;
+        //$url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/App/Index'.'?_'.$_t;
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/AcceptAgreement'.'?_'.$_t;
         $headers = [
             "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
@@ -961,11 +1064,44 @@ class HuiYuanService5 extends HuiYuanBaseService {
      * @param $tz_system_id
      * @return mixed|string
      */
+    public static function sscIndex($uid, $tz_system_id){
+        self::__init($uid, $tz_system_id);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+
+        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
+        $_t = microtime(true) * 10000;
+        //$url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/App/Index'.'?_'.$_t;
+        //$url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/GetMemberPrint?_='.$_t;
+        $url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/App/Index?_='.$_t.'#!kuaida';
+        $headers = [
+            "Accept: application/json, text/javascript, */*; q=0.01",
+            "Cookie: ".trim($TzSystemsUsers->cookie),
+            //"Origin:".str_replace('www.','',self::$baseUrl),
+            "Host:".str_replace('www.','',self::$domain),
+            "Referer:".$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+            $TzSystemsUsers->user_agent,
+        ];
+
+        $data = CurlService::getCurl($url, $headers);
+        //sleep(10);
+        //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
+        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
+        //p($logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        return $data;
+    }
+
+    /**
+     * @desc 首页
+     * @param $uid
+     * @param $tz_system_id
+     * @return mixed|string
+     */
     public static function userInfo($uid, $tz_system_id){
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        $url = HuiYuanBaseService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetInfoByName?Lottery=2';
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetInfoByName?Lottery=2';
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'url'=>$url];
         $headers = [
             "Accept: application/json, text/plain, */*",
@@ -982,6 +1118,7 @@ class HuiYuanService5 extends HuiYuanBaseService {
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
+        p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','7时彩-登陆记录', $logArr);
         return $data;
     }
@@ -1041,6 +1178,27 @@ class HuiYuanService5 extends HuiYuanBaseService {
         $headArr = array_filter(explode("\r\n", $responseHeaders));
 
         return $headArr;
+    }
+
+    /**
+     * @desc 获取远程表单值
+     * @param $uid
+     * @param $tz_system_id
+     * @return array
+     */
+    public static function getCodesAndFormData($uid, $tz_system_id){
+        $mkey = 'form_data_'.$uid.'_'.$tz_system_id;
+        $formData = \Yii::$app->cache->get($mkey);
+        if(!$formData){
+            $htmlData = self::getRemoteHtmlContent($uid, $tz_system_id);
+            $formData = FormDataService::get_page_form_data($htmlData);
+            //p([$htmlData, $formData, $uid, $tz_system_id]);
+            Yii::$app->cache->set($mkey, $formData, 120);
+        }
+        $htmlArr = self::getLoginForm($formData);
+
+        $rst = ['codeUrl'=>self::$baseUrl."/code2.aspx",'htmlArr'=>$htmlArr];
+        return $rst;
     }
 
     /**
