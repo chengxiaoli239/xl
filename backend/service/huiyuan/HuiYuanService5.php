@@ -16,7 +16,6 @@ use backend\models\User;
 use backend\models\UserCustomPlans;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
-use backend\service\BaseTZService;
 use backend\service\BetService;
 use backend\service\CurlService;
 use backend\service\HN0898Service;
@@ -24,7 +23,6 @@ use backend\service\SscDataService;
 use backend\tools\Tools;
 use common\service\CaptchaCodeService;
 use common\tools\Tool_Common;
-use yii\helpers\ArrayHelper;
 use  yii;
 
 class HuiYuanService5 extends HuiYuanBaseService {
@@ -82,22 +80,6 @@ class HuiYuanService5 extends HuiYuanBaseService {
     }
 
     /**
-     * @desc 去除重复的headers
-     * @param $headers
-     * @param string $str
-     * @return bool
-     */
-    public static function unitHeaders($str = 'Cookie'){
-        foreach (self::$headers as $k=>$head){
-            if (strstr($head, $str) !== false ){
-                unset(self::$headers[$k]);
-            }
-        }
-        return true;
-    }
-
-
-    /**
      * @decription 同步用户余额 by account
      * @param $tz_system_user_id 表lt_tz_systems_users.id
      * @return array
@@ -128,63 +110,6 @@ class HuiYuanService5 extends HuiYuanBaseService {
         }
 
         return $rst;
-    }
-
-    /**
-     * @desc 同步用户余额
-     * @return mixed
-    public static function synUsersBalance(){
-        $users = User::findAll(['status'=>1]);
-        foreach ($users as $key=>$user){
-            $balance = self::getBalance($user->id);
-            $user->balance = $balance;
-            $rst = $user->save();
-        }
-
-        return $rst;
-    }
-     */
-
-    /**
-     * @decription 同步用户余额 by user_id
-     * @param $user_id
-     */
-    public static function synBalanceByUserId($user_id){
-        //self::synBalance($user_id);
-    }
-
-    /**
-     * @decription 根据账号获取cookie
-     * @param $account
-     */
-    public static function getCookieByAccount($account,$tz_system_id){
-        //$user = User::find()->select(['cookie'])->where(['account'=>$account])->asArray()->one();
-        $TzSystemsUsers = TzSystemsUsers::findOne(['account'=>$account,'tz_system_id'=>$tz_system_id]);
-
-        $m = Yii::$app->cache;
-        $mkey = '0898tz_cookie_'.$account;
-        $m->set($mkey, $TzSystemsUsers->cookie,2*60*60);
-
-        return $TzSystemsUsers->cookie;
-    }
-
-    /**
-     * @description 还有未结单的用户不能继续投注
-     * @param $account
-     * @param $is_simulate 是否模拟
-     * @return int
-     */
-    public static function isCanedTz($account, $plan_id, $is_simulate = 0){
-        $isCaned = 1;
-        if($rst = BettingRecords::findOne(['status'=>0, 'plan_id'=>$plan_id])){
-            //$isCaned = 0; # 缓存控制开关，暂不依据投注记录表
-        }
-        $balance = User::findOne(['account'=>$account])->balance;
-        if($is_simulate == 0 && $balance < 0.50){
-            $isCaned = 0;
-        }
-
-        return $isCaned;
     }
 
     /**
@@ -361,25 +286,6 @@ class HuiYuanService5 extends HuiYuanBaseService {
     }
 
     /**
-     * @desc cookie中提取某个值
-     * @param string $cookie
-     * @param string $key
-     * @return mixed|string
-     */
-    public static function getCookieDataByKey($cookie = '', $key = 'Token'){
-        if(!$cookie) return '';
-
-        $cookies =explode(';', $cookie);
-        $cookieArr = [];
-        foreach ($cookies as $cookie){
-            $tmpVal = trim($cookie);
-            $tmpData = explode('=', $tmpVal);
-            $cookieArr[$tmpData[0]] = $tmpData[1];
-        }
-        if(isset($key) && !empty($key)) return $cookieArr[$key];
-    }
-
-    /**
      * @desc 希腊站点号码格式化成本站号码存储格式
      * @param $codes # codes:13579,,13579,,@13579,,,13579,      -- playway:10
      * @param $codes # codes:13579,X,13579,X@13579,X,X,13579   -- playway:4
@@ -429,24 +335,6 @@ class HuiYuanService5 extends HuiYuanBaseService {
         }
 
         return implode(',', $codesArr);
-    }
-
-    /**
-     * @description 更新定制化表状态
-     * @param $id
-     * @param $account
-     * @return array
-     */
-   public static function updateCustomPlansStatus($id, $account){
-        $UserCustomPlans = UserCustomPlans::findOne(['account'=>$account,'id'=>$id]);
-        $UserCustomPlans->status = $UserCustomPlans->status==1 ? 0 : 1;
-
-        $rst = $UserCustomPlans->save(false);
-        if(!$rst){
-            return ['status'=>300, 'msg'=>current($UserCustomPlans->getErrors())];
-        }
-
-        return ['status'=>200, 'msg'=>'状态更新成功~'];
     }
 
     /**
@@ -821,7 +709,7 @@ class HuiYuanService5 extends HuiYuanBaseService {
      * @return array
      */
     public static function getSn($uid, $tz_system_id){
-        $rst = SevenService::userInfo($uid, $tz_system_id);
+        $rst = HuiYuanBaseService::userInfo($uid, $tz_system_id);
         $data = [];
         if($rst['Status'] !=1) return $data;
 
@@ -836,29 +724,6 @@ class HuiYuanService5 extends HuiYuanBaseService {
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSn','INFO','7时彩获取方案号', $data);
 
         return $data;
-    }
-
-    /**
-     * @desc 调用验证码接口
-     * @param $uid
-     * @param $tz_system_id
-     * @param $cookie_key
-     * @return mixed
-     */
-    public static function getCaptchaCode($uid, $tz_system_id, $cookie_key){
-        $captcha_code_api = SystemConfig::findOne(['key'=>'captcha_code_api'])->value;
-        $filename = Yii::$app->basePath . "/runtime/captcha/".$uid."_".$tz_system_id.'_'.$cookie_key.".png";
-        switch ($captcha_code_api){
-            case 1:
-                $codeRst = CaptchaCodeService::juHe($filename); # 聚合接口
-                break;
-            case 2:
-                $codeRst = CaptchaCodeService::showApi($filename); # 万维易源
-                break;
-            default:break;
-        }
-
-        return $codeRst;
     }
 
     /**
@@ -940,21 +805,6 @@ class HuiYuanService5 extends HuiYuanBaseService {
         return $data;
     }
 
-    public static function getCookies($url = 'https://700161.com/code2.aspx'){
-        $responseHeadersArr = self::getHeaders($url);
-        foreach ($responseHeadersArr as $loop) {
-            if(strpos($loop, "Set-Cookie") !== false){
-                preg_match('/^Set-Cookie: (.*?);/m',$loop,$m);
-                $cookies = trim(substr($loop, 11));
-                p($cookies);
-            }
-        }
-
-        //p($responseHeadersArr);
-
-        //return $cookies;
-    }
-
     /**
      * @desc 首页
      * @param $uid
@@ -1028,19 +878,6 @@ class HuiYuanService5 extends HuiYuanBaseService {
         $qihao = date("ymd").sprintf("%03d", $actionNo);
 
         return $qihao;
-    }
-
-    /**
-     * @decription 根据url获取headers
-     * @param $url
-     * @return array|ø
-     */
-    public static function getHeaders($url){
-
-        $responseHeaders = CurlService::httpGetResponseHeaders($url);
-        $headArr = array_filter(explode("\r\n", $responseHeaders));
-
-        return $headArr;
     }
 
     /**
@@ -1142,59 +979,4 @@ class HuiYuanService5 extends HuiYuanBaseService {
 
         return $lotteries[$playway];
     }
-
-    /**
-     * @desc 投注之前获取期号相关信息
-     */
-    public static function getQihaoInfo($uid, $tz_system_id, $lottery_type = 6){
-        self::__init($uid, $tz_system_id);
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-
-        $lottery = self::getSiteLottery($lottery_type);
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetTheLastThree?lottery='.$lottery;
-        $headers = [
-            "Accept: application/json, text/plain, */*",
-            "Cookie:".$TzSystemsUsers->cookie,
-            //"Origin:".str_replace('www.','',self::$baseUrl),
-            "Host:".str_replace('www.','',self::$domain),
-            "Referer:".$TzSystemsUsers->ssc_domain.'/',
-            $TzSystemsUsers->user_agent,
-        ];
-
-        $data = CurlService::getCurl($url, $headers);
-        //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
-        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getQihaoInfo','INFO','快乐8登陆前', $logArr);
-
-        return $data;
-    }
-
-
-    private static function getSiteLottery($lottery_type = DEFAULT_LOTTERY_TYPE){
-        $lottery = [
-            7 => 18,
-            5 => 2,
-        ];
-
-        return $lottery[$lottery_type];
-    }
-
-    /**
-     * @desc 获取即将投注的期号、期号id
-     * @param $uid
-     * @param $tz_system_id
-     * @param int $lottery_type
-     * @return array
-     */
-    public static function getPreTz($uid, $tz_system_id, $lottery_type = 6){
-
-        $qihaoInfo = self::getQihaoInfo($uid, $tz_system_id, $lottery_type);
-        $data = $qihaoInfo['Data']['List'];
-        if($qihaoInfo['Status'] != 1 OR $data[0]['periodsStatus'] != 1) return ['status'=>302, 'msg'=>$qihaoInfo['Info']];
-
-        $rst = ['status'=>200, 'PeriodsID' => $data[0]['periodsID'], 'PeriodsNumber'=>$data[0]['periodsNumber']];
-
-        return $rst;
-    }
-
 }

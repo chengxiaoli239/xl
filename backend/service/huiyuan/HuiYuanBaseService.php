@@ -1043,21 +1043,6 @@ class HuiYuanBaseService extends BaseTZService {
         return $data;
     }
 
-    public static function getCookies($url = 'https://700161.com/code2.aspx'){
-        $responseHeadersArr = self::getHeaders($url);
-        foreach ($responseHeadersArr as $loop) {
-            if(strpos($loop, "Set-Cookie") !== false){
-                preg_match('/^Set-Cookie: (.*?);/m',$loop,$m);
-                $cookies = trim(substr($loop, 11));
-                p($cookies);
-            }
-        }
-
-        //p($responseHeadersArr);
-
-        //return $cookies;
-    }
-
     /**
      * @desc 首页
      * @param $uid
@@ -1328,10 +1313,11 @@ class HuiYuanBaseService extends BaseTZService {
     }
 
 
-    private static function getSiteLottery($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function getSiteLottery($lottery_type = DEFAULT_LOTTERY_TYPE){
         $lottery = [
-            7 => 18,
-            5 => 2,
+            7 => 18, # 北京快乐8
+            5 => 2, # 重庆
+            3 => 7, # 希腊5分彩
         ];
 
         return $lottery[$lottery_type];
