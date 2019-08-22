@@ -22,24 +22,6 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <div class="clearfix">
-                    <span><strong>添加计划：</strong></span>
-                    <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'User Sys Plans 2d'), ['create', 'playway'=>2, 'tz_type'=>16], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-                    </div>
-
-                    <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'User Sys Plans 3d'), ['create', 'playway'=>3], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-                    </div>
-                    <?php foreach ($myTzTypes as $typeData):?>
-                    <div class="btn-group">
-                        <?= Html::a($typeData['type_name'], ['create', 'tz_type'=>$typeData['tz_type']], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-                    </div>
-                    <?endforeach;?>
-                </div>
-
-                <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
@@ -48,7 +30,6 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
 
                         //'id',
                         //'uid',
-                        //'account',
                         //'playway',
                         ['attribute' => 'playway','headerOptions'=>['width'=>'5%'],'label'=>'投注类型',
                             'value' => function($model) {
@@ -95,8 +76,8 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                         ['attribute'=>'status', 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value'=>function($model){
-                                $url0 = "/forum/user-sys-plans/switch-status?id=".$model->id.'&status=1'; # 点击开启
-                                $url1 = "/forum/user-sys-plans/switch-status?id=".$model->id.'&status=0'; # 点击关闭
+                                $url0 = "#"; # 点击开启
+                                $url1 = "#"; # 点击关闭
                                 if($model->status == 1){
                                     $txt = "<font color='green'>已开启</font>" ;
                                     return Html::a($txt, $url1, ['title' => '点击关闭']);
@@ -109,6 +90,7 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                             }
                         ],
                         'single',
+                        /*
                         ['attribute' => 'tz_type','label'=>'操作', # 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
@@ -116,6 +98,7 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                                 return Html::a('立即下注', $url, ['title' => '立即下注'.$model->id,'alt'=>$model->id]);
                             }
                         ],
+                        */
                         //'tz_sites',
                         ['attribute' => 'tz_sites','label'=>'计划投注站点',#'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
@@ -127,6 +110,7 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                                 return trim($str,',');
                             }
                         ],
+                        'account',
                         //'nums',
                         //'hz_Arr',
                         ['attribute' => 'hz_Arr','label'=>'扩展【部分投注】',#'headerOptions'=>['width'=>'5%'],

@@ -55,7 +55,6 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                                 return Html::a($txt, '#', ['title' => $model->codes,'alt'=>$model->codes]);
                             }
                         ],
-                        //'account',
                         //'betting_money',
                         ['attribute' => 'betting_money','headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
@@ -94,6 +93,7 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                         //'status',
                         //'sn',
                         //'snid',
+                        'account',
                         ['attribute'=>'snid', 'label'=>'操作',
                             'format'=>'raw',
                             'value'=>function($model){
