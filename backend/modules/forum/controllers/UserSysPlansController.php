@@ -44,11 +44,14 @@ class UserSysPlansController extends BaseController
     {
         $searchModel = new UserSysPlansSearch();
         $queryParams = Yii::$app->request->queryParams;
-        $queryParams['UserSysPlans']['uid'] = $this->_user_id;
+        if($this->_user_id !== 1){ # 超级管理员
+            $queryParams['UserSysPlans']['uid'] = $this->_user_id;
+        }
         $dataProvider = $searchModel->search($queryParams);
         $myTzTypes = UserSysPlansService::getMyTzTypes($this->_user_id);
 
-        return $this->render('index', [
+        $view = $this->_user_id !== 1 ? 'index' : 'index_admin';
+        return $this->render($view, [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'myTzTypes' => $myTzTypes,

@@ -229,8 +229,8 @@ class KuaiLe8Service extends BaseTZService {
      */
     public function bet($qihao, $plan_id, $codes){
         $time = date('H:i');
-        if('00:00'<$time && $time<'09:03') return ['status'=>300, 'msg'=>'当前时间暂停投注'];
         //p([$qihao, $plan_id, 'codes'=>$codes]);
+        if('00:00'<$time && $time<'09:03') return ['status'=>300, 'msg'=>'当前时间暂停投注'];
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;

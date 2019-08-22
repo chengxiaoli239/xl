@@ -139,7 +139,7 @@ class CqsscKcw extends BaseKj {
                 'Accept-Encoding: gzip, deflate',
                 'Accept-Language:zh-CN,zh;q=0.9,en;q=0.8',
                 'Connection: keep-alive',
-                'Cookie: Token='.urlencode($TzSystemsUsers->cookie),
+                'Cookie: '.$TzSystemsUsers->cookie,
                 'Host: '.str_replace('http://', '',$domain),
                 'Referer:'.$domain,
                 $TzSystemsUsers->user_agent,
