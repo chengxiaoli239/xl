@@ -30,9 +30,13 @@ use  yii;
 class HuiYuanBaseService extends BaseTZService {
     public static $baseUrl =  '';
     public static $domain =  '';
+    public static $cookie = '';
     public static $tzSiteInfo = [];
     public static $tz_system_id = ''; # 投注系统id
     public static $user_agent = '';
+    public static $username = '';
+    public static $user_id;
+    public static $account = '';
 
     public static $headers = [];
 
