@@ -4,7 +4,7 @@ namespace backend\modules\forum\controllers;
 
 use backend\models\Admin;
 use backend\models\TzSystemsAuth;
-use backend\models\TzSystemsUsers;
+use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
 use backend\service\BetService;
 use backend\service\UserService;
 use common\models\AdminModel;
@@ -88,12 +88,23 @@ class UserController extends BaseController
     public function actionView()
     {
         $uid = \Yii::$app->user->id;
-        BetService::synUserAllBalance($uid);
+        if($uid == 1) {
+            $searchModel = new TzSystemsUsersSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('view', [
-            //'model' => $this->findModel($uid),
-            'models' => $this->findAllModel($uid),
-        ]);
+            return $this->render('view_admin', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+
+        }else {
+            BetService::synUserAllBalance($uid);
+
+            return $this->render('view', [
+                //'model' => $this->findModel($uid),
+                'models' => $this->findAllModel($uid),
+            ]);
+        }
     }
 
     /**
