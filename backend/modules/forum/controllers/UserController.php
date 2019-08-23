@@ -5,6 +5,7 @@ namespace backend\modules\forum\controllers;
 use backend\models\Admin;
 use backend\models\TzSystemsAuth;
 use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
+use backend\models\TzSystemsUsers;
 use backend\service\BetService;
 use backend\service\UserService;
 use common\models\AdminModel;
