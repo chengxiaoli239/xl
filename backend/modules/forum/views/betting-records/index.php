@@ -112,11 +112,13 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                                     if($model->playway == 2){
                                         $rst .= ' | '.Html::a('点击反买', $url3, ['title' => '点击反买:'.$model->snid,'alt'=>$model->snid]) ;
                                     }
+                                    if(\Yii::$app->user->id == 1) $rst = '等待开奖';
                                     return $rst;
                                 }
                                 if(!$model->status){
                                     $str = Html::a('点击撤单', $url1, ['title' => '点击撤单:'.$model->snid,'alt'=>$model->snid]);
                                     $str .= ' | '.Html::a('点击下注', $url2, ['title' => '点击下注:'.$model->id,'alt'=>$model->id]);
+                                    if(\Yii::$app->user->id == 1) $str = '<font color="green">等待开奖</font>';
                                     return $str;
                                 }
                                 return BaseStringHelper::truncate($model->snid,15);
