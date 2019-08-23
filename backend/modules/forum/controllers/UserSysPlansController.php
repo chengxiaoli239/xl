@@ -6,7 +6,7 @@ use backend\models\ImportPlanCodes;
 use backend\models\TzSystemsAuth;
 use backend\service\BetService;
 use backend\service\HN0898Service;
-use backend\service\StaticService;
+use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
 use backend\service\TzService;
 use backend\service\UserSysPlansService;
 use Yii;
@@ -66,9 +66,21 @@ class UserSysPlansController extends BaseController
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        $uid = \Yii::$app->user->id;
+        if($uid == 1) {
+            $searchModel = new TzSystemsUsersSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+
+        }else{
+            return $this->render('view', [
+                'model' => $this->findModel($id),
+            ]);
+        }
     }
 
     /**
