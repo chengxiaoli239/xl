@@ -245,7 +245,7 @@ class HuiYuanBaseService extends BaseTZService {
 
         $post_data = [
             'PeriodId' => $qihaoInfo['PeriodsID'],
-            'LotteryId' => 2,	# 备注：2重庆时时彩、18快乐8
+            'LotteryId' => self::getLotteryId($lottery_type),	# 备注：2重庆时时彩、18快乐8
             'BetNumber' => $bet_codes,
             'BetAmt'=> $single,
             'BetWayId' => self::getWayId($playway),
@@ -266,7 +266,7 @@ class HuiYuanBaseService extends BaseTZService {
             'Origin: '.$TzSystemsUsers->ssc_domain,
             'Referer: '.$TzSystemsUsers->ssc_domain.'/',
             'Token:'.self::getCookieDataByKey($TzSystemsUsers->cookie, 'Token'),
-            'type: 2',
+            'type: '.self::getType($lottery_type),
             $TzSystemsUsers->user_agent,
         ];
 
@@ -365,14 +365,39 @@ class HuiYuanBaseService extends BaseTZService {
     }
 
     /**
-     * @desc 返回和值投注
-     * @return string
+     * @desc 根据彩种和不同投注方式 获取header type
+     * @param int $lottery_type
+     * @param string $playway
+     * @return array|mixed
      */
-    public static function getOperationCondition(){
-        $json = '{"symbol":"X","isXian":0,"firstNumber":"","secondNumber":"","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":40,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[30,35],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[0,0,0,0],"symbolPositions":[],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}';
+    public static function getType($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $rstData = [
+            7 => 2, # 北京快乐8
+            5 => 3, # 重庆时时彩
+        ];
 
-        return $json;
+        if(!empty($lottery_type) && isset($rstData[$lottery_type])) return $rstData[$lottery_type];
+
+        return $rstData;
     }
+
+    /**
+     * @desc 根据彩种和不同投注方式 获取header type
+     * @param int $lottery_type
+     * @param string $playway
+     * @return array|mixed
+     */
+    public static function getLotteryId($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $rstData = [
+            7 => 18, # 北京快乐8
+            5 => 2, # 重庆时时彩
+        ];
+
+        if(!empty($lottery_type) && isset($rstData[$lottery_type])) return $rstData[$lottery_type];
+
+        return $rstData;
+    }
+
 
     /**
      * @description  撤单
@@ -973,7 +998,7 @@ class HuiYuanBaseService extends BaseTZService {
      * @param $code
      * @return mixed|string
      */
-    private static function loginRemote($uid, $tz_system_id, $code){
+    public static function loginRemote($uid, $tz_system_id, $code){
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
@@ -1107,7 +1132,6 @@ class HuiYuanBaseService extends BaseTZService {
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','7时彩-登陆记录', $logArr);
         return $data;
     }

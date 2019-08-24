@@ -189,7 +189,6 @@ class UserSysPlansController extends BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $rst = BetService::userSysPlansTzNow($id, $this->_user_id);
-        p($rst);
 
         return $this->redirect(['/forum/betting-records/index']);
     }

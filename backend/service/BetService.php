@@ -12,6 +12,7 @@ use backend\service\huiyuan\HuiYuanService5;
 use backend\models\LotteryType;
 use backend\models\SystemConfig;
 use backend\models\User;
+use backend\service\huiyuan\KuaiLe8Service;
 use common\kj\cqssc\CqsscKcw;
 use Yii;
 use backend\models\BettingRecords;
