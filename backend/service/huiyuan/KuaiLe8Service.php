@@ -240,7 +240,7 @@ class KuaiLe8Service extends BaseTZService {
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
         $qihaoInfo = self::getPreTz(self::$user_id, self::$tz_system_id, $lottery_type);
-        //p([self::$user_id, self::$tz_system_id, $lottery_type, $qihaoInfo]);
+        p([self::$user_id, self::$tz_system_id, $lottery_type, $qihaoInfo]);
         if($qihaoInfo['status'] != 200) return $qihaoInfo;
 
         # 验证
@@ -1235,8 +1235,11 @@ class KuaiLe8Service extends BaseTZService {
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetTheLastThree?lottery='.$lottery;
         $headers = [
             "Accept: application/json, text/plain, */*",
-            "Cookie:".$TzSystemsUsers->cookie,
+            "Accept-Encoding: gzip, deflate",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Cookie:".trim($TzSystemsUsers->cookie),
             //"Origin:".str_replace('www.','',self::$baseUrl),
+            "Connection: keep-alive",
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/',
             $TzSystemsUsers->user_agent,
