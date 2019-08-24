@@ -365,15 +365,15 @@ class HuiYuanBaseService extends BaseTZService {
     }
 
     /**
-     * @desc 根据彩种和不同投注方式 获取header type
+     * @desc 根据彩种和不同投注方式 获取header type 跟下面的方法貌似一
      * @param int $lottery_type
      * @param string $playway
      * @return array|mixed
      */
     public static function getType($lottery_type = DEFAULT_LOTTERY_TYPE){
         $rstData = [
-            7 => 2, # 北京快乐8
-            5 => 3, # 重庆时时彩
+            7 => 18, # 北京快乐8
+            5 => 2, # 重庆时时彩
         ];
 
         if(!empty($lottery_type) && isset($rstData[$lottery_type])) return $rstData[$lottery_type];
@@ -1325,7 +1325,10 @@ class HuiYuanBaseService extends BaseTZService {
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetTheLastThree?lottery='.$lottery;
         $headers = [
             "Accept: application/json, text/plain, */*",
-            "Cookie:".$TzSystemsUsers->cookie,
+            "Accept-Encoding: gzip, deflate",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            "Cookie:".trim($TzSystemsUsers->cookie),
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/',
@@ -1367,6 +1370,16 @@ class HuiYuanBaseService extends BaseTZService {
         $rst = ['status'=>200, 'PeriodsID' => $data[0]['periodsID'], 'PeriodsNumber'=>$data[0]['periodsNumber']];
 
         return $rst;
+    }
+
+    public static function queryBetInfo(){
+
+
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+
+        $lottery = self::getSiteLottery($lottery_type);
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetTheLastThree?lottery='.$lottery;
+
     }
 
 }

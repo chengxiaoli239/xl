@@ -1,3 +1,25 @@
+撤单前查询(投注后查询获取投注记录id，撤单需要)
+1、General
+	Request URL: http://zhxthy1t.58gocm.com/api/MemberDesk/GetBetForLeft?betInfoID=0&betDetailID=0&PageSize=500&PageNum=1&Lottery=2
+	Request Method: GET
+2、Response Headers
+3、Request Headers
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Cookie: ValidateToken=e3862b85210e7eb95d1508847630638e; Token=5CXxr5b0ZBOWk8U%2fMXSVKoumzFrOQSGw6RmLJn0TL2Q%3d
+	Host: zhxthy1t.58gocm.com
+	Referer: http://zhxthy1t.58gocm.com/
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+4、Query String Parameters
+	betInfoID: 0
+	betDetailID: 0
+	PageSize: 500
+	PageNum: 1
+	Lottery: 2
+返回：
+	{"Status":true,"Info":"查询成功","Data":{"List":[{"betInfoID":36470150,"betDetailID":30847704561,"periodsID":2054408,"periodsNumber":"20190825003","createDt":"2019/08/25 01:02:11","betNumber":"6789","betAmount":0.1,"betTypeID":13,"odds":9990.0}],"PageSize":500,"TotalCount":1,"TotalAmt":0.1000},"IsCheckOut":false}
 撤单
 1、Genaral
 	Request URL: http://zhxthy1t.58gocm.com/api/backOperator
@@ -22,9 +44,9 @@
 	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
 
 3、FormData
-	PeriodId: 1972979
+	PeriodId: 2054408
 	LotteryId: 2
-	BetNumber: 35319574#0001,35319574#0010,35319574#0100,35319574#1000,35319586#9999
+	BetNumber: 36470150#6789
 	UserName: tj00
 
 
@@ -77,14 +99,6 @@ Referer: http://zhxthy1t.58gocm.com/
 Token: l9T5Fc/ce7V9vLBj1HMMQzMHJTcgl3/J0XITXZ1+rHc=
 type: 2
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
-
-PeriodId: 1983147
-LotteryId: 2
-BetNumber: 000x#100,002x#100,003x#100,004x#100,005x#100,006x#100,007x#100,008x#100,009x#100,020x#100
-BetAmt: 100
-BetTypeId: 8
-BetWayId: 3
-UserName: tj00
 
 
 PeriodId: 1983151
