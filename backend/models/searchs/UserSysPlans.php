@@ -58,14 +58,12 @@ class UserSysPlans extends UserSysPlansModel
             // $query->where('0=1');
             return $dataProvider;
         }
+        $status = empty($params['UserSysPlans']['status']) ? [0,1] : $params['UserSysPlans']['status'];
 
-        // grid filtering conditions
-        $query->andFilterWhere([
+        $queryWhere = [
             'id' => $this->id,
             'playway' => $this->playway,
-            'status' => $this->status,
-            'uid' => $params['UserSysPlans']['uid'],
-            'status' => [0,1],
+            'status' => $status,
             'single' => $this->single,
             'tz_type' => $this->tz_type,
             'buy_type' => $this->buy_type,
@@ -75,7 +73,12 @@ class UserSysPlans extends UserSysPlansModel
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,
-        ]);
+        ];
+        if($this->uid !== 1){
+            $queryWhere['uid'] = $params['UserSysPlans']['uid'];
+        }
+        // grid filtering conditions
+        $query->andFilterWhere($queryWhere);
 
         $query->andFilterWhere(['like', 'account', $this->account])
             ->andFilterWhere(['like', 'tz_sites', $this->tz_sites])
