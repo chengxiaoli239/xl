@@ -948,6 +948,9 @@ class HuiYuanBaseService extends BaseTZService {
             $rst = self::loginRemote($uid, $tz_system_id, $code);
         }
 
+        if($rst['status'] == 200){
+            self::synBalance($TzSystemsUsers->id);
+        }
         # 第四步：同意
         //$rst = self::acceptAgreement($uid, $tz_system_id);
 
