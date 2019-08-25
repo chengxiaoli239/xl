@@ -31,7 +31,8 @@ class BaseKj{
         $m = \Yii::$app->cache;
 
         $qihao = HN0898Service::getCurrentQihao($lottery_type);
-        $mkey = 'KJ_DATA_QIHAO_KEY_'.$lottery_type.'_'.$qihao;
+        $mkey = self::buildKjDataKey($lottery_type, $qihao);
+        //p($mkey,0);
 
         return $m->get($mkey);
     }
@@ -45,16 +46,23 @@ class BaseKj{
 
         if($lottery_type == 5){
             $str = substr($qihao, 2, 10);
-            $setQihao = str_replace('-', '',$str);
+            $qihao = str_replace('-', '',$str);
         }else{
-            $setQihao = $qihao;
+            $qihao = $qihao;
         }
         if($kjData['opencode']){
-            $mkey = 'KJ_DATA_QIHAO_KEY_'.$lottery_type.'_'.$setQihao;
+            $mkey = self::buildKjDataKey($lottery_type, $qihao);
             $m->set($mkey, $kjData, 10*60);
         }
 
         return true;
+    }
+
+    public static function buildKjDataKey($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao){
+
+        $mkey = 'KJ_DATA_QIHAO_KEY_'.$lottery_type.'_'.$qihao;
+
+        return $mkey;
     }
 
     /**

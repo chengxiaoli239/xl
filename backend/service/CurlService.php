@@ -113,7 +113,7 @@ class CurlService extends BaseService{
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
 
-        //if(strpos($url, 'betNumber')){ p(['url'=>$url, 'header'=>$header,'post_data'=>$post_data,'rstData'=>$data,curl_close($ch),$errno]); }
+        //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,,$errno]); }
         if(curl_close($ch)) {
             echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
         }

@@ -183,4 +183,63 @@ class CqsscKcw extends BaseKj {
         return $rst;
     }
 
+    /**
+     * @desc 北京快乐8
+     * @param string $returnType
+     * @return array|bool
+     */
+    public static function getLotteryKuaiLe8SevenDay($returnType = 'json', $lottery = 18){
+
+        if(!$kjData = self::getCurrentKjData()) {
+            $domain = BaseKj::getApiHost(11);
+            $url = $domain.'/k8/ajax.aspx';
+
+            $post_data = ['act'=>'getlastkj'];
+            $headers = [
+                'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
+            ];
+            $start_time = microtime(true);
+            $content = CurlService::postCurl($url, http_build_query($post_data), $headers);
+            $end_time = microtime(true);
+            $time_consume = ($end_time-$start_time).'s';
+            $logArr = ['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rst'=>$content, 'time_consume'=>$time_consume];
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kl8_SevenDay', 'INFO', '号码抓取-kcw', $logArr);
+
+            $data = $content;
+            //p(['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rstData'=>$data]);
+
+            if (!$data OR !isset($data) OR !$kjData = $data[0]) return false;
+            if (!$kjData) return false;
+            $kjData['expect'] = $kjData['qihao'];
+            $codesArr = explode(',',$kjData['code']);
+            $code1 = substr($codesArr[0] + $codesArr[5] + $codesArr[10] + $codesArr[15], -1);
+            $code2 = substr($codesArr[1] + $codesArr[6] + $codesArr[11] + $codesArr[16], -1);
+            $code3 = substr($codesArr[2] + $codesArr[7] + $codesArr[12] + $codesArr[17], -1);
+            $code4 = substr($codesArr[3] + $codesArr[8] + $codesArr[13] + $codesArr[18], -1);
+            $code5 = substr($codesArr[4] + $codesArr[9] + $codesArr[14] + $codesArr[19], -1);
+            $kjData['opencode'] = $code1.','.$code2.','.$code3.','.$code4.','.$code5;
+            $kjData['opentime'] = date('Y-m-d H:i:s');
+            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
+        }
+        $opencode = $kjData['opencode'];
+        $opentime = $kjData['opentime'];
+        $expect = $kjData['expect'];
+        //p([DEFAULT_LOTTERY_TYPE,$expect, $kjData]);
+
+        self::setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kl8', 'INFO', '号码抓取-kcw', $logArr);
+
+        return $rst;
+    }
+
 }
