@@ -135,27 +135,45 @@ class CurlService extends BaseService{
         if(!$timeout) $timeout = 15;
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
 
-        curl_setopt($ch, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $curl = curl_init();
+        curl_setopt($ch, CURLOPT_HEADER,0);
 
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $url,
+            CURLOPT_HEADER => 1,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => $timeout,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => $post_data,
+        ]);
 
-        $data = curl_exec($ch);
-        d(['data'=>$data]);
-        $errno = curl_errno( $ch );
+        $content = curl_exec($curl);
+        //$err = curl_error($curl);
+        $errno = curl_errno($curl);
+        curl_close($curl);
+        preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
+
+        $cookie = str_replace(['Set-Cookie: ', '; path=/; httponly'], '', $matches[0]);
+
+        if(!$cookie) return ['status'=>300, 'msg'=>'登陆失败'];
+
+        return ['status'=>200, 'cookie'=>$cookie, 'msg'=>'操作成功'];
+
+        //p(['content'=>$content, 'errno'=>$errno, $matches, $cookie]);
+
+        //p([$data, $errno]);
         if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
 
-        //if(strpos($url, 'betNumber')){ p(['url'=>$url, 'header'=>$header,'post_data'=>$post_data,'rstData'=>$data,curl_close($ch),$errno]); }
+        if(strpos($url, 'MemberLogin')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
         if(curl_close($ch)) {
             echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
         }

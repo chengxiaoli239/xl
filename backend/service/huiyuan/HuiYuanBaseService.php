@@ -226,8 +226,21 @@ class HuiYuanBaseService extends BaseTZService {
         $buy_type = $plan->buy_type ? $plan->buy_type : 1;
         $lottery_type = $plan->lottery_type;
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
+
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id]);
+        $account = $TzSystemsUsers->username;  # 投注用户账号，自动化平台账号
+
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
         $qihaoInfo = self::getPreTz(self::$user_id, self::$tz_system_id, $lottery_type);
+        if($qihaoInfo['status'] && strpos($qihaoInfo['msg'], '请重新登录')){
+            $loginRst = HuiYuanBaseService::login(self::$user_id, $TzSystemsUsers->tz_system_id);
+            if($loginRst['status'] == 300){
+                $loginRst = HuiYuanBaseService::login(self::$user_id, $TzSystemsUsers->tz_system_id);
+            }
+            $BetService = new HuiYuanBaseService(self::$user_id, $TzSystemsUsers->tz_system_id);
+            $rst = $BetService->bet($qihao, $plan_id, $codes);
+            return $rst;
+        }
         //p([self::$user_id, self::$tz_system_id, $lottery_type, $qihaoInfo]);
         if($qihaoInfo['status'] != 200) return $qihaoInfo;
 
@@ -236,9 +249,6 @@ class HuiYuanBaseService extends BaseTZService {
         if($rst['status'] != 200){
             $data = ['status'=>300, 'msg'=>$qihao.$rst['msg']];
         }
-
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id]);
-        $account = $TzSystemsUsers->username;  # 投注用户账号，自动化平台账号
 
         $bet_codes = self::formCodesStyle($codes, $playway, $plan->single);
         //p(['codes'=>$codes, 'bet_codes'=>$bet_codes]);
@@ -1028,14 +1038,15 @@ class HuiYuanBaseService extends BaseTZService {
             //self::$user_agent,
         ];
 
-        //$headers = array_unique(array_merge($headers,self::$headers));
-
-        $data = CurlService::kl8PostCurlLogin($url,http_build_query($post_data), $headers);
-        //sleep(10);
+        $data = CurlService::kl8PostCurlLogin($url,json_encode($post_data), $headers);
+        if($data['status'] == 200){
+            $TzSystemsUsers->cookie = $TzSystemsUsers->cookie.'; '.$data['cookie'];
+            $TzSystemsUsers->save();
+        }
         //self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'code'=>$code, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
-        p($logArr);
+        //p($logArr);
         return $data;
     }
 

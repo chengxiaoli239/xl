@@ -13,6 +13,7 @@ use backend\models\SystemType;
 use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
 use backend\models\User;
+use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\KuaiLe8Service;
 use backend\service\McKeyService;
 use backend\service\SevenService;
@@ -275,7 +276,7 @@ class IndexController extends Controller
                 case 3:
                     break;
                 case 4: # 北京快乐8
-                    $rst = KuaiLe8Service::synBalance($TzSystemsUser->id);
+                    $rst = HuiYuanBaseService::synBalance($TzSystemsUser->id);
                     break;
             }
         }
@@ -303,7 +304,7 @@ class IndexController extends Controller
                 # 5、希腊网
             }elseif(in_array($tz_system_id, [6])){
                 # 6、会员网 暂未对接完成，暂停自动登陆
-                //$rst = KuaiLe8Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                $rst = HuiYuanBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             }
         }
         return $rst;
