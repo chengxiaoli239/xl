@@ -23,9 +23,9 @@ class KuaiLe8Controller extends Controller
      * @desc 北京快乐8 - 99彩票网
      * @return array
      */
-    public function actionSevenDay($type = 'json'){
+    public function actionNineNine($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = CqsscKcw::getLotteryKuaiLe8SevenDay();
+        $data = CqsscKcw::getLotteryKuaiLe8NineNine();
         return $data;
     }
 

@@ -188,7 +188,7 @@ class CqsscKcw extends BaseKj {
      * @param string $returnType
      * @return array|bool
      */
-    public static function getLotteryKuaiLe8SevenDay($returnType = 'json', $lottery = 18){
+    public static function getLotteryKuaiLe8NineNine($returnType = 'json', $lottery = 18){
 
         if(!$kjData = self::getCurrentKjData()) {
             $domain = BaseKj::getApiHost(11);
@@ -203,7 +203,7 @@ class CqsscKcw extends BaseKj {
             $end_time = microtime(true);
             $time_consume = ($end_time-$start_time).'s';
             $logArr = ['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rst'=>$content, 'time_consume'=>$time_consume];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kl8_SevenDay', 'INFO', '号码抓取-kcw', $logArr);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kl8_99', 'INFO', '号码抓取-kcw', $logArr);
 
             $data = $content;
             //p(['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rstData'=>$data]);
@@ -237,7 +237,7 @@ class CqsscKcw extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kl8', 'INFO', '号码抓取-kcw', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kl8', 'INFO', '99彩票网-号码抓取', $logArr);
 
         return $rst;
     }
