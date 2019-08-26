@@ -55,6 +55,23 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         'email',
+                        //'status',
+                        ['attribute' => 'status','label'=>'投注系统权限', # 'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if($model->status == 1){
+                                    $txt = '<font color="red">已禁用</font>';
+                                    $alt = '点击启用';
+                                    $val = 10;
+                                }else{
+                                    $txt = '<font color="green">已启用</font>';
+                                    $val = 1;
+                                    $alt = '点击禁用';
+                                }
+                                $url = "/forum/user/switch-status?id=".$model->id."&status=".$val; #
+                                return Html::a($txt, $url, ['title' => '开通系统权限','alt'=>$alt]);
+                            }
+                        ],
                         'pay_time',
                         'desc',
                         /*
@@ -72,7 +89,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'tz_password',
                         //'cookie',
                         //'cookie2',
-                        //'status',
                         //'created_at',
                         //'updated_at',
 

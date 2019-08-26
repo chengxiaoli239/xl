@@ -8,6 +8,7 @@ use backend\service\BetService;
 use backend\service\HN0898Service;
 use backend\service\StaticService;
 use backend\service\TzService;
+use backend\service\UserService;
 use backend\service\UserSysPlansService;
 use Yii;
 use backend\models\UserSysPlans;
@@ -100,8 +101,8 @@ class UserSysPlansController extends BaseController
         $model->single = 0.1;
         $model->tz_type = $tz_type;
         $model->buy_type = 0;
-        $defaultSiteIds = explode(',',TzSystemsAuth::findOne(['uid'=>$this->_user_id])->tz_systems_ids);
-        $model->tz_sites = [$defaultSiteIds[0]];
+        $defaultSiteId = UserService::getUserDefaultSite($this->_user_id);
+        $model->tz_sites = [$defaultSiteId];
 
         $data =  [
             'model' => $model,

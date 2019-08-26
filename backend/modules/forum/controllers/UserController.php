@@ -213,6 +213,22 @@ class UserController extends BaseController
     }
 
     /**
+     * @desc 更新用户状态
+     * @param $id
+     * @param $status
+     * @return \yii\web\Response
+     */
+    public function actionSwitchStatus($id,$status){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if(\Yii::$app->user->id == 1){
+            UserService::updateUserStatus($id, $status);
+        }
+
+        return $this->redirect(['index']);
+    }
+
+
+    /**
      * Finds the User model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id 新用户表

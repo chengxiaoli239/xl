@@ -9,6 +9,7 @@
 
 namespace backend\service;
 use backend\models\TzSystems;
+use backend\models\TzSystemsAuth;
 use backend\models\TzSystemsUsers;
 use common\models\AdminModel;
 use common\models\AuthAssignment;
@@ -142,5 +143,40 @@ class UserService extends BaseService {
         //TzSystemsUsers::deleteAll($where); # 逻辑删除
         TzSystemsUsers::deleteRecord($where); # 物理删
         return $rst;
+    }
+
+    /**
+     * @description 更新用户表状态
+     * @param $id
+     * @param $account
+     * @return array
+     */
+    public static function updateUserStatus($id, $status)
+    {
+        if(!$id) return ['status'=>300, 'msg'=>'id为空'];
+        $m = \Yii::$app->cache;
+        $mkey = 'updateUserStatus_'.$id.'_'.$status;
+        if($rst = $m->get($mkey)) return false;
+
+        $data = AdminModel::findOne($id);
+        $data->status = (int)$status;
+
+        $m->set($mkey, 1, 10);
+
+        $rst = $data->save(false);
+        $TzSystemsUsers = TzSystemsUsers::findAll(['uid'=>$id]);
+        foreach ($TzSystemsUsers as $TzSystemsUser){
+            $TzSystemsUser->status = $status == 1 ? 0 : 1;
+            $TzSystemsUser->save();
+        }
+
+        return $rst;
+    }
+
+    public static function getUserDefaultSite($uid){
+
+        $defaultSiteIds = explode(',',TzSystemsAuth::findOne(['uid'=>$uid])->tz_systems_ids);
+
+        return $defaultSiteIds[0];
     }
 }
