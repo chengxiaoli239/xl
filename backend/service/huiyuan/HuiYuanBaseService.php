@@ -803,9 +803,6 @@ class HuiYuanBaseService extends BaseTZService {
             if($cookieData){
                 $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
                 $TzSystemsUsers->cookie = trim($cookieData);
-                if(!$TzSystemsUsers->user_agent){
-                    $TzSystemsUsers->user_agent = 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36';
-                }
                 $TzSystemsUsers->cookie = str_replace('; path=/','', $TzSystemsUsers->cookie);
                 $TzSystemsUsers->save();
             }
