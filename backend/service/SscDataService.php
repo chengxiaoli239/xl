@@ -596,6 +596,17 @@ class SscDataService extends BaseService {
             $SscStaticYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
             $SscStaticYl->count = $count;
 
+            $SscStaticYl->type_2b = $dsData->type_2b;
+            $SscStaticYl->type_3b = $dsData->type_3b;
+            $SscStaticYl->type_4b = $dsData->type_4b;
+            $SscStaticYl->type_2 = $dsData->type_2;
+            $SscStaticYl->type_3 = $dsData->type_3;
+            $SscStaticYl->type_4 = $dsData->type_4;
+            $SscStaticYl->type_22 = $dsData->type_22;
+            $SscStaticYl->type_4d = $dsData->type_4d;
+            $SscStaticYl->type_4s = $dsData->type_4s;
+            $SscStaticYl->type_log = $dsData->type_log;
+
             $qishu = SscDataService::getQishus($lottery_type);
             $where = ['AND'];
             foreach ($vals as $val){
@@ -1627,6 +1638,43 @@ class SscDataService extends BaseService {
                 p($Num4Type->getFirstErrors());
             }
         }
+        return $rst;
+    }
+
+    /**
+     * @desc 更新四定号码类型表号码类型
+     * @return mixed
+     */
+    public static function insertStaticVal(){
+
+        $SscStaticVals = SscStaticVal::findAll(['type'=>[4,5]]);
+        foreach ($SscStaticVals as $SscStaticVal){
+            $code = $SscStaticVal->val;
+            $codes = $code[0].','.$code[1].','.$code[2].','.$code[3];
+            $ds = CommonService::isCodeType4ds($codes); # 是否四单双：0非四单四双1四单2四双
+            $setData = [
+                'type_2' => CommonService::isCodeType2($codes), # 是否双重
+                'type_22' => CommonService::isCodeType22($codes), # 是否双双重
+                'type_3' => CommonService::isCodeType3($codes), # 是否三重
+                'type_4' => CommonService::isCodeType4($codes), # 是否四重
+                'type_2b' => CommonService::isCodeType2b($codes), # 是否两兄弟
+                'type_3b' => CommonService::isCodeType3b($codes), # 是否三兄弟
+                'type_4b' => CommonService::isCodeType4b($codes), # 是否四兄弟
+                'type_4d' => $ds == 1 ? 1 : 0,
+                'type_4s' => $ds == 2 ? 1 : 0,
+                'type_log' => CommonService::isCodeTypeLog($codes), # 是否对数
+            ];
+            $SscStaticVal->setAttributes($setData);
+            /*
+            if($codes == '1,2,3,4'){
+                p($setData,0);
+                p(CommonService::isCodeType4b($codes), 0);
+                p($SscStaticVal->attributes);
+            }
+            */
+            $rst = $SscStaticVal->save();
+        }
+
         return $rst;
     }
 

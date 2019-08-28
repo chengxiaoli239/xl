@@ -105,6 +105,7 @@ class IndexController extends Controller
 
     public function actionDw(){
         //p($content);
+        $rst = SscDataService::insertStaticVal();p($rst);
         $rst = HuiYuanService5::login(3, 6);p($rst);
         $rst = HuiYuanService5::loginNew(18, 6);p($rst);
         $rst = HuiYuanService5::synBalance(13);p($rst);
