@@ -26,6 +26,7 @@ use Yii;
  * @property int $type_4d 是否四单
  * @property int $type_4s 是否四双
  * @property int $type_log 是否对数
+ * @property int $type_4ds 是否四单四双
  */
 class SscStaticVal extends \common\models\base\BaseModel
 {
@@ -43,7 +44,7 @@ class SscStaticVal extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['status', 'type', 'static_nums', 'created_at', 'updated_at', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4d', 'type_4s', 'type_log'], 'integer'],
+            [['status', 'type', 'static_nums', 'created_at', 'updated_at', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4d', 'type_4s', 'type_log', 'type_4ds'], 'integer'],
             [['update_time'], 'safe'],
             [['val'], 'string', 'max' => 120],
             [['name'], 'string', 'max' => 64],
@@ -75,6 +76,7 @@ class SscStaticVal extends \common\models\base\BaseModel
             'type_4d' => '是否四单',
             'type_4s' => '是否四双',
             'type_log' => '是否对数',
+            'type_4ds' => '是否四单四双',
         ];
     }
 
