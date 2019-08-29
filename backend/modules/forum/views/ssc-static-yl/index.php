@@ -28,13 +28,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= Html::a('号码类型', ['index', 'SscStaticYl[type]'=>2], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                 </div>
                 <div class="btn-group">
-                    <?= Html::a('三现带双', ['index', 'SscStaticYl[type]'=>3], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                    <?= Html::a('三现不带双', ['index', 'SscStaticYl[type]'=>3, 'SscStaticYl[type_2]'=>0], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                 </div>
                 <div class="btn-group">
-                    <?= Html::a('四现带双', ['index', 'SscStaticYl[type]'=>4], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                    <?= Html::a('四现带双', ['index', 'SscStaticYl[type]'=>4, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                 </div>
                 <div class="btn-group">
-                    <?= Html::a('四现不带双', ['index', 'SscStaticYl[type]'=>4], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                    <?= Html::a('四现不带双', ['index', 'SscStaticYl[type]'=>4, 'SscStaticYl[type_2]'=>0], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                 </div>
                 ||
                 <!--div class="btn-group">
@@ -56,13 +56,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= Html::a('四兄弟', ['index', 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4b]'=>1], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                 </div>
                 <div class="btn-group">
-                    <?= Html::a('四单', ['index', 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4d]'=>1], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                    <?= Html::a('四单不带双', ['index', 'SscStaticYl[type]'=>4, 'SscStaticYl[type_2]'=>0, 'SscStaticYl[type_4d]'=>1], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                 </div>
                 <div class="btn-group">
                     <?= Html::a('四单带双', ['index', 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4d]'=>1, 'SscStaticYl[type_2]'=>1], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                 </div>
                 <div class="btn-group">
-                    <?= Html::a('四双', ['index', 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4s]'=>1], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                    <?= Html::a('四双不带双', ['index', 'SscStaticYl[type]'=>4, 'SscStaticYl[type_2]'=>0, 'SscStaticYl[type_4s]'=>1], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                 </div>
                 <div class="btn-group">
                     <?= Html::a('四双带双', ['index', 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4s]'=>1, 'SscStaticYl[type_2]'=>1], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>

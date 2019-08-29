@@ -1722,7 +1722,7 @@ class StaticService extends BaseService {
        $lottery_types = self::getLotteryTypes();
        $rst = ['status'=>200, 'msg'=>'数据处理成功'];
        foreach ($lottery_types as $lottery_type) {
-           if ($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl')) {
+           //if ($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl')) {
                # 号码类型：双重、双双重、四重、三兄弟、四兄弟
                $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
                # 三字现带双重
@@ -1732,7 +1732,7 @@ class StaticService extends BaseService {
                # 四字现不带双重
                //$rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type);
                StaticService::afterOpStatic($lottery_type, 'opAllCodeTypeYl');
-           }
+           //}
        }
 
        return $rst;

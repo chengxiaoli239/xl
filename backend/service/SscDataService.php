@@ -576,8 +576,8 @@ class SscDataService extends BaseService {
             if(!$SscStaticYl = SscStaticYl::findOne(['lottery_type'=>$lottery_type, 'val'=>$dsData['val']])){
                 $SscStaticYl = new SscStaticYl();
                 $SscStaticYl->created_at = time();
-                $SscStaticYl->static_nums = 250;
             }
+            $SscStaticYl->static_nums = $dsData['static_nums'];
             $vals = explode(',', $dsData['val']);
             $count = SscDataService::getNumCounts($vals);
             //if($dsData['val'] == 'type_2,type_3b') p([$count, $dsData['val']]);
@@ -700,11 +700,11 @@ class SscDataService extends BaseService {
     }
 
     /**
-     * @param $type 类型：1和值2号码类型[例如:双双重、三重]3三字现带双重4四字现带双重5四字现不带双重
+     * @param $type 类型：1和值2号码类型[例如:双双重、三重]3三字现4四字现
      * @return array|bool
      */
     public static function updateCodeTypeYLs($type, $lottery_type = DEFAULT_LOTTERY_TYPE){
-        if(!in_array($type, [3, 4, 5])) return false;
+        if(!in_array($type, [3, 4])) return false;
         $rst = [];
         $SscStaticVals = SscStaticVal::find()->where(['type'=>$type, 'status'=>1])->asArray()->all();
         foreach ($SscStaticVals as $dsData){
@@ -712,8 +712,8 @@ class SscDataService extends BaseService {
             if(!$SscStaticYl = SscStaticYl::findOne(['lottery_type'=>$lottery_type, 'type'=>$type, 'val'=>$dsData['val']])){
                 $SscStaticYl = new SscStaticYl();
                 $SscStaticYl->created_at = time();
-                $SscStaticYl->static_nums = 250;
             }
+            $SscStaticYl->static_nums = $dsData['static_nums'];
             //$vals = explode(',', $dsData['val']);
             $count = SscDataService::getCodeTypeNumCounts($type);
             //p([$dsData, $count]);
@@ -1693,7 +1693,7 @@ class SscDataService extends BaseService {
     /**
      * @desc 三字现
      * @param int $isDouble 0不带双重1带双重
-     * @param $type # 类型：1和值2号码类型[例如:双双重、三重]3三字现带双重4四字现带双重5四字现不带双重
+     * @param $type # 类型：1和值2号码类型[例如:双双重、三重]3三字现4四字现
      * @return bool
      */
     public static function insertCode($type = 3){
@@ -1702,13 +1702,14 @@ class SscDataService extends BaseService {
         $setData = [];
         switch ($type){
             case 3:
-                $codes = BaseNumService::getRepeat3Codes($isRepeat = 1);
+                $codes = BaseNumService::getRepeat3Codes($isRepeat = 1);  # 三字现，双重加一码、不含三重
+                $codes_3 = BaseNumService::getRepeat3Codes3(); # 三重三字现
+                $codes = array_merge($codes, $codes_3);
                 break;
             case 4:
-                $codes = BaseNumService::getRepeat4Codes($isRepeat = 1);
-                break;
-            case 5:
-                $codes = BaseNumService::getRepeat4Codes($isRepeat = 0);
+                $codes = BaseNumService::getRepeat4Codes($isRepeat = 1); # 四字现，双重加两码、不含三重
+                $codes = array_merge($codes, BaseNumService::getRepeat4Codes($isRepeat = 0)); # 四字现不含双重
+                $codes = array_merge($codes, BaseNumService::getRepeat4Codes3()); # 四字现三重
                 break;
         }
         foreach ($codes as $code){
@@ -1726,13 +1727,39 @@ class SscDataService extends BaseService {
                     'name' => $code,
                     'status' => 1,
             ]);
+            if($type == 3){
+                # 1、三字
+                $code = $code[0].','.$code[1].','.$code[2];
+                $type_2 = CommonService::isCodeType2_3z($code);
+                $type_3 = CommonService::isCodeType3_3z($code);
+                $setData = array_merge($setData, [
+                    'type_2' => $type_2,
+                    'type_3' => $type_3,
+                ]);
+
+            }elseif ( $type == 4 ){
+                # 四字
+                $code = $code[0].','.$code[1].','.$code[2].','.$code[3];
+                $ds = CommonService::isCodeType4ds($code); # 是否四单双：0非四单四双1四单2四双
+                $setData = array_merge($setData, [
+                    'type_2' => CommonService::isCodeType2($code),
+                    'type_3' => CommonService::isCodeType3($code),
+                    'type_4' => CommonService::isCodeType4($code),
+                    'type_2b' => CommonService::isCodeType2b($code),
+                    'type_3b' => CommonService::isCodeType3b($code),
+                    'type_4b' => CommonService::isCodeType4b($code),
+                    'type_4d' => $ds == 1 ? 1 : 0,
+                    'type_4s' => $ds == 2 ? 1 : 0,
+                    'type_log' => CommonService::isCodeTypeLog($code),
+                ]);
+
+            }
 
             $SscStaticVal->setAttributes($setData);
             //p($SscStaticVal->attributes);
             $SscStaticVal->save();
 
         }
-        p($codes);
 
         return true;
     }

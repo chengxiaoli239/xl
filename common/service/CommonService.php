@@ -648,6 +648,36 @@ class  CommonService{
     }
 
     /**
+     * @desc 是否双重 - 三字现
+     * @param string $codes 格式 1,2,3
+     * @return int
+     */
+    public static function isCodeType2_3z($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = array_unique($codesArr);
+        if(count($codesArr)==2) $flag = 1;
+        $flag = self::isCodeType3_3z($codes) == 1 ? 1 : $flag; # 三重属于双重
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否三重 - 三字现
+     * @param string $codes 格式 1,2,3
+     * @return int
+     */
+    public static function isCodeType3_3z($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = array_unique($codesArr);
+        if(count($codesArr)==1) $flag = 1;
+
+        return $flag;
+    }
+
+
+    /**
      * @desc 所有投注系统
      * @param int $status
      * @return array

@@ -103,12 +103,17 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        set_time_limit(0);
+        $rst = StaticService::opAllCodeTypeYl();p($rst);
+        # 号码类型：双重、双双重、四重、三兄弟、四兄弟
+        $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst);
         # 四字现带双重
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type = 5);p($rst);
+        $rst = SscDataService::insertCode($type = 4);p($rst); # 插入三字现、四字现
         # 三字现带双重
         $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 5);p($rst);
         # 四字现不带双重
-        $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5); p($rst);
+        //$rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5); p($rst);
         $arr = ['海南省内包邮'];
         //$str = 'a:1:{i:0;s:18:"海南省内包邮"}';
         p(serialize($arr));
@@ -154,9 +159,6 @@ class IndexController extends Controller
         $rst = StaticService::staticSDHzPerDateProfits(); p($rst);
         $rst = StaticService::staticSdHzProfitsPerdate(); p($rst); # 每天每个和值利润统计
 
-        # 号码类型：双重、双双重、四重、三兄弟、四兄弟
-        $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst);
-        $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type=5); p($rst);# 号码类型每天数量统计
         $rst = KjDataGet::updateNullCode($num = 1000);p($rst);
         # 三字现带双重
@@ -166,7 +168,6 @@ class IndexController extends Controller
         $rst = NumService::getCodesArise(['003']);p($rst); //2+3+1+2+2
         $codesArr = [9, 7, 9, 8];
         $code_3n = CommonService::get3n($codesArr);p($code_3n);
-        $rst = SscDataService::insertCode($type = 5);p($rst); # 插入三字现
         $rst = StaticService::staticHzCounts('2019-06-12', $lottery_type = 5); p($rst);
         $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type = 5);p($rst); # 号码类型每天数量统计
         //$data = '{"type_3":"1","type_22":"0","type_2b":"1","type_4b":"1","arise":"12345","p1":"3456","p2":"345679","p3":"89734","p4":"56092"}';
