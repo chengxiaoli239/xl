@@ -1,0 +1,9 @@
+UPDATE lt_ssc_static_val SET static_nums = 10000 WHERE type = 4 AND type_3 = 1;
+UPDATE lt_ssc_static_val SET static_nums = 5000 WHERE type = 3 AND type_3 = 1;
+UPDATE lt_ssc_static_val SET static_nums = 1200 WHERE type = 3 AND type_3=0 AND type_2 = 1;
+UPDATE lt_ssc_static_val SET static_nums = 4000 WHERE type = 4 AND type_2 = 0;
+UPDATE lt_ssc_static_val SET `status` = 0 WHERE type = 4 AND type_3 = 1;
+UPDATE lt_ssc_static_val SET `status` = 0 WHERE type = 2 AND type_3 = 1;
+UPDATE lt_ssc_static_val SET static_nums = 8000 WHERE type = 4 AND type_2 = 1;
+UPDATE lt_ssc_static_val SET static_nums = 5000 WHERE type = 4 AND (type_4d=1 OR type_4s=1);
+UPDATE lt_ssc_static_val SET static_nums = 10000 WHERE type = 4 AND (type_4d=1 OR type_4s=1) AND type_2=1;

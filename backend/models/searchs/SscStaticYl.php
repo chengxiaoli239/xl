@@ -18,7 +18,7 @@ class SscStaticYl extends SscStaticYlModel
     public function rules()
     {
         return [
-            [['id', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'ytd_nums', 'lottery_type', 'type', 'status', 'created_at', 'updated_at', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4d', 'type_4s', 'type_log'], 'integer'],
+            [['id', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'ytd_nums', 'lottery_type', 'type', 'status', 'created_at', 'updated_at', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4d', 'type_4s', 'type_log', 'type_4ds'], 'integer'],
             [['val', 'last_time_miss_range', 'max_range', 'yl_records', 'theory_nums_perdate', 'update_time'], 'safe'],
         ];
     }
@@ -45,9 +45,11 @@ class SscStaticYl extends SscStaticYlModel
 
         // add conditions that should always apply here
 
-        $dataProvider = new ActiveDataProvider([
+        $queryData = [
             'query' => $query,
-        ]);
+        ];
+        //if($params['SscStaticYl']['is_hots']) $queryData['sort'] = ['defaultOrder' => ['LENGTH(yl_records)'=>SORT_DESC]];
+        $dataProvider = new ActiveDataProvider($queryData);
 
         $this->load($params);
 
@@ -84,7 +86,14 @@ class SscStaticYl extends SscStaticYlModel
             'type_4d' => $this->type_4d,
             'type_4s' => $this->type_4s,
             'type_log' => $this->type_log,
+            'type_4ds' => $this->type_4ds,
         ]);
+        if($params['SscStaticYl']['is_hots'] == 1){
+            $query->orderBy(['LENGTH(yl_records)'=>SORT_DESC]);
+        }else{
+            if($this->val)
+                $query->andFilterWhere(['like', 'val', $this->val]);
+        }
 
         $query->andFilterWhere(['like', 'val', $this->val])
             ->andFilterWhere(['like', 'last_time_miss_range', $this->last_time_miss_range])

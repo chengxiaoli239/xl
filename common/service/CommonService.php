@@ -716,4 +716,29 @@ class  CommonService{
 
         return $dataArr;
     }
+
+     /**
+     * @desc 获取号码类型名称
+     * @param int $code_type
+     * @return array|mixed
+     */
+    public static function getCodeTypeName($code_type = 1){
+        $codeTypeNameArr = [
+            1 => '号码类型',
+            2 => '三现带双',
+            3 => '三现带双热码',
+            4 => '三现三重',
+            5 => '四现带双',
+            6 => '四现不带双',
+            7 => '四兄弟',
+            8 => '四单四双',
+            9 => '四单带双',
+            10 => '四双带双',
+        ];
+
+        if(isset($codeTypeNameArr[$code_type]) && $codeTypeNameArr[$code_type]) return $codeTypeNameArr[$code_type];
+
+        return $codeTypeNameArr;
+    }
+
 }

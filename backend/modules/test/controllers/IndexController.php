@@ -105,11 +105,11 @@ class IndexController extends Controller
     public function actionDw(){
         set_time_limit(0);
         $rst = StaticService::opAllCodeTypeYl();p($rst);
+        $rst = SscDataService::insertCode($type = 3);p($rst); # 插入三字现、四字现
         # 号码类型：双重、双双重、四重、三兄弟、四兄弟
         $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst);
         # 四字现带双重
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type = 5);p($rst);
-        $rst = SscDataService::insertCode($type = 4);p($rst); # 插入三字现、四字现
         # 三字现带双重
         $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 5);p($rst);
         # 四字现不带双重

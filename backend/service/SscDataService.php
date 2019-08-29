@@ -754,6 +754,7 @@ class SscDataService extends BaseService {
             $SscStaticYl->type_22 = (int)$dsData['type_22'];
             $SscStaticYl->type_4d = (int)$dsData['type_4d'];
             $SscStaticYl->type_4s = (int)$dsData['type_4s'];
+            $SscStaticYl->type_4ds = (int)$dsData['type_4ds'];
             $SscStaticYl->type_log = (int)$dsData['type_log'];
 
             $qishu = SscDataService::getQishus($lottery_type);
@@ -1750,6 +1751,7 @@ class SscDataService extends BaseService {
                     'type_4b' => CommonService::isCodeType4b($code),
                     'type_4d' => $ds == 1 ? 1 : 0,
                     'type_4s' => $ds == 2 ? 1 : 0,
+                    'type_4ds' => in_array($ds, [1,2]) ? 1 : 0,
                     'type_log' => CommonService::isCodeTypeLog($code),
                 ]);
 
