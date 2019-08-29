@@ -70,4 +70,13 @@ class KjConfig extends \common\models\base\BaseModel
             'updated_at' => '更新时间',
         ];
     }
+
+    /**
+     * @inheritdoc
+     * @return KjConfigQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new KjConfigQuery(get_called_class());
+    }
 }
