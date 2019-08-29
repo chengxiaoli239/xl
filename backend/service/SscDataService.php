@@ -596,16 +596,16 @@ class SscDataService extends BaseService {
             $SscStaticYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
             $SscStaticYl->count = $count;
 
-            $SscStaticYl->type_2b = $dsData->type_2b;
-            $SscStaticYl->type_3b = $dsData->type_3b;
-            $SscStaticYl->type_4b = $dsData->type_4b;
-            $SscStaticYl->type_2 = $dsData->type_2;
-            $SscStaticYl->type_3 = $dsData->type_3;
-            $SscStaticYl->type_4 = $dsData->type_4;
-            $SscStaticYl->type_22 = $dsData->type_22;
-            $SscStaticYl->type_4d = $dsData->type_4d;
-            $SscStaticYl->type_4s = $dsData->type_4s;
-            $SscStaticYl->type_log = $dsData->type_log;
+            $SscStaticYl->type_2b = (int)$dsData['type_2b'];
+            $SscStaticYl->type_3b = (int)$dsData['type_3b'];
+            $SscStaticYl->type_4b = (int)$dsData['type_4b'];
+            $SscStaticYl->type_2 = (int)$dsData['type_2'];
+            $SscStaticYl->type_3 = (int)$dsData['type_3'];
+            $SscStaticYl->type_4 = (int)$dsData['type_4'];
+            $SscStaticYl->type_22 = (int)$dsData['type_22'];
+            $SscStaticYl->type_4d = (int)$dsData['type_4d'];
+            $SscStaticYl->type_4s = (int)$dsData['type_4s'];
+            $SscStaticYl->type_log = (int)$dsData['type_log'];
 
             $qishu = SscDataService::getQishus($lottery_type);
             $where = ['AND'];
@@ -708,6 +708,7 @@ class SscDataService extends BaseService {
         $rst = [];
         $SscStaticVals = SscStaticVal::find()->where(['type'=>$type, 'status'=>1])->asArray()->all();
         foreach ($SscStaticVals as $dsData){
+            //p($dsData);
             if(!$SscStaticYl = SscStaticYl::findOne(['lottery_type'=>$lottery_type, 'type'=>$type, 'val'=>$dsData['val']])){
                 $SscStaticYl = new SscStaticYl();
                 $SscStaticYl->created_at = time();
@@ -744,16 +745,16 @@ class SscDataService extends BaseService {
             $SscStaticYl->count = $count;
             $SscStaticYl->status = $miss['current_times'] > $dsData['static_nums'] ? 0 : 1; # 前台显示
 
-            $SscStaticYl->type_2b = $dsData->type_2b;
-            $SscStaticYl->type_3b = $dsData->type_3b;
-            $SscStaticYl->type_4b = $dsData->type_4b;
-            $SscStaticYl->type_2 = $dsData->type_2;
-            $SscStaticYl->type_3 = $dsData->type_3;
-            $SscStaticYl->type_4 = $dsData->type_4;
-            $SscStaticYl->type_22 = $dsData->type_22;
-            $SscStaticYl->type_4d = $dsData->type_4d;
-            $SscStaticYl->type_4s = $dsData->type_4s;
-            $SscStaticYl->type_log = $dsData->type_log;
+            $SscStaticYl->type_2b = (int)$dsData['type_2b'];
+            $SscStaticYl->type_3b = (int)$dsData['type_3b'];
+            $SscStaticYl->type_4b = (int)$dsData['type_4b'];
+            $SscStaticYl->type_2 = (int)$dsData['type_2'];
+            $SscStaticYl->type_3 = (int)$dsData['type_3'];
+            $SscStaticYl->type_4 = (int)$dsData['type_4'];
+            $SscStaticYl->type_22 = (int)$dsData['type_22'];
+            $SscStaticYl->type_4d = (int)$dsData['type_4d'];
+            $SscStaticYl->type_4s = (int)$dsData['type_4s'];
+            $SscStaticYl->type_log = (int)$dsData['type_log'];
 
             $qishu = SscDataService::getQishus($lottery_type);
 
@@ -773,7 +774,7 @@ class SscDataService extends BaseService {
 
             $SscStaticYl->history_max_miss = max($miss['current_times'],$SscStaticYl->max_miss,$SscStaticYl->history_max_miss); // 6、历史最大遗漏
             $SscStaticYl->update_time = date('Y-m-d H:i:s');
-            //p($SscStaticYl->attributes,0);
+            //p($SscStaticYl->attributes);
             $rst = $SscStaticYl->save();
             if(!$rst){
                 $logArr = ['attributes'=>$SscStaticYl->attributes, 'msg'=>$SscStaticYl->getErrors()];
