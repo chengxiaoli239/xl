@@ -18,7 +18,7 @@ class SscStaticYl extends SscStaticYlModel
     public function rules()
     {
         return [
-            [['id', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'ytd_nums', 'lottery_type', 'type', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'ytd_nums', 'lottery_type', 'type', 'status', 'created_at', 'updated_at', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4d', 'type_4s', 'type_log'], 'integer'],
             [['val', 'last_time_miss_range', 'max_range', 'yl_records', 'theory_nums_perdate', 'update_time'], 'safe'],
         ];
     }
@@ -45,16 +45,11 @@ class SscStaticYl extends SscStaticYlModel
 
         // add conditions that should always apply here
 
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
         $this->load($params);
-        $queryWhere = [ 'query' => $query, ];
-        if(in_array($params['SscStaticYl']['type'], [ 91, 92, 93])){
-            $queryWhere = array_merge($queryWhere,[
-                'pagination' => [
-                    'pageSize' => 20,
-                ],
-            ]);
-        }
-        $dataProvider = new ActiveDataProvider($queryWhere);
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
@@ -63,7 +58,7 @@ class SscStaticYl extends SscStaticYlModel
         }
 
         // grid filtering conditions
-        $whereFilter = [
+        $query->andFilterWhere([
             'id' => $this->id,
             'current_miss' => $this->current_miss,
             'last_time_miss' => $this->last_time_miss,
@@ -79,19 +74,20 @@ class SscStaticYl extends SscStaticYlModel
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,
-        ];
-        if(in_array($this->type, [91, 92, 93])){
-            $tmpArr = [91=>3, 92=>4, 93=>5];
-            $whereFilter = ['type' => $tmpArr[$this->type]];
-            $query->orderBy(['LENGTH(yl_records)'=>SORT_DESC]);
-        }else{
-            if($this->val)
-                $query->andFilterWhere(['like', 'val', $this->val]);
-        }
+            'type_2' => $this->type_2,
+            'type_22' => $this->type_22,
+            'type_3' => $this->type_3,
+            'type_4' => $this->type_4,
+            'type_2b' => $this->type_2b,
+            'type_3b' => $this->type_3b,
+            'type_4b' => $this->type_4b,
+            'type_4d' => $this->type_4d,
+            'type_4s' => $this->type_4s,
+            'type_log' => $this->type_log,
+        ]);
 
-        $query->andFilterWhere($whereFilter);
-
-        $query->andFilterWhere(['like', 'last_time_miss_range', $this->last_time_miss_range])
+        $query->andFilterWhere(['like', 'val', $this->val])
+            ->andFilterWhere(['like', 'last_time_miss_range', $this->last_time_miss_range])
             ->andFilterWhere(['like', 'max_range', $this->max_range])
             ->andFilterWhere(['like', 'yl_records', $this->yl_records])
             ->andFilterWhere(['like', 'theory_nums_perdate', $this->theory_nums_perdate]);
