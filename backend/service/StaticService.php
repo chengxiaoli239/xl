@@ -1730,7 +1730,7 @@ class StaticService extends BaseService {
                # 四字现带双重
                $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type);
                # 四字现不带双重
-               $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type);
+               //$rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type);
                StaticService::afterOpStatic($lottery_type, 'opAllCodeTypeYl');
            }
        }

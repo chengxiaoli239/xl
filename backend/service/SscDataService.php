@@ -744,6 +744,17 @@ class SscDataService extends BaseService {
             $SscStaticYl->count = $count;
             $SscStaticYl->status = $miss['current_times'] > $dsData['static_nums'] ? 0 : 1; # 前台显示
 
+            $SscStaticYl->type_2b = $dsData->type_2b;
+            $SscStaticYl->type_3b = $dsData->type_3b;
+            $SscStaticYl->type_4b = $dsData->type_4b;
+            $SscStaticYl->type_2 = $dsData->type_2;
+            $SscStaticYl->type_3 = $dsData->type_3;
+            $SscStaticYl->type_4 = $dsData->type_4;
+            $SscStaticYl->type_22 = $dsData->type_22;
+            $SscStaticYl->type_4d = $dsData->type_4d;
+            $SscStaticYl->type_4s = $dsData->type_4s;
+            $SscStaticYl->type_log = $dsData->type_log;
+
             $qishu = SscDataService::getQishus($lottery_type);
 
             $len = strlen($dsData['val']);
