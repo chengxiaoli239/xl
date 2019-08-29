@@ -102,9 +102,10 @@ class IndexController extends Controller
         }
         p($datas);
     }
-
     public function actionDw(){
-        //p($content);
+        $arr = ['海南省内包邮'];
+        //$str = 'a:1:{i:0;s:18:"海南省内包邮"}';
+        p(serialize($arr));
         $rst = SscDataService::insertStaticVal();p($rst);
         $rst = HuiYuanService5::login(3, 6);p($rst);
         $rst = HuiYuanService5::loginNew(18, 6);p($rst);

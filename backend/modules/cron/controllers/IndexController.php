@@ -303,7 +303,7 @@ class IndexController extends Controller
             }elseif(in_array($tz_system_id, [5])){
                 # 5、希腊网
             }elseif(in_array($tz_system_id, [6])){
-                # 6、会员网 暂未对接完成，暂停自动登陆
+                # 6、会员网
                 $rst = HuiYuanBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             }
         }

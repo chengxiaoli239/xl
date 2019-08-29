@@ -40,16 +40,15 @@ class SscStaticYlController extends BaseController
         $queryParams['SscStaticYl']['status'] = 1;
         $type = $queryParams['SscStaticYl']['type'] ? $queryParams['SscStaticYl']['type'] : 2;
         $queryParams['SscStaticYl']['type'] = $type;
+        /*
         if($type == 91){ # 热码
             $queryParams['SscStaticYl']['val'] = [
                 # type:91 三现带双重热码
                 '116','007','077','112','001','227','377','344','244','277',
                 '288','447','448','446','688','779','188','788','066','122'
-                /*
-                '007','116','227','344','377','688','077','112','001','228',
-                '277','288','447','008','244','355','399','122','448','499',
-                '334','779','788','677','005','667','556','011','557','488'
-                */
+                #'007','116','227','344','377','688','077','112','001','228',
+                #'277','288','447','008','244','355','399','122','448','499',
+                //'334','779','788','677','005','667','556','011','557','488'
             ];
         }elseif ($type == 92){
              $queryParams['SscStaticYl']['val'] = [
@@ -64,9 +63,11 @@ class SscStaticYlController extends BaseController
                 '0356','0478','2378','0349','0125','0145','1259','1678','2359','3678'
             ];
         }
+        */
         $dataProvider = $searchModel->search($queryParams);
 
         $view = $type == 2 ? 'index' : 'indexs';
+        //p($view,0);
         return $this->render($view, [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
