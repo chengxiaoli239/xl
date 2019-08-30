@@ -104,6 +104,8 @@ class IndexController extends Controller
     }
     public function actionDw(){
         set_time_limit(0);
+        $arr = 0;
+        p(empty($arr));
         $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = SscDataService::insertCode($type = 3);p($rst); # 插入三字现、四字现
         # 号码类型：双重、双双重、四重、三兄弟、四兄弟

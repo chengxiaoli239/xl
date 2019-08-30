@@ -91,7 +91,7 @@ class UserSysPlansService extends BaseService {
             }
             unset($post['UserSysPlans']['hz']);
             # 9、上奖
-            if(isset($UserSysPlans['arise']) && ($UserSysPlans['arise'] OR $UserSysPlans['arise'] == 0)){
+            if(isset($UserSysPlans['arise']) && $UserSysPlans['arise'] !== '' && ($UserSysPlans['arise'] OR $UserSysPlans['arise'] == 0)){
                 $tmpFilter['arise'] = trim($UserSysPlans['arise']);
             }
             unset($post['UserSysPlans']['arise']);
