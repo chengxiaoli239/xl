@@ -53,10 +53,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= Html::a('四单四双', ['index', 'SscStaticYl[code_type]'=>8, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_2]'=>0, 'SscStaticYl[type_4ds]'=>1], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                 </div>
                 <div class="btn-group">
-                    <?= Html::a('四单带双', ['index', 'SscStaticYl[code_type]'=>9, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4d]'=>1, 'SscStaticYl[type_2]'=>1], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                    <?= Html::a('四单带双', ['index', 'SscStaticYl[code_type]'=>9, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4d]'=>1, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>1], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                 </div>
                 <div class="btn-group">
-                    <?= Html::a('四双带双', ['index', 'SscStaticYl[code_type]'=>10, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4s]'=>1, 'SscStaticYl[type_2]'=>1], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                    <?= Html::a('四双带双', ['index', 'SscStaticYl[code_type]'=>10, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4s]'=>1, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>1], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                 </div>
 
 
