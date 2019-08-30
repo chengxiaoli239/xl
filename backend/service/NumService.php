@@ -724,7 +724,7 @@ class NumService extends BaseService {
         $filter3 = []; # 上奖
         # 0、上奖
         if(isset($hz_Arr['arise'])){
-            if($hz_Arr['arise']) $filter3['arise'] = $hz_Arr['arise'];// else $filter0['arise'] = 0;
+            if(isset($hz_Arr['arise'])) $filter3['arise'] = $hz_Arr['arise'];// else $filter0['arise'] = 0;
         }
         # 1、双重
         if(isset($hz_Arr['type_2'])){

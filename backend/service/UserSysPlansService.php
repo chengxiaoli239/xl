@@ -39,7 +39,7 @@ class UserSysPlansService extends BaseService {
         }
         $post['UserSysPlans']['lottery_type'] = $lottery_type;
         //p($post,0);
-        //p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id]);
+        //p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id],0);
         $User = AdminModel::findOne($user_id);
         $post['UserSysPlans']['tz_sites'] = implode(',',$post['UserSysPlans']['tz_sites']);
         //p($post['UserSysPlans']['hz_Arr']);
@@ -91,8 +91,8 @@ class UserSysPlansService extends BaseService {
             }
             unset($post['UserSysPlans']['hz']);
             # 9、上奖
-            if(isset($UserSysPlans['arise']) && $UserSysPlans['arise']){
-                $tmpFilter['arise'] = $UserSysPlans['arise'];
+            if(isset($UserSysPlans['arise']) && ($UserSysPlans['arise'] OR $UserSysPlans['arise'] == 0)){
+                $tmpFilter['arise'] = trim($UserSysPlans['arise']);
             }
             unset($post['UserSysPlans']['arise']);
             # 10、第1位
@@ -102,17 +102,17 @@ class UserSysPlansService extends BaseService {
             unset($post['UserSysPlans']['p1']);
             # 11、第2位
             if(isset($UserSysPlans['p2']) && $UserSysPlans['p2']){
-                $tmpFilter['p2'] = $UserSysPlans['p2'];
+                $tmpFilter['p2'] = trim($UserSysPlans['p2']);
             }
             unset($post['UserSysPlans']['p2']);
             # 12、第3位
             if(isset($UserSysPlans['p3']) && $UserSysPlans['p3']){
-                $tmpFilter['p3'] = $UserSysPlans['p3'];
+                $tmpFilter['p3'] = trim($UserSysPlans['p3']);
             }
             unset($post['UserSysPlans']['p3']);
             # 13、第4位
             if(isset($UserSysPlans['p4']) && $UserSysPlans['p4']){
-                $tmpFilter['p4'] = $UserSysPlans['p4'];
+                $tmpFilter['p4'] = trim($UserSysPlans['p4']);
             }
             unset($post['UserSysPlans']['p4']);
             # 13、四单四双
@@ -146,7 +146,7 @@ class UserSysPlansService extends BaseService {
                 $hz_Arr = str_replace('，', ',', $hz_Arr);
                 $hz_Arr = str_replace(' ', ',', $hz_Arr);
             }
-            $post['UserSysPlans']['hz_Arr'] && $post['UserSysPlans']['hz_Arr'] = $hz_Arr;
+            $post['UserSysPlans']['hz_Arr'] && $post['UserSysPlans']['hz_Arr'] = trim($hz_Arr);
         }
         $post['UserSysPlans']['uid'] = $user_id;
         $post['UserSysPlans']['account'] = $User->username;
