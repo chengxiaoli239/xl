@@ -728,12 +728,14 @@ class SscDataService extends BaseService {
             if(in_array($type, [ 3 ]) OR $getDataType == 0 OR $flag){
                 # 中的执行这里
                 $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums']);
+                //p($miss);
             }else{
                 # 遗漏本表数据做计算，不中的情况执行这里
                 $miss = SscDataService::getCodeTypeYlByTab($dsData['val'], $lottery_type, $type);
+                //p([$miss, $dsData['val'], $lottery_type, $type]);
                 if(!$miss) continue;
             }
-            if($miss['current_times'])
+            //if($miss['current_times'])
             //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
             $SscStaticYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
             $SscStaticYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
@@ -1096,7 +1098,7 @@ class SscDataService extends BaseService {
         $m = \Yii::$app->cache;
         $qihao = HN0898Service::getQihao($lottery_type);
         $mkey = 'getCodeTypeYlByTab_'.$lottery_type.'_'.$value;
-        if($m->get($mkey)) return false;
+        //if($m->get($mkey)) return false;
 
         if(!$SscStaticYl = SscStaticYl::findOne(['val'=>$value, 'type'=>$type, 'lottery_type'=>$lottery_type])){
             return [];
@@ -1124,7 +1126,7 @@ class SscDataService extends BaseService {
         ];
         $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
         $m->set($mkey, 1, $time);
-        //p($rstData);
+        //p([$value, $rstData]);
         return $rstData;
     }
 

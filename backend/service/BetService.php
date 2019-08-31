@@ -829,7 +829,7 @@ abstract class BetService extends BaseBetService {
                 if(substr($qihao,6) == '01') $cacheTime = 60 * 60 * 8 + 10 * 60; # 8小时20分
             case 5: # 重庆时时彩
                 if(substr($qihao,6) == '010') $cacheTime = 60 * 60 * 4; # 4小时
-                if(substr($qihao,6) == '001') $cacheTime = 60 * 60 * 4; # 4小时
+                if(substr($qihao,6) == '001') $cacheTime = 30 * 60; # 30分钟
                 break;
             case 6: # 新疆时时彩
                 break;
