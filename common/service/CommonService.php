@@ -735,7 +735,9 @@ class  CommonService{
             7 => '四兄弟',
             8 => '四单四双',
             9 => '四单带双',
+            901 => '四单带双热码',
             10 => '四双带双',
+            1001 => '四双带双热码',
         ];
 
         if(isset($codeTypeNameArr[$code_type]) && $codeTypeNameArr[$code_type]) return $codeTypeNameArr[$code_type];
