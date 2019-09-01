@@ -5,24 +5,20 @@ use yii\grid\GridView;
 use yii\widgets\Pjax;
 use yii\helpers\BaseStringHelper;
 use backend\models\SscKjData;
-$newRecord = SscKjData::find()->select(['qihao','code_str'])->orderBy('id DESC')->asArray()->limit(1)->one();
+$newRecord = SscKjData::find()->select(['qihao','code_str'])->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->asArray()->limit(1)->one();
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\searchs\BettingRecords */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app', 'Betting Records');
 $this->params['breadcrumbs'][] = $this->title;
-$sys_profits_3d = \backend\models\VPerdateProfits::findOne(['playway'=>2, 'tz_date'=>date('Y-m-d')])->profits;
-$sys_profits_3d = $sys_profits_3d ? $sys_profits_3d : 0.00;
-$profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
+$lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type);
 ?>
 <section class="betting-records-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title);echo '['.$newRecord['qihao'].':'.$newRecord['code_str'].']   ['.$profits_desc.']'; ?>
-            <?= Html::a(Yii::t('app', 'playway 2 Plans'), ['index', 'BettingRecords[playway]'=>2], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-            <?= Html::a(Yii::t('app', 'playway 3 Plans'), ['index', 'BettingRecords[playway]'=>3], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+            <?= Html::encode($this->title).'-'.$lottery_type_name.' [ '.$newRecord['qihao'].':'.$newRecord['code_str'].']'; ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
@@ -32,7 +28,8 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                     </div>
                 </div-->
 
-    <?php Pjax::begin(); ?>
+                <?php include(dirname(__FILE__).'/index_tab.php'); ?>
+            <?php Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([

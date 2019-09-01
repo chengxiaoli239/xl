@@ -1297,12 +1297,12 @@ class StaticService extends BaseService {
         $mkey = 'staticKj3NumCounts_'.$lottery_type.'_'.$date;
 
         if($staticDatas = $m->get($mkey)) return $staticDatas;
-        $SscKjData3nums = SscKjData3num::find()->where(['date'=>$date, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(2000)->all();
-        if(!$SscKjData3nums) return ['status'=>300, 'msg'=>'无统计数据'];
+        $SscKjDatas = SscKjData::find()->where(['date'=>$date, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(2000)->all();
+        if(!$SscKjDatas) return ['status'=>300, 'msg'=>'无统计数据'];
         $staticDatas = [];
-        foreach ($SscKjData3nums as $key=>$SscKjData3num){
-            if(!$SscKjData3num->code_3n) continue;
-            $codes3Nums = explode(',', $SscKjData3num->code_3n);
+        foreach ($SscKjDatas as $key=>$SscKjData){
+            if(!$SscKjData->code_3n) continue;
+            $codes3Nums = explode(',', $SscKjData->code_3n);
             foreach ($codes3Nums as $nums){
                 if(!isset($staticDatas[$nums])) $staticDatas[$nums] = 0;
                 $staticDatas[(string)$nums] += 1;
@@ -1414,7 +1414,7 @@ class StaticService extends BaseService {
 
         $allStatic = [];
         for($s=0; $s<5; $s++){
-            $Static3numArisePerdate = Static3numArisePerdate::find()->all();
+            $Static3numArisePerdate = Static3numArisePerdate::find()->where(['lottery_type'=>$lottery_type])->all();
             $flag = count($Static3numArisePerdate);
             if(!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
             if($beforeDays == 120 OR !$time = $m->get($mkey)) {
@@ -1427,6 +1427,7 @@ class StaticService extends BaseService {
             $date = min([date('Y-m-d'), $date]);
             if($date>date('Y-m-d')) break;
             if($statics = self::staticKj3NumCounts($date, $lottery_type)){
+                p($statics);
                 $setData = [];
                 foreach ($statics as $key=>$static){
                     $setData['codes_'.$key] = $static;

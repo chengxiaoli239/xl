@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\UserSysPlansService;
 use Yii;
 use backend\models\SscSdHzYl;
 use backend\models\searchs\SscSdHzYl as SscSdHzYlSearch;
@@ -38,9 +39,18 @@ class SscSdHzYlController extends BaseController
         $searchModel = new SscSdHzYlSearch();
         $queryParams = Yii::$app->request->queryParams;
         $queryParams['SscSdHzYl']['status'] = 1;
-        $dataProvider = $searchModel->search($queryParams);
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        if(!$queryParams['SscSdHzYl']['lottery_type']){
+            $lottery_type = $lottery_types[0]['lottery_type'];
+        }else{
+            $lottery_type = $queryParams['SscSdHzYl']['lottery_type'];
+        }
+        $queryParams['SscSdHzYl']['lottery_type'] = $lottery_type;
 
+        $dataProvider = $searchModel->search($queryParams);
         return $this->render('index', [
+            'lottery_types' => $lottery_types,
+            'lottery_type' => $lottery_type,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);

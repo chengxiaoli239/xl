@@ -9,12 +9,13 @@ use yii\grid\GridView;
 
 $this->title = Yii::t('app', 'Static3num Arise Perdates');
 $this->params['breadcrumbs'][] = $this->title;
+$lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type);
 ?>
 <section class="static3num-arise-perdate-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title) ?>
+            <?= Html::encode($this->title).'-'.$lottery_type_name ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
@@ -24,6 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 </div-->
 
+                <?php include(dirname(__FILE__).'/index_tab.php'); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([

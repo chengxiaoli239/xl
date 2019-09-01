@@ -6,6 +6,7 @@ use backend\models\searchs\VPerdateProfits as VPerdateProfitsSearch;
 use backend\service\BetService;
 use backend\service\HN0898Service;
 use backend\service\StaticService;
+use backend\service\UserSysPlansService;
 use Yii;
 use backend\models\BettingRecords;
 use backend\models\searchs\BettingRecords as BettingRecordsSearch;
@@ -41,9 +42,13 @@ class BettingRecordsController extends BaseController
     {
         $searchModel = new BettingRecordsSearch();
         $queryParams = Yii::$app->request->queryParams;
-        //$queryParams['BettingRecords']['uid'] = $this->_user_id;
-        //p([$this->_account,$queryParams]);
-
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        if(!$queryParams['BettingRecords']['lottery_type']){
+            $lottery_type = $lottery_types[0]['lottery_type'];
+        }else{
+            $lottery_type = $queryParams['BettingRecords']['lottery_type'];
+        }
+        $queryParams['BettingRecords']['lottery_type'] = $lottery_type;
 
         if($this->_user_id !== 1){
             $queryParams['BettingRecords']['uid'] = $this->_user_id;
@@ -53,6 +58,8 @@ class BettingRecordsController extends BaseController
         $qihao = HN0898Service::getQihao();
 
         $data = [
+            'lottery_types' => $lottery_types,
+            'lottery_type' => $lottery_type,
             'qihao' => $qihao,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,

@@ -27,9 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?= Html::a(Yii::t('app', 'Create Ssc Ds Yl'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
                 </div-->
-                <?php
-                include(dirname(__FILE__).'/index_tab.php');
-                ?>
+                <?php include(dirname(__FILE__).'/index_tab.php'); ?>
 
     <?php Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -109,6 +107,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->history_max_miss;
                             }
                         ],
+                        /*
                         ['attribute' => 'lottery_type','label'=>'彩票类型',#'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
                                 $txt = \common\service\CommonService::getLotteryName($model->lottery_type);
@@ -116,6 +115,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $txt;
                             }
                         ],
+                        */
                         //'updated_at',
                         'update_time',
 

@@ -48,11 +48,22 @@ class UserSysPlansController extends BaseController
         if($this->_user_id !== 1){ # 超级管理员
             $queryParams['UserSysPlans']['uid'] = $this->_user_id;
         }
+
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        if(!$queryParams['UserSysPlans']['lottery_type']){
+            $lottery_type = $lottery_types[0]['lottery_type'];
+        }else{
+            $lottery_type = $queryParams['UserSysPlans']['lottery_type'];
+        }
+        $queryParams['UserSysPlans']['lottery_type'] = $lottery_type;
         $dataProvider = $searchModel->search($queryParams);
-        $myTzTypes = UserSysPlansService::getMyTzTypes($this->_user_id);
+
+        $myTzTypes = UserSysPlansService::getMyTzTypes($this->_user_id, $lottery_type);
 
         $view = $this->_user_id !== 1 ? 'index' : 'index_admin';
         return $this->render($view, [
+            'lottery_types' => $lottery_types,
+            'lottery_type' => $lottery_type,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'myTzTypes' => $myTzTypes,
@@ -81,11 +92,13 @@ class UserSysPlansController extends BaseController
     public function actionCreate($tz_type='')
     {
         $model = new UserSysPlans();
+        $queryParams = \Yii::$app->request->queryParams;
 
-        !$tz_type && $tz_type = \Yii::$app->request->queryParams['tz_type'];
-        $playway = \Yii::$app->request->queryParams['playway'];
+        !$tz_type && $tz_type = $queryParams['tz_type'];
+        $playway = $queryParams['playway'];
         !$playway && $playway = BetService::getPlaywayByTzType($tz_type);
 
+        //p($this->_post);
         UserSysPlansService::preOpData($this->_post, $this->_user_id);
         if ($model->load($this->_post) && $model->save()) {
             if(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存

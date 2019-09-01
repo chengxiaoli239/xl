@@ -9,6 +9,7 @@ use yii\grid\GridView;
 
 $this->title = Yii::t('app', 'Static Hz Profits Perdates');
 $this->params['breadcrumbs'][] = $this->title;
+$lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type);
 ?>
 <section class="static-hz-profits-perdate-index wrapper site-min-height">
     <!-- page start-->

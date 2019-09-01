@@ -10,30 +10,29 @@ use yii\helpers\BaseStringHelper;
 
 $this->title = Yii::t('app', 'User Sys Plans');
 $this->params['breadcrumbs'][] = $this->title;
-$sys_profits_3d = \backend\models\VPerdateProfits::findOne(['playway'=>2, 'tz_date'=>date('Y-m-d')])->profits;
-$sys_profits_3d = $sys_profits_3d ? $sys_profits_3d : 0.00;
-$profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
+$lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type);
 ?>
 <section class="user-sys-plans-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title).'    ['.$profits_desc.']'; ?>
+            <?= Html::encode($this->title).'-'.$lottery_type_name; ?>
+            <?php include(dirname(__FILE__).'/index_tab.php'); ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
                 <div class="clearfix">
                     <span><strong>添加计划：</strong></span>
-                    <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'User Sys Plans 2d'), ['create', 'playway'=>2, 'tz_type'=>16], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-                    </div>
+                    <!--div class="btn-group">
+                        <?= Html::a(Yii::t('app', 'User Sys Plans 2d'), ['create', 'playway'=>2, 'tz_type'=>16, 'lottery_type'=>$lottery_type], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                    </div-->
 
                     <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'User Sys Plans 3d'), ['create', 'playway'=>3], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                        <?= Html::a(Yii::t('app', 'User Sys Plans 3d'), ['create', 'playway'=>3, 'lottery_type'=>$lottery_type], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
                     <?php foreach ($myTzTypes as $typeData):?>
                     <div class="btn-group">
-                        <?= Html::a($typeData['type_name'], ['create', 'tz_type'=>$typeData['tz_type']], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                        <?= Html::a($typeData['type_name'], ['create', 'tz_type'=>$typeData['tz_type'], 'lottery_type'=>$typeData['lottery_type']], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
                     <?endforeach;?>
                 </div>

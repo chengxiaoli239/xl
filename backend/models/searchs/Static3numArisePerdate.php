@@ -18,7 +18,7 @@ class Static3numArisePerdate extends Static3numArisePerdateModel
     public function rules()
     {
         return [
-            [['id', 'codes_289', 'codes_046', 'codes_456', 'codes_125', 'codes_589', 'codes_025', 'codes_467', 'codes_256', 'codes_128', 'codes_347', 'codes_134', 'codes_258', 'codes_124', 'codes_014', 'codes_147', 'codes_345', 'codes_678', 'codes_238', 'codes_239', 'codes_028', 'codes_268', 'codes_389', 'codes_348', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'codes_289', 'codes_046', 'codes_456', 'codes_125', 'codes_589', 'codes_025', 'codes_467', 'codes_256', 'codes_128', 'codes_347', 'codes_134', 'codes_258', 'codes_124', 'codes_014', 'codes_147', 'codes_345', 'codes_678', 'codes_238', 'codes_239', 'codes_028', 'codes_268', 'codes_389', 'codes_348', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
         ];
     }
@@ -84,6 +84,7 @@ class Static3numArisePerdate extends Static3numArisePerdateModel
             'codes_268' => $this->codes_268,
             'codes_389' => $this->codes_389,
             'codes_348' => $this->codes_348,
+            'lottery_type' => $this->lottery_type,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,

@@ -9,20 +9,24 @@ use yii\widgets\Pjax;
 
 $this->title = Yii::t('app', 'Ssc3num Yls');
 $this->params['breadcrumbs'][] = $this->title;
+$lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type);
 ?>
 <section class="ssc3num-yl-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title) ?>
+            <?= $lottery_type_name.'-'.Html::encode($this->title) ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
                 <!--div class="clearfix">
                     <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'Create Ssc3num Yl'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                        <?= $lottery_type_name.'-'.Html::a(Yii::t('app', 'Create Ssc3num Yl'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
                 </div-->
+                <?php
+                include(dirname(__FILE__).'/index_tab.php');
+                ?>
 
     <?php Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>

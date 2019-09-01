@@ -41,10 +41,10 @@ class SscDsYlController extends BaseController
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
         if(!$queryParams['SscDsYl']['lottery_type']){
             $lottery_type = $lottery_types[0]['lottery_type'];
-            $queryParams['SscDsYl']['lottery_type'] = $lottery_type;
         }else{
             $lottery_type = $queryParams['SscDsYl']['lottery_type'];
         }
+        $queryParams['SscDsYl']['lottery_type'] = $lottery_type;
         $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [

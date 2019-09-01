@@ -18,7 +18,7 @@ class UserSysPlans extends UserSysPlansModel
     public function rules()
     {
         return [
-            [['id', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'uid', 'lottery_type', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'created_at', 'updated_at'], 'integer'],
             [['account', 'tz_sites', 'hz_Arr', 'update_time'], 'safe'],
             [['single'], 'number'],
         ];
@@ -63,6 +63,7 @@ class UserSysPlans extends UserSysPlansModel
         $queryWhere = [
             'id' => $this->id,
             'playway' => $this->playway,
+            'lottery_type' => $this->lottery_type,
             'status' => $status,
             'single' => $this->single,
             'tz_type' => $this->tz_type,

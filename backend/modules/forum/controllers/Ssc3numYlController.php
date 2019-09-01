@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\UserSysPlansService;
 use Yii;
 use backend\models\Ssc3numYl;
 use backend\models\searchs\Ssc3numYl as Ssc3numYlSearch;
@@ -37,10 +38,18 @@ class Ssc3numYlController extends BaseController
     {
         $searchModel = new Ssc3numYlSearch();
         $queryParams = Yii::$app->request->queryParams;
-        $queryParams['Ssc3numYl']['lottery_type'] = DEFAULT_LOTTERY_TYPE;
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        if(!$queryParams['Ssc3numYl']['lottery_type']){
+            $lottery_type = $lottery_types[0]['lottery_type'];
+        }else{
+            $lottery_type = $queryParams['Ssc3numYl']['lottery_type'];
+        }
+        $queryParams['Ssc3numYl']['lottery_type'] = $lottery_type;
         $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
+            'lottery_types' => $lottery_types,
+            'lottery_type' => $lottery_type,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);

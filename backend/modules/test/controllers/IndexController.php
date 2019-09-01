@@ -103,6 +103,8 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 5);p($rst); # 上奖三字现
+        $statics = StaticService::staticKj3NumCounts($date='2019-09-01', $lottery_type=5);p($statics);
         $rst = CommonService::getLotteryName();p($rst);
         # 四字现带双重
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type = 5);p($rst);
@@ -149,8 +151,6 @@ class IndexController extends Controller
         $rst = SscDataService::getCodesDS('1,2,3,4,5');p($rst);
         $rst = StaticService::opStatic();p($rst); # 和值、四定利润统计
         $rst[] = StaticService::static4dPerDateProfits();p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
-        $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 5);p($rst); # 上奖三字现
-        $statics = StaticService::staticKj3NumCounts($date='2019-07-02', $lottery_type=5);p($statics);
         $rst[] = StaticService::opAllStaticProfits(); p($rst);# 利润统计
         $rst = StaticService::allHzStaticProfits($lottery_type = 5);p($rst); # 每个月份每个和值利润统计
         $rst = StaticService::staticPerHzProfits('2019-03');p($rst); # 某月份每个和值利润统计

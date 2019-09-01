@@ -30,7 +30,7 @@ class UserSysPlansService extends BaseService {
      * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return bool
      */
-    public static function preOpData(&$post, $user_id='', $lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function preOpData(&$post, $user_id=''){
         if(!$post OR !$user_id) return false;
         $tz_type = $post['UserSysPlans']['tz_type'];
         $playway = $post['UserSysPlans']['playway'];
@@ -38,8 +38,6 @@ class UserSysPlansService extends BaseService {
             $playway = BetService::getPlaywayByTzType($tz_type);
             $post['UserSysPlans']['playway'] = $playway;
         }
-        $post['UserSysPlans']['lottery_type'] = $lottery_type;
-        //p($post,0);
         //p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id],0);
         $User = AdminModel::findOne($user_id);
         $post['UserSysPlans']['tz_sites'] = implode(',',$post['UserSysPlans']['tz_sites']);
@@ -353,10 +351,10 @@ class UserSysPlansService extends BaseService {
      * @param $uid
      * @return array|TzTypes[]
      */
-    public static function getMyTzTypes($uid){
+    public static function getMyTzTypes($uid, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
         $m = \Yii::$app->cache;
-        $mkey = 'getMyTzTypes_data_'.$uid;
+        $mkey = 'getMyTzTypes_data_'.$lottery_type.'_'.$uid;
         if($tzTypeArr = $m->get($mkey)) return $tzTypeArr;
         $tz_types_Arr = explode(',', TzSystemsAuth::find()->where(['uid'=>$uid])->one()->tz_types);
 
@@ -365,7 +363,7 @@ class UserSysPlansService extends BaseService {
             $tzTypeArr[$key]['tz_type'] = $data['type'];
             $tzTypeArr[$key]['type_name'] = $data['type_name'];
             $tzTypeArr[$key]['playway'] = $data['playway'];
-            $tzTypeArr[$key]['lottery_type'] = $data['playway'];
+            $tzTypeArr[$key]['lottery_type'] = $lottery_type;
         }
 
         $m->set($mkey, $tzTypeArr, \Yii::$app->params['BASE_DATA_CACHE_TIME']);
