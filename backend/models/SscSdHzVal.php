@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string $val 和值范围
  * @property int $status 是否显示0不显示1显示
+ * @property int $static_nums 统计期数
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -30,7 +31,7 @@ class SscSdHzVal extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['status', 'created_at', 'updated_at'], 'integer'],
+            [['status', 'static_nums', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
             [['val'], 'string', 'max' => 120],
         ];
@@ -42,12 +43,13 @@ class SscSdHzVal extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'val' => Yii::t('app', '和值范围'),
-            'status' => Yii::t('app', '是否显示0不显示1显示'),
-            'created_at' => Yii::t('app', '创建时间'),
-            'updated_at' => Yii::t('app', '更新时间'),
-            'update_time' => Yii::t('app', '更新时间'),
+            'id' => 'ID',
+            'val' => '和值范围',
+            'status' => '是否显示0不显示1显示',
+            'static_nums' => '统计期数',
+            'created_at' => '创建时间',
+            'updated_at' => '更新时间',
+            'update_time' => '更新时间',
         ];
     }
 
