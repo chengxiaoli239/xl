@@ -24,6 +24,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 </div-->
 
+                <?php
+                include(dirname(__FILE__).'/index_tab.php');
+                ?>
+
     <?php Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -54,6 +58,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         'type_3b',
                         'type_4b',
                         'type_4ds',
+                        //'lottery_type',
+                        ['attribute' => 'lottery_type','label'=>'彩票类型',#'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                $txt = \common\service\CommonService::getLotteryName($model->lottery_type);
+
+                                return $txt;
+                            }
+                        ],
                         //'code_1_2',
                         //'code_1_3',
                         //'code_1_4',

@@ -23,5 +23,7 @@ return [
     # 导入号码投注类型
     'IMPORT_CODES_TYPES' => [ 19 ],
 
+    'GET_BASE_DATA_CACHE_TIME' => 30 * 60,
+
 ];
 

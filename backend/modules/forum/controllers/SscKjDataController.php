@@ -2,6 +2,8 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\UserSysPlansService;
+use common\service\CommonService;
 use Yii;
 use backend\models\SscKjData;
 use backend\models\searchs\SscKjData as SscKjDataSearch;
@@ -36,9 +38,15 @@ class SscKjDataController extends BaseController
     public function actionIndex()
     {
         $searchModel = new SscKjDataSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        if(!$queryParams['SscKjData']['lottery_type']){
+            $queryParams['SscKjData']['lottery_type'] = $lottery_types[0]['lottery_type'];
+        }
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
+            'lottery_types' => $lottery_types,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);

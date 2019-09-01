@@ -2,6 +2,7 @@
 
 namespace common\service;
 use backend\models\BettingRecords;
+use backend\models\LotteryType;
 use backend\models\TzSystems;
 use backend\models\TzTypes;
 use backend\models\UserFollowData;
@@ -743,6 +744,39 @@ class  CommonService{
         if(isset($codeTypeNameArr[$code_type]) && $codeTypeNameArr[$code_type]) return $codeTypeNameArr[$code_type];
 
         return $codeTypeNameArr;
+    }
+
+    /**
+     * @desc 获取所有彩票名称
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function getLotterys(){
+        $m = \Yii::$app->cache;
+        $mkey = 'getLotterys_data';
+        if($data = $m->get($mkey)) return $data;
+        $lottery_types = LotteryType::find()->where(['enable'=>1])->asArray()->all();
+
+        $data = [];
+        foreach ($lottery_types as $lottery){
+            $data[$lottery['lottery_type']] = $lottery['shortName'];
+        }
+        $m->set($mkey, $data, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
+
+        return $data;
+    }
+
+    /**
+     * @desc 获取彩票名称
+     * @param int $lottery_type
+     * @return mixed
+     */
+    public static function getLotteryName($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $lotterys = self::getLotterys();
+
+        $data = $lotterys[$lottery_type];
+
+        return $data;
     }
 
 }

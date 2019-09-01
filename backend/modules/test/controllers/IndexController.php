@@ -103,6 +103,7 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $rst = CommonService::getLotteryName();p($rst);
         # 四字现带双重
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type = 5);p($rst);
         # 号码类型：双重、双双重、四重、三兄弟、四兄弟

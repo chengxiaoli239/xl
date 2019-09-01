@@ -9,6 +9,7 @@
 
 namespace backend\service;
 use backend\models\ImportPlanCodes;
+use backend\models\LotteryType;
 use backend\models\SscDsYl;
 use backend\models\SysPlansCodes;
 use backend\models\TzSystemsAuth;
@@ -354,18 +355,52 @@ class UserSysPlansService extends BaseService {
      */
     public static function getMyTzTypes($uid){
 
+        $m = \Yii::$app->cache;
+        $mkey = 'getMyTzTypes_data_'.$uid;
+        if($tzTypeArr = $m->get($mkey)) return $tzTypeArr;
         $tz_types_Arr = explode(',', TzSystemsAuth::find()->where(['uid'=>$uid])->one()->tz_types);
 
         $TzTypes = TzTypes::find()->where(['type'=>$tz_types_Arr])->asArray()->all();
-        $tzTypeArr = [];
         foreach ($TzTypes as $key=>$data){
             $tzTypeArr[$key]['tz_type'] = $data['type'];
             $tzTypeArr[$key]['type_name'] = $data['type_name'];
             $tzTypeArr[$key]['playway'] = $data['playway'];
+            $tzTypeArr[$key]['lottery_type'] = $data['playway'];
         }
+
+        $m->set($mkey, $tzTypeArr, \Yii::$app->params['BASE_DATA_CACHE_TIME']);
 
         return $tzTypeArr;
     }
+
+    /**
+     * @desc 获取我的投注类型
+     * @param $uid
+     * @return array|mixed
+     */
+    public static function getMyLotteryTypes($uid){
+
+        $m = \Yii::$app->cache;
+        $mkey = 'getMyLotteryTypes_data_'.$uid;
+        //if($typeDatas = $m->get($mkey)) return $typeDatas;
+        $lottery_types = explode(',', TzSystemsAuth::find()->where(['uid'=>$uid])->one()->lottery_types);
+
+        $datas = LotteryType::find()->where(['lottery_type'=>$lottery_types])->asArray()->all();
+        $tmpDatas = [];
+        foreach ($datas as $key=>$data){
+            $tmpDatas[$data['lottery_type']] = $data['shortName'];
+        }
+        $typeDatas = [];
+        foreach ($lottery_types as $key=>$lottery_type){
+            $typeDatas[$key]['lottery_type'] = $lottery_type;
+            $typeDatas[$key]['name'] = $tmpDatas[$lottery_type];
+        }
+
+        $m->set($mkey, $typeDatas, \Yii::$app->params['BASE_DATA_CACHE_TIME']);
+
+        return $typeDatas;
+    }
+
 
     /**
      * @desc 获取默认投注注数

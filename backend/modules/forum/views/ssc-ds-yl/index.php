@@ -4,8 +4,9 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 use backend\models\SscKjData;
-$newRecord = SscKjData::find()->select(['qihao','code_str'])->orderBy('id DESC')->asArray()->limit(1)->one();
+$newRecord = SscKjData::find()->select(['qihao','code_str'])->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->asArray()->limit(1)->one();
 $newTime = \backend\models\SscKjDataDs::find()->select(['max(update_time) as update_time'])->asArray()->limit(1)->one()['update_time'];
+$lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type);
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\searchs\SscDsYl */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -17,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title);echo '['.$newRecord['qihao'].':'.$newRecord['code_str'].']';//== '.$newTime;  ?>
+            <?= $lottery_type_name.'-'.Html::encode($this->title);echo '['.$newRecord['qihao'].':'.$newRecord['code_str'].']';//== '.$newTime;  ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
@@ -26,6 +27,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?= Html::a(Yii::t('app', 'Create Ssc Ds Yl'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
                 </div-->
+                <?php
+                include(dirname(__FILE__).'/index_tab.php');
+                ?>
 
     <?php Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -103,6 +107,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute'=>'history_max_miss','label'=>'历史最大','headerOptions'=>['width'=>'3%'],
                             'value'=>function($model){
                                 return $model->history_max_miss;
+                            }
+                        ],
+                        ['attribute' => 'lottery_type','label'=>'彩票类型',#'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                $txt = \common\service\CommonService::getLotteryName($model->lottery_type);
+
+                                return $txt;
                             }
                         ],
                         //'updated_at',

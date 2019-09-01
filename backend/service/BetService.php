@@ -825,8 +825,8 @@ abstract class BetService extends BaseBetService {
             case 3: # 希腊5分彩
                 break;
             case 4: # 希腊10分彩
-                break;
                 if(substr($qihao,6) == '01') $cacheTime = 60 * 60 * 8 + 10 * 60; # 8小时20分
+                break;
             case 5: # 重庆时时彩
                 if(substr($qihao,6) == '010') $cacheTime = 60 * 60 * 4; # 4小时
                 if(substr($qihao,6) == '001') $cacheTime = 30 * 60; # 30分钟
