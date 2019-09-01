@@ -11,6 +11,7 @@ use Yii;
  * @property int $uid 用户id
  * @property string $tz_systems_ids 系统类型id列表，lt_tz_systems.id
  * @property string $tz_types 投注方式tz_types
+ * @property string $lottery_types 彩票类型
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -34,7 +35,7 @@ class TzSystemsAuth extends \common\models\base\BaseModel
             [['uid', 'created_at', 'updated_at'], 'integer'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
-            [['tz_systems_ids', 'tz_types'], 'string', 'max' => 255],
+            [['tz_systems_ids', 'tz_types', 'lottery_types'], 'string', 'max' => 255],
         ];
     }
 
@@ -44,13 +45,14 @@ class TzSystemsAuth extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'uid' => Yii::t('app', '用户id'),
-            'tz_systems_ids' => Yii::t('app', '系统类型id列表，lt_tz_systems.id'),
-            'tz_types' => Yii::t('app', '投注方式tz_types'),
-            'created_at' => Yii::t('app', '创建时间'),
-            'updated_at' => Yii::t('app', '更新时间'),
-            'update_time' => Yii::t('app', '更新时间'),
+            'id' => 'ID',
+            'uid' => '用户id',
+            'tz_systems_ids' => '系统类型id列表，lt_tz_systems.id',
+            'tz_types' => '投注方式tz_types',
+            'lottery_types' => '彩票类型',
+            'created_at' => '创建时间',
+            'updated_at' => '更新时间',
+            'update_time' => '更新时间',
         ];
     }
 
