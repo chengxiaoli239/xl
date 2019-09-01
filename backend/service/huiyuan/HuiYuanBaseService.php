@@ -230,12 +230,24 @@ class HuiYuanBaseService extends BaseTZService {
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id]);
         $account = $TzSystemsUsers->username;  # 投注用户账号，自动化平台账号
 
+        $m = \Yii::$app->cache;
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
         $qihaoInfo = self::getPreTz(self::$user_id, self::$tz_system_id, $lottery_type);
-        if($qihaoInfo['status'] && strpos($qihaoInfo['msg'], '请重新登录')){
+        if(strpos($qihaoInfo['msg'], '请重新登录')){
+            $TzSystemsUsers->cookie = '';
+            $TzSystemsUsers->save();
+            $betPreKey = 'plan_bet_pre_'.self::$user_id;
+            if($request_times = $m->get($betPreKey)){
+                $request_times = $request_times + 1;
+                if($request_times>5) return ['status'=>300, 'msg'=>'网络异常请稍后重试'];
+            }else{
+                $request_times = 1;
+            }
             $loginRst = HuiYuanBaseService::login(self::$user_id, $TzSystemsUsers->tz_system_id);
             if($loginRst['status'] == 300){
-                $loginRst = HuiYuanBaseService::login(self::$user_id, $TzSystemsUsers->tz_system_id);
+                $request_times = $request_times + 1;
+                $m->set($betPreKey, $request_times, 5*60);
+                HuiYuanBaseService::login(self::$user_id, $TzSystemsUsers->tz_system_id);
             }
             $BetService = new HuiYuanBaseService(self::$user_id, $TzSystemsUsers->tz_system_id);
             $rst = $BetService->bet($qihao, $plan_id, $codes);
@@ -287,7 +299,6 @@ class HuiYuanBaseService extends BaseTZService {
         //p(['headers'=>$headers, 'url'=>$url, 'account'=>$account, 'post_data'=>$post_data]);
 
         # 缓存锁
-        $m = \Yii::$app->cache;
         $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)){
             return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
