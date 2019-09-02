@@ -462,9 +462,10 @@ abstract class BetService extends BaseBetService {
        $mkey = 'userSysPlansTzNow_'.$uid.'_'.$id.'_'.$qihao.'_'.$UserSysPlans->playway;
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
 
-
        $rst = self::tzByPlanId($id, 0);
        $m->set($mkey, 1, 10);
+
+       $rst['lottery_type'] = $UserSysPlans->lottery_type;
 
        return $rst;
     }

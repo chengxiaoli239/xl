@@ -148,7 +148,7 @@ class UserSysPlansController extends BaseController
             if(in_array($this->_post['UserSysPlans']['tz_type'], \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
                 UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txt'], $this->_user_id);
             }
-            return $this->redirect(['index']);
+            return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$model->lottery_type]);
         }
         //p($this->_post);
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
@@ -204,9 +204,8 @@ class UserSysPlansController extends BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $rst = BetService::userSysPlansTzNow($id, $this->_user_id);
-        //p($rst);
 
-        return $this->redirect(['/forum/betting-records/index']);
+        return $this->redirect(['/forum/betting-records/index', 'BettingRecords[lottery_type]'=>$rst['lottery_type']]);
     }
 
     /**

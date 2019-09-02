@@ -235,6 +235,7 @@ class HuiYuanBaseService extends BaseTZService {
         $qihaoInfo = self::getPreTz(self::$user_id, self::$tz_system_id, $lottery_type);
         if(strpos($qihaoInfo['msg'], '请重新登录')){
             $TzSystemsUsers->cookie = '';
+            $TzSystemsUsers->balance = '';
             $TzSystemsUsers->save();
             $betPreKey = 'plan_bet_pre_'.self::$user_id;
             if($request_times = $m->get($betPreKey)){

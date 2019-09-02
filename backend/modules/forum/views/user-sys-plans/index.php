@@ -16,7 +16,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title).'-'.$lottery_type_name; ?>
+            <?= $lottery_type_name.'-'.Html::encode($this->title); ?>
             <?php include(dirname(__FILE__).'/index_tab.php'); ?>
         </header>
         <div class="panel-body">
