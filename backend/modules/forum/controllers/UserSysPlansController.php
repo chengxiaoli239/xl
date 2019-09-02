@@ -95,16 +95,20 @@ class UserSysPlansController extends BaseController
         $queryParams = \Yii::$app->request->queryParams;
 
         !$tz_type && $tz_type = $queryParams['tz_type'];
-        $playway = $queryParams['playway'];
-        !$playway && $playway = BetService::getPlaywayByTzType($tz_type);
+        $playway = BetService::getPlaywayByTzType($tz_type);
 
-        //p($this->_post);
+        if($this->_post){
+            $this->_post['UserSysPlans']['tz_type'] = $queryParams['tz_type'];
+            $this->_post['UserSysPlans']['lottery_type'] = $queryParams['lottery_type'];
+        }
+
         UserSysPlansService::preOpData($this->_post, $this->_user_id);
+        //p([$this->_post, $queryParams]);
         if ($model->load($this->_post) && $model->save()) {
             if(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
                 UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txt'], $this->_user_id);
             }
-            return $this->redirect(['index']);
+            return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$queryParams['lottery_type']]);
         }
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
 
@@ -140,10 +144,7 @@ class UserSysPlansController extends BaseController
         $model = $this->findModel($id);
 
         UserSysPlansService::preOpData($this->_post, $this->_user_id);
-        //p($this->_post);
-
         if ($model->load($this->_post) && $model->save()) {
-            //return $this->redirect(['view', 'id' => $model->id]);
             if(in_array($this->_post['UserSysPlans']['tz_type'], \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
                 UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txt'], $this->_user_id);
             }
