@@ -1297,7 +1297,7 @@ class StaticService extends BaseService {
         $mkey = 'staticKj3NumCounts_'.$lottery_type.'_'.$date;
 
         if($staticDatas = $m->get($mkey)) return $staticDatas;
-        $SscKjDatas = SscKjData::find()->where(['date'=>$date, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(2000)->all();
+        $SscKjDatas = SscKjData::find()->where(['date'=>$date, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1000)->all();
         if(!$SscKjDatas) return ['status'=>300, 'msg'=>'无统计数据'];
         $staticDatas = [];
         foreach ($SscKjDatas as $key=>$SscKjData){
@@ -1309,12 +1309,6 @@ class StaticService extends BaseService {
             }
         }
 
-        $tmpData = [];
-        foreach ($staticDatas as $key=>$data){
-            if($data>220 OR in_array($key,['014', '147', '124'])){
-                $tmpData[$key] = $data;
-            }
-        }
         arsort($staticDatas);
 
         if($date != date('Y-m-d')){
@@ -1410,7 +1404,7 @@ class StaticService extends BaseService {
      */
     public static function allDateStatic3NumsPerDate( $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'allDateStatic3Nums_PERDATE_02_'.$lottery_type;
+        $mkey = 'allDateStatic3Nums_PERDATE_03_'.$lottery_type;
 
         $allStatic = [];
         for($s=0; $s<5; $s++){
@@ -1427,7 +1421,11 @@ class StaticService extends BaseService {
             $date = min([date('Y-m-d'), $date]);
             if($date>date('Y-m-d')) break;
             if($statics = self::staticKj3NumCounts($date, $lottery_type)){
-                p($statics);
+                p([$statics, $date]);
+                if($statics['status'] == 300){
+                    $m->set($mkey, $time, 7*24*3600);
+                    continue;
+                }
                 $setData = [];
                 foreach ($statics as $key=>$static){
                     $setData['codes_'.$key] = $static;

@@ -246,7 +246,7 @@ class KjDataGet
         }
 
         # index_id
-        $beforeQihao = KjDataGet::getBeforeQihaoByQihao($qihao);
+        $beforeQihao = KjDataGet::getBeforeQihaoByQihao($qihao, $lottery_type);
         $beforeIndexId = SscKjData::findOne(['qihao'=>$beforeQihao, 'lottery_type'=>$lottery_type])->index_id;
         $index_id = $beforeIndexId + 1;
         $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);

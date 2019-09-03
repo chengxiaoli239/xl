@@ -103,6 +103,8 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 5);p($rst); # 上奖三字现
+        $statics = StaticService::staticKj3NumCounts($date='2019-09-01', $lottery_type=5);p($statics);
         set_time_limit(0);
         # 号码类型：双重、双双重、四重、三兄弟、四兄弟
         $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst);
@@ -112,8 +114,6 @@ class IndexController extends Controller
         # 四字现带双重
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type = 5);p($rst);
         //$rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5); p($rst);
-        $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 5);p($rst); # 上奖三字现
-        $statics = StaticService::staticKj3NumCounts($date='2019-09-01', $lottery_type=5);p($statics);
         $rst = CommonService::getLotteryName();p($rst);
         $arr = 0;
         p(empty($arr));
