@@ -18,7 +18,7 @@ class Static4dProfits extends Static4dProfitsModel
     public function rules()
     {
         return [
-            [['id', 'codes_1_nums', 'codes_2_nums', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'codes_1_nums', 'codes_2_nums', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['month', 'update_time'], 'safe'],
             [['codes_4d_all', 'codes_13_31', 'codes_22_22', 'codes_1111_2222', 'codes_13', 'codes_31', 'codes_13_2222', 'codes_31_1111', 'codes_31_2222', 'codes_13_1111', 'codes_31_2222_1111', 'codes_13_1111_2222', 'codes_2222', 'codes_1111'], 'number'],
         ];
@@ -78,6 +78,7 @@ class Static4dProfits extends Static4dProfitsModel
             'codes_1111' => $this->codes_1111,
             'codes_1_nums' => $this->codes_1_nums,
             'codes_2_nums' => $this->codes_2_nums,
+            'lottery_type' => $this->lottery_type,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,

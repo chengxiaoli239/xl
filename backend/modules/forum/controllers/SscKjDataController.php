@@ -38,14 +38,15 @@ class SscKjDataController extends BaseController
     public function actionIndex()
     {
         $searchModel = new SscKjDataSearch();
-        p($searchModel);
         $queryParams = Yii::$app->request->queryParams;
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
         if(!$queryParams['SscKjData']['lottery_type']){
-            $queryParams['SscKjData']['lottery_type'] = $lottery_types[0]['lottery_type'];
+            $lottery_type = $lottery_types[0]['lottery_type'];
+        }else{
+            $lottery_type = $queryParams['SscKjData']['lottery_type'];
         }
+        $queryParams['SscKjData']['lottery_type'] = $lottery_type;
         $dataProvider = $searchModel->search($queryParams);
-
         return $this->render('index', [
             'lottery_types' => $lottery_types,
             'lottery_type' => $lottery_type,

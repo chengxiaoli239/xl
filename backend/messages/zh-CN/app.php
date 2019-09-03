@@ -82,4 +82,5 @@ return [
     'Create Kj Config' => '开奖配置新增',
     'Kj Configs' => '开奖配置列表',
     'Tools Manage' => '工具管理',
+    'Tz Systems Users' => '个人信息',
 ];

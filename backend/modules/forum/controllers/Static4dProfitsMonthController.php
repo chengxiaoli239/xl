@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\UserSysPlansService;
 use Yii;
 use backend\models\Static4dProfitsMonth;
 use backend\models\searchs\Static4dProfitsMonth as Static4dProfitsMonthSearch;
@@ -36,9 +37,19 @@ class Static4dProfitsMonthController extends BaseController
     public function actionIndex()
     {
         $searchModel = new Static4dProfitsMonthSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        if(!$queryParams['Static4dProfitsMonth']['lottery_type']){
+            $lottery_type = $lottery_types[0]['lottery_type'];
+        }else{
+            $lottery_type = $queryParams['Static4dProfitsMonth']['lottery_type'];
+        }
+        $queryParams['Static4dProfitsMonth']['lottery_type'] = $lottery_type;
 
+        $dataProvider = $searchModel->search($queryParams);
         return $this->render('index', [
+            'lottery_types' => $lottery_types,
+            'lottery_type' => $lottery_type,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);

@@ -59,13 +59,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         'type_4b',
                         'type_4ds',
                         //'lottery_type',
-                        ['attribute' => 'lottery_type','label'=>'彩票类型',#'headerOptions'=>['width'=>'5%'],
-                            'value' => function($model) {
-                                $txt = \common\service\CommonService::getLotteryName($model->lottery_type);
-
-                                return $txt;
-                            }
-                        ],
                         //'code_1_2',
                         //'code_1_3',
                         //'code_1_4',

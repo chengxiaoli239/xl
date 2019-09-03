@@ -18,7 +18,7 @@ class StaticHzProfits extends StaticHzProfitsModel
     public function rules()
     {
         return [
-            [['id', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['month', 'update_time'], 'safe'],
             [['hz_0_4', 'hz_1_6', 'hz_5_10', 'hz_11_15', 'hz_16_19', 'hz_20_24', 'hz_25_29', 'hz_30_35'], 'number'],
         ];
@@ -70,6 +70,7 @@ class StaticHzProfits extends StaticHzProfitsModel
             'hz_20_24' => $this->hz_20_24,
             'hz_25_29' => $this->hz_25_29,
             'hz_30_35' => $this->hz_30_35,
+            'lottery_type' => $this->lottery_type,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,

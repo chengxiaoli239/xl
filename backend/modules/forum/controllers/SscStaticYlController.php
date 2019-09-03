@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\UserSysPlansService;
 use common\service\CommonService;
 use Yii;
 use backend\models\SscStaticYl;
@@ -46,12 +47,22 @@ class SscStaticYlController extends BaseController
         $codeType = $codeType ? $codeType : 1;
         $codeTypeName = CommonService::getCodeTypeName($codeType);
         //p($codeTypeName);
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        if(!$queryParams['SscStaticYl']['lottery_type']){
+            $lottery_type = $lottery_types[0]['lottery_type'];
+        }else{
+            $lottery_type = $queryParams['SscStaticYl']['lottery_type'];
+        }
+        $queryParams['SscStaticYl']['lottery_type'] = $lottery_type;
 
         $dataProvider = $searchModel->search($queryParams);
 
         $view = $type == 2 ? 'index' : 'indexs';
         //p($view,0);
         return $this->render($view, [
+            'lottery_types' => $lottery_types,
+            'lottery_type' => $lottery_type,
+            'code_type' => $codeType,
             'searchModel' => $searchModel,
             'codeTypeName' => $codeTypeName,
             'dataProvider' => $dataProvider,

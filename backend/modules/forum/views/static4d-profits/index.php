@@ -25,6 +25,7 @@ $update_time = \backend\models\Static4dProfits::find()->orderBy(['update_time'=>
                     </div>
                 </div-->
 
+                <?php include(dirname(__FILE__).'/index_tab.php'); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([

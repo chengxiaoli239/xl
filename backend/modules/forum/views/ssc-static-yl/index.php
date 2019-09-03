@@ -16,6 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <section class="panel">
         <header class="panel-heading">
             <?= Html::encode($this->title) ?>
+            <?php include(dirname(__FILE__).'/index_tab.php'); ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
@@ -25,9 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 </div-->
 
-                <?php
-                    include(dirname(__FILE__).'/code_type_tab.php');
-                ?>
+                <?php include(dirname(__FILE__).'/code_type_tab.php'); ?>
 
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
