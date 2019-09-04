@@ -103,6 +103,8 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $miss = SscDataService::getCodeTypeHistoryMiss('type_3b', $lottery_type = 5, $static_nums = 8000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+        $miss = SscDataService::getCodeTypeYlHistoryMiss('118', $lottery_type = 5, 10000);p($miss);
         $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
         $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type = 5); p($rst);# 和值每天数量统计
         $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type=5); p($rst);# 号码类型每天数量统计
@@ -182,7 +184,6 @@ class IndexController extends Controller
         //$rst = NumService::getCodesKuaiXuan(['type_2'=>1, 'type_3'=>1, 'hz'=>[30,31,32,33,34,35]]);p($rst);
        $rst = StaticService::static4dMonthsProfits();p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
         $domain = BaseKj::getApiHost(8);p($domain);
-        $miss = SscDataService::getCodeTypeHistoryMiss('type_2,type_2b', $lottery_type = 5, $static_nums = 80);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         p('xxx');
         $rst['updateDs'] = SscDataService::updateDsData($lottery_type=5); // 每期开奖遗漏
         $rst = TzService::opSystemBetPlans(5);p($rst);
