@@ -519,13 +519,13 @@ class KjDataGet
     /**
      * @desc 自动更新 万千百十个数据
      */
-    public static function updateNullCode( $times = 500){
+    public static function updateNullCode( $times = 500, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $msg = ['status'=>200, 'msg'=>'操作成功！'];
-        $kjDatas = SscKjData::find()->where(['code_1_2_3_4'=>null])->orderBy('id DESC')->asArray()->limit($times)->all();
-        foreach ($kjDatas as $kjData){
-            $kjDs = SscDataService::getCodesDS($kjData['code_str']);
+        $kjDatas = SscKjData::find()->where(['lottery_type'=> $lottery_type])->orderBy('id ASC')->asArray()->limit($times)->all();
+        foreach ($kjDatas as $key=>$kjData){
+            //$kjDs = SscDataService::getCodesDS($kjData['code_str']);
             $updateData = [
-                'code_1_2_3_4' => $kjDs,
+                'index_id' => $key + 1,
                 /*
                 'code_3n' => implode(',', $code_3n),
                 'code_4n' => implode('', $codesArr),
@@ -545,7 +545,7 @@ class KjDataGet
                 'type_4ds' => CommonService::isCodeType4ds($codes), # 是否四单双：0非四单四双1四单2四双
                 */
             ];
-            $sscKjData = SscKjData::findOne(['qihao'=>$kjData['qihao']]);
+            $sscKjData = SscKjData::findOne(['qihao'=>$kjData['qihao'], 'lottery_type'=>$lottery_type]);
             $sscKjData->setAttributes($updateData);
             if(!$rst = $sscKjData->save()){
                 $msg = ['status'=>300, 'msg'=>current($rst->getErrors())];

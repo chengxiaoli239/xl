@@ -103,10 +103,16 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
+        $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type = 5); p($rst);# 和值每天数量统计
+        $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type=5); p($rst);# 号码类型每天数量统计
+        $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 7);p($rst); # 上奖三字现
+        $rst = StaticService::static2NumsYl($lottery_type = 7);p($rst);
+        $rst = StaticService::get2NumsYlRecords('66', $lottery_type = 7);p($rst);
+        $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);p($rst);
         $post = \Yii::$app->request->post();
         p($post);
         $rst = CqsscKcw::getLotteryNoZhiBo();p($rst);
-        $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 5);p($rst); # 上奖三字现
         $statics = StaticService::staticKj3NumCounts($date='2019-09-01', $lottery_type=5);p($statics);
         set_time_limit(0);
         # 号码类型：双重、双双重、四重、三兄弟、四兄弟
@@ -146,7 +152,6 @@ class IndexController extends Controller
         $rst = TzService::opSystemBetPlans();p($rst); // 定制化投注计划
         $qihao = HN0898Service::getQihao($lottery_type=5);p($qihao);
         $rst = StaticService::getNiceCodes(5);p(['最优号码[四现不带双]'=>$rst]);
-        $rst['updateDsYL'] = SscDataService::updateSdHzYl(); p($rst);// 更新和值遗漏
         $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay();p($rst); # 单双利润统计(day)
         $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); # 单双利润统计(month)
         $rst = StaticService::staticSDPerDateProfits(date('Y-m-d'));p($rst);
@@ -161,12 +166,9 @@ class IndexController extends Controller
             p('xxxx');
         }
         p(rand());
-        $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type = 5); p($rst);# 和值每天数量统计
         $rst = StaticService::staticSDHzPerDateProfits(); p($rst);
         $rst = StaticService::staticSdHzProfitsPerdate(); p($rst); # 每天每个和值利润统计
 
-        $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type=5); p($rst);# 号码类型每天数量统计
-        $rst = KjDataGet::updateNullCode($num = 1000);p($rst);
         # 三字现带双重
         $rst['updateCodeTypeYLs'] = SscDataService::updateCodeTypeYLs($type = 4);p($rst);
 
@@ -227,8 +229,6 @@ class IndexController extends Controller
         $rst = CqsscKcw::getLotteryNoXl();p($rst);
         $rst = HN0898Service::getQihao(); p($rst);
         //$rst = NumService::getCodesArise(['289','125','046','456','589','467']);p($rst); //2+3+1+2+2
-        $rst = StaticService::get2NumsYlRecords('12');p($rst);
-        $rst = StaticService::static2NumsYl();p($rst);
         //$rst = NumService::getCodesArise_bak(['12345']);p($rst);
         $rst = StaticService::staticKj3NumCounts();p($rst);
         $arr = [['reach_val'=>100, 'reduce_val'=>10], ['reach_val'=>300, 'reduce_val'=>50]];p(json_encode($arr));

@@ -1421,7 +1421,7 @@ class StaticService extends BaseService {
             $date = min([date('Y-m-d'), $date]);
             if($date>date('Y-m-d')) break;
             if($statics = self::staticKj3NumCounts($date, $lottery_type)){
-                p([$statics, $date]);
+                //p([$statics, $date]);
                 if($statics['status'] == 300){
                     $m->set($mkey, $time, 7*24*3600);
                     continue;
@@ -1461,7 +1461,7 @@ class StaticService extends BaseService {
         $mkey = 'allDateStaticCodeType_PERDATE_05_'.$lottery_type;
 
         $allStatic = [];
-        for($s=0; $s<10; $s++){
+        for($s=0; $s<5; $s++){
             $StaticTables = StaticCodeTypeArisePerdate::find()->all();
             $flag = count($StaticTables);
             if(!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
@@ -1638,29 +1638,30 @@ class StaticService extends BaseService {
      * @param int $limit
      * @return array
      */
-   public static function get2NumsYlRecords($nums, $lottery_type = DEFAULT_LOTTERY_TYPE, $limit = 600){
+   public static function get2NumsYlRecords($nums, $lottery_type = DEFAULT_LOTTERY_TYPE, $limit = 300){
        if(strlen($nums) != 2) return [];
 
        $last_id = SscDataService::getKjDataLastId($lottery_type); # 表记录最后一条id
        $limit_id = $last_id - $limit;
+      //p([$last_id, $limit_id]);
 
        $codes = [$nums[0], $nums[1]];
        $where = [
             'OR',
-            ['like', 'LEFT(code_str,7)', '%'.$codes[0].','.$codes[1].'%', false],
+            //['like', 'LEFT(code_str,7)', '%'.$codes[0].','.$codes[1].'%', false],
             ['like', 'LEFT(code_str,7)', '%'.$codes[0].'%'.$codes[1].'%', false],
 
-            ['like', 'LEFT(code_str,7)', '%'.$codes[1].','.$codes[0].'%', false],
+            //['like', 'LEFT(code_str,7)', '%'.$codes[1].','.$codes[0].'%', false],
             ['like', 'LEFT(code_str,7)', '%'.$codes[1].'%'.$codes[0].'%', false],
         ];
-       $SscKjDatas = SscKjData::find()->select(['id','kj_code','qihao'])->where($where)->andWhere('id>='.$limit_id)->andWhere(['lottery_type'=>$lottery_type])->limit($limit)->orderBy(['id'=>SORT_DESC])->asArray()->all();
+       $SscKjDatas = SscKjData::find()->select(['id','qihao','index_id','kj_code','qihao'])->where($where)->andWhere('index_id>='.$limit_id)->andWhere(['lottery_type'=>$lottery_type])->limit($limit)->orderBy(['id'=>SORT_DESC])->asArray()->all();
        //p($SscKjDatas);
 
        $yl_records = '';
        $max_miss = 0;
        foreach ($SscKjDatas as $k=>$SscKjData){
            if($k == 0) continue;
-           $yl = $SscKjDatas[$k-1]['id']-$SscKjData['id'];
+           $yl = $SscKjDatas[$k-1]['index_id']-$SscKjData['index_id'] - 1;
            $yl_records .= '-'.$yl;
            if($k == 1) {
                $last_time_miss = $yl;
@@ -1674,7 +1675,7 @@ class StaticService extends BaseService {
 
        //p($yl_records);
        $rstData = [
-           'current_miss' => $last_id - $SscKjDatas[0]['id'],
+           'current_miss' => $last_id - $SscKjDatas[0]['index_id'],
            'yl_records' =>$yl_records,
            'lottery_type' =>$lottery_type,
            'last_time_miss' => $last_time_miss,

@@ -148,7 +148,7 @@ class SscDataService extends BaseService {
      * @desc 统计数据
      * @return bool
      */
-    public static function sscDwsHzNums(){
+    public static function sscDwsHzNums($lottery_type = DEFAULT_LOTTERY_TYPE){
         $intervals = [ 200,500,1000,2000,5000];
         $m = \Yii::$app->cache;
         $mkey = 'DWS_HZ_COUNT_NUMS_1';
@@ -157,7 +157,7 @@ class SscDataService extends BaseService {
         }
         $id = $id + 1;
         foreach ($intervals as $key => $interval) {
-            $last_id = SscDataService::getKjDataLastId();
+            $last_id = SscDataService::getKjDataLastId($lottery_type);
 
             if($id<=$last_id){
                 $new_qihao = SscKjData::findOne($id)->qihao;
@@ -273,7 +273,7 @@ class SscDataService extends BaseService {
      * @param int $interval
      */
     public static function getKjDataLastId($lottery_type = DEFAULT_LOTTERY_TYPE){
-        $last_id = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['max(id) as last_id'])->limit(1)->asArray()->one()['last_id'];
+        $last_id = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['max(index_id) as last_id'])->limit(1)->asArray()->one()['last_id'];
 
         return $last_id;
     }
@@ -1211,7 +1211,7 @@ class SscDataService extends BaseService {
         $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
         $min_id = $last['last_id'] - $recently - 1;
 
-        $where = ['AND', ['IN', 'codes_4nums_hz', $zuHes], ['>=', 'id', $min_id]];
+        $where = ['AND', ['IN', 'codes_4nums_hz', $zuHes], ['>=', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
         $SscKjData = SscKjData::find()->select(['id','index_id','qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
         //p([$zuHes, $last, $SscKjData[0]->id, $SscKjData[1]->id]);
         if(count($SscKjData)>1){
@@ -1231,7 +1231,7 @@ class SscDataService extends BaseService {
             $keyArr = explode('_',$maxKey);
             $tmpArr = [];
             foreach($tmpKjData as $key=>$r){
-                if(in_array($r['id'], $keyArr)){
+                if(in_array($r['index_id'], $keyArr)){
                     $tmpArr[] = $r['qihao'];
                 }
             }
@@ -1894,6 +1894,7 @@ class SscDataService extends BaseService {
         # 大数组：包括二定、三定、四定
         $updateDsDatas = SscSdHzVal::find()->asArray()->All();
         //$rst[$interval] = SscDataService::dsYLStatic($interval);
+        //p($updateDsDatas);
         foreach ($updateDsDatas as $Data){
             //if($Data['id'] != 61) continue;
             $zuHes = explode(',', $Data['val']);
@@ -1913,7 +1914,10 @@ class SscDataService extends BaseService {
             $SscSdHzYl->today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where(['date'=>date('Y-m-d'),'codes_4nums_hz'=>$zuHes, 'lottery_type'=>$lottery_type])->asArray()->one()['nums'];
 
             $SscSdHzYl->updated_at = time();
-            $miss = SscDataService::getSdHzYlHistoryMiss($zuHes, $lottery_type, $SscSdHzYl->static_nums);
+            $miss = SscDataService::getSdHzYlHistoryMiss($zuHes, $lottery_type, $Data['static_nums']);
+            //if($zuHes == [5,6,7,8,9,10]) p([$zuHes,$miss, $Data['static_nums']]);
+            $SscSdHzYl->static_nums = $Data['static_nums'];
+            $SscSdHzYl->status = $Data['status'];
             //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
             $SscSdHzYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
             $SscSdHzYl->last_time_miss = $miss['last_times']; // 2、上次遗漏
@@ -1925,11 +1929,11 @@ class SscDataService extends BaseService {
             //$SscSdHzYl->status = $Data['status']; // 7、前台显示状态
             $SscSdHzYl->lottery_type = $lottery_type; // 彩种类型
             $SscSdHzYl->update_time = date('Y-m-d H:i:s');
-            //p($SscSdHzYl);
+            //p($SscSdHzYl->attributes);
             $rst = $SscSdHzYl->save();
             if(!$rst){
                 $logArr = ['attributes'=>$SscSdHzYl->attributes, 'msg'=>$SscSdHzYl->getErrors()];
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/static_SscDwsDsNums','INFO','统计号码出现次数', $logArr);
+                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/updateSdHzYl','INFO','四定和值遗漏统计', $logArr);
             }
 
         }
