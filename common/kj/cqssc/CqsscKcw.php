@@ -30,7 +30,7 @@ class CqsscKcw extends BaseKj {
 
     public static function getLotteryNo($returnType = 'json'){
 
-        if(!$kjData = self::getCurrentKjData()) {
+        if(!$kjData = self::getCurrentKjData($lottery_type = 5)) {
             $domain = BaseKj::getApiHost(6);
             sleep(3);
             $url = $domain.'/tef05c6c66079ff29k/cqssc-3.json';
@@ -62,6 +62,45 @@ class CqsscKcw extends BaseKj {
         }
         $logArr = $rst;
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kcw', 'INFO', '号码抓取-kcw', $logArr);
+
+        return $rst;
+    }
+
+    public static function getLotteryNoZhiBo($returnType = 'json'){
+
+        if(!$kjData = self::getCurrentKjData($lottery_type = 5)) {
+            $domain = BaseKj::getApiHost(12);
+            sleep(3);
+            $date = date('Y-m-d');
+            $url = $domain.'/data/cqssc/lotteryList/'.$date.'.json?t='.time();
+            //$content = file_get_contents($url);
+            $content = CurlService::httpGet($url);
+            //$data = json_decode($content,320);
+            $data = $content[0];
+
+            if (!$data) return false;
+            $str = substr($data['issue'], 0, 8);
+            $kjData['expect'] = str_replace($str, $str . '-', $data['issue']);
+            $kjData['opencode'] = implode(',', $data['openNum']);
+            $kjData['openDateTime'] = $data['openDateTime'];
+            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
+        }
+        $opencode = $kjData['opencode'];
+        $opentime = $kjData['openDateTime'];
+        $expect = $kjData['expect'];
+
+        self::setKjDataCache($lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc', 'INFO', '号码抓取-直播网', $logArr);
 
         return $rst;
     }
@@ -121,7 +160,7 @@ class CqsscKcw extends BaseKj {
      */
     public static function getLotteryKuaiLe8($returnType = 'json', $lottery = 18){
 
-        if(!$kjData = self::getCurrentKjData()) {
+        if(!$kjData = self::getCurrentKjData($lottery_type = 7)) {
             $domain = BaseKj::getApiHost(10);
             $post_data = [
                 'lottery' => $lottery,
@@ -190,7 +229,7 @@ class CqsscKcw extends BaseKj {
      */
     public static function getLotteryKuaiLe8NineNine($returnType = 'json', $lottery = 18){
 
-        if(!$kjData = self::getCurrentKjData()) {
+        if(!$kjData = self::getCurrentKjData($lottery_type = 7)) {
             $domain = BaseKj::getApiHost(11);
             $url = $domain.'/k8/ajax.aspx';
 

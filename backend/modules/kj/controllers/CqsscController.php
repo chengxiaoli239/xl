@@ -32,6 +32,16 @@ class CqsscController extends Controller
     }
 
     /**
+     * @desc 开奖直播网
+     * @return json|xml
+     */
+    public function actionZhiBoWang($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = CqsscKcw::getLotteryNoZhiBo($type);
+        return $data;
+    }
+
+    /**
      * @desc 7天
      * @return json|xml
      */

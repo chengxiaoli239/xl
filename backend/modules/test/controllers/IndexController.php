@@ -103,6 +103,9 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $post = \Yii::$app->request->post();
+        p($post);
+        $rst = CqsscKcw::getLotteryNoZhiBo();p($rst);
         $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 5);p($rst); # 上奖三字现
         $statics = StaticService::staticKj3NumCounts($date='2019-09-01', $lottery_type=5);p($statics);
         set_time_limit(0);

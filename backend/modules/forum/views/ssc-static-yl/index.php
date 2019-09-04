@@ -8,7 +8,7 @@ use yii\grid\GridView;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 //p($codeTypeName);
-$this->title = Yii::t('app', 'Ssc Static Yls').' [ '.$codeTypeName.' ]';
+$this->title = Yii::t('app', 'Ssc Static Yls'); # .' [ '.$codeTypeName.' ]';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <section class="ssc-static-yl-index wrapper site-min-height">

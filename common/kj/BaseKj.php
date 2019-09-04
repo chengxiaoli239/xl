@@ -66,7 +66,7 @@ class BaseKj{
     }
 
     /**
-     * @param $id
+     * @param integer $id
      * @return string
      */
     public static function getApiHost($id){
