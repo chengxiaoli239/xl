@@ -133,7 +133,7 @@ class TzService extends BaseService {
      */
     public static function beforeRunSysPlans($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = Yii::$app->cache;
-        $pkey = \Yii::$app->params['PLAN_SWITCH_KEY'].'_'.$lottery_type.'_'.$qihao;
+        $pkey = BetService::buildPlanSwitchKey($lottery_type, $qihao);
         if($planStatus = $m->get($pkey)){
             return ['status'=>300, 'pkey'=>$pkey, 'msg'=>'投注计划已经处理过了~'];
         }
@@ -214,7 +214,7 @@ class TzService extends BaseService {
         # 计划任务是否处理完成后锁住(value:1)，避免重复处理 start
         $pkey = BetService::buildPlanSwitchKey($lottery_type, $qihao);
         //$simulate_pkey = \Yii::$app->params['PLAN_SWITCH_SIMULATE_KEY'].'_'.$qihao;
-        $time = 1200;
+        $time = 1000;
         if(substr($qihao,6) == '010') $time = 60*60*4; # 4小时
         $rst21 = $m->set($pkey,1,$time);
         //$rst20 = $m->set($simulate_pkey,1,$time);

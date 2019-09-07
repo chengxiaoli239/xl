@@ -103,7 +103,11 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
-        $miss = SscDataService::getCodeTypeHistoryMiss('type_3b', $lottery_type = 5, $static_nums = 8000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+        $rst = TzService::opSystemBetPlans(5);p($rst);
+        $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type = 5); p($rst);# 单双利润统计(month)
+        $miss = SscDataService::getSdHzYlHistoryMiss([8], $lottery_type = 5, 20000);p($miss);
+        $miss = SscDataService::getCodeTypeHistoryMiss('type_3', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+        $rst = KjDataGet::getNextQihaoByQihao('190525059',5);p($rst);
         $miss = SscDataService::getCodeTypeYlHistoryMiss('118', $lottery_type = 5, 10000);p($miss);
         $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
         $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type = 5); p($rst);# 和值每天数量统计
@@ -155,7 +159,6 @@ class IndexController extends Controller
         $qihao = HN0898Service::getQihao($lottery_type=5);p($qihao);
         $rst = StaticService::getNiceCodes(5);p(['最优号码[四现不带双]'=>$rst]);
         $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay();p($rst); # 单双利润统计(day)
-        $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); # 单双利润统计(month)
         $rst = StaticService::staticSDPerDateProfits(date('Y-m-d'));p($rst);
         $rst = KjDataGet::updateNullCode();p($rst);
         $rst = SscDataService::getCodesDS('1,2,3,4,5');p($rst);
@@ -186,8 +189,6 @@ class IndexController extends Controller
         $domain = BaseKj::getApiHost(8);p($domain);
         p('xxx');
         $rst['updateDs'] = SscDataService::updateDsData($lottery_type=5); // 每期开奖遗漏
-        $rst = TzService::opSystemBetPlans(5);p($rst);
-        $rst = KjDataGet::getNextQihaoByQihao('190525039',5);p($rst);
         $beforeQihao = KjDataGet::getBeforeQihaoByQihao('190525001');p($beforeQihao);
         $rst = NumService::getCodesArise(['9377']);p(count($rst));
         $arr = ['type_2b'=>1, 'hz'=>[11,12,13,14,15,16,24]]; p(json_encode($arr));

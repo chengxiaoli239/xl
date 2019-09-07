@@ -162,7 +162,7 @@ class SscDataService extends BaseService {
             if($id<=$last_id){
                 $new_qihao = SscKjData::findOne($id)->qihao;
                 $logArr = ['id'=>$id, [$interval, $new_qihao, $id]];
-                $flag = SscDataService::insertSscDwsHzNums($interval, $new_qihao, $id);
+                $flag = SscDataService::insertSscDwsHzNums($lottery_type, $interval, $new_qihao, $id);
                 $logArr['flag'] = $flag;
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/SscDwsHzNums','INFO','统计区间某和值出现次数', $logArr);
                 $m->set($mkey, $id, 60*60);

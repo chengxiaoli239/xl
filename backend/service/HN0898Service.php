@@ -600,7 +600,7 @@ class HN0898Service extends BaseTZService {
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
 
        //p([$qihao, $BettingRecords->plan_id, $codes]);
-       BetService::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id);
+       BetService::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $BettingRecords->lottery_type, $qihao, $BettingRecords->plan_id);
        $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
        BetService::afterBetNow($BettingRecords->lottery_type, $qihao);
 
@@ -896,7 +896,7 @@ class HN0898Service extends BaseTZService {
                 'uid' => $uid,
                 'playway' => 3,
                 'tz_system_id' => $tz_system_id,
-                'lottery_type' => DEFAULT_LOTTERY_TYPE,
+                'lottery_type' => $BettingRecords->lottery_type,
                 'tz_type' => 21,
                 'single' => $single,
                 'playway_name' => '四字定',

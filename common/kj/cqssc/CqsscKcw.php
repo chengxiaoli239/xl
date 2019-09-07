@@ -82,11 +82,12 @@ class CqsscKcw extends BaseKj {
             $str = substr($data['issue'], 0, 8);
             $kjData['expect'] = str_replace($str, $str . '-', $data['issue']);
             $kjData['opencode'] = implode(',', $data['openNum']);
-            $kjData['openDateTime'] = $data['openDateTime'];
+            $kjData['opentime'] = $data['openDateTime'];
+            //p($kjData);
             //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
         }
         $opencode = $kjData['opencode'];
-        $opentime = $kjData['openDateTime'];
+        $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
 
         self::setKjDataCache($lottery_type, $expect, $kjData);
@@ -206,7 +207,7 @@ class CqsscKcw extends BaseKj {
         $expect = $kjData['expect'];
         //p([DEFAULT_LOTTERY_TYPE,$expect, $kjData]);
 
-        self::setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $expect, $kjData);
+        self::setKjDataCache($lottery_type, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
@@ -265,7 +266,7 @@ class CqsscKcw extends BaseKj {
         $expect = $kjData['expect'];
         //p([DEFAULT_LOTTERY_TYPE,$expect, $kjData]);
 
-        self::setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $expect, $kjData);
+        self::setKjDataCache($lottery_type, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");

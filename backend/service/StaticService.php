@@ -200,15 +200,15 @@ class StaticService extends BaseService {
                 $time = strtotime('+1 months', $time);
             }
 
-            $date = date('Y-m', $time);
-            $date = min([date('Y-m'), $date]);
-            if ($date > date('Y-m')) break;
-            if ($statics = StaticService::staticAllSdProfitsMonth($date, $lottery_type)) {
+            $month = date('Y-m', $time);
+            $month = min([date('Y-m'), $month]);
+            if ($month > date('Y-m')) break;
+            if ($statics = StaticService::staticAllSdProfitsMonth($month, $lottery_type)) {
                 $setData = [];
-                if(!$Static4dProfitsMonth = Static4dProfitsMonth::find()->where(['lottery_type'=>$lottery_type, 'month'=>$date])->one()){
+                if(!$Static4dProfitsMonth = Static4dProfitsMonth::find()->where(['lottery_type'=>$lottery_type, 'month'=>$month])->one()){
                     $Static4dProfitsMonth = new Static4dProfitsMonth();
                     $setData = array_merge($setData,[
-                        'month' => $date,
+                        'month' => $month,
                         'created_at' => time(),
                         'lottery_type' => $lottery_type,
                     ]);
@@ -221,7 +221,7 @@ class StaticService extends BaseService {
                 $Static4dProfitsMonth->setAttributes($setData);
                 $rst = $Static4dProfitsMonth->save();
             }
-            $m->set($mkey, $time, 30*24*3600);
+            $m->set($mkey, strtotime($month), 30*24*3600);
         }
 
         return $rst;
@@ -759,14 +759,14 @@ class StaticService extends BaseService {
      * @desc 所有月份4定和值利润统计
      * @return array
      */
-    public static function allMonthSdHzStaticProfits($lottery = DEFAULT_LOTTERY_TYPE){
+    public static function allMonthSdHzStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $months = [];
         for ($i=3; $i>=0; $i--){
             $months[] = date('Y-m', strtotime('-'.$i.' months'));
         }
         $allStatic = [];
         foreach ($months as $month){
-            $statics = self::staticSdHzProfits($month, $lottery);
+            $statics = self::staticSdHzProfits($month, $lottery_type);
             foreach ($statics as $k=>$staticData){
                 $allStatic[$k][$month] = $staticData['profits'];
             }
@@ -925,8 +925,8 @@ class StaticService extends BaseService {
                 $rst['allHzStaticProfits'] = StaticService::allHzStaticProfits($lottery_type); # 每个月份每个和值利润统计
                 $rst['allHzStaticProfitsPerdate'] = StaticService::allHzStaticProfitsPerdate($lottery_type);//p($rst);# 循环计算每天每个和值利润统计
 
-                $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); # 单双利润统计(month)
-                $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay(); # 单双利润统计(day)
+                $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type); # 单双利润统计(month)
+                $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay($lottery_type); # 单双利润统计(day)
                 StaticService::afterOpStatic($lottery_type, 'opStatic');
             }
         }
