@@ -790,24 +790,25 @@ class HN0898Service extends BaseTZService {
         $HN0898Service = new HN0898Service($uid, $tz_system_id);
         $url = HN0898Service::getTzSiteInfo($tz_system_id,'SSC_INDEX');
         $headers = [
+            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36",
+            'Accept-Language:zh-CN,zh;q=0.9',
+            'Connection:keep-alive',
+            'Accept-Encoding: gunzip, deflate',
+            'X-Requested-With: XMLHttpRequest',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-            'Accept-Encoding: gunzip, deflate, br',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
             'Cache-Control: max-age=0',
-            'Connection: keep-alive',
-            //'Upgrade-Insecure-Requests: 1',
-            //"Accept-Encoding: gzip, deflate, br",
             //"Accept-Encoding: gunzip, deflate, br", # gunzip 防止乱码
-            "Cookie:".self::$cookie,
+            "Cookie:".self::$cookie."; VisitorCapacity=1;",
+            //"Cookie:ASP.NET_SessionId=pc3w1umag0jyyw45dc2z2smk; VisitorCapacity=1;",
             "Host:".str_replace('www.','',self::$domain),
             "Upgrade-Insecure-Requests: 1",
             "Referer: ".$url,
-            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"
         ];
         //$headers = array_merge(self::$headers,$headers);
 
-        $content = RemoteHtmlService::getRemoteHtmlContent($url, $headers);
-        //p(['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
+        //$content = RemoteHtmlService::getRemoteHtmlContent($url, $headers);
+        $content = CurlService::getCurl($url, $headers);
+        //if($uid == 11) p(['url'=>$url, 'cookie'=>self::$cookie, 'headers'=>$headers, 'content'=>$content]);
 
         return $content;
     }
@@ -854,7 +855,7 @@ class HN0898Service extends BaseTZService {
      * @param int $tz_system_id
      * @return array
      */
-    public static function getRemoteHzRecords($uid, $tz_system_id = 0){
+    public static function getRemoteHzRecords($tz_system_user_id = 0){
         /*
         $alls = BettingRecords::find()->where(['AND',['=','LENGTH(codes)',32], ['<', 'id', 13502]])->all();
         foreach ($alls as $all){
@@ -871,16 +872,18 @@ class HN0898Service extends BaseTZService {
         p([$rst,$alls]);
         */
         $rst = ['status'=>200, 'msg'=>'投注记录抓取成功~'];
+        //if($uid != 11) return false;
+        $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);
 
-        $lists = self::getTzList($uid, $tz_system_id);
+        $lists = self::getTzList($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
         $lists = array_reverse($lists);
         foreach ($lists as $key=>$list){
             if(strlen($list['codes']) < 150) continue; # 非和值记录无需抓取
-            $rand = rand(1,5);
-            sleep($rand);
+            //$rand = rand(1,5); sleep($rand);
 
             $setData = [];
             if($BettingRecords = BettingRecords::findOne(['snid'=>$list['snid']])){
+                //if($key == 1) p(['FLAG:'.$list['snid'], 'codes'=>$list['codes']]);
                 if(strlen($BettingRecords->codes) != 32) continue;
             }else{
                 $BettingRecords = new BettingRecords();
@@ -889,6 +892,7 @@ class HN0898Service extends BaseTZService {
                 $setData['created_at'] = time();
             }
             $cancel_status = ['正常'=>0, '已撤单'=>1];
+            $uid = $TzSystemsUsers->uid;
 
             $account = AdminModel::findOne($uid)->username;
             //if($uid == 11)p(['account'=>$account]);
@@ -902,8 +906,8 @@ class HN0898Service extends BaseTZService {
                 'account' => $account,
                 'uid' => $uid,
                 'playway' => 3,
-                'tz_system_id' => $tz_system_id,
-                'lottery_type' => $BettingRecords->lottery_type,
+                'tz_system_id' => $TzSystemsUsers->tz_system_id,
+                'lottery_type' => 5,
                 'tz_type' => 21,
                 'single' => $single,
                 'playway_name' => '四字定',
@@ -916,7 +920,9 @@ class HN0898Service extends BaseTZService {
 
             $BettingRecords->setAttributes($setData);
             //p($BettingRecords->attributes);
-            $BettingRecords->save();
+            if(!$flag = $BettingRecords->save()){
+                p($BettingRecords->getErrors());
+            }
         }
 
         return $rst;

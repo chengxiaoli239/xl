@@ -166,12 +166,16 @@ class IndexController extends Controller
         $TzSystemsUsers = TzSystemsUsers::findAll(['status'=>1]);
 
         foreach ($TzSystemsUsers as $TzSystemsUser){
-            switch ($TzSystemsUser->tz_system_id){
+            $TzSystems = TzSystems::findOne($TzSystemsUser->tz_system_id);
+            switch ($TzSystems->system_type_id){
                 case 1:
                 case 2:
-                    $rst = HN0898Service::getRemoteHzRecords($TzSystemsUser->uid, $TzSystemsUser->tz_system_id); # 抓取号码
+                    $rst = HN0898Service::getRemoteHzRecords($TzSystemsUser->id); # 抓取号码
                     break;
-                default:;
+                case 3:
+                    break;
+                case 4: # 北京快乐8
+                    break;
             }
         }
         return $rst;
