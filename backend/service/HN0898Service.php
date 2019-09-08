@@ -790,17 +790,24 @@ class HN0898Service extends BaseTZService {
         $HN0898Service = new HN0898Service($uid, $tz_system_id);
         $url = HN0898Service::getTzSiteInfo($tz_system_id,'SSC_INDEX');
         $headers = [
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'Accept-Encoding: gunzip, deflate, br',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
             'Cache-Control: max-age=0',
+            'Connection: keep-alive',
             //'Upgrade-Insecure-Requests: 1',
-            "Host:".str_replace('www.','',self::$domain),
             //"Accept-Encoding: gzip, deflate, br",
             //"Accept-Encoding: gunzip, deflate, br", # gunzip 防止乱码
             "Cookie:".self::$cookie,
-            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+            "Host:".str_replace('www.','',self::$domain),
+            "Upgrade-Insecure-Requests: 1",
+            "Referer: ".$url,
+            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"
         ];
         //$headers = array_merge(self::$headers,$headers);
 
         $content = RemoteHtmlService::getRemoteHtmlContent($url, $headers);
+        //p(['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
 
         return $content;
     }

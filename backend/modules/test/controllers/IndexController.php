@@ -103,7 +103,7 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
-        $rst = TzService::opSystemBetPlans(5);p($rst);
+        $rst = TzService::opSystemBetPlans(5);p($rst);// 定制化投注计划
         $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type = 5); p($rst);# 单双利润统计(month)
         $miss = SscDataService::getSdHzYlHistoryMiss([8], $lottery_type = 5, 20000);p($miss);
         $miss = SscDataService::getCodeTypeHistoryMiss('type_3', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
@@ -155,7 +155,6 @@ class IndexController extends Controller
         $rst = SscDataService::insertCodeType();p($rst);
         $rst = HN0898Service::getDifferentNums();p($rst);
         $rst = TzService::insertKuaiLe8DataTime();p($rst);
-        $rst = TzService::opSystemBetPlans();p($rst); // 定制化投注计划
         $qihao = HN0898Service::getQihao($lottery_type=5);p($qihao);
         $rst = StaticService::getNiceCodes(5);p(['最优号码[四现不带双]'=>$rst]);
         $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay();p($rst); # 单双利润统计(day)
