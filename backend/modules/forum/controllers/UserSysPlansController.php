@@ -94,11 +94,9 @@ class UserSysPlansController extends BaseController
         $model = new UserSysPlans();
         $queryParams = \Yii::$app->request->queryParams;
 
-        //!$tz_type && $tz_type = $queryParams['tz_type'];
         $playway = BetService::getPlaywayByTzType($tz_type);
 
         if($this->_post){
-            //$this->_post['UserSysPlans']['tz_type'] = $queryParams['tz_type'];
             $this->_post['UserSysPlans']['lottery_type'] = $queryParams['lottery_type'];
         }
 
