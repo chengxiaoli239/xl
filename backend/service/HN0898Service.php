@@ -699,22 +699,31 @@ class HN0898Service extends BaseTZService {
      */
     public static function getBalance($uid, $tz_system_id){
         self::__init($uid, $tz_system_id);
+
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid,'tz_system_id'=>$tz_system_id]);
         $headers = [
             'Accept: */*',
-            //'Accept-Encoding: gzip, deflate, br',
-            //'Accept-Encoding: gunzip, deflate, br', # gunzip防止页面数据返回乱码
-            'Content-Length: 11',
+            'Accept-Encoding: gzip, deflate, br',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Connection: keep-alive',
             'Content-Type: application/x-www-form-urlencoded',
+            'Content-Length: 11',
+            "Host:".str_replace('www.','',self::$domain),
+            'Origin:'.$TzSystemsUsers->ssc_domain,
+            'Cookie: '.$TzSystemsUsers->cookie,
+            "Referer:".$TzSystemsUsers->ssc_domain.'/index.aspx',
+            $TzSystemsUsers->user_agent,
+            'X-Requested-With: XMLHttpRequest',
         ];
         $post_data = ['act'=>'balance'];
-        $headers = array_merge(self::$headers,$headers);
+        //$headers = array_merge(self::$headers,$headers);
 
         //$url = self::getUserUrlArr(self::$user_id,'GET_BALANCE');
         $url = self::getTzSiteInfo($tz_system_id,'GET_BALANCE');
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
-        //p([$url,$post_data,$headers]);
         $start_time = microtime(true);
         $balance = CurlService::httpPost($url,http_build_query($post_data), $headers);#
+        p([$url,$post_data,$headers, $balance]);
         $end_time = microtime(true);
         $time_consume = ($end_time-$start_time).'s';
         $indexUrl = self::getTzSiteInfo($tz_system_id,'SSC_INDEX');
@@ -722,7 +731,7 @@ class HN0898Service extends BaseTZService {
         //p($logData);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','0898用户余额', $logData);
         //sleep(2);
-        $rst = CurlService::httpGet($indexUrl, $headers);
+        //$rst = CurlService::getCurl($indexUrl, $headers);
         self::$headers = [];
         //p($balance);
 

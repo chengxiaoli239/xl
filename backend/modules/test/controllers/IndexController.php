@@ -103,13 +103,15 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $rst = HN0898Service::synBalance(4);p($rst);
+        $miss = SscDataService::getCodeTypeHistoryMiss('type_3b,type_2', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+        $miss = SscDataService::getSdHzYlHistoryMiss([30], $lottery_type = 5, 20000);p($miss);
+        $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
         $rst = TzService::opSystemBetPlans(5);p($rst);// 定制化投注计划
         $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type = 5); p($rst);# 单双利润统计(month)
-        $miss = SscDataService::getSdHzYlHistoryMiss([8], $lottery_type = 5, 20000);p($miss);
         $miss = SscDataService::getCodeTypeHistoryMiss('type_3', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $rst = KjDataGet::getNextQihaoByQihao('190525059',5);p($rst);
         $miss = SscDataService::getCodeTypeYlHistoryMiss('118', $lottery_type = 5, 10000);p($miss);
-        $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
         $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type = 5); p($rst);# 和值每天数量统计
         $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type=5); p($rst);# 号码类型每天数量统计
         $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 7);p($rst); # 上奖三字现
@@ -278,7 +280,6 @@ class IndexController extends Controller
         $rst = WxService::sendMsg();p($rst); # 群发微信消息
         $rst = CqsscKcw::getLotteryNo();p($rst);
         $rst = HN0898Service::getQihao();p($rst);
-        $rst = HN0898Service::synBalance(1);p($rst);
         $rst = SscDataService::calcDsProfit();p($rst); // 单双遗漏计算
         $rst = TzService::tz();p($rst); // 计划投注
         $rst = SscDataService::calTzTotalMoney('02468,X,13579,13579', 0.1, 2); p($rst);
