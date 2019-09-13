@@ -723,7 +723,7 @@ class HN0898Service extends BaseTZService {
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
         $start_time = microtime(true);
         $balance = CurlService::httpPost($url,http_build_query($post_data), $headers);#
-        p([$url,$post_data,$headers, $balance]);
+        //p([$url,$post_data,$headers, $balance]);
         $end_time = microtime(true);
         $time_consume = ($end_time-$start_time).'s';
         $indexUrl = self::getTzSiteInfo($tz_system_id,'SSC_INDEX');
