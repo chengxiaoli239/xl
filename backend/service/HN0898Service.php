@@ -703,7 +703,7 @@ class HN0898Service extends BaseTZService {
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid,'tz_system_id'=>$tz_system_id]);
         $headers = [
             'Accept: */*',
-            'Accept-Encoding: gzip, deflate, br',
+            'Accept-Encoding: gunzip, deflate, br',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
             'Connection: keep-alive',
             'Content-Type: application/x-www-form-urlencoded',
@@ -711,6 +711,7 @@ class HN0898Service extends BaseTZService {
             "Host:".str_replace('www.','',self::$domain),
             'Origin:'.$TzSystemsUsers->ssc_domain,
             'Cookie: '.$TzSystemsUsers->cookie,
+            //'Cookie: ASP.NET_SessionId=k2m5jxavmfs3hm55qlllwz45; pageReferrInSession=https%3A//9912304.com/user/reg.aspx; firstEnterUrlInSession=https%3A//9912304.com/ssc/index.aspx; VisitorCapacity=1', # .$TzSystemsUsers->cookie,
             "Referer:".$TzSystemsUsers->ssc_domain.'/index.aspx',
             $TzSystemsUsers->user_agent,
             'X-Requested-With: XMLHttpRequest',
@@ -722,7 +723,7 @@ class HN0898Service extends BaseTZService {
         $url = self::getTzSiteInfo($tz_system_id,'GET_BALANCE');
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
         $start_time = microtime(true);
-        $balance = CurlService::httpPost($url,http_build_query($post_data), $headers);#
+        $balance = CurlService::postCurl($url,http_build_query($post_data), $headers);#
         //p([$url,$post_data,$headers, $balance]);
         $end_time = microtime(true);
         $time_consume = ($end_time-$start_time).'s';
