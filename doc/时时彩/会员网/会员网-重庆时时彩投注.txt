@@ -106,3 +106,88 @@ LotteryId: 2
 BetNumber: 612X#100,611X#100
 BetWayId: 1
 UserName: ssp558
+
+
+二定：
+
+1、General
+	Request URL: http://zhxthy1t.58gocm.com/api/betType
+	Request Method: POST
+	Status Code: 200 OK
+	Remote Address: 140.249.61.99:80
+	Referrer Policy: no-referrer-when-downgrade
+2、Response Headers
+	
+3、Request Headers
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 784
+	Content-Type: application/x-www-form-urlencoded
+	Cookie: ValidateToken=e3862b85210e7eb95d1508847630638e; Token=9AGwolSBJxaQ%2f7bq%2fThIH%2bItLMqjxOEKUmh%2b0ZnzDYQ%3d
+	Host: zhxthy1t.58gocm.com
+	Origin: http://zhxthy1t.58gocm.com
+	Referer: http://zhxthy1t.58gocm.com/
+	Token: 9AGwolSBJxaQ/7bq/ThIH+ItLMqjxOEKUmh+0ZnzDYQ=
+	type: 2
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+4、FormData
+	PeriodId: 2247927
+	LotteryId: 2
+	BetNumber: 0X0X,0X1X,0X2X,0X3X,0X4X,0X5X,0X6X,0X7X,0X8X,0X9X,1X0X,1X1X,1X2X,1X3X,1X4X,1X5X,1X6X,1X7X,1X8X,1X9X,2X0X,2X1X,2X2X,2X3X,2X4X,2X5X,2X6X,2X7X,2X8X,2X9X,3X0X,3X1X,3X2X,3X3X,3X4X,3X5X,3X6X,3X7X,3X8X,3X9X,4X0X,4X1X,4X2X,4X3X,4X4X,4X5X,4X6X,4X7X,4X8X,4X9X,5X0X,5X1X,5X2X,5X3X,5X4X,5X5X,5X6X,5X7X,5X8X,5X9X,6X0X,6X1X,6X2X,6X3X,6X4X,6X5X,6X6X,6X7X,6X8X,6X9X,7X0X,7X1X,7X2X,7X3X,7X4X,7X5X,7X6X,7X7X,7X8X,7X9X,8X0X,8X1X,8X2X,8X3X,8X4X,8X5X,8X6X,8X7X,8X8X,8X9X,9X0X,9X1X,9X2X,9X3X,9X4X,9X5X,9X6X,9X7X,9X8X,9X9X
+	BetAmt: 100
+	BetTypeId: 1
+	BetWayId: 0
+	UserName: tj00
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

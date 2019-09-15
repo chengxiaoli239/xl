@@ -134,7 +134,8 @@ class TzService extends BaseService {
     public static function beforeRunSysPlans($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = Yii::$app->cache;
         $pkey = BetService::buildPlanSwitchKey($lottery_type, $qihao);
-        if($planStatus = $m->get($pkey)){
+        $exist = SscKjData::findOne(['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
+        if($planStatus = $m->get($pkey) && $exist){
             return ['status'=>300, 'pkey'=>$pkey, 'msg'=>'投注计划已经处理过了~'];
         }
 
@@ -149,7 +150,8 @@ class TzService extends BaseService {
         self::_init();
         $rst = ['status'=>200, 'msg'=>'操作成功!'];
 
-        $qihao = KjDataGet::getEndQihao($lottery_type);
+        //$qihao = KjDataGet::getEndQihao($lottery_type);
+        $qihao = HN0898Service::getQihao($lottery_type);
         $statusRst = self::beforeRunSysPlans($qihao, $lottery_type);
         if($statusRst['status'] != 200){
             return $statusRst;

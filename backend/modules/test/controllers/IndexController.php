@@ -103,11 +103,11 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $rst = TzService::opSystemBetPlans(5);p($rst);// 定制化投注计划
         $rst = HN0898Service::synBalance(4);p($rst);
         $miss = SscDataService::getCodeTypeHistoryMiss('type_3b,type_2', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $miss = SscDataService::getSdHzYlHistoryMiss([30], $lottery_type = 5, 20000);p($miss);
         $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
-        $rst = TzService::opSystemBetPlans(5);p($rst);// 定制化投注计划
         $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type = 5); p($rst);# 单双利润统计(month)
         $miss = SscDataService::getCodeTypeHistoryMiss('type_3', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $rst = KjDataGet::getNextQihaoByQihao('190525059',5);p($rst);
