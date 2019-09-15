@@ -150,8 +150,8 @@ class TzService extends BaseService {
         self::_init();
         $rst = ['status'=>200, 'msg'=>'操作成功!'];
 
-        //$qihao = KjDataGet::getEndQihao($lottery_type);
-        $qihao = HN0898Service::getQihao($lottery_type);
+        $qihao = KjDataGet::getEndQihao($lottery_type);
+        //$qihao = HN0898Service::getQihao($lottery_type);
         $statusRst = self::beforeRunSysPlans($qihao, $lottery_type);
         if($statusRst['status'] != 200){
             return $statusRst;
