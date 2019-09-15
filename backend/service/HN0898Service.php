@@ -790,6 +790,19 @@ class HN0898Service extends BaseTZService {
     }
 
     /**
+     * @desc 开奖是否存在
+     * @param $qihao
+     * @param int $lottery_type
+     * @return bool
+     */
+    public static function isExist($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
+
+        $exist = SscKjData::findOne(['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
+
+        return $exist ? true : false;
+    }
+
+    /**
      * @desc 获取首页内容
      * @param $uid
      * @param $tz_system_id
