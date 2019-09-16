@@ -988,7 +988,7 @@ class StaticService extends BaseService {
         $mkey = 'allDateStaticProfits_PERDATE_'.$lottery_type.'_21';
 
         $allStatic = [];
-        for($s=0; $s<5; $s++){
+        for($s=0; $s<1; $s++){
             if(!$time = $m->get($mkey)) {
                 $time = strtotime('-2 day');
             }else{

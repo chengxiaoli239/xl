@@ -19,7 +19,7 @@ class OpSystemCodesService extends BaseService {
      * @param string $qihao
      * @return array
      */
-    public static function sysPlansCodes($qihao = ''){
+    public static function sysPlansCodes($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao = ''){
 
         $SysPlansCodes = SysPlansCodes::find()->where('1=1')->orderBy(['rand()' => SORT_DESC])->all();
         $rst = ['status'=>200, 'msg'=>'操作成功!'];

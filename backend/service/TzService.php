@@ -134,8 +134,7 @@ class TzService extends BaseService {
     public static function beforeRunSysPlans($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = Yii::$app->cache;
         $pkey = BetService::buildPlanSwitchKey($lottery_type, $qihao);
-        $exist = HN0898Service::isExist($qihao, $lottery_type);
-        if($planStatus = $m->get($pkey) && $exist){
+        if($planStatus = $m->get($pkey)){
             return ['status'=>300, 'pkey'=>$pkey, 'msg'=>'投注计划已经处理过了~'];
         }
 
@@ -153,40 +152,48 @@ class TzService extends BaseService {
         $qihao = KjDataGet::getEndQihao($lottery_type);
         //$qihao = HN0898Service::getQihao($lottery_type);
         $statusRst = self::beforeRunSysPlans($qihao, $lottery_type);
+        //p($statusRst,0);
         if($statusRst['status'] != 200){
             return $statusRst;
         }
+        //p($qihao,0);
 
+        $time1 = microtime(true);
         # 1、处理系统投注计划号码
-        $rst['opSystemCodesService'] = OpSystemCodesService::sysPlansCodes($qihao);
-        ///for ($i=0;$i<2;$i++){
-            # 1、定位和值
-            //$rst['heZhiStatics'] = SscDataService::heZhiStatics(); // 更新定位和值汇总表
-            //$rst['updateHeZhiYL'] = SscDataService::updateHeZhiYL(); // 更新定位和值遗漏表
-            # 每天四定利润统计，四定类型详见：StaticService::$typeArr
-            $rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type);
+        //$rst['opSystemCodesService'] = OpSystemCodesService::sysPlansCodes($lottery_type, $qihao); # 三定暂时不处理
+        # 1、定位和值
+        //$rst['heZhiStatics'] = SscDataService::heZhiStatics(); // 更新定位和值汇总表
+        //$rst['updateHeZhiYL'] = SscDataService::updateHeZhiYL(); // 更新定位和值遗漏表
+        # 每天四定利润统计，四定类型详见：StaticService::$typeArr
+        $rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type);
+        $time2 = microtime(true);
 
-            # 2、单双
-            $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖遗漏
-            $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏
+        # 2、单双
+        $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖遗漏
+        $time3 = microtime(true);
+        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏
+        $time4 = microtime(true);
 
-            # 3、三字现
-            $rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏
-            $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type);
+        # 3、三字现
+        $rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏
+        $time5 = microtime(true);
+        $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type);
+        $time6 = microtime(true);
 
-            # 4、四定和值遗漏
-            $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏
+        # 4、四定和值遗漏
+        $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏
+        $time7 = microtime(true);
+        //p([$time1, $time2, $time3, $time4, $time5, $time6, $time7, $lottery_type]);
 
 
-            //$rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); # 单双利润统计(month)
-            //$rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay(); # 单双利润统计(day)
-            //$rst['tz'] = TzService::tz(); // 计划投注
+        //$rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); # 单双利润统计(month)
+        //$rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay(); # 单双利润统计(day)
+        //$rst['tz'] = TzService::tz(); // 计划投注
 
-            //$rst['synUsersBalance'] = HN0898Service::synBalance(); // 同步用户的余额
+        //$rst['synUsersBalance'] = HN0898Service::synBalance(); // 同步用户的余额
 
-            # 计划方案倍数、投注号码或者投注状态修改
-            //$rst['userSysPlanChange'] = UserSysPlansService::userSysPlanChange($lottery_type);
-        //}
+        # 计划方案倍数、投注号码或者投注状态修改
+        //$rst['userSysPlanChange'] = UserSysPlansService::userSysPlanChange($lottery_type);
 
         $rst['qihao'] = $qihao;
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/opSystemBetPlans','INFO','处理系统投注计划', $rst);
@@ -223,6 +230,7 @@ class TzService extends BaseService {
         # 计划任务是否处理完成后锁住(value:1)，避免重复处理 end
 
         $logData = [['pkey'=>$pkey,'rst10'=>$rst10, 'rst11'=>$rst11], ['next_key'=>$next_mkey, 'rst20'=>$rst20, 'rst21'=>$rst21]];
+        p($logData);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/afterRunSysPlans','INFO','系统计划处理后', $logData);
 
         return true;
