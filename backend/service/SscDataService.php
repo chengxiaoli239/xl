@@ -701,29 +701,40 @@ class SscDataService extends BaseService {
     public static function updateCodeTypeYLs($type, $lottery_type = DEFAULT_LOTTERY_TYPE){
         if(!in_array($type, [3, 4])) return false;
         $rst = [];
-        $SscStaticVals = SscStaticVal::find()->where(['type'=>$type, 'status'=>1])->asArray()->all();
+        $SscStaticVals = self::getSscStaticVal($type);
+
+        $SscStaticYls = self::getSscStaticYls($lottery_type, $type);
+        $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->orderBy('id DESC')->limit(1)->one();
+        $yDate = date('Y-m-d',strtotime("-1 day"));
+        $tDate = date('Y-m-d');
         foreach ($SscStaticVals as $dsData){
             //p($dsData);
+            /*
             if(!$SscStaticYl = SscStaticYl::findOne(['lottery_type'=>$lottery_type, 'type'=>$type, 'val'=>$dsData['val']])){
+                $SscStaticYl = new SscStaticYl();
+                $SscStaticYl->created_at = time();
+            }
+            */
+            //p(['lottery_type'=>$lottery_type, 'type'=>$type, 'val'=>$dsData['val'], $SscStaticYls[$dsData['val']]]);
+            if(!$SscStaticYl = $SscStaticYls[$dsData['val']]){
                 $SscStaticYl = new SscStaticYl();
                 $SscStaticYl->created_at = time();
             }
             $SscStaticYl->static_nums = $dsData['static_nums'];
             //$vals = explode(',', $dsData['val']);
-            $count = SscDataService::getCodeTypeNumCounts($type);
+            $count = SscDataService::getCodeTypeNumCounts($type, strlen($dsData['val']));
             //p([$dsData, $count]);
             $SscStaticYl->lottery_type = $lottery_type;
             $SscStaticYl->updated_at = time();
             $SscStaticYl->val = $dsData['val'];
             $SscStaticYl->type = $type;
-            $getDataType = SscDataService::staticGetDataType();
-            $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->orderBy('id DESC')->limit(1)->one();
+            $getDataType = SscDataService::getCOnfig();
             $field = strlen($dsData['val']) == 3 ? 'code_3n' : 'code_4n';
             $flag = strpos($SscKjDatas->$field, $dsData['val']) !== false;
             if(in_array($type, [ 3 ]) OR $getDataType == 0 OR $flag){
                 # 中的执行这里
                 $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums']);
-                //p($miss);
+                //p([$dsData['val'], $lottery_type, $dsData['static_nums'], $miss]);
             }else{
                 # 遗漏本表数据做计算，不中的情况执行这里
                 $miss = SscDataService::getCodeTypeYlByTab($dsData['val'], $lottery_type, $type);
@@ -740,19 +751,22 @@ class SscDataService extends BaseService {
             $SscStaticYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
             $SscStaticYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
             $SscStaticYl->count = $count;
-            $SscStaticYl->status = $miss['current_times'] > $dsData['static_nums'] ? 0 : 1; # 前台显示
+            //$SscStaticYl->status = $dsData['static_nums']; # 前台显示
+            $SscStaticYl->status = $dsData['status']; # 前台显示
 
-            $SscStaticYl->type_2b = (int)$dsData['type_2b'];
-            $SscStaticYl->type_3b = (int)$dsData['type_3b'];
-            $SscStaticYl->type_4b = (int)$dsData['type_4b'];
-            $SscStaticYl->type_2 = (int)$dsData['type_2'];
-            $SscStaticYl->type_3 = (int)$dsData['type_3'];
-            $SscStaticYl->type_4 = (int)$dsData['type_4'];
-            $SscStaticYl->type_22 = (int)$dsData['type_22'];
-            $SscStaticYl->type_4d = (int)$dsData['type_4d'];
-            $SscStaticYl->type_4s = (int)$dsData['type_4s'];
-            $SscStaticYl->type_4ds = (int)$dsData['type_4ds'];
-            $SscStaticYl->type_log = (int)$dsData['type_log'];
+            //if($getDataType == 1){
+                $SscStaticYl->type_2b = (int)$dsData['type_2b'];
+                $SscStaticYl->type_3b = (int)$dsData['type_3b'];
+                $SscStaticYl->type_4b = (int)$dsData['type_4b'];
+                $SscStaticYl->type_2 = (int)$dsData['type_2'];
+                $SscStaticYl->type_3 = (int)$dsData['type_3'];
+                $SscStaticYl->type_4 = (int)$dsData['type_4'];
+                $SscStaticYl->type_22 = (int)$dsData['type_22'];
+                $SscStaticYl->type_4d = (int)$dsData['type_4d'];
+                $SscStaticYl->type_4s = (int)$dsData['type_4s'];
+                $SscStaticYl->type_4ds = (int)$dsData['type_4ds'];
+                $SscStaticYl->type_log = (int)$dsData['type_log'];
+            //}
 
             $qishu = SscDataService::getQishus($lottery_type);
 
@@ -760,20 +774,22 @@ class SscDataService extends BaseService {
             $field = $len == 3? 'code_3n' : 'code_4n';
             $where = ['AND', ['LIKE', $field, $dsData['val']]];
             $SscStaticYl->theory_nums_perdate = (string)round(($count*$qishu*0.1) / 995, 2); # 理论次数/天
-            $today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', date('Y-m-d')]]);
-            //$today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', '2019-05-24']]);
-            $today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($today_nums_where)->asArray()->all()[0]['nums'];
-            $SscStaticYl->today_nums = $today_nums;
 
+            # 今日出现次数
+            $today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', $tDate]]);
+            $today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($today_nums_where)->asArray()->all()[0]['nums'];
             # 昨日出现次数
-            $ytd_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', date('Y-m-d',strtotime("-1 day") )]]);
-            $ytd_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($ytd_nums_where)->asArray()->all()[0]['nums'];
+            //$ytd_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', $yDate ]]);
+            //$ytd_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($ytd_nums_where)->asArray()->all()[0]['nums'];
+            $ytd_nums = self::getCodeTypeYtdNums($field, $dsData['val'], $lottery_type, $yDate);
+
+            $SscStaticYl->today_nums = $today_nums;
             $SscStaticYl->ytd_nums = $ytd_nums;
 
             $SscStaticYl->history_max_miss = max($miss['current_times'],$SscStaticYl->max_miss,$SscStaticYl->history_max_miss); // 6、历史最大遗漏
             $SscStaticYl->update_time = date('Y-m-d H:i:s');
-            //p($SscStaticYl->attributes);
             $rst = $SscStaticYl->save();
+            //p([$rst,$SscStaticYl->attributes]);
             if(!$rst){
                 $logArr = ['attributes'=>$SscStaticYl->attributes, 'msg'=>$SscStaticYl->getErrors()];
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/updateCodeTypeYL','INFO','统计号码出现次数', $logArr);
@@ -782,6 +798,45 @@ class SscDataService extends BaseService {
 
 
         return $rst;
+    }
+
+    /**
+     * @desc 获取号码类型
+     * @param int $type
+     * @return array|SscStaticVal[]|mixed
+     */
+    public static function getSscStaticVal($type = 3){
+        $m = \Yii::$app->cache;
+        $mkey = 'getSscStaticVal_'.$type;
+        if(!$SscStaticVals = $m->get($mkey)){
+            $SscStaticVals = SscStaticVal::find()->where(['type'=>$type, 'status'=>1])->asArray()->all();
+        }
+
+        $m->set($mkey, $SscStaticVals, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
+
+        return $SscStaticVals;
+    }
+
+    /**
+     * @desc 获取一个号码昨天出现次数
+     * @param string $field
+     * @param string $val
+     * @param int $lottery_type
+     * @param $date
+     * @return mixed
+     */
+    public static function getCodeTypeYtdNums($field = 'code_4n', $val = '0123', $lottery_type = DEFAULT_LOTTERY_TYPE, $date){
+        $m = \Yii::$app->cache;
+
+        $mkey = 'getCodeTypeYtdNums_'.$lottery_type.'_'.$date.'_'.$field.'_'.$val;
+        if(!$nums = $m->get($mkey)){
+            $where = ['AND', ['LIKE', $field, $val]];
+            $ytd_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', $date ]]);
+            $nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($ytd_nums_where)->asArray()->all()[0]['nums'];
+            $m->set($mkey, $nums, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
+        }
+
+        return $nums;
     }
 
     /**
@@ -808,11 +863,42 @@ class SscDataService extends BaseService {
      * @desc 计算遗漏获取数据类型 1取本表数据做变更0扫表重新计算数据（比如：遗漏、数量等统计）
      * @return int
      */
-    public static function staticGetDataType(){
+    public static function getConfig($key = 'getDataType'){
+        $m = \Yii::$app->cache;
+        $mkey = 'CONFIG_TYPE_'.$key;
+        if($val = $m->get($mkey)) return $val;
 
-        $status = SystemConfig::findOne(['key'=>'getDataType'])->value;
+        $val = SystemConfig::findOne(['key'=>$key])->value;
+        $m->set($mkey, $val, \Yii::$app->params['BASE_DATA_CACHE_TIME']);
 
-        return $status;
+        return $val;
+    }
+
+    /**
+     * @desc 获取遗漏记录objects
+     * @param int $lottery_type
+     * @param int $type
+     * @return mixed|static[]
+     */
+    public static function getSscStaticYls($lottery_type = DEFAULT_LOTTERY_TYPE, $type = 3){
+        $SscStaticYls = SscStaticYl::findAll(['lottery_type'=>$lottery_type, 'type'=>$type]);
+        $datas = [];
+        foreach ($SscStaticYls as $SscStaticYl){
+            $datas[$SscStaticYl->val] = $SscStaticYl;
+        }
+        return $datas;
+        $m = \Yii::$app->cache;
+        $mkey = 'getSscStaticYls_'.$lottery_type.'_'.$type;
+        if($datas = $m->get($mkey)){
+            $SscStaticYls = SscStaticYl::findAll(['lottery_type'=>$lottery_type, 'type'=>$type]);
+            $datas = [];
+            foreach ($SscStaticYls as $SscStaticYl){
+                $datas[$SscStaticYl->val] = $SscStaticYl;
+            }
+            $m->set($mkey, $datas, \Yii::$app->params['BASE_DATA_CACHE_TIME']);
+        }
+
+        return $datas;
     }
 
     /**
@@ -821,7 +907,7 @@ class SscDataService extends BaseService {
      * @param $vals
      * @return int
      */
-    public static function getCodeTypeNumCounts($type = 2){
+    public static function getCodeTypeNumCounts($type = 2, $val = 3){
         $codesTypes = [
             //2 => 106,
             3 => 106,
@@ -1032,13 +1118,13 @@ class SscDataService extends BaseService {
             # 四字现
             $field = 'code_4n';
         }
-        $where = ['AND', ['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type],['LIKE', $field, $value]];
-        $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->where($where)->orderBy('id DESC')->limit($recently)->all();
-        //p($SscKjDatas);
+        $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'index_id', $min_id], ['LIKE', $field, $value]];
+        $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->where($where)->orderBy('id DESC')->limit($recently)->asArray()->all();
+        //p([$where, $SscKjDatas]);
         //if($value == '0026') p([$rstData, $SscKjDatas]);
         //$where = "$field=$num AND id>$min_id";
         if(count($SscKjDatas)>1){
-            $last_times = $SscKjDatas[0]->index_id - $SscKjDatas[1]->index_id - 1;  // 上次遗漏次数
+            $last_times = $SscKjDatas[0]['index_id'] - $SscKjDatas[1]['index_id'] - 1;  // 上次遗漏次数
         }
 
         # 最大遗漏期间计算 start
@@ -1066,7 +1152,8 @@ class SscDataService extends BaseService {
             $max_range = $SscKjDatas[1]['qihao'] ."-". $SscKjDatas[0]['qihao'];
         }
         $last_time_miss_range = $SscKjDatas[1]['qihao'] ."-". $SscKjDatas[0]['qihao'];
-        $current_times = $last['last_id'] - $SscKjDatas[0]->index_id;
+        $current_times = $last['last_id'] - $SscKjDatas[0]['index_id'];
+        //p([$last['last_id'] , $SscKjDatas[0]->index_id]);
         if(empty($yl_str)) $yl_str = $last_times;
 
         $rstData = [

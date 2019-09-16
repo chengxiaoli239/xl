@@ -1745,15 +1745,20 @@ class StaticService extends BaseService {
        foreach ($lottery_types as $lottery_type) {
            $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl');
            if ($status) {
+               $time1 = microtime(true);
                # 号码类型：双重、双双重、四重、三兄弟、四兄弟
                $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
+               $time2 = microtime(true);
                # 三字现
-               $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type);
+               $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type); # 10s
+               $time3 = microtime(true);
                # 四字现带
-               $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type);
+               $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
+               $time4 = microtime(true);
                # 四字现不带双重
                //$rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type);
                StaticService::afterOpStatic($lottery_type, 'opAllCodeTypeYl');
+               //p([$time1, $time2, $time3, $time4]);
            }
        }
 
@@ -1902,7 +1907,6 @@ class StaticService extends BaseService {
         $status = $m->get($mkey); # 为true或1则不能再往下执行统计
 
         $qihao = HN0898Service::getCurrentQihao($lottery_type);
-        //$qihao = KjDataGet::getEndQihao($lottery_type);
         $isExists = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao]);
         if(!$status && $isExists) {
             $flag = true;

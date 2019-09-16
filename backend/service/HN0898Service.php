@@ -1227,15 +1227,15 @@ class HN0898Service extends BaseTZService {
      * @return string
      */
     public static function getCurrentQihao($lottery_type = DEFAULT_LOTTERY_TYPE){
-        $qihao = HN0898Service::getQihao($lottery_type);
-        $strRQ = substr($qihao, 0, 6);
-        $qihao_n = str_replace($strRQ, '', $qihao);
+        $db = \Yii::$app->db;
 
         switch ($lottery_type){
             case 5:
-                if($qihao_n == '001') $actionNo = '120';
-                else $actionNo = $qihao_n - 1;
+                $time = date("H:i:s", time() - 20 * 60);
+                $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC";
+                $rst = $db->createCommand($sql)->queryOne();
 
+                $actionNo = $rst['actionNo'];
 
                 $qihao = date("ymd").sprintf("%03d", $actionNo);
                 break;

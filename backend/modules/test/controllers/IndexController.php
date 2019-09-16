@@ -103,6 +103,9 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $rst = StaticService::opAllCodeTypeYl();p($rst);
+        $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type = 5);p($rst);
+        $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 5);p($rst);
         $rst = TzService::opSystemBetPlans(5);p($rst);// 定制化投注计划
         $rst = HN0898Service::synBalance(4);p($rst);
         $miss = SscDataService::getCodeTypeHistoryMiss('type_3b,type_2', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
@@ -126,15 +129,10 @@ class IndexController extends Controller
         # 号码类型：双重、双双重、四重、三兄弟、四兄弟
         $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst);
         # 三字现带双重
-        $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 5);p($rst);
-        # 四字现不带双重
-        # 四字现带双重
-        $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type = 5);p($rst);
         //$rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5); p($rst);
         $rst = CommonService::getLotteryName();p($rst);
         $arr = 0;
         p(empty($arr));
-        $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = SscDataService::insertCode($type = 3);p($rst); # 插入三字现、四字现
         $arr = ['海南省内包邮'];
         //$str = 'a:1:{i:0;s:18:"海南省内包邮"}';
