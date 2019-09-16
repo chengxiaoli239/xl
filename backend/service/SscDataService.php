@@ -499,8 +499,6 @@ class SscDataService extends BaseService {
                 'zuHes' => [ [1,2,3,4] ],
                 'numsArr' => $SDNumsArr,
             ],
-            /*
-            */
         ];
         //p($updateDsDatas);
         //$rst[$interval] = SscDataService::dsYLStatic($interval);
@@ -548,9 +546,6 @@ class SscDataService extends BaseService {
                     $SscDsYl->update_time = date('Y-m-d H:i:s');
                     //p($SscDsYl->attributes);
                     $rst = $SscDsYl->save();
-                    if($num == '1212'){
-                        //p([$dsData['numsArr'],$YL_data, $miss,$num,$rst]);
-                    }
                     if(!$rst){
                         $logArr = ['attributes'=>$SscDsYl->attributes, 'msg'=>$SscDsYl->getErrors()];
                         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/static_SscDwsDsNums','INFO','统计号码出现次数', $logArr);
@@ -1273,7 +1268,7 @@ class SscDataService extends BaseService {
         $min_id = $last['last_id'] - $recently - 1;
         $m = \Yii::$app->cache;
         $key = 'get3NumHistoryMiss_ID_'.$lottery_type.'_'.$min_id;
-        //if(!$rst = $m->get($key)){
+        if(!$rst = $m->get($key)){
             $field = 'code_3n';
             $where = ['AND',['like', $field, $num],['=', 'lottery_type', $lottery_type],['>','index_id', $min_id]];
             //p($where,0);
@@ -1320,7 +1315,7 @@ class SscDataService extends BaseService {
                 'yl_str' => $yl_str,
             ];
             $m->set($key, $rst,60*60);
-        //}
+        }
 
 
         return $rst;

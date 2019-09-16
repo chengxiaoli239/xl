@@ -152,11 +152,10 @@ class TzService extends BaseService {
         $qihao = KjDataGet::getEndQihao($lottery_type);
         //$qihao = HN0898Service::getQihao($lottery_type);
         $statusRst = self::beforeRunSysPlans($qihao, $lottery_type);
-        //p($statusRst,0);
         if($statusRst['status'] != 200){
             return $statusRst;
         }
-        //p($qihao);
+        //p([$qihao, $statusRst],0);
 
         $time1 = microtime(true);
         # 1、处理系统投注计划号码
@@ -177,14 +176,14 @@ class TzService extends BaseService {
         # 3、三字现
         $rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏
         $time5 = microtime(true);
-        $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type); # 耗时 6-7s
+        $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type); # 耗时 6-7s - 30s
         $time6 = microtime(true);
 
         # 4、四定和值遗漏
         $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏 耗时3.5s
         $time7 = microtime(true);
-        //p([$time1, $time2, $time3, $time4, $time5, $time6, $time7, $lottery_type]);
 
+        //p([$time1, $time2, $time3, $time4, $time5, $time6, $time7, $lottery_type]);
 
         //$rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); # 单双利润统计(month)
         //$rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay(); # 单双利润统计(day)
