@@ -591,7 +591,7 @@ class  CommonService{
     }
 
     /**
-     * @desc 是否四单四双
+     * @desc 四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
      * @param string $codes 格式 1,2,3,4
      * @return int
      */
@@ -600,19 +600,39 @@ class  CommonService{
         $codesArr = explode(',', $codes);
         asort($codesArr);
 
-        # 四单判断
+        $types_1 = [
+            0 => 2, # 四双
+            1 => 4, # 一单三双
+            2 => 3, # 两双两单
+            3 => 5, # 一双三单
+            4 => 1, # 四单
+        ];
+
+        $count_1 = 0; # 单数量
+        $count_2 = 0; # 双数量
+        /*
+        # 双数量判断
         $flag_4d = 1;
         foreach ($codesArr as $code){
-            if($code % 2 == 0) $flag_4d = 0;
+            if($code % 2 == 0) {
+                $count_2++;
+                $flag_4d = 0;
+            }
         }
+        */
 
-        # 四双判断
+        # 单数量判断
         $flag_4s = 2;
         foreach ($codesArr as $code){
-            if($code % 2 == 1) $flag_4s = 0;
+            if($code % 2 == 1) {
+                $count_1++;
+                $flag_4s = 0;
+            }
         }
 
-        return max($flag, $flag_4d, $flag_4s);
+        $flag = $types_1[$count_1];
+        //return max($flag, $flag_4d, $flag_4s);
+        return $flag;
     }
 
     /**

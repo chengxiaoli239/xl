@@ -385,6 +385,8 @@ class BaseNumService extends BaseService {
             }
         }
 
+        $m->set($mcKey, $zuHes, Yii::$app->params['GET_BASE_DATA_CACHE_TIME'] * 12);
+
         return $zuHes;
     }
 

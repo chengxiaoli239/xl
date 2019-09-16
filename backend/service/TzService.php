@@ -171,19 +171,19 @@ class TzService extends BaseService {
         # 2、单双
         $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖遗漏
         $time3 = microtime(true);
-        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏
+        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏 耗时4s
         $time4 = microtime(true);
 
         # 3、三字现
         $rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏
         $time5 = microtime(true);
-        $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type);
+        $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type); # 耗时 6-7s
         $time6 = microtime(true);
 
         # 4、四定和值遗漏
-        $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏
+        $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏 耗时3.5s
         $time7 = microtime(true);
-        //p([$time1, $time2, $time3, $time4, $time5, $time6, $time7, $lottery_type]);
+        p([$time1, $time2, $time3, $time4, $time5, $time6, $time7, $lottery_type]);
 
 
         //$rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth(); # 单双利润统计(month)

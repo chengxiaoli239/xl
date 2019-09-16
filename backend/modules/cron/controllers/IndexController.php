@@ -144,13 +144,16 @@ class IndexController extends Controller
      */
     public function actionUpdateNullCodes (){
         self::_init();
+        set_time_limit(0);
         for ($i = 0; $i<10; $i++){
             $rst = KjDataGet::updateNullCode();
+            /*
             $lottery_types = StaticService::getLotteryTypes();
             foreach ($lottery_types as $lottery_type) {
                 $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖遗漏 - 临时
                 $rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏 - 临时
             }
+            */
             sleep(2);
         }
 

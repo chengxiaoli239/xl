@@ -1269,16 +1269,16 @@ class SscDataService extends BaseService {
      */
     public static function get3NumHistoryMiss($num, $lottery_type = 1, $recently = 1000){
         $last_times = 0;
-        $last = SscKjData3num::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+        $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
         $min_id = $last['last_id'] - $recently - 1;
         $m = \Yii::$app->cache;
         $key = 'get3NumHistoryMiss_ID_'.$lottery_type.'_'.$min_id;
         //if(!$rst = $m->get($key)){
             $field = 'code_3n';
-            $where = ['AND',['like',$field,$num],['=', 'lottery_type', $lottery_type],['>','index_id', $min_id]];
+            $where = ['AND',['like', $field, $num],['=', 'lottery_type', $lottery_type],['>','index_id', $min_id]];
             //p($where,0);
             //$where = "$field=$num AND id>$min_id";
-            $SscKjData3Nums = SscKjData3Num::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
+            $SscKjData3Nums = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
             //if($num == '245')p($SscKjData3Nums);
             if(count($SscKjData3Nums)>1){
                 $last_times = $SscKjData3Nums[0]->index_id - $SscKjData3Nums[1]->index_id - 1;  // 上次遗漏次数
@@ -1905,12 +1905,12 @@ class SscDataService extends BaseService {
                 $SscSdHzYl->created_at = time();
                 $SscSdHzYl->val = $Data['val'];
             }
-            $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where(['codes_hz'=>$zuHes])->asArray()->one();
-            $SscSdHzYl->count = $Num4Type['count']; # 组合总共组数
+            $count = self::getCountByHzs($zuHes);
+            $SscSdHzYl->count = $count; # 组合总共组数
             $SscSdHzYl->updated_at = time();
             //$SscDsYl->zhi = (string)$num;
             $qishu = SscDataService::getQishus($lottery_type);
-            $SscSdHzYl->theory_nums_perdate = (string)round(($Num4Type['count']*$qishu*0.1) / 995, 2); # 理论次数/天
+            $SscSdHzYl->theory_nums_perdate = (string)round(($count*$qishu*0.1) / 995, 2); # 理论次数/天
             $SscSdHzYl->today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where(['date'=>date('Y-m-d'),'codes_4nums_hz'=>$zuHes, 'lottery_type'=>$lottery_type])->asArray()->one()['nums'];
 
             $SscSdHzYl->updated_at = time();
@@ -1939,6 +1939,22 @@ class SscDataService extends BaseService {
         }
 
         return $rst;
+    }
+
+    /**
+     * @desc 获取和值组合总号码数量
+     * @param $hzs
+     * @return mixed
+     */
+    public static function getCountByHzs($hzs){
+        $m = \Yii::$app->cache;
+        $mkey = 'getCountByHzs_'.implode(',', $hzs);
+        if(!$counts = $m->get($mkey)){
+            $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where(['codes_hz'=>$hzs])->asArray()->one();
+            $counts = $Num4Type['count'];
+        }
+
+        return $counts;
     }
 
     /**

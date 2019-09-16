@@ -499,22 +499,42 @@ class StaticService extends BaseService {
         $typeArr = self::$typeArr;
         $where = ['lottery_type'=>$lottery_type, 'date' => $date];
         $static = [ 0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0, 6=>0, 7=>0, 8=>0, 9=>0, 10=>0, 11=>0]; # 统计每种组合出现次数
+        # 开奖表，type_4ds : 四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
         //$SscKjDatas = SscKjData::find()->where($where)->limit($num)->all();
-        $SscKjDataDs = SscKjDataDs::find()->where($where)->orderBy(['id'=>SORT_ASC])->all();
-        $num = count($SscKjDataDs);
-        foreach ($SscKjDataDs as $SscKjData){
-            $ds = $SscKjData->code_1_2_3_4; # 四定单双值
-            $oneCodes = [$SscKjData->code_1, $SscKjData->code_2, $SscKjData->code_3, $SscKjData->code_4];
-            foreach ($typeArr as $key=>$types){
-                if(in_array($ds, $types)){
-                    $static[$key] = $static[$key] + 1;# 统计每种组合出现次数
-                }
-                foreach ($oneCodes as $code){
-                    in_array($code, $types) && $static[$key] = $static[$key] + 1;# 统计每种组合出现次数
-                }
+        $num = SscKjData::find()->where($where)->count('id');
+
+        $datas = SscKjData::find()->select(['type_4ds', '4ds'=>'COUNT(id)'])->where($where)->groupBy(['type_4ds'])->orderBy(['id'=>SORT_ASC])->asArray()->all();
+        //p($datas);
+        foreach ($datas as $data){
+            $type_4ds = $data['type_4ds'];
+
+            # 四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
+            if($type_4ds == 1){ # 四单
+                $static[10] = $static[10] + $data['4ds'] * 4;
+                $static[11] = $static[11] + $data['4ds'] * 0;
+                $sTypes = [0,3,7,9,12,14,15];
+            }elseif ($type_4ds == 2){ # 四双
+                $static[10] = $static[10] + $data['4ds'] * 0;
+                $static[11] = $static[11] + $data['4ds'] * 4;
+                $sTypes = [0,3,6,8,13,14,15];
+            }elseif ($type_4ds == 3){ #  两单两双
+                $static[10] = $static[10] + $data['4ds'] * 2;
+                $static[11] = $static[11] + $data['4ds'] * 2;
+                $sTypes = [0,2];
+            }elseif ($type_4ds == 4){ # 一单三双
+                $static[10] = $static[10] + $data['4ds'] * 1;
+                $static[11] = $static[11] + $data['4ds'] * 3;
+                $sTypes = [0,1,4,6,12,14];
+            }elseif ($type_4ds == 5){ # 一双三单
+                $static[10] = $static[10] + $data['4ds'] * 3;
+                $static[11] = $static[11] + $data['4ds'] * 1;
+                $sTypes = [0,1,5,7];
+            }
+            foreach ($sTypes as $sType){
+                $static[$sType] = $static[$sType] + $data['4ds'];
             }
         }
-        //p([$static, count($SscKjDataDs), $lottery_type, $static[$lottery_type]]);
+        //p([$static, $num, $lottery_type]);
 
         //if($lottery_type && $static[$lottery_type]) return $static[$lottery_type];
         $allStatic = [];
