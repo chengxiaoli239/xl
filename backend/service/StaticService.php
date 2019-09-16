@@ -1901,9 +1901,8 @@ class StaticService extends BaseService {
 
         $status = $m->get($mkey); # 为true或1则不能再往下执行统计
 
-        //$qihao = HN0898Service::getCurrentQihao($lottery_type);
-        //$qihao = HN0898Service::getQihao($lottery_type);
-        $qihao = KjDataGet::getEndQihao($lottery_type);
+        $qihao = HN0898Service::getCurrentQihao($lottery_type);
+        //$qihao = KjDataGet::getEndQihao($lottery_type);
         $isExists = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao]);
         if(!$status && $isExists) {
             $flag = true;
