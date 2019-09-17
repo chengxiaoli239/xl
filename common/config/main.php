@@ -12,6 +12,7 @@ return [
                     'weight' => 60,
                 ],
             ],
+            'useMemcached' => true,
             'keyPrefix' => 'xl_',
         ],
     ],
