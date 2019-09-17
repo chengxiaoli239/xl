@@ -156,8 +156,7 @@ class TzService extends BaseService {
         if($statusRst['status'] != 200){
             //return $statusRst;
         }
-        //p([$qihao, $statusRst],0);
-        if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opSystemBetPlans')) return $status;
+        //if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opSystemBetPlans')) return $status;
 
         $time1 = microtime(true);
         # 1、处理系统投注计划号码
@@ -171,6 +170,7 @@ class TzService extends BaseService {
 
         # 2、单双
         $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖单双数据
+        p($rst);
         $time3 = microtime(true);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏 耗时4s
         $time4 = microtime(true);

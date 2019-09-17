@@ -149,9 +149,6 @@ class IndexController extends Controller
         $rst = HuiYuanService5::loginNew(18, 6);p($rst);
         $rst = HuiYuanService5::synBalance(13);p($rst);
         $rst = NumService::getCodesKuaiXuan(['type_log'=>'1']);p($rst);
-        for ($i=0;$i<5; $i++){
-            $rst = SscDataService::updateDsData();//p($rst); // 每期开奖单双
-        }
         p($rst);
         $rst = SscDataService::updateCodeTypeYL($type = 2);p($rst); # 号码类型遗漏
         $rst = HN0898Service::getCurrentQihao( 7 );p($rst);
@@ -217,7 +214,6 @@ class IndexController extends Controller
         $rst = NumService::getRecentlyCodes(5);p($rst);
         $rst = UserSysPlansService::userSysPlanChange(2);p($rst);
         $rst = StaticService::getYlByCodes('02468,13579,X,X', 2, 18);p($rst);
-        $rst['updateDs'] = SscDataService::updateDsData(3); p($rst);// 每期开奖遗漏
         $rst = HN0898Service::insertDsYl();p($rst);
         $rst = BetService::bet(); p($rst);// 用户新计划投注，可正买可反买
         $rst = OpKjService::opSscKjData(2); p($rst); # 处理投注数据
