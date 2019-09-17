@@ -708,53 +708,48 @@ class SscDataService extends BaseService {
         $yDate = date('Y-m-d',strtotime("-1 day"));
         $tDate = date('Y-m-d');
         foreach ($SscStaticVals as $dsData){
-            //p($dsData);
-            /*
-            if(!$SscStaticYl = SscStaticYl::findOne(['lottery_type'=>$lottery_type, 'type'=>$type, 'val'=>$dsData['val']])){
-                $SscStaticYl = new SscStaticYl();
-                $SscStaticYl->created_at = time();
-            }
-            */
             //p(['lottery_type'=>$lottery_type, 'type'=>$type, 'val'=>$dsData['val'], $SscStaticYls[$dsData['val']]]);
             if(!$SscStaticYl = $SscStaticYls[$dsData['val']]){
                 $SscStaticYl = new SscStaticYl();
                 $SscStaticYl->created_at = time();
+                $SscStaticYl->static_nums = $dsData['static_nums'];
+                $SscStaticYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+                $count = SscDataService::getCodeTypeNumCounts($type, strlen($dsData['val']));
+                $SscStaticYl->type = $type;
+                $SscStaticYl->count = $count;
             }
-            $SscStaticYl->static_nums = $dsData['static_nums'];
             //$vals = explode(',', $dsData['val']);
-            $count = SscDataService::getCodeTypeNumCounts($type, strlen($dsData['val']));
             //p([$dsData, $count]);
-            $SscStaticYl->lottery_type = $lottery_type;
             $SscStaticYl->updated_at = time();
             $SscStaticYl->val = $dsData['val'];
-            $SscStaticYl->type = $type;
-            $getDataType = SscDataService::getCOnfig();
+            $getDataType = SscDataService::getConfig();
             $field = strlen($dsData['val']) == 3 ? 'code_3n' : 'code_4n';
             $flag = strpos($SscKjDatas->$field, $dsData['val']) !== false;
+            $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums']);
+            /*
             if(in_array($type, [ 3 ]) OR $getDataType == 0 OR $flag){
                 # 中的执行这里
                 $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums']);
-                //p([$dsData['val'], $lottery_type, $dsData['static_nums'], $miss]);
+                //p([$dsData['val'], $lottery_type, $getDataType, $dsData['static_nums'], $miss]);
             }else{
                 # 遗漏本表数据做计算，不中的情况执行这里
                 $miss = SscDataService::getCodeTypeYlByTab($dsData['val'], $lottery_type, $type);
                 //p([$miss, $dsData['val'], $lottery_type, $type]);
                 if(!$miss) continue;
             }
+            */
             //if($miss['current_times'])
             //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
-            $SscStaticYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
             $SscStaticYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
             $SscStaticYl->last_time_miss = $miss['last_times']; // 2、上次遗漏
             $SscStaticYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
             $SscStaticYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
             $SscStaticYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
             $SscStaticYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
-            $SscStaticYl->count = $count;
             //$SscStaticYl->status = $dsData['static_nums']; # 前台显示
             $SscStaticYl->status = $dsData['status']; # 前台显示
 
-            //if($getDataType == 1){
+            if($getDataType == 1){
                 $SscStaticYl->type_2b = (int)$dsData['type_2b'];
                 $SscStaticYl->type_3b = (int)$dsData['type_3b'];
                 $SscStaticYl->type_4b = (int)$dsData['type_4b'];
@@ -766,7 +761,7 @@ class SscDataService extends BaseService {
                 $SscStaticYl->type_4s = (int)$dsData['type_4s'];
                 $SscStaticYl->type_4ds = (int)$dsData['type_4ds'];
                 $SscStaticYl->type_log = (int)$dsData['type_log'];
-            //}
+            }
 
             $qishu = SscDataService::getQishus($lottery_type);
 
@@ -792,8 +787,10 @@ class SscDataService extends BaseService {
             //p([$rst,$SscStaticYl->attributes]);
             if(!$rst){
                 $logArr = ['attributes'=>$SscStaticYl->attributes, 'msg'=>$SscStaticYl->getErrors()];
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/updateCodeTypeYL','INFO','统计号码出现次数', $logArr);
+                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/updateCodeTypeYL','INFO','号码类型遗漏统计', $logArr);
             }
+            $logArr = ['lottery_type'=>$lottery_type, 'type'=>$type, 'val'=>$dsData['val']];
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/updateCodeTypeYL','INFO','号码类型遗漏统计', $logArr);
         }
 
 
@@ -886,18 +883,6 @@ class SscDataService extends BaseService {
         foreach ($SscStaticYls as $SscStaticYl){
             $datas[$SscStaticYl->val] = $SscStaticYl;
         }
-        return $datas;
-        $m = \Yii::$app->cache;
-        $mkey = 'getSscStaticYls_'.$lottery_type.'_'.$type;
-        if($datas = $m->get($mkey)){
-            $SscStaticYls = SscStaticYl::findAll(['lottery_type'=>$lottery_type, 'type'=>$type]);
-            $datas = [];
-            foreach ($SscStaticYls as $SscStaticYl){
-                $datas[$SscStaticYl->val] = $SscStaticYl;
-            }
-            $m->set($mkey, $datas, \Yii::$app->params['BASE_DATA_CACHE_TIME']);
-        }
-
         return $datas;
     }
 
@@ -1109,7 +1094,6 @@ class SscDataService extends BaseService {
         $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
         $min_id = $last['last_id'] - $recently - 1;
         //p([$value, $recently, $min_id]);
-
         $len = strlen($value);
         if($len == 3){
             # 三字现
@@ -1119,10 +1103,8 @@ class SscDataService extends BaseService {
             $field = 'code_4n';
         }
         $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'index_id', $min_id], ['LIKE', $field, $value]];
-        $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->where($where)->orderBy('id DESC')->limit($recently)->asArray()->all();
+        $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->where($where)->orderBy('id DESC')->asArray()->all();
         //p([$where, $SscKjDatas]);
-        //if($value == '0026') p([$rstData, $SscKjDatas]);
-        //$where = "$field=$num AND id>$min_id";
         if(count($SscKjDatas)>1){
             $last_times = $SscKjDatas[0]['index_id'] - $SscKjDatas[1]['index_id'] - 1;  // 上次遗漏次数
         }
@@ -1132,7 +1114,7 @@ class SscDataService extends BaseService {
         if(count($tmpKjData) > 2){
             foreach($tmpKjData as $key=>$r){
                 if($key == 0) continue;
-                $range[$tmpKjData[$key-1]['index_id']."_".$tmpKjData[$key]['index_id']] = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
+                $range[$tmpKjData[$key-1]['index_id'].'_'.$tmpKjData[$key]['index_id']] = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
             }
 
             $max_miss = max($range);
@@ -1149,9 +1131,9 @@ class SscDataService extends BaseService {
             # 最大遗漏期间计算 end
             //p([$field=>$num,$min_id, $SscKjData[1]->id,$max_range]);
         }else{
-            $max_range = $SscKjDatas[1]['qihao'] ."-". $SscKjDatas[0]['qihao'];
+            $max_range = $SscKjDatas[1]['qihao'] .'-'. $SscKjDatas[0]['qihao'];
         }
-        $last_time_miss_range = $SscKjDatas[1]['qihao'] ."-". $SscKjDatas[0]['qihao'];
+        $last_time_miss_range = $SscKjDatas[1]['qihao'] .'-'. $SscKjDatas[0]['qihao'];
         $current_times = $last['last_id'] - $SscKjDatas[0]['index_id'];
         //p([$last['last_id'] , $SscKjDatas[0]->index_id]);
         if(empty($yl_str)) $yl_str = $last_times;

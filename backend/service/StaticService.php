@@ -1741,9 +1741,10 @@ class StaticService extends BaseService {
      */
    public static function opAllCodeTypeYl(){
        $lottery_types = self::getLotteryTypes();
-       $rst = ['status'=>200, 'msg'=>'数据处理成功'];
+       $rst = ['status'=>200];
        foreach ($lottery_types as $lottery_type) {
            $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl');
+           $msg = '数据处理成功~';
            if ($status) {
                $time1 = microtime(true);
                # 号码类型：双重、双双重、四重、三兄弟、四兄弟
@@ -1755,11 +1756,15 @@ class StaticService extends BaseService {
                # 四字现带
                $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
                $time4 = microtime(true);
+               $times = [$time1, $time2, $time3, $time4];
                # 四字现不带双重
                //$rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type);
                StaticService::afterOpStatic($lottery_type, 'opAllCodeTypeYl');
-               //p([$time1, $time2, $time3, $time4]);
+           }else{
+               $msg = '数据已经处理过了~';
            }
+           $rst['data'][$lottery_type]['msg'] = $msg;
+           $rst['data'][$lottery_type]['times'] = $times;
        }
 
        return $rst;
