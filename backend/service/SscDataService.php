@@ -712,12 +712,24 @@ class SscDataService extends BaseService {
             if(!$SscStaticYl = $SscStaticYls[$dsData['val']]){
                 $SscStaticYl = new SscStaticYl();
                 $SscStaticYl->created_at = time();
-                $SscStaticYl->static_nums = $dsData['static_nums'];
                 $SscStaticYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
                 $count = SscDataService::getCodeTypeNumCounts($type, strlen($dsData['val']));
                 $SscStaticYl->type = $type;
                 $SscStaticYl->count = $count;
+
+                $SscStaticYl->type_2b = (int)$dsData['type_2b'];
+                $SscStaticYl->type_3b = (int)$dsData['type_3b'];
+                $SscStaticYl->type_4b = (int)$dsData['type_4b'];
+                $SscStaticYl->type_2 = (int)$dsData['type_2'];
+                $SscStaticYl->type_3 = (int)$dsData['type_3'];
+                $SscStaticYl->type_4 = (int)$dsData['type_4'];
+                $SscStaticYl->type_22 = (int)$dsData['type_22'];
+                $SscStaticYl->type_4d = (int)$dsData['type_4d'];
+                $SscStaticYl->type_4s = (int)$dsData['type_4s'];
+                $SscStaticYl->type_4ds = (int)$dsData['type_4ds'];
+                $SscStaticYl->type_log = (int)$dsData['type_log'];
             }
+            $SscStaticYl->static_nums = $dsData['static_nums'];
             //$vals = explode(',', $dsData['val']);
             //p([$dsData, $count]);
             $SscStaticYl->updated_at = time();
@@ -749,20 +761,6 @@ class SscDataService extends BaseService {
             //$SscStaticYl->status = $dsData['static_nums']; # 前台显示
             $SscStaticYl->status = $dsData['status']; # 前台显示
 
-            if($getDataType == 1){
-                $SscStaticYl->type_2b = (int)$dsData['type_2b'];
-                $SscStaticYl->type_3b = (int)$dsData['type_3b'];
-                $SscStaticYl->type_4b = (int)$dsData['type_4b'];
-                $SscStaticYl->type_2 = (int)$dsData['type_2'];
-                $SscStaticYl->type_3 = (int)$dsData['type_3'];
-                $SscStaticYl->type_4 = (int)$dsData['type_4'];
-                $SscStaticYl->type_22 = (int)$dsData['type_22'];
-                $SscStaticYl->type_4d = (int)$dsData['type_4d'];
-                $SscStaticYl->type_4s = (int)$dsData['type_4s'];
-                $SscStaticYl->type_4ds = (int)$dsData['type_4ds'];
-                $SscStaticYl->type_log = (int)$dsData['type_log'];
-            }
-
             $qishu = SscDataService::getQishus($lottery_type);
 
             $len = strlen($dsData['val']);
@@ -774,8 +772,6 @@ class SscDataService extends BaseService {
             $today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', $tDate]]);
             $today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($today_nums_where)->asArray()->all()[0]['nums'];
             # 昨日出现次数
-            //$ytd_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', $yDate ]]);
-            //$ytd_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($ytd_nums_where)->asArray()->all()[0]['nums'];
             $ytd_nums = self::getCodeTypeYtdNums($field, $dsData['val'], $lottery_type, $yDate);
 
             $SscStaticYl->today_nums = $today_nums;
