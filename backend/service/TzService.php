@@ -154,9 +154,10 @@ class TzService extends BaseService {
         $qihao = HN0898Service::getCurrentQihao($lottery_type);
         $statusRst = self::beforeRunSysPlans($qihao, $lottery_type);
         if($statusRst['status'] != 200){
-            return $statusRst;
+            //return $statusRst;
         }
         //p([$qihao, $statusRst],0);
+        if($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opSystemBetPlans')) return $status;
 
         $time1 = microtime(true);
         # 1、处理系统投注计划号码
@@ -205,6 +206,7 @@ class TzService extends BaseService {
         $rst['time7'] = $time7;
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/opSystemBetPlans','INFO','处理系统投注计划', $rst);
 
+        StaticService::afterOpStatic($lottery_type, 'opSystemBetPlans');
         self::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
 
         return $rst;
