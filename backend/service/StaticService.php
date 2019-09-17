@@ -1742,6 +1742,11 @@ class StaticService extends BaseService {
    public static function opAllCodeTypeYl(){
        $lottery_types = self::getLotteryTypes();
        $rst = ['status'=>200];
+       $m = \Yii::$app->cache;
+       $mkey = 'opAllCodeTypeYl_static';
+       if($isTo = $m->get($mkey)) return ['status'=>200, 'msg'=>'数据正在处理，请稍候~'];
+
+       $m->set($mkey, 1, 180);
        foreach ($lottery_types as $lottery_type) {
            $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl');
            $msg = '数据处理成功~';
@@ -1751,14 +1756,13 @@ class StaticService extends BaseService {
                $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
                $time2 = microtime(true);
                # 三字现
-               //$rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type); # 10s
+               $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type); # 10s
                $time3 = microtime(true);
                # 四字现
-               //$rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
+               $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
                $time4 = microtime(true);
                $times = [$time1, $time2, $time3, $time4];
-               # 四字现不带双重
-               //$rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type);
+
                StaticService::afterOpStatic($lottery_type, 'opAllCodeTypeYl');
            }else{
                $msg = '数据已经处理过了~';
