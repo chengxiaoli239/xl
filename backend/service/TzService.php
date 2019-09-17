@@ -174,7 +174,7 @@ class TzService extends BaseService {
         $time4 = microtime(true);
 
         # 3、三字现
-        $rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏
+        //$rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏 已写开奖表 三字现遗漏表暂时不写了
         $time5 = microtime(true);
         $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type); # 耗时 6-7s - 30s
         $time6 = microtime(true);

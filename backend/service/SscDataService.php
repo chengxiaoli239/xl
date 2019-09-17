@@ -735,6 +735,7 @@ class SscDataService extends BaseService {
             $SscStaticYl->updated_at = time();
             $SscStaticYl->val = $dsData['val'];
             $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums']);
+            //$miss2 = SscDataService::getCodeTypeYlByTab($dsData['val'], $lottery_type, $type);
             /*
             $field = strlen($dsData['val']) == 3 ? 'code_3n' : 'code_4n';
             $flag = strpos($SscKjDatas->$field, $dsData['val']) !== false;
@@ -1463,7 +1464,7 @@ class SscDataService extends BaseService {
     }
 
     /**
-     * @desc 每期开奖三字现记录-已完成
+     * @desc 每期开奖三字现记录-已完成  写入
      * @param $lottery_type  彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @param string $qihao
      */

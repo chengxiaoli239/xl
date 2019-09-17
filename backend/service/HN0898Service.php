@@ -1232,7 +1232,7 @@ class HN0898Service extends BaseTZService {
         switch ($lottery_type){
             case 5:
                 $time = date("H:i:s", time() - 20 * 60);
-                $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC";
+                $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC LIMIT 1";
                 $rst = $db->createCommand($sql)->queryOne();
 
                 $actionNo = $rst['actionNo'];
