@@ -103,10 +103,10 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $rst = StaticService::opAllCodeTypeYl();p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([1,2,3,4,5,6], $lottery_type = 5, 20000);p($miss);
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type = 5);p($rst);
         $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 5);p($rst);
-        $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = TzService::opSystemBetPlans(5);p($rst);// 定制化投注计划
         $rst = HN0898Service::synBalance(4);p($rst);
         $miss = SscDataService::getCodeTypeHistoryMiss('type_3b,type_2', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];

@@ -851,21 +851,6 @@ class SscDataService extends BaseService {
     }
 
     /**
-     * @desc 计算遗漏获取数据类型 1取本表数据做变更0扫表重新计算数据（比如：遗漏、数量等统计）
-     * @return int
-     */
-    public static function getConfig($key = 'getDataType'){
-        $m = \Yii::$app->cache;
-        $mkey = 'CONFIG_TYPE_'.$key;
-        if($val = $m->get($mkey)) return $val;
-
-        $val = SystemConfig::findOne(['key'=>$key])->value;
-        $m->set($mkey, $val, \Yii::$app->params['BASE_DATA_CACHE_TIME']);
-
-        return $val;
-    }
-
-    /**
      * @desc 获取遗漏记录objects
      * @param int $lottery_type
      * @param int $type
@@ -1090,8 +1075,11 @@ class SscDataService extends BaseService {
         $field = strlen($value) == 3 ? 'code_3n' : 'code_4n';
         $flag = strpos($SscKjDatas->$field, $value) !== false; # 匹配则说明中奖
 
-        if(!$flag && $rstData = $m->get($mkey)){
+        $staticFlag = BetService::getConfig('is_cache_data');
+
+        if(!$flag && $staticFlag && $rstData = $m->get($mkey)){
             $rstData['current_times'] = $rstData['current_times'] + 1;
+            $qihao = HN0898Service::getQihao($lottery_type);
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($mkey, $rstData, $time);
 

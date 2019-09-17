@@ -809,6 +809,23 @@ abstract class BetService extends BaseBetService {
         return $playway;
     }
 
+
+    /**
+     * @desc 计算遗漏获取数据类型 1取本表数据做变更0扫表重新计算数据（比如：遗漏、数量等统计）
+     * @return int
+     */
+    public static function getConfig($key = 'getDataType'){
+        $m = \Yii::$app->cache;
+        $mkey = 'CONFIG_TYPE_'.$key;
+        if($val = $m->get($mkey)) return $val;
+
+        $val = SystemConfig::findOne(['key'=>$key])->value;
+        $m->set($mkey, $val, \Yii::$app->params['BASE_DATA_CACHE_TIME']);
+
+        return $val;
+    }
+
+
     /**
      * @desc 获取投注缓存时间，一般为开奖时间频率
      * @param int $lottery_type
