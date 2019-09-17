@@ -1753,7 +1753,7 @@ class StaticService extends BaseService {
                # 三字现
                $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type); # 10s
                $time3 = microtime(true);
-               # 四字现带
+               # 四字现
                $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
                $time4 = microtime(true);
                $times = [$time1, $time2, $time3, $time4];

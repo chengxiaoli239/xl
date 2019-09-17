@@ -734,11 +734,10 @@ class SscDataService extends BaseService {
             //p([$dsData, $count]);
             $SscStaticYl->updated_at = time();
             $SscStaticYl->val = $dsData['val'];
-            $getDataType = SscDataService::getConfig();
-            $field = strlen($dsData['val']) == 3 ? 'code_3n' : 'code_4n';
-            $flag = strpos($SscKjDatas->$field, $dsData['val']) !== false;
             $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums']);
             /*
+            $field = strlen($dsData['val']) == 3 ? 'code_3n' : 'code_4n';
+            $flag = strpos($SscKjDatas->$field, $dsData['val']) !== false;
             if(in_array($type, [ 3 ]) OR $getDataType == 0 OR $flag){
                 # 中的执行这里
                 $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums']);
@@ -764,7 +763,7 @@ class SscDataService extends BaseService {
             $qishu = SscDataService::getQishus($lottery_type);
 
             $len = strlen($dsData['val']);
-            $field = $len == 3? 'code_3n' : 'code_4n';
+            $field = $len == 3 ? 'code_3n' : 'code_4n';
             $where = ['AND', ['LIKE', $field, $dsData['val']]];
             $SscStaticYl->theory_nums_perdate = (string)round(($count*$qishu*0.1) / 995, 2); # 理论次数/天
 
