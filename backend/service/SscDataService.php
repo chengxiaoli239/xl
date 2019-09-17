@@ -704,7 +704,7 @@ class SscDataService extends BaseService {
         $SscStaticVals = self::getSscStaticVal($type);
 
         $SscStaticYls = self::getSscStaticYls($lottery_type, $type);
-        $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->orderBy('id DESC')->limit(1)->one();
+        //$SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->orderBy('id DESC')->limit(1)->one();
         $yDate = date('Y-m-d',strtotime("-1 day"));
         $tDate = date('Y-m-d');
         foreach ($SscStaticVals as $dsData){
@@ -730,8 +730,7 @@ class SscDataService extends BaseService {
                 $SscStaticYl->type_log = (int)$dsData['type_log'];
             }
             $SscStaticYl->static_nums = $dsData['static_nums'];
-            //$vals = explode(',', $dsData['val']);
-            //p([$dsData, $count]);
+            //$vals = explode(',', $dsData['val']); //p([$dsData, $count]);
             $SscStaticYl->updated_at = time();
             $SscStaticYl->val = $dsData['val'];
             $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums']);

@@ -1751,7 +1751,7 @@ class StaticService extends BaseService {
                $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
                $time2 = microtime(true);
                # 三字现
-               $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type); # 10s
+               //$rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type); # 10s
                $time3 = microtime(true);
                # 四字现
                //$rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
