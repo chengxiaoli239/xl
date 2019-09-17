@@ -1743,14 +1743,15 @@ class StaticService extends BaseService {
        $lottery_types = self::getLotteryTypes();
        $rst = ['status'=>200];
        $m = \Yii::$app->cache;
-       $mkey = 'opAllCodeTypeYl_static';
-       if($isTo = $m->get($mkey)) return ['status'=>200, 'msg'=>'数据正在处理，请稍候~'];
 
-       $m->set($mkey, 1, 180);
        foreach ($lottery_types as $lottery_type) {
+           $mkey = 'opAllCodeTypeYl_static_'.$lottery_type;
+           if($isTo = $m->get($mkey)) return ['status'=>200, 'msg'=>'数据正在处理，请稍候~'];
+
            $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl');
            $msg = '数据处理成功~';
            if ($status) {
+               $m->set($mkey, 1, 180);
                $time1 = microtime(true);
                # 号码类型：双重、双双重、四重、三兄弟、四兄弟
                $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
