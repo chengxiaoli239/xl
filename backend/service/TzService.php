@@ -134,7 +134,8 @@ class TzService extends BaseService {
     public static function beforeRunSysPlans($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = Yii::$app->cache;
         $pkey = BetService::buildPlanSwitchKey($lottery_type, $qihao);
-        if($planStatus = $m->get($pkey)){
+        $isExists = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao]);
+        if($isExists && $planStatus = $m->get($pkey)){
             return ['status'=>300, 'pkey'=>$pkey, 'msg'=>'投注计划已经处理过了~'];
         }
 
@@ -149,8 +150,8 @@ class TzService extends BaseService {
         self::_init();
         $rst = ['status'=>200, 'msg'=>'操作成功!'];
 
-        $qihao = KjDataGet::getEndQihao($lottery_type);
-        //$qihao = HN0898Service::getQihao($lottery_type);
+        //$qihao = KjDataGet::getEndQihao($lottery_type);
+        $qihao = HN0898Service::getCurrentQihao($lottery_type);
         $statusRst = self::beforeRunSysPlans($qihao, $lottery_type);
         if($statusRst['status'] != 200){
             return $statusRst;
@@ -168,7 +169,7 @@ class TzService extends BaseService {
         $time2 = microtime(true);
 
         # 2、单双
-        $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖遗漏
+        $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖单双数据
         $time3 = microtime(true);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏 耗时4s
         $time4 = microtime(true);
@@ -195,6 +196,13 @@ class TzService extends BaseService {
         //$rst['userSysPlanChange'] = UserSysPlansService::userSysPlanChange($lottery_type);
 
         $rst['qihao'] = $qihao;
+        $rst['time1'] = $time1;
+        $rst['time2'] = $time2;
+        $rst['time3'] = $time3;
+        $rst['time4'] = $time4;
+        $rst['time5'] = $time5;
+        $rst['time6'] = $time6;
+        $rst['time7'] = $time7;
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/opSystemBetPlans','INFO','处理系统投注计划', $rst);
 
         self::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭

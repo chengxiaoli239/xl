@@ -103,13 +103,18 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
-        $rst = SscDataService::insertSscKjDataDs('190917054');p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=5); p($rst);// 单双遗漏
+        for($i=1; $i<=56; $i++){
+            $qihao = 190917000 + $i;
+            $rst = SscDataService::insertSscKjDataDs($qihao);//p($rst);
+        }
+        p($rst);
+        $rst = TzService::opSystemBetPlans(5);p($rst);// 定制化投注计划
+        $rst[] = StaticService::static4dPerDateProfits();p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst = StaticService::opAllCodeTypeYl();p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([1,2,3,4,5,6], $lottery_type = 5, 20000);p($miss);
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type = 5);p($rst);
         $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 5);p($rst);
-        $rst = TzService::opSystemBetPlans(5);p($rst);// 定制化投注计划
         $rst = HN0898Service::synBalance(4);p($rst);
         $miss = SscDataService::getCodeTypeHistoryMiss('type_3b,type_2', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
@@ -163,7 +168,6 @@ class IndexController extends Controller
         $rst = KjDataGet::updateNullCode();p($rst);
         $rst = SscDataService::getCodesDS('1,2,3,4,5');p($rst);
         $rst = StaticService::opStatic();p($rst); # 和值、四定利润统计
-        $rst[] = StaticService::static4dPerDateProfits();p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst[] = StaticService::opAllStaticProfits(); p($rst);# 利润统计
         $rst = StaticService::allHzStaticProfits($lottery_type = 5);p($rst); # 每个月份每个和值利润统计
         $rst = StaticService::staticPerHzProfits('2019-03');p($rst); # 某月份每个和值利润统计
