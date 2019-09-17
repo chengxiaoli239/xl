@@ -704,7 +704,6 @@ class SscDataService extends BaseService {
         $SscStaticVals = self::getSscStaticVal($type);
 
         $SscStaticYls = self::getSscStaticYls($lottery_type, $type);
-        //$SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->orderBy('id DESC')->limit(1)->one();
         $yDate = date('Y-m-d',strtotime("-1 day"));
         $tDate = date('Y-m-d');
         foreach ($SscStaticVals as $dsData){
@@ -737,7 +736,7 @@ class SscDataService extends BaseService {
             //$miss2 = SscDataService::getCodeTypeYlByTab($dsData['val'], $lottery_type, $type);
             /*
             $field = strlen($dsData['val']) == 3 ? 'code_3n' : 'code_4n';
-            $flag = strpos($SscKjDatas->$field, $dsData['val']) !== false;
+            $flag = strpos($SscKjDatas->$field, $dsData['val']) !== false; # 匹配则说明中奖
             if(in_array($type, [ 3 ]) OR $getDataType == 0 OR $flag){
                 # 中的执行这里
                 $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums']);
@@ -1015,6 +1014,7 @@ class SscDataService extends BaseService {
      * @return array
      */
     public static function getCodeTypeHistoryMiss($vals, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 472){
+
         //if(!is_array($num)) $num = [ $num ];
         $last_times = 0;
         $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
@@ -1084,7 +1084,19 @@ class SscDataService extends BaseService {
      * @return array
      */
     public static function getCodeTypeYlHistoryMiss($value, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 2000){
-        //if(!is_array($num)) $num = [ $num ];
+        $m = \Yii::$app->cache;
+        $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->orderBy('id DESC')->limit(1)->one();
+        $mkey = 'getCodeTypeYlHistoryMiss_'.$lottery_type.'_'.$value;
+        $field = strlen($value) == 3 ? 'code_3n' : 'code_4n';
+        $flag = strpos($SscKjDatas->$field, $value) !== false; # 匹配则说明中奖
+
+        if(!$flag && $rstData = $m->get($mkey)){
+            $rstData['current_times'] = $rstData['current_times'] + 1;
+            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+            $m->set($mkey, $rstData, $time);
+
+            return $rstData;
+        }
         $last_times = 0;
         $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
         $min_id = $last['last_id'] - $recently - 1;
