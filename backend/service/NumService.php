@@ -681,7 +681,8 @@ class NumService extends BaseService {
         $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
 
          # 上奖
-        if(isset($codes_hz['arise']) && !empty($codes_hz['arise'])){
+        //if(isset($codes_hz['arise']) && !empty($codes_hz['arise'])){
+        if(isset($codes_hz['arise'])){
             //$tmpArise = self::getCodesArrByStr($codes_hz['arise']);
 
             $codesArr_arise = self::getCodesArise([$codes_hz['arise']]);

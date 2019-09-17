@@ -103,16 +103,16 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
-        $rst = TzService::opSystemBetPlans(5);p($rst);// 定制化投注计划
-        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=5); p($rst);// 单双遗漏
-        for($i=1; $i<=56; $i++){
+        $miss = SscDataService::getSdHzYlHistoryMiss([5,6,7,8,9,10], $lottery_type = 5, 20000);p($miss);
+        for($i=1; $i<=59; $i++){
             $qihao = 190917000 + $i;
             $rst = SscDataService::insertSscKjDataDs($qihao);//p($rst);
         }
         p($rst);
+        $rst = TzService::opSystemBetPlans(5);p($rst);// 定制化投注计划
+        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=5); p($rst);// 单双遗漏
         $rst[] = StaticService::static4dPerDateProfits();p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst = StaticService::opAllCodeTypeYl();p($rst);
-        $miss = SscDataService::getSdHzYlHistoryMiss([1,2,3,4,5,6], $lottery_type = 5, 20000);p($miss);
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type = 5);p($rst);
         $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 5);p($rst);
         $rst = HN0898Service::synBalance(4);p($rst);
