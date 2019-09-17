@@ -103,6 +103,8 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $rst = SscDataService::insertSscKjDataDs('190917054');p($rst);
+        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=5); p($rst);// 单双遗漏
         $rst = StaticService::opAllCodeTypeYl();p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([1,2,3,4,5,6], $lottery_type = 5, 20000);p($miss);
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type = 5);p($rst);
@@ -149,7 +151,6 @@ class IndexController extends Controller
         $rst = SscDataService::updateCodeTypeYL($type = 2);p($rst); # 号码类型遗漏
         $rst = HN0898Service::getCurrentQihao( 7 );p($rst);
         $rst = HN0898Service::getQihao( 7 );p($rst);
-        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=7); p($rst);// 单双遗漏
         $rst['bet'] = BetService::bet();p($rst); // 用户新计划投注，可正买可反买
         $rst = SscDataService::clearDataTables();p($rst);
         $rst = SscDataService::insertCodeType();p($rst);
@@ -304,7 +305,6 @@ class IndexController extends Controller
         $nums = [4,5,6,6];
         $rst = CommonService::get3x($nums);p($rst);
         $rst = CommonService::get3x($nums);p($rst);
-        $rst = SscDataService::insertSscKjDataDs('180808115');p($rst);
         $interval = 20;
         $rst[$interval] = SscDataService::dsYLStatic($interval);p($rst);
         $zuHes = [

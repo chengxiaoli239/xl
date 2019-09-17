@@ -180,7 +180,7 @@ class TzService extends BaseService {
         $time6 = microtime(true);
 
         # 4、四定和值遗漏
-        $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏 耗时3.5s
+        $rst['updateHzYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏 耗时3.5s
         $time7 = microtime(true);
 
         //p([$time1, $time2, $time3, $time4, $time5, $time6, $time7, $lottery_type]);

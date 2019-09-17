@@ -1081,6 +1081,7 @@ class SscDataService extends BaseService {
             $rstData['current_times'] = $rstData['current_times'] + 1;
             $qihao = HN0898Service::getQihao($lottery_type);
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+            Tool_Common::log('getCodeTypeYlHistoryMiss_cache', 'INFO', '号码类型遗漏-缓存数据', ['value'=>$value, 'lottery_type'=>$lottery_type, 'field'=>$field]);
             $m->set($mkey, $rstData, $time);
 
             return $rstData;
