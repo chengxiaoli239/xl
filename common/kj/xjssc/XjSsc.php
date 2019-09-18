@@ -71,6 +71,8 @@ class XjSsc extends BaseKj {
         }
         $logArr = $rst;
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getLotteryNoSevenDay', 'INFO', '号码抓取-7天', $logArr);
+
+        return $rst;
     }
 
     /**
