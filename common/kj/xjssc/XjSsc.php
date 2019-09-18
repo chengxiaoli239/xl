@@ -53,7 +53,7 @@ class XjSsc extends BaseKj {
      */
     public static function getLotteryNo99($returnType = 'json'){
 
-        if(!$kjData = self::getCurrentKjData(self::$lottery_type)){
+        if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)){
             $domain = BaseKj::getApiHost(9);
             $url = $domain.'/kaijiang/list.aspx?lot=jxssc';
             $content = CurlService::httpGet($url);
@@ -66,8 +66,6 @@ class XjSsc extends BaseKj {
             preg_match_all($preg,$tdData,$matcheDatas);
 
             $kjData = ['expect'=>$matcheDatas[2][0], 'opentime'=>str_replace('/', '-', $matcheDatas[3][0]), 'opencode'=>$matcheDatas[4][0]];
-            $str = substr($kjData['expect'],0,6);
-            $kjData['expect'] = '20'.str_replace($str, $str.'-',$kjData['expect']);
         }
 
         if(!$kjData) return false;
