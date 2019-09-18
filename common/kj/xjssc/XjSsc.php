@@ -16,7 +16,7 @@ class XjSsc extends BaseKj {
      */
     public static function getLotteryNoSevenDay($returnType = 'json'){
 
-        if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)){
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)){
             $domain = BaseKj::getApiHost(13);
             $url = $domain.'/kaijiang/list.aspx?lot=jxssc';
             //$content = file_get_contents($url);
@@ -37,17 +37,7 @@ class XjSsc extends BaseKj {
             preg_match_all($preg,$content,$matches);
 
             $datas = $matches;
-            //p($datas);
-
-            //$preg = "/<td><font color=\"\#330099\">(.*?)<\/font><\/td><td><font color=\"\#330099\">(.*?)<\/font><\/td><td><font color=\"\#330099\">(.*?)<\/font><\/td>/ism";
-            //preg_match_all($preg,$tdData,$matcheDatas);
-            //p(['url'=>$url, 'headers'=>$headers, /*'content'=>$content, 'matches'=>$matches,*/ 'tdData'=>$tdData, 'matcheDatas'=>$matcheDatas]);
-
-            //$kjData = ['expect'=>$matcheDatas[1][0], 'opentime'=>str_replace('/', '-', $matcheDatas[2][0]), 'opencode'=>$matcheDatas[3][0]];
             $kjData = ['expect'=>$datas[1][0], 'opentime'=>$datas[2][0], 'opencode'=>$datas[3][0]];
-            //p($kjData);
-            //$str = substr($kjData['expect'],0,6);
-            //$kjData['expect'] = '20'.str_replace($str, $str.'-',$kjData['expect']);
         }
 
         if(!$kjData) return false;
@@ -82,7 +72,7 @@ class XjSsc extends BaseKj {
      */
     public static function getLotteryNo99($returnType = 'json'){
 
-        if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)){
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)){
             $domain = BaseKj::getApiHost(9);
             $url = $domain.'/kaijiang/list.aspx?lot=jxssc';
             $content = CurlService::httpGet($url);
