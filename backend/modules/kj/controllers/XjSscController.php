@@ -13,17 +13,17 @@ use common\service\CommonService;
 class XjSscController extends Controller
 {
     /**
-     * @desc 7天
+     * @desc 7天 - 新疆时时彩
      * @return json|xml
      */
     public function actionSevenDay($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = XjSsc::getLotteryNo($type);
+        $data = XjSsc::getLotteryNoSevenDay($type);
         return $data;
     }
 
     /**
-     * @desc 99
+     * @desc 99 - 新疆时时彩
      * @return json|xml
      */
     public function actionNineNine($type = 'json'){

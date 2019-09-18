@@ -7,10 +7,11 @@ use common\tools\Tool_Common;
 use  yii;
 
 class Cqssc360 extends BaseKj {
+    public static $lottery_type = 5;
 
     public static function getLotteryNo($returnType = 'json'){
 
-        if(!$kjData = self::getCurrentKjData()){
+        if(!$kjData = self::getCurrentKjData(self::$lotter_type)){
             $domain = BaseKj::getApiHost(5);
             $url = $domain.'/zst/qkj/?lotId=255401';
             $content=file_get_contents($url);
@@ -30,7 +31,7 @@ class Cqssc360 extends BaseKj {
         $opencode = $kjData['opencode'];
 
         # 设置开奖数据缓存
-        self::setKjDataCache($lotter_type =5, $expect, $kjData);
+        self::setKjDataCache(self::$lotter_type, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");

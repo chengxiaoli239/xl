@@ -26,6 +26,7 @@ use backend\tools\Tools;
 use common\kj\BaseKj;
 use common\kj\cqssc\CqsscKcw;
 use common\kj\cqssc\CqsscSevenDay;
+use common\kj\xjssc\XjSsc;
 use common\models\AdminModel;
 use common\service\CommonService;
 use common\tools\KjDataGet;
@@ -103,6 +104,7 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $data = XjSsc::getLottery99();p($data);
         $rst = StaticService::opAllCodeTypeYl();p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([5,6,7,8,9,10], $lottery_type = 5, 20000);p($miss);
         for($i=1; $i<=59; $i++){

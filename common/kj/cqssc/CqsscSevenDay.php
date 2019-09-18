@@ -9,10 +9,11 @@ use common\tools\Tool_Common;
 use  yii;
 
 class CqsscSevenDay extends BaseKj {
+    public static $lottery_type = 5;
 
     public static function getLotteryNo($returnType = 'json'){
 
-        if(!$kjData = self::getCurrentKjData()){
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)){
             $domain = BaseKj::getApiHost(7);
             $url = $domain.'/kaijiang/list.aspx?lot=ssc';
             $content = file_get_contents($url);
@@ -38,7 +39,7 @@ class CqsscSevenDay extends BaseKj {
 
         if($kjData['opencode']){
             # 设置开奖数据缓存
-            self::setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $expect, $kjData);
+            self::setKjDataCache(self::$lottery_type, $expect, $kjData);
         }
 
         if($returnType == 'xml'){
@@ -83,7 +84,7 @@ class CqsscSevenDay extends BaseKj {
         $expect = $kjData['expect'];
 
         # 设置开奖数据缓存
-        self::setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $expect, $kjData);
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");

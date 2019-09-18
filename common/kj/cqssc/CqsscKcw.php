@@ -11,6 +11,7 @@ use common\tools\Tool_Common;
 use  yii;
 
 class CqsscKcw extends BaseKj {
+    public static $lottery_type = 5;
 
     public static $lotteryTypeArr = [
         5 => 1, # 5:1.5分
@@ -30,7 +31,7 @@ class CqsscKcw extends BaseKj {
 
     public static function getLotteryNo($returnType = 'json'){
 
-        if(!$kjData = self::getCurrentKjData($lottery_type = 5)) {
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHost(6);
             sleep(3);
             $url = $domain.'/tef05c6c66079ff29k/cqssc-3.json';
@@ -68,7 +69,7 @@ class CqsscKcw extends BaseKj {
 
     public static function getLotteryNoZhiBo($returnType = 'json'){
 
-        if(!$kjData = self::getCurrentKjData($lottery_type = 5)) {
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHost(12);
             sleep(3);
             $date = date('Y-m-d');
@@ -90,7 +91,7 @@ class CqsscKcw extends BaseKj {
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
 
-        self::setKjDataCache($lottery_type, $expect, $kjData);
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
@@ -137,7 +138,7 @@ class CqsscKcw extends BaseKj {
         $expect = substr($kjData['PeriodsNumber'], 0,8).'-'.substr($kjData['PeriodsNumber'], 8);
 
         $lottery_type = $lotteryId;
-        self::setKjDataCache($lottery_type, $expect, $kjData);
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
