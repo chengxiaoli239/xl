@@ -32,7 +32,6 @@ class BaseKj{
 
         $qihao = HN0898Service::getCurrentQihao($lottery_type);
         $mkey = self::buildKjDataKey($lottery_type, $qihao);
-        //p($mkey,0);
 
         return $m->get($mkey);
     }

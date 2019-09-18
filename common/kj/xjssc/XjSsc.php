@@ -7,7 +7,7 @@ use common\tools\Tool_Common;
 use  yii;
 
 class XjSsc extends BaseKj {
-    public static $lottery_type = 7;
+    public static $lottery_type = 6;
 
     /**
      * @desc 7天-新疆
@@ -28,10 +28,9 @@ class XjSsc extends BaseKj {
         $expect = $kjData['expect'];
         //p([$opencode, $opentime, $expect]);
 
-        if($kjData['opencode']){
-            # 设置开奖数据缓存
-            self::setKjDataCache(self::$lottery_type, $expect, $kjData);
-        }
+        //p([$expect, $kjData,$kjData['opencode']]);
+        # 设置开奖数据缓存
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
