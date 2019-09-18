@@ -89,7 +89,33 @@ class XjSsc extends BaseKj {
     }
 
     /**
-     * @desc 七天 - 新疆 批量
+     * @desc 七天 - 新疆 批量数据出口
+     * @return mixed
+     */
+    public static function batchSevenDay($returnType = 'json'){
+        $datas = self::batchGrabSevenDay();
+        $qihaos = $datas[1];
+        $times = $datas[2];
+        $codes = $datas[3];
+        $kjDatas = [];
+        foreach ($qihaos as $key=>$qihao){
+            $kjDatas[] = ['expect'=>$qihao, 'opentime'=>$times[$key], 'opencode'=>$codes[$key]];
+        }
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            $str = '<?xml version="1.0" encoding="utf-8"?>';
+            foreach ($kjDatas as $kjData){
+                $str .= '<xml><row expect="'.$kjData['expect'].'" opencode="'.$kjData['opencode'].'" opentime="'.$kjData['opentime'].'" /></xml>';
+            }
+            ob_end_flush();exit;
+        }
+
+        return $kjDatas;
+    }
+
+    /**
+     * @desc 七天 - 新疆 批量数据
      * @return mixed
      */
     public static function batchGrabSevenDay(){

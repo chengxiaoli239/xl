@@ -38,7 +38,7 @@ class XjSscController extends Controller
      */
     public function actionBatchSevenDay($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = XjSsc::batchGrabSevenDay($type);
+        $data = XjSsc::batchSevenDay($type);
         return $data;
     }
 
