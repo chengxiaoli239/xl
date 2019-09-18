@@ -1919,6 +1919,7 @@ class StaticService extends BaseService {
 
         $qihao = HN0898Service::getCurrentQihao($lottery_type);
         $isExists = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao]);
+        //p([$lottery_type, $status, $qihao, $isExists]);
         if(!$status && $isExists) {
             $flag = true;
         }else{

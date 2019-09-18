@@ -158,8 +158,11 @@ class KjDataGet
                 $m->set($mkey, 1, $cache_time);
                 $m->set($mkey_qihao, 1, $cache_time);
             }
+        }
+        $lottery_types = StaticService::getLotteryTypes();
+        foreach ($lottery_types as $lottery_type) {
             /* 处理系统投注计划 add 2019-01-21 */
-            KjDataGet::afterKj($kjConfig->lottery_type); # 处理系统投注计划，更新统计数据
+            KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
             /* 处理系统投注计划 add 2019-01-21 */
         }
 
