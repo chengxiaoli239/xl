@@ -106,12 +106,17 @@ class KjDataGet
             $url = $kjConfig->host.$kjConfig->path;
             $data = CurlService::httpGet($url);
             if($kjConfig->is_batch == 1){
-                $kjData = isset($data['opencode']) ? $data['opencode'] : [];
-                if($kjData){
+                $kjDatas = $data;
+                if($kjDatas){
                     $mkey = 'KJ_LOG_KEY_BATCH_1_'.$kjConfig->lottery_type;
-                    if($kjConfig->lottery_type == 1){
-                    }elseif($kjConfig->lottery_type == 2){
-                        foreach ($kjData as $key=>$dataInfo){
+                    if($kjConfig->lottery_type == 6){ # xjssc
+                        $kjDatas = array_reverse($kjDatas);
+                        foreach ($kjDatas as $key=>$dataInfo){
+                            if($key == 'headers') continue;
+                            $rst = KjDataGet::insertKjData($dataInfo['expect'], $kjConfig->lottery_type, $dataInfo['opencode']);
+                        }
+                    }elseif($kjConfig->lottery_type == 2){ # qxc
+                        foreach ($kjDatas as $key=>$dataInfo){
                             $rst = KjDataGet::insertQxcKjData($dataInfo['qihao'], $dataInfo['codes'], $dataInfo['date']);
                         }
                     }
@@ -190,8 +195,10 @@ class KjDataGet
         $codes_4nums = $kjDatasArr; unset($codes_4nums[4]);
 
         $codes = $kjDatasArr[0].','.$kjDatasArr[1].','.$kjDatasArr[2].','.$kjDatasArr[3];
-        if($lottery_type == 5){
-            $tmpDate = '20'.substr($qihao,0,6).' 00:00:00';
+        if($lottery_type == 5) {
+            $tmpDate = '20' . substr($qihao, 0, 6) . ' 00:00:00';
+        }elseif ($lottery_type == 6){
+            $tmpDate = substr($qihao, 0, 8);
         }else{
             $tmpDate = date('Y-m-d 00:00:00');
         }

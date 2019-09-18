@@ -261,7 +261,7 @@ class CurlService extends BaseService{
         $data = json_decode($data, true);
 
         if($data['Status'] == false){
-            $data['headers'] = $header;
+            //$data['headers'] = $header;
         }
 
         return $data;

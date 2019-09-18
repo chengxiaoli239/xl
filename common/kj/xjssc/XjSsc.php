@@ -121,7 +121,11 @@ class XjSsc extends BaseKj {
     public static function batchGrabSevenDay(){
         $domain = BaseKj::getApiHost(13);
         $url = $domain.'/kaijiang/list.aspx?lot=jxssc';
+        $mkey = 'batchGrabSevenDay_lottery_type_6';
+
+        $m = \Yii::$app->cache;
         //$content = file_get_contents($url);
+        if($datas = $m->get($mkey)) return $datas;
         $h = str_replace('https://', '', $domain);
 
         $headers = [
@@ -139,6 +143,8 @@ class XjSsc extends BaseKj {
         preg_match_all($preg,$content,$matches);
 
         $datas = $matches;
+
+        $m->set($mkey, $datas, 20 * 60);
         return $datas;
     }
 }
