@@ -253,12 +253,14 @@ class KjDataGet
         }
 
         # index_id
+        /*
         $beforeQihao = KjDataGet::getBeforeQihaoByQihao($qihao, $lottery_type);
         $beforeIndexId = SscKjData::findOne(['qihao'=>$beforeQihao, 'lottery_type'=>$lottery_type])->index_id;
         $index_id = $beforeIndexId + 1;
         $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
         $SscKjData->index_id = $index_id;
         $SscKjData->save();
+        */
 
         return ['status'=>200, 'msg'=>'开奖数据写入成功', 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'insertData'=>$insertData, 'insertRst'=>$insertRst, 'msg'=>$SscKjData->getFirstErrors()];
     }
