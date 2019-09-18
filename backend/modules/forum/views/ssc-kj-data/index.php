@@ -57,7 +57,16 @@ $this->params['breadcrumbs'][] = $this->title;
                         'type_2b',
                         'type_3b',
                         'type_4b',
-                        'type_4ds',
+                        //'type_4ds',
+                        ['attribute' => 'type_4ds', 'label'=> '单双类型', //'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $typeArr = [1=>'四单', 2=>'四双', 3=>'两单两双', 4=>'一单三双', 5=>'一双三单'];
+                                $txt = '1四单2四双3两单两双4一单三双5一双三单';
+                                //return '<a href="#" color="#2f4f4f" alt="'.$model->type_4ds.'">'.$typeArr[$model->type_4ds].'</a>';
+                                return Html::a($typeArr[$model->type_4ds], '#', ['title' => $txt]);
+                            }
+                        ],
                         //'lottery_type',
                         //'code_1_2',
                         //'code_1_3',
