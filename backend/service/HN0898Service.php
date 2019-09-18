@@ -1224,14 +1224,16 @@ class HN0898Service extends BaseTZService {
                 if('10:00:00'<=$time && $time<='23:40:00'){
                     $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC LIMIT 1";
                     $rst = $db->createCommand($sql)->queryOne();
+                    $actionNo = $rst['actionNo'];
+                    $qihao = date("Ymd").sprintf("%02d", $actionNo);
                 }else{
                     $time = date("H:i:s", $nowTime);
                     $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime <= '".$time."' AND type=$lottery_type ORDER BY id DESC LIMIT 1";
                     $rst = $db->createCommand($sql)->queryOne();
+                    $actionNo = $rst['actionNo'];
+                    $qihao = date("Ymd", strtotime('-1days')).sprintf("%02d", $actionNo);
                 }
 
-                $actionNo = $rst['actionNo'];
-                $qihao = '20'.date("ymd").sprintf("%02d", $actionNo);
                 break;
             case 7: # 北京快乐8
                 $days = self::getDifferentDays();

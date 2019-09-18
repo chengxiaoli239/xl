@@ -156,7 +156,9 @@ class TzService extends BaseService {
         if($statusRst['status'] != 200){
             //return $statusRst;
         }
-        if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opSystemBetPlans')) return $status;
+        if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opSystemBetPlans')){
+            return $status;
+        }
 
         $time1 = microtime(true);
         # 1、处理系统投注计划号码
