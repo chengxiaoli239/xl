@@ -1774,6 +1774,7 @@ class SscDataService extends BaseService {
                 $codes = BaseNumService::getRepeat4Codes($isRepeat = 1); # 四字现，双重加两码、不含三重
                 $codes = array_merge($codes, BaseNumService::getRepeat4Codes($isRepeat = 0)); # 四字现不含双重
                 $codes = array_merge($codes, BaseNumService::getRepeat4Codes3()); # 四字现三重
+                $codes = array_merge($codes, BaseNumService::getRepeat4Codes22()); # 四字现双双重
                 break;
         }
         foreach ($codes as $code){
@@ -1812,6 +1813,7 @@ class SscDataService extends BaseService {
                     'type_2b' => CommonService::isCodeType2b($code),
                     'type_3b' => CommonService::isCodeType3b($code),
                     'type_4b' => CommonService::isCodeType4b($code),
+                    'type_22' => CommonService::isCodeType22($code),
                     'type_4d' => $ds == 1 ? 1 : 0,
                     'type_4s' => $ds == 2 ? 1 : 0,
                     'type_4ds' => in_array($ds, [1,2]) ? 1 : 0,

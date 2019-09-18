@@ -521,6 +521,26 @@ class BaseNumService extends BaseService {
     }
 
     /**
+     * @desc 获取四字现-双双重
+     * @return array
+     */
+    public static function getRepeat4Codes22(){
+        $repeatCodes = ['00', '11', '22', '33', '44', '55', '66', '77', '88', '99']; # 三重数组
+        $threeCodesArr = [];
+        foreach ($repeatCodes as $repeatCode1){
+            foreach ($repeatCodes as $singleCode2){
+                $tmp3CodeArr = [$repeatCode1, $singleCode2];
+                sort($tmp3CodeArr);
+                $threeCodesArr[] = implode('', $tmp3CodeArr);
+            }
+        }
+        $codesArr = array_unique($threeCodesArr);
+        sort($codesArr);
+
+        return $codesArr;
+    }
+
+    /**
      * @desc 获取四字现
      * @return array
      */
