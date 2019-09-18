@@ -28,7 +28,7 @@ class XjSscController extends Controller
      */
     public function actionNineNine($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = XjSsc::getLottery99($type);
+        $data = XjSsc::getLotteryNo99($type);
         return $data;
     }
 
