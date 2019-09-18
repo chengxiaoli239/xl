@@ -1079,29 +1079,6 @@ class HN0898Service extends BaseTZService {
     }
 
     /**
-     * @desc 调用验证码接口
-     * @param $uid
-     * @param $tz_system_id
-     * @param $cookie_key
-     * @return mixed
-     */
-    public static function getCaptchaCode($uid, $tz_system_id, $cookie_key){
-        $captcha_code_api = SystemConfig::findOne(['key'=>'captcha_code_api'])->value;
-        $filename = Yii::$app->basePath . "/runtime/captcha/".$uid."_".$tz_system_id.'_'.$cookie_key.".png";
-        switch ($captcha_code_api){
-            case 1:
-                $codeRst = CaptchaCodeService::juHe($filename); # 聚合接口
-                break;
-            case 2:
-                $codeRst = CaptchaCodeService::showApi($filename); # 万维易源
-                break;
-            default:break;
-        }
-
-        return $codeRst;
-    }
-
-    /**
      * @desc 登陆
      * @param $uid
      * @param $tz_system_id

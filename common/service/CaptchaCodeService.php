@@ -50,7 +50,7 @@ class CaptchaCodeService{
     }
 
     /**
-     * @desc 尖叫数据验证码接口
+     * @desc 尖叫数据验证码接口, 官网：http://www.jianjiaoshuju.com
      * @param $file
      */
     public static function jianjiao($file){
@@ -92,13 +92,13 @@ class CaptchaCodeService{
         $end_time = microtime(true);
         $consume_time = ($end_time-$start_time).'s';
         $logData = ['file'=>$file, 'url'=>$url, 'consume_time'=>$consume_time, 'rstData'=>$rstData];
-        Tool_Common::log('/WORK/LOG/lottery/'.date('Ymd').'/getCaptchaCode','INFO','验证码接口-尖叫数据', $logData);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCaptchaCode','INFO','验证码接口-尖叫数据', $logData);
 
         return ['status'=>200, 'code'=>$rstData['v_code']];
     }
 
     /**
-     * @desc 万维易源API
+     * @desc 万维易源API, 官网：https://www.showapi.com
      * @param string $filename
      */
     public static function showApi($file = ''){
