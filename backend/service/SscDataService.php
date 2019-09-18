@@ -1080,9 +1080,9 @@ class SscDataService extends BaseService {
         if(!$flag && $staticFlag && $rstData = $m->get($mkey)){
             $rstData['current_times'] = $rstData['current_times'] + 1;
             $qihao = HN0898Service::getQihao($lottery_type);
-            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
-            Tool_Common::log('getCodeTypeYlHistoryMiss_cache', 'INFO', '号码类型遗漏-缓存数据', ['value'=>$value, 'lottery_type'=>$lottery_type, 'field'=>$field]);
-            $m->set($mkey, $rstData, $time);
+
+            $logArr = ['value'=>$value, 'lottery_type'=>$lottery_type, 'field'=>$field];
+            Tool_Common::log('getCodeTypeYlHistoryMiss_cache', 'INFO', '号码类型遗漏-缓存数据', $logArr);
 
             return $rstData;
         }
@@ -1142,6 +1142,7 @@ class SscDataService extends BaseService {
             'max_range' => $max_range,   // 近200期内的最大遗漏范围
             'yl_str' => $yl_str,
         ];
+        $m->set($mkey, $rstData, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
         //p($rstData);
         //if($vals == 'type_2,type_3b')p($rstData);
         return $rstData;

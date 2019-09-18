@@ -1746,7 +1746,7 @@ class StaticService extends BaseService {
 
        foreach ($lottery_types as $lottery_type) {
            $mkey = 'opAllCodeTypeYl_static_'.$lottery_type;
-           if($isTo = $m->get($mkey)) return ['status'=>200, 'msg'=>'数据正在处理，请稍候~'];
+           if($isTo = $m->get($mkey)) continue; # ['status'=>200, 'msg'=>'数据正在处理，请稍候~'];
 
            $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl');
            $msg = '数据处理成功~';
@@ -1765,11 +1765,12 @@ class StaticService extends BaseService {
                $times = [$time1, $time2, $time3, $time4];
 
                StaticService::afterOpStatic($lottery_type, 'opAllCodeTypeYl');
+               $rst['data'][$lottery_type]['times'] = $times;
+               $rst['data'][$lottery_type]['msg'] = $msg;
            }else{
                $msg = '数据已经处理过了~';
+               $rst['data'][$lottery_type] = $msg;
            }
-           $rst['data'][$lottery_type]['msg'] = $msg;
-           $rst['data'][$lottery_type]['times'] = $times;
        }
 
        return $rst;

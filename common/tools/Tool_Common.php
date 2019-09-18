@@ -532,7 +532,7 @@ class Tool_Common
             $dir = dirname($file);
             $file = basename($file);
         } else {
-            $dir = '/WORK/LOG/pay/' . date('Ymd');
+            $dir = '/WORK/LOG/'.\Yii::$app->params['LOG_PATH'].'/' . date('Ymd');
         }
     
         if (!is_dir($dir)) {
