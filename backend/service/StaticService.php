@@ -300,7 +300,7 @@ class StaticService extends BaseService {
      */
     public static function staticSDProfits($month = '2018-11', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'MONTH_STATIC_DATA_'.$lottery_type.'_'.$month;
+        $mkey = 'MONTH_STATIC_DATA_1'.$lottery_type.'_'.$month;
         $typeArr = self::$typeArr;
         if($month != date('Y-m') && $allStatic = $m->get($mkey)){
             return $allStatic;
@@ -757,7 +757,7 @@ class StaticService extends BaseService {
      */
     public static function allMonthStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $months = [];
-        for ($i=0; $i<1; $i--){
+        for ($i=7; $i>=0; $i--){
             $months[] = date('Y-m', strtotime('-'.$i.' months'));
         }
         $allStatic = [];
@@ -783,7 +783,7 @@ class StaticService extends BaseService {
      */
     public static function allMonthSdHzStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $months = [];
-        for ($i=3; $i>=0; $i--){
+        for ($i=7; $i>=0; $i--){
             $months[] = date('Y-m', strtotime('-'.$i.' months'));
         }
         $allStatic = [];
@@ -971,7 +971,7 @@ class StaticService extends BaseService {
         foreach ($tmpProfits as $key=>$tmpProfit){
             foreach ($tmpProfit as $k=>$tmp){
                 $date = $k;
-                if($date != date('Y-m-d')) continue;
+                //if($date != date('Y-m-d')) continue;
                 if($date <= '2019-02-10') continue;
                 $setData = [];
                 if(!$Static4dProfits = StaticHzProfitsPerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
@@ -1042,12 +1042,11 @@ class StaticService extends BaseService {
      */
     public static function allDateHzStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'allDateHzStaticProfits_PERDATE_09_'.$lottery_type;
+        $mkey = 'allDateHzStaticProfits_PERDATE_10_'.$lottery_type;
 
         $allStatic = [];
-        for($s=0; $s<5; $s++){
+        for($s=0; $s<25; $s++){
             if(!$time = $m->get($mkey)) {
-                //$time = strtotime('-6 day');
                 $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
                 $time = $staticsStarTime;
             }else{
@@ -1071,7 +1070,7 @@ class StaticService extends BaseService {
     }
 
     /**
-     * @desc 记录每个月的四定统计 - 写表
+     * @desc 记录每个月的四定统计 - 写表 待优化
      * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
@@ -1082,11 +1081,11 @@ class StaticService extends BaseService {
         foreach ($allMonthStaticProfits as $key=>$allMonthStaticProfit){
             $tmpProfits[] = $allMonthStaticProfit;
         }
-        p($tmpProfits);
+        //p($tmpProfits);
 
         foreach ($tmpProfits as $tmpProfit){
             foreach ($tmpProfit as $month=>$tmp){
-                if($month != date('Y-m')) continue;
+                //if($month != date('Y-m')) continue;
                 $setData = [];
                 if(!$Static4dProfits = Static4dProfits::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
                     $Static4dProfits = new Static4dProfits();
@@ -1133,7 +1132,7 @@ class StaticService extends BaseService {
 
        foreach ($tmpProfits as $tmpProfit){
            foreach ($tmpProfit as $month=>$tmp){
-               if($month != date('Y-m')) continue;
+               //if($month != date('Y-m')) continue;
                $setData = [];
                if(!$StaticHzProfits = StaticHzProfits::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
                    $StaticHzProfits = new StaticHzProfits();
