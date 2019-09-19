@@ -45,6 +45,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         'api_host',
                         'path',
                         //'is_batch',
+                        ['attribute' => 'is_batch','label'=>'是否批量',#'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                $str = $model->is_batch ? '是' : '否';
+                                return $str;
+                            }
+                        ],
                         //'method',
                         //'post_data',
                         //'data_type',
