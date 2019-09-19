@@ -190,4 +190,50 @@ class XjSsc extends BaseKj {
         return $rst;
     }
 
+    /**
+     * @desc 直播网 - 新疆 - 批量
+     * @param string $returnType
+     * @return array
+     */
+    public static function getLotteryNoBatch($returnType = 'json'){
+        $m = \Yii::$app->cache;
+
+        $mkey = 'XJSSC_getLotteryNoBatch_1';
+        $domain = BaseKj::getApiHost(12);
+
+        if(!$date = $m->get($mkey)){
+            $date = '2019-02-11';
+        }
+        $url = $domain.'/data/xjssc/lotteryList/'.$date.'.json?'.time();
+        $content = CurlService::httpGet($url);
+        $datas = array_reverse($content);
+
+        if (!$datas) return false;
+        $rstDatas = [];
+        foreach ($datas as $key=>$data){
+            $rstDatas[$key]['expect'] = $data['issue']; # 2019091905
+            $rstDatas[$key]['opencode'] = implode(',', $data['openNum']); # 0,4,1,9,1
+            $rstDatas[$key]['opentime'] = $data['openDateTime']; # 2019-9-19 11:41:05
+            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
+        }
+
+        //self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+
+        $date = date('Y-m-d', strtotime($date) + 86400);
+        $m->set($mkey, $date, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            $str = '<?xml version="1.0" encoding="utf-8"?>';
+            foreach ($rstDatas as $rstData){
+                $str .= '<xml><row expect="'.$rstData['expect'].'" opencode="'.$rstData['opencode'].'" opentime="'.$rstData['opentime'].'" /></xml>';
+            }
+            echo $str;
+            ob_end_flush();exit;
+        }
+        $logArr = $rstDatas;
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/xj_ssc', 'INFO', '号码抓取-直播网', $logArr);
+
+        return $rstDatas;
+    }
+
 }

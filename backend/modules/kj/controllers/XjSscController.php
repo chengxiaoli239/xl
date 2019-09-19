@@ -52,4 +52,13 @@ class XjSscController extends Controller
         return $data;
     }
 
+    /**
+     * @desc 99 - 新疆时时彩
+     * @return json|xml
+     */
+    public function actionBatchZhiBoWang($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = XjSsc::getLotteryNoBatch($type);
+        return $data;
+    }
 }
