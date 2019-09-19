@@ -96,6 +96,7 @@ class XjSsc extends BaseKj {
         $times = $datas[2];
         $codes = $datas[3];
         $kjDatas = [];
+        //$qihaos = array_reverse($qihaos);
         foreach ($qihaos as $key=>$qihao){
             $kjDatas[] = ['expect'=>$qihao, 'opentime'=>$times[$key], 'opencode'=>$codes[$key]];
         }
@@ -205,8 +206,8 @@ class XjSsc extends BaseKj {
             $date = '2019-02-11';
         }
         $url = $domain.'/data/xjssc/lotteryList/'.$date.'.json?'.time();
-        $content = CurlService::httpGet($url);
-        $datas = array_reverse($content);
+        $datas = CurlService::httpGet($url);
+        //$datas = array_reverse($datas);
 
         if (!$datas) return false;
         $rstDatas = [];
