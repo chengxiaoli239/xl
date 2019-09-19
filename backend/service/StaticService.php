@@ -495,7 +495,7 @@ class StaticService extends BaseService {
      */
     public static function staticSDPerDateProfits($date = '2018-08-05', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'DATE_STATIC_DATA_'.$date;
+        $mkey = 'DATE_STATIC_DATA_'.$lottery_type.'_'.$date;
         $typeArr = self::$typeArr;
         $where = ['lottery_type'=>$lottery_type, 'date' => $date];
         $static = [ 0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0, 6=>0, 7=>0, 8=>0, 9=>0, 10=>0, 11=>0]; # 统计每种组合出现次数
@@ -528,7 +528,7 @@ class StaticService extends BaseService {
             }elseif ($type_4ds == 5){ # 一双三单
                 $static[10] = $static[10] + $data['4ds'] * 3;
                 $static[11] = $static[11] + $data['4ds'] * 1;
-                $sTypes = [0,1,5,7];
+                $sTypes = [0,1,5,7,13,15];
             }
             foreach ($sTypes as $sType){
                 $static[$sType] = $static[$sType] + $data['4ds'];
@@ -574,6 +574,7 @@ class StaticService extends BaseService {
         if($allStatic = $m->get($mkey)) return $allStatic;
 
         $allCounts = SscKjData::find()->where(['date'=>$date, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_ASC])->count();
+        if(!$allCounts) return [];
         $allStatic = [];
         foreach ($typeArr as $k=>$hzArr){
             $where = ['date' => $date, 'lottery_type'=>$lottery_type, 'codes_4nums_hz'=> $hzArr];
@@ -898,8 +899,8 @@ class StaticService extends BaseService {
 
         foreach ($tmpProfits as $tmpProfit){
             foreach ($tmpProfit as $date=>$tmp){
-                if($date != date('Y-m-d')) continue;
-                if($date <= '2019-02-10') continue;
+                //if($date != date('Y-m-d')) continue;
+                //if($date <= '2019-02-10') continue;
                 $setData = [];
                 if(!$Static4dProfits = Static4dProfitsPerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
                     $Static4dProfits = new Static4dProfitsPerdate();
@@ -970,8 +971,8 @@ class StaticService extends BaseService {
         foreach ($tmpProfits as $key=>$tmpProfit){
             foreach ($tmpProfit as $k=>$tmp){
                 $date = $k;
-                if($date != date('Y-m-d')) continue;
-                if($date <= '2019-02-10') continue;
+                //if($date != date('Y-m-d')) continue;
+                //if($date <= '2019-02-10') continue;
                 $setData = [];
                 if(!$Static4dProfits = StaticHzProfitsPerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
                     $Static4dProfits = new StaticHzProfitsPerdate();
@@ -1005,12 +1006,13 @@ class StaticService extends BaseService {
      */
     public static function allDateStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'allDateStaticProfits_PERDATE_'.$lottery_type.'_21';
+        $mkey = 'allDateStaticProfits_PERDATE_'.$lottery_type.'_24';
 
         $allStatic = [];
-        for($s=0; $s<1; $s++){
+        for($s=0; $s<5; $s++){
             if(!$time = $m->get($mkey)) {
-                $time = strtotime('-2 day');
+                $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
+                $time = $staticsStarTime;
             }else{
                 $time = $time + 24 * 3600;
             }
@@ -1045,7 +1047,9 @@ class StaticService extends BaseService {
         $allStatic = [];
         for($s=0; $s<5; $s++){
             if(!$time = $m->get($mkey)) {
-                $time = strtotime('-6 day');
+                //$time = strtotime('-6 day');
+                $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
+                $time = $staticsStarTime;
             }else{
                 $time = $time + 24 * 3600;
             }
@@ -1975,6 +1979,24 @@ class StaticService extends BaseService {
         return $codesArr;
     }
 
+    /**
+     * @desc 根据开奖表数据 计算需要统计开始时间戳
+     * @param int $lottery_type
+     * @return false|int
+     */
+    public static function getStaticStartTime($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $time = strtotime('-120 days'); # 默认
+
+        $date = date('Y-m-d', $time);
+
+        $minKjDate = SscKjData::find()->where(['lottery_type' => $lottery_type])->orderBy('id ASC')->limit(1)->one()->date;
+
+        if($minKjDate > $date){
+            $time = strtotime($minKjDate.' '.'00:00:00');
+        }
+
+        return $time;
+    }
 
 
 
