@@ -105,7 +105,17 @@ class IndexController extends Controller
     }
     public function actionDw(){
         self::_init();
-        $data = XjSsc::getLotteryNoBatch();return ($data);
+        $kjDatas = XjSsc::getLotteryNoBatch();
+        $kjDatas = array_reverse($kjDatas);
+        p($kjDatas,0);
+        foreach ($kjDatas as $key=>$dataInfo){
+            $rst = KjDataGet::insertKjData($dataInfo['expect'], 6, $dataInfo['opencode']);
+            p($rst);
+        }
+
+        $data = XjSsc::getLotteryNoBatch();
+        $data = array_reverse($data);p($data);
+        $rst = KjDataGet::insertKjData('2019032701', 6, '9,3,3,3,8');p($rst);
         $data = XjSsc::getLotteryNoZhiBo();p($data);
         $data = XjSsc::getLotteryNoSevenDay();p($data);
         $data = XjSsc::getLotteryNo99();p($data);

@@ -112,7 +112,6 @@ class KjDataGet
                     if($kjConfig->lottery_type == 6){ # xjssc
                         $kjDatas = array_reverse($kjDatas);
                         foreach ($kjDatas as $key=>$dataInfo){
-                            if($key == 'headers') continue;
                             $rst = KjDataGet::insertKjData($dataInfo['expect'], $kjConfig->lottery_type, $dataInfo['opencode']);
                         }
                     }elseif($kjConfig->lottery_type == 2){ # qxc
@@ -254,16 +253,6 @@ class KjDataGet
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录-错误', $logArr);
             return ['status' => 300, 'msg' => $msg];
         }
-
-        # index_id
-        /*
-        $beforeQihao = KjDataGet::getBeforeQihaoByQihao($qihao, $lottery_type);
-        $beforeIndexId = SscKjData::findOne(['qihao'=>$beforeQihao, 'lottery_type'=>$lottery_type])->index_id;
-        $index_id = $beforeIndexId + 1;
-        $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
-        $SscKjData->index_id = $index_id;
-        $SscKjData->save();
-        */
 
         return ['status'=>200, 'msg'=>'开奖数据写入成功', 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'insertData'=>$insertData, 'insertRst'=>$insertRst, 'msg'=>$SscKjData->getFirstErrors()];
     }
