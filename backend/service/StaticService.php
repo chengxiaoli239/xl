@@ -899,8 +899,8 @@ class StaticService extends BaseService {
 
         foreach ($tmpProfits as $tmpProfit){
             foreach ($tmpProfit as $date=>$tmp){
-                //if($date != date('Y-m-d')) continue;
-                //if($date <= '2019-02-10') continue;
+                if($date != date('Y-m-d')) continue;
+                if($date <= '2019-02-10') continue;
                 $setData = [];
                 if(!$Static4dProfits = Static4dProfitsPerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
                     $Static4dProfits = new Static4dProfitsPerdate();
@@ -971,8 +971,8 @@ class StaticService extends BaseService {
         foreach ($tmpProfits as $key=>$tmpProfit){
             foreach ($tmpProfit as $k=>$tmp){
                 $date = $k;
-                //if($date != date('Y-m-d')) continue;
-                //if($date <= '2019-02-10') continue;
+                if($date != date('Y-m-d')) continue;
+                if($date <= '2019-02-10') continue;
                 $setData = [];
                 if(!$Static4dProfits = StaticHzProfitsPerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
                     $Static4dProfits = new StaticHzProfitsPerdate();
