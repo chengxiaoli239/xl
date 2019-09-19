@@ -24,7 +24,7 @@ class XjSsc extends BaseKj {
 
         if(!$kjData) return false;
         $opencode = $kjData['opencode'];
-        $opentime = $kjData['opentime'];
+        $opentime = str_replace('/', '-', $kjData['opentime']);
         $expect = $kjData['expect'];
         //p([$opencode, $opentime, $expect]);
 
@@ -145,4 +145,49 @@ class XjSsc extends BaseKj {
         $m->set($mkey, $datas, 20 * 60);
         return $datas;
     }
+
+    /**
+     * @desc 直播网 - 新疆
+     * @param string $returnType
+     * @return array
+     */
+    public static function getLotteryNoZhiBo($returnType = 'json'){
+
+        if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $domain = BaseKj::getApiHost(12);
+            sleep(3);
+            $date = date('Y-m-d');
+            //$url = $domain.'/data/xjssc/lotteryList/'.$date.'.json?t='.time();
+            $url = $domain.'/data/Current/xjssc/CurIssue.json?'.time();
+            //$content = file_get_contents($url);
+            $content = CurlService::httpGet($url);
+            //$data = json_decode($content,320);
+            $data = $content;
+
+            if (!$data) return false;
+            $kjData['expect'] = $data['preIssue']; # 2019091905
+            $kjData['opencode'] = implode(',', $data['openNum']); # 0,4,1,9,1
+            $kjData['opentime'] = date('Y-m-d H:i:s', $data['openDateTime']/1000); # 2019-9-19 11:41:05
+            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
+        }
+        $opencode = $kjData['opencode'];
+        $opentime = $kjData['opentime'];
+        $expect = $kjData['expect'];
+
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/xj_ssc', 'INFO', '号码抓取-直播网', $logArr);
+
+        return $rst;
+    }
+
 }

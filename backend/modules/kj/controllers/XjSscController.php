@@ -33,6 +33,16 @@ class XjSscController extends Controller
     }
 
     /**
+     * @desc 直播网 - 新疆时时彩
+     * @return json|xml
+     */
+    public function actionZhiBoWang($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = XjSsc::getLotteryNoZhiBo($type);
+        return $data;
+    }
+
+    /**
      * @desc 99 - 新疆时时彩
      * @return json|xml
      */

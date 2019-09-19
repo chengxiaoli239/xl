@@ -104,6 +104,7 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $data = XjSsc::getLotteryNoZhiBo();p($data);
         $data = XjSsc::getLotteryNoSevenDay();p($data);
         $data = XjSsc::getLotteryNo99();p($data);
         $rst = StaticService::opAllCodeTypeYl();p($rst);
