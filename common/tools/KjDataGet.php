@@ -145,7 +145,7 @@ class KjDataGet
                         $cache_time = 30*60;
                     }
                 }
-                $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'kjData'=>$kjData, /*'insertRst'=>$msg,*/ 'lottery'=>CqsscKcw::$lotteryNameArr[$kjConfig->lottery_type]];
+                $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, /*'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$msg,*/ 'lottery'=>CqsscKcw::$lotteryNameArr[$kjConfig->lottery_type]];
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
             }
             $mkey_qihao = 'KJ_LOG_QIHAO_'.$kjConfig->lottery_type.'_'.$qihao;
