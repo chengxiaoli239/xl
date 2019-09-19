@@ -83,7 +83,7 @@ class SscDataService extends BaseService {
 
     /**
      * @desc 更新单双
-     * @param $lottery_type integer 彩种类型：1:1.5分 2:3分 3:5分 4:10分
+     * @param $lottery_type integer 彩种类型：1:1.5分 2:3分 3:5分 4:10分 5重庆 6新疆 7北京快乐8
      * @return bool
      */
     public static function updateDsData($lottery_type = DEFAULT_LOTTERY_TYPE){
@@ -95,16 +95,16 @@ class SscDataService extends BaseService {
 
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
         $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
-        //p([$qihao, $next_qihao, $last_qihao]);
 
         if($next_qihao<=$last_qihao){
             $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
-            if($new_qihao){
-                $flag = SscDataService::insertSscKjDataDs($new_qihao, $lottery_type);
+            if(!$new_qihao){ # 防止官网某一期不开的情况, 自动获取开奖表下一期的开奖号码
+                $new_qihao = SscKjData::find()->where(['AND', ['>', 'qihao',$qihao], ['=', 'lottery_type', $lottery_type]])->orderBy('id ASC')->limit(1)->one()->qihao;
             }
+            $flag = SscDataService::insertSscKjDataDs($new_qihao, $lottery_type);
             $m->set($mkey, $new_qihao, 24*60*60);
         }
-        //p([$new_qihao, $next_qihao, $last_qihao, $lottery_type],0);
+        //p([$qihao, $new_qihao, $next_qihao, $last_qihao, $lottery_type]);
 
         return $flag;
 
@@ -544,7 +544,6 @@ class SscDataService extends BaseService {
                     //}
                     $SscDsYl->history_max_miss = max($miss['current_times'],$SscDsYl->max_miss,$SscDsYl->history_max_miss); // 6、历史最大遗漏
                     $SscDsYl->update_time = date('Y-m-d H:i:s');
-                    //p($SscDsYl->attributes);
                     $rst = $SscDsYl->save();
                     if(!$rst){
                         $logArr = ['attributes'=>$SscDsYl->attributes, 'msg'=>$SscDsYl->getErrors()];
@@ -939,6 +938,8 @@ class SscDataService extends BaseService {
         $last_times = 0;
         $last = SscKjDataDs::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
         $min_id = $last['last_id'] - $recently - 1;
+        $min_id = $min_id ? $min_id : $last['last_id'];
+        //p([$last['last_id'], $recently, $min_id]);
 
         $field = 'code_'.str_replace(',','_',$position);
         if(is_array($num)){
@@ -948,7 +949,7 @@ class SscDataService extends BaseService {
         }
         //$where = "$field=$num AND id>$min_id";
         $SscKjDataDs = SscKjDataDs::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
-        //p($where);
+
         if(count($SscKjDataDs)>1){
             $last_times = $SscKjDataDs[0]->index_id - $SscKjDataDs[1]->index_id - 1;  // 上次遗漏次数
         }
@@ -1397,7 +1398,7 @@ class SscDataService extends BaseService {
         $data = explode(',',$SscKjData['code_str']);
         $m = \Yii::$app->cache;
         $mkey = 'InsertSscKjDataDs_'.$lottery_type.'_'.$qihao;
-        if($r = $m->get($mkey)) return ['status'=>'300', 'msg'=>'已经处理完成...'];
+        //if($r = $m->get($mkey)) return ['status'=>'300', 'msg'=>'已经处理完成...'];
         //array_pop($data);
         $tmpData = [];
         foreach ($data as $key=>$v){

@@ -456,7 +456,15 @@ class KjDataGet
                     }elseif($qihao >= $maxQihao){
                         $nextQihao = ltrim(Tools::getNextDate($date),'20').'001';
                     }
-                break;
+                    break;
+                case 6:
+                    $minQihao = substr($nextQihao, 8, 2);
+                    $date = substr($nextQihao, 0, 4).'-'.substr($nextQihao, 4, 2).'-'.substr($nextQihao, 6, 2).' 00:00:00';
+                    if($minQihao == 49){
+                        $date = date('Ymd', strtotime($date) + 86400);
+                        $nextQihao = $date.'01';
+                    }
+                    break;
             }
         }
 
@@ -486,6 +494,13 @@ class KjDataGet
                 //}elseif($qihao >= 120){
                 }elseif($qihao <= 001){
                     $beforeQihao = substr(Tools::getBeforeDate($date),2,9).'0'.$maxQihao;
+                }
+            }elseif($lottery_type == 6){
+                $minQihao = substr($beforeQihao, 8, 2);
+                $date = substr($beforeQihao, 0, 4).'-'.substr($beforeQihao, 4, 2).'-'.substr($beforeQihao, 6, 2).' 00:00:00';
+                if($minQihao == '00'){
+                    $date = date('Ymd', strtotime($date) - 86400);
+                    $beforeQihao = $date.'48';
                 }
             }else{
                 $beforeQihao = $beforeQihao;

@@ -135,7 +135,8 @@ class TzService extends BaseService {
         $m = Yii::$app->cache;
         $pkey = BetService::buildPlanSwitchKey($lottery_type, $qihao);
         $isExists = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao]);
-        if($isExists && $planStatus = $m->get($pkey)){
+        $planStatus = $m->get($pkey);
+        if($isExists && $planStatus){
             return ['status'=>300, 'pkey'=>$pkey, 'msg'=>'投注计划已经处理过了~'];
         }
 
@@ -157,7 +158,7 @@ class TzService extends BaseService {
             //return $statusRst;
         }
         if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opSystemBetPlans')){
-            return $status;
+            //return $status;
         }
 
         $time1 = microtime(true);
