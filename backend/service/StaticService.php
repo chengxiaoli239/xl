@@ -1006,10 +1006,10 @@ class StaticService extends BaseService {
      */
     public static function allDateStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'allDateStaticProfits_PERDATE_'.$lottery_type.'_24';
+        $mkey = 'allDateStaticProfits_PERDATE_'.$lottery_type.'_25';
 
         $allStatic = [];
-        for($s=0; $s<5; $s++){
+        for($s=0; $s<25; $s++){
             if(!$time = $m->get($mkey)) {
                 $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
                 $time = $staticsStarTime;
