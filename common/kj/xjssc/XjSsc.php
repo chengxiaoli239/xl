@@ -198,7 +198,7 @@ class XjSsc extends BaseKj {
     public static function getLotteryNoBatch($returnType = 'json'){
         $m = \Yii::$app->cache;
 
-        $mkey = 'XJSSC_getLotteryNoBatch_1';
+        $mkey = 'XJSSC_getLotteryNoBatch_2';
         $domain = BaseKj::getApiHost(12);
 
         if(!$date = $m->get($mkey)){
@@ -231,7 +231,7 @@ class XjSsc extends BaseKj {
             ob_end_flush();exit;
         }
         $logArr = $rstDatas;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/xj_ssc', 'INFO', '号码抓取-直播网', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/xj_ssc_batch', 'INFO', '号码批量抓取-直播网', $logArr);
 
         return $rstDatas;
     }
