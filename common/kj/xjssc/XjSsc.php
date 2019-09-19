@@ -199,11 +199,11 @@ class XjSsc extends BaseKj {
     public static function getLotteryNoBatch($returnType = 'json'){
         $m = \Yii::$app->cache;
 
-        $mkey = 'XJSSC_getLotteryNoBatch_4';
+        $mkey = 'XJSSC_getLotteryNoBatch_5';
         $domain = BaseKj::getApiHost(12);
 
         if(!$date = $m->get($mkey)){
-            $date = '2019-02-11';
+            $date = '2019-09-19';
         }
         $url = $domain.'/data/xjssc/lotteryList/'.$date.'.json?'.time();
         $datas = CurlService::httpGet($url);
