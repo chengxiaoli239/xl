@@ -195,7 +195,7 @@ class BettingRecordsController extends BaseController
 
         $rst = BetService::cancelOrder($this->_user_id, $bet_id);
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index', 'BettingRecords[lottery_type]'=>$rst['lottery_type']]);
     }
 
     /**

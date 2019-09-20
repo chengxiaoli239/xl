@@ -719,6 +719,7 @@ abstract class BetService extends BaseBetService {
 
         }
 
+        $rst['lottery_type'] = $lottery_type;
         if($rst['status'] == 200){
             $m->set($mkey, 1, 5);
         }
