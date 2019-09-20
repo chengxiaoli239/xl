@@ -188,9 +188,9 @@ class UserSysPlansController extends BaseController
      */
     public function actionSwitchStatus($id,$status){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        HN0898Service::updateSysPlansStatus($id, $status, $this->_user_id);
+        $rst = HN0898Service::updateSysPlansStatus($id, $status, $this->_user_id);
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$rst['lottery_type']]);
     }
 
     /**
