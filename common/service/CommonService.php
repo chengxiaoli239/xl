@@ -811,7 +811,13 @@ class  CommonService{
 
         if(!empty($queryParams)){
             foreach ($queryParams as $queryParam){
-                $lottery_type = $queryParam['lottery_type'] ? $queryParam['lottery_type'] : DEFAULT_LOTTERY_TYPE;
+                if(isset($queryParam['lottery_type']) && $queryParam['lottery_type']){
+                    $lottery_type = $queryParam['lottery_type'];
+                }elseif ($lottery_type = $m->get($mkey)){
+                    $lottery_type = $lottery_type;
+                }else{
+                    $lottery_type = DEFAULT_LOTTERY_TYPE;
+                }
             }
         }else{
             $lottery_type = $m->get($mkey);
