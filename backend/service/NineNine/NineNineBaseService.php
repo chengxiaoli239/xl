@@ -7,7 +7,7 @@
  * Time: 09:40
  */
 
-namespace backend\service;
+namespace backend\service\NineNine;
 use backend\models\BettingRecords;
 use backend\models\DataTime;
 use backend\models\KjConfig;
@@ -22,6 +22,7 @@ use backend\models\User;
 use backend\models\UserCustomPlans;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
+use backend\service\BaseTZService;
 use backend\tools\Tools;
 use common\models\AdminModel;
 use common\service\CaptchaCodeService;
@@ -29,7 +30,7 @@ use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
 
-class HN0898Service extends BaseTZService {
+class BaseService extends BaseTZService {
     public static $username = '';
     public static $password = '';
     public static $baseUrl =  '';

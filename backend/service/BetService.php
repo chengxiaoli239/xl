@@ -13,6 +13,7 @@ use backend\models\LotteryType;
 use backend\models\SystemConfig;
 use backend\models\User;
 use backend\service\huiyuan\KuaiLe8Service;
+use backend\service\NineNine\NineNineService6;
 use common\kj\cqssc\CqsscKcw;
 use Yii;
 use backend\models\BettingRecords;
@@ -51,7 +52,7 @@ abstract class BetService extends BaseBetService {
             if($lottery_type == 5){ # 0898体系重庆
                 $BetService = new HN0898Service($uid, $tz_system_id);
             }elseif ($lottery_type == 6){
-                $BetService = new Nine($uid, $tz_system_id);
+                $BetService = new NineNineService6($uid, $tz_system_id);
             }
         }elseif(in_array($tz_system_id, [3])){
             # 3、重庆7时彩网
