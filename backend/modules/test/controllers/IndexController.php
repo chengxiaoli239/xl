@@ -104,9 +104,12 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
-        $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type = 6); p($rst);# 号码类型每天数量统计
+
+        for ($i=0;$i<20;$i++){ # 统计数据
+            //$rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type = 6); //p($rst);# 号码类型每天数量统计
+            $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type = 6); //p($rst);# 和值每天数量统计
+        }p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([30,31,32,33,34,35], $lottery_type = 6, 20000);p($miss);
-        $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type = 6); p($rst);# 和值每天数量统计
         self::_init();
         $kjDatas = XjSsc::getLotteryNoBatch();
         $kjDatas = array_reverse($kjDatas);

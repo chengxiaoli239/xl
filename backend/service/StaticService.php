@@ -1015,9 +1015,11 @@ class StaticService extends BaseService {
             if(!$flag OR !$time = $m->get($mkey)) {
                 $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
                 $time = $staticsStarTime;
+                /*
                 for ($i=0; $i<20; $i++){
                     self::allDateStaticProfits($lottery_type);
                 }
+                */
             }else{
                 $i = 5;
                 $time = $time + 24 * 3600;
@@ -1057,9 +1059,11 @@ class StaticService extends BaseService {
             if(!$flag OR !$time = $m->get($mkey)) {
                 $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
                 $time = $staticsStarTime;
+                /*
                 for ($i=0; $i<20; $i++){
                     self::allDateHzStaticProfits($lottery_type);
                 }
+                */
             }else{
                 $i = 5;
                 $time = $time + 24 * 3600;
@@ -1253,9 +1257,11 @@ class StaticService extends BaseService {
             if(!$flag OR !$time = $m->get($mkey)) {
                 $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
                 $time = $staticsStarTime;
+                /*
                 for ($i=0; $i<20; $i++){
                     self::allHzStaticProfitsPerdate($lottery_type);
                 }
+                */
             }else{
                 $i = 5;
                 $time = $time + 24 * 3600;
@@ -1457,9 +1463,11 @@ class StaticService extends BaseService {
             if(!$flag OR !$time = $m->get($mkey)) {
                 $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
                 $time = $staticsStarTime;
+                /*
                 for ($i=0; $i<20; $i++){
                     self::allDateStatic3NumsPerDate($lottery_type);
                 }
+                */
             }else{
                 $i = 5;
                 $time = $time + 24 * 3600 - 10 * 60;
@@ -1515,9 +1523,11 @@ class StaticService extends BaseService {
             if(!$flag OR !$time = $m->get($mkey)) {
                 $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
                 $time = $staticsStarTime;
+                /*
                 for ($i=0; $i<20; $i++){
                     self::allDateStaticCodeTypePerDate($lottery_type);
                 }
+                */
             }else{
                 $i = 2;
                 $time = $time + 24 * 3600;
@@ -1569,9 +1579,11 @@ class StaticService extends BaseService {
             if(!$flag OR !$time = $m->get($mkey)) {
                 $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
                 $time = $staticsStarTime;
-                for ($i=0; $i<20; $i++){
+                /*
+                for ($i=0; $i<20; $i++){ # 死循环
                     self::allDateStaticHzPerDate($lottery_type);
                 }
+                */
             }else{
                 $i = 2;
                 $time = $time + 24 * 3600;
