@@ -158,7 +158,7 @@ class TzService extends BaseService {
             //return $statusRst;
         }
         if(!$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opSystemBetPlans')){
-            //return $status;
+            return $status;
         }
 
         $time1 = microtime(true);
