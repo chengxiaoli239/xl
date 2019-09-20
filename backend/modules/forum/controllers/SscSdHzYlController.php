@@ -38,14 +38,17 @@ class SscSdHzYlController extends BaseController
     {
         $searchModel = new SscSdHzYlSearch();
         $queryParams = Yii::$app->request->queryParams;
-        $queryParams['SscSdHzYl']['status'] = 1;
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        /*
         if(!$queryParams['SscSdHzYl']['lottery_type']){
             $lottery_type = $lottery_types[0]['lottery_type'];
         }else{
             $lottery_type = $queryParams['SscSdHzYl']['lottery_type'];
         }
+        */
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
         $queryParams['SscSdHzYl']['lottery_type'] = $lottery_type;
+        $queryParams['SscSdHzYl']['status'] = 1;
 
         $dataProvider = $searchModel->search($queryParams);
         return $this->render('index', [
