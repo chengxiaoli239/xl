@@ -3,6 +3,7 @@
 namespace backend\modules\forum\controllers;
 
 use backend\service\UserSysPlansService;
+use common\service\CommonService;
 use Yii;
 use backend\models\Static3numArisePerdate;
 use backend\models\searchs\Static3numArisePerdate as Static3numArisePerdateSearch;
@@ -39,11 +40,14 @@ class Static3numArisePerdateController extends BaseController
         $searchModel = new Static3numArisePerdateSearch();
         $queryParams = Yii::$app->request->queryParams;
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        /*
         if(!$queryParams['Static3numArisePerdate']['lottery_type']){
             $lottery_type = $lottery_types[0]['lottery_type'];
         }else{
             $lottery_type = $queryParams['Static3numArisePerdate']['lottery_type'];
         }
+        */
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
         $queryParams['Static3numArisePerdate']['lottery_type'] = $lottery_type;
 
         $dataProvider = $searchModel->search($queryParams);

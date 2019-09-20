@@ -3,6 +3,7 @@
 namespace backend\modules\forum\controllers;
 
 use backend\service\UserSysPlansService;
+use common\service\CommonService;
 use Yii;
 use backend\models\StaticHzProfitsPerdate;
 use backend\models\searchs\StaticHzProfitsPerdate as StaticHzProfitsPerdateSearch;
@@ -39,11 +40,14 @@ class StaticHzProfitsPerdateController extends BaseController
         $searchModel = new StaticHzProfitsPerdateSearch();
         $queryParams = Yii::$app->request->queryParams;
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        /*
         if(!$queryParams['StaticHzProfitsPerdate']['lottery_type']){
             $lottery_type = $lottery_types[0]['lottery_type'];
         }else{
             $lottery_type = $queryParams['StaticHzProfitsPerdate']['lottery_type'];
         }
+        */
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
         $queryParams['StaticHzProfitsPerdate']['lottery_type'] = $lottery_type;
 
         $dataProvider = $searchModel->search($queryParams);

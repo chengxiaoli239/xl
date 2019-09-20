@@ -3,6 +3,7 @@
 namespace backend\modules\forum\controllers;
 
 use backend\service\UserSysPlansService;
+use common\service\CommonService;
 use Yii;
 use backend\models\Static4dProfitsDay;
 use backend\models\searchs\Static4dProfitsDay as Static4dProfitsDaySearch;
@@ -39,11 +40,14 @@ class Static4dProfitsDayController extends BaseController
         $searchModel = new Static4dProfitsDaySearch();
         $queryParams = Yii::$app->request->queryParams;
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        /*
         if(!$queryParams['Static4dProfitsDay']['lottery_type']){
             $lottery_type = $lottery_types[0]['lottery_type'];
         }else{
             $lottery_type = $queryParams['Static4dProfitsDay']['lottery_type'];
         }
+        */
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
         $queryParams['Static4dProfitsDay']['lottery_type'] = $lottery_type;
 
         $dataProvider = $searchModel->search($queryParams);

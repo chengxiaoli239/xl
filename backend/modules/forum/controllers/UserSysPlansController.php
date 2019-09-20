@@ -46,9 +46,6 @@ class UserSysPlansController extends BaseController
     {
         $searchModel = new UserSysPlansSearch();
         $queryParams = Yii::$app->request->queryParams;
-        if($this->_user_id !== 1){ # 超级管理员
-            $queryParams['UserSysPlans']['uid'] = $this->_user_id;
-        }
 
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
         /*
@@ -61,6 +58,10 @@ class UserSysPlansController extends BaseController
         $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
 
         $queryParams['UserSysPlans']['lottery_type'] = $lottery_type;
+
+        if($this->_user_id !== 1){ # 超级管理员
+            $queryParams['UserSysPlans']['uid'] = $this->_user_id;
+        }
         $dataProvider = $searchModel->search($queryParams);
 
         $myTzTypes = UserSysPlansService::getMyTzTypes($this->_user_id, $lottery_type);
