@@ -764,7 +764,8 @@ class NineNineBaseService extends BaseTZService {
         //p([$url,$post_data,$headers, $balance]);
         $end_time = microtime(true);
         $time_consume = ($end_time-$start_time).'s';
-        $indexUrl = self::getTzSiteInfo($tz_system_id,'SSC_INDEX');
+        $TzSiteInfo = self::getTzSiteInfo($tz_system_id);
+        $indexUrl = $TzSiteInfo['SSC_INDEX'];
         $logData = ['url'=>$url,'headers'=>$headers, 'balance'=>$balance, 'indexUrl'=>$indexUrl, 'time_consume'=>$time_consume];
         //p($logData);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','0898用户余额', $logData);
@@ -815,6 +816,7 @@ class NineNineBaseService extends BaseTZService {
         $mkey = 'SNID_'.$lottery_type.'_'.$sn;
         if(!$snid = $m->get($mkey)){
             $content = self::getSscIndexContent(self::$user_id, self::$tz_system_id, $lottery_type);
+            //p([self::$user_id, self::$tz_system_id, $lottery_type, $content]);
 
             $preg = "/<td>".$sn."(.*?) snid=(.*?)\>点击撤单/ism"; // 这里是表达式，大神看看
             preg_match_all($preg,$content,$matches);
@@ -851,7 +853,7 @@ class NineNineBaseService extends BaseTZService {
 
         self::__init($uid, $tz_system_id);
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        $TzSiteInfo = self::getTzSiteInfo($TzSystemUser->tz_system_id, '', $lottery_type);
+        $TzSiteInfo = self::getTzSiteInfo($TzSystemUser->tz_system_id, $lottery_type);
         $url = $TzSiteInfo['SSC_INDEX'];
         $headers = [
             "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36",
@@ -1138,7 +1140,8 @@ class NineNineBaseService extends BaseTZService {
         $post_data['ctl00$txtcode'] = $code;
         //p($post_data);
 
-        $url = self::getTzSiteInfo($tz_system_id, 'INDEX');
+        $TzSiteInfo = self::getTzSiteInfo($tz_system_id);
+        $url = $TzSiteInfo['INDEX'];
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'url'=>$url];
         $post_data = http_build_query($post_data);
         $headers = [
