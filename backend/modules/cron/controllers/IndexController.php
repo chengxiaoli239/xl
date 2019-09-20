@@ -240,7 +240,6 @@ class IndexController extends Controller
         return $rst;
     }
 
-
     /**
      * @description 本地处理开奖数据
      * @return array

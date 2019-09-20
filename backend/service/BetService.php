@@ -13,6 +13,7 @@ use backend\models\LotteryType;
 use backend\models\SystemConfig;
 use backend\models\User;
 use backend\service\huiyuan\KuaiLe8Service;
+use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineService6;
 use common\kj\cqssc\CqsscKcw;
 use Yii;
@@ -46,7 +47,6 @@ abstract class BetService extends BaseBetService {
      * @return HN0898Service|KuaiLe8Service|SevenService|XlService
      */
     public static function getBetObj($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
-
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网
             if($lottery_type == 5){ # 0898体系重庆
@@ -696,6 +696,8 @@ abstract class BetService extends BaseBetService {
             # 1、0898投注、2、99彩票网
             if($lottery_type == 5){ # 0898体系重庆
                 $rst = HN0898Service::cancelOrder($bet_id, $BettingRecords->tz_system_id);
+            }elseif ($lottery_type == 6){
+                $rst = NineNineBaseService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
             }
         }elseif(in_array($tz_system_id, [3])){
             # 3、重庆7时彩网

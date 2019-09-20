@@ -22,6 +22,7 @@ use backend\models\User;
 use backend\models\UserCustomPlans;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
+use backend\service\NineNine\NineNineBaseService;
 use backend\tools\Tools;
 use common\models\AdminModel;
 use common\service\CaptchaCodeService;
@@ -773,15 +774,21 @@ class HN0898Service extends BaseTZService {
      * @param $sn 方案号
      * @return mixed
      */
-    public static function getSnidBySn($sn){
+    public static function getSnidBySn($sn, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'SNID_'.$sn;
+        $mkey = 'SNID_'.$lottery_type.'_'.$sn;
         if(!$snid = $m->get($mkey)){
-            $content = self::getSscIndexContent(self::$user_id, self::$tz_system_id);
+            switch ($lottery_type){
+                case 5:
+                    $content = self::getSscIndexContent(self::$user_id, self::$tz_system_id, $lottery_type);
 
-            $preg = "/<td>".$sn."(.*?) snid=(.*?)\>点击撤单/ism"; // 这里是表达式，大神看看
-            preg_match_all($preg,$content,$matches);
-            $snid = $matches[2][0];
+                    $preg = "/<td>".$sn."(.*?) snid=(.*?)\>点击撤单/ism"; // 这里是表达式，大神看看
+                    preg_match_all($preg,$content,$matches);
+                    $snid = $matches[2][0];
+                    break;
+                case 6:
+                    break;
+            }
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSnidBySn','INFO','0898获取订单号', ['snid'=>$snid]);
             $m->set($mkey, 6*3600);
         }
@@ -808,10 +815,10 @@ class HN0898Service extends BaseTZService {
      * @param $tz_system_id
      * @return mixed
      */
-    public static function getSscIndexContent($uid, $tz_system_id){
+    public static function getSscIndexContent($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
         $HN0898Service = new HN0898Service($uid, $tz_system_id);
-        $url = HN0898Service::getTzSiteInfo($tz_system_id,'SSC_INDEX');
+        $url = NineNineBaseService::getTzSiteInfo($tz_system_id,$lottery_type, 'SSC_INDEX');
         $headers = [
             "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36",
             'Accept-Language:zh-CN,zh;q=0.9',

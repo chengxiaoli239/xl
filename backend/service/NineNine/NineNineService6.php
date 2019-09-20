@@ -9,7 +9,7 @@
 
 namespace backend\service\NineNine;
 
-class NineNineService6 extends BaseService {
+class NineNineService6 extends NineNineBaseService {
     public static $username = '';
     public static $password = '';
     public static $baseUrl =  '';
@@ -32,6 +32,6 @@ class NineNineService6 extends BaseService {
      * @param int $is_simulate   默认为模拟投注
      */
     public function __construct($uid = 1, $tz_system_id = 1){
-        parent::__construct();
+        parent::__construct($uid, $tz_system_id);
     }
 }

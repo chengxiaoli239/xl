@@ -23,6 +23,11 @@ use backend\models\UserCustomPlans;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
 use backend\service\BaseTZService;
+use backend\service\BetService;
+use backend\service\CurlService;
+use backend\service\HN0898Service;
+use backend\service\RemoteHtmlService;
+use backend\service\SscDataService;
 use backend\tools\Tools;
 use common\models\AdminModel;
 use common\service\CaptchaCodeService;
@@ -30,7 +35,7 @@ use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
 
-class BaseService extends BaseTZService {
+class NineNineBaseService extends BaseTZService {
     public static $username = '';
     public static $password = '';
     public static $baseUrl =  '';
@@ -69,6 +74,7 @@ class BaseService extends BaseTZService {
         self::$account = $User->username;
         self::$tz_system_id = $tz_system_id;
         self::$username = $User->username;
+        /*
         self::$tzSiteInfo = HN0898Service::getTzSiteInfo($tz_system_id);
         //self::unitHeaders('Cookie'); # 去除重复的headers，主要是Cookie
 
@@ -81,6 +87,7 @@ class BaseService extends BaseTZService {
             "Referer:".str_replace('www.','',Yii::$app->params['ajaxUrlRouteLotDw']),
         ];
         self::$headers = array_unique(array_merge(self::$headers,$headers));
+        */
     }
 
     /**
@@ -103,9 +110,9 @@ class BaseService extends BaseTZService {
      * @param $uid
      * @param $tz_system_id
      */
-    public static function getTzSiteInfo($tz_system_id, $url_key = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function getTzSiteInfo($tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE, $url_key = ''){
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
-        //p(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id,$TzSystemUser->attributes]);
+        //p(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id, $TzSystemUser->attributes]);
         $baseUrl = $TzSystemUser->ssc_domain;
         self::$cookie = $TzSystemUser->cookie;
         \Yii::$app->params['baseUrl']  = $TzSystemUser->ssc_domain;
@@ -333,17 +340,16 @@ class BaseService extends BaseTZService {
      * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
      * @return array
      */
-    //public function bet($playway = 1, $code, $single, $qihao, $tz_type = 0, $buy_type = 1){
     public function bet($qihao, $plan_id, $code){
+        self::__init(self::$user_id, self::$tz_system_id);
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
         $tz_type = $plan->tz_type ? $plan->tz_type : 0;
         $buy_type = $plan->buy_type ? $plan->buy_type : 1;
         $lottery_type = $plan->lottery_type;
-        //$TzSystemsUsers = TzSystemsUsers::findOne(['tz_system_id'=>$tz_system_id, 'account'=>$account]);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['tz_system_id'=>self::$tz_system_id, 'uid'=>$plan->uid]);
         //p([$playway, $code, $single, $qihao]);
-        //self::__init($account);
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
 
@@ -355,18 +361,27 @@ class BaseService extends BaseTZService {
 
         $post_data = [ 'act' => 'postsn', 'playway' => $playway, 'single' => $single, 'qihao' => $qihao, 'code' => $code, ];
 
+        //$url = self::getTzSiteInfo(self::$tz_system_id,'SSC_INDEX', $lottery_type); p($url);
         $data['code'] = $code;
-        $header = [
+        //$url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ', $lottery_type);
+        $TzSiteInfo = self::getTzSiteInfo(self::$tz_system_id, $lottery_type);
+        $url = $TzSiteInfo['ORDER_TZ'];
+        $headers = [
+            'Accept: */*',
+            'Accept-Encoding: gunzip, deflate, br',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Connection: keep-alive',
             'Content-Length:'.strlen(http_build_query($post_data)),
+            'Content-Type: application/x-www-form-urlencoded',
+            'Cookie: '.$TzSystemsUsers->cookie,
+            "Host:".$TzSiteInfo['domain'],
+            //'Origin: https://9912304.com',
+            "Origin:".$TzSiteInfo['baseUrl'],
+            //'Referer: https://9912304.com/jxssc_qmode/index.aspx',
+            "Referer: ".$url,
+            $TzSystemsUsers->user_agent,
+            'X-Requested-With: XMLHttpRequest',
         ];
-
-        $headers = array_merge(self::$headers,$header);
-        //p($headers);
-        //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
-        $url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ', $lottery_type);
-
-        //$account = User::findOne(self::$user_id)->account;  # 投注用户账号
-        //$account = User::findOne(['admin_id'=>self::$user_id])->account;  # 投注用户账号
 
         # 缓存锁
         $m = \Yii::$app->cache;
@@ -381,8 +396,8 @@ class BaseService extends BaseTZService {
         }
         # 真实投注
         $start_time = microtime(true);
-        $rst = CurlService::httpPost($url, http_build_query($post_data), $headers)[0];
-        //p([$rst,$url,http_build_query($post_data), $headers],0);
+        $rst = CurlService::postCurl($url, http_build_query($post_data), $headers)[0];
+        //p([$rst,$url,http_build_query($post_data), $headers]);
         $end_time = microtime(true);
         $time_consume = ($end_time - $start_time). 's';
         if($rst['err'] == -1 OR !$rst){
@@ -405,19 +420,19 @@ class BaseService extends BaseTZService {
         }
 
         //$HN0898Service = new HN0898Service(self::$user_id, self::$tz_system_id);
-        $snid = HN0898Service::getSnidBySn($rst['sn']); // 获取方案内容
+        $snid = NineNineBaseService::getSnidBySn($rst['sn'], $lottery_type); // 获取方案内容
 
         $insertData = [
             'playway'=> $playway,  // 投注方式
             'tz_type'=> $tz_type,  // 投注类型
             'buy_type'=> $buy_type,  // 购买方向类型
-            'uid'=> self::$user_id,  // 投注账号id
+            'uid'=> $plan->uid,  // 投注账号id
             'lottery_type' => $lottery_type, # 彩种
-            'account' => self::$account,
+            'account' => $plan->account,
             'codes' => $code,  // 投注号码
             'qihao' => $qihao,  // 投注期号
             'plan_id' => $plan_id,  // 计划id
-            'tz_system_id' => self::$tz_system_id,  // 投注系统tz_systems .id
+            'tz_system_id' => $TzSystemsUsers->tz_system_id,  // 投注系统tz_systems .id
             'sn'=>$rst['sn'],
             'snid'=>$snid,
             'order_type'=>3, # 单双三字定
@@ -428,8 +443,9 @@ class BaseService extends BaseTZService {
         $insertRst = BetService::_logRecords($insertData);
         self::$headers = [];
 
-        $logArr = ['uid'=>self::$user_id,'account'=>self::$account,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume,/*'insertData'=>$insertData,*/ 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','0898插入记录-真实投注', $logArr);
+        $logArr = ['uid'=>$plan->uid,'account'=>$plan->account,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume,'insertData'=>$insertData,'sn'=>$rst['sn'], 'lottery_type'=>$lottery_type,'snid'=>$snid, 'insertRst'=>$insertRst];
+        //p($logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','99彩票网['.$lottery_type.']插入记录-真实投注', $logArr);
 
         return $data;
     }
@@ -449,12 +465,30 @@ class BaseService extends BaseTZService {
         $lot = $BettingRecords->lottery_type == 6 ? 'jxssc' : 'ssc';
 
         $rst = ['status'=>300, 'msg'=>'操作成功'];
-        //$url = HN0898Service::getUserUrlArr(self::$user_id,'CANCEL_ORDER');
-        $url = HN0898Service::getTzSiteInfo($tz_system_id,'CANCEL_ORDER');
-        $post_data = [ 'act' => 'cancelsn', 'lot' => $lot, 'snid'=> $snid ];
-        $headers = self::$headers;
+        $TzSystemsUsers = TzSystemsUsers::findOne(['tz_system_id'=>self::$tz_system_id, 'uid'=>$uid]);
+        $TzSiteInfo = NineNineBaseService::getTzSiteInfo($tz_system_id,$BettingRecords->lottery_type);
+        $url = $TzSiteInfo['CANCEL_ORDER'];
 
-        $rstData = CurlService::httpPost($url,http_build_query($post_data), $headers);
+        //$url = NineNineBaseService::getTzSiteInfo($tz_system_id,'CANCEL_ORDER', $BettingRecords->lottery_type);
+        $post_data = [ 'act' => 'cancelsn', 'lot' => $lot, 'snid'=> $snid ];
+        $headers = [
+            'Accept: */*',
+            'Accept-Encoding: gunzip, deflate, br',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Connection: keep-alive',
+            'Content-Length:'.strlen(http_build_query($post_data)),
+            'Content-Type: application/x-www-form-urlencoded',
+            'Cookie: '.$TzSystemsUsers->cookie,
+            "Host:".$TzSiteInfo['domain'],
+            //'Origin: https://9912304.com',
+            "Origin:".$TzSiteInfo['baseUrl'],
+            //'Referer: https://9912304.com/jxssc_qmode/index.aspx',
+            "Referer: ".$url,
+            $TzSystemsUsers->user_agent,
+            'X-Requested-With: XMLHttpRequest',
+        ];
+
+        $rstData = CurlService::postCurl($url, http_build_query($post_data), $headers);
         $rst['data'] = $rstData;
         if($rstData == 'ok'){
             $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
@@ -462,7 +496,8 @@ class BaseService extends BaseTZService {
             $BettingRecords->save();
             $rst['status'] = 200;
         }
-        $logArr = ['snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
+        $logArr = ['url'=>$url, 'snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
+        //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
 
         return $rst;
@@ -621,7 +656,7 @@ class BaseService extends BaseTZService {
        if(!$BettingRecords) return ['status'=>300, 'msg'=>'找不到投注计划记录'];
 
        $tz_system_id = $BettingRecords->tz_system_id ? $BettingRecords->tz_system_id : 2;  # 默认99网
-       $HN0898Service = new HN0898Service($uid, $tz_system_id);
+       $HN0898Service = new self($uid, $tz_system_id);
        $oldCodes = $BettingRecords->codes;
        $oldCodesArr = explode('@', $oldCodes);
        $qihao = HN0898Service::getQihao();
@@ -721,7 +756,8 @@ class BaseService extends BaseTZService {
         //$headers = array_merge(self::$headers,$headers);
 
         //$url = self::getUserUrlArr(self::$user_id,'GET_BALANCE');
-        $url = self::getTzSiteInfo($tz_system_id,'GET_BALANCE');
+        $TzSiteInfo = self::getTzSiteInfo($tz_system_id );
+        $url = $TzSiteInfo['GET_BALANCE'];
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
         $start_time = microtime(true);
         $balance = CurlService::postCurl($url,http_build_query($post_data), $headers);#
@@ -774,18 +810,20 @@ class BaseService extends BaseTZService {
      * @param $sn 方案号
      * @return mixed
      */
-    public static function getSnidBySn($sn){
+    public static function getSnidBySn($sn, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'SNID_'.$sn;
+        $mkey = 'SNID_'.$lottery_type.'_'.$sn;
         if(!$snid = $m->get($mkey)){
-            $content = self::getSscIndexContent(self::$user_id, self::$tz_system_id);
+            $content = self::getSscIndexContent(self::$user_id, self::$tz_system_id, $lottery_type);
 
             $preg = "/<td>".$sn."(.*?) snid=(.*?)\>点击撤单/ism"; // 这里是表达式，大神看看
             preg_match_all($preg,$content,$matches);
             $snid = $matches[2][0];
+            $m->set($mkey, $snid, 6*3600);
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSnidBySn','INFO','0898获取订单号', ['snid'=>$snid]);
-            $m->set($mkey, 6*3600);
         }
+
+        //p(['$matches'=>$matches[2], 'user_id'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id, 'content'=>$content],0);
 
         return $snid;
     }
@@ -809,10 +847,12 @@ class BaseService extends BaseTZService {
      * @param $tz_system_id
      * @return mixed
      */
-    public static function getSscIndexContent($uid, $tz_system_id){
+    public static function getSscIndexContent($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
-        $HN0898Service = new HN0898Service($uid, $tz_system_id);
-        $url = HN0898Service::getTzSiteInfo($tz_system_id,'SSC_INDEX');
+        self::__init($uid, $tz_system_id);
+        $TzSystemUser = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $TzSiteInfo = self::getTzSiteInfo($TzSystemUser->tz_system_id, '', $lottery_type);
+        $url = $TzSiteInfo['SSC_INDEX'];
         $headers = [
             "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36",
             'Accept-Language:zh-CN,zh;q=0.9',
@@ -822,9 +862,9 @@ class BaseService extends BaseTZService {
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
             'Cache-Control: max-age=0',
             //"Accept-Encoding: gunzip, deflate, br", # gunzip 防止乱码
-            "Cookie:".self::$cookie."; VisitorCapacity=1;",
+            "Cookie:".$TzSystemUser->cookie."; VisitorCapacity=1;",
             //"Cookie:ASP.NET_SessionId=pc3w1umag0jyyw45dc2z2smk; VisitorCapacity=1;",
-            "Host:".str_replace('www.','',self::$domain),
+            "Host:".$TzSiteInfo['domain'],
             "Upgrade-Insecure-Requests: 1",
             "Referer: ".$url,
         ];
@@ -832,7 +872,7 @@ class BaseService extends BaseTZService {
 
         //$content = RemoteHtmlService::getRemoteHtmlContent($url, $headers);
         $content = CurlService::getCurl($url, $headers);
-        //if($uid == 11) p(['url'=>$url, 'cookie'=>self::$cookie, 'headers'=>$headers, 'content'=>$content]);
+        //p(['url'=>$url, 'cookie'=>$TzSystemUser->cookie, 'tz_system_id'=>$TzSystemUser->tz_system_id, 'headers'=>$headers, 'content'=>$content]);
 
         return $content;
     }
@@ -842,8 +882,8 @@ class BaseService extends BaseTZService {
      * @param $uid
      * @param $tz_system_id
      */
-    public static function getTzList($uid, $tz_system_id){
-        $content = self::getSscIndexContent($uid, $tz_system_id);
+    public static function getTzList($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $content = self::getSscIndexContent($uid, $tz_system_id, $lottery_type);
         $preg = '/<tr>(.*?)<td>SSC(.*?)&nbsp;&nbsp;&nbsp;&nbsp;<a class="cancelsn" style="cursor:pointer;color:blue;" snid=(.*?)>点击撤单<\/a><\/td>(.*?)<td>(.*?)<\/td>(.*?)<td title="(.*?)" style="cursor:pointer;">(.*?)<a href="\.\.\/user\/sninfo\.aspx\?id=(.*?)" target\=\_blank>详细内容<\/a>(.*?)<\/td>(.*?)<td>(.*?)<\/td>(.*?)<td>(.*?)<\/td>/ism'; // 这里是表达式，大神看看
 
         preg_match_all($preg,$content,$matches);

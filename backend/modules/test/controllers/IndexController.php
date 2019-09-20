@@ -14,6 +14,7 @@ use backend\models\TzSystemsUsers;
 use backend\service\BetService;
 use backend\service\huiyuan\HuiYuanService5;
 use backend\service\KuaiLe8Service;
+use backend\service\NineNine\NineNineBaseService;
 use backend\service\NumService;
 use backend\service\SevenService;
 use backend\service\StaticService;
@@ -105,6 +106,8 @@ class IndexController extends Controller
     }
     public function actionDw(){
 
+        $snid = NineNineBaseService::getSnidBySn('JXSSC1909201535157573FFE1', $lottery_type = 6); p($snid);// 获取方案内容
+        $rst = HN0898Service::getRemoteHzRecords(3, 2);p($rst);
         for ($i=0;$i<20;$i++){ # 统计数据
             //$rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type = 6); //p($rst);# 号码类型每天数量统计
             $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type = 6); //p($rst);# 和值每天数量统计
@@ -257,7 +260,6 @@ class IndexController extends Controller
         $rst = SevenService::sscIndex(3, 3);p($rst); # 用户信息
         $rst = BetService::userSysPlansTzNow(81, 3); p($rst);
         $rst = SevenService::getSn(3, 3);p($rst); # 用户信息
-        $rst = HN0898Service::getRemoteHzRecords(3, 2);p($rst);
         $rst = CqsscSevenDay::getLotteryNo(); p($rst);
         $rst = StaticService::staticHzPerDateProfits('2019-04-09'); p($rst);
         $rst = BetService::getCodes(1, 3, 22, 1, 0.1, 1, [1221,1222,2111]);p($rst);
