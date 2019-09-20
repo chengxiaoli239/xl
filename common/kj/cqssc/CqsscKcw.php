@@ -73,6 +73,9 @@ class CqsscKcw extends BaseKj {
             $domain = BaseKj::getApiHost(12);
             sleep(3);
             $date = date('Y-m-d');
+            if('00:00' < date('H:i:s') && date('H:i:s') < '03:00'){
+                $date = date('Y-m-d', time()-86400);
+            }
             $url = $domain.'/data/cqssc/lotteryList/'.$date.'.json?t='.time();
             //$content = file_get_contents($url);
             $content = CurlService::httpGet($url);
