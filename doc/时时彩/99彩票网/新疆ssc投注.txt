@@ -1,0 +1,77 @@
+一、投注：
+1、General
+	Request URL: https://9912304.com/jxssc_qmode/ajax.aspx
+	Request Method: POST
+	Status Code: 200 OK
+	Remote Address: 154.211.138.37:443
+	Referrer Policy: no-referrer-when-downgrade
+
+2、Response Headers
+	Cache-Control: private
+	Content-Encoding: gzip
+	Content-Length: 328
+	Content-Type: text/html; charset=utf-8
+	Date: Fri, 20 Sep 2019 03:30:19 GMT
+	Server: Microsoft-IIS/7.5
+	Vary: Accept-Encoding
+	X-AspNet-Version: 2.0.50727
+	X-Powered-By: ASP.NET
+
+3、Request Headers
+	Accept: */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 69
+	Content-Type: application/x-www-form-urlencoded
+	Cookie: ASP.NET_SessionId=0bpcp3u0gifyqwn0adyvy5u1; firstEnterUrlInSession=https%3A//9912304.com/kaijiang/list.aspx%3Flot%3Djxssc; pageReferrInSession=https%3A//9912304.com/kaijiang/list.aspx%3Flot%3Djxssc
+	Host: 9912304.com
+	Origin: https://9912304.com
+	Referer: https://9912304.com/jxssc_qmode/index.aspx
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+	X-Requested-With: XMLHttpRequest
+
+4、Form Data
+	act: postsn
+	code: 8,7,5,2@4,5,7,8
+	playway: 3
+	single: 0.1
+	qihao: 2019092005
+	
+二、撤单：
+1、General
+	Request URL: https://9912304.com/api/data.aspx
+	Request Method: POST
+	Status Code: 200 OK
+	Remote Address: 154.211.138.37:443
+	Referrer Policy: no-referrer-when-downgrade
+2、Response Headers
+	Cache-Control: private
+	Content-Encoding: gzip
+	Content-Length: 121
+	Content-Type: text/html; charset=utf-8
+	Date: Fri, 20 Sep 2019 03:34:43 GMT
+	Server: Microsoft-IIS/7.5
+	Vary: Accept-Encoding
+	X-AspNet-Version: 2.0.50727
+	X-Powered-By: ASP.NET
+3、Request Headers
+	Accept: */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 34
+	Content-Type: application/x-www-form-urlencoded
+	Cookie: ASP.NET_SessionId=0bpcp3u0gifyqwn0adyvy5u1; firstEnterUrlInSession=https%3A//9912304.com/kaijiang/list.aspx%3Flot%3Djxssc; pageReferrInSession=https%3A//9912304.com/kaijiang/list.aspx%3Flot%3Djxssc
+	Host: 9912304.com
+	Origin: https://9912304.com
+	Referer: https://9912304.com/jxssc/index.aspx
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+	X-Requested-With: XMLHttpRequest
+4、Query String Parameters
+	act: cancelsn
+	lot: jxssc
+	snid: 782296
+	
+	
+	
