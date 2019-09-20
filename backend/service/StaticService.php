@@ -1028,6 +1028,9 @@ class StaticService extends BaseService {
             $date = date('Y-m-d', $time);
             $date = min([date('Y-m-d'), $date]);
             if($date>date('Y-m-d')) break;
+            if($lottery_type == 6 && '00:00'<date('H:i:s') && date('Y-m-d')<'03:00'){
+                $date = date('Y-m-d', time()-86400);
+            }
             if($statics = self::staticSDPerDateProfits($date, $lottery_type)){
                 foreach ($statics as $k=>$staticData){
                     $kArr = self::$kArr;
