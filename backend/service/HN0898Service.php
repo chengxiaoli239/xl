@@ -1174,15 +1174,16 @@ class HN0898Service extends BaseTZService {
             case 6: # 新疆ssc
                 if ('23:40:00'<$time && $time<'23:59:55'){
                     $rst['actionNo'] = 42;
+                    $qihao = date("Ymd").sprintf("%02d", $rst['actionNo']);
                 }elseif('00:00:00'<$time && $time<'02:00:00'){
                     $where = ['AND',['=','type', $lottery_type],['>=', 'actionTime', $time],['between', 'actionTime','00:00:00','02:00:00']];
                     $rst = DataTime::find($where)->where($where)->asArray()->one();
-                    $date = '20'.date("ymd") - 1;
+                    $date = date("Ymd") - 1;
                     $qihao = $date.sprintf("%02d", $rst['actionNo']);
                 }else{
                     $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '" . $time . "' AND type=$lottery_type ORDER BY id ASC";
                     $rst = $db->createCommand($sql)->queryOne();
-                    $qihao = '20'.date("ymd").sprintf("%02d", $rst['actionNo']);
+                    $qihao = date("Ymd").sprintf("%02d", $rst['actionNo']);
                 }
                 break;
             case 7: # 北京快乐8

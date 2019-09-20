@@ -397,7 +397,7 @@ class NineNineBaseService extends BaseTZService {
         # 真实投注
         $start_time = microtime(true);
         $rst = CurlService::postCurl($url, http_build_query($post_data), $headers)[0];
-        //p([$rst,$url,http_build_query($post_data), $headers]);
+        //p([$rst,$url, $post_data,http_build_query($post_data), $headers]);
         $end_time = microtime(true);
         $time_consume = ($end_time - $start_time). 's';
         if($rst['err'] == -1 OR !$rst){
