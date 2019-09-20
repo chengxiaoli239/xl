@@ -853,6 +853,7 @@ class NineNineBaseService extends BaseTZService {
         self::__init($uid, $tz_system_id);
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $TzSiteInfo = self::getTzSiteInfo($TzSystemUser->tz_system_id, $lottery_type);
+        //p([$uid, $tz_system_id, $TzSystemUser, $TzSiteInfo]);
         $url = $TzSiteInfo['SSC_INDEX'];
         $headers = [
             "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36",
@@ -888,7 +889,6 @@ class NineNineBaseService extends BaseTZService {
         $preg = '/<tr>(.*?)<td>SSC(.*?)&nbsp;&nbsp;&nbsp;&nbsp;<a class="cancelsn" style="cursor:pointer;color:blue;" snid=(.*?)>点击撤单<\/a><\/td>(.*?)<td>(.*?)<\/td>(.*?)<td title="(.*?)" style="cursor:pointer;">(.*?)<a href="\.\.\/user\/sninfo\.aspx\?id=(.*?)" target\=\_blank>详细内容<\/a>(.*?)<\/td>(.*?)<td>(.*?)<\/td>(.*?)<td>(.*?)<\/td>/ism'; // 这里是表达式，大神看看
 
         preg_match_all($preg,$content,$matches);
-        //p($matches);
         unset($matches[0], $matches[1], $matches[4], $matches[6], $matches[8], $matches[9], $matches[10], $matches[11], $matches[13]);
         $matches = array_values($matches); # 0:方案号 1:记录id 2:期号 3:号码
         $datas = $matches;
@@ -920,27 +920,14 @@ class NineNineBaseService extends BaseTZService {
      * @param int $tz_system_id
      * @return array
      */
-    public static function getRemoteHzRecords($tz_system_user_id = 0){
-        /*
-        $alls = BettingRecords::find()->where(['AND',['=','LENGTH(codes)',32], ['<', 'id', 13502]])->all();
-        foreach ($alls as $all){
-            $codes = BettingRecords::find()->where(['id'=>11994])->one()->codes;
-            //p($codes);
-            $setData = [
-                'status' => 0,
-                'codes' => $codes,
-                'profits' => '',
-            ];
-            $all->setAttributes($setData);
-            $rst = $all->save();
-        }
-        p([$rst,$alls]);
-        */
+    public static function getRemoteHzRecords($uid = 0, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
+
         $rst = ['status'=>200, 'msg'=>'投注记录抓取成功~'];
         //if($uid != 11) return false;
-        $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        //p([$uid, $tz_system_id, $TzSystemsUsers]);
 
-        $lists = self::getTzList($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
+        $lists = self::getTzList($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $lottery_type);
         $lists = array_reverse($lists);
         foreach ($lists as $key=>$list){
             if(strlen($list['codes']) < 150) continue; # 非和值记录无需抓取

@@ -16,6 +16,7 @@ use backend\models\User;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\KuaiLe8Service;
 use backend\service\McKeyService;
+use backend\service\NineNine\NineNineBaseService;
 use backend\service\SevenService;
 use backend\service\SscDataService;
 use backend\service\TzService;
@@ -166,19 +167,21 @@ class IndexController extends Controller
      */
     public function actionGrabTzHzList(){
         self::_init();
-        $TzSystemsUsers = TzSystemsUsers::findAll(['status'=>1]);
+        $lottery_types = StaticService::getLotteryTypes();
+        $TzSystemsUsers = TzSystemsUsers::findAll(['status'=>1, 'tz_system_id'=>[1, 2]]);
+        foreach ($lottery_types as $lottery_type){
 
-        foreach ($TzSystemsUsers as $TzSystemsUser){
-            $TzSystems = TzSystems::findOne($TzSystemsUser->tz_system_id);
-            switch ($TzSystems->system_type_id){
-                case 1:
-                case 2:
-                    $rst = HN0898Service::getRemoteHzRecords($TzSystemsUser->id); # 抓取号码
-                    break;
-                case 3:
-                    break;
-                case 4: # 北京快乐8
-                    break;
+            foreach ($TzSystemsUsers as $TzSystemsUser){
+                switch ($TzSystemsUser->tz_system_id){
+                    case 1: # 0898
+                    case 2: # 99 彩票网
+                        $rst = NineNineBaseService::getRemoteHzRecords($TzSystemsUser->uid, $TzSystemsUser->tz_system_id, $lottery_type); # 抓取号码
+                        break;
+                    case 3:
+                        break;
+                    case 4: # 北京快乐8
+                        break;
+                }
             }
         }
         return $rst;

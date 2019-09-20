@@ -1028,7 +1028,7 @@ class StaticService extends BaseService {
             $date = date('Y-m-d', $time);
             $date = min([date('Y-m-d'), $date]);
             if($date>date('Y-m-d')) break;
-            if($lottery_type == 6 && '00:00'<date('H:i:s') && date('H:i:s')<'03:00'){
+            if($lottery_type == 6 && '00:00'<date('H:i:s') && date('H:i:s')<'10:00'){
                 $date = date('Y-m-d', time()-86400);
             }
             //$date = '2019-09-20'; $time = strtotime($date);

@@ -819,7 +819,6 @@ class HN0898Service extends BaseTZService {
      */
     public static function getSscIndexContent($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
-        $HN0898Service = new HN0898Service($uid, $tz_system_id);
         $url = NineNineBaseService::getTzSiteInfo($tz_system_id,$lottery_type, 'SSC_INDEX');
         $headers = [
             "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36",
@@ -879,71 +878,6 @@ class HN0898Service extends BaseTZService {
         }
 
         return $tzRecords;
-    }
-
-    /**
-     * @desc 获取和值投注记录，和值投注反应慢，异步获取
-     * @param $uid
-     * @param int $tz_system_id
-     * @return array
-     */
-    public static function getRemoteHzRecords($tz_system_user_id = 0){
-
-        $rst = ['status'=>200, 'msg'=>'投注记录抓取成功~'];
-        //if($uid != 11) return false;
-        $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);
-
-        $lists = self::getTzList($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
-        $lists = array_reverse($lists);
-        foreach ($lists as $key=>$list){
-            if(strlen($list['codes']) < 150) continue; # 非和值记录无需抓取
-            //$rand = rand(1,5); sleep($rand);
-
-            $setData = [];
-            if($BettingRecords = BettingRecords::findOne(['snid'=>$list['snid']])){
-                //if($key == 1) p(['FLAG:'.$list['snid'], 'codes'=>$list['codes']]);
-                if(strlen($BettingRecords->codes) != 32) continue;
-            }else{
-                $BettingRecords = new BettingRecords();
-                $setData['create_time'] = date('Y-m-d H:i:s');
-                $setData['createtime'] = time();
-                $setData['created_at'] = time();
-            }
-            $cancel_status = ['正常'=>0, '已撤单'=>1];
-            $uid = $TzSystemsUsers->uid;
-
-            $account = AdminModel::findOne($uid)->username;
-            //if($uid == 11)p(['account'=>$account]);
-            $codesArr = explode('@', $list['codes']);
-            $single = $list['totalmoney'] / count($codesArr);
-            $setData = array_merge($setData,[
-                'sn' => $list['sn'],
-                'snid' => $list['snid'],
-                'codes' => $list['codes'],
-                'qihao' => $list['qihao'],
-                'account' => $account,
-                'uid' => $uid,
-                'playway' => 3,
-                'tz_system_id' => $TzSystemsUsers->tz_system_id,
-                'lottery_type' => 5,
-                'tz_type' => 21,
-                'single' => $single,
-                'playway_name' => '四字定',
-                'betting_money' => $list['totalmoney'],
-                'is_simulate' => 0,
-                'cancel_status' => $cancel_status[$list['status_txt']] == 1 ? 1 : 0,
-                'lotteryclass' => 'ssc',
-                'updated_at' => time(),
-            ]);
-
-            $BettingRecords->setAttributes($setData);
-            //p($BettingRecords->attributes);
-            if(!$flag = $BettingRecords->save()){
-                p($BettingRecords->getErrors());
-            }
-        }
-
-        return $rst;
     }
 
     /**
