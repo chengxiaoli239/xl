@@ -52,6 +52,7 @@ class BettingRecordsController extends BaseController
         }
         */
         $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
+        $queryParams['BettingRecords']['lottery_type'] = $lottery_type;
 
         if($this->_user_id !== 1){
             $queryParams['BettingRecords']['uid'] = $this->_user_id;
