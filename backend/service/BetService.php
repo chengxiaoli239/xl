@@ -171,7 +171,7 @@ abstract class BetService extends BaseBetService {
     }
 
    /**
-     * @desc 判断当前期是否可以投注
+     * @desc 判断当前期是否可以自动化投注
      * @param int $lottery_type
      * @return mixed
      */
@@ -183,12 +183,17 @@ abstract class BetService extends BaseBetService {
         $m = \Yii::$app->cache;
         $status = $m->get($pkey);
 
+        $time = date('H:i:s');
         if($lottery_type == 7){
             # 北京快乐8
             $tz_systems_users_id = SystemConfig::findOne(['key'=>'kuaile8_get_kj_user_id'])->value;
             $TzSystemsUsers = TzSystemsUsers::findOne($tz_systems_users_id);
             $qihaoInfo = KuaiLe8Service::getPreTz($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $lottery_type);
             if($qihaoInfo['status'] != 200) $status = false;
+        }elseif($lottery_type == 6){ # 新疆
+            if(\Yii::$app->params['LOTTERY_TYPE_6_STOP_START_TIME'] < $time && $time < \Yii::$app->params['LOTTERY_TYPE_6_STOP_END_TIME']){
+                $status = false;
+            }
         }
 
         return $status;

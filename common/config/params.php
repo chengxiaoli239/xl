@@ -5,6 +5,8 @@ return [
     'user.passwordResetTokenExpire' => 3600,
     'ssc_kj_time_start' => '03:00',
     'ssc_kj_time_end' => '07:15',
+    'LOTTERY_TYPE_6_STOP_START_TIME' => '02:00', # 新疆截至投注开始时间
+    'LOTTERY_TYPE_6_STOP_END_TIME' => '10:00', # 新疆截至投注结束时间
     'AIP_API_ID' => '11617584',    // 百度AI APP ID
     'AIP_API_KEY' => 'YzH6ouHBfApZpGBzcauRCGst',    // 百度AI APP KEY
     'AIP_SECRET_KEY' => 'st2syHNBIjapDAXnZIG77ndnqo6LwI1B',    // 百度AI APP SECRET KEY

@@ -198,10 +198,7 @@ class IndexController extends Controller
             $rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
             return $rst;
         }
-        for ($i=0; $i<5; $i++){
-            $rst['bet'] = BetService::bet(); // 用户新计划投注，可正买可反买
-            sleep(2);
-        }
+        $rst['bet'] = BetService::bet(); // 用户新计划投注，可正买可反买
 
         return $rst;
     }
