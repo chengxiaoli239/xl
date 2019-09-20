@@ -450,7 +450,7 @@ class HN0898Service extends BaseTZService {
 
         $rst = ['status'=>300, 'msg'=>'操作成功'];
         //$url = HN0898Service::getUserUrlArr(self::$user_id,'CANCEL_ORDER');
-        $url = HN0898Service::getTzSiteInfo($tz_system_id,'CANCEL_ORDER');
+        $url = NineNineBaseService::getTzSiteInfo($tz_system_id,'CANCEL_ORDER');
         $post_data = [ 'act' => 'cancelsn', 'lot' => $lot, 'snid'=> $snid ];
         $headers = self::$headers;
 
@@ -888,21 +888,7 @@ class HN0898Service extends BaseTZService {
      * @return array
      */
     public static function getRemoteHzRecords($tz_system_user_id = 0){
-        /*
-        $alls = BettingRecords::find()->where(['AND',['=','LENGTH(codes)',32], ['<', 'id', 13502]])->all();
-        foreach ($alls as $all){
-            $codes = BettingRecords::find()->where(['id'=>11994])->one()->codes;
-            //p($codes);
-            $setData = [
-                'status' => 0,
-                'codes' => $codes,
-                'profits' => '',
-            ];
-            $all->setAttributes($setData);
-            $rst = $all->save();
-        }
-        p([$rst,$alls]);
-        */
+
         $rst = ['status'=>200, 'msg'=>'投注记录抓取成功~'];
         //if($uid != 11) return false;
         $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);

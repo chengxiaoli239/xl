@@ -50,7 +50,7 @@ abstract class BetService extends BaseBetService {
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网
             if($lottery_type == 5){ # 0898体系重庆
-                $BetService = new HN0898Service($uid, $tz_system_id);
+                $BetService = new NineNineService6($uid, $tz_system_id);
             }elseif ($lottery_type == 6){
                 $BetService = new NineNineService6($uid, $tz_system_id);
             }
@@ -695,7 +695,7 @@ abstract class BetService extends BaseBetService {
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网
             if($lottery_type == 5){ # 0898体系重庆
-                $rst = HN0898Service::cancelOrder($bet_id, $BettingRecords->tz_system_id);
+                $rst = NineNineBaseService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
             }elseif ($lottery_type == 6){
                 $rst = NineNineBaseService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
             }
