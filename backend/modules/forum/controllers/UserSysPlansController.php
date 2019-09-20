@@ -10,6 +10,7 @@ use backend\service\StaticService;
 use backend\service\TzService;
 use backend\service\UserService;
 use backend\service\UserSysPlansService;
+use common\service\CommonService;
 use Yii;
 use backend\models\UserSysPlans;
 use backend\models\searchs\UserSysPlans as UserSysPlansSearch;
@@ -50,11 +51,15 @@ class UserSysPlansController extends BaseController
         }
 
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        /*
         if(!$queryParams['UserSysPlans']['lottery_type']){
             $lottery_type = $lottery_types[0]['lottery_type'];
         }else{
             $lottery_type = $queryParams['UserSysPlans']['lottery_type'];
         }
+        */
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
+
         $queryParams['UserSysPlans']['lottery_type'] = $lottery_type;
         $dataProvider = $searchModel->search($queryParams);
 

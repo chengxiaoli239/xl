@@ -799,4 +799,28 @@ class  CommonService{
         return $data;
     }
 
+    /**
+     * @desc 返回用户默认的彩种类型
+     * @param $uid
+     * @param $queryParams
+     * @return int
+     */
+    public static function getIndexLotteryType($uid, $queryParams){
+        $m = \Yii::$app->cache;
+        $mkey = 'getIndexLotteryType_'.$uid;
+
+        if(!empty($queryParams)){
+            foreach ($queryParams as $queryParam){
+                $lottery_type = $queryParam['lottery_type'] ? $queryParam['lottery_type'] : DEFAULT_LOTTERY_TYPE;
+            }
+        }else{
+            $lottery_type = $m->get($mkey);
+            $lottery_type = $lottery_type ? $lottery_type : DEFAULT_LOTTERY_TYPE;
+        }
+
+        $m->set($mkey, $lottery_type, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
+
+        return $lottery_type;
+    }
+
 }

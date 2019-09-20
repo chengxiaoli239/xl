@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title) ?>
+            <?= Html::encode($this->title);Html::a(Yii::t('app', 'Create Kj Config'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']); ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">

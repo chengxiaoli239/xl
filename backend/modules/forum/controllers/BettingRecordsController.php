@@ -7,6 +7,7 @@ use backend\service\BetService;
 use backend\service\HN0898Service;
 use backend\service\StaticService;
 use backend\service\UserSysPlansService;
+use common\service\CommonService;
 use Yii;
 use backend\models\BettingRecords;
 use backend\models\searchs\BettingRecords as BettingRecordsSearch;
@@ -43,12 +44,14 @@ class BettingRecordsController extends BaseController
         $searchModel = new BettingRecordsSearch();
         $queryParams = Yii::$app->request->queryParams;
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        /*
         if(!$queryParams['BettingRecords']['lottery_type']){
             $lottery_type = $lottery_types[0]['lottery_type'];
         }else{
             $lottery_type = $queryParams['BettingRecords']['lottery_type'];
         }
-        $queryParams['BettingRecords']['lottery_type'] = $lottery_type;
+        */
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
 
         if($this->_user_id !== 1){
             $queryParams['BettingRecords']['uid'] = $this->_user_id;
@@ -65,7 +68,8 @@ class BettingRecordsController extends BaseController
             'dataProvider' => $dataProvider,
         ];
         if($this->_user_id !== 1){ # 超级管理员
-            return $this->render('index',$data);
+            return $this->render('index', $data);
+            //return $this->redirect(['index','BettingRecords[lottery_type]'=>$lottery_type]);
         }else{
             return $this->render('index_admin', $data);
         }

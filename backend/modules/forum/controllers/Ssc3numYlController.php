@@ -39,11 +39,15 @@ class Ssc3numYlController extends BaseController
         $searchModel = new Ssc3numYlSearch();
         $queryParams = Yii::$app->request->queryParams;
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        /*
         if(!$queryParams['Ssc3numYl']['lottery_type']){
             $lottery_type = $lottery_types[0]['lottery_type'];
         }else{
             $lottery_type = $queryParams['Ssc3numYl']['lottery_type'];
         }
+        */
+
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
         $queryParams['Ssc3numYl']['lottery_type'] = $lottery_type;
         $dataProvider = $searchModel->search($queryParams);
 

@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use common\service\CommonService;
 use Yii;
 use backend\models\SscDwHz;
 use backend\models\searchs\SscDwHz as SscDwHzSearch;
@@ -36,7 +37,12 @@ class SscDwHzController extends BaseController
     public function actionIndex()
     {
         $searchModel = new SscDwHzSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
+        $queryParams['SscDwHz']['lottery_type'] = $lottery_type;
+
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
