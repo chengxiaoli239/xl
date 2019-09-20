@@ -899,7 +899,7 @@ class StaticService extends BaseService {
 
         foreach ($tmpProfits as $tmpProfit){
             foreach ($tmpProfit as $date=>$tmp){
-                if($date != date('Y-m-d')) continue;
+                //if($date != date('Y-m-d')) continue;
                 if($date <= '2019-02-10') continue;
                 $setData = [];
                 if(!$Static4dProfits = Static4dProfitsPerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
@@ -1008,12 +1008,16 @@ class StaticService extends BaseService {
         $m = \Yii::$app->cache;
         $mkey = 'allDateStaticProfits_PERDATE_'.$lottery_type.'_25';
 
+        $flag = Static4dProfitsPerdate::find()->where(['lottery_type'=>$lottery_type])->count();
         $allStatic = [];
-        for($s=0; $s<5; $s++){
-            if(!$time = $m->get($mkey)) {
+        static $i = 5;
+        for($s=0; $s<$i; $s++){
+            if(!$flag OR !$time = $m->get($mkey)) {
                 $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
                 $time = $staticsStarTime;
+                $i = 20;
             }else{
+                $i = 5;
                 $time = $time + 24 * 3600;
             }
 
@@ -1045,11 +1049,15 @@ class StaticService extends BaseService {
         $mkey = 'allDateHzStaticProfits_PERDATE_10_'.$lottery_type;
 
         $allStatic = [];
-        for($s=0; $s<25; $s++){
-            if(!$time = $m->get($mkey)) {
+        $flag = StaticHzProfitsPerdate::find()->where(['lottery_type'=>$lottery_type])->count();
+        $i = 5;
+        for($s=0; $s<$i; $s++){
+            if(!$flag OR !$time = $m->get($mkey)) {
                 $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
                 $time = $staticsStarTime;
+                $i = 20;
             }else{
+                $i = 5;
                 $time = $time + 24 * 3600;
             }
 
@@ -1216,7 +1224,7 @@ class StaticService extends BaseService {
                     $profits[$date] = $profits[$date] - $countsNum * 0.1;
                 }
                 $counts += $countsNum;
-                p(['nums'=>$nums, 'rst'=>$codesArr, 'qihao'=>$data['qihao'], 'counts'=>$countsNum, 'data'=>$data, 'profits'=>$profits[$date]],0);
+                //p(['nums'=>$nums, 'rst'=>$codesArr, 'qihao'=>$data['qihao'], 'counts'=>$countsNum, 'data'=>$data, 'profits'=>$profits[$date]],0);
             }
             //p($counts);
             //$profits[$date] = $profits[$date] - $counts * 0.1;
@@ -1235,10 +1243,15 @@ class StaticService extends BaseService {
         $mkey = 'allHzStaticProfitsPerdate_01_'.$lottery_type;
 
         $allStatic = [];
-        for($s=0; $s<5; $s++){
-            if(!$time = $m->get($mkey)) {
-                $time = strtotime('-1 day');
+        $flag = StaticPerHzPerdateProfits::find()->count();
+        static $i = 5;
+        for($s=0; $s<$i; $s++){
+            if(!$flag OR !$time = $m->get($mkey)) {
+                $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
+                $time = $staticsStarTime;
+                $i = 20;
             }else{
+                $i = 5;
                 $time = $time + 24 * 3600;
             }
 
@@ -1432,13 +1445,15 @@ class StaticService extends BaseService {
         $mkey = 'allDateStatic3Nums_PERDATE_03_'.$lottery_type;
 
         $allStatic = [];
-        for($s=0; $s<5; $s++){
-            $Static3numArisePerdate = Static3numArisePerdate::find()->where(['lottery_type'=>$lottery_type])->all();
-            $flag = count($Static3numArisePerdate);
-            if(!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
-            if($beforeDays == 120 OR !$time = $m->get($mkey)) {
-                $time = strtotime('-120 days');
+        $flag = Static3numArisePerdate::find()->where(['lottery_type'=>$lottery_type])->count();
+        static $i = 5;
+        for($s=0; $s<$i; $s++){
+            if(!$flag OR !$time = $m->get($mkey)) {
+                $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
+                $time = $staticsStarTime;
+                $i = 20;
             }else{
+                $i = 5;
                 $time = $time + 24 * 3600 - 10 * 60;
             }
 
@@ -1486,13 +1501,15 @@ class StaticService extends BaseService {
         $mkey = 'allDateStaticCodeType_PERDATE_05_'.$lottery_type;
 
         $allStatic = [];
-        for($s=0; $s<5; $s++){
-            $StaticTables = StaticCodeTypeArisePerdate::find()->all();
-            $flag = count($StaticTables);
-            if(!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
-            if($beforeDays == 120 OR !$time = $m->get($mkey)) {
-                $time = strtotime('-120 days');
+        $flag = StaticCodeTypeArisePerdate::find()->where(['lottery_type'=>$lottery_type])->count();
+        static $i = 2;
+        for($s=0; $s<$i; $s++){
+            if(!$flag OR !$time = $m->get($mkey)) {
+                $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
+                $time = $staticsStarTime;
+                $i = 20;
             }else{
+                $i = 2;
                 $time = $time + 24 * 3600;
             }
 
@@ -1536,13 +1553,15 @@ class StaticService extends BaseService {
         $mkey = 'allDateStaticHz_PERDATE_05_'.$lottery_type;
 
         $allStatic = [];
-        for($s=0; $s<5; $s++){
-            $StaticTables = StaticHzArisePerdate::find()->all();
-            $flag = count($StaticTables);
-            if(!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
-            if($beforeDays == 120 OR !$time = $m->get($mkey)) {
-                $time = strtotime('-120 days');
+        $flag = StaticHzArisePerdate::find()->where(['lottery_type'=>$lottery_type])->count();
+        static $i = 2;
+        for($s=0; $s<$i; $s++){
+            if(!$flag OR !$time = $m->get($mkey)) {
+                $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
+                $time = $staticsStarTime;
+                $i = 20;
             }else{
+                $i = 2;
                 $time = $time + 24 * 3600;
             }
 

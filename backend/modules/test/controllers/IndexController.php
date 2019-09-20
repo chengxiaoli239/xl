@@ -104,6 +104,8 @@ class IndexController extends Controller
         p($datas);
     }
     public function actionDw(){
+        $miss = SscDataService::getSdHzYlHistoryMiss([30,31,32,33,34,35], $lottery_type = 6, 20000);p($miss);
+        $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type = 6); p($rst);# 和值每天数量统计
         self::_init();
         $kjDatas = XjSsc::getLotteryNoBatch();
         $kjDatas = array_reverse($kjDatas);
@@ -120,7 +122,6 @@ class IndexController extends Controller
         $data = XjSsc::getLotteryNoSevenDay();p($data);
         $data = XjSsc::getLotteryNo99();p($data);
         $rst = StaticService::opAllCodeTypeYl();p($rst);
-        $miss = SscDataService::getSdHzYlHistoryMiss([5,6,7,8,9,10], $lottery_type = 5, 20000);p($miss);
         for($i=1; $i<=59; $i++){
             $qihao = 190917000 + $i;
             $rst = SscDataService::insertSscKjDataDs($qihao);//p($rst);
@@ -138,7 +139,6 @@ class IndexController extends Controller
         $miss = SscDataService::getCodeTypeHistoryMiss('type_3', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $rst = KjDataGet::getNextQihaoByQihao('190525059',5);p($rst);
         $miss = SscDataService::getCodeTypeYlHistoryMiss('118', $lottery_type = 5, 10000);p($miss);
-        $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type = 5); p($rst);# 和值每天数量统计
         $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type=5); p($rst);# 号码类型每天数量统计
         $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 7);p($rst); # 上奖三字现
         $rst = StaticService::static2NumsYl($lottery_type = 7);p($rst);
