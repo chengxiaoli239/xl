@@ -18,7 +18,7 @@ use yii\helpers\Html;
 </div>
 ||
 <div class="btn-group">
-    <?= Html::a('四现带双', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>5, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0], ['class' => 'btn '.($code_type == 5 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+    <?= Html::a('四现带双', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>5, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_2]'=>1,'SscStaticYl[type_22]'=>0, 'SscStaticYl[type_3]'=>0], ['class' => 'btn '.($code_type == 5 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
 </div>
 <div class="btn-group">
     <?= Html::a('四现带双热码', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>501, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0, 'SscStaticYl[is_hots]'=>1], ['class' => 'btn '.($code_type == 501 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
@@ -41,16 +41,22 @@ use yii\helpers\Html;
 ||
 
 <div class="btn-group">
-    <?= Html::a('四单带双', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>9, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4d]'=>1, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0], ['class' => 'btn '.($code_type == 9 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+    <?= Html::a('四单带双', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>9, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4d]'=>1,'SscStaticYl[type_22]'=>0, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0], ['class' => 'btn '.($code_type == 9 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
 </div>
 <div class="btn-group">
-    <?= Html::a('四单带双热码', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>901, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4d]'=>1, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0, 'SscStaticYl[is_hots]'=>1], ['class' => 'btn '.($code_type == 901 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+    <?= Html::a('四单带双热码', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>901, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_22]'=>0,'SscStaticYl[type_4d]'=>1, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0, 'SscStaticYl[is_hots]'=>1], ['class' => 'btn '.($code_type == 901 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
 </div>
 
 ||
 <div class="btn-group">
-    <?= Html::a('四双带双', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>10, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4s]'=>1, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0], ['class' => 'btn '.($code_type == 10 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+    <?= Html::a('四双带双', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>10, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4s]'=>1, 'SscStaticYl[type_22]'=>0, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0], ['class' => 'btn '.($code_type == 10 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
 </div>
 <div class="btn-group">
-    <?= Html::a('四双带双热码', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>1001, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4s]'=>1, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0, 'SscStaticYl[is_hots]'=>1], ['class' => 'btn '.($code_type == 1001 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+    <?= Html::a('四双带双热码', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>1001, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_4s]'=>1,'SscStaticYl[type_22]'=>0, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0, 'SscStaticYl[is_hots]'=>1], ['class' => 'btn '.($code_type == 1001 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
 </div>
+
+||
+<div class="btn-group">
+    <?= Html::a('双双重', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>1002, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_22]'=>1, 'SscStaticYl[type_4s]'=>1, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0, 'SscStaticYl[is_hots]'=>1], ['class' => 'btn '.($code_type == 1002 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+</div>
+

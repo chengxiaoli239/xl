@@ -633,8 +633,8 @@ class NumService extends BaseService {
         }
 
 
-
-        if( isset($codes_hz['type_4d']) && isset($codes_hz['type_4s'])){
+        # 同时选择取、除四单四双
+        if( isset($codes_hz['type_4d']) OR isset($codes_hz['type_4s'])){
 
             if(($codes_hz['type_4s'] == 0 && $codes_hz['type_4d'] == 0) OR ($codes_hz['type_4s'] == 1 && $codes_hz['type_4d'] == 1) ){
                 # 同时除、取四单四双
