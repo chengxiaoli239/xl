@@ -1069,7 +1069,7 @@ class SscDataService extends BaseService {
      * @param $recently 多少期内，默认为
      * @return array
      */
-    public static function getCodeTypeYlHistoryMiss($value, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 2000){
+    public static function getCodeTypeYlHistoryMiss($value, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 2000, $isCache = 1){
         $m = \Yii::$app->cache;
         $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->orderBy('id DESC')->limit(1)->one();
         $mkey = 'getCodeTypeYlHistoryMiss_'.$lottery_type.'_'.$value;
@@ -1078,7 +1078,7 @@ class SscDataService extends BaseService {
 
         $staticFlag = BetService::getConfig('is_cache_data');
 
-        if(!$flag && $staticFlag && $rstData = $m->get($mkey)){
+        if($isCache && !$flag && $staticFlag && $rstData = $m->get($mkey)){
             $rstData['current_times'] = $rstData['current_times'] + 1;
             $qihao = HN0898Service::getQihao($lottery_type);
 
