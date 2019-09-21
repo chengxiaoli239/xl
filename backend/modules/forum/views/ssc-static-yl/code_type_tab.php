@@ -57,6 +57,6 @@ use yii\helpers\Html;
 
 ||
 <div class="btn-group">
-    <?= Html::a('双双重', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>1002, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_22]'=>1, 'SscStaticYl[type_4s]'=>1, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0, 'SscStaticYl[is_hots]'=>1], ['class' => 'btn '.($code_type == 1002 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+    <?= Html::a('双双重', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>1002, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_22]'=>1, 'SscStaticYl[type_3]'=>0, 'SscStaticYl[is_hots]'=>1], ['class' => 'btn '.($code_type == 1002 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
 </div>
 
