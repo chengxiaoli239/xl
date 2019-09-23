@@ -547,7 +547,7 @@ class SscDataService extends BaseService {
                     $rst = $SscDsYl->save();
                     if(!$rst){
                         $logArr = ['attributes'=>$SscDsYl->attributes, 'msg'=>$SscDsYl->getErrors()];
-                        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/static_SscDwsDsNums','INFO','统计号码出现次数', $logArr);
+                        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/static_SscDwsDsNums','INFO','统计号码出现次数', $logArr);
                     }
                 }
 
@@ -624,7 +624,7 @@ class SscDataService extends BaseService {
             $rst = $SscStaticYl->save();
             if(!$rst){
                 $logArr = ['attributes'=>$SscStaticYl->attributes, 'msg'=>$SscStaticYl->getErrors()];
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/updateCodeTypeYL','INFO','统计号码出现次数', $logArr);
+                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/updateCodeTypeYL','INFO','统计号码出现次数', $logArr);
             }
         }
 
@@ -686,7 +686,7 @@ class SscDataService extends BaseService {
             $rst = $SscStaticYl->save();
             if(!$rst){
                 $logArr = ['attributes'=>$SscStaticYl->attributes, 'msg'=>$SscStaticYl->getErrors()];
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/updateCodeTypeYL','INFO','统计号码出现次数', $logArr);
+                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/updateCodeTypeYL','INFO','统计号码出现次数', $logArr);
             }
         }
 
@@ -780,10 +780,10 @@ class SscDataService extends BaseService {
             //p([$rst,$SscStaticYl->attributes]);
             if(!$rst){
                 $logArr = ['attributes'=>$SscStaticYl->attributes, 'msg'=>$SscStaticYl->getErrors()];
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/updateCodeTypeYL','INFO','号码类型遗漏统计', $logArr);
+                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/updateCodeTypeYL','INFO','号码类型遗漏统计', $logArr);
             }
             $logArr = ['lottery_type'=>$lottery_type, 'type'=>$type, 'val'=>$dsData['val']];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/updateCodeTypeYL','INFO','号码类型遗漏统计', $logArr);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/updateCodeTypeYL','INFO','号码类型遗漏统计', $logArr);
         }
 
 
@@ -1997,7 +1997,7 @@ class SscDataService extends BaseService {
             $rst = $SscSdHzYl->save();
             if(!$rst){
                 $logArr = ['attributes'=>$SscSdHzYl->attributes, 'msg'=>$SscSdHzYl->getErrors()];
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Y-m-d').'/updateSdHzYl','INFO','四定和值遗漏统计', $logArr);
+                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/updateSdHzYl','INFO','四定和值遗漏统计', $logArr);
             }
 
         }

@@ -104,6 +104,7 @@ class IndexController extends Controller
         }
         p($datas);
     }
+
     public function actionDw(){
 
         $snid = NineNineBaseService::getSnidBySn('JXSSC1909201535157573FFE1', $lottery_type = 6); p($snid);// 获取方案内容
