@@ -908,7 +908,7 @@ class Tool_Common
     
     public static function getId() {
         if (!self::$_traceId) {
-            self::$_traceId = time() . rand(10000, 99999);
+            self::$_traceId = time() . rand(100, 999);
         }
         return self::$_traceId;
     }

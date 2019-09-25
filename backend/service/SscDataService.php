@@ -96,6 +96,7 @@ class SscDataService extends BaseService {
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
         $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
 
+        //p([$next_qihao, $last_qihao]);
         if($next_qihao<=$last_qihao){
             $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
             if(!$new_qihao){ # 防止官网某一期不开的情况, 自动获取开奖表下一期的开奖号码
@@ -1314,8 +1315,9 @@ class SscDataService extends BaseService {
             'last_time_miss_range' => $last_time_miss_range,    // 上次遗漏范围
             'max_miss' => $max_miss,   // 近200期内的最大遗漏
             'max_range' => $max_range,   // 近200期内的最大遗漏范围
+            'val' => implode(',', $zuHes),
             'yl_str' => $yl_str,
-            'zihes' => $zuHes,
+            //'zihes' => $zuHes,
         ];
         //p($rstData);
 

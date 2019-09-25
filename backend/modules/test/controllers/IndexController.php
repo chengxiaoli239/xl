@@ -107,13 +107,15 @@ class IndexController extends Controller
 
     public function actionDw(){
 
+        $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
+        $rst['updateDs'] = SscDataService::updateDsData($lottery_type=6); // 每期开奖遗漏
+        $miss = SscDataService::getSdHzYlHistoryMiss([30,31,32,33,34,35], $lottery_type = 6, 20000);p($miss);
         $snid = NineNineBaseService::getSnidBySn('JXSSC1909201535157573FFE1', $lottery_type = 6); p($snid);// 获取方案内容
         $rst = HN0898Service::getRemoteHzRecords(3, 2);p($rst);
         for ($i=0;$i<20;$i++){ # 统计数据
             //$rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type = 6); //p($rst);# 号码类型每天数量统计
             $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type = 6); //p($rst);# 和值每天数量统计
         }p($rst);
-        $miss = SscDataService::getSdHzYlHistoryMiss([30,31,32,33,34,35], $lottery_type = 6, 20000);p($miss);
         self::_init();
         $kjDatas = XjSsc::getLotteryNoBatch();
         $kjDatas = array_reverse($kjDatas);
@@ -142,7 +144,6 @@ class IndexController extends Controller
         $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 5);p($rst);
         $rst = HN0898Service::synBalance(4);p($rst);
         $miss = SscDataService::getCodeTypeHistoryMiss('type_3b,type_2', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
-        $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
         $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type = 5); p($rst);# 单双利润统计(month)
         $miss = SscDataService::getCodeTypeHistoryMiss('type_3', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $rst = KjDataGet::getNextQihaoByQihao('190525059',5);p($rst);
@@ -212,7 +213,6 @@ class IndexController extends Controller
        $rst = StaticService::static4dMonthsProfits();p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
         $domain = BaseKj::getApiHost(8);p($domain);
         p('xxx');
-        $rst['updateDs'] = SscDataService::updateDsData($lottery_type=5); // 每期开奖遗漏
         $beforeQihao = KjDataGet::getBeforeQihaoByQihao('190525001');p($beforeQihao);
         $rst = NumService::getCodesArise(['9377']);p(count($rst));
         $arr = ['type_2b'=>1, 'hz'=>[11,12,13,14,15,16,24]]; p(json_encode($arr));
