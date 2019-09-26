@@ -68,6 +68,7 @@ class UserController extends BaseController
 
         $model->tz_systems_ids = explode(',', $model->tz_systems_ids);
         $model->tz_types = explode(',', $model->tz_types);
+        CommonService::delUserTzTypesCache($uid);
 
         $allSystems = CommonService::getAllSystems();
         $allTzTypes = CommonService::getAllTzTypes();

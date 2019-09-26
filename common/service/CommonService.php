@@ -829,4 +829,30 @@ class  CommonService{
         return $lottery_type;
     }
 
+    /**
+     * @desc 生成用户默认投注方式key
+     * @param $uid
+     * @return string
+     */
+    public static function buildMyTzTypes($uid, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $mkey = 'getMyTzTypes_data_'.$lottery_type.'_'.$uid;
+
+        return $mkey;
+    }
+
+    /**
+     * @desc 删除用户授权的投注方式缓存
+     * @param $uid
+     */
+    public static function delUserTzTypesCache($uid){
+
+        $m = \Yii::$app->cache;
+        $lottery_types = StaticService::getLotteryTypes();
+        foreach ($lottery_types as $lottery_type) {
+            $mkey = CommonService::buildMyTzTypes($uid, $lottery_type);
+            $rst[$lottery_type] = $m->delete($mkey);
+        }
+
+        return $rst;
+    }
 }

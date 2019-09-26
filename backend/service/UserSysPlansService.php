@@ -17,6 +17,7 @@ use backend\models\TzTypes;
 use backend\models\UserCustomPlans;
 use backend\models\UserSysPlans;
 use common\models\AdminModel;
+use common\service\CommonService;
 use yii\helpers\ArrayHelper;
 use  yii;
 
@@ -354,7 +355,7 @@ class UserSysPlansService extends BaseService {
     public static function getMyTzTypes($uid, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
         $m = \Yii::$app->cache;
-        $mkey = 'getMyTzTypes_data_'.$lottery_type.'_'.$uid;
+        $mkey = CommonService::buildMyTzTypes($uid, $lottery_type);
         if($tzTypeArr = $m->get($mkey)) return $tzTypeArr;
         $tz_types_Arr = explode(',', TzSystemsAuth::find()->where(['uid'=>$uid])->one()->tz_types);
 
