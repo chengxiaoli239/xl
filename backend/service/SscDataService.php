@@ -545,6 +545,7 @@ class SscDataService extends BaseService {
                     //}
                     $SscDsYl->history_max_miss = max($miss['current_times'],$SscDsYl->max_miss,$SscDsYl->history_max_miss); // 6、历史最大遗漏
                     $SscDsYl->update_time = date('Y-m-d H:i:s');
+                    //p($SscDsYl);
                     $rst = $SscDsYl->save();
                     if(!$rst){
                         $logArr = ['attributes'=>$SscDsYl->attributes, 'msg'=>$SscDsYl->getErrors()];
@@ -950,6 +951,7 @@ class SscDataService extends BaseService {
         }
         //$where = "$field=$num AND id>$min_id";
         $SscKjDataDs = SscKjDataDs::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
+        //p($SscKjDataDs);
 
         if(count($SscKjDataDs)>1){
             $last_times = $SscKjDataDs[0]->index_id - $SscKjDataDs[1]->index_id - 1;  // 上次遗漏次数
@@ -1276,7 +1278,8 @@ class SscDataService extends BaseService {
 
         $where = ['AND', ['IN', 'codes_4nums_hz', $zuHes], ['>=', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
         $SscKjData = SscKjData::find()->select(['id','index_id','qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
-        //p([$zuHes, $last, $SscKjData[0]->id, $SscKjData[1]->id]);
+        //p($SscKjData);
+        //p([$where, $zuHes, $last, $SscKjData[0]->id, $SscKjData[1]->id, $recently]);
         if(count($SscKjData)>1){
             $last_times = $SscKjData[0]->index_id - $SscKjData[1]->index_id - 1;  // 上次遗漏次数
         }
@@ -2064,8 +2067,76 @@ class SscDataService extends BaseService {
         return $rst;
     }
 
+    /**
+     * @desc 获取号码的四字全导号码， 预计提供给开奖之后用，系统推荐投注号码
+     * @param array $codes
+     * @return array
+     */
+    public static function getAccountCodes($codesArr = ['1234']){
+        $codesData = [];
+        $m = \Yii::$app->cache;
+        foreach ($codesArr as $code){
+            $mkey = 'getAccountCodes_'.$code;
+            if(!$data = $m->get($mkey)){
+                $data = NumService::getAllCombination4($code); # 获取全倒号码
+                $m->set($mkey, $data, 24 * 3600 * 30); # 30天
+            }
+
+            $codesData = array_merge($codesData, $data);
+        }
+
+        return $codesData;
+    }
+
+    /**
+     * @desc 统计排除多少期内的号码投注利润
+     * @param int $sumNums 最近sumNums期内利润
+     * @param int $beforeQishus 取前beforeQishus号码
+     * @return float
+     */
+    public static function calulateBeforeProfits($sumNums = 500, $beforeQishus = 277, $nBeforeQishus = 30, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+        $min_id = $last['last_id'] - $sumNums + 1;
+        $qs = [
+            '0_0_0' => 24,
+            '0_0_1' => 12,
+            '0_1_1' => 16,
+            '1_1_1' => 1,
+        ];
+
+        $staticQishus = ['统计最近期数'=>$sumNums, '排除前期数'=>$beforeQishus, 'y'=>0, 'n'=>0];
+        $where = ['AND', ['>=', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
+        $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'qihao', 'code_4n'])->where($where)->asArray()->all();
+        $tzZushu = 0;
+        foreach ($SscKjDatas as $SscKjData){
+            $sumMinIndexId = $SscKjData['index_id'] - $beforeQishus;
+            //$sumMaxIndexId = $SscKjData['index_id'] - $nBeforeQishus;
+            $sumMaxIndexId = $SscKjData['index_id'] - 1;
+            $where = ['AND', ['>=', 'index_id', $sumMinIndexId], ['<', 'index_id', $sumMaxIndexId], ['=', 'lottery_type', $lottery_type]];
+            $beforeKjCodes = SscKjData::find()->select(['qihao', 'code_4n', 'type_4', 'type_3', 'type_2'])->where($where)->asArray()->all();
+            foreach ($beforeKjCodes as $beforeKjCode){
+                # 投注组数统计
+                $tzZushu += $qs[$beforeKjCode['type_4'].'_'.$beforeKjCode['type_3'].'_'.$beforeKjCode['type_2']];
+            }
+            //p([$tzZushu, $beforeKjCode['qihao']]);
+            $kjCodes = yii\helpers\ArrayHelper::getColumn($beforeKjCodes, 'code_4n');
+            if(in_array($SscKjData['code_4n'], $kjCodes)){
+                # 中奖
+                $staticQishus['y'] += 1;
+            }else{
+                # 不中奖
+                $staticQishus['n'] += 1;
+            }
+        }
+        $staticQishus['tzZushu'] = $tzZushu;
 
 
+        return $staticQishus;
+    }
+
+    public static function getNotLastCodes(){
+
+    }
 
 
 

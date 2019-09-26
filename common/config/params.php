@@ -21,6 +21,6 @@ return [
     # 日志目录
     'LOG_PATH' => 'lottery_xl',
 
-    # 基础数据缓存时间
+    # 基础数据缓存时间 2 分钟
     'BASE_DATA_CACHE_TIME' => 1200,
 ];
