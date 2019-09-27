@@ -22,32 +22,33 @@ use Yii;
  * @property int $nums 默认投注注数
  * @property int $sel_same 是否含上次一样的号码
  * @property int $is_custom 是否智能切换购买方向
- * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
+ * @property int $is_test 是否为系统测试计划
+ * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
  */
 class UserSysPlans extends \common\models\base\BaseModel
 {
-    public $type_2; # 双重
-    public $type_3; # 三重
-    public $type_4; # 四重
-    public $type_22; # 双双重
-    public $type_2b; # 两兄弟
-    public $type_3b; # 三兄弟
-    public $type_4b; # 四兄弟
-    public $hz; # 四兄弟
-    public $arise; # 上奖
-    public $p1; # 第1位
-    public $p2; # 第2位
-    public $p3; # 第3位
-    public $p4; # 第4位
-    public $type_4d; # 四单
-    public $type_4s; # 四双
-    public $type_log; # 对数
-    public $import_codes_txt; # 导入号码
-    //public $type_3_txt; # 三定-导入
-    //public $type_4_txt; # 四定-导入
+   public $type_2; # 双重 
+   public $type_3; # 三重 
+   public $type_4; # 四重 
+   public $type_22; # 双双重 
+   public $type_2b; # 两兄弟 
+   public $type_3b; # 三兄弟 
+   public $type_4b; # 四兄弟 
+   public $hz; # 四兄弟 
+   public $arise; # 上奖 
+   public $p1; # 第1位 
+   public $p2; # 第2位 
+   public $p3; # 第3位 
+   public $p4; # 第4位 
+   public $type_4d; # 四单 
+   public $type_4s; # 四双 
+   public $type_log; # 对数 
+   public $import_codes_txt; # 导入号码 
+   //public $type_3_txt; # 三定-导入 
+   //public $type_4_txt; # 四定-导入 
     /**
      * @inheritdoc
      */
@@ -62,7 +63,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['uid', 'account', 'created_at', 'updated_at'], 'required'],
             [['single'], 'number'],
             [['update_time'], 'safe'],
@@ -93,7 +94,8 @@ class UserSysPlans extends \common\models\base\BaseModel
             'nums' => '默认投注注数',
             'sel_same' => '是否含上次一样的号码',
             'is_custom' => '是否智能切换购买方向',
-            'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分',
+            'is_test' => '是否为系统测试计划',
+            'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
             'created_at' => '创建时间',
             'updated_at' => '更新时间',
             'update_time' => '更新时间',
@@ -109,4 +111,3 @@ class UserSysPlans extends \common\models\base\BaseModel
         return new UserSysPlansQuery(get_called_class());
     }
 }
-
