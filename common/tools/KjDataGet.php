@@ -239,7 +239,7 @@ class KjDataGet
             'date' => date('Y-m-d',strtotime($tmpDate)),
         ];
 
-        SscDataService::getAriseCodes(implode('', $codesArr)); # 缓存开奖号码四定组合
+        SscDataService::getAriseCodes([implode('', $codesArr)]); # 缓存开奖号码四定组合
 
         if(!$kjDatas) return false;
         if (!$SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type])) {
