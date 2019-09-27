@@ -63,7 +63,7 @@ class TzService extends BaseService {
      */
     public static function tz(){
 
-        $where = ['AND', ['=', 'status', 1], ['=', 'uid', 0], ['=', 'is_parent', 1]];
+        $where = ['AND', ['=', 'status', 1], ['=', 'uid', 0], ['=', 'is_parent', 1], ['=', 'is_test', 1]];
         if($plans = UserSysPlans::find()->where($where)->groupBy('playway,tz_type')->all()) {
             // 1、投注前判断
             foreach ($plans as $plan){

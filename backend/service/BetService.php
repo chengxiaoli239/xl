@@ -143,7 +143,7 @@ abstract class BetService extends BaseBetService {
             $qihao = HN0898Service::getQihao($lottery_type);
             $tzStatus = BetService::isCanBet($lottery_type);
             if (!$tzStatus) continue;
-            $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['>', 'uid', 0], ['=', 'is_parent', 1]];
+            $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['>', 'uid', 0], ['=', 'is_parent', 1], ['=', 'is_test', 0]];
             $plans = UserSysPlans::find()->where($where)->all();
             if ($plans) {
                 $datas = [];
@@ -312,6 +312,8 @@ abstract class BetService extends BaseBetService {
                     }
                 }elseif($tz_type == 25){ # 过滤
                     $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true));
+                }elseif($tz_type == 26){ # 去除近xxx期号码
+                    $codesArr = NumService::getNotLatelyCodes(json_decode($codes_hz, true));
                 }else{
                     $params = ['playway'=>$playway, 'tz_type'=>$tz_type];
                     $SysPlansCodes = SysPlansCodes::find()->where($params)->orderBy(['rand()' => SORT_DESC])->asArray()->all();

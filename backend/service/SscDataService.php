@@ -2072,7 +2072,7 @@ class SscDataService extends BaseService {
      * @param array $codes
      * @return array
      */
-    public static function getAccountCodes($codesArr = ['1234']){
+    public static function getAriseCodes($codesArr = ['1234']){
         $codesData = [];
         $m = \Yii::$app->cache;
         foreach ($codesArr as $code){

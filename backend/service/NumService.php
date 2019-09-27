@@ -850,6 +850,32 @@ class NumService extends BaseService {
 
     }
 
+    /**
+     * @desc 去除最近多少期号码 - 四定
+     * @param array $code_hz
+     * @return array
+     */
+    public static function getNotLatelyCodes($code_hz = ['lately_start'=>0, 'lately_end'=>400], $lottery_type = DEFAULT_LOTTERY_TYPE){
+
+        $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+
+        $startIndexId = $last['last_id'] - $code_hz['lately_end'];
+        $endIndexId = $last['last_id'] - $code_hz['lately_start'];
+        $where = ['AND', ['>=', 'index_id', $startIndexId], ['<=', 'index_id', $endIndexId], ['=', 'lottery_type', $lottery_type]];
+        $areaKjCodes = SscKjData::find()->select(['qihao', 'code_4n', 'type_4', 'type_3', 'type_2'])->where($where)->asArray()->all();
+        $code_4ns = ArrayHelper::getColumn($areaKjCodes, 'code_4n');
+
+        $latelyCodes = SscDataService::getAriseCodes($code_4ns); # 缓存开奖号码四定组合 ,最近开奖号码全倒
+        $latelyCodes = array_unique($latelyCodes);
+        //p(count($latelyCodes));
+
+        $codes = Num4Type::find()->where(['AND', ['>', 'id', 0], ['not in', 'code', $latelyCodes]])->asArray()->all();
+
+        $codesArr = ArrayHelper::getColumn($codes, 'code');
+
+        return $codesArr;
+    }
+
 
 
 

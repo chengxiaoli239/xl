@@ -203,7 +203,7 @@ class IndexController extends Controller
         return $rst;
     }
     /**
-     * @desc 自动化投注新入口
+     * @desc 自主研发方案系统测试自动化投注入口
      * @return array
      */
     public function actionTz(){
