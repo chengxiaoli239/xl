@@ -2094,7 +2094,7 @@ class SscDataService extends BaseService {
      * @param int $beforeQishus 取前beforeQishus号码
      * @return float
      */
-    public static function calulateBeforeProfits($sumNums = 500, $beforeQishus = 277, $nBeforeQishus = 30, $lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function calulateBeforeProfits($sumNums = 500, $beforeQishus = 277, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
         $min_id = $last['last_id'] - $sumNums + 1;
         $qs = [
@@ -2134,9 +2134,74 @@ class SscDataService extends BaseService {
         return $staticQishus;
     }
 
-    public static function getNotLastCodes(){
+    /**
+     * @desc 获取某一天排除掉最近$beforeQishus期的号码利润
+     * @param string $date 统计日期
+     * @param int $beforeQishus 排除的最近$beforeQishus期号码全倒
+     * @return float
+     */
+    public static function getOneDateBeforeProfits($date = '2019-09-28', $beforeQishus = 400, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $profits = 0.00;
 
+        $where = ['AND', ['=', "FROM_UNIXTIME(created_at,'%Y-%m-%d')", $date], ['=', 'lottery_type', $lottery_type]];
+        $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'qihao', 'code_4n'])->where($where)->asArray()->all();
+        foreach ($SscKjDatas as $SscKjData){
+            $profits += self::getProfitsBeforeProfitsByQihao($SscKjData['qihao'], $beforeQishus, $lottery_type);
+        }
+
+        return $profits;
     }
+
+    /**
+     * @desc 获取某一期排除前beforeeQishu期后投注利润
+     * @param $qihao
+     * @param int $beforeQishus 前xx期
+     * @param int $lottery_type
+     * @param int $direction 1取2排除
+     */
+    public static function getProfitsBeforeProfitsByQihao($qihao, $beforeQishus = 400, $lottery_type = DEFAULT_LOTTERY_TYPE, $direction = 2){
+
+        $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
+
+        $qs = [
+            '0_0_0' => 24,
+            '0_0_1' => 12,
+            '0_1_1' => 16,
+            '1_1_1' => 1,
+        ];
+
+        $index_id = $SscKjData->index_id;
+
+        $sumMinIndexId = $index_id - $beforeQishus;
+        $sumMaxIndexId = $index_id - 1;
+
+        $staticQishus = ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, '排除前期数'=>$beforeQishus, 'y'=>0, 'n'=>0];
+        $where = ['AND', ['>=', 'index_id', $sumMinIndexId], ['<', 'index_id', $sumMaxIndexId], ['=', 'lottery_type', $lottery_type]];
+        $beforeKjCodes = SscKjData::find()->select(['qihao', 'code_4n', 'type_4', 'type_3', 'type_2'])->where($where)->asArray()->all();
+
+        //p([$tzZushu, $beforeKjCode['qihao']]);
+        $kjCodes = yii\helpers\ArrayHelper::getColumn($beforeKjCodes, 'code_4n');
+        if($direction == 1){
+            $tzCodes = $kjCodes;
+        }else{
+            $codes = Num4Type::find()->where(['AND', ['>', 'id', 0], ['not in', 'code', $kjCodes]])->asArray()->all();
+            $tzCodes = yii\helpers\ArrayHelper::getColumn($codes, 'code');
+        }
+
+
+        if(in_array($SscKjData['code_4n'], $tzCodes)){
+            # 中奖
+            $staticQishus['y'] = 1;
+            $staticQishus['profits'] = 995 - count($tzCodes) * 0.1;
+        }else{
+            # 不中奖
+            $staticQishus['n'] = 1;
+            $staticQishus['profits'] = 0 - count($tzCodes) * 0.1;
+        }
+
+        return $staticQishus;
+    }
+
 
 
 
