@@ -774,16 +774,44 @@ class SevenService extends BaseTZService {
         return $times;
     }
 
+    public static function getSessionId($url, $header){
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($curl, CURLOPT_SSLVERSION, 3);
+
+        $content = curl_exec($curl);
+        //preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
+        preg_match("/document.cookie\=\'([^\r\n]*)\'/i", $content, $matches);
+
+        $roboot_id = str_replace('; path=/; domain=.xs1699778.com','', $matches[1]);
+        $logArr = ['content'=>$content, 'roboot_id'=>$roboot_id];
+        if(curl_error($curl)>0){
+            $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
+            Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
+        }
+
+        return $roboot_id;
+
+    }
+
     /**
      * @description 获取cookie并写表lt_tz_systems_users，场景：未登录情况下
      * @param $uid
      * @param $tz_system_id
      * @return mixed
      */
-    public static function getCookie($uid,$tz_system_id){
+    public static function getCookie($uid,$tz_system_id, $robot7_session_id=''){
         self::__init($uid, $tz_system_id);
         $m = \Yii::$app->cache;
         $mkey = 'UPDATE_COOKIE_TIME_'.$uid.'_'.$tz_system_id;
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         //if(!$cookie = $m->get($mkey)){
             //p(HN0898Service::getTzSiteInfo($tz_system_id));
             # 1、预登录
@@ -791,21 +819,31 @@ class SevenService extends BaseTZService {
             $url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/Login'.'?_'.$_t;
             if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
             $headers = [
-                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+                'Accept-Encoding: gunzip, deflate',
+                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                //$robot7_session_id,
                 'Upgrade-Insecure-Requests: 1',
+                'Proxy-Connection: keep-alive',
                 'Host: '.SevenService::getTzSiteInfo($tz_system_id,'domain'),
-                //'Referer: '.$url,
+                'Cache-Control: max-age=0',
+                'Referer: '.$url,
+                $TzSystemsUsers->user_agent,
             ];
-            $cookie = CurlService::curl_get_cookie($url, $headers);
+            $robot7_session_id = self::getSessionId($url, $headers);
+            $headers[] = 'Cookie: '.$robot7_session_id;
+            $cookie = self::curlGetSevenCookie($url, $headers);
             $cookieData = $cookie;
+            //p($cookieData);
             if($cookieData){
                 $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-                $TzSystemsUsers->cookie = trim($cookieData);
+                $TzSystemsUsers->cookie = $robot7_session_id.';'.trim($cookieData);
                 $TzSystemsUsers->cookie = str_replace('; path=/; HttpOnly','', $TzSystemsUsers->cookie);
                 $TzSystemsUsers->save();
             }
             self::$headers = [];
             $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
+            //p($logArr);
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
             $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
             $cookie = str_replace('; path=/; HttpOnly','',$cookie);
@@ -813,6 +851,42 @@ class SevenService extends BaseTZService {
         //}
         return $cookie;
     }
+
+    /**
+     *curl get请求
+     */
+    public static function curlGetSevenCookie($url,$header = []){
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($curl, CURLOPT_SSLVERSION, 3);
+
+        $content = curl_exec($curl);
+        //preg_match_all("/Set\-cookie:([^\r\n]*)[\; path=\/\; Httponly]/i", $content, $matches);
+        preg_match_all("/Set-Cookie: (.*)/i", $content, $matches);
+        //p($matches,0);
+        $cookies = $matches[1];
+        $logArr = ['cookies'=>$cookies, 'matches'=>$matches, 'content'=>$content];
+        //p(['url'=>$url, 'header'=>$header, 'matches'=>$matches, 'content'=>$content, 'errno'=>curl_error($curl)]);
+        if(curl_error($curl)>0){
+            $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
+            Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
+        }
+        $data = '';
+        foreach ($cookies as $cookie){
+            $data .= str_replace('; path=/; HttpOnly','',trim($cookie)).';';
+        }
+        $data = str_replace("; path=/; Httponly;",'',$data);
+
+        return $data;
+    }
+
 
     /**
      * @desc 下载图片验证码
@@ -844,6 +918,12 @@ class SevenService extends BaseTZService {
         return true;
     }
 
+    /**
+     * @desc 登陆处理
+     * @param int $uid
+     * @param int $tz_system_id
+     * @return array|bool|mixed|string
+     */
     public static function login($uid = 1, $tz_system_id = 1){
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         if($TzSystemsUsers->balance > 0) {
@@ -948,7 +1028,6 @@ class SevenService extends BaseTZService {
         //sleep(10);
         HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
-        //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
         return $data;
     }
