@@ -2161,43 +2161,45 @@ class SscDataService extends BaseService {
      */
     public static function getProfitsBeforeProfitsByQihao($qihao, $beforeQishus = 400, $lottery_type = DEFAULT_LOTTERY_TYPE, $direction = 2){
 
-        $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
+        if(empty($qihao)) return [];
 
-        $qs = [
-            '0_0_0' => 24,
-            '0_0_1' => 12,
-            '0_1_1' => 16,
-            '1_1_1' => 1,
-        ];
+        $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
 
         $index_id = $SscKjData->index_id;
 
         $sumMinIndexId = $index_id - $beforeQishus;
         $sumMaxIndexId = $index_id - 1;
 
-        $staticQishus = ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, '排除前期数'=>$beforeQishus, 'y'=>0, 'n'=>0];
-        $where = ['AND', ['>=', 'index_id', $sumMinIndexId], ['<', 'index_id', $sumMaxIndexId], ['=', 'lottery_type', $lottery_type]];
+        $staticQishus = ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, '排除前期数'=>$beforeQishus.'期', 'y'=>0, 'n'=>0];
+        $where = ['AND', ['>=', 'index_id', $sumMinIndexId], ['<=', 'index_id', $sumMaxIndexId], ['=', 'lottery_type', $lottery_type]];
         $beforeKjCodes = SscKjData::find()->select(['qihao', 'code_4n', 'type_4', 'type_3', 'type_2'])->where($where)->asArray()->all();
 
-        //p([$tzZushu, $beforeKjCode['qihao']]);
+        $code_4ns = yii\helpers\ArrayHelper::getColumn($beforeKjCodes, 'code_4n');
+        $latelyCodes = SscDataService::getAriseCodes($code_4ns); # 缓存开奖号码四定组合 ,最近开奖号码全倒 code_4ns:['1234','6789'] latelyCodes:['1,2,3,4', '1,2,4,3', '1,3,2,4', '1,3,4,2'.....]
+        $latelyCodes = array_unique($latelyCodes);
+
+        $latelyCodesNums = count($latelyCodes);
+
         $kjCodes = yii\helpers\ArrayHelper::getColumn($beforeKjCodes, 'code_4n');
         if($direction == 1){
+            $tzNums = $latelyCodesNums; # 统计投注多少注数, 正向(取)：投注号码为最近400号码
             $tzCodes = $kjCodes;
         }else{
+            $tzNums = 10000 - $latelyCodesNums; # 统计投注多少注数, 反向(除): 投注号码为出去最近400期号码后剩下的号码
             $codes = Num4Type::find()->where(['AND', ['>', 'id', 0], ['not in', 'code', $kjCodes]])->asArray()->all();
             $tzCodes = yii\helpers\ArrayHelper::getColumn($codes, 'code');
         }
 
-
         if(in_array($SscKjData['code_4n'], $tzCodes)){
             # 中奖
             $staticQishus['y'] = 1;
-            $staticQishus['profits'] = 995 - count($tzCodes) * 0.1;
+            $staticQishus['profits'] = 995 - $tzNums * 0.1;
         }else{
             # 不中奖
             $staticQishus['n'] = 1;
-            $staticQishus['profits'] = 0 - count($tzCodes) * 0.1;
+            $staticQishus['profits'] = 0 - $tzNums * 0.1;
         }
+        $staticQishus['tzNums'] = $tzNums;
 
         return $staticQishus;
     }
