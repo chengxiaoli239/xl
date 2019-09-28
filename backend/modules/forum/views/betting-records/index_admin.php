@@ -5,7 +5,7 @@ use yii\grid\GridView;
 use yii\widgets\Pjax;
 use yii\helpers\BaseStringHelper;
 use backend\models\SscKjData;
-$newRecord = SscKjData::find()->select(['qihao','code_str'])->orderBy('id DESC')->asArray()->limit(1)->one();
+$newRecord = SscKjData::find()->select(['qihao','code_str'])->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->asArray()->limit(1)->one();
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\searchs\BettingRecords */
 /* @var $dataProvider yii\data\ActiveDataProvider */
