@@ -111,6 +111,51 @@ class CqsscKcw extends BaseKj {
     }
 
     /**
+     * @desc 1998彩票集团网：https://www.20041998.com/
+     * @param string $returnType
+     * @return array|bool
+     */
+    public static function getLotteryNoOneNineNineEight($returnType = 'json'){
+
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $domain = BaseKj::getApiHost(17);
+            sleep(3);
+            $_t = microtime(true) * 10000;
+            $url = $domain.'/static/data/1CurIssue.json?_t='.$_t;
+            //$content = file_get_contents($url);
+            $content = CurlService::httpGet($url);
+            $data = $content;
+
+            if (!$data) return false;
+            $str1 = substr($data['issue'], 0, 8);
+            $str2 = substr($data['issue'], 8, 3);
+            $kjData['expect'] = $str1 . '-' .$str2;
+            $kjData['opencode'] = $data['nums'];
+            $kjData['opentime'] = $data['opentime'];
+            //$kjData = ['expect'=>20190925-006, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
+        }
+        $opencode = $kjData['opencode'];
+        $opentime = $kjData['opentime'];
+        $expect = $kjData['expect'];
+
+        self::setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kcw', 'INFO', '号码抓取-kcw', $logArr);
+
+        return $rst;
+
+    }
+
+    /**
      * @desc 希腊ssc
      * @param string $returnType
      * @param int $type

@@ -42,6 +42,16 @@ class CqsscController extends Controller
     }
 
     /**
+     * @desc 1998彩票集团网：https://www.20041998.com/
+     * @return json|xml
+     */
+    public function actionOneNineNineEight($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = CqsscKcw::getLotteryNoOneNineNineEight($type);
+        return $data;
+    }
+
+    /**
      * @desc 7天
      * @return json|xml
      */

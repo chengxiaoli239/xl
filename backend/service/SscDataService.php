@@ -2138,7 +2138,7 @@ class SscDataService extends BaseService {
         $profits = [];
         $time = strtotime('2019-08-01');
 
-        for ($i=0; $i<10; $i++){
+        for ($i=0; $i<30; $i++){
             $date = date('Y-m-d', $time+$i*24*3600);
             $profits[$date] = self::getOneDateBeforeProfits($date, $beforeQishus = 400, $lottery_type);
         }

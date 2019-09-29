@@ -106,6 +106,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = CqsscKcw::getLotteryNoOneNineNineEight($type='xml');p($data);
         $profits = SscDataService::getSomeDatesBeforedProfits($lottery_type = 5);p($profits);
         $profits = SscDataService::getProfitsBeforeProfitsByQihao($qihao='190929001', $beforeQishus = 400, $lottery_type = 5);p($profits);
         $rst = SevenService::login(19, 3);p($rst);
