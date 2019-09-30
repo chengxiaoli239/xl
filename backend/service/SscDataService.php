@@ -729,6 +729,7 @@ class SscDataService extends BaseService {
                 $SscStaticYl->type_4ds = (int)$dsData['type_4ds'];
                 $SscStaticYl->type_log = (int)$dsData['type_log'];
             }
+            $SscStaticYl->codes_hz = $dsData['codes_hz'];
             $SscStaticYl->static_nums = $dsData['static_nums'];
             //$vals = explode(',', $dsData['val']); //p([$dsData, $count]);
             $SscStaticYl->updated_at = time();
@@ -1787,30 +1788,32 @@ class SscDataService extends BaseService {
             ]);
             if($type == 3){
                 # 1、三字
-                $code = $code[0].','.$code[1].','.$code[2];
-                $type_2 = CommonService::isCodeType2_3z($code);
-                $type_3 = CommonService::isCodeType3_3z($code);
+                $code_str = $code[0].','.$code[1].','.$code[2];
+                $type_2 = CommonService::isCodeType2_3z($code_str);
+                $type_3 = CommonService::isCodeType3_3z($code_str);
                 $setData = array_merge($setData, [
                     'type_2' => $type_2,
                     'type_3' => $type_3,
+                    'codes_hz' => $code[0] + $code[1] + $code[2],
                 ]);
 
             }elseif ( $type == 4 ){
                 # 四字
-                $code = $code[0].','.$code[1].','.$code[2].','.$code[3];
-                $ds = CommonService::isCodeType4ds($code); # 是否四单双：0非四单四双1四单2四双
+                $code_str = $code[0].','.$code[1].','.$code[2].','.$code[3];
+                $ds = CommonService::isCodeType4ds($code_str); # 是否四单双：0非四单四双1四单2四双
                 $setData = array_merge($setData, [
-                    'type_2' => CommonService::isCodeType2($code),
-                    'type_3' => CommonService::isCodeType3($code),
-                    'type_4' => CommonService::isCodeType4($code),
-                    'type_2b' => CommonService::isCodeType2b($code),
-                    'type_3b' => CommonService::isCodeType3b($code),
-                    'type_4b' => CommonService::isCodeType4b($code),
-                    'type_22' => CommonService::isCodeType22($code),
+                    'codes_hz' => $code[0] + $code[1] + $code[2] + $code[3],
+                    'type_2' => CommonService::isCodeType2($code_str),
+                    'type_3' => CommonService::isCodeType3($code_str),
+                    'type_4' => CommonService::isCodeType4($code_str),
+                    'type_2b' => CommonService::isCodeType2b($code_str),
+                    'type_3b' => CommonService::isCodeType3b($code_str),
+                    'type_4b' => CommonService::isCodeType4b($code_str),
+                    'type_22' => CommonService::isCodeType22($code_str),
                     'type_4d' => $ds == 1 ? 1 : 0,
                     'type_4s' => $ds == 2 ? 1 : 0,
                     'type_4ds' => in_array($ds, [1,2]) ? 1 : 0,
-                    'type_log' => CommonService::isCodeTypeLog($code),
+                    'type_log' => CommonService::isCodeTypeLog($code_str),
                 ]);
 
             }
