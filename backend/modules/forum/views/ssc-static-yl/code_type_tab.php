@@ -59,4 +59,7 @@ use yii\helpers\Html;
 <div class="btn-group">
     <?= Html::a('双双重', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>1002, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_22]'=>1, 'SscStaticYl[type_3]'=>0, 'SscStaticYl[is_hots]'=>1], ['class' => 'btn '.($code_type == 1002 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
 </div>
+<div class="btn-group">
+    <?= Html::a('全部四现', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>1003, 'SscStaticYl[type]'=>4], ['class' => 'btn '.($code_type == 1003 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+</div>
 

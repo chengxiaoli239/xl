@@ -63,6 +63,7 @@ class SscStaticYl extends SscStaticYlModel
         $query->andFilterWhere([
             'id' => $this->id,
             'current_miss' => $this->current_miss,
+            'codes_hz' => $this->codes_hz,
             'last_time_miss' => $this->last_time_miss,
             'max_miss' => $this->max_miss,
             'history_max_miss' => $this->history_max_miss,

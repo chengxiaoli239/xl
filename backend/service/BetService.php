@@ -175,10 +175,10 @@ abstract class BetService extends BaseBetService {
      * @param int $lottery_type
      * @return mixed
      */
-    public static function isCanBet($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function isCanBet($lottery_type = DEFAULT_LOTTERY_TYPE, $is_test = ''){
 
         $qihao = HN0898Service::getQihao($lottery_type);
-        $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao);
+        $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao).$is_test;
 
         $m = \Yii::$app->cache;
         $status = $m->get($pkey);
@@ -581,10 +581,10 @@ abstract class BetService extends BaseBetService {
      * @param $qihao
      * @return bool
      */
-    public static function afterBetNow($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao){
+    public static function afterBetNow($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao, $is_test = ''){
         $m = \Yii::$app->cache;
 
-        $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao);
+        $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao). $is_test;
 
         $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
         $rst = $m->set($pkey, 0, $time);
