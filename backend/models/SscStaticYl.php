@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $val 和值范围
+ * @property int $codes_hz 号码和值
  * @property int $current_miss 本期遗漏
  * @property int $last_time_miss 上次遗漏
  * @property string $last_time_miss_range 上次遗漏范围
@@ -55,7 +56,7 @@ class SscStaticYl extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'ytd_nums', 'lottery_type', 'type', 'status', 'created_at', 'updated_at', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4d', 'type_4s', 'type_log', 'type_4ds'], 'integer'],
+            [['codes_hz', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'ytd_nums', 'lottery_type', 'type', 'status', 'created_at', 'updated_at', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4d', 'type_4s', 'type_log', 'type_4ds'], 'integer'],
             [['yl_records'], 'string'],
             [['update_time'], 'safe'],
             [['val', 'last_time_miss_range', 'max_range'], 'string', 'max' => 64],
@@ -71,6 +72,7 @@ class SscStaticYl extends \common\models\base\BaseModel
         return [
             'id' => 'ID',
             'val' => '和值范围',
+            'codes_hz' => '号码和值',
             'current_miss' => '本期遗漏',
             'last_time_miss' => '上次遗漏',
             'last_time_miss_range' => '上次遗漏范围',
