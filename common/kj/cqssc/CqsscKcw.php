@@ -82,7 +82,7 @@ class CqsscKcw extends BaseKj {
             //$data = json_decode($content,320);
             $data = $content[0];
 
-            if (!$data) return false;
+            if (!isset($data['issue']) OR !$data) return false;
             $str = substr($data['issue'], 0, 8);
             $kjData['expect'] = str_replace($str, $str . '-', $data['issue']);
             $kjData['opencode'] = implode(',', $data['openNum']);
