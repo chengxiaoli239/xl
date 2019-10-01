@@ -104,7 +104,7 @@ class KjDataGet
         foreach ($KjConfigs as $kjConfig){
             $lottery_type = $kjConfig->lottery_type;
             $url = $kjConfig->host.$kjConfig->path;
-            $data = CurlService::httpGet($url);
+            if(!$data = CurlService::httpGet($url)) continue;
             if($kjConfig->is_batch == 1){
                 $kjDatas = $data;
                 if($kjDatas){
