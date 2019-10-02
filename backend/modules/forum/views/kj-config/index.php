@@ -14,14 +14,19 @@ $this->params['breadcrumbs'][] = $this->title;
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title);Html::a(Yii::t('app', 'Create Kj Config'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']); ?>
+            <?= Html::encode($this->title);?>
+            <div class="btn-group">
+                <?= Html::a(Yii::t('app', 'Create Kj Config'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+            </div>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
                 <div class="clearfix">
+                    <?php foreach ($lottery_types as $lottery_type): ?>
                     <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'Create Kj Config'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                        <?= Html::a($lottery_type['name'], ['index', 'KjConfig[lottery_type]'=>$lottery_type['lottery_type']], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
+                    <?php endforeach;?>
                 </div>
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>

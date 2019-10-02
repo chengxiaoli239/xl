@@ -382,7 +382,12 @@ class UserSysPlansService extends BaseService {
         $m = \Yii::$app->cache;
         $mkey = 'getMyLotteryTypes_data_'.$uid;
         //if($typeDatas = $m->get($mkey)) return $typeDatas;
-        $lottery_types = explode(',', TzSystemsAuth::find()->where(['uid'=>$uid])->one()->lottery_types);
+        if($uid>1){
+            $where = ['uid'=>$uid];
+        }else{
+            $where = '1=1';
+        }
+        $lottery_types = explode(',', TzSystemsAuth::find()->where($where)->one()->lottery_types);
 
         $datas = LotteryType::find()->where(['lottery_type'=>$lottery_types])->asArray()->all();
         $tmpDatas = [];
