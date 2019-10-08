@@ -8,6 +8,7 @@
  */
 
 namespace backend\service\Lucky;
+use backend\service\Lucky5\LuckyBaseService;
 use  yii;
 
 class Lucky5Service extends LuckyBaseService {

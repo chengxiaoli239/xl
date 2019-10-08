@@ -505,7 +505,7 @@ class TzService extends BaseService {
     /**
      * @desc 更新时时彩开奖时间
      */
-    public static function insertCqSscDataTime($lottery_type = 6){
+    public static function insertCqSscDataTime($lottery_type = 5){
         $actionNo = 59;
         $setData = [];
         $dateTime = strtotime('2019-02-15 00:10:00');
@@ -569,7 +569,7 @@ class TzService extends BaseService {
     public static function insertLuckyDataTime($lottery_type = 8){
         $actionNo = 288;
         $setData = [];
-        $dateTime = strtotime('2019-10-01 10:00:00');
+        $dateTime = strtotime('2019-02-15 00:00:00');
         for ($i=1; $i<=$actionNo; $i++){
             $setData['type'] = $lottery_type;  # lottery_type 5 重庆时时彩
             $setData['actionNo'] = $i;
@@ -584,9 +584,7 @@ class TzService extends BaseService {
             $HIS = date('H:i:s', $dateTime);
             $setData['actionTime'] = $HIS;
             $setData['stopTime'] = $HIS;
-            //p($i.'='.$HI, 0);
             $DataTime->setAttributes($setData);
-            //p($DataTime->attributes);
             $rst = $DataTime->save();
         }
         return ['status'=>200, 'msg'=>'更新时时彩开奖', 'rst'=>$rst];

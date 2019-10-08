@@ -807,7 +807,7 @@ class SevenService extends BaseTZService {
      * @param $tz_system_id
      * @return mixed
      */
-    public static function getCookie($uid,$tz_system_id, $robot7_session_id=''){
+    public static function getCookie($uid, $tz_system_id){
         self::__init($uid, $tz_system_id);
         $m = \Yii::$app->cache;
         $mkey = 'UPDATE_COOKIE_TIME_'.$uid.'_'.$tz_system_id;

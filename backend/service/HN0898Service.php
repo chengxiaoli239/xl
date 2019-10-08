@@ -1123,6 +1123,15 @@ class HN0898Service extends BaseTZService {
             case 7: # 北京快乐8
                 $qihao = 967767 + self::getdifferentdays() * 179 + self::getDifferentNums() + 1; # 967767为2019-08-10最后一期期号
                 break;
+            case 8:
+                $time = date("H:i:s", time());
+                $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC LIMIT 1";
+                $rst = $db->createCommand($sql)->queryOne();
+
+                $actionNo = $rst['actionNo'];
+
+                $qihao = date("ymd").sprintf("%03d", $actionNo);
+                break;
         }
 
         return $qihao;
@@ -1171,9 +1180,13 @@ class HN0898Service extends BaseTZService {
                 $qihao = 967767 + $days * 179 + $nums; # 967767为2019-08-10最后一期期号
                 break;
             case 8: # 幸运五星彩
-                $days = self::getDifferentDays();
-                $nums = self::getDifferentNums();
-                $qihao = 967767 + $days * 179 + $nums; # 967767为2019-08-10最后一期期号
+                $time = date("H:i:s", time() - 5 * 60);
+                $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC LIMIT 1";
+                $rst = $db->createCommand($sql)->queryOne();
+
+                $actionNo = $rst['actionNo'];
+
+                $qihao = date("ymd").sprintf("%03d", $actionNo);
                 break;
         }
 

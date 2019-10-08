@@ -13,6 +13,7 @@ use backend\models\LotteryType;
 use backend\models\SystemConfig;
 use backend\models\User;
 use backend\service\huiyuan\KuaiLe8Service;
+use backend\service\Lucky5\LuckyBaseService;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineService6;
 use common\kj\cqssc\CqsscKcw;
@@ -54,10 +55,12 @@ abstract class BetService extends BaseBetService {
             }elseif ($lottery_type == 6){
                 $BetService = new NineNineService6($uid, $tz_system_id);
             }
-        }elseif(in_array($tz_system_id, [3])){
-            # 3、重庆7时彩网
+        }elseif(in_array($tz_system_id, [3, 7])){
+            # 3、重庆7时彩网：重庆7时彩、幸运五星彩
             if($lottery_type == 5){ # 7时彩重庆
                 $BetService = new SevenService($uid, $tz_system_id);
+            }elseif($lottery_type == 8){ # 幸运五星彩
+                $BetService = new LuckyBaseService($uid, $tz_system_id);
             }
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
@@ -91,15 +94,15 @@ abstract class BetService extends BaseBetService {
      * @return string
      */
     public static function getCodes($system_type_id, $tz_type, $buy_type, $sel_same = 1, $hz_Arr = [], $plan_id = ''){
-        //p([$system_type_id, $tz_type, $buy_type, $single, $sel_same, $hz_Arr]);
+        //p([$system_type_id, $tz_type, $buy_type, $sel_same, $hz_Arr]);
         switch ($system_type_id){ # system_type_id = lt_system_type.id
-            case 1: # 重庆0898 系统
+            case 1: # 重庆0898系统
             case 3: # 希腊彩系统
             case 4: # 北京快乐8
                 $codes = BetService::getPlansAllCodesType1($tz_type, $buy_type, $sel_same, $hz_Arr, $plan_id);
                 break;
-            case 2:
-                # 7时彩
+            case 2: # 7时彩 重庆时时彩
+            case 5: # 7时彩 幸运五分彩
                 $codes = BetService::getPlansAllCodesType2($tz_type, $buy_type, $sel_same, $hz_Arr, $plan_id);
                 break;
             default: break;

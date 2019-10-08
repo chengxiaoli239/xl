@@ -107,6 +107,7 @@ class CurlService extends BaseService{
 
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
         if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);

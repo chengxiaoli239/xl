@@ -14,7 +14,7 @@ use backend\models\TzSystemsUsers;
 use backend\service\BetService;
 use backend\service\huiyuan\HuiYuanService5;
 use backend\service\KuaiLe8Service;
-use backend\service\Lucky\LuckyBaseService;
+use backend\service\Lucky5\LuckyBaseService;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NumService;
 use backend\service\SevenService;
@@ -108,6 +108,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = TzService::insertLuckyDataTime(); p($rst);
+        $rst = LuckyBaseService::synBalance($tz_system_users_id = 15); p($rst);# 同步余额
         $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);p($data);
         $data = Lucky5::getLotteryLucky();p($data);
         $data = Lucky5::getLotteryNo();p($data);

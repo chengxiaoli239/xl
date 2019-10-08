@@ -7,7 +7,7 @@
  * Time: 09:40
  */
 
-namespace backend\service\Lucky;
+namespace backend\service\Lucky5;
 use backend\models\BettingRecords;
 use backend\models\SscKjData;
 use backend\models\SystemConfig;
@@ -22,12 +22,13 @@ use backend\service\CurlService;
 use backend\service\HN0898Service;
 use backend\service\SscDataService;
 use backend\tools\Tools;
+use common\models\AdminModel;
 use common\service\CaptchaCodeService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
 
-class LuckyBaseService extends BaseTZService {
+class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
     public static $baseUrl =  '';
     public static $domain =  '';
     public static $cookie = '';
@@ -102,10 +103,10 @@ class LuckyBaseService extends BaseTZService {
         \Yii::$app->params['domain']  = str_replace('http://','',$TzSystemUser->ssc_domain);
         $tzSiteInfo = [
             'baseUrl' => $TzSystemUser->ssc_domain,
-            'domain' => \Yii::$app->params['domain'],
             'CANCEL_ORDER' => $baseUrl.'/Member/CancelMemberBet',
             'ORDER_TZ' => $baseUrl.'/Member/BatchBet',
             'SSC_INDEX' => $baseUrl,
+            'domain' => \Yii::$app->params['domain'],
             'MULBET_URL' => $baseUrl.'/api/betNumber', # 下注接口
             'GetPeriodsQuery' => $baseUrl.'/api/Periods/GetPeriodsQuery',
             'INDEX' => $baseUrl.'/index.aspx',
@@ -152,33 +153,10 @@ class LuckyBaseService extends BaseTZService {
     }
 
     /**
-     * @desc 同步用户余额
-     * @return mixed
-    public static function synUsersBalance(){
-        $users = User::findAll(['status'=>1]);
-        foreach ($users as $key=>$user){
-            $balance = self::getBalance($user->id);
-            $user->balance = $balance;
-            $rst = $user->save();
-        }
-
-        return $rst;
-    }
-     */
-
-    /**
-     * @decription 同步用户余额 by user_id
-     * @param $user_id
-     */
-    public static function synBalanceByUserId($user_id){
-        //self::synBalance($user_id);
-    }
-
-    /**
      * @decription 根据账号获取cookie
      * @param $account
      */
-    public static function getCookieByAccount($account,$tz_system_id){
+    public static function getCookieByAccount($account, $tz_system_id){
         //$user = User::find()->select(['cookie'])->where(['account'=>$account])->asArray()->one();
         $TzSystemsUsers = TzSystemsUsers::findOne(['account'=>$account,'tz_system_id'=>$tz_system_id]);
 
@@ -211,112 +189,105 @@ class LuckyBaseService extends BaseTZService {
     /**
      * @decription 新版投注，真实投注入口， 未完待续 2018.12.23
      *
+     * @param $tz_system_id
+     * @param $account
+     * @param int $playway
+     * @param $code
+     * @param $single
      * @param $qihao
-     * @param $plan_id
-     * @param $codes
+     * @param $tz_type
+     * @param $buy_type
+     * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
      * @return array
      */
     public function bet($qihao, $plan_id, $codes){
-        $time = date('H:i');
-        //p([$qihao, $plan_id, 'codes'=>$codes]);
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
         $tz_type = $plan->tz_type ? $plan->tz_type : 0;
         $buy_type = $plan->buy_type ? $plan->buy_type : 1;
         $lottery_type = $plan->lottery_type;
+        //p(['playway'=>$playway, 'totalCount'=>count($codes), 'single'=>$single, 'qihao'=>$qihao, 'tz_type'=>$tz_type, 'buy_type'=>$buy_type,'codes'=>$codes]);
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
-
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id]);
-        $account = $TzSystemsUsers->username;  # 投注用户账号，自动化平台账号
-
-        $m = \Yii::$app->cache;
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
-        $qihaoInfo = self::getPreTz(self::$user_id, self::$tz_system_id, $lottery_type);
-        if(strpos($qihaoInfo['msg'], '请重新登录')){
-            $TzSystemsUsers->cookie = '';
-            $TzSystemsUsers->balance = '';
-            $TzSystemsUsers->save();
-            $betPreKey = 'plan_bet_pre_'.self::$user_id;
-            if($request_times = $m->get($betPreKey)){
-                $request_times = $request_times + 1;
-                if($request_times>5) return ['status'=>300, 'msg'=>'网络异常请稍后重试'];
-            }else{
-                $request_times = 1;
-            }
-            $loginRst = HuiYuanBaseService::login(self::$user_id, $TzSystemsUsers->tz_system_id);
-            if($loginRst['status'] == 300){
-                $request_times = $request_times + 1;
-                $m->set($betPreKey, $request_times, 5*60);
-                HuiYuanBaseService::login(self::$user_id, $TzSystemsUsers->tz_system_id);
-            }
-            $BetService = new HuiYuanBaseService(self::$user_id, $TzSystemsUsers->tz_system_id);
-            $rst = $BetService->bet($qihao, $plan_id, $codes);
-            return $rst;
-        }
-        //p([self::$user_id, self::$tz_system_id, $lottery_type, $qihaoInfo]);
-        if($qihaoInfo['status'] != 200) return $qihaoInfo;
 
         # 验证
-        $rst = self::validateBettingContent($playway, $codes); # codes:13579,,13579,,@13579,,13579,,
+        $rst = self::validateBettingContent($playway,$codes);
         if($rst['status'] != 200){
             $data = ['status'=>300, 'msg'=>$qihao.$rst['msg']];
         }
+        $totalCount = count($codes); # 注数
+        $totalBetMoney = $totalCount * $single; # 投注总金额
+        $way = self::getWay($tz_type);
 
-        $bet_codes = self::formCodesStyle($codes, $playway, $plan->single);
-        //p(['codes'=>$codes, 'bet_codes'=>$bet_codes]);
+        $bet_codes = $codes;
+        $isBigNumsBet = BetService::isBigNumsBet($tz_type);
+        if($isBigNumsBet){
+            $bet_codes = str_replace(',','',$bet_codes);
+            $bet_codes = str_replace('@',',',$bet_codes);
+        }
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
 
+        //$post_data = ['totalCount'=>$totalCount, 'totalBetMoney'=>$totalBetMoney, 'bets'=>json_encode($codes), 'way'=>$way, 'period_no'=>'20'.$qihao, 'bet_log'=>urlencode('投注：'.$totalCount.'/'.$single.'注,总共：'.$totalBetMoney.'元'), ];
         $post_data = [
-            'PeriodId' => $qihaoInfo['PeriodsID'],
-            'LotteryId' => self::getLotteryId($lottery_type),	# 备注：2重庆时时彩、18快乐8
-            'BetNumber' => $bet_codes,
-            'BetAmt'=> $single,
-            'BetWayId' => self::getWayId($playway),
-            'UserName' => $TzSystemsUsers->account,
+            'bet_number'=>$bet_codes,
+            'bet_money'=>$single,
+            'bet_way'=>$way,
+            'is_xian'=>0,
+            'number_type'=>40,
+            'is_iframe'=>1,
+            //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
+            'bet_log'=>'[四定位]，合分值范围：[0-36]',
+            'is_package' => 0,
+            'period_no'=>'20'.$qihao,
+            'operation_condition' => self::getOperationCondition(),
+
+            //'totalBetMoney'=>$totalBetMoney,
+            //'bets'=>json_encode($codes),
         ];
 
+        $_t = microtime(true) * 10000;
         $data['code'] = $codes;
-        $strLen = strlen(http_build_query($post_data));
         $headers = [
-            'Accept: application/json, text/plain, */*',
-            'Accept-Encoding: gzip, deflate',
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'Accept-Encoding: gunzip, deflate',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Cache-Control: max-age=0',
             'Connection: keep-alive',
-            'Content-Length:'.$strLen,
+            'Content-Length:'.strlen(http_build_query($post_data)),
             'Content-Type: application/x-www-form-urlencoded',
-            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
             'Cookie: '.$TzSystemsUsers->cookie,
+            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
             'Origin: '.$TzSystemsUsers->ssc_domain,
-            'Referer: '.$TzSystemsUsers->ssc_domain.'/',
-            'Token:'.self::getCookieDataByKey($TzSystemsUsers->cookie, 'Token'),
-            'type: '.self::getType($lottery_type),
+            'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+            'Upgrade-Insecure-Requests: 1',
             $TzSystemsUsers->user_agent,
         ];
 
-        //$headers = array_merge(self::$headers, $headers);
+        //$headers = array_merge(self::$headers,$header);
+        //p($headers);
         //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
-        $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL'); # .'?'.http_build_query($post_data);
+        $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL').'?'.http_build_query($post_data);
 
+        $account = AdminModel::findOne(self::$user_id)->username;  # 投注用户账号
         //p(['headers'=>$headers, 'url'=>$url, 'account'=>$account, 'post_data'=>$post_data]);
 
         # 缓存锁
+        $m = \Yii::$app->cache;
         $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
-        if($betLock = $m->get($betKey)){
-            return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
-        }
+        if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
-        if(in_array($tz_type, [20,23,25,19])){
+        if(in_array($tz_type, [20, 23, 25, 26])){
             # 和值投注反应时间比较久，无需返回直接锁住
-            $time = 60*18;
-            if(substr($qihao,6) == '010') $time = 60 * 60 * 4; # 十小时
+            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);
         }
         # 真实投注
         $start_time = microtime(true);
-        //p([$url,$post_data, $headers, $playway]);
-        $rst = CurlService::postCurl($url, http_build_query($post_data), $headers);
+        //$rst = CurlService::httpPost($url, $post_data, $headers);
+        $rst = CurlService::postCurl($url, $post_data, $headers);
         //$rst = json_encode($rst);
-        //p([$playway, $rst,$url,$post_data, $headers]);
+        //p(['rst'=>$rst,'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers]);
         $end_time = microtime(true);
         $time_consume = ($end_time - $start_time). 's';
         if($rst['Status'] != 1 OR !$rst){
@@ -324,13 +295,26 @@ class LuckyBaseService extends BaseTZService {
             if($tz_type != 20){
                 $tzRst['code'] = $codes;
             }
+            if($rst['Status'] == 5 && strpos($rst['Data'], '登录') !== false){ # 您的状态已经超时，请重新登录、请登录
+                # 投注失败提示登陆：执行登陆并且再次投注
+                $rst = self::login(self::$user_id, self::$tz_system_id);
+                # 投注
+                BetService::tzByPlanId($plan_id, 1);
+            }
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
             return $tzRst;
         }
-        $time = 600;
-        //if(substr($qihao,6) == '023') $time = 60 * 60 * 10; # 十小时
-        if('00:00'<date('H:i') && date('H:i')<'09:00') $time = 60 * 60 * 10; # 十小时
+
+        $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
         $m->set($betKey, 1, $time);
+
+        //p($rst,0);
+        //$position = UserFollowData::findOne(self::$plan_id)->position;
+        //$position = $position ? $position : self::$position;
+
+        if(!$isBigNumsBet){
+            $codes = implode('@', self::getMySiteCodesStyle($codes, $playway));
+        }
 
         $n = count(explode('@',$codes));
         if(in_array($playway, [2, 3]) && $tz_type != 20){
@@ -339,15 +323,15 @@ class LuckyBaseService extends BaseTZService {
             $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
         }
         # 获取方案号，记录id, 用于撤单
-        //$snInfo = SevenService::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+        $snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
 
         $insertData = [
             'playway'=> $playway,  // 投注方式
             'tz_type'=> $tz_type,  // 投注类型
             'buy_type'=> $buy_type,  // 购买方向类型
             'uid'=> self::$user_id,  // 投注账号id
-            'account' => $account,
             'lottery_type' => $lottery_type, # 彩种
+            'account' => $account,
             'plan_id' => $plan_id, # 计划id
             'codes' => (string)$codes,  // 投注号码
             'qihao' => $qihao,  // 投注期号
@@ -359,7 +343,6 @@ class LuckyBaseService extends BaseTZService {
             'single' => $single,  // 投注倍数
             'betting_money'=> $totalmoney,  // 投注金额
         ];
-        //p($insertData);
         $insertRst = BetService::_logRecords($insertData);
         self::$headers = [];
 
@@ -384,6 +367,32 @@ class LuckyBaseService extends BaseTZService {
         if(!empty($playway) && isset($rstData[$playway])) return $rstData[$playway];
 
         return $rstData;
+    }
+
+    /**
+     * @desc 根据playway、tz_type 获取投注方式
+     * @param int $tz_type
+     * @return array|mixed
+     */
+    public static function getWay($tz_type = 20){
+        $rstData = [
+            20 => 102,
+        ];
+
+        if(isset($rstData[$tz_type])) return $rstData[$tz_type];
+
+        return 108;
+        //return $rstData;
+    }
+
+    /**
+     * @desc 返回和值投注
+     * @return string
+     */
+    public static function getOperationCondition(){
+        $json = '{"symbol":"X","isXian":0,"firstNumber":"","secondNumber":"","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":40,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[30,35],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[0,0,0,0],"symbolPositions":[],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}';
+
+        return $json;
     }
 
     /**
@@ -677,7 +686,7 @@ class LuckyBaseService extends BaseTZService {
         $rst = self::userInfo($uid, $tz_system_id);
         $balance = '';
         if(isset($rst['Status']) && $rst['Status'] == 1){
-            $balance = $rst['Data']['List'][0]['cashAmount'];
+            $balance = $rst['Data']['credit_balance'];
         }
 
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','希腊-用户余额', $rst);
@@ -783,51 +792,114 @@ class LuckyBaseService extends BaseTZService {
      * @param $tz_system_id
      * @return mixed
      */
-    public static function getCookie($uid,$tz_system_id){
+    public static function getCookie($uid, $tz_system_id){
         self::__init($uid, $tz_system_id);
         $m = \Yii::$app->cache;
         $mkey = 'UPDATE_COOKIE_TIME_'.$uid.'_'.$tz_system_id;
-        if(!$cookie = $m->get($mkey)){
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        //if(!$cookie = $m->get($mkey)){
             //p(HN0898Service::getTzSiteInfo($tz_system_id));
             # 1、预登录
-            $_t = floor(microtime(true) * 100);
-            $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/home/GetValidateCode'.'?_'.$_t;
+            $_t = microtime(true) * 10000;
+            $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/Login'.'?_'.$_t;
             if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
-            $user_agent = 'User-Agent: '.$_SERVER['HTTP_USER_AGENT'];
-            //$user_agent = self::$user_agent;
-            $domain = self::getTzSiteInfo($tz_system_id,'domain');
             $headers = [
                 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-                'Accept-Encoding: gzip, deflate, br',
-                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-                //'Connection: keep-alive',
-                'Cache-Control: max-age=0',
-                'Host: '.$domain,
-                //'Referer: '.self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/login.html',
-                'Upgrade-Insecure-Requests: 1',
                 'Accept-Encoding: gunzip, deflate',
-                'X-Requested-With: XMLHttpRequest',
-                $user_agent,
-                //self::$user_agent,
+                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                //$robot7_session_id,
+                'Upgrade-Insecure-Requests: 1',
+                'Proxy-Connection: keep-alive',
+                'Host: '.self::getTzSiteInfo($tz_system_id,'domain'),
+                'Cache-Control: max-age=0',
+                'Referer: '.$url,
+                $TzSystemsUsers->user_agent,
             ];
-            $cookie = CurlService::curlGetCookie($url, $headers);
+            $robot7_session_id = self::getSessionId($url, $headers);
+            $headers[] = 'Cookie: '.$robot7_session_id;
+            $cookie = self::curlGetSevenCookie($url, $headers);
             $cookieData = $cookie;
+            //p([$robot7_session_id, $cookieData]);
             if($cookieData){
                 $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-                $TzSystemsUsers->cookie = trim($cookieData);
-                $TzSystemsUsers->cookie = str_replace('; path=/','', $TzSystemsUsers->cookie);
-                $TzSystemsUsers->save();
+                $TzSystemsUsers->cookie = $robot7_session_id.';'.trim($cookieData);
+                $TzSystemsUsers->cookie = str_replace('; path=/; HttpOnly','', $TzSystemsUsers->cookie);
+                $rst = $TzSystemsUsers->save();
             }
+            self::$headers = [];
             $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
+            //p($logArr);
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
-            $cookie = str_replace(' ValidateToken=','',$cookie);
-            $cookie = str_replace('; path=/','',$cookie);
-
-            //p(['url'=>$url, 'headers'=>$headers, 'cookie'=>$cookie],0);
+            $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
+            $cookie = str_replace('; path=/; HttpOnly','',$cookie);
             $m->set($mkey, $cookie, 180);
-        }
+        //}
         return $cookie;
     }
+
+    public static function getSessionId($url, $header){
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($curl, CURLOPT_SSLVERSION, 3);
+
+        $content = curl_exec($curl);
+        //preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
+        preg_match("/document.cookie\=\'([^\r\n]*)\'/i", $content, $matches);
+
+        $roboot_id = str_replace('; path=/; domain=.ww99865.xyz','', $matches[1]);
+        $logArr = ['content'=>$content, 'roboot_id'=>$roboot_id];
+        if(curl_error($curl)>0){
+            $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
+            Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
+        }
+
+        return $roboot_id;
+
+    }
+
+
+    /**
+     *curl get请求
+     */
+    public static function curlGetSevenCookie($url,$header = []){
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($curl, CURLOPT_SSLVERSION, 3);
+
+        $content = curl_exec($curl);
+        //preg_match_all("/Set\-cookie:([^\r\n]*)[\; path=\/\; Httponly]/i", $content, $matches);
+        preg_match_all("/Set-Cookie: (.*)/i", $content, $matches);
+        //p($matches,0);
+        $cookies = $matches[1];
+        $logArr = ['cookies'=>$cookies, 'matches'=>$matches, 'content'=>$content];
+        //p(['url'=>$url, 'header'=>$header, 'matches'=>$matches, 'content'=>$content, 'errno'=>curl_error($curl)]);
+        if(curl_error($curl)>0){
+            $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
+            Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
+        }
+        $data = '';
+        foreach ($cookies as $cookie){
+            $data .= str_replace('; path=/; HttpOnly','',trim($cookie)).';';
+        }
+        $data = str_replace("; path=/; Httponly;",'',$data);
+
+        return $data;
+    }
+
 
     /**
      * @desc 下载图片验证码
@@ -912,59 +984,14 @@ class LuckyBaseService extends BaseTZService {
 
         # 第一步：获取cookie
         $cookie_key = self::getCookie($uid,$tz_system_id);
-        p($cookie_key);
         if(isset($cookie_key['status']) && $cookie_key['status'] == 300) return $cookie_key;
-        # 第二步：下载验证码图片
-        self::downLoadCodeImg($uid, $tz_system_id, $cookie_key);
-        //p([$uid, $tz_system_id, $cookie_key]);
-        # 第三步：调验证码接口获取验证码
-        //$captchaCode = '888888'; $rst = self::loginRemote($uid, $tz_system_id,$captchaCode); p($rst);  # 测试
-        $captchaCodeRst = Tools::getCaptchaCode($uid, $tz_system_id, $cookie_key); # 真实调用验证码接口，收费
-        //p($captchaCodeRst);
-        //$code = $captchaCode['result'];
-        if($captchaCodeRst['status'] == 200){
-            $code = $captchaCodeRst['code'];
-            # 第四步：账号、验证码登录
-            $rst = self::loginRemote($uid, $tz_system_id, $code);
-        }
+        # 第二步：账号、验证码登录
+        $rst = self::loginRemote($uid, $tz_system_id);
+        # 第三步：同意
+        $rst = self::acceptAgreement($uid, $tz_system_id);
 
-        # 第四步：同意
-        //$rst = self::acceptAgreement($uid, $tz_system_id);
-
-        return $rst;
-    }
-
-    public static function loginNew($uid = 1, $tz_system_id = 1){
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        if($TzSystemsUsers->balance > 0) {
-            return ['status'=>200, 'msg'=>'已经登录的状态'];
-        }
-        self::__init($uid, $tz_system_id);
-        $rst = false;
-
-        # 第一步：获取cookie
-        //$cookie_key = self::getCookie($uid,$tz_system_id);
-        //if(isset($cookie_key['status']) && $cookie_key['status'] == 300) return $cookie_key;
-        # 第二步：下载验证码图片
-        $rst = self::downLoadCodeImgNew($uid, $tz_system_id);
-        $cookie_key = $rst['cookie_key'];
-        //p([$uid, $tz_system_id, $cookie_key]);
-        # 第三步：调验证码接口获取验证码
-        //$captchaCode = '888888'; $rst = self::loginRemote($uid, $tz_system_id,$captchaCode); p($rst);  # 测试
-        $captchaCodeRst = Tools::getCaptchaCode($uid, $tz_system_id, $cookie_key); # 真实调用验证码接口，收费
-        //p($captchaCodeRst);
-        //$code = $captchaCode['result'];
-        if($captchaCodeRst['status'] == 200){
-            $code = $captchaCodeRst['code'];
-            # 第四步：账号、验证码登录
-            $rst = self::loginRemote($uid, $tz_system_id, $code);
-        }
-
-        if($rst['status'] == 200){
-            self::synBalance($TzSystemsUsers->id);
-        }
-        # 第四步：同意
-        //$rst = self::acceptAgreement($uid, $tz_system_id);
+        # 获取用户信息
+        $rst = self::userInfo($uid, $tz_system_id);
 
         return $rst;
     }
@@ -976,7 +1003,7 @@ class LuckyBaseService extends BaseTZService {
      * @return array
      */
     public static function getSn($uid, $tz_system_id){
-        $rst = SevenService::userInfo($uid, $tz_system_id);
+        $rst = self::userInfo($uid, $tz_system_id);
         $data = [];
         if($rst['Status'] !=1) return $data;
 
@@ -1020,51 +1047,41 @@ class LuckyBaseService extends BaseTZService {
      * @desc 登陆
      * @param $uid
      * @param $tz_system_id
-     * @param $code
      * @return mixed|string
      */
-    public static function loginRemote($uid, $tz_system_id, $code){
+    private static function loginRemote($uid, $tz_system_id){
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        $post_data = [
-            'NECaptchaValidate' => $code,
-            'Password' => $TzSystemsUsers->password,
-            'Username' => $TzSystemsUsers->account,
-        ];
+        $post_data['Account'] = $TzSystemsUsers->account;
+        $post_data['Password'] = $TzSystemsUsers->password;
+        //p($post_data);
 
-        $url = self::getTzSiteInfo($tz_system_id, 'SSC_INDEX').'/api/Home/MemberLogin';
-        if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'url'=>$url];
-        $strLen = strlen(json_encode($post_data));
+        if(!$post_data['Account'] OR !$post_data['Password']) return ['status'=>300, 'msg'=>'账号或者密码不能为空'];
+
+        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
+        $_t = microtime(true) * 10000;
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/DoLogin'.'?_'.$_t;
+        $post_data = http_build_query($post_data);
         $headers = [
-            'Accept: application/json, text/plain, */*',
-            'Accept-Encoding: gzip, deflate',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            //'Content-Type: application/x-www-form-urlencoded',
-            'Connection: keep-alive',
-            'Content-Length: '.$strLen,
-            'Content-Type: application/json;charset=UTF-8',
-            'Cookie: '.str_replace('; path=/', '',$TzSystemsUsers->cookie),
-
-            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
-            'Origin: '.$TzSystemsUsers->ssc_domain,
-            'Referer: '.$TzSystemsUsers->ssc_domain.'/login.html',
-            $TzSystemsUsers->user_agent,
-            //self::$user_agent,
+            "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+            "Cache-Control:max-age=0",
+            "Upgrade-Insecure-Requests:1",
+            "Content-Length:".strlen($post_data),
+            "Content-Type: application/x-www-form-urlencoded",
+            "Cookie: ".trim($TzSystemsUsers->cookie),
+            "Origin:".str_replace('www.','',self::$baseUrl),
+            "Host:".str_replace('www.','',self::$domain),
+            "Referer:".$TzSystemsUsers->ssc_domain,
         ];
 
-        $data = CurlService::kl8PostCurlLogin($url,json_encode($post_data), $headers);
-        if($data['status'] == 200){
-            $TzSystemsUsers->cookie = $TzSystemsUsers->cookie.'; '.$data['cookie'];
-            $TzSystemsUsers->save();
-        }
-        //self::synBalance($TzSystemsUsers->id); # 同步余额
-        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'code'=>$code, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
+        $data = CurlService::httpPost($url,$post_data, $headers);
+        //sleep(10);
+        self::synBalance($TzSystemsUsers->id); # 同步余额
+        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
-        //p($logArr);
         return $data;
     }
-
     /**
      * @desc 登陆
      * @param $uid
@@ -1072,9 +1089,7 @@ class LuckyBaseService extends BaseTZService {
      * @return mixed|string
      */
     private static function acceptAgreement($uid, $tz_system_id){
-        $rst = CurlService::getCurl('http://zhxtimght.miandianjiameng.com/static/js/0.8c65143ce3ef6da23e77.js');
-        return $rst;
-        self::__init($uid, $tz_system_id);
+        //self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
@@ -1141,27 +1156,27 @@ class LuckyBaseService extends BaseTZService {
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetInfoByName?Lottery=2';
-        if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'url'=>$url];
+        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
+        $_t = microtime(true) * 10000;
+        //$url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/App/Index'.'?_'.$_t;
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/GetMemberPrint?_='.$_t;
+        if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
         $headers = [
-            "Accept: application/json, text/plain, */*",
-            "Accept-Encoding: gzip, deflate",
-            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
-            "Connection: keep-alive",
-            "Cookie:".trim($TzSystemsUsers->cookie),
+            "Accept: application/json, text/javascript, */*; q=0.01",
+            "Cookie: ".trim($TzSystemsUsers->cookie),
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
-            "Referer:".$TzSystemsUsers->ssc_domain.'/',
-            $TzSystemsUsers->user_agent,
+            "Referer:".$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
         ];
-        $data = CurlService::getCurl($url, $headers);
+
+        $data = CurlService::httpGet($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
+        //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','7时彩-登陆记录', $logArr);
         return $data;
     }
-
 
     /**
      * @decription 获取即将开奖的期号
