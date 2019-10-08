@@ -14,6 +14,7 @@ use backend\models\TzSystemsUsers;
 use backend\service\BetService;
 use backend\service\huiyuan\HuiYuanService5;
 use backend\service\KuaiLe8Service;
+use backend\service\Lucky\LuckyBaseService;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NumService;
 use backend\service\SevenService;
@@ -107,6 +108,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);p($data);
         $data = Lucky5::getLotteryLucky();p($data);
         $data = Lucky5::getLotteryNo();p($data);
         p(unserialize('a:3:{s:4:"time";i:1570224883;s:3:"ttl";i:3600000;s:4:"data";a:0:{}}'));

@@ -912,6 +912,7 @@ class LuckyBaseService extends BaseTZService {
 
         # 第一步：获取cookie
         $cookie_key = self::getCookie($uid,$tz_system_id);
+        p($cookie_key);
         if(isset($cookie_key['status']) && $cookie_key['status'] == 300) return $cookie_key;
         # 第二步：下载验证码图片
         self::downLoadCodeImg($uid, $tz_system_id, $cookie_key);
