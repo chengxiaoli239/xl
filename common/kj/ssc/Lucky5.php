@@ -21,6 +21,7 @@ class Lucky5 extends BaseKj {
 
             $kjData = ['expect'=>$datas[1][0], 'opentime'=>$datas[2][0], 'opencode'=>$datas[3][0]];
         }
+        p($kjData);
 
         if(!$kjData) return false;
         $opencode = $kjData['opencode'];
@@ -55,16 +56,15 @@ class Lucky5 extends BaseKj {
 
         if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHost(18);
-            sleep(3);
-            $date = date('Y-m-d');
-            if('00:00' < date('H:i:s') && date('H:i:s') < '03:00'){
-                $date = date('Y-m-d', time()-86400);
-            }
-            $url = $domain.'/data/cqssc/lotteryList/'.$date.'.json?t='.time();
+
+            $t = microtime(true) * 10000;
+            $url = $domain.'/Member/GetMemberPrint&_='.$t; #当前开奖号码
+            # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015
             //$content = file_get_contents($url);
             $content = CurlService::httpGet($url);
             //$data = json_decode($content,320);
-            $data = $content[0];
+            $data = $content;
+            d($data);
 
             if (!isset($data['issue']) OR !$data) return false;
             $str = substr($data['issue'], 0, 8);
@@ -99,7 +99,7 @@ class Lucky5 extends BaseKj {
      * @return mixed
      */
     public static function batchSevenDay($returnType = 'json'){
-        $datas = self::batchGrabSevenDay();
+        $datas = self::batchGrab();
         $qihaos = $datas[1];
         $times = $datas[2];
         $codes = $datas[3];
@@ -128,31 +128,18 @@ class Lucky5 extends BaseKj {
     public static function batchGrab(){
         $domain = BaseKj::getApiHost(18);
         $t = microtime(true) * 10000;
-        $url = $domain.'/DrawNo/GetDrawNoTable?pageindex=2&_='.$t;
+        $url = $domain.'/DrawNo/GetDrawNoTable?pageindex=2&_='.$t; #当前开奖号码
+
         $mkey = 'batchGrab_lottery_type_6';
         # http://f9.ww99865.xyz:5678/DrawNo/GetDrawNoTable?pageindex=2&_=1570530310790
-        p($url);
 
         $m = \Yii::$app->cache;
-        //$content = file_get_contents($url);
         //if($datas = $m->get($mkey)) return $datas;
-        $h = str_replace('https://', '', $domain);
 
-        $headers = [
-            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-            'Accept-Encoding: gunzip, deflate, br',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Connection: keep-alive',
-            'Cookie: Hm_lvt_afe1c3da922eb68bb36abb2f9a4ad0ce=1568795085; Hm_lpvt_afe1c3da922eb68bb36abb2f9a4ad0ce=1568795097',
-            'Host: '.$h,
-            'Upgrade-Insecure-Requests: 1',
-            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
-        ];
-        $content = CurlService::getCurl($url, $headers);
-        $preg = "/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/ism"; // 这里是表达式，大神看看
-        preg_match_all($preg,$content,$matches);
+        $content = CurlService::getCurl($url);
+        p($content);
 
-        $datas = $matches;
+        $datas = $content;
 
         $m->set($mkey, $datas, 20 * 60);
         return $datas;
