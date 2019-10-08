@@ -7,7 +7,7 @@ use yii\web\Controller;
 use common\service\CommonService;
 
 
-class XjSscController extends Controller
+class Lucky5Controller extends Controller
 {
     /**
      * @desc 幸运五星 - 新疆时时彩
@@ -16,6 +16,16 @@ class XjSscController extends Controller
     public function actionIndex($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $data = Lucky5::getLotteryNo($type);
+        return $data;
+    }
+
+    /**
+     * @desc 幸运五星 - 新疆时时彩
+     * @return json|xml
+     */
+    public function actionLucky($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = Lucky5::getLotteryLucky($type);
         return $data;
     }
 }
