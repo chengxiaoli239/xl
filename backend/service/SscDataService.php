@@ -93,7 +93,8 @@ class SscDataService extends BaseService {
             $qihao = self::getMinStaticQihao($lottery_type);
         }
 
-        $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
+        //$next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
+        $next_qihao = SscDataService::getNextStaticDsQihao($lottery_type);
         $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
 
         //p([$next_qihao, $last_qihao]);
@@ -108,9 +109,26 @@ class SscDataService extends BaseService {
         //p([$qihao, $new_qihao, $next_qihao, $last_qihao, $lottery_type]);
 
         return $flag;
-
     }
 
+    /**
+     * @param int $lottery_type
+     * @return bool|int|string
+     */
+    public static function getNextStaticDsQihao($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $last_qihao = SscKjDataDs::find()->select(['max(qihao) as last_qihao'])->where(['lottery_type'=>$lottery_type])->asArray()->one()['last_qihao'];
+
+        $next_qihao = KjDataGet::getNextQihaoByQihao($last_qihao, $lottery_type);
+
+        return $next_qihao;
+    }
+
+    /**
+     * @desc 获取单双数据遗漏表最后期号
+     * @param int $lottery_type
+     * @param int $recently
+     * @return int
+     */
     public static function getMinStaticQihao($lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 120){
         $last_id = SscDataService::getKjDataLastId($lottery_type);
         $qihao = SscKjData::find()->where(['AND',['=', 'lottery_type', $lottery_type], ['>', 'id', $last_id-$recently]])->limit(1)->one()->qihao;
@@ -801,9 +819,9 @@ class SscDataService extends BaseService {
     public static function getSscStaticVal($type = 3){
         $m = \Yii::$app->cache;
         $mkey = 'getSscStaticVal_'.$type;
-        if(!$SscStaticVals = $m->get($mkey)){
+        //if(!$SscStaticVals = $m->get($mkey)){
             $SscStaticVals = SscStaticVal::find()->where(['type'=>$type, 'status'=>1])->asArray()->all();
-        }
+        //}
 
         $m->set($mkey, $SscStaticVals, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
 
