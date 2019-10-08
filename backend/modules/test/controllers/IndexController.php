@@ -27,6 +27,7 @@ use backend\tools\Tools;
 use common\kj\BaseKj;
 use common\kj\cqssc\CqsscKcw;
 use common\kj\cqssc\CqsscSevenDay;
+use common\kj\ssc\Lucky5;
 use common\kj\xjssc\XjSsc;
 use common\models\AdminModel;
 use common\service\CommonService;
@@ -106,6 +107,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = Lucky5::get
+        p(unserialize('a:3:{s:4:"time";i:1570224883;s:3:"ttl";i:3600000;s:4:"data";a:0:{}}'));
         $rst = CqsscKcw::getLotteryNoZhiBo();d($rst);
         $data = CqsscKcw::getLotteryNoOneNineNineEight($type='xml');p($data);
         $profits = SscDataService::getSomeDatesBeforedProfits($lottery_type = 5);p($profits);
