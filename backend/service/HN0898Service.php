@@ -1170,6 +1170,11 @@ class HN0898Service extends BaseTZService {
                 $nums = self::getDifferentNums();
                 $qihao = 967767 + $days * 179 + $nums; # 967767为2019-08-10最后一期期号
                 break;
+            case 8: # 幸运五星彩
+                $days = self::getDifferentDays();
+                $nums = self::getDifferentNums();
+                $qihao = 967767 + $days * 179 + $nums; # 967767为2019-08-10最后一期期号
+                break;
         }
 
 

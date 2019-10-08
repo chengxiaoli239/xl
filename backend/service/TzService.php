@@ -494,6 +494,9 @@ class TzService extends BaseService {
             case 6:
                 $rst = self::insertXjSscDataTime();
                 break;
+            case 8:
+                $rst = self::insertXjSscDataTime();
+                break;
         }
         return ['status'=>200, 'msg'=>'更新时时彩开奖', 'rst'=>$rst, 'nums'=>$actionNums];
     }
@@ -547,6 +550,36 @@ class TzService extends BaseService {
             }
 
             $dateTime = $dateTime + 20 * 60;
+            //p($dateTime);
+            $HIS = date('H:i:s', $dateTime);
+            $setData['actionTime'] = $HIS;
+            $setData['stopTime'] = $HIS;
+            //p($i.'='.$HI, 0);
+            $DataTime->setAttributes($setData);
+            //p($DataTime->attributes);
+            $rst = $DataTime->save();
+        }
+        return ['status'=>200, 'msg'=>'更新时时彩开奖', 'rst'=>$rst];
+    }
+
+
+    /**
+     * @desc 更新时时彩开奖时间 - 幸运五星彩
+     */
+    public static function insertLuckyDataTime($lottery_type = 8){
+        $actionNo = 288;
+        $setData = [];
+        $dateTime = strtotime('2019-10-01 10:00:00');
+        for ($i=1; $i<=$actionNo; $i++){
+            $setData['type'] = $lottery_type;  # lottery_type 5 重庆时时彩
+            $setData['actionNo'] = $i;
+            $where = ['type'=>$lottery_type, 'actionNo'=>$i];
+            //p(date('Y-m-d H:i:s', $dateTime), 0);
+            if(!$DataTime = DataTime::findOne($where)){
+                $DataTime = new DataTime();
+            }
+
+            $dateTime = $dateTime + 5 * 60;
             //p($dateTime);
             $HIS = date('H:i:s', $dateTime);
             $setData['actionTime'] = $HIS;
