@@ -101,8 +101,9 @@ class SscDataService extends BaseService {
         if($next_qihao<=$last_qihao){
             $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
             if(!$new_qihao){ # 防止官网某一期不开的情况, 自动获取开奖表下一期的开奖号码
-                $new_qihao = SscKjData::find()->where(['AND', ['>', 'qihao',$qihao], ['=', 'lottery_type', $lottery_type]])->orderBy('id ASC')->limit(1)->one()->qihao;
+                $new_qihao = SscKjData::find()->where(['AND', ['>', 'qihao',$next_qihao], ['=', 'lottery_type', $lottery_type]])->orderBy('id ASC')->limit(1)->one()->qihao;
             }
+            //p([$qihao, $new_qihao, $next_qihao, $last_qihao, $lottery_type]);
             $flag = SscDataService::insertSscKjDataDs($new_qihao, $lottery_type);
             $m->set($mkey, $new_qihao, 24*60*60);
         }
@@ -147,13 +148,17 @@ class SscDataService extends BaseService {
             $qihao = self::getMinStaticQihao($lottery_type);
         }
 
-        $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
+        //$next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
+        $next_qihao = SscDataService::getNextStaticDsQihao($lottery_type);
         $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
 
         //p([$next_qihao, $last_qihao, $qihao, $lottery_type],0);
 
         if($next_qihao<=$last_qihao){
             $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
+            if(!$new_qihao){ # 防止官网某一期不开的情况, 自动获取开奖表下一期的开奖号码
+                $new_qihao = SscKjData::find()->where(['AND', ['>', 'qihao', $next_qihao], ['=', 'lottery_type', $lottery_type]])->orderBy('id ASC')->limit(1)->one()->qihao;
+            }
             $flag = SscDataService::insertSscKjData3Num($new_qihao, $lottery_type);
             //p($flag);
             $m->set($mkey, $new_qihao, 7*24*3600);
