@@ -109,7 +109,7 @@ class KjDataGet
                 $kjDatas = $data;
                 if($kjDatas){
                     $mkey = 'KJ_LOG_KEY_BATCH_1_'.$kjConfig->lottery_type;
-                    if($kjConfig->lottery_type == 6){ # xjssc
+                    if(in_array($kjConfig->lottery_type, [6, 8])){ # xjssc
                         $kjDatas = array_reverse($kjDatas);
                         foreach ($kjDatas as $key=>$dataInfo){
                             $rst = KjDataGet::insertKjData($dataInfo['expect'], $kjConfig->lottery_type, $dataInfo['opencode']);

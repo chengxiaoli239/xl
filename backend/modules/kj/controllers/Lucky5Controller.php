@@ -13,9 +13,9 @@ class Lucky5Controller extends Controller
      * @desc 幸运五星 - 新疆时时彩
      * @return json|xml
      */
-    public function actionIndex($type = 'json'){
+    public function actionBatch($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = Lucky5::getLotteryNo($type);
+        $data = Lucky5::batch($type);
         return $data;
     }
 
@@ -23,9 +23,10 @@ class Lucky5Controller extends Controller
      * @desc 幸运五星 - 新疆时时彩
      * @return json|xml
      */
-    public function actionLucky($type = 'json'){
+    public function actionIndex($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $data = Lucky5::getLotteryLucky($type);
         return $data;
     }
+
 }

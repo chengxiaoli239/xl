@@ -277,6 +277,7 @@ class IndexController extends Controller
                     $rst = HN0898Service::synBalance($TzSystemsUser->id);
                     break;
                 case 2:
+                case 5:
                     $rst = SevenService::synBalance($TzSystemsUser->id);
                     break;
                 case 3:

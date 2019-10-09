@@ -1,6 +1,7 @@
 <?php
 # 开彩网
 namespace common\kj\ssc;
+use backend\models\TzSystemsUsers;
 use backend\service\CurlService;
 use common\kj\BaseKj;
 use common\tools\Tool_Common;
@@ -12,67 +13,40 @@ class Lucky5 extends BaseKj {
     /**
      * @desc 幸运五星彩
      * @param string $returnType
-     * @return array|bool
-     */
-    public static function getLotteryNo($returnType = 'json'){
-
-        if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)){
-            $datas = self::batchGrab();
-
-            $kjData = ['expect'=>$datas[1][0], 'opentime'=>$datas[2][0], 'opencode'=>$datas[3][0]];
-        }
-        p($kjData);
-
-        if(!$kjData) return false;
-        $opencode = $kjData['opencode'];
-        $opentime = str_replace('/', '-', $kjData['opentime']);
-        $expect = $kjData['expect'];
-        //p([$opencode, $opentime, $expect]);
-
-        //p([$expect, $kjData,$kjData['opencode']]);
-        # 设置开奖数据缓存
-        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
-
-        if($returnType == 'xml'){
-            header("Content-type: application/xml");
-            echo'<?xml version="1.0" encoding="utf-8"?>';
-            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
-            ob_end_flush();exit;
-        }else{
-            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
-        }
-        $logArr = $rst;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getLotteryNo', 'INFO', '号码抓取-7天', $logArr);
-
-        return $rst;
-    }
-
-    /**
-     * @desc 幸运五星彩
-     * @param string $returnType
      * @return array
      */
     public static function getLotteryLucky($returnType = 'json'){
 
-        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHost(18);
 
             $t = microtime(true) * 10000;
-            $url = $domain.'/Member/GetMemberPrint&_='.$t; #当前开奖号码
+            $url = $domain.'/Member/GetMemberPrint?_='.$t; #当前开奖号码
             # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015
-            //$content = file_get_contents($url);
-            $content = CurlService::httpGet($url);
+            $tz_system_users_id = 15;
+            $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_users_id);
+
+            $headers = [
+                'Accept: application/json, text/javascript, */*; q=0.01',
+                'Accept-Encoding: gunzip, deflate',
+                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                'Connection: keep-alive',
+                'Cookie: '.$TzSystemsUsers->cookie,
+                'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+                'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$t,
+                $TzSystemsUsers->user_agent,
+                'X-Requested-With: XMLHttpRequest',
+            ];
+            $content = CurlService::getCurl($url, $headers);
             //$data = json_decode($content,320);
             $data = $content;
-            d($data);
+            //p([$url, $headers, $data]);
 
-            if (!isset($data['issue']) OR !$data) return false;
-            $str = substr($data['issue'], 0, 8);
-            $kjData['expect'] = str_replace($str, $str . '-', $data['issue']);
-            $kjData['opencode'] = implode(',', $data['openNum']);
-            $kjData['opentime'] = $data['openDateTime'];
+            if ($data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) return false;
+            $row = $data['Data']['draw_info'][0];
+            $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
+            $kjData = ['expect'=>$row['period_no'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
             //p($kjData);
-            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
         }
         $opencode = $kjData['opencode'];
         $opentime = $kjData['opentime'];
@@ -95,53 +69,71 @@ class Lucky5 extends BaseKj {
     }
 
     /**
-     * @desc 七天 - 新疆 批量数据出口
+     * @desc 幸运五星彩 批量数据出口
      * @return mixed
      */
-    public static function batchSevenDay($returnType = 'json'){
+    public static function batch($returnType = 'json'){
         $datas = self::batchGrab();
-        $qihaos = $datas[1];
-        $times = $datas[2];
-        $codes = $datas[3];
-        $kjDatas = [];
-        //$qihaos = array_reverse($qihaos);
-        foreach ($qihaos as $key=>$qihao){
-            $kjDatas[] = ['expect'=>$qihao, 'opentime'=>$times[$key], 'opencode'=>$codes[$key]];
-        }
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
             $str = '<?xml version="1.0" encoding="utf-8"?>';
-            foreach ($kjDatas as $kjData){
+            foreach ($datas as $kjData){
                 $str .= '<xml><row expect="'.$kjData['expect'].'" opencode="'.$kjData['opencode'].'" opentime="'.$kjData['opentime'].'" /></xml>';
             }
+            echo $str;
             ob_end_flush();exit;
         }
 
-        return $kjDatas;
+        return $datas;
     }
 
     /**
-     * @desc 七天 - 新疆 批量数据
+     * @desc 幸运五星 批量数据
      * @return mixed
      */
     public static function batchGrab(){
         $domain = BaseKj::getApiHost(18);
-        $t = microtime(true) * 10000;
-        $url = $domain.'/DrawNo/GetDrawNoTable?pageindex=2&_='.$t; #当前开奖号码
+        $tz_system_users_id = 15;
+        $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_users_id);
+        $datas = [];
+        for($i=1; $i<=16; $i++){
+            //for($i=16; $i>=1; $i--){
+            $t = microtime(true) * 10000;
+            $url = $domain.'/DrawNo/GetDrawNoTable?pageindex='.$i.'&_='.$t; #当前开奖号码
 
-        $mkey = 'batchGrab_lottery_type_6';
-        # http://f9.ww99865.xyz:5678/DrawNo/GetDrawNoTable?pageindex=2&_=1570530310790
+            $headers = [
+                'Accept: application/json, text/javascript, */*; q=0.01',
+                'Accept-Encoding: gunzip, deflate',
+                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                'Connection: keep-alive',
+                'X-Requested-With: XMLHttpRequest',
+                'Cookie: '.$TzSystemsUsers->cookie,
+                'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+                'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$t,
+                $TzSystemsUsers->user_agent,
+            ];
+            $mkey = 'batchGrab_lottery_type_6_'.$i;
+            # http://f9.ww99865.xyz:5678/DrawNo/GetDrawNoTable?pageindex=2&_=1570530310790
 
-        $m = \Yii::$app->cache;
-        //if($datas = $m->get($mkey)) return $datas;
+            $m = \Yii::$app->cache;
+            //if($datas = $m->get($mkey)) return $datas;
 
-        $content = CurlService::getCurl($url);
-        p($content);
+            $content = CurlService::getCurl($url, $headers);
+            //p([$headers, $url, $content]);
+            $data = $content;
+            if($data['Status'] == 1 && !empty($data['Data']['Rows'])){
+                $rows = $data['Data']['Rows'];
+                # $str .= '<xml><row expect="'.$kjData['expect'].'" opencode="'.$kjData['opencode'].'" opentime="'.$kjData['opentime'].'" /></xml>';
+                foreach ($rows as $k=>$row){
+                    $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
+                    $datas[] = ['expect'=>$row['period_no'], 'opencode'=>$opencode, 'opentime'=>$row['draw_datetime']];
+                }
+            }
 
-        $datas = $content;
-
-        $m->set($mkey, $datas, 20 * 60);
+            $m->set($mkey, $datas, 20 * 60);
+        }
+        //d($datas);
         return $datas;
     }
 

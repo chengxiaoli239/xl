@@ -108,11 +108,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = TzService::insertLuckyDataTime(); p($rst);
-        $rst = LuckyBaseService::synBalance($tz_system_users_id = 15); p($rst);# 同步余额
-        $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);p($data);
+        $data = Lucky5::batch();p($data);
         $data = Lucky5::getLotteryLucky();p($data);
-        $data = Lucky5::getLotteryNo();p($data);
+        $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);
+        $rst = LuckyBaseService::synBalance($tz_system_users_id = 15); p($rst);# 同步余额
+        $rst = TzService::insertLuckyDataTime(); p($rst);
         p(unserialize('a:3:{s:4:"time";i:1570224883;s:3:"ttl";i:3600000;s:4:"data";a:0:{}}'));
         $rst = CqsscKcw::getLotteryNoZhiBo();d($rst);
         $data = CqsscKcw::getLotteryNoOneNineNineEight($type='xml');p($data);
