@@ -27,7 +27,7 @@ class CqsscKcw extends BaseKj {
         5 => '重庆', # 20分
         6 => '新疆', # 20分
         7 => '北京快乐8', # 5分
-        8 => '幸运五星彩', # 幸运五星系统彩 5分
+        8 => '幸运五星', # 幸运五星系统彩 5分
     ];
 
     public static function getLotteryNo($returnType = 'json'){

@@ -108,10 +108,15 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $data = Lucky5::batch();p($data);
-        $data = Lucky5::getLotteryLucky();p($data);
+        $rst = KjDataGet::insertKjData('20191009224', 8, '9,5,0,8,7');p($rst);
+        $data = Lucky5::batch(); $kjDatas = array_reverse($data); //p($kjDatas);
+        foreach ($kjDatas as $key=>$dataInfo){
+            $rst = KjDataGet::insertKjData($dataInfo['expect'], 8, $dataInfo['opencode']);
+        }p($rst);
+        $rst['kj'] = KjDataGet::grabOne();p($rst);
         $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);
         $rst = LuckyBaseService::synBalance($tz_system_users_id = 15); p($rst);# 同步余额
+        $data = Lucky5::getLotteryLucky();p($data);
         $rst = TzService::insertLuckyDataTime(); p($rst);
         p(unserialize('a:3:{s:4:"time";i:1570224883;s:3:"ttl";i:3600000;s:4:"data";a:0:{}}'));
         $rst = CqsscKcw::getLotteryNoZhiBo();d($rst);
@@ -150,7 +155,6 @@ class IndexController extends Controller
         $rst = StaticService::allHzStaticProfitsPerdate($lottery_type = 6);p($rst);# 循环计算每天每个和值利润统计
         $rst = TzService::opSystemBetPlans(6);p($rst);// 定制化投注计划
         $rst = KjDataGet::getBeforeQihaoByQihao('2019052501',6);p($rst);
-        $rst['kj'] = KjDataGet::grabOne();p($rst);
         $rst = StaticService::staticAll2NumsYl();p($rst ); # 统计所有二字现遗漏
         $qihao = HN0898Service::getCurrentQihao($lottery_type = 6);p($qihao);
         //$rst = KjDataGet::insertKjData('', $kjConfig->lottery_type, $dataInfo['opencode']);
@@ -179,7 +183,6 @@ class IndexController extends Controller
 
         $data = XjSsc::getLotteryNoBatch();
         $data = array_reverse($data);p($data);
-        $rst = KjDataGet::insertKjData('2019032701', 6, '9,3,3,3,8');p($rst);
         $data = XjSsc::getLotteryNoZhiBo();p($data);
         $data = XjSsc::getLotteryNoSevenDay();p($data);
         $data = XjSsc::getLotteryNo99();p($data);

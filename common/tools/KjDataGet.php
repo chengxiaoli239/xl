@@ -103,6 +103,7 @@ class KjDataGet
         $KjConfigs = KjConfig::findAll(['enable'=>1]);
         foreach ($KjConfigs as $kjConfig){
             $lottery_type = $kjConfig->lottery_type;
+            //if($lottery_type != 8) continue; # 测试
             $url = $kjConfig->host.$kjConfig->path;
             if(!$data = CurlService::httpGet($url)) continue;
             if($kjConfig->is_batch == 1){
@@ -205,14 +206,15 @@ class KjDataGet
         }elseif ($lottery_type == 6){
             $tmpDate = substr($qihao, 0, 8);
         }else{
-            $tmpDate = date('Y-m-d 00:00:00');
+            $tmpDate = substr($qihao, 0, 8);
+            //$tmpDate = date('Y-m-d 00:00:00');
         }
         $codesArr = [$kjDatasArr[0],$kjDatasArr[1],$kjDatasArr[2],$kjDatasArr[3]];
         sort($codesArr);
         $code_3n = CommonService::get3n($codesArr);
         $insertData = [
             'kj_code' => $kjDatas,
-            'qihao' => $qihao,
+            'qihao' => (string)$qihao,
             'code_str' => $kjData,
             'codes_hz'=> array_sum($kjDatasArr),
             'codes_4nums_hz'=> array_sum($codes_4nums),

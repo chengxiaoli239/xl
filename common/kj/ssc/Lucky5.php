@@ -74,6 +74,7 @@ class Lucky5 extends BaseKj {
      */
     public static function batch($returnType = 'json'){
         $datas = self::batchGrab();
+        $datas = array_reverse($datas);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
@@ -97,7 +98,7 @@ class Lucky5 extends BaseKj {
         $tz_system_users_id = 15;
         $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_users_id);
         $datas = [];
-        for($i=1; $i<=16; $i++){
+        for($i=2; $i>=1; $i--){
             //for($i=16; $i>=1; $i--){
             $t = microtime(true) * 10000;
             $url = $domain.'/DrawNo/GetDrawNoTable?pageindex='.$i.'&_='.$t; #当前开奖号码
@@ -123,7 +124,7 @@ class Lucky5 extends BaseKj {
             //p([$headers, $url, $content]);
             $data = $content;
             if($data['Status'] == 1 && !empty($data['Data']['Rows'])){
-                $rows = $data['Data']['Rows'];
+                $rows = array_reverse($data['Data']['Rows']);
                 # $str .= '<xml><row expect="'.$kjData['expect'].'" opencode="'.$kjData['opencode'].'" opentime="'.$kjData['opentime'].'" /></xml>';
                 foreach ($rows as $k=>$row){
                     $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
