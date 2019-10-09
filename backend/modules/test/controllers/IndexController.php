@@ -108,6 +108,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        //$str = '{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}'; //p(json_decode($str, true)); d(strpos($str, "\"Status\":1") !== false);
         $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);
         $rst = LuckyBaseService::synBalance($tz_system_users_id = 15); p($rst);# 同步余额
         $rst = SevenService::login(19, 3);p($rst);

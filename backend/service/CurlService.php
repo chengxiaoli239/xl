@@ -13,6 +13,7 @@ use common\service\CommonService;
 use common\tools\Tool_Common;
 use  yii;
 
+
 class CurlService extends BaseService{
 
     public static $postHeaders = [
@@ -121,8 +122,11 @@ class CurlService extends BaseService{
         if($data == 'ok'){
             return 'ok';
         }
-        $rstData = json_decode($data, TRUE);
-        //p(['url'=>$url, 'rstData'=>$data, 'post_data'=>$post_data, 'headers'=>$headers]);
+        $rstData = json_decode($data, true); # data : {"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}
+        //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers]);
+        if(strpos($data, "\"Status\":1") !== false){ # json解析异常处理
+            $rstData['Status'] = 1;
+        }
 
         return $rstData;
     }
@@ -311,6 +315,7 @@ class CurlService extends BaseService{
     public static function is_json($string)
     {
         json_decode($string);
+
         return (json_last_error() == JSON_ERROR_NONE);
     }
 

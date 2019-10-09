@@ -213,9 +213,13 @@ abstract class BetService extends BaseBetService {
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网
             $rst = HN0898Service::synBalance($TzSystemsUser->id);
-        }elseif(in_array($tz_system_id, [3])){
+        }elseif(in_array($tz_system_id, [3, 7])){
             # 3、重庆7时彩网
-            $rst = SevenService::synBalance($TzSystemsUser->id);
+            if($tz_system_id == 3){
+                $rst = SevenService::synBalance($TzSystemsUser->id);
+            }else{
+                $rst = LuckyBaseService::synBalance($TzSystemsUser->id);
+            }
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
         }elseif(in_array($tz_system_id, [5])){

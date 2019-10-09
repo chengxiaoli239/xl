@@ -255,7 +255,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             'Cache-Control: max-age=0',
             'Connection: keep-alive',
             'Content-Length:'.strlen(http_build_query($post_data)),
-            'Content-Type: application/x-www-form-urlencoded',
+            'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
             'Cookie: '.$TzSystemsUsers->cookie,
             'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
             'Origin: '.$TzSystemsUsers->ssc_domain,
@@ -347,7 +347,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         self::$headers = [];
 
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时插入记录-真实投注', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','幸运五星时插入记录-真实投注', $logArr);
 
         return $data;
     }
