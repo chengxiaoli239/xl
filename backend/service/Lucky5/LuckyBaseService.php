@@ -107,7 +107,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             'ORDER_TZ' => $baseUrl.'/Member/BatchBet',
             'SSC_INDEX' => $baseUrl,
             'domain' => \Yii::$app->params['domain'],
-            'MULBET_URL' => $baseUrl.'/api/betNumber', # 下注接口
+            'MULBET_URL' => $baseUrl.'/Member/MultipleBet', # 下注接口
             'GetPeriodsQuery' => $baseUrl.'/api/Periods/GetPeriodsQuery',
             'INDEX' => $baseUrl.'/index.aspx',
             'GET_BALANCE' => $baseUrl.'/user/ajax.aspx',
@@ -239,7 +239,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
             'bet_log'=>'[四定位]，合分值范围：[0-36]',
             'is_package' => 0,
-            'period_no'=>'20'.$qihao,
+            'period_no'=>$qihao,
             'operation_condition' => self::getOperationCondition(),
 
             //'totalBetMoney'=>$totalBetMoney,
@@ -429,6 +429,90 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         return $rstData;
     }
 
+    /**
+     * @desc 获取本站号码存储格式
+     * @param $codes
+     * @param $playway
+     * @return array
+     */
+    public static function getMySiteCodesStyle($codes, $playway){
+        /*
+        $codes = [
+            ['bet_no'=>'15', 'dict_no_type_id'=>4],
+            ['bet_no'=>'178', 'dict_no_type_id'=>9],
+            ['bet_no'=>'609', 'dict_no_type_id'=>10],
+        ];
+        */
+
+        $codesArr = [];
+
+        foreach ($codes as $data){
+
+            $dict_no_type_id = $data['dict_no_type_id'];
+            $code = $data['bet_no'];
+            $positions = self::getPositionByTypeId($dict_no_type_id);
+
+            $tmp = [];
+            $i = 0;
+            foreach ($positions as $key=>$position){
+                if($position == 'X'){
+                    $tmp[$key] = 'X';
+                }else{
+                    $tmp[$key] = $code[$i];
+                    $i++;
+                }
+            }
+            //p(['code'=>$code, 'positions'=>$positions, 'dict_no_type_id'=>$dict_no_type_id, 'codes'=>$tmp]);
+            $codesArr[] = implode(',',$tmp);
+        }
+
+        return $codesArr;
+    }
+
+    /**
+     * @desc 根据dict_no_type_id判断位置  1千2百3十4个
+     * @param $dict_no_type_id
+     * @return array
+     */
+    public static function getPositionByTypeId($dict_no_type_id){
+        switch ($dict_no_type_id){
+            case 1: # 千百
+                $position = [1,2,'X','X'];
+                break;
+            case 2: # 千十
+                $position = [1,'X',3,'X'];
+                break;
+            case 3: # 千个
+                $position = [1,'X','X',4];
+                break;
+            case 4: # 百个
+                $position = ['X',2,'X',4];
+                break;
+            case 5: # 百十
+                $position = ['X',2,3,'X'];
+                break;
+            case 6: # 十个
+                $position = ['X','X',3,4];
+                break;
+            case 7: # 千百十
+                $position = [1,2,3,'X'];
+                break;
+            case 8: # 千百个
+                $position = [1,2,'X',4];
+                break;
+            case 9: # 千十个
+                $position = [1,'X',3,4];
+                break;
+            case 10: # 百十个
+                $position = ['X',2,3,4];
+                break;
+            case 11: # 千百十个
+                $position = [1,2,3,4];
+                break;
+        }
+
+        return $position;
+    }
 
     /**
      * @description  撤单

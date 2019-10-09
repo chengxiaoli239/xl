@@ -108,14 +108,16 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);
+        $rst = LuckyBaseService::synBalance($tz_system_users_id = 15); p($rst);# 同步余额
+        $rst = SevenService::login(19, 3);p($rst);
+        $rst = SevenService::synBalance(5);p($rst);
         $rst = KjDataGet::insertKjData('20191009224', 8, '9,5,0,8,7');p($rst);
         $data = Lucky5::batch(); $kjDatas = array_reverse($data); //p($kjDatas);
         foreach ($kjDatas as $key=>$dataInfo){
             $rst = KjDataGet::insertKjData($dataInfo['expect'], 8, $dataInfo['opencode']);
         }p($rst);
         $rst['kj'] = KjDataGet::grabOne();p($rst);
-        $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);
-        $rst = LuckyBaseService::synBalance($tz_system_users_id = 15); p($rst);# 同步余额
         $data = Lucky5::getLotteryLucky();p($data);
         $rst = TzService::insertLuckyDataTime(); p($rst);
         p(unserialize('a:3:{s:4:"time";i:1570224883;s:3:"ttl";i:3600000;s:4:"data";a:0:{}}'));
@@ -123,8 +125,6 @@ class IndexController extends Controller
         $data = CqsscKcw::getLotteryNoOneNineNineEight($type='xml');p($data);
         $profits = SscDataService::getSomeDatesBeforedProfits($lottery_type = 5);p($profits);
         $profits = SscDataService::getProfitsBeforeProfitsByQihao($qihao='190929001', $beforeQishus = 400, $lottery_type = 5);p($profits);
-        $rst = SevenService::login(19, 3);p($rst);
-        $rst = SevenService::synBalance(5);p($rst);
         $rst = TzService::tz(); p($rst);// 计划投注
         $codesArr = NumService::getNotLatelyCodes(['lately_start'=>0, 'lately_end'=>400]);p($codesArr);
         $rst = KjDataGet::getNextQihaoByQihao('190927059',5);p($rst);
@@ -232,7 +232,6 @@ class IndexController extends Controller
         $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay();p($rst); # 单双利润统计(day)
         $rst = KjDataGet::updateNullCode();p($rst);
         $rst = SscDataService::getCodesDS('1,2,3,4,5');p($rst);
-        $rst = StaticService::opStatic();p($rst); # 和值、四定利润统计
         $rst[] = StaticService::opAllStaticProfits(); p($rst);# 利润统计
         $rst = StaticService::allHzStaticProfits($lottery_type = 5);p($rst); # 每个月份每个和值利润统计
         $rst = StaticService::staticPerHzProfits('2019-03');p($rst); # 某月份每个和值利润统计
