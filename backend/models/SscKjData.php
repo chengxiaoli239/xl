@@ -25,7 +25,7 @@ use Yii;
  * @property int $code_2_4 2、4位和值
  * @property int $code_3_4 3、4位和值
  * @property string $code_1_2_3_4 四定单双
- * @property int $qihao 期号
+ * @property string $qihao 期号
  * @property string $date 开奖日期
  * @property string $code_3n 上奖三字现
  * @property string $code_4n 四字现
@@ -58,12 +58,12 @@ class SscKjData extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['index_id', 'codes_hz', 'codes_4nums_hz', 'code1', 'code2', 'code3', 'code4', 'code5', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'qihao', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['index_id', 'codes_hz', 'codes_4nums_hz', 'code1', 'code2', 'code3', 'code4', 'code5', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
             [['kj_code', 'code_4n'], 'string', 'max' => 8],
-            [['code_str', 'code_3n'], 'string', 'max' => 24],
+            [['code_str', 'qihao', 'code_3n'], 'string', 'max' => 24],
             [['code_1_2_3_4'], 'string', 'max' => 4],
-            [['qihao'], 'unique'],
+            [['lottery_type', 'qihao'], 'unique', 'targetAttribute' => ['lottery_type', 'qihao']],
         ];
     }
 
