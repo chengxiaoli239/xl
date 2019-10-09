@@ -45,6 +45,7 @@ class Lucky5 extends BaseKj {
             if ($data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) return false;
             $row = $data['Data']['draw_info'][0];
             $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
+            if($opencode == '0,0,0,0,0') return false;
             $kjData = ['expect'=>$row['period_no'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
             //p($kjData);
         }
