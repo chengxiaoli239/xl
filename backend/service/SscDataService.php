@@ -596,6 +596,8 @@ class SscDataService extends BaseService {
                 $SscStaticYl = new SscStaticYl();
                 $SscStaticYl->created_at = time();
             }
+            $SscStaticYl->codes_hz = $dsData['codes_hz'];
+
             $SscStaticYl->static_nums = $dsData['static_nums'];
             $vals = explode(',', $dsData['val']);
             $count = SscDataService::getNumCounts($vals);

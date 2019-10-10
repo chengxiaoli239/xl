@@ -65,6 +65,7 @@ class IndexController extends Controller
         }else{
             for ($i = 1; $i<5; $i++) {
                 $rst['kj'] = KjDataGet::grabOne();
+                sleep(5);
             }
         }
 

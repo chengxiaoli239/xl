@@ -207,6 +207,7 @@ class TzService extends BaseService {
         //$rst['userSysPlanChange'] = UserSysPlansService::userSysPlanChange($lottery_type);
 
         $rst['qihao'] = $qihao;
+        $rst['lottery_type'] = $lottery_type;
         $rst['time1'] = $time1;
         $rst['time2'] = $time2;
         $rst['time3'] = $time3;

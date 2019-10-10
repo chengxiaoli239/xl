@@ -1806,13 +1806,13 @@ class StaticService extends BaseService {
                $m->set($mkey, 1, 180);
                $time1 = microtime(true);
                # 号码类型：双重、双双重、四重、三兄弟、四兄弟
-               $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
+               $rst[$lottery_type]['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
                $time2 = microtime(true);
                # 三字现
-               $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type); # 10s
+               $rst[$lottery_type]['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type); # 10s
                $time3 = microtime(true);
                # 四字现
-               $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
+               $rst[$lottery_type]['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
                $time4 = microtime(true);
                $times = [$time1, $time2, $time3, $time4];
 
