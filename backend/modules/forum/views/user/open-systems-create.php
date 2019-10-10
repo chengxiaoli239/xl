@@ -23,6 +23,8 @@ $username = AdminModel::findOne($uid)->username;
 
                     <?= $form->field($model, 'tz_types')->checkboxList($allTzTypes)->label('投注方式tz_types') ?>
 
+                    <?= $form->field($model, 'lottery_types')->checkboxList($allLotteryTypes)->label('彩种lottery_types') ?>
+
                     <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
                             <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>

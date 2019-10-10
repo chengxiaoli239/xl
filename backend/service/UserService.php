@@ -95,6 +95,7 @@ class UserService extends BaseService {
 
         $post['TzSystemsAuth']['tz_systems_ids'] && $post['TzSystemsAuth']['tz_systems_ids'] = implode(',',$post['TzSystemsAuth']['tz_systems_ids']);
         $post['TzSystemsAuth']['tz_types'] && $post['TzSystemsAuth']['tz_types'] = implode(',',$post['TzSystemsAuth']['tz_types']);
+        $post['TzSystemsAuth']['lottery_types'] && $post['TzSystemsAuth']['lottery_types'] = implode(',',$post['TzSystemsAuth']['lottery_types']);
 
         $post['TzSystemsAuth']['uid'] = $uid;
         $post['TzSystemsAuth']['updated_at'] = time();

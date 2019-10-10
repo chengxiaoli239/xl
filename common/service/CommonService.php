@@ -738,6 +738,24 @@ class  CommonService{
         return $dataArr;
     }
 
+    /**
+     * @desc 所有彩票类型
+     * @param int $status
+     * @return array
+     */
+    public static function getAllLotteryTypes(){
+
+        $datas = LotteryType::find()->where(['enable'=>1])->asArray()->all();
+
+        $dataArr = [];
+
+        foreach ($datas as $key=>$data){
+            $dataArr[$data['lottery_type']] = $data['title'];
+        }
+
+        return $dataArr;
+    }
+
      /**
      * @desc 获取号码类型名称
      * @param int $code_type

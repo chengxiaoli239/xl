@@ -15,6 +15,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\User;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\KuaiLe8Service;
+use backend\service\Lucky5\LuckyBaseService;
 use backend\service\McKeyService;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\SevenService;
@@ -303,9 +304,13 @@ class IndexController extends Controller
             if(in_array($tz_system_id, [1,2])){
                 # 1、0898投注、2、99彩票网
                 $rst = HN0898Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-            }elseif(in_array($tz_system_id, [3])){
+            }elseif(in_array($tz_system_id, [3, 7])){
                 # 3、重庆7时彩网
-                $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                if($tz_system_id == 3){
+                    $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                }else{
+                    $rst = LuckyBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                }
             }elseif(in_array($tz_system_id, [4])){
                 # 4、7天彩票网
             }elseif(in_array($tz_system_id, [5])){
