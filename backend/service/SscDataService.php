@@ -735,13 +735,14 @@ class SscDataService extends BaseService {
         $tDate = date('Y-m-d');
         foreach ($SscStaticVals as $dsData){
             //p(['lottery_type'=>$lottery_type, 'type'=>$type, 'val'=>$dsData['val'], $SscStaticYls[$dsData['val']]]);
+            $count = $dsData['count'];
             if(!$SscStaticYl = $SscStaticYls[$dsData['val']]){
                 $SscStaticYl = new SscStaticYl();
                 $SscStaticYl->created_at = time();
                 $SscStaticYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
                 //$count = SscDataService::getCodeTypeNumCounts($type, strlen($dsData['val']));
                 $SscStaticYl->type = $type;
-                $SscStaticYl->count = $dsData['count'];
+                $SscStaticYl->count = $count;
 
                 $SscStaticYl->type_2b = (int)$dsData['type_2b'];
                 $SscStaticYl->type_3b = (int)$dsData['type_3b'];
@@ -754,8 +755,8 @@ class SscDataService extends BaseService {
                 $SscStaticYl->type_4s = (int)$dsData['type_4s'];
                 $SscStaticYl->type_4ds = (int)$dsData['type_4ds'];
                 $SscStaticYl->type_log = (int)$dsData['type_log'];
+                $SscStaticYl->codes_hz = $dsData['codes_hz'];
             }
-            $SscStaticYl->codes_hz = $dsData['codes_hz'];
             $SscStaticYl->static_nums = $dsData['static_nums'];
             //$vals = explode(',', $dsData['val']); //p([$dsData, $count]);
             $SscStaticYl->updated_at = time();
