@@ -11,7 +11,7 @@ use Yii;
  * @property int $index_id 顺序id
  * @property string $code_str 开奖号码str
  * @property string $code_3n 三字现号码
- * @property int $qihao 期号
+ * @property string $qihao 期号
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property string $date 开奖日期
  * @property int $created_at 创建时间
@@ -34,9 +34,10 @@ class SscKjData3num extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['index_id', 'qihao', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['index_id', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
-            [['code_str', 'code_3n'], 'string', 'max' => 24],
+            [['code_str', 'code_3n', 'qihao'], 'string', 'max' => 24],
+            [['qihao'], 'unique'],
         ];
     }
 
@@ -46,16 +47,16 @@ class SscKjData3num extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'index_id' => '顺序id',
-            'code_str' => '开奖号码str',
-            'code_3n' => '三字现号码',
-            'qihao' => '期号',
-            'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
-            'date' => '开奖日期',
-            'created_at' => '创建时间',
-            'update_time' => '创建时间',
-            'updated_at' => '更新时间',
+            'id' => Yii::t('app', 'ID'),
+            'index_id' => Yii::t('app', '顺序id'),
+            'code_str' => Yii::t('app', '开奖号码str'),
+            'code_3n' => Yii::t('app', '三字现号码'),
+            'qihao' => Yii::t('app', '期号'),
+            'lottery_type' => Yii::t('app', '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc'),
+            'date' => Yii::t('app', '开奖日期'),
+            'created_at' => Yii::t('app', '创建时间'),
+            'update_time' => Yii::t('app', '创建时间'),
+            'updated_at' => Yii::t('app', '更新时间'),
         ];
     }
 

@@ -25,8 +25,8 @@ use Yii;
  * @property int $code_1_3_4 1、3、4位
  * @property int $code_2_3_4 2、3、4位
  * @property int $code_1_2_3_4 1、3、4位
+ * @property string $qihao 期号
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
- * @property int $qihao 期号
  * @property string $date 开奖日期
  * @property int $created_at 创建时间
  * @property string $update_time 创建时间
@@ -48,9 +48,10 @@ class SscKjDataDs extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['index_id', 'code_1', 'code_2', 'code_3', 'code_4', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'code_1_2_3', 'code_1_2_4', 'code_1_3_4', 'code_2_3_4', 'code_1_2_3_4', 'lottery_type', 'qihao', 'created_at', 'updated_at'], 'integer'],
+            [['index_id', 'code_1', 'code_2', 'code_3', 'code_4', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'code_1_2_3', 'code_1_2_4', 'code_1_3_4', 'code_2_3_4', 'code_1_2_3_4', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
-            [['code_str'], 'string', 'max' => 24],
+            [['code_str', 'qihao'], 'string', 'max' => 24],
+            [['qihao'], 'unique'],
         ];
     }
 
@@ -78,8 +79,8 @@ class SscKjDataDs extends \common\models\base\BaseModel
             'code_1_3_4' => '1、3、4位',
             'code_2_3_4' => '2、3、4位',
             'code_1_2_3_4' => '1、3、4位',
-            'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
             'qihao' => '期号',
+            'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
             'date' => '开奖日期',
             'created_at' => '创建时间',
             'update_time' => '创建时间',

@@ -7,10 +7,10 @@ use Yii;
 /**
  * This is the model class for table "{{%ssc_dw_hz_static}}".
  *
- * @property string $id
+ * @property int $id
  * @property string $positions 位置，1,2;1,3;1:4;2,3;2,4;3,4
  * @property string $qihao 当前期号
- * @property int $periods 近多少期，20，50，100，150，200，300，500，1000，2000期
+ * @property int $periods 近多少期，20，50，100，150，200，300，500，1000，2000，5000期
  * @property int $hz_0
  * @property int $hz_1
  * @property int $hz_2 2
@@ -52,7 +52,7 @@ class SscDwHzStatic extends \common\models\base\BaseModel
             [['periods', 'hz_0', 'hz_1', 'hz_2', 'hz_3', 'hz_4', 'hz_5', 'hz_6', 'hz_7', 'hz_8', 'hz_9', 'hz_10', 'hz_11', 'hz_12', 'hz_13', 'hz_14', 'hz_15', 'hz_16', 'hz_17', 'hz_18', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
             [['positions'], 'string', 'max' => 8],
-            [['qihao'], 'string', 'max' => 11],
+            [['qihao'], 'string', 'max' => 24],
         ];
     }
 
@@ -65,7 +65,7 @@ class SscDwHzStatic extends \common\models\base\BaseModel
             'id' => Yii::t('app', 'ID'),
             'positions' => Yii::t('app', '位置，1,2;1,3;1:4;2,3;2,4;3,4'),
             'qihao' => Yii::t('app', '当前期号'),
-            'periods' => Yii::t('app', '近多少期，20，50，100，150，200，300，500，1000，2000期'),
+            'periods' => Yii::t('app', '近多少期，20，50，100，150，200，300，500，1000，2000，5000期'),
             'hz_0' => Yii::t('app', 'Hz 0'),
             'hz_1' => Yii::t('app', 'Hz 1'),
             'hz_2' => Yii::t('app', '2'),

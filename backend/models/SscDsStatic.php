@@ -7,7 +7,7 @@ use Yii;
 /**
  * This is the model class for table "{{%ssc_ds_static}}".
  *
- * @property string $id
+ * @property int $id
  * @property string $positions 位置，1,2;2,3;3:4;1,4
  * @property string $qihao 当前期号
  * @property int $periods 近多少期，20，50，100，150，200，300，500期
@@ -37,7 +37,7 @@ class SscDsStatic extends \common\models\base\BaseModel
             [['periods', 'DS', 'SD', 'DD', 'SS', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
             [['positions'], 'string', 'max' => 8],
-            [['qihao'], 'string', 'max' => 11],
+            [['qihao'], 'string', 'max' => 24],
         ];
     }
 
