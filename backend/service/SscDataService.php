@@ -600,7 +600,8 @@ class SscDataService extends BaseService {
 
             $SscStaticYl->static_nums = $dsData['static_nums'];
             $vals = explode(',', $dsData['val']);
-            $count = SscDataService::getNumCounts($vals);
+            //$count = SscDataService::getNumCounts($vals);
+            $count = $dsData['count'];
             //if($dsData['val'] == 'type_2,type_3b') p([$count, $dsData['val']]);
             $SscStaticYl->lottery_type = $lottery_type;
             $SscStaticYl->updated_at = time();
@@ -738,9 +739,9 @@ class SscDataService extends BaseService {
                 $SscStaticYl = new SscStaticYl();
                 $SscStaticYl->created_at = time();
                 $SscStaticYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
-                $count = SscDataService::getCodeTypeNumCounts($type, strlen($dsData['val']));
+                //$count = SscDataService::getCodeTypeNumCounts($type, strlen($dsData['val']));
                 $SscStaticYl->type = $type;
-                $SscStaticYl->count = $count;
+                $SscStaticYl->count = $dsData['count'];
 
                 $SscStaticYl->type_2b = (int)$dsData['type_2b'];
                 $SscStaticYl->type_3b = (int)$dsData['type_3b'];

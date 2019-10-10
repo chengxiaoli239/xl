@@ -108,6 +108,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = KjDataGet::getNextQihaoByQihao('20191010020',8);p($rst);
         //$str = '{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}'; //p(json_decode($str, true)); d(strpos($str, "\"Status\":1") !== false);
         $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);
         $rst = LuckyBaseService::synBalance($tz_system_users_id = 15); p($rst);# 同步余额
@@ -128,7 +129,6 @@ class IndexController extends Controller
         $profits = SscDataService::getProfitsBeforeProfitsByQihao($qihao='190929001', $beforeQishus = 400, $lottery_type = 5);p($profits);
         $rst = TzService::tz(); p($rst);// 计划投注
         $codesArr = NumService::getNotLatelyCodes(['lately_start'=>0, 'lately_end'=>400]);p($codesArr);
-        $rst = KjDataGet::getNextQihaoByQihao('190927059',5);p($rst);
         $rst = SscDataService::calulateBeforeProfits();p($rst); # 统计前面多少期号码的中奖利润
         $miss = SscDataService::getCodeTypeYlHistoryMiss('6789', $lottery_type = 5, 30000);p($miss);
         $msg = KjDataGet::insertKjData('2019092548', $lottery_type = 6, $kjData = '3,9,9,7,1');p($msg);
