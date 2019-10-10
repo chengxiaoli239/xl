@@ -14,6 +14,7 @@ use Yii;
  * @property int $status 是否显示0不显示1显示
  * @property int $type 类型：1和值2号码类型[例如:双双重、三重]3三字现带双重4四字现带双重5四字现不带双重
  * @property int $static_nums 统计期数
+ * @property int $count 组数
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -45,7 +46,7 @@ class SscStaticVal extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['codes_hz', 'status', 'type', 'static_nums', 'created_at', 'updated_at', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4d', 'type_4s', 'type_log', 'type_4ds'], 'integer'],
+            [['codes_hz', 'status', 'type', 'static_nums', 'count', 'created_at', 'updated_at', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4d', 'type_4s', 'type_log', 'type_4ds'], 'integer'],
             [['update_time'], 'safe'],
             [['val'], 'string', 'max' => 120],
             [['name'], 'string', 'max' => 64],
@@ -65,6 +66,7 @@ class SscStaticVal extends \common\models\base\BaseModel
             'status' => '是否显示0不显示1显示',
             'type' => '类型：1和值2号码类型[例如:双双重、三重]3三字现带双重4四字现带双重5四字现不带双重',
             'static_nums' => '统计期数',
+            'count' => '组数',
             'created_at' => '创建时间',
             'updated_at' => '更新时间',
             'update_time' => '更新时间',
