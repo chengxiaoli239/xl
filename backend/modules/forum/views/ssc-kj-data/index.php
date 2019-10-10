@@ -50,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'code3',
                         //'code4',
                         //'code5',
-                        //'type_2',
+                        'type_2',
                         'type_22',
                         'type_3',
                         //'type_4',
