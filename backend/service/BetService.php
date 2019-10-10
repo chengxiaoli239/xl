@@ -187,7 +187,12 @@ abstract class BetService extends BaseBetService {
         $status = $m->get($pkey);
 
         $time = date('H:i:s');
-        if($lottery_type == 7){
+        if($lottery_type == 5){
+            if(\Yii::$app->params['ssc_kj_time_start'] <= $time && $time <= \Yii::$app->params['ssc_kj_time_end'] ){
+                //$rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
+                $status = false;
+            }
+        }else if($lottery_type == 7){
             # 北京快乐8
             $tz_systems_users_id = SystemConfig::findOne(['key'=>'kuaile8_get_kj_user_id'])->value;
             $TzSystemsUsers = TzSystemsUsers::findOne($tz_systems_users_id);
