@@ -33,7 +33,6 @@ _: 1555000599483
 
 
 
-
 退单一：
 Request URL: http://k8.cq691111.xyz/Member/GetMemberPrint?_=1554999191862
 Request Method: GET
@@ -262,7 +261,7 @@ _: 1555052477064
 	{"Status":1,"Data":{"bet_datetime":null,"member_account":"ceshi12","serial_no":null,"period_no":"20191009282","print_no":null,"credit":"100","credit_balance":"99.9","bet_money_all":"0.1","win_money_all":"0","show_mode":0,"input_mode":0,"lottery_name":"幸运五星彩","store_name":"","previous_period_no":"20191009281","draw_info":[{"period_no":20191009281,"thousand_no":8,"hundred_no":4,"ten_no":3,"one_no":1,"ball5":4,"is_checkout":1},{"period_no":20191009280,"thousand_no":3,"hundred_no":5,"ten_no":2,"one_no":0,"ball5":1,"is_checkout":1},{"period_no":20191009279,"thousand_no":3,"hundred_no":8,"ten_no":8,"one_no":3,"ball5":5,"is_checkout":1},{"period_no":20191009278,"thousand_no":8,"hundred_no":2,"ten_no":2,"one_no":5,"ball5":3,"is_checkout":1},{"period_no":20191009277,"thousand_no":5,"hundred_no":8,"ten_no":3,"one_no":4,"ball5":9,"is_checkout":1},{"period_no":20191009276,"thousand_no":2,"hundred_no":7,"ten_no":9,"one_no":5,"ball5":1,"is_checkout":1},{"period_no":20191009275,"thousand_no":6,"hundred_no":4,"ten_no":3,"one_no":1,"ball5":6,"is_checkout":1},{"period_no":20191009274,"thousand_no":7,"hundred_no":2,"ten_no":4,"one_no":7,"ball5":3,"is_checkout":1}],"previous_draw_no":"8,4,3,1,4","previous_period_status":"3","Details":[],"TotalBetMoney":"0","RecordsCount":0,"AllRecordsCount":0,"AllBetMoney":null,"PageCount":1,"PageIndex":1}}
 
 
-二.下注
+二.四定位
 1、Genenral
 	Request URL: http://f1.ww99865.xyz/Member/MultipleBet
 	Request Method: POST
@@ -299,8 +298,65 @@ _: 1555052477064
 
 
 
+二定位：
+1、Genenral
+	Request URL: http://f6.ww99865.xyz/Member/BatchBet
+	Request Method: POST
+	Status Code: 200 OK
 
+2、Requerst Header
+	Accept: application/json, text/javascript, */*; q=0.01
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 387
+	Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+	Cookie: __cfduid=d7fc693222c1f28a9b2919a268d4517231570498335; robot7=bWDAL0831v7Cmd0pMduNORIbGfd2KWRCJwOZvYGRwSaOvE/cf9ZYIWzjQO3FDJBNl0nC27xMq/domSnyHWzYvQ==; SevenStarHFDirector18Frontend18=jdpgairesf0xebysy4n3wjxr; Akamai_Cookie=2651851274.13685.0000; visid_incap_1712594=L6vNif0cSt6/Rc9kMCJ/0YHqn10AAAAAQUIPAAAAAAAVxR+5OQaTLh0KYlRwuXXL; nlbi_1712594=6trPHxfWjwUnmgSbE3SBeAAAAABPvoTSsUD9NJFxFBb2whDE; incap_ses_406_1712594=bOSoT0nnsCmECKlw12miBYHqn10AAAAAjq4tvKkIpn5011pE8CQ2Aw==; robot3=BFX/oVjkibK6TzGQOB50IMqNcCOgvnnTFydnCTThSYg=; NOTICE_LOGIN_IN=1
+	Host: f6.ww99865.xyz
+	Origin: http://f6.ww99865.xyz
+	Referer: http://f6.ww99865.xyz/App/Index?_=1570762394781
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+	X-Requested-With: XMLHttpRequest
 
+3、Form Data
+	bets: [{"dict_no_type_id":"3","bet_no":"0XX0","bet_money":"0.1"},{"dict_no_type_id":"3","bet_no":"3XX3","bet_money":"0.1"},{"dict_no_type_id":"3","bet_no":"6XX5","bet_money":"0.1"}]
+	way: 104
+	guid: 0f25facc-984b-4745-80b2-cd3fbcf7a49d
+	is_package: 0
+	period_no: 20191011132
+
+三定位：
+1、Genenral
+	Request URL: http://f1.ww99865.xyz/Member/MultipleBet
+	Request Method: POST
+	Status Code: 200 OK
+
+2、Requerst Header
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Cache-Control: max-age=0
+	Connection: keep-alive
+	Content-Length: 1531
+	Content-Type: application/x-www-form-urlencoded
+	Cookie: SevenStarHFDirector18Frontend18=tv1fehdghbalqhv21f1xdjz0; Akamai_Cookie=2819623434.13685.0000; __cfduid=d7fc693222c1f28a9b2919a268d4517231570498335; robot7=bWDAL0831v7Cmd0pMduNORIbGfd2KWRCJwOZvYGRwSaOvE/cf9ZYIWzjQO3FDJBNl0nC27xMq/domSnyHWzYvQ==; first_visit=1; visid_incap_1712594=L6vNif0cSt6/Rc9kMCJ/0YHqn10AAAAAQUIPAAAAAAAVxR+5OQaTLh0KYlRwuXXL; nlbi_1712594=6trPHxfWjwUnmgSbE3SBeAAAAABPvoTSsUD9NJFxFBb2whDE; incap_ses_406_1712594=bOSoT0nnsCmECKlw12miBYHqn10AAAAAjq4tvKkIpn5011pE8CQ2Aw==; robot3=p/H5D55OTMmATrU9NLYoNtBFHz8Ym62vxYT6SLD7AkU=; NOTICE_LOGIN_IN=1
+	Host: f1.ww99865.xyz
+	Origin: http://f1.ww99865.xyz
+	Referer: http://f1.ww99865.xyz/App/Index?_=1570763218479
+	Upgrade-Insecure-Requests: 1
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+
+3、Form Data
+	bet_number: 124X,134X
+	bet_money: 0.1
+	bet_way: 102
+	is_xian: 0
+	is_iframe: 1
+	number_type: 30
+	bet_log: [三定位]，定位置“[取]”：千=[1]，百=[23]，十=[4]
+	is_package: 0
+	period_no: 20191011134
+	operation_condition: {"symbol":"X","isXian":0,"firstNumber":"1","secondNumber":"23","thirdNumber":"4","fourthNumber":"","fifthNumber":"","numberType":30,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[],"symbolPositions":[0,0,0,0],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}
 
 
 
