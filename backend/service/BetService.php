@@ -291,16 +291,17 @@ abstract class BetService extends BaseBetService {
             case 10: # 一字定
                 $codesArr = explode('@', $codes_hz);
                 break;
+            case 1: # 二字定
             case 2: # 三字定
-                $params = ['playway'=>$playway, 'tz_type'=>$tz_type, 'status'=>$buy_type];
-                $SysPlansCodes = SysPlansCodes::find()->where($params)->orderBy(['rand()' => SORT_DESC])->asArray()->all(); # ->limit($limit) 限制数量去掉
-                $codesArr = [];
-                foreach ($SysPlansCodes as $key=>$plan){
-                    $codesArr[] = $plan['code'];
-                }
-
                 if(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])) { # 导入方案
                     $codesArr = UserSysPlansService::getImportCodes($plan_id);
+                }else{
+                    $params = ['playway'=>$playway, 'tz_type'=>$tz_type, 'status'=>$buy_type];
+                    $SysPlansCodes = SysPlansCodes::find()->where($params)->orderBy(['rand()' => SORT_DESC])->asArray()->all(); # ->limit($limit) 限制数量去掉
+                    $codesArr = [];
+                    foreach ($SysPlansCodes as $key=>$plan){
+                        $codesArr[] = $plan['code'];
+                    }
                 }
                 break;
             case 3: # 四字定
@@ -422,7 +423,7 @@ abstract class BetService extends BaseBetService {
      * @param int $tz_type
      */
     public static function isBigNumsBet($tz_type = 20){
-        if(in_array($tz_type, [20, 23, 24, 25, 26])){
+        if(in_array($tz_type, [19, 20, 23, 24, 25, 26])){
             return true;
         }
 

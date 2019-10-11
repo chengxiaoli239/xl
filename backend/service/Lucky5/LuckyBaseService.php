@@ -220,33 +220,45 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $totalBetMoney = $totalCount * $single; # 投注总金额
         $way = self::getWay($tz_type);
 
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
         $bet_codes = $codes;
         $isBigNumsBet = BetService::isBigNumsBet($tz_type);
         if($isBigNumsBet){
             $bet_codes = str_replace(',','',$bet_codes);
             $bet_codes = str_replace('@',',',$bet_codes);
+            $post_data = [
+                'bet_number'=>$bet_codes,
+                'bet_money'=>$single,
+                'bet_way'=>$way,
+                'is_xian'=>0,
+                'is_iframe'=>1,
+                'number_type'=>self::getNumberType($tz_type),
+                //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
+                //'bet_log'=>'[四定位]，合分值范围：[0-36]', # 四定
+                //'bet_log'=>'[二定位]，定位置“[取]”：千=[1]，百=[34]', # 二定
+                'bet_log' => self::getBetLog($tz_type),
+                'is_package' => 0,
+                'period_no'=>$qihao,
+                'operation_condition' => self::getOperationCondition($tz_type),
+            ];
+            $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL').'?'.http_build_query($post_data);
+        }elseif($tz_type == 27){ # 二定
+            $bet_codes = self::getBetCodes($codes, $single, $playway);
+            $post_data = [
+                'bets'=>json_encode($bet_codes),
+                'way'=>$way,
+                'bet_money'=>$single,
+                //'number_type'=>self::getNumberType($tz_type),
+                'guid'=>'0f25facc-984b-4745-80b2-cd3fbcf7a49d',
+                'is_package' => 0,
+                'period_no'=>$qihao,
+            ];
+            $url = 'http://f1.ww99865.xyz/Member/BatchBet?'.http_build_query($post_data);
         }
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
-
         //$post_data = ['totalCount'=>$totalCount, 'totalBetMoney'=>$totalBetMoney, 'bets'=>json_encode($codes), 'way'=>$way, 'period_no'=>'20'.$qihao, 'bet_log'=>urlencode('投注：'.$totalCount.'/'.$single.'注,总共：'.$totalBetMoney.'元'), ];
-        $post_data = [
-            'bet_number'=>$bet_codes,
-            'bet_money'=>$single,
-            'bet_way'=>$way,
-            'is_xian'=>0,
-            'number_type'=>40,
-            'is_iframe'=>1,
-            //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
-            'bet_log'=>'[四定位]，合分值范围：[0-36]',
-            'is_package' => 0,
-            'period_no'=>$qihao,
-            'operation_condition' => self::getOperationCondition(),
 
-            //'totalBetMoney'=>$totalBetMoney,
-            //'bets'=>json_encode($codes),
-        ];
 
-        $_t = microtime(true) * 10000;
+        $_t = round(microtime(true) * 1000);
         $data['code'] = $codes;
         $headers = [
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
@@ -255,7 +267,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             'Cache-Control: max-age=0',
             'Connection: keep-alive',
             'Content-Length:'.strlen(http_build_query($post_data)),
-            'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+            //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+            'Content-Type: application/x-www-form-urlencoded',
             'Cookie: '.$TzSystemsUsers->cookie,
             'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
             'Origin: '.$TzSystemsUsers->ssc_domain,
@@ -267,7 +280,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         //$headers = array_merge(self::$headers,$header);
         //p($headers);
         //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
-        $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL').'?'.http_build_query($post_data);
 
         $account = AdminModel::findOne(self::$user_id)->username;  # 投注用户账号
         //p(['headers'=>$headers, 'url'=>$url, 'account'=>$account, 'post_data'=>$post_data]);
@@ -313,7 +325,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         //$position = $position ? $position : self::$position;
 
         if(!$isBigNumsBet){
-            $codes = implode('@', self::getMySiteCodesStyle($codes, $playway));
+            //$codes = implode('@', self::getMySiteCodesStyle($codes, $playway));
         }
 
         $n = count(explode('@',$codes));
@@ -377,6 +389,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
     public static function getWay($tz_type = 20){
         $rstData = [
             20 => 102,
+            27 => 104,
         ];
 
         if(isset($rstData[$tz_type])) return $rstData[$tz_type];
@@ -386,11 +399,45 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
     }
 
     /**
+     * @desc 根据playway、tz_type 获取投注方式
+     * @param int $tz_type
+     * @return array|mixed
+     */
+    public static function getNumberType($tz_type = 20){
+        $rstData = [
+            27 => 20,
+        ];
+
+        if(isset($rstData[$tz_type])) return $rstData[$tz_type];
+
+        return 40;
+        //return $rstData;
+    }
+
+    /**
+     * @desc 返回投注日
+     * @return string
+     */
+    public static function getBetLog($tz_type = 20){
+        if($tz_type == 27){ # 二定
+            $str = '[二定位]，定位置“[取]”：千=[1]，百=[34]';
+        }else{ # 四定
+            $str = '[四定位]，合分值范围：[0-36]';
+        }
+
+        return $str;
+    }
+
+    /**
      * @desc 返回和值投注
      * @return string
      */
-    public static function getOperationCondition(){
-        $json = '{"symbol":"X","isXian":0,"firstNumber":"","secondNumber":"","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":40,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[30,35],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[0,0,0,0],"symbolPositions":[],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}';
+    public static function getOperationCondition($tz_type = 20){
+        if($tz_type == 27){
+            $json = '{"symbol":"X","isXian":0,"firstNumber":"1","secondNumber":"34","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":20,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[],"symbolPositions":[0,0,0,0],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}';
+        }else{
+            $json = '{"symbol":"X","isXian":0,"firstNumber":"","secondNumber":"","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":40,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[30,35],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[0,0,0,0],"symbolPositions":[],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}';
+        }
 
         return $json;
     }
@@ -467,6 +514,57 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         }
 
         return $codesArr;
+    }
+
+    /**
+     * @desc 获取批投号码格式
+     * @param $codesData
+     * @param float $single
+     * @param integer $playway 1二定2三定3四定
+     * @return array
+     */
+    public static function getBetCodes($codesData, $single = 0.1, $playway = 1){
+        $codes = [];
+        $codesData = str_replace(',','',$codesData);
+        $codesData = str_replace('@',',',$codesData);
+
+        if($playway == 1){ # 二定
+            $codesArr = explode(',', $codesData);
+            foreach ($codesArr as $code){
+                $dict_no_type_id = self::getdict_no_type_id($code, $playway);
+                $codes[] = ['dict_no_type_id'=>$dict_no_type_id, 'bet_no'=>$code, 'bet_money'=>$single];
+            }
+        }
+
+        return $codes;
+    }
+
+    /**
+     * @desc 获取号码类型
+     * @param $code
+     * @param int $playway
+     */
+    public static function getdict_no_type_id($code, $playway = 1){
+        $dict_no_type_id = 1;
+        $code1 = $code[0];
+        $code2 = $code[1];
+        $code3 = $code[2];
+        $code4 = $code[3];
+        if($code3 == 'X' && $code4 == 'X'){
+            $dict_no_type_id = 1; # 千百
+        }elseif($code2 == 'X' && $code4 == 'X'){
+            $dict_no_type_id = 2; # 千十
+        }elseif($code2 == 'X' && $code3 == 'X'){
+            $dict_no_type_id = 3; # 千个
+        }elseif($code1 == 'X' && $code4 == 'X'){
+            $dict_no_type_id = 4; # 百十
+        }elseif($code1 == 'X' && $code3 == 'X'){
+            $dict_no_type_id = 5; # 百个
+        }elseif($code1 == 'X' && $code2 == 'X'){
+            $dict_no_type_id = 6; # 十个
+        }
+
+        return $dict_no_type_id;
     }
 
     /**

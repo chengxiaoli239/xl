@@ -297,8 +297,7 @@ _: 1555052477064
 	operation_condition: {"symbol":"X","isXian":0,"firstNumber":"1","secondNumber":"23","thirdNumber":"1","fourthNumber":"2","fifthNumber":"","numberType":40,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[0,0,0,0],"symbolPositions":[],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}
 
 
-
-二定位：
+批投二定：
 1、Genenral
 	Request URL: http://f6.ww99865.xyz/Member/BatchBet
 	Request Method: POST
@@ -325,7 +324,39 @@ _: 1555052477064
 	is_package: 0
 	period_no: 20191011132
 
-三定位：
+快选二定位：
+1、Genenral
+	Request URL: http://f9.ww99865.xyz:5678/Member/MultipleBet
+	Request Method: POST
+
+2、Requerst Header
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Cache-Control: max-age=0
+	Connection: keep-alive
+	Content-Length: 1502
+	Content-Type: application/x-www-form-urlencoded
+	Cookie: SevenStarHFDirector18Frontend18=qtpkyvkqlblwxi4letkfwapx; __cfduid=d7fc693222c1f28a9b2919a268d4517231570498335; Akamai_Cookie=2651851274.13685.0000; robot7=bWDAL0831v7Cmd0pMduNORIbGfd2KWRCJwOZvYGRwSaOvE/cf9ZYIWzjQO3FDJBNl0nC27xMq/domSnyHWzYvQ==; visid_incap_1712594=L6vNif0cSt6/Rc9kMCJ/0YHqn10AAAAAQUIPAAAAAAAVxR+5OQaTLh0KYlRwuXXL; nlbi_1712594=6trPHxfWjwUnmgSbE3SBeAAAAABPvoTSsUD9NJFxFBb2whDE; incap_ses_406_1712594=FOuuUcEVbklVubJw12miBUf9n10AAAAAUMyRoXkCxE+d9NHmWiEsJA==; robot3=7QMHN9IixMcUlNzV7JtzzjVH+jsS7PHbzdF8wLT5fbA=; NOTICE_LOGIN_IN=1
+	Host: f9.ww99865.xyz:5678
+	Origin: http://f9.ww99865.xyz:5678
+	Referer: http://f9.ww99865.xyz:5678/App/Index?_=1570766165513
+	Upgrade-Insecure-Requests: 1
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+
+3、Form Data
+	bet_number: 13XX,14XX
+	bet_money: 0.1
+	bet_way: 102
+	is_xian: 0
+	is_iframe: 1
+	number_type: 20
+	bet_log: [二定位]，定位置“[取]”：千=[1]，百=[34]
+	is_package: 0
+	period_no: 20191011144
+	operation_condition: {"symbol":"X","isXian":0,"firstNumber":"1","secondNumber":"34","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":20,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[],"symbolPositions":[0,0,0,0],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}
+
+快选三定位：
 1、Genenral
 	Request URL: http://f1.ww99865.xyz/Member/MultipleBet
 	Request Method: POST

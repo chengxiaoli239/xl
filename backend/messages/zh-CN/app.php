@@ -36,6 +36,7 @@ return [
     'playway 10 Plans'=> '定位胆',
     'Ssc Ds Yls' => '单双遗漏',
     'User Sys Plans' => '投注计划',
+    'Create User Sys Plans 1d' => '添加二定计划',
     'Create User Sys Plans 2d' => '添加3d计划',
     'Create User Sys Plans 3d' => '添加4d计划',
     'Create User Sys Plans 3d hz' => '添加4d和值计划',

@@ -21,8 +21,8 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
 
                     <?= $form->field($model, 'playway')->radioList([
-                        //'1'=>'二字定',
-                        '2'=>'三字定',
+                        '1'=>'二字定',
+                        //'2'=>'三字定',
                         //'3'=>'四字定',
                     ])->label('投注方式') ?>
 
@@ -34,8 +34,8 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'single')->textInput() ?>
 
-                    <?= $form->field($model, 'import_codes_txt')->textInput()->label('多组英文逗号或空格隔开 234X,345X 或 234X 345X') ?>
-                    <input type="hidden" name="UserSysPlans[tz_type]" value="19"><!--三定导入-->
+                    <?= $form->field($model, 'import_codes_txt')->textInput()->label('多组英文逗号或空格隔开 格式：23XX,34XX 或 23XX 34XX') ?>
+                    <input type="hidden" name="UserSysPlans[tz_type]" value="27"><!--三定导入-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
                     <!--?= $form->field($model, 'tz_type')->radioList([ //'1'=>'大小单双三字定', //'2'=>'大小三字定', '3'=>'单双三字定', ])->label('投注类型') ?-->
 
