@@ -1125,10 +1125,14 @@ class HN0898Service extends BaseTZService {
                 break;
             case 8:  # 幸运五星彩
                 $time = date("H:i:s", time());
-                $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC LIMIT 1";
-                $rst = $db->createCommand($sql)->queryOne();
+                if('23:55:00'<$time && $time<='23:59:59'){
+                    $actionNo = '288';
+                }else{
+                    $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC LIMIT 1";
+                    $rst = $db->createCommand($sql)->queryOne();
 
-                $actionNo = $rst['actionNo'];
+                    $actionNo = $rst['actionNo'];
+                }
 
                 $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 break;
@@ -1181,12 +1185,17 @@ class HN0898Service extends BaseTZService {
                 break;
             case 8: # 幸运五星彩
                 $time = date("H:i:s", time() - 5 * 60);
-                $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC LIMIT 1";
-                $rst = $db->createCommand($sql)->queryOne();
+                if('00:00:00'<$time && $time < '00:05:00'){
+                    $actionNo = '288';
+                    $qihao = date('Ymd', time() - 20*60).sprintf("%03d", $actionNo);
+                }else{
+                    $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC LIMIT 1";
+                    $rst = $db->createCommand($sql)->queryOne();
 
-                $actionNo = $rst['actionNo'];
+                    $actionNo = $rst['actionNo'];
+                    $qihao = date("Ymd").sprintf("%03d", $actionNo);
+                }
 
-                $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 break;
         }
 
