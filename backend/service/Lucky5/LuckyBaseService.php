@@ -624,9 +624,25 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $snid = $BettingRecords->snid;
         self::__init($uid, $tz_system_id);
 
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
-        $post_data = [ 'ids'=>$snid, 'period_no' => '20'.$qihao];
-        $headers = self::$headers;
+        $post_data = [ 'ids'=>$snid, 'period_no' => $qihao];
+
+        $_t = round(microtime(true) * 1000);
+        $headers = [
+            'Accept: application/json, text/javascript, */*; q=0.01',
+            'Accept-Encoding: gunzip, deflate',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Connection: keep-alive',
+            'Content-Length:'.strlen(http_build_query($post_data)),
+            'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+            'Cookie: '.$TzSystemsUsers->cookie,
+            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+            'Origin: '.$TzSystemsUsers->ssc_domain,
+            'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+            'X-Requested-With: XMLHttpRequest',
+            $TzSystemsUsers->user_agent,
+        ];
 
         $url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER').'?'.http_build_query($post_data);
 
@@ -640,7 +656,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             if(isset($rst['Data'])) p($rst['Data'], 0);
             sleep(2);
         }
-        $logArr = ['snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
+        $logArr = ['url'=>$url, 'snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
 
         return $rst;
