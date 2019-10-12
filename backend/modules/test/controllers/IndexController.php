@@ -108,10 +108,27 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = KjDataGet::getNextQihaoByQihao('20191010020',8);p($rst);
-        //$str = '{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}'; //p(json_decode($str, true)); d(strpos($str, "\"Status\":1") !== false);
-        $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);
-        $rst = LuckyBaseService::synBalance($tz_system_users_id = 15); p($rst);# 同步余额
+<<<<<<< .mine        $rst = StaticService::opAllCodeTypeYl();p($rst);
+        $rst = SscDataService::getLastIndexId(6);p($rst);
+        $data = LuckyBaseService::login($uid = 19, $tz_system_id = 7);
+        $rst = LuckyBaseService::synBalance($tz_system_users_id = 16); p($rst);# 同步余额
+        $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 8);p($rst);
+        $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 8);p($rst); # 号码类型遗漏
+        $rst = StaticService::static2NumsYl($lottery_type = 8);p($rst);
+        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=8); p($rst);// 单双遗漏
+        for ($i=0; $i<50; $i++){
+            $rst['updateDs'] = SscDataService::updateDsData($lottery_type=8); // 每期开奖遗漏 -- 新开
+        }
+        p($rst);
+        $lottery_types = StaticService::getLotteryTypes();
+        foreach ($lottery_types as $lottery_type) {
+            /* 处理系统投注计划 add 2019-01-21 */
+            $rst[] = KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
+            /* 处理系统投注计划 add 2019-01-21 */
+        }
+        p($rst);
+=======        $rst = KjDataGet::getNextQihaoByQihao('20191010020',8);p($rst);
+>>>>>>> .theirs        //$str = '{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}'; //p(json_decode($str, true)); d(strpos($str, "\"Status\":1") !== false);
         $rst = SevenService::login(19, 3);p($rst);
         $rst = SevenService::synBalance(5);p($rst);
         $rst = KjDataGet::insertKjData('20191009224', 8, '9,5,0,8,7');p($rst);
@@ -134,18 +151,12 @@ class IndexController extends Controller
         $msg = KjDataGet::insertKjData('2019092548', $lottery_type = 6, $kjData = '3,9,9,7,1');p($msg);
         $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
         $rst = SscDataService::update3NumYL($lottery_type = 6);$end_time = time(true); $time_consume = ($end_time-$start_time).'s';p([$rst,$time_consume]);
-        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=6); p($rst);// 单双遗漏
-        for ($i=0; $i<20; $i++){
-            $rst['updateDs'] = SscDataService::updateDsData($lottery_type=5); // 每期开奖遗漏 -- 新开
-        }
-        p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([28], $lottery_type = 5, 40000);p($miss);
         $rst[] = StaticService::static4dPerDateProfits($lottery_type = 5);p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst = StaticService::staticSDPerDateProfits(date('Y-m-d'));p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([4], $lottery_type = 6, 40000);p($miss);
         $rst = NumService::getCodesKuaiXuan(['type_4'=>0, 'type_2'=>1, 'type_4d'=>1]);p($rst);
 
-        $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type = 5);p($rst);
         $rst = SscDataService::insertCode($type = 4);p($rst); # 插入三字现、四字现
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 6); p($rst);
 
@@ -165,7 +176,6 @@ class IndexController extends Controller
 
         $rst[] = StaticService::static4dPerDateProfits($lottery_type = 6);p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
-        $rst['updateDs'] = SscDataService::updateDsData($lottery_type=6); // 每期开奖遗漏
         $miss = SscDataService::getSdHzYlHistoryMiss([30,31,32,33,34,35], $lottery_type = 6, 20000);p($miss);
         $snid = NineNineBaseService::getSnidBySn('JXSSC1909201535157573FFE1', $lottery_type = 6); p($snid);// 获取方案内容
         $rst = HN0898Service::getRemoteHzRecords(3, 2);p($rst);
@@ -187,7 +197,6 @@ class IndexController extends Controller
         $data = XjSsc::getLotteryNoZhiBo();p($data);
         $data = XjSsc::getLotteryNoSevenDay();p($data);
         $data = XjSsc::getLotteryNo99();p($data);
-        $rst = StaticService::opAllCodeTypeYl();p($rst);
         for($i=1; $i<=59; $i++){
             $qihao = 190917000 + $i;
             $rst = SscDataService::insertSscKjDataDs($qihao);//p($rst);
@@ -197,7 +206,6 @@ class IndexController extends Controller
         $miss = SscDataService::getCodeTypeHistoryMiss('type_3', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $miss = SscDataService::getCodeTypeYlHistoryMiss('118', $lottery_type = 5, 10000);p($miss);
         $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 7);p($rst); # 上奖三字现
-        $rst = StaticService::static2NumsYl($lottery_type = 7);p($rst);
         $rst = StaticService::get2NumsYlRecords('66', $lottery_type = 7);p($rst);
         $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);p($rst);
         $post = \Yii::$app->request->post();
@@ -220,7 +228,6 @@ class IndexController extends Controller
         $rst = HuiYuanService5::synBalance(13);p($rst);
         $rst = NumService::getCodesKuaiXuan(['type_log'=>'1']);p($rst);
         p($rst);
-        $rst = SscDataService::updateCodeTypeYL($type = 2);p($rst); # 号码类型遗漏
         $rst = HN0898Service::getCurrentQihao( 7 );p($rst);
         $rst = HN0898Service::getQihao( 7 );p($rst);
         $rst['bet'] = BetService::bet();p($rst); // 用户新计划投注，可正买可反买
