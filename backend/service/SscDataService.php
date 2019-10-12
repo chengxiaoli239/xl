@@ -1121,7 +1121,7 @@ class SscDataService extends BaseService {
         if($isCache && !$flag && $staticFlag && $rstData = $m->get($mkey)){
             $rstData['current_times'] = $rstData['current_times'] + 1;
 
-            $logArr = ['value'=>$value, 'lottery_type'=>$lottery_type, 'field'=>$field];
+            $logArr = ['value'=>$value, 'lottery_type'=>$lottery_type, 'field'=>$field, 'rstData'=>$rstData];
             Tool_Common::log('getCodeTypeYlHistoryMiss_cache', 'INFO', '号码类型遗漏-缓存数据', $logArr);
 
             return $rstData;
