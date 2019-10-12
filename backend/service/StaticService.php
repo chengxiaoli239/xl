@@ -32,6 +32,7 @@ use backend\models\StaticProfits;
 use backend\models\SystemConfig;
 use backend\models\TzTypes;
 use common\tools\KjDataGet;
+use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
 
@@ -1814,11 +1815,13 @@ class StaticService extends BaseService {
                # 四字现
                $rst[$lottery_type]['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
                $time4 = microtime(true);
-               $times = [$time1, $time2, $time3, $time4];
 
                StaticService::afterOpStatic($lottery_type, 'opAllCodeTypeYl');
-               $rst['data'][$lottery_type]['times'] = $times;
+               $rst['data'][$lottery_type]['consume_time1'] = $time2 - $time1;
+               $rst['data'][$lottery_type]['consume_time2'] = $time3 - $time2;
+               $rst['data'][$lottery_type]['consume_time3'] = $time4 - $time3;
                $rst['data'][$lottery_type]['msg'] = $msg;
+               Tool_Common::log('opAllCodeTypeYl', 'INFO', '号码类型遗漏更新', $rst);
            }else{
                $msg = '数据已经处理过了~';
                $rst['data'][$lottery_type] = $msg;
