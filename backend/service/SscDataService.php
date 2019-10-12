@@ -1110,10 +1110,11 @@ class SscDataService extends BaseService {
      */
     public static function getCodeTypeYlHistoryMiss($value, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 2000, $isCache = 1){
         $m = \Yii::$app->cache;
-        $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->orderBy('id DESC')->limit(1)->one();
+        //$SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->orderBy('id DESC')->limit(1)->one();
+        $SscKjDatas = self::getTabLastKjData($lottery_type);
         $mkey = 'getCodeTypeYlHistoryMiss_'.$lottery_type.'_'.$value;
         $field = strlen($value) == 3 ? 'code_3n' : 'code_4n'; # 三字现、四字现
-        $flag = strpos($SscKjDatas->$field, $value) !== false; # 匹配则说明中奖
+        $flag = strpos($SscKjDatas[$field], $value) !== false; # 匹配则说明中奖
 
         $staticFlag = BetService::getConfig('is_cache_data');
 
@@ -1177,6 +1178,22 @@ class SscDataService extends BaseService {
         //p($rstData);
         //if($vals == 'type_2,type_3b')p($rstData);
         return $rstData;
+    }
+
+    /**
+     * @desc 获取表中最后一个开奖记录
+     * @param int $lottery_type
+     * @return array|SscKjData|mixed|null
+     */
+    public static function getTabLastKjData($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $m = \Yii::$app->cache;
+        $mkey = 'getTabLastKjData_'.$lottery_type;
+        if(!$SscKjDatas = $m->get($mkey)){
+            $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->limit(1)->asArray()->one();
+            $m->set($mkey, $SscKjDatas, 60);
+        }
+
+        return $SscKjDatas;
     }
 
     /**
