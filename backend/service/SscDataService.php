@@ -861,7 +861,7 @@ class SscDataService extends BaseService {
             $where = ['AND', ['LIKE', $field, $val]];
             $ytd_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', $date ]]);
             $nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($ytd_nums_where)->asArray()->all()[0]['nums'];
-            $m->set($mkey, $nums, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
+            $m->set($mkey, $nums, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME'] * 4);
         }
 
         return $nums;
