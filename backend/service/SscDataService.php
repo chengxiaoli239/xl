@@ -730,6 +730,8 @@ class SscDataService extends BaseService {
         $rst = [];
         $SscStaticVals = self::getSscStaticVal($type);
 
+        $now_time = time();
+        $qishu = SscDataService::getQishus($lottery_type);
         $SscStaticYls = self::getSscStaticYls($lottery_type, $type);
         $yDate = date('Y-m-d',strtotime("-1 day"));
         $tDate = date('Y-m-d');
@@ -760,7 +762,7 @@ class SscDataService extends BaseService {
             }
             $SscStaticYl->static_nums = $dsData['static_nums'];
             //$vals = explode(',', $dsData['val']); //p([$dsData, $count]);
-            $SscStaticYl->updated_at = time();
+            $SscStaticYl->updated_at = $now_time;
             $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums']);
 
             //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
@@ -770,8 +772,6 @@ class SscDataService extends BaseService {
             $SscStaticYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
             //$SscStaticYl->status = $dsData['static_nums']; # 前台显示
             $SscStaticYl->status = $dsData['status']; # 前台显示
-
-            $qishu = SscDataService::getQishus($lottery_type);
 
             $len = strlen($dsData['val']);
             $field = $len == 3 ? 'code_3n' : 'code_4n';
