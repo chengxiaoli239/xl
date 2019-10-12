@@ -17,7 +17,7 @@ class Lucky5 extends BaseKj {
      */
     public static function getLotteryLucky($returnType = 'json'){
 
-        if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHost(18);
 
             $t = microtime(true) * 10000;
@@ -47,6 +47,49 @@ class Lucky5 extends BaseKj {
             $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
             if($opencode == '0,0,0,0,0') return false;
             $kjData = ['expect'=>$row['period_no'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
+            //p($kjData);
+        }
+        $opencode = $kjData['opencode'];
+        $opentime = $kjData['opentime'];
+        $expect = $kjData['expect'];
+
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc', 'INFO', '号码抓取-直播网', $logArr);
+
+        return $rst;
+    }
+
+    /**
+     * @desc 幸运五星彩 - 实时资讯网 https://cc138001.com
+     * @param string $returnType
+     * @return array
+     */
+    public static function getLotteryShiXun($returnType = 'json'){
+
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $domain = BaseKj::getApiHost(20);
+
+            $t = round(microtime(true) * 1000);
+            $url = $domain.'/kaijiang/ygxy5.json?v='.$t; #当前开奖号码
+            # 当前开奖链接：https://1.cc138001.com/kaijiang/ygxy5.json?v=1570866018057
+
+            $data = CurlService::getCurl($url);
+            //p([$url, $data]);
+
+            if (!isset($data['code'])) return false;
+            $opencode = implode(',', $data['code']);
+            if($opencode == '0,0,0,0,0') return false;
+            $kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
             //p($kjData);
         }
         $opencode = $kjData['opencode'];
