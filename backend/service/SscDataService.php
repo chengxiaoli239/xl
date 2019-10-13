@@ -1112,7 +1112,7 @@ class SscDataService extends BaseService {
         $m = \Yii::$app->cache;
         //$SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->orderBy('id DESC')->limit(1)->one();
         $SscKjDatas = self::getTabLastKjData($lottery_type);
-        $mkey = 'getCodeTypeYlHistoryMiss_'.$lottery_type.'_'.$value;
+        $mkey = 'getCodeTypeYlHistoryMiss_'.$lottery_type.'_'.$isCache.'_'.$value;
         $field = strlen($value) == 3 ? 'code_3n' : 'code_4n'; # 三字现、四字现
         $flag = strpos($SscKjDatas[$field], $value) !== false; # 匹配则说明中奖
 
@@ -1174,7 +1174,7 @@ class SscDataService extends BaseService {
             'max_range' => $max_range,   // 近200期内的最大遗漏范围
             'yl_str' => $yl_str,
         ];
-        $m->set($mkey, $rstData, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
+        $m->set($mkey, $rstData, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME'] * 4);
         //p($rstData);
         //if($vals == 'type_2,type_3b')p($rstData);
         return $rstData;
