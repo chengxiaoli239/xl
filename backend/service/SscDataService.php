@@ -630,6 +630,7 @@ class SscDataService extends BaseService {
             $SscStaticYl->type_log = (int)$dsData['type_log'];
 
             $qishu = SscDataService::getQishus($lottery_type);
+            //================================= 改造开始 ==========================================
             $where = ['AND'];
             foreach ($vals as $val){
                 $where  = array_merge($where, [['=', $val, 1]]);
@@ -645,6 +646,7 @@ class SscDataService extends BaseService {
             $ytd_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', date('Y-m-d',strtotime("-1 day") )]]);
             $ytd_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($ytd_nums_where)->asArray()->all()[0]['nums'];
             $SscStaticYl->ytd_nums = $ytd_nums;
+            //================================= 改造结束 ==========================================
 
             $SscStaticYl->history_max_miss = max($miss['current_times'],$SscStaticYl->max_miss,$SscStaticYl->history_max_miss); // 6、历史最大遗漏
             $SscStaticYl->update_time = date('Y-m-d H:i:s');
@@ -1051,7 +1053,7 @@ class SscDataService extends BaseService {
             $codesArr = self::getTypeCode($valArr);
             $where = ['AND', ['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
             if($valArr[0] == 'code_4n'){
-                $codesWhere = ['IN', 'code_4n', $codesArr];
+                $codesWhere = [['IN', 'code_4n', $codesArr]];
             }elseif($valArr[0] == 'code_3n'){
                 $codesWhere = ['OR'];
                 foreach ($codesArr as $code){
@@ -1059,6 +1061,7 @@ class SscDataService extends BaseService {
                 }
             }
             $where = array_merge($where, $codesWhere);
+            //p($where);
             $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
         }else{
             $valArr = explode(',', $vals);
