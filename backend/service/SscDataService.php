@@ -1045,17 +1045,34 @@ class SscDataService extends BaseService {
         $last_index_id = self::getLastIndexId($lottery_type);
         $min_id = $last_index_id - $recently - 1;
 
-        $valArr = explode(',', $vals);
-        if(count($valArr) == 1){
-            $where = ['AND', ['IN', $valArr[0], 1],['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
+        if(strpos($vals, '+') !== false){
+            # 1、# 四现：号码 + 三兄弟 2、三现：双重+两兄弟
+            $valArr = explode('+', $vals);
+            $codesArr = self::getTypeCode($valArr);
+            $where = ['AND', ['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
+            if($valArr[0] == 'code_4n'){
+                $codesWhere = ['IN', 'code_4n', $codesArr];
+            }elseif($valArr[0] == 'code_3n'){
+                $codesWhere = ['OR'];
+                foreach ($codesArr as $code){
+                    $codesWhere = array_merge($codesWhere, [['LIKE', 'code_3n', $code]]);
+                }
+            }
+            $where = array_merge($where, $codesWhere);
             $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
         }else{
-            $where = ['AND',['>', 'index_id', $min_id], ['=','lottery_type',$lottery_type]];
-            foreach ($valArr as $val){
-                $where = array_merge($where,[['=', $val, 1]]);
+            $valArr = explode(',', $vals);
+            if(count($valArr) == 1){
+                $where = ['AND', ['IN', $valArr[0], 1],['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
+                $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
+            }else{
+                $where = ['AND',['>', 'index_id', $min_id], ['=','lottery_type',$lottery_type]];
+                foreach ($valArr as $val){
+                    $where = array_merge($where,[['=', $val, 1]]);
+                }
+                $query = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where);
+                $SscKjDatas = $query->orderBy('id DESC')->all();
             }
-            $query = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where);
-            $SscKjDatas = $query->orderBy('id DESC')->all();
         }
         //$where = "$field=$num AND id>$min_id";
         if(count($SscKjDatas)>1){
@@ -2296,6 +2313,35 @@ class SscDataService extends BaseService {
         $staticQishus['tzNums'] = $tzNums;
 
         return $staticQishus;
+    }
+
+    /**
+     * @desc 获取某个号码带三兄弟组合
+     * @param int $valArr 1、三现：双重+两兄弟 ['code_3n', 'type_2', 'type_2b'] 四现：双重+两兄弟 、['code_4n', 0, 'type_3b']
+     * @return mixed
+     */
+    public static function getTypeCode($valArr = ['code_3n', 'type_2', 'type_2b']){
+        if($valArr[0] == 'code_3n'){
+            $codes = ['009','001','011','112','122','223','233','334','344','445','455','556','566','667','677','778','788','889','899','099'];
+        }elseif($valArr[0] == 'code_4n'){
+            $num = $valArr[1];
+            $codesArr = [
+                //['0123', '1234', '2345', '3456', '4567', '5678', '6789', '0789', '0189', '0129'],
+                0 => ['0012', '0123', '0234', '0345', '0456', '0567', '0678', '0789', '0019', '0089'],
+                1 => ['1123', '1234', '1345', '1456', '1567', '1678', '1789', '0189', '0119', '0112'],
+                2 => ['0122', '1223', '2234', '2345', '2456', '2567', '2678', '2789', '0289', '0129'],
+                3 => ['0123', '1233', '2334', '3345', '3456', '3567', '3678', '3789', '0389', '0139'],
+                4 => ['0124', '1234', '2344', '3445', '4456', '4567', '4678', '4789', '0489', '0149'],
+                5 => ['0125', '1235', '2345', '3455', '4556', '5567', '5678', '5789', '0589', '0159'],
+                6 => ['0126', '1236', '2346', '3456', '4566', '5667', '6678', '6789', '0689', '0169'],
+                7 => ['0127', '1237', '2347', '3457', '4567', '5677', '6778', '7789', '0789', '0179'],
+                8 => ['0128', '1238', '2348', '3458', '4568', '5678', '6788', '7889', '0889', '0189'],
+                9 => ['0129', '1239', '2349', '3459', '4569', '5679', '6789', '7899', '0899', '0199'],
+            ];
+            $codes = $codesArr[$num];
+        }
+
+        return $codes;
     }
 
 

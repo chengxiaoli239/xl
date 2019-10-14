@@ -108,7 +108,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-<<<<<<< .mine        $rst = StaticService::opAllCodeTypeYl();p($rst);
+        $miss = SscDataService::getSdHzYlHistoryMiss([26], $lottery_type = 6, 20000);p($miss);
+        $miss = SscDataService::getCodeTypeYlHistoryMiss('6699', $lottery_type = 5, 50000, 0);p($miss);
+        $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = SscDataService::getLastIndexId(6);p($rst);
         $data = LuckyBaseService::login($uid = 19, $tz_system_id = 7);
         $rst = LuckyBaseService::synBalance($tz_system_users_id = 16); p($rst);# 同步余额
@@ -127,8 +129,8 @@ class IndexController extends Controller
             /* 处理系统投注计划 add 2019-01-21 */
         }
         p($rst);
-=======        $rst = KjDataGet::getNextQihaoByQihao('20191010020',8);p($rst);
->>>>>>> .theirs        //$str = '{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}'; //p(json_decode($str, true)); d(strpos($str, "\"Status\":1") !== false);
+        $rst = KjDataGet::getNextQihaoByQihao('20191010020',8);p($rst);
+        //$str = '{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}'; //p(json_decode($str, true)); d(strpos($str, "\"Status\":1") !== false);
         $rst = SevenService::login(19, 3);p($rst);
         $rst = SevenService::synBalance(5);p($rst);
         $rst = KjDataGet::insertKjData('20191009224', 8, '9,5,0,8,7');p($rst);
@@ -147,7 +149,6 @@ class IndexController extends Controller
         $rst = TzService::tz(); p($rst);// 计划投注
         $codesArr = NumService::getNotLatelyCodes(['lately_start'=>0, 'lately_end'=>400]);p($codesArr);
         $rst = SscDataService::calulateBeforeProfits();p($rst); # 统计前面多少期号码的中奖利润
-        $miss = SscDataService::getCodeTypeYlHistoryMiss('6789', $lottery_type = 5, 30000);p($miss);
         $msg = KjDataGet::insertKjData('2019092548', $lottery_type = 6, $kjData = '3,9,9,7,1');p($msg);
         $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
         $rst = SscDataService::update3NumYL($lottery_type = 6);$end_time = time(true); $time_consume = ($end_time-$start_time).'s';p([$rst,$time_consume]);
@@ -176,7 +177,6 @@ class IndexController extends Controller
 
         $rst[] = StaticService::static4dPerDateProfits($lottery_type = 6);p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
-        $miss = SscDataService::getSdHzYlHistoryMiss([30,31,32,33,34,35], $lottery_type = 6, 20000);p($miss);
         $snid = NineNineBaseService::getSnidBySn('JXSSC1909201535157573FFE1', $lottery_type = 6); p($snid);// 获取方案内容
         $rst = HN0898Service::getRemoteHzRecords(3, 2);p($rst);
         for ($i=0;$i<20;$i++){ # 统计数据
