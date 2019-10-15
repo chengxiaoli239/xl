@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 
+//p([$lottery_types, $lottery_type]);
 if(count($lottery_types)>1)
 foreach ($lottery_types as $lottery) {
     $class = $lottery['lottery_type'] == $lottery_type ? 'btn-success' : 'btn-default';

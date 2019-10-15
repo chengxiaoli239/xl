@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 </div-->
 
-            <?php Pjax::begin(); ?>
+            <?//php Pjax::begin(); ?>
                 <?php include(dirname(__FILE__).'/index_tab.php'); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -144,7 +144,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
-            <?php Pjax::end(); ?>
+            <?php //Pjax::end(); ?>
             </div>
         </div>
     </section>
