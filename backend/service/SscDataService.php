@@ -629,6 +629,7 @@ class SscDataService extends BaseService {
             $SscStaticYl->type_log = (int)$dsData['type_log'];
 
             $countArr = self::getAriseCounts($dsData['val'], $count, $lottery_type);
+            //p($countArr,0);
             $SscStaticYl->theory_nums_perdate = $countArr['theory_nums_perdate'];
             $SscStaticYl->today_nums = $countArr['today_nums'];
             $SscStaticYl->ytd_nums = $countArr['ytd_nums'];
@@ -660,7 +661,20 @@ class SscDataService extends BaseService {
         if(strpos($vals, '+') !== false){
             $valArr = explode('+', $vals);
             if($valArr[0] == 'code_3n'){
-                $count = 175.2;
+                $codes = ['009','001','011','112','122','223','233','334','344','445','455','556','566','667','677','778','788','889','899','099'];
+                //$count = 1752;
+                $likeWhere = ['OR'];
+                foreach ($codes as $code){
+                    $likeWhere = array_merge($likeWhere, [['LIKE', 'code_3n', $code]]);
+                }
+
+                $date = date('Y-m-d');
+                $where = ['AND', ['=', 'lottery_type', $lottery_type],['=', 'date', $date], $likeWhere];#今日
+                $rstData['today_nums'] = SscKjData::find()->select(['COUNT(id) AS nums'])->where($where)->asArray()->all()[0]['nums'];
+
+                $date = date('Y-m-d',strtotime("-1 day") ); # 昨日
+                $where = ['AND', ['=', 'lottery_type', $lottery_type],['=', 'date', $date], $likeWhere];#昨日
+                $rstData['ytd_nums'] = SscKjData::find()->select(['COUNT(id) AS nums'])->where($where)->asArray()->all()[0]['nums'];
             }elseif($valArr[0] == 'code_4n'){
                 $num = $valArr[1];
                 $codesArr = [
@@ -1105,15 +1119,14 @@ class SscDataService extends BaseService {
             $codesArr = self::getTypeCode($valArr);
             $where = ['AND', ['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
             if($valArr[0] == 'code_4n'){
-                $codesWhere = [['IN', 'code_4n', $codesArr]];
+                $codesWhere = ['IN', 'code_4n', $codesArr];
             }elseif($valArr[0] == 'code_3n'){
                 $codesWhere = ['OR'];
                 foreach ($codesArr as $code){
                     $codesWhere = array_merge($codesWhere, [['LIKE', 'code_3n', $code]]);
                 }
             }
-            $where = array_merge($where, $codesWhere);
-            //p($where);
+            $where = array_merge($where, [$codesWhere]);
             $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
         }else{
             $valArr = explode(',', $vals);

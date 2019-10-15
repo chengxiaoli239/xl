@@ -1807,7 +1807,7 @@ class StaticService extends BaseService {
                $m->set($mkey, 1, 300);
                $time1 = microtime(true);
                # 号码类型：双重、双双重、四重、三兄弟、四兄弟
-               //$rst[$lottery_type]['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
+               $rst[$lottery_type]['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
                $time2 = microtime(true);
                # 三字现
                $rst[$lottery_type]['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type); # 10s
