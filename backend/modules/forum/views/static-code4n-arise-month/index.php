@@ -18,11 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <div class="clearfix">
+                <!--div class="clearfix">
                     <div class="btn-group">
                         <?= Html::a(Yii::t('app', 'Create Static Code4n Arise Month'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
-                </div>
+                </div-->
 
     <?php Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
