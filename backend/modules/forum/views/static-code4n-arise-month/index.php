@@ -142,7 +142,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'updated_at',
                         //'update_time',
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
             <?php //Pjax::end(); ?>
