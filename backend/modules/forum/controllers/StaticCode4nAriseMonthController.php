@@ -44,11 +44,18 @@ class StaticCode4nAriseMonthController extends BaseController
         $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
         $queryParams['StaticCode4nAriseMonth']['lottery_type'] = $lottery_type;
 
+        $type = $queryParams['StaticCode4nAriseMonth']['type'];
+        $type = $type ? $type : 1;
+        $type_2 = $queryParams['StaticCode4nAriseMonth']['type_2'];
+        $type_2 = $type_2 ? $type_2 : 0;
+
         $dataProvider = $searchModel->search($queryParams);
 
-        return $this->render('index', [
+        return $this->render('index_type_2_'.$type_2.'_'.$type, [
             'lottery_types' => $lottery_types,
             'lottery_type' => $lottery_type,
+            'type' => $type,
+            'type_2' => $type_2,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
