@@ -1571,10 +1571,11 @@ class StaticService extends BaseService {
                     'updated_at' => time(),
                 ]);
 
-                $rst = $data->setAttributes($setData);
+                $data->setAttributes($setData);
+                p($data->attributes);
                 //$allStatic[$month] = $data->attributes;
-                $allStatic[$month] = $rst;
                 $rst = $data->save();
+                $allStatic[$month] = $rst;
                 //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
             }
         }
