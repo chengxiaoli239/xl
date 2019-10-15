@@ -599,7 +599,6 @@ class SscDataService extends BaseService {
             $SscStaticYl->codes_hz = $dsData['codes_hz'];
 
             $SscStaticYl->static_nums = $dsData['static_nums'];
-            $vals = explode(',', $dsData['val']);
             //$count = SscDataService::getNumCounts($vals);
             $count = $dsData['count'];
             //if($dsData['val'] == 'type_2,type_3b') p([$count, $dsData['val']]);
@@ -629,23 +628,10 @@ class SscDataService extends BaseService {
             $SscStaticYl->type_4s = (int)$dsData['type_4s'];
             $SscStaticYl->type_log = (int)$dsData['type_log'];
 
-            $qishu = SscDataService::getQishus($lottery_type);
-            //================================= 改造开始 ==========================================
-            $where = ['AND'];
-            foreach ($vals as $val){
-                $where  = array_merge($where, [['=', $val, 1]]);
-            }
-            $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where($where)->asArray()->one();
-            $SscStaticYl->theory_nums_perdate = (string)round(($Num4Type['count']*$qishu*0.1) / 995, 2); # 理论次数/天
-            $today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', date('Y-m-d')]]);
-            //$today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', '2019-05-24']]);
-            $today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($today_nums_where)->asArray()->all()[0]['nums'];
-            $SscStaticYl->today_nums = $today_nums;
-
-            # 昨日出现次数
-            $ytd_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', date('Y-m-d',strtotime("-1 day") )]]);
-            $ytd_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($ytd_nums_where)->asArray()->all()[0]['nums'];
-            $SscStaticYl->ytd_nums = $ytd_nums;
+            $countArr = self::getAriseCounts($dsData['val'], $count, $lottery_type);
+            $SscStaticYl->theory_nums_perdate = $countArr['theory_nums_perdate'];
+            $SscStaticYl->today_nums = $countArr['today_nums'];
+            $SscStaticYl->ytd_nums = $countArr['ytd_nums'];
             //================================= 改造结束 ==========================================
 
             $SscStaticYl->history_max_miss = max($miss['current_times'],$SscStaticYl->max_miss,$SscStaticYl->history_max_miss); // 6、历史最大遗漏
@@ -659,6 +645,72 @@ class SscDataService extends BaseService {
         }
 
         return $rst;
+    }
+
+    /**
+     * @param $vals
+     * @param $count
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function getAriseCounts($vals, $count, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $rstData = [];
+
+        $qishu = SscDataService::getQishus($lottery_type);
+        if(strpos($vals, '+') !== false){
+            $valArr = explode('+', $vals);
+            if($valArr[0] == 'code_3n'){
+                $count = 175.2;
+            }elseif($valArr[0] == 'code_4n'){
+                $num = $valArr[1];
+                $codesArr = [
+                    0 => ['0012', '0123', '0234', '0345', '0456', '0567', '0678', '0789', '0019', '0089'],
+                    1 => ['1123', '1234', '1345', '1456', '1567', '1678', '1789', '0189', '0119', '0112'],
+                    2 => ['0122', '1223', '2234', '2345', '2456', '2567', '2678', '2789', '0289', '0129'],
+                    3 => ['0123', '1233', '2334', '3345', '3456', '3567', '3678', '3789', '0389', '0139'],
+                    4 => ['0124', '1234', '2344', '3445', '4456', '4567', '4678', '4789', '0489', '0149'],
+                    5 => ['0125', '1235', '2345', '3455', '4556', '5567', '5678', '5789', '0589', '0159'],
+                    6 => ['0126', '1236', '2346', '3456', '4566', '5667', '6678', '6789', '0689', '0169'],
+                    7 => ['0127', '1237', '2347', '3457', '4567', '5677', '6778', '7789', '0789', '0179'],
+                    8 => ['0128', '1238', '2348', '3458', '4568', '5678', '6788', '7889', '0889', '0189'],
+                    9 => ['0129', '1239', '2349', '3459', '4569', '5679', '6789', '7899', '0899', '0199'],
+                ];
+                $codes = $codesArr[$num];
+                $count = 204;
+
+                $date = date('Y-m-d');
+                $where = ['AND', ['=', 'lottery_type', $lottery_type],['=', 'date', $date], ['IN', 'code_4n', $codes]];#今日
+                $rstData['today_nums'] = SscKjData::find()->select(['COUNT(id) AS nums'])->where($where)->asArray()->all()[0]['nums'];
+
+                $date = date('Y-m-d',strtotime("-1 day") ); # 昨日
+                $where = ['AND', ['=', 'lottery_type', $lottery_type],['=', 'date', $date], ['IN', 'code_4n', $codes], ['=', 'date', date('Y-m-d')]];#今日
+                $rstData['ytd_nums'] = SscKjData::find()->select(['COUNT(id) AS nums'])->where($where)->asArray()->all()[0]['nums'];
+            }
+
+        }else{
+
+            $date = date('Y-m-d');
+            $rstData['today_nums'] = self::getAcountByDate($vals, $date, $lottery_type);
+
+            $date = date('Y-m-d',strtotime("-1 day") );
+            $rstData['ytd_nums'] =  self::getAcountByDate($vals, $date, $lottery_type);
+        }
+        $rstData['theory_nums_perdate'] = (string)round(($count*$qishu*0.1)/995, 2); # 理论次数/天
+
+        return $rstData;
+    }
+
+    public static function getAcountByDate($vals, $date, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $vals = explode(',', $vals);
+        //================================= 改造开始 ==========================================
+        $where = ['AND'];
+        foreach ($vals as $val){
+            $where  = array_merge($where, [['=', $val, 1]]);
+        }
+        $today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', $date]]);
+        $nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($today_nums_where)->asArray()->all()[0]['nums'];
+
+        return $nums;
     }
 
     /**
