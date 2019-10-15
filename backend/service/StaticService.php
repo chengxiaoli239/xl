@@ -1549,7 +1549,7 @@ class StaticService extends BaseService {
     public static function allDateStatic4nPerMonth( $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
         $mkey = 'allDateStatic4nPerMonth_01_'.$lottery_type;
-        for ($i=12; $i>=0; $i--){
+        for ($i=2; $i>0; $i--){
             $months[] = date('Y-m', strtotime('-'.$i.' months'));
         }
 
@@ -1572,7 +1572,7 @@ class StaticService extends BaseService {
                 ]);
 
                 $data->setAttributes($setData);
-                p($data->attributes);
+                //p($data->attributes);
                 //$allStatic[$month] = $data->attributes;
                 $rst = $data->save();
                 $allStatic[$month] = $rst;
