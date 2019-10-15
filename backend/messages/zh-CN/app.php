@@ -42,6 +42,7 @@ return [
     'Create User Sys Plans 3d hz' => '添加4d和值计划',
     'Create User Sys Plans 3d ds' => '添加4d单双计划',
     'Create User Sys Plans 6d' => '添加三字现计划',
+    'Static Code4n Arise Months' => '四现每月',
 
     'User Sys Plans 2d' => '3d计划',
     'User Sys Plans 3d' => '4d计划',

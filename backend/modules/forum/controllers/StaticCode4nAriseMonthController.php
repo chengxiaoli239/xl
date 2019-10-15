@@ -42,7 +42,7 @@ class StaticCode4nAriseMonthController extends BaseController
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
 
         $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
-        $queryParams['Static4dProfitsPerdate']['lottery_type'] = $lottery_type;
+        $queryParams['StaticCode4nAriseMonth']['lottery_type'] = $lottery_type;
 
         $dataProvider = $searchModel->search($queryParams);
 
