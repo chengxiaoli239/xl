@@ -21,6 +21,7 @@ use backend\models\Static4dProfits;
 use backend\models\Static4dProfitsDay;
 use backend\models\Static4dProfitsMonth;
 use backend\models\Static4dProfitsPerdate;
+use backend\models\StaticCode4nAriseMonth;
 use backend\models\StaticCodeTypeArisePerdate;
 use backend\models\StaticHzArisePerdate;
 use backend\models\StaticHzProfits;
@@ -1375,6 +1376,36 @@ class StaticService extends BaseService {
     }
 
     /**
+     * @desc 每月四字现出现次数
+     * @param string $date
+     * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     * @return array
+     */
+    public static function staticKj4NumCounts($month = '2019-02', $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $m = \Yii::$app->cache;
+        $mkey = 'staticKj4NumCounts_'.$lottery_type.'_'.$month;
+
+        if($staticDatas = $m->get($mkey)) return $staticDatas;
+        $SscKjDatas = SscKjData::find()->select(['code_4n', 'nums'=>'COUNT(id)'])->where(['LEFT(date, 7)'=>$month, 'lottery_type'=>$lottery_type])->groupBy('code_3n ,lottery_type')->orderBy(['id'=>SORT_DESC])->asArray()->all();
+
+        if(!$SscKjDatas) return ['status'=>300, 'msg'=>'无统计数据'];
+        $staticDatas = [];
+        foreach ($SscKjDatas as $key=>$SscKjData){
+            $code_4n = $SscKjData['code_4n'];
+            if(!isset($staticDatas[$code_4n])) $staticDatas[$code_4n] = 0;
+            $staticDatas[(string)$code_4n] = (integer)$SscKjData['nums'];
+        }
+
+        arsort($staticDatas);
+
+        if($month != date('Y-m')){
+            $m->set($mkey, $staticDatas, 7*24*3600);
+        }
+
+        return $staticDatas;
+    }
+
+    /**
      * @desc 每天和值范围数量统计:
      * @param string $date
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
@@ -1458,15 +1489,14 @@ class StaticService extends BaseService {
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
-    public static function allDateStatic3NumsPerDate( $lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function allDateStatic3NumsPerDate( $lottery_type = DEFAULT_LOTTERY_TYPE) {
         $m = \Yii::$app->cache;
-        $mkey = 'allDateStatic3Nums_PERDATE_03_'.$lottery_type;
+        $mkey = 'allDateStatic3Nums_PERDATE_03_' . $lottery_type;
 
-        $allStatic = [];
-        $flag = Static3numArisePerdate::find()->where(['lottery_type'=>$lottery_type])->count();
+        $flag = Static3numArisePerdate::find()->where(['lottery_type' => $lottery_type])->count();
         static $i = 5;
-        for($s=0; $s<$i; $s++){
-            if(!$flag OR !$time = $m->get($mkey)) {
+        for ($s = 0; $s < $i; $s++) {
+            if (!$flag OR !$time = $m->get($mkey)) {
                 $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
                 $time = $staticsStarTime;
                 /*
@@ -1474,25 +1504,25 @@ class StaticService extends BaseService {
                     self::allDateStatic3NumsPerDate($lottery_type);
                 }
                 */
-            }else{
+            } else {
                 $i = 5;
                 $time = $time + 24 * 3600 - 10 * 60;
             }
 
             $date = date('Y-m-d', $time);
             $date = min([date('Y-m-d'), $date]);
-            if($date>date('Y-m-d')) break;
-            if($statics = self::staticKj3NumCounts($date, $lottery_type)){
+            if ($date > date('Y-m-d')) break;
+            if ($statics = self::staticKj3NumCounts($date, $lottery_type)) {
                 //p([$statics, $date]);
-                if($statics['status'] == 300){
-                    $m->set($mkey, $time, 7*24*3600);
+                if ($statics['status'] == 300) {
+                    $m->set($mkey, $time, 7 * 24 * 3600);
                     continue;
                 }
                 $setData = [];
-                foreach ($statics as $key=>$static){
-                    $setData['codes_'.$key] = $static;
+                foreach ($statics as $key => $static) {
+                    $setData['codes_' . $key] = $static;
                 }
-                if(!$Static3numArisePerdate = Static3numArisePerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
+                if (!$Static3numArisePerdate = Static3numArisePerdate::findOne(['date' => $date, 'lottery_type' => $lottery_type])) {
                     $Static3numArisePerdate = new Static3numArisePerdate();
                     $setData['created_at'] = time();
                 }
@@ -1507,7 +1537,46 @@ class StaticService extends BaseService {
                 $rst = $Static3numArisePerdate->save();
                 //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
             }
-            $m->set($mkey, $time, 7*24*3600);
+            $m->set($mkey, $time, 7 * 24 * 3600);
+        }
+    }
+
+    /**
+     * @desc 每月四字现出现次数统计
+     * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc 7:北京快乐8 8幸运五星彩
+     * @return array
+     */
+    public static function allDateStatic4nPerMonth( $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $m = \Yii::$app->cache;
+        $mkey = 'allDateStatic4nPerMonth_01_'.$lottery_type;
+        for ($i=12; $i>=0; $i--){
+            $months[] = date('Y-m', strtotime('-'.$i.' months'));
+        }
+
+        $allStatic = [];
+        foreach ($months as $month){
+            //if($month>date('Y-m')) break;
+            if($statics = self::staticKj4NumCounts($month, $lottery_type)){
+                $setData = [];
+                foreach ($statics as $key=>$static){
+                    $setData['code_'.$key] = (int)$static;
+                }
+                if(!$data = StaticCode4nAriseMonth::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
+                    $data = new StaticCode4nAriseMonth();
+                    $setData['created_at'] = time();
+                }
+                $setData = array_merge($setData, [
+                    'month' => $month,
+                    'lottery_type' => $lottery_type,
+                    'updated_at' => time(),
+                ]);
+
+                $rst = $data->setAttributes($setData);
+                //$allStatic[$month] = $data->attributes;
+                $allStatic[$month] = $rst;
+                $rst = $data->save();
+                //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
+            }
         }
 
         return $allStatic;
@@ -1770,6 +1839,8 @@ class StaticService extends BaseService {
        foreach ($lottery_types as $lottery_type){
            if($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllStaticProfits')){
                #$rst['opStaticProfits'] = StaticService::opStaticProfits($lottery_type); # 暂停统计利润
+               $rst['allDateStatic4nPerMonth'] = StaticService::allDateStatic4nPerMonth($lottery_type); # 部分四现每月统计
+
                $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type); # 上奖三字现
 
                # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
@@ -2049,6 +2120,61 @@ class StaticService extends BaseService {
         return $time;
     }
 
+    public static function getCreateCodeType3nSql($lottery_type = DEFAULT_LOTTERY_TYPE){
+$sql = '
+CREATE TABLE `lt_static_code_3n_arise_month` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `month` varchar(10) DEFAULT NULL COMMENT \'月份\',
+';
+
+        $types = [0, 1];
+        $codes = [];
+        foreach ($types as $type){
+            $SscKjDatas = SscKjData::find()->select(['code_3n'])->where(['lottery_type'=>$lottery_type, 'type_2'=>$type])->groupBy('code_4n ,lottery_type')->orderBy(['COUNT(id)'=>SORT_DESC])->limit(50)->asArray()->all();
+            $codes = array_merge($codes, ArrayHelper::getColumn($SscKjDatas, 'code_4n'));
+        }
+        foreach ($codes as $key=>$code){
+            $sql .= '    `code_'.$code.'` tinyint(4) DEFAULT NULL COMMENT \''.$code.'\','."\r\n";
+        }
+
+$sql .= '
+    `lottery_type` int(11) DEFAULT \'5\' COMMENT \'彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc 7:北京快乐8 8:幸运五星\',
+    `created_at` int(11) DEFAULT NULL COMMENT \'创建时间\',
+    `updated_at` int(11) NOT NULL COMMENT \'更新时间\',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT \'更新时间\',
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT=\'四现热码月统计表\';';
+
+        return $sql;
+    }
+
+    public static function getCreateCodeType4nSql($lottery_type = DEFAULT_LOTTERY_TYPE){
+$sql = '
+CREATE TABLE `lt_static_code_4n_arise_month` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `month` varchar(10) DEFAULT NULL COMMENT \'月份\',
+';
+
+        $types = [0, 1];
+        $codes = [];
+        foreach ($types as $type){
+            $SscKjDatas = SscKjData::find()->select(['code_4n'])->where(['lottery_type'=>$lottery_type, 'type_2'=>$type])->groupBy('code_4n ,lottery_type')->orderBy(['COUNT(id)'=>SORT_DESC])->limit(50)->asArray()->all();
+            $codes = array_merge($codes, ArrayHelper::getColumn($SscKjDatas, 'code_4n'));
+        }
+        foreach ($codes as $key=>$code){
+            $sql .= '    `code_'.$code.'` tinyint(4) DEFAULT NULL COMMENT \''.$code.'\','."\r\n";
+        }
+
+$sql .= '
+    `lottery_type` int(11) DEFAULT \'5\' COMMENT \'彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc 7:北京快乐8 8:幸运五星\',
+    `created_at` int(11) DEFAULT NULL COMMENT \'创建时间\',
+    `updated_at` int(11) NOT NULL COMMENT \'更新时间\',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT \'更新时间\',
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT=\'四现热码月统计表\';';
+
+        return $sql;
+    }
 
 
 
