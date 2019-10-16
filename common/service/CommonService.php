@@ -827,6 +827,7 @@ class  CommonService{
         $m = \Yii::$app->cache;
         $mkey = 'getIndexLotteryType_'.$uid;
 
+        $userDefaultLotteryType = UserService::getUserDefaultLotteryType($uid);
         if(!empty($queryParams)){
             foreach ($queryParams as $queryParam){
                 if(isset($queryParam['lottery_type']) && $queryParam['lottery_type']){
@@ -834,12 +835,12 @@ class  CommonService{
                 }elseif ($lottery_type = $m->get($mkey)){
                     $lottery_type = $lottery_type;
                 }else{
-                    $lottery_type = DEFAULT_LOTTERY_TYPE;
+                    $lottery_type = $userDefaultLotteryType;
                 }
             }
         }else{
             $lottery_type = $m->get($mkey);
-            $lottery_type = $lottery_type ? $lottery_type : DEFAULT_LOTTERY_TYPE;
+            $lottery_type = $lottery_type ? $lottery_type : $userDefaultLotteryType;
         }
 
         $m->set($mkey, $lottery_type, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);

@@ -174,6 +174,23 @@ class UserService extends BaseService {
         return $rst;
     }
 
+    /**
+     * @desc 用户默认投注彩种
+     * @param $uid
+     * @return mixed
+     */
+    public static function getUserDefaultLotteryType($uid){
+
+        $defaultSiteIds = explode(',',TzSystemsAuth::findOne(['uid'=>$uid])->lottery_types);
+
+        return $defaultSiteIds[0];
+    }
+
+    /**
+     * @desc 用户默认投注彩种
+     * @param $uid
+     * @return mixed
+     */
     public static function getUserDefaultSite($uid){
 
         $defaultSiteIds = explode(',',TzSystemsAuth::findOne(['uid'=>$uid])->tz_systems_ids);
