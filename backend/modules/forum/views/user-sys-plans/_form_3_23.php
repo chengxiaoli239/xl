@@ -43,7 +43,7 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(三个数字一组)，多组英文逗号隔开') ?>
+                    <?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码，多组英文逗号隔开(例：223,1234,667 或 345)') ?>
 
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
 
