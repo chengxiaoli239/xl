@@ -2424,7 +2424,7 @@ class SscDataService extends BaseService {
 
         $UserSysPlans = UserSysPlans::findAll(['plan_type'=>1, 'status'=>1]);
         foreach ($UserSysPlans as $UserSysPlan){
-            $profits = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id])->sum('profits');
+            $profits = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id, 'is_profits_record'=>1])->sum('profits');
             if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
                 $UserSysPlan->status = 0;
             }
