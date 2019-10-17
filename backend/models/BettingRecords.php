@@ -31,7 +31,8 @@ use Yii;
  * @property int $order_type 订单来源：1跟投订单 2大数据订单 3系统计划订单
  * @property int $tz_system_id 投注系统tz_systems.id
  * @property string $lotteryclass 彩种
- * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
+ * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+ * @property int $is_profits_record 是否计算盈利记录0否1是
  * @property int $createtime
  * @property string $create_time 投注时间
  * @property int $updated_at 更新时间
@@ -54,7 +55,7 @@ class BettingRecords extends \common\models\base\BaseModel
     {
         return [
             [['codes', 'snid'], 'string'],
-            [['uid', 'playway', 'tz_type', 'status', 'cancel_status', 'plan_id', 'buy_type', 'is_simulate', 'order_type', 'tz_system_id', 'lottery_type', 'createtime', 'updated_at', 'created_at'], 'integer'],
+            [['uid', 'playway', 'tz_type', 'status', 'cancel_status', 'plan_id', 'buy_type', 'is_simulate', 'order_type', 'tz_system_id', 'lottery_type', 'is_profits_record', 'createtime', 'updated_at', 'created_at'], 'integer'],
             [['betting_money', 'bonus', 'single', 'profits'], 'number'],
             [['account', 'sn'], 'string', 'max' => 255],
             [['playway_name', 'create_time'], 'string', 'max' => 32],
@@ -95,7 +96,8 @@ class BettingRecords extends \common\models\base\BaseModel
             'order_type' => '订单来源：1跟投订单 2大数据订单 3系统计划订单',
             'tz_system_id' => '投注系统tz_systems.id',
             'lotteryclass' => '彩种',
-            'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分',
+            'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
+            'is_profits_record' => '是否计算盈利记录0否1是',
             'createtime' => 'Createtime',
             'create_time' => '投注时间',
             'updated_at' => '更新时间',
