@@ -20,7 +20,7 @@ class UserSysPlans extends UserSysPlansModel
         return [
             [['id', 'is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'lottery_type', 'plan_type', 'created_at', 'updated_at'], 'integer'],
             [['children_plan_id', 'account', 'tz_sites', 'hz_Arr', 'update_time'], 'safe'],
-            [['single', 'take_profits', 'stop_loss'], 'number'],
+            [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
         ];
     }
 
@@ -73,6 +73,7 @@ class UserSysPlans extends UserSysPlansModel
             'is_custom' => $this->is_custom,
             'take_profits' => $this->take_profits,
             'stop_loss' => $this->stop_loss,
+            'current_profits' => $this->current_profits,
             'plan_type' => $this->plan_type,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

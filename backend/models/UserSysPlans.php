@@ -26,6 +26,7 @@ use Yii;
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property string $take_profits 止盈点
  * @property string $stop_loss 止损点
+ * @property string $current_profits 当前盈利
  * @property int $plan_type 计划类型:0正常1止盈止损计划
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
@@ -68,7 +69,7 @@ class UserSysPlans extends \common\models\base\BaseModel
         return [
             [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'lottery_type', 'plan_type', 'created_at', 'updated_at'], 'integer'],
             [['uid', 'account', 'created_at', 'updated_at'], 'required'],
-            [['single', 'take_profits', 'stop_loss'], 'number'],
+            [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['update_time'], 'safe'],
             [['children_plan_id'], 'string', 'max' => 255],
             [['account', 'tz_sites'], 'string', 'max' => 24],
@@ -101,6 +102,7 @@ class UserSysPlans extends \common\models\base\BaseModel
             'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
             'take_profits' => '止盈点',
             'stop_loss' => '止损点',
+            'current_profits' => '当前盈利',
             'plan_type' => '计划类型:0正常1止盈止损计划',
             'created_at' => '创建时间',
             'updated_at' => '更新时间',
