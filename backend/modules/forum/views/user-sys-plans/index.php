@@ -108,6 +108,17 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             }
                         ],
                         'single',
+                        ['attribute' => 'current_profits',
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if($model->plan_type == 1){
+                                    $txt = '止盈:'.$model->take_profits.'|止损:'.$model->stop_loss .'|当前:'.$model->current_profits ;
+                                }else{
+                                    $txt = '无';
+                                }
+                                return $txt;
+                            }
+                        ],
                         ['attribute' => 'tz_type','label'=>'操作', # 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {

@@ -192,7 +192,7 @@ abstract class BetService extends BaseBetService {
                 //$rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
                 $status = false;
             }
-            if('00:11:00'<$time && $time<'00:12:00'){
+            if('00:10:00'<$time && $time<'00:12:30'){
                 $status = true;
             }
         }else if($lottery_type == 7){

@@ -9,6 +9,7 @@
 
 namespace backend\service;
 use backend\models\AdminLog;
+use backend\models\BettingRecords;
 use backend\models\Num4Type;
 use backend\models\searchs\SscDwsHzNums;
 use backend\models\Ssc3numYl;
@@ -23,6 +24,7 @@ use backend\models\SscStaticVal;
 use backend\models\SscStaticYl;
 use backend\models\SystemConfig;
 use backend\models\ThreeNum;
+use backend\models\UserSysPlans;
 use backend\models\WxFriends;
 use common\service\CommonService;
 use common\tools\KjDataGet;
@@ -2412,6 +2414,30 @@ class SscDataService extends BaseService {
         return $codes;
     }
 
+
+    /**
+     * @desc 处理止盈止损计划
+     * @return array
+     */
+    public static function opProfitsPlans(){
+        $rst = ['status'=>200, 'msg'=>'处理成功'];
+
+        $UserSysPlans = UserSysPlans::findAll(['plan_type'=>1, 'status'=>1]);
+        foreach ($UserSysPlans as $UserSysPlan){
+            $profits = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id])->sum('profits');
+            if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
+                $UserSysPlan->status = 0;
+            }
+            $UserSysPlan->current_profits = $profits;
+
+            $saveFlag = $UserSysPlan->save();
+
+            $logArr[$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
+        }
+        Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损计划', $logArr);
+
+        return $rst;
+    }
 
 
 

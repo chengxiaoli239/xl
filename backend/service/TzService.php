@@ -206,6 +206,9 @@ class TzService extends BaseService {
         # 计划方案倍数、投注号码或者投注状态修改
         //$rst['userSysPlanChange'] = UserSysPlansService::userSysPlanChange($lottery_type);
 
+        # 止盈止损计划处理
+        $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type);
+
         $rst['qihao'] = $qihao;
         $rst['lottery_type'] = $lottery_type;
         $rst['time1'] = $time1;
