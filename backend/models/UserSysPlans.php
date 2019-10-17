@@ -24,6 +24,9 @@ use Yii;
  * @property int $is_custom 是否智能切换购买方向
  * @property int $is_test 是否为系统测试计划
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+ * @property string $take_profits 止盈点
+ * @property string $stop_loss 止损点
+ * @property int $plan_type 计划类型:0正常1止盈止损计划
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -63,9 +66,9 @@ class UserSysPlans extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'lottery_type', 'plan_type', 'created_at', 'updated_at'], 'integer'],
             [['uid', 'account', 'created_at', 'updated_at'], 'required'],
-            [['single'], 'number'],
+            [['single', 'take_profits', 'stop_loss'], 'number'],
             [['update_time'], 'safe'],
             [['children_plan_id'], 'string', 'max' => 255],
             [['account', 'tz_sites'], 'string', 'max' => 24],
@@ -96,6 +99,9 @@ class UserSysPlans extends \common\models\base\BaseModel
             'is_custom' => '是否智能切换购买方向',
             'is_test' => '是否为系统测试计划',
             'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
+            'take_profits' => '止盈点',
+            'stop_loss' => '止损点',
+            'plan_type' => '计划类型:0正常1止盈止损计划',
             'created_at' => '创建时间',
             'updated_at' => '更新时间',
             'update_time' => '更新时间',

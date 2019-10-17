@@ -18,9 +18,9 @@ class UserSysPlans extends UserSysPlansModel
     public function rules()
     {
         return [
-            [['id', 'uid', 'lottery_type', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'created_at', 'updated_at'], 'integer'],
-            [['account', 'tz_sites', 'hz_Arr', 'update_time'], 'safe'],
-            [['single'], 'number'],
+            [['id', 'is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'lottery_type', 'plan_type', 'created_at', 'updated_at'], 'integer'],
+            [['children_plan_id', 'account', 'tz_sites', 'hz_Arr', 'update_time'], 'safe'],
+            [['single', 'take_profits', 'stop_loss'], 'number'],
         ];
     }
 
@@ -71,6 +71,9 @@ class UserSysPlans extends UserSysPlansModel
             'nums' => $this->nums,
             'sel_same' => $this->sel_same,
             'is_custom' => $this->is_custom,
+            'take_profits' => $this->take_profits,
+            'stop_loss' => $this->stop_loss,
+            'plan_type' => $this->plan_type,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,
