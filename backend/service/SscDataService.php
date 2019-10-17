@@ -1212,7 +1212,7 @@ class SscDataService extends BaseService {
         }
         $last_times = 0;
         $last_index_id = self::getLastIndexId($lottery_type);
-        $min_id = $last_index_id - $recently - 1;
+        $min_id = $last_index_id - $recently;
         //p([$value, $recently, $min_id]);
         $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'index_id', $min_id], ['LIKE', $field, $value]];
         $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->where($where)->orderBy('id DESC')->asArray()->all();
