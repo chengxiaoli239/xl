@@ -70,6 +70,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             }
                         ],
                         //'buy_type',
+                        /*
                         ['attribute' => 'buy_type','label'=>'正买/反买',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
@@ -88,6 +89,18 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                     $txt = "<font color='red'>$txt</font>";
                                     return Html::a($txt, $url0, ['title' => '切换正买']);
                                 }
+                            }
+                        ],
+                        */
+                        ['attribute' => 'plan_type','label'=>'计划类型',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if($model->plan_type == 1){
+                                    $txt = '止盈止损';
+                                }else{
+                                    $txt = '普通';
+                                }
+                                return $txt;
                             }
                         ],
                         //'status',
@@ -112,7 +125,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             'format'=>'raw',
                             'value' => function($model) {
                                 if($model->plan_type == 1){
-                                    $txt = '止盈:'.$model->take_profits.'|止损:'.$model->stop_loss .'|当前:'.$model->current_profits ;
+                                    $txt = '止盈:'.$model->take_profits." 止损:".$model->stop_loss .' 当前:'.$model->current_profits ;
                                 }else{
                                     $txt = '无';
                                 }
