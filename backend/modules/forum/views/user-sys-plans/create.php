@@ -23,6 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'kArr' => $kArr,
         'tz_type' => $tz_type,
         'hzArr' => $hzArr,
+        'plan_types' => $plan_types,
         'tz_sites_Arr' => $tz_sites_Arr,
     ]) ?>
 

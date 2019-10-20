@@ -115,6 +115,7 @@ class UserSysPlansController extends BaseController
             return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$queryParams['lottery_type']]);
         }
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
+        $plan_types = TzService::getTzPlanTypes($this->_user_id);
 
         $model->nums = UserSysPlansService::getDefaultTzNums($tz_type);
         $model->status = $model->status ? 1 : 0;
@@ -122,6 +123,7 @@ class UserSysPlansController extends BaseController
         $model->single = 0.1;
         $model->tz_type = $tz_type;
         $model->buy_type = 0;
+        $model->plan_type = 0;
         $defaultSiteId = UserService::getUserDefaultSite($this->_user_id);
         $model->tz_sites = [$defaultSiteId];
 
@@ -129,6 +131,7 @@ class UserSysPlansController extends BaseController
             'model' => $model,
             'tz_type' => $tz_type,
             'playway' => $playway,
+            'plan_types' => $plan_types,
             'tz_sites_Arr' => $tz_sites_Arr
         ];
         $data = array_merge($data, UserSysPlansService::getSysPlansTypeDatas($playway, $tz_type));
@@ -154,7 +157,6 @@ class UserSysPlansController extends BaseController
             }
             return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$model->lottery_type]);
         }
-        //p($this->_post);
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
         $model->tz_sites = explode(',', $model->tz_sites);
         if(in_array($model->tz_type, [20, 22])){ # 和值、四定单双
@@ -172,11 +174,13 @@ class UserSysPlansController extends BaseController
                 }
             }
         }
+        $plan_types = TzService::getTzPlanTypes($this->_user_id);
 
         $data =  [
             'model' => $model,
             'tz_type' => $model->tz_type,
             'playway' => $model->playway,
+            'plan_types' => $plan_types,
             'tz_sites_Arr' => $tz_sites_Arr,
         ];
         $data = array_merge($data, UserSysPlansService::getSysPlansTypeDatas($model->playway, $model->tz_type));

@@ -428,7 +428,22 @@ class TzService extends BaseService {
     }
 
     /**
-     * @desc 获取投注系统
+     * @desc 获取投注系统 getTzPlanTypes
+     * @return mixed
+     */
+    public static function getTzPlanTypes($admin_id = ''){
+
+        $datas = [
+            # 计划类型:0正常1止盈止损计划
+            0=>'正常',
+            1=>'止盈止损',
+        ];
+
+        return $datas;
+    }
+
+    /**
+     * @desc 获取投注系统 getTzPlanTypes
      * @return mixed
      */
     public static function getTzSites($admin_id = ''){

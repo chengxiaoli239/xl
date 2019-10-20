@@ -27,6 +27,7 @@ if( $tz_type >= 17){
         'tz_sites_Arr' => $tz_sites_Arr,
         'kArr' => $kArr,
         'tz_type' => $model->tz_type,
+        'plan_types' => $plan_types,
         'hzArr' => $hzArr,
     ]) ?>
 

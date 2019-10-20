@@ -45,6 +45,11 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码，多组英文逗号隔开(例：223,1234,667 或 345)') ?>
 
+                    <?= $form->field($model, 'plan_type')->radioList($plan_types)->label('计划类型') ?>
+
+                    <?= $form->field($model, 'take_profits')->textInput($plan_types)->label('止盈点(正数，例：3000)') ?>
+                    <?= $form->field($model, 'stop_loss')->textInput($plan_types)->label('止损点(正数，例：4000)') ?>
+
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
 
                     <!--?= $form->field($model, 'created_at')->textInput() ?-->
