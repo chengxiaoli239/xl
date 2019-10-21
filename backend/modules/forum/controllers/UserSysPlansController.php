@@ -230,6 +230,19 @@ class UserSysPlansController extends BaseController
     }
 
     /**
+     * @desc 重新计算止盈止损计划盈利点
+     * @param $id
+     * @return \yii\web\Response
+     */
+    public function actionReCalculateProfits($id){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $rst = BetService::reCalculateProfits($id, $this->_user_id);
+
+        return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$rst['lottery_type']]);
+    }
+
+    /**
      * Deletes an existing UserSysPlans model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param string $id

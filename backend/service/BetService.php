@@ -497,6 +497,30 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
+     * @desc 计划任务列表立即投注
+     * @param $id
+     * @param $uid
+     */
+   public static function reCalculateProfits($id, $uid){
+       if(!$UserSysPlans = UserSysPlans::findOne(['id'=>$id, 'uid'=>$uid])){
+           return ['status'=>300, 'msg'=>'找不到对应记录'];
+       }
+       $m = \Yii::$app->cache;
+       $qihao = HN0898Service::getQihao($UserSysPlans->lottery_type);
+       $mkey = 'reCalculateProfits_'.$uid.'_'.$id.'_'.$qihao.'_'.$UserSysPlans->playway;
+       if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
+       p($UserSysPlans);
+
+       $rst = BettingRecords::updateAll(['is_profits_record'=>0], ['plan_id'=>id]);
+
+       $m->set($mkey, 1, 10);
+
+       $rst['lottery_type'] = $UserSysPlans->lottery_type;
+
+       return $rst;
+    }
+
+    /**
      * @desc 投注列表 - 立即投注
      */
     public static function tzNowBetRecord($uid, $id){

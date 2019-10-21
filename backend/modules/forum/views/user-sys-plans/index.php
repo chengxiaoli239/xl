@@ -136,7 +136,13 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             'format'=>'raw',
                             'value' => function($model) {
                                 $url = "/forum/user-sys-plans/tz-now?id=".$model->id; # 立即下注
-                                return Html::a('立即下注', $url, ['title' => '立即下注'.$model->id,'alt'=>$model->id]);
+                                $txt = Html::a('立即下注', $url, ['title' => '立即下注'.$model->id,'alt'=>$model->id]);
+                                if($model->plan_type == 1){
+                                    $url1 = "/forum/user-sys-plans/re-calculate-profits?id=".$model->id; # 重新计算盈利
+                                    $txt .= ' | '.Html::a('重新计算盈利', $url1, ['title' => '重新计算盈利'.$model->id,'alt'=>$model->id]);
+                                }
+
+                                return $txt;
                             }
                         ],
                         //'tz_sites',
