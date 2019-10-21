@@ -139,7 +139,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 $txt = Html::a('立即下注', $url, ['title' => '立即下注'.$model->id,'alt'=>$model->id]);
                                 if($model->plan_type == 1){
                                     $url1 = "/forum/user-sys-plans/re-calculate-profits?id=".$model->id; # 重新计算盈利
-                                    $txt .= ' | '.Html::a('重新计算盈利', $url1, ['title' => '重新计算盈利'.$model->id,'alt'=>$model->id]);
+                                    $txt .= ' | '.Html::a('重算盈利', $url1, ['title' => '重算盈利'.$model->id,'alt'=>$model->id]);
                                 }
 
                                 return $txt;

@@ -509,13 +509,15 @@ abstract class BetService extends BaseBetService {
        $qihao = HN0898Service::getQihao($UserSysPlans->lottery_type);
        $mkey = 'reCalculateProfits_'.$uid.'_'.$id.'_'.$qihao.'_'.$UserSysPlans->playway;
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
-       p($UserSysPlans);
 
-       $rst = BettingRecords::updateAll(['is_profits_record'=>0], ['plan_id'=>id]);
+       $rstFlag = BettingRecords::updateAll(['is_profits_record'=>0], ['plan_id'=>$id]);
+       $UserSysPlans->current_profits = 0.00;
+       $UserSysPlans->save();
 
        $m->set($mkey, 1, 10);
 
        $rst['lottery_type'] = $UserSysPlans->lottery_type;
+       $rst['flag'] = $rstFlag;
 
        return $rst;
     }
