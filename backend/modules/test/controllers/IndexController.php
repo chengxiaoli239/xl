@@ -108,11 +108,14 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst['allDateStatic3nPerMonth'] = StaticService::allDateStatic3nPerMonth($lottery_type = 6);p($rst); # 三现每月统计
+        $rst = StaticService::staticKj3NCounts('2019-10', $lottery_type = 5);p($rst);
+        $rst['allDateStatic4nPerMonth'] = StaticService::allDateStatic4nPerMonth($lottery_type = 5); # 部分四现每月统计
         $rst = StaticService::getCreateCodeType3nSql($lottery_type = 5);p($rst);
+        $rst = StaticService::getCreateCodeType4nSql($lottery_type = 5);p($rst);
         $miss = SscDataService::getCodeTypeHistoryMiss('type_4b', $lottery_type = 6, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 5);p($rst);
         $miss = SscDataService::getCodeTypeYlHistoryMiss('555', $lottery_type = 5, 20000);p($miss);
-        $rst['allDateStatic4nPerMonth'] = StaticService::allDateStatic4nPerMonth($lottery_type = 5); # 部分四现每月统计
         $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst); # 号码类型遗漏
         $rst = StaticService::opAllCodeTypeYl();p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([26], $lottery_type = 6, 20000);p($miss);
