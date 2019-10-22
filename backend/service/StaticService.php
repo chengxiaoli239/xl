@@ -31,6 +31,7 @@ use backend\models\StaticPerHzPerdateProfits;
 use backend\models\StaticPerHzProfits;
 use backend\models\StaticProfits;
 use backend\models\SystemConfig;
+use backend\models\ThreeNum;
 use backend\models\TzTypes;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
@@ -2127,13 +2128,17 @@ CREATE TABLE `lt_static_code_3n_arise_month` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `month` varchar(10) DEFAULT NULL COMMENT \'月份\',
 ';
-
+        $threeNums_0 = ThreeNum::find()->asArray()->all();
+        $codes_3n = ArrayHelper::getColumn($threeNums_0, 'code'); # 不带双三字现
+        p($codes);
         $types = [0, 1];
         $codes = [];
         foreach ($types as $type){
-            $SscKjDatas = SscKjData::find()->select(['code_3n'])->where(['lottery_type'=>$lottery_type, 'type_2'=>$type])->groupBy('code_4n ,lottery_type')->orderBy(['COUNT(id)'=>SORT_DESC])->limit(50)->asArray()->all();
+            $SscKjDatas = SscKjData::find()->select(['code_3n'])->where(['lottery_type'=>$lottery_type, 'type_2'=>$type])->groupBy('code_4n ,lottery_type')->orderBy(['id'=>SORT_DESC])->asArray()->all();
             $codes = array_merge($codes, ArrayHelper::getColumn($SscKjDatas, 'code_4n'));
+            p($codes);
         }
+        p($codes);
         foreach ($codes as $key=>$code){
             $sql .= '    `code_'.$code.'` tinyint(4) DEFAULT NULL COMMENT \''.$code.'\','."\r\n";
         }
@@ -2144,7 +2149,7 @@ $sql .= '
     `updated_at` int(11) NOT NULL COMMENT \'更新时间\',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT \'更新时间\',
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT=\'四现热码月统计表\';';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT=\'三现热码月统计表\';';
 
         return $sql;
     }
