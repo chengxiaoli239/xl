@@ -49,8 +49,7 @@ class StaticCode3nAriseMonthController extends BaseController
 
         $dataProvider = $searchModel->search($queryParams);
 
-        //return $this->render('index_'.$type, [
-        return $this->render('index', [
+        return $this->render('index_'.$type, [
             'lottery_types' => $lottery_types,
             'lottery_type' => $lottery_type,
             'type' => $type,

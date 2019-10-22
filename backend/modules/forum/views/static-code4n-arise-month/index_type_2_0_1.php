@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div-->
 
             <?//php Pjax::begin(); ?>
-                <?php include(dirname(__FILE__).'/code_type_tab.php'); ?>
+                <?php //include(dirname(__FILE__).'/code_type_tab.php'); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([

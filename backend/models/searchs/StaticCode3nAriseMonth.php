@@ -47,6 +47,7 @@ class StaticCode3nAriseMonth extends StaticCode3nAriseMonthModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=> ['defaultOrder' => ['id'=>SORT_DESC]]
         ]);
 
         $this->load($params);
