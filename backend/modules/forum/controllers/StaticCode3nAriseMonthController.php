@@ -2,6 +2,8 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\UserSysPlansService;
+use common\service\CommonService;
 use Yii;
 use backend\models\StaticCode3nAriseMonth;
 use backend\models\searchs\StaticCode3nAriseMonth as StaticCode3nAriseMonthSearch;
@@ -36,9 +38,22 @@ class StaticCode3nAriseMonthController extends BaseController
     public function actionIndex()
     {
         $searchModel = new StaticCode3nAriseMonthSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
 
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
+        $queryParams['StaticCode3nAriseMonth']['lottery_type'] = $lottery_type;
+
+        $type = $queryParams['StaticCode3nAriseMonth']['type'];
+        $type = $type ? $type : 1;
+
+        $dataProvider = $searchModel->search($queryParams);
+
+        //return $this->render('index_'.$type, [
         return $this->render('index', [
+            'lottery_types' => $lottery_types,
+            'lottery_type' => $lottery_type,
+            'type' => $type,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);

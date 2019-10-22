@@ -18,13 +18,14 @@ $this->params['breadcrumbs'][] = $this->title;
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <div class="clearfix">
+                <!--div class="clearfix">
                     <div class="btn-group">
                         <?= Html::a(Yii::t('app', 'Create Static Code3n Arise Month'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
-                </div>
+                </div-->
 
-    <?php Pjax::begin(); ?>
+            <?php //Pjax::begin(); ?>
+                <?php include(dirname(__FILE__).'/code_type_tab.php'); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
@@ -33,38 +34,38 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
+                        //'id',
                         'month',
                         'code_137',
                         'code_256',
                         'code_126',
-                        //'code_238',
-                        //'code_078',
-                        //'code_013',
-                        //'code_589',
-                        //'code_019',
-                        //'code_138',
-                        //'code_014',
-                        //'code_478',
-                        //'code_267',
-                        //'code_125',
-                        //'code_567',
-                        //'code_012',
-                        //'code_139',
-                        //'code_469',
-                        //'code_034',
-                        //'code_018',
-                        //'code_278',
-                        //'code_056',
-                        //'code_569',
-                        //'code_025',
-                        //'code_029',
-                        //'code_356',
-                        //'code_015',
-                        //'code_347',
-                        //'code_348',
-                        //'code_134',
-                        //'code_145',
+                        'code_238',
+                        'code_078',
+                        'code_013',
+                        'code_589',
+                        'code_019',
+                        'code_138',
+                        'code_014',
+                        'code_478',
+                        'code_267',
+                        'code_125',
+                        'code_567',
+                        'code_012',
+                        'code_139',
+                        'code_469',
+                        'code_034',
+                        'code_018',
+                        'code_278',
+                        'code_056',
+                        'code_569',
+                        'code_025',
+                        'code_029',
+                        'code_356',
+                        'code_015',
+                        'code_347',
+                        'code_348',
+                        'code_134',
+                        'code_145',
                         //'code_258',
                         //'code_036',
                         //'code_123',
@@ -260,10 +261,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'updated_at',
                         //'update_time',
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
-    <?php Pjax::end(); ?>
+            <?php //Pjax::end(); ?>
             </div>
         </div>
     </section>
