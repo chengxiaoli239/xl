@@ -2,11 +2,10 @@
 /**
  * 通用处理类
  * Enter description here ...
- * @author sam
- * @authors wudean(bj) 乔迁标识
+ * @author wangyegao
  *
  */
-namespace item\tools;
+namespace backend\tools;
 class Util{
 	//获取客户端IP
 	public static function getIp(){
@@ -96,6 +95,32 @@ class Util{
         preg_match_all("/./us", $string, $match);
         // 返回单元个数
         return count($match[0]);
+    }
+
+    /**
+     * @desc 二维数组排序
+     * @param $list
+     * @param $field
+     * @return mixed
+     * @Author wangyegao
+     */
+    public static function sortByCols($list, $field)
+    {
+        $sort_arr = array();
+        $sort_rule = '';
+        foreach ($field as $sort_field => $sort_way) {
+            foreach ($list as $key => $val) {
+                $sort_arr[$sort_field][$key] = $val[$sort_field];
+            }
+            $sort_rule .= '$sort_arr["' . $sort_field . '"],' . $sort_way . ',';
+        }
+        if (empty($sort_arr) || empty($sort_rule)) {
+            return $list;
+        }
+        eval('array_multisort(' . $sort_rule . ' $list);');
+        array_multisort($sort_arr['parent'], 4, $sort_arr['value'], 3, $list);
+        return $list;
+        //$list = sortByCols($list, array( 'id' => SORT_DESC, 'name' => SORT_DESC, 'age' => SORT_DESC, ));
     }
 
 }

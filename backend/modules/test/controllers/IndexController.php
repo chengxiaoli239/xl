@@ -108,6 +108,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::getCreateCodeType3nSql($lottery_type = 5);p($rst);
+        $miss = SscDataService::getCodeTypeHistoryMiss('type_4b', $lottery_type = 6, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 5);p($rst);
         $miss = SscDataService::getCodeTypeYlHistoryMiss('555', $lottery_type = 5, 20000);p($miss);
         $rst['allDateStatic4nPerMonth'] = StaticService::allDateStatic4nPerMonth($lottery_type = 5); # 部分四现每月统计
@@ -206,7 +208,6 @@ class IndexController extends Controller
         }
         p($rst);
         $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type = 5); p($rst);# 单双利润统计(month)
-        $miss = SscDataService::getCodeTypeHistoryMiss('type_3', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 7);p($rst); # 上奖三字现
         $rst = StaticService::get2NumsYlRecords('66', $lottery_type = 7);p($rst);
         $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);p($rst);

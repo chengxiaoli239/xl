@@ -33,6 +33,7 @@ use backend\models\StaticProfits;
 use backend\models\SystemConfig;
 use backend\models\ThreeNum;
 use backend\models\TzTypes;
+use backend\tools\Util;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -2128,19 +2129,37 @@ CREATE TABLE `lt_static_code_3n_arise_month` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `month` varchar(10) DEFAULT NULL COMMENT \'月份\',
 ';
-        $threeNums_0 = ThreeNum::find()->asArray()->all();
-        $codes_3n = ArrayHelper::getColumn($threeNums_0, 'code'); # 不带双三字现
-        p($codes);
-        $types = [0, 1];
-        $codes = [];
-        foreach ($types as $type){
-            $SscKjDatas = SscKjData::find()->select(['code_3n'])->where(['lottery_type'=>$lottery_type, 'type_2'=>$type])->groupBy('code_4n ,lottery_type')->orderBy(['id'=>SORT_DESC])->asArray()->all();
-            $codes = array_merge($codes, ArrayHelper::getColumn($SscKjDatas, 'code_4n'));
-            p($codes);
+
+        $m = \Yii::$app->cache;
+        $mkey = 'getCreateCodeType3nSql_code';
+        if(!$datas = $m->get($mkey)){
+            $code3ns = ThreeNum::find()->select(['val'=>'code'])->asArray()->all();
+            foreach ($code3ns as $key=>$code3n){
+                $code3ns[$key]['type_2'] = 0;
+                $code3ns[$key]['type_3'] = 0;
+            }
+
+            $nums3ns = SscStaticVal::find()->select(['val','type_2', 'type_3'])->where(['type'=>3])->orderBy(['type_3'=>SORT_ASC])->asArray()->all();
+            $datas = array_merge($code3ns, $nums3ns);
+            //p($datas);
+
+            foreach ($datas as $k=>$data){
+                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['LIKE', 'code_3n', $data['val']], ['=', 'type_2', $data['type_2']], ['=', 'type_3', $data['type_3']]];
+                $count = SscKjData::find()->where($where)->count();
+                $datas[$k]['count'] = $count;
+            }
+            $m->set($mkey, $datas, 30*3600*24); # datas : Array ( [val] => 012 [type_2] => 0 [type_3] => 0 [nums] => 1067 )
         }
-        p($codes);
-        foreach ($codes as $key=>$code){
-            $sql .= '    `code_'.$code.'` tinyint(4) DEFAULT NULL COMMENT \''.$code.'\','."\r\n";
+        // 取得列的列表
+        foreach ($datas as $key => $row) {
+            $counts[] = $row['count'];
+            $vals[]  = $row['val'];
+        }
+
+        array_multisort($counts, SORT_DESC,  $vals, SORT_ASC, $datas);
+
+        foreach ($datas as $key=>$code){
+            $sql .= '    `code_'.$code['val'].'` tinyint(4) DEFAULT NULL COMMENT \''.$code['val'].'\','."\r\n";
         }
 
 $sql .= '
