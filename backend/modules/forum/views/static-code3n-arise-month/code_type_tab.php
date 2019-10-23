@@ -27,5 +27,5 @@ use yii\helpers\Html;
 </div>
 ||
 <div class="btn-group">
-    <?= Html::a('三重', ['index', 'StaticCode3nAriseMonth[lottery_type]'=>$lottery_type, 'StaticCode3nAriseMonth[type]'=>8], ['class' => 'btn '.($type == 9 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+    <?= Html::a('三重', ['index', 'StaticCode3nAriseMonth[lottery_type]'=>$lottery_type, 'StaticCode3nAriseMonth[type]'=>8], ['class' => 'btn '.($type == 8 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
 </div>
