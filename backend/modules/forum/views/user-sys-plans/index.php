@@ -165,9 +165,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                     $str = \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
                                     $txt = BaseStringHelper::truncate($str,25);
                                     $str = Html::a($txt, '#', ['title' => $str,'alt'=>$str]);
-                                }elseif($model->tz_type == 25){
-                                    $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
-                                }elseif($model->tz_type == 28){
+                                }elseif(in_array($model->tz_type, [25])){
                                     $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
                                 }else{
                                     $str = $model->hz_Arr;
