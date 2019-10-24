@@ -28,6 +28,9 @@ if( $tz_type >= 17){
         'kArr' => $kArr,
         'tz_type' => $model->tz_type,
         'plan_types' => $plan_types,
+        'code_types' => $code_types,
+        'get_arise' => $get_arise,
+        'remove_arise' => $remove_arise,
         'hzArr' => $hzArr,
     ]) ?>
 

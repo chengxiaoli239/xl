@@ -8,6 +8,8 @@
  */
 
 namespace backend\service;
+use backend\models\CodeTypes;
+use backend\models\CodeTypesQuery;
 use backend\models\ImportPlanCodes;
 use backend\models\LotteryType;
 use backend\models\SscDsYl;
@@ -137,6 +139,41 @@ class UserSysPlansService extends BaseService {
             }
             unset($post['UserSysPlans']['type_4s']);
 
+            $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
+        }elseif ($tz_type == 28){ # 系统快捷
+            $tmpFilter = [];
+            # 1.1、号码类型：取
+            if(isset($post['UserSysPlans']['get_types']) && $post['UserSysPlans']['get_types']){
+                $tmpFilter['get_types'] = $post['UserSysPlans']['get_types'];
+            }
+            unset($post['UserSysPlans']['get_types']);
+            # 1.2、号码类型：除
+            if(isset($post['UserSysPlans']['remove_types']) && $post['UserSysPlans']['remove_types']){
+                $tmpFilter['remove_types'] = $post['UserSysPlans']['remove_types'];
+            }
+            unset($post['UserSysPlans']['remove_types']);
+
+            # 2.1、和值：取
+            if(isset($post['UserSysPlans']['get_hzs']) && $post['UserSysPlans']['get_hzs']){
+                $tmpFilter['get_hzs'] = $post['UserSysPlans']['get_hzs'];
+            }
+            unset($post['UserSysPlans']['get_hzs']);
+            # 2.2、和值：除
+            if(isset($post['UserSysPlans']['remove_hzs']) && $post['UserSysPlans']['remove_hzs']){
+                $tmpFilter['remove_hzs'] = $post['UserSysPlans']['remove_hzs'];
+            }
+            unset($post['UserSysPlans']['remove_hzs']);
+
+            # 3.1、上奖：取
+            if(isset($post['UserSysPlans']['get_arises']) && $post['UserSysPlans']['get_arises']){
+                $tmpFilter['get_arises'] = $post['UserSysPlans']['get_arises'];
+            }
+            unset($post['UserSysPlans']['get_arises']);
+            # 3.2、上奖：除
+            if(isset($post['UserSysPlans']['remove_arises']) && $post['UserSysPlans']['remove_arises']){
+                $tmpFilter['remove_arises'] = $post['UserSysPlans']['remove_arises'];
+            }
+            unset($post['UserSysPlans']['remove_arises']);
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
         }else{
             $hz_Arr = $post['UserSysPlans']['hz_Arr'];
@@ -335,12 +372,15 @@ class UserSysPlansService extends BaseService {
                     $tmpData[$zhi] = $zhi;
                 }
                 $data['hzArr'] = $tmpData;
-            }elseif ($tz_type == 25){ # 快选
+            }elseif (in_array($tz_type, [25, 28])){ # 快选
                 $hzArr = [];
                 for ($i=1; $i<=36; $i++){
                     $hzArr[$i] = $i;
                 }
                 $data['hzArr'] = $hzArr;
+                if(in_array($tz_type, [28])){
+                    $data['code_types'] = UserSysPlansService::getCodeTypes();
+                }
             }
         }
 
@@ -405,6 +445,19 @@ class UserSysPlansService extends BaseService {
         return $typeDatas;
     }
 
+    /**
+     * @desc 号码类型
+     * @return array
+     */
+    public static function getCodeTypes(){
+        $data = [];
+        $codeTypes = CodeTypes::find()->asArray()->All();
+        foreach ($codeTypes as $codeType){
+            $data[$codeType['type']] = $codeType['type_name'];
+        }
+
+        return $data;
+    }
 
     /**
      * @desc 获取默认投注注数

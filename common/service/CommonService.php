@@ -636,6 +636,37 @@ class  CommonService{
     }
 
     /**
+     * @desc 四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType4d($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        asort($codesArr);
+
+        $types_1 = [
+            0 => 2, # 四双
+            1 => 4, # 一单三双
+            2 => 3, # 两双两单
+            3 => 5, # 一双三单
+            4 => 1, # 四单
+        ];
+
+        $count_1 = 0; # 单数量
+
+        # 单数量判断
+        foreach ($codesArr as $code){
+            if($code % 2 == 1) {
+                $count_1++;
+            }
+        }
+
+        $flag = $types_1[$count_1];
+        return $flag;
+    }
+
+    /**
      * @desc 是否对数
      * @param string $codes 格式 1,2,3,4
      * @return int

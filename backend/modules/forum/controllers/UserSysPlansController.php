@@ -127,6 +127,9 @@ class UserSysPlansController extends BaseController
         $defaultSiteId = UserService::getUserDefaultSite($this->_user_id);
         $model->tz_sites = [$defaultSiteId];
 
+        if(in_array($tz_type, [28])){ # 系统快捷
+        }
+
         $data =  [
             'model' => $model,
             'tz_type' => $tz_type,
@@ -161,6 +164,13 @@ class UserSysPlansController extends BaseController
         $model->tz_sites = explode(',', $model->tz_sites);
         if(in_array($model->tz_type, [20, 22])){ # 和值、四定单双
             $model->hz_Arr = explode(',', $model->hz_Arr);
+        }elseif (in_array($model->tz_type, [28])){
+            if($model->hz_Arr){
+                $jsons = json_decode($model->hz_Arr, true);
+                foreach ($jsons as $key=>$v){
+                    $model->$key = $v;
+                }
+            }
         }elseif (in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
             $codes = ImportPlanCodes::findOne(['uid'=>$this->_user_id, 'plan_id'=>$model])->codes;
             $model->import_codes_txt = str_replace('@', ' ', str_replace(',', '', $codes));

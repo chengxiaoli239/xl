@@ -26,6 +26,12 @@ use Yii;
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property string $take_profits 止盈点
  * @property string $stop_loss 止损点
+ * @property string $get_hzs 和值 取
+ * @property string $remove_hzs 和值 除
+ * @property string $get_types 号码类型 取
+ * @property string $remove_types 号码类型 除
+ * @property string $get_arise 上奖 除
+ * @property string $remove_arise 上奖 除
  * @property string $current_profits 当前盈利
  * @property int $plan_type 计划类型:0正常1止盈止损计划
  * @property int $created_at 创建时间
@@ -43,7 +49,9 @@ class UserSysPlans extends \common\models\base\BaseModel
    public $type_4b; # 四兄弟 
    public $hz; # 四兄弟 
    public $arise; # 上奖 
-   public $p1; # 第1位 
+   public $get_arises; # 上奖：取
+   public $remove_arises; # 上奖：除
+   public $p1; # 第1位
    public $p2; # 第2位 
    public $p3; # 第3位 
    public $p4; # 第4位 
@@ -51,7 +59,11 @@ class UserSysPlans extends \common\models\base\BaseModel
    public $type_4s; # 四双 
    public $type_log; # 对数 
    public $import_codes_txt; # 导入号码 
-   //public $type_3_txt; # 三定-导入 
+   public $get_types; #  取类型
+   public $remove_types; #  排除类型
+   public $get_hzs; #  取和值
+   public $remove_hzs; #  排除和值
+   //public $type_3_txt; # 三定-导入
    //public $type_4_txt; # 四定-导入 
     /**
      * @inheritdoc

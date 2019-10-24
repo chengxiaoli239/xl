@@ -108,6 +108,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::insertCodeType();p($rst);
+        $rst = UserSysPlansService::getCodeTypes();p($rst);
+        $miss = SscDataService::getSdHzYlHistoryMiss([35], $lottery_type = 6, 40000);p($miss);
         $miss = SscDataService::getCodeTypeHistoryMiss('type_4b', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $rst['allDateStatic3nPerMonth'] = StaticService::allDateStatic3nPerMonth($lottery_type = 6);p($rst); # 三现每月统计
         $rst = StaticService::staticKj3NCounts('2019-10', $lottery_type = 5);p($rst);
@@ -160,7 +163,6 @@ class IndexController extends Controller
         $msg = KjDataGet::insertKjData('2019092548', $lottery_type = 6, $kjData = '3,9,9,7,1');p($msg);
         $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5); p($rst);// 更新和值遗漏
         $rst = SscDataService::update3NumYL($lottery_type = 6);$end_time = time(true); $time_consume = ($end_time-$start_time).'s';p([$rst,$time_consume]);
-        $miss = SscDataService::getSdHzYlHistoryMiss([28], $lottery_type = 5, 40000);p($miss);
         $rst[] = StaticService::static4dPerDateProfits($lottery_type = 5);p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst = StaticService::staticSDPerDateProfits(date('Y-m-d'));p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([4], $lottery_type = 6, 40000);p($miss);
@@ -238,7 +240,6 @@ class IndexController extends Controller
         $rst = HN0898Service::getQihao( 7 );p($rst);
         $rst['bet'] = BetService::bet();p($rst); // 用户新计划投注，可正买可反买
         $rst = SscDataService::clearDataTables();p($rst);
-        $rst = SscDataService::insertCodeType();p($rst);
         $rst = HN0898Service::getDifferentNums();p($rst);
         $rst = TzService::insertKuaiLe8DataTime();p($rst);
         $qihao = HN0898Service::getQihao($lottery_type=5);p($qihao);

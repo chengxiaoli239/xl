@@ -35,21 +35,16 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'single')->textInput() ?>
 
-                    <?= $form->field($model, 'get_types')->checkboxList([1=>'三现:双重+两兄弟'])->label('投注类型(取)') ?>
+                    <?= $form->field($model, 'get_types')->checkboxList($code_types)->label('类型【取】') ?>
+                    <?= $form->field($model, 'remove_types')->checkboxList($code_types)->label('类型【除】') ?>
 
-                    <?= $form->field($model, 'cancel_types')->checkboxList([1=>'三现:双重+两兄弟'])->label('投注类型(除)') ?>
+                    <?= $form->field($model, 'get_hzs')->checkboxList($hzArr)->label('和值【取】') ?>
+                    <?= $form->field($model, 'remove_hzs')->checkboxList($hzArr)->label('和值【除】') ?>
 
-                    <?= $form->field($model, 'plan_type')->radioList($plan_types)->label('计划类型，为"止盈止损"计划时须填以下两项') ?>
-                    <?= $form->field($model, 'take_profits')->textInput($plan_types)->label('止盈点(正数，例：3000)') ?>
-                    <?= $form->field($model, 'stop_loss')->textInput($plan_types)->label('止损点(正数，例：4000)') ?>
+                    <?= $form->field($model, 'get_arises')->textInput()->label('上奖【取】') ?>
+                    <?= $form->field($model, 'remove_arises')->textInput()->label('上奖【除】') ?>
 
-                    <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
-
-                    <!--?= $form->field($model, 'created_at')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'updated_at')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'update_time')->textInput() ?-->
+                    <?= include (dirname(__FILE__).'/../common/common_input.php');?>
 
                     <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">

@@ -1854,6 +1854,8 @@ class SscDataService extends BaseService {
                 'type_4b' => CommonService::isCodeType4b($codes), # 是否四兄弟
                 'type_4ds' => CommonService::isCodeType4ds($codes), # 是否四单双：0非四单四双1四单2四双
                 'type_log' => CommonService::isCodeTypeLog($codes), # 是否对数
+                'type_4d' => CommonService::isCodeType4d($codes), # 是否四单
+                'type_4s' => CommonService::isCodeType4s($codes), # 是否四双
                 'codes_hz' => array_sum([$code[0],$code[1],$code[2],$code[3]]),
                 'updated_at' => time(),
                 'created_at' => time(),
