@@ -8,6 +8,7 @@
  */
 
 namespace backend\service;
+use backend\models\CodeTypes;
 use backend\models\Num4Type;
 use backend\models\SscKjData;
 use backend\models\SystemConfig;
@@ -570,7 +571,6 @@ class NumService extends BaseService {
      * @return array
      */
     public static function getCodesKuaiXuan($codes_hz) {
-        //p($codes_hz,0);
         if(empty($codes_hz)) return [];
 
         $where = ['AND'];
@@ -688,7 +688,14 @@ class NumService extends BaseService {
             $codesArr_arise = self::getCodesArise([$codes_hz['arise']]);
             $codesArr = array_intersect($codesArr, $codesArr_arise);
         }
-        //p($codesArr);
+
+        # 三现:双重+两兄弟 - 待完善
+        if(in_array(1, $codes_hz['get_types'])){
+            $codes_hz['arise'] = CodeTypes::find()->where(['type'=>1])->one()['codes'];
+            $codesArr_arise = self::getCodesArise([$codes_hz['arise']]);
+            $codesArr = array_intersect($codesArr, $codesArr_arise);
+        }
+
 
         return array_unique($codesArr);
     }
