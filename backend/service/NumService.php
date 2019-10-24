@@ -723,9 +723,19 @@ class NumService extends BaseService {
         $filter1 = []; # 取
         $filter2 = []; # 和值
         $filter3 = []; # 上奖
-        # 0、上奖
-        if(isset($hz_Arr['arise'])){
+        $filter4 = []; # 上奖除
+        $filter5 = []; # 和值除
+        $filter6 = []; # 类型取
+        $filter7 = []; # 类型除
+        # {"get_types":["1","2"],"remove_types":["4","5"],"get_hzs":["7","8","10"],"remove_hzs":["12","13","14"],"get_arises":"123","remove_arises":"456"}
+        # 0.1、上奖取
+        if(isset($hz_Arr['arise']) OR isset($hz_Arr['get_arises'])){
+            if(isset($hz_Arr['get_arises'])) $hz_Arr['arise'] = $hz_Arr['get_arises'];
             if(isset($hz_Arr['arise'])) $filter3['arise'] = $hz_Arr['arise'];// else $filter0['arise'] = 0;
+        }
+        # 0.2、上奖除 - 新
+        if(isset($hz_Arr['remove_arises']) OR isset($hz_Arr['remove_arises'])){
+            if(isset($hz_Arr['remove_arises'])) $filter4['remove_arises'] = $hz_Arr['remove_arises'];// else $filter0['arise'] = 0;
         }
         # 1、双重
         if(isset($hz_Arr['type_2'])){
@@ -761,10 +771,16 @@ class NumService extends BaseService {
             if($hz_Arr['type_log'] == 1) $filter1['type_log'] = 1; else $filter0['type_log'] = 0;
         }
 
-        # 8、和值
-        if(isset($hz_Arr['hz']) && !empty($hz_Arr['hz'])){
+        # 8.1、和值
+        if((isset($hz_Arr['hz']) && !empty($hz_Arr['hz'])) OR (isset($hz_Arr['get_hzs']) && !empty($hz_Arr['get_hzs']))){
+            if(isset($hz_Arr['get_hzs'])) $hz_Arr['hz'] = $hz_Arr['get_hzs'];
             $filter2['hz'] = implode(',',$hz_Arr['hz']);
         }
+        # 8.2、和值除 - 新
+        if(isset($hz_Arr['remove_hzs']) && !empty($hz_Arr['remove_hzs'])){
+            $filter5['hz'] = implode(',',$hz_Arr['remove_hzs']);
+        }
+
         # 9、四单
         if(isset($hz_Arr['type_4d'])){
             if($hz_Arr['type_4d'] == 1) $filter1['type_4d'] = 1; else $filter0['type_4d'] = 0;
@@ -773,11 +789,25 @@ class NumService extends BaseService {
         if(isset($hz_Arr['type_4s'])){
             if($hz_Arr['type_4s'] == 1) $filter1['type_4s'] = 1; else $filter0['type_4s'] = 0;
         }
+        # 11.1、类型取 - 新
+        if(isset($hz_Arr['get_types']) OR isset($hz_Arr['get_types'])){
+            if(isset($hz_Arr['get_types'])) $filter6['get_types'] = $hz_Arr['get_types'];// else $filter0['arise'] = 0;
+        }
+        # 11.2、类型除 - 新
+        if(isset($hz_Arr['remove_types']) OR isset($hz_Arr['remove_types'])){
+            if(isset($hz_Arr['remove_types'])) $filter7['remove_types'] = $hz_Arr['remove_types'];
+        }
 
         $typesArr = self::getNameByCodesType();
+        #和值取
         if(!empty($filter2['hz'])){
             //$desc .= '和值:'.yii\helpers\BaseStringHelper::truncate($filter2['hz'],10).' ';
             $desc .= '和值:'.$filter2['hz'].' ';
+        }
+        # 和值除
+        if(!empty($filter5['hz'])){
+            //$desc .= '和值:'.yii\helpers\BaseStringHelper::truncate($filter2['hz'],10).' ';
+            $desc .= '和值除:'.$filter5['hz'].' ';
         }
         if(!empty($filter1)){
             $desc .= '取:';
@@ -797,6 +827,8 @@ class NumService extends BaseService {
             }
             $desc = trim($desc, '、').' ';
         }
+
+        # 上奖取
         if(!empty($filter3)){
             $desc .= '上奖:';
             foreach ($filter3 as $key3=>$v3){
@@ -804,6 +836,36 @@ class NumService extends BaseService {
             }
             $desc = trim($desc, '、').' ';
         }
+        # 上奖除
+        if(!empty($filter4)){
+            $desc .= '上奖除:';
+            foreach ($filter4 as $key4=>$v4){
+                $desc .= $v4.'、';
+            }
+            $desc = trim($desc, '、').' ';
+        }
+
+        # 类型取
+        if(!empty($filter6) OR !empty($filter7)){
+            $codeTypes = UserSysPlansService::getCodeTypes();
+            if(!empty($filter6)){
+                $desc .= '类型取:';
+                foreach ($filter6['get_types'] as $key6=>$v6){
+                    $desc .= $codeTypes[$v6].'、';
+                }
+                $desc = trim($desc, '、').' ';
+            }
+            # 上奖除
+            if(!empty($filter7)){
+                $desc .= '类型除:';
+                foreach ($filter7['remove_types'] as $key7=>$v7){
+                    $desc .= $codeTypes[$v7].'、';
+                }
+                $desc = trim($desc, '、').' ';
+            }
+        }
+
+
         if(!empty($hz_Arr['p1'])){
             $desc .= ' p1:'.$hz_Arr['p1'];
         }
@@ -827,6 +889,7 @@ class NumService extends BaseService {
      * @return array|mixed
      */
     public static function getNameByCodesType($type = ''){
+        # {"get_types":["1","2"],"remove_types":["4","5"],"get_hzs":["7","8","10"],"remove_hzs":["12","13","14"],"get_arises":"123","remove_arises":"456"}
         $typeArr = [
             'type_2'=>'双重',
             'type_3'=>'三重',
@@ -839,6 +902,9 @@ class NumService extends BaseService {
             'type_4d'=>'四单',
             'type_4s'=>'四双',
             'arise'=>'上奖',
+            'remove_arises'=>'上奖除',
+            'get_types'=>'类型取',
+            'remove_types'=>'类型除',
         ];
 
         if($typeArr[$type]) return $typeArr[$type];

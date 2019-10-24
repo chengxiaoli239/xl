@@ -450,10 +450,15 @@ class UserSysPlansService extends BaseService {
      * @return array
      */
     public static function getCodeTypes(){
-        $data = [];
-        $codeTypes = CodeTypes::find()->asArray()->All();
-        foreach ($codeTypes as $codeType){
-            $data[$codeType['type']] = $codeType['type_name'];
+        $m = \Yii::$app->cache;
+        $mkey = 'getCodeTypes_01';
+
+        if(!$data = $m->get($mkey)){
+            $codeTypes = CodeTypes::find()->asArray()->All();
+            foreach ($codeTypes as $codeType){
+                $data[$codeType['type']] = $codeType['type_name'];
+            }
+            $m->set($mkey, $data, \Yii::$app->params['BASE_DATA_CACHE_TIME']*2);
         }
 
         return $data;
