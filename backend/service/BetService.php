@@ -330,6 +330,8 @@ abstract class BetService extends BaseBetService {
                     $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true));
                 }elseif($tz_type == 26){ # 去除近xxx期号码
                     $codesArr = NumService::getNotLatelyCodes(json_decode($codes_hz, true));
+                }elseif($tz_type == 28){ # 系统快捷
+                    $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true));
                 }else{
                     $params = ['playway'=>$playway, 'tz_type'=>$tz_type];
                     $SysPlansCodes = SysPlansCodes::find()->where($params)->orderBy(['rand()' => SORT_DESC])->asArray()->all();
