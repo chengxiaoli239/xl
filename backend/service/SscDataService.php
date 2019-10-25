@@ -1828,9 +1828,9 @@ class SscDataService extends BaseService {
         set_time_limit(0);
 
         //for($i = 10000; $i<=19999; $i++){
-        //for($i = 10000; $i<=13501; $i++){
+        for($i = 10000; $i<=13501; $i++){
         //for($i = 13500; $i<=16501; $i++){
-        for($i = 16500; $i<=19999; $i++){
+        //for($i = 16500; $i<=19999; $i++){
             $code = substr($i, 1,4);
             $codes = $code[0].','.$code[1].','.$code[2].','.$code[3];
             if(!$Num4Type = Num4Type::findOne(['code'=>$codes])){
@@ -1839,6 +1839,7 @@ class SscDataService extends BaseService {
                 //continue;
             }
 
+            $code_type = CommonService::isCodeType4numDs($codes); # 号码类型,四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
             $setData = [
                 'code' => $codes, # 号码
                 'code_1' => $code[0], # 第一个号码
@@ -1854,8 +1855,11 @@ class SscDataService extends BaseService {
                 'type_4b' => CommonService::isCodeType4b($codes), # 是否四兄弟
                 'type_4ds' => CommonService::isCodeType4ds($codes), # 是否四单双：0非四单四双1四单2四双
                 'type_log' => CommonService::isCodeTypeLog($codes), # 是否对数
-                'type_4d' => CommonService::isCodeType4d($codes), # 是否四单
-                'type_4s' => CommonService::isCodeType4s($codes), # 是否四双
+                'type_3d' => $code_type == 5 ? 1 : 0, # 是否四单
+                'type_3s' => $code_type == 4 ? 1 : 0, # 是否四单
+                'type_4d' => $code_type == 1 ? 1 : 0, # 是否四单
+                'type_4s' => $code_type == 2 ? 1 : 0, # 是否四双
+                'type_3n_2b' => CommonService::isCodeType3n2b($codes), # 三现:双重+兄弟
                 'codes_hz' => array_sum([$code[0],$code[1],$code[2],$code[3]]),
                 'updated_at' => time(),
                 'created_at' => time(),

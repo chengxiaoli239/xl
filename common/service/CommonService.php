@@ -640,8 +640,7 @@ class  CommonService{
      * @param string $codes 格式 1,2,3,4
      * @return int
      */
-    public static function isCodeType4d($codes){
-        $flag = 0;
+    public static function isCodeType4numDs($codes){
         $codesArr = explode(',', $codes);
         asort($codesArr);
 
@@ -694,6 +693,26 @@ class  CommonService{
 
         if(in_array(4, $codesArr) && in_array(9, $codesArr)){
             $flag = 1;
+        }
+
+        return $flag;
+    }
+
+
+    /**
+     * @desc 是否 三现:双重+兄弟
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType3n2b($codes){
+        $flag = 0;
+        $code3n2nArr = ['001','011','112','122','223','233','334','344','445','455','556','566','667','677','778','788','889','899','990','900'];
+        $codesArr = explode(',', $codes);
+        asort($codesArr);
+        $code_3ns = CommonService::get3n($codesArr);
+
+        foreach ($code_3ns as $code_3n){
+            if(in_array($code_3n, $code3n2nArr)) $flag = 1;
         }
 
         return $flag;

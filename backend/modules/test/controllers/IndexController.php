@@ -109,6 +109,7 @@ class IndexController extends Controller
 
     public function actionDw(){
         $rst = SscDataService::insertCodeType();p($rst);
+        $rst = CommonService::isCodeType3n2b('1,2,3,4');p($rst); # 三现:双重+兄弟
         $rst = UserSysPlansService::getCodeTypes();p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([35], $lottery_type = 6, 40000);p($miss);
         $miss = SscDataService::getCodeTypeHistoryMiss('type_4b', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
