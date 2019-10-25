@@ -715,10 +715,10 @@ class NumService extends BaseService {
             }else{
                 $type_3n_2b = 0;
             }
-            $where = array_merge($where, [['=', 'type_3n_2bx', $type_3n_2b]]);
+            $where = array_merge($where, [['=', 'type_3n_2b', $type_3n_2b]]);
         }
         # tz_type:28 双重
-        if(in_array(2, $codes_hz['get_types']) OR in_array(2, $codes_hz['remove_types'])){
+        if(($codes_hz['get_types'] && in_array(2, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(2, $codes_hz['remove_types']) )){
             if(in_array(2, $codes_hz['get_types'])){
                 $type_2 = 1;
             }else{
@@ -727,7 +727,7 @@ class NumService extends BaseService {
             $where = array_merge($where, [['=', 'type_2', $type_2]]);
         }
         # tz_type:28 三重
-        if(in_array(3, $codes_hz['get_types']) OR in_array(3, $codes_hz['remove_types'])){
+        if(($codes_hz['get_types'] && in_array(3, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(3, $codes_hz['remove_types']) )){
             if(in_array(3, $codes_hz['get_types'])){
                 $type_3 = 1;
             }else{
@@ -736,7 +736,7 @@ class NumService extends BaseService {
             $where = array_merge($where, [['=', 'type_3', $type_3]]);
         }
         # tz_type:28 四重
-        if(in_array(4, $codes_hz['get_types']) OR in_array(4, $codes_hz['remove_types'])){
+        if(($codes_hz['get_types'] && in_array(4, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(4, $codes_hz['remove_types']) )){
             if(in_array(4, $codes_hz['get_types'])){
                 $type_4 = 1;
             }else{
@@ -745,7 +745,7 @@ class NumService extends BaseService {
             $where = array_merge($where, [['=', 'type_4', $type_4]]);
         }
         # tz_type:28 两兄弟
-        if(in_array(5, $codes_hz['get_types']) OR in_array(5, $codes_hz['remove_types'])){
+        if(($codes_hz['get_types'] && in_array(5, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(5, $codes_hz['remove_types']) )){
             if(in_array(5, $codes_hz['get_types'])){
                 $type_2b = 1;
             }else{
@@ -754,7 +754,7 @@ class NumService extends BaseService {
             $where = array_merge($where, [['=', 'type_2b', $type_2b]]);
         }
         # tz_type:28 三兄弟
-        if(in_array(6, $codes_hz['get_types']) OR in_array(6, $codes_hz['remove_types'])){
+        if(($codes_hz['get_types'] && in_array(6, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(6, $codes_hz['remove_types']) )){
             if(in_array(6, $codes_hz['get_types'])){
                 $type_3b = 1;
             }else{
@@ -764,7 +764,7 @@ class NumService extends BaseService {
         }
 
         # tz_type:28 双双重
-        if(in_array(7, $codes_hz['get_types']) OR in_array(7, $codes_hz['remove_types'])){
+        if(($codes_hz['get_types'] && in_array(7, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(7, $codes_hz['remove_types']) )){
             if(in_array(7, $codes_hz['get_types'])){
                 $type_22 = 1;
             }else{
