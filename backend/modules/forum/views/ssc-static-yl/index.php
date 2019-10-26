@@ -41,7 +41,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'val',
                         ['attribute' => 'val','headerOptions'=>['width'=>'5%'],'label'=>'当前遗漏',
                             'value' => function($model) {
-                                return \backend\service\SscDataService::getStaticNameByType($model->val);
+                                $rst = \backend\service\SscDataService::getStaticNameByType($model->val);
+                                return $rst;
                             }
                         ],
                         'current_miss',
