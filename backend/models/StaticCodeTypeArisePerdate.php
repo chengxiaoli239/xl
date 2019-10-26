@@ -17,6 +17,7 @@ use Yii;
  * @property int $type_4b 四兄弟
  * @property int $type_2_type_2b 双重&两兄弟
  * @property int $type_2_type_3b 双重&三兄弟
+ * @property int $type_3n_2b 三现:双重+兄弟
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
@@ -38,7 +39,7 @@ class StaticCodeTypeArisePerdate extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['type_2', 'type_3', 'type_22', 'type_2b', 'type_3b', 'type_4b', 'type_2_type_2b', 'type_2_type_3b', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['type_2', 'type_3', 'type_22', 'type_2b', 'type_3b', 'type_4b', 'type_2_type_2b', 'type_2_type_3b', 'type_3n_2b', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['date'], 'string', 'max' => 10],
@@ -61,6 +62,7 @@ class StaticCodeTypeArisePerdate extends \common\models\base\BaseModel
             'type_4b' => Yii::t('app', '四兄弟'),
             'type_2_type_2b' => Yii::t('app', '双重&两兄弟'),
             'type_2_type_3b' => Yii::t('app', '双重&三兄弟'),
+            'type_3n_2b' => Yii::t('app', '三现:双重+兄弟'),
             'lottery_type' => Yii::t('app', '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc'),
             'created_at' => Yii::t('app', '创建时间'),
             'updated_at' => Yii::t('app', '更新时间'),
