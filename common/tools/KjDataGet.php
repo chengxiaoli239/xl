@@ -545,12 +545,10 @@ class KjDataGet
      */
     public static function updateNullCode( $times = 500, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $msg = ['status'=>200, 'msg'=>'操作成功！'];
-        $kjDatas = SscKjData::find()->where(['NOT IN', 'type_3n_2b', [0,1]])->orderBy('id DESC')->limit($times)->all();
-        p($kjDatas);
+        $kjDatas = SscKjData::find()->where(['=', 'type_3n_2b', 99])->orderBy('id DESC')->limit($times)->all();
         foreach ($kjDatas as $key=>$kjData){
             //$kjDs = SscDataService::getCodesDS($kjData['code_str']);
             $codes = $kjData['code1'].','.$kjData['code2'].','.$kjData['code3'].','.$kjData['code4'];
-            p($kjData);
             $updateData = [
                 //'index_id' => $key + 1,
                 /*
