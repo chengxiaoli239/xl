@@ -11,6 +11,7 @@ use backend\models\DataTime;
 use backend\models\KjConfig;
 use backend\models\QxcKjData;
 use backend\models\SscKjData;
+use backend\models\StaticCodeTypeArisePerdate;
 use backend\models\UserFollowData;
 use backend\service\BetService;
 use backend\service\SscDataService;
@@ -544,6 +545,16 @@ class KjDataGet
      * @desc 自动更新 万千百十个数据
      */
     public static function updateNullCode( $times = 500, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $lottery_types = StaticService::getLotteryTypes();
+        foreach ($lottery_types as $lottery_type) {
+            $datas = StaticCodeTypeArisePerdate::find()->where(['=', 'type_3n_2b', 99])->orderBy('id DESC')->limit($times)->all();
+            foreach ($datas as $data) {
+                $date = $data->date;
+                $count = SscKjData::find()->where(['lottery_type' => $lottery_type, 'type_3n_2b' => 1, 'date' => $date])->count('id');
+                $data->type_3n_2b = $count;
+                $data->save();
+            }
+        }
         $msg = ['status'=>200, 'msg'=>'操作成功！'];
         $kjDatas = SscKjData::find()->where(['=', 'type_3n_2b', 99])->orderBy('id DESC')->limit($times)->all();
         foreach ($kjDatas as $key=>$kjData){

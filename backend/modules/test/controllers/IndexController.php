@@ -108,9 +108,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst); # 号码类型遗漏
-        $rst = StaticService::opAllCodeTypeYl();p($rst);
+        $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);p($rst);
         $rst = KjDataGet::updateNullCode();p($rst);
+        $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type = 6);p($rst); # 号码类型每天数量统计
+        $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 6);p($rst); # 号码类型遗漏
+        $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = CommonService::isCodeType3n2b('0,0,5,6');p($rst);
         $rst = SscDataService::insertCodeType();p($rst);
         $rst = CommonService::isCodeType3n2b('1,2,3,4');p($rst); # 三现:双重+兄弟
@@ -219,7 +221,6 @@ class IndexController extends Controller
         $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type = 5); p($rst);# 单双利润统计(month)
         $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 7);p($rst); # 上奖三字现
         $rst = StaticService::get2NumsYlRecords('66', $lottery_type = 7);p($rst);
-        $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);p($rst);
         $post = \Yii::$app->request->post();
         p($post);
         $statics = StaticService::staticKj3NumCounts($date='2019-09-01', $lottery_type=5);p($statics);
@@ -267,7 +268,6 @@ class IndexController extends Controller
         $codesArr = [9, 7, 9, 8];
         $code_3n = CommonService::get3n($codesArr);p($code_3n);
         $rst = StaticService::staticHzCounts('2019-06-12', $lottery_type = 5); p($rst);
-        $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type = 5);p($rst); # 号码类型每天数量统计
         //$data = '{"type_3":"1","type_22":"0","type_2b":"1","type_4b":"1","arise":"12345","p1":"3456","p2":"345679","p3":"89734","p4":"56092"}';
         //$rst = NumService::getCodesKuaiXuan(['type_2'=>1, 'type_3'=>1, 'hz'=>[30,31,32,33,34,35]]);p($rst);
         $domain = BaseKj::getApiHost(8);p($domain);
