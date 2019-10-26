@@ -108,6 +108,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst); # 号码类型遗漏
+        $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = KjDataGet::updateNullCode();p($rst);
         $rst = CommonService::isCodeType3n2b('0,0,5,6');p($rst);
         $rst = SscDataService::insertCodeType();p($rst);
@@ -123,7 +125,6 @@ class IndexController extends Controller
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 5);p($rst);
         $miss = SscDataService::getCodeTypeYlHistoryMiss('555', $lottery_type = 5, 20000);p($miss);
         $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst); # 号码类型遗漏
-        $rst = StaticService::opAllCodeTypeYl();p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([26], $lottery_type = 6, 20000);p($miss);
         $miss = SscDataService::getCodeTypeYlHistoryMiss('6699', $lottery_type = 5, 50000, 0);p($miss);
         $rst = SscDataService::getLastIndexId(6);p($rst);
