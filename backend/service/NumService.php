@@ -709,7 +709,7 @@ class NumService extends BaseService {
         }
 
         # tz_type:28 三现:双重+两兄弟
-        if(in_array(1, $codes_hz['get_types']) OR in_array(1, $codes_hz['remove_types'])){
+        if(($codes_hz['get_types'] && in_array(1, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(1, $codes_hz['remove_types']) )){
             if(in_array(1, $codes_hz['get_types'])){
                 $type_3n_2b = 1;
             }else{
