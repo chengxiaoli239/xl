@@ -2,6 +2,7 @@
 
 namespace common\service;
 use backend\models\BettingRecords;
+use backend\models\CodeTypes;
 use backend\models\LotteryType;
 use backend\models\TzSystems;
 use backend\models\TzTypes;
@@ -706,7 +707,9 @@ class  CommonService{
      */
     public static function isCodeType3n2b($codes){
         $flag = 0;
-        $code3n2nArr = ['001','011','112','122','223','233','334','344','445','455','556','566','667','677','778','788','889','899','990','900'];
+        $code = CodeTypes::find()->where(['type'=>1])->one()['codes'];
+        $code3n2nArr = explode(',', $code);
+
         $codesArr = explode(',', $codes);
         asort($codesArr);
         $code_3ns = CommonService::get3n($codesArr);

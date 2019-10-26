@@ -108,6 +108,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = CommonService::isCodeType3n2b('0,0,5,6');p($rst);
         $rst = SscDataService::insertCodeType();p($rst);
         $rst = CommonService::isCodeType3n2b('1,2,3,4');p($rst); # 三现:双重+兄弟
         $rst = UserSysPlansService::getCodeTypes();p($rst);
