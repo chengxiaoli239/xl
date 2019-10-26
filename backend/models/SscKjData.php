@@ -37,7 +37,7 @@ use Yii;
  * @property int $type_3b 三兄弟
  * @property int $type_4b 四兄弟
  * @property int $type_4ds 四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
- * @property int $type_3n_2b 三现:双重+兄弟
+ * @property int $type_3n_2b 三现:兄弟+双重
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property int $created_at 创建时间
  * @property string $update_time 创建时间
@@ -104,7 +104,7 @@ class SscKjData extends \common\models\base\BaseModel
             'type_3b' => '三兄弟',
             'type_4b' => '四兄弟',
             'type_4ds' => '四定单双:0保留1四单2四双3两单两双4一单三双5一双三单',
-            'type_3n_2b' => '三现:双重+兄弟',
+            'type_3n_2b' => '三现:兄弟+双重',
             'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
             'created_at' => '创建时间',
             'update_time' => '创建时间',
