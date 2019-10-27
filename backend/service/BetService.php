@@ -429,7 +429,7 @@ abstract class BetService extends BaseBetService {
      * @param int $tz_type
      */
     public static function isBigNumsBet($tz_type = 20){
-        if(in_array($tz_type, [19, 20, 24, 25, 26])){
+        if(in_array($tz_type, [19, 20, 24, 25, 26, 28])){
             return true;
         }
 
