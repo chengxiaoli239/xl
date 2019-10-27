@@ -546,6 +546,15 @@ class KjDataGet
      */
     public static function updateNullCode( $times = 500, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
+        $StaticTables = StaticCodeTypeArisePerdate::find()->where(['type_3n_2b'=>'99'])->limit(500)->all();
+        foreach ($StaticTables as $StaticTable){
+            $count = SscKjData::find()->where(['lottery_type'=>$StaticTable->lottery_type, 'date'=>$StaticTable->date, 'type_3n_2b'=>1])->count('id');
+            //p([$count, $StaticTable->date, $lottery_type]);
+            $StaticTable->type_3n_2b = $count;
+            $rst = $StaticTable->save();
+        }
+        p($rst);
+
         $msg = ['status'=>200, 'msg'=>'操作成功！'];
         $kjDatas = SscKjData::find()->where(['=', 'type_3n_2b', 99])->orderBy('id DESC')->limit($times)->all();
         foreach ($kjDatas as $key=>$kjData){

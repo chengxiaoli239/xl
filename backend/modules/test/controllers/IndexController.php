@@ -108,13 +108,13 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BetService::isCanBet($lottery_type = 5);p($rst);
         $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);p($rst);
+        $rst = SscDataService::insertCodeType();p($rst);
         $rst = KjDataGet::updateNullCode();p($rst);
-        $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type = 6);p($rst); # 号码类型每天数量统计
         $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 6);p($rst); # 号码类型遗漏
         $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = CommonService::isCodeType3n2b('0,0,5,6');p($rst);
-        $rst = SscDataService::insertCodeType();p($rst);
         $rst = CommonService::isCodeType3n2b('1,2,3,4');p($rst); # 三现:双重+兄弟
         $rst = UserSysPlansService::getCodeTypes();p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([35], $lottery_type = 6, 40000);p($miss);

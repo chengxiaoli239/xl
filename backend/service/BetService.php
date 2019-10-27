@@ -188,12 +188,13 @@ abstract class BetService extends BaseBetService {
 
         $time = date('H:i:s');
         if($lottery_type == 5){
-            if(\Yii::$app->params['ssc_kj_time_start'] <= $time && $time <= \Yii::$app->params['ssc_kj_time_end'] ){
+            if(
+                (\Yii::$app->params['ssc_kj_time_start'] <= $time && $time <= \Yii::$app->params['ssc_kj_time_end']) OR
+                ('23:50:00' <= $time && $time <= '23:59:59') OR
+                ('00:00:00' <= $time && $time <= '00:10:00')
+            ){
                 //$rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
                 $status = false;
-            }
-            if('00:10:00'<$time && $time<'00:12:30'){
-                $status = true;
             }
         }else if($lottery_type == 7){
             # 北京快乐8
@@ -428,7 +429,7 @@ abstract class BetService extends BaseBetService {
      * @param int $tz_type
      */
     public static function isBigNumsBet($tz_type = 20){
-        if(in_array($tz_type, [19, 20, 23, 24, 25, 26])){
+        if(in_array($tz_type, [19, 20, 24, 25, 26])){
             return true;
         }
 
