@@ -707,8 +707,13 @@ class  CommonService{
      */
     public static function isCodeType3n2b($codes){
         $flag = 0;
-        $code = CodeTypes::find()->where(['type'=>1])->one()['codes'];
-        $code3n2nArr = explode(',', $code);
+        $m = \Yii::$app->cache;
+        $mkey = 'isCodeType3n2b_codes';
+        if(!$code3n2nArr = $m->get($mkey)){
+            $code = CodeTypes::find()->where(['type'=>1])->one()['codes'];
+            $code3n2nArr = explode(',', $code);
+            $m->set($mkey, $code3n2nArr, 3600*24);
+        }
 
         $codesArr = explode(',', $codes);
         asort($codesArr);
