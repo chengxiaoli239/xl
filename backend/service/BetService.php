@@ -190,8 +190,7 @@ abstract class BetService extends BaseBetService {
         if($lottery_type == 5){
             if(
                 (\Yii::$app->params['ssc_kj_time_start'] <= $time && $time <= \Yii::$app->params['ssc_kj_time_end']) OR
-                ('23:50:00' <= $time && $time <= '23:59:59') OR
-                ('00:00:00' <= $time && $time <= '00:10:00')
+                ('23:50:00' <= $time && $time <= '23:59:59') OR ('00:00:00' <= $time && $time <= '00:10:00')
             ){
                 //$rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
                 $status = false;
