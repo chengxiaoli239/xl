@@ -28,6 +28,7 @@ use Yii;
  * @property int $type_4d 四单
  * @property int $type_4s 四双
  * @property int $codes_hz 号码和值
+ * @property int $code_type 号码类型:1一字定2二字定3三字定4四字定
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -48,7 +49,7 @@ class Num4Type extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['code_1', 'code_2', 'code_3', 'code_4', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_log', 'type_3n_2b', 'type_3d', 'type_3s', 'type_4d', 'type_4s', 'codes_hz', 'created_at', 'updated_at'], 'integer'],
+            [['code_1', 'code_2', 'code_3', 'code_4', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_log', 'type_3n_2b', 'type_3d', 'type_3s', 'type_4d', 'type_4s', 'codes_hz', 'code_type', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
             [['code'], 'string', 'max' => 8],
         ];
@@ -81,6 +82,7 @@ class Num4Type extends \common\models\base\BaseModel
             'type_4d' => '四单',
             'type_4s' => '四双',
             'codes_hz' => '号码和值',
+            'code_type' => '号码类型:1一字定2二字定3三字定4四字定',
             'created_at' => '创建时间',
             'updated_at' => '更新时间',
             'update_time' => '更新时间',
