@@ -35,7 +35,7 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'single')->textInput() ?>
 
-                    <!--?= $form->field($model, 'arise')->textInput()->label('上奖') ?-->
+                    <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
                     <!--?= $form->field($model, 'p1')->textInput()->label('第1位') ?-->
 
                     <!--?= $form->field($model, 'p2')->textInput()->label('第2位') ?-->

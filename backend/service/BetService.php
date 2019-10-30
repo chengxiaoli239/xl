@@ -295,6 +295,11 @@ abstract class BetService extends BaseBetService {
                 $codesArr = explode('@', $codes_hz);
                 break;
             case 1: # 二字定
+
+                if($tz_type == 30) { # 过滤
+                    $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 2);
+                }
+                break;
             case 2: # 三字定
                 if(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])) { # 导入方案
                     $codesArr = UserSysPlansService::getImportCodes($plan_id);

@@ -359,33 +359,36 @@ class NumService extends BaseService {
      * @desc 上奖 - 返回匹配含号码的组合 -- 已完成 2019-04-22
      * @param array $codesArr ['123', '456']
      * @param $type 0除1取
+     * @param $code_type 1一定2二定3三定4四定
      * @return array
      */
-    public static function getCodesArise($codesArr = [], $type = 1){
+    public static function getCodesArise($codesArr = [], $type = 1, $code_type){
 
         $codes4Arr = [];
         # 去除双重数字
         foreach ($codesArr as $key=>$codes){
             $len = strlen($codes);
             if($len == 1){
-                $codesArrTmp = NumService::getAllCombination1($codes, $type);
+                $codesArrTmp = NumService::getAllCombination1($codes, $type, $code_type);
                 # 一个码
             }elseif ($len == 2){
                 # 两个码
-                $codesArrTmp = NumService::getAllCombination2($codes, $type);
+                $codesArrTmp = NumService::getAllCombination2($codes, $type, $code_type);
             }elseif ($len == 3){
                 # 三个码
-                $codesArrTmp = NumService::getAllCombination3($codes, $type);
+                $codesArrTmp = NumService::getAllCombination3($codes, $type, $code_type);
             }elseif ($len == 4){
                 # 四个码 - 全倒
-                $codesArrTmp = NumService::getAllCombination4($codes, $type);
+                $codesArrTmp = NumService::getAllCombination4($codes, $type, $code_type);
             }elseif($len > 4){
                 # 大于四个码
-                $codesArrTmp = NumService::getAllCombination4p($codes, $type);
+                $codesArrTmp = NumService::getAllCombination4p($codes, $type, $code_type);
             }
             $codes4Arr = array_merge($codes4Arr, $codesArrTmp);
         }
-        $codes4Arr = array_unique($codes4Arr);
+        if($code_type == 4){
+            $codes4Arr = array_unique($codes4Arr);
+        }
 
         return $codes4Arr;
     }
@@ -396,11 +399,11 @@ class NumService extends BaseService {
      * @param $type 0除1取
      * @return array ['1,2,3,4', '1,1,2,3', '1,1,1,2']
      */
-    public static function getAllCombination1($codes, $type = 1){
+    public static function getAllCombination1($codes, $type = 1, $code_type = 4){
         if(strlen($codes) != 1) return [];
 
         $op = ($type == 1) ? 'LIKE' : 'NOT LIKE';
-        $where = ['AND', [$op, 'code', $codes], ['=', 'code_type', 4]];
+        $where = ['AND', [$op, 'code', $codes], ['=', 'code_type', $code_type]];
         //p($where);
         $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
         $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
@@ -414,35 +417,48 @@ class NumService extends BaseService {
      * @param $type 0除1取
      * @return array ['1,2,3,4', '1,1,2,3', '1,1,1,2']
      */
-    public static function getAllCombination2($codes, $type = 1){
+    public static function getAllCombination2($codes, $type = 1, $code_type = 4){
         if(strlen($codes) != 2) return [];
 
-        if($type == 1){
-             $where = [
-                 'AND',
-                 ['=', 'code_type', 4],
-                 [
-                     'OR',
-                     ['LIKE', 'code', '%'.$codes[0].','.$codes[1].'%', false],
-                     ['LIKE', 'code', '%'.$codes[0].'%'.$codes[1].'%', false],
-
-                     ['LIKE', 'code', '%'.$codes[1].','.$codes[0].'%', false],
-                     ['LIKE', 'code', '%'.$codes[1].'%'.$codes[0].'%', false],
-                 ]
-            ];
+        if($code_type == 2){
+            $tmpCodesArr = NumService::getCodesTwo([$codes[0], $codes[1]]); # 格式：[['1','2', 'X', 'X'], ['1', 'X', '2', 'X']] ..
+            $codesArr = [];
+            foreach ($tmpCodesArr as $tmpCodes){
+                $codesArr[] = implode(',', $tmpCodes);
+            }
         }else{
-            $where = [
-                'AND',
-                ['NOT LIKE', 'code', '%'.$codes[0].'%', false],
-                ['NOT LIKE', 'code', '%'.$codes[1].'%', false],
-                ['=', 'code_type', 4],
-            ];
-        }
-        //p($where);
-        $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
-        $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+            if($type == 1){
+                 $where = [
+                     'AND',
+                     ['=', 'code_type', 4],
+                     [
+                         'OR',
+                         ['LIKE', 'code', '%'.$codes[0].','.$codes[1].'%', false],
+                         ['LIKE', 'code', '%'.$codes[0].'%'.$codes[1].'%', false],
 
-        return array_unique($codesArr);
+                         ['LIKE', 'code', '%'.$codes[1].','.$codes[0].'%', false],
+                         ['LIKE', 'code', '%'.$codes[1].'%'.$codes[0].'%', false],
+                     ]
+                ];
+            }else{
+                $where = [
+                    'AND',
+                    ['NOT LIKE', 'code', '%'.$codes[0].'%', false],
+                    ['NOT LIKE', 'code', '%'.$codes[1].'%', false],
+                    ['=', 'code_type', 4],
+                ];
+            }
+            //p($where);
+            $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
+            $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+        }
+
+        if($code_type == 4){
+            $datas = array_unique($codesArr);
+        }else{
+            $datas = $codesArr;
+        }
+        return $datas;
     }
 
     /**
@@ -451,7 +467,7 @@ class NumService extends BaseService {
      * @param $type 0除1取
      * @return array ['1,2,3,4', '1,1,2,3', '1,1,1,2']
      */
-    public static function getAllCombination3($codes, $type = 1){
+    public static function getAllCombination3($codes, $type = 1, $code_type = 4){
         if(strlen($codes) != 3) return [];
 
         $op = $type == 1 ? 'OR' : 'AND';
@@ -509,7 +525,7 @@ class NumService extends BaseService {
      * @param $type 0除1取
      * @return array ['1,2,3,4', '1,1,2,3', '1,1,1,2']
      */
-    public static function getAllCombination4($codes, $type = 1){
+    public static function getAllCombination4($codes, $type = 1, $code_type = 4){
         if(strlen($codes) != 4) return [];
         if($type == 1){
 
@@ -564,7 +580,7 @@ class NumService extends BaseService {
      * @param $codes 格式：11234或者11123或者11223或者12345或者123456
      * @return array ['1,2,3,4', '1,1,2,3', '1,1,1,2']
      */
-    public static function getAllCombination4p($codes, $codeSplit = ''){
+    public static function getAllCombination4p($codes, $codeSplit = '', $code_type = 4){
         if(strlen($codes)<5) return [];
         $tmpArr = [];
         $len = strlen($codes);
@@ -617,12 +633,13 @@ class NumService extends BaseService {
     /**
      * @desc 快选功能过滤
      * @param $codes_hz
+     * @param $type 1一定2二定3三定4四定
      * @return array
      */
-    public static function getCodesKuaiXuan($codes_hz) {
+    public static function getCodesKuaiXuan($codes_hz, $code_type = 4) {
         if(empty($codes_hz)) return [];
 
-        $where = ['AND', ['=', 'code_type', 4]];
+        $where = ['AND', ['=', 'code_type', $code_type]];
         # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
         # 1、双重
         if(isset($codes_hz['type_2'])){
@@ -789,15 +806,21 @@ class NumService extends BaseService {
             $where = array_merge($where, [['=', 'type_log', $codes_hz['type_log']]]);
         }
 
-        $Num4Types = Num4Type::find()->where($where)->asArray()->all();
-
-        $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+        $codesArr = [];
+        if($code_type == 4){
+            $Num4Types = Num4Type::find()->where($where)->asArray()->all();
+            $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+        }
 
          # 上奖
         //if(isset($codes_hz['arise']) && !empty($codes_hz['arise'])){
         if(isset($codes_hz['arise'])){
-            $codesArr_arise = self::getCodesArise([$codes_hz['arise']]);
-            $codesArr = array_intersect($codesArr, $codesArr_arise);
+            $codesArr_arise = self::getCodesArise([$codes_hz['arise']], $type = 1, $code_type);
+            if($code_type == 4){
+                $codesArr = array_intersect($codesArr, $codesArr_arise);
+            }else{
+                $codesArr = $codesArr_arise;
+            }
         }
 
         # tz_type:28 上奖取
@@ -813,7 +836,13 @@ class NumService extends BaseService {
             $codesArr = array_intersect($codesArr, $codesArr_arise);
         }
 
-        return array_unique($codesArr);
+        if($code_type == 4){
+            $datas = array_unique($codesArr);
+        }else{
+            $datas = $codesArr;
+        }
+
+        return $datas;
     }
 
     /**
@@ -1119,7 +1148,6 @@ class NumService extends BaseService {
                 ['X', $codes[2], $codes[1], $codes[0]],
             ];
         }
-
 
         return $datas;
     }

@@ -63,7 +63,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                     //投注类型:1大小单双三字定2大小三字定3单双三字定
                                     $tz_type_Arr = [1=>'大小单双三字定', 2=>'大小三字定', 3=>'单双三字定'];
                                     $typeName = $tz_type_Arr[$model->tz_type];
-                                }elseif($model->playway == 3 OR in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
+                                }elseif(in_array($model->playway, [1,2,3]) OR in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                     $typeName = \backend\service\BetService::getTypeNameByTzType($model->tz_type);
                                 }
                                 return $typeName;
@@ -163,7 +163,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             'value' => function($model) {
                                 if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                     $str = \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
-                                }elseif(in_array($model->tz_type, [25, 28])){
+                                }elseif(in_array($model->tz_type, [25, 28, 29, 30])){
                                     $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
                                 }else{
                                     $str = $model->hz_Arr;
