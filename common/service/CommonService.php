@@ -7,6 +7,7 @@ use backend\models\LotteryType;
 use backend\models\TzSystems;
 use backend\models\TzTypes;
 use backend\models\UserFollowData;
+use backend\service\NumService;
 use backend\service\SscDataService;
 use backend\service\StaticService;
 use common\models\User;
@@ -438,7 +439,7 @@ class  CommonService{
     }
 
     /**
-     * @desc 是否双重
+     * @desc 是否双重 - 四定
      * @param string $codes 格式 1,2,3,4
      * @return int
      */
@@ -451,6 +452,43 @@ class  CommonService{
 
         return $flag;
     }
+
+    /**
+     * @desc 是否双重 - 二、三定
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType_2($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
+        if(count($codesArr) == 3){
+            if($codesArr[0] == $codesArr[1] OR $codesArr[1] == $codesArr[2] OR $codesArr[0] == $codesArr[2] ) $flag = 1;
+        }else{
+            if($codesArr[0] == $codesArr[1]) $flag = 1;
+        }
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否双重 - 二、三定
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType_3($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
+        if(count($codesArr) == 3){
+            if($codesArr[0] == $codesArr[1] OR $codesArr[1] == $codesArr[2] OR $codesArr[0] == $codesArr[2] ) $flag = 1;
+        }else{
+            if($codesArr[0] == $codesArr[1]) $flag = 1;
+        }
+
+        return $flag;
+    }
+
 
     /**
      * @desc 是否双双重
@@ -500,7 +538,7 @@ class  CommonService{
     }
 
     /**
-     * @desc 是否两兄弟
+     * @desc 是否两兄弟 - 四定
      * @param string $codes 格式 1,2,3,4
      * @return int
      */
@@ -519,6 +557,7 @@ class  CommonService{
             '6,7',
             '7,8',
             '8,9',
+            '0,9',
         ];
         foreach ($bArrs as $bArr){
             if(strpos($codes_str, $bArr) !== false) $flag = 1;

@@ -762,7 +762,7 @@ class SscDataService extends BaseService {
             $SscStaticYl->count = $count;
 
             $qishu = SscDataService::getQishus($lottery_type);
-            $where = ['AND'];
+            $where = ['AND', ['=', 'code_type', 4]];
             foreach ($vals as $val){
                 $where  = array_merge($where, [['=', $val, 1]]);
             }
@@ -945,9 +945,9 @@ class SscDataService extends BaseService {
     public static function getNumCounts($vals){
 
         if(count($vals) == 1){
-            $where = ['=', $vals[0], 1];
+            $where = ['AND', ['=', 'code_type', 4], ['=', $vals[0], 1]];
         }else{
-            $where = ['AND'];
+            $where = ['AND', ['=', 'code_type', 4]];
             foreach ($vals as $val){
                 $where = array_merge($where, [ ['=', $val, 1] ]);
             }
@@ -1821,7 +1821,7 @@ class SscDataService extends BaseService {
     }
 
     /**
-     * @desc 插入号码类型表
+     * @desc 插入号码类型表 - 四字定
      * @return bool
      */
     public static function insertCodeType(){
@@ -1860,6 +1860,7 @@ class SscDataService extends BaseService {
                 'type_4d' => $code_type == 1 ? 1 : 0, # 是否四单
                 'type_4s' => $code_type == 2 ? 1 : 0, # 是否四双
                 'type_3n_2b' => CommonService::isCodeType3n2b($codes), # 三现:双重+兄弟
+                'code_type' => 4, # 号码类型:1一字定2二字定3三字定4四字定
                 'codes_hz' => array_sum([$code[0],$code[1],$code[2],$code[3]]),
                 'updated_at' => time(),
                 'created_at' => time(),
@@ -1870,6 +1871,105 @@ class SscDataService extends BaseService {
                 p($Num4Type->getFirstErrors());
             }
         }
+        return $rst;
+    }
+
+    /**
+     * @desc 插入二字定
+     * @return bool
+     */
+    public static function insertCodeType2(){
+        $rst = true;
+        set_time_limit(0);
+
+        //for($i = 10000; $i<=19999; $i++){
+        for($i = 100; $i<=199; $i++){
+            $code = substr($i, 1,2);
+            $codeNums = [$code[0],$code[1]];
+            $codesArr = NumService::getCodesTwo($codeNums); # 格式：[['1','2', 'X', 'X'], ['1', 'X', '2', 'X']] ..
+            foreach ($codesArr as $codes){
+                $code = implode(',', $codes);
+                if(!$Num4Type = Num4Type::findOne(['code'=>$code])){
+                    $Num4Type = new Num4Type();
+                }else{
+                    //continue;
+                }
+
+                $codesA = NumService::delByValue($codes, 'X');
+                $setData = [
+                    'code' => $code, # 号码
+                    'code_1' => $codes[0], # 第一个号码
+                    'code_2' => $codes[1], # 第二个号码
+                    'code_3' => $codes[2], # 第三个号码
+                    'code_4' => $codes[3], # 第四个号码
+                    'type_2' => CommonService::isCodeType_2($code), # 是否双重
+                    'type_2b' => CommonService::isCodeType2b($code), # 是否两兄弟
+                    'type_log' => CommonService::isCodeTypeLog($code), # 是否对数
+                    'code_type' => 2, # 号码类型:1一字定2二字定3三字定4四字定
+                    'codes_hz' => array_sum($codesA),
+                    'updated_at' => time(),
+                    'created_at' => time(),
+                ];
+                $Num4Type->setAttributes($setData);
+
+                if(!$rst = $Num4Type->save()){
+                    p($Num4Type->getFirstErrors());
+                }
+            }
+        }
+
+        return $rst;
+    }
+
+
+    /**
+     * @desc 插入三字定
+     * @return bool
+     */
+    public static function insertCodeType3(){
+        $rst = true;
+        set_time_limit(0);
+
+        //for($i = 1000; $i<=1350; $i++){
+        //for($i = 1350; $i<=1650; $i++){
+        for($i = 1651; $i<=1999; $i++){
+            $code = substr($i, 1,3);
+            $codeNums = [$code[0], $code[1], $code[2]];
+            $codesArr = NumService::getCodesTwo($codeNums); # 格式：[['1','2', '1', 'X'], ['1', '1', '2', 'X']] ..
+            foreach ($codesArr as $codes){
+                $code = implode(',', $codes);
+                if(!$Num4Type = Num4Type::findOne(['code'=>$code])){
+                    $Num4Type = new Num4Type();
+                }else{
+                    //continue;
+                }
+
+                $codesA = NumService::delByValue($codes, 'X');
+                $setData = [
+                    'code' => $code, # 号码
+                    'code_1' => $codes[0], # 第一个号码
+                    'code_2' => $codes[1], # 第二个号码
+                    'code_3' => $codes[2], # 第三个号码
+                    'code_4' => $codes[3], # 第四个号码
+                    'type_2' => CommonService::isCodeType_2($code), # 是否双重
+                    'type_3' => CommonService::isCodeType3($code), # 是否三重
+                    'type_2b' => CommonService::isCodeType2b($code), # 是否两兄弟
+                    'type_3b' => CommonService::isCodeType3b($code), # 是否三兄弟
+                    'type_log' => CommonService::isCodeTypeLog($code), # 是否对数
+                    'type_3n_2b' => CommonService::isCodeType3n2b($code), # 三现:双重+兄弟
+                    'code_type' => 3, # 号码类型:1一字定2二字定3三字定4四字定
+                    'codes_hz' => array_sum($codesA),
+                    'updated_at' => time(),
+                    'created_at' => time(),
+                ];
+                $Num4Type->setAttributes($setData);
+
+                if(!$rst = $Num4Type->save()){
+                    p($Num4Type->getFirstErrors());
+                }
+            }
+        }
+
         return $rst;
     }
 
@@ -2000,13 +2100,13 @@ class SscDataService extends BaseService {
             $codesArr = [];
             if($type == 1){
                 # 1、双重、双双重、三重、四重、三兄弟、四兄弟、四单四双
-                $where = ['OR', ['=', 'type_2', 1], ['=','type_22', 1], ['=','type_3', 1], ['=','type_4', 1], ['=','type_3b', 1], ['=','type_4b', 1], ['type_4ds'=>[1,2]]];
+                $where = ['AND', ['=', 'code_type', 1],['OR', ['=', 'type_2', 1], ['=','type_22', 1], ['=','type_3', 1], ['=','type_4', 1], ['=','type_3b', 1], ['=','type_4b', 1], ['type_4ds'=>[1,2]]]];
             }elseif($type == 2){
                 # 2、排除双重、双双重、三重、四重、三兄弟、四兄弟、四单四双
-                $where = ['AND', ['<>', 'type_2', 1], ['<>','type_22', 1], ['<>','type_3', 1], ['<>','type_4', 1], ['<>','type_3b', 1], ['<>','type_4b', 1], ['=', 'type_4ds', 0]];
+                $where = ['AND', ['=', 'code_type', 1], ['<>', 'type_2', 1], ['<>','type_22', 1], ['<>','type_3', 1], ['<>','type_4', 1], ['<>','type_3b', 1], ['<>','type_4b', 1], ['=', 'type_4ds', 0]];
             }else{
                 # 3、双重
-                $where = ['=', 'type_2', 1];
+                $where = ['AND', ['=', 'code_type', 1], ['=', 'type_2', 1]];
             }
             $Num4Types = Num4Type::find()->where($where)->asArray()->all();
             //p($Num4Types);
@@ -2167,11 +2267,11 @@ class SscDataService extends BaseService {
      * @param $hzs
      * @return mixed
      */
-    public static function getCountByHzs($hzs){
+    public static function getCountByHzs($hzs, $code_type = 4){
         $m = \Yii::$app->cache;
         $mkey = 'getCountByHzs_'.implode(',', $hzs);
         if(!$counts = $m->get($mkey)){
-            $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where(['codes_hz'=>$hzs])->asArray()->one();
+            $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where(['AND', ['=', 'code_type', $code_type], ['=', 'codes_hz', $hzs]])->asArray()->one();
             $counts = $Num4Type['count'];
         }
 

@@ -108,6 +108,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::insertCodeType2();p($rst);
+        $rst = CommonService::isCodeType_2($codes = '3,3,3,X');p($rst);
+        $rst = NumService::delByValue(['1', 'X', '3', 'X'], 'X');p($rst);
         $rst = BetService::isCanBet($lottery_type = 5);p($rst);
         $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);p($rst);
         $rst = SscDataService::insertCodeType();p($rst);

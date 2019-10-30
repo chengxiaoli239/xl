@@ -299,11 +299,15 @@ abstract class BetService extends BaseBetService {
                 if(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])) { # 导入方案
                     $codesArr = UserSysPlansService::getImportCodes($plan_id);
                 }else{
-                    $params = ['playway'=>$playway, 'tz_type'=>$tz_type, 'status'=>$buy_type];
-                    $SysPlansCodes = SysPlansCodes::find()->where($params)->orderBy(['rand()' => SORT_DESC])->asArray()->all(); # ->limit($limit) 限制数量去掉
-                    $codesArr = [];
-                    foreach ($SysPlansCodes as $key=>$plan){
-                        $codesArr[] = $plan['code'];
+                    if(in_array($tz_type, [29])){
+
+                    }else{
+                        $params = ['playway'=>$playway, 'tz_type'=>$tz_type, 'status'=>$buy_type];
+                        $SysPlansCodes = SysPlansCodes::find()->where($params)->orderBy(['rand()' => SORT_DESC])->asArray()->all(); # ->limit($limit) 限制数量去掉
+                        $codesArr = [];
+                        foreach ($SysPlansCodes as $key=>$plan){
+                            $codesArr[] = $plan['code'];
+                        }
                     }
                 }
                 break;
@@ -311,7 +315,7 @@ abstract class BetService extends BaseBetService {
                 if($tz_type == 20) {  # 四定和值
                     # 四定和值选号，默认排除：双双重、三重、四重、四兄弟、四单四双
                     //$where = ['codes_hz'=>explode(',', $codes_hz), 'type_22'=>0, 'type_3'=>0, 'type_4'=>0, 'type_4b'=>0, 'type_4ds'=>0];
-                    $where = ['codes_hz' => explode(',', $codes_hz)]; // , 'type_4' => 0
+                    $where = ['codes_hz' => explode(',', $codes_hz), 'code_type'=>4]; // , 'type_4' => 0
                     $codesArr = Num4Type::find()->where($where)->asArray()->all();
                     $codesArr = ArrayHelper::getColumn($codesArr, 'code');
                 }elseif($tz_type == 21){ # 四定两兄弟

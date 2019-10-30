@@ -128,7 +128,7 @@ class NumService extends BaseService {
                     $m->set($mckey, 1, 10*60);
                 }
 
-                $all4NumCodes = Num4Type::find()->select(['code AS code_str'])->orderBy(['id'=>SORT_DESC])->asArray()->all();
+                $all4NumCodes = Num4Type::find()->select(['code AS code_str'])->where(['code_type'=>4])->orderBy(['id'=>SORT_DESC])->asArray()->all();
                 $nums4Codes = ArrayHelper::getColumn($all4NumCodes, 'code_str');
                 $allCodes = [];
                 foreach ($nums4Codes as $num){
@@ -199,7 +199,7 @@ class NumService extends BaseService {
 
         //return $heZhiArr;
         //if($data['qihao'] == '190401023') p([$nums, $data, $rst]);
-        $where = ['codes_hz'=>$heZhiArr, 'type_2b'=>1, 'type_3'=>0, 'type_4b'=>0];
+        $where = ['codes_hz'=>$heZhiArr, 'type_2b'=>1, 'type_3'=>0, 'type_4b'=>0, 'code_type'=>4];
         $Num4Types = Num4Type::find()->where($where);
         $codes = $Num4Types->asArray()->all();
         $codesArr = ArrayHelper::getColumn($codes, 'code');
@@ -300,7 +300,7 @@ class NumService extends BaseService {
 
         }
         if(!empty($codesArr)){
-            $codes = Num4Type::find()->select(['code'])->where($where)->all();
+            $codes = Num4Type::find()->select(['code'])->where(['AND', ['=', 'code_type', 4], $where])->all();
             $codesData = ArrayHelper::getColumn($codes, 'code');
         }
 
@@ -400,7 +400,7 @@ class NumService extends BaseService {
         if(strlen($codes) != 1) return [];
 
         $op = ($type == 1) ? 'LIKE' : 'NOT LIKE';
-        $where = [$op, 'code', $codes];
+        $where = ['AND', [$op, 'code', $codes], ['=', 'code_type', 4]];
         //p($where);
         $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
         $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
@@ -419,18 +419,23 @@ class NumService extends BaseService {
 
         if($type == 1){
              $where = [
-                 'OR',
-                 ['LIKE', 'code', '%'.$codes[0].','.$codes[1].'%', false],
-                 ['LIKE', 'code', '%'.$codes[0].'%'.$codes[1].'%', false],
+                 'AND',
+                 ['=', 'code_type', 4],
+                 [
+                     'OR',
+                     ['LIKE', 'code', '%'.$codes[0].','.$codes[1].'%', false],
+                     ['LIKE', 'code', '%'.$codes[0].'%'.$codes[1].'%', false],
 
-                 ['LIKE', 'code', '%'.$codes[1].','.$codes[0].'%', false],
-                 ['LIKE', 'code', '%'.$codes[1].'%'.$codes[0].'%', false],
+                     ['LIKE', 'code', '%'.$codes[1].','.$codes[0].'%', false],
+                     ['LIKE', 'code', '%'.$codes[1].'%'.$codes[0].'%', false],
+                 ]
             ];
         }else{
             $where = [
                 'AND',
                 ['NOT LIKE', 'code', '%'.$codes[0].'%', false],
                 ['NOT LIKE', 'code', '%'.$codes[1].'%', false],
+                ['=', 'code_type', 4],
             ];
         }
         //p($where);
@@ -453,30 +458,34 @@ class NumService extends BaseService {
         $like_op = ($type == 1) ? 'LIKE' : 'NOT LIKE';
         if($type == 1){
             $where = [
-                $op,
-                [$like_op, 'code', '%'.$codes[0].','.$codes[1].','.$codes[2].'%', false],
-                [$like_op, 'code', $codes[0].'%'.$codes[1].','.$codes[2], false],
-                [$like_op, 'code', $codes[0].','.$codes[1].'%'.$codes[2], false],
+                'AND',
+                ['=', 'code_type', 4],
+                [
+                    $op,
+                    [$like_op, 'code', '%'.$codes[0].','.$codes[1].','.$codes[2].'%', false],
+                    [$like_op, 'code', $codes[0].'%'.$codes[1].','.$codes[2], false],
+                    [$like_op, 'code', $codes[0].','.$codes[1].'%'.$codes[2], false],
 
-                [$like_op, 'code', '%'.$codes[0].','.$codes[2].','.$codes[1].'%', false],
-                [$like_op, 'code', $codes[0].'%'.$codes[2].','.$codes[1], false],
-                [$like_op, 'code', $codes[0].','.$codes[2].'%'.$codes[1], false],
+                    [$like_op, 'code', '%'.$codes[0].','.$codes[2].','.$codes[1].'%', false],
+                    [$like_op, 'code', $codes[0].'%'.$codes[2].','.$codes[1], false],
+                    [$like_op, 'code', $codes[0].','.$codes[2].'%'.$codes[1], false],
 
-                [$like_op, 'code', '%'.$codes[1].','.$codes[0].','.$codes[2].'%', false],
-                [$like_op, 'code', $codes[1].'%'.$codes[0].','.$codes[2], false],
-                [$like_op, 'code', $codes[1].','.$codes[0].'%'.$codes[2], false],
+                    [$like_op, 'code', '%'.$codes[1].','.$codes[0].','.$codes[2].'%', false],
+                    [$like_op, 'code', $codes[1].'%'.$codes[0].','.$codes[2], false],
+                    [$like_op, 'code', $codes[1].','.$codes[0].'%'.$codes[2], false],
 
-                [$like_op, 'code', '%'.$codes[1].','.$codes[2].','.$codes[0].'%', false],
-                [$like_op, 'code', $codes[1].'%'.$codes[2].','.$codes[0], false],
-                [$like_op, 'code', $codes[1].','.$codes[2].'%'.$codes[0], false],
+                    [$like_op, 'code', '%'.$codes[1].','.$codes[2].','.$codes[0].'%', false],
+                    [$like_op, 'code', $codes[1].'%'.$codes[2].','.$codes[0], false],
+                    [$like_op, 'code', $codes[1].','.$codes[2].'%'.$codes[0], false],
 
-                [$like_op, 'code', '%'.$codes[2].','.$codes[0].','.$codes[1].'%', false],
-                [$like_op, 'code', $codes[2].'%'.$codes[0].','.$codes[1], false],
-                [$like_op, 'code', $codes[2].','.$codes[0].'%'.$codes[1], false],
+                    [$like_op, 'code', '%'.$codes[2].','.$codes[0].','.$codes[1].'%', false],
+                    [$like_op, 'code', $codes[2].'%'.$codes[0].','.$codes[1], false],
+                    [$like_op, 'code', $codes[2].','.$codes[0].'%'.$codes[1], false],
 
-                [$like_op, 'code', '%'.$codes[2].','.$codes[1].','.$codes[0].'%', false],
-                [$like_op, 'code', $codes[2].'%'.$codes[1].','.$codes[0], false],
-                [$like_op, 'code', $codes[2].','.$codes[1].'%'.$codes[0], false],
+                    [$like_op, 'code', '%'.$codes[2].','.$codes[1].','.$codes[0].'%', false],
+                    [$like_op, 'code', $codes[2].'%'.$codes[1].','.$codes[0], false],
+                    [$like_op, 'code', $codes[2].','.$codes[1].'%'.$codes[0], false],
+                ]
             ];
         }else{
             $where = [
@@ -484,6 +493,7 @@ class NumService extends BaseService {
                 ['NOT LIKE', 'code', '%'.$codes[0].'%', false],
                 ['NOT LIKE', 'code', '%'.$codes[1].'%', false],
                 ['NOT LIKE', 'code', '%'.$codes[2].'%', false],
+                ['=', 'code_type', 4],
             ];
         }
         //p($where);
@@ -539,6 +549,7 @@ class NumService extends BaseService {
                 ['NOT LIKE', 'code', '%'.$codes[1].'%', false],
                 ['NOT LIKE', 'code', '%'.$codes[2].'%', false],
                 ['NOT LIKE', 'code', '%'.$codes[3].'%', false],
+                ['=', 'code_type', 4],
             ];
 
             $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
@@ -611,7 +622,7 @@ class NumService extends BaseService {
     public static function getCodesKuaiXuan($codes_hz) {
         if(empty($codes_hz)) return [];
 
-        $where = ['AND'];
+        $where = ['AND', ['=', 'code_type', 4]];
         # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
         # 1、双重
         if(isset($codes_hz['type_2'])){
@@ -1047,14 +1058,89 @@ class NumService extends BaseService {
         $latelyCodes = array_unique($latelyCodes);
         //p(count($latelyCodes));
 
-        $codes = Num4Type::find()->where(['AND', ['>', 'id', 0], ['not in', 'code', $latelyCodes]])->asArray()->all();
+        $codes = Num4Type::find()->where(['AND', ['=', 'code_type', 4], ['>', 'id', 0], ['not in', 'code', $latelyCodes]])->asArray()->all();
 
         $codesArr = ArrayHelper::getColumn($codes, 'code');
 
         return $codesArr;
     }
 
+    /**
+     * @desc 获取二字定的号码
+     * @param array $codeArr
+     * @return array
+     */
+    public static function getCodesTwo($codes = [1, 2]){
+        if(count($codes) != 2 && count($codes) != 3) return ['status'=>300, 'msg'=>'号码错误'];
 
+        if(count($codes) == 2){
+            $datas = [
+                [$codes[0], $codes[1], 'X', 'X'],
+                [$codes[1], $codes[0], 'X', 'X'],
+                [$codes[0], 'X', $codes[1], 'X'],
+                [$codes[1], 'X', $codes[0], 'X'],
+                [$codes[0], 'X', 'X', $codes[1]],
+                [$codes[1], 'X', 'X', $codes[0]],
+                ['X', $codes[0], $codes[1], 'X'],
+                ['X', $codes[1], $codes[0], 'X'],
+                ['X', $codes[0], 'X', $codes[1]],
+                ['X', $codes[1], 'X', $codes[0]],
+                ['X', 'X', $codes[0], $codes[1]],
+                ['X', 'X', $codes[1], $codes[0]],
+            ];
+        }else{
+            $datas = [
+                [$codes[0], $codes[1], $codes[2], 'X'],
+                [$codes[0], $codes[2], $codes[1], 'X'],
+                [$codes[1], $codes[0], $codes[2], 'X'],
+                [$codes[1], $codes[2], $codes[0], 'X'],
+                [$codes[2], $codes[0], $codes[1], 'X'],
+                [$codes[2], $codes[1], $codes[0], 'X'],
+
+                [$codes[0], $codes[1], 'X', $codes[2]],
+                [$codes[0], $codes[2], 'X', $codes[1]],
+                [$codes[1], $codes[0], 'X', $codes[2]],
+                [$codes[1], $codes[2], 'X', $codes[0]],
+                [$codes[2], $codes[0], 'X', $codes[1]],
+                [$codes[2], $codes[1], 'X', $codes[0]],
+
+                [$codes[0], 'X', $codes[1], $codes[2]],
+                [$codes[0], 'X', $codes[2], $codes[1]],
+                [$codes[1], 'X', $codes[0], $codes[2]],
+                [$codes[1], 'X', $codes[2], $codes[0]],
+                [$codes[2], 'X', $codes[0], $codes[1]],
+                [$codes[2], 'X', $codes[1], $codes[0]],
+
+                ['X', $codes[0], $codes[1], $codes[2]],
+                ['X', $codes[0], $codes[2], $codes[1]],
+                ['X', $codes[1], $codes[0], $codes[2]],
+                ['X', $codes[1], $codes[2], $codes[0]],
+                ['X', $codes[2], $codes[0], $codes[1]],
+                ['X', $codes[2], $codes[1], $codes[0]],
+            ];
+        }
+
+
+        return $datas;
+    }
+
+
+    /**
+     * @desc 删除数组指定值的元素使用array_keys搜索指定的值再循环unset
+     * @param $arr
+     * @param $value
+     * @return mixed
+     */
+    public static function delByValue($arr, $value){
+        if(empty($arr) OR empty($value)) return [];
+        $keys = array_keys($arr, $value);
+        if(!empty($keys)){
+            foreach ($keys as $key) {
+                unset($arr[$key]);
+            }
+        }
+        return array_values($arr);
+    }
 
 
 

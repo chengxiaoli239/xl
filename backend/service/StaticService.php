@@ -375,7 +375,7 @@ class StaticService extends BaseService {
 
             $where = ['LEFT(date, 7)'=>$month, 'codes_4nums_hz'=> $hzArr, 'lottery_type'=>$lottery_type];
             $zJcounts = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 中奖次数
-            $where = ['codes_hz'=>$hzArr];
+            $where = ['codes_hz'=>$hzArr, 'code_type'=>4];
             $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 期数
 
             $profits = $zJcounts * 995 - $allCounts * $NumCounts * 0.1;
@@ -584,7 +584,7 @@ class StaticService extends BaseService {
         foreach ($typeArr as $k=>$hzArr){
             $where = ['date' => $date, 'lottery_type'=>$lottery_type, 'codes_4nums_hz'=> $hzArr];
             $zJcounts = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->count(); # 中奖次数
-            $where = ['codes_hz'=>$hzArr];
+            $where = ['codes_hz'=>$hzArr, 'code_type'=>4];
             $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count();
 
             $profits = $zJcounts * 999.5 - $allCounts * $NumCounts * 0.1;
@@ -635,7 +635,7 @@ class StaticService extends BaseService {
         }
         //p($hzArr);
         foreach ($hzArr as $hz=>$zjCounts){
-            $where = ['codes_hz'=>$hz];
+            $where = ['codes_hz'=>$hz, 'code_type'=>4];
             $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count(); # 该和值号码组数
 
             $tzMoney = $allQishus * $NumCounts * 0.1; # 投注本金
@@ -686,7 +686,7 @@ class StaticService extends BaseService {
 
             $where = ['LEFT(date, 7)'=>$month, 'codes_4nums_hz'=> $k, 'lottery_type'=>$lottery_type];
             $zJcounts = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 中奖次数
-            $where = ['codes_hz'=>$k];
+            $where = ['codes_hz'=>$k, 'code_type'=>4];
             $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 期数
 
             $profits = $zJcounts * 995 - $allCounts * $NumCounts * 0.1;
@@ -2298,7 +2298,6 @@ $sql .= '
 
         return $sql;
     }
-
 
 
 }
