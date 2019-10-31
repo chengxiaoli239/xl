@@ -1952,7 +1952,7 @@ class StaticService extends BaseService {
            $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl');
            $msg = '数据处理成功~';
            if ($status) {
-               $m->set($mkey, 1, 300);
+               $m->set($mkey, 1, 360);
                $time1 = microtime(true);
                # 号码类型：双重、双双重、四重、三兄弟、四兄弟
                $rst[$lottery_type]['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
