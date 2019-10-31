@@ -362,7 +362,7 @@ class NumService extends BaseService {
      * @param $code_type 1一定2二定3三定4四定
      * @return array
      */
-    public static function getCodesArise($codesArr = [], $type = 1, $code_type){
+    public static function getCodesArise($codesArr = [], $type = 1, $code_type = 4){
 
         $codes4Arr = [];
         # 去除双重数字

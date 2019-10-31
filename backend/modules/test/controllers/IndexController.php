@@ -108,6 +108,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
+        $rst = StaticService::staticHzPerDateProfits('2019-10-31', $lottery_type = 5); p($rst);
         $rst = SscDataService::insertCodeType2();p($rst);
         $rst = CommonService::isCodeType_2($codes = '3,3,3,X');p($rst);
         $rst = NumService::delByValue(['1', 'X', '3', 'X'], 'X');p($rst);
@@ -178,7 +180,6 @@ class IndexController extends Controller
         $rst = NumService::getCodesKuaiXuan(['type_4'=>0, 'type_2'=>1, 'type_4d'=>1]);p($rst);
 
         $rst = SscDataService::insertCode($type = 4);p($rst); # 插入三字现、四字现
-        $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 6); p($rst);
 
         $rst = NineNineBaseService::getRemoteHzRecords($uid = 11, $tz_system_id = 2, $lottery_type = 5);p($rst);
         $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type = 6); p($rst);# 单双利润统计(month)
@@ -321,7 +322,6 @@ class IndexController extends Controller
         $rst = BetService::userSysPlansTzNow(81, 3); p($rst);
         $rst = SevenService::getSn(3, 3);p($rst); # 用户信息
         $rst = CqsscSevenDay::getLotteryNo(); p($rst);
-        $rst = StaticService::staticHzPerDateProfits('2019-04-09'); p($rst);
         $rst = BetService::getCodes(1, 3, 22, 1, 0.1, 1, [1221,1222,2111]);p($rst);
         $rst = StaticService::getSameCodes('1221', 1);p($rst);
         $rst = SevenService::synBalance(7); p($rst); # 同步余额
