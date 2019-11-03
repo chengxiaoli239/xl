@@ -15,6 +15,7 @@ use Yii;
  * @property int $playway 投注方式:1二字定2三字定3四字定
  * @property int $status 状态:0关闭1开启
  * @property double $single 投注倍数(元/注)
+ * @property string $singles 翻倍梯度
  * @property int $tz_type 投注类型:1大小单双三字定2大小三字定3单双三字定
  * @property int $buy_type 购买方向:0反买1正买
  * @property string $tz_sites 计划投注站点，lt_tz_systems.id
@@ -85,7 +86,7 @@ class UserSysPlans extends \common\models\base\BaseModel
             [['uid', 'account', 'created_at', 'updated_at'], 'required'],
             [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['update_time'], 'safe'],
-            [['children_plan_id'], 'string', 'max' => 255],
+            [['children_plan_id', 'singles'], 'string', 'max' => 255],
             [['account', 'tz_sites'], 'string', 'max' => 24],
             [['hz_Arr'], 'string', 'max' => 640],
         ];
@@ -105,6 +106,7 @@ class UserSysPlans extends \common\models\base\BaseModel
             'playway' => '投注方式:1二字定2三字定3四字定',
             'status' => '状态:0关闭1开启',
             'single' => '投注倍数(元/注)',
+            'singles' => '翻倍梯度',
             'tz_type' => '投注类型:1大小单双三字定2大小三字定3单双三字定',
             'buy_type' => '购买方向:0反买1正买',
             'tz_sites' => '计划投注站点，lt_tz_systems.id',

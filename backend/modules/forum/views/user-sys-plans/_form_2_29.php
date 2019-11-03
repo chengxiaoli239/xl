@@ -50,6 +50,7 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'p4')->textInput()->label('个位') ?>
 
+                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:1-3-7-15-31-62-125-251') ?>
                     <!--?= $form->field($model, 'tz_type')->textInput() ?-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
                     <!--?= $form->field($model, 'tz_type')->radioList($kArr)->label('投注类型') ?-->
