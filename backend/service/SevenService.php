@@ -676,6 +676,8 @@ class SevenService extends BaseTZService {
         if(isset($rst['Status']) && $rst['Status'] == 1){
             $balance = $rst['Data']['credit_balance'];
         }
+        $rst['uid'] = $uid;
+        $rst['tz_system_id'] = $tz_system_id;
 
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','7时彩-用户余额', $rst);
 
@@ -1117,7 +1119,7 @@ class SevenService extends BaseTZService {
      * @return mixed|string
      */
     public static function userInfo($uid, $tz_system_id){
-        self::__init($uid, $tz_system_id);
+        //self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');

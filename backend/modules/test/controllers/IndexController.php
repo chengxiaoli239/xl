@@ -108,8 +108,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $qs = SscDataService::getLossQs(22);p($qs);
+        //$data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);p($data);
+        $arr = explode(',', $str);
+        p(count($arr));
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);p($rst);
-        $qs = SscDataService::getLossQs(16);p($qs);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
         $rst = StaticService::staticHzPerDateProfits('2019-10-31', $lottery_type = 5); p($rst);
         $rst = SscDataService::insertCodeType2();p($rst);
@@ -136,7 +139,6 @@ class IndexController extends Controller
         $miss = SscDataService::getSdHzYlHistoryMiss([26], $lottery_type = 6, 20000);p($miss);
         $miss = SscDataService::getCodeTypeYlHistoryMiss('6699', $lottery_type = 5, 50000, 0);p($miss);
         $rst = SscDataService::getLastIndexId(6);p($rst);
-        $data = LuckyBaseService::login($uid = 19, $tz_system_id = 7);
         $rst = LuckyBaseService::synBalance($tz_system_users_id = 16); p($rst);# 同步余额
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 8);p($rst);
         $rst = StaticService::static2NumsYl($lottery_type = 8);p($rst);

@@ -2576,6 +2576,8 @@ class SscDataService extends BaseService {
             foreach ($BettingRecords as $BettingRecord){
                 if($BettingRecord['profits']<0){
                     $i = $i + 1;
+                }else{
+                    return $i;
                 }
             }
             $qs = $i - 1;
