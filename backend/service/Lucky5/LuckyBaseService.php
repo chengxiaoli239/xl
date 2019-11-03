@@ -242,6 +242,22 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 'operation_condition' => self::getOperationCondition($tz_type),
             ];
             $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL').'?'.http_build_query($post_data);
+        }elseif(in_array($tz_type, [29])){ # 三定 - 快选
+            $bet_codes = str_replace(',','',$bet_codes);
+            $bet_codes = str_replace('@',',',$bet_codes);
+            $post_data = [
+                'bet_number'=>$bet_codes,
+                'bet_money'=>$single,
+                'bet_way'=>$way,
+                'is_xian'=>0,
+                'is_iframe'=>1,
+                'number_type'=>self::getNumberType($tz_type),
+                'bet_log' => self::getBetLog($tz_type),
+                'is_package' => 0,
+                'period_no'=>$qihao,
+                'operation_condition' => self::getOperationCondition($tz_type),
+            ];
+            $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL').'?'.http_build_query($post_data);
         }elseif(in_array($tz_type, [30])){ # 二定 - 快选
             $bet_codes = str_replace(',','',$bet_codes);
             $bet_codes = str_replace('@',',',$bet_codes);
@@ -268,9 +284,10 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 'is_package' => 0,
                 'period_no'=>$qihao,
             ];
-            $url = 'http://f1.ww99865.xyz/Member/BatchBet?'.http_build_query($post_data);
+            $url = $TzSystemsUsers->ssc_domain.'/Member/BatchBet?'.http_build_query($post_data);
         }
         //$post_data = ['totalCount'=>$totalCount, 'totalBetMoney'=>$totalBetMoney, 'bets'=>json_encode($codes), 'way'=>$way, 'period_no'=>'20'.$qihao, 'bet_log'=>urlencode('投注：'.$totalCount.'/'.$single.'注,总共：'.$totalBetMoney.'元'), ];
+        //p($post_data);
 
 
         $_t = round(microtime(true) * 1000);
@@ -405,6 +422,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $rstData = [
             20 => 102,
             27 => 104,
+            29 => 102,
             30 => 102,
         ];
 
@@ -423,6 +441,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $rstData = [
             27 => 20,
             30 => 20,
+            29 => 30,
         ];
 
         if(isset($rstData[$tz_type])) return $rstData[$tz_type];
@@ -436,8 +455,10 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @return string
      */
     public static function getBetLog($tz_type = 20){
-        if(in_array($tz_type,[ 27, 30])){ # 二定
+        if(in_array($tz_type,[ 27, 30])) { # 二定
             $str = '[二定位]，定位置“[取]”：千=[1]，百=[34]';
+        }elseif(in_array($tz_type,[ 29])){
+            $str = '[三定位]，定位置“[取]”：千=[1]，百=[2]，十=[3]';
         }else{ # 四定
             $str = '[四定位]，合分值范围：[0-36]';
         }

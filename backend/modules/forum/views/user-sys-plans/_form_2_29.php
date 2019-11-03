@@ -35,15 +35,20 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'single')->textInput() ?>
 
-                    <!--?= $form->field($model, 'arise')->textInput()->label('上奖') ?-->
+                    <!--位置合分：位置-->
+                    <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.合分取:位置') ?>
+                    <!--位置合分：合分-->
+                    <?= $form->field($model, 'hefen')->textInput()->label('1.合分值')?>
 
-                    <!--?= $form->field($model, 'p1')->textInput()->label('第1位') ?-->
+                    <?= $form->field($model, 'arise')->textInput()->label('上奖')?>
 
-                    <!--?= $form->field($model, 'p2')->textInput()->label('第2位') ?-->
+                    <?= $form->field($model, 'p1')->textInput()->label('千位') ?>
 
-                    <!--?= $form->field($model, 'p3')->textInput()->label('第3位') ?-->
+                    <?= $form->field($model, 'p2')->textInput()->label('百位') ?>
 
-                    <!--?= $form->field($model, 'p4')->textInput()->label('第4位') ?-->
+                    <?= $form->field($model, 'p3')->textInput()->label('十位') ?>
+
+                    <?= $form->field($model, 'p4')->textInput()->label('个位') ?>
 
                     <!--?= $form->field($model, 'tz_type')->textInput() ?-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
@@ -53,7 +58,7 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'hz')->checkboxList($hzArr)->label('投注类型(和值)') ?>
+                    <?= $form->field($model, 'hz')->checkboxList($hzArr)->label('三数和值') ?>
 
                     <!--?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?-->
                     <?= $form->field($model, 'type_2')->checkBoxList([
@@ -76,7 +81,7 @@ use yii\widgets\ActiveForm;
                         //0=>'非四单四双',
                         0=>'除',
                         1=>'取',
-                    ])->label('对数') ?>
+                    ])->label('对数'); $form->field($model, 'stop_loss')->textInput($plan_types)->label('止损点(正数，例：4000)') ?>
 
                     <?= $form->field($model, 'plan_type')->radioList($plan_types)->label('计划类型，为"止盈止损"计划时须填以下两项') ?>
                     <?= $form->field($model, 'take_profits')->textInput($plan_types)->label('止盈点(正数，例：3000)') ?>

@@ -177,8 +177,10 @@ class UserSysPlansController extends BaseController
         }elseif (in_array($model->tz_type, [25, 29, 30])){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
             foreach ($hz_Arr_Data as $key=>$val){
-                if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'arise', 'type_4d', 'type_4s'])){
+                if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'arise', 'type_4d', 'type_4s', 'hefen'])){
                     $model->$key = $val;
+                }elseif(in_array($key, ['hefen_pos'])){
+                    $model->$key = explode(',', $val);
                 }else{
                     $model->$key[] = $val;
                 }

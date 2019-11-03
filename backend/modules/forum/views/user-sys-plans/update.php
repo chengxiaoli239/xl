@@ -30,6 +30,8 @@ if( $tz_type >= 17){
         'plan_types' => $plan_types,
         'code_types' => $code_types,
         'get_arise' => $get_arise,
+        'hefen' => $hefen,
+        'hefen_pos' => $hefen_pos,
         'remove_arise' => $remove_arise,
         'hzArr' => $hzArr,
     ]) ?>

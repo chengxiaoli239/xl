@@ -57,12 +57,14 @@ class UserSysPlans extends \common\models\base\BaseModel
    public $p4; # 第4位 
    public $type_4d; # 四单 
    public $type_4s; # 四双 
-   public $type_log; # 对数 
-   public $import_codes_txt; # 导入号码 
+   public $type_log; # 对数
+   public $import_codes_txt; # 导入号码
    public $get_types; #  取类型
    public $remove_types; #  排除类型
    public $get_hzs; #  取和值
    public $remove_hzs; #  排除和值
+   public $hefen; #  合分值
+   public $hefen_pos; #  合分位置
    //public $type_3_txt; # 三定-导入
    //public $type_4_txt; # 四定-导入 
     /**

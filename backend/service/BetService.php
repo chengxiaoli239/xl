@@ -305,7 +305,7 @@ abstract class BetService extends BaseBetService {
                     $codesArr = UserSysPlansService::getImportCodes($plan_id);
                 }else{
                     if(in_array($tz_type, [29])){
-
+                        $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 3);
                     }else{
                         $params = ['playway'=>$playway, 'tz_type'=>$tz_type, 'status'=>$buy_type];
                         $SysPlansCodes = SysPlansCodes::find()->where($params)->orderBy(['rand()' => SORT_DESC])->asArray()->all(); # ->limit($limit) 限制数量去掉

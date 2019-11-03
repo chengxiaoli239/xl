@@ -48,8 +48,80 @@ class UserSysPlansService extends BaseService {
         if($playway == 6) {
             $post['UserSysPlans']['hz_Arr'] = str_replace('，', ',', $post['UserSysPlans']['hz_Arr']);
         }elseif ($tz_type == 29){ # 三定-快选
+            # 三定-快选过滤
+            $UserSysPlans = $post['UserSysPlans'];
+            # 双重:type_2、三重:type_3、两兄弟:type_2b、三兄弟:type_3b
+            $tmpFilter = [];
+            # 1、双重
+            if($UserSysPlans['type_2'] && count($UserSysPlans['type_2']) == 1){
+                $tmpFilter['type_2'] = $UserSysPlans['type_2'][0];
+            }
+            unset($post['UserSysPlans']['type_2']);
+            # 2、三重
+            if($UserSysPlans['type_3'] && count($UserSysPlans['type_3']) == 1){
+                $tmpFilter['type_3'] = $UserSysPlans['type_3'][0];
+            }
+            unset($post['UserSysPlans']['type_3']);
+            # 5、两兄弟
+            if($UserSysPlans['type_2b'] && count($UserSysPlans['type_2b']) == 1){
+                $tmpFilter['type_2b'] = $UserSysPlans['type_2b'][0];
+            }
+            unset($post['UserSysPlans']['type_2b']);
+            # 6、三兄弟
+            if($UserSysPlans['type_3b'] && count($UserSysPlans['type_3b']) == 1){
+                $tmpFilter['type_3b'] = $UserSysPlans['type_3b'][0];
+            }
+            unset($post['UserSysPlans']['type_3b']);
+            # 8、和值
+            if(isset($post['UserSysPlans']['hz']) && $post['UserSysPlans']['hz']){
+                $tmpFilter['hz'] = $post['UserSysPlans']['hz'];
+            }
+            unset($post['UserSysPlans']['hz']);
+            # 9、上奖
+            if(isset($UserSysPlans['arise']) && $UserSysPlans['arise'] !== '' && ($UserSysPlans['arise'] OR $UserSysPlans['arise'] == 0)){
+                $tmpFilter['arise'] = trim($UserSysPlans['arise']);
+            }
+            unset($post['UserSysPlans']['arise']);
+            # 10、第1位
+            if(isset($UserSysPlans['p1']) && $UserSysPlans['p1']){
+                $tmpFilter['p1'] = $UserSysPlans['p1'];
+            }
+            unset($post['UserSysPlans']['p1']);
+            # 11、第2位
+            if(isset($UserSysPlans['p2']) && $UserSysPlans['p2']){
+                $tmpFilter['p2'] = trim($UserSysPlans['p2']);
+            }
+            unset($post['UserSysPlans']['p2']);
+            # 12、第3位
+            if(isset($UserSysPlans['p3']) && $UserSysPlans['p3']){
+                $tmpFilter['p3'] = trim($UserSysPlans['p3']);
+            }
+            unset($post['UserSysPlans']['p3']);
+            # 13、第4位
+            if(isset($UserSysPlans['p4']) && $UserSysPlans['p4']){
+                $tmpFilter['p4'] = trim($UserSysPlans['p4']);
+            }
+            unset($post['UserSysPlans']['p4']);
+            # 14、对数
+            if($UserSysPlans['type_log'] && count($UserSysPlans['type_log']) == 1){
+                $tmpFilter['type_log'] = $UserSysPlans['type_log'][0];
+            }
+            unset($post['UserSysPlans']['type_log']);
+            # 15.1、合分位置
+            if($UserSysPlans['hefen_pos'] && count($UserSysPlans['hefen_pos']) > 0){
+                //$tmpFilter['hefen_pos'] = $UserSysPlans['hefen_pos'][0];
+                $tmpFilter['hefen_pos'] = implode(',', $post['UserSysPlans']['hefen_pos']); # 合分位置
+            }
+            unset($post['UserSysPlans']['hefen_pos']);
+            # 15.2、合分值
+            if(isset($post['UserSysPlans']['hefen']) && $post['UserSysPlans']['hefen']){
+                $tmpFilter['hefen'] = $post['UserSysPlans']['hefen']; # 合分
+            }
+            unset($post['UserSysPlans']['hefen']);
+
+            $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
         }elseif ($tz_type == 30){ # 二定-快选
-            # 快选过滤
+            # 二定-快选过滤
             $UserSysPlans = $post['UserSysPlans'];
             # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
             $tmpFilter = [];
@@ -73,6 +145,11 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['arise'] = trim($UserSysPlans['arise']);
             }
             unset($post['UserSysPlans']['arise']);
+            # 10、第1位
+            if(isset($UserSysPlans['p1']) && $UserSysPlans['p1']){
+                $tmpFilter['p1'] = $UserSysPlans['p1'];
+            }
+            unset($post['UserSysPlans']['p1']);
             # 11、第2位
             if(isset($UserSysPlans['p2']) && $UserSysPlans['p2']){
                 $tmpFilter['p2'] = trim($UserSysPlans['p2']);
@@ -95,7 +172,7 @@ class UserSysPlansService extends BaseService {
             unset($post['UserSysPlans']['type_log']);
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
         }elseif ($tz_type == 25){
-            # 快选过滤
+            # 四定-快选过滤
             $UserSysPlans = $post['UserSysPlans'];
             # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
             $tmpFilter = [];
@@ -180,7 +257,7 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['type_4d'] = $UserSysPlans['type_4d'][0];
             }
             unset($post['UserSysPlans']['type_4d']);
-            # 1l、四双
+            # 16、四双
             if($UserSysPlans['type_4s'] && count($UserSysPlans['type_4s']) == 1){
                 $tmpFilter['type_4s'] = $UserSysPlans['type_4s'][0];
             }
@@ -400,16 +477,17 @@ class UserSysPlansService extends BaseService {
         $data = [];
         if($playway ==1){
             $hzArr = [];
-            for ($i = 1; $i <= 18; $i++) {
+            for ($i = 0; $i <= 18; $i++) {
                 $hzArr[$i] = $i;
             }
             $data['hzArr'] = $hzArr;
         }elseif($playway ==2){
             $hzArr = [];
-            for ($i = 1; $i <= 27; $i++) {
+            for ($i = 0; $i <= 27; $i++) {
                 $hzArr[$i] = $i;
             }
             $data['hzArr'] = $hzArr;
+            $data['hefen_pos'] = [1=>'',2=>'',3=>'',4=>''];
         }elseif($playway ==3){
             if($tz_type<20){
                 $kArr = StaticService::$kArr;
@@ -431,7 +509,7 @@ class UserSysPlansService extends BaseService {
                 $data['hzArr'] = $tmpData;
             }elseif (in_array($tz_type, [25, 28])){ # 快选
                 $hzArr = [];
-                for ($i=1; $i<=36; $i++){
+                for ($i=0; $i<=36; $i++){
                     $hzArr[$i] = $i;
                 }
                 $data['hzArr'] = $hzArr;

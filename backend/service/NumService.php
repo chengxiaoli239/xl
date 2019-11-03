@@ -676,6 +676,26 @@ class NumService extends BaseService {
             //$query->andWhere($andWhere);
         }
 
+        # 合分
+        if(isset($codes_hz['hefen_pos']) && isset($codes_hz['hefen']) && !empty($codes_hz['hefen_pos']) && !empty($codes_hz['hefen'])){
+            $poss = explode(',', $codes_hz['hefen_pos']);
+
+            $lenHefen = strlen($codes_hz['hefen']);
+            $codes_hefen = [];
+            for ($i=0; $i<$lenHefen; $i++){
+                $codes_hefen = array_merge($codes_hefen, [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10]);
+            }
+            $codes_str = '';
+            foreach ($poss as $pos){
+                $codes_str .= 'code_'.$pos . '+';
+                $where = array_merge($where, [['<>', 'code_'.$pos, 'X']]);
+            }
+            $codes_str = rtrim($codes_str, '+');
+            $where = array_merge($where, [ ['IN', '('.$codes_str.')', $codes_hefen ] ]);
+            //$query->andWhere($andWhere);
+        }
+        //p([$where, $codes_hz]);
+
         # 第1位
         if(isset($codes_hz['p1']) && !empty($codes_hz['p1'])){
             //$p1_codes = explode(',', $codes_hz['p1']);
@@ -697,7 +717,6 @@ class NumService extends BaseService {
             $p4_codes = self::getCodesArrByStr($codes_hz['p4']);
             $where = array_merge($where, [ ['IN', 'code_4', $p4_codes] ]);
         }
-
 
         # 同时选择取、除四单四双
         if( isset($codes_hz['type_4d']) OR isset($codes_hz['type_4s'])){
@@ -807,7 +826,7 @@ class NumService extends BaseService {
         }
 
         $codesArr = [];
-        if($code_type == 4){
+        if($code_type == 4 OR $code_type == 3){
             $Num4Types = Num4Type::find()->where($where)->asArray()->all();
             $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
         }
@@ -816,7 +835,7 @@ class NumService extends BaseService {
         //if(isset($codes_hz['arise']) && !empty($codes_hz['arise'])){
         if(isset($codes_hz['arise'])){
             $codesArr_arise = self::getCodesArise([$codes_hz['arise']], $type = 1, $code_type);
-            if($code_type == 4){
+            if(in_array($code_type, [3,4])){
                 $codesArr = array_intersect($codesArr, $codesArr_arise);
             }else{
                 $codesArr = $codesArr_arise;
@@ -879,6 +898,8 @@ class NumService extends BaseService {
         $filter5 = []; # 和值除
         $filter6 = []; # 类型取
         $filter7 = []; # 类型除
+        $filter8 = []; # 合分取
+        $filter9 = []; # 合分除
         # {"get_types":["1","2"],"remove_types":["4","5"],"get_hzs":["7","8","10"],"remove_hzs":["12","13","14"],"get_arises":"123","remove_arises":"456"}
         # 0.1、上奖取
         if(isset($hz_Arr['arise']) OR isset($hz_Arr['get_arises'])){
@@ -950,6 +971,11 @@ class NumService extends BaseService {
             if(isset($hz_Arr['remove_types'])) $filter7['remove_types'] = $hz_Arr['remove_types'];
         }
 
+        # 合分
+        if(isset($hz_Arr['hefen_pos']) && isset($hz_Arr['hefen'])){
+            if(isset($hz_Arr['hefen_pos']) && isset($hz_Arr['hefen'])) $filter8['hefen'] = 1; else $filter9['hefen'] = 0;
+        }
+
         $typesArr = self::getNameByCodesType();
         #和值取
         if(!empty($filter2['hz'])){
@@ -972,17 +998,27 @@ class NumService extends BaseService {
             }
             $desc = trim($desc, '、').' ';
         }
-        if(!empty($filter0)){
-            $desc .= '除:';
-            foreach ($filter0 as $key0=>$v0){
-                $desc .= $typesArr[$key0].'、';
-            }
-            $desc = trim($desc, '、').' ';
+
+        if(!empty($hz_Arr['p1'])){
+            $desc .= '千'.$hz_Arr['p1'];
+        }
+        if(!empty($hz_Arr['p2'])){
+            $desc .= ' 百'.$hz_Arr['p2'];
+        }
+        if(!empty($hz_Arr['p3'])){
+            $desc .= ' 十'.$hz_Arr['p3'];
+        }
+        if(!empty($hz_Arr['p4'])){
+            $desc .= ' 个'.$hz_Arr['p4'];
+        }
+
+        if(!empty($filter8)){
+            $desc .= ' 合分取[位:'.$hz_Arr['hefen_pos'] . ' 合分:'.$hz_Arr['hefen'].']';
         }
 
         # 上奖取
         if(!empty($filter3)){
-            $desc .= '上奖:';
+            $desc .= ' 上奖:';
             foreach ($filter3 as $key3=>$v3){
                 $desc .= $v3.'、';
             }
@@ -997,6 +1033,13 @@ class NumService extends BaseService {
             $desc = trim($desc, '、').' ';
         }
 
+        if(!empty($filter0)){
+            $desc .= ' 除:';
+            foreach ($filter0 as $key0=>$v0){
+                $desc .= $typesArr[$key0].'、';
+            }
+            $desc = trim($desc, '、').' ';
+        }
         # 类型取
         if(!empty($filter6) OR !empty($filter7)){
             $codeTypes = UserSysPlansService::getCodeTypes();
@@ -1016,21 +1059,6 @@ class NumService extends BaseService {
                 $desc = trim($desc, '、').' ';
             }
         }
-
-
-        if(!empty($hz_Arr['p1'])){
-            $desc .= ' p1:'.$hz_Arr['p1'];
-        }
-        if(!empty($hz_Arr['p2'])){
-            $desc .= ' p2:'.$hz_Arr['p2'];
-        }
-        if(!empty($hz_Arr['p3'])){
-            $desc .= ' p3:'.$hz_Arr['p3'];
-        }
-        if(!empty($hz_Arr['p4'])){
-            $desc .= ' p4:'.$hz_Arr['p4'];
-        }
-
 
         return $desc;
     }
@@ -1057,6 +1085,8 @@ class NumService extends BaseService {
             'remove_arises'=>'上奖除',
             'get_types'=>'类型取',
             'remove_types'=>'类型除',
+            //'hefen_pos'=>'合分位',
+            'hefen'=>'合分',
         ];
 
         if($typeArr[$type]) return $typeArr[$type];
