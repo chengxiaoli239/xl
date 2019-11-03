@@ -206,7 +206,7 @@ class TzService extends BaseService {
         # 计划方案倍数、投注号码或者投注状态修改
         //$rst['userSysPlanChange'] = UserSysPlansService::userSysPlanChange($lottery_type);
 
-        # 止盈止损计划处理
+        # 止盈止损、倍投计划处理
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type);
 
         $rst['qihao'] = $qihao;
@@ -437,6 +437,7 @@ class TzService extends BaseService {
             # 计划类型:0正常1止盈止损计划
             0=>'正常',
             1=>'止盈止损',
+            2=>'翻倍',
         ];
 
         return $datas;

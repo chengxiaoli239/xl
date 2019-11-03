@@ -97,6 +97,8 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             'value' => function($model) {
                                 if($model->plan_type == 1){
                                     $txt = '止盈止损';
+                                }elseif($model->plan_type == 2){
+                                    $txt = '倍投';
                                 }else{
                                     $txt = '普通';
                                 }
@@ -170,6 +172,9 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 }
                                 $txt = BaseStringHelper::truncate($str,20);
                                 $str = Html::a($txt, '#', ['title' => $str,'alt'=>$str]);
+                                if($model->singles && $model->plan_type == 2){
+                                    $str .= '翻倍梯度:'.$model->singles;
+                                }
                                 return $str;
                             }
                         ],

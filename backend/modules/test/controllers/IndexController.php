@@ -108,6 +108,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);p($rst);
+        $qs = SscDataService::getLossQs(16);p($qs);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
         $rst = StaticService::staticHzPerDateProfits('2019-10-31', $lottery_type = 5); p($rst);
         $rst = SscDataService::insertCodeType2();p($rst);
@@ -129,7 +131,6 @@ class IndexController extends Controller
         $rst['allDateStatic4nPerMonth'] = StaticService::allDateStatic4nPerMonth($lottery_type = 5); # 部分四现每月统计
         $rst = StaticService::getCreateCodeType3nSql($lottery_type = 5);p($rst);
         $rst = StaticService::getCreateCodeType4nSql($lottery_type = 5);p($rst);
-        $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 5);p($rst);
         $miss = SscDataService::getCodeTypeYlHistoryMiss('555', $lottery_type = 5, 20000);p($miss);
         $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst); # 号码类型遗漏
         $miss = SscDataService::getSdHzYlHistoryMiss([26], $lottery_type = 6, 20000);p($miss);

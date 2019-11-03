@@ -2525,10 +2525,11 @@ class SscDataService extends BaseService {
      * @desc 处理止盈止损计划
      * @return array
      */
-    public static function opProfitsPlans(){
+    public static function opProfitsPlans($lottery_type = DEFAULT_LOTTERY_TYPE){
         $rst = ['status'=>200, 'msg'=>'处理成功'];
 
-        $UserSysPlans = UserSysPlans::findAll(['plan_type'=>1, 'status'=>1]);
+        # 止盈止损
+        $UserSysPlans = UserSysPlans::findAll(['plan_type'=>1, 'status'=>1, 'lottery_type'=>$lottery_type]);
         foreach ($UserSysPlans as $UserSysPlan){
             $profits = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id, 'is_profits_record'=>1])->sum('profits');
             if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
@@ -2540,12 +2541,51 @@ class SscDataService extends BaseService {
 
             $logArr[$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
         }
-        Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损计划', $logArr);
+
+        # 倍投 连续x期不中 决定倍数
+        $UserSysPlans = UserSysPlans::findAll(['plan_type'=>2, 'status'=>1, 'lottery_type'=>$lottery_type]);
+        foreach ($UserSysPlans as $UserSysPlan){
+            $singles = explode('-', $UserSysPlan->singles);
+
+            $qs = self::getLossQs($UserSysPlan->id);
+            if(isset($singles[$qs])){
+                $single = $singles[$qs];
+            }else{
+                $single = $singles[0];
+            }
+            $UserSysPlan->single = $single;
+            $saveFlag = $UserSysPlan->save();
+
+            $logArr[$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
+        }
+        Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', $logArr);
 
         return $rst;
     }
 
 
+    /**
+     * @desc 计算某个计划多少期不中
+     * @return int
+     */
+    public static function getLossQs($plan_id){
+        $qs = 0;
+        $where = ['AND', ['=', 'plan_id', $plan_id]];
+        if($BettingRecords = BettingRecords::find()->where($where)->asArray()->orderBy(['id'=>SORT_DESC])->all()){
+            $i = 0;
+            foreach ($BettingRecords as $BettingRecord){
+                if($BettingRecord['profits']<0){
+                    $i = $i + 1;
+                }
+            }
+            $qs = $i - 1;
+        }else{
+            $where = ['AND', ['=', 'plan_id', $plan_id], ['<', 'profits', 0]];
+            $qs = BettingRecords::find()->where($where)->asArray()->orderBy(['id'=>SORT_DESC])->count('id');
+        }
+
+        return $qs;
+    }
 
 
 
