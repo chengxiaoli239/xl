@@ -41,11 +41,12 @@ class TzSystemsUsers extends \common\models\base\BaseModel
         return [
             [['uid', 'tz_system_id', 'status', 'created_at', 'updated_at'], 'integer'],
             [['balance'], 'number'],
+            [['cookie'], 'string'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['username', 'sys_name', 'account', 'ssc_domain'], 'string', 'max' => 64],
             [['password'], 'string', 'max' => 20],
-            [['cookie', 'user_agent'], 'string', 'max' => 640],
+            [['user_agent'], 'string', 'max' => 640],
         ];
     }
 
@@ -71,5 +72,14 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'updated_at' => '更新时间',
             'update_time' => '更新时间',
         ];
+    }
+
+    /**
+     * @inheritdoc
+     * @return TzSystemsUsersQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new TzSystemsUsersQuery(get_called_class());
     }
 }
