@@ -649,8 +649,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             'Upgrade-Insecure-Requests: 1',
             $TzSystemsUsers->user_agent,
         ];
-
         $account = AdminModel::findOne(self::$user_id)->username;  # 投注用户账号
+
         //p(['headers'=>$headers, 'url'=>$url, 'account'=>$account, 'post_data'=>$post_data]);
 
         # 缓存锁
