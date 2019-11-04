@@ -233,7 +233,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
             # 缓存锁
             $m = \Yii::$app->cache;
-            $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
+            $betKey = BetService::buildBetKey($TzSystemsUsers->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
             if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
             $n = count($codesArr5s)/$nums;

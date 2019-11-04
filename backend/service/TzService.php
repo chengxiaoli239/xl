@@ -207,6 +207,13 @@ class TzService extends BaseService {
         //$rst['userSysPlanChange'] = UserSysPlansService::userSysPlanChange($lottery_type);
 
         # 止盈止损、倍投计划处理
+        /*
+        $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opProfitsPlans');
+        if($status){
+            $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type);
+            StaticService::afterOpStatic($lottery_type, 'opProfitsPlans');
+        }
+        */
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type);
 
         $rst['qihao'] = $qihao;

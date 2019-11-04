@@ -2546,10 +2546,12 @@ class SscDataService extends BaseService {
         # 倍投 连续x期不中 决定倍数
         $UserSysPlans = UserSysPlans::findAll(['plan_type'=>2, 'status'=>1, 'lottery_type'=>$lottery_type]);
         foreach ($UserSysPlans as $UserSysPlan){
-            $flags[$UserSysPlan->uid] = 0;
+            if(!isset($flags[$UserSysPlan->uid])){
+                $flags[$UserSysPlan->uid] = 0;
+            }
             # 中的计划回0.1、不中的计划翻倍
             $BettingRecords = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id])->orderBy(['id'=>SORT_DESC])->one();
-            if($BettingRecords->profits>0 && !isset($flags[$UserSysPlan->uid])){
+            if($BettingRecords->profits>0){
                 $flags[$UserSysPlan->uid] = 1;
             }
         }
@@ -2560,7 +2562,7 @@ class SscDataService extends BaseService {
                 # 中的计划回0.1
                 $singles = explode('-', $UserSysPlan->singles);
                 if($flag){
-                    $single = $singles[0];
+                    $single = $singles[0]; # 0.1
                 }else{
                     $single = self::getPlanNextSingle($UserSysPlan->id, $UserSysPlan->single);
                 }
@@ -2571,6 +2573,7 @@ class SscDataService extends BaseService {
                 $logArr[$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
             }
         }
+        $logArr['flags'] = $flags;
         Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', $logArr);
 
         return $rst;
