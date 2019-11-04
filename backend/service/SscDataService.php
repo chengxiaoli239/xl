@@ -2551,7 +2551,7 @@ class SscDataService extends BaseService {
             if(isset($singles[$qs])){
                 $single = $singles[$qs];
             }else{
-                $single = $singles[0];
+                $single = $UserSysPlan->single;
             }
             $UserSysPlan->single = $single;
             $saveFlag = $UserSysPlan->save();
