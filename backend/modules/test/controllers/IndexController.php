@@ -108,9 +108,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::getPlanNextSingle(3, 0.4);p($rst);
+        $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);p($data);
         $qs = SscDataService::getLossQs(22);p($qs);
-        //$data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);p($data);
-        $arr = explode(',', $str);
         p(count($arr));
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);p($rst);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);

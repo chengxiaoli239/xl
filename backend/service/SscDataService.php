@@ -2545,14 +2545,23 @@ class SscDataService extends BaseService {
         # 倍投 连续x期不中 决定倍数
         $UserSysPlans = UserSysPlans::findAll(['plan_type'=>2, 'status'=>1, 'lottery_type'=>$lottery_type]);
         foreach ($UserSysPlans as $UserSysPlan){
-            $singles = explode('-', $UserSysPlan->singles);
-
-            $qs = self::getLossQs($UserSysPlan->id);
-            if(isset($singles[$qs])){
-                $single = $singles[$qs];
-            }else{
-                $single = $UserSysPlan->single;
+            $flag = 0;
+            # 中的计划回0.1、不中的计划翻倍
+            $BettingRecords = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id])->orderBy(['id'=>SORT_DESC])->one();
+            if($BettingRecords->profits>0){
+                $flag = 1;
             }
+
+        }
+        foreach ($UserSysPlans as $UserSysPlan){
+            # 中的计划回0.1
+            $singles = explode('-', $UserSysPlan->singles);
+            if($flag){
+                $single = $singles[0];
+            }else{
+                $single = self::getPlanNextSingle($UserSysPlan->id, $UserSysPlan->single);
+            }
+
             $UserSysPlan->single = $single;
             $saveFlag = $UserSysPlan->save();
 
@@ -2587,6 +2596,21 @@ class SscDataService extends BaseService {
         $qs = $i - 1;
 
         return $qs;
+    }
+
+    public static function getPlanNextSingle($plan_id, $single){
+        $UserSysPlans = UserSysPlans::findOne($plan_id);
+
+        $singles = $UserSysPlans->singles;
+        $singlesArr = explode(',', str_replace('-', ',', $singles));
+
+        $key = array_search($single, $singlesArr);
+        $nextKey = $key + 1;
+        if(!isset($singlesArr[$nextKey])){
+            $nextKey = 0;
+        }
+
+        return $singlesArr[$nextKey];
     }
 
 
