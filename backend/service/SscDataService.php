@@ -2580,11 +2580,11 @@ class SscDataService extends BaseService {
                     return $i;
                 }
             }
-            $qs = $i - 1;
         }else{
             $where = ['AND', ['=', 'plan_id', $plan_id], ['<', 'profits', 0]];
             $qs = BettingRecords::find()->where($where)->asArray()->orderBy(['id'=>SORT_DESC])->count('id');
         }
+        $qs = $i - 1;
 
         return $qs;
     }
