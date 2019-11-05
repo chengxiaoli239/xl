@@ -1965,7 +1965,7 @@ class StaticService extends BaseService {
                $time4 = microtime(true);
 
                # 四字现带双组合，如:123，包含1123、1223、1233
-               $rst[$lottery_type]['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
+               $rst[$lottery_type]['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type); # 70s
                $time5 = microtime(true);
 
                StaticService::afterOpStatic($lottery_type, 'opAllCodeTypeYl');
