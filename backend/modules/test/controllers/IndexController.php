@@ -108,6 +108,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5);p($rst); # 70s
         $rst = SscDataService::insertCode($type = 5);p($rst); # 插入三字现、四字现
         $rst = SscDataService::insertCodeType();p($rst);
         $rst = SscDataService::getPlanNextSingle(3, 0.4);p($rst);

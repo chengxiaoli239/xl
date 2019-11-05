@@ -829,7 +829,9 @@ class SscDataService extends BaseService {
                 $SscStaticYl->type_4ds = (int)$dsData['type_4ds'];
                 $SscStaticYl->type_log = (int)$dsData['type_log'];
                 $SscStaticYl->codes_hz = $dsData['codes_hz'];
+                $n = 1;
             }
+            $SscStaticYl->count = $count;
             $SscStaticYl->static_nums = $dsData['static_nums'];
             //$vals = explode(',', $dsData['val']); //p([$dsData, $count]);
             $SscStaticYl->updated_at = $now_time;
@@ -850,14 +852,14 @@ class SscDataService extends BaseService {
             $SscStaticYl->theory_nums_perdate = (string)$nums; # 理论次数/天
 
             $flag = strpos($SscKjData->$field, $dsData['val']) !== false; # 匹配则说明中奖
-            if($flag){ # 中奖才更新的字段
+            if($flag OR $n == 1){ # 中奖才更新的字段
                 $SscStaticYl->last_time_miss = $miss['last_times']; // 2、上次遗漏
                 $SscStaticYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
-                $SscStaticYl->val = $dsData['val'];
                 # 今日出现次数
                 $today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', $tDate]]);
                 $today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($today_nums_where)->asArray()->all()[0]['nums'];
                 $SscStaticYl->today_nums = $today_nums;
+                $SscStaticYl->val = $dsData['val'];
             }
             # 昨日出现次数
             $ytd_nums = self::getCodeTypeYtdNums($field, $dsData['val'], $lottery_type, $yDate);
