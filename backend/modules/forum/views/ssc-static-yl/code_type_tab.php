@@ -18,7 +18,7 @@ use yii\helpers\Html;
 </div>
 ||
 <div class="btn-group">
-    <?= Html::a('四现带双三字', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>502, 'SscStaticYl[type]'=>5, 'SscStaticYl[type_2]'=>1], ['class' => 'btn '.($code_type == 502 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+    <?= Html::a('四现带双三字', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>502, 'SscStaticYl[type]'=>5, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[is_hots]'=>1], ['class' => 'btn '.($code_type == 502 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
 </div>
 <div class="btn-group">
     <?= Html::a('四现带双', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>5, 'SscStaticYl[type]'=>4, 'SscStaticYl[type_2]'=>1,'SscStaticYl[type_22]'=>0, 'SscStaticYl[type_3]'=>0], ['class' => 'btn '.($code_type == 5 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
