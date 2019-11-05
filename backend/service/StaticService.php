@@ -1964,10 +1964,15 @@ class StaticService extends BaseService {
                $rst[$lottery_type]['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
                $time4 = microtime(true);
 
+               # 四字现带双组合，如:123，包含1123、1223、1233
+               $rst[$lottery_type]['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
+               $time5 = microtime(true);
+
                StaticService::afterOpStatic($lottery_type, 'opAllCodeTypeYl');
                $rst['data'][$lottery_type]['consume_time1'] = $time2 - $time1;
                $rst['data'][$lottery_type]['consume_time2'] = $time3 - $time2;
                $rst['data'][$lottery_type]['consume_time3'] = $time4 - $time3;
+               $rst['data'][$lottery_type]['consume_time4'] = $time5 - $time4;
                $rst['data'][$lottery_type]['msg'] = $msg;
                Tool_Common::log('opAllCodeTypeYl', 'INFO', '号码类型遗漏更新', $rst);
            }else{

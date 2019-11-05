@@ -108,10 +108,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::insertCode($type = 5);p($rst); # 插入三字现、四字现
+        $rst = SscDataService::insertCodeType();p($rst);
         $rst = SscDataService::getPlanNextSingle(3, 0.4);p($rst);
         $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);p($data);
         $qs = SscDataService::getLossQs(22);p($qs);
-        p(count($arr));
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);p($rst);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
         $rst = StaticService::staticHzPerDateProfits('2019-10-31', $lottery_type = 5); p($rst);
@@ -120,7 +121,6 @@ class IndexController extends Controller
         $rst = NumService::delByValue(['1', 'X', '3', 'X'], 'X');p($rst);
         $rst = BetService::isCanBet($lottery_type = 5);p($rst);
         $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);p($rst);
-        $rst = SscDataService::insertCodeType();p($rst);
         $rst = KjDataGet::updateNullCode();p($rst);
         $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 6);p($rst); # 号码类型遗漏
         $rst = StaticService::opAllCodeTypeYl();p($rst);
@@ -137,7 +137,6 @@ class IndexController extends Controller
         $miss = SscDataService::getCodeTypeYlHistoryMiss('555', $lottery_type = 5, 20000);p($miss);
         $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst); # 号码类型遗漏
         $miss = SscDataService::getSdHzYlHistoryMiss([26], $lottery_type = 6, 20000);p($miss);
-        $miss = SscDataService::getCodeTypeYlHistoryMiss('6699', $lottery_type = 5, 50000, 0);p($miss);
         $rst = SscDataService::getLastIndexId(6);p($rst);
         $rst = LuckyBaseService::synBalance($tz_system_users_id = 16); p($rst);# 同步余额
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 8);p($rst);
@@ -182,7 +181,6 @@ class IndexController extends Controller
         $miss = SscDataService::getSdHzYlHistoryMiss([4], $lottery_type = 6, 40000);p($miss);
         $rst = NumService::getCodesKuaiXuan(['type_4'=>0, 'type_2'=>1, 'type_4d'=>1]);p($rst);
 
-        $rst = SscDataService::insertCode($type = 4);p($rst); # 插入三字现、四字现
 
         $rst = NineNineBaseService::getRemoteHzRecords($uid = 11, $tz_system_id = 2, $lottery_type = 5);p($rst);
         $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type = 6); p($rst);# 单双利润统计(month)

@@ -796,7 +796,7 @@ class SscDataService extends BaseService {
      * @return array|bool
      */
     public static function updateCodeTypeYLs($type, $lottery_type = DEFAULT_LOTTERY_TYPE){
-        if(!in_array($type, [3, 4])) return false;
+        if(!in_array($type, [3, 4, 5])) return false;
         $rst = [];
         $SscStaticVals = self::getSscStaticVal($type);
 
@@ -833,7 +833,7 @@ class SscDataService extends BaseService {
             $SscStaticYl->static_nums = $dsData['static_nums'];
             //$vals = explode(',', $dsData['val']); //p([$dsData, $count]);
             $SscStaticYl->updated_at = $now_time;
-            $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums']);
+            $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums'], $type);
 
             //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
             $SscStaticYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
@@ -1195,7 +1195,7 @@ class SscDataService extends BaseService {
      * @param $recently 多少期内，默认为
      * @return array
      */
-    public static function getCodeTypeYlHistoryMiss($value, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 2000, $isCache = 1){
+    public static function getCodeTypeYlHistoryMiss($value, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 2000, $type = 4, $isCache = 1){
         $m = \Yii::$app->cache;
         //$SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->orderBy('id DESC')->limit(1)->one();
         $SscKjDatas = self::getTabLastKjData($lottery_type);
@@ -1217,6 +1217,10 @@ class SscDataService extends BaseService {
         $min_id = $last_index_id - $recently;
         //p([$value, $recently, $min_id]);
         $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'index_id', $min_id], ['LIKE', $field, $value]];
+        if($type == 5){
+            # 四字现双重 如：123，包括：1123、1223、1233
+            $where = array_merge($where, [['=', 'type_2', 1]]);
+        }
         $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->where($where)->orderBy('id DESC')->asArray()->all();
         //p([$where, $SscKjDatas]);
         if(count($SscKjDatas)>1){
@@ -2032,6 +2036,10 @@ class SscDataService extends BaseService {
                 $codes = array_merge($codes, BaseNumService::getRepeat4Codes3()); # 四字现三重
                 $codes = array_merge($codes, BaseNumService::getRepeat4Codes22()); # 四字现双双重
                 break;
+            case 5:
+                $codes = ThreeNum::find()->asArray()->all();
+                $codes = yii\helpers\ArrayHelper::getColumn($codes, 'code');
+                break;
         }
         foreach ($codes as $code){
             $where = ['val'=>$code, 'type'=>$type];
@@ -2077,11 +2085,25 @@ class SscDataService extends BaseService {
                     'type_4ds' => in_array($ds, [1,2]) ? 1 : 0,
                     'type_log' => CommonService::isCodeTypeLog($code_str),
                 ]);
+            }elseif ( $type == 5 ){
+                # 带双四字现三码，如：123，包含1123、1223、1233
+                $code_str = $code[0].','.$code[1].','.$code[2].','.$code[0];
+                $ds = CommonService::isCodeType4ds($code_str); # 是否四单双：0非四单四双1四单2四双
+                $setData = array_merge($setData, [
+                    'codes_hz' => $code[0] + $code[1] + $code[2] + $code[3],
+                    'static_nums' => 6000,
+                    'type_2' => 1,
+                    'type_2b' => CommonService::isCodeType2b($code_str),
+                    'type_3b' => CommonService::isCodeType3b($code_str),
+                    'type_4d' => $ds == 1 ? 1 : 0,
+                    'type_4s' => $ds == 2 ? 1 : 0,
+                    'type_4ds' => in_array($ds, [1,2]) ? 1 : 0,
+                    'type_log' => CommonService::isCodeTypeLog($code_str),
+                ]);
 
             }
 
             $SscStaticVal->setAttributes($setData);
-            //p($SscStaticVal->attributes);
             $SscStaticVal->save();
 
         }
