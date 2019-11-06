@@ -141,6 +141,8 @@ abstract class BetService extends BaseBetService {
      * @desc 用户投注基本入口
      */
     public static function bet(){
+        $tzStatus = SystemConfig::findOne(['key'=>'tz_status'])->value;
+        if(!$tzStatus) return ['status'=>300, 'msg'=>'投注开关未开启'];
         $lottery_types = StaticService::getLotteryTypes();
         foreach ($lottery_types as $lottery_type) {
             $qihao = HN0898Service::getQihao($lottery_type);
@@ -167,7 +169,7 @@ abstract class BetService extends BaseBetService {
             }
         }
         $count = count($plans);
-        $logArr = ['tzRst'=>$tzRst, 'msg'=>$count == 0 ? '无投注计划' : $count.'条计划', 'datas'=>$datas];
+        $logArr = ['tzRst'=>$tzRst, 'qihao'=>$qihao, 'msg'=>$count == 0 ? '无投注计划' : $count.'条计划', 'datas'=>$datas];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','用户真实投注', $logArr);
 
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];

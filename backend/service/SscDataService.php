@@ -2560,7 +2560,6 @@ class SscDataService extends BaseService {
                 $UserSysPlan->status = 0;
             }
             $UserSysPlan->current_profits = $profits;
-
             $saveFlag = $UserSysPlan->save();
 
             $logArr[$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
@@ -2579,24 +2578,32 @@ class SscDataService extends BaseService {
                 $flags[$UserSysPlan->uid] = 1;
             }
         }
-        foreach ($flags as $uid=>$flag){
-            $UserSysPlans = UserSysPlans::findAll(['plan_type'=>2, 'status'=>1, 'uid'=>$uid, 'lottery_type'=>$lottery_type]);
+        p($flags);
 
-            foreach ($UserSysPlans as $UserSysPlan){
-                # 中的计划回0.1
-                $singles = explode('-', $UserSysPlan->singles);
-                if($flag){
-                    $single = $singles[0]; # 0.1
-                }else{
-                    $single = self::getPlanNextSingle($UserSysPlan->id, $UserSysPlan->single);
-                }
-
-                $UserSysPlan->single = $single;
-                $saveFlag = $UserSysPlan->save();
-
-                $logArr[$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
-            }
+        # 获取用户下一期投注倍数
+        $userPlansLossNums = [];
+        $UserSysPlans = UserSysPlans::findAll(['plan_type'=>2, 'status'=>1, 'lottery_type'=>$lottery_type]);
+        foreach ($UserSysPlans as $UserSysPlan){
+            $userPlansLossNums[$UserSysPlan->uid][] = self::getLossQs($UserSysPlan->id);
+            $logArr[$UserSysPlan->id]['userPlansLossNums'] = $userPlansLossNums;
         }
+
+        $UserSysPlans = UserSysPlans::findAll(['plan_type'=>2, 'status'=>1, 'lottery_type'=>$lottery_type]);
+        foreach ($UserSysPlans as $UserSysPlan) {
+            $index = min($userPlansLossNums[$UserSysPlan->uid]);
+            # 更新用户所有启用计划的倍数
+            # 中的计划回0.1
+            $singles = explode('-', $UserSysPlan->singles);
+            if ($flag) {
+                $single = $singles[0]; # 0.1
+            } else {
+                $single = self::getPlanNextSingle($UserSysPlan->id, $UserSysPlan->single);
+            }
+
+            $UserSysPlan->single = $single;
+            $saveFlag = $UserSysPlan->save();
+        }
+
         $logArr['flags'] = $flags;
         Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', $logArr);
 
@@ -2609,10 +2616,9 @@ class SscDataService extends BaseService {
      * @return int
      */
     public static function getLossQs($plan_id){
-        $qs = 0;
         $where = ['AND', ['=', 'plan_id', $plan_id]];
+        $i = 0;
         if($BettingRecords = BettingRecords::find()->where($where)->asArray()->orderBy(['id'=>SORT_DESC])->all()){
-            $i = 0;
             foreach ($BettingRecords as $BettingRecord){
                 if($BettingRecord['profits']<0){
                     $i = $i + 1;
@@ -2620,15 +2626,17 @@ class SscDataService extends BaseService {
                     return $i;
                 }
             }
-        }else{
-            $where = ['AND', ['=', 'plan_id', $plan_id], ['<', 'profits', 0]];
-            $qs = BettingRecords::find()->where($where)->asArray()->orderBy(['id'=>SORT_DESC])->count('id');
         }
-        $qs = $i - 1;
 
-        return $qs;
+        return $i;
     }
 
+    /**
+     * @desc 获取计划下一个倍数
+     * @param $plan_id
+     * @param $single
+     * @return mixed
+     */
     public static function getPlanNextSingle($plan_id, $single){
         $UserSysPlans = UserSysPlans::findOne($plan_id);
 
