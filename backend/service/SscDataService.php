@@ -2580,7 +2580,7 @@ class SscDataService extends BaseService {
                 if($BettingRecords->profits>0){
                     $flags[$UserSysPlan->uid] = 1;
                 }
-                $userPlansLossNums[$UserSysPlan->uid][] = self::getLossQs($UserSysPlan->id);
+                $userPlansLossNums[$UserSysPlan->uid][$UserSysPlan->id] = self::getLossQs($UserSysPlan->id);
             }
             $logArr['plan_2_3']['userPlansLossNums'] = $userPlansLossNums;
 
@@ -2594,9 +2594,12 @@ class SscDataService extends BaseService {
                     if($flags[$uid] == 1){
                         $single = $singles[0];
                     }else{
+                        $single = self::getPlanNextSingle($UserSysPlan->id, $UserSysPlan->single);
+                        /*
                         $single0 = $singles[$userPlansLossNum[0] % $count];
                         $single1 = $singles[$userPlansLossNum[1] % $count];
                         $single = min([$single0, $single1]);
+                        */
                     }
                     $whereUpdate = ['AND', ['=', 'lottery_type', $UserSysPlan->lottery_type], ['=', 'uid', $UserSysPlan->uid], ['=', 'plan_type', $UserSysPlan->plan_type], ['=', 'status', 1]];
                     $rst = UserSysPlans::updateAll(['single'=>$single], $whereUpdate);
@@ -2641,18 +2644,26 @@ class SscDataService extends BaseService {
      * @return mixed
      */
     public static function getPlanNextSingle($plan_id, $single){
+        $m = \Yii::$app->cache;
         $UserSysPlans = UserSysPlans::findOne($plan_id);
+        $qihao = HN0898Service::getQihao($UserSysPlans->lottery_type);
+        $mkey = 'getPlanNextSingle_'.$plan_id.'_'.$qihao;
 
-        $singles = $UserSysPlans->singles;
-        $singlesArr = explode(',', str_replace('-', ',', $singles));
+        if(!$nextSingle = $m->get($mkey)){
+            $singles = $UserSysPlans->singles;
+            $singlesArr = explode(',', str_replace('-', ',', $singles));
 
-        $key = array_search($single, $singlesArr);
-        $nextKey = $key + 1;
-        if(!isset($singlesArr[$nextKey])){
-            $nextKey = 0;
+            $key = array_search($single, $singlesArr);
+            $nextKey = $key + 1;
+            if(!isset($singlesArr[$nextKey])){
+                $nextKey = 0;
+            }
+
+            $nextSingle = $singlesArr[$nextKey];
+            $m->set($mkey, 10*3600);
         }
 
-        return $singlesArr[$nextKey];
+        return $nextSingle;
     }
 
 
