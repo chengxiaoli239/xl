@@ -2660,7 +2660,7 @@ class SscDataService extends BaseService {
             }
 
             $nextSingle = $singlesArr[$nextKey];
-            $m->set($mkey, 10*3600);
+            $m->set($mkey, $nextSingle,10*3600);
         }
 
         return $nextSingle;
