@@ -2596,11 +2596,12 @@ class SscDataService extends BaseService {
                 $UserSysPlans = UserSysPlans::find()->where($where)->one();
                 # 中的计划回0.1
                 $singles = explode('-', $UserSysPlans->singles);
+                $count = count($singles);
                 if($flags[$uid] == 1){
                     $single = $singles[0];
                 }else{
-                    $single0 = $singles[$userPlansLossNum[0]] ? $singles[$userPlansLossNum[0]] : $singles[0];
-                    $single1 = $singles[$userPlansLossNum[1]] ? $singles[$userPlansLossNum[1]] : $singles[0];
+                    $single0 = $singles[$userPlansLossNum[0] % $count];
+                    $single1 = $singles[$userPlansLossNum[1] % $count];
                     $single = min([$single0, $single1]);
                 }
                 $rst = UserSysPlans::updateAll(['single'=>$single], $where);

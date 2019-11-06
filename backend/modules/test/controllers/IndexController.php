@@ -108,6 +108,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        p(11%5);
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);p($rst);
         $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5);p($rst); # 70s
         $rst = SscDataService::insertCode($type = 5);p($rst); # 插入三字现、四字现
