@@ -2580,32 +2580,29 @@ class SscDataService extends BaseService {
                 if($BettingRecords->profits>0){
                     $flags[$UserSysPlan->uid] = 1;
                 }
-            }
-
-            # 获取用户下一期投注倍数
-            $userPlansLossNums = [];
-            $UserSysPlans = UserSysPlans::findAll(['plan_type'=>2, 'status'=>1, 'lottery_type'=>$lottery_type]);
-            foreach ($UserSysPlans as $UserSysPlan){
                 $userPlansLossNums[$UserSysPlan->uid][] = self::getLossQs($UserSysPlan->id);
-                $logArr['plan_2_3'][$UserSysPlan->id]['userPlansLossNums'] = $userPlansLossNums;
             }
+            $logArr['plan_2_3']['userPlansLossNums'] = $userPlansLossNums;
 
-            //p([$flags, $userPlansLossNums],0);
             foreach ($userPlansLossNums as $uid=>$userPlansLossNum){
-                $where = ['plan_type'=>2, 'uid'=>$uid, 'status'=>1, 'lottery_type'=>$lottery_type];
-                $UserSysPlans = UserSysPlans::find()->where($where)->one();
-                # 中的计划回0.1
-                $singles = explode('-', $UserSysPlans->singles);
-                $count = count($singles);
-                if($flags[$uid] == 1){
-                    $single = $singles[0];
-                }else{
-                    $single0 = $singles[$userPlansLossNum[0] % $count];
-                    $single1 = $singles[$userPlansLossNum[1] % $count];
-                    $single = min([$single0, $single1]);
+                //$where = ['plan_type'=>2, 'uid'=>$uid, 'status'=>1, 'lottery_type'=>$lottery_type];
+                $UserSysPlans = UserSysPlans::find()->where($where)->all();
+                foreach ($UserSysPlans as $UserSysPlan){
+                    # 中的计划回0.1
+                    $singles = explode('-', $UserSysPlan->singles);
+                    $count = count($singles);
+                    if($flags[$uid] == 1){
+                        $single = $singles[0];
+                    }else{
+                        $single0 = $singles[$userPlansLossNum[0] % $count];
+                        $single1 = $singles[$userPlansLossNum[1] % $count];
+                        $single = min([$single0, $single1]);
+                    }
+                    $whereUpdate = ['AND', ['=', 'lottery_type', $UserSysPlan->lottery_type], ['=', 'uid', $UserSysPlan->uid], ['=', 'plan_type', $UserSysPlan->plan_type], ['=', 'status', 1]];
+                    $rst = UserSysPlans::updateAll(['single'=>$single], $whereUpdate);
                 }
-                $rst = UserSysPlans::updateAll(['single'=>$single], $where);
-                $logArr['plan_2_3']['updatesingles'][] = $rst;
+                $updateSingles = ['uid'=>$uid, 'userPlansLossNum'=>$userPlansLossNum, 'single'=>$single, 'countSingles'=>$count, 'singles'=>$singles, 'rst'=>$rst];
+                $logArr['plan_2_3']['updateSingles'][] = $updateSingles;
 
             }
         }

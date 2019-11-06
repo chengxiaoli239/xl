@@ -108,14 +108,14 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        p(11%5);
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);p($rst);
+        p(3%5);
+        $qs = SscDataService::getLossQs(3);p($qs);
         $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5);p($rst); # 70s
         $rst = SscDataService::insertCode($type = 5);p($rst); # 插入三字现、四字现
         $rst = SscDataService::insertCodeType();p($rst);
         $rst = SscDataService::getPlanNextSingle(3, 0.4);p($rst);
         $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);p($data);
-        $qs = SscDataService::getLossQs(22);p($qs);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
         $rst = StaticService::staticHzPerDateProfits('2019-10-31', $lottery_type = 5); p($rst);
         $rst = SscDataService::insertCodeType2();p($rst);
