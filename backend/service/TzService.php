@@ -438,14 +438,16 @@ class TzService extends BaseService {
      * @desc 获取投注系统 getTzPlanTypes
      * @return mixed
      */
-    public static function getTzPlanTypes($admin_id = ''){
+    public static function getTzPlanTypes($type = ''){
 
         $datas = [
             # 计划类型:0正常1止盈止损计划
             0=>'正常',
             1=>'止盈止损',
-            2=>'翻倍',
+            2=>'倍投',
+            3=>'倍投&止盈止损',
         ];
+        if(isset($datas[$type])) return $datas[$type];
 
         return $datas;
     }

@@ -95,13 +95,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         ['attribute' => 'plan_type','label'=>'计划类型',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                if($model->plan_type == 1){
-                                    $txt = '止盈止损';
-                                }elseif($model->plan_type == 2){
-                                    $txt = '倍投';
-                                }else{
-                                    $txt = '普通';
-                                }
+                                $txt = \backend\service\TzService::getTzPlanTypes($model->plan_type);
                                 return $txt;
                             }
                         ],

@@ -2552,62 +2552,67 @@ class SscDataService extends BaseService {
     public static function opProfitsPlans($lottery_type = DEFAULT_LOTTERY_TYPE){
         $rst = ['status'=>200, 'msg'=>'处理成功'];
 
-        # 止盈止损
-        $UserSysPlans = UserSysPlans::findAll(['plan_type'=>1, 'status'=>1, 'lottery_type'=>$lottery_type]);
-        foreach ($UserSysPlans as $UserSysPlan){
-            $profits = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id, 'is_profits_record'=>1])->sum('profits');
-            if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
-                $UserSysPlan->status = 0;
-            }
-            $UserSysPlan->current_profits = $profits;
-            $saveFlag = $UserSysPlan->save();
+        # 止盈止损、翻倍止盈止损 计划
+        $where = ['AND', ['IN', 'plan_type', [1, 3]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+        if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+            foreach ($UserSysPlans as $UserSysPlan){
+                $profits = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id, 'is_profits_record'=>1])->sum('profits');
+                if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
+                    $UserSysPlan->status = 0;
+                }
+                $UserSysPlan->current_profits = $profits;
+                $saveFlag = $UserSysPlan->save();
 
-            $logArr[$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
+                $logArr['plan_1_3'][$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
+            }
         }
 
         $flags = [];
-        # 倍投 连续x期不中 决定倍数
-        $UserSysPlans = UserSysPlans::findAll(['plan_type'=>2, 'status'=>1, 'lottery_type'=>$lottery_type]);
-        foreach ($UserSysPlans as $UserSysPlan){
-            if(!isset($flags[$UserSysPlan->uid])){
-                $flags[$UserSysPlan->uid] = 0;
-            }
-            # 中的计划回0.1、不中的计划翻倍
-            $BettingRecords = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id])->orderBy(['id'=>SORT_DESC])->one();
-            if($BettingRecords->profits>0){
-                $flags[$UserSysPlan->uid] = 1;
-            }
-        }
-        p($flags);
-
-        # 获取用户下一期投注倍数
-        $userPlansLossNums = [];
-        $UserSysPlans = UserSysPlans::findAll(['plan_type'=>2, 'status'=>1, 'lottery_type'=>$lottery_type]);
-        foreach ($UserSysPlans as $UserSysPlan){
-            $userPlansLossNums[$UserSysPlan->uid][] = self::getLossQs($UserSysPlan->id);
-            $logArr[$UserSysPlan->id]['userPlansLossNums'] = $userPlansLossNums;
-        }
-
-        $UserSysPlans = UserSysPlans::findAll(['plan_type'=>2, 'status'=>1, 'lottery_type'=>$lottery_type]);
-        foreach ($UserSysPlans as $UserSysPlan) {
-            $index = min($userPlansLossNums[$UserSysPlan->uid]);
-            # 更新用户所有启用计划的倍数
-            # 中的计划回0.1
-            $singles = explode('-', $UserSysPlan->singles);
-            if ($flag) {
-                $single = $singles[0]; # 0.1
-            } else {
-                $single = self::getPlanNextSingle($UserSysPlan->id, $UserSysPlan->single);
+        # 翻倍计划、翻倍止盈止损，倍投 连续x期不中 决定倍数
+        $where = ['AND', ['IN', 'plan_type', [2, 3]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+        if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+            foreach ($UserSysPlans as $UserSysPlan){
+                if(!isset($flags[$UserSysPlan->uid])){
+                    $flags[$UserSysPlan->uid] = 0;
+                }
+                # 中的计划回0.1、不中的计划翻倍
+                $BettingRecords = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id])->orderBy(['id'=>SORT_DESC])->one();
+                if($BettingRecords->profits>0){
+                    $flags[$UserSysPlan->uid] = 1;
+                }
             }
 
-            $UserSysPlan->single = $single;
-            $saveFlag = $UserSysPlan->save();
+            # 获取用户下一期投注倍数
+            $userPlansLossNums = [];
+            $UserSysPlans = UserSysPlans::findAll(['plan_type'=>2, 'status'=>1, 'lottery_type'=>$lottery_type]);
+            foreach ($UserSysPlans as $UserSysPlan){
+                $userPlansLossNums[$UserSysPlan->uid][] = self::getLossQs($UserSysPlan->id);
+                $logArr['plan_2_3'][$UserSysPlan->id]['userPlansLossNums'] = $userPlansLossNums;
+            }
+
+            //p([$flags, $userPlansLossNums],0);
+            foreach ($userPlansLossNums as $uid=>$userPlansLossNum){
+                $where = ['plan_type'=>2, 'uid'=>$uid, 'status'=>1, 'lottery_type'=>$lottery_type];
+                $UserSysPlans = UserSysPlans::find()->where($where)->one();
+                # 中的计划回0.1
+                $singles = explode('-', $UserSysPlans->singles);
+                if($flags[$uid] == 1){
+                    $single = $singles[0];
+                }else{
+                    $single0 = $singles[$userPlansLossNum[0]] ? $singles[$userPlansLossNum[0]] : $singles[0];
+                    $single1 = $singles[$userPlansLossNum[1]] ? $singles[$userPlansLossNum[1]] : $singles[0];
+                    $single = min([$single0, $single1]);
+                }
+                $rst = UserSysPlans::updateAll(['single'=>$single], $where);
+                $logArr['plan_2_3']['updatesingles'][] = $rst;
+
+            }
         }
 
         $logArr['flags'] = $flags;
         Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', $logArr);
 
-        return $rst;
+        return $logArr;
     }
 
 
