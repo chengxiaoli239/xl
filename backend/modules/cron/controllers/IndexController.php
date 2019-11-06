@@ -60,14 +60,9 @@ class IndexController extends Controller
      */
     public function actionGrabKjDataOne(){
         self::_init();
-        $date_time = date('H:i');
-        if('03:30' < $date_time && $date_time < '07:10'){
-            $rst = ['status'=>300, 'msg'=>'自动化投注时间关闭[03:10~07:10]'];
-        }else{
-            for ($i = 1; $i<5; $i++) {
-                $rst['kj'] = KjDataGet::grabOne();
-                sleep(5);
-            }
+        for ($i = 1; $i<5; $i++) {
+            $rst['kj'] = KjDataGet::grabOne();
+            sleep(5);
         }
 
         return $rst;

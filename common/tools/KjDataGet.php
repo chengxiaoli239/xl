@@ -100,77 +100,95 @@ class KjDataGet
     public static function grabOne(){
         $msg = ['status'=>200, 'msg'=>'操作成功~'];
 
-        $m = \Yii::$app->cache;
-        $KjConfigs = KjConfig::findAll(['enable'=>1]);
-        foreach ($KjConfigs as $kjConfig){
-            $lottery_type = $kjConfig->lottery_type;
-            //if($lottery_type != 8) continue; # 测试
-            $url = $kjConfig->host.$kjConfig->path;
-            if(!$data = CurlService::httpGet($url)) continue;
-            if($kjConfig->is_batch == 1){
-                $kjDatas = $data;
-                if($kjDatas){
-                    $mkey = 'KJ_LOG_KEY_BATCH_1_'.$kjConfig->lottery_type;
-                    if(in_array($kjConfig->lottery_type, [6, 8])){ # xjssc
-                        $kjDatas = array_reverse($kjDatas);
-                        foreach ($kjDatas as $key=>$dataInfo){
-                            $rst = KjDataGet::insertKjData($dataInfo['expect'], $kjConfig->lottery_type, $dataInfo['opencode']);
-                        }
-                    }elseif($kjConfig->lottery_type == 2){ # qxc
-                        foreach ($kjDatas as $key=>$dataInfo){
-                            $rst = KjDataGet::insertQxcKjData($dataInfo['qihao'], $dataInfo['codes'], $dataInfo['date']);
-                        }
-                    }
-                }
-                $cache_time = 10;
-                $logArr = ['data'=>$data, 'rst'=>$rst];
-            }else{
-                $mkey = 'KJ_LOG_KEY_BATCH_0_'.$kjConfig->lottery_type;
-                $kjData = isset($data['opencode']) ? $data['opencode'] : [];
-                if($kjData){
-                    if($kjConfig->lottery_type != 99){
-                        if($kjConfig->lottery_type == 5){
-                            $qihao = substr($data['expect'],2,6).substr($data['expect'],9,3);
-                        }else{
-                            $qihao = $data['expect'];
-                        }
-                        # ssc
-                        $msg = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData);
-                        //if($kjConfig->lottery_type ==2) p([$qihao, $kjConfig->lottery_type, $kjData, $msg]);
-                        $cache_time = 10;
-                    }elseif($kjConfig->lottery_type == 99){
-                        $qihao = $data['expect'];
-                        $date = date('Y-m-d',$data['opentime']);
-                        # qxc
-                        //p($kjConfig);
-                        $msg = KjDataGet::insertQxcKjData($qihao, $kjData, $date);
-                        $cache_time = 30*60;
-                    }
-                }
-                $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, /*'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$msg,*/ 'lottery'=>CqsscKcw::$lotteryNameArr[$kjConfig->lottery_type]];
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
-            }
-            $mkey_qihao = 'KJ_LOG_QIHAO_'.$kjConfig->lottery_type.'_'.$qihao;
-            //if(!$m->get($mkey) OR ($kjConfig->lottery_type == 1 && !$m->get($mkey_qihao))){
-            if(!$m->get($mkey_qihao) ){
-                $logArr['url'] = $url;
-                $logArr['mkey_qihao'] = $mkey_qihao;
-                $logArr['qihao'] = $qihao;
-                $logArr['mkey'] = $mkey;
-                $logArr['lottery_type'] = $lottery_type;
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
-                $m->set($mkey, 1, $cache_time);
-                $m->set($mkey_qihao, 1, $cache_time);
-            }
-        }
         $lottery_types = StaticService::getLotteryTypes();
-        foreach ($lottery_types as $lottery_type) {
+        $m = \Yii::$app->cache;
+        foreach ($lottery_types as $lottery_type){
+            $status = self::isCanGrab($lottery_type);
+            if(!$status) continue;
+            $KjConfigs = KjConfig::findAll(['enable'=>1, 'lottery_type'=>$lottery_type]);
+            foreach ($KjConfigs as $kjConfig){
+                $lottery_type = $kjConfig->lottery_type;
+                //if($lottery_type != 8) continue; # 测试
+                $url = $kjConfig->host.$kjConfig->path;
+                if(!$data = CurlService::httpGet($url)) continue;
+                if($kjConfig->is_batch == 1){
+                    $kjDatas = $data;
+                    if($kjDatas){
+                        $mkey = 'KJ_LOG_KEY_BATCH_1_'.$kjConfig->lottery_type;
+                        if(in_array($kjConfig->lottery_type, [6, 8])){ # xjssc
+                            $kjDatas = array_reverse($kjDatas);
+                            foreach ($kjDatas as $key=>$dataInfo){
+                                $rst = KjDataGet::insertKjData($dataInfo['expect'], $kjConfig->lottery_type, $dataInfo['opencode']);
+                            }
+                        }elseif($kjConfig->lottery_type == 2){ # qxc
+                            foreach ($kjDatas as $key=>$dataInfo){
+                                $rst = KjDataGet::insertQxcKjData($dataInfo['qihao'], $dataInfo['codes'], $dataInfo['date']);
+                            }
+                        }
+                    }
+                    $cache_time = 10;
+                    $logArr = ['data'=>$data, 'rst'=>$rst];
+                }else{
+                    $mkey = 'KJ_LOG_KEY_BATCH_0_'.$kjConfig->lottery_type;
+                    $kjData = isset($data['opencode']) ? $data['opencode'] : [];
+                    if($kjData){
+                        if($kjConfig->lottery_type != 99){
+                            if($kjConfig->lottery_type == 5){
+                                $qihao = substr($data['expect'],2,6).substr($data['expect'],9,3);
+                            }else{
+                                $qihao = $data['expect'];
+                            }
+                            # ssc
+                            $msg = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData);
+                            //if($kjConfig->lottery_type ==2) p([$qihao, $kjConfig->lottery_type, $kjData, $msg]);
+                            $cache_time = 10;
+                        }elseif($kjConfig->lottery_type == 99){
+                            $qihao = $data['expect'];
+                            $date = date('Y-m-d',$data['opentime']);
+                            # qxc
+                            //p($kjConfig);
+                            $msg = KjDataGet::insertQxcKjData($qihao, $kjData, $date);
+                            $cache_time = 30*60;
+                        }
+                    }
+                    $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, /*'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$msg,*/ 'lottery'=>CqsscKcw::$lotteryNameArr[$kjConfig->lottery_type]];
+                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
+                }
+                $mkey_qihao = 'KJ_LOG_QIHAO_'.$kjConfig->lottery_type.'_'.$qihao;
+                //if(!$m->get($mkey) OR ($kjConfig->lottery_type == 1 && !$m->get($mkey_qihao))){
+                if(!$m->get($mkey_qihao) ){
+                    $logArr['url'] = $url;
+                    $logArr['mkey_qihao'] = $mkey_qihao;
+                    $logArr['qihao'] = $qihao;
+                    $logArr['mkey'] = $mkey;
+                    $logArr['lottery_type'] = $lottery_type;
+                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
+                    $m->set($mkey, 1, $cache_time);
+                    $m->set($mkey_qihao, 1, $cache_time);
+                }
+            }
             /* 处理系统投注计划 add 2019-01-21 */
             KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
             /* 处理系统投注计划 add 2019-01-21 */
         }
 
         return $msg;
+    }
+
+    public static function isCanGrab($lottery_type = DEFAULT_LOTTERY_TYPE) {
+        $rst = true;
+        $date_time = date('H:i');
+        if (in_array($lottery_type, [5, 6])){
+            if ('03:10' < $date_time && $date_time < '07:10') {
+                $rst = false;
+            }
+        }elseif($lottery_type == 8){ # 幸运五星
+            if ('04:10' < $date_time && $date_time < '09:00') {
+                $rst = false;
+            }
+        }
+
+        return $rst;
     }
 
     /**

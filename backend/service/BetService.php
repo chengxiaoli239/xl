@@ -205,6 +205,10 @@ abstract class BetService extends BaseBetService {
             if(\Yii::$app->params['LOTTERY_TYPE_6_STOP_START_TIME'] < $time && $time < \Yii::$app->params['LOTTERY_TYPE_6_STOP_END_TIME']){
                 $status = false;
             }
+        }elseif($lottery_type == 8){ # 幸运五星
+            if('04:00:00' < $time && $time < '09:00:00'){
+                $status = false;
+            }
         }
 
         return $status;
