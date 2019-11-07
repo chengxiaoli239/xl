@@ -115,7 +115,7 @@ class UserSysPlansController extends BaseController
             return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$queryParams['lottery_type']]);
         }
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
-        $plan_types = TzService::getTzPlanTypes($this->_user_id);
+        $plan_types = TzService::getTzPlanTypes();
 
         $model->nums = UserSysPlansService::getDefaultTzNums($tz_type);
         $model->status = $model->status ? 1 : 0;
@@ -186,7 +186,7 @@ class UserSysPlansController extends BaseController
                 }
             }
         }
-        $plan_types = TzService::getTzPlanTypes($this->_user_id);
+        $plan_types = TzService::getTzPlanTypes();
 
         $data =  [
             'model' => $model,
@@ -196,7 +196,6 @@ class UserSysPlansController extends BaseController
             'tz_sites_Arr' => $tz_sites_Arr,
         ];
         $data = array_merge($data, UserSysPlansService::getSysPlansTypeDatas($model->playway, $model->tz_type));
-        //p($model->getErrors());
         //p($data);
 
         return $this->render('update',$data);
