@@ -179,7 +179,7 @@ class KjDataGet
         $rst = true;
         $date_time = date('H:i');
         if (in_array($lottery_type, [5, 6])){
-            if ('03:10' < $date_time && $date_time < '07:10') {
+            if ('04:00' < $date_time && $date_time < '07:10') {
                 $rst = false;
             }
         }elseif($lottery_type == 8){ # 幸运五星
