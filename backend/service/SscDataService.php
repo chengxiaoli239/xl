@@ -2646,8 +2646,9 @@ class SscDataService extends BaseService {
     public static function getPlanNextSingle($plan_id, $single){
         $m = \Yii::$app->cache;
         $UserSysPlans = UserSysPlans::findOne($plan_id);
-        $qihao = HN0898Service::getQihao($UserSysPlans->lottery_type);
-        $mkey = 'getPlanNextSingle_'.$plan_id.'_'.$qihao;
+        //$qihao = HN0898Service::getQihao($UserSysPlans->lottery_type);
+        $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one();
+        $mkey = 'getPlanNextSingle_'.$plan_id.'_'.$BettingRecords->qihao;
 
         if(!$nextSingle = $m->get($mkey)){
             $singles = $UserSysPlans->singles;
