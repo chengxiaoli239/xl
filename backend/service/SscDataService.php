@@ -2661,7 +2661,7 @@ class SscDataService extends BaseService {
                 $nextSingle = $singlesArr[$nextKey];
             }
         }else{
-            $nextSingle = 0.1;
+            $nextSingle = $single;
         }
         $m->set($mkey, $nextSingle,10*3600);
 
