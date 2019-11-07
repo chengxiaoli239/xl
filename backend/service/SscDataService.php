@@ -2611,7 +2611,7 @@ class SscDataService extends BaseService {
         }
 
         $logArr['flags'] = $flags;
-        Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', $logArr);
+        Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', [$logArr]);
 
         return $logArr;
     }
@@ -2646,23 +2646,24 @@ class SscDataService extends BaseService {
     public static function getPlanNextSingle($plan_id, $single){
         $m = \Yii::$app->cache;
         $UserSysPlans = UserSysPlans::findOne($plan_id);
-        //$qihao = HN0898Service::getQihao($UserSysPlans->lottery_type);
-        $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one();
-        $mkey = 'getPlanNextSingle_'.$plan_id.'_'.$BettingRecords->qihao;
+        $singles = $UserSysPlans->singles;
+        $singlesArr = explode(',', str_replace('-', ',', $singles));
+        if($BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one()){
+            $mkey = 'getPlanNextSingle_'.$plan_id.'_'.$BettingRecords->qihao;
+            if(!$nextSingle = $m->get($mkey)){
 
-        if(!$nextSingle = $m->get($mkey)){
-            $singles = $UserSysPlans->singles;
-            $singlesArr = explode(',', str_replace('-', ',', $singles));
+                $key = array_search($single, $singlesArr);
+                $nextKey = $key + 1;
+                if(!isset($singlesArr[$nextKey])){
+                    $nextKey = 0;
+                }
 
-            $key = array_search($single, $singlesArr);
-            $nextKey = $key + 1;
-            if(!isset($singlesArr[$nextKey])){
-                $nextKey = 0;
+                $nextSingle = $singlesArr[$nextKey];
             }
-
-            $nextSingle = $singlesArr[$nextKey];
-            $m->set($mkey, $nextSingle,10*3600);
+        }else{
+            $nextSingle = 0.1;
         }
+        $m->set($mkey, $nextSingle,10*3600);
 
         return $nextSingle;
     }
