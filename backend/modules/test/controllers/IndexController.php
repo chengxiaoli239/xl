@@ -108,6 +108,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);p($rst);
         p(3%5);
         $qs = SscDataService::getLossQs(3);p($qs);
@@ -116,7 +117,6 @@ class IndexController extends Controller
         $rst = SscDataService::insertCodeType();p($rst);
         $rst = SscDataService::getPlanNextSingle(3, 0.4);p($rst);
         $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);p($data);
-        $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
         $rst = StaticService::staticHzPerDateProfits('2019-10-31', $lottery_type = 5); p($rst);
         $rst = SscDataService::insertCodeType2();p($rst);
         $rst = CommonService::isCodeType_2($codes = '3,3,3,X');p($rst);

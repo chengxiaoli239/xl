@@ -908,9 +908,9 @@ class SscDataService extends BaseService {
     public static function getSscStaticVal($type = 3){
         $m = \Yii::$app->cache;
         $mkey = 'getSscStaticVal_'.$type;
-        //if(!$SscStaticVals = $m->get($mkey)){
+        if(!$SscStaticVals = $m->get($mkey)){
             $SscStaticVals = SscStaticVal::find()->where(['type'=>$type, 'status'=>1])->asArray()->all();
-        //}
+        }
 
         $m->set($mkey, $SscStaticVals, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
 
