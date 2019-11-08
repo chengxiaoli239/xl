@@ -2585,7 +2585,7 @@ class SscDataService extends BaseService {
             $logArr['plan_2_3']['userPlansLossNums'] = $userPlansLossNums;
 
             foreach ($userPlansLossNums as $uid=>$userPlansLossNum){
-                //$where = ['plan_type'=>2, 'uid'=>$uid, 'status'=>1, 'lottery_type'=>$lottery_type];
+                $where = ['AND', ['IN', 'plan_type', [2, 3]], ['=', 'uid', $uid], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
                 $UserSysPlans = UserSysPlans::find()->where($where)->all();
                 foreach ($UserSysPlans as $UserSysPlan){
                     # 中的计划回0.1
