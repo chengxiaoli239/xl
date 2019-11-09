@@ -89,16 +89,30 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                                 //return $model->snid;
                             }
                         ],
-                        'single',
-                        /*
+                        ['attribute' => 'current_profits',
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if(in_array($model->plan_type,[1, 3])){
+                                    $txt = '止盈:'.floatval($model->take_profits)." 止损:".floatval($model->stop_loss) .' 当前:'.round($model->current_profits, 2) ;
+                                }else{
+                                    $txt = '无';
+                                }
+                                return $txt;
+                            }
+                        ],
                         ['attribute' => 'tz_type','label'=>'操作', # 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 $url = "/forum/user-sys-plans/tz-now?id=".$model->id; # 立即下注
-                                return Html::a('立即下注', $url, ['title' => '立即下注'.$model->id,'alt'=>$model->id]);
+                                $txt = Html::a('立即下注', $url, ['title' => '立即下注'.$model->id,'alt'=>$model->id]);
+                                if(in_array($model->plan_type,[1, 3])){
+                                    $url1 = "/forum/user-sys-plans/re-calculate-profits?id=".$model->id; # 重新计算盈利
+                                    $txt .= ' | '.Html::a('重算盈利', $url1, ['title' => '重算盈利'.$model->id,'alt'=>$model->id]);
+                                }
+
+                                return $txt;
                             }
                         ],
-                        */
                         //'tz_sites',
                         ['attribute' => 'tz_sites','label'=>'计划投注站点',#'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
@@ -118,14 +132,15 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                             'value' => function($model) {
                                 if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                     $str = \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
-                                    $txt = BaseStringHelper::truncate($str,25);
-                                    $str = Html::a($txt, '#', ['title' => $str,'alt'=>$str]);
-                                }elseif($model->tz_type == 25){
+                                }elseif(in_array($model->tz_type, [25, 28, 29, 30])){
                                     $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
                                 }else{
                                     $str = $model->hz_Arr;
-                                    $txt = BaseStringHelper::truncate($str,25);
-                                    $str = Html::a($txt, '#', ['title' => $str,'alt'=>$str]);
+                                }
+                                $txt = BaseStringHelper::truncate($str,20);
+                                $str = Html::a($txt, '#', ['title' => $str,'alt'=>$str]);
+                                if($model->singles && in_array($model->plan_type,[2, 3])){
+                                    $str .= '翻倍梯度:'.$model->singles;
                                 }
                                 return $str;
                             }
