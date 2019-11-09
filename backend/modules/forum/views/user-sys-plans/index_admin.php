@@ -96,6 +96,7 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                                 //return $model->snid;
                             }
                         ],
+                        'single',
                         ['attribute' => 'current_profits',
                             'format'=>'raw',
                             'value' => function($model) {
