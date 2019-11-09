@@ -45,10 +45,17 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                                     //投注类型:1大小单双三字定2大小三字定3单双三字定
                                     $tz_type_Arr = [1=>'大小单双三字定', 2=>'大小三字定', 3=>'单双三字定'];
                                     $typeName = $tz_type_Arr[$model->tz_type];
-                                }elseif($model->playway == 3 OR in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
+                                }elseif(in_array($model->playway, [1,2,3]) OR in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                     $typeName = \backend\service\BetService::getTypeNameByTzType($model->tz_type);
                                 }
                                 return $typeName;
+                            }
+                        ],
+                        ['attribute' => 'plan_type','label'=>'计划类型',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $txt = \backend\service\TzService::getTzPlanTypes($model->plan_type);
+                                return $txt;
                             }
                         ],
                         //'buy_type',
