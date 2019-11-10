@@ -1125,8 +1125,10 @@ class HN0898Service extends BaseTZService {
                 break;
             case 8:  # 幸运五星彩
                 $time = date("H:i:s", time());
-                if('23:55:00'<$time && $time<='23:59:59'){
+                if('23:55:00'<$time && $time<='23:59:59') {
                     $actionNo = '288';
+                }elseif('00:00:00'<=$time && $time<'00:05:00'){
+                    $actionNo = '001';
                 }else{
                     $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC LIMIT 1";
                     $rst = $db->createCommand($sql)->queryOne();
