@@ -9,7 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $date 日期
- * @property string $codes_1 1(3组)
+ * @property string $codes_1 1
  * @property string $codes_2 2
  * @property string $codes_3 3
  * @property string $codes_4 4
@@ -82,7 +82,7 @@ class StaticPerHzPerdateProfits extends \common\models\base\BaseModel
         return [
             'id' => 'ID',
             'date' => '日期',
-            'codes_1' => '1(3组)',
+            'codes_1' => '1',
             'codes_2' => '2',
             'codes_3' => '3',
             'codes_4' => '4',

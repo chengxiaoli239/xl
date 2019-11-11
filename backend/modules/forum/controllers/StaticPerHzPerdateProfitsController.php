@@ -47,8 +47,8 @@ class StaticPerHzPerdateProfitsController extends BaseController
             $lottery_type = $queryParams['StaticPerHzPerdateProfits']['lottery_type'];
         }
         */
-        $type = $queryParams['StaticPerHzPerdateProfits']['lottery_type'];
-        $type = $type == 2 ? 1 : 2;
+        $type = $queryParams['StaticPerHzPerdateProfits']['type'];
+        $type = ($type == 2) ? 2 : 1;
         $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
         $queryParams['StaticPerHzPerdateProfits']['lottery_type'] = $lottery_type;
 
@@ -56,6 +56,7 @@ class StaticPerHzPerdateProfitsController extends BaseController
         return $this->render('index_'.$type, [
             'lottery_types' => $lottery_types,
             'lottery_type' => $lottery_type,
+            'type' => $type,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
