@@ -15,7 +15,8 @@ $update_time = \backend\models\searchs\StaticPerHzPerdateProfits::find()->select
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title).'[更新时间：'.$update_time.']' ?>
+            <?= Html::encode($this->title);//.'[更新时间：'.$update_time.']' ?>
+            <?php include(dirname(__FILE__).'/index_tab.php'); ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
@@ -25,7 +26,7 @@ $update_time = \backend\models\searchs\StaticPerHzPerdateProfits::find()->select
                     </div>
                 </div-->
 
-                <?php include(dirname(__FILE__).'/index_tab.php'); ?>
+                <?php include(dirname(__FILE__).'/code_type_tab.php'); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
@@ -38,44 +39,44 @@ $update_time = \backend\models\searchs\StaticPerHzPerdateProfits::find()->select
                         'month',
                         //'codes_1',
                         //'codes_2',
-                        'codes_3',
+                        //'codes_3',
                         //'codes_4',
-                        'codes_5',
-                        'codes_6',
-                        'codes_7',
-                        'codes_8',
+                        //'codes_5',
+                        //'codes_6',
+                        //'codes_7',
+                        //'codes_8',
                         //'codes_9',
-                        'codes_10',
-                        'codes_11',
+                        //'codes_10',
+                        //'codes_11',
                         //'codes_12',
-                        'codes_13',
+                        //'codes_13',
                         //'codes_14',
                         //'codes_15',
                         //'codes_16',
-                        'codes_17',
+                        //'codes_17',
                         //'codes_18',
-                        //'codes_19',
+                        'codes_19',
                         'codes_20',
-                        //'codes_21',
+                        'codes_21',
                         'codes_22',
-                        //'codes_23',
-                        //'codes_24',
-                        //'codes_25',
+                        'codes_23',
+                        'codes_24',
+                        'codes_25',
                         'codes_26',
-                        //'codes_27',
+                        'codes_27',
                         'codes_28',
                         'codes_29',
                         'codes_30',
                         'codes_31',
-                        //'codes_32',
+                        'codes_32',
                         'codes_33',
                         'codes_34',
                         'codes_35',
-                        //'codes_36',
+                        'codes_36',
                         //'lottery_type',
                         //'created_at',
                         //'updated_at',
-                        //'update_time',
+                        'update_time',
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
