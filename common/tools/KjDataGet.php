@@ -469,9 +469,10 @@ class KjDataGet
         if($lottery_type == 'qxc'){
             # 未完
         }else{
+            $time = date('H:i:s');
             $nextQihao = $qihao + 1;
             switch ($lottery_type){
-                case 5:
+                case 5: # 重庆
                     $year = '20'.substr($qihao,0,2);
                     $date = '20'.substr($qihao,0,6);
                     $qihao = substr($qihao,6,3);
@@ -484,13 +485,15 @@ class KjDataGet
                         $nextQihao = ltrim(Tools::getNextDate($date),'20').'001';
                     }
                     break;
-                case 6:
+                case 6: # 新疆
                     $minQihao = substr($nextQihao, 8, 2);
                     $date = substr($nextQihao, 0, 4).'-'.substr($nextQihao, 4, 2).'-'.substr($nextQihao, 6, 2).' 00:00:00';
                     if($minQihao == 49){
                         $date = date('Ymd', strtotime($date) + 86400);
                         $nextQihao = $date.'01';
                     }
+                    break;
+                case 8: # 幸运五星彩
                     break;
             }
         }
