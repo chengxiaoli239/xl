@@ -469,7 +469,6 @@ class KjDataGet
         if($lottery_type == 'qxc'){
             # 未完
         }else{
-            $time = date('H:i:s');
             $nextQihao = $qihao + 1;
             switch ($lottery_type){
                 case 5: # 重庆
@@ -494,6 +493,11 @@ class KjDataGet
                     }
                     break;
                 case 8: # 幸运五星彩
+                    if(substr($qihao, -3, 3) >= 288){
+                        $date = substr($qihao, 0, 4).'-'.substr($nextQihao, 4, 2).'-'.substr($nextQihao, 6, 2).' 00:00:00';
+                        $date = date('Ymd', strtotime($date) + 86400);
+                        $nextQihao = $date.'001';
+                    }
                     break;
             }
         }
@@ -531,6 +535,12 @@ class KjDataGet
                 if($minQihao == '00'){
                     $date = date('Ymd', strtotime($date) - 86400);
                     $beforeQihao = $date.'48';
+                }
+            }elseif($lottery_type == 8){  # 幸运五星彩
+                if(substr($qihao, -3, 3) == '001') {
+                    $date = substr($beforeQihao, 0, 4) . '-' . substr($beforeQihao, 4, 2) . '-' . substr($beforeQihao, 6, 2) . ' 00:00:00';
+                    $date = date('Ymd', strtotime($date) - 86400);
+                    $beforeQihao = $date.'288';
                 }
             }else{
                 $beforeQihao = $beforeQihao;

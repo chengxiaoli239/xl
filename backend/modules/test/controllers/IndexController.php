@@ -108,6 +108,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = KjDataGet::getBeforeQihaoByQihao('20191112001',8);p($rst);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);p($rst);
         p(3%5);
@@ -155,7 +156,6 @@ class IndexController extends Controller
             /* 处理系统投注计划 add 2019-01-21 */
         }
         p($rst);
-        $rst = KjDataGet::getNextQihaoByQihao('20191010020',8);p($rst);
         //$str = '{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}'; //p(json_decode($str, true)); d(strpos($str, "\"Status\":1") !== false);
         $rst = SevenService::login(19, 3);p($rst);
         $rst = SevenService::synBalance(5);p($rst);
