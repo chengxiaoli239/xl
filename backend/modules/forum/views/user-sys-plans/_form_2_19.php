@@ -44,6 +44,7 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'nums')->textInput() ?-->
 
+                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:0.1-0.3-0.7-1.5-3.1-6.2-12.5-25.1') ?>
                     <?= $form->field($model, 'plan_type')->radioList($plan_types)->label('计划类型，为"止盈止损"计划时须填以下两项') ?>
                     <?= $form->field($model, 'take_profits')->textInput($plan_types)->label('止盈点(正数，例：3000)') ?>
                     <?= $form->field($model, 'stop_loss')->textInput($plan_types)->label('止损点(正数，例：4000)') ?>
