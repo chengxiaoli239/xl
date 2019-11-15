@@ -49,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'max_miss',
                         //'max_range',
                         'yl_records:ntext',
-                        //'history_max_miss',
+                        'history_max_miss',
                         'codes_hz',
                         'count',
                         //'static_nums',
