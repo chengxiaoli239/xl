@@ -108,6 +108,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = KjDataGet::getBeforeQihaoByQihao('20191112001',8);p($rst);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);p($rst);
@@ -126,7 +127,6 @@ class IndexController extends Controller
         $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);p($rst);
         $rst = KjDataGet::updateNullCode();p($rst);
         $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 6);p($rst); # 号码类型遗漏
-        $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = CommonService::isCodeType3n2b('0,0,5,6');p($rst);
         $rst = CommonService::isCodeType3n2b('1,2,3,4');p($rst); # 三现:双重+兄弟
         $rst = UserSysPlansService::getCodeTypes();p($rst);

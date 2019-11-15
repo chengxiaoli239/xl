@@ -834,7 +834,8 @@ class NumService extends BaseService {
          # 上奖
         //if(isset($codes_hz['arise']) && !empty($codes_hz['arise'])){
         if(isset($codes_hz['arise'])){
-            $codesArr_arise = self::getCodesArise([$codes_hz['arise']], $type = 1, $code_type);
+            $asises = explode(',', $codes_hz['arise']);
+            $codesArr_arise = self::getCodesArise($asises, $type = 1, $code_type);
             if(in_array($code_type, [3,4])){
                 $codesArr = array_intersect($codesArr, $codesArr_arise);
             }else{
