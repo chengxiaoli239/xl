@@ -108,6 +108,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $miss = SscDataService::getSdHzYlHistoryMiss([1,2,3,4,5,6], $lottery_type = 6, 40000);p($miss);
         $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = KjDataGet::getBeforeQihaoByQihao('20191112001',8);p($rst);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
@@ -180,7 +181,6 @@ class IndexController extends Controller
         $rst = SscDataService::update3NumYL($lottery_type = 6);$end_time = time(true); $time_consume = ($end_time-$start_time).'s';p([$rst,$time_consume]);
         $rst[] = StaticService::static4dPerDateProfits($lottery_type = 5);p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst = StaticService::staticSDPerDateProfits(date('Y-m-d'));p($rst);
-        $miss = SscDataService::getSdHzYlHistoryMiss([4], $lottery_type = 6, 40000);p($miss);
         $rst = NumService::getCodesKuaiXuan(['type_4'=>0, 'type_2'=>1, 'type_4d'=>1]);p($rst);
 
 

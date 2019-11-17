@@ -297,6 +297,9 @@ class IndexController extends Controller
         $TzSystemsUsers = TzSystemsUsers::find()->where(['AND',['=', 'status', 1], ['<>', 'ssc_domain', '']])->all();
 
         foreach ($TzSystemsUsers as $TzSystemsUser){
+            if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
+                continue;
+            }
             $tz_system_id = $TzSystemsUser->tz_system_id;
             if(in_array($tz_system_id, [1,2])){
                 # 1、0898投注、2、99彩票网
