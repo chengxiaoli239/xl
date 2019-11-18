@@ -108,7 +108,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $miss = SscDataService::getSdHzYlHistoryMiss([1,2,3,4,5,6], $lottery_type = 6, 40000);p($miss);
+        $miss = SscDataService::getSdHzYlHistoryMiss([34], $lottery_type = 5, 40000);p($miss);
         $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = KjDataGet::getBeforeQihaoByQihao('20191112001',8);p($rst);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
