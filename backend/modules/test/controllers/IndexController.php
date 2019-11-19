@@ -107,7 +107,32 @@ class IndexController extends Controller
         p($datas);
     }
 
+    /**
+     * @desc 测试投注
+     */
+    public function actionTestBet(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $playway = $post['playway'];
+        if(!$codes = $post['codes']){
+            return ['status'=>300, 'msg'=>'投注号码不能为空'];
+        }
+        $single = $post['single'] ? $post['single'] : 0.1;
+        $lottery_type = $post['lottery_type'] ? $post['lottery_type'] : 5;
+
+        $rst = HN0898Service::postBet($uid = 2, $playway, $single, $codes, $lottery_type);
+
+        return $rst;
+    }
+
     public function actionDw(){
+        $codes = '';
+        for($i=0; $i<10; $i++){
+            for($x=0; $x<10; $x++){
+                $codes .= $i.','.$x.',X,X@';
+            }
+        }
+        p(trim($codes, '@'));
         $miss = SscDataService::getSdHzYlHistoryMiss([34], $lottery_type = 5, 40000);p($miss);
         $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = KjDataGet::getBeforeQihaoByQihao('20191112001',8);p($rst);

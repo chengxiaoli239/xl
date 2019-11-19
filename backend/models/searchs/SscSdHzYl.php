@@ -47,6 +47,7 @@ class SscSdHzYl extends SscSdHzYlModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => ['pageSize' => 21],
         ]);
 
         $this->load($params);

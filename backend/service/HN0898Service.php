@@ -469,6 +469,49 @@ class HN0898Service extends BaseTZService {
     }
 
     /**
+     * @desc 手动下单
+     * @param int $uid
+     * @param int $playway
+     * @param array $post_data
+     * @param int $lottery_type
+     */
+    public static function postBet($uid = 2, $playway = 3, $single = 0.1, $codes = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $HN0898Service = new HN0898Service($uid, $tz_system_id = 2);
+        self::__init($uid, $tz_system_id = 2);
+        $qihao = HN0898Service::getQihao($lottery_type);
+        $post_data = [ 'act' => 'postsn', 'playway' => $playway, 'single' => $single, 'qihao' => $qihao, 'code' => $codes, ];
+
+        $TzSystemsUsers = TzSystemsUsers::findOne(['tz_system_id'=>$tz_system_id, 'uid'=>$uid]);
+        //p($TzSystemsUsers);
+        //$headers = array_merge(self::$headers, $header);
+        $urls = self::getTzSiteInfo($tz_system_id = 2, '', $lottery_type);
+        $url = $urls['ORDER_TZ'];
+
+        $headers = [
+            "Accept: */*",
+            "Accept-Encoding: gunzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            'Content-Length: '.strlen(http_build_query($post_data)),
+            "Cookie: ".$TzSystemsUsers->cookie,
+            "Content-Type: application/x-www-form-urlencoded",
+            $TzSystemsUsers->user_agent,
+            "Host: ".$urls['domain'],
+            "Origin: ".$urls['baseUrl'],
+            "Referer:".$urls['ORDER_TZ'],
+            "X-Requested-With: XMLHttpRequest"
+        ];
+
+        //p($logArr);
+
+        $rst = CurlService::postCurl($url, http_build_query($post_data), $headers)[0];
+        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$rst];
+        p($logArr);
+
+        return $rst;
+    }
+
+    /**
      * @description 更新计划表状态
      * @param $id
      * @param $account
