@@ -126,6 +126,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $num = ['1122', '1212', '1221', '2112', '2121', '2211'];
+        $miss = SscDataService::getDsHistoryMiss($num, '1,2,3,4', $lottery_type=5, 5000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+
         $rst = StaticService::opAllCodeTypeYl();p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([34], $lottery_type = 5, 40000);p($miss);
         $codes = '';
