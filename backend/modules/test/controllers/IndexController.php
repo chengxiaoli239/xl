@@ -126,6 +126,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::opAllCodeTypeYl();p($rst);
+        $miss = SscDataService::getSdHzYlHistoryMiss([34], $lottery_type = 5, 40000);p($miss);
         $codes = '';
         for($i=0; $i<10; $i++){
             for($x=0; $x<10; $x++){
@@ -133,8 +135,6 @@ class IndexController extends Controller
             }
         }
         p(trim($codes, '@'));
-        $miss = SscDataService::getSdHzYlHistoryMiss([34], $lottery_type = 5, 40000);p($miss);
-        $rst = StaticService::opAllCodeTypeYl();p($rst);
         $rst = KjDataGet::getBeforeQihaoByQihao('20191112001',8);p($rst);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);p($rst);
