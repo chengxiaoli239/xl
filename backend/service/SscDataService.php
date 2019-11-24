@@ -1266,7 +1266,7 @@ class SscDataService extends BaseService {
             'max_range' => $max_range,   // 近200期内的最大遗漏范围
             'yl_str' => $yl_str,
         ];
-        $m->set($mkey, $rstData, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME'] * 4);
+        $m->set($mkey, $rstData, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
         //p($rstData);
         //if($vals == 'type_2,type_3b')p($rstData);
         return $rstData;
@@ -1282,7 +1282,7 @@ class SscDataService extends BaseService {
         $mkey = 'getTabLastKjData_'.$lottery_type;
         if(!$SscKjDatas = $m->get($mkey)){
             $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'code_3n', 'code_4n', 'qihao', 'kj_code'])->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->limit(1)->asArray()->one();
-            $m->set($mkey, $SscKjDatas, 60);
+            $m->set($mkey, $SscKjDatas, 120);
         }
 
         return $SscKjDatas;

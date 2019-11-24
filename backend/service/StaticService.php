@@ -2308,5 +2308,24 @@ $sql .= '
         return $sql;
     }
 
+    /**
+     * @desc 四定三现带双统计
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function getStaticCodeType2($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $threeNums = ThreeNum::find()->asArray()->all();
+
+        $codes = ArrayHelper::getColumn($threeNums, 'code');
+        $staticDatas = [];
+        foreach ($codes as $code){
+            $where = ['AND', ['LIKE', 'code_3n', $code], ['=', 'type_2', 1], ['=', 'lottery_type', $lottery_type]];
+            $count = SscKjData::find()->where($where)->count('id');
+            $staticDatas[$code] = $count;
+        }
+        arsort($staticDatas);
+        return $staticDatas;
+    }
+
 
 }
