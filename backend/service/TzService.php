@@ -259,7 +259,7 @@ class TzService extends BaseService {
         //$rst20 = $m->set($simulate_pkey,1,$time);
         # 计划任务是否处理完成后锁住(value:1)，避免重复处理 end
 
-        $logData = [['pkey'=>$pkey,'rst10'=>$rst10, ''=>$time 'rst11'=>$rst11], ['next_key'=>$next_mkey, 'next_time'=>$next_time, 'rst20'=>$rst20, 'rst21'=>$rst21]];
+        $logData = [['pkey'=>$pkey,'rst10'=>$rst10, ''=>$time, 'rst11'=>$rst11], ['next_key'=>$next_mkey, 'next_time'=>$next_time, 'rst20'=>$rst20, 'rst21'=>$rst21]];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/afterRunSysPlans','INFO','系统计划处理后', $logData);
 
         return true;
