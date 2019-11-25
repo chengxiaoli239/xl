@@ -126,6 +126,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = NineNineBaseService::getRemoteHzRecords($uid = 11, $tz_system_id = 2, $lottery_type = 6);p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([4], $lottery_type = 5, 40000);p($miss);
         $rst = StaticService::getStaticCodeType2($lottery_type = 5); p($rst);
         $num = ['1122', '1212', '1221', '2112', '2121', '2211'];
@@ -213,7 +214,6 @@ class IndexController extends Controller
         $rst = NumService::getCodesKuaiXuan(['type_4'=>0, 'type_2'=>1, 'type_4d'=>1]);p($rst);
 
 
-        $rst = NineNineBaseService::getRemoteHzRecords($uid = 11, $tz_system_id = 2, $lottery_type = 5);p($rst);
         $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type = 6); p($rst);# 单双利润统计(month)
         $rst['staticHzMonthsProfits'] = StaticService::staticHzMonthsProfits($lottery_type=6); p($rst);# 每月四定和值利润统计
         $rst = StaticService::static4dMonthsProfits($lottery_type = 6);p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr

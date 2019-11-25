@@ -886,7 +886,12 @@ class NineNineBaseService extends BaseTZService {
      */
     public static function getTzList($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $content = self::getSscIndexContent($uid, $tz_system_id, $lottery_type);
-        $preg = '/<tr>(.*?)<td>SSC(.*?)&nbsp;&nbsp;&nbsp;&nbsp;<a class="cancelsn" style="cursor:pointer;color:blue;" snid=(.*?)>点击撤单<\/a><\/td>(.*?)<td>(.*?)<\/td>(.*?)<td title="(.*?)" style="cursor:pointer;">(.*?)<a href="\.\.\/user\/sninfo\.aspx\?id=(.*?)" target\=\_blank>详细内容<\/a>(.*?)<\/td>(.*?)<td>(.*?)<\/td>(.*?)<td>(.*?)<\/td>/ism'; // 这里是表达式，大神看看
+
+        if($lottery_type == 5){ # 重庆
+            $preg = '/<tr>(.*?)<td>SSC(.*?)&nbsp;&nbsp;&nbsp;&nbsp;<a class="cancelsn" style="cursor:pointer;color:blue;" snid=(.*?)>点击撤单<\/a><\/td>(.*?)<td>(.*?)<\/td>(.*?)<td title="(.*?)" style="cursor:pointer;">(.*?)<a href="\.\.\/user\/sninfo\.aspx\?id=(.*?)" target\=\_blank>详细内容<\/a>(.*?)<\/td>(.*?)<td>(.*?)<\/td>(.*?)<td>(.*?)<\/td>/ism'; // 这里是表达式，大神看看
+        }elseif($lottery_type == 6){ # 新疆
+            $preg = '/<tr>(.*?)<td>JXSSC(.*?)&nbsp;&nbsp;&nbsp;&nbsp;<a class="cancelsn" style="cursor:pointer;color:blue;" snid=(.*?)>点击撤单<\/a><\/td>(.*?)<td>(.*?)<\/td>(.*?)<td title="(.*?)" style="cursor:pointer;">(.*?)<a href="\.\.\/user\/sninfo\.aspx\?id=(.*?)" target\=\_blank>详细内容<\/a>(.*?)<\/td>(.*?)<td>(.*?)<\/td>(.*?)<td>(.*?)<\/td>/ism'; // 这里是表达式，大神看看
+        }
 
         preg_match_all($preg,$content,$matches);
         unset($matches[0], $matches[1], $matches[4], $matches[6], $matches[8], $matches[9], $matches[10], $matches[11], $matches[13]);
@@ -928,6 +933,7 @@ class NineNineBaseService extends BaseTZService {
         //p([$uid, $tz_system_id, $TzSystemsUsers]);
 
         $lists = self::getTzList($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $lottery_type);
+        //p([$TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $lottery_type, $lists]);
         $lists = array_reverse($lists);
         foreach ($lists as $key=>$list){
             if(strlen($list['codes']) < 150) continue; # 非和值记录无需抓取
@@ -959,7 +965,7 @@ class NineNineBaseService extends BaseTZService {
                 'uid' => $uid,
                 'playway' => 3,
                 'tz_system_id' => $TzSystemsUsers->tz_system_id,
-                'lottery_type' => 5,
+                'lottery_type' => $lottery_type,
                 'tz_type' => 21,
                 'single' => $single,
                 'playway_name' => '四字定',
