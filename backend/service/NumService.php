@@ -675,6 +675,14 @@ class NumService extends BaseService {
             $where = array_merge($where, [ ['IN', 'codes_hz', $codes_hz['hz']] ]);
             //$query->andWhere($andWhere);
         }
+        # tz_type:28 和值-取
+        if(isset($codes_hz['get_hzs']) && empty($codes_hz['get_hzs'])){
+            $where = array_merge($where, [ ['IN', 'codes_hz', $codes_hz['get_hzs']] ]);
+        }
+        # tz_type:28 和值-除
+        if(isset($codes_hz['remove_hzs']) && !empty($codes_hz['remove_hzs'])){
+            $where = array_merge($where, [ ['NOT IN', 'codes_hz', $codes_hz['remove_hzs']] ]);
+        }
 
         # 合分
         if(isset($codes_hz['hefen_pos']) && isset($codes_hz['hefen']) && !empty($codes_hz['hefen_pos']) && !empty($codes_hz['hefen'])){
