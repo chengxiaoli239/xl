@@ -35,6 +35,9 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'single')->textInput() ?>
 
+                    <!--位置合分：合分-->
+                    <?= $form->field($model, 'hefen')->textInput()->label('合分值')?>
+
                     <?= $form->field($model, 'get_types')->checkboxList($code_types)->label('类型【取】') ?>
                     <?= $form->field($model, 'remove_types')->checkboxList($code_types)->label('类型【除】') ?>
 

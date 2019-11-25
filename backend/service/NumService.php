@@ -684,7 +684,7 @@ class NumService extends BaseService {
             $where = array_merge($where, [ ['NOT IN', 'codes_hz', $codes_hz['remove_hzs']] ]);
         }
 
-        # 合分
+        # 合分 - 三定
         if(isset($codes_hz['hefen_pos']) && isset($codes_hz['hefen']) && !empty($codes_hz['hefen_pos']) && !empty($codes_hz['hefen'])){
             $poss = explode(',', $codes_hz['hefen_pos']);
 
@@ -703,6 +703,17 @@ class NumService extends BaseService {
             //$query->andWhere($andWhere);
         }
         //p([$where, $codes_hz]);
+        //p([$code_type, $codes_hz['hefen']]);
+
+        # 合分 - 四定
+        if($code_type == 4 && isset($codes_hz['hefen']) && !empty($codes_hz['hefen'])){
+            $lenHefen = strlen($codes_hz['hefen']);
+            $codes_hefen = [];
+            for ($i=0; $i<$lenHefen; $i++){
+                $codes_hefen = array_merge($codes_hefen, [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10]);
+            }
+            $where = array_merge($where, [ ['IN', 'codes_hz', $codes_hefen ] ]);
+        }
 
         # 第1位
         if(isset($codes_hz['p1']) && !empty($codes_hz['p1'])){
@@ -980,9 +991,13 @@ class NumService extends BaseService {
             if(isset($hz_Arr['remove_types'])) $filter7['remove_types'] = $hz_Arr['remove_types'];
         }
 
-        # 合分
+        # 合分 - 三定
         if(isset($hz_Arr['hefen_pos']) && isset($hz_Arr['hefen'])){
             if(isset($hz_Arr['hefen_pos']) && isset($hz_Arr['hefen'])) $filter8['hefen'] = 1; else $filter9['hefen'] = 0;
+        }
+        # 合分 - 四定
+        if(isset($hz_Arr['hefen'])){
+            if(isset($hz_Arr['hefen'])) $filter8['hefen'] = 1; else $filter9['hefen'] = 0;
         }
 
         $typesArr = self::getNameByCodesType();
@@ -1022,7 +1037,11 @@ class NumService extends BaseService {
         }
 
         if(!empty($filter8)){
-            $desc .= ' 合分取[位:'.$hz_Arr['hefen_pos'] . ' 合分:'.$hz_Arr['hefen'].']';
+            if(isset($hz_Arr['hefen_pos'])){
+                $desc .= ' 合分取[位:'.$hz_Arr['hefen_pos'] . ' 合分:'.$hz_Arr['hefen'].']';
+            }else{
+                $desc .= ' 合分取[位:1,2,3,4 '. '合分:'.$hz_Arr['hefen'].']';
+            }
         }
 
         # 上奖取

@@ -298,6 +298,11 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['remove_arises'] = $post['UserSysPlans']['remove_arises'];
             }
             unset($post['UserSysPlans']['remove_arises']);
+            # 15.2、合分值
+            if(isset($post['UserSysPlans']['hefen']) && $post['UserSysPlans']['hefen']){
+                $tmpFilter['hefen'] = $post['UserSysPlans']['hefen']; # 合分
+            }
+            unset($post['UserSysPlans']['hefen']);
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
         }else{
             $hz_Arr = $post['UserSysPlans']['hz_Arr'];
