@@ -51,6 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'yl_records:ntext',
                         'history_max_miss',
                         'codes_hz',
+                        'type_3b',
                         'count',
                         //'static_nums',
                         //'theory_nums_perdate',
