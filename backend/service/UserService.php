@@ -130,7 +130,7 @@ class UserService extends BaseService {
                 $setData = array_merge($setData,[
                     'uid' => $uid,
                     'username' => $user->username,
-                    //'ssc_domain' => $TzSystems->ssc_domain,
+                    'ssc_domain' => $TzSystemsUsers->ssc_domain ? $TzSystemsUsers->ssc_domain : $TzSystems->ssc_domain,
                     'tz_system_id' => $tz_system_id,
                     'sys_name' => $TzSystems->name,
                     ''
