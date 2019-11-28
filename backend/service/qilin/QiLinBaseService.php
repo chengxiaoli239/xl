@@ -1387,7 +1387,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
             //p(HN0898Service::getTzSiteInfo($tz_system_id));
             # 1、预登录
             $_t = microtime(true) * 10000;
-            $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/Login'.'?_'.$_t;
+            $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/loginview';
             if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
             $headers = [
                 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
@@ -1405,19 +1405,19 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
             $headers[] = 'Cookie: '.$robot7_session_id;
             $cookie = self::curlGetSevenCookie($url, $headers);
             $cookieData = $cookie;
-            //p([$robot7_session_id, $cookieData, $cookie]);
+            //p([$robot7_session_id, $cookieData, $cookie, $headers]);
             if($cookieData){
                 $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-                $TzSystemsUsers->cookie = $robot7_session_id.';'.trim($cookieData);
-                $TzSystemsUsers->cookie = str_replace('; path=/; HttpOnly','', $TzSystemsUsers->cookie);
+                //$TzSystemsUsers->cookie = $robot7_session_id.';'.trim($cookieData);
+                $TzSystemsUsers->cookie = trim(str_replace('; path=/; domain='.str_replace('http://', '', $TzSystemsUsers->ssc_domain),'', $cookieData), ';');
+                //p([$cookieData, $TzSystemsUsers->cookie]);
                 $rst = $TzSystemsUsers->save();
             }
             self::$headers = [];
             $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
             //p($logArr);
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
-            $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
-            $cookie = str_replace('; path=/; HttpOnly','',$cookie);
+            $cookie = str_replace('MC=','',$TzSystemsUsers->cookie);
             $m->set($mkey, $cookie, 180);
         //}
         return $cookie;
@@ -1509,7 +1509,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
             //self::$user_agent,
         ];
         $_t = floor(microtime(true) * 1000);
-        $url = self::getTzSiteInfo($TzSystemsUsers->tz_system_id,'SSC_INDEX').'/api/home/GetValidateCode?_='.$_t;
+        $url = self::getTzSiteInfo($TzSystemsUsers->tz_system_id,'SSC_INDEX').'/checksum?t='.$_t;
         $imageData = CurlService::getCurl($url, $headers);
         //p($imageData);
         $filename = Yii::$app->basePath . "/runtime/captcha/".$uid.'_'.$tz_system_id.'_'.$cookie_key.".png";
@@ -1517,7 +1517,6 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         fwrite($tp, trim($imageData));
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
-        //p($logData);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return true;
@@ -1571,10 +1570,25 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         # 第一步：获取cookie
         $cookie_key = self::getCookie($uid,$tz_system_id);
         if(isset($cookie_key['status']) && $cookie_key['status'] == 300) return $cookie_key;
+
+        # 第二步：下载验证码图片
+        self::downLoadCodeImg($uid, $tz_system_id, $cookie_key);
+        //p([$uid, $tz_system_id, $cookie_key]);
+        # 第三步：调验证码接口获取验证码
+        $captchaCode = '888888'; $rst = self::loginRemote($uid, $tz_system_id,$captchaCode); p($rst);  # 测试
+        //$captchaCodeRst = Tools::getCaptchaCode($uid, $tz_system_id, $cookie_key); # 真实调用验证码接口，收费
+        //p($captchaCodeRst);
+        //$code = $captchaCode['result'];
+        if($captchaCodeRst['status'] == 200){
+            $code = $captchaCodeRst['code'];
+            # 第四步：账号、验证码登录
+            $rst = self::loginRemote($uid, $tz_system_id, $code);
+        }
+
         # 第二步：账号、验证码登录
-        $rst = self::loginRemote($uid, $tz_system_id);
+        //$rst = self::loginRemote($uid, $tz_system_id);
         # 第三步：同意
-        $rst = self::acceptAgreement($uid, $tz_system_id);
+        //$rst = self::acceptAgreement($uid, $tz_system_id);
 
         # 获取用户信息
         $rst = self::userInfo($uid, $tz_system_id);
@@ -1633,21 +1647,23 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
      * @desc 登陆
      * @param $uid
      * @param $tz_system_id
+     * @param $code 验证码
      * @return mixed|string
      */
-    private static function loginRemote($uid, $tz_system_id){
+    private static function loginRemote($uid, $tz_system_id, $code){
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        $post_data['Account'] = $TzSystemsUsers->account;
-        $post_data['Password'] = $TzSystemsUsers->password;
+        $post_data['u'] = $TzSystemsUsers->account;
+        $post_data['p'] = $TzSystemsUsers->password;
+        $post_data['c'] = $code;
         //p($post_data);
 
-        if(!$post_data['Account'] OR !$post_data['Password']) return ['status'=>300, 'msg'=>'账号或者密码不能为空'];
+        if(!$post_data['u'] OR !$post_data['p']) return ['status'=>300, 'msg'=>'账号或者密码不能为空'];
 
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
         $_t = microtime(true) * 10000;
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/DoLogin'.'?_'.$_t;
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/loginview';
         $post_data = http_build_query($post_data);
         $headers = [
             "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
@@ -1663,9 +1679,10 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
 
         $data = CurlService::httpPost($url,$post_data, $headers);
         //sleep(10);
-        self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
+        p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        self::synBalance($TzSystemsUsers->id); # 同步余额
         return $data;
     }
     /**

@@ -22,7 +22,8 @@ class BaseService{
      * @param $id
      * @return array|bool
      */
-    public static function login($id){
+    public static function login($id = ''){
+        if(!$id) return ['status'=>300, 'msg'=>'id不能为空'];
         if(!$TzSystemsUser = TzSystemsUsers::findOne($id)){
             return ['status'=>300, 'msg'=>'操作失败'];
         }
@@ -53,7 +54,7 @@ class BaseService{
             $rst = QiLinBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
         }
 
-        return false;
+        return $rst;
     }
 
 }
