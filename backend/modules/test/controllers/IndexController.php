@@ -126,6 +126,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = QiLinBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
         $rst = NineNineBaseService::getRemoteHzRecords($uid = 11, $tz_system_id = 2, $lottery_type = 6);p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([4], $lottery_type = 5, 40000);p($miss);
         $rst = StaticService::getStaticCodeType2($lottery_type = 5); p($rst);

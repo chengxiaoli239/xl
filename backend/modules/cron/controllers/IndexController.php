@@ -13,11 +13,13 @@ use backend\models\SystemType;
 use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
 use backend\models\User;
+use backend\service\BaseService;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\KuaiLe8Service;
 use backend\service\Lucky5\LuckyBaseService;
 use backend\service\McKeyService;
 use backend\service\NineNine\NineNineBaseService;
+use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
 use backend\service\SscDataService;
 use backend\service\TzService;
@@ -297,6 +299,8 @@ class IndexController extends Controller
         $TzSystemsUsers = TzSystemsUsers::find()->where(['AND',['=', 'status', 1], ['<>', 'ssc_domain', '']])->all();
 
         foreach ($TzSystemsUsers as $TzSystemsUser){
+            $rst[$TzSystemsUser->id] = BaseService::login($TzSystemsUser->id);
+            /*
             if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
                 continue;
             }
@@ -318,7 +322,11 @@ class IndexController extends Controller
             }elseif(in_array($tz_system_id, [6])){
                 # 6、会员网
                 $rst = HuiYuanBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+            }elseif(in_array($tz_system_id, [8])){
+                # 8、麒麟财务系统网
+                $rst = QiLinBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             }
+            */
         }
         return $rst;
     }
