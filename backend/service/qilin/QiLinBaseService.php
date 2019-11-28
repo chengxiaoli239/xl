@@ -1662,8 +1662,8 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         if(!$post_data['u'] OR !$post_data['p']) return ['status'=>300, 'msg'=>'账号或者密码不能为空'];
 
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
-        $_t = microtime(true) * 10000;
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/loginview';
+        $post_data['t'] = microtime(true) * 10000;
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/login?'.http_build_query($post_data);
         $post_data = http_build_query($post_data);
         $headers = [
             "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
@@ -1677,7 +1677,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
             "Referer:".$TzSystemsUsers->ssc_domain,
         ];
 
-        $data = CurlService::httpPost($url,$post_data, $headers);
+        $data = CurlService::getCurl($url, $headers);
         //sleep(10);
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         p($logArr);
