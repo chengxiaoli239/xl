@@ -1,0 +1,252 @@
+1、General
+2、Response Headers
+3、Request Headers
+4、Query String Parameters
+4、Form Data
+
+一、登录一：获取验证码cookie
+A:
+1、General
+	Request URL: http://h5.906333906.com/loginview
+	Request Method: GET
+2、Response Headers
+	Connection: keep-alive
+	Content-Type: text/html; charset=UTF-8
+	Date: Thu, 28 Nov 2019 07:45:23 GMT
+	Server: nginx
+	Set-Cookie: MC=3b36358f2d1029262fc3fd161d9403ed; path=/; domain=h2.906333906.com
+	Transfer-Encoding: chunked
+	Vary: Accept-Encoding
+3、Request Headers
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9
+	Cache-Control: max-age=0
+	Connection: keep-alive
+	Host: h2.906333906.com
+	Upgrade-Insecure-Requests: 1
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36
+4、Query String Parameters
+
+登录二(选择线路，估计可以忽略)：
+1、General
+	Request URL: http://h2.906333906.com/update_lc?lc=h2&mclist=h2-3b36358f2d1029262fc3fd161d9403ed&update_lc_callback=update_lc_jsonp_callback&_=1574927122190
+	Request Method: GET
+	Status Code: 200 OK
+	Remote Address: 103.231.30.64:80
+	Referrer Policy: no-referrer-when-downgrade
+2、Response Headers
+	Access-Control-Allow-Credentials: true
+	Connection: keep-alive
+	Content-Type: text/html; charset=UTF-8
+	Date: Thu, 28 Nov 2019 07:45:23 GMT
+	Server: nginx
+	Set-Cookie: LC=h2; path=/
+	Set-Cookie: MCLIST=h2-3b36358f2d1029262fc3fd161d9403ed; path=/
+	Transfer-Encoding: chunked
+	Vary: Accept-Encoding
+3、Request Headers
+	Accept: text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9
+	Connection: keep-alive
+	Cookie: MC=3b36358f2d1029262fc3fd161d9403ed
+	Host: h2.906333906.com
+	Referer: http://h2.906333906.com/loginview
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36
+	X-Requested-With: XMLHttpRequest
+4、Query String Parameters
+	lc: h2
+	mclist: h2-3b36358f2d1029262fc3fd161d9403ed
+	update_lc_callback: update_lc_jsonp_callback
+	_: 1574927122190
+
+
+二：提交登录
+提交一：
+1、General
+	Request URL: http://h2.906333906.com/challenge?t=1574927421721&o=pub
+	Request Method: GET
+	Status Code: 200 OK
+	Remote Address: 103.140.151.116:80
+	Referrer Policy: no-referrer-when-downgrade
+2、Response Headers
+	Connection: keep-alive
+	Content-Type: application/json;charset=utf-8
+	Date: Thu, 28 Nov 2019 07:50:23 GMT
+	Server: nginx
+	Transfer-Encoding: chunked
+	Vary: Accept-Encoding
+3、Request Headers
+	Accept: application/json, text/javascript, */*; q=0.01
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9
+	Connection: keep-alive
+	Cookie: MC=3b36358f2d1029262fc3fd161d9403ed; LC=h2; MCLIST=h2-3b36358f2d1029262fc3fd161d9403ed
+	Host: h2.906333906.com
+	Referer: http://h2.906333906.com/loginview
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36
+	X-Requested-With: XMLHttpRequest
+4、Query String Parameters
+	t: 1574927421721
+	o: pub	
+提交二：
+1、General
+	Request URL: http://h2.906333906.com/challenge?k=765537517365486a6d4e51462f52614d466b6979424b37484667557765446b6c47666f7361616e536443634c4968467a73324274515775443942502b316a6f656155616347356e736f6c6e5a39644b48443946502f627436734e5142354331624a36586a4c6b704d652f486c697a63342b443264684955715962477a64346f695039763063637954326746695966484b35426d68366a7833614b424c742b6952645738386b3133434777453d&t=1574927421913&o=aes
+	Request Method: GET
+	Status Code: 200 OK
+	Remote Address: 103.140.151.116:80
+	Referrer Policy: no-referrer-when-downgrade
+2、Response Headers
+	Connection: keep-alive
+	Content-Type: application/json;charset=utf-8
+	Date: Thu, 28 Nov 2019 07:50:23 GMT
+	Server: nginx
+	Transfer-Encoding: chunked
+	Vary: Accept-Encoding
+3、Request Headers
+	Accept: application/json, text/javascript, */*; q=0.01
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9
+	Connection: keep-alive
+	Cookie: MC=3b36358f2d1029262fc3fd161d9403ed; LC=h2; MCLIST=h2-3b36358f2d1029262fc3fd161d9403ed
+	Host: h2.906333906.com
+	Referer: http://h2.906333906.com/loginview
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36
+	X-Requested-With: XMLHttpRequest
+4、Query String Parameters
+	k: 765537517365486a6d4e51462f52614d466b6979424b37484667557765446b6c47666f7361616e536443634c4968467a73324274515775443942502b316a6f656155616347356e736f6c6e5a39644b48443946502f627436734e5142354331624a36586a4c6b704d652f486c697a63342b443264684955715962477a64346f695039763063637954326746695966484b35426d68366a7833614b424c742b6952645738386b3133434777453d
+	t: 1574927421913
+	o: aes
+提交三（是否同意页面）：
+1、General
+	Request URL: http://h2.906333906.com/warm_tips/?l=%2Fdec%3Fa%3Dmem
+	Request Method: GET
+	Status Code: 200 OK
+	Remote Address: 103.140.151.116:80
+	Referrer Policy: no-referrer-when-downgrade
+2、Response Headers
+	Connection: keep-alive
+	Content-Type: text/html; charset=UTF-8
+	Date: Thu, 28 Nov 2019 07:50:24 GMT
+	Server: nginx
+	Transfer-Encoding: chunked
+	Vary: Accept-Encoding
+3、Request Headers
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9
+	Connection: keep-alive
+	Cookie: MC=3b36358f2d1029262fc3fd161d9403ed; LC=h2; MCLIST=h2-3b36358f2d1029262fc3fd161d9403ed; sel_lotdefid=7
+	Host: h2.906333906.com
+	Referer: http://h2.906333906.com/loginview
+	Upgrade-Insecure-Requests: 1
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36
+4、Query String Parameters
+	l: /dec?a=mem
+
+提交四：真实
+1、General
+	Request URL: http://h2.906333906.com/login?t=1574926404445&u=56544a4763325248566d74594d5339475957737652466858535670436158705051545a4b656b39684d6b4a325430497953324a71643039615354303d&p=56544a4763325248566d74594d546835546d393056586848547a4e5762336c764e31526d6254467053574677565555314d3056734d57317761437450656c6c326157356c5533684a4e326433556b704d4d6b5678596e4a346444517652303035546b4e784f545535596d7078523146464d31453950513d3d&c=3900&pwd_simple=0
+	Request Method: GET
+2、Response Headers
+3、Request Headers
+	Accept: application/json, text/javascript, */*; q=0.01
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9
+	Connection: keep-alive
+	Cookie: sel_appid=h2; AC=; sel_lotdefid=3; MC=dd1062122c3acc12d924f5e054dc89f1; AC=MC%3Add1062122c3acc12d924f5e054dc89f1; LC=h2; MCLIST=h2-dd1062122c3acc12d924f5e054dc89f1
+	Host: h2.906333906.com
+	Referer: http://h2.906333906.com/loginview
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36
+	X-Requested-With: XMLHttpRequest
+4、Query String Parameters
+	t: 1574926404445
+	u: 56544a4763325248566d74594d5339475957737652466858535670436158705051545a4b656b39684d6b4a325430497953324a71643039615354303d
+	p: 56544a4763325248566d74594d546835546d393056586848547a4e5762336c764e31526d6254467053574677565555314d3056734d57317761437450656c6c326157356c5533684a4e326433556b704d4d6b5678596e4a346444517652303035546b4e784f545535596d7078523146464d31453950513d3d
+	c: 3900
+	pwd_simple: 0
+	
+
+
+# 四定投注
+1、General
+	请求网址:http://h2.906333906.com/sellnumbers
+	请求方法:POST
+	远程地址:103.214.166.117:80
+	状态码:	200
+	版本:HTTP/1.1
+	Referrer 政策:no-referrer-when-downgrade
+2、Response Headers
+	HTTP/1.1 200 OK
+	Server: nginx
+	Date: Thu, 28 Nov 2019 08:07:33 GMT
+	Content-Type: application/json;charset=utf-8
+	Content-Length: 141
+	Connection: keep-alive
+3、Request Headers
+	Host: h2.906333906.com
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0
+	Accept: application/json, text/javascript, */*; q=0.01
+	Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
+	Accept-Encoding: gzip, deflate
+	Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+	X-Requested-With: XMLHttpRequest
+	Content-Length: 163
+	Origin: http://h2.906333906.com
+	Connection: keep-alive
+	Referer: http://h2.906333906.com/order_print?tid=1574928607
+	Cookie: MC=d72fe8d589d3e07e176c39c9b5679bfa; AC=MC%3Ad72fe8d589d3e07e176c39c9b5679bfa; sel_appid=h2; AC=; LC=h2; MCLIST=h2-d72fe8d589d3e07e176c39c9b5679bfa; sel_lotdefid=2
+4、Form Data
+	si	{"OOOO":"0000M0.1"}
+	sn	20191128037
+	uc	200
+	ot	3
+	log	3M1N1N0NNNNM5N0N0M99N1N0.1
+	nomd5	dae222a5dfcc0314c934d90613d203a7
+	commited_suffix	1574928777215
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
