@@ -275,19 +275,19 @@ class IndexController extends Controller
             $TzSystems = TzSystems::findOne($TzSystemsUser->tz_system_id);
             switch ($TzSystems->system_type_id){
                 case 1:
-                    $rst = HN0898Service::synBalance($TzSystemsUser->id);
+                    $rst['rst'][$TzSystemsUser->id] = HN0898Service::synBalance($TzSystemsUser->id);
                     break;
                 case 2:
                 case 5:
-                    $rst = SevenService::synBalance($TzSystemsUser->id);
+                    $rst['rst'][$TzSystemsUser->id] = SevenService::synBalance($TzSystemsUser->id);
                     break;
                 case 3:
                     break;
                 case 4: # 北京快乐8
-                    $rst = HuiYuanBaseService::synBalance($TzSystemsUser->id);
+                    $rst['rst'][$TzSystemsUser->id] = HuiYuanBaseService::synBalance($TzSystemsUser->id);
                     break;
-                case 8: # 麒麟财务系统
-                    $rst = QiLinBaseService::synBalance($TzSystemsUser->id);
+                case 6: # 麒麟财务系统
+                    $rst['rst'][$TzSystemsUser->id] = QiLinBaseService::synBalance($TzSystemsUser->id);
                     break;
             }
         }

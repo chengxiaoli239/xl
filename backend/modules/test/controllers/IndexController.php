@@ -127,6 +127,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = QiLinBaseService::synBalance(26);p($rst);
         $rst = QiLinBaseService::userInfo($uid = 18, $tz_system_id = 8);p($rst);
         p(microtime(true));
         $rst = BaseService::login(26);p($rst);
