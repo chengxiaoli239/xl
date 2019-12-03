@@ -286,6 +286,9 @@ class IndexController extends Controller
                 case 4: # 北京快乐8
                     $rst = HuiYuanBaseService::synBalance($TzSystemsUser->id);
                     break;
+                case 8: # 麒麟财务系统
+                    $rst = QiLinBaseService::synBalance($TzSystemsUser->id);
+                    break;
             }
         }
         return $rst;

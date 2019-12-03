@@ -913,4 +913,17 @@ class Tool_Common
         return self::$_traceId;
     }
 
+
+    //aes加密
+    public static function aes_ecrypt($data,$key='12345',$iv='IlovephpIlovephp'){
+        return base64_encode(openssl_encrypt($data,'aes-256-cbc',md5($key),OPENSSL_ZERO_PADDING,$iv));
+    }
+
+
+    //aes解密
+    public static function aes_decrypt($data,$key='12345',$iv='IlovephpIlovephp') {
+        return openssl_decrypt(base64_decode($data), 'aes-256-cbc', md5($key), OPENSSL_ZERO_PADDING, $iv);
+
+    }
+
 }

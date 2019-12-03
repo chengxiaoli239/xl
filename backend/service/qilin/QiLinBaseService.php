@@ -1270,8 +1270,8 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         self::__init($uid, $tz_system_id);
         $rst = self::userInfo($uid, $tz_system_id);
         $balance = '';
-        if(isset($rst['Status']) && $rst['Status'] == 1){
-            $balance = $rst['Data']['credit_balance'];
+        if(isset($rst['status']) && $rst['status'] == 200){
+            $balance = $rst['info']['total_credit'];
         }
 
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','希腊-用户余额', $rst);
@@ -1605,7 +1605,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
     public static function getSn($uid, $tz_system_id){
         $rst = self::userInfo($uid, $tz_system_id);
         $data = [];
-        if($rst['Status'] !=1) return $data;
+        if($rst['status'] !=200) return $data;
 
         $data['sn'] = $rst['Data']['serial_no'];
         $data['qihao'] = substr($rst['Data']['previous_period_no'], 2);
@@ -1655,14 +1655,14 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
         $post_data['u'] = $TzSystemsUsers->account;
-        $post_data['p'] = $TzSystemsUsers->password;
+        $post_data['p'] = self::getEncPwd($TzSystemsUsers->password);
         $post_data['c'] = $code;
+        $post_data['t'] = microtime(true) * 1000;
         //p($post_data);
 
         if(!$post_data['u'] OR !$post_data['p']) return ['status'=>300, 'msg'=>'账号或者密码不能为空'];
 
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
-        $post_data['t'] = microtime(true) * 10000;
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/login?'.http_build_query($post_data);
         $post_data = http_build_query($post_data);
         $headers = [
@@ -1684,6 +1684,10 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
         self::synBalance($TzSystemsUsers->id); # 同步余额
         return $data;
+    }
+
+    public static function getEncPwd($pwd){
+        $pwd = md5($pwd);
     }
     /**
      * @desc 登陆
@@ -1762,7 +1766,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
         $_t = microtime(true) * 10000;
         //$url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/App/Index'.'?_'.$_t;
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/GetMemberPrint?_='.$_t;
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/queryLastInfo?timeid='.$_t;
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
         $headers = [
             "Accept: application/json, text/javascript, */*; q=0.01",

@@ -17,6 +17,7 @@ use backend\service\KuaiLe8Service;
 use backend\service\Lucky5\LuckyBaseService;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NumService;
+use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
 use backend\service\StaticService;
 use backend\service\TestService;
@@ -126,6 +127,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = QiLinBaseService::userInfo($uid = 18, $tz_system_id = 8);p($rst);
+        p(microtime(true));
         $rst = BaseService::login(26);p($rst);
         $rst = NineNineBaseService::getRemoteHzRecords($uid = 11, $tz_system_id = 2, $lottery_type = 6);p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([4], $lottery_type = 5, 40000);p($miss);
