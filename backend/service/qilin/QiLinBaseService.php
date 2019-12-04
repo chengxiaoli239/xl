@@ -1654,11 +1654,13 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        $post_data['u'] = $TzSystemsUsers->account;
-        $post_data['p'] = self::getEncPwd($TzSystemsUsers->password);
+        $k = self::getK();
+        $post_data['u'] = self::getEnc($TzSystemsUsers->account, $k);
+        $post_data['p'] = self::getEnc(md5($TzSystemsUsers->password), $k);
         $post_data['c'] = $code;
-        $post_data['t'] = microtime(true) * 1000;
-        //p($post_data);
+        $post_data['pwd_simple'] = 0;
+        $post_data['t'] = round(microtime(true) * 1000);
+        p($post_data);
 
         if(!$post_data['u'] OR !$post_data['p']) return ['status'=>300, 'msg'=>'账号或者密码不能为空'];
 
@@ -1686,9 +1688,29 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         return $data;
     }
 
-    public static function getEncPwd($pwd){
-        $pwd = md5($pwd);
+    /**
+     * @desc ase加密
+     * @param $d
+     * @param $k
+     * @return string
+     */
+    public static function getEnc($d, $k){
+        $d = md5($d);
+        $enc_str = Tool_Common::aes_ecrypt($d, $k);
+
+        # return s2h(btoa(CryptoJS.AES.encrypt(d, k).toString()));
+
+        //$btoa =
+
+        return (string)$str;
     }
+
+    public static function getK(){
+        $k = [0,0,0,0,0,0,0,0];
+
+        return implode(',', $k);
+    }
+
     /**
      * @desc 登陆
      * @param $uid

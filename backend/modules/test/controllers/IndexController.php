@@ -127,12 +127,13 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BaseService::login(26);p($rst);
+        $rst = bin2hex("Shanghai");p($rst);
+        $miss = SscDataService::getSdHzYlHistoryMiss([30], $lottery_type = 5, 40000);p($miss);
         $rst = QiLinBaseService::synBalance(26);p($rst);
         $rst = QiLinBaseService::userInfo($uid = 18, $tz_system_id = 8);p($rst);
         p(microtime(true));
-        $rst = BaseService::login(26);p($rst);
         $rst = NineNineBaseService::getRemoteHzRecords($uid = 11, $tz_system_id = 2, $lottery_type = 6);p($rst);
-        $miss = SscDataService::getSdHzYlHistoryMiss([4], $lottery_type = 5, 40000);p($miss);
         $rst = StaticService::getStaticCodeType2($lottery_type = 5); p($rst);
         $num = ['1122', '1212', '1221', '2112', '2121', '2211'];
         $miss = SscDataService::getDsHistoryMiss($num, '1,2,3,4', $lottery_type=5, 5000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
