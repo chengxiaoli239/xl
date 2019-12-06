@@ -52,6 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'history_max_miss',
                         'codes_hz',
                         'type_3b',
+                        'type_4ds',
                         'count',
                         //'static_nums',
                         //'theory_nums_perdate',
