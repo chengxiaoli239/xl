@@ -313,6 +313,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 }
             }
 
+            $betKey = BetService::buildBetKey($TzSystemsUsers->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);
 
@@ -402,6 +403,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                     }
                 }
             }
+            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+            $m->set($betKey, 1, $time);
         }else{
             if(in_array($tz_type, [29])){ # 三定 - 快选
                 /*快选 */
