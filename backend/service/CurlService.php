@@ -135,6 +135,7 @@ class CurlService extends BaseService{
         if(strpos($data, '余额不足')){
             $rstData['Status'] = 0;
         }
+        //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
         return $rstData;
     }
