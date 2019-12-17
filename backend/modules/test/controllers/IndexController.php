@@ -127,6 +127,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BetService::tzByPlanId(24, 0);p($rst); # 投注
         $rst = BaseService::synBalance(29);p($rst);
         $rst = BaseService::login(29);p($rst);
         $rst = SevenService::synBalance(29);p($rst);
@@ -329,7 +330,6 @@ class IndexController extends Controller
             $rst['update3NumData'] = SscDataService::update3NumData($lottery_type=5);
         }
         p($rst); // 每期开奖遗漏
-        $rst = BetService::tzByPlanId(7, 1);p($rst); # 投注
         $qihao = HN0898Service::getQihao(5);
         $rst = BetService::getBetCacheTime($lottery_type = 5, $qihao); p($rst);# 投注之后缓存时间
         $qihao = HN0898Service::getQihao(5);p($qihao);

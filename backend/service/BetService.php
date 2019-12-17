@@ -55,7 +55,7 @@ abstract class BetService extends BaseBetService {
             }elseif ($lottery_type == 6){
                 $BetService = new NineNineService6($uid, $tz_system_id);
             }
-        }elseif(in_array($tz_system_id, [3, 7])){
+        }elseif(in_array($tz_system_id, [3, 7, 9])){
             # 3、重庆7时彩网：重庆7时彩、幸运五星彩
             if($lottery_type == 5){ # 7时彩重庆
                 $BetService = new SevenService($uid, $tz_system_id);
@@ -105,7 +105,9 @@ abstract class BetService extends BaseBetService {
             case 5: # 7时彩 幸运五分彩
                 $codes = BetService::getPlansAllCodesType2($tz_type, $buy_type, $sel_same, $hz_Arr, $plan_id);
                 break;
-            default: break;
+            default:
+                $codes = BetService::getPlansAllCodesType2($tz_type, $buy_type, $sel_same, $hz_Arr, $plan_id);
+                break;
         }
 
         return $codes;
@@ -224,10 +226,12 @@ abstract class BetService extends BaseBetService {
     public static function synBalance($uid, $tz_system_id){
         $TzSystemsUser = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
+        $rst = BaseService::synBalance($TzSystemsUser->id);
+        /*
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网
             $rst = HN0898Service::synBalance($TzSystemsUser->id);
-        }elseif(in_array($tz_system_id, [3, 7])){
+        }elseif(in_array($tz_system_id, [3, 7, 9])){
             # 3、重庆7时彩网
             if($tz_system_id == 3){
                 $rst = SevenService::synBalance($TzSystemsUser->id);
@@ -242,6 +246,7 @@ abstract class BetService extends BaseBetService {
             # 6、会员网
             $rst = KuaiLe8Service::synBalance($TzSystemsUser->id);
         }
+        */
 
         return $rst;
     }

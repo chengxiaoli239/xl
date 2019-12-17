@@ -212,13 +212,14 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
 
         # 验证
-        $rst = self::validateBettingContent($playway,$codes);
+        $rst = self::validateBettingContent($playway, $codes);
         if($rst['status'] != 200){
             $data = ['status'=>300, 'msg'=>$qihao.$rst['msg']];
         }
         $way = self::getWay($tz_type);
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
+        //p(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id, 'TzSystemsUsers'=>$TzSystemsUsers]);
         $bet_codes = $codes;
         $isBigNumsBet = BetService::isBigNumsBet($tz_type);
 
@@ -333,7 +334,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
                 # 缓存锁
                 $m = \Yii::$app->cache;
-                $betKey = BetService::buildBetKey($TzSystemsUsers->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
+                //p([$TzSystemsUsers->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id]);
+                $betKey = BetService::buildBetKey($TzSystemsUsers->username, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
                 if ($betLock = $m->get($betKey)) return ['status' => 303, 'msg' => '已经投注过了', 'key' => $betKey];
 
                 $n = count($codesArr5s) / $nums;
@@ -341,9 +343,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 for ($i = 0; $i < $count5s; $i++) {
                     $tmpArrs[] = array_slice($codesArr5s, $i * $nums, 100);
                 }
-
-                $betKey = BetService::buildBetKey($TzSystemsUsers->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
-                if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
                 $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
                 $m->set($betKey, 1, $time);
@@ -389,6 +388,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                     $rst = CurlService::postCurl($url, $post_data, $headers);
                     $end_time = microtime(true);
                     $time_consume = ($end_time - $start_time) . 's';
+                    //p(['rst'=>$rst,'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers]);
                     if ($rst['Status'] != 1 OR !$rst) {
                         $tzRst = ['uid' => self::$user_id, 'status' => 301, 'msg' => $qihao . $rst['msg'], 'url' => $url, 'post_data' => $post_data, 'user_id' => self::$user_id, 'headers' => $headers, 'postRst' => $rst, 'time_consume' => $time_consume];
                         if ($tz_type != 20) {
@@ -497,7 +497,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
             # 缓存锁
             $m = \Yii::$app->cache;
-            $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
+            $betKey = BetService::buildBetKey($TzSystemsUsers->username, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
             if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
             if(in_array($tz_type, [20, 23, 25, 26])){
@@ -553,7 +553,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             'buy_type'=> $buy_type,  // 购买方向类型
             'uid'=> self::$user_id,  // 投注账号id
             'lottery_type' => $lottery_type, # 彩种
-            'account' => $account,
+            'account' => $TzSystemsUsers->username,
             'plan_id' => $plan_id, # 计划id
             'codes' => (string)$codes,  // 投注号码
             'qihao' => $qihao,  // 投注期号
