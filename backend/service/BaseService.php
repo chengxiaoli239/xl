@@ -25,7 +25,7 @@ class BaseService{
     public static function login($id = ''){
         if(!$id) return ['status'=>300, 'msg'=>'id不能为空'];
         if(!$TzSystemsUser = TzSystemsUsers::findOne($id)){
-            return ['status'=>300, 'msg'=>'操作失败'];
+            return ['status'=>300, 'msg'=>'操作失败:找不到记录'];
         }
 
         if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){

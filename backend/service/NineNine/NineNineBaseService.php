@@ -405,7 +405,7 @@ class NineNineBaseService extends BaseTZService {
             if($tz_type != 20){
                 $tzRst['code'] = $code;
             }
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','0898投注记录-投注失败', $tzRst);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','99投注记录-投注失败', $tzRst);
             return $tzRst;
         }
 

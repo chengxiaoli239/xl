@@ -792,7 +792,7 @@ class SevenService extends BaseTZService {
         //preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
         preg_match("/document.cookie\=\'([^\r\n]*)\'/i", $content, $matches);
 
-        $roboot_id = str_replace('; path=/; domain=.xs1699778.com','', $matches[1]);
+        $roboot_id = str_replace('; path=/; domain=.ww22277.xyz','', $matches[1]);
         $logArr = ['content'=>$content, 'roboot_id'=>$roboot_id];
         if(curl_error($curl)>0){
             $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
@@ -814,43 +814,42 @@ class SevenService extends BaseTZService {
         $m = \Yii::$app->cache;
         $mkey = 'UPDATE_COOKIE_TIME_'.$uid.'_'.$tz_system_id;
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        //if(!$cookie = $m->get($mkey)){
-            //p(HN0898Service::getTzSiteInfo($tz_system_id));
-            # 1、预登录
-            $_t = microtime(true) * 10000;
-            $url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/Login'.'?_'.$_t;
-            if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
-            $headers = [
-                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-                'Accept-Encoding: gunzip, deflate',
-                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-                //$robot7_session_id,
-                'Upgrade-Insecure-Requests: 1',
-                'Proxy-Connection: keep-alive',
-                'Host: '.SevenService::getTzSiteInfo($tz_system_id,'domain'),
-                'Cache-Control: max-age=0',
-                'Referer: '.$url,
-                $TzSystemsUsers->user_agent,
-            ];
-            $robot7_session_id = self::getSessionId($url, $headers);
-            $headers[] = 'Cookie: '.$robot7_session_id;
-            $cookie = self::curlGetSevenCookie($url, $headers);
-            $cookieData = $cookie;
-            //p($cookieData);
-            if($cookieData){
-                $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-                $TzSystemsUsers->cookie = $robot7_session_id.';'.trim($cookieData);
-                $TzSystemsUsers->cookie = str_replace('; path=/; HttpOnly','', $TzSystemsUsers->cookie);
-                $TzSystemsUsers->save();
-            }
-            self::$headers = [];
-            $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
-            //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
-            $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
-            $cookie = str_replace('; path=/; HttpOnly','',$cookie);
-            $m->set($mkey, $cookie, 180);
-        //}
+        # 1、预登录
+        $_t = microtime(true) * 10000;
+        $url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/Login'.'?_'.$_t;
+        //if($uid == 18)p(SevenService::getTzSiteInfo($tz_system_id));
+        if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
+        $headers = [
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'Accept-Encoding: gunzip, deflate',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            //$robot7_session_id,
+            'Upgrade-Insecure-Requests: 1',
+            'Proxy-Connection: keep-alive',
+            'Host: '.SevenService::getTzSiteInfo($tz_system_id,'domain'),
+            'Cache-Control: max-age=0',
+            'Referer: '.$url,
+            $TzSystemsUsers->user_agent,
+        ];
+        $robot7_session_id = self::getSessionId($url, $headers);
+        $headers[] = 'Cookie: '.$robot7_session_id;
+        $cookie = self::curlGetSevenCookie($url, $headers);
+        $cookieData = $cookie;
+        if($cookieData){
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+            $TzSystemsUsers->cookie = $robot7_session_id.';'.trim($cookieData);
+            $TzSystemsUsers->cookie = str_replace('; path=/; HttpOnly','', $TzSystemsUsers->cookie);
+            $TzSystemsUsers->save();
+        }
+        //p($TzSystemsUsers->cookie);
+        self::$headers = [];
+        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
+        //p($logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
+        $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
+        $cookie = str_replace('; path=/; HttpOnly','',$cookie);
+        $m->set($mkey, $cookie, 180);
+
         return $cookie;
     }
 

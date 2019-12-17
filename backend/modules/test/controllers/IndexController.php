@@ -127,7 +127,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = BaseService::login(26);p($rst);
+        $rst = BaseService::login(29);p($rst);
+
+        $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);p($data);
         $rst = bin2hex("Shanghai");p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([30], $lottery_type = 5, 40000);p($miss);
         $rst = QiLinBaseService::synBalance(26);p($rst);
@@ -155,7 +157,6 @@ class IndexController extends Controller
         $rst = SscDataService::insertCode($type = 5);p($rst); # 插入三字现、四字现
         $rst = SscDataService::insertCodeType();p($rst);
         $rst = SscDataService::getPlanNextSingle(3, 0.4);p($rst);
-        $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);p($data);
         $rst = StaticService::staticHzPerDateProfits('2019-10-31', $lottery_type = 5); p($rst);
         $rst = SscDataService::insertCodeType2();p($rst);
         $rst = CommonService::isCodeType_2($codes = '3,3,3,X');p($rst);

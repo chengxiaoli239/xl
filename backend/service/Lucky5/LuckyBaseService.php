@@ -1447,44 +1447,41 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $m = \Yii::$app->cache;
         $mkey = 'UPDATE_COOKIE_TIME_'.$uid.'_'.$tz_system_id;
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        //p($TzSystemsUsers);
-        //if(!$cookie = $m->get($mkey)){
-            //p(HN0898Service::getTzSiteInfo($tz_system_id));
-            # 1、预登录
-            $_t = microtime(true) * 10000;
-            $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/Login'.'?_'.$_t;
-            if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
-            $headers = [
-                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-                'Accept-Encoding: gunzip, deflate',
-                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-                //$robot7_session_id,
-                'Upgrade-Insecure-Requests: 1',
-                'Proxy-Connection: keep-alive',
-                'Host: '.self::getTzSiteInfo($tz_system_id,'domain'),
-                'Cache-Control: max-age=0',
-                'Referer: '.$url,
-                $TzSystemsUsers->user_agent,
-            ];
-            $robot7_session_id = self::getSessionId($url, $headers);
-            $headers[] = 'Cookie: '.$robot7_session_id;
-            $cookie = self::curlGetSevenCookie($url, $headers);
-            $cookieData = $cookie;
-            //p([$robot7_session_id, $cookieData, $cookie]);
-            if($cookieData){
-                $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-                $TzSystemsUsers->cookie = $robot7_session_id.';'.trim($cookieData);
-                $TzSystemsUsers->cookie = str_replace('; path=/; HttpOnly','', $TzSystemsUsers->cookie);
-                $rst = $TzSystemsUsers->save();
-            }
-            self::$headers = [];
-            $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
-            //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
-            $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
-            $cookie = str_replace('; path=/; HttpOnly','',$cookie);
-            $m->set($mkey, $cookie, 180);
-        //}
+        # 1、预登录
+        $_t = microtime(true) * 10000;
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/Login'.'?_'.$_t;
+        if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
+        $headers = [
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'Accept-Encoding: gunzip, deflate',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            //$robot7_session_id,
+            'Upgrade-Insecure-Requests: 1',
+            'Proxy-Connection: keep-alive',
+            'Host: '.self::getTzSiteInfo($tz_system_id,'domain'),
+            'Cache-Control: max-age=0',
+            'Referer: '.$url,
+            $TzSystemsUsers->user_agent,
+        ];
+        $robot7_session_id = self::getSessionId($url, $headers);
+        $headers[] = 'Cookie: '.$robot7_session_id;
+        $cookie = self::curlGetSevenCookie($url, $headers);
+        $cookieData = $cookie;
+        //if($uid == 18) p([$robot7_session_id, $cookieData, $cookie]);
+        if($cookieData){
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+            $TzSystemsUsers->cookie = $robot7_session_id.';'.trim($cookieData);
+            $TzSystemsUsers->cookie = str_replace('; path=/; HttpOnly','', $TzSystemsUsers->cookie);
+            $rst = $TzSystemsUsers->save();
+        }
+        self::$headers = [];
+        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
+        //if($uid == 18)p($logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
+        $cookie = trim($cookie, ';');
+        $cookie = str_replace('; path=/; HttpOnly','',$cookie);
+        $m->set($mkey, $cookie, 180);
+
         return $cookie;
     }
 
@@ -1502,9 +1499,11 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         $content = curl_exec($curl);
         //preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
-        preg_match("/document.cookie\=\'([^\r\n]*)\'/i", $content, $matches);
+        preg_match("/document.cookie\=\'([^\r\n]*)\; path/i", $content, $matches);
 
-        $roboot_id = str_replace('; path=/; domain=.ww99865.xyz','', $matches[1]);
+        //p([$url, $header, $content, $matches]);
+        //$roboot_id = str_replace('; path=/; domain=.ww22277.xyz','', $matches[1]);
+        $roboot_id = $matches[1];
         $logArr = ['content'=>$content, 'roboot_id'=>$roboot_id];
         if(curl_error($curl)>0){
             $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
@@ -1730,6 +1729,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         //sleep(10);
         self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
+
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
         return $data;
     }
