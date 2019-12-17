@@ -127,7 +127,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BaseService::synBalance(29);p($rst);
         $rst = BaseService::login(29);p($rst);
+        $rst = SevenService::synBalance(29);p($rst);
+        $rst = LuckyBaseService::synBalance($tz_system_users_id = 29); p($rst);# 同步余额
 
         $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);p($data);
         $rst = bin2hex("Shanghai");p($rst);
@@ -179,7 +182,6 @@ class IndexController extends Controller
         $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst); # 号码类型遗漏
         $miss = SscDataService::getSdHzYlHistoryMiss([26], $lottery_type = 6, 20000);p($miss);
         $rst = SscDataService::getLastIndexId(6);p($rst);
-        $rst = LuckyBaseService::synBalance($tz_system_users_id = 16); p($rst);# 同步余额
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 8);p($rst);
         $rst = StaticService::static2NumsYl($lottery_type = 8);p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=8); p($rst);// 单双遗漏

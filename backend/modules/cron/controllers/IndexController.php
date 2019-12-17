@@ -272,6 +272,8 @@ class IndexController extends Controller
         $TzSystemsUsers = TzSystemsUsers::findAll(['status'=>1]);
 
         foreach ($TzSystemsUsers as $TzSystemsUser){
+            $rst['rst'][$TzSystemsUser->id] = BaseService::synBalance($TzSystemsUser->id);
+            /*
             $TzSystems = TzSystems::findOne($TzSystemsUser->tz_system_id);
             switch ($TzSystems->system_type_id){
                 case 1:
@@ -290,6 +292,7 @@ class IndexController extends Controller
                     $rst['rst'][$TzSystemsUser->id] = QiLinBaseService::synBalance($TzSystemsUser->id);
                     break;
             }
+            */
         }
         return $rst;
     }
