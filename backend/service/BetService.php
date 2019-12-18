@@ -387,8 +387,6 @@ abstract class BetService extends BaseBetService {
                 $codesArr = explode(',', $codes_hz);
                 break;
         }
-
-        p($codesArr);
         $codes = implode('@', $codesArr);
         //$m->set($mkey, $codes, 5*60);
 
