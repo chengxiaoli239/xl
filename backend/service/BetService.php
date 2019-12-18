@@ -315,7 +315,7 @@ abstract class BetService extends BaseBetService {
                 if(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])) { # 导入方案
                     $codesArr = UserSysPlansService::getImportCodes($plan_id);
                 }else{
-                    if(in_array($tz_type, [29])){
+                    if(in_array($tz_type, [29])){ # 三定快选
                         $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 3);
                     }else{
                         $params = ['playway'=>$playway, 'tz_type'=>$tz_type, 'status'=>$buy_type];
@@ -387,6 +387,7 @@ abstract class BetService extends BaseBetService {
                 $codesArr = explode(',', $codes_hz);
                 break;
         }
+        //p($codesArr);
         $codes = implode('@', $codesArr);
         //$m->set($mkey, $codes, 5*60);
 

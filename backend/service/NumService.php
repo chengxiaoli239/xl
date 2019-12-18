@@ -684,7 +684,7 @@ class NumService extends BaseService {
             $where = array_merge($where, [ ['NOT IN', 'codes_hz', $codes_hz['remove_hzs']] ]);
         }
 
-        # 合分 - 三定
+        # 定位合分 - 三定
         if(isset($codes_hz['hefen_pos']) && isset($codes_hz['hefen']) && !empty($codes_hz['hefen_pos']) && !empty($codes_hz['hefen'])){
             $poss = explode(',', $codes_hz['hefen_pos']);
 
@@ -700,15 +700,52 @@ class NumService extends BaseService {
             }
             $codes_str = '';
             foreach ($poss as $pos){
-                $codes_str .= 'code_'.$pos . '+';
+                $codes_str .= '`code_'.$pos.'`' . ' +';
                 $where = array_merge($where, [['<>', 'code_'.$pos, 'X']]);
             }
-            $codes_str = rtrim($codes_str, '+');
+            $codes_str = rtrim(trim($codes_str), '+');
             $where = array_merge($where, [ ['IN', '('.$codes_str.')', $codes_hefen ] ]);
             //$query->andWhere($andWhere);
         }
         //p([$where, $codes_hz]);
         //p([$code_type, $codes_hz['hefen']]);
+        # 不定位合分(1两数、2三数) - 三定
+        if($code_type == 3 && isset($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen'])){
+
+            $no_fix_lenHefen = strlen($codes_hz['no_fix_hefen']);
+            $codes_no_fix_hefen = [];
+            for ($i=0; $i<$no_fix_lenHefen;$i++){
+                if($codes_hz['no_fix_hefen_pos'] == 1){
+                    # 1、两数合分
+                    if($codes_hz['no_fix_hefen'][$i]<=8){
+                        $no_fix_hefenArr = [$codes_hz['no_fix_hefen'][$i], $codes_hz['no_fix_hefen'][$i] + 10];
+                    }else{
+                        $no_fix_hefenArr = [$codes_hz['no_fix_hefen'][$i]];
+                    }
+                }elseif($codes_hz['no_fix_hefen_pos'] == 2){
+                    # 1、三数合分
+                    if($codes_hz['no_fix_hefen'][$i]<=7){
+                        $no_fix_hefenArr = [$codes_hz['no_fix_hefen'][$i], $codes_hz['no_fix_hefen'][$i] + 10, $codes_hz['no_fix_hefen'][$i] + 20];
+                    }else{
+                        $no_fix_hefenArr = [$codes_hz['no_fix_hefen'][$i], $codes_hz['no_fix_hefen'][$i] + 10];
+                    }
+                }
+                $codes_no_fix_hefen = array_merge($codes_no_fix_hefen, $no_fix_hefenArr);
+            }
+            //p($codes_no_fix_hefen);
+
+            if($codes_hz['no_fix_hefen_pos'] == 1){ # 两数合分
+                $tmp_no_fix_hefen = ['OR'];
+                $poss = [[1,2], [1,3], [1,4],[2,3],[2,4],[3,4]];
+                foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
+                    $tmp_no_fix_hefen = array_merge($tmp_no_fix_hefen, [['IN', '(`code_'.$pos[0].'` + `code_'.$pos[1].'`)', $codes_no_fix_hefen]]);
+                }
+            }elseif($codes_hz['no_fix_hefen_pos'] == 2){ # 三数合分
+                $tmp_no_fix_hefen = [ ['IN', 'codes_hz', $codes_no_fix_hefen ] ];
+            }
+            $where = array_merge($where, [$tmp_no_fix_hefen]);
+
+        }
 
         # 合分 - 四定
         if($code_type == 4 && isset($codes_hz['hefen']) && !empty($codes_hz['hefen'])){
