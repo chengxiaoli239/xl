@@ -119,6 +119,18 @@ class UserSysPlansService extends BaseService {
             }
             unset($post['UserSysPlans']['hefen']);
 
+            # 16.1、不定位合分:位置
+            if($UserSysPlans['no_fix_hefen_pos'] && count($UserSysPlans['no_fix_hefen_pos']) == 1){
+                //$tmpFilter['hefen_pos'] = $UserSysPlans['hefen_pos'][0];
+                $tmpFilter['no_fix_hefen_pos'] = implode(',', $post['UserSysPlans']['no_fix_hefen_pos']); # 合分位置
+            }
+            unset($post['UserSysPlans']['no_fix_hefen_pos']);
+            # 16.2、不定位合分:值
+            if(isset($post['UserSysPlans']['no_fix_hefen']) && $post['UserSysPlans']['no_fix_hefen']){
+                $tmpFilter['no_fix_hefen'] = $post['UserSysPlans']['no_fix_hefen']; # 合分
+            }
+            unset($post['UserSysPlans']['no_fix_hefen']);
+
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
         }elseif ($tz_type == 30){ # 二定-快选
             # 二定-快选过滤

@@ -64,8 +64,10 @@ class UserSysPlans extends \common\models\base\BaseModel
    public $remove_types; #  排除类型
    public $get_hzs; #  取和值
    public $remove_hzs; #  排除和值
-   public $hefen; #  合分值
-   public $hefen_pos; #  合分位置
+   public $hefen; #  定位合分值
+   public $hefen_pos; #  定位合分位置
+   public $no_fix_hefen; #  定位合分值
+   public $no_fix_hefen_pos; #  定位合分位置
    //public $type_3_txt; # 三定-导入
    //public $type_4_txt; # 四定-导入 
     /**

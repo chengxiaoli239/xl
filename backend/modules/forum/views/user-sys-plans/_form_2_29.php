@@ -36,9 +36,14 @@ use yii\widgets\ActiveForm;
                     <?= $form->field($model, 'single')->textInput() ?>
 
                     <!--位置合分：位置-->
-                    <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.合分取:位置') ?>
+                    <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.定位合分取:位置') ?>
                     <!--位置合分：合分-->
-                    <?= $form->field($model, 'hefen')->textInput()->label('1.合分值')?>
+                    <?= $form->field($model, 'hefen')->textInput()->label('1.定位合分:值')?>
+
+                    <!--两数合、三数合-->
+                    <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList([1=>'两数和',2=>'三数合'])->label('2.不定位合分:位置') ?>
+                    <!--位置合分：合分-->
+                    <?= $form->field($model, 'no_fix_hefen')->textInput()->label('2.不定位合分:值')?>
 
                     <?= $form->field($model, 'arise')->textInput()->label('上奖')?>
 
@@ -59,7 +64,7 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'hz')->checkboxList($hzArr)->label('三数和值') ?>
+                    <!--?= $form->field($model, 'hz')->checkboxList($hzArr)->label('三数和值') ?-->
 
                     <!--?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?-->
                     <?= $form->field($model, 'type_2')->checkBoxList([
