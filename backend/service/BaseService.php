@@ -36,7 +36,7 @@ class BaseService{
             # 1、0898投注、2、99彩票网
             //$rst = HN0898Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             $rst['rst'][$TzSystemsUser->id] = HN0898Service::synBalance($TzSystemsUser->id);
-        }elseif(in_array($tz_system_id, [3, 7, 9])){
+        }elseif(in_array($tz_system_id, [3, 7, 9, 10])){
             # 3、重庆7时彩网
             if($tz_system_id == 3){
                 $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
@@ -77,7 +77,7 @@ class BaseService{
             # 1、0898投注、2、99彩票网
             //$rst = HN0898Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             $rst = HN0898Service::synBalance($TzSystemsUser->id);
-        }elseif(in_array($tz_system_id, [3, 7, 9])){
+        }elseif(in_array($tz_system_id, [3, 7, 9, 10])){
             # 3、重庆7时彩网
             if(in_array($tz_system_id, [3, 7])){
                 $rst = SevenService::synBalance($TzSystemsUser->id);

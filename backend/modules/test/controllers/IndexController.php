@@ -127,9 +127,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::insertCodeType3();p($rst);
+        $rst = CommonService::isCodeType2b('9,1,1,X');p($rst);
+        $rst = BaseService::synBalance(35);p($rst);
+        $rst = BaseService::login(35);p($rst);
         $rst = BetService::tzByPlanId(24, 0);p($rst); # 投注
-        $rst = BaseService::synBalance(29);p($rst);
-        $rst = BaseService::login(29);p($rst);
         $rst = SevenService::synBalance(29);p($rst);
         $rst = LuckyBaseService::synBalance($tz_system_users_id = 29); p($rst);# 同步余额
 

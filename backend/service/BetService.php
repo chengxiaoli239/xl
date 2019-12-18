@@ -55,7 +55,7 @@ abstract class BetService extends BaseBetService {
             }elseif ($lottery_type == 6){
                 $BetService = new NineNineService6($uid, $tz_system_id);
             }
-        }elseif(in_array($tz_system_id, [3, 7, 9])){
+        }elseif(in_array($tz_system_id, [3, 7, 9, 10])){
             # 3、重庆7时彩网：重庆7时彩、幸运五星彩
             if($lottery_type == 5){ # 7时彩重庆
                 $BetService = new SevenService($uid, $tz_system_id);
@@ -387,6 +387,8 @@ abstract class BetService extends BaseBetService {
                 $codesArr = explode(',', $codes_hz);
                 break;
         }
+
+        p($codesArr);
         $codes = implode('@', $codesArr);
         //$m->set($mkey, $codes, 5*60);
 

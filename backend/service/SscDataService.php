@@ -2017,7 +2017,7 @@ class SscDataService extends BaseService {
     }
 
     /**
-     * @desc 三字现
+     * @desc 统计表插入 三字现
      * @param int $isDouble 0不带双重1带双重
      * @param $type # 类型：1和值2号码类型[例如:双双重、三重]3三字现4四字现
      * @return bool

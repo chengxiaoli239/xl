@@ -1449,7 +1449,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         # 1、预登录
         $_t = microtime(true) * 10000;
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/Login'.'?_'.$_t;
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/Login'.'?_='.$_t;
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
         $headers = [
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
@@ -1467,7 +1467,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $headers[] = 'Cookie: '.$robot7_session_id;
         $cookie = self::curlGetSevenCookie($url, $headers);
         $cookieData = $cookie;
-        //if($uid == 18) p([$robot7_session_id, $cookieData, $cookie]);
+        //if($uid == 19) p([$robot7_session_id, $cookieData, $cookie]);
         if($cookieData){
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
             $TzSystemsUsers->cookie = $robot7_session_id.';'.trim($cookieData);

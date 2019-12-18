@@ -691,7 +691,12 @@ class NumService extends BaseService {
             $lenHefen = strlen($codes_hz['hefen']);
             $codes_hefen = [];
             for ($i=0; $i<$lenHefen; $i++){
-                $codes_hefen = array_merge($codes_hefen, [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10]);
+                if($codes_hz['hefen'][$i]<=7){
+                    $hefenArr = [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10, $codes_hz['hefen'][$i] + 20];
+                }else{
+                    $hefenArr = [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10];
+                }
+                $codes_hefen = array_merge($codes_hefen, $hefenArr);
             }
             $codes_str = '';
             foreach ($poss as $pos){
@@ -710,7 +715,12 @@ class NumService extends BaseService {
             $lenHefen = strlen($codes_hz['hefen']);
             $codes_hefen = [];
             for ($i=0; $i<$lenHefen; $i++){
-                $codes_hefen = array_merge($codes_hefen, [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10]);
+                if($codes_hz['hefen'][$i]<=6){
+                    $hefenArr = [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10, $codes_hz['hefen'][$i] + 20, $codes_hz['hefen'][$i] + 30];
+                }else{
+                    $hefenArr = [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10, $codes_hz['hefen'][$i] + 20];
+                }
+                $codes_hefen = array_merge($codes_hefen, $hefenArr);
             }
             $where = array_merge($where, [ ['IN', 'codes_hz', $codes_hefen ] ]);
         }
@@ -855,7 +865,7 @@ class NumService extends BaseService {
         if(isset($codes_hz['arise'])){
             $asises = explode(',', $codes_hz['arise']);
             $codesArr_arise = self::getCodesArise($asises, $type = 1, $code_type);
-            if(in_array($code_type, [3,4])){
+            if(in_array($code_type, [3, 4])){
                 $codesArr = array_intersect($codesArr, $codesArr_arise);
             }else{
                 $codesArr = $codesArr_arise;

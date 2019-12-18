@@ -15,6 +15,8 @@ use common\tools\Tool_Common;
 use backend\service\CurlService;
 use backend\service\UserService;
 use backend\models\SscKjData;
+use common\tools\Tools;
+
 class  CommonService{
 
 
@@ -545,6 +547,7 @@ class  CommonService{
     public static function isCodeType2b($codes){
         $flag = 0;
         $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
         asort($codesArr);
         $codes_str = implode(',', $codesArr);
         $bArrs = [
@@ -575,11 +578,13 @@ class  CommonService{
     public static function isCodeType3b($codes){
         $flag = 0;
         $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
         $codesArr = array_unique($codesArr);
         asort($codesArr);
         $codes_str = implode(',', $codesArr);
         $bArrs = [
             '0,1,2',
+            '0,1,8',
             '1,2,3',
             '2,3,4',
             '3,4,5',
@@ -609,6 +614,7 @@ class  CommonService{
     public static function isCodeType4b($codes){
         $flag = 0;
         $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
         asort($codesArr);
         $codes_str = implode(',', $codesArr);
         $bArrs = [
