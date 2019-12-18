@@ -7,12 +7,13 @@ use Yii;
 /**
  * This is the model class for table "{{%tz_types}}".
  *
- * @property string $id
+ * @property int $id
  * @property string $type 投注/购买类型
  * @property string $type_name 类型名称
  * @property int $playway 投注方式:1二字定2三字定3四字定
  * @property int $status 状态
  * @property string $codes 组合号码
+ * @property int $sort 排序
  * @property string $desc 描述
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
@@ -34,7 +35,7 @@ class TzTypes extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['playway', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['playway', 'status', 'sort', 'created_at', 'updated_at'], 'integer'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['type'], 'string', 'max' => 255],
@@ -55,6 +56,7 @@ class TzTypes extends \common\models\base\BaseModel
             'playway' => Yii::t('app', '投注方式:1二字定2三字定3四字定'),
             'status' => Yii::t('app', '状态'),
             'codes' => Yii::t('app', '组合号码'),
+            'sort' => Yii::t('app', '排序'),
             'desc' => Yii::t('app', '描述'),
             'created_at' => Yii::t('app', '创建时间'),
             'updated_at' => Yii::t('app', '更新时间'),
