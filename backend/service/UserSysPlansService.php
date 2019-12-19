@@ -127,9 +127,20 @@ class UserSysPlansService extends BaseService {
             unset($post['UserSysPlans']['no_fix_hefen_pos']);
             # 16.2、不定位合分:值
             if(isset($post['UserSysPlans']['no_fix_hefen']) && $post['UserSysPlans']['no_fix_hefen']){
-                $tmpFilter['no_fix_hefen'] = $post['UserSysPlans']['no_fix_hefen']; # 合分
+                $tmpFilter['no_fix_hefen'] = trim($post['UserSysPlans']['no_fix_hefen']); # 合分
             }
             unset($post['UserSysPlans']['no_fix_hefen']);
+
+            # 17.1、三定含：除、取
+            if(!empty($UserSysPlans['arise_in_sel']) && count($UserSysPlans['arise_in_sel']) == 1){
+                $tmpFilter['arise_in_sel'] = $UserSysPlans['arise_in_sel'][0];
+            }
+            unset($post['UserSysPlans']['arise_in_sel']);
+            # 17.2、含
+            if(!empty($UserSysPlans['arise_in'])){
+                $tmpFilter['arise_in'] = trim($UserSysPlans['arise_in']);
+            }
+            unset($post['UserSysPlans']['arise_in']);
 
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
         }elseif ($tz_type == 30){ # 二定-快选
@@ -159,7 +170,7 @@ class UserSysPlansService extends BaseService {
             unset($post['UserSysPlans']['arise']);
             # 10、第1位
             if(isset($UserSysPlans['p1']) && $UserSysPlans['p1']){
-                $tmpFilter['p1'] = $UserSysPlans['p1'];
+                $tmpFilter['p1'] = trim($UserSysPlans['p1']);
             }
             unset($post['UserSysPlans']['p1']);
             # 11、第2位
@@ -274,6 +285,41 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['type_4s'] = $UserSysPlans['type_4s'][0];
             }
             unset($post['UserSysPlans']['type_4s']);
+
+            # 15.1、合分位置
+            if($UserSysPlans['hefen_pos'] && count($UserSysPlans['hefen_pos']) > 0){
+                //$tmpFilter['hefen_pos'] = $UserSysPlans['hefen_pos'][0];
+                $tmpFilter['hefen_pos'] = implode(',', $post['UserSysPlans']['hefen_pos']); # 合分位置
+            }
+            unset($post['UserSysPlans']['hefen_pos']);
+            # 15.2、合分值
+            if(isset($post['UserSysPlans']['hefen']) && $post['UserSysPlans']['hefen']){
+                $tmpFilter['hefen'] = $post['UserSysPlans']['hefen']; # 合分
+            }
+            unset($post['UserSysPlans']['hefen']);
+
+            # 16.1、不定位合分:位置
+            if($UserSysPlans['no_fix_hefen_pos'] && count($UserSysPlans['no_fix_hefen_pos']) == 1){
+                //$tmpFilter['hefen_pos'] = $UserSysPlans['hefen_pos'][0];
+                $tmpFilter['no_fix_hefen_pos'] = implode(',', $post['UserSysPlans']['no_fix_hefen_pos']); # 合分位置
+            }
+            unset($post['UserSysPlans']['no_fix_hefen_pos']);
+            # 16.2、不定位合分:值
+            if(isset($post['UserSysPlans']['no_fix_hefen']) && $post['UserSysPlans']['no_fix_hefen']){
+                $tmpFilter['no_fix_hefen'] = trim($post['UserSysPlans']['no_fix_hefen']); # 合分
+            }
+            unset($post['UserSysPlans']['no_fix_hefen']);
+
+            # 17.1、三定含：除、取
+            if(!empty($UserSysPlans['arise_in_sel']) && count($UserSysPlans['arise_in_sel']) == 1){
+                $tmpFilter['arise_in_sel'] = $UserSysPlans['arise_in_sel'][0];
+            }
+            unset($post['UserSysPlans']['arise_in_sel']);
+            # 17.2、含
+            if(!empty($UserSysPlans['arise_in'])){
+                $tmpFilter['arise_in'] = trim($UserSysPlans['arise_in']);
+            }
+            unset($post['UserSysPlans']['arise_in']);
 
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
         }elseif ($tz_type == 28){ # 系统快捷
@@ -506,6 +552,7 @@ class UserSysPlansService extends BaseService {
             $data['hzArr'] = $hzArr;
             $data['hefen_pos'] = [1=>'',2=>'',3=>'',4=>''];
         }elseif($playway ==3){
+            $data['hefen_pos'] = [1=>'',2=>'',3=>'',4=>''];
             if($tz_type<20){
                 $kArr = StaticService::$kArr;
                 unset($kArr[0], $kArr[1], $kArr[10], $kArr[11], $kArr[21], $kArr[22]);

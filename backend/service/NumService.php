@@ -707,10 +707,10 @@ class NumService extends BaseService {
             $where = array_merge($where, [ ['IN', '('.$codes_str.')', $codes_hefen ] ]);
             //$query->andWhere($andWhere);
         }
-        //p([$where, $codes_hz]);
-        //p([$code_type, $codes_hz['hefen']]);
+
         # 不定位合分(1两数、2三数) - 三定
-        if($code_type == 3 && isset($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen'])){
+        //if($code_type == 3 && !empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){
+        if(!empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){
 
             $no_fix_lenHefen = strlen($codes_hz['no_fix_hefen']);
             $codes_no_fix_hefen = [];
@@ -737,29 +737,85 @@ class NumService extends BaseService {
             if($codes_hz['no_fix_hefen_pos'] == 1){ # 两数合分
                 $tmp_no_fix_hefen = ['OR'];
                 $poss = [[1,2], [1,3], [1,4],[2,3],[2,4],[3,4]];
-                foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
-                    $tmp_no_fix_hefen = array_merge($tmp_no_fix_hefen, [['IN', '(`code_'.$pos[0].'` + `code_'.$pos[1].'`)', $codes_no_fix_hefen]]);
+                if($code_type == 3){ # 三定
+                    foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
+                        $son_where = [
+                            ['AND',
+                                ['IN', '(`code_'.$pos[0].'` + `code_'.$pos[1].'`)', $codes_no_fix_hefen],
+                                ['<>', '`code_'.$pos[0].'`', 'X'],
+                                ['<>', '`code_'.$pos[1].'`', 'X']
+                            ]
+                        ];
+                        $tmp_no_fix_hefen = array_merge($tmp_no_fix_hefen, $son_where);
+                    }
+                }elseif($code_type == 4){ # 四定
+                    foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
+                        $son_where = [ ['IN', '(`code_'.$pos[0].'` + `code_'.$pos[1].'`)', $codes_no_fix_hefen] ];
+                        $tmp_no_fix_hefen = array_merge($tmp_no_fix_hefen, $son_where);
+                    }
                 }
             }elseif($codes_hz['no_fix_hefen_pos'] == 2){ # 三数合分
-                $tmp_no_fix_hefen = [ ['IN', 'codes_hz', $codes_no_fix_hefen ] ];
+                if($code_type == 3) { # 三定
+                    $tmp_no_fix_hefen = ['IN', 'codes_hz', $codes_no_fix_hefen];
+                }elseif ($code_type == 4){
+                    $tmp_no_fix_hefen = ['OR'];
+                    $poss = [[1,2,3], [1,2,4], [1,3,4],[2,3,4]];
+                    foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
+                        $son_where = [ ['IN', '(`code_'.$pos[0].'` + `code_'.$pos[1].'` + `code_'.$pos[2].'`)', $codes_no_fix_hefen] ];
+                        $tmp_no_fix_hefen = array_merge($tmp_no_fix_hefen, $son_where);
+                    }
+                }
             }
             $where = array_merge($where, [$tmp_no_fix_hefen]);
 
         }
 
         # 合分 - 四定
-        if($code_type == 4 && isset($codes_hz['hefen']) && !empty($codes_hz['hefen'])){
-            $lenHefen = strlen($codes_hz['hefen']);
+        if($code_type == 4 && isset($codes_hz['xhefen']) && !empty($codes_hz['xhefen'])){
+            $lenHefen = strlen($codes_hz['xhefen']);
             $codes_hefen = [];
             for ($i=0; $i<$lenHefen; $i++){
-                if($codes_hz['hefen'][$i]<=6){
-                    $hefenArr = [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10, $codes_hz['hefen'][$i] + 20, $codes_hz['hefen'][$i] + 30];
+                if($codes_hz['xhefen'][$i]<=6){
+                    $hefenArr = [$codes_hz['xhefen'][$i], $codes_hz['xhefen'][$i] + 10, $codes_hz['xhefen'][$i] + 20, $codes_hz['xhefen'][$i] + 30];
                 }else{
-                    $hefenArr = [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10, $codes_hz['hefen'][$i] + 20];
+                    $hefenArr = [$codes_hz['xhefen'][$i], $codes_hz['xhefen'][$i] + 10, $codes_hz['xhefen'][$i] + 20];
                 }
                 $codes_hefen = array_merge($codes_hefen, $hefenArr);
             }
             $where = array_merge($where, [ ['IN', 'codes_hz', $codes_hefen ] ]);
+        }
+
+        # 三定、四定除、取
+        if($code_type = 3 && !empty($codes_hz['arise_in']) && in_array($codes_hz['arise_in_sel'], [1, 2])){
+            $lenAriseIn = strlen($codes_hz['arise_in']);
+            $tmpAriseInType = $codes_hz['arise_in_sel'];
+            if($tmpAriseInType == 1){ # 除
+                $op = 'AND';
+                $sel_type = '<>';
+            }elseif($tmpAriseInType == 2){ # 取
+                $op = 'OR';
+                $sel_type = '=';
+            }
+            if($lenAriseIn>1){
+                $tmpAriseIn = [$op];
+                for($i=0; $i<$lenAriseIn; $i++){
+                    $tmpAriseIn = array_merge($tmpAriseIn, [
+                        [
+                            $op,
+                            [$sel_type, 'code_1', $codes_hz['arise_in'][$i] ], [$sel_type, 'code_2', $codes_hz['arise_in'][$i] ],
+                            [$sel_type, 'code_3', $codes_hz['arise_in'][$i] ], [$sel_type, 'code_4', $codes_hz['arise_in'][$i] ]
+                        ]
+                    ]);
+                }
+                $where = array_merge($where, [$tmpAriseIn]);
+            }else{
+                $where = array_merge($where, [
+                    [ $op,
+                        [$sel_type, 'code_1', $codes_hz['arise_in'] ], [$sel_type, 'code_2', $codes_hz['arise_in'] ],
+                        [$sel_type, 'code_3', $codes_hz['arise_in'] ], [$sel_type, 'code_4', $codes_hz['arise_in'] ]
+                    ]
+                ]);
+            }
         }
 
         # 第1位
@@ -891,6 +947,8 @@ class NumService extends BaseService {
             $where = array_merge($where, [['=', 'type_log', $codes_hz['type_log']]]);
         }
 
+        $get = \Yii::$app->request->get();
+        if($get['t'] == 1)p($where);
         $codesArr = [];
         if($code_type == 4 OR $code_type == 3){
             $Num4Types = Num4Type::find()->where($where)->asArray()->all();

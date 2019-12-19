@@ -53,6 +53,21 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
+                    <!--位置合分：位置-->
+                    <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.定位合分取:位置') ?>
+                    <!--位置合分：合分-->
+                    <?= $form->field($model, 'hefen')->textInput()->label('1.定位合分:值')?>
+
+                    <!--两数合、三数合-->
+                    <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList([1=>'两数和',2=>'三数合'])->label('2.不定位合分') ?>
+                    <!--位置合分：合分-->
+                    <?= $form->field($model, 'no_fix_hefen')->textInput()->label('2.不定位合分:值')?>
+
+                    <!--三定含除、取-->
+                    <?= $form->field($model, 'arise_in_sel')->checkboxList([1=>'除',2=>'取'])->label('3.四字定含') ?>
+                    <?= $form->field($model, 'arise_in')->textInput()->label('3.四字定含')?>
+
+
                     <?= $form->field($model, 'hz')->checkboxList($hzArr)->label('投注类型(和值)') ?>
 
                     <!--?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?-->

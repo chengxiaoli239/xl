@@ -41,35 +41,38 @@ use Yii;
  */
 class UserSysPlans extends \common\models\base\BaseModel
 {
-   public $type_2; # 双重 
-   public $type_3; # 三重 
-   public $type_4; # 四重 
-   public $type_22; # 双双重 
-   public $type_2b; # 两兄弟 
-   public $type_3b; # 三兄弟 
-   public $type_4b; # 四兄弟 
-   public $hz; # 四兄弟 
-   public $arise; # 上奖 
-   public $get_arises; # 上奖：取
-   public $remove_arises; # 上奖：除
-   public $p1; # 第1位
-   public $p2; # 第2位 
-   public $p3; # 第3位 
-   public $p4; # 第4位 
-   public $type_4d; # 四单 
-   public $type_4s; # 四双 
-   public $type_log; # 对数
-   public $import_codes_txt; # 导入号码
-   public $get_types; #  取类型
-   public $remove_types; #  排除类型
-   public $get_hzs; #  取和值
-   public $remove_hzs; #  排除和值
-   public $hefen; #  定位合分值
-   public $hefen_pos; #  定位合分位置
-   public $no_fix_hefen; #  定位合分值
-   public $no_fix_hefen_pos; #  定位合分位置
-   //public $type_3_txt; # 三定-导入
-   //public $type_4_txt; # 四定-导入 
+    public $type_2; # 双重
+    public $type_3; # 三重
+    public $type_4; # 四重
+    public $type_22; # 双双重
+    public $type_2b; # 两兄弟
+    public $type_3b; # 三兄弟
+    public $type_4b; # 四兄弟
+    public $hz; # 四兄弟
+    public $arise; # 上奖
+    public $get_arises; # 上奖：取
+    public $remove_arises; # 上奖：除
+    public $p1; # 第1位
+    public $p2; # 第2位
+    public $p3; # 第3位
+    public $p4; # 第4位
+    public $type_4d; # 四单
+    public $type_4s; # 四双
+    public $type_log; # 对数
+    public $import_codes_txt; # 导入号码
+    public $get_types; #  取类型
+    public $remove_types; #  排除类型
+    public $get_hzs; #  取和值
+    public $remove_hzs; #  排除和值
+    public $xhefen; #  四定系统快捷定位合分值
+    public $hefen; #  定位合分值
+    public $hefen_pos; #  定位合分位置
+    public $no_fix_hefen; #  定位合分值
+    public $no_fix_hefen_pos; #  定位合分位置
+    public $arise_in; #  三定含
+    public $arise_in_sel; #  三定含，除取
+    //public $type_3_txt; # 三定-导入
+    //public $type_4_txt; # 四定-导入
     /**
      * @inheritdoc
      */
