@@ -685,7 +685,7 @@ class NumService extends BaseService {
         }
 
         # 定位合分 - 三定
-        if(isset($codes_hz['hefen_pos']) && isset($codes_hz['hefen']) && !empty($codes_hz['hefen_pos']) && !empty($codes_hz['hefen'])){
+        if($code_type == 3 && isset($codes_hz['hefen_pos']) && isset($codes_hz['hefen']) && !empty($codes_hz['hefen_pos']) && !empty($codes_hz['hefen'])){
             $poss = explode(',', $codes_hz['hefen_pos']);
 
             $lenHefen = strlen($codes_hz['hefen']);
@@ -786,7 +786,7 @@ class NumService extends BaseService {
         }
 
         # 三定、四定除、取
-        if($code_type = 3 && !empty($codes_hz['arise_in']) && in_array($codes_hz['arise_in_sel'], [1, 2])){
+        if($code_type == 3 && !empty($codes_hz['arise_in']) && in_array($codes_hz['arise_in_sel'], [1, 2])){
             $lenAriseIn = strlen($codes_hz['arise_in']);
             $tmpAriseInType = $codes_hz['arise_in_sel'];
             if($tmpAriseInType == 1){ # 除
