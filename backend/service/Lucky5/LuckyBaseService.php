@@ -231,8 +231,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             case 2:
                 break;
             case 3:
-                //$rst = self::bet_playway_3($plan_id, $codes, $single, $qihao);
-                $rst = self::bet_playway_33($plan_id, $codes, $single, $qihao);
+                $rst = self::bet_playway_3($plan_id, $codes, $single, $qihao);
+                //$rst = self::bet_playway_33($plan_id, $codes, $single, $qihao);
                 p($rst);
                 break;
             case 4:
@@ -366,13 +366,13 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $TzSystemsUsers->user_agent,
         ];
 
-        p(['url'=>$url, 'codes'=>$codes, 'post_data'=>$post_data, 'headers'=>$headers]);
+        //p(['url'=>$url, 'codes'=>$codes, 'post_data'=>$post_data, 'headers'=>$headers]);
         $start_time = microtime(true);
         $rst = self::postCurl($url, $post_data, $headers);
         //$rst = CurlService::postCurl($url, $post_data, $headers);
         $end_time = microtime(true);
         $time_consume = ($end_time - $start_time) . 's';
-        //p(['rst'=>$rst,'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers]);
+        p(['rst'=>$rst,'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers]);
         if ($rst['Status'] != 1 OR !$rst) {
             $tzRst = ['uid' => self::$user_id, 'status' => 301, 'msg' => $qihao . $rst['msg'], 'url' => $url, 'post_data' => $post_data, 'user_id' => self::$user_id, 'headers' => $headers, 'postRst' => $rst, 'time_consume' => $time_consume];
             if ($tz_type != 20) {
