@@ -430,4 +430,52 @@ class CurlService extends BaseService{
 
         return $cookie;
     }
+
+    /**
+     * @decription post请求根据，接受传递的header头
+     * @param $url
+     */
+    public static function testCurl($url, $post_data = [], $headers=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        if(!$timeout) $timeout = 15;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+
+        //设置post方式提交
+        curl_setopt($ch, CURLOPT_POST, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+        $data = curl_exec($ch);
+        $errno = curl_errno( $ch );
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
+        if($errno){
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+            //p($logArr);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+        }
+
+        //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,,$errno]); }
+        if(curl_close($ch)) {
+            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+        }
+        if($data == 'ok'){
+            return 'ok';
+        }
+        $rstData = json_decode($data, true); # data : {"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}
+
+        return $rstData;
+    }
+
 }

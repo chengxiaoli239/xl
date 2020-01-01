@@ -67,13 +67,14 @@ class UserSysPlansController extends BaseController
         $myTzTypes = UserSysPlansService::getMyTzTypes($this->_user_id, $lottery_type);
 
         $view = $this->_user_id !== 1 ? 'index' : 'index_admin';
-        return $this->render($view, [
+        $data = [
             'lottery_types' => $lottery_types,
             'lottery_type' => $lottery_type,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'myTzTypes' => $myTzTypes,
-        ]);
+        ];
+        return $this->render($view, $data);
     }
 
     /**

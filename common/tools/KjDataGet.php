@@ -478,7 +478,7 @@ class KjDataGet
                     $maxQihaoArr = BetService::$maxQihaoArr;
                     $maxQihao = $maxQihaoArr[$lottery_type];
                     if($date == $year.'1231' && $qihao >=$maxQihao){
-                        $nextQihao = ($year+1).'0101001';
+                        $nextQihao = substr(($year+1).'0101001', 2, 9);
                     //}elseif($qihao >= 120){
                     }elseif($qihao >= $maxQihao){
                         $nextQihao = ltrim(Tools::getNextDate($date),'20').'001';

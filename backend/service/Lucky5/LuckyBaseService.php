@@ -351,7 +351,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             //'Access-Control-Allow-Origin : * ',
             //'Access-Control-Allow-Credentials : true',
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-            'Accept-Encoding: gzip, deflate',
+            'Accept-Encoding: gunzip, deflate',
             'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
             'Cache-Control: max-age=0',
             'Connection: keep-alive',
