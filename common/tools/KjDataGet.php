@@ -481,7 +481,7 @@ class KjDataGet
                         $nextQihao = substr(($year+1).'0101001', 2, 9);
                     //}elseif($qihao >= 120){
                     }elseif($qihao >= $maxQihao){
-                        $nextQihao = ltrim(Tools::getNextDate($date),'20').'001';
+                        $nextQihao = substr(Tools::getNextDate($date),2, 6).'001';
                     }
                     break;
                 case 6: # 新疆
