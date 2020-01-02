@@ -358,7 +358,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             'Content-Length:' . strlen(http_build_query($post_data)),
             //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
             'Content-Type: application/x-www-form-urlencoded',
-            'Cookie: ' . $TzSystemsUsers->cookie,
+            'Cookie: ' . trim($TzSystemsUsers->cookie, ';'),
             'Host: ' . str_replace('http://', '', $TzSystemsUsers->ssc_domain),
             'Origin: ' . $TzSystemsUsers->ssc_domain,
             'Referer: ' . $TzSystemsUsers->ssc_domain . '/App/Index?_=' . $_t,
@@ -1285,6 +1285,29 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         return $rst;
     }
 
+
+    public static function loginWriteCookie($uid = 1, $tz_system_id = 1){
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        if($TzSystemsUsers->balance > 0) {
+            return ['status'=>200, 'msg'=>'已经登录的状态'];
+        }
+        //self::__init($uid, $tz_system_id);
+        $rst = false;
+
+        # 第一步：获取cookie
+        $cookie_key = self::getCookie($uid,$tz_system_id);
+        if(isset($cookie_key['status']) && $cookie_key['status'] == 300) return $cookie_key;
+        # 第二步：账号、验证码登录
+        $rst = self::loginRemote($uid, $tz_system_id);
+        # 第三步：同意
+        $rst = self::acceptAgreement($uid, $tz_system_id);
+
+        # 获取用户信息
+        $rst = self::userInfo($uid, $tz_system_id);
+
+        return $rst;
+    }
+
     /**
      * @desc 获取方案号
      * @param $uid
@@ -2146,7 +2169,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
 
-        //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,,$errno]); }
+        if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
         if(curl_close($ch)) {
             echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
         }

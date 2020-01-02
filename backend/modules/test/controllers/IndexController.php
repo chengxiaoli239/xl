@@ -127,7 +127,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = BaseService::synBalance(36); $rst = BaseService::login(36);p($rst);
+        $id = 4;$rst = BaseService::login($id);p($rst,0); $rst = BaseService::synBalance($id); p($rst);
+
+        $miss = SscDataService::getSdHzYlHistoryMiss([1], $lottery_type = 5, 900000);p($miss);
+
         $rst = SscDataService::insertCodeType3();p($rst);
         $rst = CommonService::isCodeType2b('9,1,1,X');p($rst);
         $rst = BetService::tzByPlanId(24, 0);p($rst); # 投注
@@ -136,7 +139,6 @@ class IndexController extends Controller
 
         $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);p($data);
         $rst = bin2hex("Shanghai");p($rst);
-        $miss = SscDataService::getSdHzYlHistoryMiss([30], $lottery_type = 5, 40000);p($miss);
         $rst = QiLinBaseService::synBalance(26);p($rst);
         $rst = QiLinBaseService::userInfo($uid = 18, $tz_system_id = 8);p($rst);
         p(microtime(true));

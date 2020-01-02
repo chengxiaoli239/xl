@@ -34,14 +34,16 @@ class BaseService{
         $tz_system_id = $TzSystemsUser->tz_system_id;
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网
-            //$rst = HN0898Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-            $rst['rst'][$TzSystemsUser->id] = HN0898Service::synBalance($TzSystemsUser->id);
+            $rst = HN0898Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+            //$rst['rst'][$TzSystemsUser->id] = HN0898Service::synBalance($TzSystemsUser->id);
+            //$rst['rst'][$TzSystemsUser->id] = HN0898Service::login($TzSystemsUser->id);
         }elseif(in_array($tz_system_id, [3, 7, 9, 10])){
             # 3、重庆7时彩网
             if($tz_system_id == 3){
                 $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             }else{
-                $rst = LuckyBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                //$rst = LuckyBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                $rst = LuckyBaseService::loginWriteCookie($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             }
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
