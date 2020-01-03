@@ -932,6 +932,7 @@ class NineNineBaseService extends BaseTZService {
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         //p([$uid, $tz_system_id, $TzSystemsUsers]);
 
+        sleep(2);
         $lists = self::getTzList($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $lottery_type);
         //p([$TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $lottery_type, $lists]);
         $lists = array_reverse($lists);
