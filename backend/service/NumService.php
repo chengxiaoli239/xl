@@ -427,7 +427,7 @@ class NumService extends BaseService {
                 $codesArr[] = implode(',', $tmpCodes);
             }
         }else{
-            if($type == 1){
+            if($type == 1){ # 取
                  $where = [
                      'AND',
                      ['=', 'code_type', 4],
@@ -440,15 +440,27 @@ class NumService extends BaseService {
                          ['LIKE', 'code', '%'.$codes[1].'%'.$codes[0].'%', false],
                      ]
                 ];
-            }else{
-                $where = [
-                    'AND',
-                    ['NOT LIKE', 'code', '%'.$codes[0].'%', false],
-                    ['NOT LIKE', 'code', '%'.$codes[1].'%', false],
-                    ['=', 'code_type', 4],
-                ];
+            }else{ # 除
+                if($codes[0] == $codes[1]){ # 双重
+                    $where = [
+                        'AND',
+                        ['NOT LIKE', 'code', $codes[0].','.$codes[1].',%,%', false],
+                        ['NOT LIKE', 'code', $codes[0].',%,'.$codes[1].',%', false],
+                        ['NOT LIKE', 'code', $codes[0].',%,%,'.$codes[1], false],
+                        ['NOT LIKE', 'code', '%,'.$codes[0].','.$codes[1].',%', false],
+                        ['NOT LIKE', 'code', '%,'.$codes[0].',%,'.$codes[1], false],
+                        ['NOT LIKE', 'code', '%,%,'.$codes[0].','.$codes[1], false],
+                        ['=', 'code_type', 4],
+                    ];
+                }else{
+                    $where = [
+                        'AND',
+                        ['NOT LIKE', 'code', '%'.$codes[0].'%', false],
+                        ['NOT LIKE', 'code', '%'.$codes[1].'%', false],
+                        ['=', 'code_type', 4],
+                    ];
+                }
             }
-            //p($where);
             $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
             $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
         }
@@ -973,10 +985,12 @@ class NumService extends BaseService {
             $codesArr_arise = self::getCodesArise([$codes_hz['arise'], $type = 1]);
             $codesArr = array_intersect($codesArr, $codesArr_arise);
         }
+
         # tz_type:28 上奖除
-        if(isset($codes_hz['reomve_arises'])){
-            $codes_hz['reomve_arises'] = explode(',', $codes_hz['reomve_arises']);
-            $codesArr_arise = self::getCodesArise([$codes_hz['reomve_arises'], $type = 0]);
+        if(isset($codes_hz['remove_arises'])){ # remove_arises
+            $codes_hz['remove_arises'] = explode(',', $codes_hz['remove_arises']);
+            $codesArr_arise = self::getCodesArise($codes_hz['remove_arises'], $type = 0);
+            //p([count($codesArr_arise), $codes_hz['remove_arises'], $codesArr_arise]);
             $codesArr = array_intersect($codesArr, $codesArr_arise);
         }
 
