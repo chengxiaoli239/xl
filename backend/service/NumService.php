@@ -891,7 +891,7 @@ class NumService extends BaseService {
 
         # tz_type:28 三现:双重+两兄弟
         if(($codes_hz['get_types'] && in_array(1, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(1, $codes_hz['remove_types']) )){
-            if(in_array(1, $codes_hz['get_types'])){
+            if($codes_hz['get_types'] && in_array(1, $codes_hz['get_types'])){
                 $type_3n_2b = 1;
             }else{
                 $type_3n_2b = 0;
@@ -909,7 +909,7 @@ class NumService extends BaseService {
         }
         # tz_type:28 三重
         if(($codes_hz['get_types'] && in_array(3, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(3, $codes_hz['remove_types']) )){
-            if(in_array(3, $codes_hz['get_types'])){
+            if($codes_hz['get_types'] && in_array(3, $codes_hz['get_types'])){
                 $type_3 = 1;
             }else{
                 $type_3 = 0;
@@ -927,7 +927,7 @@ class NumService extends BaseService {
         }
         # tz_type:28 两兄弟
         if(($codes_hz['get_types'] && in_array(5, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(5, $codes_hz['remove_types']) )){
-            if(in_array(5, $codes_hz['get_types'])){
+            if($codes_hz['get_types'] && in_array(5, $codes_hz['get_types'])){
                 $type_2b = 1;
             }else{
                 $type_2b = 0;
@@ -936,7 +936,7 @@ class NumService extends BaseService {
         }
         # tz_type:28 三兄弟
         if(($codes_hz['get_types'] && in_array(6, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(6, $codes_hz['remove_types']) )){
-            if(in_array(6, $codes_hz['get_types'])){
+            if($codes_hz['get_types'] && in_array(6, $codes_hz['get_types'])){
                 $type_3b = 1;
             }else{
                 $type_3b = 0;
@@ -946,7 +946,7 @@ class NumService extends BaseService {
 
         # tz_type:28 双双重
         if(($codes_hz['get_types'] && in_array(7, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(7, $codes_hz['remove_types']) )){
-            if(in_array(7, $codes_hz['get_types'])){
+            if($codes_hz['get_types'] && in_array(7, $codes_hz['get_types'])){
                 $type_22 = 1;
             }else{
                 $type_22 = 0;
