@@ -87,4 +87,6 @@ return [
     'Tools Manage' => '工具管理',
     'Tz Systems Users' => '个人信息',
     '(not set)' => '',
+    'Static Code Type Profits Perdates' => '号码类型利润(天)',
+    'Static Code Type Profits Months' => '号码类型利润(月)',
 ];

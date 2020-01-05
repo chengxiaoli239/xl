@@ -48,6 +48,7 @@ class StaticCodeTypeProfitsMonth extends StaticCodeTypeProfitsMonthModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder'=>['month'=>SORT_DESC]],
         ]);
 
         $this->load($params);

@@ -2,6 +2,8 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\UserSysPlansService;
+use common\service\CommonService;
 use Yii;
 use backend\models\StaticCodeTypeProfitsMonth;
 use backend\models\searchs\StaticCodeTypeProfitsMonth as StaticCodeTypeProfitsMonthSearch;
@@ -36,9 +38,18 @@ class StaticCodeTypeProfitsMonthController extends BaseController
     public function actionIndex()
     {
         $searchModel = new StaticCodeTypeProfitsMonthSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
+        $queryParams['BettingRecords']['lottery_type'] = $lottery_type;
+
+        $dataProvider = $searchModel->search($queryParams);
+
 
         return $this->render('index', [
+            'lottery_types' => $lottery_types,
+            'lottery_type' => $lottery_type,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
