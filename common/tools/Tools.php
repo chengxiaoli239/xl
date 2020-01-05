@@ -40,7 +40,7 @@ class Tools
     }
 
     /**
-     * @description 获取下一天的日期
+     * @description 获取上一天的日期
      * @param $date 2018-01-01 或者 20180101
      * @param string $split 日期分隔符 ：-或/或''
      * @return mixed

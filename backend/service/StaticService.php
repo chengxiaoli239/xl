@@ -24,6 +24,7 @@ use backend\models\Static4dProfitsPerdate;
 use backend\models\StaticCode3nAriseMonth;
 use backend\models\StaticCode4nAriseMonth;
 use backend\models\StaticCodeTypeArisePerdate;
+use backend\models\StaticCodeTypeProfitsPerdate;
 use backend\models\StaticHzArisePerdate;
 use backend\models\StaticHzProfits;
 use backend\models\SscStaticYl;
@@ -37,6 +38,7 @@ use backend\models\TzTypes;
 use backend\tools\Util;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
+use common\tools\Tools;
 use yii\helpers\ArrayHelper;
 use  yii;
 
@@ -350,6 +352,155 @@ class StaticService extends BaseService {
 
         //echo $date.'月份：';
         return $allStatic;
+    }
+
+    /**
+     * @desc 获取已开奖期数
+     * @param string $date
+     * @param int $lottery_type
+     * @return int|string
+     */
+    public static function getQishuByDate($date = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
+
+        $m = \Yii::$app->cache;
+        $mkey = 'getQishuByDate_'.$lottery_type.'_'.$date;
+        if($count = $m->get($mkey)) return $count;
+        $count = SscKjData::find()->where(['date'=>$date, 'lottery_type'=>$lottery_type])->count('id');
+        if(!$count) $count = 0;
+
+        $m->set($mkey, $count, 10*60);
+
+        return $count;
+    }
+
+    /**
+     * @desc 获取统计日期
+     * @param int $lottery_type
+     * @param string $staticModel
+     * @return mixed
+     */
+    public static function getStaticDate($lottery_type = DEFAULT_LOTTERY_TYPE, $staticModel = 'StaticCodeTypeProfitsPerdate'){
+
+        $staticModel = 'backend\\models\\'.$staticModel;
+        if(!$static_date = $staticModel::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one()['date']){
+            $date = SscKjData::find()->select(['date'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_ASC])->one()['date']; # 历史开奖第一期日期
+        }else{
+            $last_date = SscKjData::find()->select(['date', 'qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one()['date']; # 截止目前开奖日期
+            if($static_date<$last_date){
+                $date = Tools::getNextDate($static_date, '-');
+            }else{
+                $date = $last_date;
+            }
+        }
+
+        return $date;
+    }
+
+    /**
+     * @desc 统计号码类型利润(每天)
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function staticCodeTypeProfitsDate_parent($lottery_type = DEFAULT_LOTTERY_TYPE){
+
+        $date = self::getStaticDate($lottery_type, 'StaticCodeTypeProfitsPerdate');
+        $rst = self::staticCodeTypeProfitsDate($date, $lottery_type);
+        if($date<date('Y-m-d')){
+            for ($i=0; $i<50;$i++){
+                $date = self::getStaticDate($lottery_type, 'StaticCodeTypeProfitsPerdate');
+                $rst = self::staticCodeTypeProfitsDate($date, $lottery_type);
+            }
+        }
+
+        return $rst;
+    }
+
+    /**
+     * @desc 号码类型利润统计
+     * @param $date
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function staticCodeTypeProfitsDate($date, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $datas = [];
+
+        $code_types = ['type_2', 'type_3', 'type_22', 'type_2b', 'type_3b', 'type_4b', 'type_2,type_2b', 'type_2,type_3b', 'type_3n_2b'];
+        foreach ($code_types as $code_type){
+            $datas[str_replace(',', '_', $code_type)] = self::staticCodeTypeProfitsDate_son($date, $code_type, $lottery_type);
+        }
+
+        $where = ['lottery_type'=>$lottery_type, 'date'=>$date];
+        $setData = [];
+        if(!$StaticCodeTypeProfitsPerdate = StaticCodeTypeProfitsPerdate::findOne($where)){
+            $StaticCodeTypeProfitsPerdate = new StaticCodeTypeProfitsPerdate();
+            $setData = array_merge($setData, ['date'=>$date, 'lottery_type'=>$lottery_type, 'created_at'=>time()]);
+        }
+        foreach ($datas as $key=>$data){
+            $key = str_replace('', '', $key);
+            $setData[$key] = $datas[$key]['profits'];
+        }
+        $setData['updated_at'] = time();
+        $StaticCodeTypeProfitsPerdate->setAttributes($setData);
+        $saveFlag = $StaticCodeTypeProfitsPerdate->save();
+
+        return ['saveFlag'=>$saveFlag, 'datas'=>$datas];
+    }
+
+    /**
+     * @desc 计算单个号码类型组数、中奖次数、利润
+     * @param string $code_type
+     * @param string $date
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function staticCodeTypeProfitsDate_son($date = '', $code_type = 'type_2b', $lottery_type = DEFAULT_LOTTERY_TYPE){
+
+        $qishu = self::getQishuByDate($date, $lottery_type); # 已开奖期数
+        $where = ['lottery_type'=>$lottery_type, 'date'=>$date];
+
+        $code_types = explode(',', $code_type);
+        foreach ($code_types as $val){
+            $where_son[$val] = 1;
+        }
+
+        $static = SscKjData::find()->where(array_merge($where, $where_son))->count('id'); # 双重 中奖次数
+        $count = self::getCodeTypeCount($code_type); # 号码类型组数
+        $profits = self::calProfits($count, $qishu, $static);
+
+        $data = ['date'=>$date, 'static'=>$static, 'qishu'=>$qishu, 'count'=>$count, 'profits'=>$profits];
+
+        return $data;
+    }
+
+    /**
+     * @desc 获取号码类型组数
+     * @param string $code_type
+     * @return int|mixed
+     */
+    public static function getCodeTypeCount($code_type = 'type_2b'){
+
+        $m = \Yii::$app->cache;
+        $mkey = 'getCodeTypeCount_'.$code_type;
+        if($count = $m->get($mkey)) return $count;
+
+        $count = SscStaticVal::find()->select(['count'])->where(['val'=>$code_type])->one()['count'];
+        if(!$count) $count = 10000;
+        $m->set($mkey, $count, 20*60);
+
+        return $count;
+    }
+
+    /**
+     * @desc 计算利润
+     * @param $count 组数
+     * @param int $qishu 已开奖期数
+     * @param int $zjCounts 中奖次数
+     * @return float
+     */
+    public static function calProfits($count, $qishu = 59, $zjCounts = 1){
+
+        $profits = $zjCounts * 995 - $qishu * $count * 0.1;
+        return $profits;
     }
 
     /**
@@ -1932,6 +2083,8 @@ class StaticService extends BaseService {
                $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type);
                # 和值每天数量统计
                $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type);
+
+               $rst['staticCodeTypeProfitsDate_parent'] = StaticService::staticCodeTypeProfitsDate_parent($lottery_type);
 
                StaticService::afterOpStatic($lottery_type, 'opAllStaticProfits');
            }
