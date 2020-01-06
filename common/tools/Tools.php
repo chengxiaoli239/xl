@@ -40,6 +40,20 @@ class Tools
     }
 
     /**
+     * @description 获取下一月月份
+     * @param $month 2018-01 或者 201801
+     * @param string $split 日期分隔符 ：-或/或''
+     * @return mixed
+     */
+    public static function getNextMonth($month, $split = ''){
+        $month_str = $month.'-01 '.'00:00:00';
+        $nextMonth = date('Y'.$split.'m', strtotime($month_str.' +1 month'));
+        if($nextMonth == '1970'.$split.'01') return $month;
+
+        return $nextMonth;
+    }
+
+    /**
      * @description 获取上一天的日期
      * @param $date 2018-01-01 或者 20180101
      * @param string $split 日期分隔符 ：-或/或''

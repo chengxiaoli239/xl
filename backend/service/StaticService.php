@@ -24,6 +24,7 @@ use backend\models\Static4dProfitsPerdate;
 use backend\models\StaticCode3nAriseMonth;
 use backend\models\StaticCode4nAriseMonth;
 use backend\models\StaticCodeTypeArisePerdate;
+use backend\models\StaticCodeTypeProfitsMonth;
 use backend\models\StaticCodeTypeProfitsPerdate;
 use backend\models\StaticHzArisePerdate;
 use backend\models\StaticHzProfits;
@@ -360,6 +361,25 @@ class StaticService extends BaseService {
      * @param int $lottery_type
      * @return int|string
      */
+    public static function getQishuByMonth($month = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
+
+        $m = \Yii::$app->cache;
+        $mkey = 'getQishuByMonth_'.$lottery_type.'_'.$month;
+        if($count = $m->get($mkey)) return $count;
+        $count = SscKjData::find()->where(['LEFT(date,7)'=>$month, 'lottery_type'=>$lottery_type])->count('id');
+        if(!$count) $count = 0;
+
+        $m->set($mkey, $count, 10*60);
+
+        return $count;
+    }
+
+    /**
+     * @desc 获取已开奖期数
+     * @param string $date
+     * @param int $lottery_type
+     * @return int|string
+     */
     public static function getQishuByDate($date = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
 
         $m = \Yii::$app->cache;
@@ -371,6 +391,29 @@ class StaticService extends BaseService {
         $m->set($mkey, $count, 10*60);
 
         return $count;
+    }
+
+    /**
+     * @desc 获取统计月份
+     * @param int $lottery_type
+     * @param string $staticModel
+     * @return mixed
+     */
+    public static function getStaticMonth($lottery_type = DEFAULT_LOTTERY_TYPE, $staticModel = 'StaticCodeTypeProfitsMonth'){
+
+        $staticModel = 'backend\\models\\'.$staticModel;
+        if(!$static_month = $staticModel::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one()['month']){
+            $month = SscKjData::find()->select(['month'=>'LEFT(date,7)'])->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_ASC])->one()['month']; # 历史开奖第一期日期
+        }else{
+            $last_month = SscKjData::find()->select(['month'=>'LEFT(date,7)', 'qihao'])->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->one()['month']; # 截止目前开奖日期
+            if($static_month<$last_month){
+                $month = Tools::getNextMonth($static_month, '-');
+            }else{
+                $month = $last_month;
+            }
+        }
+
+        return $month;
     }
 
     /**
@@ -397,6 +440,26 @@ class StaticService extends BaseService {
     }
 
     /**
+     * @desc 统计号码类型利润(每月)
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function staticCodeTypeProfitsMonth_parent($lottery_type = DEFAULT_LOTTERY_TYPE){
+
+        $month = self::getStaticMonth($lottery_type, 'StaticCodeTypeProfitsMonth');
+        $rst = self::staticCodeTypeProfitsMonth($month, $lottery_type);
+        if($month<date('Y-m')){
+            for ($i=0; $i<12;$i++){
+                $date = self::getStaticMonth($lottery_type, 'StaticCodeTypeProfitsMonth');
+                $month = substr($date, 0,7);
+                $rst = self::staticCodeTypeProfitsMonth($month, $lottery_type);
+            }
+        }
+
+        return $rst;
+    }
+
+    /**
      * @desc 统计号码类型利润(每天)
      * @param int $lottery_type
      * @return array
@@ -416,7 +479,38 @@ class StaticService extends BaseService {
     }
 
     /**
-     * @desc 号码类型利润统计
+     * @desc 号码类型利润统计 - 每月
+     * @param $month
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function staticCodeTypeProfitsMonth($month, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $datas = [];
+
+        $code_types = ['type_2', 'type_3', 'type_22', 'type_2b', 'type_3b', 'type_4b', 'type_2,type_2b', 'type_2,type_3b', 'type_3n_2b'];
+        foreach ($code_types as $code_type){
+            $datas[str_replace(',', '_', $code_type)] = self::staticCodeTypeProfitsMonth_son($month, $code_type, $lottery_type);
+        }
+
+        $where = ['lottery_type'=>$lottery_type, 'month'=>$month];
+        $setData = [];
+        if(!$StaticCodeTypeProfitsMonth = StaticCodeTypeProfitsMonth::findOne($where)){
+            $StaticCodeTypeProfitsMonth = new StaticCodeTypeProfitsMonth();
+            $setData = array_merge($setData, ['month'=>$month, 'lottery_type'=>$lottery_type, 'created_at'=>time()]);
+        }
+        foreach ($datas as $key=>$data){
+            $key = str_replace('', '', $key);
+            $setData[$key] = $datas[$key]['profits'];
+        }
+        $setData['updated_at'] = time();
+        $StaticCodeTypeProfitsMonth->setAttributes($setData);
+        $saveFlag = $StaticCodeTypeProfitsMonth->save();
+
+        return ['saveFlag'=>$saveFlag, 'datas'=>$datas];
+    }
+
+    /**
+     * @desc 号码类型利润统计 - 每天
      * @param $date
      * @param int $lottery_type
      * @return array
@@ -445,6 +539,33 @@ class StaticService extends BaseService {
 
         return ['saveFlag'=>$saveFlag, 'datas'=>$datas];
     }
+
+    /**
+     * @desc 计算单个号码类型组数、中奖次数、利润
+     * @param string $code_type
+     * @param string $month
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function staticCodeTypeProfitsMonth_son($month = '', $code_type = 'type_2b', $lottery_type = DEFAULT_LOTTERY_TYPE){
+
+        $qishu = self::getQishuByMonth($month, $lottery_type); # 已开奖期数
+        $where = ['lottery_type'=>$lottery_type, 'LEFT(date,7)'=>$month];
+
+        $code_types = explode(',', $code_type);
+        foreach ($code_types as $val){
+            $where_son[$val] = 1;
+        }
+
+        $static = SscKjData::find()->where(array_merge($where, $where_son))->count('id'); # 双重 中奖次数
+        $count = self::getCodeTypeCount($code_type); # 号码类型组数
+        $profits = self::calProfits($count, $qishu, $static);
+
+        $data = ['month'=>$month, 'static'=>$static, 'qishu'=>$qishu, 'count'=>$count, 'profits'=>$profits];
+
+        return $data;
+    }
+
 
     /**
      * @desc 计算单个号码类型组数、中奖次数、利润
@@ -2085,6 +2206,7 @@ class StaticService extends BaseService {
                $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type);
 
                $rst['staticCodeTypeProfitsDate_parent'] = StaticService::staticCodeTypeProfitsDate_parent($lottery_type);
+               $rst['staticCodeTypeProfitsMonth_parent'] = StaticService::staticCodeTypeProfitsMonth_parent($lottery_type);
 
                StaticService::afterOpStatic($lottery_type, 'opAllStaticProfits');
            }
