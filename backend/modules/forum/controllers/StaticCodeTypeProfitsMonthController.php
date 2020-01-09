@@ -42,7 +42,7 @@ class StaticCodeTypeProfitsMonthController extends BaseController
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
 
         $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
-        $queryParams['BettingRecords']['lottery_type'] = $lottery_type;
+        $queryParams['StaticCodeTypeProfitsMonth']['lottery_type'] = $lottery_type;
 
         $dataProvider = $searchModel->search($queryParams);
 
