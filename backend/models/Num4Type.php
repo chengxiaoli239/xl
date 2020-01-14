@@ -17,6 +17,7 @@ use Yii;
  * @property int $type_22 是否双双重
  * @property int $type_3 是否三重
  * @property int $type_4 是否四重
+ * @property int $type_22b 双两兄弟
  * @property int $type_2b 是否两兄弟
  * @property int $type_3b 是否三兄弟
  * @property int $type_4b 是否四兄弟
@@ -49,7 +50,7 @@ class Num4Type extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_log', 'type_3n_2b', 'type_3d', 'type_3s', 'type_4d', 'type_4s', 'codes_hz', 'code_type', 'created_at', 'updated_at'], 'integer'],
+            [['type_2', 'type_22', 'type_3', 'type_4', 'type_22b', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_log', 'type_3n_2b', 'type_3d', 'type_3s', 'type_4d', 'type_4s', 'codes_hz', 'code_type', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
             [['code'], 'string', 'max' => 8],
             [['code_1', 'code_2', 'code_3', 'code_4'], 'string', 'max' => 1],
@@ -72,6 +73,7 @@ class Num4Type extends \common\models\base\BaseModel
             'type_22' => '是否双双重',
             'type_3' => '是否三重',
             'type_4' => '是否四重',
+            'type_22b' => '双两兄弟',
             'type_2b' => '是否两兄弟',
             'type_3b' => '是否三兄弟',
             'type_4b' => '是否四兄弟',
