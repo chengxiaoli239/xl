@@ -578,17 +578,9 @@ class KjDataGet
      */
     public static function updateNullCode( $times = 500, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
-        $StaticTables = StaticCodeTypeArisePerdate::find()->where(['type_3n_2b'=>'99'])->limit(500)->all();
-        foreach ($StaticTables as $StaticTable){
-            $count = SscKjData::find()->where(['lottery_type'=>$StaticTable->lottery_type, 'date'=>$StaticTable->date, 'type_3n_2b'=>1])->count('id');
-            //p([$count, $StaticTable->date, $lottery_type]);
-            $StaticTable->type_3n_2b = $count;
-            $rst = $StaticTable->save();
-        }
-        p($rst);
 
         $msg = ['status'=>200, 'msg'=>'操作成功！'];
-        $kjDatas = SscKjData::find()->where(['=', 'type_3n_2b', 99])->orderBy('id DESC')->limit($times)->all();
+        $kjDatas = SscKjData::find()->where(['IS', 'type_22b', NULL])->orderBy('id DESC')->limit($times)->all();
         foreach ($kjDatas as $key=>$kjData){
             //$kjDs = SscDataService::getCodesDS($kjData['code_str']);
             $codes = $kjData['code1'].','.$kjData['code2'].','.$kjData['code3'].','.$kjData['code4'];
@@ -611,9 +603,9 @@ class KjDataGet
                 'type_3b' => CommonService::isCodeType3b($codes), # 是否三兄弟
                 'type_4b' => CommonService::isCodeType4b($codes), # 是否四兄弟
                 */
-                'type_3n_2b' => CommonService::isCodeType3n2b($codes), # 是否四单双：0非四单四双1四单2四双
+                //'type_3n_2b' => CommonService::isCodeType3n2b($codes), # 是否四单双：0非四单四双1四单2四双
             ];
-            $kjData->type_3n_2b = CommonService::isCodeType3n2b($codes);
+            $kjData->type_22b = CommonService::isCodeType22b($codes);
             if(!$rst = $kjData->save()){
                 $msg = ['status'=>300, 'msg'=>current($rst->getErrors())];
                 p($msg);
