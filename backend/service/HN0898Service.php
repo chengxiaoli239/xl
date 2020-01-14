@@ -413,7 +413,7 @@ class HN0898Service extends BaseTZService {
             'buy_type'=> $buy_type,  // 购买方向类型
             'uid'=> self::$user_id,  // 投注账号id
             'lottery_type' => $lottery_type, # 彩种
-            'account' => self::$account,
+            'account' => self::$account == "gaozi2018" ? 'gaozi2018' : self::$account,
             'codes' => $code,  // 投注号码
             'qihao' => $qihao,  // 投注期号
             'plan_id' => $plan_id,  // 计划id
