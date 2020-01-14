@@ -571,6 +571,42 @@ class  CommonService{
     }
 
     /**
+     * @desc 是否双两兄弟 - 四定
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType22b($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
+        sort($codesArr);
+        $code_1 = $codesArr[0].','.$codesArr[1];
+        $code_2 = $codesArr[2].','.$codesArr[3];
+
+        $code_3 = $codesArr[0].','.$codesArr[3];
+        $code_4 = $codesArr[1].','.$codesArr[2];
+        $bArrs = [
+            '0,1',
+            '1,2',
+            '2,3',
+            '3,4',
+            '4,5',
+            '5,6',
+            '6,7',
+            '7,8',
+            '8,9',
+            '0,9',
+        ];
+        if((in_array($code_1, $bArrs) && in_array($code_2, $bArrs)) OR (in_array($code_3, $bArrs) && in_array($code_4, $bArrs))){
+            $flag = 1;
+        }
+
+
+
+        return $flag;
+    }
+
+    /**
      * @desc 是否三兄弟
      * @param string $codes 格式 1,2,3,4
      * @return int
