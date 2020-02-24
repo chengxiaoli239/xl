@@ -506,7 +506,7 @@ class HN0898Service extends BaseTZService {
 
         $rst = CurlService::postCurl($url, http_build_query($post_data), $headers)[0];
         $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$rst];
-        p($logArr);
+        //p($logArr);
 
         return $rst;
     }

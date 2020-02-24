@@ -240,7 +240,6 @@ class CurlService extends BaseService{
         return $data;
     }
 
-
     /**
      * @decription 获取远程html内容
      * @param $url
@@ -262,6 +261,7 @@ class CurlService extends BaseService{
         curl_setopt($ch, CURLOPT_SSLVERSION, 1);
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER,0);
 
         $data = curl_exec($ch);
@@ -279,6 +279,80 @@ class CurlService extends BaseService{
         }
 
         return $data;
+    }
+
+    /**
+     * @decription 获取远程html内容
+     * @param $url
+     */
+    public static function getCurl302($url,$header=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        //$header = array_merge(self::$postHeaders,$header);
+        //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+
+        $data = curl_exec($ch);
+
+        $info = curl_getinfo($ch);
+
+        if($info['http_code']==302){
+            $data = self::getCurlData($info['url']);
+        }
+        //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
+        if(curl_close($ch)) {
+            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+        }
+        if(!self::is_json($data)){
+            return $data;
+        }
+        $data = json_decode($data, true);
+
+        if($data['Status'] == false){
+            //$data['headers'] = $header;
+        }
+
+        return $data;
+    }
+
+    public static function getCurlData($url){
+        $cookie = tempnam("/WORK/LOG", "cookie");
+        //先获取 cookie
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie);
+        curl_exec($ch);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION,TRUE);
+
+        $cdata = curl_exec($ch);
+        $info = curl_getinfo($ch);
+        /*
+        if($info['http_code']==302){
+        getCurlData($url);
+        }
+        */
+        curl_close($ch);
+
+        return $cdata;
     }
 
    /**

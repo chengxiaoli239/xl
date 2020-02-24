@@ -23,7 +23,7 @@ class Lucky5 extends BaseKj {
             $t = microtime(true) * 10000;
             $url = $domain.'/Member/GetMemberPrint?_='.$t; #当前开奖号码
             # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015
-            $tz_system_users_id = 19;
+            $tz_system_users_id = 39;
             $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_users_id);
 
             $headers = [
@@ -70,26 +70,71 @@ class Lucky5 extends BaseKj {
     }
 
     /**
-     * @desc 幸运五星彩 - 实时资讯网 https://cc138001.com
+     * @desc 幸运五星彩 - 实时资讯网 https://cc138001.com 未完
+     * http://web01.cc138008.com/?url=pc/live/ygxy5#/pc/live/ygxy5
      * @param string $returnType
      * @return array
      */
-    public static function getLotteryShiXun($returnType = 'json'){
-
-        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
-            $domain = BaseKj::getApiHost(20);
+    public static function getLotteryShiXunOne($returnType = 'json'){
+        if(true or !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $domain = BaseKj::getApiHost(21);
 
             $t = round(microtime(true) * 1000);
-            $url = $domain.'/kaijiang/ygxy5.json?v='.$t; #当前开奖号码
+            $url = $domain.'/kaijiang/history/ygxy5.json?v='.$t; #当前开奖号码
             # 当前开奖链接：https://1.cc138001.com/kaijiang/ygxy5.json?v=1570866018057
+            # 当前开奖链接：https://web01.cc138008.com/kaijiang/history/ygxy5.json?v=1582557689975
 
             $data = CurlService::getCurl($url);
-            //p([$url, $data]);
+            p([$url, $data]);
 
             if (!isset($data['code'])) return false;
             $opencode = implode(',', $data['code']);
             if($opencode == '0,0,0,0,0') return false;
             $kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
+            //p($kjData);
+        }
+        $opencode = $kjData['opencode'];
+        $opentime = $kjData['opentime'];
+        $expect = $kjData['expect'];
+
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc', 'INFO', '号码抓取-直播网', $logArr);
+
+        return $rst;
+    }
+
+    /**
+     * @desc 幸运五星彩 - 实时资讯网 https://cc138001.com
+     * @param string $returnType
+     * @return array
+     */
+    public static function getLotteryShiXun($returnType = 'json'){
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $domain = BaseKj::getApiHost(20);
+
+            $t = round(microtime(true) * 1000);
+            $url = $domain.'/kaijiang/ygxy5.json?v='.$t; #当前开奖号码
+            # https://web01.cc138008.com/kaijiang/ygxy5.json?v=1582561329435
+            # 当前开奖链接：https://1.cc138001.com/kaijiang/ygxy5.json?v=1570866018057
+
+            //$data = CurlService::getCurl($url);
+            $data = CurlService::getCurl302($url);
+            //$data = file_get_contents($url);
+
+            if (!isset($data['code'])) return false;
+            $opencode = implode(',', $data['code']);
+            if($opencode == '0,0,0,0,0') return false;
+            $kjData = ['expect'=>$data['preDrawIssue']?$data['preDrawIssue']:$data['issue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']?$data['preDrawTime']:$data['draw_time']];
             //p($kjData);
         }
         $opencode = $kjData['opencode'];

@@ -927,7 +927,7 @@ class XlService extends BaseTZService {
             if(strpos($loop, "Set-Cookie") !== false){
                 preg_match('/^Set-Cookie: (.*?);/m',$loop,$m);
                 $cookies = trim(substr($loop, 11));
-                p($cookies);
+                //p($cookies);
             }
         }
 

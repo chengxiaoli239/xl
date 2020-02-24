@@ -25,6 +25,7 @@ class BaseController extends Controller
     {
         parent::init();
         $this->_user_id = Yii::$app->user->id;
+        //if(in_array($this->_post['user_id'], [1,2])){ } # 用户限制
         self::_initData();
         $this->_post = \Yii::$app->request->post();
         $this->_get = \Yii::$app->request->get();

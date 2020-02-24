@@ -193,7 +193,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @param $codes
      * @return array
      */
-    public function bet($qihao, $plan_id, $codes){
+    public function bet_bak($qihao, $plan_id, $codes){
         //$rst = self::bet_bak($qihao, $plan_id, $codes); d($rst);
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
@@ -226,7 +226,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         //$beforeBet = CurlService::getBetforeBetStatus($plan->uid, self::$tz_system_id);
         $beforeBet = self::getBetforeBetStatus($plan->uid, self::$tz_system_id);
-        //p([$plan->uid, self::$tz_system_id, $beforeBet]);
+        //p([$playway, $plan->uid, self::$tz_system_id, $beforeBet]);
         switch ($playway){
             case 2:
                 break;
@@ -238,7 +238,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             case 4:
                 break;
         }
-        p($rst);
 
         return $rst;
     }
@@ -621,6 +620,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             'X-Requested-With: XMLHttpRequest',
         ];
         $rst = CurlService::postCurl($url, [], $headers);
+
+        return $rst;
         //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$rst]);
     }
 
@@ -1750,7 +1751,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
      * @return array
      */
-    public function bet_bak($qihao, $plan_id, $codes){
+    public function bet($qihao, $plan_id, $codes){
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
