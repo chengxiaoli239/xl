@@ -20,7 +20,6 @@ class CqsscSevenDay extends BaseKj {
             //$content = CurlService::httpGet($url);
             $preg = "/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/ism"; // 这里是表达式，大神看看
             preg_match_all($preg,$content,$matches);
-            //p($content);
 
             $tdData = $matches[0][0];
 
@@ -52,6 +51,7 @@ class CqsscSevenDay extends BaseKj {
         }
         $logArr = $rst;
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_seven', 'INFO', '号码抓取-7天', $logArr);
+        return $rst;
     }
 
     /**
