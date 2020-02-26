@@ -851,6 +851,11 @@ class NumService extends BaseService {
             $p4_codes = self::getCodesArrByStr($codes_hz['p4']);
             $where = array_merge($where, [ ['IN', 'code_4', $p4_codes] ]);
         }
+        # 第5位
+        if(isset($codes_hz['p5']) && !empty($codes_hz['p5'])){
+            $p5_codes = self::getCodesArrByStr($codes_hz['p5']);
+            $where = array_merge($where, [ ['IN', 'code_5', $p5_codes] ]);
+        }
 
         # 同时选择取、除四单四双
         if( isset($codes_hz['type_4d']) OR isset($codes_hz['type_4s'])){
@@ -959,6 +964,7 @@ class NumService extends BaseService {
             $where = array_merge($where, [['=', 'type_log', $codes_hz['type_log']]]);
         }
 
+        //p([$where, $codes_hz]);
         $get = \Yii::$app->request->get();
         if($get['t'] == 1)p($where);
         $codesArr = [];
@@ -972,8 +978,9 @@ class NumService extends BaseService {
         if(isset($codes_hz['arise'])){
             $asises = explode(',', $codes_hz['arise']);
             $codesArr_arise = self::getCodesArise($asises, $type = 1, $code_type);
-            if(in_array($code_type, [3, 4])){
+            if(in_array($code_type, [3, 4])) {
                 $codesArr = array_intersect($codesArr, $codesArr_arise);
+            }elseif(in_array($code_type, [5])){
             }else{
                 $codesArr = $codesArr_arise;
             }
@@ -1154,6 +1161,9 @@ class NumService extends BaseService {
         if(!empty($hz_Arr['p4'])){
             $desc .= ' 个'.$hz_Arr['p4'];
         }
+        if(!empty($hz_Arr['p5'])){
+            $desc .= ' 个'.$hz_Arr['p5'];
+        }
 
         if(!empty($filter8)){
             if(isset($hz_Arr['hefen_pos'])){
@@ -1329,6 +1339,42 @@ class NumService extends BaseService {
         return $datas;
     }
 
+    /**
+     * @desc 返回五位二定
+     * @param array $codes
+     * @return array
+     */
+    public static function getCodesTwo5($codes = [1, 2]){
+        if(count($codes) != 2) return ['status'=>300, 'msg'=>'号码错误'];
+
+        if($codes[0] == $codes[1]){
+            $datas = [
+                [$codes[0],'X','X','X', $codes[1]],
+
+                ['X',$codes[0],'X','X', $codes[1]],
+
+                ['X','X',$codes[0],'X', $codes[1]],
+
+                ['X','X','X',$codes[0], $codes[1]],
+            ];
+        }else{
+            $datas = [
+                [$codes[0],'X','X','X', $codes[1]],
+                [$codes[1],'X','X','X', $codes[0]],
+
+                ['X',$codes[0],'X','X', $codes[1]],
+                ['X',$codes[1],'X','X', $codes[0]],
+
+                ['X','X',$codes[0],'X', $codes[1]],
+                ['X','X',$codes[1],'X', $codes[0]],
+
+                ['X','X','X',$codes[0], $codes[1]],
+                ['X','X','X',$codes[1], $codes[0]],
+            ];
+        }
+
+        return $datas;
+    }
 
     /**
      * @desc 删除数组指定值的元素使用array_keys搜索指定的值再循环unset

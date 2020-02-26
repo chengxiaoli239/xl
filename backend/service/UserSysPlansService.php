@@ -143,7 +143,7 @@ class UserSysPlansService extends BaseService {
             unset($post['UserSysPlans']['arise_in']);
 
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
-        }elseif ($tz_type == 30){ # 二定-快选
+        }elseif (in_array($tz_type, [30, 31])){ # 二定-快选、五位二定
             # 二定-快选过滤
             $UserSysPlans = $post['UserSysPlans'];
             # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
@@ -188,7 +188,12 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['p4'] = trim($UserSysPlans['p4']);
             }
             unset($post['UserSysPlans']['p4']);
-            # 14、对数
+            # 14、第5位
+            if(isset($UserSysPlans['p5']) && $UserSysPlans['p5']){
+                $tmpFilter['p5'] = trim($UserSysPlans['p5']);
+            }
+            unset($post['UserSysPlans']['p4']);
+            # 15、对数
             if($UserSysPlans['type_log'] && count($UserSysPlans['type_log']) == 1){
                 $tmpFilter['type_log'] = $UserSysPlans['type_log'][0];
             }
@@ -595,7 +600,7 @@ class UserSysPlansService extends BaseService {
 
         $m = \Yii::$app->cache;
         $mkey = CommonService::buildMyTzTypes($uid, $lottery_type);
-        if($tzTypeArr = $m->get($mkey)) return $tzTypeArr;
+        //if($tzTypeArr = $m->get($mkey)) return $tzTypeArr;
         $tz_types_Arr = explode(',', TzSystemsAuth::find()->where(['uid'=>$uid])->one()->tz_types);
 
         $TzTypes = TzTypes::find()->where(['type'=>$tz_types_Arr])->asArray()->all();

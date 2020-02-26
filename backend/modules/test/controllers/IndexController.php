@@ -127,6 +127,12 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::insertCodeType5();p($rst);
+        $rst = KjDataGet::updateNullCode($num = 1000, $lottery_type = 5);p($rst);
+        $rst = SscDataService::insertCodeType();p($rst);
+        $str = '0,9,1,0';
+        $rst = CommonService::isCodeType22b($str);p($rst);
+        $miss = SscDataService::getSdHzYlHistoryMiss([32], $lottery_type = 5, 80000);p($miss);
         $id = 4;$rst = BaseService::login($id);p($rst,0); $rst = BaseService::synBalance($id); p($rst);
 
         $miss = SscDataService::getSdHzYlHistoryMiss([1], $lottery_type = 5, 900000);p($miss);
@@ -162,20 +168,17 @@ class IndexController extends Controller
         $qs = SscDataService::getLossQs(3);p($qs);
         $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5);p($rst); # 70s
         $rst = SscDataService::insertCode($type = 5);p($rst); # 插入三字现、四字现
-        $rst = SscDataService::insertCodeType();p($rst);
         $rst = SscDataService::getPlanNextSingle(3, 0.4);p($rst);
         $rst = StaticService::staticHzPerDateProfits('2019-10-31', $lottery_type = 5); p($rst);
         $rst = SscDataService::insertCodeType2();p($rst);
         $rst = CommonService::isCodeType_2($codes = '3,3,3,X');p($rst);
         $rst = NumService::delByValue(['1', 'X', '3', 'X'], 'X');p($rst);
         $rst = BetService::isCanBet($lottery_type = 5);p($rst);
-        $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);p($rst);
         $rst = KjDataGet::updateNullCode();p($rst);
         $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 6);p($rst); # 号码类型遗漏
         $rst = CommonService::isCodeType3n2b('0,0,5,6');p($rst);
         $rst = CommonService::isCodeType3n2b('1,2,3,4');p($rst); # 三现:双重+兄弟
         $rst = UserSysPlansService::getCodeTypes();p($rst);
-        $miss = SscDataService::getSdHzYlHistoryMiss([35], $lottery_type = 6, 40000);p($miss);
         $miss = SscDataService::getCodeTypeHistoryMiss('type_4b', $lottery_type = 5, $static_nums = 20000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $rst['allDateStatic3nPerMonth'] = StaticService::allDateStatic3nPerMonth($lottery_type = 6);p($rst); # 三现每月统计
         $rst = StaticService::staticKj3NCounts('2019-10', $lottery_type = 5);p($rst);

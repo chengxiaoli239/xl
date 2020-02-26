@@ -307,8 +307,10 @@ abstract class BetService extends BaseBetService {
                 break;
             case 1: # 二字定
 
-                if($tz_type == 30) { # 过滤
+                if(in_array($tz_type, [30])) { # 二定快选
                     $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 2);
+                }elseif(in_array($tz_type, [31])) { # 五位二定
+                    $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 5);
                 }
                 break;
             case 2: # 三字定

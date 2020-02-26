@@ -56,6 +56,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $p2; # 第2位
     public $p3; # 第3位
     public $p4; # 第4位
+    public $p5; # 第5位
     public $type_4d; # 四单
     public $type_4s; # 四双
     public $type_log; # 对数

@@ -159,7 +159,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             'value' => function($model) {
                                 if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                     $str = \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
-                                }elseif(in_array($model->tz_type, [25, 28, 29, 30])){
+                                }elseif(in_array($model->tz_type, [25, 28, 29, 30, 31])){
                                     $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
                                 }else{
                                     $str = $model->hz_Arr;

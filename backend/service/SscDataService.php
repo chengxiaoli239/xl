@@ -1928,6 +1928,53 @@ class SscDataService extends BaseService {
         return $rst;
     }
 
+    /**
+     * @desc 插入二字定 - 五位二定
+     * @return bool
+     */
+    public static function insertCodeType5(){
+        $rst = true;
+        set_time_limit(0);
+
+        //for($i = 10000; $i<=19999; $i++){
+        for($i = 100; $i<=199; $i++){
+            $code = substr($i, 1,2);
+            $codeNums = [$code[0],$code[1]];
+            $codesArr = NumService::getCodesTwo5($codeNums); # 格式：[['1','2', 'X', 'X'], ['1', 'X', '2', 'X']] ..
+            foreach ($codesArr as $codes){
+                $code = implode(',', $codes);
+                if(!$Num4Type = Num4Type::findOne(['code'=>$code])){
+                    $Num4Type = new Num4Type();
+                }else{
+                    //continue;
+                }
+
+                $codesA = NumService::delByValue($codes, 'X');
+                $setData = [
+                    'code' => $code, # 号码
+                    'code_1' => $codes[0], # 第一个号码
+                    'code_2' => $codes[1], # 第二个号码
+                    'code_3' => $codes[2], # 第三个号码
+                    'code_4' => $codes[3], # 第四个号码
+                    'code_5' => $codes[4], # 第四个号码
+                    'type_2' => CommonService::isCodeType_2($code), # 是否双重
+                    'type_2b' => CommonService::isCodeType2b($code), # 是否两兄弟
+                    'type_log' => CommonService::isCodeTypeLog($code), # 是否对数
+                    'code_type' => 5, # 号码类型:1一字定2二字定3三字定4四字定5五位二定
+                    'codes_hz' => array_sum($codesA),
+                    'updated_at' => time(),
+                    'created_at' => time(),
+                ];
+                $Num4Type->setAttributes($setData);
+
+                if(!$rst = $Num4Type->save()){
+                    p($Num4Type->getFirstErrors());
+                }
+            }
+        }
+
+        return $rst;
+    }
 
     /**
      * @desc 插入三字定
