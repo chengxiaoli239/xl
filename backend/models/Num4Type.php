@@ -53,7 +53,7 @@ class Num4Type extends \common\models\base\BaseModel
         return [
             [['type_2', 'type_22', 'type_3', 'type_4', 'type_22b', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_log', 'type_3n_2b', 'type_3d', 'type_3s', 'type_4d', 'type_4s', 'codes_hz', 'code_type', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
-            [['code'], 'string', 'max' => 8],
+            [['code'], 'string', 'max' => 12],
             [['code_1', 'code_2', 'code_3', 'code_4', 'code_5'], 'string', 'max' => 1],
         ];
     }
