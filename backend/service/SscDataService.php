@@ -1940,7 +1940,7 @@ class SscDataService extends BaseService {
         for($i = 100; $i<=199; $i++){
             $code = substr($i, 1,2);
             $codeNums = [$code[0],$code[1]];
-            $codesArr = NumService::getCodesTwo5($codeNums); # 格式：[['1','2', 'X', 'X'], ['1', 'X', '2', 'X']] ..
+            $codesArr = NumService::getCodesTwo5($codeNums); # 格式：[['1','X', 'X', 'X', '2'], ['X', '1', 'X', 'X', '2'], ['X', 'X', '1', 'X', '2'], ['X', 'X', 'X', '1', '2']] ..
             foreach ($codesArr as $codes){
                 $code = implode(',', $codes);
                 if(!$Num4Type = Num4Type::findOne(['code'=>$code])){

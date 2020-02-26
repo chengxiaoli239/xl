@@ -359,7 +359,7 @@ class NumService extends BaseService {
      * @desc 上奖 - 返回匹配含号码的组合 -- 已完成 2019-04-22
      * @param array $codesArr ['123', '456']
      * @param $type 0除1取
-     * @param $code_type 1一定2二定3三定4四定
+     * @param $code_type 1一定2二定3三定4四定5五位二定
      * @return array
      */
     public static function getCodesArise($codesArr = [], $type = 1, $code_type = 4){
@@ -415,6 +415,7 @@ class NumService extends BaseService {
      * @desc 2个号码返回组号码组合 - 全倒
      * @param $codes 格式：11或者12
      * @param $type 0除1取
+     * @param $code_type 2二字定3三定4四定5五位二定
      * @return array ['1,2,3,4', '1,1,2,3', '1,1,1,2']
      */
     public static function getAllCombination2($codes, $type = 1, $code_type = 4){
@@ -427,42 +428,47 @@ class NumService extends BaseService {
                 $codesArr[] = implode(',', $tmpCodes);
             }
         }else{
-            if($type == 1){ # 取
-                 $where = [
-                     'AND',
-                     ['=', 'code_type', 4],
-                     [
-                         'OR',
-                         ['LIKE', 'code', '%'.$codes[0].','.$codes[1].'%', false],
-                         ['LIKE', 'code', '%'.$codes[0].'%'.$codes[1].'%', false],
 
-                         ['LIKE', 'code', '%'.$codes[1].','.$codes[0].'%', false],
-                         ['LIKE', 'code', '%'.$codes[1].'%'.$codes[0].'%', false],
-                     ]
-                ];
-            }else{ # 除
-                if($codes[0] == $codes[1]){ # 双重
+            if($code_type == 5){ # 五位二定
+                $codesArr = NumService::getTwo5ByTwoNums([$codes[0], $codes[1]]); # 格式：[['1','X','X','X','2'],['X','1','X','X','2'], ['X','X','1','X','2'],['X','X','X','1','2']] ..
+            }else {
+                if ($type == 1) { # 取
                     $where = [
                         'AND',
-                        ['NOT LIKE', 'code', $codes[0].','.$codes[1].',%,%', false],
-                        ['NOT LIKE', 'code', $codes[0].',%,'.$codes[1].',%', false],
-                        ['NOT LIKE', 'code', $codes[0].',%,%,'.$codes[1], false],
-                        ['NOT LIKE', 'code', '%,'.$codes[0].','.$codes[1].',%', false],
-                        ['NOT LIKE', 'code', '%,'.$codes[0].',%,'.$codes[1], false],
-                        ['NOT LIKE', 'code', '%,%,'.$codes[0].','.$codes[1], false],
                         ['=', 'code_type', 4],
+                        [
+                            'OR',
+                            ['LIKE', 'code', '%' . $codes[0] . ',' . $codes[1] . '%', false],
+                            ['LIKE', 'code', '%' . $codes[0] . '%' . $codes[1] . '%', false],
+
+                            ['LIKE', 'code', '%' . $codes[1] . ',' . $codes[0] . '%', false],
+                            ['LIKE', 'code', '%' . $codes[1] . '%' . $codes[0] . '%', false],
+                        ]
                     ];
-                }else{
-                    $where = [
-                        'AND',
-                        ['NOT LIKE', 'code', '%'.$codes[0].'%', false],
-                        ['NOT LIKE', 'code', '%'.$codes[1].'%', false],
-                        ['=', 'code_type', 4],
-                    ];
+                } else { # 除
+                    if ($codes[0] == $codes[1]) { # 双重
+                        $where = [
+                            'AND',
+                            ['NOT LIKE', 'code', $codes[0] . ',' . $codes[1] . ',%,%', false],
+                            ['NOT LIKE', 'code', $codes[0] . ',%,' . $codes[1] . ',%', false],
+                            ['NOT LIKE', 'code', $codes[0] . ',%,%,' . $codes[1], false],
+                            ['NOT LIKE', 'code', '%,' . $codes[0] . ',' . $codes[1] . ',%', false],
+                            ['NOT LIKE', 'code', '%,' . $codes[0] . ',%,' . $codes[1], false],
+                            ['NOT LIKE', 'code', '%,%,' . $codes[0] . ',' . $codes[1], false],
+                            ['=', 'code_type', 4],
+                        ];
+                    } else {
+                        $where = [
+                            'AND',
+                            ['NOT LIKE', 'code', '%' . $codes[0] . '%', false],
+                            ['NOT LIKE', 'code', '%' . $codes[1] . '%', false],
+                            ['=', 'code_type', 4],
+                        ];
+                    }
                 }
+                $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
+                $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
             }
-            $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
-            $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
         }
 
         if($code_type == 4){
@@ -482,51 +488,58 @@ class NumService extends BaseService {
     public static function getAllCombination3($codes, $type = 1, $code_type = 4){
         if(strlen($codes) != 3) return [];
 
-        $op = $type == 1 ? 'OR' : 'AND';
-        $like_op = ($type == 1) ? 'LIKE' : 'NOT LIKE';
-        if($type == 1){
-            $where = [
-                'AND',
-                ['=', 'code_type', 4],
-                [
-                    $op,
-                    [$like_op, 'code', '%'.$codes[0].','.$codes[1].','.$codes[2].'%', false],
-                    [$like_op, 'code', $codes[0].'%'.$codes[1].','.$codes[2], false],
-                    [$like_op, 'code', $codes[0].','.$codes[1].'%'.$codes[2], false],
-
-                    [$like_op, 'code', '%'.$codes[0].','.$codes[2].','.$codes[1].'%', false],
-                    [$like_op, 'code', $codes[0].'%'.$codes[2].','.$codes[1], false],
-                    [$like_op, 'code', $codes[0].','.$codes[2].'%'.$codes[1], false],
-
-                    [$like_op, 'code', '%'.$codes[1].','.$codes[0].','.$codes[2].'%', false],
-                    [$like_op, 'code', $codes[1].'%'.$codes[0].','.$codes[2], false],
-                    [$like_op, 'code', $codes[1].','.$codes[0].'%'.$codes[2], false],
-
-                    [$like_op, 'code', '%'.$codes[1].','.$codes[2].','.$codes[0].'%', false],
-                    [$like_op, 'code', $codes[1].'%'.$codes[2].','.$codes[0], false],
-                    [$like_op, 'code', $codes[1].','.$codes[2].'%'.$codes[0], false],
-
-                    [$like_op, 'code', '%'.$codes[2].','.$codes[0].','.$codes[1].'%', false],
-                    [$like_op, 'code', $codes[2].'%'.$codes[0].','.$codes[1], false],
-                    [$like_op, 'code', $codes[2].','.$codes[0].'%'.$codes[1], false],
-
-                    [$like_op, 'code', '%'.$codes[2].','.$codes[1].','.$codes[0].'%', false],
-                    [$like_op, 'code', $codes[2].'%'.$codes[1].','.$codes[0], false],
-                    [$like_op, 'code', $codes[2].','.$codes[1].'%'.$codes[0], false],
-                ]
-            ];
+        if($code_type == 5){
+            $twoNums = NumService::getTwoNums($codes);
+            foreach ($twoNums as $twoNum){
+                $codesArr = NumService::getTwo5ByTwoNums([$twoNum[0], $twoNum[1]]);
+            }
         }else{
-            $where = [
-                'AND',
-                ['NOT LIKE', 'code', '%'.$codes[0].'%', false],
-                ['NOT LIKE', 'code', '%'.$codes[1].'%', false],
-                ['NOT LIKE', 'code', '%'.$codes[2].'%', false],
-                ['=', 'code_type', 4],
-            ];
+            $op = $type == 1 ? 'OR' : 'AND';
+            $like_op = ($type == 1) ? 'LIKE' : 'NOT LIKE';
+            if($type == 1){
+                $where = [
+                    'AND',
+                    ['=', 'code_type', 4],
+                    [
+                        $op,
+                        [$like_op, 'code', '%'.$codes[0].','.$codes[1].','.$codes[2].'%', false],
+                        [$like_op, 'code', $codes[0].'%'.$codes[1].','.$codes[2], false],
+                        [$like_op, 'code', $codes[0].','.$codes[1].'%'.$codes[2], false],
+
+                        [$like_op, 'code', '%'.$codes[0].','.$codes[2].','.$codes[1].'%', false],
+                        [$like_op, 'code', $codes[0].'%'.$codes[2].','.$codes[1], false],
+                        [$like_op, 'code', $codes[0].','.$codes[2].'%'.$codes[1], false],
+
+                        [$like_op, 'code', '%'.$codes[1].','.$codes[0].','.$codes[2].'%', false],
+                        [$like_op, 'code', $codes[1].'%'.$codes[0].','.$codes[2], false],
+                        [$like_op, 'code', $codes[1].','.$codes[0].'%'.$codes[2], false],
+
+                        [$like_op, 'code', '%'.$codes[1].','.$codes[2].','.$codes[0].'%', false],
+                        [$like_op, 'code', $codes[1].'%'.$codes[2].','.$codes[0], false],
+                        [$like_op, 'code', $codes[1].','.$codes[2].'%'.$codes[0], false],
+
+                        [$like_op, 'code', '%'.$codes[2].','.$codes[0].','.$codes[1].'%', false],
+                        [$like_op, 'code', $codes[2].'%'.$codes[0].','.$codes[1], false],
+                        [$like_op, 'code', $codes[2].','.$codes[0].'%'.$codes[1], false],
+
+                        [$like_op, 'code', '%'.$codes[2].','.$codes[1].','.$codes[0].'%', false],
+                        [$like_op, 'code', $codes[2].'%'.$codes[1].','.$codes[0], false],
+                        [$like_op, 'code', $codes[2].','.$codes[1].'%'.$codes[0], false],
+                    ]
+                ];
+            }else{
+                $where = [
+                    'AND',
+                    ['NOT LIKE', 'code', '%'.$codes[0].'%', false],
+                    ['NOT LIKE', 'code', '%'.$codes[1].'%', false],
+                    ['NOT LIKE', 'code', '%'.$codes[2].'%', false],
+                    ['=', 'code_type', 4],
+                ];
+            }
+            //p($where);
+            $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
+            $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
         }
-        //p($where);
-        $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
-        $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
 
         return array_unique($codesArr);
     }
@@ -539,49 +552,56 @@ class NumService extends BaseService {
      */
     public static function getAllCombination4($codes, $type = 1, $code_type = 4){
         if(strlen($codes) != 4) return [];
-        if($type == 1){
-
-            $codesArr = [
-                $codes[0].','.$codes[1].','.$codes[2].','.$codes[3],
-                $codes[0].','.$codes[1].','.$codes[3].','.$codes[2],
-                $codes[0].','.$codes[2].','.$codes[1].','.$codes[3],
-                $codes[0].','.$codes[2].','.$codes[3].','.$codes[1],
-                $codes[0].','.$codes[3].','.$codes[1].','.$codes[2],
-                $codes[0].','.$codes[3].','.$codes[2].','.$codes[1],
-
-                $codes[1].','.$codes[0].','.$codes[2].','.$codes[3],
-                $codes[1].','.$codes[0].','.$codes[3].','.$codes[2],
-                $codes[1].','.$codes[2].','.$codes[0].','.$codes[3],
-                $codes[1].','.$codes[2].','.$codes[3].','.$codes[0],
-                $codes[1].','.$codes[3].','.$codes[0].','.$codes[2],
-                $codes[1].','.$codes[3].','.$codes[2].','.$codes[0],
-
-                $codes[2].','.$codes[0].','.$codes[1].','.$codes[3],
-                $codes[2].','.$codes[0].','.$codes[3].','.$codes[1],
-                $codes[2].','.$codes[1].','.$codes[0].','.$codes[3],
-                $codes[2].','.$codes[1].','.$codes[3].','.$codes[0],
-                $codes[2].','.$codes[3].','.$codes[0].','.$codes[1],
-                $codes[2].','.$codes[3].','.$codes[1].','.$codes[0],
-
-                $codes[3].','.$codes[0].','.$codes[1].','.$codes[2],
-                $codes[3].','.$codes[0].','.$codes[2].','.$codes[1],
-                $codes[3].','.$codes[1].','.$codes[0].','.$codes[2],
-                $codes[3].','.$codes[1].','.$codes[2].','.$codes[0],
-                $codes[3].','.$codes[2].','.$codes[0].','.$codes[1],
-                $codes[3].','.$codes[2].','.$codes[1].','.$codes[0],
-            ];
+        if($code_type == 5){ # 五位二定
+            $twoNums = NumService::getTwoNums($codes);
+            foreach ($twoNums as $twoNum){
+                $codesArr = NumService::getTwo5ByTwoNums([$twoNum[0], $twoNum[1]]);
+            }
         }else{
-            $where = [
-                'AND',
-                ['NOT LIKE', 'code', '%'.$codes[0].'%', false],
-                ['NOT LIKE', 'code', '%'.$codes[1].'%', false],
-                ['NOT LIKE', 'code', '%'.$codes[2].'%', false],
-                ['NOT LIKE', 'code', '%'.$codes[3].'%', false],
-                ['=', 'code_type', 4],
-            ];
+            if($type == 1){
 
-            $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
-            $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+                $codesArr = [
+                    $codes[0].','.$codes[1].','.$codes[2].','.$codes[3],
+                    $codes[0].','.$codes[1].','.$codes[3].','.$codes[2],
+                    $codes[0].','.$codes[2].','.$codes[1].','.$codes[3],
+                    $codes[0].','.$codes[2].','.$codes[3].','.$codes[1],
+                    $codes[0].','.$codes[3].','.$codes[1].','.$codes[2],
+                    $codes[0].','.$codes[3].','.$codes[2].','.$codes[1],
+
+                    $codes[1].','.$codes[0].','.$codes[2].','.$codes[3],
+                    $codes[1].','.$codes[0].','.$codes[3].','.$codes[2],
+                    $codes[1].','.$codes[2].','.$codes[0].','.$codes[3],
+                    $codes[1].','.$codes[2].','.$codes[3].','.$codes[0],
+                    $codes[1].','.$codes[3].','.$codes[0].','.$codes[2],
+                    $codes[1].','.$codes[3].','.$codes[2].','.$codes[0],
+
+                    $codes[2].','.$codes[0].','.$codes[1].','.$codes[3],
+                    $codes[2].','.$codes[0].','.$codes[3].','.$codes[1],
+                    $codes[2].','.$codes[1].','.$codes[0].','.$codes[3],
+                    $codes[2].','.$codes[1].','.$codes[3].','.$codes[0],
+                    $codes[2].','.$codes[3].','.$codes[0].','.$codes[1],
+                    $codes[2].','.$codes[3].','.$codes[1].','.$codes[0],
+
+                    $codes[3].','.$codes[0].','.$codes[1].','.$codes[2],
+                    $codes[3].','.$codes[0].','.$codes[2].','.$codes[1],
+                    $codes[3].','.$codes[1].','.$codes[0].','.$codes[2],
+                    $codes[3].','.$codes[1].','.$codes[2].','.$codes[0],
+                    $codes[3].','.$codes[2].','.$codes[0].','.$codes[1],
+                    $codes[3].','.$codes[2].','.$codes[1].','.$codes[0],
+                ];
+            }else{
+                $where = [
+                    'AND',
+                    ['NOT LIKE', 'code', '%'.$codes[0].'%', false],
+                    ['NOT LIKE', 'code', '%'.$codes[1].'%', false],
+                    ['NOT LIKE', 'code', '%'.$codes[2].'%', false],
+                    ['NOT LIKE', 'code', '%'.$codes[3].'%', false],
+                    ['=', 'code_type', 4],
+                ];
+
+                $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
+                $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+            }
         }
 
         return array_unique($codesArr);
@@ -594,53 +614,100 @@ class NumService extends BaseService {
      */
     public static function getAllCombination4p($codes, $codeSplit = '', $code_type = 4){
         if(strlen($codes)<5) return [];
-        $tmpArr = [];
-        $len = strlen($codes);
-        for($i=0; $i<$len; $i++){
-            $tmpArr[] = $codes[$i];
-        }
-        $tmpArr1 = $tmpArr2 = $tmpArr3 = $tmpArr4 = $tmpArr;
+        if($code_type == 5){ # 五位二定
+            $twoNums = NumService::getTwoNums($codes);
+            foreach ($twoNums as $twoNum){
+                $codesArr = NumService::getTwo5ByTwoNums([$twoNum[0], $twoNum[1]]);
+            }
+        }else {
+            $tmpArr = [];
+            $len = strlen($codes);
+            for ($i = 0; $i < $len; $i++) {
+                $tmpArr[] = $codes[$i];
+            }
+            $tmpArr1 = $tmpArr2 = $tmpArr3 = $tmpArr4 = $tmpArr;
 
-        # 第1步：循环获取二字组合
-        $codes2Arr = [];
-        $codes3Arr = [];
-        $codes4Arr = [];
-        foreach ($tmpArr1 as $k1=>$v1){
-            $fen = floor(count($tmpArr1) / 2);
-            if($k1+1>$fen) break;
-            foreach ($tmpArr2 as $k2=>$v2){
-                if($k2<=$k1) continue;
-                $codes2Str = $v1.$codeSplit.$v2;
-                $codes2Arr[] = $codes2Str;
-                foreach ($tmpArr3 as $k3=>$v3){
-                    if($k3==$k1 OR $k3==$k2) continue;
-                    $codes3Str = $codes2Str.$codeSplit.$v3;
-                    $codes3Arr[] = $codes3Str;
-                    foreach ($tmpArr4 as $k4=>$v4){
-                        if($k4==$k1 OR $k4==$k2 OR $k4==$k3) continue;
-                        $codes4Str = $codes3Str.$codeSplit.$v4;
-                        $tmp = [$codes4Str[0], $codes4Str[1], $codes4Str[2], $codes4Str[3],];
-                        asort($tmp);
-                        $codes4Arr[] = $tmp;
+            # 第1步：循环获取二字组合
+            $codes2Arr = [];
+            $codes3Arr = [];
+            $codes4Arr = [];
+            foreach ($tmpArr1 as $k1 => $v1) {
+                $fen = floor(count($tmpArr1) / 2);
+                if ($k1 + 1 > $fen) break;
+                foreach ($tmpArr2 as $k2 => $v2) {
+                    if ($k2 <= $k1) continue;
+                    $codes2Str = $v1 . $codeSplit . $v2;
+                    $codes2Arr[] = $codes2Str;
+                    foreach ($tmpArr3 as $k3 => $v3) {
+                        if ($k3 == $k1 OR $k3 == $k2) continue;
+                        $codes3Str = $codes2Str . $codeSplit . $v3;
+                        $codes3Arr[] = $codes3Str;
+                        foreach ($tmpArr4 as $k4 => $v4) {
+                            if ($k4 == $k1 OR $k4 == $k2 OR $k4 == $k3) continue;
+                            $codes4Str = $codes3Str . $codeSplit . $v4;
+                            $tmp = [$codes4Str[0], $codes4Str[1], $codes4Str[2], $codes4Str[3],];
+                            asort($tmp);
+                            $codes4Arr[] = $tmp;
+                        }
                     }
                 }
             }
-        }
-        //p($codes4Arr);
-        //$codes4Arr = array_unique($codes4Arr);
-        $tmpCodesArr = [];
-        foreach ($codes4Arr as $k=>$v){
-            $tmpCodesArr[] = implode('', $v);
-        }
-        $tmpCodesArr = array_unique($tmpCodesArr);
-        $codesArr = [];
-        foreach ($tmpCodesArr as $k=>$v){
-            $codesArr = array_merge($codesArr, NumService::getAllCombination4($v));
+            //p($codes4Arr);
+            //$codes4Arr = array_unique($codes4Arr);
+            $tmpCodesArr = [];
+            foreach ($codes4Arr as $k => $v) {
+                $tmpCodesArr[] = implode('', $v);
+            }
+            $tmpCodesArr = array_unique($tmpCodesArr);
+            $codesArr = [];
+            foreach ($tmpCodesArr as $k => $v) {
+                $codesArr = array_merge($codesArr, NumService::getAllCombination4($v));
+            }
         }
 
         return $codesArr;
     }
 
+    /**
+     * @desc
+     * @param string $code1
+     * @param string $code2
+     * @return array ['1,X,X,X,2', 'X,1,X,X,2', 'X,X,1,X,2', 'X,X,X,1,2', '2,X,X,X,1', 'X,2,X,X,1', 'X,X,2,X,1', 'X,X,X,2,1']
+     */
+    public static function getTwo5ByTwoNums($code1 = '', $code2 = ''){
+        $codesArr = [];
+
+        $tmpCodesArr = NumService::getCodesTwo5([$code1, $code2]);
+        foreach ($tmpCodesArr as $tmpCodes){
+            $codesArr[] = implode(',', $tmpCodes);
+        }
+
+        return $codesArr;
+    }
+
+    /**
+     * @param $codes
+     */
+    public static function getTwoNums($codes){
+        $codesArr = [];
+        if(strlen($codes) == 1){
+            $codesArr[] = [$codes, $codes];
+        }elseif (strlen($codes) == 2){
+            $codesArr = [[$codes[0], $codes[1]]];
+        }elseif(strlen($codes) == 3){
+            $codesArr = [[$codes[0], $codes[1]], [$codes[0], $codes[2]], [$codes[1], $codes[2]]];
+        }else{
+            $len = strlen($codes);
+            for($i=0; $i<$len; $i++){
+                for ($j=0; $i<$len; $i++){
+                    if($i == $j) continue;
+                    $codesArr[] = [$codes[$i], $codes[$j]];
+                }
+            }
+        }
+
+        return $codesArr;
+    }
 
     /**
      * @desc 快选功能过滤
@@ -968,10 +1035,11 @@ class NumService extends BaseService {
         $get = \Yii::$app->request->get();
         if($get['t'] == 1)p($where);
         $codesArr = [];
-        if($code_type == 4 OR $code_type == 3){
+        if($code_type == 4 OR $code_type == 3 OR $code_type == 5){
             $Num4Types = Num4Type::find()->where($where)->asArray()->all();
             $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
         }
+        p($codesArr);
 
          # 上奖
         //if(isset($codes_hz['arise']) && !empty($codes_hz['arise'])){
