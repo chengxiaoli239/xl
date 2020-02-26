@@ -8,11 +8,12 @@ use Yii;
  * This is the model class for table "{{%num4_type}}".
  *
  * @property int $id
- * @property string $code 彩种
+ * @property string $code 号码
  * @property string $code_1
  * @property string $code_2
  * @property string $code_3
  * @property string $code_4
+ * @property string $code_5
  * @property int $type_2 是否双重
  * @property int $type_22 是否双双重
  * @property int $type_3 是否三重
@@ -53,7 +54,7 @@ class Num4Type extends \common\models\base\BaseModel
             [['type_2', 'type_22', 'type_3', 'type_4', 'type_22b', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_log', 'type_3n_2b', 'type_3d', 'type_3s', 'type_4d', 'type_4s', 'codes_hz', 'code_type', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
             [['code'], 'string', 'max' => 8],
-            [['code_1', 'code_2', 'code_3', 'code_4'], 'string', 'max' => 1],
+            [['code_1', 'code_2', 'code_3', 'code_4', 'code_5'], 'string', 'max' => 1],
         ];
     }
 
@@ -64,11 +65,12 @@ class Num4Type extends \common\models\base\BaseModel
     {
         return [
             'id' => 'ID',
-            'code' => '彩种',
+            'code' => '号码',
             'code_1' => 'Code 1',
             'code_2' => 'Code 2',
             'code_3' => 'Code 3',
             'code_4' => 'Code 4',
+            'code_5' => 'Code 5',
             'type_2' => '是否双重',
             'type_22' => '是否双双重',
             'type_3' => '是否三重',
