@@ -210,7 +210,8 @@ class OpKjService extends BaseService {
                 break;
                 */
             case 3: // 四字定
-                $kjData_n = substr($kjData, 0,7); // 开奖截取前4位号码
+                //$kjData_n = substr($kjData, 0,7); // 开奖截取前4位号码
+                $kjData_n = $kjData; // 开奖截取前4位号码
                 $zjResult = OpKjService::opKjData4($codes, $kjData_n);
                 break;
             case 10:

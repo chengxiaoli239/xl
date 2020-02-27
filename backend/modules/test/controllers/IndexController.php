@@ -127,7 +127,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = OpKjService::opKjData4('X,X,5,X,7@0124,X,X,X,7@01234,45678,56789,56789','3,4,5,7,7');p($rst);
+        $rst = OpKjService::opKjData4('3,X,2,9@X,2,4,9@3,9,X,9@3,9,7,X','3,9,7,9,5');p($rst);
+        $rst = OpKjService::opKjData4('3,X,X,X,5@X,X,X,9,5@X,X,7,X,5@3,9,X,X,X','3,9,7,9,5');p($rst);
         $rst = SscDataService::insertCodeType5();p($rst);
         $rst = KjDataGet::updateNullCode($num = 1000, $lottery_type = 5);p($rst);
         $rst = SscDataService::insertCodeType();p($rst);
