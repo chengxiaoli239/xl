@@ -127,6 +127,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = OpKjService::opKjData4('X,X,5,X,7@0124,X,X,X,7@01234,45678,56789,56789','3,4,5,7,7');p($rst);
         $rst = SscDataService::insertCodeType5();p($rst);
         $rst = KjDataGet::updateNullCode($num = 1000, $lottery_type = 5);p($rst);
         $rst = SscDataService::insertCodeType();p($rst);
@@ -403,7 +404,6 @@ class IndexController extends Controller
         $r = $m->set($mkey, 1, 10*60);
         //$rst = StaticService::staticSDProfits();p($rst); # 利润统计
         $rst = StaticService::staticProfits($playway = 3, 3600 * 3, 0);p($rst);
-        $rst = OpKjService::opKjData4('01234,56789,56789,56789@01234,45678,56789,56789','3,4,5,7');p($rst);
         $rst = WxService::sendMsg();p($rst); # 群发微信消息
         $rst = CqsscKcw::getLotteryNo();p($rst);
         $rst = HN0898Service::getQihao();p($rst);
