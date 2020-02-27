@@ -748,7 +748,7 @@ abstract class BetService extends BaseBetService {
             }elseif ($lottery_type == 6){
                 $rst = NineNineBaseService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
             }
-        }elseif(in_array($tz_system_id, [3, 7])){
+        }elseif(in_array($tz_system_id, [3, 7, 9])){
             # 3、重庆7时彩网
             if($lottery_type == 5){ # 7时彩重庆
                 $rst = SevenService::cancelOrder($bet_id, $BettingRecords->tz_system_id);

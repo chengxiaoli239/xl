@@ -716,11 +716,12 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $BettingRecords = BettingRecords::findOne($id);
         $uid = $BettingRecords->uid;
         $snid = $BettingRecords->snid;
+        $sn = $BettingRecords->sn;
         self::__init($uid, $tz_system_id);
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
-        $post_data = [ 'ids'=>'{'.$snid.'}|'.$BettingRecords->single, 'period_no' => $qihao];
+        $post_data = [ 'ids'=>'{'.$sn.'}|'.$BettingRecords->single, 'period_no' => $qihao];
 
         $_t = round(microtime(true) * 1000);
         $headers = [
@@ -2009,7 +2010,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                     'period_no'=>$qihao,
                     'operation_condition' => self::getOperationCondition($tz_type),
                 ];
-                $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL'); # .'?'.http_build_query($post_data);
+                //$url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL'); # .'?'.http_build_query($post_data);
+                $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL') .'?'.http_build_query($post_data);
             }elseif(in_array($tz_type, [27])){ # 二定
                 $post_data = [
                     'bets'=>json_encode($bet_codes),
