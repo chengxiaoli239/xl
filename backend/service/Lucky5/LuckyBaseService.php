@@ -420,6 +420,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             27 => 104,
             29 => 102,
             30 => 102,
+            31 => 102,
         ];
 
         if(isset($rstData[$tz_type])) return $rstData[$tz_type];
@@ -438,6 +439,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             27 => 20,
             30 => 20,
             29 => 30,
+            31 => 50,
         ];
 
         if(isset($rstData[$tz_type])) return $rstData[$tz_type];
@@ -1774,7 +1776,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $bet_codes = $codes;
         $isBigNumsBet = BetService::isBigNumsBet($tz_type);
 
-        if($playway == 2){
+        if(in_array($playway, [2])){ # 三字定
            /*快选 */
             $bet_codes = str_replace(',','',$bet_codes);
             $bet_codes = str_replace('@',',',$bet_codes);
@@ -1844,9 +1846,9 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 $start_time = microtime(true);
                 //$rst = CurlService::httpPost($url, $post_data, $headers);
                 //p(rand(), 0);
+                //p(['rst'=>$rst,'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers]);
                 $rst = CurlService::postCurl($url, $post_data, $headers);
                 //$rst = json_encode($rst);
-                //p(['rst'=>$rst,'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers]);
                 $end_time = microtime(true);
                 $time_consume = ($end_time - $start_time). 's';
                 if($rst['Status'] != 1 OR !$rst){
@@ -1992,7 +1994,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 $url = self::getTzSiteInfo(self::$tz_system_id, 'SSC_INDEX').'/Member/BatchBet'; #.'?'.http_build_query($post_data);
                 */
                 //p($post_data);
-            }elseif(in_array($tz_type, [30])){ # 二定 - 快选
+            }elseif(in_array($tz_type, [30, 31])){ # 二定 - 快选
                 $bet_codes = str_replace(',','',$bet_codes);
                 $bet_codes = str_replace('@',',',$bet_codes);
                 $post_data = [
@@ -2060,9 +2062,9 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $start_time = microtime(true);
             //$rst = CurlService::httpPost($url, $post_data, $headers);
             //p(rand(), 0);
+            //p(['rst'=>$rst,'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers]);
             $rst = CurlService::postCurl($url, $post_data, $headers);
             //$rst = json_encode($rst);
-            //p(['rst'=>$rst,'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers]);
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time). 's';
             if($rst['Status'] != 1 OR !$rst){

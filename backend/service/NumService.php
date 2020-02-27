@@ -386,7 +386,7 @@ class NumService extends BaseService {
             }
             $codes4Arr = array_merge($codes4Arr, $codesArrTmp);
         }
-        if($code_type == 4){
+        if(in_array($code_type, [4, 5])){
             $codes4Arr = array_unique($codes4Arr);
         }
 
@@ -488,12 +488,14 @@ class NumService extends BaseService {
     public static function getAllCombination3($codes, $type = 1, $code_type = 4){
         if(strlen($codes) != 3) return [];
 
+        $codesArr = [];
         if($code_type == 5){
             $twoNums = NumService::getTwoNums($codes);
             foreach ($twoNums as $twoNum){
                 $codesArr = NumService::getTwo5ByTwoNums([$twoNum[0], $twoNum[1]]);
             }
-        }else{
+        }elseif($code_type == 3){
+        }elseif($code_type == 4){
             $op = $type == 1 ? 'OR' : 'AND';
             $like_op = ($type == 1) ? 'LIKE' : 'NOT LIKE';
             if($type == 1){
@@ -615,9 +617,10 @@ class NumService extends BaseService {
     public static function getAllCombination4p($codes, $codeSplit = '', $code_type = 4){
         if(strlen($codes)<5) return [];
         if($code_type == 5){ # 五位二定
+            $codesArr = [];
             $twoNums = NumService::getTwoNums($codes);
             foreach ($twoNums as $twoNum){
-                $codesArr = NumService::getTwo5ByTwoNums([$twoNum[0], $twoNum[1]]);
+                $codesArr = array_merge($codesArr, NumService::getTwo5ByTwoNums($twoNum[0], $twoNum[1]));
             }
         }else {
             $tmpArr = [];
@@ -661,7 +664,7 @@ class NumService extends BaseService {
             $tmpCodesArr = array_unique($tmpCodesArr);
             $codesArr = [];
             foreach ($tmpCodesArr as $k => $v) {
-                $codesArr = array_merge($codesArr, NumService::getAllCombination4($v));
+                $codesArr = array_merge($codesArr, NumService::getAllCombination4($v, $code_type));
             }
         }
 
@@ -697,11 +700,11 @@ class NumService extends BaseService {
         }elseif(strlen($codes) == 3){
             $codesArr = [[$codes[0], $codes[1]], [$codes[0], $codes[2]], [$codes[1], $codes[2]]];
         }else{
+            $codesArr = [];
             $len = strlen($codes);
-            for($i=0; $i<$len; $i++){
-                for ($j=0; $i<$len; $i++){
-                    if($i == $j) continue;
-                    $codesArr[] = [$codes[$i], $codes[$j]];
+            for($i=0; $i<$len; $i++){ # 2345678
+                for ($j=$i+1; $j<$len; $j++){
+                    $codesArr = array_merge($codesArr, [ [$codes[$i], $codes[$j]] ]);
                 }
             }
         }
@@ -1031,24 +1034,42 @@ class NumService extends BaseService {
             $where = array_merge($where, [['=', 'type_log', $codes_hz['type_log']]]);
         }
 
+        # 上奖字段
+        $tmpAriseLen = strlen($codes_hz['arise']);
+        $tmpAriseArr = [];
+        for ($i=0; $i<$tmpAriseLen; $i++){
+            $tmpAriseArr[] = $codes_hz['arise'][$i];
+        }
+
         //p([$where, $codes_hz]);
         $get = \Yii::$app->request->get();
         if($get['t'] == 1)p($where);
         $codesArr = [];
-        if($code_type == 4 OR $code_type == 3 OR $code_type == 5){
-            $Num4Types = Num4Type::find()->where($where)->asArray()->all();
-            $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+        if($code_type == 4){
+        }elseif ($code_type == 3){
+        }elseif ($code_type == 5){
+            $tmpArisewhere = ['OR'];
+            if($codes_hz['arise']){
+                $tmpArisewhere = array_merge($tmpArisewhere, [ ['IN', 'code_1', $tmpAriseArr] ]);
+                $tmpArisewhere = array_merge($tmpArisewhere, [ ['IN', 'code_2', $tmpAriseArr] ]);
+                $tmpArisewhere = array_merge($tmpArisewhere, [ ['IN', 'code_3', $tmpAriseArr] ]);
+                $tmpArisewhere = array_merge($tmpArisewhere, [ ['IN', 'code_4', $tmpAriseArr] ]);
+                $where = array_merge($where, [$tmpArisewhere]);
+            }
         }
-        p($codesArr);
+        $Num4Types = Num4Type::find()->where($where)->asArray()->all();
+        $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+        //p(['where'=>$where, 'codes_hz'=>$codes_hz, 'codesArr'=>$codesArr]);
 
          # 上奖
         //if(isset($codes_hz['arise']) && !empty($codes_hz['arise'])){
-        if(isset($codes_hz['arise'])){
+        if(in_array($code_type, [2,3,4]) && isset($codes_hz['arise'])){
             $asises = explode(',', $codes_hz['arise']);
             $codesArr_arise = self::getCodesArise($asises, $type = 1, $code_type);
-            if(in_array($code_type, [3, 4])) {
+            //p(['code_type'=>$code_type, 'where'=>$where, 'codes_hz'=>$codes_hz, 'codesArr_arise'=>$codesArr_arise, 'codesArr'=>$codesArr]);
+            if(in_array($code_type, [4])) {
                 $codesArr = array_intersect($codesArr, $codesArr_arise);
-            }elseif(in_array($code_type, [5])){
+            }elseif($code_type == 3){
             }else{
                 $codesArr = $codesArr_arise;
             }

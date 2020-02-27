@@ -389,7 +389,38 @@ _: 1555052477064
 	period_no: 20191011134
 	operation_condition: {"symbol":"X","isXian":0,"firstNumber":"1","secondNumber":"23","thirdNumber":"4","fourthNumber":"","fifthNumber":"","numberType":30,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[],"symbolPositions":[0,0,0,0],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}
 
-
+快选五位二定：
+1、Genenral
+	Request URL: http://f9.ww668855.xyz:5678/Member/MultipleBet
+	Request Method: POST
+	Status Code: 200 OK
+	Remote Address: 129.204.99.164:5678
+	Referrer Policy: no-referrer-when-downgrade
+2、Requerst Header
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
+	Accept-Encoding: gzip, deflate
+	Accept-Language: zh-CN,zh;q=0.9
+	Cache-Control: max-age=0
+	Connection: keep-alive
+	Content-Length: 1523
+	Content-Type: application/x-www-form-urlencoded
+	Cookie: __cfduid=d5e0abc111db7866a9c32193f56641eca1582699962; robot7=45tCDg4Yt+KZIgOUS+TTOlFuscDhqFLXFcsrpSIFvmCf51JtL/ZerpSxCoi7tcIqmbrID0Skct7ToDGk6XgMIg==; nlbi_1712594=Q3PfFVvmzUNw5FFDE3SBeAAAAAAyXLhZ7r3UgWG82bwWAmk/; visid_incap_1712594=8W1Rzr5DTMuNm+3MBL9Z2ckVVl4AAAAAQUIPAAAAAABowCFO92/9k/ek1UoxWi89; incap_ses_463_1712594=6F49dvEVFiXDZwrHs+lsBskVVl4AAAAAc5+76OB2MnhWYjt3I7Z1mg==; SevenStarHFDirector32Frontend32=l5pawwrzsb52jimp1xklg4rp; Akamai_Cookie=504367626.13685.0000; robot3=dc7WCf07KIw1NqKrKRZ9pKTWean18GSNcif7HR7wy+A=; NOTICE_LOGIN_IN=1
+	Host: f9.ww668855.xyz:5678
+	Origin: http://f9.ww668855.xyz:5678
+	Referer: http://f9.ww668855.xyz:5678/App/Index?_=1582702662354
+	Upgrade-Insecure-Requests: 1
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36
+3、Form Data
+	bet_number: 0XXX0,1XXX0
+	bet_money: 1
+	bet_way: 102
+	is_xian: 0
+	is_iframe: 1
+	number_type: 50
+	bet_log: [五位二定]，定位置“[取]”：千=[01]，五=[0]
+	is_package: 0
+	period_no: 20200227202
+	operation_condition: {"symbol":"X","isXian":0,"firstNumber":"01","secondNumber":"","thirdNumber":"","fourthNumber":"","fifthNumber":"0","numberType":50,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[],"symbolPositions":[0,0,0,0,0],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0,0]}
 
 
 

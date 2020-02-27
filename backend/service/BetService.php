@@ -102,7 +102,7 @@ abstract class BetService extends BaseBetService {
                 $codes = BetService::getPlansAllCodesType1($tz_type, $buy_type, $sel_same, $hz_Arr, $plan_id);
                 break;
             case 2: # 7时彩 重庆时时彩
-            case 5: # 7时彩 幸运五分彩
+            case 5: # 7时彩 幸运五星彩
                 $codes = BetService::getPlansAllCodesType2($tz_type, $buy_type, $sel_same, $hz_Arr, $plan_id);
                 break;
             default:
@@ -416,32 +416,7 @@ abstract class BetService extends BaseBetService {
      * @return string
      */
     public static function getPlansAllCodesType2($tz_type = 1, $buy_type = 1, $sel_same = 1, $codes_hz = '', $plan_id = ''){
-        $m = \Yii::$app->cache;
-
-        $playway = TzTypes::findOne(['type'=>$tz_type])->playway;
-        $qihao = HN0898Service::getQihao();
         $codes = self::getPlansAllCodesType1($tz_type, $buy_type, $sel_same, $codes_hz, $plan_id);
-        //$codesDatas = explode('@', $codes);
-
-        switch ($playway) {
-            case 1: # 二定
-                break;
-            case 2: # 三定
-                break;
-            case 3: # 四定
-                $position = '1,2,3,4';
-                break;
-            default:
-                ;
-        }
-        $dict_no_type_id = self::get_dict_no_type_id($position);
-
-        //$codes = '13579,02468,,@,23456,23465,';
-
-        $mkey = 'getPlansAllCodesType1_'.$playway.'_'.$tz_type.'_'.$buy_type.'_'.$qihao;
-        //if($codes = $m->get($mkey)) return $codes;
-
-        //$m->set($mkey, $codes, 5*60);
 
         return $codes;
     }
