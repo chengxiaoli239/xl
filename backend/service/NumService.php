@@ -1251,7 +1251,7 @@ class NumService extends BaseService {
             $desc .= ' 个'.$hz_Arr['p4'];
         }
         if(!empty($hz_Arr['p5'])){
-            $desc .= ' 个'.$hz_Arr['p5'];
+            $desc .= ' 五'.$hz_Arr['p5'];
         }
 
         if(!empty($filter8)){
