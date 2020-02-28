@@ -590,10 +590,19 @@ abstract class BetService extends BaseBetService {
            # 5、投注请求
            $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id);
            $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
-           $rst[] = $BetService->bet($qihao, $plan->id, $codes);
+           $tmpRst = $BetService->bet($qihao, $plan->id, $codes);
+           $rst[] = $tmpRst;
            $isAuto == 0 && BetService::afterBetNow($plan->lottery_type, $qihao); # 手动无需锁
 
            BetService::synBalance($plan->uid, $tz_system_id);
+
+           # 测试账号取消订单
+           if(in_array($plan->account, \Yii::$app->params['test_account'])){
+               $tmpBets = BettingRecords::findAll(['account'=>$plan->account]);
+               foreach ($tmpBets as $tmpBet){
+                   BetService::cancelOrder($plan->uid, $tmpBet->id);
+               }
+           }
        }
        $logArr = ['tz_sites'=>$tz_sites,'codes'=>$codes, 'postRst'=>$rst];
        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/plan_bet','INFO','0898投注记录', $logArr);

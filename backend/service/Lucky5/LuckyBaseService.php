@@ -2126,6 +2126,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','幸运五星时插入记录-真实投注', $logArr);
 
+        $data['postRst'] = $insertData;
+
         return $data;
     }
 

@@ -371,7 +371,6 @@ class IndexController extends Controller
         $rst = BetService::userSysPlansTzNow(81, 3); p($rst);
         $rst = SevenService::getSn(3, 3);p($rst); # 用户信息
         $rst = CqsscSevenDay::getLotteryNo(); p($rst);
-        $rst = BetService::getCodes(1, 3, 22, 1, 0.1, 1, [1221,1222,2111]);p($rst);
         $rst = StaticService::getSameCodes('1221', 1);p($rst);
         $rst = SevenService::synBalance(7); p($rst); # 同步余额
         //p(base64_decode('1324%E5%85%A8%E5%80%92%E5%9B%9B%E5%AE%9A%E5%90%840.1'));
