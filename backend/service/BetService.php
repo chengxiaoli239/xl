@@ -598,7 +598,7 @@ abstract class BetService extends BaseBetService {
 
            # 测试账号取消订单
            if(in_array($plan->account, \Yii::$app->params['test_account'])){
-               $tmpBets = BettingRecords::findAll(['account'=>$plan->account]);
+               $tmpBets = BettingRecords::findAll(['account'=>$plan->account, 'cancel_status'=>0]);
                foreach ($tmpBets as $tmpBet){
                    BetService::cancelOrder($plan->uid, $tmpBet->id);
                }
