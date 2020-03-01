@@ -127,6 +127,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $qihao = HN0898Service::getQihao($lottery_type = 8);p(['即将开奖期号'=>$qihao, 'lottery_type'=>$lottery_type]);
         $rst = OpKjService::opKjData4('3,X,2,9@X,2,4,9@3,9,X,9@3,9,7,X','3,9,7,9,5');p($rst);
         $rst = OpKjService::opKjData4('3,X,X,X,5@X,X,X,9,5@X,X,7,X,5@3,9,X,X,X','3,9,7,9,5');p($rst);
         $rst = SscDataService::insertCodeType5();p($rst);
