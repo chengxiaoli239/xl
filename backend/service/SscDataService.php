@@ -2606,6 +2606,12 @@ class SscDataService extends BaseService {
             foreach ($UserSysPlans as $UserSysPlan){
                 $profits = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id, 'is_profits_record'=>1])->sum('profits');
 
+                $maxQihao = BetService::$maxQihaoArr[$lottery_type];
+                $qihao = substr(HN0898Service::getCurrentQihao($lottery_type),-3); # 最后三位
+                if(in_array($lottery_type, [8]) && $maxQihao == $qihao){
+                    $profits = 0.00; # 每天的盈利重新计算
+                }
+
                 //if(($UserSysPlan->take_profits!=0 && $UserSysPlan->stop_loss!=0) AND ($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits))){
                 if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
                     $UserSysPlan->status = 0;

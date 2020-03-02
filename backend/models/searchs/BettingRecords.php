@@ -60,10 +60,9 @@ class BettingRecords extends BettingRecordsModel
         }
 
         // grid filtering conditions
-        $query->andFilterWhere([
+        $filterWhere = [
             'id' => $this->id,
             'playway' => $this->playway,
-            'uid' => $params['BettingRecords']['uid'],
             'betting_money' => $this->betting_money,
             'bonus' => $this->bonus,
             'single' => $this->single,
@@ -72,7 +71,10 @@ class BettingRecords extends BettingRecordsModel
             'lottery_type' => $this->lottery_type,
             'is_simulate' => $this->is_simulate,
             'createtime' => $this->createtime,
-        ]);
+        ];
+        if($params['BettingRecords']['uid'] !==1) $filterWhere['uid'] = $params['BettingRecords']['uid'];
+
+        $query->andFilterWhere($filterWhere);
 
         $query->andFilterWhere(['like', 'codes', $this->codes])
             ->andFilterWhere(['like', 'account', $this->account])

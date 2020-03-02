@@ -155,6 +155,7 @@ class UserSysPlansController extends BaseController
         $model = $this->findModel($id);
 
         UserSysPlansService::preOpData($this->_post, $this->_user_id);
+        $this->_post['update_time'] = date('Y-m-d H:i:s');
         if ($model->load($this->_post) && $model->save()) {
             if(in_array($this->_post['UserSysPlans']['tz_type'], \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
                 UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txt'], $this->_user_id);

@@ -32,7 +32,8 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                     </div>
                 </div-->
 
-    <?php Pjax::begin(); ?>
+                <?php include(dirname(__FILE__).'/index_tab.php'); ?>
+                <?php Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
