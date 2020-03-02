@@ -36,6 +36,15 @@ use yii\widgets\ActiveForm;
                     <?= $form->field($model, 'single')->textInput() ?>
 
                     <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
+
+                    <?= $form->field($model, 'p1')->textInput()->label('千') ?>
+
+                    <?= $form->field($model, 'p2')->textInput()->label('百') ?>
+
+                    <?= $form->field($model, 'p3')->textInput()->label('十') ?>
+
+                    <?= $form->field($model, 'p4')->textInput()->label('个') ?>
+
                     <!--?= $form->field($model, 'p1')->textInput()->label('第1位') ?-->
 
                     <!--?= $form->field($model, 'p2')->textInput()->label('第2位') ?-->
@@ -52,6 +61,7 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
+                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:1-3-7-15-31-62-125-251') ?>
                     <?= $form->field($model, 'hz')->checkboxList($hzArr)->label('投注类型(和值)') ?>
 
                     <!--?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?-->
