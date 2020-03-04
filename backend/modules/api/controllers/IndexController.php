@@ -10,6 +10,7 @@ namespace backend\modules\api\controllers;
 
 use backend\models\UserFollowData;
 use backend\service\HN0898Service;
+use common\tools\Tool_Common;
 use Yii;
 use yii\web\Controller;
 use common\service\CommonService;
@@ -122,6 +123,21 @@ class IndexController extends Controller
                     $rst = ['status'=>302, 'msg'=>'投注失败~'];
             }
         }
+
+        return $rst;
+    }
+
+    /**
+     * @desc 接受微信消息
+     * @return array
+     */
+    public function actionUpMembersInfo(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $data = \Yii::$app->request->post();
+
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/UpMembersInfo','INFO','0898投注记录-投注失败', ['msg'=>$data]);
+
+        $rst = ['status'=>302, 'msg'=>'操作成功', 'data'=>$data];
 
         return $rst;
     }
