@@ -57,6 +57,9 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $p3; # 第3位
     public $p4; # 第4位
     public $p5; # 第5位
+    public $code1; # 快译号码组1,例如：千12345百12345十67890
+    public $code2; # 快译号码组2,例如：千12345百12345十67890
+    public $status_val; # 取号码组值
     public $type_4d; # 四单
     public $type_4s; # 四双
     public $type_log; # 对数

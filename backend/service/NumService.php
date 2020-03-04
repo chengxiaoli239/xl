@@ -1135,6 +1135,7 @@ class NumService extends BaseService {
         $filter7 = []; # 类型除
         $filter8 = []; # 合分取
         $filter9 = []; # 合分除
+        $filter10 = []; # 号码组
         # {"get_types":["1","2"],"remove_types":["4","5"],"get_hzs":["7","8","10"],"remove_hzs":["12","13","14"],"get_arises":"123","remove_arises":"456"}
         # 0.1、上奖取
         if(isset($hz_Arr['arise']) OR isset($hz_Arr['get_arises'])){
@@ -1205,6 +1206,14 @@ class NumService extends BaseService {
         if(isset($hz_Arr['remove_types']) OR isset($hz_Arr['remove_types'])){
             if(isset($hz_Arr['remove_types'])) $filter7['remove_types'] = $hz_Arr['remove_types'];
         }
+        # 12.1、号码组1
+        if(isset($hz_Arr['code1']) OR isset($hz_Arr['code1'])){
+            $filter10['code1'] = $hz_Arr['code1'];
+        }
+        # 12.1、号码组2
+        if(isset($hz_Arr['code2']) OR isset($hz_Arr['code2'])){
+            $filter10['code2'] = $hz_Arr['code2'];
+        }
 
         # 合分 - 三定
         if(isset($hz_Arr['hefen_pos']) && isset($hz_Arr['hefen'])){
@@ -1213,6 +1222,15 @@ class NumService extends BaseService {
         # 合分 - 四定
         if(isset($hz_Arr['hefen'])){
             if(isset($hz_Arr['hefen'])) $filter8['hefen'] = 1; else $filter9['hefen'] = 0;
+        }
+        if(!empty($filter10['code1'])){
+            $desc .= '组1:'.$filter10['code1'].' ';
+        }
+        if(!empty($filter10['code2'])){
+            $desc .= '组2:'.$filter10['code2'].' ';
+        }
+        if(!empty($filter10['status_val'])){
+            $desc .= '当前:'.$filter10['status_val'].' ';
         }
 
         $typesArr = self::getNameByCodesType();
