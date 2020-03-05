@@ -1501,7 +1501,39 @@ class NumService extends BaseService {
     }
 
 
+    /**
+     * @desc 快译描述转换成位置号码，支持一二三四定
+     * @param $codes_desc   千12345百12345十67890
+     * @return array ['p1'=>12345, 'p2'=>12345, 'p3'=>67890]
+     */
+    public static function getPosByCodesDesc($codes_desc){
+        $data = [];
+        if(!$codes_desc) return $data;
+        $code_type = NumService::getCodeTypeByDesc($codes_desc);
 
+        return $data;
+    }
+
+    /**
+     * @desc 根据描述判断号码类型：
+     * @param $codes_desc
+     * @return int code_type 1一字定2二字定3三字定4四字定
+     */
+    public static function getCodeTypeByDesc($codes_desc){
+        $code_type = 3;
+
+        if(strpos($codes_desc, []) !== false){
+            $code_type = 1;
+        }elseif (strpos($codes_desc, []) !== false){
+            $code_type = 2;
+        }elseif (strpos($codes_desc, []) !== false){
+            $code_type = 3;
+        }elseif (strpos($codes_desc, []) !== false){
+            $code_type = 4;
+        }
+
+        return $code_type;
+    }
 
 
 
