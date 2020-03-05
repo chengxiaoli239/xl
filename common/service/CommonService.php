@@ -755,6 +755,7 @@ class  CommonService{
     public static function isCodeTypeLog($codes){
         $flag = 0;
         $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
         asort($codesArr);
 
         if(in_array(0, $codesArr) && in_array(5, $codesArr)){

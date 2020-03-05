@@ -1506,30 +1506,90 @@ class NumService extends BaseService {
      * @param $codes_desc   千12345百12345十67890
      * @return array ['p1'=>12345, 'p2'=>12345, 'p3'=>67890]
      */
-    public static function getPosByCodesDesc($codes_desc){
+    public static function getCodesHzByDesc($codes_desc){
         $data = [];
         if(!$codes_desc) return $data;
-        $code_type = NumService::getCodeTypeByDesc($codes_desc);
+
+        $code_type = NumService::getCodeTypeByDesc($codes_desc, $positions);
+        $data['code_type'] = $code_type;
+
+        $pos = ['千'=>'p1', '百'=>'p2', '十'=>'p3', '个'=>'p1', '五'=>'p5', '值'=>'hz', '值范围'=>'hz'];
+        foreach ($positions as $position){
+            if(in_array($position, ['值范围', '值'])){
+                preg_match("/".$position."\d+\-\d+/", $codes_desc, $returns);
+                p($returns);
+            }else{
+                preg_match("/".$position."\d+/", $codes_desc, $returns);
+                $data[$pos[$position]] = str_replace($position, '', $returns[0]);
+            }
+        }
+        //p(['code_type'=>$code_type, 'pos'=>$positions, 'data'=>$data]);
+        # 筛选逻辑包括两数合、三数合、跑=移、值范围、取双重、除双重、取三重、除三重、取双双重、除双双重、取二兄弟、除二兄弟、
+        # 取千单、 除千单、取千大、除千大、取百单、除百单、取百大、除百大、取十单、除十单、取十大、除十大、取个单、除个单、取个大、除个大
+
+        if(strpos($codes_desc, '除双重') !== false){
+            $data['type_2'] = 0;
+        }
+        if(strpos($codes_desc, '取双重') !== false){
+            $data['type_2'] = 1;
+        }
+
+        if(strpos($codes_desc, '除三重') !== false){
+            $data['type_3'] = 0;
+        }
+        if(strpos($codes_desc, '取三重') !== false){
+            $data['type_3'] = 1;
+        }
+
+        if(strpos($codes_desc, '除双双重') !== false){
+            $data['type_22'] = 0;
+        }
+        if(strpos($codes_desc, '取双双重') !== false){
+            $data['type_22'] = 1;
+        }
+
+        if(strpos($codes_desc, '取二兄弟') !== false OR strpos($codes_desc, '取兄弟') !== false){
+            $data['type_2b'] = 0;
+        }
+        if(strpos($codes_desc, '除二兄弟') !== false OR strpos($codes_desc, '除二兄弟') !== false){
+            $data['type_2b'] = 1;
+        }
 
         return $data;
     }
 
     /**
      * @desc 根据描述判断号码类型：
-     * @param $codes_desc
+     * @param $codes_desc 四字定千1234百4567十7890个2468、三字定千1234百6789十1357、二定千02468百13579、千2345十5678个0289
      * @return int code_type 1一字定2二字定3三字定4四字定
      */
-    public static function getCodeTypeByDesc($codes_desc){
-        $code_type = 3;
+    public static function getCodeTypeByDesc($codes_desc, &$positions = []){
+        $code_type = 0;
 
-        if(strpos($codes_desc, []) !== false){
+        # 1、出现：XX定、X定，则首先判断
+        if(strpos($codes_desc, '一定') !== false OR strpos($codes_desc, '一字定') !== false){
             $code_type = 1;
-        }elseif (strpos($codes_desc, []) !== false){
+        }elseif (strpos($codes_desc, '二定') !== false OR strpos($codes_desc, '二字定') !== false){
             $code_type = 2;
-        }elseif (strpos($codes_desc, []) !== false){
+        }elseif (strpos($codes_desc, '三定') !== false OR strpos($codes_desc, '三字定') !== false){
             $code_type = 3;
-        }elseif (strpos($codes_desc, []) !== false){
+        }elseif (strpos($codes_desc, '四定') !== false OR strpos($codes_desc, '四字定') !== false){
             $code_type = 4;
+        }
+
+        # 2、不出现：XX定、X定，则判断：千百十个出现次数来判断定位类型
+        $num = 0;
+        $types = ['千', '百', '十', '个', '五'];
+        foreach ($types as $type){
+            if(strpos($codes_desc, $type) !== false){
+                $num = $num + 1;
+                $positions[] = $type; # 记录：千、百、十、个、五
+            }
+
+        }
+
+        if($code_type == 0){
+            $code_type = $num;
         }
 
         return $code_type;
