@@ -906,25 +906,49 @@ class NumService extends BaseService {
             $p1_codes = self::getCodesArrByStr($codes_hz['p1']);
             $where = array_merge($where, [ ['IN', 'code_1', $p1_codes] ]);
         }
+        if(isset($codes_hz['p1_0']) && !empty($codes_hz['p1_0'])){
+            $p1_codes = self::getCodesArrByStr($codes_hz['p1_0']);
+            $where = array_merge($where, [ ['NOT IN', 'code_1', $p1_codes] ]);
+        }
+
         # 第2位
         if(isset($codes_hz['p2']) && !empty($codes_hz['p2'])){
             $p2_codes = self::getCodesArrByStr($codes_hz['p2']);
             $where = array_merge($where, [ ['IN', 'code_2', $p2_codes] ]);
         }
+        if(isset($codes_hz['p2_0']) && !empty($codes_hz['p2_0'])){
+            $p2_codes = self::getCodesArrByStr($codes_hz['p2_0']);
+            $where = array_merge($where, [ ['NOT IN', 'code_2', $p2_codes] ]);
+        }
+
         # 第3位
         if(isset($codes_hz['p3']) && !empty($codes_hz['p3'])){
             $p3_codes = self::getCodesArrByStr($codes_hz['p3']);
             $where = array_merge($where, [ ['IN', 'code_3', $p3_codes] ]);
         }
+        if(isset($codes_hz['p3_0']) && !empty($codes_hz['p3_0'])){
+            $p3_codes = self::getCodesArrByStr($codes_hz['p3_0']);
+            $where = array_merge($where, [ ['NOT IN', 'code_3', $p3_codes] ]);
+        }
+
         # 第4位
         if(isset($codes_hz['p4']) && !empty($codes_hz['p4'])){
             $p4_codes = self::getCodesArrByStr($codes_hz['p4']);
             $where = array_merge($where, [ ['IN', 'code_4', $p4_codes] ]);
         }
+        if(isset($codes_hz['p4_0']) && !empty($codes_hz['p4_0'])){
+            $p4_codes = self::getCodesArrByStr($codes_hz['p4_0']);
+            $where = array_merge($where, [ ['NOT IN', 'code_4', $p4_codes] ]);
+        }
+
         # 第5位
         if(isset($codes_hz['p5']) && !empty($codes_hz['p5'])){
             $p5_codes = self::getCodesArrByStr($codes_hz['p5']);
             $where = array_merge($where, [ ['IN', 'code_5', $p5_codes] ]);
+        }
+        if(isset($codes_hz['p5_0']) && !empty($codes_hz['p5_0'])){
+            $p5_codes = self::getCodesArrByStr($codes_hz['p5_0']);
+            $where = array_merge($where, [ ['NOT IN', 'code_5', $p5_codes] ]);
         }
 
         # 同时选择取、除四单四双
@@ -1515,45 +1539,26 @@ class NumService extends BaseService {
 
         $pos = ['千'=>'p1', '百'=>'p2', '十'=>'p3', '个'=>'p1', '五'=>'p5', '值'=>'hz', '值范围'=>'hz'];
         foreach ($positions as $position){
+            if(preg_match("/值范围\d+\-\d+/", $codes_desc, $returns) OR preg_match("/值\d+\-\d+/", $codes_desc, $returns)){
+                $str = str_replace('值范围', '', $returns[0]);
+                $str = str_replace('值', '', $str);
+            }
+            p($returns);
             if(in_array($position, ['值范围', '值'])){
-                preg_match("/".$position."\d+\-\d+/", $codes_desc, $returns);
-                p($returns);
             }else{
                 preg_match("/".$position."\d+/", $codes_desc, $returns);
                 $data[$pos[$position]] = str_replace($position, '', $returns[0]);
             }
         }
+
+        # 位置号码除、取
+        $data = NumService::getPosCodes($codes_desc, $data);
+
         //p(['code_type'=>$code_type, 'pos'=>$positions, 'data'=>$data]);
         # 筛选逻辑包括两数合、三数合、跑=移、值范围、取双重、除双重、取三重、除三重、取双双重、除双双重、取二兄弟、除二兄弟、
         # 取千单、 除千单、取千大、除千大、取百单、除百单、取百大、除百大、取十单、除十单、取十大、除十大、取个单、除个单、取个大、除个大
 
-        if(strpos($codes_desc, '除双重') !== false){
-            $data['type_2'] = 0;
-        }
-        if(strpos($codes_desc, '取双重') !== false){
-            $data['type_2'] = 1;
-        }
-
-        if(strpos($codes_desc, '除三重') !== false){
-            $data['type_3'] = 0;
-        }
-        if(strpos($codes_desc, '取三重') !== false){
-            $data['type_3'] = 1;
-        }
-
-        if(strpos($codes_desc, '除双双重') !== false){
-            $data['type_22'] = 0;
-        }
-        if(strpos($codes_desc, '取双双重') !== false){
-            $data['type_22'] = 1;
-        }
-
-        if(strpos($codes_desc, '取二兄弟') !== false OR strpos($codes_desc, '取兄弟') !== false){
-            $data['type_2b'] = 0;
-        }
-        if(strpos($codes_desc, '除二兄弟') !== false OR strpos($codes_desc, '除二兄弟') !== false){
-            $data['type_2b'] = 1;
-        }
+        $data = NumService::getCodeType($codes_desc, $data);
 
         return $data;
     }
@@ -1595,7 +1600,69 @@ class NumService extends BaseService {
         return $code_type;
     }
 
+    /**
+     * @desc 获取位置的号码
+     * @param $codes_desc
+     * @param $data
+     * @return mixed
+     */
+    public static function getPosCodes($codes_desc, &$data){
+        if(empty($data)) $data = [];
 
+        $get_types = [
+            '取千大'=>['p1'=>'56789'],'取千小'=>['p1'=>'01234'],'取千单'=>['p1'=>'13579'],'取千双'=>['p1'=>'02468'],'除千大'=>['p1_0'=>'56789'],'除千小'=>['p1_0'=>'01234'],'除千单'=>['p1_0'=>'13579'],'除千双'=>['p1_0'=>'02468'],
+            '取百大'=>['p2'=>'56789'],'取百小'=>['p2'=>'01234'],'取百单'=>['p2'=>'13579'],'取百双'=>['p2'=>'02468'],'除百大'=>['p2_0'=>'56789'],'除百小'=>['p2_0'=>'01234'],'除百单'=>['p2_0'=>'13579'],'除百双'=>['p2_0'=>'02468'],
+            '取十大'=>['p3'=>'56789'],'取十小'=>['p3'=>'01234'],'取十单'=>['p3'=>'13579'],'取十双'=>['p3'=>'02468'],'除十大'=>['p3_0'=>'56789'],'除十小'=>['p3_0'=>'01234'],'除十单'=>['p3_0'=>'13579'],'除十双'=>['p3_0'=>'02468'],
+            '取个大'=>['p4'=>'56789'],'取个小'=>['p4'=>'01234'],'取个单'=>['p4'=>'13579'],'取个双'=>['p4'=>'02468'],'除个大'=>['p4_0'=>'56789'],'除个小'=>['p4_0'=>'01234'],'除个单'=>['p4_0'=>'13579'],'除个双'=>['p4_0'=>'02468'],
+            '取五大'=>['p5'=>'56789'],'取五小'=>['p5'=>'01234'],'取五单'=>['p5'=>'13579'],'取五双'=>['p5'=>'02468'],'除五大'=>['p5_0'=>'56789'],'除五小'=>['p5_0'=>'01234'],'除五单'=>['p5_0'=>'13579'],'除五双'=>['p5_0'=>'02468'],
+        ];
+        foreach ($get_types as $key=>$get_type){
+            if(strpos($codes_desc, $key) !== false){
+                $data = array_merge($data, $get_types[$key]);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @desc 号码类型筛选
+     * @param $codes_desc
+     * @param $data
+     * @return mixed
+     */
+    public static function getCodeType($codes_desc, &$data){
+
+        if(strpos($codes_desc, '除双重') !== false){
+            $data['type_2'] = 0;
+        }
+        if(strpos($codes_desc, '取双重') !== false){
+            $data['type_2'] = 1;
+        }
+
+        if(strpos($codes_desc, '除三重') !== false){
+            $data['type_3'] = 0;
+        }
+        if(strpos($codes_desc, '取三重') !== false){
+            $data['type_3'] = 1;
+        }
+
+        if(strpos($codes_desc, '除双双重') !== false){
+            $data['type_22'] = 0;
+        }
+        if(strpos($codes_desc, '取双双重') !== false){
+            $data['type_22'] = 1;
+        }
+
+        if(strpos($codes_desc, '取二兄弟') !== false OR strpos($codes_desc, '取兄弟') !== false){
+            $data['type_2b'] = 0;
+        }
+        if(strpos($codes_desc, '除二兄弟') !== false OR strpos($codes_desc, '除二兄弟') !== false){
+            $data['type_2b'] = 1;
+        }
+
+        return $data;
+    }
 
 
 }
