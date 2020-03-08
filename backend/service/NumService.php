@@ -794,6 +794,12 @@ class NumService extends BaseService {
         //if($code_type == 3 && !empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){
         if(!empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){
 
+            /**
+             * 1、处理合分值，例如：149转换成：
+             * 二定：1、11、4、14、9
+             * 三定：1、11、21、4、14、24、9、19、29
+             * 四定：1、11、21、31、4、14、24、9、19、29
+             */
             $no_fix_lenHefen = strlen($codes_hz['no_fix_hefen']);
             $codes_no_fix_hefen = [];
             for ($i=0; $i<$no_fix_lenHefen;$i++){
@@ -816,6 +822,9 @@ class NumService extends BaseService {
             }
             //p($codes_no_fix_hefen);
 
+            /**
+             * 2、组合where条件
+             */
             if($codes_hz['no_fix_hefen_pos'] == 1){ # 两数合分
                 $tmp_no_fix_hefen = ['OR'];
                 $poss = [[1,2], [1,3], [1,4],[2,3],[2,4],[3,4]];
@@ -839,7 +848,7 @@ class NumService extends BaseService {
             }elseif($codes_hz['no_fix_hefen_pos'] == 2){ # 三数合分
                 if($code_type == 3) { # 三定
                     $tmp_no_fix_hefen = ['IN', 'codes_hz', $codes_no_fix_hefen];
-                }elseif ($code_type == 4){
+                }elseif ($code_type == 4){ # 四定
                     $tmp_no_fix_hefen = ['OR'];
                     $poss = [[1,2,3], [1,2,4], [1,3,4],[2,3,4]];
                     foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
@@ -852,7 +861,7 @@ class NumService extends BaseService {
 
         }
 
-        # 合分 - 四定
+        # 合分 - 四定，例如：合分：147，转化成和值：1、11、21、31、4、14、14、34、7、17、27
         if($code_type == 4 && isset($codes_hz['xhefen']) && !empty($codes_hz['xhefen'])){
             $lenHefen = strlen($codes_hz['xhefen']);
             $codes_hefen = [];
@@ -1524,6 +1533,18 @@ class NumService extends BaseService {
         return array_values($arr);
     }
 
+    /**
+     * @desc 转换处理  头：千、尾：个
+     * @param $codes_desc
+     * @return mixed
+     */
+    public static function opChangeDesc($codes_desc){
+
+        $codes_desc = str_replace('头', '千', $codes_desc);
+        $codes_desc = str_replace('尾', '个', $codes_desc);
+
+        return $codes_desc;
+    }
 
     /**
      * @desc 快译描述转换成位置号码，支持一二三四定
@@ -1531,34 +1552,33 @@ class NumService extends BaseService {
      * @return array ['p1'=>12345, 'p2'=>12345, 'p3'=>67890]
      */
     public static function getCodesHzByDesc($codes_desc){
+        echo $codes_desc.'<br>';
         $data = [];
         if(!$codes_desc) return $data;
 
+        $codes_desc = NumService::opChangeDesc($codes_desc);
+
         $code_type = NumService::getCodeTypeByDesc($codes_desc, $positions);
-        $data['code_type'] = $code_type;
 
-        $pos = ['千'=>'p1', '百'=>'p2', '十'=>'p3', '个'=>'p1', '五'=>'p5', '值'=>'hz', '值范围'=>'hz'];
-        foreach ($positions as $position){
-            if(preg_match("/值范围\d+\-\d+/", $codes_desc, $returns) OR preg_match("/值\d+\-\d+/", $codes_desc, $returns)){
-                $str = str_replace('值范围', '', $returns[0]);
-                $str = str_replace('值', '', $str);
-            }
-            p($returns);
-            if(in_array($position, ['值范围', '值'])){
-            }else{
-                preg_match("/".$position."\d+/", $codes_desc, $returns);
-                $data[$pos[$position]] = str_replace($position, '', $returns[0]);
-            }
-        }
+        $data = NumService::getHzsByDesc($codes_desc, $data);
+        //p($data);
 
-        # 位置号码除、取
-        $data = NumService::getPosCodes($codes_desc, $data);
+        # 获取位置号码除、取
+        $data = NumService::getPosCodes($codes_desc, $data); # p1、p1_0
+        //p($data);
 
         //p(['code_type'=>$code_type, 'pos'=>$positions, 'data'=>$data]);
         # 筛选逻辑包括两数合、三数合、跑=移、值范围、取双重、除双重、取三重、除三重、取双双重、除双双重、取二兄弟、除二兄弟、
         # 取千单、 除千单、取千大、除千大、取百单、除百单、取百大、除百大、取十单、除十单、取十大、除十大、取个单、除个单、取个大、除个大
 
-        $data = NumService::getCodeType($codes_desc, $data);
+        $data = NumService::getCodeType($codes_desc, $data);# type_2、type_3、type_22 等
+
+        $data = NumService::getCodeTypeDw($codes_desc, $data); # 定位：23568头尾 、千1234百4567十7890
+
+        $data = NumService::getSingleByDesc($codes_desc, $data);# 获取倍数
+
+        $data['code_type'] = $code_type;
+        p($data);
 
         return $data;
     }
@@ -1590,7 +1610,6 @@ class NumService extends BaseService {
                 $num = $num + 1;
                 $positions[] = $type; # 记录：千、百、十、个、五
             }
-
         }
 
         if($code_type == 0){
@@ -1598,6 +1617,41 @@ class NumService extends BaseService {
         }
 
         return $code_type;
+    }
+
+    /**
+     * @param $codes_desc 值范围15-35、值15,17,18
+     * @param $data
+     * @return mixed
+     */
+    public static function getHzsByDesc($codes_desc, &$data){
+
+        if(!$data['hz']) $data['hz'] = [];
+        if(preg_match("/值范围\d+\-\d+/", $codes_desc, $returns) OR preg_match("/值\d+\-\d+/", $codes_desc, $returns)){
+            $str = str_replace('值范围', '', $returns[0]);
+            $str = str_replace('值', '', $str);
+            if(strpos($str, '-') !== false){
+                # 和值区间
+                $zhi_scopes = explode('-', $str);
+                if(count($zhi_scopes) == 1){
+                    $min_zhi = $max_zhi = $zhi_scopes[0];
+                }else{
+                    $min_zhi = array_shift($zhi_scopes);
+                    $max_zhi = end($zhi_scopes);
+                }
+                for ($i=$min_zhi; $i<=$max_zhi; $i++){
+                    $data['hz'][] = $i;
+                }
+
+            }
+        }elseif (preg_match("/值范围\d+\,\d+/", $codes_desc, $returns) OR preg_match("/值\d+\,\d+/", $codes_desc, $returns)){
+            $str = str_replace('值范围', '', $returns[0]);
+            $str = str_replace('值', '', $str);
+            $data['hz'] = explode(',', $str);
+        }
+        if(empty($data['hz'])) unset($data['hz']);
+
+        return $data;
     }
 
     /**
@@ -1619,6 +1673,21 @@ class NumService extends BaseService {
         foreach ($get_types as $key=>$get_type){
             if(strpos($codes_desc, $key) !== false){
                 $data = array_merge($data, $get_types[$key]);
+            }
+        }
+
+        $get_num_types = [
+            '取千'=>'p1','除千'=>'p1_0',
+            '取百'=>'p2','除百'=>'p2_0',
+            '取十'=>'p3','除十'=>'p3_0',
+            '取个'=>'p4','除个'=>'p4_0',
+            '取五'=>'p5','除五'=>'p5_0',
+        ];
+        foreach ($get_num_types as $get_num_type=>$val){
+            if(strpos($codes_desc, $get_num_type) !== false){
+                preg_match("/".$get_num_type."\d+/", $codes_desc, $matches);
+                $match_codes = str_replace($get_num_type, '', $matches[0]);
+                $data = array_merge($data, [$val=>$match_codes]);
             }
         }
 
@@ -1655,14 +1724,81 @@ class NumService extends BaseService {
         }
 
         if(strpos($codes_desc, '取二兄弟') !== false OR strpos($codes_desc, '取兄弟') !== false){
-            $data['type_2b'] = 0;
+            $data['type_2b'] = 1;
         }
         if(strpos($codes_desc, '除二兄弟') !== false OR strpos($codes_desc, '除二兄弟') !== false){
-            $data['type_2b'] = 1;
+            $data['type_2b'] = 0;
         }
 
         return $data;
     }
 
+    /**
+     * @desc 例如:23456头尾各1
+     * @param $codes_desc
+     * @param array $data
+     * @return array
+     */
+    public static function getCodeTypeDw($codes_desc, &$data = []){
+
+        $posData = [
+            '千百十'=>['p1', 'p2', 'p3'], '千百个'=>['p1', 'p2', 'p4'], '千十个'=>['p1', 'p3', 'p4'], '百十个'=>['p2', 'p3', 'p4'],
+            '千百'=>['p1', 'p2'], '千十'=>['p1', 'p3'], '千个'=>['p1', 'p4'], '百十'=>['p2', 'p3'], '百个'=>['p2','p4'], '十个'=>['p3','p4'],
+            '千'=>['p1'], '百'=>['p2'],'十'=>['p3'], '个'=>['p4'], '五'=>['p5'],
+        ];
+
+        $pds = [
+            '千百十'=>['千', '百', '十'], '千百个'=>['千', '百', '个'], '千十个'=>['千', '十', '个'], '百十个'=>['百', '十', '个'],
+            '千百'=>['千', '百'], '千十'=>['千', '十'],'千个'=>['千', '个'], '百十'=>['百', '十'], '百个'=>['百', '个'], '十个'=>['十', '个'],
+            '千'=>['千'], '百'=>['百'],'十'=>['十'], '个'=>['个'], '五'=>['五'],
+        ];
+
+        $hasOp = [];
+        foreach ($posData as $key=>$poss){
+            //if(in_array($key, $hasOp)) break;
+            if(strpos($codes_desc, $key) !== false) {
+                $hasOp = array_merge($hasOp, $pds[$key]);
+
+                preg_match("/^".$key."[0-9]+/", $codes_desc, $matches1);  # 头百尾23456、头尾
+                //p(['matches1'=>$matches1],0);
+                if(empty($matches1[0])){
+                    preg_match("/".$key."[0-9]+/", $codes_desc, $matches1);  # 头百尾23456、头尾
+                }
+
+                preg_match("/^[0-9]+".$key."/", $codes_desc, $matches2);  # 023468头尾
+                if(empty($matches2[0])){
+                    preg_match("/".$key."[0-9]+/", $codes_desc, $matches2);  # 头百尾23456、头尾
+                }
+                //p(['matches2'=>$matches2]);
+
+                $matches = max($matches1[0], $matches2[0]);
+                //p(['matches1'=>$matches1, 'matches2'=>$matches2, 'matches'=>$matches, $poss]);
+                $nums = str_replace($key, '', $matches);
+                foreach ($poss as $pos){
+                    //p([$key, $pos, $nums, $matches], 0);
+                    $data[$pos] = $nums;
+                }
+                if(count($poss)>1) return $data;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @desc 获取倍数
+     * @param $codes_desc
+     * @param array $data
+     * @return array
+     */
+    public static function getSingleByDesc($codes_desc, &$data = []){
+
+        if(strpos($codes_desc, '各') !== false){
+            preg_match("/各([0-9].)?(\d)+/", $codes_desc, $matches);
+            $data['single'] = str_replace('各', '', $matches[0]);
+        }
+
+        return $data;
+    }
 
 }

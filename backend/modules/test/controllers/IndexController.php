@@ -127,7 +127,16 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = NumService::getCodesHzByDesc("千12345百12345十67890值范围12-19");p($rst);
+        $testData = [
+            '千12345百12345十67890',
+            '头尾12345各1',
+            '头百尾23456各0.1',
+            '023468头尾各0.1',
+            '千12百345四字定两数合45值范围15-35除个1234除双重除二兄弟各0.1',
+        ];
+        $rst = NumService::getCodesHzByDesc($testData[4]);p($rst);
+        $rst = NumService::getCodesHzByDesc("千12百345四字定两数合45值范围15-35除个1234除双重除二兄弟");p($rst);
+        $rst = NumService::getSingleByDesc("千12百345四字定两数合45值范围15-35除个1234除双重除二兄弟各0.1");p($rst);
         $qihao = HN0898Service::getQihao($lottery_type = 8);p(['即将开奖期号'=>$qihao, 'lottery_type'=>$lottery_type]);
         $rst = OpKjService::opKjData4('3,X,2,9@X,2,4,9@3,9,X,9@3,9,7,X','3,9,7,9,5');p($rst);
         $rst = OpKjService::opKjData4('3,X,X,X,5@X,X,X,9,5@X,X,7,X,5@3,9,X,X,X','3,9,7,9,5');p($rst);
