@@ -322,10 +322,8 @@ abstract class BetService extends BaseBetService {
                     }elseif(in_array($tz_type, [32])) { # 三定切换
                         $codes_hz_arr = json_decode($codes_hz, true);
                         $codes_desc = $codes_hz_arr['status_val'] == 1 ? $codes_hz_arr['code1'] : $codes_hz_arr['code2'];
-                        unset($codes_hz_arr['code1'], $codes_hz_arr['code2'], $codes_hz_arr['status_val']);
-                        $codes_hz_arr = array_merge($codes_hz_arr, NumService::getCodesHzByDesc($codes_desc));
-                        $codesArr = NumService::getCodesKuaiXuan($codes_hz_arr, $code_type = 3);
-                        p([$codes_hz_arr, $codesArr]);
+                        $codesArr = NumService::getCodesByDesc($codes_desc, $code_type = 3);
+                        //p([$codes_hz_arr, $codesArr]);
                     }else{
                         $params = ['playway'=>$playway, 'tz_type'=>$tz_type, 'status'=>$buy_type];
                         $SysPlansCodes = SysPlansCodes::find()->where($params)->orderBy(['rand()' => SORT_DESC])->asArray()->all(); # ->limit($limit) 限制数量去掉

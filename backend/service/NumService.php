@@ -1552,7 +1552,7 @@ class NumService extends BaseService {
      * @return array ['p1'=>12345, 'p2'=>12345, 'p3'=>67890]
      */
     public static function getCodesHzByDesc($codes_desc){
-        echo $codes_desc.'<br>';
+        //echo $codes_desc.'<br>';
         $data = [];
         if(!$codes_desc) return $data;
 
@@ -1578,9 +1578,31 @@ class NumService extends BaseService {
         $data = NumService::getSingleByDesc($codes_desc, $data);# 获取倍数
 
         $data['code_type'] = $code_type;
-        p($data);
+        //p($data);
 
         return $data;
+    }
+
+    /**
+     * @desc 根据code描述获取号码
+     * @param $codes_desc
+     * @param  $code_type 号码类型：1字定2二字定3三字定4四字定
+     * @return array
+     */
+    public static function getCodesByDesc($codes_descs, $code_type = ''){
+        $codesArr = [];
+        $codes_descArr = explode(',', $codes_descs);
+
+        foreach ($codes_descArr as $codes_desc){
+            $codes_hz = NumService::getCodesHzByDesc($codes_desc);
+            if(empty($code_type)) $code_type = $codes_hz['code_type'];
+            $tmpCodesArr = NumService::getCodesKuaiXuan($codes_hz, $code_type);
+            if($tmpCodesArr) $codesArr = array_merge($codesArr, $tmpCodesArr);
+        }
+
+        $codesArr = array_unique($codesArr);
+
+        return $codesArr;
     }
 
     /**

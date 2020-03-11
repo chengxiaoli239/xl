@@ -2601,7 +2601,7 @@ class SscDataService extends BaseService {
         $rst = ['status'=>200, 'msg'=>'处理成功'];
 
         # 止盈止损、翻倍止盈止损 计划
-        $where = ['AND', ['IN', 'plan_type', [1, 3]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+        $where = ['AND', ['IN', 'plan_type', [1, 3, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
                 $profits = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id, 'is_profits_record'=>1])->sum('profits');
@@ -2625,7 +2625,7 @@ class SscDataService extends BaseService {
 
         $flags = [];
         # 翻倍计划、翻倍止盈止损，倍投 连续x期不中 决定倍数
-        $where = ['AND', ['IN', 'plan_type', [2, 3]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+        $where = ['AND', ['IN', 'plan_type', [2, 3, 4]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
                 if(!isset($flags[$UserSysPlan->uid])){
@@ -2641,24 +2641,36 @@ class SscDataService extends BaseService {
             $logArr['plan_2_3']['userPlansLossNums'] = $userPlansLossNums;
 
             foreach ($userPlansLossNums as $uid=>$userPlansLossNum){
-                $where = ['AND', ['IN', 'plan_type', [2, 3]], ['=', 'uid', $uid], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+                $where = ['AND', ['IN', 'plan_type', [2, 3, 4]], ['=', 'uid', $uid], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
                 $UserSysPlans = UserSysPlans::find()->where($where)->all();
                 foreach ($UserSysPlans as $UserSysPlan){
                     # 中的计划回0.1
                     $singles = explode('-', $UserSysPlan->singles);
                     $count = count($singles);
-                    if($flags[$uid] == 1){
+                    if($flags[$uid] == 1){ # 中奖
                         $single = $singles[0];
-                    }else{
+                    }else{ # 不中奖
                         $single = self::getPlanNextSingle($UserSysPlan->id, $UserSysPlan->single);
-                        /*
-                        $single0 = $singles[$userPlansLossNum[0] % $count];
-                        $single1 = $singles[$userPlansLossNum[1] % $count];
-                        $single = min([$single0, $single1]);
-                        */
                     }
-                    $whereUpdate = ['AND', ['=', 'lottery_type', $UserSysPlan->lottery_type], ['=', 'uid', $UserSysPlan->uid], ['=', 'plan_type', $UserSysPlan->plan_type], ['=', 'status', 1]];
-                    $rst = UserSysPlans::updateAll(['single'=>$single], $whereUpdate);
+                    $whereUpdate = [
+                        'AND',
+                        ['=', 'lottery_type', $UserSysPlan->lottery_type],
+                        ['=', 'uid', $UserSysPlan->uid],
+                        ['=', 'plan_type', $UserSysPlan->plan_type],
+                        ['=', 'status', 1]
+                    ];
+                    $updateData = ['single'=>$single];
+                    if(in_array($UserSysPlan->plan_type, [4])){ # 号码切换&倍投
+                        # 号码切换
+                        $codes_hz = json_decode($UserSysPlan->hz_Arr);
+                        if($flags[$uid] == 1) { # 中奖
+                            $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 1 : 2;
+                        }else{
+                            $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 2 : 1;
+                        }
+                        $updateData['hz_Arr'] = json_encode($codes_hz);
+                    }
+                    $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                 }
                 $updateSingles = ['uid'=>$uid, 'userPlansLossNum'=>$userPlansLossNum, 'single'=>$single, 'countSingles'=>$count, 'singles'=>$singles, 'rst'=>$rst];
                 $logArr['plan_2_3']['updateSingles'][] = $updateSingles;

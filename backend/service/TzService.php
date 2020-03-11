@@ -214,7 +214,7 @@ class TzService extends BaseService {
             StaticService::afterOpStatic($lottery_type, 'opProfitsPlans');
         }
         */
-        $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type);
+        $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type); # 处理止盈止损计划
 
         $rst['qihao'] = $qihao;
         $rst['lottery_type'] = $lottery_type;
@@ -447,6 +447,7 @@ class TzService extends BaseService {
             2=>'倍投',
             3=>'倍投&止盈止损',
             4=>'倍投&号码切换',
+            5=>'倍投&号码切换止盈止损',
         ];
         if(isset($datas[$type])) return $datas[$type];
 

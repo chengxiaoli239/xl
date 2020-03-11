@@ -144,11 +144,13 @@ class UserSysPlansService extends BaseService {
 
             # 号码切换倍投
             if(!empty($UserSysPlans['code1'])){
-                $tmpFilter['code1'] = trim($UserSysPlans['code1']);
+                $UserSysPlans['code1'] = str_replace(' ', '',$UserSysPlans['code1']);
+                $tmpFilter['code1'] = str_replace('，', ',', $UserSysPlans['code1']);
             }
             unset($post['UserSysPlans']['code1']);
             if(!empty($UserSysPlans['code2'])){
-                $tmpFilter['code2'] = trim($UserSysPlans['code2']);
+                $UserSysPlans['code2'] = str_replace(' ', '',$UserSysPlans['code2']);
+                $tmpFilter['code2'] = str_replace('，', ',', $UserSysPlans['code2']);
             }
             $tmpFilter['status_val'] = 1;
             unset($post['UserSysPlans']['code2']);
