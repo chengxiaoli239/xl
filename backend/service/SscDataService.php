@@ -2662,7 +2662,7 @@ class SscDataService extends BaseService {
                     $updateData = ['single'=>$single];
                     if(in_array($UserSysPlan->plan_type, [4])){ # 号码切换&倍投
                         # 号码切换
-                        $codes_hz = json_decode($UserSysPlan->hz_Arr);
+                        $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
                         if($flags[$uid] == 1) { # 中奖
                             $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 1 : 2;
                         }else{
