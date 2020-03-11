@@ -166,7 +166,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 }
                                 $txt = BaseStringHelper::truncate($str,20);
                                 $str = Html::a($txt, '#', ['title' => $str,'alt'=>$str]);
-                                if($model->singles && in_array($model->plan_type,[2, 3])){
+                                if($model->singles && in_array($model->plan_type,[2, 3, 4, 5])){
                                     $str .= '翻倍梯度:'.$model->singles;
                                 }
                                 return $str;
