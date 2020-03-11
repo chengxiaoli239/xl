@@ -107,7 +107,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 if($model->cancel_status == 1){
                                     $rst = '<font color="red">已撤单</font>';
                                     if($model->playway == 2){
-                                        $rst .= ' | '.Html::a('点击反买', $url3, ['title' => '点击反买:'.$model->snid,'alt'=>$model->snid]) ;
+                                        //$rst .= ' | '.Html::a('点击反买', $url3, ['title' => '点击反买:'.$model->snid,'alt'=>$model->snid]) ;
                                     }
                                     if(\Yii::$app->user->id == 1) $rst = '等待开奖';
                                     return $rst;

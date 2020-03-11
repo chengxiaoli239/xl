@@ -111,7 +111,7 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                                 if($model->cancel_status == 1){
                                     $rst = '<font color="red">已撤单</font>';
                                     if($model->playway == 2){
-                                        $rst .= ' | '.Html::a('点击反买', $url3, ['title' => '点击反买:'.$model->snid,'alt'=>$model->snid]) ;
+                                        //$rst .= ' | '.Html::a('点击反买', $url3, ['title' => '点击反买:'.$model->snid,'alt'=>$model->snid]) ;
                                     }
                                     if(\Yii::$app->user->id == 1) $rst = '已撤单';
                                     return $rst;
