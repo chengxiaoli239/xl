@@ -721,7 +721,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
-        $post_data = [ 'ids'=>'{'.$sn.'}|'.$BettingRecords->single, 'period_no' => $qihao];
+        $counts = (int)($BettingRecords->betting_money/$BettingRecords->single);
+        $post_data = [ 'ids'=>'{'.$sn.'}|'.$counts, 'period_no' => $qihao];
 
         $_t = round(microtime(true) * 1000);
         $headers = [
