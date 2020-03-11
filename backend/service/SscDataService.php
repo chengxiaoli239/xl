@@ -2668,7 +2668,7 @@ class SscDataService extends BaseService {
                         }else{
                             $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 2 : 1;
                         }
-                        $updateData['hz_Arr'] = json_encode($codes_hz);
+                        $updateData['hz_Arr'] = json_encode($codes_hz, 320);
                     }
                     $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                 }
