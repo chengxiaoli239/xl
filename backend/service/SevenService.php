@@ -790,11 +790,15 @@ class SevenService extends BaseTZService {
 
         $content = curl_exec($curl);
         //preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
-        preg_match("/document.cookie\=\'([^\r\n]*)\'/i", $content, $matches);
+        if(strpos($content, 'Set-Cookie') !== false){
 
-        $roboot_id = str_replace('; path=/; domain=.ww22277.xyz','', $matches[1]);
+        }else{
+            preg_match("/document.cookie\=\'([^\r\n]*)\'/i", $content, $matches);
+        }
+
+        $roboot_id = str_replace('; path=/; domain=.cq779835.xyz','', $matches[1]);
         $logArr = ['content'=>$content, 'roboot_id'=>$roboot_id];
-        if(curl_error($curl)>0){
+        if(TRUE OR curl_error($curl)>0){
             $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
             Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
         }
