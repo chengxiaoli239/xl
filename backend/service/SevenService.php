@@ -791,12 +791,12 @@ class SevenService extends BaseTZService {
         $content = curl_exec($curl);
         //preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
         if(strpos($content, 'Set-Cookie') !== false){
-
+            preg_match("/Set\-Cookie:([^\r\n]*)/i", $content, $matches);
         }else{
             preg_match("/document.cookie\=\'([^\r\n]*)\'/i", $content, $matches);
         }
 
-        $roboot_id = str_replace('; path=/; domain=.cq779835.xyz','', $matches[1]);
+        $roboot_id = trim(str_replace('; path=/; domain=.cq779835.xyz','', $matches[1]));
         $logArr = ['content'=>$content, 'roboot_id'=>$roboot_id];
         if(TRUE OR curl_error($curl)>0){
             $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
@@ -848,7 +848,6 @@ class SevenService extends BaseTZService {
         //p($TzSystemsUsers->cookie);
         self::$headers = [];
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
-        //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
         $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
         $cookie = str_replace('; path=/; HttpOnly','',$cookie);
