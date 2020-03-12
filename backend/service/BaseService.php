@@ -19,7 +19,7 @@ class BaseService{
 
     /**
      * @desc 登陆中转
-     * @param $id
+     * @param $id TzSystemsUsers表id
      * @return array|bool
      */
     public static function login($id = ''){
