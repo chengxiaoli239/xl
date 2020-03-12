@@ -128,7 +128,8 @@ class IndexController extends Controller
 
     public function actionDw(){
         $id = 43;
-        $rst = BaseService::login($id);p($rst);
+        $rst = BaseService::login($id);p($rst,0);
+
         $rst = BaseService::synBalance($id); p($rst);
         $testData = [
             '千12345百12345十67890',
