@@ -69,13 +69,13 @@ class SevenService extends BaseTZService {
 
         self::$baseUrl = self::$tzSiteInfo['baseUrl'];
         self::$domain = self::$tzSiteInfo['domain'];
-        $headers = [
+        self::$headers = [
             "Cookie:".trim(self::$cookie),
             "Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".str_replace('www.','',self::$baseUrl.'/App/Index?_='.(microtime(true)*10000)),
         ];
-        self::$headers = array_unique(array_merge(self::$headers,$headers));
+        //self::$headers = array_unique(array_merge(self::$headers,$headers));
     }
 
     /**
@@ -1148,6 +1148,8 @@ class SevenService extends BaseTZService {
         $data = CurlService::httpGet($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
+        if(!is_array($data)) return ['status'=>302, 'msg'=>'网页重定向获取信息失败'];
+
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','7时彩-用户信息1', $logArr);
