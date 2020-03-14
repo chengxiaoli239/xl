@@ -242,10 +242,8 @@ class SevenService extends BaseTZService {
 
         $bet_codes = $codes;
         $isBigNumsBet = BetService::isBigNumsBet($tz_type);
-        if($isBigNumsBet){
-            $bet_codes = str_replace(',','',$bet_codes);
-            $bet_codes = str_replace('@',',',$bet_codes);
-        }
+        $bet_codes = str_replace(',','',$bet_codes);
+        $bet_codes = str_replace('@',',',$bet_codes);
 
         //$post_data = ['totalCount'=>$totalCount, 'totalBetMoney'=>$totalBetMoney, 'bets'=>json_encode($codes), 'way'=>$way, 'period_no'=>'20'.$qihao, 'bet_log'=>urlencode('投注：'.$totalCount.'/'.$single.'注,总共：'.$totalBetMoney.'元'), ];
         $post_data = [
