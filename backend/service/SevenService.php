@@ -1667,11 +1667,6 @@ class SevenService extends BaseTZService {
 
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
-        if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
-            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];
-            //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
-        }
 
         //if(strpos($url, 'betNumber')){ p(['url'=>$url, 'header'=>$header,'post_data'=>$post_data,'rstData'=>$data,curl_close($ch),$errno]); }
         if(curl_close($ch)) {
@@ -1692,6 +1687,10 @@ class SevenService extends BaseTZService {
             $rstData = ["Status"=>0, 'code'=>306, 'msg'=>'系统线路维护中'];
         }else{
             $rstData = json_decode($data, TRUE);
+        }
+        if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306])){
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
         //p([$data, $rstData, $post_data, $header]);
 
