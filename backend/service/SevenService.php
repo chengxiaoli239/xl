@@ -134,8 +134,8 @@ class SevenService extends BaseTZService {
     public static function synBalance($tz_system_user_id){
         $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);
         $balance = self::getBalance($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
-        //p([$TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $tz_system_user_id]);
-        //p($balance);
+        //p([$TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $tz_system_user_id, $balance]);
+
         $msg = ['status'=>200, 'msg'=>'金额同步成功~','tz_system_user_id'=>$tz_system_user_id, 'balance'=>$balance ];
 
         $TzSystemsUsers->balance = $balance;
@@ -217,6 +217,7 @@ class SevenService extends BaseTZService {
         if(strlen($codes)>5000){ # 针对大量号码下注 用post请求
             return $this->postBet($qihao, $plan_id, $codes);
         }
+        p('yyyy');
 
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
@@ -417,7 +418,6 @@ class SevenService extends BaseTZService {
         ];
 
         $headers = array_merge(self::$headers,$header);
-        p($headers);
         //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
         $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL').'?'.http_build_query($post_data);
 
@@ -435,10 +435,10 @@ class SevenService extends BaseTZService {
             $m->set($betKey, 1, $time);
         }
         # 真实投注
+        p([$rst,$url,$post_data, $headers]);
         $start_time = microtime(true);
         $rst = CurlService::httpPost($url, $post_data, $headers);
         //$rst = json_encode($rst);
-        //p([$rst,$url,$post_data, $headers]);
         $end_time = microtime(true);
         $time_consume = ($end_time - $start_time). 's';
         if($rst['Status'] != 1 OR !$rst){
@@ -944,6 +944,7 @@ class SevenService extends BaseTZService {
         curl_setopt($curl, CURLOPT_SSLVERSION, 3);
 
         $content = curl_exec($curl);
+        //p(['url'=>$url, 'header'=>$header, 'content'=>$content]);
         //preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
         if(strpos($content, 'Set-Cookie') !== false){
             preg_match("/Set\-Cookie:([^\r\n]*)/i", $content, $matches);
@@ -991,22 +992,35 @@ class SevenService extends BaseTZService {
             'Proxy-Connection: keep-alive',
             'Host: '.SevenService::getTzSiteInfo($tz_system_id,'domain'),
             'Cache-Control: max-age=0',
-            'Referer: '.$url,
             $TzSystemsUsers->user_agent,
         ];
+        # 1、获取SessionId
         $robot7_session_id = self::getSessionId($url, $headers);
-        $headers[] = 'Cookie: '.$robot7_session_id;
-        $cookie = self::curlGetSevenCookie($url, $headers);
-        //p([$robot7_session_id, $headers]);
-        $cookieData = $cookie;
-        if($cookieData){
+
+        $tmpCookieStr = $robot7_session_id;
+        $headers[] = 'Referer: '.$url;
+
+        # 2、获取SevenStarHFDirector1Frontend1
+        $SevenStarHFDirector1Frontend1 = self::curlGetSevenCookie($url, array_merge($headers, ['Cookie: '.$tmpCookieStr]));
+        //p($SevenStarHFDirector1Frontend1);
+
+        $tmpCookieStr = $tmpCookieStr.';'.$SevenStarHFDirector1Frontend1;
+        # 3、获取AKaimai Cookie
+        if(strpos($SevenStarHFDirector1Frontend1, 'Akamai_Cookie') === false){
+            $AKamaiCookie = self::curlGetSevenCookie($url, array_merge($headers, [$tmpCookieStr]));
+            if($AKamaiCookie) $tmpCookieStr = ';'.$AKamaiCookie;
+        }
+        //p(['robot7_session_id'=>$robot7_session_id, 'headers'=>$headers, 'SevenStarHFDirector1Frontend1'=>$SevenStarHFDirector1Frontend1, 'AKamaiCookie'=>$AKamaiCookie]);
+        if($tmpCookieStr){
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-            $TzSystemsUsers->cookie = $robot7_session_id.';'.trim($cookieData);
+            $TzSystemsUsers->cookie = trim($tmpCookieStr);//.'NOTICE_LOGIN_IN=1;first_visit=1';
             $TzSystemsUsers->cookie = trim(str_replace('; path=/; HttpOnly','', $TzSystemsUsers->cookie), ';');
             $TzSystemsUsers->save();
         }
         //p($TzSystemsUsers->cookie);
         self::$headers = [];
+        $tmpCookieArr = explode(';',$SevenStarHFDirector1Frontend1);
+        $cookie = $tmpCookieArr[0];
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
         //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
@@ -1038,7 +1052,7 @@ class SevenService extends BaseTZService {
         //p($matches,0);
         $cookies = $matches[1];
         $logArr = ['cookies'=>$cookies, 'matches'=>$matches, 'content'=>$content];
-        //p(['url'=>$url, 'header'=>$header, 'matches'=>$matches, 'content'=>$content, 'errno'=>curl_error($curl)],0);
+        //p(['url'=>$url, 'header'=>$header, 'matches'=>$matches, 'content'=>$content, 'errno'=>curl_error($curl)]);
         if(curl_error($curl)>0){
             $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
             Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
@@ -1048,11 +1062,34 @@ class SevenService extends BaseTZService {
             $data .= str_replace('; path=/; HttpOnly','',trim($cookie)).';';
         }
         $data = str_replace("; path=/; Httponly;",'',$data);
-        //p($data);
 
         return $data;
     }
 
+    public static function getAkaiMaiCookie($url,$header = []){
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($curl, CURLOPT_SSLVERSION, 3);
+
+        $content = curl_exec($curl);
+
+        preg_match_all("/Set-Cookie: (.*)/i", $content, $matches);
+        p(['url'=>$url, 'header'=>$header, 'content'=>$content, 'errno'=>curl_error($curl)]);
+        $data = '';
+        foreach ($cookies as $cookie){
+            $data .= str_replace('; path=/; HttpOnly','',trim($cookie)).';';
+        }
+        $data = str_replace("; path=/; Httponly;",'',$data);
+        //p($data);
+
+        return $data;
+    }
 
     /**
      * @desc 下载图片验证码
@@ -1107,7 +1144,9 @@ class SevenService extends BaseTZService {
         $rst = self::acceptAgreement($uid, $tz_system_id);
 
         # 获取用户信息
-        $rst = SevenService::userInfo($uid, $tz_system_id);
+        $rst = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
+        //$rst = SevenService::userInfo($uid, $tz_system_id);
+        //p(['rst'=>$rst]);
         return $rst;
     }
 
@@ -1179,23 +1218,82 @@ class SevenService extends BaseTZService {
         $url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/DoLogin'.'?_'.$_t;
         $post_data = http_build_query($post_data);
         $headers = [
-            "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-            "Cache-Control:max-age=0",
-            "Upgrade-Insecure-Requests:1",
+            "Accept: application/json, text/javascript, */*; q=0.01",
+            "Accept-Encoding: guzip, deflate",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
             "Content-Length:".strlen($post_data),
-            "Content-Type: application/x-www-form-urlencoded",
+            "Content-Type: application/x-www-form-urlencoded; charset=UTF-8",
             "Cookie: ".trim($TzSystemsUsers->cookie),
-            "Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
+            "Origin:".str_replace('www.','',self::$baseUrl),
             "Referer:".$TzSystemsUsers->ssc_domain,
+            $TzSystemsUsers->user_agent,
         ];
 
-        $data = CurlService::httpPost($url,$post_data, $headers);
-        //sleep(10);
-        BaseService::synBalance($TzSystemsUsers->id); # 同步余额
+        //$data = CurlService::httpPost($url,$post_data, $headers);
+        $data = self::httpPost($url,$post_data, $headers);
+        //$syncBalance = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
+        //p($syncBalance);
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
         return $data;
+    }
+
+    /**
+     * @decription 获取远程html内容
+     * @param $url
+     */
+    public static function httpPost($url,$post_data = [],$header=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        if(!$timeout) $timeout = 15;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+
+        //设置post方式提交
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+
+        $isPrintHeaders = 1; # 1打印0不打印  打印头是为了登录获取set-cookie
+        curl_setopt($ch, CURLOPT_HEADER,$isPrintHeaders); # 是否打印respond headers
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+        $data = curl_exec($ch);
+        //p(['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'data'=>$data]);
+        $errno = curl_errno( $ch );
+        if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];
+            //p($logArr);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+        }
+
+        //if(strpos($url, 'betNumber')){ p(['url'=>$url, 'header'=>$header,'post_data'=>$post_data,'rstData'=>$data,curl_close($ch),$errno]); }
+        if(curl_close($ch)) {
+            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+        }
+        if($data == 'ok'){
+            return 'ok';
+        }
+        if($isPrintHeaders){
+            $flag = strpos($data, '"Status":1');
+            if($flag !== false){
+                $rstData = ['Status'=>1];
+            }
+        }else{
+            $rstData = json_decode($data, TRUE);
+        }
+        //p([$data, $rstData, $post_data, $header]);
+
+        return $rstData;
     }
 
     /**
@@ -1261,13 +1359,19 @@ class SevenService extends BaseTZService {
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
         $headers = [
             "Accept: application/json, text/javascript, */*; q=0.01",
+            "Accept-Encoding: guzip, deflate",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
             "Cookie: ".trim($TzSystemsUsers->cookie),
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+            $TzSystemsUsers->user_agent,
+            "X-Requested-With: XMLHttpRequest",
         ];
 
-        $data = CurlService::httpGet($url, $headers);
+        //$data = CurlService::httpGet($url, $headers);
+        $data = self::httpGet($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         if(!is_array($data)) return ['status'=>302, 'msg'=>'网页重定向获取信息失败'];
@@ -1275,6 +1379,47 @@ class SevenService extends BaseTZService {
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','7时彩-用户信息1', $logArr);
+        return $data;
+    }
+
+    /**
+     * @decription
+     * @param $url
+     */
+    public static function httpGet($url,$header=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+
+        $data = curl_exec($ch);
+
+        //$logArr = ['url'=>$url, 'url'=>$url, 'headers'=>$header,'data'=>$data]; p($logArr);
+        //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
+        if(curl_close($ch)) {
+            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+        }
+        if(!BaseService::is_json($data)){
+            return $data;
+        }
+        $data = json_decode($data, true);
+
+        if($data['Status'] == false){
+            //$data['headers'] = $header;
+        }
+
         return $data;
     }
 

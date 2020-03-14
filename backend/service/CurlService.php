@@ -25,7 +25,7 @@ class CurlService extends BaseService{
         'X-Requested-With: XMLHttpRequest',
     ];
 
-        /**
+    /**
      * @decription 获取远程html内容
      * @param $url
      */

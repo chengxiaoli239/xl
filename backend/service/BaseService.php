@@ -86,6 +86,7 @@ class BaseService{
             }else{
                 $rst = LuckyBaseService::synBalance($TzSystemsUser->id);// p($rst);# 同步余额
             }
+            //p(['rst'=>$rst]);
             //$rst = LuckyBaseService::synBalance($TzSystemsUser->id); //p($rst);# 同步余额
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
@@ -102,4 +103,15 @@ class BaseService{
         return $rst;
     }
 
+    /**
+     * @description
+     * @param $string
+     * @return bool
+     */
+    public static function is_json($string)
+    {
+        json_decode($string);
+
+        return (json_last_error() == JSON_ERROR_NONE);
+    }
 }
