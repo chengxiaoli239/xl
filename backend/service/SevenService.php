@@ -299,13 +299,13 @@ class SevenService extends BaseTZService {
                 # 投注失败提示登陆：执行登陆并且再次投注
                 $rst = SevenService::login(self::$user_id, self::$tz_system_id);
                 # 投注
-                //BetService::tzByPlanId($plan_id, 1);
+                BetService::tzByPlanId($plan_id, 1);
             }
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
             if($rst['code'] == 305){
                 return $rst;
             }
-            //return $tzRst;
+            return $tzRst;
         }elseif (strpos($rst['msg'], '余额不足') OR $rst['code'] == 302){
             return ['status'=>300, 'msg'=>'余额不足'];
         }
