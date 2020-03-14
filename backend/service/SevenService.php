@@ -295,7 +295,7 @@ class SevenService extends BaseTZService {
         if($rst['Status'] != 1){
             $tzRst = ['uid'=>self::$user_id,'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
             //if($tz_type != 20) $tzRst['code'] = $codes;
-            if($rst['code'] == 302){ # 您的状态已经超时，请重新登录、请登录
+            if($rst['code'] == 303){ # 您的状态已经超时，请重新登录、请登录
                 # 投注失败提示登陆：执行登陆并且再次投注
                 $rst = SevenService::login(self::$user_id, self::$tz_system_id);
                 # 投注
