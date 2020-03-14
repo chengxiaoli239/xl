@@ -1686,8 +1686,11 @@ class SevenService extends BaseTZService {
         }elseif(strpos($data, '登录') !== false){
             $rstData = ["Status"=>0, 'code'=>303, 'msg'=>'请重新登录'];
         }elseif(strpos($data, '短时间内重复提交') !== false){
+            $rstData = ["Status"=>0, 'code'=>304, 'msg'=>'短时间内重复提交'];
         }elseif(strpos($data, '已关盘') !== false){
             $rstData = ["Status"=>0, 'code'=>305, 'msg'=>'已关盘'];
+        }elseif(strpos($data, '维护中') !== false){
+            $rstData = ["Status"=>0, 'code'=>306, 'msg'=>'系统线路维护中'];
         }else{
             $rstData = json_decode($data, TRUE);
         }
