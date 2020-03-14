@@ -294,19 +294,17 @@ class SevenService extends BaseTZService {
         //$rst = json_encode($rst);
         $end_time = microtime(true);
         $time_consume = ($end_time - $start_time). 's';
-        if($rst['Status'] != 1 && $rst['msg'] != '余额不足'){
+        if($rst['Status'] != 1 && $rst['code'] == 303){
             $tzRst = ['uid'=>self::$user_id,'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
-            if($tz_type != 20){
-                $tzRst['code'] = $codes;
-            }
+            //if($tz_type != 20) $tzRst['code'] = $codes;
             if($rst['Status'] == 5 && strpos($rst['Data'], '登录') !== false){ # 您的状态已经超时，请重新登录、请登录
                 # 投注失败提示登陆：执行登陆并且再次投注
                 $rst = SevenService::login(self::$user_id, self::$tz_system_id);
                 # 投注
-                BetService::tzByPlanId($plan_id, 1);
+                //BetService::tzByPlanId($plan_id, 1);
             }
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
-            return $tzRst;
+            //return $tzRst;
         }elseif (strpos($rst['msg'], '余额不足') OR $rst['code'] == 302){
             return ['status'=>300, 'msg'=>'余额不足'];
         }
@@ -1684,6 +1682,8 @@ class SevenService extends BaseTZService {
         }
         if(strpos($data, '余额不足') !== false){
             $rstData = ["Status"=>0, 'code'=>302, 'msg'=>'余额不足'];
+        }elseif(strpos($data, '登录') !== false){
+            $rstData = ["Status"=>0, 'code'=>303, 'msg'=>'请重新登录'];
         }else{
             $rstData = json_decode($data, TRUE);
         }
