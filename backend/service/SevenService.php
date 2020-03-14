@@ -302,10 +302,9 @@ class SevenService extends BaseTZService {
                 BetService::tzByPlanId($plan_id, 1);
             }
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
-            if($rst['code'] == 305){
+            if(in_array($rst['code'], [302, 305, 306])){ # 余额不足、已关盘、系统维护
                 return $rst;
             }
-            return $tzRst;
         }elseif (strpos($rst['msg'], '余额不足') OR $rst['code'] == 302){
             return ['status'=>300, 'msg'=>'余额不足'];
         }
