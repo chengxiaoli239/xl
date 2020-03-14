@@ -214,7 +214,9 @@ class SevenService extends BaseTZService {
      * @return array
      */
     public function bet($qihao, $plan_id, $codes){
-        if(true OR strlen($codes)>5000){ # 针对大量号码下注 用post请求
+        $bigFlag = 0;
+        if(strlen($codes)>5000){ # 针对大量号码下注 用post请求
+            $bigFlag = 1;
             //return $this->postBet($qihao, $plan_id, $codes, $is_auto);
         }
 
@@ -280,7 +282,7 @@ class SevenService extends BaseTZService {
         $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
-        if(in_array($tz_type, [20,23])){
+        if(in_array($tz_type, [20,23, 25]) OR $bigFlag == 1){
             # 和值投注反应时间比较久，无需返回直接锁住
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);
