@@ -305,6 +305,8 @@ class SevenService extends BaseTZService {
             }
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
             return $tzRst;
+        }elseif (strpos($rst['msg'], '余额不足') OR $rst['code'] == 302){
+            return ['status'=>300, 'msg'=>'余额不足'];
         }
 
         $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
