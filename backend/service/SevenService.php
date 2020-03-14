@@ -304,6 +304,9 @@ class SevenService extends BaseTZService {
                 //BetService::tzByPlanId($plan_id, 1);
             }
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
+            if($rst['code'] == 305){
+                return $rst;
+            }
             //return $tzRst;
         }elseif (strpos($rst['msg'], '余额不足') OR $rst['code'] == 302){
             return ['status'=>300, 'msg'=>'余额不足'];
@@ -1685,7 +1688,8 @@ class SevenService extends BaseTZService {
         }elseif(strpos($data, '登录') !== false){
             $rstData = ["Status"=>0, 'code'=>303, 'msg'=>'请重新登录'];
         }elseif(strpos($data, '短时间内重复提交') !== false){
-            $rstData = ["Status"=>0, 'code'=>304, 'msg'=>'请勿在短时间内重复提交相同的注单'];
+        }elseif(strpos($data, '已关盘') !== false){
+            $rstData = ["Status"=>0, 'code'=>305, 'msg'=>'已关盘'];
         }else{
             $rstData = json_decode($data, TRUE);
         }
