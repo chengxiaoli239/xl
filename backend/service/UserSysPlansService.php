@@ -44,7 +44,7 @@ class UserSysPlansService extends BaseService {
         //p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id]);
 
         if(!$id && in_array($tz_type, [2,3,4,5])){
-            $post['UserSysPlans']['singles_key'] = 0;
+            $tmpFilter['singles_key'] = 0;
         }
 
         $User = AdminModel::findOne($user_id);

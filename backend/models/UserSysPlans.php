@@ -75,6 +75,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $no_fix_hefen_pos; #  定位合分位置
     public $arise_in; #  三定含
     public $arise_in_sel; #  三定含，除取
+    public $singles_key; # 倍数key
     //public $type_3_txt; # 三定-导入
     //public $type_4_txt; # 四定-导入
     /**
