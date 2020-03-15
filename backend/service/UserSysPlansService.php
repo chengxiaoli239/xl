@@ -33,7 +33,7 @@ class UserSysPlansService extends BaseService {
      * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return bool
      */
-    public static function preOpData(&$post, $user_id=''){
+    public static function preOpData(&$post, $user_id='', $id = ''){
         if(!$post OR !$user_id) return false;
         $tz_type = $post['UserSysPlans']['tz_type'];
         $playway = $post['UserSysPlans']['playway'];
@@ -41,7 +41,12 @@ class UserSysPlansService extends BaseService {
             $playway = BetService::getPlaywayByTzType($tz_type);
             $post['UserSysPlans']['playway'] = $playway;
         }
-        //p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id],0);
+        //p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id]);
+
+        if(!$id && in_array($tz_type, [2,3,4,5])){
+            $post['UserSysPlans']['singles_key'] = 0;
+        }
+
         $User = AdminModel::findOne($user_id);
         $post['UserSysPlans']['tz_sites'] = implode(',',$post['UserSysPlans']['tz_sites']);
         //p($post['UserSysPlans']['hz_Arr']);

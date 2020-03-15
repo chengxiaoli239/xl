@@ -2643,6 +2643,7 @@ class SscDataService extends BaseService {
             foreach ($userPlansLossNums as $uid=>$userPlansLossNum){
                 $where = ['AND', ['IN', 'plan_type', [2, 3, 4]], ['=', 'uid', $uid], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
                 $UserSysPlans = UserSysPlans::find()->where($where)->all();
+                $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
                 foreach ($UserSysPlans as $UserSysPlan){
                     # 中的计划回0.1
                     $singles = explode('-', $UserSysPlan->singles);
@@ -2650,7 +2651,9 @@ class SscDataService extends BaseService {
                     if($flags[$uid] == 1){ # 中奖
                         $single = $singles[0];
                     }else{ # 不中奖
-                        $single = self::getPlanNextSingle($UserSysPlan->id, $UserSysPlan->single);
+                        //$single = self::getPlanNextSingle($UserSysPlan->id, $UserSysPlan->single);
+                        $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key);
+                        $codes_hz['singles_key'] = $next_single_key;
                     }
                     $whereUpdate = [
                         'AND',
@@ -2662,14 +2665,13 @@ class SscDataService extends BaseService {
                     $updateData = ['single'=>$single];
                     if(in_array($UserSysPlan->plan_type, [4])){ # 号码切换&倍投
                         # 号码切换
-                        $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
                         if($flags[$uid] == 1) { # 中奖
                             $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 1 : 2;
                         }else{
                             $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 2 : 1;
                         }
-                        $updateData['hz_Arr'] = json_encode($codes_hz, 320);
                     }
+                    $updateData['hz_Arr'] = json_encode($codes_hz, 320);
                     $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                 }
                 $updateSingles = ['uid'=>$uid, 'userPlansLossNum'=>$userPlansLossNum, 'single'=>$single, 'countSingles'=>$count, 'singles'=>$singles, 'rst'=>$rst];
@@ -2712,7 +2714,8 @@ class SscDataService extends BaseService {
      * @param $single
      * @return mixed
      */
-    public static function getPlanNextSingle($plan_id, $single){
+    public static function getPlanNextSingle($plan_id, $single_key = 0, &$next_single_key = 0){
+        if(!$single_key) $single_key = 0;
         $m = \Yii::$app->cache;
         $UserSysPlans = UserSysPlans::findOne($plan_id);
         $singles = $UserSysPlans->singles;
@@ -2720,17 +2723,16 @@ class SscDataService extends BaseService {
         if($BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one()){
             $mkey = 'getPlanNextSingle_'.$plan_id.'_'.$BettingRecords->qihao;
             if(!$nextSingle = $m->get($mkey)){
-
-                $key = array_search($single, $singlesArr);
-                $nextKey = $key + 1;
-                if(!isset($singlesArr[$nextKey])){
-                    $nextKey = 0;
+                //$key = array_search($single, $singlesArr);
+                $next_single_key = $single_key + 1;
+                if(!isset($singlesArr[$next_single_key])){
+                    $next_single_key = 0;
                 }
 
-                $nextSingle = $singlesArr[$nextKey];
+                $nextSingle = $singlesArr[$next_single_key];
             }
         }else{
-            $nextSingle = $single;
+            $nextSingle = $singlesArr[$single_key];
         }
         $m->set($mkey, $nextSingle,10*3600);
 
