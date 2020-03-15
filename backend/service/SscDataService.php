@@ -2649,12 +2649,13 @@ class SscDataService extends BaseService {
                     $singles = explode('-', $UserSysPlan->singles);
                     $count = count($singles);
                     if($flags[$uid] == 1){ # 中奖
-                        $single = $singles[0];
+                        $next_single_key = 0;
+                        $single = $singles[$next_single_key];
                     }else{ # 不中奖
                         //$single = self::getPlanNextSingle($UserSysPlan->id, $UserSysPlan->single);
                         $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key);
-                        $codes_hz['singles_key'] = $next_single_key;
                     }
+                    $codes_hz['singles_key'] = $next_single_key;
                     $whereUpdate = [
                         'AND',
                         ['=', 'lottery_type', $UserSysPlan->lottery_type],
