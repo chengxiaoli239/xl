@@ -1626,19 +1626,20 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 //$rst = json_encode($rst);
                 $end_time = microtime(true);
                 $time_consume = ($end_time - $start_time). 's';
-                if($rst['Status'] != 1 OR !$rst){
+                if($rst['Status'] != 1){
                     $tzRst = ['uid'=>self::$user_id,'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
-                    if($tz_type != 20){
-                        $tzRst['code'] = $codes;
-                    }
-                    if($rst['Status'] == 5 && strpos($rst['Data'], '登录') !== false){ # 您的状态已经超时，请重新登录、请登录
+                    if($rst['code'] == 303){ # 您的状态已经超时，请重新登录、请登录
                         # 投注失败提示登陆：执行登陆并且再次投注
-                        //$rst = self::login(self::$user_id, self::$tz_system_id);
+                        $rst = self::login(self::$user_id, self::$tz_system_id);
                         # 投注
-                        //BetService::tzByPlanId($plan_id, 1);
+                        BetService::tzByPlanId($plan_id, 1);
                     }
                     Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
-                    return $tzRst;
+                    if(in_array($rst['code'], [302, 305])){ # 余额不足、已关盘、系统维护 302, 305, 306
+                        return $rst;
+                    }
+                }elseif (strpos($rst['msg'], '余额不足') OR $rst['code'] == 302){
+                    return ['status'=>300, 'msg'=>'余额不足'];
                 }
             }
 
@@ -1646,11 +1647,10 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);
 
-
             if(!$isBigNumsBet){
                 //$codes = implode('@', self::getMySiteCodesStyle($codes, $playway));
             }
-        }elseif($playway == 3 && in_array($tz_type, [20, 25])){
+        }elseif($playway == 3){
 
             $bet_codes = str_replace(',', '', $bet_codes);
             $bet_codes = str_replace('@', ',', $bet_codes);
