@@ -680,7 +680,7 @@ class HuiYuanBaseService extends BaseTZService {
             $balance = $rst['Data']['List'][0]['cashAmount'];
         }
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','希腊-用户余额', $rst);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','会员网-用户余额', $rst);
 
         return $balance;
     }

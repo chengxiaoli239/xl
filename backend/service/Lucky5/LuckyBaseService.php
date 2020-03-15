@@ -16,6 +16,7 @@ use backend\models\User;
 use backend\models\UserCustomPlans;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
+use backend\service\BaseService;
 use backend\service\BaseTZService;
 use backend\service\BetService;
 use backend\service\CurlService;
@@ -983,7 +984,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $balance = $rst['Data']['credit_balance'];
         }
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','希腊-用户余额', $rst);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','幸运五星-用户余额', $rst);
 
         return $balance;
     }
@@ -1480,19 +1481,30 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/GetMemberPrint?_='.$_t;
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
         $headers = [
+            //"Accept: application/json, text/javascript, */*; q=0.01",
+            //"Cookie: ".trim($TzSystemsUsers->cookie),
+            //"Origin:".str_replace('www.','',self::$baseUrl),
+            //"Host:".str_replace('www.','',self::$domain),
+            //"Referer:".$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+
             "Accept: application/json, text/javascript, */*; q=0.01",
+            "Accept-Encoding: guzip, deflate",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
             "Cookie: ".trim($TzSystemsUsers->cookie),
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+            $TzSystemsUsers->user_agent,
+            "X-Requested-With: XMLHttpRequest",
         ];
 
-        $data = CurlService::httpGet($url, $headers);
+        $data = self::httpGet($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','幸运五星-用户信息4', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','幸运五星-用户信息', $logArr);
         return $data;
     }
 
@@ -2202,4 +2214,44 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         return $rstData;
     }
 
+    /**
+     * @decription
+     * @param $url
+     */
+    public static function httpGet($url,$header=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+
+        $data = curl_exec($ch);
+
+        //$logArr = ['url'=>$url, 'url'=>$url, 'headers'=>$header,'data'=>$data]; p($logArr);
+        //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
+        if(curl_close($ch)) {
+            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+        }
+        if(!BaseService::is_json($data)){
+            return $data;
+        }
+        $data = json_decode($data, true);
+
+        if($data['Status'] == false){
+            //$data['headers'] = $header;
+        }
+
+        return $data;
+    }
 }

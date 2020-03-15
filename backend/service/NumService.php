@@ -1080,7 +1080,7 @@ class NumService extends BaseService {
         $codesArr = [];
         if($code_type == 4){
         }elseif ($code_type == 3){
-        }elseif ($code_type == 5){
+        }elseif ($code_type == 5){ # 五位二定
             $tmpArisewhere = ['OR'];
             if($codes_hz['arise']){
                 $tmpArisewhere = array_merge($tmpArisewhere, [ ['IN', 'code_1', $tmpAriseArr] ]);
