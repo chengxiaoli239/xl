@@ -2679,6 +2679,7 @@ class SscDataService extends BaseService {
         }
 
         $logArr['flags'] = $flags;
+        $logArr['lottery_type'] = $lottery_type;
         Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', [$logArr]);
 
         return $logArr;
