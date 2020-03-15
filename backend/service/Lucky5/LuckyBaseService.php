@@ -1612,11 +1612,11 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 $account = AdminModel::findOne(self::$user_id)->username;  # 投注用户账号
                 //p(['headers'=>$headers, 'url'=>$url, 'account'=>$account, 'post_data'=>$post_data]);
 
-                if(in_array($tz_type, [20, 23, 25, 26])){
+                //if(in_array($tz_type, [20, 23, 25, 26])){
                     # 和值投注反应时间比较久，无需返回直接锁住
                     $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
                     $m->set($betKey, 1, $time);
-                }
+                //}
                 # 真实投注
                 $start_time = microtime(true);
                 //$rst = CurlService::httpPost($url, $post_data, $headers);
@@ -1634,7 +1634,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                         # 投注
                         BetService::tzByPlanId($plan_id, 1);
                     }
-                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
+                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','幸运五星投注记录-投注失败-1', $tzRst);
                     if(in_array($rst['code'], [302, 305])){ # 余额不足、已关盘、系统维护 302, 305, 306
                         return $rst;
                     }
@@ -1707,7 +1707,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $time_consume = ($end_time - $start_time) . 's';
             //p(['rst'=>$rst,'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers]);
             if($rst['Status'] != 1){
-                $tzRst = ['uid'=>self::$user_id,'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
+                $tzRst = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
                 //if($tz_type != 20) $tzRst['code'] = $codes;
                 if($rst['code'] == 303){ # 您的状态已经超时，请重新登录、请登录
                     # 投注失败提示登陆：执行登陆并且再次投注
