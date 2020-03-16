@@ -230,7 +230,7 @@ class UserSysPlansService extends BaseService {
             $pi = 0;
             $Null_ps = [];
             foreach ($p_Arrs as $p){
-                if($UserSysPlans[$p] !== NULL){
+                if(!empty($UserSysPlans[$p])){
                     $pi++;
                 }else{
                     $Null_ps[] = $p;
@@ -241,6 +241,7 @@ class UserSysPlansService extends BaseService {
                     $tmpFilter[$pos] = 'X';
                 }
             }
+            //p([$p_Arrs, $Null_ps, $pi, $tmpFilter]);
 
             //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
         }elseif ($tz_type == 25){
