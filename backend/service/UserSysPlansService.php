@@ -158,6 +158,7 @@ class UserSysPlansService extends BaseService {
 
             //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
         }elseif (in_array($tz_type, [30, 31, 33])){ # 二定-快选、五位二定、二定变换
+            $p_Arrs = ['p1', 'p2', 'p3', 'p4'];
             # 二定-快选过滤
             $UserSysPlans = $post['UserSysPlans'];
             # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
@@ -184,22 +185,22 @@ class UserSysPlansService extends BaseService {
             unset($post['UserSysPlans']['arise']);
             # 10、第1位
             if(isset($UserSysPlans['p1']) && $UserSysPlans['p1']){
-                $tmpFilter['p1'] = trim($UserSysPlans['p1']);
+                $tmpFilter['p1'] = (string)trim($UserSysPlans['p1']);
             }
             unset($post['UserSysPlans']['p1']);
             # 11、第2位
             if(isset($UserSysPlans['p2']) && $UserSysPlans['p2']){
-                $tmpFilter['p2'] = trim($UserSysPlans['p2']);
+                $tmpFilter['p2'] = (string)trim($UserSysPlans['p2']);
             }
             unset($post['UserSysPlans']['p2']);
             # 12、第3位
             if(isset($UserSysPlans['p3']) && $UserSysPlans['p3']){
-                $tmpFilter['p3'] = trim($UserSysPlans['p3']);
+                $tmpFilter['p3'] = (string)trim($UserSysPlans['p3']);
             }
             unset($post['UserSysPlans']['p3']);
             # 13、第4位
             if(isset($UserSysPlans['p4']) && $UserSysPlans['p4']){
-                $tmpFilter['p4'] = trim($UserSysPlans['p4']);
+                $tmpFilter['p4'] = (string)trim($UserSysPlans['p4']);
             }
             unset($post['UserSysPlans']['p4']);
             # 14、第5位
@@ -225,6 +226,21 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['code2'] = str_replace('，', ',', $UserSysPlans['code2']);
             }
             unset($post['UserSysPlans']['code2']);
+
+            $pi = 0;
+            $Null_ps = [];
+            foreach ($p_Arrs as $p){
+                if($UserSysPlans[$p] !== NULL){
+                    $pi++;
+                }else{
+                    $Null_ps[] = $p;
+                }
+            }
+            if($pi > 1){
+                foreach ($Null_ps as $pos){
+                    $tmpFilter[$pos] = 'X';
+                }
+            }
 
             //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
         }elseif ($tz_type == 25){

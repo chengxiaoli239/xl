@@ -127,9 +127,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $id = 38; $rst = BaseService::login($id);p($rst);
         $rst = SscDataService::insertCodeType2();p($rst);
         $rst = SscDataService::getPlanNextSingle(920, 1);p($rst);
-        $id = 43; $rst = BaseService::login($id);p($rst);
 
         $testData = [
             '千12345百12345十67890',
