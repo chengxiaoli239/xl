@@ -281,11 +281,11 @@ class SevenService extends BaseTZService {
         $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
-        if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
+        //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
             # 和值投注反应时间比较久，无需返回直接锁住
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);
-        }
+        //}
         # 真实投注
         $start_time = microtime(true);
         //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$rst,'post_data'=>$post_data]);
@@ -300,12 +300,14 @@ class SevenService extends BaseTZService {
                 # 投注失败提示登陆：执行登陆并且再次投注
                 $rst = SevenService::login(self::$user_id, self::$tz_system_id);
                 # 投注
-                //BetService::tzByPlanId($plan_id, 1);
+                //return BetService::tzByPlanId($plan_id, 1);
+                //return self::postBetCurl($url, $post_data, $headers);
             }
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
             if(in_array($rst['code'], [302, 305])){ # 余额不足、已关盘、系统维护 302, 305, 306
-                return $rst;
+                //return $rst;
             }
+            return $rst;
         }elseif (strpos($rst['msg'], '余额不足') OR $rst['code'] == 302){
             return ['status'=>300, 'msg'=>'余额不足'];
         }
