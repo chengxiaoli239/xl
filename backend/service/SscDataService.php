@@ -2715,7 +2715,7 @@ class SscDataService extends BaseService {
      * @param $single
      * @return mixed
      */
-    public static function getPlanNextSingle($plan_id, $single_key = 0, &$next_single_key = 0){
+    public static function getPlanNextSingle($plan_id, $single_key = 0, &$next_single_key = 0, $lottery_type = DEFAULT_LOTTERY_TYPE){
         if(!$single_key) $single_key = 0;
         $m = \Yii::$app->cache;
         $UserSysPlans = UserSysPlans::findOne($plan_id);
@@ -2735,7 +2735,9 @@ class SscDataService extends BaseService {
         }else{
             $nextSingle = $singlesArr[$single_key];
         }
-        $m->set($mkey, $nextSingle,10*3600);
+        $qihao = HN0898Service::getQihao($lottery_type);
+        $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+        $m->set($mkey, $nextSingle,$time);
 
         return $nextSingle;
     }
