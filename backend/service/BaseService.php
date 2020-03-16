@@ -42,8 +42,8 @@ class BaseService{
             if($tz_system_id == 3){
                 $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             }else{
-                //$rst = LuckyBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-                $rst = LuckyBaseService::loginWriteCookie($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                $rst = LuckyBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                //$rst = LuckyBaseService::loginWriteCookie($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             }
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网

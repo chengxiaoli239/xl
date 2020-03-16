@@ -21,6 +21,7 @@ use backend\service\BaseTZService;
 use backend\service\BetService;
 use backend\service\CurlService;
 use backend\service\HN0898Service;
+use backend\service\SevenService;
 use backend\service\SscDataService;
 use backend\tools\Tools;
 use common\models\AdminModel;
@@ -217,6 +218,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             29 => 102,
             30 => 102,
             31 => 102,
+            33 => 102,
         ];
 
         if(isset($rstData[$tz_type])) return $rstData[$tz_type];
@@ -236,6 +238,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             30 => 20,
             29 => 30,
             31 => 50,
+            33 => 20,
         ];
 
         if(isset($rstData[$tz_type])) return $rstData[$tz_type];
@@ -249,7 +252,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @return string
      */
     public static function getBetLog($tz_type = 20){
-        if(in_array($tz_type,[ 27, 30])) { # 二定
+        if(in_array($tz_type,[ 27, 30, 31, 33])) { # 二定
             $str = '[二定位]，定位置“[取]”：千=[1]，百=[34]';
         }elseif(in_array($tz_type,[ 29])){
             $str = '[三定位]，定位置“[取]”：千=[13579]，固定合分取值：第[3]位选中，第[4]位选中，内容：[13579]；';
@@ -1067,21 +1070,20 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
     public static function login($uid = 1, $tz_system_id = 1){
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         if($TzSystemsUsers->balance > 0) {
-            return ['status'=>200, 'msg'=>'已经登录的状态'];
+            $rst = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
+            return $rst;
+        }else{
+            # 第一步：获取cookie
+            $rst = SevenService::getCookie($uid,$tz_system_id);
+            if(isset($rst['status']) && $rst['status'] == 300) return $rst;
+            # 第二步：账号、验证码登录
+            $rst = self::loginRemote($uid, $tz_system_id);
+            # 第三步：同意
+            $rst = self::acceptAgreement($uid, $tz_system_id);
         }
-        //self::__init($uid, $tz_system_id);
-        $rst = false;
-
-        # 第一步：获取cookie
-        $cookie_key = self::getCookie($uid,$tz_system_id);
-        if(isset($cookie_key['status']) && $cookie_key['status'] == 300) return $cookie_key;
-        # 第二步：账号、验证码登录
-        $rst = self::loginRemote($uid, $tz_system_id);
-        # 第三步：同意
-        $rst = self::acceptAgreement($uid, $tz_system_id);
 
         # 获取用户信息
-        $rst = self::userInfo($uid, $tz_system_id);
+        $rst = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
 
         return $rst;
     }
@@ -1587,8 +1589,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL');//.'?'.http_build_query($post_data);
 
                 //$post_data = ['totalCount'=>$totalCount, 'totalBetMoney'=>$totalBetMoney, 'bets'=>json_encode($codes), 'way'=>$way, 'period_no'=>'20'.$qihao, 'bet_log'=>urlencode('投注：'.$totalCount.'/'.$single.'注,总共：'.$totalBetMoney.'元'), ];
-                //p($post_data);
-
 
                 $_t = round(microtime(true) * 1000);
                 $data['code'] = $codes;
@@ -1627,17 +1627,20 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 $end_time = microtime(true);
                 $time_consume = ($end_time - $start_time). 's';
                 if($rst['Status'] != 1){
-                    $tzRst = ['uid'=>self::$user_id,'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
+                    $tzRst = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
+                    //if($tz_type != 20) $tzRst['code'] = $codes;
                     if($rst['code'] == 303){ # 您的状态已经超时，请重新登录、请登录
                         # 投注失败提示登陆：执行登陆并且再次投注
-                        $rst = self::login(self::$user_id, self::$tz_system_id);
+                        $rst = SevenService::login(self::$user_id, self::$tz_system_id);
                         # 投注
-                        BetService::tzByPlanId($plan_id, 1);
+                        //return BetService::tzByPlanId($plan_id, 1);
+                        //return self::postBetCurl($url, $post_data, $headers);
                     }
-                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','幸运五星投注记录-投注失败-1', $tzRst);
+                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
                     if(in_array($rst['code'], [302, 305])){ # 余额不足、已关盘、系统维护 302, 305, 306
-                        return $rst;
+                        //return $rst;
                     }
+                    //return $rst;
                 }elseif (strpos($rst['msg'], '余额不足') OR $rst['code'] == 302){
                     return ['status'=>300, 'msg'=>'余额不足'];
                 }
@@ -1758,7 +1761,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 $url = self::getTzSiteInfo(self::$tz_system_id, 'SSC_INDEX').'/Member/BatchBet'; #.'?'.http_build_query($post_data);
                 */
                 //p($post_data);
-            }elseif(in_array($tz_type, [30, 31])){ # 二定 - 快选
+            }elseif(in_array($tz_type, [30, 31, 33])){ # 二定 - 快选
                 $bet_codes = str_replace(',','',$bet_codes);
                 $bet_codes = str_replace('@',',',$bet_codes);
                 $post_data = [
@@ -1774,7 +1777,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                     'operation_condition' => self::getOperationCondition($tz_type),
                 ];
                 //$url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL'); # .'?'.http_build_query($post_data);
-                $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL') .'?'.http_build_query($post_data);
+                $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL') ;//.'?'.http_build_query($post_data);
             }elseif(in_array($tz_type, [27])){ # 二定
                 $post_data = [
                     'bets'=>json_encode($bet_codes),
@@ -1789,7 +1792,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             }
             //$post_data = ['totalCount'=>$totalCount, 'totalBetMoney'=>$totalBetMoney, 'bets'=>json_encode($codes), 'way'=>$way, 'period_no'=>'20'.$qihao, 'bet_log'=>urlencode('投注：'.$totalCount.'/'.$single.'注,总共：'.$totalBetMoney.'元'), ];
             //p($post_data);
-
 
             $_t = round(microtime(true) * 1000);
             $data['code'] = $codes;
@@ -1827,25 +1829,31 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $start_time = microtime(true);
             //$rst = CurlService::httpPost($url, $post_data, $headers);
             //p(rand(), 0);
-            $rst = CurlService::postCurl($url, $post_data, $headers);
             //p(['rst'=>$rst,'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers]);
+            //$rst = CurlService::postCurl($url, $post_data, $headers);
+            $rst = self::postBetCurl($url, $post_data, $headers);
             //$rst = json_encode($rst);
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time). 's';
-            if($rst['Status'] != 1 OR !$rst){
-                $tzRst = ['uid'=>self::$user_id,'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
-                if($tz_type != 20){
-                    $tzRst['code'] = $codes;
-                }
-                if($rst['Status'] == 5 && strpos($rst['Data'], '登录') !== false){ # 您的状态已经超时，请重新登录、请登录
+            if($rst['Status'] != 1){
+                $tzRst = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
+                //if($tz_type != 20) $tzRst['code'] = $codes;
+                if($rst['code'] == 303){ # 您的状态已经超时，请重新登录、请登录
                     # 投注失败提示登陆：执行登陆并且再次投注
-                    //$rst = self::login(self::$user_id, self::$tz_system_id);
+                    $rst = SevenService::login(self::$user_id, self::$tz_system_id);
                     # 投注
-                    //BetService::tzByPlanId($plan_id, 1);
+                    //return BetService::tzByPlanId($plan_id, 1);
+                    //return self::postBetCurl($url, $post_data, $headers);
                 }
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
-                return $tzRst;
+                if(in_array($rst['code'], [302, 305])){ # 余额不足、已关盘、系统维护 302, 305, 306
+                    //return $rst;
+                }
+                if($rst['code'] != 307) return $rst; # 停押账号测试
+            }elseif (strpos($rst['msg'], '余额不足') OR $rst['code'] == 302){
+                return ['status'=>300, 'msg'=>'余额不足'];
             }
+
 
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);
@@ -1863,7 +1871,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
         }
         # 获取方案号，记录id, 用于撤单
-        $snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+        //$snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
 
         $insertData = [
             'playway'=> $playway,  // 投注方式
@@ -1907,14 +1915,10 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        //curl_setopt($ch,CURLOPT_COOKIEFILE, $cookie);
-        //curl_setopt($ch, CURLOPT_COOKIEJAR, $cookie);
 
         // 设置浏览器的特定header
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
-
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT , 120);// 大数据量
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
@@ -1925,9 +1929,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER,0);
-        if($post_data){
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data));
-        }
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data));
 
         $data = curl_exec($ch);
         //d($data);
@@ -1966,6 +1968,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $rstData = ["Status"=>0, 'code'=>305, 'msg'=>'已关盘'];
         }elseif(strpos($data, '维护中') !== false){
             $rstData = ["Status"=>0, 'code'=>306, 'msg'=>'系统线路维护中'];
+        }elseif(strpos($data, '停押') !== false){
+            $rstData = ["Status"=>0, 'code'=>307, 'msg'=>'您的账号已被停押'];
         }else{
             $rstData = json_decode($data, TRUE);
         }
