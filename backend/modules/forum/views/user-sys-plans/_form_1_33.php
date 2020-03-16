@@ -12,7 +12,7 @@ use yii\widgets\ActiveForm;
     <div class="col-lg-12">
         <section class="panel">
             <header class="panel-heading">
-                <?= Html::encode($this->title).'[三定-快译变换]' ?>
+                <?= Html::encode($this->title).'[二定-号码变换]' ?>
             </header>
             <div class="panel-body">
                 <?php $form = ActiveForm::begin(); ?>
@@ -21,39 +21,31 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
 
                     <?= $form->field($model, 'playway')->radioList([
-                        //'1'=>'二字定',
-                        '2'=>'三字定',
+                        '1'=>'二字定',
+                        //'2'=>'三字定',
                         //'3'=>'四字定',
                     ])->label('投注方式') ?>
                     <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
+                    <input type="hidden" value="<?=$model->status_val?>" name="UserSysPlans[status_val]">
 
-                    <!--?= $form->field($model, 'status')->textInput() ?-->
+                <!--?= $form->field($model, 'status')->textInput() ?-->
                     <?= $form->field($model, 'status')->radioList([
                         '0'=>'关闭',
                         '1'=>'开启',
                     ])->label('投注状态') ?>
 
-                    <?= $form->field($model, 'single')->textInput() ?>
 
                     <?= $form->field($model, 'code1')->textInput()->label('号码组一') ?>
                     <?= $form->field($model, 'code2')->textInput()->label('号码组二') ?>
 
-                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:1-3-7-15-31-62-125-251') ?>
-                    <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
-                    <!-- 1大小单双三字定2大小三字定3单双三字定 -->
-                    <!--?= $form->field($model, 'tz_type')->radioList($kArr)->label('投注类型') ?-->
-
-                    <!--?= $form->field($model, 'buy_type')->textInput() ?-->
-
-
-                    <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
+                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:1-2-4-8-16-32-42-84') ?>
 
                     <!--?= $form->field($model, 'hz')->checkboxList($hzArr)->label('投注类型(和值)') ?-->
 
                     <!--?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?-->
                     <?= $form->field($model, 'type_2')->checkBoxList([ 0=>'除', 1=>'取' ])->label('双重') ?>
                     <?= $form->field($model, 'type_2b')->checkBoxList([ 0=>'除', 1=>'取' ])->label('两兄弟') ?>
-                    <?= $form->field($model, 'type_log')->checkBoxList([ 0=>'除', 1=>'取', ])->label('对数') ?>
+                    <?= $form->field($model, 'type_log')->checkBoxList([ 0=>'除', 1=>'取' ])->label('对数') ?>
 
                     <?= $form->field($model, 'plan_type')->radioList($plan_types)->label('计划类型，为"止盈止损"计划时须填以下两项') ?>
                     <?= $form->field($model, 'take_profits')->textInput($plan_types)->label('止盈点(正数，例：3000)') ?>

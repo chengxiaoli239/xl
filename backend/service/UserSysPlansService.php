@@ -37,15 +37,12 @@ class UserSysPlansService extends BaseService {
         if(!$post OR !$user_id) return false;
         $tz_type = $post['UserSysPlans']['tz_type'];
         $playway = $post['UserSysPlans']['playway'];
+        $plan_type = $post['UserSysPlans']['plan_type'];
         if(!$playway){
             $playway = BetService::getPlaywayByTzType($tz_type);
             $post['UserSysPlans']['playway'] = $playway;
         }
         //p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id]);
-
-        if(!$id && in_array($tz_type, [2,3,4,5])){
-            $tmpFilter['singles_key'] = 0;
-        }
 
         $User = AdminModel::findOne($user_id);
         $post['UserSysPlans']['tz_sites'] = implode(',',$post['UserSysPlans']['tz_sites']);
@@ -157,11 +154,10 @@ class UserSysPlansService extends BaseService {
                 $UserSysPlans['code2'] = str_replace(' ', '',$UserSysPlans['code2']);
                 $tmpFilter['code2'] = str_replace('，', ',', $UserSysPlans['code2']);
             }
-            $tmpFilter['status_val'] = 1;
             unset($post['UserSysPlans']['code2']);
 
-            $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
-        }elseif (in_array($tz_type, [30, 31])){ # 二定-快选、五位二定
+            //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
+        }elseif (in_array($tz_type, [30, 31, 33])){ # 二定-快选、五位二定、二定变换
             # 二定-快选过滤
             $UserSysPlans = $post['UserSysPlans'];
             # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
@@ -216,7 +212,21 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['type_log'] = $UserSysPlans['type_log'][0];
             }
             unset($post['UserSysPlans']['type_log']);
-            $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
+
+            # 号码切换倍投
+            if(!empty($UserSysPlans['code1'])){
+                $UserSysPlans['code1'] = str_replace(' ', '',$UserSysPlans['code1']);
+                $tmpFilter['code1'] = str_replace('，', ',', $UserSysPlans['code1']);
+            }
+            unset($post['UserSysPlans']['code1']);
+
+            if(!empty($UserSysPlans['code2'])){
+                $UserSysPlans['code2'] = str_replace(' ', '',$UserSysPlans['code2']);
+                $tmpFilter['code2'] = str_replace('，', ',', $UserSysPlans['code2']);
+            }
+            unset($post['UserSysPlans']['code2']);
+
+            //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
         }elseif ($tz_type == 25){
             # 四定-快选过滤
             $UserSysPlans = $post['UserSysPlans'];
@@ -344,7 +354,7 @@ class UserSysPlansService extends BaseService {
             }
             unset($post['UserSysPlans']['arise_in']);
 
-            $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
+            //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
         }elseif ($tz_type == 28){ # 系统快捷
             $tmpFilter = [];
             # 1.1、号码类型：取
@@ -384,8 +394,9 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['hefen'] = $post['UserSysPlans']['hefen']; # 合分
             }
             unset($post['UserSysPlans']['hefen']);
-            $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter);
+            //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
         }else{
+            #
             $hz_Arr = $post['UserSysPlans']['hz_Arr'];
             if(is_array($hz_Arr)) { # Array 和值打法，多个和值
                 $hz_Arr = implode(',', $hz_Arr); # 和值打法
@@ -395,6 +406,20 @@ class UserSysPlansService extends BaseService {
             }
             $post['UserSysPlans']['hz_Arr'] && $post['UserSysPlans']['hz_Arr'] = trim($hz_Arr);
         }
+
+        if(!in_array($tz_type, [20, 23]) && in_array($plan_type, [2,3,4,5])){ # 翻倍计划
+            $tmpFilter['singles_key'] = (isset($post['UserSysPlans']['singles_key'])) ? (int)$post['UserSysPlans']['singles_key'] : 0;
+            unset($post['UserSysPlans']['singles_key']);
+            if(in_array($plan_type, [4, 5])){ # 号码切换,当前组1或者组2
+                $tmpFilter['status_val'] = ($post['UserSysPlans']['status_val'] == 2) ? 2 : 1;
+                unset($post['UserSysPlans']['status_val']);
+            }
+        }
+
+        if(!in_array($tz_type, [20, 23])){
+            $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
+        }
+
         $post['UserSysPlans']['uid'] = $user_id;
         $post['UserSysPlans']['account'] = $User->username;
         $post['UserSysPlans']['updated_at'] = time();

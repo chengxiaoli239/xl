@@ -311,6 +311,13 @@ abstract class BetService extends BaseBetService {
                     $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 2);
                 }elseif(in_array($tz_type, [31])) { # 五位二定
                     $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 5);
+                }elseif(in_array($tz_type, [33])) { # 二定号码翻倍切换
+                    $codes_hz_arr = json_decode($codes_hz, true);
+                    $codes_desc = $codes_hz_arr['status_val'] == 1 ? $codes_hz_arr['code1'] : $codes_hz_arr['code2'];
+                    unset($codes_hz_arr['code1'], $codes_hz_arr['code2'], $codes_hz_arr['singles_key'], $codes_hz_arr['status_val']);
+                    $codes_hz = NumService::getCodesHzByDesc($codes_desc);
+                    $codes_hz = array_merge($codes_hz_arr, $codes_hz);
+                    $codesArr = NumService::getCodesKuaiXuan($codes_hz, $code_type = 2);
                 }
                 break;
             case 2: # 三字定

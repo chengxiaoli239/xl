@@ -1141,7 +1141,7 @@ class NumService extends BaseService {
         $strlen = strlen($codes_str);
         $codes_Arr = [];
         for ($i=0; $i<$strlen; $i++){
-            $codes_Arr[] = $codes_str[$i];
+            $codes_Arr[] = (string)$codes_str[$i];
         }
 
         return $codes_Arr;
@@ -1240,12 +1240,16 @@ class NumService extends BaseService {
             if(isset($hz_Arr['remove_types'])) $filter7['remove_types'] = $hz_Arr['remove_types'];
         }
         # 12.1、号码组1
-        if(isset($hz_Arr['code1']) OR isset($hz_Arr['code1'])){
+        if(isset($hz_Arr['code1'])){
             $filter10['code1'] = $hz_Arr['code1'];
         }
         # 12.1、号码组2
-        if(isset($hz_Arr['code2']) OR isset($hz_Arr['code2'])){
+        if(isset($hz_Arr['code2'])){
             $filter10['code2'] = $hz_Arr['code2'];
+        }
+        # 12.1、当前号码组
+        if(isset($hz_Arr['status_val'])){
+            $filter10['status_val'] = $hz_Arr['status_val'];
         }
 
         # 合分 - 三定
@@ -1263,7 +1267,7 @@ class NumService extends BaseService {
             $desc .= '组2:'.$filter10['code2'].' ';
         }
         if(!empty($filter10['status_val'])){
-            $desc .= '当前:'.$filter10['status_val'].' ';
+            $desc .= '当前:组'.$filter10['status_val'].' ';
         }
 
         $typesArr = self::getNameByCodesType();

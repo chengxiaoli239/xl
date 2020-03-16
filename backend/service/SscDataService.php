@@ -2645,7 +2645,7 @@ class SscDataService extends BaseService {
                 $UserSysPlans = UserSysPlans::find()->where($where)->all();
                 $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
                 foreach ($UserSysPlans as $UserSysPlan){
-                    # 中的计划回0.1
+                    # 倍数处理，中的计划回第一个倍数
                     $singles = explode('-', $UserSysPlan->singles);
                     $count = count($singles);
                     if($flags[$uid] == 1){ # 中奖
@@ -2664,7 +2664,7 @@ class SscDataService extends BaseService {
                         ['=', 'status', 1]
                     ];
                     $updateData = ['single'=>$single];
-                    if(in_array($UserSysPlan->plan_type, [4])){ # 号码切换&倍投
+                    if(in_array($UserSysPlan->plan_type, [4, 5])){ # 号码切换&倍投
                         # 号码切换
                         if($flags[$uid] == 1) { # 中奖
                             $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 1 : 2;
