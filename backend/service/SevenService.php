@@ -307,7 +307,7 @@ class SevenService extends BaseTZService {
             if(in_array($rst['code'], [302, 305])){ # 余额不足、已关盘、系统维护 302, 305, 306
                 //return $rst;
             }
-            return $rst;
+            //return $rst;
         }elseif (strpos($rst['msg'], '余额不足') OR $rst['code'] == 302){
             return ['status'=>300, 'msg'=>'余额不足'];
         }
