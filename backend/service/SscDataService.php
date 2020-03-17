@@ -2665,7 +2665,7 @@ class SscDataService extends BaseService {
                         ['=', 'id', $UserSysPlan->id]
                     ];
                     $updateData = ['single'=>$single];
-                    if(in_array($UserSysPlan->plan_type, [4, 5])){ # 号码切换&倍投
+                    if(in_array($UserSysPlan->plan_type, [2, 4, 5]) && isset($codes_hz['status_val'])){ # 号码切换&倍投
                         # 号码切换
                         if($flags[$uid] == 1) { # 中奖
                             $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 1 : 2;
