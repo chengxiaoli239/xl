@@ -2653,7 +2653,7 @@ class SscDataService extends BaseService {
                         $single = $singles[$next_single_key];
                     }else{ # 不中奖
                         //$single = self::getPlanNextSingle($UserSysPlan->id, $UserSysPlan->single);
-                        $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key);
+                        $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                     }
                     $codes_hz['singles_key'] = $next_single_key;
                     $whereUpdate = [
