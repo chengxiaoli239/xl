@@ -1629,20 +1629,16 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 if($rst['Status'] != 1){
                     $tzRst = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
                     //if($tz_type != 20) $tzRst['code'] = $codes;
-                    if($rst['code'] == 303){ # 您的状态已经超时，请重新登录、请登录
-                        # 投注失败提示登陆：执行登陆并且再次投注
-                        $rst = SevenService::login(self::$user_id, self::$tz_system_id);
-                        # 投注
-                        //return BetService::tzByPlanId($plan_id, 1);
-                        //return self::postBetCurl($url, $post_data, $headers);
+                    if(in_array($rst['code'], [303])){ # 您的状态已经超时，请重新登录、请登录
+                        return $rst;
                     }
                     Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
                     if(in_array($rst['code'], [302, 305])){ # 余额不足、已关盘、系统维护 302, 305, 306
                         //return $rst;
                     }
-                    //return $rst;
-                }elseif (strpos($rst['msg'], '余额不足') OR $rst['code'] == 302){
-                    return ['status'=>300, 'msg'=>'余额不足'];
+                    if(!in_array($rst['code'], [307])){ # 停押账号为了测试不返回
+                        return $rst;
+                    }
                 }
             }
 
