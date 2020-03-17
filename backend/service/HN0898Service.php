@@ -578,12 +578,12 @@ class HN0898Service extends BaseTZService {
 
         $UserSysPlans->status = (int)$status;
 
-        if(in_array($UserSysPlans->plan_type, [2,3,4,5])){
+        if(in_array($UserSysPlans->plan_type, [2,3,4,5])){ # 倍投
             $singles = explode('-', $UserSysPlans->singles);
 
             $code_hz = json_decode($UserSysPlans->hz_Arr, true);
             $code_hz['singles_key'] = 0;# 切换开关翻倍回第一次
-            if(in_array($UserSysPlans->plan_type, [4, 5])){
+            if(in_array($UserSysPlans->plan_type, [4, 5])){ # 切换
                 $code_hz['status_val'] = 1;# 切换开关号码回第一组
             }
             $UserSysPlans->single = $singles[0];
