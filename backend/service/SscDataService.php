@@ -2623,67 +2623,60 @@ class SscDataService extends BaseService {
             }
         }
 
-        $flags = [];
+        $flags = []; # 计划是否中奖表示
         # 翻倍计划、翻倍止盈止损，倍投 连续x期不中 决定倍数
-        $where = ['AND', ['IN', 'plan_type', [2, 3, 4]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+        $where = ['AND', ['IN', 'plan_type', [2, 3, 4, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
-                if(!isset($flags[$UserSysPlan->uid])){
-                    $flags[$UserSysPlan->uid] = 0;
-                }
-                # 中的计划回0.1、不中的计划翻倍
+
+                # flag 是否中奖金，中的计划回0.1、不中的计划翻倍
                 $BettingRecords = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id])->orderBy(['id'=>SORT_DESC])->one();
-                if($BettingRecords->profits>0){
-                    $flags[$UserSysPlan->uid] = 1;
-                }
-                $userPlansLossNums[$UserSysPlan->uid][$UserSysPlan->id] = self::getLossQs($UserSysPlan->id);
-            }
-            $logArr['plan_2_3']['userPlansLossNums'] = $userPlansLossNums;
 
-            foreach ($userPlansLossNums as $uid=>$userPlansLossNum){
-                $where = ['AND', ['IN', 'plan_type', [2, 3, 4]], ['=', 'uid', $uid], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
-                $UserSysPlans = UserSysPlans::find()->where($where)->all();
+                # 最近一期是否中中奖
+                $flag = $BettingRecords->profits>0 ? 1 : 0;
+                $flags[$UserSysPlan->uid][$UserSysPlan->id] = $flag;
+
+                # 遗漏期数[不中奖期数]
+                $lossQs = self::getLossQs($UserSysPlan->id);
+
+                $logArr[$UserSysPlan->id]['flag'] = $flag; # 中奖标识
+                $logArr[$UserSysPlan->id]['lossQs'] = $lossQs; # 以后期数
+
+                # 倍数处理，中的计划回第一个倍数
+                $singles = explode('-', $UserSysPlan->singles);
+                $logArr[$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
+
                 $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
-                foreach ($UserSysPlans as $UserSysPlan){
-                    # 倍数处理，中的计划回第一个倍数
-                    $singles = explode('-', $UserSysPlan->singles);
-                    $count = count($singles);
-                    if($flags[$uid] == 1){ # 中奖
-                        $next_single_key = 0;
-                        $single = $singles[$next_single_key];
-                    }else{ # 不中奖
-                        //$single = self::getPlanNextSingle($UserSysPlan->id, $UserSysPlan->single);
-                        $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
-                    }
-                    $codes_hz['singles_key'] = $next_single_key;
-                    $whereUpdate = [
-                        'AND',
-                        ['=', 'lottery_type', $UserSysPlan->lottery_type],
-                        ['=', 'uid', $UserSysPlan->uid],
-                        ['=', 'plan_type', $UserSysPlan->plan_type],
-                        ['=', 'status', 1],
-                        ['=', 'id', $UserSysPlan->id]
-                    ];
-                    $updateData = ['single'=>$single];
-                    //if(in_array($UserSysPlan->plan_type, [3, 4, 5]) && isset($codes_hz['status_val'])){ # 号码切换&倍投
-                    if(isset($codes_hz['status_val'])){ # 号码切换&倍投
-                        # 号码切换
-                        if($flags[$uid] == 1) { # 中奖
-                            $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 1 : 2;
-                        }else{
-                            $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 2 : 1;
-                        }
-                    }
-                    $updateData['hz_Arr'] = json_encode($codes_hz, 320);
-                    $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                if($flag == 1){ # 中奖
+                    $next_single_key = 0;
+                    $single = $singles[$next_single_key];
+                }else{ # 不中奖
+                    $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                 }
-                $updateSingles = ['uid'=>$uid, 'account'=>$UserSysPlan->account, 'userPlansLossNum'=>$userPlansLossNum, 'single'=>$single, 'countSingles'=>$count, 'singles'=>$singles, 'rst'=>$rst, 'whereUpdate'=>$whereUpdate];
-                $logArr['plan_2_3']['updateSingles'][] = $updateSingles;
+                $logArr[$UserSysPlan->id]['single'] = $single; # 最新更新倍数
+                $logArr[$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新倍数singles 的 key
 
+                $codes_hz['singles_key'] = $next_single_key;
+                $whereUpdate = ['id'=>$UserSysPlan->id ]; # 更新条件
+                $logArr[$UserSysPlan->id]['whereUpdate'] = $whereUpdate;
+
+                $updateData = ['single'=>$single];
+                if(isset($codes_hz['status_val'])){ # 号码切换&倍投
+                    # 号码切换
+                    if($flag == 1) { # 中奖
+                        $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 1 : 2;
+                    }else{
+                        $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 2 : 1;
+                    }
+                }
+                $updateData['hz_Arr'] = json_encode($codes_hz, 320);
+                $logArr[$UserSysPlan->id]['updateData'] = $updateData;
+
+                $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                $logArr[$UserSysPlan->id]['rst'] = $rst;
             }
         }
 
-        $logArr['flags'] = $flags;
         $logArr['lottery_type'] = $lottery_type;
         Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', [$logArr]);
 

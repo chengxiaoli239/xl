@@ -130,7 +130,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                     $buy_type_Arr = [0=>'反买', 1=>'正买'];
                                     $str .= '['.$buy_type_Arr[$model->buy_type].']';
                                 }
-                                if($model->playway == 3 && $model->tz_type > 0){
+                                if($model->tz_type > 0){
                                     //$str .= '['.\backend\service\StaticService::$kArr[$model->tz_type].']';
                                     $str .= '['.\backend\service\BetService::getTypeNameByTzType($model->tz_type).']';
                                 }
