@@ -2677,7 +2677,7 @@ class SscDataService extends BaseService {
                     $updateData['hz_Arr'] = json_encode($codes_hz, 320);
                     $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                 }
-                $updateSingles = ['uid'=>$uid, 'userPlansLossNum'=>$userPlansLossNum, 'single'=>$single, 'countSingles'=>$count, 'singles'=>$singles, 'rst'=>$rst, 'whereUpdate'=>$whereUpdate];
+                $updateSingles = ['uid'=>$uid, 'account'=>$UserSysPlan->account, 'userPlansLossNum'=>$userPlansLossNum, 'single'=>$single, 'countSingles'=>$count, 'singles'=>$singles, 'rst'=>$rst, 'whereUpdate'=>$whereUpdate];
                 $logArr['plan_2_3']['updateSingles'][] = $updateSingles;
 
             }
