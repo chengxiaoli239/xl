@@ -2670,7 +2670,7 @@ class SscDataService extends BaseService {
                     }
                 }
                 $updateData['hz_Arr'] = json_encode($codes_hz, 320);
-                $logArr[$UserSysPlan->id]['updateData'] = json_decode($updateData,true);
+                $logArr[$UserSysPlan->id]['updateData'] = $codes_hz;
 
                 $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                 $logArr[$UserSysPlan->id]['rst'] = $rst;
