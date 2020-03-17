@@ -1983,6 +1983,21 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
     }
 
     /**
+     * @desc 判断是否登录
+     * @param $uid
+     * @param $tz_system_id
+     * @return bool
+     */
+    public static function isLogin($uid, $tz_system_id){
+
+        $balance = LuckyBaseService::getBalance($uid,$tz_system_id);
+
+        $flag = $balance > 0 ? true : false;
+
+        return (boolean)$flag;
+    }
+
+    /**
      * @decription
      * @param $url
      */

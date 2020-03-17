@@ -9,6 +9,8 @@
 
 namespace backend\service\NineNine;
 
+use backend\service\HN0898Service;
+
 class NineNineService6 extends NineNineBaseService {
     public static $username = '';
     public static $password = '';
@@ -33,5 +35,21 @@ class NineNineService6 extends NineNineBaseService {
      */
     public function __construct($uid = 1, $tz_system_id = 1){
         parent::__construct($uid, $tz_system_id);
+    }
+
+
+    /**
+     * @desc 判断是否登录
+     * @param $uid
+     * @param $tz_system_id
+     * @return bool
+     */
+    public static function isLogin($uid, $tz_system_id){
+
+        $balance = HN0898Service::getBalance($uid,$tz_system_id);
+
+        $flag = $balance > 0 ? true : false;
+
+        return (boolean)$flag;
     }
 }

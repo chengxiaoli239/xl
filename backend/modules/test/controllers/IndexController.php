@@ -127,6 +127,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BetService::isLogin($uid = 18, $tz_system_id = 19);d($rst);
         $id = 38; $rst = BaseService::login($id);p($rst);
         $rst = SscDataService::insertCodeType2();p($rst);
         $rst = SscDataService::getPlanNextSingle(920, 1);p($rst);

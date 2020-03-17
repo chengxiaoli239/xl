@@ -595,6 +595,12 @@ abstract class BetService extends BaseBetService {
        foreach ($tz_sites as $tz_system_id){
            $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
 
+           # 1、首先判断是否登录，否则登录之后再下注
+           if($flag = self::isLogin($plan->uid, $tz_system_id)){
+               $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id]);
+               BaseService::login($TzSystemsUsers->id);
+           }
+
            # 4、投注号码 codes
            $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
            //p([$system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $codes]);
@@ -801,6 +807,29 @@ abstract class BetService extends BaseBetService {
 
 
        return $rst;
+    }
+
+    /**
+     * @desc 是否登录，判断标准，能正常获取用户信息
+     * @param $tz_system_id
+     * @param int $lottery_type
+     * @return HuiYuanService5|KuaiLe8Service|LuckyBaseService|NineNineService6|SevenService|XlService
+     */
+    public static function isLogin($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        if(in_array($tz_system_id, [1,2])){
+            # 1、0898投注、2、99彩票网
+            $flag = NineNineService6::isLogin($uid, $tz_system_id);
+        }elseif(in_array($tz_system_id, [3, 6, 7, 9, 10])){
+            # 3、3重庆7时彩网：重庆7时彩、幸运五星彩、6会员网
+            $flag = LuckyBaseService::isLogin($uid, $tz_system_id);
+        }elseif(in_array($tz_system_id, [4])){
+            # 4、7天彩票网
+        }elseif(in_array($tz_system_id, [5])){
+            # 5、希腊网
+            $flag = XlService::isLogin($uid, $tz_system_id);
+        }
+
+        return (boolean)$flag;
     }
 
     /**
