@@ -1842,7 +1842,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                     # 投注失败提示登陆：执行登陆并且再次投注
                     $rst = SevenService::login(self::$user_id, self::$tz_system_id);
                     # 投注
-                    //return BetService::tzByPlanId($plan_id, 1);
+                    //BetService::tzByPlanId($plan_id, 1);
                     //return self::postBetCurl($url, $post_data, $headers);
                 }
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
@@ -1871,7 +1871,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
         }
         # 获取方案号，记录id, 用于撤单
-        //$snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+        $snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
 
         $insertData = [
             'playway'=> $playway,  // 投注方式

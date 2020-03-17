@@ -34,8 +34,9 @@ use yii\widgets\ActiveForm;
                         '1'=>'开启',
                     ])->label('投注状态') ?>
 
+                <?= $form->field($model, 'single')->textInput() ?>
 
-                    <?= $form->field($model, 'code1')->textInput()->label('号码组一') ?>
+                <?= $form->field($model, 'code1')->textInput()->label('号码组一') ?>
                     <?= $form->field($model, 'code2')->textInput()->label('号码组二') ?>
 
                     <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:1-2-4-8-16-32-42-84') ?>

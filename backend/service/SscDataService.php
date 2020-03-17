@@ -2661,7 +2661,8 @@ class SscDataService extends BaseService {
                         ['=', 'lottery_type', $UserSysPlan->lottery_type],
                         ['=', 'uid', $UserSysPlan->uid],
                         ['=', 'plan_type', $UserSysPlan->plan_type],
-                        ['=', 'status', 1]
+                        ['=', 'status', 1],
+                        ['=', 'id', $UserSysPlan->id]
                     ];
                     $updateData = ['single'=>$single];
                     if(in_array($UserSysPlan->plan_type, [4, 5])){ # 号码切换&倍投
