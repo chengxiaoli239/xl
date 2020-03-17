@@ -2665,7 +2665,8 @@ class SscDataService extends BaseService {
                         ['=', 'id', $UserSysPlan->id]
                     ];
                     $updateData = ['single'=>$single];
-                    if(in_array($UserSysPlan->plan_type, [2, 4, 5]) && isset($codes_hz['status_val'])){ # 号码切换&倍投
+                    //if(in_array($UserSysPlan->plan_type, [3, 4, 5]) && isset($codes_hz['status_val'])){ # 号码切换&倍投
+                    if(isset($codes_hz['status_val'])){ # 号码切换&倍投
                         # 号码切换
                         if($flags[$uid] == 1) { # 中奖
                             $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 1 : 2;
@@ -2676,7 +2677,7 @@ class SscDataService extends BaseService {
                     $updateData['hz_Arr'] = json_encode($codes_hz, 320);
                     $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                 }
-                $updateSingles = ['uid'=>$uid, 'userPlansLossNum'=>$userPlansLossNum, 'single'=>$single, 'countSingles'=>$count, 'singles'=>$singles, 'rst'=>$rst];
+                $updateSingles = ['uid'=>$uid, 'userPlansLossNum'=>$userPlansLossNum, 'single'=>$single, 'countSingles'=>$count, 'singles'=>$singles, 'rst'=>$rst, 'whereUpdate'=>$whereUpdate];
                 $logArr['plan_2_3']['updateSingles'][] = $updateSingles;
 
             }
