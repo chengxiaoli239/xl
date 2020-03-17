@@ -596,7 +596,7 @@ abstract class BetService extends BaseBetService {
            $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
 
            # 1、首先判断是否登录，否则登录之后再下注
-           if($flag = self::isLogin($plan->uid, $tz_system_id)){
+           if(!$flag = self::isLogin($plan->uid, $tz_system_id)){
                $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id]);
                BaseService::login($TzSystemsUsers->id);
            }
