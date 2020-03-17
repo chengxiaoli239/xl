@@ -2739,6 +2739,8 @@ class SscDataService extends BaseService {
         }
         $qihao = HN0898Service::getQihao($lottery_type);
         $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+        $logArr = ['plan_id'=>$plan_id, 'single_key'=>$single_key, 'next_single_key'=>$next_single_key, 'time'=>$time, 'lottery_type'=>$lottery_type];
+        Tool_Common::log('getPlanNextSingle', 'INFO', '倍数获取', $logArr);
         $m->set($mkey, $nextSingle,$time);
 
         return $nextSingle;
