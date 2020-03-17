@@ -214,7 +214,6 @@ class SevenService extends BaseTZService {
      * @return array
      */
     public function bet($qihao, $plan_id, $codes){
-        sleep(5);
         $bigFlag = 0;
         if(strlen($codes)>5000){ # 针对大量号码下注 用post请求
             $bigFlag = 1;
