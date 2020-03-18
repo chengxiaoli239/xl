@@ -1712,7 +1712,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                     # 投注失败提示登陆：执行登陆并且再次投注
                     $rst = self::login(self::$user_id, self::$tz_system_id);
                     # 投注
-                    BetService::tzByPlanId($plan_id, 1);
+                    //BetService::tzByPlanId($plan_id, 1);
                 }
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
                 if(in_array($rst['code'], [302, 305])){ # 余额不足、已关盘、系统维护 302, 305, 306
