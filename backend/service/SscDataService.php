@@ -2689,7 +2689,7 @@ class SscDataService extends BaseService {
      * @return int
      */
     public static function getLossQs($plan_id){
-        $where = ['AND', ['=', 'plan_id', $plan_id]];
+        $where = ['plan_id' =>$plan_id];
         $i = 0;
         if($BettingRecords = BettingRecords::find()->where($where)->asArray()->orderBy(['id'=>SORT_DESC])->all()){
             foreach ($BettingRecords as $BettingRecord){

@@ -620,7 +620,7 @@ abstract class BetService extends BaseBetService {
            if($tmpRst['status'] == 200 && in_array($plan->account, \Yii::$app->params['test_account'])){
                if($tmpBets = BettingRecords::findAll(['account'=>$plan->account, 'cancel_status'=>0, 'qihao'=>$qihao])){
                    foreach ($tmpBets as $tmpBet){
-                       BetService::cancelOrder($plan->uid, $tmpBet->id);
+                       if($tmpBet->sn) BetService::cancelOrder($plan->uid, $tmpBet->id);
                    }
                }
            }
