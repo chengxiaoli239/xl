@@ -2724,15 +2724,11 @@ class SscDataService extends BaseService {
                 if(!isset($singlesArr[$next_single_key])){
                     $next_single_key = 0;
                 }
-
-                $nextSingle = $singlesArr[$next_single_key];
-            }else{
-                $nextSingle = $singlesArr[$next_single_key];
-
             }
         }else{
-            $nextSingle = $singlesArr[$single_key];
+            $next_single_key = $single_key;
         }
+        $nextSingle = $singlesArr[$next_single_key];
         $qihao = HN0898Service::getQihao($lottery_type);
         $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
         $logArr = ['plan_id'=>$plan_id, 'single_key'=>$single_key, 'next_single_key'=>$next_single_key, 'time'=>$time, 'lottery_type'=>$lottery_type];
