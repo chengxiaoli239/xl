@@ -2717,8 +2717,8 @@ class SscDataService extends BaseService {
         $singles = $UserSysPlans->singles;
         $singlesArr = explode(',', str_replace('-', ',', $singles));
         if($BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one()){
-            $mkey = 'getPlanNextSingle_'.$plan_id.'_'.$BettingRecords->qihao;
-            if(!$nextSingle = $m->get($mkey)){
+            $mkey = 'getPlanNextSingle_1_'.$plan_id.'_'.$BettingRecords->qihao;
+            if(!$next_single_key = $m->get($mkey)){
                 //$key = array_search($single, $singlesArr);
                 $next_single_key = $single_key + 1;
                 if(!isset($singlesArr[$next_single_key])){
@@ -2726,6 +2726,9 @@ class SscDataService extends BaseService {
                 }
 
                 $nextSingle = $singlesArr[$next_single_key];
+            }else{
+                $nextSingle = $singlesArr[$next_single_key];
+
             }
         }else{
             $nextSingle = $singlesArr[$single_key];
@@ -2734,7 +2737,7 @@ class SscDataService extends BaseService {
         $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
         $logArr = ['plan_id'=>$plan_id, 'single_key'=>$single_key, 'next_single_key'=>$next_single_key, 'time'=>$time, 'lottery_type'=>$lottery_type];
         Tool_Common::log('getPlanNextSingle', 'INFO', '倍数获取', $logArr);
-        $m->set($mkey, $nextSingle,$time);
+        $m->set($mkey, $next_single_key,$time - 50);
 
         return $nextSingle;
     }
