@@ -308,7 +308,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
                         # 投注
                         //BetService::tzByPlanId($plan_id, 1);
                     }
-                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
+                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','麒麟投注记录-投注失败', $tzRst);
                     return $tzRst;
                 }
             }
@@ -460,7 +460,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
                     # 投注
                     //BetService::tzByPlanId($plan_id, 1);
                 }
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
+                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','麒麟投注记录-投注失败', $tzRst);
                 return $tzRst;
             }
 
@@ -683,7 +683,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
                 # 投注
                 //BetService::tzByPlanId($plan_id, 1);
             }
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','麒麟投注记录-投注失败', $tzRst);
             return $tzRst;
         }
 

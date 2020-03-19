@@ -589,8 +589,10 @@ abstract class BetService extends BaseBetService {
        if(!$plan = UserSysPlans::findOne($planId)){
             return ['status'=>300, 'msg'=>'找不到对应记录'];
        }
+       $m = \Yii::$app->cache;
        $tz_sites = explode(',', trim($plan->tz_sites));
        $qihao = HN0898Service::getQihao($plan->lottery_type);
+       $mkey = 'tzByPlanId_account_'.$plan->account.'_qihao_'.$qihao.'_plan_id_'.$plan->id;
        $rst = [];
        foreach ($tz_sites as $tz_system_id){
            $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
@@ -600,6 +602,11 @@ abstract class BetService extends BaseBetService {
                $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id]);
                BaseService::login($TzSystemsUsers->id);
            }
+
+           if($tzflag = $m->get($mkey)) continue; # ['status'=>300, 'msg'=>'已经投注过了~'];
+
+           $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
+           $m->set($tzflag, 1, $time);
 
            # 4、投注号码 codes
            $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
