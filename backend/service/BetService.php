@@ -198,7 +198,7 @@ abstract class BetService extends BaseBetService {
         if($lottery_type == 5){
             if(
                 (\Yii::$app->params['ssc_kj_time_start'] <= $time && $time <= \Yii::$app->params['ssc_kj_time_end']) OR
-                ('23:50:00' <= $time && $time <= '23:59:59') OR ('00:00:00' <= $time && $time <= '00:10:00')
+                ('23:50:00' <= $time && $time <= '23:59:59') OR ('00:00:00' <= $time && $time <= '00:12:00')
             ){
                 //$rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
                 $status = false;
@@ -618,7 +618,7 @@ abstract class BetService extends BaseBetService {
            $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
            //p([$system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $codes]);
 
-           $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'tz_sites'=>$tz_sites];
+           $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'tz_sites'=>$tz_sites];
            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId','INFO','投注记录tzByPlanId', $logArr);
            # 5、投注请求
            $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id);
