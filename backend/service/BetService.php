@@ -600,7 +600,8 @@ abstract class BetService extends BaseBetService {
            # 1、首先判断是否登录，否则登录之后再下注
            if(!$flag = self::isLogin($plan->uid, $tz_system_id)){
                $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id]);
-               BaseService::login($TzSystemsUsers->id);
+               $loginRst = BaseService::login($TzSystemsUsers->id);
+               if($loginRst['status'] != 200) continue;
            }
 
            if($tzflag = $m->get($mkey)) continue; # ['status'=>300, 'msg'=>'已经投注过了~'];

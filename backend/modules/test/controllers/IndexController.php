@@ -127,12 +127,16 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $loginRst = BaseService::login($id = 44);p($loginRst);
+
+        $time = BetService::getBetCacheTime($lottery_type=5, $qihao = '200319036'); p($time);# 投注之后缓存时间
+        $rst = SscDataService::getPlanNextSingle(52, 0, $next_single_key, $lottery_type=5);p($rst);
+        $qs = SscDataService::getLossQs(52);p($qs);
         $rst = BetService::isLogin($uid = 18, $tz_system_id = 9);d($rst);
         $rst = BetService::isLogin($uid = 20, $tz_system_id = 9);d($rst);
 
         $id = 38; $rst = BaseService::login($id);p($rst);
         $rst = SscDataService::insertCodeType2();p($rst);
-        $rst = SscDataService::getPlanNextSingle(920, 1);p($rst);
 
         $testData = [
             '千12345百12345十67890',
@@ -192,7 +196,6 @@ class IndexController extends Controller
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);p($rst);
         p(3%5);
-        $qs = SscDataService::getLossQs(3);p($qs);
         $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5);p($rst); # 70s
         $rst = SscDataService::insertCode($type = 5);p($rst); # 插入三字现、四字现
         $rst = StaticService::staticHzPerDateProfits('2019-10-31', $lottery_type = 5); p($rst);
@@ -320,7 +323,6 @@ class IndexController extends Controller
         p($rst);
         $rst = HN0898Service::getCurrentQihao( 7 );p($rst);
         $rst = HN0898Service::getQihao( 7 );p($rst);
-        $rst['bet'] = BetService::bet();p($rst); // 用户新计划投注，可正买可反买
         $rst = SscDataService::clearDataTables();p($rst);
         $rst = HN0898Service::getDifferentNums();p($rst);
         $rst = TzService::insertKuaiLe8DataTime();p($rst);
