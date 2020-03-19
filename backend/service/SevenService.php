@@ -298,7 +298,7 @@ class SevenService extends BaseTZService {
             if(in_array($rst['code'], [303])){ # 您的状态已经超时，请重新登录、请登录
                 return $rst;
             }
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时彩投注记录-投注失败', $tzRst);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','7时彩投注记录-投注失败', $tzRst);
             if(in_array($rst['code'], [302, 305])){ # 余额不足、已关盘、系统维护 302, 305, 306
                 //return $rst;
             }

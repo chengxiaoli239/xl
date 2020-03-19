@@ -324,7 +324,7 @@ class HuiYuanBaseService extends BaseTZService {
             if($tz_type != 20){
                 $tzRst['code'] = $codes;
             }
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','会员网7时彩投注记录-投注失败', $tzRst);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','会员网7时彩投注记录-投注失败', $tzRst);
             return $tzRst;
         }
         $time = 600;
