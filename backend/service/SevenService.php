@@ -863,6 +863,7 @@ class SevenService extends BaseTZService {
         if(strpos($SevenStarHFDirector1Frontend1, 'Akamai_Cookie') === false){
             $AKamaiCookie = self::curlGetSevenCookie($url, array_merge($headers, [$tmpCookieStr]));
             if($AKamaiCookie) $tmpCookieStr = ';'.$AKamaiCookie;
+            $tmpCookieStr .= ';NOTICE_LOGIN_IN=0';
         }
         //p(['robot7_session_id'=>$robot7_session_id, 'headers'=>$headers, 'SevenStarHFDirector1Frontend1'=>$SevenStarHFDirector1Frontend1, 'AKamaiCookie'=>$AKamaiCookie]);
         if($tmpCookieStr){
@@ -1480,6 +1481,10 @@ class SevenService extends BaseTZService {
         curl_setopt($ch, CURLOPT_HEADER,0);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data));
 
+        //函数中加入下面这条语句 CURLOPT_FOLLOWLOCATION指明： 让curl递归的抓取http头中Location中指明的url，当
+        //抓取次数超过CURLOPT_MAXREDIRS时，递归将终止。 在抓取中任何跳转带来的问题，都可通过设置此参数解决。
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
 
@@ -1508,8 +1513,7 @@ class SevenService extends BaseTZService {
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
         $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'rstData'=>$rstData];
-        //if(count($post_data['bet_number'])<2000)
-        $logArr['post_data'] = $post_data;
+        if(count($post_data['bet_number'])<2000) $logArr['post_data'] = $post_data;
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求', $logArr);
         //p([$data, $rstData, $post_data, $header]);
 

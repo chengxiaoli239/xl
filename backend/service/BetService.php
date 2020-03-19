@@ -150,7 +150,8 @@ abstract class BetService extends BaseBetService {
             $qihao = HN0898Service::getQihao($lottery_type);
             $tzStatus = BetService::isCanBet($lottery_type);
             if (!$tzStatus) continue;
-            $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['>', 'uid', 0], ['=', 'is_parent', 1], ['=', 'is_test', 0]];
+            //$where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['>', 'uid', 0], ['=', 'is_parent', 1], ['=', 'is_test', 0]];
+            $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['>', 'uid', 0], ['=', 'is_parent', 1]];
             $plans = UserSysPlans::find()->where($where)->all();
             if ($plans) {
                 $datas = [];
@@ -169,9 +170,12 @@ abstract class BetService extends BaseBetService {
                 //p($datas);
                 BetService::afterBetNow($plan->lottery_type, $qihao); # 彩种投注结束锁
             }
+            $count = count($plans);
+            $logArr[$lottery_type]['plans'] = $plans;
+            $logArr[$lottery_type]['ids'] = $ids;
+            $logArr[$lottery_type]['qihao'] = $qihao;
+            $logArr[$lottery_type]['msg'] = $count == 0 ? '无投注计划' : $count.'条计划';
         }
-        $count = count($plans);
-        $logArr = ['tzRst'=>$tzRst, 'qihao'=>$qihao, 'msg'=>$count == 0 ? '无投注计划' : $count.'条计划', 'datas'=>$datas];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','用户真实投注', $logArr);
 
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
