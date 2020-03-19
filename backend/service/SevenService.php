@@ -352,30 +352,6 @@ class SevenService extends BaseTZService {
         return $data;
     }
 
-    /**
-     * @desc 大量号码投注拆解
-     * @param $url
-     * @param $post_data
-     * @param $headers
-     * @return mixed|string
-     */
-    public static function betParkCode($url, $post_data, $headers, $plan_id, $key, $is_auto = 1){
-        $m = \Yii::$app->cache;
-        $key = self::buildBetParkCodeKey($plan_id, $key);
-
-        $times = $m->get($key);
-        if($times>1 && $is_auto){
-            return ['Status'=>1, 'msg'=>'已经投注过了！'];
-        }
-        $rst = self::postBetCurl($url, $post_data, $headers);
-        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$rst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/betParkCode','INFO','7时彩分单投注记录', $logArr);
-        $times = (int)$times + 1;
-        $m->set($key, (int)$times, 15);
-
-        return $rst;
-    }
-
     public static function buildBetParkCodeKey($plan_id = 0, $key = 0){
         return "buildBetParkCodeKey_".$plan_id.'_'.$key;
     }
@@ -1532,6 +1508,7 @@ class SevenService extends BaseTZService {
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
         $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+        if(count($post_data['bet_number'])<2000) $logArr['post_data'] = $post_data;
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求', $logArr);
         //p([$data, $rstData, $post_data, $header]);
 
