@@ -215,7 +215,7 @@ class SevenService extends BaseTZService {
      */
     public function bet($qihao, $plan_id, $codes){
         $bigFlag = 0;
-        if(true OR strlen($codes)>5000){ # 针对大量号码下注 用post请求
+        if(strlen($codes)>5000){ # 针对大量号码下注 用post请求
             $bigFlag = 1;
             return $this->postBatchBet($qihao, $plan_id, $codes);
         }
@@ -337,7 +337,7 @@ class SevenService extends BaseTZService {
             'qihao' => $qihao,  // 投注期号
             'tz_system_id' => self::$tz_system_id,  // 投注系统tz_systems .id
             'sn'=>$snInfo['sn'],
-            'snid'=>$snInfo['snid'],
+            'snid'=>'{'.$snInfo['sn'].'}|'.$n,
             'order_type'=>3, # 单双三字定
             'is_simulate' => 0,  // 是否模拟投注
             'single' => $single,  // 投注倍数
