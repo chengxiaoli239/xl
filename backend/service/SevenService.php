@@ -1625,7 +1625,8 @@ class SevenService extends BaseTZService {
 
             # 获取方案号，记录id, 用于撤单
             $snInfo = SevenService::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
-            $snInfo_sn .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
+            $snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
+            $snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
         }
         $snInfo_snid .= $snInfo['snid']; # 多次下单需要分开，多次撤单 # ids: {68972687339717620}|12 period_no: 20200320048
         $data['rst'] = $rst;
@@ -1648,8 +1649,8 @@ class SevenService extends BaseTZService {
             'codes' => (string)$codes,  // 投注号码
             'qihao' => $qihao,  // 投注期号
             'tz_system_id' => self::$tz_system_id,  // 投注系统tz_systems_id
-            'sn'=>$snInfo_sn,
-            'snid'=>$snInfo_snid,
+            'sn'=> trim($snInfo_sn, ';'),
+            'snid'=> trim($snInfo_snid, ';'),
             'order_type'=>3, # 单双三字定
             'is_simulate' => 0,  // 是否模拟投注
             'single' => $single,  // 投注倍数
