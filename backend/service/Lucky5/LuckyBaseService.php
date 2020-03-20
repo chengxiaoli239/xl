@@ -1557,9 +1557,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $totalBetMoney = $totalCount * $single; # 投注总金额
         $way = self::getWay($tz_type);
 
-        $bet_codes = $codes;
-        $isBigNumsBet = BetService::isBigNumsBet($tz_type);
-        $bet_codes = str_replace(',','',$bet_codes);
+        $bet_codes = str_replace(',','',$codes);
         $bet_codes = str_replace('@',',',$bet_codes);
 
         //$post_data = ['totalCount'=>$totalCount, 'totalBetMoney'=>$totalBetMoney, 'bets'=>json_encode($codes), 'way'=>$way, 'period_no'=>'20'.$qihao, 'bet_log'=>urlencode('投注：'.$totalCount.'/'.$single.'注,总共：'.$totalBetMoney.'元'), ];
@@ -1580,12 +1578,24 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             'operation_condition' => self::getOperationCondition($tz_type),
         ];
 
-        //$data['code'] = $codes;
-        $header = [
-            //'Content-Length:'.strlen(http_build_query($post_data)),
+        $_t = round(microtime(true) * 1000);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
+        $headers = [
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'Accept-Encoding: gunzip, deflate',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Cache-Control: max-age=0',
+            'Connection: keep-alive',
+            'Content-Length:'.strlen(http_build_query($post_data)),
+            //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+            'Content-Type: application/x-www-form-urlencoded',
+            'Cookie: '.$TzSystemsUsers->cookie,
+            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+            'Origin: '.$TzSystemsUsers->ssc_domain,
+            'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+            'Upgrade-Insecure-Requests: 1',
+            $TzSystemsUsers->user_agent,
         ];
-
-        $headers = array_merge(self::$headers,$header);
         //p($headers);
         //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
         $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL');//.'?'.http_build_query($post_data);
@@ -1629,10 +1639,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         //p($rst,0);
         //$position = UserFollowData::findOne(self::$plan_id)->position;
         //$position = $position ? $position : self::$position;
-
-        if(!$isBigNumsBet){
-            $codes = implode('@', self::getMySiteCodesStyle($codes, $playway));
-        }
 
         $n = count(explode('@',$codes));
         if(in_array($playway, [2, 3]) && $tz_type != 20){

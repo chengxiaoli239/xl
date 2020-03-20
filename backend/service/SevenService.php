@@ -1209,7 +1209,7 @@ class SevenService extends BaseTZService {
      * @return mixed|string
      */
     public static function userInfo($uid, $tz_system_id){
-        //self::__init($uid, $tz_system_id);
+        self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
@@ -1232,9 +1232,8 @@ class SevenService extends BaseTZService {
 
         //$data = CurlService::httpGet($url, $headers);
         $data = self::httpGet($url, $headers);
-        //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
-        if(!is_array($data)) return ['status'=>302, 'msg'=>'网页重定向获取信息失败'];
+        //if(!is_array($data)) return ['status'=>302, 'msg'=>'网页重定向获取信息失败'];
 
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
