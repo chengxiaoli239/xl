@@ -605,12 +605,15 @@ abstract class BetService extends BaseBetService {
            $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
            //p([$system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $codes]);
 
+           $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id); # 手动下注时，先删除缓存
 
-           if($plan->is_test == 1){
-               # 模拟下注
-           }else{
-               $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id); # 手动下注时，先删除缓存
-               # 正式下注
+           if($tzflag = $m->get($mkey)) continue; # ['status'=>300, 'msg'=>'已经投注过了~'];
+           $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
+           $m->set($mkey, 1, $time);
+
+           if($plan->is_test == 1){ # 模拟下注
+               $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type); # 直接记录表
+           }else{ # 正式下注
                # 1、首先判断是否登录，否则登录之后再下注
                if(!$flag = self::isLogin($plan->uid, $tz_system_id)){
                    $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id]);
@@ -619,19 +622,11 @@ abstract class BetService extends BaseBetService {
                    if($loginRst['status'] != 200 OR $loginRst['balance']<0.01) continue;
                }
 
-               if($tzflag = $m->get($mkey)) continue; # ['status'=>300, 'msg'=>'已经投注过了~'];
-
-               $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
-               $m->set($mkey, 1, $time);
-
                $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'tz_sites'=>$tz_sites];
                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId','INFO','投注记录tzByPlanId', $logArr);
                # 5、投注请求
                $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
                $tmpRst = $BetService->bet($qihao, $plan->id, $codes);
-
-               $rst[] = $tmpRst;
-               $isAuto == 0 && BetService::afterBetNow($plan->lottery_type, $qihao); # 手动无需锁
 
                BetService::synBalance($plan->uid, $tz_system_id);
 
@@ -644,6 +639,8 @@ abstract class BetService extends BaseBetService {
                    }
                }
            }
+           $isAuto == 0 && BetService::afterBetNow($plan->lottery_type, $qihao); # 手动无需锁
+           $rst[] = $tmpRst;
        }
        $logArr = ['tz_sites'=>$tz_sites,'codes'=>$codes, 'postRst'=>$rst];
        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/plan_bet','INFO','0898投注记录', $logArr);
@@ -1055,6 +1052,39 @@ abstract class BetService extends BaseBetService {
     }
 
 
+    /**
+     * @desc 记录投注记录
+     * @param $plan_id
+     * @param $qihao
+     * @param $codes
+     * @param int $lottery_type
+     * @return bool
+     */
+    public static function _logRecordsByPlandId($plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $UserSysPlans = UserSysPlans::findOne($plan_id);
+        $totalmoney = count(explode('@', $codes)) * $UserSysPlans->single;
+        $insertData = [
+            'playway'=> $UserSysPlans->playway,  // 投注方式
+            'tz_type'=> $UserSysPlans->tz_type,  // 投注类型
+            'buy_type'=> 1,  // 购买方向类型
+            'uid'=> $UserSysPlans->uid,  // 投注账号id
+            'lottery_type' => $lottery_type, # 彩种
+            'account' => $UserSysPlans->account,
+            'plan_id' => $plan_id, # 计划id
+            'codes' => (string)$codes,  // 投注号码
+            'qihao' => $qihao,  // 投注期号
+            'tz_system_id' => self::$tz_system_id,  // 投注系统tz_systems .id
+            'sn'=>'888888',
+            'snid'=>'888888id',
+            'order_type'=>$UserSysPlans->playway, # 单双三字定
+            'is_simulate' => 0,  // 是否模拟投注
+            'single' => $UserSysPlans->single,  // 投注倍数
+            'betting_money'=> $totalmoney,  // 投注金额
+        ];
+        $insertRst = BetService::_logRecords($insertData);
+
+        return $insertRst;
+    }
 
 
 
