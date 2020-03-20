@@ -601,39 +601,45 @@ abstract class BetService extends BaseBetService {
        foreach ($tz_sites as $tz_system_id){
            $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
 
-           # 1、首先判断是否登录，否则登录之后再下注
-           if(!$flag = self::isLogin($plan->uid, $tz_system_id)){
-               $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id]);
-               $loginRst = BaseService::login($TzSystemsUsers->id);
-               Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['loginRst'=>$loginRst]);
-               if($loginRst['status'] != 200 OR $loginRst['balance']<0.01) continue;
-           }
-
-           if($tzflag = $m->get($mkey)) continue; # ['status'=>300, 'msg'=>'已经投注过了~'];
-
-           $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
-           $m->set($mkey, 1, $time);
-
            # 4、投注号码 codes
            $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
            //p([$system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $codes]);
 
-           $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'tz_sites'=>$tz_sites];
-           Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId','INFO','投注记录tzByPlanId', $logArr);
-           # 5、投注请求
-           $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id);
-           $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
-           $tmpRst = $BetService->bet($qihao, $plan->id, $codes);
-           $rst[] = $tmpRst;
-           $isAuto == 0 && BetService::afterBetNow($plan->lottery_type, $qihao); # 手动无需锁
 
-           BetService::synBalance($plan->uid, $tz_system_id);
+           if($plan->is_test == 1){
+               # 模拟下注
+           }else{
+               # 正式下注
+               # 1、首先判断是否登录，否则登录之后再下注
+               if(!$flag = self::isLogin($plan->uid, $tz_system_id)){
+                   $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id]);
+                   $loginRst = BaseService::login($TzSystemsUsers->id);
+                   Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['loginRst'=>$loginRst]);
+                   if($loginRst['status'] != 200 OR $loginRst['balance']<0.01) continue;
+               }
 
-           # 测试账号取消订单
-           if($tmpRst['status'] == 200 && in_array($plan->account, \Yii::$app->params['test_account'])){
-               if($tmpBets = BettingRecords::findAll(['account'=>$plan->account, 'cancel_status'=>0, 'qihao'=>$qihao])){
-                   foreach ($tmpBets as $tmpBet){
-                       if($tmpBet->sn) BetService::cancelOrder($plan->uid, $tmpBet->id);
+               if($tzflag = $m->get($mkey)) continue; # ['status'=>300, 'msg'=>'已经投注过了~'];
+
+               $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
+               $m->set($mkey, 1, $time);
+
+               $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'tz_sites'=>$tz_sites];
+               Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId','INFO','投注记录tzByPlanId', $logArr);
+               # 5、投注请求
+               $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id);
+               $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
+               $tmpRst = $BetService->bet($qihao, $plan->id, $codes);
+               $rst[] = $tmpRst;
+               $isAuto == 0 && BetService::afterBetNow($plan->lottery_type, $qihao); # 手动无需锁
+
+               BetService::synBalance($plan->uid, $tz_system_id);
+
+               # 测试账号取消订单
+               if($tmpRst['status'] == 200 && in_array($plan->account, \Yii::$app->params['test_account'])){
+                   if($tmpBets = BettingRecords::findAll(['account'=>$plan->account, 'cancel_status'=>0, 'qihao'=>$qihao])){
+                       foreach ($tmpBets as $tmpBet){
+                           if($tmpBet->sn) BetService::cancelOrder($plan->uid, $tmpBet->id);
+                       }
                    }
                }
            }
