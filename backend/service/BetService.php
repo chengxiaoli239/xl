@@ -169,9 +169,9 @@ abstract class BetService extends BaseBetService {
                 $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
                 //p($datas);
                 BetService::afterBetNow($plan->lottery_type, $qihao); # 彩种投注结束锁
+                $logArr[$lottery_type]['plans'] = $plans;
             }
             $count = count($plans);
-            $logArr[$lottery_type]['plans'] = $plans;
             $logArr[$lottery_type]['ids'] = $ids;
             $logArr[$lottery_type]['qihao'] = $qihao;
             $logArr[$lottery_type]['msg'] = $count == 0 ? '无投注计划' : $count.'条计划';
@@ -596,7 +596,7 @@ abstract class BetService extends BaseBetService {
        $m = \Yii::$app->cache;
        $tz_sites = explode(',', trim($plan->tz_sites));
        $qihao = HN0898Service::getQihao($plan->lottery_type);
-       $mkey = 'tzByPlanId_account_'.$plan->account.'_qihao_'.$qihao.'_plan_id_'.$plan->id;
+       $mkey = self::buildBetPlanIdKey($plan->account, $qihao, $plan->id);
        $rst = [];
        foreach ($tz_sites as $tz_system_id){
            $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
@@ -609,6 +609,7 @@ abstract class BetService extends BaseBetService {
            if($plan->is_test == 1){
                # 模拟下注
            }else{
+               $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id); # 手动下注时，先删除缓存
                # 正式下注
                # 1、首先判断是否登录，否则登录之后再下注
                if(!$flag = self::isLogin($plan->uid, $tz_system_id)){
@@ -626,9 +627,9 @@ abstract class BetService extends BaseBetService {
                $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'tz_sites'=>$tz_sites];
                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId','INFO','投注记录tzByPlanId', $logArr);
                # 5、投注请求
-               $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id);
                $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
                $tmpRst = $BetService->bet($qihao, $plan->id, $codes);
+
                $rst[] = $tmpRst;
                $isAuto == 0 && BetService::afterBetNow($plan->lottery_type, $qihao); # 手动无需锁
 
@@ -665,6 +666,9 @@ abstract class BetService extends BaseBetService {
 
         $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao);
         $m->delete($pkey);
+
+        $tzPlanIdmkey = self::buildBetPlanIdKey($account, $qihao, $plan_id);
+        $m->delete($tzPlanIdmkey);
     }
 
     /**
@@ -694,6 +698,19 @@ abstract class BetService extends BaseBetService {
         $pkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$lottery_type.'_'.$qihao;
 
         return $pkey;
+    }
+
+    /**
+     * @desc 计划投注的key
+     * @param string $account
+     * @param string $qihao
+     * @param string $plan_id
+     * @return string
+     */
+    public static function buildBetPlanIdKey($account = '', $qihao = '', $plan_id =''){
+        $key = 'tzByPlanId_account_'.$account.'_qihao_'.$qihao.'_plan_id_'.$plan_id;
+
+        return $key;
     }
 
     /**

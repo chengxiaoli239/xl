@@ -293,16 +293,13 @@ class SevenService extends BaseTZService {
         $end_time = microtime(true);
         $time_consume = ($end_time - $start_time). 's';
         if($rst['Status'] != 1){
-            $tzRst = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
+            $tzRst = [
+                'uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,
+                'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume
+            ];
             //if($tz_type != 20) $tzRst['code'] = $codes;
-            if(in_array($rst['code'], [303])){ # 您的状态已经超时，请重新登录、请登录
-                return $rst;
-            }
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','7时彩投注记录-投注失败', $tzRst);
-            if(in_array($rst['code'], [302, 305])){ # 余额不足、已关盘、系统维护 302, 305, 306
-                //return $rst;
-            }
-            if(!in_array($rst['code'], [304])){ # 重复提交号码
+            if(!in_array($account, ['aa07']) && in_array($rst['code'], [302, 303, 304, 305, 306])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
                 return $rst;
             }
             //return $rst;
@@ -349,6 +346,7 @@ class SevenService extends BaseTZService {
         $insertRst = BetService::_logRecords($insertData);
         self::$headers = [];
 
+        if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'bigFlag'=>$bigFlag, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时重庆插入记录-真实投注', $logArr);
 
@@ -1515,8 +1513,8 @@ class SevenService extends BaseTZService {
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
-        $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'rstData'=>$rstData];
-        if(strlen($post_data['bet_number'])>1000) $logArr['post_data'] = substr($post_data, 0, 200).'...';
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rst'=>$data, 'errno'=>$errno, 'rstData'=>$rstData];
+        if(strlen($post_data['bet_number'])>1000) $logArr['post_data'] = substr($post_data['bet_number'], 0, 200).'...';
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求', $logArr);
         //p([$data, $rstData, $post_data, $header]);
 
