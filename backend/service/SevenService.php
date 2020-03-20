@@ -1628,7 +1628,6 @@ class SevenService extends BaseTZService {
             $snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
             $snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
         }
-        $snInfo_snid .= $snInfo['snid']; # 多次下单需要分开，多次撤单 # ids: {68972687339717620}|12 period_no: 20200320048
         $data['rst'] = $rst;
 
         $n = count(explode('@',$codes));
