@@ -175,6 +175,27 @@ class UserService extends BaseService {
     }
 
     /**
+     * @description 更新用户表状态
+     * @param $id
+     * @param $account
+     * @return array
+     */
+    public static function updateUserTzSystemStatus($id, $status)
+    {
+        if(!$id) return ['status'=>300, 'msg'=>'id为空'];
+        $m = \Yii::$app->cache;
+        $mkey = 'updateUserTzSystemStatus_'.$id.'_'.$status;
+        if($rst = $m->get($mkey)) return false;
+
+        $TzSystemsUser = TzSystemsUsers::findOne($id);
+        $TzSystemsUser->status = $status == 1 ? 0 : 1;
+        $TzSystemsUser->save();
+
+        return $rst;
+    }
+
+
+    /**
      * @desc 用户默认投注彩种
      * @param $uid
      * @return mixed

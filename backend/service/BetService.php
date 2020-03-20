@@ -1060,7 +1060,7 @@ abstract class BetService extends BaseBetService {
      * @param int $lottery_type
      * @return bool
      */
-    public static function _logRecordsByPlandId($plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function _logRecordsByPlandId($plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $sn='888888', $snid='888888id'){
         $UserSysPlans = UserSysPlans::findOne($plan_id);
         $totalmoney = count(explode('@', $codes)) * $UserSysPlans->single;
         $insertData = [
@@ -1073,9 +1073,9 @@ abstract class BetService extends BaseBetService {
             'plan_id' => $plan_id, # 计划id
             'codes' => (string)$codes,  // 投注号码
             'qihao' => $qihao,  // 投注期号
-            'tz_system_id' => self::$tz_system_id,  // 投注系统tz_systems .id
-            'sn'=>'888888',
-            'snid'=>'888888id',
+            'tz_system_id' => '',  // 投注系统tz_systems .id
+            'sn'=>$sn,
+            'snid'=>$snid,
             'order_type'=>$UserSysPlans->playway, # 单双三字定
             'is_simulate' => 0,  // 是否模拟投注
             'single' => $UserSysPlans->single,  // 投注倍数

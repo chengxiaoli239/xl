@@ -51,11 +51,29 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                         ],
                         //'status',
+                        /*
                         ['attribute' => 'status', 'label'=>'状态', //'headerOptions' => ['width' => '170'],
                             'format' => 'raw',
                             'value'=> function($model){
                                 return $model->status ? '<font color="green">已启用</font>' : '<font color="red">已禁用</font>';
                             },
+                        ],
+                        */
+                        ['attribute' => 'status','label'=>'投注系统状态', # 'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if($model->status == 1){
+                                    $txt = '<font color="green">已启用</font>';
+                                    $alt = '点击禁用';
+                                    $val = 0;
+                                }else{
+                                    $txt = '<font color="red">已禁用</font>';
+                                    $val = 1;
+                                    $alt = '点击启用';
+                                }
+                                $url = "/forum/user/switch-tz-system-status?id=".$model->id."&status=".$val; #
+                                return Html::a($txt, $url, ['title' => '开通系统权限','alt'=>$alt]);
+                            }
                         ],
                         'ssc_domain',
                         //'cookie',

@@ -231,6 +231,20 @@ class UserController extends BaseController
         return $this->redirect(['index']);
     }
 
+    /**
+     * @desc 修改投注系统状态，主要是禁止账号自动登录和获取余额
+     * @param $id
+     * @param $status
+     * @return \yii\web\Response
+     */
+    public function acitonSwitchTzSystemStatus($id,$status){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if(\Yii::$app->user->id == 1){
+            UserService::updateUserTzSystemStatus($id, $status);
+        }
+
+        return $this->redirect(['index']);
+    }
 
     /**
      * Finds the User model based on its primary key value.
