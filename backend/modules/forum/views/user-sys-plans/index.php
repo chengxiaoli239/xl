@@ -27,9 +27,9 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         <?= Html::a(Yii::t('app', 'User Sys Plans 2d'), ['create', 'playway'=>2, 'tz_type'=>16, 'lottery_type'=>$lottery_type], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div-->
 
-                    <div class="btn-group">
+                    <!--div class="btn-group">
                         <?= Html::a(Yii::t('app', 'User Sys Plans 3d'), ['create', 'playway'=>3, 'lottery_type'=>$lottery_type], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-                    </div>
+                    </div-->
                     <?php foreach ($myTzTypes as $typeData):?>
                     <div class="btn-group">
                         <?= Html::a($typeData['type_name'], ['create', 'tz_type'=>$typeData['tz_type'], 'lottery_type'=>$typeData['lottery_type']], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
