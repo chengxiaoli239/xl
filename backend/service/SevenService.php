@@ -215,11 +215,10 @@ class SevenService extends BaseTZService {
      */
     public function bet($qihao, $plan_id, $codes){
         $bigFlag = 0;
-        if(strlen($codes)>5000){ # 针对大量号码下注 用post请求
+        if(true OR strlen($codes)>5000){ # 针对大量号码下注 用post请求
             $bigFlag = 1;
             return $this->postBatchBet($qihao, $plan_id, $codes);
         }
-        p('xxx');
 
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
@@ -400,14 +399,14 @@ class SevenService extends BaseTZService {
         $snids = explode(';', $snid);
         $qihao = HN0898Service::getQihao();
         foreach ($snids as $ids){
-            $post_data = [ 'ids'=>$ids, 'period_no' => '20'.$qihao];
+            $post_data = [ 'ids'=>$ids, 'period_no' => '20'.$qihao]; # ids: {68972687339717620}|12 period_no: 20200320048
             $headers = self::$headers;
 
             //$url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER').'?'.http_build_query($post_data);
             $url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER');//.'?'.http_build_query($post_data);
 
             //$rst = CurlService::httpPost($url,$post_data, $headers);
-            $rst = self::postBatchBet($url,$post_data, $headers);
+            $rst = self::postBetCurl($url,$post_data, $headers);
             if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
                 $BettingRecords = BettingRecords::findOne($id);
                 $BettingRecords->cancel_status = 1;
@@ -1025,12 +1024,10 @@ class SevenService extends BaseTZService {
         $data['qihao'] = substr($rst['Data']['previous_period_no'], 2);
         $tzDatas = $rst['Data']['Details'];
         $snidStr = '';
-        /*
         foreach ($tzDatas as $tzData){
             $snidStr .= $tzData['bet_id'].'|1,';
         }
-        */
-        $snidStr = trim('|1,', implode('|1,', $tzDatas));
+        //$snidStr = trim('|1,', implode('|1,', $tzDatas));
         $data['snid'] = trim($snidStr, ',');
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSn','INFO','7时彩获取方案号', $data);
 
@@ -1629,7 +1626,7 @@ class SevenService extends BaseTZService {
             # 获取方案号，记录id, 用于撤单
             $snInfo = SevenService::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
             $snInfo_sn .= $snInfo['sn'].','; # 多次下单需要分开，多次撤单
-            $snInfo_snid .= $snInfo['snid'].';'; # 多次下单需要分开，多次撤单
+            $snInfo_snid .= '{'.$snInfo['snid'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单 # ids: {68972687339717620}|12 period_no: 20200320048
         }
         $data['rst'] = $rst;
 
