@@ -1129,8 +1129,9 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         foreach ($tzDatas as $tzData){
             $snidStr .= $tzData['bet_id'].'|1,';
         }
+        //$snidStr = trim('|1,', implode('|1,', $tzDatas));
         $data['snid'] = trim($snidStr, ',');
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSn','INFO','7时彩获取方案号', $data);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSn','INFO','幸运五获取方案号', $data);
 
         return $data;
     }
@@ -1516,14 +1517,26 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
     }
 
     /**
-     * @decription 新版投注，真实投注入口， 未完待续 2020.03.19
+     * @decription 新版投注，真实投注入口， 未完待续 2018.12.23
      *
+     * @param $tz_system_id
+     * @param $account
+     * @param int $playway
+     * @param $code
+     * @param $single
      * @param $qihao
-     * @param $plan_id
-     * @param $codes
+     * @param $tz_type
+     * @param $buy_type
+     * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
      * @return array
      */
     public function bet($qihao, $plan_id, $codes){
+        $bigFlag = 0;
+        if(strlen($codes)>5000){ # 针对大量号码下注 用post请求
+            $bigFlag = 1;
+            return $this->postBatchBet($qihao, $plan_id, $codes);
+        }
+
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
@@ -1535,26 +1548,21 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
 
         # 验证
-        $rst = self::validateBettingContent($playway, $codes);
+        $rst = self::validateBettingContent($playway,$codes);
         if($rst['status'] != 200){
             $data = ['status'=>300, 'msg'=>$qihao.$rst['msg']];
         }
+        $totalCount = count(explode("@",$codes)); # 注数
+        //p($totalCount);
+        $totalBetMoney = $totalCount * $single; # 投注总金额
+        $way = self::getWay($tz_type);
 
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
         $bet_codes = $codes;
+        $isBigNumsBet = BetService::isBigNumsBet($tz_type);
+        $bet_codes = str_replace(',','',$bet_codes);
+        $bet_codes = str_replace('@',',',$bet_codes);
 
-        $bet_codes = str_replace(',', '', $bet_codes);
-        $bet_codes = str_replace('@', ',', $bet_codes);
-
-        # 缓存锁
-        $m = \Yii::$app->cache;
-        //p([$TzSystemsUsers->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id]);
-        $betKey = BetService::buildBetKey($TzSystemsUsers->username, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
-        if ($betLock = $m->get($betKey)) return ['status' => 303, 'msg' => '已经投注过了', 'key' => $betKey];
-
-        $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
-        $m->set($betKey, 1, $time);
-
+        //$post_data = ['totalCount'=>$totalCount, 'totalBetMoney'=>$totalBetMoney, 'bets'=>json_encode($codes), 'way'=>$way, 'period_no'=>'20'.$qihao, 'bet_log'=>urlencode('投注：'.$totalCount.'/'.$single.'注,总共：'.$totalBetMoney.'元'), ];
         $way = self::getWay($tz_type);
         $number_type = self::getNumberType($tz_type);
         $bet_type = self::getBetLog($tz_type);
@@ -1571,47 +1579,33 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             'period_no' => $qihao,
             'operation_condition' => self::getOperationCondition($tz_type),
         ];
-        //$url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL') . '?' . http_build_query($post_data);
-        $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL');// . '?' . http_build_query($post_data);
 
-        $_t = round(microtime(true) * 1000);
         //$data['code'] = $codes;
-        $headers = [
-            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-            'Accept-Encoding: gunzip, deflate',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Cache-Control: max-age=0',
-            'Connection: keep-alive',
-            'Content-Length:'.strlen(http_build_query($post_data)),
-            //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
-            'Content-Type: application/x-www-form-urlencoded',
-            'Cookie: '.$TzSystemsUsers->cookie,
-            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
-            'Origin: '.$TzSystemsUsers->ssc_domain,
-            'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
-            'Upgrade-Insecure-Requests: 1',
-            $TzSystemsUsers->user_agent,
+        $header = [
+            //'Content-Length:'.strlen(http_build_query($post_data)),
         ];
+
+        $headers = array_merge(self::$headers,$header);
+        //p($headers);
+        //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
+        $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL');//.'?'.http_build_query($post_data);
 
         $account = AdminModel::findOne(self::$user_id)->username;  # 投注用户账号
         //p(['headers'=>$headers, 'url'=>$url, 'account'=>$account, 'post_data'=>$post_data]);
 
         # 缓存锁
         $m = \Yii::$app->cache;
-        $betKey = BetService::buildBetKey($TzSystemsUsers->username, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
+        $betKey = BetService::buildBetKey($account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
-        if(in_array($tz_type, [20, 23, 25, 26])){
-            # 和值投注反应时间比较久，无需返回直接锁住
-            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
-            $m->set($betKey, 1, $time);
-        }
+        //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
+        # 和值投注反应时间比较久，无需返回直接锁住
+        $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+        $m->set($betKey, 1, $time);
+        //}
         # 真实投注
         $start_time = microtime(true);
-        //$rst = CurlService::httpPost($url, $post_data, $headers);
-        //p(rand(), 0);
-        //p(['rst'=>$rst,'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers]);
-        //$rst = CurlService::postCurl($url, $post_data, $headers);
+        //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$rst,'post_data'=>$post_data]);
         $rst = self::postBetCurl($url, $post_data, $headers);
         //$rst = json_encode($rst);
         $end_time = microtime(true);
@@ -1621,16 +1615,24 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 'uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,
                 'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume
             ];
-
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','幸运五星投注记录-投注失败', $tzRst);
-            if(in_array($rst['code'], [302, 305])){ # 余额不足、已关盘、系统维护 302, 305, 306
-                //return $rst;
+            //if($tz_type != 20) $tzRst['code'] = $codes;
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','7时彩投注记录-投注失败', $tzRst);
+            if(!in_array($account, ['aa07']) && in_array($rst['code'], [302, 303, 304, 305, 306])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
+                return $rst;
             }
-            if($rst['code'] != 307) return $rst; # 停押账号测试
+            //return $rst;
         }
 
         $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
         $m->set($betKey, 1, $time);
+
+        //p($rst,0);
+        //$position = UserFollowData::findOne(self::$plan_id)->position;
+        //$position = $position ? $position : self::$position;
+
+        if(!$isBigNumsBet){
+            $codes = implode('@', self::getMySiteCodesStyle($codes, $playway));
+        }
 
         $n = count(explode('@',$codes));
         if(in_array($playway, [2, 3]) && $tz_type != 20){
@@ -1639,7 +1641,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
         }
         # 获取方案号，记录id, 用于撤单
-        $snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+        $snInfo = SevenService::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
 
         $insertData = [
             'playway'=> $playway,  // 投注方式
@@ -1647,13 +1649,13 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             'buy_type'=> $buy_type,  // 购买方向类型
             'uid'=> self::$user_id,  // 投注账号id
             'lottery_type' => $lottery_type, # 彩种
-            'account' => $TzSystemsUsers->username,
+            'account' => $account,
             'plan_id' => $plan_id, # 计划id
             'codes' => (string)$codes,  // 投注号码
             'qihao' => $qihao,  // 投注期号
             'tz_system_id' => self::$tz_system_id,  // 投注系统tz_systems .id
             'sn'=>$snInfo['sn'],
-            'snid'=>$snInfo['snid'],
+            'snid'=>'{'.$snInfo['sn'].'}|'.$n,
             'order_type'=>3, # 单双三字定
             'is_simulate' => 0,  // 是否模拟投注
             'single' => $single,  // 投注倍数
@@ -1662,10 +1664,142 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $insertRst = BetService::_logRecords($insertData);
         self::$headers = [];
 
+        if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','幸运五星时插入记录-真实投注', $logArr);
+        return $data;
+    }
 
-        $data['postRst'] = $insertData;
+    /**
+     * @desc 号码拆解
+     * @param $codes ['8,9,9,9','9,8,9,9','9,9,8,9','9,9,9,8']
+     * @param int $length
+     * @return mixed
+     */
+    public static function splitCodes($codes, $length = 300){
+
+        $codesArr = array_chunk($codes, $length);
+
+        return $codesArr;
+    }
+
+    /**
+     * @desc 批量号码拆解下注
+     * @param $qihao
+     * @param $plan_id
+     * @param $codes
+     * @return array
+     */
+    public static function postBatchBet($qihao, $plan_id, $codes){
+        $tmpCodes = $codes;
+        $tmpCodes = str_replace(',', '', $tmpCodes);
+        $codesArr = explode('@', $tmpCodes);
+
+        $codesArrs = self::splitCodes($codesArr,  2500); # 2500一次
+
+        $plan = UserSysPlans::findOne($plan_id);
+        $playway = $plan->playway ? $plan->playway : 3;
+        $single = $plan->single ? $plan->single : 0.1;
+        $tz_type = $plan->tz_type ? $plan->tz_type : 0;
+        $lottery_type = $plan->lottery_type;
+        //p(['playway'=>$playway, 'totalCount'=>count($codes), 'single'=>$single, 'qihao'=>$qihao, 'tz_type'=>$tz_type, 'buy_type'=>$buy_type,'codes'=>$codes]);
+        if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
+
+        $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
+
+        $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL');//.'?'.http_build_query($post_data);
+        $way = self::getWay($tz_type);
+        $snInfo_sn = '';
+        $snInfo_snid = '';
+        $rst = [];
+        foreach ($codesArrs as $key=>$tmpcodesArr){
+
+            $bet_codes = implode(',', $tmpcodesArr);
+            $post_data = [
+                'bet_number'=>$bet_codes,
+                'bet_money'=>$single,
+                'bet_way'=>$way,
+                'is_xian'=>0,
+                'number_type'=>40,
+                'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
+                'bet_log'=>'[四定位]，合分值范围：[30-35]',
+                'is_package' => 0,
+                'period_no'=>'20'.$qihao,
+                'operation_condition' => self::getOperationCondition(),
+            ];
+
+            # 缓存锁
+            $m = \Yii::$app->cache;
+            $betKey = BetService::buildBetKey($plan->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id).'_'.$key; # 分配下注后面加key
+            //if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
+
+            //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
+            # 和值投注反应时间比较久，无需返回直接锁住
+            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+            $m->set($betKey, 1, $time);
+            //}
+            # 真实投注
+            $start_time = microtime(true);
+            //p(['url'=>$url, 'headers'=>self::$headers, 'rst'=>$rst,'post_data'=>$post_data]);
+            $tmpRst = self::postBetCurl($url, $post_data, self::$headers);
+            $rst[$key] = $tmpRst;
+            //$rst = json_encode($rst);
+            $end_time = microtime(true);
+            $time_consume = ($end_time - $start_time). 's';
+            if($tmpRst['Status'] != 1){
+                $tzRst = [
+                    'uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,
+                    'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>self::$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume
+                ];
+                //if($tz_type != 20) $tzRst['code'] = $codes;
+                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','7时彩分批投注记录-投注失败', $tzRst);
+                if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst['code'], [302, 303, 304, 305, 306])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
+                    return $rst;
+                }
+                //return $rst;
+            }
+
+            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+            $m->set($betKey, 1, $time);
+
+            # 获取方案号，记录id, 用于撤单
+            $snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+            $snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
+            $snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
+        }
+        $data['rst'] = $rst;
+
+        $n = count(explode('@',$codes));
+        if(in_array($playway, [2, 3]) && $tz_type != 20){
+            $totalmoney = SscDataService::calTzTotalMoney($codes, $single, $playway);
+        }else{
+            $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
+        }
+
+        $insertData = [
+            'playway'=> $playway,  // 投注方式
+            'tz_type'=> $tz_type,  // 投注类型
+            'buy_type'=> 1,  // 购买方向类型
+            'uid'=> self::$user_id,  // 投注账号id
+            'lottery_type' => $lottery_type, # 彩种
+            'account' => $plan->account,
+            'plan_id' => $plan_id, # 计划id
+            'codes' => (string)$codes,  // 投注号码
+            'qihao' => $qihao,  // 投注期号
+            'tz_system_id' => self::$tz_system_id,  // 投注系统tz_systems_id
+            'sn'=> trim($snInfo_sn, ';'),
+            'snid'=> trim($snInfo_snid, ';'),
+            'order_type'=>3, # 单双三字定
+            'is_simulate' => 0,  // 是否模拟投注
+            'single' => $single,  // 投注倍数
+            'betting_money'=> round($totalmoney, 2),  // 投注金额
+        ];
+        $insertRst = BetService::_logRecords($insertData);
+        self::$headers = [];
+
+        if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
+        $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>self::$headers, 'bigFlag'=>1, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
 
         return $data;
     }
