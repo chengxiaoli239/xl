@@ -2733,7 +2733,7 @@ class SscDataService extends BaseService {
         $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
         $logArr = ['plan_id'=>$plan_id, 'single_key'=>$single_key, 'next_single_key'=>$next_single_key, 'time'=>$time, 'lottery_type'=>$lottery_type];
         Tool_Common::log('getPlanNextSingle', 'INFO', '倍数获取', $logArr);
-        $m->set($mkey, $next_single_key,$time - 50);
+        $m->set($mkey, $next_single_key,180);
 
         return $nextSingle;
     }
