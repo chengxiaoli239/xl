@@ -2640,7 +2640,7 @@ class SscDataService extends BaseService {
                 $lossQs = self::getLossQs($UserSysPlan->id);
 
                 $logArr[$UserSysPlan->id]['flag'] = $flag; # 中奖标识
-                $logArr[$UserSysPlan->id]['lossQs'] = $lossQs; # 以后期数
+                $logArr[$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
 
                 # 倍数处理，中的计划回第一个倍数
                 $singles = explode('-', $UserSysPlan->singles);
@@ -2654,7 +2654,8 @@ class SscDataService extends BaseService {
                     $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                 }
                 $logArr[$UserSysPlan->id]['single'] = $single; # 最新更新倍数
-                $logArr[$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新倍数singles 的 key
+                $logArr[$UserSysPlan->id]['before_singles_key'] = $codes_hz['singles_key']; # 更新前倍数key
+                $logArr[$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新即将下注的倍数key, singles的 key
 
                 $codes_hz['singles_key'] = $next_single_key;
                 $whereUpdate = ['id'=>$UserSysPlan->id ]; # 更新条件
@@ -2733,7 +2734,7 @@ class SscDataService extends BaseService {
         $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
         $logArr = ['plan_id'=>$plan_id, 'single_key'=>$single_key, 'next_single_key'=>$next_single_key, 'time'=>$time, 'lottery_type'=>$lottery_type];
         Tool_Common::log('getPlanNextSingle', 'INFO', '倍数获取', $logArr);
-        $m->set($mkey, $next_single_key,180);
+        $m->set($mkey, $next_single_key,$time);
 
         return $nextSingle;
     }

@@ -868,7 +868,7 @@ class SevenService extends BaseTZService {
         # 3、获取AKaimai Cookie
         if(strpos($SevenStarHFDirector1Frontend1, 'Akamai_Cookie') === false){
             $AKamaiCookie = self::curlGetSevenCookie($url, array_merge($headers, [$tmpCookieStr]));
-            if($AKamaiCookie) $tmpCookieStr = ';'.$AKamaiCookie;
+            if($AKamaiCookie) $tmpCookieStr = trim(';'.$AKamaiCookie, ';');
             $tmpCookieStr .= ';NOTICE_LOGIN_IN=0';
         }
         //p(['robot7_session_id'=>$robot7_session_id, 'headers'=>$headers, 'SevenStarHFDirector1Frontend1'=>$SevenStarHFDirector1Frontend1, 'AKamaiCookie'=>$AKamaiCookie]);
