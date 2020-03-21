@@ -127,12 +127,14 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SevenService::userInfo(18, 3);p($rst);
+        $rst = SevenService::getSn(18, 3);p($rst); # 用户信息
+        $rst = OpKjService::opSscKjData(8); p($rst); # 处理投注数据
         $loginRst = BaseService::login($id = 44);p($loginRst);
 
         $time = BetService::getBetCacheTime($lottery_type=5, $qihao = '200319036'); p($time);# 投注之后缓存时间
         $rst = SscDataService::getPlanNextSingle(52, 0, $next_single_key, $lottery_type=5);p($rst);
         $qs = SscDataService::getLossQs(52);p($qs);
-        $rst = BetService::isLogin($uid = 18, $tz_system_id = 9);d($rst);
         $rst = BetService::isLogin($uid = 20, $tz_system_id = 9);d($rst);
 
         $id = 38; $rst = BaseService::login($id);p($rst);
@@ -374,7 +376,6 @@ class IndexController extends Controller
         $rst = UserSysPlansService::userSysPlanChange(2);p($rst);
         $rst = StaticService::getYlByCodes('02468,13579,X,X', 2, 18);p($rst);
         $rst = HN0898Service::insertDsYl();p($rst);
-        $rst = OpKjService::opSscKjData(2); p($rst); # 处理投注数据
         $rst = KjDataGet::grabOne();p($rst);
         $captchaCodeRst = Tools::getCaptchaCode(10, 5, '2x2tdrnawlpbli554jlsuf2c');p($captchaCodeRst); # 真实调用验证码接口，收费
         $rst = XlService::login(10, 5);p($rst); # 7时登录
@@ -394,13 +395,11 @@ class IndexController extends Controller
         $codes = BetService::getCodes(2, 3, 20, 1, 0.1, 1, '35,36');p($codes);
         $rst = SevenService::sscIndex(3, 3);p($rst); # 用户信息
         $rst = BetService::userSysPlansTzNow(81, 3); p($rst);
-        $rst = SevenService::getSn(3, 3);p($rst); # 用户信息
         $rst = CqsscSevenDay::getLotteryNo(); p($rst);
         $rst = StaticService::getSameCodes('1221', 1);p($rst);
         $rst = SevenService::synBalance(7); p($rst); # 同步余额
         //p(base64_decode('1324%E5%85%A8%E5%80%92%E5%9B%9B%E5%AE%9A%E5%90%840.1'));
         $rst = BetService::getPlansAllCodesType2(3, 4); p($rst);
-        $rst = SevenService::userInfo(2, 3);p($rst);
 
         p([base64_decode('OTA1Mjg2MTM1MzI3Ng=='), base64_decode( 'MjI5OTE2MTM0MTQ2MQ==') ,base64_decode( 'MjA4ODY2MTM1MzI4Nw==')]);
         //$rst = HN0898Service::getTzList(3, 2);p($rst);
