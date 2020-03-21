@@ -1,0 +1,192 @@
+/*
+   mend-reset.css   补丁重置样式
+   Created by hison on 2017-04-28
+*/
+
+*,
+*:before,
+*:after {
+	-moz-box-sizing: border-box;   /* Firefox 1, probably can drop this */
+	-webkit-box-sizing: border-box;   /* Safari 3-4, also probably droppable */
+	box-sizing: border-box;   /* Everything else */
+}
+
+html {
+	-ms-text-size-adjust: none;
+	-webkit-text-size-adjust: none;
+}
+body{
+	background-color:#f8f8f8;font:12px/1.5 "Microsoft Yahei", Arial, Helvetica, Tahoma, sans-serif;
+	margin: 0 auto; padding:0; min-width: 320px; max-width: 750px; height: 100%; width: 100%;
+}
+body.overflow{overflow:hidden;}
+
+p, ul, ol, dl, dd, h1, h2, h3, h4, h5, h6, img, label, input, button, textarea, select, form {
+	margin: 0; padding:0;
+}
+
+h1, h2, h3, h4, h5, h6, em, i, th, caption {font-style: normal;font-weight: normal;}
+img {
+	border: 0;
+}
+a {
+	color: inherit;
+	text-decoration: none;
+}
+a img {
+	vertical-align: top;
+}
+ul, ol, li {
+	list-style: none;
+}
+input, textarea{border-radius: 0;outline: none;}
+input[type="checkbox"], input[type="radio"] {
+	box-sizing: border-box; /* 1 */
+	padding: 0; /* 2 */
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+th, td {
+	padding: 0;
+}
+
+/** user-defined Attributes ========================================================================== */
+.clearfix {_zoom:1;}
+.clearfix:after {content: "";clear: both;display: block;}
+* html .clearfix { /* for IE6 */
+	display: inline-block;
+}
+* + html .clearfix { /* for IE7 */
+	display: inline-block;
+}
+
+/* 或者(不占位清除浮动) */
+.cls{content: "";clear: both;height: 0px!important;line-height: 0px!important;font-size: 0px!important;overflow: hidden;}
+
+.fl {float: left!important;}
+.fr {float: right!important;}
+.hide{display:none!important;}
+.w100{width:100%;}
+.db {
+	display: block!important;
+}
+.dib {
+	display: inline-block!important;
+	*zoom: 1;
+	*display: inline;
+}
+.pos-rel {
+    position: relative;
+}
+.pos-abs {
+	position: absolute;
+}
+
+.v__top{vertical-align: top!important;} .v__middle{vertical-align: middle!important;}
+.max__img{display:block;margin:0 auto;max-width:100%;vertical-align:top;}
+/* 去除android上a、button、input标签点击产生的边框 */
+a,button,input,label{-webkit-tap-highlight-color:rgba(255,0,0,0);}
+
+.clamp1, .clamp2, .clamp3{display: -webkit-box!important; overflow: hidden; -webkit-box-orient: vertical;}
+.clamp1{-webkit-line-clamp:1;}
+.clamp2{-webkit-line-clamp:2;}
+.clamp3{-webkit-line-clamp:3;}
+
+
+/*背景颜色*/
+.bg--fff{background:#fff;}
+.bg--000{background:#000;}
+/*字体颜色*/
+.ca_c876401{color:#876401;}
+.ca_c666{color:#666;}
+.ca_f40{color:#f40;}
+
+/*间距*/
+.car_mt2{margin-top:.2rem;}
+.car_mt4{margin-top:.4rem;}
+.car_mt5{margin-top:.5rem;}
+.car_mt65{margin-top:.65rem;}
+.car_mt1{margin-top:.1rem;}
+.car_mb1{margin-bottom:.1rem;}
+.car_mt15{margin-top:.15rem;}
+.car_ml1{margin-left:.1rem;}
+.car_ml2{margin-left:.2rem;}
+.car_mr1{margin-right:.1rem;}
+.car_pdt25{ padding-top:.25rem;}
+.car_pdt45{ padding-top:.45rem;}
+/*字体大小*/
+.car_fs62{font-size:.62rem;}
+.car_fs52{font-size:.52rem;}
+.car_fs4{font-size:.4rem;}
+.car_fs3{font-size:.3rem;}
+.car_fs24{font-size:.24rem;}
+.car_fs22{font-size:.22rem;}
+.car_fs18{font-size:.18rem;}
+
+/* 文字省略 */
+.ellipsis {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+/** reset input Placeholder ========================================================================== */
+::-webkit-input-placeholder { /* WebKit browsers */
+	color:#999;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+	color:#999;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+	color:#999;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+	color:#999;
+}
+
+/** reset HTML5 Attributes ========================================================================== */
+article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
+	display: block;
+}
+
+
+/* |:: 定义flex弹性盒子 */
+.flexbox {
+	/*老版本：iOS 6-, Safari 3.1-6*/
+	display: -webkit-box; display: -moz-box; display: -webkit-flex;
+	/*新版本：Chrome*/
+	display: flex;
+	/*设置父元素内部的伸缩子元素项目换行规则：水平排列（row）不换行（nowrap）*/
+	-webkit-box-orient: horizontal;
+	/*老版本：iOS 6-, Safari 3.1-6*/
+	-webkit-flex-flow: row nowrap;
+	/*新版本：Chrome*/
+	flex-flow: row nowrap;
+}
+.flex1 {
+	/*老版本：iOS 6-, Safari 3.1-6*/
+	-webkit-box-flex: 1; -moz-box-flex: 1; -webkit-flex: 1;
+	/*新版本：Chrome*/
+	flex: 1;
+	/*此处无需设置宽度，因为flexbox会自动伸缩*/
+	width: auto!important;
+}
+.flex2 {
+	/*老版本：iOS 6-, Safari 3.1-6*/
+	-webkit-box-flex: 2; -moz-box-flex: 2; -webkit-flex: 2;
+	/*新版本：Chrome*/
+	flex: 2;
+	/*此处无需设置宽度，因为flexbox会自动伸缩*/
+	width: auto!important;
+}
+.flex-direction--column {
+	-webkit-box-direction: normal;
+	-moz-box-direction: normal;
+	-webkit-box-orient: vertical;
+	-moz-box-orient: vertical;
+	-webkit-flex-direction: column;
+	-ms-flex-direction: column;
+	flex-direction: column;
+}

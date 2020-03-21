@@ -30,6 +30,10 @@ return [
             'class' => 'backend\modules\test\Module',
             'layout' => '@app/views/layouts/main.php',
         ],
+        'chat' => [
+            'class' => 'backend\modules\chat\Module',
+            'layout' => '@app/views/layouts/chat.php',
+        ],
         /*
         'wx' => [
             'class' => 'backend\modules\wx\Module',

@@ -1,5 +1,5 @@
 <?php
-namespace backend\modules\kj;
+namespace backend\modules\chat;
 
 class Module extends \yii\base\Module
 {
