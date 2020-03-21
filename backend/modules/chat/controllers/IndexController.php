@@ -8,7 +8,8 @@ use common\service\CommonService;
 
 class IndexController extends Controller
 {
-	public function actionBind(){
-
-	}
+	public function actionIndex(){
+	    $data = [];
+        return $this->render('chat', $data);
+    }
 }

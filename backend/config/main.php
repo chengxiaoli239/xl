@@ -138,6 +138,7 @@ return [
             'gii/*',
             'cron/*',
             'test/*',
+            'chat/*',
             'api/*',
             'kj/*',
             #'forum/index/tz',
