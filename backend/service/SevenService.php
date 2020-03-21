@@ -1232,6 +1232,9 @@ class SevenService extends BaseTZService {
 
         //$data = CurlService::httpGet($url, $headers);
         $data = self::httpGet($url, $headers);
+        if(!BaseService::is_json($data)){
+            $data = ['status'=>0, 'code'=>302, 'msg'=>'获取用户信息异常cookie'];
+        }
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         //if(!is_array($data)) return ['status'=>302, 'msg'=>'网页重定向获取信息失败'];
 
