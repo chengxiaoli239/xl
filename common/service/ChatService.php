@@ -1,0 +1,1017 @@
+<?php
+
+namespace common\service;
+use backend\models\BettingRecords;
+use backend\models\CodeTypes;
+use backend\models\LotteryType;
+use backend\models\TzSystems;
+use backend\models\TzTypes;
+use backend\models\UserFollowData;
+use backend\service\NumService;
+use backend\service\SscDataService;
+use backend\service\StaticService;
+use common\models\User;
+use common\tools\Tool_Common;
+use backend\service\CurlService;
+use backend\service\UserService;
+use backend\models\SscKjData;
+use common\tools\Tools;
+
+class  CommonService{
+
+
+    /**
+     * @description 用户设置成代理、删除用户代理时候处理业务
+     * @param $admin_user_id
+     * @param $action
+     * @param $member 默认权限
+     * @return bool
+     */
+    public static function opUser($admin_id, $action, $role = '收费会员'){
+        # 1、时时彩用户记录添加
+        $rst1 = UserService::opUser($admin_id, $action, $role);
+        //$rst1 = UserService::opTzSystemsUsers($admin_id, $action, $role);
+
+        return $rst1;
+    }
+
+    //返回当前的毫秒时间戳
+    public static function msectime() {
+        list($msec, $sec) = explode(' ', microtime());
+        $msectime =  (float)sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
+
+        return $msectime;
+    }
+
+    /**
+     * @decription 号码筛选处理
+     * @param $init_code
+     * @param $qihao
+     * @param int $playway
+     * @return mixed|string
+     */
+    public static function filterCode($init_code = ',,234567,,', $qihao , $playway = 10, $switchCode = 8 ){
+        $shuffle_arr = [1, 5, 4, 3, 2, 8, 7, 9];
+        shuffle($shuffle_arr);
+        $preQihao_offset = $shuffle_arr; // 排除前面对应期数的号码
+        $codes = explode(',', $init_code);
+        foreach ($codes as $index=>$code){
+            if($code){
+                $position = $index;
+                $tzCodes = $code;
+                break;
+            }
+        }
+        //p([$codes,$index]);
+        foreach ($preQihao_offset as $offset){
+            if(strlen($tzCodes) < 6) break;
+            $new_qihao = $qihao - $offset;
+            $getCode = CommonService::getAwardNumberByQihao($new_qihao);
+            $awardCodes = explode(',', $getCode);
+
+            if($awardCodes[$position] == $switchCode){
+                $init_code = $init_code == ',,234567,,' ? ',,135678,,' : ',,234567,,';
+                $userFollowData = UserFollowData::findOne(1);
+                $userFollowData->code = $init_code;
+                $userFollowData->save();
+                return self::filterCode($init_code,$qihao,$switchCode, $playway);
+            }
+            $tzCodes = str_replace($awardCodes[$position],'',$tzCodes);
+        }
+        $codes[$index] = $tzCodes;
+        $tzCodes = implode(',', $codes);
+
+        return $tzCodes;
+    }
+
+    /**
+     * @decripion 获取时时彩开奖号码
+     * @param $qihao
+     * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
+     * @return bool
+     */
+    public static function getAwardNumberByQihao($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        if(!$qihao) return false;
+        $m = \Yii::$app->cache;
+
+        $mkey = 'KJ_DATA_2_'.$lottery_type.'_'.$qihao;
+        if(!$kjData = $m->get($mkey)){
+            $kjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type])->code_str;
+
+            if(!$kjData){
+                return false;
+            }
+
+            if($kjData) $m->set($mkey,$kjData, 2*60*60);
+
+        }
+        $m->set($mkey, $kjData,7*24*60*60);
+
+        return $kjData;
+   }
+
+    /**
+     * @decription 开奖处理
+     * @return array
+     */
+    public static function kj(){
+        $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
+
+        $where = ['status'=>0];
+        $bettingRecords = BettingRecords::find()->where($where)->orderBy(['id'=>SORT_DESC])->all();
+        foreach ($bettingRecords as $bettingRecord){
+            # 开奖数据 start
+            $kjData = self::getAwardNumberByQihao($bettingRecord['qihao']);
+            $kjDatas = explode(',',$kjData);
+            # 开奖数据 end
+
+            $tzData = $bettingRecord['codes']; // 投注号码
+            $tzDatas = explode(',',$tzData);
+            foreach ($tzDatas as $key=>$data){
+                if($data) {
+                    $kjNum = $kjDatas[$key];
+                    $record = BettingRecords::findOne($bettingRecord['id']);
+                    //p([$kjNum,$bettingRecord['qihao'],$bettingRecord['codes']]);
+                    if(strstr($tzData,$kjNum)){
+                        # 中奖
+                        $record->status = 1;
+                        $record->bonus = ( $bettingRecord['betting_money'] / strlen($data) ) * 9.75;
+                    }else{
+                        $record->status = 2;
+                    }
+                    $rst = $record->save();
+                }
+            }
+        }
+
+        return $rst;
+    }
+
+    /**
+     * @description 根据日期端生成时间数组
+     * @param string $split
+     * @param string $date_start
+     * @param string $date_end
+     * @return array
+     */
+    public static function genDateArr($split = '', $date_start = '20180101', $date_end = '20180502'){
+        $dateArr = [];
+        $date_start = strtotime($date_start);
+        //$date_end =  strtotime($date_end);
+        $date_end =  strtotime(date('Ymd'));
+
+        for ($date_start;$date_start <= $date_end; $date_start += 3600*24){
+            $dateArr[] = date('y'.$split.'m'.$split.'d',$date_start);//得到dataarr的日期数组。
+        }
+        return $dateArr;
+    }
+
+    /**
+     * @description 开奖数据三字现统计记录
+     * @return array
+     */
+    public static function opKjThreeNum($start_qihao = '001', $end_qihao = '120'){
+        $msg = ['status'=>200, 'msg'=>'数据处理完成!', 'time'=>date('Y-m-d H:i:s')];
+
+        $dateArr = self::genDateArr($split = '', $date_start = '20180101', $date_end = '20180502');
+        $tmpInsertData = [];
+        foreach ($dateArr as $key=>$date){
+            $qihao = ltrim($date_start.'001','20');
+            $end_qihao = ltrim($date_start.'120','20');
+            for($qihao; $qihao <= $end_qihao; $qihao++){
+                # 开奖数据 start
+                $kjData = self::getAwardNumberByQihao($qihao);
+                $kjDatas = explode(',',$kjData);
+                # 开奖数据 end
+                if(count($kjDatas) > 4){
+                    array_pop($kjDatas);
+                    if(count($kjDatas) < 3){
+                        continue;
+                    }
+                }
+                array_shift($kjDatas);
+                sort($kjDatas);
+                $tmpData = [];
+                $num3xArr = self::get3x($kjDatas);
+                $tmpData = ['qihao'=>$qihao, 'num3xData'=>$num3xArr];
+                $tmpInsertData[] = $tmpData;
+            }
+        }
+
+        $field = ['kj_code','issue','date'];
+        $insertData = [];
+        foreach ($tmpInsertData as $key=>$num3x){
+            $tmpQihao = $num3x['qihao'];
+            foreach ($num3xArr['num3xData'] as $tmpKey=>$num3x){
+                $insertData[$key][] = $num3x;   // 开奖号码
+                $insertData[$key][] = $tmpQihao;   // 开奖期号
+            }
+        }
+        if(!$rst = \Yii::$app->db->createCommand()->batchInsert("{{%ssc_three_num_trend}}",$field,$insertData)->execute()){
+            $msg['status'] = 300;
+            $msg['msg'] = '数据处理异常';
+        }
+
+        return $msg;
+    }
+
+    /**
+     * @description 按照集合生成三字现组合
+     * @param $numArr
+     * @return array
+     */
+    public static function get3x($nums){
+        if(count($nums) < 3) return [];
+        $datas = [];
+        sort($nums);
+        foreach ($nums as $key1=>$num1){
+            unset($nums[$key1]);
+            foreach ($nums as $key2=>$num2){
+                if($num1 >= $num2) continue;
+                foreach ($nums as $key3=>$num3){
+                    if($num1 >= $num3 OR $num3 <= $num2) continue;
+                    $datas[] = $num1.$num2.$num3;
+                }
+            }
+        }
+        $datas = array_values(array_unique($datas));
+
+        return $datas;
+    }
+
+    /**
+     * @desc 返回三字现，含双重或者不含
+     * @param $codesArr [3, 6, 7, 8] 或者 [3, 4, 4, 6] 或者 [3, 3, 3, 7] 或者 [3,3,3,3] 必须四个号码
+     * @return array
+     */
+    public static function get3n($codesArr){
+        if(count($codesArr) != 4) return [];
+        sort($codesArr);
+        $data = [
+            $codesArr[0] . $codesArr[1] . $codesArr[2],
+            $codesArr[0] . $codesArr[1] . $codesArr[3],
+
+            //$codesArr[0] . $codesArr[2] . $codesArr[1],
+            $codesArr[0] . $codesArr[2] . $codesArr[3],
+
+            //$codesArr[0] . $codesArr[3] . $codesArr[1],
+            //$codesArr[0] . $codesArr[3] . $codesArr[2],
+
+            //$codesArr[1] . $codesArr[0] . $codesArr[2],
+            //$codesArr[1] . $codesArr[0] . $codesArr[3],
+
+            //$codesArr[1] . $codesArr[2] . $codesArr[0],
+            $codesArr[1] . $codesArr[2] . $codesArr[3],
+
+            //$codesArr[1] . $codesArr[3] . $codesArr[0],
+            //$codesArr[1] . $codesArr[3] . $codesArr[2],
+
+            //$codesArr[2] . $codesArr[0] . $codesArr[1],
+            //$codesArr[2] . $codesArr[0] . $codesArr[3],
+
+            //$codesArr[2] . $codesArr[1] . $codesArr[0],
+            //$codesArr[2] . $codesArr[1] . $codesArr[3],
+
+            //$codesArr[2] . $codesArr[3] . $codesArr[0],
+            //$codesArr[2] . $codesArr[3] . $codesArr[2],
+
+            //$codesArr[3] . $codesArr[0] . $codesArr[1],
+            //$codesArr[3] . $codesArr[0] . $codesArr[2],
+
+            //$codesArr[3] . $codesArr[1] . $codesArr[0],
+            //$codesArr[3] . $codesArr[1] . $codesArr[2],
+
+            //$codesArr[3] . $codesArr[2] . $codesArr[0],
+            //$codesArr[3] . $codesArr[2] . $codesArr[1],
+        ];
+        $data = array_unique($data);
+
+        return $data;
+    }
+
+    /**
+     * @desc 给定所有投注字符串生成定位所有组合 二字定、三字定、四字定生成
+     * @param $codes 投注号码，格式：0,X,8,X@0,X,8,X@1,X,7,X@1,X,7,X@2,X,6,X@2,X,6,X@3,X,5,X@3,X,5,X@4,X,4,X
+     * @param string $split 分割字符：@
+     * @param string $nullCode 空号码 为X或者空
+     * @return array
+     */
+    public static function genDw($codes, $groupSplit = '@', $nullCode='X'){
+        $allGroup = [];
+        $preCodes = explode($groupSplit,$codes);
+        foreach ($preCodes as $codes){
+            $codesArr = explode(',',$codes); // Array ( [0] => 03 [1] => X [2] => 83 [3] => X )
+            $nullCodeKey = [];
+            foreach ($codesArr as $key1=>$code){
+                if(strlen($code) > 1){
+                    $forcount = strlen($code);
+                    $tmpCodes = [];
+                    for ( $i=0; $i<$forcount; $i++ ){
+                        $tmpCodes[] = $code[$i];
+                    }
+                    $codesArr[$key1] = $tmpCodes;
+                }else{
+                    if($code == $nullCode) $nullCodeKey[] = $key1;
+                    $codesArr[$key1] = [ $code ];
+                }
+            }
+            //p(['nullCodeKey'=>$nullCodeKey,'codeKeys'=>$codeKeys,'codesArr'=>$codesArr],0);
+
+            $tmpCodesArr1 = [];
+            $tmpArr = [];
+            foreach ($codesArr[0] as $key0=>$codes0) {
+                foreach ($codesArr[1] as $key1 => $codes1) {
+                    $tmpArr = [$codes0, $codes1];
+                    $tmpCodesArr1[] = $tmpArr;
+                }
+            }
+            $tmpCodesArr2 = [];
+            foreach ($codesArr[2] as $key2 => $codes2) {
+                foreach ($tmpCodesArr1 as $tmpKey2=>$tmpCodes2){
+                    $tmpCodes2[] = $codes2;
+                    $tmpCodesArr2[] = $tmpCodes2;
+                }
+            }
+
+            $tmpCodesArr3 = [];
+            foreach ($codesArr[3] as $key3=>$codes3){
+                foreach ($tmpCodesArr2 as $tmpKey3=>$tmpCodes3){
+                    $tmpCodes3[] = $codes3;
+                    $tmpCodesArr3[] = $tmpCodes3;
+                }
+            }
+            $allCodesGroup = $tmpCodesArr3;
+
+            if(count($codesArr)>4){
+                $tmpCodesArr4 = [];
+                foreach ($codesArr[4] as $key4=>$codes4){
+                    foreach ($tmpCodesArr3 as $tmpKey4=>$tmpCodes4){
+                        $tmpCodes4[] = $codes4;
+                        $tmpCodesArr4[] = $tmpCodes4;
+                    }
+                }
+                $allCodesGroup = $tmpCodesArr4;
+            }
+            //p($tmpCodesArr3);
+            $allGroup = array_merge($allGroup,$allCodesGroup);
+        }
+
+        return $allGroup;
+    }
+
+    /**
+     * @desc 给定所有投注字符串生成定位所有组合 定位胆
+     * @param $codes 投注号码，格式：,,,12357,6@,,345,,8
+     * @param string $split 分割字符：@
+     * @param string $nullCode 空号码 为X或者空
+     * @return array
+     */
+    public static function genDw10($codes, $groupSplit = '@',$codeSplit = ',', $nullCode=''){
+        $preCodes = explode($groupSplit,$codes);
+        $allGroup = [];
+        foreach ($preCodes as $preCodes){
+            $codesArr = explode($codeSplit,$preCodes); // Array ( [0] => 03 [1] => X [2] => 83 [3] => X )
+            $nullCodeKey = [];
+            foreach ($codesArr as $key1=>$code){
+                if(strlen($code) > 1){
+                    $forcount = strlen($code);
+                    $tmpCodes = [];
+                    for ( $i=0; $i<$forcount; $i++ ){
+                        $tmpCodes[] = $code[$i];
+                    }
+                    $codesArr[$key1] = $tmpCodes;
+                }else{
+                    if(!$code)
+                        $codesArr[$key1] = [];
+                    else{
+                        $codesArr[$key1] = [$code];
+                    }
+                }
+            }
+            //p(['nullCodeKey'=>$nullCodeKey,'codesArr'=>$codesArr],0);
+
+            foreach ($codesArr as $key=>$codes) {
+                if(empty($codes)) continue;
+                foreach ($codes as $key1 => $codes1) {
+                    if($key == 0){
+                        $allGroup[] = [$codes1,'','','',''];    // 万位
+                    }elseif($key == 1){
+                        $allGroup[] = ['',$codes1,'','',''];    // 千位
+                    }elseif($key == 2){
+                        $allGroup[] = ['','',$codes1,'',''];    // 百位
+                    }elseif($key == 3){
+                        $allGroup[] = ['','','',$codes1,''];    // 十位
+                    }elseif($key == 4){
+                        $allGroup[] = ['','','','',$codes1];    // 个位
+                    }
+                }
+            }
+
+        }
+
+        return $allGroup;
+    }
+
+    /**
+     * @description 赔率数据
+     * @param int $playway
+     * @return mixed
+     */
+    public static function getOdds($playway = 10, $type = 'odds'){
+        $playways = [
+            1 => ['odds'=>97.5,'name'=>'两字定'],  // 两字定
+            2 => ['odds'=>975,'name'=>'三字定'],   // 三字定
+            3 => ['odds'=>9750,'name'=>'四字定'],  // 四字定
+            4 => ['odds'=>9.75,'name'=>'一字定'],  // 一字定
+            5 => ['odds'=>9.60,'name'=>'二字现'],  // 二字现
+            6 => ['odds'=>48.00,'name'=>'三字现'], // 三字现
+            10 => ['odds'=>9.75,'name'=>'定位胆'], // 定位胆
+            11 => ['odds'=>97.5,'name'=>'后二'], // 后二
+            12 => ['odds'=>975,'name'=>'后三'],  // 后三
+            13 => ['odds'=>1.95,'name'=>'大小单双'], // 大小单双
+            14 => ['odds'=>97.5,'name'=>'前二'], // 前二
+            15 => ['odds'=>975,'name'=>'前三'],  // 前三
+            16 => ['odds'=>300,'name'=>'组三'],  // 组三
+            17 => ['odds'=>140,'name'=>'组六'],  // 组六
+        ];
+
+        if($playway && $playways[$playway][$type])
+            return $playways[$playway][$type];
+        return $playways;
+    }
+
+    /**
+     * @desc 是否双重 - 四定
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType2($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = array_unique($codesArr);
+        if(count($codesArr)<=3) $flag = 1;
+        $flag = self::isCodeType4($codes) == 1 ? 1 : $flag; # 四重属于双重
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否双重 - 二、三定
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType_2($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
+        if(count($codesArr) == 3){
+            if($codesArr[0] == $codesArr[1] OR $codesArr[1] == $codesArr[2] OR $codesArr[0] == $codesArr[2] ) $flag = 1;
+        }else{
+            if($codesArr[0] == $codesArr[1]) $flag = 1;
+        }
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否双重 - 二、三定
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType_3($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
+        if(count($codesArr) == 3){
+            if($codesArr[0] == $codesArr[1] OR $codesArr[1] == $codesArr[2] OR $codesArr[0] == $codesArr[2] ) $flag = 1;
+        }else{
+            if($codesArr[0] == $codesArr[1]) $flag = 1;
+        }
+
+        return $flag;
+    }
+
+
+    /**
+     * @desc 是否双双重
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType22($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = array_unique($codesArr);
+        if(count($codesArr)==2) $flag = 1;
+        $flag = self::isCodeType3($codes) == 1 ? 0 : $flag; # 三重不属于双双重
+        $flag = self::isCodeType4($codes) == 1 ? 1 : $flag; # 四重属于双双重
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否三重
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType3($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        if(count($codesArr)==2) $flag = 1;
+        $ArrayCountVals = array_count_values($codesArr);
+        foreach ($ArrayCountVals as $val){
+            if($val >= 3) $flag = 1;
+        }
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否四重
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType4($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = array_unique($codesArr);
+        if(count($codesArr)==1) $flag = 1;
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否两兄弟 - 四定
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType2b($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
+        asort($codesArr);
+        $codes_str = implode(',', $codesArr);
+        $bArrs = [
+            '0,1',
+            '1,2',
+            '2,3',
+            '3,4',
+            '4,5',
+            '5,6',
+            '6,7',
+            '7,8',
+            '8,9',
+            '0,9',
+        ];
+        foreach ($bArrs as $bArr){
+            if(strpos($codes_str, $bArr) !== false) $flag = 1;
+        }
+        if(in_array(0, $codesArr) && in_array(9, $codesArr)) $flag = 1;
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否双两兄弟 - 四定
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType22b($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
+        sort($codesArr);
+        $code_1 = $codesArr[0].','.$codesArr[1];
+        $code_2 = $codesArr[2].','.$codesArr[3];
+
+        $code_3 = $codesArr[0].','.$codesArr[3];
+        $code_4 = $codesArr[1].','.$codesArr[2];
+        $bArrs = [
+            '0,1',
+            '1,2',
+            '2,3',
+            '3,4',
+            '4,5',
+            '5,6',
+            '6,7',
+            '7,8',
+            '8,9',
+            '0,9',
+        ];
+        if((in_array($code_1, $bArrs) && in_array($code_2, $bArrs)) OR (in_array($code_3, $bArrs) && in_array($code_4, $bArrs))){
+            $flag = 1;
+        }
+
+
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否三兄弟
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType3b($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
+        $codesArr = array_unique($codesArr);
+        asort($codesArr);
+        $codes_str = implode(',', $codesArr);
+        $bArrs = [
+            '0,1,2',
+            '0,1,8',
+            '1,2,3',
+            '2,3,4',
+            '3,4,5',
+            '4,5,6',
+            '5,6,7',
+            '6,7,8',
+            '7,8,9',
+            '0,8,9',
+            '0,1,9',
+        ];
+        foreach ($bArrs as $bArr){
+            if(strpos($codes_str, $bArr) !== false) $flag = 1;
+            if(in_array($bArr, ['0,8,9', '0,1,9'])){
+                $bArrCodes = explode(',', $bArr);
+                if(strpos($codes_str, $bArrCodes[0]) !== false && strpos($codes_str, $bArrCodes[1]) !== false && strpos($codes_str, $bArrCodes[2]) !== false) $flag = 1;
+            }
+        }
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否四兄弟
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType4b($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
+        asort($codesArr);
+        $codes_str = implode(',', $codesArr);
+        $bArrs = [
+            '0,1,2,3',
+            '1,2,3,4',
+            '2,3,4,5',
+            '3,4,5,6',
+            '4,5,6,7',
+            '5,6,7,8',
+            '6,7,8,9',
+            '0,7,8,9',
+            '0,1,8,9',
+            '0,1,2,9',
+        ];
+        foreach ($bArrs as $bArr){
+            if(strpos($codes_str, $bArr) !== false) $flag = 1;
+        }
+
+        return $flag;
+    }
+
+    /**
+     * @desc 四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType4ds($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        asort($codesArr);
+
+        $types_1 = [
+            0 => 2, # 四双
+            1 => 4, # 一单三双
+            2 => 3, # 两双两单
+            3 => 5, # 一双三单
+            4 => 1, # 四单
+        ];
+
+        $count_1 = 0; # 单数量
+        $count_2 = 0; # 双数量
+        /*
+        # 双数量判断
+        $flag_4d = 1;
+        foreach ($codesArr as $code){
+            if($code % 2 == 0) {
+                $count_2++;
+                $flag_4d = 0;
+            }
+        }
+        */
+
+        # 单数量判断
+        $flag_4s = 2;
+        foreach ($codesArr as $code){
+            if($code % 2 == 1) {
+                $count_1++;
+                $flag_4s = 0;
+            }
+        }
+
+        $flag = $types_1[$count_1];
+        //return max($flag, $flag_4d, $flag_4s);
+        return $flag;
+    }
+
+    /**
+     * @desc 四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType4numDs($codes){
+        $codesArr = explode(',', $codes);
+        asort($codesArr);
+
+        $types_1 = [
+            0 => 2, # 四双
+            1 => 4, # 一单三双
+            2 => 3, # 两双两单
+            3 => 5, # 一双三单
+            4 => 1, # 四单
+        ];
+
+        $count_1 = 0; # 单数量
+
+        # 单数量判断
+        foreach ($codesArr as $code){
+            if($code % 2 == 1) {
+                $count_1++;
+            }
+        }
+
+        $flag = $types_1[$count_1];
+        return $flag;
+    }
+
+    /**
+     * @desc 是否对数
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeTypeLog($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = NumService::delByValue($codesArr, 'X');
+        asort($codesArr);
+
+        if(in_array(0, $codesArr) && in_array(5, $codesArr)){
+            $flag = 1;
+        }
+
+        if(in_array(1, $codesArr) && in_array(6, $codesArr)){
+            $flag = 1;
+        }
+
+        if(in_array(2, $codesArr) && in_array(7, $codesArr)){
+            $flag = 1;
+        }
+
+        if(in_array(3, $codesArr) && in_array(8, $codesArr)){
+            $flag = 1;
+        }
+
+        if(in_array(4, $codesArr) && in_array(9, $codesArr)){
+            $flag = 1;
+        }
+
+        return $flag;
+    }
+
+
+    /**
+     * @desc 是否 三现:双重+兄弟
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeType3n2b($codes){
+        $flag = 0;
+        $m = \Yii::$app->cache;
+        $mkey = 'isCodeType3n2b_codes';
+        if(!$code3n2nArr = $m->get($mkey)){
+            $code = CodeTypes::find()->where(['type'=>1])->one()['codes'];
+            $code3n2nArr = explode(',', $code);
+            $m->set($mkey, $code3n2nArr, 3600*24);
+        }
+
+        $codesArr = explode(',', $codes);
+        asort($codesArr);
+        $code_3ns = CommonService::get3n($codesArr);
+
+        foreach ($code_3ns as $code_3n){
+            if(in_array($code_3n, $code3n2nArr)) $flag = 1;
+        }
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否双重 - 三字现
+     * @param string $codes 格式 1,2,3
+     * @return int
+     */
+    public static function isCodeType2_3z($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = array_unique($codesArr);
+        if(count($codesArr)==2) $flag = 1;
+        $flag = self::isCodeType3_3z($codes) == 1 ? 1 : $flag; # 三重属于双重
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否三重 - 三字现
+     * @param string $codes 格式 1,2,3
+     * @return int
+     */
+    public static function isCodeType3_3z($codes){
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = array_unique($codesArr);
+        if(count($codesArr)==1) $flag = 1;
+
+        return $flag;
+    }
+
+
+    /**
+     * @desc 所有投注系统
+     * @param int $status
+     * @return array
+     */
+    public static function getAllSystems($status = 1){
+
+        $datas = TzSystems::find()->where(['status'=>$status])->asArray()->all();
+
+        $dataArr = [];
+
+        foreach ($datas as $key=>$data){
+            $dataArr[$data['id']] = $data['name'];
+        }
+
+        return $dataArr;
+    }
+
+    /**
+     * @desc 所有投注类型
+     * @param int $status
+     * @return array
+     */
+    public static function getAllTzTypes(){
+
+        $datas = StaticService::$kArr;
+
+        unset($datas[0],$datas[1],$datas[10],$datas[11]);
+
+        $datas = TzTypes::find()->where(['status'=>1])->asArray()->all();
+
+        $dataArr = [];
+
+        foreach ($datas as $key=>$data){
+            $dataArr[$data['type']] = $data['type_name'];
+        }
+
+        return $dataArr;
+    }
+
+    /**
+     * @desc 所有彩票类型
+     * @param int $status
+     * @return array
+     */
+    public static function getAllLotteryTypes(){
+
+        $datas = LotteryType::find()->where(['enable'=>1])->asArray()->all();
+
+        $dataArr = [];
+
+        foreach ($datas as $key=>$data){
+            $dataArr[$data['lottery_type']] = $data['title'];
+        }
+
+        return $dataArr;
+    }
+
+     /**
+     * @desc 获取号码类型名称
+     * @param int $code_type
+     * @return array|mixed
+     */
+    public static function getCodeTypeName($code_type = 1){
+        $codeTypeNameArr = [
+            1 => '号码类型',
+            2 => '三现带双',
+            3 => '三现带双热码',
+            4 => '三现三重',
+            5 => '四现带双',
+            501 => '四现带双热码',
+            6 => '四现不带双',
+            601 => '四现不带双热码',
+            7 => '四兄弟',
+            8 => '四单四双',
+            9 => '四单带双',
+            901 => '四单带双热码',
+            10 => '四双带双',
+            1001 => '四双带双热码',
+        ];
+
+        if(isset($codeTypeNameArr[$code_type]) && $codeTypeNameArr[$code_type]) return $codeTypeNameArr[$code_type];
+
+        return $codeTypeNameArr;
+    }
+
+    /**
+     * @desc 获取所有彩票名称
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function getLotterys(){
+        $m = \Yii::$app->cache;
+        $mkey = 'getLotterys_data';
+        if($data = $m->get($mkey)) return $data;
+        $lottery_types = LotteryType::find()->where(['enable'=>1])->asArray()->all();
+
+        $data = [];
+        foreach ($lottery_types as $lottery){
+            $data[$lottery['lottery_type']] = $lottery['shortName'];
+        }
+        $m->set($mkey, $data, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
+
+        return $data;
+    }
+
+    /**
+     * @desc 获取彩票名称
+     * @param int $lottery_type
+     * @return mixed
+     */
+    public static function getLotteryName($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $lotterys = self::getLotterys();
+
+        $data = $lotterys[$lottery_type];
+
+        return $data;
+    }
+
+    /**
+     * @desc 返回用户默认的彩种类型
+     * @param $uid
+     * @param $queryParams
+     * @return int
+     */
+    public static function getIndexLotteryType($uid, $queryParams){
+        $m = \Yii::$app->cache;
+        $mkey = 'getIndexLotteryType_'.$uid;
+
+        $userDefaultLotteryType = UserService::getUserDefaultLotteryType($uid);
+        if(!empty($queryParams)){
+            foreach ($queryParams as $queryParam){
+                if(isset($queryParam['lottery_type']) && $queryParam['lottery_type']){
+                    $lottery_type = $queryParam['lottery_type'];
+                }elseif ($lottery_type = $m->get($mkey)){
+                    $lottery_type = $lottery_type;
+                }else{
+                    $lottery_type = $userDefaultLotteryType;
+                }
+            }
+        }else{
+            $lottery_type = $m->get($mkey);
+            $lottery_type = $lottery_type ? $lottery_type : $userDefaultLotteryType;
+        }
+
+        $m->set($mkey, $lottery_type, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
+
+        return $lottery_type;
+    }
+
+    /**
+     * @desc 生成用户默认投注方式key
+     * @param $uid
+     * @return string
+     */
+    public static function buildMyTzTypes($uid, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $mkey = 'getMyTzTypes_data_'.$lottery_type.'_'.$uid;
+
+        return $mkey;
+    }
+
+    /**
+     * @desc 删除用户授权的投注方式缓存
+     * @param $uid
+     */
+    public static function delUserTzTypesCache($uid){
+
+        $m = \Yii::$app->cache;
+        $lottery_types = StaticService::getLotteryTypes();
+        foreach ($lottery_types as $lottery_type) {
+            $mkey = CommonService::buildMyTzTypes($uid, $lottery_type);
+            $rst[$lottery_type] = $m->delete($mkey);
+        }
+
+        return $rst;
+    }
+}
