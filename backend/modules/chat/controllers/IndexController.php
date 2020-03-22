@@ -24,7 +24,7 @@ class IndexController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $data = ['status'=>200, 'uid'=>'xxx', 'msg'=>'登录成功'];
-        $data['rst'] = ChatService::send();
+        $data['rst'] = ChatService::send($data);
         return $data;
     }
 }

@@ -7,6 +7,7 @@ class Hsw {
 	public function __construct(){
 		File::init();
 		$this->serv = new swoole_websocket_server("0.0.0.0",9876);
+        //$this->serv = new swoole_websocket_server("154.83.17.96",9876);
 		$this->serv->set( ['task_worker_num' => 8 ]);
 		$this->serv->on("open",[$this,"onOpen"]);
 		$this->serv->on("message", [$this,"onMessage"]);

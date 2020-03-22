@@ -9,7 +9,8 @@ class File {
 	
 	private function __construct() {
 		global $rooms;
-        $this->online_dir = ONLINE_DIR;
+		$rooms = \Yii::$app->params['CHAT_ROOMS'];
+        $this->online_dir = \Yii::$app->params['ONLINE_DIR'];
 		foreach($rooms as $_k => $_v){
 			$this->checkDir($this->online_dir.$_k.'/', true);
 		}

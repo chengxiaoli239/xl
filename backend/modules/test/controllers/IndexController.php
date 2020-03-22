@@ -32,6 +32,7 @@ use common\kj\cqssc\CqsscSevenDay;
 use common\kj\ssc\Lucky5;
 use common\kj\xjssc\XjSsc;
 use common\models\AdminModel;
+use common\service\ChatService;
 use common\service\CommonService;
 use common\tools\KjDataGet;
 use backend\service\BaseNumService;
@@ -127,6 +128,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data['rst'] = ChatService::send();p($data);
         $rst = SevenService::userInfo(18, 3);p($rst);
         $rst = SevenService::getSn(18, 3);p($rst); # 用户信息
         $rst = OpKjService::opSscKjData(8); p($rst); # 处理投注数据
