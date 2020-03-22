@@ -1,4 +1,5 @@
 <?php
+namespace common\service\chat\classes\file;
 class File {
 	private static $instance;
 	protected $online_dir;

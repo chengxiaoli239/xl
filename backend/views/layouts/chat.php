@@ -10,7 +10,7 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use common\widgets\Alert;
 
-AppAsset::register($this);
+ChatAsset::register($this);
 
 $this->registerCssFile('@web/statics/css/soon.css');
 

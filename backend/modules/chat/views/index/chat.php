@@ -1,3 +1,5 @@
+<script src="http://lt.sm0898.com/chat_statics/js/jquery-1.8.0.min.js"></script>
+<script src="http://lt.sm0898.com/chat_statics/js/fingerprint2.min.js"></script>
 <style>
     .button-area li {
         height: .7rem;
@@ -13,7 +15,7 @@
     }
 
     .vkb{
-        background:url(/chat_static/images/wei-scene/vkb.png) no-repeat;
+        background:url(/chat_statics/images/wei-scene/vkb.png) no-repeat;
         background-size:100% 100%;
         width:.6rem;
         height:.6rem;
@@ -44,7 +46,7 @@
             </div>
             <!-- //消息列表-->
             <ul class="clearfix" id="J__chatMsgList">
-                <li class="time"><span>2020-03-21 16:02:51</span></li>
+                <li class="time"><span><?php echo date("Y-m-d H:i:s");?></span></li>
             </ul>
         </div>
     </div>
@@ -63,7 +65,27 @@
         <!-- 操作区(表情-选择)-->
         <div class="wschat__choice-panel" style="overflow: hidden; display: block;">
             <div class="similar-area button-area" style="overflow: hidden; display: block;">
-                <ul id="keyboard"><li class="item">查</li><li class="item">上</li><li class="item">下</li><li class="item">二</li><li class="item">三</li><li class="item">四</li><li class="item">定</li><li class="item">现</li><li class="item">←</li><li class="item">奖</li><li class="item">大</li><li class="item">千</li><li class="item">1</li><li class="item">2</li><li class="item">3</li><li class="item">除</li><li class="item">双重</li><li class="item">兄弟</li><li class="item">走</li><li class="item">小</li><li class="item">百</li><li class="item">4</li><li class="item">5</li><li class="item">6</li><li class="item">取</li><li class="item">三重</li><li class="item">两</li><li class="item">倒</li><li class="item">单</li><li class="item">十</li><li class="item">7</li><li class="item">8</li><li class="item">9</li><li class="item">。</li><li class="item">四重</li><li class="item">清除</li><li class="item">全</li><li class="item">双</li><li class="item">个</li><li class="item">0</li><li class="item">.</li><li class="item">X</li><li class="item">各</li><li class="item">合</li><li class="item">换行</li></ul>
+                <ul id="keyboard">
+                    <li class="item">查</li><li class="item">上</li><li class="item">下</li>
+                    <li class="item">二</li><li class="item">三</li><li class="item">四</li>
+                    <li class="item">定</li><li class="item">现</li><li class="item">←</li>
+
+                    <li class="item">奖</li><li class="item">大</li><li class="item">千</li>
+                    <li class="item">1</li><li class="item">2</li><li class="item">3</li>
+                    <li class="item">除</li><li class="item">双重</li><li class="item">兄弟</li>
+
+                    <li class="item">走</li><li class="item">小</li><li class="item">百</li>
+                    <li class="item">4</li><li class="item">5</li><li class="item">6</li>
+                    <li class="item">取</li><li class="item">三重</li><li class="item">两</li>
+
+                    <li class="item">倒</li><li class="item">单</li><li class="item">十</li>
+                    <li class="item">7</li><li class="item">8</li><li class="item">9</li>
+                    <li class="item">。</li><li class="item">四重</li><li class="item">清除</li>
+
+                    <li class="item">全</li><li class="item">双</li><li class="item">个</li>
+                    <li class="item">0</li><li class="item">.</li><li class="item">X</li>
+                    <li class="item">各</li><li class="item">合</li><li class="item">换行</li>
+                </ul>
             </div>
         </div>
         <!--</div>-->
@@ -71,6 +93,8 @@
 </div>
 
 <script type="text/javascript">
+    var uid = '1238120025638916098'
+    var url_domain = 'http://154.83.17.96:6060'
     $(function(){
         var buttonArray = [
             '查','上','下','二','三','四','定','现','←',
@@ -85,9 +109,7 @@
         }
         $('#keyboard').html(keyboard);
     });
-</script>
 
-<script type="text/javascript">
     function isEmpty(obj){
         if(typeof obj == "undefined" || obj == null || obj == ""){
             return true;
@@ -146,7 +168,6 @@
             }
         });
 
-
         /* ——聊天编辑器区域 */
         var $editor = $(".J__editorText"), editor = $editor[0];
         $('#keyboard li').on('click', function(e){
@@ -186,10 +207,16 @@
         var $chatMsgList = $("#J__chatMsgList");
         $(".J__submitCnt").on("click", function(){
             //判断内容是否为空
-            if(isEmpty($editor.val())){
+            //var avatar = "http://154.83.17.96:6060/static/images/avatar/f1/f_3.jpg";
+            var avatar = "static/images/avatar/f1/f_3.jpg";
+            var text = $editor.val();
+            var json = {"type": 4,"name": "下注", "uid":uid, "avatar": avatar, "message": text, "c":'text',"roomid":"a", "fd":5};
+            if(isEmpty($editor.val()+'1235')){
                 return;
             }
-            ws.send($editor.val());
+            // JSON.stringify(json)
+            //ws.send($editor.val());
+            ws.send(JSON.stringify(json));
 
             //清空输入框
             $editor.val('');
@@ -200,9 +227,7 @@
 </script>
 
 <script type="text/javascript">
-
     var ws;
-
     // 重连
     function reconnect(url) {
         if (reconnect.lockReconnect) return;
@@ -250,23 +275,27 @@
 
     var clipboard;
 
+    //  监听消息
     function onmessage(event){
         //appendln("receive:" + event.data);
         //alert(event.data);
+        var uid = '1238120025638916098'
 
         var ret = JSON.parse(event.data);
         var $chatMsgList = $("#J__chatMsgList");
+        console.log(ret);
 
-        if(ret.succeed){
+        console.log(ret)
+        if(ret.code == 0){
             for(var i = 0; i < ret.data.length; i++){
                 var message = ret.data[i];
                 var tpl_msg = '';
                 if(message.msgType == 0){
-                    var className = '1238120025638916098' == message.fromId?'me':'others';
+                    var className = (uid == message.fromId)?'me':'others';
                     tpl_msg = [
                         '<li class="msg-item '+className+'" data-id="'+message.id+'">\
 							<div class="avatar">\
-								<img src="/avatar/'+message.imgUrl+'" />\
+								<img src="'+url_domain + "/" +message.avatar+'" />\
 							</div>\
 							<div class="content">\
 								<p class="author">'+message.name+'</p>\
@@ -280,7 +309,7 @@
                     tpl_msg = [
                         '<li class="msg-item others image" data-id="'+message.id+'">\
 							<div class="avatar">\
-								<img src="/avatar/'+message.imgUrl+'" />\
+								<img src="'+url_domain + "/" +message.avatar+'" />\
 							</div>\
 							<div class="content">\
 								<p class="author">'+message.name+'</p>\
@@ -302,35 +331,39 @@
             }
             mescroll.scrollTo(0, 300);
             //$('.ws__chatMsg-panel').animate({scrollTop: 0}, 300);
-        }else{
-            var message = ret;
+        }else if(ret.code == 1){  // 系统提示
+            notice(ret.msg)
+        }else if(ret.code == 2){  // 聊天
+            var message = ret.data;
             var tpl_msg = '';
-            if(message.msgType == 0){
-                var className = '1238120025638916098' == message.fromId?'me':'others';
+            console.log(ret);
+            if(message.roomid == 'a'){
+                var className = (uid == message.from_id) ? 'me':'others';
+                console.log(className)
                 tpl_msg = [
                     '<li class="msg-item '+className+'" data-id="'+message.id+'">\
 							<div class="avatar">\
-								<img src="/avatar/'+message.imgUrl+'" />\
+								<img src="'+url_domain + "/" +message.avatar+'" />\
 							</div>\
 							<div class="content">\
 								<p class="author">'+message.name+'</p>\
 								<div class="msg">\
-									<div class="plain">' + message.content.replace(/\n/g,'<br>') + '</div>\
+									<div class="plain">' + message.newmessage.replace(/\n/g,'<br>') + '</div>\
 								</div>\
 							</div>\
 						</li>'
                 ].join("");
-            }else if(message.msgType == 1){
+            }else if(message.from_id == uid){
                 tpl_msg = [
                     '<li class="msg-item others image" data-id="'+message.id+'">\
 							<div class="avatar">\
-								<img src="/avatar/'+message.imgUrl+'" />\
+								<img src="'+url_domain + "/" +message.avatar+'" />\
 							</div>\
 							<div class="content">\
 								<p class="author">'+message.name+'</p>\
 								<div class="msg">\
 									<div class="picture">\
-										<img class="J__img" src="' + message.content + '" />\
+										<img class="J__img" src="' + message.newmessage + '" />\
 									</div>\
 								</div>\
 						</div>\
@@ -360,9 +393,9 @@
     };
 
     function notice(msg){
-        //var $chatMsgList = $("#J__chatMsgList");
-        //$chatMsgList.append('<li class="time"><span>'+msg+'</span></li>');
-        //$('.ws__chatMsg-panel').animate({scrollTop: $("#J__chatMsgList").height()}, 300);
+        var $chatMsgList = $("#J__chatMsgList");
+        $chatMsgList.append('<li class="time"><span>'+msg+'</span></li>');
+        $('.ws__chatMsg-panel').animate({scrollTop: $("#J__chatMsgList").height()}, 300);
     }
 
     function getHistory(){
@@ -376,15 +409,26 @@
         }, 1000);
     }
 
-</script>
-<script>
+
+    function getQueryVariable(variable)
+    {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if(pair[0] == variable){return pair[1];}
+        }
+        return(false);
+    }
+
     var fp = new Fingerprint2();
     fp.get(function(result) {
+        var uid = '1238120025638916098'
         //var url = 'http://153.83.17.96:8090/';
         var url = 'http://lt.sm0898.com/chat/index/bind';
-        $.post(url,{uid:'1238120025638916098', fingerprint:result}, function(ret){
-            if(ret.succeed){
-                createWebSocket("ws://"+location.hostname+":8080/ws?uid=1238120025638916098&fp="+result);
+        $.post(url,{uid:uid, fingerprint:result}, function(ret){
+            if(ret.status == 200){
+                createWebSocket("ws://154.83.17.96:9876/ws?uid="+uid+"&fp="+result);
             }
         }, 'json');
     });

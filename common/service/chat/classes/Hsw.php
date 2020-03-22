@@ -1,5 +1,8 @@
 <?php
-class hsw {
+namespace common\service\chat\classes;
+
+use common\service\chat\classes\file\File;
+class Hsw {
 	private $serv = null;
 	public function __construct(){
 		File::init();
