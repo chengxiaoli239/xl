@@ -285,17 +285,17 @@
         var $chatMsgList = $("#J__chatMsgList");
         console.log(ret);
 
-        console.log(ret)
         if(ret.code == 0){
             for(var i = 0; i < ret.data.length; i++){
                 var message = ret.data[i];
+                var avatar = str.indexOf("http://") != -1? message.avatar : url_domain + message.avatar;
                 var tpl_msg = '';
                 if(message.msgType == 0){
                     var className = (uid == message.fromId)?'me':'others';
                     tpl_msg = [
                         '<li class="msg-item '+className+'" data-id="'+message.id+'">\
 							<div class="avatar">\
-								<img src="'+url_domain + "/" +message.avatar+'" />\
+								<img src="'+avatar+'" />\
 							</div>\
 							<div class="content">\
 								<p class="author">'+message.name+'</p>\
@@ -309,7 +309,7 @@
                     tpl_msg = [
                         '<li class="msg-item others image" data-id="'+message.id+'">\
 							<div class="avatar">\
-								<img src="'+url_domain + "/" +message.avatar+'" />\
+								<img src="'+avatar+'" />\
 							</div>\
 							<div class="content">\
 								<p class="author">'+message.name+'</p>\
@@ -335,6 +335,7 @@
             notice(ret.msg)
         }else if(ret.code == 2){  // 聊天
             var message = ret.data;
+            var avatar = message.avatar.indexOf("http://") != -1? message.avatar : url_domain + message.avatar;
             var tpl_msg = '';
             console.log(ret);
             if(message.roomid == 'a'){
@@ -343,7 +344,7 @@
                 tpl_msg = [
                     '<li class="msg-item '+className+'" data-id="'+message.id+'">\
 							<div class="avatar">\
-								<img src="'+url_domain + "/" +message.avatar+'" />\
+								<img src="'+avatar+'" />\
 							</div>\
 							<div class="content">\
 								<p class="author">'+message.name+'</p>\
@@ -357,7 +358,7 @@
                 tpl_msg = [
                     '<li class="msg-item others image" data-id="'+message.id+'">\
 							<div class="avatar">\
-								<img src="'+url_domain + "/" +message.avatar+'" />\
+								<img src="'+avatar+'" />\
 							</div>\
 							<div class="content">\
 								<p class="author">'+message.name+'</p>\
