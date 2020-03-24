@@ -129,6 +129,7 @@ class IndexController extends Controller
 
     public function actionDw(){
         $data['rst'] = ChatService::send();p($data);
+
         $rst = SevenService::userInfo(18, 3);p($rst);
         $rst = SevenService::getSn(18, 3);p($rst); # 用户信息
         $rst = OpKjService::opSscKjData(8); p($rst); # 处理投注数据

@@ -3,6 +3,7 @@ namespace common\service;
 
 use common\service\chat\classes\Hsw;
 //use common\service\Sock;
+//use Swoole\Http\Client;
 class  ChatService{
     public $master;
 
@@ -10,7 +11,38 @@ class  ChatService{
 
         $data = ['status'=>200, 'msg'=>'测试发送消息'];
         //$hsw = new Hsw();
+        //p($hsw);
+
+        # 1
+        $client = new Swoole\Client(SWOOLE_SOCK_TCP);
+        if (!$client->connect('lt.sm0898.com', \Yii::$app->params['CHAT_PORT'], -1)) {
+            exit("connect failed. Error: {$client->errCode}\n");
+        }
+        $client->send("hello world\n");
+        echo $client->recv();
+        $client->close();
+        p('llll');
+
+        #  2
+        $client = new Client('lt.sm0898.com', \Yii::$app->params['CHAT_PORT'], false);
+
+        $client->on('message', function (Client $cli, \Swoole\WebSocket\Frame $frame){
+            //接收对方返回的数据
+            $data = json_decode($frame->data, true);
+            var_dump($data);
+        });
+
+        $client->upgrade('/额外参数', function (Client $cli) {
+            //推送数据 请求
+            $cli->push('推送内容');
+        });
+        p('cxxx');
+
+
+        $fp = fsockopen("ws://lt.sm0898.com", 9876);
+        p($fp);
         //$rst = $hsw->sendMsg($data);
+        //p([\Yii::$app->params['CHAT_DOMAIN'], \Yii::$app->params['CHAT_PORT']]);
         $master = self::WebSocket(\Yii::$app->params['CHAT_DOMAIN'], \Yii::$app->params['CHAT_PORT']);
 
         p($master);
@@ -22,6 +54,7 @@ class  ChatService{
     public static function WebSocket($address, $port){
         error_reporting(E_ALL ^ E_NOTICE);
         ob_implicit_flush();
+
 
         //连接服务器
         $sk = new Sock($address, $port);
