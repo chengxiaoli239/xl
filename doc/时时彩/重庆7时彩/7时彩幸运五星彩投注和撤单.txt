@@ -423,6 +423,13 @@ _: 1555052477064
 	operation_condition: {"symbol":"X","isXian":0,"firstNumber":"01","secondNumber":"","thirdNumber":"","fourthNumber":"","fifthNumber":"0","numberType":50,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[],"symbolPositions":[0,0,0,0,0],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0,0]}
 
 
+# 异步抓取投注列表，后面用于撤单
+期号获取投注列表：
+http://f9.cq779835.xyz:5678/App/Index?_=1585054648303#!lastbill.betlist|betlist?last=1&period_number=20200324052
+
+获取投注列表
+Request URL: http://f9.cq779835.xyz:5678/Member/GetMemberBetList?period_number=20200324052&is_winning=&pageindex=2&_=1585055446243
+Request Method: GET
 
 
 

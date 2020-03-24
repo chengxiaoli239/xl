@@ -12,7 +12,11 @@ class  ChatService{
         $data = ['status'=>200, 'msg'=>'测试发送消息'];
         //$hsw = new Hsw();
         //p($hsw);
+        $param = ['scene'=>'主动发送消息'];
+        $rst = self::postCurl($param);
+        p($rst);
 
+        /*
         # 1
         $client = new Swoole\Client(SWOOLE_SOCK_TCP);
         if (!$client->connect('lt.sm0898.com', \Yii::$app->params['CHAT_PORT'], -1)) {
@@ -22,6 +26,7 @@ class  ChatService{
         echo $client->recv();
         $client->close();
         p('llll');
+        */
 
         #  2
         $client = new Client('lt.sm0898.com', \Yii::$app->params['CHAT_PORT'], false);
@@ -69,6 +74,21 @@ class  ChatService{
         //$this->e('Server Started : '.date('Y-m-d H:i:s'));
         //$this->e('Listening on   : '.$address.' port '.$port);
         return $server;
+    }
+
+    public static function postCurl($data){
+
+        $curl = curl_init();
+        curl_setopt($curl, "http://lt.sm0898.com:9876");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER);
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+
+        $rst = curl_exec($curl);
+        curl_close($curl);
+
+        return $rst;
     }
 
 }

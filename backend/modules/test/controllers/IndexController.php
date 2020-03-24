@@ -130,6 +130,9 @@ class IndexController extends Controller
     public function actionDw(){
         $data['rst'] = ChatService::send();p($data);
 
+        $rst = KjDataGet::insertKjData('2020032238', 6, '8,4,1,5,2');p($rst);
+        $rst = KjDataGet::insertKjData('2020032239', 6, '0,1,6,8,6');p($rst);
+        $rst = KjDataGet::insertKjData('2020032240', 6, '5,1,1,2,7');p($rst);
         $rst = SevenService::userInfo(18, 3);p($rst);
         $rst = SevenService::getSn(18, 3);p($rst); # 用户信息
         $rst = OpKjService::opSscKjData(8); p($rst); # 处理投注数据
@@ -239,7 +242,6 @@ class IndexController extends Controller
         //$str = '{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}'; //p(json_decode($str, true)); d(strpos($str, "\"Status\":1") !== false);
         $rst = SevenService::login(19, 3);p($rst);
         $rst = SevenService::synBalance(5);p($rst);
-        $rst = KjDataGet::insertKjData('20191009224', 8, '9,5,0,8,7');p($rst);
         $data = Lucky5::batch(); $kjDatas = array_reverse($data); //p($kjDatas);
         foreach ($kjDatas as $key=>$dataInfo){
             $rst = KjDataGet::insertKjData($dataInfo['expect'], 8, $dataInfo['opencode']);
