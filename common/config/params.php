@@ -25,7 +25,9 @@ return [
     'BASE_DATA_CACHE_TIME' => 1200,
 
     # 聊天室配置
+    'CHAT_DOMAIN' => 'lt.sm0898.com', # 域名
     'ONLINE_DIR' => '/tmp/chat/', # 缓存目录
+    'CHAT_PORT' => '9876', # web socket端口
     'CHAT_STORAGE' => 'file', # 缓存类型：文件
     'CHAT_ROOMS' => [ 'a'=>'唐', 'b'=>'伯', 'c'=>'虎', 'd'=>'点', 'e'=>'秋', 'f'=>'香' ], # , 'b =>'伯', 'c'=>'虎', 'd'=>'点', 'e'=>'秋', 'f'=>'香'
 

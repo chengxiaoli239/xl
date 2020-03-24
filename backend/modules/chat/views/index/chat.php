@@ -288,7 +288,7 @@
         if(ret.code == 0){
             for(var i = 0; i < ret.data.length; i++){
                 var message = ret.data[i];
-                var avatar = str.indexOf("http://") != -1? message.avatar : url_domain + message.avatar;
+                var avatar = str.indexOf("http://") != -1? message.avatar : url_domain + '/' + message.avatar;
                 var tpl_msg = '';
                 if(message.msgType == 0){
                     var className = (uid == message.fromId)?'me':'others';
@@ -335,7 +335,7 @@
             notice(ret.msg)
         }else if(ret.code == 2){  // 聊天
             var message = ret.data;
-            var avatar = message.avatar.indexOf("http://") != -1? message.avatar : url_domain + message.avatar;
+            var avatar = message.avatar.indexOf("http://") != -1? message.avatar : url_domain + '/' + message.avatar;
             var tpl_msg = '';
             console.log(ret);
             if(message.roomid == 'a'){
@@ -425,11 +425,12 @@
     var fp = new Fingerprint2();
     fp.get(function(result) {
         var uid = '1238120025638916098'
-        //var url = 'http://153.83.17.96:8090/';
-        var url = 'http://lt.sm0898.com/chat/index/bind';
+        //var domain = '154.83.17.96';
+        var domain = 'lt.sm0898.com';
+        var url = "http://"+domain+"/chat/index/bind";
         $.post(url,{uid:uid, fingerprint:result}, function(ret){
             if(ret.status == 200){
-                createWebSocket("ws://154.83.17.96:9876/ws?uid="+uid+"&fp="+result);
+                createWebSocket("ws://"+domain+":9876/ws?uid="+uid+"&fp="+result);
             }
         }, 'json');
     });
