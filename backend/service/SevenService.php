@@ -1555,7 +1555,7 @@ class SevenService extends BaseTZService {
         $tmpCodes = str_replace(',', '', $tmpCodes);
         $codesArr = explode('@', $tmpCodes);
 
-        $codesArrs = self::splitCodes($codesArr,  2500); # 2500一次
+        $codesArrs = self::splitCodes($codesArr,  1700); # 2500一次
 
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
