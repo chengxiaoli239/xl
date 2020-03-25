@@ -30,7 +30,7 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'status')->textInput() ?-->
 
-                    <?= $form->field($model, 'ssc_domain')->textInput(['maxlength' => true])->label('网盘地址(注：前缀必须含http://或https://)') ?>
+                    <?= $form->field($model, 'ssc_domain')->textInput(['maxlength' => true])->label('网盘地址(格式：http://f9.ww666733.xyz:5678，或http://f9.ww666733.xyz)') ?>
 
                     <?= $form->field($model, 'cookie')->textInput(['maxlength' => true]) ?>
 
