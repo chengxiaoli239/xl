@@ -433,7 +433,7 @@ class UserSysPlansService extends BaseService {
             }
         }
 
-        if(!in_array($tz_type, [20, 23])){
+        if(!in_array($tz_type, [20, 23, 24])){ # 四定和值、上奖全倒、直码
             $post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
         }
 
