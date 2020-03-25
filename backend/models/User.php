@@ -19,6 +19,7 @@ use Yii;
  * @property string $ssc_domain 网盘地址
  * @property string $cookie 登陆cookie
  * @property string $cookie2
+ * @property int $is_agent 是否代理
  * @property int $status 状态
  * @property int $created_at
  * @property int $updated_at
@@ -39,7 +40,7 @@ class User extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['admin_id', 'expire_time', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['admin_id', 'expire_time', 'is_agent', 'status', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'simulate_balance'], 'number'],
             [['email', 'created_at', 'updated_at'], 'required'],
             [['username', 'account', 'email'], 'string', 'max' => 255],
@@ -67,6 +68,7 @@ class User extends \common\models\base\BaseModel
             'ssc_domain' => Yii::t('app', '网盘地址'),
             'cookie' => Yii::t('app', '登陆cookie'),
             'cookie2' => Yii::t('app', 'Cookie2'),
+            'is_agent' => Yii::t('app', '是否代理'),
             'status' => Yii::t('app', '状态'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
