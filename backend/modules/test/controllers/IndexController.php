@@ -128,11 +128,12 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $data['rst'] = ChatService::send();p($data);
+        //$data['rst'] = ChatService::send();p($data);
 
-        $rst = KjDataGet::insertKjData('2020032238', 6, '8,4,1,5,2');p($rst);
-        $rst = KjDataGet::insertKjData('2020032239', 6, '0,1,6,8,6');p($rst);
-        $rst = KjDataGet::insertKjData('2020032240', 6, '5,1,1,2,7');p($rst);
+        $rst = KjDataGet::insertKjData('200325016', 5, '6,1,2,1,2');//p($rst);
+        $rst = KjDataGet::insertKjData('200325017', 5, '0,7,8,0,7');//p($rst);
+        $rst = KjDataGet::insertKjData('200325018', 5, '0,9,0,0,5');//p($rst);
+        $rst = KjDataGet::insertKjData('200325019', 5, '1,7,6,2,8');p($rst);
         $rst = SevenService::userInfo(18, 3);p($rst);
         $rst = SevenService::getSn(18, 3);p($rst); # 用户信息
         $rst = OpKjService::opSscKjData(8); p($rst); # 处理投注数据

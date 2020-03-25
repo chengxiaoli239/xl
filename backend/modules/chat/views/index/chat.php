@@ -210,7 +210,7 @@
             //var avatar = "http://154.83.17.96:6060/static/images/avatar/f1/f_3.jpg";
             var avatar = "static/images/avatar/f1/f_3.jpg";
             var text = $editor.val();
-            var json = {"type": 4,"name": "下注", "uid":uid, "avatar": avatar, "message": text, "c":'text',"roomid":"a", "fd":5};
+            var json = {"class":"Index", "action":"index", "param":{"type": 4,"name": "wangyegao_tz", "uid":uid, "avatar": avatar, "message": text, "c":'text',"roomid":1}};
             if(isEmpty($editor.val()+'1235')){
                 return;
             }
@@ -263,7 +263,7 @@
             $('.J__submitCnt').removeAttr('disabled');
         };
         ws.onclose = function () {
-            notice('掉线了，正在重连...')
+            //notice('掉线了，正在重连...')
             reconnect(wsUrl);
         };
         ws.onerror = function (err) {
@@ -283,8 +283,7 @@
 
         var ret = JSON.parse(event.data);
         var $chatMsgList = $("#J__chatMsgList");
-        console.log(ret);
-
+        console.log(ret.code);
         if(ret.code == 0){
             for(var i = 0; i < ret.data.length; i++){
                 var message = ret.data[i];
@@ -334,12 +333,14 @@
         }else if(ret.code == 1){  // 系统提示
             notice(ret.msg)
         }else if(ret.code == 2){  // 聊天
+            // 1、微信群聊： "wxid1":"群房间号", "wxid2":"发送的用户id"  2、私聊 "wxid1":"wxid_875i1kgd38x122", "wxid2":"_"
             var message = ret.data;
             var avatar = message.avatar.indexOf("http://") != -1? message.avatar : url_domain + '/' + message.avatar;
             var tpl_msg = '';
             console.log(ret);
-            if(message.roomid == 'a'){
-                var className = (uid == message.from_id) ? 'me':'others';
+            if(message.roomid > 0){ // 群聊
+                //var className = (uid == message.from_id) ? 'me':'others';
+                var className = (message.mine == 1) ? 'me':'others';
                 console.log(className)
                 tpl_msg = [
                     '<li class="msg-item '+className+'" data-id="'+message.id+'">\
@@ -354,7 +355,7 @@
 							</div>\
 						</li>'
                 ].join("");
-            }else if(message.from_id == uid){
+            }else { // 私聊
                 tpl_msg = [
                     '<li class="msg-item others image" data-id="'+message.id+'">\
 							<div class="avatar">\
@@ -428,9 +429,10 @@
         //var domain = '154.83.17.96';
         var domain = 'lt.sm0898.com';
         var url = "http://"+domain+"/chat/index/bind";
+        console.log(result);
         $.post(url,{uid:uid, fingerprint:result}, function(ret){
             if(ret.status == 200){
-                createWebSocket("ws://"+domain+":9876/ws?uid="+uid+"&fp="+result);
+                createWebSocket("ws://"+domain+":9501/ws?uid="+uid+"&fp="+result);
             }
         }, 'json');
     });
