@@ -1824,7 +1824,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
      * @return array
      */
-    public function bet_bak($qihao, $plan_id, $codes){
+    public function bet_bakxx($qihao, $plan_id, $codes){
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
