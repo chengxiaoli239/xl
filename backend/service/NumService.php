@@ -616,12 +616,35 @@ class NumService extends BaseService {
      */
     public static function getAllCombination4p($codes, $codeSplit = '', $code_type = 4){
         if(strlen($codes)<5) return [];
-        if($code_type == 5){ # 五位二定
+        if($code_type == 5) { # 五位二定
             $codesArr = [];
             $twoNums = NumService::getTwoNums($codes);
-            foreach ($twoNums as $twoNum){
+            foreach ($twoNums as $twoNum) {
                 $codesArr = array_merge($codesArr, NumService::getTwo5ByTwoNums($twoNum[0], $twoNum[1]));
             }
+        }elseif ($code_type == 4){
+            $tmpArr = [];
+            $len = strlen($codes);
+            for ($i = 0; $i < $len; $i++) {
+                $tmpArr[] = $codes[$i]; // [1,2,3,4,5,6]
+            }
+            $tmpCodesArr = []; // ['1234', '2345', '4567'....]
+            for($i=0; $i<$len-3; $i++){
+                for($j=$i+1; $j<$len; $j++){
+                    for($k=$j+1; $k<$len; $k++){
+                        for($l=$k+1; $l<$len; $l++){
+                            $tmpStr = $tmpArr[$i].$tmpArr[$j].$tmpArr[$k].$tmpArr[$l];
+                            $tmpCodesArr[] = $tmpStr;
+                        }
+                    }
+
+                }
+            }
+            $codesArr = [];
+            foreach ($tmpCodesArr as $k => $v) {
+                $codesArr = array_merge($codesArr, NumService::getAllCombination4($v, $type=1, $code_type));
+            }
+            $codesArr = array_unique($codesArr);
         }else {
             $tmpArr = [];
             $len = strlen($codes);
@@ -658,13 +681,14 @@ class NumService extends BaseService {
             //p($codes4Arr);
             //$codes4Arr = array_unique($codes4Arr);
             $tmpCodesArr = [];
+            //p($codes4Arr);
             foreach ($codes4Arr as $k => $v) {
                 $tmpCodesArr[] = implode('', $v);
             }
             $tmpCodesArr = array_unique($tmpCodesArr);
             $codesArr = [];
             foreach ($tmpCodesArr as $k => $v) {
-                $codesArr = array_merge($codesArr, NumService::getAllCombination4($v, $code_type));
+                $codesArr = array_merge($codesArr, NumService::getAllCombination4($v, $type = 1, $code_type));
             }
         }
 
