@@ -8,9 +8,10 @@ use Yii;
  * This is the model class for table "{{%agent_users}}".
  *
  * @property int $id
+ * @property int $agent_id 代理ID
  * @property string $name 账号名称
  * @property string $desc 备注
- * @property string $images 系统类型id，lt_tz_systems.id
+ * @property string $images 头像
  * @property string $balance 用户积分
  * @property int $is_tuo 托
  * @property int $is_chi 吃
@@ -40,8 +41,8 @@ class AgentUsers extends \common\models\base\BaseModel
     public function rules()
     {
         return [
+            [['agent_id', 'is_tuo', 'is_chi', 'is_cha', 'is_bind', 'status', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'all_bet_money'], 'number'],
-            [['is_tuo', 'is_chi', 'is_cha', 'is_bind', 'status', 'created_at', 'updated_at'], 'integer'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['name', 'desc', 'token'], 'string', 'max' => 64],
@@ -57,9 +58,10 @@ class AgentUsers extends \common\models\base\BaseModel
     {
         return [
             'id' => Yii::t('app', 'ID'),
+            'agent_id' => Yii::t('app', '代理ID'),
             'name' => Yii::t('app', '账号名称'),
             'desc' => Yii::t('app', '备注'),
-            'images' => Yii::t('app', '系统类型id，lt_tz_systems.id'),
+            'images' => Yii::t('app', '头像'),
             'balance' => Yii::t('app', '用户积分'),
             'is_tuo' => Yii::t('app', '托'),
             'is_chi' => Yii::t('app', '吃'),
