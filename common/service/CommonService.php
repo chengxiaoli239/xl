@@ -1014,4 +1014,27 @@ class  CommonService{
 
         return $rst;
     }
+
+    /**
+     * @desc status或者是否多选框处理成1个值   数组->单个
+     * @param $post
+     * @param array $fields
+     * @return mixed
+     */
+    public static function opPreStatusFields($post, $fields = [], $model = ''){
+        if(empty($fields)) return $post;
+
+        $data = $post[$model];
+        foreach ($fields as $field){
+            if(isset($data[$field]) && !empty($data[$field])){
+                if(count($data[$field])>1) unset($post[$model][$field]);
+                $post[$model][$field] = $post[$model][$field][0];
+            }else{
+                unset($post[$model][$field]);
+            }
+
+        }
+
+        return $post;
+    }
 }

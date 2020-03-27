@@ -89,4 +89,7 @@ return [
     '(not set)' => '',
     'Static Code Type Profits Perdates' => '号码类型利润(天)',
     'Static Code Type Profits Months' => '号码类型利润(月)',
+
+    'Agent Users' => '会员管理',
+    'Create Agent Users' => '添加',
 ];

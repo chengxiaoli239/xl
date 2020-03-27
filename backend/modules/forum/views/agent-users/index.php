@@ -33,22 +33,38 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
+                        //'id',
                         'name',
-                        'desc',
+                        //'desc',
                         'images',
                         'balance',
                         //'is_tuo',
-                        //'is_chi',
-                        //'is_cha',
-                        //'all_bet_money',
-                        //'is_bind',
-                        //'bet_url:url',
-                        //'token',
-                        //'status',
+                        ['attribute'=>'is_tuo',// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                $url0 = "/forum/agent-users/switch-status?fields=is_tuo&id=".$model->id.'&status=1'; # 点击开启
+                                $url1 = "/forum/agent-users/switch-status?fields=is_tuo&id=".$model->id.'&status=0'; # 点击关闭
+                                if($model->status == 1){
+                                    $txt = "<font color='green'>已开启</font>" ;
+                                    return Html::a($txt, $url1, ['title' => '点击关闭']);
+                                }
+                                if(!$model->status){
+                                    $txt = "<font color='red'>已关闭</font>";
+                                    return Html::a($txt, $url0, ['title' => '点击开启']);
+                                }
+                                //return $model->snid;
+                            }
+                        ],
+                        'is_chi',
+                        'is_cha',
+                        'all_bet_money',
+                        'is_bind',
+                        'bet_url:url',
+                        'token',
+                        'status',
                         //'created_at',
                         //'updated_at',
-                        //'update_time',
+                        'update_time',
 
                         ['class' => 'yii\grid\ActionColumn'],
                     ],

@@ -1,5 +1,5 @@
-<script src="http://lt.sm0898.com/chat_statics/js/jquery-1.8.0.min.js"></script>
-<script src="http://lt.sm0898.com/chat_statics/js/fingerprint2.min.js"></script>
+<script src="http://120.77.157.40:8090/chat_statics/js/jquery-1.8.0.min.js"></script>
+<script src="http://120.77.157.40:8090/chat_statics/js/fingerprint2.min.js"></script>
 <style>
     .button-area li {
         height: .7rem;
@@ -427,8 +427,8 @@
     fp.get(function(result) {
         var uid = '1238120025638916098'
         //var domain = '154.83.17.96';
-        var domain = 'lt.sm0898.com';
-        var url = "http://"+domain+"/chat/index/bind";
+        var domain = '120.77.157.40';
+        var url = "http://"+domain+":8090/chat/index/bind";
         console.log(result);
         $.post(url,{uid:uid, fingerprint:result}, function(ret){
             if(ret.status == 200){

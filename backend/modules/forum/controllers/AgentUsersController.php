@@ -2,6 +2,8 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\AgentUsersService;
+use backend\service\HN0898Service;
 use Yii;
 use backend\models\AgentUsers;
 use backend\models\searchs\AgentUsers as AgentUsersSearch;
@@ -66,13 +68,28 @@ class AgentUsersController extends BaseController
     {
         $model = new AgentUsers();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        AgentUsersService::opPreData($this->_post);
+        //p($this->_post);
+        if ($model->load($this->_post) && $model->save()) {
+            return $this->redirect(['index']);
         }
 
         return $this->render('create', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * @desc 更新投注状态
+     * @param $id
+     * @param $status
+     * @return \yii\web\Response
+     */
+    public function actionSwitchStatus($id,$status, $field){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $rst = AgentUsersService::updateAgentUsersStatus($id, $status, $this->_user_id, $field);
+
+        return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$rst['lottery_type']]);
     }
 
     /**

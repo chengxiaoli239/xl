@@ -20,31 +20,30 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'desc')->textInput(['maxlength' => true]) ?>
 
-                    <?= $form->field($model, 'images')->textInput(['maxlength' => true]) ?>
+                    <!--?= $form->field($model, 'images')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'balance')->textInput(['maxlength' => true]) ?>
+                    <!--?= $form->field($model, 'balance')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'is_tuo')->textInput() ?>
+                    <?= $form->field($model, 'is_tuo')->checkboxList(['1'=>'否', '2'=>'是'])?>
 
-                    <?= $form->field($model, 'is_chi')->textInput() ?>
+                    <?= $form->field($model, 'is_chi')->checkboxList(['1'=>'否', '2'=>'是'])?>
 
-                    <?= $form->field($model, 'is_cha')->textInput() ?>
+                    <?= $form->field($model, 'is_cha')->checkboxList(['1'=>'否', '2'=>'是'])?>
 
-                    <?= $form->field($model, 'all_bet_money')->textInput(['maxlength' => true]) ?>
+                    <?= $form->field($model, 'is_bind')->checkboxList(['1'=>'否', '2'=>'是'])?>
+                    <!--?= $form->field($model, 'all_bet_money')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'is_bind')->textInput() ?>
+                    <!--?= $form->field($model, 'bet_url')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'bet_url')->textInput(['maxlength' => true]) ?>
+                    <!--?= $form->field($model, 'token')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'token')->textInput(['maxlength' => true]) ?>
+                    <!--?= $form->field($model, 'status')->textInput() ?-->
 
-                    <?= $form->field($model, 'status')->textInput() ?>
+                    <!--?= //$form->field($model, 'created_at')->textInput() ?-->
 
-                    <?= $form->field($model, 'created_at')->textInput() ?>
+                    <!--?= //$form->field($model, 'updated_at')->textInput() ?-->
 
-                    <?= $form->field($model, 'updated_at')->textInput() ?>
-
-                    <?= $form->field($model, 'update_time')->textInput() ?>
+                    <!--?= //$form->field($model, 'update_time')->textInput() ?-->
 
                     <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
