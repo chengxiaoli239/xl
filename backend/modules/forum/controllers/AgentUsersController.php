@@ -66,9 +66,10 @@ class AgentUsersController extends BaseController
      */
     public function actionCreate()
     {
+        $agent_id = \Yii::$app->user->id;
         $model = new AgentUsers();
 
-        AgentUsersService::opPreData($this->_post);
+        AgentUsersService::opPreData($this->_post, $agent_id);
         //p($this->_post);
         if ($model->load($this->_post) && $model->save()) {
             return $this->redirect(['index']);
@@ -101,10 +102,12 @@ class AgentUsersController extends BaseController
      */
     public function actionUpdate($id)
     {
+        $agent_id = \Yii::$app->user->id;
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        AgentUsersService::opPreData($this->_post, $agent_id);
+        if ($model->load($this->_post) && $model->save()) {
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [

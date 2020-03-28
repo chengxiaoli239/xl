@@ -16,7 +16,7 @@ use  yii;
 
 class AgentUsersService extends BaseService {
 
-    public static function opPreData(&$post){
+    public static function opPreData(&$post, $agent_id=''){
 
         $fields = ['is_tuo', 'is_cha', 'is_chi', 'is_bind'];
         $post = CommonService::opPreStatusFields($post, $fields, $model = 'AgentUsers');
@@ -25,6 +25,7 @@ class AgentUsersService extends BaseService {
         if(!$id = $data['id']){
             $post[$model]['created_at'] = time();
         }
+        $post[$model]['agent_id'] = $agent_id;
         $post[$model]['updated_at'] = time();
 
         return $post;
@@ -40,10 +41,11 @@ class AgentUsersService extends BaseService {
     {
         if(!$uid) return ['status'=>300, 'msg'=>'用户id为空'];
         $model = AgentUsers::findOne(['agent_id' => $uid, 'id' => $id]);
-        if($model) return ['status'=>301, 'msg'=>'找不到记录'];
+        if(!$model) return ['status'=>301, 'msg'=>'找不到记录'];
         $m = \Yii::$app->cache;
         $mkey = 'updateSysPlansStatus_'.$field.'_'.$id.'_'.$status;
-        if($rst = $m->get($mkey)) return ['status'=>302, 'msg'=>'正在修改'];
+        //if($rst = $m->get($mkey)) return ['status'=>302, 'msg'=>'正在修改'];
+        //p([$id, $status, $uid , $field]);
 
         $model->$field = (int)$status;
         $model->updated_at = time();
