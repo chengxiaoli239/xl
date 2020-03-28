@@ -18,9 +18,9 @@ class AgentUsers extends AgentUsersModel
     public function rules()
     {
         return [
-            [['id', 'is_tuo', 'is_chi', 'is_cha', 'is_bind', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'agent_id', 'is_tuo', 'is_chi', 'is_cha', 'is_bind', 'status', 'created_at', 'updated_at'], 'integer'],
             [['name', 'desc', 'images', 'bet_url', 'token', 'update_time'], 'safe'],
-            [['balance', 'all_bet_money'], 'number'],
+            [['balance', 'all_bet_money', 'today_profits_loss', 'all_profits_loss'], 'number'],
         ];
     }
 
@@ -61,12 +61,15 @@ class AgentUsers extends AgentUsersModel
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'agent_id' => $this->agent_id,
             'balance' => $this->balance,
             'is_tuo' => $this->is_tuo,
             'is_chi' => $this->is_chi,
             'is_cha' => $this->is_cha,
-            'all_bet_money' => $this->all_bet_money,
             'is_bind' => $this->is_bind,
+            'all_bet_money' => $this->all_bet_money,
+            'today_profits_loss' => $this->today_profits_loss,
+            'all_profits_loss' => $this->all_profits_loss,
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
