@@ -9,10 +9,10 @@ use Yii;
  *
  * @property int $id
  * @property int $agent_id 代理ID
- * @property string $name 账号名称
+ * @property string $name 账号
  * @property string $desc 备注
  * @property string $images 头像
- * @property string $balance 用户积分
+ * @property string $balance 积分
  * @property int $is_tuo 托
  * @property int $is_chi 吃
  * @property int $is_cha 查
@@ -20,9 +20,9 @@ use Yii;
  * @property string $all_bet_money 投分
  * @property string $today_profits_loss 今日盈亏
  * @property string $all_profits_loss 总盈亏
- * @property string $bet_url 游戏链接
+ * @property string $bet_url 链接
  * @property string $token token
- * @property int $status 系统开启状态
+ * @property int $status 开启状态
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -61,10 +61,10 @@ class AgentUsers extends \common\models\base\BaseModel
         return [
             'id' => Yii::t('app', 'ID'),
             'agent_id' => Yii::t('app', '代理ID'),
-            'name' => Yii::t('app', '账号名称'),
+            'name' => Yii::t('app', '账号'),
             'desc' => Yii::t('app', '备注'),
             'images' => Yii::t('app', '头像'),
-            'balance' => Yii::t('app', '用户积分'),
+            'balance' => Yii::t('app', '积分'),
             'is_tuo' => Yii::t('app', '托'),
             'is_chi' => Yii::t('app', '吃'),
             'is_cha' => Yii::t('app', '查'),
@@ -72,9 +72,9 @@ class AgentUsers extends \common\models\base\BaseModel
             'all_bet_money' => Yii::t('app', '投分'),
             'today_profits_loss' => Yii::t('app', '今日盈亏'),
             'all_profits_loss' => Yii::t('app', '总盈亏'),
-            'bet_url' => Yii::t('app', '游戏链接'),
+            'bet_url' => Yii::t('app', '链接'),
             'token' => Yii::t('app', 'token'),
-            'status' => Yii::t('app', '系统开启状态'),
+            'status' => Yii::t('app', '开启状态'),
             'created_at' => Yii::t('app', '创建时间'),
             'updated_at' => Yii::t('app', '更新时间'),
             'update_time' => Yii::t('app', '更新时间'),
