@@ -24,13 +24,13 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'balance')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'is_tuo')->checkboxList(['1'=>'否', '2'=>'是'])?>
+                    <?= $form->field($model, 'is_tuo')->checkboxList(['0'=>'否', '1'=>'是'])?>
 
-                    <?= $form->field($model, 'is_chi')->checkboxList(['1'=>'否', '2'=>'是'])?>
+                    <?= $form->field($model, 'is_chi')->checkboxList(['0'=>'否', '1'=>'是'])?>
 
-                    <?= $form->field($model, 'is_cha')->checkboxList(['1'=>'否', '2'=>'是'])?>
+                    <?= $form->field($model, 'is_cha')->checkboxList(['0'=>'否', '1'=>'是'])?>
 
-                    <?= $form->field($model, 'is_bind')->checkboxList(['1'=>'否', '2'=>'是'])?>
+                    <?= $form->field($model, 'is_bind')->checkboxList(['0'=>'否', '1'=>'是'])?>
                     <!--?= $form->field($model, 'all_bet_money')->textInput(['maxlength' => true]) ?-->
 
                     <!--?= $form->field($model, 'bet_url')->textInput(['maxlength' => true]) ?-->

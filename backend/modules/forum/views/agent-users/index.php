@@ -20,8 +20,14 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="adv-table editable-table ">
                 <div class="clearfix">
                     <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'Create Agent Users'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                        <?= Html::a("+", ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
+                    <!--div class="btn-group">
+                        <input type="text" class="form-control" id="balance-val" placeholder="积分：负扣分，正加分">
+                    </div>
+                    <div class="btn-group">
+                        <?= Html::a(Yii::t('app', 'Update Users balance'), '#', ['class' => 'btn btn-success update-balance', 'style' => 'margin-bottom:15px;']) ?>
+                    </div-->
                 </div>
 
     <?php Pjax::begin(); ?>
@@ -31,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
                     'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
+                        ['class' => 'yii\grid\SerialColumn','headerOptions'=>['width'=>'3%']],
 
                         //'id',
                         //'name',
@@ -41,7 +47,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->name;
                             }
                         ],
-                        //'desc',
                         //'images',
                         ['attribute'=>'images','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
@@ -56,6 +61,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->balance;
                             }
                         ],
+                        //'desc',
+                        ['attribute'=>'desc','headerOptions'=>['width'=>'8%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                return $model->desc;
+                            }
+                        ],
                         //'is_tuo',
                         ['attribute'=>'is_tuo','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
@@ -63,11 +75,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $url0 = "/forum/agent-users/switch-status?field=is_tuo&id=".$model->id.'&status=1'; # 点击开启
                                 $url1 = "/forum/agent-users/switch-status?field=is_tuo&id=".$model->id.'&status=0'; # 点击关闭
                                 if($model->is_tuo == 1){
-                                    $txt = "<font color='green'>已开启</font>" ;
+                                    $txt = "<font color='green'>√</font>" ;
                                     return Html::a($txt, $url1, ['title' => '点击关闭']);
                                 }
                                 if(!$model->is_tuo){
-                                    $txt = "<font color='red'>已关闭</font>";
+                                    $txt = "<font color='red'>X</font>";
                                     return Html::a($txt, $url0, ['title' => '点击开启']);
                                 }
                                 //return $model->snid;
@@ -80,28 +92,44 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $url0 = "/forum/agent-users/switch-status?field=is_chi&id=".$model->id.'&status=1'; # 点击开启
                                 $url1 = "/forum/agent-users/switch-status?field=is_chi&id=".$model->id.'&status=0'; # 点击关闭
                                 if($model->is_chi == 1){
-                                    $txt = "<font color='green'>已开启</font>" ;
+                                    $txt = "<font color='green'>√</font>" ;
                                     return Html::a($txt, $url1, ['title' => '点击关闭']);
                                 }
                                 if(!$model->is_chi){
-                                    $txt = "<font color='red'>已关闭</font>";
+                                    $txt = "<font color='red'>X</font>";
                                     return Html::a($txt, $url0, ['title' => '点击开启']);
                                 }
                                 return '';
                             }
                         ],
                         //'is_cha',
+                        ['attribute'=>'is_private','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                $url0 = "/forum/agent-users/switch-status?field=is_private&id=".$model->id.'&status=1'; # 点击开启
+                                $url1 = "/forum/agent-users/switch-status?field=is_private&id=".$model->id.'&status=0'; # 点击关闭
+                                if($model->is_private == 1){
+                                    $txt = "<font color='green'>√</font>" ;
+                                    return Html::a($txt, $url1, ['title' => '点击关闭']);
+                                }
+                                if(!$model->is_private){
+                                    $txt = "<font color='red'>X</font>";
+                                    return Html::a($txt, $url0, ['title' => '点击开启']);
+                                }
+                                //return $model->snid;
+                            }
+                        ],
                         ['attribute'=>'is_cha','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value'=>function($model){
                                 $url0 = "/forum/agent-users/switch-status?field=is_cha&id=".$model->id.'&status=1'; # 点击开启
                                 $url1 = "/forum/agent-users/switch-status?field=is_cha&id=".$model->id.'&status=0'; # 点击关闭
                                 if($model->is_cha == 1){
-                                    $txt = "<font color='green'>已开启</font>" ;
+                                    $txt = "<font color='green'>√</font>" ;
                                     return Html::a($txt, $url1, ['title' => '点击关闭']);
                                 }
                                 if(!$model->is_cha){
-                                    $txt = "<font color='red'>已关闭</font>";
+                                    $txt = "<font color='red'>X</font>";
                                     return Html::a($txt, $url0, ['title' => '点击开启']);
                                 }
                                 return '';
@@ -114,11 +142,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $url0 = "/forum/agent-users/switch-status?field=status&id=".$model->id.'&status=1'; # 点击开启
                                 $url1 = "/forum/agent-users/switch-status?field=status&id=".$model->id.'&status=0'; # 点击关闭
                                 if($model->status == 1){
-                                    $txt = "<font color='green'>已激活</font>" ;
+                                    $txt = "<font color='green'>√</font>" ;
                                     return Html::a($txt, $url1, ['title' => '点击停用']);
                                 }
                                 if(!$model->status){
-                                    $txt = "<font color='red'>已停用</font>";
+                                    $txt = "<font color='red'>X</font>";
                                     return Html::a($txt, $url0, ['title' => '点击激活']);
                                 }
                                 return '';
@@ -131,15 +159,71 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->all_bet_money;
                             }
                         ],
+                        ['attribute'=>'today_profits_loss','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                return $model->today_profits_loss;
+                            }
+                        ],
+                        ['attribute'=>'all_profits_loss','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                return $model->all_profits_loss;
+                            }
+                        ],
                         //'is_bind',
-                        'bet_url:url',
-                        'token',
+                        //'bet_url:url',
+                        //'token',
 
                         //'created_at',
                         //'updated_at',
-                        'update_time',
+                        [
+                            'class' => 'yii\grid\ActionColumn','headerOptions'=>['width'=>'25%'],
+                            'template'=>'{act-up-balance} {act-down-balance} {user-delete}',
+                             'buttons' => [
+                                 // 下面代码来自于 yii\grid\ActionColumn 简单修改了下
+                                 'act-up-balance' => function ($url, $model, $key) {
+                                     $options = [
+                                         'type'=>'button',
+                                         'class'=>'min-btn btn-info act-up-balance btn btn-default',
+                                         'data-id' => $model->id,
+                                     ];
+                                     return Html::button('上', $options);
+                                 },
+                                 'act-down-balance' => function ($url, $model, $key) {
+                                     $options = [
+                                         'type'=>'button',
+                                         'class'=>'min-btn btn-info act-down-balance btn btn-default',
+                                         'data-id'=>$model->id,
+                                     ];
+                                     return Html::button('下', $options);
+                                 },
+                                 'user-delete' => function ($url, $model, $key) {
+                                     $options = [
+                                         'title' => Yii::t('yii', 'Delete'),
+                                         'aria-label' => Yii::t('yii', 'Delete'),
+                                         //'data-confirm' => Yii::t('yii', '确定删除此用户吗?'),
+                                         //'data-method' => 'post',
+                                         'type'=>'button',
+                                         'data-id'=>$model->id,
+                                         //'url'=>'#',
+                                         'name'=>$model->name,
+                                         'class'=>'min-btn btn-info act-del btn btn-default',
+                                         //'data-pjax' => '0',
+                                     ];
+                                     return Html::button('删', $options);
+                                 },
+                             ],
+                        ],
+                        //'update_time',
+                        ['attribute'=>'update_time','headerOptions'=>['width'=>'10%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                return $model->update_time;
+                            }
+                        ],
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
     <?php Pjax::end(); ?>
@@ -148,3 +232,108 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<input type="hidden" name="act" value="">
+
+<!--修改框-->
+<div class="modal fade" id="tipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
+     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
+">
+    <form class="form-inline">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="tip_msg_title"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group up-reason">
+                        <label id="tip_msg" for="updateData"></label>
+                        <input type="text" class="form-control" id="updateData" placeholder="数字">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="opRstConfirm">确定</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!--修改结果提示-->
+<div class="modal fade" id="rstTipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
+     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
+">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_rst">修改结果</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group up-reason">
+                    <label id="tip_msg_rst" for="updateData"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="opConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script>
+<script>
+    $(function () {
+        function updateData(id, act, balance) {
+            var data = {id:id, act:act, balance:balance};
+            var tip_title = '';
+            $.post("/forum/agent-users/update-user-balance",data,function(rst) {
+                if(rst.status == 200) {
+                    tip_title = '操作成功';
+                    balance = rst.balance;
+                    $("#balance_"+id).html(balance);
+                } else {
+                    tip_title = '操作失败';
+                }
+                //showTips(null, rst.msg, tip_title); # 同步完无需弹框，暂且注释
+            },'JSON');
+        }
+
+        $('.act-up-balance').click(function () { // 积分加
+            var up_id = $(this).attr('data-id');
+            console.log(up_id)
+            $("#act").val('act-up-balance')
+            showTips(up_id, '加分：');
+        });
+
+        $('.act-down-balance').click(function () { // 积分减
+            var up_id = $(this).attr('data-id');
+            console.log(up_id)
+            $("#act").val('act-down-balance')
+            showTips(up_id, '扣分：');
+        });
+
+        function showTips(id, tip_msg = '积分变动', title = '提示信息') {
+            $("#updateData").val("");
+
+            $('#tip_msg_title').html(title);
+            $('#tip_msg').html(tip_msg);
+            $('#tipModal').modal('show');
+            $("#opConfirm").attr('op-id', id);
+        }
+
+        $('#opConfirm').click(function () {
+            var id = $(this).attr('op-id');
+            balance = $("#updateData").val()
+            act = $("#act").val();
+            if(id != null) updateData(id, act, balance)
+        });
+    });
+</script>

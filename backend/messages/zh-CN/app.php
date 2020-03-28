@@ -92,4 +92,5 @@ return [
 
     'Agent Users' => '会员管理',
     'Create Agent Users' => '添加',
+    'Update Users balance' => '变更积分',
 ];

@@ -17,6 +17,7 @@ use  yii;
 class AgentUsersService extends BaseService {
 
     public static function opPreData(&$post, $agent_id=''){
+        if(!$post OR !$agent_id) return false;
 
         $fields = ['is_tuo', 'is_cha', 'is_chi', 'is_bind'];
         $post = CommonService::opPreStatusFields($post, $fields, $model = 'AgentUsers');
