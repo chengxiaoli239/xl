@@ -121,6 +121,7 @@ class UserSysPlansController extends BaseController
         $model->nums = UserSysPlansService::getDefaultTzNums($tz_type);
         $model->status = $model->status ? 1 : 0;
         $model->playway = $playway;
+        $model->is_test = 0;
         $model->single = in_array($tz_type, [30]) ? 1 : 0.1;
         $model->tz_type = $tz_type;
         $model->buy_type = 0;
