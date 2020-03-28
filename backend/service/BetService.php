@@ -616,7 +616,10 @@ abstract class BetService extends BaseBetService {
            }else{ # 正式下注
                # 1、首先判断是否登录，否则登录之后再下注
                if(!$flag = self::isLogin($plan->uid, $tz_system_id)){
-                   $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id]);
+                   if(!$TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id, 'status'=>1])){
+                       Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['uid'=>$plan->uid,'account'=>$plan->account, 'msg'=>'账号已被禁用不能下注']);
+                       continue;
+                   }
                    $loginRst = BaseService::login($TzSystemsUsers->id);
                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['loginRst'=>$loginRst]);
                    if($loginRst['status'] != 200 OR $loginRst['balance']<0.01) continue;
