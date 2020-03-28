@@ -15,6 +15,7 @@ use Yii;
  * @property string $balance 积分
  * @property int $is_tuo 托
  * @property int $is_chi 吃
+ * @property int $is_private 私
  * @property int $is_cha 查
  * @property int $is_bind 绑定
  * @property string $all_bet_money 投分
@@ -43,7 +44,7 @@ class AgentUsers extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['agent_id', 'is_tuo', 'is_chi', 'is_cha', 'is_bind', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['agent_id', 'is_tuo', 'is_chi', 'is_private', 'is_cha', 'is_bind', 'status', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'all_bet_money', 'today_profits_loss', 'all_profits_loss'], 'number'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
@@ -67,6 +68,7 @@ class AgentUsers extends \common\models\base\BaseModel
             'balance' => Yii::t('app', '积分'),
             'is_tuo' => Yii::t('app', '托'),
             'is_chi' => Yii::t('app', '吃'),
+            'is_private' => Yii::t('app', '私'),
             'is_cha' => Yii::t('app', '查'),
             'is_bind' => Yii::t('app', '绑定'),
             'all_bet_money' => Yii::t('app', '投分'),
