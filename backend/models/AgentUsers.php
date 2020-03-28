@@ -16,8 +16,10 @@ use Yii;
  * @property int $is_tuo 托
  * @property int $is_chi 吃
  * @property int $is_cha 查
- * @property string $all_bet_money 投分
  * @property int $is_bind 绑定
+ * @property string $all_bet_money 投分
+ * @property string $today_profits_loss 今日盈亏
+ * @property string $all_profits_loss 总盈亏
  * @property string $bet_url 游戏链接
  * @property string $token token
  * @property int $status 系统开启状态
@@ -42,7 +44,7 @@ class AgentUsers extends \common\models\base\BaseModel
     {
         return [
             [['agent_id', 'is_tuo', 'is_chi', 'is_cha', 'is_bind', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['balance', 'all_bet_money'], 'number'],
+            [['balance', 'all_bet_money', 'today_profits_loss', 'all_profits_loss'], 'number'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['name', 'desc', 'token'], 'string', 'max' => 64],
@@ -66,8 +68,10 @@ class AgentUsers extends \common\models\base\BaseModel
             'is_tuo' => Yii::t('app', '托'),
             'is_chi' => Yii::t('app', '吃'),
             'is_cha' => Yii::t('app', '查'),
-            'all_bet_money' => Yii::t('app', '投分'),
             'is_bind' => Yii::t('app', '绑定'),
+            'all_bet_money' => Yii::t('app', '投分'),
+            'today_profits_loss' => Yii::t('app', '今日盈亏'),
+            'all_profits_loss' => Yii::t('app', '总盈亏'),
             'bet_url' => Yii::t('app', '游戏链接'),
             'token' => Yii::t('app', 'token'),
             'status' => Yii::t('app', '系统开启状态'),
