@@ -612,7 +612,7 @@ abstract class BetService extends BaseBetService {
            $m->set($mkey, 1, $time);
 
            if($plan->is_test == 1){ # 模拟下注
-               $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type); # 直接记录表
+               $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1); # 直接记录表
            }else{ # 正式下注
                # 1、首先判断是否登录，否则登录之后再下注
                if(!$flag = self::isLogin($plan->uid, $tz_system_id)){
@@ -1063,7 +1063,7 @@ abstract class BetService extends BaseBetService {
      * @param int $lottery_type
      * @return bool
      */
-    public static function _logRecordsByPlandId($plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $sn='888888', $snid='888888id'){
+    public static function _logRecordsByPlandId($plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test = 0, $sn='888888', $snid='888888id'){
         $UserSysPlans = UserSysPlans::findOne($plan_id);
         $totalmoney = count(explode('@', $codes)) * $UserSysPlans->single;
         $insertData = [
@@ -1080,7 +1080,7 @@ abstract class BetService extends BaseBetService {
             'sn'=>$sn,
             'snid'=>$snid,
             'order_type'=>$UserSysPlans->playway, # 单双三字定
-            'is_simulate' => 0,  // 是否模拟投注
+            'is_simulate' => $is_test,  // 是否模拟投注
             'single' => $UserSysPlans->single,  // 投注倍数
             'betting_money'=> $totalmoney,  // 投注金额
         ];

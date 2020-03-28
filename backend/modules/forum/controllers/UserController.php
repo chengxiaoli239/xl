@@ -105,9 +105,19 @@ class UserController extends BaseController
         }else {
             BetService::synUserAllBalance($uid);
 
-            return $this->render('view', [
+            $model = $this->findAllModel($uid);
+            /*
+            $user = AdminModel::findOne($uid);
+            if($model->is_agent){
+                $view = "agent_view";
+            }else{
+                $view = "view";
+            }
+            */
+            $view = "view";
+            return $this->render($view, [
                 //'model' => $this->findModel($uid),
-                'models' => $this->findAllModel($uid),
+                'models' => $model
             ]);
         }
     }
@@ -237,13 +247,13 @@ class UserController extends BaseController
      * @param $status
      * @return \yii\web\Response
      */
-    public function acitonSwitchTzSystemStatus($id,$status){
+    public function actionSwitchTzSystemStatus($id,$status){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if(\Yii::$app->user->id == 1){
             UserService::updateUserTzSystemStatus($id, $status);
         }
 
-        return $this->redirect(['index']);
+        return $this->redirect(['view']);
     }
 
     /**

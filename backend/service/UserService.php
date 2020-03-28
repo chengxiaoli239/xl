@@ -11,6 +11,7 @@ namespace backend\service;
 use backend\models\TzSystems;
 use backend\models\TzSystemsAuth;
 use backend\models\TzSystemsUsers;
+use backend\models\UserSysPlans;
 use common\models\AdminModel;
 use common\models\AuthAssignment;
 use common\tools\Tool_Common;
@@ -175,7 +176,7 @@ class UserService extends BaseService {
     }
 
     /**
-     * @description 更新用户表状态
+     * @description 更新用户表状态 tz_systems_users 表状态
      * @param $id
      * @param $account
      * @return array
@@ -188,7 +189,9 @@ class UserService extends BaseService {
         if($rst = $m->get($mkey)) return false;
 
         $TzSystemsUser = TzSystemsUsers::findOne($id);
-        $TzSystemsUser->status = $status == 1 ? 0 : 1;
+        $TzSystemsUser->status = (int)$status;
+        $TzSystemsUser->cookie = '';
+        $TzSystemsUser->balance = '';
         $TzSystemsUser->save();
 
         return $rst;

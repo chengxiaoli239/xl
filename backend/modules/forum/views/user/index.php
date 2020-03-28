@@ -56,7 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         'email',
                         //'status',
-                        ['attribute' => 'status','label'=>'投注系统权限', # 'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'status','label'=>'账号状态', # 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 if($model->status == 1){
