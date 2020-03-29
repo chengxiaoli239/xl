@@ -18,6 +18,10 @@ return [
 //            'layout' => 'left-menu',
             'layout' => '@app/views/layouts/main.php',
         ],
+        'agent' => [
+            'class' => 'backend\modules\agent\Module',
+            'layout' => '@app/views/layouts/main.php',
+        ],
         'forum' => [
             'class' => 'backend\modules\forum\Module',
             'layout' => '@app/views/layouts/main.php',

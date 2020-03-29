@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\modules\forum\controllers;
+namespace backend\modules\agent\controllers;
 
 use backend\service\AgentUsersService;
 use backend\service\HN0898Service;
