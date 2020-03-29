@@ -215,7 +215,7 @@ class SevenService extends BaseTZService {
      */
     public function bet($qihao, $plan_id, $codes){
         $bigFlag = 0;
-        if(strlen($codes)>5000){ # 针对大量号码下注 用post请求
+        if(true OR strlen($codes)>5000){ # 针对大量号码下注 用post请求
             $bigFlag = 1;
             return $this->postBatchBet($qihao, $plan_id, $codes);
         }
@@ -313,7 +313,7 @@ class SevenService extends BaseTZService {
         //$position = $position ? $position : self::$position;
 
         if(!$isBigNumsBet){
-            $codes = implode('@', self::getMySiteCodesStyle($codes, $playway));
+            //$codes = implode('@', self::getMySiteCodesStyle($codes, $playway));
         }
 
         $n = count(explode('@',$codes));
