@@ -60,5 +60,48 @@ class AgentUsersService extends BaseService {
         return $rstData;
     }
 
+    public static function actUpUserData($post, $agent_id = ''){
+        if(!$agent_id) return ['status'=>301, 'msg'=>'不是代理账号，不能修改用户信息'];
+        $act = $post['act'];
+        $id = $post['id'];
+
+        $rst = ['status'=>200];
+        if(in_array($act, ['act-up-balance', 'act-down-balance'])){
+            if(!$balance = $post['balance']){
+                $rst = ['status'=>302, 'msg'=>'积分不能为空'];
+            }else{
+                $AgentUsers = AgentUsers::findOne(['agent_id'=>$agent_id, 'id'=>$id]);
+                if($act == 'act-up-balance'){
+                    $f = '加';
+                    $AgentUsers->balance = $AgentUsers->balance + $balance;
+                }elseif ($act == 'act-down-balance'){
+                    $f = '减';
+                    $AgentUsers->balance = $AgentUsers->balance - $balance;
+                }
+
+                if(!$flag = $AgentUsers->save()){
+                    //$rst = ['status'=>303, 'msg'=>$AgentUsers->getFirstError()];
+                    $rst = ['status'=>303, 'msg'=>'用户['.$AgentUsers->name.']'.$f.'分：'.$balance.', 结果：失败'];
+                    return $rst;
+                }
+                $rst['msg'] = '用户['.$AgentUsers->name.']'.$f.'分：'.$balance.', 操作成功&nbsp;<font color="green"><strong>√</strong></font> 当前积分：'.$AgentUsers->balance;
+                $rst['balance_now'] = $AgentUsers->balance;
+            }
+
+        }elseif ($act == 'act-status'){
+        }elseif ($act == 'act-user-del'){
+            $flag = 0;
+            if($AgentUsers = AgentUsers::findOne(['agent_id'=>$agent_id, 'id'=>$post['id']])){
+                $flag = $AgentUsers->delete();
+            }
+            if(!$flag) {
+                return ['status'>300, 'msg'=>'删除失败，用户名：'.$AgentUsers->name];
+            }
+
+            $rst['msg'] = '成功删除用户：'.$AgentUsers->name;
+        }
+
+        return $rst;
+    }
 
 }

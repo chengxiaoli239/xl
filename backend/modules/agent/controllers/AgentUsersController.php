@@ -101,6 +101,9 @@ class AgentUsersController extends BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $rst = ['status'=>200, 'msg'=>'修改成功'];
 
+        $agent_id = \Yii::$app->user->id;
+        $rst['data'] = AgentUsersService::actUpUserData($this->_post, $agent_id);
+
         return $rst;
     }
 
