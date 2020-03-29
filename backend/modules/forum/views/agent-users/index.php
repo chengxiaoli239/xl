@@ -187,6 +187,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                          'type'=>'button',
                                          'class'=>'min-btn btn-info act-up-balance btn btn-default',
                                          'data-id' => $model->id,
+                                         'data-name' => $model->name,
                                      ];
                                      return Html::button('上', $options);
                                  },
@@ -195,6 +196,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                          'type'=>'button',
                                          'class'=>'min-btn btn-info act-down-balance btn btn-default',
                                          'data-id'=>$model->id,
+                                         'data-name' => $model->name,
                                      ];
                                      return Html::button('下', $options);
                                  },
@@ -206,8 +208,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                          //'data-method' => 'post',
                                          'type'=>'button',
                                          'data-id'=>$model->id,
-                                         //'url'=>'#',
-                                         'name'=>$model->name,
+                                         'data-name' => $model->name,
                                          'class'=>'min-btn btn-info act-del btn btn-default',
                                          //'data-pjax' => '0',
                                      ];
@@ -232,7 +233,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
-<input type="hidden" name="act" value="">
+<input type="hidden" name="act" id="act" value="">
 
 <!--修改框-->
 <div class="modal fade" id="tipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
@@ -255,7 +256,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="opRstConfirm">确定</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="opConfirm">确定</button>
                 </div>
             </div>
         </div>
@@ -281,7 +282,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="opConfirm">确定</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="opRstConfirm">确定</button>
             </div>
         </div>
     </div>
@@ -293,8 +294,9 @@ $this->params['breadcrumbs'][] = $this->title;
     $(function () {
         function updateData(id, act, balance) {
             var data = {id:id, act:act, balance:balance};
+            console.log(data);
             var tip_title = '';
-            $.post("/forum/agent-users/update-user-balance",data,function(rst) {
+            $.post("/forum/agent-users/up-user-data",data,function(rst) {
                 if(rst.status == 200) {
                     tip_title = '操作成功';
                     balance = rst.balance;
@@ -308,19 +310,20 @@ $this->params['breadcrumbs'][] = $this->title;
 
         $('.act-up-balance').click(function () { // 积分加
             var up_id = $(this).attr('data-id');
-            console.log(up_id)
+            var up_name = $(this).attr('data-name');
             $("#act").val('act-up-balance')
-            showTips(up_id, '加分：');
+            showTips(up_id, '加分：', '正在变更['+up_name+']数据：');
         });
 
         $('.act-down-balance').click(function () { // 积分减
             var up_id = $(this).attr('data-id');
-            console.log(up_id)
+            var up_name = $(this).attr('data-name');
             $("#act").val('act-down-balance')
-            showTips(up_id, '扣分：');
+            showTips(up_id, '扣分：', '正在变更['+up_name+']数据：');
         });
 
         function showTips(id, tip_msg = '积分变动', title = '提示信息') {
+            console.log(id)
             $("#updateData").val("");
 
             $('#tip_msg_title').html(title);

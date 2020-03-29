@@ -94,6 +94,18 @@ class AgentUsersController extends BaseController
     }
 
     /**
+     * @desc 变更用户数据入口
+     * @return array
+     */
+    public function actionUpUserData(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $rst = ['status'=>200, 'msg'=>'修改成功'];
+
+        return $rst;
+    }
+
+
+    /**
      * Updates an existing AgentUsers model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id

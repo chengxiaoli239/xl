@@ -129,7 +129,8 @@ class IndexController extends Controller
 
     public function actionDw(){
         //$data['rst'] = ChatService::send();p($data);
-
+        $rst = NumService::getCodesArise(['0144']);p($rst);
+        $rst = KjDataGet::insertKjData('2020032541', 6, '6,3,0,5,1');p($rst);
         $rst = KjDataGet::insertKjData('200325016', 5, '6,1,2,1,2');//p($rst);
         $rst = KjDataGet::insertKjData('200325017', 5, '0,7,8,0,7');//p($rst);
         $rst = KjDataGet::insertKjData('200325018', 5, '0,9,0,0,5');//p($rst);
@@ -375,7 +376,6 @@ class IndexController extends Controller
         $rst = BetService::getBetCacheTime($lottery_type = 5, $qihao); p($rst);# 投注之后缓存时间
         $qihao = HN0898Service::getQihao(5);p($qihao);
         $rst['update3NumData'] = SscDataService::update3NumData(5);p($rst); // 每期开奖遗漏
-        $rst = NumService::getCodesArise(['1234589']);p(count($rst));
 
         $rst = NumService::filterLaterCodesAnd2bcode(5, $qihao = '190516056');p($rst);
         $rst = NumService::getRecentlyCodes(5);p($rst);
