@@ -401,6 +401,7 @@ class NineNineBaseService extends BaseTZService {
         $end_time = microtime(true);
         $time_consume = ($end_time - $start_time). 's';
         if($rst['err'] == -1 OR !$rst){
+            $post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
             $tzRst = ['uid'=>self::$user_id, 'account'=>self::$account, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
             if($tz_type != 20){
                 $tzRst['code'] = $code;
