@@ -2,6 +2,7 @@
 
 namespace backend\modules\agent\controllers;
 
+use backend\service\AgentUsersService;
 use Yii;
 use backend\models\AgentUsersBalanceFlows;
 use backend\models\searchs\AgentUsersBalanceFlows as AgentUsersBalanceFlowsSearch;
@@ -36,7 +37,11 @@ class AgentUsersBalanceFlowsController extends BaseController
     public function actionIndex()
     {
         $searchModel = new AgentUsersBalanceFlowsSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        if(\Yii::$app->user->id != 1){
+            $queryParams['AgentUsersBalanceFlows']['agent_id'] = \Yii::$app->user->id;
+        }
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -55,6 +60,18 @@ class AgentUsersBalanceFlowsController extends BaseController
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
+    }
+
+    /**
+     * @return array
+     */
+    public function actionUserFlowsCheck(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $desc = $this->_post['type'] == 1 ? '用户申请->代理审核' : '代理操作';
+
+        $rst = AgentUsersService::userFlowsCheck($this->_post, \Yii::$app->user->id, $desc);
+
+        return $rst;
     }
 
     /**

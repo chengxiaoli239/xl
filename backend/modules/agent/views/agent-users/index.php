@@ -189,7 +189,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'updated_at',
                         [
                             'class' => 'yii\grid\ActionColumn','headerOptions'=>['width'=>'25%'],
-                            'template'=>'{act-up-balance} {act-down-balance} {act-user-del} {act-user-edit}',
+                            'template'=>'{act-up-balance} {act-down-balance} {act-user-del} {act-user-edit} {act-user-balance-flows}',
                              'buttons' => [
                                  // 下面代码来自于 yii\grid\ActionColumn 简单修改了下
                                  'act-up-balance' => function ($url, $model, $key) {
@@ -236,7 +236,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                          'data-id'=>$model->id,
                                          'data-name' => $model->name,
                                      ];
-                                     return Html::button('删', $options);
+                                     return Html::button('查', $options);
                                  },
                              ],
                         ],
@@ -467,8 +467,11 @@ $this->params['breadcrumbs'][] = $this->title;
         });
         
         $(".act-user-balance-flows").click(function () {
-            uid = $(this).attr('data-id')
-            console.log(uid);
+            account = $(this).attr('data-name')
+            console.log(account);
+
+            window.location.href = '/agent/agent-users-balance-flows/index?AgentUsersBalanceFlows[member_account]='+account;
+
         });
     });
 </script>

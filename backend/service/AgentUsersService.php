@@ -9,6 +9,7 @@
 
 namespace backend\service;
 use backend\models\AgentUsers;
+use backend\models\AgentUsersBalanceFlows;
 use backend\models\CodeTypes;
 use common\service\CommonService;
 use yii\helpers\ArrayHelper;
@@ -127,6 +128,55 @@ class AgentUsersService extends BaseService {
         }
 
         return $rst;
+    }
+
+    /**
+     * @desc 审核用积分流水
+     * @param $data
+     * @param $agent_id
+     * @return array
+     */
+    public static function userFlowsCheck($data, $agent_id = '', $desc = ''){
+        if(!$data['id']) return ['status'=>301, 'msg'=>'缺少参数id'];
+
+        if(empty($agent_id)){
+            return ['status'=>302, 'msg'=>'不是代理,无权限'];
+        }
+
+        if(!$AgentUsersBalanceFlows = AgentUsersBalanceFlows::findOne(['id'=>$data['id'], 'agent_id'=>$agent_id])){
+            return ['status'=>400, 'msg'=>'未找到记录'];
+        }
+
+        $status = $data['status']; # 审核状态 0未审核1审核通过2拒绝
+        $AgentUsers = AgentUsers::findOne(['id'=>$AgentUsersBalanceFlows->member_id, 'agent_id'=>$agent_id]);
+        if($status == 1){
+            if($AgentUsersBalanceFlows['type'] == 1){
+                $changeBalance = $AgentUsersBalanceFlows->balance; # 1 上分
+            }elseif($AgentUsersBalanceFlows['type'] == 2){
+                $changeBalance = 0 - $AgentUsersBalanceFlows->balance; # 2 下分
+            }
+            $after_balance = $AgentUsers->balance + $changeBalance ;
+            $AgentUsers->balance = $after_balance;
+            $AgentUsers->updated_at = time();
+            if(!$flag = $AgentUsers->save()){
+                return ['status'=>303, 'msg'=>current($AgentUsers->getFirstError())];
+            }
+
+            $AgentUsersBalanceFlows->balance_now = $after_balance;
+            $AgentUsersBalanceFlows->status = 1;
+
+        }elseif($status == 2){ # 审核拒绝
+            $AgentUsersBalanceFlows->balance_now = $AgentUsers->balance;
+            $AgentUsersBalanceFlows->status = 2;
+        }
+
+        $AgentUsersBalanceFlows->desc = $desc;
+        $AgentUsersBalanceFlows->check_time = (string)time();
+        if(!$flag = $AgentUsersBalanceFlows->save()){
+            return ['status'=>303, 'msg'=>current($AgentUsersBalanceFlows->getFirstError())];
+        }
+
+        return ['status'=>200, 'msg'=>'操作成功', 'data'=>['status'=>200, 'msg'=>$desc]];
     }
 
 }

@@ -93,4 +93,6 @@ return [
     'Agent Users' => '会员管理',
     'Create Agent Users' => '添加',
     'Update Users balance' => '变更积分',
+
+    'Agent Users Balance Flows' => '用户积分流水',
 ];
