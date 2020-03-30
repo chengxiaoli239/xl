@@ -136,7 +136,7 @@ class AgentUsersService extends BaseService {
      * @param $agent_id
      * @return array
      */
-    public static function userFlowsCheck($data, $agent_id = '', $desc = ''){
+    public static function userFlowsCheck($data, $agent_id = '', $desc = '代理操作'){
         if(!$data['id']) return ['status'=>301, 'msg'=>'缺少参数id'];
 
         if(empty($agent_id)){
