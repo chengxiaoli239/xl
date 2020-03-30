@@ -107,6 +107,25 @@ class AgentUsersController extends BaseController
         return $rst;
     }
 
+    /**
+     * @desc 变更用户数据入口
+     * @return array
+     */
+    public function actionGetToken(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+
+        $agent_id = \Yii::$app->user->id;
+        $rand = Yii::$app->getSecurity()->generateRandomString();
+        $rst['token'] = AgentUsersService::getUserToken('rand_name', $agent_id, $rand);
+        $rst['token'] = $rand;
+
+        return $rst;
+    }
+
+    public function actionUserBalanceFlow(){
+
+    }
 
     /**
      * Updates an existing AgentUsers model.

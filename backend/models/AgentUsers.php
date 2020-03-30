@@ -19,7 +19,7 @@ use Yii;
  * @property int $is_cha 查
  * @property int $is_bind 绑定
  * @property string $all_bet_money 投分
- * @property string $today_profits_loss 今日盈亏
+ * @property string $today_profits_loss 今盈亏
  * @property string $all_profits_loss 总盈亏
  * @property string $bet_url 链接
  * @property string $token token
@@ -72,7 +72,7 @@ class AgentUsers extends \common\models\base\BaseModel
             'is_cha' => Yii::t('app', '查'),
             'is_bind' => Yii::t('app', '绑定'),
             'all_bet_money' => Yii::t('app', '投分'),
-            'today_profits_loss' => Yii::t('app', '今日盈亏'),
+            'today_profits_loss' => Yii::t('app', '今盈亏'),
             'all_profits_loss' => Yii::t('app', '总盈亏'),
             'bet_url' => Yii::t('app', '链接'),
             'token' => Yii::t('app', 'token'),

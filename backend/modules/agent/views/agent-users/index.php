@@ -46,6 +46,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'id',
                         //'name',
                         ['attribute'=>'name','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'contentOptions' => function($model){
+                                return ['id' => 'name_'.$model->id];
+                            },
                             'format'=>'raw',
                             'value'=>function($model){
                                 return $model->name;
@@ -212,10 +215,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                          'type'=>'button',
                                          'class'=>'min-btn btn-info act-user-edit btn btn-default',
                                          'data-id'=>$model->id,
-                                         'data-tuo'=>$model->is_tuo,
-                                         'data-chi'=>$model->is_chi,
-                                         'data-cha'=>$model->is_cha,
-                                         'data-private'=>$model->is_private,
+                                         'data-token'=>$model->token,
                                          'data-name' => $model->name,
                                      ];
                                      return Html::button('改', $options);
@@ -224,6 +224,15 @@ $this->params['breadcrumbs'][] = $this->title;
                                      $options = [
                                          'type'=>'button',
                                          'class'=>'min-btn btn-info act-user-del btn btn-default',
+                                         'data-id'=>$model->id,
+                                         'data-name' => $model->name,
+                                     ];
+                                     return Html::button('删', $options);
+                                 },
+                                 'act-user-balance-flows' => function ($url, $model, $key) {
+                                     $options = [
+                                         'type'=>'button',
+                                         'class'=>'min-btn btn-info act-user-balance-flows btn btn-default',
                                          'data-id'=>$model->id,
                                          'data-name' => $model->name,
                                      ];
@@ -266,8 +275,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="modal-body">
                     <div class="form-group up-reason">
                         <label id="tip_msg" for="updateData"></label>
-                        <input type="text" class="form-control media-middle" id="updateData" placeholder="">
+                        <input type="text" class="form-control media-middle" size="8" id="updateData" placeholder="">
                         <span id="current_tip"></span>
+                    </div>
+                    <div class="form-group g_token">
+                        <label id="tip_edit_msg" for="account_token">token:</label>
+                        <input type="text" class="form-control media-middle input-mini" size="36" name="account_token" id="account_token" placeholder="token">
+                        <input type="button" id="re_token" class="btn btn-success" value="刷新token">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -304,59 +318,6 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 
-<!--修改框-->
-<div class="modal fade" id="tipEditModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
-     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
-">
-    <form class="form-inline">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span></button>
-                    <h4 class="modal-title" id="tip_edit_msg_title"></h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group up-reason">
-                        <label id="tip_edit_msg" for="account_name">账号：</label>
-                        <input type="text" class="form-control media-middle input-mini" name="account_name" id="account_name" placeholder="账号">
-
-                        <!--
-                        <label id="tip_edit_msg" for="is_tuo">托：</label>
-                        <select name="is_tuo" id="sel_is_tuo">
-                            <option value="0">否</option>
-                            <option value="1">是</option>
-                        </select>
-                        吃：
-                        <select name="is_chi" id="sel_is_chi">
-                            <option value="0">否</option>
-                            <option value="1">是</option>
-                        </select>
-
-                        查：
-                        <select name="is_cha" id="sel_is_cha">
-                            <option value="0">否</option>
-                            <option value="1">是</option>
-                        </select>
-
-                        私：
-                        <select name="is_private" id="sel_is_private">
-                            <option value="0">否</option>
-                            <option value="1">是</option>
-                        </select>
-                        -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="opEditConfirm">确定</button>
-                </div>
-            </div>
-        </div>
-    </form>
-</div>
-
 <!--删除提示框-->
 <div class="modal fade" id="delTipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
@@ -371,7 +332,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             <div class="modal-body">
                 <div class="form-group up-reason">
-                    <label id="del_tip_msg" for="updateData"></label>
+                    <label id="del_tip_msg" for="del_tip_msg"></label>
                 </div>
             </div>
             <div class="modal-footer">
@@ -386,21 +347,26 @@ $this->params['breadcrumbs'][] = $this->title;
 <script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script>
 <script>
     $(function () {
-        function updateData(id, act, balance='') {
+        function updateData(id, act, udata='') {
             var data = {id:id, act:act};
             if(act == 'act-up-balance' || act == 'act-down-balance'){
-                data.balance = balance;
+                data.balance = udata;
+            }else if(act == 'act-user-edit'){
+                data.name = udata;
+                data.token = $("#account_token").val();
             }
             var tip_title = '';
             $.post("/agent/agent-users/up-user-data",data,function(rst) {
                 if(rst.status == 200) {
                     tip_title = '操作成功';
-                    balance = rst.data.balance_now;
                     if(act == 'act-up-balance' || act == 'act-down-balance') {
+                        balance = rst.data.balance_now;
                         // 修改页面积分
                         if(rst.data.status == 200)
                             $("#balance_" + id).html(balance.toFixed(2));
                         console.log(rst.data.msg);
+                    }else if(act == 'act-user-edit'){
+                        $("#name_" + id).html(rst.data.name_now);
                     }else if(act == 'act-user-del'){
                         // 删除行
                         var ele = $("#record_"+id).parent("tr");
@@ -417,29 +383,36 @@ $this->params['breadcrumbs'][] = $this->title;
 
         // 积分加
         $('.act-up-balance').click(function () {
+            $('.g_token').hide();
             var up_id = $(this).attr('data-id');
             var up_name = $(this).attr('data-name');
             $("#act").val('act-up-balance')
+            $("#updateData").val('');
             showTips(up_id, '加分：', '正在变更['+up_name+']数据：');
         });
 
         // 积分减
         $('.act-down-balance').click(function () {
+            $('.g_token').hide();
             var up_id = $(this).attr('data-id');
             var up_name = $(this).attr('data-name');
+            $("#updateData").val('');
             $("#act").val('act-down-balance');
             showTips(up_id, '扣分：', '正在变更['+up_name+']数据：');
         });
 
         // 编辑
         $('.act-user-edit').click(function () {
+            $('.g_token').show();
             var up_id = $(this).attr('data-id');
             var up_name = $(this).attr('data-name');
+            var user_token = $(this).attr('data-token');
+
             $("#act").val('act-user-edit');
             $("#updateData").val(up_name);
-            console.log(up_name)
+            $("#account_token").val(user_token);
 
-            showTips(up_id, '编辑用户信息', '正在变更['+up_name+']数据：')
+            showTips(up_id, '账号:', '正在变更['+up_name+']数据，')
         });
 
         // 删除用户
@@ -455,11 +428,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
         function showTips(id, tip_msg = '积分变动', title = '提示信息') {
             console.log(id)
-            $("#updateData").val("");
+            //$("#updateData").val("");
 
-            $('#tip_msg_title').html(title);
+            $('#tip_msg_title').html(title + ''+ "当前积分：" + $("#balance_"+id).html());
             $('#tip_msg').html(tip_msg);
-            $('#current_tip').html("当前积分：" + $("#balance_"+id).html());
+            //$('#current_tip').html();
             $("#opConfirm").attr('op-id', id);
             $('#tipModal').modal('show');
         }
@@ -475,6 +448,27 @@ $this->params['breadcrumbs'][] = $this->title;
             balance = $("#updateData").val()
             act = $("#act").val();
             if(id != null) updateData(id, act, balance)
+        });
+
+        $("#opRstConfirm").click(function () {
+            act = $("#act");
+            if(act = 'act-user-edit'){
+                location.reload();
+            }
+        });
+        
+        $("#re_token").click(function() {
+            $.post("/agent/agent-users/get-token",[],function(rst) {
+                console.log(rst);
+                if(rst.status == 200){
+                    $("#account_token").val(rst.token);
+                }
+            });
+        });
+        
+        $(".act-user-balance-flows").click(function () {
+            uid = $(this).attr('data-id')
+            console.log(uid);
         });
     });
 </script>

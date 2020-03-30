@@ -28,10 +28,6 @@ class AgentUsersService extends BaseService {
             $post[$model]['token'] = self::getUserToken($post['name'], $agent_id);
         }
 
-        if($data['id'] && $AgentUsers = AgentUsers::findOne($data['id'])){
-            if(!$AgentUsers->token) $post[$model]['token'] = self::getUserToken($post['name'], $agent_id);
-        }
-
         $post[$model]['agent_id'] = $agent_id;
         $post[$model]['updated_at'] = time();
 
@@ -66,6 +62,7 @@ class AgentUsersService extends BaseService {
 
         $model->$field = (int)$status;
         $model->updated_at = time();
+        $model->token = $model->token ? $model->token : self::getUserToken($model->name, $uid);
 
         $m->set($mkey, 1, 10);
 
@@ -83,7 +80,7 @@ class AgentUsersService extends BaseService {
 
         $rst = ['status'=>200];
         if(in_array($act, ['act-up-balance', 'act-down-balance'])){
-            if(!$balance = $post['balance']){
+            if(!$balance = trim($post['balance'])){
                 $rst = ['status'=>302, 'msg'=>'积分不能为空'];
             }else{
                 $AgentUsers = AgentUsers::findOne(['agent_id'=>$agent_id, 'id'=>$id]);
@@ -104,7 +101,19 @@ class AgentUsersService extends BaseService {
                 $rst['balance_now'] = $AgentUsers->balance;
             }
 
-        }elseif ($act == 'act-status'){
+        }elseif ($act == 'act-user-edit'){
+            if(empty($post['name'])) return ['status'=>303, 'msg'=>'用户名不能为空'];
+            $flag = 0;
+            if($AgentUsers = AgentUsers::findOne(['agent_id'=>$agent_id, 'id'=>$post['id']])){
+                $AgentUsers->name = trim($post['name']);
+                $AgentUsers->token = trim($post['token']);
+                $flag = $AgentUsers->save();
+            }
+            if(!$flag) {
+                return ['status'>300, 'msg'=>'删除失败，用户名：'.$AgentUsers->name];
+            }
+            $rst['msg'] = '成功修改用户名：'.$AgentUsers->name;
+            $rst['name_now'] = $AgentUsers->name;
         }elseif ($act == 'act-user-del'){
             $flag = 0;
             if($AgentUsers = AgentUsers::findOne(['agent_id'=>$agent_id, 'id'=>$post['id']])){
