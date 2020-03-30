@@ -425,8 +425,14 @@ class UserSysPlansService extends BaseService {
         }
 
         if(!in_array($tz_type, [20, 23]) && in_array($plan_type, [2,3,4,5])){ # 翻倍计划
-            $tmpFilter['singles_key'] = (isset($post['UserSysPlans']['singles_key'])) ? (int)$post['UserSysPlans']['singles_key'] : 0;
-            unset($post['UserSysPlans']['singles_key']);
+            if($id && $plan = UserSysPlans::findOne($id)){
+                $tmpHzArr = json_decode($plan->hz_Arr, true);
+                $singles_key = (isset($tmpHzArr['singles_key'])) ? $tmpHzArr['singles_key'] : 0;
+            }else{
+                $singles_key = 0;
+            }
+            $tmpFilter['singles_key'] = $singles_key;
+
             if(in_array($plan_type, [4, 5])){ # 号码切换,当前组1或者组2
                 $tmpFilter['status_val'] = ($post['UserSysPlans']['status_val'] == 2) ? 2 : 1;
                 unset($post['UserSysPlans']['status_val']);
