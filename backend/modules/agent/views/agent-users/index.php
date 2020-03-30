@@ -186,7 +186,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'updated_at',
                         [
                             'class' => 'yii\grid\ActionColumn','headerOptions'=>['width'=>'25%'],
-                            'template'=>'{act-up-balance} {act-down-balance} {act-user-del}',
+                            'template'=>'{act-up-balance} {act-down-balance} {act-user-del} {act-user-edit}',
                              'buttons' => [
                                  // 下面代码来自于 yii\grid\ActionColumn 简单修改了下
                                  'act-up-balance' => function ($url, $model, $key) {
@@ -206,6 +206,19 @@ $this->params['breadcrumbs'][] = $this->title;
                                          'data-name' => $model->name,
                                      ];
                                      return Html::button('下', $options);
+                                 },
+                                 'act-user-edit' => function ($url, $model, $key) {
+                                     $options = [
+                                         'type'=>'button',
+                                         'class'=>'min-btn btn-info act-user-edit btn btn-default',
+                                         'data-id'=>$model->id,
+                                         'data-tuo'=>$model->is_tuo,
+                                         'data-chi'=>$model->is_chi,
+                                         'data-cha'=>$model->is_cha,
+                                         'data-private'=>$model->is_private,
+                                         'data-name' => $model->name,
+                                     ];
+                                     return Html::button('改', $options);
                                  },
                                  'act-user-del' => function ($url, $model, $key) {
                                      $options = [
@@ -237,7 +250,7 @@ $this->params['breadcrumbs'][] = $this->title;
 </section>
 <input type="hidden" name="act" id="act" value="">
 
-<!--修改框-->
+<!--修改积分-->
 <div class="modal fade" id="tipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
      min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
@@ -253,7 +266,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="modal-body">
                     <div class="form-group up-reason">
                         <label id="tip_msg" for="updateData"></label>
-                        <input type="text" class="form-control media-middle" id="updateData" placeholder="数字">
+                        <input type="text" class="form-control media-middle" id="updateData" placeholder="">
                         <span id="current_tip"></span>
                     </div>
                 </div>
@@ -280,7 +293,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             <div class="modal-body">
                 <div class="form-group up-reason">
-                    <label id="tip_msg_rst" for="updateData"></label>
+                    <label id="tip_msg_rst" for="tip_msg_rst"></label>
                 </div>
             </div>
             <div class="modal-footer">
@@ -289,6 +302,59 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
     </div>
+</div>
+
+<!--修改框-->
+<div class="modal fade" id="tipEditModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
+     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
+">
+    <form class="form-inline">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="tip_edit_msg_title"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group up-reason">
+                        <label id="tip_edit_msg" for="account_name">账号：</label>
+                        <input type="text" class="form-control media-middle input-mini" name="account_name" id="account_name" placeholder="账号">
+
+                        <!--
+                        <label id="tip_edit_msg" for="is_tuo">托：</label>
+                        <select name="is_tuo" id="sel_is_tuo">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                        吃：
+                        <select name="is_chi" id="sel_is_chi">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+
+                        查：
+                        <select name="is_cha" id="sel_is_cha">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+
+                        私：
+                        <select name="is_private" id="sel_is_private">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                        -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="opEditConfirm">确定</button>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 
 <!--删除提示框-->
@@ -332,7 +398,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     balance = rst.data.balance_now;
                     if(act == 'act-up-balance' || act == 'act-down-balance') {
                         // 修改页面积分
-                        $("#balance_" + id).html(balance.toFixed(2));
+                        if(rst.data.status == 200)
+                            $("#balance_" + id).html(balance.toFixed(2));
                         console.log(rst.data.msg);
                     }else if(act == 'act-user-del'){
                         // 删除行
@@ -360,9 +427,21 @@ $this->params['breadcrumbs'][] = $this->title;
         $('.act-down-balance').click(function () {
             var up_id = $(this).attr('data-id');
             var up_name = $(this).attr('data-name');
-            $("#act").val('act-down-balance')
+            $("#act").val('act-down-balance');
             showTips(up_id, '扣分：', '正在变更['+up_name+']数据：');
         });
+
+        // 编辑
+        $('.act-user-edit').click(function () {
+            var up_id = $(this).attr('data-id');
+            var up_name = $(this).attr('data-name');
+            $("#act").val('act-user-edit');
+            $("#updateData").val(up_name);
+            console.log(up_name)
+
+            showTips(up_id, '编辑用户信息', '正在变更['+up_name+']数据：')
+        });
+
         // 删除用户
         $('.act-user-del').click(function () {
             $("#delConfirm").attr('data-id', $(this).attr('data-id'));
@@ -381,8 +460,8 @@ $this->params['breadcrumbs'][] = $this->title;
             $('#tip_msg_title').html(title);
             $('#tip_msg').html(tip_msg);
             $('#current_tip').html("当前积分：" + $("#balance_"+id).html());
-            $('#tipModal').modal('show');
             $("#opConfirm").attr('op-id', id);
+            $('#tipModal').modal('show');
         }
 
         $("#delConfirm").click(function () {

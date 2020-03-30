@@ -25,11 +25,27 @@ class AgentUsersService extends BaseService {
         $data = $post[$model];
         if(!$id = $data['id']){
             $post[$model]['created_at'] = time();
+            $post[$model]['token'] = self::getUserToken($post['name'], $agent_id);
         }
+
+        if($data['id'] && $AgentUsers = AgentUsers::findOne($data['id'])){
+            if(!$AgentUsers->token) $post[$model]['token'] = self::getUserToken($post['name'], $agent_id);
+        }
+
         $post[$model]['agent_id'] = $agent_id;
         $post[$model]['updated_at'] = time();
 
         return $post;
+    }
+
+    /**
+     * @desc 获取用户token，用于聊天窗口识别用户
+     * @param string $name
+     * @param string $agent_id
+     * @return string
+     */
+    public static function getUserToken($name = '', $agent_id = '', $randKey = 'MLGB'){
+        return md5($name.'_'.$agent_id.'_'.$randKey);
     }
 
     /**
