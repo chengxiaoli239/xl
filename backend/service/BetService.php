@@ -346,6 +346,7 @@ abstract class BetService extends BaseBetService {
                 }
                 break;
             case 3: # 四字定
+                $code_type = 4;
                 if($tz_type == 20) {  # 四定和值
                     # 四定和值选号，默认排除：双双重、三重、四重、四兄弟、四单四双
                     //$where = ['codes_hz'=>explode(',', $codes_hz), 'type_22'=>0, 'type_3'=>0, 'type_4'=>0, 'type_4b'=>0, 'type_4ds'=>0];
@@ -405,7 +406,14 @@ abstract class BetService extends BaseBetService {
                 $codesArr = explode(',', $codes_hz);
                 break;
         }
-        //p(['count'=>count($codesArr), $codesArr]);
+
+        $before_count=count($codesArr);
+        # 反买号码获取
+        if(in_array($tz_type, \Yii::$app->params['can_change_buy_type'])){
+            $codesArr = self::getInverseCodes($codesArr, $code_type);
+        }
+        //p(['buy_type'=>$buy_type, 'before_count'=>$before_count, 'after_count'=>count($codesArr), 'codesArr'=>$codesArr]);
+
         $codes = implode('@', $codesArr);
         //$m->set($mkey, $codes, 5*60);
 
@@ -1090,6 +1098,20 @@ abstract class BetService extends BaseBetService {
     }
 
 
+    /**
+     * @desc 获取相反号码
+     * @param $codesArr
+     * @param $code_type
+     * @return array
+     */
+    public static function getInverseCodes($codesArr, $code_type){
+        if(!is_array($codesArr)) return [];
+        $where = ['AND', ['=', 'code_type', $code_type], ['NOT IN', 'code', $codesArr]];
+        $Num4Type = Num4Type::find()->where($where)->asArray()->all();
+        $data = ArrayHelper::getColumn($Num4Type, 'code');
+
+        return $data;
+    }
 
 
 

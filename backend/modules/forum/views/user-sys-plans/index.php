@@ -70,7 +70,6 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             }
                         ],
                         //'buy_type',
-                        /*
                         ['attribute' => 'buy_type','label'=>'正买/反买',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
@@ -78,7 +77,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 $txt = $buy_type_Arr[$model->buy_type];
                                 $url0 = "/forum/user-sys-plans/switch-buy-type?id=".$model->id.'&status=1'; # 切换正买
                                 $url1 = "/forum/user-sys-plans/switch-buy-type?id=".$model->id.'&status=0'; # 切换反买
-                                if($model->playway == 3){
+                                if(!in_array($model->tz_type, \Yii::$app->params['can_change_buy_type'])){
                                     return Html::a($txt, '#', ['title' => '正买']);
                                 }
                                 if($model->buy_type == 1){
@@ -91,7 +90,6 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 }
                             }
                         ],
-                        */
                         ['attribute' => 'plan_type','label'=>'计划类型',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
