@@ -16,6 +16,7 @@ use Yii;
  * @property string $balance_now 当前剩余
  * @property string $desc 备注
  * @property int $status 审核状态(0未审核1通过2未通过)
+ * @property string $check_time 审核时间
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -41,6 +42,7 @@ class AgentUsersBalanceFlows extends \common\models\base\BaseModel
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['member_id', 'member_account', 'desc'], 'string', 'max' => 64],
+            [['check_time'], 'string', 'max' => 12],
             [['status', 'member_id', 'agent_id'], 'unique', 'targetAttribute' => ['status', 'member_id', 'agent_id']],
         ];
     }
@@ -60,6 +62,7 @@ class AgentUsersBalanceFlows extends \common\models\base\BaseModel
             'balance_now' => Yii::t('app', '当前剩余'),
             'desc' => Yii::t('app', '备注'),
             'status' => Yii::t('app', '审核状态(0未审核1通过2未通过)'),
+            'check_time' => Yii::t('app', '审核时间'),
             'created_at' => Yii::t('app', '创建时间'),
             'updated_at' => Yii::t('app', '更新时间'),
             'update_time' => Yii::t('app', '更新时间'),
