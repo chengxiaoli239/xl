@@ -409,7 +409,7 @@ abstract class BetService extends BaseBetService {
 
         $before_count=count($codesArr);
         # 反买号码获取
-        if(in_array($tz_type, \Yii::$app->params['can_change_buy_type']) && $buy_type == 1){
+        if(in_array($tz_type, \Yii::$app->params['can_change_buy_type']) && $buy_type == 0){
             $codesArr = self::getInverseCodes($codesArr, $code_type);
         }
         //p(['buy_type'=>$buy_type, 'before_count'=>$before_count, 'after_count'=>count($codesArr), 'codesArr'=>$codesArr]);
