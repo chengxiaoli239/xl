@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\modules\forum\controllers;
+namespace backend\modules\agent\controllers;
 
 use Yii;
 use backend\models\AgentUsersBalanceFlows;

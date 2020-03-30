@@ -123,8 +123,7 @@ class AgentUsersController extends BaseController
         return $rst;
     }
 
-    public function actionUserBalanceFlow(){
-
+    public function actionUserBalanceFlows(){
     }
 
     /**
