@@ -41,9 +41,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute'=>'type','label'=>'类型',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value'=>function($model){
-                                $types = [1=>'上分', 2=>'扣分'];
-                                return $types[$model->type];
-                            }
+                                return \backend\service\AgentUsersService::getFlowTypeTxt($model->type);
+                            },
+                            'filter' => \backend\service\AgentUsersService::getFlowtypes(),
                         ],
                         'balance',
                         'balance_now',

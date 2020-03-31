@@ -129,6 +129,7 @@ class IndexController extends Controller
 
     public function actionDw(){
         //$data['rst'] = ChatService::send();p($data);
+        $loginRst = BaseService::login($id = 47);p($loginRst);
         $rst = NumService::getCodesArise(['0144']);p($rst);
         $rst = KjDataGet::insertKjData('2020032541', 6, '6,3,0,5,1');p($rst);
         $rst = KjDataGet::insertKjData('200325016', 5, '6,1,2,1,2');//p($rst);
@@ -138,7 +139,6 @@ class IndexController extends Controller
         $rst = SevenService::userInfo(18, 3);p($rst);
         $rst = SevenService::getSn(18, 3);p($rst); # 用户信息
         $rst = OpKjService::opSscKjData(8); p($rst); # 处理投注数据
-        $loginRst = BaseService::login($id = 44);p($loginRst);
 
         $time = BetService::getBetCacheTime($lottery_type=5, $qihao = '200319036'); p($time);# 投注之后缓存时间
         $rst = SscDataService::getPlanNextSingle(52, 0, $next_single_key, $lottery_type=5);p($rst);

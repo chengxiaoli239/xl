@@ -42,7 +42,7 @@ class AgentUsersService extends BaseService {
      * @return string
      */
     public static function getUserToken($name = '', $agent_id = '', $randKey = 'MLGB'){
-        return md5($name.'_'.$agent_id.'_'.$randKey);
+        return substr(md5($name.'_'.$agent_id.'_'.$randKey), 0,12);
     }
 
     /**
@@ -177,6 +177,22 @@ class AgentUsersService extends BaseService {
         }
 
         return ['status'=>200, 'msg'=>'操作成功', 'data'=>['status'=>200, 'msg'=>$desc]];
+    }
+
+    /**
+     * @desc 类型名称
+     * @param $type
+     * @return mixed
+     */
+    public static function getFlowTypeTxt($type){
+        $types = self::getFlowtypes();
+
+        return $types[$type];
+    }
+
+    public static function getFlowtypes(){
+
+        return [1=> '上分', 2=>'扣分'];
     }
 
 }

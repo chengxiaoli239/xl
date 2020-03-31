@@ -118,7 +118,6 @@ class AgentUsersController extends BaseController
         $agent_id = \Yii::$app->user->id;
         $rand = Yii::$app->getSecurity()->generateRandomString();
         $rst['token'] = AgentUsersService::getUserToken('rand_name', $agent_id, $rand);
-        $rst['token'] = $rand;
 
         return $rst;
     }

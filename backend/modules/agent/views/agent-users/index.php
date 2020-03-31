@@ -189,7 +189,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'updated_at',
                         [
                             'class' => 'yii\grid\ActionColumn','headerOptions'=>['width'=>'25%'],
-                            'template'=>'{act-up-balance} {act-down-balance} {act-user-del} {act-user-edit} {act-user-balance-flows}',
+                            'template'=>'{act-up-balance} {act-down-balance} {act-user-edit} {act-user-balance-flows} {act-user-copy-url} {act-user-del}',
                              'buttons' => [
                                  // 下面代码来自于 yii\grid\ActionColumn 简单修改了下
                                  'act-up-balance' => function ($url, $model, $key) {
@@ -237,6 +237,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                          'data-name' => $model->name,
                                      ];
                                      return Html::button('查', $options);
+                                 },
+                                 'act-user-copy-url' => function ($url, $model, $key) {
+                                     $options = [
+                                         'type'=>'button',
+                                         'class'=>'min-btn btn-info act-user-copy-url btn btn-default',
+                                         'data-id'=>$model->id,
+                                         'data-token'=>$model->token,
+                                         'data-name' => $model->name,
+                                     ];
+                                     return Html::button('地址', $options);
                                  },
                              ],
                         ],
@@ -319,7 +329,7 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 
 <!--删除提示框-->
-<div class="modal fade" id="delTipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+<div class="modal fade" id="MSG_TipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
      min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
 ">
@@ -338,6 +348,32 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="delConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--删除提示框-->
+<div class="modal fade" id="COPY_TipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
+     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
+">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="copy_tip_msg_title"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group up-reason">
+                    <label id="copy_tip_msg" for="copy_tip_msg"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="CopyConfirm">确定</button>
             </div>
         </div>
     </div>
@@ -414,6 +450,23 @@ $this->params['breadcrumbs'][] = $this->title;
 
             showTips(up_id, '账号:', '正在变更['+up_name+']数据，')
         });
+        
+        $('.act-user-copy-url').click(function () {
+            var up_name = $(this).attr('data-name');
+            var token = $(this).attr('data-token');
+            $("#copy_tip_msg_title").html("用户[<strong>"+up_name+"</strong>]游戏地址");
+            $("#copy_tip_msg").html('http://120.77.157.40:8090/chat/index/index?token='+ token + '&nbsp;&nbsp 长按复制');
+            $("#act").val('act-user-copy-url');
+            $("#COPY_TipModal").modal('show');
+        });
+        $("#CopyConfirm").click(function () {
+            //copyUrl2('copy_tip_msg');
+
+            var Url2=document.getElementById("copy_tip_msg");
+            Url2.select(); // 选择对象
+            document.execCommand("Copy"); // 执行浏览器复制命令
+            alert("已复制好，可贴粘。");
+        });
 
         // 删除用户
         $('.act-user-del').click(function () {
@@ -423,7 +476,7 @@ $this->params['breadcrumbs'][] = $this->title;
             $("#del_tip_msg_title").html("删除用户");
             $("#del_tip_msg").html("确定删除用户："+up_name+ '？');
             $("#act").val('act-user-del')
-            $("#delTipModal").modal('show');
+            $("#MSG_TipModal").modal('show');
         });
 
         function showTips(id, tip_msg = '积分变动', title = '提示信息') {
@@ -473,5 +526,12 @@ $this->params['breadcrumbs'][] = $this->title;
             window.location.href = '/agent/agent-users-balance-flows/index?AgentUsersBalanceFlows[member_account]='+account;
 
         });
+
+        function copyUrl2(id){
+            var Url2=document.getElementById(id);
+            Url2.select(); // 选择对象
+            document.execCommand("Copy"); // 执行浏览器复制命令
+            alert("已复制好，可贴粘。");
+        }
     });
 </script>
