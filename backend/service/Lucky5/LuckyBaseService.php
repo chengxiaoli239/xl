@@ -1727,8 +1727,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 'bet_way'=>$way,
                 'is_xian'=>0,
                 'number_type'=>40,
-                'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
-                'bet_log'=>'[四定位]，合分值范围：[30-35]',
+                //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
+                'bet_log'=>'[四定位]，定位置“[取]”：千=[1]，百=[24]，十=[4]，个=[6]',
                 'is_package' => 0,
                 'period_no'=>'20'.$qihao,
                 'operation_condition' => self::getOperationCondition(),
@@ -1765,7 +1765,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             //}
             # 真实投注
             $start_time = microtime(true);
-            //p(['url'=>$url, 'headers'=>self::$headers, 'rst'=>$rst,'post_data'=>$post_data]);
+            //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$rst,'post_data'=>$post_data]);
             $tmpRst = self::postBetCurl($url, $post_data, $headers);
             $rst[$key] = $tmpRst;
             //$rst = json_encode($rst);
