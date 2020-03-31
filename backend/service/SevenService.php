@@ -816,7 +816,7 @@ class SevenService extends BaseTZService {
         foreach ($middle_domains as $domain){
             if(strpos($matches[1], $domain) !== false){
                 $roboot_id = trim(str_replace('; path=/; domain=.'.$domain.'.xyz','', $matches[1]));
-                Tool_Common::log('getSessionId', 'INFO', 'middle_domains', '获取session_id', ['url'=>$url, 'domain'=>$domain]);
+                Tool_Common::log('getSessionId', 'INFO', '获取session_id', ['url'=>$url, 'domain'=>$domain]);
                 break;
             }
         }
