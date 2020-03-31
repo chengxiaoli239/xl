@@ -804,7 +804,7 @@ class SevenService extends BaseTZService {
         curl_setopt($curl, CURLOPT_SSLVERSION, 3);
 
         $content = curl_exec($curl);
-        //p(['url'=>$url, 'header'=>$header, 'content'=>$content]);
+        //p(['url'=>$url, 'header'=>$header, 'content'=>$content, 'errno'=>curl_error($curl)]);
         //preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
         if(strpos($content, 'Set-Cookie') !== false){
             preg_match("/Set\-Cookie:([^\r\n]*)/i", $content, $matches);
@@ -812,7 +812,21 @@ class SevenService extends BaseTZService {
             preg_match("/document.cookie\=\'([^\r\n]*)\'/i", $content, $matches);
         }
 
-        $roboot_id = trim(str_replace('; path=/; domain=.cq779835.xyz','', $matches[1]));
+        $middle_domains = \Yii::$app->params['TZ_SITE_MIDDLE_DOMAINS'];
+        foreach ($middle_domains as $domain){
+            if(strpos($matches[1], $domain) !== false){
+                $roboot_id = trim(str_replace('; path=/; domain=.'.$domain.'.xyz','', $matches[1]));
+                Tool_Common::log('getSessionId', 'INFO', 'middle_domains', '获取session_id', ['url'=>$url, 'domain'=>$domain]);
+                break;
+            }
+        }
+        /*
+        if(strpos($matches[1], 'cq779835') !== false){
+            $roboot_id = trim(str_replace('; path=/; domain=.cq779835.xyz','', $matches[1]));
+        }elseif (strpos($matches[1], 'ww98877') !== false){
+            $roboot_id = trim(str_replace('; path=/; domain=.ww98877.xyz','', $matches[1]));
+        }
+        */
         if(strpos($roboot_id, '您当前使用的浏览器不支持') !== false){
             $tmp_roboot_id = explode('\';', $roboot_id);
             $roboot_id = $tmp_roboot_id[0];
@@ -856,6 +870,7 @@ class SevenService extends BaseTZService {
         ];
         # 1、获取SessionId
         $robot7_session_id = self::getSessionId($url, $headers);
+        //if($uid=21)p($robot7_session_id);
 
         $tmpCookieStr = $robot7_session_id;
         $headers[] = 'Referer: '.$url;

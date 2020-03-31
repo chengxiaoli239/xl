@@ -27,5 +27,8 @@ return [
 
     'GET_BASE_DATA_CACHE_TIME' => 30 * 60,
 
+    # 站点域名，目前大部分站点登录之前robot7_session_id匹配获取
+    'TZ_SITE_MIDDLE_DOMAINS' => ['cq779835', 'ww98877', 'ww33899', 'wx36625771', 'ww666733', 'cq779835'],
+
 ];
 
