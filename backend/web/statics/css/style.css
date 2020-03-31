@@ -721,7 +721,11 @@ ul.top-menu > li > a:hover, ul.top-menu > li > a:focus {
 .sidebar-toggle-box .fa-bars {
     cursor: pointer;
     display: inline-block;
-    font-size: 34px;
+    font-size: 28px;
+    z-index: 9999;
+    width: 35px;
+    height: 20px;
+    margin-top: -5px;
 }
 
 
