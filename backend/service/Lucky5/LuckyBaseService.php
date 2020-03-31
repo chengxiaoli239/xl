@@ -1762,7 +1762,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst['code'], [302, 303, 304, 305, 306])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
                     return $rst;
                 }
-                //return $rst;
+                return $rst;
             }
 
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
