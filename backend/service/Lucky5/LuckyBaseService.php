@@ -1701,7 +1701,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $tmpCodes = str_replace(',', '', $tmpCodes);
         $codesArr = explode('@', $tmpCodes);
 
-        $codesArrs = self::splitCodes($codesArr,  2500); # 2500一次
+        $codesArrs = self::splitCodes($codesArr,  1700); # 2500一次
 
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
