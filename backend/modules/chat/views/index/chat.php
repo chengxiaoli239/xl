@@ -435,6 +435,7 @@
                 createWebSocket("ws://"+domain+":9501/ws?uid="+uid+"&fp="+result);
             }
         }, 'json');
+        setInterval('heartbeat()', 50000); // add 04.01
     });
 
     var mescroll;
@@ -448,6 +449,19 @@
             }
         });
     })
+    //发送心跳包 add 04.01
+    function heartbeat() {
+        var json = {
+            "class": "Index",
+            "action": "index",
+            "param": {
+                "type": 'heartbeat',
+                "txt": 'heartbeat',
+            }
+        };
+        //chat.wsSend(JSON.stringify(json));
+        ws.send(JSON.stringify(json));
+    }
 </script>
 
 </body>

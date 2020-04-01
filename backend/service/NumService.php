@@ -421,54 +421,69 @@ class NumService extends BaseService {
     public static function getAllCombination2($codes, $type = 1, $code_type = 4){
         if(strlen($codes) != 2) return [];
 
-        if($code_type == 2){
+        if($code_type == 2){ # 二定
             $tmpCodesArr = NumService::getCodesTwo([$codes[0], $codes[1]]); # 格式：[['1','2', 'X', 'X'], ['1', 'X', '2', 'X']] ..
             $codesArr = [];
             foreach ($tmpCodesArr as $tmpCodes){
                 $codesArr[] = implode(',', $tmpCodes);
             }
-        }else{
+        }elseif($code_type==3) { # 三定
+            if ($type == 1) {
+                $where = [
+                    'AND',
+                    ['=', 'code_type', 3],
+                    [
+                        'OR',
+                        ['LIKE', 'code', '%' . $codes[0] . ',' . $codes[1] . '%', false],
+                        ['LIKE', 'code', '%' . $codes[0] . '%' . $codes[1] . '%', false],
 
-            if($code_type == 5){ # 五位二定
-                $codesArr = NumService::getTwo5ByTwoNums([$codes[0], $codes[1]]); # 格式：[['1','X','X','X','2'],['X','1','X','X','2'], ['X','X','1','X','2'],['X','X','X','1','2']] ..
-            }else {
-                if ($type == 1) { # 取
+                        ['LIKE', 'code', '%' . $codes[1] . ',' . $codes[0] . '%', false],
+                        ['LIKE', 'code', '%' . $codes[1] . '%' . $codes[0] . '%', false],
+                    ]
+                ];
+            }
+            $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
+            $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+
+        }elseif($code_type == 5){ # 五位二定
+            $codesArr = NumService::getTwo5ByTwoNums([$codes[0], $codes[1]]); # 格式：[['1','X','X','X','2'],['X','1','X','X','2'], ['X','X','1','X','2'],['X','X','X','1','2']] ..
+        }elseif($code_type == 4){
+            if ($type == 1) { # 取
+                $where = [
+                    'AND',
+                    ['=', 'code_type', 4],
+                    [
+                        'OR',
+                        ['LIKE', 'code', '%' . $codes[0] . ',' . $codes[1] . '%', false],
+                        ['LIKE', 'code', '%' . $codes[0] . '%' . $codes[1] . '%', false],
+
+                        ['LIKE', 'code', '%' . $codes[1] . ',' . $codes[0] . '%', false],
+                        ['LIKE', 'code', '%' . $codes[1] . '%' . $codes[0] . '%', false],
+                    ]
+                ];
+            } else { # 除
+                if ($codes[0] == $codes[1]) { # 双重
                     $where = [
                         'AND',
+                        ['NOT LIKE', 'code', $codes[0] . ',' . $codes[1] . ',%,%', false],
+                        ['NOT LIKE', 'code', $codes[0] . ',%,' . $codes[1] . ',%', false],
+                        ['NOT LIKE', 'code', $codes[0] . ',%,%,' . $codes[1], false],
+                        ['NOT LIKE', 'code', '%,' . $codes[0] . ',' . $codes[1] . ',%', false],
+                        ['NOT LIKE', 'code', '%,' . $codes[0] . ',%,' . $codes[1], false],
+                        ['NOT LIKE', 'code', '%,%,' . $codes[0] . ',' . $codes[1], false],
                         ['=', 'code_type', 4],
-                        [
-                            'OR',
-                            ['LIKE', 'code', '%' . $codes[0] . ',' . $codes[1] . '%', false],
-                            ['LIKE', 'code', '%' . $codes[0] . '%' . $codes[1] . '%', false],
-
-                            ['LIKE', 'code', '%' . $codes[1] . ',' . $codes[0] . '%', false],
-                            ['LIKE', 'code', '%' . $codes[1] . '%' . $codes[0] . '%', false],
-                        ]
                     ];
-                } else { # 除
-                    if ($codes[0] == $codes[1]) { # 双重
-                        $where = [
-                            'AND',
-                            ['NOT LIKE', 'code', $codes[0] . ',' . $codes[1] . ',%,%', false],
-                            ['NOT LIKE', 'code', $codes[0] . ',%,' . $codes[1] . ',%', false],
-                            ['NOT LIKE', 'code', $codes[0] . ',%,%,' . $codes[1], false],
-                            ['NOT LIKE', 'code', '%,' . $codes[0] . ',' . $codes[1] . ',%', false],
-                            ['NOT LIKE', 'code', '%,' . $codes[0] . ',%,' . $codes[1], false],
-                            ['NOT LIKE', 'code', '%,%,' . $codes[0] . ',' . $codes[1], false],
-                            ['=', 'code_type', 4],
-                        ];
-                    } else {
-                        $where = [
-                            'AND',
-                            ['NOT LIKE', 'code', '%' . $codes[0] . '%', false],
-                            ['NOT LIKE', 'code', '%' . $codes[1] . '%', false],
-                            ['=', 'code_type', 4],
-                        ];
-                    }
+                } else {
+                    $where = [
+                        'AND',
+                        ['NOT LIKE', 'code', '%' . $codes[0] . '%', false],
+                        ['NOT LIKE', 'code', '%' . $codes[1] . '%', false],
+                        ['=', 'code_type', 4],
+                    ];
                 }
-                $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
-                $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
             }
+            $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
+            $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
         }
 
         if($code_type == 4){
@@ -495,6 +510,17 @@ class NumService extends BaseService {
                 $codesArr = NumService::getTwo5ByTwoNums([$twoNum[0], $twoNum[1]]);
             }
         }elseif($code_type == 3){
+            if($type == 1) {
+                $where = [
+                    'AND',
+                    ['=', 'code_type', 3],
+                    ['LIKE', 'code', '%'.$codes[0].'%', false],
+                    ['LIKE', 'code', '%'.$codes[1].'%', false],
+                    ['LIKE', 'code', '%'.$codes[2].'%', false],
+                ];
+            }
+            $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
+            $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
         }elseif($code_type == 4){
             $op = $type == 1 ? 'OR' : 'AND';
             $like_op = ($type == 1) ? 'LIKE' : 'NOT LIKE';
@@ -1125,8 +1151,9 @@ class NumService extends BaseService {
             $codesArr_arise = self::getCodesArise($asises, $type = 1, $code_type);
             //p(['code_type'=>$code_type, 'where'=>$where, 'codes_hz'=>$codes_hz, 'codesArr_arise'=>$codesArr_arise, 'codesArr'=>$codesArr]);
             if(in_array($code_type, [4])) {
-                $codesArr = array_intersect($codesArr, $codesArr_arise);
+                $codesArr = array_intersect($codesArr, $codesArr_arise); # 函数用于比较两个(或更多个)数组的键值,并返回交集
             }elseif($code_type == 3){
+                $codesArr = array_intersect($codesArr, $codesArr_arise);
             }else{
                 $codesArr = $codesArr_arise;
             }
