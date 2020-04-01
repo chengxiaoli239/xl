@@ -816,7 +816,7 @@ class SevenService extends BaseTZService {
         foreach ($middle_domains as $domain){
             if(strpos($matches[1], $domain) !== false){
                 $roboot_id = trim(str_replace('; path=/; domain=.'.$domain.'.xyz','', $matches[1]));
-                Tool_Common::log('getSessionId', 'INFO', '获取session_id', ['url'=>$url, 'domain'=>$domain, 'roboot_id'=>$roboot_id]);
+                Tool_Common::log('getSessionId', 'INFO', '获取session_id', ['url'=>$url, 'domain'=>$domain, 'roboot_id'=>$roboot_id, 'content'=>$content]);
                 break;
             }
         }
@@ -829,12 +829,13 @@ class SevenService extends BaseTZService {
         */
         if(strpos($roboot_id, '您当前使用的浏览器不支持') !== false){
             $tmp_roboot_id = explode('\';', $roboot_id);
-            $roboot_id = $tmp_roboot_id[0];
+            if($tmp_roboot_id[0]) $roboot_id = $tmp_roboot_id[0];
         }
         $logArr = ['content'=>$content, 'roboot_id'=>$roboot_id];
+        Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
         if(TRUE OR curl_error($curl)>0){
-            $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
-            Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
+            $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'roboot_id'=>$roboot_id]);
+            Tool_Common::log('roboot_id', 'INFO', '获取roboot_id', $logArr);
         }
 
         return $roboot_id;
@@ -884,7 +885,7 @@ class SevenService extends BaseTZService {
         if(strpos($SevenStarHFDirector1Frontend1, 'Akamai_Cookie') === false){
             $AKamaiCookie = self::curlGetSevenCookie($url, array_merge($headers, [$tmpCookieStr]));
             if($AKamaiCookie) $tmpCookieStr = trim(';'.$AKamaiCookie, ';');
-            $tmpCookieStr .= ';NOTICE_LOGIN_IN=0';
+            if($tmpCookieStr) $tmpCookieStr .= ';NOTICE_LOGIN_IN=0';
         }
         //p(['robot7_session_id'=>$robot7_session_id, 'headers'=>$headers, 'SevenStarHFDirector1Frontend1'=>$SevenStarHFDirector1Frontend1, 'AKamaiCookie'=>$AKamaiCookie]);
         if($tmpCookieStr){
@@ -897,7 +898,7 @@ class SevenService extends BaseTZService {
         self::$headers = [];
         $tmpCookieArr = explode(';',$SevenStarHFDirector1Frontend1);
         $cookie = $tmpCookieArr[0];
-        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
+        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'SevenStarHFDirector1Frontend1'=>$SevenStarHFDirector1Frontend1, 'url'=>$url, 'headers'=>$headers];
         //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
         $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
@@ -938,6 +939,10 @@ class SevenService extends BaseTZService {
             $data .= str_replace('; path=/; HttpOnly','',trim($cookie)).';';
         }
         $data = str_replace("; path=/; Httponly;",'',$data);
+
+        $logArr = ['matches'=>$matches, 'cookie'=>$cookie, 'url'=>$url, 'header'=>$header, 'content'=>$content];
+        //p($logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/curlGetSevenCookie','INFO','curlGetSevenCookie记录', $logArr);
 
         return $data;
     }
