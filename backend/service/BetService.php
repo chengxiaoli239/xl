@@ -619,7 +619,7 @@ abstract class BetService extends BaseBetService {
            $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
            $m->set($mkey, 1, $time);
 
-           if($plan->is_test == 1){ # 模拟下注
+           if($plan->is_test == 1 OR $plan->uid == 1){ # 模拟下注
                $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1); # 直接记录表
            }else{ # 正式下注
                # 1、首先判断是否登录，否则登录之后再下注
