@@ -13,6 +13,8 @@ use backend\models\LotteryType;
 use backend\models\SystemConfig;
 use backend\models\User;
 use backend\service\huiyuan\KuaiLe8Service;
+use backend\service\Juhua\JuHuaBaseService;
+use backend\service\Juhua\JuHuaService;
 use backend\service\Lucky5\LuckyBaseService;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineService6;
@@ -68,6 +70,10 @@ abstract class BetService extends BaseBetService {
             # 5、希腊网
             if($lottery_type == 3) { # 希腊网 5分彩
                 $BetService = new XlService($uid, $tz_system_id);
+            }
+        }elseif(in_array($tz_system_id, [11])){
+            if($lottery_type == 5){
+                $BetService = new JuHuaService($uid, $tz_system_id);
             }
         }elseif(in_array($tz_system_id, [6])){
             # 6、会员网
@@ -871,6 +877,9 @@ abstract class BetService extends BaseBetService {
         }elseif(in_array($tz_system_id, [5])){
             # 5、希腊网
             $flag = XlService::isLogin($uid, $tz_system_id);
+        }elseif(in_array($tz_system_id, [11])){
+            # 11、菊花网
+            $flag = JuHuaBaseService::isLogin($uid, $tz_system_id);
         }
 
         return (boolean)$flag;

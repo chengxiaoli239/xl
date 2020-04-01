@@ -13,6 +13,7 @@ use backend\models\SscKjData;
 use backend\models\TzSystemsUsers;
 use backend\service\BetService;
 use backend\service\huiyuan\HuiYuanService5;
+use backend\service\Juhua\JuHuaBaseService;
 use backend\service\KuaiLe8Service;
 use backend\service\Lucky5\LuckyBaseService;
 use backend\service\NineNine\NineNineBaseService;
@@ -128,8 +129,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = JuHuaBaseService::synBalance(21); p($rst); # 同步余额
+        $snInfo = JuHuaBaseService::getSn($uid =12, $tz_system_id = 11); p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+        $loginRst = BaseService::login($id = 48);p($loginRst);
         //$data['rst'] = ChatService::send();p($data);
-        $loginRst = BaseService::login($id = 47);p($loginRst);
         $rst = NumService::getCodesArise(['0144']);p($rst);
         $rst = KjDataGet::insertKjData('2020032541', 6, '6,3,0,5,1');p($rst);
         $rst = KjDataGet::insertKjData('200325016', 5, '6,1,2,1,2');//p($rst);
@@ -403,7 +406,6 @@ class IndexController extends Controller
         $rst = BetService::userSysPlansTzNow(81, 3); p($rst);
         $rst = CqsscSevenDay::getLotteryNo(); p($rst);
         $rst = StaticService::getSameCodes('1221', 1);p($rst);
-        $rst = SevenService::synBalance(7); p($rst); # 同步余额
         //p(base64_decode('1324%E5%85%A8%E5%80%92%E5%9B%9B%E5%AE%9A%E5%90%840.1'));
         $rst = BetService::getPlansAllCodesType2(3, 4); p($rst);
 

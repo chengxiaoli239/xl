@@ -9,6 +9,7 @@
 namespace backend\service;
 use backend\models\TzSystemsUsers;
 use backend\service\huiyuan\HuiYuanBaseService;
+use backend\service\Juhua\JuHuaBaseService;
 use backend\service\Lucky5\LuckyBaseService;
 use backend\service\qilin\QiLinBaseService;
 use  yii;
@@ -52,6 +53,9 @@ class BaseService{
         }elseif(in_array($tz_system_id, [6])){
             # 6、会员网
             $rst = HuiYuanBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+        }elseif(in_array($tz_system_id, [11])){
+            # 11、菊花网暂时没对接登录
+            //$rst = JuHuaBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
         }elseif(in_array($tz_system_id, [8])){
             # 8、麒麟财务系统网
             $rst = QiLinBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
@@ -72,7 +76,7 @@ class BaseService{
         }
 
         if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
-            return false;
+            //return false;
         }
         $tz_system_id = $TzSystemsUser->tz_system_id;
         if(in_array($tz_system_id, [1,2])){
@@ -95,6 +99,8 @@ class BaseService{
         }elseif(in_array($tz_system_id, [6])){
             # 6、会员网
             $rst = HuiYuanBaseService::synBalance($TzSystemsUser->id);
+        }elseif(in_array($tz_system_id, [11])){
+            $rst = JuHuaBaseService::synBalance($TzSystemsUser->id);
         }elseif(in_array($tz_system_id, [8])){
             # 8、麒麟财务系统网
             $rst = QiLinBaseService::synBalance($TzSystemsUser->id);
