@@ -841,6 +841,10 @@ abstract class BetService extends BaseBetService {
             # 5、希腊网
             if($lottery_type == 3) { # 希腊网 5分彩
             }
+        }elseif(in_array($tz_system_id, [11])){ # 菊花网
+            if($lottery_type == 5){
+                $rst = JuHuaBaseService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
+            }
         }elseif(in_array($tz_system_id, [6])){
             # 6、会员网
             if($lottery_type == 5) { # 重庆时时彩

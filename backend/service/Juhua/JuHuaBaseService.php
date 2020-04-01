@@ -519,8 +519,18 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
-        $counts = (int)($BettingRecords->betting_money/$BettingRecords->single);
-        $post_data = [ 'ids'=>'{'.$sn.'}|'.$counts, 'period_no' => $qihao];
+        //$counts = (int)($BettingRecords->betting_money/$BettingRecords->single);
+        //$post_data = [ 'ids'=>'{'.$sn.'}|'.$counts, 'period_no' => $qihao];
+        $tmpDatas = explode(';', $BettingRecords->snid);
+        $post_data = [];
+        foreach ($tmpDatas as $key=>$tmpData){
+            $d = explode(',', $tmpData);
+            $post_data['lotnumbers'][$key]['orderno'] = $d[0];
+            $post_data['lotnumbers'][$key]['lotname'] = $d[1];
+            $post_data['lotnumbers'][$key]['number'] = $d[2];
+        }
+        $post_data['serno'] = '20'.$BettingRecords->qihao;
+        $post_data['isencode'] = true;
 
         $_t = round(microtime(true) * 1000);
         $headers = [
@@ -538,11 +548,11 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $TzSystemsUsers->user_agent,
         ];
 
-        $url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER').'?'.http_build_query($post_data);
+        $url = self::getTzSiteInfo(self::$tz_system_id, 'SSC_INDEX').'/cancelnumbers';//.'?'.http_build_query($post_data);
 
-        $rst = CurlService::postCurl($url, $post_data, $headers);
-        if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
-            $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
+        $rst = self::postBetCurl($url, $post_data, $headers);
+        if($rst['status'] == 200 && !empty($rst['suc'])){
+            $BettingRecords = BettingRecords::findOne(['sn'=>$sn]);
             $BettingRecords->cancel_status = 1;
             $BettingRecords->save();
             $rst['status'] = 200;
@@ -552,6 +562,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         }
         $logArr = ['url'=>$url, 'snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
+        //p($logArr);
 
         return $rst;
     }
