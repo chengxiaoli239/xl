@@ -399,7 +399,24 @@
                 autoShowLoading: true
             }
         });
+
+        setInterval('heartbeat()', 50000); // add 04.01
     })
+
+    //发送心跳包 add 04.01
+    function heartbeat() {
+        var json = {
+            "class": "Index",
+            "action": "index",
+            "param": {
+                "type": 'heartbeat',
+                "txt": 'heartbeat',
+            }
+        };
+        //chat.wsSend(JSON.stringify(json));
+        ws.send(JSON.stringify(json));
+    }
+
 </script>
 
 </body>
