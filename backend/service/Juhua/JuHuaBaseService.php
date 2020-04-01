@@ -1251,8 +1251,6 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         ];
 
         $data = self::httpGet($url, $headers);
-        //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
-        BaseService::synBalance($TzSystemsUsers->id);
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','菊花游戏-用户信息', $logArr);
         return $data;
