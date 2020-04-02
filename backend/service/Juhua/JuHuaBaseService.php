@@ -359,33 +359,48 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @param integer $playway 1二定2三定3四定
      * @return array
      */
-    public static function getBetCodes($codesData, $single = 0.1, $playway = 1){
+    public static function getBetCodes($codesData, $single = 0.1, $playway = 1, $type = ''){
         $codes = [];
         $codesData = str_replace(',','',$codesData);
         $codesData = str_replace('@',',',$codesData);
 
-        /*
-        if($playway == 1){ # 二定
-            $codesArr = explode(',', $codesData);
-            foreach ($codesArr as $code){
-                $dict_no_type_id = self::getdict_no_type_id($code, $playway);
-                $codes[] = ['dict_no_type_id'=>$dict_no_type_id, 'bet_no'=>$code, 'bet_money'=>$single];
-            }
-        }elseif ($playway == 2){
-            $codesArr = explode(',', $codesData);
-            foreach ($codesArr as $code){
-                $dict_no_type_id = self::getdict_no_type_id($code, $playway);
-                $codes[] = ['dict_no_type_id'=>$dict_no_type_id, 'bet_no'=>$code, 'bet_money'=>$single];
+        if($playway == 2){
+            if($type){
+                $codes  = [$type=>implode('M'.$single.'N', $codesData).'M'.$single.'N'];
+            }else{
+                $types = [
+                    'OOOX'=> [],
+                    'OOXO'=> [],
+                    'OXOO'=> [],
+                    'XOOO'=> [],
+                ];
+
+                # 三定
+                $tmpTypes = [];
+                foreach ($codesData as $code){
+                    $code = strtoupper($code);
+                    $pos = strpos($code, 'X');
+                    if($pos == 0){
+                        $type = 'XOOO';
+                    }elseif($pos == 1){
+                        $type = 'OXOO';
+                    }elseif($pos == 2){
+                        $type = 'OOXO';
+                    }elseif($pos == 3){
+                        $type = 'OOOX';
+                    }
+                    $tmpTypes[$type][] = $code;
+                }
+                $codes = [];
+                foreach ($tmpTypes as $key=>$typeCode){
+                    $codes[$key] = implode('M'.$single.'N', $typeCode).'M'.$single;
+                }
             }
 
+        }else{
+            # 四定
+            $codes = ['OOOO'=>implode('M'.$single.'N', $codesData).'M'.$single];
         }
-        */
-        $codesArr = explode(',', $codesData);
-        foreach ($codesArr as $code){
-            $dict_no_type_id = self::getdict_no_type_id($code, $playway);
-            $codes[] = ['dict_no_type_id'=>$dict_no_type_id, 'bet_no'=>$code, 'bet_money'=>$single];
-        }
-        //p([$codesData, $single, $playway, $codes]);
 
         return $codes;
     }
@@ -1716,7 +1731,8 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $snInfo_snid = '';
         $rst = [];
         foreach ($codesArrs as $key=>$tmpcodesArr){
-            $bet_codes = json_encode(['OOOO'=>implode('M'.$single.'N', $tmpcodesArr).'M'.$single]);
+            //$bet_codes = json_encode(['OOOO'=>implode('M'.$single.'N', $tmpcodesArr).'M'.$single]);
+            $bet_codes = json_encode(self::getBetCodes($tmpcodesArr, $single, $playway));
             $post_data = [
                 'si'=>$bet_codes, # 号码信息
                 'sn'=>'20'.$qihao, # 不清楚

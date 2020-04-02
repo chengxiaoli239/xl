@@ -3,7 +3,7 @@
 3、Form Data
 3、Query String Parameters
 
-一、 下注
+一、 四定下注
 1、Genenral
 Request URL: http://f5.faa2020.com/sellnumbers
 Request Method: POST
@@ -103,3 +103,31 @@ X-Requested-With: XMLHttpRequest
 timeid: 1585753360494
 4、返回：
 {"status":200,"info":{"user_name":"jj771","alias_name":"","print_title":"\"\"","cur_serno":"2020040140","total_credit":99.6,"used_credit":"0.0","remain_credit":99.6},"other":{"open":true,"qprflag":"0","is_print":"1"},"last_order":[],"perorder_max":{"OOXX":{"max":1500,"min":1,"multi":"1.0"},"OXOX":{"max":1500,"min":1,"multi":"1.0"},"OXXO":{"max":1500,"min":1,"multi":"1.0"},"XOOX":{"max":1500,"min":1,"multi":"1.0"},"XOXO":{"max":1500,"min":1,"multi":"1.0"},"XXOO":{"max":1500,"min":1,"multi":"1.0"},"OOOX":{"max":100,"min":0.1,"multi":"0.1"},"OOXO":{"max":100,"min":0.1,"multi":"0.1"},"OXOO":{"max":100,"min":0.1,"multi":"0.1"},"XOOO":{"max":100,"min":0.1,"multi":"0.1"},"OOOO":{"max":50,"min":0.1,"multi":"0.1"},"AA":{"max":1000,"min":1,"multi":"1.0"},"AAA":{"max":1000,"min":1,"multi":"1.0"},"AAAA":{"max":100,"min":1,"multi":"1.0"},"OXXX":{"max":3000,"min":1,"multi":"1.0"},"XOXX":{"max":3000,"min":1,"multi":"1.0"},"XXOX":{"max":3000,"min":1,"multi":"1.0"},"XXXO":{"max":3000,"min":1,"multi":"1.0"},"XXXXO":{"max":3000,"min":1,"multi":"1.0"},"XXXOO":{"max":1500,"min":1,"multi":"1.0"},"OXXXO":{"max":1500,"min":1,"multi":"1.0"},"XOXXO":{"max":1500,"min":1,"multi":"1.0"},"XXOXO":{"max":1500,"min":1,"multi":"1.0"}},"order_lotdefid":3}
+
+五、三定
+1、Genenral
+Request URL: http://f2.faa2020.com/sellnumbers
+Request Method: POST
+
+2、Requerst Header
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Content-Length: 362
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Cookie: __cfduid=d582bae660d8c42d134f11e9a6926019d1584195092; AC=MC%3Ae8a69493b35a226d64ea5805a48597d0; sel_appid=f1; AC=; LC=f3%7Cf4%7Cf5%7Cf2%7Cf1; MCLIST=f1-efcd34c55f9f62ff50e8705e459b6fce%7Cf2-64eed9189ac1ec3adbaa16cdaa018bd9%7Cf5-54a5d3297f3741d393787ff7ce0633ea%7Cf4-ba43009b9e1a3c3496a775e173f2c8d0%7Cf3-b1286341f02778f752d0224f3c5aa436; MC=0306afd5d179a8605e731190c80a2b67; sel_lotdefid=2
+Host: f2.faa2020.com
+Origin: http://f2.faa2020.com
+Referer: http://f2.faa2020.com/order_print?tid=1585837677
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36
+X-Requested-With: XMLHttpRequest
+3、Form Data
+si: {"OOOX":"255XM0.1N256XM0.1N265XM0.1N266XM0.1N275XM0.1N276XM0.1N355XM0.1N356XM0.1N365XM0.1N366XM0.1N375XM0.1N376XM0.1N455XM0.1N456XM0.1N465XM0.1N466XM0.1N475XM0.1N476XM0.1"}
+sn: 20200402055
+uc: 96.4
+ot: 3
+log: 2M1N1N0N324N567N56NM3N1N0N0N0N0N0NN0N0N0N0NN0N0N0N0NN0N0N0N0NM99N18N0.1
+nomd5: 790dcf70e60a4f9360e930481e041eb5
+commited_suffix: 1585837709611
+
