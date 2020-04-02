@@ -100,17 +100,18 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 if($model->is_simulate){
                                     $str = '模拟订单';
 
+                                    return $str;
                                     //$str .= ' | '.Html::a('下注', $url2, ['title' => '下注'.$model->id,'alt'=>$model->id]);
                                     //$str .= ' | '.Html::a('反买', $url3, ['title' => '反买'.$model->snid,'alt'=>$model->snid]);
-                                    return $str;
                                 }
                                 if($model->cancel_status == 1){
-                                    $rst = '<font color="red">已撤单</font>';
+                                    $str = '<font color="red">已撤单</font>';//.$model->sn;
                                     if($model->playway == 2){
                                         //$rst .= ' | '.Html::a('点击反买', $url3, ['title' => '点击反买:'.$model->snid,'alt'=>$model->snid]) ;
                                     }
                                     if(\Yii::$app->user->id == 1) $rst = '等待开奖';
-                                    return $rst;
+                                    //return $str;
+                                    return Html::a($str, '#', ['title' => '方案号：'.$model->sn,'alt'=>$model->sn]);;
                                 }
                                 if(!$model->status){
                                     $str = Html::a('点击撤单', $url1, ['title' => '点击撤单:'.$model->snid,'alt'=>$model->snid]);
