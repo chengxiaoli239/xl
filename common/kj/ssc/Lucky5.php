@@ -17,37 +17,38 @@ class Lucky5 extends BaseKj {
      */
     public static function getLotteryLucky($returnType = 'json'){
 
-        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
-            $domain = BaseKj::getApiHost(18);
+        if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $TzSystemsUserses = TzSystemsUsers::find()->where(['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [7,9]] ])->all();
+            foreach ($TzSystemsUserses as $TzSystemsUsers){ # 用户账号去网盘抓数据
+                //$domain = BaseKj::getApiHost(18);
+                $domain = $TzSystemsUsers->ssc_domain;
 
-            $t = microtime(true) * 10000;
-            $url = $domain.'/Member/GetMemberPrint?_='.$t; #当前开奖号码
-            # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015
-            $tz_system_users_id = 48;
-            $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_users_id);
+                $t = microtime(true) * 10000;
+                $url = $domain.'/Member/GetMemberPrint?_='.$t; #当前开奖号码
+                # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015
 
-            $headers = [
-                'Accept: application/json, text/javascript, */*; q=0.01',
-                'Accept-Encoding: gunzip, deflate',
-                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-                'Connection: keep-alive',
-                'Cookie: '.$TzSystemsUsers->cookie,
-                'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
-                'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$t,
-                $TzSystemsUsers->user_agent,
-                'X-Requested-With: XMLHttpRequest',
-            ];
-            $content = CurlService::getCurl($url, $headers);
-            //$data = json_decode($content,320);
-            $data = $content;
-            //p([$url, $headers, $data]);
+                $headers = [
+                    'Accept: application/json, text/javascript, */*; q=0.01',
+                    'Accept-Encoding: gunzip, deflate',
+                    'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                    'Connection: keep-alive',
+                    'Cookie: '.$TzSystemsUsers->cookie,
+                    'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+                    'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$t,
+                    $TzSystemsUsers->user_agent,
+                    'X-Requested-With: XMLHttpRequest',
+                ];
+                $content = CurlService::getCurl($url, $headers);
+                //$data = json_decode($content,320);
+                $data = $content;
 
-            if ($data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) return false;
-            $row = $data['Data']['draw_info'][0];
-            $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
-            if($opencode == '0,0,0,0,0') return false;
-            $kjData = ['expect'=>$row['period_no'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
-            //p($kjData);
+                if ($data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) return false;
+                $row = $data['Data']['draw_info'][0];
+                $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
+                if($opencode == '0,0,0,0,0') return false;
+                $kjData = ['expect'=>$row['period_no'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
+                //p($kjData);
+            }
         }
         $opencode = $kjData['opencode'];
         $opentime = $kjData['opentime'];

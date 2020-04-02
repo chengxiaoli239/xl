@@ -129,6 +129,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = KjDataGet::insertKjData('20200403004', 8, '5,7,0,3,3');p($rst);
         $rst = JuHuaBaseService::getBetCodes(['2123', '3457', '7892', '3029', '3X09', '3424'], $single = 0.1, $playway=3); p($rst); # 同步余额
         $rst = JuHuaBaseService::getBetCodes(['X123', 'X457', 'X892', '30X9', '3X09', '34X4'], $single = 0.1, $playway=2); p($rst); # 同步余额
         $rst = JuHuaBaseService::synBalance(21); p($rst); # 同步余额
@@ -136,7 +137,6 @@ class IndexController extends Controller
         $loginRst = BaseService::login($id = 48);p($loginRst);
         //$data['rst'] = ChatService::send();p($data);
         $rst = NumService::getCodesArise(['0144']);p($rst);
-        $rst = KjDataGet::insertKjData('2020032541', 6, '6,3,0,5,1');p($rst);
         $rst = KjDataGet::insertKjData('200325016', 5, '6,1,2,1,2');//p($rst);
         $rst = KjDataGet::insertKjData('200325017', 5, '0,7,8,0,7');//p($rst);
         $rst = KjDataGet::insertKjData('200325018', 5, '0,9,0,0,5');//p($rst);
