@@ -76,7 +76,7 @@ class BaseService{
         }
 
         if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
-            //return false;
+            return false;
         }
         $tz_system_id = $TzSystemsUser->tz_system_id;
         if(in_array($tz_system_id, [1,2])){
