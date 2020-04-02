@@ -23,7 +23,7 @@ class Lucky5 extends BaseKj {
             $t = microtime(true) * 10000;
             $url = $domain.'/Member/GetMemberPrint?_='.$t; #当前开奖号码
             # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015
-            $tz_system_users_id = 39;
+            $tz_system_users_id = 48;
             $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_users_id);
 
             $headers = [
