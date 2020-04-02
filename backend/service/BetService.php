@@ -361,6 +361,8 @@ abstract class BetService extends BaseBetService {
                     $codesArr = ArrayHelper::getColumn($codesArr, 'code');
                 }elseif($tz_type == 21){ # 四定两兄弟
                     $codesArr = NumService::get2bCodeArr();
+                }elseif(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])) { # 导入方案 34
+                    $codesArr = UserSysPlansService::getImportCodes($plan_id);
                 }elseif($tz_type == 22){ # 四定单双
                     $codesArr = NumService::getCodesByDs(explode(',',$codes_hz));
                 }elseif($tz_type == 23){ # 上奖
