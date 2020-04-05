@@ -1834,9 +1834,9 @@ class SscDataService extends BaseService {
         set_time_limit(0);
 
         //for($i = 10000; $i<=19999; $i++){
-        //for($i = 10000; $i<=13501; $i++){
+        for($i = 10000; $i<=13501; $i++){
         //for($i = 13500; $i<=16501; $i++){
-        for($i = 16500; $i<=19999; $i++){
+        //for($i = 16500; $i<=19999; $i++){
             $code = substr($i, 1,4);
             $codes = $code[0].','.$code[1].','.$code[2].','.$code[3];
             if(!$Num4Type = Num4Type::findOne(['code'=>$codes])){
@@ -1844,10 +1844,14 @@ class SscDataService extends BaseService {
             }else{
                 //continue;
             }
+            $code_strArr = [$code[0], $code[1], $code[2], $code[3]];
+            asort($code_strArr);
+            $code_str = implode('', $code_strArr);
 
             $code_type = CommonService::isCodeType4numDs($codes); # 号码类型,四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
             $setData = [
                 'code' => $codes, # 号码
+                'code_str' => $code_str, # 号码
                 'code_1' => $code[0], # 第一个号码
                 'code_2' => $code[1], # 第二个号码
                 'code_3' => $code[2], # 第三个号码
