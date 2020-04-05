@@ -129,6 +129,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::insertCodeType();p($rst);
         $rst = KjDataGet::insertKjData('20200403004', 8, '5,7,0,3,3');p($rst);
         $rst = JuHuaBaseService::getBetCodes(['2123', '3457', '7892', '3029', '3X09', '3424'], $single = 0.1, $playway=3); p($rst); # 同步余额
         $rst = JuHuaBaseService::getBetCodes(['X123', 'X457', 'X892', '30X9', '3X09', '34X4'], $single = 0.1, $playway=2); p($rst); # 同步余额
@@ -176,7 +177,6 @@ class IndexController extends Controller
         $rst = OpKjService::opKjData4('3,X,X,X,5@X,X,X,9,5@X,X,7,X,5@3,9,X,X,X','3,9,7,9,5');p($rst);
         $rst = SscDataService::insertCodeType5();p($rst);
         $rst = KjDataGet::updateNullCode($num = 1000, $lottery_type = 5);p($rst);
-        $rst = SscDataService::insertCodeType();p($rst);
         $str = '0,9,1,0';
         $rst = CommonService::isCodeType22b($str);p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([32], $lottery_type = 5, 80000);p($miss);

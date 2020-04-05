@@ -30,6 +30,7 @@
     }
 </style>
 <body class="bg--efeff4">
+<input type="hidden" name="token" id="token" value="<?php echo $_GET['token']?>">
 
 <!-- <>微现场 -->
 <div class="wei__scene-panel flexbox flex-direction--column">
@@ -93,8 +94,9 @@
 </div>
 
 <script type="text/javascript">
+    var token = $("#token").val();
     var uid = '1238120025638916098'
-    var url_domain = 'http://154.83.17.96:6060'
+    var url_domain = 'http://120.77.157.40:8989'
     $(function(){
         var buttonArray = [
             '查','上','下','二','三','四','定','现','←',
@@ -210,8 +212,16 @@
             //var avatar = "http://154.83.17.96:6060/static/images/avatar/f1/f_3.jpg";
             var avatar = "static/images/avatar/f1/f_3.jpg";
             var text = $editor.val();
-            var json = {"class":"Index", "action":"index", "param":{"type": 4,"name": "wangyegao_tz", "uid":uid, "avatar": avatar, "message": text, "c":'text',"roomid":1}};
-            if(isEmpty($editor.val()+'1235')){
+            var json = {
+                "class":"Index", "action":"index",
+                "param":{
+                    "type": 4, 'token':token,
+                    "name":"wangyegao_tz", "uid":uid, "avatar": avatar,
+                    "message": text, "c":'text', "roomid":1
+                }
+            };
+            console.log(json)
+            if(isEmpty($editor.val())){
                 return;
             }
             // JSON.stringify(json)
@@ -277,10 +287,6 @@
 
     //  监听消息
     function onmessage(event){
-        //appendln("receive:" + event.data);
-        //alert(event.data);
-        var uid = '1238120025638916098'
-
         var ret = JSON.parse(event.data);
         var $chatMsgList = $("#J__chatMsgList");
         console.log(ret.code);
@@ -426,7 +432,7 @@
     var fp = new Fingerprint2();
     fp.get(function(result) {
         var uid = '1238120025638916098'
-        //var domain = '154.83.17.96';
+        var token = $("#token").val();
         var domain = '120.77.157.40';
         var url = "http://"+domain+":8090/chat/index/bind";
         console.log(result);
@@ -457,6 +463,7 @@
             "param": {
                 "type": 'heartbeat',
                 "txt": 'heartbeat',
+                "token": token,
             }
         };
         //chat.wsSend(JSON.stringify(json));
