@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $code 号码
+ * @property string $code_str 排序号码
  * @property string $code_1
  * @property string $code_2
  * @property string $code_3
@@ -53,7 +54,7 @@ class Num4Type extends \common\models\base\BaseModel
         return [
             [['type_2', 'type_22', 'type_3', 'type_4', 'type_22b', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_log', 'type_3n_2b', 'type_3d', 'type_3s', 'type_4d', 'type_4s', 'codes_hz', 'code_type', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
-            [['code'], 'string', 'max' => 12],
+            [['code', 'code_str'], 'string', 'max' => 12],
             [['code_1', 'code_2', 'code_3', 'code_4', 'code_5'], 'string', 'max' => 1],
         ];
     }
@@ -66,6 +67,7 @@ class Num4Type extends \common\models\base\BaseModel
         return [
             'id' => 'ID',
             'code' => '号码',
+            'code_str' => '排序号码',
             'code_1' => 'Code 1',
             'code_2' => 'Code 2',
             'code_3' => 'Code 3',
