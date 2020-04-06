@@ -4,7 +4,7 @@
  * author: lianyuanfu
  * Date: 2015-07-22
  */
-namespace common\tools;
+namespace common\service\chat;
 class Tool_Common
 {
 

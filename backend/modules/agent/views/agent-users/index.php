@@ -58,7 +58,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute'=>'images','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>['image',['height'=>30, 'width'=>30]],
                             'value'=>function($model){
-                                return Yii::$app->params['CHAT_DOMAIN'].'/static/images/avatar/f1/f_'.$model->id.'.jpg';
+                                //return Yii::$app->params['CHAT_DOMAIN'].'/static/images/avatar/f1/f_'.$model->id.'.jpg';
+                                return $model->images;
                             }
                         ],
                         //'balance',

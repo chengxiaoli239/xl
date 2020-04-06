@@ -341,7 +341,7 @@
         }else if(ret.code == 2){  // 聊天
             // 1、微信群聊： "wxid1":"群房间号", "wxid2":"发送的用户id"  2、私聊 "wxid1":"wxid_875i1kgd38x122", "wxid2":"_"
             var message = ret.data;
-            var avatar = message.avatar.indexOf("http://") != -1? message.avatar : url_domain + '/' + message.avatar;
+            var avatar = message.avatar.indexOf("http://") != -1 ? message.avatar :  message.avatar;
             var tpl_msg = '';
             console.log(ret);
             if(message.roomid > 0){ // 群聊

@@ -46,6 +46,7 @@ class ChatController extends Controller
         $rst = ChatCommonBetService::betByDesc($token, $txt);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/chatBet','INFO', '聊天室下注', $post);
 
-        return ['status'=>200, 'msg'=>'接收到请求', 'token'=>$token, 'tz_params'=>$post['params']];
+        return $rst;
+        //return ['status'=>200, 'msg'=>'接收到请求', 'token'=>$token, 'tz_params'=>$post['params']];
     }
 }
