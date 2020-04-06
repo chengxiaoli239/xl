@@ -92,6 +92,8 @@
         <!--</div>-->
     </div>
 </div>
+<input type="hidden" name="avatar" id="avatar" value="">
+<input type="hidden" name="username" id="username" value="">
 
 <script type="text/javascript">
     var token = $("#token").val();
@@ -144,6 +146,9 @@
 
     /** __自定函数 */
     $(function(){
+        /* 获取用户信息 */
+        $.post();
+
         /* ——聊天区函数(底部) */
         //...点击内容区域(关闭表情/选择区)
         $(document).on("click", ".ws__chatMsg-panel", function (){
@@ -210,13 +215,14 @@
         $(".J__submitCnt").on("click", function(){
             //判断内容是否为空
             //var avatar = "http://154.83.17.96:6060/static/images/avatar/f1/f_3.jpg";
-            var avatar = "static/images/avatar/f1/f_3.jpg";
+            var avatar = $("#avatar").val();
+            var name = $("#username").val();
             var text = $editor.val();
             var json = {
                 "class":"Index", "action":"index",
                 "param":{
                     "type": 4, 'token':token,
-                    "name":"wangyegao_tz", "uid":uid, "avatar": avatar,
+                    "name":name, "avatar": avatar,
                     "message": text, "c":'text', "roomid":1
                 }
             };
@@ -432,12 +438,13 @@
     var fp = new Fingerprint2();
     fp.get(function(result) {
         var uid = '1238120025638916098'
-        var token = $("#token").val();
         var domain = '120.77.157.40';
-        var url = "http://"+domain+":8090/chat/index/bind";
+        var url = "http://"+domain+":8090/agent/agent-users/get-user-info";
         console.log(result);
-        $.post(url,{uid:uid, fingerprint:result}, function(ret){
+        $.post(url,{token:token}, function(ret){
             if(ret.status == 200){
+                $("#avatar").val(ret.data.avatar)
+                $("#username").val(ret.data.name)
                 createWebSocket("ws://"+domain+":9501/ws?uid="+uid+"&fp="+result);
             }
         }, 'json');

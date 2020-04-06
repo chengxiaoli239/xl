@@ -3,6 +3,7 @@
 namespace backend\modules\agent\controllers;
 
 use backend\service\AgentUsersService;
+use backend\service\ChatCommonBetService;
 use backend\service\HN0898Service;
 use Yii;
 use backend\models\AgentUsers;
@@ -126,6 +127,17 @@ class AgentUsersController extends BaseController
     public function actionUserBalanceFlows(){
     }
 
+    /**
+     * @desc 获取用户信息接口
+     * @return array
+     */
+    public function actionGetUserInfo(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $rst = ChatCommonBetService::getUserInfo($this->_post['token']);
+
+        return $rst;
+    }
     /**
      * Updates an existing AgentUsers model.
      * If update is successful, the browser will be redirected to the 'view' page.

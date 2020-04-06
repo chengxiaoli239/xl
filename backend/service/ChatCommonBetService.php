@@ -51,4 +51,22 @@ class ChatCommonBetService extends BaseService {
 
         return $AgentUsers;
     }
+
+    /**
+     * @desc 获取用户信息
+     * @param $token
+     * @return array
+     */
+    public static function getUserInfo($token){
+        if(empty($token)) return ['status'=>404, 'msg'=>'缺少参数token'];
+
+        if(!$AgentUsers = AgentUsers::findOne(['token'=>$token])){
+            return ['status'=>401, 'msg'=>'未找到用户信息'];
+        }
+
+        //$rst = ['status'=>200, 'msg'=>'操作成功', 'data'=>$AgentUsers->attributes];
+        $rst = ['status'=>200, 'msg'=>'操作成功', 'data'=>['name'=>$AgentUsers->name, 'avatar'=>$AgentUsers->images]];
+
+        return $rst;
+    }
 }
