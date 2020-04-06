@@ -195,4 +195,15 @@ class AgentUsersService extends BaseService {
         return [1=> '上分', 2=>'扣分'];
     }
 
+    /**
+     * @desc 随机获取用户头像
+     * @param $agent_id
+     * @return string
+     */
+    public static function getImages($agent_id){
+        $num = rand(2, 13);
+        $img = 'static/images/avatar/f1/f_'.$num.'.jpg';
+
+        return $img;
+    }
 }

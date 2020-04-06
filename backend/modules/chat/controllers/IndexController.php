@@ -11,7 +11,7 @@ class IndexController extends Controller
 {
 	public function actionIndex($id=''){
 	    $data = [];
-        return $this->render('chat', $data);
+        return $this->render('index', $data);
     }
     public function actionBind($id=''){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;

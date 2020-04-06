@@ -71,6 +71,7 @@ class AgentUsersController extends BaseController
 
         AgentUsersService::opPreData($this->_post, $agent_id);
         //p($this->_post);
+        $this->_post['images'] = AgentUsersService::getImages($agent_id);
         if ($model->load($this->_post) && $model->save()) {
             return $this->redirect(['index']);
         }
@@ -138,6 +139,7 @@ class AgentUsersController extends BaseController
         $model = $this->findModel($id);
 
         AgentUsersService::opPreData($this->_post, $agent_id);
+        if(!$this->_post['images']) $this->_post['images'] = AgentUsersService::getImages($agent_id);
         if ($model->load($this->_post) && $model->save()) {
             return $this->redirect(['index']);
         }

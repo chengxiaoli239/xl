@@ -12,6 +12,7 @@ use backend\models\Admin;
 use backend\models\SscKjData;
 use backend\models\TzSystemsUsers;
 use backend\service\BetService;
+use backend\service\ChatCommonBetService;
 use backend\service\huiyuan\HuiYuanService5;
 use backend\service\Juhua\JuHuaBaseService;
 use backend\service\KuaiLe8Service;
@@ -129,6 +130,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = ChatCommonBetService::betByDesc($token='e221d63e7d00', $desc = '千123456789百123456789十123456789个123456789各0.1');p($rst);
         $rst = SscDataService::insertCodeType();p($rst);
         $rst = KjDataGet::insertKjData('20200403004', 8, '5,7,0,3,3');p($rst);
         $rst = JuHuaBaseService::getBetCodes(['2123', '3457', '7892', '3029', '3X09', '3424'], $single = 0.1, $playway=3); p($rst); # 同步余额

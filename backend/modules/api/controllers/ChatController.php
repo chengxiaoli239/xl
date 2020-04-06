@@ -8,6 +8,7 @@
 
 namespace backend\modules\api\controllers;
 
+use backend\service\ChatCommonBetService;
 use backend\service\HN0898Service;
 use common\tools\Tool_Common;
 use Yii;
@@ -39,9 +40,12 @@ class ChatController extends Controller
     public function actionBet(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
+        $token = $post['params']['token'];
+        $txt = $post['params']['txt'];
 
+        $rst = ChatCommonBetService::betByDesc($token, $txt);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/chatBet','INFO', '聊天室下注', $post);
 
-        return ['status'=>200, 'msg'=>'接收到请求', 'token'=>$post['params']['token'], 'tz_params'=>$post['params']];
+        return ['status'=>200, 'msg'=>'接收到请求', 'token'=>$token, 'tz_params'=>$post['params']];
     }
 }
