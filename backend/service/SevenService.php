@@ -812,19 +812,15 @@ class SevenService extends BaseTZService {
             preg_match("/document.cookie\=\'([^\r\n]*)\'/i", $content, $matches);
         }
 
-        $middle_domains = \Yii::$app->params['TZ_SITE_MIDDLE_DOMAINS'];
-        foreach ($middle_domains as $domain){
-            if(strpos($matches[1], $domain) !== false){
-                $roboot_id = trim(str_replace('; path=/; domain=.'.$domain.'.xyz','', $matches[1]));
-                Tool_Common::log('getSessionId', 'INFO', '获取session_id', ['url'=>$url, 'domain'=>$domain, 'roboot_id'=>$roboot_id, 'content'=>$content]);
-                break;
-            }
+        $Arrs = explode('.', $url);
+        $domain = $Arrs[1];
+        if(strpos($matches[1], $domain) !== false){
+            $roboot_id = trim(str_replace('; path=/; domain=.'.$domain.'.xyz','', $matches[1]));
+            Tool_Common::log('getSessionId', 'INFO', '获取session_id', ['url'=>$url, 'domain'=>$domain, 'roboot_id'=>$roboot_id, 'content'=>$content]);
         }
         /*
         if(strpos($matches[1], 'cq779835') !== false){
             $roboot_id = trim(str_replace('; path=/; domain=.cq779835.xyz','', $matches[1]));
-        }elseif (strpos($matches[1], 'ww98877') !== false){
-            $roboot_id = trim(str_replace('; path=/; domain=.ww98877.xyz','', $matches[1]));
         }
         */
         if(strpos($roboot_id, '您当前使用的浏览器不支持') !== false){
