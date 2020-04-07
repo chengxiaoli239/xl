@@ -16,13 +16,18 @@ class ChatCommonBetService extends BaseService {
      * @param string $desc
      * @return array|AgentUsers ['status'=>200, 'msg'=>'投注结果描述']
      */
-    public static function betByDesc($token, $desc = ''){
+    public static function betByDesc($token, $desc = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $rst = [];
 
         $info = ChatCommonBetService::getUserInfoByToken($token);
+        $rst['userInfo'] = $info['data'];
+        $rst['data'] =  [ # 期号、当前期状态
+            'qihao' => substr(HN0898Service::getQihao($lottery_type), -3),
+        ];
         if($info['status'] != 200){ # 验证账号状态
-            //return ['status'=>404, 'msg'=>'非法用户', 'data'=>['avatar'=>'static/images/avatar/f1/f_xxx.jpg']];
-            return ['status'=>300, 'msg'=>$info['msg'], 'userInfo'=>$info['data']];
+            $rst['status'] = 300;
+            $rst['msg'] = $info['msg'];
+            return $rst;
         }
         $userInfo = $info['data'];
 

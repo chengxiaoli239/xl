@@ -43,7 +43,7 @@ class ChatController extends Controller
         $token = $post['params']['token'];
         $txt = $post['params']['txt'];
 
-        $rst = ChatCommonBetService::betByDesc($token, $txt);
+        $rst = ChatCommonBetService::betByDesc($token, $txt, $lottery_type = 5);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/chatBet','INFO', '聊天室下注', $post);
 
         return $rst;
