@@ -433,9 +433,25 @@ Request Method: GET
 
 
 
+当前期投注状态：
+1、Genenral
+Request URL: http://f1.cq779835.xyz/drawno/GetCurrentPeriodStatus?_=1586275845210
+Request Method: GET
+2、Requerst Header
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Cookie: __cfduid=d300ad5c39dc5d94006d6bf4613138fe91584160848; robot7=4H+Gm4gEVZ5cGyp0a/Mg6f+27urp4Oyr9fBuLOD3EbwdN268+KeISHswUevKyqCG8uUCjuFmpejvB3UTbfTZog==; SevenStarHFDirector1Frontend1=edtqls4nfmdg0y3m3l0425tk; Akamai_Cookie=2517633546.12917.0000; robot3=WemqDDBz/eDkm6St20FY0y59R0U0DoxF/aNUZGJffis=; NOTICE_LOGIN_IN=1
+Host: f1.cq779835.xyz
+Referer: http://f1.cq779835.xyz/App/Index?_=1586275664344
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36
+X-Requested-With: XMLHttpRequest
+3、Query String Parameters
+_: 1586275845210
 
-
-
+返回：Data.status : 4开盘倒计时 0开盘中 1已封盘
+{"Status":1,"Data":{"period_no":20200408001,"open_datetime":"2020-04-08 00:10:50","close_datetime":"2020-04-08 00:29:30","status":0,"enable_status":1,"next_period_no":20200408002,"next_open_datetime":"2020-04-08 00:30:50","next_close_datetime":"2020-04-08 00:49:30","next_period_status":4,"next_period_enable_status":1,"last_seconds":803.0,"system_now_diff":1.0,"system_db_now":"2020-04-08 00:16:07","real_period_no":20200408001}}
 
 
 
