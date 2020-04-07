@@ -11,16 +11,35 @@ use common\tools\Tool_Common;
 class ChatCommonBetService extends BaseService {
 
 
+    /**
+     * @param $token
+     * @param string $desc
+     * @return array|AgentUsers ['status'=>200, 'msg'=>'投注结果描述']
+     */
     public static function betByDesc($token, $desc = ''){
+        $rst = [];
 
-        $rst = ChatCommonBetService::getUserInfoByToken($token);
-        if(!$rst['status'] != 200){
+        $info = ChatCommonBetService::getUserInfoByToken($token);
+        if($info['status'] != 200){ # 验证账号状态
             //return ['status'=>404, 'msg'=>'非法用户', 'data'=>['avatar'=>'static/images/avatar/f1/f_xxx.jpg']];
-            return $rst;
+            return ['status'=>300, 'msg'=>$info['msg'], 'userInfo'=>$info['data']];
+        }
+        $userInfo = $info['data'];
+
+        $rst['status'] = 200;
+        $rst['msg'] = '状态正常，等待对接攻击接口';
+        $rst['userInfo'] = $userInfo;
+
+        $balance = $userInfo['balance']; # 用户投注前余额
+        $needMoney = NumService::getNeedMoneyByDesc($desc);
+        if($balance<$needMoney){
+            $rst['status'] = 300;
+            $rst['msg'] = '需分:'.$needMoney. '，剩鱼:'.$balance;
         }
 
         //$code_hz = BetService::xx();
 
+        return $rst;
     }
 
     /**
@@ -30,8 +49,9 @@ class ChatCommonBetService extends BaseService {
      */
     public static function getUserInfoByToken($token){
         $AgentUsers = AgentUsers::findOne(['token'=>$token]);
-        $rst = ['status'=>200, 'msg'=>'操作成功', 'params'=>['name'=>$AgentUsers->name, 'avatar'=>$AgentUsers->images]];
+        //$rst = ['status'=>200, 'msg'=>'操作成功', 'params'=>['name'=>$AgentUsers->name, 'avatar'=>$AgentUsers->images]];
 
+        $rst['data'] = $AgentUsers;
         if($AgentUsers->status == 0){
             $rst['status'] = 301;
             $rst['msg'] = '账号未激活';
@@ -45,11 +65,12 @@ class ChatCommonBetService extends BaseService {
 
         if($AgentUsers->balance <= 0){
             $rst['status'] = 303;
-            $rst['msg'] = '账号余分不足！';
+            $rst['msg'] = '账号余分不足！剩鱼:'.$AgentUsers->balance;
             return $rst;
         }
 
-        return $AgentUsers;
+        $rst['status'] = 200;
+        return $rst;
     }
 
     /**

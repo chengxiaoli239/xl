@@ -1878,4 +1878,13 @@ class NumService extends BaseService {
         return $data;
     }
 
+    /**
+     * @param $desc
+     * @return float
+     */
+    public static function getNeedMoneyByDesc($desc){
+        $money = 10.00;
+
+        return $money;
+    }
 }
