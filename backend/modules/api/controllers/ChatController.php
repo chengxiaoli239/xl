@@ -37,16 +37,30 @@ class ChatController extends Controller
      * @desc 聊天室下注
      * @return array
      */
-    public function actionBet(){
+    public function actionPostDesc(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         $token = $post['params']['token'];
         $txt = $post['params']['txt'];
 
-        $rst = ChatCommonBetService::betByDesc($token, $txt, $lottery_type = 5);
+        $rst = ChatCommonBetService::postDesc($token, trim($txt), $lottery_type = 5);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/chatBet','INFO', '聊天室下注', $post);
 
         return $rst;
         //return ['status'=>200, 'msg'=>'接收到请求', 'token'=>$token, 'tz_params'=>$post['params']];
+    }
+
+    /**
+     * @desc 获取用户信息接口
+     * @return array
+     */
+    public function actionGetUserInfo(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $token = $post['token'];
+
+        $rst = ChatCommonBetService::getUserInfo($token);
+
+        return $rst;
     }
 }

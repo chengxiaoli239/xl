@@ -1,3 +1,4 @@
+<title>聊天室</title>
 <script src="http://120.77.157.40:8090/chat_statics/js/jquery-1.8.0.min.js"></script>
 <script src="http://120.77.157.40:8090/chat_statics/js/fingerprint2.min.js"></script>
 <style>
@@ -439,7 +440,7 @@
     fp.get(function(result) {
         var uid = '1238120025638916098'
         var domain = '120.77.157.40';
-        var url = "http://"+domain+":8090/agent/agent-users/get-user-info";
+        var url = "http://"+domain+":8090/api/chat/get-user-info";
         console.log(result);
         $.post(url,{token:token}, function(ret){
             if(ret.status == 200){

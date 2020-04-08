@@ -145,6 +145,7 @@ return [
             'chat/*',
             'api/*',
             'kj/*',
+            '/agent/agent-users/get-user-info',
             #'forum/index/tz',
             #'admin/*',
             // The actions listed here will be allowed to everyone including guests.
