@@ -126,6 +126,7 @@ class XjSsc extends BaseKj {
         //$content = file_get_contents($url);
         if($datas = $m->get($mkey)) return $datas;
         $h = str_replace('https://', '', $domain);
+        $h = str_replace('http://', '', $h);
 
         $headers = [
            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
