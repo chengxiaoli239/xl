@@ -47,6 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         'balance',
                         'balance_now',
+                        'balance_after',
                         'desc',
                         //'status',
                         ['attribute'=>'status','label'=>'操作',//'headerOptions'=>['width'=>'5%'],// #'headerOptions'=>['width'=>'5%'],

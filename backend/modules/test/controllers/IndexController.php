@@ -130,6 +130,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $desc = '上50';
+        $type = ChatCommonBetService::getTypeByDesc($desc);p($type);
+
+        $rst = ChatCommonBetService::upOrDownBalance($desc);p($rst);
         $rst = ChatCommonBetService::betByDesc($token='e221d63e7d00', $desc = '千123456789百123456789十123456789个123456789各0.1');p($rst);
         $rst = SscDataService::insertCodeType();p($rst);
         $rst = KjDataGet::insertKjData('20200403004', 8, '5,7,0,3,3');p($rst);

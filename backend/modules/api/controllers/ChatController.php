@@ -41,10 +41,10 @@ class ChatController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         $token = $post['params']['token'];
-        $txt = $post['params']['txt'];
+        $txt = $post['params']['tz_txt'];
 
         $rst = ChatCommonBetService::postDesc($token, trim($txt), $lottery_type = 5);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/chatBet','INFO', '聊天室下注', $post);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/chatBet','INFO', '聊天室下注', ['post'=>$post, 'rst'=>$rst]);
 
         return $rst;
         //return ['status'=>200, 'msg'=>'接收到请求', 'token'=>$token, 'tz_params'=>$post['params']];

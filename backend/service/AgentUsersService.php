@@ -162,18 +162,18 @@ class AgentUsersService extends BaseService {
                 return ['status'=>303, 'msg'=>current($AgentUsers->getFirstError())];
             }
 
-            $AgentUsersBalanceFlows->balance_now = $after_balance;
+            $AgentUsersBalanceFlows->balance_after = $after_balance;
             $AgentUsersBalanceFlows->status = 1;
 
         }elseif($status == 2){ # 审核拒绝
-            $AgentUsersBalanceFlows->balance_now = $AgentUsers->balance;
+            $AgentUsersBalanceFlows->balance_after = $AgentUsers->balance;
             $AgentUsersBalanceFlows->status = 2;
         }
 
         $AgentUsersBalanceFlows->desc = $desc;
         $AgentUsersBalanceFlows->check_time = (string)time();
         if(!$flag = $AgentUsersBalanceFlows->save()){
-            return ['status'=>303, 'msg'=>current($AgentUsersBalanceFlows->getFirstError())];
+            return ['status'=>303, 'msg'=>current($AgentUsersBalanceFlows->getErrors())];
         }
 
         return ['status'=>200, 'msg'=>'操作成功', 'data'=>['status'=>200, 'msg'=>$desc]];

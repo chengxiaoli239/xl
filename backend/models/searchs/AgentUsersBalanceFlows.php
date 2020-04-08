@@ -20,7 +20,7 @@ class AgentUsersBalanceFlows extends AgentUsersBalanceFlowsModel
         return [
             [['id', 'agent_id', 'type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['member_id', 'member_account', 'desc', 'update_time'], 'safe'],
-            [['balance', 'balance_now'], 'number'],
+            [['balance', 'balance_now', 'balance_after'], 'number'],
         ];
     }
 
