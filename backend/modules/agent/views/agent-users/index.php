@@ -269,6 +269,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <!-- page end-->
 </section>
 <input type="hidden" name="act" id="act" value="">
+<input type="hidden" name="copyTxt" id="copyTxt" value="">
 
 <!--修改积分-->
 <div class="modal fade" id="tipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
@@ -281,7 +282,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span></button>
-                    <h4 class="modal-title" id="tip_msg_title"></h4>
+                    <h4 class="modal-title" id="tip_msg_title_1"></h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group up-reason">
@@ -355,7 +356,7 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 
 
-<!--删除提示框-->
+<!--复制提示框-->
 <div class="modal fade" id="COPY_TipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
      min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
@@ -369,12 +370,12 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             <div class="modal-body">
                 <div class="form-group up-reason">
-                    <label id="copy_tip_msg" for="copy_tip_msg"></label>
+                    <label id="copy_tip_msg" for="copy_tip_msg"></label><span></span>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="CopyConfirm">确定</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" data-clipboard-target="#copy_tip_msg" id="CopyConfirm">复制</button>
             </div>
         </div>
     </div>
@@ -382,6 +383,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 <script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script>
+<script src="/chat_statics/js/clipboard.min.js"></script>
 <script>
     $(function () {
         function updateData(id, act, udata='') {
@@ -456,17 +458,33 @@ $this->params['breadcrumbs'][] = $this->title;
             var up_name = $(this).attr('data-name');
             var token = $(this).attr('data-token');
             $("#copy_tip_msg_title").html("用户[<strong>"+up_name+"</strong>]游戏地址");
-            $("#copy_tip_msg").html('http://120.77.157.40:8090/chat/index/index?token='+ token + '&nbsp;&nbsp 长按复制');
+            $("#copy_tip_msg").html('http://120.77.157.40:8090/chat/index/index?token='+ token );
             $("#act").val('act-user-copy-url');
             $("#COPY_TipModal").modal('show');
         });
+        var clipboard;
         $("#CopyConfirm").click(function () {
-            //copyUrl2('copy_tip_msg');
 
-            var Url2=document.getElementById("copy_tip_msg");
-            Url2.select(); // 选择对象
-            document.execCommand("Copy"); // 执行浏览器复制命令
-            alert("已复制好，可贴粘。");
+            if(clipboard){
+                clipboard.destroy();
+            }
+
+            var copyBtn = new ClipboardJS('#CopyConfirm');
+
+            var flag = 0;
+            var txt = '';
+            copyBtn.on("success",function(e){
+                // 复制成功
+                txt = e.text;
+                //alert(e.text);
+                $("#copyTxt").val(e.text);
+                e.clearSelection();
+            });
+
+            $("#tip_msg_title").html('复制结果');
+            //$("#tip_msg_rst").html($("#copyTxt").val());
+            $("#tip_msg_rst").html("复制成功");
+            $("#rstTipModal").modal('show');
         });
 
         // 删除用户
