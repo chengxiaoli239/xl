@@ -12,6 +12,7 @@ use backend\models\TzSystemsUsers;
 use common\tools\Tool_Common;
 
 class ChatCommonBetService extends BaseService {
+    public static $types = [1=>'上分', 2=>'下分', 3=>'开奖查询', 4=>'投注'];
 
     /**
      * @desc 接受用户发送desc
