@@ -315,7 +315,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">×</span></button>
-                <h4 class="modal-title" id="tip_msg_title">修改结果</h4>
+                <h4 class="modal-title" id="tip_msg_title">提示信息</h4>
             </div>
             <div class="modal-body">
                 <div class="form-group up-reason">

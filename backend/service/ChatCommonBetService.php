@@ -1,6 +1,7 @@
 <?php
 
 namespace backend\service;
+use backend\models\AgentRecordUsersDesc;
 use backend\models\AgentUsers;
 use backend\models\AgentUsersBalanceFlows;
 use backend\models\CodeTypes;
@@ -23,16 +24,27 @@ class ChatCommonBetService extends BaseService {
 
         $info = ChatCommonBetService::getUserInfoByToken($token);
         $userInfo = $info['data'];
-        $rst['userInfo'] = $userInfo;
+        //$rst['userInfo'] = $userInfo;
         $types = [1=>'上分', 2=>'下分', 3=>'查询开奖', 4=>'投注'];
         $type = ChatCommonBetService::getTypeByDesc($desc);
+        $qihao = HN0898Service::getQihao($lottery_type);
+        $rst = [
+            'type' => $type,
+            'qihao' => $qihao,
+            'userInfo' => $userInfo,
+        ];
+
+        $rst['data'] =  [ # 期号、当前期状态
+            'qihao' => substr($qihao, -3),
+        ];
+
         $setData = [
             'agent_id' => $userInfo->agent_id,
             'member_id'=>$userInfo->id,
         ];
 
         if(in_array($type, [1, 2])){ # 1、上、下分
-            $rst = array_merge(ChatCommonBetService::upOrDownBalance($desc, $userInfo), ['type'=>$type]);
+            $rst = array_merge(ChatCommonBetService::upOrDownBalance($desc, $userInfo), $rst);
             return $rst;
         }elseif ($type == 3){   # 查询开奖
 
@@ -49,10 +61,6 @@ class ChatCommonBetService extends BaseService {
                 'updated_at' => time(),
             ];
         }
-
-        $rst['data'] =  [ # 期号、当前期状态
-            'qihao' => substr(HN0898Service::getQihao($lottery_type), -3),
-        ];
 
         # 1、记录下发送desc
 
@@ -236,5 +244,38 @@ class ChatCommonBetService extends BaseService {
         return $rst;
     }
 
+    /**
+     * @desc 记录用发送消息
+     * @param $post
+     * @param $rst
+     * @return array
+     */
+    public static function recordPostDesc($post, $postRst){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+        $token = $post['params']['token'];
+        $desc = $post['params']['tz_txt'];
+        $type = $postRst['type'];
+
+        $setData = [
+            'agent_id' => $postRst['userInfo']['agent_id'],
+            'member_id' => $postRst['userInfo']['id'],
+            'member_account' => $postRst['userInfo']['name'],
+            'qihao' => $postRst['data']['qihao'],
+            'desc' => $desc,
+            'type' => $type,
+            'token' => $token,
+            'user_info' => json_encode($postRst['userInfo'], 320),
+            'status' => $postRst['status'],
+            'return' => $postRst['msg'],
+            'created_at' => time(),
+            'updated_at' => time(),
+        ];
+
+        $AgentRecordUsersDesc = new AgentRecordUsersDesc();
+        $AgentRecordUsersDesc->setAttributes($setData);
+        $rst['saveFlag'] = $AgentRecordUsersDesc->save();
+
+        return $rst;
+    }
 
 }
