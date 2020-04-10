@@ -17,7 +17,7 @@ class Lucky5 extends BaseKj {
      */
     public static function getLotteryLucky($returnType = 'json'){
 
-        if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $TzSystemsUserses = TzSystemsUsers::find()->where(['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [7,9]] ])->all();
             foreach ($TzSystemsUserses as $TzSystemsUsers){ # 用户账号去网盘抓数据
                 //$domain = BaseKj::getApiHost(18);
@@ -77,7 +77,7 @@ class Lucky5 extends BaseKj {
      * @return array
      */
     public static function getLotteryShiXunOne($returnType = 'json'){
-        if(true or !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHost(21);
 
             $t = round(microtime(true) * 1000);
