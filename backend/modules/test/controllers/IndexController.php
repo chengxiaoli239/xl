@@ -130,6 +130,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = strpos('上100', '上');d($rst===0);
+        $rst = ChatCommonBetService::getLotteryTypeByToken($token = '784bfe044b30');p($rst);
         $desc = '上50';
         $type = ChatCommonBetService::getTypeByDesc($desc);p($type);
 
@@ -143,6 +145,7 @@ class IndexController extends Controller
         $snInfo = JuHuaBaseService::getSn($uid =12, $tz_system_id = 11); p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         $loginRst = BaseService::login($id = 48);p($loginRst);
         //$data['rst'] = ChatService::send();p($data);
+        $loginRst = BaseService::login($id = 47);p($loginRst);
         $rst = NumService::getCodesArise(['0144']);p($rst);
         $rst = KjDataGet::insertKjData('200325016', 5, '6,1,2,1,2');//p($rst);
         $rst = KjDataGet::insertKjData('200325017', 5, '0,7,8,0,7');//p($rst);

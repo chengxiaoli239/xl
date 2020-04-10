@@ -95,4 +95,5 @@ return [
     'Update Users balance' => '变更积分',
 
     'Agent Users Balance Flows' => '用户积分流水',
+    'Agent Record Users Descs' => '群消息记录',
 ];

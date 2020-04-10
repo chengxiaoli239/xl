@@ -896,7 +896,7 @@ class SevenService extends BaseTZService {
         $cookie = $tmpCookieArr[0];
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'SevenStarHFDirector1Frontend1'=>$SevenStarHFDirector1Frontend1, 'url'=>$url, 'headers'=>$headers];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','Seven Cookie记录', $logArr);
         $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
         $cookie = str_replace('; path=/; HttpOnly','',$cookie);
         $m->set($mkey, $cookie, 180);
@@ -937,6 +937,7 @@ class SevenService extends BaseTZService {
         $data = str_replace("; path=/; Httponly;",'',$data);
 
         $logArr = ['matches'=>$matches, 'cookie'=>$cookie, 'url'=>$url, 'header'=>$header, 'content'=>$content];
+        if(empty($matches[0])) $logArr['content'] = $content;
         //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/curlGetSevenCookie','INFO','curlGetSevenCookie记录', $logArr);
 

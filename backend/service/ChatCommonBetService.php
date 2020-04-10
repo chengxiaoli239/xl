@@ -48,6 +48,9 @@ class ChatCommonBetService extends BaseService {
             $rst = array_merge(ChatCommonBetService::upOrDownBalance($desc, $userInfo), $rst);
             return $rst;
         }elseif ($type == 3){   # 查询开奖
+            $SscKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one();
+            $rst = array_merge(['msg'=>'【号码】'.$SscKjData->code_str], $rst);
+            return $rst;
 
         }else{  # 4、投注
             $TzSystemsUsers = TzSystemsUsers::findOne(['is_agent'=>1, 'uid'=>$userInfo->agent_id, 'status'=>1]);
@@ -261,7 +264,7 @@ class ChatCommonBetService extends BaseService {
             'agent_id' => $postRst['userInfo']['agent_id'],
             'member_id' => $postRst['userInfo']['id'],
             'member_account' => $postRst['userInfo']['name'],
-            'qihao' => $postRst['data']['qihao'],
+            'qihao' => $postRst['qihao'],
             'desc' => $desc,
             'type' => $type,
             'token' => $token,
