@@ -54,6 +54,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             ]),
                         ],
                         'admin_email',
+                        'gets',
+                        'posts',
                         'created_at:datetime',
                         'ip',
                         [
