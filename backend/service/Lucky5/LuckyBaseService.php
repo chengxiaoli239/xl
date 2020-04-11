@@ -1472,7 +1472,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $data = CurlService::getCurl($url, $headers);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getQihaoInfo','INFO','快乐8登陆前', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getQihaoInfo','INFO','幸运五登陆前', $logArr);
 
         return $data;
     }

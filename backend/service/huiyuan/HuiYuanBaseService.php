@@ -1347,7 +1347,9 @@ class HuiYuanBaseService extends BaseTZService {
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
         $lottery = self::getSiteLottery($lottery_type);
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetTheLastThree?lottery='.$lottery;
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX');
+        if(is_array($url)) return ['status'=>300, 'msg'=>'无效url,Array'];
+        $url = $url.'/api/MemberDesk/GetTheLastThree?lottery='.$lottery;
         $headers = [
             "Accept: application/json, text/plain, */*",
             "Accept-Encoding: gzip, deflate",
