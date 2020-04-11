@@ -1,5 +1,6 @@
 <?php
 
+use yii\helpers\BaseStringHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
@@ -55,7 +56,15 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         'admin_email',
                         'gets',
-                        'posts',
+                        //'posts',
+                        ['attribute' => 'posts',
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $txt = BaseStringHelper::truncate($model->posts,14);
+
+                                return Html::a($txt, '#', ['title' => $model->posts,'alt'=>$model->posts]);
+                            }
+                        ],
                         'created_at:datetime',
                         'ip',
                         [
