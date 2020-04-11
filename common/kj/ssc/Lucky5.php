@@ -42,7 +42,10 @@ class Lucky5 extends BaseKj {
                 //$data = json_decode($content,320);
                 $data = $content;
 
-                if (!isset($data['Status']) OR $data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) continue;
+                if (!isset($data['Status']) OR $data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) {
+                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getLotteryLucky', 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
+                    continue;
+                }
                 $row = $data['Data']['draw_info'][0];
                 $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
                 if($opencode == '0,0,0,0,0') return false;
