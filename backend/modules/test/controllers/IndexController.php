@@ -47,6 +47,7 @@ use backend\models\UserFollowData;
 use backend\service\RemoteHtmlService;
 use backend\models\BettingRecords;
 use backend\models\User;
+use common\tools\Tool_Common;
 use Yii;
 use yii\web\Controller;
 use backend\service\SscDataService;
@@ -111,10 +112,26 @@ class IndexController extends Controller
         p($datas);
     }
 
+    public function actionTestIp(){
+        $ch = curl_init();
+        //$url = "http://localhost/ser.php";
+        $url = "http://120.77.157.40/test/index/test-bet";
+        $header = array( 'CLIENT-IP:208.165.188.175', 'X-FORWARDED-FOR:208.165.188.175' );
+        //声明伪造head请求头
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
+        $page_content = curl_exec($ch); curl_close($ch);
+        echo $page_content;
+    }
+
     /**
      * @desc 测试投注
      */
     public function actionTestBet(){
+        $logArr = ['test'=>'dw', '_SERVER'=>$_SERVER, 'HTTP_CLIENT_IP'=>getenv('HTTP_CLIENT_IP'), 'HTTP_X_FORWARDED_FOR'=>getenv('HTTP_X_FORWARDED_FOR'), 'REMOTE_ADDR'=>getenv('REMOTE_ADDR')];
+        Tool_Common::log('/WORK/LOG/lottery_xl/'.date('Ymd').'/dw', 'INFO', '测试windows计划', $logArr);p('xx');
+
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         $playway = $post['playway'];
@@ -124,12 +141,14 @@ class IndexController extends Controller
         $single = $post['single'] ? $post['single'] : 0.1;
         $lottery_type = $post['lottery_type'] ? $post['lottery_type'] : 5;
 
-        $rst = HN0898Service::postBet($uid = 2, $playway, $single, $codes, $lottery_type);
+        //$rst = HN0898Service::postBet($uid = 2, $playway, $single, $codes, $lottery_type);
 
         return $rst;
     }
 
     public function actionDw(){
+        $id = 43; $rst = BaseService::login($id);p($rst);
+        $id = 43; $rst = SevenService::synBalance($id);p($rst);
         $rst = strpos('上100', '上');d($rst===0);
         $rst = ChatCommonBetService::getLotteryTypeByToken($token = '784bfe044b30');p($rst);
         $desc = '上50';
@@ -160,7 +179,6 @@ class IndexController extends Controller
         $qs = SscDataService::getLossQs(52);p($qs);
         $rst = BetService::isLogin($uid = 20, $tz_system_id = 9);d($rst);
 
-        $id = 38; $rst = BaseService::login($id);p($rst);
         $rst = SscDataService::insertCodeType2();p($rst);
 
         $testData = [
