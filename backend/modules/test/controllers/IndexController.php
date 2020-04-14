@@ -125,6 +125,16 @@ class IndexController extends Controller
         echo $page_content;
     }
 
+    public function actionTestLogin(){
+        self::_init();
+        $post = \Yii::$app->request->post();
+        $id = $post['id'];
+        $rst = BaseService::login($id);
+        $TzSystemsUsers = TzSystemsUsers::findOne($id);
+
+        return array_merge($rst,  ['TzSystemsUsers'=>$TzSystemsUsers]);
+    }
+
     /**
      * @desc 测试投注
      */
