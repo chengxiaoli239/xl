@@ -117,8 +117,6 @@ class IndexController extends Controller
         $ch = curl_init();
         //$url = "http://localhost/ser.php";
         $url = "http://120.77.157.40/test/index/test-bet";
-        $header = array( 'CLIENT-IP:120.77.157.40', 'X-FORWARDED-FOR:120.77.157.40' );
-
         //声明伪造head请求头
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
