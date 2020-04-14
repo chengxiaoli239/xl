@@ -19,6 +19,7 @@ use backend\service\KuaiLe8Service;
 use backend\service\Lucky5\LuckyBaseService;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NumService;
+use backend\service\PoxyIPService;
 use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
 use backend\service\StaticService;
@@ -116,7 +117,8 @@ class IndexController extends Controller
         $ch = curl_init();
         //$url = "http://localhost/ser.php";
         $url = "http://120.77.157.40/test/index/test-bet";
-        $header = array( 'CLIENT-IP:208.165.188.175', 'X-FORWARDED-FOR:208.165.188.175' );
+        $header = array( 'CLIENT-IP:120.77.157.40', 'X-FORWARDED-FOR:120.77.157.40' );
+
         //声明伪造head请求头
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
@@ -147,7 +149,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = PoxyIPService::kuaiPoxyExpire();p($rst);
+        $rst = PoxyIPService::kuaiPoxy();p($rst);
         $id = 43; $rst = BaseService::login($id);p($rst);
+
         $id = 43; $rst = SevenService::synBalance($id);p($rst);
         $rst = strpos('上100', '上');d($rst===0);
         $rst = ChatCommonBetService::getLotteryTypeByToken($token = '784bfe044b30');p($rst);
