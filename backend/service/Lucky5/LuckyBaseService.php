@@ -928,7 +928,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         return $cookie;
     }
-
     public static function getSessionId($url, $header){
 
         $curl = curl_init();
@@ -937,27 +936,44 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         curl_setopt($curl, CURLOPT_HEADER, 1);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
+        self::setPoxy($curl); # 设置代理
+
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
         curl_setopt($curl, CURLOPT_SSLVERSION, 3);
 
         $content = curl_exec($curl);
-        //preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
-        preg_match("/document.cookie\=\'([^\r\n]*)\; path/i", $content, $matches);
+        if(strpos($content, 'Set-Cookie') !== false){
+            preg_match("/Set\-Cookie:([^\r\n]*)/i", $content, $matches);
+        }else{
+            preg_match("/document.cookie\=\'([^\r\n]*)\'/i", $content, $matches);
+        }
 
-        //p([$url, $header, $content, $matches]);
-        //$roboot_id = str_replace('; path=/; domain=.ww22277.xyz','', $matches[1]);
-        $roboot_id = $matches[1];
+        $Arrs = explode('.', $url);
+        $domain = $Arrs[1];
+        if(strpos($matches[1], $domain) !== false){
+            $roboot_id = trim(str_replace('; path=/; domain=.'.$domain.'.xyz','', $matches[1]));
+            Tool_Common::log('getSessionId', 'INFO', '获取session_id', ['url'=>$url, 'domain'=>$domain, 'roboot_id'=>$roboot_id, 'content'=>$content]);
+        }
+        /*
+        if(strpos($matches[1], 'cq779835') !== false){
+            $roboot_id = trim(str_replace('; path=/; domain=.cq779835.xyz','', $matches[1]));
+        }
+        */
+        if(strpos($roboot_id, '您当前使用的浏览器不支持') !== false){
+            $tmp_roboot_id = explode('\';', $roboot_id);
+            if($tmp_roboot_id[0]) $roboot_id = $tmp_roboot_id[0];
+        }
         $logArr = ['content'=>$content, 'roboot_id'=>$roboot_id];
-        if(curl_error($curl)>0){
-            $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
-            Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
+        Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
+        if(TRUE OR curl_error($curl)>0){
+            $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'roboot_id'=>$roboot_id]);
+            Tool_Common::log('roboot_id', 'INFO', '获取roboot_id', $logArr);
         }
 
         return $roboot_id;
 
     }
-
 
     /**
      *curl get请求
@@ -970,12 +986,13 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         curl_setopt($curl, CURLOPT_HEADER, 1);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
+        self::setPoxy($curl); # 设置代理IP
+
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
         curl_setopt($curl, CURLOPT_SSLVERSION, 3);
 
         $content = curl_exec($curl);
-        //preg_match_all("/Set\-cookie:([^\r\n]*)[\; path=\/\; Httponly]/i", $content, $matches);
         preg_match_all("/Set-Cookie: (.*)/i", $content, $matches);
         //p($matches,0);
         $cookies = $matches[1];
@@ -989,85 +1006,17 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         foreach ($cookies as $cookie){
             $data .= str_replace('; path=/; HttpOnly','',trim($cookie)).';';
         }
-        $data = str_replace("; path=/; Httponly;",'',$data);
 
+        $data = str_replace("; path=/; Httponly;",'',$data);
         return $data;
     }
 
-
     /**
-     * @desc 下载图片验证码
-     * @param $uid
-     * @param $tz_system_id
-     * @param $cookie_key
-     * @return bool
+     * @desc 登录
+     * @param int $uid
+     * @param int $tz_system_id
+     * @return array|bool|mixed|string
      */
-    public static function downLoadCodeImg($uid, $tz_system_id, $cookie_key){
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        $headers = [
-            'Accept: image/webp,image/apng,image/*,*/*;q=0.8',
-            'Accept-Encoding: gzip, deflate',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Connection: keep-alive',
-            'Cookie: '.$TzSystemsUsers->cookie,
-            'Host: '.str_replace('http://', '', self::getTzSiteInfo($TzSystemsUsers->tz_system_id,'SSC_INDEX')),
-            'Referer: '.$TzSystemsUsers->ssc_domain.'/login.html',
-            //'Upgrade-Insecure-Requests: 1',
-            $TzSystemsUsers->user_agent,
-            //self::$user_agent,
-        ];
-        $_t = floor(microtime(true) * 1000);
-        $url = self::getTzSiteInfo($TzSystemsUsers->tz_system_id,'SSC_INDEX').'/api/home/GetValidateCode?_='.$_t;
-        $imageData = CurlService::getCurl($url, $headers);
-        //p($imageData);
-        $filename = Yii::$app->basePath . "/runtime/captcha/".$uid.'_'.$tz_system_id.'_'.$cookie_key.".png";
-        $tp = fopen($filename,"w");
-        fwrite($tp, trim($imageData));
-        fclose($tp);
-        $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
-        //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
-
-        return true;
-    }
-
-    /**
-     * @desc 下载图片验证码
-     * @param $uid
-     * @param $tz_system_id
-     * @param $cookie_key
-     * @return bool
-     */
-    public static function downLoadCodeImgNew($uid, $tz_system_id){
-        self::__init($uid, $tz_system_id);
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        $headers = [
-            'Accept: image/webp,image/apng,image/*,*/*;q=0.8',
-            'Accept-Encoding: gzip, deflate',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Connection: keep-alive',
-            //'Cookie: '.$TzSystemsUsers->cookie,
-            'Host: '.str_replace('http://', '', self::getTzSiteInfo($TzSystemsUsers->tz_system_id,'SSC_INDEX')),
-            'Referer: '.$TzSystemsUsers->ssc_domain.'/login.html',
-            //'Upgrade-Insecure-Requests: 1',
-            //$TzSystemsUsers->user_agent,
-            self::$user_agent,
-            'Cookie:ValidateToken=08fbfb46cc8d59159308d435d21c5bb7',
-        ];
-        $_t = floor(microtime(true) * 1000);
-        $url = self::getTzSiteInfo($TzSystemsUsers->tz_system_id,'SSC_INDEX').'/api/home/GetValidateCode?_='.$_t;
-        $imageData = CurlService::getCurl($url, $headers);
-        $filename = Yii::$app->basePath . "/runtime/captcha/".$uid.'_'.$tz_system_id.'_'.$cookie_key.".png";
-        $tp = fopen($filename,"w");
-        fwrite($tp, $imageData);
-        fclose($tp);
-        $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
-        //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
-
-        return true;
-    }
-
     public static function login($uid = 1, $tz_system_id = 1){
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         if($TzSystemsUsers->balance > 0) {
@@ -1075,12 +1024,13 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             return $rst;
         }else{
             # 第一步：获取cookie
-            $rst = SevenService::getCookie($uid,$tz_system_id);
+            $rst = self::getCookie($uid,$tz_system_id);
             if(isset($rst['status']) && $rst['status'] == 300) return $rst;
             # 第二步：账号、验证码登录
             $rst = self::loginRemote($uid, $tz_system_id);
             # 第三步：同意
-            $rst = self::acceptAgreement($uid, $tz_system_id);
+            if($rst['Status'] == 1)
+                $rst = self::acceptAgreement($uid, $tz_system_id);
         }
 
         # 获取用户信息
@@ -1161,6 +1111,51 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
     }
 
     /**
+     * @decription 获取远程html内容
+     * @param $url
+     */
+    public static function getCurl($url,$header=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        //$header = array_merge(self::$postHeaders,$header);
+        //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        self::setPoxy($ch); # 设置代理IP
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+
+        $data = curl_exec($ch);
+        //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
+        if(curl_close($ch)) {
+            $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data]);
+            return $str;
+        }
+        if(!BaseService::is_json($data)){
+            return $data;
+        }
+        $data = json_decode($data, true);
+
+        if($data['Status'] == false){
+            //$data['headers'] = $header;
+        }
+
+        return $data;
+    }
+
+    /**
      * @desc 登陆
      * @param $uid
      * @param $tz_system_id
@@ -1181,6 +1176,12 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/DoLogin'.'?_='.$_t;
         $post_data = http_build_query($post_data);
         $headers = [
+            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
+            //'Accept-Language:zh-CN,zh;q=0.9,en;q=0.8',
+            'Accept-Language:zh-CN,zh;q=0.9',
+            'Connection:keep-alive',
+            'Accept-Encoding: gunzip, deflate',
+            'X-Requested-With: XMLHttpRequest',
             "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
             "Cache-Control:max-age=0",
             "Upgrade-Insecure-Requests:1",
@@ -1192,8 +1193,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             "Referer:".$TzSystemsUsers->ssc_domain,
         ];
 
-        $poxy = PoxyIPService::getPoxyIp();
-        $data = CurlService::httpPost($url,$post_data, $headers, $poxy);
+        $data = self::httpPost($url,$post_data, $headers);
         //sleep(10);
         //self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
@@ -1223,13 +1223,12 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             "Host:".str_replace('www.','',self::$domain),
         ];
 
-        $poxy = PoxyIPService::getPoxyIp();
-        $data = CurlService::getCurl($url, $headers, $poxy);
+        $data = self::getCurl($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','幸运五登陆-同意', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/acceptAgreement','INFO','幸运五登陆-同意', $logArr);
         return $data;
     }
 
@@ -1266,8 +1265,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             "X-Requested-With: XMLHttpRequest",
         ];
 
-        $poxy = PoxyIPService::getPoxyIp();
-        $data = self::httpGet($url, $headers, $poxy);
+        $data = self::httpGet($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
@@ -1474,7 +1472,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $TzSystemsUsers->user_agent,
         ];
 
-        $data = CurlService::getCurl($url, $headers);
+        $data = self::getCurl($url, $headers);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getQihaoInfo','INFO','幸运五登陆前', $logArr);
@@ -1857,6 +1855,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSLVERSION, 3);
 
+        self::setPoxy($ch); # 设置代理IP
+
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
 
@@ -1936,7 +1936,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @decription
      * @param $url
      */
-    public static function httpGet($url,$header=[], $poxy = []){
+    public static function httpGet($url,$header=[]){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
 
@@ -1946,17 +1946,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         // 设置浏览器的特定header
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
-        if(!empty($poxy)){
-            $poxy_addr = $poxy[0].':'.$poxy[1];
-            //设置代理
-            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-            curl_setopt($ch, CURLOPT_PROXY, $poxy_addr);
-            //设置代理用户名密码（私密代理/独享代理）
-            //如果是开放代理，请注释掉下面两句
-            $username = "379879537"; $password = '14wmcx7y';
-            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
-        }
+
+        self::setPoxy($ch); # 设置代理IP
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -1983,4 +1974,78 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         return $data;
     }
+
+    /**
+     * @decription 获取远程html内容
+     * @param $url
+     */
+    public static function httpPost($url,$post_data = [],$header=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        if(!$timeout) $timeout = 15;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        self::setPoxy($ch); # 设置代理IP
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+
+        //设置post方式提交
+        curl_setopt($ch, CURLOPT_POST, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+        $data = curl_exec($ch);
+        $errno = curl_errno( $ch );
+        //if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];p($logArr);
+        if($errno){
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];
+            //p($logArr);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+        }
+
+        //if(strpos($url, 'betNumber')){ p(['url'=>$url, 'header'=>$header,'post_data'=>$post_data,'rstData'=>$data,curl_close($ch),$errno]); }
+        if(curl_close($ch)) {
+            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+        }
+        if($data == 'ok'){
+            return 'ok';
+        }
+        $rstData = json_decode($data, TRUE);
+        //p([$data, $rstData, $post_data, $header]);
+
+        return $rstData;
+    }
+
+    /**
+     * @desc 设置全局代理
+     * @param $ch
+     * @return bool
+     */
+    public static function setPoxy($ch){
+        $poxy_addr = PoxyIPService::getPoxyIp();
+        if(!empty($poxy_addr)){
+            //设置代理
+            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+            curl_setopt($ch, CURLOPT_PROXY, $poxy_addr);
+            //设置代理用户名密码（私密代理/独享代理）
+            //如果是开放代理，请注释掉下面两句
+            $username = \Yii::$app->params['KUAI_USERNAME'];
+            $password = \Yii::$app->params['KUAI_PASSWORD'];
+            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+        }
+
+        return true;
+    }
+
 }

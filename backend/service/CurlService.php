@@ -261,7 +261,7 @@ class CurlService extends BaseService{
      * @decription 获取远程html内容
      * @param $url
      */
-    public static function getCurl($url,$header=[], $poxy = []){
+    public static function getCurl($url,$header=[]){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         //$header = array_merge(self::$postHeaders,$header);
         //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
@@ -272,17 +272,6 @@ class CurlService extends BaseService{
         // 设置浏览器的特定header
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
-        if(!empty($poxy)){
-            $poxy_addr = $poxy[0].':'.$poxy[1];
-            //设置代理
-            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-            curl_setopt($ch, CURLOPT_PROXY, $poxy_addr);
-            //设置代理用户名密码（私密代理/独享代理）
-            //如果是开放代理，请注释掉下面两句
-            $username = "379879537"; $password = '14wmcx7y';
-            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
-        }
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);

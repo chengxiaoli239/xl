@@ -33,6 +33,8 @@ return [
     # IP代理 快代理配置
     'KUAI_POXY_API' => 'https://dev.kdlapi.com',
     'KUAI_POXY_ORDER_ID' => '938684913491492',
+    'KUAI_USERNAME' => '379879537', # 通过密码使用私密代理
+    'KUAI_PASSWORD' => '14wmcx7y', # 快代理密码
 
 ];
 

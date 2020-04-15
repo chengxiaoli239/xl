@@ -878,9 +878,8 @@ class SevenService extends BaseTZService {
             $TzSystemsUsers->user_agent,
         ];
 
-        $poxy = PoxyIPService::getPoxyIp();
         # 1、获取SessionId
-        $robot7_session_id = self::getSessionId($url, $headers, $poxy);
+        $robot7_session_id = self::getSessionId($url, $headers);
         //if($uid=21)p($robot7_session_id);
 
         $tmpCookieStr = $robot7_session_id;
@@ -1043,7 +1042,8 @@ class SevenService extends BaseTZService {
             # 第二步：账号、验证码登录
             $rst = self::loginRemote($uid, $tz_system_id);
             # 第三步：同意
-            $rst = self::acceptAgreement($uid, $tz_system_id);
+            if($rst['Status'] == 1)
+                $rst = self::acceptAgreement($uid, $tz_system_id);
         }
 
         # 获取用户信息

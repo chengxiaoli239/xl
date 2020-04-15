@@ -159,6 +159,7 @@ class IndexController extends Controller
     public function actionDw(){
         $id = 48; $rst = BaseService::login($id);p($rst);
         $rst = PoxyIPService::getPoxyIp();p($rst);
+        $rst = PoxyIPService::isValid(['122.7.3.56:17856']);p($rst);
         $rst = PoxyIPService::kuaiPoxy();p($rst);
         $rst = PoxyIPService::kuaiPoxyExpire();p($rst);
 

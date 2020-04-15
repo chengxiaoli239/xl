@@ -29,23 +29,13 @@ class PoxyIPService extends BaseService {
             return ['status'=>300, 'msg'=>'代理端口不可用'];
         }
 
-        /*
-        IPS :
-        36.41.128.60
-        125.87.96.94
-        60.13.42.108
-        113.138.133.210
-        110.86.174.182
-        182.87.127.158
-        171.80.186.62
-        36.41.128.129
-        27.30.22.230
-        125.87.107.170
-        */
-
         return ['status'=>200, 'data'=>$rst['data']['proxy_list'], 'msg'=>'代理IP数据获取成功'];
     }
 
+    /**
+     * @desc 获取快代理的代理IP
+     * @return array|mixed
+     */
     public static function getPoxyIp(){
         //return ['171.83.165.196', '20000'];
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
@@ -55,19 +45,32 @@ class PoxyIPService extends BaseService {
         }
         $m = \Yii::$app->cache;
         $time = 3600 * 3;
-        $mkey = 'getPoxyIp_Kuai_0';
+        $mkey = 'getPoxyIp_Kuai_1';
         if(!$poxy_ip_data = $m->get($mkey)){
             $data = self::kuaiPoxy();
             //return $data;
-            $poxy_ip_data = explode(':', $data['data'][0]);
+            //$poxy_ip_data = explode(':', $data['data'][0]);
+            $poxy_ip_data = $data['data'][0];
             $m->set($mkey, $poxy_ip_data, $time);
             if($data['status'] != 200) {
                 return [];
             }
+        }else{
+            $flag = self::isValid([$poxy_ip_data]);
+            if(!$flag){
+                $data = self::kuaiPoxy();
+                $poxy_ip_data = $data['data'][0];
+            }
         }
+
+
         return $poxy_ip_data;
     }
 
+    /**
+     * @desc 代理账号过期时间
+     * @return array
+     */
     public static function kuaiPoxyExpire(){
         $query = [
             'orderid' => \Yii::$app->params['KUAI_POXY_ORDER_ID'], # 快代理订单号
@@ -81,5 +84,28 @@ class PoxyIPService extends BaseService {
         }
 
         return ['status'=>200, 'expire'=>$rst['data']['expire_time']];
+    }
+
+    /**
+     * @desc 判断代理IP有效性
+     * @param $poxy_ip array  ['122.7.3.56:17856', '122.8.8.56:176']
+     * @return bool
+     */
+    public static function isValid($poxy_ips = []){
+
+        $API_KEY = BetService::getConfig('KUAI_POXY_API_KEY'); # 快代理 API Key
+        $query = [
+            'orderid' => \Yii::$app->params['KUAI_POXY_ORDER_ID'],
+            'proxy' => implode(',', $poxy_ips),
+            'signature' => $API_KEY,
+        ];
+        $url = \Yii::$app->params['KUAI_POXY_API'].'/api/checkdpsvalid/?'.http_build_query($query);
+        $rst = CurlService::getCurl($url);
+        if(count($poxy_ips)==1){
+            $flag = (boolean)$rst['data'][$poxy_ips[0]];
+            return $flag;
+        }
+
+        return  $rst;
     }
 }
