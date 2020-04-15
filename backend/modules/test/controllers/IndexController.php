@@ -157,9 +157,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = PoxyIPService::kuaiPoxyExpire();p($rst);
+        $id = 48; $rst = BaseService::login($id);p($rst);
+        $rst = PoxyIPService::getPoxyIp();p($rst);
         $rst = PoxyIPService::kuaiPoxy();p($rst);
-        $id = 43; $rst = BaseService::login($id);p($rst);
+        $rst = PoxyIPService::kuaiPoxyExpire();p($rst);
 
         $id = 43; $rst = SevenService::synBalance($id);p($rst);
         $rst = strpos('上100', '上');d($rst===0);

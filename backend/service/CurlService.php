@@ -29,7 +29,7 @@ class CurlService extends BaseService{
      * @decription 获取远程html内容
      * @param $url
      */
-    public static function httpPost($url,$post_data = [],$header=[]){
+    public static function httpPost($url,$post_data = [],$header=[], $poxy = []){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         if(!$timeout) $timeout = 15;
         #$cookiefile = Yii::getAlias('@common')."/lib/0898.com/cookie_file.txt";
@@ -42,6 +42,20 @@ class CurlService extends BaseService{
         // 设置浏览器的特定header
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        # 设定代理
+        //if(false && !empty($poxy)){
+        if(!empty($poxy)){
+            $poxy_addr = $poxy[0].':'.$poxy[1];
+            //设置代理
+            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+            curl_setopt($ch, CURLOPT_PROXY, $poxy_addr);
+            //设置代理用户名密码（私密代理/独享代理）
+            //如果是开放代理，请注释掉下面两句
+            $username = "379879537"; $password = '14wmcx7y';
+            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+        }
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
@@ -61,8 +75,10 @@ class CurlService extends BaseService{
 
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
-        if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
-            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];
+        //if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];p($logArr);
+        if($errno){
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'poxy_addr'=>$poxy_addr, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
@@ -245,7 +261,7 @@ class CurlService extends BaseService{
      * @decription 获取远程html内容
      * @param $url
      */
-    public static function getCurl($url,$header=[]){
+    public static function getCurl($url,$header=[], $poxy = []){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         //$header = array_merge(self::$postHeaders,$header);
         //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
@@ -256,6 +272,17 @@ class CurlService extends BaseService{
         // 设置浏览器的特定header
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+        if(!empty($poxy)){
+            $poxy_addr = $poxy[0].':'.$poxy[1];
+            //设置代理
+            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+            curl_setopt($ch, CURLOPT_PROXY, $poxy_addr);
+            //设置代理用户名密码（私密代理/独享代理）
+            //如果是开放代理，请注释掉下面两句
+            $username = "379879537"; $password = '14wmcx7y';
+            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+        }
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);

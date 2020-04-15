@@ -791,13 +791,25 @@ class SevenService extends BaseTZService {
         return $times;
     }
 
-    public static function getSessionId($url, $header){
+    public static function getSessionId($url, $header, $poxy = []){
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
         curl_setopt($curl, CURLOPT_HEADER, 1);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        if(!empty($poxy)){
+            $poxy_addr = $poxy[0].':'.$poxy[1];
+            //设置代理
+            curl_setopt($curl, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+            curl_setopt($curl, CURLOPT_PROXY, $poxy_addr);
+            //设置代理用户名密码（私密代理/独享代理）
+            //如果是开放代理，请注释掉下面两句
+            $username = "379879537"; $password = '14wmcx7y';
+            curl_setopt($curl, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+            curl_setopt($curl, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+        }
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -865,15 +877,17 @@ class SevenService extends BaseTZService {
             'Cache-Control: max-age=0',
             $TzSystemsUsers->user_agent,
         ];
+
+        $poxy = PoxyIPService::getPoxyIp();
         # 1、获取SessionId
-        $robot7_session_id = self::getSessionId($url, $headers);
+        $robot7_session_id = self::getSessionId($url, $headers, $poxy);
         //if($uid=21)p($robot7_session_id);
 
         $tmpCookieStr = $robot7_session_id;
         $headers[] = 'Referer: '.$url;
 
         # 2、获取SevenStarHFDirector1Frontend1
-        $SevenStarHFDirector1Frontend1 = self::curlGetSevenCookie($url, array_merge($headers, ['Cookie: '.$tmpCookieStr]));
+        $SevenStarHFDirector1Frontend1 = self::curlGetSevenCookie($url, array_merge($headers, ['Cookie: '.$tmpCookieStr]), $poxy);
         //p($SevenStarHFDirector1Frontend1);
 
         $tmpCookieStr = $tmpCookieStr.';'.$SevenStarHFDirector1Frontend1;
@@ -907,13 +921,25 @@ class SevenService extends BaseTZService {
     /**
      *curl get请求
      */
-    public static function curlGetSevenCookie($url,$header = []){
+    public static function curlGetSevenCookie($url,$header = [], $poxy = []){
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
         curl_setopt($curl, CURLOPT_HEADER, 1);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        if(!empty($poxy)){
+            $poxy_addr = $poxy[0].':'.$poxy[1];
+            //设置代理
+            curl_setopt($curl, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+            curl_setopt($curl, CURLOPT_PROXY, $poxy_addr);
+            //设置代理用户名密码（私密代理/独享代理）
+            //如果是开放代理，请注释掉下面两句
+            $username = "379879537"; $password = '14wmcx7y';
+            curl_setopt($curl, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+            curl_setopt($curl, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+        }
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -1113,7 +1139,7 @@ class SevenService extends BaseTZService {
         //$syncBalance = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
         //p($syncBalance);
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','seven登陆记录', $logArr);
         return $data;
     }
 

@@ -30,5 +30,9 @@ return [
     # 站点域名，目前大部分站点登录之前robot7_session_id匹配获取
     'TZ_SITE_MIDDLE_DOMAINS' => ['cq779835', 'ww98877', 'ww33899', 'wx36625771', 'ww666733', 'cq779835' ,'ww793288', 'ww368755'],
 
+    # IP代理 快代理配置
+    'KUAI_POXY_API' => 'https://dev.kdlapi.com',
+    'KUAI_POXY_ORDER_ID' => '938684913491492',
+
 ];
 

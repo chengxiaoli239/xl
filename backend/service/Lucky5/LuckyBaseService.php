@@ -21,6 +21,7 @@ use backend\service\BaseTZService;
 use backend\service\BetService;
 use backend\service\CurlService;
 use backend\service\HN0898Service;
+use backend\service\PoxyIPService;
 use backend\service\SevenService;
 use backend\service\SscDataService;
 use backend\tools\Tools;
@@ -1177,7 +1178,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
         $_t = microtime(true) * 10000;
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/DoLogin'.'?_'.$_t;
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/DoLogin'.'?_='.$_t;
         $post_data = http_build_query($post_data);
         $headers = [
             "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
@@ -1185,18 +1186,20 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             "Upgrade-Insecure-Requests:1",
             "Content-Length:".strlen($post_data),
             "Content-Type: application/x-www-form-urlencoded",
-            "Cookie: ".trim($TzSystemsUsers->cookie),
+            "Cookie: ".str_replace(';;', ';',trim($TzSystemsUsers->cookie)),
             "Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain,
         ];
 
-        $data = CurlService::httpPost($url,$post_data, $headers);
+        $poxy = PoxyIPService::getPoxyIp();
+        $data = CurlService::httpPost($url,$post_data, $headers, $poxy);
         //sleep(10);
-        self::synBalance($TzSystemsUsers->id); # 同步余额
+        //self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
+        //p($logArr);
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','Luck5登陆记录', $logArr);
         return $data;
     }
     /**
@@ -1220,12 +1223,13 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             "Host:".str_replace('www.','',self::$domain),
         ];
 
-        $data = CurlService::getCurl($url, $headers);
+        $poxy = PoxyIPService::getPoxyIp();
+        $data = CurlService::getCurl($url, $headers, $poxy);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','7时彩登陆记录', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','幸运五登陆-同意', $logArr);
         return $data;
     }
 
@@ -1262,7 +1266,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             "X-Requested-With: XMLHttpRequest",
         ];
 
-        $data = self::httpGet($url, $headers);
+        $poxy = PoxyIPService::getPoxyIp();
+        $data = self::httpGet($url, $headers, $poxy);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
@@ -1931,7 +1936,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @decription
      * @param $url
      */
-    public static function httpGet($url,$header=[]){
+    public static function httpGet($url,$header=[], $poxy = []){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
 
@@ -1941,6 +1946,17 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         // 设置浏览器的特定header
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+        if(!empty($poxy)){
+            $poxy_addr = $poxy[0].':'.$poxy[1];
+            //设置代理
+            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+            curl_setopt($ch, CURLOPT_PROXY, $poxy_addr);
+            //设置代理用户名密码（私密代理/独享代理）
+            //如果是开放代理，请注释掉下面两句
+            $username = "379879537"; $password = '14wmcx7y';
+            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+        }
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
