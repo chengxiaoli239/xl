@@ -94,6 +94,17 @@ class IndexController extends Controller
         echo '<br>======'.$count.'======'.$totalnum.'=========';
     }
 
+    /**
+     * @desc 切换代理
+     * @return bool
+     */
+    public static function actionChangePoxyIp(){
+        self::_init();
+        $rst = PoxyIPService::clearProxyIpKey();p($rst);
+
+        return $rst;
+    }
+
     public function actionGenNum(){
         $field = ['code'];
         $insertData[] = ['123'];
@@ -157,9 +168,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = PoxyIPService::getPoxyIp();p($rst);
         $id = 48; $rst = BaseService::login($id);p($rst);
         $id = 48; $rst = PoxyIPService::clearProxyIpKey();p($rst);
+        $rst = PoxyIPService::getPoxyIp();p($rst);
         $rst = PoxyIPService::isValid(['122.7.3.56:17856']);p($rst);
         $rst = PoxyIPService::kuaiPoxy();p($rst);
         $rst = PoxyIPService::kuaiPoxyExpire();p($rst);

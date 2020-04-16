@@ -782,6 +782,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         if(isset($rst['Status']) && $rst['Status'] == 1){
             $balance = $rst['Data']['credit_balance'];
         }
+        $rst['uid'] = $uid;
+        $rst['tz_system_id'] = $tz_system_id;
 
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','幸运五星-用户余额', $rst);
 
@@ -1247,12 +1249,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/GetMemberPrint?_='.$_t;
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
         $headers = [
-            //"Accept: application/json, text/javascript, */*; q=0.01",
-            //"Cookie: ".trim($TzSystemsUsers->cookie),
-            //"Origin:".str_replace('www.','',self::$baseUrl),
-            //"Host:".str_replace('www.','',self::$domain),
-            //"Referer:".$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
-
             "Accept: application/json, text/javascript, */*; q=0.01",
             "Accept-Encoding: guzip, deflate",
             "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",

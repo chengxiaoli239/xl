@@ -807,7 +807,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $balance = $rst['info']['total_credit'];
         }
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','幸运五星-用户余额', $rst);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','菊花网-用户余额', $rst);
 
         return $balance;
     }
