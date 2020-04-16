@@ -550,7 +550,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $rst['status'] = 200;
         }else{
             if(isset($rst['Data'])) p($rst['Data'], 0);
-            sleep(2);
+            sleep(1);
         }
         $logArr = ['url'=>$url, 'snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
@@ -1765,7 +1765,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             # 真实投注
             $start_time = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers);
-            sleep(2);
+            sleep(1);
             //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
             $rst[$key] = $tmpRst;
             //$rst = json_encode($rst);
