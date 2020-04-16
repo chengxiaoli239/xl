@@ -45,7 +45,7 @@ class PoxyIPService extends BaseService {
         }
         $m = \Yii::$app->cache;
         $time = 3600 * 3;
-        $mkey = 'getPoxyIp_Kuai_1';
+        $mkey = self::builProxyIpKey();
         if(!$poxy_ip_data = $m->get($mkey)){
             $data = self::kuaiPoxy();
             //return $data;
@@ -60,11 +60,36 @@ class PoxyIPService extends BaseService {
             if(!$flag){
                 $data = self::kuaiPoxy();
                 $poxy_ip_data = $data['data'][0];
+                $m->set($mkey, $poxy_ip_data, $time);
             }
         }
 
 
         return $poxy_ip_data;
+    }
+
+    /**
+     * @desc
+     * @return string
+     */
+    public static function builProxyIpKey(){
+        $mkey = 'getPoxyIp_Kuai_1';
+
+        return $mkey;
+    }
+
+    /**
+     * @desc 清除代理IP
+     * @return bool
+     */
+    public static function clearProxyIpKey(){
+        $m = \Yii::$app->cache;
+        $mkey = self::builProxyIpKey();
+        $oldIP = $m->get($mkey);
+
+        $flag = $m->delete($mkey);
+        $newIP = self::getPoxyIp();
+        return ['status'=>200, 'data'=>['new_ip'=>$newIP, 'old_ip'=>$oldIP]];
     }
 
     /**
