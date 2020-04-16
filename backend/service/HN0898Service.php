@@ -1240,7 +1240,7 @@ class HN0898Service extends BaseTZService {
                 $qihao = 967767 + $days * 179 + $nums; # 967767为2019-08-10最后一期期号
                 break;
             case 8: # 幸运五星彩
-                $time = date("H:i:s", time() - 5 * 60);
+                $time = date("H:i:s");
                 if('00:00:00'<$time && $time < '00:05:00'){
                     $actionNo = '288';
                     $qihao = date('Ymd', time() - 20*60).sprintf("%03d", $actionNo);
