@@ -782,8 +782,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         if(isset($rst['Status']) && $rst['Status'] == 1){
             $balance = $rst['Data']['credit_balance'];
         }
-        $rst['uid'] = $uid;
-        $rst['tz_system_id'] = $tz_system_id;
+        //$rst['uid'] = $uid;
+        //$rst['tz_system_id'] = $tz_system_id;
 
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','幸运五星-用户余额', $rst);
 
