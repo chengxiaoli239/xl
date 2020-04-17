@@ -24,8 +24,8 @@ class PoxyIPService extends BaseService {
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdps/?'.http_build_query($query);
         $rst = CurlService::getCurl($url);
 
+        Tool_Common::log('kuaiPoxy', 'ERR', '代理IP获取', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
         if($rst['code'] != 0 OR empty($rst['data']['proxy_list'][0])){
-            Tool_Common::log('kuaiPoxy', 'ERR', '代理IP获取', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
             return ['status'=>300, 'msg'=>'代理端口不可用'];
         }
 
@@ -126,6 +126,7 @@ class PoxyIPService extends BaseService {
         ];
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/checkdpsvalid/?'.http_build_query($query);
         $rst = CurlService::getCurl($url);
+        Tool_Common::log('poxy_ip_is_valid','INFO', '判断代理IP有效性', ['url'=>$url, 'rst'=>$rst]);
         if(count($poxy_ips)==1){
             $flag = (boolean)$rst['data'][$poxy_ips[0]];
             return $flag;
