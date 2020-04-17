@@ -2349,6 +2349,7 @@ class SscDataService extends BaseService {
         if(!$counts = $m->get($mkey)){
             $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where(['AND', ['=', 'code_type', $code_type], ['=', 'codes_hz', $hzs]])->asArray()->one();
             $counts = $Num4Type['count'];
+            $m->set($mkey, $counts, 3600);
         }
 
         return $counts;
