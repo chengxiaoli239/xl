@@ -791,7 +791,7 @@ class SevenService extends BaseTZService {
         return $times;
     }
 
-    public static function getSessionId($url, $header, $poxy = []){
+    public static function getSessionId($url, $header){
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
@@ -799,17 +799,7 @@ class SevenService extends BaseTZService {
         curl_setopt($curl, CURLOPT_HEADER, 1);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-        if(!empty($poxy)){
-            $poxy_addr = $poxy[0].':'.$poxy[1];
-            //设置代理
-            curl_setopt($curl, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-            curl_setopt($curl, CURLOPT_PROXY, $poxy_addr);
-            //设置代理用户名密码（私密代理/独享代理）
-            //如果是开放代理，请注释掉下面两句
-            $username = "379879537"; $password = '14wmcx7y';
-            curl_setopt($curl, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-            curl_setopt($curl, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
-        }
+        self::setPoxy($curl); # 设置代理
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -928,17 +918,7 @@ class SevenService extends BaseTZService {
         curl_setopt($curl, CURLOPT_HEADER, 1);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-        if(!empty($poxy)){
-            $poxy_addr = $poxy[0].':'.$poxy[1];
-            //设置代理
-            curl_setopt($curl, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-            curl_setopt($curl, CURLOPT_PROXY, $poxy_addr);
-            //设置代理用户名密码（私密代理/独享代理）
-            //如果是开放代理，请注释掉下面两句
-            $username = "379879537"; $password = '14wmcx7y';
-            curl_setopt($curl, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-            curl_setopt($curl, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
-        }
+        self::setPoxy($curl); # 设置代理IP
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -1101,6 +1081,51 @@ class SevenService extends BaseTZService {
     }
 
     /**
+     * @decription 获取远程html内容
+     * @param $url
+     */
+    public static function getCurl($url,$header=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        //$header = array_merge(self::$postHeaders,$header);
+        //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        self::setPoxy($ch); # 设置代理IP
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+
+        $data = curl_exec($ch);
+        //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
+        if(curl_close($ch)) {
+            $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data]);
+            return $str;
+        }
+        if(!BaseService::is_json($data)){
+            return $data;
+        }
+        $data = json_decode($data, true);
+
+        if($data['Status'] == false){
+            //$data['headers'] = $header;
+        }
+
+        return $data;
+    }
+
+    /**
      * @desc 登陆
      * @param $uid
      * @param $tz_system_id
@@ -1162,6 +1187,8 @@ class SevenService extends BaseTZService {
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSLVERSION, 3);
 
+        self::setPoxy($ch); # 设置代理IP
+
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
@@ -1221,7 +1248,8 @@ class SevenService extends BaseTZService {
             "Host:".str_replace('www.','',self::$domain),
         ];
 
-        $data = CurlService::httpGet($url, $headers);
+        //$data = CurlService::httpGet($url, $headers);
+        $data = self::httpGet($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
@@ -1301,6 +1329,8 @@ class SevenService extends BaseTZService {
         // 设置浏览器的特定header
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        self::setPoxy($ch); # 设置代理IP
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -1526,6 +1556,8 @@ class SevenService extends BaseTZService {
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSLVERSION, 3);
 
+        self::setPoxy($ch); # 设置代理IP
+
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
 
@@ -1710,4 +1742,25 @@ class SevenService extends BaseTZService {
         return $data;
     }
 
+    /**
+     * @desc 设置全局代理
+     * @param $ch
+     * @return bool
+     */
+    public static function setPoxy($ch){
+        $poxy_addr = PoxyIPService::getPoxyIp();
+        if(!empty($poxy_addr)){
+            //设置代理
+            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+            curl_setopt($ch, CURLOPT_PROXY, $poxy_addr);
+            //设置代理用户名密码（私密代理/独享代理）
+            //如果是开放代理，请注释掉下面两句
+            $username = \Yii::$app->params['KUAI_USERNAME'];
+            $password = \Yii::$app->params['KUAI_PASSWORD'];
+            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+        }
+
+        return true;
+    }
 }
