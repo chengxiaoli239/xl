@@ -2345,7 +2345,7 @@ class SscDataService extends BaseService {
      */
     public static function getCountByHzs($hzs, $code_type = 4){
         $m = \Yii::$app->cache;
-        $mkey = 'getCountByHzs_'.implode(',', $hzs);
+        $mkey = 'getCountByHzs_x_'.implode(',', $hzs);
         if(!$counts = $m->get($mkey)){
             $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where(['AND', ['=', 'code_type', $code_type], ['=', 'codes_hz', $hzs]])->asArray()->one();
             $counts = $Num4Type['count'];
