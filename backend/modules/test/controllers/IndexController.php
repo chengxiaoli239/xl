@@ -17,6 +17,7 @@ use backend\service\huiyuan\HuiYuanService5;
 use backend\service\Juhua\JuHuaBaseService;
 use backend\service\KuaiLe8Service;
 use backend\service\Lucky5\LuckyBaseService;
+use backend\service\McLockService;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NumService;
 use backend\service\PoxyIPService;
@@ -168,8 +169,16 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $mcLock = new McLockService();
+        $flag = $mcLock->Lock('dw');
+        d($flag);
+        $flag = $mcLock->isLock('dw');
+        d($flag,0);
+
+        $mcLock->Lock('dw');
+        $flag = $mcLock->isLock('dw');
+        d($flag);
         $id = 48; $rst = BaseService::login($id);p($rst);
-        $id = 48; $rst = PoxyIPService::clearProxyIpKey();p($rst);
         $rst = PoxyIPService::getPoxyIp();p($rst);
         $rst = PoxyIPService::isValid(['122.7.3.56:17856']);p($rst);
         $rst = PoxyIPService::kuaiPoxy();p($rst);

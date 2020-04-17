@@ -58,6 +58,16 @@ class PoxyIPService extends BaseService {
         }else{
             $flag = self::isValid([$poxy_ip_data]);
             if(!$flag){
+                # 并非控制
+                $mkey_lock = 'lock_getPoxyIp';
+                $mcLock = new  McLockService();
+
+                if($flag = $mcLock->isLock($mkey_lock)){
+                    sleep(2);
+                    return self::getPoxyIp();
+                }
+                $mcLock->Lock($mkey_lock);
+
                 $data = self::kuaiPoxy();
                 $poxy_ip_data = $data['data'][0];
                 $m->set($mkey, $poxy_ip_data, $time);
