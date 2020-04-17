@@ -44,7 +44,7 @@ class PoxyIPService extends BaseService {
             return [];
         }
         $m = \Yii::$app->cache;
-        $time = 3600 * 3;
+        $time = 3600 * 4;
         $mkey = self::builProxyIpKey();
         if(!$poxy_ip_data = $m->get($mkey)){
             $data = self::kuaiPoxy();
