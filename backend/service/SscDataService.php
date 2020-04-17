@@ -2302,7 +2302,8 @@ class SscDataService extends BaseService {
                 $SscSdHzYl->created_at = time();
                 $SscSdHzYl->val = $Data['val'];
             }
-            $count = self::getCountByHzs($zuHes);
+            //$count = self::getCountByHzs($zuHes);
+            $count = $Data['count'];
             //if($type == 2)p([$count, $zuHes]);
             $SscSdHzYl->count = $count; # 组合总共组数
             $SscSdHzYl->updated_at = time();
