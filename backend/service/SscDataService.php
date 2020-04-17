@@ -2286,16 +2286,16 @@ class SscDataService extends BaseService {
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array|bool
      */
-    public static function updateSdHzYl($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function updateSdHzYl($lottery_type = DEFAULT_LOTTERY_TYPE, $type=1){
         $rst = [];
         # 大数组：包括二定、三定、四定
         $updateDsDatas = SscSdHzVal::find()->asArray()->All();
         //$rst[$interval] = SscDataService::dsYLStatic($interval);
-        //p($updateDsDatas);
+        //if($type==2)p($updateDsDatas);
         foreach ($updateDsDatas as $Data){
             //if($Data['id'] != 61) continue;
             $zuHes = explode(',', $Data['val']);
-            $where = [ 'AND',[ '=', 'val', $Data['val']], ['=', 'lottery_type', $lottery_type] ];
+            $where = [ 'AND',[ 'IN', 'val', $Data['val']], ['=', 'lottery_type', $lottery_type] ];
 
             if(!$SscSdHzYl = SscSdHzYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->one()){
                 $SscSdHzYl = new SscSdHzYl();
@@ -2303,6 +2303,7 @@ class SscDataService extends BaseService {
                 $SscSdHzYl->val = $Data['val'];
             }
             $count = self::getCountByHzs($zuHes);
+            //if($type == 2)p([$count, $zuHes]);
             $SscSdHzYl->count = $count; # 组合总共组数
             $SscSdHzYl->updated_at = time();
             //$SscDsYl->zhi = (string)$num;
@@ -2322,11 +2323,11 @@ class SscDataService extends BaseService {
             $SscSdHzYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
             $SscSdHzYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
             $SscSdHzYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
-            $SscSdHzYl->history_max_miss = max($miss['current_times'],$SscSdHzYl->max_miss,$SscSdHzYl->history_max_miss); // 6、历史最大遗漏
+            $SscSdHzYl->history_max_miss = (string)max($miss['current_times'],$SscSdHzYl->max_miss,$SscSdHzYl->history_max_miss); // 6、历史最大遗漏
             //$SscSdHzYl->status = $Data['status']; // 7、前台显示状态
             $SscSdHzYl->lottery_type = $lottery_type; // 彩种类型
             $SscSdHzYl->update_time = date('Y-m-d H:i:s');
-            //p($SscSdHzYl->attributes);
+            //if($type == 2)p($SscSdHzYl->attributes);
             $rst = $SscSdHzYl->save();
             if(!$rst){
                 $logArr = ['attributes'=>$SscSdHzYl->attributes, 'msg'=>$SscSdHzYl->getErrors()];
@@ -2345,9 +2346,9 @@ class SscDataService extends BaseService {
      */
     public static function getCountByHzs($hzs, $code_type = 4){
         $m = \Yii::$app->cache;
-        $mkey = 'getCountByHzs_x_'.implode(',', $hzs);
+        $mkey = 'getCountByHzs_Z_'.implode(',', $hzs);
         if(!$counts = $m->get($mkey)){
-            $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where(['AND', ['=', 'code_type', $code_type], ['=', 'codes_hz', $hzs]])->asArray()->one();
+            $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where(['AND', ['=', 'code_type', $code_type], ['IN', 'codes_hz', $hzs]])->asArray()->one();
             $counts = $Num4Type['count'];
             $m->set($mkey, $counts, 3600);
         }
