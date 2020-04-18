@@ -68,6 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = \backend\service\TzService::getTzPlanTypes($model->plan_type);
+                                if($model->is_test) $txt .= '_模拟';
                                 return $txt;
                             }
                         ],
