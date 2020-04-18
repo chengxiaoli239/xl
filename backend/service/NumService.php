@@ -769,6 +769,7 @@ class NumService extends BaseService {
      * @return array
      */
     public static function getCodesKuaiXuan($codes_hz, $code_type = 4) {
+        //p([$codes_hz, $code_type],0);
         if(empty($codes_hz)) return [];
 
         $where = ['AND', ['=', 'code_type', $code_type]];
@@ -926,9 +927,9 @@ class NumService extends BaseService {
             $where = array_merge($where, [ ['IN', 'codes_hz', $codes_hefen ] ]);
         }
 
-        # 三定、四定除、取
-        if($code_type == 3 && !empty($codes_hz['arise_in']) && in_array($codes_hz['arise_in_sel'], [1, 2])){
-            $lenAriseIn = strlen($codes_hz['arise_in']);
+        # 三定、四定 "含" 除、取
+        if(in_array($code_type, [3,4]) && !empty($codes_hz['arise_in']) && in_array($codes_hz['arise_in_sel'], [1, 2])){
+            $lenAriseIn = strlen($codes_hz['arise_in']); # 含的个数
             $tmpAriseInType = $codes_hz['arise_in_sel'];
             if($tmpAriseInType == 1){ # 除
                 $op = 'AND';
@@ -1220,6 +1221,7 @@ class NumService extends BaseService {
         $filter8 = []; # 合分取
         $filter9 = []; # 合分除
         $filter10 = []; # 号码组
+        $filter11 = []; # 定位 含
         # {"get_types":["1","2"],"remove_types":["4","5"],"get_hzs":["7","8","10"],"remove_hzs":["12","13","14"],"get_arises":"123","remove_arises":"456"}
         # 0.1、上奖取
         if(isset($hz_Arr['arise']) OR isset($hz_Arr['get_arises'])){
@@ -1230,6 +1232,7 @@ class NumService extends BaseService {
         if(isset($hz_Arr['remove_arises']) OR isset($hz_Arr['remove_arises'])){
             if(isset($hz_Arr['remove_arises'])) $filter4['remove_arises'] = $hz_Arr['remove_arises'];// else $filter0['arise'] = 0;
         }
+
         # 1、双重
         if(isset($hz_Arr['type_2'])){
             if($hz_Arr['type_2'] == 1) $filter1['type_2'] = 1; else $filter0['type_2'] = 0;
@@ -1302,6 +1305,10 @@ class NumService extends BaseService {
         if(isset($hz_Arr['status_val'])){
             $filter10['status_val'] = $hz_Arr['status_val'];
         }
+        # 13 二、三、四定 含
+        if(isset($hz_Arr['arise_in_sel']) && isset($hz_Arr['arise_in'])){
+            $filter11 = ['sel'=>$hz_Arr['arise_in_sel'], 'val'=>$hz_Arr['arise_in']];
+        }
 
         # 合分 - 三定
         if(isset($hz_Arr['hefen_pos']) && isset($hz_Arr['hefen'])){
@@ -1366,6 +1373,12 @@ class NumService extends BaseService {
             }else{
                 $desc .= ' 合分取[位:1,2,3,4 '. '合分:'.$hz_Arr['hefen'].']';
             }
+        }
+
+        if(!empty($filter11)){
+            $desc .= '定位含:';
+            $desc .= $filter11['sel'] == 1 ? '除' : '取';
+            $desc .= $filter11['val'];
         }
 
         # 上奖取

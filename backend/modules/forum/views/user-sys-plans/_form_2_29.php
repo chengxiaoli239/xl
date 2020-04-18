@@ -27,6 +27,12 @@ use yii\widgets\ActiveForm;
                     ])->label('投注方式') ?>
                     <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
 
+                    <?= $form->field($model, 'is_test')->radioList([
+                        '0'=>'真实',
+                        '1'=>'模拟',
+                    ])->label('真实/模拟') ?>
+                    <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
+
                     <!--?= $form->field($model, 'status')->textInput() ?-->
                     <?= $form->field($model, 'status')->radioList([
                         '0'=>'关闭',

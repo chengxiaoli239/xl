@@ -542,7 +542,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         $url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER').'?'.http_build_query($post_data);
 
-        $rst = CurlService::postCurl($url, $post_data, $headers);
+        //$rst = CurlService::postCurl($url, $post_data, $headers);
+        $rst = self::postBetCurl($url,$post_data, $headers);
         if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
             $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
             $BettingRecords->cancel_status = 1;
@@ -1075,6 +1076,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $data = [];
         if($rst['Status'] !=1) return $data;
 
+        //p($rst);
         $data['sn'] = $rst['Data']['serial_no'];
         $data['qihao'] = substr($rst['Data']['previous_period_no'], 2);
         $tzDatas = $rst['Data']['Details'];
@@ -1531,7 +1533,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      */
     public function bet($qihao, $plan_id, $codes){
         $bigFlag = 0;
-        if(strlen($codes)>5000){ # 针对大量号码下注 用post请求
+        if(true OR strlen($codes)>5000){ # 针对大量号码下注 用post请求
             $bigFlag = 1;
             return $this->postBatchBet($qihao, $plan_id, $codes);
         }
@@ -1646,7 +1648,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
         }
         # 获取方案号，记录id, 用于撤单
-        $snInfo = SevenService::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+        $snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
 
         $insertData = [
             'playway'=> $playway,  // 投注方式
