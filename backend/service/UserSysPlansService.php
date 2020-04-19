@@ -848,4 +848,34 @@ class UserSysPlansService extends BaseService {
         return $rst;
     }
 
+    public static function getYLByPlanId($plan_id = 934){
+        $yl = 0;
+        $UserSysPlans = UserSysPlans::findOne($plan_id);
+        //p($UserSysPlans);
+        $lottery_type = $UserSysPlans->lottery_type;
+        $code_type = self::getCodeTypeByTzType($UserSysPlans->tz_type);
+        $codeArr = NumService::getCodesKuaiXuan(json_decode($UserSysPlans->hz_Arr, 320), $code_type);
+        p($codeArr);
+
+    }
+
+    /**
+     * @desc 获取code_type 用于筛选号码
+     * @param int $tz_type
+     * @return int|mixed
+     */
+    public static function getCodeTypeByTzType($tz_type = 25){
+        $code_type = 4;
+        $tz_types = [
+            30 => 2,
+            31 => 5,
+            29 => 3,
+            33 => 2,
+        ];
+
+        if(isset($tz_types[$tz_type])) $code_type = $tz_types[$tz_type];
+
+        return $code_type;
+    }
+
 }

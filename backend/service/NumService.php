@@ -764,7 +764,7 @@ class NumService extends BaseService {
 
     /**
      * @desc 快选功能过滤
-     * @param $codes_hz
+     * @param $codes_hz array
      * @param $type 1一定2二定3三定4四定
      * @return array
      */
