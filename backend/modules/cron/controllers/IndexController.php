@@ -154,7 +154,7 @@ class IndexController extends Controller
                 $rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏 - 临时
             }
             */
-            sleep(2);
+            //sleep(2);
         }
 
         return $rst;
@@ -216,7 +216,7 @@ class IndexController extends Controller
         }
         for ($i=0; $i<5; $i++){
             $rst['tz'] = TzService::tz(); // 计划投注
-            sleep(2);
+            //sleep(2);
         }
 
         return $rst;
@@ -255,7 +255,7 @@ class IndexController extends Controller
         $lottery_types = StaticService::getLotteryTypes();
         foreach ($lottery_types as $lottery_type) {
             $rst = OpKjService::opSscKjData($lottery_type); # 在抓取完开奖数据已经调用 KjDataGet::grabOne
-            sleep(2);
+            //sleep(2);
         }
 
         return $rst;

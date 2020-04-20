@@ -391,7 +391,7 @@ class XlService extends BaseTZService {
             $rst['status'] = 200;
         }else{
             if(isset($rst['Data'])) p($rst['Data'], 0);
-            sleep(2);
+            //sleep(2);
         }
         $logArr = ['snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);

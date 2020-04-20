@@ -414,7 +414,7 @@ class SevenService extends BaseTZService {
                 $rst['status'] = 200;
             }else{
                 if(isset($rst['Data'])) p($rst['Data'], 0);
-                sleep(2);
+                //sleep(2);
             }
         }
         $logArr = ['snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
