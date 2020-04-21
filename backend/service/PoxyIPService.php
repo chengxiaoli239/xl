@@ -50,11 +50,11 @@ class PoxyIPService extends BaseService {
             $data = self::kuaiPoxy();
             //return $data;
             //$poxy_ip_data = explode(':', $data['data'][0]);
-            $poxy_ip_data = $data['data'][0];
-            $m->set($mkey, $poxy_ip_data, $time);
             if($data['status'] != 200) {
                 return [];
             }
+            $poxy_ip_data = $data['data'][0];
+            $m->set($mkey, $poxy_ip_data, $time);
         }else{
             $flag = self::isValid([$poxy_ip_data]);
             if(!$flag){
