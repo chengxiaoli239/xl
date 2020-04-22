@@ -44,8 +44,8 @@ class SscDsYl extends \common\models\base\BaseModel
             [['update_time'], 'safe'],
             [['positions'], 'string', 'max' => 8],
             [['zhi'], 'string', 'max' => 120],
-            [['current_miss', 'last_time_miss', 'max_miss', 'max_range', 'history_max_miss'], 'string', 'max' => 12],
-            [['last_time_miss_range'], 'string', 'max' => 128],
+            [['current_miss', 'last_time_miss', 'max_miss', 'history_max_miss'], 'string', 'max' => 12],
+            [['last_time_miss_range', 'max_range'], 'string', 'max' => 64],
         ];
     }
 
@@ -55,21 +55,21 @@ class SscDsYl extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'positions' => Yii::t('app', '位置'),
-            'zhi' => Yii::t('app', '值'),
-            'current_miss' => Yii::t('app', '本期遗漏'),
-            'last_time_miss' => Yii::t('app', '上次遗漏'),
-            'last_time_miss_range' => Yii::t('app', '上次遗漏范围'),
-            'max_miss' => Yii::t('app', '最大遗漏(近200期)'),
-            'max_range' => Yii::t('app', '最大遗漏范围(近200期)'),
-            'yl_records' => Yii::t('app', '遗漏记录'),
-            'history_max_miss' => Yii::t('app', '历史最大遗漏'),
-            'type' => Yii::t('app', '1一定2二定3三定4四定'),
-            'lottery_type' => Yii::t('app', '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc'),
-            'created_at' => Yii::t('app', '创建时间'),
-            'updated_at' => Yii::t('app', '更新时间'),
-            'update_time' => Yii::t('app', '更新时间'),
+            'id' => 'ID',
+            'positions' => '位置',
+            'zhi' => '值',
+            'current_miss' => '本期遗漏',
+            'last_time_miss' => '上次遗漏',
+            'last_time_miss_range' => '上次遗漏范围',
+            'max_miss' => '最大遗漏(近200期)',
+            'max_range' => '最大遗漏范围(近200期)',
+            'yl_records' => '遗漏记录',
+            'history_max_miss' => '历史最大遗漏',
+            'type' => '1一定2二定3三定4四定',
+            'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
+            'created_at' => '创建时间',
+            'updated_at' => '更新时间',
+            'update_time' => '更新时间',
         ];
     }
 
