@@ -1691,6 +1691,17 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
     }
 
     /**
+     * @desc 获取每次下注号码量
+     * @return int|string
+     */
+    public static function getBetNumsPer(){
+        $nums = SystemConfig::findOne(['key'=>'tz_nums_per'])->value;
+        if(!$nums) $nums = 1650;
+
+        return $nums;
+    }
+
+    /**
      * @desc 批量号码拆解下注
      * @param $qihao
      * @param $plan_id
@@ -1702,7 +1713,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $tmpCodes = str_replace(',', '', $tmpCodes);
         $codesArr = explode('@', $tmpCodes);
 
-        $codesArrs = self::splitCodes($codesArr,  1650); # 2500一次
+        $betNums = self::getBetNumsPer();
+        $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
 
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;

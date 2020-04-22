@@ -1537,6 +1537,17 @@ class SevenService extends BaseTZService {
     }
 
     /**
+     * @desc 获取每次下注号码量
+     * @return int|string
+     */
+    public static function getBetNumsPer(){
+        $nums = SystemConfig::findOne(['key'=>'tz_nums_per'])->value;
+        if(!$nums) $nums = 1650;
+
+        return $nums;
+    }
+
+    /**
      * @decription 获取远程html内容
      * @param $url
      */
