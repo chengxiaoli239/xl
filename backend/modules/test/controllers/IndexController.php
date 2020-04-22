@@ -169,8 +169,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $id = 45; $rst = BaseService::login($id);p($rst);
+
+        $rst = PoxyIPService::getPoxyIp();p($rst);
         $rst = UserSysPlansService::getYLByPlanId($plan_id = 934);p($rst);
-        $id = 53; $rst = BaseService::login($id);p($rst);
         $snInfo = LuckyBaseService::getSn($user_id =17, $tz_system_id = 9);p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5, $type = 2); p($rst);// 更新和值遗漏
         $mcLock = new McLockService();
@@ -182,7 +184,6 @@ class IndexController extends Controller
         $mcLock->Lock('dw');
         $flag = $mcLock->isLock('dw');
         d($flag);
-        $rst = PoxyIPService::getPoxyIp();p($rst);
         $rst = PoxyIPService::isValid(['122.7.3.56:17856']);p($rst);
         $rst = PoxyIPService::kuaiPoxy();p($rst);
         $rst = PoxyIPService::kuaiPoxyExpire();p($rst);
