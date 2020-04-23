@@ -559,10 +559,10 @@ class SscDataService extends BaseService {
                     $miss = SscDataService::getDsHistoryMiss($num, $position, $lottery_type); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
                     //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
                     $SscDsYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
-                    $SscDsYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
-                    $SscDsYl->last_time_miss = $miss['last_times']; // 2、上次遗漏
+                    $SscDsYl->current_miss = (string)$miss['current_times'];  // 1、当前遗漏次数
+                    $SscDsYl->last_time_miss = (string)$miss['last_times']; // 2、上次遗漏
                     $SscDsYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
-                    $SscDsYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
+                    $SscDsYl->max_miss = (string)$miss['max_miss'];      // 4、近200期内最大遗漏
                     $SscDsYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
                     $SscDsYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
                     //p($updateData);
