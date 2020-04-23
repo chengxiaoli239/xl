@@ -2008,7 +2008,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        self::setPoxy($ch, $url); # 设置代理IP
+        $poxy_addr = self::setPoxy($ch, $url); # 设置代理IP
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
@@ -2026,7 +2026,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         //if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
         //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];p($logArr);
         if($errno){
-            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
             //p($logArr);
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
@@ -2052,8 +2052,9 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
     public static function setPoxy($ch, $url=''){
         $poxy_addr = PoxyIPService::getPoxyIp();
         if(strpos($url, 'ww662889') !== false){
-            //$poxy_addr = '218.85.247.70:20000';
+            $poxy_addr = '218.85.247.70:20000';
         }
+        $poxy_addr = '218.85.247.70:20000';
 
         if(!empty($poxy_addr)){
             //设置代理
