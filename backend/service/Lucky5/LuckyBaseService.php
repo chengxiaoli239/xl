@@ -1923,7 +1923,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $rstData = json_decode($data, TRUE);
         }
         if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306])){
-            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
         $time_consume = ($end_time-$start_time).'s';
