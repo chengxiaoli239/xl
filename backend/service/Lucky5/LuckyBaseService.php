@@ -1869,7 +1869,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
         }
 
-        self::setPoxy($ch, $url); # 设置代理IP
+        $poxy_addr = self::setPoxy($ch, $url); # 设置代理IP
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -1927,7 +1927,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
         $time_consume = ($end_time-$start_time).'s';
-        $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume];
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
@@ -2063,7 +2063,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
         }
 
-        return true;
+        return $poxy_addr;
     }
 
 }
