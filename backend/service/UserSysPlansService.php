@@ -443,6 +443,7 @@ class UserSysPlansService extends BaseService {
             $hz_Arr = json_encode($tmpFilter, 320);
             $post['UserSysPlans']['hz_Arr'] = !empty($hz_Arr) ? $hz_Arr : '';
         }
+        $post['UserSysPlans']['hz_Arr'] = !$post['UserSysPlans']['hz_Arr'] ? '' : $post['UserSysPlans']['hz_Arr'];
 
         $post['UserSysPlans']['uid'] = $user_id;
         $post['UserSysPlans']['account'] = $User->username;

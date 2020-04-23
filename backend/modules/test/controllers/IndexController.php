@@ -169,6 +169,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 6); p($rst);// 更新和值遗漏
         $id = 45; $rst = BaseService::login($id);p($rst);
 
         $rst = PoxyIPService::getPoxyIp();p($rst);
