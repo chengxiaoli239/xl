@@ -2053,7 +2053,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $poxy_addr = PoxyIPService::getPoxyIp();
         if(strpos($url, 'ww662889') === false){
             //$poxy_addr = '218.85.247.70:20000';
-            $poxy_addr = '218.85.247.70:20000';
         }
 
         if(!empty($poxy_addr)){
