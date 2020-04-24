@@ -143,8 +143,9 @@ class IndexController extends Controller
         $id = $post['id'];
         $rst = BaseService::login($id);
         $TzSystemsUsers = TzSystemsUsers::findOne($id);
+        $poxy_addr = PoxyIPService::getPoxyIp();
 
-        return array_merge($rst,  ['TzSystemsUsers'=>$TzSystemsUsers]);
+        return array_merge($rst,  ['TzSystemsUsers'=>$TzSystemsUsers, 'poxy_addr'=>$poxy_addr]);
     }
 
     /**
@@ -169,10 +170,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = PoxyIPService::getPoxyIp();p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 6); p($rst);// 更新和值遗漏
         $id = 45; $rst = BaseService::login($id);p($rst);
-
-        $rst = PoxyIPService::getPoxyIp();p($rst);
         $rst = UserSysPlansService::getYLByPlanId($plan_id = 934);p($rst);
         $snInfo = LuckyBaseService::getSn($user_id =17, $tz_system_id = 9);p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5, $type = 2); p($rst);// 更新和值遗漏
