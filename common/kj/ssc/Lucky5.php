@@ -3,6 +3,7 @@
 namespace common\kj\ssc;
 use backend\models\TzSystemsUsers;
 use backend\service\CurlService;
+use backend\service\Lucky5\LuckyBaseService;
 use common\kj\BaseKj;
 use common\tools\Tool_Common;
 use  yii;
@@ -28,7 +29,7 @@ class Lucky5 extends BaseKj {
                 # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015
 
                 $headers = [
-                    'Accept: application/json, text/javascript, */*; q=0.01',
+                    'Accept: application/json, text/javascript, */*',
                     'Accept-Encoding: gunzip, deflate',
                     'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
                     'Connection: keep-alive',
@@ -38,7 +39,7 @@ class Lucky5 extends BaseKj {
                     $TzSystemsUsers->user_agent,
                     'X-Requested-With: XMLHttpRequest',
                 ];
-                $content = CurlService::getCurl($url, $headers);
+                $content = LuckyBaseService::getCurl($url, $headers);
                 //$data = json_decode($content,320);
                 $data = $content;
 
@@ -89,7 +90,6 @@ class Lucky5 extends BaseKj {
             # 当前开奖链接：https://web01.cc138008.com/kaijiang/history/ygxy5.json?v=1582557689975
 
             $data = CurlService::getCurl($url);
-            p([$url, $data]);
 
             if (!isset($data['code'])) return false;
             $opencode = implode(',', $data['code']);

@@ -170,6 +170,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = Lucky5::getLotteryLucky();p($data);
+        $str = "/App/ClearSession?errMsg=%e6%82%a8%e7%9a%84%e8%b4%a6%e5%8f%b7%e5%b7%b2%e5%9c%a8%e5%88%ab%e5%a4%84%e7%99%bb%e5%bd%95%e3%80%82";
+        p(urldecode($str));
         $rst = PoxyIPService::getPoxyIp();p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 6); p($rst);// 更新和值遗漏
         $id = 45; $rst = BaseService::login($id);p($rst);
@@ -322,7 +325,6 @@ class IndexController extends Controller
             $rst = KjDataGet::insertKjData($dataInfo['expect'], 8, $dataInfo['opencode']);
         }p($rst);
         $rst['kj'] = KjDataGet::grabOne();p($rst);
-        $data = Lucky5::getLotteryLucky();p($data);
         $rst = TzService::insertLuckyDataTime(); p($rst);
         p(unserialize('a:3:{s:4:"time";i:1570224883;s:3:"ttl";i:3600000;s:4:"data";a:0:{}}'));
         $rst = CqsscKcw::getLotteryNoZhiBo();d($rst);
