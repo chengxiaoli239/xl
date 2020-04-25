@@ -817,19 +817,19 @@ class NumService extends BaseService {
             $where = array_merge($where, [ ['NOT IN', 'codes_hz', $codes_hz['remove_hzs']] ]);
         }
 
-        # 定位合分 - 三定
+        # 定位合分
         if($code_type == 3 && isset($codes_hz['hefen_pos']) && isset($codes_hz['hefen']) && !empty($codes_hz['hefen_pos']) && !empty($codes_hz['hefen'])){
+            # 三定
             $poss = explode(',', $codes_hz['hefen_pos']);
-
             $lenHefen = strlen($codes_hz['hefen']);
-            $codes_hefen = [];
+            $hf_codes_hzs = [];
             for ($i=0; $i<$lenHefen; $i++){
                 if($codes_hz['hefen'][$i]<=7){
                     $hefenArr = [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10, $codes_hz['hefen'][$i] + 20];
                 }else{
                     $hefenArr = [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10];
                 }
-                $codes_hefen = array_merge($codes_hefen, $hefenArr);
+                $hf_codes_hzs = array_merge($hf_codes_hzs, $hefenArr);
             }
             $codes_str = '';
             foreach ($poss as $pos){
@@ -837,8 +837,22 @@ class NumService extends BaseService {
                 $where = array_merge($where, [['<>', 'code_'.$pos, 'X']]);
             }
             $codes_str = rtrim(trim($codes_str), '+');
-            $where = array_merge($where, [ ['IN', '('.$codes_str.')', $codes_hefen ] ]);
+            $where = array_merge($where, [ ['IN', '('.$codes_str.')', $hf_codes_hzs ] ]);
             //$query->andWhere($andWhere);
+        }if($code_type == 4 && isset($codes_hz['hefen_pos']) && isset($codes_hz['hefen']) && !empty($codes_hz['hefen_pos']) && !empty($codes_hz['hefen'])){
+            # 四定
+            $poss = explode(',', $codes_hz['hefen_pos']);
+            $lenPos = count($poss);
+            $hf_codes_hzs = self::getHezhisByHefen($codes_hz['hefen'], $lenPos);
+
+            $codes_str = '';
+            foreach ($poss as $pos){
+                $codes_str .= '`code_'.$pos.'`' . ' + ';
+                $where = array_merge($where, [['<>', 'code_'.$pos, 'X']]);
+            }
+            $codes_str = rtrim(trim($codes_str), '+');
+            $where = array_merge($where, [ ['IN', '('.$codes_str.')', $hf_codes_hzs ] ]);
+            //p([$poss, $codes_hz['hefen'], $hf_codes_hzs]);
         }
 
         # 不定位合分(1两数、2三数) - 三定
@@ -1180,8 +1194,47 @@ class NumService extends BaseService {
         }else{
             $datas = $codesArr;
         }
+        //p(count($datas));
 
         return $datas;
+    }
+
+    /**
+     * @param $hefens 1234  合分值
+     * @param int $lenHefen 位置个数
+     * @param $code_type 1一定2二定3三定4四定
+     * @return array
+     */
+    public static function getHezhisByHefen($hefens, $lenPos = 4, $code_type = 4){
+        $hezhis = [];
+        //p([$hefens, $lenPos],0);
+
+        $lenHefen = strlen($hefens);
+        for ($i=0; $i<$lenHefen; $i++){
+            $hefensZhi = $hefens[$i];
+            if($lenPos == 4){
+                if($hefensZhi<=6){
+                    $hefenArr = [$hefensZhi, $hefensZhi + 10, $hefensZhi + 20, $hefensZhi + 30];
+                }else{
+                    $hefenArr = [$hefensZhi, $hefensZhi + 10, $hefensZhi + 20];
+                }
+            }elseif ($lenPos == 3){
+                if($hefensZhi<=7){
+                    $hefenArr = [$hefensZhi, $hefensZhi + 10, $hefensZhi + 20];
+                }else{
+                    $hefenArr = [$hefensZhi, $hefensZhi + 10];
+                }
+            }elseif ($lenPos == 2){
+                if($hefensZhi<=8){
+                    $hefenArr = [$hefensZhi, $hefens[$i] + 10];
+                }else{
+                    $hefenArr = [$hefensZhi];
+                }
+            }
+            $hezhis = array_merge($hezhis, $hefenArr);
+        }
+
+        return $hezhis;
     }
 
     /**
