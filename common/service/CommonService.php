@@ -620,7 +620,8 @@ class  CommonService{
         $codes_str = implode(',', $codesArr);
         $bArrs = [
             '0,1,2',
-            '0,1,8',
+            '0,1,9',
+            '0,8,9',
             '1,2,3',
             '2,3,4',
             '3,4,5',
@@ -628,8 +629,6 @@ class  CommonService{
             '5,6,7',
             '6,7,8',
             '7,8,9',
-            '0,8,9',
-            '0,1,9',
         ];
         foreach ($bArrs as $bArr){
             if(strpos($codes_str, $bArr) !== false) $flag = 1;
