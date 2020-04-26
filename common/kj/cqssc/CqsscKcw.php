@@ -68,6 +68,11 @@ class CqsscKcw extends BaseKj {
         return $rst;
     }
 
+    /**
+     * @desc 直播网
+     * @param string $returnType
+     * @return array|bool
+     */
     public static function getLotteryNoZhiBo($returnType = 'json'){
 
         if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
@@ -89,6 +94,52 @@ class CqsscKcw extends BaseKj {
             $kjData['opencode'] = implode(',', $data['openNum']);
             $kjData['opentime'] = $data['openDateTime'];
             //p($kjData);
+            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
+        }
+        $opencode = $kjData['opencode'];
+        $opentime = $kjData['opentime'];
+        $expect = $kjData['expect'];
+
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc', 'INFO', '号码抓取-直播网', $logArr);
+
+        return $rst;
+    }
+
+    /**
+     * @desc 直播网 - 重庆
+     * @param string $returnType
+     * @return array|bool
+     */
+    public static function getLotteryNoNineNum($returnType = 'json'){
+
+        if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $domain = BaseKj::getApiHost(20);
+            $date = date('Y-m-d');
+            if('00:00' < date('H:i:s') && date('H:i:s') < '03:00'){
+                $date = date('Y-m-d', time()-86400);
+            }
+            $url = $domain.'/api/v1/result/service/mobile/results/hist/HF_CQSSC?limit=4&brand=09cp'; # limit 数量
+            //$content = file_get_contents($url);
+            $content = CurlService::httpGet($url);
+            //$data = json_decode($content,320);
+            $data = $content[0];
+
+            if (!isset($data['uniqueIssueNumber']) OR !$data) return false;
+            $str = substr($data['uniqueIssueNumber'], 0, 8);
+            $kjData['expect'] = str_replace($str, $str . '-', $data['uniqueIssueNumber']); # 20200427-059
+            $kjData['opencode'] = $data['openCode']; # 1,4,3,5,1
+            $kjData['opentime'] = date('Y-m-d H:i:s', strtotime($data['openTime']));
             //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
         }
         $opencode = $kjData['opencode'];

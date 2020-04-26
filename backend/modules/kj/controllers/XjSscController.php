@@ -33,6 +33,16 @@ class XjSscController extends Controller
     }
 
     /**
+     * @desc 开奖9号娱乐网 - 新疆时时彩
+     * @return json|xml
+     */
+    public function actionNineNum($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = XjSsc::getLotteryNoNineNum($type);
+        return $data;
+    }
+
+    /**
      * @desc 直播网 - 新疆时时彩
      * @return json|xml
      */
