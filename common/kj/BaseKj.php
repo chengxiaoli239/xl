@@ -74,5 +74,15 @@ class BaseKj{
         return $domain;
     }
 
+    /**
+     * @desc 根据路由获取 domain
+     * @param string $route
+     * @return string
+     */
+    public static function getApiHostByRoute($route = '/kj/cqssc/nine-num'){
+        $domain = KjConfig::findOne(['path'=>$route])->api_host;
+
+        return $domain;
+    }
 
 }

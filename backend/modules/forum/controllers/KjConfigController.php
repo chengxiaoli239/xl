@@ -76,8 +76,10 @@ class KjConfigController extends BaseController
     public function actionCreate()
     {
         $model = new KjConfig();
+        $post = Yii::$app->request->post();
+        self::trimParams($post);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load($post) && $model->save()) {
             return $this->redirect(['index']);
         }
 
@@ -85,6 +87,20 @@ class KjConfigController extends BaseController
             'model' => $model,
             'lottery_type_arr' => CqsscKcw::$lotteryNameArr,
         ]);
+    }
+
+    /**
+     * @desc 去空格
+     * @param $posts
+     * @return mixed
+     */
+    public static function trimParams(&$posts){
+        foreach ($posts as $key=>$post){
+            foreach ($post as $k){
+                $posts[$key][$k] = trim($post[$k]);
+            }
+        }
+        return $post;
     }
 
     /**
@@ -97,8 +113,10 @@ class KjConfigController extends BaseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $post = Yii::$app->request->post();
+        self::trimParams($post);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load($post) && $model->save()) {
             return $this->redirect(['index']);
         }
 

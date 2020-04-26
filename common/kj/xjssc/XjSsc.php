@@ -207,7 +207,7 @@ class XjSsc extends BaseKj {
     public static function getLotteryNoNineNum($returnType = 'json'){
 
         if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
-            $domain = BaseKj::getApiHost(21);
+            $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/nine-num');
             $date = date('Y-m-d');
             if('00:00' < date('H:i:s') && date('H:i:s') < '03:00'){
                 $date = date('Y-m-d', time()-86400);

@@ -124,11 +124,7 @@ class CqsscKcw extends BaseKj {
     public static function getLotteryNoNineNum($returnType = 'json'){
 
         if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
-            $domain = BaseKj::getApiHost(20);
-            $date = date('Y-m-d');
-            if('00:00' < date('H:i:s') && date('H:i:s') < '03:00'){
-                $date = date('Y-m-d', time()-86400);
-            }
+            $domain = BaseKj::getApiHostByRoute('/kj/cqssc/nine-num');
             $url = $domain.'/api/v1/result/service/mobile/results/hist/HF_CQSSC?limit=4&brand=09cp'; # limit 数量
             //$content = file_get_contents($url);
             $content = CurlService::httpGet($url);
