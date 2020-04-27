@@ -1127,6 +1127,16 @@ class NumService extends BaseService {
             $where = array_merge($where, [['=', 'type_22', $type_22]]);
         }
 
+        # tz_type:28 双双重
+        if(($codes_hz['get_types'] && in_array(8, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(8, $codes_hz['remove_types']) )){
+            if($codes_hz['get_types'] && in_array(8, $codes_hz['get_types'])){
+                $type_22b = 1;
+            }else{
+                $type_22b = 0;
+            }
+            $where = array_merge($where, [['=', 'type_22b', $type_22b]]);
+        }
+
         # 对数
         if(isset($codes_hz['type_log'])){
             $where = array_merge($where, [['=', 'type_log', $codes_hz['type_log']]]);

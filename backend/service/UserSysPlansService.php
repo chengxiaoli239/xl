@@ -723,7 +723,7 @@ class UserSysPlansService extends BaseService {
      */
     public static function getCodeTypes(){
         $m = \Yii::$app->cache;
-        $mkey = 'getCodeTypes_01';
+        $mkey = 'getCodeTypes_02';
 
         if(!$data = $m->get($mkey)){
             $codeTypes = CodeTypes::find()->asArray()->All();
