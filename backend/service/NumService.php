@@ -1073,7 +1073,7 @@ class NumService extends BaseService {
         }
         # tz_type:28 双重
         if(($codes_hz['get_types'] && in_array(2, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(2, $codes_hz['remove_types']) )){
-            if(in_array(2, $codes_hz['get_types'])){
+            if($codes_hz['get_types'] && in_array(2, $codes_hz['get_types'])){
                 $type_2 = 1;
             }else{
                 $type_2 = 0;
@@ -1091,7 +1091,7 @@ class NumService extends BaseService {
         }
         # tz_type:28 四重
         if(($codes_hz['get_types'] && in_array(4, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(4, $codes_hz['remove_types']) )){
-            if(in_array(4, $codes_hz['get_types'])){
+            if($codes_hz['get_types'] && in_array(4, $codes_hz['get_types'])){
                 $type_4 = 1;
             }else{
                 $type_4 = 0;

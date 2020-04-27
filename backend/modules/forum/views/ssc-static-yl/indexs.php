@@ -43,17 +43,75 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return \backend\service\SscDataService::getStaticNameByType($model->val);
                             }
                         ],
-                        'current_miss',
-                        'last_time_miss',
+                        //'current_miss',
+                        ['attribute' => 'current_miss','headerOptions'=>['width'=>'5%'],'label'=>'当前遗漏',
+                            'value' => function($model) {
+                                return $model->current_miss;
+                            }
+                        ],
+                        //'last_time_miss',
+                        ['attribute' => 'last_time_miss','headerOptions'=>['width'=>'5%'],'label'=>'当前遗漏',
+                            'value' => function($model) {
+                                return $model->last_time_miss;
+                            }
+                        ],
                         //'last_time_miss_range',
-                        'max_miss',
+                        //'max_miss',
+                        ['attribute' => 'max_miss','headerOptions'=>['width'=>'5%'],'label'=>'近期最大',
+                            'value' => function($model) {
+                                return $model->max_miss;
+                            }
+                        ],
                         //'max_range',
                         'yl_records:ntext',
-                        'history_max_miss',
-                        'codes_hz',
-                        'type_3b',
-                        'type_4ds',
-                        'count',
+                        //'history_max_miss',
+                        ['attribute' => 'history_max_miss','headerOptions'=>['width'=>'5%'],'label'=>'历史最大',
+                            'value' => function($model) {
+                                return $model->history_max_miss;
+                            }
+                        ],
+                        //'codes_hz',
+                        ['attribute' => 'codes_hz','headerOptions'=>['width'=>'5%'],'label'=>'和值',
+                            'value' => function($model) {
+                                return $model->codes_hz;
+                            }
+                        ],
+                        //'type_3b',
+                        ['attribute' => 'type_3b','headerOptions'=>['width'=>'5%'],'label'=>'三兄弟',
+                            'value' => function($model) {
+                                return $model->type_3b;
+                            }
+                        ],
+                        //'type_3',
+                        ['attribute' => 'type_3','headerOptions'=>['width'=>'5%'],'label'=>'三重',
+                            'value' => function($model) {
+                                return $model->type_3;
+                            }
+                        ],
+                        //'type_4',
+                        ['attribute' => 'type_4','headerOptions'=>['width'=>'5%'],'label'=>'四重',
+                            'value' => function($model) {
+                                return $model->type_4;
+                            }
+                        ],
+                        //'type_22',
+                        ['attribute' => 'type_22','headerOptions'=>['width'=>'5%'],'label'=>'双双重',
+                            'value' => function($model) {
+                                return $model->type_22;
+                            }
+                        ],
+                        //'type_4ds',
+                        ['attribute' => 'type_4ds','headerOptions'=>['width'=>'5%'],'label'=>'四单双',
+                            'value' => function($model) {
+                                return $model->type_4ds;
+                            }
+                        ],
+                        //'count',
+                        ['attribute' => 'count','headerOptions'=>['width'=>'5%'],'label'=>'总组数',
+                            'value' => function($model) {
+                                return $model->count;
+                            }
+                        ],
                         //'static_nums',
                         //'theory_nums_perdate',
                         //'today_nums',
