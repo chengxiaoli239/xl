@@ -1216,7 +1216,8 @@ class SscDataService extends BaseService {
         }
         $last_times = 0;
         $last_index_id = self::getLastIndexId($lottery_type);
-        $min_id = $last_index_id - $recently;
+        //$min_id = $last_index_id - $recently;
+        $min_id = self::getMinStaticId($last_index_id, $recently);
         //p([$value, $recently, $min_id]);
         $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'index_id', $min_id], ['LIKE', $field, $value]];
         if($type == 5){
@@ -1232,11 +1233,22 @@ class SscDataService extends BaseService {
         # 最大遗漏期间计算 start
         $tmpKjData = $SscKjDatas;
         if(count($tmpKjData) > 2){
+            $max_len = 0;
+            $allKjData = [];
             foreach($tmpKjData as $key=>$r){
                 if($key == 0) continue;
-                $range[$tmpKjData[$key-1]['index_id'].'_'.$tmpKjData[$key]['index_id']] = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
+                $len = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
+                $range[$tmpKjData[$key-1]['index_id'].'_'.$tmpKjData[$key]['index_id']] = $len;
+                $allKjData[$tmpKjData[$key]['index_id']] = $r;
+                if($len > $max_len){
+                    $max_len =  $len;
+                    $tmpArrKey = [$tmpKjData[$key]['index_id'], $tmpKjData[$key-1]['index_id']];
+                }
             }
+            $tmpArr[0] = $allKjData[$tmpArrKey[0]]['qihao'];
+            $tmpArr[1] = $allKjData[$tmpArrKey[1]]['qihao'];
 
+            /*
             $max_miss = max($range);
             $maxKey = array_search($max_miss, $range);
             $keyArr = explode('_',$maxKey);
@@ -1246,6 +1258,7 @@ class SscDataService extends BaseService {
                     $tmpArr[] = $r['qihao'];
                 }
             }
+            */
             $max_range = $tmpArr[1].'-'.$tmpArr[0];  // 近200期内最大遗漏
             $yl_str = implode('-',$range);
             # 最大遗漏期间计算 end
@@ -1270,6 +1283,24 @@ class SscDataService extends BaseService {
         //p($rstData);
         //if($vals == 'type_2,type_3b')p($rstData);
         return $rstData;
+    }
+
+    /**
+     * @desc 获取统计最小id
+     * @param $last_index_id
+     * @param int $recently
+     * @return int|mixed
+     */
+    public static function getMinStaticId($last_index_id, $recently = 2000){
+        $m = \Yii::$app->cache;
+        $mkey = 'getMinStaticId_'.$last_index_id.'_'.$recently;
+
+        if(!$min_id = $m->get($mkey)){
+            $min_id = $last_index_id - $recently;
+            $m->set($mkey, $min_id, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
+        }
+
+        return $min_id;
     }
 
     /**
