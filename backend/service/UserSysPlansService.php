@@ -726,7 +726,7 @@ class UserSysPlansService extends BaseService {
         $mkey = 'getCodeTypes_02';
 
         if(!$data = $m->get($mkey)){
-            $codeTypes = CodeTypes::find()->asArray()->All();
+            $codeTypes = CodeTypes::find()->where(['status'=>1])->asArray()->All();
             foreach ($codeTypes as $codeType){
                 $data[$codeType['type']] = $codeType['type_name'];
             }
