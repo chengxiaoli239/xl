@@ -31,7 +31,7 @@ class OpKjService extends BaseService {
 
         $m = \Yii::$app->cache;
         //p($qihaos);
-        $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type])->orderBy('id ASC')->limit(50)->all();
+        $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type])->orderBy('id DESC')->limit(50)->all();
         //p(['status'=>0, 'lottery_type'=>$lottery_type,'bettingRecords'=>$bettingRecords]);
         if(!$bettingRecords) return $rst;
         foreach ($bettingRecords as $bettingRecord){
