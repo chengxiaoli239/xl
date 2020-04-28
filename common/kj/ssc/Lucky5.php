@@ -20,7 +20,10 @@ class Lucky5 extends BaseKj {
 
         if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $TzSystemsUserses = TzSystemsUsers::find()->where(['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [7,9]] ])->all();
+            $m = \Yii::$app->cache;
             foreach ($TzSystemsUserses as $TzSystemsUsers){ # 用户账号去网盘抓数据
+                $mkey = 'getLotteryLucky_0_'.self::$lottery_type;
+                if($flag = $m->get($mkey)) continue;
                 //$domain = BaseKj::getApiHost(18);
                 $domain = $TzSystemsUsers->ssc_domain;
 
@@ -51,6 +54,7 @@ class Lucky5 extends BaseKj {
                 $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
                 if($opencode == '0,0,0,0,0') return false;
                 $kjData = ['expect'=>$row['period_no'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
+                $m->set($mkey, 1, 5);
                 //p($kjData);
             }
         }

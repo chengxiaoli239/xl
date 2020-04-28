@@ -51,7 +51,7 @@ class BaseKj{
         }
         if($kjData['opencode']){
             $mkey = self::buildKjDataKey($lottery_type, $qihao);
-            $m->set($mkey, $kjData, 10*60);
+            $m->set($mkey, $kjData, 5*60);
         }
 
         return true;
