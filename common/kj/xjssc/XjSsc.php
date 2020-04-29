@@ -200,7 +200,7 @@ class XjSsc extends BaseKj {
     }
 
     /**
-     * @desc 直播网 - 重庆
+     * @desc 9号娱乐网 - 重庆
      * @param string $returnType
      * @return array|bool
      */
@@ -220,7 +220,8 @@ class XjSsc extends BaseKj {
 
             if (!isset($data['uniqueIssueNumber']) OR !$data) return false;
             $str = substr($data['uniqueIssueNumber'], 0, 8);
-            $kjData['expect'] = str_replace($str, $str . '-', $data['uniqueIssueNumber']); # 20200427-059
+            $qh = (int)str_replace($str, '', $data['uniqueIssueNumber']);
+            $kjData['expect'] = $str. $qh; # 20200427-59
             $kjData['opencode'] = $data['openCode']; # 1,4,3,5,1
             $kjData['opentime'] = date('Y-m-d H:i:s', strtotime($data['openTime']));
             //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
