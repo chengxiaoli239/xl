@@ -15,7 +15,7 @@ class AppAsset extends AssetBundle
         'statics/css/bootstrap.min.css',
         'statics/css/bootstrap-reset.css',
         'statics/assets/font-awesome/css/font-awesome.css',
-        'statics/css/style.css',
+        'statics/css/style.css?v=2',
         'statics/css/style-responsive.css',
     ];
     public $js = [
@@ -24,7 +24,7 @@ class AppAsset extends AssetBundle
         'statics/js/jquery.nicescroll.js',
         'statics/js/jquery.sparkline.js',
         'statics/js/slidebars.min.js',
-        'statics/js/common-scripts.js',
+        'statics/js/common-scripts.js?v=2',
     ];
     public $depends = [
         'yii\web\YiiAsset',
