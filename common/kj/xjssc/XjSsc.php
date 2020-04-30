@@ -221,7 +221,7 @@ class XjSsc extends BaseKj {
 
             if (!isset($data['uniqueIssueNumber']) OR !$data) return false;
             $str = substr($data['uniqueIssueNumber'], 0, 8);
-            $qh = (int)str_replace($str, '', $data['uniqueIssueNumber']);
+            $qh = substr(str_replace($str, '', $data['uniqueIssueNumber']), -2);
             $kjData['expect'] = $str. $qh; # 20200427-59
             $kjData['opencode'] = $data['openCode']; # 1,4,3,5,1
             $kjData['opentime'] = date('Y-m-d H:i:s', strtotime($data['openTime']));
