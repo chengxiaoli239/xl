@@ -582,7 +582,8 @@ class Tool_Common
         $content = preg_replace('/(\r\n)|\r|\n/', ' ', $content);
     
         // 完整日志
-        $str = date('Y-m-d H:i:s') . ' [' . $priority . '] trace:' . self::getId() . ' ' . $backtrace . ' ' .  $ip . ' [' . $title . ']';
+        //$str = date('Y-m-d H:i:s') . ' [' . $priority . '] trace:' . self::getId() . ' ' . $backtrace . ' ' .  $ip . ' [' . $title . ']';
+        $str = date('Y-m-d H:i:s') . ' [' . $priority . ']  ' . $backtrace . ' ' .  $ip . ' [' . $title . ']';
 
         if ($content) {
             $str .= ' == ' . $content;
