@@ -23,7 +23,8 @@ class XjSsc extends BaseKj {
             foreach ($kjData as $key=>$d){
                 $d = str_replace('<font color="#330099">', '', $d);
                 $d = str_replace('/', '-', $d);
-                $kjData[$key] = str_replace("</font>", '', $d);
+                $d = str_replace("</font>", '', $d);
+                $kjData[$key] = str_replace("<-font>", '', $d);
             }
         }
 
