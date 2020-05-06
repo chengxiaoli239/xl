@@ -3,7 +3,7 @@ return [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=lottery_db_xl_host;dbname=lottery_xl',
+            'dsn' => 'mysql:host=127.0.0.1;dbname=lottery_xl',
             'username' => 'lottery_xl',
             'tablePrefix' => 'lt_',
             'password' => 'dPmk3frLf8Teb6wm',
