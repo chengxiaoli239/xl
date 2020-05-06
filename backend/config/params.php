@@ -31,7 +31,7 @@ return [
     'TZ_SITE_MIDDLE_DOMAINS' => ['cq779835', 'ww98877', 'ww33899', 'wx36625771', 'ww666733', 'cq779835' ,'ww793288', 'ww368755'],
 
     # IP代理 快代理配置
-    'KUAI_POXY_API' => 'https://dev.kdlapi.com',
+    'KUAI_POXY_API' => 'https://dps.kdlapi.com',
     'KUAI_POXY_ORDER_ID' => '938684913491492',
     'KUAI_USERNAME' => '379879537', # 通过密码使用私密代理
     'KUAI_PASSWORD' => '14wmcx7y', # 快代理密码
