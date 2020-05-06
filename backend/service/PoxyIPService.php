@@ -127,6 +127,11 @@ class PoxyIPService extends BaseService {
      * @return bool
      */
     public static function isValid($poxy_ips = []){
+        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
+        if($POXY_STATUS == 0){
+            # CURL 代理开关
+            return [];
+        }
 
         $API_KEY = BetService::getConfig('KUAI_POXY_API_KEY'); # 快代理 API Key
         $query = [
