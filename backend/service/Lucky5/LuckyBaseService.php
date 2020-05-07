@@ -543,7 +543,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER').'?'.http_build_query($post_data);
 
         //$rst = CurlService::postCurl($url, $post_data, $headers);
-        $rst = self::postBetCurl($url,$post_data, $headers);
+        $rst = self::postBetCurl($url,$post_data, $headers, $TzSystemsUsers->uid);
         if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
             $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
             $BettingRecords->cancel_status = 1;
@@ -1617,7 +1617,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         # 真实投注
         $start_time = microtime(true);
         //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$rst,'post_data'=>$post_data]);
-        $rst = self::postBetCurl($url, $post_data, $headers);
+        $rst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
         //$rst = json_encode($rst);
         $end_time = microtime(true);
         $time_consume = ($end_time - $start_time). 's';
@@ -1779,7 +1779,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             //}
             # 真实投注
             $start_time = microtime(true);
-            $tmpRst = self::postBetCurl($url, $post_data, $headers);
+            $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
             //sleep(1);
             //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
             $rst[$key] = $tmpRst;
@@ -1849,7 +1849,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @decription post请求根据，接受传递的header头
      * @param $url
      */
-    public static function postBetCurl($url,$post_data = [],$headers=[]){
+    public static function postBetCurl($url,$post_data = [],$headers=[], $uid = 0){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         if(!$timeout) $timeout = 30;
         $timeout = 120;
@@ -1871,7 +1871,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
         }
 
-        $poxy_addr = self::setPoxy($ch, $url); # 设置代理IP
+        $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -2051,10 +2051,15 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @param $ch
      * @return bool
      */
-    public static function setPoxy($ch, $url=''){
+    public static function setPoxy($ch, $url='', $uid = 0){
         $poxy_addr = PoxyIPService::getPoxyIp();
         if(strpos($url, 'ww662889') === false){
             //$poxy_addr = '218.85.247.70:20000';
+        }
+        $POXY_USER_IDS = BetService::getConfig('POXY_USER_IDS');
+        $uids = explode(',', $POXY_USER_IDS);
+        if(empty($uids) OR !in_array($uid, $uids) OR !$uid){
+            return [];
         }
 
         if(!empty($poxy_addr)){
