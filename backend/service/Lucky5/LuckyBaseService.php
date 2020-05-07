@@ -1197,7 +1197,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             "Referer:".$TzSystemsUsers->ssc_domain,
         ];
 
-        $data = self::httpPost($url,$post_data, $headers);
+        $data = self::httpPost($url,$post_data, $headers, $TzSystemsUsers->uid);
         //sleep(10);
         //self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
@@ -1999,7 +1999,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @decription 获取远程html内容
      * @param $url
      */
-    public static function httpPost($url,$post_data = [],$header=[]){
+    public static function httpPost($url,$post_data = [],$header=[], $uid = 0){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         if(!$timeout) $timeout = 15;
 
@@ -2010,7 +2010,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        $poxy_addr = self::setPoxy($ch, $url); # 设置代理IP
+        $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
