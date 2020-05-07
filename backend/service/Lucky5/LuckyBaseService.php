@@ -1263,7 +1263,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             "X-Requested-With: XMLHttpRequest",
         ];
 
-        $data = self::httpGet($url, $headers, $uid);
+        $data = self::httpGet($url, $headers, $TzSystemsUsers->uid);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
