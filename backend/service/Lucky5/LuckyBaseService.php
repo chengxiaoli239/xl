@@ -1792,7 +1792,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 ];
                 //if($tz_type != 20) $tzRst['code'] = $codes;
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','7时彩分批投注记录-投注失败', $tzRst);
-                if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [302, 303, 304, 305, 306])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
+                if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [302, 303, 304, 305, 306, 307])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
                     return $rst;
                 }
                 //return $rst;
