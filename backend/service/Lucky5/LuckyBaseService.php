@@ -1856,7 +1856,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
     public static function postBetCurl($url,$post_data = [],$headers=[], $uid = 0){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         if(!$timeout) $timeout = 30;
-        $timeout = 120;
 
         //$cookie = dirname(__FILE__)."/cookie.txt";
 
