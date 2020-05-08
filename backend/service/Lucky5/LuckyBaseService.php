@@ -1713,7 +1713,10 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $tmpCodes = $codes;
         $tmpCodes = str_replace(',', '', $tmpCodes);
         $codesArr = explode('@', $tmpCodes);
-        //if(count($codesArr)>6000) return ['status'=>300, 'msg'=>'号码组数太多不能超过6000组号码'];
+        $BET_BIG_STATUS = BetService::getConfig('BET_BIG_STATUS');
+        if($BET_BIG_STATUS_LIMIT){
+            if(count($codesArr)>6000) return ['status'=>300, 'msg'=>'号码组数太多不能超过6000组号码'];
+        }
 
         $betNums = self::getBetNumsPer();
         $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
