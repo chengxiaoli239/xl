@@ -20,6 +20,7 @@ use Yii;
  * @property string $ssc_domain 网盘地址
  * @property string $cookie 登陆cookie
  * @property string $user_agent 浏览器代理
+ * @property int $tz_sort 投注排序:从小到大
  * @property string $odds_2x 代理二现赔率
  * @property string $odds_3x 代理三现赔率
  * @property string $odds_4x 代理四现赔率
@@ -47,7 +48,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['uid', 'is_agent', 'tz_system_id', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'is_agent', 'tz_system_id', 'status', 'tz_sort', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
             [['cookie'], 'string'],
             [['updated_at'], 'required'],
@@ -78,6 +79,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'ssc_domain' => Yii::t('app', '网盘地址'),
             'cookie' => Yii::t('app', '登陆cookie'),
             'user_agent' => Yii::t('app', '浏览器代理'),
+            'tz_sort' => Yii::t('app', '投注排序:从小到大'),
             'odds_2x' => Yii::t('app', '代理二现赔率'),
             'odds_3x' => Yii::t('app', '代理三现赔率'),
             'odds_4x' => Yii::t('app', '代理四现赔率'),
