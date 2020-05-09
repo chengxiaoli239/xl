@@ -148,6 +148,8 @@ class PoxyIPService extends BaseService {
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdpsvalidtime/?'.http_build_query($query);
 
         $rst = CurlService::getCurl($url);
+        $logArr = ['url'=>$url, 'rst'=>$rst];
+        Tool_Common::log('kuaiIPValidTime', 'INFO', '获取私密代理可用时长', $logArr);
         if($rst['code'] != 0){ # 为确保稳定，使用时间少于60s则认为IP失效
             return ['status'=>301, 'msg'=>'接口调用失败'];
         }
