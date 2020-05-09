@@ -158,7 +158,7 @@ abstract class BetService extends BaseBetService {
             if (!$tzStatus) continue;
             //$where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['>', 'uid', 0], ['=', 'is_parent', 1], ['=', 'is_test', 0]];
             $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['>', 'uid', 0], ['=', 'is_parent', 1]];
-            $plans = UserSysPlans::find()->where($where)->all();
+            $plans = UserSysPlans::find()->where($where)->orderBy(['tz_sort'=>SORT_ASC])->all();
             if ($plans) {
                 $datas = [];
                 foreach ($plans as $key => $plan) {

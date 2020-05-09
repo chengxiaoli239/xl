@@ -48,8 +48,6 @@ class PoxyIPService extends BaseService {
         $mkey = self::builProxyIpKey();
         if(!$poxy_ip_data = $m->get($mkey)){
             $data = self::kuaiPoxy();
-            //return $data;
-            //$poxy_ip_data = explode(':', $data['data'][0]);
             if($data['status'] != 200) {
                 return [];
             }
@@ -57,7 +55,7 @@ class PoxyIPService extends BaseService {
             $m->set($mkey, $poxy_ip_data, $time);
         }else{
             $flag = self::isValid([$poxy_ip_data]);
-            if(!$flag){
+            if($flag === false){
                 # 并发控制
                 $mkey_lock = 'lock_getPoxyIp';
                 $mcLock = new  McLockService();
@@ -71,6 +69,20 @@ class PoxyIPService extends BaseService {
                 $data = self::kuaiPoxy();
                 $poxy_ip_data = $data['data'][0];
                 $m->set($mkey, $poxy_ip_data, $time);
+            }elseif(empty($flag)){
+                $v_mkey = 'KUAI_POXYIP_ValidTime';
+                if($m->get($v_mkey)) return self::getPoxyIp();
+                $rst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
+                if($rst['status'] != 200 OR $rst['data'][$poxy_ip_data] < 5*60){
+                    # 调用失败或者可使用时间少于5分钟则认为IP失效
+                    $data = self::kuaiPoxy();
+                    if($data['status'] != 200) {
+                        return [];
+                    }
+                    $poxy_ip_data = $data['data'][0];
+                    $m->set($v_mkey, 1, 5);
+                    $m->set($mkey, $poxy_ip_data, $time);
+                }
             }
         }
 
@@ -119,6 +131,28 @@ class PoxyIPService extends BaseService {
         }
 
         return ['status'=>200, 'expire'=>$rst['data']['expire_time']];
+    }
+
+    /**
+     * @desc 获取私密代理可用时长
+     * @param $poxy_ip 单个：['113.120.61.166:22989']  或多个：['113.120.61.166:22989','122.4.44.132:21808']
+     * @return array
+     */
+    public static function kuaiIPValidTime($poxy_ips = ''){
+        if(strpos($poxy_ips[0], ':') === false) return ['status'=>300, 'msg'=>'IP格式错误，缺少冒号 ":"'];
+        $query = [
+            'orderid' => \Yii::$app->params['KUAI_POXY_ORDER_ID'], # 快代理订单号
+            'proxy' => implode(',', $poxy_ips),
+            'signature' => BetService::getConfig('KUAI_POXY_API_KEY'), # 配置
+        ];
+        $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdpsvalidtime/?'.http_build_query($query);
+
+        $rst = CurlService::getCurl($url);
+        if($rst['code'] != 0){ # 为确保稳定，使用时间少于60s则认为IP失效
+            return ['status'=>301, 'msg'=>'接口调用失败'];
+        }
+
+        return ['status'=>200, 'data'=>$rst['data']];
     }
 
     /**

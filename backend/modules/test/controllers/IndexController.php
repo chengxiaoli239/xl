@@ -170,6 +170,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = PoxyIPService::kuaiIPValidTime(['116.115.210.176:16092', '121.56.39.180:20749']);p($rst);
+        $rst = PoxyIPService::isValid(['116.115.210.176:16092']);d($rst);
         $data = XjSsc::getLotteryNoNineNum();p($data);
         $data = Lucky5::getLotteryLucky();p($data);
         $str = "/App/ClearSession?errMsg=%e6%82%a8%e7%9a%84%e8%b4%a6%e5%8f%b7%e5%b7%b2%e5%9c%a8%e5%88%ab%e5%a4%84%e7%99%bb%e5%bd%95%e3%80%82";
@@ -189,7 +191,6 @@ class IndexController extends Controller
         $mcLock->Lock('dw');
         $flag = $mcLock->isLock('dw');
         d($flag);
-        $rst = PoxyIPService::isValid(['122.7.3.56:17856']);p($rst);
         $rst = PoxyIPService::kuaiPoxy();p($rst);
         $rst = PoxyIPService::kuaiPoxyExpire();p($rst);
 

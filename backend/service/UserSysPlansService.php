@@ -15,6 +15,7 @@ use backend\models\LotteryType;
 use backend\models\SscDsYl;
 use backend\models\SysPlansCodes;
 use backend\models\TzSystemsAuth;
+use backend\models\TzSystemsUsers;
 use backend\models\TzTypes;
 use backend\models\UserCustomPlans;
 use backend\models\UserSysPlans;
@@ -450,6 +451,12 @@ class UserSysPlansService extends BaseService {
         $post['UserSysPlans']['updated_at'] = time();
 
         if(!$post['UserSysPlans']['id']){
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$user_id, 'tz_system_id'=>$post['UserSysPlans']['tz_sites'][0], 'status'=>1]);
+            $tz_sort = 99;
+            if($TzSystemsUsers){
+                $TzSystemsUsers->tz_sort && $tz_sort = $TzSystemsUsers->tz_sort;
+            }
+            $post['UserSysPlans']['tz_sort'] = $tz_sort;
             $post['UserSysPlans']['created_at'] = time();
         }
 

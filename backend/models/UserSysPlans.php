@@ -35,6 +35,7 @@ use Yii;
  * @property string $remove_arise 上奖 除
  * @property string $current_profits 当前盈利
  * @property int $plan_type 计划类型:0正常1止盈止损计划
+ * @property int $tz_sort 投注排序:从小到大
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -92,7 +93,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'lottery_type', 'plan_type', 'created_at', 'updated_at'], 'integer'],
+            [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'lottery_type', 'plan_type', 'tz_sort', 'created_at', 'updated_at'], 'integer'],
             [['uid', 'account', 'created_at', 'updated_at'], 'required'],
             [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['update_time'], 'safe'],
@@ -130,6 +131,7 @@ class UserSysPlans extends \common\models\base\BaseModel
             'stop_loss' => '止损点',
             'current_profits' => '当前盈利',
             'plan_type' => '计划类型:0正常1止盈止损计划',
+            'tz_sort' => '投注排序:从小到大',
             'created_at' => '创建时间',
             'updated_at' => '更新时间',
             'update_time' => '更新时间',
