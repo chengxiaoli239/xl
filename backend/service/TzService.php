@@ -182,7 +182,9 @@ class TzService extends BaseService {
         # 2、单双
         $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖单双数据
         $time3 = microtime(true);
-        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏 耗时4s
+        if(in_array($lottery_type, [5,6])){ # 重庆、新疆才统计单双遗漏
+            $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏 耗时4s
+        }
         $time4 = microtime(true);
 
         # 3、三字现
@@ -221,7 +223,7 @@ class TzService extends BaseService {
         $rst['consume_time1'] = ($time2 - $time1).'s';
         $rst['consume_time2'] = ($time3 - $time2).'s';
         $rst['consume_time3'] = ($time4 - $time3).'s';
-        $rst['consume_time4'] = ($time5 - $time4).'s';
+        //$rst['consume_time4'] = ($time5 - $time4).'s';
         $rst['consume_time5'] = ($time6 - $time5).'s';
         $rst['consume_time6'] = ($time7 - $time6).'s';
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/opSystemBetPlans','INFO','处理系统投注计划', $rst);
