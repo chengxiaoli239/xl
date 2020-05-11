@@ -1520,11 +1520,12 @@ class SscDataService extends BaseService {
      */
     public static function get3NumHistoryMiss($num, $lottery_type = 1, $recently = 1000){
         $last_times = 0;
-        $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
-        $min_id = $last['last_id'] - $recently - 1;
+        //$last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+        $last_index_id = self::getLastIndexId($lottery_type);
+        $min_id = $last_index_id - $recently - 1;
         $m = \Yii::$app->cache;
-        $key = 'get3NumHistoryMiss_ID_'.$lottery_type.'_'.$min_id;
-        if(!$rst = $m->get($key)){
+        $mkey = 'get3NumHistoryMiss_ID_'.$lottery_type.'_'.$min_id;
+        if(!$rst = $m->get($mkey)){
             $field = 'code_3n';
             $where = ['AND',['like', $field, $num],['=', 'lottery_type', $lottery_type],['>','index_id', $min_id]];
             $SscKjData3Nums = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
@@ -1557,7 +1558,7 @@ class SscDataService extends BaseService {
                 $max_range = $SscKjData3Nums[1]['qihao'] ."-". $SscKjData3Nums[0]['qihao'];
             }
             $last_time_miss_range = $SscKjData3Nums[1]['qihao'] ."-". $SscKjData3Nums[0]['qihao'];
-            $current_times = $last['last_id'] - $SscKjData3Nums[0]->index_id;
+            $current_times = $last_index_id - $SscKjData3Nums[0]->index_id;
 
             $rst = [
                 'current_times' => $current_times,    // 当前遗漏次数
@@ -1567,7 +1568,7 @@ class SscDataService extends BaseService {
                 'max_range' => $max_range,   // 近200期内的最大遗漏范围
                 'yl_str' => $yl_str,
             ];
-            $m->set($key, $rst,60*60);
+            $m->set($mkey, $rst,60*60);
         }
 
 
