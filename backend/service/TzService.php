@@ -218,13 +218,12 @@ class TzService extends BaseService {
 
         $rst['qihao'] = $qihao;
         $rst['lottery_type'] = $lottery_type;
-        $rst['time1'] = $time1;
-        $rst['time2'] = $time2;
-        $rst['time3'] = $time3;
-        $rst['time4'] = $time4;
-        $rst['time5'] = $time5;
-        $rst['time6'] = $time6;
-        $rst['time7'] = $time7;
+        $rst['consume_time1'] = ($time2 - $time1).'s';
+        $rst['consume_time2'] = ($time3 - $time2).'s';
+        $rst['consume_time3'] = ($time4 - $time3).'s';
+        $rst['consume_time4'] = ($time5 - $time4).'s';
+        $rst['consume_time5'] = ($time6 - $time5).'s';
+        $rst['consume_time6'] = ($time7 - $time6).'s';
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/opSystemBetPlans','INFO','处理系统投注计划', $rst);
 
         StaticService::afterOpStatic($lottery_type, 'opSystemBetPlans');
