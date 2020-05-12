@@ -125,12 +125,12 @@ abstract class BetService extends BaseBetService {
      * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      */
     //public static function beforeBet($qihao, $tz_system_id, $playway, $account = 'gaozi2017', $lottery_type = 'ssc'){
-    public static function beforeBet($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function beforeBet($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE, $uid = ''){
         $m = \Yii::$app->cache;
         $rst = ['status'=>200, 'msg'=>'可以投注~'];
         switch ($lottery_type){
             case 1:
-                $mkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao);
+                $mkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao, $uid);
                 $tzStatus = $m->get($mkey);
 
                 # 判断当期开奖数据处理是否完成，未完成则不能下一期的投注
@@ -174,7 +174,7 @@ abstract class BetService extends BaseBetService {
                 }
                 $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
                 //p($datas);
-                BetService::afterBetNow($plan->lottery_type, $qihao); # 彩种投注结束锁
+                BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 彩种投注结束锁
                 $logArr[$lottery_type]['plans'] = $plans;
             }
             $count = count($plans);
@@ -197,7 +197,7 @@ abstract class BetService extends BaseBetService {
         $lottery_types = StaticService::getLotteryTypes();
         foreach ($lottery_types as $lottery_type) {
             $qihao = HN0898Service::getQihao($lottery_type);
-            $tzStatus = BetService::isCanBet($lottery_type);
+            $tzStatus = BetService::isCanBet($lottery_type, $uid);
             if (!$tzStatus) continue;
             $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['=', 'uid', $uid], ['=', 'is_parent', 1]];
             $plans = UserSysPlans::find()->where($where)->orderBy(['tz_sort'=>SORT_ASC])->all();
@@ -207,12 +207,12 @@ abstract class BetService extends BaseBetService {
                     $tzRst[$plan->id] = self::tzByPlanId($plan->id);
                 }
                 $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
-                BetService::afterBetNow($plan->lottery_type, $qihao); # 彩种投注结束锁
+                BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 彩种投注结束锁
                 $logArr[$lottery_type]['plans'] = $plans;
+                $count = count($plans);
+                $logArr[$lottery_type]['qihao'] = $qihao;
+                $logArr[$lottery_type]['msg'] = $count == 0 ? '无投注计划' : $count.'条计划';
             }
-            $count = count($plans);
-            $logArr[$lottery_type]['qihao'] = $qihao;
-            $logArr[$lottery_type]['msg'] = $count == 0 ? '无投注计划' : $count.'条计划';
         }
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','用户真实投注', $logArr);
 
@@ -222,12 +222,13 @@ abstract class BetService extends BaseBetService {
    /**
      * @desc 判断当前期是否可以自动化投注
      * @param int $lottery_type
-     * @return mixed
+     * @param string $uid
+     * @return bool|mixed
      */
-    public static function isCanBet($lottery_type = DEFAULT_LOTTERY_TYPE, $is_test = ''){
+    public static function isCanBet($lottery_type = DEFAULT_LOTTERY_TYPE, $uid = ''){
 
         $qihao = HN0898Service::getQihao($lottery_type);
-        $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao).$is_test;
+        $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao, $uid);
 
         $m = \Yii::$app->cache;
         $status = $m->get($pkey);
@@ -653,7 +654,7 @@ abstract class BetService extends BaseBetService {
            $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
            //p([$system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $codes]);
 
-           $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id); # 手动下注时，先删除缓存
+           $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id, $plan->uid); # 手动下注时，先删除缓存
 
            if($tzflag = $m->get($mkey)) continue; # ['status'=>300, 'msg'=>'已经投注过了~'];
            $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
@@ -690,7 +691,7 @@ abstract class BetService extends BaseBetService {
                    }
                }
            }
-           $isAuto == 0 && BetService::afterBetNow($plan->lottery_type, $qihao); # 手动无需锁
+           $isAuto == 0 && BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 手动无需锁
            $rst[] = $tmpRst;
        }
        $logArr = ['tz_sites'=>$tz_sites,'codes'=>$codes, 'postRst'=>$rst];
@@ -707,12 +708,12 @@ abstract class BetService extends BaseBetService {
      * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @param $plan_id
      */
-    public static function beforeBetNow($account, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE, $qihao, $plan_id = 0){
+    public static function beforeBetNow($account, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE, $qihao, $plan_id = 0, $uid = ''){
         $m = \Yii::$app->cache;
         $mkey = BetService::buildBetKey($account, $tz_system_id, $lottery_type, $qihao, $plan_id);
         $m->delete($mkey);
 
-        $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao);
+        $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao, $uid);
         $m->delete($pkey);
 
         $tzPlanIdmkey = self::buildBetPlanIdKey($account, $qihao, $plan_id);
@@ -724,10 +725,10 @@ abstract class BetService extends BaseBetService {
      * @param $qihao
      * @return bool
      */
-    public static function afterBetNow($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao, $is_test = ''){
+    public static function afterBetNow($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao, $uid = ''){
         $m = \Yii::$app->cache;
 
-        $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao). $is_test;
+        $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao, $uid);
 
         $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
         $rst = $m->set($pkey, 0, $time);
@@ -741,9 +742,9 @@ abstract class BetService extends BaseBetService {
      * @param $qihao
      * @return string
      */
-    public static function buildBeforeAndAfterBetKey($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao){
+    public static function buildBeforeAndAfterBetKey($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao, $uid){
 
-        $pkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$lottery_type.'_'.$qihao;
+        $pkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$lottery_type.'_'.$qihao.'_'.$uid;
 
         return $pkey;
     }

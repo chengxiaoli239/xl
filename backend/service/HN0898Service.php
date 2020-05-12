@@ -657,9 +657,9 @@ class HN0898Service extends BaseTZService {
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
 
        //p([$qihao, $BettingRecords->plan_id, $codes]);
-       BetService::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $BettingRecords->lottery_type, $qihao, $BettingRecords->plan_id);
+       BetService::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $BettingRecords->lottery_type, $qihao, $BettingRecords->plan_id, $uid);
        $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
-       BetService::afterBetNow($BettingRecords->lottery_type, $qihao);
+       BetService::afterBetNow($BettingRecords->lottery_type, $qihao, $uid);
 
        $m->set($mkey, 1, 10);
 
@@ -695,9 +695,9 @@ class HN0898Service extends BaseTZService {
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了'];
 
        $account = AdminModel::findOne(Yii::$app->user->id)['account'];
-       BetService::beforeBetNow($account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id);
+       BetService::beforeBetNow($account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id, $uid);
        $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
-       BetService::afterBetNow($BettingRecords->lottery_type, $qihao);
+       BetService::afterBetNow($BettingRecords->lottery_type, $qihao, $uid);
 
        $m->set($mkey, 1, 5);
 

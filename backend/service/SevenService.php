@@ -605,9 +605,9 @@ class SevenService extends BaseTZService {
        $mkey = 'tzNowBetRecord_'.$uid.'_'.$qihao.'_'.$playway;
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
 
-       BetService::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id);
+       BetService::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id, $uid);
        $rst = $BetService->bet($qihao, $plan_id, $codes);
-       BetService::afterBetNow($BettingRecords->lottery_type, $qihao);
+       BetService::afterBetNow($BettingRecords->lottery_type, $qihao, $uid);
 
        $m->set($mkey, 1, 10);
 

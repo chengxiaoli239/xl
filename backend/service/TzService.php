@@ -61,6 +61,7 @@ class TzService extends BaseService {
      * @desc 系统自动化投注方法，投注号码为表：lt_sys_plans_codes，正买status=1 、自主研发公式模拟投注
      * @return array
      */
+    /*
     public static function tz(){
 
         $lottery_types = StaticService::getLotteryTypes();
@@ -89,6 +90,7 @@ class TzService extends BaseService {
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tz','INFO','投注记录(系统正买)', $logArr);
         return ['status'=>200, 'msg'=>'系统定制化模拟正买投注完成~', 'tzRst'=>$tzRst];
     }
+    */
 
     /**
      * @desc 投注计划 by plan_id
@@ -105,7 +107,7 @@ class TzService extends BaseService {
         # 期号
         $qihao = HN0898Service::getQihao($plan->lottery_type);
 
-        $rst = BetService::beforeBet($qihao, $plan->lottery_type);
+        $rst = BetService::beforeBet($qihao, $plan->lottery_type, $plan->uid);
         if($rst['status'] == 200){
             # 0898体系最终投注
             $HN0898Service = new HN0898Service();
