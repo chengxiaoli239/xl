@@ -203,6 +203,20 @@ class IndexController extends Controller
 
         return $rst;
     }
+
+    /**
+     * @desc 多线程跑用户计划
+     * @return mixed
+     */
+    public static function actionBetByUid(){
+        self::_init();
+        $post = \Yii::$app->request->post();
+        $uid = $post['uid'];
+        $rst['bet'] = BetService::betByUid($uid); // 用户新计划投注，可正买可反买
+
+        return $rst;
+    }
+
     /**
      * @desc 自主研发方案系统测试自动化投注入口
      * @return array

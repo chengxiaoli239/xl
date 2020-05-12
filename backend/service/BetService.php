@@ -187,6 +187,38 @@ abstract class BetService extends BaseBetService {
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
     }
 
+    /**
+     * @desc 单用户下注
+     */
+    public static function betByUid($uid = 0){
+        if(!$uid) return ['status'=>300, 'msg'=>'用户id不能为0'];
+        $tzStatus = SystemConfig::findOne(['key'=>'tz_status'])->value;
+        if(!$tzStatus) return ['status'=>300, 'msg'=>'投注开关未开启'];
+        $lottery_types = StaticService::getLotteryTypes();
+        foreach ($lottery_types as $lottery_type) {
+            $qihao = HN0898Service::getQihao($lottery_type);
+            $tzStatus = BetService::isCanBet($lottery_type);
+            if (!$tzStatus) continue;
+            $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['=', 'uid', $uid], ['=', 'is_parent', 1]];
+            $plans = UserSysPlans::find()->where($where)->orderBy(['tz_sort'=>SORT_ASC])->all();
+            if ($plans) {
+                $datas = [];
+                foreach ($plans as $key => $plan) {
+                    $tzRst[$plan->id] = self::tzByPlanId($plan->id);
+                }
+                $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
+                BetService::afterBetNow($plan->lottery_type, $qihao); # 彩种投注结束锁
+                $logArr[$lottery_type]['plans'] = $plans;
+            }
+            $count = count($plans);
+            $logArr[$lottery_type]['qihao'] = $qihao;
+            $logArr[$lottery_type]['msg'] = $count == 0 ? '无投注计划' : $count.'条计划';
+        }
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','用户真实投注', $logArr);
+
+        return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
+    }
+
    /**
      * @desc 判断当前期是否可以自动化投注
      * @param int $lottery_type
