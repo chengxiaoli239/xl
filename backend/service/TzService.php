@@ -243,13 +243,17 @@ class TzService extends BaseService {
     public static function afterRunSysPlans($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = Yii::$app->cache;
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
-
-        # 处理完计划后,下一期投注开关开启(value:1) start
-        $next_mkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $next_qihao);
-        $next_simulate_mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$lottery_type.'_'.$next_qihao;
-
         $next_time = \Yii::$app->params['TZ_LOCK_TIME'];
-        $rst11 = $m->set($next_mkey,1,$next_time); # 真实
+
+        $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['=', 'is_parent', 1]];
+        $plans = UserSysPlans::find()->where($where)->orderBy(['tz_sort'=>SORT_ASC])->all();
+        foreach ($plans as $plan){
+            # 处理完计划后,下一期投注开关开启(value:1) start
+            $next_mkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $next_qihao, $plan->uid);
+            $rst11 = $m->set($next_mkey,1,$next_time); # 真实
+        }
+
+        $next_simulate_mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$lottery_type.'_'.$next_qihao;
         $rst10 = $m->set($next_simulate_mkey,1,$next_time); # 模拟
         # 处理完计划后,下一期投注开关开启(value:1) end
 
