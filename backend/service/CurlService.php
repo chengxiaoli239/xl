@@ -329,6 +329,7 @@ class CurlService extends BaseService{
         $info = curl_getinfo($ch);
 
         if($info['http_code']==302){
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCurl302', 'ERR', 'getCurl 302', ['url'=>$url]);
             $data = self::getCurlData($info['url']);
         }
         //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
