@@ -130,7 +130,7 @@ class KjDataGet
                     $logArr = ['data'=>$data, 'rst'=>$rst];
                 }else{
                     $mkey = 'KJ_LOG_KEY_BATCH_0_'.$kjConfig->lottery_type;
-                    $kjData = isset($data['opencode']) ? $data['opencode'] : [];
+                    $kjData = (isset($data['opencode']) && !empty($data['opencode'])) ? $data['opencode'] : [];
                     if($kjData){
                         if($kjConfig->lottery_type != 99){
                             if($kjConfig->lottery_type == 5){

@@ -288,7 +288,7 @@ class SevenService extends BaseTZService {
         # 真实投注
         $start_time = microtime(true);
         //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$rst,'post_data'=>$post_data]);
-        $rst = self::postBetCurl($url, $post_data, $headers);
+        $rst = self::postBetCurl($url, $post_data, $headers, $plan->uid);
         //$rst = json_encode($rst);
         $end_time = microtime(true);
         $time_consume = ($end_time - $start_time). 's';
@@ -406,7 +406,7 @@ class SevenService extends BaseTZService {
             $url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER');//.'?'.http_build_query($post_data);
 
             //$rst = CurlService::httpPost($url,$post_data, $headers);
-            $rst = self::postBetCurl($url,$post_data, $headers);
+            $rst = self::postBetCurl($url,$post_data, $headers, $uid);
             if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
                 $BettingRecords = BettingRecords::findOne($id);
                 $BettingRecords->cancel_status = 1;
@@ -791,7 +791,7 @@ class SevenService extends BaseTZService {
         return $times;
     }
 
-    public static function getSessionId($url, $header){
+    public static function getSessionId($url, $header, $uid){
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
@@ -799,7 +799,7 @@ class SevenService extends BaseTZService {
         curl_setopt($curl, CURLOPT_HEADER, 1);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-        self::setPoxy($curl); # 设置代理
+        self::setPoxy($curl, $url, $uid); # 设置代理
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -869,20 +869,20 @@ class SevenService extends BaseTZService {
         ];
 
         # 1、获取SessionId
-        $robot7_session_id = self::getSessionId($url, $headers);
+        $robot7_session_id = self::getSessionId($url, $headers, $uid);
         //if($uid=21)p($robot7_session_id);
 
         $tmpCookieStr = $robot7_session_id;
         $headers[] = 'Referer: '.$url;
 
         # 2、获取SevenStarHFDirector1Frontend1
-        $SevenStarHFDirector1Frontend1 = self::curlGetSevenCookie($url, array_merge($headers, ['Cookie: '.$tmpCookieStr]), $poxy);
+        $SevenStarHFDirector1Frontend1 = self::curlGetSevenCookie($url, array_merge($headers, ['Cookie: '.$tmpCookieStr]), $uid);
         //p($SevenStarHFDirector1Frontend1);
 
         $tmpCookieStr = $tmpCookieStr.';'.$SevenStarHFDirector1Frontend1;
         # 3、获取AKaimai Cookie
         if(strpos($SevenStarHFDirector1Frontend1, 'Akamai_Cookie') === false){
-            $AKamaiCookie = self::curlGetSevenCookie($url, array_merge($headers, [$tmpCookieStr]));
+            $AKamaiCookie = self::curlGetSevenCookie($url, array_merge($headers, [$tmpCookieStr]), $uid);
             if($AKamaiCookie) $tmpCookieStr = trim(';'.$AKamaiCookie, ';');
             if($tmpCookieStr) $tmpCookieStr .= ';NOTICE_LOGIN_IN=0';
         }
@@ -910,7 +910,7 @@ class SevenService extends BaseTZService {
     /**
      *curl get请求
      */
-    public static function curlGetSevenCookie($url,$header = [], $poxy = []){
+    public static function curlGetSevenCookie($url,$header = [], $uid=0){
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
@@ -918,7 +918,7 @@ class SevenService extends BaseTZService {
         curl_setopt($curl, CURLOPT_HEADER, 1);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-        self::setPoxy($curl); # 设置代理IP
+        self::setPoxy($curl, $url, $uid); # 设置代理IP
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -1084,7 +1084,7 @@ class SevenService extends BaseTZService {
      * @decription 获取远程html内容
      * @param $url
      */
-    public static function getCurl($url,$header=[]){
+    public static function getCurl($url,$header=[], $uid=0){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         //$header = array_merge(self::$postHeaders,$header);
         //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
@@ -1096,7 +1096,7 @@ class SevenService extends BaseTZService {
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        self::setPoxy($ch); # 设置代理IP
+        self::setPoxy($ch, $url, $uid); # 设置代理IP
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -1160,7 +1160,7 @@ class SevenService extends BaseTZService {
         ];
 
         //$data = CurlService::httpPost($url,$post_data, $headers);
-        $data = self::httpPost($url,$post_data, $headers);
+        $data = self::httpPost($url,$post_data, $headers, $uid);
         //$syncBalance = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
         //p($syncBalance);
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
@@ -1172,7 +1172,7 @@ class SevenService extends BaseTZService {
      * @decription 获取远程html内容
      * @param $url
      */
-    public static function httpPost($url,$post_data = [],$header=[]){
+    public static function httpPost($url,$post_data = [],$header=[], $uid = 0){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         if(!$timeout) $timeout = 15;
 
@@ -1187,7 +1187,7 @@ class SevenService extends BaseTZService {
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSLVERSION, 3);
 
-        self::setPoxy($ch); # 设置代理IP
+        self::setPoxy($ch, $url, $uid); # 设置代理IP
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -1249,7 +1249,7 @@ class SevenService extends BaseTZService {
         ];
 
         //$data = CurlService::httpGet($url, $headers);
-        $data = self::httpGet($url, $headers);
+        $data = self::httpGet($url, $headers, $uid);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
@@ -1302,7 +1302,7 @@ class SevenService extends BaseTZService {
         ];
 
         //$data = CurlService::httpGet($url, $headers);
-        $data = self::httpGet($url, $headers);
+        $data = self::httpGet($url, $headers, $uid);
         if(!is_array($data)){
             $data = ['status'=>0, 'code'=>302, 'msg'=>'获取用户信息异常cookie'];
         }
@@ -1319,7 +1319,7 @@ class SevenService extends BaseTZService {
      * @decription
      * @param $url
      */
-    public static function httpGet($url,$header=[]){
+    public static function httpGet($url,$header=[], $uid=0){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
 
@@ -1330,7 +1330,7 @@ class SevenService extends BaseTZService {
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        self::setPoxy($ch); # 设置代理IP
+        self::setPoxy($ch, $url, $uid); # 设置代理IP
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -1551,7 +1551,7 @@ class SevenService extends BaseTZService {
      * @decription 获取远程html内容
      * @param $url
      */
-    public static function postBetCurl($url, $post_data = [],$headers=[]){
+    public static function postBetCurl($url, $post_data = [],$headers=[], $uid=0){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         if(!$timeout) $timeout = 15;
 
@@ -1567,7 +1567,7 @@ class SevenService extends BaseTZService {
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSLVERSION, 3);
 
-        self::setPoxy($ch); # 设置代理IP
+        self::setPoxy($ch, $url, $uid); # 设置代理IP
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -1691,7 +1691,7 @@ class SevenService extends BaseTZService {
             # 真实投注
             $start_time = microtime(true);
             //p(['url'=>$url, 'headers'=>self::$headers, 'rst'=>$rst,'post_data'=>$post_data]);
-            $tmpRst = self::postBetCurl($url, $post_data, self::$headers);
+            $tmpRst = self::postBetCurl($url, $post_data, self::$headers, $plan->uid);
             $rst[$key] = $tmpRst;
             //$rst = json_encode($rst);
             $end_time = microtime(true);
@@ -1759,8 +1759,17 @@ class SevenService extends BaseTZService {
      * @param $ch
      * @return bool
      */
-    public static function setPoxy($ch){
+    public static function setPoxy($ch, $url = '', $uid = 0){
         $poxy_addr = PoxyIPService::getPoxyIp();
+        if(strpos($url, 'ww662889') === false){
+            //$poxy_addr = '218.85.247.70:20000';
+        }
+        Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);
+        $POXY_USER_IDS = BetService::getConfig('POXY_USER_IDS');
+        $uids = explode(',', $POXY_USER_IDS);
+        if(empty($uids) OR !in_array($uid, $uids) OR !$uid){
+            return [];
+        }
         if(!empty($poxy_addr)){
             //设置代理
             curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);

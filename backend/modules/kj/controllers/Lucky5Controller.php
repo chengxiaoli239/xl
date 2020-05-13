@@ -20,7 +20,7 @@ class Lucky5Controller extends Controller
     }
 
     /**
-     * @desc 幸运五星 - 新疆时时彩
+     * @desc 幸运五星 - 抓网盘 - 在用
      * @return json|xml
      */
     public function actionIndex($type = 'json'){

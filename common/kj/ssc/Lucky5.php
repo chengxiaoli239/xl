@@ -58,6 +58,7 @@ class Lucky5 extends BaseKj {
                 //p($kjData);
             }
         }
+        if(empty($opencode['opencode'])) return false;
         $opencode = $kjData['opencode'];
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
