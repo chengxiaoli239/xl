@@ -16,7 +16,7 @@ class Lucky5 extends BaseKj {
      * @param string $returnType
      * @return array
      */
-    public static function getLotteryLucky($returnType = 'json'){
+    public static function getLotteryLucky($returnType = 'json', $test = 0){
 
         if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $TzSystemsUserses = TzSystemsUsers::find()->where(['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [7,9]] ])->all();
@@ -42,7 +42,7 @@ class Lucky5 extends BaseKj {
                     $TzSystemsUsers->user_agent,
                     'X-Requested-With: XMLHttpRequest',
                 ];
-                $content = LuckyBaseService::getCurl($url, $headers);
+                $content = LuckyBaseService::getCurl($url, $headers, $TzSystemsUsers->uid);
                 //$data = json_decode($content,320);
                 $data = $content;
 
