@@ -36,7 +36,7 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'tz_type')->textInput() ?-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
-                    <?= $form->field($model, 'hz_Arr')->checkboxList($hzArr)->label('投注类型(和值)') ?>
+                    <?= $form->field($model, 'hz_Arr')->checkboxList($hzArr)->label('投注类型[单双]') ?>
                     <!--?= $form->field($model, 'tz_type')->radioList($kArr)->label('投注类型') ?-->
 
                     <!--?= $form->field($model, 'buy_type')->textInput() ?-->
