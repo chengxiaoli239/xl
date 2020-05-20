@@ -21,6 +21,7 @@ use backend\service\BaseTZService;
 use backend\service\BetService;
 use backend\service\CurlService;
 use backend\service\HN0898Service;
+use backend\service\NumService;
 use backend\service\PoxyIPService;
 use backend\service\SevenService;
 use backend\service\SscDataService;
@@ -362,17 +363,29 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @return array
      */
     public static function getBetCodes($codesData, $single = 0.1, $playway = 1){
+        $orgin_codesData = $codesData;
         $codes = [];
         $codesData = str_replace(',','',$codesData);
         $codesData = str_replace('@',',',$codesData);
 
-        /*
         if($playway == 1){ # 二定
             $codesArr = explode(',', $codesData);
             foreach ($codesArr as $code){
                 $dict_no_type_id = self::getdict_no_type_id($code, $playway);
                 $codes[] = ['dict_no_type_id'=>$dict_no_type_id, 'bet_no'=>$code, 'bet_money'=>$single];
             }
+        }elseif ($playway == 3){
+            $tmpCodes = explode('@', $orgin_codesData);
+            $codesArr = [];
+            foreach ($tmpCodes as $tmpCode){
+                $t_codes = explode(',', $tmpCode);
+                $codes_hz = ['p1'=>$t_codes[0], 'p2'=>$t_codes[1], 'p3'=>$t_codes[2], 'p4'=>$t_codes[3]];
+                $codesArr_tmp = NumService::getCodesKuaiXuan($codes_hz, $code_type=4);
+                $codesArr = array_merge($codesArr, $codesArr_tmp);
+            }
+            $codesArr_tmp1 = implode('@', $codesArr);
+            $codesArr_tmp2 = str_replace(',', '', $codesArr_tmp1);
+            $codes = explode('@', $codesArr_tmp2);
         }elseif ($playway == 2){
             $codesArr = explode(',', $codesData);
             foreach ($codesArr as $code){
@@ -381,12 +394,13 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             }
 
         }
-        */
+        /*
         $codesArr = explode(',', $codesData);
         foreach ($codesArr as $code){
             $dict_no_type_id = self::getdict_no_type_id($code, $playway);
             $codes[] = ['dict_no_type_id'=>$dict_no_type_id, 'bet_no'=>$code, 'bet_money'=>$single];
         }
+        */
         //p([$codesData, $single, $playway, $codes]);
 
         return $codes;
@@ -1712,8 +1726,13 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      */
     public static function postBatchBet($qihao, $plan_id, $codes){
         $tmpCodes = $codes;
-        $tmpCodes = str_replace(',', '', $tmpCodes);
-        $codesArr = explode('@', $tmpCodes);
+        $plan = UserSysPlans::findOne($plan_id);
+        if($plan->tz_type == 22){ # 四定单双,codes格式：13579,13579,02468,13579@13579,13579,02468,02468@13579,02468,13579,13579
+            $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway);
+        }else{
+            $tmpCodes = str_replace(',', '', $tmpCodes);
+            $codesArr = explode('@', $tmpCodes);
+        }
         $BET_BIG_LIMIT_STATUS = BetService::getConfig('BET_BIG_LIMIT_STATUS');
         if($BET_BIG_LIMIT_STATUS){
             if(count($codesArr)>6000) return ['status'=>300, 'msg'=>'号码组数太多不能超过6000组号码'];
@@ -1722,7 +1741,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $betNums = self::getBetNumsPer();
         $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
 
-        $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
         $tz_type = $plan->tz_type ? $plan->tz_type : 0;
