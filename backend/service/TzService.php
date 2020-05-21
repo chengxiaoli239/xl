@@ -184,9 +184,9 @@ class TzService extends BaseService {
         # 2、单双
         $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖单双数据
         $time3 = microtime(true);
-        if(in_array($lottery_type, [5,6])){ # 重庆、新疆才统计单双遗漏
+        //if(in_array($lottery_type, [5,6])){ # 重庆、新疆才统计单双遗漏
             $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏 耗时4s
-        }
+        //}
         $time4 = microtime(true);
 
         # 3、三字现
