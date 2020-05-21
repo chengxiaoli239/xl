@@ -51,20 +51,23 @@ var Script = function () {
     });
 
     $('.fa-bars').click(function () {
-        if ($('#sidebar').is(":visible") === true) {
+        v = $('#sidebar > ul').is(":visible");
+        if ( v === true) {
             $('#main-content').css({
                 'margin-left': '0px'
             });
             $('#sidebar').css({
                 'margin-left': '-210px'
             });
-            $('#sidebar').hide();
+            //$('#sidebar > ul').hide();
+            $("#sidebar").css("display","none");
             $("#container").addClass("sidebar-closed");
         } else {
             $('#main-content').css({
                 'margin-left': '210px'
             });
-            $('#sidebar').show();
+            //$('#sidebar > ul').show();
+            $("#sidebar").css("display","block");
             $('#sidebar').css({
                 'margin-left': '0'
             });
