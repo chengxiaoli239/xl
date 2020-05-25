@@ -2662,17 +2662,12 @@ class SscDataService extends BaseService {
             }
         }
 
-        $flags = []; # 计划是否中奖表示
+        $flags = []; # 计划是否中奖标识
         # 翻倍计划、翻倍止盈止损，倍投 连续x期不中 决定倍数
         $where = ['AND', ['IN', 'plan_type', [2, 3, 4, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
-
-                # flag 是否中奖金，中的计划回0.1、不中的计划翻倍
-                $BettingRecords = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id])->orderBy(['id'=>SORT_DESC])->one();
-
-                # 最近一期是否中中奖
-                $flag = $BettingRecords->profits>0 ? 1 : 0;
+                $flag = SscDataService::isZjBefore($UserSysPlan->id);
                 $flags[$UserSysPlan->uid][$UserSysPlan->id] = $flag;
 
                 # 遗漏期数[不中奖期数]
@@ -2721,6 +2716,22 @@ class SscDataService extends BaseService {
         Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', [$logArr]);
 
         return $logArr;
+    }
+
+    /**
+     * @desc 上期是否中奖
+     * @param int $plan_id
+     * @return bool|int
+     */
+    public static function isZjBefore($plan_id = 0){
+        if(!empty($plan_id)) return false;
+        # flag 是否中奖金，中的计划回0.1、不中的计划翻倍
+        $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one();
+
+        # 最近一期是否中中奖
+        $flag = $BettingRecords->profits>0 ? 1 : 0;
+
+        return $flag;
     }
 
 
