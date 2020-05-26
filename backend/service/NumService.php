@@ -1150,8 +1150,7 @@ class NumService extends BaseService {
         }
 
         //p([$where, $codes_hz]);
-        $get = \Yii::$app->request->get();
-        if($get['t'] == 1)p($where);
+        //$get = \Yii::$app->request->get(); if($get['t'] == 1)p($where);
         $codesArr = [];
         if($code_type == 4){
         }elseif ($code_type == 3){
