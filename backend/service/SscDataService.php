@@ -2712,6 +2712,23 @@ class SscDataService extends BaseService {
             }
         }
 
+        # plan_type:6 中则投，不中则不投
+        $where = ['AND', ['IN', 'plan_type', [6]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+        if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+            $flag = SscDataService::isZjBefore($UserSysPlan->id);
+            $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
+            if($flag){
+                $betStatus = 1;
+            }else{
+                $betStatus = 0;
+            }
+            $codes_hz['betStatus'] = $betStatus;
+            $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
+            $updateData['hz_Arr'] = json_encode($codes_hz, 320);
+            $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+            $logArr[$UserSysPlan->id]['rst'] = $rst;
+        }
+
         $logArr['lottery_type'] = $lottery_type;
         Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', [$logArr]);
 
@@ -2721,7 +2738,7 @@ class SscDataService extends BaseService {
     /**
      * @desc 上期是否中奖
      * @param int $plan_id
-     * @return bool|int
+     * @return bool
      */
     public static function isZjBefore($plan_id = 0){
         if(!empty($plan_id)) return false;
@@ -2729,7 +2746,7 @@ class SscDataService extends BaseService {
         $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one();
 
         # 最近一期是否中中奖
-        $flag = $BettingRecords->profits>0 ? 1 : 0;
+        $flag = $BettingRecords->profits>0 ? true : false;
 
         return $flag;
     }

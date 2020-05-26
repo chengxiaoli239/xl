@@ -660,8 +660,18 @@ abstract class BetService extends BaseBetService {
            $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
            $m->set($mkey, 1, $time);
 
-           if($plan->is_test == 1 OR $plan->uid == 1){ # 模拟下注
-               $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1); # 直接记录表
+           $is_test = $plan->is_test;
+           if(in_array($plan->plan_type, [6])){ # 中则投
+               $flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
+               if(!$flag){
+                   $is_test = 1;
+                   $sn = '888888_istest_0';
+                   $snid = '888888id_istest_0';
+               }
+           }
+
+           if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
+               $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid); # 直接记录表
            }else{ # 正式下注
                # 1、首先判断是否登录，否则登录之后再下注
                if(!$flag = self::isLogin($plan->uid, $tz_system_id)){
@@ -1133,8 +1143,8 @@ abstract class BetService extends BaseBetService {
             'codes' => (string)$codes,  // 投注号码
             'qihao' => $qihao,  // 投注期号
             'tz_system_id' => '',  // 投注系统tz_systems .id
-            'sn'=>$sn,
-            'snid'=>$snid,
+            'sn'=>$sn ? $sn : '888888',
+            'snid'=>$snid ? $snid : '888888id',
             'order_type'=>$UserSysPlans->playway, # 单双三字定
             'is_simulate' => $is_test,  // 是否模拟投注
             'single' => $UserSysPlans->single,  // 投注倍数

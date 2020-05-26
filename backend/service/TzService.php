@@ -453,6 +453,7 @@ class TzService extends BaseService {
             3=>'倍投&止盈止损',
             4=>'倍投&号码切换',
             5=>'倍投&号码切换止盈止损',
+            6=>'中则投',
         ];
         if(isset($datas[$type])) return $datas[$type];
 
