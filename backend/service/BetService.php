@@ -666,8 +666,8 @@ abstract class BetService extends BaseBetService {
                $flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
                if(!$flag){
                    $is_test = 1;
-                   $sn = '888888_istest_0';
-                   $snid = '888888id_istest_0';
+                   $sn = 'istest';
+                   $snid = 'istest_id';
                }
            }
 

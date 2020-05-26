@@ -102,7 +102,7 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                                 $url2 = "/forum/betting-records/tz-now?id=".$model->id; # 追加下注
                                 $url3 = "/forum/betting-records/reverse-tz-now?id=".$model->id; # 反买
                                 if($model->is_simulate){
-                                    $str = '模拟订单'.$model->plan_id;
+                                    $str = '模拟'.$model->plan_id.'_'.$model->sn;
                                     //$str .= ' | '.Html::a('下注', $url2, ['title' => '下注'.$model->id,'alt'=>$model->id]);
                                     //$str .= ' | '.Html::a('反买', $url3, ['title' => '反买'.$model->snid,'alt'=>$model->snid]);
                                     return $str;

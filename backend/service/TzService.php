@@ -248,11 +248,15 @@ class TzService extends BaseService {
         foreach ($plans as $plan){
             # 处理完计划后,下一期投注开关开启(value:1) start
             $next_mkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $next_qihao, $plan->uid);
-            $rst11 = $m->set($next_mkey,1,$next_time); # 真实
+            $rst11[$plan->id]['rst'] = $m->set($next_mkey,1,$next_time); # 真实
+            $rst11[$plan->id]['next_mkey'] = $next_mkey;
+            $rst11[$plan->id]['next_time'] = $next_time;
         }
 
         $next_simulate_mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$lottery_type.'_'.$next_qihao;
-        $rst10 = $m->set($next_simulate_mkey,1,$next_time); # 模拟
+        $rst10['rst'] = $m->set($next_simulate_mkey,1,$next_time); # 模拟
+        $rst10['next_simulate_mkey'] = $next_simulate_mkey;
+        $rst10['next_time'] = $next_time;
         # 处理完计划后,下一期投注开关开启(value:1) end
 
         # 计划任务是否处理完成后锁住(value:1)，避免重复处理 start
@@ -260,11 +264,13 @@ class TzService extends BaseService {
         //$simulate_pkey = \Yii::$app->params['PLAN_SWITCH_SIMULATE_KEY'].'_'.$qihao;
         $time = 1080;
         if($lottery_type == 5 && substr($qihao,6) == '010') $time = 60*60*4; # 4小时
-        $rst21 = $m->set($pkey,1,$time);
+        $rst21['rst'] = $m->set($pkey,1,$time);
+        $rst21['pkey'] = $pkey;
+        $rst21['time'] = $time;
         //$rst20 = $m->set($simulate_pkey,1,$time);
         # 计划任务是否处理完成后锁住(value:1)，避免重复处理 end
 
-        $logData = [['pkey'=>$pkey,'rst10'=>$rst10, ''=>$time, 'rst11'=>$rst11], ['next_key'=>$next_mkey, 'next_time'=>$next_time, 'rst20'=>$rst20, 'rst21'=>$rst21]];
+        $logData = ['rst11'=>$rst11, 'rst10'=>$rst10, 'rst21'=>$rst21];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/afterRunSysPlans','INFO','系统计划处理后', $logData);
 
         return true;

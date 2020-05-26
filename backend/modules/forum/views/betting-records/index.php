@@ -98,9 +98,9 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 $url2 = "/forum/betting-records/tz-now?id=".$model->id; # 追加下注
                                 $url3 = "/forum/betting-records/reverse-tz-now?id=".$model->id; # 反买
                                 if($model->is_simulate){
-                                    $str = '模拟订单';
+                                    $str = '模拟';
 
-                                    return $str;
+                                    return $str.'_'.$model->sn;
                                     //$str .= ' | '.Html::a('下注', $url2, ['title' => '下注'.$model->id,'alt'=>$model->id]);
                                     //$str .= ' | '.Html::a('反买', $url3, ['title' => '反买'.$model->snid,'alt'=>$model->snid]);
                                 }
