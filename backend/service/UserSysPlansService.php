@@ -576,7 +576,7 @@ class UserSysPlansService extends BaseService {
                 ]);
             }
             $codesData = trim($codes);
-            $codesData = str_replace('  ', ',', $codesData);
+            $codesData = preg_replace( '#\s+#', ' ', $codesData );
             $codesData = str_replace(' ', ',', $codesData);
             $codesArr = explode(',', $codesData);
             $insertCodes = [];
