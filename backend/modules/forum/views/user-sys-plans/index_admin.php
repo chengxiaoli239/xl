@@ -146,7 +146,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return trim($str,',');
                             }
                         ],
-                        'account',
+                        //'account',
+                        ['attribute' => 'account','headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return Html::a($model->account, '/user-sys-plans/index?UserSysPlans[account]='.$model->account);
+                            }
+                        ],
                         //'nums',
                         //'hz_Arr',
                         ['attribute' => 'hz_Arr','label'=>'扩展【部分投注】',#'headerOptions'=>['width'=>'5%'],
