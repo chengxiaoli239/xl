@@ -150,7 +150,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'account','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                return Html::a($model->account, '/user-sys-plans/index?UserSysPlans[account]='.$model->account);
+                                return Html::a($model->account, '/forum/user-sys-plans/index?UserSysPlans[account]='.$model->account);
                             }
                         ],
                         //'nums',
