@@ -94,7 +94,13 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                         //'status',
                         //'sn',
                         //'snid',
-                        'account',
+                        //'account',
+                        ['attribute' => 'account','headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return Html::a($model->account, '/forum/betting-records/index?BettingRecords[account]='.$model->account);
+                            }
+                        ],
                         ['attribute'=>'snid', 'label'=>'操作',
                             'format'=>'raw',
                             'value'=>function($model){
