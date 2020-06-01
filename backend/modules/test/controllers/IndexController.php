@@ -170,6 +170,13 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $s = 0; if(empty($s))p('xx');else p('yy');
+        $str = '1234   3346 1267 9021
+        2356
+        2345 9234';
+        //$str = '1234 2354 6457 1226';
+        $codesData = $str;
+        $rst = preg_replace( '#\s+#', ' ', $str );p($rst);
         $data = Lucky5::getLotteryLucky($type='json', $test = 1);p($data);
         $rst = PoxyIPService::kuaiIPValidTime(['116.115.210.176:16092', '121.56.39.180:20749']);p($rst);
         $rst = PoxyIPService::isValid(['116.115.210.176:16092']);d($rst);

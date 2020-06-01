@@ -99,7 +99,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value'=>function($model){
                                 $url0 = "#"; # 点击开启
                                 $url1 = "#"; # 点击关闭
-                                if(\Yii::$app->user->id == $model->uid){
+                                if(true OR \Yii::$app->user->id == $model->uid){
                                     $url0 = "/forum/user-sys-plans/switch-status?id=".$model->id.'&status=1'; # 点击开启
                                     $url1 = "/forum/user-sys-plans/switch-status?id=".$model->id.'&status=0'; # 点击关闭
                                 }
