@@ -151,8 +151,8 @@ class KjDataGet
                             $cache_time = 30*60;
                         }
                     }
-                    $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, /*'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$msg,'lottery'=>CqsscKcw::$lotteryNameArr[$kjConfig->lottery_type]*/ ];
-                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
+                    $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, /*'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$msg,*/ 'lottery'=>CqsscKcw::$lotteryNameArr[$kjConfig->lottery_type]];
+                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖记录', $logArr);
                 }
                 $mkey_qihao = 'KJ_LOG_QIHAO_'.$kjConfig->lottery_type.'_'.$qihao;
                 //if(!$m->get($mkey) OR ($kjConfig->lottery_type == 1 && !$m->get($mkey_qihao))){
@@ -161,8 +161,8 @@ class KjDataGet
                     $logArr['mkey_qihao'] = $mkey_qihao;
                     $logArr['qihao'] = $qihao;
                     $logArr['mkey'] = $mkey;
-                    //$logArr['lottery_type'] = $lottery_type;
-                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录', $logArr);
+                    $logArr['lottery_type'] = $lottery_type;
+                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖记录', $logArr);
                     $m->set($mkey, 1, $cache_time);
                     $m->set($mkey_qihao, 1, $cache_time);
                 }
@@ -278,7 +278,7 @@ class KjDataGet
         if (!$insertRst = $SscKjData->save()) {
             $msg = current($SscKjData->getErrors());
             $logArr = ['msg'=>$msg, 'qihao'=>$qihao, 'kjData'=>$kjData, 'lottery'=>CqsscKcw::$lotteryTypeArr[$lottery_type]];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖号码记录-错误', $logArr);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertSscKjData', 'INFO', '开奖记录-错误', $logArr);
             return ['status' => 300, 'msg' => $msg];
         }
 
@@ -321,7 +321,7 @@ class KjDataGet
         if (!$QxcKjData->save()) {
             $msg = current($QxcKjData->getErrors());
             $logArr = ['msg'=>$msg, 'qihao'=>$qihao, 'kjData'=>$kjData];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertQxcKjData', 'INFO', '开奖号码记录-错误', $logArr);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/insertQxcKjData', 'INFO', '开奖记录-错误', $logArr);
             return ['status' => 300, 'msg' => $msg];
         }
         return ['status'=>200, 'msg'=>'开奖数据写入成功', 'insertRst'=>$insertRst];
