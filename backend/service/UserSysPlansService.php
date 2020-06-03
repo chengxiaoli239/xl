@@ -657,7 +657,7 @@ class UserSysPlansService extends BaseService {
                     $hzArr[$i] = $i;
                 }
                 $data['hzArr'] = $hzArr;
-                if(in_array($tz_type, [28])){
+                if(in_array($tz_type, [28])){ # 系统快捷
                     $data['code_types'] = UserSysPlansService::getCodeTypes();
                 }
             }
@@ -730,7 +730,7 @@ class UserSysPlansService extends BaseService {
      */
     public static function getCodeTypes(){
         $m = \Yii::$app->cache;
-        $mkey = 'getCodeTypes_02';
+        $mkey = 'getCodeTypes_03';
 
         if(!$data = $m->get($mkey)){
             $codeTypes = CodeTypes::find()->where(['status'=>1])->asArray()->All();
