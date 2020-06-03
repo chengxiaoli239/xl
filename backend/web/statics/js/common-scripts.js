@@ -51,7 +51,7 @@ var Script = function () {
     });
 
     $('.fa-bars').click(function () {
-        v = $('#sidebar > ul').is(":visible");
+        var v = $('#sidebar > ul').is(':visible');
         if ( v === true) {
             $('#main-content').css({
                 'margin-left': '0px'
@@ -60,35 +60,37 @@ var Script = function () {
                 'margin-left': '-210px'
             });
             //$('#sidebar > ul').hide();
-            $("#sidebar").css("display","none");
-            $("#container").addClass("sidebar-closed");
+            $('#sidebar').css('display','none');
+            $('#nav-accordion').css('display','none');
+            $('#container').addClass('sidebar-closed');
         } else {
             $('#main-content').css({
                 'margin-left': '210px'
             });
             //$('#sidebar > ul').show();
-            $("#sidebar").css("display","block");
+            $('#sidebar').css('display','block');
+            $('#nav-accordion').css('display','block');
             $('#sidebar').css({
                 'margin-left': '0'
             });
-            $("#container").removeClass("sidebar-closed");
+            $('#container').removeClass('sidebar-closed');
         }
     });
 
 // custom scrollbar
-    $("#sidebar").niceScroll({styler:"fb",cursorcolor:"#e8403f", cursorwidth: '3', cursorborderradius: '10px', background: '#404040', spacebarenabled:false, cursorborder: ''});
+    $('#sidebar').niceScroll({styler:'fb',cursorcolor:'#e8403f', cursorwidth: '3', cursorborderradius: '10px', background: '#404040', spacebarenabled:false, cursorborder: ''});
 
-    $("html").niceScroll({styler:"fb",cursorcolor:"#e8403f", cursorwidth: '6', cursorborderradius: '10px', background: '#404040', spacebarenabled:false,  cursorborder: '', zindex: '1000'});
+    $('html').niceScroll({styler:'fb',cursorcolor:'#e8403f', cursorwidth: '6', cursorborderradius: '10px', background: '#404040', spacebarenabled:false,  cursorborder: '', zindex: '1000'});
 
 // widget tools
 
     jQuery('.panel .tools .fa-chevron-down').click(function () {
-        var el = jQuery(this).parents(".panel").children(".panel-body");
-        if (jQuery(this).hasClass("fa-chevron-down")) {
-            jQuery(this).removeClass("fa-chevron-down").addClass("fa-chevron-up");
+        var el = jQuery(this).parents('.panel').children('.panel-body');
+        if (jQuery(this).hasClass('fa-chevron-down')) {
+            jQuery(this).removeClass('fa-chevron-down').addClass('fa-chevron-up');
             el.slideUp(200);
         } else {
-            jQuery(this).removeClass("fa-chevron-up").addClass("fa-chevron-down");
+            jQuery(this).removeClass('fa-chevron-up').addClass('fa-chevron-down');
             el.slideDown(200);
         }
     });

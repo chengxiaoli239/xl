@@ -101,6 +101,13 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                                 return Html::a($model->account, '/forum/betting-records/index?BettingRecords[account]='.$model->account);
                             }
                         ],
+                        //'plan_id',
+                        ['attribute' => 'plan_id','headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return Html::a($model->plan_id, '/forum/betting-records/index?BettingRecords[plan_id]='.$model->plan_id);
+                            }
+                        ],
                         ['attribute'=>'snid', 'label'=>'操作',
                             'format'=>'raw',
                             'value'=>function($model){

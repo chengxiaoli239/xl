@@ -19,7 +19,7 @@ class BettingRecords extends BettingRecordsModel
     {
         return [
             [['id', 'lottery_type', 'playway', 'status', 'is_simulate', 'createtime'], 'integer'],
-            [['codes', 'account', 'playway_name', 'qihao', 'kj_codes', 'position', 'sn', 'snid', 'lotteryclass', 'create_time'], 'safe'],
+            [['codes', 'account', 'plan_id', 'playway_name', 'qihao', 'kj_codes', 'position', 'sn', 'snid', 'lotteryclass', 'create_time'], 'safe'],
             [['betting_money', 'bonus', 'single', 'profits'], 'number'],
         ];
     }
@@ -65,6 +65,7 @@ class BettingRecords extends BettingRecordsModel
             'playway' => $this->playway,
             'betting_money' => $this->betting_money,
             'bonus' => $this->bonus,
+            'plan_id' => $this->plan_id,
             'single' => $this->single,
             'profits' => $this->profits,
             'status' => $this->status,
