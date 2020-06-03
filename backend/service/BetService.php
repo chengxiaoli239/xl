@@ -198,7 +198,7 @@ abstract class BetService extends BaseBetService {
         foreach ($lottery_types as $lottery_type) {
             $qihao = HN0898Service::getQihao($lottery_type);
             $tzStatus = BetService::isCanBet($lottery_type, $uid);
-            Tool_Common::log('betByUid', 'INFO', '单用户下单', ['tzStatus'=>$tzStatus]);
+            Tool_Common::log('betByUid', 'INFO', '单用户下单', ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'tzStatus'=>$tzStatus]);
             if (!$tzStatus) continue;
             $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['=', 'uid', $uid], ['=', 'is_parent', 1]];
             $plans = UserSysPlans::find()->where($where)->orderBy(['tz_sort'=>SORT_ASC])->all();
