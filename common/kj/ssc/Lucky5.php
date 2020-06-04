@@ -45,6 +45,9 @@ class Lucky5 extends BaseKj {
                 $content = LuckyBaseService::getCurl($url, $headers, $TzSystemsUsers->uid);
                 //$data = json_decode($content,320);
                 $data = $content;
+                if($data['Status'] == 1){
+
+                }
 
                 if (!isset($data['Status']) OR $data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) {
                     Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getLotteryLucky', 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
@@ -58,7 +61,7 @@ class Lucky5 extends BaseKj {
                 //p($kjData);
             }
         }
-        if(empty($opencode['opencode'])) return false;
+        if(empty($kjData['opencode'])) return false;
         $opencode = $kjData['opencode'];
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
