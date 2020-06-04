@@ -28,6 +28,7 @@ use Yii;
  * @property string $odds_3d 三定赔率
  * @property string $odds_4d 四定赔率
  * @property string $warn_val 预警值
+ * @property int $expire_time 到期时间
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -48,7 +49,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['uid', 'is_agent', 'tz_system_id', 'status', 'tz_sort', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'is_agent', 'tz_system_id', 'status', 'tz_sort', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
             [['cookie'], 'string'],
             [['updated_at'], 'required'],
@@ -87,6 +88,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'odds_3d' => Yii::t('app', '三定赔率'),
             'odds_4d' => Yii::t('app', '四定赔率'),
             'warn_val' => Yii::t('app', '预警值'),
+            'expire_time' => Yii::t('app', '到期时间'),
             'created_at' => Yii::t('app', '创建时间'),
             'updated_at' => Yii::t('app', '更新时间'),
             'update_time' => Yii::t('app', '更新时间'),
