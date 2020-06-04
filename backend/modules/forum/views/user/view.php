@@ -61,10 +61,8 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                             if(!empty($model->expire_time)){
                                                 if($model->expire_time <= time()){
                                                     $txt = '<font color="red">已过期，请续费</font>';
-                                                }elseif($model->expire_time - $date_time < time()){
-                                                    $txt = date('Y-m-d H:i', $model->expire_time) . ' [<font color="red">即将到期，请及时缴费 </font>]';
                                                 }elseif($model->expire_time - 2 * $date_time < time()){
-                                                    $txt = date('Y-m-d H:i', $model->expire_time) . ' [<font color="#c71585">使用时间不足两天</font>]';
+                                                    $txt = date('m-d H:i', $model->expire_time) . ' [<font color="red">即将到期</font>]';
                                                 }
                                             }else{
                                                 $txt = '<font color="green">永久生效</font>';

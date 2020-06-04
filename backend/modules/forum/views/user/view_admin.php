@@ -99,7 +99,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'expire_time:datetime',
                         ['attribute' => 'expire_time', //'label'=>'更新时间', 'headerOptions' => ['width' => '170'],
                             'value'=> function($model){
-                                return  $model->expire_time ? date('Y-m-d H:i',$model->expire_time) : '永久';   //主要通过此种方式实现
+                                return  $model->expire_time ? date('m-d H:i',$model->expire_time) : '永久';   //主要通过此种方式实现
                             },
                         ],
                         //'cookie',
