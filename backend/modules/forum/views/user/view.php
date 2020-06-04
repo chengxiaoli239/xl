@@ -52,7 +52,27 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                         }
                                     ],
                                     //'email:email',
-                                    //'password',
+                                    'password',
+                                    //'expire_time:datetime',
+                                    ['attribute'=>'expire_time',//'label'=>'状态',
+                                        'format'=>'raw',
+                                        'value'=>function($model){
+                                            $date_time = 86400; # 一天时间戳
+                                            if(!empty($model->expire_time)){
+                                                if($model->expire_time <= time()){
+                                                    $txt = '<font color="red">已过期，请续费</font>';
+                                                }elseif($model->expire_time - $date_time < time()){
+                                                    $txt = date('Y-m-d H:i', $model->expire_time) . ' [<font color="red">即将到期，请及时缴费 </font>]';
+                                                }elseif($model->expire_time - 2 * $date_time < time()){
+                                                    $txt = date('Y-m-d H:i', $model->expire_time) . ' [<font color="#c71585">使用时间不足两天</font>]';
+                                                }
+                                            }else{
+                                                $txt = '<font color="green">永久生效</font>';
+                                            }
+
+                                            return $txt;
+                                        }
+                                    ],
                                     'ssc_domain',
                                     [ 'attribute'=>'status','label'=>'状态',
                                         'format'=>'raw',
@@ -60,7 +80,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                             return $model->status ? '<font color="green">已激活</font>' : '<font color="red">已禁用</font>';
                                         }
                                     ],
-                                    //'cookie',
+                                    'desc',
                                     ['attribute' => 'cookie',
                                         'format'=>'raw',
                                         'value' => function($model) {

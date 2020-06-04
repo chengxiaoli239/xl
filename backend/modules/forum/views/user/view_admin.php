@@ -33,19 +33,39 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['class' => 'yii\grid\SerialColumn'],
 
                         //'id',
-                        'uid',
+                        //'uid',
+                        ['attribute' => 'uid', 'label'=>'uid', 'headerOptions' => ['width' => '5%'],
+                            'value'=> function($model){
+                                return $model->uid ? $model->uid : '';
+                            },
+                        ],
                         //'tz_system_id',
-                        'username',
-                        'sys_name',
-                        'account',
+                        //'username',
+                        ['attribute' => 'username', 'label'=>'账号', 'headerOptions' => ['width' => '8%'],
+                            'value'=> function($model){
+                                return $model->username ? $model->username : '';
+                            },
+                        ],
+                        //'sys_name',
+                        ['attribute' => 'sys_name', 'label'=>'系统', 'headerOptions' => ['width' => '8%'],
+                            'value'=> function($model){
+                                return $model->sys_name ? $model->sys_name : '';
+                            },
+                        ],
+                        //'account',
+                        ['attribute' => 'account', 'label'=>'投注账号', 'headerOptions' => ['width' => '8%'],
+                            'value'=> function($model){
+                                return $model->account ? $model->account : '';
+                            },
+                        ],
                         //'password',
-                        ['attribute' => 'password', 'label'=>'密码', //'headerOptions' => ['width' => '170'],
+                        ['attribute' => 'password', 'label'=>'密码', 'headerOptions' => ['width' => '5%'],
                             'value'=> function($model){
                                 return $model->password ? $model->password : '';
                             },
                         ],
                         //'balance',
-                        ['attribute' => 'balance', 'label'=>'余额', //'headerOptions' => ['width' => '170'],
+                        ['attribute' => 'balance', 'label'=>'余额', 'headerOptions' => ['width' => '8%'],
                             'value'=> function($model){
                                 return $model->balance ? $model->balance : '';
                             },
@@ -59,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                         ],
                         */
-                        ['attribute' => 'status','label'=>'投注系统状态', # 'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'status','label'=>'投注系统状态', 'headerOptions'=>['width'=>'8%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 if($model->status == 1){
@@ -76,6 +96,12 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         'ssc_domain',
+                        //'expire_time:datetime',
+                        ['attribute' => 'expire_time', //'label'=>'更新时间', 'headerOptions' => ['width' => '170'],
+                            'value'=> function($model){
+                                return  $model->expire_time ? date('Y-m-d H:i',$model->expire_time) : '永久';   //主要通过此种方式实现
+                            },
+                        ],
                         //'cookie',
                         //'created_at:datetime',
                         /*

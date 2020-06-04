@@ -154,6 +154,7 @@ class UserController extends BaseController
 
         if ($model->load($post) && $model->save()) {
             //UserService::saveTzSystemUsers(explode(',', $this->_post['TzSystemsAuth']['tz_systems_ids']), $uid);
+            UserService::updateTzSystemUsers($post);
             return $this->redirect(['index', 'id' => $model->id]);
         }
 

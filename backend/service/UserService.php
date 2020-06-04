@@ -148,6 +148,24 @@ class UserService extends BaseService {
     }
 
     /**
+     * @desc 更新用户信息
+     * @param $data
+     * @return bool
+     */
+    public static function updateTzSystemUsers($data){
+        $where = ['username'=>$data['Admin']['username']];
+        $TzSystemsUsers = TzSystemsUsers::findAll($where);
+        foreach ($TzSystemsUsers as $TzSystemsUser){
+            $TzSystemsUser->expire_time = strtotime($data['Admin']['pay_time']) + 30 * 86400;
+            $TzSystemsUser->updated_at = time();
+
+            $rst[$TzSystemsUser->id] = $TzSystemsUser->save();
+        }
+
+        return $rst;
+    }
+
+    /**
      * @description 更新用户表状态
      * @param $id
      * @param $account
