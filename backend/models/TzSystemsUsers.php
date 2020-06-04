@@ -28,6 +28,7 @@ use Yii;
  * @property string $odds_3d 三定赔率
  * @property string $odds_4d 四定赔率
  * @property string $warn_val 预警值
+ * @property string $desc 盘口状态
  * @property int $expire_time 到期时间
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
@@ -56,7 +57,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             [['update_time'], 'safe'],
             [['username', 'sys_name', 'account', 'ssc_domain'], 'string', 'max' => 64],
             [['password'], 'string', 'max' => 20],
-            [['user_agent'], 'string', 'max' => 640],
+            [['user_agent', 'desc'], 'string', 'max' => 640],
             [['warn_val'], 'string', 'max' => 11],
         ];
     }
@@ -88,6 +89,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'odds_3d' => Yii::t('app', '三定赔率'),
             'odds_4d' => Yii::t('app', '四定赔率'),
             'warn_val' => Yii::t('app', '预警值'),
+            'desc' => Yii::t('app', '盘口状态'),
             'expire_time' => Yii::t('app', '到期时间'),
             'created_at' => Yii::t('app', '创建时间'),
             'updated_at' => Yii::t('app', '更新时间'),
