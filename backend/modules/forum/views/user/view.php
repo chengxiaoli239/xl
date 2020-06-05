@@ -63,6 +63,8 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                                     $txt = '<font color="red">已过期，请续费</font>';
                                                 }elseif($model->expire_time - 2 * $date_time < time()){
                                                     $txt = date('m-d H:i', $model->expire_time) . ' [<font color="red">即将到期</font>]';
+                                                }else{
+                                                    $txt = date('m-d H:i', $model->expire_time);
                                                 }
                                             }else{
                                                 $txt = '<font color="green">永久生效</font>';
@@ -79,7 +81,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                         }
                                     ],
                                     'desc',
-                                    ['attribute' => 'cookie',
+                                    ['attribute' => 'cookie', 'label'=>'cookie',
                                         'format'=>'raw',
                                         'value' => function($model) {
                                             $txt = BaseStringHelper::truncate($model->cookie,24);
