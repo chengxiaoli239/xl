@@ -98,6 +98,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'ssc_domain',
                         //'expire_time:datetime',
                         ['attribute' => 'expire_time', //'label'=>'更新时间', 'headerOptions' => ['width' => '170'],
+                            'format'=>'raw',
                             'value'=> function($model){
                                 $date_time = 86400; # 一天时间戳
                                 if(!empty($model->expire_time)){
