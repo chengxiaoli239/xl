@@ -96,4 +96,5 @@ return [
 
     'Agent Users Balance Flows' => '用户积分流水',
     'Agent Record Users Descs' => '群消息记录',
+    'Assignments' => '新建用户',
 ];
