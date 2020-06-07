@@ -53,13 +53,13 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             }
                         ],
                         //'betting_money',
-                        ['attribute' => 'betting_money','headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'betting_money','label'=>'投注','headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
                                 return $model->betting_money;
                             }
                         ],
                         //'bonus',
-                        ['attribute' => 'bonus','headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'bonus','label'=>'中奖','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 return $model->bonus>0 ? '<font color="green">'.$model->bonus.'</font>' : ' ';
@@ -80,7 +80,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         ],
                         */
                         //'kj_codes',
-                        ['attribute' => 'kj_codes','headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'kj_codes','labe'=>'号码','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 return $model->kj_codes ? $model->kj_codes : '待开奖';
@@ -124,7 +124,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         ],
                         //'playway',
                         //'playway_name',
-                        ['attribute' => 'playway_name',#'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'playway_name','label'=>'方式',#'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
                                 $str = $model->playway_name;
                                 if($model->playway == 2 && $model->tz_type > 0){
@@ -141,7 +141,12 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         //'is_simulate',
                         //'lotteryclass',
                         //'createtime:datetime',
-                        'create_time',
+                        //'create_time',
+                        ['attribute' => 'create_time','label'=>'时间',//'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return $model->create_time;
+                            }
+                        ],
 
                         //['class' => 'yii\grid\ActionColumn','headerOptions' => ['width' => '5%'],'template'=>'{view}  {delete}'],
                     ],
