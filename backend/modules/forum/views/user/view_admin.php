@@ -112,6 +112,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }else{
                                     $txt = '<font color="green">永久</font>';
                                 }
+                                $txt = \backend\service\UserService::accountIsExpireDesc($model->id, $model->tz_system_id);
 
                                 return $txt;
                                 //return  $model->expire_time ? date('m-d H:i',$model->expire_time) : '永久';   //主要通过此种方式实现
@@ -137,3 +138,4 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<?php include(dirname(__FILE__).'/user-renew.php'); ?>

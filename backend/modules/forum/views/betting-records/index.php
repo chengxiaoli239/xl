@@ -66,7 +66,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             }
                         ],
                         //'single',
-                        ['attribute' => 'single',//'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'single','label'=>'倍',//'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
                                 return $model->single;
                             }

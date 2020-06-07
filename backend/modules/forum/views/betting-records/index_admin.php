@@ -57,20 +57,20 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                             }
                         ],
                         //'betting_money',
-                        ['attribute' => 'betting_money','headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'betting_money','label'=>'投注','headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
                                 return $model->betting_money;
                             }
                         ],
                         //'bonus',
-                        ['attribute' => 'bonus','headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'bonus','label'=>'中奖','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 return $model->bonus>0 ? '<font color="green">'.$model->bonus.'</font>' : ' ';
                             }
                         ],
                         //'single',
-                        ['attribute' => 'single',//'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'single','label'=>'倍',//'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
                                 return $model->single;
                             }
@@ -95,14 +95,14 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                         //'sn',
                         //'snid',
                         //'account',
-                        ['attribute' => 'account','headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'account','label'=>'账号','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 return Html::a($model->account, '/forum/betting-records/index?BettingRecords[account]='.$model->account);
                             }
                         ],
                         //'plan_id',
-                        ['attribute' => 'plan_id','headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'plan_id','label'=>'planid','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 return Html::a($model->plan_id, '/forum/betting-records/index?BettingRecords[plan_id]='.$model->plan_id);
@@ -139,7 +139,7 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                         ],
                         //'playway',
                         //'playway_name',
-                        ['attribute' => 'playway_name',#'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'playway_name','label'=>'方式',#'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
                                 $str = $model->playway_name;
                                 if($model->playway == 2 && $model->tz_type > 0){
@@ -156,7 +156,12 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                         //'is_simulate',
                         //'lotteryclass',
                         //'createtime:datetime',
-                        'create_time',
+                        //'create_time',
+                        ['attribute' => 'create_time','label'=>'时间','headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return $model->create_time;
+                            }
+                        ],
 
                         //['class' => 'yii\grid\ActionColumn','headerOptions' => ['width' => '5%'],'template'=>'{view}  {delete}'],
                     ],
