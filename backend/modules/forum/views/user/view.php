@@ -57,6 +57,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                     ['attribute'=>'expire_time',//'label'=>'状态',
                                         'format'=>'raw',
                                         'value'=>function($model){
+                                            /*
                                             $date_time = 86400; # 一天时间戳
                                             if(!empty($model->expire_time)){
                                                 if($model->expire_time <= time()){
@@ -69,6 +70,8 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                             }else{
                                                 $txt = '<font color="green">永久生效</font>';
                                             }
+                                            */
+                                            $txt = \backend\service\UserService::accountIsExpireDesc($model->id, $model->tz_system_id);
 
                                             return $txt;
                                         }

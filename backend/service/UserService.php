@@ -239,4 +239,48 @@ class UserService extends BaseService {
 
         return $defaultSiteIds[0];
     }
+
+    /**
+     * @dssc 账号是否过期 描述
+     * @param string $tz_system_users_id
+     * @return boolean
+     */
+    public static function accountIsExpire($user_id = '', $tz_system_id = ''){
+        $Model = TzSystemsUsers::findOne(['uid'=>$user_id, 'tz_system_id'=>$tz_system_id]);
+        //$Model = TzSystemsUsers::findOne($tz_system_users_id);
+        if(!$Model) return false;
+        $flag = false;
+        if(!empty($Model->expire_time)){
+            if($Model->expire_time <= time()){
+                $flag = true;
+            }
+        }
+
+        return  $flag;
+    }
+
+    /**
+     * @dssc 账号是否过期 描述
+     * @param string $tz_system_users_id
+     * @return false|string
+     */
+    public static function accountIsExpireDesc($user_id = '', $tz_system_id = ''){
+        $Model = TzSystemsUsers::findOne(['uid'=>$user_id, 'tz_system_id'=>$tz_system_id]);
+        //$Model = TzSystemsUsers::findOne($tz_system_users_id);
+        if(!$Model) return '';
+        $date_time = 86400; # 一天时间戳
+        if(!empty($Model->expire_time)){
+            if($Model->expire_time <= time()){
+                $txt = '<font color="red">已过期，请续费</font>';
+            }elseif($Model->expire_time - 2 * $date_time < time()){
+                $txt = date('m-d H:i', $Model->expire_time) . ' [<font color="red">即将到期</font>]';
+            }else{
+                $txt = date('m-d H:i', $Model->expire_time);
+            }
+        }else{
+            $txt = '<font color="green">永久生效</font>';
+        }
+
+        return $txt;
+    }
 }

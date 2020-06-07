@@ -103,12 +103,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $date_time = 86400; # 一天时间戳
                                 if(!empty($model->expire_time)){
                                     if($model->expire_time <= time()){
-                                        $txt = '<font color="red">已过期，请续费</font>';
+                                        $txt = '<font color="red">已过期</font>';
                                     }elseif($model->expire_time - 2 * $date_time < time()){
-                                        $txt = date('m-d H:i', $model->expire_time) . ' [<font color="red">即将到期</font>]';
+                                        $txt = date('m-d', $model->expire_time) . ' [<font color="red">即将到期</font>]';
+                                    }else{
+                                        $txt = date('m-d', $model->expire_time);
                                     }
                                 }else{
-                                    $txt = '<font color="green">永久生效</font>';
+                                    $txt = '<font color="green">永久</font>';
                                 }
 
                                 return $txt;
