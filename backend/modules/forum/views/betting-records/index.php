@@ -80,7 +80,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         ],
                         */
                         //'kj_codes',
-                        ['attribute' => 'kj_codes','labe'=>'号码','headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'kj_codes','label'=>'号码','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 return $model->kj_codes ? $model->kj_codes : '待开奖';
