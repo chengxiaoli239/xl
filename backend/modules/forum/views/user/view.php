@@ -73,7 +73,13 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                             return $model->status ? '<font color="green">已激活</font>' : '<font color="red">已禁用</font>';
                                         }
                                     ],
-                                    'desc',
+                                    //'desc',
+                                    [ 'attribute'=>'desc','label'=>'网盘状态',
+                                        'format'=>'raw',
+                                        'value'=>function($model){
+                                            return empty($model->desc) ? '<font color="green">正常</font>' : '<font color="red">'.$model->desc.'</font>';
+                                        }
+                                    ],
                                     ['attribute' => 'cookie', 'label'=>'cookie',
                                         'format'=>'raw',
                                         'value' => function($model) {

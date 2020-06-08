@@ -100,9 +100,9 @@ class Lucky5 extends BaseKj {
             $rst = CurlService::getCurl($url);
             $data = $rst['data']['list'][0];
 
-            if (empty($data)) return false;
+            if (!isset($rst['data']['list'][0]) OR empty($data)) return false;
             $opencode = implode(',', $data['code']);
-            if($opencode == '0,0,0,0,0') return false;
+                if($opencode == '0,0,0,0,0') return false;
             //$kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
             $kjData = ['expect'=>str_replace('期', '', $data['pc_issue'][0]), 'opencode'=>$opencode, 'opentime'=>$data['open_date'].' '.trim($data['pc_issue'][1])];
             //p($kjData);

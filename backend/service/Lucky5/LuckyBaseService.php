@@ -131,6 +131,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
     public static function synBalance($tz_system_user_id){
         $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);
         $balance = self::getBalance($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
+        //d($balance);
         $msg = ['status'=>200, 'msg'=>'金额同步成功~','tz_system_user_id'=>$tz_system_user_id, 'balance'=>$balance ];
 
         $TzSystemsUsers->balance = $balance;
@@ -1046,8 +1047,9 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             # 第二步：账号、验证码登录
             $rst = self::loginRemote($uid, $tz_system_id);
             # 第三步：同意
-            if(isset($rst['status']) && $rst['Status'] == 1)
+            if(isset($rst['status']) && $rst['Status'] == 1){
                 $rst = self::acceptAgreement($uid, $tz_system_id);
+            }
         }
 
         # 获取用户信息
@@ -1215,8 +1217,15 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $data = self::httpPost($url,$post_data, $headers, $TzSystemsUsers->uid);
         //sleep(10);
         //self::synBalance($TzSystemsUsers->id); # 同步余额
-        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
+        $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
+        $desc = '';
+        if(isset($data['Status']) && $data['Status'] == 2){
+            $desc = $data['Data'];
+        }
+        $TzSystemsUsers->desc = $desc;
+        $TzSystemsUsers->updated_at = time();
+        $TzSystemsUsers->save();
 
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','Luck5登陆记录', $logArr);
         return $data;
@@ -1262,13 +1271,13 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
-        $_t = microtime(true) * 10000;
+        $_t = (int)microtime(true) * 1000;
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/GetMemberPrint?_='.$_t;
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
         $headers = [
             "Accept: application/json, text/javascript, */*; q=0.01",
-            "Accept-Encoding: guzip, deflate",
-            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Accept-Encoding: gzip, deflate",
+            "Accept-Language: zh-CN,zh;q=0.9",
             "Connection: keep-alive",
             "Cookie: ".trim($TzSystemsUsers->cookie),
             //"Origin:".str_replace('www.','',self::$baseUrl),
@@ -1282,7 +1291,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $data = self::httpGet($url, $headers, $uid);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
-        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
+        $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','幸运五星-用户信息', $logArr);
         return $data;

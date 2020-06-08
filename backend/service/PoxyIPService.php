@@ -36,7 +36,7 @@ class PoxyIPService extends BaseService {
      * @desc 获取快代理的代理IP
      * @return array|mixed
      */
-    public static function getPoxyIp(){
+    public static function getPoxyIp($is_auto = 1){
         //return ['171.83.165.196', '20000'];
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if($POXY_STATUS == 0){
@@ -46,7 +46,7 @@ class PoxyIPService extends BaseService {
         $m = \Yii::$app->cache;
         $time = 3600 * 4;
         $mkey = self::builProxyIpKey();
-        if(!$poxy_ip_data = $m->get($mkey)){
+        if($is_auto == 1 && !$poxy_ip_data = $m->get($mkey)){
             $data = self::kuaiPoxy();
             if($data['status'] != 200) {
                 return [];

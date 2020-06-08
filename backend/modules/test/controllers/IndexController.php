@@ -170,6 +170,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $id = 45; $rst = BaseService::login($id);p($rst);
+        $rst = PoxyIPService::getPoxyIp($is_auto = 0);p($rst);
         $s = 0; if(empty($s))p('xx');else p('yy');
         $str = '1234   3346 1267 9021
         2356
@@ -183,9 +185,7 @@ class IndexController extends Controller
         $data = XjSsc::getLotteryNoNineNum();p($data);
         $str = "/App/ClearSession?errMsg=%e6%82%a8%e7%9a%84%e8%b4%a6%e5%8f%b7%e5%b7%b2%e5%9c%a8%e5%88%ab%e5%a4%84%e7%99%bb%e5%bd%95%e3%80%82";
         p(urldecode($str));
-        $rst = PoxyIPService::getPoxyIp();p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 6); p($rst);// 更新和值遗漏
-        $id = 45; $rst = BaseService::login($id);p($rst);
         $rst = UserSysPlansService::getYLByPlanId($plan_id = 934);p($rst);
         $snInfo = LuckyBaseService::getSn($user_id =17, $tz_system_id = 9);p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5, $type = 2); p($rst);// 更新和值遗漏

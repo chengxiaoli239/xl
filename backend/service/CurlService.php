@@ -287,6 +287,9 @@ class CurlService extends BaseService{
         if($errno>0) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'errno'=>$errno, 'postRst'=>$data, 'error'=>$str]);
+            if($errno == 52){
+                return ['Status'=>2, 'Data'=>'网盘网络超时，错误码52'];
+            }
             return '';
         }
         curl_close($ch);

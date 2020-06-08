@@ -101,6 +101,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return  $model->ssc_domain;
                             },
                         ],
+                        [ 'attribute'=>'desc','label'=>'状态',
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                return empty($model->desc) ? '<font color="green">正常</font>' : '<font color="red">'.$model->desc.'</font>';
+                            }
+                        ],
                         //'expire_time:datetime',
                         ['attribute' => 'expire_time', 'label'=>'到期',// 'headerOptions' => ['width' => '170'],
                             'format'=>'raw',

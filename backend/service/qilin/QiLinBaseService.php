@@ -1801,7 +1801,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         $data = CurlService::httpGet($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
-        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
+        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'username'=>$TzSystemsUsers->username, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','幸运五星-用户信息4', $logArr);
         return $data;
