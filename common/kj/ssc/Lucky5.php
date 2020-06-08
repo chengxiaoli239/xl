@@ -97,12 +97,14 @@ class Lucky5 extends BaseKj {
             # 当前开奖链接：https://1.cc138001.com/kaijiang/ygxy5.json?v=1570866018057
             # 当前开奖链接：https://web01.cc138008.com/kaijiang/history/ygxy5.json?v=1582557689975
 
-            $data = CurlService::getCurl($url);
+            $rst = CurlService::getCurl($url);
+            $data = $rst['data']['list'][0];
 
-            if (!isset($data['code'])) return false;
+            if (empty($data)) return false;
             $opencode = implode(',', $data['code']);
             if($opencode == '0,0,0,0,0') return false;
-            $kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
+            //$kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
+            $kjData = ['expect'=>str_replace('期', '', $data['pc_issue'][0]), 'opencode'=>$opencode, 'opentime'=>$data['open_date'].' '.trim($data['pc_issue'][1])];
             //p($kjData);
         }
         $opencode = $kjData['opencode'];

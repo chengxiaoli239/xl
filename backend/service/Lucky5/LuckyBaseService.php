@@ -1046,7 +1046,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             # 第二步：账号、验证码登录
             $rst = self::loginRemote($uid, $tz_system_id);
             # 第三步：同意
-            if($rst['Status'] == 1)
+            if(isset($rst['status']) && $rst['Status'] == 1)
                 $rst = self::acceptAgreement($uid, $tz_system_id);
         }
 
