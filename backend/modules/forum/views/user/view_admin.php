@@ -129,5 +129,5 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
-<script src="statics/js/jquery-1.7.1.min.js"></script>
+<script src="/statics/js/jquery-2.0.3.js"></script>
 <?php include(dirname(__FILE__).'/user-renew.php'); ?>

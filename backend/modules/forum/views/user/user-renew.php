@@ -25,10 +25,10 @@
 <!--2、提佣 -->
 <span id="edit_cm" style="display: none;">
     <div class="form-group">
-        <label for="points" class="col-sm-2 control-label" style="margin-top:6px">到期时间</label>
+        <label for="points" class="col-sm-2 control-label" style="margin-top:6px">时间</label>
         <div class="col-sm-8">
             <input type="text" class="form-control" id="user_cm" name="user_cm" placeholder="请输入时间" value="">
-            <span>输入到期时间</span>
+            <p><span>输入到期时间</span></p>
         </div>
         <div class="clearfix"></div>
     </div>
