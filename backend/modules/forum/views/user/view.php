@@ -40,7 +40,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                 'attributes' => [
                                     //'id',
                                     //'tz_system_id',
-                                    [ 'attribute'=>'tz_system_id','label'=>'系统类型','value'=>function($model){
+                                    [ 'attribute'=>'tz_system_id','label'=>'系统时间','value'=>function($model){
                                         return $model->update_time;
                                     }],
                                     'sys_name',
@@ -71,7 +71,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                                 $txt = '<font color="green">永久生效</font>';
                                             }
                                             */
-                                            $txt = \backend\service\UserService::accountIsExpireDesc($model->id, $model->tz_system_id);
+                                            $txt = \backend\service\UserService::accountIsExpireDesc($model->uid, $model->tz_system_id);
 
                                             return $txt;
                                         }
