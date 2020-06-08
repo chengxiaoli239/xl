@@ -73,7 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         //'buy_type',
-                        ['attribute' => 'buy_type','label'=>'正买/反买',#'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'buy_type','label'=>'正/反',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 $buy_type_Arr = [0=>'反买', 1=>'正买'];
@@ -114,14 +114,19 @@ $this->params['breadcrumbs'][] = $this->title;
                                 //return $model->snid;
                             }
                         ],
-                        'single',
-                        ['attribute' => 'current_profits',
+                        //'single',
+                        ['attribute' => 'single','headerOptions'=>['width'=>'5%'],'label'=>'倍(元)',
+                            'value' => function($model) {
+                                return $model->single;
+                            }
+                        ],
+                        ['attribute' => 'current_profits','label'=>'当前',
                             'format'=>'raw',
                             'value' => function($model) {
                                 if(in_array($model->plan_type,[1, 3])){
                                     $txt = '止盈:'.floatval($model->take_profits)." 止损:".floatval($model->stop_loss) .' 当前:'.round($model->current_profits, 2) ;
                                 }else{
-                                    $txt = '无';
+                                    $txt = '';
                                 }
                                 return $txt;
                             }
@@ -140,7 +145,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         //'tz_sites',
-                        ['attribute' => 'tz_sites','label'=>'计划投注站点',#'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'tz_sites','label'=>'站点',#'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
                                 $site_ids = explode(',',$model->tz_sites);
                                 $str = '';
@@ -151,7 +156,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         //'account',
-                        ['attribute' => 'account','headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'account','headerOptions'=>['width'=>'5%'],'label'=>'账号',
                             'format'=>'raw',
                             'value' => function($model) {
                                 return Html::a($model->account, '/forum/user-sys-plans/index?UserSysPlans[account]='.$model->account);
@@ -159,7 +164,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //'nums',
                         //'hz_Arr',
-                        ['attribute' => 'hz_Arr','label'=>'扩展【部分投注】',#'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'hz_Arr','label'=>'扩展',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
@@ -190,7 +195,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         */
                         //'created_at',
                         //'updated_at',
-                        'update_time',
+                        //'update_time',
+                        ['attribute' => 'updated_at','label'=>'时间',
+                            'value' => function($model) {
+                                return date('m-d H:i', $model->updated_at);
+                            }
+                        ],
 
                         //['class' => 'yii\grid\ActionColumn'],
                         ['class' => 'yii\grid\ActionColumn','headerOptions'=>['width'=>'5%'],'template'=>'{update}'],

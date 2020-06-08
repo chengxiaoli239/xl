@@ -57,26 +57,16 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                     ['attribute'=>'expire_time',//'label'=>'状态',
                                         'format'=>'raw',
                                         'value'=>function($model){
-                                            /*
-                                            $date_time = 86400; # 一天时间戳
-                                            if(!empty($model->expire_time)){
-                                                if($model->expire_time <= time()){
-                                                    $txt = '<font color="red">已过期，请续费</font>';
-                                                }elseif($model->expire_time - 2 * $date_time < time()){
-                                                    $txt = date('m-d H:i', $model->expire_time) . ' [<font color="red">即将到期</font>]';
-                                                }else{
-                                                    $txt = date('m-d H:i', $model->expire_time);
-                                                }
-                                            }else{
-                                                $txt = '<font color="green">永久生效</font>';
-                                            }
-                                            */
                                             $txt = \backend\service\UserService::accountIsExpireDesc($model->uid, $model->tz_system_id);
-
                                             return $txt;
                                         }
                                     ],
-                                    'ssc_domain',
+                                    //'ssc_domain',
+                                    ['attribute' => 'ssc_domain', 'label'=>'网盘', //'headerOptions' => ['width' => '170'],
+                                        'value'=> function($model){
+                                            return  $model->ssc_domain;
+                                        },
+                                    ],
                                     [ 'attribute'=>'status','label'=>'状态',
                                         'format'=>'raw',
                                         'value'=>function($model){
@@ -91,7 +81,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                             return Html::a($txt, '#', ['title' => $model->cookie,'alt'=>$model->cookie]);
                                         }
                                     ],
-                                    [ 'attribute'=>'update_time','label'=>'更新时间','value'=>function($model){
+                                    [ 'attribute'=>'update_time','label'=>'时间','value'=>function($model){
                                         return $model->update_time;
                                     }],
                                 ],

@@ -53,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                         ],
                         //'account',
-                        ['attribute' => 'account', 'label'=>'投注账号', 'headerOptions' => ['width' => '8%'],
+                        ['attribute' => 'account', 'label'=>'账号', 'headerOptions' => ['width' => '8%'],
                             'value'=> function($model){
                                 return $model->account ? $model->account : '';
                             },
@@ -79,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                         ],
                         */
-                        ['attribute' => 'status','label'=>'投注系统状态', 'headerOptions'=>['width'=>'8%'],
+                        ['attribute' => 'status','label'=>'状态', 'headerOptions'=>['width'=>'8%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 if($model->status == 1){
@@ -95,27 +95,18 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a($txt, $url, ['title' => '开通系统权限','alt'=>$alt]);
                             }
                         ],
-                        'ssc_domain',
+                        //'ssc_domain',
+                        ['attribute' => 'ssc_domain', 'label'=>'网盘', //'headerOptions' => ['width' => '170'],
+                            'value'=> function($model){
+                                return  $model->ssc_domain;
+                            },
+                        ],
                         //'expire_time:datetime',
-                        ['attribute' => 'expire_time', //'label'=>'更新时间', 'headerOptions' => ['width' => '170'],
+                        ['attribute' => 'expire_time', 'label'=>'到期',// 'headerOptions' => ['width' => '170'],
                             'format'=>'raw',
                             'value'=> function($model){
-                                $date_time = 86400; # 一天时间戳
-                                if(!empty($model->expire_time)){
-                                    if($model->expire_time <= time()){
-                                        $txt = '<font color="red">已过期</font>';
-                                    }elseif($model->expire_time - 2 * $date_time < time()){
-                                        $txt = date('m-d', $model->expire_time) . ' [<font color="red">即将到期</font>]';
-                                    }else{
-                                        $txt = date('m-d', $model->expire_time);
-                                    }
-                                }else{
-                                    $txt = '<font color="green">永久</font>';
-                                }
                                 $txt = \backend\service\UserService::accountIsExpireDesc($model->uid, $model->tz_system_id);
-
                                 return $txt;
-                                //return  $model->expire_time ? date('m-d H:i',$model->expire_time) : '永久';   //主要通过此种方式实现
                             },
                         ],
                         //'cookie',
@@ -138,4 +129,5 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<script src="statics/js/jquery-1.7.1.min.js"></script>
 <?php include(dirname(__FILE__).'/user-renew.php'); ?>

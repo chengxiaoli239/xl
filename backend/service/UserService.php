@@ -278,8 +278,12 @@ class UserService extends BaseService {
                 $txt = date('m-d H:i', $Model->expire_time);
             }
         }else{
-            $txt = '<font color="green">永久生效</font>';
+            $txt = '<font color="green">永久</font>';
         }
+        $options = [
+            'class' => 'renew-account',
+        ];
+        $txt = yii\helpers\Html::a($txt, '#', $options);
 
         return $txt;
     }

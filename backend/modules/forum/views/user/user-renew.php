@@ -60,7 +60,7 @@
 <script>
     $(function () {
         // 修改过期时间
-        $('.act-apply-cm').click(function () {
+        $('.renew-account').click(function () {
             var up_name = $(this).attr('data-name');
 
             op_id = $(this).attr('id');
