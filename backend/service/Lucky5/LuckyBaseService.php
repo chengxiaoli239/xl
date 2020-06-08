@@ -1047,7 +1047,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             # 第二步：账号、验证码登录
             $rst = self::loginRemote($uid, $tz_system_id);
             # 第三步：同意
-            if(isset($rst['status']) && $rst['Status'] == 1){
+            if(isset($rst['Status']) && $rst['Status'] == 1){
                 $rst = self::acceptAgreement($uid, $tz_system_id);
             }
         }
@@ -1276,7 +1276,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
         $headers = [
             "Accept: application/json, text/javascript, */*; q=0.01",
-            "Accept-Encoding: gzip, deflate",
+            "Accept-Encoding: gunzip, deflate",
             "Accept-Language: zh-CN,zh;q=0.9",
             "Connection: keep-alive",
             "Cookie: ".trim($TzSystemsUsers->cookie),
@@ -2071,7 +2071,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             return 'ok';
         }
         $rstData = json_decode($data, TRUE);
-        //p([$data, $rstData, $post_data, $header]);
+        //p(['data'=>$data, 'rstData'=>$rstData, 'post_data'=>$post_data, 'header'=>$header]);
 
         return $rstData;
     }
