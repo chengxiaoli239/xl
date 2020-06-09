@@ -22,16 +22,29 @@ use yii\widgets\ActiveForm;
                     <input type="hidden" value="3" name="UserSysPlans[playway]">
                     <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
 
-                    <?= $form->field($model, 'playway')->radioList([
-                        '3'=>'四字定',
-                    ])->label('投注方式') ?>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <?= $form->field($model, 'playway')->radioList([
+                                //'1'=>'二字定',
+                                //'2'=>'三字定',
+                                '3'=>'四字定',
+                            ])->label('投注方式') ?>
+                        </div>
+                        <div class="col-lg-4">
+                            <?= $form->field($model, 'is_test')->radioList([
+                                '0'=>'真实',
+                                '1'=>'模拟',
+                            ])->label('真实/模拟') ?>
+                        </div>
+                        <div class="col-lg-4">
+                            <?= $form->field($model, 'status')->radioList([
+                                '0'=>'关闭',
+                                '1'=>'开启',
+                            ])->label('投注状态') ?>
+                        </div>
+                    </div>
 
-                    <!--?= $form->field($model, 'status')->textInput() ?-->
-                    <?= $form->field($model, 'status')->radioList([
-                        '0'=>'关闭',
-                        '1'=>'开启',
-                    ])->label('投注状态') ?>
-
+                    <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
                     <?= $form->field($model, 'single')->textInput() ?>
 
                     <!--?= $form->field($model, 'tz_type')->textInput() ?-->
@@ -41,6 +54,32 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'buy_type')->textInput() ?-->
 
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <?= $form->field($model, 'type_2')->checkBoxList([
+                                0=>'除',
+                                1=>'取'
+                            ])->label('双重') ?>
+                        </div>
+                        <div class="col-lg-3">
+                            <?= $form->field($model, 'type_3')->checkBoxList([
+                                0=>'除',
+                                1=>'取'
+                            ])->label('三重') ?>
+                        </div>
+                        <div class="col-lg-3">
+                            <?= $form->field($model, 'type_4')->checkBoxList([
+                                0=>'除',
+                                1=>'取'
+                            ])->label('四重') ?>
+                        </div>
+                        <div class="col-lg-3">
+                            <?= $form->field($model, 'type_22')->checkBoxList([
+                                0=>'除',
+                                1=>'取'
+                            ])->label('双双重') ?>
+                        </div>
+                    </div>
 
                     <?= $form->field($model, 'plan_type')->radioList($plan_types)->label('计划类型，为"止盈止损"计划时须填以下两项') ?>
                     <?= $form->field($model, 'take_profits')->textInput($plan_types)->label('止盈点(正数，例：3000)') ?>
