@@ -49,11 +49,38 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'tz_type')->textInput() ?-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
-                    <?= $form->field($model, 'hz_Arr')->checkboxList($hzArr)->label('投注类型(和值)') ?>
+                    <?= $form->field($model, 'hz')->checkboxList($hzArr)->label('投注类型(和值)') ?>
 
                     <!--?= $form->field($model, 'buy_type')->textInput() ?-->
 
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <?= $form->field($model, 'type_2b')->checkBoxList([
+                                0=>'除',
+                                1=>'取'
+                            ])->label('两兄弟') ?>
+                        </div>
+                        <div class="col-lg-3">
+                            <?= $form->field($model, 'type_3b')->checkBoxList([
+                                0=>'除',
+                                1=>'取'
+                            ])->label('三兄弟') ?>
+                        </div>
+                        <div class="col-lg-3">
+                            <?= $form->field($model, 'type_4b')->checkBoxList([
+                                0=>'除',
+                                1=>'取'
+                            ])->label('四兄弟') ?>
+                        </div>
+                        <div class="col-lg-3">
+                            <?= $form->field($model, 'type_log')->checkBoxList([
+                                //0=>'非四单四双',
+                                0=>'除',
+                                1=>'取',
+                            ])->label('对数') ?>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-lg-3">
                             <?= $form->field($model, 'type_2')->checkBoxList([

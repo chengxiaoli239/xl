@@ -387,13 +387,7 @@ abstract class BetService extends BaseBetService {
                 break;
             case 3: # 四字定
                 $code_type = 4;
-                if($tz_type == 20) {  # 四定和值
-                    # 四定和值选号，默认排除：双双重、三重、四重、四兄弟、四单四双
-                    //$where = ['codes_hz'=>explode(',', $codes_hz), 'type_22'=>0, 'type_3'=>0, 'type_4'=>0, 'type_4b'=>0, 'type_4ds'=>0];
-                    $where = ['codes_hz' => explode(',', $codes_hz), 'code_type'=>4]; // , 'type_4' => 0
-                    $codesArr = Num4Type::find()->where($where)->asArray()->all();
-                    $codesArr = ArrayHelper::getColumn($codesArr, 'code');
-                }elseif($tz_type == 21){ # 四定两兄弟
+                if($tz_type == 21){ # 四定两兄弟
                     $codesArr = NumService::get2bCodeArr();
                 }elseif(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])) { # 导入方案 34
                     $codesArr = UserSysPlansService::getImportCodes($plan_id);
@@ -407,7 +401,7 @@ abstract class BetService extends BaseBetService {
                     foreach ($tmpArr as $arr){
                         $codesArr[] = $arr[0].','.$arr[1].','.$arr[2].','.$arr[3];
                     }
-                }elseif($tz_type == 25){ # 过滤
+                }elseif(in_array($tz_type, [20, 25])){ # 过滤
                     $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true));
                 }elseif($tz_type == 26){ # 去除近xxx期号码
                     $codesArr = NumService::getNotLatelyCodes(json_decode($codes_hz, true));

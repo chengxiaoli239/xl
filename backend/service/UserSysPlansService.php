@@ -245,7 +245,7 @@ class UserSysPlansService extends BaseService {
             //p([$p_Arrs, $Null_ps, $pi, $tmpFilter]);
 
             //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
-        }elseif ($tz_type == 25){
+        }elseif (in_array($tz_type, [25, 20])){
             # 四定-快选过滤
             $UserSysPlans = $post['UserSysPlans'];
             # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
@@ -440,7 +440,7 @@ class UserSysPlansService extends BaseService {
             }
         }
 
-        if(!in_array($tz_type, [20, 22, 23, 24])){ # 四定和值、上奖全倒、直码
+        if(!in_array($tz_type, [22, 23, 24])){ # 四定和值、上奖全倒、直码
             $hz_Arr = json_encode($tmpFilter, 320);
             $post['UserSysPlans']['hz_Arr'] = !empty($hz_Arr) ? $hz_Arr : '';
         }
@@ -459,6 +459,7 @@ class UserSysPlansService extends BaseService {
             $post['UserSysPlans']['tz_sort'] = $tz_sort;
             $post['UserSysPlans']['created_at'] = time();
         }
+        //p($post);
 
         return $post;
     }
@@ -637,12 +638,6 @@ class UserSysPlansService extends BaseService {
                 $kArr = StaticService::$kArr;
                 unset($kArr[0], $kArr[1], $kArr[10], $kArr[11], $kArr[21], $kArr[22]);
                 $data['kArr'] = $kArr;
-            }elseif ($tz_type == 20){ # 四定和值
-                $hzArr = [];
-                for ($i=1; $i<=36; $i++){
-                    $hzArr[$i] = $i;
-                }
-                $data['hzArr'] = $hzArr;
             }elseif ($tz_type == 22){ # 四字定单双
                 $SscDsYls = SscDsYl::find()->select(['id', 'positions', 'zhi'])->where(['type'=>4, 'LENGTH(zhi)'=>4])->asArray()->all();
                 $hzArr = ArrayHelper::getColumn($SscDsYls, 'zhi', false);
@@ -651,7 +646,7 @@ class UserSysPlansService extends BaseService {
                     $tmpData[$zhi] = $zhi;
                 }
                 $data['hzArr'] = $tmpData;
-            }elseif (in_array($tz_type, [25, 28])){ # 快选
+            }elseif (in_array($tz_type, [20, 25, 28])){ # 20四定和值 25快选 28系统快捷
                 $hzArr = [];
                 for ($i=0; $i<=36; $i++){
                     $hzArr[$i] = $i;
