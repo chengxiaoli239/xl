@@ -17,12 +17,6 @@
                     <input type="text" class="form-control" style="width: 200px;" id="default_datetimepicker">
                     <!--span class="input-group-addon">.00</span00-->
                 </div>
-                <!--
-                <div id="edit_cm" style="display: none;">
-                    <label for="dtp_input3">到期时间：</label>
-                    <input type="text" id="default_datetimepicker"/>
-                </div>
-                -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
@@ -72,11 +66,10 @@ $(function () {
     $('.renew-account').click(function () {
         var up_name = $(this).attr('data-name');
 
-        op_id = $(this).attr('id');
-        $("#edit_cm").show();
-        //$("#modal-body-cm").html($('#edit_cm'))
+        op_id = $(this).attr('data-id');
         $('#ApplyCmConfirm').attr('data-op-id', op_id);
-        showTips('过期时间', '输入到期日期：');
+        txt = '正在修改 [<strong><font color="#a52a2a">'+$("#renew_"+op_id).attr('data-username')+'</font></strong>] 过期时间：';
+        showTips('过期时间', txt);
     });
     /**
      * @desc 显示修改结果提示框
@@ -90,8 +83,8 @@ $(function () {
     }
 
     $("#ApplyCmConfirm").click(function () {
+        id = $(this).attr('data-op-id')
         val = $('#default_datetimepicker').val();
-        id = $(this).attr('data-id')
         apply(id, val);
     });
 
@@ -102,19 +95,20 @@ $(function () {
      */
     function apply(id, val) {
         data = {id:id, time_val:val};
+        console.log(data);
         $.post("/forum/tz-systems-users/up-expire-time",data,function(rst) {
             Qrst = rst.data;
             status = rst.status;
             msg = '';
             if(rst.status == 200){
                 expire_time = Qrst.expire_time;
-                txt = '';
+                desc = '';
                 if(expire_time == null || expire_time == '' || expire_time == NaN){
-                   txt = '永久';
+                    desc = '永久';
                 }else{
-                    txt = expire_time;
+                    desc = '过期时间：'+expire_time;
                 }
-                $('#renew_'+id).html(txt)
+                $("#renew_"+id).html(expire_time.substr(5));
                 $("#ApplyCmConfirmEnd").attr('refresh', 1);
             }else {
                 $("#ApplyCmConfirmEnd").attr('refresh', 0);

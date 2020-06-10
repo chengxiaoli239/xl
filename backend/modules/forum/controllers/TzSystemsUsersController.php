@@ -83,7 +83,7 @@ class TzSystemsUsersController extends BaseController
     public function actionUpExpireTime(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
-        $expire_time = $post['val'];
+        $expire_time = $post['time_val'];
         $id = $post['id'];
 
         $rst = UserService::upExpireTime($id, $expire_time);

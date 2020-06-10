@@ -282,8 +282,9 @@ class UserService extends BaseService {
         }
         $options = [
             'class' => 'renew-account',
-            'data-id' => $tz_system_id,
-            'id' => 'renew_'.$tz_system_id,
+            'data-id' => $Model->id,
+            'data-username' => $Model->username,
+            'id' => 'renew_'.$Model->id,
         ];
         $txt = yii\helpers\Html::a($txt, '#', $options);
 
@@ -296,7 +297,7 @@ class UserService extends BaseService {
      * @param $expire_time
      */
     public static function upExpireTime($id, $expire_time = ''){
-        $rst = ['status'=>300, 'msg'=>'操作成功'];
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
         if(empty($expire_time)) $expire_time = '';
         $TzSystemsUsers = TzSystemsUsers::findOne($id);
         if(!$TzSystemsUsers){
@@ -306,7 +307,7 @@ class UserService extends BaseService {
         $TzSystemsUsers->updated_at = time();
         $flag = $TzSystemsUsers->save();
         if(!$flag){
-            return ['status'=>303, 'msg'=>$TzSystemsUsers->getFirstError()];
+            return ['status'=>303, 'msg'=>current($TzSystemsUsers->getErrors())];
         }
         $rst['data']['expire_time'] = $expire_time;
 
