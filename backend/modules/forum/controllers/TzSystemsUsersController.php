@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\UserService;
 use Yii;
 use backend\models\TzSystemsUsers;
 use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
@@ -73,6 +74,21 @@ class TzSystemsUsersController extends BaseController
         return $this->render('create', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * @desc 更新用户到期时间
+     * @return mixed
+     */
+    public function actionUpExpireTime(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $expire_time = $post['val'];
+        $id = $post['id'];
+
+        $rst = UserService::upExpireTime($id, $expire_time);
+
+        return $rst;
     }
 
     /**

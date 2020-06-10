@@ -282,9 +282,34 @@ class UserService extends BaseService {
         }
         $options = [
             'class' => 'renew-account',
+            'data-id' => $tz_system_id,
+            'id' => 'renew_'.$tz_system_id,
         ];
         $txt = yii\helpers\Html::a($txt, '#', $options);
 
         return $txt;
+    }
+
+    /**
+     * @desc 过期时间设置
+     * @param $id TzSystemsUsers.id
+     * @param $expire_time
+     */
+    public static function upExpireTime($id, $expire_time = ''){
+        $rst = ['status'=>300, 'msg'=>'操作成功'];
+        if(empty($expire_time)) $expire_time = '';
+        $TzSystemsUsers = TzSystemsUsers::findOne($id);
+        if(!$TzSystemsUsers){
+            return ['status'=>302, 'msg'=>'找不到记录'];
+        }
+        $TzSystemsUsers->expire_time = strtotime($expire_time);
+        $TzSystemsUsers->updated_at = time();
+        $flag = $TzSystemsUsers->save();
+        if(!$flag){
+            return ['status'=>303, 'msg'=>$TzSystemsUsers->getFirstError()];
+        }
+        $rst['data']['expire_time'] = $expire_time;
+
+        return $rst;
     }
 }
