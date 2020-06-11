@@ -10,6 +10,8 @@ namespace backend\modules\test\controllers;
 
 use backend\models\Admin;
 use backend\models\SscKjData;
+use backend\models\SscSdHzVal;
+use backend\models\SscStaticVal;
 use backend\models\TzSystemsUsers;
 use backend\service\BetService;
 use backend\service\ChatCommonBetService;
@@ -170,6 +172,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = NumService::staticPlansProfits();p($rst);
+
         $id = 45; $rst = BaseService::login($id);p($rst);
         $rst = PoxyIPService::getPoxyIp($is_auto = 0);p($rst);
         $s = 0; if(empty($s))p('xx');else p('yy');

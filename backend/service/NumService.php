@@ -12,6 +12,7 @@ use backend\models\CodeTypes;
 use backend\models\Num4Type;
 use backend\models\SscKjData;
 use backend\models\SystemConfig;
+use backend\models\UserSysPlans;
 use common\tools\Tool_Common;
 use backend\models\ThreeNum;
 use yii\helpers\ArrayHelper;
@@ -1970,5 +1971,18 @@ class NumService extends BaseService {
         $money = 10.00;
 
         return $money;
+    }
+
+    /**
+     * @desc 按计划id做利润数据统计
+     * @return array
+     */
+    public static function staticPlansProfits(){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+        $where = ['AND', ['=', 'account', 'admin'], ['=', 'status', 1]];
+        $plans = UserSysPlans::find()->where($where)->all();
+        //p($plans);
+
+        return $rst;
     }
 }
