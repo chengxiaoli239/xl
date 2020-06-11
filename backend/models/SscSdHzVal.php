@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $val 和值范围
+ * @property string $where where条件
  * @property int $count 组数
  * @property int $status 是否显示0不显示1显示
  * @property int $static_nums 统计期数
@@ -32,6 +33,7 @@ class SscSdHzVal extends \common\models\base\BaseModel
     public function rules()
     {
         return [
+            [['where'], 'string'],
             [['count', 'status', 'static_nums', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
             [['val'], 'string', 'max' => 120],
@@ -46,6 +48,7 @@ class SscSdHzVal extends \common\models\base\BaseModel
         return [
             'id' => 'ID',
             'val' => '和值范围',
+            'where' => 'where条件',
             'count' => '组数',
             'status' => '是否显示0不显示1显示',
             'static_nums' => '统计期数',

@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $val 值
+ * @property string $where where条件
  * @property int $codes_hz 号码和值
  * @property string $name 名字
  * @property int $status 是否显示0不显示1显示
@@ -46,6 +47,7 @@ class SscStaticVal extends \common\models\base\BaseModel
     public function rules()
     {
         return [
+            [['where'], 'string'],
             [['codes_hz', 'status', 'type', 'static_nums', 'count', 'created_at', 'updated_at', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4d', 'type_4s', 'type_log', 'type_4ds'], 'integer'],
             [['update_time'], 'safe'],
             [['val'], 'string', 'max' => 120],
@@ -61,6 +63,7 @@ class SscStaticVal extends \common\models\base\BaseModel
         return [
             'id' => 'ID',
             'val' => '值',
+            'where' => 'where条件',
             'codes_hz' => '号码和值',
             'name' => '名字',
             'status' => '是否显示0不显示1显示',
