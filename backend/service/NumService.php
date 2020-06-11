@@ -1981,6 +1981,9 @@ class NumService extends BaseService {
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $where = ['AND', ['=', 'account', 'admin'], ['=', 'status', 1]];
         $plans = UserSysPlans::find()->where($where)->all();
+        foreach ($plans as $plan){
+            $lottery_type = $plan->lottery_type;
+        }
         //p($plans);
 
         return $rst;
