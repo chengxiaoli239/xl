@@ -1979,10 +1979,11 @@ class NumService extends BaseService {
      */
     public static function staticPlansProfits(){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
-        $where = ['AND', ['=', 'account', 'admin'], ['=', 'status', 1]];
+        $where = ['OR', ['AND', ['=', 'account', 'admin'], ['=', 'status', 1]], ['=', 'id', 981]];
         $plans = UserSysPlans::find()->where($where)->all();
         foreach ($plans as $plan){
             $lottery_type = $plan->lottery_type;
+            p($lottery_type);
         }
         //p($plans);
 

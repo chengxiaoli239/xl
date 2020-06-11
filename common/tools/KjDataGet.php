@@ -580,7 +580,7 @@ class KjDataGet
 
 
         $msg = ['status'=>200, 'msg'=>'操作成功！'];
-        $kjDatas = SscKjData::find()->where(['IS', 'type_22b', NULL])->orderBy('id DESC')->limit($times)->all();
+        $kjDatas = SscKjData::find()->where(['OR', ['IS', 'type_22b', NULL], ['IS', 'type_3b', NULL]])->orderBy('id DESC')->limit($times)->all();
         foreach ($kjDatas as $key=>$kjData){
             //$kjDs = SscDataService::getCodesDS($kjData['code_str']);
             $codes = $kjData['code1'].','.$kjData['code2'].','.$kjData['code3'].','.$kjData['code4'];
