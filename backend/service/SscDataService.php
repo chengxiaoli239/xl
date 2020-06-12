@@ -1525,10 +1525,11 @@ class SscDataService extends BaseService {
         $min_id = $last_index_id - $recently - 1;
         $m = \Yii::$app->cache;
         $mkey = 'get3NumHistoryMiss_ID_'.$lottery_type.'_'.$min_id;
-        if(!$rst = $m->get($mkey)){
+        if(true OR !$rst = $m->get($mkey)){
             $field = 'code_3n';
             $where = ['AND',['like', $field, $num],['=', 'lottery_type', $lottery_type],['>','index_id', $min_id]];
             $SscKjData3Nums = SscKjData::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
+            //p($SscKjData3Nums);
             if(count($SscKjData3Nums)>1){
                 $last_times = $SscKjData3Nums[0]->index_id - $SscKjData3Nums[1]->index_id - 1;  // 上次遗漏次数
             }
