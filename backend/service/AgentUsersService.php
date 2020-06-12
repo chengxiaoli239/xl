@@ -206,4 +206,14 @@ class AgentUsersService extends BaseService {
 
         return $img;
     }
+
+    /**
+     * @desc 检测网络是否通，切换网盘线路
+     * @return array
+     */
+    public static function pingTzSystemUsersDomain(){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+
+        return $rst;
+    }
 }

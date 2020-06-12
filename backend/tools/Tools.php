@@ -72,4 +72,98 @@ class Tools
     }
 
 
+    /**
+     * 使用PHP检测能否ping通IP或域名
+     * @param $address
+     * @return array
+     */
+    public static function pingAddress($address = '') {
+        if(empty($address)) return [];
+            $status = -1;
+        if (strcasecmp(PHP_OS, 'WINNT') === 0) {
+            // Windows 服务器下
+            $result = exec("ping -n 1 {$address}", $outcome, $status);
+        } elseif (strcasecmp(PHP_OS, 'Linux') === 0) {
+            // Linux 服务器下
+            $result = exec("ping -c 1 {$address}", $outcome, $status);
+            //p(['address'=>$address, 'outcome'=>$outcome, 'status'=>$status]);
+        }
+        return ['address'=>$address, 'outcome'=>$outcome, 'status'=>$status, 'result'=>$result];
+    }
+
+    /**
+     * @desc 获取ping域名对应的ip和延迟信息
+     * @param string $address
+     * @return array
+     */
+    public static function getPingAddressInfo($address = ''){
+        $rst = Tools::pingAddress($address);
+        //p($rst);
+        $status = $rst['status'];
+        if (0 != $status) {
+            return [];
+        }
+
+        $outcome = $rst['outcome'];
+        $d = $outcome[1];
+
+        # 取IP
+        preg_match("/\(.*?\)/i", $d, $matches1);
+        $ip = str_replace(['(', ')'], '', $matches1[0]); # 域名对应的ip
+
+        # 延迟
+        $pos = strpos($d, "time=");
+        $ms = substr($d, $pos+5);
+        //p(['rst'=>$rst, 'd'=>$d, 'ms'=>$ms, 'ip'=>$ip]);
+
+        return ['address'=>$rst['address'], 'ip'=>$ip, 'ms'=>$ms];
+    }
+
+    /**
+     * 使用PHP检测能否telnet通IP或域名
+     * @param $address
+     * @return array
+     */
+    public static function telnetAddress($address = '') {
+        if(empty($address)) return [];
+        $status = -1;
+        if (strcasecmp(PHP_OS, 'WINNT') === 0) {
+            // Windows 服务器下
+            $result = exec("telnet -n 1 {$address}", $outcome, $status);
+        } elseif (strcasecmp(PHP_OS, 'Linux') === 0) {
+            // Linux 服务器下
+            $result = exec("telnet -c {$address}", $outcome, $status);
+            //p(['address'=>$address, 'outcome'=>$outcome, 'status'=>$status, 'result'=>$result]);
+        }
+        return ['address'=>$address, 'outcome'=>$outcome, 'status'=>$status, 'result'=>$result];
+    }
+
+    /**
+     * @desc 获取telnet域名对应的ip和延迟信息 - telnet 出现超时问题还未解决 - 未完待续2020.06.12
+     * @param string $address
+     * @return array
+     */
+    public static function getTelnetAddressInfo($address = ''){
+        $rst = Tools::telnetAddress($address);
+        p($rst);
+        $status = $rst['status'];
+        if (0 != $status) {
+            return [];
+        }
+
+        $outcome = $rst['outcome'];
+        $d = $outcome[1];
+
+        # 取IP
+        preg_match("/\(.*?\)/i", $d, $matches1);
+        $ip = str_replace(['(', ')'], '', $matches1[0]); # 域名对应的ip
+
+        # 延迟
+        $pos = strpos($d, "time=");
+        $ms = substr($d, $pos+5);
+        //p(['rst'=>$rst, 'd'=>$d, 'ms'=>$ms, 'ip'=>$ip]);
+
+        return ['address'=>$rst['address'], 'ip'=>$ip, 'ms'=>$ms];
+    }
+
 }

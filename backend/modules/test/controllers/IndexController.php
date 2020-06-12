@@ -174,6 +174,20 @@ class IndexController extends Controller
     public function actionDw(){
         $rst = NumService::staticPlansProfits();p($rst);
 
+        $domain = 'f2.ww835566.xyz';
+        // ping域名
+        p(Tools::getPingAddressInfo($domain));
+        p(Tools::getTelnetAddressInfo($domain));
+        d(Tools::pingAddress($domain));
+        // ping IP
+        //var_dump(pingAddress('45.33.36.121'));
+
+        if (Tools::pingAddress($domain)==true) {
+            $ip = gethostbyname($domain);//获取域名ip
+        }
+        p($ip);
+        //system('/tmp/cron/test.sh');p('xx');
+
         $id = 45; $rst = BaseService::login($id);p($rst);
         $rst = PoxyIPService::getPoxyIp($is_auto = 0);p($rst);
         $s = 0; if(empty($s))p('xx');else p('yy');

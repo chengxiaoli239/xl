@@ -11,6 +11,7 @@ namespace backend\service;
 use backend\models\CodeTypes;
 use backend\models\Num4Type;
 use backend\models\SscKjData;
+use backend\models\StaticProfits;
 use backend\models\SystemConfig;
 use backend\models\UserSysPlans;
 use common\tools\Tool_Common;
@@ -1981,12 +1982,97 @@ class NumService extends BaseService {
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $where = ['OR', ['AND', ['=', 'account', 'admin'], ['=', 'status', 1]], ['=', 'id', 981]];
         $plans = UserSysPlans::find()->where($where)->all();
+
+        $m = \Yii::$app->cache;
+        $time = time();
         foreach ($plans as $plan){
+            $mkey = 'staticPlansProfits_plan_'.$plan->id;
+            if(!$last_id = $m->get($mkey)){
+                $last_id = 0;
+            }
             $lottery_type = $plan->lottery_type;
-            p($lottery_type);
+            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'id', $last_id]];
+            $plan_mkey = 'plan_id_mkey_'.$plan->id;
+            if(!$codesStrs = $m->get($plan_mkey)){
+                $codesStrs = BetService::getPlansAllCodesType1($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+                $m->set($plan_mkey, $codesStrs, 5 * 60);
+            }
+            $count = count(explode('@', $codesStrs));
+            $bet_money = $count * $plan->single;
+            $zjBouns = 9950 * $plan->single;
+
+            $SscKjDatas = SscKjData::find()->where($where)->limit(50)->all();
+            foreach ($SscKjDatas as $SscKjData){
+                $qihao = $SscKjData->qihao;
+                # static_profits 表
+                $where = ['AND', ['=', 'plan_id', $plan->id], ['=', 'qihao', $SscKjData->qihao], ['=', 'lottery_type', $lottery_type]];
+                if($StaticProfits = StaticProfits::find()->where($where)->all()){
+                    continue;
+                }
+
+                $kjCode = substr($SscKjData->code_str, 0, 7);
+                if(strpos($codesStrs, $kjCode) !== false){
+                    $flag = true;
+                    # 中奖
+                    $profits = $zjBouns - $bet_money;# 中奖金额 - 投注金额
+                }else{
+                    $flag = false;
+                    $profits = 0 - $bet_money;# 中奖金额 - 投注金额
+                }
+
+                $StaticProfits = new StaticProfits();
+                $cut_profits = $profits + NumService::getCutProfits($qihao, $plan->id, $lottery_type); # 截至当前期利润
+                $setDatas = [
+                    'plan_id' => $plan->id,
+                    'uid' => $plan->uid,
+                    'playway' => $plan->playway,
+                    'qihao' => $qihao,
+                    'tz_money' => $bet_money,
+                    'profits' => $profits,
+                    'zj_bouns' => $zjBouns,
+                    'lottery_type' => $lottery_type,
+                    'cut_profits' => $cut_profits,
+                    'tz_time' => (string)$time,
+                    'created_at' => $time,
+                    'updated_at' => $time,
+                ];
+                $StaticProfits->setAttributes($setDatas);
+                $r = $StaticProfits->save();
+                if(!$r){
+                    p($StaticProfits->getErrors());
+                }
+                $rst['data'][$qihao]['rst'] = $r;
+                $rst['data'][$qihao]['profits'] = $profits;
+                $rst['data'][$qihao]['bet_money'] = $bet_money;
+                $rst['data'][$qihao]['kj_codes'] = $kjCode;
+                $rst['data'][$qihao]['cut_profits'] = $cut_profits;
+                $rst['data'][$qihao]['codesStrs'] = $codesStrs;
+                $rst['data'][$qihao]['flag'] = (int)$flag;
+
+                //p(['flag'=>(int)$flag, 'kjCode'=>$kjCode, 'profits'=>$profits, 'codesArr'=>$codesStrs,  /*$SscKjData->attributes*/]);
+            }
         }
-        //p($plans);
+        p($rst);
 
         return $rst;
+    }
+
+    /**
+     * @desc 获取截止上一期的利润
+     * @param $qihao
+     * @param $plan_id
+     * @param int $lottery_type
+     * @return float
+     */
+    public static function getCutProfits($qihao, $plan_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $profits = 0.00;
+
+        $where = ['AND', ['<', 'qihao', $qihao], ['=', 'plan_id', $plan_id], ['=', 'lottery_type', $lottery_type]];
+        $StaticProfits = StaticProfits::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+        if($StaticProfits){
+            $profits = $StaticProfits->cut_profits;
+        }
+
+        return $profits;
     }
 }
