@@ -133,7 +133,7 @@ class IndexController extends Controller
         $url = "http://120.77.157.40/test/index/test-bet";
         //声明伪造head请求头
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header = []);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
         $page_content = curl_exec($ch); curl_close($ch);
         echo $page_content;
@@ -166,13 +166,14 @@ class IndexController extends Controller
         $single = $post['single'] ? $post['single'] : 0.1;
         $lottery_type = $post['lottery_type'] ? $post['lottery_type'] : 5;
 
-        //$rst = HN0898Service::postBet($uid = 2, $playway, $single, $codes, $lottery_type);
+        $rst = HN0898Service::postBet($uid = 2, $playway, $single, $codes, $lottery_type);
 
         return $rst;
     }
 
     public function actionDw(){
         $rst = NumService::staticPlansProfits();p($rst);
+        $rst = SscDataService::update3NumYL($lottery_type = 6);p($rst);
 
         $domain = 'f2.ww835566.xyz';
         // ping域名
@@ -362,7 +363,6 @@ class IndexController extends Controller
         $codesArr = NumService::getNotLatelyCodes(['lately_start'=>0, 'lately_end'=>400]);p($codesArr);
         $rst = SscDataService::calulateBeforeProfits();p($rst); # 统计前面多少期号码的中奖利润
         $msg = KjDataGet::insertKjData('2019092548', $lottery_type = 6, $kjData = '3,9,9,7,1');p($msg);
-        $rst = SscDataService::update3NumYL($lottery_type = 6);$end_time = time(true); $time_consume = ($end_time-$start_time).'s';p([$rst,$time_consume]);
         $rst[] = StaticService::static4dPerDateProfits($lottery_type = 5);p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst = StaticService::staticSDPerDateProfits(date('Y-m-d'));p($rst);
         $rst = NumService::getCodesKuaiXuan(['type_4'=>0, 'type_2'=>1, 'type_4d'=>1]);p($rst);

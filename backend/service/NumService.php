@@ -1978,12 +1978,14 @@ class NumService extends BaseService {
      * @desc 按计划id做利润数据统计
      * @return array
      */
-    public static function staticPlansProfits(){
+    public static function staticPlansProfits($limit = 500){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
+
+        $m = \Yii::$app->cache;
+        $pkey = 'mkey_staticPlansProfits';
         $where = ['OR', ['AND', ['=', 'account', 'admin'], ['=', 'status', 1]], ['=', 'id', 981]];
         $plans = UserSysPlans::find()->where($where)->all();
 
-        $m = \Yii::$app->cache;
         $time = time();
         foreach ($plans as $plan){
             $mkey = 'staticPlansProfits_plan_'.$plan->id;
@@ -1991,7 +1993,12 @@ class NumService extends BaseService {
                 $last_id = 0;
             }
             $lottery_type = $plan->lottery_type;
-            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'id', $last_id]];
+            $where = ['AND', ['=', 'lottery_type', $lottery_type]];
+            if($last_qihao = $m->get($pkey)){
+                $where = array_merge($where, [['>', 'qihao', $last_qihao]]);
+            }else{
+                $where = array_merge($where, [['>', 'id', $last_id]]);
+            }
             $plan_mkey = 'plan_id_mkey_'.$plan->id;
             if(!$codesStrs = $m->get($plan_mkey)){
                 $codesStrs = BetService::getPlansAllCodesType1($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
@@ -1999,9 +2006,8 @@ class NumService extends BaseService {
             }
             $count = count(explode('@', $codesStrs));
             $bet_money = $count * $plan->single;
-            $zjBouns = 9950 * $plan->single;
 
-            $SscKjDatas = SscKjData::find()->where($where)->limit(50)->all();
+            $SscKjDatas = SscKjData::find()->where($where)->limit($limit)->all();
             foreach ($SscKjDatas as $SscKjData){
                 $qihao = $SscKjData->qihao;
                 # static_profits 表
@@ -2014,10 +2020,12 @@ class NumService extends BaseService {
                 if(strpos($codesStrs, $kjCode) !== false){
                     $flag = true;
                     # 中奖
+                    $zjBouns = 9950 * $plan->single;
                     $profits = $zjBouns - $bet_money;# 中奖金额 - 投注金额
                 }else{
                     $flag = false;
-                    $profits = 0 - $bet_money;# 中奖金额 - 投注金额
+                    $zjBouns = 0;
+                    $profits = $zjBouns - $bet_money;# 中奖金额 - 投注金额
                 }
 
                 $StaticProfits = new StaticProfits();
@@ -2046,8 +2054,9 @@ class NumService extends BaseService {
                 $rst['data'][$qihao]['bet_money'] = $bet_money;
                 $rst['data'][$qihao]['kj_codes'] = $kjCode;
                 $rst['data'][$qihao]['cut_profits'] = $cut_profits;
-                $rst['data'][$qihao]['codesStrs'] = $codesStrs;
+                //$rst['data'][$qihao]['codesStrs'] = $codesStrs;
                 $rst['data'][$qihao]['flag'] = (int)$flag;
+                $m->set($pkey, $qihao, 3600);
 
                 //p(['flag'=>(int)$flag, 'kjCode'=>$kjCode, 'profits'=>$profits, 'codesArr'=>$codesStrs,  /*$SscKjData->attributes*/]);
             }

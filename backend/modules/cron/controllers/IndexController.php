@@ -19,6 +19,7 @@ use backend\service\KuaiLe8Service;
 use backend\service\Lucky5\LuckyBaseService;
 use backend\service\McKeyService;
 use backend\service\NineNine\NineNineBaseService;
+use backend\service\NumService;
 use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
 use backend\service\SscDataService;
@@ -147,6 +148,7 @@ class IndexController extends Controller
         self::_init();
         set_time_limit(0);
         for ($i = 0; $i<10; $i++){
+            $rst = NumService::staticPlansProfits();
             $rst = KjDataGet::updateNullCode();
             /*
             $lottery_types = StaticService::getLotteryTypes();
