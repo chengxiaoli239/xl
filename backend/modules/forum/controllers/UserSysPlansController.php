@@ -165,7 +165,7 @@ class UserSysPlansController extends BaseController
         }
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
         $model->tz_sites = explode(',', $model->tz_sites);
-        if(in_array($model->tz_type, [20, 22])){ # 和值、四定单双
+        if(in_array($model->tz_type, [22])){ # 和值、四定单双
             $model->hz_Arr = explode(',', $model->hz_Arr);
         }elseif (in_array($model->tz_type, [28])){
             if($model->hz_Arr){
@@ -177,7 +177,7 @@ class UserSysPlansController extends BaseController
         }elseif (in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
             $codes = ImportPlanCodes::findOne(['uid'=>$this->_user_id, 'plan_id'=>$model])->codes;
             $model->import_codes_txt = str_replace('@', ' ', str_replace(',', '', $codes));
-        }elseif (in_array($model->tz_type, [25, 29, 30, 31, 32, 33])){
+        }elseif (in_array($model->tz_type, [20, 25, 29, 30, 31, 32, 33])){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
             foreach ($hz_Arr_Data as $key=>$val){
                 if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'p5', 'status_val', 'code1', 'code2', 'arise', 'type_4d', 'type_4s', 'hefen', 'no_fix_hefen', 'arise_in', 'xhenfen','singles_key'])){

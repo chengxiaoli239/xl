@@ -425,7 +425,7 @@ class UserSysPlansService extends BaseService {
             $post['UserSysPlans']['hz_Arr'] && $post['UserSysPlans']['hz_Arr'] = trim($hz_Arr);
         }
 
-        if(!in_array($tz_type, [20, 23]) && in_array($plan_type, [2,3,4,5])){ # 翻倍计划
+        if(!in_array($tz_type, [23]) && in_array($plan_type, [2,3,4,5])){ # 翻倍计划
             if($id && $plan = UserSysPlans::findOne($id)){
                 $tmpHzArr = json_decode($plan->hz_Arr, true);
                 $singles_key = (isset($tmpHzArr['singles_key'])) ? $tmpHzArr['singles_key'] : 0;

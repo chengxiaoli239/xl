@@ -1982,7 +1982,7 @@ class NumService extends BaseService {
         $rst = ['status'=>200, 'msg'=>'操作成功'];
 
         $m = \Yii::$app->cache;
-        $where = ['OR', ['AND', ['=', 'account', 'admin'], ['=', 'status', 1]], ['=', 'id', 981]];
+        $where = ['OR', ['AND', ['=', 'account', 'admin'], ['=', 'status', 1]], ['=', 'id', 981], ['=', 'id', '0']];
         $plans = UserSysPlans::find()->where($where)->all();
 
         $time = time();
