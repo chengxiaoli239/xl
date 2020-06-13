@@ -2061,7 +2061,7 @@ class NumService extends BaseService {
                 //p(['flag'=>(int)$flag, 'kjCode'=>$kjCode, 'profits'=>$profits, 'codesArr'=>$codesStrs,  /*$SscKjData->attributes*/]);
             }
         }
-        p($rst);
+        Tool_Common::log('staticPlansProfits', 'INFO', '数据统计', $rst);
 
         return $rst;
     }
