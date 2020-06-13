@@ -11,6 +11,7 @@ use Yii;
  * @property int $plan_id 计划id
  * @property int $uid 用户id,默认为系统
  * @property string $qihao 期号
+ * @property string $kj_code 开奖号码
  * @property int $playway 投注类型
  * @property string $tz_money 系统类型id，lt_tz_systems.id
  * @property string $profits 当期利润
@@ -43,7 +44,7 @@ class StaticProfits extends \common\models\base\BaseModel
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['qihao'], 'string', 'max' => 64],
-            [['tz_time'], 'string', 'max' => 20],
+            [['kj_code', 'tz_time'], 'string', 'max' => 20],
         ];
     }
 
@@ -57,6 +58,7 @@ class StaticProfits extends \common\models\base\BaseModel
             'plan_id' => Yii::t('app', '计划id'),
             'uid' => Yii::t('app', '用户id,默认为系统'),
             'qihao' => Yii::t('app', '期号'),
+            'kj_code' => Yii::t('app', '开奖号码'),
             'playway' => Yii::t('app', '投注类型'),
             'tz_money' => Yii::t('app', '系统类型id，lt_tz_systems.id'),
             'profits' => Yii::t('app', '当期利润'),
