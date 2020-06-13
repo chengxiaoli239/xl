@@ -1978,7 +1978,7 @@ class NumService extends BaseService {
      * @desc 按计划id做利润数据统计
      * @return array
      */
-    public static function staticPlansProfits($limit = 500){
+    public static function staticPlansProfits($limit = 1000){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
 
         $m = \Yii::$app->cache;
