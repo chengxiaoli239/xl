@@ -2041,6 +2041,7 @@ class NumService extends BaseService {
                     'uid' => $plan->uid,
                     'playway' => $plan->playway,
                     'qihao' => $qihao,
+                    'kj_code' => $SscKjData->code_str,
                     'tz_money' => $bet_money,
                     'profits' => $profits,
                     'zj_bouns' => $zjBouns,
