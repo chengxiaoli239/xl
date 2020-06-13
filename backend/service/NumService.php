@@ -1982,7 +1982,6 @@ class NumService extends BaseService {
         $rst = ['status'=>200, 'msg'=>'操作成功'];
 
         $m = \Yii::$app->cache;
-        $pkey = 'mkey_staticPlansProfits';
         $where = ['OR', ['AND', ['=', 'account', 'admin'], ['=', 'status', 1]], ['=', 'id', 981]];
         $plans = UserSysPlans::find()->where($where)->all();
 
@@ -1994,7 +1993,8 @@ class NumService extends BaseService {
             }
             $lottery_type = $plan->lottery_type;
             $where = ['AND', ['=', 'lottery_type', $lottery_type]];
-            if($last_qihao = $m->get($pkey)){
+            $last_qihao = NumService::getLastStaticProfitsQihao($lottery_type, $plan->id);
+            if($last_qihao){
                 $where = array_merge($where, [['>', 'qihao', $last_qihao]]);
             }else{
                 $where = array_merge($where, [['>', 'id', $last_id]]);
@@ -2010,6 +2010,12 @@ class NumService extends BaseService {
             $SscKjDatas = SscKjData::find()->where($where)->limit($limit)->all();
             foreach ($SscKjDatas as $SscKjData){
                 $qihao = $SscKjData->qihao;
+                # 存在记录则 continue
+                $where = ['AND', ['=', 'qihao', $qihao], ['=', 'plan_id', $plan->id]];
+                if($StaticProfits = StaticProfits::find()->where($where)->one()){
+                    continue;
+                }
+
                 # static_profits 表
                 $where = ['AND', ['=', 'plan_id', $plan->id], ['=', 'qihao', $SscKjData->qihao], ['=', 'lottery_type', $lottery_type]];
                 if($StaticProfits = StaticProfits::find()->where($where)->all()){
@@ -2056,7 +2062,6 @@ class NumService extends BaseService {
                 $rst['data'][$qihao]['cut_profits'] = $cut_profits;
                 //$rst['data'][$qihao]['codesStrs'] = $codesStrs;
                 $rst['data'][$qihao]['flag'] = (int)$flag;
-                $m->set($pkey, $qihao, 3600);
 
                 //p(['flag'=>(int)$flag, 'kjCode'=>$kjCode, 'profits'=>$profits, 'codesArr'=>$codesStrs,  /*$SscKjData->attributes*/]);
             }
@@ -2064,6 +2069,36 @@ class NumService extends BaseService {
         Tool_Common::log('staticPlansProfits', 'INFO', '数据统计', $rst);
 
         return $rst;
+    }
+
+    /**
+     * @desc 获取最后统计的期号
+     * @param $lottery_type
+     * @return mixed
+     */
+    public static function getLastStaticProfitsQihao($lottery_type, $plan_id = ''){
+
+        $where = ['AND', ['=', 'plan_id', $plan_id], ['=', 'lottery_type', $lottery_type]];
+        $StaticProfits = StaticProfits::find()->where($where)->orderBy(['qihao'=>SORT_DESC])->one();
+        $last_qihao = $StaticProfits->qihao;
+        if(!$last_qihao){
+            $last_qihao = '';
+        }
+        //$m = \Yii::$app->cache;
+        //$pkey = NumService::buildLastStaticProfitsKey($plan_id, $lottery_type);
+        //$m->set($pkey, $last_qihao, 3600);
+
+        return $last_qihao;
+    }
+
+    /**
+     * @desc 返回统计期号key
+     * @return string
+     */
+    public static function buildLastStaticProfitsKey($plan_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $pkey = 'mkey_staticPlansProfits_0_'.$plan_id.'_'.$lottery_type;
+
+        return $pkey;
     }
 
     /**
