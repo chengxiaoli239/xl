@@ -176,8 +176,12 @@ class CaptchaCodeService{
      * @param $pass
      * @return mixed
      */
-    public static function chaojiying($file, $codetype = '1902'){
+    public static function chaojiying($file='', $codetype = '1902'){
         $url = 'http://upload.chaojiying.net/Upload/Processing.php' ;
+        if(empty($file)){
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCaptchaCode','INFO','验证码接口-超级鹰-错误', ['msg'=>'file文件为空']);
+            return ['status'=>300, 'msg'=>'file文件为空'];
+        }
 
         $fp = fopen($file, 'rb', 0);
         $v_pic = base64_encode(fread($fp,filesize($file)));
