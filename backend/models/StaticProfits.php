@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property int $plan_id 计划id
+ * @property string $static_time 统计时间
  * @property int $uid 用户id,默认为系统
  * @property string $qihao 期号
  * @property string $kj_code 开奖号码
@@ -43,8 +44,8 @@ class StaticProfits extends \common\models\base\BaseModel
             [['tz_money', 'profits', 'zj_bouns', 'cut_profits'], 'number'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
+            [['static_time', 'kj_code', 'tz_time'], 'string', 'max' => 20],
             [['qihao'], 'string', 'max' => 64],
-            [['kj_code', 'tz_time'], 'string', 'max' => 20],
         ];
     }
 
@@ -56,6 +57,7 @@ class StaticProfits extends \common\models\base\BaseModel
         return [
             'id' => Yii::t('app', 'ID'),
             'plan_id' => Yii::t('app', '计划id'),
+            'static_time' => Yii::t('app', '统计时间'),
             'uid' => Yii::t('app', '用户id,默认为系统'),
             'qihao' => Yii::t('app', '期号'),
             'kj_code' => Yii::t('app', '开奖号码'),
