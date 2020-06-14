@@ -1992,7 +1992,7 @@ class NumService extends BaseService {
                 $last_id = 0;
             }
             $lottery_type = $plan->lottery_type;
-            $where = ['AND', ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>=', 'date', '2019-06-01']];
             $last_qihao = NumService::getLastStaticProfitsQihao($lottery_type, $plan->id);
             if($last_qihao){
                 $where = array_merge($where, [['>', 'qihao', $last_qihao]]);
