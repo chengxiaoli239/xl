@@ -2018,7 +2018,7 @@ class NumService extends BaseService {
 
                 # static_profits 表
                 $where = ['AND', ['=', 'plan_id', $plan->id], ['=', 'qihao', $SscKjData->qihao], ['=', 'lottery_type', $lottery_type]];
-                if($StaticProfits = StaticProfits::find()->where($where)->all()){
+                if($StaticProfits = StaticProfits::find()->where($where)->one()){
                     continue;
                 }
 

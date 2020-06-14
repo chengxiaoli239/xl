@@ -45,7 +45,7 @@ class Lucky5 extends BaseKj {
                 $content = LuckyBaseService::getCurl($url, $headers, $TzSystemsUsers->uid);
                 //$data = json_decode($content,320);
                 $data = $content;
-                if($data['Status'] == 1){
+                if(isset($data['Status']) && $data['Status'] == 1){
 
                 }
 

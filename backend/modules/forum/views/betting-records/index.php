@@ -35,6 +35,10 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
+                    'pager' => [
+                        'firstPageLabel' => '首页',
+                        'lastPageLabel' => '尾页',
+                    ],
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
