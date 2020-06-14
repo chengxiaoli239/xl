@@ -2046,7 +2046,7 @@ class NumService extends BaseService {
                     'profits' => $profits,
                     'zj_bouns' => $zjBouns,
                     'lottery_type' => $lottery_type,
-                    'cut_profits' => $cut_profits,
+                    'cut_profits' => substr($SscKjData->date,8) == '01' ? $profits : $cut_profits,
                     'tz_time' => (string)$time,
                     'created_at' => $time,
                     'updated_at' => $time,
