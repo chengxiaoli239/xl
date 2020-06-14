@@ -22,6 +22,7 @@ use backend\models\SscSdHzVal;
 use backend\models\SscSdHzYl;
 use backend\models\SscStaticVal;
 use backend\models\SscStaticYl;
+use backend\models\StaticProfits;
 use backend\models\SystemConfig;
 use backend\models\ThreeNum;
 use backend\models\UserSysPlans;
@@ -2809,6 +2810,48 @@ class SscDataService extends BaseService {
         return $nextSingle;
     }
 
+    /**
+     * @description 某个计划利润统计
+     * @param int $hezhi
+     * @param $periodsArr
+     * @param $positions
+     * @param int $interval
+     * @return mixed
+     */
+    public static function getPlanChartsData($plan_id = 981, $periodsArr, $positions, $interval = 100){
+        $data['xAxis'] = [ 'data'=>[] ];    // 期号
+        $series = [];
+        $times = [6=>0.07, 7=>0.08, 8=>0.09, 9=>0.10, 10=>0.09, 11=>0.08, 12=>0.07];
+
+        foreach ($periodsArr as $periods){
+            $where = ['plan_id'=>$plan_id, 'static_time'=>$periods];
+            $fields = ['id', 'plan_id','static_time', 'qihao', 'cut_profits'];
+            $datas = StaticProfits::find()->select($fields)->where($where)->limit($interval)->orderBy('qihao DESC')->all();
+            $tmpData = [];
+            $tmpData['name'] = $periods.'月';
+            $tmpData['type'] = 'line';
+            $tmpData['stack'] = '次数';
+            $tmpData['smooth'] = true;
+            $numsData = [];
+            $datas = array_reverse($datas);
+            foreach ($datas as $key=>$d){
+                if($key == 0){
+                    $dif_cut_profits = 0 - $d->cut_profits;
+                }
+                //!in_array($d->qihao, $data['xAxis']['data']) && $data['xAxis']['data'][] = $d->qihao;
+                !in_array($key, $data['xAxis']['data']) && $data['xAxis']['data'][] = $key;
+                //$numsData[] = $d->cut_profits - ceil($periods * $times[$plan_id]);
+                $numsData[] = [$key, $d->cut_profits + $dif_cut_profits];
+            }
+            $tmpData['data'] = $numsData;
+            $series[] = $tmpData;
+            $data['series'] = $series;
+            unset($tmpData);
+        }
+        //p($data);
+        //$data['xAxis']['data'] = array_reverse($data['xAxis']['data']);
+        return $data;
+    }
 
 
 
