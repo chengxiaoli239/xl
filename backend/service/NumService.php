@@ -2039,6 +2039,7 @@ class NumService extends BaseService {
                 $setDatas = [
                     'plan_id' => $plan->id,
                     'uid' => $plan->uid,
+                    'static_time' => substr($SscKjData->date,0,8),
                     'playway' => $plan->playway,
                     'qihao' => $qihao,
                     'kj_code' => $SscKjData->code_str,
