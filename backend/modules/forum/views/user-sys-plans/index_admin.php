@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'playway',
                         ['attribute' => 'playway','headerOptions'=>['width'=>'5%'],'label'=>'投注类型',
                             'value' => function($model) {
-                                $playway_Arr = [1=>'二字定', 2=>'三字定', 3=>'四字定', 6=>'三字现'];
+                                $playway_Arr = [1=>'二字定', 2=>'三字定', 3=>'四字定', 4=>'一字定', 6=>'三字现'];
                                 return $playway_Arr[$model->playway];
                             }
                         ],
@@ -58,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     //投注类型:1大小单双三字定2大小三字定3单双三字定
                                     $tz_type_Arr = [1=>'大小单双三字定', 2=>'大小三字定', 3=>'单双三字定'];
                                     $typeName = $tz_type_Arr[$model->tz_type];
-                                }elseif(in_array($model->playway, [1,2,3]) OR in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
+                                }elseif(in_array($model->playway, [1,2,3,4]) OR in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                     $typeName = \backend\service\BetService::getTypeNameByTzType($model->tz_type);
                                 }
                                 return $typeName;
