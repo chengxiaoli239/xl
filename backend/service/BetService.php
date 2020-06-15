@@ -678,7 +678,6 @@ abstract class BetService extends BaseBetService {
                $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid); # 直接记录表
            }else{ # 正式下注
                # 1、首先判断是否登录，否则登录之后再下注
-               /*
                if(!$flag = self::isLogin($plan->uid, $tz_system_id)){
                    if(!$TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id, 'status'=>1])){
                        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['uid'=>$plan->uid,'account'=>$plan->account, 'msg'=>'账号已被禁用不能下注']);
@@ -688,7 +687,6 @@ abstract class BetService extends BaseBetService {
                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['loginRst'=>$loginRst]);
                    if($loginRst['status'] != 200 OR $loginRst['balance']<0.01) continue;
                }
-               */
 
                $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'tz_sites'=>$tz_sites];
                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId','INFO','投注记录tzByPlanId', $logArr);
@@ -1140,7 +1138,12 @@ abstract class BetService extends BaseBetService {
      */
     public static function _logRecordsByPlandId($plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test = 0, $sn='888888', $snid='888888id'){
         $UserSysPlans = UserSysPlans::findOne($plan_id);
-        $totalmoney = count(explode('@', $codes)) * $UserSysPlans->single;
+        if($UserSysPlans->tz_type == 18){
+            $count = strlen(str_replace(',', '', $codes));
+        }else{
+            $count = count(explode('@', $codes));
+        }
+        $totalmoney = $count * $UserSysPlans->single;
         $insertData = [
             'playway'=> $UserSysPlans->playway,  // 投注方式
             'tz_type'=> $UserSysPlans->tz_type,  // 投注类型
