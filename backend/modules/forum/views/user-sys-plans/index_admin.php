@@ -80,8 +80,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $txt = $buy_type_Arr[$model->buy_type];
                                 $url0 = "/forum/user-sys-plans/switch-buy-type?id=".$model->id.'&status=1'; # 切换正买
                                 $url1 = "/forum/user-sys-plans/switch-buy-type?id=".$model->id.'&status=0'; # 切换反买
-                                if($model->playway == 3){
-                                    return Html::a($txt, '#', ['title' => '正买']);
+                                if(!in_array($model->tz_type, \Yii::$app->params['can_change_buy_type'])){
+                                    //return Html::a($txt, '#', ['title' => '正买']);
+                                    return '';
                                 }
                                 if($model->buy_type == 1){
                                     $txt = "<font color='green'>$txt</font>" ;
