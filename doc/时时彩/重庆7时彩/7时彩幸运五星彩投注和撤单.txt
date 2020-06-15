@@ -454,7 +454,32 @@ _: 1586275845210
 {"Status":1,"Data":{"period_no":20200408001,"open_datetime":"2020-04-08 00:10:50","close_datetime":"2020-04-08 00:29:30","status":0,"enable_status":1,"next_period_no":20200408002,"next_open_datetime":"2020-04-08 00:30:50","next_close_datetime":"2020-04-08 00:49:30","next_period_status":4,"next_period_enable_status":1,"last_seconds":803.0,"system_now_diff":1.0,"system_db_now":"2020-04-08 00:16:07","real_period_no":20200408001}}
 
 
+# 一字定
+1、Genenral
+Request URL: http://f4.ww835566.xyz/Member/BatchBet
+Request Method: POST
+Status Code: 200 OK
+Remote Address: 47.90.125.174:80
+Referrer Policy: no-referrer-when-downgrade
 
+2、Requerst Header
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Content-Length: 938
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Cookie: __cfduid=db36139c2c5777842cedc0e48267554a81590861904; robot7=6d+t4AKsjgIUxeE3euVnVSXiWuU812PKRHOmOSbKM0eTwuRMll72YDhiE6492eu7K+HuvHqFPUw3+G7yP2zgvA==; SevenStarHFDirector31Frontend31=qgtm5jfm431s05hck3tgtrrk; Akamai_Cookie=2802846218.15221.0000; robot3=2cTqu+iDla1wSP0/c5jyTZRXJzt8kG34EqRbb2MvWLg=; NOTICE_LOGIN_IN=1
+Host: f4.ww835566.xyz
+Origin: http://f4.ww835566.xyz
+Referer: http://f4.ww835566.xyz/App/Index?_=1592225999342
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36
+X-Requested-With: XMLHttpRequest
+
+3、Form Data
+bets: [{"dict_no_type_id":"19","bet_no":"2XXXX","bet_money":"0.1"},{"dict_no_type_id":"19","bet_no":"4XXXX","bet_money":"0.1"},{"dict_no_type_id":"19","bet_no":"6XXXX","bet_money":"0.1"},{"dict_no_type_id":"20","bet_no":"X5XXX","bet_money":"0.1"},{"dict_no_type_id":"21","bet_no":"XX5XX","bet_money":"0.1"},{"dict_no_type_id":"22","bet_no":"XXX3X","bet_money":"0.1"},{"dict_no_type_id":"22","bet_no":"XXX7X","bet_money":"0.1"},{"dict_no_type_id":"23","bet_no":"XXXX3","bet_money":"0.1"},{"dict_no_type_id":"23","bet_no":"XXXX6","bet_money":"0.1"}]
+way: 109
+period_no: 20200615253
 
 
 

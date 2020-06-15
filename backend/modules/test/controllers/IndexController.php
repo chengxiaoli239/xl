@@ -172,6 +172,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = KjDataGet::insertKjData('20200615000', 8, '5,7,0,3,3');p($rst);
+        $codes_hz = '{"p1":"123","p2":"345","p3":"569","p4":"6589","p5":"1234"}';
+        $codesArr = NumService::getOneFixedCode(json_decode($codes_hz, true));p($codesArr);
         $rst = NumService::staticPlansProfits();p($rst);
         $rst = SscDataService::update3NumYL($lottery_type = 6);p($rst);
 
@@ -229,7 +232,6 @@ class IndexController extends Controller
         $rst = ChatCommonBetService::upOrDownBalance($desc);p($rst);
         $rst = ChatCommonBetService::betByDesc($token='e221d63e7d00', $desc = '千123456789百123456789十123456789个123456789各0.1');p($rst);
         $rst = SscDataService::insertCodeType();p($rst);
-        $rst = KjDataGet::insertKjData('20200403004', 8, '5,7,0,3,3');p($rst);
         $rst = JuHuaBaseService::getBetCodes(['2123', '3457', '7892', '3029', '3X09', '3424'], $single = 0.1, $playway=3); p($rst); # 同步余额
         $rst = JuHuaBaseService::getBetCodes(['X123', 'X457', 'X892', '30X9', '3X09', '34X4'], $single = 0.1, $playway=2); p($rst); # 同步余额
         $rst = JuHuaBaseService::synBalance(21); p($rst); # 同步余额

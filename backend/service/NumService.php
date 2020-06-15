@@ -1897,6 +1897,26 @@ class NumService extends BaseService {
     }
 
     /**
+     * @desc 获取一定号码
+     * @param $codes_hz ['p1'=>'123', 'p2'=>'234', 'p3'=>'3267', 'p4'=>'5678', 'p5'=>'8095']
+     * @return array
+     */
+    public static function getOneFixedCode($codes_hz){
+        $codeArr = [];
+        //$str = implode(',', $codes_hz);
+        $poss = ['p1', 'p2', 'p3', 'p4', 'p5'];
+        foreach ($poss as $pos){
+            if(!isset($codes_hz[$pos]) OR empty($codes_hz[$pos])){
+                $codeArr[$pos] = '';
+            }else{
+                $codeArr[$pos] = $codes_hz[$pos];
+            }
+        }
+
+        return [implode(',', $codeArr)];
+    }
+
+    /**
      * @desc 例如:23456头尾各1
      * @param $codes_desc
      * @param array $data

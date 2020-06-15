@@ -50,6 +50,7 @@ abstract class BetService extends BaseBetService {
      * @return HN0898Service|KuaiLe8Service|SevenService|XlService
      */
     public static function getBetObj($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        //p([$uid, $tz_system_id, $lottery_type]);
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网
             if($lottery_type == 5){ # 0898体系重庆
@@ -346,6 +347,9 @@ abstract class BetService extends BaseBetService {
 
         switch ($playway){
             case 4: # 一字定
+                // {"p1":"123","p2":"345","p3":"569","p4":"6589","p5":"1234"}
+                $codesArr = NumService::getOneFixedCode(json_decode($codes_hz, true));
+                break;
             case 10: # 一字定
                 $codesArr = explode('@', $codes_hz);
                 break;
@@ -674,6 +678,7 @@ abstract class BetService extends BaseBetService {
                $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid); # 直接记录表
            }else{ # 正式下注
                # 1、首先判断是否登录，否则登录之后再下注
+               /*
                if(!$flag = self::isLogin($plan->uid, $tz_system_id)){
                    if(!$TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id, 'status'=>1])){
                        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['uid'=>$plan->uid,'account'=>$plan->account, 'msg'=>'账号已被禁用不能下注']);
@@ -683,6 +688,7 @@ abstract class BetService extends BaseBetService {
                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['loginRst'=>$loginRst]);
                    if($loginRst['status'] != 200 OR $loginRst['balance']<0.01) continue;
                }
+               */
 
                $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'tz_sites'=>$tz_sites];
                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId','INFO','投注记录tzByPlanId', $logArr);

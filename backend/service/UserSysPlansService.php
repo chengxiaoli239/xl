@@ -50,6 +50,33 @@ class UserSysPlansService extends BaseService {
         //p($post['UserSysPlans']['hz_Arr']);
         if($playway == 6) {
             $post['UserSysPlans']['hz_Arr'] = str_replace('，', ',', $post['UserSysPlans']['hz_Arr']);
+        }elseif (in_array($tz_type, [18])){ # 一定
+            # 10、第1位
+            $UserSysPlans = $post['UserSysPlans'];
+            if(isset($UserSysPlans['p1']) && $UserSysPlans['p1']){
+                $tmpFilter['p1'] = (string)trim($UserSysPlans['p1']);
+            }
+            unset($post['UserSysPlans']['p1']);
+            # 11、第2位
+            if(isset($UserSysPlans['p2']) && $UserSysPlans['p2']){
+                $tmpFilter['p2'] = (string)trim($UserSysPlans['p2']);
+            }
+            unset($post['UserSysPlans']['p2']);
+            # 12、第3位
+            if(isset($UserSysPlans['p3']) && $UserSysPlans['p3']){
+                $tmpFilter['p3'] = (string)trim($UserSysPlans['p3']);
+            }
+            unset($post['UserSysPlans']['p3']);
+            # 13、第4位
+            if(isset($UserSysPlans['p4']) && $UserSysPlans['p4']){
+                $tmpFilter['p4'] = (string)trim($UserSysPlans['p4']);
+            }
+            unset($post['UserSysPlans']['p4']);
+            # 14、第5位
+            if(isset($UserSysPlans['p5']) && $UserSysPlans['p5']){
+                $tmpFilter['p5'] = trim($UserSysPlans['p5']);
+            }
+            unset($post['UserSysPlans']['p5']);
         }elseif (in_array($tz_type, [29, 32])){ # 三定-快选 、三定快译切换
             # 三定-快选过滤
             $UserSysPlans = $post['UserSysPlans'];
@@ -208,7 +235,7 @@ class UserSysPlansService extends BaseService {
             if(isset($UserSysPlans['p5']) && $UserSysPlans['p5']){
                 $tmpFilter['p5'] = trim($UserSysPlans['p5']);
             }
-            unset($post['UserSysPlans']['p4']);
+            unset($post['UserSysPlans']['p5']);
             # 15、对数
             if($UserSysPlans['type_log'] && count($UserSysPlans['type_log']) == 1){
                 $tmpFilter['type_log'] = $UserSysPlans['type_log'][0];

@@ -222,6 +222,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             30 => 102,
             31 => 102,
             33 => 102,
+            18 => 109,
         ];
 
         if(isset($rstData[$tz_type])) return $rstData[$tz_type];
@@ -375,7 +376,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 $dict_no_type_id = self::getdict_no_type_id($code, $playway);
                 $codes[] = ['dict_no_type_id'=>$dict_no_type_id, 'bet_no'=>$code, 'bet_money'=>$single];
             }
-        }elseif ($playway == 3){
+        }elseif ($playway == 3){ # 四定
             $tmpCodes = explode('@', $orgin_codesData);
             $codesArr = [];
             foreach ($tmpCodes as $tmpCode){
@@ -387,7 +388,31 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $codesArr_tmp1 = implode('@', $codesArr);
             $codesArr_tmp2 = str_replace(',', '', $codesArr_tmp1);
             $codes = explode('@', $codesArr_tmp2);
-        }elseif ($playway == 2){
+        }elseif ($playway == 4){ # 一定
+            $tmpDatas = explode(',', $codesData);
+            $tmpArr = [];
+            foreach ($tmpDatas as $k=>$tmpData){
+                if(!isset($tmpData) OR empty($tmpData)) continue;
+                $p = $k + 1;
+                $dict_no_type_id = self::getdict_no_type_id_oneFixed($p);
+                $len = strlen($tmpData);
+                for ($i = 0; $i<$len; $i++){
+                    if($p == '1'){
+                        $bet_no = $tmpData[$i].'XXXX';
+                    }elseif ($p == '2'){
+                        $bet_no = 'X'.$tmpData[$i].'XXX';
+                    }elseif ($p == '3'){
+                        $bet_no = 'X'.$tmpData[$i].'XXX';
+                    }elseif ($p == '4'){
+                        $bet_no = 'X'.$tmpData[$i].'XXX';
+                    }elseif ($p == '5'){
+                        $bet_no = 'X'.$tmpData[$i].'XXX';
+                    }
+                    $tmpArr[] = ['dict_no_type_id'=>$dict_no_type_id, 'bet_no'=>$bet_no, 'bet_money'=>$single];
+                }
+            }
+            $codes = $tmpArr;
+        }elseif ($playway == 2){ # 三定
             $codesArr = explode(',', $codesData);
             foreach ($codesArr as $code){
                 $dict_no_type_id = self::getdict_no_type_id($code, $playway);
@@ -440,6 +465,28 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         return $rst;
         //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$rst]);
+    }
+
+    /**
+     * @desc 根据位置获取dict_no_type_id
+     * @param $pos
+     * @return int
+     */
+    public static function getdict_no_type_id_oneFixed($pos){
+        $dict_no_type_id = 19;
+        if($pos == 1){
+            $dict_no_type_id = 19;
+        }elseif ($pos == 2){
+            $dict_no_type_id = 20;
+        }elseif ($pos == 3){
+            $dict_no_type_id = 21;
+        }elseif ($pos == 4){
+            $dict_no_type_id = 22;
+        }elseif ($pos == 5){
+            $dict_no_type_id = 23;
+        }
+
+        return $dict_no_type_id;
     }
 
     /**
@@ -1738,6 +1785,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $plan = UserSysPlans::findOne($plan_id);
         if($plan->tz_type == 22){ # 四定单双,codes格式：13579,13579,02468,13579@13579,13579,02468,02468@13579,02468,13579,13579
             $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway);
+        }elseif($plan->tz_type == 18){
+            $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway);
         }else{
             $tmpCodes = str_replace(',', '', $tmpCodes);
             $codesArr = explode('@', $tmpCodes);
@@ -1747,14 +1796,18 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             if(count($codesArr)>6000) return ['status'=>300, 'msg'=>'号码组数太多不能超过6000组号码'];
         }
 
+        # 组数
+        $count = count($codesArr);
+
         $betNums = self::getBetNumsPer();
         $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
+        //p($codesArrs);
 
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
         $tz_type = $plan->tz_type ? $plan->tz_type : 0;
         $lottery_type = $plan->lottery_type;
-        //p(['playway'=>$playway, 'totalCount'=>count($codes), 'single'=>$single, 'qihao'=>$qihao, 'tz_type'=>$tz_type, 'buy_type'=>$buy_type,'codes'=>$codes]);
+        //p(['playway'=>$playway, 'totalCount'=>count($codes), 'single'=>$single, 'qihao'=>$qihao, 'tz_type'=>$tz_type, 'buy_type'=>$plan->buy_type,'codes'=>$codes]);
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
 
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
@@ -1766,19 +1819,28 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $rst = [];
         foreach ($codesArrs as $key=>$tmpcodesArr){
 
-            $bet_codes = implode(',', $tmpcodesArr);
-            $post_data = [
-                'bet_number'=>$bet_codes,
-                'bet_money'=>$single,
-                'bet_way'=>$way,
-                'is_xian'=>0,
-                'number_type'=>40,
-                //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
-                'bet_log'=>'[四定位]，定位置“[取]”：千=[1]，百=[24]，十=[4]，个=[6]',
-                'is_package' => 0,
-                'period_no'=>$qihao,
-                'operation_condition' => self::getOperationCondition(),
-            ];
+            if($playway == 4){ # 一字定
+                $post_data = [
+                    'bets' => json_encode($tmpcodesArr),
+                    'way' => $way,
+                    'period_no' => $qihao,
+                ];
+
+            }else{ # 四定、三定
+                $bet_codes = implode(',', $tmpcodesArr);
+                $post_data = [
+                    'bet_number'=>$bet_codes,
+                    'bet_money'=>$single,
+                    'bet_way'=>$way,
+                    'is_xian'=>0,
+                    'number_type'=>40,
+                    //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
+                    'bet_log'=>'[四定位]，定位置“[取]”：千=[1]，百=[24]，十=[4]，个=[6]',
+                    'is_package' => 0,
+                    'period_no'=>$qihao,
+                    'operation_condition' => self::getOperationCondition(),
+                ];
+            }
 
             $_t = round(microtime(true) * 1000);
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
@@ -1847,6 +1909,9 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $totalmoney = SscDataService::calTzTotalMoney($codes, $single, $playway);
         }else{
             $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
+        }
+        if($playway == 4 && $tz_type == 18){ # 一字定
+            $totalmoney = $count * $single;
         }
 
         $insertData = [
