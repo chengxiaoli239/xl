@@ -118,15 +118,15 @@ $this->params['breadcrumbs'][] = $this->title;
                                    'filterMode' => 'none',
                                    'xAxisIndex' => [0],
                                    'startValue' => 0,
-                                   'endValue' =>8000
+                                   'endValue' =>$chartsData['range'],
                                ],
                                [
                                    'show' => true,
                                    'type' => 'inside',
                                    'filterMode' => 'none',
                                    'yAxisIndex' => [0],
-                                   'startValue' => -8000,
-                                    'endValue' => 8000,
+                                   'startValue' => 0-$chartsData['range'],
+                                    'endValue' => $chartsData['range'],
                                ]
                            ],
                            'series' => $chartsData['series'],

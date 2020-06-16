@@ -30,6 +30,7 @@ use yii\widgets\ActiveForm;
         <div class="col-lg-3">
             <?= $form->field($model, 'plan_id')->radioList([
                 '981'=>'981',// '981'=>'981',
+                '1029'=>'1029',// '1029'=>'1029',
             ]) ?>
         </div>
         <!--div class="col-lg-3">

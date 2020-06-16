@@ -1998,11 +1998,11 @@ class NumService extends BaseService {
      * @desc 按计划id做利润数据统计
      * @return array
      */
-    public static function staticPlansProfits($limit = 100){
+    public static function staticPlansProfits($limit = 200){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
 
         $m = \Yii::$app->cache;
-        $where = ['OR', ['AND', ['=', 'account', 'admin'], ['=', 'status', 1]], ['=', 'id', 981], ['=', 'id', '1029']];
+        $where = ['OR', ['AND', ['=', 'account', 'admin'], ['=', 'status', 1]], ['=', 'id', '981'], ['=', 'id', '1029']];
         $plans = UserSysPlans::find()->where($where)->all();
 
         $time = time();
