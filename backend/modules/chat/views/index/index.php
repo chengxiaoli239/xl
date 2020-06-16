@@ -21,6 +21,9 @@
         width:.6rem;
         height:.6rem;
     }
+    .btn-send{
+        border-radius: 5px;
+    }
 
     .wschat__input-panel .editor-text{
         width: 100%;
@@ -60,7 +63,7 @@
         <div class="wschat__input-panel flexbox">
             <span class="vkb"></span>
             <div class="editor-container flex1">
-                <textarea autoheight="true" class="editor-text J__editorText"></textarea>
+                <textarea autoheight="true" class="editor-text J__editorText" style="border-radius: 5px;"></textarea>
             </div>
             <button class="btn-send J__submitCnt" disabled="">发送</button>
         </div>

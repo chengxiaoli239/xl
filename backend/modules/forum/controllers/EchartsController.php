@@ -91,8 +91,8 @@ class EchartsController extends BaseController
         $searchModel = new StaticProfitsSearch();
         $queryParams = Yii::$app->request->queryParams;
         $dataProvider = $searchModel->search($queryParams);
-        $periods = $queryParams['SscDwsHzNums']['periods'];  // 20期，50期，100期，120期...
-        $plan_id = $queryParams['SscDwsHzNums']['plan_id'];
+        $periods = $queryParams['StaticProfits']['periods'];  // 20期，50期，100期，120期...
+        $plan_id = $queryParams['StaticProfits']['plan_id'];
         //$hezhi = $queryParams['SscDwsHzNums']['hezhi'];
         //$hezhi = $hezhi ? $hezhi : 9;
         $periodsArr = [

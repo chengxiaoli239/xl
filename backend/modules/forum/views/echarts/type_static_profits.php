@@ -19,14 +19,17 @@ $this->params['breadcrumbs'][] = $this->title;
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <!--div class="clearfix">
+                <div class="clearfix">
                     <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'Create Ssc Dws Hz Nums'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                        <?= Html::a(Yii::t('app', '981'), ['type-static-profits', 'StaticProfits[plan_id]'=>981], ['class' => 'btn '.($plan_id==981?'btn-success':'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
                     </div>
-                </div-->
+                    <div class="btn-group">
+                        <?= Html::a(Yii::t('app', '1029'), ['type-static-profits', 'StaticProfits[plan_id]'=>1029], ['class' => 'btn '.($plan_id==1029?'btn-success':'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+                    </div>
+                </div>
 
-    <?php Pjax::begin(); ?>
-                <?php echo $this->render('_search_echarts', ['model' => $searchModel]); ?>
+    <?php //Pjax::begin(); ?>
+                <?php //echo $this->render('_search_echarts', ['model' => $searchModel]); ?>
 
                 <?= ECharts::widget([
                     'responsive' => true,
@@ -145,7 +148,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]
                     ]
                 ]); ?>
-    <?php Pjax::end(); ?>
+    <?php //Pjax::end(); ?>
             </div>
         </div>
     </section>

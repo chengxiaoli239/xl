@@ -70,8 +70,16 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $get_hzs; #  取和值
     public $remove_hzs; #  排除和值
     public $xhefen; #  四定系统快捷定位合分值
-    public $hefen; #  定位合分值
-    public $hefen_pos; #  定位合分位置
+
+    public $hefen; #  定位合分值1
+    public $hefen_pos; #  定位合分位置1
+    public $hefen2; #  定位合分值2
+    public $hefen_pos2; #  定位合分位置2
+    public $hefen3; #  定位合分值3
+    public $hefen_pos3; #  定位合分位置3
+    public $hefen4; #  定位合分值4
+    public $hefen_pos4; #  定位合分位置4
+
     public $no_fix_hefen; #  定位合分值
     public $no_fix_hefen_pos; #  定位合分位置
     public $arise_in; #  三定含

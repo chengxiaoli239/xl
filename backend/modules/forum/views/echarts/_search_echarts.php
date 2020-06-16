@@ -11,7 +11,7 @@ use yii\widgets\ActiveForm;
 <div class="ssc-dws-hz-nums-search">
 
     <?php $form = ActiveForm::begin([
-        'action' => ['type-static-profits'],
+        //'action' => ['type-static-profits'],
         'method' => 'get',
         'options' => [
             'data-pjax' => 1

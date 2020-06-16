@@ -48,95 +48,95 @@ class UserSysPlansService extends BaseService {
         $User = AdminModel::findOne($user_id);
         $post['UserSysPlans']['tz_sites'] = implode(',',$post['UserSysPlans']['tz_sites']);
         //p($post['UserSysPlans']['hz_Arr']);
+
+        ################### 公共参数 - 开始 #########################
+        $tmpFilter = []; # hz_Arr
+        # 一、位置
+        # 10、第1位
+        $UserSysPlans = $post['UserSysPlans'];
+        if(isset($UserSysPlans['p1']) && $UserSysPlans['p1']){
+            $tmpFilter['p1'] = (string)trim($UserSysPlans['p1']);
+        }
+        unset($post['UserSysPlans']['p1']);
+        # 11、第2位
+        if(isset($UserSysPlans['p2']) && $UserSysPlans['p2']){
+            $tmpFilter['p2'] = (string)trim($UserSysPlans['p2']);
+        }
+        unset($post['UserSysPlans']['p2']);
+        # 12、第3位
+        if(isset($UserSysPlans['p3']) && $UserSysPlans['p3']){
+            $tmpFilter['p3'] = (string)trim($UserSysPlans['p3']);
+        }
+        unset($post['UserSysPlans']['p3']);
+        # 13、第4位
+        if(isset($UserSysPlans['p4']) && $UserSysPlans['p4']){
+            $tmpFilter['p4'] = (string)trim($UserSysPlans['p4']);
+        }
+        unset($post['UserSysPlans']['p4']);
+        # 14、第5位
+        if(isset($UserSysPlans['p5']) && $UserSysPlans['p5']){
+            $tmpFilter['p5'] = trim($UserSysPlans['p5']);
+        }
+        unset($post['UserSysPlans']['p5']);
+
+        # 二、类型：双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
+        # 1、双重
+        if($UserSysPlans['type_2'] && count($UserSysPlans['type_2']) == 1){
+            $tmpFilter['type_2'] = $UserSysPlans['type_2'][0];
+        }
+        unset($post['UserSysPlans']['type_2']);
+        # 2、三重
+        if($UserSysPlans['type_3'] && count($UserSysPlans['type_3']) == 1){
+            $tmpFilter['type_3'] = $UserSysPlans['type_3'][0];
+        }
+        unset($post['UserSysPlans']['type_3']);
+        # 3、四重
+        if($UserSysPlans['type_4'] && count($UserSysPlans['type_4']) == 1){
+            $tmpFilter['type_4'] = $UserSysPlans['type_4'][0];
+        }
+        unset($post['UserSysPlans']['type_4']);
+        # 4、双双重
+        if($UserSysPlans['type_22'] && count($UserSysPlans['type_22']) == 1){
+            $tmpFilter['type_22'] = $UserSysPlans['type_22'][0];
+        }
+        unset($post['UserSysPlans']['type_22']);
+        # 5、两兄弟
+        if($UserSysPlans['type_2b'] && count($UserSysPlans['type_2b']) == 1){
+            $tmpFilter['type_2b'] = $UserSysPlans['type_2b'][0];
+        }
+        unset($post['UserSysPlans']['type_2b']);
+        # 6、三兄弟
+        if($UserSysPlans['type_3b'] && count($UserSysPlans['type_3b']) == 1){
+            $tmpFilter['type_3b'] = $UserSysPlans['type_3b'][0];
+        }
+        unset($post['UserSysPlans']['type_3b']);
+        # 7、四兄弟
+        if($UserSysPlans['type_4b'] && count($UserSysPlans['type_4b']) == 1){
+            $tmpFilter['type_4b'] = $UserSysPlans['type_4b'][0];
+        }
+        unset($post['UserSysPlans']['type_4b']);
+        # 8、和值
+        if(isset($post['UserSysPlans']['hz']) && $post['UserSysPlans']['hz']){
+            $tmpFilter['hz'] = $post['UserSysPlans']['hz'];
+        }
+        unset($post['UserSysPlans']['hz']);
+        # 9、上奖
+        if(isset($UserSysPlans['arise']) && $UserSysPlans['arise'] !== '' && ($UserSysPlans['arise'] OR $UserSysPlans['arise'] == 0)){
+            $tmpFilter['arise'] = trim($UserSysPlans['arise']);
+        }
+        unset($post['UserSysPlans']['arise']);
+        # 14、对数
+        if($UserSysPlans['type_log'] && count($UserSysPlans['type_log']) == 1){
+            $tmpFilter['type_log'] = $UserSysPlans['type_log'][0];
+        }
+        unset($post['UserSysPlans']['type_log']);
+        ################### 公共参数 - 结束 #########################
+
         if($playway == 6) {
             $post['UserSysPlans']['hz_Arr'] = str_replace('，', ',', $post['UserSysPlans']['hz_Arr']);
         }elseif (in_array($tz_type, [18])){ # 一定
-            # 10、第1位
-            $UserSysPlans = $post['UserSysPlans'];
-            if(isset($UserSysPlans['p1']) && $UserSysPlans['p1']){
-                $tmpFilter['p1'] = (string)trim($UserSysPlans['p1']);
-            }
-            unset($post['UserSysPlans']['p1']);
-            # 11、第2位
-            if(isset($UserSysPlans['p2']) && $UserSysPlans['p2']){
-                $tmpFilter['p2'] = (string)trim($UserSysPlans['p2']);
-            }
-            unset($post['UserSysPlans']['p2']);
-            # 12、第3位
-            if(isset($UserSysPlans['p3']) && $UserSysPlans['p3']){
-                $tmpFilter['p3'] = (string)trim($UserSysPlans['p3']);
-            }
-            unset($post['UserSysPlans']['p3']);
-            # 13、第4位
-            if(isset($UserSysPlans['p4']) && $UserSysPlans['p4']){
-                $tmpFilter['p4'] = (string)trim($UserSysPlans['p4']);
-            }
-            unset($post['UserSysPlans']['p4']);
-            # 14、第5位
-            if(isset($UserSysPlans['p5']) && $UserSysPlans['p5']){
-                $tmpFilter['p5'] = trim($UserSysPlans['p5']);
-            }
-            unset($post['UserSysPlans']['p5']);
         }elseif (in_array($tz_type, [29, 32])){ # 三定-快选 、三定快译切换
             # 三定-快选过滤
-            $UserSysPlans = $post['UserSysPlans'];
-            # 双重:type_2、三重:type_3、两兄弟:type_2b、三兄弟:type_3b
-            $tmpFilter = [];
-            # 1、双重
-            if($UserSysPlans['type_2'] && count($UserSysPlans['type_2']) == 1){
-                $tmpFilter['type_2'] = $UserSysPlans['type_2'][0];
-            }
-            unset($post['UserSysPlans']['type_2']);
-            # 2、三重
-            if($UserSysPlans['type_3'] && count($UserSysPlans['type_3']) == 1){
-                $tmpFilter['type_3'] = $UserSysPlans['type_3'][0];
-            }
-            unset($post['UserSysPlans']['type_3']);
-            # 5、两兄弟
-            if($UserSysPlans['type_2b'] && count($UserSysPlans['type_2b']) == 1){
-                $tmpFilter['type_2b'] = $UserSysPlans['type_2b'][0];
-            }
-            unset($post['UserSysPlans']['type_2b']);
-            # 6、三兄弟
-            if($UserSysPlans['type_3b'] && count($UserSysPlans['type_3b']) == 1){
-                $tmpFilter['type_3b'] = $UserSysPlans['type_3b'][0];
-            }
-            unset($post['UserSysPlans']['type_3b']);
-            # 8、和值
-            if(isset($post['UserSysPlans']['hz']) && $post['UserSysPlans']['hz']){
-                $tmpFilter['hz'] = $post['UserSysPlans']['hz'];
-            }
-            unset($post['UserSysPlans']['hz']);
-            # 9、上奖
-            if(isset($UserSysPlans['arise']) && $UserSysPlans['arise'] !== '' && ($UserSysPlans['arise'] OR $UserSysPlans['arise'] == 0)){
-                $tmpFilter['arise'] = trim($UserSysPlans['arise']);
-            }
-            unset($post['UserSysPlans']['arise']);
-            # 10、第1位
-            if(isset($UserSysPlans['p1']) && $UserSysPlans['p1']){
-                $tmpFilter['p1'] = $UserSysPlans['p1'];
-            }
-            unset($post['UserSysPlans']['p1']);
-            # 11、第2位
-            if(isset($UserSysPlans['p2']) && $UserSysPlans['p2']){
-                $tmpFilter['p2'] = trim($UserSysPlans['p2']);
-            }
-            unset($post['UserSysPlans']['p2']);
-            # 12、第3位
-            if(isset($UserSysPlans['p3']) && $UserSysPlans['p3']){
-                $tmpFilter['p3'] = trim($UserSysPlans['p3']);
-            }
-            unset($post['UserSysPlans']['p3']);
-            # 13、第4位
-            if(isset($UserSysPlans['p4']) && $UserSysPlans['p4']){
-                $tmpFilter['p4'] = trim($UserSysPlans['p4']);
-            }
-            unset($post['UserSysPlans']['p4']);
-            # 14、对数
-            if($UserSysPlans['type_log'] && count($UserSysPlans['type_log']) == 1){
-                $tmpFilter['type_log'] = $UserSysPlans['type_log'][0];
-            }
-            unset($post['UserSysPlans']['type_log']);
             # 15.1、合分位置
             if($UserSysPlans['hefen_pos'] && count($UserSysPlans['hefen_pos']) > 0){
                 //$tmpFilter['hefen_pos'] = $UserSysPlans['hefen_pos'][0];
@@ -189,58 +189,6 @@ class UserSysPlansService extends BaseService {
             $p_Arrs = ['p1', 'p2', 'p3', 'p4'];
             # 二定-快选过滤
             $UserSysPlans = $post['UserSysPlans'];
-            # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
-            $tmpFilter = [];
-            # 1、双重
-            if($UserSysPlans['type_2'] && count($UserSysPlans['type_2']) == 1){
-                $tmpFilter['type_2'] = $UserSysPlans['type_2'][0];
-            }
-            unset($post['UserSysPlans']['type_2']);
-            # 5、两兄弟
-            if($UserSysPlans['type_2b'] && count($UserSysPlans['type_2b']) == 1){
-                $tmpFilter['type_2b'] = $UserSysPlans['type_2b'][0];
-            }
-            unset($post['UserSysPlans']['type_2b']);
-            # 8、和值
-            if(isset($post['UserSysPlans']['hz']) && $post['UserSysPlans']['hz']){
-                $tmpFilter['hz'] = $post['UserSysPlans']['hz'];
-            }
-            unset($post['UserSysPlans']['hz']);
-            # 9、上奖
-            if(isset($UserSysPlans['arise']) && $UserSysPlans['arise'] !== '' && ($UserSysPlans['arise'] OR $UserSysPlans['arise'] == 0)){
-                $tmpFilter['arise'] = trim($UserSysPlans['arise']);
-            }
-            unset($post['UserSysPlans']['arise']);
-            # 10、第1位
-            if(isset($UserSysPlans['p1']) && $UserSysPlans['p1']){
-                $tmpFilter['p1'] = (string)trim($UserSysPlans['p1']);
-            }
-            unset($post['UserSysPlans']['p1']);
-            # 11、第2位
-            if(isset($UserSysPlans['p2']) && $UserSysPlans['p2']){
-                $tmpFilter['p2'] = (string)trim($UserSysPlans['p2']);
-            }
-            unset($post['UserSysPlans']['p2']);
-            # 12、第3位
-            if(isset($UserSysPlans['p3']) && $UserSysPlans['p3']){
-                $tmpFilter['p3'] = (string)trim($UserSysPlans['p3']);
-            }
-            unset($post['UserSysPlans']['p3']);
-            # 13、第4位
-            if(isset($UserSysPlans['p4']) && $UserSysPlans['p4']){
-                $tmpFilter['p4'] = (string)trim($UserSysPlans['p4']);
-            }
-            unset($post['UserSysPlans']['p4']);
-            # 14、第5位
-            if(isset($UserSysPlans['p5']) && $UserSysPlans['p5']){
-                $tmpFilter['p5'] = trim($UserSysPlans['p5']);
-            }
-            unset($post['UserSysPlans']['p5']);
-            # 15、对数
-            if($UserSysPlans['type_log'] && count($UserSysPlans['type_log']) == 1){
-                $tmpFilter['type_log'] = $UserSysPlans['type_log'][0];
-            }
-            unset($post['UserSysPlans']['type_log']);
 
             # 号码切换倍投
             if(!empty($UserSysPlans['code1'])){
@@ -255,6 +203,7 @@ class UserSysPlansService extends BaseService {
             }
             unset($post['UserSysPlans']['code2']);
 
+            # 二定补 'X'
             $pi = 0;
             $Null_ps = [];
             foreach ($p_Arrs as $p){
@@ -269,89 +218,14 @@ class UserSysPlansService extends BaseService {
                     $tmpFilter[$pos] = 'X';
                 }
             }
-            //p([$p_Arrs, $Null_ps, $pi, $tmpFilter]);
-
-            //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
         }elseif (in_array($tz_type, [25, 20])){
             # 四定-快选过滤
-            $UserSysPlans = $post['UserSysPlans'];
-            # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
-            $tmpFilter = [];
-            # 1、双重
-            if($UserSysPlans['type_2'] && count($UserSysPlans['type_2']) == 1){
-                $tmpFilter['type_2'] = $UserSysPlans['type_2'][0];
-            }
-            unset($post['UserSysPlans']['type_2']);
-            # 2、三重
-            if($UserSysPlans['type_3'] && count($UserSysPlans['type_3']) == 1){
-                $tmpFilter['type_3'] = $UserSysPlans['type_3'][0];
-            }
-            unset($post['UserSysPlans']['type_3']);
-            # 3、四重
-            if($UserSysPlans['type_4'] && count($UserSysPlans['type_4']) == 1){
-                $tmpFilter['type_4'] = $UserSysPlans['type_4'][0];
-            }
-            unset($post['UserSysPlans']['type_4']);
-            # 4、双双重
-            if($UserSysPlans['type_22'] && count($UserSysPlans['type_22']) == 1){
-                $tmpFilter['type_22'] = $UserSysPlans['type_22'][0];
-            }
-            unset($post['UserSysPlans']['type_22']);
-            # 5、两兄弟
-            if($UserSysPlans['type_2b'] && count($UserSysPlans['type_2b']) == 1){
-                $tmpFilter['type_2b'] = $UserSysPlans['type_2b'][0];
-            }
-            unset($post['UserSysPlans']['type_2b']);
-            # 6、三兄弟
-            if($UserSysPlans['type_3b'] && count($UserSysPlans['type_3b']) == 1){
-                $tmpFilter['type_3b'] = $UserSysPlans['type_3b'][0];
-            }
-            unset($post['UserSysPlans']['type_3b']);
-            # 7、四兄弟
-            if($UserSysPlans['type_4b'] && count($UserSysPlans['type_4b']) == 1){
-                $tmpFilter['type_4b'] = $UserSysPlans['type_4b'][0];
-            }
-            unset($post['UserSysPlans']['type_4b']);
-            # 8、和值
-            if(isset($post['UserSysPlans']['hz']) && $post['UserSysPlans']['hz']){
-                $tmpFilter['hz'] = $post['UserSysPlans']['hz'];
-            }
-            unset($post['UserSysPlans']['hz']);
-            # 9、上奖
-            if(isset($UserSysPlans['arise']) && $UserSysPlans['arise'] !== '' && ($UserSysPlans['arise'] OR $UserSysPlans['arise'] == 0)){
-                $tmpFilter['arise'] = trim($UserSysPlans['arise']);
-            }
-            unset($post['UserSysPlans']['arise']);
-            # 10、第1位
-            if(isset($UserSysPlans['p1']) && $UserSysPlans['p1']){
-                $tmpFilter['p1'] = $UserSysPlans['p1'];
-            }
-            unset($post['UserSysPlans']['p1']);
-            # 11、第2位
-            if(isset($UserSysPlans['p2']) && $UserSysPlans['p2']){
-                $tmpFilter['p2'] = trim($UserSysPlans['p2']);
-            }
-            unset($post['UserSysPlans']['p2']);
-            # 12、第3位
-            if(isset($UserSysPlans['p3']) && $UserSysPlans['p3']){
-                $tmpFilter['p3'] = trim($UserSysPlans['p3']);
-            }
-            unset($post['UserSysPlans']['p3']);
-            # 13、第4位
-            if(isset($UserSysPlans['p4']) && $UserSysPlans['p4']){
-                $tmpFilter['p4'] = trim($UserSysPlans['p4']);
-            }
-            unset($post['UserSysPlans']['p4']);
+
             # 13、四单四双
             if(isset($UserSysPlans['type_4ds']) && $UserSysPlans['type_4ds'] && count($UserSysPlans['type_4ds']) == 1){
                 $tmpFilter['type_4ds'] = $UserSysPlans['type_4ds'][0];
             }
             unset($post['UserSysPlans']['type_4ds']);
-            # 14、对数
-            if($UserSysPlans['type_log'] && count($UserSysPlans['type_log']) == 1){
-                $tmpFilter['type_log'] = $UserSysPlans['type_log'][0];
-            }
-            unset($post['UserSysPlans']['type_log']);
 
             # 15、四单
             if($UserSysPlans['type_4d'] && count($UserSysPlans['type_4d']) == 1){
@@ -401,7 +275,6 @@ class UserSysPlansService extends BaseService {
 
             //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
         }elseif ($tz_type == 28){ # 系统快捷
-            $tmpFilter = [];
             # 1.1、号码类型：取
             if(isset($post['UserSysPlans']['get_types']) && $post['UserSysPlans']['get_types']){
                 $tmpFilter['get_types'] = $post['UserSysPlans']['get_types'];

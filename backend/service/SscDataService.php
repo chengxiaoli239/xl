@@ -2823,7 +2823,7 @@ class SscDataService extends BaseService {
         $series = [];
         $times = [6=>0.07, 7=>0.08, 8=>0.09, 9=>0.10, 10=>0.09, 11=>0.08, 12=>0.07];
 
-        $data['range'] = 10000;
+        $data['range'] = 35000;
         foreach ($periodsArr as $periods){
             $where = ['plan_id'=>$plan_id, 'static_time'=>$periods];
             $fields = ['id', 'plan_id','static_time', 'qihao', 'cut_profits'];

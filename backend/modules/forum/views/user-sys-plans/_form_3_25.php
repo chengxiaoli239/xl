@@ -70,9 +70,21 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
                     <!--位置合分：位置-->
-                    <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.定位合分取:位置') ?>
+                    <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.1定位合分取:位置') ?>
                     <!--位置合分：合分-->
-                    <?= $form->field($model, 'hefen')->textInput()->label('1.定位合分:值')?>
+                    <?= $form->field($model, 'hefen')->textInput()->label('1.1定位合分:值')?>
+                    <!--位置合分：位置2-->
+                    <!--?= $form->field($model, 'hefen_pos2')->checkboxList($hefen_pos)->label('1.2定位合分取:位置') ?-->
+                    <!--位置合分：合分2-->
+                    <!--?= $form->field($model, 'hefen2')->textInput()->label('1.2定位合分:值')?-->
+                    <!--位置合分：位置3-->
+                    <!--?= $form->field($model, 'hefen_pos3')->checkboxList($hefen_pos)->label('1.3定位合分取:位置') ?-->
+                    <!--位置合分：合分3-->
+                    <!--?= $form->field($model, 'hefen3')->textInput()->label('1.3定位合分:值')?-->
+                    <!--位置合分：位置4-->
+                    <!--?= $form->field($model, 'hefen_pos4')->checkboxList($hefen_pos)->label('1.4定位合分取:位置') ?-->
+                    <!--位置合分：合分4-->
+                    <!--?= $form->field($model, 'hefen4')->textInput()->label('1.4定位合分:值')?-->
 
                     <!--两数合、三数合-->
                     <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList([1=>'两数和',2=>'三数合'])->label('2.不定位合分') ?>
