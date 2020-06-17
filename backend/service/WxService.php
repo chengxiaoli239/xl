@@ -508,7 +508,7 @@ class WxService {
             $m->set($mkey, $WxInfo, 7*24*3600);
 
             //p($WxInfo);
-            $logArr = ['mkey'=>$mkey, 'WxInfo'=>$WxInfo, 'rst'=>$rst, 'loginInfo'=>$loginInfo];
+            $logArr = ['mkey'=>$mkey, 'WxInfo'=>$WxInfo, 'rst'=>$rst, 'loginInfo'=>$loginInfo, 'contacts'=>$contacts];
             Tool_Common::log('setWxInfo', 'INFO', '设置微信缓存', $logArr);
             //print_r($_SESSION['callback_post_url_header']);die;
             //header("Location: wx.php?cmd=send"); exit;
