@@ -45,8 +45,6 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?>
 
-                    <?= $form->field($model, 'plan_type')->radioList($plan_types)->label('计划类型，为"止盈止损"计划时须填以下两项') ?>
-
                     <!--止盈止损-->
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
 
