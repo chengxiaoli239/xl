@@ -38,16 +38,16 @@ use yii\widgets\ActiveForm;
                             ])->label('类型') ?>
                         </div>
                         <div class="col-lg-4 col-xs-4">
-                            <?= $form->field($model, 'is_test')->radioList([
-                                '0'=>'真',
-                                '1'=>'模拟',
-                            ])->label('真/模拟') ?>
-                        </div>
-                        <div class="col-lg-4 col-xs-4">
                             <?= $form->field($model, 'status')->radioList([
                                 '0'=>'关',
                                 '1'=>'开',
                             ])->label('状态') ?>
+                        </div>
+                        <div class="col-lg-4 col-xs-4">
+                            <?= $form->field($model, 'is_test')->radioList([
+                                '0'=>'真',
+                                '1'=>'模拟',
+                            ])->label('真/模拟') ?>
                         </div>
                     </div>
 
@@ -85,11 +85,11 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
                     <div class="row">
-                        <div class="col-lg-3 col-xs-6">
+                        <div class="col-lg-3 col-xs-4">
                             <!--位置合分：位置-->
                         <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>
                         </div>
-                        <div class="col-lg-3 col-xs-6">
+                        <div class="col-lg-3 col-xs-4">
                             <!--位置合分：合分-->
                         <?= $form->field($model, 'hefen')->textInput()->label('1.1定位合分:值')?>
                         </div>
@@ -108,22 +108,22 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'hefen4')->textInput()->label('1.4定位合分:值')?-->
 
                     <div class="row">
-                        <div class="col-lg-3 col-xs-6">
+                        <div class="col-lg-3 col-xs-4">
                             <!--两数合、三数合-->
                         <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList([1=>'两数和',2=>'三数合'])->label('2.不定位合分') ?>
                         </div>
-                        <div class="col-lg-3 col-xs-6">
+                        <div class="col-lg-3 col-xs-4">
                             <!--位置合分：合分-->
                         <?= $form->field($model, 'no_fix_hefen')->textInput()->label('2.不定位合分:值')?>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-3 col-xs-6">
+                        <div class="col-lg-3 col-xs-4">
                             <!--三定含除、取-->
                         <?= $form->field($model, 'arise_in_sel')->checkboxList([1=>'除',2=>'取'])->label('3.四字定含') ?>
                         </div>
-                        <div class="col-lg-3 col-xs-6">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'arise_in')->textInput()->label('3.四字定含')?>
                         </div>
                     </div>

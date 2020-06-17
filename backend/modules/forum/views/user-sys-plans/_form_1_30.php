@@ -44,10 +44,10 @@ use yii\widgets\ActiveForm;
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                         <?= $form->field($model, 'single')->textInput() ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                         <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
                     </div>
                 </div>

@@ -30,17 +30,17 @@ use yii\widgets\ActiveForm;
                             ])->label('类型') ?>
                         </div>
                         <div class="col-lg-4 col-xs-4">
-                            <?= $form->field($model, 'is_test')->radioList([
-                                '0'=>'真',
-                                '1'=>'模拟',
-                            ])->label('真/模拟') ?>
-                        </div>
-                        <div class="col-lg-4 col-xs-4">
                             <!--?= $form->field($model, 'status')->textInput() ?-->
                             <?= $form->field($model, 'status')->radioList([
                                 '0'=>'关',
                                 '1'=>'开',
                             ])->label('状态') ?>
+                        </div>
+                        <div class="col-lg-4 col-xs-4">
+                            <?= $form->field($model, 'is_test')->radioList([
+                                '0'=>'真',
+                                '1'=>'模拟',
+                            ])->label('真/模拟') ?>
                         </div>
                     </div>
 

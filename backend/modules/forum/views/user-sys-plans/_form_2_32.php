@@ -46,10 +46,10 @@ use yii\widgets\ActiveForm;
                     <?= $form->field($model, 'single')->textInput() ?>
 
                 <div class="row">
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                     <?= $form->field($model, 'code1')->textInput()->label('号码组一') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                     <?= $form->field($model, 'code2')->textInput()->label('号码组二') ?>
                     </div>
                 </div>
@@ -77,8 +77,6 @@ use yii\widgets\ActiveForm;
                         <?= $form->field($model, 'type_log')->checkBoxList([ 0=>'除', 1=>'取', ])->label('对数') ?>
                     </div>
                 </div>
-                    <?= $form->field($model, 'plan_type')->radioList($plan_types)->label('计划类型，为"止盈止损"计划时须填以下两项') ?>
-
                     <!--止盈止损-->
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
 

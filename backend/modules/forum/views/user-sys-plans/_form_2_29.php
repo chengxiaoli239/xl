@@ -47,7 +47,14 @@ use yii\widgets\ActiveForm;
                             ])->label('状态') ?>
                         </div>
                     </div>
-                <?= $form->field($model, 'single')->textInput() ?>
+                <div class="row">
+                    <div class="col-lg-4 col-xs-4">
+                        <?= $form->field($model, 'single')->textInput() ?>
+                    </div>
+                    <div class="col-lg-4 col-xs-4">
+                        <?= $form->field($model, 'arise')->textInput()->label('上奖')?>
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col-lg-4 col-xs-4">
@@ -72,7 +79,7 @@ use yii\widgets\ActiveForm;
                 <div class="row">
                     <div class="col-lg-4 col-xs-4">
                         <!--位置合分：位置3-->
-                    <?= $form->field($model, 'hefen_pos3')->checkboxList($hefen_pos)->label('1.3定位合分取:位置') ?>
+                    <?= $form->field($model, 'hefen_pos3')->checkboxList($hefen_pos)->label('1.3定位合分:取') ?>
                     </div>
                     <div class="col-lg-4 col-xs-4">
                         <!--位置合分：合分3-->
@@ -91,11 +98,11 @@ use yii\widgets\ActiveForm;
                 </div>
 
                 <div class="row">
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                         <!--两数合、三数合-->
                     <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList([1=>'两数和',2=>'三数合'])->label('2.不定位合分') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                     <!--位置合分：合分-->
                     <?= $form->field($model, 'no_fix_hefen')->textInput()->label('2.不定位合分:值')?>
                     </div>
@@ -110,7 +117,6 @@ use yii\widgets\ActiveForm;
                     </div>
                 </div>
 
-                <?= $form->field($model, 'arise')->textInput()->label('上奖')?>
                     <div class="row">
                         <div class="col-lg-3 col-xs-3"> <?= $form->field($model, 'p1')->textInput()->label('千') ?> </div>
                         <div class="col-lg-3 col-xs-3"> <?= $form->field($model, 'p2')->textInput()->label('百') ?> </div>

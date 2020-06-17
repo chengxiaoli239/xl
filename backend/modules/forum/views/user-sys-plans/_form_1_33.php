@@ -43,10 +43,10 @@ use yii\widgets\ActiveForm;
                 <?= $form->field($model, 'single')->textInput() ?>
 
                 <div class="row">
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                         <?= $form->field($model, 'code1')->textInput()->label('号码组一') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                         <?= $form->field($model, 'code2')->textInput()->label('号码组二') ?>
                     </div>
                 </div>

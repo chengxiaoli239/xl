@@ -20,6 +20,7 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
 
+                <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
                 <div class="row">
                     <div class="col-lg-3 col-xs-4">
                         <?= $form->field($model, 'playway')->radioList([
@@ -29,25 +30,24 @@ use yii\widgets\ActiveForm;
                         ])->label('类型') ?>
                     </div>
                     <div class="col-lg-3 col-xs-4">
-                        <?= $form->field($model, 'is_test')->radioList([
-                            '0'=>'真',
-                            '1'=>'模拟',
-                        ])->label('真/模拟') ?>
-                    </div>
-                    <div class="col-lg-3 col-xs-4">
                         <?= $form->field($model, 'status')->radioList([
                             '0'=>'关',
                             '1'=>'开',
                         ])->label('状态') ?>
                     </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'is_test')->radioList([
+                            '0'=>'真',
+                            '1'=>'模拟',
+                        ])->label('真/模拟') ?>
+                    </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-3 col-xs-4">
+                    <div class="col-lg-3 col-xs-6">
                         <?= $form->field($model, 'single')->textInput() ?>
                     </div>
                 </div>
 
-                    <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
                     <!--?= $form->field($model, 'tz_type')->textInput() ?-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
                     <!--?= $form->field($model, 'tz_type')->radioList($kArr)->label('投注类型') ?-->

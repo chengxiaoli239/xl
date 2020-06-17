@@ -20,20 +20,28 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
                     <div class="row">
-                        <div class="col-lg-3 col-xs-6">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'playway')->radioList([
                                 //'1'=>'二字定',
                                 '2'=>'三字定',
                                 //'3'=>'四字定',
                             ])->label('类型') ?>
                         </div>
-                        <div class="col-lg-3 col-xs-6">
+                        <div class="col-lg-3 col-xs-4">
                             <!--?= $form->field($model, 'status')->textInput() ?-->
                             <?= $form->field($model, 'status')->radioList([
                                 '0'=>'关闭',
                                 '1'=>'开启',
                             ])->label('状态') ?>
                         </div>
+                        <div class="col-lg-4 col-xs-4">
+                            <?= $form->field($model, 'is_test')->radioList([
+                                '0'=>'真',
+                                '1'=>'模拟',
+                            ])->label('真/模拟') ?>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-lg-3 col-xs-6">
                             <?= $form->field($model, 'single')->textInput() ?>
                         </div>
