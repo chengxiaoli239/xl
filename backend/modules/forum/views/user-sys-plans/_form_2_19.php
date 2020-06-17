@@ -19,20 +19,25 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'uid')->textInput(['maxlength' => true]) ?-->
 
                     <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
-
-                    <?= $form->field($model, 'playway')->radioList([
-                        //'1'=>'二字定',
-                        '2'=>'三字定',
-                        //'3'=>'四字定',
-                    ])->label('投注方式') ?>
-
-                    <!--?= $form->field($model, 'status')->textInput() ?-->
-                    <?= $form->field($model, 'status')->radioList([
-                        '0'=>'关闭',
-                        '1'=>'开启',
-                    ])->label('投注状态') ?>
-
-                    <?= $form->field($model, 'single')->textInput() ?>
+                    <div class="row">
+                        <div class="col-lg-3 col-xs-6">
+                            <?= $form->field($model, 'playway')->radioList([
+                                //'1'=>'二字定',
+                                '2'=>'三字定',
+                                //'3'=>'四字定',
+                            ])->label('类型') ?>
+                        </div>
+                        <div class="col-lg-3 col-xs-6">
+                            <!--?= $form->field($model, 'status')->textInput() ?-->
+                            <?= $form->field($model, 'status')->radioList([
+                                '0'=>'关闭',
+                                '1'=>'开启',
+                            ])->label('状态') ?>
+                        </div>
+                        <div class="col-lg-3 col-xs-6">
+                            <?= $form->field($model, 'single')->textInput() ?>
+                        </div>
+                    </div>
 
                     <?= $form->field($model, 'import_codes_txt')->textInput()->label('多组英文逗号或空格隔开 234X,345X 或 234X 345X') ?>
                     <input type="hidden" name="UserSysPlans[tz_type]" value="19"><!--三定导入-->
@@ -45,29 +50,13 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'nums')->textInput() ?-->
 
                     <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:0.1-0.3-0.7-1.5-3.1-6.2-12.5-25.1') ?>
-                    <?= $form->field($model, 'plan_type')->radioList($plan_types)->label('计划类型，为"止盈止损"计划时须填以下两项') ?>
-                    <div class="row">
-                        <div class="col-lg-3">
-                            <?= $form->field($model, 'take_profits')->textInput()->label('止盈点(正数，例：3000)') ?>
-                        </div>
-                        <div class="col-lg-3">
-                            <?= $form->field($model, 'stop_loss')->textInput()->label('止损点(正数，例：4000)') ?>
-                        </div>
-                    </div>
 
-                    <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
+                    <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
+
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
 
-
-
-                    <!--?= $form->field($model, 'created_at')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'updated_at')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'update_time')->textInput() ?-->
-
                     <div class="form-group">
-                        <div class="col-lg-offset-2 col-lg-10">
+                        <div class="col-lg-offset-6 col-lg-10 ml-auto">
                             <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>
                         </div>
                     </div>

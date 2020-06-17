@@ -20,62 +20,54 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
                     <div class="row">
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-6">
                             <?= $form->field($model, 'playway')->radioList([
                                 //'1'=>'二字定',
                                 //'2'=>'三字定',
                                 //'3'=>'四字定',
                                 '4'=>'一字定',
-                            ])->label('投注方式') ?>
+                            ])->label('类型') ?>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-6">
                             <?= $form->field($model, 'is_test')->radioList([
                                 '0'=>'真实',
                                 '1'=>'模拟',
-                            ])->label('真实/模拟') ?>
+                            ])->label('真/模拟') ?>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-6">
                             <?= $form->field($model, 'status')->radioList([
                                 '0'=>'关闭',
                                 '1'=>'开启',
-                            ])->label('投注状态') ?>
+                            ])->label('状态') ?>
                         </div>
-                        <div class="col-lg-3">
-                            <?= $form->field($model, 'single')->textInput() ?>
+                        <div class="col-lg-3 col-xs-6">
+                            <?= $form->field($model, 'single')->textInput()->label('倍(元)') ?>
                         </div>
                     </div>
                     <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
                     <!--?= $form->field($model, 'arise')->textInput()->label('上奖') ?-->
 
                     <div class="row">
-                        <div class="col-lg-2">
+                        <div class="col-lg-2 col-xs-4">
                             <?= $form->field($model, 'p1')->textInput()->label('千') ?>
                         </div>
-                        <div class="col-lg-2">
+                        <div class="col-lg-2 col-xs-4">
                             <?= $form->field($model, 'p2')->textInput()->label('百') ?>
                         </div>
-                        <div class="col-lg-2">
+                        <div class="col-lg-2 col-xs-4">
                             <?= $form->field($model, 'p3')->textInput()->label('十') ?>
                         </div>
-                        <div class="col-lg-2">
+                        <div class="col-lg-2 col-xs-4">
                             <?= $form->field($model, 'p4')->textInput()->label('个') ?>
                         </div>
-                        <div class="col-lg-2">
+                        <div class="col-lg-2 col-xs-4">
                             <?= $form->field($model, 'p5')->textInput()->label('五') ?>
                         </div>
                     </div>
 
                     <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:1-3-7-15-31-62-125-251') ?>
 
-                    <?= $form->field($model, 'plan_type')->radioList($plan_types)->label('计划类型，为"止盈止损"计划时须填以下两项') ?>
-                    <div class="row">
-                        <div class="col-lg-3">
-                            <?= $form->field($model, 'take_profits')->textInput()->label('止盈点(正数，例：3000)') ?>
-                        </div>
-                        <div class="col-lg-3">
-                            <?= $form->field($model, 'stop_loss')->textInput()->label('止损点(正数，例：4000)') ?>
-                        </div>
-                    </div>
+                    <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
 
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
 

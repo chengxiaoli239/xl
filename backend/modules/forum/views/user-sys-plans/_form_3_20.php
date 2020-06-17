@@ -23,29 +23,35 @@ use yii\widgets\ActiveForm;
                     <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
 
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 col-xs-4">
                             <?= $form->field($model, 'playway')->radioList([
                                 //'1'=>'二字定',
                                 //'2'=>'三字定',
                                 '3'=>'四字定',
-                            ])->label('投注方式') ?>
+                            ])->label('类型') ?>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 col-xs-4">
                             <?= $form->field($model, 'is_test')->radioList([
-                                '0'=>'真实',
+                                '0'=>'真',
                                 '1'=>'模拟',
-                            ])->label('真实/模拟') ?>
+                            ])->label('真/模拟') ?>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 col-xs-4">
                             <?= $form->field($model, 'status')->radioList([
-                                '0'=>'关闭',
-                                '1'=>'开启',
-                            ])->label('投注状态') ?>
+                                '0'=>'关',
+                                '1'=>'开',
+                            ])->label('状态') ?>
                         </div>
                     </div>
 
-                    <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
-                    <?= $form->field($model, 'single')->textInput() ?>
+                    <div class="row">
+                        <div class="col-lg-4 col-xs-6">
+                            <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
+                        </div>
+                        <div class="col-lg-4 col-xs-6">
+                            <?= $form->field($model, 'single')->textInput() ?>
+                        </div>
+                    </div>
 
                     <!--?= $form->field($model, 'tz_type')->textInput() ?-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
@@ -55,52 +61,50 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
                     <div class="row">
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'type_2b')->checkBoxList([
                                 0=>'除',
                                 1=>'取'
                             ])->label('两兄弟') ?>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'type_3b')->checkBoxList([
                                 0=>'除',
                                 1=>'取'
                             ])->label('三兄弟') ?>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'type_4b')->checkBoxList([
                                 0=>'除',
                                 1=>'取'
                             ])->label('四兄弟') ?>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'type_log')->checkBoxList([
                                 //0=>'非四单四双',
                                 0=>'除',
                                 1=>'取',
                             ])->label('对数') ?>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'type_2')->checkBoxList([
                                 0=>'除',
                                 1=>'取'
                             ])->label('双重') ?>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'type_3')->checkBoxList([
                                 0=>'除',
                                 1=>'取'
                             ])->label('三重') ?>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'type_4')->checkBoxList([
                                 0=>'除',
                                 1=>'取'
                             ])->label('四重') ?>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'type_22')->checkBoxList([
                                 0=>'除',
                                 1=>'取'
@@ -108,26 +112,10 @@ use yii\widgets\ActiveForm;
                         </div>
                     </div>
 
-                    <?= $form->field($model, 'plan_type')->radioList($plan_types)->label('计划类型，为"止盈止损"计划时须填以下两项') ?>
-                    <div class="row">
-                        <div class="col-lg-3">
-                            <?= $form->field($model, 'take_profits')->textInput()->label('止盈点(正数，例：3000)') ?>
-                        </div>
-                        <div class="col-lg-3">
-                            <?= $form->field($model, 'stop_loss')->textInput()->label('止损点(正数，例：4000)') ?>
-                        </div>
-                    </div>
+                    <!--止盈止损-->
+                    <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
 
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
-
-                    <!--?= $form->field($model, 'nums')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'created_at')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'updated_at')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'update_time')->textInput() ?-->
-
                     <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
                             <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>
