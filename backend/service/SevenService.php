@@ -73,7 +73,7 @@ class SevenService extends BaseTZService {
             "Cookie:".trim(self::$cookie),
             "Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
-            "Referer:".str_replace('www.','',self::$baseUrl.'/App/Index?_='.(microtime(true)*10000)),
+            "Referer:".str_replace('www.','',self::$baseUrl.'/App/Index?_='.((int)microtime(true)*1000)),
         ];
         //self::$headers = array_unique(array_merge(self::$headers,$headers));
     }
@@ -1291,7 +1291,7 @@ class SevenService extends BaseTZService {
         $headers = [
             "Accept: application/json, text/javascript, */*; q=0.01",
             "Accept-Encoding: guzip, deflate",
-            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Accept-Language: zh-CN,zh;q=0.9",
             "Connection: keep-alive",
             "Cookie: ".trim($TzSystemsUsers->cookie),
             //"Origin:".str_replace('www.','',self::$baseUrl),
