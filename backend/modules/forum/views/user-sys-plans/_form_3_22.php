@@ -23,7 +23,7 @@ use yii\widgets\ActiveForm;
                     <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
 
                     <div class="row">
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'playway')->radioList([
                                 //'1'=>'二字定',
                                 //'2'=>'三字定',
@@ -31,19 +31,20 @@ use yii\widgets\ActiveForm;
                                 //'4'=>'一字定',
                             ])->label('投注方式') ?>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'is_test')->radioList([
                                 '0'=>'真实',
                                 '1'=>'模拟',
                             ])->label('真实/模拟') ?>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'status')->radioList([
                                 '0'=>'关闭',
                                 '1'=>'开启',
                             ])->label('投注状态') ?>
                         </div>
-                        <div class="col-lg-3">
+                    <div class="row">
+                        <div class="col-lg-3 col-xs-4">
                             <?= $form->field($model, 'single')->textInput() ?>
                         </div>
                     </div>

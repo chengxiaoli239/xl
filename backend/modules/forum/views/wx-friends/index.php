@@ -39,6 +39,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'UserName',
                         'NickName',
                         //'HeadImgUrl',
+                        ['attribute'=>'HeadImgUrl','label'=>'头像','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>['image',['height'=>30, 'width'=>30]],
+                            'value'=>function($model){
+                                return $model->HeadImgUrl;
+                            }
+                        ],
                         //'ContactFlag',
                         //'MemberCount',
                         //'MemberList:ntext',

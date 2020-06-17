@@ -7,7 +7,11 @@ use yii\widgets\ActiveForm;
 /* @var $model backend\models\UserSysPlans */
 /* @var $form yii\widgets\ActiveForm */
 ?>
-
+<style>
+    .form-control{
+        padding: 0px 1px;
+    }
+</style>
 <div class="user-sys-plans-form row">
     <div class="col-lg-12">
         <section class="panel">
@@ -43,64 +47,65 @@ use yii\widgets\ActiveForm;
                             ])->label('状态') ?>
                         </div>
                     </div>
+                <?= $form->field($model, 'single')->textInput() ?>
 
                 <div class="row">
-                    <div class="col-lg-4 col-xs-6">
+                    <div class="col-lg-4 col-xs-4">
                         <!--位置合分：位置-->
                     <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-6">
+                    <div class="col-lg-4 col-xs-4">
                         <!--位置合分：合分-->
                     <?= $form->field($model, 'hefen')->textInput()->label('1.1定位合分:值')?>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 col-xs-6">
+                    <div class="col-lg-4 col-xs-4">
                         <!--位置合分：位置2-->
                     <?= $form->field($model, 'hefen_pos2')->checkboxList($hefen_pos)->label('1.2定位合分:取') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-6">
+                    <div class="col-lg-4 col-xs-4">
                         <!--位置合分：合分2-->
                     <?= $form->field($model, 'hefen2')->textInput()->label('1.2定位合分:值')?>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 col-xs-6">
+                    <div class="col-lg-4 col-xs-4">
                         <!--位置合分：位置3-->
                     <?= $form->field($model, 'hefen_pos3')->checkboxList($hefen_pos)->label('1.3定位合分取:位置') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-6">
+                    <div class="col-lg-4 col-xs-4">
                         <!--位置合分：合分3-->
                     <?= $form->field($model, 'hefen3')->textInput()->label('1.3定位合分:值')?>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 col-xs-6">
+                    <div class="col-lg-4 col-xs-4">
                         <!--位置合分：位置4-->
                     <?= $form->field($model, 'hefen_pos4')->checkboxList($hefen_pos)->label('1.4定位合分:取') ?>
                     <!--位置合分：合分4-->
                     </div>
-                    <div class="col-lg-4 col-xs-6">
+                    <div class="col-lg-4 col-xs-4">
                         <?= $form->field($model, 'hefen4')->textInput()->label('1.4定位合分:值')?>
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="col-lg-4 col-xs-6">
+                    <div class="col-lg-4 col-xs-4">
                         <!--两数合、三数合-->
                     <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList([1=>'两数和',2=>'三数合'])->label('2.不定位合分') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-6">
+                    <div class="col-lg-4 col-xs-4">
                     <!--位置合分：合分-->
                     <?= $form->field($model, 'no_fix_hefen')->textInput()->label('2.不定位合分:值')?>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 col-xs-6">
+                    <div class="col-lg-4 col-xs-4">
                     <!--三定含除、取-->
                     <?= $form->field($model, 'arise_in_sel')->checkboxList([1=>'除',2=>'取'])->label('3.三字定含') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-6">
+                    <div class="col-lg-4 col-xs-4">
                     <?= $form->field($model, 'arise_in')->textInput()->label('3.三字定含')?>
                     </div>
                 </div>

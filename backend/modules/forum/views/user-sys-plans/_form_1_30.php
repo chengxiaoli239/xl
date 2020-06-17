@@ -20,38 +20,52 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'playway')->radioList([
+                <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
+                <div class="row">
+                    <div class="col-lg-4 col-xs-4">
+                        <?= $form->field($model, 'playway')->radioList([
                         '1'=>'二字定',
                         //'2'=>'三字定',
                         //'3'=>'四字定',
                     ])->label('投注方式') ?>
-                    <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
-
+                    </div>
+                    <div class="col-lg-4 col-xs-4">
                     <!--?= $form->field($model, 'status')->textInput() ?-->
                     <?= $form->field($model, 'status')->radioList([
                         '0'=>'关闭',
                         '1'=>'开启',
                     ])->label('投注状态') ?>
+                    </div>
+                    <div class="col-lg-4 col-xs-4">
+                        <?= $form->field($model, 'is_test')->radioList([
+                            '0'=>'真',
+                            '1'=>'模拟',
+                        ])->label('真/模拟') ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-xs-4">
+                        <?= $form->field($model, 'single')->textInput() ?>
+                    </div>
+                    <div class="col-lg-4 col-xs-4">
+                        <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
+                    </div>
+                </div>
 
-                    <?= $form->field($model, 'single')->textInput() ?>
-
-                    <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
-
-                    <?= $form->field($model, 'p1')->textInput()->label('千') ?>
-
-                    <?= $form->field($model, 'p2')->textInput()->label('百') ?>
-
-                    <?= $form->field($model, 'p3')->textInput()->label('十') ?>
-
-                    <?= $form->field($model, 'p4')->textInput()->label('个') ?>
-
-                    <!--?= $form->field($model, 'p1')->textInput()->label('第1位') ?-->
-
-                    <!--?= $form->field($model, 'p2')->textInput()->label('第2位') ?-->
-
-                    <!--?= $form->field($model, 'p3')->textInput()->label('第3位') ?-->
-
-                    <!--?= $form->field($model, 'p4')->textInput()->label('第4位') ?-->
+                <div class="row">
+                    <div class="col-lg-3 col-xs-3">
+                        <?= $form->field($model, 'p1')->textInput()->label('第1位') ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-3">
+                        <?= $form->field($model, 'p2')->textInput()->label('第2位') ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-3">
+                        <?= $form->field($model, 'p3')->textInput()->label('第3位') ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-3">
+                        <?= $form->field($model, 'p4')->textInput()->label('第4位') ?>
+                    </div>
+                </div>
 
                     <!--?= $form->field($model, 'tz_type')->textInput() ?-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
@@ -64,20 +78,28 @@ use yii\widgets\ActiveForm;
                     <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:1-3-7-15-31-62-125-251') ?>
                     <?= $form->field($model, 'hz')->checkboxList($hzArr)->label('投注类型(和值)') ?>
 
-                    <!--?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?-->
+                <div class="row">
+                    <div class="col-lg-3 col-xs-4">
+                        <!--?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?-->
                     <?= $form->field($model, 'type_2')->checkBoxList([
                         0=>'除',
                         1=>'取'
                     ])->label('双重') ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
                     <?= $form->field($model, 'type_2b')->checkBoxList([
                         0=>'除',
                         1=>'取'
                     ])->label('两兄弟') ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
                     <?= $form->field($model, 'type_log')->checkBoxList([
                         //0=>'非四单四双',
                         0=>'除',
                         1=>'取',
                     ])->label('对数') ?>
+                    </div>
+                </div>
 
                     <?= $form->field($model, 'plan_type')->radioList($plan_types)->label('计划类型，为"止盈止损"计划时须填以下两项') ?>
 

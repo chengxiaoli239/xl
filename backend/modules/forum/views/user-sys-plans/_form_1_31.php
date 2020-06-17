@@ -20,33 +20,60 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'playway')->radioList([
-                        '1'=>'二字定',
-                        //'2'=>'三字定',
-                        //'3'=>'四字定',
-                    ])->label('投注方式') ?>
-                    <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
+                <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
+                <div class="row">
+                    <div class="col-lg-4 col-xs-4">
+                        <?= $form->field($model, 'playway')->radioList([
+                            '1'=>'二字定',
+                            //'2'=>'三字定',
+                            //'3'=>'四字定',
+                        ])->label('投注方式') ?>
+                    </div>
+                    <div class="col-lg-4 col-xs-4">
+                        <!--?= $form->field($model, 'status')->textInput() ?-->
+                        <?= $form->field($model, 'status')->radioList([
+                            '0'=>'关闭',
+                            '1'=>'开启',
+                        ])->label('投注状态') ?>
+                    </div>
+                    <div class="col-lg-4 col-xs-4">
+                        <?= $form->field($model, 'is_test')->radioList([
+                            '0'=>'真',
+                            '1'=>'模拟',
+                        ])->label('真/模拟') ?>
+                    </div>
+                </div>
 
-                    <!--?= $form->field($model, 'status')->textInput() ?-->
-                    <?= $form->field($model, 'status')->radioList([
-                        '0'=>'关闭',
-                        '1'=>'开启',
-                    ])->label('投注状态') ?>
+                <div class="row">
+                    <div class="col-lg-3 col-xs-6">
+                        <?= $form->field($model, 'single')->textInput() ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-6">
 
-                    <?= $form->field($model, 'single')->textInput() ?>
-
-                    <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
-                    <?= $form->field($model, 'p1')->textInput()->label('千') ?>
-
-                    <?= $form->field($model, 'p2')->textInput()->label('百') ?>
-
-                    <?= $form->field($model, 'p3')->textInput()->label('十') ?>
-
-                    <?= $form->field($model, 'p4')->textInput()->label('个') ?>
-
+                        <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'p1')->textInput()->label('第1位') ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'p2')->textInput()->label('第2位') ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'p3')->textInput()->label('第3位') ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-xs-3">
+                        <?= $form->field($model, 'p4')->textInput()->label('第4位') ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-3">
                     <?= $form->field($model, 'p5')->textInput()->label('五') ?>
+                    </div>
+                </div>
 
-                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:1-3-7-15-31-62-125-251') ?>
+                <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:1-3-7-15-31-62-125-251') ?>
                     <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
                     <!--?= $form->field($model, 'tz_type')->radioList($kArr)->label('投注类型') ?-->
