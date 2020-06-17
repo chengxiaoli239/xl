@@ -36,5 +36,6 @@ return [
     'KUAI_USERNAME' => '379879537', # 通过密码使用私密代理
     'KUAI_PASSWORD' => '14wmcx7y', # 快代理密码
 
+    'WX_IMG_URL_DOMAIN' => 'https://wx2.qq.com',
 ];
 
