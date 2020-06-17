@@ -7,6 +7,11 @@ use yii\widgets\ActiveForm;
 /* @var $model backend\models\UserSysPlans */
 /* @var $form yii\widgets\ActiveForm */
 ?>
+<style>
+    .form-control{
+        padding: 0px 1px;
+    }
+</style>
 
 <div class="user-sys-plans-form row">
     <div class="col-lg-12">
@@ -15,7 +20,11 @@ use yii\widgets\ActiveForm;
                 <?= Html::encode($this->title).'[快选]' ?>
             </header>
             <div class="panel-body">
-                <?php $form = ActiveForm::begin(); ?>
+                <?php $form = ActiveForm::begin([
+                    'fieldConfig' => [
+                        //'inputOptions'=>['class'=>'p-1'],
+                    ],
+                ]); ?>
                     <!--?= $form->field($model, 'uid')->textInput(['maxlength' => true]) ?-->
 
                     <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
