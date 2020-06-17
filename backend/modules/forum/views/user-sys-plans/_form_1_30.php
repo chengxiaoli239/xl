@@ -54,16 +54,16 @@ use yii\widgets\ActiveForm;
 
                 <div class="row">
                     <div class="col-lg-3 col-xs-3">
-                        <?= $form->field($model, 'p1')->textInput()->label('第1位') ?>
+                        <?= $form->field($model, 'p1')->textInput()->label('千') ?>
                     </div>
                     <div class="col-lg-3 col-xs-3">
-                        <?= $form->field($model, 'p2')->textInput()->label('第2位') ?>
+                        <?= $form->field($model, 'p2')->textInput()->label('百') ?>
                     </div>
                     <div class="col-lg-3 col-xs-3">
-                        <?= $form->field($model, 'p3')->textInput()->label('第3位') ?>
+                        <?= $form->field($model, 'p3')->textInput()->label('十') ?>
                     </div>
                     <div class="col-lg-3 col-xs-3">
-                        <?= $form->field($model, 'p4')->textInput()->label('第4位') ?>
+                        <?= $form->field($model, 'p4')->textInput()->label('个') ?>
                     </div>
                 </div>
 

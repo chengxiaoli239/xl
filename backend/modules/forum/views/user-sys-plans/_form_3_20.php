@@ -46,10 +46,10 @@ use yii\widgets\ActiveForm;
 
                     <div class="row">
                         <div class="col-lg-4 col-xs-6">
-                            <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
+                            <?= $form->field($model, 'single')->textInput()->label('倍(元)') ?>
                         </div>
                         <div class="col-lg-4 col-xs-6">
-                            <?= $form->field($model, 'single')->textInput() ?>
+                            <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
                         </div>
                     </div>
 

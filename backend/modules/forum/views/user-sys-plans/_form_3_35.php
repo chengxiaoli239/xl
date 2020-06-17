@@ -16,18 +16,27 @@ use yii\widgets\ActiveForm;
             </header>
             <div class="panel-body">
                 <?php $form = ActiveForm::begin(); ?>
-                    <?= $form->field($model, 'playway')->radioList([
-                        //'1'=>'二字定',
-                        //'2'=>'三字定',
-                        '3'=>'四字定',
-                    ])->label('投注方式') ?>
-
-                    <!--?= $form->field($model, 'status')->textInput() ?-->
-                    <?= $form->field($model, 'status')->radioList([
-                        '0'=>'关闭',
-                        '1'=>'开启',
-                    ])->label('投注状态') ?>
-
+                <div class="row">
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'playway')->radioList([
+                            //'1'=>'二字定',
+                            //'2'=>'三字定',
+                            '3'=>'四字定',
+                        ])->label('类型') ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'is_test')->radioList([
+                            '0'=>'真',
+                            '1'=>'模拟',
+                        ])->label('真/模拟') ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'status')->radioList([
+                            '0'=>'关',
+                            '1'=>'开',
+                        ])->label('状态') ?>
+                    </div>
+                </div>
                     <!--?= $form->field($model, 'single')->textInput() ?-->
 
                     <?= $form->field($model, 'import_codes_txt')->textInput()->label('号码跟倍数之间多组英文逗号或空格或分号隔开 2345:0.1,3456:0.2 或 2345 0.1 3456 0.2 或者 2345:0.1;3456:0.2') ?>

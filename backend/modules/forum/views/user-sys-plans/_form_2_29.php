@@ -51,7 +51,7 @@ use yii\widgets\ActiveForm;
 
                 <div class="row">
                     <div class="col-lg-4 col-xs-4">
-                        <!--位置合分：位置-->
+                    <!--位置合分：位置-->
                     <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>
                     </div>
                     <div class="col-lg-4 col-xs-4">
@@ -118,17 +118,6 @@ use yii\widgets\ActiveForm;
                         <div class="col-lg-3 col-xs-3"> <?= $form->field($model, 'p4')->textInput()->label('个') ?> </div>
                     </div>
 
-                    <!--?= $form->field($model, 'tz_type')->textInput() ?-->
-                    <!-- 1大小单双三字定2大小三字定3单双三字定 -->
-                    <!--?= $form->field($model, 'tz_type')->radioList($kArr)->label('投注类型') ?-->
-
-                    <!--?= $form->field($model, 'buy_type')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
-
-                    <!--?= $form->field($model, 'hz')->checkboxList($hzArr)->label('三数和值') ?-->
-
-                    <!--?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?-->
                     <div class="row">
                         <div class="col-lg-2 col-xs-4">
                         <?= $form->field($model, 'type_2')->checkBoxList([
@@ -170,13 +159,6 @@ use yii\widgets\ActiveForm;
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
 
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
-
-                    <!--?= $form->field($model, 'created_at')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'updated_at')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'update_time')->textInput() ?-->
-
                     <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
                             <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>
