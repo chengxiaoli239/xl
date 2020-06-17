@@ -61,7 +61,7 @@ use yii\widgets\ActiveForm;
                     <!--位置合分：位置-->
                     <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                         <!--位置合分：合分-->
                     <?= $form->field($model, 'hefen')->textInput()->label('1.1定位合分:值')?>
                     </div>
@@ -102,7 +102,7 @@ use yii\widgets\ActiveForm;
                         <!--三定含除、取-->
                         <?= $form->field($model, 'arise_in_sel')->checkboxList([1=>'除',2=>'取'])->label('2.三字定含') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                         <?= $form->field($model, 'arise_in')->textInput()->label('2.三字定含')?>
                     </div>
                 </div>
@@ -111,7 +111,7 @@ use yii\widgets\ActiveForm;
                         <!--两数合、三数合-->
                     <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList([1=>'两数',2=>'三数'])->label('3.不定位合分') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                     <!--位置合分：合分-->
                     <?= $form->field($model, 'no_fix_hefen')->textInput()->label('3.不定位合分:值')?>
                     </div>
