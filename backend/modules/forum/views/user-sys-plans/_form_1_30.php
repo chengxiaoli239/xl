@@ -8,6 +8,11 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
+<style>
+    .form-control{
+        padding: 0px 1px;
+    }
+</style>
 <div class="user-sys-plans-form row">
     <div class="col-lg-12">
         <section class="panel">
@@ -100,8 +105,6 @@ use yii\widgets\ActiveForm;
                     ])->label('对数') ?>
                     </div>
                 </div>
-
-                    <?= $form->field($model, 'plan_type')->radioList($plan_types)->label('计划类型，为"止盈止损"计划时须填以下两项') ?>
 
                     <!--止盈止损-->
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>

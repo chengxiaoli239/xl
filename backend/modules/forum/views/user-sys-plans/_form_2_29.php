@@ -71,7 +71,7 @@ use yii\widgets\ActiveForm;
                         <!--位置合分：位置2-->
                     <?= $form->field($model, 'hefen_pos2')->checkboxList($hefen_pos)->label('1.2定位合分:取') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                         <!--位置合分：合分2-->
                     <?= $form->field($model, 'hefen2')->textInput()->label('1.2定位合分:值')?>
                     </div>
@@ -81,7 +81,7 @@ use yii\widgets\ActiveForm;
                         <!--位置合分：位置3-->
                     <?= $form->field($model, 'hefen_pos3')->checkboxList($hefen_pos)->label('1.3定位合分:取') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                         <!--位置合分：合分3-->
                     <?= $form->field($model, 'hefen3')->textInput()->label('1.3定位合分:值')?>
                     </div>
@@ -92,7 +92,7 @@ use yii\widgets\ActiveForm;
                     <?= $form->field($model, 'hefen_pos4')->checkboxList($hefen_pos)->label('1.4定位合分:取') ?>
                     <!--位置合分：合分4-->
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-4 col-xs-6">
                         <?= $form->field($model, 'hefen4')->textInput()->label('1.4定位合分:值')?>
                     </div>
                 </div>

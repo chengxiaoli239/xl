@@ -22,7 +22,7 @@ use yii\widgets\ActiveForm;
 
                 <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
                 <div class="row">
-                    <div class="col-lg-4 col-xs-6">
+                    <div class="col-lg-4 col-xs-4">
                     <?= $form->field($model, 'playway')->radioList([
                         //'1'=>'二字定',
                         //'2'=>'三字定',
