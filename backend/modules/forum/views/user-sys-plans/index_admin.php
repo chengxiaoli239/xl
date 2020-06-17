@@ -204,7 +204,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
 
                         //['class' => 'yii\grid\ActionColumn'],
-                        ['class' => 'yii\grid\ActionColumn','headerOptions'=>['width'=>'5%'],'template'=>'{update}'],
+                        ['class' => 'yii\grid\ActionColumn','headerOptions'=>['width'=>'5%'],'template'=>'{update}&nbsp;&nbsp;&nbsp;&nbsp;{delete}'],
                     ],
                 ]); ?>
             </div>
