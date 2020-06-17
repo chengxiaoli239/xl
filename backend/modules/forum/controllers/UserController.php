@@ -6,6 +6,7 @@ use backend\models\Admin;
 use backend\models\TzSystemsAuth;
 use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
 use backend\models\TzSystemsUsers;
+use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\UserService;
 use common\models\AdminModel;
@@ -120,6 +121,19 @@ class UserController extends BaseController
                 'models' => $model
             ]);
         }
+    }
+
+    /**
+     * @desc 手动登录
+     * @return array|bool
+     */
+    public function actionLogin(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $id = $post['tz_sys_users_id'];
+        $rst = BaseService::login($id);
+
+        return $rst;
     }
 
     /**

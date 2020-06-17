@@ -111,7 +111,7 @@ class SevenService extends BaseTZService {
         \Yii::$app->params['ajaxUrlRouteLotDw']  = $TzSystemUser->ssc_domain.Yii::$app->params['ajaxUrlRouteLotDw_key'];
         $tzSiteInfo = [
             'baseUrl' => $TzSystemUser->ssc_domain,
-            'domain' => \Yii::$app->params['domain'],
+            'domain' => str_replace('http://','',$TzSystemUser->ssc_domain),
             'CANCEL_ORDER' => $baseUrl.'/Member/CancelMemberBet',
             'ORDER_TZ' => $baseUrl.'/Member/BatchBet',
             'SSC_INDEX' => $baseUrl,
