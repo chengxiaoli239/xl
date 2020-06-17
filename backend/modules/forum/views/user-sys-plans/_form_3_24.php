@@ -43,7 +43,7 @@ use yii\widgets\ActiveForm;
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-3 col-xs-6">
+                    <div class="col-lg-3 col-xs-12">
                         <?= $form->field($model, 'single')->textInput() ?>
                     </div>
                 </div>

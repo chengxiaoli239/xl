@@ -30,20 +30,20 @@ use yii\widgets\ActiveForm;
                         ])->label('类型') ?>
                     </div>
                     <div class="col-lg-3 col-xs-4">
-                        <?= $form->field($model, 'is_test')->radioList([
-                            '0'=>'真实',
-                            '1'=>'模拟',
-                        ])->label('真/模拟') ?>
-                    </div>
-                    <div class="col-lg-3 col-xs-4">
                         <?= $form->field($model, 'status')->radioList([
                             '0'=>'关闭',
                             '1'=>'开启',
                         ])->label('状态') ?>
                     </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'is_test')->radioList([
+                            '0'=>'真',
+                            '1'=>'模拟',
+                        ])->label('真/模拟') ?>
+                    </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-3 col-xs-6">
+                    <div class="col-lg-3 col-xs-12">
                         <?= $form->field($model, 'single')->textInput()->label('倍(元)') ?>
                     </div>
                 </div>

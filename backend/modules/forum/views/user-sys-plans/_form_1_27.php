@@ -21,28 +21,30 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
 
                     <div class="row">
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
                             <?= $form->field($model, 'playway')->radioList([
-                            '1'=>'二字定',
-                            //'2'=>'三字定',
-                            //'3'=>'四字定',
-                        ])->label('投注方式') ?>
+                                '1'=>'二字定',
+                                //'2'=>'三字定',
+                                //'3'=>'四字定',
+                            ])->label('投注方式') ?>
                         </div>
-                        <div class="col-lg-3">
-
+                        <div class="col-lg-4">
                             <!--?= $form->field($model, 'status')->textInput() ?-->
-                        <?= $form->field($model, 'status')->radioList([
-                            '0'=>'关闭',
-                            '1'=>'开启',
-                        ])->label('投注状态') ?>
+                            <?= $form->field($model, 'status')->radioList([
+                                '0'=>'关闭',
+                                '1'=>'开启',
+                            ])->label('投注状态') ?>
                         </div>
-                        <div class="col-lg-3">
-
-                            <?= $form->field($model, 'single')->textInput() ?>
+                        <div class="col-lg-4 col-xs-4">
+                            <?= $form->field($model, 'is_test')->radioList([
+                                '0'=>'真',
+                                '1'=>'模拟',
+                            ])->label('真/模拟') ?>
                         </div>
                     </div>
+                <?= $form->field($model, 'single')->textInput() ?>
 
-                    <?= $form->field($model, 'import_codes_txt')->textInput()->label('多组英文逗号或空格隔开 格式：23XX,34XX 或 23XX 34XX') ?>
+                <?= $form->field($model, 'import_codes_txt')->textInput()->label('多组英文逗号或空格隔开 格式：23XX,34XX 或 23XX 34XX') ?>
                     <input type="hidden" name="UserSysPlans[tz_type]" value="27"><!--三定导入-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
                     <!--?= $form->field($model, 'tz_type')->radioList([ //'1'=>'大小单双三字定', //'2'=>'大小三字定', '3'=>'单双三字定', ])->label('投注类型') ?-->

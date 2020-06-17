@@ -43,7 +43,7 @@ use yii\widgets\ActiveForm;
                         ])->label('真/模拟') ?>
                     </div>
                 </div>
-                    <?= $form->field($model, 'single')->textInput() ?>
+                <?= $form->field($model, 'single')->textInput() ?>
 
                 <div class="row">
                     <div class="col-lg-4 col-xs-6">
