@@ -2818,7 +2818,7 @@ class SscDataService extends BaseService {
      * @param int $interval
      * @return mixed
      */
-    public static function getPlanChartsData($plan_id = 981, $periodsArr, $positions, $interval = 200){
+    public static function getPlanChartsData($plan_id = 981, $periodsArr, $positions, $interval = 10000){
         $data['xAxis'] = [ 'data'=>[] ];    // 期号
         $series = [];
         $times = [6=>0.07, 7=>0.08, 8=>0.09, 9=>0.10, 10=>0.09, 11=>0.08, 12=>0.07];
@@ -2832,6 +2832,7 @@ class SscDataService extends BaseService {
             $tmpData['name'] = $periods.'月';
             $tmpData['type'] = 'line';
             $tmpData['stack'] = '次数';
+            $tmpData['symbolSize'] = 'symbolSize';
             $tmpData['smooth'] = true;
             $numsData = [];
             $datas = array_reverse($datas);
@@ -2843,6 +2844,7 @@ class SscDataService extends BaseService {
                 !in_array($key, $data['xAxis']['data']) && $data['xAxis']['data'][] = $key;
                 //$numsData[] = $d->cut_profits - ceil($periods * $times[$plan_id]);
                 $numsData[] = [$key, $d->cut_profits + $dif_cut_profits];
+                //$numsData[] = $d->cut_profits + $dif_cut_profits;
             }
             $tmpData['data'] = $numsData;
             $series[] = $tmpData;

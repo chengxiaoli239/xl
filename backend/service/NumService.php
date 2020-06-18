@@ -2002,7 +2002,12 @@ class NumService extends BaseService {
         $rst = ['status'=>200, 'msg'=>'操作成功'];
 
         $m = \Yii::$app->cache;
-        $where = ['OR', ['AND', ['=', 'account', 'admin'], ['=', 'status', 1]], ['=', 'id', '981'], ['=', 'id', '1029']];
+        $where = ['OR', ['AND', ['=', 'account', 'admin'], ['=', 'status', 1]]];
+        $planids = explode(',', SystemConfig::findOne(['key'=>'system_static_plan_ids'])->value);
+        foreach ($planids as $planid){
+            $where = array_merge($where, [['=', 'id', $planid]]);
+        }
+
         $plans = UserSysPlans::find()->where($where)->all();
 
         $time = time();
@@ -2012,7 +2017,7 @@ class NumService extends BaseService {
                 $last_id = 0;
             }
             $lottery_type = $plan->lottery_type;
-            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>=', 'date', '2019-06-01']];
+            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>=', 'date', '2018-01-01']];
             $last_qihao = NumService::getLastStaticProfitsQihao($lottery_type, $plan->id);
             if($last_qihao){
                 $where = array_merge($where, [['>', 'qihao', $last_qihao]]);

@@ -21,10 +21,10 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="adv-table editable-table ">
                 <div class="clearfix">
                     <div class="btn-group">
-                        <?= Html::a(Yii::t('app', '981'), ['type-static-profits', 'StaticProfits[plan_id]'=>981], ['class' => 'btn '.($plan_id==981?'btn-success':'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+                        <?= Html::a(Yii::t('app', '正买：981'), ['type-static-profits', 'StaticProfits[plan_id]'=>981], ['class' => 'btn '.($plan_id==981?'btn-success':'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
                     </div>
                     <div class="btn-group">
-                        <?= Html::a(Yii::t('app', '1029'), ['type-static-profits', 'StaticProfits[plan_id]'=>1029], ['class' => 'btn '.($plan_id==1029?'btn-success':'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+                        <?= Html::a(Yii::t('app', '反买：1029'), ['type-static-profits', 'StaticProfits[plan_id]'=>1029], ['class' => 'btn '.($plan_id==1029?'btn-success':'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
                     </div>
                 </div>
 
@@ -97,8 +97,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             'yAxis' => [
                                 'name' => '利润',
                                 //'type' => 'value',
-                                'min' -8000,
-                                'max' => 8000,
+                                'min' => 0-$chartsData['range'],
+                                'max' => $chartsData['range'],
                                 'minorTick' => [
                                     'show'=> true
                                 ],
