@@ -2818,14 +2818,23 @@ class SscDataService extends BaseService {
      * @param int $interval
      * @return mixed
      */
-    public static function getPlanChartsData($plan_id = 981, $periodsArr, $positions, $interval = 10000){
+    public static function getPlanChartsData($plan_id = 981, $interval = 200){
         $data['xAxis'] = [ 'data'=>[] ];    // 期号
         $series = [];
         $times = [6=>0.07, 7=>0.08, 8=>0.09, 9=>0.10, 10=>0.09, 11=>0.08, 12=>0.07];
+        $start_time = strtotime('2018-01-01 00:00:00');
+        $end_time = date('Y-m');
+        $periodsArr = [];
+        for ($i=0; $i<120; $i++){
+            $end = date('Y-m', strtotime('+'.$i.' month', $start_time));
+            if($end > $end_time) break;
+            $periodsArr[] = $end;
+        }
+        //p($periodsArr);
 
         $data['range'] = 35000;
         foreach ($periodsArr as $periods){
-            $where = ['plan_id'=>$plan_id, 'static_time'=>$periods];
+            $where = ['AND', ['=', 'plan_id', $plan_id], ['>=', 'static_time', $periods]];
             $fields = ['id', 'plan_id','static_time', 'qihao', 'cut_profits'];
             $datas = StaticProfits::find()->select($fields)->where($where)->limit($interval)->orderBy('qihao DESC')->all();
             $tmpData = [];

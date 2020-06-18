@@ -95,16 +95,8 @@ class EchartsController extends BaseController
         $plan_id = $queryParams['StaticProfits']['plan_id'];
         //$hezhi = $queryParams['SscDwsHzNums']['hezhi'];
         //$hezhi = $hezhi ? $hezhi : 9;
-        $periodsArr = [
-            '2020-06',
-            //'2020-05',
-            //'2020-04',
-            //'2020-03',
-            //'2020-02',
-            //'2020-01',
-        ];
         $plan_id = $plan_id ? $plan_id : '981';
-        $chartsData = SscDataService::getPlanChartsData($plan_id, $periodsArr, $positions);
+        $chartsData = SscDataService::getPlanChartsData($plan_id);
         //p($chartsData['series']);
 
         $searchModel->plan_id = $plan_id;
