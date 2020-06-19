@@ -3,6 +3,7 @@
 namespace backend\modules\forum\controllers;
 
 use backend\models\searchs\VPerdateProfits as VPerdateProfitsSearch;
+use backend\service\AgentUsersService;
 use backend\service\BetService;
 use backend\service\HN0898Service;
 use backend\service\StaticService;
@@ -44,13 +45,7 @@ class BettingRecordsController extends BaseController
         $searchModel = new BettingRecordsSearch();
         $queryParams = Yii::$app->request->queryParams;
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
-        /*
-        if(!$queryParams['BettingRecords']['lottery_type']){
-            $lottery_type = $lottery_types[0]['lottery_type'];
-        }else{
-            $lottery_type = $queryParams['BettingRecords']['lottery_type'];
-        }
-        */
+
         $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
         $queryParams['BettingRecords']['lottery_type'] = $lottery_type;
 
@@ -68,12 +63,17 @@ class BettingRecordsController extends BaseController
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ];
+        $is_agent = AgentUsersService::isAgent($this->_user_id);
         if($this->_user_id !== 1){ # 超级管理员
-            return $this->render('index', $data);
-            //return $this->redirect(['index','BettingRecords[lottery_type]'=>$lottery_type]);
+            if($is_agent){
+                $view = 'index_agent';
+            }else{
+                $view = 'index';
+            }
         }else{
-            return $this->render('index_admin', $data);
+            $view = 'index_admin';
         }
+        return $this->render($view, $data);
     }
 
     /**

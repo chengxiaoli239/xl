@@ -57,7 +57,7 @@ class ChatCommonBetService extends BaseService {
             $setData = [
                 'agent_id' => $userInfo->agent_id,
                 'type' => $type,
-                'desc' => $desc,
+                'post_desc' => $desc,
                 'token' =>$token,
                 'status' => 0,
                 'tz_system_id' => $TzSystemsUsers->tz_system_id,

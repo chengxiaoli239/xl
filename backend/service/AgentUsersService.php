@@ -11,6 +11,7 @@ namespace backend\service;
 use backend\models\AgentUsers;
 use backend\models\AgentUsersBalanceFlows;
 use backend\models\CodeTypes;
+use backend\models\TzSystemsUsers;
 use common\service\CommonService;
 use yii\helpers\ArrayHelper;
 use  yii;
@@ -215,5 +216,26 @@ class AgentUsersService extends BaseService {
         $rst = ['status'=>200, 'msg'=>'操作成功'];
 
         return $rst;
+    }
+
+    /**
+     * @desc 是否为代理
+     * @param string $admin_id
+     * @return bool
+     */
+    public static function isAgent($admin_id = ''){
+        $flag = false;
+        //if(empty($admin_id)) $flag = false;
+        $m = \Yii::$app->cache;
+        $mkey = 'IS_AGENT_UID_'.$admin_id;
+        if(true OR !$m->get($mkey)){
+            $where = ['AND', ['=', 'uid', $admin_id], ['=', 'status', 1]];
+            $TzSystemsUsers = TzSystemsUsers::find()->where($where)->one();
+            if($TzSystemsUsers->is_agent){
+                $flag = true;
+            }
+            $m->set($mkey, $flag, 3600);
+        }
+        return $flag;
     }
 }

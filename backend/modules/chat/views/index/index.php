@@ -1,6 +1,6 @@
 <title>聊天室</title>
-<script src="http://120.77.157.40:8090/chat_statics/js/jquery-1.8.0.min.js"></script>
-<script src="http://120.77.157.40:8090/chat_statics/js/fingerprint2.min.js"></script>
+<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<script src="/chat_statics/js/fingerprint2.min.js"></script>
 <style>
     .button-area li {
         height: .7rem;
