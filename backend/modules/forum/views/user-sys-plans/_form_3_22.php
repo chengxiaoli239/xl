@@ -7,6 +7,11 @@ use yii\widgets\ActiveForm;
 /* @var $model backend\models\UserSysPlans */
 /* @var $form yii\widgets\ActiveForm */
 ?>
+<style>
+    .btn-default:active {
+        background-color: green !important;
+    }
+</style>
 
 <div class="user-sys-plans-form row">
     <div class="col-lg-12">
@@ -53,8 +58,30 @@ use yii\widgets\ActiveForm;
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
                     <?= $form->field($model, 'hz_Arr')->checkboxList($hzArr)->label('投注类型[单双]') ?>
                     <!--?= $form->field($model, 'tz_type')->radioList($kArr)->label('投注类型') ?-->
+                <div class="row">
+                    <div class="col-lg-3 col-xs-4">
+                        <a id="2d2s" href="#" class="btn btn-default btn-xs">两单两双</a>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <a id="1d3s" href="#" class="btn btn-default btn-xs">一单三双</a>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <a id="1s3d" href="#" class="btn btn-default btn-xs">一双三单</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-xs-4">
+                        <a id="1d3s4d4s" href="#" class="btn btn-default btn-xs">一单三双44</a>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <a id="1s3d4d4s" href="#" class="btn btn-default btn-xs">一双三单44</a>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <a id="4d4s" href="#" class="btn btn-default btn-xs">四单四双</a>
+                    </div>
+                </div>
 
-                    <!--?= $form->field($model, 'buy_type')->textInput() ?-->
+                <!--?= $form->field($model, 'buy_type')->textInput() ?-->
 
                     <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:0.1-0.3-0.7-1.5-3.1') ?>
 
@@ -81,3 +108,136 @@ use yii\widgets\ActiveForm;
         </section>
     </div>
 </div>
+<input type="hidden" id="type_id" value="">
+<input type="hidden" id="type_val" value="">
+<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<script>
+$(function () {
+    // 两单两双
+    $('#2d2s').click(function () {
+        $("[name='UserSysPlans[hz_Arr][]']").each(function () {
+            var arr = ['1122', '1212', '2121', '2112', '2211', '1221'];
+            v = $.inArray($(this).val(), arr);
+            if(v != -1){
+                if($(this).prop('checked') == false){
+                    $(this).prop("checked",true);
+                }else {
+                    $(this).prop("checked",false);
+                }
+            }else if($(this).prop('checked') == true) {
+                $(this).prop("checked", false);
+            }
+        });
+    });
+    // 一单三双
+    $('#1d3s').click(function () {
+        $("[name='UserSysPlans[hz_Arr][]']").each(function () {
+            var arr = ['1222', '2122', '2212', '2221'];
+            v = $.inArray($(this).val(), arr);
+            if(v != -1){
+                if($(this).prop('checked') == false){
+                    $(this).prop("checked",true);
+                }else {
+                    $(this).prop("checked",false);
+                }
+            }else if($(this).prop('checked') == true) {
+                $(this).prop("checked", false);
+            }
+        });
+    });
+    // 一单三双四单四双
+    $('#1d3s4d4s').click(function () {
+        //type_id = $('#type_id').val('1d3s4d4s');
+        type_id = $('#type_id').val();
+        if(type_id == '1d3s4d4s' && $('#type_val').val() == 1){
+            $("[name='UserSysPlans[hz_Arr][]']").each(function () {
+                $(this).prop("checked",false);
+            });
+            $('#type_val').val(0);
+        }else if(type_id == '1d3s4d4s' && $('#type_val').val() == 0){
+            $('#type_val').val(1);
+        }else if(type_id != '1d3s4d4s' || $('#type_val').val() == 0){
+            $('#type_id').val('1d3s4d4s');
+            $('#type_val').val(1);
+        }
+        val = $('#type_val').val();
+        $("[name='UserSysPlans[hz_Arr][]']").each(function () {
+            var arr = ['1222', '2122', '2212', '2221', '1111', '2222'];
+            v = $.inArray($(this).val(), arr);
+            if(v >= 0 && val == 1){
+                $(this).prop("checked",true);
+            }else {
+                $(this).prop("checked", false);
+            }
+        });
+    });
+    // 一双三单
+    $('#1s3d').click(function () {
+        $("[name='UserSysPlans[hz_Arr][]']").each(function () {
+            var arr = ['2111', '1211', '1121', '1112'];
+            v = $.inArray($(this).val(), arr);
+            if(v != -1){
+                if($(this).prop('checked') == false){
+                    $(this).prop("checked",true);
+                }else {
+                    $(this).prop("checked",false);
+                }
+            }else if($(this).prop('checked') == true) {
+                $(this).prop("checked", false);
+            }
+        });
+    });
+    // 一双三单四单四双
+    $('#1s3d4d4s').click(function () {
+        type_id = $('#type_id').val();
+        if(type_id == '1s3d4d4s' && $('#type_val').val() == 1){
+            $("[name='UserSysPlans[hz_Arr][]']").each(function () {
+                $(this).prop("checked",false);
+            });
+            $('#type_val').val(0);
+        }else if(type_id == '1s3d4d4s' && $('#type_val').val() == 0){
+            $('#type_val').val(1);
+        }else if(type_id != '1s3d4d4s'){
+            $('#type_id').val('1s3d4d4s');
+            $('#type_val').val(1);
+        }
+        val = $('#type_val').val();
+        $("[name='UserSysPlans[hz_Arr][]']").each(function () {
+            var arr = ['2111', '1211', '1121', '1112', '1111', '2222'];
+            v = $.inArray($(this).val(), arr);
+            console.log(v, $(this).val(), $(this).prop('checked'))
+            if(v >= 0 && val == 1){
+                $(this).prop("checked",true);
+            }else {
+                $(this).prop("checked", false);
+            }
+        });
+        //$('#type_val').val('');
+    });
+    // 四单四双
+    $('#4d4s').click(function () {
+        type_id = $('#type_id').val();
+        if(type_id == '4d4s' && $('#type_val').val() == 1){
+            $("[name='UserSysPlans[hz_Arr][]']").each(function () {
+                $(this).prop("checked",false);
+            });
+            $('#type_val').val(0);
+        }else if(type_id == '4d4s' && $('#type_val').val() == 0){
+            $('#type_val').val(1);
+        }else if(type_id != '4d4s' || $('#type_val').val() == 0){
+            $('#type_id').val('4d4s');
+            $('#type_val').val(1);
+        }
+        val = $('#type_val').val();
+        $("[name='UserSysPlans[hz_Arr][]']").each(function () {
+            var arr = ['1111', '2222'];
+            v = $.inArray($(this).val(), arr);
+            if(v >= 0 && val == 1){
+                $(this).prop("checked",true);
+            }else if($(this).prop('checked') == true) {
+                $(this).prop("checked", false);
+            }
+        });
+    });
+});
+</script>
