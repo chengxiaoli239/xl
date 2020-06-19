@@ -9,8 +9,9 @@ use Yii;
  *
  * @property int $id
  * @property string $codes 投注号码
- * @property int $uid 用户id
+ * @property int $uid 用户id,代理id
  * @property string $account
+ * @property int $member_id 会员id
  * @property int $playway 投注方式：10定位胆
  * @property int $tz_type 投注类型
  * @property string $playway_name 投注方式
@@ -33,6 +34,7 @@ use Yii;
  * @property string $lotteryclass 彩种
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property int $is_profits_record 是否计算盈利记录0否1是
+ * @property string $post_desc 下注文本
  * @property int $createtime
  * @property string $create_time 投注时间
  * @property int $updated_at 更新时间
@@ -54,8 +56,8 @@ class BettingRecords extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['codes', 'snid'], 'string'],
-            [['uid', 'playway', 'tz_type', 'status', 'cancel_status', 'plan_id', 'buy_type', 'is_simulate', 'order_type', 'tz_system_id', 'lottery_type', 'is_profits_record', 'createtime', 'updated_at', 'created_at'], 'integer'],
+            [['codes', 'snid', 'post_desc'], 'string'],
+            [['uid', 'member_id', 'playway', 'tz_type', 'status', 'cancel_status', 'plan_id', 'buy_type', 'is_simulate', 'order_type', 'tz_system_id', 'lottery_type', 'is_profits_record', 'createtime', 'updated_at', 'created_at'], 'integer'],
             [['betting_money', 'bonus', 'single', 'profits'], 'number'],
             [['account', 'sn'], 'string', 'max' => 255],
             [['playway_name', 'create_time'], 'string', 'max' => 32],
@@ -74,8 +76,9 @@ class BettingRecords extends \common\models\base\BaseModel
         return [
             'id' => 'ID',
             'codes' => '投注号码',
-            'uid' => '用户id',
+            'uid' => '用户id,代理id',
             'account' => 'Account',
+            'member_id' => '会员id',
             'playway' => '投注方式：10定位胆',
             'tz_type' => '投注类型',
             'playway_name' => '投注方式',
@@ -98,6 +101,7 @@ class BettingRecords extends \common\models\base\BaseModel
             'lotteryclass' => '彩种',
             'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
             'is_profits_record' => '是否计算盈利记录0否1是',
+            'post_desc' => '下注文本',
             'createtime' => 'Createtime',
             'create_time' => '投注时间',
             'updated_at' => '更新时间',
