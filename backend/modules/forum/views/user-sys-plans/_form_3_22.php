@@ -59,24 +59,22 @@ use yii\widgets\ActiveForm;
                     <?= $form->field($model, 'hz_Arr')->checkboxList($hzArr)->label('投注类型[单双]') ?>
                     <!--?= $form->field($model, 'tz_type')->radioList($kArr)->label('投注类型') ?-->
                 <div class="row">
-                    <div class="col-lg-3 col-xs-4">
+                    <div class="col-lg-2 col-xs-4">
                         <a id="2d2s" href="#" class="btn btn-default btn-xs">两单两双</a>
                     </div>
-                    <div class="col-lg-3 col-xs-4">
+                    <div class="col-lg-2 col-xs-4">
                         <a id="1d3s" href="#" class="btn btn-default btn-xs">一单三双</a>
                     </div>
-                    <div class="col-lg-3 col-xs-4">
+                    <div class="col-lg-2 col-xs-4">
                         <a id="1s3d" href="#" class="btn btn-default btn-xs">一双三单</a>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-3 col-xs-4">
+                    <div class="col-lg-2 col-xs-4">
                         <a id="1d3s4d4s" href="#" class="btn btn-default btn-xs">一单三双44</a>
                     </div>
-                    <div class="col-lg-3 col-xs-4">
+                    <div class="col-lg-2 col-xs-4">
                         <a id="1s3d4d4s" href="#" class="btn btn-default btn-xs">一双三单44</a>
                     </div>
-                    <div class="col-lg-3 col-xs-4">
+                    <div class="col-lg-2 col-xs-4">
                         <a id="4d4s" href="#" class="btn btn-default btn-xs">四单四双</a>
                     </div>
                 </div>
