@@ -2602,5 +2602,20 @@ $sql .= '
         return $staticDatas;
     }
 
+    /**
+     * @desc 号码类型统计
+     * @param string $val
+     * @param int $type
+     * @param int $lottery_type
+     * @param int $static_nums
+     * @return array|string
+     */
+    public static function getValStatic($val = '', $type = 4, $lottery_type = DEFAULT_LOTTERY_TYPE, $static_nums = 50000){
+        if(empty($val)) return '';
+
+        $data = SscDataService::getCodeTypeYlHistoryMiss($val, $lottery_type, $static_nums, $type);
+
+        return $data;
+    }
 
 }

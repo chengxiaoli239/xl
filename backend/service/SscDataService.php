@@ -1249,8 +1249,8 @@ class SscDataService extends BaseService {
             $tmpArr[0] = $allKjData[$tmpArrKey[0]]['qihao'];
             $tmpArr[1] = $allKjData[$tmpArrKey[1]]['qihao'];
 
-            /*
             $max_miss = max($range);
+            /*
             $maxKey = array_search($max_miss, $range);
             $keyArr = explode('_',$maxKey);
             $tmpArr = [];

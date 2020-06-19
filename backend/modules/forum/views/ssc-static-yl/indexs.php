@@ -39,18 +39,26 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'id',
                         //'val',
                         ['attribute' => 'val','headerOptions'=>['width'=>'5%'],'label'=>'号码',
+                            'format'=>'raw',
                             'value' => function($model) {
-                                return \backend\service\SscDataService::getStaticNameByType($model->val);
+                                $txt = \backend\service\SscDataService::getStaticNameByType($model->val);
+                                $options = [
+                                    'class' => 'code_val',
+                                    'data-val' => $txt,
+                                    'data-type' => Yii::$app->request->queryParams['SscStaticYl']['type'],
+                                    'data-lottery_type' => Yii::$app->request->queryParams['SscStaticYl']['lottery_type'],
+                                ];
+                                return Html::a($txt, '#', $options);
                             }
                         ],
                         //'current_miss',
-                        ['attribute' => 'current_miss','headerOptions'=>['width'=>'5%'],'label'=>'当前遗漏',
+                        ['attribute' => 'current_miss','headerOptions'=>['width'=>'5%'],'label'=>'当前',
                             'value' => function($model) {
                                 return $model->current_miss;
                             }
                         ],
                         //'last_time_miss',
-                        ['attribute' => 'last_time_miss','headerOptions'=>['width'=>'5%'],'label'=>'当前遗漏',
+                        ['attribute' => 'last_time_miss','headerOptions'=>['width'=>'5%'],'label'=>'上次',
                             'value' => function($model) {
                                 return $model->last_time_miss;
                             }
@@ -130,3 +138,42 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<div class="modal fade" id="rstTipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
+     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
+">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_title">提示信息</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group up-reason">
+                    <label id="tip_msg_rst" for="tip_msg_rst"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="opRstConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<script>
+$(function () {
+    $('.code_val').click(function () {
+        val = $(this).data('val');
+        type = $(this).data('type');
+        lottery_type = $(this).data('lottery_type');
+        console.log(val, type, lottery_type);
+        $.post('/forum/ssc-static-yl/get-val-static', {val:val,type:type,lottery_type:lottery_type}, function(rst) {
+            $('#tip_msg_rst').html('<strong>号码：</strong>'+val + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str)
+            $('#rstTipModal').modal('show');
+        });
+    });
+})
+</script>

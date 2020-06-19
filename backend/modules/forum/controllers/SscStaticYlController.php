@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\StaticService;
 use backend\service\UserSysPlansService;
 use common\service\CommonService;
 use Yii;
@@ -70,6 +71,21 @@ class SscStaticYlController extends BaseController
             'codeTypeName' => $codeTypeName,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    /**
+     * @desc 单个号码统计
+     * @return array|string
+     */
+    public function actionGetValStatic(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $type = $post['type'] ? $post['type'] : 4;
+        $lottery_type = $post['lottery_type'] ? $post['lottery_type'] : 5;
+
+        $rst = StaticService::getValStatic($post['val'], $type, $lottery_type);
+
+        return $rst;
     }
 
     /**
