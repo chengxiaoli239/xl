@@ -2603,7 +2603,7 @@ $sql .= '
     }
 
     /**
-     * @desc 号码类型统计
+     * @desc 单个号码类型遗漏统计
      * @param string $val
      * @param int $type
      * @param int $lottery_type
@@ -2618,4 +2618,17 @@ $sql .= '
         return $data;
     }
 
+    /**
+     * @desc 和值遗漏
+     * @param string $hzs
+     * @param int $lottery_type
+     * @param int $static_nums
+     * @return array
+     */
+    public static function getHzYl($hzs = '0,1,2,3,4,5,6', $lottery_type = DEFAULT_LOTTERY_TYPE, $static_nums = 50000){
+        $zuHes = explode(',', $hzs);
+        $miss = SscDataService::getSdHzYlHistoryMiss($zuHes, $lottery_type, $static_nums);
+
+        return $miss;
+    }
 }

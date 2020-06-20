@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\StaticService;
 use backend\service\UserSysPlansService;
 use common\service\CommonService;
 use Yii;
@@ -71,6 +72,20 @@ class SscSdHzYlController extends BaseController
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
+    }
+
+    /**
+     * @desc 和值遗漏
+     * @return array
+     */
+    public function actionGetHzStatic(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $lottery_type = $post['lottery_type'] ? $post['lottery_type'] : 5;
+
+        $rst = StaticService::getHzYl($post['val'], $lottery_type);
+
+        return $rst;
     }
 
     /**
