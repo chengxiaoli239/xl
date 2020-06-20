@@ -14,6 +14,7 @@ use Yii;
  * @property int $status 状态
  * @property string $codes 组合号码
  * @property string $desc 描述
+ * @property int $flag 类型标识
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -34,7 +35,7 @@ class CodeTypes extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['playway', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['playway', 'status', 'flag', 'created_at', 'updated_at'], 'integer'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['type'], 'string', 'max' => 255],
@@ -56,6 +57,7 @@ class CodeTypes extends \common\models\base\BaseModel
             'status' => '状态',
             'codes' => '组合号码',
             'desc' => '描述',
+            'flag' => '类型标识',
             'created_at' => '创建时间',
             'updated_at' => '更新时间',
             'update_time' => '更新时间',
