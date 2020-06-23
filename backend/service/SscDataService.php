@@ -2818,7 +2818,7 @@ class SscDataService extends BaseService {
      * @param int $interval
      * @return mixed
      */
-    public static function getPlanChartsData($plan_id = 981, $interval = 200){
+    public static function getPlanChartsData($plan_id = 981, $interval = 100){
         $data['xAxis'] = [ 'data'=>[] ];    // 期号
         $series = [];
         $times = [6=>0.07, 7=>0.08, 8=>0.09, 9=>0.10, 10=>0.09, 11=>0.08, 12=>0.07];

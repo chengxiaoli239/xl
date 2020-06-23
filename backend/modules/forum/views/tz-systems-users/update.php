@@ -12,7 +12,7 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Tz Systems Users'), 
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
-<section class="tz-systems-users-update wrapper site-min-height">
+<section class="user-view wrapper site-min-height">
 
     <?= $this->render('_form', [
         'model' => $model,

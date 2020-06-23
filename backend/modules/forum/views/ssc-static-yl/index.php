@@ -39,10 +39,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         //'id',
                         //'val',
-                        ['attribute' => 'val','headerOptions'=>['width'=>'5%'],'label'=>'当前遗漏',
+                        ['attribute' => 'val','headerOptions'=>['width'=>'5%'],'label'=>'号码',
+                            'format'=>'raw',
                             'value' => function($model) {
-                                $rst = \backend\service\SscDataService::getStaticNameByType($model->val);
-                                return $rst;
+                                $txt = \backend\service\SscDataService::getStaticNameByType($model->val);
+                                $options = [
+                                    'class' => 'code_val',
+                                    'data-val' => $model->val,
+                                    'data-lottery_type' => Yii::$app->request->queryParams['SscStaticYl']['lottery_type'],
+                                ];
+                                return Html::a($txt, '#', $options);
                             }
                         ],
                         'current_miss',
@@ -71,3 +77,16 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<script>
+    $(function () {
+        $('.code_val').click(function () {
+            val = $(this).data('val');
+            lottery_type = $(this).data('lottery_type');
+            $.post('/forum/ssc-static-yl/get-code-type-static', {val:val,lottery_type:lottery_type}, function(rst) {
+                $('#tip_msg_rst').html('<strong>号码：</strong>'+val + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str)
+                $('#rstTipModal').modal('show');
+            });
+        });
+    })
+</script>

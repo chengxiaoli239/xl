@@ -130,6 +130,12 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['type_log'] = $UserSysPlans['type_log'][0];
         }
         unset($post['UserSysPlans']['type_log']);
+        # 15、单双类型
+        if(isset($UserSysPlans['type_4ds']) && $UserSysPlans['type_4ds']){
+            $tmpFilter['type_4ds'] = $UserSysPlans['type_4ds'];
+        }
+        unset($post['UserSysPlans']['type_log']);
+
         ################### 公共参数 - 结束 #########################
 
         if($playway == 6) {
@@ -555,6 +561,7 @@ class UserSysPlansService extends BaseService {
                 if(in_array($tz_type, [28])){ # 系统快捷
                     $data['code_types'] = UserSysPlansService::getCodeTypes();
                 }
+                $data['type_4ds_Arr'] = UserSysPlansService::getCodeTypes($flag = 2);
             }
         }
 
@@ -623,12 +630,12 @@ class UserSysPlansService extends BaseService {
      * @desc 号码类型
      * @return array
      */
-    public static function getCodeTypes(){
+    public static function getCodeTypes($flag = 1){
         $m = \Yii::$app->cache;
-        $mkey = 'getCodeTypes_03';
+        $mkey = 'getCodeTypes_03_'.$flag;
 
         if(!$data = $m->get($mkey)){
-            $codeTypes = CodeTypes::find()->where(['status'=>1])->asArray()->All();
+            $codeTypes = CodeTypes::find()->where(['status'=>1, 'flag'=>$flag])->asArray()->All();
             foreach ($codeTypes as $codeType){
                 $data[$codeType['type']] = $codeType['type_name'];
             }

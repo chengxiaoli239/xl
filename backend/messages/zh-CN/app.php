@@ -99,4 +99,5 @@ return [
     'Agent Record Users Descs' => '群消息记录',
     'Assignments' => '新建用户',
     'Search' => '搜索',
+    'Chat Room' => '聊天室',
 ];

@@ -1,3 +1,6 @@
+<?php
+$this->title = Yii::t('app', 'Chat Room');
+?>
 <title>聊天室</title>
 <script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
 <script src="/chat_statics/js/fingerprint2.min.js"></script>

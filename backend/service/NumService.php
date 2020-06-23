@@ -1382,6 +1382,10 @@ class NumService extends BaseService {
         if(isset($hz_Arr['arise_in_sel']) && isset($hz_Arr['arise_in'])){
             $filter11 = ['sel'=>$hz_Arr['arise_in_sel'], 'val'=>$hz_Arr['arise_in']];
         }
+        # 14.1、单双类型取
+        if(isset($hz_Arr['type_4ds']) && !empty($hz_Arr['type_4ds'])){
+            if(isset($hz_Arr['type_4ds'])) $filter6['type_4ds'] = $hz_Arr['type_4ds'];
+        }
 
         # 合分 - 三定
         if(isset($hz_Arr['hefen_pos']) && isset($hz_Arr['hefen'])){

@@ -3,6 +3,7 @@ namespace backend\service;
 
 use backend\models\WxFriends;
 use backend\models\WxMsgTypes;
+use common\general\helpers\Curl;
 use common\tools\Tool_Common;
 
 class WxService {
@@ -488,6 +489,8 @@ class WxService {
                 }
                 $setData['updated_at'] = time();
 
+                $url = \Yii::$app->params['WX_IMG_URL_DOMAIN'].$info['HeadImgUrl'];
+                CurlService::getCurl($url);
                 $WxFriends->setAttributes($setData);
                 $rst = $WxFriends->save();
                 //p($WxFriends->getFirstErrors(),0);
@@ -508,7 +511,7 @@ class WxService {
             $m->set($mkey, $WxInfo, 7*24*3600);
 
             //p($WxInfo);
-            $logArr = ['mkey'=>$mkey, 'WxInfo'=>$WxInfo, 'rst'=>$rst, 'loginInfo'=>$loginInfo, 'contacts'=>$contacts];
+            $logArr = ['mkey'=>$mkey, 'WxInfo'=>$WxInfo, 'rst'=>$rst, 'loginInfo'=>$loginInfo, 'contacts'=>$contacts, 'url'=>$url];
             Tool_Common::log('setWxInfo', 'INFO', '设置微信缓存', $logArr);
             //print_r($_SESSION['callback_post_url_header']);die;
             //header("Location: wx.php?cmd=send"); exit;

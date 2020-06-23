@@ -2625,9 +2625,37 @@ $sql .= '
      * @param int $static_nums
      * @return array
      */
-    public static function getHzYl($hzs = '0,1,2,3,4,5,6', $lottery_type = DEFAULT_LOTTERY_TYPE, $static_nums = 50000){
+    public static function getHzYl($hzs = '0,1,2,3,4,5,6', $lottery_type = DEFAULT_LOTTERY_TYPE, $static_nums = 10000){
         $zuHes = explode(',', $hzs);
         $miss = SscDataService::getSdHzYlHistoryMiss($zuHes, $lottery_type, $static_nums);
+
+        return $miss;
+    }
+
+    /**
+     * @desc 三字现遗漏
+     * @param string $val
+     * @param int $lottery_type
+     * @param int $static_nums
+     * @return array
+     */
+    public static function get3NumStatic($val = '', $lottery_type = DEFAULT_LOTTERY_TYPE, $static_nums = 10000){
+
+        $miss = SscDataService::get3NumHistoryMiss($val, $lottery_type, $static_nums); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+
+        return $miss;
+    }
+
+    /**
+     * @desc 号码类型：双重、双双重、四重、三兄弟、四兄弟 遗漏统计
+     * @param string $val
+     * @param int $lottery_type
+     * @param int $static_nums
+     * @return array
+     */
+    public static function getCodeTypeStatic($val = '', $lottery_type = DEFAULT_LOTTERY_TYPE, $static_nums = 5000){
+
+        $miss = SscDataService::getCodeTypeHistoryMiss($val, $lottery_type, $static_nums); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
 
         return $miss;
     }

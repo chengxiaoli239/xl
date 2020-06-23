@@ -79,13 +79,17 @@ class  ChatService{
     public static function postCurl($data){
 
         $curl = curl_init();
-        curl_setopt($curl, "http://lt.sm0898.com:9876");
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER);
+        curl_setopt($curl, CURLOPT_URL, "http://lt.sm0898.com:9876");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_HEADER, 1);
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 
         $rst = curl_exec($curl);
+
+        $aStatus = curl_getinfo ( $curl );
+        $err_code = curl_errno($curl);
+        d([$aStatus, $err_code]);
         curl_close($curl);
 
         return $rst;

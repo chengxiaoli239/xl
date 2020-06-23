@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'code_types' => $code_types,
         'plan_types' => $plan_types,
         'tz_sites_Arr' => $tz_sites_Arr,
+        'type_4ds_Arr' => $type_4ds_Arr,
     ]) ?>
 
 </div>

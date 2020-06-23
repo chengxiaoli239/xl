@@ -24,8 +24,8 @@ class Hsw {
 	}
 	
 	public function onMessage( $serv , $frame){
-		$data = json_decode( $frame->data , true );
-        \common\tools\Tool_Common::log('onMessage', 'INFO', '接受客户端消息', ['data'=>$data]);
+		$data = json_decode( $frame , true );
+        \common\tools\Tool_Common::log('onMessage', 'INFO', '接受客户端消息', ['frame'=>$data]);
 		switch($data['type']){
 			case 1://登录
 				$data = [

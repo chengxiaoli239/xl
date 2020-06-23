@@ -89,6 +89,21 @@ class SscStaticYlController extends BaseController
     }
 
     /**
+     * @desc 号码类型统计
+     * @return array|string
+     */
+    public function actionGetCodeTypeStatic(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $type = $post['type'] ? $post['type'] : 4;
+        $lottery_type = $post['lottery_type'] ? $post['lottery_type'] : 5;
+
+        $rst = StaticService::getCodeTypeStatic($post['val'], $type, $lottery_type);
+
+        return $rst;
+    }
+
+    /**
      * Displays a single SscStaticYl model.
      * @param integer $id
      * @return mixed
