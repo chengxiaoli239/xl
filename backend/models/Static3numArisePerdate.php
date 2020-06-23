@@ -94,7 +94,7 @@ class Static3numArisePerdate extends \common\models\base\BaseModel
             'created_at' => '创建时间',
             'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
             'updated_at' => '更新时间',
-            'update_time' => '更新时间',
+            'update_time' => '时间',
         ];
     }
 

@@ -35,7 +35,13 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         ['class' => 'yii\grid\SerialColumn'],
 
                         //'id',
-                        'date',
+                        //'date',
+                        ['attribute'=>'date',//'label'=>'时间',
+                            'format' => 'raw',
+                            'value'=>function($model){
+                                return substr($model->date, 5,5);
+                            }
+                        ],
                         //'codes_289',
                         ['attribute'=>'codes_289','label'=>'289',
                             'value'=>function($model){
@@ -176,7 +182,13 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         ],
                         //'created_at',
                         //'updated_at',
-                        'update_time',
+                        ['attribute'=>'update_time',//'label'=>'时间',
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                return substr($model->update_time, 10,6);
+                            }
+                        ],
+                        //'update_time',
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
