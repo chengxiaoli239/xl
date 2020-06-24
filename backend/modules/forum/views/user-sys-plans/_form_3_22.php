@@ -56,7 +56,7 @@ use yii\widgets\ActiveForm;
                     </div>
                     <!--?= $form->field($model, 'tz_type')->textInput() ?-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
-                    <?= $form->field($model, 'hz_Arr')->checkboxList($hzArr)->label('投注类型[单双]') ?>
+                    <?= $form->field($model, 'hz_Arr')->checkboxList($hzArr)->label('投注类型[单双] &nbsp;&nbsp;<a href="#" class="btn btn-xs btn-info reverse_type_4ds">反买</a>') ?>
                     <!--?= $form->field($model, 'tz_type')->radioList($kArr)->label('投注类型') ?-->
                 <div class="row">
                     <div class="col-lg-2 col-xs-4">
@@ -234,6 +234,15 @@ $(function () {
                 $(this).prop("checked",true);
             }else if($(this).prop('checked') == true) {
                 $(this).prop("checked", false);
+            }
+        });
+    });
+    $('.reverse_type_4ds').click(function () {
+        $("[name='UserSysPlans[hz_Arr][]']").each(function () {
+            if($(this).prop('checked') == false){
+                $(this).prop("checked",true);
+            }else {
+                $(this).prop("checked",false);
             }
         });
     });

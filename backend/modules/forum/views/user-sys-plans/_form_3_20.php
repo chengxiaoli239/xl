@@ -55,7 +55,18 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'tz_type')->textInput() ?-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
-                    <?= $form->field($model, 'hz')->checkboxList($hzArr)->label('投注类型(和值)') ?>
+                    <?= $form->field($model, 'hz')->checkboxList($hzArr)
+                        ->label('和值 
+                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_0_6">0-6</a>&nbsp;&nbsp;
+                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_5_10">5-10</a>&nbsp;&nbsp;
+                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_11_15">11-15</a>&nbsp;&nbsp;
+                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_16_19">16-19</a>&nbsp;&nbsp;
+                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_20_24">20-24</a>&nbsp;&nbsp;
+                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_25_29">25-29</a>&nbsp;&nbsp;
+                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_30_36">30-36</a>&nbsp;&nbsp;
+                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds">反买</a>
+                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_Null">清</a>
+                    ') ?>
 
                     <!--?= $form->field($model, 'buy_type')->textInput() ?-->
 
@@ -126,3 +137,128 @@ use yii\widgets\ActiveForm;
         </section>
     </div>
 </div>
+<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<script>
+    $(function () {
+        $('.reverse_type_4ds').click(function () {
+            $("[name='UserSysPlans[hz][]']").each(function () {
+                if($(this).prop('checked') == false){
+                    $(this).prop("checked",true);
+                }else {
+                    $(this).prop("checked",false);
+                }
+            });
+        });
+
+        // 0-6
+        $('.reverse_type_4ds_0_6').click(function () {
+            arr = ['0','1','2','3','4','5','6']
+            $("[name='UserSysPlans[hz][]']").each(function () {
+                v = $.inArray($(this).val(), arr);
+                console.log(v, $(this).val());
+                if(v != -1){
+                    if($(this).prop('checked') == false){
+                        $(this).prop("checked",true);
+                    }else {
+                        $(this).prop("checked",false);
+                    }
+                }
+            });
+        });
+        // 5-10
+        $('.reverse_type_4ds_5_10').click(function () {
+            arr = ['5','6','7','8','9','10']
+            $("[name='UserSysPlans[hz][]']").each(function () {
+                v = $.inArray($(this).val(), arr);
+                console.log(v, $(this).val());
+                if(v != -1){
+                    if($(this).prop('checked') == false){
+                        $(this).prop("checked",true);
+                    }else {
+                        $(this).prop("checked",false);
+                    }
+                }
+            });
+        });
+        // 11-15
+        $('.reverse_type_4ds_11_15').click(function () {
+            arr = ['11','12','13','14','15']
+            $("[name='UserSysPlans[hz][]']").each(function () {
+                v = $.inArray($(this).val(), arr);
+                console.log(v, $(this).val());
+                if(v != -1){
+                    if($(this).prop('checked') == false){
+                        $(this).prop("checked",true);
+                    }else {
+                        $(this).prop("checked",false);
+                    }
+                }
+            });
+        });
+        // 16-19
+        $('.reverse_type_4ds_16_19').click(function () {
+            arr = ['16','17','18','19']
+            $("[name='UserSysPlans[hz][]']").each(function () {
+                v = $.inArray($(this).val(), arr);
+                console.log(v, $(this).val());
+                if(v != -1){
+                    if($(this).prop('checked') == false){
+                        $(this).prop("checked",true);
+                    }else {
+                        $(this).prop("checked",false);
+                    }
+                }
+            });
+        });
+        // 20-24
+        $('.reverse_type_4ds_20_24').click(function () {
+            arr = ['20','21','22','23','24']
+            $("[name='UserSysPlans[hz][]']").each(function () {
+                v = $.inArray($(this).val(), arr);
+                console.log(v, $(this).val());
+                if(v != -1){
+                    if($(this).prop('checked') == false){
+                        $(this).prop("checked",true);
+                    }else {
+                        $(this).prop("checked",false);
+                    }
+                }
+            });
+        });
+        // 25-29
+        $('.reverse_type_4ds_25_29').click(function () {
+            arr = ['25','26','27','28','29']
+            $("[name='UserSysPlans[hz][]']").each(function () {
+                v = $.inArray($(this).val(), arr);
+                console.log(v, $(this).val());
+                if(v != -1){
+                    if($(this).prop('checked') == false){
+                        $(this).prop("checked",true);
+                    }else {
+                        $(this).prop("checked",false);
+                    }
+                }
+            });
+        });
+        // 30-36
+        $('.reverse_type_4ds_30_36').click(function () {
+            arr = ['30','31','32','33','34','35','36']
+            $("[name='UserSysPlans[hz][]']").each(function () {
+                v = $.inArray($(this).val(), arr);
+                console.log(v, $(this).val());
+                if(v != -1){
+                    if($(this).prop('checked') == false){
+                        $(this).prop("checked",true);
+                    }else {
+                        $(this).prop("checked",false);
+                    }
+                }
+            });
+        });
+        $('.reverse_type_4ds_Null').click(function () {
+            $("[name='UserSysPlans[hz][]']").each(function () {
+                $(this).prop("checked",false);
+            });
+        });
+    });
+</script>
