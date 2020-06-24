@@ -1358,10 +1358,15 @@ class NumService extends BaseService {
         if(isset($hz_Arr['type_4s'])){
             if($hz_Arr['type_4s'] == 1) $filter1['type_4s'] = 1; else $filter0['type_4s'] = 0;
         }
-        # 11.1、类型取 - 新
+        # 11.1、类型取 - 新  双重、三重、四重、双双重
         if(isset($hz_Arr['get_types']) OR isset($hz_Arr['get_types'])){
             if(isset($hz_Arr['get_types'])) $filter6['get_types'] = $hz_Arr['get_types'];// else $filter0['arise'] = 0;
         }
+        # 14.1、单双类型取
+        if(isset($hz_Arr['type_4ds']) && !empty($hz_Arr['type_4ds'])){
+            if(isset($hz_Arr['type_4ds'])) $filter6['type_4ds'] = $hz_Arr['type_4ds'];
+        }
+
         # 11.2、类型除 - 新
         if(isset($hz_Arr['remove_types']) OR isset($hz_Arr['remove_types'])){
             if(isset($hz_Arr['remove_types'])) $filter7['remove_types'] = $hz_Arr['remove_types'];
@@ -1382,10 +1387,7 @@ class NumService extends BaseService {
         if(isset($hz_Arr['arise_in_sel']) && isset($hz_Arr['arise_in'])){
             $filter11 = ['sel'=>$hz_Arr['arise_in_sel'], 'val'=>$hz_Arr['arise_in']];
         }
-        # 14.1、单双类型取
-        if(isset($hz_Arr['type_4ds']) && !empty($hz_Arr['type_4ds'])){
-            if(isset($hz_Arr['type_4ds'])) $filter6['type_4ds'] = $hz_Arr['type_4ds'];
-        }
+
 
         # 合分 - 三定
         if(isset($hz_Arr['hefen_pos']) && isset($hz_Arr['hefen'])){
@@ -1485,10 +1487,18 @@ class NumService extends BaseService {
         # 类型取
         if(!empty($filter6) OR !empty($filter7)){
             $codeTypes = UserSysPlansService::getCodeTypes();
+            //p([$hz_Arr['get_types'], $filter6['get_types']]);
             if(!empty($filter6)){
                 $desc .= '类型取:';
-                foreach ($filter6['get_types'] as $key6=>$v6){
-                    $desc .= $codeTypes[$v6].'、';
+                if(!empty($filter6['get_types'])){
+                    foreach ($filter6['get_types'] as $key6=>$v6){
+                        $desc .= $codeTypes[$v6].'、';
+                    }
+                }
+                if(!empty($filter6['type_4ds'])){
+                    foreach ($filter6['type_4ds'] as $key6=>$v6){
+                        $desc .= $codeTypes[$v6].'、';
+                    }
                 }
                 $desc = trim($desc, '、').' ';
             }
