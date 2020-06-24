@@ -10,15 +10,113 @@
 
 3、点击查看最新帖子
 请求：GET /forum/public/businessEssayController.do?action=22004&autherid=5149826&id=2374782 HTTP/1.1
+GET https://api.jddmoto.com/forum/public/motorpostController.do?action=20022v3&repostid=2374782&autherid=5149826&limit=20&page=1&sort=1&type=essay_detail HTTP/1.1
+deviceId: 56392dc0c910e9e1b3e1b69ba2c4d6bc
+platform: 1
+os: HUAWEI:VOG-AL10
+mfgr: hw
+osversion: 29
+channel: huawei%2Bcom.jdd.motorfans
+version: 3.3.1.1
+timestamp: 1592905239373
+sign: 6ECBBBFFCAE7A7CD37DB1EDC7A8405A0
+token: 2d4432ba80ec4838b2ca77ac1ca7ad13
+uid: 5149826
+Host: api.jddmoto.com
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.3.1
+If-Modified-Since: Tue, 23 Jun 2020 09:40:29 GMT
+
 返回：
 
 3、最新帖子：GET /forum/public/motorpostController.do?action=20022v3&repostid=2374782&autherid=5149826&limit=20&page=1&sort=1&type=essay_detail HTTP/1.1
 {"code":0,"data":[{"auther":"大叔骑不快你们等等我","autherid":4983095,"autherimg":"http://images.jddmoto.com/avatar/20200613/4983095_1592028951149.jpeg!avatar200","certifyList":[],"commentNum":"4","content":"有多少人是为了看球进来的？？举手我看看！！！","dateline":1592267146,"favcnt":0,"gender":1,"highlightPosition":"","highlightPositionList":[],"id":9415718,"ifLocalAuther":0,"praise":0,"praisecnt":115,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":0,"routeid":0,"secondReplyVOList":[{"auther":"济宁大魔王","autherId":4869300,"content":"你才看球，我是来看大灯的，真白。","id":9423369,"sourceId":9415718,"status":0,"toAuther":"大叔骑不快你们等等我","toAutherId":4983095},{"auther":"BINGEYA","autherId":3284531,"content":"不举","id":9457163,"sourceId":9415718,"status":0,"toAuther":"大叔骑不快你们等等我","toAutherId":4983095},{"auther":"骑士宇晓","autherId":3660125,"content":"像你这样的老实人不多了","id":9493709,"sourceId":9415718,"status":0,"toAuther":"大叔骑不快你们等等我","toAutherId":4983095}],"sourceid":9415718,"spaceUid":0,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"獨愛丶kimi","autherid":1603115,"autherimg":"http://file.jddmoto.com/group1/M00/0D/B3/CngAwFx2MyCAEOozAAAYvAmQgPs445.jpg","certifyList":[],"commentNum":"1","content":"萨瓦迪卡","dateline":1592898882,"favcnt":0,"gender":1,"highlightPosition":"","highlightPositionList":[],"id":9694599,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9694599,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"机车子非鱼","autherid":2982076,"autherimg":"http://images.jddmoto.com/avatar/20200528/2982076_1590646983047.jpeg!avatar200","certifyList":[{"certifyName":"大力神 n19","count":1,"imgUrl":"","status":1,"type":"3"}],"commentNum":"1","content":"要不是衣服拉链没拉，我根本就不会进来。","dateline":1592898118,"favcnt":0,"gender":1,"highlightPosition":"","highlightPositionList":[],"id":9694111,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9694111,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"A哈罗骑士","autherid":4847316,"autherimg":"http://thirdwx.qlogo.cn/mmopen/vi_32/svEnpKOnlplOnlAgsFzQOMib12F4ZPOiaBzXqrVMG23eCicqA8DiaWkICYQjYnVf7PhaxaE4JYRl1MrANT45BQJKzw/132","certifyList":[],"commentNum":"1","content":"胸肌练的真好","dateline":1592877948,"favcnt":0,"gender":1,"highlightPosition":"","highlightPositionList":[],"id":9684116,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9684116,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"骑士9388397","autherid":1829472,"autherimg":"http://file.jddmoto.com/group1/M00/82/85/CngBC10WCreAYk2zAAH3jgW5_vY725.png?_564_564","certifyList":[],"commentNum":"1","content":"这是拍摩托车？","dateline":1592874436,"favcnt":0,"gender":0,"highlightPosition":"","highlightPositionList":[],"id":9682194,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9682194,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"骑士583502","autherid":5054209,"autherimg":"http://thirdwx.qlogo.cn/mmopen/vi_32/k5r6L01rTcO7NEU4YhuMLhHK18td8rkb8ia1UF7YOcW1ymZ7fZjqkgliblyX7vfjtwtmKG0ian9gKs7twCuYxMqDg/132","certifyList":[],"commentNum":"1","content":"这是龙3吧","dateline":1592812047,"favcnt":0,"gender":1,"highlightPosition":"","highlightPositionList":[],"id":9651259,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9651259,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"周洪磊","autherid":4734566,"autherimg":"http://images.jddmoto.com/avatar/20200601/4734566_1591010359019.jpeg!avatar200","certifyList":[],"commentNum":"1","content":"好好看 别说话","dateline":1592791647,"favcnt":0,"gender":1,"highlightPosition":"","highlightPositionList":[],"id":9640618,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9640618,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"骑士8945623","autherid":5118044,"autherimg":"http://file.jddmoto.com/group1/M00/82/84/CngBC10WCoCACCsWAAI1jqLOTrs401.png?_564_564","certifyList":[],"commentNum":"1","content":"封面截的好绅士少不了。","dateline":1592711534,"favcnt":0,"gender":0,"highlightPosition":"","highlightPositionList":[],"id":9603320,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9603320,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"12525147加我","autherid":3956437,"autherimg":"http://images.jddmoto.com/avatar/20200621/3956437_1592710203600.jpeg!avatar200","certifyList":[],"commentNum":"1","content":"该条评论内容已屏蔽","dateline":1592711307,"favcnt":0,"gender":2,"highlightPosition":"","highlightPositionList":[],"id":9603146,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9603146,"spaceUid":4166909,"status":3,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"淡望云卷云舒","autherid":4791665,"autherimg":"http://file.jddmoto.com/group1/M00/82/84/CngBC10WCoCACCsWAAI1jqLOTrs401.png?_564_564","certifyList":[],"commentNum":"1","content":"这这这 这是600嘛😂","dateline":1592694534,"favcnt":0,"gender":1,"highlightPosition":"","highlightPositionList":[],"id":9595404,"ifLocalAuther":0,"praise":0,"praisecnt":1,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9595404,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"淡望云卷云舒","autherid":4791665,"autherimg":"http://file.jddmoto.com/group1/M00/82/84/CngBC10WCoCACCsWAAI1jqLOTrs401.png?_564_564","certifyList":[],"commentNum":"1","content":"你们都是进来看车的?我都不好意思说你们😂","dateline":1592694363,"favcnt":0,"gender":1,"highlightPosition":"","highlightPositionList":[],"id":9595361,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9595361,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"加Q24156002","autherid":5124910,"autherimg":"http://images.jddmoto.com/avatar/20200620/5124910_1592663972555.jpeg!avatar200","certifyList":[],"commentNum":"1","content":"该条评论内容已屏蔽","dateline":1592675722,"favcnt":0,"gender":2,"highlightPosition":"","highlightPositionList":[],"id":9591722,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9591722,"spaceUid":4166909,"status":3,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"12525147加Q","autherid":3078974,"autherimg":"http://images.jddmoto.com/avatar/20200620/3078974_1592668035912.jpeg!avatar200","certifyList":[],"commentNum":"1","content":"该条评论内容已屏蔽","dateline":1592671757,"favcnt":0,"gender":2,"highlightPosition":"","highlightPositionList":[],"id":9590066,"ifLocalAuther":0,"praise":0,"praisecnt":1,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9590066,"spaceUid":4166909,"status":3,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"骑士2025992","autherid":4375628,"autherimg":"http://images.jddmoto.com/avatar/20200419/4375628_1587227126292.jpeg!avatar200","certifyList":[],"commentNum":"1","content":"为什么不拍车呢，叫我们看什么来着","dateline":1592659366,"favcnt":0,"gender":1,"highlightPosition":"","highlightPositionList":[],"id":9583022,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9583022,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"3O48442847","autherid":5120573,"autherimg":"http://images.jddmoto.com/avatar/20200620/5120573_1592656892622.jpeg!avatar200","certifyList":[],"commentNum":"1","content":"该条评论内容已屏蔽","dateline":1592659138,"favcnt":0,"gender":0,"highlightPosition":"","highlightPositionList":[],"id":9582869,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9582869,"spaceUid":4166909,"status":3,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"骑士8036967","autherid":5122532,"autherimg":"http://images.jddmoto.com/avatar/20200620/5122532_1592650712406.jpeg!avatar200","certifyList":[],"commentNum":"1","content":"该条评论内容已屏蔽","dateline":1592651272,"favcnt":0,"gender":0,"highlightPosition":"","highlightPositionList":[],"id":9578726,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9578726,"spaceUid":4166909,"status":3,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"骑士3237620","autherid":4546428,"autherimg":"http://file.jddmoto.com/group1/M00/82/85/CngBC10WCreAYk2zAAH3jgW5_vY725.png?_564_564","certifyList":[],"commentNum":"1","content":"我们是来看球的不是看脸的 ，把头盔带上拍","dateline":1592647603,"favcnt":0,"gender":0,"highlightPosition":"","highlightPositionList":[],"id":9576839,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9576839,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"1405572186","autherid":5121973,"autherimg":"http://images.jddmoto.com/avatar/20200620/5121973_1592644614597.jpeg!avatar200","certifyList":[],"commentNum":"1","content":"该条评论内容已屏蔽","dateline":1592647068,"favcnt":0,"gender":0,"highlightPosition":"","highlightPositionList":[],"id":9576591,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9576591,"spaceUid":4166909,"status":3,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"期待有一辆车的新手","autherid":1555793,"autherimg":"http://images.jddmoto.com/avatar/20200115/1555793_1579060313635.jpeg!avatar200","certifyList":[],"commentNum":"1","content":"文明观球","dateline":1592643599,"favcnt":0,"gender":1,"highlightPosition":"","highlightPositionList":[],"id":9574837,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9574837,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"721521","autherid":2458915,"autherimg":"http://file.jddmoto.com/group2/M00/0D/04/CngAEl1RfPSAFCn3AAAeWMZC67s656.jpg","certifyList":[],"commentNum":"1","content":"人妖，鉴定完毕","dateline":1592641467,"favcnt":0,"gender":1,"highlightPosition":"","highlightPositionList":[],"id":9573838,"ifLocalAuther":0,"praise":0,"praisecnt":1,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9573838,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]},{"auther":"Miles1983","autherid":4636807,"autherimg":"http://images.jddmoto.com/avatar/20200524/4636807_1590290697554.jpeg!avatar200","certifyList":[],"commentNum":"1","content":"怎么那么多萨瓦迪卡","dateline":1592575090,"favcnt":0,"gender":1,"highlightPosition":"","highlightPositionList":[],"id":9544774,"ifLocalAuther":0,"praise":0,"praisecnt":0,"realityStatus":0,"realityid":0,"replyUserId":0,"replyUserName":"","repostid":2374782,"routeid":0,"secondReplyVOList":[],"sourceid":9544774,"spaceUid":4166909,"status":0,"title":"","titleHighlightPosition":"","titleHighlightPositionList":[]}],"ext":{},"msg":"success"}
 
+4、某个帖子的评论：
+POST https://api.jddmoto.com/forum/public/motorpostController.do?action=20023v2 HTTP/1.1
+deviceId: 56392dc0c910e9e1b3e1b69ba2c4d6bc
+platform: 1
+os: HUAWEI:VOG-AL10
+mfgr: hw
+osversion: 29
+channel: huawei%2Bcom.jdd.motorfans
+version: 3.3.1.1
+timestamp: 1592905636198
+sign: E740738AC4C85E0FA4695D8D86C3FED9
+token: 2d4432ba80ec4838b2ca77ac1ca7ad13
+uid: 5149826
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 87
+Host: api.jddmoto.com
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.3.1
 
+post 数据：
+repostid=2374782&autherid=5149826&type=essay_detail&content=%E8%BF%99%E9%87%8C%E5%91%A2
+repostid=2374782&autherid=5149826&type=essay_detail&content=这里呢
+decodeURI('%E8%BF%99%E9%87%8C%E5%91%A2'); == 这里呢
 
+5、登录：
+POST https://api.jddmoto.com/uic/oneclick/login HTTP/1.1
+deviceId: 56392dc0c910e9e1b3e1b69ba2c4d6bc
+platform: 1
+os: HUAWEI:VOG-AL10
+mfgr: hw
+osversion: 29
+channel: huawei%2Bcom.jdd.motorfans
+version: 3.3.1.1
+timestamp: 1592906152762
+sign: 5E2EE20AE38230DC296CC850FAB4DC70
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 140
+Host: api.jddmoto.com
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.3.1
 
+token=195597775820619777&opToken=STsid0000001592906153755UUxtdYvq4U5TMu0wre7DLeIYtPqa4nwg&operator=CMCC&md5=6446041A5C7C66D8E781C0E1BBD421BD
 
+6.1、手机号登录 获取验证码
+POST https://api.jddmoto.com/uic/mobile/requestCode HTTP/1.1
+deviceId: 56392dc0c910e9e1b3e1b69ba2c4d6bc
+platform: 1
+os: HUAWEI:VOG-AL10
+mfgr: hw
+osversion: 29
+channel: huawei%2Bcom.jdd.motorfans
+version: 3.3.1.1
+timestamp: 1592963958659
+sign: 37C19CBB09D9695831243C82A3D51925
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 35
+Host: api.jddmoto.com
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.3.1
+
+mobile=ExbJSslZPYO6bvN839GSOQ%3D%3D
+
+6.2、手机号登录，提交验证码
+POST https://api.jddmoto.com/uic/mobile/login HTTP/1.1
+deviceId: 56392dc0c910e9e1b3e1b69ba2c4d6bc
+platform: 1
+os: HUAWEI:VOG-AL10
+mfgr: hw
+osversion: 29
+channel: huawei%2Bcom.jdd.motorfans
+version: 3.3.1.1
+timestamp: 1592963997943
+sign: 578743DD3C9FD17C008EDDCD8BDA9B0C
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 47
+Host: api.jddmoto.com
+Connection: Keep-Alive
+Accept-Encoding: gzip
+User-Agent: okhttp/4.3.1
+
+mobile=ExbJSslZPYO6bvN839GSOQ%3D%3D&code=436363
 
 
 
