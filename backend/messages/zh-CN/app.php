@@ -54,7 +54,7 @@ return [
     'User Sys Plans 23d' => '上奖玩法',
 
     'Pre Date Profits' => '系统投注利润统计',
-    'Update User Sys Plans' => '编辑投注计划',
+    'Update User Sys Plans' => '编辑计划',
 
     'Weixin Login' => '登录',
     'Wx Friends' => '微信好友',

@@ -5,9 +5,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model backend\models\UserSysPlans */
 
-$this->title = Yii::t('app', 'Update User Sys Plans: {nameAttribute}', [
-    'nameAttribute' => $model->id,
-]);
+//$this->title = Yii::t('app', 'Update User Sys Plans: {nameAttribute}', [ 'nameAttribute' => $model->id, ]);
+$this->title = Yii::t('app', 'Update User Sys Plans');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'User Sys Plans'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
@@ -34,6 +33,7 @@ if( $tz_type >= 17){
         'hefen_pos' => $hefen_pos,
         'remove_arise' => $remove_arise,
         'hzArr' => $hzArr,
+        'type_4ds_Arr' => $type_4ds_Arr,
     ]) ?>
 
 </section>
