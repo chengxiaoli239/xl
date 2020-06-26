@@ -226,13 +226,6 @@ class UserSysPlansService extends BaseService {
             }
         }elseif (in_array($tz_type, [25, 20])){
             # 四定-快选过滤
-
-            # 13、四单四双
-            if(isset($UserSysPlans['type_4ds']) && $UserSysPlans['type_4ds'] && count($UserSysPlans['type_4ds']) == 1){
-                $tmpFilter['type_4ds'] = $UserSysPlans['type_4ds'][0];
-            }
-            unset($post['UserSysPlans']['type_4ds']);
-
             # 15、四单
             if($UserSysPlans['type_4d'] && count($UserSysPlans['type_4d']) == 1){
                 $tmpFilter['type_4d'] = $UserSysPlans['type_4d'][0];
