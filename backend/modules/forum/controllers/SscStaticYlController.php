@@ -95,10 +95,9 @@ class SscStaticYlController extends BaseController
     public function actionGetCodeTypeStatic(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
-        $type = $post['type'] ? $post['type'] : 4;
         $lottery_type = $post['lottery_type'] ? $post['lottery_type'] : 5;
 
-        $rst = StaticService::getCodeTypeStatic($post['val'], $type, $lottery_type);
+        $rst = StaticService::getCodeTypeStatic($post['val'], $lottery_type);
 
         return $rst;
     }

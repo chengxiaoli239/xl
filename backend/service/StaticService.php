@@ -2656,6 +2656,7 @@ $sql .= '
     public static function getCodeTypeStatic($val = '', $lottery_type = DEFAULT_LOTTERY_TYPE, $static_nums = 5000){
 
         $miss = SscDataService::getCodeTypeHistoryMiss($val, $lottery_type, $static_nums); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+        $miss['val_desc'] = \backend\service\SscDataService::getStaticNameByType($val);
 
         return $miss;
     }
