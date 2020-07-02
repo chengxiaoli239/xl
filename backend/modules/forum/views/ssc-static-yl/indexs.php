@@ -65,15 +65,20 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //'last_time_miss_range',
                         //'max_miss',
-                        ['attribute' => 'max_miss','headerOptions'=>['width'=>'5%'],'label'=>'近期最大',
+                        ['attribute' => 'max_miss','headerOptions'=>['width'=>'5%'],'label'=>'最大',
                             'value' => function($model) {
                                 return $model->max_miss;
                             }
                         ],
                         //'max_range',
-                        'yl_records:ntext',
+                        //'yl_records:ntext',
+                        ['attribute' => 'yl_records','label'=>'遗漏',
+                            'value' => function($model) {
+                                return $model->yl_records;
+                            }
+                        ],
                         //'history_max_miss',
-                        ['attribute' => 'history_max_miss','headerOptions'=>['width'=>'5%'],'label'=>'历史最大',
+                        ['attribute' => 'history_max_miss','headerOptions'=>['width'=>'5%'],'label'=>'最大',
                             'value' => function($model) {
                                 return $model->history_max_miss;
                             }
@@ -82,6 +87,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'codes_hz','headerOptions'=>['width'=>'5%'],'label'=>'和值',
                             'value' => function($model) {
                                 return $model->codes_hz;
+                            }
+                        ],
+                        ['attribute' => 'type_2b','headerOptions'=>['width'=>'5%'],'label'=>'两兄弟',
+                            'value' => function($model) {
+                                return $model->type_3b;
                             }
                         ],
                         //'type_3b',
@@ -128,7 +138,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'status',
                         //'created_at',
                         //'updated_at',
-                        'update_time',
+                        //'update_time',
+                        ['attribute' => 'update_time','headerOptions'=>['width'=>'5%'],'label'=>'时间',
+                            'value' => function($model) {
+                                return substr($model->update_time, 5);
+                            }
+                        ],
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
