@@ -781,4 +781,28 @@ class UserSysPlansService extends BaseService {
         return $code_type;
     }
 
+    /**
+     * @desc 部分投注类型切换反买处理，目前处理：四定单双
+     * @param string $plan_id
+     * @return array
+     */
+    public static function switchBuyType($plan_id = ''){
+        $rst = ['status'=>300, 'msg'=>'操作成功'];
+        $UserSysPlans = UserSysPlans::findOne($plan_id);
+        if(!empty($UserSysPlans) && in_array($UserSysPlans->tz_type, \Yii::$app->params['can_change_buy_type'])){
+            if($UserSysPlans->tz_type == 22){
+                $vals = explode(',', $UserSysPlans->hz_Arr);
+                $allVals = explode(',', \Yii::$app->params['ALL_DS']);
+                $val = array_diff($allVals, $vals);
+                $val_str = implode(',', $val);
+                if(!empty($val_str)){
+                    $UserSysPlans->hz_Arr = $val_str;
+                    $UserSysPlans->save();
+                }
+            }
+        }
+
+        return $rst;
+    }
+
 }
