@@ -1334,11 +1334,14 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             "X-Requested-With: XMLHttpRequest",
         ];
 
+        $start_time = microtime(true);
         $uid = max($TzSystemsUsers->uid, $uid);
         $data = self::httpGet($url, $headers, $uid);
+        $end_time = microtime(true);
+        $time_consume = ($end_time-$start_time).'s';
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
-        $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
+        $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'time_consume'=>$time_consume, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','幸运五星-用户信息', $logArr);
         return $data;

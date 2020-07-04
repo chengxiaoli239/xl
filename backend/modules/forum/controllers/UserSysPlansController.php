@@ -86,7 +86,7 @@ class UserSysPlansController extends BaseController
     public function actionView($id)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->findModel($id, \Yii::$app->user->id),
         ]);
     }
 
@@ -153,7 +153,7 @@ class UserSysPlansController extends BaseController
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel($id, \Yii::$app->user->id);
 
         UserSysPlansService::preOpData($this->_post, $this->_user_id, $id);
         $this->_post['update_time'] = date('Y-m-d H:i:s');
@@ -266,7 +266,7 @@ class UserSysPlansController extends BaseController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $this->findModel($id, \Yii::$app->user->id)->delete();
 
         return $this->redirect(['index']);
     }
@@ -278,9 +278,14 @@ class UserSysPlansController extends BaseController
      * @return UserSysPlans the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id, $uid)
     {
-        if (($model = UserSysPlans::findOne(['id'=>$id, 'uid'=>$this->_user_id])) !== null) {
+        if($uid == 1){
+            $where = ['id'=>$id];
+        }else{
+            $where = ['id'=>$id, 'uid'=>$this->_user_id];
+        }
+        if (($model = UserSysPlans::findOne($where)) !== null) {
             return $model;
         }
 
