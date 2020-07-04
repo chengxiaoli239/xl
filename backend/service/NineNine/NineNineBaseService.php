@@ -367,8 +367,6 @@ class NineNineBaseService extends BaseTZService {
         foreach ($codesArrs as $key=>$codesArr){
             $post_data = [ 'act' => 'postsn', 'playway' => $playway, 'single' => $single, 'qihao' => $qihao, 'code' => implode('@', $codesArr)];
 
-            //$url = self::getTzSiteInfo(self::$tz_system_id,'SSC_INDEX', $lottery_type); p($url);
-            //$url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ', $lottery_type);
             $TzSiteInfo = self::getTzSiteInfo(self::$tz_system_id, $lottery_type);
             $url = $TzSiteInfo['ORDER_TZ'];
             $headers = [
@@ -405,7 +403,7 @@ class NineNineBaseService extends BaseTZService {
             //p([$rst,$url, $post_data,http_build_query($post_data), $headers]);
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time). 's';
-            if($rst['err'] == -1 OR !$rst){
+            if($rst[$key]['err'] == -1 OR !$rst[$key]){
                 $post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
                 $tzRst = ['uid'=>self::$user_id, 'account'=>self::$account, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst[$key], 'time_consume'=>$time_consume];
                 if($tz_type != 20){
@@ -468,7 +466,7 @@ class NineNineBaseService extends BaseTZService {
     public static function cancelOrder($id, $tz_system_id){
         $BettingRecords = BettingRecords::findOne($id);
         $uid = $BettingRecords->uid;
-        $snid = $BettingRecords->snid;
+        $snids = explode(',', $BettingRecords->snid);
         self::__init($uid, $tz_system_id);
         $lot = $BettingRecords->lottery_type == 6 ? 'jxssc' : 'ssc';
 
@@ -477,32 +475,34 @@ class NineNineBaseService extends BaseTZService {
         $TzSiteInfo = NineNineBaseService::getTzSiteInfo($tz_system_id,$BettingRecords->lottery_type);
         $url = $TzSiteInfo['CANCEL_ORDER'];
 
-        //$url = NineNineBaseService::getTzSiteInfo($tz_system_id,'CANCEL_ORDER', $BettingRecords->lottery_type);
-        $post_data = [ 'act' => 'cancelsn', 'lot' => $lot, 'snid'=> $snid ];
-        $headers = [
-            'Accept: */*',
-            'Accept-Encoding: gunzip, deflate, br',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Connection: keep-alive',
-            'Content-Length:'.strlen(http_build_query($post_data)),
-            'Content-Type: application/x-www-form-urlencoded',
-            'Cookie: '.$TzSystemsUsers->cookie,
-            "Host:".$TzSiteInfo['domain'],
-            //'Origin: https://9912304.com',
-            "Origin:".$TzSiteInfo['baseUrl'],
-            //'Referer: https://9912304.com/jxssc_qmode/index.aspx',
-            "Referer: ".$url,
-            $TzSystemsUsers->user_agent,
-            'X-Requested-With: XMLHttpRequest',
-        ];
+        foreach ($snids as $key=>$snid) {
+            //$url = NineNineBaseService::getTzSiteInfo($tz_system_id,'CANCEL_ORDER', $BettingRecords->lottery_type);
+            $post_data = ['act' => 'cancelsn', 'lot' => $lot, 'snid' => $snid];
+            $headers = [
+                'Accept: */*',
+                'Accept-Encoding: gunzip, deflate, br',
+                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                'Connection: keep-alive',
+                'Content-Length:' . strlen(http_build_query($post_data)),
+                'Content-Type: application/x-www-form-urlencoded',
+                'Cookie: ' . $TzSystemsUsers->cookie,
+                "Host:" . $TzSiteInfo['domain'],
+                //'Origin: https://9912304.com',
+                "Origin:" . $TzSiteInfo['baseUrl'],
+                //'Referer: https://9912304.com/jxssc_qmode/index.aspx',
+                "Referer: " . $url,
+                $TzSystemsUsers->user_agent,
+                'X-Requested-With: XMLHttpRequest',
+            ];
 
-        $rstData = CurlService::postCurl($url, http_build_query($post_data), $headers);
-        $rst['data'] = $rstData;
-        if($rstData == 'ok'){
-            $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
-            $BettingRecords->cancel_status = 1;
-            $BettingRecords->save();
-            $rst['status'] = 200;
+            $rstData = CurlService::postCurl($url, http_build_query($post_data), $headers);
+            $rst[$key]['data'] = $rstData;
+            if ($rstData == 'ok') {
+                $BettingRecords = BettingRecords::findOne(['snid' => $snid]);
+                $BettingRecords->cancel_status = 1;
+                $BettingRecords->save();
+                $rst[$key]['status'] = 200;
+            }
         }
         $logArr = ['url'=>$url, 'snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);

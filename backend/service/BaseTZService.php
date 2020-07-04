@@ -53,7 +53,7 @@ abstract class BaseTZService{
      */
     public static function getBetNumsPer(){
         $nums = SystemConfig::findOne(['key'=>'tz_nums_per'])->value;
-        if(!$nums) $nums = 1650;
+        if(!$nums) $nums = 1350;
 
         return $nums;
     }

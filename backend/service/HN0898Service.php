@@ -390,8 +390,8 @@ class HN0898Service extends BaseTZService {
             //p([$rst,$url,http_build_query($post_data), $headers],0);
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time) . 's';
-            if ($rst['err'] == -1 OR !$rst) {
-                $tzRst = ['uid' => self::$user_id, 'account' => self::$account, 'status' => 301, 'msg' => $qihao . $rst['msg'], 'url' => $url, 'post_data' => $post_data, 'user_id' => self::$user_id, 'headers' => $headers, 'postRst' => $rst, 'time_consume' => $time_consume];
+            if ($rst[$key]['err'] == -1 OR !$rst[$key]) {
+                $tzRst = ['uid' => self::$user_id, 'account' => self::$account, 'status' => 301, 'msg' => $qihao . $rst['msg'], 'url' => $url, 'post_data' => $post_data, 'user_id' => self::$user_id, 'headers' => $headers, 'postRst' => $rst[$key], 'time_consume' => $time_consume];
                 if ($tz_type != 20) {
                     $tzRst['code'] = $code;
                 }
@@ -424,8 +424,8 @@ class HN0898Service extends BaseTZService {
             'qihao' => $qihao,  // 投注期号
             'plan_id' => $plan_id,  // 计划id
             'tz_system_id' => self::$tz_system_id,  // 投注系统tz_systems .id
-            'sn'=>$rst['sn'],
-            'snid'=>$snid,
+            'sn'=>trim($sn, ','),
+            'snid'=>trim($snid, ','),
             'order_type'=>3, # 单双三字定
             'is_simulate' => 0,  // 是否模拟投注
             'single' => $single,  // 投注倍数
@@ -450,23 +450,25 @@ class HN0898Service extends BaseTZService {
     public static function cancelOrder($id, $tz_system_id){
         $BettingRecords = BettingRecords::findOne($id);
         $uid = $BettingRecords->uid;
-        $snid = $BettingRecords->snid;
+        $snids = explode(',', $BettingRecords->snid);
         self::__init($uid, $tz_system_id);
         $lot = $BettingRecords->lottery_type == 6 ? 'jxssc' : 'ssc';
 
         $rst = ['status'=>300, 'msg'=>'操作成功'];
         //$url = HN0898Service::getUserUrlArr(self::$user_id,'CANCEL_ORDER');
-        $url = NineNineBaseService::getTzSiteInfo($tz_system_id,'CANCEL_ORDER');
-        $post_data = [ 'act' => 'cancelsn', 'lot' => $lot, 'snid'=> $snid ];
-        $headers = self::$headers;
+        foreach ($snids as $key=>$snid){
+            $url = NineNineBaseService::getTzSiteInfo($tz_system_id,'CANCEL_ORDER');
+            $post_data = [ 'act' => 'cancelsn', 'lot' => $lot, 'snid'=> $snid ];
+            $headers = self::$headers;
 
-        $rstData = CurlService::httpPost($url,http_build_query($post_data), $headers);
-        $rst['data'] = $rstData;
-        if($rstData == 'ok'){
-            $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
-            $BettingRecords->cancel_status = 1;
-            $BettingRecords->save();
-            $rst['status'] = 200;
+            $rstData = CurlService::httpPost($url,http_build_query($post_data), $headers);
+            $rst[$key]['data'] = $rstData;
+            if($rstData == 'ok'){
+                $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
+                $BettingRecords->cancel_status = 1;
+                $BettingRecords->save();
+                $rst[$key]['status'] = 200;
+            }
         }
         $logArr = ['snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
