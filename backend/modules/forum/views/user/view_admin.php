@@ -43,7 +43,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'username',
                         ['attribute' => 'username', 'label'=>'账号', 'headerOptions' => ['width' => '8%'],
                             'value'=> function($model){
-                                return $model->username ? $model->username : '';
+                                $txt = $model->username ? $model->username : '';
+                                $url = '/tz-system-users/index/login?uid='.$model->uid;
+                                return Html::a($txt, $url, $txt);
                             },
                         ],
                         //'sys_name',

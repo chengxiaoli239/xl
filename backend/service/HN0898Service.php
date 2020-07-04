@@ -353,59 +353,65 @@ class HN0898Service extends BaseTZService {
             $data = ['status'=>300, 'msg'=>$qihao.$rst['msg']];
         }
 
-        $post_data = [ 'act' => 'postsn', 'playway' => $playway, 'single' => $single, 'qihao' => $qihao, 'code' => $code, ];
-
         $data['code'] = $code;
-        $header = [
-            'Content-Length:'.strlen(http_build_query($post_data)),
-        ];
+        $betNums = self::getBetNumsPer();
+        $codesArrs = self::splitCodes(explode('@', $code),  $betNums); # 2500一次
+        $sn = '';
+        $snid = '';
+        foreach ($codesArrs as $key=>$codesArr) {
+            $post_data = ['act' => 'postsn', 'playway' => $playway, 'single' => $single, 'qihao' => $qihao, 'code' => implode('@', $codesArr)];
 
-        $headers = array_merge(self::$headers,$header);
-        //p($headers);
-        //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
-        $url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ', $lottery_type);
+            $header = [
+                'Content-Length:' . strlen(http_build_query($post_data)),
+            ];
 
-        //$account = User::findOne(self::$user_id)->account;  # 投注用户账号
-        //$account = User::findOne(['admin_id'=>self::$user_id])->account;  # 投注用户账号
+            $headers = array_merge(self::$headers, $header);
+            //p($headers);
+            //$url = self::getUserUrlArr(self::$user_id, 'ORDER_TZ');
+            $url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ', $lottery_type);
 
-        # 缓存锁
-        $m = \Yii::$app->cache;
-        $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
-        if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
+            //$account = User::findOne(self::$user_id)->account;  # 投注用户账号
+            //$account = User::findOne(['admin_id'=>self::$user_id])->account;  # 投注用户账号
 
-        $isBigNumsBet = BetService::isBigNumsBet($tz_type);
-        if($isBigNumsBet){
-            # 和值投注反应时间比较久，无需返回直接锁住
+            # 缓存锁
+            $m = \Yii::$app->cache;
+            $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $lottery_type, $qihao, $plan_id).'_'.$key;
+            if ($betLock = $m->get($betKey)) return ['status' => 303, 'msg' => '已经投注过了', 'key' => $betKey];
+
+            $isBigNumsBet = BetService::isBigNumsBet($tz_type);
+            if ($isBigNumsBet) {
+                # 和值投注反应时间比较久，无需返回直接锁住
+                $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+                $m->set($betKey, 1, $time);
+            }
+            # 真实投注
+            $start_time = microtime(true);
+            $rst[$key] = CurlService::postCurl($url, http_build_query($post_data), $headers)[0];
+            //p([$rst,$url,http_build_query($post_data), $headers],0);
+            $end_time = microtime(true);
+            $time_consume = ($end_time - $start_time) . 's';
+            if ($rst['err'] == -1 OR !$rst) {
+                $tzRst = ['uid' => self::$user_id, 'account' => self::$account, 'status' => 301, 'msg' => $qihao . $rst['msg'], 'url' => $url, 'post_data' => $post_data, 'user_id' => self::$user_id, 'headers' => $headers, 'postRst' => $rst, 'time_consume' => $time_consume];
+                if ($tz_type != 20) {
+                    $tzRst['code'] = $code;
+                }
+                Tool_Common::log('/WORK/LOG/' . Yii::$app->params['LOG_PATH'] . '/' . date('Ymd') . '/bet', 'INFO', '0898投注记录-投注失败', $tzRst);
+                return $tzRst;
+            }
+
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);
-        }
-        # 真实投注
-        $start_time = microtime(true);
-        $rst = CurlService::httpPost($url, http_build_query($post_data), $headers)[0];
-        //p([$rst,$url,http_build_query($post_data), $headers],0);
-        $end_time = microtime(true);
-        $time_consume = ($end_time - $start_time). 's';
-        if($rst['err'] == -1 OR !$rst){
-            $tzRst = ['uid'=>self::$user_id, 'account'=>self::$account, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
-            if($tz_type != 20){
-                $tzRst['code'] = $code;
+
+            $n = count(explode('@', $code));
+            if (in_array($playway, [2, 3]) && $tz_type != 20) {
+                $totalmoney = SscDataService::calTzTotalMoney($code, $single, $playway);
+            } else {
+                $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
             }
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','0898投注记录-投注失败', $tzRst);
-            return $tzRst;
+
+            $sn = $sn.','.$rst[$key]['sn'];
+            $snid = $snid.','.NineNineBaseService::getSnidBySn($rst[$key]['sn'], $lottery_type); // 获取方案内容
         }
-
-        $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
-        $m->set($betKey, 1, $time);
-
-        $n = count(explode('@',$code));
-        if(in_array($playway, [2, 3]) && $tz_type != 20){
-            $totalmoney = SscDataService::calTzTotalMoney($code, $single, $playway);
-        }else{
-            $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
-        }
-
-        //$HN0898Service = new HN0898Service(self::$user_id, self::$tz_system_id);
-        $snid = HN0898Service::getSnidBySn($rst['sn']); // 获取方案内容
 
         $insertData = [
             'playway'=> $playway,  // 投注方式

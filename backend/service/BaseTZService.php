@@ -8,6 +8,8 @@
 
 namespace backend\service;
 
+use backend\models\SystemConfig;
+
 abstract class BaseTZService{
     protected $_nowTime = null;    // 当前时间戳
     protected $_operateTime = null;    // 当前时间戳的格式
@@ -32,5 +34,28 @@ abstract class BaseTZService{
      */
     //abstract public function betting($cookie, $playway, $code, $single, $qihao, $is_simulate);
 
+    /**
+     * @desc 号码拆解
+     * @param $codes ['8,9,9,9','9,8,9,9','9,9,8,9','9,9,9,8']
+     * @param int $length
+     * @return mixed
+     */
+    public static function splitCodes($codes, $length = 300){
+
+        $codesArr = array_chunk($codes, $length);
+
+        return $codesArr;
+    }
+
+    /**
+     * @desc 获取每次下注号码量
+     * @return int|string
+     */
+    public static function getBetNumsPer(){
+        $nums = SystemConfig::findOne(['key'=>'tz_nums_per'])->value;
+        if(!$nums) $nums = 1650;
+
+        return $nums;
+    }
 
 }
