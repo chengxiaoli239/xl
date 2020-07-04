@@ -1888,11 +1888,24 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                     'uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,
                     'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>self::$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume
                 ];
+                $mkey = 'request_login_'.$TzSystemsUsers->uid.'_'.$qihao.'_'.$key;
+                if($f = $m->get($mkey)){
+                    return ['status'=>300, 'msg'=>'已经重复登录过一次'];
+                }
+                if($rst[$key]['code'] == 303){ # 判断掉线登录一次
+                    $m = \Yii::$app->cache;
+                    $mkey_proxy = PoxyIPService::builProxyIpKey();
+                    $m->delete($mkey_proxy);
+                    BaseService::login($TzSystemsUsers->id);
+                    $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+                    $m->set($mkey, 1, 5*60);
+                }
                 //if($tz_type != 20) $tzRst['code'] = $codes;
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','7时彩分批投注记录-投注失败', $tzRst);
                 # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护，307账号停押
                 if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [302, 303, 304, 305, 306, 307])){
-                    return $rst;
+                    //return $rst;
+                    continue;
                 }
                 //return $rst;
             }
@@ -2010,7 +2023,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         if(strpos($data, '余额不足') !== false){
             $rstData = ["Status"=>0, 'code'=>302, 'msg'=>'余额不足'];
-        }elseif(strpos($data, '登录') !== false){
+        }elseif(strpos($data, '登录') !== false OR strpos($data, 'Bad Gateway') !== false OR strpos($data, 'Object moved') !== false){
             $rstData = ["Status"=>0, 'code'=>303, 'msg'=>'请重新登录'];
         }elseif(strpos($data, '短时间内重复提交') !== false){
             $rstData = ["Status"=>0, 'code'=>304, 'msg'=>'短时间内重复提交'];
