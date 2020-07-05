@@ -42,10 +42,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'tz_system_id',
                         //'username',
                         ['attribute' => 'username', 'label'=>'账号', 'headerOptions' => ['width' => '8%'],
+                            'format'=>'raw',
                             'value'=> function($model){
                                 $txt = $model->username ? $model->username : '';
                                 $url = '/tz-system-users/index/login?uid='.$model->uid;
-                                return Html::a($txt, $url, $txt);
+                                return Html::a($txt, $url);
                             },
                         ],
                         //'sys_name',
