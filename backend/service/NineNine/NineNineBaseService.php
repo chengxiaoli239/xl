@@ -359,6 +359,11 @@ class NineNineBaseService extends BaseTZService {
             $data = ['status'=>300, 'msg'=>$qihao.$rst['msg']];
         }
 
+        # 缓存锁
+        $m = \Yii::$app->cache;
+        $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
+        if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
+
         $data['code'] = $code;
         $betNums = self::getBetNumsPer();
         $codesArrs = self::splitCodes(explode('@', $code),  $betNums); # 2500一次
@@ -386,11 +391,6 @@ class NineNineBaseService extends BaseTZService {
                 'X-Requested-With: XMLHttpRequest',
             ];
 
-            # 缓存锁
-            $m = \Yii::$app->cache;
-            $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $lottery_type, $qihao, $plan_id).'_'.$key;
-            if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
-
             $isBigNumsBet = BetService::isBigNumsBet($tz_type);
             if($isBigNumsBet){
                 # 和值投注反应时间比较久，无需返回直接锁住
@@ -413,9 +413,6 @@ class NineNineBaseService extends BaseTZService {
                 return $tzRst;
             }
 
-            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
-            $m->set($betKey, 1, $time);
-
             $n = count(explode('@',$code));
             if(in_array($playway, [2, 3]) && $tz_type != 20){
                 $totalmoney = SscDataService::calTzTotalMoney($code, $single, $playway);
@@ -426,6 +423,9 @@ class NineNineBaseService extends BaseTZService {
             $sn = $sn.','.$rst[$key]['sn'];
             $snid = $snid.','.NineNineBaseService::getSnidBySn($rst[$key]['sn'], $lottery_type); // 获取方案内容
         }
+
+        $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+        $m->set($betKey, 1, $time);
 
         $insertData = [
             'playway'=> $playway,  // 投注方式
