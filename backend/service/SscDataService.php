@@ -1091,7 +1091,7 @@ class SscDataService extends BaseService {
             $max_range = $SscKjDataDs[1]['qihao'] ."-". $SscKjDataDs[0]['qihao'];
         }
         $last_time_miss_range = $SscKjDataDs[1]['qihao'] ."-". $SscKjDataDs[0]['qihao'];
-        $current_times = $last_index_id - $SscKjDataDs[0]->index_id;
+        $current_times = $last_index_id - $SscKjDataDs[0]->index_id + 1;
 
         $rstData = [
             'current_times' => $current_times,    // 当前遗漏次数
