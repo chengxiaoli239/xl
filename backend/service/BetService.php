@@ -927,7 +927,7 @@ abstract class BetService extends BaseBetService {
             $flag = NineNineService6::isLogin($uid, $tz_system_id);
         }elseif(in_array($tz_system_id, [3, 6, 7, 9, 10])){
             # 3、3重庆7时彩网：重庆7时彩、幸运五星彩、6会员网
-            $flag = LuckyBaseService::isLogin($uid, $tz_system_id);
+            $flag = Lucky5Service::isLogin($uid, $tz_system_id);
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
         }elseif(in_array($tz_system_id, [5])){
