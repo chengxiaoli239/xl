@@ -175,14 +175,14 @@ class NineNineBaseService extends BaseTZService {
      * @desc 同步用户余额
      * @return mixed
     public static function synUsersBalance(){
-    $users = User::findAll(['status'=>1]);
-    foreach ($users as $key=>$user){
-    $balance = self::getBalance($user->id);
-    $user->balance = $balance;
-    $rst = $user->save();
-    }
+        $users = User::findAll(['status'=>1]);
+        foreach ($users as $key=>$user){
+            $balance = self::getBalance($user->id);
+            $user->balance = $balance;
+            $rst = $user->save();
+        }
 
-    return $rst;
+        return $rst;
     }
      */
 
@@ -359,69 +359,76 @@ class NineNineBaseService extends BaseTZService {
             $data = ['status'=>300, 'msg'=>$qihao.$rst['msg']];
         }
 
-        $post_data = [ 'act' => 'postsn', 'playway' => $playway, 'single' => $single, 'qihao' => $qihao, 'code' => $code, ];
-
-        //$url = self::getTzSiteInfo(self::$tz_system_id,'SSC_INDEX', $lottery_type); p($url);
-        $data['code'] = $code;
-        //$url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ', $lottery_type);
-        $TzSiteInfo = self::getTzSiteInfo(self::$tz_system_id, $lottery_type);
-        $url = $TzSiteInfo['ORDER_TZ'];
-        $headers = [
-            'Accept: */*',
-            'Accept-Encoding: gunzip, deflate, br',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Connection: keep-alive',
-            'Content-Length:'.strlen(http_build_query($post_data)),
-            'Content-Type: application/x-www-form-urlencoded',
-            'Cookie: '.$TzSystemsUsers->cookie,
-            "Host:".$TzSiteInfo['domain'],
-            //'Origin: https://9912304.com',
-            "Origin:".$TzSiteInfo['baseUrl'],
-            //'Referer: https://9912304.com/jxssc_qmode/index.aspx',
-            "Referer: ".$url,
-            $TzSystemsUsers->user_agent,
-            'X-Requested-With: XMLHttpRequest',
-        ];
-
         # 缓存锁
         $m = \Yii::$app->cache;
         $betKey = BetService::buildBetKey(self::$account, self::$tz_system_id, $lottery_type, $qihao, $plan_id);
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
+        $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
 
-        $isBigNumsBet = BetService::isBigNumsBet($tz_type);
-        if($isBigNumsBet){
-            # 和值投注反应时间比较久，无需返回直接锁住
-            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
-            $m->set($betKey, 1, $time);
-        }
-        # 真实投注
-        $start_time = microtime(true);
-        $rst = CurlService::postCurl($url, http_build_query($post_data), $headers)[0];
-        //p([$rst,$url, $post_data,http_build_query($post_data), $headers]);
-        $end_time = microtime(true);
-        $time_consume = ($end_time - $start_time). 's';
-        if($rst['err'] == -1 OR !$rst){
-            $post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
-            $tzRst = ['uid'=>self::$user_id, 'account'=>self::$account, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume];
-            if($tz_type != 20){
-                $tzRst['code'] = $code;
+        $data['code'] = $code;
+        $betNums = self::getBetNumsPer();
+        $codesArrs = self::splitCodes(explode('@', $code),  $betNums); # 2500一次
+        $sn = '';
+        $snid = '';
+        foreach ($codesArrs as $key=>$codesArr){
+            $betKey_i = $betKey.'_'.$key;
+            if($fi = $m->get($betKey_i)){
+                continue;
             }
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','99投注记录-投注失败', $tzRst);
-            return $tzRst;
+            $post_data = [ 'act' => 'postsn', 'playway' => $playway, 'single' => $single, 'qihao' => $qihao, 'code' => implode('@', $codesArr)];
+
+            $TzSiteInfo = self::getTzSiteInfo(self::$tz_system_id, $lottery_type);
+            $url = $TzSiteInfo['ORDER_TZ'];
+            $headers = [
+                'Accept: */*',
+                'Accept-Encoding: gunzip, deflate, br',
+                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                'Connection: keep-alive',
+                'Content-Length:'.strlen(http_build_query($post_data)),
+                'Content-Type: application/x-www-form-urlencoded',
+                'Cookie: '.$TzSystemsUsers->cookie,
+                "Host:".$TzSiteInfo['domain'],
+                //'Origin: https://9912304.com',
+                "Origin:".$TzSiteInfo['baseUrl'],
+                //'Referer: https://9912304.com/jxssc_qmode/index.aspx',
+                "Referer: ".$url,
+                $TzSystemsUsers->user_agent,
+                'X-Requested-With: XMLHttpRequest',
+            ];
+
+            # 和值投注反应时间比较久，无需返回直接锁住
+            $m->set($betKey_i, 1, $time);
+
+            # 真实投注
+            $start_time = microtime(true);
+            $rst[$key] = CurlService::postCurl($url, http_build_query($post_data), $headers)[0];
+            //p([$rst,$url, $post_data,http_build_query($post_data), $headers]);
+            $end_time = microtime(true);
+            $time_consume = ($end_time - $start_time). 's';
+            if($rst[$key]['err'] == -1 OR !$rst[$key]){
+                $post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
+                $tzRst = ['uid'=>self::$user_id, 'account'=>self::$account, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst[$key], 'time_consume'=>$time_consume];
+                if($tz_type != 20){
+                    $tzRst['code'] = $code;
+                }
+                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','99投注记录-投注失败', $tzRst);
+                //return $tzRst;
+                continue;
+            }
+
+            $n = count(explode('@',$code));
+            if(in_array($playway, [2, 3]) && $tz_type != 20){
+                $totalmoney = SscDataService::calTzTotalMoney($code, $single, $playway);
+            }else{
+                $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
+            }
+
+            $sn = $sn.','.$rst[$key]['sn'];
+            $snid = $snid.','.NineNineBaseService::getSnidBySn($rst[$key]['sn'], $lottery_type); // 获取方案内容
         }
 
         $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
         $m->set($betKey, 1, $time);
-
-        $n = count(explode('@',$code));
-        if(in_array($playway, [2, 3]) && $tz_type != 20){
-            $totalmoney = SscDataService::calTzTotalMoney($code, $single, $playway);
-        }else{
-            $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
-        }
-
-        //$HN0898Service = new HN0898Service(self::$user_id, self::$tz_system_id);
-        $snid = NineNineBaseService::getSnidBySn($rst['sn'], $lottery_type); // 获取方案内容
 
         $insertData = [
             'playway'=> $playway,  // 投注方式
@@ -434,8 +441,8 @@ class NineNineBaseService extends BaseTZService {
             'qihao' => $qihao,  // 投注期号
             'plan_id' => $plan_id,  // 计划id
             'tz_system_id' => $TzSystemsUsers->tz_system_id,  // 投注系统tz_systems .id
-            'sn'=>$rst['sn'],
-            'snid'=>$snid,
+            'sn'=>trim($sn, ','),
+            'snid'=>trim($snid, ','),
             'order_type'=>3, # 单双三字定
             'is_simulate' => 0,  // 是否模拟投注
             'single' => $single,  // 投注倍数
@@ -462,7 +469,7 @@ class NineNineBaseService extends BaseTZService {
     public static function cancelOrder($id, $tz_system_id){
         $BettingRecords = BettingRecords::findOne($id);
         $uid = $BettingRecords->uid;
-        $snid = $BettingRecords->snid;
+        $snids = explode(',', $BettingRecords->snid);
         self::__init($uid, $tz_system_id);
         $lot = $BettingRecords->lottery_type == 6 ? 'jxssc' : 'ssc';
 
@@ -471,32 +478,34 @@ class NineNineBaseService extends BaseTZService {
         $TzSiteInfo = NineNineBaseService::getTzSiteInfo($tz_system_id,$BettingRecords->lottery_type);
         $url = $TzSiteInfo['CANCEL_ORDER'];
 
-        //$url = NineNineBaseService::getTzSiteInfo($tz_system_id,'CANCEL_ORDER', $BettingRecords->lottery_type);
-        $post_data = [ 'act' => 'cancelsn', 'lot' => $lot, 'snid'=> $snid ];
-        $headers = [
-            'Accept: */*',
-            'Accept-Encoding: gunzip, deflate, br',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Connection: keep-alive',
-            'Content-Length:'.strlen(http_build_query($post_data)),
-            'Content-Type: application/x-www-form-urlencoded',
-            'Cookie: '.$TzSystemsUsers->cookie,
-            "Host:".$TzSiteInfo['domain'],
-            //'Origin: https://9912304.com',
-            "Origin:".$TzSiteInfo['baseUrl'],
-            //'Referer: https://9912304.com/jxssc_qmode/index.aspx',
-            "Referer: ".$url,
-            $TzSystemsUsers->user_agent,
-            'X-Requested-With: XMLHttpRequest',
-        ];
+        foreach ($snids as $key=>$snid) {
+            //$url = NineNineBaseService::getTzSiteInfo($tz_system_id,'CANCEL_ORDER', $BettingRecords->lottery_type);
+            $post_data = ['act' => 'cancelsn', 'lot' => $lot, 'snid' => $snid];
+            $headers = [
+                'Accept: */*',
+                'Accept-Encoding: gunzip, deflate, br',
+                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                'Connection: keep-alive',
+                'Content-Length:' . strlen(http_build_query($post_data)),
+                'Content-Type: application/x-www-form-urlencoded',
+                'Cookie: ' . $TzSystemsUsers->cookie,
+                "Host:" . $TzSiteInfo['domain'],
+                //'Origin: https://9912304.com',
+                "Origin:" . $TzSiteInfo['baseUrl'],
+                //'Referer: https://9912304.com/jxssc_qmode/index.aspx',
+                "Referer: " . $url,
+                $TzSystemsUsers->user_agent,
+                'X-Requested-With: XMLHttpRequest',
+            ];
 
-        $rstData = CurlService::postCurl($url, http_build_query($post_data), $headers);
-        $rst['data'] = $rstData;
-        if($rstData == 'ok'){
-            $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
-            $BettingRecords->cancel_status = 1;
-            $BettingRecords->save();
-            $rst['status'] = 200;
+            $rstData = CurlService::postCurl($url, http_build_query($post_data), $headers);
+            $rst[$key]['data'] = $rstData;
+            if ($rstData == 'ok') {
+                $BettingRecords = BettingRecords::findOne(['snid' => $snid]);
+                $BettingRecords->cancel_status = 1;
+                $BettingRecords->save();
+                $rst[$key]['status'] = 200;
+            }
         }
         $logArr = ['url'=>$url, 'snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
@@ -535,7 +544,7 @@ class NineNineBaseService extends BaseTZService {
         Tool_Common::log('/WORK/LOG/lottery_xl/updateFollowDataStatus','INFO','修改状态记录', $logArr);
 
         return ['status'=>200, 'msg'=>'状态更新成功~'];
-    }
+   }
 
     /**
      * @description 更新定制化表状态
@@ -543,7 +552,7 @@ class NineNineBaseService extends BaseTZService {
      * @param $account
      * @return array
      */
-    public static function updateCustomPlansStatus($id, $account){
+   public static function updateCustomPlansStatus($id, $account){
         $UserCustomPlans = UserCustomPlans::findOne(['account'=>$account,'id'=>$id]);
         $UserCustomPlans->status = $UserCustomPlans->status==1 ? 0 : 1;
 
@@ -616,73 +625,73 @@ class NineNineBaseService extends BaseTZService {
         return $rst;
     }
 
-    /**
+   /**
      * @desc 立即投注
      * @param $account
      * @param $plan_id
      * @return array
      */
-    public static function tzNowBetRecord($uid, $BetRecordId){
-        $qihao = HN0898Service::getQihao();
-        $BettingRecords = BettingRecords::findOne($BetRecordId);
-        $playway = $BettingRecords->playway;
-        if(!$BettingRecords) return ['status'=>300, 'msg'=>'找不到投注计划记录'];
-        $tz_system_id = $BettingRecords->tz_system_id ? $BettingRecords->tz_system_id : 2;
-        $HN0898Service = new HN0898Service($uid, $tz_system_id);
-        $codes = $BettingRecords->codes;
-        $single = $BettingRecords->single;
+   public static function tzNowBetRecord($uid, $BetRecordId){
+       $qihao = HN0898Service::getQihao();
+       $BettingRecords = BettingRecords::findOne($BetRecordId);
+       $playway = $BettingRecords->playway;
+       if(!$BettingRecords) return ['status'=>300, 'msg'=>'找不到投注计划记录'];
+       $tz_system_id = $BettingRecords->tz_system_id ? $BettingRecords->tz_system_id : 2;
+       $HN0898Service = new HN0898Service($uid, $tz_system_id);
+       $codes = $BettingRecords->codes;
+       $single = $BettingRecords->single;
 
-        $m = \Yii::$app->cache;
-        $mkey = 'tzNowBetRecord_'.$uid.'_'.$qihao.'_'.$playway;
-        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
+       $m = \Yii::$app->cache;
+       $mkey = 'tzNowBetRecord_'.$uid.'_'.$qihao.'_'.$playway;
+       if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
 
-        //p([$qihao, $BettingRecords->plan_id, $codes]);
-        BetService::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $BettingRecords->lottery_type, $qihao, $BettingRecords->plan_id, $uid);
-        $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
-        BetService::afterBetNow($BettingRecords->lottery_type, $qihao, $uid);
+       //p([$qihao, $BettingRecords->plan_id, $codes]);
+       BetService::beforeBetNow($BettingRecords->account, $BettingRecords->tz_system_id, $BettingRecords->lottery_type, $qihao, $BettingRecords->plan_id, $uid);
+       $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
+       BetService::afterBetNow($BettingRecords->lottery_type, $qihao, $uid);
 
-        $m->set($mkey, 1, 10);
+       $m->set($mkey, 1, 10);
 
-        return $rst;
-    }
+       return $rst;
+   }
 
-    /**
+   /**
      * @desc 立即反买
      * @param $account
      * @param $plan_id
      * @return array
      */
-    public static function reverseTzNowBetRecord($uid, $BetRecordId){
-        $BettingRecords = BettingRecords::findOne($BetRecordId);
-        if(!$BettingRecords) return ['status'=>300, 'msg'=>'找不到投注计划记录'];
+   public static function reverseTzNowBetRecord($uid, $BetRecordId){
+       $BettingRecords = BettingRecords::findOne($BetRecordId);
+       if(!$BettingRecords) return ['status'=>300, 'msg'=>'找不到投注计划记录'];
 
-        $tz_system_id = $BettingRecords->tz_system_id ? $BettingRecords->tz_system_id : 2;  # 默认99网
-        $HN0898Service = new self($uid, $tz_system_id);
-        $oldCodes = $BettingRecords->codes;
-        $oldCodesArr = explode('@', $oldCodes);
-        $qihao = HN0898Service::getQihao();
-        $playway = $BettingRecords->playway;
+       $tz_system_id = $BettingRecords->tz_system_id ? $BettingRecords->tz_system_id : 2;  # 默认99网
+       $HN0898Service = new self($uid, $tz_system_id);
+       $oldCodes = $BettingRecords->codes;
+       $oldCodesArr = explode('@', $oldCodes);
+       $qihao = HN0898Service::getQihao();
+       $playway = $BettingRecords->playway;
 
-        $codes = '';
-        $SysPlansCodes = SysPlansCodes::find()->where(['AND',['NOT IN','code', $oldCodesArr], ['=', 'playway', $playway]])->all();
-        foreach ($SysPlansCodes as $sysPlansCode){
-            $codes .= $sysPlansCode->code.'@';
-        }
-        $codes = trim($codes, '@');
+       $codes = '';
+       $SysPlansCodes = SysPlansCodes::find()->where(['AND',['NOT IN','code', $oldCodesArr], ['=', 'playway', $playway]])->all();
+       foreach ($SysPlansCodes as $sysPlansCode){
+           $codes .= $sysPlansCode->code.'@';
+       }
+       $codes = trim($codes, '@');
 
-        $m = \Yii::$app->cache;
-        $mkey = 'reverseTzNowBetRecord_'.$qihao.'_'.$playway;
-        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了'];
+       $m = \Yii::$app->cache;
+       $mkey = 'reverseTzNowBetRecord_'.$qihao.'_'.$playway;
+       if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了'];
 
-        $account = AdminModel::findOne(Yii::$app->user->id)['account'];
-        BetService::beforeBetNow($account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id, $uid);
-        $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
-        BetService::afterBetNow($BettingRecords->lottery_type, $qihao, $uid);
+       $account = AdminModel::findOne(Yii::$app->user->id)['account'];
+       BetService::beforeBetNow($account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id, $uid);
+       $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
+       BetService::afterBetNow($BettingRecords->lottery_type, $qihao, $uid);
 
-        $m->set($mkey, 1, 5);
+       $m->set($mkey, 1, 5);
 
-        return $rst;
-    }
+       return $rst;
+   }
 
 
     /**
@@ -958,30 +967,7 @@ class NineNineBaseService extends BaseTZService {
             $account = AdminModel::findOne($uid)->username;
             //if($uid == 11)p(['account'=>$account]);
             $codesArr = explode('@', $list['codes']);
-            $playway = 4 - (substr_count($codesArr[0],'X')) - 1;
-            $tz_type = 21;
-            $count = count($codesArr);
-            $playway_name = '四字定';
-            if($playway != 3){
-                if($playway == 2) {
-                    # $list['codes'] = 01234,13579,X,01234@01234,X,13579,01234@01234,13579,X,02468@01234,X,13579,02468@02468,X,13579,01234@02468,13579,X,01234@02468,13579,X,02468@02468,X,13579,02468
-                    $tz_type = 29;
-                    $t1 = explode('@', $list['codes']);
-                    $count = 0;
-                    foreach ($t1 as $k1=>$v1){
-                        $n = [];
-                        $v1s = explode(',', $v1);
-                        foreach ($v1s as $k11=>$v11){
-                            if($v11 != 'X'){
-                                $n[] = strlen($v1);
-                            }
-                        }
-                        $count = $count + $n[0] * $n[1] * $n[2];
-                    }
-                    $playway_name = '三字定';
-                }
-            }
-            $single = $list['totalmoney'] / $count;
+            $single = $list['totalmoney'] / count($codesArr);
             $setData = array_merge($setData,[
                 'sn' => $list['sn'],
                 'snid' => $list['snid'],
@@ -989,12 +975,12 @@ class NineNineBaseService extends BaseTZService {
                 'qihao' => $list['qihao'],
                 'account' => $account,
                 'uid' => $uid,
-                'playway' => $playway,
+                'playway' => 3,
                 'tz_system_id' => $TzSystemsUsers->tz_system_id,
                 'lottery_type' => $lottery_type,
-                'tz_type' => $tz_type,
+                'tz_type' => 21,
                 'single' => $single,
-                'playway_name' => $playway_name,
+                'playway_name' => '四字定',
                 'betting_money' => $list['totalmoney'],
                 'is_simulate' => 0,
                 'cancel_status' => $cancel_status[$list['status_txt']] == 1 ? 1 : 0,
