@@ -10,7 +10,7 @@ namespace backend\service;
 use backend\models\TzSystemsUsers;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\Juhua\JuHuaBaseService;
-use backend\service\Lucky5\LuckyBaseService;
+use backend\service\Lucky5\Lucky5Service;
 use backend\service\qilin\QiLinBaseService;
 use  yii;
 use common\tools\Util;
@@ -43,8 +43,7 @@ class BaseService{
             if($tz_system_id == 3){
                 $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             }else{
-                $rst = LuckyBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-                //$rst = LuckyBaseService::loginWriteCookie($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                $rst = Lucky5Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             }
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
@@ -88,10 +87,8 @@ class BaseService{
             if(in_array($tz_system_id, [3, 7])){
                 $rst = SevenService::synBalance($TzSystemsUser->id);
             }else{
-                $rst = LuckyBaseService::synBalance($TzSystemsUser->id);// p($rst);# 同步余额
+                $rst = Lucky5Service::synBalance($TzSystemsUser->id);// p($rst);# 同步余额
             }
-            //p(['rst'=>$rst]);
-            //$rst = LuckyBaseService::synBalance($TzSystemsUser->id); //p($rst);# 同步余额
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
         }elseif(in_array($tz_system_id, [5])){
