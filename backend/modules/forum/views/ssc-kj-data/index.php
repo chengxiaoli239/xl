@@ -44,7 +44,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'codes_hz',
                         'codes_4nums_hz',
                         'code_3n',
-                        'code_4n',
+                        //'code_4n',
+                        ['attribute' => 'code_4n', 'label'=> '单双类型', //'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $url = '/forum/ssc-static-yl/index?SscStaticYl[val]='.$model->code_4n.'&SscStaticYl[current_miss]=&SscStaticYl[last_time_miss]=&SscStaticYl[max_miss]=&SscStaticYl[yl_records]=&SscStaticYl[history_max_miss]=&SscStaticYl[codes_hz]=&SscStaticYl[type_2]=&SscStaticYl[type_3b]=&SscStaticYl[type_3]=&SscStaticYl[type_4]=&SscStaticYl[type_22]=&SscStaticYl[type_4ds]=&SscStaticYl[count]=&SscStaticYl[update_time]=&SscStaticYl[lottery_type]='.$model->lottery_type.'&SscStaticYl[code_type]=1003&SscStaticYl[type]=4';
+                                return Html::a($model->code_4n, $url, ['title' => $model->code_4n]);
+                            }
+                        ],
                         //'code1',
                         //'code2',
                         //'code3',
