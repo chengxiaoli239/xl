@@ -1,5 +1,5 @@
 <?php
-
+namespace backend\service\Lucky5;
 /**
  * Created by PhpStorm.
  * User: wangyegao
@@ -7,7 +7,6 @@
  * Time: 09:40
  */
 
-namespace backend\service\Lucky5;
 use backend\models\BettingRecords;
 use backend\models\SscKjData;
 use backend\models\SystemConfig;
@@ -1876,9 +1875,11 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                     return ['status'=>300, 'msg'=>'已经重复登录过一次'];
                 }
                 if($rst[$key]['code'] == 303){ # 判断掉线登录一次
-                    $m = \Yii::$app->cache;
-                    $mkey_proxy = PoxyIPService::builProxyIpKey();
-                    $m->delete($mkey_proxy);
+                    if($rst[$key]['errno']>0){
+                        $m = \Yii::$app->cache;
+                        $mkey_proxy = PoxyIPService::builProxyIpKey();
+                        $m->delete($mkey_proxy);
+                    }
                     BaseService::login($TzSystemsUsers->id);
                     $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
                     $m->set($mkey, 1, 5*60);
@@ -2020,6 +2021,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求-3', $logArr);
         }
+        $rstData['errno'] = $errno;
         $time_consume = ($end_time-$start_time).'s';
         $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求-4', $logArr);

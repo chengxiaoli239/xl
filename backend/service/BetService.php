@@ -14,8 +14,7 @@ use backend\models\SystemConfig;
 use backend\models\User;
 use backend\service\huiyuan\KuaiLe8Service;
 use backend\service\Juhua\JuHuaBaseService;
-use backend\service\Juhua\JuHuaService;
-use backend\service\Lucky5\LuckyBaseService;
+use backend\service\Lucky5\Lucky5Service;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineService6;
 use common\kj\cqssc\CqsscKcw;
@@ -63,7 +62,7 @@ abstract class BetService extends BaseBetService {
             if($lottery_type == 5){ # 7时彩重庆
                 $BetService = new SevenService($uid, $tz_system_id);
             }elseif($lottery_type == 8){ # 幸运五星彩
-                $BetService = new LuckyBaseService($uid, $tz_system_id);
+                $BetService = new Lucky5Service($uid, $tz_system_id);
             }
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网

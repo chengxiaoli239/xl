@@ -7,8 +7,7 @@
  * Time: 09:40
  */
 
-namespace backend\service\Lucky;
-use backend\service\Lucky5\LuckyBaseService;
+namespace backend\service\Lucky5;
 use  yii;
 
 class Lucky5Service extends LuckyBaseService {
