@@ -685,7 +685,7 @@ abstract class BetService extends BaseBetService {
                    }
                    $loginRst = BaseService::login($TzSystemsUsers->id);
                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['loginRst'=>$loginRst]);
-                   if($loginRst['status'] != 200 OR $loginRst['balance']<0.01) continue;
+                   if($loginRst['status'] != 200) continue;
                }
 
                $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'tz_sites'=>$tz_sites];

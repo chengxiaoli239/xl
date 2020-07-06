@@ -172,6 +172,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $str = '01234,13579,X,01234@01234,X,13579,01234@01234,13579,X,02468@01234,X,13579,02468@02468,X,13579,01234@02468,13579,X,01234@02468,13579,X,02468@02468,X,13579,02468';
+        p(substr_count($str,'X'));
         $rst = KjDataGet::insertKjData('20200615000', 8, '5,7,0,3,3');p($rst);
         $codes_hz = '{"p1":"123","p2":"345","p3":"569","p4":"6589","p5":"1234"}';
         $codesArr = NumService::getOneFixedCode(json_decode($codes_hz, true));p($codesArr);

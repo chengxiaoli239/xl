@@ -144,20 +144,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
     }
 
     /**
-     * @desc 同步用户所有站点余额
-     * @param $uid
-     */
-    public static function synUserAllBalance($uid){
-        //$TzSystemsUsers = TzSystemsUsers::find()->where(['status'=>1, 'uid'=>$uid])->all();
-        $TzSystemsUsers = TzSystemsUsers::findAll(['status'=>1, 'uid'=>$uid]);
-        foreach ($TzSystemsUsers as $TzSystemsUser){
-            $rst = self::synBalance($TzSystemsUser->id);
-        }
-
-        return $rst;
-    }
-
-    /**
      * @decription 根据账号获取cookie
      * @param $account
      */
@@ -845,8 +831,9 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         if(isset($rst['Status']) && $rst['Status'] == 1){
             $balance = $rst['Data']['credit_balance'];
         }
-        //$rst['uid'] = $uid;
-        //$rst['tz_system_id'] = $tz_system_id;
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $TzSystemsUsers->balance = $balance;
+        $TzSystemsUsers->save();
 
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','幸运五星-用户余额', $rst);
 
@@ -1084,19 +1071,15 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      */
     public static function login($uid = 1, $tz_system_id = 1){
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        if($TzSystemsUsers->balance > 0) {
-            $rst = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
-            return $rst;
-        }else{
-            # 第一步：获取cookie
-            $rst = self::getCookie($uid,$tz_system_id);
-            if(isset($rst['status']) && $rst['status'] == 300) return $rst;
-            # 第二步：账号、验证码登录
-            $rst = self::loginRemote($uid, $tz_system_id);
-            # 第三步：同意
-            if(isset($rst['Status']) && $rst['Status'] == 1){
-                $rst = self::acceptAgreement($uid, $tz_system_id);
-            }
+
+        # 第一步：获取cookie
+        $rst = self::getCookie($uid,$tz_system_id);
+        if(isset($rst['status']) && $rst['status'] == 300) return $rst;
+        # 第二步：账号、验证码登录
+        $rst = self::loginRemote($uid, $tz_system_id);
+        # 第三步：同意
+        if(isset($rst['Status']) && $rst['Status'] == 1){
+            $rst = self::acceptAgreement($uid, $tz_system_id);
         }
 
         # 获取用户信息

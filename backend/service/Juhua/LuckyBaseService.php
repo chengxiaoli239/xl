@@ -7,7 +7,7 @@
  * Time: 09:40
  */
 
-namespace backend\service\Lucky5;
+namespace backend\service\Juhua;
 use backend\models\BettingRecords;
 use backend\models\SscKjData;
 use backend\models\SystemConfig;

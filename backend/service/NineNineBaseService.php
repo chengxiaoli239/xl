@@ -7,7 +7,7 @@
  * Time: 09:40
  */
 
-namespace backend\service\NineNine;
+namespace backend\service;
 use backend\models\BettingRecords;
 use backend\models\DataTime;
 use backend\models\KjConfig;
@@ -958,7 +958,26 @@ class NineNineBaseService extends BaseTZService {
             $account = AdminModel::findOne($uid)->username;
             //if($uid == 11)p(['account'=>$account]);
             $codesArr = explode('@', $list['codes']);
-            $single = $list['totalmoney'] / count($codesArr);
+            $playway = 4 - (substr_count($codesArr[0],'X')) - 1;
+            $tz_type = 21;
+            $count = count($codesArr);
+            $playway_name = '四字定';
+            if($playway != 3){
+                if($playway == 2) {
+                    # $list['codes'] = 01234,13579,X,01234@01234,X,13579,01234@01234,13579,X,02468@01234,X,13579,02468@02468,X,13579,01234@02468,13579,X,01234@02468,13579,X,02468@02468,X,13579,02468
+                    $tz_type = 29;
+                    $t1 = explode('@', $list['codes']);
+                    $n = [];
+                    foreach ($t1 as $k1=>$v1){
+                        if($v1 != 'X'){
+                            $n[] = strlen($v1);
+                        }
+                    }
+                    $count = $n[0] * $n[1] * $n[2];
+                    $playway_name = '三字定';
+                }
+            }
+            $single = $list['totalmoney'] / $count;
             $setData = array_merge($setData,[
                 'sn' => $list['sn'],
                 'snid' => $list['snid'],
@@ -966,12 +985,12 @@ class NineNineBaseService extends BaseTZService {
                 'qihao' => $list['qihao'],
                 'account' => $account,
                 'uid' => $uid,
-                'playway' => 3,
+                'playway' => $playway,
                 'tz_system_id' => $TzSystemsUsers->tz_system_id,
                 'lottery_type' => $lottery_type,
-                'tz_type' => 21,
+                'tz_type' => $tz_type,
                 'single' => $single,
-                'playway_name' => '四字定',
+                'playway_name' => $playway_name,
                 'betting_money' => $list['totalmoney'],
                 'is_simulate' => 0,
                 'cancel_status' => $cancel_status[$list['status_txt']] == 1 ? 1 : 0,
