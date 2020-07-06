@@ -833,6 +833,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->save();
+        $rst['balance'] = $balance;
 
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','幸运五星-用户余额', $rst);
 
