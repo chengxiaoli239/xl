@@ -152,7 +152,7 @@ class HN0898Service extends BaseTZService {
         $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);
         $balance = self::getBalance($TzSystemsUsers->uid,$TzSystemsUsers->tz_system_id);
         //p($balance);
-        $msg = ['status'=>200, 'msg'=>'金额同步成功~','tz_system_user_id'=>$tz_system_user_id, 'balance'=>$balance ];
+        $msg = ['status'=>200, 'msg'=>'金额同步成功~','tz_system_user_id'=>$tz_system_user_id, 'balance'=>$balance, 'account'=>$TzSystemsUsers->account, 'username'=>$TzSystemsUsers->username];
 
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->updated_at = time();
