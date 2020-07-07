@@ -28,11 +28,11 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span></button>
-                <h4 class="modal-title" id="tip_title_end_cm">提示信息</h4>
+                <h4 class="modal-title" id="tip_title_end_login">提示信息</h4>
             </div>
-            <div class="modal-body" id="modal-body-cm">
+            <div class="modal-body" id="modal-body-login">
                 <div class="form-group up-reason">
-                    <label id="tip_msg_title_end_cm" for="tip_msg_title_end_cm"></label>
+                    <label id="tip_msg_title_end_login" for="tip_msg_title_end_login"></label>
                 </div>
             </div>
             <div class="modal-footer">
@@ -81,15 +81,14 @@ $(function () {
         $.post("/forum/tz-systems-users/login",data,function(rst) {
             console.log(rst);
             status = rst.status;
-            msg = '';
             if(rst.status == 200){
                 balance = rst.balance;
                 $("#balance_"+id).html(balance);
                 $("#ApplyLoginConfirmEnd").attr('refresh', 1);
             }else {
                 $("#ApplyLoginConfirmEnd").attr('refresh', 0);
-                msg = rst.msg;
             }
+            msg = rst.msg;
 
             $("#tip_msg_title_end_login").html(msg);
             $("#rstTipModalEndLogin").modal('show');
