@@ -340,7 +340,7 @@ class NineNineBaseService extends BaseTZService {
      * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
      * @return array
      */
-    public function bet($qihao, $plan_id, $code){
+    public function bet($qihao, $plan_id, $code, $is_auto = 1){
         self::__init(self::$user_id, self::$tz_system_id);
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
@@ -349,7 +349,7 @@ class NineNineBaseService extends BaseTZService {
         $buy_type = $plan->buy_type ? $plan->buy_type : 1;
         $lottery_type = $plan->lottery_type;
         $TzSystemsUsers = TzSystemsUsers::findOne(['tz_system_id'=>self::$tz_system_id, 'uid'=>$plan->uid]);
-        //p([$playway, $code, $single, $qihao]);
+        //p(['playway'=>$playway, 'code'=>$code, 'single'=>$single, 'qihao'=>$qihao, 'user_id'=>self::$user_id]);
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
 
@@ -372,7 +372,7 @@ class NineNineBaseService extends BaseTZService {
         $snid = '';
         foreach ($codesArrs as $key=>$codesArr){
             $betKey_i = $betKey.'_'.$key;
-            if($fi = $m->get($betKey_i)){
+            if($fi = $m->get($betKey_i) && $is_auto){
                 continue;
             }
             $post_data = [ 'act' => 'postsn', 'playway' => $playway, 'single' => $single, 'qihao' => $qihao, 'code' => implode('@', $codesArr)];
@@ -401,8 +401,8 @@ class NineNineBaseService extends BaseTZService {
 
             # 真实投注
             $start_time = microtime(true);
+            //p([$rst,$url, $post_data,http_build_query($post_data), $headers, $is_auto]);
             $rst[$key] = CurlService::postCurl($url, http_build_query($post_data), $headers)[0];
-            //p([$rst,$url, $post_data,http_build_query($post_data), $headers]);
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time). 's';
             if($rst[$key]['err'] == -1 OR !$rst[$key]){
