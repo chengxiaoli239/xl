@@ -1,0 +1,117 @@
+<!--修改结果提示-->
+<div class="modal fade in" id="rstTipModalLogin" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%); min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit; ">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_title_login">提示信息</h4>
+            </div>
+            <div class="modal-body" id="modal-body-login">
+                <div class="input-group" id="txt_id">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="ApplyLoginConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--修改结果提示-->
+<div class="modal fade in" id="rstTipModalEndLogin" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
+     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
+">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_title_end_cm">提示信息</h4>
+            </div>
+            <div class="modal-body" id="modal-body-cm">
+                <div class="form-group up-reason">
+                    <label id="tip_msg_title_end_cm" for="tip_msg_title_end_cm"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="ApplyCmConfirmEnd">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/statics/datetimepicker/jquery.js"></script>
+<script>
+$(function () {
+    // 修改过期时间
+    $('.act-login').click(function () {
+        op_id = $(this).attr('data-id');
+
+        $('#ApplyLoginConfirm').attr('data-op-id', op_id);
+        txt = '系统账号:<strong><font color="green">' + $(this).data('username') + '</font></strong> &nbsp;&nbsp;网盘账号:<strong><font color="green">'+ $(this).data('account') + '</font></strong>'
+        + '&nbsp;&nbsp;网盘地址:<strong><font color="green">'+ $(this).data('domain') + '</font></strong>';
+        $('#txt_id').html(txt);
+        showTips('登录操作', '正在登录');
+    });
+    /**
+     * @desc 显示修改结果提示框
+     * @param tip_msg
+     * @param title
+     */
+    function showTips(tip_msg = '信息变动', title = '提示信息') {
+        $('#tip_msg_title_login').html(title);
+        $('#tip_msg_rst_login').html(tip_msg);
+        $('#rstTipModalLogin').modal('show');
+    }
+
+    $("#ApplyLoginConfirm").click(function () {
+        id = $(this).attr('data-op-id')
+        apply(id);
+    });
+
+    /**
+     * @desc 接口
+     * @param uid
+     */
+    function apply(id) {
+        data = {id:id,is_auto:0};
+        console.log(data);
+        $.post("/forum/tz-systems-users/login",data,function(rst) {
+            console.log(rst);
+            Qrst = rst.data;
+            status = rst.status;
+            msg = '';
+            if(rst.status == 200){
+                balance = Qrst.balance;
+                desc = '';
+                if(expire_time == null || expire_time == '' || expire_time == NaN){
+                    desc = '永久';
+                }else{
+                    desc = '过期时间：'+expire_time;
+                }
+                $("#balance_"+id).html(balance);
+                $("#ApplyLoginConfirmEnd").attr('refresh', 1);
+            }else {
+                $("#ApplyLoginConfirmEnd").attr('refresh', 0);
+                msg = rst.msg;
+            }
+
+            $("#tip_msg_title_end_login").html(msg);
+            $("#rstTipModalEndLogin").modal('show');
+        },'JSON');
+    }
+
+    /**
+     * 确定按钮
+     */
+    $("#ApplyLoginConfirmEnd").click(function () {
+        refresh = $(this).attr('refresh');
+        if(refresh == 1){
+            url = location.href.replace(/#/g, '');
+            window.location.href = url;
+        }
+    });
+});
+</script>

@@ -45,8 +45,15 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value'=> function($model){
                                 $txt = $model->username ? $model->username : '';
-                                $url = '/tz-system-users/index/login?uid='.$model->uid;
-                                return Html::a($txt, $url);
+                                $options = [
+                                    'class' => 'act-login',
+                                    'data-id'=>$model->id,
+                                    'data-uid'=>$model->uid,
+                                    'data-username'=>$model->username, # 系统账号
+                                    'data-account'=>$model->account, # 网盘账号
+                                    'data-domain'=>$model->ssc_domain, # 网盘地址
+                                ];
+                                return Html::a($txt, '#', $options);
                             },
                         ],
                         //'sys_name',
@@ -140,3 +147,4 @@ $this->params['breadcrumbs'][] = $this->title;
 </section>
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <?php include(dirname(__FILE__).'/user-renew.php'); ?>
+<?php include(dirname(__FILE__).'/act-user-login.php'); ?>

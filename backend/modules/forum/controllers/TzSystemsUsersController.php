@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\BaseService;
 use backend\service\UserService;
 use Yii;
 use backend\models\TzSystemsUsers;
@@ -43,6 +44,19 @@ class TzSystemsUsersController extends BaseController
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    /**
+     * @return array|bool
+     */
+    public function actionLogin(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $id = $post['id'];
+        $is_auto = $post['is_auto'];
+        $rst = BaseService::login($id, $is_auto);
+
+        return $rst;
     }
 
     /**
