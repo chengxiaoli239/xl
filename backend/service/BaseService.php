@@ -11,6 +11,7 @@ use backend\models\TzSystemsUsers;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\Juhua\JuHuaBaseService;
 use backend\service\Lucky5\Lucky5Service;
+use backend\service\NineNine\NineNineService6;
 use backend\service\qilin\QiLinBaseService;
 use  yii;
 use common\tools\Util;
@@ -23,7 +24,7 @@ class BaseService{
      * @param $id TzSystemsUsers表id
      * @return array|bool
      */
-    public static function login($id = ''){
+    public static function login($id = '', $is_auto = 1){
         if(!$id) return ['status'=>300, 'msg'=>'id不能为空'];
         if(!$TzSystemsUser = TzSystemsUsers::findOne($id)){
             return ['status'=>300, 'msg'=>'操作失败:找不到记录'];
@@ -33,11 +34,13 @@ class BaseService{
             return false;
         }
         $tz_system_id = $TzSystemsUser->tz_system_id;
+        $flag = BetService::isLogin($TzSystemsUser->uid, $tz_system_id); #
+        if($flag && $is_auto){
+            return ['status'=>200, 'msg'=>'已经是登录状态'];
+        }
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网
             $rst = HN0898Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-            //$rst['rst'][$TzSystemsUser->id] = HN0898Service::synBalance($TzSystemsUser->id);
-            //$rst['rst'][$TzSystemsUser->id] = HN0898Service::login($TzSystemsUser->id);
         }elseif(in_array($tz_system_id, [3, 7, 9, 10])){
             # 3、重庆7时彩网
             if($tz_system_id == 3){

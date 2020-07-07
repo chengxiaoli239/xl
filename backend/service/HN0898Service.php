@@ -1036,10 +1036,10 @@ class HN0898Service extends BaseTZService {
     }
 
     public static function login($uid = 1, $tz_system_id = 1){
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        if($TzSystemsUsers->balance > 0) {
-            return ['status'=>200, 'msg'=>'已经登录的状态'];
-        }
+        //$TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        //if($TzSystemsUsers->balance > 0) {
+        //    return ['status'=>200, 'msg'=>'已经登录的状态'];
+        //}
         //self::__init($uid, $tz_system_id);
         $rst = false;
 

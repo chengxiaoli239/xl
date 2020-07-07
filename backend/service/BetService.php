@@ -916,12 +916,12 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
-     * @desc 是否登录，判断标准，能正常获取用户信息
+     * @desc 是否登录，判断标准，能正常获取用户信息、余额
+     * @param int $uid
      * @param $tz_system_id
-     * @param int $lottery_type
      * @return HuiYuanService5|KuaiLe8Service|LuckyBaseService|NineNineService6|SevenService|XlService
      */
-    public static function isLogin($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function isLogin($uid, $tz_system_id){
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网
             $flag = NineNineService6::isLogin($uid, $tz_system_id);
