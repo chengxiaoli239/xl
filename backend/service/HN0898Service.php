@@ -1036,7 +1036,7 @@ class HN0898Service extends BaseTZService {
     }
 
     public static function login($uid = 1, $tz_system_id = 1){
-        //$TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         //if($TzSystemsUsers->balance > 0) {
         //    return ['status'=>200, 'msg'=>'已经登录的状态'];
         //}
@@ -1057,6 +1057,8 @@ class HN0898Service extends BaseTZService {
             # 第四步：账号、验证码登录
             $rst = self::loginRemote($uid, $tz_system_id, $code);
         }
+
+        $rst = HN0898Service::synBalance($TzSystemsUsers->id);
 
         return $rst;
     }
@@ -1101,7 +1103,7 @@ class HN0898Service extends BaseTZService {
 
         $data = CurlService::httpPost($url,$post_data, $headers);
         //sleep(10);
-        HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
+        //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'code'=>$code, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
