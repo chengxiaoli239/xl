@@ -76,8 +76,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //'balance',
                         ['attribute' => 'balance', 'label'=>'余额', 'headerOptions' => ['width' => '8%'],
+                            'format'=>'raw',
                             'value'=> function($model){
-                                return $model->balance ? $model->balance : '';
+                                $options = [
+                                    'id' => 'balance_'.$model->id
+                                ];
+                                return Html::a($model->balance, '#', $options);
+                                //return $model->balance ? $model->balance : '';
                             },
                         ],
                         //'status',

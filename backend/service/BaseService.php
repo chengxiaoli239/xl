@@ -36,7 +36,7 @@ class BaseService{
         $tz_system_id = $TzSystemsUser->tz_system_id;
         $flag = BetService::isLogin($TzSystemsUser->uid, $tz_system_id); #
         if($flag && $is_auto){
-            return ['status'=>200, 'msg'=>'已经是登录状态', 'data'=>['balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account]];
+            return ['status'=>200, 'msg'=>'已经是登录状态', 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account];
         }
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网

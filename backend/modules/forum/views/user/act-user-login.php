@@ -80,17 +80,10 @@ $(function () {
         console.log(data);
         $.post("/forum/tz-systems-users/login",data,function(rst) {
             console.log(rst);
-            Qrst = rst.data;
             status = rst.status;
             msg = '';
             if(rst.status == 200){
-                balance = Qrst.balance;
-                desc = '';
-                if(expire_time == null || expire_time == '' || expire_time == NaN){
-                    desc = '永久';
-                }else{
-                    desc = '过期时间：'+expire_time;
-                }
+                balance = rst.balance;
                 $("#balance_"+id).html(balance);
                 $("#ApplyLoginConfirmEnd").attr('refresh', 1);
             }else {
