@@ -81,14 +81,18 @@ $(function () {
         $.post("/forum/tz-systems-users/login",data,function(rst) {
             console.log(rst);
             status = rst.status;
+            msg = rst.msg;
             if(rst.status == 200){
+                txt = '登录成功！';
                 balance = rst.balance;
                 $("#balance_"+id).html(balance);
                 $("#ApplyLoginConfirmEnd").attr('refresh', 1);
             }else {
+                balance = '';
+                txt = '登录失败！';
                 $("#ApplyLoginConfirmEnd").attr('refresh', 0);
             }
-            msg = rst.msg;
+            msg = txt + '系统账号:' + rst.username + '   网盘账号:'+ rst.account + ' ' + msg + '， 余额：' + balance;
 
             $("#tip_msg_title_end_login").html(msg);
             $("#rstTipModalEndLogin").modal('show');
