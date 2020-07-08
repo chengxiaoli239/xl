@@ -135,7 +135,7 @@ $profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
                                 if(!$model->status){
                                     $str = Html::a('点击撤单', $url1, ['title' => '点击撤单:'.$model->snid,'alt'=>$model->snid]);
                                     $str .= ' | '.Html::a('点击下注', $url2, ['title' => '点击下注:'.$model->id,'alt'=>$model->id]);
-                                    if(\Yii::$app->user->id == 1) $str = '<font color="green">等待开奖</font>';
+                                    if(\Yii::$app->user->id == 1) $str = Html::a('<font color="green">等待开奖</font>', '#', ['title' => '方案号:'.$model->snid,'alt'=>$model->snid]);
                                     return $str;
                                 }
                                 return BaseStringHelper::truncate($model->snid,15);
