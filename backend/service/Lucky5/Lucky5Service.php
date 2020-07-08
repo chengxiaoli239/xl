@@ -833,9 +833,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->save();
-        $rst['balance'] = $balance;
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','幸运五星-用户余额', $rst);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','幸运五星-用户余额', ['rst'=>$rst, 'balance'=>$balance]);
 
         return $balance;
     }
@@ -1084,29 +1083,6 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         # 获取用户信息
         $rst = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
-
-        return $rst;
-    }
-
-
-    public static function loginWriteCookie($uid = 1, $tz_system_id = 1){
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        if($TzSystemsUsers->balance > 0) {
-            return ['status'=>200, 'msg'=>'已经登录的状态'];
-        }
-        //self::__init($uid, $tz_system_id);
-        $rst = false;
-
-        # 第一步：获取cookie
-        $cookie_key = self::getCookie($uid,$tz_system_id);
-        if(isset($cookie_key['status']) && $cookie_key['status'] == 300) return $cookie_key;
-        # 第二步：账号、验证码登录
-        $rst = self::loginRemote($uid, $tz_system_id);
-        # 第三步：同意
-        $rst = self::acceptAgreement($uid, $tz_system_id);
-
-        # 获取用户信息
-        $rst = self::userInfo($uid, $tz_system_id);
 
         return $rst;
     }

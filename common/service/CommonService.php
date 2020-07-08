@@ -16,6 +16,7 @@ use backend\service\CurlService;
 use backend\service\UserService;
 use backend\models\SscKjData;
 use common\tools\Tools;
+use Yii;
 
 class  CommonService{
 
@@ -1042,39 +1043,58 @@ class  CommonService{
         # 1、获取验证码
         $rand = rand(60000000000000000, 6999999999999999);
         $url = 'http://vote.chkling.com/api/vote/captcha.png.php?rnd=&itemid=1466789&authType=1';
-        $rst = CurlService::curlGetCookie($url);
-        $acw_tc = explode('=', str_replace(';path=/;HttpOnly;Max-Age=1800', '', $rst));
-        p([$rst, $acw_tc]);
+        $cookie = CurlService::curlGetCookie($url);
+        $acw_tc = explode('=', str_replace(';path=/;HttpOnly;Max-Age=1800', '', $cookie))[1];
+        //p([$cookie, $acw_tc]);
 
         # 2、下载图片
-        $rst2 = CurlService::downLoadVoteImg($acw_tc);
+        $filename = CommonService::downLoadVoteImg($uid = 1000, $rand, $acw_tc);
 
         # 3、验证码接口
+        $codeRst = CaptchaCodeService::chaojiying($filename, $codeType = '6001'); # 超级鹰
+        //p($codeRst);
 
-        # 4、投票
-        $url = 'http://vote.chkling.com/api/vote/captcha.check.php?rnd='.$rand.'&itemid=1466789&authType=1&captcha=2';
-        $post_data = [
-            
-        ];
-        p($rst);
+        if($codeRst['status'] == 200){
+            # 4、投票
+            $url = 'http://vote.chkling.com/api/vote/captcha.check.php?rnd='.$rand.'&itemid=1466789&authType=1&captcha='.$codeRst['code'];
+            $headers = [
+                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+                'Accept-Encoding: gunzip, deflate',
+                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                'Cache-Control: max-age=0',
+                'Connection: keep-alive',
+                //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+                'Content-Type: application/x-www-form-urlencoded',
+                'Cookie: '.$cookie,
+                'Host: vote.chkling.com',
+                'Origin: http://vote.chkling.com',
+                'Referer: '.$url,
+                'Upgrade-Insecure-Requests: 1',
+                'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
+            ];
+            $rst = CurlService::getCurl($url, $headers);
+            p($rst);
+        }
+        p('xxxx');
 
         $cookie = 'czt_openinfo=%257B%2522uid%2522%253A%252211599625%2522%252C%2522token%2522%253A%25224584d583f1730a193e6d0ccc3f8a8cad%2522%257D; UM_distinctid=1732c8825ba22a-05ef0d3e077e67-4e31563f-5e106-1732c8825bb769; Hm_lvt_5aa56b2bef4b65b9c1660a5987b93134=1594179987; Hm_lpvt_5aa56b2bef4b65b9c1660a5987b93134=1594196682; acw_tc=2f624a4815941966830157919e096a214d8921d809bdd348daba87faf9df8b';
-        $codeRst = CaptchaCodeService::chaojiying($filename, $codeType = '6001'); # 超级鹰
     }
 
-    public static function downLoadVoteImg($uid = 1, $rnd = '', $acw_tc = ''){
+    public static function downLoadVoteImg($uid = 1000, $rnd = '', $acw_tc = ''){
         $url = 'http://vote.chkling.com/api/vote/captcha.png.php?rnd='.$rnd.'&itemid=1466789&authType=1';
         $headers = [
             
         ];
         $imageData = CurlService::httpGet($url, $headers);
-        $filename = Yii::$app->basePath . "/runtime/captcha/".$uid.'_'.$acw_tc.".png";
+        $filename = \Yii::$app->basePath . "/runtime/captcha/".$uid.'_'.$acw_tc.".png";
         //$filename = Yii::$app->basePath . "/runtime/captcha/".$cookie.".png";
         $tp = fopen($filename,"w");
         fwrite($tp, $imageData);
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
         //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+        Tool_Common::log('/WORK/LOG/'.\Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+
+        return $filename;
     }
 }
