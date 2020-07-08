@@ -172,6 +172,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = CommonService::getVoteCode();p($rst);
         p(urldecode('czt_openinfo=%257B%2522uid%2522%253A%252211599625%2522%252C%2522token%2522%253A%25224584d583f1730a193e6d0ccc3f8a8cad%2522%257D'));
         $str = '01234,13579,X,01234@01234,X,13579,01234@01234,13579,X,02468@01234,X,13579,02468@02468,X,13579,01234@02468,13579,X,01234@02468,13579,X,02468@02468,X,13579,02468';
         p(substr_count($str,'X'));

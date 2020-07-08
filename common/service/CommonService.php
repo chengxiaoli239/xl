@@ -1036,4 +1036,45 @@ class  CommonService{
 
         return $post;
     }
+
+    public static function getVoteCode(){
+
+        # 1、获取验证码
+        $rand = rand(60000000000000000, 6999999999999999);
+        $url = 'http://vote.chkling.com/api/vote/captcha.png.php?rnd=&itemid=1466789&authType=1';
+        $rst = CurlService::curlGetCookie($url);
+        $acw_tc = explode('=', str_replace(';path=/;HttpOnly;Max-Age=1800', '', $rst));
+        p([$rst, $acw_tc]);
+
+        # 2、下载图片
+        $rst2 = CurlService::downLoadVoteImg($acw_tc);
+
+        # 3、验证码接口
+
+        # 4、投票
+        $url = 'http://vote.chkling.com/api/vote/captcha.check.php?rnd='.$rand.'&itemid=1466789&authType=1&captcha=2';
+        $post_data = [
+            
+        ];
+        p($rst);
+
+        $cookie = 'czt_openinfo=%257B%2522uid%2522%253A%252211599625%2522%252C%2522token%2522%253A%25224584d583f1730a193e6d0ccc3f8a8cad%2522%257D; UM_distinctid=1732c8825ba22a-05ef0d3e077e67-4e31563f-5e106-1732c8825bb769; Hm_lvt_5aa56b2bef4b65b9c1660a5987b93134=1594179987; Hm_lpvt_5aa56b2bef4b65b9c1660a5987b93134=1594196682; acw_tc=2f624a4815941966830157919e096a214d8921d809bdd348daba87faf9df8b';
+        $codeRst = CaptchaCodeService::chaojiying($filename, $codeType = '6001'); # 超级鹰
+    }
+
+    public static function downLoadVoteImg($uid = 1, $rnd = '', $acw_tc = ''){
+        $url = 'http://vote.chkling.com/api/vote/captcha.png.php?rnd='.$rnd.'&itemid=1466789&authType=1';
+        $headers = [
+            
+        ];
+        $imageData = CurlService::httpGet($url, $headers);
+        $filename = Yii::$app->basePath . "/runtime/captcha/".$uid.'_'.$acw_tc.".png";
+        //$filename = Yii::$app->basePath . "/runtime/captcha/".$cookie.".png";
+        $tp = fopen($filename,"w");
+        fwrite($tp, $imageData);
+        fclose($tp);
+        $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
+        //p($logData);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+    }
 }
