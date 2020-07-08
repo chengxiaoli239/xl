@@ -1875,7 +1875,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 if($f = $m->get($mkey)){
                     return ['status'=>300, 'msg'=>'已经重复登录过一次'];
                 }
-                if($rst[$key]['code'] == 303){ # 判断掉线登录一次
+                if(in_array($rst[$key]['code'], [303, 309])){ # 判断掉线登录一次
                     if($rst[$key]['errno']>0){
                         $m = \Yii::$app->cache;
                         $mkey_proxy = PoxyIPService::builProxyIpKey();
@@ -2012,6 +2012,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $rstData = ["Status"=>0, 'code'=>305, 'msg'=>'已关盘'];
         }elseif(strpos($data, '维护中') !== false){
             $rstData = ["Status"=>0, 'code'=>306, 'msg'=>'系统线路维护中'];
+        }elseif($errno>0){
+            $rstData = ["Status"=>0, 'code'=>309, 'errno'=>$errno, 'msg'=>'网络超时'];
         }elseif(strpos($data, '停押') !== false){
             $rstData = ["Status"=>0, 'code'=>307, 'msg'=>'您的账号已被停押'];
         }else{
