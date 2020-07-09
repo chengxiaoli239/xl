@@ -1042,10 +1042,26 @@ class  CommonService{
 
         # 1、获取验证码
         $rand = rand(60000000000000000, 6999999999999999);
-        $url = 'http://vote.chkling.com/api/vote/captcha.png.php?rnd=&itemid=1466789&authType=1';
-        $cookie = CurlService::curlGetCookie($url);
+        $itemid = '2193389';
+        $url = 'http://vote.chkling.com/api/vote/captcha.png.php?rnd=&itemid='.$itemid.'&authType=1';
+        $cookie_str = 'UM_distinctid=1732c8825ba22a-05ef0d3e077e67-4e31563f-5e106-1732c8825bb769; Hm_lvt_5aa56b2bef4b65b9c1660a5987b93134=1594179987; czt_openinfo=%257B%2522uid%2522%253A%252211599625%2522%252C%2522token%2522%253A%252299a155fdcbb73305fa201d06f3fcad9b%2522%257D; Hm_lpvt_5aa56b2bef4b65b9c1660a5987b93134=1594287530';
+        $common_headers = [
+            'Host: vote.chkling.com',
+            'Connection: keep-alive',
+            'User-Agent: Mozilla/5.0 (Linux; Android 10; VOG-AL10 Build/HUAWEIVOG-AL10; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.62 XWEB/2469 MMWEBSDK/200601 Mobile Safari/537.36 MMWEBID/3859 MicroMessenger/7.0.16.1700(0x27001039) Process/tools WeChat/arm64 NetType/WIFI Language/zh_CN ABI/arm64',
+            'X-Requested-With: com.tencent.mm',
+            'Referer: http://m.chkling.com/activity?sid=0aa0562d621d67be&cfrom=UP2CW&from=singlemessage',
+            'Accept-Encoding: gunzip, deflate',
+            'Accept-Language: zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+            //'Cookie: '.$cookie_str,
+        ];
+        $cookie_headers = [
+            'Accept: image/wxpic,image/tpg,image/wxpic,image/tpg,image/webp,image/apng,image/*,*/*;q=0.8',
+        ];
+        $cookie = CurlService::curlGetCookie($url, array_merge($common_headers, $cookie_headers));
         $acw_tc = explode('=', str_replace(';path=/;HttpOnly;Max-Age=1800', '', $cookie))[1];
-        //p([$cookie, $acw_tc]);
+        $cookie = CurlService::curlGetCookie($url, array_merge($common_headers, array_merge($cookie_headers, ['Cookie: '.$cookie_str.'; acw_tc='.$acw_tc])));
+        //p(['cookie'=>$cookie, array_merge($common_headers, $cookie_headers), $acw_tc]);
 
         # 2、下载图片
         $filename = CommonService::downLoadVoteImg($uid = 1000, $rand, $acw_tc);
@@ -1056,25 +1072,17 @@ class  CommonService{
 
         if($codeRst['status'] == 200){
             # 4、投票
-            $url = 'http://vote.chkling.com/api/vote/captcha.check.php?rnd='.$rand.'&itemid=1466789&authType=1&captcha='.$codeRst['code'];
-            $headers = [
-                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-                'Accept-Encoding: gunzip, deflate',
-                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-                'Cache-Control: max-age=0',
-                'Connection: keep-alive',
-                //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
-                'Content-Type: application/x-www-form-urlencoded',
-                'Cookie: '.$cookie,
-                'Host: vote.chkling.com',
-                'Origin: http://vote.chkling.com',
-                'Referer: '.$url,
-                'Upgrade-Insecure-Requests: 1',
-                'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
+            $url = 'http://vote.chkling.com/api/vote/captcha.check.php?rnd='.$rand.'&itemid='.$itemid.'&authType=1&captcha='.$codeRst['code'];
+            $vote_headers = [
+                'Accept: application/json, text/plain, */*',
+                'Origin: http://m.chkling.com',
+                'Cookie: '.$cookie_str.'; acw_tc='.$acw_tc.''
+                // 2f624a1c15942884560606649e7f64ca606a345e012248b91aa297ba1b192a;
             ];
-            $rst = CurlService::getCurl($url, $headers);
-            p($rst);
+            $rst = CurlService::getCurl($url, array_merge($common_headers, $vote_headers));
         }
+        Tool_Common::log('getVoteCode', 'INFO', '投票', ['filename'=>$filename, 'codeRst'=>$codeRst, 'url'=>$url, 'headers'=>$vote_headers, 'rst'=>$rst]);
+        p($rst);
         p('xxxx');
 
         $cookie = 'czt_openinfo=%257B%2522uid%2522%253A%252211599625%2522%252C%2522token%2522%253A%25224584d583f1730a193e6d0ccc3f8a8cad%2522%257D; UM_distinctid=1732c8825ba22a-05ef0d3e077e67-4e31563f-5e106-1732c8825bb769; Hm_lvt_5aa56b2bef4b65b9c1660a5987b93134=1594179987; Hm_lpvt_5aa56b2bef4b65b9c1660a5987b93134=1594196682; acw_tc=2f624a4815941966830157919e096a214d8921d809bdd348daba87faf9df8b';
