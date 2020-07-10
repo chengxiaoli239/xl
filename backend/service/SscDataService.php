@@ -2666,7 +2666,7 @@ class SscDataService extends BaseService {
 
         $flags = []; # 计划是否中奖标识
         # 翻倍计划、翻倍止盈止损，倍投 连续x期不中 决定倍数
-        $where = ['AND', ['IN', 'plan_type', [2, 3, 4, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+        $where = ['AND', ['IN', 'plan_type', [2, 3, 4, 5, 9]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
                 $flag = SscDataService::isZjBefore($UserSysPlan->id);
@@ -2728,6 +2728,20 @@ class SscDataService extends BaseService {
                 $codes_hz['betStatus'] = $betStatus;
                 $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                 $updateData['hz_Arr'] = json_encode($codes_hz, 320);
+                $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                $logArr[$UserSysPlan->id]['rst'] = $rst;
+            }
+        }
+
+        # plan_type:7 中则继续投否则反买
+        $where = ['AND', ['IN', 'plan_type', [7]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+        if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+            foreach ($UserSysPlans as $UserSysPlan){
+                $flag = SscDataService::isZjBefore($UserSysPlan->id);
+                $buy_type = $flag ? $UserSysPlan->buy_type : ($UserSysPlan->buy_type == 1 ? 0 : 1);
+
+                $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
+                $updateData['buy_type'] = $buy_type;
                 $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                 $logArr[$UserSysPlan->id]['rst'] = $rst;
             }
