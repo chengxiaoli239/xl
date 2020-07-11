@@ -667,7 +667,7 @@ abstract class BetService extends BaseBetService {
            if(in_array($plan->plan_type, [6, 8, 9])){ # 6中则投 8、9遗漏多少期投
                //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
                $flag = BetService::getIsBetTrue($planId);
-               if(!$flag){
+               if(!$flag && $isAuto == 1){
                    $is_test = 1;
                    $sn = 'istest';
                    $snid = 'istest_id';
