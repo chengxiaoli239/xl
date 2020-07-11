@@ -12,15 +12,12 @@ $newRecord = SscKjData::find()->select(['qihao','code_str'])->where(['lottery_ty
 
 $this->title = Yii::t('app', 'Betting Records');
 $this->params['breadcrumbs'][] = $this->title;
-$sys_profits_3d = \backend\models\VPerdateProfits::findOne(['playway'=>2, 'tz_date'=>date('Y-m-d')])->profits;
-$sys_profits_3d = $sys_profits_3d ? $sys_profits_3d : 0.00;
-$profits_desc = date('Y-m-d').'系统投注利润：三定 : '.$sys_profits_3d;
 ?>
 <section class="betting-records-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title);echo '['.$newRecord['qihao'].':'.$newRecord['code_str'].']   ['.$profits_desc.']'; ?>
+            <?= Html::encode($this->title);echo '['.$newRecord['qihao'].':'.$newRecord['code_str'].']'; ?>
             <?= Html::a(Yii::t('app', 'playway 2 Plans'), ['index', 'BettingRecords[playway]'=>2], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
             <?= Html::a(Yii::t('app', 'playway 3 Plans'), ['index', 'BettingRecords[playway]'=>3], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
         </header>

@@ -11,15 +11,12 @@ use backend\models\SscKjData;
 
 $this->title = Yii::t('app', 'Pre Date Profits');
 $this->params['breadcrumbs'][] = $this->title;
-$sys_profits = \backend\models\VPerdateProfits::findOne(['tz_date'=>date('Y-m-d')])->profits;
-$sys_profits = $sys_profits ? $sys_profits : 0.00;
-$profits_desc = date('Y-m-d').'系统自动化投注利润：'.$sys_profits;
 ?>
 <section class="betting-records-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title);echo '   ('.$profits_desc.')'; ?>
+            <?= Html::encode($this->title); ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
