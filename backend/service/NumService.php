@@ -1359,8 +1359,8 @@ class NumService extends BaseService {
         }
 
         # 当前遗漏
-        if(!empty($hz_Arr['current_miss'])){
-            $desc .= '遗漏:'.$hz_Arr['current_miss'].' ';
+        if(isset($hz_Arr['current_miss'])){
+            $desc .= '遗漏:'.(int)$hz_Arr['current_miss'].' ';
         }
 
         # 合分 - 三定
