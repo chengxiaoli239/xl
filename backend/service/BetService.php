@@ -666,7 +666,7 @@ abstract class BetService extends BaseBetService {
            $is_test = $plan->is_test;
            if(in_array($plan->plan_type, [6, 8, 9])){ # 6中则投 8、9遗漏多少期投
                //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
-               $flag = BetService::getIsBetTest($planId);
+               $flag = BetService::getIsBetTrue($planId);
                if(!$flag){
                    $is_test = 1;
                    $sn = 'istest';
@@ -719,7 +719,7 @@ abstract class BetService extends BaseBetService {
      * @param string $plan_id
      * @return bool
      */
-    public static function getIsBetTest($plan_id = ''){
+    public static function getIsBetTrue($plan_id = ''){
 
         $flag = SscDataService::isZjBefore($plan_id); # 上期是否中奖，第一次下注认为是上期不中 中则投
         $plan = UserSysPlans::findOne($plan_id);
@@ -727,7 +727,7 @@ abstract class BetService extends BaseBetService {
             $flag = 0;
             $codes_hz = json_decode($plan->hz_Arr);
             if($codes_hz['current_miss']<=$codes_hz['bet_while_miss']){
-                $flag = 1;
+                $flag = 0;
             }
         }
 
