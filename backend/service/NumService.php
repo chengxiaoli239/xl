@@ -1360,7 +1360,7 @@ class NumService extends BaseService {
 
         # 当前遗漏
         if(isset($hz_Arr['current_miss'])){
-            $desc .= '遗漏:'.(int)$hz_Arr['current_miss'].' ';
+            $desc .= '[遗漏:'.$hz_Arr['bet_while_miss'].'投,当前:'.(int)$hz_Arr['current_miss'].'] ';
         }
 
         # 合分 - 三定
