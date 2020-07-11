@@ -1358,6 +1358,11 @@ class NumService extends BaseService {
             $filter11 = ['sel'=>$hz_Arr['arise_in_sel'], 'val'=>$hz_Arr['arise_in']];
         }
 
+        # 当前遗漏
+        if(!empty($hz_Arr['current_miss'])){
+            $desc .= '遗漏:'.$hz_Arr['current_miss'].' ';
+        }
+
         # 合分 - 三定
         if(isset($hz_Arr['hefen_pos']) && isset($hz_Arr['hefen'])){
             if(isset($hz_Arr['hefen_pos']) && isset($hz_Arr['hefen'])) $filter8['hefen'] = 1; else $filter9['hefen'] = 0;

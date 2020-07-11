@@ -337,6 +337,10 @@ class UserSysPlansService extends BaseService {
             }
         }
 
+        if($post['UserSysPlans']['bet_while_miss']>0){
+            $tmpFilter['current_miss'] = 0;
+        }
+
         if(!in_array($tz_type, [22, 23, 24])){ # 四定和值、上奖全倒、直码
             $hz_Arr = json_encode($tmpFilter, 320);
             $post['UserSysPlans']['hz_Arr'] = !empty($hz_Arr) ? $hz_Arr : '';
