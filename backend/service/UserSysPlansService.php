@@ -356,7 +356,6 @@ class UserSysPlansService extends BaseService {
             $post['UserSysPlans']['tz_sort'] = $tz_sort;
             $post['UserSysPlans']['created_at'] = time();
         }
-        p($post);
 
         return $post;
     }
