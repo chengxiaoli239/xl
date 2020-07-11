@@ -125,7 +125,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         ['attribute' => 'current_profits','label'=>'当前',
                             'format'=>'raw',
                             'value' => function($model) {
-                                if(in_array($model->plan_type,[1, 3])){
+                                if(in_array($model->plan_type,[1, 3]) OR ($model->take_profits>0 OR $model->stop_loss)){
                                     $txt = '止盈:'.floatval($model->take_profits)." 止损:".floatval($model->stop_loss) .' 当前:'.round($model->current_profits, 2) ;
                                 }else{
                                     $txt = '';
@@ -171,7 +171,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 }
                                 $txt = BaseStringHelper::truncate($str,20);
                                 $str = Html::a($txt, '#', ['title' => $str,'alt'=>$str]);
-                                if($model->singles && in_array($model->plan_type,[2, 3, 4, 5])){
+                                if($model->singles && in_array($model->plan_type,[2, 3, 4, 5, 9])){
                                     $str .= '翻倍梯度:'.$model->singles;
                                 }
                                 return $str;
