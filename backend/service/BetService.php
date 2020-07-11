@@ -664,8 +664,9 @@ abstract class BetService extends BaseBetService {
            $m->set($mkey, 1, $time);
 
            $is_test = $plan->is_test;
-           if(in_array($plan->plan_type, [6])){ # 中则投
-               $flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
+           if(in_array($plan->plan_type, [6, 8, 9])){ # 6中则投 8、9遗漏多少期投
+               //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
+               $flag = BetService::getIsBetTest($planId);
                if(!$flag){
                    $is_test = 1;
                    $sn = 'istest';
@@ -711,6 +712,26 @@ abstract class BetService extends BaseBetService {
        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/plan_bet','INFO','0898投注记录', $logArr);
 
        return $rst;
+    }
+
+    /**
+     * @desc 获取计划是否投注为测试
+     * @param string $plan_id
+     * @return bool
+     */
+    public static function getIsBetTest($plan_id = ''){
+
+        $flag = SscDataService::isZjBefore($plan_id); # 上期是否中奖，第一次下注认为是上期不中 中则投
+        $plan = UserSysPlans::findOne($plan_id);
+        if(in_array($plan->plan_type, [6, 7])){ # 遗漏多少期启投
+            $flag = 0;
+            $codes_hz = json_decode($plan->hz_Arr);
+            if($codes_hz['current_miss']<=$codes_hz['bet_while_miss']){
+                $flag = 1;
+            }
+        }
+
+        return $flag;
     }
 
     /**

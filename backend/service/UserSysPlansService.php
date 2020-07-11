@@ -136,11 +136,16 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['type_log']);
 
+        # 15、单双类型
+        if(isset($UserSysPlans['bet_while_miss']) && $UserSysPlans['bet_while_miss']){
+            $tmpFilter['bet_while_miss'] = $UserSysPlans['bet_while_miss'];
+        }
+        unset($post['UserSysPlans']['bet_while_miss']);
+
         ################### 公共参数 - 结束 #########################
 
         if($playway == 6) {
             $post['UserSysPlans']['hz_Arr'] = str_replace('，', ',', $post['UserSysPlans']['hz_Arr']);
-        }elseif (in_array($tz_type, [18])){ # 一定
         }elseif (in_array($tz_type, [29, 32])){ # 三定-快选 、三定快译切换
             # 三定-快选过滤
             # 15.1、合分位置
@@ -226,16 +231,6 @@ class UserSysPlansService extends BaseService {
             }
         }elseif (in_array($tz_type, [25, 20])){
             # 四定-快选过滤
-            # 15、四单
-            if($UserSysPlans['type_4d'] && count($UserSysPlans['type_4d']) == 1){
-                $tmpFilter['type_4d'] = $UserSysPlans['type_4d'][0];
-            }
-            unset($post['UserSysPlans']['type_4d']);
-            # 16、四双
-            if($UserSysPlans['type_4s'] && count($UserSysPlans['type_4s']) == 1){
-                $tmpFilter['type_4s'] = $UserSysPlans['type_4s'][0];
-            }
-            unset($post['UserSysPlans']['type_4s']);
 
             # 15.1、合分位置
             if($UserSysPlans['hefen_pos'] && count($UserSysPlans['hefen_pos']) > 0){
@@ -324,14 +319,17 @@ class UserSysPlansService extends BaseService {
             $post['UserSysPlans']['hz_Arr'] && $post['UserSysPlans']['hz_Arr'] = trim($hz_Arr);
         }
 
-        if(!in_array($tz_type, [23]) && in_array($plan_type, [2,3,4,5])){ # 翻倍计划
+        if(!in_array($tz_type, [23]) && in_array($plan_type, [2,3,4,5,9])){ # 翻倍计划
             if($id && $plan = UserSysPlans::findOne($id)){
                 $tmpHzArr = json_decode($plan->hz_Arr, true);
-                $singles_key = (isset($tmpHzArr['singles_key'])) ? $tmpHzArr['singles_key'] : 0;
+                $singles_key = isset($tmpHzArr['singles_key']) ? $tmpHzArr['singles_key'] : 0;
+                $current_miss = isset($tmpHzArr['current_miss']) ? $tmpHzArr['current_miss'] : 0;
             }else{
                 $singles_key = 0;
+                $current_miss = 0;
             }
             $tmpFilter['singles_key'] = $singles_key;
+            $tmpFilter['current_miss'] = $current_miss;
 
             if(in_array($plan_type, [4, 5])){ # 号码切换,当前组1或者组2
                 $tmpFilter['status_val'] = ($post['UserSysPlans']['status_val'] == 2) ? 2 : 1;
@@ -358,7 +356,7 @@ class UserSysPlansService extends BaseService {
             $post['UserSysPlans']['tz_sort'] = $tz_sort;
             $post['UserSysPlans']['created_at'] = time();
         }
-        //p($post);
+        p($post);
 
         return $post;
     }

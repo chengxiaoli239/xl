@@ -216,7 +216,7 @@ class TzService extends BaseService {
             StaticService::afterOpStatic($lottery_type, 'opProfitsPlans');
         }
         */
-        $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type); # 处理止盈止损计划
+        $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type); # 处理止盈止损、倍投等计划
 
         $rst['qihao'] = $qihao;
         $rst['lottery_type'] = $lottery_type;
@@ -454,13 +454,13 @@ class TzService extends BaseService {
         $datas = [
             # 计划类型:0正常1止盈止损计划
             0=>'正常',
-            1=>'止盈止损',
+            //1=>'止盈止损',
             2=>'倍投',
-            3=>'倍投&止盈止损',
+            //3=>'倍投&止盈止损',
             4=>'倍投&号码切换',
-            5=>'倍投&号码切换止盈止损',
+            //5=>'倍投&号码切换止盈止损',
             6=>'中则投',
-            7=>'中则继续投否则反买',
+            7=>'中则投否则反买',
             8=>'遗漏xx期投',  # 遗漏x期数则开始投，投中了后就再等遗漏x期再继续投
             9=>'遗漏xx期倍投', # 遗漏x期数则开始倍投，投中了后就回到第一个倍数再等遗漏x期再继续倍投
         ];

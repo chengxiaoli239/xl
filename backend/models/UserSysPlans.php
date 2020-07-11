@@ -87,6 +87,9 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $arise_in_sel; #  三定含，除取
     public $singles_key; # 倍数key
     public $betStatus; # 投注状态
+    public $is_init; # 是否初始
+    public $bet_while_miss; # 遗漏多少期启投
+    public $current_miss; # 当前遗漏期数
     //public $type_3_txt; # 三定-导入
     //public $type_4_txt; # 四定-导入
     /**

@@ -2642,7 +2642,7 @@ class SscDataService extends BaseService {
         $rst = ['status'=>200, 'msg'=>'处理成功'];
 
         # 止盈止损、翻倍止盈止损 计划
-        $where = ['AND', ['IN', 'plan_type', [1, 3, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+        $where = ['OR', ['AND', ['IN', 'plan_type', [1, 3, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]], ['OR', ['>', 'take_profits', 0], ['>', 'stop_loss', 0]]];
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
                 $profits = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id, 'is_profits_record'=>1])->sum('profits');
@@ -2683,17 +2683,27 @@ class SscDataService extends BaseService {
                 $logArr[$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
 
                 $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
-                if($flag == 1){ # 中奖
+                if($flag == 1 OR $codes_hz['is_init'] == 1){ # 中奖
                     $next_single_key = 0;
                     $single = $singles[$next_single_key];
+                    $codes_hz['current_miss'] = 0;
                 }else{ # 不中奖
-                    $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                    if(in_array($UserSysPlan->plan_type, [9]) && $codes_hz['is_init'] == 0 && $codes_hz['current_miss']<=$codes_hz['bet_while_miss']){ # 如果小于设置的遗漏期数，则为第一个倍数
+                        # plan_type:9 遗漏x期投
+                        $next_single_key = 0;
+                        $single = $singles[$next_single_key];
+                    //}elseif(in_array($UserSysPlan->plan_type, [9]) && $codes_hz['current_miss']) {
+                    }else{
+                        $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                    }
+                    $codes_hz['current_miss'] = (int)$codes_hz['current_miss'] + 1;
                 }
                 $logArr[$UserSysPlan->id]['single'] = $single; # 最新更新倍数
                 $logArr[$UserSysPlan->id]['before_singles_key'] = $codes_hz['singles_key']; # 更新前倍数key
                 $logArr[$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新即将下注的倍数key, singles的 key
 
                 $codes_hz['singles_key'] = $next_single_key;
+                $codes_hz['is_init'] = 0; # 开奖之后初始标识改成 0
                 $whereUpdate = ['id'=>$UserSysPlan->id ]; # 更新条件
                 $logArr[$UserSysPlan->id]['whereUpdate'] = $whereUpdate;
 
@@ -2715,12 +2725,12 @@ class SscDataService extends BaseService {
         }
 
         # plan_type:6 中则投，不中则不投
-        $where = ['AND', ['IN', 'plan_type', [6]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+        $where = ['AND', ['IN', 'plan_type', [6, 8, 9]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
                 $flag = SscDataService::isZjBefore($UserSysPlan->id);
                 $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
-                if($flag){
+                if($flag OR (in_array($UserSysPlan->plan_type, [8, 9]) && $codes_hz['current_miss']>=$codes_hz['bet_while_miss'])){ # plan_type:8、9 遗漏xx期投、遗漏xx期投
                     $betStatus = 1;
                 }else{
                     $betStatus = 0;
