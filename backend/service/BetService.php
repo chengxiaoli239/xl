@@ -726,7 +726,7 @@ abstract class BetService extends BaseBetService {
         if(in_array($plan->plan_type, [8, 9])){ # 遗漏多少期启投
             $flag = 0;
             $codes_hz = json_decode($plan->hz_Arr, true);
-            if($codes_hz['current_miss']<=$codes_hz['bet_while_miss']){
+            if($codes_hz['current_miss']>=$codes_hz['bet_while_miss']){
                 $flag = 0;
             }
         }
