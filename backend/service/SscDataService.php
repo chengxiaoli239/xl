@@ -2682,28 +2682,39 @@ class SscDataService extends BaseService {
                 $singles = explode('-', $UserSysPlan->singles);
                 $logArr[$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
 
+                $is_init = 1; # 是否初始真实投注
                 $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
-                if($flag == 1 OR $codes_hz['is_init'] == 1){ # 中奖
+                if($flag == 1){ # 中奖
                     $next_single_key = 0;
                     $single = $singles[$next_single_key];
-                    $codes_hz['current_miss'] = 0;
+                    if(in_array($UserSysPlan->plan_type, [9])){
+                        $codes_hz['current_miss'] = 0;
+                        $is_init = 1;
+                    }
                 }else{ # 不中奖
-                    if(in_array($UserSysPlan->plan_type, [9]) && $codes_hz['is_init'] == 0 && $codes_hz['current_miss']<=$codes_hz['bet_while_miss']){ # 如果小于设置的遗漏期数，则为第一个倍数
-                        # plan_type:9 遗漏x期投
+                    if(in_array($UserSysPlan->plan_type, [9]) && $codes_hz['current_miss']<$codes_hz['bet_while_miss']){
+                        $codes_hz['current_miss'] = $codes_hz['current_miss'] + 1;
+                        $is_init = 2; # 不中未达到遗漏期数状态
                         $next_single_key = 0;
                         $single = $singles[$next_single_key];
-                    //}elseif(in_array($UserSysPlan->plan_type, [9]) && $codes_hz['current_miss']) {
+                    }elseif(in_array($UserSysPlan->plan_type, [9]) && $codes_hz['current_miss']>=$codes_hz['bet_while_miss']) {
+                        $codes_hz['current_miss'] = $codes_hz['current_miss'] + 1;
+                        $is_init = 3; # 开始投注
+                        $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                        if($codes_hz['is_init'] == 2){
+                            $next_single_key = 1;
+                            $single = $singles[$next_single_key];
+                        }
                     }else{
                         $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                     }
-                    $codes_hz['current_miss'] = (int)$codes_hz['current_miss'] + 1;
                 }
                 $logArr[$UserSysPlan->id]['single'] = $single; # 最新更新倍数
                 $logArr[$UserSysPlan->id]['before_singles_key'] = $codes_hz['singles_key']; # 更新前倍数key
                 $logArr[$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新即将下注的倍数key, singles的 key
 
+                $codes_hz['is_init'] = $is_init; # 开奖之后初始标识改成 0
                 $codes_hz['singles_key'] = $next_single_key;
-                $codes_hz['is_init'] = 0; # 开奖之后初始标识改成 0
                 $whereUpdate = ['id'=>$UserSysPlan->id ]; # 更新条件
                 $logArr[$UserSysPlan->id]['whereUpdate'] = $whereUpdate;
 

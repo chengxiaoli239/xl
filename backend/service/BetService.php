@@ -721,7 +721,7 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
-     * @desc 获取计划是否投注为测试
+     * @desc 获取计划是否投注为真实
      * @param string $plan_id
      * @return bool
      */
