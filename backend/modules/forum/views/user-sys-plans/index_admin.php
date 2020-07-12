@@ -124,7 +124,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'current_profits','label'=>'当前',
                             'format'=>'raw',
                             'value' => function($model) {
-                                if(in_array($model->plan_type,[1, 3])){
+                                if(in_array($model->plan_type,[1, 3]) OR ($model->take_profits>0 OR $model->stop_loss)){
                                     $txt = '止盈:'.floatval($model->take_profits)." 止损:".floatval($model->stop_loss) .' 当前:'.round($model->current_profits, 2) ;
                                 }else{
                                     $txt = '';
@@ -137,7 +137,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => function($model) {
                                 $url = "/forum/user-sys-plans/tz-now?id=".$model->id; # 立即下注
                                 $txt = Html::a('立即下注', $url, ['title' => '立即下注'.$model->id,'alt'=>$model->id]);
-                                if(in_array($model->plan_type,[1, 3]) OR ($model->take_profits>0 OR $model->stop_loss)){
+                                if(in_array($model->plan_type,[1, 3])){
                                     $url1 = "/forum/user-sys-plans/re-calculate-profits?id=".$model->id; # 重新计算盈利
                                     $txt .= ' | '.Html::a('重算盈利', $url1, ['title' => '重算盈利'.$model->id,'alt'=>$model->id]);
                                 }
