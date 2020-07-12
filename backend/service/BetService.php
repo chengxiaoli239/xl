@@ -573,6 +573,11 @@ abstract class BetService extends BaseBetService {
        $mkey = 'reCalculateProfits_'.$uid.'_'.$id.'_'.$qihao.'_'.$UserSysPlans->playway;
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
 
+       $codes_hz = json_decode($UserSysPlans->hz_Arr, true);
+       $codes_hz['current_miss'] = 0; # 当前遗漏
+       $codes_hz['singles_key'] = 0; # 倍数key
+       $codes_hz['is_init'] = 1; # 是否最初
+
        $rstFlag = BettingRecords::updateAll(['is_profits_record'=>0], ['plan_id'=>$id]);
        $UserSysPlans->current_profits = 0.00;
        $UserSysPlans->save();
