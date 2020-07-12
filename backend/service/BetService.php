@@ -733,7 +733,7 @@ abstract class BetService extends BaseBetService {
             $flag = 0;
             $codes_hz = json_decode($plan->hz_Arr, true);
             if($codes_hz['current_miss']>=$codes_hz['bet_while_miss']){
-                $flag = 0;
+                $flag = 1;
             }
         }
 
