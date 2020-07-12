@@ -580,6 +580,7 @@ abstract class BetService extends BaseBetService {
 
        $rstFlag = BettingRecords::updateAll(['is_profits_record'=>0], ['plan_id'=>$id]);
        $UserSysPlans->current_profits = 0.00;
+       $UserSysPlans->hz_Arr = json_encode($codes_hz, 320);
        $UserSysPlans->save();
 
        $m->set($mkey, 1, 10);
