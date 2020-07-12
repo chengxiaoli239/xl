@@ -137,7 +137,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => function($model) {
                                 $url = "/forum/user-sys-plans/tz-now?id=".$model->id; # 立即下注
                                 $txt = Html::a('立即下注', $url, ['title' => '立即下注'.$model->id,'alt'=>$model->id]);
-                                if(in_array($model->plan_type,[1, 3])){
+                                if(in_array($model->plan_type,[1, 3]) OR ($model->take_profits>0 OR $model->stop_loss)){
                                     $url1 = "/forum/user-sys-plans/re-calculate-profits?id=".$model->id; # 重新计算盈利
                                     $txt .= ' | '.Html::a('重算盈利', $url1, ['title' => '重算盈利'.$model->id,'alt'=>$model->id]);
                                 }
