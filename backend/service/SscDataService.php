@@ -2660,7 +2660,7 @@ class SscDataService extends BaseService {
                 $UserSysPlan->current_profits = $profits;
                 $saveFlag = $UserSysPlan->save();
 
-                $logArr['plan_1_3'][$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
+                $logArr['plan_1_3_5'][$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
             }
         }
 
@@ -2675,12 +2675,12 @@ class SscDataService extends BaseService {
                 # 遗漏期数[不中奖期数]
                 $lossQs = self::getLossQs($UserSysPlan->id);
 
-                $logArr[$UserSysPlan->id]['flag'] = $flag; # 中奖标识
-                $logArr[$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
+                $logArr['plan_2_3_4_5_9'][$UserSysPlan->id]['flag'] = $flag; # 中奖标识
+                $logArr['plan_2_3_4_5_9'][$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
 
                 # 倍数处理，中的计划回第一个倍数
                 $singles = explode('-', $UserSysPlan->singles);
-                $logArr[$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
+                $logArr['plan_2_3_4_5_9'][$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
 
                 $is_init = 1; # 是否初始真实投注
                 $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
@@ -2692,31 +2692,34 @@ class SscDataService extends BaseService {
                         $is_init = 1;
                     }
                 }else{ # 不中奖
-                    if(in_array($UserSysPlan->plan_type, [9]) && $codes_hz['current_miss']<$codes_hz['bet_while_miss']){
+                    $current_miss = $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏
+                    if(in_array($UserSysPlan->plan_type, [9]) && $current_miss<$codes_hz['bet_while_miss']){
                         $codes_hz['current_miss'] = $codes_hz['current_miss'] + 1;
                         $is_init = 2; # 不中未达到遗漏期数状态
                         $next_single_key = 0;
                         $single = $singles[$next_single_key];
-                    }elseif(in_array($UserSysPlan->plan_type, [9]) && $codes_hz['current_miss']>=$codes_hz['bet_while_miss']) {
-                        $codes_hz['current_miss'] = $codes_hz['current_miss'] + 1;
+                    }elseif(in_array($UserSysPlan->plan_type, [9]) && $current_miss>=$codes_hz['bet_while_miss']) {
+                        $codes_hz['current_miss'] = $current_miss;
                         $is_init = 3; # 开始投注
                         $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                         if($codes_hz['is_init'] == 2){
-                            $next_single_key = 1;
+                            $next_single_key = 0;
                             $single = $singles[$next_single_key];
+                        }else{
+
                         }
                     }else{
                         $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                     }
                 }
-                $logArr[$UserSysPlan->id]['single'] = $single; # 最新更新倍数
-                $logArr[$UserSysPlan->id]['before_singles_key'] = $codes_hz['singles_key']; # 更新前倍数key
-                $logArr[$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新即将下注的倍数key, singles的 key
+                $logArr['plan_2_3_4_5_9'][$UserSysPlan->id]['single'] = $single; # 最新更新倍数
+                $logArr['plan_2_3_4_5_9'][$UserSysPlan->id]['before_singles_key'] = $codes_hz['singles_key']; # 更新前倍数key
+                $logArr['plan_2_3_4_5_9'][$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新即将下注的倍数key, singles的 key
 
                 $codes_hz['is_init'] = $is_init; # 开奖之后初始标识改成 0
                 $codes_hz['singles_key'] = $next_single_key;
                 $whereUpdate = ['id'=>$UserSysPlan->id ]; # 更新条件
-                $logArr[$UserSysPlan->id]['whereUpdate'] = $whereUpdate;
+                $logArr['plan_2_3_4_5_9'][$UserSysPlan->id]['whereUpdate'] = $whereUpdate;
 
                 $updateData = ['single'=>$single];
                 if(isset($codes_hz['status_val'])){ # 号码切换&倍投
@@ -2728,10 +2731,10 @@ class SscDataService extends BaseService {
                     }
                 }
                 $updateData['hz_Arr'] = json_encode($codes_hz, 320);
-                $logArr[$UserSysPlan->id]['updateData'] = $codes_hz;
+                $logArr['plan_2_3_4_5_9'][$UserSysPlan->id]['updateData'] = $codes_hz;
 
                 $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
-                $logArr[$UserSysPlan->id]['rst'] = $rst;
+                $logArr['plan_2_3_4_5_9'][$UserSysPlan->id]['rst'] = $rst;
             }
         }
 
@@ -2748,9 +2751,9 @@ class SscDataService extends BaseService {
                 }
                 $codes_hz['betStatus'] = $betStatus;
                 $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
-                $updateData['hz_Arr'] = json_encode($codes_hz, 320);
+                $updateData = ['hz_Arr'=>json_encode($codes_hz, 320)];
                 $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
-                $logArr[$UserSysPlan->id]['rst'] = $rst;
+                $logArr['6_8_9'][$UserSysPlan->id]['rst'] = $rst;
             }
         }
 
@@ -2762,9 +2765,9 @@ class SscDataService extends BaseService {
                 $buy_type = $flag ? $UserSysPlan->buy_type : ($UserSysPlan->buy_type == 1 ? 0 : 1);
 
                 $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
-                $updateData['buy_type'] = $buy_type;
+                $updateData = ['buy_type'=>$buy_type];
                 $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
-                $logArr[$UserSysPlan->id]['rst'] = $rst;
+                $logArr['plan_7'][$UserSysPlan->id]['rst'] = $rst;
             }
         }
 
@@ -2843,6 +2846,19 @@ class SscDataService extends BaseService {
         $m->set($mkey, $next_single_key,$time);
 
         return $nextSingle;
+    }
+
+    /**
+     * @desc 获取计划从统计开始到现在的遗漏
+     * @param int $plan_id
+     * @return int
+     */
+    private static function getPlanStaticYl($plan_id = 0){
+        $yl = 0;
+        $plan = UserSysPlans::findOne($plan_id);
+        $codes_hz = json_decode($plan->hz_Arr);
+
+        return $yl;
     }
 
     /**
