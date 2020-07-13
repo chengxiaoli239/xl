@@ -89,6 +89,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->codes_hz;
                             }
                         ],
+                        ['attribute' => 'type_2b','headerOptions'=>['width'=>'5%'],'label'=>'兄弟',
+                            'value' => function($model) {
+                                return $model->type_2b;
+                            }
+                        ],
                         ['attribute' => 'type_2','headerOptions'=>['width'=>'5%'],'label'=>'双重',
                             'value' => function($model) {
                                 return $model->type_2;
