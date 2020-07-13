@@ -2693,8 +2693,8 @@ class SscDataService extends BaseService {
                         $is_init = 1;
                     }
                 }else{ # 不中奖
-                    $current_miss = $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
                     if(in_array($UserSysPlan->plan_type, [9])){ # 遗漏倍投
+                        $current_miss = $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
                         if($current_miss<$codes_hz['bet_while_miss']){
                             $codes_hz['current_miss'] = $current_miss;
                             $is_init = 2; # 不中未达到遗漏期数状态
