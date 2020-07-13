@@ -2764,11 +2764,12 @@ class SscDataService extends BaseService {
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
                 $flag = SscDataService::isZjBefore($UserSysPlan->id);
-                $buy_type = $flag == 1 ? $UserSysPlan->buy_type : ($UserSysPlan->buy_type == 1 ? 0 : 1);
+                $buy_type = ($flag == 1) ? $UserSysPlan->buy_type : ($UserSysPlan->buy_type == 1 ? 0 : 1);
 
                 $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                 $updateData = ['buy_type'=>$buy_type];
                 $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                $logArr['plan_7'][$UserSysPlan->id]['updateData'] = $updateData;
                 $logArr['plan_7'][$UserSysPlan->id]['rst'] = $rst;
             }
         }
