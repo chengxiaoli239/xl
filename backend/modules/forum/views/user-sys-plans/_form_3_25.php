@@ -85,7 +85,7 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
                     <div class="row">
-                        <div class="col-lg-3 col-xs-4">
+                        <div class="col-lg-3 col-xs-6">
                             <!--位置合分：位置-->
                         <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>
                         </div>
@@ -108,7 +108,7 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'hefen4')->textInput()->label('1.4定位合分:值')?-->
 
                     <div class="row">
-                        <div class="col-lg-3 col-xs-4">
+                        <div class="col-lg-3 col-xs-6">
                             <!--两数合、三数合-->
                         <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList([1=>'两数',2=>'三数'])->label('2.不定位合分') ?>
                         </div>

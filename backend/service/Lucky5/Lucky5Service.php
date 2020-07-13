@@ -1868,7 +1868,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     //return $rst;
                     continue;
                 }
-                //return $rst;
+                if(in_array($rst[$key]['code'], [302])){
+                    //return $rst; # 余额不足
+                }
             }
 
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
