@@ -95,9 +95,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         //'type_3b',
-                        ['attribute' => 'type_3b','headerOptions'=>['width'=>'5%'],'label'=>'三兄弟',
+                        ['attribute' => 'type_3b','headerOptions'=>['width'=>'5%'],'label'=>'三兄',
                             'value' => function($model) {
                                 return $model->type_3b;
+                            }
+                        ],
+                        ['attribute' => 'type_4b','headerOptions'=>['width'=>'5%'],'label'=>'四兄',
+                            'value' => function($model) {
+                                return $model->type_4b;
                             }
                         ],
                         //'type_3',
