@@ -2642,7 +2642,11 @@ class SscDataService extends BaseService {
         $rst = ['status'=>200, 'msg'=>'处理成功'];
 
         # 止盈止损、翻倍止盈止损 计划
-        $where = ['OR', ['AND', ['IN', 'plan_type', [1, 3, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]], ['OR', ['>', 'take_profits', 0], ['>', 'stop_loss', 0], ['=', 'status', 1]]];
+        $where = [
+            'OR',
+            [ 'AND', ['IN', 'plan_type', [1, 3, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type] ],
+            [ 'AND', ['>', 'take_profits', 0], ['>', 'stop_loss', 0], ['=', 'status', 1] ]
+        ];
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
                 $profits = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id, 'is_profits_record'=>1])->sum('profits');
