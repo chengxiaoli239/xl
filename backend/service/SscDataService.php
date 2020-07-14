@@ -2757,6 +2757,14 @@ class SscDataService extends BaseService {
                 }else{
                     $betStatus = 0;
                 }
+                if(in_array($UserSysPlan->plan_type, [8])){
+                    if(in_array($flag, [1, -1])){
+                        $current_miss = 0;
+                    }else{
+                        $current_miss = $codes_hz['current_miss'] + 1;
+                    }
+                    $codes_hz['current_miss'] = $current_miss;
+                }
                 $codes_hz['betStatus'] = $betStatus;
                 $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                 $updateData = ['hz_Arr'=>json_encode($codes_hz, 320)];
