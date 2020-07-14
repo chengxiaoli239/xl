@@ -2793,7 +2793,7 @@ class SscDataService extends BaseService {
         }
 
         $logArr['lottery_type'] = $lottery_type;
-        $logArr['lottery_type'] = HN0898Service::getQihao($lottery_type);
+        $logArr['qihao'] = HN0898Service::getQihao($lottery_type);
         Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', [$logArr]);
 
         return $logArr;
