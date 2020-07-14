@@ -2797,7 +2797,7 @@ class SscDataService extends BaseService {
         # flag 是否中奖金，中的计划回0.1、不中的计划翻倍
         $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one();
 
-        //if(empty($BettingRecords)) return -1;
+        if(empty($BettingRecords)) return -1;
 
         # 最近一期是否中中奖
         $flag = $BettingRecords->profits>0 ? true : false;
