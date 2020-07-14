@@ -1164,6 +1164,7 @@ abstract class BetService extends BaseBetService {
      * @return bool
      */
     public static function _logRecordsByPlandId($plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test = 0, $sn='888888', $snid='888888id'){
+        //p([$plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test, $sn, $snid],0);
         $UserSysPlans = UserSysPlans::findOne($plan_id);
         if($UserSysPlans->tz_type == 18){
             $count = strlen(str_replace(',', '', $codes));
@@ -1189,6 +1190,7 @@ abstract class BetService extends BaseBetService {
             'single' => $UserSysPlans->single,  // 投注倍数
             'betting_money'=> $totalmoney,  // 投注金额
         ];
+        //p($insertData,0);
         $insertRst = BetService::_logRecords($insertData);
 
         return $insertRst;

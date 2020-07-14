@@ -53,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'data-account'=>$model->account, # 网盘账号
                                     'data-domain'=>$model->ssc_domain, # 网盘地址
                                 ];
-                                return Html::a($txt, '#', $options);
+                                return Html::a($txt, 'javascript:;', $options);
                             },
                         ],
                         //'sys_name',

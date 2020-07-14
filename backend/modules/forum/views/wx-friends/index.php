@@ -60,7 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'Signature', 'format'=>'raw',
                             'value' => function($model) {
                                 $txt = BaseStringHelper::truncate($model->Signature,25);
-                                return Html::a($txt, '#', ['title' => $model->Signature,'alt'=>$model->Signature]);
+                                return Html::a($txt, 'javascript:;', ['title' => $model->Signature,'alt'=>$model->Signature]);
                             }
                         ],
                         'send_name',

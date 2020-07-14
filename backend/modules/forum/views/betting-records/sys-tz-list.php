@@ -49,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = BaseStringHelper::truncate($model->codes,25);
-                                return Html::a($txt, '#', ['title' => $model->codes,'alt'=>$model->codes]);
+                                return Html::a($txt, 'javascript:;', ['title' => $model->codes,'alt'=>$model->codes]);
                             }
                         ],
                         ['attribute' => 'kj_codes','headerOptions'=>['width'=>'5%'],

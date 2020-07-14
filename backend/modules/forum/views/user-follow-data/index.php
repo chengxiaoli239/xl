@@ -61,7 +61,7 @@ $txt = Yii::t('app', 'Create tz plans');
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = BaseStringHelper::truncate($model->code,25);
-                                return Html::a($txt, '#', ['title' => $model->code,'alt'=>$model->code]);
+                                return Html::a($txt, 'javascript:;', ['title' => $model->code,'alt'=>$model->code]);
                             }
                         ],
                         ['attribute' => 'current_miss', 'label'=>'当前遗漏',

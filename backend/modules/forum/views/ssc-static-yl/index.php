@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'data-val' => $model->val,
                                     'data-lottery_type' => Yii::$app->request->queryParams['SscStaticYl']['lottery_type'],
                                 ];
-                                return Html::a($txt, '#', $options);
+                                return Html::a($txt, 'javascript:;', $options);
                             }
                         ],
                         'current_miss',

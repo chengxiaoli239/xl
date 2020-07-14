@@ -47,7 +47,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                     'data-val' => $txt,
                                     'data-lottery_type' => Yii::$app->request->queryParams['SscSdHzYl']['lottery_type'],
                                 ];
-                                return Html::a($txt, '#', $options);
+                                return Html::a($txt, 'javascript:;', $options);
                             }
                         ],
                         'current_miss',

@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = BaseStringHelper::truncate($model->codes,25);
-                                return Html::a($txt, '#', ['title' => $model->codes,'alt'=>$model->codes]);
+                                return Html::a($txt, 'javascript:;', ['title' => $model->codes,'alt'=>$model->codes]);
                             }
                         ],
                         //'betting_money',
@@ -106,7 +106,15 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'plan_id','label'=>'planid','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                return Html::a($model->plan_id, '/forum/betting-records/index?BettingRecords[plan_id]='.$model->plan_id);
+                                $plan = \backend\models\UserSysPlans::findOne($model->plan_id);
+                                $alt_str = \backend\service\NumService::getDescByKuaixuan(json_decode($plan->hz_Arr, true));
+                                if($plan->singles && in_array($plan->plan_type,[2, 3, 4, 5, 9, 10])){
+                                    $alt_str .= '翻倍梯度:'.$plan->singles;
+                                }
+                                $options = [
+                                    'title' => \backend\service\TzService::getTzPlanTypes($plan->plan_type) . '，'.$alt_str,
+                                ];
+                                return Html::a($model->plan_id, '/forum/betting-records/index?BettingRecords[plan_id]='.$model->plan_id, $options);
                             }
                         ],
                         ['attribute'=>'snid', 'label'=>'操作',
@@ -141,6 +149,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'playway',
                         //'playway_name',
                         ['attribute' => 'playway_name','label'=>'方式',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
                             'value' => function($model) {
                                 $str = $model->playway_name;
                                 if($model->playway == 2 && $model->tz_type > 0){
@@ -160,7 +169,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'create_time',
                         ['attribute' => 'create_time','label'=>'时间','headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
-                                return $model->create_time;
+                                return substr($model->create_time, 10);
                             }
                         ],
 

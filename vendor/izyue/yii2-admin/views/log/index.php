@@ -62,7 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => function($model) {
                                 $txt = BaseStringHelper::truncate($model->posts,14);
 
-                                return Html::a($txt, '#', ['title' => $model->posts,'alt'=>$model->posts]);
+                                return Html::a($txt, 'javascript:;', ['title' => $model->posts,'alt'=>$model->posts]);
                             }
                         ],
                         'created_at:datetime',
