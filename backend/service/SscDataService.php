@@ -514,13 +514,13 @@ class SscDataService extends BaseService {
                 'zuHes' => [ [1,2,3], [1,2,4], [1,3,4], [2,3,4] ],
                 'numsArr' => [111,112,121,122,211,212,221,222],  // [8,9,10,11,12,13];  // 值
             ],
-            /*
-            */
             # 四定单双
             'dwds4' => [
                 'zuHes' => [ [1,2,3,4] ],
                 'numsArr' => [1111,1112,1121,1122,1211,1212,1221,1222,2111,2112,2121,2122,2211,2212,2221,2222],  // [8,9,10,11,12,13];  // 值
             ],
+            /*
+            */
             # 四定组合单双
             'dwds5' => [
                 'zuHes' => [ [1,2,3,4] ],
@@ -1046,11 +1046,14 @@ class SscDataService extends BaseService {
      */
     public static function getDsHistoryMiss($num, $position, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 472){
         //if(!is_array($num)) $num = [ $num ];
+        $cArr = [2=>30, 3=>60, 4=>120];
+        $c = count(explode(',',$position));
+        $recently = $cArr[$c];
         $last_times = 0;
         $last_index_id = self::getLastIndexId($lottery_type);
         $min_id = $last_index_id - $recently - 1;
         $min_id = $min_id ? $min_id : $last_index_id;
-        //p([$last['last_id'], $recently, $min_id]);
+        //p(['num'=>$num, 'position'=>$position, 'last_index_id'=>$last_index_id, 'recently'=>$recently, 'min'=>$min_id, $recently]);
 
         $field = 'code_'.str_replace(',','_',$position);
         if(is_array($num)){
@@ -1059,6 +1062,7 @@ class SscDataService extends BaseService {
             $where = ['AND', ['=', $field, $num],['>', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
         }
         //$where = "$field=$num AND id>$min_id";
+        //p($where);
         $SscKjDataDs = SscKjDataDs::find()->select(['id', 'index_id', 'qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
         //p($SscKjDataDs);
 

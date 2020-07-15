@@ -172,6 +172,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=8); p($rst);// 单双遗漏
+        $rst = SscDataService::update3NumYL($lottery_type = 8);p($rst);
         $miss = SscDataService::getDsHistoryMiss($num, '1,2,3,4', $lottery_type=5, 5000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $flag = BetService::getIsBetTrue($plan_id=6);d($flag);
         $flag = BetSe($plan_id=6, $istest=0); d($flag);# 上期是否中奖，第一次下注认为是上期不中 中则投
@@ -184,7 +186,6 @@ class IndexController extends Controller
         $codes_hz = '{"p1":"123","p2":"345","p3":"569","p4":"6589","p5":"1234"}';
         $codesArr = NumService::getOneFixedCode(json_decode($codes_hz, true));p($codesArr);
         $rst = NumService::staticPlansProfits();p($rst);
-        $rst = SscDataService::update3NumYL($lottery_type = 6);p($rst);
 
         $domain = 'f2.ww835566.xyz';
         // ping域名
@@ -342,7 +343,6 @@ class IndexController extends Controller
         $rst = SscDataService::getLastIndexId(6);p($rst);
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 8);p($rst);
         $rst = StaticService::static2NumsYl($lottery_type = 8);p($rst);
-        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=8); p($rst);// 单双遗漏
         for ($i=0; $i<50; $i++){
             $rst['updateDs'] = SscDataService::updateDsData($lottery_type=8); // 每期开奖遗漏 -- 新开
         }
