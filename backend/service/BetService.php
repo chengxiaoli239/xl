@@ -737,7 +737,7 @@ abstract class BetService extends BaseBetService {
             }
         }
 
-        return $flag;
+        return (int)$flag;
     }
 
     /**

@@ -2804,15 +2804,19 @@ class SscDataService extends BaseService {
      * @param int $plan_id
      * @return bool
      */
-    public static function isZjBefore($plan_id = 0){
+    public static function isZjBefore($plan_id = 0, $is_test = 0){
         if(empty($plan_id)) return false;
         # flag 是否中奖金，中的计划回0.1、不中的计划翻倍
-        $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one();
+        $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+
+        if($is_test){
+            p([$BettingRecords['profits'], $BettingRecords]);
+        }
 
         if(empty($BettingRecords)) return -1;
 
         # 最近一期是否中中奖
-        $flag = $BettingRecords->profits>0 ? true : false;
+        $flag = $BettingRecords['profits']>0 ? true : false;
 
         return $flag;
     }
