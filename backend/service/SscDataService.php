@@ -1332,7 +1332,7 @@ class SscDataService extends BaseService {
             //$index_id =
             $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
             $index_id = $last['index_id'];
-            $m->set($mkey, $index_id, 300);
+            $m->set($mkey, $index_id, 280);
         }
 
         return $index_id;
@@ -2701,15 +2701,15 @@ class SscDataService extends BaseService {
                 }else{ # 不中奖
                     if(in_array($UserSysPlan->plan_type, [9])) { # 遗漏倍投
                         $current_miss = $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
-                        if ($current_miss < $codes_hz['bet_while_miss']) {
+                        if ($current_miss <= $codes_hz['bet_while_miss']) {
                             $is_init = 2; # 不中未达到遗漏期数状态
                             $next_single_key = 0;
                             $single = $singles[$next_single_key];
-                        } elseif ($current_miss >= $codes_hz['bet_while_miss']) {
+                        } elseif ($current_miss > $codes_hz['bet_while_miss']) {
                             $is_init = 3; # 开始投注
                             $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                             if ($codes_hz['is_init'] == 2) {
-                                $next_single_key = 0;
+                                $next_single_key = 1;
                                 $single = $singles[$next_single_key];
                             }
                         }
@@ -2816,9 +2816,9 @@ class SscDataService extends BaseService {
         if(empty($BettingRecords)) return -1;
 
         # 最近一期是否中中奖
-        $flag = $BettingRecords['profits']>0 ? true : false;
+        $flag = $BettingRecords['profits']>0 ? 1 : 0;
 
-        return $flag;
+        return (int)$flag;
     }
 
 

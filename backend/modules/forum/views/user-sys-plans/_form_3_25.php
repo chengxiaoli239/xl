@@ -243,7 +243,13 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'update_time')->textInput() ?-->
 
-                    <div class="form-group">
+                    <div class="row">
+                        <div class="col-lg-3 col-xs-12">
+                            <?= $form->field($model,"desc")->textarea([ 'autofocus' => false,'style'=>'height:60px' ])?>
+                        </div>
+                    </div>
+
+                <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
                             <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>
                         </div>

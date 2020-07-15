@@ -90,6 +90,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $is_init; # 是否初始
     public $bet_while_miss; # 遗漏多少期启投
     public $current_miss; # 当前遗漏期数
+    public $desc; # 计划备注
     //public $type_3_txt; # 三定-导入
     //public $type_4_txt; # 四定-导入
     /**
@@ -145,6 +146,7 @@ class UserSysPlans extends \common\models\base\BaseModel
             'current_profits' => '当前盈利',
             'plan_type' => '计划类型:0正常1止盈止损计划',
             'tz_sort' => '投注排序:从小到大',
+            'desc' => '计划备注',
             'created_at' => '创建时间',
             'updated_at' => '更新时间',
             'update_time' => '更新时间',
