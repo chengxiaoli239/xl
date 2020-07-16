@@ -1336,7 +1336,9 @@ class SscDataService extends BaseService {
             //$index_id =
             $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
             $index_id = $last['index_id'];
-            $m->set($mkey, $index_id, 280);
+            $qihao = HN0898Service::getQihao($lottery_type);
+            $time = BetService::getBetCacheTime($lottery_type, $qihao);
+            $m->set($mkey, $index_id, $time);
         }
 
         return $index_id;
