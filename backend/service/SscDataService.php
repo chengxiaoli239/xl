@@ -557,7 +557,7 @@ class SscDataService extends BaseService {
                     }
 
                     $SscDsYl->updated_at = time();
-                    $miss = SscDataService::getDsHistoryMiss($num, $position, $lottery_type); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+                    $miss = SscDataService::getDsHistoryMiss($num, $position, $lottery_type, $SscDsYl->static_nums); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
                     //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
                     $SscDsYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
                     $SscDsYl->current_miss = (string)$miss['current_times'];  // 1、当前遗漏次数
@@ -1046,9 +1046,7 @@ class SscDataService extends BaseService {
      */
     public static function getDsHistoryMiss($num, $position, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 472){
         //if(!is_array($num)) $num = [ $num ];
-        $cArr = [2=>30, 3=>60, 4=>120];
-        $c = count(explode(',',$position));
-        $recently = $cArr[$c];
+
         $last_times = 0;
         $last_index_id = self::getLastIndexId($lottery_type);
         $min_id = $last_index_id - $recently - 1;
@@ -1336,9 +1334,9 @@ class SscDataService extends BaseService {
             //$index_id =
             $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
             $index_id = $last['index_id'];
-            $qihao = HN0898Service::getQihao($lottery_type);
-            $time = BetService::getBetCacheTime($lottery_type, $qihao);
-            $m->set($mkey, $index_id, $time);
+            //$qihao = HN0898Service::getQihao($lottery_type);
+            //$time = BetService::getBetCacheTime($lottery_type, $qihao);
+            $m->set($mkey, $index_id, 300);
         }
 
         return $index_id;
