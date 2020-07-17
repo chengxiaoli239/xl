@@ -18,6 +18,7 @@ use Yii;
  * @property string $yl_records 遗漏记录
  * @property string $history_max_miss 历史最大遗漏
  * @property int $type 1一定2二定3三定4四定
+ * @property int $static_nums 统计期数
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
@@ -40,7 +41,7 @@ class SscDsYl extends \common\models\base\BaseModel
     {
         return [
             [['yl_records'], 'string'],
-            [['type', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['type', 'static_nums', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
             [['positions'], 'string', 'max' => 8],
             [['zhi'], 'string', 'max' => 120],
@@ -66,6 +67,7 @@ class SscDsYl extends \common\models\base\BaseModel
             'yl_records' => '遗漏记录',
             'history_max_miss' => '历史最大遗漏',
             'type' => '1一定2二定3三定4四定',
+            'static_nums' => '统计期数',
             'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
             'created_at' => '创建时间',
             'updated_at' => '更新时间',
