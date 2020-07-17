@@ -69,14 +69,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         //'current_miss',
-                        ['attribute'=>'current_miss','label'=>'本期遗漏','headerOptions'=>['width'=>'3%'],
+                        ['attribute'=>'current_miss','label'=>'本期','headerOptions'=>['width'=>'3%'],
                             'value'=>function($model){
                                 return $model->current_miss;
                             }
                         ],
                         'yl_records',
                         //'last_time_miss',
-                        ['attribute'=>'last_time_miss','label'=>'上次遗漏','headerOptions'=>['width'=>'3%'],
+                        ['attribute'=>'last_time_miss','label'=>'上次','headerOptions'=>['width'=>'3%'],
                             'value'=>function($model){
                                 return $model->last_time_miss;
                             }
@@ -90,19 +90,21 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         */
                         //'max_miss',
-                        ['attribute'=>'max_miss','label'=>'最大遗漏','headerOptions'=>['width'=>'3%'],
+                        ['attribute'=>'max_miss','label'=>'最大','headerOptions'=>['width'=>'3%'],
                             'value'=>function($model){
                                 return $model->max_miss;
                             }
                         ],
                         //'max_range',
+                        /*
                         ['attribute'=>'max_range','label'=>'最大遗漏范围',//'headerOptions'=>['width'=>'5%'],
                             'value'=>function($model){
                                 return $model->max_range;
                             }
                         ],
+                        */
                         //'history_max_miss',
-                        ['attribute'=>'history_max_miss','label'=>'历史最大','headerOptions'=>['width'=>'3%'],
+                        ['attribute'=>'history_max_miss','label'=>'历史','headerOptions'=>['width'=>'3%'],
                             'value'=>function($model){
                                 return $model->history_max_miss;
                             }
@@ -117,7 +119,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         */
                         //'updated_at',
-                        'update_time',
+                        //'update_time',
+                        ['attribute'=>'update_time','label'=>'时间','headerOptions'=>['width'=>'5%'],
+                            'value'=>function($model){
+                                return substr($model->update_time, 11);
+                            }
+                        ],
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
