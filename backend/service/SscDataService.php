@@ -560,7 +560,7 @@ class SscDataService extends BaseService {
                     $miss = SscDataService::getDsHistoryMiss($num, $position, $lottery_type, $SscDsYl->static_nums); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
                     //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
                     $SscDsYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
-                    $SscDsYl->current_miss = (string)$miss['current_times'];  // 1、当前遗漏次数
+                    $SscDsYl->current_miss = $miss['current_times'] < 0 ? 0 : (string)$miss['current_times'];  // 1、当前遗漏次数
                     $SscDsYl->last_time_miss = (string)$miss['last_times']; // 2、上次遗漏
                     $SscDsYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
                     $SscDsYl->max_miss = (string)$miss['max_miss'];      // 4、近200期内最大遗漏
@@ -2948,7 +2948,45 @@ class SscDataService extends BaseService {
         return $data;
     }
 
+    /**
+     * @desc 获取投注组数
+     * @param string $codes
+     * @return int
+     */
+    public static function getBetNums($codes = ''){
+        $nums = 0;
+        # codes :X,02468,02468,13579@02468,X,02468,13579@02468,02468,X,13579@X,02468,02468,01234@02468,X,02468,01234@02468,02468,X,01234@X,02468,01234,13579@02468,X,01234,13579
+        //$codes = '02468,X,02468,13579@X,02468,02468,13579@02468,02468,X,13579@X,02468,02468,01234@02468,X,02468,01234@02468,02468,X,01234@X,02468,01234,13579@02468,X,01234,13579';
 
+        $Arrs = explode('@', $codes);
+        foreach ($Arrs as $arr){
+            $arr = trim(str_replace("X,", '', ','.$arr.','), ',');
+            $tmpCodes = explode(',', $arr);
+            $n = 1;
+            foreach ($tmpCodes as $tmpCode){
+                $n = $n * strlen($tmpCode);
+            }
+            $nums = $nums + $n;
+        }
+
+        return $nums;
+    }
+
+    /**
+     * @desc 获取号码的定位类型
+     * @param string $codes
+     * @return int
+     */
+    public static function getPlaywayByCodes($codes = ''){
+        //$codes = '02468,3,02468,13579@X,02468,02468,13579@02468,02468,X,13579@X,02468,02468,01234@02468,X,02468,01234@02468,02468,X,01234@X,02468,01234,13579@02468,X,01234,13579';
+        $playway = 3;
+        $Arrs = explode('@', $codes);
+        $data = $Arrs[0];
+        $XNums = array_count_values(explode(',', $data))['X'];
+        $playway = $playway - $XNums;
+
+        return $playway;
+    }
 
 
 

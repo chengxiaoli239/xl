@@ -172,6 +172,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::getPlaywayByCodes(); p($rst);// 单双遗漏
+        $rst = SscDataService::getBetNums(); p($rst);// 单双遗漏
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=8); p($rst);// 单双遗漏
         $rst = SscDataService::update3NumYL($lottery_type = 8);p($rst);
         $miss = SscDataService::getDsHistoryMiss($num, '1,2,3,4', $lottery_type=5, 5000);p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];

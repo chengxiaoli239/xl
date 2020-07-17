@@ -963,11 +963,14 @@ class NineNineBaseService extends BaseTZService {
             }
             $cancel_status = ['正常'=>0, '已撤单'=>1];
             $uid = $TzSystemsUsers->uid;
+            $betNums = SscDataService::getBetNums($list['codes']); //p($rst);
+            $playway = SscDataService::getPlaywayByCodes($list['codes']);
+            $single = $list['totalmoney'] / $betNums;
+            $playwayName = [1=>'二字定', 2=>'三字定', 3=>'四字定'];
 
             $account = AdminModel::findOne($uid)->username;
             //if($uid == 11)p(['account'=>$account]);
             $codesArr = explode('@', $list['codes']);
-            $single = $list['totalmoney'] / count($codesArr);
             $setData = array_merge($setData,[
                 'sn' => $list['sn'],
                 'snid' => $list['snid'],
@@ -975,12 +978,12 @@ class NineNineBaseService extends BaseTZService {
                 'qihao' => $list['qihao'],
                 'account' => $account,
                 'uid' => $uid,
-                'playway' => 3,
+                'playway' => $playway,
                 'tz_system_id' => $TzSystemsUsers->tz_system_id,
                 'lottery_type' => $lottery_type,
-                'tz_type' => 21,
+                'tz_type' => $playway == 3 ? 21 : 16,
                 'single' => $single,
-                'playway_name' => '四字定',
+                'playway_name' => $playwayName[$playway],
                 'betting_money' => $list['totalmoney'],
                 'is_simulate' => 0,
                 'cancel_status' => $cancel_status[$list['status_txt']] == 1 ? 1 : 0,
