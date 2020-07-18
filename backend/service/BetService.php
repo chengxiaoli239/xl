@@ -1212,6 +1212,15 @@ abstract class BetService extends BaseBetService {
         return $data;
     }
 
+    /**
+     * @desc 获取针对用户的号码缓存 plan_id 的key，用于号码量大的计划异步抓回
+     * @param $uid
+     * @param $codes
+     * @return string
+     */
+    public static function getBetCodesKey($uid, $codes){
+        return md5('getBetCodesKey_'.$uid.'_'.$codes);
+    }
 
 
 

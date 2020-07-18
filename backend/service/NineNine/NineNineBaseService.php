@@ -365,6 +365,9 @@ class NineNineBaseService extends BaseTZService {
         if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
         $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
 
+        $plan_id_key = BetService::getBetCodesKey($TzSystemsUsers->uid, $code);
+        $m->set($plan_id_key, $plan_id, $time);
+
         $data['code'] = $code;
         $betNums = self::getBetNumsPer();
         $codesArrs = self::splitCodes(explode('@', $code),  $betNums); # 2500一次
@@ -943,6 +946,7 @@ class NineNineBaseService extends BaseTZService {
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         //p([$uid, $tz_system_id, $TzSystemsUsers]);
 
+        $m = \Yii::$app->cache;
         sleep(2);
         $lists = self::getTzList($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $lottery_type);
         //p([$TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $lottery_type, $lists]);
@@ -961,6 +965,9 @@ class NineNineBaseService extends BaseTZService {
                 $setData['createtime'] = time();
                 $setData['created_at'] = time();
             }
+            $plan_id_key = BetService::getBetCodesKey($uid, $list['codes']);
+            $plan_id = $m->get($plan_id_key);
+            $plan_id = $plan_id ? $plan_id : '';
             $cancel_status = ['正常'=>0, '已撤单'=>1];
             $uid = $TzSystemsUsers->uid;
             $betNums = SscDataService::getBetNums($list['codes']); //p($rst);
@@ -970,7 +977,7 @@ class NineNineBaseService extends BaseTZService {
 
             $account = AdminModel::findOne($uid)->username;
             //if($uid == 11)p(['account'=>$account]);
-            $codesArr = explode('@', $list['codes']);
+            //$codesArr = explode('@', $list['codes']);
             $setData = array_merge($setData,[
                 'sn' => $list['sn'],
                 'snid' => $list['snid'],
@@ -978,6 +985,7 @@ class NineNineBaseService extends BaseTZService {
                 'qihao' => $list['qihao'],
                 'account' => $account,
                 'uid' => $uid,
+                'plan_id' => $plan_id,
                 'playway' => $playway,
                 'tz_system_id' => $TzSystemsUsers->tz_system_id,
                 'lottery_type' => $lottery_type,
