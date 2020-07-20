@@ -57,15 +57,15 @@ use yii\widgets\ActiveForm;
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
                     <?= $form->field($model, 'hz')->checkboxList($hzArr)
                         ->label('和值 
-                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_0_6">0-6</a>&nbsp;&nbsp;
-                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_5_10">5-10</a>&nbsp;&nbsp;
-                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_11_15">11-15</a>&nbsp;&nbsp;
-                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_16_19">16-19</a>&nbsp;&nbsp;
-                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_20_24">20-24</a>&nbsp;&nbsp;
-                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_25_29">25-29</a>&nbsp;&nbsp;
-                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_30_36">30-36</a>&nbsp;&nbsp;
-                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds">反买</a>
-                            <a href="#" class="btn btn-xs btn-info reverse_type_4ds_Null">清</a>
+                            <a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds_0_6">0-6</a>&nbsp;&nbsp;
+                            <a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds_5_10">5-10</a>&nbsp;&nbsp;
+                            <a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds_11_15">11-15</a>&nbsp;&nbsp;
+                            <a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds_16_19">16-19</a>&nbsp;&nbsp;
+                            <a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds_20_24">20-24</a>&nbsp;&nbsp;
+                            <a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds_25_29">25-29</a>&nbsp;&nbsp;
+                            <a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds_30_36">30-36</a>&nbsp;&nbsp;
+                            <a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds">反买</a>
+                            <a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds_Null">清</a>
                     ') ?>
 
                     <!--?= $form->field($model, 'buy_type')->textInput() ?-->
