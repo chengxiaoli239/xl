@@ -18,7 +18,7 @@ class StaticCodeTypeArisePerdate extends StaticCodeTypeArisePerdateModel
     public function rules()
     {
         return [
-            [['id', 'type_2', 'type_3', 'type_22', 'type_2b', 'type_3b', 'type_4b', 'type_2_type_2b', 'type_2_type_3b', 'type_3n_2b', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'type_2', 'type_3', 'type_22', 'type_2b', 'type_3b', 'type_4b', 'type_2_type_2b', 'type_2_type_3b', 'type_3n_2b', 'type_22b', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
         ];
     }
@@ -70,6 +70,7 @@ class StaticCodeTypeArisePerdate extends StaticCodeTypeArisePerdateModel
             'type_2_type_2b' => $this->type_2_type_2b,
             'type_2_type_3b' => $this->type_2_type_3b,
             'type_3n_2b' => $this->type_3n_2b,
+            'type_22b' => $this->type_22b,
             'lottery_type' => $this->lottery_type,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
