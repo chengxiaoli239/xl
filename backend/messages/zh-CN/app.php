@@ -2,6 +2,7 @@
 
 return [
     'edit' => '编辑',
+    'query' => '查询',
     'Create Follow Datas' => '添加计划',
     'playway 10' => '定位胆',
     'playway 1' => '二字定',

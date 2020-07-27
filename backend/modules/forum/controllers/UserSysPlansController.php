@@ -135,6 +135,7 @@ class UserSysPlansController extends BaseController
         $data =  [
             'model' => $model,
             'tz_type' => $tz_type,
+            'lottery_type' => $queryParams['lottery_type'],
             'playway' => $playway,
             'plan_types' => $plan_types,
             'tz_sites_Arr' => $tz_sites_Arr
@@ -196,6 +197,7 @@ class UserSysPlansController extends BaseController
             'model' => $model,
             'tz_type' => $model->tz_type,
             'playway' => $model->playway,
+            'lottery_type' => $model->lottery_type,
             'plan_types' => $plan_types,
             'tz_sites_Arr' => $tz_sites_Arr,
         ];

@@ -103,6 +103,18 @@ class SscStaticYlController extends BaseController
     }
 
     /**
+     * @desc 遗漏功能查询
+     * @return array
+     */
+    public function actionQuery(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $rst = StaticService::queryCodeTypeStatic($post);
+
+        return $rst;
+    }
+
+    /**
      * Displays a single SscStaticYl model.
      * @param integer $id
      * @return mixed

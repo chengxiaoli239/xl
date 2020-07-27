@@ -1989,6 +1989,40 @@ class StaticService extends BaseService {
         return $allStatic;
     }
 
+    /**
+     * @desc 号码类型每天
+     * @param $date
+     * @param $lottery_type
+     * @return mixed
+     */
+    public static function staticCodeTypeArisePerData($dates, $lottery_type){
+        if(!is_array($dates)) $dates = [$dates];
+        foreach ($dates as $date){
+            if($statics = StaticService::staticCodeTypeCounts($date, $lottery_type)){
+                $setData = [];
+                foreach ($statics as $key=>$static){
+                    $setData[$key] = $static;
+                }
+                if(!$StaticTables = StaticCodeTypeArisePerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
+                    $StaticTables = new StaticCodeTypeArisePerdate();
+                    $setData['created_at'] = time();
+                }
+                $setData = array_merge($setData, [
+                    'date' => $date,
+                    'lottery_type' => $lottery_type,
+                    'updated_at' => time(),
+                ]);
+                $allStatic[] = $setData;
+
+                $StaticTables->setAttributes($setData);
+                $rst[$date] = $StaticTables->save();
+                //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
+            }
+        }
+
+        return $rst;
+    }
+
 
     /**
      * @desc 每天和值范围数量统计
@@ -2659,5 +2693,16 @@ $sql .= '
         $miss['val_desc'] = \backend\service\SscDataService::getStaticNameByType($val);
 
         return $miss;
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    public static function queryCodeTypeStatic($data){
+        $rst = [];
+        p($data);
+
+        return $rst;
     }
 }

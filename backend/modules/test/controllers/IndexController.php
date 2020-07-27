@@ -172,6 +172,14 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $dates = [ ];
+        $tmp_date =  strtotime('2020-07-01 00:00:00');
+        $i = 0;
+        for ($i ; $i<26; $i++){
+            $dates[] = date('Y-m-d', $tmp_date + $i * 86400);
+        }
+        $rst = StaticService::staticCodeTypeArisePerData($dates, $lottery_type=6);
+        p($rst);
         $rst = SscDataService::getPlaywayByCodes(); p($rst);// 单双遗漏
         $rst = SscDataService::getBetNums(); p($rst);// 单双遗漏
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type=8); p($rst);// 单双遗漏
