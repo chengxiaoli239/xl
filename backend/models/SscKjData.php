@@ -11,6 +11,7 @@ use Yii;
  * @property int $index_id 顺序id
  * @property string $kj_code 开奖号码
  * @property string $code_str 开奖号码str
+ * @property string $code_4n_str 开奖前四位str
  * @property int $codes_hz 号码和值
  * @property int $codes_4nums_hz 前4位和值
  * @property int $code1 万位
@@ -63,7 +64,7 @@ class SscKjData extends \common\models\base\BaseModel
             [['index_id', 'codes_hz', 'codes_4nums_hz', 'code1', 'code2', 'code3', 'code4', 'code5', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'type_2', 'type_22', 'type_22b', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_3n_2b', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
             [['kj_code', 'code_4n'], 'string', 'max' => 8],
-            [['code_str', 'qihao', 'code_3n'], 'string', 'max' => 24],
+            [['code_str', 'code_4n_str', 'qihao', 'code_3n'], 'string', 'max' => 24],
             [['code_1_2_3_4'], 'string', 'max' => 4],
             [['lottery_type', 'qihao'], 'unique', 'targetAttribute' => ['lottery_type', 'qihao']],
         ];
@@ -79,6 +80,7 @@ class SscKjData extends \common\models\base\BaseModel
             'index_id' => '顺序id',
             'kj_code' => '开奖号码',
             'code_str' => '开奖号码str',
+            'code_4n_str' => '开奖前四位str',
             'codes_hz' => '号码和值',
             'codes_4nums_hz' => '前4位和值',
             'code1' => '万位',
