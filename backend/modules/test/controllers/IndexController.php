@@ -172,6 +172,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = KjDataGet::updateNullCode($num = 1000, $lottery_type = 5);p($rst);
+        $rst = StaticService::queryCodeTypeStatic($post);p($rst);
         $dates = [ ];
         $tmp_date =  strtotime('2020-07-01 00:00:00');
         $i = 0;
@@ -296,7 +298,6 @@ class IndexController extends Controller
         $rst = OpKjService::opKjData4('3,X,2,9@X,2,4,9@3,9,X,9@3,9,7,X','3,9,7,9,5');p($rst);
         $rst = OpKjService::opKjData4('3,X,X,X,5@X,X,X,9,5@X,X,7,X,5@3,9,X,X,X','3,9,7,9,5');p($rst);
         $rst = SscDataService::insertCodeType5();p($rst);
-        $rst = KjDataGet::updateNullCode($num = 1000, $lottery_type = 5);p($rst);
         $str = '0,9,1,0';
         $rst = CommonService::isCodeType22b($str);p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([32], $lottery_type = 5, 80000);p($miss);
@@ -500,7 +501,6 @@ class IndexController extends Controller
         $rst = NumService::filterLaterCodesAnd2bcode(5, $qihao = '190516056');p($rst);
         $rst = NumService::getRecentlyCodes(5);p($rst);
         $rst = UserSysPlansService::userSysPlanChange(2);p($rst);
-        $rst = StaticService::getYlByCodes('02468,13579,X,X', 2, 18);p($rst);
         $rst = HN0898Service::insertDsYl();p($rst);
         $rst = KjDataGet::grabOne();p($rst);
         $captchaCodeRst = Tools::getCaptchaCode(10, 5, '2x2tdrnawlpbli554jlsuf2c');p($captchaCodeRst); # 真实调用验证码接口，收费

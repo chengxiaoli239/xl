@@ -576,15 +576,16 @@ class KjDataGet
     /**
      * @desc 自动更新 万千百十个数据
      */
-    public static function updateNullCode( $times = 500, $lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function updateNullCode( $times = 5000, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
 
         $msg = ['status'=>200, 'msg'=>'操作成功！'];
-        $kjDatas = SscKjData::find()->where(['OR', ['IS', 'type_22', NULL], ['IS', 'type_22b', NULL], ['IS', 'type_3b', NULL]])->orderBy('id DESC')->limit($times)->all();
+        $kjDatas = SscKjData::find()->where(['OR', ['IS', 'type_22', NULL], ['IS', 'code_4n_str', NULL]])->orderBy('id DESC')->limit($times)->all();
         foreach ($kjDatas as $key=>$kjData){
             //$kjDs = SscDataService::getCodesDS($kjData['code_str']);
             $codes = $kjData['code1'].','.$kjData['code2'].','.$kjData['code3'].','.$kjData['code4'];
             $updateData = [
+                'code_4n_str' => $codes, # 四字定str
                 //'index_id' => $key + 1,
                 /*
                 'code_3n' => implode(',', $code_3n),
@@ -603,10 +604,10 @@ class KjDataGet
                 'type_3b' => CommonService::isCodeType3b($codes), # 是否三兄弟
                 'type_4b' => CommonService::isCodeType4b($codes), # 是否四兄弟
                 'type_3n_2b' => CommonService::isCodeType3n2b($codes), # 是否四单双：0非四单四双1四单2四双
-                */
                 'type_22' => CommonService::isCodeType22($codes), # 是否双双重
                 'type_3b' => CommonService::isCodeType3b($codes), # 是否三兄弟
                 'type_22b' => CommonService::isCodeType22b($codes), # 是否双兄弟
+                */
             ];
             //$kjData->type_22b = CommonService::isCodeType22b($codes);
             $kjData->setAttributes($updateData);

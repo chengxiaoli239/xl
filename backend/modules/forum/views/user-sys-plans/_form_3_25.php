@@ -438,7 +438,7 @@ $(function () {
         });
 
         lottery_type = $('#lottery_type').val();
-        data = {arise:arise,p1:p1,p2:p2,p3:p3,p4:p4,hzs:hzs,type_2:type_2,type_3:type_3,type_4:type_4,type_22:type_22,type_3b:type_3b,type_4b:type_4b,lottery_type:lottery_type};
+        data = {arise:arise,p1:p1,p2:p2,p3:p3,p4:p4,hzs:hzs,type_2:type_2,type_3:type_3,type_4:type_4,type_22:type_22,type_2b:type_2b,type_3b:type_3b,type_4b:type_4b,type_log:type_log,type_4ds:type_4ds,lottery_type:lottery_type};
         console.log(data)
         url = '/forum/ssc-static-yl/query'
         $.post(url, data, function(rst) {

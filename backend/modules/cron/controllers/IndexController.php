@@ -147,7 +147,7 @@ class IndexController extends Controller
     public function actionUpdateNullCodes (){
         self::_init();
         set_time_limit(0);
-        $rst = NumService::staticPlansProfits();
+        //$rst = NumService::staticPlansProfits();
         for ($i = 0; $i<10; $i++){
             $rst = KjDataGet::updateNullCode();
             /*
