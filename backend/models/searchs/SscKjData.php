@@ -18,7 +18,7 @@ class SscKjData extends SscKjDataModel
     public function rules()
     {
         return [
-            [['id', 'index_id', 'codes_hz', 'codes_4nums_hz', 'code1', 'code2', 'code3', 'code4', 'code5', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'qihao', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'index_id', 'codes_hz', 'code_4n_str', 'codes_4nums_hz', 'code1', 'code2', 'code3', 'code4', 'code5', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'qihao', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['kj_code', 'code_4n_str', 'code_str', 'date', 'code_3n', 'code_4n', 'update_time'], 'safe'],
         ];
     }
@@ -63,7 +63,7 @@ class SscKjData extends SscKjDataModel
             'id' => $this->id,
             'index_id' => $this->index_id,
             'codes_hz' => $this->codes_hz,
-            'codes_4n_str' => $this->codes_4n_str,
+            'code_4n_str' => $this->code_4n_str,
             'codes_4nums_hz' => $this->codes_4nums_hz,
             'code1' => $this->code1,
             'code2' => $this->code2,
