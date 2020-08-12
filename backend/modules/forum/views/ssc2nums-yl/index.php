@@ -45,13 +45,13 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             }
                         ],
                         //'current_miss',
-                        ['attribute' => 'current_miss','headerOptions'=>['width'=>'5%'],'label'=>'当前遗漏',
+                        ['attribute' => 'current_miss','headerOptions'=>['width'=>'5%'],'label'=>'当前',
                             'value' => function($model) {
                                 return $model->current_miss;
                             }
                         ],
                         //'last_time_miss',
-                        ['attribute' => 'last_time_miss','headerOptions'=>['width'=>'5%'],'label'=>'上次遗漏',
+                        ['attribute' => 'last_time_miss','headerOptions'=>['width'=>'5%'],'label'=>'上次',
                             'value' => function($model) {
                                 return $model->last_time_miss;
                             }
@@ -59,11 +59,26 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         //'last_time_miss_range',
                         //'max_range',
                         'yl_records:ntext',
-                        'max_miss',
-                        'history_max_miss',
+                        //'max_miss',
+                        ['attribute'=>'max_miss','label'=>'最大','headerOptions'=>['width'=>'5%'],
+                            'value'=>function($model){
+                                return $model->last_time_miss;
+                            }
+                        ],
+                        //'history_max_miss',
+                        ['attribute'=>'history_max_miss','label'=>'历史','headerOptions'=>['width'=>'5%'],
+                            'value'=>function($model){
+                                return $model->history_max_miss;
+                            }
+                        ],
                         //'created_at',
                         //'updated_at',
-                        'update_time',
+                        //'update_time',
+                        ['attribute' => 'update_time','headerOptions'=>['width'=>'8%'],'label'=>'时间',
+                            'value' => function($model) {
+                                return substr($model->update_time, 5,11);
+                            }
+                        ],
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
