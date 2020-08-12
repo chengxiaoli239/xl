@@ -172,6 +172,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = KjDataGet::insertKjData('2020073043', 8, '9,3,7,4,0');p($rst);
         $rst = KjDataGet::updateNullCode($num = 1000, $lottery_type = 5);p($rst);
         $rst = StaticService::queryCodeTypeStatic($post);p($rst);
         $dates = [ ];
@@ -194,7 +195,6 @@ class IndexController extends Controller
         p(urldecode('czt_openinfo=%257B%2522uid%2522%253A%252211599625%2522%252C%2522token%2522%253A%25224584d583f1730a193e6d0ccc3f8a8cad%2522%257D'));
         $str = '01234,13579,X,01234@01234,X,13579,01234@01234,13579,X,02468@01234,X,13579,02468@02468,X,13579,01234@02468,13579,X,01234@02468,13579,X,02468@02468,X,13579,02468';
         p(substr_count($str,'X'));
-        $rst = KjDataGet::insertKjData('20200615000', 8, '5,7,0,3,3');p($rst);
         $codes_hz = '{"p1":"123","p2":"345","p3":"569","p4":"6589","p5":"1234"}';
         $codesArr = NumService::getOneFixedCode(json_decode($codes_hz, true));p($codesArr);
         $rst = NumService::staticPlansProfits();p($rst);

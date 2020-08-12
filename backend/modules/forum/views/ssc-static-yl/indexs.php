@@ -34,11 +34,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
                     'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
+                        ['class' => 'yii\grid\SerialColumn','headerOptions'=>['width'=>'2%']],
 
                         //'id',
                         //'val',
-                        ['attribute' => 'val','headerOptions'=>['width'=>'5%'],'label'=>'号码',
+                        ['attribute' => 'val','headerOptions'=>['width'=>'3%'],'label'=>'号码',
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = \backend\service\SscDataService::getStaticNameByType($model->val);
@@ -52,90 +52,90 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         //'current_miss',
-                        ['attribute' => 'current_miss','headerOptions'=>['width'=>'5%'],'label'=>'当前',
+                        ['attribute' => 'current_miss','headerOptions'=>['width'=>'3%'],'label'=>'当前',
                             'value' => function($model) {
                                 return $model->current_miss;
                             }
                         ],
                         //'last_time_miss',
-                        ['attribute' => 'last_time_miss','headerOptions'=>['width'=>'5%'],'label'=>'上次',
+                        ['attribute' => 'last_time_miss','headerOptions'=>['width'=>'3%'],'label'=>'上次',
                             'value' => function($model) {
                                 return $model->last_time_miss;
                             }
                         ],
                         //'last_time_miss_range',
                         //'max_miss',
-                        ['attribute' => 'max_miss','headerOptions'=>['width'=>'5%'],'label'=>'最大',
+                        ['attribute' => 'max_miss','headerOptions'=>['width'=>'3%'],'label'=>'最大',
                             'value' => function($model) {
                                 return $model->max_miss;
                             }
                         ],
                         //'max_range',
                         //'yl_records:ntext',
-                        ['attribute' => 'yl_records','label'=>'遗漏',
+                        ['attribute' => 'yl_records','label'=>'遗漏','headerOptions'=>['width'=>'30%'],
                             'value' => function($model) {
                                 return $model->yl_records;
                             }
                         ],
                         //'history_max_miss',
-                        ['attribute' => 'history_max_miss','headerOptions'=>['width'=>'5%'],'label'=>'最大',
+                        ['attribute' => 'history_max_miss','headerOptions'=>['width'=>'3%'],'label'=>'最大',
                             'value' => function($model) {
                                 return $model->history_max_miss;
                             }
                         ],
                         //'codes_hz',
-                        ['attribute' => 'codes_hz','headerOptions'=>['width'=>'5%'],'label'=>'和值',
+                        ['attribute' => 'codes_hz','headerOptions'=>['width'=>'3%'],'label'=>'和值',
                             'value' => function($model) {
                                 return $model->codes_hz;
                             }
                         ],
-                        ['attribute' => 'type_2b','headerOptions'=>['width'=>'5%'],'label'=>'兄弟',
+                        ['attribute' => 'type_2b','headerOptions'=>['width'=>'3%'],'label'=>'兄弟',
                             'value' => function($model) {
                                 return $model->type_2b;
                             }
                         ],
-                        ['attribute' => 'type_2','headerOptions'=>['width'=>'5%'],'label'=>'双重',
+                        ['attribute' => 'type_2','headerOptions'=>['width'=>'3%'],'label'=>'双重',
                             'value' => function($model) {
                                 return $model->type_2;
                             }
                         ],
                         //'type_3b',
-                        ['attribute' => 'type_3b','headerOptions'=>['width'=>'5%'],'label'=>'三兄',
+                        ['attribute' => 'type_3b','headerOptions'=>['width'=>'3%'],'label'=>'三兄',
                             'value' => function($model) {
                                 return $model->type_3b;
                             }
                         ],
-                        ['attribute' => 'type_4b','headerOptions'=>['width'=>'5%'],'label'=>'四兄',
+                        ['attribute' => 'type_4b','headerOptions'=>['width'=>'3%'],'label'=>'四兄',
                             'value' => function($model) {
                                 return $model->type_4b;
                             }
                         ],
                         //'type_3',
-                        ['attribute' => 'type_3','headerOptions'=>['width'=>'5%'],'label'=>'三重',
+                        ['attribute' => 'type_3','headerOptions'=>['width'=>'3%'],'label'=>'三重',
                             'value' => function($model) {
                                 return $model->type_3;
                             }
                         ],
                         //'type_4',
-                        ['attribute' => 'type_4','headerOptions'=>['width'=>'5%'],'label'=>'四重',
+                        ['attribute' => 'type_4','headerOptions'=>['width'=>'3%'],'label'=>'四重',
                             'value' => function($model) {
                                 return $model->type_4;
                             }
                         ],
                         //'type_22',
-                        ['attribute' => 'type_22','headerOptions'=>['width'=>'5%'],'label'=>'双双重',
+                        ['attribute' => 'type_22','headerOptions'=>['width'=>'3%'],'label'=>'双双',
                             'value' => function($model) {
                                 return $model->type_22;
                             }
                         ],
                         //'type_4ds',
-                        ['attribute' => 'type_4ds','headerOptions'=>['width'=>'5%'],'label'=>'四单双',
+                        ['attribute' => 'type_4ds','headerOptions'=>['width'=>'3%'],'label'=>'单双',
                             'value' => function($model) {
                                 return $model->type_4ds;
                             }
                         ],
                         //'count',
-                        ['attribute' => 'count','headerOptions'=>['width'=>'5%'],'label'=>'总组数',
+                        ['attribute' => 'count','headerOptions'=>['width'=>'3%'],'label'=>'组数',
                             'value' => function($model) {
                                 return $model->count;
                             }
@@ -149,9 +149,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'created_at',
                         //'updated_at',
                         //'update_time',
-                        ['attribute' => 'update_time','headerOptions'=>['width'=>'5%'],'label'=>'时间',
+                        ['attribute' => 'update_time','headerOptions'=>['width'=>'3%'],'label'=>'时间',
                             'value' => function($model) {
-                                return substr($model->update_time, 5);
+                                return substr($model->update_time, 10, 9);
                             }
                         ],
 
