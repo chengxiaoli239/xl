@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         //'id',
                         //'val',
-                        ['attribute' => 'val','headerOptions'=>['width'=>'3%'],'label'=>'号码',
+                        ['attribute' => 'val','headerOptions'=>['width'=>'5%'],'label'=>'号码',
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = \backend\service\SscDataService::getStaticNameByType($model->val);
