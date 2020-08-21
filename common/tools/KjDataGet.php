@@ -612,8 +612,9 @@ class KjDataGet
             //$kjData->type_22b = CommonService::isCodeType22b($codes);
             $kjData->setAttributes($updateData);
             if(!$rst = $kjData->save()){
-                $msg = ['status'=>300, 'msg'=>current($rst->getErrors())];
-                p($msg);
+                $msg = current($kjData->getErrors());
+                Tool_Common::log('updateNullCode', 'ERR', '更新空值', ['msg'=>$msg]);
+                $msg = ['status'=>300, 'msg'=>$msg];
             }
         }
 
