@@ -2169,7 +2169,7 @@ class StaticService extends BaseService {
      */
    public static function get2NumsYlRecords($nums, $lottery_type = DEFAULT_LOTTERY_TYPE, $limit = 300){
        if(strlen($nums) != 2) return [];
-       $limit = ($nums[0] == $nums[1]) ? 660 : 550;
+       $limit = ($nums[0] == $nums[1]) ? 480 : 450;
 
        $last_id = SscDataService::getKjDataLastId($lottery_type); # 表记录最后一条id
        $limit_id = $last_id - $limit;

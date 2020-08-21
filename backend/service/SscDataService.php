@@ -1523,7 +1523,7 @@ class SscDataService extends BaseService {
      * @param $recently 多少期内，默认为1000期
      * @return array
      */
-    public static function get3NumHistoryMiss($num, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 1800){
+    public static function get3NumHistoryMiss($num, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 1200){
         $last_times = 0;
         //$last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
         $last_index_id = self::getLastIndexId($lottery_type);
