@@ -61,7 +61,7 @@ class SscKjData extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['index_id', 'codes_hz', 'code_4n_str', 'codes_4nums_hz', 'code1', 'code2', 'code3', 'code4', 'code5', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'type_2', 'type_22', 'type_22b', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_3n_2b', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['index_id', 'codes_hz', 'codes_4nums_hz', 'code1', 'code2', 'code3', 'code4', 'code5', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'type_2', 'type_22', 'type_22b', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_3n_2b', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
             [['kj_code', 'code_4n'], 'string', 'max' => 8],
             [['code_str', 'code_4n_str', 'qihao', 'code_3n'], 'string', 'max' => 24],
