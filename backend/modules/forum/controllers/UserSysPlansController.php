@@ -226,7 +226,7 @@ class UserSysPlansController extends BaseController
      * @return \yii\web\Response
      */
     public function actionTzNow($id){
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        //\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $rst = BetService::userSysPlansTzNow($id, $this->_user_id);
 
