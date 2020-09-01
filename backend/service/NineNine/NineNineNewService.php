@@ -1033,6 +1033,87 @@ class NineNineNewService extends BaseTZService {
     }
 
     /**
+     * @desc 获取心跳包
+     * @param $uid
+     * @param $tz_system_id
+     * @return array|mixed
+     */
+    public static function getHeartrCheck($uid, $tz_system_id){
+        self::__init($uid, $tz_system_id);
+        $m = \Yii::$app->cache;
+        $mkey = 'getHeartrCheck_'.$uid.'_'.$tz_system_id;
+        if(true OR !$cookie = $m->get($mkey)){
+            $uid = '3413519067';
+            $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
+            $url = $urlArr['baseUrl'].'/web/js/dist/heartCheck.120ef04d.asp?uid='.$uid;
+            if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
+            $headers = [
+                ':authority: 99065z.com',
+                ':method: GET',
+                ':path: /web/js/dist/heartCheck.120ef04d.asp?uid='.$uid,
+                ':scheme: https',
+                'accept: application/json, text/plain, */*',
+                'accept-encoding: gzip, deflate, br',
+                'accept-language: zh-CN,zh;q=0.9,en;q=0.8',
+                'contenttype: application/json',
+                'referer: '.$urlArr['baseUrl'].'/web/',
+                'sec-fetch-dest: empty',
+                'sec-fetch-mode: cors',
+                'sec-fetch-site: same-origin',
+                'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36',
+                'usertype: 0'
+            ];
+            $cookie = self::get_heart_cookie($url, $headers);
+            p($cookie);
+            $cookieData = $cookie;
+            if($cookieData){
+                $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+                $TzSystemsUsers->cookie = trim($cookieData);
+                $TzSystemsUsers->cookie = str_replace('; path=/; HttpOnly','', $TzSystemsUsers->cookie);
+                $TzSystemsUsers->save();
+            }
+            self::$headers = [];
+            $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
+            $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
+            $cookie = str_replace('; path=/; HttpOnly','',$cookie);
+            $m->set($mkey, $cookie, 180);
+        }
+        return $cookie;
+
+    }
+
+
+    /**
+     *curl get请求
+     */
+    public static function get_heart_cookie($url,$header = []){
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($curl, CURLOPT_SSLVERSION, 3);
+
+        $content = curl_exec($curl);
+        preg_match("/set\-cookie:([^\r\n]*)/i", $content, $matches);
+        p(['url'=>$url, 'header'=>$header, 'content'=>$content, 'errno'=>curl_error($curl)]);
+        $cookie = $matches[1];
+        $logArr = ['content'=>$content, 'cookie'=>$cookie];
+        if(curl_error($curl)>0){
+            $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
+            Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
+        }
+        //$cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
+        //$cookie = str_replace('; path=/; HttpOnly','',$cookie);
+
+        return $cookie;
+    }
+    /**
      * @desc 下载图片验证码
      * @param $uid
      * @param $tz_system_id
@@ -1069,6 +1150,11 @@ class NineNineNewService extends BaseTZService {
         }
         //self::__init($uid, $tz_system_id);
         $rst = false;
+
+        # 第一步：心跳检测 获取cookie:emp-id
+        $cookie_key = NineNineNewService::getHeartrCheck($uid, $tz_system_id);p($cookie_key);
+        # 第二步：获取token 获取cookie: guest_id=bcb51788-a146-4678-b35e-2187a596f93c、statistical-2020-09-01-1=1
+
 
         # 第一步：获取cookie
         $cookie_key = NineNineNewService::getCookie($uid,$tz_system_id);
