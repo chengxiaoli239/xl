@@ -21,6 +21,7 @@ use backend\service\KuaiLe8Service;
 use backend\service\Lucky5\LuckyBaseService;
 use backend\service\McLockService;
 use backend\service\NineNine\NineNineBaseService;
+use backend\service\NineNine\NineNineNewService;
 use backend\service\NumService;
 use backend\service\PoxyIPService;
 use backend\service\qilin\QiLinBaseService;
@@ -172,6 +173,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = NineNineNewService::login($uid=18, $tz_system_id=12);p($rst);
+        $rst = NineNineNewService::getDifferentNums();p($rst);
         $rst = StaticService::static2NumsYl($lottery_type = 5);p($rst);
         $rst = SscDataService::update3NumYL($lottery_type = 6);p($rst);
         $rst = KjDataGet::insertKjData('2020073043', 8, '9,3,7,4,0');p($rst);
