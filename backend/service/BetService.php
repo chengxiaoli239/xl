@@ -1166,8 +1166,11 @@ abstract class BetService extends BaseBetService {
     public static function _logRecordsByPlandId($plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test = 0, $sn='888888', $snid='888888id'){
         //p([$plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test, $sn, $snid],0);
         $UserSysPlans = UserSysPlans::findOne($plan_id);
-        if($UserSysPlans->tz_type == 18){
+        if($UserSysPlans->tz_type == 18) {
             $count = strlen(str_replace(',', '', $codes));
+        }elseif($UserSysPlans->tz_type == 22){
+            $codesArr = Lucky5Service::getBetCodes($codes, $UserSysPlans->single, $UserSysPlans->playway);
+            $count = count($codesArr);
         }else{
             $count = count(explode('@', $codes));
         }
