@@ -518,7 +518,7 @@ class StaticService extends BaseService {
     public static function staticCodeTypeProfitsDate($date, $lottery_type = DEFAULT_LOTTERY_TYPE){
         $datas = [];
 
-        $code_types = ['type_2', 'type_3', 'type_22', 'type_2b', 'type_3b', 'type_4b', 'type_2,type_2b', 'type_2,type_3b', 'type_3n_2b'];
+        $code_types = ['type_2', 'type_3', 'type_22', 'type_22b', 'type_2b', 'type_3b', 'type_4b', 'type_2,type_2b', 'type_2,type_3b', 'type_3n_2b'];
         foreach ($code_types as $code_type){
             $datas[str_replace(',', '_', $code_type)] = self::staticCodeTypeProfitsDate_son($date, $code_type, $lottery_type);
         }
