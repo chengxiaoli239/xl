@@ -68,6 +68,7 @@ class StaticCodeTypeProfitsPerdate extends StaticCodeTypeProfitsPerdateModel
             'type_2b' => $this->type_2b,
             'type_3b' => $this->type_3b,
             'type_4b' => $this->type_4b,
+            'type_22b' => $this->type_22b,
             'type_2_type_2b' => $this->type_2_type_2b,
             'type_2_type_3b' => $this->type_2_type_3b,
             'type_3n_2b' => $this->type_3n_2b,
