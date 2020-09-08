@@ -15,6 +15,7 @@ use Yii;
  * @property int $type_2b 两兄弟
  * @property int $type_3b 三兄弟
  * @property int $type_4b 四兄弟
+ * @property int $type_22b 四兄弟
  * @property int $type_2_type_2b 双重&两兄弟
  * @property int $type_2_type_3b 双重&三兄弟
  * @property int $type_3n_2b 三现:双重+兄弟
