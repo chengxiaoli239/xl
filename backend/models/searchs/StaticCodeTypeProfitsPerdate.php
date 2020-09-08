@@ -20,7 +20,7 @@ class StaticCodeTypeProfitsPerdate extends StaticCodeTypeProfitsPerdateModel
         return [
             [['id', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
-            [['type_2', 'type_3', 'type_22', 'type_2b', 'type_3b', 'type_4b', 'type_2_type_2b', 'type_2_type_3b', 'type_3n_2b'], 'number'],
+            [['type_2', 'type_3', 'type_22', 'type_2b', 'type_3b', 'type_4b', 'type_22b', 'type_2_type_2b', 'type_2_type_3b', 'type_3n_2b'], 'number'],
         ];
     }
 
