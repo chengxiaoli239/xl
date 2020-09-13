@@ -843,9 +843,9 @@ class  CommonService{
      * @param int $status
      * @return array
      */
-    public static function getAllSystems($status = 1){
+    public static function getAllSystems($status = 1, $type = 1){
 
-        $datas = TzSystems::find()->where(['status'=>$status])->asArray()->all();
+        $datas = TzSystems::find()->where(['status'=>$status, 'type'=>$type])->asArray()->all();
 
         $dataArr = [];
 
@@ -861,7 +861,7 @@ class  CommonService{
      * @param int $status
      * @return array
      */
-    public static function getAllTzTypes(){
+    public static function getAllTzTypes($type = 'lottery'){
 
         $datas = StaticService::$kArr;
 

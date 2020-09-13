@@ -1,7 +1,8 @@
 <?php
-namespace backend\service\wanbo;
+namespace backend\service\pingbo;
 
 use backend\models\SystemConfig;
+use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\PoxyIPService;
@@ -291,11 +292,36 @@ class PingBoBaseService {
      */
     public static function isLogin($uid, $tz_system_id){
 
-        $balance = LuckyBaseService::getBalance($uid,$tz_system_id);
+        $balance = self::getBalance($uid,$tz_system_id);
 
         $flag = $balance > 0 ? true : false;
 
         return (boolean)$flag;
+    }
+
+    /**
+     * @desc 登录
+     * @param int $uid
+     * @param int $tz_system_id
+     * @return array|bool|mixed|string
+     */
+    public static function login($uid = 1, $tz_system_id = 1){
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+
+        # 第一步：获取cookie
+        $rst = self::getCookie($uid,$tz_system_id);
+        if(isset($rst['status']) && $rst['status'] == 300) return $rst;
+        # 第二步：账号、验证码登录
+        $rst = self::loginRemote($uid, $tz_system_id);
+        # 第三步：同意
+        if(isset($rst['Status']) && $rst['Status'] == 1){
+            $rst = self::acceptAgreement($uid, $tz_system_id);
+        }
+
+        # 获取用户信息
+        $rst = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
+
+        return $rst;
     }
 
     /**

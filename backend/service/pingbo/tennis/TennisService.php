@@ -1,5 +1,5 @@
 <?php
-namespace backend\service\wanbo\tennis;
+namespace backend\service\pingbo\tennis;
 
 use backend\service\wanbo\PingBoBaseService;
 use common\tools\Tool_Common;

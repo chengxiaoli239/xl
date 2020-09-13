@@ -55,7 +55,47 @@ class UserController extends BaseController
         ]);
     }
 
+    /**
+     * @desc ssc
+     * @param $uid
+     * @return string|\yii\web\Response
+     */
     public function actionOpenSystems($uid){
+
+        if(!$model = TzSystemsAuth::findOne(['uid'=>$uid])){
+            $model = new TzSystemsAuth();
+        }
+        UserService::preOpenData($this->_post, $uid);
+
+        if ($model->load($this->_post) && $model->save()) {
+            UserService::saveTzSystemUsers(explode(',', $this->_post['TzSystemsAuth']['tz_systems_ids']), $uid);
+            return $this->redirect(['index']);
+        }
+
+        $model->tz_systems_ids = explode(',', $model->tz_systems_ids);
+        $model->tz_types = explode(',', $model->tz_types);
+        $model->lottery_types = explode(',', $model->lottery_types);
+        CommonService::delUserTzTypesCache($uid);
+
+        $allSystems = CommonService::getAllSystems();
+        $allTzTypes = CommonService::getAllTzTypes();
+        $allLotteryTypes = CommonService::getAllLotteryTypes();
+
+        return $this->render('open-systems', [
+            'model' => $model,
+            'uid' => $uid,
+            'allSystems' => $allSystems,
+            'allTzTypes' => $allTzTypes,
+            'allLotteryTypes' => $allLotteryTypes,
+        ]);
+    }
+
+    /**
+     * @desc ssc
+     * @param $uid
+     * @return string|\yii\web\Response
+     */
+    public function actionOpenTennis($uid){
 
         if(!$model = TzSystemsAuth::findOne(['uid'=>$uid])){
             $model = new TzSystemsAuth();
