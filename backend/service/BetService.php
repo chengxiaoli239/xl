@@ -14,7 +14,7 @@ use backend\models\SystemConfig;
 use backend\models\User;
 use backend\service\huiyuan\KuaiLe8Service;
 use backend\service\Juhua\JuHuaBaseService;
-use backend\service\Lucky5\Lucky5Service;
+use backend\service\Lucky5\tennisService;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineService6;
 use common\kj\cqssc\CqsscKcw;
@@ -62,7 +62,7 @@ abstract class BetService extends BaseBetService {
             if($lottery_type == 5){ # 7时彩重庆
                 $BetService = new SevenService($uid, $tz_system_id);
             }elseif($lottery_type == 8){ # 幸运五星彩
-                $BetService = new Lucky5Service($uid, $tz_system_id);
+                $BetService = new tennisService($uid, $tz_system_id);
             }
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
@@ -912,7 +912,7 @@ abstract class BetService extends BaseBetService {
             if($lottery_type == 5){ # 7时彩重庆
                 $rst = SevenService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
             }elseif ($lottery_type == 8){
-                $rst = Lucky5Service::cancelOrder($bet_id, $BettingRecords->tz_system_id);
+                $rst = tennisService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
             }
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
@@ -954,7 +954,7 @@ abstract class BetService extends BaseBetService {
             $flag = NineNineService6::isLogin($uid, $tz_system_id);
         }elseif(in_array($tz_system_id, [3, 6, 7, 9, 10])){
             # 3、3重庆7时彩网：重庆7时彩、幸运五星彩、6会员网
-            $flag = Lucky5Service::isLogin($uid, $tz_system_id);
+            $flag = tennisService::isLogin($uid, $tz_system_id);
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
         }elseif(in_array($tz_system_id, [5])){
@@ -1169,7 +1169,7 @@ abstract class BetService extends BaseBetService {
         if($UserSysPlans->tz_type == 18) {
             $count = strlen(str_replace(',', '', $codes));
         }elseif($UserSysPlans->tz_type == 22){
-            $codesArr = Lucky5Service::getBetCodes($codes, $UserSysPlans->single, $UserSysPlans->playway);
+            $codesArr = tennisService::getBetCodes($codes, $UserSysPlans->single, $UserSysPlans->playway);
             $count = count($codesArr);
         }else{
             $count = count(explode('@', $codes));

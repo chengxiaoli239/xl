@@ -27,9 +27,11 @@ use backend\service\PoxyIPService;
 use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
 use backend\service\StaticService;
+use backend\service\wanbo\tennis\TennisService;
 use backend\service\TestService;
 use backend\service\UserCustomPlansService;
 use backend\service\UserSysPlansService;
+use backend\service\wanbo\PingBoBaseService;
 use backend\service\WxService;
 use backend\service\XlService;
 use backend\tools\Tools;
@@ -172,7 +174,17 @@ class IndexController extends Controller
         return $rst;
     }
 
+    /**
+     * @desc 网球测试
+     */
+    public function actionTennis(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $rst = TennisService::getTennisGame(); return $rst;
+
+    }
+
     public function actionDw(){
+        $rst = StaticService::staticCodeTypeProfitsDate($date = '2020-09-08', $lottery_type = 5);p($rst);
         $rst = NineNineNewService::login($uid=18, $tz_system_id=12);p($rst);
         $rst = NineNineNewService::getDifferentNums();p($rst);
         $rst = StaticService::static2NumsYl($lottery_type = 5);p($rst);
