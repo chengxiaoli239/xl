@@ -10,7 +10,7 @@ namespace backend\service;
 use backend\models\TzSystemsUsers;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\Juhua\JuHuaBaseService;
-use backend\service\Lucky5\tennisService;
+use backend\service\Lucky5\LuckyBaseService;
 use backend\service\NineNine\NineNineService6;
 use backend\service\qilin\QiLinBaseService;
 use  yii;
@@ -46,7 +46,7 @@ class BaseService{
             if($tz_system_id == 3){
                 $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             }else{
-                $rst = tennisService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                $rst = LuckyBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
             }
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
@@ -107,6 +107,12 @@ class BaseService{
         }
 
         return $rst;
+    }
+
+    public static function isHasActiveBetPlans(){
+        $flag = false;
+
+        return $flag;
     }
 
     /**
