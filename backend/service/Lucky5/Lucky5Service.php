@@ -2019,7 +2019,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      */
     public static function isLogin($uid, $tz_system_id){
 
-        $balance = tennisService::getBalance($uid,$tz_system_id);
+        $balance = LuckyBaseService::getBalance($uid,$tz_system_id);
 
         $flag = $balance > 0 ? true : false;
 
