@@ -183,7 +183,7 @@ class IndexController extends Controller
         //p($data);
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $data = [];
-        $rst = TennisService::getGameType($data, $type = 1, $game_type = 3); return $rst;
+        $rst = TennisService::getGameType($data, $type = 1, $game_type = 33); return $rst;
 
     }
 

@@ -5,8 +5,10 @@ use backend\models\BettingRecords;
 use backend\models\CodeTypes;
 use backend\models\LotteryType;
 use backend\models\TzSystems;
+use backend\models\TzSystemsUsers;
 use backend\models\TzTypes;
 use backend\models\UserFollowData;
+use backend\models\UserSysPlans;
 use backend\service\NumService;
 use backend\service\SscDataService;
 use backend\service\StaticService;
@@ -854,6 +856,34 @@ class  CommonService{
         }
 
         return $dataArr;
+    }
+
+    /**
+     * @desc 是否有激活的正常计划， 主要用于判断是否要开启代理
+     * @param int $lottery_type
+     * @return int
+     */
+    public static function hasPlansActiveSys($tz_system_id = 9){
+        $where = ['AND', ['=', 'tz_sites', $tz_system_id], ['=', 'status', 1]];
+        $row = UserSysPlans::find()->where($where)->one();
+
+        $flag = !empty($row) ? 1 : 0;
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否有激活的正常计划， 主要用于判断是否要开启代理
+     * @param int $lottery_type
+     * @return int
+     */
+    public static function hasPlansActive($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $where = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'status', 1]];
+        $row = UserSysPlans::find()->where($where)->one();
+
+        $flag = !empty($row) ? 1 : 0;
+
+        return $flag;
     }
 
     /**

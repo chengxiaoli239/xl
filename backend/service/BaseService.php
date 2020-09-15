@@ -13,6 +13,7 @@ use backend\service\Juhua\JuHuaBaseService;
 use backend\service\Lucky5\Lucky5Service;
 use backend\service\NineNine\NineNineService6;
 use backend\service\qilin\QiLinBaseService;
+use common\service\CommonService;
 use  yii;
 use common\tools\Util;
 
@@ -30,10 +31,16 @@ class BaseService{
             return ['status'=>300, 'msg'=>'操作失败:找不到记录'];
         }
 
+        $tz_system_id = $TzSystemsUser->tz_system_id;
+        # 是否有激活的计划
+        $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id);
+        if(!$hasActivePlan){
+            return false;
+        }
+
         if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
             return false;
         }
-        $tz_system_id = $TzSystemsUser->tz_system_id;
         $flag = BetService::isLogin($TzSystemsUser->uid, $tz_system_id); #
         if($flag && $is_auto){
             return ['status'=>200, 'msg'=>'已经是登录状态', 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username];

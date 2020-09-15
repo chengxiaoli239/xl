@@ -5,6 +5,7 @@ use backend\models\TzSystemsUsers;
 use backend\service\CurlService;
 use backend\service\Lucky5\LuckyBaseService;
 use common\kj\BaseKj;
+use common\service\CommonService;
 use common\tools\Tool_Common;
 use  yii;
 
@@ -17,6 +18,11 @@ class Lucky5 extends BaseKj {
      * @return array
      */
     public static function getLotteryLucky($returnType = 'json', $test = 0){
+
+        $hasActivePlan = CommonService::hasPlansActive(self::$lottery_type);
+        if(in_array(self::$lottery_type, [8]) && !$hasActivePlan){
+            return false;
+        }
 
         if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $TzSystemsUserses = TzSystemsUsers::find()->where(['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [7,9]] ])->all();
