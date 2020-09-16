@@ -10,6 +10,7 @@ use  yii;
 
 class TennisSportsService extends SportsBaseService  {
     public static $game_type = 33;
+    public static $system_id = 14;
 
     public static function grabTennisSportsGame(){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
@@ -33,6 +34,7 @@ class TennisSportsService extends SportsBaseService  {
                     'created_at' => $time,
                 ];
             }
+            $setDatas['system_id'] = self::$system_id;
             $setDatas = array_merge($data, $setDatas);
             $allDatas[] = $setDatas;
             $Matchs->setAttributes($setDatas);
