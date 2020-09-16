@@ -84,6 +84,13 @@ class BaseService{
             return ['status'=>300, 'msg'=>'操作失败:找不到记录'];
         }
 
+        $tz_system_id = $TzSystemsUser->tz_system_id;
+        # 是否有激活的计划
+        $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id);
+        if(!$hasActivePlan){
+            return false;
+        }
+
         if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
             return false;
         }
