@@ -23,7 +23,8 @@ use Yii;
  * @property int $bind_id 绑定关联id
  * @property int $type 类型:1时时彩2网球
  * @property int $created_at 创建时间
- * @property string $updated_at 更新时间
+ * @property int $updated_at 更新时间
+ * @property string $update_time
  */
 class Matchs extends \common\models\base\BaseModel
 {
@@ -41,9 +42,9 @@ class Matchs extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['system_id', 'game_type', 'g_id', 'game_id', 'status', 'is_bind', 'bind_id', 'type', 'created_at'], 'integer'],
+            [['system_id', 'game_type', 'g_id', 'game_id', 'status', 'is_bind', 'bind_id', 'type', 'created_at', 'updated_at'], 'integer'],
             [['player_1_water', 'player_2_water'], 'number'],
-            [['updated_at'], 'safe'],
+            [['update_time'], 'safe'],
             [['game_type_name'], 'string', 'max' => 64],
             [['game_name', 'player_1', 'player_2'], 'string', 'max' => 255],
         ];
@@ -72,6 +73,7 @@ class Matchs extends \common\models\base\BaseModel
             'type' => Yii::t('app', '类型:1时时彩2网球'),
             'created_at' => Yii::t('app', '创建时间'),
             'updated_at' => Yii::t('app', '更新时间'),
+            'update_time' => Yii::t('app', 'Update Time'),
         ];
     }
 
