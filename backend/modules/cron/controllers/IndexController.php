@@ -22,6 +22,7 @@ use backend\service\NineNine\NineNineBaseService;
 use backend\service\NumService;
 use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
+use backend\service\sports\TennisSportsService;
 use backend\service\SscDataService;
 use backend\service\TzService;
 use Yii;
@@ -334,9 +335,16 @@ class IndexController extends Controller
 
     }
 
+    /**
+     * @desc 抓取网球赛事
+     * @return array
+     */
     public function actionGrabSportsGames(){
         self::_init();
 
+        $rst = TennisSportsService::grabTennisSportsGame();
+
+        return $rst;
     }
 
 }
