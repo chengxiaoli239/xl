@@ -1,5 +1,5 @@
 <?php
-namespace backend\service\wanbo\tennis;
+namespace backend\service\pingbo\tennis;
 
 use backend\service\pingbo\PingBoBaseService;
 use common\tools\Tool_Common;
@@ -7,8 +7,7 @@ use yii\helpers\ArrayHelper;
 use  yii;
 
 class TennisService extends PingBoBaseService { #
-    public static $baseUrl = 'https://cn.man152.com';
-    public static $dataBaseApi = 'https://xj-sb-asia-manx.prdasbbwla2.com';
+    public static $baseUrl = 'https://www.ps3838.com';
 
     /**
      * @param int $game_type 33:网球
@@ -17,7 +16,7 @@ class TennisService extends PingBoBaseService { #
     public static function getGameData($game_type = 33){
         $v = microtime(true) * 1000;
         $_ = $v + 60 * 40;
-        $url = self::$dataBaseApi.'/sports-service/sv/odds/events?mk=2&sp='.$game_type.'&ot=1&btg=1&o=1&lg=&ev=&d=&l=3&v='.$v.'&me=0&more=false&c=CN&tm=0&g=&pa=0&cl=3&_g=1&_='.$_.'&locale=zh_CN';
+        $url = self::$baseUrl.'/sports-service/sv/odds/events?mk=2&sp='.$game_type.'&ot=1&btg=1&o=1&lg=&ev=&d=&l=3&v='.$v.'&me=0&more=false&c=CN&tm=0&g=&pa=0&cl=3&_g=1&_='.$_.'&locale=zh_CN';
 
         $data = PingBoBaseService::getCurl($url);
         return $data;
@@ -29,7 +28,8 @@ class TennisService extends PingBoBaseService { #
      * @param int $game_type 29:篮球，33:网球
      * @return array|bool|mixed|string
      */
-    public static function getGameType($data = [], $type = 1, $game_type = 33){
+    public static function getGames($data = [], $type = 1, $game_type = 33){
+        $rstData = ['status'=>200, 'msg'=>'操作成功'];
         $gameTypes = [3=>'棒球', 29=>'足球', 33=>'网球'];
         if(empty($data)){
             $data = TennisService::getGameData($game_type);
@@ -73,9 +73,9 @@ class TennisService extends PingBoBaseService { #
                 }
             }
         }
-        p($setDatas);
+        $rstData['data'] = $setDatas;
 
-        return $data;
+        return $rstData;
     }
 
 }
