@@ -1,7 +1,290 @@
-一、投注：
 1、General
 
 2、Response Headers
 
 3、Request Headers
 4、Form Data
+
+一、获取PHPSESSID cookie
+1、General
+	Request URL: https://cn.man152.com/home/index
+	Request Method: GET
+2、Response Headers
+	Access-Control-Allow-Credentials: true
+	Access-Control-Allow-Headers: Authorization, Origin, X-Requested-With, Content-Type, Accept
+	Access-Control-Allow-Origin: http://localhost:4200
+	c-Type: df
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Type: text/html; charset=UTF-8
+	Date: Fri, 18 Sep 2020 00:26:28 GMT
+	Expires: Thu, 01 Jan 1970 00:00:01 GMT
+	Location: https://cn.man152.com/home/register
+	rid: f40eeb1de4120eb05d628f3b4d140cc5
+	Server: now
+	Set-Cookie: ccd11=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/; domain=man152.com
+	Set-Cookie: vcd11=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/; domain=man152.com
+	Set-Cookie: PHPSESSID=tlvp6f3tovc12foli4ji87lr4g; path=/
+	Set-Cookie: _first=false; expires=Wed, 30-Sep-2020 00:26:28 GMT; Max-Age=1036800; path=/
+	Strict-Transport-Security: max-age=31536000; includeSubDomains
+	Transfer-Encoding: chunked
+	X-Content-Type-Options: nosniff
+	X-Frame-Options: SAMEORIGIN
+3、Request Headers
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Host: cn.man152.com
+	Referer: https://cn.man152.com/home/register
+	Sec-Fetch-Dest: document
+	Sec-Fetch-Mode: navigate
+	Sec-Fetch-Site: same-origin
+	Sec-Fetch-User: ?1
+	Upgrade-Insecure-Requests: 1
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36
+4、Form Data	
+
+二、获取JSESSIONID cookie
+1、General
+	Request URL: https://cn.man152.com/service/vpkey
+	Request Method: GET	
+2、Response Headers
+	Access-Control-Allow-Credentials: true
+	Access-Control-Allow-Headers: Authorization, Origin, X-Requested-With, Content-Type, Accept
+	Access-Control-Allow-Origin: http://localhost:4200
+	c-Type: df
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Encoding: gzip
+	Content-Type: application/json;charset=UTF-8
+	Date: Fri, 18 Sep 2020 00:01:41 GMT
+	Expires: Thu, 01 Jan 1970 00:00:01 GMT
+	rid: c716fbe497100b31ecd7c1134a5a0e01
+	Server: now
+	Set-Cookie: JSESSIONID=00E392B0CD94218B1A9941F0B1A7B795; Path=/; HttpOnly
+	Strict-Transport-Security: max-age=31536000; includeSubDomains
+	Transfer-Encoding: chunked
+	X-Content-Type-Options: nosniff
+	X-Frame-Options: SAMEORIGIN
+3、Request Headers
+	Accept: */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Cookie: PHPSESSID=ch93iesmdn3skdvlmttuhruof7; _first=false; JSESSIONID=7CBC31A0FB3BB53C15D04F446FE873CB; _vcid=7CBC31A0FB3BB53C15D04F446FE873CB; _ga=GA1.2.1930740492.1600387286; _gid=GA1.2.506624906.1600387286; _gat=1; _gat_gtag_UA_119765380_3=1
+	Host: cn.man152.com
+	Referer: https://cn.man152.com/home/register
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36
+	X-Requested-With: XMLHttpRequest
+4、Form Data
+
+三、登陆校验
+1、General
+	Request URL: https://cn.man152.com/ee/loginverification
+	Request Method: POST
+2、Response Headers
+	Access-Control-Allow-Credentials: true
+	Access-Control-Allow-Headers: Authorization, Origin, X-Requested-With, Content-Type, Accept
+	Access-Control-Allow-Origin: http://localhost:4200
+	c-Type: df
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Encoding: gzip
+	Content-Type: application/json;charset=utf-8
+	Date: Fri, 18 Sep 2020 00:30:53 GMT
+	Expires: Thu, 01 Jan 1970 00:00:01 GMT
+	rid: bceedb1dc5b9cae3f9f2cf238cda1de4
+	Server: now
+	Set-Cookie: ccd11=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/; domain=man152.com
+	Set-Cookie: vcd11=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/; domain=man152.com
+	Strict-Transport-Security: max-age=31536000; includeSubDomains
+	Transfer-Encoding: chunked
+	X-Content-Type-Options: nosniff
+	X-Frame-Options: SAMEORIGIN
+
+3、Request Headers
+	Accept: */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 1574
+	Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+	Cookie: PHPSESSID=tlvp6f3tovc12foli4ji87lr4g; _first=false; _vcid=EBC217D36CC8BA5E8FACD3A1648E0E40; _ga=GA1.2.1647672890.1600388788; _gid=GA1.2.886041944.1600388788; JSESSIONID=D948CFF617E7AFF728648704C78EC26E
+	Host: cn.man152.com
+	Origin: https://cn.man152.com
+	Referer: https://cn.man152.com/home/register
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36
+	X-Requested-With: XMLHttpRequest
+4、Form Data
+	eeblackbox: 0002MDAwN0xTVE9LRU4wMDI0M2I3MmQzYjgtMzhiMC00MGQyLWE5YTgtYTU3ODJlN2I0NTlmMDAwNklOVExPQzAwMjNodHRwczovL2NuLm1hbjE1Mi5jb20vaG9tZS9yZWdpc3RlcjAwMDVKRU5CTDAwMDExMDAwNUpTU1JDMDAyMGh0dHBzOi8vd3d3LmY0Ynp5cno5MnVzMy5jb20vRTIvMDAwNFVBR1QwMDcyTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzgxLjAuNDA0NC45MiBTYWZhcmkvNTM3LjM2MDAwN0pTVE9LRU4wMDI0MTEyZmE2YjItZTk4OC00Zjc2LWIxMjUtYmNmMGY2ZGY2MzY5MDAwN0hBQ0NMTkcwMDE3emgtQ04semg7cT0wLjksZW47cT0wLjgwMDA3SEFDQ0NIUjAwMGZVbmljb2RlIChVVEYtOCkwMDA1SlNWRVIwMDAzMS4yMDAwNFRaT04wMDA0LTQ4MDAwMDZKU1RJTUUwMDEzMjAyMC8wOS8xOCAwMDoyNjoyNzAwMDdTVlJUSU1FMDAxNTkvMTgvMjAyMCAxMjoyNjozMCBBTTAwMDVKQlJOTTAwMDZDaHJvbWUwMDA1SkJSVlIwMDBjODEuMC40MDQ0LjkyMDAwNUpCUk9TMDAwZldpbmRvd3MgTlQgMTAuMDAwMDVKQlJDTTAwMWRXaW42NDsgeDY0OyBLSFRNTCwgbGlrZSBHZWNrbzAwMDVKTEFORzAwMDV6aC1DTjAwMDRKUkVTMDAwOTEwODB4MTkyMDAwMDZKUExHTlMwMDRhaW50ZXJuYWwtcGRmLXZpZXdlcjttaGpmYm1kZ2NmamJicGFlb2pvZm9ob2VmZ2llaGphaTtpbnRlcm5hbC1uYWNsLXBsdWdpbjswMDA2SlJFRlJSMDAyM2h0dHBzOi8vY24ubWFuMTUyLmNvbS9ob21lL3JlZ2lzdGVyMDAwNElHR1kwMDJjKzJySG5icHVnQnZCRmRBNTlDTU1hOGZ5Yi9EK1dmdEtxSFVPcWxONG5aUT0wMDA1QVBWRVIwMDZhNS4wIChXaW5kb3dzIE5UIDEwLjA7IFdpbjY0OyB4NjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS84MS4wLjQwNDQuOTIgU2FmYXJpLzUzNy4zNjAwMDVBUE5BTTAwMDhOZXRzY2FwZTAwMDVOUExBVDAwMDVXaW4zMjAwMDJNVjAwMjAxQThCQzVGNUEzMUQ5REI3MkZCREQ5RUFEN0VDRTIwQTAwMDZDVE9LRU4wMDI0M2I3MmQzYjgtMzhiMC00MGQyLWE5YTgtYTU3ODJlN2I0NTlmMDAwOFdEQlRPS0VOMDAyNDNiNzJkM2I4LTM4YjAtNDBkMi1hOWE4LWE1NzgyZTdiNDU5Zg==
+	info: gaozi2018
+	
+	
+四、登陆
+1、General
+	Request URL: https://cn.man152.com/kz/member/login2?r=0.35884047299617716
+	Request Method: POST
+2、Response Headers
+	Access-Control-Allow-Credentials: true
+	Access-Control-Allow-Headers: Authorization, Origin, X-Requested-With, Content-Type, Accept
+	Access-Control-Allow-Origin: http://localhost:4200
+	c-Type: df
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Encoding: gzip
+	Content-Type: application/json;charset=UTF-8
+	Date: Fri, 18 Sep 2020 00:30:53 GMT
+	Expires: Thu, 01 Jan 1970 00:00:01 GMT
+	rid: cfc39f194bae71be159b1583c225b4be
+	Server: now
+	Set-Cookie: JSESSIONID=8FEF860A79CE39CF4BE62C11A7925715; Path=/; HttpOnly
+	Set-Cookie: ccd11=m6YLvMmS09CNjjHSDS0Xl1UC4syEk0bz_i4X4fcl3XF07jKoy0hvPXCzbDvqNfdfH5grqaw86fRPooY5qKGCgcKPxyqOwGOYwI; Domain=.man152.com; Path=/; Secure; HttpOnly
+	Set-Cookie: ud11=gaozi2018; Domain=.man152.com; Path=/; Secure; HttpOnly
+	Set-Cookie: vcd11=0dd327a13447dbfb34d10f4266f0ac42a1fd5ba60d11; Domain=.man152.com; Path=/; Secure; HttpOnly
+	Strict-Transport-Security: max-age=31536000; includeSubDomains
+	Transfer-Encoding: chunked
+	X-Content-Type-Options: nosniff
+	X-Frame-Options: SAMEORIGIN
+3、Request Headers
+	Accept: application/json, text/javascript, */*; q=0.01
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 336
+	Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+	Cookie: PHPSESSID=tlvp6f3tovc12foli4ji87lr4g; _first=false; _vcid=EBC217D36CC8BA5E8FACD3A1648E0E40; _ga=GA1.2.1647672890.1600388788; _gid=GA1.2.886041944.1600388788; JSESSIONID=D948CFF617E7AFF728648704C78EC26E
+	Host: cn.man152.com
+	Origin: https://cn.man152.com
+	Referer: https://cn.man152.com/home/register
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36
+	X-Requested-With: XMLHttpRequest
+4、Query String Parameter
+	r: 0.35884047299617716
+5、Form Data
+	loginpwd: gX6kMOAhShez+yRJ3dL8jK3a+lhBevAC6PfKYCj0B7y7uEcCdqoufEmP5Q2jMMlyCXJZmF4a1vfO6jvMAMQ9AO06hLB+5aDOYoM5AuvCx+CMplsFwf8ClnDc/ijt9Iu5AQJ/R/48bsm9YCB6qMlEotZNKA7CJVnS79x77rbCIa0=
+	loginame: gaozi2018
+	verifycode: sc6n
+	fkey: 644f643842Hqu4SlXQCHs7cN2/OPF478uprcGJW+ceRJ+KaTbEBkuM9CbFo7y6IOCSeVUiEcpvaJzl8O6n4AhOK4KanA
+
+
+五、设置赔率
+1、General
+	Request URL: https://xj-sb-asia-manx.prdasbbwla2.com/zh-cn/serv/addbs
+	Request Method: POST
+2、Response Headers
+	Access-Control-Allow-Headers: Content-Type,X-OpCode
+	Access-Control-Allow-Methods: POST
+	Access-Control-Allow-Origin: *
+	Cache-Control: no-cache
+	Content-Encoding: gzip
+	Content-Type: application/json; charset=utf-8
+	Date: Fri, 18 Sep 2020 00:36:46 GMT
+	Expires: -1
+	Pragma: no-cache
+	Server: Microsoft-IIS/10.0
+	Transfer-Encoding: chunked
+	Vary: Accept-Encoding
+3、Request Headers
+	Accept: application/json, text/javascript, */*; q=0.01
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 114
+	Content-Type: application/json; charset=UTF-8
+	Cookie: ASP.NET_SessionId=luakc1ks4fqvrc13q5mnokxo; sbawl3-manx=152178442.20480.0000; fltx=%7b%222%22%3a%5b%22pfhvs%22%2c%22pfqts%22%5d%7d; .Xauth=B71381BCA70D096EB99718BF6577ABC2D2BD3F4885434BFE5BED942E4C3A17315CE531C2E963FA33A5AAEE4B1359D09E9C9B5A33D5C64B61CBE213B4F8FD4F263DEB70413870D204006E9B574F6E73ADFFD01761A9D31C15557CEB9A71842BE974AD907D9E13B0126C7F3F8B0FDBB30D1242BFA8DB3621F58298185E0F58861469DA21F497FADDF5E1447AD2CDA65403935AE5FF60B87439FCCC987B56EA8182
+	Host: xj-sb-asia-manx.prdasbbwla2.com
+	Origin: https://xj-sb-asia-manx.prdasbbwla2.com
+	Referer: https://xj-sb-asia-manx.prdasbbwla2.com/zh-cn/sports
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36
+	X-Requested-With: XMLHttpRequest
+4、Request Payload
+	{"ep":[{"pid":0,"slid":"5064657990","eid":4260544,"ods":"0.83","hdp":"210.5","scr":"67:57","iip":true}],"is":true}
+
+六、下注
+1、General
+	Request URL: https://xj-sb-asia-manx.prdasbbwla2.com/zh-cn/serv/placebet
+	Request Method: POST
+2、Response Headers
+	Access-Control-Allow-Headers: Content-Type,X-OpCode
+	Access-Control-Allow-Methods: POST
+	Access-Control-Allow-Origin: *
+	Cache-Control: no-cache
+	Content-Encoding: gzip
+	Content-Type: application/json; charset=utf-8
+	Date: Fri, 18 Sep 2020 00:36:54 GMT
+	Expires: -1
+	Pragma: no-cache
+	Server: Microsoft-IIS/10.0
+	Transfer-Encoding: chunked
+	Vary: Accept-Encoding
+3、Request Headers
+	Accept: application/json, text/javascript, */*; q=0.01
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 131
+	Content-Type: application/json; charset=UTF-8
+	Cookie: ASP.NET_SessionId=luakc1ks4fqvrc13q5mnokxo; sbawl3-manx=152178442.20480.0000; fltx=%7b%222%22%3a%5b%22pfhvs%22%2c%22pfqts%22%5d%7d; .Xauth=B71381BCA70D096EB99718BF6577ABC2D2BD3F4885434BFE5BED942E4C3A17315CE531C2E963FA33A5AAEE4B1359D09E9C9B5A33D5C64B61CBE213B4F8FD4F263DEB70413870D204006E9B574F6E73ADFFD01761A9D31C15557CEB9A71842BE974AD907D9E13B0126C7F3F8B0FDBB30D1242BFA8DB3621F58298185E0F58861469DA21F497FADDF5E1447AD2CDA65403935AE5FF60B87439FCCC987B56EA8182
+	Host: xj-sb-asia-manx.prdasbbwla2.com
+	Origin: https://xj-sb-asia-manx.prdasbbwla2.com
+	Referer: https://xj-sb-asia-manx.prdasbbwla2.com/zh-cn/sports
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36
+	X-Requested-With: XMLHttpRequest
+4、Request Payload
+	{"ep":[{"pid":0,"slid":"5064657990","eid":4260544,"ods":0.83,"hdp":"210.5","scr":"67:57","iip":true}],"am":[283],"ew":[],"is":true}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
