@@ -10,7 +10,7 @@ use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
 
-class PingBoBaseService {
+class Mbs188BaseService {
 
     /**
      * @desc 判断是否登录
@@ -150,6 +150,7 @@ class PingBoBaseService {
         if(!$timeout) $timeout = 15;
 
         $ch = curl_init();
+        $version = curl_version();
         curl_setopt($ch, CURLOPT_URL, $url);
 
         // 设置浏览器的特定header
@@ -158,21 +159,24 @@ class PingBoBaseService {
 
         $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
 
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        //curl_setopt($ch, CURLOPT_USERAGENT, '');
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1);
         curl_setopt($ch, CURLOPT_SSLVERSION, 3);
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER,0);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
 
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
-        //if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
-        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];p($logArr);
+        if($errno) {
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];p($logArr);
+        }
         curl_close($ch);
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];

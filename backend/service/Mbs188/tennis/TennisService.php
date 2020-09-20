@@ -1,24 +1,66 @@
 <?php
-namespace backend\service\pingbo\tennis;
+namespace backend\service\Mbs188\tennis;
 
-use backend\service\pingbo\PingBoBaseService;
+use backend\models\Matchs;
+use backend\service\Mbs188\Mbs188BaseService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
 
-class TennisService extends PingBoBaseService { #
-    public static $baseUrl = 'https://www.ps3838.com';
+class TennisService extends Mbs188BaseService { #
+    public static $baseUrl = 'https://landing-mbs.188sbk.com';
 
     /**
      * @param int $game_type 33:网球
      * @return bool|mixed|string
      */
     public static function getGameData($game_type = 33){
-        $v = microtime(true) * 1000;
+        $v = (int)(microtime(true) * 1000);
         $_ = $v + 60 * 40;
-        $url = self::$baseUrl.'/sports-service/sv/odds/events?mk=2&sp='.$game_type.'&ot=1&btg=1&o=1&lg=&ev=&d=&l=3&v='.$v.'&me=0&more=false&c=CN&tm=0&g=&pa=0&cl=3&_g=1&_='.$_.'&locale=zh_CN';
+        $url = self::$baseUrl.'/zh-cn/Service/CentralService?GetData&ts='.$v;
 
-        $data = PingBoBaseService::getCurl($url);
+        $headers = [
+            'Accept: */*',
+            'Accept-Encoding: gzip, deflate, br',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Connection: keep-alive',
+            'Content-Length: 420',
+            'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+            'Cookie: ASP.NET_SessionId=s211e4jzggak2ci0yz0vwgwx; mc=; sb188cashlv=2183401226.20480.0000; historyUrl=%2Fm%2Fzh-cn%2Fsports%2Ffootball%2Fin-play%2Ffull-time-asian-handicap-and-over-under%3Fsc%3DADGBCE%26u%3Dhttps%3A%2F%2Fm.188xiaoba.net%26c%3D44%26allowracing%3Dfalse%26reg%3DChina%26rc%3DCN; timeZone=480; settingProfile=OddsType=2&NoOfLinePerEvent=1&SortBy=1&AutoRefreshBetslip=True; fav3=; HighlightedSport=; _ga=GA1.2.1556568454.1600441259; _gid=GA1.2.368257017.1600441259; CCDefaultMbPlay=; CCCurrentMbPlay=; CCDefaultBgPlay=; CCEnlargeStatus=false; BS@Cookies=5084168122%234274292%23100%23false%230_0%231.56%23null%230%3A0%23true%23true%23%234274292%23false%23',
+            'Host: landing-mbs.188sbk.com',
+            'Origin: https://landing-mbs.188sbk.com',
+            'Referer: https://landing-mbs.188sbk.com/zh-cn/sports/tennis/competition/full-time-asian-handicap-and-over-under',
+            'Sec-Fetch-Dest: empty',
+            'Sec-Fetch-Mode: cors',
+            'Sec-Fetch-Site: same-origin',
+            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36',
+            'X-Requested-With: XMLHttpRequest'
+        ];
+        $post_data = [
+            'IsFirstLoad' => true,
+            'VersionL'=> -1,
+            'VersionU' => 0,
+            'VersionS' => -1,
+            'VersionF' => -1,
+            'VersionH' => 0,
+            'VersionT' => -1,
+            'IsEventMenu' => false,
+            'SportID' => 1,
+            'CompetitionID' => -1,
+            'reqUrl' => '/zh-cn/sports/tennis/competition/full-time-asian-handicap-and-over-under',
+            'oIsInplayAll' => false,
+            'oIsFirstLoad' => true,
+            'oSortBy' => 1,
+            'oOddsType' => 0,
+            'oPageNo' => 0,
+            'hisUrl' => '/zh-cn/sports/tennis/competition/full-time-asian-handicap-and-over-under',
+            'LiveCenterEventId' => 0,
+            'LiveCenterSportId' => 0,
+        ];
+
+        //$data = self::httpPost($url, $post_data, $headers);
+        $data = self::httpPost($url, http_build_query($post_data), $headers);
+
         return $data;
     }
 
@@ -29,53 +71,12 @@ class TennisService extends PingBoBaseService { #
      * @return array|bool|mixed|string
      */
     public static function getGames($data = [], $type = 1, $game_type = 33){
-        $rstData = ['status'=>200, 'msg'=>'操作成功'];
-        $gameTypes = [3=>'棒球', 29=>'足球', 33=>'网球'];
-        if(empty($data)){
-            $data = TennisService::getGameData($game_type);
+        $rstData = ['status' => 200, 'msg' => '操作成功'];
+        $gameTypes = [3 => '棒球', 29 => '足球', 33 => '网球'];
+        if (empty($data)) {
+            $data = self::getGameData($game_type);
         }
-        $datas = $data['l']; # 比赛数据
-        //p($datas);
-        $setDatas = [];
-        foreach ($datas as $row){
-            $match_id = $row[0]; # 比赛id 33:网球
-            $match_name = $row[1]; # 比赛名称：Tennis
-            //p([$match_id, $match_name]);
-            foreach ($row[2] as $row1){
-                $game_id = $row1[0]; # 比赛记录id
-                $game_name = $row1[1]; # 联赛名称
-                foreach ($row1[2] as $row2){
-                    $g_id = $row2[0]; # 比赛场次id
-                    $player_1 = $row2[1]; # 选手1
-                    $player_2 = $row2[2]; # 选手2
-                    //p([$player_1, $player_2]);
-                    if($type == 1 && (empty($row2[8][0][1]) OR empty($row2[8][0][1]))){
-                        continue; # 独赢
-                    }
-                    # 全场独赢水位
-                    $waters = $row2[8][0][2];
-                    $player_1_water = $waters[1]; # 选手一全场独赢水位
-                    $player_2_water = $waters[0]; # 选手二全场独赢水位
-                    if($type == 1 && (empty($player_1_water) OR empty($player_2_water))){
-                        continue; # 独赢赔率为空
-                    }
-                    $setDatas[] = [
-                        'game_type' => $game_type,
-                        'game_type_name' => $gameTypes[$game_type],
-                        'game_id' => $game_id,
-                        'game_name' => $game_name,
-                        'g_id' => $g_id,
-                        'player_1' => $player_1,
-                        'player_1_water' => $player_1_water,
-                        'player_2' => $player_2,
-                        'player_2_water' => $player_2_water
-                    ];
-                }
-            }
-        }
-        $rstData['data'] = $setDatas;
+        p($data);
 
-        return $rstData;
     }
-
 }
