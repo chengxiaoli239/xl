@@ -5,7 +5,9 @@ use backend\models\SystemConfig;
 use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
 use backend\service\BetService;
+use backend\service\CurlService;
 use backend\service\PoxyIPService;
+use common\general\helpers\Curl;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
@@ -47,7 +49,6 @@ class PingBoBaseService {
      */
     public static function login($uid = 1, $tz_system_id = 1){
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-
         # 第一步：获取cookie
         //$rst = self::getCookie($uid,$tz_system_id);
         //if(isset($rst['status']) && $rst['status'] == 300) return $rst;
@@ -97,7 +98,9 @@ class PingBoBaseService {
             $TzSystemUsers->user_agent,
         ];
 
-        $rst = self::httpPost($url, $post_data, $headers, $TzSystemUsers->uid);
+        //$rst = self::httpPost($url, $post_data, $headers, $TzSystemUsers->uid);
+        //$rst = self::postCurl($url, $post_data, $headers, $TzSystemUsers->uid);
+        $rst = CurlService::postCurl($url, $post_data, $headers, $TzSystemUsers->uid);
         p($rst);
 
     }
@@ -189,6 +192,24 @@ class PingBoBaseService {
         }
 
         return $data;
+    }
+
+    public static function postCurl($url,$post_data = [],$header=[], $uid = 0){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        if(!$timeout) $timeout = 15;
+        $curl = new Curl();
+        $curl->setOptions([
+            'CURLOPT_URL' => $url,
+            'CURLOPT_HEADER' => 0,
+            'CURLOPT_RETURNTRANSFER' => 1,
+            'CURLOPT_TIMEOUT' => $timeout,
+            'CURLOPT_HTTPHEADER' => $header,
+            'CURLOPT_POST' => 1,
+            'CURLOPT_POSTFIELDS' => $post_data,
+            'CURLOPT_SSL_VERIFYPEER' => 0,
+            'CURLOPT_SSL_VERIFYHOST' => 0,
+        ]);
+
     }
 
     /**
