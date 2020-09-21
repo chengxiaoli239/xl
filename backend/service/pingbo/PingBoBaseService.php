@@ -11,6 +11,18 @@ use yii\helpers\ArrayHelper;
 use  yii;
 
 class PingBoBaseService {
+    private static $account = '';
+    private static $domain = '';
+
+    public static function __init__($uid = '', $tz_system_id = ''){
+        self::initParams($uid, $tz_system_id);
+    }
+
+    private static function initParams($uid = '', $tz_system_id = ''){
+        $TzSystemsUsers = TzSystemsUsers::findOne(['tz_system_id'=>$tz_system_id, 'uid'=>$uid]);
+        self::$account = $TzSystemsUsers->account;
+        self::$domain = str_replace('https://', '',$TzSystemsUsers->ssc_domain);
+    }
 
     /**
      * @desc 判断是否登录
@@ -37,8 +49,8 @@ class PingBoBaseService {
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
         # 第一步：获取cookie
-        $rst = self::getCookie($uid,$tz_system_id);
-        if(isset($rst['status']) && $rst['status'] == 300) return $rst;
+        //$rst = self::getCookie($uid,$tz_system_id);
+        //if(isset($rst['status']) && $rst['status'] == 300) return $rst;
         # 第二步：账号、验证码登录
         $rst = self::loginRemote($uid, $tz_system_id);
         # 第三步：同意
@@ -50,6 +62,44 @@ class PingBoBaseService {
         $rst = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
 
         return $rst;
+    }
+
+    /**
+     * @desc 登陆接口
+     * @param $uid
+     * @param $tz_system_id
+     */
+    public static function loginRemote($uid, $tz_system_id){
+        self::__init__($uid, $tz_system_id);
+
+        $TzSystemUsers = TzSystemsUsers::findOne(['tz_system_id'=>$tz_system_id, 'uid'=>$uid]);
+        $url = $TzSystemUsers->ssc_domain.'/member-service/v1/login?locale=zh_CN';
+
+        $post_data = http_build_query([ 'loginId' => $TzSystemUsers->account, 'password' => $TzSystemUsers->password]);
+        $headers = [
+            ':authority: '.self::$domain,
+            ':method: POST',
+            ':path: /member-service/v1/login?locale=zh_CN',
+            ':scheme: https',
+            'accept: */*',
+            'accept-encoding: gzip, deflate, br',
+            'accept-language: zh-CN,zh;q=0.9,en;q=0.8',
+            'content-length: '.strlen($post_data),
+            'content-type: application/x-www-form-urlencoded; charset=UTF-8',
+            'cookie: '.$TzSystemUsers->cookie,
+            //'cookie: JSESSIONID=07bfbf9dc0a0c06e9e6da8156bdc; _ga=GA1.2.1484142201.1592757279; _gid=GA1.2.958431061.1600624769; _og=QQ==; __cfduid=d0d72b5ec597271746bb54c9730eebba91600694389; lang=zh_CN; specialLeagueList=',
+            'origin: '.$TzSystemUsers->ssc_domain,
+            'referer: '.$TzSystemUsers->ssc_domain.'/zh-cn/sports',
+            'sec-fetch-dest: empty',
+            'sec-fetch-mode: cors',
+            'sec-fetch-site: same-origin',
+            'x-requested-with: XMLHttpRequest',
+            $TzSystemUsers->user_agent,
+        ];
+
+        $rst = self::httpPost($url, $post_data, $headers, $TzSystemUsers->uid);
+        p($rst);
+
     }
 
     /**
@@ -172,7 +222,7 @@ class PingBoBaseService {
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
         //if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
-        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];p($logArr);
+        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];p($logArr);
         curl_close($ch);
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
