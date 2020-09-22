@@ -5,3 +5,55 @@
 
 3、Request Headers
 4、Form Data
+
+一、登陆：
+1、General
+	Request URL: https://www.ps3838.com/member-service/v1/login?locale=zh_CN
+	Request Method: POST
+2、Response Headers
+	age: 0
+	cf-cache-status: DYNAMIC
+	cf-ray: 5d6d4736c8d90540-LAX
+	cf-request-id: 05582ad63c00000540be118200000001
+	content-encoding: br
+	content-type: application/json;charset=UTF-8
+	date: Tue, 22 Sep 2020 16:07:19 GMT
+	expect-ct: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+	p3p: CP='POTATO'
+	server: cloudflare
+	set-cookie: JSESSIONID=691bec28e6cbaf4b97689b5099c7; Path=/member-service; HttpOnly
+	set-cookie: u=AAAAAwAAAAAERYzXAAABdLbIrUp1h5wwbNmKjmblhnODmJXizTTCJdCvtqH5Gg_3zuYLUg==; Path=/; Domain=.ps3838.com; HttpOnly; SameSite=None; Secure
+	set-cookie: lcu=AAAAAwAAAAAERYzXAAABdLbIrUp1h5wwbNmKjmblhnODmJXizTTCJdCvtqH5Gg_3zuYLUg==; Path=/; Domain=.ps3838.com; HttpOnly; SameSite=None; Secure
+	set-cookie: custid=id=2021940001&login=202009221207&roundTrip=202009221207&hash=4FF9B1664B04151748F3EE1CF3E60DA9; Path=/; Domain=.ps3838.com; SameSite=None; Secure
+	set-cookie: _loginId=""; Domain=.ps3838.com; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/
+	set-cookie: __prefs=W251bGwsMSwxLDAsMSxudWxsLGZhbHNlLDAuMDAwMCxmYWxzZSx0cnVlLCJfM0xJTkVTIiwwLG51bGxd; Path=/; Domain=.ps3838.com; SameSite=None; Secure
+	set-cookie: _og=QQ==; Path=/; Domain=.ps3838.com; SameSite=None; Secure
+	set-cookie: _userLang=emhfQ04=; Path=/; Domain=.ps3838.com; SameSite=None; Secure
+	set-cookie: _userDefaultView=ASIA; Path=/; Domain=.ps3838.com; SameSite=None; Secure
+	set-cookie: SLID=-2022725039; Path=/; Domain=.ps3838.com; HttpOnly; SameSite=None; Secure
+	set-cookie: BrowserSessionId=-2022725039; Path=/; Domain=.ps3838.com; SameSite=None; Secure
+	set-cookie: pctag=0ee654d6-b561-469d-9b7a-da49ea1e74b3; Path=/; Domain=.ps3838.com; HttpOnly; Expires=Fri, 02-Jan-1970 19:12:00 GMT; SameSite=None; Secure
+	status: 200
+	vary: Accept-Encoding
+	x-cache: MISS
+3、Request Headers
+	:authority: www.ps3838.com
+	:method: POST
+	:path: /member-service/v1/login?locale=zh_CN
+	:scheme: https
+	accept: */*
+	accept-encoding: gzip, deflate, br
+	accept-language: zh-CN,zh;q=0.9,en;q=0.8
+	content-length: 36
+	content-type: application/x-www-form-urlencoded; charset=UTF-8
+	cookie: __cfduid=def6761ac4e97f6269f233f7a215aef4b1600790763; lang=zh_CN; _ga=GA1.2.512147534.1600790762; _gid=GA1.2.652365972.1600790762
+	origin: https://www.ps3838.com
+	referer: https://www.ps3838.com/zh-cn/
+	sec-fetch-dest: empty
+	sec-fetch-mode: cors
+	sec-fetch-site: same-origin
+	user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36
+	x-requested-with: XMLHttpRequest
+4、Form Data
+	loginId: 2021940001
+	password: aaaa7777

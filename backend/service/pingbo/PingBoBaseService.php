@@ -55,9 +55,11 @@ class PingBoBaseService {
         # 第二步：账号、验证码登录
         $rst = self::loginRemote($uid, $tz_system_id);
         # 第三步：同意
+        /*
         if(isset($rst['Status']) && $rst['Status'] == 1){
             $rst = self::acceptAgreement($uid, $tz_system_id);
         }
+        */
 
         # 获取用户信息
         $rst = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
@@ -83,7 +85,7 @@ class PingBoBaseService {
             ':path: /member-service/v1/login?locale=zh_CN',
             ':scheme: https',
             'accept: */*',
-            'accept-encoding: gzip, deflate, br',
+            'accept-encoding: gunzip, deflate, br',
             'accept-language: zh-CN,zh;q=0.9,en;q=0.8',
             'content-length: '.strlen($post_data),
             'content-type: application/x-www-form-urlencoded; charset=UTF-8',
@@ -98,11 +100,116 @@ class PingBoBaseService {
             $TzSystemUsers->user_agent,
         ];
 
-        //$rst = self::httpPost($url, $post_data, $headers, $TzSystemUsers->uid);
-        //$rst = self::postCurl($url, $post_data, $headers, $TzSystemUsers->uid);
-        $rst = CurlService::postCurl($url, $post_data, $headers, $TzSystemUsers->uid);
-        p($rst);
+        $rst = self::httpPost($url, $post_data, $headers, $TzSystemUsers->uid, $isCookie = 1);
 
+        $deleteStrs = [
+            'Path=/; Domain=.ps3838.com; HttpOnly; SameSite=None; Secure',
+            'Path=/; Domain=.ps3838.com; SameSite=None; Secure'
+        ];
+
+        preg_match_all("/Set\-Cookie:([^\r\n]*)(.*?)/i", $rst, $matches);
+        //preg_match_all("/set\-cookie:([^\r\n]*)(.*?)/i", $rst, $matches2);
+        //p(['rst'=>$rst, 'matches'=>$matches],0);
+        $keys = ['JSESSIONID', '__cfduid', '_ga', '_gid'];
+        $cookie_str = '';
+        foreach ($matches[1] as $match){
+            $tmpCookie = $match;
+            foreach ($deleteStrs as $deleteStr){
+                $tmpCookie = str_replace($deleteStr, '', trim(trim($tmpCookie), ';'));
+            }
+            $cookie_str .= ';'.trim($tmpCookie, ';');
+        }
+        //p($cookie_str);
+        $TzSystemUsers->cookie = str_replace('; ;', ';', trim($cookie_str, ';'));
+        $TzSystemUsers->updated_at = time();
+        if(!$TzSystemUsers->save()){
+            return ['status'=>300, 'msg'=>$TzSystemUsers->getErrors()];
+        }
+        return ['status'=>200, 'msg'=>'操作成功'];
+    }
+
+    /**
+     * @decription 同步用户余额 by account
+     * @param $tz_system_user_id 表lt_tz_systems_users.id
+     * @return array
+     */
+    public static function synBalance($tz_system_user_id){
+        $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);
+        $balance = self::getBalance($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
+        $msg = ['status'=>200, 'msg'=>'金额同步成功~','tz_system_user_id'=>$tz_system_user_id, 'balance'=>$balance ];
+
+        $TzSystemsUsers->balance = $balance;
+        $TzSystemsUsers->updated_at = time();
+        if(!$TzSystemsUsers->save()){
+            $msg = ['status'=>300, 'msg'=>'金额同步失败~'];
+        }
+
+        return $msg;
+    }
+
+    /**
+     * @description 获取对应站点用户余额
+     * @param $uid
+     * @return mixed
+     */
+    public static function getBalance($uid, $tz_system_id){
+        $rst = self::userInfo($uid, $tz_system_id);
+        $balance = '';
+        if(isset($rst['Status']) && $rst['Status'] == 1){
+            $balance = $rst['Data']['credit_balance'];
+        }
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $TzSystemsUsers->balance = $balance;
+        $TzSystemsUsers->save();
+
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','幸运五星-用户余额', ['rst'=>$rst, 'balance'=>$balance]);
+
+        return $balance;
+    }
+
+    /**
+     * @desc 首页
+     * @param $uid
+     * @param $tz_system_id
+     * @return mixed|string
+     */
+    public static function userInfo($uid, $tz_system_id){
+
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
+        $_t = (int)microtime(true) * 1000;
+        $url = $TzSystemsUsers->ssc_domain . '/member-service/v1/account-balance?locale=zh_CN';
+        if(strpos(strtolower($url), 'http') === false) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
+        $post_data = http_build_query(['json'=>'']);
+        $headers = [
+            ':authority: '.str_replace('https://', '', $TzSystemsUsers->ssc_domain),
+            ':method: POST',
+            ':path: /member-service/v1/account-balance?locale=zh_CN',
+            ':scheme: https',
+            'accept: */*',
+            'accept-encoding: gzip, deflate, br',
+            'accept-language: zh-CN,zh;q=0.9,en;q=0.8',
+            'content-length: '.strlen($post_data),
+            'content-type: application/x-www-form-urlencoded; charset=UTF-8',
+            "Cookie: ".trim($TzSystemsUsers->cookie),
+            'origin: '.$TzSystemsUsers->ssc_domain,
+            'referer: '.$TzSystemsUsers->ssc_domain.'/zh-cn/sports',
+            'sec-fetch-dest: empty',
+            'sec-fetch-mode: cors',
+            'sec-fetch-site: same-origin',
+            $TzSystemsUsers->user_agent,
+            'x-requested-with: XMLHttpRequest',
+        ];
+
+        $start_time = microtime(true);
+        $uid = max($TzSystemsUsers->uid, $uid);
+        $data = self::httpPost($url, $post_data, $headers, $uid);
+        $end_time = microtime(true);
+        $time_consume = ($end_time-$start_time).'s';
+        $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'time_consume'=>$time_consume, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
+        p($logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','万博-用户信息', $logArr);
+        return $data;
     }
 
     /**
@@ -210,13 +317,23 @@ class PingBoBaseService {
             'CURLOPT_SSL_VERIFYHOST' => 0,
         ]);
 
+        $errno = $curl->getError();
+        $rst = $curl->post($url, $post_data);
+        //$rst = $curl->getResponse();
+        p(['errno'=>$errno, 'rst'=>$rst]);
+
     }
 
     /**
      * @decription 获取远程html内容
      * @param $url
+     * @param array $post_data
+     * @param array $header
+     * @param int $uid
+     * @param int $isHeader 0正常请求1打印头是否打印header获取cookie，主要用于登陆前后返回获取登陆的cookie
+     * @return mixed|string
      */
-    public static function httpPost($url,$post_data = [],$header=[], $uid = 0){
+    public static function httpPost($url,$post_data = [],$header=[], $uid = 0, $isHeader = 0){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         if(!$timeout) $timeout = 15;
 
@@ -231,19 +348,19 @@ class PingBoBaseService {
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+        //curl_setopt($ch, CURLOPT_SSLVERSION, 3);
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
-        curl_setopt($ch, CURLOPT_HEADER,0);
+        curl_setopt($ch, CURLOPT_HEADER,$isHeader);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
 
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
         //if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
-        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];p($logArr);
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];p($logArr);
         curl_close($ch);
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
@@ -256,7 +373,11 @@ class PingBoBaseService {
         if($data == 'ok'){
             return 'ok';
         }
-        $rstData = json_decode($data, TRUE);
+        if(BaseService::is_json($data)){
+            $rstData = json_decode($data, TRUE);
+        }else{
+            $rstData = $data;
+        }
         //p(['data'=>$data, 'rstData'=>$rstData, 'post_data'=>$post_data, 'header'=>$header]);
 
         return $rstData;
