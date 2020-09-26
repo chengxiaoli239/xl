@@ -57,3 +57,18 @@
 4、Form Data
 	loginId: 2021940001
 	password: aaaa7777
+	
+二、获取用户信息：
+1、General
+
+2、Response Headers
+
+3、Request Headers
+4、Form Data	
+	
+	
+	
+	
+	
+	
+	
