@@ -269,7 +269,7 @@ class PingBoBaseService {
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
