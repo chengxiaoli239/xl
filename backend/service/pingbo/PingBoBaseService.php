@@ -75,16 +75,16 @@ class PingBoBaseService {
      */
     public static function getCookie($uid = 1, $tz_system_id = 1){
         self::__init__($uid, $tz_system_id);
-        $rst = ['status'=>220, 'msg'=>'操作成功'];
+        //$rst = ['status'=>200, 'msg'=>'操作成功'];
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $_ = (int)(microtime(true) * 1000);
         $url = $TzSystemsUsers->ssc_domain.'/member-service/v1/announcement/list-limit?_='.$_.'&locale=zh_CN';
         $headers = [
-            ':authority: www.ps3838.com',
-            ':method: GET',
-            ':path: /member-service/v1/announcement/list-limit?_='.$_.'&locale=zh_CN',
-            ':scheme: https',
+            //':authority: www.ps3838.com',
+            //':method: GET',
+            //':path: /member-service/v1/announcement/list-limit?_='.$_.'&locale=zh_CN',
+            //':scheme: https',
             'accept: */*',
             'accept-encoding: gunzip, deflate, br',
             'accept-language: zh-CN,zh;q=0.9,en;q=0.8',
@@ -95,11 +95,57 @@ class PingBoBaseService {
             $TzSystemsUsers->user_agent,
             'x-requested-with: XMLHttpRequest',
         ];
-        $rst = self::getCurl($url, $headers, $isHeader = 1);
-        p(['url'=>$url, 'header'=>$headers, 'rst'=>$rst]);
+        $cookieVals = self::getCurl($url, $headers, $uid, $isHeader = 1); # 返回头，取cookie：__cfduid 的值
+        $valKeys = ['__cfduid'];
+        $cookies_str = self::getCookieStrByValsAndKeys($cookieVals, $valKeys);
+        $TzSystemsUsers->cookie = trim($cookies_str, ';');
+        $TzSystemsUsers->save();
 
+        //p(['url'=>$url, 'header'=>$headers, 'rst'=>$rst, 'vals'=>$vals]);
+        return $cookies_str;
+    }
 
-        return $rst;
+    /**
+     * @param $cookieVals
+     * @param $keys
+     * @return string
+     */
+    public static function getCookieStrByValsAndKeys($cookieVals, $keys){
+        $vals = self::getCookieValByKey($cookieVals, $keys);
+        $cookies_str = '';
+        foreach ($vals as $key=>$val){
+            $cookies_str .= $key.'='.$val.'; ';
+        }
+        $cookies_str = trim(trim($cookies_str), ';');
+
+        return $cookies_str;
+    }
+
+    /**
+     * @param string $headers_content
+     * @param array $keys
+     * @return array
+     */
+    public static function getCookieValByKey($headers_content = '', $keys = []){
+        $keyVals = [];
+        preg_match_all("/Set-Cookie: (.*)/i", $headers_content, $matches);
+
+        foreach ($matches[1] as $match){
+            $valxs = explode(';', $match);
+            for($i=0; $i<count($valxs); $i++){
+                $subVal = trim($valxs[$i]);
+                foreach ($keys as $k){
+                    $key_v = $k.'=';
+                    $s = strpos($subVal, $key_v);
+                    if($s !== false) {
+                        $keyVals[$k] = str_replace($key_v, '', $subVal);
+                    }
+                }
+            }
+            //p(['matches'=>$matches, 'key'=>$key, 'key_matches'=>$key_matches]);
+        }
+
+        return $keyVals;
     }
 
     /**
@@ -120,7 +166,7 @@ class PingBoBaseService {
             ':path: /member-service/v1/login?locale=zh_CN',
             ':scheme: https',
             'accept: */*',
-            'accept-encoding: gunzip, deflate, br',
+            'accept-encoding: gzip, deflate, br',
             'accept-language: zh-CN,zh;q=0.9,en;q=0.8',
             'content-length: '.strlen($post_data),
             'content-type: application/x-www-form-urlencoded; charset=UTF-8',
@@ -135,27 +181,11 @@ class PingBoBaseService {
             $TzSystemUsers->user_agent,
         ];
 
-        $rst = self::httpPost($url, $post_data, $headers, $TzSystemUsers->uid, $isCookie = 1);
-
-        $deleteStrs = [
-            'Path=/; Domain=.ps3838.com; HttpOnly; SameSite=None; Secure',
-            'Path=/; Domain=.ps3838.com; SameSite=None; Secure'
-        ];
-
-        preg_match_all("/Set\-Cookie:([^\r\n]*)(.*?)/i", $rst, $matches);
-        //preg_match_all("/set\-cookie:([^\r\n]*)(.*?)/i", $rst, $matches2);
-        p(['rst'=>$rst, 'matches'=>$matches]);
-        $keys = ['JSESSIONID', '__cfduid', '_ga', '_gid'];
-        $cookie_str = '';
-        foreach ($matches[1] as $match){
-            $tmpCookie = $match;
-            foreach ($deleteStrs as $deleteStr){
-                $tmpCookie = str_replace($deleteStr, '', trim(trim($tmpCookie), ';'));
-            }
-            $cookie_str .= ';'.trim($tmpCookie, ';');
-        }
-        //p($cookie_str);
-        $TzSystemUsers->cookie = str_replace('; ;', ';', trim($cookie_str, ';'));
+        $cookieVals = self::httpPost($url, $post_data, $headers, $TzSystemUsers->uid, $isCookie = 1);
+        $valKeys = ['JSESSIONID','_ga', '_og', 'specialLeagueList','u', 'lcu', 'custid', '_userLang', '_userDefaultView', 'SLID', 'BrowserSessionId', '__prefs', 'lang', 'displayMessPopUp'];
+        $cookies_str = $TzSystemUsers->cookie.';'.self::getCookieStrByValsAndKeys($cookieVals, $valKeys);
+        //p($cookies_str);
+        $TzSystemUsers->cookie = $cookies_str;
         $TzSystemUsers->updated_at = time();
         if(!$TzSystemUsers->save()){
             return ['status'=>300, 'msg'=>$TzSystemUsers->getErrors()];
@@ -218,10 +248,10 @@ class PingBoBaseService {
         //$post_data = http_build_query(['json']);
         $post_data = ['json'=>''];
         $headers = [
-            //':authority: '.str_replace('https://', '', $TzSystemsUsers->ssc_domain),
-            //':method: POST',
-            //':path: /member-service/v1/account-balance?locale=zh_CN',
-            //':scheme: https',
+            ':authority: '.str_replace('https://', '', $TzSystemsUsers->ssc_domain),
+            ':method: POST',
+            ':path: /member-service/v1/account-balance?locale=zh_CN',
+            ':scheme: https',
             'accept: */*',
             'accept-encoding: gzip, deflate, br',
             'accept-language: zh-CN,zh;q=0.9,en;q=0.8',
@@ -276,8 +306,8 @@ class PingBoBaseService {
         curl_setopt($ch, CURLOPT_HEADER, $isHeader);
 
         $data = curl_exec($ch);
-        //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
         $errno = curl_errno($ch);
+        //if(strpos($url, 'announcement') !== false){ p(['header'=>$headers, 'url'=>$url, 'rst'=>$data, 'errno'=>$errno, 'isHeader'=>$isHeader]); }
         if($errno>0) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]);
@@ -397,7 +427,7 @@ class PingBoBaseService {
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
         //if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
-        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];p($logArr);
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];p($logArr);
         curl_close($ch);
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
