@@ -79,7 +79,8 @@ class PingBoBaseService {
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $_ = (int)(microtime(true) * 1000);
-        $url = $TzSystemsUsers->ssc_domain.'/member-service/v1/announcement/list-limit?_='.$_.'&locale=zh_CN';
+        //$url = $TzSystemsUsers->ssc_domain.'/member-service/v1/announcement/list-limit?_='.$_.'&locale=zh_CN'; # pc端
+        $url = $TzSystemsUsers->ssc_domain.'/sports-service/sv/am/sports-markets?c=US&v=&wm=dz&locale=zh_CN&_='.$_.'&withCredentials=true'; //移动端
         $headers = [
             //':authority: www.ps3838.com',
             //':method: GET',
@@ -97,8 +98,8 @@ class PingBoBaseService {
         ];
         $cookieVals = self::getCurl($url, $headers, $uid, $isHeader = 1); # 返回头，取cookie：__cfduid 的值
         $valKeys = ['__cfduid'];
-        $cookies_str = self::getCookieStrByValsAndKeys($cookieVals, $valKeys);
-        $TzSystemsUsers->cookie = trim($cookies_str, ';');
+        $cookies_str = trim(self::getCookieStrByValsAndKeys($cookieVals, $valKeys),';');
+        $TzSystemsUsers->cookie = $cookies_str;
         $TzSystemsUsers->save();
 
         //p(['url'=>$url, 'header'=>$headers, 'rst'=>$rst, 'vals'=>$vals]);
@@ -110,7 +111,29 @@ class PingBoBaseService {
      * @param $keys
      * @return string
      */
-    public static function getCookieStrByValsAndKeys($cookieVals, $keys){
+    public static function getCookiesByKeys($cookieVals, $keys, $cookies_exist = []){
+        $cookies_str = '';
+        $vals = self::getCookieValByKey($cookieVals, $keys);
+        //$vals = array_merge($vals, $cookies_exist);
+        $vals['__cfduid'] = $cookies_exist['__cfduid'];
+        $vals['isShowAcceptTC'] = false;
+        $vals['skin'] = 'ps3838';
+        $vals['locale'] = 'zh_CN';
+        $vals['auth'] = true;
+        $vals['closeAnnTime'] = 0;
+        $vals['session'] = '{"userName":"undefined","id":"undefined","role":{"bitMask":2,"title":"user"}}';
+        $vals['rs'] = 6;
+        p([$keys, $vals]);
+
+        return $cookies_str;
+    }
+
+    /**
+     * @param $cookieVals
+     * @param $keys
+     * @return string
+     */
+    public static function getCookieStrByValsAndKeys($cookieVals, $keys, $exist_cookies = []){
         $vals = self::getCookieValByKey($cookieVals, $keys);
         $cookies_str = '';
         foreach ($vals as $key=>$val){
@@ -156,8 +179,10 @@ class PingBoBaseService {
     public static function loginRemote($uid, $tz_system_id){
         self::__init__($uid, $tz_system_id);
 
+        $_ = (int)(microtime(true) * 1000);
         $TzSystemUsers = TzSystemsUsers::findOne(['tz_system_id'=>$tz_system_id, 'uid'=>$uid]);
-        $url = $TzSystemUsers->ssc_domain.'/member-service/v1/login?locale=zh_CN';
+        //$url = $TzSystemUsers->ssc_domain.'/member-service/v1/login?locale=zh_CN'; # PC端
+        $url = $TzSystemUsers->ssc_domain.'/member-service/v1/login?locale=zh_CN&_='.$_.'&withCredentials=true'; # 移动端
 
         $post_data = http_build_query([ 'loginId' => $TzSystemUsers->account, 'password' => $TzSystemUsers->password]);
         $headers = [
@@ -173,7 +198,8 @@ class PingBoBaseService {
             'cookie: '.$TzSystemUsers->cookie,
             //'cookie: JSESSIONID=07bfbf9dc0a0c06e9e6da8156bdc; _ga=GA1.2.1484142201.1592757279; _gid=GA1.2.958431061.1600624769; _og=QQ==; __cfduid=d0d72b5ec597271746bb54c9730eebba91600694389; lang=zh_CN; specialLeagueList=',
             'origin: '.$TzSystemUsers->ssc_domain,
-            'referer: '.$TzSystemUsers->ssc_domain.'/zh-cn/sports',
+            //'referer: '.$TzSystemUsers->ssc_domain.'/zh-cn/sports',
+            'referer: '.$TzSystemUsers->ssc_domain.'/m/zh-cn/asian/sports/tennis/Early/ML1X2/0',
             'sec-fetch-dest: empty',
             'sec-fetch-mode: cors',
             'sec-fetch-site: same-origin',
@@ -182,8 +208,15 @@ class PingBoBaseService {
         ];
 
         $cookieVals = self::httpPost($url, $post_data, $headers, $TzSystemUsers->uid, $isCookie = 1);
-        $valKeys = ['JSESSIONID','_ga', '_og', 'specialLeagueList','u', 'lcu', 'custid', '_userLang', '_userDefaultView', 'SLID', 'BrowserSessionId', '__prefs', 'lang', 'displayMessPopUp'];
-        $cookies_str = $TzSystemUsers->cookie.';'.self::getCookieStrByValsAndKeys($cookieVals, $valKeys);
+        p($cookieVals);
+        #必需参数 SLID u BrowserSessionId __cfduid displayMessPopUp
+        //$valKeys = ['JSESSIONID','_ga', '_og', 'specialLeagueList','u', 'lcu', 'custid', '_userLang', '_userDefaultView', 'SLID', 'BrowserSessionId', '__prefs', 'lang', 'displayMessPopUp'];
+        //$valKeys = ['JSESSIONID','u', 'custid', '_userLang', 'SLID', 'lang', 'displayMessPopUp']; # pc端
+        $valKeys = ['JSESSIONID', '__cfduid', 'u', 'lcu', 'custid', '_og', '_userLang', '_userDefaultView', 'SLID', 'BrowserSessionId', 'closeAnnTime','rs', '_loginId', 'session', '__prefs', 'isShowAcceptTC', 'skin', 'locale', 'auth']; # 移动端
+        //$cookieArrs = self::getCookieStrByValsAndKeys($cookieVals, $valKeys);
+        $cookieArrs = self::getCookiesByKeys($cookieVals, $valKeys, ['__cfduid'=>str_replace('__cfduid=', '', $TzSystemUsers->cookie)]);
+        p(['cookie'=>$TzSystemUsers->cookie, 'cookieArrs'=>$cookieArrs]);
+        $cookies_str = $TzSystemUsers->cookie.';'.$cookieArrs;
         //p($cookies_str);
         $TzSystemUsers->cookie = $cookies_str;
         $TzSystemUsers->updated_at = time();
@@ -456,6 +489,7 @@ class PingBoBaseService {
      * @return bool
      */
     public static function setPoxy($ch, $url='', $uid = 0){
+        return false;
         $poxy_addr = PoxyIPService::getPoxyIp();
         if(!empty($poxy_addr)){
             //$poxy_addr = '218.85.247.70:20000';
