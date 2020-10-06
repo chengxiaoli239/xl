@@ -379,4 +379,51 @@ class CqsscKcw extends BaseKj {
         return $rst;
     }
 
+    /**
+     * @desc 北京快乐8  800网 , $lottery_type = 7
+     * @param string $returnType
+     * @return array|bool 返回格式(数组)：{"expect":"2020100623","opencode":"0,8,6,3,6","opentime":"2020-10-06 17:41:38"}
+     */
+    public static function getLotteryKuaiLe8Eight($returnType = 'json'){
+
+        if(!$kjData = self::getCurrentKjData($lottery_type = 7)) {
+            $domain = BaseKj::getApiHostByRoute('/kj/kuai-le8/eight');
+            $url = $domain.'/getbasebjkl8shicai2?lotCode=30010';
+
+            $start_time = microtime(true);
+            $content = CurlService::getCurl($url);
+            $end_time = microtime(true);
+            $time_consume = ($end_time-$start_time).'s';
+            $logArr = ['url'=>$url, 'rst'=>$content, 'time_consume'=>$time_consume];
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kl8_99', 'INFO', '号码抓取-kcw', $logArr);
+
+            $data = $content;
+
+            if (!isset($data) OR !$data OR !$kData = $data['result']['data']) return false;
+            $kjData['expect'] = $kData['drawIssue'];
+            $kjData['opencode'] = $kData['preDrawCode'];
+            $kjData['opentime'] = date('Y-m-d H:i:s');
+            //p($kjData);
+            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ] # 返回格式
+        }
+        $opencode = $kjData['opencode']; # 开奖号码
+        $opentime = $kjData['opentime']; # 开奖时间
+        $expect = $kjData['expect']; # 期号
+        //p([DEFAULT_LOTTERY_TYPE,$expect, $kjData]);
+
+        self::setKjDataCache($lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_kl8', 'INFO', '99彩票网-号码抓取', $logArr);
+
+        return $rst;
+    }
 }

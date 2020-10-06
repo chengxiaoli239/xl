@@ -192,6 +192,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = CqsscKcw::getLotteryKuaiLe8Eight();p($data);
         $rst = \backend\service\pingbo\tennis\TennisService::login($uid = 18, $tz_system_id = 14);p($rst);
         $rst = TennisSportsService::grabTennisSportsGame();p($rst);
         $rst = \backend\service\Mbs188\tennis\TennisService::getGames();p($rst);
