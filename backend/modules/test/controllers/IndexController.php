@@ -192,6 +192,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BaseService::synBalance(51);p($rst);
+        $rst[] = StaticService::opAllStaticProfits(); p($rst);# 利润统计
         $data = CqsscKcw::getLotteryKuaiLe8Eight();p($data);
         $rst = \backend\service\pingbo\tennis\TennisService::login($uid = 18, $tz_system_id = 14);p($rst);
         $rst = TennisSportsService::grabTennisSportsGame();p($rst);
@@ -476,7 +478,6 @@ class IndexController extends Controller
         $rst = SscDataService::insertStaticVal();p($rst);
         $rst = HuiYuanService5::login(3, 6);p($rst);
         $rst = HuiYuanService5::loginNew(18, 6);p($rst);
-        $rst = HuiYuanService5::synBalance(13);p($rst);
         $rst = NumService::getCodesKuaiXuan(['type_log'=>'1']);p($rst);
         p($rst);
         $rst = HN0898Service::getCurrentQihao( 7 );p($rst);
@@ -488,7 +489,6 @@ class IndexController extends Controller
         $rst = StaticService::getNiceCodes(5);p(['最优号码[四现不带双]'=>$rst]);
         $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay();p($rst); # 单双利润统计(day)
         $rst = SscDataService::getCodesDS('1,2,3,4,5');p($rst);
-        $rst[] = StaticService::opAllStaticProfits(); p($rst);# 利润统计
         $rst = StaticService::allHzStaticProfits($lottery_type = 5);p($rst); # 每个月份每个和值利润统计
         $rst = StaticService::staticPerHzProfits('2019-03');p($rst); # 某月份每个和值利润统计
         if($status = StaticService::isCanOpStatic($lottery_type=5, $mkey = 'opStatic')) {

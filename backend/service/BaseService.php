@@ -88,7 +88,7 @@ class BaseService{
         $tz_system_id = $TzSystemsUser->tz_system_id;
         # 是否有激活的计划
         $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id);
-        if(!$hasActivePlan && !in_array($tz_system_id, [14])){
+        if(!$hasActivePlan && !in_array($tz_system_id, [14, 11])){
             return false;
         }
 
@@ -115,6 +115,7 @@ class BaseService{
             # 6、会员网
             $rst = HuiYuanBaseService::synBalance($TzSystemsUser->id);
         }elseif(in_array($tz_system_id, [11])){
+            # 菊花网
             $rst = JuHuaBaseService::synBalance($TzSystemsUser->id);
         }elseif(in_array($tz_system_id, [8])){
             # 8、麒麟财务系统网
