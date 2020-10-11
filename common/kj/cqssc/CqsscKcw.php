@@ -327,8 +327,9 @@ class CqsscKcw extends BaseKj {
      */
     public static function getLotteryKuaiLe8NineNine($returnType = 'json', $lottery = 18){
 
-        if(!$kjData = self::getCurrentKjData($lottery_type = 7)) {
-            $domain = BaseKj::getApiHost(11);
+        if(true OR !$kjData = self::getCurrentKjData($lottery_type = 7)) {
+            //$domain = BaseKj::getApiHost(11);
+            $domain = BaseKj::getApiHostByRoute('/kj/kuai-le8/nine-nine');
             $url = $domain.'/k8/ajax.aspx';
 
             $post_data = ['act'=>'getlastkj'];
@@ -400,7 +401,7 @@ class CqsscKcw extends BaseKj {
             $data = $content;
 
             if (!isset($data) OR !$data OR !$kData = $data['result']['data']) return false;
-            $kjData['expect'] = $kData['drawIssue'];
+            $kjData['expect'] = $kData['preDrawIssue'];
             $kjData['opencode'] = $kData['preDrawCode'];
             $kjData['opentime'] = date('Y-m-d H:i:s');
             //p($kjData);

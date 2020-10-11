@@ -1183,7 +1183,7 @@ class HN0898Service extends BaseTZService {
                 }
                 break;
             case 7: # 北京快乐8
-                $qihao = 967767 + self::getdifferentdays() * 179 + self::getDifferentNums() + 1; # 967767为2019-08-10最后一期期号
+                $qihao = 947004 + self::getdifferentdays() * 179 + self::getDifferentNums() ; # 967767为2019-08-10最后一期期号
                 break;
             case 8:  # 幸运五星彩
                 $time = date("H:i:s", time());
@@ -1243,9 +1243,7 @@ class HN0898Service extends BaseTZService {
 
                 break;
             case 7: # 北京快乐8
-                $days = self::getDifferentDays();
-                $nums = self::getDifferentNums();
-                $qihao = 967767 + $days * 179 + $nums; # 967767为2019-08-10最后一期期号
+                $qihao = 947006 + self::getdifferentdays() * 179 + self::getDifferentNums() - 2; # 967767为2019-08-10最后一期期号
                 break;
             case 8: # 幸运五星彩
                 $time = date("H:i:s", time()-5*60);

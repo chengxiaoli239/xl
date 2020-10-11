@@ -1104,6 +1104,7 @@ abstract class BetService extends BaseBetService {
             case 6: # 新疆时时彩
                 break;
             case 7: # 北京快乐8
+                $cacheTime = 5 * 60;
                 break;
             case 8: # 幸运五星彩
                 $cacheTime = 5 * 60;

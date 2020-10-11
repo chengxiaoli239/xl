@@ -804,7 +804,8 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $rst = self::userInfo($uid, $tz_system_id);
         $balance = '';
         if(isset($rst['status']) && $rst['status'] == 200){
-            $balance = $rst['info']['total_credit'];
+            //$balance = $rst['info']['total_credit'];
+            $balance = $rst['info']['remain_credit'];
         }
 
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','菊花网-用户余额', $rst);
@@ -1261,7 +1262,8 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
         $_t = microtime(true) * 10000;
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/queryLastInfo?timeid='.$_t;
+        //$url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/queryLastInfo?timeid='.$_t;
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/querymembaseInfo?timeid='.$_t;
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
         $headers = [
             "Accept: application/json, text/javascript, */*; q=0.01",
@@ -1728,32 +1730,31 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
         $url = self::getTzSiteInfo(self::$tz_system_id, 'SSC_INDEX').'/sellnumbers';//.'?'.http_build_query($post_data);
         $snInfo_sn = '';
-        $snInfo_snid = '';
+        $snInfo_snids = '';
         $rst = [];
         foreach ($codesArrs as $key=>$tmpcodesArr){
             //$bet_codes = json_encode(['OOOO'=>implode('M'.$single.'N', $tmpcodesArr).'M'.$single]);
             $bet_codes = json_encode(self::getBetCodes($tmpcodesArr, $single, $playway));
             $post_data = [
                 'si'=>$bet_codes, # 号码信息
-                'sn'=>'20'.$qihao, # 不清楚
-                'uc'=>$TzSystemsUsers->balance,
+                'sn'=>self::getQihaoBeforeBet($qihao, $lottery_type), # 不清楚
+                'uc'=>floatval($TzSystemsUsers->balance),
                 'ot'=>3,
-                'log'=>'3M1N1N0N12N3N54N2M3N1N0N0N0N0N0NN0N0N0N0NN0N0N0N0NN0N0N0N0NM99N4N'.$single,
-                'nomd5'=>'83744ee2497bbf32447c1321a8af2b50',
-                'commited_suffix'=>microtime(true)*10000,
-                //'period_no'=>$qihao,
+                'log'=>'3M1N1N0N1N2N3N4M3N1N0N0N0N0N0NN0N0N0N0NN0N0N0N0NN0N0N0N0NM99N1N'.$single,
+                'nomd5'=>'11694ec2ae01ec1a6fbe54888e3d1ac8',
+                'commited_suffix'=>(int)(microtime(true)*1000),
             ];
 
             $_t = round(microtime(true) * 1000);
             $headers = [
                 'Accept: application/json, text/javascript, */*; q=0.01',
-                'Accept-Encoding: gunzip, deflate',
+                'Accept-Encoding: gzip, deflate',
                 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
                 'Connection: keep-alive',
                 'Content-Length:'.strlen(http_build_query($post_data)),
                 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
 
-                'Cookie: '.$TzSystemsUsers->cookie,
+                'Cookie: '.self::changeCookie($TzSystemsUsers->cookie, $lottery_type),
                 'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
                 'Origin: '.$TzSystemsUsers->ssc_domain,
                 'Referer: '.$TzSystemsUsers->ssc_domain.'/order_print?tid='.time(),
@@ -1774,7 +1775,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             # 真实投注
             $start_time = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers);
-            //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
+            p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
             $rst[$key] = $tmpRst;
             //$rst = json_encode($rst);
             $end_time = microtime(true);
@@ -1782,7 +1783,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             if($tmpRst['status'] != 200){
                 $tzRst = [
                     'uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,
-                    'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>self::$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume
+                    'post_data'=>$post_data, 'user_id'=>self::$user_id, 'postRst'=>$tmpRst, 'time_consume'=>$time_consume
                 ];
                 //if($tz_type != 20) $tzRst['code'] = $codes;
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','菊花网批投注记录-投注失败', $tzRst);
@@ -1795,14 +1796,23 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);
 
+            /*
             # 获取方案号，记录id, 用于撤单
             $snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
             $preStr = '';
             if($key == 0){
                 $preStr = $snInfo['sn'].',OOOO,';
             }
-            $snInfo_snid .= $preStr.implode(';'.$snInfo['sn'].',OOOO,', $tmpcodesArr); # 多次下单需要分开，多次撤单，四定：OOOO
-            $snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
+            */
+            foreach ($tmpRst['suc'] as $k=>$suc){
+                $snInfo_snids[] = $k; # 多次下单需要分开，多次撤单，四定：OOOO
+            }
+            //$snInfo_snids = $preStr.implode(';'.$snInfo['sn'].',OOOO,', $tmpcodesArr); # 多次下单需要分开，多次撤单，四定：OOOO
+            //$snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
+        }
+        $snInfo_sn = $qihao; # 多次下单需要分开，多次撤单
+        if(!empty($snInfo_snids)){
+            $snInfo_snid = implode(',', $snInfo_snids);
         }
         $data['rst'] = $rst;
 
@@ -1839,6 +1849,50 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
 
         return $data;
+    }
+
+    /**
+     * @desc 期号转换
+     * @param $qihao
+     * @param int $lottery_type
+     * @return string
+     */
+    public static function getQihaoBeforeBet($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        if($lottery_type == 5){
+            $qihao = '20'.$qihao;
+        }else{
+            $qihao = $qihao;
+        }
+
+        return $qihao;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function chooseLotId($tz_system_user_id = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $rst = true;
+
+        return $rst;
+    }
+
+    /**
+     * @param string $cookie_str
+     * @param int $lottery_type
+     * @return string
+     */
+    public static function changeCookie($cookie_str = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $sel_lotdefids = [
+            5 => 2, # 重庆
+            7 => 1, # 北京赛车
+            99 => 4, # 台湾宾果
+        ];
+        preg_match('/sel_lotdefid\=[1-9]/i', $cookie_str, $mathes);
+        if(!empty($mathes[0])){
+            $cookie_str = str_replace($mathes[0], 'sel_lotdefid='.$sel_lotdefids[$lottery_type], $cookie_str);
+        }
+
+        return $cookie_str;
     }
 
     /**
@@ -1912,6 +1966,9 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
         }
         $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+        if(strlen(http_build_query($post_data))<1000){
+            $logArr['post_data'] = $post_data;
+        }
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
