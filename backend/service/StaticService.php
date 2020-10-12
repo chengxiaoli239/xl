@@ -2776,4 +2776,28 @@ $sql .= '
 
         return $rst;
     }
+
+    /**
+     * @desc 计算遗漏数据 - 四定带双现
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function static4dYlCode($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+
+        //$where = ['type_22'=>0, 'type_2'=>1, 'lottery_type'=>$lottery_type, 'type_3'=>0, 'type'=>4]; # 四现带双
+        $where = ['type_22'=>0, 'type_2'=>0, 'lottery_type'=>$lottery_type, 'type_3'=>0, 'type'=>4]; # 四现不带双
+        $datas = SscStaticYl::findAll($where);
+        $numDatas = [];
+        foreach ($datas as $data){
+            $tmpYls = explode('-', $data->yl_records);
+            //if(($tmpYls[0] + $tmpYls[2]>2500) OR ($tmpYls[0]>1000 && $tmpYls[2]>1000)){ # 四现带双
+            if(($tmpYls[0] + $tmpYls[2]>2500) OR ($tmpYls[0]>1000 && $tmpYls[2]>1000)){ # 四现不带双
+                $numDatas[] = ['val'=>$data->val, 'yl_records'=>$data->yl_records];
+            }
+        }
+        $rst['data'] = $numDatas;
+
+        return $rst;
+    }
 }

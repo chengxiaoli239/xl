@@ -192,6 +192,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::static4dYlCode($lottery_type = 6);p($rst);
         $balance = JuHuaBaseService::getBalance($uid = 18,$tz_system_id = 11);p($balance);
         $data = CqsscKcw::getLotteryKuaiLe8NineNine();p($data);
         $data = CqsscKcw::getLotteryKuaiLe8Eight();p($data);
