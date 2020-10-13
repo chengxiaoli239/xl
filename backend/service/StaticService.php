@@ -37,6 +37,7 @@ use backend\models\SystemConfig;
 use backend\models\ThreeNum;
 use backend\models\TzTypes;
 use backend\tools\Util;
+use common\service\CommonService;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use common\tools\Tools;
@@ -2778,25 +2779,33 @@ $sql .= '
     }
 
     /**
-     * @desc 计算遗漏数据 - 四定带双现
+     * @desc 号码类型监控
      * @param int $lottery_type
      * @return array
      */
-    public static function static4dYlCode($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function static4dYlCode(){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
 
-        //$where = ['type_22'=>0, 'type_2'=>1, 'lottery_type'=>$lottery_type, 'type_3'=>0, 'type'=>4]; # 四现带双
-        $where = ['type_22'=>0, 'type_2'=>0, 'lottery_type'=>$lottery_type, 'type_3'=>0, 'type'=>4]; # 四现不带双
-        $datas = SscStaticYl::findAll($where);
-        $numDatas = [];
-        foreach ($datas as $data){
-            $tmpYls = explode('-', $data->yl_records);
-            //if(($tmpYls[0] + $tmpYls[2]>2500) OR ($tmpYls[0]>1000 && $tmpYls[2]>1000)){ # 四现带双
-            if(($tmpYls[0] + $tmpYls[2]>2500) OR ($tmpYls[0]>1000 && $tmpYls[2]>1000)){ # 四现不带双
-                $numDatas[] = ['val'=>$data->val, 'yl_records'=>$data->yl_records];
+        $lottery_types = StaticService::getLotteryTypes();
+        $wheres = [
+            1 => ['type_22'=>0, 'type_2'=>1, 'type_3'=>0, 'type'=>4], # 四现带双：除双双重、取双重、除三重
+            2 => ['type_22'=>0, 'type_2'=>0, 'type_3'=>0, 'type'=>4], # 四现不带双：除双双重、除双重、除三重
+        ];
+        foreach ($lottery_types as $k=>$lottery_type){
+            foreach ($wheres as $key=>$where){
+                $where['lottery_type'] = $lottery_type;
+                $datas = SscStaticYl::findAll($where);
+                $numDatas = [];
+                foreach ($datas as $data){
+                    $tmpYls = explode('-', $data->yl_records);
+                    //if(($tmpYls[0] + $tmpYls[2]>2500) OR ($tmpYls[0]>1000 && $tmpYls[2]>1000)){ # 四现带双
+                    if(($tmpYls[0] + $tmpYls[2]>2500) OR ($tmpYls[0]>1000 && $tmpYls[2]>1000)){ # 四现不带双
+                        $numDatas[] = ['val'=>$data->val, 'yl_records'=>$data->yl_records];
+                    }
+                }
+                $rst['data'][$lottery_type][$key] = $numDatas;
             }
         }
-        $rst['data'] = $numDatas;
 
         return $rst;
     }
