@@ -62,17 +62,37 @@ use yii\widgets\ActiveForm;
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-3 col-xs-3">
-                            <?= $form->field($model, 'p1')->textInput()->label('第1位') ?>
+                        <div class="col-lg-3 col-xs-6">
+                            <?= $form->field($model, 'p1')->textInput()->label('千
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_1">大</a>
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_2">小</a>
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_1">单</a>
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_2">双</a>
+                            ') ?>
                         </div>
-                        <div class="col-lg-3 col-xs-3">
-                            <?= $form->field($model, 'p2')->textInput()->label('第2位') ?>
+                        <div class="col-lg-3 col-xs-6">
+                            <?= $form->field($model, 'p2')->textInput()->label('百
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_1">大</a>
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_2">小</a>
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_1">单</a>
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_2">双</a>
+                            ') ?>
                         </div>
-                        <div class="col-lg-3 col-xs-3">
-                            <?= $form->field($model, 'p3')->textInput()->label('第3位') ?>
+                        <div class="col-lg-3 col-xs-6">
+                            <?= $form->field($model, 'p3')->textInput()->label('十
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_1">大</a>
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_2">小</a>
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_1">单</a>
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_2">双</a>
+                            ') ?>
                         </div>
-                        <div class="col-lg-3 col-xs-3">
-                            <?= $form->field($model, 'p4')->textInput()->label('第4位') ?>
+                        <div class="col-lg-3 col-xs-6">
+                            <?= $form->field($model, 'p4')->textInput()->label('个
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_1">大</a>
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_2">小</a>
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_1">单</a>
+                                <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_2">双</a>
+                            ') ?>
                         </div>
                     </div>
 
@@ -447,6 +467,22 @@ $(function () {
         });
     });
 
+    // 大
+    $('.code_type_dx_1').click(function () {
+        $(this).parent().next().val('56789');
+    });
+    // 双
+    $('.code_type_dx_2').click(function () {
+        $(this).parent().next().val('01234');
+    });
+    // 单
+    $('.code_type_ds_1').click(function () {
+        $(this).parent().next().val('13579');
+    });
+    // 双
+    $('.code_type_ds_2').click(function () {
+        $(this).parent().next().val('02468');
+    });
 
 });
 </script>

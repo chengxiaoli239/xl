@@ -2799,7 +2799,7 @@ $sql .= '
                 foreach ($datas as $data){
                     $tmpYls = explode('-', $data->yl_records);
                     //if(($tmpYls[0] + $tmpYls[2]>2500) OR ($tmpYls[0]>1000 && $tmpYls[2]>1000)){ # 四现带双
-                    if(($tmpYls[0] + $tmpYls[2]>2500) OR ($tmpYls[0]>1000 && $tmpYls[2]>1000)){ # 四现不带双
+                    if(($tmpYls[0] + $tmpYls[2]>3500) OR ($tmpYls[0]>1700 && $tmpYls[2]>1700)){ # 四现不带双
                         $numDatas[] = ['val'=>$data->val, 'yl_records'=>$data->yl_records];
                     }
                 }
