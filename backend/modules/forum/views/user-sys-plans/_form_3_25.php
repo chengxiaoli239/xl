@@ -469,19 +469,23 @@ $(function () {
 
     // 大
     $('.code_type_dx_1').click(function () {
-        $(this).parent().next().val('56789');
+        obj = $(this).parent().next();
+        obj.val() == '' ? obj.val('56789') : obj.val('');
     });
     // 双
     $('.code_type_dx_2').click(function () {
-        $(this).parent().next().val('01234');
+        obj = $(this).parent().next();
+        obj.val() == '' ? obj.val('01234') : obj.val('');
     });
     // 单
     $('.code_type_ds_1').click(function () {
-        $(this).parent().next().val('13579');
+        obj = $(this).parent().next();
+        obj.val() == '' ? obj.val('13579') : obj.val('');
     });
     // 双
     $('.code_type_ds_2').click(function () {
-        $(this).parent().next().val('02468');
+        obj = $(this).parent().next();
+        obj.val() == '' ? obj.val('02468') : obj.val('');
     });
 
 });
