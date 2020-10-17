@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'codes_4nums_hz', 'label'=> '和值', //'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                $url = '/forum/ssc-static-yl/index?SscStaticYl[codes_4nums_hz]='.$model->codes_4nums_hz.'&SscStaticYl[lottery_type]='.$model->lottery_type;
+                                $url = '/forum/ssc-kj-data/index?SscKjData[codes_4nums_hz]='.$model->codes_4nums_hz.'&SscKjData[lottery_type]='.$model->lottery_type;
                                 return Html::a($model->codes_4nums_hz, $url, ['title' => $model->codes_4nums_hz]);
                             }
                         ],
@@ -65,9 +65,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'code4',
                         //'code5',
                         'type_2',
-                        ['attribute' => 'type_22', 'label'=> '双双','value' =>function($model){//'headerOptions'=>['width'=>'5%'],
-                            return $model->type_22;
-                        }],
+                        ['attribute' => 'codes_4nums_hz', 'label'=> '双双', //'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $url = '/forum/ssc-kj-data/index?SscKjData[type_22]='.$model->type_22.'&SscKjData[lottery_type]='.$model->lottery_type;
+                                return Html::a($model->type_22, $url, ['title' => $model->type_22]);
+                            }
+                        ],
                         'type_3',
                         //'type_4',
                         'type_2b',
