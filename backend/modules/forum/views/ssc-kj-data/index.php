@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value' => function($model) {
                                 $url = '/forum/ssc-static-yl/index?SscStaticYl[codes_4nums_hz]='.$model->codes_4nums_hz.'&SscStaticYl[lottery_type]='.$model->lottery_type;
-                                return Html::a($model->code_4n, $url, ['title' => $model->code_4n]);
+                                return Html::a($model->codes_4nums_hz, $url, ['title' => $model->codes_4nums_hz]);
                             }
                         ],
                         'code_3n',
@@ -65,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'code4',
                         //'code5',
                         'type_2',
-                        ['attribute' => 'type_22', 'label'=> '双双','value' =>function(){//'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'type_22', 'label'=> '双双','value' =>function($model){//'headerOptions'=>['width'=>'5%'],
                             return $model->type_22;
                         }],
                         'type_3',
