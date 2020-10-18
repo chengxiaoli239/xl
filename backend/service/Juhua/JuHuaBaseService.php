@@ -1775,7 +1775,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             # 真实投注
             $start_time = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers);
-            p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
+            //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
             $rst[$key] = $tmpRst;
             //$rst = json_encode($rst);
             $end_time = microtime(true);

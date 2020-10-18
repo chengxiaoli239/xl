@@ -5,33 +5,37 @@
 
 一、 四定下注
 1、Genenral
-Request URL: http://f5.faa2020.com/sellnumbers
+Request URL: http://f3.eeaa123789.com/sellnumbers
 Request Method: POST
 Status Code: 200 OK
-Remote Address: 104.26.15.84:80
+Remote Address: 104.26.11.44:80
+Referrer Policy: no-referrer-when-downgrade
+
 2、Requerst Header
 Accept: application/json, text/javascript, */*; q=0.01
 Accept-Encoding: gzip, deflate
 Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
 Connection: keep-alive
-Content-Length: 232
+Content-Length: 214
 Content-Type: application/x-www-form-urlencoded; charset=UTF-8
-Cookie: __cfduid=d582bae660d8c42d134f11e9a6926019d1584195092; sel_appid=f2; AC=; LC=f3%7Cf4%7Cf5%7Cf2%7Cf1; MCLIST=f1-efcd34c55f9f62ff50e8705e459b6fce%7Cf2-64eed9189ac1ec3adbaa16cdaa018bd9%7Cf5-54a5d3297f3741d393787ff7ce0633ea%7Cf4-ba43009b9e1a3c3496a775e173f2c8d0%7Cf3-b1286341f02778f752d0224f3c5aa436; MC=2f6bfce6abfa67ded70c59880dcf2862; AC=MC%3A2f6bfce6abfa67ded70c59880dcf2862; sel_lotdefid=3
-Host: f5.faa2020.com
-Origin: http://f5.faa2020.com
-Referer: http://f5.faa2020.com/order_print?tid=1585752379
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36
+Cookie: __cfduid=d15af3e060312ef9820a04d9b033fdf901601979639; MC=b7a9ecb021bcf5cdf184f76becf54056; MCLIST=f3-b7a9ecb021bcf5cdf184f76becf54056%7Cf8-2e06cc877dcf16f10c3f04801586278b; LC=f8%7Cf3; sel_lotdefid=2
+Host: f3.eeaa123789.com
+Origin: http://f3.eeaa123789.com
+Referer: http://f3.eeaa123789.com/order_print?tid=1603011893853&randtid=2864597
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36
 X-Requested-With: XMLHttpRequest
+
 3、Form Data
-si: {"OOOO":"1342M0.1N1352M0.1N2342M0.1N2352M0.1"}
-sn: 2020040139
-uc: 99.6
+si: {"OOOO":"1234M0.1N1434M0.1"}
+sn: 20201018039
+uc: 48.5
 ot: 3
-log: 3M1N1N0N12N3N54N2M3N1N0N0N0N0N0NN0N0N0N0NN0N0N0N0NN0N0N0N0NM99N4N0.1
-nomd5: 83744ee2497bbf32447c1321a8af2b50
-commited_suffix: 1585752480463
+log: 3M1N1N0N1N24N3N4M3N1N0N0N0N0N0NN0N0N0N0NN0N0N0N0NN0N0N0N0NM99N2N0.1
+nomd5: 450603b3e653886d8ec31d48ed67a657
+commited_suffix: 1603012049256
+
 4、返回：
-{"status":200,"sn":"2020040139","n":1585752483,"suc":{"300001366":[{"l":11,"n":"1342","m":0.1,"o":9990,"iol":0},{"l":11,"n":"1352","m":0.1,"o":9990,"iol":0},{"l":11,"n":"2342","m":0.1,"o":9990,"iol":0},{"l":11,"n":"2352","m":0.1,"o":9990,"iol":0}]},"order_lotdefid":3,"dy":5}
+{"status":200,"sn":"20201018039","n":1603012050,"suc_shortcut":0,"suc_m":0.2,"suc_cnt":2,"suc":{"200001897":[{"l":11,"n":"1234","m":"0.1","o":9850,"iol":1},{"l":11,"n":"1434","m":"0.1","o":9850,"iol":1}]},"order_lotdefid":2,"dy":5}
 
 二、撤单：
 1、Genenral
