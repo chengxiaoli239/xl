@@ -846,7 +846,7 @@ class StaticService extends BaseService {
      */
     public static function staticHzPerDateProfits($date = '2018-08-05', $lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $mkey = 'DATE_STATIC_HZ_DATA_'.$lottery_type.'_'.$date;
+        $mkey = 'DATE_STATIC_HZ_DATA_0_'.$lottery_type.'_'.$date;
         $typeArr = self::$typeHzArr;
 
         if($allStatic = $m->get($mkey)) return $allStatic;
