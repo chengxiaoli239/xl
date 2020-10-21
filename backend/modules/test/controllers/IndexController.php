@@ -192,6 +192,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 6); p($rst);
+        $rst = TzService::opSystemBetPlans(5);p($rst);// 定制化投注计划
+
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $rst = StaticService::static4dYlCode();return $rst;
         $balance = JuHuaBaseService::getBalance($uid = 18,$tz_system_id = 11);p($balance);
@@ -365,7 +368,6 @@ class IndexController extends Controller
         }
         p(trim($codes, '@'));
         $rst = KjDataGet::getBeforeQihaoByQihao('20191112001',8);p($rst);
-        $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 5); p($rst);
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);p($rst);
         p(3%5);
         $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5);p($rst); # 70s
@@ -429,7 +431,6 @@ class IndexController extends Controller
         $rst['staticHzMonthsProfits'] = StaticService::staticHzMonthsProfits($lottery_type=6); p($rst);# 每月四定和值利润统计
         $rst = StaticService::static4dMonthsProfits($lottery_type = 6);p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
         $rst = StaticService::allHzStaticProfitsPerdate($lottery_type = 6);p($rst);# 循环计算每天每个和值利润统计
-        $rst = TzService::opSystemBetPlans(6);p($rst);// 定制化投注计划
         $rst = KjDataGet::getBeforeQihaoByQihao('2019052501',6);p($rst);
         $rst = StaticService::staticAll2NumsYl();p($rst ); # 统计所有二字现遗漏
         $qihao = HN0898Service::getCurrentQihao($lottery_type = 6);p($qihao);

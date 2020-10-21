@@ -874,7 +874,8 @@ class StaticService extends BaseService {
             ];
         }
         //p($allStatic);
-        if($date != date('Y-m-d')){
+        $now_time = date('H:i');
+        if($date != date('Y-m-d') && $now_time>'03:30'){
             $m->set($mkey, $allStatic, 6*30*24*60*60);
         }
 
@@ -1353,7 +1354,7 @@ class StaticService extends BaseService {
             }
 
             $date = date('Y-m-d', $time);
-            $date = min([date('Y-m-d'), $date]);
+            $date = min(date('Y-m-d'), $date);
             if($date>date('Y-m-d')) break;
             $now_time = date('H:i');
             if($lottery_type == 6 && $now_time > '00:00' && $now_time < '02:10'){

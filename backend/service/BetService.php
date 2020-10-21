@@ -251,10 +251,15 @@ abstract class BetService extends BaseBetService {
             }
         }elseif($lottery_type == 7){
             # 北京快乐8
+            if('00:00:00'<$time && $time<'09:00:00'){
+                $status = false;
+            }
+            /*
             $tz_systems_users_id = SystemConfig::findOne(['key'=>'kuaile8_get_kj_user_id'])->value;
             $TzSystemsUsers = TzSystemsUsers::findOne($tz_systems_users_id);
             $qihaoInfo = KuaiLe8Service::getPreTz($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $lottery_type);
             if($qihaoInfo['status'] != 200) $status = false;
+            */
         }elseif($lottery_type == 6){ # 新疆
             if(\Yii::$app->params['LOTTERY_TYPE_6_STOP_START_TIME'] < $time && $time < \Yii::$app->params['LOTTERY_TYPE_6_STOP_END_TIME']){
                 $status = false;
