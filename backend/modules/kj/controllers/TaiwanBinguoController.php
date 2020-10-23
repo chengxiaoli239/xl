@@ -18,7 +18,7 @@ class TaiwanBinguoController extends Controller
      */
     public function actionKai800($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = XjSsc::getLotteryNoSevenDay($type);
+        $data = CqsscKcw::getLotteryTaiwanBinguo($type);
         return $data;
     }
 
