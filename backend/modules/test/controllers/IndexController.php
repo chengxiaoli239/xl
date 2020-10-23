@@ -192,6 +192,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = CqsscKcw::getLotteryTaiwanBinguo();p($data);
+        $data = CqsscKcw::getLotteryKuaiLe8Eight();p($data);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 6); p($rst);
         $rst = TzService::opSystemBetPlans(5);p($rst);// 定制化投注计划
 
@@ -199,7 +201,6 @@ class IndexController extends Controller
         $rst = StaticService::static4dYlCode();return $rst;
         $balance = JuHuaBaseService::getBalance($uid = 18,$tz_system_id = 11);p($balance);
         $data = CqsscKcw::getLotteryKuaiLe8NineNine();p($data);
-        $data = CqsscKcw::getLotteryKuaiLe8Eight();p($data);
         $str = '__cfduid=d15af3e060312ef9820a04d9b033fdf901601979639; MC=c7b87edc5f6ad9803b363967dba8f83f; MCLIST=f4-c7b87edc5f6ad9803b363967dba8f83f%7Cf5-1001c9d2b2ca3fe6486276f3084f2536%7Cf2-505955572a46981f3a34eb2b10f8d9d9%7Cf1-dd065cafe26982584e35b83652a7b855%7Cf3-6e8a6c621ac150f3146ea1b415f5c079; LC=f3%7Cf1%7Cf2%7Cf5%7Cf4; sel_lotdefid=8';
         preg_match('/sel_lotdefid\=[1-9]/i', $str, $mathes);
         p($mathes);
