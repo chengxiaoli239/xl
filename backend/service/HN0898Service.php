@@ -1200,6 +1200,9 @@ class HN0898Service extends BaseTZService {
 
                 $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 break;
+            case 9: # 台湾宾果
+                $qihao = 109060291 + self::getTwDefferentDays() * 204 + self::getDifferentNums($lottery_type = 9); # 109060291为2020-10-23最后一期期号
+                break;
         }
 
         return $qihao;
@@ -1258,12 +1261,31 @@ class HN0898Service extends BaseTZService {
                     $actionNo = $rst['actionNo'];
                     $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 }
-
+                break;
+            case 9: # 台湾宾果
+                $qihao = 109060291 + self::getTwDefferentDays() * 204 + self::getDifferentNums($lottery_type = 9) - 1; # 967767为2019-08-10最后一期期号
                 break;
         }
 
 
         return $qihao;
+    }
+
+    /**
+     * @desc 获取台湾宾果天数差
+     * @param string $end_date
+     * @return float|int
+     */
+    public static function getTwDefferentDays($end_date = ''){
+        $start_date = '2020-10-23';
+        if(!$end_date) $end_date = date('Y-m-d');
+
+        $start = strtotime($start_date);
+        $end = strtotime($end_date);
+
+        $nums = ( $end - $start ) / (24 * 3600);
+
+        return $nums - 1;
     }
 
     /**
@@ -1287,13 +1309,21 @@ class HN0898Service extends BaseTZService {
      * @desc 北京快乐8 计算当前要开奖期号序号
      * @return float
      */
-    public static function getDifferentNums(){
+    public static function getDifferentNums($lottery_type = DEFAULT_LOTTERY_TYPE){
         $time = time();
         $date_time = date('H:i');
-        $start_time = strtotime(date('Y-m-d').' 09:05');
-        if('00:00'<$date_time && $date_time<'09:05') $time = $start_time;
-        //p([$time, $start_time]);
-        $nums = floor(($time - $start_time)/(5*60));
+        //$date_time = '07:09';
+        if($lottery_type == 9){
+            $start_time = strtotime(date('Y-m-d').' 07:05');
+            if('00:00'<$date_time && $date_time<'07:05') $time = $start_time;
+            $nums = floor(($time - $start_time)/(5*60));
+
+        }else{
+            $start_time = strtotime(date('Y-m-d').' 09:05');
+            if('00:00'<$date_time && $date_time<'09:05') $time = $start_time;
+            //p([$time, $start_time]);
+            $nums = floor(($time - $start_time)/(5*60));
+        }
 
         return $nums + 1;
     }

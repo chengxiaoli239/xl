@@ -192,6 +192,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $qihao = HN0898Service::getQihao($lottery_type = 9);p($qihao);
+        $qihao = HN0898Service::getCurrentQihao($lottery_type = 9);p($qihao);
+        $rst = KjDataGet::insertKjData('109060291', 9, '9,6,0,1,0');p($rst);
         $data = CqsscKcw::getLotteryTaiwanBinguo();p($data);
         $data = CqsscKcw::getLotteryKuaiLe8Eight();p($data);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 6); p($rst);
@@ -214,7 +217,6 @@ class IndexController extends Controller
         $rst = NineNineNewService::getDifferentNums();p($rst);
         $rst = StaticService::static2NumsYl($lottery_type = 5);p($rst);
         $rst = SscDataService::update3NumYL($lottery_type = 6);p($rst);
-        $rst = KjDataGet::insertKjData('2020073043', 8, '9,3,7,4,0');p($rst);
         $rst = KjDataGet::updateNullCode($num = 1000, $lottery_type = 5);p($rst);
         $rst = StaticService::queryCodeTypeStatic($post);p($rst);
         $dates = [ ];
@@ -434,7 +436,6 @@ class IndexController extends Controller
         $rst = StaticService::allHzStaticProfitsPerdate($lottery_type = 6);p($rst);# 循环计算每天每个和值利润统计
         $rst = KjDataGet::getBeforeQihaoByQihao('2019052501',6);p($rst);
         $rst = StaticService::staticAll2NumsYl();p($rst ); # 统计所有二字现遗漏
-        $qihao = HN0898Service::getCurrentQihao($lottery_type = 6);p($qihao);
         //$rst = KjDataGet::insertKjData('', $kjConfig->lottery_type, $dataInfo['opencode']);
         $rst = BetService::bet(); p($rst);// 用户新计划投注，可正买可反买
         $data = XjSsc::batchSevenDay();p($data);
