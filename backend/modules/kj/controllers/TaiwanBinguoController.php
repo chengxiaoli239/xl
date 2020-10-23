@@ -16,7 +16,7 @@ class TaiwanBinguoController extends Controller
      * @desc 开800 - 台湾宾果
      * @return json|xml
      */
-    public function actionSevenDay($type = 'json'){
+    public function actionKai800($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $data = XjSsc::getLotteryNoSevenDay($type);
         return $data;
