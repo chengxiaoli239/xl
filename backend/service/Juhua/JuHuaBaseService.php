@@ -1602,10 +1602,11 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$plan->tz_sites]);
         $url = $TzSystemsUsers->ssc_domain.'/sellnumbers';//.'?'.http_build_query($post_data);
-        $snInfo_sn = '';
-        $snInfo_snids = '';
+        $snInfo_snids = [];
         $rst = [];
+        //p($codesArrs);
         foreach ($codesArrs as $key=>$tmpcodesArr){
+            $md5 = JuHuaBaseService::getCodesMd5($tmpcodesArr);
             //$bet_codes = json_encode(['OOOO'=>implode('M'.$single.'N', $tmpcodesArr).'M'.$single]);
             $bet_codes = json_encode(self::getBetCodes($tmpcodesArr, $single, $playway));
             $post_data = [
@@ -1614,14 +1615,15 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 'uc'=>floatval($TzSystemsUsers->balance),
                 'ot'=>3,
                 'log'=>'3M1N1N0N1N2N3N4M3N1N0N0N0N0N0NN0N0N0N0NN0N0N0N0NN0N0N0N0NM99N1N'.$single,
-                'nomd5'=>'11694ec2ae01ec1a6fbe54888e3d1ac8',
+                //'nomd5'=>'11694ec2ae01ec1a6fbe54888e3d1ac8',
+                'nomd5'=>$md5,
                 'commited_suffix'=>(int)(microtime(true)*1000),
             ];
 
             $_t = round(microtime(true) * 1000);
             $headers = [
                 'Accept: application/json, text/javascript, */*; q=0.01',
-                'Accept-Encoding: gzip, deflate',
+                'Accept-Encoding: gunzip, deflate',
                 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
                 'Connection: keep-alive',
                 'Content-Length:'.strlen(http_build_query($post_data)),
@@ -1645,7 +1647,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);
             //}
-            p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
+            //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
             # 真实投注
             $start_time = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers);
@@ -1701,7 +1703,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             'playway'=> $playway,  // 投注方式
             'tz_type'=> $tz_type,  // 投注类型
             'buy_type'=> 1,  // 购买方向类型
-            'uid'=> self::$user_id,  // 投注账号id
+            'uid'=> $plan->uid,  // 投注账号id
             'lottery_type' => $lottery_type, # 彩种
             'account' => $plan->account,
             'plan_id' => $plan_id, # 计划id
@@ -1720,9 +1722,22 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>self::$headers, 'bigFlag'=>1, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBatchBet','INFO','7时重庆批量插入记录-真实投注', $logArr);
 
         return $data;
+    }
+
+    /**
+     * @desc 获取号码 md5 参数值
+     * @param $codeArrs
+     * @return string
+     */
+    public static function getCodesMd5($codeArrs){
+        $str = implode('|', $codeArrs);
+
+        $md5 = md5($str);
+
+        return $md5;
     }
 
     /**

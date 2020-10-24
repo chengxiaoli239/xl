@@ -254,6 +254,7 @@ class IndexController extends Controller
             foreach ($TzSystemsUsers as $tzSystemsUser){
 
                 if($tzSystemsUser->tz_system_id == 11){
+                    if($lottery_type != 9) continue;
                     $flag1 = JuHuaBaseService::getHomePage($tzSystemsUser->uid, $tzSystemsUser->tz_system_id, $lottery_type);
                     $flag2 = JuHuaBaseService::selectLottery($tzSystemsUser->uid, $tzSystemsUser->tz_system_id, $lottery_type);
                 }
