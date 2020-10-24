@@ -1738,7 +1738,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $mkey = 'selectLottery_0_'.$uid.'_'.$tz_system_id;
 
         $timeid = (int)(microtime(true) * 1000);
-        if(!$flag = $m->get($mkey)){
+        if(true OR !$flag = $m->get($mkey)){
             $cur_lotid = self::$lotdefids[$lottery_type];
             $url = $TzSystemsUsers->ssc_domain.'/getzhiboserno?cur_lotid='.$cur_lotid.'&timeid='.$timeid;
             $headers = [
@@ -1788,6 +1788,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         $rst = CurlService::getCurl($url, $headers);
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'lottery_type'=>$lottery_type, 'url'=>$url, 'headers'=>$headers, 'rst'=>$rst];
+        Tool_Common::log('getHomePage', 'INFO', '访问首页', $logArr);
 
         return $rst;
     }

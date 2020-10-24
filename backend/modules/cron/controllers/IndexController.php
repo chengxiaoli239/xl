@@ -254,12 +254,13 @@ class IndexController extends Controller
             foreach ($TzSystemsUsers as $tzSystemsUser){
 
                 if($tzSystemsUser->tz_system_id == 11){
-                    $flag = JuHuaBaseService::getHomePage($tzSystemsUser->uid, $tzSystemsUser->tz_system_id , $lottery_type);
+                    //$flag1 = JuHuaBaseService::getHomePage($tzSystemsUser->uid, $tzSystemsUser->tz_system_id, $lottery_type);
+                    $flag2 = JuHuaBaseService::selectLottery($tzSystemsUser->uid, $tzSystemsUser->tz_system_id, $lottery_type);
                 }
             }
         }
 
-        return $flag;
+        return ['flag1'=>$flag1, 'flag2'=>$flag2];
     }
 
     /**
