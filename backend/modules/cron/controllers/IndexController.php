@@ -15,6 +15,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\User;
 use backend\service\BaseService;
 use backend\service\huiyuan\HuiYuanBaseService;
+use backend\service\Juhua\JuHuaBaseService;
 use backend\service\KuaiLe8Service;
 use backend\service\Lucky5\LuckyBaseService;
 use backend\service\McKeyService;
@@ -238,6 +239,27 @@ class IndexController extends Controller
         }
 
         return $rst;
+    }
+
+    /**
+     * @desc 访问首页
+     * @return mixed
+     */
+    public function actionVisitHomePage(){
+        self::_init();
+        $lottery_types = StaticService::getLotteryTypes();
+        $TzSystemsUsers = TzSystemsUsers::findAll(['status'=>1]);
+
+        foreach ($lottery_types as $lottery_type){
+            foreach ($TzSystemsUsers as $tzSystemsUser){
+
+                if($tzSystemsUser->tz_system_id == 11){
+                    $flag = JuHuaBaseService::getHomePage($tzSystemsUser->uid, $tzSystemsUser->tz_system_id , $lottery_type);
+                }
+            }
+        }
+
+        return $flag;
     }
 
     /**

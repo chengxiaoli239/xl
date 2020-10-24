@@ -192,6 +192,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = JuHuaBaseService::getHomePage($tz_sites = 18, $uid = 11, $lottery_type = 9);p($rst);
+        $rst = JuHuaBaseService::selectLottery($tz_sites = 18, $uid = 11, $lottery_type = 9);p($rst);
         $qihao = HN0898Service::getQihao($lottery_type = 9);p($qihao);
         $qihao = HN0898Service::getCurrentQihao($lottery_type = 9);p($qihao);
         $rst = KjDataGet::insertKjData('109060291', 9, '9,6,0,1,0');p($rst);

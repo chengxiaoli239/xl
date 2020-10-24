@@ -72,9 +72,9 @@ abstract class BetService extends BaseBetService {
                 $BetService = new XlService($uid, $tz_system_id);
             }
         }elseif(in_array($tz_system_id, [11])){
-            if($lottery_type == 5){
+            if($lottery_type == 5){ # 重庆
                 $BetService = new JuHuaBaseService($uid, $tz_system_id);
-            }elseif($lottery_type == 7){
+            }else{ # 北京快乐、台湾宾果
                 $BetService = new JuHuaBaseService($uid, $tz_system_id);
             }
         }elseif(in_array($tz_system_id, [6])){

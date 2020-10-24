@@ -32,6 +32,8 @@ use  yii;
 class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
     public static $baseUrl =  '';
     public static $domain =  '';
+    public static $host =  '';
+    public static $referer =  '';
     public static $cookie = '';
     public static $tzSiteInfo = [];
     public static $tz_system_id = ''; # 投注系统id
@@ -39,6 +41,11 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
     public static $username = '';
     public static $user_id;
     public static $account = '';
+    public static $lotdefids = [
+        5 => 2, # 重庆
+        7 => 1, # 北京赛车
+        9 => 4, # 台湾宾果
+    ];
 
     public static $headers = [];
 
@@ -57,20 +64,24 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
     private static function __init($uid = 1, $tz_system_id = 2){
         $User = User::findOne($uid);
         self::$user_id = $uid;
+        self::$tzSiteInfo = self::getTzSiteInfo($tz_system_id);
+        //p(self::$tzSiteInfo);
+        self::$domain = self::$tzSiteInfo['domain'];
+        self::$baseUrl = self::$tzSiteInfo['baseUrl'];
+
         self::$account = $User->account;
         self::$tz_system_id = $tz_system_id;
+        self::$host = str_replace('www.','',self::$domain);
+        self::$referer = str_replace('www.','',self::$baseUrl).'/';
         self::$username = $User->username;
-        self::$tzSiteInfo = self::getTzSiteInfo($tz_system_id);
         self::$user_agent = 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.'.$uid;
         //self::unitHeaders('Cookie'); # 去除重复的headers，主要是Cookie
 
-        self::$baseUrl = self::$tzSiteInfo['baseUrl'];
-        self::$domain = self::$tzSiteInfo['domain'];
         $headers = [
             "Token: ".trim(self::$cookie),
             "Origin: ".str_replace('www.','',self::$baseUrl),
-            //"Host:".str_replace('www.','',self::$domain),
-            "Referer: ".str_replace('www.','',self::$baseUrl).'/',
+            "Host:".self::$host,
+            "Referer: ".self::$referer
         ];
         self::$headers = array_unique(array_merge(self::$headers,$headers));
     }
@@ -288,6 +299,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $rstData = [
             7 => 18, # 北京快乐8
             5 => 2, # 重庆时时彩
+            9 => 4, # 台湾宾果
         ];
 
         if(!empty($lottery_type) && isset($rstData[$lottery_type])) return $rstData[$lottery_type];
@@ -305,6 +317,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $rstData = [
             7 => 18, # 北京快乐8
             5 => 2, # 重庆时时彩
+            9 => 4, # 台湾宾果
         ];
 
         if(!empty($lottery_type) && isset($rstData[$lottery_type])) return $rstData[$lottery_type];
@@ -1583,10 +1596,12 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         //p(['playway'=>$playway, 'totalCount'=>count($codes), 'single'=>$single, 'qihao'=>$qihao, 'tz_type'=>$tz_type, 'buy_type'=>$buy_type,'codes'=>$codes]);
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
 
+        JuHuaBaseService::selectLottery($plan->tz_sites, $plan->uid, $lottery_type);
+
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
 
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
-        $url = self::getTzSiteInfo(self::$tz_system_id, 'SSC_INDEX').'/sellnumbers';//.'?'.http_build_query($post_data);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$plan->tz_sites]);
+        $url = $TzSystemsUsers->ssc_domain.'/sellnumbers';//.'?'.http_build_query($post_data);
         $snInfo_sn = '';
         $snInfo_snids = '';
         $rst = [];
@@ -1622,7 +1637,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
             # 缓存锁
             $m = \Yii::$app->cache;
-            $betKey = BetService::buildBetKey($plan->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id).'_'.$key; # 分配下注后面加key
+            $betKey = BetService::buildBetKey($plan->account, $plan->tz_sites, $lottery_type, $qihao, $plan_id).'_'.$key; # 分配下注后面加key
             //if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
             //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
@@ -1630,6 +1645,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);
             //}
+            p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
             # 真实投注
             $start_time = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers);
@@ -1691,7 +1707,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             'plan_id' => $plan_id, # 计划id
             'codes' => (string)$codes,  // 投注号码
             'qihao' => $qihao,  // 投注期号
-            'tz_system_id' => self::$tz_system_id,  // 投注系统tz_systems_id
+            'tz_system_id' => $plan->tz_sites,  // 投注系统tz_systems_id
             'sn'=> trim($snInfo_sn, ';'),
             'snid'=> $snInfo_snid,
             'order_type'=>3, # 单双三字定
@@ -1707,6 +1723,73 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
 
         return $data;
+    }
+
+    /**
+     * @desc 选择彩种
+     * @param $uid
+     * @param $tz_system_id
+     * @param int $lottery_type
+     */
+    public static function selectLottery($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        self::__init($uid, $tz_system_id);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $m = \Yii::$app->cache;
+        $mkey = 'selectLottery_0_'.$uid.'_'.$tz_system_id;
+
+        $timeid = (int)(microtime(true) * 1000);
+        if(!$flag = $m->get($mkey)){
+            $cur_lotid = self::$lotdefids[$lottery_type];
+            $url = $TzSystemsUsers->ssc_domain.'/getzhiboserno?cur_lotid='.$cur_lotid.'&timeid='.$timeid;
+            $headers = [
+                "Accept: application/json, text/javascript, */*; q=0.01",
+                "Accept-Encoding: gzip, deflate",
+                "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+                "Connection: keep-alive",
+                "Host: ".self::$host,
+                'Cookie: '.self::changeCookie($TzSystemsUsers->cookie, $lottery_type),
+                "Referer: ".self::$referer."mem",
+                $TzSystemsUsers->user_agent,
+                "X-Requested-With: XMLHttpRequest",
+            ];
+
+            $rst = CurlService::getCurl($url, $headers);
+            $m->set($mkey, 1, 60);
+        }
+        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'lottery_type'=>$lottery_type, 'url'=>$url, 'headers'=>$headers, 'rst'=>$rst];
+        Tool_Common::log('selectLottery', 'INFO', '选择彩种', $logArr);
+
+        return $rst;
+    }
+
+    /**
+     * @desc 访问首页
+     * @param $uid
+     * @param $tz_system_id
+     * @param int $lottery_type
+     * @return array|bool|mixed|string
+     */
+    public static function getHomePage($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        self::__init($uid, $tz_system_id);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+
+        $url = $TzSystemsUsers->ssc_domain.'/mem';
+        $headers = [
+            "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            "Accept-Encoding: gunzip, deflate",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Cache-Control: max-age=0",
+            "Connection: keep-alive",
+            'Cookie: '.self::changeCookie($TzSystemsUsers->cookie, $lottery_type),
+            "Host: ".self::$host,
+            "Upgrade-Insecure-Requests: 1",
+            $TzSystemsUsers->user_agent,
+        ];
+
+        $rst = CurlService::getCurl($url, $headers);
+        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'lottery_type'=>$lottery_type, 'url'=>$url, 'headers'=>$headers, 'rst'=>$rst];
+
+        return $rst;
     }
 
     /**
@@ -1740,14 +1823,10 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @return string
      */
     public static function changeCookie($cookie_str = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
-        $sel_lotdefids = [
-            5 => 2, # 重庆
-            7 => 1, # 北京赛车
-            99 => 4, # 台湾宾果
-        ];
+
         preg_match('/sel_lotdefid\=[1-9]/i', $cookie_str, $mathes);
         if(!empty($mathes[0])){
-            $cookie_str = str_replace($mathes[0], 'sel_lotdefid='.$sel_lotdefids[$lottery_type], $cookie_str);
+            $cookie_str = str_replace($mathes[0], 'sel_lotdefid='.self::$lotdefids[$lottery_type], $cookie_str);
         }
 
         return $cookie_str;
