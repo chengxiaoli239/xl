@@ -1743,7 +1743,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $url = $TzSystemsUsers->ssc_domain.'/getzhiboserno?cur_lotid='.$cur_lotid.'&timeid='.$timeid;
             $headers = [
                 "Accept: application/json, text/javascript, */*; q=0.01",
-                "Accept-Encoding: gzip, deflate",
+                "Accept-Encoding: gunzip, deflate",
                 "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
                 "Connection: keep-alive",
                 "Host: ".self::$host,
