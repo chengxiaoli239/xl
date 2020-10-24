@@ -43,6 +43,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
     public static $account = '';
     public static $lotdefids = [
         5 => 2, # 重庆
+        6 => 3, # 新疆时时彩
         7 => 1, # 北京赛车
         9 => 4, # 台湾宾果
     ];
