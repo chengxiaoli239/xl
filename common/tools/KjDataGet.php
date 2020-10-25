@@ -97,10 +97,10 @@ class KjDataGet
      * @description 时时彩逐期抓取(以此方法为主抓取时时彩数据)
      * @return array
      */
-    public static function grabOne(){
+    public static function grabOne($lottery_types = []){
         $msg = ['status'=>200, 'msg'=>'操作成功~'];
 
-        $lottery_types = StaticService::getLotteryTypes();
+        if(empty($lottery_types)) $lottery_types = StaticService::getLotteryTypes();
         $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
             $status = self::isCanGrab($lottery_type);
