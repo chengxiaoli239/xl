@@ -1608,7 +1608,7 @@ class SevenService extends BaseTZService {
         }
         $logArr = ['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rst'=>$data, 'errno'=>$errno, 'rstData'=>$rstData];
         if(strlen($post_data['bet_number'])>1000) $logArr['post_data'] = substr($post_data['bet_number'], 0, 200).'...';
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求-七星', $logArr);
         //p([$data, $rstData, $post_data, $header]);
 
         return $rstData;
