@@ -1606,8 +1606,9 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $snInfo_snids = [];
         $rst = [];
         //p($codesArrs);
+        $suffix = (int)(microtime(true)*1000);
         foreach ($codesArrs as $key=>$tmpcodesArr){
-            $md5 = JuHuaBaseService::getCodesMd5($tmpcodesArr);
+            $md5 = JuHuaBaseService::getCodesMd5($tmpcodesArr, $suffix);
             //$bet_codes = json_encode(['OOOO'=>implode('M'.$single.'N', $tmpcodesArr).'M'.$single]);
             $bet_codes = json_encode(self::getBetCodes($tmpcodesArr, $single, $playway));
             $post_data = [
@@ -1618,7 +1619,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 'log'=>'3M1N1N0N1N2N3N4M3N1N0N0N0N0N0NN0N0N0N0NN0N0N0N0NN0N0N0N0NM99N1N'.$single,
                 //'nomd5'=>'11694ec2ae01ec1a6fbe54888e3d1ac8',
                 'nomd5'=>$md5,
-                'commited_suffix'=>(int)(microtime(true)*1000),
+                'commited_suffix'=>$suffix,
             ];
 
             $_t = round(microtime(true) * 1000);
@@ -1641,7 +1642,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             # 缓存锁
             $m = \Yii::$app->cache;
             $betKey = BetService::buildBetKey($plan->account, $plan->tz_sites, $lottery_type, $qihao, $plan_id).'_'.$key; # 分配下注后面加key
-            //if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
+            if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
             //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
             # 和值投注反应时间比较久，无需返回直接锁住
@@ -1733,10 +1734,10 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @param $codeArrs
      * @return string
      */
-    public static function getCodesMd5($codeArrs){
+    public static function getCodesMd5($codeArrs, $suffix = ''){
         $str = implode('|', $codeArrs);
 
-        $md5 = md5($str);
+        $md5 = md5($str.'|'.$suffix);
 
         return $md5;
     }
