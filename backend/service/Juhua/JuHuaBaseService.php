@@ -1644,6 +1644,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $betKey = BetService::buildBetKey($plan->account, $plan->tz_sites, $lottery_type, $qihao, $plan_id).'_'.$key; # 分配下注后面加key
             if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_key','INFO','菊花网投注key', ['lottery_type'=>$lottery_type, 'account'=>$plan->account, 'uid'=>$plan->uid, 'betKey'=>$betKey, 'betLock'=>$betLock]);
             //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
             # 和值投注反应时间比较久，无需返回直接锁住
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
