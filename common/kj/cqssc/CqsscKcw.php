@@ -18,6 +18,7 @@ class CqsscKcw extends BaseKj {
         6 => 2, # 6:3分
         7 => 3, # 7:5分
         8 => 4, # 8:10分
+        9 => 3, # 9:5分  台湾宾果
     ];
     public static $lotteryNameArr = [
         1 => '希腊1.5分', # 5:1.5分
