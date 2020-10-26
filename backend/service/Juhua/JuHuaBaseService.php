@@ -1558,7 +1558,9 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @return array
      */
     public function bet($qihao, $plan_id, $codes){
-        return $this->postBatchBet($qihao, $plan_id, $codes);
+        $rst = $this->postBatchBet($qihao, $plan_id, $codes);
+        Tool_Common::log('bet_rst', 'INFO', '下注返回值', ['qihao'=>$qihao, 'plan_id'=>$plan_id, 'codes'=>$codes]);
+        return $rst;
     }
 
     /**

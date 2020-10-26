@@ -228,7 +228,7 @@ class PingBoBaseService {
 
     /**
      * @decription 同步用户余额 by account
-     * @param $tz_system_user_id 表lt_tz_systems_users.id
+     * @param $tz_system_user_id - 表lt_tz_systems_users.id
      * @return array
      */
     public static function synBalance($tz_system_user_id){
