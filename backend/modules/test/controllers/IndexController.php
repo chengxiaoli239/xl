@@ -192,9 +192,18 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst['kj'] = KjDataGet::grabOne($lottery_types = [9]); p($rst); # 开奖抓取
+        $qihao = HN0898Service::getQihao($lottery_type = 9);p($qihao);
+        $lottery_types = StaticService::getLotteryTypes();
+        $lottery_types = [9];
+        foreach ($lottery_types as $lottery_type) {
+            /* 处理系统投注计划 add 2019-01-21 */
+            $rst[$lottery_type] = KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
+            /* 处理系统投注计划 add 2019-01-21 */
+        }
+        p($rst);
         $rst = JuHuaBaseService::getHomePage($tz_sites = 18, $uid = 11, $lottery_type = 9);p($rst);
         $rst = JuHuaBaseService::selectLottery($tz_sites = 18, $uid = 11, $lottery_type = 9);p($rst);
-        $qihao = HN0898Service::getQihao($lottery_type = 9);p($qihao);
         $qihao = HN0898Service::getCurrentQihao($lottery_type = 9);p($qihao);
         $rst = KjDataGet::insertKjData('109060291', 9, '9,6,0,1,0');p($rst);
         $data = CqsscKcw::getLotteryTaiwanBinguo();p($data);
@@ -402,13 +411,7 @@ class IndexController extends Controller
             $rst['updateDs'] = SscDataService::updateDsData($lottery_type=8); // 每期开奖遗漏 -- 新开
         }
         p($rst);
-        $lottery_types = StaticService::getLotteryTypes();
-        foreach ($lottery_types as $lottery_type) {
-            /* 处理系统投注计划 add 2019-01-21 */
-            $rst[] = KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
-            /* 处理系统投注计划 add 2019-01-21 */
-        }
-        p($rst);
+
         //$str = '{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}'; //p(json_decode($str, true)); d(strpos($str, "\"Status\":1") !== false);
         $rst = SevenService::login(19, 3);p($rst);
         $rst = SevenService::synBalance(5);p($rst);
