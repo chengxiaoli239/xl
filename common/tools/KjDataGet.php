@@ -225,7 +225,7 @@ class KjDataGet
         }elseif ($lottery_type == 6){
             $tmpDate = substr($qihao, 0, 8);
         }else{
-            $tmpDate = substr($qihao, 0, 8);
+            $tmpDate = substr($kjData['opentime'], 0, 10);
             //$tmpDate = date('Y-m-d 00:00:00');
         }
         $codesArr = [$kjDatasArr[0],$kjDatasArr[1],$kjDatasArr[2],$kjDatasArr[3]];
