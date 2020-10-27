@@ -704,30 +704,33 @@ class NineNineNewService extends BaseTZService {
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid,'tz_system_id'=>$tz_system_id]);
         $headers = [
-            'Accept: */*',
-            'Accept-Encoding: gunzip, deflate, br',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Connection: keep-alive',
-            'Content-Type: application/x-www-form-urlencoded',
-            'Content-Length: 11',
-            "Host:".str_replace('www.','',self::$domain),
-            'Origin:'.$TzSystemsUsers->ssc_domain,
-            'Cookie: '.$TzSystemsUsers->cookie,
-            //'Cookie: ASP.NET_SessionId=k2m5jxavmfs3hm55qlllwz45; pageReferrInSession=https%3A//9912304.com/user/reg.aspx; firstEnterUrlInSession=https%3A//9912304.com/ssc/index.aspx; VisitorCapacity=1', # .$TzSystemsUsers->cookie,
-            "Referer:".$TzSystemsUsers->ssc_domain.'/index.aspx',
-            $TzSystemsUsers->user_agent,
-            'X-Requested-With: XMLHttpRequest',
+            "Accept: application/json, text/plain, */*",
+            "Accept-Encoding: gzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            "contentType: application/json",
+            "Cookie: emp-id=eb042ce2-e9ad-4993-a716-b7401fb37c84; guest_id=e3c921df-ec7f-4d64-b042-7f91f130eb4d; statistical-2020-10-28-1=1; x-id=125b3e9e-1229-4b2b-9ab7-7d457e152c91; sid=e79d9d8c-6dca-4dac-ad26-c2297ce8152a",
+            "Host: 99065v.com",
+            "Referer: https://99065v.com/web/",
+            "Sec-Fetch-Dest: empty",
+            "Sec-Fetch-Mode: cors",
+            "Sec-Fetch-Site: same-origin",
+            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+            "userType: 0",
+            "x-csrf-index: 4",
+            "x-csrf-token: 511d3aa6-e3bf-4caa-a5f5-d644f06a3bea",
         ];
         $post_data = ['act'=>'balance'];
         //$headers = array_merge(self::$headers,$headers);
 
         //$url = self::getUserUrlArr(self::$user_id,'GET_BALANCE');
-        $TzSiteInfo = self::getTzSiteInfo($tz_system_id );
+        $TzSiteInfo = self::getTzSiteInfo($tz_system_id);
         $url = $TzSiteInfo['GET_BALANCE'];
+        $url = 'https://99065v.com/cloud-pay-service-server/userwallet/getUserBalanceByUid';
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
         $start_time = microtime(true);
-        $balance = CurlService::postCurl($url,http_build_query($post_data), $headers);#
-        //p([$url,$post_data,$headers, $balance]);
+        $balance = CurlService::getCurl($url, $headers);#
+        p([$url,$post_data,$headers, $balance]);
         $end_time = microtime(true);
         $time_consume = ($end_time-$start_time).'s';
         $TzSiteInfo = self::getTzSiteInfo($tz_system_id);
