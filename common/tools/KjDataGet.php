@@ -139,7 +139,7 @@ class KjDataGet
                                 $qihao = $data['expect'];
                             }
                             # ssc
-                            $msg = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData);
+                            $msg = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData, $kjData['opentime']);
                             //if($kjConfig->lottery_type ==2) p([$qihao, $kjConfig->lottery_type, $kjData, $msg]);
                             $cache_time = 10;
                         }elseif($kjConfig->lottery_type == 99){
@@ -211,9 +211,10 @@ class KjDataGet
      * @param $qihao 181120059
      * @param int $lottery_type 彩票类型1:1.5彩2:3分彩3:5分彩4:10分彩
      * @param $kjDatas
+     * @param string $opentime
      * @return array|bool
      */
-    public static function insertKjData($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE, $kjData){
+    public static function insertKjData($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE, $kjData, $opentime = ''){
         $kjDatas = str_replace(',', '', $kjData);
         if(!$qihao OR !$kjDatas) return false;
         $kjDatasArr = explode(',',$kjData);
@@ -224,9 +225,10 @@ class KjDataGet
             $tmpDate = '20' . substr($qihao, 0, 6) . ' 00:00:00';
         }elseif ($lottery_type == 6){
             $tmpDate = substr($qihao, 0, 8);
+        }elseif (!empty($opentime)){
+            $tmpDate = substr($opentime, 0, 10);
         }else{
-            $tmpDate = substr($kjData['opentime'], 0, 10);
-            //$tmpDate = date('Y-m-d 00:00:00');
+            $tmpDate = date('Y-m-d 00:00:00');
         }
         $codesArr = [$kjDatasArr[0],$kjDatasArr[1],$kjDatasArr[2],$kjDatasArr[3]];
         sort($codesArr);
