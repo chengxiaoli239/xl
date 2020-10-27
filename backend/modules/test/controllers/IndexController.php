@@ -192,8 +192,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst['kj'] = KjDataGet::grabOne($lottery_types = [9]); p($rst); # 开奖抓取
+        $qihao = HN0898Service::getCurrentQihao($lottery_type = 9);p($qihao);
         $qihao = HN0898Service::getQihao($lottery_type = 9);p($qihao);
+        $rst['kj'] = KjDataGet::grabOne($lottery_types = [9]); p($rst); # 开奖抓取
         $lottery_types = StaticService::getLotteryTypes();
         $lottery_types = [9];
         foreach ($lottery_types as $lottery_type) {

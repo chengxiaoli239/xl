@@ -269,6 +269,11 @@ abstract class BetService extends BaseBetService {
             if('04:00:00' < $time && $time < '09:00:00'){
                 $status = false;
             }
+        }elseif($lottery_type == 9){
+            # 台湾宾果
+            if('00:00:00'<$time && $time<'07:00:00'){
+                $status = false;
+            }
         }
 
         return $status;
