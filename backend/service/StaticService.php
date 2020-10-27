@@ -1168,9 +1168,9 @@ class StaticService extends BaseService {
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
-    public static function static4dPerDateProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function static4dPerDateProfits($lottery_type = DEFAULT_LOTTERY_TYPE, $s_date = ''){
         $rst = ['status'=>200, 'msg'=>'处理成功'];
-        $allStaticProfits = self::allDateStaticProfits($lottery_type);
+        $allStaticProfits = self::allDateStaticProfits($lottery_type, $s_date);
         $tmpProfits = [];
         foreach ($allStaticProfits as $key=>$allStaticProfit){
             $tmpProfits[] = $allStaticProfit;
@@ -1284,7 +1284,7 @@ class StaticService extends BaseService {
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
-    public static function allDateStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function allDateStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE, $s_date = ''){
         $m = \Yii::$app->cache;
         $mkey = 'allDateStaticProfits_PERDATE_'.$lottery_type.'_25';
 
@@ -1305,9 +1305,13 @@ class StaticService extends BaseService {
                 $time = $time + 24 * 3600;
             }
 
-            $date = date('Y-m-d', $time);
-            $date = min([date('Y-m-d'), $date]);
-            if($date>date('Y-m-d')) break;
+            if($s_date){
+                $date = $s_date;
+            }else{
+                $date = date('Y-m-d', $time);
+                $date = min([date('Y-m-d'), $date]);
+                if($date>date('Y-m-d')) break;
+            }
             if($lottery_type == 6 && '00:00'<date('H:i:s') && date('H:i:s')<'10:00'){
                 $date = date('Y-m-d', time()-86400);
             }
