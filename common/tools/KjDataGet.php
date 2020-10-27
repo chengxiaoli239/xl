@@ -139,7 +139,7 @@ class KjDataGet
                                 $qihao = $data['expect'];
                             }
                             # ssc
-                            $msg = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData, $kjData['opentime']);
+                            $msg = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData, $data['opentime']);
                             //if($kjConfig->lottery_type ==2) p([$qihao, $kjConfig->lottery_type, $kjData, $msg]);
                             $cache_time = 10;
                         }elseif($kjConfig->lottery_type == 99){
