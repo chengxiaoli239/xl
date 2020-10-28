@@ -1316,7 +1316,7 @@ class HN0898Service extends BaseTZService {
         if($lottery_type == 9){
             $start_time = strtotime(date('Y-m-d').' 07:05');
             if('00:00'<$date_time && $date_time<'07:05') $time = $start_time;
-            $nums = floor(($time - $start_time)/(5*60));
+            $nums = floor(($time - $start_time)/(5*60)) - 1;
 
         }else{
             $start_time = strtotime(date('Y-m-d').' 09:05');
