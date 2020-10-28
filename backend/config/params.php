@@ -18,7 +18,7 @@ return [
     'DATA_STATIC_KEY' => 'DATA_STATIC_KEY', # 数据统计基本key
     'ALL_DS' => '1112,1121,1211,2111,1222,2122,2212,2221,1122,1212,1221,2112,2121,2211,1111,2222',
 
-    'test_account' => ['aa07', 'aa03', 'aa02'],
+    'test_account' => ['aa07', 'aa03', 'aa02', 'aaa888'],
 
     'TZ_LOCK_TIME' => 4 * 60 * 60,
 
