@@ -1201,7 +1201,7 @@ class HN0898Service extends BaseTZService {
                 $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 break;
             case 9: # 台湾宾果
-                $qihao = 109060291 + self::getTwDefferentDays() * 204 + self::getDifferentNums($lottery_type = 9) - 2; # 109060291为2020-10-23最后一期期号
+                $qihao = 109060291 + self::getTwDefferentDays() * 204 + self::getDifferentNums($lottery_type = 9) - self::getTwDefferentDays() - 1; # 109060291为2020-10-23最后一期期号
                 break;
         }
 
@@ -1263,7 +1263,7 @@ class HN0898Service extends BaseTZService {
                 }
                 break;
             case 9: # 台湾宾果
-                $qihao = 109060291 + self::getTwDefferentDays() * 204 + self::getDifferentNums($lottery_type = 9) - 3; # 967767为2019-08-10最后一期期号
+                $qihao = 109060291 + self::getTwDefferentDays() * 204 + self::getDifferentNums($lottery_type = 9) - self::getTwDefferentDays(); # 967767为2019-08-10最后一期期号
                 break;
         }
 
@@ -1316,7 +1316,7 @@ class HN0898Service extends BaseTZService {
         if($lottery_type == 9){
             $start_time = strtotime(date('Y-m-d').' 07:05');
             if('00:00'<$date_time && $date_time<'07:05') $time = $start_time;
-            $nums = floor(($time - $start_time)/(5*60)) - 1;
+            $nums = floor(($time - $start_time)/(5*60));
 
         }else{
             $start_time = strtotime(date('Y-m-d').' 09:05');
