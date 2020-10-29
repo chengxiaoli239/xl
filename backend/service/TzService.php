@@ -263,7 +263,11 @@ class TzService extends BaseService {
         $pkey = BetService::buildPlanSwitchKey($lottery_type, $qihao);
         //$simulate_pkey = \Yii::$app->params['PLAN_SWITCH_SIMULATE_KEY'].'_'.$qihao;
         $time = 1080;
-        if($lottery_type == 5 && substr($qihao,6) == '010') $time = 60*60*4; # 4小时
+        if($lottery_type == 5 && substr($qihao,6) == '010'){
+            $time = 60*60*4; # 4小时
+        } elseif($lottery_type == 9){
+            $time = 60*60*7; # 台湾宾果 7小时
+        }
         $rst21['rst'] = $m->set($pkey,1,$time);
         $rst21['pkey'] = $pkey;
         $rst21['time'] = $time;
