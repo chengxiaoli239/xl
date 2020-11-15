@@ -7,7 +7,7 @@
  * Time: 09:40
  */
 
-namespace backend\service\qilin;
+namespace backend\service\BingDao;
 use backend\models\BettingRecords;
 use backend\models\SscKjData;
 use backend\models\SystemConfig;
@@ -16,10 +16,12 @@ use backend\models\User;
 use backend\models\UserCustomPlans;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
+use backend\service\BaseService;
 use backend\service\BaseTZService;
 use backend\service\BetService;
 use backend\service\CurlService;
 use backend\service\HN0898Service;
+use backend\service\PoxyIPService;
 use backend\service\SscDataService;
 use backend\tools\Tools;
 use common\models\AdminModel;
@@ -201,6 +203,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
      * @return array
      */
     public function bet($qihao, $plan_id, $codes){
+        return $this->postBatchBet($qihao, $plan_id, $codes);
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
@@ -1076,8 +1079,8 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
      * @return string  格式：X1XX,X6XX
      */
     public static function formCodesStyle($codes, $playway = 10, $single = 0.1){
+        //$codes = explode('@', $codes);
         //p([$codes, $playway, $single]);
-        $codes = explode('@', $codes);
         //p($codes, 0);
 
         $codesArr = [];
@@ -1108,16 +1111,16 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                 case 1: # 二字定 2357,2468,X,X
                     break;
                 case 2: # 三字定
-                    $codesArr[] = str_replace(',','',strtolower($code)).'#'.$single;
+                    $codesArr[str_replace(',','',$code)] = $single;
                     break;
                 case 3: # 四字定
-                    $codesArr[] = str_replace(',','',$code).'#'.$single;
+                    $codesArr[str_replace(',','',$code)] = $single;
                     break;
             }
 
         }
 
-        return implode(',', $codesArr);
+        return $codesArr;
     }
 
     /**
@@ -1387,7 +1390,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             //p(HN0898Service::getTzSiteInfo($tz_system_id));
             # 1、预登录
             $_t = microtime(true) * 10000;
-            $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/loginview';
+            $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/verifycode/generateCode.php';
             if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
             $headers = [
                 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
@@ -1401,26 +1404,17 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                 'Referer: '.$url,
                 $TzSystemsUsers->user_agent,
             ];
-            $robot7_session_id = self::getSessionId($url, $headers);
-            $headers[] = 'Cookie: '.$robot7_session_id;
-            $cookie = self::curlGetSevenCookie($url, $headers);
-            $cookieData = $cookie;
-            //p([$robot7_session_id, $cookieData, $cookie, $headers]);
-            if($cookieData){
-                $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-                //$TzSystemsUsers->cookie = $robot7_session_id.';'.trim($cookieData);
-                $TzSystemsUsers->cookie = trim(str_replace('; path=/; domain='.str_replace('http://', '', $TzSystemsUsers->ssc_domain),'', $cookieData), ';');
-                //p([$cookieData, $TzSystemsUsers->cookie]);
-                $rst = $TzSystemsUsers->save();
+            $rst = self::postCurl($url, $headers);
+            if($rst['code'] != 200){
+                return $rst;
             }
-            self::$headers = [];
-            $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
-            //p($logArr);
+            $cookie = $rst['data'];
+
+            $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$rst, 'url'=>$url, 'headers'=>$headers];
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
-            $cookie = str_replace('MC=','',$TzSystemsUsers->cookie);
             $m->set($mkey, $cookie, 180);
         //}
-        return $cookie;
+        return ['status'=>200, 'data'=>$cookie];
     }
 
     public static function getSessionId($url, $header){
@@ -1561,7 +1555,6 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
 
     public static function login($uid = 1, $tz_system_id = 1){
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        p($TzSystemsUsers);
         if($TzSystemsUsers->balance > 0) {
             return ['status'=>200, 'msg'=>'已经登录的状态'];
         }
@@ -1573,17 +1566,16 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         if(isset($cookie_key['status']) && $cookie_key['status'] == 300) return $cookie_key;
 
         # 第二步：下载验证码图片
-        self::downLoadCodeImg($uid, $tz_system_id, $cookie_key);
+        //self::downLoadCodeImg($uid, $tz_system_id, $cookie_key);
         //p([$uid, $tz_system_id, $cookie_key]);
         # 第三步：调验证码接口获取验证码
-        $captchaCode = '888888'; $rst = self::loginRemote($uid, $tz_system_id,$captchaCode); p($rst);  # 测试
+        //$captchaCode = '888888'; $rst = self::loginRemote($uid, $tz_system_id,$captchaCode); p($rst);  # 测试
         //$captchaCodeRst = Tools::getCaptchaCode($uid, $tz_system_id, $cookie_key); # 真实调用验证码接口，收费
         //p($captchaCodeRst);
         //$code = $captchaCode['result'];
-        if($captchaCodeRst['status'] == 200){
-            $code = $captchaCodeRst['code'];
+        if($cookie_key['status'] == 200){
             # 第四步：账号、验证码登录
-            $rst = self::loginRemote($uid, $tz_system_id, $code);
+            $rst = self::loginRemote($uid, $tz_system_id, $cookie_key['data']);
         }
 
         # 第二步：账号、验证码登录
@@ -1651,36 +1643,31 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
      * @param $code 验证码
      * @return mixed|string
      */
-    private static function loginRemote($uid, $tz_system_id, $code){
+    private static function loginRemote($uid, $tz_system_id, $codeData){
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        $k = self::getK();
-        $post_data['u'] = self::getEnc($TzSystemsUsers->account, $k);
-        $post_data['p'] = self::getEnc(md5($TzSystemsUsers->password), $k);
-        $post_data['c'] = $code;
-        $post_data['pwd_simple'] = 0;
-        $post_data['t'] = round(microtime(true) * 1000);
-        p($post_data);
-
-        if(!$post_data['u'] OR !$post_data['p']) return ['status'=>300, 'msg'=>'账号或者密码不能为空'];
+        if(!$TzSystemsUsers) return ['status'=>300, 'msg'=>'账号或者密码不能为空'];
 
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/login?'.http_build_query($post_data);
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/member/?a=member.login&m=memberLogin';
+        $post_data = [
+            'accountName' => $TzSystemsUsers->account,
+            'password' => $TzSystemsUsers->password,
+            'verifyCode' => $codeData['code'],
+            'seq' => $codeData['seq'],
+            'deviceType' => 1,
+            'code' => $codeData['code'],
+        ];
         $post_data = http_build_query($post_data);
         $headers = [
-            "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-            "Cache-Control:max-age=0",
-            "Upgrade-Insecure-Requests:1",
+            "content-type: application/x-www-form-urlencoded",
             "Content-Length:".strlen($post_data),
-            "Content-Type: application/x-www-form-urlencoded",
-            "Cookie: ".trim($TzSystemsUsers->cookie),
             "Origin:".str_replace('www.','',self::$baseUrl),
-            "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain,
         ];
 
-        $data = CurlService::getCurl($url, $headers);
+        $data = self::postCurl($url, $post_data, $headers);
         //sleep(10);
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         p($logArr);
@@ -2051,4 +2038,248 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
 
     }
 
+    /**
+     * @decription post请求根据，接受传递的header头
+     * @param $url
+     */
+    public static function postCurl($url,$post_data = [],$headers=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        if(!$timeout) $timeout = 15;
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["content-type:  application/x-www-form-urlencoded"]);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, 2);
+
+        //设置post方式提交
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+        $data = curl_exec($ch);
+        $errno = curl_errno( $ch );
+
+        if(strpos($url, 'placeBet') !== false){$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'error'=>curl_error($ch)]; p($logArr);}
+        if($errno){
+            if(isset($post_data['code']) && !empty($post_data['code']))$post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+            //p($logArr);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+        }
+
+        //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,,$errno]); }
+        if(curl_close($ch)) {
+            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+        }
+        if($data == 'ok'){
+            return 'ok';
+        }
+        $rstData = json_decode($data, true); # data : {"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}
+        //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
+        if(strpos($data, "\"Status\":1") !== false && strpos($data, "\"CompletedStatus\":1") !== false){ # json解析异常处理
+            $rstData['Status'] = 1;
+        }
+        if($data['code'] == 200){
+            $rstData['Status'] = 1;
+        }else{
+            $rstData['Status'] = 0;
+        }
+
+        if(strpos($data, '余额不足')){
+            $rstData['Status'] = 0;
+        }
+        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postCurl','INFO','httpPost请求', $logArr);
+        //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
+
+        return $rstData;
+    }
+
+    /**
+     * @desc 批量号码拆解下注
+     * @param $qihao
+     * @param $plan_id
+     * @param $codes
+     * @return array
+     */
+    public static function postBatchBet($qihao, $plan_id, $codes){
+        //p([$qihao, $plan_id, $codes]);
+        $tmpCodes = $codes;
+        $plan = UserSysPlans::findOne($plan_id);
+        if($plan->tz_type == 22){ # 四定单双,codes格式：13579,13579,02468,13579@13579,13579,02468,02468@13579,02468,13579,13579
+            $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway);
+        }elseif($plan->tz_type == 18){
+            $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway);
+        }else{
+            $tmpCodes = str_replace(',', '', $tmpCodes);
+            $codesArr = explode('@', $tmpCodes);
+        }
+        $BET_BIG_LIMIT_STATUS = BetService::getConfig('BET_BIG_LIMIT_STATUS');
+        if($BET_BIG_LIMIT_STATUS){
+            if(count($codesArr)>6000) return ['status'=>300, 'msg'=>'号码组数太多不能超过6000组号码'];
+        }
+
+        # 组数
+        $count = count($codesArr);
+
+        $betNums = self::getBetNumsPer();
+        $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
+        //p($codesArrs);
+
+        $playway = $plan->playway ? $plan->playway : 3;
+        $single = $plan->single ? $plan->single : 0.1;
+        $tz_type = $plan->tz_type ? $plan->tz_type : 0;
+        $lottery_type = $plan->lottery_type;
+        //p(['playway'=>$playway, 'totalCount'=>count($codes), 'single'=>$single, 'qihao'=>$qihao, 'tz_type'=>$tz_type, 'buy_type'=>$plan->buy_type,'codes'=>$codes]);
+        if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
+
+        $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
+
+        $url = self::getTzSiteInfo(self::$tz_system_id, 'SSC_INDEX').'/member/?a=member.bet&m=placeBet';//.'?'.http_build_query($post_data);
+        $way = self::getWay($tz_type);
+        $snInfo_sn = '';
+        $snInfo_snid = '';
+        $rst = [];
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
+        foreach ($codesArrs as $key=>$tmpcodesArr){
+
+            $tmpcodesArr = ['123X', '435X'];
+            if($playway == 4){ # 一字定
+                $post_data = [
+                    'bets' => json_encode($tmpcodesArr),
+                    'way' => $way,
+                    'period_no' => $qihao,
+                ];
+
+            }else{ # 四定、三定
+                $bet_codes = self::formCodesStyle($tmpcodesArr, $playway, $single);
+                $post_data = [
+                    'betsPool'=>json_encode($bet_codes),
+                    'source' => 4,
+                    'lotteryType' => 6,
+                    'apiKey' => $TzSystemsUsers->cookie,
+                    'drawNumber' => $qihao,
+                    'resultCount' => count($tmpcodesArr),
+                    'forceBet' => 0,
+                    'forceOverwrite' => 0,
+                    'amountFastImport' => 0,
+                    'text' => '取定位千0123456789百0123456789十0123456789三定',
+                ];
+            }
+
+            $_t = round(microtime(true) * 1000);
+            $headers = [
+                'content-length: '.strlen(json_encode($bet_codes)),
+                'content-type: application/x-www-form-urlencoded',
+                'Cookie: apiKey='.$TzSystemsUsers->cookie,
+                'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+                'Origin: '.$TzSystemsUsers->ssc_domain,
+                'Referer: '.$TzSystemsUsers->ssc_domain.'/main.html',
+                'sec-fetch-dest: empty',
+                'sec-fetch-mode: cors',
+                'sec-fetch-site: same-origin',
+                $TzSystemsUsers->user_agent,
+            ];
+
+            # 缓存锁
+            $m = \Yii::$app->cache;
+            $betKey = BetService::buildBetKey($plan->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id).'_'.$key; # 分配下注后面加key
+            //if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
+
+            //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
+            # 和值投注反应时间比较久，无需返回直接锁住
+            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+            $m->set($betKey, 1, $time);
+            //}
+            # 真实投注
+            $start_time = microtime(true);
+            $tmpRst = self::postCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+            p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
+            //sleep(1);
+            $rst[$key] = $tmpRst;
+            //$rst = json_encode($rst);
+            $end_time = microtime(true);
+            $time_consume = ($end_time - $start_time). 's';
+            if($tmpRst['Status'] != 1){
+                $tzRst = [
+                    'uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,
+                    'post_data'=>$post_data, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume
+                ];
+                $mkey = 'request_login_'.$TzSystemsUsers->uid.'_'.$qihao.'_'.$key;
+                if($f = $m->get($mkey)){
+                    return ['status'=>300, 'msg'=>'已经重复登录过一次'];
+                }
+                if(in_array($rst[$key]['code'], [303, 309])){ # 判断掉线登录一次
+                    if($rst[$key]['errno']>0){
+                        $m = \Yii::$app->cache;
+                        $mkey_proxy = PoxyIPService::builProxyIpKey();
+                        $m->delete($mkey_proxy);
+                    }
+                    BaseService::login($TzSystemsUsers->id);
+                    $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+                    $m->set($mkey, 1, 5*60);
+                }
+                //if($tz_type != 20) $tzRst['code'] = $codes;
+                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','幸运五5分批投注记录-投注失败', $tzRst);
+                # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护，307账号停押
+                if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [302, 303, 304, 305, 306, 307])){
+                    //return $rst;
+                    continue;
+                }
+                if(in_array($rst[$key]['code'], [302])){
+                    //return $rst; # 余额不足
+                }
+            }
+
+            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+            $m->set($betKey, 1, $time);
+
+            # 获取方案号，记录id, 用于撤单
+            $snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+            $snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
+            $snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
+        }
+        $data['rst'] = $rst;
+
+        $n = count(explode('@',$codes));
+        if(in_array($playway, [2, 3]) && $tz_type != 20){
+            $totalmoney = SscDataService::calTzTotalMoney($codes, $single, $playway);
+        }else{
+            $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
+        }
+        if($playway == 4 && $tz_type == 18){ # 一字定
+            $totalmoney = $count * $single;
+        }
+
+        $insertData = [
+            'playway'=> $playway,  // 投注方式
+            'tz_type'=> $tz_type,  // 投注类型
+            'buy_type'=> 1,  // 购买方向类型
+            'uid'=> self::$user_id,  // 投注账号id
+            'lottery_type' => $lottery_type, # 彩种
+            'account' => $plan->account,
+            'plan_id' => $plan_id, # 计划id
+            'codes' => (string)$codes,  // 投注号码
+            'qihao' => $qihao,  // 投注期号
+            'tz_system_id' => self::$tz_system_id,  // 投注系统tz_systems_id
+            'sn'=> trim($snInfo_sn, ';'),
+            'snid'=> trim($snInfo_snid, ';'),
+            'order_type'=>3, # 单双三字定
+            'is_simulate' => 0,  // 是否模拟投注
+            'single' => $single,  // 投注倍数
+            'betting_money'=> round($totalmoney, 2),  // 投注金额
+        ];
+        $insertRst = BetService::_logRecords($insertData);
+        self::$headers = [];
+
+        if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
+        $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>self::$headers, 'bigFlag'=>1, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
+
+        return $data;
+    }
 }

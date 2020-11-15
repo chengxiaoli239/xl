@@ -25,7 +25,7 @@ use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineNewService;
 use backend\service\NumService;
 use backend\service\PoxyIPService;
-use backend\service\qilin\BingDaoService;
+use backend\service\BingDao\BingDaoService;
 use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
 use backend\service\sports\TennisSportsService;

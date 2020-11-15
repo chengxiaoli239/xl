@@ -87,7 +87,7 @@ abstract class BetService extends BaseBetService {
             }
         }elseif(in_array($tz_system_id, [13])){
             # 13 冰岛
-            $BetService = new BingDaoService($uid, $tz_system_id);
+            $BetService = new \backend\service\BingDao\BingDaoService($uid, $tz_system_id);
         }
 
         return $BetService;
@@ -675,7 +675,7 @@ abstract class BetService extends BaseBetService {
            $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
 
            $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
-           if($status && $plan->account != 'gaozi2018'){
+           if(!$status && $plan->account != 'gaozi2018'){
                Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
                continue;
            }
@@ -985,6 +985,10 @@ abstract class BetService extends BaseBetService {
         }elseif(in_array($tz_system_id, [11])){
             # 11、菊花网
             $flag = JuHuaBaseService::isLogin($uid, $tz_system_id);
+        }elseif(in_array($tz_system_id, [13])){
+            # 13、冰岛
+            //$flag = \backend\service\BingDao\BingDaoService::isLogin($uid, $tz_system_id);
+            $flag = true;
         }
 
         return (boolean)$flag;

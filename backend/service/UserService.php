@@ -251,8 +251,11 @@ class UserService extends BaseService {
         if(!$Model) return false;
         $flag = false;
         if(!empty($Model->expire_time)){
-            if($Model->expire_time <= time()){
+            if($Model->expire_time >= time()){
                 $flag = true;
+            }else{
+                $Model->desc = '账号过期，请及时续费';
+                $Model->save();
             }
         }
 

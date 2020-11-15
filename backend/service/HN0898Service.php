@@ -1211,7 +1211,7 @@ class HN0898Service extends BaseTZService {
                 if('00:00:00'<$nowTime && $nowTime < '03:00:00') {
                     $max_actionNo = '639';
                     $now_timsstamp = $timsstamp - $today_time; # 早8点到凌晨3点 不开奖
-                    $actionNo = (int)($now_timsstamp / 90) + 1 + $max_actionNo;
+                    $actionNo = (int)($now_timsstamp / 90) + 2 + $max_actionNo;
                     $qihao = date('Ymd', time() - 20 * 60) . sprintf("%03d", $actionNo);
                 }else{
                     $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
