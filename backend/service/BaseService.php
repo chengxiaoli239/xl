@@ -13,6 +13,7 @@ use backend\service\Juhua\JuHuaBaseService;
 use backend\service\Lucky5\Lucky5Service;
 use backend\service\NineNine\NineNineService6;
 use backend\service\pingbo\PingBoBaseService;
+use backend\service\qilin\BingDaoService;
 use backend\service\qilin\QiLinBaseService;
 use common\service\CommonService;
 use  yii;
@@ -69,6 +70,9 @@ class BaseService{
         }elseif(in_array($tz_system_id, [8])){
             # 8、麒麟财务系统网
             $rst = QiLinBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+        }elseif(in_array($tz_system_id, [13])){
+            # 9、冰岛
+            $rst = BingDaoService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
         }
 
         return $rst;
@@ -123,6 +127,9 @@ class BaseService{
         }elseif(in_array($tz_system_id, [14])){
             # 14、平博网
             $rst = PingBoBaseService::synBalance($TzSystemsUser->id);
+        }elseif(in_array($tz_system_id, [13])){
+            # 13、冰岛
+            $rst = BingDaoService::synBalance($TzSystemsUser->id);
         }
 
         return $rst;

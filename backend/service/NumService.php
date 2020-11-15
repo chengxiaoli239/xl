@@ -1405,19 +1405,19 @@ class NumService extends BaseService {
             $desc = trim($desc, '、').' ';
         }
 
-        if(!empty($hz_Arr['p1'])){
+        if(isset($hz_Arr['p1']) && $hz_Arr['p1'] !== ''){
             $desc .= '千'.$hz_Arr['p1'];
         }
-        if(!empty($hz_Arr['p2'])){
+        if(isset($hz_Arr['p2']) && $hz_Arr['p2'] !== ''){
             $desc .= ' 百'.$hz_Arr['p2'];
         }
-        if(!empty($hz_Arr['p3'])){
+        if(isset($hz_Arr['p3']) && $hz_Arr['p3'] !== ''){
             $desc .= ' 十'.$hz_Arr['p3'];
         }
-        if(!empty($hz_Arr['p4'])){
+        if(isset($hz_Arr['p4']) && $hz_Arr['p4'] !== ''){
             $desc .= ' 个'.$hz_Arr['p4'];
         }
-        if(!empty($hz_Arr['p5'])){
+        if(isset($hz_Arr['p5']) && $hz_Arr['p5'] !== ''){
             $desc .= ' 五'.$hz_Arr['p5'];
         }
 

@@ -17,6 +17,7 @@ use backend\service\Juhua\JuHuaBaseService;
 use backend\service\Lucky5\Lucky5Service;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineService6;
+use backend\service\qilin\BingDaoService;
 use common\kj\cqssc\CqsscKcw;
 use Yii;
 use backend\models\BettingRecords;
@@ -84,7 +85,9 @@ abstract class BetService extends BaseBetService {
             }elseif($lottery_type == 7){ # 北京快乐8
                 $BetService = new KuaiLe8Service($uid, $tz_system_id);
             }
-
+        }elseif(in_array($tz_system_id, [13])){
+            # 13 冰岛
+            $BetService = new BingDaoService($uid, $tz_system_id);
         }
 
         return $BetService;
@@ -1124,6 +1127,9 @@ abstract class BetService extends BaseBetService {
                 break;
             case 9: # 台湾宾果
                 $cacheTime = 5 * 60;
+                break;
+            case 10: # 冰岛90s
+                $cacheTime = 1.5 * 60;
                 break;
         }
 

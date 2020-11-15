@@ -25,6 +25,7 @@ use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineNewService;
 use backend\service\NumService;
 use backend\service\PoxyIPService;
+use backend\service\qilin\BingDaoService;
 use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
 use backend\service\sports\TennisSportsService;
@@ -194,6 +195,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BingDaoService::login($uid = 20, $tz_system_id = 13);p($rst);
         $kjData = BingDao::getLotteryOne();p($kjData);
         $data = CqsscKcw::getLotteryTaiwanBinguo();p($data);
         $qihao_1 = HN0898Service::getCurrentQihao($lottery_type = 10);
