@@ -4,7 +4,6 @@ namespace common\kj\ssc;
 use backend\models\SystemConfig;
 use backend\models\TzSystemsUsers;
 use backend\service\CurlService;
-use common\general\helpers\Curl;
 use common\kj\BaseKj;
 use common\service\CommonService;
 use common\tools\Tool_Common;
@@ -118,8 +117,9 @@ class BingDao extends BaseKj {
                 "sec-fetch-site: same-origin",
                 "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
             ];
-            $post_data = http_build_query(['lotteryType'=>6]);
-            $rst = self::postCurl($url, $post_data, $headers);
+            $post_data = ['lotteryType'=>6];
+            $data = self::postCurl($url, http_build_query($post_data), $headers);
+            p($data);
             $data = $rst['data']['list'][0];
 
             if (!isset($rst['data']['list'][0]) OR empty($data)) return false;
@@ -159,26 +159,23 @@ class BingDao extends BaseKj {
         if(!$timeout) $timeout = 15;
 
         $ch = curl_init();
+
         curl_setopt($ch, CURLOPT_URL, $url);
 
         // 设置浏览器的特定header
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["content-type:  application/x-www-form-urlencoded"]);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, 2);
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
-
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
-        curl_setopt($ch, CURLOPT_HEADER,0);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
-
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
-        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
+
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'error'=>curl_error($ch)]; p($logArr);
         if($errno){
             if(isset($post_data['code']) && !empty($post_data['code']))$post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];

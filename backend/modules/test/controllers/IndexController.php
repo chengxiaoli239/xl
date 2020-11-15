@@ -195,6 +195,7 @@ class IndexController extends Controller
 
     public function actionDw(){
         $kjData = BingDao::getLotteryOne();p($kjData);
+        $data = CqsscKcw::getLotteryTaiwanBinguo();p($data);
         $qihao_1 = HN0898Service::getCurrentQihao($lottery_type = 10);
         $qihao_2 = HN0898Service::getQihao($lottery_type = 10);p([$qihao_1, $qihao_2]);
         $rst['kj'] = KjDataGet::grabOne($lottery_types = [9]); p($rst); # 开奖抓取
@@ -210,7 +211,6 @@ class IndexController extends Controller
         $rst = JuHuaBaseService::selectLottery($tz_sites = 18, $uid = 11, $lottery_type = 9);p($rst);
         $qihao = HN0898Service::getCurrentQihao($lottery_type = 9);p($qihao);
         $rst = KjDataGet::insertKjData('109060291', 9, '9,6,0,1,0');p($rst);
-        $data = CqsscKcw::getLotteryTaiwanBinguo();p($data);
         $data = CqsscKcw::getLotteryKuaiLe8Eight();p($data);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 6); p($rst);
         $rst = TzService::opSystemBetPlans(5);p($rst);// 定制化投注计划
