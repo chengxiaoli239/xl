@@ -118,15 +118,14 @@ class BingDao extends BaseKj {
                 "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
             ];
             $post_data = ['lotteryType'=>6];
-            $data = self::postCurl($url, http_build_query($post_data), $headers);
-            p($data);
-            $data = $rst['data']['list'][0];
+            $rst = self::postCurl($url, http_build_query($post_data), $headers);
+            $data = $rst['data']['drawInfo']['historyDraw'];
 
-            if (!isset($rst['data']['list'][0]) OR empty($data)) return false;
-            $opencode = implode(',', $data['code']);
-                if($opencode == '0,0,0,0,0') return false;
+            if (empty($data)) return false;
+            $opencode = implode(',', $data['resultList']);
+            if($opencode == '0,0,0,0,0') return false;
             //$kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
-            $kjData = ['expect'=>str_replace('期', '', $data['pc_issue'][0]), 'opencode'=>$opencode, 'opentime'=>$data['open_date'].' '.trim($data['pc_issue'][1])];
+            $kjData = ['expect'=>$data['draw_number'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
             //p($kjData);
         }
         $opencode = $kjData['opencode'];
