@@ -13,6 +13,7 @@ use backend\models\SscKjData;
 use backend\models\SscSdHzVal;
 use backend\models\SscStaticVal;
 use backend\models\TzSystemsUsers;
+use backend\modules\kj\controllers\BingDaoController;
 use backend\service\BetService;
 use backend\service\ChatCommonBetService;
 use backend\service\huiyuan\HuiYuanService5;
@@ -39,6 +40,7 @@ use backend\tools\Tools;
 use common\kj\BaseKj;
 use common\kj\cqssc\CqsscKcw;
 use common\kj\cqssc\CqsscSevenDay;
+use common\kj\ssc\BingDao;
 use common\kj\ssc\Lucky5;
 use common\kj\xjssc\XjSsc;
 use common\models\AdminModel;
@@ -192,8 +194,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $qihao_1 = HN0898Service::getCurrentQihao($lottery_type = 9);
-        $qihao_2 = HN0898Service::getQihao($lottery_type = 9);p([$qihao_1, $qihao_2]);
+        $kjData = BingDao::getLotteryOne();p($kjData);
+        $qihao_1 = HN0898Service::getCurrentQihao($lottery_type = 10);
+        $qihao_2 = HN0898Service::getQihao($lottery_type = 10);p([$qihao_1, $qihao_2]);
         $rst['kj'] = KjDataGet::grabOne($lottery_types = [9]); p($rst); # 开奖抓取
         $lottery_types = StaticService::getLotteryTypes();
         $lottery_types = [9];

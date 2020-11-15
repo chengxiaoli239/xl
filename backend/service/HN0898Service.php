@@ -1203,6 +1203,23 @@ class HN0898Service extends BaseTZService {
             case 9: # 台湾宾果
                 $qihao = 109060291 + self::getTwDifferentDays() * 204 + self::getDifferentNums($lottery_type = 9) - self::getTwDifferentDays() + 1; # 109060291为2020-10-23最后一期期号
                 break;
+            case 10: # 冰岛90s 早8点到凌晨3点
+                $timsstamp = time();
+                $today_time = strtotime(date('Y-m-d 00:00:00'));
+
+                $nowTime = date("H:i:s");
+                if('00:00:00'<$nowTime && $nowTime < '03:00:00') {
+                    $max_actionNo = '639';
+                    $now_timsstamp = $timsstamp - $today_time; # 早8点到凌晨3点 不开奖
+                    $actionNo = (int)($now_timsstamp / 90) + 1 + $max_actionNo;
+                    $qihao = date('Ymd', time() - 20 * 60) . sprintf("%03d", $actionNo);
+                }else{
+                    $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
+
+                    $actionNo = (int)($now_timsstamp / 90);
+                    $qihao = date("Ymd").sprintf("%03d", $actionNo);
+                }
+                break;
         }
 
         return $qihao;
@@ -1264,6 +1281,23 @@ class HN0898Service extends BaseTZService {
                 break;
             case 9: # 台湾宾果
                 $qihao = 109060291 + self::getTwDifferentDays() * 204 + self::getDifferentNums($lottery_type = 9) - self::getTwDifferentDays(); # 967767为2019-08-10最后一期期号
+                break;
+            case 10: # 冰岛90s 早8点到凌晨3点
+                $timsstamp = time();
+                $today_time = strtotime(date('Y-m-d 00:00:00'));
+
+                $nowTime = date("H:i:s");
+                if('00:00:00'<$nowTime && $nowTime < '03:00:00') {
+                    $max_actionNo = '639';
+                    $now_timsstamp = $timsstamp - $today_time; # 早8点到凌晨3点 不开奖
+                    $actionNo = (int)($now_timsstamp / 90) + 1 + $max_actionNo;
+                    $qihao = date('Ymd', time() - 20 * 60) . sprintf("%03d", $actionNo);
+                }else{
+                    $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
+
+                    $actionNo = (int)($now_timsstamp / 90) + 1;
+                    $qihao = date("Ymd").sprintf("%03d", $actionNo);
+                }
                 break;
         }
 

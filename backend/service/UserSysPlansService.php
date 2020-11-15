@@ -600,7 +600,7 @@ class UserSysPlansService extends BaseService {
         if($uid>1){
             $where = ['uid'=>$uid];
         }else{
-            $where = '1=1';
+            $where = ['uid'=>1];
         }
         $lottery_types = explode(',', TzSystemsAuth::find()->where($where)->one()->lottery_types);
 
