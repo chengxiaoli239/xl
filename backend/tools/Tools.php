@@ -48,7 +48,7 @@ class Tools
      * @param $cookie_key
      * @return mixed
      */
-    public static function getCaptchaCode($uid, $tz_system_id, $cookie_key){
+    public static function getCaptchaCode($uid, $tz_system_id, $cookie_key, $code_type = 6001){
         $captcha_code_api = SystemConfig::findOne(['key'=>'captcha_code_api'])->value;
         $filename = Yii::$app->basePath . "/runtime/captcha/".$uid."_".$tz_system_id.'_'.$cookie_key.".png";
         switch ($captcha_code_api){
@@ -62,7 +62,11 @@ class Tools
                 $codeRst = CaptchaCodeService::jianjiao($filename); # 尖叫数据
                 break;
             case 4:
-                $codeType = in_array($tz_system_id, [5, 6]) ? '6001' : '1902';
+                if($code_type){
+                    $codeType = $code_type;
+                }else{
+                    $codeType = in_array($tz_system_id, [5, 6]) ? '6001' : '1902';
+                }
                 $codeRst = CaptchaCodeService::chaojiying($filename, $codeType); # 超级鹰
                 break;
             default:break;

@@ -129,7 +129,7 @@ class BaseService{
             $rst = PingBoBaseService::synBalance($TzSystemsUser->id);
         }elseif(in_array($tz_system_id, [13])){
             # 13、冰岛
-            $rst = BingDaoService::synBalance($TzSystemsUser->id);
+            $rst = \backend\service\BingDao\BingDaoService::synBalance($TzSystemsUser->id);
         }
 
         return $rst;
