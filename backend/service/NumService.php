@@ -977,52 +977,52 @@ class NumService extends BaseService {
         }
 
         # 第1位
-        if(isset($codes_hz['p1']) && !empty($codes_hz['p1'])){
+        if(isset($codes_hz['p1']) && $codes_hz['p1'] !== ''){
             //$p1_codes = explode(',', $codes_hz['p1']);
             $p1_codes = self::getCodesArrByStr($codes_hz['p1']);
             $where = array_merge($where, [ ['IN', 'code_1', $p1_codes] ]);
         }
-        if(isset($codes_hz['p1_0']) && !empty($codes_hz['p1_0'])){
+        if(isset($codes_hz['p1_0']) && $codes_hz['p1_0'] !== ''){
             $p1_codes = self::getCodesArrByStr($codes_hz['p1_0']);
             $where = array_merge($where, [ ['NOT IN', 'code_1', $p1_codes] ]);
         }
 
         # 第2位
-        if(isset($codes_hz['p2']) && !empty($codes_hz['p2'])){
+        if(isset($codes_hz['p2']) && $codes_hz['p2'] !== ''){
             $p2_codes = self::getCodesArrByStr($codes_hz['p2']);
             $where = array_merge($where, [ ['IN', 'code_2', $p2_codes] ]);
         }
-        if(isset($codes_hz['p2_0']) && !empty($codes_hz['p2_0'])){
+        if(isset($codes_hz['p2_0']) && $codes_hz['p2_0'] !== ''){
             $p2_codes = self::getCodesArrByStr($codes_hz['p2_0']);
             $where = array_merge($where, [ ['NOT IN', 'code_2', $p2_codes] ]);
         }
 
         # 第3位
-        if(isset($codes_hz['p3']) && !empty($codes_hz['p3'])){
+        if(isset($codes_hz['p3']) && $codes_hz['p3'] !== ''){
             $p3_codes = self::getCodesArrByStr($codes_hz['p3']);
             $where = array_merge($where, [ ['IN', 'code_3', $p3_codes] ]);
         }
-        if(isset($codes_hz['p3_0']) && !empty($codes_hz['p3_0'])){
+        if(isset($codes_hz['p3_0']) && $codes_hz['p3_0'] !== ''){
             $p3_codes = self::getCodesArrByStr($codes_hz['p3_0']);
             $where = array_merge($where, [ ['NOT IN', 'code_3', $p3_codes] ]);
         }
 
         # 第4位
-        if(isset($codes_hz['p4']) && !empty($codes_hz['p4'])){
+        if(isset($codes_hz['p4']) && $codes_hz['p4'] !== ''){
             $p4_codes = self::getCodesArrByStr($codes_hz['p4']);
             $where = array_merge($where, [ ['IN', 'code_4', $p4_codes] ]);
         }
-        if(isset($codes_hz['p4_0']) && !empty($codes_hz['p4_0'])){
+        if(isset($codes_hz['p4_0']) && $codes_hz['p4_0'] !== ''){
             $p4_codes = self::getCodesArrByStr($codes_hz['p4_0']);
             $where = array_merge($where, [ ['NOT IN', 'code_4', $p4_codes] ]);
         }
 
         # 第5位
-        if(isset($codes_hz['p5']) && !empty($codes_hz['p5'])){
+        if(isset($codes_hz['p5']) && $codes_hz['p5'] !== ''){
             $p5_codes = self::getCodesArrByStr($codes_hz['p5']);
             $where = array_merge($where, [ ['IN', 'code_5', $p5_codes] ]);
         }
-        if(isset($codes_hz['p5_0']) && !empty($codes_hz['p5_0'])){
+        if(isset($codes_hz['p5_0']) && $codes_hz['p5_0'] !== ''){
             $p5_codes = self::getCodesArrByStr($codes_hz['p5_0']);
             $where = array_merge($where, [ ['NOT IN', 'code_5', $p5_codes] ]);
         }

@@ -1111,10 +1111,10 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                 case 1: # 二字定 2357,2468,X,X
                     break;
                 case 2: # 三字定
-                    $codesArr[str_replace(',','',$code)] = $single;
+                    $codesArr[str_replace(',','',$code)] = (string)$single;
                     break;
                 case 3: # 四字定
-                    $codesArr[str_replace(',','',$code)] = $single;
+                    $codesArr[str_replace(',','',$code)] = (string)$single;
                     break;
             }
 
@@ -2208,12 +2208,18 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
 
             $_t = round(microtime(true) * 1000);
             $headers = [
+                ":authority: o1.op5168.com",
+                ":method: POST",
+                ":path: /member/?a=member.bet&m=placeBet",
+                ":scheme: https",
+                "accept: application/json, text/plain, */*",
+                "accept-encoding: gzip, deflate, br",
+                "accept-language: zh-CN,zh;q=0.9,en;q=0.8                ",
                 'content-length: '.strlen(json_encode($bet_codes)),
                 'content-type: application/x-www-form-urlencoded',
-                'Cookie: apiKey='.$TzSystemsUsers->cookie,
-                'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
-                'Origin: '.$TzSystemsUsers->ssc_domain,
-                'Referer: '.$TzSystemsUsers->ssc_domain.'/main.html',
+                'cookie: apiKey='.$TzSystemsUsers->cookie,
+                'origin: '.$TzSystemsUsers->ssc_domain,
+                'eeferer: '.$TzSystemsUsers->ssc_domain.'/main.html',
                 'sec-fetch-dest: empty',
                 'sec-fetch-mode: cors',
                 'sec-fetch-site: same-origin',
