@@ -1572,7 +1572,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         //p([$uid, $tz_system_id, $cookie_key]);
         # 第三步：调验证码接口获取验证码
         //$captchaCode = '888888'; $rst = self::loginRemote($uid, $tz_system_id,$captchaCode); p($rst);  # 测试
-        $captchaCodeRst = Tools::getCaptchaCode($uid, $tz_system_id, md5($cookie_key['data']['seq']), $code_type = '4111'); # 真实调用验证码接口，收费
+        $captchaCodeRst = Tools::getCaptchaCode($uid, $tz_system_id, md5($cookie_key['data']['seq']), $code_type = '1010'); # 真实调用验证码接口，收费
         //p([$captchaCodeRst, $cookie_key]);
         //$code = $captchaCode['result'];
         if($cookie_key['status'] == 200){
@@ -2193,16 +2193,16 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             }else{ # 四定、三定
                 $bet_codes = self::formCodesStyle($tmpcodesArr, $playway, $single);
                 $post_data = [
-                    'betsPool'=>json_encode($bet_codes),
+                    'apiKey' => $TzSystemsUsers->cookie,
                     'source' => 4,
                     'lotteryType' => 6,
-                    'apiKey' => $TzSystemsUsers->cookie,
                     'drawNumber' => $qihao,
                     'resultCount' => count($tmpcodesArr),
                     'forceBet' => 0,
                     'forceOverwrite' => 0,
                     'amountFastImport' => 0,
-                    'text' => '取定位千0123456789百0123456789十0123456789三定',
+                    'betsPool'=>json_encode($bet_codes),
+                    'text' => '取定位千1百23十4三定定',
                 ];
             }
 
@@ -2214,12 +2214,12 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                 ":scheme: https",
                 "accept: application/json, text/plain, */*",
                 "accept-encoding: gzip, deflate, br",
-                "accept-language: zh-CN,zh;q=0.9,en;q=0.8                ",
-                'content-length: '.strlen(json_encode($bet_codes)),
+                "accept-language: zh-CN,zh;q=0.9,en;q=0.8",
+                'content-length: '.strlen(json_encode($post_data)),
                 'content-type: application/x-www-form-urlencoded',
-                'cookie: apiKey='.$TzSystemsUsers->cookie,
-                'origin: '.$TzSystemsUsers->ssc_domain,
-                'eeferer: '.$TzSystemsUsers->ssc_domain.'/main.html',
+                'cookie:apiKey='.$TzSystemsUsers->cookie,
+                'origin:'.$TzSystemsUsers->ssc_domain,
+                'referer:'.$TzSystemsUsers->ssc_domain.'/main.html',
                 'sec-fetch-dest: empty',
                 'sec-fetch-mode: cors',
                 'sec-fetch-site: same-origin',
@@ -2229,7 +2229,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             # 缓存锁
             $m = \Yii::$app->cache;
             $betKey = BetService::buildBetKey($plan->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id).'_'.$key; # 分配下注后面加key
-            //if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
+            if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
             //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
             # 和值投注反应时间比较久，无需返回直接锁住
@@ -2238,14 +2238,15 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             //}
             # 真实投注
             $start_time = microtime(true);
-            $tmpRst = self::postCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
-            p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
+            //$tmpRst = self::postCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+            $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+            //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
             //sleep(1);
             $rst[$key] = $tmpRst;
             //$rst = json_encode($rst);
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time). 's';
-            if($tmpRst['Status'] != 1){
+            if(false && $tmpRst['code'] != 200){
                 $tzRst = [
                     'uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,
                     'post_data'=>$post_data, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume
@@ -2254,7 +2255,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                 if($f = $m->get($mkey)){
                     return ['status'=>300, 'msg'=>'已经重复登录过一次'];
                 }
-                if(in_array($rst[$key]['code'], [303, 309])){ # 判断掉线登录一次
+                if(in_array($tmpRst['code']['code'], [303, 309])){ # 判断掉线登录一次
                     if($rst[$key]['errno']>0){
                         $m = \Yii::$app->cache;
                         $mkey_proxy = PoxyIPService::builProxyIpKey();
@@ -2265,7 +2266,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                     $m->set($mkey, 1, 5*60);
                 }
                 //if($tz_type != 20) $tzRst['code'] = $codes;
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','幸运五5分批投注记录-投注失败', $tzRst);
+                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','冰岛90s批投注记录-投注失败', $tzRst);
                 # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护，307账号停押
                 if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [302, 303, 304, 305, 306, 307])){
                     //return $rst;
@@ -2280,9 +2281,11 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             $m->set($betKey, 1, $time);
 
             # 获取方案号，记录id, 用于撤单
-            $snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
-            $snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
-            $snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
+            if(false){
+                $snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+                $snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
+                $snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
+            }
         }
         $data['rst'] = $rst;
 
@@ -2314,12 +2317,13 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             'single' => $single,  // 投注倍数
             'betting_money'=> round($totalmoney, 2),  // 投注金额
         ];
+        //p($insertData);
         $insertRst = BetService::_logRecords($insertData);
         self::$headers = [];
 
         if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>self::$headers, 'bigFlag'=>1, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','冰岛90s批量插入记录-真实投注', $logArr);
 
         return $data;
     }
@@ -2361,5 +2365,97 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         }
 
         return $data;
+    }
+
+    /**
+     * @decription post请求根据，接受传递的header头
+     * @param $url
+     */
+    public static function postBetCurl($url,$post_data = [],$headers=[], $uid = 0){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        if(!$timeout) $timeout = 30;
+
+        //$cookie = dirname(__FILE__)."/cookie.txt";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        //curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["content-type:  application/x-www-form-urlencoded"]);
+
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+
+        if(strpos($url, 'ww662889') !== false){
+            //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
+        }
+
+        //$poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+
+        //设置post方式提交
+        curl_setopt($ch, CURLOPT_POST, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data));
+
+        $start_time = microtime(true);
+        $data = curl_exec($ch);
+        $end_time = microtime(true);
+        //d($data);
+        $errno = curl_errno( $ch );
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
+        if($errno){
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+            //p($logArr);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求-1', $logArr);
+        }
+
+        if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
+        if(curl_close($ch)) {
+            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+        }
+        if($data == 'ok'){
+            return 'ok';
+        }
+        $rstData = json_decode($data, true); # data : {"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}
+        //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
+        if(strpos($data, "\"Status\":1") !== false && strpos($data, "\"CompletedStatus\":1") !== false){ # json解析异常处理
+            $rstData['Status'] = 1;
+        }
+
+        if(strpos($data, '余额不足') !== false){
+            $rstData = ["Status"=>0, 'code'=>302, 'msg'=>'余额不足'];
+        }elseif(strpos($data, '登录') !== false OR strpos($data, 'Bad Gateway') !== false OR strpos($data, 'Object moved') !== false){
+            $rstData = ["Status"=>0, 'code'=>303, 'msg'=>'请重新登录'];
+        }elseif(strpos($data, '短时间内重复提交') !== false){
+            $rstData = ["Status"=>0, 'code'=>304, 'msg'=>'短时间内重复提交'];
+        }elseif(strpos($data, '已关盘') !== false){
+            $rstData = ["Status"=>0, 'code'=>305, 'msg'=>'已关盘'];
+        }elseif(strpos($data, '维护中') !== false){
+            $rstData = ["Status"=>0, 'code'=>306, 'msg'=>'系统线路维护中'];
+        }elseif($errno>0){
+            $rstData = ["Status"=>0, 'code'=>309, 'errno'=>$errno, 'msg'=>'网络超时'];
+        }elseif(strpos($data, '停押') !== false){
+            $rstData = ["Status"=>0, 'code'=>307, 'msg'=>'您的账号已被停押'];
+        }else{
+            $rstData = json_decode($data, TRUE);
+        }
+        if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306])){
+            if(isset($post_data['bet_number']) && strlen($post_data['bet_number'])>200) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 300);
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求-冰岛', $logArr);
+        }
+        $rstData['errno'] = $errno;
+        $time_consume = ($end_time-$start_time).'s';
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求-冰岛', $logArr);
+        //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
+
+        return $rstData;
     }
 }
