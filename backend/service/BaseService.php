@@ -72,7 +72,7 @@ class BaseService{
             $rst = QiLinBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
         }elseif(in_array($tz_system_id, [13])){
             # 9、冰岛
-            $rst = BingDaoService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+            $rst = \backend\service\BingDao\BingDaoService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
         }
 
         return $rst;

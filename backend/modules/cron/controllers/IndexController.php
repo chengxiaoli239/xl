@@ -219,7 +219,10 @@ class IndexController extends Controller
         self::_init();
         $post = \Yii::$app->request->post();
         $uid = $post['uid'];
-        $rst['bet'] = BetService::betByUid($uid); // 用户新计划投注，可正买可反买
+        for($i=0; $i<5; $i++){
+            $rst['bet'] = BetService::betByUid($uid); // 用户新计划投注，可正买可反买
+            sleep(3);
+        }
 
         return $rst;
     }

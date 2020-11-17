@@ -719,6 +719,9 @@ abstract class BetService extends BaseBetService {
                # 5、投注请求
                $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
                $tmpRst = $BetService->bet($qihao, $plan->id, $codes, $isAuto);
+               if($tmpRst === false){
+                   return false;
+               }
 
                BetService::synBalance($plan->uid, $tz_system_id);
 
