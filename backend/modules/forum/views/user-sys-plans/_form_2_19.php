@@ -47,7 +47,11 @@ use yii\widgets\ActiveForm;
                         </div>
                     </div>
 
-                    <?= $form->field($model, 'import_codes_txt')->textInput()->label('多组英文逗号或空格隔开 234X,345X 或 234X 345X') ?>
+                    <div class="row">
+                        <div class="col-lg-3 col-xs-12">
+                            <?= $form->field($model,"import_codes_txt")->textarea([ 'autofocus' => false,'style'=>'height:100px' ])->label('多组英文逗号或空格隔开 234X,345X 或 234X 345X')?>
+                        </div>
+                    </div>
                     <input type="hidden" name="UserSysPlans[tz_type]" value="19"><!--三定导入-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
                     <!--?= $form->field($model, 'tz_type')->radioList([ //'1'=>'大小单双三字定', //'2'=>'大小三字定', '3'=>'单双三字定', ])->label('投注类型') ?-->
