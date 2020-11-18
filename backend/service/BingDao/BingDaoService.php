@@ -21,6 +21,7 @@ use backend\service\BaseTZService;
 use backend\service\BetService;
 use backend\service\CurlService;
 use backend\service\HN0898Service;
+use backend\service\Juhua\JuHuaBaseService;
 use backend\service\PoxyIPService;
 use backend\service\SscDataService;
 use backend\tools\Tools;
@@ -1553,6 +1554,21 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return true;
+    }
+
+    /**
+     * @desc 判断是否登录
+     * @param $uid
+     * @param $tz_system_id
+     * @return bool
+     */
+    public static function isLogin($uid, $tz_system_id){
+
+        $balance = BingDaoService::getBalance($uid,$tz_system_id);
+
+        $flag = $balance > 0 ? true : false;
+
+        return (boolean)$flag;
     }
 
     public static function login($uid = 1, $tz_system_id = 1){

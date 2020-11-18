@@ -990,8 +990,7 @@ abstract class BetService extends BaseBetService {
             $flag = JuHuaBaseService::isLogin($uid, $tz_system_id);
         }elseif(in_array($tz_system_id, [13])){
             # 13、冰岛
-            //$flag = \backend\service\BingDao\BingDaoService::isLogin($uid, $tz_system_id);
-            $flag = true;
+            $flag = \backend\service\BingDao\BingDaoService::isLogin($uid, $tz_system_id);
         }
 
         return (boolean)$flag;
