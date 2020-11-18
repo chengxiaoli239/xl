@@ -1,0 +1,13 @@
+添加新彩种步骤：
+1、表：lt_lottery_type  添加彩种
+
+2、授权表：lt_tz_systems_auth  添加管理员授权彩种，用于添加开奖配置表记录
+2、表：lt_tz_systems  添加投注系统，如果同一系统有添加过别的彩种记录，则此步骤忽略
+
+3、配置表：lt_system_config 处理彩种(key:lottery_types) 后面英文逗号隔开添加  lt_lottery_type.lottery_type 例如：5,6,7,9,10,11
+
+4、添加期号相关计算判断
+	A、获取当前时间已经开奖的期号：HN0898Service::getCurrentQihao($lotteryType)
+	B、获取即将开奖的期号::getQihao($lotteryType)
+5、添加彩种投注之后，针对计划的某一期锁定时间
+	BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
