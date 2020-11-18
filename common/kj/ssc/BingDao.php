@@ -11,6 +11,10 @@ use  yii;
 
 class BingDao extends BaseKj {
     public static $lottery_type = 10;
+    public static $l_types = [
+        6 => 10, # 90s
+        7 => 11, # 3m
+    ];
 
     /**
      * @desc 幸运五星彩
@@ -91,10 +95,11 @@ class BingDao extends BaseKj {
     /**
      * @desc 冰岛90 - 官网 https://icelot.20191030pro.com/drawResult.html#/detail/6
      * @param string $returnType
+     * @param integer $l_type 6:90s 7:3m 8:5m 9:10m
      * @return array
      */
-    public static function getLotteryOne($returnType = 'json'){
-        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
+    public static function getLotteryOne($returnType = 'json', $l_type = 6){
+        if(!$kjData = self::getCurrentKjData(self::$l_types[$l_type])) {
             $domain = BaseKj::getApiHostByRoute('/kj/bing-dao/index');
 
             $url = $domain.'/kaijiangWeb/?a=kaijiangWeb.drawResult&m=getActiveDrawInfo'; #当前开奖号码
@@ -117,7 +122,7 @@ class BingDao extends BaseKj {
                 "sec-fetch-site: same-origin",
                 "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
             ];
-            $post_data = ['lotteryType'=>6];
+            $post_data = ['lotteryType'=>$l_type];
             $rst = self::postCurl($url, http_build_query($post_data), $headers);
             $data = $rst['data']['drawInfo']['historyDraw'];
 
