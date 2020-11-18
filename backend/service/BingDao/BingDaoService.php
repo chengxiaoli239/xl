@@ -1780,7 +1780,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             $m->set($betKey, 1, $time);
 
             # 获取方案号，记录id, 用于撤单
-            if(false){
+            if(true){
                 //$snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
                 $snInfo_snid .= $tmpRst['data']['lastBetNumber']['bet_listid'].';'; # 多次下单需要分开，多次撤单
                 //$snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
