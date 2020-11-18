@@ -2197,8 +2197,6 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         $rst = [];
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
         foreach ($codesArrs as $key=>$tmpcodesArr){
-
-            $tmpcodesArr = ['123X', '435X'];
             if($playway == 4){ # 一字定
                 $post_data = [
                     'bets' => json_encode($tmpcodesArr),
