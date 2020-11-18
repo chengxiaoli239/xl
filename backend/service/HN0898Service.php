@@ -1220,6 +1220,23 @@ class HN0898Service extends BaseTZService {
                     $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 }
                 break;
+            case 11: # 冰岛3分 早8点到凌晨3点
+                $timsstamp = time();
+                $today_time = strtotime(date('Y-m-d 00:00:00'));
+
+                $nowTime = date("H:i:s");
+                if('00:00:00'<$nowTime && $nowTime < '03:00:00') {
+                    $max_actionNo = '319';
+                    $now_timsstamp = $timsstamp - $today_time; # 早8点到凌晨3点 不开奖
+                    $actionNo = (int)($now_timsstamp / 180) + 2 + $max_actionNo;
+                    $qihao = date('Ymd', time() - 24 * 3600) . sprintf("%03d", $actionNo);
+                }else{
+                    $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
+
+                    $actionNo = (int)($now_timsstamp / 180) + 1;
+                    $qihao = date("Ymd").sprintf("%03d", $actionNo);
+                }
+                break;
         }
 
         return $qihao;
@@ -1296,6 +1313,23 @@ class HN0898Service extends BaseTZService {
                     $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
 
                     $actionNo = (int)($now_timsstamp / 90);
+                    $qihao = date("Ymd").sprintf("%03d", $actionNo);
+                }
+                break;
+            case 11: # 冰岛3分 早8点到凌晨3点
+                $timsstamp = time();
+                $today_time = strtotime(date('Y-m-d 00:00:00'));
+
+                $nowTime = date("H:i:s");
+                if('00:00:00'<$nowTime && $nowTime < '03:00:00') {
+                    $max_actionNo = '319';
+                    $now_timsstamp = $timsstamp - $today_time; # 早8点到凌晨3点 不开奖
+                    $actionNo = (int)($now_timsstamp / 180) + 1 + $max_actionNo;
+                    $qihao = date('Ymd', time() - 24 * 3600) . sprintf("%03d", $actionNo);
+                }else{
+                    $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
+
+                    $actionNo = (int)($now_timsstamp / 180);
                     $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 }
                 break;

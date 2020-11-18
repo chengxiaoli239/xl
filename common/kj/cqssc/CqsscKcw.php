@@ -31,6 +31,7 @@ class CqsscKcw extends BaseKj {
         8 => '幸运五星', # 幸运五星系统彩 5分
         9 => '台湾宾果', # 台湾宾果 5分
         10 => '冰岛90s', # 冰岛90s 1.5分
+        11 => '冰岛3m', # 冰岛90s 1.5分
     ];
 
     public static function getLotteryNo($returnType = 'json'){

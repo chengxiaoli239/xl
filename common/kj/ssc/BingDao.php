@@ -3,6 +3,7 @@
 namespace common\kj\ssc;
 use backend\models\SystemConfig;
 use backend\models\TzSystemsUsers;
+use backend\service\BingDao\BingDaoService;
 use backend\service\CurlService;
 use common\kj\BaseKj;
 use common\service\CommonService;
@@ -11,10 +12,6 @@ use  yii;
 
 class BingDao extends BaseKj {
     public static $lottery_type = 10;
-    public static $l_types = [
-        6 => 10, # 90s
-        7 => 11, # 3m
-    ];
 
     /**
      * @desc 幸运五星彩
@@ -99,7 +96,7 @@ class BingDao extends BaseKj {
      * @return array
      */
     public static function getLotteryOne($returnType = 'json', $l_type = 6){
-        if(!$kjData = self::getCurrentKjData(self::$l_types[$l_type])) {
+        if(!$kjData = self::getCurrentKjData(BingDaoService::$l_types[$l_type])) {
             $domain = BaseKj::getApiHostByRoute('/kj/bing-dao/index');
 
             $url = $domain.'/kaijiangWeb/?a=kaijiangWeb.drawResult&m=getActiveDrawInfo'; #当前开奖号码

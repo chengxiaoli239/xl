@@ -1,9 +1,7 @@
+# 90s
 1、General
 Request URL: https://o1.op5168.com/member/?a=member.bet&m=placeBet
 Request Method: POST
-Status Code: 200 
-Remote Address: 13.70.30.145:443
-Referrer Policy: strict-origin-when-cross-origin
 
 2、Request Headers
 :authority: o1.op5168.com
@@ -38,3 +36,43 @@ forceOverwrite: 0
 amountFastImport: 0
 betsPool: {"124X":"0.1","134X":"0.1"}
 text: 取定位千1百23十4三定
+
+
+# 三分
+1、General
+Request URL: https://o2.op5168.com/member/?a=member.bet&m=placeBet
+Request Method: POST
+
+2、Request Headers
+:authority: o2.op5168.com
+:method: POST
+:path: /member/?a=member.bet&m=placeBet
+:scheme: https
+accept: application/json, text/plain, */*
+accept-encoding: gzip, deflate, br
+accept-language: zh-CN,zh;q=0.9,en;q=0.8
+content-length: 291
+content-type: application/x-www-form-urlencoded
+cookie: apiKey=b3f62145fcd696f571c0cff6e04a92b4
+origin: https://o2.op5168.com
+referer: https://o2.op5168.com/main.html
+sec-fetch-dest: empty
+sec-fetch-mode: cors
+sec-fetch-site: same-origin
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+
+3、query string paramters
+a: member.bet
+m: placeBet
+
+4、Form Data
+apiKey: b3f62145fcd696f571c0cff6e04a92b4
+source: 4
+lotteryType: 7
+drawNumber: 20201118309
+resultCount: 2
+forceBet: 0
+forceOverwrite: 0
+amountFastImport: 0
+betsPool: {"122X":"0.1","123X":"0.1"}
+text: 取定位千1百2十23三定
