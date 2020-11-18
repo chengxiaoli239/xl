@@ -96,8 +96,13 @@ class BingDao extends BaseKj {
      * @return array
      */
     public static function getLotteryOne($returnType = 'json', $l_type = 6){
+        $r_s = [
+            6 => '',
+            7 => '3m',
+            8 => '5m',
+        ];
         if(!$kjData = self::getCurrentKjData(BingDaoService::$l_types[$l_type])) {
-            $domain = BaseKj::getApiHostByRoute('/kj/bing-dao/index');
+            $domain = BaseKj::getApiHostByRoute('/kj/bing-dao/index'.$r_s[$l_type]);
 
             $url = $domain.'/kaijiangWeb/?a=kaijiangWeb.drawResult&m=getActiveDrawInfo'; #当前开奖号码
             # 当前开奖链接：https://icelot.20191030pro.com/kaijiangWeb/?a=kaijiangWeb.drawResult&m=getActiveDrawInfo

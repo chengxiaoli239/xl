@@ -194,12 +194,12 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $kjData = BingDao::getLotteryOne('json', $l_type = 7);p($kjData);
         $rst = BingDaoService::login($uid = 20, $tz_system_id = 13);p($rst);
         $rst = BingDaoService::synBalance($TzSystemsUser_id = 66);p($rst);
         $rst = BingDaoService::userInfo($uid = 20, $tz_system_id = 13);p($rst);
         $varifyCode = BingDaoService::getVerifyCodeByCaptchCodeRst($captchaCodeRst = '0129487653', $code = '463');p($varifyCode);
         $balance = BingDaoService::getBalance($uid = 20,$tz_system_id = 13);p($balance);
-        $kjData = BingDao::getLotteryOne();p($kjData);
         $data = CqsscKcw::getLotteryTaiwanBinguo();p($data);
         $qihao_1 = HN0898Service::getCurrentQihao($lottery_type = 10);
         $qihao_2 = HN0898Service::getQihao($lottery_type = 10);p([$qihao_1, $qihao_2]);
