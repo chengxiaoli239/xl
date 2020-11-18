@@ -277,6 +277,11 @@ abstract class BetService extends BaseBetService {
             if('00:00:00'<$time && $time<'07:00:00'){
                 $status = false;
             }
+        }elseif(in_array($lottery_type, [10, 11])){
+            # 冰岛90s 3m
+            if('03:00:00'<$time && $time<'08:00:00'){
+                $status = false;
+            }
         }
 
         return $status;
