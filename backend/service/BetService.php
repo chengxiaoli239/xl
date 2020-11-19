@@ -199,15 +199,15 @@ abstract class BetService extends BaseBetService {
         if(!$uid) return ['status'=>300, 'msg'=>'用户id不能为0'];
         $tzStatus = SystemConfig::findOne(['key'=>'tz_status'])->value;
         if(!$tzStatus) return ['status'=>300, 'msg'=>'投注开关未开启'];
-        $lottery_types = StaticService::getLotteryTypes();
+        $lottery_types = StaticService::getUserLotteryTypes($uid);
         foreach ($lottery_types as $lottery_type) {
             $hasActivePlan = CommonService::hasPlansActive($lottery_type);
-            if(in_array($lottery_type, [8]) && !$hasActivePlan){
+            if(in_array($lottery_type, [8, 10, 11]) && !$hasActivePlan){
                 continue;
             }
             $qihao = HN0898Service::getQihao($lottery_type);
             $tzStatus = BetService::isCanBet($lottery_type, $uid);
-            Tool_Common::log('betByUid', 'INFO', '单用户下单', ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'tzStatus'=>$tzStatus]);
+            Tool_Common::log('betByUid', 'INFO', '单用户下单', ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'tzStatus'=>$tzStatus]);
             if (!$tzStatus) continue;
             $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['=', 'uid', $uid], ['=', 'is_parent', 1]];
             $plans = UserSysPlans::find()->where($where)->orderBy(['tz_sort'=>SORT_ASC])->all();
@@ -216,9 +216,9 @@ abstract class BetService extends BaseBetService {
                 $datas = [];
                 foreach ($plans as $key => $plan) {
                     $tzRst[$plan->id] = self::tzByPlanId($plan->id);
+                    BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 彩种投注结束锁
                 }
                 $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
-                BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 彩种投注结束锁
                 $logArr[$lottery_type]['plans'] = $plans;
                 $count = count($plans);
                 $logArr[$lottery_type]['qihao'] = $qihao;
@@ -243,6 +243,7 @@ abstract class BetService extends BaseBetService {
 
         $m = \Yii::$app->cache;
         $status = $m->get($pkey);
+        Tool_Common::log('isCanBet', 'INFO', '是否下注缓存值', ['lottery_type'=>$lottery_type, 'uid'=>$uid, 'pKey'=>$pkey, 'status'=>$status]);
 
         $time = date('H:i:s');
         if($lottery_type == 5){
@@ -740,6 +741,7 @@ abstract class BetService extends BaseBetService {
                }
            }
            $isAuto == 0 && BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 手动无需锁
+           $tmpRst['lottery_type'] = $plan->lottery_type;
            $rst[] = $tmpRst;
        }
        $logArr = ['tz_sites'=>$tz_sites,'codes'=>$codes, 'postRst'=>$rst];

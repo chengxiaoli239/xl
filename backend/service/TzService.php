@@ -168,6 +168,8 @@ class TzService extends BaseService {
         if(!$is_test && !$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opSystemBetPlans')){
             return $status;
         }
+        $rst['qihao'] = $qihao;
+        $rst['lottery_type'] = $lottery_type;
 
         $time1 = microtime(true);
         # 1、处理系统投注计划号码
@@ -182,15 +184,17 @@ class TzService extends BaseService {
         # 2、单双
         $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖单双数据
         $time3 = microtime(true);
-        //if(in_array($lottery_type, [5,6])){ # 重庆、新疆才统计单双遗漏
+        if(!in_array($lottery_type, [10,11])){ # 重庆、新疆才统计单双遗漏, 冰岛90、3分不统计
             $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏 耗时4s
-        //}
+        }
         $time4 = microtime(true);
 
         # 3、三字现
         //$rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏 已写开奖表 三字现遗漏表暂时不写了
         $time5 = microtime(true);
-        $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type); # 耗时 6-7s - 30s
+        if(!in_array($lottery_type, [10,11])) { # 重庆、新疆才统计单双遗漏, 冰岛90、3分不统计
+            $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type); # 耗时 6-7s - 30s
+        }
         $time6 = microtime(true);
 
         # 4、四定和值遗漏
@@ -218,8 +222,6 @@ class TzService extends BaseService {
         */
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type); # 处理止盈止损、倍投等计划
 
-        $rst['qihao'] = $qihao;
-        $rst['lottery_type'] = $lottery_type;
         $rst['consume_time1'] = ($time2 - $time1).'s';
         $rst['consume_time2'] = ($time3 - $time2).'s';
         $rst['consume_time3'] = ($time4 - $time3).'s';

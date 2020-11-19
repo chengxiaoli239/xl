@@ -43,15 +43,18 @@ class BaseKj{
     public static function setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao, $kjData){
         $m = \Yii::$app->cache;
 
-        if($lottery_type == 5){
+        $set_time = 5*60;
+        if($lottery_type == 5) {
             $str = substr($qihao, 2, 10);
-            $qihao = str_replace('-', '',$str);
+            $qihao = str_replace('-', '', $str);
+        }elseif (in_array($lottery_type, [10, 11])){ # 冰岛3分  90s
+            $set_time = 5;
         }else{
             $qihao = $qihao;
         }
         if($kjData['opencode']){
             $mkey = self::buildKjDataKey($lottery_type, $qihao);
-            $m->set($mkey, $kjData, 5*60);
+            $m->set($mkey, $kjData, $set_time);
         }
 
         return true;

@@ -1638,6 +1638,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
      */
     public static function postBatchBet($qihao, $plan_id, $codes){
         //p([$qihao, $plan_id, $codes]);
+        Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-3', ['qihao'=>$qihao, 'plan_id'=>$plan_id]);
         $tmpCodes = $codes;
         $plan = UserSysPlans::findOne($plan_id);
         if($plan->tz_type == 22){ # 四定单双,codes格式：13579,13579,02468,13579@13579,13579,02468,02468@13579,02468,13579,13579
@@ -1659,6 +1660,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         $betNums = self::getBetNumsPer();
         $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
         //p($codesArrs);
+        Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-4', ['qihao'=>$qihao, 'plan_id'=>$plan_id]);
 
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
@@ -1719,11 +1721,13 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                 $TzSystemsUsers->user_agent,
             ];
 
+            Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-5', ['qihao'=>$qihao, 'plan_id'=>$plan_id]);
             # 缓存锁
             $m = \Yii::$app->cache;
             $betKey = BetService::buildBetKey($plan->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id).'_'.$key; # 分配下注后面加key
             if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
+            Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-6', ['qihao'=>$qihao, 'plan_id'=>$plan_id]);
             //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
             # 和值投注反应时间比较久，无需返回直接锁住
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
@@ -1733,6 +1737,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             $start_time = microtime(true);
             //$tmpRst = self::postCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
             $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+            Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-7', ['qihao'=>$qihao, 'plan_id'=>$plan_id]);
             //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
             //sleep(1);
             $rst[$key] = $tmpRst;
@@ -1762,12 +1767,14 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                     $m->delete($betKey);
                     //sleep(10);
                     //$tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+                    Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-8', $tmpRst);
                     return false;
                 }
                 //if($tz_type != 20) $tzRst['code'] = $codes;
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','冰岛90s批投注记录-投注失败', $tzRst);
                 # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护，307账号停押
                 if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [302, 303, 304, 305, 306, 307])){
+                    Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-9', $tmpRst);
                     //return $rst;
                     continue;
                 }

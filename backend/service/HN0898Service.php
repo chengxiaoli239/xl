@@ -1132,7 +1132,7 @@ class HN0898Service extends BaseTZService {
     }
 
     /**
-     * @decription 获取即将开奖的期号
+     * @decription 获取 - 即将开奖的期号
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return string
      */
@@ -1216,7 +1216,7 @@ class HN0898Service extends BaseTZService {
                 }else{
                     $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
 
-                    $actionNo = (int)($now_timsstamp / 90) + 2;
+                    $actionNo = (int)($now_timsstamp / 90) + 1;
                     $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 }
                 break;
@@ -1243,7 +1243,7 @@ class HN0898Service extends BaseTZService {
     }
 
     /**
-     * @decription 获取当前时间已经开奖的期号
+     * @decription 获取当前时间 - 已经开奖的期号
      * @param int $type
      * @return string
      */
@@ -1312,7 +1312,7 @@ class HN0898Service extends BaseTZService {
                 }else{
                     $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
 
-                    $actionNo = (int)($now_timsstamp / 90) + 1;
+                    $actionNo = (int)($now_timsstamp / 90);
                     $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 }
                 break;

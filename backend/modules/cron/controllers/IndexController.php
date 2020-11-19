@@ -67,9 +67,16 @@ class IndexController extends Controller
     public function actionGrabKjDataOne(){
         self::_init();
         $post = \Yii::$app->request->post();
-        for ($i = 1; $i<8; $i++) {
+        if($post['lottery_types'][0] == 10){
+            $for_times = 33;
+            $sleep_time = 2;
+        }else{
+            $for_times = 8;
+            $sleep_time = 5;
+        }
+        for ($i = 1; $i<$for_times; $i++) {
             $rst['kj'] = KjDataGet::grabOne($post['lottery_types']);
-            sleep(5);
+            sleep($sleep_time);
         }
 
         return $rst;
@@ -219,9 +226,16 @@ class IndexController extends Controller
         self::_init();
         $post = \Yii::$app->request->post();
         $uid = $post['uid'];
-        for($i=0; $i<5; $i++){
+        if(in_array($uid, [20])){
+            $for_times = 14;
+            $sleep_time = 5;
+        }else{
+            $for_times = 8;
+            $sleep_time = 5;
+        }
+        for($i=0; $i<$for_times; $i++){
             $rst['bet'] = BetService::betByUid($uid); // 用户新计划投注，可正买可反买
-            sleep(3);
+            sleep($sleep_time);
         }
 
         return $rst;

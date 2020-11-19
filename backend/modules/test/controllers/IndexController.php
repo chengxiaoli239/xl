@@ -194,6 +194,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $lottery_type = 10;
+        $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
+        $qihao_2 = HN0898Service::getQihao($lottery_type);p([$qihao_1, $qihao_2]);
         $kjData = BingDao::getLotteryOne('json', $l_type = 7);p($kjData);
         $rst = BingDaoService::login($uid = 20, $tz_system_id = 13);p($rst);
         $rst = BingDaoService::synBalance($TzSystemsUser_id = 66);p($rst);
@@ -201,8 +204,6 @@ class IndexController extends Controller
         $varifyCode = BingDaoService::getVerifyCodeByCaptchCodeRst($captchaCodeRst = '0129487653', $code = '463');p($varifyCode);
         $balance = BingDaoService::getBalance($uid = 20,$tz_system_id = 13);p($balance);
         $data = CqsscKcw::getLotteryTaiwanBinguo();p($data);
-        $qihao_1 = HN0898Service::getCurrentQihao($lottery_type = 10);
-        $qihao_2 = HN0898Service::getQihao($lottery_type = 10);p([$qihao_1, $qihao_2]);
         $rst['kj'] = KjDataGet::grabOne($lottery_types = [9]); p($rst); # 开奖抓取
         $lottery_types = StaticService::getLotteryTypes();
         $lottery_types = [9];

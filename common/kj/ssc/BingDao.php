@@ -139,7 +139,7 @@ class BingDao extends BaseKj {
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
 
-        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+        self::setKjDataCache(BingDaoService::$l_types[$l_type], $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
@@ -150,7 +150,7 @@ class BingDao extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/luck5', 'INFO', '号码抓取-实讯网', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bingdao_kj', 'INFO', '号码抓取-冰岛', $logArr);
 
         return $rst;
     }

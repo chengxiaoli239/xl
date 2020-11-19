@@ -35,6 +35,7 @@ use backend\models\StaticPerHzProfits;
 use backend\models\StaticProfits;
 use backend\models\SystemConfig;
 use backend\models\ThreeNum;
+use backend\models\TzSystemsAuth;
 use backend\models\TzTypes;
 use backend\tools\Util;
 use common\service\CommonService;
@@ -2303,6 +2304,17 @@ class StaticService extends BaseService {
 
        return $rst;
    }
+
+    /**
+     * @desc 用户分配的彩种
+     * @return array
+     */
+    public static function getUserLotteryTypes($uid){
+        $lottery_types = TzSystemsAuth::findOne(['uid'=>$uid])->lottery_types;
+        $lottery_typesArr = explode(',', $lottery_types);
+
+        return $lottery_typesArr;
+    }
 
     /**
      * @desc 需要处理的猜中

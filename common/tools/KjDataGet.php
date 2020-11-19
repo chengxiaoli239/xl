@@ -103,7 +103,7 @@ class KjDataGet
         if(empty($lottery_types)) $lottery_types = StaticService::getLotteryTypes();
         $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
-            $status = self::isCanGrab($lottery_type);
+            $status = KjDataGet::isCanGrab($lottery_type);
             if(!$status) continue;
             $KjConfigs = KjConfig::findAll(['enable'=>1, 'lottery_type'=>$lottery_type]);
             foreach ($KjConfigs as $kjConfig){
@@ -175,6 +175,11 @@ class KjDataGet
         return $msg;
     }
 
+    /**
+     * @desc 判断时间段是否可以抓取开奖号码  主要针对半夜不开奖时间段
+     * @param int $lottery_type
+     * @return bool
+     */
     public static function isCanGrab($lottery_type = DEFAULT_LOTTERY_TYPE) {
         $rst = true;
         $date_time = date('H:i');
@@ -184,6 +189,10 @@ class KjDataGet
             }
         }elseif($lottery_type == 8){ # 幸运五星
             if ('04:10' < $date_time && $date_time < '09:00') {
+                $rst = false;
+            }
+        }elseif(in_array($lottery_type, [10, 11])){ # 冰岛90s、3分
+            if ('03:10' < $date_time && $date_time < '09:00') {
                 $rst = false;
             }
         }
