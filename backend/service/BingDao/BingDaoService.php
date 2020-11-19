@@ -42,10 +42,12 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
     public static $user_id;
     public static $account = '';
     public static $l_types = [ # 网盘对本系统的彩种类型id
+        5 => 6, # 新疆时时彩
         6 => 10, # 90s
         7 => 11, # 3m
     ];
     public static $ll_types = [ # 本系统对网盘的彩种类型id
+        6 => 5, # 新疆
         10 => 6, # 90s
         11 => 7, # 3m
     ];
@@ -1663,6 +1665,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-4', ['qihao'=>$qihao, 'plan_id'=>$plan_id]);
 
         $playway = $plan->playway ? $plan->playway : 3;
+        $playwayArr = [2=>'三定', 3=>'四定'];
         $single = $plan->single ? $plan->single : 0.1;
         $tz_type = $plan->tz_type ? $plan->tz_type : 0;
         $lottery_type = $plan->lottery_type;
@@ -1697,7 +1700,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                     'forceOverwrite' => 0,
                     'amountFastImport' => 0,
                     'betsPool'=>json_encode($bet_codes),
-                    'text' => '取定位千1百23十4三定定',
+                    'text' => '取定位千1百23十4'.$playwayArr[$playway],
                 ];
             }
 

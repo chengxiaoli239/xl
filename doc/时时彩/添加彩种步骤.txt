@@ -13,3 +13,11 @@
 	BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
 7、投注时间点限制
 	BetService::isCanBet($lottery_type)
+8、开奖号码抓取时间段限制
+	KjDataGet::isCanGrab($lottery_type)
+9、开奖号码缓存时间设置，主要防止频繁请求抓开奖号码被封
+	KjDataGet::isCanGrab($lottery_type)
+10、# 处理系统投注计划，更新统计数据
+	TzService::opSystemBetPlans($lottery_type); # 主要限制高频彩统计数据太多耗时太长影响下下注
+11、针对试用验证码、代理ip站点做拦截，没开启计划做不必要请求网盘的限制
+	BetService::betByUid($uid)
