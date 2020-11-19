@@ -1216,7 +1216,7 @@ class HN0898Service extends BaseTZService {
                 }else{
                     $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
 
-                    $actionNo = (int)($now_timsstamp / 90) + 1;
+                    $actionNo = (int)($now_timsstamp / 90) + 2;
                     $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 }
                 break;
