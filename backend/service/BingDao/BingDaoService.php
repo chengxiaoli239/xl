@@ -1782,7 +1782,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                     continue;
                 }
                 if(in_array($rst[$key]['code'], [302])){
-                    //return $rst; # 余额不足
+                    return $rst; # 余额不足
                 }
             }
 
@@ -1946,7 +1946,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             $data_type = 'json';
         }
 
-        if(strpos($data, '余额不足') !== false){
+        if(strpos($data, '余额不足') !== false OR $rstData['code'] == 101){
             $rstData = ["Status"=>0, 'code'=>302, 'msg'=>'余额不足'];
         }elseif(strpos($data, '登录') !== false OR strpos($data, 'Bad Gateway') !== false OR strpos($data, 'Object moved') !== false){
             $rstData = ["Status"=>0, 'code'=>303, 'msg'=>'请重新登录'];
