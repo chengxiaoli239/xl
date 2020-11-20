@@ -1782,6 +1782,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                     continue;
                 }
                 if(in_array($rst[$key]['code'], [302])){
+                    Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-10', $tmpRst);
                     return $rst; # 余额不足
                 }
             }
