@@ -580,6 +580,15 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
     </footer>
     <!--footer end-->
 </section>
+<script>
+    <!--ST客服代码-->
+    (function () {
+        var _stkf_code = document.createElement("script");
+        _stkf_code.src = "//kf.sm0898.com/code/index";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(_stkf_code, s);
+    })();
+</script>
 
 <?php $this->endBody() ?>
 </body>

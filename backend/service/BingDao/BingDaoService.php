@@ -591,6 +591,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                     }
                     break;
                 case 1: # 二字定 2357,2468,X,X
+                    $codesArr[str_replace(',','',$code)] = (string)$single;
                     break;
                 case 2: # 三字定
                     $codesArr[str_replace(',','',$code)] = (string)$single;
@@ -1688,7 +1689,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                     'period_no' => $qihao,
                 ];
 
-            }else{ # 四定、三定
+            }else{ # 四定、三定、二定
                 $bet_codes = self::formCodesStyle($tmpcodesArr, $playway, $single);
                 $post_data = [
                     'apiKey' => $TzSystemsUsers->cookie,
