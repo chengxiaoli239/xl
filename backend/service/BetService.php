@@ -382,6 +382,8 @@ abstract class BetService extends BaseBetService {
 
                 if(in_array($tz_type, [30])) { # 二定快选
                     $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 2);
+                }elseif(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])) { # 二定 导入方案
+                    $codesArr = UserSysPlansService::getImportCodes($plan_id);
                 }elseif(in_array($tz_type, [31])) { # 五位二定
                     $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 5);
                 }elseif(in_array($tz_type, [33])) { # 二定号码翻倍切换

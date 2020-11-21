@@ -45,7 +45,13 @@ use yii\widgets\ActiveForm;
                     </div>
                     <?= $form->field($model, 'single')->textInput() ?>
 
-                    <?= $form->field($model, 'import_codes_txt')->textInput()->label('多组英文逗号或空格隔开 格式：23XX,34XX 或 23XX 34XX') ?>
+                    <div class="row">
+                        <div class="col-lg-3 col-xs-12">
+                            <?= $form->field($model,"import_codes_txt")->textarea([ 'autofocus' => false,'style'=>'height:100px' ])->label('多组英文逗号或空格隔开 23XX,34XX 或 23XX 34XX')?>
+                        </div>
+                    </div>
+
+                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:1-3-7-15-31-62-125-251') ?>
 
                     <!--止盈止损-->
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
