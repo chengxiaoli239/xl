@@ -41,6 +41,16 @@ class BingDaoController extends Controller
     }
 
     /**
+     * @desc 彩种:冰岛5m - 抓官网
+     * @return json|xml
+     */
+    public function actionIndex10m($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = BingDao::getLotteryOne($type, $l_type=9);
+        return $data;
+    }
+
+    /**
      * @desc 冰岛 - 实时资讯网 https://icelot.20191030pro.com/
      * @param string $type
      * @return array
