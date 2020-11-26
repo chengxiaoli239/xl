@@ -48,8 +48,8 @@ class HN0898Service extends BaseTZService {
     public static $typeTimes = [
         10 => ['m'=>1.5, 'max_qihao'=>639],
         11 => ['m'=>3, 'max_qihao'=>319],
-        12 => ['m'=>5, 'max_qihao'=>227], # 待定
-        13 => ['m'=>10, 'max_qihao'=>113], # 待定
+        12 => ['m'=>5, 'max_qihao'=>191], # 待定
+        13 => ['m'=>10, 'max_qihao'=>95], # 待定
     ];
 
     /**
@@ -1238,7 +1238,7 @@ class HN0898Service extends BaseTZService {
                 $today_time = strtotime(date('Y-m-d 00:00:00'));
                 $nowTime = date("H:i:s");
                 if('00:00:00'<$nowTime && $nowTime < '03:00:00') {
-                    $max_actionNo = $types[$lottery_type]['max_qihao'];
+                    $max_actionNo = $types[$lottery_type]['max_qihao']; # 12点最大期号
                     $now_timsstamp = $timsstamp - $today_time; # 早8点到凌晨3点 不开奖
                     $actionNo = (int)($now_timsstamp / $qujian_times) + 2 + $max_actionNo;
                     $qihao = date('Ymd', time() - 24 * 3600) . sprintf("%03d", $actionNo);
@@ -1338,7 +1338,7 @@ class HN0898Service extends BaseTZService {
 
                 $nowTime = date("H:i:s");
                 if('00:00:00'<$nowTime && $nowTime < '03:00:00') {
-                    $max_actionNo = $types[$lottery_type]['max_qihao'];
+                    $max_actionNo = $types[$lottery_type]['max_qihao']; # 12点最大期号
                     $now_timsstamp = $timsstamp - $today_time; # 早8点到凌晨3点 不开奖
                     $actionNo = (int)($now_timsstamp / $qujian_times) + 1 + $max_actionNo;
                     $qihao = date('Ymd', time() - 24 * 3600) . sprintf("%03d", $actionNo);
