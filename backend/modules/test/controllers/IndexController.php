@@ -194,7 +194,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $lottery_type = 12;
+        $lottery_type = 9;
         $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
         $qihao_2 = HN0898Service::getQihao($lottery_type);p([$qihao_1, $qihao_2]);
         $rst = BingDaoService::login($uid = 20, $tz_system_id = 13);p($rst);

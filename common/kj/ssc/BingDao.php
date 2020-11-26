@@ -101,6 +101,7 @@ class BingDao extends BaseKj {
             7 => '3m',
             8 => '5m',
             9 => '10m',
+            10 => '5m-tw', # 台湾宾果
         ];
         if(!$kjData = self::getCurrentKjData(BingDaoService::$l_types[$l_type])) {
             $domain = BaseKj::getApiHostByRoute('/kj/bing-dao/index'.$r_s[$l_type]);

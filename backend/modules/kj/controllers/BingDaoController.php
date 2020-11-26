@@ -31,6 +31,16 @@ class BingDaoController extends Controller
     }
 
     /**
+     * @desc 彩种:冰岛台湾冰果 5m - 抓官网
+     * @return json|xml
+     */
+    public function actionIndex5mTw($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = BingDao::getLotteryOne($type, $l_type=8);
+        return $data;
+    }
+
+    /**
      * @desc 彩种:冰岛5m - 抓官网
      * @return json|xml
      */
