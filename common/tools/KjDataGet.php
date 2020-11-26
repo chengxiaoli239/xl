@@ -191,7 +191,7 @@ class KjDataGet
             if ('04:10' < $date_time && $date_time < '09:00') {
                 $rst = false;
             }
-        }elseif(in_array($lottery_type, [10, 11])){ # 冰岛90s、3分
+        }elseif(in_array($lottery_type, [10, 11, 12, 13])){ # 冰岛90s、3分
             if ('03:10' < $date_time && $date_time < '09:00') {
                 $rst = false;
             }

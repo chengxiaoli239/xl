@@ -45,11 +45,15 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         5 => 6, # 新疆时时彩
         6 => 10, # 90s
         7 => 11, # 3m
+        8 => 12, # 5m
+        9 => 13, # 10m
     ];
     public static $ll_types = [ # 本系统对网盘的彩种类型id
         6 => 5, # 新疆
         10 => 6, # 90s
         11 => 7, # 3m
+        12 => 8, # 5m
+        13 => 9, # 5m
     ];
 
     public static $headers = [];

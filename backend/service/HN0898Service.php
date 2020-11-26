@@ -45,6 +45,13 @@ class HN0898Service extends BaseTZService {
 
     public static $headers = [];
 
+    public static $typeTimes = [
+        10 => ['m'=>1.5, 'max_qihao'=>639],
+        11 => ['m'=>3, 'max_qihao'=>319],
+        12 => ['m'=>5, 'max_qihao'=>227], # 待定
+        13 => ['m'=>10, 'max_qihao'=>113], # 待定
+    ];
+
     /**
      * HN0898Service constructor.
      * @param string $account
@@ -1221,19 +1228,24 @@ class HN0898Service extends BaseTZService {
                 }
                 break;
             case 11: # 冰岛3分 早8点到凌晨3点
+            case 12: # 冰岛5分 早8点到凌晨3点
+            case 13: # 冰岛10分 早8点到凌晨3点
                 $timsstamp = time();
-                $today_time = strtotime(date('Y-m-d 00:00:00'));
+                $types = self::$typeTimes;
 
+                $qujian_times =  ($types[$lottery_type]['m']*60);
+
+                $today_time = strtotime(date('Y-m-d 00:00:00'));
                 $nowTime = date("H:i:s");
                 if('00:00:00'<$nowTime && $nowTime < '03:00:00') {
-                    $max_actionNo = '319';
+                    $max_actionNo = $types[$lottery_type]['max_qihao'];
                     $now_timsstamp = $timsstamp - $today_time; # 早8点到凌晨3点 不开奖
-                    $actionNo = (int)($now_timsstamp / 180) + 2 + $max_actionNo;
+                    $actionNo = (int)($now_timsstamp / $qujian_times) + 2 + $max_actionNo;
                     $qihao = date('Ymd', time() - 24 * 3600) . sprintf("%03d", $actionNo);
                 }else{
                     $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
 
-                    $actionNo = (int)($now_timsstamp / 180) + 1;
+                    $actionNo = (int)($now_timsstamp / $qujian_times) + 1;
                     $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 }
                 break;
@@ -1317,19 +1329,23 @@ class HN0898Service extends BaseTZService {
                 }
                 break;
             case 11: # 冰岛3分 早8点到凌晨3点
+            case 12: # 冰岛5分 早8点到凌晨3点
+            case 13: # 冰岛10分 早8点到凌晨3点
+                $types = self::$typeTimes;
+                $qujian_times =  ($types[$lottery_type]['m']*60);
                 $timsstamp = time();
                 $today_time = strtotime(date('Y-m-d 00:00:00'));
 
                 $nowTime = date("H:i:s");
                 if('00:00:00'<$nowTime && $nowTime < '03:00:00') {
-                    $max_actionNo = '319';
+                    $max_actionNo = $types[$lottery_type]['max_qihao'];
                     $now_timsstamp = $timsstamp - $today_time; # 早8点到凌晨3点 不开奖
-                    $actionNo = (int)($now_timsstamp / 180) + 1 + $max_actionNo;
+                    $actionNo = (int)($now_timsstamp / $qujian_times) + 1 + $max_actionNo;
                     $qihao = date('Ymd', time() - 24 * 3600) . sprintf("%03d", $actionNo);
                 }else{
                     $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
 
-                    $actionNo = (int)($now_timsstamp / 180);
+                    $actionNo = (int)($now_timsstamp / $qujian_times);
                     $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 }
                 break;

@@ -6,6 +6,9 @@
 
 4、配置表：lt_system_config 处理彩种(key:lottery_types) 后面英文逗号隔开添加  lt_lottery_type.lottery_type 例如：5,6,7,9,10,11
 
+4.1 添加，彩种对应名称，后面优化从 lt_lottery_type 表取数据：
+	CqsscKcw::$lotteryNameArr
+
 5、添加期号相关计算判断
 	A、获取当前时间已经开奖的期号：HN0898Service::getCurrentQihao($lotteryType)
 	B、获取即将开奖的期号::getQihao($lotteryType)

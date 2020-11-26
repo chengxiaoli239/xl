@@ -25,6 +25,9 @@ return [
     # 导入号码投注类型
     'IMPORT_CODES_TYPES' => [ 19,27,34 ],
 
+    # 不统计的彩种
+    'NOT_STATIC_LOTTERYS' => [ 10, 11, 12, 13 ],
+
     'GET_BASE_DATA_CACHE_TIME' => 30 * 60,
 
     # 站点域名，目前大部分站点登录之前robot7_session_id匹配获取

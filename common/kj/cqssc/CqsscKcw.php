@@ -13,13 +13,20 @@ use  yii;
 class CqsscKcw extends BaseKj {
     public static $lottery_type = 5;
 
+    # 彩种时间类型
     public static $lotteryTypeArr = [
         5 => 1, # 5:1.5分
         6 => 2, # 6:3分
         7 => 3, # 7:5分
         8 => 4, # 8:10分
         9 => 3, # 9:5分  台湾宾果
+        10 => 1, # 10:1.5分 冰岛90
+        11 => 2, # 11:3分 冰岛3m
+        12 => 3, # 11:5分 冰岛5m
+        13 => 4, # 11:5分 冰岛10m
     ];
+
+    # 彩种对应名称
     public static $lotteryNameArr = [
         1 => '希腊1.5分', # 5:1.5分
         2 => '希腊3分', # 6:3分
@@ -31,7 +38,9 @@ class CqsscKcw extends BaseKj {
         8 => '幸运五星', # 幸运五星系统彩 5分
         9 => '台湾宾果', # 台湾宾果 5分
         10 => '冰岛90s', # 冰岛90s 1.5分
-        11 => '冰岛3m', # 冰岛90s 1.5分
+        11 => '冰岛3m', # 冰岛3分
+        12 => '冰岛5m', # 冰岛5分
+        13 => '冰岛10m', # 冰岛5分
     ];
 
     public static function getLotteryNo($returnType = 'json'){
