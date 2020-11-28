@@ -11,10 +11,11 @@ class PoxyIPService extends BaseService {
      * @param $num = 1; # 提取IP数量
      */
     public static function kuaiPoxy($num = 1){
+        $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
         $API_KEY = BetService::getConfig('KUAI_POXY_API_KEY'); # 快代理 API Key
         // https://dev.kdlapi.com/api/getorderexpiretime?orderid=938684913491492&signature=vdany88efprusvlm16cb0is9wr9smb4q
         $query = [
-            'orderid' => \Yii::$app->params['KUAI_POXY_ORDER_ID'], # 快代理订单号
+            'orderid' => $KUAI_POXY_ORDER_ID, # 快代理订单号
             'num' => $num,
             'pt' => 1, # 1、http/https,返回http代理的端口号 2、socks4/socks5,返回socks代理的端口号
             'format' => 'json', # json、xml
@@ -119,8 +120,9 @@ class PoxyIPService extends BaseService {
      * @return array
      */
     public static function kuaiPoxyExpire(){
+        $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
         $query = [
-            'orderid' => \Yii::$app->params['KUAI_POXY_ORDER_ID'], # 快代理订单号
+            'orderid' => $KUAI_POXY_ORDER_ID, # 快代理订单号
             'signature' => BetService::getConfig('KUAI_POXY_API_KEY'), # 配置
         ];
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getorderexpiretime/?'.http_build_query($query);
@@ -140,8 +142,9 @@ class PoxyIPService extends BaseService {
      */
     public static function kuaiIPValidTime($poxy_ips = ''){
         if(strpos($poxy_ips[0], ':') === false) return ['status'=>300, 'msg'=>'IP格式错误，缺少冒号 ":"'];
+        $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
         $query = [
-            'orderid' => \Yii::$app->params['KUAI_POXY_ORDER_ID'], # 快代理订单号
+            'orderid' => $KUAI_POXY_ORDER_ID, # 快代理订单号
             'proxy' => implode(',', $poxy_ips),
             'signature' => BetService::getConfig('KUAI_POXY_API_KEY'), # 配置
         ];
@@ -170,8 +173,9 @@ class PoxyIPService extends BaseService {
         }
 
         $API_KEY = BetService::getConfig('KUAI_POXY_API_KEY'); # 快代理 API Key
+        $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
         $query = [
-            'orderid' => \Yii::$app->params['KUAI_POXY_ORDER_ID'],
+            'orderid' => $KUAI_POXY_ORDER_ID,
             'proxy' => implode(',', $poxy_ips),
             'signature' => $API_KEY,
         ];
