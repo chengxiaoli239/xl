@@ -7,11 +7,12 @@ use Yii;
 /**
  * This is the model class for table "{{%tz_systems}}".
  *
- * @property int $id
+ * @property int $id id
  * @property string $name 系统名称
  * @property int $system_type_id 系统类型id
  * @property string $ssc_domain 系统站点
  * @property int $status 系统开启状态
+ * @property int $type 类型:1时时彩2网球
  * @property int $created_at 创建时间
  * @property string $updated_at 更新时间
  */
@@ -31,7 +32,7 @@ class TzSystems extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['system_type_id', 'status', 'created_at'], 'integer'],
+            [['system_type_id', 'status', 'type', 'created_at'], 'integer'],
             [['updated_at'], 'safe'],
             [['name'], 'string', 'max' => 64],
             [['ssc_domain'], 'string', 'max' => 255],
@@ -44,11 +45,12 @@ class TzSystems extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
+            'id' => Yii::t('app', 'id'),
             'name' => Yii::t('app', '系统名称'),
             'system_type_id' => Yii::t('app', '系统类型id'),
             'ssc_domain' => Yii::t('app', '系统站点'),
             'status' => Yii::t('app', '系统开启状态'),
+            'type' => Yii::t('app', '类型:1时时彩2网球'),
             'created_at' => Yii::t('app', '创建时间'),
             'updated_at' => Yii::t('app', '更新时间'),
         ];
