@@ -220,7 +220,10 @@ class TzService extends BaseService {
             StaticService::afterOpStatic($lottery_type, 'opProfitsPlans');
         }
         */
-        $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type); # 处理止盈止损、倍投等计划
+        if($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opProfitsPlans')) {
+            $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type); # 处理止盈止损、倍投等计划
+            StaticService::afterOpStatic($lottery_type, 'opProfitsPlans');
+        }
 
         $rst['consume_time1'] = ($time2 - $time1).'s';
         $rst['consume_time2'] = ($time3 - $time2).'s';
