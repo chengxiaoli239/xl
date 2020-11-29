@@ -47,6 +47,7 @@ class SystemConfig extends SystemConfigModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder'=>['id'=>SORT_DESC]],
         ]);
 
         $this->load($params);
@@ -69,6 +70,7 @@ class SystemConfig extends SystemConfigModel
             ->andFilterWhere(['like', 'value', $this->value])
             ->andFilterWhere(['like', 'desc', $this->desc])
             ->andFilterWhere(['like', 'extend', $this->extend]);
+        $query->andFilterWhere(['<>', 'status', -2]);
 
         return $dataProvider;
     }

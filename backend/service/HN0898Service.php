@@ -570,6 +570,24 @@ class HN0898Service extends BaseTZService {
     }
 
     /**
+     * @description 更新定制化表状态
+     * @param $id
+     * @param $account
+     * @return array
+     */
+    public static function updateStatus($id, $model = 'UserSysPlans'){
+        $M = $model::findOne($id);
+        $M->status = $M->status==1 ? 0 : 1;
+
+        $rst = $M->save(false);
+        if(!$rst){
+            return ['status'=>300, 'msg'=>current($M->getErrors())];
+        }
+
+        return ['status'=>200, 'msg'=>'状态更新成功~'];
+    }
+
+    /**
      * @description 更新计划表状态
      * @param $id
      * @param $account

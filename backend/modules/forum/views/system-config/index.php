@@ -13,9 +13,11 @@ $this->params['breadcrumbs'][] = $this->title;
 <section class="system-config-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
+        <!--
         <header class="panel-heading">
             <?= Html::encode($this->title) ?>
         </header>
+        -->
         <div class="panel-body">
             <div class="adv-table editable-table ">
                 <div class="clearfix">
@@ -32,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
+                        //'id',
                         'name',
                         'key',
                         'value',
@@ -41,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'created_at',
                         //'updated_at',
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        ['class' => 'yii\grid\ActionColumn','headerOptions'=>['width'=>'5%'],'template'=>'{update}&nbsp;&nbsp;&nbsp;&nbsp;{delete}'],
                     ],
                 ]); ?>
             </div>

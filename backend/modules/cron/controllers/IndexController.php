@@ -243,25 +243,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 自主研发方案系统测试自动化投注入口
-     * @return array
-     */
-    public function actionTz(){
-        self::_init();
-        $time = date("H:i");
-        if(\Yii::$app->params['ssc_kj_time_start'] < $time && $time < \Yii::$app->params['ssc_kj_time_end'] ){
-            $rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
-            return $rst;
-        }
-        for ($i=0; $i<5; $i++){
-            $rst['tz'] = TzService::tz(); // 计划投注
-            //sleep(2);
-        }
-
-        return $rst;
-    }
-
-    /**
      * @desc 访问首页
      * @return mixed
      */

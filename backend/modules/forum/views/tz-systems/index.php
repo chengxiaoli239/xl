@@ -13,9 +13,11 @@ $this->params['breadcrumbs'][] = $this->title;
 <section class="tz-systems-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
+        <!--
         <header class="panel-heading">
             <?= Html::encode($this->title) ?>
         </header>
+        -->
         <div class="panel-body">
             <div class="adv-table editable-table ">
                 <div class="clearfix">
@@ -32,11 +34,32 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
+                        //'id',
                         'name',
                         'system_type_id',
-                        'ssc_domain',
-                        'status',
+                        //'ssc_domain',
+                        ['attribute'=>'ssc_domain', 'label'=>'站点首页',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                return $model->ssc_domain;
+                            }
+                        ],
+                        //'status',
+                        ['attribute'=>'status', 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                $url0 = "/forum/tz-systems/switch-status?id=".$model->id.'&status=1'; # 点击开启
+                                $url1 = "/forum/tz-systems/switch-status?id=".$model->id.'&status=0'; # 点击关闭
+                                if($model->status == 1){
+                                    $txt = "<font color='green'>已开启</font>" ;
+                                    return Html::a($txt, $url1, ['title' => '点击关闭']);
+                                }
+                                if(!$model->status){
+                                    $txt = "<font color='red'>已关闭</font>";
+                                    return Html::a($txt, $url0, ['title' => '点击开启']);
+                                }
+                            }
+                        ],
                         //'type',
                         //'created_at',
                         //'updated_at',

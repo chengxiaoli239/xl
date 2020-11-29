@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\HN0898Service;
 use Yii;
 use backend\models\TzSystems;
 use backend\models\searchs\TzSystems as TzSystemsSearch;
@@ -58,6 +59,18 @@ class TzSystemsController extends BaseController
     }
 
     /**
+     * @desc 更新记录status状态 0/1
+     * @param $id
+     * @return \yii\web\Response
+     */
+    public function actionSwitchStatus($id){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $rst = HN0898Service::updateStatus($id, $model = '\backend\models\TzSystems');
+
+        return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$rst['lottery_type']]);
+    }
+
+    /**
      * Creates a new TzSystems model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
@@ -85,9 +98,13 @@ class TzSystemsController extends BaseController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $post = Yii::$app->request->post();
+        if(!empty($post)){
+            $post['TzSystems']['status'] = $post['TzSystems']['status'][0];
+        }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load($post) && $model->save()) {
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [

@@ -194,6 +194,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        d(false==='');
         $loginRst = BaseService::login($id = 48);p($loginRst);
         $lottery_type = 9;
         $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);

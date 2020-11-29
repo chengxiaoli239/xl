@@ -22,13 +22,13 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'ssc_domain')->textInput(['maxlength' => true]) ?>
 
-                    <?= $form->field($model, 'status')->textInput() ?>
+                    <?= $form->field($model, 'status')->checkboxList([0=>'关闭', 1=>'开启'])->label('开启状态') ?>
 
                     <?= $form->field($model, 'type')->textInput() ?>
 
-                    <?= $form->field($model, 'created_at')->textInput() ?>
+                    <!--?= $form->field($model, 'created_at')->textInput() ?-->
 
-                    <?= $form->field($model, 'updated_at')->textInput() ?>
+                    <!--?= $form->field($model, 'updated_at')->textInput() ?-->
 
                     <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
@@ -40,3 +40,19 @@ use yii\widgets\ActiveForm;
         </section>
     </div>
 </div>
+
+<script src="/assets/1dbbeb3f/jquery.js"></script>
+<script>
+    $(function(){
+        $(":checkbox").click(function(){
+            console.log($(this).parent().siblings().children()[0]);
+            $(this).parent().siblings().children().each(function(n,ele){
+                if($(this).is(":checked")){
+                    $(this).prop("checked",false)
+                }else {
+                    $(this).prop("checked",true)
+                }
+            })
+        });
+    });
+</script>

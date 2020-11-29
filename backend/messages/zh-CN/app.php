@@ -69,6 +69,7 @@ return [
 
     'Ssc Sd Hz Yls' => '四定和值遗漏',
     'Create Tz Systems' => '新建投注系统',
+    'Create System Config' => '新增系统配置',
 
     'Static3num Arise Perdates' => '三字现热码(Day)',
     'Ssc2nums Yls' => '二字现遗漏',
