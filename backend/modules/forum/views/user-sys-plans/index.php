@@ -162,10 +162,13 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         ['attribute' => 'hz_Arr','label'=>'扩展',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
+                                if(false && in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                     $str = \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
-                                }elseif(in_array($model->tz_type, [18, 20, 25, 28, 29, 30, 31, 32, 33])){
+                                }elseif(in_array($model->tz_type, [18, 19, 20, 25, 28, 29, 30, 31, 32, 33])){
                                     $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
+                                    if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
+                                        $str .= \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
+                                    }
                                 }else{
                                     $str = $model->hz_Arr;
                                 }
