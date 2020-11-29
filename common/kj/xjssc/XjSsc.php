@@ -174,7 +174,7 @@ class XjSsc extends BaseKj {
             //$data = json_decode($content,320);
             $data = $content;
 
-            if (!$data) return false;
+            if (!$data OR !isset($data['preIssue'])) return false;
             $kjData['expect'] = $data['preIssue']; # 2019091905
             $kjData['opencode'] = implode(',', $data['openNum']); # 0,4,1,9,1
             $kjData['opentime'] = date('Y-m-d H:i:s', $data['openDateTime']/1000); # 2019-9-19 11:41:05
