@@ -743,7 +743,7 @@ abstract class BetService extends BaseBetService {
                }
            }
            $isAuto == 0 && BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 手动无需锁
-           $tmpRst['lottery_type'] = $plan->lottery_type;
+           is_array($tmpRst) && $tmpRst['lottery_type'] = $plan->lottery_type;
            $rst[] = $tmpRst;
        }
        $logArr = ['tz_sites'=>$tz_sites,'codes'=>$codes, 'postRst'=>$rst];

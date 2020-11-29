@@ -217,7 +217,9 @@ class SevenService extends BaseTZService {
         $bigFlag = 0;
         if(true OR strlen($codes)>5000){ # 针对大量号码下注 用post请求
             $bigFlag = 1;
-            return $this->postBatchBet($qihao, $plan_id, $codes);
+            $rst = $this->postBatchBet($qihao, $plan_id, $codes);
+            Tool_Common::log('postBatchBet_sevnen', 'INFO', '批投', ['qihao'=>$qihao, 'plan_id'=>$plan_id, 'rst'=>$rst]);
+            return $rst;
         }
 
         $plan = UserSysPlans::findOne($plan_id);

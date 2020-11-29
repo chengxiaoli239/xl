@@ -68,7 +68,7 @@ return [
     'Static Hz Profits' => '每月四定和值利润统计',
 
     'Ssc Sd Hz Yls' => '四定和值遗漏',
-    'Create Tz Systems' => '开通投注系统权限',
+    'Create Tz Systems' => '新建投注系统',
 
     'Static3num Arise Perdates' => '三字现热码(Day)',
     'Ssc2nums Yls' => '二字现遗漏',
