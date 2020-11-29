@@ -26,6 +26,7 @@ use backend\service\SevenService;
 use backend\service\sports\TennisSportsService;
 use backend\service\SscDataService;
 use backend\service\TzService;
+use common\service\CommonService;
 use Yii;
 use backend\models\SscKjData;
 use backend\service\OpKjService;
@@ -274,6 +275,11 @@ class IndexController extends Controller
 
                 if($tzSystemsUser->tz_system_id == 11){
                     if($lottery_type != 9) continue;
+                    # 是否有激活的计划
+                    $hasActivePlan = CommonService::hasPlansActiveSys($tzSystemsUser->tz_system_id);
+                    if(!$hasActivePlan){
+                        return false;
+                    }
                     $flag1 = JuHuaBaseService::getHomePage($tzSystemsUser->uid, $tzSystemsUser->tz_system_id, $lottery_type);
                     $flag2 = JuHuaBaseService::selectLottery($tzSystemsUser->uid, $tzSystemsUser->tz_system_id, $lottery_type);
                 }

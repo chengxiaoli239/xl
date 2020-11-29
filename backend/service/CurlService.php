@@ -284,11 +284,8 @@ class CurlService extends BaseService{
         $errno = curl_errno($ch);
         if($errno>0) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'errno'=>$errno, 'postRst'=>$data, 'error'=>$str]);
-            if($errno == 52){
-                return ['Status'=>2, 'Data'=>'网盘网络超时，错误码52'];
-            }
-            return '';
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/err/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'errno'=>$errno, 'postRst'=>$data, 'error'=>$str]);
+            return ['Status'=>2, 'code'=>300, 'Data'=>'代理网络超时，错误码:'.$errno, 'errno'=>$errno];
         }
         curl_close($ch);
         if(!self::is_json($data)){

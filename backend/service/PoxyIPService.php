@@ -27,6 +27,12 @@ class PoxyIPService extends BaseService {
 
         Tool_Common::log('kuaiPoxy', 'ERR', '代理IP获取', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
         if($rst['code'] != 0 OR empty($rst['data']['proxy_list'][0])){
+            $m = \Yii::$app->cache;
+            $mkey = 're_get_kuai_poxy';
+            if(isset($rst['errno']) && in_array($rst['errno'], [28, 52]) && !$m->get($mkey)){
+                $m->set($mkey, 1, 10);
+                return self::kuaiPoxy(); # 获取代理失败，再次获取一次代理ip
+            }
             return ['status'=>300, 'msg'=>'代理端口不可用'];
         }
 
