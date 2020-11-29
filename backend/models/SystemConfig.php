@@ -13,6 +13,7 @@ use Yii;
  * @property string $value 配置值
  * @property string $desc 描述
  * @property string $extend 扩展
+ * @property int $status 删除状态
  * @property int $created_at 创建时间
  * @property string $updated_at 更新时间
  */
@@ -33,7 +34,7 @@ class SystemConfig extends \common\models\base\BaseModel
     {
         return [
             [['desc'], 'string'],
-            [['created_at'], 'integer'],
+            [['status', 'created_at'], 'integer'],
             [['updated_at'], 'safe'],
             [['name'], 'string', 'max' => 64],
             [['key', 'value', 'extend'], 'string', 'max' => 255],
@@ -52,6 +53,7 @@ class SystemConfig extends \common\models\base\BaseModel
             'value' => Yii::t('app', '配置值'),
             'desc' => Yii::t('app', '描述'),
             'extend' => Yii::t('app', '扩展'),
+            'status' => Yii::t('app', '删除状态'),
             'created_at' => Yii::t('app', '创建时间'),
             'updated_at' => Yii::t('app', '更新时间'),
         ];
