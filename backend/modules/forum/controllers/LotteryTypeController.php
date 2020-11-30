@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\HN0898Service;
 use Yii;
 use backend\models\LotteryType;
 use backend\models\searchs\LotteryType as LotteryTypeSearch;
@@ -58,6 +59,18 @@ class LotteryTypeController extends BaseController
     }
 
     /**
+     * @desc 更新投注状态
+     * @param $id
+     * @return \yii\web\Response
+     */
+    public function actionSwitchStatus($id){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $rst = HN0898Service::updateStatus($id, '\backend\models\LotteryType', $field = 'enable');
+
+        return $this->redirect(['index']);
+    }
+
+    /**
      * Creates a new LotteryType model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
@@ -67,7 +80,7 @@ class LotteryTypeController extends BaseController
         $model = new LotteryType();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('create', [
@@ -87,7 +100,7 @@ class LotteryTypeController extends BaseController
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [

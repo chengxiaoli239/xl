@@ -32,24 +32,80 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
-                        'lottery_type',
-                        'enable',
-                        'isDelete',
-                        'sort',
+                        //'id',
+                        //'sort',
+                        //'lottery_type',
+                        //'title',
+                        ['attribute' => 'title','label'=>'名称',#'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return $model->title;
+                            }
+                        ],
+                        ['attribute' => 'lottery_type','label'=>'系统lottery_type',#'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                //return  \backend\service\Config_Base::lotteryTypeLists($model->lottery_type);
+                                return  $model->lottery_type;
+                            }
+                        ],
+                        //'shortName',
+                        ['attribute' => 'shortName','label'=>'简称',#'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return $model->shortName;
+                            }
+                        ],
+                        //'enable',
+                        ['attribute' => 'enable','label'=>'开启状态','headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $url0 = "/forum/lottery-type/switch-status?id=".$model->id.'&enable=1'; # 点击开启
+                                $url1 = "/forum/lottery-type/switch-status?id=".$model->id.'&enable=0'; # 点击关闭
+                                if($model->enable == 1){
+                                    $txt = "<font color='green'>已开启</font>" ;
+                                    return Html::a($txt, $url1, ['title' => '点击关闭']);
+                                }
+                                if(!$model->enable){
+                                    $txt = "<font color='red'>已关闭</font>";
+                                    return Html::a($txt, $url0, ['title' => '点击开启']);
+                                }
+                                //return \backend\service\Config_Base::dropDown('enable', $model->enable);
+                            },
+                            'filter' => \backend\service\Config_Base::dropDown('enable'),
+                        ],
+                        //'isDelete',
                         //'name',
                         //'codeList',
-                        //'title',
-                        //'shortName',
+                        ['attribute' => 'codeList','label'=>'号码',#'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return $model->codeList;
+                            }
+                        ],
                         //'info',
+                        ['attribute' => 'info','label'=>'描述',#'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return $model->info;
+                            }
+                        ],
                         //'onGetNoed',
-                        //'data_ftime:datetime',
+                        ['attribute' => 'onGetNoed','label'=>'事件函数',#'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return $model->onGetNoed;
+                            }
+                        ],
+                        ['attribute' => 'data_ftime','label'=>'时间间隔(s)',#'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return $model->data_ftime;
+                            }
+                        ],
                         //'defaultViewGroup',
                         //'android',
                         //'num',
-                        //'typeGroupName',
+                        ['attribute' => 'typeGroupName','label'=>'彩种类别',#'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return $model->typeGroupName;
+                            }
+                        ],
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        ['class' => 'yii\grid\ActionColumn','headerOptions'=>['width'=>'5%'],'template'=>'{update}&nbsp;&nbsp;&nbsp;&nbsp;{delete}'],
                     ],
                 ]); ?>
             </div>

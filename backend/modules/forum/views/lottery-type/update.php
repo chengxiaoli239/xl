@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $model backend\models\LotteryType */
 
 $this->title = Yii::t('app', 'Update Lottery Type: {nameAttribute}', [
-    'nameAttribute' => $model->name,
+    'nameAttribute' => $model->title,
 ]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Lottery Types'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];

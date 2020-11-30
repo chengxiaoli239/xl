@@ -70,6 +70,10 @@ return [
     'Ssc Sd Hz Yls' => '四定和值遗漏',
     'Create Tz Systems' => '新建投注系统',
     'Create System Config' => '新增系统配置',
+    'Create Lottery Type' => '新增彩种',
+    'Lottery Types' => '彩种管理',
+    'Tz Systems' => '下注系统',
+    'Update Lottery Type: {nameAttribute}' => '更新',
 
     'Static3num Arise Perdates' => '三字现热码(Day)',
     'Ssc2nums Yls' => '二字现遗漏',
