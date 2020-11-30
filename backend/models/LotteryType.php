@@ -23,6 +23,9 @@ use Yii;
  * @property int $android
  * @property int $num 彩种期数
  * @property string $typeGroupName 彩种分类名称
+ * @property int $updated_at 更新时间
+ * @property int $created_at 创建时间
+ * @property string $update_time 更新时间
  */
 class LotteryType extends \common\models\base\BaseModel
 {
@@ -40,8 +43,9 @@ class LotteryType extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['lottery_type', 'enable', 'isDelete', 'sort', 'data_ftime', 'defaultViewGroup', 'android', 'num'], 'integer'],
+            [['lottery_type', 'enable', 'isDelete', 'sort', 'data_ftime', 'defaultViewGroup', 'android', 'num', 'updated_at', 'created_at'], 'integer'],
             [['name', 'title', 'info', 'num'], 'required'],
+            [['update_time'], 'safe'],
             [['name'], 'string', 'max' => 32],
             [['codeList'], 'string', 'max' => 125],
             [['title', 'onGetNoed'], 'string', 'max' => 64],
@@ -73,6 +77,9 @@ class LotteryType extends \common\models\base\BaseModel
             'android' => Yii::t('app', 'Android'),
             'num' => Yii::t('app', '彩种期数'),
             'typeGroupName' => Yii::t('app', '彩种分类名称'),
+            'updated_at' => Yii::t('app', '更新时间'),
+            'created_at' => Yii::t('app', '创建时间'),
+            'update_time' => Yii::t('app', '更新时间'),
         ];
     }
 
