@@ -701,7 +701,10 @@ class NineNineNewService extends BaseTZService {
      */
     public static function getBalance($uid, $tz_system_id){
         self::__init($uid, $tz_system_id);
+        $XcsrfToken = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
+        $balance = NULL;
 
+        $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid,'tz_system_id'=>$tz_system_id]);
         $headers = [
             "Accept: application/json, text/plain, */*",
@@ -709,39 +712,31 @@ class NineNineNewService extends BaseTZService {
             "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
             "Connection: keep-alive",
             "contentType: application/json",
-            "Cookie: emp-id=eb042ce2-e9ad-4993-a716-b7401fb37c84; guest_id=e3c921df-ec7f-4d64-b042-7f91f130eb4d; statistical-2020-10-28-1=1; x-id=125b3e9e-1229-4b2b-9ab7-7d457e152c91; sid=e79d9d8c-6dca-4dac-ad26-c2297ce8152a",
-            "Host: 99065v.com",
-            "Referer: https://99065v.com/web/",
+            "Cookie: ".$TzSystemsUsers['cookie'],
+            "Host: ".$urlArr['domain'],
+            "referer: ".$urlArr['baseUrl']."/web/",
             "Sec-Fetch-Dest: empty",
             "Sec-Fetch-Mode: cors",
             "Sec-Fetch-Site: same-origin",
             "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
             "userType: 0",
-            "x-csrf-index: 4",
-            "x-csrf-token: 511d3aa6-e3bf-4caa-a5f5-d644f06a3bea",
+            "x-csrf-index: ".$XcsrfToken['Index'],
+            "x-csrf-token: ".$XcsrfToken['Token'],
         ];
-        $post_data = ['act'=>'balance'];
-        //$headers = array_merge(self::$headers,$headers);
 
-        //$url = self::getUserUrlArr(self::$user_id,'GET_BALANCE');
-        $TzSiteInfo = self::getTzSiteInfo($tz_system_id);
-        $url = $TzSiteInfo['GET_BALANCE'];
-        $url = 'https://99065v.com/cloud-pay-service-server/userwallet/getUserBalanceByUid';
+        $url = $urlArr['baseUrl'].'/cloud-pay-service-server/userwallet/getUserBalanceByUid';
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
         $start_time = microtime(true);
-        $balance = CurlService::getCurl($url, $headers);#
-        p([$url,$post_data,$headers, $balance]);
+        $rst = CurlService::getCurl($url, $headers);#
+        //p(['url'=>$url, 'headers'=>$headers, 'balance'=>$balance]);
         $end_time = microtime(true);
         $time_consume = ($end_time-$start_time).'s';
-        $TzSiteInfo = self::getTzSiteInfo($tz_system_id);
-        $indexUrl = $TzSiteInfo['SSC_INDEX'];
-        $logData = ['url'=>$url,'headers'=>$headers, 'balance'=>$balance, 'indexUrl'=>$indexUrl, 'time_consume'=>$time_consume];
+        if($rst['code'] == 200){
+            $balance = $rst['data']['balance'];
+        }
+        $logData = ['url'=>$url,'headers'=>$headers, 'balance'=>$balance, 'time_consume'=>$time_consume];
         //p($logData);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','0898用户余额', $logData);
-        //sleep(2);
-        //$rst = CurlService::getCurl($indexUrl, $headers);
-        self::$headers = [];
-        //p($balance);
 
         return $balance;
     }
@@ -1155,7 +1150,8 @@ class NineNineNewService extends BaseTZService {
         $rst = false;
 
         # 第一步：心跳检测 获取cookie:emp-id
-        $cookie_key = NineNineNewService::getHeartrCheck($uid, $tz_system_id);p($cookie_key);
+        //$cookie_key = NineNineNewService::getHeartrCheck($uid, $tz_system_id);p($cookie_key);
+        $XcsrfToken = NineNineNewService::getXcsrfToken($uid, $tz_system_id);p($cookie_key);
         # 第二步：获取token 获取cookie: guest_id=bcb51788-a146-4678-b35e-2187a596f93c、statistical-2020-09-01-1=1
 
 
@@ -1176,6 +1172,70 @@ class NineNineNewService extends BaseTZService {
         }
 
         return $rst;
+    }
+
+    /**
+     * @param $uid
+     * @param $tz_system_id
+     */
+    public static function getXcsrfToken($uid, $tz_system_id){
+        self::__init($uid, $tz_system_id);
+
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
+        //p($urlArr);
+        $url = $urlArr['baseUrl'].'/cloud-pay-service-server/userwallet/getUserBalanceByUid';
+        $headers = [
+            ":authority: ".$urlArr['99065z.com'],
+            ":method: GET",
+            ":path: /cloud-pay-service-server/userwallet/getUserBalanceByUid",
+            ":scheme: https",
+            "accept: application/json, text/plain, */*",
+            "accept-encoding: gzip, deflate, br",
+            "accept-language: zh-CN,zh;q=0.9,en;q=0.8",
+            "contenttype: application/json",
+            "cookie: ".$TzSystemsUsers['cookie'],
+            "referer: ".$urlArr['baseUrl']."/web/",
+            "sec-fetch-dest: empty",
+            "sec-fetch-mode: cors",
+            "sec-fetch-site: same-origin",
+            "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
+            "usertype: 0",
+            "x-csrf-index: 52",
+            "x-csrf-token: 65ece07e-fd49-4f7e-9db3-fb484607024b",
+        ];
+        $xCsrf = self::curlXCsrf($url, $headers);
+
+        return $xCsrf;
+    }
+
+    /**
+     *curl get请求
+     */
+    public static function curlXCsrf($url,$header = []){
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($curl, CURLOPT_SSLVERSION, 1);
+
+        $content = curl_exec($curl);
+        preg_match("/X\-Csrf\-Index:([^\r\n]*)/i", $content, $matches1);
+        preg_match("/X\-Csrf\-Token:([^\r\n]*)/i", $content, $matches2);
+        //p(['url'=>$url, 'header'=>$header, 'content'=>$content, 'errno'=>curl_error($curl), 'errno'=>curl_errno($curl)]);
+        $xCsrf = ['Index'=>$matches1[1], 'Token'=>$matches2[1]];
+        $logArr = ['xCsrf'=>$xCsrf];
+        if(curl_error($curl)>0){
+            $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
+            Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
+        }
+
+        return $xCsrf;
     }
 
     /**

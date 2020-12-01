@@ -194,8 +194,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = NineNineNewService::synBalance($tz_system_users_id=31);p($rst);
+        $loginRst = NineNineNewService::login($id = 18, $tz_system_id=12);p($loginRst);
         d(false==='');
-        $loginRst = BaseService::login($id = 48);p($loginRst);
         $lottery_type = 9;
         $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
         $qihao_2 = HN0898Service::getQihao($lottery_type);p([$qihao_1, $qihao_2]);

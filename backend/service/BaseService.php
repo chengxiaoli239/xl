@@ -11,6 +11,7 @@ use backend\models\TzSystemsUsers;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\Juhua\JuHuaBaseService;
 use backend\service\Lucky5\Lucky5Service;
+use backend\service\NineNine\NineNineNewService;
 use backend\service\NineNine\NineNineService6;
 use backend\service\pingbo\PingBoBaseService;
 use backend\service\qilin\BingDaoService;
@@ -111,6 +112,9 @@ class BaseService{
             }else{
                 $rst = Lucky5Service::synBalance($TzSystemsUser->id);// p($rst);# 同步余额
             }
+        }elseif(in_array($tz_system_id, [12])){
+            # 九九新网
+            $rst = NineNineNewService::synBalance($TzSystemsUser->id);
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
         }elseif(in_array($tz_system_id, [5])){
