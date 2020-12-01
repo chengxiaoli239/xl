@@ -93,7 +93,7 @@ class BaseService{
         $tz_system_id = $TzSystemsUser->tz_system_id;
         # 是否有激活的计划
         $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id);
-        if(!$hasActivePlan && !in_array($tz_system_id, [14, 11, 3, 13])){
+        if(!$hasActivePlan && !in_array($tz_system_id, [3, 11, 12, 13, 14])){
             return false;
         }
 
