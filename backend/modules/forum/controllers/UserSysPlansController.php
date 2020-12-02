@@ -11,6 +11,7 @@ use backend\service\TzService;
 use backend\service\UserService;
 use backend\service\UserSysPlansService;
 use common\service\CommonService;
+use common\tools\Tool_Common;
 use Yii;
 use backend\models\UserSysPlans;
 use backend\models\searchs\UserSysPlans as UserSysPlansSearch;
@@ -231,6 +232,7 @@ class UserSysPlansController extends BaseController
         //\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $rst = BetService::userSysPlansTzNow($id, $this->_user_id);
+        Tool_Common::log('actionTzNow', 'INFO', '计划列表 - 立即投注', ['rst'=>$rst]);
 
         return $this->redirect(['/forum/betting-records/index', 'BettingRecords[lottery_type]'=>$rst['lottery_type']]);
     }

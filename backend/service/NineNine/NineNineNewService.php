@@ -182,6 +182,21 @@ class NineNineNewService extends BaseTZService {
     }
 
     /**
+     * @desc 判断是否登录
+     * @param $uid
+     * @param $tz_system_id
+     * @return bool
+     */
+    public static function isLogin($uid, $tz_system_id){
+
+        $balance = NineNineNewService::getBalance($uid,$tz_system_id);
+
+        $flag = $balance > 0 ? true : false;
+
+        return (boolean)$flag;
+    }
+
+    /**
      * @decription 投注接受方法
      * @param $data
      */
@@ -302,7 +317,7 @@ class NineNineNewService extends BaseTZService {
         $buy_type = $plan->buy_type ? $plan->buy_type : 1;
         $lottery_type = $plan->lottery_type;
         $TzSystemsUsers = TzSystemsUsers::findOne(['tz_system_id'=>self::$tz_system_id, 'uid'=>$plan->uid]);
-        //p(['playway'=>$playway, 'code'=>$code, 'single'=>$single, 'qihao'=>$qihao, 'user_id'=>self::$user_id]);
+        p(['playway'=>$playway, 'code'=>$code, 'single'=>$single, 'qihao'=>$qihao, 'user_id'=>self::$user_id]);
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
 

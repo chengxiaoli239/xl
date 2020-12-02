@@ -257,6 +257,8 @@ class UserService extends BaseService {
                 $Model->desc = '账号过期，请及时续费';
                 $Model->save();
             }
+        }else{
+            $flag = true;
         }
 
         return  $flag;

@@ -16,6 +16,7 @@ use backend\service\huiyuan\KuaiLe8Service;
 use backend\service\Juhua\JuHuaBaseService;
 use backend\service\Lucky5\Lucky5Service;
 use backend\service\NineNine\NineNineBaseService;
+use backend\service\NineNine\NineNineNewService;
 use backend\service\NineNine\NineNineService6;
 use backend\service\qilin\BingDaoService;
 use common\kj\cqssc\CqsscKcw;
@@ -85,6 +86,9 @@ abstract class BetService extends BaseBetService {
             }elseif($lottery_type == 7){ # 北京快乐8
                 $BetService = new KuaiLe8Service($uid, $tz_system_id);
             }
+        }elseif(in_array($tz_system_id, [12])){
+            # 九九新网
+            $BetService = new \backend\service\NineNine\NineNineNewService($uid, $tz_system_id);
         }elseif(in_array($tz_system_id, [13])){
             # 13 冰岛
             $BetService = new \backend\service\BingDao\BingDaoService($uid, $tz_system_id);
@@ -685,7 +689,7 @@ abstract class BetService extends BaseBetService {
            $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
            if(!$status && $plan->account != 'gaozi2018'){
                Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
-               continue;
+               return ['status'=>300, 'msg'=>'账号过期提示'];
            }
            # 4、投注号码 codes
            $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
@@ -719,7 +723,7 @@ abstract class BetService extends BaseBetService {
                    }
                    $loginRst = BaseService::login($TzSystemsUsers->id);
                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['loginRst'=>$loginRst]);
-                   if($loginRst['status'] != 200) continue;
+                   if($loginRst['status'] != 200) return $loginRst;
                }
 
                $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'tz_sites'=>$tz_sites];
@@ -728,7 +732,8 @@ abstract class BetService extends BaseBetService {
                $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
                $tmpRst = $BetService->bet($qihao, $plan->id, $codes, $isAuto);
                if($tmpRst === false){
-                   return false;
+                   Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tz_err/tzByPlanId','INFO','投注记录 异常', $logArr);
+                   return ['status'=>301, 'msg'=>'投注异常', 'tmpRst'=>false];
                }
 
                BetService::synBalance($plan->uid, $tz_system_id);
@@ -994,6 +999,9 @@ abstract class BetService extends BaseBetService {
         }elseif(in_array($tz_system_id, [5])){
             # 5、希腊网
             $flag = XlService::isLogin($uid, $tz_system_id);
+        }elseif(in_array($tz_system_id, [12])){
+            # 九九新网
+            $flag = NineNineNewService::isLogin($uid, $tz_system_id);
         }elseif(in_array($tz_system_id, [11])){
             # 11、菊花网
             $flag = JuHuaBaseService::isLogin($uid, $tz_system_id);
