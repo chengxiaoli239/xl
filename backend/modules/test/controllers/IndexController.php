@@ -194,6 +194,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = NineNineNewService::getSnidBySn($uid=18, $tz_system_id = 12);p($rst);
         $rst['rst'] = BaseService::synBalance($tz_system_users_id=31);p($rst);
         $rst = NineNineNewService::synBalance($tz_system_users_id=31);p($rst);
         $loginRst = NineNineNewService::login($id = 18, $tz_system_id=12);p($loginRst);

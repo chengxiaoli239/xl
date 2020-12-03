@@ -295,6 +295,22 @@ class NineNineNewService extends BaseTZService {
     }
 
     /**
+     * @desc 获取九九网期号 主要是跟系统的期号有些不一样
+     * @param $qihao
+     * @param int $lottery_type
+     * @return string
+     */
+    public static function getNineNineQihao($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        if($lottery_type == 6){
+            $qihao = substr($qihao, 0, 8) . '0' . substr($qihao, 8, 2);
+        }else{
+            $qihao = substr($qihao, 0, 8) . '0' . substr($qihao, 8, 2);
+        }
+
+        return $qihao;
+    }
+
+    /**
      * @decription 新版投注，真实投注入口， 未完待续 2018.12.23
      *
      * @param $tz_system_id
@@ -317,7 +333,7 @@ class NineNineNewService extends BaseTZService {
         $buy_type = $plan->buy_type ? $plan->buy_type : 1;
         $lottery_type = $plan->lottery_type;
         $TzSystemsUsers = TzSystemsUsers::findOne(['tz_system_id'=>self::$tz_system_id, 'uid'=>$plan->uid]);
-        p(['playway'=>$playway, 'code'=>$code, 'single'=>$single, 'qihao'=>$qihao, 'user_id'=>self::$user_id]);
+        //p(['playway'=>$playway, 'code'=>$code, 'single'=>$single, 'qihao'=>$qihao, 'user_id'=>self::$user_id]);
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
 
@@ -342,29 +358,41 @@ class NineNineNewService extends BaseTZService {
         $sn = '';
         $snid = '';
         foreach ($codesArrs as $key=>$codesArr){
+            $items = self::getBetStyleCodes($playway, $codesArr, $single);
             $betKey_i = $betKey.'_'.$key;
             if($fi = $m->get($betKey_i) && $is_auto){
                 continue;
             }
-            $post_data = [ 'act' => 'postsn', 'playway' => $playway, 'single' => $single, 'qihao' => $qihao, 'code' => implode('@', $codesArr)];
+            $nn_qihao = self::getNineNineQihao($qihao, $lottery_type);
+            $post_data = [
+                'betIssue'=>$nn_qihao, 'lotName'=>'xjssc',
+                'items' => $items,
+            ];
+            $post_data = json_encode($post_data, 320);
 
-            $TzSiteInfo = self::getTzSiteInfo(self::$tz_system_id, $lottery_type);
-            $url = $TzSiteInfo['ORDER_TZ'];
+            $urlArr = self::getTzSiteInfo(self::$tz_system_id, $lottery_type);
+            $xCsrf = NineNineNewService::getXcsrfToken($plan->uid, self::$tz_system_id);
+            //p($xCsrf);
+            $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/userlottery/add';
             $headers = [
-                'Accept: */*',
-                'Accept-Encoding: gunzip, deflate, br',
-                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-                'Connection: keep-alive',
-                'Content-Length:'.strlen(http_build_query($post_data)),
-                'Content-Type: application/x-www-form-urlencoded',
+                "Accept: application/json, text/plain, */*",
+                "Accept-Encoding: gzip, deflate, br",
+                "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+                "Connection: keep-alive",
+                'Content-Length:'.strlen($post_data),
+                "Content-Type: application/json;charset=UTF-8",
+                "contentType: application/json",
                 'Cookie: '.$TzSystemsUsers->cookie,
-                "Host:".$TzSiteInfo['domain'],
-                //'Origin: https://9912304.com',
-                "Origin:".$TzSiteInfo['baseUrl'],
-                //'Referer: https://9912304.com/jxssc_qmode/index.aspx',
-                "Referer: ".$url,
-                $TzSystemsUsers->user_agent,
-                'X-Requested-With: XMLHttpRequest',
+                "Host: www.".$urlArr['domain'],
+                "Origin: ".$urlArr['baseUrl'],
+                "Referer: ".$urlArr['baseUrl']."/web/caipiao/ssc/xjssc",
+                "Sec-Fetch-Dest: empty",
+                "Sec-Fetch-Mode: cors",
+                "Sec-Fetch-Site: same-origin",
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
+                "userType: 0",
+                "x-csrf-index: ".$xCsrf['Index'],
+                "x-csrf-token: ".$xCsrf['Token'],
             ];
 
             # 和值投注反应时间比较久，无需返回直接锁住
@@ -372,8 +400,8 @@ class NineNineNewService extends BaseTZService {
 
             # 真实投注
             $start_time = microtime(true);
-            //p([$rst,$url, $post_data,http_build_query($post_data), $headers, $is_auto]);
-            $rst[$key] = CurlService::postCurl($url, http_build_query($post_data), $headers)[0];
+            $rst[$key] = self::postBetCurl($url, $post_data, $headers);
+            //p(['rst'=>$rst, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'is_auto'=>$is_auto]);
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time). 's';
             if($rst[$key]['err'] == -1 OR !$rst[$key]){
@@ -393,9 +421,10 @@ class NineNineNewService extends BaseTZService {
             }else{
                 $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
             }
-
-            $sn = $sn.','.$rst[$key]['sn'];
-            $snid = $snid.','.NineNineBaseService::getSnidBySn($rst[$key]['sn'], $lottery_type); // 获取方案内容
+            $snRst = NineNineNewService::getSnidBySn($plan->uid, self::$tz_system_id);
+            if(isset($snRst['list'][0]['orderNo'])){
+                $snid = $snid.','.$snRst['list'][0]['orderNo']; // 获取方案内容
+            }
         }
 
         $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
@@ -420,14 +449,161 @@ class NineNineNewService extends BaseTZService {
             'betting_money'=> $totalmoney,  // 投注金额
         ];
         $insertRst = BetService::_logRecords($insertData);
-        self::$headers = [];
 
-        $post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
+        //$post_data['code'] = isset($post_data['code']) && strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
         $logArr = ['uid'=>$plan->uid,'account'=>$plan->account,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume,'insertData'=>$insertData,'sn'=>$sn, 'lottery_type'=>$lottery_type,'snid'=>$snid, 'insertRst'=>$insertRst];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','99彩票网['.$lottery_type.']插入记录-真实投注', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBet','INFO','99彩票网['.$lottery_type.']插入记录-真实投注', $logArr);
 
         return $data;
+    }
+
+    /**
+     * @param $playway
+     * @param $codesArr
+     * @param float $single
+     * @param float $unit 0.1角 1元
+     * @param int $type 1前四
+     * @return array 例如： ['1234X', '4537X']
+     */
+    public static function getBetStyleCodes($playway, $codesArr, $single = 0.1, $type = 1){
+        $units = [1=>1, 2=>0.1, 3=>0.1]; # 0.1角模式 1元模式
+        $datas = [];
+        $betUnit =  $units[$playway];
+        if($playway == 3){ # 四定
+            foreach ($codesArr as $code){
+                $codes[] = str_replace(',', '', $code.'X');
+            }
+            $datas[] = [
+                'betType' => 'all',
+                'backRate' => 0, # 返点，默认最高赔率，无返点
+                'betUnit' => $betUnit,
+                'playType' => self::getPlayType($playway),
+                'betNum' => implode(',', $codes),
+                'betBeishu' => ($single/$betUnit),
+                'betZhushu' => count($codesArr),
+            ];
+        }elseif(in_array($playway, [1, 2])){ # 二定、三定
+            foreach ($codesArr as $code){
+                $datas[] = [
+                    'betType' => 'all',
+                    'backRate' => 0, # 返点，默认最高赔率，无返点
+                    'betUnit' => $betUnit,
+                    'playType' => self::getPlayType($playway),
+                    'betNum' => $code.',X',
+                    'odds' => ['minOdds'=>86.5, 'maxOdds'=>99.5, 'backRate'=>13],
+                    'betBeishu' => ($single/$betUnit),
+                    'betZhushu' => 1,
+                ];
+            }
+
+        }
+
+        return $datas;
+    }
+
+    /**
+     * @decription post请求根据，接受传递的header头
+     * @param $url
+     */
+    public static function postBetCurl($url,$post_data = [],$headers=[], $uid = 0){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        if(!$timeout) $timeout = 30;
+
+        //$cookie = dirname(__FILE__)."/cookie.txt";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+
+        if(strpos($url, 'ww662889') !== false){
+            //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
+        }
+
+        $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+
+        //设置post方式提交
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+        $start_time = microtime(true);
+        $data = curl_exec($ch);
+        $end_time = microtime(true);
+        //d($data);
+        $errno = curl_errno( $ch );
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
+        if($errno){
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+            //p($logArr);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求-1', $logArr);
+        }
+
+        if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
+        if(curl_close($ch)) {
+            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+        }
+        if($data == 'ok'){
+            return 'ok';
+        }
+        $rstData = json_decode($data, true); # data : {"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}
+        //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
+        if(strpos($data, "\"Status\":1") !== false && strpos($data, "\"CompletedStatus\":1") !== false){ # json解析异常处理
+            $rstData['Status'] = 1;
+        }
+
+        if(strpos($data, '余额不足') !== false){
+            $rstData = ["Status"=>0, 'code'=>302, 'msg'=>'余额不足'];
+        }elseif(strpos($data, '登录') !== false OR strpos($data, 'Bad Gateway') !== false OR strpos($data, 'Object moved') !== false){
+            $rstData = ["Status"=>0, 'code'=>303, 'msg'=>'请重新登录'];
+        }elseif(strpos($data, '短时间内重复提交') !== false){
+            $rstData = ["Status"=>0, 'code'=>304, 'msg'=>'短时间内重复提交'];
+        }elseif(strpos($data, '已关盘') !== false){
+            $rstData = ["Status"=>0, 'code'=>305, 'msg'=>'已关盘'];
+        }elseif(strpos($data, '维护中') !== false){
+            $rstData = ["Status"=>0, 'code'=>306, 'msg'=>'系统线路维护中'];
+        }elseif(strpos($data, '停押') !== false){
+            $rstData = ["Status"=>0, 'code'=>307, 'msg'=>'您的账号已被停押'];
+        }else{
+            $rstData = json_decode($data, TRUE);
+        }
+        if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306])){
+            if(isset($post_data['bet_number']) && strlen($post_data['bet_number'])>200) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 300);
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求-3', $logArr);
+        }
+        $rstData['errno'] = $errno;
+        $time_consume = ($end_time-$start_time).'s';
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求-4', $logArr);
+        //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
+
+        return $rstData;
+    }
+
+    /**
+     * @desc 获取网盘玩法类型
+     * @param int $playway
+     * @return array|mixed
+     */
+    public static function getPlayType($playway = 3){
+        $planTypes = [
+            1 => '二定',
+            2 => '三定',
+            3 => '四定#单式',
+        ];
+
+        return isset($planTypes[$playway]) ? $planTypes[$playway] : $planTypes;
     }
 
     /**
@@ -790,23 +966,43 @@ class NineNineNewService extends BaseTZService {
      * @param $sn 方案号
      * @return mixed
      */
-    public static function getSnidBySn($sn, $lottery_type = DEFAULT_LOTTERY_TYPE){
-        $m = \Yii::$app->cache;
-        $mkey = 'SNID_'.$lottery_type.'_'.$sn;
-        if(!$snid = $m->get($mkey)){
-            $content = self::getSscIndexContent(self::$user_id, self::$tz_system_id, $lottery_type);
-            //p([self::$user_id, self::$tz_system_id, $lottery_type, $content]);
+    public static function getSnidBySn($uid = 1,$tz_system_id = 1, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        self::__init($uid, $tz_system_id);
 
-            $preg = "/<td>".$sn."(.*?) snid=(.*?)\>点击撤单/ism"; // 这里是表达式，大神看看
-            preg_match_all($preg,$content,$matches);
-            $snid = $matches[2][0];
-            $m->set($mkey, $snid, 6*3600);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSnidBySn','INFO','0898获取订单号', ['snid'=>$snid]);
+        $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
+        $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
+
+        $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
+        $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/userlottery/query/betCode/xjssc?limit=5&page=1';
+        $headers = [
+            "Accept: application/json, text/plain, */*",
+            "Accept-Encoding: gzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            "contentType: application/json",
+            "Cookie: ".$TzSystemUser['cookie'],
+            "Host: www.99065w.com",
+            "Referer: ".$urlArr['baseUrl']."/web/caipiao/ssc/xjssc",
+            "Sec-Fetch-Dest: empty",
+            "Sec-Fetch-Mode: cors",
+            "Sec-Fetch-Site: same-origin",
+            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
+            "userType: 0",
+            "x-csrf-index: ".$xCsrf['Index'],
+            "x-csrf-token: ".$xCsrf['Token'],
+        ];
+        $rst = CurlService::getCurl($url, $headers);
+
+        $rstData = [];
+        if($rst['code'] == 200 && !empty($rst['data'])){
+            $rstData = $rst['data'];
         }
+
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSnidBySn','INFO','0898获取订单号', ['snid'=>$snid]);
 
         //p(['$matches'=>$matches[2], 'user_id'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id, 'content'=>$content],0);
 
-        return $snid;
+        return $rstData;
     }
 
     /**

@@ -9,6 +9,7 @@
 namespace backend\service;
 
 use backend\models\SystemConfig;
+use common\tools\Tool_Common;
 
 abstract class BaseTZService{
     protected $_nowTime = null;    // 当前时间戳
@@ -56,6 +57,38 @@ abstract class BaseTZService{
         if(!$nums) $nums = 1350;
 
         return $nums;
+    }
+
+    /**
+     * @desc 设置全局代理
+     * @param $ch
+     * @return bool
+     */
+    public static function setPoxy($ch, $url='', $uid = 0){
+        $poxy_addr = PoxyIPService::getPoxyIp();
+        if(strpos($url, 'ww662889') === false){
+            //$poxy_addr = '218.85.247.70:20000';
+        }
+        Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);
+        $POXY_USER_IDS = BetService::getConfig('POXY_USER_IDS');
+        $uids = explode(',', $POXY_USER_IDS);
+        if(empty($uids) OR !in_array($uid, $uids) OR !$uid){
+            return [];
+        }
+
+        if(!empty($poxy_addr)){
+            //设置代理
+            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+            curl_setopt($ch, CURLOPT_PROXY, $poxy_addr);
+            //设置代理用户名密码（私密代理/独享代理）
+            //如果是开放代理，请注释掉下面两句
+            $username = \Yii::$app->params['KUAI_USERNAME'];
+            $password = \Yii::$app->params['KUAI_PASSWORD'];
+            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+        }
+
+        return $poxy_addr;
     }
 
 }
