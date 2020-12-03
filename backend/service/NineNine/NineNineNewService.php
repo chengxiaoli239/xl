@@ -607,60 +607,6 @@ class NineNineNewService extends BaseTZService {
     }
 
     /**
-     * @description  撤单 - 0898投注系列
-     * @param $uid
-     * @param $snid
-     * @param $tz_system_id
-     * @return mixed|string
-     */
-    public static function cancelOrder($id, $tz_system_id){
-        $BettingRecords = BettingRecords::findOne($id);
-        $uid = $BettingRecords->uid;
-        $snids = explode(',', $BettingRecords->snid);
-        self::__init($uid, $tz_system_id);
-        $lot = $BettingRecords->lottery_type == 6 ? 'jxssc' : 'ssc';
-
-        $rst = ['status'=>300, 'msg'=>'操作成功'];
-        $TzSystemsUsers = TzSystemsUsers::findOne(['tz_system_id'=>self::$tz_system_id, 'uid'=>$uid]);
-        $TzSiteInfo = NineNineBaseService::getTzSiteInfo($tz_system_id,$BettingRecords->lottery_type);
-        $url = $TzSiteInfo['CANCEL_ORDER'];
-
-        foreach ($snids as $key=>$snid) {
-            //$url = NineNineBaseService::getTzSiteInfo($tz_system_id,'CANCEL_ORDER', $BettingRecords->lottery_type);
-            $post_data = ['act' => 'cancelsn', 'lot' => $lot, 'snid' => $snid];
-            $headers = [
-                'Accept: */*',
-                'Accept-Encoding: gunzip, deflate, br',
-                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-                'Connection: keep-alive',
-                'Content-Length:' . strlen(http_build_query($post_data)),
-                'Content-Type: application/x-www-form-urlencoded',
-                'Cookie: ' . $TzSystemsUsers->cookie,
-                "Host:" . $TzSiteInfo['domain'],
-                //'Origin: https://9912304.com',
-                "Origin:" . $TzSiteInfo['baseUrl'],
-                //'Referer: https://9912304.com/jxssc_qmode/index.aspx',
-                "Referer: " . $url,
-                $TzSystemsUsers->user_agent,
-                'X-Requested-With: XMLHttpRequest',
-            ];
-
-            $rstData = CurlService::postCurl($url, http_build_query($post_data), $headers);
-            $rst[$key]['data'] = $rstData;
-            if ($rstData == 'ok') {
-                $BettingRecords = BettingRecords::findOne(['snid' => $snid]);
-                $BettingRecords->cancel_status = 1;
-                $BettingRecords->save();
-                $rst[$key]['status'] = 200;
-            }
-        }
-        $logArr = ['url'=>$url, 'snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
-
-        return $rst;
-    }
-
-    /**
      * @description 更新计划表状态
      * @param $id
      * @param $account
@@ -1003,6 +949,57 @@ class NineNineNewService extends BaseTZService {
         //p(['$matches'=>$matches[2], 'user_id'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id, 'content'=>$content],0);
 
         return $rstData;
+    }
+
+    /**
+     * @desc 撤单
+     * @param $orderNo 方案号
+     * @return mixed
+     */
+    public static function cancelOrder($id = 1, $tz_system_id = 1){
+
+        $BettingRecords = BettingRecords::findOne($id);
+        $uid = $BettingRecords->uid;
+        self::__init($uid, $tz_system_id);
+
+        $orderNos = explode(',', $BettingRecords->snid);
+        $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
+        $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
+
+        foreach ($orderNos as $key=>$orderNo) {
+            $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
+            $url = $urlArr['baseUrl'] . '/cloud-lottery-service-server/gameInfo/userlottery/cancel/' . $orderNo;
+            $headers = [
+                "Accept: application/json, text/plain, */*",
+                "Accept-Encoding: gzip, deflate, br",
+                "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+                "Connection: keep-alive",
+                "contentType: application/json",
+                "Cookie: " . $TzSystemUser['cookie'],
+                "Host: www.99065w.com",
+                "Referer: " . $urlArr['baseUrl'] . "/web/caipiao/ssc/xjssc",
+                "Sec-Fetch-Dest: empty",
+                "Sec-Fetch-Mode: cors",
+                "Sec-Fetch-Site: same-origin",
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
+                "userType: 0",
+                "x-csrf-index: " . $xCsrf['Index'],
+                "x-csrf-token: " . $xCsrf['Token'],
+            ];
+            $rstData = CurlService::getCurl($url, $headers);
+            $rst[$key]['data'] = $rstData;
+            if ($rstData['code'] == 200) {
+                $BettingRecords = BettingRecords::findOne($id);
+                $BettingRecords->cancel_status = 1;
+                $BettingRecords->save();
+                $rst[$key]['status'] = 200;
+            }
+        }
+
+        $logArr = ['url'=>$url,'headers'=>$headers, 'rst'=>$rst];
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
+
+        return $rst;
     }
 
     /**
