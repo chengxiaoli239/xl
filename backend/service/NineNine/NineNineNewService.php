@@ -358,7 +358,7 @@ class NineNineNewService extends BaseTZService {
         $sn = '';
         $snid = '';
         foreach ($codesArrs as $key=>$codesArr){
-            $items = self::getBetStyleCodes($playway, $codesArr, $single);
+            $items = self::getBetStyleCodes($playway, $codesArr, $single, $tz_type);
             $betKey_i = $betKey.'_'.$key;
             if($fi = $m->get($betKey_i) && $is_auto){
                 continue;
@@ -412,7 +412,6 @@ class NineNineNewService extends BaseTZService {
                 }
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','99投注记录-投注失败', $tzRst);
                 return $tzRst;
-                //continue;
             }
 
             $n = count(explode('@',$code));
@@ -466,23 +465,48 @@ class NineNineNewService extends BaseTZService {
      * @param int $type 1前四
      * @return array 例如： ['1234X', '4537X']
      */
-    public static function getBetStyleCodes($playway, $codesArr, $single = 0.1, $type = 1){
+    public static function getBetStyleCodes($playway, $codesArr, $single = 0.1, $tz_type = 1){
         $units = [1=>1, 2=>0.1, 3=>0.1]; # 0.1角模式 1元模式
         $datas = [];
+
+        $oddsTypes = [
+            1 => ['minOdds'=>86.5, 'maxOdds'=>99.5], # 二定，元
+            2 => ['minOdds'=>865, 'maxOdds'=>995], # 三定，元
+            3 => ['minOdds'=>8650, 'maxOdds'=>9950], # 四定，元
+        ];
+
         $betUnit =  $units[$playway];
+        $odds = ['minOdds'=>$oddsTypes[$playway]['minOdds'], 'maxOdds'=>$oddsTypes[$playway]['maxOdds'], 'backRate'=>13];
         if($playway == 3){ # 四定
-            foreach ($codesArr as $code){
-                $codes[] = str_replace(',', '', $code.'X');
+            if($tz_type == 22){
+                # 四定单双
+                foreach ($codesArr as $code){
+                    $datas[] = [
+                        'betType' => 'all',
+                        'backRate' => 0, # 返点，默认最高赔率，无返点
+                        'betUnit' => $betUnit,
+                        'playType' => '四定',
+                        'betNum' => $code.',X',
+                        'odds' => $odds,
+                        'betBeishu' => ($single/$betUnit),
+                        'betZhushu' => 625,
+                    ];
+                }
+            }else{
+                # 全倒
+                foreach ($codesArr as $code){
+                    $codes[] = str_replace(',', '', $code.'X');
+                }
+                $datas[] = [
+                    'betType' => 'all',
+                    'backRate' => 0, # 返点，默认最高赔率，无返点
+                    'betUnit' => $betUnit,
+                    'playType' => self::getPlayType($playway),
+                    'betNum' => implode(',', $codes),
+                    'betBeishu' => ($single/$betUnit),
+                    'betZhushu' => count($codesArr),
+                ];
             }
-            $datas[] = [
-                'betType' => 'all',
-                'backRate' => 0, # 返点，默认最高赔率，无返点
-                'betUnit' => $betUnit,
-                'playType' => self::getPlayType($playway),
-                'betNum' => implode(',', $codes),
-                'betBeishu' => ($single/$betUnit),
-                'betZhushu' => count($codesArr),
-            ];
         }elseif(in_array($playway, [1, 2])){ # 二定、三定
             foreach ($codesArr as $code){
                 $datas[] = [
@@ -491,7 +515,7 @@ class NineNineNewService extends BaseTZService {
                     'betUnit' => $betUnit,
                     'playType' => self::getPlayType($playway),
                     'betNum' => $code.',X',
-                    'odds' => ['minOdds'=>86.5, 'maxOdds'=>99.5, 'backRate'=>13],
+                    'odds' => $odds,
                     'betBeishu' => ($single/$betUnit),
                     'betZhushu' => 1,
                 ];
