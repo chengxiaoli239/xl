@@ -862,7 +862,7 @@ class NineNineNewService extends BaseTZService {
      */
     public static function getBalance($uid, $tz_system_id){
         $m = \Yii::$app->cache;
-        $mkey = 'getBalance_getBalance_'.$uid.'_'.$tz_system_id;
+        $mkey = 'getBalance_'.$uid.'_'.$tz_system_id;
         if($balance = $m->get($mkey)) return $balance;
         self::__init($uid, $tz_system_id);
         $XcsrfToken = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
@@ -898,10 +898,10 @@ class NineNineNewService extends BaseTZService {
         if($rst['code'] == 200){
             $balance = $rst['data']['balance'];
         }
-        $logData = ['url'=>$url,'headers'=>$headers, 'balance'=>$balance, 'time_consume'=>$time_consume];
+        $m->set($mkey, $balance, 5);
+        $logData = ['url'=>$url, 'rst'=>$rst, 'headers'=>$headers, 'balance'=>$balance, 'time_consume'=>$time_consume];
         //p($logData);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','0898用户余额', $logData);
-        $m->set($mkey, $balance, 5);
 
         return $balance;
     }
@@ -1465,6 +1465,7 @@ class NineNineNewService extends BaseTZService {
         preg_match("/X\-Csrf\-Token:([^\r\n]*)/i", $content, $matches2);
         //p(['url'=>$url, 'header'=>$header, 'content'=>$content, 'errno'=>curl_error($curl), 'errno'=>curl_errno($curl)]);
         $xCsrf = ['Index'=>trim($matches1[1]), 'Token'=>trim($matches2[1])];
+        Tool_Common::log('get_curlXCsrf', 'INFO', '获取XCsrf', ['xCsrf'=>$xCsrf, 'content'=>$content]);
         $logArr = ['xCsrf'=>$xCsrf];
         if(curl_error($curl)>0){
             $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
