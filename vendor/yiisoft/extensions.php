@@ -80,11 +80,11 @@ return [
             '@daixianceng/echarts' => $vendorDir . '/daixianceng/yii2-echarts/src',
         ],
     ],
-    'yiisoft/yii2-redis' => [
-        'name' => 'yiisoft/yii2-redis',
+    'yiisoft/yii2-redis/src' => [
+        'name' => 'yiisoft/yii2-redis/src',
         'version' => '2.2.0.0',
         'alias' => [
-            '@yii/redis' => $vendorDir . '/yiisoft/yii2-redis',
+            '@yii/redis' => $vendorDir . '/yiisoft/yii2-redis/src',
         ],
     ],
 ];

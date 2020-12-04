@@ -194,7 +194,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $redis = Yii::$app->redis;p($redis);
+        $redis = \Yii::$app->redis;p($redis);
         $rst['rst'] = BaseService::synBalance($tz_system_users_id=32);p($rst);
 
         $rst = NineNineNewService::getSnidBySn($uid=18, $tz_system_id = 12);p($rst);
