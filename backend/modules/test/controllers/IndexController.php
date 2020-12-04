@@ -195,6 +195,7 @@ class IndexController extends Controller
 
     public function actionDw(){
         $rst['rst'] = BaseService::synBalance($tz_system_users_id=32);p($rst);
+        $redis = \Yii::$app->redis;p($redis);
 
         $rst = NineNineNewService::getSnidBySn($uid=18, $tz_system_id = 12);p($rst);
         $rst = NineNineNewService::synBalance($tz_system_users_id=31);p($rst);

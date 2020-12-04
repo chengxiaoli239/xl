@@ -885,8 +885,8 @@ class NineNineNewService extends BaseTZService {
             "Sec-Fetch-Site: same-origin",
             "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
             "userType: 0",
-            "x-csrf-index: ".$XcsrfToken['Index'],
-            "x-csrf-token: ".$XcsrfToken['Token'],
+            "x-csrf-index: ".$xCsrf['Index'],
+            "x-csrf-token: ".$xCsrf['Token'],
         ];
 
         $url = $urlArr['baseUrl'].'/cloud-pay-service-server/userwallet/getUserBalanceByUid';
@@ -1390,7 +1390,7 @@ class NineNineNewService extends BaseTZService {
 
         # 第一步：心跳检测 获取cookie:emp-id
         //$cookie_key = NineNineNewService::getHeartrCheck($uid, $tz_system_id);p($cookie_key);
-        //$XcsrfToken = NineNineNewService::getXcsrfToken($uid, $tz_system_id);p($cookie_key);
+        //$xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);p($cookie_key);
         # 第二步：获取token 获取cookie: guest_id=bcb51788-a146-4678-b35e-2187a596f93c、statistical-2020-09-01-1=1
 
 
