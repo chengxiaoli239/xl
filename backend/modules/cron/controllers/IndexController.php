@@ -189,7 +189,7 @@ class IndexController extends Controller
                     case 1: # 0898
                     case 2: # 99 彩票网
                         if(in_array($lottery_type, [5, 6]))
-                            $rst = NineNineBaseService::getRemoteHzRecords($TzSystemsUser->uid, $TzSystemsUser->tz_system_id, $lottery_type); # 抓取号码
+                            //$rst = NineNineBaseService::getRemoteHzRecords($TzSystemsUser->uid, $TzSystemsUser->tz_system_id, $lottery_type); # 抓取号码
                         break;
                     case 3:
                         break;
