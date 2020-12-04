@@ -220,8 +220,8 @@ abstract class BetService extends BaseBetService {
                 $datas = [];
                 foreach ($plans as $key => $plan) {
                     $tzRst[$plan->id] = self::tzByPlanId($plan->id);
-                    BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 彩种投注结束锁
                 }
+                BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 彩种投注结束锁
                 $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
                 $logArr[$lottery_type]['plans'] = $plans;
                 $count = count($plans);
