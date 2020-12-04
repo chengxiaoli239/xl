@@ -1464,7 +1464,7 @@ class NineNineNewService extends BaseTZService {
         preg_match("/X\-Csrf\-Index:([^\r\n]*)/i", $content, $matches1);
         preg_match("/X\-Csrf\-Token:([^\r\n]*)/i", $content, $matches2);
         //p(['url'=>$url, 'header'=>$header, 'content'=>$content, 'errno'=>curl_error($curl), 'errno'=>curl_errno($curl)]);
-        $xCsrf = ['Index'=>$matches1[1], 'Token'=>$matches2[1]];
+        $xCsrf = ['Index'=>trim($matches1[1]), 'Token'=>trim($matches2[1])];
         $logArr = ['xCsrf'=>$xCsrf];
         if(curl_error($curl)>0){
             $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
