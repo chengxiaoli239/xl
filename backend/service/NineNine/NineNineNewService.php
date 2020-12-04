@@ -866,6 +866,7 @@ class NineNineNewService extends BaseTZService {
         if($balance = $m->get($mkey)) return $balance;
         self::__init($uid, $tz_system_id);
         $XcsrfToken = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
+        if(empty($XcsrfToken['Token'])) return ['status'=>300, 'msg'=>'xcsrfToken为空'];
 
         $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid,'tz_system_id'=>$tz_system_id]);
