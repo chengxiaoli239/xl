@@ -1423,7 +1423,7 @@ class NineNineNewService extends BaseTZService {
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
         //p($urlArr);
-        $url = $urlArr['baseUrl'].'/cloud-pay-service-server/userwallet/getUserBalanceByUid';
+        $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/lotterytime/xjssc';
         $headers = [
             ":authority: ".$urlArr['99065z.com'],
             ":method: GET",
