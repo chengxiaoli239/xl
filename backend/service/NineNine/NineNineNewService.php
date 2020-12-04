@@ -372,6 +372,7 @@ class NineNineNewService extends BaseTZService {
 
             $urlArr = self::getTzSiteInfo(self::$tz_system_id, $lottery_type);
             $xCsrf = NineNineNewService::getXcsrfToken($plan->uid, self::$tz_system_id);
+            if(empty($xCsrf['Token'])) return ['status'=>200, 'msg'=>'xCsrf请求失败'];
             //p($xCsrf);
             $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/userlottery/add';
             $headers = [
@@ -865,8 +866,8 @@ class NineNineNewService extends BaseTZService {
         $mkey = 'getBalance_'.$uid.'_'.$tz_system_id;
         if($balance = $m->get($mkey)) return $balance;
         self::__init($uid, $tz_system_id);
-        $XcsrfToken = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
-        if(empty($XcsrfToken['Token'])) return ['status'=>300, 'msg'=>'xcsrfToken为空'];
+        $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
+        if(empty($xCsrf['Token'])) return ['status'=>300, 'msg'=>'xcsrfToken为空'];
 
         $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid,'tz_system_id'=>$tz_system_id]);
@@ -940,13 +941,14 @@ class NineNineNewService extends BaseTZService {
      * @param $sn 方案号
      * @return mixed
      */
-    public static function getSnidBySn($uid = 1,$tz_system_id = 1, $lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function getSnidBySn($uid = 1,$tz_system_id = 1){
         self::__init($uid, $tz_system_id);
 
         $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
 
         $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
+        if(empty($xCsrf['Token'])) return ['status'=>200, 'msg'=>'xCsrf请求失败'];
         $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/userlottery/query/betCode/xjssc?limit=5&page=1';
         $headers = [
             "Accept: application/json, text/plain, */*",
@@ -990,12 +992,13 @@ class NineNineNewService extends BaseTZService {
         $uid = $BettingRecords->uid;
         self::__init($uid, $tz_system_id);
 
-        $orderNos = explode(',', $BettingRecords->snid);
+        $orderNos = trim(explode(',', $BettingRecords->snid), ',');
         $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
 
         foreach ($orderNos as $key=>$orderNo) {
             $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
+            if(empty($xCsrf['Token'])) return ['status'=>200, 'msg'=>'xCsrf请求失败'];
             $url = $urlArr['baseUrl'] . '/cloud-lottery-service-server/gameInfo/userlottery/cancel/' . $orderNo;
             $headers = [
                 "Accept: application/json, text/plain, */*",
@@ -1387,7 +1390,7 @@ class NineNineNewService extends BaseTZService {
 
         # 第一步：心跳检测 获取cookie:emp-id
         //$cookie_key = NineNineNewService::getHeartrCheck($uid, $tz_system_id);p($cookie_key);
-        $XcsrfToken = NineNineNewService::getXcsrfToken($uid, $tz_system_id);p($cookie_key);
+        //$XcsrfToken = NineNineNewService::getXcsrfToken($uid, $tz_system_id);p($cookie_key);
         # 第二步：获取token 获取cookie: guest_id=bcb51788-a146-4678-b35e-2187a596f93c、statistical-2020-09-01-1=1
 
 
