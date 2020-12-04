@@ -861,9 +861,11 @@ class NineNineNewService extends BaseTZService {
      * @return mixed
      */
     public static function getBalance($uid, $tz_system_id){
+        $m = \Yii::$app->cache;
+        $mkey = 'getBalance_getBalance_'.$uid.'_'.$tz_system_id;
+        if($balance = $m->get($mkey)) return $balance;
         self::__init($uid, $tz_system_id);
         $XcsrfToken = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
-        $balance = NULL;
 
         $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid,'tz_system_id'=>$tz_system_id]);
@@ -898,6 +900,7 @@ class NineNineNewService extends BaseTZService {
         $logData = ['url'=>$url,'headers'=>$headers, 'balance'=>$balance, 'time_consume'=>$time_consume];
         //p($logData);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','0898用户余额', $logData);
+        $m->set($mkey, $balance, 5);
 
         return $balance;
     }
