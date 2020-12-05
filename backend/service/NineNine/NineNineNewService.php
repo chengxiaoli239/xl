@@ -879,7 +879,6 @@ class NineNineNewService extends BaseTZService {
         $start_time = microtime(true);
 
         $tmpRst = NineNineNewService::getCurl($url, $headers);#
-        p($tmpRst);
 
         $rstData = $tmpRst['rstData'];
         $xCsrf = $tmpRst['xCsrf'];
