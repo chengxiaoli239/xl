@@ -31,6 +31,8 @@ use backend\service\SscDataService;
 use backend\tools\Tools;
 use common\models\AdminModel;
 use common\service\CaptchaCodeService;
+use common\service\CommonService;
+use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
@@ -372,7 +374,6 @@ class NineNineNewService extends BaseTZService {
 
             $urlArr = self::getTzSiteInfo(self::$tz_system_id, $lottery_type);
             $xCsrf = NineNineNewService::getXcsrfToken($plan->uid, self::$tz_system_id);
-            if(empty($xCsrf['Token'])) return ['status'=>200, 'msg'=>'xCsrf请求失败'];
             //p($xCsrf);
             $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/userlottery/add';
             $headers = [
@@ -401,13 +402,20 @@ class NineNineNewService extends BaseTZService {
 
             # 真实投注
             $start_time = microtime(true);
-            $rst[$key] = self::postBetCurl($url, $post_data, $headers);
+            $tmpRst = self::postBetCurl($url, $post_data, $headers);
+            $rstData = $tmpRst['rstData'];
+            $xCsrf = $tmpRst['xCsrf'];
+            if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+                $xCsrf_key = CommonService::buildXCsrfTokenKey($plan->uid, self::$tz_system_id);
+                $m->set($xCsrf_key, $xCsrf, 120);
+            }
+            $rst[$key] = $rstData;
             //p(['rst'=>$rst, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'is_auto'=>$is_auto]);
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time). 's';
-            if($rst[$key]['err'] == -1 OR !$rst[$key]){
+            if(!$rst[$key]){
                 $post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
-                $tzRst = ['uid'=>self::$user_id, 'account'=>self::$account, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst[$key], 'time_consume'=>$time_consume];
+                $tzRst = ['uid'=>self::$user_id, 'account'=>self::$account, 'status'=>301, 'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rstData, 'time_consume'=>$time_consume];
                 if($tz_type != 20){
                     $tzRst['code'] = $code;
                 }
@@ -549,71 +557,46 @@ class NineNineNewService extends BaseTZService {
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 
-        if(strpos($url, 'ww662889') !== false){
-            //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
-        }
+        curl_setopt($ch, CURLOPT_HEADER, 1); #
 
-        $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+        //$poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
-        curl_setopt($ch, CURLOPT_HEADER,0);
+        curl_setopt($ch, CURLOPT_HEADER, TRUE);    //表示需要response header
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
 
         $start_time = microtime(true);
-        $data = curl_exec($ch);
+        $content = curl_exec($ch);
         $end_time = microtime(true);
         //d($data);
-        $errno = curl_errno( $ch );
+        $errno = curl_errno($ch);
         //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
         if($errno){
-            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$content, 'errno'=>$errno];
             //p($logArr);
             Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求-1', $logArr);
         }
 
-        if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
-        if(curl_close($ch)) {
-            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
-        }
-        if($data == 'ok'){
-            return 'ok';
-        }
-        $rstData = json_decode($data, true); # data : {"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}
-        //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
-        if(strpos($data, "\"Status\":1") !== false && strpos($data, "\"CompletedStatus\":1") !== false){ # json解析异常处理
-            $rstData['Status'] = 1;
-        }
+        # ================= xCsrf token start =====================
+        if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == '200') {
 
-        if(strpos($data, '余额不足') !== false){
-            $rstData = ["Status"=>0, 'code'=>302, 'msg'=>'余额不足'];
-        }elseif(strpos($data, '登录') !== false OR strpos($data, 'Bad Gateway') !== false OR strpos($data, 'Object moved') !== false){
-            $rstData = ["Status"=>0, 'code'=>303, 'msg'=>'请重新登录'];
-        }elseif(strpos($data, '短时间内重复提交') !== false){
-            $rstData = ["Status"=>0, 'code'=>304, 'msg'=>'短时间内重复提交'];
-        }elseif(strpos($data, '已关盘') !== false){
-            $rstData = ["Status"=>0, 'code'=>305, 'msg'=>'已关盘'];
-        }elseif(strpos($data, '维护中') !== false){
-            $rstData = ["Status"=>0, 'code'=>306, 'msg'=>'系统线路维护中'];
-        }elseif(strpos($data, '停押') !== false){
-            $rstData = ["Status"=>0, 'code'=>307, 'msg'=>'您的账号已被停押'];
-        }else{
-            $rstData = json_decode($data, TRUE);
-        }
-        if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306])){
-            if(isset($post_data['bet_number']) && strlen($post_data['bet_number'])>200) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 300);
-            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求-3', $logArr);
-        }
-        $rstData['errno'] = $errno;
-        $time_consume = ($end_time-$start_time).'s';
-        $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求-4', $logArr);
-        //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
+            $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $header = substr($content, 0, $headerSize);
 
-        return $rstData;
+            preg_match("/X\-Csrf\-Index:([^\r\n]*)/i", $header, $matches1);
+            preg_match("/X\-Csrf\-Token:([^\r\n]*)/i", $header, $matches2);
+
+            $body = substr($content, $headerSize);
+            $result['rstData'] = json_decode($body, true);
+
+            $result['xCsrf'] = ['Index'=>trim($matches1[1]), 'Token'=>trim($matches2[1])];
+        }
+        # ================= xCsrf token start =====================
+
+        return $result;
     }
 
     /**
@@ -862,13 +845,15 @@ class NineNineNewService extends BaseTZService {
      * @return mixed
      */
     public static function getBalance($uid, $tz_system_id){
+        // 创建redislock对象
+
         $m = \Yii::$app->cache;
         $mkey = 'getBalance_'.$uid.'_'.$tz_system_id;
-        if($balance = $m->get($mkey)) return $balance;
+        //if($balance = $m->get($mkey)) return $balance;
         self::__init($uid, $tz_system_id);
         $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
-        if(empty($xCsrf['Token'])) return ['status'=>300, 'msg'=>'xcsrfToken为空'];
 
+        //p($xCsrf);
         $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid,'tz_system_id'=>$tz_system_id]);
         $headers = [
@@ -892,19 +877,68 @@ class NineNineNewService extends BaseTZService {
         $url = $urlArr['baseUrl'].'/cloud-pay-service-server/userwallet/getUserBalanceByUid';
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
         $start_time = microtime(true);
-        $rst = CurlService::getCurl($url, $headers);#
+
+        $tmpRst = NineNineNewService::getCurl($url, $headers);#
+
+        $rstData = $tmpRst['rstData'];
+        $xCsrf = $tmpRst['xCsrf'];
+        if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+            $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
+            $m->set($xCsrf_key, $xCsrf, 120);
+        }
         //p(['url'=>$url, 'headers'=>$headers, 'balance'=>$balance]);
         $end_time = microtime(true);
         $time_consume = ($end_time-$start_time).'s';
-        if($rst['code'] == 200){
-            $balance = $rst['data']['balance'];
+        if($rstData['code'] == 200){
+            $balance = $rstData['data']['balance'];
         }
         $m->set($mkey, $balance, 5);
-        $logData = ['url'=>$url, 'rst'=>$rst, 'headers'=>$headers, 'balance'=>$balance, 'time_consume'=>$time_consume];
+        $logData = ['url'=>$url, 'rst'=>$rstData, 'headers'=>$headers, 'balance'=>$balance, 'time_consume'=>$time_consume, 'xCsrf'=>$xCsrf];
         //p($logData);
         Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','0898用户余额', $logData);
 
         return $balance;
+
+    }
+
+    public static function getCurl($url, $header=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        //$header = array_merge(self::$postHeaders,$header);
+        //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+
+        $content = curl_exec($ch);
+
+        # ================= xCsrf token start =====================
+        if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 200) {
+            $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $header = substr($content, 0, $headerSize);
+
+            preg_match("/X\-Csrf\-Index:([^\r\n]*)/i", $header, $matches1);
+            preg_match("/X\-Csrf\-Token:([^\r\n]*)/i", $header, $matches2);
+
+            $body = substr($content, $headerSize);
+            $result['rstData'] = json_decode($body, true);
+
+            $result['xCsrf'] = ['Index'=>trim($matches1[1]), 'Token'=>trim($matches2[1])];
+        }
+        # ================= xCsrf token start =====================
+
+        return $result;
     }
 
     /**
@@ -948,7 +982,6 @@ class NineNineNewService extends BaseTZService {
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
 
         $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
-        if(empty($xCsrf['Token'])) return ['status'=>200, 'msg'=>'xCsrf请求失败'];
         $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/userlottery/query/betCode/xjssc?limit=5&page=1';
         $headers = [
             "Accept: application/json, text/plain, */*",
@@ -992,13 +1025,12 @@ class NineNineNewService extends BaseTZService {
         $uid = $BettingRecords->uid;
         self::__init($uid, $tz_system_id);
 
-        $orderNos = trim(explode(',', $BettingRecords->snid), ',');
+        $orderNos = explode(',', trim($BettingRecords->snid, ','));
         $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
 
         foreach ($orderNos as $key=>$orderNo) {
             $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
-            if(empty($xCsrf['Token'])) return ['status'=>200, 'msg'=>'xCsrf请求失败'];
             $url = $urlArr['baseUrl'] . '/cloud-lottery-service-server/gameInfo/userlottery/cancel/' . $orderNo;
             $headers = [
                 "Accept: application/json, text/plain, */*",
@@ -1390,13 +1422,13 @@ class NineNineNewService extends BaseTZService {
 
         # 第一步：心跳检测 获取cookie:emp-id
         //$cookie_key = NineNineNewService::getHeartrCheck($uid, $tz_system_id);p($cookie_key);
-        //$xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);p($cookie_key);
+        $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);p($xCsrf);
         # 第二步：获取token 获取cookie: guest_id=bcb51788-a146-4678-b35e-2187a596f93c、statistical-2020-09-01-1=1
 
 
         # 第一步：获取cookie
         $cookie_key = NineNineNewService::getCookie($uid,$tz_system_id);
-        p($cookie_key);
+        //p($cookie_key);
         if(isset($cookie_key['status']) && $cookie_key['status'] == 300) return $cookie_key;
         # 第二步：下载验证码图片
         HN0898Service::downLoadCodeImg($uid, $tz_system_id, $cookie_key);
@@ -1414,18 +1446,34 @@ class NineNineNewService extends BaseTZService {
     }
 
     /**
+     * @desc 获取 xCrsrf token
+     * @param $uid
+     * @param $tz_system_id
+     * @return mixed
+     */
+    public static function getXcsrfToken($uid, $tz_system_id){
+        $m = \Yii::$app->cache;
+
+        $key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
+        $xCsrfToken = $m->get($key);
+
+        return $xCsrfToken;
+    }
+
+    /**
      * @param $uid
      * @param $tz_system_id
      */
-    public static function getXcsrfToken($uid, $tz_system_id){
+    public static function getXcsrfToken_bak($uid, $tz_system_id){
         self::__init($uid, $tz_system_id);
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
         //p($urlArr);
-        $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/lotterytime/xjssc';
+        //$url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/lotterytime/xjssc';
+        $url = $urlArr['baseUrl'].'/cloud-pay-service-server/userwallet/getUserBalanceByUid';
         $headers = [
-            ":authority: ".$urlArr['99065z.com'],
+            ":authority: ".$urlArr['domain'],
             ":method: GET",
             ":path: /cloud-pay-service-server/userwallet/getUserBalanceByUid",
             ":scheme: https",
@@ -1444,6 +1492,10 @@ class NineNineNewService extends BaseTZService {
             "x-csrf-token: 65ece07e-fd49-4f7e-9db3-fb484607024b",
         ];
         $xCsrf = self::curlXCsrf($url, $headers);
+        //p(['url'=>$url, 'header'=>$headers, 'xCsrf'=>$xCsrf]);
+        if(empty($xCsrf['Token'])){
+            //return self::getXcsrfToken($uid, $tz_system_id);
+        }
 
         return $xCsrf;
     }
@@ -1451,7 +1503,7 @@ class NineNineNewService extends BaseTZService {
     /**
      *curl get请求
      */
-    public static function curlXCsrf($url,$header = []){
+    public static function curlXCsrf($url, $header = []){
 
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
@@ -1464,9 +1516,16 @@ class NineNineNewService extends BaseTZService {
         curl_setopt($curl, CURLOPT_SSLVERSION, 1);
 
         $content = curl_exec($curl);
-        preg_match("/X\-Csrf\-Index:([^\r\n]*)/i", $content, $matches1);
-        preg_match("/X\-Csrf\-Token:([^\r\n]*)/i", $content, $matches2);
         //p(['url'=>$url, 'header'=>$header, 'content'=>$content, 'errno'=>curl_error($curl), 'errno'=>curl_errno($curl)]);
+        if (curl_getinfo($curl, CURLINFO_HTTP_CODE) == '200') {
+            preg_match("/X\-Csrf\-Index:([^\r\n]*)/i", $content, $matches1);
+            preg_match("/X\-Csrf\-Token:([^\r\n]*)/i", $content, $matches2);
+
+            $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+            $header = substr($content, 0, $headerSize);
+            $body = substr($content, $headerSize);
+            //p(['header'=>$header, 'rstData'=>json_decode($body, true)]);
+        }
         $xCsrf = ['Index'=>trim($matches1[1]), 'Token'=>trim($matches2[1])];
         Tool_Common::log('get_curlXCsrf', 'INFO', '获取XCsrf', ['xCsrf'=>$xCsrf, 'content'=>$content]);
         $logArr = ['xCsrf'=>$xCsrf];

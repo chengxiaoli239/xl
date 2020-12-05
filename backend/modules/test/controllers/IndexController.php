@@ -194,12 +194,13 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $redis = \Yii::$app->redis;p($redis);
-        $rst['rst'] = BaseService::synBalance($tz_system_users_id=32);p($rst);
-
-        $rst = NineNineNewService::getSnidBySn($uid=18, $tz_system_id = 12);p($rst);
-        $rst = NineNineNewService::synBalance($tz_system_users_id=31);p($rst);
+        $rst = NineNineNewService::getBalance($uid=18, $tz_system_id = 12);p($rst);
         $loginRst = NineNineNewService::login($id = 18, $tz_system_id=12);p($loginRst);
+        $rst = NineNineNewService::getSnidBySn($uid=18, $tz_system_id = 12);p($rst);
+        $rst['rst'] = BaseService::synBalance($tz_system_users_id=32);p($rst);
+        $redis = \Yii::$app->redis;p($redis);
+
+        $rst = NineNineNewService::synBalance($tz_system_users_id=31);p($rst);
         d(false==='');
         $lottery_type = 9;
         $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);

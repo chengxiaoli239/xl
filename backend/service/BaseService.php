@@ -112,9 +112,6 @@ class BaseService{
             }else{
                 $rst = Lucky5Service::synBalance($TzSystemsUser->id);// p($rst);# 同步余额
             }
-        }elseif(in_array($tz_system_id, [12])){
-            # 九九新网
-            $rst = NineNineNewService::synBalance($TzSystemsUser->id);
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
         }elseif(in_array($tz_system_id, [5])){
@@ -125,6 +122,9 @@ class BaseService{
         }elseif(in_array($tz_system_id, [11])){
             # 菊花网
             $rst = JuHuaBaseService::synBalance($TzSystemsUser->id);
+        }elseif(in_array($tz_system_id, [12])){
+            # 九九新网
+            $rst = NineNineNewService::synBalance($TzSystemsUser->id);
         }elseif(in_array($tz_system_id, [8])){
             # 8、麒麟财务系统网
             $rst = QiLinBaseService::synBalance($TzSystemsUser->id);

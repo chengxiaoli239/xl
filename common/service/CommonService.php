@@ -887,6 +887,16 @@ class  CommonService{
     }
 
     /**
+     * @desc 主要针对 - 九九网 用户网站临时 存储数据
+     * @param $uid
+     * @param $tz_system_id
+     * @return string
+     */
+    public static function buildXCsrfTokenKey($uid, $tz_system_id){
+        return 'buildXCsrfTokenKey_'.$uid.'_'.$tz_system_id;
+    }
+
+    /**
      * @desc 所有投注类型
      * @param int $status
      * @return array

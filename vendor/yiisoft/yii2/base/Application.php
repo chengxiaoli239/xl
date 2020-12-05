@@ -23,6 +23,7 @@ use Yii;
  * enabled. This property is read-only.
  * @property array $container Values given in terms of name-value pairs. This property is write-only.
  * @property \yii\db\Connection $db The database connection. This property is read-only.
+ * @property \yii\redis\Connection $redis The database connection. This property is read-only.
  * @property \yii\web\ErrorHandler|\yii\console\ErrorHandler $errorHandler The error handler application
  * component. This property is read-only.
  * @property \yii\i18n\Formatter $formatter The formatter application component. This property is read-only.
