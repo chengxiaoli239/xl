@@ -221,6 +221,7 @@ abstract class BetService extends BaseBetService {
                 foreach ($plans as $key => $plan) {
                     $tzRst[$plan->id] = self::tzByPlanId($plan->id);
                 }
+                BetService::synBalance($plan->uid, $plan->tz_sites);# 目前tz_sites 已变更为单个站点id
                 BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 彩种投注结束锁
                 $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
                 $logArr[$lottery_type]['plans'] = $plans;
@@ -736,8 +737,6 @@ abstract class BetService extends BaseBetService {
                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tz_err/tzByPlanId','INFO','投注记录 异常', $logArr);
                    return ['status'=>301, 'msg'=>'投注异常', 'tmpRst'=>false];
                }
-
-               BetService::synBalance($plan->uid, $tz_system_id);
 
                # 测试账号取消订单
                if($tmpRst['status'] == 200 && in_array($plan->account, \Yii::$app->params['test_account'])){

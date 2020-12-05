@@ -18,6 +18,7 @@ use backend\service\pingbo\PingBoBaseService;
 use backend\service\qilin\BingDaoService;
 use backend\service\qilin\QiLinBaseService;
 use common\service\CommonService;
+use common\tools\RedisLock;
 use  yii;
 use common\tools\Util;
 
@@ -94,6 +95,12 @@ class BaseService{
         if(!$id) return ['status'=>300, 'msg'=>'id不能为空'];
         if(!$TzSystemsUser = TzSystemsUsers::findOne($id)){
             return ['status'=>300, 'msg'=>'操作失败:找不到记录'];
+        }
+
+        $redisLock = new RedisLock();
+        $redisKey = 'Auto_synBalance_'.$id;
+        if($redisLock->lock($redisKey, 5)){
+            return ['status'=>301, 'msg'=>'同步余额并发锁'];
         }
 
         $tz_system_id = $TzSystemsUser->tz_system_id;
