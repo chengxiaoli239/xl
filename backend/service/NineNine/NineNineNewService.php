@@ -879,6 +879,7 @@ class NineNineNewService extends BaseTZService {
         $start_time = microtime(true);
 
         $tmpRst = NineNineNewService::getCurl($url, $headers);#
+        p($tmpRst);
 
         $rstData = $tmpRst['rstData'];
         $xCsrf = $tmpRst['xCsrf'];
@@ -919,7 +920,7 @@ class NineNineNewService extends BaseTZService {
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
-        curl_setopt($ch, CURLOPT_HEADER,0);
+        curl_setopt($ch, CURLOPT_HEADER,1); #
 
         $content = curl_exec($ch);
 
