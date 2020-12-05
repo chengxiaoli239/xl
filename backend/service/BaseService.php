@@ -7,6 +7,7 @@
  */
 
 namespace backend\service;
+use backend\models\SystemConfig;
 use backend\models\TzSystemsUsers;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\Juhua\JuHuaBaseService;
@@ -44,6 +45,11 @@ class BaseService{
         if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
             return false;
         }
+        $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'ssc_kj_time_period'])->value); # 开奖时间间隔:20分钟
+        if(in_array($tz_system_id, $not_need_login_tz_system_ids)){
+            return ['status'=>200, 'msg'=>'无需登陆站点', 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username];
+        }
+
         $flag = BetService::isLogin($TzSystemsUser->uid, $tz_system_id); #
         if($flag && $is_auto){
             return ['status'=>200, 'msg'=>'已经是登录状态', 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username];

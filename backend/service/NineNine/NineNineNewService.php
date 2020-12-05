@@ -129,7 +129,6 @@ class NineNineNewService extends BaseTZService {
     public static function synBalance($tz_system_user_id){
         $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);
         $balance = self::getBalance($TzSystemsUsers->uid,$TzSystemsUsers->tz_system_id);
-        //p($balance);
         $msg = ['status'=>200, 'msg'=>'金额同步成功~','tz_system_user_id'=>$tz_system_user_id, 'balance'=>$balance ];
 
         $TzSystemsUsers->balance = $balance;
@@ -886,6 +885,14 @@ class NineNineNewService extends BaseTZService {
             $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
             $m->set($xCsrf_key, $xCsrf, 120);
         }
+        $redis_mkey_retry = 'getBalance_retry_'.$uid.'_'.$tz_system_id;
+        if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!'){
+            $redis = new RedisLock();
+            if($redis->lock($redis_mkey_retry, 5)){
+                return false;
+            }
+            return self::getBalance($uid, $tz_system_id);
+        }
         //p(['url'=>$url, 'headers'=>$headers, 'balance'=>$balance]);
         $end_time = microtime(true);
         $time_consume = ($end_time-$start_time).'s';
@@ -919,7 +926,7 @@ class NineNineNewService extends BaseTZService {
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
-        curl_setopt($ch, CURLOPT_HEADER,1); #
+        curl_setopt($ch, CURLOPT_HEADER,1); # 表示需要返回headers
 
         $content = curl_exec($ch);
 

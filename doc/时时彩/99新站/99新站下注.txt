@@ -1,0 +1,552 @@
+A、General
+B、Response Headers
+C、Request Headers
+D、Query String Parameters
+
+# 四定下注 1
+A、General
+    Request URL: https://www.99065w.com/cloud-lottery-service-server/gameInfo/userlottery/add
+    Request Method: POST
+B、Response Headers
+C、Request Headers
+    Accept: application/json, text/plain, */*
+    Accept-Encoding: gzip, deflate, br
+    Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+    Connection: keep-alive
+    Content-Length: 388
+    Content-Type: application/json;charset=UTF-8
+    contentType: application/json
+    Cookie: emp-id=43edb9b2-dabb-4779-bf3a-d97a0e4f128e; guest_id=479c1fe5-7c67-41e1-a884-17dcbd20a2c5; statistical-2020-12-02-1=1; sid=e4ceb409-0d98-4d60-a639-cbba1fcd4f16; statistical-2020-12-03-1=1
+    Host: www.99065w.com
+    Origin: https://www.99065w.com
+    Referer: https://www.99065w.com/web/caipiao/ssc/xjssc
+    Sec-Fetch-Dest: empty
+    Sec-Fetch-Mode: cors
+    Sec-Fetch-Site: same-origin
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+    userType: 0
+    x-csrf-index: 985
+    x-csrf-token: fe866898-cf52-4936-8b9c-1b5e1c94adf3
+D、Request Payload
+    {"betIssue":"20201202046","lotName":"xjssc","items":[{"betType":"all","backRate":"0","betUnit":1,"playType":"四定","betNum":"6,4,2,6,X","odds":{"minOdds":8650,"maxOdds":9950,"backRate":13},"betBeishu":1,"betZhushu":1},{"betType":"all","backRate":"0","betUnit":1,"playType":"四定","betNum":"8,7,4,2,X","odds":{"minOdds":8650,"maxOdds":9950,"backRate":13},"betBeishu":1,"betZhushu":1}]}
+
+# 四定下注 2  优选
+A、General
+    Request URL: https://www.99065w.com/cloud-lottery-service-server/gameInfo/userlottery/add
+    Request Method: POST
+B、Response Headers
+C、Request Headers
+    Accept: application/json, text/plain, */*
+    Accept-Encoding: gzip, deflate, br
+    Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+    Connection: keep-alive
+    Content-Length: 179
+    Content-Type: application/json;charset=UTF-8
+    contentType: application/json
+    Cookie: emp-id=43edb9b2-dabb-4779-bf3a-d97a0e4f128e; guest_id=479c1fe5-7c67-41e1-a884-17dcbd20a2c5; statistical-2020-12-02-1=1; sid=e4ceb409-0d98-4d60-a639-cbba1fcd4f16; statistical-2020-12-03-1=1
+    Host: www.99065w.com
+    Origin: https://www.99065w.com
+    Referer: https://www.99065w.com/web/caipiao/ssc/xjssc
+    Sec-Fetch-Dest: empty
+    Sec-Fetch-Mode: cors
+    Sec-Fetch-Site: same-origin
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+    userType: 0
+    x-csrf-index: 1263
+    x-csrf-token: 6c7a9158-7bbd-4838-a308-afe9a30a245e
+D、Request Payload
+    {"betIssue":"20201202046","lotName":"xjssc","items":[{"betType":"all","backRate":0,"betUnit":0.1,"playType":"四定#单式","betNum":"1234X,4567X","betBeishu":"1","betZhushu":2}]}
+E、返回
+    { "code":"200", "data":null, "dataFlowVoList":[], "errorCode":"SUCCESS", "map":{}, "msg":"操作成功" }
+
+    ﻿
+    ​
+
+
+# 二定下注
+A、General
+    Request URL: https://www.99065w.com/cloud-lottery-service-server/gameInfo/userlottery/add
+    Request Method: POST
+B、Response Headers
+C、Request Headers
+    Accept: application/json, text/plain, */*
+    Accept-Encoding: gzip, deflate, br
+    Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+    Connection: keep-alive
+    Content-Length: 223
+    Content-Type: application/json;charset=UTF-8
+    contentType: application/json
+    1.Cookie: emp-id=43edb9b2-dabb-4779-bf3a-d97a0e4f128e; guest_id=479c1fe5-7c67-41e1-a884-17dcbd20a2c5; statistical-2020-12-02-1=1; x-id=48b99d76-2432-4e50-8dd1-3a7e12f2afb0; sid=e4ceb409-0d98-4d60-a639-cbba1fcd4f16; statistical-2020-12-03-1=1
+    2.Cookie: emp-id=43edb9b2-dabb-4779-bf3a-d97a0e4f128e; guest_id=479c1fe5-7c67-41e1-a884-17dcbd20a2c5; statistical-2020-12-02-1=1; sid=e4ceb409-0d98-4d60-a639-cbba1fcd4f16; statistical-2020-12-03-1=1
+    Host: www.99065w.com
+    Origin: https://www.99065w.com
+    Referer: https://www.99065w.com/web/caipiao/ssc/xjssc
+    Sec-Fetch-Dest: empty
+    Sec-Fetch-Mode: cors
+    Sec-Fetch-Site: same-origin
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+    userType: 0
+    x-csrf-index: 163
+    x-csrf-token: 6c54461e-d89e-44f7-b053-8f00a9ec5ee6
+D、Query String Parameters
+   a.{"betIssue":"20201202045","lotName":"xjssc","items":[{"betType":"all","backRate":"0","betUnit":1,"playType":"二定","betNum":"25,X,X,26,X","odds":{"minOdds":86.5,"maxOdds":99.5,"backRate":13},"betBeishu":1,"betZhushu":4}]}
+   b.{"betIssue":"20201202045","lotName":"xjssc","items":[{"betType":"all","backRate":"0","betUnit":1,"playType":"二定","betNum":"4,X,X,5,X","odds":{"minOdds":86.5,"maxOdds":99.5,"backRate":13},"betBeishu":1,"betZhushu":1},{"betType":"all","backRate":"0","betUnit":1,"playType":"二定","betNum":"7,X,X,3,X","odds":{"minOdds":86.5,"maxOdds":99.5,"backRate":13},"betBeishu":1,"betZhushu":1}]}
+E、返回
+    {
+    	"code":"200",
+    	"data":null,
+    	"dataFlowVoList":[],
+    	"errorCode":"SUCCESS",
+    	"map":{},
+    	"msg":"操作成功"
+    }
+
+
+# 撤单
+A、General
+    Request URL: https://www.99065w.com/cloud-lottery-service-server/gameInfo/userlottery/cancel/XJSSC1606927868075F683E    订单号从下注列表接口获取
+    Request Method: GET
+B、Response Headers
+C、Request Headers
+    Accept: application/json, text/plain, */*
+    Accept-Encoding: gzip, deflate, br
+    Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+    Connection: keep-alive
+    contentType: application/json
+    Cookie: emp-id=43edb9b2-dabb-4779-bf3a-d97a0e4f128e; guest_id=479c1fe5-7c67-41e1-a884-17dcbd20a2c5; statistical-2020-12-02-1=1; sid=e4ceb409-0d98-4d60-a639-cbba1fcd4f16; statistical-2020-12-03-1=1
+    Host: www.99065w.com
+    Referer: https://www.99065w.com/web/caipiao/ssc/xjssc
+    Sec-Fetch-Dest: empty
+    Sec-Fetch-Mode: cors
+    Sec-Fetch-Site: same-origin
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+    userType: 0
+    x-csrf-index: 418
+    x-csrf-token: db432047-72c1-4e25-98f3-ef353bfb7696
+D、Query String Parameters
+E、返回：
+    { "code":"200", "data":null, "dataFlowVoList":[], "errorCode":"SUCCESS", "map":{}, "msg":"操作成功" }
+
+# 下注列表接口
+A、General
+    Request URL: https://www.99065w.com/cloud-lottery-service-server/gameInfo/userlottery/query/betCode/xjssc?limit=5&page=1
+    Request Method: GET
+B、Response Headers
+C、Request Headers
+    Accept: application/json, text/plain, */*
+    Accept-Encoding: gzip, deflate, br
+    Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+    Connection: keep-alive
+    contentType: application/json
+    Cookie: emp-id=43edb9b2-dabb-4779-bf3a-d97a0e4f128e; guest_id=479c1fe5-7c67-41e1-a884-17dcbd20a2c5; statistical-2020-12-02-1=1; sid=e4ceb409-0d98-4d60-a639-cbba1fcd4f16; statistical-2020-12-03-1=1
+    Host: www.99065w.com
+    Referer: https://www.99065w.com/web/caipiao/ssc/xjssc
+    Sec-Fetch-Dest: empty
+    Sec-Fetch-Mode: cors
+    Sec-Fetch-Site: same-origin
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+    userType: 0
+    x-csrf-index: 542
+    x-csrf-token: 6e750807-fada-4a95-af44-3249acc05745
+D、Query String Parameters
+    limit: 5
+    page: 1
+E、返回：
+    {
+    	"code":"200",
+    	"data":{
+    		"currPage":1,
+    		"list":[
+    			{
+    				"orderNo":"XJSSC1606928130948F8A5E",
+    				"payAmount":1.00000,
+    				"betTime":1606928130948,
+    				"awardAmount":0,
+    				"userName":"gaozi2018",
+    				"issueNo":"20201202045",
+    				"userId":"660182040173785088",
+    				"lotteryType":"xjssc",
+    				"status":"paid"
+    			},
+    			{
+    				"orderNo":"XJSSC16069281093994CC58",
+    				"payAmount":1.00000,
+    				"betTime":1606928109399,
+    				"awardAmount":0,
+    				"userName":"gaozi2018",
+    				"issueNo":"20201202045",
+    				"userId":"660182040173785088",
+    				"lotteryType":"xjssc",
+    				"status":"u_canceled"
+    			},
+    			{
+    				"orderNo":"XJSSC1606927868075F683E",
+    				"payAmount":1.00000,
+    				"betTime":1606927868075,
+    				"awardAmount":0,
+    				"userName":"gaozi2018",
+    				"issueNo":"20201202045",
+    				"userId":"660182040173785088",
+    				"lotteryType":"xjssc",
+    				"status":"u_canceled"
+    			},
+    			{
+    				"orderNo":"XJSSC16069276910421619A",
+    				"payAmount":2.00000,
+    				"betTime":1606927691042,
+    				"awardAmount":0,
+    				"userName":"gaozi2018",
+    				"issueNo":"20201202045",
+    				"userId":"660182040173785088",
+    				"lotteryType":"xjssc",
+    				"status":"u_canceled"
+    			},
+    			{
+    				"orderNo":"XJSSC160692736839182EC2",
+    				"payAmount":4.00000,
+    				"betTime":1606927368391,
+    				"awardAmount":0,
+    				"userName":"gaozi2018",
+    				"issueNo":"20201202045",
+    				"userId":"660182040173785088",
+    				"lotteryType":"xjssc",
+    				"status":"u_canceled"
+    			}
+    		],
+    		"pageSize":5,
+    		"totalCount":5,
+    		"totalPage":1
+    	},
+    	"dataFlowVoList":[],
+    	"errorCode":"SUCCESS",
+    	"map":{},
+    	"msg":"ok"
+    }
+
+2、获取token[有用]
+A、General
+	Request URL: https://99065z.com/api/cloud-boss/token/createToken.asp?userType=0&grantType=1&loginType=1
+	Request Method: POST
+	Status Code: 200 
+	Remote Address: 103.147.172.79:443
+	Referrer Policy: no-referrer-when-downgrade
+B、Response Headers
+	access-control-allow-credentials: true
+	access-control-allow-headers: Accept, Authorization,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type
+	access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS
+	access-control-allow-origin: *
+	cache-control: no-cache
+	content-length: 676
+	content-type: application/json;charset=UTF-8
+	date: Tue, 01 Sep 2020 14:24:38 GMT
+	expires: Tue, 01 Sep 2020 14:24:37 GMT
+	server: openresty
+	set-cookie: guest_id=bcb51788-a146-4678-b35e-2187a596f93c; Max-Age=88800; Expires=Wed, 02-Sep-2020 15:02:40 GMT; Path=/
+	set-cookie: statistical-2020-09-01-1=1; Max-Age=88800; Expires=Wed, 02-Sep-2020 15:02:40 GMT; Path=/
+	status: 200
+	x-frame-options: SAMEORIGIN
+C、Request Headers
+	:authority: 99065z.com
+	:method: POST
+	:path: /api/cloud-boss/token/createToken.asp?userType=0&grantType=1&loginType=1
+	:scheme: https
+	accept: application/json, text/plain, */*
+	accept-encoding: gzip, deflate, br
+	accept-language: zh-CN,zh;q=0.9,en;q=0.8
+	content-length: 50
+	content-type: application/json;charset=UTF-8
+	origin: https://99065z.com
+	referer: https://99065z.com/web/
+	sec-fetch-dest: empty
+	sec-fetch-mode: cors
+	sec-fetch-site: same-origin
+	user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36
+D、Query String Parameters
+	userType: 0
+	grantType: 1
+	loginType: 1
+E、Request Payload
+	{"headers":{"Content-Type":"multipart/form-data"}}
+
+3、登录一[有用]
+A、General
+	Request URL: https://99065z.com/web/js/dist/socket.34fd50ud.asp?uid=5536108128
+	Request Method: GET
+	Status Code: 200 
+	Remote Address: 103.147.172.79:443
+	Referrer Policy: no-referrer-when-downgrade
+B、Response Headers
+	accept-charset: big5, big5-hkscs, cesu-8, euc-jp, euc-kr, gb18030, gb2312, gbk, ibm-thai, ibm00858, ibm01140, ibm01141, ibm01142, ibm01143, ibm01144, ibm01145, ibm01146, ibm01147, ibm01148, ibm01149, ibm037, ibm1026, ibm1047, ibm273, ibm277, ibm278, ibm280, ibm284, ibm285, ibm290, ibm297, ibm420, ibm424, ibm437, ibm500, ibm775, ibm850, ibm852, ibm855, ibm857, ibm860, ibm861, ibm862, ibm863, ibm864, ibm865, ibm866, ibm868, ibm869, ibm870, ibm871, ibm918, iso-2022-cn, iso-2022-jp, iso-2022-jp-2, iso-2022-kr, iso-8859-1, iso-8859-13, iso-8859-15, iso-8859-2, iso-8859-3, iso-8859-4, iso-8859-5, iso-8859-6, iso-8859-7, iso-8859-8, iso-8859-9, jis_x0201, jis_x0212-1990, koi8-r, koi8-u, shift_jis, tis-620, us-ascii, utf-16, utf-16be, utf-16le, utf-32, utf-32be, utf-32le, utf-8, windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257, windows-1258, windows-31j, x-big5-hkscs-2001, x-big5-solaris, x-compound_text, x-euc-jp-linux, x-euc-tw, x-eucjp-open, x-ibm1006, x-ibm1025, x-ibm1046, x-ibm1097, x-ibm1098, x-ibm1112, x-ibm1122, x-ibm1123, x-ibm1124, x-ibm1166, x-ibm1364, x-ibm1381, x-ibm1383, x-ibm300, x-ibm33722, x-ibm737, x-ibm833, x-ibm834, x-ibm856, x-ibm874, x-ibm875, x-ibm921, x-ibm922, x-ibm930, x-ibm933, x-ibm935, x-ibm937, x-ibm939, x-ibm942, x-ibm942c, x-ibm943, x-ibm943c, x-ibm948, x-ibm949, x-ibm949c, x-ibm950, x-ibm964, x-ibm970, x-iscii91, x-iso-2022-cn-cns, x-iso-2022-cn-gb, x-iso-8859-11, x-jis0208, x-jisautodetect, x-johab, x-macarabic, x-maccentraleurope, x-maccroatian, x-maccyrillic, x-macdingbat, x-macgreek, x-machebrew, x-maciceland, x-macroman, x-macromania, x-macsymbol, x-macthai, x-macturkish, x-macukraine, x-ms932_0213, x-ms950-hkscs, x-ms950-hkscs-xp, x-mswin-936, x-pck, x-sjis_0213, x-utf-16le-bom, x-utf-32be-bom, x-utf-32le-bom, x-windows-50220, x-windows-50221, x-windows-874, x-windows-949, x-windows-950, x-windows-iso2022jp
+	accept-codes: gzip, deflate, br;MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCdNDC+z1JUuNjw2JXH7YT5fKXJZDRBe34rPFrwAz6caEggkX0FwwyQJEVboM5rNweAdtKw7nCgchNIQyalpsp4xYuWhh8Dq94WtLsZOVDBZ9TQ3dokrqDY+MPi//I4fD4bflgUJc3+DBD0ruaPmduz63CHvxXraHcbZ35Bu15+DwIDAQAB
+	access-control-allow-credentials: true
+	access-control-allow-headers: Accept, Authorization,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type
+	access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS
+	access-control-allow-origin: *
+	cache-control: no-cache
+	content-encoding: br
+	content-type: application/json;charset=UTF-8
+	date: Tue, 01 Sep 2020 14:29:38 GMT
+	expires: Tue, 01 Sep 2020 14:29:37 GMT
+	server: openresty
+	set-cookie: x-id=389161c1-4c45-4aab-b64b-75f2269bbf96; Max-Age=300; Expires=Tue, 01-Sep-2020 14:32:40 GMT; Path=/
+	status: 200
+	vary: Accept-Encoding
+	x-frame-options: SAMEORIGIN
+C、Request Headers
+	:authority: 99065z.com
+	:method: GET
+	:path: /web/js/dist/socket.34fd50ud.asp?uid=5536108128
+	:scheme: https
+	accept: application/json, text/plain, */*
+	accept-codes: 
+	accept-encoding: gzip, deflate, br
+	accept-language: zh-CN,zh;q=0.9,en;q=0.8
+	accept-languages: zh-CN,zh;q=0.9,en;q=0.8;country=7A9A47DC9603D617C92316F1155264FA
+	accept-type: application/json;wcvM7s/joKr8odW+rQ1hiQ==
+	contenttype: application/json
+	cookie: emp-id=be9a507d-c5c2-454f-9806-4c63c264376f; guest_id=bcb51788-a146-4678-b35e-2187a596f93c; statistical-2020-09-01-1=1
+	referer: https://99065z.com/web/
+	sec-fetch-dest: empty
+	sec-fetch-mode: cors
+	sec-fetch-site: same-origin
+	user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36
+	usertype: 0
+D、Query String Parameters
+	uid: 5536108128
+#、返回：
+	{
+		"code":"200",
+		"data":null,
+		"dataFlowVoList":[],
+		"errorCode":"SUCCESS",
+		"map":{},
+		"msg":"f - d"
+	}
+
+4、登录二，会员状态检测
+A、General
+	Request URL: https://99065z.com/cloud-member-service-server/member/query
+	Request Method: GET
+	Status Code: 200 
+	Remote Address: 103.147.172.79:443
+	Referrer Policy: no-referrer-when-downgrade
+B、Response Headers
+	access-control-allow-credentials: true
+	access-control-allow-headers: Accept, Authorization,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type
+	access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS
+	access-control-allow-origin: *
+	cache-control: no-cache
+	content-encoding: br
+	content-type: application/json;charset=UTF-8
+	date: Tue, 01 Sep 2020 14:29:39 GMT
+	expires: Tue, 01 Sep 2020 14:29:38 GMT
+	server: openresty
+	status: 200
+	vary: Accept-Encoding
+	x-csrf-index: 2
+	x-csrf-token: 850bc5f6-cdbf-478c-a41f-0f865c7822fa
+	x-frame-options: SAMEORIGIN
+C、Request Headers
+	:authority: 99065z.com
+	:method: GET
+	:path: /cloud-member-service-server/member/query
+	:scheme: https
+	accept: application/json, text/plain, */*
+	accept-encoding: gzip, deflate, br
+	accept-language: zh-CN,zh;q=0.9,en;q=0.8
+	contenttype: application/json
+	cookie: emp-id=be9a507d-c5c2-454f-9806-4c63c264376f; guest_id=bcb51788-a146-4678-b35e-2187a596f93c; statistical-2020-09-01-1=1; x-id=389161c1-4c45-4aab-b64b-75f2269bbf96; sid=0c5fd555-2cd3-4f1b-9fe8-f8c90d8c686a
+	referer: https://99065z.com/web/
+	sec-fetch-dest: empty
+	sec-fetch-mode: cors
+	sec-fetch-site: same-origin
+	user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36
+	usertype: 0
+	x-csrf-index: 1
+	x-csrf-token: 32cfd6f6-f095-4a89-a7c4-850de497c172
+D、返回：
+	{
+		"code":"200",
+		"data":{
+			"accessTime":null,
+			"accessToken":"",
+			"address":"",
+			"amountOfCode":"",
+			"birthday":null,
+			"capitalPwd":"",
+			"checkBy":"",
+			"checkStatus":0,
+			"checkTime":1589558408000,
+			"chessCardBalance":"",
+			"dupName":0,
+			"email":"",
+			"emaileType":null,
+			"fingerprint":"",
+			"frozenEnd":null,
+			"frozenStart":null,
+			"gameName":"数控车",
+			"icon":"",
+			"integral":0,
+			"joinDate":1577441263970,
+			"joinIp":"",
+			"joinType":1,
+			"lastLoginIp":"",
+			"lastLoginTime":1598967176960,
+			"loginCount":568,
+			"loginIp":"",
+			"loginTime":1598970461040,
+			"loginType":null,
+			"name":"gaozi2018",
+			"nameArray":"",
+			"nation":"前台正常注册",
+			"nativePlace":"",
+			"newUp":"",
+			"onlineLong":"",
+			"onlineState":false,
+			"password":"",
+			"phone":"",
+			"photo":"/group1/M00/00/23/wKgvKV37OSiAIFLRAAAgaBtici4188.jpg",
+			"pid":null,
+			"playerType":2,
+			"promoCode":"Q71",
+			"pwd":"",
+			"qq":"",
+			"rank":1,
+			"rankName":"普通",
+			"realName":"王业高",
+			"rebate":"",
+			"recharge":"",
+			"remark":"",
+			"rid":"647746122833833984",
+			"runId":"-1",
+			"salt":"",
+			"sendTime":1589558408407,
+			"sex":"",
+			"siteCode":"",
+			"smallPhoto":"/group1/M00/00/23/wKgvKV37OSiAIFLRAAAgaBtici4188.jpg",
+			"status":1,
+			"suggestAddress":"4330",
+			"target":"",
+			"telephone":"",
+			"uid":"660182040173785088",
+			"uidArray":"",
+			"upName":"",
+			"upRank":0,
+			"updateBy":"",
+			"updateTime":null,
+			"userWallet":null,
+			"vesion":0,
+			"walletAmount":"",
+			"withdrawals":""
+		},
+		"dataFlowVoList":[],
+		"errorCode":"SUCCESS",
+		"map":{},
+		"msg":"ok"
+	}
+
+5、获取余额
+A、General
+	Request URL: https://99065z.com/cloud-pay-service-server/userwallet/getUserBalanceByUid
+	Request Method: GET
+	Status Code: 200 
+	Remote Address: 103.147.172.79:443
+	Referrer Policy: no-referrer-when-downgrade
+B、Response Headers
+	access-control-allow-credentials: true
+	access-control-allow-headers: Accept, Authorization,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type
+	access-control-allow-methods: GET, POST, PUT, DELETE, OPTIONS
+	access-control-allow-origin: *
+	cache-control: no-cache
+	content-length: 303
+	content-type: application/json;charset=UTF-8
+	date: Tue, 01 Sep 2020 14:29:40 GMT
+	expires: Tue, 01 Sep 2020 14:29:39 GMT
+	server: openresty
+	status: 200
+	x-csrf-index: 4
+	x-csrf-token: 5d0a2769-cd7b-4289-bf31-22935b0d910c
+	x-frame-options: SAMEORIGIN
+C、Request Headers
+	:authority: 99065z.com
+	:method: GET
+	:path: /cloud-pay-service-server/userwallet/getUserBalanceByUid
+	:scheme: https
+	accept: application/json, text/plain, */*
+	accept-encoding: gzip, deflate, br
+	accept-language: zh-CN,zh;q=0.9,en;q=0.8
+	contenttype: application/json
+	cookie: emp-id=be9a507d-c5c2-454f-9806-4c63c264376f; guest_id=bcb51788-a146-4678-b35e-2187a596f93c; statistical-2020-09-01-1=1; x-id=389161c1-4c45-4aab-b64b-75f2269bbf96; sid=0c5fd555-2cd3-4f1b-9fe8-f8c90d8c686a
+	referer: https://99065z.com/web/
+	sec-fetch-dest: empty
+	sec-fetch-mode: cors
+	sec-fetch-site: same-origin
+	user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36
+	usertype: 0
+	x-csrf-index: 2
+	x-csrf-token: 850bc5f6-cdbf-478c-a41f-0f865c7822fa
+D、返回：
+	{
+		"code":"200",
+		"data":{
+			"agBalance":0,
+			"balance":105.83000,
+			"depositBalance":null,
+			"frozenBalance":0,
+			"id":"0",
+			"loginname":"gaozi2018",
+			"type":"1 ",
+			"uid":"0",
+			"uptime":1598367266304,
+			"yebBalance":0.00000
+		},
+		"dataFlowVoList":[],
+		"errorCode":"SUCCESS",
+		"map":{},
+		"msg":"ok"
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
