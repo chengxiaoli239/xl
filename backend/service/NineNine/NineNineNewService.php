@@ -408,12 +408,7 @@ class NineNineNewService extends BaseTZService {
                 $xCsrf_key = CommonService::buildXCsrfTokenKey($plan->uid, self::$tz_system_id);
                 $m->set($xCsrf_key, $xCsrf, 120);
             }
-            $redis_mkey_retry = 'bet_retry_'.$plan->uid.'_'.self::$tz_system_id.'_'.$plan_id;
             if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!'){
-                $redis = new RedisLock();
-                if($redis->lock($redis_mkey_retry, 5)){
-                    return false;
-                }
                 $headers = [
                     "Accept: application/json, text/plain, */*",
                     "Accept-Encoding: gzip, deflate, br",
@@ -882,63 +877,82 @@ class NineNineNewService extends BaseTZService {
     public static function getBalance($uid, $tz_system_id){
         // 创建redislock对象
 
-        $m = \Yii::$app->cache;
-        $mkey = 'getBalance_'.$uid.'_'.$tz_system_id;
-        //if($balance = $m->get($mkey)) return $balance;
-        self::__init($uid, $tz_system_id);
-        $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
+        $redisLock = new RedisLock();
+        $redisKey = 'Auto_synBalance_'.$uid .'_'. $tz_system_id;
+        if($redisLock->lock($redisKey, 5)){
+            $m = \Yii::$app->cache;
+            self::__init($uid, $tz_system_id);
+            $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
 
-        //p($xCsrf);
-        $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid,'tz_system_id'=>$tz_system_id]);
-        $headers = [
-            "Accept: application/json, text/plain, */*",
-            "Accept-Encoding: gzip, deflate, br",
-            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
-            "Connection: keep-alive",
-            "contentType: application/json",
-            "Cookie: ".$TzSystemsUsers['cookie'],
-            "Host: ".$urlArr['domain'],
-            "referer: ".$urlArr['baseUrl']."/web/",
-            "Sec-Fetch-Dest: empty",
-            "Sec-Fetch-Mode: cors",
-            "Sec-Fetch-Site: same-origin",
-            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
-            "userType: 0",
-            "x-csrf-index: ".$xCsrf['Index'],
-            "x-csrf-token: ".$xCsrf['Token'],
-        ];
+            //p($xCsrf);
+            $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid,'tz_system_id'=>$tz_system_id]);
+            $headers = [
+                "Accept: application/json, text/plain, */*",
+                "Accept-Encoding: gzip, deflate, br",
+                "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+                "Connection: keep-alive",
+                "contentType: application/json",
+                "Cookie: ".$TzSystemsUsers['cookie'],
+                "Host: ".$urlArr['domain'],
+                "referer: ".$urlArr['baseUrl']."/web/",
+                "Sec-Fetch-Dest: empty",
+                "Sec-Fetch-Mode: cors",
+                "Sec-Fetch-Site: same-origin",
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+                "userType: 0",
+                "x-csrf-index: ".$xCsrf['Index'],
+                "x-csrf-token: ".$xCsrf['Token'],
+            ];
 
-        $url = $urlArr['baseUrl'].'/cloud-pay-service-server/userwallet/getUserBalanceByUid';
-        if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
-        $start_time = microtime(true);
+            $url = $urlArr['baseUrl'].'/cloud-pay-service-server/userwallet/getUserBalanceByUid';
+            if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
+            $start_time = microtime(true);
 
-        $tmpRst = NineNineNewService::getCurl($url, $headers);#
+            $tmpRst = NineNineNewService::getCurl($url, $headers);#
 
-        $rstData = $tmpRst['rstData'];
-        $xCsrf = $tmpRst['xCsrf'];
-        if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
-            $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
-            $m->set($xCsrf_key, $xCsrf, 120);
-        }
-        $redis_mkey_retry = 'getBalance_retry_'.$uid.'_'.$tz_system_id;
-        if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!'){
-            $redis = new RedisLock();
-            if($redis->lock($redis_mkey_retry, 5)){
-                return false;
+            $rstData = $tmpRst['rstData'];
+            $xCsrf = $tmpRst['xCsrf'];
+            if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+                $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
+                $m->set($xCsrf_key, $xCsrf, 120);
             }
-            return self::getBalance($uid, $tz_system_id);
+            if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!'){
+                $headers = [
+                    "Accept: application/json, text/plain, */*",
+                    "Accept-Encoding: gzip, deflate, br",
+                    "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+                    "Connection: keep-alive",
+                    "contentType: application/json",
+                    "Cookie: ".$TzSystemsUsers['cookie'],
+                    "Host: ".$urlArr['domain'],
+                    "referer: ".$urlArr['baseUrl']."/web/",
+                    "Sec-Fetch-Dest: empty",
+                    "Sec-Fetch-Mode: cors",
+                    "Sec-Fetch-Site: same-origin",
+                    "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+                    "userType: 0",
+                    "x-csrf-index: ".$xCsrf['Index'],
+                    "x-csrf-token: ".$xCsrf['Token'],
+                ];
+                $tmpRst = NineNineNewService::getCurl($url, $headers);#
+                $rstData = $tmpRst['rstData'];
+                $xCsrf = $tmpRst['xCsrf'];
+                if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+                    $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
+                    $m->set($xCsrf_key, $xCsrf, 120);
+                }
+            }
+            //p(['url'=>$url, 'headers'=>$headers, 'balance'=>$balance]);
+            $end_time = microtime(true);
+            $time_consume = ($end_time-$start_time).'s';
+            if($rstData['code'] == 200){
+                $balance = $rstData['data']['balance'];
+            }
+            $logData = ['url'=>$url, 'rst'=>$rstData, 'headers'=>$headers, 'balance'=>$balance, 'time_consume'=>$time_consume, 'xCsrf'=>$xCsrf];
+            //p($logData);
+            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','0898用户余额', $logData);
         }
-        //p(['url'=>$url, 'headers'=>$headers, 'balance'=>$balance]);
-        $end_time = microtime(true);
-        $time_consume = ($end_time-$start_time).'s';
-        if($rstData['code'] == 200){
-            $balance = $rstData['data']['balance'];
-        }
-        $m->set($mkey, $balance, 5);
-        $logData = ['url'=>$url, 'rst'=>$rstData, 'headers'=>$headers, 'balance'=>$balance, 'time_consume'=>$time_consume, 'xCsrf'=>$xCsrf];
-        //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','0898用户余额', $logData);
 
         return $balance;
 
@@ -1068,6 +1082,7 @@ class NineNineNewService extends BaseTZService {
         $uid = $BettingRecords->uid;
         self::__init($uid, $tz_system_id);
 
+        $m = \Yii::$app->cache;
         $orderNos = explode(',', trim($BettingRecords->snid, ','));
         $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
@@ -1092,7 +1107,39 @@ class NineNineNewService extends BaseTZService {
                 "x-csrf-index: " . $xCsrf['Index'],
                 "x-csrf-token: " . $xCsrf['Token'],
             ];
-            $rstData = CurlService::getCurl($url, $headers);
+            $tmpRst = self::getCurl($url, $headers);
+            $rstData = $tmpRst['rstData'];
+            $xCsrf = $tmpRst['xCsrf'];
+            if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+                $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
+                $m->set($xCsrf_key, $xCsrf, 120);
+            }
+            if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!') {
+                $headers = [
+                    "Accept: application/json, text/plain, */*",
+                    "Accept-Encoding: gzip, deflate, br",
+                    "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+                    "Connection: keep-alive",
+                    "contentType: application/json",
+                    "Cookie: " . $TzSystemUser['cookie'],
+                    "Host: www.99065w.com",
+                    "Referer: " . $urlArr['baseUrl'] . "/web/caipiao/ssc/xjssc",
+                    "Sec-Fetch-Dest: empty",
+                    "Sec-Fetch-Mode: cors",
+                    "Sec-Fetch-Site: same-origin",
+                    "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
+                    "userType: 0",
+                    "x-csrf-index: " . $xCsrf['Index'],
+                    "x-csrf-token: " . $xCsrf['Token'],
+                ];
+                $tmpRst = self::getCurl($url, $headers);
+                $rstData = $tmpRst['rstData'];
+                $xCsrf = $tmpRst['xCsrf'];
+                if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+                    $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
+                    $m->set($xCsrf_key, $xCsrf, 120);
+                }
+            }
             $rst[$key]['data'] = $rstData;
             if ($rstData['code'] == 200) {
                 $BettingRecords = BettingRecords::findOne($id);

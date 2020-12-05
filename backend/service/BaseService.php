@@ -100,53 +100,53 @@ class BaseService{
         $redisLock = new RedisLock();
         $redisKey = 'Auto_synBalance_'.$id;
         if($redisLock->lock($redisKey, 5)){
-            return ['status'=>301, 'msg'=>'同步余额并发锁'];
-        }
-
-        $tz_system_id = $TzSystemsUser->tz_system_id;
-        # 是否有激活的计划
-        $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id);
-        if(!$hasActivePlan && !in_array($tz_system_id, [3, 11, 12, 13, 14])){
-            return false;
-        }
-
-        if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
-            return false;
-        }
-        $tz_system_id = $TzSystemsUser->tz_system_id;
-        if(in_array($tz_system_id, [1,2])){
-            # 1、0898投注、2、99彩票网
-            //$rst = HN0898Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-            $rst = HN0898Service::synBalance($TzSystemsUser->id);
-        }elseif(in_array($tz_system_id, [3, 7, 9, 10])){
-            # 3、重庆7时彩网
-            if(in_array($tz_system_id, [3, 7])){
-                $rst = SevenService::synBalance($TzSystemsUser->id);
-            }else{
-                $rst = Lucky5Service::synBalance($TzSystemsUser->id);// p($rst);# 同步余额
+            $tz_system_id = $TzSystemsUser->tz_system_id;
+            # 是否有激活的计划
+            $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id);
+            if(!$hasActivePlan && !in_array($tz_system_id, [3, 11, 12, 13, 14])){
+                return false;
             }
-        }elseif(in_array($tz_system_id, [4])){
-            # 4、7天彩票网
-        }elseif(in_array($tz_system_id, [5])){
-            # 5、希腊网
-        }elseif(in_array($tz_system_id, [6])){
-            # 6、会员网
-            $rst = HuiYuanBaseService::synBalance($TzSystemsUser->id);
-        }elseif(in_array($tz_system_id, [11])){
-            # 菊花网
-            $rst = JuHuaBaseService::synBalance($TzSystemsUser->id);
-        }elseif(in_array($tz_system_id, [12])){
-            # 九九新网
-            $rst = NineNineNewService::synBalance($TzSystemsUser->id);
-        }elseif(in_array($tz_system_id, [8])){
-            # 8、麒麟财务系统网
-            $rst = QiLinBaseService::synBalance($TzSystemsUser->id);
-        }elseif(in_array($tz_system_id, [14])){
-            # 14、平博网
-            $rst = PingBoBaseService::synBalance($TzSystemsUser->id);
-        }elseif(in_array($tz_system_id, [13])){
-            # 13、冰岛
-            $rst = \backend\service\BingDao\BingDaoService::synBalance($TzSystemsUser->id);
+
+            if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
+                return false;
+            }
+            $tz_system_id = $TzSystemsUser->tz_system_id;
+            if(in_array($tz_system_id, [1,2])){
+                # 1、0898投注、2、99彩票网
+                //$rst = HN0898Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                $rst = HN0898Service::synBalance($TzSystemsUser->id);
+            }elseif(in_array($tz_system_id, [3, 7, 9, 10])){
+                # 3、重庆7时彩网
+                if(in_array($tz_system_id, [3, 7])){
+                    $rst = SevenService::synBalance($TzSystemsUser->id);
+                }else{
+                    $rst = Lucky5Service::synBalance($TzSystemsUser->id);// p($rst);# 同步余额
+                }
+            }elseif(in_array($tz_system_id, [4])){
+                # 4、7天彩票网
+            }elseif(in_array($tz_system_id, [5])){
+                # 5、希腊网
+            }elseif(in_array($tz_system_id, [6])){
+                # 6、会员网
+                $rst = HuiYuanBaseService::synBalance($TzSystemsUser->id);
+            }elseif(in_array($tz_system_id, [11])){
+                # 菊花网
+                $rst = JuHuaBaseService::synBalance($TzSystemsUser->id);
+            }elseif(in_array($tz_system_id, [12])){
+                # 九九新网
+                $rst = NineNineNewService::synBalance($TzSystemsUser->id);
+            }elseif(in_array($tz_system_id, [8])){
+                # 8、麒麟财务系统网
+                $rst = QiLinBaseService::synBalance($TzSystemsUser->id);
+            }elseif(in_array($tz_system_id, [14])){
+                # 14、平博网
+                $rst = PingBoBaseService::synBalance($TzSystemsUser->id);
+            }elseif(in_array($tz_system_id, [13])){
+                # 13、冰岛
+                $rst = \backend\service\BingDao\BingDaoService::synBalance($TzSystemsUser->id);
+            }
+        }else{
+            return ['status'=>301, 'msg'=>'同步余额并发锁['.$id.']'];
         }
 
         return $rst;
