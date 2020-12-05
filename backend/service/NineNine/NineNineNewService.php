@@ -408,19 +408,46 @@ class NineNineNewService extends BaseTZService {
                 $xCsrf_key = CommonService::buildXCsrfTokenKey($plan->uid, self::$tz_system_id);
                 $m->set($xCsrf_key, $xCsrf, 120);
             }
-            $redis_mkey_retry = 'bet_retry_'.$plan->uid.'_'.self::$tz_system_id;
+            $redis_mkey_retry = 'bet_retry_'.$plan->uid.'_'.self::$tz_system_id.'_'.$plan_id;
             if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!'){
                 $redis = new RedisLock();
                 if($redis->lock($redis_mkey_retry, 5)){
                     return false;
                 }
-                return $this->bet($plan->uid, self::$tz_system_id);
+                $headers = [
+                    "Accept: application/json, text/plain, */*",
+                    "Accept-Encoding: gzip, deflate, br",
+                    "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+                    "Connection: keep-alive",
+                    'Content-Length:'.strlen($post_data),
+                    "Content-Type: application/json;charset=UTF-8",
+                    "contentType: application/json",
+                    'Cookie: '.$TzSystemsUsers->cookie,
+                    "Host: www.".$urlArr['domain'],
+                    "Origin: ".$urlArr['baseUrl'],
+                    "Referer: ".$urlArr['baseUrl']."/web/caipiao/ssc/xjssc",
+                    "Sec-Fetch-Dest: empty",
+                    "Sec-Fetch-Mode: cors",
+                    "Sec-Fetch-Site: same-origin",
+                    "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
+                    "userType: 0",
+                    "x-csrf-index: ".$xCsrf['Index'],
+                    "x-csrf-token: ".$xCsrf['Token'],
+                ];
+                $tmpRst = self::postBetCurl($url, $post_data, $headers);
+                //return $this->bet($plan->uid, self::$tz_system_id);
+                $rstData = $tmpRst['rstData'];
+                $xCsrf = $tmpRst['xCsrf'];
+                Tool_Common::log('NineNineNew_retry_bet', 'INFO', '九九网重新下注',['rstData'=>$rstData, 'xCsrf'=>$xCsrf]);
+                if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+                    $xCsrf_key = CommonService::buildXCsrfTokenKey($plan->uid, self::$tz_system_id);
+                    $m->set($xCsrf_key, $xCsrf, 120);
+                }
             }
-            $rst[$key] = $rstData;
             //p(['rst'=>$rst, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'is_auto'=>$is_auto]);
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time). 's';
-            if(!$rst[$key]){
+            if(!$rstData){
                 $post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
                 $tzRst = ['uid'=>self::$user_id, 'account'=>self::$account, 'status'=>301, 'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rstData, 'time_consume'=>$time_consume];
                 if($tz_type != 20){
@@ -429,6 +456,7 @@ class NineNineNewService extends BaseTZService {
                 Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','99投注记录-投注失败', $tzRst);
                 return $tzRst;
             }
+            $rst[$key] = $rstData;
 
             $n = count(explode('@',$code));
             if(in_array($playway, [2, 3]) && $tz_type != 20){
@@ -468,7 +496,7 @@ class NineNineNewService extends BaseTZService {
         //$post_data['code'] = isset($post_data['code']) && strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
         $logArr = ['uid'=>$plan->uid,'account'=>$plan->account,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume,'insertData'=>$insertData,'sn'=>$sn, 'lottery_type'=>$lottery_type,'snid'=>$snid, 'insertRst'=>$insertRst];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBet','INFO','99彩票网['.$lottery_type.']插入记录-真实投注', $logArr);
+        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBet','INFO','99彩票网['.$lottery_type.']插入记录-真实投注-3', $logArr);
 
         return $data;
     }
