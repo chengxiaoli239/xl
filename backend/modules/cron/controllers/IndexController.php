@@ -321,26 +321,6 @@ class IndexController extends Controller
 
         foreach ($TzSystemsUsers as $TzSystemsUser){
             $rst['rst'][$TzSystemsUser->id] = BaseService::synBalance($TzSystemsUser->id);
-            /*
-            $TzSystems = TzSystems::findOne($TzSystemsUser->tz_system_id);
-            switch ($TzSystems->system_type_id){
-                case 1:
-                    $rst['rst'][$TzSystemsUser->id] = HN0898Service::synBalance($TzSystemsUser->id);
-                    break;
-                case 2:
-                case 5:
-                    $rst['rst'][$TzSystemsUser->id] = SevenService::synBalance($TzSystemsUser->id);
-                    break;
-                case 3:
-                    break;
-                case 4: # 北京快乐8
-                    $rst['rst'][$TzSystemsUser->id] = HuiYuanBaseService::synBalance($TzSystemsUser->id);
-                    break;
-                case 6: # 麒麟财务系统
-                    $rst['rst'][$TzSystemsUser->id] = QiLinBaseService::synBalance($TzSystemsUser->id);
-                    break;
-            }
-            */
         }
         return $rst;
     }

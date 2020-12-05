@@ -408,6 +408,14 @@ class NineNineNewService extends BaseTZService {
                 $xCsrf_key = CommonService::buildXCsrfTokenKey($plan->uid, self::$tz_system_id);
                 $m->set($xCsrf_key, $xCsrf, 120);
             }
+            $redis_mkey_retry = 'bet_retry_'.$plan->uid.'_'.self::$tz_system_id;
+            if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!'){
+                $redis = new RedisLock();
+                if($redis->lock($redis_mkey_retry, 5)){
+                    return false;
+                }
+                return $this->bet($plan->uid, self::$tz_system_id);
+            }
             $rst[$key] = $rstData;
             //p(['rst'=>$rst, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'is_auto'=>$is_auto]);
             $end_time = microtime(true);
