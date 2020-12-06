@@ -296,7 +296,7 @@ class XlService extends BaseTZService {
             if($tz_type != 20){
                 $tzRst['code'] = $codes;
             }
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','希腊投注记录-投注失败', $tzRst);
+            Tool_Common::log('bet','INFO','希腊投注记录-投注失败', $tzRst);
             //return $tzRst;
         }
         $time = 600;
@@ -334,7 +334,7 @@ class XlService extends BaseTZService {
         self::$headers = [];
 
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时希腊插入记录-真实投注', $logArr);
+        Tool_Common::log('bet','INFO','7时希腊插入记录-真实投注', $logArr);
 
         return $data;
     }
@@ -394,7 +394,7 @@ class XlService extends BaseTZService {
             //sleep(2);
         }
         $logArr = ['snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
+        Tool_Common::log('cancelOrder','INFO','撤单记录', $logArr);
 
         return $rst;
     }
@@ -603,7 +603,7 @@ class XlService extends BaseTZService {
             $balance = $rst['Data']['credit_balance'];
         }
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','希腊-用户余额', $rst);
+        Tool_Common::log('getBalance','INFO','希腊-用户余额', $rst);
 
         return $balance;
     }
@@ -665,7 +665,7 @@ class XlService extends BaseTZService {
             $snid = $matches[2][0];
             $logData = ['url'=>$url,'headers'=>$headers, 'snid'=>$snid,/* 'content'=>$content*/];
             //p($logData);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSnidBySn','INFO','获取方案号', $logData);
+            Tool_Common::log('getSnidBySn','INFO','获取方案号', $logData);
             $m->set($mkey, 6*3600);
         }
 
@@ -732,7 +732,7 @@ class XlService extends BaseTZService {
             }
             self::$headers = [];
             $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
+            Tool_Common::log('getCookie','INFO','0898Cookie记录', $logArr);
             $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
             $cookie = str_replace('; path=/; HttpOnly','',$cookie);
             $m->set($mkey, $cookie, 180);
@@ -765,7 +765,7 @@ class XlService extends BaseTZService {
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
         //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+        Tool_Common::log('downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return true;
     }
@@ -815,7 +815,7 @@ class XlService extends BaseTZService {
             $snidStr .= $tzData['bet_id'].'|1,';
         }
         $data['snid'] = trim($snidStr, ',');
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSn','INFO','7时彩获取方案号', $data);
+        Tool_Common::log('getSn','INFO','7时彩获取方案号', $data);
 
         return $data;
     }
@@ -886,7 +886,7 @@ class XlService extends BaseTZService {
         self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'code'=>$code, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','0898登陆记录', $logArr);
         return $data;
     }
 
@@ -917,7 +917,7 @@ class XlService extends BaseTZService {
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','7时彩登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','7时彩登陆记录', $logArr);
         return $data;
     }
 
@@ -964,7 +964,7 @@ class XlService extends BaseTZService {
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','0898登陆记录', $logArr);
         return $data;
     }
 
@@ -996,7 +996,7 @@ class XlService extends BaseTZService {
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','7时彩-用户信息2', $logArr);
+        Tool_Common::log('userInfo','INFO','7时彩-用户信息2', $logArr);
         return $data;
     }
 
@@ -1199,7 +1199,7 @@ class XlService extends BaseTZService {
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','0898登陆记录', $logArr);
 
         return $data;
     }

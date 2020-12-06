@@ -300,7 +300,7 @@ class SevenService extends BaseTZService {
                 'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume
             ];
             //if($tz_type != 20) $tzRst['code'] = $codes;
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','7时彩投注记录-投注失败', $tzRst);
+            Tool_Common::log('bet_error','INFO','7时彩投注记录-投注失败', $tzRst);
             if(!in_array($account, ['aa07']) && in_array($rst['code'], [302, 303, 304, 305, 306])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
                 return $rst;
             }
@@ -350,7 +350,7 @@ class SevenService extends BaseTZService {
 
         if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'bigFlag'=>$bigFlag, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时重庆插入记录-真实投注', $logArr);
+        Tool_Common::log('bet','INFO','7时重庆插入记录-真实投注', $logArr);
 
         return $data;
     }
@@ -420,7 +420,7 @@ class SevenService extends BaseTZService {
             }
         }
         $logArr = ['snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
+        Tool_Common::log('cancelOrder','INFO','撤单记录', $logArr);
 
         return $rst;
     }
@@ -696,7 +696,7 @@ class SevenService extends BaseTZService {
         $rst['uid'] = $uid;
         $rst['tz_system_id'] = $tz_system_id;
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','7时彩-用户余额', $rst);
+        Tool_Common::log('getBalance','INFO','7时彩-用户余额', $rst);
 
         return $balance;
     }
@@ -758,7 +758,7 @@ class SevenService extends BaseTZService {
             $snid = $matches[2][0];
             $logData = ['url'=>$url,'headers'=>$headers, 'snid'=>$snid,/* 'content'=>$content*/];
             //p($logData);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSnidBySn','INFO','获取方案号', $logData);
+            Tool_Common::log('getSnidBySn','INFO','获取方案号', $logData);
             $m->set($mkey, 6*3600);
         }
 
@@ -901,7 +901,7 @@ class SevenService extends BaseTZService {
         $cookie = $tmpCookieArr[0];
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'SevenStarHFDirector1Frontend1'=>$SevenStarHFDirector1Frontend1, 'url'=>$url, 'headers'=>$headers];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','Seven Cookie记录', $logArr);
+        Tool_Common::log('getCookie','INFO','Seven Cookie记录', $logArr);
         $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
         $cookie = str_replace('; path=/; HttpOnly','',$cookie);
         $m->set($mkey, $cookie, 180);
@@ -946,7 +946,7 @@ class SevenService extends BaseTZService {
         $logArr = ['matches'=>$matches, 'cookie'=>$cookie, 'url'=>$url, 'header'=>$header, 'content'=>$content];
         if(empty($matches[0])) $logArr['content'] = $content;
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/curlGetSevenCookie','INFO','curlGetSevenCookie记录', $logArr);
+        Tool_Common::log('curlGetSevenCookie','INFO','curlGetSevenCookie记录', $logArr);
 
         return $data;
     }
@@ -1001,7 +1001,7 @@ class SevenService extends BaseTZService {
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
         //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+        Tool_Common::log('downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return true;
     }
@@ -1051,7 +1051,7 @@ class SevenService extends BaseTZService {
         }
         //$snidStr = trim('|1,', implode('|1,', $tzDatas));
         $data['snid'] = trim($snidStr, ',');
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSn','INFO','7时彩获取方案号', $data);
+        Tool_Common::log('getSn','INFO','7时彩获取方案号', $data);
 
         return $data;
     }
@@ -1109,7 +1109,7 @@ class SevenService extends BaseTZService {
         //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
         if(curl_close($ch)) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data]);
+            Tool_Common::log('getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data]);
             return $str;
         }
         if(!BaseService::is_json($data)){
@@ -1163,7 +1163,7 @@ class SevenService extends BaseTZService {
         //$syncBalance = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
         //p($syncBalance);
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','seven登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','seven登陆记录', $logArr);
         return $data;
     }
 
@@ -1202,11 +1202,11 @@ class SevenService extends BaseTZService {
         if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
         }
 
         $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPost','INFO','httpPost请求', $logArr);
+        Tool_Common::log('httpPost','INFO','httpPost请求', $logArr);
         //if(strpos($url, 'betNumber')){ p(['url'=>$url, 'header'=>$header,'post_data'=>$post_data,'rstData'=>$data,curl_close($ch),$errno]); }
         if(curl_close($ch)) {
             echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
@@ -1254,7 +1254,7 @@ class SevenService extends BaseTZService {
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','7时彩登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','7时彩登陆记录', $logArr);
         return $data;
     }
 
@@ -1311,7 +1311,7 @@ class SevenService extends BaseTZService {
 
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','重庆7时彩-用户信息', $logArr);
+        Tool_Common::log('userInfo','INFO','重庆7时彩-用户信息', $logArr);
         return $data;
     }
 
@@ -1605,11 +1605,11 @@ class SevenService extends BaseTZService {
         }
         if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306])){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
         }
         $logArr = ['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rst'=>$data, 'errno'=>$errno, 'rstData'=>$rstData];
         if(strlen($post_data['bet_number'])>1000) $logArr['post_data'] = substr($post_data['bet_number'], 0, 200).'...';
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求-七星', $logArr);
+        Tool_Common::log('postBetCurl','INFO','httpPost下注请求-七星', $logArr);
         //p([$data, $rstData, $post_data, $header]);
 
         return $rstData;
@@ -1702,7 +1702,7 @@ class SevenService extends BaseTZService {
                     'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>self::$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume
                 ];
                 //if($tz_type != 20) $tzRst['code'] = $codes;
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','7时彩分批投注记录-投注失败', $tzRst);
+                Tool_Common::log('bet_error','INFO','7时彩分批投注记录-投注失败', $tzRst);
                 if(!in_array($plan->account, ['aa07']) && in_array($rst['code'], [302, 303, 304, 305, 306])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
                     return $rst;
                 }
@@ -1749,7 +1749,7 @@ class SevenService extends BaseTZService {
 
         if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>self::$headers, 'bigFlag'=>1, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
+        Tool_Common::log('bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
 
         return $data;
     }

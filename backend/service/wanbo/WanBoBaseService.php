@@ -138,7 +138,7 @@ class WanBoBaseService {
                     $m->set($mkey, 1, 5*60);
                 }
                 //if($tz_type != 20) $tzRst['code'] = $codes;
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','幸运星分批投注记录-投注失败', $tzRst);
+                Tool_Common::log('bet_error','INFO','幸运星分批投注记录-投注失败', $tzRst);
                 # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护，307账号停押
                 if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [302, 303, 304, 305, 306, 307])){
                     //return $rst;
@@ -190,7 +190,7 @@ class WanBoBaseService {
 
         if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>self::$headers, 'bigFlag'=>1, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
+        Tool_Common::log('bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
 
         return $data;
     }
@@ -238,7 +238,7 @@ class WanBoBaseService {
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求-1', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
         }
 
         if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
@@ -272,12 +272,12 @@ class WanBoBaseService {
         if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306])){
             if(isset($post_data['bet_number']) && strlen($post_data['bet_number'])>200) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 300);
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求-3', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-3', $logArr);
         }
         $rstData['errno'] = $errno;
         $time_consume = ($end_time-$start_time).'s';
         $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求-万博', $logArr);
+        Tool_Common::log('postBetCurl','INFO','httpPost下注请求-万博', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
         return $rstData;
@@ -329,7 +329,7 @@ class WanBoBaseService {
         $errno = curl_errno($ch);
         if($errno>0) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]);
+            Tool_Common::log('getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]);
             return $str;
         }
         if(!BaseService::is_json($data)){
@@ -423,7 +423,7 @@ class WanBoBaseService {
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
             return '';
         }
 

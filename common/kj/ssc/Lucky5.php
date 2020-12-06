@@ -56,7 +56,7 @@ class Lucky5 extends BaseKj {
                 }
 
                 if (!isset($data['Status']) OR $data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) {
-                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getLotteryLucky', 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
+                    Tool_Common::log('getLotteryLucky', 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
                     continue;
                 }
                 $row = $data['Data']['draw_info'][0];
@@ -83,7 +83,7 @@ class Lucky5 extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/luck5', 'INFO', '号码抓取-幸运网', $logArr);
+        Tool_Common::log('luck5', 'INFO', '号码抓取-幸运网', $logArr);
 
         return $rst;
     }
@@ -128,7 +128,7 @@ class Lucky5 extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/luck5', 'INFO', '号码抓取-实讯网', $logArr);
+        Tool_Common::log('luck5', 'INFO', '号码抓取-实讯网', $logArr);
 
         return $rst;
     }
@@ -172,7 +172,7 @@ class Lucky5 extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/luck5', 'INFO', '号码抓取-时讯网', $logArr);
+        Tool_Common::log('luck5', 'INFO', '号码抓取-时讯网', $logArr);
 
         return $rst;
     }

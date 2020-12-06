@@ -57,7 +57,7 @@ class BingDao extends BaseKj {
                 }
 
                 if (!isset($data['Status']) OR $data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) {
-                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getLotteryLucky', 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
+                    Tool_Common::log('getLotteryLucky', 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
                     continue;
                 }
                 $row = $data['Data']['draw_info'][0];
@@ -84,7 +84,7 @@ class BingDao extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/luck5', 'INFO', '号码抓取-幸运网', $logArr);
+        Tool_Common::log('luck5', 'INFO', '号码抓取-幸运网', $logArr);
 
         return $rst;
     }
@@ -152,7 +152,7 @@ class BingDao extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bingdao_kj', 'INFO', '号码抓取-冰岛', $logArr);
+        Tool_Common::log('bingdao_kj', 'INFO', '号码抓取-冰岛', $logArr);
 
         return $rst;
     }
@@ -188,7 +188,7 @@ class BingDao extends BaseKj {
             if(isset($post_data['code']) && !empty($post_data['code']))$post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
         }
 
         //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,,$errno]); }
@@ -208,7 +208,7 @@ class BingDao extends BaseKj {
             $rstData['Status'] = 0;
         }
         $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postCurl','INFO','httpPost请求', $logArr);
+        Tool_Common::log('postCurl','INFO','httpPost请求', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
         return $rstData;

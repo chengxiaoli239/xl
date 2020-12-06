@@ -52,7 +52,7 @@ class TzService extends BaseService {
         # 判断当期开奖数据处理是否完成，未完成则不能下一期的投注
         if(!$tzStatus){
             $rst = ['status'=>300, 'msg'=>'投注开关未开启，有未处理完成的数据~','mkey'=>$mkey,'tzStatus'=>$tzStatus];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/0898tzCron','INFO','0898投注记录', $rst);
+            Tool_Common::log('0898tzCron','INFO','0898投注记录', $rst);
         }
 
         return $rst;
@@ -199,7 +199,7 @@ class TzService extends BaseService {
         //$rst['consume_time4'] = ($time5 - $time4).'s';
         $rst['consume_time5'] = ($time6 - $time5).'s';
         $rst['consume_time6'] = ($time7 - $time6).'s';
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/opSystemBetPlans','INFO','处理系统投注计划', $rst);
+        Tool_Common::log('opSystemBetPlans','INFO','处理系统投注计划', $rst);
 
         StaticService::afterOpStatic($lottery_type, 'opSystemBetPlans');
         self::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
@@ -248,7 +248,7 @@ class TzService extends BaseService {
         # 计划任务是否处理完成后锁住(value:1)，避免重复处理 end
 
         $logData = ['lottery_type'=>$lottery_type, 'rst11'=>$rst11, 'rst10'=>$rst10, 'rst21'=>$rst21];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/afterRunSysPlans','INFO','系统计划处理后', $logData);
+        Tool_Common::log('afterRunSysPlans','INFO','系统计划处理后', $logData);
 
         return true;
     }

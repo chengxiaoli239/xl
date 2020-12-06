@@ -50,7 +50,7 @@ class CqsscSevenDay extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc_seven', 'INFO', '号码抓取-7天', $logArr);
+        Tool_Common::log('cqssc_seven', 'INFO', '号码抓取-7天', $logArr);
         return $rst;
     }
 

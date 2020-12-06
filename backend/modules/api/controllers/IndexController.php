@@ -135,7 +135,7 @@ class IndexController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $data = \Yii::$app->request->post();
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/UpMembersInfo','INFO','0898投注记录-投注失败', ['msg'=>$data]);
+        Tool_Common::log('UpMembersInfo','INFO','0898投注记录-投注失败', ['msg'=>$data]);
 
         $rst = ['status'=>302, 'msg'=>'操作成功', 'data'=>$data];
 

@@ -552,7 +552,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             sleep(2);
         }
         $logArr = ['url'=>$url, 'snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
+        Tool_Common::log('cancelOrder','INFO','撤单记录', $logArr);
 
         return $rst;
     }
@@ -782,7 +782,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $balance = $rst['Data']['credit_balance'];
         }
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','幸运五星-用户余额', $rst);
+        Tool_Common::log('getBalance','INFO','幸运五星-用户余额', $rst);
 
         return $balance;
     }
@@ -844,7 +844,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $snid = $matches[2][0];
             $logData = ['url'=>$url,'headers'=>$headers, 'snid'=>$snid,/* 'content'=>$content*/];
             //p($logData);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSnidBySn','INFO','获取方案号', $logData);
+            Tool_Common::log('getSnidBySn','INFO','获取方案号', $logData);
             $m->set($mkey, 6*3600);
         }
 
@@ -920,7 +920,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         self::$headers = [];
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
         //if($uid == 18)p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
+        Tool_Common::log('getCookie','INFO','0898Cookie记录', $logArr);
         $cookie = trim($cookie, ';');
         $cookie = str_replace('; path=/; HttpOnly','',$cookie);
         $m->set($mkey, $cookie, 180);
@@ -1025,7 +1025,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
         //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+        Tool_Common::log('downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return true;
     }
@@ -1062,7 +1062,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
         //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+        Tool_Common::log('downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return true;
     }
@@ -1131,7 +1131,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         }
         //$snidStr = trim('|1,', implode('|1,', $tzDatas));
         $data['snid'] = trim($snidStr, ',');
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSn','INFO','幸运五获取方案号', $data);
+        Tool_Common::log('getSn','INFO','幸运五获取方案号', $data);
 
         return $data;
     }
@@ -1196,7 +1196,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','0898登陆记录', $logArr);
         return $data;
     }
     /**
@@ -1225,7 +1225,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','7时彩登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','7时彩登陆记录', $logArr);
         return $data;
     }
 
@@ -1267,7 +1267,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','幸运五星-用户信息', $logArr);
+        Tool_Common::log('userInfo','INFO','幸运五星-用户信息', $logArr);
         return $data;
     }
 
@@ -1472,7 +1472,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $data = CurlService::getCurl($url, $headers);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getQihaoInfo','INFO','快乐8登陆前', $logArr);
+        Tool_Common::log('getQihaoInfo','INFO','快乐8登陆前', $logArr);
 
         return $data;
     }
@@ -1626,7 +1626,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume
             ];
             //if($tz_type != 20) $tzRst['code'] = $codes;
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','幸运五投注记录-投注失败', $tzRst);
+            Tool_Common::log('bet_error','INFO','幸运五投注记录-投注失败', $tzRst);
             if(!in_array($account, ['aa07']) && in_array($rst['code'], [302, 303, 304, 305, 306, 307])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
                 return $rst;
             }
@@ -1672,7 +1672,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','幸运五星时插入记录-真实投注', $logArr);
+        Tool_Common::log('bet','INFO','幸运五星时插入记录-真实投注', $logArr);
         return $data;
     }
 
@@ -1777,7 +1777,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                     'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>self::$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume
                 ];
                 //if($tz_type != 20) $tzRst['code'] = $codes;
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','菊花分批投注记录-投注失败', $tzRst);
+                Tool_Common::log('bet_error','INFO','菊花分批投注记录-投注失败', $tzRst);
                 if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst['code'], [302, 303, 304, 305, 306])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
                     return $rst;
                 }
@@ -1824,7 +1824,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>self::$headers, 'bigFlag'=>1, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
+        Tool_Common::log('bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
 
         return $data;
     }
@@ -1865,7 +1865,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
         }
 
         if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
@@ -1898,10 +1898,10 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         }
         if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306])){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
         }
         $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求-幸运五', $logArr);
+        Tool_Common::log('postBetCurl','INFO','httpPost下注请求-幸运五', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
         return $rstData;

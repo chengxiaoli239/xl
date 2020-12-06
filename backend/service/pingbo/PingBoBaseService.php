@@ -260,7 +260,7 @@ class PingBoBaseService {
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->save();
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','幸运五星-用户余额', ['rst'=>$rst, 'balance'=>$balance]);
+        Tool_Common::log('getBalance','INFO','幸运五星-用户余额', ['rst'=>$rst, 'balance'=>$balance]);
 
         return $balance;
     }
@@ -308,7 +308,7 @@ class PingBoBaseService {
         $time_consume = ($end_time-$start_time).'s';
         $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'time_consume'=>$time_consume, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','万博-用户信息', $logArr);
+        Tool_Common::log('userInfo','INFO','万博-用户信息', $logArr);
         return $data;
     }
 
@@ -343,7 +343,7 @@ class PingBoBaseService {
         //if(strpos($url, 'announcement') !== false){ p(['header'=>$headers, 'url'=>$url, 'rst'=>$data, 'errno'=>$errno, 'isHeader'=>$isHeader]); }
         if($errno>0) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]);
+            Tool_Common::log('getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]);
             return $str;
         }
         if(!BaseService::is_json($data)){
@@ -465,7 +465,7 @@ class PingBoBaseService {
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
             return '';
         }
 

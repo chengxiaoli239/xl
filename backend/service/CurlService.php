@@ -80,7 +80,7 @@ class CurlService extends BaseService{
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'poxy_addr'=>$poxy_addr, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
         }
 
         //if(strpos($url, 'betNumber')){ p(['url'=>$url, 'header'=>$header,'post_data'=>$post_data,'rstData'=>$data,curl_close($ch),$errno]); }
@@ -129,7 +129,7 @@ class CurlService extends BaseService{
             if(isset($post_data['code']) && !empty($post_data['code']))$post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
         }
 
         //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,,$errno]); }
@@ -149,7 +149,7 @@ class CurlService extends BaseService{
             $rstData['Status'] = 0;
         }
         $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postCurl','INFO','httpPost请求', $logArr);
+        Tool_Common::log('postCurl','INFO','httpPost请求', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
         return $rstData;
@@ -199,7 +199,7 @@ class CurlService extends BaseService{
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
         }
 
         if(strpos($url, 'MemberLogin')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
@@ -284,7 +284,7 @@ class CurlService extends BaseService{
         $errno = curl_errno($ch);
         if($errno>0) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/err/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'errno'=>$errno, 'postRst'=>$data, 'error'=>$str]);
+            Tool_Common::log('err/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'errno'=>$errno, 'postRst'=>$data, 'error'=>$str]);
             return ['Status'=>2, 'code'=>300, 'Data'=>'代理网络超时，错误码:'.$errno, 'errno'=>$errno];
         }
         curl_close($ch);
@@ -329,7 +329,7 @@ class CurlService extends BaseService{
         $info = curl_getinfo($ch);
 
         if($info['http_code']==302){
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCurl302', 'ERR', 'getCurl 302', ['url'=>$url]);
+            Tool_Common::log('getCurl302', 'ERR', 'getCurl 302', ['url'=>$url]);
             $data = self::getCurlData($info['url']);
         }
         //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
@@ -557,7 +557,7 @@ class CurlService extends BaseService{
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
         }
 
         //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,,$errno]); }

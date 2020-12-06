@@ -590,7 +590,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             sleep(2);
         }
         $logArr = ['url'=>$url, 'snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
+        Tool_Common::log('cancelOrder','INFO','撤单记录', $logArr);
         //p($logArr);
 
         return $rst;
@@ -822,7 +822,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $balance = $rst['info']['remain_credit'];
         }
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','菊花网-用户余额', $rst);
+        Tool_Common::log('getBalance','INFO','菊花网-用户余额', $rst);
 
         return $balance;
     }
@@ -884,7 +884,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $snid = $matches[2][0];
             $logData = ['url'=>$url,'headers'=>$headers, 'snid'=>$snid,/* 'content'=>$content*/];
             //p($logData);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSnidBySn','INFO','获取方案号', $logData);
+            Tool_Common::log('getSnidBySn','INFO','获取方案号', $logData);
             $m->set($mkey, 6*3600);
         }
 
@@ -960,7 +960,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         self::$headers = [];
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
         //if($uid == 18)p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
+        Tool_Common::log('getCookie','INFO','0898Cookie记录', $logArr);
         $cookie = trim($cookie, ';');
         $cookie = str_replace('; path=/; HttpOnly','',$cookie);
         $m->set($mkey, $cookie, 180);
@@ -1065,7 +1065,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
         //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+        Tool_Common::log('downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return true;
     }
@@ -1102,7 +1102,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
         //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+        Tool_Common::log('downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return true;
     }
@@ -1166,7 +1166,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $data['qihao'] = substr($rst['info']['cur_serno'], 2);
         $data['detail'] = $rst['last_order']['suc'];
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSn','INFO','幸运五获取方案号', $data);
+        Tool_Common::log('getSn','INFO','幸运五获取方案号', $data);
 
         return $data;
     }
@@ -1231,7 +1231,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','0898登陆记录', $logArr);
         return $data;
     }
     /**
@@ -1260,7 +1260,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','7时彩登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','7时彩登陆记录', $logArr);
         return $data;
     }
 
@@ -1294,7 +1294,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         $data = self::httpGet($url, $headers);
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','菊花游戏-用户信息', $logArr);
+        Tool_Common::log('userInfo','INFO','菊花游戏-用户信息', $logArr);
         return $data;
     }
 
@@ -1499,7 +1499,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $data = CurlService::getCurl($url, $headers);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getQihaoInfo','INFO','菊花登陆前', $logArr);
+        Tool_Common::log('getQihaoInfo','INFO','菊花登陆前', $logArr);
 
         return $data;
     }
@@ -1646,7 +1646,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $betKey = BetService::buildBetKey($plan->account, $plan->tz_sites, $lottery_type, $qihao, $plan_id).'_'.$key; # 分配下注后面加key
             if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_key','INFO','菊花网投注key', ['lottery_type'=>$lottery_type, 'account'=>$plan->account, 'uid'=>$plan->uid, 'betKey'=>$betKey, 'betLock'=>$betLock]);
+            Tool_Common::log('bet_key','INFO','菊花网投注key', ['lottery_type'=>$lottery_type, 'account'=>$plan->account, 'uid'=>$plan->uid, 'betKey'=>$betKey, 'betLock'=>$betLock]);
             //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
             # 和值投注反应时间比较久，无需返回直接锁住
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
@@ -1667,7 +1667,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
                     'post_data'=>$post_data, 'user_id'=>self::$user_id, 'postRst'=>$tmpRst, 'time_consume'=>$time_consume
                 ];
                 //if($tz_type != 20) $tzRst['code'] = $codes;
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','菊花网批投注记录-投注失败', $tzRst);
+                Tool_Common::log('bet_error','INFO','菊花网批投注记录-投注失败', $tzRst);
                 if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst['code'], [302, 303, 304, 305, 306])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
                     return $rst;
                 }
@@ -1727,7 +1727,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>self::$headers, 'bigFlag'=>1, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBatchBet','INFO','菊花网批量插入记录-真实投注', $logArr);
+        Tool_Common::log('postBatchBet','INFO','菊花网批量插入记录-真实投注', $logArr);
 
         return $data;
     }
@@ -1888,7 +1888,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
         }
 
         //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
@@ -1921,13 +1921,13 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         }
         if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306])){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
         }
         $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno];
         if(strlen(http_build_query($post_data))<1000){
             $logArr['post_data'] = $post_data;
         }
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBetCurl','INFO','httpPost下注请求-菊花网', $logArr);
+        Tool_Common::log('postBetCurl','INFO','httpPost下注请求-菊花网', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
         return $rstData;

@@ -308,7 +308,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
                         # 投注
                         //BetService::tzByPlanId($plan_id, 1);
                     }
-                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','麒麟投注记录-投注失败', $tzRst);
+                    Tool_Common::log('bet','INFO','麒麟投注记录-投注失败', $tzRst);
                     return $tzRst;
                 }
             }
@@ -460,7 +460,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
                     # 投注
                     //BetService::tzByPlanId($plan_id, 1);
                 }
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','麒麟投注记录-投注失败', $tzRst);
+                Tool_Common::log('bet','INFO','麒麟投注记录-投注失败', $tzRst);
                 return $tzRst;
             }
 
@@ -504,7 +504,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         self::$headers = [];
 
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','幸运五星时插入记录-真实投注', $logArr);
+        Tool_Common::log('bet','INFO','幸运五星时插入记录-真实投注', $logArr);
 
         return $data;
     }
@@ -683,7 +683,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
                 # 投注
                 //BetService::tzByPlanId($plan_id, 1);
             }
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','麒麟投注记录-投注失败', $tzRst);
+            Tool_Common::log('bet','INFO','麒麟投注记录-投注失败', $tzRst);
             return $tzRst;
         }
 
@@ -726,7 +726,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         self::$headers = [];
 
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','幸运五星时插入记录-真实投注', $logArr);
+        Tool_Common::log('bet','INFO','幸运五星时插入记录-真实投注', $logArr);
 
         return $data;
     }
@@ -1044,7 +1044,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
             sleep(2);
         }
         $logArr = ['url'=>$url, 'snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
+        Tool_Common::log('cancelOrder','INFO','撤单记录', $logArr);
 
         return $rst;
     }
@@ -1274,7 +1274,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
             $balance = $rst['info']['total_credit'];
         }
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','麒麟-用户余额', $rst);
+        Tool_Common::log('getBalance','INFO','麒麟-用户余额', $rst);
 
         return $balance;
     }
@@ -1336,7 +1336,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
             $snid = $matches[2][0];
             $logData = ['url'=>$url,'headers'=>$headers, 'snid'=>$snid,/* 'content'=>$content*/];
             //p($logData);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSnidBySn','INFO','获取方案号', $logData);
+            Tool_Common::log('getSnidBySn','INFO','获取方案号', $logData);
             $m->set($mkey, 6*3600);
         }
 
@@ -1416,7 +1416,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
             self::$headers = [];
             $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
+            Tool_Common::log('getCookie','INFO','0898Cookie记录', $logArr);
             $cookie = str_replace('MC=','',$TzSystemsUsers->cookie);
             $m->set($mkey, $cookie, 180);
         //}
@@ -1517,7 +1517,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         fwrite($tp, trim($imageData));
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+        Tool_Common::log('downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return true;
     }
@@ -1554,7 +1554,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
         //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+        Tool_Common::log('downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return true;
     }
@@ -1615,7 +1615,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
             $snidStr .= $tzData['bet_id'].'|1,';
         }
         $data['snid'] = trim($snidStr, ',');
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSn','INFO','7时彩获取方案号', $data);
+        Tool_Common::log('getSn','INFO','7时彩获取方案号', $data);
 
         return $data;
     }
@@ -1683,7 +1683,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         //sleep(10);
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','0898登陆记录', $logArr);
         self::synBalance($TzSystemsUsers->id); # 同步余额
         return $data;
     }
@@ -1738,7 +1738,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','7时彩登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','7时彩登陆记录', $logArr);
         return $data;
     }
 
@@ -1771,7 +1771,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','0898登陆记录', $logArr);
         return $data;
     }
 
@@ -1803,7 +1803,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'username'=>$TzSystemsUsers->username, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/userInfo','INFO','幸运五星-用户信息4', $logArr);
+        Tool_Common::log('userInfo','INFO','幸运五星-用户信息4', $logArr);
         return $data;
     }
 
@@ -2008,7 +2008,7 @@ class QiLinBaseService extends BaseTZService { # 麒麟时时彩登陆体系
         $data = CurlService::getCurl($url, $headers);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getQihaoInfo','INFO','麒麟登陆前', $logArr);
+        Tool_Common::log('getQihaoInfo','INFO','麒麟登陆前', $logArr);
 
         return $data;
     }

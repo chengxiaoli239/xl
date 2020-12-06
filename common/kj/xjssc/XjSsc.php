@@ -47,7 +47,7 @@ class XjSsc extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getLotteryNoSevenDay', 'INFO', '号码抓取-7天', $logArr);
+        Tool_Common::log('getLotteryNoSevenDay', 'INFO', '号码抓取-7天', $logArr);
 
         return $rst;
     }
@@ -195,7 +195,7 @@ class XjSsc extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/xj_ssc', 'INFO', '号码抓取-直播网', $logArr);
+        Tool_Common::log('xj_ssc', 'INFO', '号码抓取-直播网', $logArr);
 
         return $rst;
     }
@@ -242,7 +242,7 @@ class XjSsc extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cqssc', 'INFO', '号码抓取-直播网', $logArr);
+        Tool_Common::log('cqssc', 'INFO', '号码抓取-直播网', $logArr);
 
         return $rst;
     }
@@ -288,9 +288,13 @@ class XjSsc extends BaseKj {
             ob_end_flush();exit;
         }
         $logArr = $rstDatas;
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/xj_ssc_batch', 'INFO', '号码批量抓取-直播网', $logArr);
+        Tool_Common::log('xj_ssc_batch', 'INFO', '号码批量抓取-直播网', $logArr);
 
         return $rstDatas;
+    }
+
+    public static function NineNineNew(){
+
     }
 
 }

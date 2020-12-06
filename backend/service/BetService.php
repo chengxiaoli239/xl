@@ -145,7 +145,7 @@ abstract class BetService extends BaseBetService {
                 # 判断当期开奖数据处理是否完成，未完成则不能下一期的投注
                 if(!$tzStatus){
                     $rst = ['status'=>300, 'msg'=>'投注开关未开启，有未处理完成的数据~','mkey'=>$mkey,'tzStatus'=>$tzStatus];
-                    Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzCron','INFO','不能投注', $rst);
+                    Tool_Common::log('tzCron','INFO','不能投注', $rst);
                 }
                 break;
             default:
@@ -191,7 +191,7 @@ abstract class BetService extends BaseBetService {
             $logArr[$lottery_type]['qihao'] = $qihao;
             $logArr[$lottery_type]['msg'] = $count == 0 ? '无投注计划' : $count.'条计划';
         }
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','用户真实投注', $logArr);
+        Tool_Common::log('bet','INFO','用户真实投注', $logArr);
 
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
     }
@@ -233,7 +233,7 @@ abstract class BetService extends BaseBetService {
                 $logArr[$lottery_type]['msg'] = $count == 0 ? '无投注计划' : $count.'条计划';
             }
         }
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','用户真实投注', $logArr);
+        Tool_Common::log('bet','INFO','用户真实投注', $logArr);
 
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
     }
@@ -723,21 +723,21 @@ abstract class BetService extends BaseBetService {
                # 1、首先判断是否登录，否则登录之后再下注
                if(!in_array($tz_system_id, $not_need_login_tz_system_ids) && !$flag = self::isLogin($plan->uid, $tz_system_id)){
                    if(!$TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id, 'status'=>1])){
-                       Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['uid'=>$plan->uid,'account'=>$plan->account, 'msg'=>'账号已被禁用不能下注']);
+                       Tool_Common::log('tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['uid'=>$plan->uid,'account'=>$plan->account, 'msg'=>'账号已被禁用不能下注']);
                        continue;
                    }
                    $loginRst = BaseService::login($TzSystemsUsers->id);
-                   Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['loginRst'=>$loginRst]);
+                   Tool_Common::log('tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['loginRst'=>$loginRst]);
                    if($loginRst['status'] != 200) return $loginRst;
                }
 
                $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'tz_sites'=>$tz_sites];
-               Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tzByPlanId','INFO','投注记录tzByPlanId', $logArr);
+               Tool_Common::log('tzByPlanId','INFO','投注记录tzByPlanId', $logArr);
                # 5、投注请求
                $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
                $tmpRst = $BetService->bet($qihao, $plan->id, $codes, $isAuto);
                if($tmpRst === false){
-                   Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tz_err/tzByPlanId','INFO','投注记录 异常', $logArr);
+                   Tool_Common::log('tz_err/tzByPlanId','INFO','投注记录 异常', $logArr);
                    return ['status'=>301, 'msg'=>'投注异常', 'tmpRst'=>false];
                }
 
@@ -755,7 +755,7 @@ abstract class BetService extends BaseBetService {
            $rst[] = $tmpRst;
        }
        $logArr = ['tz_sites'=>$tz_sites,'codes'=>$codes, 'postRst'=>$rst];
-       Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/plan_bet','INFO','0898投注记录', $logArr);
+       Tool_Common::log('plan_bet','INFO','0898投注记录', $logArr);
 
        return $rst;
     }

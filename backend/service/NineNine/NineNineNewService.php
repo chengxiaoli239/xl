@@ -290,7 +290,7 @@ class NineNineNewService extends BaseTZService {
         self::$headers = [];
 
         $logArr = ['post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/betting','INFO','0898模拟投注记录-插入记录', $logArr);
+        Tool_Common::log('betting','INFO','0898模拟投注记录-插入记录', $logArr);
 
         return $data;
     }
@@ -450,7 +450,7 @@ class NineNineNewService extends BaseTZService {
                 if($tz_type != 20){
                     $tzRst['code'] = $code;
                 }
-                Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet_error','INFO','99投注记录-投注失败', $tzRst);
+                Tool_Common::log('bet_error','INFO','99投注记录-投注失败', $tzRst);
                 return $tzRst;
             }
             $rst[$key] = $rstData;
@@ -493,7 +493,7 @@ class NineNineNewService extends BaseTZService {
         //$post_data['code'] = isset($post_data['code']) && strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
         $logArr = ['uid'=>$plan->uid,'account'=>$plan->account,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume,'insertData'=>$insertData,'sn'=>$sn, 'lottery_type'=>$lottery_type,'snid'=>$snid, 'insertRst'=>$insertRst];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/postBet','INFO','99彩票网['.$lottery_type.']插入记录-真实投注-3', $logArr);
+        Tool_Common::log('postBet','INFO','99彩票网['.$lottery_type.']插入记录-真实投注-3', $logArr);
 
         return $data;
     }
@@ -609,7 +609,7 @@ class NineNineNewService extends BaseTZService {
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$content, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/httpPostError','INFO','httpPost请求-1', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
         }
 
         # ================= xCsrf token start =====================
@@ -953,7 +953,7 @@ class NineNineNewService extends BaseTZService {
             }
             $logData = ['url'=>$url, 'rst'=>$rstData, 'headers'=>$headers, 'balance'=>$balance, 'time_consume'=>$time_consume, 'xCsrf'=>$xCsrf];
             //p($logData);
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','0898用户余额', $logData);
+            Tool_Common::log('getBalance','INFO','0898用户余额', $logData);
         }
 
         return $balance;
@@ -1066,7 +1066,7 @@ class NineNineNewService extends BaseTZService {
             $rstData = $rst['data'];
         }
 
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSnidBySn','INFO','0898获取订单号', ['snid'=>$snid]);
+        Tool_Common::log('getSnidBySn','INFO','0898获取订单号', ['snid'=>$snid]);
 
         //p(['$matches'=>$matches[2], 'user_id'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id, 'content'=>$content],0);
 
@@ -1152,7 +1152,7 @@ class NineNineNewService extends BaseTZService {
         }
 
         $logArr = ['url'=>$url,'headers'=>$headers, 'rst'=>$rst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
+        Tool_Common::log('cancelOrder','INFO','撤单记录', $logArr);
 
         return $rst;
     }
@@ -1385,7 +1385,7 @@ class NineNineNewService extends BaseTZService {
             }
             self::$headers = [];
             $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
+            Tool_Common::log('getCookie','INFO','0898Cookie记录', $logArr);
             $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
             $cookie = str_replace('; path=/; HttpOnly','',$cookie);
             $m->set($mkey, $cookie, 180);
@@ -1435,7 +1435,7 @@ class NineNineNewService extends BaseTZService {
             }
             self::$headers = [];
             $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
+            Tool_Common::log('getCookie','INFO','0898Cookie记录', $logArr);
             $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
             $cookie = str_replace('; path=/; HttpOnly','',$cookie);
             $m->set($mkey, $cookie, 180);
@@ -1499,7 +1499,7 @@ class NineNineNewService extends BaseTZService {
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
         //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+        Tool_Common::log('downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return true;
     }
@@ -1673,7 +1673,7 @@ class NineNineNewService extends BaseTZService {
         HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'code'=>$code, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','0898登陆记录', $logArr);
         return $data;
     }
 

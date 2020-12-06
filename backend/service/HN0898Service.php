@@ -321,7 +321,7 @@ class HN0898Service extends BaseTZService {
         self::$headers = [];
 
         $logArr = ['post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/betting','INFO','0898模拟投注记录-插入记录', $logArr);
+        Tool_Common::log('betting','INFO','0898模拟投注记录-插入记录', $logArr);
 
         return $data;
     }
@@ -397,7 +397,7 @@ class HN0898Service extends BaseTZService {
             if($tz_type != 20){
                 $tzRst['code'] = $code;
             }
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','0898投注记录-投注失败', $tzRst);
+            Tool_Common::log('bet','INFO','0898投注记录-投注失败', $tzRst);
             return $tzRst;
         }
 
@@ -436,7 +436,7 @@ class HN0898Service extends BaseTZService {
         self::$headers = [];
 
         $logArr = ['uid'=>self::$user_id,'account'=>self::$account,'url'=>$url,'post_data'=>$post_data,'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume,/*'insertData'=>$insertData,*/ 'insertRst'=>$insertRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/bet','INFO','0898插入记录-真实投注', $logArr);
+        Tool_Common::log('bet','INFO','0898插入记录-真实投注', $logArr);
 
         return $data;
     }
@@ -470,7 +470,7 @@ class HN0898Service extends BaseTZService {
             $rst['status'] = 200;
         }
         $logArr = ['snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/cancelOrder','INFO','撤单记录', $logArr);
+        Tool_Common::log('cancelOrder','INFO','撤单记录', $logArr);
 
         return $rst;
     }
@@ -818,7 +818,7 @@ class HN0898Service extends BaseTZService {
         $indexUrl = self::getTzSiteInfo($tz_system_id,'SSC_INDEX');
         $logData = ['url'=>$url,'headers'=>$headers, 'balance'=>$balance, 'indexUrl'=>$indexUrl, 'time_consume'=>$time_consume];
         //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getBalance','INFO','0898用户余额', $logData);
+        Tool_Common::log('getBalance','INFO','0898用户余额', $logData);
         //sleep(2);
         //$rst = CurlService::getCurl($indexUrl, $headers);
         self::$headers = [];
@@ -876,7 +876,7 @@ class HN0898Service extends BaseTZService {
                 case 6:
                     break;
             }
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getSnidBySn','INFO','0898获取订单号', ['snid'=>$snid]);
+            Tool_Common::log('getSnidBySn','INFO','0898获取订单号', ['snid'=>$snid]);
             $m->set($mkey, 6*3600);
         }
 
@@ -1028,7 +1028,7 @@ class HN0898Service extends BaseTZService {
             }
             self::$headers = [];
             $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$cookie, 'url'=>$url, 'headers'=>$headers];
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCookie','INFO','0898Cookie记录', $logArr);
+            Tool_Common::log('getCookie','INFO','0898Cookie记录', $logArr);
             $cookie = str_replace(' ASP.NET_SessionId=','',$cookie);
             $cookie = str_replace('; path=/; HttpOnly','',$cookie);
             $m->set($mkey, $cookie, 180);
@@ -1061,7 +1061,7 @@ class HN0898Service extends BaseTZService {
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
         //p($logData);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+        Tool_Common::log('downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return true;
     }
@@ -1137,7 +1137,7 @@ class HN0898Service extends BaseTZService {
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'code'=>$code, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/loginRemote','INFO','0898登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','0898登陆记录', $logArr);
         return $data;
     }
 

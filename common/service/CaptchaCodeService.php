@@ -38,7 +38,7 @@ class CaptchaCodeService{
 
         $rstData = json_decode($response, true);
         $logData = ['post_data'=>$data, 'rst'=>$response,'filename'=>$file, 'consume_time'=>$consume_time, 'rstData'=>$rstData];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCaptchaCode','INFO','验证码接口-聚合', $logData);
+        Tool_Common::log('getCaptchaCode','INFO','验证码接口-聚合', $logData);
         if($rstData['error_code'] != 0)
             return ['status'=>300, 'code'=>$rstData['reason']];
 
@@ -97,7 +97,7 @@ class CaptchaCodeService{
         $end_time = microtime(true);
         $consume_time = ($end_time-$start_time).'s';
         $logData = ['file'=>$file, 'url'=>$url, 'consume_time'=>$consume_time, 'rstData'=>$rstData];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCaptchaCode','INFO','验证码接口-尖叫数据', $logData);
+        Tool_Common::log('getCaptchaCode','INFO','验证码接口-尖叫数据', $logData);
 
         return ['status'=>200, 'code'=>$rstData['v_code']];
     }
@@ -142,7 +142,7 @@ class CaptchaCodeService{
             $rst = ['status'=>200, 'code'=>$rstData['showapi_res_body']['Result']];
         }
         $logData = ['file'=>$file, 'url'=>$url, 'consume_time'=>$consume_time, 'rstData'=>$rstData];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCaptchaCode','INFO','验证码接口-万维易源', $logData);
+        Tool_Common::log('getCaptchaCode','INFO','验证码接口-万维易源', $logData);
 
         return $rst;
     }
@@ -179,7 +179,7 @@ class CaptchaCodeService{
     public static function chaojiying($file='', $codetype = '1902'){
         $url = 'http://upload.chaojiying.net/Upload/Processing.php' ;
         if(empty($file)){
-            Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCaptchaCode','INFO','验证码接口-超级鹰-错误', ['msg'=>'file文件为空']);
+            Tool_Common::log('getCaptchaCode','INFO','验证码接口-超级鹰-错误', ['msg'=>'file文件为空']);
             return ['status'=>300, 'msg'=>'file文件为空'];
         }
 
@@ -216,7 +216,7 @@ class CaptchaCodeService{
         $end_time = microtime(true);
         $consume_time = ($end_time-$start_time).'s';
         $logData = ['file'=>$file, 'url'=>$url, 'consume_time'=>$consume_time, 'rstData'=>$rstData, 'code'=>$rstData['pic_str']];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/getCaptchaCode','INFO','验证码接口-超级鹰', $logData);
+        Tool_Common::log('getCaptchaCode','INFO','验证码接口-超级鹰', $logData);
 
         return $rst ;
     }
