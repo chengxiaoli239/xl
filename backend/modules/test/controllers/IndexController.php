@@ -194,6 +194,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = XjSsc::NineNineNew();p($data);
         $m = \Yii::$app->cache;
         $mkey = BetService::buildBeforeAndAfterBetKey($lottery_type=6, $qihao='2020120603', $uid=11);
         $r = $m->get($mkey);p([$mkey, $r]);

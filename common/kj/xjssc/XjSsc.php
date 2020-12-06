@@ -207,7 +207,7 @@ class XjSsc extends BaseKj {
      */
     public static function getLotteryNoNineNum($returnType = 'json'){
 
-        if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/nine-num');
             $date = date('Y-m-d');
             if('00:00' < date('H:i:s') && date('H:i:s') < '03:00'){
@@ -293,8 +293,44 @@ class XjSsc extends BaseKj {
         return $rstDatas;
     }
 
-    public static function NineNineNew(){
+    /**
+     * @desc 九九网 - 新疆时时彩
+     * @return json|xml
+     */
+    public static function NineNineNew($returnType = 'json'){
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $domain = BaseKj::getApiHostByRoute('/kj/xjssc/nine-nine-new');
+            $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/lastTen/xjssc'; # limit 数量
+            $content = CurlService::httpGet($url);
 
+            if ($content['code'] != 200 OR !$content['data']) return false;
+            $data = $content['data'][0];
+
+            $str = substr($data['issue'], 0, 8);
+            $qh = substr(str_replace($str, '', $data['issue']), -2);
+            $kjData['expect'] = $str. $qh; # 20200427-59
+            $kjData['opencode'] = $data['lotteryNum']; # 1,4,3,5,1
+            $kjData['opentime'] = date('Y-m-d H:i:s', substr($data['createTime'], 0, 10));
+            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
+        }
+        $opencode = $kjData['opencode'];
+        $opentime = $kjData['opentime'];
+        $expect = $kjData['expect'];
+
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('cqssc', 'INFO', '号码抓取-九九网', $logArr);
+
+        return $rst;
     }
 
 }
