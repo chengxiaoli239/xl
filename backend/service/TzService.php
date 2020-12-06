@@ -57,38 +57,6 @@ class TzService extends BaseService {
 
         return $rst;
     }
-    /**
-     * @desc 系统自动化投注方法，投注号码为表：lt_sys_plans_codes，正买status=1 、自主研发公式模拟投注
-     * @return array
-     */
-    public static function tz(){
-
-        $lottery_types = StaticService::getLotteryTypes();
-        foreach ($lottery_types as $lottery_type) {
-            $is_test = 1;
-            $qihao = HN0898Service::getQihao($lottery_type);
-            $tzStatus = BetService::isCanBet($lottery_type, $is_test);
-            if (!$tzStatus) continue;
-            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['=', 'uid', 0], ['=', 'is_parent', 1], ['=', 'is_test', $is_test]];
-            if ($plans = UserSysPlans::find()->where($where)->groupBy('playway,tz_type')->all()) {
-                // 1、投注前判断
-                foreach ($plans as $plan) {
-                    if ($plan->children_plan_id > 0) {
-                        $ids = explode(',', $plan->children_plan_id);
-                        foreach ($ids as $id) {
-                            $tzRst[$id] = self::tzByPlanId($id);
-                        }
-                    } else {
-                        $tzRst[$plan->id] = self::tzByPlanId($plan->id);
-                    }
-                }
-                BetService::afterBetNow($plan->lottery_type, $qihao, $is_test); # 彩种投注结束锁
-            }
-        }
-        $logArr = ['tzRst'=>$tzRst];
-        Tool_Common::log('/WORK/LOG/'.Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/tz','INFO','投注记录(系统正买)', $logArr);
-        return ['status'=>200, 'msg'=>'系统定制化模拟正买投注完成~', 'tzRst'=>$tzRst];
-    }
 
     /**
      * @desc 投注计划 by plan_id

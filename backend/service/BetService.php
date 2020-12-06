@@ -227,6 +227,7 @@ abstract class BetService extends BaseBetService {
                 $logArr[$lottery_type]['plans'] = $plans;
                 $count = count($plans);
                 $logArr[$lottery_type]['qihao'] = $qihao;
+                $logArr[$lottery_type]['datas'] = $datas;
                 $logArr[$lottery_type]['msg'] = $count == 0 ? '无投注计划' : $count.'条计划';
             }
         }

@@ -194,6 +194,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $m = \Yii::$app->cache;
+        $mkey = BetService::buildBeforeAndAfterBetKey($lottery_type=6, $qihao='2020120603', $uid=11);
+        $r = $m->get($mkey);p([$mkey, $r]);
         $rst = NineNineNewService::getBalance($uid=18, $tz_system_id = 12);p($rst);
         $loginRst = NineNineNewService::login($id = 18, $tz_system_id=12);p($loginRst);
         $rst = NineNineNewService::getSnidBySn($uid=18, $tz_system_id = 12);p($rst);

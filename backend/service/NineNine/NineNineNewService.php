@@ -362,7 +362,7 @@ class NineNineNewService extends BaseTZService {
             $items = self::getBetStyleCodes($playway, $codesArr, $single, $tz_type);
             $betKey_i = $betKey.'_'.$key;
             if($fi = $m->get($betKey_i) && $is_auto){
-                continue;
+                Tool_Common::log('/debug/bet_record', 'INFO', '投注继续', ['betKey_1'=>$betKey_i]);
             }
             $nn_qihao = self::getNineNineQihao($qihao, $lottery_type);
             $post_data = [
@@ -405,6 +405,7 @@ class NineNineNewService extends BaseTZService {
             $rstData = $tmpRst['rstData'];
             $xCsrf = $tmpRst['xCsrf'];
             if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+                Tool_Common::log('/debug/bet_record', 'INFO', '投注继续', ['time'=>1, 'xCsrf'=>$xCsrf, 'tmpRst'=>$tmpRst]);
                 $xCsrf_key = CommonService::buildXCsrfTokenKey($plan->uid, self::$tz_system_id);
                 $m->set($xCsrf_key, $xCsrf, 120);
             }
@@ -435,6 +436,7 @@ class NineNineNewService extends BaseTZService {
                 $xCsrf = $tmpRst['xCsrf'];
                 Tool_Common::log('NineNineNew_retry_bet', 'INFO', '九九网重新下注',['rstData'=>$rstData, 'xCsrf'=>$xCsrf]);
                 if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+                    Tool_Common::log('/debug/bet_record', 'INFO', '投注继续', ['time'=>2, 'xCsrf'=>$xCsrf, 'tmpRst'=>$tmpRst]);
                     $xCsrf_key = CommonService::buildXCsrfTokenKey($plan->uid, self::$tz_system_id);
                     $m->set($xCsrf_key, $xCsrf, 120);
                 }

@@ -531,6 +531,7 @@ class Tool_Common
         if (strpos($file, '/') !== false) { // 有包含路劲的
             $dir = dirname($file);
             $file = basename($file);
+            $dir = '/WORK/LOG/'.\Yii::$app->params['LOG_PATH'].'/' . date('Ymd').$dir;
         } else {
             $dir = '/WORK/LOG/'.\Yii::$app->params['LOG_PATH'].'/' . date('Ymd');
         }
