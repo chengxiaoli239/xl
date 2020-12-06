@@ -155,7 +155,7 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
-     * @desc 用户投注基本入口
+     * @desc 用户投注基本入口 - 废弃
      */
     public static function bet(){
         $tzStatus = SystemConfig::findOne(['key'=>'tz_status'])->value;
@@ -218,13 +218,15 @@ abstract class BetService extends BaseBetService {
             Tool_Common::log('betByUid_plans', 'INFO', '计划数据', ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'plans'=>$plans]);
             if ($plans) {
                 $datas = [];
+                $planIds = [];
                 foreach ($plans as $key => $plan) {
+                    $planIds[] = $plan->id;
                     $tzRst[$plan->id] = self::tzByPlanId($plan->id);
                 }
                 BetService::synBalance($plan->uid, $plan->tz_sites);# 目前tz_sites 已变更为单个站点id
                 BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 彩种投注结束锁
                 $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
-                $logArr[$lottery_type]['plans'] = $plans;
+                $logArr[$lottery_type]['plansIds'] = $planIds;
                 $count = count($plans);
                 $logArr[$lottery_type]['qihao'] = $qihao;
                 $logArr[$lottery_type]['datas'] = $datas;
