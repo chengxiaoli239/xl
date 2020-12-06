@@ -719,7 +719,7 @@ abstract class BetService extends BaseBetService {
            if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
                $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid); # 直接记录表
            }else{ # 正式下注
-               $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'ssc_kj_time_period'])->value); # 开奖时间间隔:20分钟
+               $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'not_need_login_tz_system_ids'])->value); # 无需登陆站点
                # 1、首先判断是否登录，否则登录之后再下注
                if(!in_array($tz_system_id, $not_need_login_tz_system_ids) && !$flag = self::isLogin($plan->uid, $tz_system_id)){
                    if(!$TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id, 'status'=>1])){
@@ -727,7 +727,7 @@ abstract class BetService extends BaseBetService {
                        continue;
                    }
                    $loginRst = BaseService::login($TzSystemsUsers->id);
-                   Tool_Common::log('tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['loginRst'=>$loginRst]);
+                   Tool_Common::log('tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['loginRst'=>$loginRst, 'uid'=>$plan->uid, 'TzSystemsUsers_id'=>$TzSystemsUsers->id]);
                    if($loginRst['status'] != 200) return $loginRst;
                }
 
@@ -737,7 +737,7 @@ abstract class BetService extends BaseBetService {
                $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
                $tmpRst = $BetService->bet($qihao, $plan->id, $codes, $isAuto);
                if($tmpRst === false){
-                   Tool_Common::log('tz_err/tzByPlanId','INFO','投注记录 异常', $logArr);
+                   Tool_Common::log('/tz_err/tzByPlanId','INFO','投注记录 异常', $logArr);
                    return ['status'=>301, 'msg'=>'投注异常', 'tmpRst'=>false];
                }
 
