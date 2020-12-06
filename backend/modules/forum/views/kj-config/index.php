@@ -71,6 +71,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 //return $model->snid;
                             }
                         ],
+                        ['attribute'=>'status', 'label'=>'操作',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                $url1 = $model->path; # 路由
+                                $txt = "<button data-url='".$url1."' color='green' class='button btn-success grab-execute'>执行</button>" ;
+                                return Html::a($txt, 'javascript:;', ['title' => '点击执行']);
+                            }
+                        ],
                         //'lottery_type',
 
                         //'created_at',
@@ -84,3 +92,68 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<div class="modal fade" id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_title">提示信息</h4>
+            </div>
+            <div class="modal-body">
+                <form id="tip_form_msg" style="display:block; width:100%;height: 560px;overflow-y: scroll">
+                    <strong>推送结果：</strong>
+                    <pre><code id="rst_code"></code></pre>
+                    <strong>推送内容：</strong>
+                    <pre><code id="push_content"></code></pre>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="copyBarcodes" type="button" class="btn btn-primary">复制链接</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/statics/js/jquery-2.0.3.js"></script>
+<script>
+$(function () {
+    $("#copyBarcodes").click(function(){
+        var text = $("#push_content").html();
+        console.log(text)
+        status = copyTextToClipboard(text);
+        console.log(status);
+    });
+    $('.grab-execute').click(function () {
+        domain = window.location.protocol+"//"+window.location.host;
+        url = $(this).data('url');
+        console.log(domain)
+        $.post(url, {is_auto:0}, function(rst) {
+            console.log(rst)
+            $('#rst_code').text(JSON.stringify(rst, null, ' '))
+            $('#push_content').text('curl ' + domain + url)
+            $('#exampleModal_msg').modal('show');
+        });
+    });
+
+    // 复制内容到剪切板
+    function copyTextToClipboard (text) {
+        var textArea = document.createElement('textarea')
+        textArea.style.position = 'fixed'
+        textArea.style.top = 0
+        textArea.style.left = 0
+        textArea.style.width = '2em'
+        textArea.style.height = '2em'
+        textArea.style.padding = 0
+        textArea.style.border = 'none'
+        textArea.style.outline = 'none'
+        textArea.style.boxShadow = 'none'
+        textArea.style.background = 'transparent'
+        textArea.value = text
+        document.body.appendChild(textArea)
+        textArea.select()
+        var result = document.execCommand('copy')
+        document.body.removeChild(textArea)
+        return result
+    }})
+</script>

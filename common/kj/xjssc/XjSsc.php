@@ -14,7 +14,7 @@ class XjSsc extends BaseKj {
      * @param string $returnType
      * @return array|bool
      */
-    public static function getLotteryNoSevenDay($returnType = 'json'){
+    public static function getLotteryNoSevenDay($returnType = 'json', $is_auto = 1){
 
         if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)){
             $datas = self::batchGrabSevenDay();
@@ -57,7 +57,7 @@ class XjSsc extends BaseKj {
      * @param string $returnType
      * @return array|bool
      */
-    public static function getLotteryNo99($returnType = 'json'){
+    public static function getLotteryNo99($returnType = 'json', $is_auto = 1){
 
         if(!$kjData = self::getCurrentKjData(self::$lottery_type)){
             $domain = BaseKj::getApiHost(9);
@@ -96,7 +96,7 @@ class XjSsc extends BaseKj {
      * @desc 七天 - 新疆 批量数据出口
      * @return mixed
      */
-    public static function batchSevenDay($returnType = 'json'){
+    public static function batchSevenDay($returnType = 'json', $is_auto = 1){
         $datas = self::batchGrabSevenDay();
         $qihaos = $datas[1];
         $times = $datas[2];
@@ -161,7 +161,7 @@ class XjSsc extends BaseKj {
      * @param string $returnType
      * @return array
      */
-    public static function getLotteryNoZhiBo($returnType = 'json'){
+    public static function getLotteryNoZhiBo($returnType = 'json', $is_auto = 1){
 
         if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHost(12);
@@ -205,7 +205,7 @@ class XjSsc extends BaseKj {
      * @param string $returnType
      * @return array|bool
      */
-    public static function getLotteryNoNineNum($returnType = 'json'){
+    public static function getLotteryNoNineNum($returnType = 'json', $is_auto = 1){
 
         if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/nine-num');
@@ -252,7 +252,7 @@ class XjSsc extends BaseKj {
      * @param string $returnType
      * @return array
      */
-    public static function getLotteryNoBatch($returnType = 'json'){
+    public static function getLotteryNoBatch($returnType = 'json', $is_auto = 1){
         $m = \Yii::$app->cache;
 
         $mkey = 'XJSSC_getLotteryNoBatch_5';
@@ -297,9 +297,9 @@ class XjSsc extends BaseKj {
      * @desc 九九网 - 新疆时时彩
      * @return json|xml
      */
-    public static function NineNineNew($returnType = 'json'){
-        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
-            $domain = BaseKj::getApiHostByRoute('/kj/xjssc/nine-nine-new');
+    public static function NineNineNew($returnType = 'json', $is_auto = 1){
+        if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/nine-nine-new');
             $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/lastTen/xjssc'; # limit 数量
             $content = CurlService::httpGet($url);
 

@@ -18,7 +18,8 @@ class XjSscController extends Controller
      */
     public function actionSevenDay($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = XjSsc::getLotteryNoSevenDay($type);
+        $post = \Yii::$app->request->post();
+        $data = XjSsc::getLotteryNoSevenDay($type, $post['is_auto']);
         return $data;
     }
 
@@ -28,7 +29,8 @@ class XjSscController extends Controller
      */
     public function actionNineNine($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = XjSsc::getLotteryNo99($type);
+        $post = \Yii::$app->request->post();
+        $data = XjSsc::getLotteryNo99($type, $post['is_auto']);
         return $data;
     }
 
@@ -38,7 +40,8 @@ class XjSscController extends Controller
      */
     public function actionNineNum($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = XjSsc::getLotteryNoNineNum($type);
+        $post = \Yii::$app->request->post();
+        $data = XjSsc::getLotteryNoNineNum($type, $post['is_auto']);
         return $data;
     }
 
@@ -48,7 +51,8 @@ class XjSscController extends Controller
      */
     public function actionZhiBoWang($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = XjSsc::getLotteryNoZhiBo($type);
+        $post = \Yii::$app->request->post();
+        $data = XjSsc::getLotteryNoZhiBo($type, $post['is_auto']);
         return $data;
     }
 
@@ -58,7 +62,8 @@ class XjSscController extends Controller
      */
     public function actionNineNineNew($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = XjSsc::NineNineNew($type);
+        $post = \Yii::$app->request->post();
+        $data = XjSsc::NineNineNew($type, $post['is_auto']);
         return $data;
     }
 
@@ -68,7 +73,8 @@ class XjSscController extends Controller
      */
     public function actionBatchSevenDay($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = XjSsc::batchSevenDay($type);
+        $post = \Yii::$app->request->post();
+        $data = XjSsc::batchSevenDay($type, $post['is_auto']);
         return $data;
     }
 
@@ -78,7 +84,8 @@ class XjSscController extends Controller
      */
     public function actionBatchZhiBoWang($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = XjSsc::getLotteryNoBatch($type);
+        $post = \Yii::$app->request->post();
+        $data = XjSsc::getLotteryNoBatch($type, $post['is_auto']);
         return $data;
     }
 }
