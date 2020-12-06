@@ -28,7 +28,7 @@ class CqsscKcw extends BaseKj {
 
     # 彩种对应名称
     public static $lotteryNameArr = [
-        1 => '希腊1.5分', # 5:1.5分
+        1 => '七星彩', # 七星彩
         2 => '希腊3分', # 6:3分
         3 => '希腊5分', # 7:5分
         4 => '希腊10分', # 8:10分

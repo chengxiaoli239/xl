@@ -1168,8 +1168,8 @@ class HN0898Service extends BaseTZService {
         $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC";
         $rst = $db->createCommand($sql)->queryOne();
         switch ($lottery_type) {
-            case 1: # 希腊1.5分彩
-                //break;
+            case 1: # 七星彩
+                break;
             case 2: # 希腊3分彩
                 //break;
             case 3: # 希腊5分彩
@@ -1281,6 +1281,8 @@ class HN0898Service extends BaseTZService {
         $db = \Yii::$app->db;
 
         switch ($lottery_type){
+            case 1: # 七星彩
+                break;
             case 5:
                 $time = date("H:i:s", time() - 20 * 60);
                 $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC LIMIT 1";

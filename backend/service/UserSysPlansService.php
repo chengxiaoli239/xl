@@ -602,7 +602,12 @@ class UserSysPlansService extends BaseService {
         }else{
             $where = ['uid'=>1];
         }
-        $lottery_types = explode(',', TzSystemsAuth::find()->where($where)->one()->lottery_types);
+
+        if($uid == 1){
+            $lottery_types = ArrayHelper::getColumn(LotteryType::find()->select(['lottery_type'])->where(['enable'=>1])->asArray()->all(), 'lottery_type');
+        }else{
+            $lottery_types = explode(',', TzSystemsAuth::find()->where($where)->one()->lottery_types);
+        }
 
         $datas = LotteryType::find()->where(['lottery_type'=>$lottery_types])->asArray()->all();
         $tmpDatas = [];
