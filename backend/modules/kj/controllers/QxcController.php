@@ -16,7 +16,8 @@ class QxcController extends Controller
      */
     public function actionKcw($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = QxcKcw::getLotteryNo($type);
+        $post = \Yii::$app->request->post();
+        $data = QxcKcw::getLotteryNo($type, $post['is_auto']);
         return $data;
     }
 
@@ -26,7 +27,8 @@ class QxcController extends Controller
      */
     public function action360($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = Qxc360::getLotteryNo($type);
+        $post = \Yii::$app->request->post();
+        $data = Qxc360::getLotteryNo($type, $post['is_auto']);
         return $data;
     }
 
@@ -37,9 +39,11 @@ class QxcController extends Controller
      */
     public function actionTcw($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = QxcTcw::getLotteryNo($type);
+        $post = \Yii::$app->request->post();
+        $data = QxcTcw::getLotteryNo($type, $post['is_auto']);
         return $data;
     }
+
     /**
      * @desc 官网
      * @param string $type
@@ -47,7 +51,21 @@ class QxcController extends Controller
      */
     public function actionTcwBatch($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = QxcTcw::getBatchLotteryNo($type);
+        $post = \Yii::$app->request->post();
+        $data = QxcTcw::getBatchLotteryNo($type, $post['is_auto']);
         return $data;
     }
+
+    /**
+     * @desc 官网
+     * @param string $type
+     * @return array|bool
+     */
+    public function actionQxcBatch($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $post = \Yii::$app->request->post();
+        $data = QxcTcw::QixingCaiBatch($type, $post['is_auto']);
+        return $data;
+    }
+
 }

@@ -2,11 +2,14 @@
 # 开彩网
 namespace common\kj\qxc;
 use backend\service\CurlService;
+use common\kj\BaseKj;
+use common\tools\Tool_Common;
 use  yii;
 
 class QxcTcw{
+    public static $lottery_type = 1; # 七星彩
 
-    public static function getLotteryNo($returnType = 'json'){
+    public static function getLotteryNo($returnType = 'json', $is_auto = 1){
 
         //$url='http://wd.apiplus.net/tef05c6c66079ff29k/cqssc-3.json';
         $url='http://www.lottery.gov.cn/historykj/history.jspx?_ltype=qxc';
@@ -39,7 +42,7 @@ class QxcTcw{
      * @param $type
      * @return array
      */
-    public static function getBatchLotteryNo($type = json){
+    public static function getBatchLotteryNo($type = json, $is_auto = 1){
         $m = \Yii::$app->cache;
         $mkey = 'BATCH_TCW_PAGE_V4';
         if($page = $m->get($mkey)){
@@ -69,4 +72,47 @@ class QxcTcw{
         return $kjDatas;
     }
 
+    /**
+     * @desc 中国体彩网 - 七星彩
+     * @return json|xml
+     */
+    public static function QixingCaiBatch($returnType = 'json', $is_auto = 1){
+
+        $m = \Yii::$app->cache;
+        $mkey = 'QixingCaiBatch_page';
+        $page = $m->get($mkey) ? : 84;
+        $domain = BaseKj::getApiHostByRoute('/kj/qxc/qxc-batch');
+        $url = $domain.'/gateway/lottery/getHistoryPageListV1.qry?gameNo=04&provinceId=0&pageSize=30&isVerify=1&pageNo='.$page; # limit 数量
+
+        $headers = [
+            "Accept: application/json, text/javascript, */*; q=0.01",
+            "Accept-Encoding: gunzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            "Host: webapi.sporttery.cn",
+            "Origin: https://static.sporttery.cn",
+            "Referer: https://static.sporttery.cn/",
+            "Sec-Fetch-Dest: empty",
+            "Sec-Fetch-Mode: cors",
+            "Sec-Fetch-Site: same-site",
+            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36                ",
+        ];
+
+        $content = CurlService::httpGet($url, $headers);
+        if(isset($content['value']['list']) && !$data = $content['value']['list']);
+        $datas = array_reverse($data);
+
+        $rstData = [];
+        foreach ($datas as $data){
+            $expect = '20'.$data['lotteryDrawNum'];
+            $opencode = str_replace(' ', ',', $data['lotteryDrawResult']);
+            $opentime = $data['lotterySaleEndtime'];
+            $rstData[] = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+
+        $logArr = ['page'=>$page, 'data'=>$rstData];
+        Tool_Common::log('cqssc', 'INFO', '号码抓取-九九网', $logArr);
+
+        return $rst;
+    }
 }
