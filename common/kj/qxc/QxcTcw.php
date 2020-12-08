@@ -76,7 +76,17 @@ class QxcTcw{
      * @desc 中国体彩网 - 七星彩
      * @return json|xml
      */
-    public static function QixingCaiBatch($returnType = 'json', $is_auto = 1){
+    public static function QixingCaiBatch(){
+        $datas = self::QixingCaiBatchDatas();
+
+        return $datas;
+    }
+
+    /**
+     * @desc 中国体彩网 - 七星彩
+     * @return json|xml
+     */
+    public static function QixingCaiBatchDatas(){
 
         $m = \Yii::$app->cache;
         $mkey = 'QixingCaiBatch_page';
@@ -113,6 +123,6 @@ class QxcTcw{
         $logArr = ['page'=>$page, 'data'=>$rstData];
         Tool_Common::log('cqssc', 'INFO', '号码抓取-九九网', $logArr);
 
-        return $rst;
+        return $rstData;
     }
 }

@@ -195,10 +195,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = QxcTcw::QixingCaiBatch($type = 'json', $post['is_auto']=0);p($data);
+
         $data = XjSsc::cg($type='json', $is_auto=0);p($data);
         $data = XjSsc::huangGuan($type='json', $is_auto=0);p($data);
         $data = XjSsc::fuLiCai($type='json', $is_auto=0);p($data);
-        $data = QxcTcw::QixingCaiBatch($type = 'json', $post['is_auto']=0);p($data);
         $data = XjSsc::NineNineNew();p($data);
         $m = \Yii::$app->cache;
         $mkey = BetService::buildBeforeAndAfterBetKey($lottery_type=6, $qihao='2020120603', $uid=11);

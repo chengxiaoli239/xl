@@ -63,8 +63,7 @@ class QxcController extends Controller
      */
     public function actionQxcBatch($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $post = \Yii::$app->request->post();
-        $data = QxcTcw::QixingCaiBatch($type, $post['is_auto']);
+        $data = QxcTcw::QixingCaiBatch();
         return $data;
     }
 
