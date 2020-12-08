@@ -57,6 +57,17 @@ class XjSscController extends Controller
     }
 
     /**
+     * @desc 福利彩网 - 新疆时时彩
+     * @return json|xml
+     */
+    public function actionFuLiCai($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $post = \Yii::$app->request->post();
+        $data = XjSsc::fuLiCai($type, $post['is_auto']);
+        return $data;
+    }
+
+    /**
      * @desc 九九网 - 新疆时时彩
      * @return json|xml
      */

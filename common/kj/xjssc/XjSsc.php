@@ -59,8 +59,8 @@ class XjSsc extends BaseKj {
      */
     public static function getLotteryNo99($returnType = 'json', $is_auto = 1){
 
-        if(!$kjData = self::getCurrentKjData(self::$lottery_type)){
-            $domain = BaseKj::getApiHost(9);
+        if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type)){
+            $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/nine-nine');
             $url = $domain.'/kaijiang/list.aspx?lot=jxssc';
             $content = CurlService::httpGet($url);
             $preg = "/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/ism"; // 这里是表达式，大神看看
@@ -163,15 +163,10 @@ class XjSsc extends BaseKj {
      */
     public static function getLotteryNoZhiBo($returnType = 'json', $is_auto = 1){
 
-        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
-            $domain = BaseKj::getApiHost(12);
-            sleep(3);
-            $date = date('Y-m-d');
-            //$url = $domain.'/data/xjssc/lotteryList/'.$date.'.json?t='.time();
+        if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/zhi-bo-wang');
             $url = $domain.'/data/Current/xjssc/CurIssue.json?'.time();
-            //$content = file_get_contents($url);
             $content = CurlService::httpGet($url);
-            //$data = json_decode($content,320);
             $data = $content;
 
             if (!$data OR !isset($data['preIssue'])) return false;
@@ -329,6 +324,46 @@ class XjSsc extends BaseKj {
         }
         $logArr = $rst;
         Tool_Common::log('cqssc', 'INFO', '号码抓取-九九网', $logArr);
+
+        return $rst;
+    }
+
+    /**
+     * @desc 福利彩网 - 新疆时时彩   https://833cp1.com/
+     * @return json|xml
+     */
+    public static function fuLiCai($returnType = 'json', $is_auto = 1){
+        if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/fu-li-cai');
+            $url = $domain.'/api/v1/result/service/mobile/results/hist/HF_XJSSC?limit=1&brand=833'; # limit 数量
+            $content = CurlService::httpGet($url);
+
+            $data = $content[0];
+            if ($data['gameUniqueId'] != 'HF_XJSSC' OR empty($data['openCode'])) return false;
+
+            $str = substr($data['uniqueIssueNumber'], 0, 8);
+            $qh = substr(str_replace($str, '', $data['uniqueIssueNumber']), -2);
+            $kjData['expect'] = $str. $qh; # 20200427-59
+            $kjData['opencode'] = $data['openCode']; # 1,4,3,5,1
+            $kjData['opentime'] = date('Y-m-d H:i:s', strtotime($data['openTime']));
+            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
+        }
+        $opencode = $kjData['opencode'];
+        $opentime = $kjData['opentime'];
+        $expect = $kjData['expect'];
+
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('cqssc', 'INFO', '号码抓取-福利彩网', $logArr);
 
         return $rst;
     }
