@@ -2,6 +2,7 @@
 # 开彩网
 namespace common\kj\xjssc;
 use backend\service\CurlService;
+use backend\service\NineNine\NineNineNewService;
 use common\kj\BaseKj;
 use common\tools\Tool_Common;
 use  yii;
@@ -346,6 +347,109 @@ class XjSsc extends BaseKj {
             $kjData['expect'] = $str. $qh; # 20200427-59
             $kjData['opencode'] = $data['openCode']; # 1,4,3,5,1
             $kjData['opentime'] = date('Y-m-d H:i:s', strtotime($data['openTime']));
+            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
+        }
+        $opencode = $kjData['opencode'];
+        $opentime = $kjData['opentime'];
+        $expect = $kjData['expect'];
+
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('cqssc', 'INFO', '号码抓取-福利彩网', $logArr);
+
+        return $rst;
+    }
+
+    /**
+     * @desc 皇冠网 - 新疆时时彩   https://cp9393.co/
+     * @return json|xml
+     */
+    public static function huangGuan($returnType = 'json', $is_auto = 1){
+        if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/huang-guan');
+            $url = $domain.'/user/getResult'; #
+
+            $post_data = ['game_code'=>159, 'page'=>1, 'numb'=>10];
+
+            $headers = [
+                "Accept: application/json, text/plain, */*",
+                "Accept-Encoding: gzip, deflate, br",
+                "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+                "Connection: keep-alive",
+                "Content-Length: 36",
+                "Content-Type: application/x-www-form-urlencoded",
+                "Cookie: PHPSESSID=lhfoi0442euttb5dqi8nnl1356; ApiUrl=//cp9393.co",
+                "Host: cp9393.co",
+                "Origin: https://cp9393.co",
+                "Referer: https://cp9393.co/",
+                "Sec-Fetch-Dest: empty",
+                "Sec-Fetch-Mode: cors",
+                "Sec-Fetch-Site: same-origin",
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
+            ];
+            $content = NineNineNewService::postBetCurl($url, $post_data, $headers);
+            p($content);
+
+            $content = $content['result'];
+            if (isset($content[0]) && empty($content[0])) return false;
+            $data = $content[0];
+
+            //$str = substr($data['uniqueIssueNumber'], 0, 8);
+            //$qh = substr(str_replace($str, '', $data['uniqueIssueNumber']), -2);
+            $kjData['expect'] = $data['round']; # 20200427-59
+            $kjData['opencode'] = $data['number']; # 1,4,3,5,1
+            $kjData['opentime'] = date('Y-m-d H:i:s', $data['endtime']);
+            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
+        }
+        $opencode = $kjData['opencode'];
+        $opentime = $kjData['opentime'];
+        $expect = $kjData['expect'];
+
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('cqssc', 'INFO', '号码抓取-福利彩网', $logArr);
+
+        return $rst;
+    }
+
+    /**
+     * @desc 皇冠网 - 新疆时时彩   https://game.lottery.tripleone.tech/
+     * @return json|xml
+     */
+    public static function cg($returnType = 'json', $is_auto = 1){
+        if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/cg');
+            $url = $domain.'/game/opencode?&id=2&pagesize=1'; #
+
+            $content = NineNineNewService::getCurl($url);
+
+            $content = $content['rstData'];
+            if (isset($content['items']) && empty($content['items'][0])) return false;
+            $data = $content['items'][0];
+
+            //$str = substr($data['uniqueIssueNumber'], 0, 8);
+            //$qh = substr(str_replace($str, '', $data['uniqueIssueNumber']), -2);
+            $kjData['expect'] = $data['period']; # 20200427-59
+            $kjData['opencode'] = str_replace('|', ',', $data['result']); # 1,4,3,5,1
+            $kjData['opentime'] = date('Y-m-d H:i:s', $data['time']);
             //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ]
         }
         $opencode = $kjData['opencode'];

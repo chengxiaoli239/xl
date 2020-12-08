@@ -195,6 +195,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = XjSsc::cg($type='json', $is_auto=0);p($data);
+        $data = XjSsc::huangGuan($type='json', $is_auto=0);p($data);
         $data = XjSsc::fuLiCai($type='json', $is_auto=0);p($data);
         $data = QxcTcw::QixingCaiBatch($type = 'json', $post['is_auto']=0);p($data);
         $data = XjSsc::NineNineNew();p($data);

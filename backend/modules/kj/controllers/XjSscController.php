@@ -68,6 +68,28 @@ class XjSscController extends Controller
     }
 
     /**
+     * @desc CG网 - 新疆时时彩
+     * @return json|xml
+     */
+    public function actionCg($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $post = \Yii::$app->request->post();
+        $data = XjSsc::cG($type, $post['is_auto']);
+        return $data;
+    }
+
+    /**
+     * @desc 福利彩网 - 新疆时时彩
+     * @return json|xml
+     */
+    public function actionHuangGuan($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $post = \Yii::$app->request->post();
+        $data = XjSsc::huangGuan($type, $post['is_auto']);
+        return $data;
+    }
+
+    /**
      * @desc 九九网 - 新疆时时彩
      * @return json|xml
      */
