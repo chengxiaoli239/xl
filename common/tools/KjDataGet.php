@@ -118,7 +118,7 @@ class KjDataGet
                         if(in_array($kjConfig->lottery_type, [6, 8, 1])){ # xjssc
                             $kjDatas = array_reverse($kjDatas);
                             foreach ($kjDatas as $key=>$dataInfo){
-                                $rst = KjDataGet::insertKjData($dataInfo['expect'], $kjConfig->lottery_type, $dataInfo['opencode']);
+                                $rst = KjDataGet::insertKjData($dataInfo['expect'], $kjConfig->lottery_type, $dataInfo['opencode'], $dataInfo['opentime']);
                             }
                         }elseif($kjConfig->lottery_type == 2){ # qxc
                             foreach ($kjDatas as $key=>$dataInfo){
@@ -277,6 +277,9 @@ class KjDataGet
             'lottery_type' => $lottery_type,
             'date' => date('Y-m-d',strtotime($tmpDate)),
         ];
+        if(!empty($opentime)){
+            $insertData['created_at'] = strtotime($opentime);
+        }
 
         SscDataService::getAriseCodes([implode('', $codesArr)]); # 缓存开奖号码四定组合
 
@@ -287,6 +290,7 @@ class KjDataGet
             $index_id = $lastIndexId + 1;
             $insertData = array_merge($insertData, ['index_id'=>$index_id]);
         }
+
         $SscKjData->setAttributes($insertData);
         if (!$insertRst = $SscKjData->save()) {
             $msg = current($SscKjData->getErrors());

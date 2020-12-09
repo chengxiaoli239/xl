@@ -195,7 +195,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = KjDataGet::insertKjData('2020124', 1, '4,1,0,9,5,2,11', '2020-12-08 20:00:00');p($rst);
         $data = QxcTcw::QixingCaiBatch($type = 'json', $post['is_auto']=0);p($data);
+        $rst = StaticService::opAllCodeTypeYl([1]);p($rst);
 
         $data = XjSsc::cg($type='json', $is_auto=0);p($data);
         $data = XjSsc::huangGuan($type='json', $is_auto=0);p($data);

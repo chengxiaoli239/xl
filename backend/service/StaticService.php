@@ -2261,8 +2261,8 @@ class StaticService extends BaseService {
      * @desc 号码类型遗漏更新
      * @return mixed
      */
-   public static function opAllCodeTypeYl(){
-       $lottery_types = self::getLotteryTypes();
+   public static function opAllCodeTypeYl($lottery_types = []){
+       $lottery_types = $lottery_types ? : self::getLotteryTypes();
        $rst = ['status'=>200];
        $m = \Yii::$app->cache;
 

@@ -95,7 +95,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'code_2_4',
                         //'code_3_4',
                         //'date',
-                        'update_time',
+                        //'update_time',
+                        ['attribute' => 'created_at', 'label'=> '时间', //'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return date('Y-m-d H:i', $model->created_at);
+                            }
+                        ],
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
