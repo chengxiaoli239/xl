@@ -57,13 +57,25 @@ class QxcController extends Controller
     }
 
     /**
-     * @desc 官网
+     * @desc 官网 https://www.lottery.gov.cn/kj/kjlb.html?qxc
      * @param string $type
      * @return array|bool
      */
     public function actionQxcBatch($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $data = QxcTcw::QixingCaiBatch();
+        return $data;
+    }
+
+    /**
+     * @desc 官网  https://www.lottery.gov.cn/kj/kjlb.html?qxc
+     * @param string $type
+     * @return array|bool
+     */
+    public function actionTcwOne($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $post = \Yii::$app->request->post();
+        $data = QxcTcw::getTcwOne($type, $post['is_auto']);
         return $data;
     }
 

@@ -6,7 +6,7 @@ use common\kj\BaseKj;
 use common\tools\Tool_Common;
 use  yii;
 
-class QxcTcw{
+class QxcTcw extends BaseKj{
     public static $lottery_type = 1; # 七星彩
 
     public static function getLotteryNo($returnType = 'json', $is_auto = 1){
@@ -70,6 +70,44 @@ class QxcTcw{
         if($kjDatas) $m->set($mkey, $page, 2*3600);
 
         return $kjDatas;
+    }
+
+    /**
+     * @desc 七星彩  中国体育彩票 , $lottery_type = 1   https://www.lottery.gov.cn/kj/kjlb.html?qxc
+     * @param string $returnType
+     * @return array|bool 返回格式(数组)：{"expect":"2020100623","opencode":"0,8,6,3,6,3,4","opentime":"2020-10-06 17:41:38"}
+     */
+    public static function getTcwOne($returnType = 'json', $is_auto = 1){
+
+        if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type = 1)) {
+            $data = self::QixingCaiBatch();
+
+            if (!isset($data) OR !$data OR !$kData = $data[0]) return false;
+            $kjData['expect'] = $kData['expect'];
+            $kjData['opencode'] = $kData['opencode'];
+            $kjData['opentime'] = $kData['opentime'];
+            //p($kjData);
+            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ] # 返回格式
+        }
+        $opencode = $kjData['opencode']; # 开奖号码
+        $opentime = $kjData['opentime']; # 开奖时间
+        $expect = $kjData['expect']; # 期号
+        //p([DEFAULT_LOTTERY_TYPE,$expect, $kjData]);
+
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('cqssc_kl8', 'INFO', '99彩票网-号码抓取', $logArr);
+
+        return $rst;
     }
 
     /**
