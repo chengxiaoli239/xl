@@ -91,7 +91,6 @@ class QxcTcw{
         $m = \Yii::$app->cache;
         $mkey = 'QixingCaiBatch_page_2';
         $page = $m->get($mkey) ? : 84;
-        $page < 2 && $page = 1;
 
         $running_status_key = 'QixingCaiBatch_status';
         if($status = $m->get($running_status_key)) return ['status'=>300, 'msg'=>'有在执行的任务，请稍后'];
@@ -125,7 +124,9 @@ class QxcTcw{
             $opentime = $data['lotterySaleEndtime'];
             $rstData[] = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
-        $m->set($mkey, $page-1, 24*3600);
+        $page = $page-1;
+        $page < 2 && $page = 1;
+        $m->set($mkey, $page, 24*3600);
         $m->delete($running_status_key); # 跑完任务删除key
 
         $logArr = ['page'=>$page, 'data'=>$rstData];
