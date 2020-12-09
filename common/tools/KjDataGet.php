@@ -227,7 +227,7 @@ class KjDataGet
         $kjDatas = str_replace(',', '', $kjData);
         if(!$qihao OR !$kjDatas) return false;
         $kjDatasArr = explode(',',$kjData);
-        $codes_4nums = $kjDatasArr; unset($codes_4nums[4]);
+        $codes_4nums = $kjDatasArr; unset($codes_4nums[4],$codes_4nums[5],$codes_4nums[6]); # 四定和值只取前四个号码
 
         $codes = $kjDatasArr[0].','.$kjDatasArr[1].','.$kjDatasArr[2].','.$kjDatasArr[3];
         if($lottery_type == 5) {
