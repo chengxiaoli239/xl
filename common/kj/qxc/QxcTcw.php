@@ -89,7 +89,7 @@ class QxcTcw{
     public static function QixingCaiBatchDatas(){
 
         $m = \Yii::$app->cache;
-        $mkey = 'QixingCaiBatch_page_0';
+        $mkey = 'QixingCaiBatch_page_2';
         $page = $m->get($mkey) ? : 84;
         $page < 2 && $page = 1;
 
@@ -115,8 +115,8 @@ class QxcTcw{
         ];
 
         $content = CurlService::httpGet($url, $headers);
-        if(isset($content['value']['list']) && !$data = $content['value']['list']);
-        $datas = array_reverse($data);
+        if(isset($content['value']['list']) && !$datas = $content['value']['list']);
+        //$datas = array_reverse($data);
 
         $rstData = [];
         foreach ($datas as $data){
