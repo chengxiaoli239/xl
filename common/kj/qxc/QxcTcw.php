@@ -80,7 +80,7 @@ class QxcTcw extends BaseKj{
     public static function getTcwOne($returnType = 'json', $is_auto = 1){
 
         if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type = 1)) {
-            $data = self::QixingCaiBatch();
+            $data = self::QixingCaiBatch($is_new = 1);
 
             if (!isset($data) OR !$data OR !$kData = $data[0]) return false;
             $kjData['expect'] = $kData['expect'];
@@ -114,8 +114,8 @@ class QxcTcw extends BaseKj{
      * @desc 中国体彩网 - 七星彩
      * @return json|xml
      */
-    public static function QixingCaiBatch(){
-        $datas = self::QixingCaiBatchDatas();
+    public static function QixingCaiBatch($is_new = 0){
+        $datas = self::QixingCaiBatchDatas($is_new);
 
         return $datas;
     }
@@ -124,11 +124,12 @@ class QxcTcw extends BaseKj{
      * @desc 中国体彩网 - 七星彩
      * @return json|xml
      */
-    public static function QixingCaiBatchDatas(){
+    public static function QixingCaiBatchDatas($is_new = 0){
 
         $m = \Yii::$app->cache;
-        $mkey = 'QixingCaiBatch_page_4';
+        $mkey = 'QixingCaiBatch_page_4_'.$is_new;
         $page = $m->get($mkey) ? : 84;
+        if($is_new==1) $page = 1;
 
         $running_status_key = 'QixingCaiBatch_status';
         if($status = $m->get($running_status_key)) return ['status'=>300, 'msg'=>'有在执行的任务，请稍后'];
