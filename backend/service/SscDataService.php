@@ -571,7 +571,7 @@ class SscDataService extends BaseService {
                     //}
                     $SscDsYl->history_max_miss = max($miss['current_times'],$SscDsYl->max_miss,$SscDsYl->history_max_miss); // 6、历史最大遗漏
                     $SscDsYl->update_time = date('Y-m-d H:i:s');
-                    //p($SscDsYl);
+                    //p($SscDsYl->attributes);
                     $rst = $SscDsYl->save();
                     if(!$rst){
                         $logArr = ['attributes'=>$SscDsYl->attributes, 'msg'=>$SscDsYl->getErrors()];
@@ -1051,7 +1051,7 @@ class SscDataService extends BaseService {
         $last_index_id = self::getLastIndexId($lottery_type);
         $min_id = $last_index_id - $recently - 1;
         $min_id = $min_id ? $min_id : $last_index_id;
-        //p(['num'=>$num, 'position'=>$position, 'last_index_id'=>$last_index_id, 'recently'=>$recently, 'min'=>$min_id, $recently]);
+        //p(['num'=>$num, 'position'=>$position, 'last_index_id'=>$last_index_id, 'recently'=>$recently, 'min'=>$min_id, 'recently'=>$recently]);
 
         $field = 'code_'.str_replace(',','_',$position);
         if(is_array($num)){

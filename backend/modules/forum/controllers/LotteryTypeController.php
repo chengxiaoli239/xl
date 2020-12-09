@@ -3,6 +3,7 @@
 namespace backend\modules\forum\controllers;
 
 use backend\service\HN0898Service;
+use backend\service\SystemService;
 use Yii;
 use backend\models\LotteryType;
 use backend\models\searchs\LotteryType as LotteryTypeSearch;
@@ -86,6 +87,19 @@ class LotteryTypeController extends BaseController
         return $this->render('create', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * @desc 更新记录status状态 0/1
+     * @param $id
+     * @return \yii\web\Response
+     */
+    public function actionInitLottery(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $rst = SystemService::initLottery($post['lottery_type']);
+
+        return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$rst['lottery_type']]);
     }
 
     /**

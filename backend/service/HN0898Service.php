@@ -24,6 +24,7 @@ use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
 use backend\service\NineNine\NineNineBaseService;
 use backend\tools\Tools;
+use common\kj\qxc\QxcTcw;
 use common\models\AdminModel;
 use common\service\CaptchaCodeService;
 use common\tools\Tool_Common;
@@ -1169,6 +1170,8 @@ class HN0898Service extends BaseTZService {
         $rst = $db->createCommand($sql)->queryOne();
         switch ($lottery_type) {
             case 1: # 七星彩
+                $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);
+                $qihao = $data['expect'] + 1; # 期号
                 break;
             case 2: # 希腊3分彩
                 //break;
@@ -1282,6 +1285,8 @@ class HN0898Service extends BaseTZService {
 
         switch ($lottery_type){
             case 1: # 七星彩
+                $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);
+                $qihao = $data['expect']; # 期号
                 break;
             case 5:
                 $time = date("H:i:s", time() - 20 * 60);
@@ -1566,23 +1571,24 @@ class HN0898Service extends BaseTZService {
     }
 
     /**
-     * @desc 插入单双遗漏
+     * @desc 插入单双遗漏 - 新彩种统计插入 单双记录 - 初始化新彩种
      */
-    public static function insertDsYl(){
-        $SscDsYls = SscDsYl::find()->where(['lottery_type'=>2])->all();
-        for ($i=1; $i<=6; $i++){
+    public static function insertDsYl($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $SscDsYls = SscDsYl::find()->where(['lottery_type'=>5])->all();
+        //for ($i=1; $i<=6; $i++){
             foreach ($SscDsYls as $SscDsYl){
                 $setData = $SscDsYl->attributes;
-                $setData['lottery_type'] = $i;
-                $where = ['lottery_type'=>$i, 'zhi'=>$setData['zhi'], 'positions'=>$setData['positions']];
+                $setData['yl_records'] = '';
+                $setData['lottery_type'] = $lottery_type;
+                $where = ['lottery_type'=>$lottery_type, 'zhi'=>$setData['zhi'], 'positions'=>$setData['positions']];
                 if(!$record = SscDsYl::findOne($where)){
                     $record = new SscDsYl();
                 }
                 $record->setAttributes($setData);
                 $rst = $record->save();
             }
-        }
+        //}
 
-        return $rst;
+        return ['status'=>200, 'rst'=>$rst];
     }
 }

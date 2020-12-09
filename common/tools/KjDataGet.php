@@ -491,6 +491,8 @@ class KjDataGet
         }else{
             $nextQihao = $qihao + 1;
             switch ($lottery_type){
+                case 1: # 七星彩
+                    break;
                 case 5: # 重庆
                     $year = '20'.substr($qihao,0,2);
                     $date = '20'.substr($qihao,0,6);

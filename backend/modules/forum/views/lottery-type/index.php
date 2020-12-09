@@ -85,6 +85,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->info;
                             }
                         ],
+                        ['attribute'=>'status', 'label'=>'操作',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                $url1 = '/forum/lottery-type/init-lottery'; # 路由
+                                $txt = "<button data-url='".$url1."' color='green' data-lottery-type='".$model->lottery_type."' class='button btn-success act-execute'>初始化</button>" ;
+                                return Html::a($txt, 'javascript:;', ['title' => '点击执行']);
+                            }
+                        ],
                         //'onGetNoed',
                         ['attribute' => 'onGetNoed','label'=>'事件函数',#'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
@@ -113,3 +121,42 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<div class="modal fade" id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_title">提示信息</h4>
+            </div>
+            <div class="modal-body">
+                <form id="tip_form_msg" style="display:block; width:100%;height: 560px;overflow-y: scroll">
+                    <strong>推送结果：</strong>
+                    <pre><code id="rst_code"></code></pre>
+                    <strong>推送内容：</strong>
+                    <pre><code id="push_content"></code></pre>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="copyBarcodes" type="button" class="btn btn-primary">复制链接</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/statics/js/jquery-2.0.3.js"></script>
+<script>
+$(function () {
+    $('.act-execute').click(function () {
+        domain = window.location.protocol + "//" + window.location.host;
+        url = $(this).data('url');
+        lottery_type = $(this).data('lottery-type');
+        console.log(domain)
+        $.post(url, {lottery_type: lottery_type}, function (rst) {
+            $('#rst_code').text(JSON.stringify(rst, null, ' '))
+            //$('#push_content').text('curl ' + domain + url)
+            $('#exampleModal_msg').modal('show');
+        });
+    });
+})
+</script>

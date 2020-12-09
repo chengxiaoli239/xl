@@ -149,6 +149,10 @@ class StaticService extends BaseService {
      * @Time 2019-07-11
      */
     public static function opStaticSdProfitsDay($lottery_type = DEFAULT_LOTTERY_TYPE){
+        if(in_array($lottery_type, [1])){
+            return true;
+            //return ['status'=>200, 'msg'=> '七星彩低频彩不需统计天利润'];
+        }
         $rst = true;
         $m = \Yii::$app->cache;
         $mkey = 'opStaticSdProfitsDay_'.$lottery_type;
@@ -1218,11 +1222,11 @@ class StaticService extends BaseService {
      * @desc 利润统计
      * @return array
      */
-    public static function opStatic(){
-        $lottery_types = StaticService::getLotteryTypes();
+    public static function opStatic($lottery_types = []){
+        $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
         foreach ($lottery_types as $lottery_type) {
             $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opStatic');
-            if($status) {
+            if($lottery_type==1 OR $status) {
                 $rst['staticSDHzPerDateProfits'] = StaticService::staticSDHzPerDateProfits($lottery_type); # 每天四定和值利润统计
                 $rst['staticHzMonthsProfits'] = StaticService::staticHzMonthsProfits($lottery_type); # 每月四定和值利润统计
                 $rst['allHzStaticProfits'] = StaticService::allHzStaticProfits($lottery_type); # 每个月份每个和值利润统计
@@ -1242,6 +1246,9 @@ class StaticService extends BaseService {
      * @return array
      */
     public static function staticSDHzPerDateProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
+        if(in_array($lottery_type, [1])){
+            return ['status'=>200, 'msg'=> '七星彩低频彩不需统计天利润'];
+        }
         $rst = ['status'=>200, 'msg'=>'处理成功'];
         $allStaticProfits = self::allDateHzStaticProfits($lottery_type);
 
@@ -1540,6 +1547,9 @@ class StaticService extends BaseService {
      * @return array
      */
     public static function allHzStaticProfitsPerdate($lottery_type = DEFAULT_LOTTERY_TYPE){
+        if(in_array($lottery_type, [1])){
+            return ['status'=>200, 'msg'=> '七星彩低频彩不需统计天利润'];
+        }
         $m = \Yii::$app->cache;
         $mkey = 'allHzStaticProfitsPerdate_01_'.$lottery_type;
 
