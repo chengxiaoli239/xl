@@ -89,7 +89,7 @@ class QxcTcw{
     public static function QixingCaiBatchDatas(){
 
         $m = \Yii::$app->cache;
-        $mkey = 'QixingCaiBatch_page_3';
+        $mkey = 'QixingCaiBatch_page_4';
         $page = $m->get($mkey) ? : 84;
 
         $running_status_key = 'QixingCaiBatch_status';
