@@ -118,10 +118,12 @@ class KjDataGet
                         if(in_array($kjConfig->lottery_type, [6, 8, 1])){ # xjssc
                             $kjDatas = array_reverse($kjDatas);
                             foreach ($kjDatas as $key=>$dataInfo){
-                                $rst = KjDataGet::insertKjData($dataInfo['expect'], $kjConfig->lottery_type, $dataInfo['opencode'], $dataInfo['opentime']);
+                                $qihao = $dataInfo['expect'];
+                                $rst = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $dataInfo['opencode'], $dataInfo['opentime']);
                             }
                         }elseif($kjConfig->lottery_type == 2){ # qxc
                             foreach ($kjDatas as $key=>$dataInfo){
+                                $qihao = $dataInfo['expect'];
                                 $rst = KjDataGet::insertQxcKjData($dataInfo['qihao'], $dataInfo['codes'], $dataInfo['date']);
                             }
                         }
