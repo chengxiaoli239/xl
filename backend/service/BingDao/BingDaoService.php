@@ -1749,7 +1749,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             $start_time = microtime(true);
             //$tmpRst = self::postCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
             $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
-            Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-7', ['qihao'=>$qihao, 'plan_id'=>$plan_id]);
+            Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-7', ['qihao'=>$qihao, 'plan_id'=>$plan_id, 'uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'codes'=>$tmpcodesArr]);
             //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
             //sleep(1);
             $rst[$key] = $tmpRst;
