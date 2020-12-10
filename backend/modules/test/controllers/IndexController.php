@@ -196,6 +196,7 @@ class IndexController extends Controller
 
     public function actionDw(){
 
+        $rst['rst'] = BaseService::synBalance($tz_system_users_id=66);p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 1); p($rst);// 更新单双遗漏
         $rst = HN0898Service::insertDsYl($lottery_type = 1);p($rst); # 七星彩单双
         $rst = StaticService::opStatic($lottery_types = [1]); p($rst);# 和值、四定利润统计
@@ -219,7 +220,6 @@ class IndexController extends Controller
         $rst = NineNineNewService::getBalance($uid=18, $tz_system_id = 12);p($rst);
         $loginRst = NineNineNewService::login($id = 18, $tz_system_id=12);p($loginRst);
         $rst = NineNineNewService::getSnidBySn($uid=18, $tz_system_id = 12);p($rst);
-        $rst['rst'] = BaseService::synBalance($tz_system_users_id=32);p($rst);
         $redis = \Yii::$app->redis;p($redis);
 
         $rst = NineNineNewService::synBalance($tz_system_users_id=31);p($rst);

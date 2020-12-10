@@ -1739,7 +1739,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             $betKey = BetService::buildBetKey($plan->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id).'_'.$key; # 分配下注后面加key
             if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
-            Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-6', ['qihao'=>$qihao, 'plan_id'=>$plan_id]);
+            Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-6', ['qihao'=>$qihao, 'plan_id'=>$plan_id, 'betKey'=>$betKey, 'all_counts'=>count($codesArr), 'count'=>count($tmpcodesArr)]);
             //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
             # 和值投注反应时间比较久，无需返回直接锁住
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
@@ -1749,13 +1749,13 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             $start_time = microtime(true);
             //$tmpRst = self::postCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
             $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
-            Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-7', ['qihao'=>$qihao, 'plan_id'=>$plan_id, 'uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'codes'=>$tmpcodesArr]);
+            $end_time = microtime(true);
+            $time_consume = ($end_time - $start_time). 's';
+            Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-7', ['qihao'=>$qihao, 'plan_id'=>$plan_id, 'uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'codes'=>$tmpcodesArr, 'time_consume'=>$time_consume]);
             //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
             //sleep(1);
             $rst[$key] = $tmpRst;
             //$rst = json_encode($rst);
-            $end_time = microtime(true);
-            $time_consume = ($end_time - $start_time). 's';
             if($tmpRst['code'] != 200){
                 $tzRst = [
                     'uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,
@@ -1922,12 +1922,14 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         curl_setopt($ch, CURLOPT_HEADER,0);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data));
 
+        Tool_Common::log('postBetCurl_rst','INFO','httpPost下注请求-冰岛', ['start'=>1]);
         $start_time = microtime(true);
         $data = curl_exec($ch);
         if(!BaseService::is_json($data)){
             $data = substr($data,3);
         }
         $end_time = microtime(true);
+        $time_consume = ($end_time-$start_time).'s';
         //d($data);
         $errno = curl_errno( $ch );
         //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
@@ -1938,13 +1940,8 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         }
 
         //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
-        if(curl_close($ch)) {
-            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
-        }
-        if($data == 'ok'){
-            return 'ok';
-        }
         $rstData = json_decode($data, true); # data : {"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}
+        Tool_Common::log('postBetCurl_rst','INFO','httpPost下注请求-冰岛', ['end'=>1, 'data'=>$data, 'rstData'=>$rstData, 'time_consume'=>$time_consume]);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
         if(strpos($data, "\"Status\":1") !== false && strpos($data, "\"CompletedStatus\":1") !== false){ # json解析异常处理
             $rstData['Status'] = 1;
@@ -1983,8 +1980,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             Tool_Common::log('httpPostError','INFO','httpPost请求-冰岛-1', $logArr);
         }
         //$rstData['errno'] = $errno;
-        $time_consume = ($end_time-$start_time).'s';
-        $logArr = ['url'=>$url, 'headers'=>$headers, 'data'=>$data, 'post_data'=>$post_data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr, 'rstData'=>$rstData, 'data_type'=>$data_type, 'flag'=>$flag];
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'data'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr, 'rstData'=>$rstData, 'data_type'=>$data_type, 'flag'=>$flag];
         Tool_Common::log('postBetCurl','INFO','httpPost下注请求-冰岛-all', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 

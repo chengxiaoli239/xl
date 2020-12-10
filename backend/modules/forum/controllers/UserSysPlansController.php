@@ -179,10 +179,14 @@ class UserSysPlansController extends BaseController
         }elseif (false && in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
             $codes = ImportPlanCodes::findOne(['uid'=>$this->_user_id, 'plan_id'=>$model])->codes;
             $model->import_codes_txt = str_replace('@', ' ', str_replace(',', '', $codes));
-        }elseif (in_array($model->tz_type, [18, 19, 20, 25, 27, 29, 30, 31, 32, 33])){
+        }elseif (in_array($model->tz_type, [18, 19, 20, 25, 27, 29, 30, 31, 32, 33, 34])){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
             //p($hz_Arr_Data);
-            $codes = ImportPlanCodes::findOne(['uid'=>$this->_user_id, 'plan_id'=>$model])->codes;
+            $where = ['plan_id'=>$model->id];
+            if($this->_user_id != 1){
+                $where['uid'] = $this->_user_id;
+            }
+            $codes = ImportPlanCodes::findOne($where)->codes;
             $model->import_codes_txt = str_replace('@', ' ', str_replace(',', '', $codes));
             foreach ($hz_Arr_Data as $key=>$val){
                 if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'p5', 'bet_while_miss', 'status_val', 'type_4ds', 'code1', 'code2', 'arise', 'type_4d', 'type_4s', 'hefen', 'no_fix_hefen', 'arise_in', 'xhenfen','singles_key'])){
