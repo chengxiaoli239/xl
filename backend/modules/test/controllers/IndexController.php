@@ -197,6 +197,7 @@ class IndexController extends Controller
 
     public function actionDw(){
         set_time_limit(0);
+        $rst = JinYingService::getBalance('18', '15');p($rst);
         $rst = JinYingService::login('18', '15');p($rst);
         $rst['rst'] = BaseService::synBalance($tz_system_users_id=66);p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 1); p($rst);// 更新单双遗漏

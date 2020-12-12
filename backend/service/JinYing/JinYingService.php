@@ -41,6 +41,8 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
     public static $username = '';
     public static $user_id;
     public static $account = '';
+    public static $defaultLT = 'PK10JSC';
+    public static $token_key = 'c6af995cba1f';
     public static $l_types = [ # 网盘对本系统的彩种类型id
         5 => 6, # 新疆时时彩
         6 => 10, # 90s
@@ -1075,6 +1077,7 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
         # 第一步：获取cookie
         $cookieData = self::getCookie($uid,$tz_system_id);
         if(!isset($cookieData['status']) OR $cookieData['status'] != 200) return $cookieData;
+        //p($cookieData);
 
         # 第二步：下载验证码图片 getCookie 已经下注图片，此步骤忽略
         //self::downLoadCodeImg($uid, $tz_system_id, $cookie_key['data']);
@@ -1094,10 +1097,15 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
         //$rst = self::loginRemote($uid, $tz_system_id);
         # 第三步：同意
         $rst = self::acceptAgreement($uid, $tz_system_id);
-        p(['rst1'=>$rst]);
+        $steps = [1,2,3,4,5,6,7,8,9];
+        foreach ($steps as $step){
+            $stepArr[$step] = self::acceptStep($uid, $tz_system_id, $step);
+        }
 
+        sleep(3);
         # 获取用户信息
         $rst = self::userInfo($uid, $tz_system_id);
+        p(['step'=>$stepArr, 'rst'=>$rst]);
 
         return $rst;
     }
@@ -1204,73 +1212,80 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
             "Sec-Fetch-User: ?1",
             "Upgrade-Insecure-Requests: 1",
             "Host: ".$urlArr['host'],
-            "Origin:".str_replace('www.','',self::$baseUrl),
-            "Referer:".$TzSystemsUsers->ssc_domain.'/login',
+            "Referer: ".$TzSystemsUsers->ssc_domain.'/login',
             $TzSystemsUsers->user_agent,
         ];
         $setCookies = [];
         $post_data = http_build_query($post_data);
-        $loginHeaders = [
+        $loginHeaders = array_merge($commonHeaders, [
             "Content-Length:".strlen($post_data),
             "Content-Type: application/x-www-form-urlencoded",
             "Cookie: ".$cookieData['cookie_key']."=".$cookieData['cookie_val'],
-        ];
+            "Origin: ".$TzSystemsUsers->ssc_domain,
+        ]);
+
         $status = 300;
         $loginRst = self::postCurlLogin($url, $post_data, $loginHeaders);
         p(['url'=>$url, 'loginHeaders'=>$loginHeaders, 'post_data'=>$post_data, 'loginRst'=>$loginRst, 'code'=>$code],0);
         if(isset($loginRst['code']) && $loginRst['code'] == 200){
             $token = end(explode('=', $loginRst['Location']));
             $setCookies['token'] = 'token='.$token;
+            $setCookies[self::$token_key] = self::$token_key.'='.$token;
             # 登陆成功获取cookie
-            $url = $TzSystemsUsers->ssc_domain.'/'.$loginRst['Location'];
+            $url = $TzSystemsUsers->ssc_domain.str_replace('//', '/', $loginRst['Location']);
             $agreeHeaders = array_merge($commonHeaders, [
-                "Cookie: defaultLT=PK10JSC; c6af995cba1f=".$token,//."; ssid1=81c70646bfa827bbeca0d1074176c6a2; random=654",
+                "Cookie: defaultLT=".self::$defaultLT."; ".self::$token_key."=".$token,//."; ssid1=81c70646bfa827bbeca0d1074176c6a2; random=654",
             ]);
             //$cookieData = self::getCookieAndAgree($url, $agreeHeaders);
             $agreeRst = self::getCurlLogin($url, $agreeHeaders);
             p(['url'=>$url, 'agreeHeaders'=>$agreeHeaders, 'agreeRst'=>$agreeRst],0);
             if($agreeRst['code'] == 200){
-                $url = $TzSystemsUsers->ssc_domain.'/'.$agreeRst['Location'];
-                $ssidHeaders = array_merge($commonHeaders, [
-                    "Host: ".$urlArr['host'],
-                    "Referer:".$TzSystemsUsers->ssc_domain.'/login',
-                ]);
+                $url = $TzSystemsUsers->ssc_domain . $agreeRst['Location'];
+                $ssidHeaders = $commonHeaders;
                 $ssidRst = self::getCurlLogin($url, $ssidHeaders, $isGetCookie = 1);
                 p(['url'=>$url, 'ssidHeaders'=>$ssidHeaders, 'ssidRst'=>$ssidRst],0);
                 if($ssidRst['code'] == 200){
-                    $setCookies['ssid1'] = 'ssid1='.$ssidRst['cookie']['ssid1'][1];
-                    $setCookies['random'] = 'random='.$ssidRst['cookie']['random'][1];
-                    $url = $TzSystemsUsers->ssc_domain.'/'.$ssidRst['Location'];
+                    $ssidRst_status = 200;
+                    $setCookies['ssid1'] = 'ssid1='.trim($ssidRst['cookie']['ssid1'][1]);
+                    $setCookies['random'] = 'random='.trim($ssidRst['cookie']['random'][1]);
+                    $url = $TzSystemsUsers->ssc_domain.$ssidRst['Location'];
                     $agreementHeaders = array_merge($commonHeaders, [
                         //"Cookie: defaultLT=AULUCKY10; c6af995cba1f=ed8c589736e647f47ca34696a6d1e32ee72f8dfc; ssid1=b118b9107402b92a3e6277ec425676d6; random=2603",
                         "Cookie: ".implode('; ', $setCookies),
                     ]);
                     $agreementRst = self::getCurlLogin($url, $agreementHeaders, $isGetCookie = 2);
-                    p(['url'=>$url, 'agreementHeaders'=>$agreementHeaders, 'agreementRst'=>$agreementRst, 'setCookies'=>$setCookies], 0);
+                    //p(['url'=>$url, 'agreementHeaders'=>$agreementHeaders, 'agreementRst'=>$agreementRst, 'setCookies'=>$setCookies]);
                     if($agreementRst['code'] == 200){
                         $status = 200;
-                        $setCookies['xxx'] = current(explode(';', $agreementRst['cookie']['xxx'][1]));
-                        $setCookies['token'] = current(explode(';', $agreementRst['cookie']['token'][1]));
+                        $setCookies['xxx'] = trim(current(explode(';', trim($agreementRst['cookie']['xxx'][1]))));
+                        $setCookies['token'] = trim(str_replace(self::$token_key, 'token', current(explode(';', $agreementRst['cookie']['token'][1]))));
 
-                        $url = $TzSystemsUsers->ssc_domain.'/'.str_replace('//', '/', $ssidRst['Location']);
+                        $url = $TzSystemsUsers->ssc_domain . $agreementRst['Location'];
                         $endAgreeHeaders = array_merge($commonHeaders, [
-                            "Cookie: ".implode('; ', $setCookies),
+                            "Cookie: defaultLT=".self::$defaultLT."; ".implode('; ', $setCookies),
                         ]);
                         $endAgreementRst = self::getCurlLogin($url, $endAgreeHeaders);
-                        p(['url'=>$url, 'endAgreementRst'=>$endAgreementRst, 'agreementRst'=>$endAgreeHeaders, 'setCookies'=>$setCookies]);
-
+                        p(['url'=>$url, 'endAgreementRst'=>$endAgreementRst, 'endAgreeHeaders'=>$endAgreeHeaders, 'setCookies'=>$setCookies],0 );
+                    }else{
+                        //$setCookies['token'] = trim(str_replace(self::$token_key, 'token', current(explode(';', $agreementRst['cookie']['token'][1]))));
                     }
                 }
 
-                if($status == 200){
-                    $TzSystemsUsers->cookie = implode(';', $setCookies);
+                if($ssidRst_status == 200 OR $status == 200){
+                    foreach ($setCookies as $key=>$setCookie){
+                        if(empty($setCookies)) unset($setCookies[$key]);
+                    }
+                    if(!isset($setCookies['token']) OR empty($setCookies['token'])){
+                        $setCookies['token'] = 'token'.str_replace(self::$token_key, '', $setCookies[self::$token_key]);
+                    }
+                    $TzSystemsUsers->cookie = trim(trim(implode(';', $setCookies)), ';');
                     $TzSystemsUsers->save();
                 }
             }
         }
-        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers, 'setCookies'=>$setCookies, 'code'=>$code];
+        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'setCookies'=>$setCookies, 'code'=>$code];
         Tool_Common::log('loginRemote','INFO','0898登陆记录', $logArr);
-        return $data;
+        return ['status'=>$status];
     }
 
     /**
@@ -1306,24 +1321,79 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
         //self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
-        $_t = microtime(true) * 10000;
+        $urlArr = self::getTzSiteInfo($tz_system_id);
         //$url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/App/Index'.'?_'.$_t;
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/AcceptAgreement'.'?_'.$_t;
+        $url = $urlArr['baseUrl'] . '/member/index';
         $headers = [
-            "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-            "Cache-Control:max-age=0",
-            "Upgrade-Insecure-Requests:1",
+            "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            "Accept-Encoding: gzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
             "Cookie: ".trim($TzSystemsUsers->cookie),
             "Host:".str_replace('www.','',self::$domain),
+            "Referer:".$TzSystemsUsers->ssc_domain.'/member/agreement',
+            "Sec-Fetch-Dest: document",
+            "Sec-Fetch-Mode: navigate",
+            "Sec-Fetch-Site: same-origin",
+            "Sec-Fetch-User: ?1",
+            "Upgrade-Insecure-Requests: 1",
+            $TzSystemsUsers->user_agent
         ];
 
         $data = CurlService::getCurl($url, $headers);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        //p($logArr);
         Tool_Common::log('loginRemote','INFO','7时彩登陆记录', $logArr);
+        return $data;
+    }
+
+    /**
+     * @desc 登陆
+     * @param $uid
+     * @param $tz_system_id
+     * @return mixed|string
+     */
+    private static function acceptStep($uid, $tz_system_id, $step = 1){
+        //self::__init($uid, $tz_system_id);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $_t = (int)(microtime(true) * 1000);
+        $stepArr = [
+            1 => '/member/params?_='.$_t,
+            2 => '/member/lasts?lottery='.self::$defaultLT.'&_='.$_t,
+            3 => 'member/load?lottery='.self::$defaultLT.'&page=lm',
+            4 => '/member/notice?_='.$_t,
+            5 => '/web/rest/productGame/list?_='.$_t,
+            6 => '/time?_='.$_t,
+            7 => '/member/period?lottery=PK10JSC&games=DX1,DX2,DX3,DX4,DX5,DX6,DX7,DX8,DX9,DX10,DS1,DS2,DS3,DS4,DS5,DS6,DS7,DS8,DS9,DS10,GDX,GDS,LH1,LH2,LH3,LH4,LH5&_='.$_t,
+            8 => '/member/lastResult?lottery=PK10JSC&_='.$_t,
+            9 => '/member/odds?lottery=PK10JSC&games=DX1,DX2,DX3,DX4,DX5,DX6,DX7,DX8,DX9,DX10,DS1,DS2,DS3,DS4,DS5,DS6,DS7,DS8,DS9,DS10,GDX,GDS,LH1,LH2,LH3,LH4,LH5&_='.$_t,
+        ];
+
+        $urlArr = self::getTzSiteInfo($tz_system_id);
+        $url = $urlArr['baseUrl'].$stepArr[$step];
+        $headers = [
+            "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            "Accept-Encoding: gzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            "Cookie: defaultLT=".self::$defaultLT."; ".trim($TzSystemsUsers->cookie),
+            "Host:".str_replace('www.','',self::$domain),
+            "Referer:".$TzSystemsUsers->ssc_domain.'/member/index',
+            "Sec-Fetch-Dest: document",
+            "Sec-Fetch-Mode: navigate",
+            "Sec-Fetch-Site: same-origin",
+            "Sec-Fetch-User: ?1",
+            "X-Requested-With: XMLHttpRequest",
+            $TzSystemsUsers->user_agent
+        ];
+
+        //$data = CurlService::getCurl($url, $headers);
+        $data = self::getCurlStep($url, $headers);
+        //sleep(10);
+        //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
+        $logArr = ['uid'=>$uid, 'step'=>$step, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
+        Tool_Common::log('loginRemote','INFO','金盈网登陆step', $logArr);
         return $data;
     }
 
@@ -1370,33 +1440,29 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
-        $_t = microtime(true) * 10000;
-        //$url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/App/Index'.'?_'.$_t;
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/member/?a=member.account&m=getBalance';
+        $_t = (int)(microtime(true) * 1000);
+        $urlArr = self::getTzSiteInfo($tz_system_id);//.'/member/?a=member.account&m=getBalance';
+        $url = $urlArr['baseUrl'].'/member/accounts?_='.$_t;
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
-        $post_data = http_build_query(['apiKey'=>str_replace('apiKey=', '', $TzSystemsUsers->cookie)]);
         $headers = [
-            ":authority: o1.op5168.com",
-            ":method: POST",
-            ":path: /member/?a=member.account&m=getBalance",
-            ":scheme: https",
-            "accept: application/json, text/plain, */*1",
-            "accept-encoding: gzip, deflate, br",
-            "content-type: application/x-www-form-urlencoded",
-            "Cookie: ".trim($TzSystemsUsers->cookie),
-            "Origin:".str_replace('www.','',self::$baseUrl),
-            "Referer:".$TzSystemsUsers->ssc_domain."/main.html",
-            "content-length: ".strlen($post_data),
-            "sec-fetch-dest: empty",
-            "sec-fetch-mode: cors",
-            "sec-fetch-site: same-origin",
+            "Accept: */*",
+            "Accept-Encoding: gzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            "Cookie: ".'defaultLT='.self::$defaultLT.'; '.trim($TzSystemsUsers->cookie),
+            "Host:".str_replace('www.','',self::$domain),
+            "Referer:".$TzSystemsUsers->ssc_domain."/member/load?lottery=".self::$defaultLT."&page=lm",
+            "Sec-Fetch-Dest: empty",
+            "Sec-Fetch-Mode: cors",
+            "Sec-Fetch-Site: same-origin",
             $TzSystemsUsers->user_agent,
+            "X-Requested-With: XMLHttpRequest",
         ];
 
-        //$data = CurlService::httpGet($url, $headers);
-        $data = self::postCurl($url, $post_data, $headers);
+        $data = CurlService::httpGet($url, $headers);
+        //$data = self::postCurl($url, $post_data, $headers);
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'username'=>$TzSystemsUsers->username, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
+        p($logArr);
         Tool_Common::log('userInfo','INFO','幸运五星-用户信息4', $logArr);
         return $data;
     }
@@ -1693,7 +1759,7 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
         if (true OR curl_getinfo($ch, CURLINFO_HTTP_CODE) == 302) {
             preg_match("/Location:([^\r\n]*)/i", $response, $matches);
         }
-        $result = ['code'=>$code, 'Location'=>trim($matches[1])];
+        $result = ['code'=>$code, 'Location'=>'/'.trim(trim($matches[1]), '/')];
         if($isGetCookie){
             preg_match("/Location:([^\r\n]*)/i", $response, $matches1);
             $result['cookie'] = $matches1;
@@ -2109,6 +2175,46 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
     }
 
     /**
+     * @decription 获取远程html内容
+     * @param $url
+     */
+    public static function getCurlStep($url,$header=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        //$header = array_merge(self::$postHeaders,$header);
+        //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+
+        $data = curl_exec($ch);
+        $errno = curl_errno($ch);
+        $logArr = ['url'=>$url, 'errno'=>$errno, 'data'=>$data];////////////////p($logArr);
+        Tool_Common::log('getCurlStep', 'INFO', 'getCurlStep', $logArr);
+        if($errno>0) {
+            $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+            Tool_Common::log('getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'errno'=>$errno, 'postRst'=>$data, 'error'=>$str]);
+            if($errno == 52){
+                return ['Status'=>2, 'Data'=>'网盘网络超时，错误码52'];
+            }
+            return '';
+        }
+
+        return $data;
+    }
+
+    /**
      * @decription post请求根据，接受传递的header头
      * @param $url
      */
@@ -2200,7 +2306,7 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
 
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
-        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
+        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
         if($errno){
             if(isset($post_data['code']) && !empty($post_data['code']))$post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
