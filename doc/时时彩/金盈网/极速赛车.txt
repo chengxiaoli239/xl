@@ -38,8 +38,8 @@
         lottery: PK10JSC
 		_: 1607743507948
 		
-2.1、获取cookie 获取key
-A、General
+2.1、获取验证码和cookie 登陆1
+A、General   16077558986142
 	Request URL: https://5195312914-jy.cp168.ws/code?_=1607752135270
 	Request Method: GET
 B、Response Headers
@@ -68,20 +68,21 @@ C、Request Headers
 D、Query String Parameters  GET
 	_: 1607752135270
 
-2.2、登陆    登陆2
+2.2、登陆account password    登陆2
 cookie  2a29530a2306   9a7bfe6774fdbdd8a344a50c60524ab1140e176edf296295
 A、General
 	Request URL: https://5195312914-jy.cp168.ws/login
+	Request Method: POST
 B、Response Headers
 	c-Type: df
 	Cache-Control: no-cache
 	Connection: keep-alive
 	Content-Language: zh-CN
 	Content-Length: 0
-	Date: Sat, 12 Dec 2020 04:00:46 GMT
+	Date: Sat, 12 Dec 2020 08:28:19 GMT
 	Expires: Thu, 01 Jan 1970 00:00:01 GMT
-	Location: member/agreement?_OLID_=0abf73b35d20447ad6fa9516ffd5446e446f1aeb
-	rid: c2d42f0818aca97b75916c3fe9edf86b
+	Location: member/agreement?_OLID_=e8d99453433fb9be1b493464a156ae5073b852fc
+	rid: c690588ca9dd3798a1b95fb0c00e6f09
 	Server: now
 	Set-Cookie: 2a29530a2306=; Max-Age=0; Expires=Thu, 01-Jan-1970 00:00:10 GMT
 C、Request Headers
@@ -107,6 +108,77 @@ D、Form Data		POST
 	account: zhizong001
 	password: Asaa1111
 	code: 3409
+2.3 登陆之后获取cookie 登陆3 需要头
+A、General
+	Request URL: https://5195312914-jy.cp168.ws/member/agreement?_OLID_=e8d99453433fb9be1b493464a156ae5073b852fc
+	Request Method: GET
+B、Response Headers
+	c-Type: df
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Length: 0
+	Date: Sat, 12 Dec 2020 08:28:19 GMT
+	Expires: Thu, 01 Jan 1970 00:00:01 GMT
+	Location: /member/agreement
+	p3p: CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT"
+	rid: d9724b2e5e0fef8b842315d29c8ad564
+	Server: now
+	Set-Cookie: c6af995cba1f=e8d99453433fb9be1b493464a156ae5073b852fc; Max-Age=2592000; Expires=Mon, 11-Jan-2021 08:28:19 GMT; HttpOnly
+	Set-Cookie: token=e8d99453433fb9be1b493464a156ae5073b852fc; Domain=5195312914-jy.cp168.ws; Path=/; HttpOnly
+C、Request Headers
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Cache-Control: max-age=0
+	Connection: keep-alive
+	Cookie: defaultLT=PK10JSC; c6af995cba1f=516574b8c8343db0e9c88298d3ec1a5aa6889ad0; ssid1=81c70646bfa827bbeca0d1074176c6a2; random=654
+	Host: 5195312914-jy.cp168.ws
+	Referer: https://5195312914-jy.cp168.ws/login
+	Sec-Fetch-Dest: document
+	Sec-Fetch-Mode: navigate
+	Sec-Fetch-Site: same-origin
+	Sec-Fetch-User: ?1
+	Upgrade-Insecure-Requests: 1
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+D、Query String Parameters  GET
+	_OLID_=e8d99453433fb9be1b493464a156ae5073b852fc
+
+2.4 登陆  登陆4 返回头 需 存储
+A、General
+	Request URL: https://5195312914-jy.cp168.ws/ssid1?url=/member/agreement?_OLID_=fd93a3bb3daeb79d9cc3e86a66823c9c3d41431f   # 域名后面是上一步header返回 Location
+	Request Method: GET
+B、Response Headers
+	c-Type: df
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Length: 158
+	Content-Type: text/html
+	Date: Sat, 12 Dec 2020 12:24:47 GMT
+	Expires: Thu, 01 Jan 1970 00:00:01 GMT
+	Location: /member/agreement?_OLID_=fd93a3bb3daeb79d9cc3e86a66823c9c3d41431f
+	rid: 49ade8a29f56a1b03318dddf463dbc8f
+	Server: now
+	Set-Cookie: ssid1=b118b9107402b92a3e6277ec425676d6
+	Set-Cookie: random=2603
+C、Request Headers
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Cache-Control: max-age=0
+	Connection: keep-alive
+	Host: 5195312914-jy.cp168.ws
+	Referer: https://5195312914-jy.cp168.ws/login
+	Sec-Fetch-Dest: document
+	Sec-Fetch-Mode: navigate
+	Sec-Fetch-Site: same-origin
+	Sec-Fetch-User: ?1
+	Upgrade-Insecure-Requests: 1
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+D、Query String Parameters  GET
+	url=/member/agreement?_OLID_=fd93a3bb3daeb79d9cc3e86a66823c9c3d41431f
+
+
+
 
 3、同意
 A、General
@@ -140,10 +212,40 @@ C、Request Headers
 	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
 
 
-
-
-
-
+4、下注：
+A、General
+	Request URL: https://5195312914-jy.cp168.ws/member/bet
+	Request Method: POST
+B、Response Headers
+	c-Type: df
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Encoding: br
+	Content-Type: application/json;charset=UTF-8
+	Date: Sat, 12 Dec 2020 08:31:05 GMT
+	Expires: Thu, 01 Jan 1970 00:00:01 GMT
+	rid: 2431f77390e89dbaa5efa0ab2fe9e794
+	Server: now
+	Transfer-Encoding: chunked
+	Vary: Accept-Encoding
+C、Request Headers
+	Accept: */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 294
+	Content-Type: application/json
+	Cookie: c6af995cba1f=7585126340d6908d5f3e5abf0e4ad27482b94f35; defaultLT=AULUCKY10; ssid1=81c70646bfa827bbeca0d1074176c6a2; random=654; token=7585126340d6908d5f3e5abf0e4ad27482b94f35
+	Host: 5195312914-jy.cp168.ws
+	Origin: https://5195312914-jy.cp168.ws
+	Referer: https://5195312914-jy.cp168.ws/member/index
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+	X-Requested-With: XMLHttpRequest
+D、Request Payload
+   {"lottery":"AULUCKY10","drawNumber":"20754100","bets":[{"game":"DX2","contents":"D","amount":2,"odds":1.9838,"title":"亚军"},{"game":"DX3","contents":"D","amount":1,"odds":1.9838,"title":"第三名"},{"game":"DX4","contents":"D","amount":33,"odds":1.9838,"title":"第四名"}],"ignore":false}
 
 
 

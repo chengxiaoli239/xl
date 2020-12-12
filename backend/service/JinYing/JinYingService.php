@@ -92,7 +92,6 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
             //"Host:".str_replace('www.','',self::$domain),
             "Referer: ".str_replace('www.','',self::$baseUrl).'/',
         ];
-        self::$headers = array_unique(array_merge(self::$headers,$headers));
     }
 
     /**
@@ -122,12 +121,14 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
         self::$cookie = $TzSystemUser->cookie;
         \Yii::$app->params['baseUrl']  = $TzSystemUser->ssc_domain;
         \Yii::$app->params['domain']  = str_replace('http://','',$TzSystemUser->ssc_domain);
+        \Yii::$app->params['domain']  = str_replace('https://','',\Yii::$app->params['domain']);
         $tzSiteInfo = [
             'baseUrl' => $TzSystemUser->ssc_domain,
             'CANCEL_ORDER' => $baseUrl.'/Member/CancelMemberBet',
             'ORDER_TZ' => $baseUrl.'/Member/BatchBet',
             'SSC_INDEX' => $baseUrl,
             'domain' => \Yii::$app->params['domain'],
+            'host' => \Yii::$app->params['domain'],
             'MULBET_URL' => $baseUrl.'/Member/MultipleBet', # 下注接口
             'GetPeriodsQuery' => $baseUrl.'/api/Periods/GetPeriodsQuery',
             'INDEX' => $baseUrl.'/index.aspx',
@@ -873,39 +874,41 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
      */
     public static function getCookie($uid, $tz_system_id){
         self::__init($uid, $tz_system_id);
-        $m = \Yii::$app->cache;
-        $mkey = 'UPDATE_COOKIE_TIME_'.$uid.'_'.$tz_system_id;
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        //p($TzSystemsUsers);
-        //if(!$cookie = $m->get($mkey)){
-            //p(HN0898Service::getTzSiteInfo($tz_system_id));
-            # 1、预登录
-            $_t = microtime(true) * 10000;
-            $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/verifycode/generateCode.php';
-            if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
-            $headers = [
-                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-                'Accept-Encoding: gunzip, deflate',
-                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-                //$robot7_session_id,
-                'Upgrade-Insecure-Requests: 1',
-                'Proxy-Connection: keep-alive',
-                'Host: '.self::getTzSiteInfo($tz_system_id,'domain'),
-                'Cache-Control: max-age=0',
-                'Referer: '.$url,
-                $TzSystemsUsers->user_agent,
-            ];
-            $rst = self::postCurl($url, $headers);
-            if(!isset($rst['code']) OR $rst['code'] != 200){
-                return $rst;
-            }
-            $cookie = $rst['data'];
+        # 1、预登录
+        $_t = (int)(microtime(true) * 1000);
+        $urlArr = self::getTzSiteInfo($tz_system_id);
+        $url = $urlArr['baseUrl'].'/code?='.$_t;
+        if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
+        $headers = [
+            "Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+            "Accept-Encoding: gzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            //"Cookie: ssid1=81c70646bfa827bbeca0d1074176c6a2; random=654",
+            "Host: ".$urlArr['host'],
+            "Referer:".$TzSystemsUsers->ssc_domain."/login",
+            "Sec-Fetch-Dest: image",
+            "Sec-Fetch-Mode: no-cors",
+            "Sec-Fetch-Site: same-origin",
+            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36"
+        ];
+        //p(['urlArr'=>$urlArr, 'url'=>$url, 'headers'=>$headers]);
+        //$rst = self::postCurl($url, $headers);
+        $rst = self::getCookieAndDownLoadImg($url, $headers);
+        $cookiesArr = explode('=', trim($rst['cookie'][1]));
+        $cookies = ['key'=>$cookiesArr[0], 'val'=>$cookiesArr[1]];
+        $imgContent = $rst['imgContent'];
 
-            $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'cookie'=>$rst, 'url'=>$url, 'headers'=>$headers];
-            Tool_Common::log('getCookie','INFO','0898Cookie记录', $logArr);
-            $m->set($mkey, $cookie, 180);
-        //}
-        return ['status'=>200, 'data'=>$cookie];
+        $img_key = md5($cookies['val']);
+        $filename = Yii::$app->basePath . "/runtime/captcha/".$uid.'_'.$tz_system_id.'_'.$img_key.".png";
+        $tp = fopen($filename,"w");
+        fwrite($tp, trim($imgContent));
+        fclose($tp);
+        $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
+        Tool_Common::log('downLoadCodeImg','INFO','下载图片验证码', $logData);
+
+        return ['status'=>200, 'cookie_key'=>$cookies['key'], 'cookie_val'=>$cookies['val'], 'img_key'=>$img_key];
     }
 
     public static function getSessionId($url, $header){
@@ -1070,27 +1073,28 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
         $rst = false;
 
         # 第一步：获取cookie
-        $cookie_key = self::getCookie($uid,$tz_system_id);
-        if(!isset($cookie_key['status']) OR $cookie_key['status'] != 200) return $cookie_key;
+        $cookieData = self::getCookie($uid,$tz_system_id);
+        if(!isset($cookieData['status']) OR $cookieData['status'] != 200) return $cookieData;
 
-        # 第二步：下载验证码图片
-        self::downLoadCodeImg($uid, $tz_system_id, $cookie_key['data']);
+        # 第二步：下载验证码图片 getCookie 已经下注图片，此步骤忽略
+        //self::downLoadCodeImg($uid, $tz_system_id, $cookie_key['data']);
         //p([$uid, $tz_system_id, $cookie_key]);
         # 第三步：调验证码接口获取验证码
         //$captchaCode = '888888'; $rst = self::loginRemote($uid, $tz_system_id,$captchaCode); p($rst);  # 测试
-        $captchaCodeRst = Tools::getCaptchaCode($uid, $tz_system_id, md5($cookie_key['data']['seq']), $code_type = '1010'); # 真实调用验证码接口，收费
+        $captchaCodeRst = Tools::getCaptchaCode($uid, $tz_system_id, $cookieData['img_key']); # 真实调用验证码接口，收费
         //p([$captchaCodeRst, $cookie_key]);
         //$code = $captchaCode['result'];
-        if($cookie_key['status'] == 200){
+        if($cookieData['status'] == 200){
             # 第四步：账号、验证码登录
-            $verifyCode = self::getVerifyCodeByCaptchCodeRst($captchaCodeRst['code'], $cookie_key['data']['code']);
-            $rst = self::loginRemote($uid, $tz_system_id, array_merge($cookie_key['data'], ['verifyCode'=>$verifyCode]));
+            //$verifyCode = self::getVerifyCodeByCaptchCodeRst($captchaCodeRst['code'], $cookie_key['data']['code']);
+            $rst = self::loginRemote($uid, $tz_system_id, $cookieData, $captchaCodeRst['code']);
         }
 
         # 第二步：账号、验证码登录
         //$rst = self::loginRemote($uid, $tz_system_id);
         # 第三步：同意
-        //$rst = self::acceptAgreement($uid, $tz_system_id);
+        $rst = self::acceptAgreement($uid, $tz_system_id);
+        p(['rst1'=>$rst]);
 
         # 获取用户信息
         $rst = self::userInfo($uid, $tz_system_id);
@@ -1099,7 +1103,7 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
     }
 
     /**
-     * @desc 验证码获取对应顺序码
+     * @desc 验证码获取对应顺序码 - 冰岛验证码
      * @param $captchaCodeRst 例如： 1423768950
      * @param $code 例如：780
      * @return string 例如：469
@@ -1172,45 +1176,99 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
      * @param $code 验证码
      * @return mixed|string
      */
-    private static function loginRemote($uid, $tz_system_id, $codeData){
+    private static function loginRemote($uid, $tz_system_id, $cookieData, $code = ''){
+        if(empty($code)) return ['status'=>300, 'msg'=>'验证码为空'];
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
         if(!$TzSystemsUsers) return ['status'=>300, 'msg'=>'账号或者密码不能为空'];
 
-        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/member/?a=member.login&m=memberLogin';
+        $urlArr = self::getTzSiteInfo($tz_system_id);
+        $url = $urlArr['SSC_INDEX'].'/login';
         $post_data = [
-            'accountName' => $TzSystemsUsers->account,
+            'type' => 1,
+            'account' => $TzSystemsUsers->account,
             'password' => $TzSystemsUsers->password,
-            'verifyCode' => $codeData['verifyCode'],
-            'seq' => $codeData['seq'],
-            'deviceType' => 1,
-            'code' => $codeData['code'],
+            'code' => $code,
         ];
-        $post_data = http_build_query($post_data);
-        $headers = [
-            "accept: application/json, text/plain, */*",
-            "accept-encoding: gunzip, deflate, br",
-            "accept-language: zh-CN,zh;q=0.9,en;q=0.8",
-            "content-type: application/x-www-form-urlencoded",
-            "Content-Length:".strlen($post_data),
+        $commonHeaders = [
+            "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            "Accept-Encoding: gzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Cache-Control: max-age=0",
+            "Connection: keep-alive",
+
+            "Sec-Fetch-Dest: document",
+            "Sec-Fetch-Mode: navigate",
+            "Sec-Fetch-Site: same-origin",
+            "Sec-Fetch-User: ?1",
+            "Upgrade-Insecure-Requests: 1",
+            "Host: ".$urlArr['host'],
             "Origin:".str_replace('www.','',self::$baseUrl),
-            "Referer:".$TzSystemsUsers->ssc_domain,
-            "sec-fetch-dest: empty",
-            "sec-fetch-mode: cors",
-            "sec-fetch-site: same-origins",
+            "Referer:".$TzSystemsUsers->ssc_domain.'/login',
             $TzSystemsUsers->user_agent,
         ];
+        $setCookies = [];
+        $post_data = http_build_query($post_data);
+        $loginHeaders = [
+            "Content-Length:".strlen($post_data),
+            "Content-Type: application/x-www-form-urlencoded",
+            "Cookie: ".$cookieData['cookie_key']."=".$cookieData['cookie_val'],
+        ];
+        $status = 300;
+        $loginRst = self::postCurlLogin($url, $post_data, $loginHeaders);
+        p(['url'=>$url, 'loginHeaders'=>$loginHeaders, 'post_data'=>$post_data, 'loginRst'=>$loginRst, 'code'=>$code],0);
+        if(isset($loginRst['code']) && $loginRst['code'] == 200){
+            $token = end(explode('=', $loginRst['Location']));
+            $setCookies['token'] = 'token='.$token;
+            # 登陆成功获取cookie
+            $url = $TzSystemsUsers->ssc_domain.'/'.$loginRst['Location'];
+            $agreeHeaders = array_merge($commonHeaders, [
+                "Cookie: defaultLT=PK10JSC; c6af995cba1f=".$token,//."; ssid1=81c70646bfa827bbeca0d1074176c6a2; random=654",
+            ]);
+            //$cookieData = self::getCookieAndAgree($url, $agreeHeaders);
+            $agreeRst = self::getCurlLogin($url, $agreeHeaders);
+            p(['url'=>$url, 'agreeHeaders'=>$agreeHeaders, 'agreeRst'=>$agreeRst],0);
+            if($agreeRst['code'] == 200){
+                $url = $TzSystemsUsers->ssc_domain.'/'.$agreeRst['Location'];
+                $ssidHeaders = array_merge($commonHeaders, [
+                    "Host: ".$urlArr['host'],
+                    "Referer:".$TzSystemsUsers->ssc_domain.'/login',
+                ]);
+                $ssidRst = self::getCurlLogin($url, $ssidHeaders, $isGetCookie = 1);
+                p(['url'=>$url, 'ssidHeaders'=>$ssidHeaders, 'ssidRst'=>$ssidRst],0);
+                if($ssidRst['code'] == 200){
+                    $setCookies['ssid1'] = 'ssid1='.$ssidRst['cookie']['ssid1'][1];
+                    $setCookies['random'] = 'random='.$ssidRst['cookie']['random'][1];
+                    $url = $TzSystemsUsers->ssc_domain.'/'.$ssidRst['Location'];
+                    $agreementHeaders = array_merge($commonHeaders, [
+                        //"Cookie: defaultLT=AULUCKY10; c6af995cba1f=ed8c589736e647f47ca34696a6d1e32ee72f8dfc; ssid1=b118b9107402b92a3e6277ec425676d6; random=2603",
+                        "Cookie: ".implode('; ', $setCookies),
+                    ]);
+                    $agreementRst = self::getCurlLogin($url, $agreementHeaders, $isGetCookie = 2);
+                    p(['url'=>$url, 'agreementHeaders'=>$agreementHeaders, 'agreementRst'=>$agreementRst, 'setCookies'=>$setCookies], 0);
+                    if($agreementRst['code'] == 200){
+                        $status = 200;
+                        $setCookies['xxx'] = current(explode(';', $agreementRst['cookie']['xxx'][1]));
+                        $setCookies['token'] = current(explode(';', $agreementRst['cookie']['token'][1]));
 
-        $data = self::postCurl($url, $post_data, $headers);
-        if(isset($data['code']) && $data['code'] == 200){
-            $TzSystemsUsers->cookie = $data['data']['apiKey'];
-            $TzSystemsUsers->balance = $data['data']['userInfo']['balance'];
-            $TzSystemsUsers->save();
+                        $url = $TzSystemsUsers->ssc_domain.'/'.str_replace('//', '/', $ssidRst['Location']);
+                        $endAgreeHeaders = array_merge($commonHeaders, [
+                            "Cookie: ".implode('; ', $setCookies),
+                        ]);
+                        $endAgreementRst = self::getCurlLogin($url, $endAgreeHeaders);
+                        p(['url'=>$url, 'endAgreementRst'=>$endAgreementRst, 'agreementRst'=>$endAgreeHeaders, 'setCookies'=>$setCookies]);
+
+                    }
+                }
+
+                if($status == 200){
+                    $TzSystemsUsers->cookie = implode(';', $setCookies);
+                    $TzSystemsUsers->save();
+                }
+            }
         }
-        //sleep(10);
-        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data, 'codeData'=>$codeData];
+        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers, 'setCookies'=>$setCookies, 'code'=>$code];
         Tool_Common::log('loginRemote','INFO','0898登陆记录', $logArr);
         return $data;
     }
@@ -1592,52 +1650,120 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
      * @decription post请求根据，接受传递的header头
      * @param $url
      */
-    public static function postCurl($url,$post_data = [],$headers=[]){
+    public static function postCurlLogin($url,$post_data = [],$headers=[], $isGetCookie = 0){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
-        if(!$timeout) $timeout = 15;
+        if(!$timeout) $timeout = 30;
+        $timeout = 5;
 
         $ch = curl_init();
-
         curl_setopt($ch, CURLOPT_URL, $url);
 
         // 设置浏览器的特定header
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["content-type:  application/x-www-form-urlencoded"]);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        curl_setopt($ch, CURLOPT_HTTP_VERSION, 2);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+        //$poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect 返回header 必需注释掉
+        curl_setopt($ch, CURLOPT_HEADER, TRUE);    //表示需要response header
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
-        $data = curl_exec($ch);
-        $errno = curl_errno( $ch );
 
-        //if(strpos($url, 'memberLogin') !== false)p($data);//{$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'error'=>curl_error($ch)]; p($logArr);}
+        $start_time = microtime(true);
+        $response = curl_exec($ch);
+        $end_time = microtime(true);
+        $time_consume = ($end_time-$start_time).'s';
+        //p($content);
+        $errno = curl_errno($ch);
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$content, 'errno'=>$errno]; p($logArr);
         if($errno){
-            if(isset($post_data['code']) && !empty($post_data['code']))$post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
-            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+            $code = 300;
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$response, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
+        }else{
+            $code = 200;
         }
 
-        //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,,$errno]); }
-        if(curl_close($ch)) {
-            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+        # ================= xCsrf token start =====================
+        if (true OR curl_getinfo($ch, CURLINFO_HTTP_CODE) == 302) {
+            preg_match("/Location:([^\r\n]*)/i", $response, $matches);
         }
-        if($data == 'ok'){
-            return 'ok';
+        $result = ['code'=>$code, 'Location'=>trim($matches[1])];
+        if($isGetCookie){
+            preg_match("/Location:([^\r\n]*)/i", $response, $matches1);
+            $result['cookie'] = $matches1;
         }
-        //if(strpos($url, 'memberLogin') !== false)p(['data1'=>substr($data,1), 'data2'=>substr($data,2), 'data3'=>substr($data,3), 'ddata'=>json_decode(substr($data, 1))]);//{$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'error'=>curl_error($ch)]; p($logArr);}
-        if(!BaseService::is_json($data)){
-            $data = substr($data,3);
-        }
-        $rstData = json_decode($data, true); # data : {"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}
-        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'rstData'=>$rstData, 'errno'=>$errno];
-        Tool_Common::log('postCurl','INFO','httpPost请求', $logArr);
-        //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
+        //p(['conten'=>$response, 'match'=>$matches, 'code'=>curl_getinfo($ch, CURLINFO_HTTP_CODE), 'time_consume'=>$time_consume, 'errno'=>$errno]);
+        # ================= xCsrf token start =====================
 
-        return $rstData;
+        return $result;
+    }
+
+    /**
+     * @decription post请求根据，接受传递的header头
+     * @param $url
+     */
+    public static function getCurlLogin($url, $headers=[], $isGetCookie = 0){
+        $timeout = 5;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+        //$poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+
+        //设置post方式提交
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect 返回header 必需注释掉
+        curl_setopt($ch, CURLOPT_HEADER, TRUE);    //表示需要response header
+
+        $start_time = microtime(true);
+        $response = curl_exec($ch);
+        $end_time = microtime(true);
+        $time_consume = ($end_time-$start_time).'s';
+        //p($content);
+        $errno = curl_errno($ch);
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$content, 'errno'=>$errno]; p($logArr);
+        if($errno){
+            $code = 300;
+            $logArr = ['url'=>$url, 'header'=>$headers, 'rst'=>$response, 'errno'=>$errno];
+            //p($logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
+        }else{
+            $code = 200;
+        }
+
+        # ================= xCsrf token start =====================
+        if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 302) {
+            preg_match("/Location:([^\r\n]*)/i", $response, $matches);
+        }
+        $result = ['code'=>$code, 'Location'=>trim($matches[1])];
+        if($isGetCookie == 1){
+            preg_match("/Set\-Cookie: ssid1\=([^\r\n]*)/i", $response, $matches1);
+            preg_match("/Set\-Cookie: random\=([^\r\n]*)/i", $response, $matches2);
+            $result['cookie']['ssid1'] = $matches1;
+            $result['cookie']['random'] = $matches2;
+        }elseif($isGetCookie == 2){
+            preg_match("/Set\-Cookie: ([^\r\n]*)/i", $response, $matches1);
+            $result['cookie']['xxx'] = $matches1;
+            preg_match("/Set\-Cookie: token\=([^\r\n]*)/i", $response, $matches2);
+            $result['cookie']['token'] = $matches1;
+
+        }
+        //p(['conten'=>$response, 'match'=>$matches, 'code'=>curl_getinfo($ch, CURLINFO_HTTP_CODE), 'time_consume'=>$time_consume, 'errno'=>$errno]);
+        # ================= xCsrf token start =====================
+
+        return $result;
     }
 
     /**
@@ -1848,6 +1974,102 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
     }
 
     /**
+     * @desc 获取登陆cookie和下载验证码图片
+     * @param $url
+     * @param array $header
+     * @return mixed
+     */
+    public static function getCookieAndDownLoadImg($url, $header=[], $getImage = 1){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,1); # 表示需要返回headers
+        $content = curl_exec($ch);
+
+        $result = [];
+        # ================= xCsrf token start =====================
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($code == 200) {
+            $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $header = substr($content, 0, $headerSize);
+            preg_match("/Set\-Cookie:([^\r\n]*)/i", $header, $matches);
+
+            $body = substr($content, $headerSize);
+            //p(['header'=>$header, 'matches'=>$matches, 'body'=>$body]);
+            $result['cookie'] = $matches;
+
+            $getImage == 1 && ($result['imgContent'] = $body);
+        }
+        $result['code'] = $code;
+        # ================= xCsrf token start =====================
+
+        return $result;
+    }
+
+    /**
+     * @desc 获取登陆cookie和下载验证码图片
+     * @param $url
+     * @param array $header
+     * @return mixed
+     */
+    public static function getCookieAndAgree($url, $headers=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+        //$poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+
+        //设置post方式提交
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect 返回header 必需注释掉
+        curl_setopt($ch, CURLOPT_HEADER, TRUE);    //表示需要response header
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+        $start_time = microtime(true);
+        $response = curl_exec($ch);
+        $end_time = microtime(true);
+        $time_consume = ($end_time-$start_time).'s';
+
+        $result = [];
+        # ================= xCsrf token start =====================
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($code == 200) {
+            $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $header = substr($content, 0, $headerSize);
+            preg_match("/Set\-Cookie:([^\r\n]*)/i", $header, $matches);
+
+            $body = substr($content, $headerSize);
+            //p(['header'=>$header, 'matches'=>$matches, 'body'=>$body]);
+            $result['cookie'] = $matches;
+        }else{
+            $code = 300;
+        }
+        $result['code'] = $code;
+        # ================= xCsrf token start =====================
+
+        return $result;
+    }
+
+    /**
      * @decription 获取远程html内容
      * @param $url
      */
@@ -1900,88 +2122,110 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
         curl_setopt($ch, CURLOPT_URL, $url);
 
         // 设置浏览器的特定header
-        //curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["content-type:  application/x-www-form-urlencoded"]);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);//设置超时限制，防止死循环
 
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+
+        curl_setopt($ch, CURLOPT_HEADER, 1); #
+
+        //$poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+
+        //设置post方式提交
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER, TRUE);    //表示需要response header
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+        $start_time = microtime(true);
+        $content = curl_exec($ch);
+        $end_time = microtime(true);
+        //d($data);
+        $errno = curl_errno($ch);
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
+        if($errno){
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$content, 'errno'=>$errno];
+            //p($logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
+        }
+
+        # ================= xCsrf token start =====================
+        if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == '200') {
+
+            $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $header = substr($content, 0, $headerSize);
+
+            preg_match("/X\-Csrf\-Index:([^\r\n]*)/i", $header, $matches1);
+            preg_match("/X\-Csrf\-Token:([^\r\n]*)/i", $header, $matches2);
+
+            $body = substr($content, $headerSize);
+            $result['rstData'] = json_decode($body, true);
+
+            $result['xCsrf'] = ['Index'=>trim($matches1[1]), 'Token'=>trim($matches2[1])];
+        }
+        # ================= xCsrf token start =====================
+
+        return $result;
+    }
+
+    /**
+     * @decription post请求根据，接受传递的header头
+     * @param $url
+     */
+    public static function postCurl($url,$post_data = [],$headers=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        if(!$timeout) $timeout = 15;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
-
-        if(strpos($url, 'ww662889') !== false){
-            //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
-        }
-
-        //$poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER,0);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
 
-        Tool_Common::log('postBetCurl_rst','INFO','httpPost下注请求-冰岛', ['start'=>1]);
-        $start_time = microtime(true);
         $data = curl_exec($ch);
-        if(!BaseService::is_json($data)){
-            $data = substr($data,3);
-        }
-        $end_time = microtime(true);
-        $time_consume = ($end_time-$start_time).'s';
-        //d($data);
         $errno = curl_errno( $ch );
         //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
         if($errno){
+            if(isset($post_data['code']) && !empty($post_data['code']))$post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
         }
 
-        //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
+        //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,,$errno]); }
+        if(curl_close($ch)) {
+            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+        }
+        if($data == 'ok'){
+            return 'ok';
+        }
         $rstData = json_decode($data, true); # data : {"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}
-        Tool_Common::log('postBetCurl_rst','INFO','httpPost下注请求-冰岛', ['end'=>1, 'data'=>$data, 'rstData'=>$rstData, 'time_consume'=>$time_consume]);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
         if(strpos($data, "\"Status\":1") !== false && strpos($data, "\"CompletedStatus\":1") !== false){ # json解析异常处理
             $rstData['Status'] = 1;
         }
-        if(is_array($data)){
-            $data_type = 'array';
-        }
-        if(BaseService::is_json($data)){
-            $data_type = 'json';
-        }
 
-        if(strpos($data, '余额不足') !== false OR $rstData['code'] == 101){
-            $rstData = ["Status"=>0, 'code'=>302, 'msg'=>'余额不足'];
-        }elseif(strpos($data, '登录') !== false OR strpos($data, 'Bad Gateway') !== false OR strpos($data, 'Object moved') !== false){
-            $rstData = ["Status"=>0, 'code'=>303, 'msg'=>'请重新登录'];
-        }elseif(strpos($data, '短时间内重复提交') !== false){
-            $rstData = ["Status"=>0, 'code'=>304, 'msg'=>'短时间内重复提交'];
-        }elseif(strpos($data, '已关盘') !== false){
-            $rstData = ["Status"=>0, 'code'=>305, 'msg'=>'已关盘'];
-        }elseif(strpos($data, '维护中') !== false){
-            $rstData = ["Status"=>0, 'code'=>306, 'msg'=>'系统线路维护中'];
-        }elseif($errno>0){
-            $rstData = ["Status"=>0, 'code'=>309, 'errno'=>$errno, 'msg'=>'网络超时'];
-        }elseif(strpos($data, '停押') !== false){
-            $rstData = ["Status"=>0, 'code'=>307, 'msg'=>'您的账号已被停押'];
-        }else{
-            $flag = 1;
-            $rstData = json_decode($data, TRUE);
-            if(empty($rstData)){
-                $rstData = json_decode($data, true);
-            }
+        if(strpos($data, '余额不足')){
+            $rstData['Status'] = 0;
         }
-        if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306])){
-            if(isset($post_data['bet_number']) && strlen($post_data['bet_number'])>200) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 300);
-            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
-            Tool_Common::log('httpPostError','INFO','httpPost请求-冰岛-1', $logArr);
-        }
-        //$rstData['errno'] = $errno;
-        $logArr = ['url'=>$url, 'headers'=>$headers, 'data'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr, 'rstData'=>$rstData, 'data_type'=>$data_type, 'flag'=>$flag];
-        Tool_Common::log('postBetCurl','INFO','httpPost下注请求-冰岛-all', $logArr);
+        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+        Tool_Common::log('postCurl','INFO','httpPost请求', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
         return $rstData;

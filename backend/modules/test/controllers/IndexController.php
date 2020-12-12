@@ -17,6 +17,7 @@ use backend\modules\kj\controllers\BingDaoController;
 use backend\service\BetService;
 use backend\service\ChatCommonBetService;
 use backend\service\huiyuan\HuiYuanService5;
+use backend\service\JinYing\JinYingService;
 use backend\service\Juhua\JuHuaBaseService;
 use backend\service\KuaiLe8Service;
 use backend\service\Lucky5\LuckyBaseService;
@@ -195,7 +196,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-
+        set_time_limit(0);
+        $rst = JinYingService::login('18', '15');p($rst);
         $rst['rst'] = BaseService::synBalance($tz_system_users_id=66);p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 1); p($rst);// 更新单双遗漏
         $rst = HN0898Service::insertDsYl($lottery_type = 1);p($rst); # 七星彩单双
