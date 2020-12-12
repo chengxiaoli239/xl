@@ -85,12 +85,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->info;
                             }
                         ],
-                        ['attribute'=>'status', 'label'=>'操作',#'headerOptions'=>['width'=>'5%'],
+                        ['attribute'=>'status', 'label'=>'操作','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value'=>function($model){
                                 $url1 = '/forum/lottery-type/init-lottery'; # 路由
-                                $txt = "<button data-url='".$url1."' color='green' data-lottery-type='".$model->lottery_type."' class='button btn-success act-execute'>初始化</button>" ;
-                                return Html::a($txt, 'javascript:;', ['title' => '点击执行']);
+                                $txt = "<button data-url='".$url1."' color='green' data-lottery-type='".$model->lottery_type."' class='min-button btn-info btn-xs act-execute'>初始化</button>" ;
+                                return Html::a($txt, 'javascript:;', ['title' => '点击执行，新加彩种初始化']);
                             }
                         ],
                         //'onGetNoed',
@@ -121,7 +121,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
-<div class="modal fade" id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+<div class="modal fade" id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="max-height: 500px;margin-top: 100px;">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -138,7 +138,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 </form>
             </div>
             <div class="modal-footer">
-                <button id="copyBarcodes" type="button" class="btn btn-primary">复制链接</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
             </div>
         </div>
@@ -153,8 +152,8 @@ $(function () {
         lottery_type = $(this).data('lottery-type');
         console.log(domain)
         $.post(url, {lottery_type: lottery_type}, function (rst) {
-            $('#rst_code').text(JSON.stringify(rst, null, ' '))
-            //$('#push_content').text('curl ' + domain + url)
+            $('#rst_code').text(JSON.stringify(rst.rstData, null, ' '))
+            $('#push_content').text(JSON.stringify(rst.post, null, ' '))
             $('#exampleModal_msg').modal('show');
         });
     });

@@ -97,9 +97,12 @@ class LotteryTypeController extends BaseController
     public function actionInitLottery(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
-        $rst = SystemService::initLottery($post['lottery_type']);
+        $rstData = SystemService::initLottery($post['lottery_type']);
+        $rst['rstData'] = $rstData;
+        $rst['post']['post_url'] = 'http://'.\Yii::$app->request->hostName.'/forum/lottery-type/init-lottery';
+        $rst['post']['post_data'] = $post;
 
-        return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$rst['lottery_type']]);
+        return $rst;
     }
 
     /**

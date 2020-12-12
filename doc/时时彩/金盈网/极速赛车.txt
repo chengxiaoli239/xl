@@ -1,0 +1,162 @@
+﻿域名：
+    https://5195312914-jy.cp168.ws/
+
+    A、General
+    B、Response Headers
+    C、Request Headers
+    D、Form Data		POST
+	D、Query String Parameters  GET
+1、开奖号码抓取
+    A、General
+        https://5195312914-jy.cp168.ws/member/lastResult?lottery=PK10JSC&_=1607743507948
+	B、Response Headers
+		c-Type: df
+		Cache-Control: no-cache
+		Connection: keep-alive
+		Content-Encoding: gzip
+		Content-Type: application/json;charset=UTF-8
+		Date: Sat, 12 Dec 2020 03:46:35 GMT
+		Expires: Thu, 01 Jan 1970 00:00:01 GMT
+		rid: 17c28da378fdba68f876b5b03c0980bd
+		Server: now
+		Transfer-Encoding: chunked
+    C、Request Headers
+        Accept: */*
+		Accept-Encoding: gzip, deflate, br
+		Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+		Connection: keep-alive
+		Cookie: c6af995cba1f=2459a362c3e37e7d4ad44904c6d9efa66b4ae9cd; defaultLT=PK10JSC; ssid1=1a5daceb2b0af467f27330f129a72908; random=3147; token=2459a362c3e37e7d4ad44904c6d9efa66b4ae9cd
+		Host: 5195312914-jy.cp168.ws
+		Referer: https://5195312914-jy.cp168.ws/member/index
+		Sec-Fetch-Dest: empty
+		Sec-Fetch-Mode: cors
+		Sec-Fetch-Site: same-origin
+		User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+		X-Requested-With: XMLHttpRequest
+        X-Requested-With:XMLHttpRequest
+    D、Query String Parameters
+        lottery: PK10JSC
+		_: 1607743507948
+		
+2.1、获取cookie 获取key
+A、General
+	Request URL: https://5195312914-jy.cp168.ws/code?_=1607752135270
+	Request Method: GET
+B、Response Headers
+	c-Type: df
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Date: Sat, 12 Dec 2020 05:48:55 GMT
+	Expires: Thu, 01 Jan 1970 00:00:01 GMT
+	Pragma: No-cache
+	rid: fb355a614191e35684c122323be820a1
+	Server: now
+	Set-Cookie: 2a29530a2306=584fa35ea74b8955c21098de49b9047af3f1043dc12fff5d
+	Transfer-Encoding: chunked
+C、Request Headers
+	Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Cookie: ssid1=81c70646bfa827bbeca0d1074176c6a2; random=654
+	Host: 5195312914-jy.cp168.ws
+	Referer: https://5195312914-jy.cp168.ws/login
+	Sec-Fetch-Dest: image
+	Sec-Fetch-Mode: no-cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+D、Query String Parameters  GET
+	_: 1607752135270
+
+2.2、登陆    登陆2
+cookie  2a29530a2306   9a7bfe6774fdbdd8a344a50c60524ab1140e176edf296295
+A、General
+	Request URL: https://5195312914-jy.cp168.ws/login
+B、Response Headers
+	c-Type: df
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Language: zh-CN
+	Content-Length: 0
+	Date: Sat, 12 Dec 2020 04:00:46 GMT
+	Expires: Thu, 01 Jan 1970 00:00:01 GMT
+	Location: member/agreement?_OLID_=0abf73b35d20447ad6fa9516ffd5446e446f1aeb
+	rid: c2d42f0818aca97b75916c3fe9edf86b
+	Server: now
+	Set-Cookie: 2a29530a2306=; Max-Age=0; Expires=Thu, 01-Jan-1970 00:00:10 GMT
+C、Request Headers
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Cache-Control: max-age=0
+	Connection: keep-alive
+	Content-Length: 53
+	Content-Type: application/x-www-form-urlencoded
+	Cookie: 2a29530a2306=9a7bfe6774fdbdd8a344a50c60524ab1140e176edf296295
+	Host: 5195312914-jy.cp168.ws
+	Origin: https://5195312914-jy.cp168.ws
+	Referer: https://5195312914-jy.cp168.ws/login
+	Sec-Fetch-Dest: document
+	Sec-Fetch-Mode: navigate
+	Sec-Fetch-Site: same-origin
+	Sec-Fetch-User: ?1
+	Upgrade-Insecure-Requests: 1
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+D、Form Data		POST
+	type: 1
+	account: zhizong001
+	password: Asaa1111
+	code: 3409
+
+3、同意
+A、General
+	Request URL: https://5195312914-jy.cp168.ws/member/index
+	Request Method: GET
+B、Response Headers
+	c-Type: df
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Encoding: gzip
+	Content-Language: zh-CN
+	Content-Type: text/html;charset=UTF-8
+	Date: Sat, 12 Dec 2020 04:06:08 GMT
+	Expires: Thu, 01 Jan 1970 00:00:01 GMT
+	rid: 8d00af53f1888fe6aabd00def11aa041
+	Server: now
+	Transfer-Encoding: chunked
+C、Request Headers
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Cookie: defaultLT=PK10JSC; c6af995cba1f=516574b8c8343db0e9c88298d3ec1a5aa6889ad0; ssid1=d808df16559c2803c5ec5f80420a6c76; random=6626; token=516574b8c8343db0e9c88298d3ec1a5aa6889ad0
+	Host: 5195312914-jy.cp168.ws
+	Referer: https://5195312914-jy.cp168.ws/member/agreement
+	Sec-Fetch-Dest: document
+	Sec-Fetch-Mode: navigate
+	Sec-Fetch-Site: same-origin
+	Sec-Fetch-User: ?1
+	Upgrade-Insecure-Requests: 1
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
