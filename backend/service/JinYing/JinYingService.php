@@ -1442,16 +1442,19 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
 
         $_t = (int)(microtime(true) * 1000);
         $urlArr = self::getTzSiteInfo($tz_system_id);//.'/member/?a=member.account&m=getBalance';
-        $url = $urlArr['baseUrl'].'/member/accounts?_='.$_t;
+        //$url = $urlArr['baseUrl'].'/member/accounts?_='.$_t;
+        $url = $urlArr['baseUrl'].'/member/notice?_='.$_t;
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
         $headers = [
             "Accept: */*",
             "Accept-Encoding: gzip, deflate, br",
             "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
             "Connection: keep-alive",
-            "Cookie: ".'defaultLT='.self::$defaultLT.'; '.trim($TzSystemsUsers->cookie),
+            //"Cookie: ".'defaultLT='.self::$defaultLT.'; '.trim($TzSystemsUsers->cookie),
+            "Cookie: ".trim($TzSystemsUsers->cookie),
             "Host:".str_replace('www.','',self::$domain),
-            "Referer:".$TzSystemsUsers->ssc_domain."/member/load?lottery=".self::$defaultLT."&page=lm",
+            //"Referer:".$TzSystemsUsers->ssc_domain."/member/load?lottery=".self::$defaultLT."&page=lm",
+            "Referer:".$TzSystemsUsers->ssc_domain."/member/index",
             "Sec-Fetch-Dest: empty",
             "Sec-Fetch-Mode: cors",
             "Sec-Fetch-Site: same-origin",
@@ -1463,7 +1466,7 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
         //$data = self::postCurl($url, $post_data, $headers);
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'username'=>$TzSystemsUsers->username, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         p($logArr);
-        Tool_Common::log('userInfo','INFO','幸运五星-用户信息4', $logArr);
+        Tool_Common::log('userInfo','INFO','金盈网-用户信息4', $logArr);
         return $data;
     }
 

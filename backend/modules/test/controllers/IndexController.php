@@ -196,6 +196,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = PoxyIPService::getPoxyIp($is_auto = 0);p($rst);
         set_time_limit(0);
         $rst = JinYingService::getBalance('18', '15');p($rst);
         $rst = JinYingService::login('18', '15');p($rst);
@@ -309,7 +310,6 @@ class IndexController extends Controller
         //system('/tmp/cron/test.sh');p('xx');
 
         $id = 45; $rst = BaseService::login($id);p($rst);
-        $rst = PoxyIPService::getPoxyIp($is_auto = 0);p($rst);
         $s = 0; if(empty($s))p('xx');else p('yy');
         $str = '1234   3346 1267 9021
         2356

@@ -1,6 +1,7 @@
 <?php
 namespace backend\service;
 
+use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use  yii;
 
@@ -46,14 +47,25 @@ class PoxyIPService extends BaseService {
     public static function getPoxyIp($is_auto = 1){
         //return ['171.83.165.196', '20000'];
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        if($POXY_STATUS == 0){
+        if($POXY_STATUS == 0 && $is_auto == 1){
             # CURL 代理开关
             return [];
         }
+
+        $redis_key = 'KUAI_POXY_API_KEY';
+        $lock_sec = 2; # 锁2秒
+        $redisLock = new RedisLock();
+        if(!$redisLock->lock($redis_key, 1)) {
+            sleep(1);
+        }
+
         $m = \Yii::$app->cache;
         $time = 3600 * 4;
         $mkey = self::builProxyIpKey();
         if($is_auto == 1 && !$poxy_ip_data = $m->get($mkey)){
+            if(!$redisLock->lock($redis_key, $lock_sec)) {
+                sleep(2);
+            }
             $data = self::kuaiPoxy();
             if($data['status'] != 200) {
                 return [];
@@ -63,25 +75,22 @@ class PoxyIPService extends BaseService {
         }else{
             $flag = self::isValid([$poxy_ip_data]);
             if($flag === false){
-                # 并发控制
-                $mkey_lock = 'lock_getPoxyIp';
-                $mcLock = new  McLockService();
-
-                if($flag = $mcLock->isLock($mkey_lock)){
+                if(!$redisLock->lock($redis_key, $lock_sec)) {
                     sleep(2);
-                    return self::getPoxyIp();
                 }
-                $mcLock->Lock($mkey_lock);
-
                 $data = self::kuaiPoxy();
                 $poxy_ip_data = $data['data'][0];
                 $m->set($mkey, $poxy_ip_data, $time);
             }elseif(empty($flag)){
+                if(!$redisLock->lock($redis_key, $lock_sec)) {
+                    sleep(2);
+                }
                 $v_mkey = 'KUAI_POXYIP_ValidTime';
                 if($m->get($v_mkey)) return self::getPoxyIp();
                 $rst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
                 if($rst['status'] != 200 OR $rst['data'][$poxy_ip_data] < 5*60){
                     # 调用失败或者可使用时间少于5分钟则认为IP失效
+
                     $data = self::kuaiPoxy();
                     if($data['status'] != 200) {
                         return [];

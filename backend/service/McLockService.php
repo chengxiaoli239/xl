@@ -23,7 +23,7 @@ class McLockService extends BaseService {
             $flag = false;
             try{
                 $flag = $this->mc->add($mkey, 1, $expire);
-            }catch(Exception $e){
+            }catch(\Exception $e){
                 $flag = false;
                 //log
             }

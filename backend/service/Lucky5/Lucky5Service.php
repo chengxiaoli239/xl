@@ -2019,7 +2019,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }
         $rstData['errno'] = $errno;
         $time_consume = ($end_time-$start_time).'s';
-        $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
+        $logArr = ['uid'=>$uid, 'url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
         Tool_Common::log('postBetCurl','INFO','httpPost下注请求-5', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
