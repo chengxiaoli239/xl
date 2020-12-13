@@ -1851,11 +1851,17 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 if($f = $m->get($mkey)){
                     return ['status'=>300, 'msg'=>'已经重复登录过一次'];
                 }
-                if(in_array($rst[$key]['code'], [303, 309])){ # 判断掉线登录一次
-                    if($rst[$key]['errno']>0){
+                if(in_array($rst[$key]['code'], [303, 309, 310])){ # 判断掉线登录一次，再下注一次
+                    if($rst[$key]['errno']>0 OR $rst[$key]['code'] == 310){
                         $m = \Yii::$app->cache;
-                        $mkey_proxy = PoxyIPService::builProxyIpKey();
-                        $m->delete($mkey_proxy);
+                        $mkey_310 = 'has_jinyong_ip_310'; # 您当前使用的浏览器不支持cookie，换一次代理ip
+                        $m->set($mkey_310,1, 60);
+                        if($rst[$key]['code'] == 310 && $m->get($mkey_310)){
+
+                        }else{
+                            $mkey_proxy = PoxyIPService::builProxyIpKey();
+                            $m->delete($mkey_proxy);
+                        }
                     }
                     BaseService::login($TzSystemsUsers->id);
                     $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
@@ -2000,6 +2006,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $rstData = ["Status"=>0, 'code'=>309, 'errno'=>$errno, 'msg'=>'网络超时'];
         }elseif(strpos($data, '停押') !== false){
             $rstData = ["Status"=>0, 'code'=>307, 'msg'=>'您的账号已被停押'];
+        }elseif(strpos($data, '您当前使用的浏览器不支持cookie') !== false){
+            $rstData = ["Status"=>0, 'code'=>310, 'msg'=>'您当前使用的浏览器不支持cookie'];
         }else{
             $rstData = json_decode($data, TRUE);
         }
@@ -2011,7 +2019,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $rstData['errno'] = $errno;
         $time_consume = ($end_time-$start_time).'s';
         $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
-        Tool_Common::log('postBetCurl','INFO','httpPost下注请求-4', $logArr);
+        Tool_Common::log('postBetCurl','INFO','httpPost下注请求-5', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
         return $rstData;
