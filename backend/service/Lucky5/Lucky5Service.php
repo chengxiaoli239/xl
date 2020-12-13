@@ -1851,14 +1851,14 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 if($f = $m->get($mkey)){
                     return ['status'=>300, 'msg'=>'已经重复登录过一次'];
                 }
-                if(in_array($rst[$key]['code'], [303, 309, 310])){ # 判断掉线登录一次，再下注一次
-                    if($rst[$key]['errno']>0 OR $rst[$key]['code'] == 310){
+                if(in_array($tmpRst['code'], [303, 309, 310])){ # 判断掉线登录一次，再下注一次
+                    if($tmpRst['errno']>0 OR $tmpRst['code'] == 310){
                         $m = \Yii::$app->cache;
                         $mkey_310 = 'has_jinyong_ip_310'; # 您当前使用的浏览器不支持cookie，换一次代理ip
-                        $m->set($mkey_310,1, 60);
                         if($rst[$key]['code'] == 310 && $m->get($mkey_310)){
 
                         }else{
+                            $m->set($mkey_310,1, 60);
                             $mkey_proxy = PoxyIPService::builProxyIpKey();
                             $m->delete($mkey_proxy);
                         }
@@ -1868,8 +1868,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     $m->set($mkey, 1, 5*60);
                     $rst[$key] = $tmpRst;
                 }
-                if(in_array($rst[$key]['code'], [305])){ # 提早下注，睡眠10秒再下一次
-                    sleep(10);
+                if(in_array($tmpRst['code'], [305])){ # 提早下注，睡眠10秒再下一次
+                    sleep(15);
                     $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
                     $rst[$key] = $tmpRst;
                 }
@@ -1881,7 +1881,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     continue;
                 }
                 if(in_array($rst[$key]['code'], [302])){
-                    return $rst; # 余额不足
+                    break;
+                    //return $rst; # 余额不足
                 }
             }
 
