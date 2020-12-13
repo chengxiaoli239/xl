@@ -1881,7 +1881,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     continue;
                 }
                 if(in_array($rst[$key]['code'], [302])){
-                    //return $rst; # 余额不足
+                    return $rst; # 余额不足
                 }
             }
 
