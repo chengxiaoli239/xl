@@ -1876,7 +1876,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 //if($tz_type != 20) $tzRst['code'] = $codes;
                 Tool_Common::log('bet_error','INFO','幸运五5分批投注记录-投注失败', $tzRst);
                 # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护，307账号停押
-                if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [302, 303, 304, 306, 307])){
+                if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [303, 304, 306, 307])){
                     //return $rst;
                     continue;
                 }
