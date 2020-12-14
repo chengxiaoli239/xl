@@ -874,6 +874,20 @@ class  CommonService{
 
     /**
      * @desc 是否有激活的正常计划， 主要用于判断是否要开启代理
+     * @param int $lottery_types
+     * @return int
+     */
+    public static function hasPlansActiveLottery($lottery_types = []){
+        $where = ['AND', ['IN', 'lottery_type', $lottery_types], ['=', 'status', 1]];
+        $row = UserSysPlans::find()->where($where)->one();
+
+        $flag = !empty($row) ? 1 : 0;
+
+        return $flag;
+    }
+
+    /**
+     * @desc 是否有激活的正常计划， 主要用于判断是否要开启代理
      * @param int $lottery_type
      * @return int
      */

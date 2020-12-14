@@ -1,6 +1,7 @@
 <?php
 namespace backend\service;
 
+use common\service\CommonService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use  yii;
@@ -206,10 +207,15 @@ class PoxyIPService extends BaseService {
      * @desc 自动脚本 - 预先判断缓存是否存在  每3-5秒检测一次缓存的ip，如果过期则重新获取代理IP缓存
      * @return array
      */
-    public static function preGetIpValidStatus(){
+    public static function preGetValidIp(){
 
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return []; # CURL 代理开关
+
+        $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);
+        if(!$hasPlansActiveLottery){
+            return [];
+        }
 
         $m = \Yii::$app->cache;
         $time = 3600 * 4;

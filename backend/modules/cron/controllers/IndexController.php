@@ -21,6 +21,7 @@ use backend\service\Lucky5\LuckyBaseService;
 use backend\service\McKeyService;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NumService;
+use backend\service\PoxyIPService;
 use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
 use backend\service\sports\TennisSportsService;
@@ -335,6 +336,17 @@ class IndexController extends Controller
         foreach ($TzSystemsUsers as $TzSystemsUser){
             $rst[$TzSystemsUser->id] = BaseService::login($TzSystemsUser->id);
         }
+        return $rst;
+    }
+
+    /**
+     * @desc 缓存代理IP数据
+     * @return array
+     */
+    public function actionCacheProxyIp(){
+        self::_init();
+        $rst = PoxyIPService::preGetValidIp();
+
         return $rst;
     }
 

@@ -196,6 +196,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = PoxyIPService::preGetValidIp();p($rst);
+
         $rst = PoxyIPService::getPoxyIp($is_auto = 0);p($rst);
         set_time_limit(0);
         $rst = JinYingService::getBalance('18', '15');p($rst);

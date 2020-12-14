@@ -25,6 +25,9 @@ return [
     # 导入号码投注类型
     'IMPORT_CODES_TYPES' => [ 19,27,34 ],
 
+
+    'NEED_PROXY_LOTTERYS' => [8, 10, 11 ], # 需要代理IP的彩种，后面修改判断站点ID
+
     # 不统计的彩种
     'NOT_STATIC_LOTTERYS' => [8, 9, 10, 11, 12, 13 ], # 台湾宾果，冰岛90s,3m,5m,10m
 
