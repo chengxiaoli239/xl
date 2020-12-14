@@ -99,10 +99,9 @@ $(function () {
         $.post("/forum/tz-systems-users/up-expire-time",data,function(rst) {
             Qrst = rst.data;
             status = rst.status;
-            msg = '';
+            desc = '操作成功~';
             if(rst.status == 200){
                 expire_time = Qrst.expire_time;
-                desc = '';
                 if(expire_time == null || expire_time == '' || expire_time == NaN){
                     desc = '永久';
                 }else{
@@ -112,10 +111,10 @@ $(function () {
                 $("#ApplyCmConfirmEnd").attr('refresh', 1);
             }else {
                 $("#ApplyCmConfirmEnd").attr('refresh', 0);
-                msg = rst.msg;
+                desc = rst.msg;
             }
 
-            $("#tip_msg_title_end_cm").html(msg);
+            $("#tip_msg_title_end_cm").html(desc);
             $("#rstTipModalEndCm").modal('show');
         },'JSON');
     }
