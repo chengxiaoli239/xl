@@ -1312,6 +1312,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
+        $start_time = microtime(true);
         //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
         $_t = microtime(true) * 10000;
         //$url = SevenService::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/App/Index'.'?_'.$_t;
@@ -1338,7 +1339,9 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
 
         //$data = CurlService::httpGet($url, $headers);
         $data = self::postCurl($url, $post_data, $headers);
-        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'username'=>$TzSystemsUsers->username, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
+        $end_time = microtime(true);
+        $consume_time = ($end_time-$start_time).'s';
+        $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'username'=>$TzSystemsUsers->username, 'url'=>$url, 'headers'=>$headers,'data'=>$data, 'consume_time'=>$consume_time];
         Tool_Common::log('userInfo','INFO','幸运五星-用户信息4', $logArr);
         return $data;
     }
