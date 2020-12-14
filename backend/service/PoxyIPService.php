@@ -56,7 +56,7 @@ class PoxyIPService extends BaseService {
         $lock_sec = 2; # 锁2秒
         $redisLock = new RedisLock();
         if(!$redisLock->lock($redis_key, 1)) {
-            sleep(1);
+            sleep(2);
         }
 
         $m = \Yii::$app->cache;
@@ -75,16 +75,10 @@ class PoxyIPService extends BaseService {
         }else{
             $flag = self::isValid([$poxy_ip_data]);
             if($flag === false){
-                if(!$redisLock->lock($redis_key, $lock_sec)) {
-                    sleep(2);
-                }
                 $data = self::kuaiPoxy();
                 $poxy_ip_data = $data['data'][0];
                 $m->set($mkey, $poxy_ip_data, $time);
             }elseif(empty($flag)){
-                if(!$redisLock->lock($redis_key, $lock_sec)) {
-                    sleep(2);
-                }
                 $v_mkey = 'KUAI_POXYIP_ValidTime';
                 if($m->get($v_mkey)) return self::getPoxyIp();
                 $rst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
