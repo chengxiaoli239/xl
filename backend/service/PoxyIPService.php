@@ -53,7 +53,6 @@ class PoxyIPService extends BaseService {
         }
 
         $redis_key = 'KUAI_POXY_API_KEY';
-        $lock_sec = 2; # 锁2秒
         $redisLock = new RedisLock();
         if(!$redisLock->lock($redis_key, 1)) {
             sleep(2);
@@ -63,9 +62,6 @@ class PoxyIPService extends BaseService {
         $time = 3600 * 4;
         $mkey = self::builProxyIpKey();
         if($is_auto == 1 && !$poxy_ip_data = $m->get($mkey)){
-            if(!$redisLock->lock($redis_key, $lock_sec)) {
-                sleep(2);
-            }
             $data = self::kuaiPoxy();
             if($data['status'] != 200) {
                 return [];
@@ -79,7 +75,7 @@ class PoxyIPService extends BaseService {
                 $poxy_ip_data = $data['data'][0];
                 $m->set($mkey, $poxy_ip_data, $time);
             }elseif(empty($flag)){
-                $v_mkey = 'KUAI_POXYIP_ValidTime';
+                $v_mkey = PoxyIPService::buildPoxyValidKey();
                 if($m->get($v_mkey)) return self::getPoxyIp();
                 $rst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
                 if($rst['status'] != 200 OR $rst['data'][$poxy_ip_data] < 5*60){
@@ -98,6 +94,16 @@ class PoxyIPService extends BaseService {
 
 
         return $poxy_ip_data;
+    }
+
+    /**
+     * @desc 有效期缓存key
+     * @return string
+     */
+    public static function buildPoxyValidKey(){
+        $v_mkey = 'KUAI_POXYIP_ValidTime';
+
+        return $v_mkey;
     }
 
     /**
@@ -176,10 +182,7 @@ class PoxyIPService extends BaseService {
      */
     public static function isValid($poxy_ips = []){
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        if($POXY_STATUS == 0){
-            # CURL 代理开关
-            return [];
-        }
+        if(!$POXY_STATUS) return false; # CURL 代理开关
 
         $API_KEY = BetService::getConfig('KUAI_POXY_API_KEY'); # 快代理 API Key
         $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
@@ -197,5 +200,51 @@ class PoxyIPService extends BaseService {
         }
 
         return  $rst;
+    }
+
+    /**
+     * @desc 自动脚本 - 预先判断缓存是否存在  每3-5秒检测一次缓存的ip，如果过期则重新获取代理IP缓存
+     * @return array
+     */
+    public static function preGetIpValidStatus(){
+
+        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
+        if(!$POXY_STATUS) return []; # CURL 代理开关
+
+        $m = \Yii::$app->cache;
+        $time = 3600 * 4;
+
+        $mkey = self::builProxyIpKey();
+        $poxy_ip_data = $m->get($mkey);
+        $isValid = PoxyIPService::isValid([$poxy_ip_data]);
+
+        $rst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
+        if(($isValid === false OR empty($isValid)) OR $rst['status'] != 200 OR $rst['data'][$poxy_ip_data] < 5*60){
+            # 调用失败或者可使用时间少于5分钟则认为IP失效
+            $data = self::kuaiPoxy();
+            if($data['status'] != 200) {
+                return [];
+            }
+            $poxy_ip_data = $data['data'][0];
+            $m->set($mkey, $poxy_ip_data, $time);
+        }
+
+        $logArr = ['IP'=>$poxy_ip_data, 'is_valid'=>$isValid, 'rst'=>$rst];
+        Tool_Common::log('preGetIpValidStatus', 'INFO', '预先缓存代理IP', $logArr);
+    }
+
+    /**
+     * @desc 获取新ip优化
+     * @return mixed
+     */
+    public static function getProxyIpNew($is_auto = 1){
+        $mkey = self::builProxyIpKey();
+        $m = \Yii::$app->cache;
+        $poxy_ip_data = $m->get($mkey);
+
+        $logArr = ['IP'=>$poxy_ip_data, 'is_auto'=>$is_auto];
+        Tool_Common::log('preGetIpValidStatus', 'INFO', '预先缓存代理IP', $logArr);
+
+        return $poxy_ip_data;
     }
 }
