@@ -196,7 +196,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = PoxyIPService::preGetValidIp();p($rst);
+
+        $rst = PoxyIPService::getProxyIpNew();p($rst);
+        $rst = PoxyIPService::preGetValidIp($is_auto=0);p($rst);
 
         $rst = PoxyIPService::getPoxyIp($is_auto = 0);p($rst);
         set_time_limit(0);

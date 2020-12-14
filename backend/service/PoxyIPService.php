@@ -207,13 +207,14 @@ class PoxyIPService extends BaseService {
      * @desc 自动脚本 - 预先判断缓存是否存在  每3-5秒检测一次缓存的ip，如果过期则重新获取代理IP缓存
      * @return array
      */
-    public static function preGetValidIp(){
+    public static function preGetValidIp($is_auto = 1){
 
+        $start_time = microtime(true);
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return []; # CURL 代理开关
 
         $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);
-        if(!$hasPlansActiveLottery){
+        if($is_auto == 1 && !$hasPlansActiveLottery){
             return [];
         }
 
@@ -224,8 +225,9 @@ class PoxyIPService extends BaseService {
         $poxy_ip_data = $m->get($mkey);
         $isValid = PoxyIPService::isValid([$poxy_ip_data]);
 
-        $rst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
-        if(($isValid === false OR empty($isValid)) OR $rst['status'] != 200 OR $rst['data'][$poxy_ip_data] < 5*60){
+        $isValidRst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
+        //p(['poxy_ip_data'=>$poxy_ip_data, 'isValid'=>$isValid, 'isValidRst'=>$isValidRst]);
+        if(($isValid === false OR empty($isValid)) OR $isValidRst['status'] != 200 OR $isValidRst['data'][$poxy_ip_data] < 5*60){
             # 调用失败或者可使用时间少于5分钟则认为IP失效
             $data = self::kuaiPoxy();
             if($data['status'] != 200) {
@@ -235,8 +237,12 @@ class PoxyIPService extends BaseService {
             $m->set($mkey, $poxy_ip_data, $time);
         }
 
-        $logArr = ['IP'=>$poxy_ip_data, 'is_valid'=>$isValid, 'rst'=>$rst];
+        $logArr = ['IP'=>$poxy_ip_data, 'is_valid'=>$isValid, 'rst'=>$isValidRst];
+        $end_time = microtime(true);
+        $logArr['time_consume'] = ($end_time-$start_time).'s';
         Tool_Common::log('preGetIpValidStatus', 'INFO', '预先缓存代理IP', $logArr);
+
+        return ['status'=>200, 'msg'=>'操作成功', 'data'=>$logArr];
     }
 
     /**

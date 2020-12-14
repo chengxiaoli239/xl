@@ -345,7 +345,10 @@ class IndexController extends Controller
      */
     public function actionCacheProxyIp(){
         self::_init();
-        $rst = PoxyIPService::preGetValidIp();
+        for ($i=0; $i<15; $i++){
+            $rst = PoxyIPService::preGetValidIp();
+            sleep(3);
+        }
 
         return $rst;
     }
