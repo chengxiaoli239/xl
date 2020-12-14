@@ -258,7 +258,7 @@ class PoxyIPService extends BaseService {
         $poxy_ip_data = $m->get($mkey);
 
         $logArr = ['IP'=>$poxy_ip_data, 'is_auto'=>$is_auto];
-        Tool_Common::log('preGetIpValidStatus', 'INFO', '预先缓存代理IP', $logArr);
+        Tool_Common::log('getProxyIpNew', 'INFO', '预先缓存代理IP', $logArr);
 
         return $poxy_ip_data;
     }
