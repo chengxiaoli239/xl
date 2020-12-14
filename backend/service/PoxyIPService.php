@@ -47,6 +47,9 @@ class PoxyIPService extends BaseService {
      */
     public static function getPoxyIp($is_auto = 1){
         //return ['171.83.165.196', '20000'];
+        if(true){
+            return PoxyIPService::getProxyIpNew();
+        }
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if($POXY_STATUS == 0 && $is_auto == 1){
             # CURL 代理开关
