@@ -605,7 +605,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                     $codesArr[str_replace(',','',$code)] = (string)$single;
                     break;
                 case 3: # 四字定
-                    $codesArr[str_replace(',','',$code)] = (string)$single;
+                    $codesArr[str_replace(',','',$code)] = $single;
                     break;
             }
 
@@ -1690,13 +1690,26 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         $rst = [];
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
         foreach ($codesArrs as $key=>$tmpcodesArr){
-            if($playway == 4){ # 一字定
+            if($playway == 4) { # 一字定
                 $post_data = [
                     'bets' => json_encode($tmpcodesArr),
                     'way' => $way,
                     'period_no' => $qihao,
                 ];
 
+            }elseif($playway == 3){ # 四定
+                $bet_codes = self::formCodesStyle($tmpcodesArr, $playway, $single);
+                $post_data = [
+                    'apiKey' => $TzSystemsUsers->cookie,
+                    'source' => 6,
+                    'lotteryType' => self::$ll_types[$plan->lottery_type],
+                    'drawNumber' => $qihao,
+                    'resultCount' => count($tmpcodesArr),
+                    'forceBet' => 0,
+                    'forceOverwrite' => 1,
+                    'amountFastImport' => $single,
+                    'betsPool'=>json_encode($bet_codes),
+                ];
             }else{ # 四定、三定、二定
                 $bet_codes = self::formCodesStyle($tmpcodesArr, $playway, $single);
                 $post_data = [
