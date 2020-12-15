@@ -530,7 +530,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             $TzSystemsUsers->user_agent,
         ];
 
-        $rst = CurlService::postCurl($url, $post_data, $headers);
+        $rst = postBetCurl::postCurl($url, $post_data, $headers);
         if($rst['code'] == 200){
             $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
             $BettingRecords->cancel_status = 1;
@@ -1155,7 +1155,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             $TzSystemsUsers->user_agent,
         ];
 
-        $rst = BingDaoService::postCurl($url, $post_data, $headers);
+        $rst = BingDaoService::postBetCurl($url, $post_data, $headers);
         $logArr = ['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rst'=>$rst];
         $data = [];
         if($rst['code'] && isset($rst['data']['betList'][0]['betid']) && $rst['data']['betList'][0]['betid']){
