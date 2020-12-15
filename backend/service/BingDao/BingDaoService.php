@@ -806,69 +806,6 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
     }
 
     /**
-     * @desc 获取订单号
-     * @param $sn 方案号
-     * @return mixed
-     */
-    public static function getSnidBySn($sn){
-        $m = \Yii::$app->cache;
-        $mkey = 'SNID_'.$sn;
-        if(!$snid = $m->get($mkey)){
-            //$url = HN0898Service::getUserUrlArr($user_id,'SSC_INDEX');
-            $url = HN0898Service::getTzSiteInfo(self::$tz_system_id,'SSC_INDEX');
-            $headers = [
-                'Cache-Control: max-age=0',
-                //'Upgrade-Insecure-Requests: 1',
-                "Host:".str_replace('www.','',self::$domain),
-                //"Accept-Encoding: gzip, deflate, br",
-                //"Accept-Encoding: gunzip, deflate, br", # gunzip 防止乱码
-                "Cookie:".self::$cookie,
-                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
-            ];
-            //$headers = array_merge(self::$headers,$headers);
-
-            $content = RemoteHtmlService::getRemoteHtmlContent($url, $headers);
-            $preg = "/<td>".$sn."(.*?) snid=(.*?)\>点击撤单/ism"; // 这里是表达式，大神看看
-            preg_match_all($preg,$content,$matches);
-            $snid = $matches[2][0];
-            $logData = ['url'=>$url,'headers'=>$headers, 'snid'=>$snid,/* 'content'=>$content*/];
-            //p($logData);
-            Tool_Common::log('getSnidBySn','INFO','获取方案号', $logData);
-            $m->set($mkey, 6*3600);
-        }
-
-        return $snid;
-    }
-
-    /**
-     * @decription 获取登录表单
-     * @param $formData
-     * @return array
-     */
-    private static function getLoginForm($formData){
-        $form = $formData[0];
-        $filterField = ['__VIEWSTATE','__EVENTVALIDATION','__VIEWSTATEGENERATOR','ctl00$txtUser', 'ctl00$txtPwd', 'ctl00$txtcode'];
-        $inputs = [];
-        foreach ($form['inputs'] as $key=>$item){
-            $field = $item['name'];
-            if(!in_array($field, $filterField)) continue;
-            $value = $item['value'];
-
-            $inputs[$field] = $value;
-        }
-        $inputs['ctl00$btnlogin.x'] = rand(10,99);
-        $inputs['ctl00$btnlogin.y'] = rand(10,99);
-
-        return ['action'=>$form['action'],'inputs'=>$inputs];
-    }
-
-   public static function getZjByInterval(){
-        $times = 0;
-
-        return $times;
-    }
-
-    /**
      * @description 获取cookie并写表lt_tz_systems_users，场景：未登录情况下
      * @param $uid
      * @param $tz_system_id
@@ -1013,43 +950,6 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
     }
 
     /**
-     * @desc 下载图片验证码
-     * @param $uid
-     * @param $tz_system_id
-     * @param $cookie_key
-     * @return bool
-     */
-    public static function downLoadCodeImgNew($uid, $tz_system_id){
-        self::__init($uid, $tz_system_id);
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        $headers = [
-            'Accept: image/webp,image/apng,image/*,*/*;q=0.8',
-            'Accept-Encoding: gzip, deflate',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Connection: keep-alive',
-            //'Cookie: '.$TzSystemsUsers->cookie,
-            'Host: '.str_replace('http://', '', self::getTzSiteInfo($TzSystemsUsers->tz_system_id,'SSC_INDEX')),
-            'Referer: '.$TzSystemsUsers->ssc_domain.'/login.html',
-            //'Upgrade-Insecure-Requests: 1',
-            //$TzSystemsUsers->user_agent,
-            self::$user_agent,
-            'Cookie:ValidateToken=08fbfb46cc8d59159308d435d21c5bb7',
-        ];
-        $_t = floor(microtime(true) * 1000);
-        $url = self::getTzSiteInfo($TzSystemsUsers->tz_system_id,'SSC_INDEX').'/api/home/GetValidateCode?_='.$_t;
-        $imageData = CurlService::getCurl($url, $headers);
-        $filename = Yii::$app->basePath . "/runtime/captcha/".$uid.'_'.$tz_system_id.'_'.$cookie_key.".png";
-        $tp = fopen($filename,"w");
-        fwrite($tp, $imageData);
-        fclose($tp);
-        $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
-        //p($logData);
-        Tool_Common::log('downLoadCodeImg','INFO','下载图片验证码', $logData);
-
-        return true;
-    }
-
-    /**
      * @desc 判断是否登录
      * @param $uid
      * @param $tz_system_id
@@ -1156,11 +1056,12 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         ];
 
         $rst = BingDaoService::postBetCurl($url, $post_data, $headers);
-        $logArr = ['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rst'=>$rst];
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rst'=>$rst, 'xx'=>$rst['data']['betList'][0]];
         $data = [];
-        if($rst['code'] && isset($rst['data']['betList'][0]['betid']) && $rst['data']['betList'][0]['betid']){
+        if($rst['code'] == 200 && isset($rst['data']['betList'][0]['betid']) && $rst['data']['betList'][0]['betid']){
             $data['sn'] = $rst['data']['betList'][0]['betid'];
         }
+        $logArr['sn'] = $data;
         Tool_Common::log('getSn','INFO','冰岛获取方案号', $logArr);
 
         return $data;
