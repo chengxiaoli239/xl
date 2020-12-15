@@ -1762,9 +1762,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $count = count($codesArr);
 
         $betNums = self::getBetNumsPer();
-        if($plan->account == 'aa22'){
-            $betNums = 10000;
-        }
+        //if($plan->account == 'aa22'){ $betNums = 10000; }
         $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
         //p($codesArrs);
 
