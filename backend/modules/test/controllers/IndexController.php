@@ -196,9 +196,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = OpKjService::opSscKjData(12); p($rst); # 处理投注数据
 
+        $snInfo = BingDaoService::getSn($uid=12, $tz_system_id=13, $lottery_type = 13);p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         $rst = BingDaoService::login($uid=12, $tz_system_id=13);p($rst);
+        $rst = OpKjService::opSscKjData(12); p($rst); # 处理投注数据
         $rst = PoxyIPService::getProxyIpNew();p($rst);
         $rst = PoxyIPService::preGetValidIp($is_auto=0);p($rst);
 

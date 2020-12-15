@@ -121,7 +121,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         $baseUrl = $TzSystemUser->ssc_domain;
         self::$cookie = $TzSystemUser->cookie;
         \Yii::$app->params['baseUrl']  = $TzSystemUser->ssc_domain;
-        \Yii::$app->params['domain']  = str_replace('http://','',$TzSystemUser->ssc_domain);
+        \Yii::$app->params['domain']  = str_replace('https://','',$TzSystemUser->ssc_domain);
         $tzSiteInfo = [
             'baseUrl' => $TzSystemUser->ssc_domain,
             'CANCEL_ORDER' => $baseUrl.'/member/?a=member.bet&m=cancelBet',
@@ -506,13 +506,13 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         //$qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
-        $post_data = [ 'apiKey'=>$TzSystemsUsers->cookie, 'lottery_type' => self::$ll_types[$BettingRecords->lottery_type], 'betids'=>$BettingRecords->snid];
+        $post_data = [ 'apiKey'=>$TzSystemsUsers->cookie, 'lotteryType' => self::$ll_types[$BettingRecords->lottery_type], 'betids'=>$BettingRecords->snid];
         $urlArr = self::getTzSiteInfo(self::$tz_system_id);//.'?'.http_build_query($post_data);
         $url = $urlArr['CANCEL_ORDER'];
 
         $_t = round(microtime(true) * 1000);
         $headers = [
-            ":authority: ".$urlArr['domain'],
+            ":authority: ".$TzSystemsUsers->ssc_domain,
             ":method: POST",
             ":path: /member/?a=member.bet&m=cancelBet",
             ":scheme: https",
@@ -1132,21 +1132,21 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $qihao = HN0898Service::getQihao($lottery_type);
-        $post_data = [ 'apiKey'=>$TzSystemsUsers->cookie, 'lottery_type' => self::$ll_types[$lottery_type], 'pageIndex'=>1, 'pageSize'=>10, 'drawNumber'=>$qihao];
+        $post_data = ['apiKey'=>$TzSystemsUsers->cookie, 'lotteryType' => self::$ll_types[$lottery_type], 'pageIndex'=>1, 'pageSize'=>10, 'drawNumber'=>$qihao];
         $urlArr = self::getTzSiteInfo(self::$tz_system_id);
         $url = $urlArr['baseUrl'].'/member/?a=member.bet&m=getBetList';
 
         $headers = [
             ":authority: ".$urlArr['domain'],
             ":method: POST",
-            ":path: /member/?a=member.bet&m=cancelBet",
+            ":path: /member/?a=member.bet&m=getBetList",
             ":scheme: https",
             "accept: application/json, text/plain, */*",
             "accept-encoding: gzip, deflate, br",
             "accept-language: zh-CN,zh;q=0.9,en;q=0.8",
-            'Content-Length:'.strlen(http_build_query($post_data)),
+            'content-Length:'.strlen(http_build_query($post_data)),
             "content-type: application/x-www-form-urlencoded",
-            "cookie: apiKey=".$TzSystemsUsers->cookie,
+            "Cookie: ".$TzSystemsUsers->cookie,
             'Origin: '.$TzSystemsUsers->ssc_domain,
             "referer: ".$TzSystemsUsers->ssc_domain."/main.html",
             "sec-fetch-dest: empty",
@@ -1155,8 +1155,10 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             $TzSystemsUsers->user_agent,
         ];
 
-        $logArr = ['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data];
-        $rst = CurlService::postCurl($url, $post_data, $headers);
+        $rst = BingDaoService::postCurl($url, $post_data, $headers);
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rst'=>$rst];
+        p($logArr);
+        $data = [];
         if($rst['code'] && isset($rst['data']['betList'][0]['betid']) && $rst['data']['betList'][0]['betid']){
             $data['sn'] = $rst['data']['betList'][0]['betid'];
         }
