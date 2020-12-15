@@ -124,7 +124,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         \Yii::$app->params['domain']  = str_replace('http://','',$TzSystemUser->ssc_domain);
         $tzSiteInfo = [
             'baseUrl' => $TzSystemUser->ssc_domain,
-            'CANCEL_ORDER' => $baseUrl.'/Member/CancelMemberBet',
+            'CANCEL_ORDER' => $baseUrl.'/member/?a=member.bet&m=cancelBet',
             'ORDER_TZ' => $baseUrl.'/Member/BatchBet',
             'SSC_INDEX' => $baseUrl,
             'domain' => \Yii::$app->params['domain'],
@@ -505,35 +505,38 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         self::__init($uid, $tz_system_id);
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
-        $post_data = [ 'ids'=>$snid, 'period_no' => $qihao];
+        //$qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
+        $post_data = [ 'apiKey'=>$TzSystemsUsers->cookie, 'lottery_type' => self::$ll_types[$BettingRecords->lottery_type], 'betids'=>$BettingRecords->snid];
+        $urlArr = self::getTzSiteInfo(self::$tz_system_id);//.'?'.http_build_query($post_data);
+        $url = $urlArr['CANCEL_ORDER'];
 
         $_t = round(microtime(true) * 1000);
         $headers = [
-            'Accept: application/json, text/javascript, */*; q=0.01',
-            'Accept-Encoding: gunzip, deflate',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Connection: keep-alive',
+            ":authority: ".$urlArr['domain'],
+            ":method: POST",
+            ":path: /member/?a=member.bet&m=cancelBet",
+            ":scheme: https",
+            "accept: application/json, text/plain, */*",
+            "accept-encoding: gzip, deflate, br",
+            "accept-language: zh-CN,zh;q=0.9,en;q=0.8",
             'Content-Length:'.strlen(http_build_query($post_data)),
-            'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
-            'Cookie: '.$TzSystemsUsers->cookie,
-            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+            "content-type: application/x-www-form-urlencoded",
+            "cookie: apiKey=".$TzSystemsUsers->cookie,
             'Origin: '.$TzSystemsUsers->ssc_domain,
-            'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
-            'X-Requested-With: XMLHttpRequest',
+            "referer: ".$TzSystemsUsers->ssc_domain."/main.html",
+            "sec-fetch-dest: empty",
+            "sec-fetch-mode: cors",
+            "sec-fetch-site: same-origin",
             $TzSystemsUsers->user_agent,
         ];
 
-        $url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER').'?'.http_build_query($post_data);
-
         $rst = CurlService::postCurl($url, $post_data, $headers);
-        if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
+        if($rst['code'] == 200){
             $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
             $BettingRecords->cancel_status = 1;
             $BettingRecords->save();
             $rst['status'] = 200;
         }else{
-            if(isset($rst['Data'])) p($rst['Data'], 0);
             sleep(2);
         }
         $logArr = ['url'=>$url, 'snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
@@ -1124,20 +1127,40 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
      * @param $tz_system_id
      * @return array
      */
-    public static function getSn($uid, $tz_system_id){
-        $rst = self::userInfo($uid, $tz_system_id);
-        $data = [];
-        if($rst['status'] !=200) return $data;
+    public static function getSn($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        self::__init($uid, $tz_system_id);
 
-        $data['sn'] = $rst['Data']['serial_no'];
-        $data['qihao'] = substr($rst['Data']['previous_period_no'], 2);
-        $tzDatas = $rst['Data']['Details'];
-        $snidStr = '';
-        foreach ($tzDatas as $tzData){
-            $snidStr .= $tzData['bet_id'].'|1,';
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $qihao = HN0898Service::getQihao($lottery_type);
+        $post_data = [ 'apiKey'=>$TzSystemsUsers->cookie, 'lottery_type' => self::$ll_types[$lottery_type], 'pageIndex'=>1, 'pageSize'=>10, 'drawNumber'=>$qihao];
+        $urlArr = self::getTzSiteInfo(self::$tz_system_id);
+        $url = $urlArr['baseUrl'].'/member/?a=member.bet&m=getBetList';
+
+        $headers = [
+            ":authority: ".$urlArr['domain'],
+            ":method: POST",
+            ":path: /member/?a=member.bet&m=cancelBet",
+            ":scheme: https",
+            "accept: application/json, text/plain, */*",
+            "accept-encoding: gzip, deflate, br",
+            "accept-language: zh-CN,zh;q=0.9,en;q=0.8",
+            'Content-Length:'.strlen(http_build_query($post_data)),
+            "content-type: application/x-www-form-urlencoded",
+            "cookie: apiKey=".$TzSystemsUsers->cookie,
+            'Origin: '.$TzSystemsUsers->ssc_domain,
+            "referer: ".$TzSystemsUsers->ssc_domain."/main.html",
+            "sec-fetch-dest: empty",
+            "sec-fetch-mode: cors",
+            "sec-fetch-site: same-origin",
+            $TzSystemsUsers->user_agent,
+        ];
+
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data];
+        $rst = CurlService::postCurl($url, $post_data, $headers);
+        if($rst['code'] && isset($rst['data']['betList'][0]['betid']) && $rst['data']['betList'][0]['betid']){
+            $data['sn'] = $rst['data']['betList'][0]['betid'];
         }
-        $data['snid'] = trim($snidStr, ',');
-        Tool_Common::log('getSn','INFO','7时彩获取方案号', $data);
+        Tool_Common::log('getSn','INFO','7时彩获取方案号', $logArr);
 
         return $data;
     }
@@ -1817,9 +1840,10 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
 
             # 获取方案号，记录id, 用于撤单
             if(true){
-                //$snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
-                $snInfo_snid .= $tmpRst['data']['lastBetNumber']['bet_listid'].';'; # 多次下单需要分开，多次撤单
-                //$snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
+                //$snInfo_snid .= $tmpRst['data']['lastBetNumber']['bet_listid'].';'; # 多次下单需要分开，多次撤单
+
+                $snInfo = self::getSn(self::$user_id, self::$tz_system_id, $lottery_type);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+                $snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
             }
         }
         $data['rst'] = $rst;

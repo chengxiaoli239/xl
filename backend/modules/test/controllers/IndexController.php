@@ -196,7 +196,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = OpKjService::opSscKjData(12); p($rst); # 处理投注数据
 
+        $rst = BingDaoService::login($uid=12, $tz_system_id=13);p($rst);
         $rst = PoxyIPService::getProxyIpNew();p($rst);
         $rst = PoxyIPService::preGetValidIp($is_auto=0);p($rst);
 
@@ -364,7 +366,6 @@ class IndexController extends Controller
         $rst = KjDataGet::insertKjData('200325019', 5, '1,7,6,2,8');p($rst);
         $rst = SevenService::userInfo(18, 3);p($rst);
         $rst = SevenService::getSn(18, 3);p($rst); # 用户信息
-        $rst = OpKjService::opSscKjData(8); p($rst); # 处理投注数据
 
         $time = BetService::getBetCacheTime($lottery_type=5, $qihao = '200319036'); p($time);# 投注之后缓存时间
         $rst = SscDataService::getPlanNextSingle(52, 0, $next_single_key, $lottery_type=5);p($rst);

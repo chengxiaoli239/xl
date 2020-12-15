@@ -32,7 +32,6 @@ class OpKjService extends BaseService {
         $m = \Yii::$app->cache;
         //p($qihaos);
         $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type])->orderBy('id DESC')->limit(50)->all();
-        //p(['status'=>0, 'lottery_type'=>$lottery_type,'bettingRecords'=>$bettingRecords]);
         if(!$bettingRecords) return $rst;
         foreach ($bettingRecords as $bettingRecord){
             $is_simulate = $bettingRecord['is_simulate'];
@@ -286,7 +285,7 @@ class OpKjService extends BaseService {
      * @param $kjData
      * @return array
      */
-    public static function opKjData4($codes = '', $kjData, $zhuSplit = '@'){
+    public static function opKjData4($codes = '', $kjData = '', $zhuSplit = '@'){
         $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
         $tzCodesArr = self::explodeCodes($codes);
         $kjCodesArr = explode(',', $kjData);

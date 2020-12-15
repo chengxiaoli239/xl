@@ -968,6 +968,8 @@ abstract class BetService extends BaseBetService {
             }else{
                 $rst = NineNineNewService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
             }
+        }elseif(in_array($tz_system_id, [13])){ # 冰岛
+            $rst = \backend\service\BingDao\BingDaoService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
         }elseif(in_array($tz_system_id, [11])){ # 菊花网
             if($lottery_type == 5){
                 $rst = JuHuaBaseService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
