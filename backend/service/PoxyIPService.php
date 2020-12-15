@@ -257,7 +257,12 @@ class PoxyIPService extends BaseService {
         $m = \Yii::$app->cache;
         $poxy_ip_data = $m->get($mkey);
         if(!empty($poxy_ip_data)){
-            PoxyIPService::preGetValidIp();
+            $redisLock = new RedisLock();
+            if($redisLock->lock($mkey.'_redis', 1)){
+                PoxyIPService::preGetValidIp();
+            }else{
+                sleep(3);
+            }
         }
         $poxy_ip_data = $m->get($mkey);
 
