@@ -256,6 +256,10 @@ class PoxyIPService extends BaseService {
         $mkey = self::builProxyIpKey();
         $m = \Yii::$app->cache;
         $poxy_ip_data = $m->get($mkey);
+        if(!empty($poxy_ip_data)){
+            PoxyIPService::preGetValidIp();
+        }
+        $poxy_ip_data = $m->get($mkey);
 
         $logArr = ['IP'=>$poxy_ip_data, 'is_auto'=>$is_auto];
         Tool_Common::log('getProxyIpNew', 'INFO', '获取新ip优化', $logArr);
