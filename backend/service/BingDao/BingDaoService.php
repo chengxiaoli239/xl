@@ -1157,12 +1157,11 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
 
         $rst = BingDaoService::postCurl($url, $post_data, $headers);
         $logArr = ['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rst'=>$rst];
-        p($logArr);
         $data = [];
         if($rst['code'] && isset($rst['data']['betList'][0]['betid']) && $rst['data']['betList'][0]['betid']){
             $data['sn'] = $rst['data']['betList'][0]['betid'];
         }
-        Tool_Common::log('getSn','INFO','7时彩获取方案号', $logArr);
+        Tool_Common::log('getSn','INFO','冰岛获取方案号', $logArr);
 
         return $data;
     }
