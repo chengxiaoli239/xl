@@ -55,7 +55,7 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
-                    <?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?>
+                    <?= $form->field($model, 'hz_Arr')->textInput()->label('英文逗号或者空格隔开比如：1234,2345 或 1234 2345') ?>
 
                     <!--止盈止损-->
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
