@@ -310,6 +310,7 @@ class UserService extends BaseService {
         }
         $TzSystemsUsers->expire_time = strtotime($expire_time);
         $TzSystemsUsers->updated_at = time();
+        $TzSystemsUsers->desc = '';
         $flag = $TzSystemsUsers->save();
         if(!$flag){
             return ['status'=>303, 'msg'=>current($TzSystemsUsers->getErrors())];
