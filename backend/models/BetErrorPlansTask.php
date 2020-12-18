@@ -51,13 +51,12 @@ class BetErrorPlansTask extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['codes', 'post_datas'], 'string'],
+            [['codes', 'bet_headers', 'post_datas', 'error_desc'], 'string'],
             [['uid', 'agent_id', 'playway', 'tz_type', 'status', 'plan_id', 'tz_system_id', 'lottery_type', 'updated_at', 'created_at'], 'integer'],
             [['bet_money', 'single'], 'number'],
             [['updated_time'], 'safe'],
             [['account', 'kj_codes'], 'string', 'max' => 24],
-            [['bet_url', 'snid', 'post_desc', 'error_desc'], 'string', 'max' => 240],
-            [['bet_headers'], 'string', 'max' => 640],
+            [['bet_url', 'snid', 'post_desc'], 'string', 'max' => 240],
             [['playway_name'], 'string', 'max' => 32],
             [['qihao'], 'string', 'max' => 20],
             [['sn'], 'string', 'max' => 255],
