@@ -87,9 +87,9 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                             return Html::a($txt, 'javascript:;', ['title' => $model->cookie,'alt'=>$model->cookie]);
                                         }
                                     ],
-                                    [ 'attribute'=>'update_time','label'=>'时间','value'=>function($model){
-                                        return $model->update_time;
-                                    }],
+                                    //[ 'attribute'=>'update_time','label'=>'时间','value'=>function($model){
+                                    //    return $model->update_time;
+                                    //}],
                                 ],
                             ]) ?>
                         </div>
