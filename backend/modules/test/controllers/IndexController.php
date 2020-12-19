@@ -199,6 +199,8 @@ class IndexController extends Controller
 
     public function actionDw(){
 
+        $rst = KjDataGet::insertKjData('2020122047', 6, '3,9,3,9,1');p($rst);
+        $data = BingDao::getLotteryOne($type='json', $l_type=6);p($data);
         $data = BetService::getLotteryName();p($data);
         $data = CqsscKcw::getLotteryBg($type='json', $is_auto=0);p($data,0);
         $lottery_type = 9;
@@ -366,7 +368,6 @@ class IndexController extends Controller
         //$data['rst'] = ChatService::send();p($data);
         $loginRst = BaseService::login($id = 47);p($loginRst);
         $rst = NumService::getCodesArise(['0144']);p($rst);
-        $rst = KjDataGet::insertKjData('200325016', 5, '6,1,2,1,2');//p($rst);
         $rst = KjDataGet::insertKjData('200325017', 5, '0,7,8,0,7');//p($rst);
         $rst = KjDataGet::insertKjData('200325018', 5, '0,9,0,0,5');//p($rst);
         $rst = KjDataGet::insertKjData('200325019', 5, '1,7,6,2,8');p($rst);

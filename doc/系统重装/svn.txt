@@ -1,0 +1,8 @@
+1、/www/wwwroot/lt.yjjytech.com
+svn://gitee.com/gaozi/lottery_xl
+
+2、/www/wwwroot/lt.sm0898.com
+svn://gitee.com/gaozi/lottery_xl
+
+3、/www/wwwroot/invent.sm0898.com
+svn://gitee.com/gaozi/invent

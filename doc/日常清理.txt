@@ -1,0 +1,56 @@
+日常清理 每天凌晨四点
+#!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+ #!/bin/bash
+# 清空cron目录下大于60M的日志文件
+ for size in $(du -sh -b /www/server/cron/*.log | awk '{ print $1 }')
+ do
+    for file in $(du -sh -b /www/server/cron/*.log | grep ${size} |awk '{print $2}')
+    do
+          echo ${file} ${size}
+          if [ ${size} -gt 62914560 ];then # 大于60M文件	
+          echo ${file} ${size}
+          echo "" > ${file}
+          fi
+     done
+ done
+
+# 备份数据库保留前x天
+searchPath=/www/backup/database/lottery_xl
+cd ${searchPath}
+
+declare -i total=`ls lottery_xl_*.sql | wc -l`
+declare -i nums=$total-7
+
+if [ "${nums}" -ge 1 ];then
+    rm -rf `ls -tr lottery_xl_*.sql | head -${nums}`
+fi
+
+# 清除mysql log日志，保留2个bin日志文件
+searchPath=/www/server/data
+cd ${searchPath}
+
+declare -i total=`ls mysql-bin.0* | wc -l`
+declare -i nums=$total-2
+
+if [ "${nums}" -ge 1 ];then
+    ls -tr mysql-bin.0* | head -${nums}
+    #rm -rf `ls -tr mysql-bin.0* | head -${nums}`
+fi
+
+# 删除日志目录，保留5天
+searchPath=/WORK/LOG/lottery_xl
+cd ${searchPath}
+
+declare -i total=`ls | wc -l`
+declare -i nums=$total-5
+
+if [ "${nums}" -ge 1 ];then
+    rm -rf `ls | head -${nums}`
+fi
+
+echo "----------------------------------------------------------------------------"
+endDate=`date +"%Y-%m-%d %H:%M:%S"`
+echo "★[$endDate] Successful"
+echo "----------------------------------------------------------------------------"
