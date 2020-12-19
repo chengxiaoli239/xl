@@ -26,6 +26,7 @@ use backend\service\BaseTZService;
 use backend\service\BetService;
 use backend\service\CurlService;
 use backend\service\HN0898Service;
+use backend\service\plans\BetErrorPlansTaskService;
 use backend\service\RemoteHtmlService;
 use backend\service\SscDataService;
 use backend\tools\Tools;
@@ -402,6 +403,9 @@ class NineNineNewService extends BaseTZService {
             # 真实投注
             $start_time = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers);
+            if(true){
+                BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
+            }
             $rstData = $tmpRst['rstData'];
             $xCsrf = $tmpRst['xCsrf'];
             if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){

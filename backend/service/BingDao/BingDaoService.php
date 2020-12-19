@@ -22,6 +22,7 @@ use backend\service\BetService;
 use backend\service\CurlService;
 use backend\service\HN0898Service;
 use backend\service\Juhua\JuHuaBaseService;
+use backend\service\plans\BetErrorPlansTaskService;
 use backend\service\PoxyIPService;
 use backend\service\SscDataService;
 use backend\tools\Tools;
@@ -530,7 +531,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             $TzSystemsUsers->user_agent,
         ];
 
-        $rst = BingDaoService::postBetCurl($url, $post_data, $headers);
+        $rst = BingDaoService::postBetCurl($url, $post_data, $headers, $uid);
         if($rst['code'] == 200){
             $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
             $BettingRecords->cancel_status = 1;
@@ -1055,7 +1056,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             $TzSystemsUsers->user_agent,
         ];
 
-        $rst = BingDaoService::postBetCurl($url, $post_data, $headers);
+        $rst = BingDaoService::postBetCurl($url, $post_data, $headers, $uid);
         $logArr = ['url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rst'=>$rst, 'xx'=>$rst['data']['betList'][0]];
         $data = [];
         if($rst['code'] == 200 && isset($rst['data']['betList'][0]['betid']) && $rst['data']['betList'][0]['betid']){
@@ -1690,6 +1691,9 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             $start_time = microtime(true);
             //$tmpRst = self::postCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
             $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+            if(true) {
+                BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($tmpcodesArr) * $single, $playway, self::$tz_system_id, $tmpRst, $lottery_type);
+            }
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time). 's';
             Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-7', ['qihao'=>$qihao, 'plan_id'=>$plan_id, 'uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'codes'=>$tmpcodesArr, 'time_consume'=>$time_consume]);
