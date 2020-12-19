@@ -25,6 +25,7 @@ use backend\service\McLockService;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineNewService;
 use backend\service\NumService;
+use backend\service\plans\BetErrorPlansTaskService;
 use backend\service\PoxyIPService;
 use backend\service\BingDao\BingDaoService;
 use backend\service\qilin\QiLinBaseService;
@@ -45,6 +46,7 @@ use common\kj\cqssc\CqsscSevenDay;
 use common\kj\qxc\QxcTcw;
 use common\kj\ssc\BingDao;
 use common\kj\ssc\Lucky5;
+use common\kj\ssc\TaiWanHuanLe;
 use common\kj\xjssc\XjSsc;
 use common\models\AdminModel;
 use common\service\ChatService;
@@ -197,6 +199,12 @@ class IndexController extends Controller
 
     public function actionDw(){
 
+        $data = BetService::getLotteryName();p($data);
+        $data = CqsscKcw::getLotteryBg($type='json', $is_auto=0);p($data,0);
+        $lottery_type = 9;
+        $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
+        $qihao_2 = HN0898Service::getQihao($lottery_type);p([$qihao_1, $qihao_2]);
+        $rst = BetErrorPlansTaskService::reBetErrorPlans($lottery_types = [12]);p($rst);
         $snInfo = BingDaoService::getSn($uid=12, $tz_system_id=13, $lottery_type = 13);p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         $rst = BingDaoService::login($uid=12, $tz_system_id=13);p($rst);
         $rst = OpKjService::opSscKjData(12); p($rst); # 处理投注数据
@@ -235,9 +243,6 @@ class IndexController extends Controller
 
         $rst = NineNineNewService::synBalance($tz_system_users_id=31);p($rst);
         d(false==='');
-        $lottery_type = 9;
-        $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
-        $qihao_2 = HN0898Service::getQihao($lottery_type);p([$qihao_1, $qihao_2]);
         $rst = BingDaoService::login($uid = 20, $tz_system_id = 13);p($rst);
         $kjData = BingDao::getLotteryOne('json', $l_type = 7);p($kjData);
         $rst = BingDaoService::synBalance($TzSystemsUser_id = 66);p($rst);

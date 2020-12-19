@@ -88,16 +88,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'tz_type','label' => '类型',
                             'format'=>'raw',
                             'value' => function($model) {
-                                return $model->tz_type;
+                                return \backend\service\BetService::getTypeNameByTzType($model->tz_type);
                             }
                         ],
                         //'playway_name',
-                        ['attribute' => 'playway_name','label' => '方式',
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                return $model->playway_name;
-                            }
-                        ],
                         //'bet_money',
                         ['attribute' => 'bet_money','label' => '金额',
                             'format'=>'raw',
@@ -141,8 +135,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         //'tz_system_id',
-                        'lotteryclass',
+                        //'lotteryclass',
                         //'lottery_type',
+                        ['attribute' => 'lottery_type','label' => '种类',
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return \backend\service\BetService::getLotteryName($model->lottery_type);
+                            }
+                        ],
                         //'post_desc',
                         //'error_desc',
                         ['attribute' => 'error_desc','label' => '错误描述',
@@ -158,7 +158,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'created_at','label' => '时间',
                             'format'=>'raw',
                             'value' => function($model) {
-                                return date('m-d H:i');
+                                return date('m-d H:i', $model->created_at);
                             }
                         ],
 

@@ -17,7 +17,7 @@ class XjSsc extends BaseKj {
      */
     public static function getLotteryNoSevenDay($returnType = 'json', $is_auto = 1){
 
-        if(true OR !$kjData = self::getCurrentKjData(self::$lottery_type)){
+        if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)){
             $datas = self::batchGrabSevenDay();
 
             $kjData = ['expect'=>$datas[1][0], 'opentime'=>$datas[2][0], 'opencode'=>$datas[3][0]];
@@ -60,7 +60,7 @@ class XjSsc extends BaseKj {
      */
     public static function getLotteryNo99($returnType = 'json', $is_auto = 1){
 
-        if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type)){
+        if($is_auto == 2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)){
             $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/nine-nine');
             $url = $domain.'/kaijiang/list.aspx?lot=jxssc';
             $content = CurlService::httpGet($url);
@@ -164,7 +164,7 @@ class XjSsc extends BaseKj {
      */
     public static function getLotteryNoZhiBo($returnType = 'json', $is_auto = 1){
 
-        if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if($is_auto == 2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/zhi-bo-wang');
             $url = $domain.'/data/Current/xjssc/CurIssue.json?'.time();
             $content = CurlService::httpGet($url);
@@ -203,7 +203,7 @@ class XjSsc extends BaseKj {
      */
     public static function getLotteryNoNineNum($returnType = 'json', $is_auto = 1){
 
-        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/nine-num');
             $date = date('Y-m-d');
             if('00:00' < date('H:i:s') && date('H:i:s') < '03:00'){
@@ -294,7 +294,7 @@ class XjSsc extends BaseKj {
      * @return json|xml
      */
     public static function NineNineNew($returnType = 'json', $is_auto = 1){
-        if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if($is_auto == 2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/nine-nine-new');
             $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/lastTen/xjssc'; # limit 数量
             $content = CurlService::httpGet($url);
@@ -334,7 +334,7 @@ class XjSsc extends BaseKj {
      * @return json|xml
      */
     public static function fuLiCai($returnType = 'json', $is_auto = 1){
-        if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if($is_auto == 2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/fu-li-cai');
             $url = $domain.'/api/v1/result/service/mobile/results/hist/HF_XJSSC?limit=1&brand=833'; # limit 数量
             $content = CurlService::httpGet($url);
@@ -374,7 +374,7 @@ class XjSsc extends BaseKj {
      * @return json|xml
      */
     public static function huangGuan($returnType = 'json', $is_auto = 1){
-        if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if($is_auto == 2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/huang-guan');
             $url = $domain.'/user/getResult'; #
 
@@ -435,7 +435,7 @@ class XjSsc extends BaseKj {
      * @return json|xml
      */
     public static function cg($returnType = 'json', $is_auto = 1){
-        if($is_auto == 0 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if($is_auto == 2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/cg');
             $url = $domain.'/game/opencode?&id=2&pagesize=1'; #
 

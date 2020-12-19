@@ -17,14 +17,14 @@ class Lucky5 extends BaseKj {
      * @param string $returnType
      * @return array
      */
-    public static function getLotteryLucky($returnType = 'json', $test = 0){
+    public static function getLotteryLucky($returnType = 'json', $is_auto = 1){
 
         $hasActivePlan = CommonService::hasPlansActive(self::$lottery_type);
         if(in_array(self::$lottery_type, [8]) && !$hasActivePlan){
             return false;
         }
 
-        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $TzSystemsUserses = TzSystemsUsers::find()->where(['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [7,9]] ])->all();
             $m = \Yii::$app->cache;
             foreach ($TzSystemsUserses as $TzSystemsUsers){ # 用户账号去网盘抓数据
@@ -92,11 +92,12 @@ class Lucky5 extends BaseKj {
      * @desc 幸运五星彩 - 实时资讯网 https://cc138001.com 未完
      * http://web01.cc138008.com/?url=pc/live/ygxy5#/pc/live/ygxy5
      * @param string $returnType
+     * @param int $is_auto 1:自动2手动
      * @return array
      */
-    public static function getLotteryShiXunOne($returnType = 'json'){
-        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
-            $domain = BaseKj::getApiHost(21);
+    public static function getLotteryShiXunOne($returnType = 'json', $is_auto=1){
+        if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+            $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun-one');
 
             $t = round(microtime(true) * 1000);
             $url = $domain.'/kaijiang/history/ygxy5.json?v='.$t; #当前开奖号码
@@ -138,8 +139,8 @@ class Lucky5 extends BaseKj {
      * @param string $returnType
      * @return array
      */
-    public static function getLotteryShiXun($returnType = 'json'){
-        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
+    public static function getLotteryShiXun($returnType = 'json', $is_auto=1){
+        if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHost(20);
 
             $t = round(microtime(true) * 1000);

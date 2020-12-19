@@ -20,7 +20,7 @@ class TaiWanHuanLe extends BaseKj {
      */
     public static function getLotteryHl($returnType = 'json', $is_auto = 1){
 
-        if(!$is_auto OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/tai-wan-huan-le/index');
             $url = $domain.'/kaijiangWeb/?a=kaijiangWeb.drawResult&m=getActiveDrawInfo'; #当前开奖号码
             # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015

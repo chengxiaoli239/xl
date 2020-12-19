@@ -21,6 +21,7 @@ use backend\service\Lucky5\LuckyBaseService;
 use backend\service\McKeyService;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NumService;
+use backend\service\plans\BetErrorPlansTaskService;
 use backend\service\PoxyIPService;
 use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
@@ -306,6 +307,18 @@ class IndexController extends Controller
             $rst = OpKjService::opSscKjData($lottery_type); # 在抓取完开奖数据已经调用 KjDataGet::grabOne
             //sleep(2);
         }
+
+        return $rst;
+    }
+
+    /**
+     * @desc 多线程跑用户计划
+     * @return mixed
+     */
+    public static function actionReBetErrorPlans(){
+        self::_init();
+
+        $rst = BetErrorPlansTaskService::reBetErrorPlans();
 
         return $rst;
     }

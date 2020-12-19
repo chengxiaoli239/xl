@@ -451,7 +451,7 @@ class CqsscKcw extends BaseKj {
      */
     public static function getLotteryTaiwanBinguo($returnType = 'json', $is_auto = 1){
 
-        if(!$is_auto OR !$kjData = self::getCurrentKjData($lottery_type = 9)) {
+        if($is_auto==2 OR !$kjData = self::getCurrentKjData($lottery_type = 9)) {
             $domain = BaseKj::getApiHostByRoute('/kj/taiwan-binguo/kai800');
             $url = $domain.'/getbasekaimanshicai?lotCode=30002';
 
@@ -497,9 +497,9 @@ class CqsscKcw extends BaseKj {
      * @param string $returnType
      * @return array
      */
-    public static function getLotteryBg($returnType = 'json', $is_auto = 0){
+    public static function getLotteryBg($returnType = 'json', $is_auto = 1){
 
-        if(!$is_auto OR !$kjData = self::getCurrentKjData($lottery_type = 9)) {
+        if($is_auto==2 OR !$kjData = self::getCurrentKjData($lottery_type = 9)) {
             $domain = BaseKj::getApiHostByRoute('/kj/taiwan-binguo/tw-bg');
             $url = $domain.'/kaijiangWeb/?a=kaijiangWeb.drawResult&m=getActiveDrawInfo'; #当前开奖号码
             # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015

@@ -8,6 +8,7 @@
 
 namespace backend\service;
 
+use backend\models\TzType;
 use backend\service\huiyuan\HuiYuanService5;
 use backend\models\LotteryType;
 use backend\models\SystemConfig;
@@ -194,6 +195,68 @@ abstract class BetService extends BaseBetService {
         Tool_Common::log('bet','INFO','用户真实投注', $logArr);
 
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
+    }
+
+    /**
+     * @desc 彩种名称缓存key
+     * @return string
+     */
+    public static function buildLotteryNameKey(){
+        return 'buildLotteryNameKey_1';
+    }
+
+    /**
+     * @desc 彩种名称
+     * @param string $lottery_type
+     */
+    public static function getLotteryName($lottery_type = ''){
+        $m = \Yii::$app->cache;
+        $mkey = self::buildLotteryNameKey();
+        if(!$datas = $m->get($mkey)){
+            $datas = [];
+            $LotteryTypes = LotteryType::find()->asArray()->all();
+            foreach ($LotteryTypes as $lotteryType){
+                $datas[$lotteryType['lottery_type']] = $lotteryType['title'];
+            }
+
+            $m->set($mkey, $datas, 4*3600);
+        }
+        if(!empty($lottery_type) && isset($datas[$lottery_type])){
+            $datas = $datas[$lottery_type]; # 单个彩种名称
+        }
+
+        return $datas;
+    }
+
+    /**
+     * @desc 彩种名称缓存key
+     * @return string
+     */
+    public static function buildBetTypeNameKey(){
+        return 'buildBetTypeNameKey_1';
+    }
+
+    /**
+     * @desc 彩种名称
+     * @param string $lottery_type
+     */
+    public static function getBetTypeName($tzType = ''){
+        $m = \Yii::$app->cache;
+        $mkey = self::buildBetTypeNameKey();
+        if(!$datas = $m->get($mkey)){
+            $datas = [];
+            $TzTypes = TzTypes::find()->asArray()->all();
+            foreach ($TzTypes as $tz_type){
+                $datas[$tz_type['type']] = $tz_type['type_name'];
+            }
+
+            $m->set($mkey, $datas, 4*3600);
+        }
+        if(!empty($tzType) && isset($datas[$tzType])){
+            $datas = $datas[$tzType]; # 单个彩种名称
+        }
+
+        return $datas;
     }
 
     /**

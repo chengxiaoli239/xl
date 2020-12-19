@@ -128,7 +128,7 @@ $(function () {
         domain = window.location.protocol+"//"+window.location.host;
         url = $(this).data('url');
         console.log(domain)
-        $.post(url, {is_auto:0}, function(rst) {
+        $.post(url, {is_auto:2}, function(rst) {
             console.log(rst)
             $('#rst_code').text(JSON.stringify(rst, null, ' '))
             $('#push_content').text('curl ' + domain + url)

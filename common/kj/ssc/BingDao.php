@@ -20,7 +20,7 @@ class BingDao extends BaseKj {
      */
     public static function getLottery($returnType = 'json', $is_auto = 1){
 
-        if(!$is_auto OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $TzSystemsUserses = TzSystemsUsers::find()->where(['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [7,9]] ])->all();
             $m = \Yii::$app->cache;
             foreach ($TzSystemsUserses as $TzSystemsUsers){ # 用户账号去网盘抓数据
