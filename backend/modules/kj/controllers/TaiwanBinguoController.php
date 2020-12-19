@@ -18,9 +18,20 @@ class TaiwanBinguoController extends Controller
      */
     public function actionKai800($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = CqsscKcw::getLotteryTaiwanBinguo($type);
+        $post = \Yii::$app->request->post();
+        $data = CqsscKcw::getLotteryTaiwanBinguo($type, $post['is_auto']);
         return $data;
     }
 
+    /**
+     * @desc 开800 - 台湾宾果
+     * @return json|xml
+     */
+    public function actionTwBg($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $post = \Yii::$app->request->post();
+        $data = CqsscKcw::getLotteryBg($type, $post['is_auto']);
+        return $data;
+    }
 
 }

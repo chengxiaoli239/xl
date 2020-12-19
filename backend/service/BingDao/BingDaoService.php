@@ -49,7 +49,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         8 => 12, # 5m
         9 => 13, # 10m
         10 => 9, # 台湾冰果
-        11 => 14, # 台湾欢乐生肖
+        11 => 15, # 台湾欢乐生肖
     ];
     public static $ll_types = [ # 本系统对网盘的彩种类型id
         6 => 5, # 新疆
@@ -58,7 +58,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         12 => 8, # 5m
         13 => 9, # 10m
         9 => 10, # 台湾冰果
-        14 => 11, # 台湾欢乐生肖
+        15 => 11, # 台湾欢乐生肖
     ];
 
     public static $headers = [];

@@ -18,14 +18,9 @@ class BingDao extends BaseKj {
      * @param string $returnType
      * @return array
      */
-    public static function getLottery($returnType = 'json', $test = 0){
+    public static function getLottery($returnType = 'json', $is_auto = 1){
 
-        $hasActivePlan = CommonService::hasPlansActive(self::$lottery_type);
-        if(in_array(self::$lottery_type, [10]) && !$hasActivePlan){
-            return false;
-        }
-
-        if(!$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if(!$is_auto OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $TzSystemsUserses = TzSystemsUsers::find()->where(['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [7,9]] ])->all();
             $m = \Yii::$app->cache;
             foreach ($TzSystemsUserses as $TzSystemsUsers){ # 用户账号去网盘抓数据
@@ -52,9 +47,6 @@ class BingDao extends BaseKj {
                 $content = LuckyBaseService::getCurl($url, $headers, $TzSystemsUsers->uid);
                 //$data = json_decode($content,320);
                 $data = $content;
-                if(isset($data['Status']) && $data['Status'] == 1){
-
-                }
 
                 if (!isset($data['Status']) OR $data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) {
                     Tool_Common::log('getLotteryLucky', 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);

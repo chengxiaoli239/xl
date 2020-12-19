@@ -1,6 +1,7 @@
 <?php
 namespace backend\modules\kj\controllers;
 
+use common\kj\cqssc\CqsscKcw;
 use common\kj\ssc\BingDao;
 use common\kj\ssc\Lucky5;
 use Yii;
@@ -36,7 +37,7 @@ class BingDaoController extends Controller
      */
     public function actionIndex5mTw($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = BingDao::getLotteryOne($type, $l_type=8);
+        $data = CqsscKcw::getLotteryBg($type, $l_type=8);
         return $data;
     }
 

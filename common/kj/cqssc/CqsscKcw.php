@@ -4,6 +4,7 @@ namespace common\kj\cqssc;
 use backend\models\KjConfig;
 use backend\models\SystemConfig;
 use backend\models\TzSystemsUsers;
+use backend\service\BingDao\BingDaoService;
 use backend\service\CurlService;
 use common\kj\BaseKj;
 use backend\service\HN0898Service;
@@ -24,6 +25,7 @@ class CqsscKcw extends BaseKj {
         11 => 2, # 11:3分 冰岛3m
         12 => 3, # 11:5分 冰岛5m
         13 => 4, # 11:5分 冰岛10m
+        15 => 3, # 11:5分 冰岛10m
     ];
 
     # 彩种对应名称
@@ -41,6 +43,7 @@ class CqsscKcw extends BaseKj {
         11 => '冰岛3m', # 冰岛3分
         12 => '冰岛5m', # 冰岛5分
         13 => '冰岛10m', # 冰岛5分
+        15 => '欢乐生肖', # 冰岛5分
     ];
 
     public static function getLotteryNo($returnType = 'json'){
@@ -446,9 +449,9 @@ class CqsscKcw extends BaseKj {
      * @param string $returnType
      * @return array|bool 返回格式(数组)：{"expect":"2020100623","opencode":"0,8,6,3,6","opentime":"2020-10-06 17:41:38"}
      */
-    public static function getLotteryTaiwanBinguo($returnType = 'json'){
+    public static function getLotteryTaiwanBinguo($returnType = 'json', $is_auto = 1){
 
-        if(!$kjData = self::getCurrentKjData($lottery_type = 9)) {
+        if(!$is_auto OR !$kjData = self::getCurrentKjData($lottery_type = 9)) {
             $domain = BaseKj::getApiHostByRoute('/kj/taiwan-binguo/kai800');
             $url = $domain.'/getbasekaimanshicai?lotCode=30002';
 
@@ -485,6 +488,58 @@ class CqsscKcw extends BaseKj {
         }
         $logArr = $rst;
         Tool_Common::log('cqssc_kl8', 'INFO', '99彩票网-号码抓取', $logArr);
+
+        return $rst;
+    }
+
+    /**
+     * @desc 台湾冰果 https://twhlsx168.com/#/index
+     * @param string $returnType
+     * @return array
+     */
+    public static function getLotteryBg($returnType = 'json', $is_auto = 0){
+
+        if(!$is_auto OR !$kjData = self::getCurrentKjData($lottery_type = 9)) {
+            $domain = BaseKj::getApiHostByRoute('/kj/taiwan-binguo/tw-bg');
+            $url = $domain.'/kaijiangWeb/?a=kaijiangWeb.drawResult&m=getActiveDrawInfo'; #当前开奖号码
+            # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015
+
+            $content = BingDaoService::postCurl($url, http_build_query(['lotteryType'=>BingDaoService::$ll_types[$lottery_type=9]]));
+            $data = $content;
+
+            if (!isset($data['code']) OR $data['code'] != 200) {
+                Tool_Common::log('/kj_data/getLotteryTwHl', 'ERR', '台湾欢乐号码抓取异常', ['url'=>$url, 'content'=>$content]);
+            }
+            $codesArr = $data['data']['drawInfo']['historyDraw']['resultList'];
+            $qihao = $data['data']['drawInfo']['historyDraw']['draw_number'];
+
+            $code1 = substr($codesArr[0] + $codesArr[5] + $codesArr[10] + $codesArr[15], -1);
+            $code2 = substr($codesArr[1] + $codesArr[6] + $codesArr[11] + $codesArr[16], -1);
+            $code3 = substr($codesArr[2] + $codesArr[7] + $codesArr[12] + $codesArr[17], -1);
+            $code4 = substr($codesArr[3] + $codesArr[8] + $codesArr[13] + $codesArr[18], -1);
+            $code5 = substr($codesArr[4] + $codesArr[9] + $codesArr[14] + $codesArr[19], -1);
+            $opencode = $code1.','.$code2.','.$code3.','.$code4.','.$code5;
+
+            if($opencode == '0,0,0,0,0') return false;
+            $kjData = ['expect'=>$qihao , 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
+        }
+        if(empty($kjData['opencode'])) return false;
+        $opencode = $opencode;
+        $opentime = $kjData['opentime'];
+        $expect = $kjData['expect'];
+
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = $rst;
+        Tool_Common::log('luck5', 'INFO', '号码抓取-冰岛相关网', $logArr);
 
         return $rst;
     }

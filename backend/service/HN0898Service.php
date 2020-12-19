@@ -47,10 +47,12 @@ class HN0898Service extends BaseTZService {
     public static $headers = [];
 
     public static $typeTimes = [
+        9 => ['m'=>5, 'max_qihao'=>203], # 台湾冰果
         10 => ['m'=>1.5, 'max_qihao'=>639],
         11 => ['m'=>3, 'max_qihao'=>319],
         12 => ['m'=>5, 'max_qihao'=>191], # 待定
         13 => ['m'=>10, 'max_qihao'=>95], # 待定
+        15 => ['m'=>5, 'max_qihao'=>203], # 一天最大期号 台湾欢乐生肖
     ];
 
     /**
@@ -1229,7 +1231,7 @@ class HN0898Service extends BaseTZService {
                 $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 break;
             case 9: # 台湾宾果
-                $qihao = 109060291 + self::getTwDifferentDays() * 204 + self::getDifferentNums($lottery_type = 9) - self::getTwDifferentDays() + 1; # 109060291为2020-10-23最后一期期号
+                $qihao = 109071659 + self::getTwDifferentDays() * 203 + self::getDifferentNums($lottery_type = 9) + 1; # 109060291为2020-10-23最后一期期号
                 break;
             case 10: # 冰岛90s 早8点到凌晨3点
                 $timsstamp = time();
@@ -1269,6 +1271,10 @@ class HN0898Service extends BaseTZService {
                     $actionNo = (int)($now_timsstamp / $qujian_times) + 1;
                     $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 }
+                break;
+            case 15: # 冰岛-欢乐生肖 早9点到凌晨2点
+                //p([self::getHLDifferentDays(), self::getDifferentNums($lottery_type = 15)]);
+                $qihao = 109071636 + self::getHLDifferentDays() * 203 + self::getDifferentNums($lottery_type = 15) + 1; # 109071636为2020-12-19最后一期期号
                 break;
         }
 
@@ -1334,7 +1340,7 @@ class HN0898Service extends BaseTZService {
                 }
                 break;
             case 9: # 台湾宾果
-                $qihao = 109060291 + self::getTwDifferentDays() * 204 + self::getDifferentNums($lottery_type = 9) - self::getTwDifferentDays(); # 967767为2019-08-10最后一期期号
+                $qihao = 109071659 + self::getTwDifferentDays() * 203 + self::getDifferentNums($lottery_type = 9); # 109071659为2020-10-23最后一期期号
                 break;
             case 10: # 冰岛90s 早8点到凌晨3点
                 $timsstamp = time();
@@ -1364,15 +1370,18 @@ class HN0898Service extends BaseTZService {
                 $nowTime = date("H:i:s");
                 if('00:00:00'<$nowTime && $nowTime < '03:00:00') {
                     $max_actionNo = $types[$lottery_type]['max_qihao']; # 12点最大期号
-                    $now_timsstamp = $timsstamp - $today_time; # 早8点到凌晨3点 不开奖
+                    $now_timsstamp = $timsstamp - $today_time; # 凌晨3点早8点到 不开奖
                     $actionNo = (int)($now_timsstamp / $qujian_times) + 1 + $max_actionNo;
                     $qihao = date('Ymd', time() - 24 * 3600) . sprintf("%03d", $actionNo);
                 }else{
-                    $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
+                    $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 凌晨3点到早8点 不开奖
 
                     $actionNo = (int)($now_timsstamp / $qujian_times);
                     $qihao = date("Ymd").sprintf("%03d", $actionNo);
                 }
+                break;
+            case 15: # 冰岛-欢乐生肖 早9点到凌晨2点
+                $qihao = 109071636 + self::getHLDifferentDays() * 203 + self::getDifferentNums($lottery_type = 15); # 109071637为2020-12-18最后一期期号
                 break;
         }
 
@@ -1381,12 +1390,52 @@ class HN0898Service extends BaseTZService {
     }
 
     /**
+     * @desc 获取台湾欢乐生肖天数差
+     * @param string $end_date
+     * @return float|int
+     */
+    public static function getHLDifferentDays($end_date = ''){
+        $start_date = '2020-12-18';
+        if(!$end_date) $end_date = date('Y-m-d');
+
+        $start = strtotime($start_date);
+        $end = strtotime($end_date);
+
+        $nums = ( $end - $start ) / (24 * 3600);
+
+        return $nums - 1;
+    }
+    /**
+     * @desc 计算当前日期距离2020-12-19天数 - 台湾欢乐生肖
+     * @param integer $lottery_type
+     * @return float|int
+     */
+    public static function getHLDifferentNums($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $time = time();
+        $date_time = date('H:i');
+        //$date_time = '07:09';
+        if($lottery_type == 9){
+            $start_time = strtotime(date('Y-m-d').' 07:05');
+            if('00:00'<$date_time && $date_time<'07:05') $time = $start_time;
+            $nums = floor(($time - $start_time)/(5*60));
+
+        }else{
+            $start_time = strtotime(date('Y-m-d').' 09:05');
+            if('00:00'<$date_time && $date_time<'09:05') $time = $start_time;
+            //p([$time, $start_time]);
+            $nums = floor(($time - $start_time)/(5*60));
+        }
+
+        return $nums + 1;
+    }
+
+    /**
      * @desc 获取台湾宾果天数差
      * @param string $end_date
      * @return float|int
      */
     public static function getTwDifferentDays($end_date = ''){
-        $start_date = '2020-10-23';
+        $start_date = '2020-12-18';
         if(!$end_date) $end_date = date('Y-m-d');
 
         $start = strtotime($start_date);
@@ -1415,18 +1464,29 @@ class HN0898Service extends BaseTZService {
     }
 
     /**
-     * @desc 北京快乐8 计算当前要开奖期号序号
+     * @desc 计算开奖期数
      * @return float
      */
     public static function getDifferentNums($lottery_type = DEFAULT_LOTTERY_TYPE){
         $time = time();
         $date_time = date('H:i');
         //$date_time = '07:09';
-        if($lottery_type == 9){
-            $start_time = strtotime(date('Y-m-d').' 07:05');
-            if('00:00'<$date_time && $date_time<'07:05') $time = $start_time;
-            $nums = floor(($time - $start_time)/(5*60));
+        if($lottery_type == 9) {
+            $start_time = strtotime(date('Y-m-d') . ' 07:05');
+            if ('00:00' < $date_time && $date_time < '07:05') $time = $start_time;
+            $nums = floor(($time - $start_time) / (5 * 60));
 
+        }elseif($lottery_type == 15){ # 台湾欢乐生肖
+            $today_time = strtotime(date('Y-m-d 00:00:00'));
+            $start_time = strtotime(date('Y-m-d').' 09:05');
+            if($date_time < '02:00'){
+                $start_time = $today_time;
+                $nums = floor(($time - $start_time)/(5*60));
+            }elseif('02:00'<$date_time && $date_time<'09:05'){
+                $nums = 23;
+            }elseif($date_time>'09:05'){
+                $nums =  23 + floor(($time - $start_time)/(5*60));
+            }
         }else{
             $start_time = strtotime(date('Y-m-d').' 09:05');
             if('00:00'<$date_time && $date_time<'09:05') $time = $start_time;
