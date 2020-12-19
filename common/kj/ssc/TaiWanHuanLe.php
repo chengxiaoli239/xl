@@ -18,7 +18,7 @@ class TaiWanHuanLe extends BaseKj {
      * @param string $returnType
      * @return array
      */
-    public static function getLotteryHl($returnType = 'json', $is_auto = 0){
+    public static function getLotteryHl($returnType = 'json', $is_auto = 1){
 
         if(!$is_auto OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/tai-wan-huan-le/index');
