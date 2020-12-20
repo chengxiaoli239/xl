@@ -250,6 +250,7 @@ class KjDataGet
             'qihao' => (string)$qihao,
             'code_str' => $kjData,
             'codes_hz'=> array_sum($kjDatasArr),
+            'code_4n_str' => $kjDatasArr[0].','.$kjDatasArr[1].','.$kjDatasArr[2].','.$kjDatasArr[2], # 四字定str
             'codes_4nums_hz'=> array_sum($codes_4nums),
             'code1'=>$kjDatasArr[0],
             'code2'=>$kjDatasArr[1],
