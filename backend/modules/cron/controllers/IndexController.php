@@ -135,7 +135,8 @@ class IndexController extends Controller
     public function actionStaticHzProfits(){
         self::_init();
         if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
-        $rst = StaticService::opStatic(); # 和值、四定利润统计
+        $post = \Yii::$app->request->post();
+        $rst = StaticService::opStatic($post['lottery_types']); # 和值、四定利润统计
 
         return $rst;
     }

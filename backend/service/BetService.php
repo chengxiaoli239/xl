@@ -1205,6 +1205,7 @@ abstract class BetService extends BaseBetService {
         $cacheTime = $lottery->data_ftime;
         switch ($lottery_type){
             case 1: # 希腊1.5分彩
+                $cacheTime = 7200;
                 break;
             case 2: # 希腊3分彩
                 break;

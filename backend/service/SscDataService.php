@@ -100,7 +100,7 @@ class SscDataService extends BaseService {
         $next_qihao = SscDataService::getNextStaticDsQihao($lottery_type);
         $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
 
-        //p([$next_qihao, $last_qihao]);
+        //p([$lottery_type, $next_qihao, $last_qihao]);
         if($next_qihao<=$last_qihao){
             $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
             if(!$new_qihao){ # 防止官网某一期不开的情况, 自动获取开奖表下一期的开奖号码
@@ -120,7 +120,7 @@ class SscDataService extends BaseService {
      * @return bool|int|string
      */
     public static function getNextStaticDsQihao($lottery_type = DEFAULT_LOTTERY_TYPE){
-        $last_qihao = SscKjDataDs::find()->select(['max(qihao) as last_qihao'])->where(['lottery_type'=>$lottery_type])->asArray()->one()['last_qihao'];
+        $last_qihao = SscKjDataDs::find()->select(['qihao as last_qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one()['last_qihao'];
 
         $next_qihao = KjDataGet::getNextQihaoByQihao($last_qihao, $lottery_type);
 
@@ -321,7 +321,8 @@ class SscDataService extends BaseService {
      * @param int $interval
      */
     public static function getKjDataLastQihao($lottery_type = DEFAULT_LOTTERY_TYPE){
-        $last_qihao = SscKjData::find()->select(['max(qihao) as last_qihao'])->where(['lottery_type'=>$lottery_type])->asArray()->one()['last_qihao'];
+        //$last_qihao = SscKjData::find()->select(['max(qihao) as last_qihao'])->where(['lottery_type'=>$lottery_type])->asArray()->one()['last_qihao'];
+        $last_qihao = SscKjData::find()->select(['qihao as last_qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one()['last_qihao'];
 
         return $last_qihao;
     }
@@ -793,7 +794,7 @@ class SscDataService extends BaseService {
     }
 
     /**
-     * @param $type 类型：1和值2号码类型[例如:双双重、三重]3三字现4四字现
+     * @param $type - 类型：1和值2号码类型[例如:双双重、三重]3三字现4四字现
      * @return array|bool
      */
     public static function updateCodeTypeYLs($type, $lottery_type = DEFAULT_LOTTERY_TYPE){
@@ -1605,6 +1606,7 @@ class SscDataService extends BaseService {
         $opData = [];
         $opData['updated_at'] = time();
         $opData['updated_time'] = date('Y-m-d H:i:s');
+        //p(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
         $SscKjDataDs = SscKjDataDs::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
         if(!$SscKjDataDs){
             $SscKjDataDs = new SscKjDataDs();
@@ -1649,7 +1651,7 @@ class SscDataService extends BaseService {
             $val = SystemConfig::findOne(['key'=>'ssc_kj_time_period'])->value; # 开奖时间间隔:20分钟
             $m->set($mkey, 1,$val*60);
         }
-        //p([$tmpData,$SscKjDataDs->attributes,$SscKjDataDs->getErrors()],0);
+        //p([$rst, $tmpData,$SscKjDataDs->attributes,$SscKjDataDs->getErrors()]);
         if(!$rst){
             $logArr = ['attributes'=>$SscKjDataDs->attributes, 'msg'=>$SscKjDataDs->getErrors()];
             Tool_Common::log('insertSscKjDataDsError','INFO','每期开奖单双记录-插入失败', $logArr);

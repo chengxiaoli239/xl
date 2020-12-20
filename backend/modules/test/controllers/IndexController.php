@@ -198,12 +198,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = BaseService::login($id=72);p($rst);
         $lottery_types = [6];
         foreach ($lottery_types as $lottery_type) {
             /* 处理系统投注计划 add 2019-01-21 */
             $rst[$lottery_type] = KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
-            $rst['TzService'] = TzService::opSystemBetPlans(6, $istest = 1);p($rst);// 定制化投注计划
+            $rst['TzService'] = TzService::opSystemBetPlans($lottery_type, $istest = 1);p($rst);// 定制化投注计划
             /* 处理系统投注计划 add 2019-01-21 */
         }
         p($rst);
@@ -231,7 +230,7 @@ class IndexController extends Controller
         $rst = HN0898Service::insertDsYl($lottery_type = 1);p($rst); # 七星彩单双
         $rst = StaticService::opStatic($lottery_types = [1]); p($rst);# 和值、四定利润统计
         for ($i=0; $i<1000; $i++){
-            $rst['updateDs'] = SscDataService::updateDsData($lottery_type=1); // 每期开奖遗漏 -- 新开
+            $rst['updateDs'] = SscDataService::updateDsData($lottery_type=6); // 每期开奖遗漏 -- 新开
         }
         p($rst);
         $rst = StaticService::opAllCodeTypeYl([1]);p($rst);

@@ -1226,7 +1226,7 @@ class StaticService extends BaseService {
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
         foreach ($lottery_types as $lottery_type) {
             $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opStatic');
-            if($lottery_type==1 OR $status) {
+            if($status) {
                 $rst['staticSDHzPerDateProfits'] = StaticService::staticSDHzPerDateProfits($lottery_type); # 每天四定和值利润统计
                 $rst['staticHzMonthsProfits'] = StaticService::staticHzMonthsProfits($lottery_type); # 每月四定和值利润统计
                 $rst['allHzStaticProfits'] = StaticService::allHzStaticProfits($lottery_type); # 每个月份每个和值利润统计

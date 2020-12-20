@@ -1291,7 +1291,7 @@ class HN0898Service extends BaseTZService {
 
         switch ($lottery_type){
             case 1: # 七星彩
-                $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);
+                $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 2);
                 $qihao = $data['expect']; # 期号
                 break;
             case 5:
