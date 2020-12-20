@@ -198,6 +198,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BaseService::login($id=72);p($rst);
         $lottery_types = [6];
         foreach ($lottery_types as $lottery_type) {
             /* 处理系统投注计划 add 2019-01-21 */
@@ -325,7 +326,6 @@ class IndexController extends Controller
         p($ip);
         //system('/tmp/cron/test.sh');p('xx');
 
-        $id = 45; $rst = BaseService::login($id);p($rst);
         $s = 0; if(empty($s))p('xx');else p('yy');
         $str = '1234   3346 1267 9021
         2356

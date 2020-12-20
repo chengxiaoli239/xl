@@ -1054,6 +1054,18 @@ class  CommonService{
     }
 
     /**
+     * @desc 删除用户投注记录 - 主要针对新开通用户清除数据
+     * @param $uid
+     */
+    public static function delUserBetRecords($uid){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+
+        $rst['data']['flag'] = BettingRecords::deleteRecord(['uid'=>$uid]);
+
+        return $rst;
+    }
+
+    /**
      * @desc 删除用户授权的投注方式缓存
      * @param $uid
      */

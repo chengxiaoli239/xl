@@ -6,3 +6,8 @@ svn://gitee.com/gaozi/lottery_xl
 
 3、/www/wwwroot/invent.sm0898.com
 svn://gitee.com/gaozi/invent
+
+4、/www/wwwroot/swoole_webim
+svn://gitee.com/gaozi/ziliao/swoole_webim
+
+5、

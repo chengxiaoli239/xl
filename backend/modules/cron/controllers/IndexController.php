@@ -122,7 +122,8 @@ class IndexController extends Controller
         self::_init();
         if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
 
-        $rst = StaticService::opAllCodeTypeYl();
+        $post = \Yii::$app->request->post();
+        $rst = StaticService::opAllCodeTypeYl($post['lottery_types']);
 
         return $rst;
     }
