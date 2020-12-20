@@ -94,7 +94,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                         ],
                         */
-                        ['attribute' => 'status','label'=>'状态', 'headerOptions'=>['width'=>'8%'],
+                        ['attribute' => 'status','label'=>'状态', 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 if($model->status == 1){
@@ -108,6 +108,22 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                                 $url = "/forum/user/switch-tz-system-status?id=".$model->id."&status=".$val; #
                                 return Html::a($txt, $url, ['title' => '开通系统权限','alt'=>$alt]);
+                            }
+                        ],
+                        ['attribute' => 'is_use_proxy','label'=>'需代理', 'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if($model->is_use_proxy == 1){
+                                    $txt = '<font color="green">是</font>';
+                                    $alt = '点击禁用';
+                                    $val = 0;
+                                }else{
+                                    $txt = '<font color="red">否</font>';
+                                    $val = 1;
+                                    $alt = '点击启用';
+                                }
+                                $url = "/forum/user/switch-proxy?id=".$model->id."&status=".$val; #
+                                return Html::a($txt, $url, ['title' => '开通使用代理IP','alt'=>$alt]);
                             }
                         ],
                         //'ssc_domain',

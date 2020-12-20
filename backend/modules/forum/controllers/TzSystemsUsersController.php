@@ -122,6 +122,7 @@ class TzSystemsUsersController extends BaseController
             if($model->account == $post['TzSystemsUsers']['account']){
                  $cookie = trim($post['TzSystemsUsers']['cookie']);
             }
+            $post['TzSystemsUsers']['ssc_domain'] = trim($post['TzSystemsUsers']['ssc_domain'], '/');
             $post['TzSystemsUsers']['cookie'] = $cookie;
         }
 
