@@ -1730,12 +1730,12 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                 //if($tz_type != 20) $tzRst['code'] = $codes;
                 Tool_Common::log('bet_error','INFO','冰岛90s批投注记录-投注失败', $tzRst);
                 # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护，307账号停押
-                if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [302, 303, 304, 305, 306, 307])){
+                if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [303, 304, 305, 306, 307])){
                     Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-9', $tmpRst);
                     //return $rst;
                     continue;
                 }
-                if(in_array($rst[$key]['code'], [302])){
+                if(in_array($tmpRst['code'], [302])){
                     Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-10', $tmpRst);
                     return $rst; # 余额不足
                 }
