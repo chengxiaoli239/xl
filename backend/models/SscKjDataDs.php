@@ -51,7 +51,7 @@ class SscKjDataDs extends \common\models\base\BaseModel
             [['index_id', 'code_1', 'code_2', 'code_3', 'code_4', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'code_1_2_3', 'code_1_2_4', 'code_1_3_4', 'code_2_3_4', 'code_1_2_3_4', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
             [['code_str', 'qihao'], 'string', 'max' => 24],
-            [['qihao'], 'unique'],
+            [['lottery_type', 'qihao'], 'unique', 'targetAttribute' => ['lottery_type', 'qihao']],
         ];
     }
 
