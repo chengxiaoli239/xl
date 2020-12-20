@@ -1737,9 +1737,13 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
                 }
                 if(in_array($tmpRst['code'], [302])){
                     Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-10', $tmpRst);
+                    $TzSystemsUsers->desc = '网盘：余额不足';
+                    $TzSystemsUsers->save();
                     return $rst; # 余额不足
                 }
             }
+            $TzSystemsUsers->desc = '';
+            $TzSystemsUsers->save();
 
             $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
             $m->set($betKey, 1, $time);
