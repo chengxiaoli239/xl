@@ -1,6 +1,7 @@
 <?php
 namespace backend\service;
 
+use backend\models\TzSystemsUsers;
 use common\service\CommonService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
@@ -270,5 +271,41 @@ class PoxyIPService extends BaseService {
         Tool_Common::log('getProxyIpNew', 'INFO', '获取新ip优化', $logArr);
 
         return $poxy_ip_data;
+    }
+
+    /**
+     * @desc 代理id key
+     * @return string
+     */
+    public static function buildProxyUidsKey(){
+        return 'buildProxyUidsKey_0';
+    }
+
+    public static function delProxyUidsKey(){
+        $m = \Yii::$app->cache;
+        $mkey = self::buildProxyUidsKey();
+        $flag = $m->delete($mkey);
+
+        return $flag;
+    }
+
+    /**
+     * @desc 使用代理用户uid lt_admin.id
+     * @return array|mixed
+     */
+    public static function getProxyUids(){
+        $m = \Yii::$app->cache;
+        $mkey = self::buildProxyUidsKey();
+        $uids = $m->get($mkey);
+        if(empty($uids)){
+            $TzSystemsUsers = TzSystemsUsers::findAll(['is_use_proxy'=>1]);
+            $uids = yii\helpers\ArrayHelper::getColumn($TzSystemsUsers, 'uid');
+
+            $m->set($mkey, $uids, 4*3600);
+        }
+
+        $uids = $uids ? $uids : [];
+
+        return $uids;
     }
 }

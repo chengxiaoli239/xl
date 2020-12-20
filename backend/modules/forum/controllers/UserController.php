@@ -8,6 +8,7 @@ use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
 use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
 use backend\service\BetService;
+use backend\service\PoxyIPService;
 use backend\service\UserService;
 use common\models\AdminModel;
 use common\service\CommonService;
@@ -307,6 +308,7 @@ class UserController extends BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if(\Yii::$app->user->id == 1){
             $rst = HN0898Service::updateStatus($id, $model = '\backend\models\TzSystemsUsers', 'is_use_proxy');
+            PoxyIPService::delProxyUidsKey();
         }
 
         return $this->redirect(['view']);

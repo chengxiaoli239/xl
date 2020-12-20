@@ -70,8 +70,7 @@ abstract class BaseTZService{
             //$poxy_addr = '218.85.247.70:20000';
         }
         Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);
-        $POXY_USER_IDS = BetService::getConfig('POXY_USER_IDS');
-        $uids = explode(',', $POXY_USER_IDS);
+        $uids = PoxyIPService::getProxyUids();
         if(empty($uids) OR !in_array($uid, $uids) OR !$uid){
             return [];
         }

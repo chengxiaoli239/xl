@@ -226,7 +226,7 @@ class KjDataGet
      * @param string $opentime
      * @return array|bool
      */
-    public static function insertKjData($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE, $kjData, $opentime = ''){
+    public static function insertKjData($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE, $kjData='', $opentime = ''){
         $kjDatas = str_replace(',', '', $kjData);
         if(!$qihao OR !$kjDatas) return false;
         $kjDatasArr = explode(',',$kjData);
@@ -303,7 +303,7 @@ class KjDataGet
             return ['status' => 300, 'msg' => $msg];
         }
 
-        return ['status'=>200, 'msg'=>'开奖数据写入成功', 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'insertData'=>$insertData, 'insertRst'=>$insertRst];
+        return ['status'=>200, 'msg'=>'开奖数据写入成功', 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'insertData'=>$insertData, 'insertRst'=>$insertRst, 'id'=>$SscKjData->id];
     }
 
     /**

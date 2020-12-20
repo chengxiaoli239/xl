@@ -198,6 +198,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        //PoxyIPService::delProxyUidsKey();
+        $rst = PoxyIPService::getProxyUids();p($rst);
+        $rst = KjDataGet::insertKjData('2020122047', 6, '3,7,8,2,4');p($rst);
+        $http = 'http://120.77.157.40:8090/forum/user/';
+        p(trim($http, '/'));
         $lottery_types = [6];
         foreach ($lottery_types as $lottery_type) {
             /* 处理系统投注计划 add 2019-01-21 */
@@ -207,7 +212,6 @@ class IndexController extends Controller
         }
         p($rst);
 
-        $rst = KjDataGet::insertKjData('2020122047', 6, '3,9,3,9,1');p($rst);
         $data = BingDao::getLotteryOne($type='json', $l_type=6);p($data);
         $data = BetService::getLotteryName();p($data);
         $data = CqsscKcw::getLotteryBg($type='json', $is_auto=0);p($data,0);
