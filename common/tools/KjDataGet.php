@@ -206,8 +206,8 @@ class KjDataGet
      * @desc 开奖后处理的数据
      */
     public static function afterKj($lottery_type = DEFAULT_LOTTERY_TYPE){
-        OpKjService::opSscKjData($lottery_type); # 处理投注数据
-        TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
+        $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
+        $rst['TzService'] = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
         //StaticService::opStaticProfits(); # 投注利润统计
         //SscDataService::updateDsData(); // 更新单双
         //StaticService::static4dMonthsProfits(); # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
@@ -215,6 +215,7 @@ class KjDataGet
         //StaticService::static4DdsLastTime(); # 记录上次单双值, 主要针对当前四定组合排除最近一期的号码
         //StaticService::staticSDHzPerDateProfits(); # 每天四定和值利润统计
         //StaticService::staticHzMonthsProfits(); # 每月四定和值利润统计
+        return $rst;
     }
 
     /**

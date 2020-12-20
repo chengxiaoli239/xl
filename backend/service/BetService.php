@@ -268,8 +268,9 @@ abstract class BetService extends BaseBetService {
         if(!$tzStatus) return ['status'=>300, 'msg'=>'投注开关未开启'];
         $lottery_types = StaticService::getUserLotteryTypes($uid);
         foreach ($lottery_types as $lottery_type) {
+
             $hasActivePlan = CommonService::hasPlansActive($lottery_type);
-            if(in_array($lottery_type, [8, 10, 11]) && !$hasActivePlan){
+            if(in_array($lottery_type, [1, 8, 10, 11]) && !$hasActivePlan){
                 continue;
             }
             $qihao = HN0898Service::getQihao($lottery_type);
