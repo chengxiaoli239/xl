@@ -18,9 +18,9 @@ class TzSystemsUsers extends TzSystemsUsersModel
     public function rules()
     {
         return [
-            [['id', 'uid', 'tz_system_id', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'sys_name', 'account', 'password', 'ssc_domain', 'cookie', 'user_agent', 'update_time'], 'safe'],
-            [['balance'], 'number'],
+            [['id', 'uid', 'is_agent', 'tz_system_id', 'status', 'tz_sort', 'is_use_proxy', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['username', 'sys_name', 'account', 'password', 'ssc_domain', 'cookie', 'user_agent', 'warn_val', 'desc', 'update_time'], 'safe'],
+            [['balance', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
         ];
     }
 
@@ -62,9 +62,19 @@ class TzSystemsUsers extends TzSystemsUsersModel
         $query->andFilterWhere([
             'id' => $this->id,
             'uid' => $this->uid,
+            'is_agent' => $this->is_agent,
             'tz_system_id' => $this->tz_system_id,
             'balance' => $this->balance,
             'status' => $this->status,
+            'tz_sort' => $this->tz_sort,
+            'odds_2x' => $this->odds_2x,
+            'odds_3x' => $this->odds_3x,
+            'odds_4x' => $this->odds_4x,
+            'odds_2d' => $this->odds_2d,
+            'odds_3d' => $this->odds_3d,
+            'odds_4d' => $this->odds_4d,
+            'is_use_proxy' => $this->is_use_proxy,
+            'expire_time' => $this->expire_time,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,
@@ -76,7 +86,9 @@ class TzSystemsUsers extends TzSystemsUsersModel
             ->andFilterWhere(['like', 'password', $this->password])
             ->andFilterWhere(['like', 'ssc_domain', $this->ssc_domain])
             ->andFilterWhere(['like', 'cookie', $this->cookie])
-            ->andFilterWhere(['like', 'user_agent', $this->user_agent]);
+            ->andFilterWhere(['like', 'user_agent', $this->user_agent])
+            ->andFilterWhere(['like', 'warn_val', $this->warn_val])
+            ->andFilterWhere(['like', 'desc', $this->desc]);
 
         return $dataProvider;
     }
