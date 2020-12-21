@@ -15,6 +15,7 @@ use Yii;
  * @property string $codes 组合号码
  * @property int $sort 排序
  * @property string $desc 描述
+ * @property int $play_type 玩法1单双2海南玩法
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
@@ -35,7 +36,7 @@ class TzTypes extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['playway', 'status', 'sort', 'created_at', 'updated_at'], 'integer'],
+            [['playway', 'status', 'sort', 'play_type', 'created_at', 'updated_at'], 'integer'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['type'], 'string', 'max' => 255],
@@ -58,6 +59,7 @@ class TzTypes extends \common\models\base\BaseModel
             'codes' => Yii::t('app', '组合号码'),
             'sort' => Yii::t('app', '排序'),
             'desc' => Yii::t('app', '描述'),
+            'play_type' => Yii::t('app', '玩法1单双2海南玩法'),
             'created_at' => Yii::t('app', '创建时间'),
             'updated_at' => Yii::t('app', '更新时间'),
             'update_time' => Yii::t('app', '更新时间'),
