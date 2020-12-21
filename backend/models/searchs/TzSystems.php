@@ -19,7 +19,7 @@ class TzSystems extends TzSystemsModel
     {
         return [
             [['id', 'system_type_id', 'status', 'type', 'created_at'], 'integer'],
-            [['name', 'ssc_domain', 'updated_at'], 'safe'],
+            [['name', 'ssc_domain', 'tz_types', 'updated_at'], 'safe'],
         ];
     }
 
@@ -63,6 +63,7 @@ class TzSystems extends TzSystemsModel
             'system_type_id' => $this->system_type_id,
             'status' => $this->status,
             'type' => $this->type,
+            'tz_types' => $this->tz_types,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);

@@ -3,6 +3,7 @@
 namespace backend\modules\forum\controllers;
 
 use backend\service\HN0898Service;
+use common\service\CommonService;
 use Yii;
 use backend\models\TzSystems;
 use backend\models\searchs\TzSystems as TzSystemsSearch;
@@ -100,6 +101,7 @@ class TzSystemsController extends BaseController
         $model = $this->findModel($id);
         $post = Yii::$app->request->post();
         if(!empty($post)){
+            $post['TzSystems']['tz_types'] && $post['TzSystems']['tz_types'] = implode(',',$post['TzSystems']['tz_types']);
             $post['TzSystems']['status'] = $post['TzSystems']['status'][0];
         }
 
@@ -107,7 +109,9 @@ class TzSystemsController extends BaseController
             return $this->redirect(['index']);
         }
 
+        $allTzTypes = CommonService::getAllTzTypes();
         return $this->render('update', [
+            'allTzTypes' => $allTzTypes,
             'model' => $model,
         ]);
     }

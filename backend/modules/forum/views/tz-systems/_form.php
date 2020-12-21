@@ -26,6 +26,8 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'type')->textInput() ?>
 
+                    <?= $form->field($model, 'tz_types')->checkboxList($allTzTypes)->label('已对接玩法') ?>
+
                     <!--?= $form->field($model, 'created_at')->textInput() ?-->
 
                     <!--?= $form->field($model, 'updated_at')->textInput() ?-->

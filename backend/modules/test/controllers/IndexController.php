@@ -198,6 +198,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BingDaoService::login($uid = 12, $tz_system_id = 13);p($rst);
         //PoxyIPService::delProxyUidsKey();
         $rst = PoxyIPService::getProxyUids();p($rst);
         $rst = KjDataGet::insertKjData('2020122047', 6, '3,7,8,2,4');p($rst);

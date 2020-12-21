@@ -44,6 +44,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->ssc_domain;
                             }
                         ],
+                        ['attribute'=>'tz_types', 'label'=>'对接玩法',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                return $model->tz_types;
+                            }
+                        ],
                         //'status',
                         ['attribute'=>'status', 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',

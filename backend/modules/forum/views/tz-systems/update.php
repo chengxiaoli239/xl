@@ -15,6 +15,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 <section class="tz-systems-update wrapper site-min-height">
 
     <?= $this->render('_form', [
+        'allTzTypes' => $allTzTypes,
         'model' => $model,
     ]) ?>
 

@@ -915,13 +915,13 @@ class  CommonService{
      * @param int $status
      * @return array
      */
-    public static function getAllTzTypes($type = 'lottery'){
+    public static function getAllTzTypes($play_type = 2, $type = 'lottery'){
 
         $datas = StaticService::$kArr;
 
         unset($datas[0],$datas[1],$datas[10],$datas[11]);
 
-        $datas = TzTypes::find()->where(['status'=>1])->asArray()->all();
+        $datas = TzTypes::find()->where(['status'=>1, 'play_type'=>$play_type])->asArray()->all();
 
         $dataArr = [];
 
