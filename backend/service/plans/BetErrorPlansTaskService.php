@@ -24,7 +24,7 @@ class BetErrorPlansTaskService extends BaseService {
             'uid' => $uid,
             'account' => $account,
             'plan_id' => $plan_id,
-            'qihao' => $qihao,
+            'qihao' => (string)$qihao,
             'codes' => json_encode($bet_codes, 320),
             'tz_type' => $tz_type,
             'tz_system_id' => $tz_system_id,

@@ -332,7 +332,7 @@ abstract class BetService extends BaseBetService {
                 $qihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
                 if(empty($qihao)){
                     Tool_Common::log('wang_pan_is_active', 'ERR', '网盘开盘状态', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
-                    return ['status'=>300, 'msg'=>'未开盘或者已关盘'];
+                    return ['status'=>300, 'msg'=>'未开盘或者已关盘['.date('Y-m-d H:i:s').']'];
                 }
                 $mkey = self::buildBetPlanIdKey($plan->account, $qihao, $plan->id);
 
