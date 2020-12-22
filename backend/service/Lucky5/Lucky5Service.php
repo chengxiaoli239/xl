@@ -1858,7 +1858,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $start_time = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
             //sleep(1);
-            if(true){
+            if($tmpRst['Status'] != 1){
                 $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $codesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
             }
             //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data, 'recordRst'=>$recordRst]);
