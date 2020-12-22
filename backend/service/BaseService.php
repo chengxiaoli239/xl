@@ -39,7 +39,7 @@ class BaseService{
         $tz_system_id = $TzSystemsUser->tz_system_id;
         # 是否有激活的计划
         $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id);
-        if(!$hasActivePlan){
+        if($is_auto == 1 && !$hasActivePlan){
             return false;
         }
 

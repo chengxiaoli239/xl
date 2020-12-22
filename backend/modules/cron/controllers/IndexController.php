@@ -247,6 +247,29 @@ class IndexController extends Controller
     }
 
     /**
+     * @desc 多线程跑用户计划
+     * @return mixed
+     */
+    public static function actionBetByUidXy(){
+        self::_init();
+        $post = \Yii::$app->request->post();
+        $uid = $post['uid'];
+        if(in_array($uid, [20])){
+            $for_times = 14;
+            $sleep_time = 5;
+        }else{
+            $for_times = 8;
+            $sleep_time = 5;
+        }
+        for($i=0; $i<$for_times; $i++){
+            $rst['bet'] = BetService::betByUidXy($uid); // 用户新计划投注，可正买可反买
+            sleep($sleep_time);
+        }
+
+        return $rst;
+    }
+
+    /**
      * @desc 访问首页
      * @return mixed
      */

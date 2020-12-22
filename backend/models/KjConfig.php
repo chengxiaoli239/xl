@@ -21,6 +21,7 @@ use Yii;
  * @property int $enable 开关0关闭1开启
  * @property int $created_at 创建时间
  * @property string $updated_at 更新时间
+ * @property string $update_time 更新时间
  */
 class KjConfig extends \common\models\base\BaseModel
 {
@@ -38,8 +39,8 @@ class KjConfig extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['is_batch', 'lottery_type', 'enable', 'created_at'], 'integer'],
-            [['updated_at'], 'safe'],
+            [['is_batch', 'lottery_type', 'enable', 'created_at', 'updated_at'], 'integer'],
+            [['update_time'], 'safe'],
             [['title', 'name'], 'string', 'max' => 64],
             [['host', 'path', 'post_data'], 'string', 'max' => 255],
             [['api_host'], 'string', 'max' => 128],
@@ -68,6 +69,7 @@ class KjConfig extends \common\models\base\BaseModel
             'enable' => '开关0关闭1开启',
             'created_at' => '创建时间',
             'updated_at' => '更新时间',
+            'update_time' => Yii::t('app', '更新时间'),
         ];
     }
 

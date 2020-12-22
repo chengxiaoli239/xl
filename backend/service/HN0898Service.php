@@ -647,7 +647,7 @@ class HN0898Service extends BaseTZService {
 
         $data = KjConfig::findOne($id);
         $data->enable = (int)$status;
-        $data->updated_at = date('Y-m-d H:i:s');
+        $data->updated_at = time();
 
         $m->set($mkey, 1, 10);
 

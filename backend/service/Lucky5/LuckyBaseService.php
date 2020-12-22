@@ -1256,7 +1256,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $TzSystemsUsers->updated_at = time();
         $TzSystemsUsers->save();
 
-        Tool_Common::log('loginRemote','INFO','Luck5登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','Luck5登陆记录-1', $logArr);
         return $data;
     }
     /**

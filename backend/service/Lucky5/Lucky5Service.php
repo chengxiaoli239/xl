@@ -1233,7 +1233,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $TzSystemsUsers->updated_at = time();
         $TzSystemsUsers->save();
 
-        Tool_Common::log('loginRemote','INFO','Luck5登陆记录', $logArr);
+        Tool_Common::log('loginRemote','INFO','Luck5登陆记录-2', $logArr);
         return $data;
     }
     /**
@@ -1484,28 +1484,47 @@ class Lucky5Service { # 重庆7时彩登陆体系
     }
 
     /**
+     * @desc 获取正在进行的期号
+     * @param string $uid
+     * @param string $tz_system_id
+     * @return array|string
+     */
+    public static function getActiveQihao($uid='', $tz_system_id='', $lottery_type = 8){
+        if(!$uid OR !$tz_system_id) return ['code'=>300, 'msg'=>'uid或者tz_system_id不能为空'];
+        $data = self::getQihaoInfo($uid, $tz_system_id);
+        if(isset($data['Status']) && isset($data['Data']) && $data['Data']['status']==0){
+            $qihao = $data['Data']['real_period_no'];
+        }else{
+            $qihao = '';
+        }
+
+        return $qihao;
+    }
+
+    /**
      * @desc 投注之前获取期号相关信息
      */
-    public static function getQihaoInfo($uid, $tz_system_id, $lottery_type = 6){
+    public static function getQihaoInfo($uid='', $tz_system_id='', $lottery_type = 8){
+        //$lottery = self::getSiteLottery($lottery_type);
         self::__init($uid, $tz_system_id);
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $urlArr = self::getTzSiteInfo($tz_system_id);//.'?'.http_build_query($post_data);
 
-        $lottery = self::getSiteLottery($lottery_type);
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetTheLastThree?lottery='.$lottery;
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $_t = round(microtime(true) * 1000);
+        $url = $urlArr['baseUrl'].'/drawno/GetCurrentPeriodStatus?_='.$_t;
         $headers = [
-            "Accept: application/json, text/plain, */*",
-            "Accept-Encoding: gzip, deflate",
+            "Accept: application/json, text/javascript, */*; q=0.01",
+            "Accept-Encoding: gunzip, deflate",
             "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
             "Connection: keep-alive",
-            "Cookie:".trim($TzSystemsUsers->cookie),
-            //"Origin:".str_replace('www.','',self::$baseUrl),
+            "Cookie: ".$TzSystemsUsers->cookie,
+            "Referer: ".$TzSystemsUsers->ssc_domain."/App/Index?_=".$_t,
             "Host:".str_replace('www.','',self::$domain),
-            "Referer:".$TzSystemsUsers->ssc_domain.'/',
             $TzSystemsUsers->user_agent,
+            "X-Requested-With: XMLHttpRequest",
         ];
+        $data = CurlService::getCurl($url, $headers);
 
-        $data = self::getCurl($url, $headers, $uid);
-        //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         Tool_Common::log('getQihaoInfo','INFO','幸运五登陆前', $logArr);
 
@@ -1860,12 +1879,14 @@ class Lucky5Service { # 重庆7时彩登陆体系
                         if($rst[$key]['code'] == 310 && $m->get($mkey_310)){
 
                         }else{
-                            $m->set($mkey_310,1, 60);
+                            $m->set($mkey_310,1, 15);
                             $mkey_proxy = PoxyIPService::builProxyIpKey();
                             $m->delete($mkey_proxy);
                         }
                     }
-                    BaseService::login($TzSystemsUsers->id);
+                    $TzSystemsUsers->cookie = '';
+                    $TzSystemsUsers->save();
+                    $loginRst = BaseService::login($TzSystemsUsers->id);
                     $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
                     $m->set($mkey, 1, 5*60);
                     $rst[$key] = $tmpRst;
@@ -1876,6 +1897,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     $rst[$key] = $tmpRst;
                 }
                 //if($tz_type != 20) $tzRst['code'] = $codes;
+                $tzRst['loginRst'] = $loginRst;
                 Tool_Common::log('bet_error','INFO','幸运五5分批投注记录-投注失败', $tzRst);
                 # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护，307账号停押
                 if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [303, 304, 306, 307])){
@@ -2036,7 +2058,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      */
     public static function isLogin($uid, $tz_system_id){
 
-        $balance = LuckyBaseService::getBalance($uid,$tz_system_id);
+        $balance = Lucky5Service::getBalance($uid,$tz_system_id);
 
         $flag = $balance > 0 ? true : false;
 
@@ -2167,6 +2189,16 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }
 
         return $poxy_addr;
+    }
+
+    public static function getQihaoInfox(){
+
+    }
+
+    public static function getOpenQihao($uid='', $tz_system_id=''){
+
+        p(['url'=>$url, 'rst'=>$rst]);
+
     }
 
 }

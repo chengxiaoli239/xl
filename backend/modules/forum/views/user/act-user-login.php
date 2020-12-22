@@ -42,6 +42,7 @@
         </div>
     </div>
 </div>
+<input type="hidden" id="act_login_status" value="1">
 <script src="/statics/datetimepicker/jquery.js"></script>
 <script>
 $(function () {
@@ -50,7 +51,16 @@ $(function () {
         op_id = $(this).attr('data-id');
 
         $('#ApplyLoginConfirm').attr('data-op-id', op_id);
-        txt = '系统账号:<strong><font color="green">' + $(this).data('username') + '</font></strong> &nbsp;&nbsp;网盘账号:<strong><font color="green">'+ $(this).data('account') + '</font></strong>'
+        username = $(this).data('username');
+        account = $(this).data('account');
+        if(account == undefined || username == undefined){
+            $('#txt_id').html('账号或密码不能为空');
+            showTips('登录操作', '正在登录');
+            $("#act_login_status").val(0);
+            return false;
+        }
+        $("#act_login_status").val(1);
+        txt = '系统账号:<strong><font color="green">' + username + '</font></strong> &nbsp;&nbsp;网盘账号:<strong><font color="green">'+ account + '</font></strong>'
         + '&nbsp;&nbsp;网盘地址:<strong><font color="green">'+ $(this).data('domain') + '</font></strong>';
         $('#txt_id').html(txt);
         showTips('登录操作', '正在登录');
@@ -67,6 +77,11 @@ $(function () {
     }
 
     $("#ApplyLoginConfirm").click(function () {
+        status = $('#act_login_status').val();
+        if(status == 0){
+            $("#rstTipModalLogin").modal('hide');
+            return false;
+        }
         id = $(this).attr('data-op-id')
         apply(id);
     });
@@ -76,7 +91,7 @@ $(function () {
      * @param uid
      */
     function apply(id) {
-        data = {id:id,is_auto:0};
+        data = {id:id,is_auto:2};
         console.log(data);
         $.post("/forum/tz-systems-users/login",data,function(rst) {
             console.log(rst);
