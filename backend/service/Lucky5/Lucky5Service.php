@@ -7,6 +7,7 @@ namespace backend\service\Lucky5;
  * Time: 09:40
  */
 
+use backend\models\BetErrorPlansTask;
 use backend\models\BettingRecords;
 use backend\models\SscKjData;
 use backend\models\SystemConfig;
@@ -1308,6 +1309,50 @@ class Lucky5Service { # 重庆7时彩登陆体系
     }
 
     /**
+     * @desc 重复下注失败的号码
+     * @param $id
+     */
+    public function repeatErrorBet($id){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+        $row = BetErrorPlansTask::findOne($id);
+        $url = $row->bet_url;
+        //$headers = json_decode($row->bet_headers); # 含有cookie，如果是重新登陆 cookie要变动，待处理
+        $uid = $row->uid;
+        $tz_system_id = $row->tz_system_id;
+        $post_data = json_decode($row->post_datas);
+
+        $_t = round(microtime(true) * 1000);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $headers = [
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'Accept-Encoding: gunzip, deflate',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Cache-Control: max-age=0',
+            'Connection: keep-alive',
+            'Content-Length:'.strlen(http_build_query($post_data)),
+            //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+            'Content-Type: application/x-www-form-urlencoded',
+            'Cookie: '.$TzSystemsUsers->cookie,
+            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+            'Origin: '.$TzSystemsUsers->ssc_domain,
+            'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+            'Upgrade-Insecure-Requests: 1',
+            $TzSystemsUsers->user_agent,
+        ];
+
+        $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid);
+        $row->status = ($tmpRst['Status'] == 1) ? 2 : 3;
+
+        $flag = $row->save();
+        if(!$flag){
+            return ['status'=>300, 'msg'=>$row->getFirstErrors()];
+        }
+        $rst['data']['bet_rst'] = $tmpRst;
+
+        return $rst;
+    }
+
+    /**
      * @decription 获取即将开奖的期号
      * @param int $type
      * @return string
@@ -1493,7 +1538,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
     public static function getActiveQihao($uid='', $tz_system_id='', $lottery_type = 8){
         if(!$uid OR !$tz_system_id) return ['code'=>300, 'msg'=>'uid或者tz_system_id不能为空'];
         $data = self::getQihaoInfo($uid, $tz_system_id);
-        if(isset($data['Status']) && isset($data['Data']) && $data['Data']['status']==0){
+        if(isset($data['Status']) && isset($data['Data']) && isset($data['Data']['status']) && $data['Data']['status']==0){
             $qihao = $data['Data']['real_period_no'];
         }else{
             $qihao = '';
@@ -1875,7 +1920,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     return ['status'=>300, 'msg'=>'已经重复登录过一次'];
                 }
                 if(in_array($tmpRst['code'], [303, 309, 310])){ # 判断掉线登录一次，再下注一次
-                    if($tmpRst['errno']>0 OR $tmpRst['code'] == 310){
+                    if($tmpRst['errno']>0 OR in_array($tmpRst['code'], [309,310])){
                         $m = \Yii::$app->cache;
                         $mkey_310 = 'has_jinyong_ip_310'; # 您当前使用的浏览器不支持cookie，换一次代理ip
                         if($rst[$key]['code'] == 310 && $m->get($mkey_310)){
@@ -1889,6 +1934,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     $TzSystemsUsers->cookie = '';
                     $TzSystemsUsers->save();
                     $loginRst = BaseService::login($TzSystemsUsers->id);
+                    $tzRst['loginRst'] = $loginRst;
                     $tmpRst_2 = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
                     $m->set($mkey, 1, 5*60);
                     $rst[$key] = $tmpRst_2;
@@ -1900,9 +1946,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     $rst[$key] = $tmpRst_2;
                 }
                 //if($tz_type != 20) $tzRst['code'] = $codes;
-                $tzRst['loginRst'] = $loginRst;
-                if($loginRst['status'] != 200 OR $tmpRst_2['Status'] != 1){
-                    $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $codesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
+                //if($loginRst['status'] != 200 OR $tmpRst_2['Status'] != 1){
+                if($tmpRst_2['Status'] != 1){
+                    $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
                 }
                 Tool_Common::log('bet_error','INFO','幸运五5分批投注记录-投注失败', $tzRst);
                 # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护，307账号停押

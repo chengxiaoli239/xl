@@ -298,6 +298,20 @@ class IndexController extends Controller
     }
 
     /**
+     * @desc 补打失败计划
+     * @return array
+     */
+    public function actionRepeatBetErrorPlans(){
+        self::_init();
+        $rst = ['status'=>200, 'msg'=>200];
+        for ($i=0; $i<10; $i++){
+            $rst[$i]['rst'] = BetService::repeatErrorBet();
+        }
+
+        return $rst;
+    }
+
+    /**
      * @desc 统计数据处理
      * @return bool
      */

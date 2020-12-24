@@ -404,7 +404,7 @@ class NineNineNewService extends BaseTZService {
             $start_time = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers);
             if(true){
-                BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
+                BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
             }
             $rstData = $tmpRst['rstData'];
             $xCsrf = $tmpRst['xCsrf'];

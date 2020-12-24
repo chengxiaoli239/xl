@@ -8,6 +8,7 @@
 
 namespace backend\service;
 
+use backend\models\BetErrorPlansTask;
 use backend\models\TzType;
 use backend\service\huiyuan\HuiYuanService5;
 use backend\models\LotteryType;
@@ -49,7 +50,7 @@ abstract class BetService extends BaseBetService {
      * @param $uid
      * @param $tz_system_id - 表lt_tz_systems.id
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
-     * @return HN0898Service|KuaiLe8Service|SevenService|XlService
+     * @return HN0898Service|KuaiLe8Service|SevenService|XlService|Lucky5Service|NineNineNewService
      */
     public static function getBetObj($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
         //p([$uid, $tz_system_id, $lottery_type]);
@@ -354,6 +355,47 @@ abstract class BetService extends BaseBetService {
         Tool_Common::log('bet','INFO','用户真实投注', $logArr);
 
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
+    }
+
+    /**
+     *
+     * @param array $lottery_types
+     */
+    public static function repeatErrorBet($lottery_types = []){
+
+        $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
+
+        foreach ($lottery_types as $lottery_type){
+            //$lottery_type = 8; # 测试
+            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 3]]];
+            $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->all();
+            foreach ($BetErrorPlansTasks as $betErrorPlansTask){
+                $uid = $betErrorPlansTask->uid;
+                $tz_system_id = $betErrorPlansTask->tz_system_id;
+                $lottery_type = $betErrorPlansTask->lottery_type;
+                $account = $betErrorPlansTask->account;
+                $qihao = $betErrorPlansTask->qihao;
+                $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
+                if($qihao == $activeQihao){
+                    $flag = self::isLogin($uid, $tz_system_id);
+                    if(!$flag){
+                        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+                        $loginRst = BaseService::login($TzSystemsUsers->id);
+                    }
+                    $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
+                    $betRst = $BetService->repeatErrorBet($betErrorPlansTask->id);
+                    $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = $betRst;
+                    Tool_Common::log('/repeatErrorBet/bet_rst', 'ERR', '网盘开盘状态', ['uid' => $uid, 'account' => $account, 'tz_system_id' => $tz_system_id, 'rst'=>$rst]);
+                }else{
+                    $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = ['status' => 300, 'msg' => '未开盘或者已关盘[' . date('Y-m-d H:i:s') . ']'];
+                    Tool_Common::log('/repeatErrorBet/bet_error', 'ERR', '网盘开盘状态', ['uid' => $uid, 'account' => $account, 'tz_system_id' => $tz_system_id, 'rst'=>$rst]);
+                }
+                $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetInfo'] = $betErrorPlansTask;
+
+            }
+        }
+
+        return $rst;
     }
 
     /**

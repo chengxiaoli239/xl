@@ -17,13 +17,14 @@ use yii\helpers\ArrayHelper;
 
 class BetErrorPlansTaskService extends BaseService {
 
-    public static function recordPlanTask($uid='',$account='', $plan_id='', $qihao='', $bet_codes='', $tz_type = '', $bet_url='', $bet_headers=[], $post_datas='', $single = 0.1, $bet_moneys='', $playway = 3, $tz_system_id='', $error_rst = [], $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function recordPlanTask($uid='',$account='', $plan_id='', $qihao='', $bet_sort_key=0, $bet_codes='', $tz_type = '', $bet_url='', $bet_headers=[], $post_datas='', $single = 0.1, $bet_moneys='', $playway = 3, $tz_system_id='', $error_rst = [], $lottery_type=DEFAULT_LOTTERY_TYPE){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $BetErrorPlansTask = new BetErrorPlansTask();
         $setDatas = [
             'uid' => $uid,
             'account' => $account,
             'plan_id' => $plan_id,
+            'bet_sort_key' => $bet_sort_key,
             'qihao' => (string)$qihao,
             'codes' => json_encode($bet_codes, 320),
             'tz_type' => $tz_type,

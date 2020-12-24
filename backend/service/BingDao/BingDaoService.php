@@ -1692,7 +1692,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
             //$tmpRst = self::postCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
             $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
             if(true) {
-                BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $codesArr, $tz_type, $url, $headers, json_encode($post_data), $single, count($tmpcodesArr) * $single, $playway, self::$tz_system_id, $tmpRst, $lottery_type);
+                BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $codesArr, $tz_type, $url, $headers, json_encode($post_data), $single, count($tmpcodesArr) * $single, $playway, self::$tz_system_id, $tmpRst, $lottery_type);
             }
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time). 's';
