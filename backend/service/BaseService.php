@@ -97,10 +97,12 @@ class BaseService{
             return ['status'=>300, 'msg'=>'操作失败:找不到记录'];
         }
 
+        $tz_system_id = $TzSystemsUser->tz_system_id;
+        $m = \Yii::$app->cache;
+        $mkey = 'synBalance_'.$tz_system_id.'_'.$TzSystemsUser->id;
         $redisLock = new RedisLock();
         $redisKey = 'Auto_synBalance_'.$id;
-        if($redisLock->lock($redisKey, 5)){
-            $tz_system_id = $TzSystemsUser->tz_system_id;
+        if($redisLock->lock($redisKey, 3)){
             # 是否有激活的计划
             $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id);
             if(!$hasActivePlan && !in_array($tz_system_id, [3, 11, 12, 13, 14])){
@@ -145,8 +147,18 @@ class BaseService{
                 # 13、冰岛
                 $rst = \backend\service\BingDao\BingDaoService::synBalance($TzSystemsUser->id);
             }
+            $m->set($mkey, $rst, 8);
         }else{
-            return ['status'=>301, 'msg'=>'同步余额并发锁['.$id.']'];
+            $rst = $m->get($mkey);
+            if(empty($rst)){
+                if(in_array($tz_system_id, [3, 7, 9, 10])){
+                    $rst = Lucky5Service::synBalance($TzSystemsUser->id);// p($rst);# 同步余额
+                }else{
+                    $rst = ['status'=>301, 'msg'=>'同步余额并发锁['.$id.']'];
+                }
+            }else{
+                $rst = ['status'=>301, 'msg'=>'同步余额并发锁['.$id.']'];
+            }
         }
 
         return $rst;

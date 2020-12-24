@@ -1268,7 +1268,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         $end_time = microtime(true);
         $consume_time = ($end_time-$start_time).'s';
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'username'=>$TzSystemsUsers->username, 'url'=>$url, 'headers'=>$headers,'data'=>$data, 'consume_time'=>$consume_time];
-        Tool_Common::log('userInfo','INFO','幸运五星-用户信息4', $logArr);
+        Tool_Common::log('userInfo','INFO','幸运五星-用户信息-5', $logArr);
         return $data;
     }
 

@@ -136,7 +136,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->updated_at = time();
-        if(!$rst = $TzSystemsUsers->save()){
+        if(!$rst = $TzSystemsUsers->save() OR $balance === false){
             $msg = ['status'=>300, 'msg'=>'金额同步失败~'];
         }
 
@@ -827,7 +827,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
     public static function getBalance($uid, $tz_system_id){
         self::__init($uid, $tz_system_id);
         $rst = self::userInfo($uid, $tz_system_id);
-        $balance = '';
+        $balance = false;
         if(isset($rst['Status']) && $rst['Status'] == 1){
             $balance = $rst['Data']['credit_balance'];
         }
@@ -1303,7 +1303,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'time_consume'=>$time_consume, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
-        Tool_Common::log('userInfo','INFO','幸运五星-用户信息', $logArr);
+        Tool_Common::log('userInfo','INFO','幸运五星-用户信息-2', $logArr);
         return $data;
     }
 
@@ -1858,9 +1858,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $start_time = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
             //sleep(1);
-            if($tmpRst['Status'] != 1){
-                $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $codesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
-            }
+
             //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data, 'recordRst'=>$recordRst]);
             $rst[$key] = $tmpRst;
             //$rst = json_encode($rst);
@@ -1891,17 +1889,21 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     $TzSystemsUsers->cookie = '';
                     $TzSystemsUsers->save();
                     $loginRst = BaseService::login($TzSystemsUsers->id);
-                    $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+                    $tmpRst_2 = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
                     $m->set($mkey, 1, 5*60);
-                    $rst[$key] = $tmpRst;
+                    $rst[$key] = $tmpRst_2;
+                    $tzRst['tmpRst_1'] = $tmpRst_2;
                 }
                 if(in_array($tmpRst['code'], [305])){ # 提早下注，睡眠10秒再下一次
                     sleep(15);
-                    $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
-                    $rst[$key] = $tmpRst;
+                    $tmpRst_2 = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+                    $rst[$key] = $tmpRst_2;
                 }
                 //if($tz_type != 20) $tzRst['code'] = $codes;
                 $tzRst['loginRst'] = $loginRst;
+                if($loginRst['status'] != 200 OR $tmpRst_2['Status'] != 1){
+                    $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $codesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
+                }
                 Tool_Common::log('bet_error','INFO','幸运五5分批投注记录-投注失败', $tzRst);
                 # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护，307账号停押
                 if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [303, 304, 306, 307])){
