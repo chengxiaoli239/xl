@@ -29,6 +29,7 @@ use Yii;
  * @property int $tz_system_id 投注系统tz_systems.id
  * @property string $lotteryclass 彩种
  * @property int $lottery_type 彩种类型
+ * @property int $bet_sort_key 分组key
  * @property string $post_desc 下注文本
  * @property string $error_desc 错误描述
  * @property string $updated_time 更新时间
@@ -52,7 +53,7 @@ class BetErrorPlansTask extends \common\models\base\BaseModel
     {
         return [
             [['codes', 'bet_headers', 'post_datas', 'error_desc'], 'string'],
-            [['uid', 'agent_id', 'playway', 'tz_type', 'status', 'plan_id', 'tz_system_id', 'lottery_type', 'updated_at', 'created_at'], 'integer'],
+            [['uid', 'agent_id', 'playway', 'tz_type', 'status', 'plan_id', 'tz_system_id', 'lottery_type', 'bet_sort_key', 'updated_at', 'created_at'], 'integer'],
             [['bet_money', 'single'], 'number'],
             [['updated_time'], 'safe'],
             [['account', 'kj_codes'], 'string', 'max' => 24],
@@ -92,6 +93,7 @@ class BetErrorPlansTask extends \common\models\base\BaseModel
             'tz_system_id' => Yii::t('app', '投注系统tz_systems.id'),
             'lotteryclass' => Yii::t('app', '彩种'),
             'lottery_type' => Yii::t('app', '彩种类型'),
+            'bet_sort_key' => Yii::t('app', '分组key'),
             'post_desc' => Yii::t('app', '下注文本'),
             'error_desc' => Yii::t('app', '错误描述'),
             'updated_time' => Yii::t('app', '更新时间'),
