@@ -304,8 +304,9 @@ class IndexController extends Controller
     public function actionRepeatBetErrorPlans(){
         self::_init();
         $rst = ['status'=>200, 'msg'=>'操作成功'];
+        $post = \Yii::$app->request->post();
         for ($i=0; $i<10; $i++){
-            $rst[$i]['rst'] = BetService::repeatErrorBet();
+            $rst[$i]['rst'] = BetService::repeatErrorBet($post['lottery_types']);
         }
 
         return $rst;
