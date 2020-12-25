@@ -385,9 +385,10 @@ abstract class BetService extends BaseBetService {
                     $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
                     $betRst = $BetService->repeatErrorBet($betErrorPlansTask->id);
                     $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = $betRst;
-                    Tool_Common::log('/repeatErrorBet/bet_rst', 'ERR', '网盘开盘状态', ['uid' => $uid, 'account' => $account, 'tz_system_id' => $tz_system_id, 'rst'=>$rst]);
+                    $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account' => $account, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$rst, 'loginRst'=>$loginRst];
+                    Tool_Common::log('/repeatErrorBet/bet_rst', 'ERR', '网盘开盘状态', $logArr);
                 }else{
-                    $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = ['status' => 300, 'msg' => '未开盘或者已关盘[' . date('Y-m-d H:i:s') . ']'];
+                    $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = ['status' => 300, 'qihao'=>$qihao, 'activeQihao'=>$activeQihao, 'msg' => '未开盘或者已关盘[' . date('Y-m-d H:i:s') . ']'];
                     Tool_Common::log('/repeatErrorBet/bet_error', 'ERR', '网盘开盘状态', ['uid' => $uid, 'account' => $account, 'tz_system_id' => $tz_system_id, 'rst'=>$rst]);
                 }
                 $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetInfo'] = $betErrorPlansTask;
