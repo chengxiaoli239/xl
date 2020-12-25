@@ -1576,10 +1576,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $TzSystemsUsers->user_agent,
             "X-Requested-With: XMLHttpRequest",
         ];
-        $data = CurlService::getCurl($url, $headers);
+        $data = self::getCurl($url, $headers, $uid);
+        //$data = CurlService::getCurl($url, $headers);
 
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
-        Tool_Common::log('getQihaoInfo','INFO','幸运五登陆前', $logArr);
+        Tool_Common::log('getQihaoInfo','INFO','幸运五登陆前-2', $logArr);
 
         return $data;
     }

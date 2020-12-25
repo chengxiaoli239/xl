@@ -199,11 +199,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $activeQihao = BetService::getActiveQihao($uid=24, $tz_system_id=9, $lottery_type=8);p($activeQihao);
         $rst = BetService::repeatErrorBet();p($rst);
         $rst['bet'] = BetService::betByUidXy($uid=10);p($rst); // 用户新计划投注，可正买可反买
         $rst = Lucky5Service::getQihaoInfo($uid=10, $tz_system_id=9, $lottery_type=8);p($rst);
-        $rst = Lucky5Service::getPreTz($uid=10, $tz_system_id=9);p($rst);
-        $rst = Lucky5Service::getOpenQihao($uid=10, $tz_system_id=9);p($rst);
         $rst = BaseService::login($id=39, $is_auto=2);p($rst);
         $rst = BingDaoService::login($uid = 12, $tz_system_id = 13);p($rst);
         //PoxyIPService::delProxyUidsKey();
