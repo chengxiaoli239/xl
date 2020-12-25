@@ -1916,36 +1916,28 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     'uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,
                     'post_data'=>$post_data, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume, 'tmpRst_1'=>$tmpRst
                 ];
-                $mkey = 'request_login_'.$TzSystemsUsers->uid.'_'.$qihao.'_'.$key;
-                if($f = $m->get($mkey)){
-                    return ['status'=>300, 'msg'=>'已经重复登录过一次'];
-                }
                 if(in_array($tmpRst['code'], [303, 309, 310])){ # 判断掉线登录一次，再下注一次
-                    if($tmpRst['errno']>0 OR in_array($tmpRst['code'], [309,310])){
-                        $m = \Yii::$app->cache;
+                    if($tmpRst['errno']>0 OR in_array($tmpRst['code'], [309,310,311])){ # 309,310,311   310有排查是已经换过代理IP,有待排查，为确保
                         $mkey_310 = 'has_jinyong_ip_310'; # 您当前使用的浏览器不支持cookie，换一次代理ip
-                        if($rst[$key]['code'] == 310 && $m->get($mkey_310)){
-
+                        $RedisLock = new RedisLock();
+                        if($RedisLock->lock($mkey_310, 3)){
+                            $mkey_proxy = PoxyIPService::builProxyIpKey();
+                            $m->delete($mkey_proxy);
+                            $new_ip = PoxyIPService::getProxyIpNew();
                         }else{
-                            $RedisLock = new RedisLock();
-                            if($RedisLock->lock($mkey_310, 3)){
-                                $m->set($mkey_310,1, 15);
-                                $mkey_proxy = PoxyIPService::builProxyIpKey();
-                                $m->delete($mkey_proxy);
-                            }
+                            sleep(5);
                         }
+                        $tzRst['new_ip'] = $new_ip;
                     }
                     $TzSystemsUsers->cookie = '';
                     $TzSystemsUsers->save();
                     $loginRst = BaseService::login($TzSystemsUsers->id, $is_auto = 2);
                     $tzRst['loginRst'] = $loginRst;
                     $tmpRst_2 = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
-                    $m->set($mkey, 1, 5*60);
                     $rst[$key] = $tmpRst_2;
                     $tzRst['tmpRst_2'] = $tmpRst_2;
                 }
-                //if($loginRst['status'] != 200 OR $tmpRst_2['Status'] != 1){
-                if($tmpRst_2['Status'] != 1){
+                if($tmpRst_2['Status'] != 1){ # 尝试再次下注失败则记录表，便于新下单
                     $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
                     Tool_Common::log('BetErrorPlansTaskService_log', 'INFO', '自动下注重试失败1', ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'key'=>$key, 'tmpRst_1'=>$tmpRst, 'tmpRst_2'=>$tmpRst_2, 'recordRst'=>$recordRst]);
                 }
@@ -2070,7 +2062,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         if(strpos($data, '余额不足') !== false){
             $rstData = ["Status"=>0, 'code'=>302, 'msg'=>'余额不足'];
-        }elseif(strpos($data, '登录') !== false OR strpos($data, 'Bad Gateway') !== false OR strpos($data, 'Object moved') !== false){
+        }elseif(strpos($data, '登录') !== false){
             $rstData = ["Status"=>0, 'code'=>303, 'msg'=>'请重新登录'];
         }elseif(strpos($data, '短时间内重复提交') !== false){
             $rstData = ["Status"=>0, 'code'=>304, 'msg'=>'短时间内重复提交'];
@@ -2084,10 +2076,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $rstData = ["Status"=>0, 'code'=>307, 'msg'=>'您的账号已被停押'];
         }elseif(strpos($data, '您当前使用的浏览器不支持cookie') !== false){
             $rstData = ["Status"=>0, 'code'=>310, 'msg'=>'您当前使用的浏览器不支持cookie'];
+        }elseif(strpos($data, 'Bad Gateway') !== false OR strpos($data, 'Object moved') !== false){
+            $rstData = ["Status"=>0, 'code'=>311, 'msg'=>'代理IP网络故障'];
         }else{
             $rstData = json_decode($data, TRUE);
         }
-        if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306])){
+        if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306, 310, 311])){
             if(isset($post_data['bet_number']) && strlen($post_data['bet_number'])>200) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 300);
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
             Tool_Common::log('httpPostError','INFO','httpPost请求-3', $logArr);

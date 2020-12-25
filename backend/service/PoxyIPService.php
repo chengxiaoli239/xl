@@ -259,10 +259,10 @@ class PoxyIPService extends BaseService {
         $poxy_ip_data = $m->get($mkey);
         if(empty($poxy_ip_data)){
             $redisLock = new RedisLock();
-            if($redisLock->lock($mkey.'_redis', 2)){
+            if($redisLock->lock($mkey.'_redis', 3)){
                 PoxyIPService::preGetValidIp();
             }else{
-                sleep(4);
+                sleep(5);
             }
         }
         $poxy_ip_data = $m->get($mkey);
