@@ -386,13 +386,13 @@ abstract class BetService extends BaseBetService {
                     $betRst = $BetService->repeatErrorBet($betErrorPlansTask->id);
                     $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = $betRst;
                     $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account' => $account, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$rst, 'loginRst'=>$loginRst];
-                    Tool_Common::log('/repeatErrorBet/bet_rst', 'ERR', '网盘开盘状态', $logArr);
+                    Tool_Common::log('/repeatErrorBet/bet_rst', 'ERR', '网盘开盘状态-1', $logArr);
                 }else{
                     $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = ['status' => 300, 'qihao'=>$qihao, 'activeQihao'=>$activeQihao, 'msg' => '未开盘或者已关盘[' . date('Y-m-d H:i:s') . ']'];
-                    Tool_Common::log('/repeatErrorBet/bet_error', 'ERR', '网盘开盘状态', ['uid' => $uid, 'account' => $account, 'tz_system_id' => $tz_system_id, 'rst'=>$rst]);
+                    Tool_Common::log('/repeatErrorBet/bet_error', 'ERR', '网盘开盘状态-2', ['uid' => $uid, 'account' => $account, 'tz_system_id' => $tz_system_id, 'rst'=>$rst]);
                 }
                 $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetInfo'] = $betErrorPlansTask;
-
+                sleep(2);
             }
         }
 
