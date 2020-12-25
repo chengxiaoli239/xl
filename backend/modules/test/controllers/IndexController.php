@@ -199,6 +199,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BetService::repeatErrorBet();p($rst);
         $rst['bet'] = BetService::betByUidXy($uid=10);p($rst); // 用户新计划投注，可正买可反买
         $rst = Lucky5Service::getQihaoInfo($uid=10, $tz_system_id=9, $lottery_type=8);p($rst);
         $rst = Lucky5Service::getPreTz($uid=10, $tz_system_id=9);p($rst);
