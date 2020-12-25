@@ -149,15 +149,16 @@ class BaseService{
             }
             $m->set($mkey, $rst, 8);
         }else{
+            sleep(3);
             $rst = $m->get($mkey);
             if(empty($rst)){
                 if(in_array($tz_system_id, [3, 7, 9, 10])){
                     $rst = Lucky5Service::synBalance($TzSystemsUser->id);// p($rst);# 同步余额
                 }else{
-                    $rst = ['status'=>301, 'msg'=>'同步余额并发锁['.$id.']'];
+                    $rst = ['status'=>301, 'msg'=>'同步余额并发锁-1['.$id.']'];
                 }
             }else{
-                $rst = ['status'=>301, 'msg'=>'同步余额并发锁['.$id.']'];
+                $rst = ['status'=>302, 'msg'=>'同步余额并发锁-2['.$id.']'];
             }
         }
 

@@ -29,6 +29,7 @@ use backend\service\SscDataService;
 use backend\tools\Tools;
 use common\models\AdminModel;
 use common\service\CaptchaCodeService;
+use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
@@ -1926,9 +1927,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
                         if($rst[$key]['code'] == 310 && $m->get($mkey_310)){
 
                         }else{
-                            $m->set($mkey_310,1, 15);
-                            $mkey_proxy = PoxyIPService::builProxyIpKey();
-                            $m->delete($mkey_proxy);
+                            $RedisLock = new RedisLock();
+                            if($RedisLock->lock($mkey_310, 3)){
+                                $m->set($mkey_310,1, 15);
+                                $mkey_proxy = PoxyIPService::builProxyIpKey();
+                                $m->delete($mkey_proxy);
+                            }
                         }
                     }
                     $TzSystemsUsers->cookie = '';
