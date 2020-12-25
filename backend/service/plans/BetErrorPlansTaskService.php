@@ -48,7 +48,7 @@ class BetErrorPlansTaskService extends BaseService {
             $err_msg = json_encode($BetErrorPlansTask->getErrors(), 320);
             $logArr = ['setDatas'=>$setDatas, 'error'=>$err_msg];
             Tool_Common::log('/bet_errors/recordPlanTask', 'ERR', '下注失败记录异常', $logArr);
-            $rst = ['status'=>200, 'msg'=>$err_msg];
+            $rst = ['status'=>300, 'msg'=>$err_msg];
         }
 
         return $rst;

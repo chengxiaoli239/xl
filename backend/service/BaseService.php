@@ -52,7 +52,7 @@ class BaseService{
         }
 
         $flag = BetService::isLogin($TzSystemsUser->uid, $tz_system_id); #
-        if($flag && $is_auto){
+        if($flag && $is_auto == 1){
             return ['status'=>200, 'msg'=>'已经是登录状态', 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username];
         }
         if(in_array($tz_system_id, [1,2])){
