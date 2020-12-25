@@ -1341,8 +1341,14 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $TzSystemsUsers->user_agent,
         ];
 
+        $time1 = microtime(true);
         $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid);
+        $time2 = microtime(true);
         $row->status = ($tmpRst['Status'] == 1) ? 2 : 3;
+
+        $time_consume = ($time2 - $time1).'s';
+        $logArr = ['id'=>$id, 'uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
+        Tool_Common::log('repeatErrorBet', 'INFO', '重复下注失败的号码', $logArr);
 
         $flag = $row->save();
         if(!$flag){

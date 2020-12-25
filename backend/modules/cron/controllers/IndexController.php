@@ -303,7 +303,7 @@ class IndexController extends Controller
      */
     public function actionRepeatBetErrorPlans(){
         self::_init();
-        $rst = ['status'=>200, 'msg'=>200];
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
         for ($i=0; $i<10; $i++){
             $rst[$i]['rst'] = BetService::repeatErrorBet();
         }
