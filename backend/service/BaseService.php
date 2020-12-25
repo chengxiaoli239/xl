@@ -51,9 +51,11 @@ class BaseService{
             return ['status'=>200, 'msg'=>'无需登陆站点', 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username];
         }
 
-        $flag = BetService::isLogin($TzSystemsUser->uid, $tz_system_id); #
-        if($flag && $is_auto == 1){
-            return ['status'=>200, 'msg'=>'已经是登录状态', 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username];
+        if($is_auto == 1){
+            $flag = BetService::isLogin($TzSystemsUser->uid, $tz_system_id); #
+            if($flag && $is_auto == 1){
+                return ['status'=>200, 'msg'=>'已经是登录状态', 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username];
+            }
         }
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网

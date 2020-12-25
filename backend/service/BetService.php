@@ -380,7 +380,7 @@ abstract class BetService extends BaseBetService {
                     $flag = self::isLogin($uid, $tz_system_id);
                     if(!$flag){
                         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-                        $loginRst = BaseService::login($TzSystemsUsers->id);
+                        $loginRst = BaseService::login($TzSystemsUsers->id, $is_auto=2);
                     }
                     $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
                     $betRst = $BetService->repeatErrorBet($betErrorPlansTask->id);
