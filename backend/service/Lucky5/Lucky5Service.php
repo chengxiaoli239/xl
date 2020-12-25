@@ -1909,7 +1909,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
             //}
             # 真实投注
             $start_time = microtime(true);
-            $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+            if(in_array($plan->account, \Yii::$app->params['test_account'])){
+                $tmpRst = ["Status"=>0, 'code'=>303, 'msg'=>'请重新登录']; //$tmpRst = ['Status'=>0, 'code'=>311];
+            }else{
+                $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+            }
             //sleep(1);
 
             //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data, 'recordRst'=>$recordRst]);
