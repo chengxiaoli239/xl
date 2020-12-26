@@ -1347,8 +1347,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $status = 0;
         if($tmpRst['Status'] == 1){
             $status = 2;
-        }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 307,304])){
-            $status = 3; # 不可再次下注：302余额不足
+        }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 305, 307])){
+            $status = 3; # 不可再次下注：302余额不足305已关盘307网盘账号停押
         }
         $row->status = $status;
 
