@@ -1344,7 +1344,13 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $time1 = microtime(true);
         $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 调试阶段先注释12.26
         $time2 = microtime(true);
-        $row->status = (isset($tmpRst['Status']) && $tmpRst['Status'] == 1) ? 2 : 3;
+        $status = 0;
+        if($tmpRst['Status'] == 1){
+            $status = 2;
+        }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 307,304])){
+            $status = 3; # 不可再次下注：302余额不足
+        }
+        $row->status = $status;
 
         $time_consume = ($time2 - $time1).'s';
         $logArr = ['id'=>$id, 'uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
