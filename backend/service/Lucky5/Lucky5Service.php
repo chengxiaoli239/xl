@@ -1957,7 +1957,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 }
                 if($tmpRst_2['Status'] != 1){ # 尝试再次下注失败则记录表，便于新下单
                     $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
-                    Tool_Common::log('BetErrorPlansTaskService_log', 'INFO', '自动下注重试失败1', ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'key'=>$key, 'tmpRst_1'=>$tmpRst, 'tmpRst_2'=>$tmpRst_2, 'recordRst'=>$recordRst]);
+                    $logArr1 = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'key'=>$key, 'tmpRst_1'=>$tmpRst, 'recordRst'=>$recordRst];
+                    if(isset($tmpRst_2)){
+                        $logArr1['tmpRst_2'] = $tmpRst_2;
+                    }
+                    Tool_Common::log('BetErrorPlansTaskService_log', 'INFO', '自动下注重试失败1', $logArr1);
                     if($tmpRst_2['code'] == 303){
                         $loginRst2 = BaseService::login($TzSystemsUsers->id, $is_auto = 2);
                     }

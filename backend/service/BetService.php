@@ -376,9 +376,9 @@ abstract class BetService extends BaseBetService {
                 $account = $betErrorPlansTask->account;
                 $plan_id = $betErrorPlansTask->plan_id;
 
-                $status = UserService::accountIsExpire($plan_id, $tz_system_id); # 账号是否过期
+                $status = UserService::accountIsExpire($uid, $tz_system_id); # 账号是否过期
                 if(!$status && $account != 'gaozi2018'){
-                    Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['uid'=>$uid, 'account'=>$account, 'tz_system_id'=>$tz_system_id]);
+                    Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['plan_id'=>$plan_id, 'uid'=>$uid, 'account'=>$account, 'tz_system_id'=>$tz_system_id]);
                     return ['status'=>300, 'msg'=>'账号过期提示'];
                 }
 
