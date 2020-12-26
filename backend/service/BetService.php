@@ -367,7 +367,7 @@ abstract class BetService extends BaseBetService {
 
         foreach ($lottery_types as $lottery_type){
             //$lottery_type = 8; # 测试
-            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 3]]];
+            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
             $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(1)->all();
             foreach ($BetErrorPlansTasks as $betErrorPlansTask){
                 $uid = $betErrorPlansTask->uid;
