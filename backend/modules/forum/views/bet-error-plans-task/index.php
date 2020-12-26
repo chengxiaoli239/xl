@@ -112,7 +112,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'status','label' => '状态',
                             'format'=>'raw',
                             'value' => function($model) {
-                                $txt = $model->status == 2 ? '<font color="green">重推成功</font>' : ($model->status == 1 ? '<font color="red">重推失败</a>' : '<font color="red">未推送</a>');
+                                $txt = $model->status == 2 ? '<font color="green">重推成功</font>' : ($model->status == 3 ? '<font color="#2f4f4f">推送失败</a>' : '<font color="red">未推送</a>');
                                 $url = "/forum/user-custom-plans/update-status?id=".$model->id;
                                 return Html::a($txt, $url, ['title' => '更新状态']);
                             }
