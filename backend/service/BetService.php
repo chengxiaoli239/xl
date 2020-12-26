@@ -358,7 +358,7 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
-     *
+     * @desc 下注失败补打
      * @param array $lottery_types
      */
     public static function repeatErrorBet($lottery_types = []){
@@ -368,12 +368,20 @@ abstract class BetService extends BaseBetService {
         foreach ($lottery_types as $lottery_type){
             //$lottery_type = 8; # 测试
             $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
-            $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(1)->all();
+            $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(3)->all();
             foreach ($BetErrorPlansTasks as $betErrorPlansTask){
                 $uid = $betErrorPlansTask->uid;
                 $tz_system_id = $betErrorPlansTask->tz_system_id;
                 $lottery_type = $betErrorPlansTask->lottery_type;
                 $account = $betErrorPlansTask->account;
+                $plan_id = $betErrorPlansTask->plan_id;
+
+                $status = UserService::accountIsExpire($plan_id, $tz_system_id); # 账号是否过期
+                if(!$status && $account != 'gaozi2018'){
+                    Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['uid'=>$uid, 'account'=>$account, 'tz_system_id'=>$tz_system_id]);
+                    return ['status'=>300, 'msg'=>'账号过期提示'];
+                }
+
                 $qihao = $betErrorPlansTask->qihao;
                 $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
                 if($qihao == $activeQihao){
@@ -388,6 +396,8 @@ abstract class BetService extends BaseBetService {
                     $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account' => $account, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$rst, 'loginRst'=>$loginRst];
                     Tool_Common::log('/repeatErrorBet/bet_rst', 'ERR', '网盘开盘状态-1', $logArr);
                 }else{
+                    $betErrorPlansTask->status = 3; # 不可重推
+                    $betErrorPlansTask->save();
                     $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = ['status' => 300, 'qihao'=>$qihao, 'activeQihao'=>$activeQihao, 'msg' => '未开盘或者已关盘[' . date('Y-m-d H:i:s') . ']'];
                     Tool_Common::log('/repeatErrorBet/bet_error', 'ERR', '网盘开盘状态-2', ['uid' => $uid, 'account' => $account, 'tz_system_id' => $tz_system_id, 'rst'=>$rst]);
                 }

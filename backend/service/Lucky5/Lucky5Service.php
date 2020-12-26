@@ -1351,6 +1351,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $status = 3; # 不可再次下注：302余额不足305已关盘307网盘账号停押
         }
         $row->status = $status;
+        $row->post_desc = json_encode($tmpRst, 320);
 
         $time_consume = ($time2 - $time1).'s';
         $logArr = ['id'=>$id, 'uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];

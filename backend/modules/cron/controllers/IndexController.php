@@ -305,9 +305,9 @@ class IndexController extends Controller
         self::_init();
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $post = \Yii::$app->request->post();
-        for ($i=0; $i<2; $i++){
+        for ($i=0; $i<3; $i++){
             $rst[$i]['rst'] = BetService::repeatErrorBet($post['lottery_types']);
-            sleep(20);
+            sleep(18);
         }
 
         return $rst;
