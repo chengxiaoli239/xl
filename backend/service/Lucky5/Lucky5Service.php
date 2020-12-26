@@ -1320,7 +1320,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         //$headers = json_decode($row->bet_headers); # 含有cookie，如果是重新登陆 cookie要变动，待处理
         $uid = $row->uid;
         $tz_system_id = $row->tz_system_id;
-        $post_data = json_decode($row->post_datas);
+        $post_data = json_decode($row->post_datas, 320);
 
         $_t = round(microtime(true) * 1000);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
