@@ -307,7 +307,7 @@ class IndexController extends Controller
         $post = \Yii::$app->request->post();
         for ($i=0; $i<6; $i++){
             $rst[$i]['rst'] = BetService::repeatErrorBet($post['lottery_types']);
-            sleep(5);
+            sleep(3);
         }
 
         return $rst;
