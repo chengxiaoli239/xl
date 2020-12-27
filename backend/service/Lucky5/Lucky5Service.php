@@ -1956,7 +1956,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     $tzRst['tmpRst_2'] = $tmpRst_2;
                 }
                 if($tmpRst_2['Status'] != 1){ # 尝试再次下注失败则记录表，便于新下单
-                    $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
+                    $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($tmpcodesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
                     $logArr1 = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'key'=>$key, 'tmpRst_1'=>$tmpRst, 'recordRst'=>$recordRst];
                     if(isset($tmpRst_2)){
                         $logArr1['tmpRst_2'] = $tmpRst_2;

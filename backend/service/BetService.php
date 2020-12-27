@@ -395,7 +395,7 @@ abstract class BetService extends BaseBetService {
                     $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = $betRst;
                     $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account' => $account, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$rst, 'loginRst'=>$loginRst];
                     Tool_Common::log('/repeatErrorBet/bet_rst', 'ERR', '网盘开盘状态-1', $logArr);
-                }else{
+                }elseif(!empty($activeQihao)){
                     $betErrorPlansTask->status = 3; # 不可重推
                     $betErrorPlansTask->save();
                     $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = ['status' => 300, 'qihao'=>$qihao, 'activeQihao'=>$activeQihao, 'msg' => '未开盘或者已关盘[' . date('Y-m-d H:i:s') . ']'];
