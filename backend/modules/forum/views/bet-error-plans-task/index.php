@@ -104,7 +104,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'post_desc','label' => '重推结果',
                             'format'=>'raw',
                             'value' => function($model) {
-                                $txt = BaseStringHelper::truncate($model->post_datas,15);
+                                $txt = BaseStringHelper::truncate($model->post_desc,15);
                                 $opions = [
                                     'class' => 'act-post-desc',
                                     'title' => $model->post_datas,
