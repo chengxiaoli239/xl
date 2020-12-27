@@ -148,15 +148,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //'cookie',
                         //'created_at:datetime',
-                        /*
-                        ['attribute' => 'updated_at', 'label'=>'更新时间', 'headerOptions' => ['width' => '170'],
+                        ['attribute' => 'update_time', 'label'=>'更新时间',// 'headerOptions' => ['width' => '170'],
                             'value'=> function($model){
-                                return  date('Y-m-d H:i:s',$model->updated_at);   //主要通过此种方式实现
+                                return  substr($model->update_time, 5, -3);   //主要通过此种方式实现
                             },
                         ],
-                        */
                         //'updated_at',
-                        'update_time',
+                        //'update_time',
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],

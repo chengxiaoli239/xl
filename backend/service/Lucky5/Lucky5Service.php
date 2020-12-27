@@ -2099,6 +2099,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $rstData = ["Status"=>0, 'code'=>310, 'msg'=>'您当前使用的浏览器不支持cookie'];
         }elseif(strpos($data, 'Bad Gateway') !== false OR strpos($data, 'Object moved') !== false){
             $rstData = ["Status"=>0, 'code'=>311, 'msg'=>'代理IP网络故障'];
+        }elseif(strpos($data, 'Too Many Request') !== false){
+            $rstData = ["Status"=>0, 'code'=>312, 'msg'=>'代理请求太频繁'];
         }else{
             $rstData = json_decode($data, TRUE);
         }

@@ -55,13 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'plan_id','label' => 'planid',
                             'format'=>'raw',
                             'value' => function($model) {
-                                return $model->plan_id;
-                            }
-                        ],
-                        ['attribute' => 'bet_sort_key','label' => 'key',
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                return $model->bet_sort_key;
+                                return $model->plan_id.'_'.$model->bet_sort_key;
                             }
                         ],
                         //'bet_url:url',
@@ -86,6 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => function($model) {
                                 $txt = BaseStringHelper::truncate($model->post_datas,15);
                                 $opions = [
+                                    'class' => 'act-post-desc',
                                     'title' => $model->post_datas,
                                     'alt'=>$model->post_datas,
                                     'data-url' => $model->bet_url,
@@ -211,11 +206,17 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <!--提示框-end-->
+<script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
     $(function () {
-        $("[id^='push_desc']").click(function (rst) {
-            var a = JSON.parse($(this).attr('title'))
-            $('#rst_code').text(JSON.stringify(a.rst,null,' '))
+        //$("[id^='act-post-desc']").click(function (rst) {
+        $(".act-post-desc").click(function (rst) {
+            //var a = JSON.parse($(this).attr('title'))
+            var bet_error = JSON.parse($(this).data('error'));
+            //act_data = {"bet_url":$(this).data('url'), "bet_content":$(this).data('content'), "bet_error":$(this).data('error')};
+            console.log($(this).data('error'))
+            //$('#rst_code').text(JSON.stringify(bet_error,null,' '))
+            /*
             if($(this).data('type') == 4  && $(this).attr('title').indexOf("alipay") == -1){
                 // 支付单
                 xml = showXml(a.push_content);
@@ -223,6 +224,7 @@ $this->params['breadcrumbs'][] = $this->title;
             }else {
                 $('#push_content').text(JSON.stringify(a.push_content,null,' '))
             }
+             */
 
             $('#exampleModal_msg').modal('show');
         });
