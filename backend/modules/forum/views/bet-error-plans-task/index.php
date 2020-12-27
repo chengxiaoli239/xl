@@ -59,21 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         //'bet_url:url',
-                        ['attribute' => 'bet_url','label' => '接口',
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                $txt = BaseStringHelper::truncate($model->bet_url,15);
-                                return Html::a($txt, 'javascript:;', ['title' => $model->bet_url,'alt'=>$model->bet_url]);
-                            }
-                        ],
                         //'bet_headers',
-                        ['attribute' => 'bet_headers','label' => '头部',
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                $txt = BaseStringHelper::truncate($model->bet_headers,15);
-                                return Html::a($txt, 'javascript:;', ['title' => $model->bet_headers,'alt'=>$model->bet_headers]);
-                            }
-                        ],
                         //'post_datas:ntext',
                         ['attribute' => 'post_datas','label' => '请求内容',
                             'format'=>'raw',
@@ -110,17 +96,26 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'bet_money','label' => '金额',
                             'format'=>'raw',
                             'value' => function($model) {
-                                return $model->bet_money;
+                                return '['.$model->single.'元]'.$model->bet_money;
                             }
                         ],
                         //'single',
-                        ['attribute' => 'single','label' => '倍[元]',
+                        'qihao',
+                        ['attribute' => 'post_desc','label' => '重推结果',
                             'format'=>'raw',
                             'value' => function($model) {
-                                return $model->single;
+                                $txt = BaseStringHelper::truncate($model->post_datas,15);
+                                $opions = [
+                                    'class' => 'act-post-desc',
+                                    'title' => $model->post_datas,
+                                    'alt'=>$model->post_datas,
+                                    'data-url' => $model->bet_url,
+                                    'data-content' => $model->post_datas,
+                                    'data-error' => $model->post_desc,
+                                ];
+                                return Html::a($txt, 'javascript:;', $opions);
                             }
                         ],
-                        'qihao',
                         //'kj_codes',
                         //'status',
                         ['attribute' => 'status','label' => '状态',
@@ -153,13 +148,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //'post_desc',
                         //'error_desc',
-                        ['attribute' => 'error_desc','label' => '错误描述',
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                $txt = BaseStringHelper::truncate($model->error_desc,15);
-                                return Html::a($txt, 'javascript:;', ['title' => $model->error_desc,'alt'=>$model->error_desc]);
-                            }
-                        ],
                         //'updated_time',
                         //'updated_at',
                         //'created_at',
@@ -211,20 +199,12 @@ $this->params['breadcrumbs'][] = $this->title;
     $(function () {
         //$("[id^='act-post-desc']").click(function (rst) {
         $(".act-post-desc").click(function (rst) {
-            //var a = JSON.parse($(this).attr('title'))
-            var bet_error = JSON.parse($(this).data('error'));
-            //act_data = {"bet_url":$(this).data('url'), "bet_content":$(this).data('content'), "bet_error":$(this).data('error')};
-            console.log($(this).data('error'))
-            //$('#rst_code').text(JSON.stringify(bet_error,null,' '))
-            /*
-            if($(this).data('type') == 4  && $(this).attr('title').indexOf("alipay") == -1){
-                // 支付单
-                xml = showXml(a.push_content);
-                $('#push_content').html(xml);
-            }else {
-                $('#push_content').text(JSON.stringify(a.push_content,null,' '))
-            }
-             */
+            bet_rst = $(this).data('error');
+            content = $(this).data('content');
+
+            act_data = {"bet_url":$(this).data('url'), "bet_content":content};
+            $('#rst_code').text(JSON.stringify(bet_rst,null,' '))
+            $('#push_content').text(JSON.stringify(act_data,null,' '))
 
             $('#exampleModal_msg').modal('show');
         });
