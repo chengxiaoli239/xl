@@ -124,6 +124,7 @@ class UserService extends BaseService {
                 if(!$TzSystemsUsers = TzSystemsUsers::findOne(['tz_system_id'=>$tz_system_id, 'uid'=>$uid])){
                     $TzSystemsUsers = new TzSystemsUsers();
                     $setData['created_at'] = time();
+                    $setData['expire_time'] = time() + 30*86400 + 5*3600; # 默认 30天加5个小时
                 }
                 $TzSystems = TzSystems::findOne($tz_system_id);
                 $user = AdminModel::findOne($uid);
@@ -134,7 +135,6 @@ class UserService extends BaseService {
                     'ssc_domain' => $TzSystemsUsers->ssc_domain ? $TzSystemsUsers->ssc_domain : $TzSystems->ssc_domain,
                     'tz_system_id' => $tz_system_id,
                     'sys_name' => $TzSystems->name,
-                    ''
                 ]);
 
                 $TzSystemsUsers->setAttributes($setData);
