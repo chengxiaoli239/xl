@@ -598,7 +598,11 @@ class HN0898Service extends BaseTZService {
      */
     public static function updateSysPlansStatus($id, $status, $uid = '')
     {
-        $UserSysPlans = UserSysPlans::findOne(['uid' => $uid, 'id' => $id]);
+        $where = $id;
+        if($uid != 1){
+            $where = ['uid' => $uid, 'id' => $id];
+        }
+        $UserSysPlans = UserSysPlans::findOne($where);
         if(!$uid) return ['status'=>300, 'msg'=>'用户id为空', 'lottery_type'=>$UserSysPlans->lottery_type];
         $m = \Yii::$app->cache;
         $mkey = 'updateSysPlansStatus_'.$id.'_'.$status;
