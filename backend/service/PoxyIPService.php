@@ -165,7 +165,7 @@ class PoxyIPService extends BaseService {
      * @desc 自动脚本 - 预先判断缓存是否存在  每3-5秒检测一次缓存的ip，如果过期则重新获取代理IP缓存
      * @return array
      */
-    public static function preGetValidIp($is_auto = 1){
+    public static function preGetValidIp($mod_uid = '', $is_auto = 1){
 
         $start_time = microtime(true);
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
@@ -179,7 +179,7 @@ class PoxyIPService extends BaseService {
         $m = \Yii::$app->cache;
         $time = 3600 * 4;
 
-        $mkey = self::builProxyIpKey();
+        $mkey = self::builProxyIpKey($mod_uid);
         $poxy_ip_data = $m->get($mkey);
         $isValid = PoxyIPService::isValid([$poxy_ip_data]);
 
@@ -215,7 +215,7 @@ class PoxyIPService extends BaseService {
         if(empty($poxy_ip_data)){
             $redisLock = new RedisLock();
             if($redisLock->lock($mkey.'_redis', 3)){
-                PoxyIPService::preGetValidIp();
+                PoxyIPService::preGetValidIp($uid);
             }else{
                 sleep(5);
             }

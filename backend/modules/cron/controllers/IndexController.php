@@ -400,7 +400,9 @@ class IndexController extends Controller
     public function actionCacheProxyIp(){
         self::_init();
         for ($i=0; $i<15; $i++){
-            $rst = PoxyIPService::preGetValidIp();
+            $multi_status = BetService::getConfig('MULTI_PROXY_STATUS');
+            $mol_uid = $multi_status ? $i : 0;
+            $rst = PoxyIPService::preGetValidIp($mol_uid);
             sleep(3);
         }
 
