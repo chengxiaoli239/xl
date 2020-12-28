@@ -46,59 +46,8 @@ class PoxyIPService extends BaseService {
      * @desc 获取快代理的代理IP
      * @return array|mixed
      */
-    public static function getPoxyIp($is_auto = 1){
-        //return ['171.83.165.196', '20000'];
-        if(true){
-            return PoxyIPService::getProxyIpNew();
-        }
-        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        if($POXY_STATUS == 0 && $is_auto == 1){
-            # CURL 代理开关
-            return [];
-        }
-
-        $redis_key = 'KUAI_POXY_API_KEY';
-        $redisLock = new RedisLock();
-        if(!$redisLock->lock($redis_key, 1)) {
-            sleep(2);
-        }
-
-        $m = \Yii::$app->cache;
-        $time = 3600 * 4;
-        $mkey = self::builProxyIpKey();
-        if($is_auto == 1 && !$poxy_ip_data = $m->get($mkey)){
-            $data = self::kuaiPoxy();
-            if($data['status'] != 200) {
-                return [];
-            }
-            $poxy_ip_data = $data['data'][0];
-            $m->set($mkey, $poxy_ip_data, $time);
-        }else{
-            $flag = self::isValid([$poxy_ip_data]);
-            if($flag === false){
-                $data = self::kuaiPoxy();
-                $poxy_ip_data = $data['data'][0];
-                $m->set($mkey, $poxy_ip_data, $time);
-            }elseif(empty($flag)){
-                $v_mkey = PoxyIPService::buildPoxyValidKey();
-                if($m->get($v_mkey)) return self::getPoxyIp();
-                $rst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
-                if($rst['status'] != 200 OR $rst['data'][$poxy_ip_data] < 5*60){
-                    # 调用失败或者可使用时间少于5分钟则认为IP失效
-
-                    $data = self::kuaiPoxy();
-                    if($data['status'] != 200) {
-                        return [];
-                    }
-                    $poxy_ip_data = $data['data'][0];
-                    $m->set($v_mkey, 1, 5);
-                    $m->set($mkey, $poxy_ip_data, $time);
-                }
-            }
-        }
-
-
-        return $poxy_ip_data;
+    public static function getPoxyIp($uid, $is_auto = 1){
+        return PoxyIPService::getProxyIpNew($uid, $is_auto);
     }
 
     /**
@@ -115,8 +64,13 @@ class PoxyIPService extends BaseService {
      * @desc
      * @return string
      */
-    public static function builProxyIpKey(){
+    public static function builProxyIpKey($uid=''){
+        $multi_status = BetService::getConfig('MULTI_PROXY_STATUS');
+        $mol = $uid%2; # 求余
         $mkey = 'getPoxyIp_Kuai_1';
+        if(!empty($uid) && $multi_status && $mol == 1){
+            $mkey = $mkey.$mol;
+        }
 
         return $mkey;
     }
@@ -253,8 +207,9 @@ class PoxyIPService extends BaseService {
      * @desc 获取新ip优化
      * @return mixed
      */
-    public static function getProxyIpNew($is_auto = 1){
-        $mkey = self::builProxyIpKey();
+    public static function getProxyIpNew($uid='', $is_auto = 1){
+        $mkey = self::builProxyIpKey($uid);
+
         $m = \Yii::$app->cache;
         $poxy_ip_data = $m->get($mkey);
         if(empty($poxy_ip_data)){

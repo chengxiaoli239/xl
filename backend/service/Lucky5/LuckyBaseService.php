@@ -1877,7 +1877,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 if($rst[$key]['code'] == 303){ # 判断掉线登录一次
                     if($rst[$key]['errno']>0){
                         $m = \Yii::$app->cache;
-                        $mkey_proxy = PoxyIPService::builProxyIpKey();
+                        $mkey_proxy = PoxyIPService::builProxyIpKey($plan->uid);
                         $m->delete($mkey_proxy);
                     }
                     BaseService::login($TzSystemsUsers->id);
@@ -2144,7 +2144,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @return bool
      */
     public static function setPoxy($ch, $url='', $uid = 0){
-        $poxy_addr = PoxyIPService::getPoxyIp();
+        $poxy_addr = PoxyIPService::getPoxyIp($uid);
         if(strpos($url, 'ww662889') === false){
             //$poxy_addr = '218.85.247.70:20000';
         }
