@@ -14,6 +14,7 @@ use Yii;
  * @property string $password 平台密码
  * @property int $status 开启状态
  * @property string $domain 地址
+ * @property string $suffix 安全后缀
  * @property string $cookie 登陆cookie
  * @property string $user_agent 浏览器代理
  * @property string $version 版本号
@@ -40,8 +41,9 @@ class BtSystemConfigs extends \common\models\base\BaseModel
             [['uid', 'status', 'created_at', 'updated_at'], 'integer'],
             [['cookie'], 'string'],
             [['update_time'], 'safe'],
-            [['sys_name', 'account', 'domain', 'version'], 'string', 'max' => 64],
+            [['sys_name', 'account', 'suffix', 'version'], 'string', 'max' => 24],
             [['password'], 'string', 'max' => 20],
+            [['domain'], 'string', 'max' => 64],
             [['user_agent'], 'string', 'max' => 640],
         ];
     }
@@ -59,6 +61,7 @@ class BtSystemConfigs extends \common\models\base\BaseModel
             'password' => Yii::t('app', '平台密码'),
             'status' => Yii::t('app', '开启状态'),
             'domain' => Yii::t('app', '地址'),
+            'suffix' => Yii::t('app', '安全后缀'),
             'cookie' => Yii::t('app', '登陆cookie'),
             'user_agent' => Yii::t('app', '浏览器代理'),
             'version' => Yii::t('app', '版本号'),
