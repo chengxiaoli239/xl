@@ -14,6 +14,7 @@ use backend\models\SscSdHzVal;
 use backend\models\SscStaticVal;
 use backend\models\TzSystemsUsers;
 use backend\modules\kj\controllers\BingDaoController;
+use backend\service\baota\BaoTaService;
 use backend\service\BetService;
 use backend\service\ChatCommonBetService;
 use backend\service\huiyuan\HuiYuanService5;
@@ -199,7 +200,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        p(3%2);
+        $rst = BaoTaService::getCronTabs();p($rst);
+        $rst = BaoTaService::btLogin();p($rst);
         $activeQihao = BetService::getActiveQihao($uid=24, $tz_system_id=9, $lottery_type=8);p($activeQihao);
         $rst = BetService::repeatErrorBet();p($rst);
         $rst['bet'] = BetService::betByUidXy($uid=10);p($rst); // 用户新计划投注，可正买可反买

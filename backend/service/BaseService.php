@@ -19,6 +19,7 @@ use backend\service\qilin\BingDaoService;
 use backend\service\qilin\QiLinBaseService;
 use common\service\CommonService;
 use common\tools\RedisLock;
+use common\tools\Tool_Common;
 use  yii;
 use common\tools\Util;
 
@@ -177,5 +178,68 @@ class BaseService{
         json_decode($string);
 
         return (json_last_error() == JSON_ERROR_NONE);
+    }
+
+    /**
+     * @decription post请求根据，接受传递的header头
+     * @param $url
+     */
+    public static function postCommonCurl($url,$post_data = [],$headers=[], $uid = 0){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        if(!$timeout) $timeout = 30;
+
+        //$cookie = dirname(__FILE__)."/cookie.txt";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+
+        curl_setopt($ch, CURLOPT_HEADER, 1); #
+
+        //$poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+
+        //设置post方式提交
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER, TRUE);    //表示需要response header
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+        $start_time = microtime(true);
+        $content = curl_exec($ch);
+        $end_time = microtime(true);
+        //d($content);
+        $errno = curl_errno($ch);
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
+        if($errno){
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$content, 'errno'=>$errno];
+            //p($logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
+        }
+
+        # ================= xCsrf token start =====================
+        if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == '200') {
+
+            $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $header = substr($content, 0, $headerSize);
+
+            preg_match_all("/set\-cookie:([^\r\n]*)/i", $header, $matches1);
+
+            $body = substr($content, $headerSize);
+            $result['rstData'] = json_decode($body, true);
+
+            $result['cookie'] = $matches1;
+        }
+        # ================= xCsrf token start =====================
+
+        return $result;
     }
 }
