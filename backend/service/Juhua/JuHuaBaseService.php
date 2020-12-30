@@ -46,6 +46,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         6 => 3, # 新疆时时彩
         7 => 1, # 北京赛车
         9 => 4, # 台湾宾果
+        16 => 2, # 台湾宾果
     ];
 
     public static $headers = [];
@@ -1559,7 +1560,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
      */
     public function bet($qihao, $plan_id, $codes){
         $rst = $this->postBatchBet($qihao, $plan_id, $codes);
-        Tool_Common::log('bet_rst', 'INFO', '下注返回值', ['qihao'=>$qihao, 'plan_id'=>$plan_id, 'codes'=>$codes]);
+        Tool_Common::log('bet_rst', 'INFO', '下注返回值', ['qihao'=>$qihao, 'plan_id'=>$plan_id, 'codes'=>$codes, 'rst'=>$rst]);
         return $rst;
     }
 
@@ -1618,7 +1619,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 'sn'=>self::getQihaoBeforeBet($qihao, $lottery_type), # 不清楚
                 'uc'=>floatval($TzSystemsUsers->balance),
                 'ot'=>3,
-                'log'=>'3M1N1N0N1N2N3N4M3N1N0N0N0N0N0NN0N0N0N0NN0N0N0N0NN0N0N0N0NM99N1N'.$single,
+                'log'=>'3M1N0N0N12N3N4N5M99N2N'.$single,
                 //'nomd5'=>'11694ec2ae01ec1a6fbe54888e3d1ac8',
                 'nomd5'=>$md5,
                 'commited_suffix'=>$suffix,
@@ -1636,7 +1637,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 'Cookie: '.self::changeCookie($TzSystemsUsers->cookie, $lottery_type),
                 'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
                 'Origin: '.$TzSystemsUsers->ssc_domain,
-                'Referer: '.$TzSystemsUsers->ssc_domain.'/order_print?tid='.time(),
+                'Referer: '.$TzSystemsUsers->ssc_domain.'/order_print?tid='.time().'&randtid='.rand(1000000,4999999),
                 $TzSystemsUsers->user_agent,
                 'X-Requested-With: XMLHttpRequest',
             ];
