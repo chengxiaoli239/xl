@@ -17,6 +17,11 @@ class PoxyIPService extends BaseService {
         $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
         $API_KEY = BetService::getConfig('KUAI_POXY_API_KEY'); # 快代理 API Key
         // https://dev.kdlapi.com/api/getorderexpiretime?orderid=938684913491492&signature=vdany88efprusvlm16cb0is9wr9smb4q
+        $RedisLock = new RedisLock();
+        $Rkey = $API_KEY.'_redis';
+        if(!$RedisLock->lock($Rkey.'_redis', 10)){
+            sleep(10);
+        }
         $query = [
             'orderid' => $KUAI_POXY_ORDER_ID, # 快代理订单号
             'num' => $num,
@@ -181,7 +186,9 @@ class PoxyIPService extends BaseService {
 
         $mkey = self::builProxyIpKey($mod_uid);
         $poxy_ip_data = $m->get($mkey);
-        $isValid = PoxyIPService::isValid([$poxy_ip_data]);
+        if(!empty($poxy_ip_data)){
+            $isValid = PoxyIPService::isValid([$poxy_ip_data]);
+        }
 
         $isValidRst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
         //p(['poxy_ip_data'=>$poxy_ip_data, 'isValid'=>$isValid, 'isValidRst'=>$isValidRst]);
