@@ -254,16 +254,9 @@ class IndexController extends Controller
         self::_init();
         $post = \Yii::$app->request->post();
         $uid = $post['uid'];
-        if(in_array($uid, [20])){
-            $for_times = 14;
-            $sleep_time = 5;
-        }else{
-            $for_times = 8;
-            $sleep_time = 5;
-        }
-        for($i=0; $i<$for_times; $i++){
+        for($i=0; $i<10; $i++){
             $rst['bet'] = BetService::betByUidXy($uid); // 用户新计划投注，可正买可反买
-            sleep($sleep_time);
+            sleep(5);
         }
 
         return $rst;

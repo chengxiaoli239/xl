@@ -1656,6 +1656,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
             # 真实投注
             $start_time = microtime(true);
+            //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
             $tmpRst = self::postBetCurl($url, $post_data, $headers);
             //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data]);
             $rst[$key] = $tmpRst;
@@ -1728,7 +1729,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>self::$headers, 'bigFlag'=>1, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('postBatchBet','INFO','菊花网批量插入记录-真实投注', $logArr);
+        Tool_Common::log('postBatchBet_juhua','INFO','菊花网批量插入记录-真实投注', $logArr);
 
         return $data;
     }
@@ -1837,6 +1838,41 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $rst = true;
 
         return $rst;
+    }
+
+    /**
+     * @desc 获取正在激活的期号 - 来自网盘
+     * @param $uid
+     * @param $tz_system_id
+     * @param $lottery_type
+     * @return string
+     */
+    public static function getActiveQihao($uid, $tz_system_id, $lottery_type){
+        self::__init($uid, $tz_system_id);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+
+        $qihao = false;
+        $timeid = (int)(microtime(true)*1000);
+        $url = $TzSystemsUsers->ssc_domain.'/settings/openstate?timeid='.$timeid;
+        $headers = [
+            "Accept: application/json, text/javascript, */*; q=0.01",
+            "Accept-Encoding: gzip, deflate",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            "Cookie: ".$TzSystemsUsers->cookie,
+            "Host: ".self::$host,
+            "Referer: ".$TzSystemsUsers->ssc_domain."/mem",
+            $TzSystemsUsers->user_agent,
+            "X-Requested-With: XMLHttpRequest",
+        ];
+        $data = CurlService::getCurl($url, $headers);
+        if($data['status'] == 200 && $data['open'] && !empty($data['serno'])){
+            $qihao = $data['serno'];
+        }
+        Tool_Common::log('getActiveQihao', 'INFO', '网盘激活的期号', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'lottery_type'=>$lottery_type, 'data'=>$data]);
+        //p(['url'=>$url, 'headers'=>$headers, 'data'=>$data]);
+
+        return $qihao;
     }
 
     /**

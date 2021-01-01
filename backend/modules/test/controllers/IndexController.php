@@ -201,6 +201,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BetService::betOnePlan($plan_id=1642);p($rst);
+        $lottery_type = 16;
+        $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
+        $qihao_2 = HN0898Service::getQihao($lottery_type);p([$qihao_1, $qihao_2]);
         $data = JiaNaDa::getLotteryCanada($type='json', $is_auto=2);p($data);
         $data = JiaNaDa::getLottery($type='json', $is_auto=2);p($data);
         $rst = BaoTaService::getCronTabs();p($rst);
@@ -228,9 +232,6 @@ class IndexController extends Controller
         $data = BingDao::getLotteryOne($type='json', $l_type=6);p($data);
         $data = BetService::getLotteryName();p($data);
         $data = CqsscKcw::getLotteryBg($type='json', $is_auto=0);p($data,0);
-        $lottery_type = 9;
-        $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
-        $qihao_2 = HN0898Service::getQihao($lottery_type);p([$qihao_1, $qihao_2]);
         $rst = BetErrorPlansTaskService::reBetErrorPlans($lottery_types = [12]);p($rst);
         $snInfo = BingDaoService::getSn($uid=12, $tz_system_id=13, $lottery_type = 13);p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         $rst = BingDaoService::login($uid=12, $tz_system_id=13);p($rst);

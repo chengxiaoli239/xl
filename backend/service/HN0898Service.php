@@ -1280,6 +1280,9 @@ class HN0898Service extends BaseTZService {
                 //p([self::getHLDifferentDays(), self::getDifferentNums($lottery_type = 15)]);
                 $qihao = 109071636 + self::getHLDifferentDays() * 203 + self::getDifferentNums($lottery_type = 15) + 1; # 109071636为2020-12-19最后一期期号
                 break;
+            case 16: # 加拿大
+                $qihao = 2659612 + self::getDifferentNums($lottery_type = 16) + 1; # 2659612为2021-01-01
+                break;
         }
 
         return $qihao;
@@ -1387,8 +1390,10 @@ class HN0898Service extends BaseTZService {
             case 15: # 冰岛-欢乐生肖 早9点到凌晨2点
                 $qihao = 109071636 + self::getHLDifferentDays() * 203 + self::getDifferentNums($lottery_type = 15); # 109071637为2020-12-18最后一期期号
                 break;
+            case 16: # 加拿大
+                $qihao = 2659612 + self::getDifferentNums($lottery_type = 16); # 2659612为2021-01-01
+                break;
         }
-
 
         return $qihao;
     }
@@ -1468,6 +1473,23 @@ class HN0898Service extends BaseTZService {
     }
 
     /**
+     * @desc 计算当前日期距离2019-08-10天数 - 北京快乐8
+     * @param string $end_date
+     * @return float|int
+     */
+    public static function getCanadaDifferentDays($end_date = ''){
+        $start_date = '2021-01-01';
+        if(!$end_date) $end_date = date('Y-m-d');
+
+        $start = strtotime($start_date);
+        $end = strtotime($end_date);
+
+        $nums = ( $end - $start ) / (24 * 3600);
+
+        return $nums;
+    }
+
+    /**
      * @desc 计算开奖期数
      * @return float
      */
@@ -1491,6 +1513,11 @@ class HN0898Service extends BaseTZService {
             }elseif($date_time>'09:05'){
                 $nums =  23 + floor(($time - $start_time)/(5*60));
             }
+        }elseif($lottery_type == 16){ # 加拿大
+            $start_time = strtotime('2021-01-01 13:42:00');
+            if('20:00'<$date_time && $date_time<'21:00') $time = $start_time;
+            $day_z = self::getCanadaDifferentDays();
+            $nums = floor(($time - $start_time - $day_z*3600)/(3.5*60));
         }else{
             $start_time = strtotime(date('Y-m-d').' 09:05');
             if('00:00'<$date_time && $date_time<'09:05') $time = $start_time;

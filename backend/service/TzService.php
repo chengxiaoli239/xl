@@ -152,7 +152,7 @@ class TzService extends BaseService {
         # 2、单双
         $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖单双数据
         $time3 = microtime(true);
-        if(!in_array($lottery_type, \Yii::$app->params['NOT_STATIC_LOTTERYS'])){ # 重庆、新疆才统计单双遗漏, 冰岛90、3m5m10m不统计
+        if(in_array($lottery_type, \Yii::$app->params['STATIC_DATA_LOTTERYS'])){ # 重庆、新疆才统计单双遗漏, 冰岛90、3m5m10m不统计
             $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏 耗时4s
         }
         $time4 = microtime(true);
@@ -160,7 +160,7 @@ class TzService extends BaseService {
         # 3、三字现
         //$rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏 已写开奖表 三字现遗漏表暂时不写了
         $time5 = microtime(true);
-        if(!in_array($lottery_type, \Yii::$app->params['NOT_STATIC_LOTTERYS'])) { # 重庆、新疆才统计单双遗漏, 冰岛90、3m5m10m不统计
+        if(in_array($lottery_type, \Yii::$app->params['STATIC_DATA_LOTTERYS'])) { # 重庆、新疆才统计单双遗漏, 冰岛90、3m5m10m不统计
             $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type); # 耗时 6-7s - 30s
         }
         $time6 = microtime(true);

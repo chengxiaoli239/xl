@@ -50,7 +50,7 @@ abstract class BetService extends BaseBetService {
      * @param $uid
      * @param $tz_system_id - 表lt_tz_systems.id
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
-     * @return HN0898Service|KuaiLe8Service|SevenService|XlService|Lucky5Service|NineNineNewService
+     * @return HN0898Service|KuaiLe8Service|SevenService|XlService|Lucky5Service|NineNineNewService|JuHuaBaseService
      */
     public static function getBetObj($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
         //p([$uid, $tz_system_id, $lottery_type]);
@@ -320,41 +320,53 @@ abstract class BetService extends BaseBetService {
             $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['=', 'uid', $uid], ['=', 'is_parent', 1]];
             $plans = UserSysPlans::find()->where($where)->orderBy(['tz_sort'=>SORT_ASC])->all();
             foreach ($plans as $plan){
-                $tz_system_id = $plan->tz_sites;
-
-                ############# 账号是否过期检测 ################
-                $status = UserService::accountIsExpire($plan->uid, $tz_system_id);
-                if(!$status && $plan->account != 'gaozi2018'){
-                    Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
-                    return ['status'=>300, 'msg'=>'账号过期提示'];
-                }
-                ############# 账号是否过期检测 ################
-
-                $qihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
-                if(empty($qihao)){
-                    Tool_Common::log('wang_pan_is_active', 'ERR', '网盘开盘状态', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
-                    return ['status'=>300, 'msg'=>'未开盘或者已关盘['.date('Y-m-d H:i:s').']'];
-                }
-                $mkey = self::buildBetPlanIdKey($plan->account, $qihao, $plan->id);
-
-                # 4、投注号码 codes
-                $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
-                $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
-
-                # 5、投注请求
-                $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
-                $tmpRst = $BetService->bet($qihao, $plan->id, $codes, $is_auto);
-
-                $logArr = ['tz_system_id'=>$tz_system_id,'codes'=>$codes, 'postRst'=>$tmpRst];
-                Tool_Common::log('betByUidXy','INFO','0898投注记录', $logArr);
-
-
+                $rst['data'][$plan->id] = self::betOneyPlan($plan->id);
             }
         }
 
         Tool_Common::log('bet','INFO','用户真实投注', $logArr);
 
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
+    }
+
+    /**
+     * @desc 单个计划
+     * @param string $plan_id
+     * @return array
+     */
+    public static function betOnePlan($plan_id='', $is_auto=1){
+        if(!$plan_id) return ['status'=>300, 'msg'=>'计划id不能为空'];
+        $plan = UserSysPlans::findOne($plan_id);
+        $tz_system_id = $plan->tz_sites;
+
+        $uid = $plan->uid;
+        $lottery_type = $plan->lottery_type;
+        ############# 账号是否过期检测 ################
+        $status = UserService::accountIsExpire($plan->uid, $tz_system_id);
+        if(!$status && $plan->account != 'gaozi2018'){
+            Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
+            return ['status'=>300, 'msg'=>'账号过期提示'];
+        }
+        ############# 账号是否过期检测 ################
+
+        $qihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
+        if(empty($qihao)){
+            Tool_Common::log('wang_pan_is_active', 'ERR', '网盘开盘状态', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
+            return ['status'=>300, 'msg'=>'未开盘或者已关盘['.date('Y-m-d H:i:s').']'];
+        }
+
+        # 4、投注号码 codes
+        $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
+        $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+
+        # 5、投注请求
+        $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
+        $tmpRst = $BetService->bet($qihao, $plan->id, $codes, $is_auto);
+
+        $logArr = ['tz_system_id'=>$tz_system_id,'codes'=>$codes, 'postRst'=>$tmpRst];
+        Tool_Common::log('betByUidXy','INFO','0898投注记录', $logArr);
+
+
     }
 
     /**
@@ -429,6 +441,8 @@ abstract class BetService extends BaseBetService {
 
         if($tz_system_id == 9){
             $qihao = Lucky5Service::getActiveQihao($uid, $tz_system_id, $lottery_type);
+        }elseif($tz_system_id == 11){ # 菊花网
+            $qihao = JuHuaBaseService::getActiveQihao($uid, $tz_system_id, $lottery_type);
         }else{
             $qihao = HN0898Service::getQihao($lottery_type);
         }
@@ -484,6 +498,8 @@ abstract class BetService extends BaseBetService {
             if('00:00:00'<$time && $time<'07:00:00'){
                 $status = false;
             }
+        }elseif(in_array($lottery_type, [16]) && '20:00:00'<$time && $time<'21:00:00'){
+            $status = false;
         }elseif(in_array($lottery_type, [10, 11, 12, 13])){
             # 冰岛90s 3m 5m 10m
             if('03:00:00'<$time && $time<'08:00:00'){
@@ -1353,6 +1369,7 @@ abstract class BetService extends BaseBetService {
                 if(substr($qihao,6) == '001') $cacheTime = 30 * 60; # 30分钟
                 break;
             case 6: # 新疆时时彩
+                $cacheTime = 20 * 60;
                 break;
             case 7: # 北京快乐8
                 $cacheTime = 5 * 60;
@@ -1368,6 +1385,9 @@ abstract class BetService extends BaseBetService {
                 break;
             case 11: # 冰岛3分
                 $cacheTime = 3 * 60;
+                break;
+            case 16: # 加拿大28   3.5分
+                $cacheTime = 3.5 * 60;
                 break;
         }
 
