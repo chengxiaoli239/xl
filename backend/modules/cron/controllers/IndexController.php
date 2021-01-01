@@ -254,9 +254,9 @@ class IndexController extends Controller
         self::_init();
         $post = \Yii::$app->request->post();
         $uid = $post['uid'];
-        for($i=0; $i<10; $i++){
+        for($i=0; $i<8; $i++){
             $rst['bet'] = BetService::betByUidXy($uid); // 用户新计划投注，可正买可反买
-            sleep(5);
+            sleep(6);
         }
 
         return $rst;
