@@ -320,11 +320,11 @@ abstract class BetService extends BaseBetService {
             $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['=', 'uid', $uid], ['=', 'is_parent', 1]];
             $plans = UserSysPlans::find()->where($where)->orderBy(['tz_sort'=>SORT_ASC])->all();
             foreach ($plans as $plan){
-                $rst['data'][$plan->id] = self::betOneyPlan($plan->id);
+                $rst['data'][$plan->id] = self::betOnePlan($plan->id);
             }
         }
 
-        Tool_Common::log('bet','INFO','用户真实投注', $logArr);
+        Tool_Common::log('bet','INFO','用户真实投注', ['uid'=>$uid, 'rst'=>$rst]);
 
         return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
     }
