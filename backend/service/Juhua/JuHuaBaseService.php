@@ -1158,7 +1158,7 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @param $tz_system_id
      * @return array
      */
-    public static function getSn($uid, $tz_system_id, $lottery_type){
+    public static function getSn($uid, $tz_system_id, $lottery_type=DEFAULT_LOTTERY_TYPE){
 
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
@@ -1171,9 +1171,9 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             "Connection: keep-alive",
             "Content-Length: 244",
             "Content-Type: application/x-www-form-urlencoded; charset=UTF-8",
-            "Cookie: ".$TzSystemsUsers->cookie,
-            "Host: ".str_replace('https://', '', $TzSystemsUsers->ssc_domain),
-            "Origin: ".$TzSystemsUsers->ssc_domain,
+            'Cookie: '.self::changeCookie($TzSystemsUsers->cookie, $lottery_type),
+            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+            'Origin: '.$TzSystemsUsers->ssc_domain,
             "Referer: ".$TzSystemsUsers->ssc_domain."/mem_orders?tid=".$tid,
             "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36",
             "X-Requested-With: XMLHttpRequest",
@@ -1186,10 +1186,13 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
                 'serno'=>$qihao,
                 'account'=>'',
                 'selstate' => 3,
+                'iswin' => 0,
             ],
         ];
         $sn = '';
-        $data = CurlService::postCurl($url, $post_data, $headers);
+        $data = CurlService::postCurl($url, http_build_query($post_data), $headers);
+        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'data'=>$data];
+        p($logArr);
         if($data['tsts']){
             $sn = end($data['r'])['no'];
         }
@@ -1709,8 +1712,8 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $m->set($betKey, 1, $time);
 
             # 获取方案号，记录id, 用于撤单
-            $snInfo = self::getSn(self::$user_id, self::$tz_system_id, $lottery_type);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
-            $sn_str = $sn_str.','.$snInfo;
+            //$snInfo = self::getSn(self::$user_id, self::$tz_system_id, $lottery_type);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+            //$sn_str = $sn_str.','.$snInfo;
 
         }
         $snInfo_sn = $qihao; # 多次下单需要分开，多次撤单

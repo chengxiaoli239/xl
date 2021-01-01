@@ -201,6 +201,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $snInfo = JuHuaBaseService::getSn($uid =35, $tz_system_id = 11); p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         $rst = BetService::betOnePlan($plan_id=1642);p($rst);
         $lottery_type = 16;
         $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
@@ -382,7 +383,6 @@ class IndexController extends Controller
         $rst = JuHuaBaseService::getBetCodes(['2123', '3457', '7892', '3029', '3X09', '3424'], $single = 0.1, $playway=3); p($rst); # 同步余额
         $rst = JuHuaBaseService::getBetCodes(['X123', 'X457', 'X892', '30X9', '3X09', '34X4'], $single = 0.1, $playway=2); p($rst); # 同步余额
         $rst = JuHuaBaseService::synBalance(21); p($rst); # 同步余额
-        $snInfo = JuHuaBaseService::getSn($uid =12, $tz_system_id = 11); p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         //$data['rst'] = ChatService::send();p($data);
         $loginRst = BaseService::login($id = 47);p($loginRst);
         $rst = NumService::getCodesArise(['0144']);p($rst);
