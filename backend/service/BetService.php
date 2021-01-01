@@ -321,6 +321,7 @@ abstract class BetService extends BaseBetService {
             $plans = UserSysPlans::find()->where($where)->orderBy(['tz_sort'=>SORT_ASC])->all();
             foreach ($plans as $plan){
                 $rst['data'][$plan->id] = self::betOnePlan($plan->id);
+
             }
         }
 
