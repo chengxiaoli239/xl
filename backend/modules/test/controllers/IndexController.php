@@ -47,6 +47,7 @@ use common\kj\cqssc\CqsscKcw;
 use common\kj\cqssc\CqsscSevenDay;
 use common\kj\qxc\QxcTcw;
 use common\kj\ssc\BingDao;
+use common\kj\ssc\JiaNaDa;
 use common\kj\ssc\Lucky5;
 use common\kj\ssc\TaiWanHuanLe;
 use common\kj\xjssc\XjSsc;
@@ -200,6 +201,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = JiaNaDa::getLotteryCanada($type='json', $is_auto=2);p($data);
+        $data = JiaNaDa::getLottery($type='json', $is_auto=2);p($data);
         $rst = BaoTaService::getCronTabs();p($rst);
         $rst = BaoTaService::btLogin();p($rst);
         $activeQihao = BetService::getActiveQihao($uid=24, $tz_system_id=9, $lottery_type=8);p($activeQihao);

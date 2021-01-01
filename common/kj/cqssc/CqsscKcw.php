@@ -44,6 +44,7 @@ class CqsscKcw extends BaseKj {
         12 => '冰岛5m', # 冰岛5分
         13 => '冰岛10m', # 冰岛5分
         15 => '欢乐生肖', # 冰岛5分
+        16 => '加拿大', # 加拿大3.5分
     ];
 
     public static function getLotteryNo($returnType = 'json'){

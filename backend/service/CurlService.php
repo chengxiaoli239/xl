@@ -280,7 +280,7 @@ class CurlService extends BaseService{
         curl_setopt($ch, CURLOPT_HEADER,0);
 
         $data = curl_exec($ch);
-        //if(strpos($url, 'cc138008') !== false OR true){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
+        //if(strpos($url, 'dashen28') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
         $errno = curl_errno($ch);
         if($errno>0) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
