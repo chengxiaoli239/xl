@@ -14,6 +14,10 @@ class PoxyIPService extends BaseService {
      * @param $num = 1; # 提取IP数量
      */
     public static function kuaiPoxy($num = 1){
+        $time_HI = date("H:i");
+        if('04:00'<$time_HI && $time_HI<'08:55'){
+            return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
+        }
         $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
         $API_KEY = BetService::getConfig('KUAI_POXY_API_KEY'); # 快代理 API Key
         // https://dev.kdlapi.com/api/getorderexpiretime?orderid=938684913491492&signature=vdany88efprusvlm16cb0is9wr9smb4q
