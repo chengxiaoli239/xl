@@ -201,6 +201,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BaoTaService::btLogin($id=1);//p($rst);
+        $rst = BaoTaService::getTaskList($id=1);p($rst);
+        $rst = BaoTaService::getCronTabs();p($rst);
         $snInfo = JuHuaBaseService::getSn($uid =35, $tz_system_id = 11); p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         $rst = BetService::betOnePlan($plan_id=1642);p($rst);
         $lottery_type = 16;
@@ -208,8 +211,6 @@ class IndexController extends Controller
         $qihao_2 = HN0898Service::getQihao($lottery_type);p([$qihao_1, $qihao_2]);
         $data = JiaNaDa::getLotteryCanada($type='json', $is_auto=2);p($data);
         $data = JiaNaDa::getLottery($type='json', $is_auto=2);p($data);
-        $rst = BaoTaService::getCronTabs();p($rst);
-        $rst = BaoTaService::btLogin();p($rst);
         $activeQihao = BetService::getActiveQihao($uid=24, $tz_system_id=9, $lottery_type=8);p($activeQihao);
         $rst = BetService::repeatErrorBet();p($rst);
         $rst['bet'] = BetService::betByUidXy($uid=10);p($rst); // 用户新计划投注，可正买可反买
