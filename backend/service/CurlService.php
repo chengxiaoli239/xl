@@ -124,7 +124,7 @@ class CurlService extends BaseService{
 
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
-        if(strpos($url, 'GetCrontab') !== false)p(['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]);
+        //if(strpos($url, 'GetCrontab') !== false)p(['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]);
         if($errno){
             if(isset($post_data['code']) && !empty($post_data['code']))$post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
