@@ -218,7 +218,7 @@ class BaseService{
         $end_time = microtime(true);
         //d($content);
         $errno = curl_errno($ch);
-        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$content, 'errno'=>$errno]; p($logArr);
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$content, 'errno'=>$errno];
             //p($logArr);
@@ -235,6 +235,9 @@ class BaseService{
 
             $body = substr($content, $headerSize);
             $result['rstData'] = json_decode($body, true);
+            foreach ($matches1[1] as $key=>$match){
+                $matches1[1][$key] = trim($match);
+            }
 
             $result['cookie'] = $matches1;
         }

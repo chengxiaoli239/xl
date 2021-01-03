@@ -23,7 +23,7 @@ class PoxyIPService extends BaseService {
         // https://dev.kdlapi.com/api/getorderexpiretime?orderid=938684913491492&signature=vdany88efprusvlm16cb0is9wr9smb4q
         $RedisLock = new RedisLock();
         $Rkey = $API_KEY.'_redis';
-        if(!$RedisLock->lock($Rkey.'_redis', 10)){
+        if(!$RedisLock->lock($Rkey.'_redis', 15)){
             sleep(10);
         }
         $query = [
@@ -225,10 +225,10 @@ class PoxyIPService extends BaseService {
         $poxy_ip_data = $m->get($mkey);
         if(empty($poxy_ip_data)){
             $redisLock = new RedisLock();
-            if($redisLock->lock($mkey.'_redis', 10)){
+            if($redisLock->lock($mkey.'_redis', 15)){
                 PoxyIPService::preGetValidIp($uid);
             }else{
-                sleep(5);
+                sleep(10);
             }
         }
         $poxy_ip_data = $m->get($mkey);

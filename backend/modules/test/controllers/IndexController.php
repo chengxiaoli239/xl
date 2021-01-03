@@ -202,7 +202,9 @@ class IndexController extends Controller
 
     public function actionDw(){
         $rst = BaoTaService::btLogin($id=1);//p($rst);
-        $rst = BaoTaService::getTaskList($id=1);p($rst);
+        $rst = BaoTaService::getDataList($id=1);//p($rst);
+        $rst = BaoTaService::getCronTabs($id=1);p($rst);
+        $rst['visitIndex'] = BaoTaService::visitHomePage($id=1);p($rst);
         $rst = BaoTaService::getCronTabs();p($rst);
         $snInfo = JuHuaBaseService::getSn($uid =35, $tz_system_id = 11); p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         $rst = BetService::betOnePlan($plan_id=1642);p($rst);
