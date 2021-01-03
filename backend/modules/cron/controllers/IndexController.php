@@ -279,7 +279,7 @@ class IndexController extends Controller
                     # 是否有激活的计划
                     $hasActivePlan = CommonService::hasPlansActiveSys($tzSystemsUser->tz_system_id);
                     if(!$hasActivePlan){
-                        //return false;
+                        return false;
                     }
                     $flag1 = JuHuaBaseService::getHomePage($tzSystemsUser->uid, $tzSystemsUser->tz_system_id, $lottery_type);
                     $flag2 = JuHuaBaseService::selectLottery($tzSystemsUser->uid, $tzSystemsUser->tz_system_id, $lottery_type);
