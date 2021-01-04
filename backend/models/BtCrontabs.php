@@ -49,10 +49,9 @@ class BtCrontabs extends \common\models\base\BaseModel
             [['uid', 'p_id', 'status', 'created_at', 'updated_at'], 'integer'],
             [['addtime', 'update_time'], 'safe'],
             [['updated_at'], 'required'],
-            [['name', 'sName', 'domain', 'echo', 'cycle', 'backupTo', 'save'], 'string', 'max' => 64],
-            [['sType', 'where_minute', 'where_hour', 'where1'], 'string', 'max' => 12],
+            [['name', 'sName', 'cycle'], 'string', 'max' => 120],
+            [['sType', 'domain', 'echo', 'backupTo', 'save', 'where_minute', 'where_hour', 'where1', 'type_desc'], 'string', 'max' => 64],
             [['sBody', 'urladdress'], 'string', 'max' => 250],
-            [['type_desc'], 'string', 'max' => 20],
         ];
     }
 
