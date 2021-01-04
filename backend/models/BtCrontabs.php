@@ -15,6 +15,7 @@ use Yii;
  * @property string $sType 脚本类型:toShell
  * @property int $status 开启状态
  * @property string $domain 地址
+ * @property int $cron_type 计划类型:1下注2:其它
  * @property string $echo 脚本key
  * @property string $cycle 频率描述
  * @property string $backupTo ...
@@ -46,12 +47,12 @@ class BtCrontabs extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['uid', 'p_id', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'p_id', 'status', 'cron_type', 'created_at', 'updated_at'], 'integer'],
             [['addtime', 'update_time'], 'safe'],
             [['updated_at'], 'required'],
-            [['name', 'sName', 'cycle'], 'string', 'max' => 120],
+            [['name', 'sBody', 'urladdress'], 'string', 'max' => 240],
+            [['sName', 'cycle'], 'string', 'max' => 120],
             [['sType', 'domain', 'echo', 'backupTo', 'save', 'where_minute', 'where_hour', 'where1', 'type_desc'], 'string', 'max' => 64],
-            [['sBody', 'urladdress'], 'string', 'max' => 250],
         ];
     }
 
@@ -69,6 +70,7 @@ class BtCrontabs extends \common\models\base\BaseModel
             'sType' => Yii::t('app', '脚本类型:toShell'),
             'status' => Yii::t('app', '开启状态'),
             'domain' => Yii::t('app', '地址'),
+            'cron_type' => Yii::t('app', '计划类型:1下注2:其它'),
             'echo' => Yii::t('app', '脚本key'),
             'cycle' => Yii::t('app', '频率描述'),
             'backupTo' => Yii::t('app', '...'),
