@@ -201,9 +201,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = BaoTaService::btLogin($id=1);//p($rst);
-        $rst = BaoTaService::getDataList($id=1);//p($rst);
-        $rst = BaoTaService::getCronTabs($id=1);p($rst);
+        //$rst = BaoTaService::btLogin($id=1);p($rst);
+        //$rst = BaoTaService::getCronTabs($id=1);p($rst);
+        $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
+        $rst = BaoTaService::getUserInfoByCrontabName('用户【id:30-as07】- 男同学 - 投注计划');p($rst);
         $rst['visitIndex'] = BaoTaService::visitHomePage($id=1);p($rst);
         $rst = BaoTaService::getCronTabs();p($rst);
         $snInfo = JuHuaBaseService::getSn($uid =35, $tz_system_id = 11); p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )

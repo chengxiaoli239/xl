@@ -9,9 +9,11 @@
 
 namespace backend\service\baota;
 
+use backend\models\BtCrontabs;
 use backend\models\BtSystemConfigs;
 use backend\service\BaseService;
 use backend\service\CurlService;
+use backend\service\Juhua\JuHuaBaseService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
@@ -31,7 +33,7 @@ class BaoTaService extends BaseService { #
             $getIndexList = BaoTaService::getIndexList($id);
             $getTaskList = BaoTaService::getTaskList($id);
         }
-        $rst = BaoTaService::getXHttpToken($id);
+        //$rst = BaoTaService::getXHttpToken($id);
 
         return ['BT_PANEL_6'=>$BT_PANEL_6, 'rstLogin'=>$rstLogin, 'rst'=>$rst, 'visitIndex'=>$visitIndex, 'getDataList'=>$getDataList, 'getIndexList'=>$getIndexList, 'getTaskList'=>$getTaskList];
     }
@@ -43,7 +45,10 @@ class BaoTaService extends BaseService { #
      */
     public static function getBtPanel($id){
         $b = BtSystemConfigs::findOne($id);
-        $url = $b->domain.'/'.$b->suffix.'/';
+        $url = $b->domain;
+        if($b->suffix){
+            $url = $url.'/'.$b->suffix.'/';
+        }
         $headers = [
             "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
             "Accept-Encoding: gzip, deflate",
@@ -121,7 +126,54 @@ class BaoTaService extends BaseService { #
      */
     public static function getCronTabs($id=1){
         $BtSystemConfigs = BtSystemConfigs::findOne($id);
-        $x_http_token = BaoTaService::visitCrontabPage($id);
+
+        $url = $BtSystemConfigs->domain.'/crontab?action=GetCrontab';
+        $curl = curl_init();
+        $headers = [
+            'Accept:  */*',
+            'Accept-Encoding:  gzip, deflate',
+            'Accept-Language:  zh-CN,zh;q=0.9,en;q=0.8',
+            'Connection:  keep-alive',
+            'Content-Length:  0',
+            'Cookie: '.$BtSystemConfigs->cookie,
+
+            "Host: ".str_replace('http://', '', $BtSystemConfigs->domain),
+            "Origin: ".$BtSystemConfigs->domain,
+            "Referer: ".$BtSystemConfigs->domain."/crontab",
+
+            'User-Agent:  Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+            "x-cookie-token: ".BaoTaService::getXCookieToken(),
+            "x-http-token: ".BaoTaService::getXHttpTokenVal(),
+            'X-Requested-With:  XMLHttpRequest'
+        ];
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_HTTPHEADER => $headers
+        ]);
+
+        $data = curl_exec($curl);
+        curl_close($curl);
+
+        $data = json_decode($data, true);
+
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'data'=>$data];
+        return $data;
+    }
+
+    /**
+     * @desc 获取计划任务
+     * @param int $id
+     */
+    public static function getCronTabsBak($id=1){
+        $BtSystemConfigs = BtSystemConfigs::findOne($id);
 
         $url = $BtSystemConfigs->domain.'/crontab?action=GetCrontab';
         $headers = [
@@ -130,18 +182,18 @@ class BaoTaService extends BaseService { #
             "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
             "Connection: keep-alive",
             "Content-Length: 0",
-            $BtSystemConfigs->cookie.'; pro_end=-1; ltd_end=-1; serverType=nginx; order=id%20desc; memSize=3783',
+            'pro_end=-1; ltd_end=-1; serverType=nginx; order=id%20desc; memSize=3783; '.$BtSystemConfigs->cookie,
             "Host: ".str_replace('http://', '', $BtSystemConfigs->domain),
             "Origin: ".$BtSystemConfigs->domain,
             "Referer: ".$BtSystemConfigs->domain."/crontab",
 
             $BtSystemConfigs->user_agent,
             "x-cookie-token: ".BaoTaService::getXCookieToken(),
-            //"x-http-token: ".BaoTaService::getXHttpTokenVal(),
-            "x-http-token: ".$x_http_token,
+            "x-http-token: ".BaoTaService::getXHttpTokenVal(),
             "X-Requested-With: XMLHttpRequest",
         ];
-        $data = CurlService::postCurl($url, '', $headers);
+        //$data = CurlService::postCurl($url, '', $headers);
+        $data = JuHuaBaseService::postBetCurl($url,[], $headers);
         $logArr = ['url'=>$url, 'headers'=>$headers, 'data'=>$data];
         p($logArr);
         return $data;
@@ -326,6 +378,7 @@ class BaoTaService extends BaseService { #
         ];
         $data = CurlService::postCurl($url, $post_data, $headers);
         $logArr = ['url'=>$url, 'headers'=>$headers, 'data'=>$data];
+        p($logArr,0);
         return $data;
     }
 
@@ -359,6 +412,67 @@ class BaoTaService extends BaseService { #
         $val = $m->get($mkey);
 
         return $val;
+    }
+
+    /**
+     * @desc 同步宝塔计划任务
+     * @param int $id
+     * @return array|bool|string
+     */
+    public static function syncBaoTaCrontabs($id=1){
+        $crontabs = BaoTaService::getCronTabs($id);
+        if(empty($crontabs)) return [];
+        $crontabs = array_reverse($crontabs);
+
+        foreach ($crontabs as $crontab){
+            if(empty($crontab)) continue;
+            $setDatas = $crontab;
+            $setDatas['type_desc'] = $crontab['type'];
+            $setDatas['p_id'] = $crontab['id'];
+            $M = BtCrontabs::findOne(['p_id'=>$crontab['id']]);
+            $now_time = time();
+            if(empty($M)){
+                $M = new BtCrontabs();
+                $setDatas = array_merge($setDatas, [
+                    'created_at' => $now_time
+                ]);
+            }
+            $userInfo = BaoTaService::getUserInfoByCrontabName($setDatas['name']);
+            if(!empty($userInfo)){
+                $setDatas['uid'] = $userInfo['uid'];
+                $setDatas['cron_type'] = 1;
+            }
+
+            $setDatas = array_merge($setDatas, [
+                'updated_at' => $now_time
+            ]);
+            //$setDatas['name'] = urlencode($setDatas['name']);
+
+            $M->setAttributes($setDatas);
+            if(!$M->save()){
+                continue;
+                //return ['status'=>300, 'msg'=>current($M->getErrors())];
+            }
+        }
+
+        return $crontabs;
+    }
+
+    /**
+     * @desc 根据宝塔的计划任务截取，获取用户id
+     * @param $name
+     * @return array
+     */
+    public static function getUserInfoByCrontabName($name){
+        $info = [];
+        $preg = '/用户【id:(.*?)-(.*?)】- (.*?) - 投注计划/ism';
+        preg_match_all($preg, $name, $matches);
+
+        if($matches[1][0]){
+            $info = ['uid'=>$matches[1][0], 'username'=>$matches[2][0], 'weixin_name'=>$matches[3][0]];
+        }
+
+        return $info;
     }
 
 }

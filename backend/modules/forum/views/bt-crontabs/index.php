@@ -32,13 +32,23 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
-                        'uid',
-                        'p_id',
-                        'name',
-                        'sName',
+                        //'id',
+                        //'uid',
+                        ['attribute' => 'uid','headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return $model->uid;
+                            }
+                        ],
+                        //'p_id',
+                        //'name',
+                        ['attribute' => 'name','headerOptions'=>['width'=>'20%'],
+                            'value' => function($model) {
+                                return $model->name;
+                            }
+                        ],
+                        //'sName',
                         //'sType',
-                        //'status',
+                        'status',
                         //'domain',
                         //'echo',
                         //'cycle',
@@ -47,15 +57,21 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'where_minute',
                         //'where_hour',
                         //'where1',
-                        //'sBody',
+                        'sBody',
                         //'type_desc',
                         //'urladdress',
                         //'addtime',
+                        ['attribute' => 'addtime','label' => '更新时间',
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return substr($model->addtime, 5, 11);
+                            }
+                        ],
                         //'created_at',
                         //'updated_at',
                         //'update_time',
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
             </div>

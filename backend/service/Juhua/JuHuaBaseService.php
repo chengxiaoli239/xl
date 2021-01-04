@@ -1922,7 +1922,6 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
         if(!$timeout) $timeout = 30;
         $timeout = 120;
 
-
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
 

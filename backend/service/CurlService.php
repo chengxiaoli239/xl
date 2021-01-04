@@ -132,7 +132,7 @@ class CurlService extends BaseService{
             Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
         }
 
-        if(strpos($url, 'getBetList')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data, $errno]); }
+        //if(strpos($url, 'getBetList')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data, $errno]); }
         if(curl_close($ch)) {
             echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
         }
