@@ -420,6 +420,7 @@ class BaoTaService extends BaseService { #
      * @return array|bool|string
      */
     public static function syncBaoTaCrontabs($id=1){
+        $rst = BaoTaService::btLogin($id); # 登陆
         $crontabs = BaoTaService::getCronTabs($id);
         if(empty($crontabs)) return [];
         $crontabs = array_reverse($crontabs);
