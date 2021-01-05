@@ -11,6 +11,7 @@ namespace backend\service\baota;
 
 use backend\models\BtCrontabs;
 use backend\models\BtSystemConfigs;
+use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
 use backend\service\CurlService;
 use backend\service\Juhua\JuHuaBaseService;
@@ -446,7 +447,6 @@ class BaoTaService extends BaseService { #
             $setDatas = array_merge($setDatas, [
                 'updated_at' => $now_time
             ]);
-            p($setDatas);
             //$setDatas['name'] = urlencode($setDatas['name']);
 
             $M->setAttributes($setDatas);
@@ -510,6 +510,71 @@ class BaoTaService extends BaseService { #
         }
 
         return ['status'=>200, 'msg'=>$data['msg']];
+    }
+
+    /**
+     * @desc 用户计划任务
+     * @param $uid
+     * @return array
+     */
+    public static function updateUserBetStatus($tz_system_user_id='', $is_auto=0){
+        if(empty($tz_system_user_id)) return ['status'=>300, 'msg'=>'操作失败'];
+        $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);
+        $uid = $TzSystemsUsers->uid;
+        $is_auto_bet = $TzSystemsUsers->is_auto_bet;
+        if(!$is_auto_bet && !$is_auto){
+            return ['status'=>300, 'msg'=>'状态未开启，不能同步到宝塔'];
+        }
+
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+        $BtCrontabs = BtCrontabs::findOne(['uid'=>$uid]);
+        if(empty($BtCrontabs) OR $is_auto){
+
+            $BtSystemConfigs = BtSystemConfigs::findOne($id=1);
+
+            $url = $BtSystemConfigs->domain.'/crontab?action=AddCrontab';
+            $post_data = [
+                'name' => '用户【id:'.$uid.'-'.$TzSystemsUsers->username.'】- '.$TzSystemsUsers->username. ' - 投注计划',
+                'type' => 'minute-n', # 执行周期类型
+                'where1' => 1, # 执行周期，1分钟
+                'hour' => '',
+                'minute' => '',
+                'week' => '',
+                'sType' => 'toShell', # 脚本类型:shell
+                'sBody' => 'curl -H "Content-Type:application/json" -X POST --data \'{"uid": "'.$uid.'"}\' http://www.lottery.com/cron/index/bet-by-uid', # 脚本内容
+                'sName' => '',
+                'backupTo' => 'localhost',
+                'save' => '',
+                'urladdress' => 'undefined',
+            ];
+
+            $post_data = http_build_query($post_data);
+            $headers = [
+                'Accept:  */*',
+                'Accept-Encoding:  gzip, deflate',
+                'Accept-Language:  zh-CN,zh;q=0.9,en;q=0.8',
+                'Connection:  keep-alive',
+                'Content-Length:  '.strlen($post_data),
+                'Cookie: '.$BtSystemConfigs->cookie,
+
+                "Host: ".str_replace('http://', '', $BtSystemConfigs->domain),
+                "Origin: ".$BtSystemConfigs->domain,
+                "Referer: ".$BtSystemConfigs->domain."/crontab",
+
+                'User-Agent:  Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+                "x-cookie-token: ".BaoTaService::getXCookieToken(),
+                "x-http-token: ".BaoTaService::getXHttpTokenVal(),
+                'X-Requested-With:  XMLHttpRequest'
+            ];
+
+            $data = BaseService::postCommonCurl($url, $post_data, $headers);
+            Tool_Common::log('addUserCrontab', 'INFO', '添加投注计划', ['tz_systems_user_id'=>$tz_system_user_id, 'uid'=>$uid, 'url'=>$url, 'post_data'=>$post_data, 'data'=>$data]);
+            if(!$data['rstData']['status']){
+                return ['status'=>300, 'msg'=>$data['rstData']['msg']];
+            }
+        }
+
+        return $rst;
     }
 
 }

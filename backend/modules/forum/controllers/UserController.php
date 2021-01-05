@@ -6,6 +6,7 @@ use backend\models\Admin;
 use backend\models\TzSystemsAuth;
 use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
 use backend\models\TzSystemsUsers;
+use backend\service\baota\BaoTaService;
 use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\PoxyIPService;
@@ -163,6 +164,24 @@ class UserController extends BaseController
                 'models' => $model
             ]);
         }
+    }
+
+    /**
+     * @desc 自动下注
+     * @param $id
+     * @param $status
+     * @return \yii\web\Response
+     */
+    public function actionSwitchAutoBetStatus($id, $status) {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if(\Yii::$app->user->id == 1){
+            $rst = HN0898Service::updateStatus($id, '\backend\models\TzSystemsUsers', $field = 'is_auto_bet');
+            if($rst['status'] == 200){
+                $rst = BaoTaService::updateUserBetStatus($id);
+            }
+        }
+
+        return $this->redirect(['view']);
     }
 
     /**

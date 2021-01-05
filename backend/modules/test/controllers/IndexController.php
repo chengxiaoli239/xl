@@ -202,6 +202,7 @@ class IndexController extends Controller
 
     public function actionDw(){
         $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
+        $rst = BaoTaService::updateUserBetStatus($id=86, $is_auto=2);p($rst);
 
         $rst = BaoTaService::updateCrontabStatus($id=46);p($rst);
         //$rst = BaoTaService::btLogin($id=1);p($rst);

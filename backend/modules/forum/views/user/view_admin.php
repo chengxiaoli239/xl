@@ -126,6 +126,22 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a($txt, $url, ['title' => '开通使用代理IP','alt'=>$alt]);
                             }
                         ],
+                        ['attribute' => 'is_auto_bet','label'=>'自动下', 'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if($model->is_auto_bet == 1){
+                                    $txt = '<font color="green">是</font>';
+                                    $alt = '点击禁用';
+                                    $val = 0;
+                                }else{
+                                    $txt = '<font color="red">否</font>';
+                                    $val = 1;
+                                    $alt = '点击启用';
+                                }
+                                $url = "/forum/user/switch-auto-bet-status?id=".$model->id."&status=".$val; #
+                                return Html::a($txt, $url, ['title' => '自动下注脚本开启','alt'=>$alt]);
+                            }
+                        ],
                         //'ssc_domain',
                         ['attribute' => 'ssc_domain', 'label'=>'网盘', //'headerOptions' => ['width' => '170'],
                             'value'=> function($model){
