@@ -16,7 +16,6 @@ use Yii;
  * @property int $status 开启状态
  * @property string $domain 地址
  * @property int $cron_type 计划类型:1下注2:其它
- *
  * @property string $echo 脚本key
  * @property string $cycle 频率描述
  * @property string $backupTo ...

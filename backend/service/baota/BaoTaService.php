@@ -378,7 +378,6 @@ class BaoTaService extends BaseService { #
         ];
         $data = CurlService::postCurl($url, $post_data, $headers);
         $logArr = ['url'=>$url, 'headers'=>$headers, 'data'=>$data];
-        p($logArr,0);
         return $data;
     }
 
@@ -447,6 +446,7 @@ class BaoTaService extends BaseService { #
             $setDatas = array_merge($setDatas, [
                 'updated_at' => $now_time
             ]);
+            p($setDatas);
             //$setDatas['name'] = urlencode($setDatas['name']);
 
             $M->setAttributes($setDatas);
