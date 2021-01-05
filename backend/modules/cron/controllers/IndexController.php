@@ -271,6 +271,7 @@ class IndexController extends Controller
         $lottery_types = StaticService::getLotteryTypes();
         $TzSystemsUsers = TzSystemsUsers::findAll(['status'=>1]);
 
+        Tool_Common::log('actionVisitHomePage', 'INFO', '访问首页',['lottery_types'=>$lottery_types]);
         foreach ($lottery_types as $lottery_type){
             foreach ($TzSystemsUsers as $tzSystemsUser){
 
