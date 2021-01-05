@@ -2,6 +2,8 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\baota\BaoTaService;
+use backend\service\HN0898Service;
 use Yii;
 use backend\models\BtCrontabs;
 use backend\models\searchs\BtCrontabs as BtCrontabsSearch;
@@ -42,6 +44,21 @@ class BtCrontabsController extends BaseController
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    /**
+     * @desc 更新投注状态
+     * @param $id
+     * @return \yii\web\Response
+     */
+    public function actionSwitchStatus($id){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $rst = HN0898Service::updateStatus($id, '\backend\models\BtCrontabs', $field = 'status');
+        if($rst['status'] == 200){
+            BaoTaService::updateCrontabStatus($id);
+        }
+
+        return $this->redirect(['index']);
     }
 
     /**

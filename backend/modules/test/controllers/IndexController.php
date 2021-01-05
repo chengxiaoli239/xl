@@ -201,9 +201,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
+        $rst = BaoTaService::updateCrontabStatus($id=46);p($rst);
         //$rst = BaoTaService::btLogin($id=1);p($rst);
         //$rst = BaoTaService::getCronTabs($id=1);p($rst);
-        $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
         $rst = BaoTaService::getUserInfoByCrontabName('用户【id:30-as07】- 男同学 - 投注计划');p($rst);
         $rst['visitIndex'] = BaoTaService::visitHomePage($id=1);p($rst);
         $rst = BaoTaService::getCronTabs();p($rst);

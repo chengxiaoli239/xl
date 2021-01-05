@@ -48,7 +48,22 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //'sName',
                         //'sType',
-                        'status',
+                        //'status',
+                        ['attribute'=>'status', 'label'=>'状态','headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                $url0 = "/forum/bt-crontabs/switch-status?id=".$model->id.'&status=1'; # 点击开启
+                                $url1 = "/forum/bt-crontabs/switch-status?id=".$model->id.'&status=0'; # 点击关闭
+                                if($model->status == 1){
+                                    $txt = "<font color='green'>已开启</font>" ;
+                                    return Html::a($txt, $url1, ['title' => '点击关闭']);
+                                }
+                                if(!$model->status){
+                                    $txt = "<font color='red'>已关闭</font>";
+                                    return Html::a($txt, $url0, ['title' => '点击开启']);
+                                }
+                            }
+                        ],
                         //'domain',
                         //'echo',
                         //'cycle',
@@ -61,6 +76,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'type_desc',
                         //'urladdress',
                         //'addtime',
+                        ['attribute'=>'backupTo', 'label'=>'操作','headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                $txt = "<font color='green'>执行</font>" ;
+                                return Html::a($txt, 'javascript:;', ['title' => '点击关闭']);
+                            }
+                        ],
                         ['attribute' => 'addtime','label' => '更新时间',
                             'format'=>'raw',
                             'value' => function($model) {

@@ -475,4 +475,40 @@ class BaoTaService extends BaseService { #
         return $info;
     }
 
+    /**
+     * @desc 宝塔状态同步更新
+     * @param $id - 本地用户表的id
+     */
+    public static function updateCrontabStatus($id){
+        $BtCrontabs = BtCrontabs::findOne($id);
+        $bt_cron_id = $BtCrontabs->p_id;
+
+        $BtSystemConfigs = BtSystemConfigs::findOne($id=1);
+        $url = $BtSystemConfigs->domain.'/crontab?action=set_cron_status';
+        $post_data = http_build_query(['id'=>$bt_cron_id]);
+        $headers = [
+            "Accept: */*",
+            "Accept-Encoding: gzip, deflate",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            "Content-Length: ".strlen($post_data),
+            "Content-Type: application/x-www-form-urlencoded; charset=UTF-8",
+            "Cookie: pro_end=-1; ltd_end=-1; serverType=nginx; order=id%20desc; memSize=3783; ".$BtSystemConfigs->cookie,
+
+            "Host: ".str_replace('http://', '', $BtSystemConfigs->domain),
+            "Origin: ".$BtSystemConfigs->domain,
+            "Referer: ".$BtSystemConfigs->domain."/crontab",
+            $BtSystemConfigs->user_agent,
+            "x-cookie-token: ".BaoTaService::getXCookieToken(),
+            "x-http-token: ".BaoTaService::getXHttpTokenVal(),
+            "X-Requested-With: XMLHttpRequest",
+        ];
+        $data = CurlService::postCurl($url, $post_data, $headers);
+        if(!$data['status']){
+            return ['status'=>300, 'msg'=>$data['msg']];
+        }
+
+        return ['status'=>200, 'msg'=>$data['msg']];
+    }
+
 }
