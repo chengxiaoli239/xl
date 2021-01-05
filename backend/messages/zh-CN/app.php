@@ -108,4 +108,7 @@ return [
     'Assignments' => '新建用户',
     'Search' => '搜索',
     'Chat Room' => '聊天室',
+
+    'Bt Crontabs' => '计划任务',
+    'Create Bt Crontabs' => '新建计划任务',
 ];

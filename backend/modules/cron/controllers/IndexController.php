@@ -13,6 +13,7 @@ use backend\models\SystemType;
 use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
 use backend\models\User;
+use backend\service\baota\BaoTaService;
 use backend\service\BaseService;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\Juhua\JuHuaBaseService;
@@ -303,6 +304,14 @@ class IndexController extends Controller
             $rst[$i]['rst'] = BetService::repeatErrorBet($post['lottery_types']);
             sleep(3);
         }
+
+        return $rst;
+    }
+
+    public static function actionSyncBtCrontabs(){
+        self::_init();
+
+        $rst = BaoTaService::syncBaoTaCrontabs();
 
         return $rst;
     }

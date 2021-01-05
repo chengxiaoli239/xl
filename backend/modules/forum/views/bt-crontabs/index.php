@@ -34,14 +34,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         //'id',
                         //'uid',
-                        ['attribute' => 'uid','headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'uid', 'label'=>'UID','headerOptions'=>['width'=>'3%'],
                             'value' => function($model) {
                                 return $model->uid;
                             }
                         ],
                         //'p_id',
                         //'name',
-                        ['attribute' => 'name','headerOptions'=>['width'=>'20%'],
+                        ['attribute' => 'name','headerOptions'=>['width'=>'18%'],
                             'value' => function($model) {
                                 return $model->name;
                             }
@@ -49,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'sName',
                         //'sType',
                         //'status',
-                        ['attribute'=>'status', 'label'=>'状态','headerOptions'=>['width'=>'5%'],
+                        ['attribute'=>'status', 'label'=>'状态','headerOptions'=>['width'=>'4%'],
                             'format'=>'raw',
                             'value'=>function($model){
                                 $url0 = "/forum/bt-crontabs/switch-status?id=".$model->id.'&status=1'; # 点击开启
@@ -72,6 +72,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'where_minute',
                         //'where_hour',
                         //'where1',
+                        ['attribute' => 'type_desc','label' => '周期','headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return $model->type_desc;
+                            }
+                        ],
                         'sBody',
                         //'type_desc',
                         //'urladdress',
@@ -83,7 +89,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a($txt, 'javascript:;', ['title' => '点击关闭']);
                             }
                         ],
-                        ['attribute' => 'addtime','label' => '更新时间',
+                        ['attribute' => 'addtime','label' => '更新时间','headerOptions'=>['width'=>'8%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 return substr($model->addtime, 5, 11);
