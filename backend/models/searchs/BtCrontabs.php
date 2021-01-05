@@ -18,7 +18,7 @@ class BtCrontabs extends BtCrontabsModel
     public function rules()
     {
         return [
-            [['id', 'uid', 'p_id', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'uid', 'p_id', 'status', 'cron_type', 'created_at', 'updated_at'], 'integer'],
             [['name', 'sName', 'sType', 'domain', 'echo', 'cycle', 'backupTo', 'save', 'where_minute', 'where_hour', 'where1', 'sBody', 'type_desc', 'urladdress', 'addtime', 'update_time'], 'safe'],
         ];
     }
@@ -47,7 +47,6 @@ class BtCrontabs extends BtCrontabsModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['id'=>SORT_DESC]]
         ]);
 
         $this->load($params);
@@ -64,6 +63,7 @@ class BtCrontabs extends BtCrontabsModel
             'uid' => $this->uid,
             'p_id' => $this->p_id,
             'status' => $this->status,
+            'cron_type' => $this->cron_type,
             'addtime' => $this->addtime,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
