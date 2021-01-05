@@ -29,6 +29,7 @@ use Yii;
  * @property string $odds_4d 四定赔率
  * @property string $warn_val 预警值
  * @property string $desc 盘口状态
+ * @property int $is_auto_bet 自动下注
  * @property int $is_use_proxy 使用代理
  * @property int $expire_time 到期时间
  * @property int $created_at 创建时间
@@ -51,7 +52,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['uid', 'is_agent', 'tz_system_id', 'status', 'tz_sort', 'is_use_proxy', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'is_agent', 'tz_system_id', 'status', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
             [['cookie'], 'string'],
             [['updated_at'], 'required'],
@@ -91,6 +92,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'odds_4d' => '四定赔率',
             'warn_val' => '预警值',
             'desc' => '盘口状态',
+            'is_auto_bet' => '自动下注',
             'is_use_proxy' => '使用代理',
             'expire_time' => '到期时间',
             'created_at' => '创建时间',
