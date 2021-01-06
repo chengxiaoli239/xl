@@ -478,7 +478,7 @@ class BaoTaService extends BaseService { #
 
     /**
      * @desc 宝塔状态同步更新
-     * @param $id - 本地用户表的id
+     * @param $id - 本地 lt_bt_crontabs.id
      */
     public static function updateCrontabStatus($id){
         $BtCrontabs = BtCrontabs::findOne($id);
@@ -505,6 +505,7 @@ class BaoTaService extends BaseService { #
             "X-Requested-With: XMLHttpRequest",
         ];
         $data = CurlService::postCurl($url, $post_data, $headers);
+        Tool_Common::log('updateCrontabStatus', 'INFO', '宝塔计划任务状态更新',['post_data'=>$post_data, 'rst'=>$data]);
         if(!$data['status']){
             return ['status'=>300, 'msg'=>$data['msg']];
         }
@@ -572,6 +573,10 @@ class BaoTaService extends BaseService { #
             if(!$data['rstData']['status']){
                 return ['status'=>300, 'msg'=>$data['rstData']['msg']];
             }
+        }else{
+            # 已经添加过的，则修改状态
+            $BtCrontabs = BtCrontabs::findOne(['uid'=>$uid]);
+            $rst = BaoTaService::updateCrontabStatus($BtCrontabs->id);
         }
 
         return $rst;
