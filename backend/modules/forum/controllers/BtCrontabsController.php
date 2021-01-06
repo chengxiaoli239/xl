@@ -54,9 +54,7 @@ class BtCrontabsController extends BaseController
     public function actionSwitchStatus($id){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $rst = HN0898Service::updateStatus($id, '\backend\models\BtCrontabs', $field = 'status');
-        if($rst['status'] == 200){
-            BaoTaService::updateCrontabStatus($id);
-        }
+        BaoTaService::updateCrontabStatus($id);
 
         return $this->redirect(['index']);
     }

@@ -524,12 +524,12 @@ class BaoTaService extends BaseService { #
         $uid = $TzSystemsUsers->uid;
         $is_auto_bet = $TzSystemsUsers->is_auto_bet;
         if(!$is_auto_bet && !$is_auto){
-            return ['status'=>300, 'msg'=>'状态未开启，不能同步到宝塔'];
+            //return ['status'=>300, 'msg'=>'状态未开启，不能同步到宝塔'];
         }
 
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $BtCrontabs = BtCrontabs::findOne(['uid'=>$uid]);
-        if(empty($BtCrontabs) OR $is_auto){
+        if(empty($BtCrontabs)){
 
             $BtSystemConfigs = BtSystemConfigs::findOne($id=1);
 
@@ -575,11 +575,14 @@ class BaoTaService extends BaseService { #
             }
         }else{
             # 已经添加过的，则修改状态
-            $BtCrontabs = BtCrontabs::findOne(['uid'=>$uid]);
             $rst = BaoTaService::updateCrontabStatus($BtCrontabs->id);
+            Tool_Common::log('addUserCrontab', 'INFO', '修改计划状态', ['tz_systems_user_id'=>$tz_system_user_id, 'rst'=>$rst]);
         }
 
         return $rst;
     }
 
+    public static function updateCrontabByTzSystemsUserId($tz_system_user_id){
+
+    }
 }
