@@ -308,6 +308,10 @@ class IndexController extends Controller
         return $rst;
     }
 
+    /**
+     * @desc 同步宝塔计划任务
+     * @return array|bool|string
+     */
     public static function actionSyncBtCrontabs(){
         self::_init();
 
@@ -402,11 +406,11 @@ class IndexController extends Controller
      */
     public function actionCacheProxyIp(){
         self::_init();
-        for ($i=0; $i<15; $i++){
+        for ($i=0; $i<4; $i++){
             $multi_status = BetService::getConfig('MULTI_PROXY_STATUS');
             $mol_uid = $multi_status ? $i : 0;
             $rst = PoxyIPService::preGetValidIp($mol_uid);
-            sleep(3);
+            sleep(15);
         }
 
         return $rst;
