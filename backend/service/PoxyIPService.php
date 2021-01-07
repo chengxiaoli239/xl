@@ -185,6 +185,12 @@ class PoxyIPService extends BaseService {
             return [];
         }
 
+        $redis = new RedisLock();
+        $rKey = 'preGetValidIp_'.$mod_uid;
+        if(!$redis->lock($rKey, 10)){
+            sleep(10);
+        }
+
         $m = \Yii::$app->cache;
         $time = 3600 * 4;
 
@@ -192,9 +198,9 @@ class PoxyIPService extends BaseService {
         $poxy_ip_data = $m->get($mkey);
         if(!empty($poxy_ip_data)){
             $isValid = PoxyIPService::isValid([$poxy_ip_data]);
+            $isValidRst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
         }
 
-        $isValidRst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
         //p(['poxy_ip_data'=>$poxy_ip_data, 'isValid'=>$isValid, 'isValidRst'=>$isValidRst]);
         if(($isValid === false OR empty($isValid)) OR $isValidRst['status'] != 200 OR $isValidRst['data'][$poxy_ip_data] < 5*60){
             # 调用失败或者可使用时间少于5分钟则认为IP失效
