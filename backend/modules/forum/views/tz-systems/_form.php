@@ -46,7 +46,8 @@ use yii\widgets\ActiveForm;
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
     $(function(){
-        $(":checkbox").click(function(){
+        //$(":checkbox").click(function(){
+        $("input[name='TzSystems[status][]']").click(function(){
             console.log($(this).parent().siblings().children()[0]);
             $(this).parent().siblings().children().each(function(n,ele){
                 if($(this).is(":checked")){
