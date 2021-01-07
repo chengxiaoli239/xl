@@ -125,6 +125,9 @@ class PoxyIPService extends BaseService {
      */
     public static function kuaiIPValidTime($poxy_ips = ''){
         if(strpos($poxy_ips[0], ':') === false) return ['status'=>300, 'msg'=>'IP格式错误，缺少冒号 ":"'];
+        $m = \Yii::$app->cache;
+        $mkey = 'retry_kuaiIPValidTime_key';
+
         $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
         $query = [
             'orderid' => $KUAI_POXY_ORDER_ID, # 快代理订单号
@@ -133,7 +136,11 @@ class PoxyIPService extends BaseService {
         ];
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdpsvalidtime/?'.http_build_query($query);
 
-        $rst = CurlService::getCurl($url);
+        $rst = CurlService::getCurl($url, [], 6);
+        if($rst['errno']>0 && !$r = $m->get($mkey)){
+            $m->set($mkey, 1, 5);
+            return self::kuaiIPValidTime($poxy_ips);
+        }
         $logArr = ['url'=>$url, 'rst'=>$rst];
         Tool_Common::log('kuaiIPValidTime', 'INFO', '获取私密代理可用时长', $logArr);
         if($rst['code'] != 0){ # 为确保稳定，使用时间少于60s则认为IP失效
@@ -151,6 +158,8 @@ class PoxyIPService extends BaseService {
     public static function isValid($poxy_ips = []){
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return false; # CURL 代理开关
+        $m = \Yii::$app->cache;
+        $mkey = 'retry_get_isValid_key';
 
         $API_KEY = BetService::getConfig('KUAI_POXY_API_KEY'); # 快代理 API Key
         $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
@@ -159,8 +168,14 @@ class PoxyIPService extends BaseService {
             'proxy' => implode(',', $poxy_ips),
             'signature' => $API_KEY,
         ];
+
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/checkdpsvalid/?'.http_build_query($query);
-        $rst = CurlService::getCurl($url);
+        $rst = CurlService::getCurl($url, [], 6);
+        if($rst['errno']>0 && !$r = $m->get($mkey)){
+            $m->set($mkey, 1, 5);
+            return self::isValid($poxy_ips);
+        }
+
         Tool_Common::log('poxy_ip_is_valid','INFO', '判断代理IP有效性', ['url'=>$url, 'rst'=>$rst]);
         if(count($poxy_ips)==1){
             $flag = (boolean)$rst['data'][$poxy_ips[0]];

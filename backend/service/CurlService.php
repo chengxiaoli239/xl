@@ -259,10 +259,10 @@ class CurlService extends BaseService{
      * @decription 获取远程html内容
      * @param $url
      */
-    public static function getCurl($url,$header=[]){
-        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
-        //$header = array_merge(self::$postHeaders,$header);
-        //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
+    public static function getCurl($url,$header=[], $timeout=''){
+        if(!$timeout){
+            $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        }
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
