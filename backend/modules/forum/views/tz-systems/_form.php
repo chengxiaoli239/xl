@@ -43,7 +43,7 @@ use yii\widgets\ActiveForm;
     </div>
 </div>
 
-<script src="/assets/1dbbeb3f/jquery.js"></script>
+<script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
     $(function(){
         $(":checkbox").click(function(){

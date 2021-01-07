@@ -82,6 +82,7 @@ class UserController extends BaseController
 
         $allSystems = CommonService::getAllSystems();
         $allTzTypes = CommonService::getAllTzTypes();
+        $systemTzTypes = CommonService::getSystemTzTypes();
         $allLotteryTypes = CommonService::getAllLotteryTypes();
 
         return $this->render('open-systems', [
@@ -89,6 +90,7 @@ class UserController extends BaseController
             'uid' => $uid,
             'allSystems' => $allSystems,
             'allTzTypes' => $allTzTypes,
+            'systemTzTypes' => $systemTzTypes,
             'allLotteryTypes' => $allLotteryTypes,
         ]);
     }

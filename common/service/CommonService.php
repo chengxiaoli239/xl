@@ -911,6 +911,25 @@ class  CommonService{
     }
 
     /**
+     * @desc 所有网盘对应的投注类型
+     * @param int $type
+     * @param int $status
+     * @return array
+     */
+    public static function getSystemTzTypes($type=1, $status=1){
+        $datas = TzSystems::find()->select(['id', 'tz_types'])->where(['status'=>$status, 'type'=>$type])->asArray()->all();
+
+        $dataArr = [];
+
+        foreach ($datas as $key=>$data){
+            if(empty($data['tz_types'])) continue;
+            $dataArr[$data['id']] = explode(',', $data['tz_types']);
+        }
+
+        return $dataArr;
+    }
+
+    /**
      * @desc 所有投注类型
      * @param int $status
      * @return array

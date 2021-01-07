@@ -16,6 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'allSystems' => $allSystems,
         'allTzTypes' => $allTzTypes,
+        'systemTzTypes' => $systemTzTypes,
         'allLotteryTypes' => $allLotteryTypes,
         'uid' => $uid,
     ]) ?>
