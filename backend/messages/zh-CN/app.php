@@ -21,7 +21,7 @@ return [
     'Ssc Dw Hz Yls' => '遗漏分析',
     'Ssc Kj Datas' => '历史开奖',
     'My Infomation' => '个人信息',
-    'Betting Records' => '投注记录',
+    'Betting Records' => '游戏记录',
     'System Betting Records' => '系统投注',
 
     'Ssc Dw Hz Statics' => '二定和值统计',
