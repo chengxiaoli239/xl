@@ -933,6 +933,10 @@ abstract class BetService extends BaseBetService {
         }
 
         if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
+            $mkey = self::buildBetPlanIdKey($plan->account, $qihao, $plan->id);
+            $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
+            if($tzflag = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了~'];
+            $m->set($mkey, 1, $time);
             $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid); # 直接记录表
         }else{ # 正式下注
 
@@ -955,7 +959,7 @@ abstract class BetService extends BaseBetService {
             }
             $mkey = self::buildBetPlanIdKey($plan->account, $activeQihao, $plan->id);
             if($tzflag = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了~'];
-            $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
+            $time = BetService::getBetCacheTime($plan->lottery_type, $activeQihao); # 投注之后缓存时间
             $m->set($mkey, 1, $time);
 
             $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'activeQihao'=>$activeQihao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id];
