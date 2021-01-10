@@ -962,7 +962,7 @@ abstract class BetService extends BaseBetService {
             Tool_Common::log('tzByPlanIdNew','INFO','投注记录tzByPlanIdNew', $logArr);
             # 5、投注请求
             $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
-            //$tmpRst = $BetService->bet($qihao, $plan->id, $codes);
+            $tmpRst = $BetService->bet($qihao, $plan->id, $codes);
             $logArr = ['tz_sites'=>$tz_system_id,'codes'=>$codes, 'postRst'=>$rst];
             Tool_Common::log('plan_bet','INFO','0898投注记录', $logArr);
             if($tmpRst === false){
