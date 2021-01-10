@@ -958,11 +958,11 @@ abstract class BetService extends BaseBetService {
             $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
             $m->set($mkey, 1, $time);
 
-            $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id];
-            Tool_Common::log('tzByPlanId','INFO','投注记录tzByPlanId', $logArr);
+            $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'activeQihao'=>$activeQihao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id];
+            Tool_Common::log('tzByPlanIdNew','INFO','投注记录tzByPlanIdNew', $logArr);
             # 5、投注请求
             $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
-            $tmpRst = $BetService->bet($qihao, $plan->id, $codes);
+            //$tmpRst = $BetService->bet($qihao, $plan->id, $codes);
             $logArr = ['tz_sites'=>$tz_system_id,'codes'=>$codes, 'postRst'=>$rst];
             Tool_Common::log('plan_bet','INFO','0898投注记录', $logArr);
             if($tmpRst === false){
