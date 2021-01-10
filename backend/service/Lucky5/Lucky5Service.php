@@ -1787,7 +1787,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             //$rst = json_encode($rst);
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time). 's';
-            Tool_Common::log('afterPostBetCurl', 'INFO', '下注之后', ['account'=>$plan->account, 'uid'=>$plan->uid, 'plan_id'=>$plan->id, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'tmpRst'=>$tmpRst, 'qihao'=>$qihao, 'tmpcodesArr'=>count($tmpcodesArr), 'time_consume'=>$time_consume]);
+            Tool_Common::log('afterPostBetCurl', 'INFO', '下注之后', ['account'=>$plan->account, 'uid'=>$plan->uid, 'plan_id'=>$plan->id, 'single'=>$single, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'tmpRst'=>$tmpRst, 'qihao'=>$qihao, 'tmpcodesArr'=>count($tmpcodesArr), 'time_consume'=>$time_consume]);
             if($tmpRst['Status'] != 1){
                 $tzRst = [
                     'uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,
