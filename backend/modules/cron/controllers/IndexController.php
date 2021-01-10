@@ -241,7 +241,7 @@ class IndexController extends Controller
             $sleep_time = 5;
         }
         for($i=0; $i<$for_times; $i++){
-            if(in_array($uid, [32, 27])){
+            if(true OR in_array($uid, [32, 27, 21])){
                 $rst['bet'] = BetService::betByUidNew($uid);
             }else{
                 $rst['bet'] = BetService::betByUid($uid); // 用户新计划投注，可正买可反买
