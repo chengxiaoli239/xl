@@ -1746,6 +1746,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
             $need_money = count($tmpcodesArr) * $single;
             $left_money = $TzSystemsUsers->balance;
+            if($key==0 && $need_money>$left_money){
+                $msg = '第一次余额不足中断该用户后面所有下注';
+                Tool_Common::log('less_bet_money', 'INFO', '下注之后', ['account'=>$plan->account, 'uid'=>$plan->uid, 'plan_id'=>$plan->id, 'single'=>$single, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'msg'=>$msg]);
+                return ['status'=>303, 'msg'=>$msg];
+            }
             $headers = [
                 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
                 'Accept-Encoding: gunzip, deflate',
