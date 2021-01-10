@@ -29,6 +29,7 @@ use backend\service\SevenService;
 use backend\service\sports\TennisSportsService;
 use backend\service\SscDataService;
 use backend\service\TzService;
+use backend\service\UserSysPlansService;
 use common\service\CommonService;
 use Yii;
 use backend\models\SscKjData;
@@ -240,24 +241,12 @@ class IndexController extends Controller
             $sleep_time = 5;
         }
         for($i=0; $i<$for_times; $i++){
-            $rst['bet'] = BetService::betByUid($uid); // 用户新计划投注，可正买可反买
+            if(in_array($uid, [32])){
+                $rst['bet'] = BetService::betByUidNew($uid);
+            }else{
+                $rst['bet'] = BetService::betByUid($uid); // 用户新计划投注，可正买可反买
+            }
             sleep($sleep_time);
-        }
-
-        return $rst;
-    }
-
-    /**
-     * @desc 多线程跑用户计划
-     * @return mixed
-     */
-    public static function actionBetByUidXy(){
-        self::_init();
-        $post = \Yii::$app->request->post();
-        $uid = $post['uid'];
-        for($i=0; $i<8; $i++){
-            $rst['bet'] = BetService::betByUidXy($uid); // 用户新计划投注，可正买可反买
-            sleep(6);
         }
 
         return $rst;
@@ -301,7 +290,7 @@ class IndexController extends Controller
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $post = \Yii::$app->request->post();
         for ($i=0; $i<6; $i++){
-            $rst[$i]['rst'] = BetService::repeatErrorBet($post['lottery_types']);
+            $rst[$i]['rst'] = BetService::repeatErrorBet($post['lottery_types'], $post['uid']);
             sleep(3);
         }
 
@@ -316,25 +305,6 @@ class IndexController extends Controller
         self::_init();
 
         $rst = BaoTaService::syncBaoTaCrontabs();
-
-        return $rst;
-    }
-
-    /**
-     * @desc 统计数据处理
-     * @return bool
-     */
-    public function actionInsertSscDwsHzNums(){
-        exit; # 二字定数据太多，禁用
-
-        for ($i=0;$i<1;$i++) {
-            $start_time = microtime(true);
-            $rst = SscDataService::sscDwsHzNums();
-            $end_time = microtime(true);
-            $time_consume = ($end_time-$start_time).'s';
-            $logArr = ['start_time'=>$start_time,'end_time'=>$end_time, 'time_consume'=>$time_consume];
-            Tool_Common::log('actionInsertSscDwsHzNums','INFO','统计区间某和值出现次数-执行时间', $logArr);
-        }
 
         return $rst;
     }
