@@ -1802,7 +1802,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     if($tmpRst['errno']>0 OR in_array($tmpRst['code'], [309,311])){ # 309,310,311   310有排查是已经换过代理IP,有待排查，为确保
                         $mkey_310 = 'has_jinyong_ip_310'; # 您当前使用的浏览器不支持cookie，换一次代理ip
                         $RedisLock = new RedisLock();
-                        if($RedisLock->lock($mkey_310, 300)){
+                        if($RedisLock->lock($mkey_310, 60)){
                             $mkey_proxy = PoxyIPService::builProxyIpKey($plan->uid);
 
                             $m = \Yii::$app->cache;
