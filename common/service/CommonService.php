@@ -863,8 +863,8 @@ class  CommonService{
      * @param int $lottery_type
      * @return int
      */
-    public static function hasPlansActiveSys($tz_system_id = 9){
-        $where = ['AND', ['=', 'tz_sites', $tz_system_id], ['=', 'status', 1]];
+    public static function hasPlansActiveSys($tz_system_id = 9, $uid=''){
+        $where = ['AND', ['=', 'tz_sites', $tz_system_id], ['=', 'uid', $uid], ['=', 'status', 1]];
         $row = UserSysPlans::find()->where($where)->one();
 
         $flag = !empty($row) ? 1 : 0;

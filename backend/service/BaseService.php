@@ -39,7 +39,7 @@ class BaseService{
 
         $tz_system_id = $TzSystemsUser->tz_system_id;
         # 是否有激活的计划
-        $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id);
+        $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id, $TzSystemsUser->uid);
         if($is_auto == 1 && !$hasActivePlan){
             return false;
         }
@@ -113,8 +113,8 @@ class BaseService{
         $redisKey = 'Auto_synBalance_'.$id;
         if($redisLock->lock($redisKey, 3)){
             # 是否有激活的计划
-            $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id);
-            if(!$hasActivePlan && !in_array($tz_system_id, [3, 11, 12, 13, 14])){
+            $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id, $TzSystemsUser->uid);
+            if(!$hasActivePlan){
                 return false;
             }
 
