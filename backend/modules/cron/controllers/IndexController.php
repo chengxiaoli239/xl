@@ -237,11 +237,11 @@ class IndexController extends Controller
             $for_times = 14;
             $sleep_time = 5;
         }else{
-            $for_times = 8;
-            $sleep_time = 5;
+            $for_times = 6;
+            $sleep_time = 8;
         }
         for($i=0; $i<$for_times; $i++){
-            if(true OR in_array($uid, [32, 27, 21])){
+            if(true){
                 $rst['bet'] = BetService::betByUidNew($uid);
             }else{
                 $rst['bet'] = BetService::betByUid($uid); // 用户新计划投注，可正买可反买
