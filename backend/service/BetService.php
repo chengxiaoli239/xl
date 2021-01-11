@@ -410,7 +410,7 @@ abstract class BetService extends BaseBetService {
                     $betErrorPlansTask->save();
 
                 }elseif($qihao == $activeQihao){
-                    $flag = self::isLogin($uid, $tz_system_id);
+                    $flag = self::isLogin($uid, $tz_system_id, $r=2);
                     if(!$flag){
                         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
                         $loginRst = BaseService::login($TzSystemsUsers->id, $is_auto=2);
@@ -942,7 +942,7 @@ abstract class BetService extends BaseBetService {
 
             $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'not_need_login_tz_system_ids'])->value); # 无需登陆站点
             # 1、首先判断是否登录，否则登录之后再下注
-            if(!in_array($tz_system_id, $not_need_login_tz_system_ids) && !$flag = self::isLogin($plan->uid, $tz_system_id)){
+            if(!in_array($tz_system_id, $not_need_login_tz_system_ids) && !$flag = self::isLogin($plan->uid, $tz_system_id, $r=3)){
                 if(!$TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id, 'status'=>1])){
                     $msg = '账号已被禁用不能下注';
                     Tool_Common::log('tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['uid'=>$plan->uid,'account'=>$plan->account, 'msg'=>$msg]);
@@ -1041,7 +1041,7 @@ abstract class BetService extends BaseBetService {
            }else{ # 正式下注
                $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'not_need_login_tz_system_ids'])->value); # 无需登陆站点
                # 1、首先判断是否登录，否则登录之后再下注
-               if(!in_array($tz_system_id, $not_need_login_tz_system_ids) && !$flag = self::isLogin($plan->uid, $tz_system_id)){
+               if(!in_array($tz_system_id, $not_need_login_tz_system_ids) && !$flag = self::isLogin($plan->uid, $tz_system_id, $r=4)){
                    if(!$TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id, 'status'=>1])){
                        Tool_Common::log('tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['uid'=>$plan->uid,'account'=>$plan->account, 'msg'=>'账号已被禁用不能下注']);
                        continue;
@@ -1320,7 +1320,10 @@ abstract class BetService extends BaseBetService {
      * @param $tz_system_id
      * @return HuiYuanService5|KuaiLe8Service|LuckyBaseService|NineNineService6|SevenService|XlService
      */
-    public static function isLogin($uid, $tz_system_id){
+    public static function isLogin($uid, $tz_system_id, $r=''){
+        $m = \Yii::$app->cache;
+        $mkey = 'isLogin_'.$uid.'_'.$tz_system_id;
+        Tool_Common::log('isLogin_REQ', 'INFO', '是否登陆', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'r'=>$r]);
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网
             $flag = NineNineService6::isLogin($uid, $tz_system_id);
