@@ -834,7 +834,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->save();
 
-        Tool_Common::log('getBalance','INFO','幸运五星-用户余额', $rst);
+        Tool_Common::log('getBalance','INFO','幸运五星-用户余额-1', $rst);
 
         return $balance;
     }

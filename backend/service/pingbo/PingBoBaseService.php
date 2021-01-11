@@ -260,7 +260,7 @@ class PingBoBaseService {
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->save();
 
-        Tool_Common::log('getBalance','INFO','幸运五星-用户余额', ['rst'=>$rst, 'balance'=>$balance]);
+        Tool_Common::log('getBalance','INFO','幸运五星-用户余额-5', ['rst'=>$rst, 'balance'=>$balance]);
 
         return $balance;
     }
