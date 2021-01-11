@@ -22,6 +22,7 @@ use backend\service\NineNine\NineNineNewService;
 use backend\service\NineNine\NineNineService6;
 use backend\service\qilin\BingDaoService;
 use common\kj\cqssc\CqsscKcw;
+use common\tools\RedisLock;
 use Yii;
 use backend\models\BettingRecords;
 use backend\models\Num4Type;
@@ -901,6 +902,7 @@ abstract class BetService extends BaseBetService {
             return ['status'=>300, 'msg'=>'找不到对应记录'];
         }
         $m = \Yii::$app->cache;
+        $redis = new RedisLock();
         $tz_system_id = trim($plan->tz_sites);
         $lottery_type = $plan->lottery_type;
 
@@ -944,7 +946,8 @@ abstract class BetService extends BaseBetService {
             # 1、首先判断是否登录，否则登录之后再下注
             if(!in_array($tz_system_id, $not_need_login_tz_system_ids)){
                 $lKey = 'bet_before_login_flag_'.$plan->uid;
-                if(!$flag = $m->get($lKey)){
+                $RKey = $lKey.'_redis';
+                if(!$flag = $m->get($lKey) && $redisLock = $redis->lock($RKey, 10)){
                     $flag = self::isLogin($plan->uid, $tz_system_id, $r=3);
                     $m->set($lKey, $flag, 15);
                 }
