@@ -100,7 +100,7 @@ class BaseService{
      * @param $id
      * @return array|bool
      */
-    public static function synBalance($id = ''){
+    public static function synBalance($id = '', $is_auto=1){
         if(!$id) return ['status'=>300, 'msg'=>'id不能为空'];
         if(!$TzSystemsUser = TzSystemsUsers::findOne($id)){
             return ['status'=>300, 'msg'=>'操作失败:找不到记录'];
@@ -114,7 +114,7 @@ class BaseService{
         if($redisLock->lock($redisKey, 3)){
             # 是否有激活的计划
             $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id, $TzSystemsUser->uid);
-            if(!$hasActivePlan){
+            if(!$hasActivePlan && $is_auto==1){
                 return false;
             }
 

@@ -296,11 +296,12 @@ class UserController extends BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         $tz_system_user_id = $post['tz_system_user_id'];
+        $is_auto = $post['is_auto'];
 
         $system_user_id = TzSystemsUsers::findOne($tz_system_user_id)->tz_system_id;
 
         //$rst = HN0898Service::synBalance($tz_system_user_id);
-        $rst = BetService::synBalance($this->_user_id,$system_user_id);
+        $rst = BetService::synBalance($this->_user_id,$system_user_id, $is_auto);
         return $rst;
     }
 

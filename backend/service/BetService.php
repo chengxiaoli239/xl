@@ -519,10 +519,10 @@ abstract class BetService extends BaseBetService {
      * @param $uid
      * @param $tz_system_id
      */
-    public static function synBalance($uid, $tz_system_id){
+    public static function synBalance($uid, $tz_system_id, $is_auto=1){
         $TzSystemsUser = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        $rst = BaseService::synBalance($TzSystemsUser->id);
+        $rst = BaseService::synBalance($TzSystemsUser->id, $is_auto);
         /*
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网

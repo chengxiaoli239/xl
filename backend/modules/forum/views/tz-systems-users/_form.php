@@ -24,7 +24,7 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?>
 
-                    <?= $form->field($model, 'password')->passwordInput(['maxlength' => true]) ?>
+                    <?= $form->field($model, 'password')->textInput(['maxlength' => true]) ?>
 
                     <!--?= $form->field($model, 'balance')->textInput(['maxlength' => true]) ?-->
 
