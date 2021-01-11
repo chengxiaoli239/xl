@@ -124,6 +124,7 @@ class TzSystemsUsersController extends BaseController
             }
             $post['TzSystemsUsers']['ssc_domain'] = trim($post['TzSystemsUsers']['ssc_domain'], '/');
             $post['TzSystemsUsers']['cookie'] = $cookie;
+            $post['TzSystemsUsers']['desc'] = ''; # ÖØĞÂ±£´æÇå¿ÕÍøÅÌ×´Ì¬£¬×¢ÒâÕë¶ÔÆµ·±µÇÂ½ÏŞÖÆ
         }
 
         if ($model->load($post) && $model->save()) {

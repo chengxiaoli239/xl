@@ -47,6 +47,12 @@ class BaseService{
         if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
             return false;
         }
+
+        # 密码或账号不正确
+        if(strpos($TzSystemsUser->desc, '用户名或密码不正确') !== false OR strpos($TzSystemsUser->desc, '您的访问过于频繁') !== false){
+            return false;
+        }
+
         $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'ssc_kj_time_period'])->value); # 开奖时间间隔:20分钟
         if(in_array($tz_system_id, $not_need_login_tz_system_ids)){
             return ['status'=>200, 'msg'=>'无需登陆站点', 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username];
