@@ -268,7 +268,7 @@ class IndexController extends Controller
                 if($tzSystemsUser->tz_system_id == 11){
                     if($lottery_type != 9) continue;
                     # 是否有激活的计划
-                    $hasActivePlan = CommonService::hasPlansActiveSys($tzSystemsUser->tz_system_id);
+                    $hasActivePlan = CommonService::hasPlansActiveSys($tzSystemsUser->tz_system_id, $tzSystemsUser->uid);
                     if(!$hasActivePlan){
                         return false;
                     }
