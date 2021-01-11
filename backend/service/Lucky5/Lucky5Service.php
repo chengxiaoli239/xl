@@ -132,7 +132,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      */
     public static function synBalance($tz_system_user_id){
         $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);
-        $balance = self::getBalance($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
+        $balance = self::getBalance($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $r=1);
         //d($balance);
         $msg = ['status'=>200, 'msg'=>'金额同步成功~','tz_system_user_id'=>$tz_system_user_id, 'balance'=>$balance, 'account'=>$TzSystemsUsers->account, 'username'=>$TzSystemsUsers->username];
 
@@ -826,7 +826,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param $uid
      * @return mixed
      */
-    public static function getBalance($uid, $tz_system_id){
+    public static function getBalance($uid, $tz_system_id, $r=''){
         self::__init($uid, $tz_system_id);
         $rst = self::userInfo($uid, $tz_system_id);
         $balance = false;
@@ -837,7 +837,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->save();
 
-        Tool_Common::log('getBalance','INFO','幸运五星-用户余额-3', ['rst'=>$rst, 'balance'=>$balance]);
+        Tool_Common::log('getBalance','INFO','幸运五星-用户余额-3', ['uid'=>$uid, 'r'=>$r, 'rst'=>$rst, 'balance'=>$balance]);
 
         return $balance;
     }
@@ -1996,7 +1996,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      */
     public static function isLogin($uid, $tz_system_id){
 
-        $balance = Lucky5Service::getBalance($uid,$tz_system_id);
+        $balance = Lucky5Service::getBalance($uid,$tz_system_id, $r=2);
 
         $flag = $balance > 0 ? true : false;
 
