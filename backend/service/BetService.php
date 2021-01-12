@@ -1636,6 +1636,44 @@ abstract class BetService extends BaseBetService {
     }
 
 
+    /**
+     * @desc 批量填插入用户计划任务
+     * @return array
+     */
+    public static function insertPlansTask($lottery_types = []){
+        $rst = ['status'=>300, 'msg'=>'操作成功'];
+        $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
+
+        $where = ['AND', ['=', 'status', 1], ['=', 'is_test', 0] ];
+        if(empty($lottery_types)){
+            $where = array_merge($where, [['IN', 'lottery_type', $lottery_types]]);
+        }
+
+        $plans = UserSysPlans::find()->where($where)->all();
+        foreach ($plans as $plan){
+            $tz_system_id = $plan->tz_sites;
+            $lottery_type = $plan->lottery_type;
+            $uid = $plan->uid;
+
+            $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
+            $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
+
+            $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
+            $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
+            if(!$status && $plan->account != 'gaozi2018'){
+                Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示-2', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
+                return ['status'=>300, 'msg'=>'账号过期提示'];
+            }
+            # 4、投注号码 codes
+            $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+
+            $insertRst = $BetService->postBatchBetInsert($activeQihao, $plan->id, $codes);
+            $rst['data'][$plan->id] = $insertRst;
+            Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务', ['plan_id'=>$plan->id, 'activeQihao'=>$activeQihao, 'insertRst'=>$insertRst]);
+        }
+
+        return $rst;
+    }
 
 
 

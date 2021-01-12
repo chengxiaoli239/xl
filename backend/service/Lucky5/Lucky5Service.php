@@ -1356,6 +1356,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $row->status = $status;
         $row->post_desc = json_encode($tmpRst, 320);
 
+        //# 获取方案号，记录id, 用于撤单
+        //$snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+        //$snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
+        //$snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
+
         $time_consume = ($time2 - $time1).'s';
         $logArr = ['id'=>$id, 'uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
         Tool_Common::log('repeatErrorBet', 'INFO', '重复下注失败的号码', $logArr);
@@ -1801,7 +1806,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     'uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,
                     'post_data'=>$post_data, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume, 'tmpRst_1'=>$tmpRst
                 ];
-                if(in_array($tmpRst['code'], [303, 309, 310])){ # 判断掉线登录一次，再下注一次
+                if(in_array($tmpRst['code'], [303, 309, 310, 313])){ # 判断掉线登录一次，再下注一次
                     if($tmpRst['errno']>0 OR in_array($tmpRst['code'], [309,311])){ # 309,310,311   310有排查是已经换过代理IP,有待排查，为确保
                         $mkey_310 = 'has_jinyong_ip_310'; # 您当前使用的浏览器不支持cookie，换一次代理ip
                         $RedisLock = new RedisLock();
@@ -1854,6 +1859,147 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
             $snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
             $snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
+        }
+        $data['rst'] = $rst;
+
+        $n = count(explode('@',$codes));
+        if(in_array($playway, [2, 3]) && $tz_type != 20){
+            $totalmoney = SscDataService::calTzTotalMoney($codes, $single, $playway);
+        }else{
+            $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
+        }
+        if($playway == 4 && $tz_type == 18){ # 一字定
+            $totalmoney = $count * $single;
+        }
+
+        $insertData = [
+            'playway'=> $playway,  // 投注方式
+            'tz_type'=> $tz_type,  // 投注类型
+            'buy_type'=> 1,  // 购买方向类型
+            'uid'=> self::$user_id,  // 投注账号id
+            'lottery_type' => $lottery_type, # 彩种
+            'account' => $plan->account,
+            'plan_id' => $plan_id, # 计划id
+            'codes' => (string)$codes,  // 投注号码
+            'qihao' => $qihao,  // 投注期号
+            'tz_system_id' => self::$tz_system_id,  // 投注系统tz_systems_id
+            'sn'=> trim($snInfo_sn, ';'),
+            'snid'=> trim($snInfo_snid, ';'),
+            'order_type'=>3, # 单双三字定
+            'is_simulate' => 0,  // 是否模拟投注
+            'single' => $single,  // 投注倍数
+            'betting_money'=> round($totalmoney, 2),  // 投注金额
+        ];
+        $insertRst = BetService::_logRecords($insertData);
+        self::$headers = [];
+
+        if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
+        $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>self::$headers, 'bigFlag'=>1, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
+        Tool_Common::log('bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
+
+        return $data;
+    }
+
+    /**
+     * @desc 批量号码拆解下注
+     * @param $qihao
+     * @param $plan_id
+     * @param $codes
+     * @return array
+     */
+    public function postBatchBetInsert($qihao, $plan_id, $codes){
+        $tmpCodes = $codes;
+        $plan = UserSysPlans::findOne($plan_id);
+        if($plan->tz_type == 22){ # 四定单双,codes格式：13579,13579,02468,13579@13579,13579,02468,02468@13579,02468,13579,13579
+            $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway);
+        }elseif($plan->tz_type == 18){
+            $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway);
+        }else{
+            $tmpCodes = str_replace(',', '', $tmpCodes);
+            $codesArr = explode('@', $tmpCodes);
+        }
+
+        # 组数
+        $count = count($codesArr);
+
+        $betNums = self::getBetNumsPer();
+        //if($plan->account == 'aa22'){ $betNums = 10000; }
+        $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
+        //p($codesArrs);
+
+        $playway = $plan->playway ? $plan->playway : 3;
+        $single = $plan->single ? $plan->single : 0.1;
+        $tz_type = $plan->tz_type ? $plan->tz_type : 0;
+        $lottery_type = $plan->lottery_type;
+        //p(['playway'=>$playway, 'totalCount'=>count($codes), 'single'=>$single, 'qihao'=>$qihao, 'tz_type'=>$tz_type, 'buy_type'=>$plan->buy_type,'codes'=>$codes]);
+        if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
+
+        $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
+
+        $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL');//.'?'.http_build_query($post_data);
+        $way = self::getWay($tz_type);
+        $snInfo_sn = '';
+        $snInfo_snid = '';
+        $rst = [];
+        foreach ($codesArrs as $key=>$tmpcodesArr){
+            if($playway == 4){ # 一字定
+                $post_data = [
+                    'bets' => json_encode($tmpcodesArr),
+                    'way' => $way,
+                    'period_no' => $qihao,
+                ];
+
+            }else{ # 四定、三定
+                $bet_codes = implode(',', $tmpcodesArr);
+                $post_data = [
+                    'bet_number'=>$bet_codes,
+                    'bet_money'=>$single,
+                    'bet_way'=>$way,
+                    'is_xian'=>0,
+                    'number_type'=>40,
+                    //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
+                    'bet_log'=>'[四定位]，定位置“[取]”：千=[1]，百=[24]，十=[4]，个=[6]',
+                    'is_package' => 0,
+                    'period_no'=>$qihao,
+                    'operation_condition' => self::getOperationCondition(),
+                ];
+            }
+
+            $_t = round(microtime(true) * 1000);
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
+            $need_money = count($tmpcodesArr) * $single;
+            $left_money = $TzSystemsUsers->balance;
+            if($key==0 && $need_money>$left_money){
+                $msg = '第一次余额不足中断该用户后面所有下注';
+                Tool_Common::log('less_bet_money', 'INFO', '下注之后', ['account'=>$plan->account, 'uid'=>$plan->uid, 'plan_id'=>$plan->id, 'single'=>$single, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'msg'=>$msg]);
+                return ['status'=>303, 'msg'=>$msg];
+            }
+            $headers = [
+                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+                'Accept-Encoding: gunzip, deflate',
+                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                'Cache-Control: max-age=0',
+                'Connection: keep-alive',
+                'Content-Length:'.strlen(http_build_query($post_data)),
+                //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+                'Content-Type: application/x-www-form-urlencoded',
+                'Cookie: '.$TzSystemsUsers->cookie,
+                'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+                'Origin: '.$TzSystemsUsers->ssc_domain,
+                'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+                'Upgrade-Insecure-Requests: 1',
+                $TzSystemsUsers->user_agent,
+            ];
+
+            Tool_Common::log('afterPostBetCurl', 'INFO', '下注之后', ['account'=>$plan->account, 'uid'=>$plan->uid, 'plan_id'=>$plan->id, 'single'=>$single, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'tmpcodesArr'=>count($tmpcodesArr)]);
+            $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($tmpcodesArr)*$single, $playway,self::$tz_system_id, [], $lottery_type);
+            $logArr1 = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'key'=>$key, 'recordRst'=>$recordRst];
+            Tool_Common::log('recordBetPlansTaskLog', 'INFO', '拆分记录下注号码至推送表', $logArr1);
+
+            # 获取方案号，记录id, 用于撤单
+            //$snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+            //$snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
+            //$snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
         }
         $data['rst'] = $rst;
 
@@ -1974,6 +2120,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $rstData = ["Status"=>0, 'code'=>311, 'msg'=>'代理IP网络故障'];
         }elseif(strpos($data, 'Too Many Request') !== false){
             $rstData = ["Status"=>0, 'code'=>312, 'msg'=>'代理请求太频繁'];
+        }elseif(strpos($data, 'ClearSession') !== false){
+            $rstData = ["Status"=>0, 'code'=>313, 'msg'=>'请求重定向跳转'];
         }else{
             $rstData = json_decode($data, TRUE);
         }

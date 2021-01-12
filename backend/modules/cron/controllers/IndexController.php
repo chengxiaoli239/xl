@@ -231,6 +231,7 @@ class IndexController extends Controller
      */
     public static function actionBetByUid(){
         self::_init();
+        set_time_limit(0);
         $post = \Yii::$app->request->post();
         $uid = $post['uid'];
         if(in_array($uid, [20])){
@@ -279,6 +280,18 @@ class IndexController extends Controller
         }
 
         return ['flag1'=>$flag1, 'flag2'=>$flag2];
+    }
+
+    /**
+     * @desc 批量插入投注任务
+     * @return array
+     */
+    public function actionInsertPlansTask(){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+
+        $rst['data'] = BetService::insertPlansTask();
+
+        return $rst;
     }
 
     /**
