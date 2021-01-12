@@ -826,9 +826,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param $uid
      * @return mixed
      */
-    public static function getBalance($uid, $tz_system_id, $r=''){
+    public static function getBalance($uid, $tz_system_id, $r='', $is_auto=1){
         self::__init($uid, $tz_system_id);
-        $rst = self::userInfo($uid, $tz_system_id);
+        $rst = self::userInfo($uid, $tz_system_id, $is_auto);
         $balance = false;
         if(isset($rst['Status']) && $rst['Status'] == 1){
             $balance = $rst['Data']['credit_balance'];
@@ -1275,10 +1275,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param $tz_system_id
      * @return mixed|string
      */
-    public static function userInfo($uid, $tz_system_id){
+    public static function userInfo($uid, $tz_system_id, $is_auto = 1){
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        if(strpos($TzSystemsUsers->desc, '您的访问过于频繁') !== false OR strpos($TzSystemsUsers->desc, '用户名或密码不正确') !== false){
+        if($is_auto == 1 && (strpos($TzSystemsUsers->desc, '您的访问过于频繁') !== false OR strpos($TzSystemsUsers->desc, '用户名或密码不正确') !== false)){
             return ['status'=>300, 'msg'=>'您的访问过于频繁，请稍后再试 或 用户名或密码不正确'];
         }
 
