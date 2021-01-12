@@ -1644,7 +1644,7 @@ abstract class BetService extends BaseBetService {
         $rst = ['status'=>300, 'msg'=>'操作成功'];
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
 
-        $where = ['AND', ['=', 'status', 1], ['=', 'is_test', 0], ['=', 'uid', 12] ];
+        $where = ['AND', ['=', 'status', 1], ['=', 'is_test', 0] ];
         if(empty($lottery_types)){
             $where = array_merge($where, [['IN', 'lottery_type', $lottery_types]]);
         }
