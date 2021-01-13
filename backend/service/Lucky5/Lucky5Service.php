@@ -1325,6 +1325,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $tz_system_id = $row->tz_system_id;
         $post_data = json_decode($row->post_datas, 320);
 
+        $m = \Yii::$app->cache;
         $_t = round(microtime(true) * 1000);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $headers = [
@@ -1352,7 +1353,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $status = 2;
         }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 305, 307])){
             $status = 3; # 不可再次下注：302余额不足305已关盘307网盘账号停押
+        }else{
+            $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key);
+            $m->delete($betKey); # 失败之后可重新下注的情况解锁
         }
+        $tmpRst['bet_time'] = date('Y-m-d H:i:s');
         $row->status = $status;
         $row->post_desc = json_encode($tmpRst, 320);
 
@@ -1934,7 +1939,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         //p(['playway'=>$playway, 'totalCount'=>count($codes), 'single'=>$single, 'qihao'=>$qihao, 'tz_type'=>$tz_type, 'buy_type'=>$plan->buy_type,'codes'=>$codes]);
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
 
-        $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
+        $data = ['status'=>200, 'msg'=>$qihao.'操作成功!', 'time'=>date('Y-m-d H:i:s')];
 
         $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL');//.'?'.http_build_query($post_data);
         $way = self::getWay($tz_type);
@@ -1972,7 +1977,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             if($key==0 && $need_money>$left_money){
                 $msg = '第一次余额不足中断该用户后面所有下注';
                 Tool_Common::log('less_bet_money', 'INFO', '下注之后', ['account'=>$plan->account, 'uid'=>$plan->uid, 'plan_id'=>$plan->id, 'single'=>$single, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'msg'=>$msg]);
-                return ['status'=>303, 'msg'=>$msg];
+                //return ['status'=>303, 'msg'=>$msg];
             }
             $headers = [
                 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',

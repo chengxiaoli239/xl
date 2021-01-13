@@ -215,8 +215,8 @@ abstract class BetService extends BaseBetService {
     public static function lotteryBet($uid){
         $lottery_types = UserSysPlansService::getMyLotteryTypes($uid);
         foreach ($lottery_types as $lottery_type){
-            if($lottery_type == 8){
-                $rst = BetService::repeatErrorBet($lottery_types = [8], $uid);
+            if($lottery_type['lottery_type'] == 8){
+                $rst = BetService::repeatErrorBet([8], $uid);
             }else{
                 $rst = BetService::betByUidNew($uid);
             }
@@ -400,6 +400,7 @@ abstract class BetService extends BaseBetService {
 
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
 
+        $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
             //$lottery_type = 8; # 测试
             $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
@@ -415,7 +416,9 @@ abstract class BetService extends BaseBetService {
                 $account = $betErrorPlansTask->account;
                 $plan_id = $betErrorPlansTask->plan_id;
                 $bet_money = $betErrorPlansTask->bet_money;
+                $bet_sort_key = $betErrorPlansTask->bet_sort_key;
 
+                Tool_Common::log('lottery_bet', 'ERR', '下注新逻辑-2', ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'account'=>$account, 'tz_system_id'=>$tz_system_id]);
                 $status = UserService::accountIsExpire($uid, $tz_system_id); # 账号是否过期
                 if(!$status && $account != 'gaozi2018'){
                     Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['plan_id'=>$plan_id, 'uid'=>$uid, 'account'=>$account, 'tz_system_id'=>$tz_system_id]);
@@ -427,12 +430,19 @@ abstract class BetService extends BaseBetService {
 
                 $qihao = $betErrorPlansTask->qihao;
                 $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
+
                 if($balance<$bet_money){
                     $betErrorPlansTask->status = 3; # 不可重推
                     $betErrorPlansTask->post_desc = json_encode(['Status'=>0, 'qihao'=>$qihao, 'account'=>$account, 'push_time'=>date('Y-m-d H:i:s'), 'msg'=>'余额不足，不可重推'], 320);
                     $betErrorPlansTask->save();
 
                 }elseif($qihao == $activeQihao){
+                    $betKey = BetService::buildLotteryBetKey($activeQihao, $plan_id, $bet_sort_key);
+                    if($lock = $m->get($betKey)) continue;
+
+                    $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
+                    $m->set($betKey, 1, $time);
+
                     $flag = self::isLogin($uid, $tz_system_id, $r=2);
                     if(!$flag){
                         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
@@ -455,6 +465,10 @@ abstract class BetService extends BaseBetService {
         }
 
         return $rst;
+    }
+
+    public static function buildLotteryBetKey($qihao='', $plan_id='', $bet_sort_key=0){
+        return 'buildLotteryBetKey_'.$qihao.'_'.$plan_id.'_'.$bet_sort_key;
     }
 
     /**
@@ -1666,6 +1680,7 @@ abstract class BetService extends BaseBetService {
         if(empty($lottery_types)){
             $where = array_merge($where, [['IN', 'lottery_type', $lottery_types]]);
         }
+        $m = \Yii::$app->cache;
 
         $plans = UserSysPlans::find()->where($where)->all();
         foreach ($plans as $plan){
@@ -1676,6 +1691,10 @@ abstract class BetService extends BaseBetService {
 
             $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
             $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
+            if(!$activeQihao){
+                Tool_Common::log('accountIsExpire', 'ERR', '封盘或者未开盘-2', ['uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
+                return ['status'=>300, 'msg'=>'封盘或者未开盘'];
+            }
 
             $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
             $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
@@ -1685,6 +1704,11 @@ abstract class BetService extends BaseBetService {
             }
             # 4、投注号码 codes
             $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+            $preInsertLockKey = 'preInsertLockKey_'.$plan->id.'_'.$activeQihao;
+
+            if($lock = $m->get($preInsertLockKey))continue;
+            $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
+            $m->set($preInsertLockKey, 1, $time);
 
             $insertRst = $BetService->postBatchBetInsert($activeQihao, $plan->id, $codes);
             $rst['data'][$plan->id] = $insertRst;
