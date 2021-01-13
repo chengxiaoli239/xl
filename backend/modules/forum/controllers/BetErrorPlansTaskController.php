@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\HN0898Service;
 use common\service\CommonService;
 use Yii;
 use backend\models\BetErrorPlansTask;
@@ -50,6 +51,7 @@ class BetErrorPlansTaskController extends BaseController
         $data = [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'currentQihao' => HN0898Service::getQihao($lottery_type),
         ];
 
         if($this->_user_id !== 1){ # 超级管理员
@@ -60,6 +62,27 @@ class BetErrorPlansTaskController extends BaseController
         return $this->render($view, $data);
 
         return $this->render('index', $data);
+    }
+
+    /**
+     * @desc 更新投注状态
+     * @param $id
+     * @param $status
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionSwitchStatus(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $id = $post['id'];
+        $Model = $this->findModel($id);
+        if($Model->uid != $this->_user_id && $this->_user_id != 1){
+            return ['status'=>400, 'msg'=>'非法请求'];
+        }
+        //$rStatus = $Model->status; # 可根据是否可以重推
+        $rst = HN0898Service::updateStatus($id, '\backend\models\BetErrorPlansTask');
+
+        return $rst;
     }
 
     /**

@@ -11,7 +11,6 @@ use yii\grid\GridView;
 $this->title = Yii::t('app', 'Bet Error Plans Tasks');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<input type="hidden" id="currentQihao" value="<?php echo $currentQihao;?>">
 <section class="bet-error-plans-task-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
@@ -102,7 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //'single',
                         'qihao',
-                        ['attribute' => 'post_desc','label' => '推送结果',
+                        ['attribute' => 'post_desc','label' => '重推结果',
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = BaseStringHelper::truncate($model->post_desc,15);
@@ -122,20 +121,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'status','label' => '状态',
                             'format'=>'raw',
                             'value' => function($model) {
-                                $options = ['title' => '更新状态'.$model->status];
-                                if($model->status==2){
-                                    $txt = '<font color="green">推送成功</font>';
-                                }elseif($model->status == 3){
-                                    $txt = '<font color="#2f4f4f">推送失败</a>';
-                                    $options['class'] = 'act-re-bet';
-                                    $options['data-rebet-url'] = "/forum/bet-error-plans-task/switch-status";
-                                    $options['data-id'] = $model->id;
-                                    $options['data-qihao'] = $model->qihao;
-                                    $options['id'] = 'act_'.$model->id;
-                                }else{
-                                    $txt = '<font color="red">未推送</a>';
-                                }
-                                return Html::a($txt, 'javascript:;', $options);
+                                $txt = $model->status == 2 ? '<font color="green">重推成功</font>' : ($model->status == 3 ? '<font color="#2f4f4f">推送失败</a>' : '<font color="red">等待推送</a>');
+                                //$url = "/forum/user-custom-plans/update-status?id=".$model->id;
+                                return Html::a($txt, 'javascript:;', ['title' => '更新状态'.$model->status]);
                             }
                         ],
                         //'sn',
@@ -206,84 +194,19 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <!--提示框-end-->
-
-<!--提示框-->
-<div class="modal fade" id="MSG_TipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
-     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
-">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span></button>
-                <h4 class="modal-title" id="del_tip_msg_title"></h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-group up-reason">
-                    <label id="del_tip_msg" for="del_tip_msg"></label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="actConfirm">确定</button>
-            </div>
-        </div>
-    </div>
-</div>
-<input type="hidden" id="act">
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
-$(function () {
-    //$("[id^='act-post-desc']").click(function (rst) {
-    $(".act-post-desc").click(function (rst) {
-        bet_rst = $(this).data('error');
-        content = $(this).data('content');
+    $(function () {
+        //$("[id^='act-post-desc']").click(function (rst) {
+        $(".act-post-desc").click(function (rst) {
+            bet_rst = $(this).data('error');
+            content = $(this).data('content');
 
-        act_data = {"bet_url":$(this).data('url'), "bet_content":content};
-        $('#rst_code').text(JSON.stringify(bet_rst,null,' '))
-        $('#push_content').text(JSON.stringify(act_data,null,' '))
+            act_data = {"bet_url":$(this).data('url'), "bet_content":content};
+            $('#rst_code').text(JSON.stringify(bet_rst,null,' '))
+            $('#push_content').text(JSON.stringify(act_data,null,' '))
 
-        $('#exampleModal_msg').modal('show');
+            $('#exampleModal_msg').modal('show');
+        });
     });
-
-    // 删除用户
-    $('.act-re-bet').click(function () {
-        $("#actConfirm").attr('data-id', $(this).attr('data-id'));
-        console.log($(this).attr('data-id'));
-
-        $("#del_tip_msg_title").html("温馨提示");
-        re_bet_qihao = $(this).data('qihao');
-        current_qihao = $("#currentQihao").val();
-        console.log(re_bet_qihao, current_qihao)
-        if(re_bet_qihao != current_qihao){
-            $("#del_tip_msg").html("<font color='red'><strong>已关盘或者未开盘的期号不能重置推送状态</strong></font>");
-            $("#act").val('');
-        }else {
-            $("#del_tip_msg").html("确定重新下注失败号码？");
-            $("#act").val('act-rebet');
-        }
-        $("#MSG_TipModal").modal('show');
-    });
-
-    $("#actConfirm").click(function () {
-        url = $("#act_"+$(this).data('id')).data('rebet-url')
-        if($("#act").val() != ''){
-            $.post(url, {id:$(this).data('id')}, function(rst) {
-                if(rst.status == 200) {
-                    $("#act").val("");
-                    $("#del_tip_msg").html("重置状态成功，等待推送下注...");
-                    console.log(rst.msg)
-                    $("#MSG_TipModal").modal('show');
-                } else {
-                    tip_title = '操作失败';
-                }
-            },'JSON');
-        }else {
-            $("#MSG_TipModal").hide();
-            document.location.reload();//当前页面
-        }
-
-    });
-});
 </script>
