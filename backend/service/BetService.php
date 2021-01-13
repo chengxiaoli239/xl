@@ -208,6 +208,24 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
+     * @desc 彩票下注
+     * @param $uid
+     * @return array
+     */
+    public static function lotteryBet($uid){
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($uid);
+        foreach ($lottery_types as $lottery_type){
+            if($lottery_type == 8){
+                $rst = BetService::repeatErrorBet($lottery_types = [8], $uid);
+            }else{
+                $rst = BetService::betByUidNew($uid);
+            }
+        }
+
+        return $rst;
+    }
+
+    /**
      * @desc 彩种名称
      * @param string $lottery_type
      */

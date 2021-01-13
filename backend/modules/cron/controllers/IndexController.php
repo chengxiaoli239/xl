@@ -242,8 +242,7 @@ class IndexController extends Controller
             $sleep_time = 8;
         }
         for($i=0; $i<$for_times; $i++){
-            //$rst['bet'] = BetService::betByUidNew($uid);
-            $rst[$i]['rst'] = BetService::repeatErrorBet($post['lottery_types'], $post['uid']);
+            $rst[$i]['rst'] = BetService::lotteryBet($uid);
             sleep($sleep_time);
         }
 
