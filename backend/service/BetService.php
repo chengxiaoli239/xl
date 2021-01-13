@@ -1654,6 +1654,7 @@ abstract class BetService extends BaseBetService {
             $tz_system_id = $plan->tz_sites;
             $lottery_type = $plan->lottery_type;
             $uid = $plan->uid;
+            Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-1', ['plan_id'=>$plan->id, 'plan_id'=>$plan->id]);
 
             $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
             $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
@@ -1669,7 +1670,7 @@ abstract class BetService extends BaseBetService {
 
             $insertRst = $BetService->postBatchBetInsert($activeQihao, $plan->id, $codes);
             $rst['data'][$plan->id] = $insertRst;
-            Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务', ['plan_id'=>$plan->id, 'activeQihao'=>$activeQihao, 'insertRst'=>$insertRst]);
+            Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-2', ['plan_id'=>$plan->id, 'activeQihao'=>$activeQihao, 'insertRst'=>$insertRst]);
         }
 
         return $rst;
