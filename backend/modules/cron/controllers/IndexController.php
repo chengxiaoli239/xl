@@ -284,6 +284,7 @@ class IndexController extends Controller
      * @return array
      */
     public function actionInsertPlansTask(){
+        self::_init();
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $post = \Yii::$app->request->post();
 
