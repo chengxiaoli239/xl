@@ -242,11 +242,8 @@ class IndexController extends Controller
             $sleep_time = 8;
         }
         for($i=0; $i<$for_times; $i++){
-            if(true){
-                $rst['bet'] = BetService::betByUidNew($uid);
-            }else{
-                $rst['bet'] = BetService::betByUid($uid); // 用户新计划投注，可正买可反买
-            }
+            //$rst['bet'] = BetService::betByUidNew($uid);
+            $rst[$i]['rst'] = BetService::repeatErrorBet($post['lottery_types'], $post['uid']);
             sleep($sleep_time);
         }
 
@@ -288,8 +285,9 @@ class IndexController extends Controller
      */
     public function actionInsertPlansTask(){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
+        $post = \Yii::$app->request->post();
 
-        $rst['data'] = BetService::insertPlansTask();
+        $rst['data'] = BetService::insertPlansTask($post['lottery_types']);
 
         return $rst;
     }
