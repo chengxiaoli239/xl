@@ -252,7 +252,7 @@ use yii\widgets\ActiveForm;
                         </div>
                     </div>
 
-                        <!--止盈止损-->
+                    <!--止盈止损-->
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
 
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
