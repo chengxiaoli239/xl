@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use common\service\CommonService;
 use Yii;
 use backend\models\BetErrorPlansTask;
 use backend\models\searchs\BetErrorPlansTask as BetErrorPlansTaskSearch;
@@ -36,12 +37,29 @@ class BetErrorPlansTaskController extends BaseController
     public function actionIndex()
     {
         $searchModel = new BetErrorPlansTaskSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
 
-        return $this->render('index', [
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
+        $queryParams['BetErrorPlansTask']['lottery_type'] = $lottery_type;
+
+        if($this->_user_id !== 1){
+            $queryParams['BetErrorPlansTask']['uid'] = $this->_user_id;
+        }
+
+        $dataProvider = $searchModel->search($queryParams);
+        $data = [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-        ]);
+        ];
+
+        if($this->_user_id !== 1){ # 超级管理员
+            $view = 'index';
+        }else{
+            $view = 'index_admin';
+        }
+        return $this->render($view, $data);
+
+        return $this->render('index', $data);
     }
 
     /**

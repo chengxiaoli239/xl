@@ -101,7 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //'single',
                         'qihao',
-                        ['attribute' => 'post_desc','label' => '重推结果',
+                        ['attribute' => 'post_desc','label' => '推送结果',
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = BaseStringHelper::truncate($model->post_desc,15);
@@ -121,9 +121,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'status','label' => '状态',
                             'format'=>'raw',
                             'value' => function($model) {
-                                $txt = $model->status == 2 ? '<font color="green">重推成功</font>' : ($model->status == 3 ? '<font color="#2f4f4f">推送失败</a>' : '<font color="red">未推送</a>');
-                                //$url = "/forum/user-custom-plans/update-status?id=".$model->id;
-                                return Html::a($txt, 'javascript:;', ['title' => '更新状态'.$model->status]);
+                                $url = "/forum/bet-error-plans-task/update-status?id=".$model->id;
+                                $txt = $model->status == 2 ? '<font color="green">推送成功</font>' : ($model->status == 3 ? '<font color="#2f4f4f">推送失败</a>' : '<font color="red">未推送</a>');
+                                return Html::a($txt, $url, ['title' => '更新状态'.$model->status]);
                             }
                         ],
                         //'sn',
