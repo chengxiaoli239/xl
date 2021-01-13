@@ -143,7 +143,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     if(\Yii::$app->user->id == 1) $str = Html::a('<font color="green">等待开奖</font>', '#', ['title' => '方案号:'.$model->snid,'alt'=>$model->snid]);
                                     return $str;
                                 }
-                                return BaseStringHelper::truncate($model->snid,15);
+                                $str = Html::a(BaseStringHelper::truncate($model->snid,15), 'javascript:;', ['title' => '方案号：'.$model->sn,'alt'=>$model->sn]);;
+                                return $str;
                             }
                         ],
                         //'playway',

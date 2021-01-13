@@ -571,8 +571,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
-        $counts = (int)($BettingRecords->betting_money/$BettingRecords->single);
-        $post_data = [ 'ids'=>'{'.$sn.'}|'.$counts, 'period_no' => $qihao];
+        //$counts = (int)($BettingRecords->betting_money/$BettingRecords->single);
+        $post_data = [ 'ids'=>$snid, 'period_no' => $qihao];
 
         $_t = round(microtime(true) * 1000);
         $headers = [
@@ -1351,6 +1351,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $status = 0;
         if($tmpRst['Status'] == 1){
             $status = 2;
+            //# 获取方案号，记录id, 用于撤单
+            $snInfo = self::getSn($row->uid, $row->tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+            $snid = '{'.$snInfo['sn'].'}|'.count(json_decode($row->codes)); # 多次下单需要分开，多次撤单
+            $sn = $snInfo['sn'];
+            $tmpRst['snid'] = $snid;
+            $tmpRst['sn'] = $sn;
         }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 305, 307])){
             $status = 3; # 不可再次下注：302余额不足305已关盘307网盘账号停押
         }else{
@@ -1360,11 +1366,6 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $tmpRst['bet_time'] = date('Y-m-d H:i:s');
         $row->status = $status;
         $row->post_desc = json_encode($tmpRst, 320);
-
-        //# 获取方案号，记录id, 用于撤单
-        //$snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
-        //$snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
-        //$snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
 
         $time_consume = ($time2 - $time1).'s';
         $logArr = ['id'=>$id, 'uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];

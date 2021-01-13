@@ -407,6 +407,7 @@ abstract class BetService extends BaseBetService {
             if($uid){
                 $where = array_merge($where, [['=', 'uid', $uid]]);
             }
+            $planSnids = [];
             $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
             if(empty($BetErrorPlansTasks)) continue;
             foreach ($BetErrorPlansTasks as $betErrorPlansTask){
@@ -450,7 +451,14 @@ abstract class BetService extends BaseBetService {
                     }
                     $betRst = $BetService->repeatErrorBet($betErrorPlansTask->id);
                     $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = $betRst;
-                    $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account' => $account, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$rst, 'loginRst'=>$loginRst];
+                    if($betRst['data']['bet_rst']['Status'] == 1){
+                        $betSuccess = 1;
+                    }
+                    $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account' => $account, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst];
+                    $snid = $betRst['data']['bet_rst']['snid'];
+                    $sn = $betRst['data']['bet_rst']['sn'];
+                    $planSnidArrs[$plan_id]['snids'][] = $snid;
+                    $planSnidArrs[$plan_id]['sns'][] = $sn;
                     Tool_Common::log('/repeatErrorBet/bet_rst', 'ERR', '网盘开盘状态-1', $logArr);
                 }elseif(!empty($activeQihao) && $qihao<$activeQihao){
                     $betErrorPlansTask->post_desc = json_encode(['Status'=>0, 'qihao'=>$qihao, 'activeQihao'=>$activeQihao, 'account'=>$account, 'push_time'=>date('Y-m-d H:i:s'), 'msg'=>'未开盘或者已关盘'], 320);
@@ -461,6 +469,16 @@ abstract class BetService extends BaseBetService {
                 }
                 $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetInfo'] = $betErrorPlansTask;
                 sleep(2);
+            }
+            if($betSuccess){
+                foreach ($planSnidArrs as $pid=>$planSn){
+                    $where = ['plan_id'=>$pid, 'qihao'=>$activeQihao, 'lottery_type'=>$lottery_type];
+                    $BettingRecords = BettingRecords::find()->where($where)->one();
+                    $BettingRecords->snid = implode(';', $planSn['snids']);
+                    $BettingRecords->sn = implode(';', $planSn['sns']);
+                    $BettingRecords->save();
+                }
+                $rst = BetService::synBalance($uid,$tz_system_id, $is_auto);
             }
         }
 

@@ -123,7 +123,8 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                     if(\Yii::$app->user->id == 1) $str = '<font color="green">等待开奖</font>';
                                     return $str;
                                 }
-                                return BaseStringHelper::truncate($model->snid,15);
+                                $str = Html::a(BaseStringHelper::truncate($model->snid,15), 'javascript:;', ['title' => '方案号：'.$model->sn,'alt'=>$model->sn]);;
+                                return $str;
                             }
                         ],
                         //'playway',
