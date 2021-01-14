@@ -1283,6 +1283,10 @@ class HN0898Service extends BaseTZService {
             case 16: # 加拿大
                 $qihao = 2659612 + self::getDifferentNums($lottery_type = 16) + 1; # 2659612为2021-01-01
                 break;
+            case 17: # 排列五
+                $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0, $lottery_type = 17);
+                $qihao = $data['expect'] + 1; # 期号
+                break;
         }
 
         return $qihao;
@@ -1392,6 +1396,10 @@ class HN0898Service extends BaseTZService {
                 break;
             case 16: # 加拿大
                 $qihao = 2659612 + self::getDifferentNums($lottery_type = 16); # 2659612为2021-01-01
+                break;
+            case 17: # 七星彩
+                $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 2, $lottery_type = 17);
+                $qihao = $data['expect']; # 期号
                 break;
         }
 

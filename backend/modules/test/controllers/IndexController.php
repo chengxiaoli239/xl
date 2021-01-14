@@ -201,6 +201,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = QxcTcw::QixingCaiBatch($type = 'json', $post['is_auto']=0);p($data);
         $rst['bet'] = BetService::betByUidNew($uid=10);p($rst); // 用户新计划投注，可正买可反买
         $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
         $rst = BaoTaService::updateUserBetStatus($id=86, $is_auto=2);p($rst);
@@ -260,7 +261,6 @@ class IndexController extends Controller
         p($rst);
         $rst = StaticService::opAllCodeTypeYl([1]);p($rst);
         $data = QxcTcw::getTcwOne();p($data);
-        $data = QxcTcw::QixingCaiBatch($type = 'json', $post['is_auto']=0);p($data);
         $rst = KjDataGet::insertKjData('2020124', 1, '4,1,0,9,5,2,11', '2020-12-08 20:00:00');p($rst);
 
         $data = XjSsc::cg($type='json', $is_auto=0);p($data);

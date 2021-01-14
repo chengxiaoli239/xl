@@ -1,0 +1,125 @@
+1、Genenral
+2、Requerst Header
+3、Form Data
+3、Query String Parameters
+
+一、 开关盘状态
+1、Genenral
+Request URL: http://f9.eeaa123789.com/settings/openstate?timeid=1609481844975
+Request Method: GET
+
+2、Requerst Header
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Cookie: __cfduid=d2983b295150ed1f8bc6338ddc703cb561609327801; MC=f1d6b6802d397dc3a90587828355eb0b; MCLIST=f9-f1d6b6802d397dc3a90587828355eb0b%7Cf7-1ca9e5fa5531df2a4226737519862085%7Cf3-e59e10d239e58c733c92064b6d8c989b%7Cf4-14087ee765d0a0b58545c72fd9164410%7Cf5-ac3f5103956370682bff700e5423286b%7Cf2-1caff6f43a33ca632a961827079718f8%7Cf1-2a677102a3ec943f9df96caef7b3ce88; LC=f1%7Cf2%7Cf5%7Cf4%7Cf3%7Cf7%7Cf9; sel_lotdefid=2
+Host: f9.eeaa123789.com
+Referer: http://f9.eeaa123789.com/mem
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36
+X-Requested-With: XMLHttpRequest
+
+3、Form Data
+timeid: 1609481844975
+4、返回：
+等待开盘：{"status":200,"serno":"2659624","open":false,"wait_open":true,"difftime":39,"next_diff":0,"end_time":"2021-01-01 14:16:40","endtimestr":1609481800,"opentimestr":1609481630,"pre_time":38}
+已开盘：{"status":200,"serno":"2659624","open":true,"wait_open":false,"difftime":166,"next_diff":0,"end_time":"2021-01-01 14:20:10","endtimestr":1609482010,"opentimestr":1609481840,"pre_time":0}
+
+二、撤单：
+1、Genenral
+Request URL: http://f5.faa2020.com/cancelnumbers
+Request Method: POST
+2、Requerst Header
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Content-Length: 518
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Cookie: __cfduid=d582bae660d8c42d134f11e9a6926019d1584195092; sel_appid=f2; AC=; LC=f3%7Cf4%7Cf5%7Cf2%7Cf1; MCLIST=f1-efcd34c55f9f62ff50e8705e459b6fce%7Cf2-64eed9189ac1ec3adbaa16cdaa018bd9%7Cf5-54a5d3297f3741d393787ff7ce0633ea%7Cf4-ba43009b9e1a3c3496a775e173f2c8d0%7Cf3-b1286341f02778f752d0224f3c5aa436; MC=2f6bfce6abfa67ded70c59880dcf2862; AC=MC%3A2f6bfce6abfa67ded70c59880dcf2862; sel_lotdefid=3
+Host: f5.faa2020.com
+Origin: http://f5.faa2020.com
+Referer: http://f5.faa2020.com/order_print?tid=1585752379
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36
+X-Requested-With: XMLHttpRequest
+3、Form Data
+lotnumbers[0][orderno]: 2020040139300001366
+lotnumbers[0][lotname]: OOOO
+lotnumbers[0][number]: 2352
+lotnumbers[1][orderno]: 2020040139300001366
+lotnumbers[1][lotname]: OOOO
+lotnumbers[1][number]: 2342
+lotnumbers[2][orderno]: 2020040139300001366
+lotnumbers[2][lotname]: OOOO
+lotnumbers[2][number]: 1352
+lotnumbers[3][orderno]: 2020040139300001366
+lotnumbers[3][lotname]: OOOO
+lotnumbers[3][number]: 1342
+serno: 2020040139
+isencode: true
+4、返回： 
+{"status":200,"suc":[{"orderno":"2020040139300001366","lotname":"OOOO","number":"2352","order_money":"0.1"},{"orderno":"2020040139300001366","lotname":"OOOO","number":"2342","order_money":"0.1"},{"orderno":"2020040139300001366","lotname":"OOOO","number":"1352","order_money":"0.1"},{"orderno":"2020040139300001366","lotname":"OOOO","number":"1342","order_money":"0.1"}],"reason":"原因:订单已经超过退码时间","total":99.6,"use":0,"remain":99.6,"serno":"2020040139","opentime":1585752020,"endtime":1585753080,"isopen":true}
+
+三、获取投注方案号
+1、Genenral
+Request URL: http://f5.faa2020.com/queryLastInfo?timeid=1585758028440
+Request Method: GET
+2、Requerst Header
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Cookie: __cfduid=d582bae660d8c42d134f11e9a6926019d1584195092; sel_appid=f2; AC=; LC=f3%7Cf4%7Cf5%7Cf2%7Cf1; MCLIST=f1-efcd34c55f9f62ff50e8705e459b6fce%7Cf2-64eed9189ac1ec3adbaa16cdaa018bd9%7Cf5-54a5d3297f3741d393787ff7ce0633ea%7Cf4-ba43009b9e1a3c3496a775e173f2c8d0%7Cf3-b1286341f02778f752d0224f3c5aa436; MC=2f6bfce6abfa67ded70c59880dcf2862; AC=MC%3A2f6bfce6abfa67ded70c59880dcf2862; sel_lotdefid=2
+Host: f5.faa2020.com
+Referer: http://f5.faa2020.com/order_print?tid=1585757734
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36
+X-Requested-With: XMLHttpRequest
+3、Query String Parameters
+timeid: 1585758028440
+
+四、获取用户信息
+1、Genenral
+Request URL: http://f5.faa2020.com/queryLastInfo?timeid=1585753360494
+Request Method: GET
+2、Requerst Header
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Cookie: __cfduid=d582bae660d8c42d134f11e9a6926019d1584195092; sel_appid=f2; AC=; LC=f3%7Cf4%7Cf5%7Cf2%7Cf1; MCLIST=f1-efcd34c55f9f62ff50e8705e459b6fce%7Cf2-64eed9189ac1ec3adbaa16cdaa018bd9%7Cf5-54a5d3297f3741d393787ff7ce0633ea%7Cf4-ba43009b9e1a3c3496a775e173f2c8d0%7Cf3-b1286341f02778f752d0224f3c5aa436; MC=2f6bfce6abfa67ded70c59880dcf2862; AC=MC%3A2f6bfce6abfa67ded70c59880dcf2862; sel_lotdefid=3
+Host: f5.faa2020.com
+Referer: http://f5.faa2020.com/order_print?tid=1585752379
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36
+X-Requested-With: XMLHttpRequest
+3、Query String Parameters
+timeid: 1585753360494
+4、返回：
+{"status":200,"info":{"user_name":"jj771","alias_name":"","print_title":"\"\"","cur_serno":"2020040140","total_credit":99.6,"used_credit":"0.0","remain_credit":99.6},"other":{"open":true,"qprflag":"0","is_print":"1"},"last_order":[],"perorder_max":{"OOXX":{"max":1500,"min":1,"multi":"1.0"},"OXOX":{"max":1500,"min":1,"multi":"1.0"},"OXXO":{"max":1500,"min":1,"multi":"1.0"},"XOOX":{"max":1500,"min":1,"multi":"1.0"},"XOXO":{"max":1500,"min":1,"multi":"1.0"},"XXOO":{"max":1500,"min":1,"multi":"1.0"},"OOOX":{"max":100,"min":0.1,"multi":"0.1"},"OOXO":{"max":100,"min":0.1,"multi":"0.1"},"OXOO":{"max":100,"min":0.1,"multi":"0.1"},"XOOO":{"max":100,"min":0.1,"multi":"0.1"},"OOOO":{"max":50,"min":0.1,"multi":"0.1"},"AA":{"max":1000,"min":1,"multi":"1.0"},"AAA":{"max":1000,"min":1,"multi":"1.0"},"AAAA":{"max":100,"min":1,"multi":"1.0"},"OXXX":{"max":3000,"min":1,"multi":"1.0"},"XOXX":{"max":3000,"min":1,"multi":"1.0"},"XXOX":{"max":3000,"min":1,"multi":"1.0"},"XXXO":{"max":3000,"min":1,"multi":"1.0"},"XXXXO":{"max":3000,"min":1,"multi":"1.0"},"XXXOO":{"max":1500,"min":1,"multi":"1.0"},"OXXXO":{"max":1500,"min":1,"multi":"1.0"},"XOXXO":{"max":1500,"min":1,"multi":"1.0"},"XXOXO":{"max":1500,"min":1,"multi":"1.0"}},"order_lotdefid":3}
+
+五、三定
+1、Genenral
+Request URL: http://f2.faa2020.com/sellnumbers
+Request Method: POST
+
+2、Requerst Header
+Accept: application/json, text/javascript, */*; q=0.01
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+Connection: keep-alive
+Content-Length: 362
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Cookie: __cfduid=d582bae660d8c42d134f11e9a6926019d1584195092; AC=MC%3Ae8a69493b35a226d64ea5805a48597d0; sel_appid=f1; AC=; LC=f3%7Cf4%7Cf5%7Cf2%7Cf1; MCLIST=f1-efcd34c55f9f62ff50e8705e459b6fce%7Cf2-64eed9189ac1ec3adbaa16cdaa018bd9%7Cf5-54a5d3297f3741d393787ff7ce0633ea%7Cf4-ba43009b9e1a3c3496a775e173f2c8d0%7Cf3-b1286341f02778f752d0224f3c5aa436; MC=0306afd5d179a8605e731190c80a2b67; sel_lotdefid=2
+Host: f2.faa2020.com
+Origin: http://f2.faa2020.com
+Referer: http://f2.faa2020.com/order_print?tid=1585837677
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36
+X-Requested-With: XMLHttpRequest
+3、Form Data
+si: {"OOOX":"255XM0.1N256XM0.1N265XM0.1N266XM0.1N275XM0.1N276XM0.1N355XM0.1N356XM0.1N365XM0.1N366XM0.1N375XM0.1N376XM0.1N455XM0.1N456XM0.1N465XM0.1N466XM0.1N475XM0.1N476XM0.1"}
+sn: 20200402055
+uc: 96.4
+ot: 3
+log: 2M1N1N0N324N567N56NM3N1N0N0N0N0N0NN0N0N0N0NN0N0N0N0NN0N0N0N0NM99N18N0.1
+nomd5: 790dcf70e60a4f9360e930481e041eb5
+commited_suffix: 1585837709611
+

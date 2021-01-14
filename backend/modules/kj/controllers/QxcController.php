@@ -61,6 +61,17 @@ class QxcController extends Controller
      * @param string $type
      * @return array|bool
      */
+    public function actionPl5Batch($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = QxcTcw::QixingCaiBatch($is_new=0, $lottery_type=17);
+        return $data;
+    }
+
+    /**
+     * @desc 官网 https://www.lottery.gov.cn/kj/kjlb.html?qxc
+     * @param string $type
+     * @return array|bool
+     */
     public function actionQxcBatch($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $data = QxcTcw::QixingCaiBatch();
@@ -76,6 +87,18 @@ class QxcController extends Controller
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
         $data = QxcTcw::getTcwOne($type, $post['is_auto']);
+        return $data;
+    }
+
+    /**
+     * @desc 官网  https://www.lottery.gov.cn/kj/kjlb.html?qxc
+     * @param string $type
+     * @return array|bool
+     */
+    public function actionPl5One($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $post = \Yii::$app->request->post();
+        $data = QxcTcw::getTcwOne($type, $post['is_auto'], $lottery_type=17);
         return $data;
     }
 
