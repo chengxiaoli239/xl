@@ -138,12 +138,17 @@ class QxcTcw extends BaseKj{
 
         $m = \Yii::$app->cache;
         $mkey = 'QixingCaiBatch_page_4_'.$is_new;
-        $page = $m->get($mkey) ? : 84;
+        $default_page = 84;
+        if($lottery_type==17){
+            $mkey = $mkey.'_'.$lottery_type;
+            $default_page = 192;
+        }
+        $page = $m->get($mkey) ? : $default_page;
         if($is_new==1) $page = 1;
         $gameNo = self::$tcwTypes[$lottery_type];
 
         $running_status_key = 'QixingCaiBatch_status';
-        if($lottery_type==17) $running_status_key = $running_status_key.'_'.$lottery_type;
+        if($lottery_type==17) $running_status_key = $running_status_key.'_0_'.$lottery_type;
         if($status = $m->get($running_status_key)) return ['status'=>300, 'msg'=>'有在执行的任务，请稍后'];
         $m->set($running_status_key, 1, 300);
 

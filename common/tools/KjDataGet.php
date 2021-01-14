@@ -115,7 +115,7 @@ class KjDataGet
                     $kjDatas = $data;
                     if($kjDatas){
                         $mkey = 'KJ_LOG_KEY_BATCH_1_'.$kjConfig->lottery_type;
-                        if(in_array($kjConfig->lottery_type, [6, 8, 1])){ # xjssc
+                        if(in_array($kjConfig->lottery_type, [6, 8, 1, 17])){ # xjssc  1七星彩17排列五
                             $kjDatas = array_reverse($kjDatas);
                             foreach ($kjDatas as $key=>$dataInfo){
                                 $qihao = $dataInfo['expect'];
