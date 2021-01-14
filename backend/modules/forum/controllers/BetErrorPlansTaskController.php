@@ -41,9 +41,9 @@ class BetErrorPlansTaskController extends BaseController
         $queryParams = Yii::$app->request->queryParams;
 
         $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
-        $queryParams['BetErrorPlansTask']['lottery_type'] = $lottery_type;
 
         if($this->_user_id !== 1){
+            $queryParams['BetErrorPlansTask']['lottery_type'] = $lottery_type;
             $queryParams['BetErrorPlansTask']['uid'] = $this->_user_id;
         }
 
