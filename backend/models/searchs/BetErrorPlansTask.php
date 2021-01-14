@@ -58,11 +58,8 @@ class BetErrorPlansTask extends BetErrorPlansTaskModel
             // $query->where('0=1');
             return $dataProvider;
         }
-
-        // grid filtering conditions
-        $query->andFilterWhere([
+        $filterWhere = [
             'id' => $this->id,
-            'uid' => $this->uid,
             'agent_id' => $this->agent_id,
             'playway' => $this->playway,
             'tz_type' => $this->tz_type,
@@ -71,11 +68,17 @@ class BetErrorPlansTask extends BetErrorPlansTaskModel
             'status' => $this->status,
             'plan_id' => $this->plan_id,
             'tz_system_id' => $this->tz_system_id,
-            'lottery_type' => $this->lottery_type,
             'updated_time' => $this->updated_time,
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at,
-        ]);
+        ];
+
+        if($params['BetErrorPlansTask']['uid'] !==1){
+            $filterWhere['uid'] = $params['BetErrorPlansTask']['uid'];
+            $filterWhere['lottery_type'] = $params['BetErrorPlansTask']['lottery_type'];
+        }
+        // grid filtering conditions
+        $query->andFilterWhere($filterWhere);
 
         $query->andFilterWhere(['like', 'codes', $this->codes])
             ->andFilterWhere(['like', 'account', $this->account])

@@ -47,7 +47,7 @@ return [
     'Static Code4n Arise Months' => '四字现(月)',
     'Static Code3n Arise Months' => '三字现(月)',
 
-    'Bet Error Plans Tasks' => '投注异常监控',
+    'Bet Error Plans Tasks' => '异常监控',
 
     'User Sys Plans 2d' => '3d计划',
     'User Sys Plans 3d' => '4d计划',
