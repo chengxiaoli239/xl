@@ -3,7 +3,7 @@ if($_SERVER['SERVER_PORT'] == '8090')@ini_set('session.name', 'PHPSESSID_BACKEND
 defined('YII_DEBUG') or define('YII_DEBUG', true);
 defined('YII_ENV') or define('YII_ENV', 'dev');
 
-defined('DEFAULT_LOTTERY_TYPE') or define('DEFAULT_LOTTERY_TYPE',5); # 默认为重庆时时彩
+defined('DEFAULT_LOTTERY_TYPE') or define('DEFAULT_LOTTERY_TYPE',6); # 默认为重庆时时彩
 
 require(__DIR__ . '/../../vendor/autoload.php');
 require(__DIR__ . '/../../vendor/yiisoft/yii2/Yii.php');
