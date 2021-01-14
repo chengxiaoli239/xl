@@ -69,7 +69,7 @@ use yii\widgets\ActiveForm;
                     </div>
                 </div>
 
-                <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:1-3-7-15-31-62-125-251') ?>
+                <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
 
                 <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
 

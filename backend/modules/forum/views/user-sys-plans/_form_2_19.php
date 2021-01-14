@@ -61,7 +61,7 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'nums')->textInput() ?-->
 
-                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:0.1-0.3-0.7-1.5-3.1-6.2-12.5-25.1') ?>
+                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:0.1-0.3-0.7-1.5-3.1-6.2-12.5-25.1') ?>
                     <div class="row">
                         <div class="col-lg-3 col-xs-6">
                             <?= $form->field($model, 'bet_while_miss')->textInput()->label('遗漏x期投,如:10') ?>

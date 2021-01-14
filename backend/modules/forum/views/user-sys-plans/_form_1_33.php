@@ -50,7 +50,7 @@ use yii\widgets\ActiveForm;
                         <?= $form->field($model, 'code2')->textInput()->label('号码组二') ?>
                     </div>
                 </div>
-                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度,如:1-2-4-8-16-32-42-84') ?>
+                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-2-4-8-16-32-42-84') ?>
 
                     <!--?= $form->field($model, 'hz')->checkboxList($hzArr)->label('投注类型(和值)') ?-->
 
