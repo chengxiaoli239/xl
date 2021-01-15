@@ -410,6 +410,9 @@ abstract class BetService extends BaseBetService {
             $planSnids = [];
             $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
             if(empty($BetErrorPlansTasks)) continue;
+            if($uid){
+                $activeQihao = BetService::getActiveQihao($uid, $BetErrorPlansTasks[0]->tz_system_id, $lottery_type);
+            }
             foreach ($BetErrorPlansTasks as $betErrorPlansTask){
                 $uid = $betErrorPlansTask->uid;
                 $tz_system_id = $betErrorPlansTask->tz_system_id;
@@ -430,8 +433,6 @@ abstract class BetService extends BaseBetService {
                 $balance = $BetService::getBalance($uid, $tz_system_id, $r=3, $is_auto=2); # 余额
 
                 $qihao = $betErrorPlansTask->qihao;
-                $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
-
                 if(false && $balance<$bet_money){
                     $betErrorPlansTask->status = 3; # 不可重推
                     $betErrorPlansTask->post_desc = json_encode(['Status'=>0, 'qihao'=>$qihao, 'account'=>$account, 'push_time'=>date('Y-m-d H:i:s'), 'msg'=>'余额不足，不可重推'], 320);
@@ -454,7 +455,7 @@ abstract class BetService extends BaseBetService {
                     if($betRst['data']['bet_rst']['Status'] == 1){
                         $betSuccess = 1;
                     }
-                    $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account' => $account, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst];
+                    $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account' => $account, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'loginRst'=>$loginRst];
                     $snid = $betRst['data']['bet_rst']['snid'];
                     $sn = $betRst['data']['bet_rst']['sn'];
                     $planSnidArrs[$plan_id]['snids'][] = $snid;
