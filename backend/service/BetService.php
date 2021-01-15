@@ -432,7 +432,7 @@ abstract class BetService extends BaseBetService {
                 $qihao = $betErrorPlansTask->qihao;
                 $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
 
-                if($balance<$bet_money){
+                if(false && $balance<$bet_money){
                     $betErrorPlansTask->status = 3; # 不可重推
                     $betErrorPlansTask->post_desc = json_encode(['Status'=>0, 'qihao'=>$qihao, 'account'=>$account, 'push_time'=>date('Y-m-d H:i:s'), 'msg'=>'余额不足，不可重推'], 320);
                     $betErrorPlansTask->save();
