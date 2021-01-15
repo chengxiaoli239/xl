@@ -422,7 +422,8 @@ abstract class BetService extends BaseBetService {
                 $bet_money = $betErrorPlansTask->bet_money;
                 $bet_sort_key = $betErrorPlansTask->bet_sort_key;
 
-                Tool_Common::log('lottery_bet', 'ERR', '下注新逻辑-2', ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'account'=>$account, 'tz_system_id'=>$tz_system_id]);
+                $qihao = $betErrorPlansTask->qihao;
+                Tool_Common::log('lottery_bet', 'ERR', '下注新逻辑-2', ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'account'=>$account, 'tz_system_id'=>$tz_system_id, 'activeQihao'=>$activeQihao, 'qihao'=>$qihao]);
                 $status = UserService::accountIsExpire($uid, $tz_system_id); # 账号是否过期
                 if(!$status && $account != 'gaozi2018'){
                     Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['plan_id'=>$plan_id, 'uid'=>$uid, 'account'=>$account, 'tz_system_id'=>$tz_system_id]);
@@ -432,7 +433,6 @@ abstract class BetService extends BaseBetService {
                 $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
                 $balance = $BetService::getBalance($uid, $tz_system_id, $r=3, $is_auto=2); # 余额
 
-                $qihao = $betErrorPlansTask->qihao;
                 if(false && $balance<$bet_money){
                     $betErrorPlansTask->status = 3; # 不可重推
                     $betErrorPlansTask->post_desc = json_encode(['Status'=>0, 'qihao'=>$qihao, 'account'=>$account, 'push_time'=>date('Y-m-d H:i:s'), 'msg'=>'余额不足，不可重推'], 320);
