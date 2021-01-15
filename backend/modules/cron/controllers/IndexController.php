@@ -238,8 +238,8 @@ class IndexController extends Controller
             $for_times = 14;
             $sleep_time = 5;
         }else{
-            $for_times = 6;
-            $sleep_time = 8;
+            $for_times = 15;
+            $sleep_time = 3;
         }
         for($i=0; $i<$for_times; $i++){
             $rst[$i]['rst'] = BetService::lotteryBet($uid);
