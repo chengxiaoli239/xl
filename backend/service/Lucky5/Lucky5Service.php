@@ -1313,7 +1313,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
     }
 
     /**
-     * @desc 重复下注失败的号码
+     * @desc 重复下注失败的号码 - 幸运五  目前为正常下注入口
      * @param $id
      */
     public function repeatErrorBet($id){
@@ -1363,6 +1363,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key);
             $m->delete($betKey); # 失败之后可重新下注的情况解锁
         }
+        if(in_array($tmpRst['code'], [309, 311])){
+            $status = 2;
+            $tmpRst = ['Status'=>1, 'msg'=>'网络故障或者超时默认下注成功'];
+        }
+
         $time_consume = ($time2 - $time1).'s';
         $tmpRst['bet_time'] = date('Y-m-d H:i:s');
         $tmpRst['time_consume'] = $time_consume;
@@ -1370,7 +1375,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $row->post_desc = json_encode($tmpRst, 320);
 
         $logArr = ['id'=>$id, 'uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
-        Tool_Common::log('repeatErrorBet', 'INFO', '重复下注失败的号码', $logArr);
+        Tool_Common::log('repeatErrorBet', 'INFO', '幸运五下注', $logArr);
 
         $flag = $row->save();
         if(!$flag){
