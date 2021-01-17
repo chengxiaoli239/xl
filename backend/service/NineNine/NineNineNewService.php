@@ -533,7 +533,7 @@ class NineNineNewService extends BaseTZService {
                         'playType' => '四定',
                         'betNum' => $code.',X',
                         'odds' => $odds,
-                        'betBeishu' => ($single/$betUnit),
+                        'betBeishu' => ceil($single/$betUnit),
                         'betZhushu' => 625,
                     ];
                 }
@@ -548,7 +548,7 @@ class NineNineNewService extends BaseTZService {
                     'betUnit' => $betUnit,
                     'playType' => self::getPlayType($playway),
                     'betNum' => implode(',', $codes),
-                    'betBeishu' => ($single/$betUnit),
+                    'betBeishu' => ceil($single/$betUnit),
                     'betZhushu' => count($codesArr),
                 ];
             }
@@ -561,7 +561,7 @@ class NineNineNewService extends BaseTZService {
                     'playType' => self::getPlayType($playway),
                     'betNum' => $code.',X',
                     'odds' => $odds,
-                    'betBeishu' => ($single/$betUnit),
+                    'betBeishu' => ceil($single/$betUnit),
                     'betZhushu' => 1,
                 ];
             }
