@@ -287,7 +287,10 @@ class IndexController extends Controller
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $post = \Yii::$app->request->post();
 
-        $rst['data'] = BetService::insertPlansTask($post['lottery_types']);
+        for ($i=0; $i<5; $i++){
+            $rst['data'] = BetService::insertPlansTask($post['lottery_types']);
+            sleep(10);
+        }
 
         return $rst;
     }
