@@ -1719,7 +1719,8 @@ abstract class BetService extends BaseBetService {
             $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
             if(!$status && $plan->account != 'gaozi2018'){
                 Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示-2', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
-                return ['status'=>300, 'msg'=>'账号过期提示'];
+                continue;
+                //return ['status'=>300, 'msg'=>'账号过期提示'];
             }
             # 4、投注号码 codes
             $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
