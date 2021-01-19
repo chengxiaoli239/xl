@@ -1712,7 +1712,8 @@ abstract class BetService extends BaseBetService {
             $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
             if(!$activeQihao){
                 Tool_Common::log('accountIsExpire', 'ERR', '封盘或者未开盘-2', ['uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
-                return ['status'=>300, 'msg'=>'封盘或者未开盘'];
+                //return ['status'=>300, 'msg'=>'封盘或者未开盘'];
+                continue;
             }
 
             $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
