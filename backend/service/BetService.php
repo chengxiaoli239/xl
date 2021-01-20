@@ -372,8 +372,8 @@ abstract class BetService extends BaseBetService {
         }
         ############# 账号是否过期检测 ################
 
-        $qihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
-        if(empty($qihao)){
+        $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
+        if(empty($activeQihao) OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
             Tool_Common::log('wang_pan_is_active', 'ERR', '网盘开盘状态', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
             return ['status'=>300, 'msg'=>'未开盘或者已关盘['.date('Y-m-d H:i:s').']'];
         }
@@ -384,7 +384,7 @@ abstract class BetService extends BaseBetService {
 
         # 5、投注请求
         $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
-        $tmpRst = $BetService->bet($qihao, $plan->id, $codes);
+        $tmpRst = $BetService->bet($activeQihao, $plan->id, $codes);
 
         $logArr = ['tz_system_id'=>$tz_system_id,'codes'=>$codes, 'postRst'=>$tmpRst];
         Tool_Common::log('betByUidXy','INFO','0898投注记录', $logArr);
@@ -407,11 +407,14 @@ abstract class BetService extends BaseBetService {
             if($uid){
                 $where = array_merge($where, [['=', 'uid', $uid]]);
             }
-            $planSnids = [];
             $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
             if(empty($BetErrorPlansTasks)) continue;
             if($uid){
                 $activeQihao = BetService::getActiveQihao($uid, $BetErrorPlansTasks[0]->tz_system_id, $lottery_type);
+                if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
+                    Tool_Common::log('wang_pan_is_active', 'ERR', '网盘开盘状态-2', ['uid'=>$uid, 'tz_system_id'=>$lottery_type]);
+                    return ['status'=>300, 'msg'=>'未开盘或者已关盘['.date('Y-m-d H:i:s').']'];
+                }
             }
             foreach ($BetErrorPlansTasks as $betErrorPlansTask){
                 $uid = $betErrorPlansTask->uid;
@@ -1019,8 +1022,8 @@ abstract class BetService extends BaseBetService {
             }
 
             $activeQihao = BetService::getActiveQihao($plan->uid, $tz_system_id, $lottery_type);
-            if(!$activeQihao){
-                return ['status'=>300, 'msg'=>'无可下注的期号'];
+            if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
+                return ['status'=>300, 'msg'=>'无可下注的期号或者代理IP获取异常'];
             }
             $mkey = self::buildBetPlanIdKey($plan->account, $activeQihao, $plan->id);
             if($tzflag = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了~'];
@@ -1710,7 +1713,7 @@ abstract class BetService extends BaseBetService {
 
             $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
             $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
-            if(!$activeQihao){
+            if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
                 Tool_Common::log('accountIsExpire', 'ERR', '封盘或者未开盘-2', ['uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
                 //return ['status'=>300, 'msg'=>'封盘或者未开盘'];
                 continue;

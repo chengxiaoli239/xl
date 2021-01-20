@@ -1156,6 +1156,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
         $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+        if(empty($poxy_addr)) return ['status'=>30200, 'msg'=>'代理IP获取异常,请稍候...'];
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -1572,6 +1573,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
     public static function getActiveQihao($uid='', $tz_system_id='', $lottery_type = 8){
         if(!$uid OR !$tz_system_id) return ['code'=>300, 'msg'=>'uid或者tz_system_id不能为空'];
         $data = self::getQihaoInfo($uid, $tz_system_id);
+        if(isset($data[['status']]) && $data['status'] == '30200') return $data;
         if(isset($data['Status']) && isset($data['Data']) && isset($data['Data']['status']) && $data['Data']['status']==0){
             $qihao = $data['Data']['real_period_no'];
         }else{
