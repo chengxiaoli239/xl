@@ -1261,6 +1261,11 @@ abstract class BetService extends BaseBetService {
             'create_time' => date('Y-m-d H:i:s'),  // 下单时间 string
         ];
         //if($data['tz_type'] == 20) $insertData['codes'] = md5($insertData['codes']);
+        $where = ['AND', ['=', 'qihao', $data['qihao']], ['=', 'plan_id', $data['plan_id']], ['=', 'uid', $data['uid']]];
+        $flag = BettingRecords::find()->where($where)->one();
+        if($flag){
+            return $flag;
+        }
 
         $bettingRecords = new BettingRecords();
         $bettingRecords->setAttributes($insertData);
@@ -1658,10 +1663,7 @@ abstract class BetService extends BaseBetService {
         $rst = ['status'=>300, 'msg'=>'操作成功'];
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
 
-        $where = ['AND', ['=', 'status', 1], ['=', 'is_test', 0] ];
-        if(empty($lottery_types)){
-            $where = array_merge($where, [['IN', 'lottery_type', $lottery_types]]);
-        }
+        $where = ['AND', ['=', 'status', 1], ['IN', 'lottery_type', $lottery_types] ];
         $m = \Yii::$app->cache;
 
         $plans = UserSysPlans::find()->where($where)->all();
@@ -1686,7 +1688,7 @@ abstract class BetService extends BaseBetService {
 
             if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
                 $qihao = HN0898Service::getQihao($lottery_type);
-                $tmpRst = self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid); # 直接记录表
+                $tmpRst = self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
             }else{
                 Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-1', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'uid'=>$uid]);
 
