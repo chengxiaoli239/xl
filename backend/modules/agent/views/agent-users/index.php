@@ -22,12 +22,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="btn-group">
                         <?= Html::a("+", ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
-                    <!--div class="btn-group">
-                        <input type="text" class="form-control" id="balance-val" placeholder="积分：负扣分，正加分">
-                    </div>
-                    <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'Update Users balance'), '#', ['class' => 'btn btn-success update-balance', 'style' => 'margin-bottom:15px;']) ?>
-                    </div-->
                 </div>
 
     <?php Pjax::begin(); ?>

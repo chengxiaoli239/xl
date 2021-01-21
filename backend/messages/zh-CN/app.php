@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'Users' => '用户列表',
     'edit' => '编辑',
     'query' => '查询',
     'Create Follow Datas' => '添加计划',

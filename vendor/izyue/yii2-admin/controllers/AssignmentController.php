@@ -256,11 +256,14 @@ class AssignmentController extends Controller
      */
     public function actionUpdate($id)
     {
+        $post = Yii::$app->request->post();
         $model = $this->findModel($id);
         $model->setScenario('update');
-        if($model->load(Yii::$app->request->post())){
+        if($model->load($post)){
             if($model->password){
-                $model->setPassword($model->password);
+                $pwd = $model->password;
+                $model->desc = '账号：'.$model->username.' 密码：'.$pwd;
+                $model->setPassword($pwd);
                 $model->generateAuthKey();
             }
 

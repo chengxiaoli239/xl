@@ -73,7 +73,19 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         'pay_time',
-                        'desc',
+                        //'desc',
+                        ['attribute'=>'desc',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                $options = [
+                                    'class'=>'act-user-copy',
+                                    'data-id'=>$model->id,
+                                    'data-username'=>$model->username,
+                                    'data-desc'=>$model->desc,
+                                ];
+                                return Html::a($model->desc, 'javascript:;', $options);
+                            }
+                        ],
                         /*
                         ['attribute' => 'id','label'=>'投注方式', # 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
@@ -101,3 +113,68 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+
+<!--复制提示框-->
+<div class="modal fade" id="COPY_TipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
+     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
+">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="copy_tip_msg_title"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group up-reason">
+                    <label id="copy_tip_msg" for="copy_tip_msg"></label><span></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" data-clipboard-target="#copy_tip_msg" id="CopyConfirm">复制</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script>
+<script src="/chat_statics/js/clipboard.min.js"></script>
+<script>
+$(function () {
+    $('.act-user-copy').click(function () {
+        console.log('xxx')
+        var desc = $(this).data('desc');
+        var username = $(this).data('username');
+        $("#copy_tip_msg_title").html("用户[<strong>" + username + "</strong>]");
+        $("#copy_tip_msg").html('http://' + window.location.host + '\r\n' + desc);
+        $("#act").val('act-user-copy');
+        $("#COPY_TipModal").modal('show');
+    });
+    var clipboard;
+    $("#CopyConfirm").click(function () {
+
+        if (clipboard) {
+            clipboard.destroy();
+        }
+
+        var copyBtn = new ClipboardJS('#CopyConfirm');
+
+        var flag = 0;
+        var txt = '';
+        copyBtn.on("success", function (e) {
+            // 复制成功
+            txt = e.text;
+            //alert(e.text);
+            $("#copyTxt").val(e.text);
+            e.clearSelection();
+        });
+
+        $("#tip_msg_title").html('复制结果');
+        //$("#tip_msg_rst").html($("#copyTxt").val());
+        $("#tip_msg_rst").html("复制成功");
+        $("#rstTipModal").modal('show');
+    });
+});
+</script>
