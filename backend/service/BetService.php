@@ -1264,7 +1264,7 @@ abstract class BetService extends BaseBetService {
         $where = ['AND', ['=', 'qihao', $data['qihao']], ['=', 'plan_id', $data['plan_id']], ['=', 'uid', $data['uid']]];
         $flag = BettingRecords::find()->where($where)->one();
         if($flag){
-            return $flag;
+            return ['status'=>200, 'msg'=>'写入成功'];
         }
 
         $bettingRecords = new BettingRecords();
