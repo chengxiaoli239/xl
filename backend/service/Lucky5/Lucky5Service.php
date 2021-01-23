@@ -1365,8 +1365,17 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $m->delete($betKey); # 失败之后可重新下注的情况解锁
         }
         if(in_array($tmpRst['code'], [309, 311])){
-            $status = 2;
-            $tmpRst = ['Status'=>1, 'msg'=>'网络故障或者超时默认下注成功'];
+            $m = \Yii::$app->cache;
+            $mkey_time_out = 'mkey_time_out_retry_key_'.$row->uid.'_'.$row->plan_id.'_'.$row->bet_sort_key;
+            $val = $m->get($mkey_time_out);
+            if($val==1){
+                $status = 2;
+                $tmpRst = ['Status'=>1, 'msg'=>'网络故障或者超时默认下注成功', 'data'=>['qihao'=>$row->qihao, 'uid'=>$uid, 'plan_id'=>$row->plan_id]];
+                Tool_Common::log('repeatErrorBet_time_out', 'INFO', '幸运五下注', $tmpRst);
+            }else{
+                $m->set($mkey_time_out, 1, 60);
+                return ['status'=>301, 'msg'=>'下注请求超时'];
+            }
         }
 
         $time_consume = ($time2 - $time1).'s';
