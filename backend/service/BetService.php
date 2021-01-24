@@ -1674,7 +1674,7 @@ abstract class BetService extends BaseBetService {
             $qihao = HN0898Service::getQihao($lottery_type);
             $next_qihao_is_active = TzService::beforeBet($lottery_type);
             if($next_qihao_is_active['status'] != 200){
-                Tool_Common::log('next_qihao_is_active', 'INFO', '利润统计结束', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id]);
+                Tool_Common::log('next_qihao_is_active', 'INFO', '利润统计结束', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id, 'next_qihao_is_active'=>$next_qihao_is_active]);
                 return ['status'=>200, 'msg'=>'利润统计未结束'.$lottery_type.'_'.$qihao];
             }
 
