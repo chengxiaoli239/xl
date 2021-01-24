@@ -45,7 +45,7 @@ class TzService extends BaseService {
     public static function beforeBet($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = Yii::$app->cache;
         $rst = ['status'=>200, 'msg'=>'可以投注~'];
-        $qihao = HN0898Service::getQihao();
+        $qihao = HN0898Service::getQihao($lottery_type);
         $mkey = TzService::buildNextKey($lottery_type, $qihao);
         $tzStatus = $m->get($mkey);
 

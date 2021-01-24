@@ -482,6 +482,7 @@ class WxService {
             foreach ($contacts['MemberList'] as $info){
                 $setData = $info;
                 $setData['uid'] = $uid;
+                $setData['NickName'] = urlencode($info['NickName']);
                 $setData['MemberList'] = json_encode($info['MemberList'], 320);
                 if(!$WxFriends = WxFriends::findOne(['NickName'=>$info['NickName'], 'uid'=>$uid])){
                     $WxFriends = new WxFriends();

@@ -201,6 +201,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $miss = SscDataService::getSdHzYlHistoryMiss([4], $lottery_type = 6, 50000);p($miss);
+        $rst = Lucky5Service::getQihaoInfo($uid=10, $tz_system_id=9, $lottery_type=8);p($rst);
+        $str = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx16d295b4421899d4&redirect_uri=http%3A%2F%2Fgoapi.hngoshare.com%2Fpay%2Findex%2Fmiddle-redirect%3Fparams%3D%252Fweixin%252Fwechat.html%253Forder_sn%253D2021011610424878811%2526&response_type=code&scope=snsapi_base&state=STATE&connect_redirect=1#wechat_redirect";
+        p(urldecode($str));
+        $uuid    = WxService::get_uuid();p($uuid);
         $data = QxcTcw::QixingCaiBatch($type = 'json', $post['is_auto']=0);p($data);
         $rst['bet'] = BetService::betByUidNew($uid=10);p($rst); // 用户新计划投注，可正买可反买
         $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
@@ -213,7 +218,6 @@ class IndexController extends Controller
         $rst['visitIndex'] = BaoTaService::visitHomePage($id=1);p($rst);
         $rst = BaoTaService::getCronTabs();p($rst);
         $snInfo = JuHuaBaseService::getSn($uid =35, $tz_system_id = 11); p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
-        $rst = BetService::betOnePlan($plan_id=1642);p($rst);
         $lottery_type = 16;
         $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
         $qihao_2 = HN0898Service::getQihao($lottery_type);p([$qihao_1, $qihao_2]);
@@ -221,7 +225,6 @@ class IndexController extends Controller
         $data = JiaNaDa::getLottery($type='json', $is_auto=2);p($data);
         $activeQihao = BetService::getActiveQihao($uid=24, $tz_system_id=9, $lottery_type=8);p($activeQihao);
         $rst = BetService::repeatErrorBet();p($rst);
-        $rst = Lucky5Service::getQihaoInfo($uid=10, $tz_system_id=9, $lottery_type=8);p($rst);
         $rst = BaseService::login($id=39, $is_auto=2);p($rst);
         $rst = BingDaoService::login($uid = 12, $tz_system_id = 13);p($rst);
         //PoxyIPService::delProxyUidsKey();
@@ -479,7 +482,6 @@ class IndexController extends Controller
         $rst = StaticService::getCreateCodeType4nSql($lottery_type = 5);p($rst);
         $miss = SscDataService::getCodeTypeYlHistoryMiss('555', $lottery_type = 5, 20000);p($miss);
         $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);p($rst); # 号码类型遗漏
-        $miss = SscDataService::getSdHzYlHistoryMiss([26], $lottery_type = 6, 20000);p($miss);
         $rst = SscDataService::getLastIndexId(6);p($rst);
         $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 8);p($rst);
         $rst = StaticService::static2NumsYl($lottery_type = 8);p($rst);
@@ -730,8 +732,6 @@ class IndexController extends Controller
         //$rst5 = KjDataGet::getSscGrupTime();
         //$rst6 = OpKjService::opSscKjData();
         //$HN0898Service = new HN0898Service('gaozi2017', 10, 0.1, 1); $rst7 = $HN0898Service->getSnidBySn('SSC18060701220111649660C9'); p($rst7); // 获取方案内容
-        # 某个和值组合遗漏次数
-        $rst7 = HN0898Service::dwHzZuHeYL([2,3], [8,9]); p($rst7);
 
         p($data);
     }

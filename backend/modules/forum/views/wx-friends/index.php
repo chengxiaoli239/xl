@@ -37,7 +37,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'id',
                         //'Uin',
                         //'UserName',
-                        'NickName',
+                        //'NickName',
+                        ['attribute'=>'NickName','label'=>'昵称',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                return urldecode($model->NickName);
+                            }
+                        ],
                         //'HeadImgUrl',
                         ['attribute'=>'HeadImgUrl','label'=>'头像','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>['image',['height'=>30, 'width'=>30]],
