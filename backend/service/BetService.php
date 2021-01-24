@@ -1671,6 +1671,12 @@ abstract class BetService extends BaseBetService {
             $tz_system_id = $plan->tz_sites;
             $lottery_type = $plan->lottery_type;
             $uid = $plan->uid;
+            $qihao = HN0898Service::getQihao($lottery_type);
+            $next_qihao_is_active = TzService::beforeBet($lottery_type);
+            if($next_qihao_is_active['status'] != 200){
+                Tool_Common::log('next_qihao_is_active', 'INFO', '利润统计结束', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id]);
+                return ['status'=>200, 'msg'=>'利润统计未结束'.$lottery_type.'_'.$qihao];
+            }
 
             # 4、投注号码 codes
             $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
@@ -1687,7 +1693,6 @@ abstract class BetService extends BaseBetService {
             }
 
             if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
-                $qihao = HN0898Service::getQihao($lottery_type);
                 $tmpRst = self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
             }else{
                 Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-1', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'uid'=>$uid]);

@@ -42,11 +42,11 @@ class TzService extends BaseService {
      * @param $qihao
      * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      */
-    public static function beforeTz($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function beforeBet($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = Yii::$app->cache;
         $rst = ['status'=>200, 'msg'=>'可以投注~'];
         $qihao = HN0898Service::getQihao();
-        $mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$lottery_type.'_'.$qihao;
+        $mkey = TzService::buildNextKey($lottery_type, $qihao);
         $tzStatus = $m->get($mkey);
 
         # 判断当期开奖数据处理是否完成，未完成则不能下一期的投注
@@ -226,7 +226,7 @@ class TzService extends BaseService {
             $rst11[$plan->id]['next_time'] = $next_time;
         }
 
-        $next_simulate_mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$lottery_type.'_'.$next_qihao;
+        $next_simulate_mkey = TzService::buildNextKey($lottery_type, $next_qihao);
         $rst10['rst'] = $m->set($next_simulate_mkey,1,$next_time); # 模拟
         $rst10['next_simulate_mkey'] = $next_simulate_mkey;
         $rst10['next_time'] = $next_time;
@@ -251,6 +251,18 @@ class TzService extends BaseService {
         Tool_Common::log('afterRunSysPlans','INFO','系统计划处理后', $logData);
 
         return true;
+    }
+
+    /**
+     * @desc 下一期开启开关缓存
+     * @param int $lottery_type
+     * @param string $next_qihao
+     * @return string
+     */
+    public static function buildNextKey($lottery_type = DEFAULT_LOTTERY_TYPE, $next_qihao=''){
+        $next_mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$lottery_type.'_'.$next_qihao;
+
+        return $next_mkey;
     }
 
     /**
