@@ -1667,6 +1667,10 @@ abstract class BetService extends BaseBetService {
         $m = \Yii::$app->cache;
 
         $plans = UserSysPlans::find()->where($where)->all();
+        if(empty($plans)){
+            Tool_Common::log('plan_is_active', 'INFO', '投注计划', ['lottery_types'=>$lottery_types]);
+            return ['status'=>201, 'msg'=>'没有开启的计划'];
+        }
         foreach ($plans as $plan){
             $tz_system_id = $plan->tz_sites;
             $lottery_type = $plan->lottery_type;
