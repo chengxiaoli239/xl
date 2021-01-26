@@ -1,0 +1,786 @@
+A、General
+B、Request Header
+C、Query String Parameter
+C、Request Payload
+
+
+微信登陆步骤：
+一、扫码前
+1、获取uuid
+A、General
+	Request URL: https://login.wx2.qq.com/jslogin?appid=wx782c26e4c19acffb&redirect_uri=https%3A%2F%2Fwx2.qq.com%2Fcgi-bin%2Fmmwebwx-bin%2Fwebwxnewloginpage&fun=new&lang=zh_CN&_=1611672275235
+	Request Method: GET
+B、Request Header
+	Accept: */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Cookie: mm_lang=zh_CN
+	Host: login.wx2.qq.com
+	Referer: https://wx2.qq.com/
+	Sec-Fetch-Dest: script
+	Sec-Fetch-Mode: no-cors
+	Sec-Fetch-Site: same-site
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+返回：window.QRLogin.code = 200; window.QRLogin.uuid = "IYmtn2Cs-w==";
+2、开始登陆报告
+A、General
+	Request URL: https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxstatreport?fun=new&lang=zh_CN
+	Request Method: POST
+B、Request Header
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 1010
+	Content-Type: application/json;charset=UTF-8
+	Cookie: mm_lang=zh_CN; MM_WX_NOTIFY_STATE=1; MM_WX_SOUND_STATE=1
+	Host: wx2.qq.com
+	Origin: https://wx2.qq.com
+	Referer: https://wx2.qq.com/?&lang=zh_CN
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+C、Request Payload
+	{
+	  "BaseRequest": {
+		"Uin": "",
+		"Sid": "",
+		"DeviceID": "e219650688607339"
+	  },
+	  "Count": 2,
+	  "List": [
+		{
+		  "Type": 1,
+		  "Text": "{"type":"[
+			app-runtime
+		  ]","data":{"unload":{"listenerCount":117,"watchersCount":120,"scopesCount":34}}}"
+		},
+		{
+		  "Type": 1,
+		  "Text": "{"type":"[
+			app-timing
+		  ]","data":{"appTiming":{"qrcodeStart":1611672258175,"qrcodeEnd":1611672258413},"pageTiming":{"connectStart":1611672257572,"navigationStart":1611672257571,"loadEventEnd":0,"domLoading":1611672257701,"secureConnectionStart":0,"fetchStart":1611672257572,"domContentLoadedEventStart":1611672257994,"responseStart":1611672257682,"responseEnd":1611672257688,"domInteractive":1611672257994,"domainLookupEnd":1611672257572,"redirectStart":0,"requestStart":1611672257576,"unloadEventEnd":1611672257698,"unloadEventStart":1611672257697,"domComplete":1611672275192,"domainLookupStart":1611672257572,"loadEventStart":0,"domContentLoadedEventEnd":1611672257995,"redirectEnd":0,"connectEnd":1611672257572}}}"
+		}
+	  ]
+	}
+	返回：无返回
+
+3、步骤
+A、General
+	Request URL: https://wx2.qq.com/?&lang=zh_CN
+	Request Method: GET
+B、Request Header
+	Cache-Control: no-cache, must-revalidate
+	Connection: keep-alive
+	Content-Encoding: gzip
+	Content-Length: 19281
+	Content-Type: text/html; charset=utf-8
+	Set-Cookie: mm_lang=zh_CN; Domain=wx2.qq.com; Path=/; Expires=Wed, 27-Jan-2021 02:44:35 GMT; Secure
+	Strict-Transport-Security: max-age=31536000
+B、Request Header
+	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Cache-Control: max-age=0
+	Connection: keep-alive
+	Host: wx2.qq.com
+	Sec-Fetch-Dest: document
+	Sec-Fetch-Mode: navigate
+	Sec-Fetch-Site: none
+	Sec-Fetch-User: ?1
+	Upgrade-Insecure-Requests: 1
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+C、Query String Parameter
+	&lang=zh_CN
+	
+4、jslogin登陆预请求
+A、General
+	Request URL: https://login.wx2.qq.com/jslogin?appid=wx782c26e4c19acffb&redirect_uri=https%3A%2F%2Fwx2.qq.com%2Fcgi-bin%2Fmmwebwx-bin%2Fwebwxnewloginpage&fun=new&lang=zh_CN&_=1611672275235
+	Request Method: GET
+B、Request Header
+	Accept: */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Cookie: mm_lang=zh_CN
+	Host: login.wx2.qq.com
+	Referer: https://wx2.qq.com/
+	Sec-Fetch-Dest: script
+	Sec-Fetch-Mode: no-cors
+	Sec-Fetch-Site: same-site
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+C、Query String Parameter
+	appid: wx782c26e4c19acffb
+	redirect_uri: https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxnewloginpage
+	fun: new
+	lang: zh_CN
+	_: 1611672275235
+
+5、步骤5
+A、General
+	Request URL: https://login.weixin.qq.com/qrcode/IYmtn2Cs-w==
+	Request Method: GET
+B、Request Header
+	Accept: image/avif,image/webp,image/apng,image/*,*/*;q=0.8
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Host: login.weixin.qq.com
+	Referer: https://wx2.qq.com/
+	Sec-Fetch-Dest: image
+	Sec-Fetch-Mode: no-cors
+	Sec-Fetch-Site: same-site
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+返回：无返回
+
+
+二、扫码之后
+1、扫码之后轮询请求是否点击确认登陆状态
+A、General
+	Request URL: https://login.wx2.qq.com/cgi-bin/mmwebwx-bin/login?loginicon=true&uuid=gcUh-c3f5w==&tip=0&r=-1061690180&_=1611674387678
+	Request Method: GET
+B、Request Header
+	Accept: */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Cookie: mm_lang=zh_CN
+	Host: login.wx2.qq.com
+	Referer: https://wx2.qq.com/
+	Sec-Fetch-Dest: script
+	Sec-Fetch-Mode: no-cors
+	Sec-Fetch-Site: same-site
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+C、Query String Parameter
+	loginicon: true
+	uuid: gcUh-c3f5w==
+	tip: 0
+	r: -1061690180
+	_: 1611674387678
+返回：
+	a.失败(尚未点击确认登陆)
+		window.code = 201;
+		window.userAvatar = 'data:img/jpg;base64,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';
+	b.成功(已点击确认登陆)
+		window.code=200;
+		window.redirect_uri="https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxnewloginpage?ticket=AzeYiiVyd05sBJGENEXV4Kll@qrticket_0&uuid=gcUh-c3f5w==&lang=zh_CN&scan=1611674425";
+
+2、获取微信新的登陆页面
+A、General
+	Request URL: https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxnewloginpage?ticket=AzeYiiVyd05sBJGENEXV4Kll@qrticket_0&uuid=gcUh-c3f5w==&lang=zh_CN&scan=1611674425&fun=new&version=v2&lang=zh_CN
+	Request Method: GET
+B、Response Headers
+	Connection: keep-alive
+	Content-Encoding: gzip
+	Content-Length: 238
+	Content-Type: text/plain;charset=utf-8
+	Set-Cookie: wxuin=1120382433; Domain=wx2.qq.com; Path=/; Expires=Wed, 27-Jan-2021 03:20:29 GMT; Secure
+	Set-Cookie: wxsid=uOcm0aQ3hwhq3U8E; Domain=wx2.qq.com; Path=/; Expires=Wed, 27-Jan-2021 03:20:29 GMT; Secure
+	Set-Cookie: wxloadtime=1611674429; Domain=wx2.qq.com; Path=/; Expires=Wed, 27-Jan-2021 03:20:29 GMT; Secure
+	Set-Cookie: mm_lang=zh_CN; Domain=wx2.qq.com; Path=/; Expires=Wed, 27-Jan-2021 03:20:29 GMT; Secure
+	Set-Cookie: webwx_data_ticket=gSc4JWKbL/veg69icySP9adU; Domain=.qq.com; Path=/; Expires=Wed, 27-Jan-2021 03:20:29 GMT; Secure
+	Set-Cookie: webwxuvid=268881558dae1c261dca0f0a1c74aaa7b014816c2e7c50cc816ecf7ffbd50ed707c83d12add001c7738d9a6d900e9232; Domain=wx2.qq.com; Path=/; Expires=Fri, 24-Jan-2031 15:20:29 GMT; Secure
+	Set-Cookie: webwx_auth_ticket=CIsBELnbj+gDGoABGKcIKD/GouY+/as6Nl9gvDYwLYQX5VWUcxv9W0w9VNEXtVEWdhuKm4kl6yCFJ4Gr7AYFNVfZXeJyJryWEmii0dHA/zzVqZZ+j/ojZLVNLRnjFez/JD+bqwHrtin/6bchRewg3tfXsd+gz04QtYxSyJCgxhZR0LjmR3d+ZcwKiOM=; Domain=wx2.qq.com; Path=/; Expires=Fri, 24-Jan-2031 15:20:29 GMT; Secure
+	Strict-Transport-Security: max-age=31536000
+C、Request Header
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Cookie: mm_lang=zh_CN; MM_WX_NOTIFY_STATE=1; MM_WX_SOUND_STATE=1; refreshTimes=5
+	Host: wx2.qq.com
+	Referer: https://wx2.qq.com/?&lang=zh_CN
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+D、Query String Parameter
+	ticket: AzeYiiVyd05sBJGENEXV4Kll@qrticket_0
+	uuid: gcUh-c3f5w==
+	lang: zh_CN
+	scan: 1611674425
+	fun: new
+	version: v2
+	lang: zh_CN
+返回：
+	<error><ret>0</ret><message></message><skey>@crypt_133e5bb7_48be0fb82d0e50758696333935f518ce</skey><wxsid>uOcm0aQ3hwhq3U8E</wxsid><wxuin>1120382433</wxuin><pass_ticket>kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%2Fr</pass_ticket><isgrayscale>1</isgrayscale></error>
+3、初始化微信(失败情况可能有多次请求)
+A、General
+	Request URL: https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxinit?r=-1061651716&lang=zh_CN&pass_ticket=kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%252Fr
+	Request Method: POST
+B、Request Header
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 149
+	Content-Type: application/json;charset=UTF-8
+	Cookie: mm_lang=zh_CN; MM_WX_NOTIFY_STATE=1; MM_WX_SOUND_STATE=1; refreshTimes=5; wxuin=1120382433; wxsid=uOcm0aQ3hwhq3U8E; wxloadtime=1611674429; webwx_data_ticket=gSc4JWKbL/veg69icySP9adU; webwxuvid=268881558dae1c261dca0f0a1c74aaa7b014816c2e7c50cc816ecf7ffbd50ed707c83d12add001c7738d9a6d900e9232; webwx_auth_ticket=CIsBELnbj+gDGoABGKcIKD/GouY+/as6Nl9gvDYwLYQX5VWUcxv9W0w9VNEXtVEWdhuKm4kl6yCFJ4Gr7AYFNVfZXeJyJryWEmii0dHA/zzVqZZ+j/ojZLVNLRnjFez/JD+bqwHrtin/6bchRewg3tfXsd+gz04QtYxSyJCgxhZR0LjmR3d+ZcwKiOM=; login_frequency=1; last_wxuin=1120382433
+	Host: wx2.qq.com
+	Origin: https://wx2.qq.com
+	Referer: https://wx2.qq.com/?&lang=zh_CN
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+C、Query String Parameter
+	r: -1061651716
+	lang: zh_CN
+	pass_ticket: kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%252Fr
+D、Request Payload
+	{"BaseRequest":{"Uin":"1120382433","Sid":"uOcm0aQ3hwhq3U8E","Skey":"@crypt_133e5bb7_48be0fb82d0e50758696333935f518ce","DeviceID":"e880908437260728"}}
+
+4、获取微信 MsgID
+A、General
+	Request URL: https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxstatusnotify?lang=zh_CN&pass_ticket=kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%252Fr
+	Request Method: POST
+B、Request Header
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 348
+	Content-Type: application/json;charset=UTF-8
+	Cookie: mm_lang=zh_CN; MM_WX_NOTIFY_STATE=1; MM_WX_SOUND_STATE=1; refreshTimes=5; wxuin=1120382433; wxsid=uOcm0aQ3hwhq3U8E; wxloadtime=1611674429; webwx_data_ticket=gSc4JWKbL/veg69icySP9adU; webwxuvid=268881558dae1c261dca0f0a1c74aaa7b014816c2e7c50cc816ecf7ffbd50ed707c83d12add001c7738d9a6d900e9232; webwx_auth_ticket=CIsBELnbj+gDGoABGKcIKD/GouY+/as6Nl9gvDYwLYQX5VWUcxv9W0w9VNEXtVEWdhuKm4kl6yCFJ4Gr7AYFNVfZXeJyJryWEmii0dHA/zzVqZZ+j/ojZLVNLRnjFez/JD+bqwHrtin/6bchRewg3tfXsd+gz04QtYxSyJCgxhZR0LjmR3d+ZcwKiOM=; login_frequency=1; last_wxuin=1120382433
+	Host: wx2.qq.com
+	Origin: https://wx2.qq.com
+	Referer: https://wx2.qq.com/?&lang=zh_CN
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+C、Query String Parameter
+	lang: zh_CN
+	pass_ticket: kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%252Fr
+D、Request Payload
+	{"BaseRequest":{"Uin":1120382433,"Sid":"uOcm0aQ3hwhq3U8E","Skey":"@crypt_133e5bb7_48be0fb82d0e50758696333935f518ce","DeviceID":"e708609070072133"},"Code":3,"FromUserName":"@2fcf53182c69725227d231c6167c10a7ba883fb3d7599def36ea8246a106815a","ToUserName":"@2fcf53182c69725227d231c6167c10a7ba883fb3d7599def36ea8246a106815a","ClientMsgId":1611674430195}
+
+5、获取微信联系人列表(可能是当前对话列表)
+A、General
+	Request URL: https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetcontact?lang=zh_CN&pass_ticket=kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%252Fr&r=1611674430286&seq=0&skey=@crypt_133e5bb7_48be0fb82d0e50758696333935f518ce
+	Request Method: GET
+B、Request Header
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Cookie: mm_lang=zh_CN; MM_WX_NOTIFY_STATE=1; MM_WX_SOUND_STATE=1; refreshTimes=5; wxuin=1120382433; wxsid=uOcm0aQ3hwhq3U8E; wxloadtime=1611674429; webwx_data_ticket=gSc4JWKbL/veg69icySP9adU; webwxuvid=268881558dae1c261dca0f0a1c74aaa7b014816c2e7c50cc816ecf7ffbd50ed707c83d12add001c7738d9a6d900e9232; webwx_auth_ticket=CIsBELnbj+gDGoABGKcIKD/GouY+/as6Nl9gvDYwLYQX5VWUcxv9W0w9VNEXtVEWdhuKm4kl6yCFJ4Gr7AYFNVfZXeJyJryWEmii0dHA/zzVqZZ+j/ojZLVNLRnjFez/JD+bqwHrtin/6bchRewg3tfXsd+gz04QtYxSyJCgxhZR0LjmR3d+ZcwKiOM=; login_frequency=1; last_wxuin=1120382433
+	Host: wx2.qq.com
+	Referer: https://wx2.qq.com/?&lang=zh_CN
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+C、Query String Parameter
+	lang: zh_CN
+	pass_ticket: kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%2Fr
+	r: 1611674430286
+	seq: 0
+	skey: @crypt_133e5bb7_48be0fb82d0e50758696333935f518ce
+返回：
+{
+  "BaseResponse": {
+    "Ret": 0,
+    "ErrMsg": ""
+  },
+  "MemberCount": 176,
+  "MemberList": [
+    {
+      "Uin": 0,
+      "UserName": "@3d770f54d4fefa9a46322770afd85326",
+      "NickName": "å¯å¯ç¬‘å·¥åŠ",
+      "HeadImgUrl": "/cgi-bin/mmwebwx-bin/webwxgeticon?seq=621960107&username=@3d770f54d4fefa9a46322770afd85326&skey=@crypt_133e5bb7_48be0fb82d0e50758696333935f518ce",
+      "ContactFlag": 3,
+      "MemberCount": 0,
+      "MemberList": [
+        
+      ],
+      "RemarkName": "",
+      "HideInputBarFlag": 0,
+      "Sex": 0,
+      "Signature": "çŠ€åˆ©çš„æ–°é²œå¹½é»˜ï¼Œç¿æ™ºçš„äººç”Ÿå“²ç†",
+      "VerifyFlag": 8,
+      "OwnerUin": 0,
+      "PYInitial": "KKXGF",
+      "PYQuanPin": "kekexiaogongfang",
+      "RemarkPYInitial": "",
+      "RemarkPYQuanPin": "",
+      "StarFriend": 0,
+      "AppAccountFlag": 0,
+      "Statues": 0,
+      "AttrStatus": 0,
+      "Province": "å®‰å¾½",
+      "City": "åˆè‚¥",
+      "Alias": "",
+      "SnsFlag": 0,
+      "UniFriend": 0,
+      "DisplayName": "",
+      "ChatRoomId": 0,
+      "KeyWord": "gh_",
+      "EncryChatRoomId": "",
+      "IsOwner": 0
+    },
+    {
+      "Uin": 0,
+      "UserName": "@d3587b78d83f6663d560825183086d3a265d0398a9d28b2f489458fd9b2ba1c8",
+      "NickName": "å¶ç§‹",
+      "HeadImgUrl": "/cgi-bin/mmwebwx-bin/webwxgeticon?seq=649720149&username=@d3587b78d83f6663d560825183086d3a265d0398a9d28b2f489458fd9b2ba1c8&skey=@crypt_133e5bb7_48be0fb82d0e50758696333935f518ce",
+      "ContactFlag": 3,
+      "MemberCount": 0,
+      "MemberList": [
+        
+      ],
+      "RemarkName": "",
+      "HideInputBarFlag": 0,
+      "Sex": 1,
+      "Signature": "",
+      "VerifyFlag": 0,
+      "OwnerUin": 0,
+      "PYInitial": "YQ",
+      "PYQuanPin": "yeqiu",
+      "RemarkPYInitial": "",
+      "RemarkPYQuanPin": "",
+      "StarFriend": 0,
+      "AppAccountFlag": 0,
+      "Statues": 0,
+      "AttrStatus": 104449,
+      "Province": "æ²³åŒ—",
+      "City": "ä¿å®š",
+      "Alias": "",
+      "SnsFlag": 49,
+      "UniFriend": 0,
+      "DisplayName": "",
+      "ChatRoomId": 0,
+      "KeyWord": "",
+      "EncryChatRoomId": "",
+      "IsOwner": 0
+    }
+  ]
+}
+6、同步状态检测[心跳,每次请求需25秒才会有返回]
+A、General
+	Request URL: https://webpush.wx2.qq.com/cgi-bin/mmwebwx-bin/synccheck?r=1611674430289&skey=%40crypt_133e5bb7_48be0fb82d0e50758696333935f518ce&sid=uOcm0aQ3hwhq3U8E&uin=1120382433&deviceid=e185251991178316&synckey=1_728449707%7C2_728449725%7C3_728449639%7C1000_1611669606&_=1611674387679
+	Request Method: GET
+B、Request Header
+	Accept: */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Cookie: mm_lang=zh_CN; wxuin=1120382433; wxsid=uOcm0aQ3hwhq3U8E; wxloadtime=1611674429; webwx_data_ticket=gSc4JWKbL/veg69icySP9adU; webwxuvid=268881558dae1c261dca0f0a1c74aaa7b014816c2e7c50cc816ecf7ffbd50ed707c83d12add001c7738d9a6d900e9232; webwx_auth_ticket=CIsBELnbj+gDGoABGKcIKD/GouY+/as6Nl9gvDYwLYQX5VWUcxv9W0w9VNEXtVEWdhuKm4kl6yCFJ4Gr7AYFNVfZXeJyJryWEmii0dHA/zzVqZZ+j/ojZLVNLRnjFez/JD+bqwHrtin/6bchRewg3tfXsd+gz04QtYxSyJCgxhZR0LjmR3d+ZcwKiOM=
+	Host: webpush.wx2.qq.com
+	Referer: https://wx2.qq.com/
+	Sec-Fetch-Dest: script
+	Sec-Fetch-Mode: no-cors
+	Sec-Fetch-Site: same-site
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+C、Query String Parameter
+	r: 1611674430289
+	skey: @crypt_133e5bb7_48be0fb82d0e50758696333935f518ce
+	sid: uOcm0aQ3hwhq3U8E
+	uin: 1120382433
+	deviceid: e185251991178316
+	synckey: 1_728449707|2_728449725|3_728449639|1000_1611669606
+	_: 1611674387679
+返回：	
+	1、window.synccheck={retcode:"0",selector:"2"}
+	2、window.synccheck={retcode:"0",selector:"0"}
+	
+7、获取联系人列表2(可能是我的好友)
+A、General
+	Request URL: https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxbatchgetcontact?type=ex&r=1611674430408&lang=zh_CN&pass_ticket=kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%252Fr
+	Request Method: POST
+B、Request Header
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 264
+	Content-Type: application/json;charset=UTF-8
+	Cookie: mm_lang=zh_CN; MM_WX_NOTIFY_STATE=1; MM_WX_SOUND_STATE=1; refreshTimes=5; wxuin=1120382433; wxsid=uOcm0aQ3hwhq3U8E; wxloadtime=1611674429; webwx_data_ticket=gSc4JWKbL/veg69icySP9adU; webwxuvid=268881558dae1c261dca0f0a1c74aaa7b014816c2e7c50cc816ecf7ffbd50ed707c83d12add001c7738d9a6d900e9232; webwx_auth_ticket=CIsBELnbj+gDGoABGKcIKD/GouY+/as6Nl9gvDYwLYQX5VWUcxv9W0w9VNEXtVEWdhuKm4kl6yCFJ4Gr7AYFNVfZXeJyJryWEmii0dHA/zzVqZZ+j/ojZLVNLRnjFez/JD+bqwHrtin/6bchRewg3tfXsd+gz04QtYxSyJCgxhZR0LjmR3d+ZcwKiOM=; login_frequency=1; last_wxuin=1120382433
+	Host: wx2.qq.com
+	Origin: https://wx2.qq.com
+	Referer: https://wx2.qq.com/?&lang=zh_CN
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+C、Query String Parameter
+	type: ex
+	r: 1611674430408
+	lang: zh_CN
+	pass_ticket: kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%252Fr
+D、Request Payload
+	{"BaseRequest":{"Uin":1120382433,"Sid":"uOcm0aQ3hwhq3U8E","Skey":"@crypt_133e5bb7_48be0fb82d0e50758696333935f518ce","DeviceID":"e002532916896860"},"Count":1,"List":[{"UserName":"@@98cd0f9fdf87f329c6bfed5821048a8b2f017e3ecd7d30bf6708dcac0c15b6db","ChatRoomId":""}]}
+返回：
+{
+  "BaseResponse": {
+    "Ret": 0,
+    "ErrMsg": ""
+  },
+  "Count": 1,
+  "ContactList": [
+    {
+      "Uin": 0,
+      "UserName": "@@98cd0f9fdf87f329c6bfed5821048a8b2f017e3ecd7d30bf6708dcac0c15b6db",
+      "NickName": "æ­£èƒ½é‡ç¾¤ï¼ŒåŠ æ²¹!",
+      "HeadImgUrl": "/cgi-bin/mmwebwx-bin/webwxgetheadimg?seq=711103432&username=@@98cd0f9fdf87f329c6bfed5821048a8b2f017e3ecd7d30bf6708dcac0c15b6db&skey=",
+      "ContactFlag": 2,
+      "MemberCount": 18,
+      "MemberList": [
+        {
+          "Uin": 0,
+          "UserName": "@98ff6056edd7d0679f84899f23e596bf1f1a96b452996f20b1050d3fe934316f",
+          "NickName": "å† é¹åŠžå…¬ç”¨å“è¶…å¸‚é»„é¹",
+          "AttrStatus": 102437,
+          "PYInitial": "",
+          "PYQuanPin": "",
+          "RemarkPYInitial": "",
+          "RemarkPYQuanPin": "",
+          "MemberStatus": 0,
+          "DisplayName": "",
+          "KeyWord": ""
+        },
+        {
+          "Uin": 0,
+          "UserName": "@5b14153eaaa842895e48c01ba598405330b93b93097d51b65b3e11459fc47b8c",
+          "NickName": "é’æ©™",
+          "AttrStatus": 2151751013,
+          "PYInitial": "",
+          "PYQuanPin": "",
+          "RemarkPYInitial": "",
+          "RemarkPYQuanPin": "",
+          "MemberStatus": 0,
+          "DisplayName": "",
+          "KeyWord": ""
+        }
+      ]
+    }
+  ]
+}
+8、同步微信（9.2一样，这里可以先忽略）
+A、General
+	Request URL: https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxsync?sid=uOcm0aQ3hwhq3U8E&skey=@crypt_133e5bb7_48be0fb82d0e50758696333935f518ce&lang=zh_CN&pass_ticket=kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%252Fr
+	Request Method: POST
+B、Response Headers
+	Connection: keep-alive
+	Content-Encoding: gzip
+	Content-Length: 364
+	Content-Type: text/plain
+	Set-Cookie: wxloadtime=1611674429_expired; Domain=wx2.qq.com; Path=/; Expires=Wed, 27-Jan-2021 03:20:30 GMT; Secure
+	Set-Cookie: wxpluginkey=1611669606; Domain=wx2.qq.com; Path=/; Expires=Wed, 27-Jan-2021 03:20:30 GMT; Secure
+	Set-Cookie: wxuin=1120382433; Domain=wx2.qq.com; Path=/; Expires=Fri, 29-Jan-2021 15:20:30 GMT; Secure
+	Set-Cookie: wxsid=uOcm0aQ3hwhq3U8E; Domain=wx2.qq.com; Path=/; Expires=Wed, 27-Jan-2021 03:20:30 GMT; Secure
+	Set-Cookie: webwx_data_ticket=gSc4JWKbL/veg69icySP9adU; Domain=.qq.com; Path=/; Expires=Wed, 27-Jan-2021 03:20:30 GMT; Secure
+	Strict-Transport-Security: max-age=31536000
+C、Request Header
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 404
+	Content-Type: application/json;charset=UTF-8
+	Cookie: mm_lang=zh_CN; MM_WX_NOTIFY_STATE=1; MM_WX_SOUND_STATE=1; refreshTimes=5; wxuin=1120382433; wxsid=uOcm0aQ3hwhq3U8E; webwx_data_ticket=gSc4JWKbL/veg69icySP9adU; webwxuvid=268881558dae1c261dca0f0a1c74aaa7b014816c2e7c50cc816ecf7ffbd50ed707c83d12add001c7738d9a6d900e9232; webwx_auth_ticket=CIsBELnbj+gDGoABGKcIKD/GouY+/as6Nl9gvDYwLYQX5VWUcxv9W0w9VNEXtVEWdhuKm4kl6yCFJ4Gr7AYFNVfZXeJyJryWEmii0dHA/zzVqZZ+j/ojZLVNLRnjFez/JD+bqwHrtin/6bchRewg3tfXsd+gz04QtYxSyJCgxhZR0LjmR3d+ZcwKiOM=; login_frequency=1; last_wxuin=1120382433; wxloadtime=1611674429_expired; wxpluginkey=1611669606
+	Host: wx2.qq.com
+	Origin: https://wx2.qq.com
+	Referer: https://wx2.qq.com/?&lang=zh_CN
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+D、Query String Parameter
+	sid: uOcm0aQ3hwhq3U8E
+	skey: @crypt_133e5bb7_48be0fb82d0e50758696333935f518ce
+	lang: zh_CN
+	pass_ticket: kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%252Fr
+E、Request Payload
+	{"BaseRequest":{"Uin":1120382433,"Sid":"uOcm0aQ3hwhq3U8E","Skey":"@crypt_133e5bb7_48be0fb82d0e50758696333935f518ce","DeviceID":"e757380592793035"},"SyncKey":{"Count":8,"List":[{"Key":1,"Val":728449707},{"Key":2,"Val":728449726},{"Key":3,"Val":728449639},{"Key":11,"Val":728443908},{"Key":19,"Val":2172},{"Key":206,"Val":103},{"Key":1000,"Val":1611669606},{"Key":1001,"Val":1611665360}]},"rr":-1061694836}
+返回：
+{
+  "BaseResponse": {
+    "Ret": 0,
+    "ErrMsg": ""
+  },
+  "AddMsgCount": 1,
+  "AddMsgList": [
+    {
+      "MsgId": "5362848928509530202",
+      "FromUserName": "@2fcf53182c69725227d231c6167c10a7ba883fb3d7599def36ea8246a106815a",
+      "ToUserName": "@2fcf53182c69725227d231c6167c10a7ba883fb3d7599def36ea8246a106815a",
+      "MsgType": 51,
+      "Content": "",
+      "Status": 3,
+      "ImgStatus": 1,
+      "CreateTime": 1611674430,
+      "VoiceLength": 0,
+      "PlayLength": 0,
+      "FileName": "",
+      "FileSize": "",
+      "MediaId": "",
+      "Url": "",
+      "AppMsgType": 0,
+      "StatusNotifyCode": 4,
+      "StatusNotifyUserName": "filehelper,@4324b1062d33fc48de42763fbe4bdfef,@1bd1251c8870dc71f30890cb951166b9,@07ca880fd95463b4b785eb476f4efacb,@dbb7a548c8eaaa551fbf483fea1b7e11bdf587d1edc8cb27d77bb6a6de75f105,@@98cd0f9fdf87f329c6bfed5821048a8b2f017e3ecd7d30bf6708dcac0c15b6db,@81391303fd1e4d96bc0e98cb785a9f4ba9097e0b7829a23dc158f6f1f01a253a,@7df4b8b899336283b333bd2f5631c6e6,@0e642fe6aee236b28c9c177d795c4077e5aa9edd53aebdcb38a41f2fc7374da4,@@89d0303f5977a4450d4d74bede2c48f444651c98b8186007fdd2d35602e083e5,@3a387defa57bd4621c147da9d410c3b422e1f71f122285c696d0490af5913610,@b480941d27c50d524f927fa55250d1b377b89f6a7e911db921ff516af65ab2a7,@64be7ef33e35e5ef0d20b0f8bf58d815,@f58f62b2e73cb7dcaecc6e9914f36d920cbd826ef720e295530a91b93acc35d7,@03db6d710d63e6ab337968c293a50a9d,@f2acae1bfde835b6206aeaff41fe6e352497d4b74992d18f3633c537b692565d,@0ef2088f86bd90d2d44b574f66804d08,@c56136183d9458cdffa5e9aa2238aebb,@aead0e2b9fe79bdd26133457292e8b12,@f9f79e15cae94f88fe1a06278c7d0dad97b098cef3f585ac3239e615ebeeb295,@48b15cb00732d9b9fa8f9f4ebdc1d91e55739bc7dcbd88bdcf2064904232a052,@48b1f1cbdbe11013883519cf8ee3d937a2726ff8843f42aa69c675cb373c8709,@8d36ccdf054adfc31509e6b0607bda394b21393aa99f81fbc10d483efb52d2fd,@e33bcf6304e8a7af772bbe30baf6095b,@6a4fe5c704050f518421719a0e0b49418634b5a8abb68f6217c32862e2e567d1,@a70ba2b3f0e74149782affd97da11318cf937816cf5e5e8a8584a991deaabaf8,@09e775adb62174af8f1f67dc12b72451e3ad0d0fc3b03f5b862ca34f1add827a,@0f812b2c3bbdfb64861e2de092742b0479f3c7a7168be7a822e700f3ec246df0,@4b1f14cec63003fd68fc3fa8ff225c8d,@2e4fd2e25fb8df9b3223c6d1aca15257,@9bae6d3e6f9c3335f645754e1cd340c801015e69765530920c9f595a5bce5aa4,@9738e792b165edbe933360a800daab44,@821fd0cf8a237ec6aa119aed0012548f,@397642848241679027619d543ff9b1243038c8f3256e7191d2b03c51eb8db971,@6e590ba79017e172fa18e0d961823228e318a6896ae8f94825d96a09bc4d286d,@c5623c52f27eea97bff6d8504a95f90dddf98eb72f9c0ea37f224a97a6ffbdeb,@f5c3615d420c53a7a131a7c6bd70136f,@b8e945071b7e2ca3b6768ba500ee124e,@39aa4be6d699918d9ed1956138e5ee4b,@1ba60f59d0920f2cee33fcaa56d6d086,@e52f730f81fedef8ab124733699abae9,@c110ef886184a3da4ead5cb7a754feaeaf26b9118ad2de3f62b600d4b16c79a5,@@c97cbd3b737312e4ffc165ab0babac84fb9cec3ca7c19b2e68b9f856ff112880,@b2d4e2704fc3a9d49af54d77ace8e53e65a0d9085b9434e9a52d1f5d3bdc6c27,@@0c9250d5024a82e348a8c5d3372eabdcc87e5d2b7d2ce8481157e9a7d2580b04,@df3d7e8324314308f90d65c20a338f90ab21350de20d87d7725b08a0e75a7951,@97c38657bf43f651537d83765465176976f03b2b8180e217f879f52f221600d4,@ba9cb6bc3dfe6c1ca4a68203cc7a5245617da5895a2570f4298013c1ebdbc4ce,@@4265049caef1de27f613dc05ac8e65febb2126804d63bd0e60d0e7411d317241,@ddcb7a2273d8752665b5e5194a603d0bdf9927a3ed167b2ad0d1f234020c9b32,@db468744783a6843ed7fb6cc3ad07c8c,@c806f333db76883621e61aa8686bb35ae3769b3ecacdd3fc25b8b2bac4a1259e,@a7cc8e5640c0fa1aef72e5393cbe5be1,@44e6ddbf46255bad0bb948cb329f08c158502951260958f469e257c62bacd5db,@bc0a65eff2231a5d5891ba807f55cf78,weixin,@bd48f009205049f7ce9acd80398ba254d354e7c20d58e50f44a1a91230eeaf66,@e74ddcc8b2b261706a70a63c44ada35d6c18ced02446cb40f6b63a363ec441cc,@172be8f24f85d9105a0d33883f77a4f9,@1922609073189ba595181f3894bdf6cc45a1c83104142317a1f4d43270f12710,@f8062e2c4da2acd6a46b2affbb5131e18bf1ff68b84f93e29dc987dbd7164589,@32bfa9a2a744a0b5034581c4aba7c5f066b484d7fd445e85c0b45d1e50053063,@3a05e207fffbffd914ad6e8f731927b9",
+      "RecommendInfo": {
+        "UserName": "",
+        "NickName": "",
+        "QQNum": 0,
+        "Province": "",
+        "City": "",
+        "Content": "",
+        "Signature": "",
+        "Alias": "",
+        "Scene": 0,
+        "VerifyFlag": 0,
+        "AttrStatus": 0,
+        "Sex": 0,
+        "Ticket": "",
+        "OpCode": 0
+      },
+      "ForwardFlag": 0,
+      "AppInfo": {
+        "AppID": "",
+        "Type": 0
+      },
+      "HasProductId": 0,
+      "Ticket": "",
+      "ImgHeight": 0,
+      "ImgWidth": 0,
+      "SubMsgType": 0,
+      "NewMsgId": 5362848928509530202,
+      "OriContent": "",
+      "EncryFileName": ""
+    }
+  ],
+  "ModContactCount": 0,
+  "ModContactList": [
+    
+  ],
+  "DelContactCount": 0,
+  "DelContactList": [
+    
+  ],
+  "ModChatRoomMemberCount": 0,
+  "ModChatRoomMemberList": [
+    
+  ],
+  "Profile": {
+    "BitFlag": 0,
+    "UserName": {
+      "Buff": ""
+    },
+    "NickName": {
+      "Buff": ""
+    },
+    "BindUin": 0,
+    "BindEmail": {
+      "Buff": ""
+    },
+    "BindMobile": {
+      "Buff": ""
+    },
+    "Status": 0,
+    "Sex": 0,
+    "PersonalCard": 0,
+    "Alias": "",
+    "HeadImgUpdateFlag": 0,
+    "HeadImgUrl": "",
+    "Signature": ""
+  },
+  "ContinueFlag": 0,
+  "SyncKey": {
+    "Count": 9,
+    "List": [
+      {
+        "Key": 1,
+        "Val": 728449707
+      },
+      {
+        "Key": 2,
+        "Val": 728449727
+      },
+      {
+        "Key": 3,
+        "Val": 728449639
+      },
+      {
+        "Key": 11,
+        "Val": 728443908
+      },
+      {
+        "Key": 19,
+        "Val": 2172
+      },
+      {
+        "Key": 201,
+        "Val": 1611674430
+      },
+      {
+        "Key": 206,
+        "Val": 103
+      },
+      {
+        "Key": 1000,
+        "Val": 1611669606
+      },
+      {
+        "Key": 1001,
+        "Val": 1611665360
+      }
+    ]
+  },
+  "SKey": "",
+  "SyncCheckKey": {
+    "Count": 9,
+    "List": [
+      {
+        "Key": 1,
+        "Val": 728449707
+      },
+      {
+        "Key": 2,
+        "Val": 728449727
+      },
+      {
+        "Key": 3,
+        "Val": 728449639
+      },
+      {
+        "Key": 11,
+        "Val": 728443908
+      },
+      {
+        "Key": 19,
+        "Val": 2172
+      },
+      {
+        "Key": 201,
+        "Val": 1611674430
+      },
+      {
+        "Key": 206,
+        "Val": 103
+      },
+      {
+        "Key": 1000,
+        "Val": 1611669606
+      },
+      {
+        "Key": 1001,
+        "Val": 1611665360
+      }
+    ]
+  }
+}
+每次发消息请求
+9.0 跟9.2一样
+9.1 发送
+A、General
+	Request URL: https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxsendmsg?lang=zh_CN&pass_ticket=kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%252Fr
+	Request Method: POST
+B、Request Header
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 361
+	Content-Type: application/json;charset=UTF-8
+	Cookie: mm_lang=zh_CN; MM_WX_NOTIFY_STATE=1; MM_WX_SOUND_STATE=1; refreshTimes=5; wxuin=1120382433; wxsid=uOcm0aQ3hwhq3U8E; webwx_data_ticket=gSc4JWKbL/veg69icySP9adU; webwxuvid=268881558dae1c261dca0f0a1c74aaa7b014816c2e7c50cc816ecf7ffbd50ed707c83d12add001c7738d9a6d900e9232; webwx_auth_ticket=CIsBELnbj+gDGoABGKcIKD/GouY+/as6Nl9gvDYwLYQX5VWUcxv9W0w9VNEXtVEWdhuKm4kl6yCFJ4Gr7AYFNVfZXeJyJryWEmii0dHA/zzVqZZ+j/ojZLVNLRnjFez/JD+bqwHrtin/6bchRewg3tfXsd+gz04QtYxSyJCgxhZR0LjmR3d+ZcwKiOM=; login_frequency=1; last_wxuin=1120382433; wxloadtime=1611674429_expired; wxpluginkey=1611669606
+	Host: wx2.qq.com
+	Origin: https://wx2.qq.com
+	Referer: https://wx2.qq.com/?&lang=zh_CN
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+C、Query String Parameter
+	lang: zh_CN
+	pass_ticket: kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%252Fr
+D、Request Payload
+	{"BaseRequest":{"Uin":1120382433,"Sid":"uOcm0aQ3hwhq3U8E","Skey":"@crypt_133e5bb7_48be0fb82d0e50758696333935f518ce","DeviceID":"e105780578501133"},"Msg":{"Type":1,"Content":"x","FromUserName":"@2fcf53182c69725227d231c6167c10a7ba883fb3d7599def36ea8246a106815a","ToUserName":"filehelper","LocalID":"16116838563830130","ClientMsgId":"16116838563830130"},"Scene":0}
+
+9.2 同步消息(每次发消息9.1前后都会调用)
+A、General
+	Request URL: https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxsync?sid=uOcm0aQ3hwhq3U8E&skey=@crypt_133e5bb7_48be0fb82d0e50758696333935f518ce&lang=zh_CN&pass_ticket=kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%252Fr
+	Request Method: POST
+B、Response Headers
+	Connection: keep-alive
+	Content-Encoding: gzip
+	Content-Length: 377
+	Content-Type: text/plain
+	Set-Cookie: wxpluginkey=1611669606; Domain=wx2.qq.com; Path=/; Expires=Wed, 27-Jan-2021 05:57:36 GMT; Secure
+	Set-Cookie: wxuin=1120382433; Domain=wx2.qq.com; Path=/; Expires=Fri, 29-Jan-2021 17:57:36 GMT; Secure
+	Set-Cookie: wxsid=uOcm0aQ3hwhq3U8E; Domain=wx2.qq.com; Path=/; Expires=Wed, 27-Jan-2021 05:57:36 GMT; Secure
+	Set-Cookie: webwx_data_ticket=gSc4JWKbL/veg69icySP9adU; Domain=.qq.com; Path=/; Expires=Wed, 27-Jan-2021 05:57:36 GMT; Secure
+	Strict-Transport-Security: max-age=31536000
+C、Request Header
+	Accept: application/json, text/plain, */*
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+	Connection: keep-alive
+	Content-Length: 463
+	Content-Type: application/json;charset=UTF-8
+	Cookie: mm_lang=zh_CN; MM_WX_NOTIFY_STATE=1; MM_WX_SOUND_STATE=1; refreshTimes=5; wxuin=1120382433; wxsid=uOcm0aQ3hwhq3U8E; webwx_data_ticket=gSc4JWKbL/veg69icySP9adU; webwxuvid=268881558dae1c261dca0f0a1c74aaa7b014816c2e7c50cc816ecf7ffbd50ed707c83d12add001c7738d9a6d900e9232; webwx_auth_ticket=CIsBELnbj+gDGoABGKcIKD/GouY+/as6Nl9gvDYwLYQX5VWUcxv9W0w9VNEXtVEWdhuKm4kl6yCFJ4Gr7AYFNVfZXeJyJryWEmii0dHA/zzVqZZ+j/ojZLVNLRnjFez/JD+bqwHrtin/6bchRewg3tfXsd+gz04QtYxSyJCgxhZR0LjmR3d+ZcwKiOM=; login_frequency=1; last_wxuin=1120382433; wxloadtime=1611674429_expired; wxpluginkey=1611669606
+	Host: wx2.qq.com
+	Origin: https://wx2.qq.com
+	Referer: https://wx2.qq.com/?&lang=zh_CN
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36
+D、Query String Parameter
+	sid: uOcm0aQ3hwhq3U8E
+	skey: @crypt_133e5bb7_48be0fb82d0e50758696333935f518ce
+	lang: zh_CN
+	pass_ticket: kp7aGhTsb6lzSZkJMIX3fzKYbSfO6z6dSX8OKWiFrIeQiH4DnhwsGGpDLKqnZ5%252Fr
+E、Request Payload
+	{"BaseRequest":{"Uin":1120382433,"Sid":"uOcm0aQ3hwhq3U8E","Skey":"@crypt_133e5bb7_48be0fb82d0e50758696333935f518ce","DeviceID":"e227440953455440"},"SyncKey":{"Count":10,"List":[{"Key":1,"Val":728449813},{"Key":2,"Val":728449919},{"Key":3,"Val":728449917},{"Key":11,"Val":728443908},{"Key":19,"Val":2174},{"Key":201,"Val":1611683238},{"Key":202,"Val":1611683418},{"Key":206,"Val":103},{"Key":1000,"Val":1611669606},{"Key":1001,"Val":1611665360}]},"rr":-1071120719}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

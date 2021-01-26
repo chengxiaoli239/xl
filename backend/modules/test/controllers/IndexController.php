@@ -201,11 +201,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $uuid    = WxService::get_uuid();p($uuid);
         $miss = SscDataService::getSdHzYlHistoryMiss([4], $lottery_type = 6, 50000);p($miss);
         $rst = Lucky5Service::getQihaoInfo($uid=10, $tz_system_id=9, $lottery_type=8);p($rst);
         $str = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx16d295b4421899d4&redirect_uri=http%3A%2F%2Fgoapi.hngoshare.com%2Fpay%2Findex%2Fmiddle-redirect%3Fparams%3D%252Fweixin%252Fwechat.html%253Forder_sn%253D2021011610424878811%2526&response_type=code&scope=snsapi_base&state=STATE&connect_redirect=1#wechat_redirect";
         p(urldecode($str));
-        $uuid    = WxService::get_uuid();p($uuid);
         $data = QxcTcw::QixingCaiBatch($type = 'json', $post['is_auto']=0);p($data);
         $rst['bet'] = BetService::betByUidNew($uid=10);p($rst); // 用户新计划投注，可正买可反买
         $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
