@@ -2622,6 +2622,8 @@ $sql = '
 CREATE TABLE `lt_static_pei_shu_code_true_false` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `'.$date_type['name'].'` varchar(10) DEFAULT NULL COMMENT \''.$date_type['cn_name'].'\',
+    `qihao` varchar(24) DEFAULT NULL COMMENT \'期号\',
+    `kj_code` varchar(24) DEFAULT NULL COMMENT \'号码\',
 ';
 
         $datas = self::getAllPeiShu();

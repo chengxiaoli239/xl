@@ -419,4 +419,14 @@ class IndexController extends Controller
         return $rst;
     }
 
+    /**
+     * @return array
+     */
+    public function actionSetPeiShuTrueFalse(){
+        self::_init();
+        $rst = SscDataService::staticPerShuTrueFalse();
+
+        return $rst;
+    }
+
 }

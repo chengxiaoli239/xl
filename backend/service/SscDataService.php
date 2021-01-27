@@ -22,6 +22,7 @@ use backend\models\SscSdHzVal;
 use backend\models\SscSdHzYl;
 use backend\models\SscStaticVal;
 use backend\models\SscStaticYl;
+use backend\models\StaticPeiShuCodeTrueFalse;
 use backend\models\StaticProfits;
 use backend\models\SystemConfig;
 use backend\models\ThreeNum;
@@ -2995,14 +2996,101 @@ class SscDataService extends BaseService {
      * @param int $lottery_type
      * @return array
      */
-    public static function staticPerShuTrueFalse($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function staticPerShuTrueFalse($lottery_types = []){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
+
+        $lottery_types = empty($lottery_types) ? StaticService::getLotteryTypes() : $lottery_types;
+        foreach ($lottery_types as $lottery_type){
+            $isEmpty = SscDataService::getPerShuIsEmpty($lottery_type);
+            if($isEmpty){
+                $staticStartDate = date("Y-m-d", time()-86400*2);
+                $SscKjDatas = SscKjData::find()->select(['code_4n_str', 'date', 'code_str', 'qihao'])->where(['AND', ['=', 'lottery_type',$lottery_type], ['>=', 'date', $staticStartDate]])->asArray()->all();
+                foreach ($SscKjDatas as $sscKjData){
+                    $rst[$sscKjData['qihao']] = SscDataService::setOnePeiShuTrueFalse($lottery_type, $sscKjData);
+                }
+            }else{
+                $sscKjData = SscKjData::find()->select(['code_4n_str', 'date', 'code_str', 'qihao'])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+                $rst = SscDataService::setOnePeiShuTrueFalse($lottery_type, $sscKjData);
+            }
+            Tool_Common::log('staticPerShuTrueFalse', 'INFO', '配数每期对错处理', ['rst'=>$rst]);
+        }
 
         return $rst;
     }
 
-    public static function getPerShuStartQihao(){
+    /**
+     * @desc 设置单个配数对错
+     * @param int $lottery_type
+     * @param array $sscKjData
+     */
+    public static function setOnePeiShuTrueFalse($lottery_type = DEFAULT_LOTTERY_TYPE, $sscKjData = []){
+        $setDatas = [];
+        $qihao = $sscKjData['qihao'];
+        $code_4n_str = $sscKjData['code_4n_str'];
+        $kj_code = $sscKjData['code_str'];
+        $date = $sscKjData['date'];
+        $peiShus = StaticService::getAllPeiShu();
+        if(!$row = StaticPeiShuCodeTrueFalse::find()->where(['lottery_type'=>$lottery_type, 'qihao'=>$qihao])->one()){
+            $row = new StaticPeiShuCodeTrueFalse();
+            $setDatas = array_merge($setDatas, [
+                'lottery_type' => $lottery_type,
+                'qihao' => $qihao,
+                'date' => $date,
+                'kj_code' => $kj_code,
+            ]);
+        }
+        $setDatas['updated_at'] = time();
 
+        foreach ($peiShus as $peiShu){
+            if(strpos($peiShu, '_') !== false){
+                $ps = explode('_', $peiShu);
+                $codes_hz = ['ps_1'=>$ps[0], 'ps_2'=>$ps[1]];
+            }else{
+                $codes_hz = ['type_'.$peiShu=>1];
+            }
+            //$codes = NumService::getCodesKuaiXuan($codes_hz, $code_type=4);p(['peiShu'=>$peiShu, $codes_hz, 'codes'=>$codes]);
+            $codes = SscDataService::getCacheCodeByCodeHz($codes_hz, $code_type=4);
+            $setDatas = array_merge($setDatas, [
+                'code_'.$peiShu => in_array($code_4n_str, $codes) ? 1 : 0,
+            ]);
+        }
+        $row->setAttributes($setDatas);
+        if(!$flag = $row->save()){
+            p(['msg'=>$row->getErrors()]);
+        }
+
+        return ['qihao'=>$qihao, 'flag'=>$flag];
+    }
+
+    /**
+     * @desc 根据条件获取号码 - md5 key 缓存
+     * @param array $codes_hz
+     * @param int $code_type
+     * @return array|mixed
+     */
+    public static function getCacheCodeByCodeHz($codes_hz = [], $code_type=4){
+        $m = \Yii::$app->cache;
+        $mkey = 'getCacheCodeByCodeHz_'.md5(json_encode($codes_hz).'_'.$code_type);
+        if(!$codes = $m->get($mkey)){
+            $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type=4);//p(['peiShu'=>$peiShu, $codes_hz, 'codes'=>$codes]);
+            $m->set($mkey, $codes, 86400);
+        }
+
+        return $codes;
+    }
+
+    /**
+     * @desc 配数对错统计是否为空
+     * @return int
+     */
+    public static function getPerShuIsEmpty($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $isEmpty = 1;
+        $r = StaticPeiShuCodeTrueFalse::find()->where(['lottery_type'=>$lottery_type])->one();
+        if(!empty($r)){
+            $isEmpty = 0;
+        }
+
+        return $isEmpty;
     }
 
 

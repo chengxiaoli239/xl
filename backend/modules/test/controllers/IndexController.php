@@ -201,13 +201,14 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $miss = SscDataService::staticPerShuTrueFalse($lottery_type = 6);p($miss);
+        $miss = SscDataService::staticPerShuTrueFalse($lottery_type = [6]);p($miss);
+        //$r = Yii::$app->db->getSchema()->refreshTableSchema('{{%static_pei_shu_code_true_false}}');p($r);
+        $rst = StaticService::getCreatePeiShuCodeTypeSql($type=1);p($rst);
+        $rst = StaticService::getCreatePeiShuTrueFalseSql();p($rst);
+        $miss = SscDataService::getSdHzYlHistoryMiss([5], $lottery_type = 6, 500000);p($miss);
         $codes_hz = ['ps_1'=>147, 'ps_2'=>369];
         $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type=2);p($codes);
-        $rst = StaticService::getCreatePeiShuTrueFalseSql();p($rst);
-        $rst = StaticService::getCreatePeiShuCodeTypeSql($type=1);p($rst);
         $uuid    = WxService::get_uuid();p($uuid);
-        $miss = SscDataService::getSdHzYlHistoryMiss([4], $lottery_type = 6, 50000);p($miss);
         $rst = Lucky5Service::getQihaoInfo($uid=10, $tz_system_id=9, $lottery_type=8);p($rst);
         $str = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx16d295b4421899d4&redirect_uri=http%3A%2F%2Fgoapi.hngoshare.com%2Fpay%2Findex%2Fmiddle-redirect%3Fparams%3D%252Fweixin%252Fwechat.html%253Forder_sn%253D2021011610424878811%2526&response_type=code&scope=snsapi_base&state=STATE&connect_redirect=1#wechat_redirect";
         p(urldecode($str));
