@@ -3001,6 +3001,9 @@ class SscDataService extends BaseService {
         return $rst;
     }
 
+    public static function getPerShuStartQihao(){
+
+    }
 
 
 

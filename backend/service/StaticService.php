@@ -2551,7 +2551,7 @@ class StaticService extends BaseService {
      * @return string
      */
     public static function getCreateCodeType3nSql($lottery_type = DEFAULT_LOTTERY_TYPE){
-$sql = '
+        $sql = '
 CREATE TABLE `lt_static_code_3n_arise_month` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `month` varchar(10) DEFAULT NULL COMMENT \'月份\',
@@ -2570,13 +2570,73 @@ CREATE TABLE `lt_static_code_3n_arise_month` (
             $sql .= '    `code_'.$code['val'].'` tinyint(4) DEFAULT NULL COMMENT \''.$code['val'].'\','."\r\n";
         }
 
-$sql .= '
+        $sql .= '
     `lottery_type` int(11) DEFAULT \'5\' COMMENT \'彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc 7:北京快乐8 8:幸运五星\',
     `created_at` int(11) DEFAULT NULL COMMENT \'创建时间\',
     `updated_at` int(11) NOT NULL COMMENT \'更新时间\',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT \'更新时间\',
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT=\'三现热码月统计表\';';
+
+        return $sql;
+    }
+
+    /**
+     * @desc 创建配数遗漏表
+     * @param int $lottery_type
+     * @param int $type 1天2月
+     * @return string
+     */
+    public static function getCreatePeiShuCodeTypeSql($type = 1){
+        $date_type = [1=>['val'=>1, 'name'=>'date', 'cn_name'=>'天'], ['val'=>1, 'name'=>'month', 'cn_name'=>'月']];
+        $sql = '
+CREATE TABLE `lt_static_pei_shu_code_'.$date_type[$type]['name'].'_profits` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `'.$date_type[$type]['name'].'` varchar(10) DEFAULT NULL COMMENT \''.$date_type[$type]['cn_name'].'\',
+';
+
+        $datas = self::getAllPeiShu();
+
+        foreach ($datas as $key=>$code_str){
+            $sql .= '    `code_'.$code_str.'` decimal(10,2) DEFAULT NULL COMMENT \''.$code_str.'\','."\r\n";
+        }
+
+        $sql .= '
+    `lottery_type` int(11) DEFAULT \'5\' COMMENT \'彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc 7:北京快乐 8:幸运五星\',
+    `created_at` int(11) DEFAULT NULL COMMENT \'创建时间\',
+    `updated_at` int(11) NOT NULL COMMENT \'更新时间\',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT \'更新时间\',
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT=\'配数'.$date_type[$type]['cn_name'].'统计利润表\';';
+
+        return $sql;
+    }
+
+    /**
+     * @desc 创建每期对错表
+     * @return string
+     */
+    public static function getCreatePeiShuTrueFalseSql(){
+        $date_type = ['val'=>1, 'name'=>'date', 'cn_name'=>'天'];
+$sql = '
+CREATE TABLE `lt_static_pei_shu_code_true_false` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `'.$date_type['name'].'` varchar(10) DEFAULT NULL COMMENT \''.$date_type['cn_name'].'\',
+';
+
+        $datas = self::getAllPeiShu();
+
+        foreach ($datas as $key=>$code_str){
+            $sql .= '    `code_'.$code_str.'` TINYINT(1) DEFAULT NULL COMMENT \''.$code_str.'\','."\r\n";
+        }
+
+$sql .= '
+    `lottery_type` int(11) DEFAULT \'5\' COMMENT \'彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc 7:北京快乐 8:幸运五星\',
+    `created_at` int(11) DEFAULT NULL COMMENT \'创建时间\',
+    `updated_at` int(11) NOT NULL COMMENT \'更新时间\',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT \'更新时间\',
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT=\'配数每期对错表\';';
 
         return $sql;
     }
@@ -2608,6 +2668,34 @@ $sql .= '
                 $datas[$k]['count'] = $count;
             }
             $m->set($mkey, $datas, 30*3600*24); # datas : Array ( [val] => 012 [type_2] => 0 [type_3] => 0 [nums] => 1067 )
+        }
+
+        return $datas;
+
+    }
+
+    /**
+     * @desc 获取所有三字现
+     * @param int $lottery_type
+     * @return array|mixed
+     */
+    public static function getAllPeiShu(){
+        $m = \Yii::$app->cache;
+        $mkey = 'getCreatePeiShuCodeTypeSql_code';
+        if(!$datas = $m->get($mkey)){
+            $datas = [
+                '147_369',
+                '259_369',
+                '019_368',
+                '123_678',
+                '147_258',
+                '017_348',
+                '456_789',
+                '012_789',
+                '345_678',
+                '357_019',
+                '3b',
+            ];
         }
 
         return $datas;

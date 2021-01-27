@@ -201,9 +201,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $miss = SscDataService::staticPerShuTrueFalse($lottery_type = 6);p($miss);
         $codes_hz = ['ps_1'=>147, 'ps_2'=>369];
         $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type=2);p($codes);
-        $miss = SscDataService::staticPerShuTrueFalse($lottery_type = 6);p($miss);
         $rst = StaticService::getCreatePeiShuTrueFalseSql();p($rst);
         $rst = StaticService::getCreatePeiShuCodeTypeSql($type=1);p($rst);
         $uuid    = WxService::get_uuid();p($uuid);
