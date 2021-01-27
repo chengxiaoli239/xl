@@ -3009,7 +3009,7 @@ class SscDataService extends BaseService {
                     $rst[$sscKjData['qihao']] = SscDataService::setOnePeiShuTrueFalse($lottery_type, $sscKjData);
                 }
             }else{
-                $sscKjData = SscKjData::find()->select(['code_4n_str', 'date', 'code_str', 'qihao'])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+                $sscKjData = SscKjData::find()->select(['code_4n_str', 'date', 'code_str', 'qihao'])->select(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one();
                 $rst = SscDataService::setOnePeiShuTrueFalse($lottery_type, $sscKjData);
             }
             Tool_Common::log('staticPerShuTrueFalse', 'INFO', '配数每期对错处理', ['rst'=>$rst]);
