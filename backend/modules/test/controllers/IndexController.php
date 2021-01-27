@@ -201,6 +201,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $codes_hz = ['ps_1'=>147, 'ps_2'=>369];
+        $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type=2);p($codes);
+        $miss = SscDataService::staticPerShuTrueFalse($lottery_type = 6);p($miss);
+        $rst = StaticService::getCreatePeiShuTrueFalseSql();p($rst);
+        $rst = StaticService::getCreatePeiShuCodeTypeSql($type=1);p($rst);
         $uuid    = WxService::get_uuid();p($uuid);
         $miss = SscDataService::getSdHzYlHistoryMiss([4], $lottery_type = 6, 50000);p($miss);
         $rst = Lucky5Service::getQihaoInfo($uid=10, $tz_system_id=9, $lottery_type=8);p($rst);

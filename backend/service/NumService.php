@@ -857,6 +857,34 @@ class NumService extends BaseService {
             //p([$poss, $codes_hz['hefen'], $hf_codes_hzs]);
         }
 
+        # 配数 - 支持二定、三定、四定
+        if(isset($codes_hz['ps_1']) && !empty($codes_hz['ps_1']) && isset($codes_hz['ps_2']) && !empty($codes_hz['ps_2'])){
+            $ps1 = (string)$codes_hz['ps_1']; $ps1_len = strlen($ps1); # 配数1
+            $ps2 = (string)$codes_hz['ps_2']; $ps2_len = strlen($ps2); # 配数2
+            //p([$ps1_len, $ps2_len]);
+            $tmpPsWhere2 = ['OR'];
+            for ($x=0;$x<$ps1_len;$x++){
+                for ($y=0;$y<$ps2_len;$y++){
+                    $p1Types = [1,2,3,4];
+                    $p2Types = [1,2,3,4];
+                    foreach ($p1Types as $p1Type){
+                        foreach ($p2Types as $p2Type){
+                            if($p1Type == $p2Type) continue;
+                            $tmpPsWhere2 = array_merge($tmpPsWhere2, [
+                                ['AND',
+                                    ['=', 'code_'.$p1Type, $ps1[$x] ],
+                                    ['=', 'code_'.$p2Type, $ps2[$y] ]
+                                ]
+                            ]);
+                            //$tmpPsWhere2 = array_merge($tmpPsWhere1, [$tmpPsWhere1]);
+                        }
+                        //p($tmpPsWhere2);
+                    }
+                }
+            }
+            $where = array_merge($where, [$tmpPsWhere2]);
+        }
+
         # 不定位合分(1两数、2三数) - 三定
         //if($code_type == 3 && !empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){
         if(!empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){

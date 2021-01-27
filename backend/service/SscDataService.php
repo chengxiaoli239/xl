@@ -2990,6 +2990,16 @@ class SscDataService extends BaseService {
         return $playway;
     }
 
+    /**
+     * @desc 配数每期对错处理
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function staticPerShuTrueFalse($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+
+        return $rst;
+    }
 
 
 

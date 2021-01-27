@@ -332,7 +332,7 @@ abstract class BetService extends BaseBetService {
         $lottery_types = StaticService::getUserLotteryTypes($uid);
         foreach ($lottery_types as $lottery_type) {
             $hasActivePlan = CommonService::hasPlansActive($lottery_type);
-            if(in_array($lottery_type, [1, 8, 10, 11]) && !$hasActivePlan){
+            if(in_array($lottery_type, [1, 8, 10, 11, 17]) && !$hasActivePlan){
                 continue;
             }
             $qihao = HN0898Service::getQihao($lottery_type);
