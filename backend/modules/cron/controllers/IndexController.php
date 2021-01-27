@@ -424,7 +424,8 @@ class IndexController extends Controller
      */
     public function actionSetPeiShuTrueFalse(){
         self::_init();
-        $rst = SscDataService::staticPerShuTrueFalse();
+        $post = \Yii::$app->request->post();
+        $rst = SscDataService::staticPerShuTrueFalse($post['lottery_types']);
 
         return $rst;
     }
