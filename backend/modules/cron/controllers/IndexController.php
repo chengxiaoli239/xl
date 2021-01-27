@@ -238,7 +238,7 @@ class IndexController extends Controller
             $for_times = 14;
             $sleep_time = 5;
         }else{
-            $for_times = 5;
+            $for_times = 4;
             $sleep_time = 10;
         }
         for($i=0; $i<$for_times; $i++){
