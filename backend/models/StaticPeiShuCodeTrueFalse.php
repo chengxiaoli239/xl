@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $date 天
+ * @property string $qihao 期号
  * @property int $code_147_369 147_369
  * @property int $code_259_369 259_369
  * @property int $code_019_368 019_368
@@ -45,6 +46,7 @@ class StaticPeiShuCodeTrueFalse extends \common\models\base\BaseModel
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['date'], 'string', 'max' => 10],
+            [['qihao'], 'string', 'max' => 24],
         ];
     }
 
@@ -56,6 +58,7 @@ class StaticPeiShuCodeTrueFalse extends \common\models\base\BaseModel
         return [
             'id' => Yii::t('app', 'ID'),
             'date' => Yii::t('app', '天'),
+            'qihao' => Yii::t('app', '期号'),
             'code_147_369' => Yii::t('app', '147_369'),
             'code_259_369' => Yii::t('app', '259_369'),
             'code_019_368' => Yii::t('app', '019_368'),
