@@ -120,8 +120,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //'code_3b',
                         ['attribute' => 'code_3b','label'=>'三兄',//'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
                             'value' => function($model) {
-                                return $model->code_3b;
+                                $txt = $model->code_3b==1 ? "<font color='green'>√</font>" :"<font color='red'>X</font>";
+                                return Html::a($txt, 'javascript:;', ['title' => '√对X错']);
                             }
                         ],
                         //'lottery_type',
