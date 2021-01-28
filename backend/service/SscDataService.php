@@ -3039,6 +3039,8 @@ class SscDataService extends BaseService {
                 'date' => $date,
                 'kj_code' => $kj_code,
             ]);
+        }else{
+            return ['status'=>300, 'msg'=>'已统计过该期号'];
         }
         $setDatas['updated_at'] = time();
 
