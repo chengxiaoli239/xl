@@ -53,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'lottery_type',
                         //'created_at',
                         //'updated_at',
-                        'update_time',
+                        //'update_time',
                         ['attribute' => 'update_time','label'=>'时间',//'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
                                 return substr($model->update_time, 10,6);
