@@ -2684,7 +2684,7 @@ $sql .= '
     public static function getAllPeiShu(){
         $m = \Yii::$app->cache;
         $mkey = 'getCreatePeiShuCodeTypeSql_code';
-        if(!$datas = $m->get($mkey)){
+        if(true OR !$datas = $m->get($mkey)){
             $datas = [
                 '147_369',
                 '258_369',

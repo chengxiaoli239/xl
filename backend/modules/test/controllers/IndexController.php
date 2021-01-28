@@ -202,6 +202,7 @@ class IndexController extends Controller
 
     public function actionDw(){
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%static_pei_shu_code_true_false}}');p($r);
+
         $miss = SscDataService::staticPerShuTrueFalse($lottery_type = [6]);p($miss);
         $rst = StaticService::getCreatePeiShuCodeTypeSql($type=1);p($rst);
         $rst = StaticService::getCreatePeiShuTrueFalseSql();p($rst);
