@@ -22,6 +22,7 @@ use backend\models\SscSdHzVal;
 use backend\models\SscSdHzYl;
 use backend\models\SscStaticVal;
 use backend\models\SscStaticYl;
+use backend\models\StaticPeiShuCodeDateProfits;
 use backend\models\StaticPeiShuCodeTrueFalse;
 use backend\models\StaticProfits;
 use backend\models\SystemConfig;
@@ -3001,7 +3002,7 @@ class SscDataService extends BaseService {
 
         $lottery_types = empty($lottery_types) ? StaticService::getLotteryTypes() : $lottery_types;
         foreach ($lottery_types as $lottery_type){
-            $isEmpty = SscDataService::getPerShuIsEmpty($lottery_type);
+            $isEmpty = SscDataService::getPeiShuIsEmpty($lottery_type);
             if($isEmpty){
                 $staticStartDate = date("Y-m-d", time()-86400*2);
                 $where = ['AND', ['=', 'lottery_type',$lottery_type], ['>=', 'date', $staticStartDate]];
@@ -3087,7 +3088,7 @@ class SscDataService extends BaseService {
      * @desc 配数对错统计是否为空
      * @return int
      */
-    public static function getPerShuIsEmpty($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function getPeiShuIsEmpty($lottery_type = DEFAULT_LOTTERY_TYPE){
         $isEmpty = 1;
         $r = StaticPeiShuCodeTrueFalse::find()->where(['lottery_type'=>$lottery_type])->one();
         if(!empty($r)){
@@ -3097,7 +3098,127 @@ class SscDataService extends BaseService {
         return $isEmpty;
     }
 
+    /**
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function staticPeiShuProfitsSection($lottery_type=DEFAULT_LOTTERY_TYPE){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
 
+        return $rst;
+    }
 
+    /**
+     * @desc 计划脚本实时统计利润
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function cronStaticPeiShuProfits($lottery_type=DEFAULT_LOTTERY_TYPE){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+        $time_HI = date('H:i');
+        $pre_date = date('Y-m-d', time()-86400);
+        $date = date('Y-m-d');
+        if($lottery_type==6){
+            if('00:00'<$time_HI && $time_HI<'02:05'){
+                $date = $pre_date;
+            }
+        }else{
+            if('00:00'<$time_HI && $time_HI<'04:05'){
+                $date = $pre_date;
+            }
+        }
+        $rst['data'] = SscDataService::staticPerShuDateProfits($lottery_type, $date);
+
+        return $rst;
+    }
+
+    /**
+     * @desc 配数每天利润统计
+     * @param string $date
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function staticPerShuDateProfits($lottery_type=DEFAULT_LOTTERY_TYPE, $date = ''){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+        if(empty($date)) $date = date('Y-m-d');
+
+        //$static_sections = SscDataService::getStaticStartAndEndDate($lottery_type, $date);
+        //p($static_sections);
+        //$start_time = $static_sections['start_time'];
+        //$end_time = $static_sections['end_time'];
+        $date_s = str_replace('-', '', $date);
+
+        $where = ['AND', ['=', 'lottery_type',$lottery_type], ['LIKE', 'qihao', $date_s.'%', false]];
+        $SscKjDatas = SscKjData::find()->select(['date', 'code_str'=>'LEFT(code_str,7)', 'qihao'])->where($where)->orderBy(['qihao'=>SORT_ASC])->asArray()->all();
+        $kjDatas = yii\helpers\ArrayHelper::getColumn($SscKjDatas, 'code_str');
+        $peiShus = StaticService::getAllPeiShu();
+
+        $time = time();
+        $row = StaticPeiShuCodeDateProfits::findOne(['lottery_type'=>$lottery_type, 'date'=>$date]);
+        $setDatas = [];
+        if(empty($row)){
+            $row = new StaticPeiShuCodeDateProfits();
+            $setDatas = [
+                'date' => $date,
+                'lottery_type' => $lottery_type,
+                'create_tiem' => $time,
+            ];
+        }
+        $setDatas['updated_at'] = $time;
+        $codes_fields = [];
+        foreach ($peiShus as $peiShu){
+            if(strpos($peiShu, '_') !== false){
+                $ps = explode('_', $peiShu);
+                $codes_hz = ['ps_1'=>$ps[0], 'ps_2'=>$ps[1]];
+            }else{
+                $codes_hz = ['type_'.$peiShu=>1];
+            }
+            $codes = SscDataService::getCacheCodeByCodeHz($codes_hz, $code_type=4);
+            $codes_fields['code_'.$peiShu] = $codes;
+        }
+        //p($codes_fields);
+
+        $zjTimes = [];
+        foreach ($codes_fields as $field=>$codes){
+            $zjTimes[$field] = 0;
+            foreach ($kjDatas as $kjData){
+                if(in_array($kjData, $codes)){
+                    $zjTimes[$field] += 1;
+                }
+            }
+        }
+        foreach ($zjTimes as $field=>$zjTime){
+            //p([$zjTimes[$field]*980, count($codes_fields[$field]) * 0.1*count($kjDatas)]);
+            $setDatas = array_merge($setDatas, [
+                $field => $zjTimes[$field]*980 - count($codes_fields[$field]) * 0.1 * count($kjDatas), # 中奖 - 成本
+            ]);
+        }
+        $row->setAttributes($setDatas);
+        if(!$row->save()){
+            return ['status'=>300, 'msg'=>$row->getErrors()];
+        }
+
+        return $rst;
+    }
+
+    /**
+     * @desc 指定日期利润统计时间区间
+     * @param int $lottery_type
+     * @param string $date
+     * @return array
+     */
+    public static function getStaticStartAndEndDate($lottery_type=DEFAULT_LOTTERY_TYPE, $date=''){
+        if(empty($date)) $date = date('Y-m-d');
+        $next_date = date('Y-m-d', strtotime($date.'00:00:00') + 86400);
+        if($lottery_type==8){
+            $start_time = $date.' '.'09:00:00';
+            $end_time = $next_date.' 04:05:00';
+        }else{
+            $start_time = $date.' '.'10:00:00';
+            $end_time = $next_date.' 02:05:00';
+        }
+
+        return ['start_time'=>$start_time, 'end_time'=>$end_time];
+    }
 
 }
