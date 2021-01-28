@@ -86,10 +86,38 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a($txt, 'javascript:;', ['title' => '√对X错']);
                             }
                         ],
-                        'code_456_789',
-                        'code_012_789',
-                        'code_345_678',
-                        'code_357_019',
+                        //'code_456_789',
+                        ['attribute' => 'code_456_789',//'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $txt = $model->code_456_789==1 ? "<font color='green'>√</font>" :"<font color='red'>X</font>";
+                                return Html::a($txt, 'javascript:;', ['title' => '√对X错']);
+                            }
+                        ],
+                        //'code_012_789',
+                        ['attribute' => 'code_012_789',//'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $txt = $model->code_456_789==1 ? "<font color='green'>√</font>" :"<font color='red'>X</font>";
+                                return Html::a($txt, 'javascript:;', ['title' => '√对X错']);
+                            }
+                        ],
+                        //'code_345_678',
+                        ['attribute' => 'code_345_678',//'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $txt = $model->code_345_678==1 ? "<font color='green'>√</font>" :"<font color='red'>X</font>";
+                                return Html::a($txt, 'javascript:;', ['title' => '√对X错']);
+                            }
+                        ],
+                        //'code_357_019',
+                        ['attribute' => 'code_357_019',//'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $txt = $model->code_345_678==1 ? "<font color='green'>√</font>" :"<font color='red'>X</font>";
+                                return Html::a($txt, 'javascript:;', ['title' => '√对X错']);
+                            }
+                        ],
                         //'code_3b',
                         ['attribute' => 'code_3b','label'=>'三兄',//'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
