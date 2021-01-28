@@ -3074,6 +3074,7 @@ class SscDataService extends BaseService {
     public static function getCacheCodeByCodeHz($codes_hz = [], $code_type=4){
         $m = \Yii::$app->cache;
         $mkey = 'getCacheCodeByCodeHz_'.md5(json_encode($codes_hz).'_'.$code_type);
+
         if(!$codes = $m->get($mkey)){
             $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type=4);//p(['peiShu'=>$peiShu, $codes_hz, 'codes'=>$codes]);
             $m->set($mkey, $codes, 86400);
