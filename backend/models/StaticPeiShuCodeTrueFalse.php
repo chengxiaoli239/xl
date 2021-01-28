@@ -48,6 +48,7 @@ class StaticPeiShuCodeTrueFalse extends \common\models\base\BaseModel
             [['update_time'], 'safe'],
             [['date'], 'string', 'max' => 10],
             [['qihao', 'kj_code'], 'string', 'max' => 24],
+            [['date', 'qihao', 'lottery_type'], 'unique', 'targetAttribute' => ['date', 'qihao', 'lottery_type']],
         ];
     }
 
