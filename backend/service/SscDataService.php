@@ -3005,7 +3005,7 @@ class SscDataService extends BaseService {
             if($isEmpty){
                 $staticStartDate = date("Y-m-d", time()-86400*2);
                 $where = ['AND', ['=', 'lottery_type',$lottery_type], ['>=', 'date', $staticStartDate]];
-                $SscKjDatas = SscKjData::find()->select(['code_4n_str', 'date', 'code_str', 'qihao'])->where($where)->asArray()->all();
+                $SscKjDatas = SscKjData::find()->select(['code_4n_str', 'date', 'code_str', 'qihao'])->where($where)->orderBy(['qihao'=>SORT_ASC])->asArray()->all();
                 foreach ($SscKjDatas as $sscKjData){
                     $rst[$sscKjData['qihao']] = SscDataService::setOnePeiShuTrueFalse($lottery_type, $sscKjData);
                 }
