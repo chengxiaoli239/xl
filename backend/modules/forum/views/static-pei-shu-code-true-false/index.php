@@ -47,10 +47,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a($txt, 'javascript:;', ['title' => '√对X错']);
                             }
                         ],
-                        ['attribute' => 'code_259_369',//'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'code_258_369',//'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                $txt = $model->code_259_369==1 ? "<font color='green'>√</font>" :"<font color='red'>X</font>";
+                                $txt = $model->code_258_369==1 ? "<font color='green'>√</font>" :"<font color='red'>X</font>";
                                 return Html::a($txt, 'javascript:;', ['title' => '√对X错']);
                             }
                         ],

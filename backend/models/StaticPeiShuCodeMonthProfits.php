@@ -10,7 +10,7 @@ use Yii;
  * @property int $id
  * @property string $month 月
  * @property string $code_147_369 147_369
- * @property string $code_259_369 259_369
+ * @property string $code_258_369 258_369
  * @property string $code_019_368 019_368
  * @property string $code_123_678 123_678
  * @property string $code_147_258 147_258
@@ -41,7 +41,7 @@ class StaticPeiShuCodeMonthProfits extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['code_147_369', 'code_259_369', 'code_019_368', 'code_123_678', 'code_147_258', 'code_017_348', 'code_456_789', 'code_012_789', 'code_345_678', 'code_357_019', 'code_3b'], 'number'],
+            [['code_147_369', 'code_258_369', 'code_019_368', 'code_123_678', 'code_147_258', 'code_017_348', 'code_456_789', 'code_012_789', 'code_345_678', 'code_357_019', 'code_3b'], 'number'],
             [['lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
@@ -58,7 +58,7 @@ class StaticPeiShuCodeMonthProfits extends \common\models\base\BaseModel
             'id' => Yii::t('app', 'ID'),
             'month' => Yii::t('app', '月'),
             'code_147_369' => Yii::t('app', '147_369'),
-            'code_259_369' => Yii::t('app', '259_369'),
+            'code_258_369' => Yii::t('app', '258_369'),
             'code_019_368' => Yii::t('app', '019_368'),
             'code_123_678' => Yii::t('app', '123_678'),
             'code_147_258' => Yii::t('app', '147_258'),

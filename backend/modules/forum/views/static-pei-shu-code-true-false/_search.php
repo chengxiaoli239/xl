@@ -25,7 +25,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'code_147_369') ?>
 
-    <?php // echo $form->field($model, 'code_259_369') ?>
+    <?php // echo $form->field($model, 'code_258_369') ?>
 
     <?php // echo $form->field($model, 'code_019_368') ?>
 

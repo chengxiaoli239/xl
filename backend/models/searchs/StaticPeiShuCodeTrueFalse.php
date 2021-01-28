@@ -18,7 +18,7 @@ class StaticPeiShuCodeTrueFalse extends StaticPeiShuCodeTrueFalseModel
     public function rules()
     {
         return [
-            [['id', 'code_147_369', 'code_259_369', 'code_019_368', 'code_123_678', 'code_147_258', 'code_017_348', 'code_456_789', 'code_012_789', 'code_345_678', 'code_357_019', 'code_3b', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'code_147_369', 'code_258_369', 'code_019_368', 'code_123_678', 'code_147_258', 'code_017_348', 'code_456_789', 'code_012_789', 'code_345_678', 'code_357_019', 'code_3b', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'qihao', 'kj_code', 'update_time'], 'safe'],
         ];
     }
@@ -62,7 +62,7 @@ class StaticPeiShuCodeTrueFalse extends StaticPeiShuCodeTrueFalseModel
         $query->andFilterWhere([
             'id' => $this->id,
             'code_147_369' => $this->code_147_369,
-            'code_259_369' => $this->code_259_369,
+            'code_258_369' => $this->code_258_369,
             'code_019_368' => $this->code_019_368,
             'code_123_678' => $this->code_123_678,
             'code_147_258' => $this->code_147_258,
