@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\searchs\StaticPeiShuCodeTrueFalse */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Static Pei Shu Code True Falses';
+$this->title = Yii::t('app', 'Static Pei Shu Code True Falses');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <section class="static-pei-shu-code-true-false-index wrapper site-min-height">
@@ -18,13 +18,16 @@ $this->params['breadcrumbs'][] = $this->title;
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
+                <!--
                 <div class="clearfix">
                     <div class="btn-group">
                         <?= Html::a('Create Static Pei Shu Code True False', ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
                 </div>
+                -->
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+                <?php include(dirname(__FILE__).'/index_tab.php'); ?>
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
@@ -32,27 +35,32 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
+                        //'id',
                         'date',
                         'qihao',
                         'kj_code',
                         'code_147_369',
-                        //'code_259_369',
-                        //'code_019_368',
-                        //'code_123_678',
-                        //'code_147_258',
-                        //'code_017_348',
-                        //'code_456_789',
-                        //'code_012_789',
-                        //'code_345_678',
-                        //'code_357_019',
-                        //'code_3b',
+                        'code_259_369',
+                        'code_019_368',
+                        'code_123_678',
+                        'code_147_258',
+                        'code_017_348',
+                        'code_456_789',
+                        'code_012_789',
+                        'code_345_678',
+                        'code_357_019',
+                        'code_3b',
                         //'lottery_type',
                         //'created_at',
                         //'updated_at',
-                        //'update_time',
+                        'update_time',
+                        ['attribute' => 'update_time','label'=>'时间',//'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return substr($model->update_time, 10,6);
+                            }
+                        ],
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
             </div>

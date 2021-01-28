@@ -112,4 +112,5 @@ return [
 
     'Bt Crontabs' => '计划任务',
     'Create Bt Crontabs' => '新建计划任务',
+    'Static Pei Shu Code True Falses' => '配数对错',
 ];

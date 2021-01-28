@@ -3004,12 +3004,14 @@ class SscDataService extends BaseService {
             $isEmpty = SscDataService::getPerShuIsEmpty($lottery_type);
             if($isEmpty){
                 $staticStartDate = date("Y-m-d", time()-86400*2);
-                $SscKjDatas = SscKjData::find()->select(['code_4n_str', 'date', 'code_str', 'qihao'])->where(['AND', ['=', 'lottery_type',$lottery_type], ['>=', 'date', $staticStartDate]])->asArray()->all();
+                $where = ['AND', ['=', 'lottery_type',$lottery_type], ['>=', 'date', $staticStartDate]];
+                $SscKjDatas = SscKjData::find()->select(['code_4n_str', 'date', 'code_str', 'qihao'])->where($where)->asArray()->all();
+                p($SscKjDatas);
                 foreach ($SscKjDatas as $sscKjData){
                     $rst[$sscKjData['qihao']] = SscDataService::setOnePeiShuTrueFalse($lottery_type, $sscKjData);
                 }
             }else{
-                $sscKjData = SscKjData::find()->select(['code_4n_str', 'date', 'code_str', 'qihao'])->select(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+                $sscKjData = SscKjData::find()->select(['code_4n_str', 'date', 'code_str', 'qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one();
                 $rst = SscDataService::setOnePeiShuTrueFalse($lottery_type, $sscKjData);
             }
             Tool_Common::log('staticPerShuTrueFalse', 'INFO', '配数每期对错处理', ['rst'=>$rst]);
