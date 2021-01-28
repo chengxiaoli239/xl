@@ -8,11 +8,11 @@ use Yii;
  * This is the model class for table "{{%static_pei_shu_code_true_false}}".
  *
  * @property int $id
- * @property string $date 天
+ * @property string $date 日期
  * @property string $qihao 期号
  * @property string $kj_code 号码
  * @property int $code_147_369 147_369
- * @property int $code_259_369 259_369
+ * @property int $code_258_369 258_369
  * @property int $code_019_368 019_368
  * @property int $code_123_678 123_678
  * @property int $code_147_258 147_258
@@ -43,7 +43,7 @@ class StaticPeiShuCodeTrueFalse extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['code_147_369', 'code_259_369', 'code_019_368', 'code_123_678', 'code_147_258', 'code_017_348', 'code_456_789', 'code_012_789', 'code_345_678', 'code_357_019', 'code_3b', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['code_147_369', 'code_258_369', 'code_019_368', 'code_123_678', 'code_147_258', 'code_017_348', 'code_456_789', 'code_012_789', 'code_345_678', 'code_357_019', 'code_3b', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['date'], 'string', 'max' => 10],
@@ -59,11 +59,11 @@ class StaticPeiShuCodeTrueFalse extends \common\models\base\BaseModel
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'date' => Yii::t('app', '天'),
+            'date' => Yii::t('app', '日期'),
             'qihao' => Yii::t('app', '期号'),
             'kj_code' => Yii::t('app', '号码'),
             'code_147_369' => Yii::t('app', '147_369'),
-            'code_259_369' => Yii::t('app', '259_369'),
+            'code_258_369' => Yii::t('app', '258_369'),
             'code_019_368' => Yii::t('app', '019_368'),
             'code_123_678' => Yii::t('app', '123_678'),
             'code_147_258' => Yii::t('app', '147_258'),
