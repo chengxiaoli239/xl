@@ -3054,7 +3054,7 @@ class SscDataService extends BaseService {
             //$codes = NumService::getCodesKuaiXuan($codes_hz, $code_type=4);p(['peiShu'=>$peiShu, $codes_hz, 'codes'=>$codes]);
             $codes = SscDataService::getCacheCodeByCodeHz($codes_hz, $code_type=4);
             $setDatas = array_merge($setDatas, [
-                'code_'.$peiShu => in_array($code_4n_str, $codes) ? 1 : 0,
+                'code_'.$peiShu => in_array(substr($kj_code, 0,7), $codes) ? 1 : 0,
             ]);
         }
         $row->setAttributes($setDatas);
