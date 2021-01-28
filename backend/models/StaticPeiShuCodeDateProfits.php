@@ -10,7 +10,7 @@ use Yii;
  * @property int $id
  * @property string $date 天
  * @property string $code_147_369 147_369
- * @property string $code_258_369 258_369
+ * @property string $code_258_369 259_369
  * @property string $code_019_368 019_368
  * @property string $code_123_678 123_678
  * @property string $code_147_258 147_258
@@ -58,7 +58,7 @@ class StaticPeiShuCodeDateProfits extends \common\models\base\BaseModel
             'id' => Yii::t('app', 'ID'),
             'date' => Yii::t('app', '天'),
             'code_147_369' => Yii::t('app', '147_369'),
-            'code_258_369' => Yii::t('app', '258_369'),
+            'code_258_369' => Yii::t('app', '259_369'),
             'code_019_368' => Yii::t('app', '019_368'),
             'code_123_678' => Yii::t('app', '123_678'),
             'code_147_258' => Yii::t('app', '147_258'),
