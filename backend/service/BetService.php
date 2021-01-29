@@ -418,7 +418,7 @@ abstract class BetService extends BaseBetService {
                     if($betRst['data']['bet_rst']['Status'] == 1){
                         $betSuccess = 1;
                     }
-                    $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account' => $account, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'loginRst'=>$loginRst];
+                    $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account' => $account, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'loginRst'=>$loginRst, 'betKey'=>$betKey, 'time'=>$time];
                     $snid = $betRst['data']['bet_rst']['snid'];
                     $sn = $betRst['data']['bet_rst']['sn'];
                     $planSnidArrs[$plan_id]['snids'][] = $snid;
