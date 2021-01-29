@@ -98,7 +98,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'code_012_789',//'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                $txt = $model->code_456_789==1 ? "<font color='green'>√</font>" :"<font color='red'>X</font>";
+                                $txt = $model->code_012_789==1 ? "<font color='green'>√</font>" :"<font color='red'>X</font>";
                                 return Html::a($txt, 'javascript:;', ['title' => '√对X错']);
                             }
                         ],
