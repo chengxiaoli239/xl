@@ -3127,7 +3127,7 @@ class SscDataService extends BaseService {
                 $date = $pre_date;
             }
         }
-        $rst['data'] = SscDataService::staticPerShuDateProfits($lottery_type, $date);
+        $rst['data'] = SscDataService::staticPeiShuDateProfits($lottery_type, $date);
 
         return $rst;
     }
@@ -3138,7 +3138,7 @@ class SscDataService extends BaseService {
      * @param int $lottery_type
      * @return array
      */
-    public static function staticPerShuDateProfits($lottery_type=DEFAULT_LOTTERY_TYPE, $date = ''){
+    public static function staticPeiShuDateProfits($lottery_type=DEFAULT_LOTTERY_TYPE, $date = ''){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         if(empty($date)) $date = date('Y-m-d');
 
@@ -3196,6 +3196,25 @@ class SscDataService extends BaseService {
         $row->setAttributes($setDatas);
         if(!$row->save()){
             return ['status'=>300, 'msg'=>$row->getErrors()];
+        }
+
+        return $rst;
+    }
+
+    /**
+     * @desc
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function staticPeiShuDate($lottery_type=DEFAULT_LOTTERY_TYPE){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+        if(true OR $lottery_type==8){
+            $start_date = '2021-01-01';
+            $end_date = '2021-01-29';
+        }
+        $dateArr = StaticService::getStartAndEndDate($start_date, $end_date);
+        foreach ($dateArr as $date){
+            $rst['data'][$date] = SscDataService::staticPeiShuDateProfits($lottery_type, $date);
         }
 
         return $rst;
