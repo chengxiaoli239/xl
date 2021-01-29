@@ -433,4 +433,16 @@ class IndexController extends Controller
         return $rst;
     }
 
+    /**
+     * @desc 配数利润统计
+     * @return array
+     */
+    public function actionCronStaticPeiShuProfits(){
+        self::_init();
+        $post = \Yii::$app->request->post();
+        $rst = SscDataService::cronStaticPeiShuProfits($post['lottery_type']);
+
+        return $rst;
+    }
+
 }
