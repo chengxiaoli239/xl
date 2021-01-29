@@ -3149,7 +3149,13 @@ class SscDataService extends BaseService {
         $date_s = str_replace('-', '', $date);
 
         $where = ['AND', ['=', 'lottery_type',$lottery_type], ['LIKE', 'qihao', $date_s.'%', false]];
-        $SscKjDatas = SscKjData::find()->select(['date', 'code_str'=>'LEFT(code_str,7)', 'qihao'])->where($where)->orderBy(['qihao'=>SORT_ASC])->asArray()->all();
+        if($lottery_type==8){
+            $sort_num = 3;
+            $where = array_merge($where, [['>', 'RIGHT(qihao,'.$sort_num.')', '108'], ['<', 'RIGHT(qihao,'.$sort_num.')', '48']]);
+        }else{
+            $sort_num = 2;
+        }
+        $SscKjDatas = SscKjData::find()->select(['date', 'code_str'=>'LEFT(code_str,7)', 'qihao', 'sort_qihao'=>'RIGHT(qihao,'.$sort_num.')'])->where($where)->orderBy(['qihao'=>SORT_ASC])->asArray()->all();
         $kjDatas = yii\helpers\ArrayHelper::getColumn($SscKjDatas, 'code_str');
         $peiShus = StaticService::getAllPeiShu();
 

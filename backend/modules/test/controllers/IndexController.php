@@ -201,8 +201,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $miss = SscDataService::staticPeiShuDate($lottery_type=6);p($miss);
-        $miss = SscDataService::staticPeiShuDateProfits($lottery_type=6, '2021-01-28');p($miss);
+        $miss = SscDataService::staticPeiShuDateProfits($lottery_type=8, '2021-01-28');p($miss);
+        $miss = SscDataService::staticPeiShuDate($lottery_type=8);p($miss);
         $codes_hz = ['ps_1'=>147, 'ps_2'=>369];
         $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type=4);p($codes);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%static_pei_shu_code_true_false}}');p($r);
