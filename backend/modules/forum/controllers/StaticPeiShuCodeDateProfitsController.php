@@ -2,6 +2,9 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\models\searchs\StaticPeiShuCodeTrueFalse as StaticPeiShuCodeTrueFalseSearch;
+use backend\service\UserSysPlansService;
+use common\service\CommonService;
 use Yii;
 use backend\models\StaticPeiShuCodeDateProfits;
 use backend\models\searchs\StaticPeiShuCodeDateProfits as StaticPeiShuCodeDateProfitsSearch;
@@ -36,9 +39,17 @@ class StaticPeiShuCodeDateProfitsController extends BaseController
     public function actionIndex()
     {
         $searchModel = new StaticPeiShuCodeDateProfitsSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $queryParams = Yii::$app->request->queryParams;
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
+        $queryParams['StaticPeiShuCodeDateProfits']['lottery_type'] = $lottery_type;
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
+            'lottery_type' => $lottery_type,
+            'lottery_types' => $lottery_types,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
