@@ -105,6 +105,16 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
                     <div class="row">
+                        <div class="col-lg-3 col-xs-3">
+                            <!--配数1-->
+                            <?= $form->field($model, 'ps_1')->textInput()->label('配数1')?>
+                        </div>
+                        <div class="col-lg-3 col-xs-3">
+                            <!--配数2-->
+                            <?= $form->field($model, 'ps_2')->textInput()->label('配数2')?>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-lg-3 col-xs-6">
                             <!--位置合分：位置-->
                         <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>

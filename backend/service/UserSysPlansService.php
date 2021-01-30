@@ -79,6 +79,17 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['p5']);
 
+        # 15、配数1
+        if(isset($UserSysPlans['ps_1']) && $UserSysPlans['ps_1'] !== ''){
+            $tmpFilter['ps_1'] = trim($UserSysPlans['ps_1']);
+        }
+        unset($post['UserSysPlans']['ps_1']);
+        # 15、配数1
+        if(isset($UserSysPlans['ps_2']) && $UserSysPlans['ps_2'] !== ''){
+            $tmpFilter['ps_2'] = trim($UserSysPlans['ps_2']);
+        }
+        unset($post['UserSysPlans']['pei_shu_2']);
+
         # 二、类型：双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
         # 1、双重
         if($UserSysPlans['type_2'] && count($UserSysPlans['type_2']) == 1){

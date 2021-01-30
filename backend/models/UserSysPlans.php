@@ -81,6 +81,9 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $hefen4; #  定位合分值4
     public $hefen_pos4; #  定位合分位置4
 
+    public $ps_1; #  配数1
+    public $ps_2; #  配数2
+
     public $no_fix_hefen; #  定位合分值
     public $no_fix_hefen_pos; #  定位合分位置
     public $arise_in; #  三定含

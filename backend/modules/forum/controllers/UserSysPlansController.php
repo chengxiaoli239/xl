@@ -130,9 +130,6 @@ class UserSysPlansController extends BaseController
         $defaultSiteId = UserService::getUserDefaultSite($this->_user_id);
         $model->tz_sites = [$defaultSiteId];
 
-        if(in_array($tz_type, [28])){ # 系统快捷
-        }
-
         $data =  [
             'model' => $model,
             'tz_type' => $tz_type,
@@ -189,12 +186,11 @@ class UserSysPlansController extends BaseController
             $codes = ImportPlanCodes::findOne($where)->codes;
             $model->import_codes_txt = str_replace('@', ' ', str_replace(',', '', $codes));
             foreach ($hz_Arr_Data as $key=>$val){
-                if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'p5', 'bet_while_miss', 'status_val', 'type_4ds', 'code1', 'code2', 'arise', 'type_4d', 'type_4s', 'hefen', 'no_fix_hefen', 'arise_in', 'xhenfen','singles_key'])){
-                    $model->$key = $val;
-                }elseif(in_array($key, ['hefen_pos', 'no_fix_henfen_pos', 'arise_in_sel'])){
+                if(in_array($key, ['hefen_pos', 'no_fix_henfen_pos', 'arise_in_sel'])){
                     $model->$key = explode(',', $val);
                 }else{
-                    $model->$key[] = $val;
+                    $model->$key = $val;
+                    //if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'p5', 'bet_while_miss', 'status_val', 'type_4ds', 'code1', 'code2', 'arise', 'type_4d', 'type_4s', 'hefen', 'no_fix_hefen', 'arise_in', 'xhenfen','singles_key', 'pei_shu_1', 'pei_shu_2'])){
                 }
             }
         }

@@ -1448,6 +1448,12 @@ class NumService extends BaseService {
         if(isset($hz_Arr['p5']) && $hz_Arr['p5'] !== ''){
             $desc .= ' 五'.$hz_Arr['p5'];
         }
+        if(isset($hz_Arr['ps_1']) && $hz_Arr['ps_1'] !== ''){
+            $desc .= ' 配数1:'.$hz_Arr['ps_1'];
+        }
+        if(isset($hz_Arr['ps_2']) && $hz_Arr['ps_2'] !== ''){
+            $desc .= ' 配数2:'.$hz_Arr['ps_2'];
+        }
 
         # 不定位合分:两数、三数
         if(isset($hz_Arr['no_fix_hefen_pos']) && isset($hz_Arr['no_fix_hefen'])){ # no_fix_hefen_pos=1:两数、no_fix_hefen_pos=2:三数
