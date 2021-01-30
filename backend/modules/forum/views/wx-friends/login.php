@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model backend\models\WxFriends */
 
-$this->title = $model->id;
+$this->title = Yii::t('app', 'Wx Login'); # $model->id
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Wx Friends'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -19,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </header>
                 <div class="panel-body">
                     <p>
+                        <!--
                         <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
                         <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->id], [
                             'class' => 'btn btn-danger',
@@ -27,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'method' => 'post',
                             ],
                         ]) ?>
+                        -->
                     </p>
                     <div class="row">
                         <div class="col-lg-11">
@@ -35,10 +37,17 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attributes' => [
 
                                     'id',
-                                    'Uin',
-                                    'UserName',
-                                    'NickName',
-                                    'HeadImgUrl',
+                                    //'Uin',
+                                    //'UserName',
+                                    //'NickName',
+                                    //'HeadImgUrl',
+                                    ['attribute'=>'HeadImgUrl','label'=>'头像','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                                        'format'=>['image',['height'=>300, 'width'=>300]],
+                                        'value'=>function($model){
+                                            return $model->login_img;
+                                        }
+                                    ],
+                                    /*
                                     'ContactFlag',
                                     'MemberCount',
                                     'MemberList:ntext',
@@ -66,8 +75,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'KeyWord',
                                     'EncryChatRoomId',
                                     'IsOwner',
-                                    'created_at',
-                                    'updated_at',
+                                    */
+                                    //'created_at',
+                                    ['attribute' => 'created_at', 'label'=>'时间',
+                                        'value' => function($model) {
+                                            return date('Y-m-d H:i:s', $model->created_at);
+                                        }
+                                    ],
+                                    //'updated_at',
                                 ],
                             ]) ?>
                         </div>

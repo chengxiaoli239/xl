@@ -149,17 +149,26 @@ class WxFriendsController extends BaseController
     public function actionLogin(){
 
         //重新扫描登陆时，清空缓存
+        $uid = $this->_user_id;
         /*
         session_start();
         unset($_SESSION);
         session_destroy();
         */
+        $model = $this->findModel(['uid'=>$uid]);
         $uuid    = WxService::get_uuid();
         $erweima = WxService::qrcode($uuid);
-        echo ($erweima); //显示二维码
-        echo "<a href='/forum/wx-friends/sync-friends?uuid=" . $uuid . "'>扫描后，点击登陆确认</a>(备注：扫描后点击登陆按钮" . $uuid . ")";
+        $model->login_img = $erweima;
+        //echo ($erweima); //显示二维码
+        //echo "<a href='/forum/wx-friends/sync-friends?uuid=" . $uuid . "'>扫描后，点击登陆确认</a>(备注：扫描后点击登陆按钮" . $uuid . ")";
 
-        //return $this->render('login', [ ]);
+        $data = [
+            'model' => $model,
+            'uuid' => $uuid,
+            'erweima' => $erweima,
+        ];
+
+        return $this->render('login', $data);
     }
 
     /**

@@ -201,6 +201,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $uuid = WxService::get_uuid();p($uuid);
         $miss = SscDataService::staticPeiShuDateProfits($lottery_type=8, '2021-01-28');p($miss);
         $miss = SscDataService::staticPeiShuDate($lottery_type=8);p($miss);
         $codes_hz = ['ps_1'=>147, 'ps_2'=>369];
@@ -211,7 +212,6 @@ class IndexController extends Controller
         $rst = StaticService::getCreatePeiShuCodeTypeSql($type=1);p($rst);
         $rst = StaticService::getCreatePeiShuTrueFalseSql();p($rst);
         $miss = SscDataService::getSdHzYlHistoryMiss([5], $lottery_type = 6, 500000);p($miss);
-        $uuid    = WxService::get_uuid();p($uuid);
         $rst = Lucky5Service::getQihaoInfo($uid=10, $tz_system_id=9, $lottery_type=8);p($rst);
         $str = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx16d295b4421899d4&redirect_uri=http%3A%2F%2Fgoapi.hngoshare.com%2Fpay%2Findex%2Fmiddle-redirect%3Fparams%3D%252Fweixin%252Fwechat.html%253Forder_sn%253D2021011610424878811%2526&response_type=code&scope=snsapi_base&state=STATE&connect_redirect=1#wechat_redirect";
         p(urldecode($str));

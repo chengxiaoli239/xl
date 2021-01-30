@@ -43,10 +43,14 @@ class WxService {
      * @param $uuid
      * @return img
      */
-    public static function qrcode($uuid) {
+    public static function qrcode($uuid='') {
+        if(empty($uuid)){
+            $uuid  = WxService::get_uuid();
+        }
         $url = 'https://login.weixin.qq.com/qrcode/' . $uuid . '?t=webwx';
-        $img = "<img class='img' src=" . $url . "/>";
-        return $img;
+        //$img = "<img class='img' src=" . $url . "/>";
+        //return $img;
+        return $url;
     }
 
     /**

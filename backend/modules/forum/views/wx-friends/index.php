@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'ContactFlag',
                         //'MemberCount',
                         //'MemberList:ntext',
-                        'RemarkName',
+                        //'RemarkName',
                         ['attribute' => 'RemarkName', 'format'=>'raw',
                             'value' => function($model) {
                                 $dataArr = [0=>'未知', 1=>'男', 2=>'女'];
