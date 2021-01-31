@@ -36,12 +36,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'model' => $model,
                                 'attributes' => [
 
-                                    'id',
+                                    //'id',
                                     //'Uin',
                                     //'UserName',
                                     //'NickName',
                                     //'HeadImgUrl',
-                                    ['attribute'=>'HeadImgUrl','label'=>'头像','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                                    ['attribute'=>'HeadImgUrl','label'=>'二维码','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                                         'format'=>['image',['height'=>300, 'width'=>300]],
                                         'value'=>function($model){
                                             return $model->login_img;
@@ -96,14 +96,17 @@ $this->params['breadcrumbs'][] = $this->title;
 <script src="/statics/datetimepicker/jquery.js"></script>
 <script>
 $(function () {
-    var t2 = window.setTimeout(function (){
-        uuid = $("#uuid").val();
-        $.post("/forum/wx-friends/get-login-status", {uuid:uuid}, function(rst) {
-            console.log(rst);
-            if(rst.status == 200){
-                console.log(200);
-            }
-        });
-    },3000);
 })
+var t2 = window.setInterval(function (){
+    uuid = $("#uuid").val();
+    $.post("/forum/wx-friends/get-login-status", {uuid:uuid}, function(rst) {
+        console.log(rst);
+        if(rst.code == 200){
+            redirect_uri = rst.redirect_uri + '&fun=new&version=v2&lang=zh_CN';
+            //$.get(redirect_uri, function(result) {
+            //    console.log(result);
+            //});
+        }
+    });
+},6000);
 </script>

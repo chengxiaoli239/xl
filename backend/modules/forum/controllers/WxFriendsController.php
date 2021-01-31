@@ -180,6 +180,9 @@ class WxFriendsController extends BaseController
         $post = \Yii::$app->request->post();
         if(!empty($post['uuid'])){
             $rst = WxService::isLogin($post['uuid']);
+            if($rst['code']==200){
+                $rst['data'] = WxService::webWxNewLoginPage($rst['redirect_uri']);
+            }
         }else{
             $rst = ['status'=>300, 'msg'=>'uuid'];
         }

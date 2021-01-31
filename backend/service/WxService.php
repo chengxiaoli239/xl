@@ -54,7 +54,7 @@ class WxService {
     }
 
     /**
-     * 扫描登录
+     * 二、1.微信扫描
      * @param $uuid
      * @param string $icon
      * @return array code 408:未扫描;201:扫描未登录;200:登录成功; icon:用户头像
@@ -76,9 +76,31 @@ class WxService {
 		} else {
 			$data['code'] = $code;
 		}
+		$strArr = [];
+		if(strpos($content, 'redirect_uri') !== false){
+		    $strArr = explode('"', $content);
+		    $data['redirect_uri'] = $strArr[1];
+        }
+		Tool_Common::log('/wx/isLogin', 'INFO', '二、1.微信扫描', ['code'=>$code, 'content'=>$content, 'strArr'=>$strArr]);
         //echo json_encode($data);//改之前
 		return $data;
 	}
+
+    /**
+     * @desc 二、2.获取微信新的登陆页面   # 需存储cookie 未完成
+     * @param string $url
+     * @return array|bool
+     */
+	public static function webWxNewLoginPage($url = ''){
+        if(strpos($url, 'http') === false){
+            return false;
+        }
+        $url = $url . '&fun=new&version=v2&lang=zh_CN';
+        $content = self::curlPost($url);
+        Tool_Common::log('/wx/webWxNewLoginPage', 'INFO', '二、2.获取微信新的登陆页面', ['url'=>$url, 'content'=>$content]);
+
+        return ['status'=>200, 'msg'=>'操作成功'];
+    }
 
     /**
      * 登录成功回调
