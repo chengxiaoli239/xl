@@ -108,5 +108,5 @@ var t2 = window.setInterval(function (){
             //});
         }
     });
-},6000);
+},10000);
 </script>

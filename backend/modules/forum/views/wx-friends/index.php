@@ -19,12 +19,13 @@ $this->params['breadcrumbs'][] = $this->title;
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
+                <!--
                 <div class="clearfix">
                     <div class="btn-group">
-                        <!--?= Html::a(Yii::t('app', 'Create Wx Friends'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?-->
                         <?= Html::a(Yii::t('app', 'Weixin Login'), ['login'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
                 </div>
+                -->
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 

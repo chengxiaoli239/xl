@@ -178,9 +178,12 @@ class WxFriendsController extends BaseController
     public function actionGetLoginStatus(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
+        $m = \Yii::$app->cache;
         if(!empty($post['uuid'])){
+            $mkey = 'actionGetLoginStatus_'.$post['uuid'];
             $rst = WxService::isLogin($post['uuid']);
-            if($rst['code']==200){
+            if($rst['code']==200 && !$flag = $m->get($mkey)){
+                $m->set($mkey, 1, 120);
                 $rst['data'] = WxService::webWxNewLoginPage($rst['redirect_uri']);
             }
         }else{
