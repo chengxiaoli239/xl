@@ -172,6 +172,22 @@ class WxFriendsController extends BaseController
     }
 
     /**
+     * @desc 是否确认登陆状态
+     * @return array
+     */
+    public function actionGetLoginStatus(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        if(!empty($post['uuid'])){
+            $rst = WxService::isLogin($post['uuid']);
+        }else{
+            $rst = ['status'=>300, 'msg'=>'uuid'];
+        }
+
+        return $rst;
+    }
+
+    /**
      * @desc 同步好友状态
      */
     public function actionSyncFriends(){

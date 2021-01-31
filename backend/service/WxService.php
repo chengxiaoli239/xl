@@ -59,7 +59,7 @@ class WxService {
      * @param string $icon
      * @return array code 408:未扫描;201:扫描未登录;200:登录成功; icon:用户头像
      */
-    public static function login($uuid, $icon = 'true') {
+    public static function isLogin($uuid, $icon = 'true') {
         //$url = 'https://login.weixin.qq.com/cgi-bin/mmwebwx-bin/login?loginicon=' . $icon . '&r=' . ~time() . '&uuid=' . $uuid . '&tip=0&_=' . getMillisecond();
         $url = 'https://login.weixin.qq.com/cgi-bin/mmwebwx-bin/login?loginicon=' . $icon .'&r=' . ~time() . '&uuid=' . $uuid . '&tip=0&_=' . time();
 		$content = self::curlPost($url);
@@ -467,7 +467,7 @@ class WxService {
     public static function syncFriendsData($uid, $uuid){
         self::$uuid = $uuid;
         $get = \Yii::$app->request->get();
-        if(!$get['test']) $loginInfo = WxService::login($uuid);
+        if(!$get['test']) $loginInfo = WxService::isLogin($uuid);
         if ($loginInfo['code'] == 200 OR $get['test']) {
             //获取登录成功回调
             $callback = WxService::get_uri($uid, $uuid);

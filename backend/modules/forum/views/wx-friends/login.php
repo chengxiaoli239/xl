@@ -92,3 +92,18 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </section>
+<input type="hidden" id="uuid" value="<? echo $uuid;?>">
+<script src="/statics/datetimepicker/jquery.js"></script>
+<script>
+$(function () {
+    var t2 = window.setTimeout(function (){
+        uuid = $("#uuid").val();
+        $.post("/forum/wx-friends/get-login-status", {uuid:uuid}, function(rst) {
+            console.log(rst);
+            if(rst.status == 200){
+                console.log(200);
+            }
+        });
+    },3000);
+})
+</script>

@@ -145,6 +145,7 @@ return [
             'chat/*',
             'api/*',
             'kj/*',
+            'wx-friends/*',
             '/agent/agent-users/get-user-info',
             #'forum/index/tz',
             #'admin/*',

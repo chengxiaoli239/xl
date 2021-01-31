@@ -170,7 +170,8 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 
-<script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script>
+<!--script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script-->
+<script src="/statics/datetimepicker/jquery.js"></script>
 <script>
     $(function () {
         $(".act-check").click(function () {
