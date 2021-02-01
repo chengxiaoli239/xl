@@ -1,6 +1,7 @@
 <?php
 namespace backend\service;
 
+use backend\models\SystemConfig;
 use backend\models\WxFriends;
 use backend\models\WxMsgTypes;
 use common\general\helpers\Curl;
@@ -625,5 +626,68 @@ class WxService {
         return ['status'=>200, 'data'=>json_decode($sendRst, true)];
     }
 
+    /**
+     * @decription post请求根据，接受传递的header头
+     * @param $url
+     */
+    public static function postCurl($url,$post_data = [], $headers=[], $uid = 0){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        if(!$timeout) $timeout = 30;
+
+        //$cookie = dirname(__FILE__)."/cookie.txt";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+
+        curl_setopt($ch, CURLOPT_HEADER, 1); #
+
+        //$poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+
+        //设置post方式提交
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER, TRUE);    //表示需要response header
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+        $start_time = microtime(true);
+        $content = curl_exec($ch);
+        $end_time = microtime(true);
+        //d($data);
+        $errno = curl_errno($ch);
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
+        if($errno){
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$content, 'errno'=>$errno];
+            //p($logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
+        }
+
+        # ================= xCsrf token start =====================
+        if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == '200') {
+
+            $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $header = substr($content, 0, $headerSize);
+
+            preg_match("/X\-Csrf\-Index:([^\r\n]*)/i", $header, $matches1);
+            preg_match("/X\-Csrf\-Token:([^\r\n]*)/i", $header, $matches2);
+
+            $body = substr($content, $headerSize);
+            $result['rstData'] = json_decode($body, true);
+
+            $result['xCsrf'] = ['Index'=>trim($matches1[1]), 'Token'=>trim($matches2[1])];
+        }
+        # ================= xCsrf token start =====================
+
+        return $result;
+    }
 
 }
