@@ -55,12 +55,12 @@ class TzSystemsUsers extends \common\models\base\BaseModel
         return [
             [['uid', 'is_agent', 'tz_system_id', 'status', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
-            [['cookie'], 'string'],
+            [['cookie', 'cookie_wx_web'], 'string'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['username', 'sys_name', 'account', 'ssc_domain'], 'string', 'max' => 64],
             [['password'], 'string', 'max' => 20],
-            [['user_agent', 'cookie_wx_web', 'desc'], 'string', 'max' => 640],
+            [['user_agent', 'desc'], 'string', 'max' => 640],
             [['warn_val'], 'string', 'max' => 11],
         ];
     }
