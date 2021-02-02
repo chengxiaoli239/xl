@@ -2,6 +2,7 @@
 namespace backend\service;
 
 use backend\models\SystemConfig;
+use backend\models\TzSystemsUsers;
 use backend\models\WxFriends;
 use backend\models\WxMsgTypes;
 use common\general\helpers\Curl;
@@ -90,17 +91,54 @@ class WxService {
     /**
      * @desc 二、2.获取微信新的登陆页面   # 需存储cookie 未完成
      * @param string $url
+     * @param string $uid
      * @return array|bool
      */
-	public static function webWxNewLoginPage($url = ''){
+	public static function webWxNewLoginPage($uid = '', $url = ''){
         if(strpos($url, 'http') === false){
             return false;
         }
+        $m = \Yii::$app->cache;
+        $mkey = WxService::buildWebWxNewLoginKey($uid);
         $url = $url . '&fun=new&version=v2&lang=zh_CN';
-        $content = self::curlPost($url);
-        Tool_Common::log('/wx/webWxNewLoginPage', 'INFO', '二、2.获取微信新的登陆页面', ['url'=>$url, 'content'=>$content]);
+        //$content = self::curlPost($url);
+        $content = self::postCurl($url);
+        $m->set($mkey, $content['rstData'], 3600);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+        $cookiesArr = $content['cookies'][1];
+        $cookieDatas = [];
+        foreach ($cookiesArr as $cookie){
+            $cookieDatas[] = trim(explode(';', $cookie)[0]);
+        }
+        $TzSystemsUsers->cookie_wx_web = 'MM_WX_NOTIFY_STATE=1; MM_WX_SOUND_STATE=1; refreshTimes=5;'.implode(';', $cookieDatas).'';
+        $TzSystemsUsers->save();
+        Tool_Common::log('/wx/webWxNewLoginPage', 'INFO', '二、2.获取微信新的登陆页面', ['uid'=>$uid, 'url'=>$url, 'content'=>$content]);
 
         return ['status'=>200, 'msg'=>'操作成功'];
+    }
+
+    /**
+     * @desc 网页确认登陆后微信返回数据
+     * @param string $uid
+     * @return string
+     */
+    public static function buildWebWxNewLoginKey($uid = ''){
+        $mkey = 'webWxNewLoginPage_xml_data_'.$uid;
+
+        return $mkey;
+    }
+
+    /**
+     * @desc 微信的登陆返回信息
+     * @param string $uid
+     * @return mixed
+     */
+    public static function getWxNewLoginCallBackData($uid = ''){
+        $m = \Yii::$app->cache;
+        $mkey = WxService::buildWebWxNewLoginKey($uid);
+        $data = $m->get($mkey);
+
+        return $data;
     }
 
     /**
@@ -108,7 +146,7 @@ class WxService {
      * @param $uuid
      * @return array $callback
      */
-	public static function get_uri($uid, $uuid) {
+	public static function get_uri($uuid) {
 		$url         = 'https://login.weixin.qq.com/cgi-bin/mmwebwx-bin/login?uuid=' . $uuid . '&tip=0&_=e' . time();
 		$content     = self::curlPost($url);
 		$content     = explode(';', $content);
@@ -489,61 +527,64 @@ class WxService {
      */
     public static function syncFriendsData($uid, $uuid){
         self::$uuid = $uuid;
-        $get = \Yii::$app->request->get();
-        if(!$get['test']) $loginInfo = WxService::isLogin($uuid);
-        if ($loginInfo['code'] == 200 OR $get['test']) {
-            //获取登录成功回调
-            $callback = WxService::get_uri($uid, $uuid);
-            //获取post数据
-            $post = WxService::post_self($callback, $https_header);
-            //初始化数据json格式
-            $initInfo = WxService::wxinit($post, $https_header);
-            //p(['initInfo'=>$initInfo],0);
+        //获取登录成功回调
+        $callback = WxService::get_uri($uuid);
+        //获取post数据
+        $post = WxService::post_self($callback, $https_header);
+        //初始化数据json格式
+        $initInfo = WxService::wxinit($post, $https_header);
+        //p(['initInfo'=>$initInfo],0);
 
-            //获取MsgId,参数post，初始化数据initInfo
-            //$msgInfo = WxService::wxstatusnotify($post,$initInfo,$callback['post_url_header']);
-            //获取联系人
-            $contactInfo = WxService::webwxgetcontact($post, $callback[ 'post_url_header']);
-            //p(['contactInfo'=>json_decode($contactInfo, true)]);
-            $contacts = json_decode($contactInfo, true);
-            foreach ($contacts['MemberList'] as $info){
+        //获取MsgId,参数post，初始化数据initInfo
+        $msgInfo = WxService::wxstatusnotify($post, $initInfo, $callback['post_url_header']);
+        //获取联系人
+        $contactInfo = WxService::webwxgetcontact($post, $callback[ 'post_url_header']);
+        //p(['contactInfo'=>json_decode($contactInfo, true)]);
+        $contacts = json_decode($contactInfo, true);
+        foreach ($contacts['MemberList'] as $info){
+            try{
                 $setData = $info;
                 $setData['uid'] = $uid;
                 $setData['NickName'] = urlencode($info['NickName']);
                 $setData['MemberList'] = json_encode($info['MemberList'], 320);
-                if(!$WxFriends = WxFriends::findOne(['NickName'=>$info['NickName'], 'uid'=>$uid])){
+                if(!$WxFriends = WxFriends::findOne(['UserName'=>$info['UserName'], 'uid'=>$uid])){
                     $WxFriends = new WxFriends();
                     $setData['created_at'] = time();
+                    $setData['UserName'] = $info['UserName'];
                 }
                 $setData['updated_at'] = time();
+                $setData['AttrStatus'] = (string)$setData['AttrStatus'];
+                $setData['RemarkName'] = urlencode($setData['RemarkName']);
 
                 $url = \Yii::$app->params['WX_IMG_URL_DOMAIN'].$info['HeadImgUrl'];
-                CurlService::getCurl($url);
+                //CurlService::getCurl($url);
                 $WxFriends->setAttributes($setData);
-                $rst = $WxFriends->save();
-                //p($WxFriends->getFirstErrors(),0);
-                //p($WxFriends->attributes, 0);
+                if(!$rst = $WxFriends->save()){
+                    Tool_Common::log('/wx/syncFriendsData', 'INFO', '微信好友同步', ['msg'=>$WxFriends->getErrors(), 'setData'=>$setData, 'info'=>$info]);
+                }
+            }catch (\ErrorException $e){
+                Tool_Common::log('/wx/syncFriendsData', 'INFO', '微信好友同步', ['msg'=>$e->getMessage(), 'setData'=>$setData, 'info'=>$info]);
             }
-
-            //查询的数据放入缓存
-            $m = \Yii::$app->cache;
-            $mkey = self::getWxMcKey($uid);
-            $WxInfo  = [];
-            //session_start();
-            $WxInfo['callback_post_url_header'] = $callback['post_url_header'];
-            $WxInfo['post']                     = $post;
-            //$WxInfo['initInfo']                 = $initInfo;
-            $initData = json_decode($initInfo, true);
-            $WxInfo['fromUser']                 = $initData['User'];
-            $WxInfo['contactInfo']              = $contactInfo;
-            $m->set($mkey, $WxInfo, 7*24*3600);
-
-            //p($WxInfo);
-            $logArr = ['mkey'=>$mkey, 'WxInfo'=>$WxInfo, 'rst'=>$rst, 'loginInfo'=>$loginInfo, 'contacts'=>$contacts, 'url'=>$url];
-            Tool_Common::log('setWxInfo', 'INFO', '设置微信缓存', $logArr);
-            //print_r($_SESSION['callback_post_url_header']);die;
-            //header("Location: wx.php?cmd=send"); exit;
         }
+
+        //查询的数据放入缓存
+        $m = \Yii::$app->cache;
+        $mkey = self::getWxMcKey($uid);
+        $WxInfo  = [];
+        //session_start();
+        $WxInfo['callback_post_url_header'] = $callback['post_url_header'];
+        $WxInfo['post']                     = $post;
+        //$WxInfo['initInfo']                 = $initInfo;
+        $initData = json_decode($initInfo, true);
+        $WxInfo['fromUser']                 = $initData['User'];
+        $WxInfo['contactInfo']              = $contactInfo;
+        $m->set($mkey, $WxInfo, 7*24*3600);
+
+        //p($WxInfo);
+        $logArr = ['mkey'=>$mkey, 'WxInfo'=>$WxInfo, 'rst'=>$rst, 'contacts'=>$contacts, 'url'=>$url];
+        Tool_Common::log('/wx/setWxInfo', 'INFO', '设置微信缓存', $logArr);
+        //print_r($_SESSION['callback_post_url_header']);die;
+        //header("Location: wx.php?cmd=send"); exit;
         //print_r($loginInfo);
         //print_r('登陆失败');
 
@@ -634,8 +675,6 @@ class WxService {
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         if(!$timeout) $timeout = 30;
 
-        //$cookie = dirname(__FILE__)."/cookie.txt";
-
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
 
@@ -643,51 +682,52 @@ class WxService {
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);//设置超时限制，防止死循环
-
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-
         curl_setopt($ch, CURLOPT_HEADER, 1); #
 
         //$poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
 
-        //设置post方式提交
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER, TRUE);    //表示需要response header
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+        if(!empty($post_data)){
+            //设置post方式提交
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+        }
 
         $start_time = microtime(true);
         $content = curl_exec($ch);
         $end_time = microtime(true);
-        //d($data);
         $errno = curl_errno($ch);
         //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
         if($errno){
-            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$content, 'errno'=>$errno];
-            //p($logArr);
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$content, 'errno'=>$errno]; //p($logArr);
             Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
         }
 
         # ================= xCsrf token start =====================
         if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == '200') {
-
             $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-            $header = substr($content, 0, $headerSize);
+            $headers = substr($content, 0, $headerSize);
 
-            preg_match("/X\-Csrf\-Index:([^\r\n]*)/i", $header, $matches1);
-            preg_match("/X\-Csrf\-Token:([^\r\n]*)/i", $header, $matches2);
-
+            preg_match_all("/Set\-Cookie:([^\r\n]*)/i", $headers, $matches1);
             $body = substr($content, $headerSize);
-            $result['rstData'] = json_decode($body, true);
-
-            $result['xCsrf'] = ['Index'=>trim($matches1[1]), 'Token'=>trim($matches2[1])];
+            $result['rstData'] = WxService::xmlToArray(trim($body));
+            $result['cookies'] = $matches1;
         }
         # ================= xCsrf token start =====================
 
         return $result;
     }
 
+    public static function xmlToArray($xml)
+    {
+        //禁止引用外部xml实体
+        libxml_disable_entity_loader(true);
+        $values = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+        return $values;
+    }
 }

@@ -102,10 +102,7 @@ var t2 = window.setInterval(function (){
     $.post("/forum/wx-friends/get-login-status", {uuid:uuid}, function(rst) {
         console.log(rst);
         if(rst.code == 200){
-            redirect_uri = rst.redirect_uri + '&fun=new&version=v2&lang=zh_CN';
-            //$.get(redirect_uri, function(result) {
-            //    console.log(result);
-            //});
+            window.location.href = '/forum/wx-friends/index';
         }
     });
 },10000);

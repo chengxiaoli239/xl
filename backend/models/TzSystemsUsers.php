@@ -39,6 +39,7 @@ use Yii;
  */
 class TzSystemsUsers extends \common\models\base\BaseModel
 {
+    public $login_img;
     /**
      * @inheritdoc
      */

@@ -201,12 +201,17 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%wx_friends}}');p($r);
+        $m = \Yii::$app->cache;
+        $mkey = WxService::buildWebWxNewLoginKey($uid=18);
+        p($m->get($mkey));
+        $url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxnewloginpage?ticket=AzuRMOCfGIArJoT5WpvIxkyl@qrticket_0&uuid=Yc4HbjCpgw==&lang=zh_CN&scan=1612280590&fun=new&version=v2&lang=zh_CN';
+        $rst['data'] = WxService::webWxNewLoginPage($uid=18, $url);p($rst);
         $uuid = WxService::get_uuid();p($uuid);
         $miss = SscDataService::staticPeiShuDateProfits($lottery_type=8, '2021-01-28');p($miss);
         $miss = SscDataService::staticPeiShuDate($lottery_type=8);p($miss);
         $codes_hz = ['ps_1'=>147, 'ps_2'=>369];
         $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type=4);p($codes);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%static_pei_shu_code_true_false}}');p($r);
 
         $miss = SscDataService::staticPerShuTrueFalse($lottery_type = [6]);p($miss);
         $rst = StaticService::getCreatePeiShuCodeTypeSql($type=1);p($rst);

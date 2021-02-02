@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\models\TzSystemsUsers;
 use backend\service\Wx;
 use backend\service\WxService;
 use Yii;
@@ -150,12 +151,7 @@ class WxFriendsController extends BaseController
 
         //重新扫描登陆时，清空缓存
         $uid = $this->_user_id;
-        /*
-        session_start();
-        unset($_SESSION);
-        session_destroy();
-        */
-        $model = $this->findModel(['uid'=>$uid]);
+        $model = TzSystemsUsers::findOne(['uid'=>$uid]);//$this->findModel(['uid'=>$uid]);
         $uuid    = WxService::get_uuid();
         $erweima = WxService::qrcode($uuid);
         $model->login_img = $erweima;
@@ -184,8 +180,9 @@ class WxFriendsController extends BaseController
             $rst = WxService::isLogin($post['uuid']);
             if($rst['code']==200 && !$flag = $m->get($mkey)){
                 $m->set($mkey, 1, 120);
-                $rst['data'] = WxService::webWxNewLoginPage($rst['redirect_uri']);
+                $rst['data'] = WxService::webWxNewLoginPage($this->_user_id, $rst['redirect_uri']);
             }
+            WxService::syncFriendsData($this->_user_id, $post['uuid']);
         }else{
             $rst = ['status'=>300, 'msg'=>'uuid'];
         }
@@ -199,7 +196,6 @@ class WxFriendsController extends BaseController
     public function actionSyncFriends(){
         $get = \Yii::$app->request->get();
 
-        $list = WxService::syncFriendsData($this->_user_id, $get['uuid']);
 
         header('Location: /forum/wx-friends/index');
         //return $this->render('index', [ 'list'=>$list ]);
