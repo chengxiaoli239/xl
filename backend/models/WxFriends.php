@@ -63,10 +63,10 @@ class WxFriends extends \common\models\base\BaseModel
         return [
             [['uid', 'Uin', 'status', 'ContactFlag', 'MemberCount', 'HideInputBarFlag', 'Sex', 'VerifyFlag', 'OwnerUin', 'StarFriend', 'AppAccountFlag', 'Statues', 'SnsFlag', 'UniFriend', 'ChatRoomId', 'IsOwner', 'created_at', 'updated_at'], 'integer'],
             [['MemberList'], 'string'],
-            [['UserName', 'NickName', 'HeadImgUrl', 'KeyWord', 'EncryChatRoomId'], 'string', 'max' => 255],
+            [['UserName', 'NickName', 'HeadImgUrl', 'PYInitial', 'PYQuanPin', 'KeyWord', 'EncryChatRoomId'], 'string', 'max' => 255],
             [['send_name', 'RemarkName', 'AttrStatus', 'Province', 'City', 'Alias', 'DisplayName'], 'string', 'max' => 32],
             [['Signature'], 'string', 'max' => 120],
-            [['PYInitial', 'PYQuanPin', 'RemarkPYInitial', 'RemarkPYQuanPin'], 'string', 'max' => 64],
+            [['RemarkPYInitial', 'RemarkPYQuanPin'], 'string', 'max' => 64],
         ];
     }
 
