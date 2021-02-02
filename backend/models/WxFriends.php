@@ -31,7 +31,7 @@ use Yii;
  * @property int $StarFriend
  * @property int $AppAccountFlag
  * @property int $Statues
- * @property int $AttrStatus
+ * @property string $AttrStatus
  * @property string $Province 省
  * @property string $City 市县
  * @property string $Alias 别名
@@ -47,7 +47,6 @@ use Yii;
  */
 class WxFriends extends \common\models\base\BaseModel
 {
-    public $login_img;
     /**
      * @inheritdoc
      */
@@ -62,11 +61,12 @@ class WxFriends extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['uid', 'Uin', 'status', 'ContactFlag', 'MemberCount', 'HideInputBarFlag', 'Sex', 'VerifyFlag', 'OwnerUin', 'StarFriend', 'AppAccountFlag', 'Statues', 'AttrStatus', 'SnsFlag', 'UniFriend', 'ChatRoomId', 'IsOwner', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'Uin', 'status', 'ContactFlag', 'MemberCount', 'HideInputBarFlag', 'Sex', 'VerifyFlag', 'OwnerUin', 'StarFriend', 'AppAccountFlag', 'Statues', 'SnsFlag', 'UniFriend', 'ChatRoomId', 'IsOwner', 'created_at', 'updated_at'], 'integer'],
             [['MemberList'], 'string'],
             [['UserName', 'NickName', 'HeadImgUrl', 'KeyWord', 'EncryChatRoomId'], 'string', 'max' => 255],
-            [['send_name', 'RemarkName', 'PYInitial', 'PYQuanPin', 'RemarkPYInitial', 'RemarkPYQuanPin', 'Province', 'City', 'Alias', 'DisplayName'], 'string', 'max' => 32],
+            [['send_name', 'RemarkName', 'AttrStatus', 'Province', 'City', 'Alias', 'DisplayName'], 'string', 'max' => 32],
             [['Signature'], 'string', 'max' => 120],
+            [['PYInitial', 'PYQuanPin', 'RemarkPYInitial', 'RemarkPYQuanPin'], 'string', 'max' => 64],
         ];
     }
 
