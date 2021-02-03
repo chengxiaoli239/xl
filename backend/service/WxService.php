@@ -313,20 +313,13 @@ class WxService {
 		}
 		$SyncKey_value = '';
 		foreach ($SyncKey['List'] as $key => $value) {
-			if ($key == 1) {
-				$SyncKey_value = $value['Key'] . '_' . $value[ 'Val'];
-			} else {
-				$SyncKey_value .= '|' . $value['Key'] . '_' . $value['Val'];
-			}
+            $SyncKey_value .= $value['Key'] . '_' . $value[ 'Val'].'|';
 		}
+		$SyncKey_value = trim($SyncKey_value, '|');
 
-		$header = [
-			'0' => 'https://webpush.wx2.qq.com',
-			'1' => 'https://webpush.wx.qq.com'
-		];
-
+		$header = [ '0' => 'https://webpush.wx2.qq.com', '1' => 'https://webpush.wx.qq.com' ];
 		foreach ($header as $key => $value) {
-			$url = $value . "/cgi-bin/mmwebwx-bin/synccheck?r=" . getMillisecond() . "&skey=" . urlencode($post['skey']) . "&sid=" . $post['sid']."&deviceid=" . $post['BaseRequest']['DeviceID'] . "&uin=" . $post['uin'] . "&synckey=" . urlencode($SyncKey_value) . "&_=" . self::getMillisecond();
+			$url = $value . "/cgi-bin/mmwebwx-bin/synccheck?r=" . self::getMillisecond() . "&skey=" . urlencode($post['skey']) . "&sid=" . $post['sid']."&deviceid=" . $post['BaseRequest']['DeviceID'] . "&uin=" . $post['uin'] . "&synckey=" . urlencode($SyncKey_value) . "&_=" . self::getMillisecond();
 			$data[] = self::curlPost($url);
 		}
 

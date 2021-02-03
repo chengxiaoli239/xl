@@ -30,6 +30,7 @@ use backend\service\sports\TennisSportsService;
 use backend\service\SscDataService;
 use backend\service\TzService;
 use backend\service\UserSysPlansService;
+use backend\service\WxService;
 use common\service\CommonService;
 use Yii;
 use backend\models\SscKjData;
@@ -444,5 +445,26 @@ class IndexController extends Controller
 
         return $rst;
     }
+
+    /**
+     * @desc 配数利润统计
+     * @return array
+     */
+    public function actionWxSyncCheck(){
+        self::_init();
+        $post = \Yii::$app->request->post();
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+        $uid = $post['uid'];
+        $m = \Yii::$app->cache;
+        $mkey = WxService::buildWebWxNewLoginKey($uid);
+        if($loginData = $m->get($mkey)){
+            for($i=0; $i<10; $i++){
+                WxService::synccheck($loginData);
+            }
+        }
+
+        return $rst;
+    }
+
 
 }
