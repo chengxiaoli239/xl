@@ -162,15 +162,15 @@ class WxService {
 		$uri     = $new_uri[0] . 'fun=new&scan=' . time();
 		$getXML  = self::curlPost($uri);
 
-		$XML = simplexml_load_string($getXML);
+       $XML = WxService::xmlToArray($getXML);
 
 		$callback = [
 			'post_url_header' => $post_url_header,
             'https_header' => $https_header,
-			'Ret'             => (array) $XML
+			'Ret' => (array) $XML
 		];
-		$logArr = ['callback'=>$callback, 'url'=>$url, 'content'=>$content, 'https_header'=>$https_header];
-		Tool_Common::log('get_uri', 'INFO', '登录成功回调', $logArr);
+		$logArr = ['callback'=>$callback, 'url'=>$url, 'getXML'=>$getXML, 'content'=>$content, 'https_header'=>$https_header];
+		Tool_Common::log('/wx/get_uri', 'INFO', '登录成功回调', $logArr);
 		return (array)$callback;
 	}
 
@@ -185,7 +185,7 @@ class WxService {
 		$Ret    = $callback['Ret'];
 		$status = $Ret['ret'];
 		if ($status == '1203') {
-			self::error('未知错误,请2小时后重试');
+            Tool_Common::log('/wx/post_self_error', 'INFO', '微信post', ['msg'=>'未知错误,请2小时后重试']);
 		}
 		if ($status == '0') {
 			$post['BaseRequest'] = [
@@ -204,11 +204,12 @@ class WxService {
 			$post['uin'] = $Ret['wxuin'];
             $https_header = $callback['https_header'];
 		}
+        Tool_Common::log('/wx/post_self', 'INFO', '微信post', ['callback'=>$callback, 'status'=>$status, 'post'=>$post, 'https_header'=>$https_header]);
         return (array)$post;
 	}
 
     /**
-     * 初始化
+     * 初始化 - 返回数据有 data.SyncKey.List 里边有心跳包需要的参数
      * @param $post
      * @return json $json
      */
@@ -219,6 +220,7 @@ class WxService {
 			'BaseRequest' => $post['BaseRequest']
 		];
 		$json = self::curlPost($url, $post);
+		Tool_Common::log('/wx/wxinit', 'INFO', '微信登陆初始化', ['post'=>$post, 'https_header'=>$https_header, 'json'=>$json]);
 
 		return $json;
 	}
@@ -512,6 +514,19 @@ class WxService {
         return $data;
     }
 
+    public static function buildCallbackKey($uid=''){
+        $mkey = 'syncFriendsData_callback_'.$uid;
+        return $mkey;
+    }
+    public static function buildPostSelfKey($uid=''){
+        $mkey = 'syncFriendsData_post_self_'.$uid;
+        return $mkey;
+    }
+    public static function buildInitInfoKey($uid=''){
+        $mkey = 'syncFriendsData_initInfo_'.$uid;
+	    return $mkey;
+    }
+
     /**
      * @desc 同步好友数据
      * @param $uid
@@ -520,13 +535,19 @@ class WxService {
      */
     public static function syncFriendsData($uid, $uuid){
         self::$uuid = $uuid;
+        $m = \Yii::$app->cache;
         //获取登录成功回调
         $callback = WxService::get_uri($uuid);
+        $mkey = WxService::buildCallbackKey($uid);
+        $m->set($mkey, $callback, 3600);
         //获取post数据
         $post = WxService::post_self($callback, $https_header);
+        $mkey = WxService::buildPostSelfKey($uid);
+        $m->set($mkey, $post, 3600);
         //初始化数据json格式
         $initInfo = WxService::wxinit($post, $https_header);
-        //p(['initInfo'=>$initInfo],0);
+        $mkey = WxService::buildInitInfoKey($uid);
+        $m->set($mkey, $initInfo, 3600);
 
         //获取MsgId,参数post，初始化数据initInfo
         $msgInfo = WxService::wxstatusnotify($post, $initInfo, $callback['post_url_header']);

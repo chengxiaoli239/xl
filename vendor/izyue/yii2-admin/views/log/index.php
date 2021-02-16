@@ -10,7 +10,7 @@ use yii\widgets\Pjax;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $searchModel izyue\admin\models\searchs\BizRule */
 
-$this->title = Yii::t('rbac-admin', 'Rules');
+$this->title = Yii::t('app', 'Admin Log');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 

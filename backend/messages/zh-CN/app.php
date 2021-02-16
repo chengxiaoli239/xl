@@ -4,6 +4,7 @@ return [
     'Users' => '用户列表',
     'edit' => '编辑',
     'query' => '查询',
+    'Admin Log' => '访问日志',
     'Create Follow Datas' => '添加计划',
     'playway 10' => '定位胆',
     'playway 1' => '二字定',
