@@ -201,6 +201,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        p('测试git提交');
+
         $xml = '<error><ret>1203</ret><message></message></error>';
         $data = WxService::xmlToArray($xml);p($data);
         $m = \Yii::$app->cache;

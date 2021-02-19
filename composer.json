@@ -11,15 +11,14 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=5.4.0",
-        "yiisoft/yii2": ">=2.0.6",
+        "yiisoft/yii2": "~2.0.6",
         "yiisoft/yii2-bootstrap": "*",
         "yiisoft/yii2-swiftmailer": "*",
         "izyue/yii2-admin": "*",
         "yiidoc/yii2-redactor": "*",
         "yiisoft/yii2-imagine": "*",
         "bubifengyun/yii2-echarts": "*",
-        "daixianceng/yii2-echarts": "*",
-        "xj/yii2-weui.js": "~1.1.0"
+        "daixianceng/yii2-echarts": "*"
     },
     "github-oauth":{
         "github.com": "722087c57e7cbca71d81c8c1f74116ccce8218cf"
@@ -31,7 +30,8 @@
         "yiisoft/yii2-faker": "*"
     },
     "config": {
-        "process-timeout": 1800
+        "process-timeout": 1800,
+        "secure-http": false
     },
     "extra": {
         "asset-installer-paths": {
@@ -47,5 +47,11 @@
             "name": "刘李鹏",
             "email": "liu.lipeng@icloud.com"
         }
-    ]
+    ],
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://mirrors.aliyun.com/composer/"
+        }
+    }
 }
