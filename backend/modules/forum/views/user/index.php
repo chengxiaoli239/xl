@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 </div-->
 
-    <?php Pjax::begin(); ?>
+    <?php //Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
@@ -107,7 +107,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
-    <?php Pjax::end(); ?>
+    <?php //Pjax::end(); ?>
             </div>
         </div>
     </section>
