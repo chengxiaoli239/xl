@@ -672,8 +672,8 @@ class WxService {
                         $sendRst = self::webwxsendmsg($post, $fromUser, $post_url, $to, $word);
                         //$logArr = ['sendRst'=>json_decode($sendRst, true), 'post'=>$post, 'initInfo'=>json_decode($initInfo,true), 'post_url'=>$post_url, 'to'=>$to, 'word'=>$word];
                         //p($logArr);
-                        $logArr = ['WxInfo'=>$WxInfo, 'post'=>$post, 'sendRst'=>json_decode($sendRst, true), 'to'=>$to, 'word'=>$word];
-                        Tool_Common::log('sendMsg', 'INFO', '微信发送信息', $logArr);
+                        $logArr = ['WxInfo'=>$WxInfo, 'post'=>$post, 'sendRst'=>json_decode($sendRst, true),'from'=>$fromUser, 'to'=>$to, 'word'=>$word];
+                        Tool_Common::log('/wx/sendMsg', 'INFO', '微信发送信息', $logArr);
                     }
                 }
             }
