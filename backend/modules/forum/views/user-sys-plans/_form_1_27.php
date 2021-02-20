@@ -52,6 +52,11 @@ use yii\widgets\ActiveForm;
                     </div>
 
                     <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
+                    <div class="row">
+                        <div class="col-lg-3 col-xs-6">
+                            <?= $form->field($model, 'bet_while_miss')->textInput()->label('遗漏x期投,如:10') ?>
+                        </div>
+                    </div>
 
                     <!--止盈止损-->
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
