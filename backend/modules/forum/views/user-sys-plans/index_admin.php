@@ -168,10 +168,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'hz_Arr','label'=>'扩展',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
-                                    $str = \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
-                                }elseif(in_array($model->tz_type, [25, 28, 29, 30])){
+                                if(\backend\service\BaseService::is_json($model->hz_Arr) OR in_array($model->tz_type, [18, 19, 20, 25, 27, 28, 29, 30, 31, 32, 33, 34])){
                                     $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
+                                    if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
+                                        $str .= \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
+                                    }
                                 }else{
                                     $str = $model->hz_Arr;
                                 }
