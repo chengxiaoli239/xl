@@ -289,8 +289,10 @@ class WxService {
             $TzSystemsUsers->user_agent,
         ];
         $rstData = self::sendCurlPost($url, $headers, $post_datas);
-
 		$data = json_decode($rstData, true);
+
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'data'=>$data];
+        Tool_Common::log('/wx/wxstatusnotify', 'INFO', '获取MsgId', $logArr);
 
 		return $data;
 	}
@@ -301,12 +303,28 @@ class WxService {
      * @param $post_url_header
      * @return array $data
      */
-	public static function webwxgetcontact($post) {
+	public static function webwxgetcontact($uid, $post) {
 		$url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetcontact?lang=zh_CN&pass_ticket='.$post['pass_ticket'].'&seq=0&skey='.$post['skey'].'&r=' . time();
 
-		//$params['BaseRequest'] = $post['BaseRequest'];
-
-		$data = self::curlPost($url);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+        //p($TzSystemsUsers);
+        $headers = [
+            "Accept: application/json, text/plain, */*",
+            "Accept-Encoding: gzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            "Cookie: ".$TzSystemsUsers->cookie_wx_web,
+            "Host: wx2.qq.com",
+            "Referer: https://wx2.qq.com/?&lang=zh_CN",
+            "Sec-Fetch-Dest: empty",
+            "Sec-Fetch-Mode: cors",
+            "Sec-Fetch-Site: same-origin",
+            $TzSystemsUsers->user_agent,
+        ];
+        $rstData = self::sendCurlPost($url, $headers);
+        $data = json_decode($rstData, true);
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'data'=>$data];
+        Tool_Common::log('/wx/webwxgetcontact', 'INFO', '获取微信联系人', $logArr);
 
 		return $data;
 	}
@@ -596,9 +614,8 @@ class WxService {
         //获取MsgId,参数post，初始化数据initInfo
         $msgInfo = WxService::wxstatusnotify($uid, $postBase, $initInfo);
         //获取联系人
-        $contactInfo = WxService::webwxgetcontact($postBase);
+        $contacts = WxService::webwxgetcontact($uid, $postBase);
         //p(['contactInfo'=>json_decode($contactInfo, true)]);
-        $contacts = json_decode($contactInfo, true);
         foreach ($contacts['MemberList'] as $info){
             try{
                 $setData = $info;
@@ -631,14 +648,14 @@ class WxService {
         $WxInfo  = [
             'post' => $postBase,
             'fromUser' => json_decode($initInfo, true)['User'],
-            'contactInfo' => $contactInfo
+            'contacts' => $contacts
         ];
         $m->set($mkey, $WxInfo, 7*24*3600);
 
         $logArr = ['mkey'=>$mkey, 'WxInfo'=>$WxInfo, 'contacts'=>$contacts, 'url'=>$url];
         Tool_Common::log('/wx/setWxInfo', 'INFO', '设置微信缓存', $logArr);
 
-        return ['status'=>200, 'contactInfo'=>$contactInfo];
+        return ['status'=>200, 'contacts'=>$contacts];
     }
 
     /**
