@@ -18,7 +18,8 @@
         "yiidoc/yii2-redactor": "*",
         "yiisoft/yii2-imagine": "*",
         "bubifengyun/yii2-echarts": "*",
-        "daixianceng/yii2-echarts": "*"
+        "daixianceng/yii2-echarts": "*",
+        "ext-json": "*"
     },
     "github-oauth":{
         "github.com": "722087c57e7cbca71d81c8c1f74116ccce8218cf"

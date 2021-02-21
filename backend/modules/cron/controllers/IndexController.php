@@ -447,21 +447,15 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 配数利润统计
+     * @desc 微信心跳检测
      * @return array
      */
     public function actionWxSyncCheck(){
         self::_init();
         $post = \Yii::$app->request->post();
-        $rst = ['status'=>200, 'msg'=>'操作成功'];
         $uid = $post['uid'];
-        $m = \Yii::$app->cache;
-        $mkey = WxService::buildWebWxNewLoginKey($uid);
-        if($loginData = $m->get($mkey)){
-            for($i=0; $i<10; $i++){
-                WxService::synccheck($loginData);
-            }
-        }
+
+        $rst = WxService::syncCheckTask($uid);
 
         return $rst;
     }
