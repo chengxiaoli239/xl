@@ -182,10 +182,10 @@ class WxService {
      * @return array|bool
      */
 	public static function getWxNewLoginPostData($uid='') {
-	    if(!empty($uid)) return false;
+	    if(empty($uid)) return false;
 	    $m = \Yii::$app->cache;
 	    $mkey_post = 'getWxNewLoginPostData_'.$uid;
-	    if($post = $m->get($mkey_post)) return $post;
+	    if(true or $post = $m->get($mkey_post)) return $post;
 
 	    $mkey = WxService::buildWebWxNewLoginKey($uid);
 	    $wxLoginRst = $m->get($mkey);
@@ -209,6 +209,7 @@ class WxService {
                 'uin' => $Ret['wxuin'],
 			];
 		}
+		$m->set($mkey_post, $post, 3600);
         Tool_Common::log('/wx/post_self', 'INFO', '微信post', ['wxLoginRst'=>$wxLoginRst, 'status'=>$Ret['ret'], 'post'=>$post]);
         return (array)$post;
 	}
@@ -382,9 +383,7 @@ class WxService {
      * @return array $data
      */
 	public static function webwxsendmsg($uid, $fromUser, $to, $word ) {
-		$m = \Yii::$app->cache;
-		$mkey = WxService::getWxNewLoginPostData($uid);
-		$post = $m->get($mkey);
+		$post = WxService::getWxNewLoginPostData($uid);
         $url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxsendmsg?pass_ticket='.$post['pass_ticket'];
 
 		$clientMsgId = time() * 1000 + rand(1000, 9999); //原方法
@@ -543,8 +542,6 @@ class WxService {
         $m = \Yii::$app->cache;
         //获取post数据
         $postBase = WxService::getWxNewLoginPostData($uid);
-        $mkey = WxService::buildPostSelfKey($uid);
-        $m->set($mkey, $postBase, 3600);
         //初始化数据json格式
         $initInfo = WxService::wxinit($postBase);
         $mkey = WxService::buildInitInfoKey($uid);
@@ -592,7 +589,7 @@ class WxService {
         ];
         $m->set($mkey, $WxInfo, 7*24*3600);
 
-        $logArr = ['mkey'=>$mkey, 'WxInfo'=>$WxInfo, 'rst'=>$rst, 'contacts'=>$contacts, 'url'=>$url];
+        $logArr = ['mkey'=>$mkey, 'WxInfo'=>$WxInfo, 'contacts'=>$contacts, 'url'=>$url];
         Tool_Common::log('/wx/setWxInfo', 'INFO', '设置微信缓存', $logArr);
 
         return ['status'=>200, 'contactInfo'=>$contactInfo];
