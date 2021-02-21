@@ -58,11 +58,12 @@ class WxService {
     /**
      * 二、1.微信扫描
      * @param $uuid
-     * @param string $icon
      * @return array code 408:未扫描;201:扫描未登录;200:登录成功; icon:用户头像
      */
-    public static function isLogin($uuid, $icon = 'true') {
-        $url = 'https://login.weixin.qq.com/cgi-bin/mmwebwx-bin/login?loginicon=' . $icon . '&r=' . ~time() . '&uuid=' . $uuid . '&tip=0&_=' . self::getMillisecond();
+    public static function isLogin($uuid) {
+        # https://login.wx2.qq.com/cgi-bin/mmwebwx-bin/login?loginicon=true&uuid=gcUh-c3f5w==&tip=0&r=-1061690180&_=1611674387678
+        //$url = 'https://login.weixin.qq.com/cgi-bin/mmwebwx-bin/login?loginicon=true&r=-' . ~time() . '&uuid=' . $uuid . '&tip=0&_=' . self::getMillisecond();
+        $url = 'https://login.wx2.qq.com/cgi-bin/mmwebwx-bin/login?loginicon=true&uuid=' . $uuid . '&tip=0&r=-' . ~time() . '&_=' . self::getMillisecond();
 		$content = self::curlPost($url);
 		preg_match('/\d+/', $content, $match);
 		$code = $match[0];
