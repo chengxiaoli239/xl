@@ -185,12 +185,11 @@ class WxService {
 	    if(empty($uid)) return false;
 	    $m = \Yii::$app->cache;
 	    $mkey_post = 'getWxNewLoginPostData_'.$uid;
-	    if(true or $post = $m->get($mkey_post)) return $post;
+	    //if($post = $m->get($mkey_post)) return $post;
 
 	    $mkey = WxService::buildWebWxNewLoginKey($uid);
-	    $wxLoginRst = $m->get($mkey);
+	    $Ret = $m->get($mkey);
         $post   = [];
-		$Ret    = $wxLoginRst['Ret'];
 		if ($Ret['ret'] == '1203') {
             Tool_Common::log('/wx/post_self_error', 'INFO', '微信post', ['msg'=>'未知错误,请2小时后重试']);
             return false;
@@ -210,8 +209,8 @@ class WxService {
 			];
 		}
 		$m->set($mkey_post, $post, 3600);
-        Tool_Common::log('/wx/post_self', 'INFO', '微信post', ['wxLoginRst'=>$wxLoginRst, 'status'=>$Ret['ret'], 'post'=>$post]);
-        return (array)$post;
+        Tool_Common::log('/wx/post_self', 'INFO', '微信post', ['wxLoginRst'=>$Ret, 'status'=>$Ret['ret'], 'post'=>$post]);
+        return $post;
 	}
 
     /**
@@ -315,7 +314,7 @@ class WxService {
      * @param $SyncKey 初始化方法中获取
      * @return array $status
      */
-	public static function synccheck($post, $SyncKey) {
+	public static function synccheck($post, $SyncKey='') {
 		if (!$SyncKey['List']) {
 			$SyncKey = $_SESSION['json']['SyncKey'];
 		}
@@ -384,7 +383,7 @@ class WxService {
      */
 	public static function webwxsendmsg($uid, $fromUser, $to, $word ) {
 		$post = WxService::getWxNewLoginPostData($uid);
-        $url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxsendmsg?pass_ticket='.$post['pass_ticket'];
+        $url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxsendmsg?lang=zh_CN&pass_ticket='.$post['pass_ticket'];
 
 		$clientMsgId = time() * 1000 + rand(1000, 9999); //原方法
 		$params = [
@@ -402,7 +401,7 @@ class WxService {
 		$data = self::sendCurlPost($url, $params, 1);
 
 		$logArr = ['url'=>$url, 'fromUser'=>$fromUser, 'params'=>$params, 'data'=>$data];
-		Tool_Common::log('webwxsendmsg', 'INFO', '发送微信消息', $logArr);
+		Tool_Common::log('/wx/webwxsendmsg', 'INFO', '发送微信消息', $logArr);
 
 		return $data;
 	}

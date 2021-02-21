@@ -210,7 +210,6 @@ class IndexController extends Controller
 
         $data = $m->get($mkey);p($data);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%wx_friends}}');p($r);
-        $mkey = WxService::buildWebWxNewLoginKey($uid=18);
         p($m->get($mkey));
         $url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxnewloginpage?ticket=AzuRMOCfGIArJoT5WpvIxkyl@qrticket_0&uuid=Yc4HbjCpgw==&lang=zh_CN&scan=1612280590&fun=new&version=v2&lang=zh_CN';
         $rst['data'] = WxService::webWxNewLoginPage($uid=18, $url);p($rst);
