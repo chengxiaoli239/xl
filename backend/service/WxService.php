@@ -62,7 +62,7 @@ class WxService {
      * @return array code 408:未扫描;201:扫描未登录;200:登录成功; icon:用户头像
      */
     public static function isLogin($uuid, $icon = 'true') {
-        $url = 'https://login.weixin.qq.com/cgi-bin/mmwebwx-bin/login?loginicon=' . $icon . '&r=' . ~time() . '&uuid=' . $uuid . '&tip=0&_=' . getMillisecond();
+        $url = 'https://login.weixin.qq.com/cgi-bin/mmwebwx-bin/login?loginicon=' . $icon . '&r=' . ~time() . '&uuid=' . $uuid . '&tip=0&_=' . self::getMillisecond();
 		$content = self::curlPost($url);
 		preg_match('/\d+/', $content, $match);
 		$code = $match[0];
