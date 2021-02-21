@@ -218,16 +218,35 @@ class WxService {
      * @param $post
      * @return json $json
      */
-	public static function wxinit($post) {
+	public static function wxinit($uid, $post) {
 		$url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxinit?pass_ticket='.$post['pass_ticket'].'&skey='.$post['skey'] . '&r=' . time();
 
-		$post = [
+		$post_datas = [
 			'BaseRequest' => $post['BaseRequest']
 		];
-		$json = self::curlPost($url, $post);
-		Tool_Common::log('/wx/wxinit', 'INFO', '微信登陆初始化', ['post'=>$post, 'json'=>$json]);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+        //p($TzSystemsUsers);
+        $headers = [
+            "Accept: application/json, text/plain, */*",
+            "Accept-Encoding: gzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            "Content-Length: ".strlen(json_encode($post_datas)),
+            "Content-Type: application/json;charset=UTF-8",
+            "Cookie: ".$TzSystemsUsers->cookie_wx_web,
+            "Host: wx2.qq.com",
+            "Origin: https://wx2.qq.com",
+            "Referer: https://wx2.qq.com/?&lang=zh_CN",
+            "Sec-Fetch-Dest: empty",
+            "Sec-Fetch-Mode: cors",
+            "Sec-Fetch-Site: same-origin",
+            $TzSystemsUsers->user_agent,
+        ];
+        $rstData = self::sendCurlPost($url, $headers, $post_datas);
+		//$json = self::curlPost($url, $post);
+		Tool_Common::log('/wx/wxinit', 'INFO', '微信登陆初始化', ['post'=>$post, 'rstData'=>$rstData]);
 
-		return $json;
+		return $rstData;
 	}
 
     /**
@@ -237,13 +256,13 @@ class WxService {
      * @param $post_url_header
      * @return array $data
      */
-	public static function wxstatusnotify($post, $json) {
+	public static function wxstatusnotify($uid, $post, $json) {
 		$init = json_decode($json, true);
 
 		$User = $init['User'];
 		$url  = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxstatusnotify?lang=zh_CN&pass_ticket='.$post['pass_ticket'];
 
-		$params = [
+		$post_datas = [
 			'BaseRequest'  => $post['BaseRequest'],
 			"Code"         => 3,
 			"FromUserName" => $User['UserName'],
@@ -251,9 +270,27 @@ class WxService {
 			"ClientMsgId"  => time()
 		];
 
-		$data = self::curlPost($url, $params);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+        //p($TzSystemsUsers);
+        $headers = [
+            "Accept: application/json, text/plain, */*",
+            "Accept-Encoding: gzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            "Content-Length: ".strlen(json_encode($post_datas)),
+            "Content-Type: application/json;charset=UTF-8",
+            "Cookie: ".$TzSystemsUsers->cookie_wx_web,
+            "Host: wx2.qq.com",
+            "Origin: https://wx2.qq.com",
+            "Referer: https://wx2.qq.com/?&lang=zh_CN",
+            "Sec-Fetch-Dest: empty",
+            "Sec-Fetch-Mode: cors",
+            "Sec-Fetch-Site: same-origin",
+            $TzSystemsUsers->user_agent,
+        ];
+        $rstData = self::sendCurlPost($url, $headers, $post_datas);
 
-		$data = json_decode($data, true);
+		$data = json_decode($rstData, true);
 
 		return $data;
 	}
@@ -265,11 +302,11 @@ class WxService {
      * @return array $data
      */
 	public static function webwxgetcontact($post) {
-		$url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetcontact?pass_ticket='.$post['pass_ticket'].'&seq=0&skey='.$post['skey'].'&r=' . time();
+		$url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetcontact?lang=zh_CN&pass_ticket='.$post['pass_ticket'].'&seq=0&skey='.$post['skey'].'&r=' . time();
 
-		$params['BaseRequest'] = $post['BaseRequest'];
+		//$params['BaseRequest'] = $post['BaseRequest'];
 
-		$data = self::curlPost($url, $params);
+		$data = self::curlPost($url);
 
 		return $data;
 	}
@@ -386,7 +423,7 @@ class WxService {
         $url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxsendmsg?lang=zh_CN&pass_ticket='.$post['pass_ticket'];
 
 		$clientMsgId = time() * 1000 + rand(1000, 9999); //原方法
-		$params = [
+		$post_datas = [
 			'BaseRequest' => $post['BaseRequest'],
 			'Msg' => [
 				"Type"         => 1,
@@ -398,9 +435,29 @@ class WxService {
 			],
 			'Scene' => 0
 		];
-		$data = self::sendCurlPost($url, $params, 1);
+		$TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+		//p($TzSystemsUsers);
+		$headers = [
+            "Accept: application/json, text/plain, */*",
+            "Accept-Encoding: gzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            "Content-Length: ".strlen(json_encode($post_datas)),
+            "Content-Type: application/json;charset=UTF-8",
+            "Cookie: ".$TzSystemsUsers->cookie_wx_web,
+            "Host: wx2.qq.com",
+            "Origin: https://wx2.qq.com",
+            "Referer: https://wx2.qq.com/?&lang=zh_CN",
+            "Sec-Fetch-Dest: empty",
+            "Sec-Fetch-Mode: cors",
+            "Sec-Fetch-Site: same-origin",
+            $TzSystemsUsers->user_agent,
+        ];
 
-		$logArr = ['url'=>$url, 'fromUser'=>$fromUser, 'params'=>$params, 'data'=>$data];
+		//p(['url'=>$url, 'headers'=>$headers, 'post_datas'=>$post_datas]);
+		$data = self::sendCurlPost($url, $headers, $post_datas);
+
+		$logArr = ['url'=>$url, 'fromUser'=>$fromUser, 'post_datas'=>$post_datas, 'data'=>$data];
 		Tool_Common::log('/wx/webwxsendmsg', 'INFO', '发送微信消息', $logArr);
 
 		return $data;
@@ -423,7 +480,7 @@ class WxService {
 		return true;
 	}
 
-	public static function curlPost($url, $data = '', $is_gbk = false, $timeout = 30, $CA = false) {
+	public static function curlPost($url, $data = '', $timeout = 30, $CA = false) {
 		$cacert = getcwd() . '/cacert.pem'; //CA根证书
 
 		$SSL = substr($url, 0, 8) == "https://" ? true : false;
@@ -447,12 +504,7 @@ class WxService {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, ['Expect:']); //避免data数据过长问题
 		if ($data) {
-			if ($is_gbk) {
-				$data = json_encode($data);
-			} else {
-				$data = json_encode($data);
-			}
-
+            $data = json_encode($data);
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 		}
@@ -463,16 +515,16 @@ class WxService {
 		return $ret;
 	}
 
-	public static function sendCurlPost($url, $data = '', $is_gbk = false, $timeout = 30, $CA = false) {
+	public static function sendCurlPost($url, $headers=[], $data = '', $timeout = 30, $CA = false) {
 		$cacert = getcwd() . '/cacert.pem'; //CA根证书
 
 		$SSL = substr($url, 0, 8) == "https://" ? true : false;
 
-        //$header = 'ContentType: application/json; charset=UTF-8';
-		$header[] = 'ContentType: application/json;';
-		$header[] = "charset:UTF-8";
+		if(empty($headers)){
+		    $headers = [ 'ContentType: application/json;charset:UTF-8'];
+        }
 		$ch       = curl_init();
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout - 2);
@@ -487,12 +539,7 @@ class WxService {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, ['Expect:']); //避免data数据过长问题
 		if ($data) {
-			if ($is_gbk) {
-				$data = urldecode(json_encode($data));
-			} else {
-				$data = urldecode(json_encode($data));
-			}
-
+            $data = urldecode(json_encode($data));
 			curl_setopt($ch, CURLOPT_POST, true);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 		}
@@ -542,12 +589,12 @@ class WxService {
         //获取post数据
         $postBase = WxService::getWxNewLoginPostData($uid);
         //初始化数据json格式
-        $initInfo = WxService::wxinit($postBase);
+        $initInfo = WxService::wxinit($uid, $postBase);
         $mkey = WxService::buildInitInfoKey($uid);
         $m->set($mkey, $initInfo, 3600);
 
         //获取MsgId,参数post，初始化数据initInfo
-        $msgInfo = WxService::wxstatusnotify($postBase, $initInfo);
+        $msgInfo = WxService::wxstatusnotify($uid, $postBase, $initInfo);
         //获取联系人
         $contactInfo = WxService::webwxgetcontact($postBase);
         //p(['contactInfo'=>json_decode($contactInfo, true)]);
