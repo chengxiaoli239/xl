@@ -8,6 +8,7 @@ class ComposerStaticInitcccd0ff27bebe50b03d4728fff1bd413
 {
     public static $files = array (
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
+        'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
     );
 
@@ -16,6 +17,17 @@ class ComposerStaticInitcccd0ff27bebe50b03d4728fff1bd413
         array (
             'yii\\swiftmailer\\' => 16,
             'yii\\redactor\\' => 13,
+            'yii\\queue\\sync\\' => 15,
+            'yii\\queue\\stomp\\' => 16,
+            'yii\\queue\\sqs\\' => 14,
+            'yii\\queue\\redis\\' => 16,
+            'yii\\queue\\gearman\\' => 18,
+            'yii\\queue\\file\\' => 15,
+            'yii\\queue\\db\\' => 13,
+            'yii\\queue\\beanstalk\\' => 20,
+            'yii\\queue\\amqp_interop\\' => 23,
+            'yii\\queue\\amqp\\' => 15,
+            'yii\\queue\\' => 10,
             'yii\\imagine\\' => 12,
             'yii\\gii\\' => 8,
             'yii\\faker\\' => 10,
@@ -41,6 +53,11 @@ class ComposerStaticInitcccd0ff27bebe50b03d4728fff1bd413
         array (
             'bubifengyun\\echarts\\' => 20,
         ),
+        'S' => 
+        array (
+            'Symfony\\Polyfill\\Php80\\' => 23,
+            'Symfony\\Component\\Process\\' => 26,
+        ),
         'H' => 
         array (
             'Hisune\\EchartsPHP\\' => 18,
@@ -63,6 +80,50 @@ class ComposerStaticInitcccd0ff27bebe50b03d4728fff1bd413
         'yii\\redactor\\' => 
         array (
             0 => __DIR__ . '/..' . '/yiidoc/yii2-redactor',
+        ),
+        'yii\\queue\\sync\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yiisoft/yii2-queue/src/drivers/sync',
+        ),
+        'yii\\queue\\stomp\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yiisoft/yii2-queue/src/drivers/stomp',
+        ),
+        'yii\\queue\\sqs\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yiisoft/yii2-queue/src/drivers/sqs',
+        ),
+        'yii\\queue\\redis\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yiisoft/yii2-queue/src/drivers/redis',
+        ),
+        'yii\\queue\\gearman\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yiisoft/yii2-queue/src/drivers/gearman',
+        ),
+        'yii\\queue\\file\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yiisoft/yii2-queue/src/drivers/file',
+        ),
+        'yii\\queue\\db\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yiisoft/yii2-queue/src/drivers/db',
+        ),
+        'yii\\queue\\beanstalk\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yiisoft/yii2-queue/src/drivers/beanstalk',
+        ),
+        'yii\\queue\\amqp_interop\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yiisoft/yii2-queue/src/drivers/amqp_interop',
+        ),
+        'yii\\queue\\amqp\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yiisoft/yii2-queue/src/drivers/amqp',
+        ),
+        'yii\\queue\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yiisoft/yii2-queue/src',
         ),
         'yii\\imagine\\' => 
         array (
@@ -112,6 +173,14 @@ class ComposerStaticInitcccd0ff27bebe50b03d4728fff1bd413
         array (
             0 => __DIR__ . '/..' . '/bubifengyun/yii2-echarts',
         ),
+        'Symfony\\Polyfill\\Php80\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
+        ),
+        'Symfony\\Component\\Process\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/process',
+        ),
         'Hisune\\EchartsPHP\\' => 
         array (
             0 => __DIR__ . '/..' . '/hisune/echarts-php/src',
@@ -154,12 +223,21 @@ class ComposerStaticInitcccd0ff27bebe50b03d4728fff1bd413
         ),
     );
 
+    public static $classMap = array (
+        'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
+        'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
+        'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitcccd0ff27bebe50b03d4728fff1bd413::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitcccd0ff27bebe50b03d4728fff1bd413::$prefixDirsPsr4;
             $loader->prefixesPsr0 = ComposerStaticInitcccd0ff27bebe50b03d4728fff1bd413::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitcccd0ff27bebe50b03d4728fff1bd413::$classMap;
 
         }, null, ClassLoader::class);
     }
