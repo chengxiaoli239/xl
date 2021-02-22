@@ -219,7 +219,7 @@ class WxService {
      * @return json $json
      */
 	public static function wxinit($uid, $post) {
-		$url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxinit?pass_ticket='.$post['pass_ticket'].'&skey='.$post['skey'] . '&r=' . time();
+		$url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxinit?pass_ticket='.$post['pass_ticket'].'&skey='.$post['skey'] . '&r=' . self::getMillisecond();
 
 		$post_datas = [
 			'BaseRequest' => $post['BaseRequest']
@@ -267,7 +267,7 @@ class WxService {
 			"Code"         => 3,
 			"FromUserName" => $User['UserName'],
 			"ToUserName"   => $User['UserName'],
-			"ClientMsgId"  => time()
+			"ClientMsgId"  => self::getMillisecond()
 		];
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
@@ -304,7 +304,7 @@ class WxService {
      * @return array $data
      */
 	public static function webwxgetcontact($uid, $post) {
-		$url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetcontact?lang=zh_CN&pass_ticket='.$post['pass_ticket'].'&seq=0&skey='.$post['skey'].'&r=' . time();
+		$url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxgetcontact?lang=zh_CN&pass_ticket='.$post['pass_ticket'].'&r='. self::getMillisecond() .'&seq=0&skey='.$post['skey'];
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
         //p($TzSystemsUsers);
@@ -336,29 +336,46 @@ class WxService {
      * @param $group_list 从获取联系人和初始化中获取
      * @return array $data
      */
-	public static function webwxbatchgetcontact($post, $post_url_header, $group_list) {
-		$url = $post_url_header.'/webwxbatchgetcontact?type=ex&lang=zh_CN&r='.time().'&pass_ticket='.$post['pass_ticket'];
+	public static function webwxbatchgetcontact($uid, $post, $group_list) {
+		$url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxbatchgetcontact?type=ex&lang=zh_CN&r='.self::getMillisecond().'&pass_ticket='.$post['pass_ticket'];
 
-		$params['BaseRequest'] = $post['BaseRequest'];
+		$post_datas['BaseRequest'] = $post['BaseRequest'];
 
-		$params['Count'] = count($group_list);
+		$post_datas['Count'] = 1; # count($group_list);
 
 		foreach ($group_list as $key => $value) {
 			if ($value['MemberCount'] == 0) {
-				$params['List'][] = [
+				$post_datas['List'][] = [
 					'UserName'   => $value['UserName'],
 					'ChatRoomId' => ""
 				];
 			}
-			$params['List'][] = [
+			$post_datas['List'][] = [
 				'UserName'        => $value['UserName'],
 				'EncryChatRoomId' => ""
 			];
 		}
-
-		$data = self::curlPost($url, $params);
-
-		$data = json_decode($data, true);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+        $headers = [
+            "Accept: application/json, text/plain, */*",
+            "Accept-Encoding: gzip, deflate, br",
+            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection: keep-alive",
+            "Content-Length: ".strlen(json_encode($post_datas)),
+            "Content-Type: application/json;charset=UTF-8",
+            "Cookie: ".$TzSystemsUsers->cookie_wx_web,
+            "Host: wx2.qq.com",
+            "Origin: https://wx2.qq.com",
+            "Referer: https://wx2.qq.com/?&lang=zh_CN",
+            "Sec-Fetch-Dest: empty",
+            "Sec-Fetch-Mode: cors",
+            "Sec-Fetch-Site: same-origin",
+            $TzSystemsUsers->user_agent,
+        ];
+        $rstData = self::sendCurlPost($url, $headers, $post_datas);
+        $data = json_decode($rstData, true);
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'data'=>$data];
+        Tool_Common::log('/wx/webwxgetbatchcontact', 'INFO', '批量获取微信联系人', $logArr);
 
 		return $data;
 	}
@@ -415,7 +432,7 @@ class WxService {
      * @return array $data
      */
     public static function webwxsync($post, $post_url_header, $SyncKey) {
-        $url = $post_url_header.'/webwxsync?sid='.$post['sid'].'&skey='.$post['skey'].'&pass_ticket=' . $post['pass_ticket'];
+        $url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxsync?sid='.$post['sid'].'&skey='.$post['skey'].'&pass_ticket=' . $post['pass_ticket'];
 
         $params = [
             'BaseRequest' => $post['BaseRequest'],
@@ -615,7 +632,8 @@ class WxService {
         $msgInfo = WxService::wxstatusnotify($uid, $postBase, $initInfo);
         //获取联系人
         $contacts = WxService::webwxgetcontact($uid, $postBase);
-        //p(['contactInfo'=>json_decode($contactInfo, true)]);
+        # 4、批量获取联系人
+        //$batchContacts = WxService::webwxbatchgetcontact($uid, $postBase);
         foreach ($contacts['MemberList'] as $info){
             try{
                 $setData = $info;
