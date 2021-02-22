@@ -1514,9 +1514,15 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://files.phpcomposer.com/files/yiisoft/yii2-codeception/086c8c2d28736e7a484a7a8611b5cc84024e9fb3.zip",
+                "url": "https://api.github.com/repos/yiisoft/yii2-codeception/zipball/086c8c2d28736e7a484a7a8611b5cc84024e9fb3",
                 "reference": "086c8c2d28736e7a484a7a8611b5cc84024e9fb3",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "yiisoft/yii2": ">=2.0.4"
@@ -1547,6 +1553,13 @@
                 "codeception",
                 "yii2"
             ],
+            "support": {
+                "forum": "http://www.yiiframework.com/forum/",
+                "irc": "irc://irc.freenode.net/yii",
+                "issues": "https://github.com/yiisoft/yii2-codeception/issues",
+                "source": "https://github.com/yiisoft/yii2-codeception",
+                "wiki": "http://www.yiiframework.com/wiki/"
+            },
             "abandoned": "codeception/codeception",
             "time": "2017-05-22T12:08:21+00:00"
         },
