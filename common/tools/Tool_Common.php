@@ -108,7 +108,7 @@ class Tool_Common
     	}
     	$key = '';
     	for ($i = 0; $i < $length; $i ++) {
-    		$key .= $pattern{rand(0, (strlen($pattern) - 1))};
+    		$key .= $pattern[rand(0, (strlen($pattern) - 1))];
     	}
     	return $key;
     }
