@@ -817,6 +817,7 @@ class WxService {
             while (true){
                 $m->set($syncCheckKey, 1, 60);
                 $syncRst = WxService::synccheck($loginData);
+                Tool_Common::log('/wx/syncCheckTask_time', 'INFO', '心跳检测异常清理', ['uid'=>$uid, 'syncRst'=>$syncRst]);
                 sleep(5);
                 $i++;
                 if($i>=20 OR $syncRst['sel'] == 3){
@@ -825,7 +826,6 @@ class WxService {
                     Tool_Common::log('/wx/syncCheckTask_clear', 'INFO', '心跳检测异常清理', ['uid'=>$uid, 'r1'=>$r1, 'r2'=>$r2, 'syncRst'=>$syncRst]);
                     break;
                 }
-                Tool_Common::log('/wx/syncCheckTask_time', 'INFO', '心跳检测异常清理', ['uid'=>$uid, 'syncRst'=>$syncRst]);
             }
         }
         $m->delete($syncCheckKey);
