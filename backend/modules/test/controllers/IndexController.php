@@ -203,7 +203,7 @@ class IndexController extends Controller
     public function actionDw(){
         $qihao = '20210223048';
         p(substr($qihao, -3 ));
-        
+
         $sendRst = WxService::webwxsendmsg($uid=18, $fromUser = ['UserName'=>'@c005bd32a26f52268f83033ef5c74cd7a9c03ccabc822d17d9a498c78b65b833'], $to = '@a0b085715b825f16b937d6f1c0f7fe34', $word = 'xxx');p($sendRst);
         $callback = WxService::get_uri($uuid);p($callback);
         $xml = '<error><ret>1203</ret><message></message></error>';
