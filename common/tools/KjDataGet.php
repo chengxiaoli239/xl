@@ -464,7 +464,7 @@ class KjDataGet
                 if($qihao >= 154){
                     $nextQihao = ($year+1).'001';
                 }else{
-                    $nextQihao = $year.$qihao + 1;
+                    $nextQihao = (int)($year.$qihao) + 1;
                 }
             }
         }else{
