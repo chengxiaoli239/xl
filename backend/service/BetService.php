@@ -1489,12 +1489,13 @@ abstract class BetService extends BaseBetService {
     /**
      * @desc 获取投注缓存时间，一般为开奖时间频率
      * @param int $lottery_type
-     * @param $qihao
+     * @param $qihao - 已经开奖的期号
      * @return float|int|string
      */
     public static function getBetCacheTime($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao){
         $lottery = LotteryType::findOne(['lottery_type'=>$lottery_type]);
         $cacheTime = $lottery->data_ftime;
+        $now_HI = date('H:i:s');
         switch ($lottery_type){
             case 1: # 希腊1.5分彩
                 $cacheTime = 7200;
@@ -1518,6 +1519,10 @@ abstract class BetService extends BaseBetService {
                 break;
             case 8: # 幸运五星彩
                 $cacheTime = 5 * 60;
+                $min_qihao = substr($qihao, -3);
+                if(($min_qihao == '048') OR ('04:05:00'<$now_HI && $now_HI<'09:05:00')){
+                    $cacheTime = 5 * 3600;
+                }
                 break;
             case 9: # 台湾宾果
                 $cacheTime = 5 * 60;
