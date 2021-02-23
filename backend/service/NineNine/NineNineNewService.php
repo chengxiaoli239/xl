@@ -1738,7 +1738,7 @@ class NineNineNewService extends BaseTZService {
                 }elseif('00:00:00'<$time && $time<'02:00:00'){
                     $where = ['AND',['=','type', $lottery_type],['>=', 'actionTime', $time],['between', 'actionTime','00:00:00','02:00:00']];
                     $rst = DataTime::find($where)->where($where)->asArray()->one();
-                    $date = (int)'20'.date("ymd") - 1;
+                    $date = (int)('20'.date("ymd")) - 1;
                     $qihao = $date.sprintf("%02d", $rst['actionNo']);
                 }else{
                     $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '" . $time . "' AND type=$lottery_type ORDER BY id ASC";
