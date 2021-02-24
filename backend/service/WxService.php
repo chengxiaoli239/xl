@@ -219,7 +219,7 @@ class WxService {
      * @return json $json
      */
 	public static function wxinit($uid, $post) {
-		$url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxinit?pass_ticket='.$post['pass_ticket'].'&skey='.$post['skey'] . '&r=' . self::getMillisecond();
+		$url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxinit?lang=zh_CN&pass_ticket='.$post['pass_ticket']. '&r=-' . self::getMillisecond();
 
 		$post_datas = [
 			'BaseRequest' => $post['BaseRequest']
@@ -244,7 +244,7 @@ class WxService {
         ];
         $rstData = self::sendCurlPost($url, $headers, $post_datas);
 		//$json = self::curlPost($url, $post);
-		Tool_Common::log('/wx/wxinit', 'INFO', '微信登陆初始化', ['post'=>$post, 'rstData'=>$rstData]);
+		Tool_Common::log('/wx/wxinit', 'INFO', '微信登陆初始化', ['url'=>$url, 'post_datas'=>$post_datas 'post'=>$post, 'rstData'=>$rstData]);
 
 		return $rstData;
 	}
