@@ -244,7 +244,7 @@ class WxService {
         ];
         $rstData = self::sendCurlPost($url, $headers, $post_datas);
 		//$json = self::curlPost($url, $post);
-		Tool_Common::log('/wx/wxinit', 'INFO', '微信登陆初始化', ['url'=>$url, 'post_datas'=>$post_datas 'post'=>$post, 'rstData'=>$rstData]);
+		Tool_Common::log('/wx/wxinit', 'INFO', '微信登陆初始化', ['url'=>$url, 'post_datas'=>$post_datas, 'post'=>$post, 'rstData'=>$rstData]);
 
 		return $rstData;
 	}
