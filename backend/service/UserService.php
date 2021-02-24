@@ -237,7 +237,7 @@ class UserService extends BaseService {
 
         $defaultSiteIds = explode(',',TzSystemsAuth::findOne(['uid'=>$uid])->tz_systems_ids);
 
-        return $defaultSiteIds[0];
+        return $defaultSiteIds[0] ? : DEFAULT_LOTTERY_TYPE;
     }
 
     /**
