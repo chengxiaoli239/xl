@@ -308,12 +308,13 @@ class WxService {
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
         //p($TzSystemsUsers);
+        $postBase = WxService::getWxNewLoginPostData($uid);
         $headers = [
             "Accept: application/json, text/plain, */*",
             "Accept-Encoding: gzip, deflate, br",
             "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
             "Connection: keep-alive",
-            "Cookie: ".$TzSystemsUsers->cookie_wx_web,
+            "Cookie: ".$TzSystemsUsers->cookie_wx_web.'; login_frequency=1; last_wxuin='.$postBase['uin'],
             "Host: wx2.qq.com",
             "Referer: https://wx2.qq.com/?&lang=zh_CN",
             "Sec-Fetch-Dest: empty",
