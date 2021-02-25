@@ -322,7 +322,7 @@ class WxService {
             "Sec-Fetch-Site: same-origin",
             $TzSystemsUsers->user_agent,
         ];
-        $rstData = self::sendCurlPost($url, $headers);
+        $rstData = self::sendCurlPost($url, $headers, $postBase);
         $data = json_decode($rstData, true);
         $logArr = ['url'=>$url, 'headers'=>$headers, 'data'=>$data];
         Tool_Common::log('/wx/webwxgetcontact', 'INFO', '获取微信联系人', $logArr);
@@ -624,15 +624,18 @@ class WxService {
         $m = \Yii::$app->cache;
         //获取post数据
         $postBase = WxService::getWxNewLoginPostData($uid);
-        //初始化数据json格式
+
+        # 1、初始化数据json格式
         $initInfo = WxService::wxinit($uid, $postBase);
         $mkey = WxService::buildInitInfoKey($uid);
         $m->set($mkey, $initInfo, 3600);
 
-        //获取MsgId,参数post，初始化数据initInfo
+        # 2、获取MsgId,参数post，初始化数据initInfo
         $msgInfo = WxService::wxstatusnotify($uid, $postBase, $initInfo);
-        //获取联系人
+
+        # 3、获取联系人
         $contacts = WxService::webwxgetcontact($uid, $postBase);
+
         # 4、批量获取联系人
         //$batchContacts = WxService::webwxbatchgetcontact($uid, $postBase);
         foreach ($contacts['MemberList'] as $info){
