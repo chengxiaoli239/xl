@@ -875,12 +875,12 @@ class WxService {
         if($loginData = $m->get($mkey)){
             $syncCheckKey = WxService::buildWxSyncCheckTaskKey($uid);
             //if($status = $m->get($syncCheckKey)) return ['status'=>300, 'msg'=>'有在进行的任务，请稍后...'];
-            for ($i=0; $i<10; $i++){
+            for ($i=0; $i<6; $i++){
                 $m->set($syncCheckKey, 1, 60);
                 $syncKeysString = WxService::getSyncKeysString($uid);
                 $syncRst = WxService::synccheck($uid, $syncKeysString);
                 Tool_Common::log('/wx/syncCheckTask_time', 'INFO', '心跳检测', ['uid'=>$uid, 'loginData'=>$loginData, 'syncRst'=>$syncRst, 'syncKeysString'=>$syncKeysString]);
-                sleep(5);
+                sleep(10);
                 $i++;
                 if($syncRst['sel'] == 3){
                     $r1 = $m->delete($mkey); # 删除用户登陆信息
