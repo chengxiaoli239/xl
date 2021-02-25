@@ -243,11 +243,58 @@ class WxService {
             $TzSystemsUsers->user_agent,
         ];
         $rstData = self::sendCurlPost($url, $headers, $post_datas);
+        $syncKeysString = '';
+        if($rstData['BaseResponse']['Ret'] == 0){
+            $syncKeysString = WxService::setSyncKeysString($rstData['SyncKey'], $uid);
+        }
 		//$json = self::curlPost($url, $post);
-		Tool_Common::log('/wx/wxinit', 'INFO', '微信登陆初始化', ['url'=>$url, 'post_datas'=>$post_datas, 'post'=>$post, 'rstData'=>$rstData]);
+		Tool_Common::log('/wx/wxinit', 'INFO', '微信登陆初始化', ['url'=>$url, 'post_datas'=>$post_datas, 'post'=>$post, 'rstData'=>$rstData, 'syncKeysString'=>$syncKeysString]);
 
 		return $rstData;
 	}
+
+    /**
+     * @desc 生成微信心跳包同步keys
+     * @param string $uid
+     * @return string
+     */
+	public static function buildSyncKeysString($uid =''){
+        return 'setSyncKeysString_'.$uid;
+    }
+    /**
+     * @desc 微信同步 syncKey
+     * @param $syncKeys
+     * @return string
+     */
+	public static function setSyncKeysString($syncKeys, $uid=''){
+	    $m = \Yii::$app->cache;
+	    $syncKeysString = '';
+	    $mkey = WxService::buildSyncKeysString($uid);
+	    if(isset($syncKeys['Count']) && $syncKeys['Count']>0 && !empty($syncKeys['List'])){
+	        $syncKeysArr = [];
+	        foreach ($syncKeys['List'] as $row){
+	            $syncKeysArr[] = $row['Key'].'_'.$row['Val'];
+            }
+
+	        $syncKeysString = implode('|', $syncKeysArr);
+        }
+	    $m->set($mkey, $syncKeysString, 86400);
+
+	    return $syncKeysString;
+    }
+
+    /**
+     * @desc 获取心跳包key
+     * @param string $uid
+     * @return mixed
+     */
+    public static function getSyncKeysString($uid=''){
+        $m = \Yii::$app->cache;
+        $mkey = WxService::buildSyncKeysString($uid);
+        $syncKeysString = $m->get($mkey);
+
+        return $syncKeysString;
+    }
 
     /**
      * 获取MsgId
@@ -384,19 +431,10 @@ class WxService {
     /**
      * 心跳检测 0正常；1101失败／登出；2新消息；7不要耍手机了我都收不到消息了；
      * @param $post
-     * @param $SyncKey 初始化方法中获取
+     * @param $syncKeyString 初始化方法中获取
      * @return array $status
      */
-	public static function synccheck($post, $SyncKey='') {
-		if (!$SyncKey['List']) {
-			$SyncKey = $_SESSION['json']['SyncKey'];
-		}
-		$SyncKey_value = '';
-		foreach ($SyncKey['List'] as $key => $value) {
-            $SyncKey_value .= $value['Key'] . '_' . $value[ 'Val'].'|';
-		}
-		$SyncKey_value = trim($SyncKey_value, '|');
-
+	public static function synccheck($post, $syncKeyString='') {
         // https://webpush.wx2.qq.com/cgi-bin/mmwebwx-bin/synccheck?r=1613883269500&skey=%40crypt_133e5bb7_bfe7c7220554fcf93fb668b486488db6&sid=c35OOrVYDxQvFMKX&uin=1120382433&deviceid=e822961665627194&synckey=1_733942461%7C2_733942477%7C3_733941956%7C11_733942444%7C19_5979%7C201_1613883216%7C203_1613878857%7C206_103%7C1000_1613878833%7C1001_1613880193&_=1613875831805
         //$header = [ '0' => 'https://webpush.wx2.qq.com', '1' => 'https://webpush.wx.qq.com' ];
         $baseUrl = 'https://webpush.wx2.qq.com';
@@ -407,13 +445,17 @@ class WxService {
             'sid' => $post['sid'],
             'deviceid' => $post['BaseRequest']['DeviceID'],
             'uin' => $post['uin'],
-            'synckey' => urlencode($SyncKey_value),
+            'synckey' => $syncKeyString,
             '_' => $microtime,
         ];
         $url = $baseUrl . "/cgi-bin/mmwebwx-bin/synccheck?" . http_build_query($post_datas);
         $rstData = self::curlPost($url);  # window.synccheck={retcode:"0",selector:"0"}
 
         $rule = '/window.synccheck={retcode:"(\d+)",selector:"(\d+)"}/';
+        # window.synccheck={retcode:"xxx",selector:"xxx"}
+        /** retcode: 0正常、 1100失败/登出微信
+            selector: 0正常 2新的消息 7进入/离开聊天界面
+        */
         preg_match($rule, $rstData, $match);
 
         if ($match[1] == '0') {
@@ -820,7 +862,8 @@ class WxService {
             $i = 0;
             while (true){
                 $m->set($syncCheckKey, 1, 60);
-                $syncRst = WxService::synccheck($loginData);
+                $syncKeysString = WxService::getSyncKeysString($uid);
+                $syncRst = WxService::synccheck($loginData, $syncKeysString);
                 Tool_Common::log('/wx/syncCheckTask_time', 'INFO', '心跳检测异常清理', ['uid'=>$uid, 'syncRst'=>$syncRst]);
                 sleep(5);
                 $i++;
@@ -838,6 +881,11 @@ class WxService {
         return $rst;
     }
 
+    /**
+     * @desc 微信心跳包执行任务key
+     * @param string $uid
+     * @return string
+     */
     public static function buildWxSyncCheckTaskKey($uid=''){
         return 'buildWxSyncCheckTaskKey_'.$uid;
     }
