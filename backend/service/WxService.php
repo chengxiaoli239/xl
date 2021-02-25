@@ -455,7 +455,7 @@ class WxService {
             "Accept-Encoding: gzip, deflate, br",
             "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
             "Connection: keep-alive",
-            "Cookie: ".$TzSystemsUsers->cookie_wx_web,
+            "Cookie: ".str_replace('MM_WX_NOTIFY_STATE=1; MM_WX_SOUND_STATE=1; refreshTimes=5;', '', $TzSystemsUsers->cookie_wx_web),
             "Host: webpush.wx2.qq.com",
             "Referer: https://wx2.qq.com/",
             "Sec-Fetch-Dest: script",
