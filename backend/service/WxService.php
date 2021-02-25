@@ -209,7 +209,7 @@ class WxService {
 			];
 		}
 		$m->set($mkey_post, $post, 3600);
-        Tool_Common::log('/wx/post_self', 'INFO', '微信post', ['wxLoginRst'=>$Ret, 'status'=>$Ret['ret'], 'post'=>$post]);
+        Tool_Common::log('/wx/getWxNewLoginPostData', 'INFO', '获取post数据', ['wxLoginRst'=>$Ret, 'status'=>$Ret['ret'], 'post'=>$post]);
         return $post;
 	}
 
