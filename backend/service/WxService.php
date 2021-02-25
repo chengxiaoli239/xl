@@ -434,18 +434,19 @@ class WxService {
      * @param $syncKeyString 初始化方法中获取
      * @return array $status
      */
-	public static function synccheck($uid, $post, $syncKeyString='') {
+	public static function synccheck($uid, $syncKeyString='') {
         // https://webpush.wx2.qq.com/cgi-bin/mmwebwx-bin/synccheck?r=1613883269500&skey=%40crypt_133e5bb7_bfe7c7220554fcf93fb668b486488db6&sid=c35OOrVYDxQvFMKX&uin=1120382433&deviceid=e822961665627194&synckey=1_733942461%7C2_733942477%7C3_733941956%7C11_733942444%7C19_5979%7C201_1613883216%7C203_1613878857%7C206_103%7C1000_1613878833%7C1001_1613880193&_=1613875831805
         //$header = [ '0' => 'https://webpush.wx2.qq.com', '1' => 'https://webpush.wx.qq.com' ];
+        $post = WxService::getWxNewLoginPostData($uid);
         $baseUrl = 'https://webpush.wx2.qq.com';
         $microtime = self::getMillisecond();
         $post_datas = [
             'r' => $microtime,
-            'skey' => urlencode($post['skey']),
+            'skey' => $post['skey'],
             'sid' => $post['sid'],
             'deviceid' => $post['BaseRequest']['DeviceID'],
             'uin' => $post['uin'],
-            'synckey' => $syncKeyString,
+            'synckey' => trim($syncKeyString),
             '_' => $microtime,
         ];
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
@@ -472,7 +473,8 @@ class WxService {
             selector: 0正常 2新的消息 7进入/离开聊天界面
         */
         preg_match($rule, $rstData, $match);
-        $logArr = ['url'=>$url, 'syncKeyString'=>$syncKeyString, 'rstData'=>$rstData, 'match'=>$match];
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'post'=>$post, 'syncKeyString'=>$syncKeyString, 'rstData'=>$rstData, 'match'=>$match];
+        p($logArr);
         Tool_Common::log('/wx/synccheck', 'INFO', '心跳检测', $logArr);
 
         $retcode  = $match[1];
@@ -873,11 +875,11 @@ class WxService {
         $mkey = WxService::buildWebWxNewLoginKey($uid);
         if($loginData = $m->get($mkey)){
             $syncCheckKey = WxService::buildWxSyncCheckTaskKey($uid);
-            if($status = $m->get($syncCheckKey)) return ['status'=>300, 'msg'=>'有在进行的任务，请稍后...'];
+            //if($status = $m->get($syncCheckKey)) return ['status'=>300, 'msg'=>'有在进行的任务，请稍后...'];
             for ($i=0; $i<10; $i++){
                 $m->set($syncCheckKey, 1, 60);
                 $syncKeysString = WxService::getSyncKeysString($uid);
-                $syncRst = WxService::synccheck($uid, $loginData, $syncKeysString);
+                $syncRst = WxService::synccheck($uid, $syncKeysString);
                 Tool_Common::log('/wx/syncCheckTask_time', 'INFO', '心跳检测', ['uid'=>$uid, 'loginData'=>$loginData, 'syncRst'=>$syncRst, 'syncKeysString'=>$syncKeysString]);
                 sleep(5);
                 $i++;
