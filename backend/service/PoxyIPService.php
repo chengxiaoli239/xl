@@ -203,7 +203,7 @@ class PoxyIPService extends BaseService {
         $redis = new RedisLock();
         $rKey = 'preGetValidIp_'.$mod_uid;
         if(!$redis->lock($rKey, 10)){
-            sleep(10);
+            sleep(15);
         }
 
         $m = \Yii::$app->cache;
