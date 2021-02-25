@@ -865,7 +865,7 @@ class WxService {
                 $m->set($syncCheckKey, 1, 60);
                 $syncKeysString = WxService::getSyncKeysString($uid);
                 $syncRst = WxService::synccheck($loginData, $syncKeysString);
-                Tool_Common::log('/wx/syncCheckTask_time', 'INFO', '心跳检测', ['uid'=>$uid, 'syncRst'=>$syncRst, 'syncKeysString'=>$syncKeysString]);
+                Tool_Common::log('/wx/syncCheckTask_time', 'INFO', '心跳检测', ['uid'=>$uid, 'loginData'=>$loginData, 'syncRst'=>$syncRst, 'syncKeysString'=>$syncKeysString]);
                 sleep(5);
                 $i++;
                 if($syncRst['sel'] == 3){
