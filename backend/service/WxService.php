@@ -242,9 +242,10 @@ class WxService {
             "Sec-Fetch-Site: same-origin",
             $TzSystemsUsers->user_agent,
         ];
-        $rstData = self::sendCurlPost($url, $headers, $post_datas);
+        $result = self::sendCurlPost($url, $headers, $post_datas);
+        $rstData = json_decode($result, 320);
         $syncKeysString = '';
-        if($rstData['BaseResponse']['Ret'] == 0){
+        if(isset($rstData['BaseResponse']['Ret']) && $rstData['BaseResponse']['Ret'] == 0){
             $syncKeysString = WxService::setSyncKeysString($rstData['SyncKey'], $uid);
         }
 		//$json = self::curlPost($url, $post);
@@ -304,9 +305,7 @@ class WxService {
      * @return array $data
      */
 	public static function wxstatusnotify($uid, $post, $json) {
-		$init = json_decode($json, true);
-
-		$User = $init['User'];
+		$User = $json['User'];
 		$url  = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxstatusnotify?lang=zh_CN&pass_ticket='.$post['pass_ticket'];
 
 		$post_datas = [
@@ -451,6 +450,8 @@ class WxService {
         $url = $baseUrl . "/cgi-bin/mmwebwx-bin/synccheck?" . http_build_query($post_datas);
         $rstData = self::curlPost($url);  # window.synccheck={retcode:"0",selector:"0"}
 
+        $logArr = ['url'=>$url, 'syncKeyString'=>$syncKeyString, 'rstData'=>$rstData];
+        Tool_Common::log('/wx/synccheck', 'INFO', '心跳检测', $logArr);
         $rule = '/window.synccheck={retcode:"(\d+)",selector:"(\d+)"}/';
         # window.synccheck={retcode:"xxx",selector:"xxx"}
         /** retcode: 0正常、 1100失败/登出微信
@@ -711,7 +712,7 @@ class WxService {
         $mkey = self::getWxMcKey($uid);
         $WxInfo  = [
             'post' => $postBase,
-            'fromUser' => json_decode($initInfo, true)['User'],
+            'fromUser' => $initInfo['User'],
             'contacts' => $contacts
         ];
         $m->set($mkey, $WxInfo, 7*24*3600);
@@ -864,10 +865,10 @@ class WxService {
                 $m->set($syncCheckKey, 1, 60);
                 $syncKeysString = WxService::getSyncKeysString($uid);
                 $syncRst = WxService::synccheck($loginData, $syncKeysString);
-                Tool_Common::log('/wx/syncCheckTask_time', 'INFO', '心跳检测异常清理', ['uid'=>$uid, 'syncRst'=>$syncRst]);
+                Tool_Common::log('/wx/syncCheckTask_time', 'INFO', '心跳检测', ['uid'=>$uid, 'syncRst'=>$syncRst, 'syncKeysString'=>$syncKeysString]);
                 sleep(5);
                 $i++;
-                if($i>=20 OR $syncRst['sel'] == 3){
+                if($syncRst['sel'] == 3){
                     $r1 = $m->delete($syncCheckKey);
                     $r2 = $m->delete($mkey); # 删除用户登陆信息
                     Tool_Common::log('/wx/syncCheckTask_clear', 'INFO', '心跳检测异常清理', ['uid'=>$uid, 'r1'=>$r1, 'r2'=>$r2, 'syncRst'=>$syncRst]);

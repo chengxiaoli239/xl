@@ -202,8 +202,9 @@ class IndexController extends Controller
 
     public function actionDw(){
         $m = \Yii::$app->cache;
-        $mkey = WxService::buildWebWxNewLoginKey($uid=18);
-        //p($m->get($mkey));
+        $mkey = WxService::getSyncKeysString($uid=18);
+        p($m->get($mkey));
+        $rst = WxService::syncCheckTask($uid=18);p($rst);
         $sendRst = WxService::webwxsendmsg($uid=18, $fromUser = ['UserName'=>'@4678d431465a45f2ee5129dbaa353482c8f678049f9f973e6a5deadcc130ed1f'], $to = '@a6c2666f2464f8c8628ebbf099f0749a', $word = 'xxx');p($sendRst);
         $callback = WxService::get_uri($uuid);p($callback);
         $xml = '<error><ret>1203</ret><message></message></error>';
