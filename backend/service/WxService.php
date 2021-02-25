@@ -474,7 +474,6 @@ class WxService {
         */
         preg_match($rule, $rstData, $match);
         $logArr = ['url'=>$url, 'headers'=>$headers, 'post'=>$post, 'syncKeyString'=>$syncKeyString, 'rstData'=>$rstData, 'match'=>$match];
-        p($logArr);
         Tool_Common::log('/wx/synccheck', 'INFO', '心跳检测', $logArr);
 
         $retcode  = $match[1];
