@@ -97,4 +97,53 @@ class LoginService extends BaseService
 
         return $rst;
     }
+
+    /**
+     * @desciption webot获取通讯录列表（好友/群）
+     * @param $uid
+     * @param $wId
+     * @return bool|string
+     */
+    public static function getAddressList($uid){
+        self::__init($uid);
+        self::initAddressList($uid);
+        $config = self::$webotConfigs;
+        $url = $config->base_url.'/getAddressList';
+
+        $headers = [
+            'Content-Type: application/json; charset=utf-8',
+            'Authorization: '.$config['authorization'],
+        ];
+        $post_datas = [
+            'wId' => $config->wId,
+        ];
+        $rst = BaseService::sendCurlPost($url, $headers, $post_datas);
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'post_datas'=>$post_datas, 'rst'=>$rst];
+        Tool_Common::log('/wx/'.__FUNCTION__, 'INFO', 'webot获取通讯录列表', $logArr);
+
+        return $rst;
+    }
+
+    /**
+     * @desciption webot初始化通讯录
+     * @param $wId
+     * @return bool|string
+     */
+    public static function initAddressList(){
+        $config = self::$webotConfigs;
+        $url = $config->base_url.'/initAddressList';
+
+        $headers = [
+            'Content-Type: application/json; charset=utf-8',
+            'Authorization: '.$config['authorization'],
+        ];
+        $post_datas = [
+            'wId' => $config->wId,
+        ];
+        $rst = BaseService::sendCurlPost($url, $headers, $post_datas);
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'post_datas'=>$post_datas, 'rst'=>$rst];
+        Tool_Common::log('/wx/'.__FUNCTION__, 'INFO', 'webot初始化通讯录', $logArr);
+
+        return $rst;
+    }
 }

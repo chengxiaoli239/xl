@@ -205,6 +205,7 @@ class IndexController extends Controller
      * @desc 微信测试
      */
     public function actionTestWx(){
+        $rst = LoginService::getAddressList($uid=1);p($rst);
         $rst = LoginService::getIPadLoginInfo($uid=1);p($rst);
         $rst = LoginService::getLoginQrCode($uid=1);p($rst);
         $rst = LoginService::loginWebot($uid=1);p($rst);
