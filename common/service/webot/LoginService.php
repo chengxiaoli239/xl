@@ -76,22 +76,20 @@ class LoginService extends BaseService
     /**
      * @desciption webot执行微信登陆
      * @param $uid
-     * @param $wcId
-     * @param int $type
+     * @param $wId
      * @return bool|string
      */
-    public static function getIPadLoginInfo($uid, $type=2){
+    public static function getIPadLoginInfo($uid){
         self::__init($uid);
         $config = self::$webotConfigs;
-        $url = $config->base_url.'/iPadLogin';
+        $url = $config->base_url.'/getIPadLoginInfo';
 
         $headers = [
             'Content-Type: application/json; charset=utf-8',
             'Authorization: '.$config['authorization'],
         ];
         $post_datas = [
-            'wcId' => $config->wcId,
-            'type' => $type,
+            'wId' => $config->wId,
         ];
         $rst = BaseService::sendCurlPost($url, $headers, $post_datas);
         $logArr = ['url'=>$url, 'headers'=>$headers, 'post_datas'=>$post_datas, 'rst'=>$rst];

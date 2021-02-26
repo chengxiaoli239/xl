@@ -205,8 +205,9 @@ class IndexController extends Controller
      * @desc 微信测试
      */
     public function actionTestWx(){
-        $rst = LoginService::loginWebot($uid=1);p($rst);
+        $rst = LoginService::getIPadLoginInfo($uid=1);p($rst);
         $rst = LoginService::getLoginQrCode($uid=1);p($rst);
+        $rst = LoginService::loginWebot($uid=1);p($rst);
         $sendRst = WxService::webwxsendmsg($uid=18, $fromUser = ['UserName'=>'@4678d431465a45f2ee5129dbaa353482c8f678049f9f973e6a5deadcc130ed1f'], $to = '@a6c2666f2464f8c8628ebbf099f0749a', $word = 'xxx');p($sendRst);
         $uuid = WxService::get_uuid();p($uuid);
         $callback = WxService::get_uri($uuid);p($callback);
