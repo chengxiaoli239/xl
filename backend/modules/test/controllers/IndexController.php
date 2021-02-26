@@ -54,6 +54,7 @@ use common\kj\xjssc\XjSsc;
 use common\models\AdminModel;
 use common\service\ChatService;
 use common\service\CommonService;
+use common\service\webot\LoginService;
 use common\tools\KjDataGet;
 use backend\service\BaseNumService;
 use backend\service\BaseService;
@@ -200,27 +201,20 @@ class IndexController extends Controller
 
     }
 
-    public function actionDw(){
-        $rst = WxService::syncCheckTask($uid=18);p($rst);
-        $rstData = 'window.synccheck={retcode:"1101",selector:"0"}';
-        $rule = '/window.synccheck={retcode:"(\d+)",selector:"(\d+)"}/';
-        preg_match($rule, $rstData, $match);p($match);
-        $m = \Yii::$app->cache;
-        $mkey = WxService::getSyncKeysString($uid=18);
-        p($m->get($mkey));
+    /**
+     * @desc 微信测试
+     */
+    public function actionTestWx(){
+        $rst = LoginService::loginWebot($uid=1);p($rst);
+        $rst = LoginService::getLoginQrCode($uid=1);p($rst);
         $sendRst = WxService::webwxsendmsg($uid=18, $fromUser = ['UserName'=>'@4678d431465a45f2ee5129dbaa353482c8f678049f9f973e6a5deadcc130ed1f'], $to = '@a6c2666f2464f8c8628ebbf099f0749a', $word = 'xxx');p($sendRst);
-        $callback = WxService::get_uri($uuid);p($callback);
-        $xml = '<error><ret>1203</ret><message></message></error>';
-        $data = WxService::xmlToArray($xml);p($data);
-        $m = \Yii::$app->cache;
-        $mkey = WxService::buildInitInfoKey($uid=18);
-
-        $data = $m->get($mkey);p($data);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%wx_friends}}');p($r);
-        p($m->get($mkey));
-        $url = 'https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxnewloginpage?ticket=AzuRMOCfGIArJoT5WpvIxkyl@qrticket_0&uuid=Yc4HbjCpgw==&lang=zh_CN&scan=1612280590&fun=new&version=v2&lang=zh_CN';
-        $rst['data'] = WxService::webWxNewLoginPage($uid=18, $url);p($rst);
         $uuid = WxService::get_uuid();p($uuid);
+        $callback = WxService::get_uri($uuid);p($callback);
+    }
+
+    public function actionDw(){
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%webot_configs}}');p($r);
+        $rst = WxService::syncCheckTask($uid=18);p($rst);
         $miss = SscDataService::staticPeiShuDateProfits($lottery_type=8, '2021-01-28');p($miss);
         $miss = SscDataService::staticPeiShuDate($lottery_type=8);p($miss);
         $codes_hz = ['ps_1'=>147, 'ps_2'=>369];

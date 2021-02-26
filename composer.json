@@ -20,7 +20,8 @@
         "bubifengyun/yii2-echarts": "*",
         "daixianceng/yii2-echarts": "*",
         "ext-json": "*",
-        "yiisoft/yii2-queue": "^2.3"
+        "yiisoft/yii2-queue": "^2.3",
+        "ext-curl": "*"
     },
     "github-oauth":{
         "github.com": "722087c57e7cbca71d81c8c1f74116ccce8218cf"

@@ -108,7 +108,7 @@ class Tool_Common
     	}
     	$key = '';
     	for ($i = 0; $i < $length; $i ++) {
-    		$key .= $pattern{rand(0, (strlen($pattern) - 1))};
+    		$key .= $pattern[rand(0, (strlen($pattern) - 1))];
     	}
     	return $key;
     }
@@ -531,10 +531,11 @@ class Tool_Common
         if (strpos($file, '/') !== false) { // 有包含路劲的
             $dir = dirname($file);
             $file = basename($file);
+            $dir = '/WORK/LOG/'.\Yii::$app->params['LOG_PATH']. '/' . date('Ymd'). $dir;
         } else {
-            $dir = '/WORK/LOG/chat/' . date('Ymd');
+            $dir = '/WORK/LOG/'.\Yii::$app->params['LOG_PATH']. '/' . date('Ymd');
         }
-    
+
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
@@ -548,7 +549,7 @@ class Tool_Common
     
         // 完整路劲
         $fullFile = $dir . '/' . $file . '.log';
-    
+
         // 获取到上一级执行的类名::方法 或者 文件名::行号
         $arr = debug_backtrace();
         
