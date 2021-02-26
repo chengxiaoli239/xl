@@ -9,7 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property int $uid 本系统uid
- * @property int $account 开发者账号
+ * @property string $account 开发者账号
  * @property string $password 开发者密码
  * @property string $base_url webot接口域名
  * @property string $authorization 企业认证信息
@@ -39,12 +39,12 @@ class WebotConfigs extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['uid', 'account', 'status', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'status', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
-            [['password'], 'string', 'max' => 1],
-            [['base_url'], 'string', 'max' => 255],
-            [['authorization', 'wcId', 'wId'], 'string', 'max' => 64],
+            [['account'], 'string', 'max' => 24],
+            [['password', 'wcId', 'wId'], 'string', 'max' => 64],
+            [['base_url', 'authorization'], 'string', 'max' => 255],
             [['user_agent', 'desc'], 'string', 'max' => 640],
         ];
     }
