@@ -10,7 +10,7 @@ use Yii;
  * @property int $id
  * @property int $uid 用户id
  * @property int $Uin
- * @property string $UserName
+ * @property string $UserName 微信原始id
  * @property string $NickName 昵称
  * @property int $status 是否发送：0否1是
  * @property string $send_name 发送微信名称
@@ -79,7 +79,7 @@ class WxFriends extends \common\models\base\BaseModel
             'id' => Yii::t('app', 'ID'),
             'uid' => Yii::t('app', '用户id'),
             'Uin' => Yii::t('app', 'Uin'),
-            'UserName' => Yii::t('app', 'User Name'),
+            'UserName' => Yii::t('app', '微信原始id'),
             'NickName' => Yii::t('app', '昵称'),
             'status' => Yii::t('app', '是否发送：0否1是'),
             'send_name' => Yii::t('app', '发送微信名称'),
