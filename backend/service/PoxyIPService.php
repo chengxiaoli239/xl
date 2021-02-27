@@ -170,13 +170,16 @@ class PoxyIPService extends BaseService {
         ];
 
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/checkdpsvalid/?'.http_build_query($query);
+        $start_time = microtime(true);
         $rst = CurlService::getCurl($url, [], 6);
+        $end_time = microtime(true);
+        $consume_time = ($end_time-$start_time).'s';
         if($rst['errno']>0 && !$r = $m->get($mkey)){
             $m->set($mkey, 1, 5);
             return self::isValid($poxy_ips);
         }
 
-        Tool_Common::log('poxy_ip_is_valid','INFO', '判断代理IP有效性', ['url'=>$url, 'rst'=>$rst]);
+        Tool_Common::log('poxy_ip_is_valid','INFO', '判断代理IP有效性', ['url'=>$url, 'rst'=>$rst, 'consume_time'=>$consume_time]);
         if(count($poxy_ips)==1){
             $flag = (boolean)$rst['data'][$poxy_ips[0]];
             return $flag;
