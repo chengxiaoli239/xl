@@ -207,6 +207,7 @@ class IndexController extends Controller
      * @desc 微信测试
      */
     public function actionTestWx(){
+        $rst = WebotService::syncAddressList($uid=1);p($rst);
         //$r = Yii::$app->db->getSchema()->refreshTableSchema('{{%wx_friends}}');p($r);
         $rst = WebotService::syncAddressData($uid=1, $wcIds = ['wxid_fz1qsc0ja2612', 'wxid_v5ni9x7kbjbp21', 'wxid_r4ewv74q8c6922']);p($rst);
         $rst = FriendsService::getContactDetail($uid=1, $wcIds = ['wxid_fz1qsc0ja2612', 'wxid_v5ni9x7kbjbp21', 'wxid_r4ewv74q8c6922']);p($rst);
