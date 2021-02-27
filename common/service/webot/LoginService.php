@@ -7,9 +7,7 @@
  */
 
 namespace common\service\webot;
-use backend\service\Lucky5\Lucky5Service;
 use common\service\chat\Tool_Common;
-use common\tools\Util;
 
 class LoginService extends BaseService
 {
@@ -100,13 +98,15 @@ class LoginService extends BaseService
 
     /**
      * @desciption webot获取通讯录列表（好友/群）
-     * @param $uid
-     * @param $wId
+     * @param string $type
      * @return bool|string
      */
-    public static function getAddressList($uid){
+    public static function getAddressList($uid, $type = 'friends', $is_auto=1){
+        $m = \Yii::$app->cache;
+        $mkey = 'getAddressList_'.$uid.'_'.$type;
+        if($is_auto != 1 OR $rst = $m->get($mkey)) return $rst;
         self::__init($uid);
-        self::initAddressList($uid);
+        self::initAddressList();
         $config = self::$webotConfigs;
         $url = $config->base_url.'/getAddressList';
 
@@ -120,6 +120,12 @@ class LoginService extends BaseService
         $rst = BaseService::sendCurlPost($url, $headers, $post_datas);
         $logArr = ['url'=>$url, 'headers'=>$headers, 'post_datas'=>$post_datas, 'rst'=>$rst];
         Tool_Common::log('/wx/'.__FUNCTION__, 'INFO', 'webot获取通讯录列表', $logArr);
+        if($rst['code']==1000 && isset($rst['data'][$type])){
+            $rst = $rst['data'][$type];
+        }else{
+            $rst = $rst['data'];
+        }
+        $m->set($mkey, $rst, 86400);
 
         return $rst;
     }
@@ -146,4 +152,5 @@ class LoginService extends BaseService
 
         return $rst;
     }
+
 }

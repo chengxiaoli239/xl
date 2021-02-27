@@ -71,4 +71,17 @@ class BaseService
         return $rst;
     }
 
+    /**
+     * @desc 数据拆解 每组20个...
+     * @param $codes ['8,9,9,9','9,8,9,9','9,9,8,9','9,9,9,8']
+     * @param int $length
+     * @return mixed
+     */
+    public static function splitDatas($datas, $length = 300){
+
+        $rstDatas = array_chunk($datas, $length);
+
+        return $rstDatas;
+    }
+
 }

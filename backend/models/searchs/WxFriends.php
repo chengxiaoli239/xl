@@ -82,7 +82,7 @@ class WxFriends extends WxFriendsModel
         ]);
 
         $query->andFilterWhere(['like', 'UserName', $this->UserName])
-            ->andFilterWhere(['like', 'NickName', $this->NickName])
+            ->andFilterWhere(['like', 'NickName', urlencode($this->NickName)])
             ->andFilterWhere(['like', 'send_name', $this->send_name])
             ->andFilterWhere(['like', 'HeadImgUrl', $this->HeadImgUrl])
             ->andFilterWhere(['like', 'MemberList', $this->MemberList])

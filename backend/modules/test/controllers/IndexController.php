@@ -54,7 +54,9 @@ use common\kj\xjssc\XjSsc;
 use common\models\AdminModel;
 use common\service\ChatService;
 use common\service\CommonService;
+use common\service\webot\FriendsService;
 use common\service\webot\LoginService;
+use common\service\webot\WebotService;
 use common\tools\KjDataGet;
 use backend\service\BaseNumService;
 use backend\service\BaseService;
@@ -205,6 +207,10 @@ class IndexController extends Controller
      * @desc 微信测试
      */
     public function actionTestWx(){
+        //$r = Yii::$app->db->getSchema()->refreshTableSchema('{{%wx_friends}}');p($r);
+        $rst = WebotService::syncAddressData($uid=1, $wcIds = ['wxid_fz1qsc0ja2612', 'wxid_v5ni9x7kbjbp21', 'wxid_r4ewv74q8c6922']);p($rst);
+        $rst = FriendsService::getContactDetail($uid=1, $wcIds = ['wxid_fz1qsc0ja2612', 'wxid_v5ni9x7kbjbp21', 'wxid_r4ewv74q8c6922']);p($rst);
+        $rst = LoginService::syncAddressList($uid=1);p($rst);
         $rst = LoginService::getAddressList($uid=1);p($rst);
         $rst = LoginService::getIPadLoginInfo($uid=1);p($rst);
         $rst = LoginService::getLoginQrCode($uid=1);p($rst);
@@ -215,7 +221,6 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%webot_configs}}');p($r);
         $rst = WxService::syncCheckTask($uid=18);p($rst);
         $miss = SscDataService::staticPeiShuDateProfits($lottery_type=8, '2021-01-28');p($miss);
         $miss = SscDataService::staticPeiShuDate($lottery_type=8);p($miss);
