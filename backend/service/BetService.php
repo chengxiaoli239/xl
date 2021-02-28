@@ -714,8 +714,8 @@ abstract class BetService extends BaseBetService {
                 }
 
                 break;
-            case 6:
-                $codesArr = explode(',', $codes_hz);
+            case 6: # 二、三、四字现
+                $codesArr = explode(',', json_decode($codes_hz, 320)['codes']);
                 break;
         }
 

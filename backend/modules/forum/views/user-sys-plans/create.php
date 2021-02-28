@@ -12,7 +12,11 @@ if( $tz_type >= 17){
     $tpl = $playway;
 }
 
-$this->title = Yii::t('app', 'Create User Sys Plans '.$playway.'d');
+if(in_array($tz_type, \Yii::$app->params['IS_XIAN'])){
+    $this->title = Yii::t('app', 'Create User Sys Plans '.$playway.'_'.$tz_type.'d');
+}else{
+    $this->title = Yii::t('app', 'Create User Sys Plans '.$playway.'d');
+}
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'User Sys Plans'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

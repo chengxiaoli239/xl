@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'playway',
                         ['attribute' => 'playway','headerOptions'=>['width'=>'5%'],'label'=>'投注类型',
                             'value' => function($model) {
-                                $playway_Arr = [1=>'二字定', 2=>'三字定', 3=>'四字定', 4=>'一字定', 6=>'三字现'];
+                                $playway_Arr = [1=>'二字定', 2=>'三字定', 3=>'四字定', 4=>'一字定', 6=>'X字现'];
                                 return $playway_Arr[$model->playway];
                             }
                         ],
@@ -60,6 +60,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $typeName = $tz_type_Arr[$model->tz_type];
                                 }elseif(in_array($model->playway, [1,2,3,4]) OR in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                     $typeName = \backend\service\BetService::getTypeNameByTzType($model->tz_type);
+                                }
+                                if(in_array($model->tz_type, \Yii::$app->params['IS_XIAN'])){
+                                    $xians = [36=>'二字现', 17=>'三字现', 37=>'四字现'];
+                                    return $xians[$model->tz_type];
                                 }
                                 return $typeName;
                             }
@@ -168,7 +172,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'hz_Arr','label'=>'扩展',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                if(\backend\service\BaseService::is_json($model->hz_Arr) OR in_array($model->tz_type, [18, 19, 20, 25, 27, 28, 29, 30, 31, 32, 33, 34])){
+                                if(\backend\service\BaseService::is_json($model->hz_Arr) OR in_array($model->tz_type, [18, 19, 20, 25, 27, 28, 29, 30, 31, 32, 33, 34, 17,36,37])){
                                     $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
                                     if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                         $str .= \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;

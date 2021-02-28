@@ -123,7 +123,7 @@ class UserSysPlansController extends BaseController
         $model->status = $model->status ? 1 : 0;
         $model->playway = $playway;
         $model->is_test = 0;
-        $model->single = in_array($tz_type, [30]) ? 1 : 0.1;
+        $model->single = in_array($tz_type, [30, 17, 36, 37]) ? 1 : 0.1;
         $model->tz_type = $tz_type;
         $model->buy_type = 0;
         $model->plan_type = 0;
@@ -176,6 +176,9 @@ class UserSysPlansController extends BaseController
         }elseif (false && in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
             $codes = ImportPlanCodes::findOne(['uid'=>$this->_user_id, 'plan_id'=>$model])->codes;
             $model->import_codes_txt = str_replace('@', ' ', str_replace(',', '', $codes));
+        }elseif (in_array($model->tz_type, \Yii::$app->params['IS_XIAN'])){
+            $hz_Arr_Data = json_decode($model->hz_Arr, true);
+            $model->hz_Arr = $hz_Arr_Data['codes'];
         }elseif (in_array($model->tz_type, [18, 19, 20, 25, 27, 29, 30, 31, 32, 33, 34])){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
             //p($hz_Arr_Data);

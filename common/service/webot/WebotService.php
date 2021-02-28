@@ -55,13 +55,16 @@ class WebotService extends BaseService {
             ]);
             $WxFriends->setAttributes($setDatas);
             $rst['data'][$rstData['userName']] = ['status'=>200, 'msg'=>'成功'];
+            $logArr = [];
             try{
-                $WxFriends->save();
+                $flag = $WxFriends->save();
             }catch (\Exception $e){
                 $rst['data'][$rstData['userName']] = ['status'=>300, 'msg'=>$e->getMessage()];
                 $logArr = ['error'=>$e->getMessage(), 'setDatas'=>$setDatas];
-                Tool_Common::log('/wx/'.__FUNCTION__.'_err', 'INFO', 'webot获取微信二维码', $logArr);
+                Tool_Common::log('/wx/'.__FUNCTION__.'_err', 'INFO', 'webot微信好友保存错误', $logArr);
             }
+            $logArr = array_merge($logArr, ['flag'=>$flag, 'wx_id'=>$rstData['userName']]);
+            Tool_Common::log('/wx/'.__FUNCTION__, 'INFO', 'webot微信好友信息保存', $logArr);
         }
 
         return $rst;

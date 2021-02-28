@@ -56,6 +56,8 @@ use common\service\ChatService;
 use common\service\CommonService;
 use common\service\webot\FriendsService;
 use common\service\webot\LoginService;
+use common\service\webot\MsgService;
+use common\service\webot\SendMsgService;
 use common\service\webot\WebotService;
 use common\tools\KjDataGet;
 use backend\service\BaseNumService;
@@ -207,6 +209,8 @@ class IndexController extends Controller
      * @desc 微信测试
      */
     public function actionTestWx(){
+        $rst = WebotService::syncAddressList($uid=1);p($rst);
+        $rst = SendMsgService::text($uid=1, 'wangyegao2012');p($rst);
         $rst = WebotService::syncAddressList($uid=1);p($rst);
         //$r = Yii::$app->db->getSchema()->refreshTableSchema('{{%wx_friends}}');p($r);
         $rst = WebotService::syncAddressData($uid=1, $wcIds = ['wxid_fz1qsc0ja2612', 'wxid_v5ni9x7kbjbp21', 'wxid_r4ewv74q8c6922']);p($rst);

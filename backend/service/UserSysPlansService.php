@@ -156,7 +156,8 @@ class UserSysPlansService extends BaseService {
         ################### 公共参数 - 结束 #########################
 
         if($playway == 6) {
-            $post['UserSysPlans']['hz_Arr'] = str_replace('，', ',', $post['UserSysPlans']['hz_Arr']);
+            $tmpFilter['codes'] = str_replace('，', ',', $post['UserSysPlans']['hz_Arr']);
+            unset($post['UserSysPlans']['hz_Arr']);
         }elseif (in_array($tz_type, [29, 32])){ # 三定-快选 、三定快译切换
             # 三定-快选过滤
             # 15.1、合分位置

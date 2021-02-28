@@ -245,6 +245,12 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $str = '[二定位]，定位置“[取]”：千=[1]，百=[34]';
         }elseif(in_array($tz_type,[ 29])){
             $str = '[三定位]，定位置“[取]”：千=[0123456789]，百=[0123456789]，十=[0123456789]，固定合分取值：第[3]位选中，第[4]位选中，内容：[13579]；';
+        }elseif(in_array($tz_type,[36])){ # 二字现
+            $str = '[二字现]，不定合分值(两数合)：[0123456789]，包含“[取]”数：[0123456789]';
+        }elseif(in_array($tz_type,[17])){ # 三字现
+            $str = '[三字现]，不定合分值(两数合)：[0123456789]，包含“[取]”数：[0123456789]';
+        }elseif(in_array($tz_type,[37])){ # 四字现
+            $str = '[四字现]，不定合分值(两数合)：[0123456789]，包含“[取]”数：[0123456789]';
         }else{ # 四定
             $str = '[四定位]，合分值范围：[0-36]';
         }
@@ -1804,23 +1810,25 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $rst = [];
         foreach ($codesArrs as $key=>$tmpcodesArr){
 
+            $bet_log = self::getBetLog($tz_type);
             if($playway == 4){ # 一字定
                 $post_data = [
                     'bets' => json_encode($tmpcodesArr),
                     'way' => $way,
                     'period_no' => $qihao,
                 ];
-
-            }else{ # 四定、三定
+            }else{ # 四定、三定、X字现
+                $is_xian = in_array($tz_type, \Yii::$app->params['IS_XIAN']) ? 1 : 0;
                 $bet_codes = implode(',', $tmpcodesArr);
                 $post_data = [
                     'bet_number'=>$bet_codes,
                     'bet_money'=>$single,
                     'bet_way'=>$way,
-                    'is_xian'=>0,
-                    'number_type'=>40,
+                    'is_xian'=>$is_xian,
+                    'number_type'=> LuckyBaseService::getNumType($tz_type),
+                    'is_iframe' => 1,
                     //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
-                    'bet_log'=>'[四定位]，定位置“[取]”：千=[1]，百=[24]，十=[4]，个=[6]',
+                    'bet_log'=>$bet_log,
                     'is_package' => 0,
                     'period_no'=>$qihao,
                     'operation_condition' => self::getOperationCondition(),
@@ -1940,6 +1948,22 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         Tool_Common::log('bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
 
         return $data;
+    }
+
+    /**
+     * @param $tz_type
+     * @return array|mixed
+     */
+    public static function getNumType($tz_type){
+        $num_type = 40; # 四定
+        $num_types = [
+            36 => 21, # 二字现
+            17 => 31, # 三字现
+            37 => 41, # 四字现
+        ];
+        if(isset($num_types[$tz_type])) return $num_types[$tz_type];
+
+        return $num_type;
     }
 
     /**

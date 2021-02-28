@@ -1410,6 +1410,11 @@ class NumService extends BaseService {
             $desc .= '当前:组'.$filter10['status_val'].' ';
         }
 
+        # 号码
+        if(isset($hz_Arr['codes'])){
+            $desc .= '号码:'.$hz_Arr['codes'];
+        }
+
         $typesArr = self::getNameByCodesType();
         #和值取
         if(!empty($filter2['hz'])){
