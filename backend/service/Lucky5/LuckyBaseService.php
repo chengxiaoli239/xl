@@ -1809,7 +1809,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $snInfo_snid = '';
         $rst = [];
         foreach ($codesArrs as $key=>$tmpcodesArr){
-
             $bet_log = self::getBetLog($tz_type);
             if($playway == 4){ # 一字定
                 $post_data = [

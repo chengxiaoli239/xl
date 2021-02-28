@@ -211,6 +211,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
             31 => 102,
             33 => 102,
             18 => 109,
+            17 => 31,
+            36 => 21,
+            37 => 41,
         ];
 
         if(isset($rstData[$tz_type])) return $rstData[$tz_type];
@@ -1968,6 +1971,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $snInfo_snid = '';
         $rst = [];
         foreach ($codesArrs as $key=>$tmpcodesArr){
+            $bet_log = self::getBetLog($tz_type);
             if($playway == 4){ # 一字定
                 $post_data = [
                     'bets' => json_encode($tmpcodesArr),
@@ -1976,15 +1980,17 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 ];
 
             }else{ # 四定、三定
+                $is_xian = in_array($tz_type, \Yii::$app->params['IS_XIAN']) ? 1 : 0;
                 $bet_codes = implode(',', $tmpcodesArr);
                 $post_data = [
                     'bet_number'=>$bet_codes,
                     'bet_money'=>$single,
                     'bet_way'=>$way,
-                    'is_xian'=>0,
-                    'number_type'=>40,
+                    'is_xian'=>$is_xian,
+                    'is_iframe' => 1,
+                    'number_type'=> LuckyBaseService::getNumType($tz_type),
                     //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
-                    'bet_log'=>'[四定位]，定位置“[取]”：千=[1]，百=[24]，十=[4]，个=[6]',
+                    'bet_log'=>$bet_log,
                     'is_package' => 0,
                     'period_no'=>$qihao,
                     'operation_condition' => self::getOperationCondition(),
@@ -2158,8 +2164,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }
         $rstData['errno'] = $errno;
         $time_consume = ($end_time-$start_time).'s';
-        $logArr = ['uid'=>$uid, 'url'=>$url, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
-        Tool_Common::log('postBetCurl','INFO','httpPost下注请求-5', $logArr);
+
+        $logArr = ['uid'=>$uid, 'url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rst'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
+        Tool_Common::log('postBetCurl','INFO','httpPost下注请求-5-1', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
         return $rstData;

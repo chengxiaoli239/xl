@@ -171,7 +171,7 @@ class PoxyIPService extends BaseService {
 
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/checkdpsvalid/?'.http_build_query($query);
         $start_time = microtime(true);
-        $rst = CurlService::getCurl($url, [], 6);
+        $rst = CurlService::getCurl($url, [], 9);
         $end_time = microtime(true);
         $consume_time = ($end_time-$start_time).'s';
         if($rst['errno']>0 && !$r = $m->get($mkey)){
