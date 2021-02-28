@@ -231,6 +231,8 @@ class IndexController extends Controller
      * @return mixed
      */
     public static function actionBetByUid(){
+        $tzStatus = SystemConfig::findOne(['key'=>'tz_status'])->value;
+        if(!$tzStatus) return ['status'=>300, 'msg'=>'投注开关未开启'];
         self::_init();
         set_time_limit(0);
         $post = \Yii::$app->request->post();
