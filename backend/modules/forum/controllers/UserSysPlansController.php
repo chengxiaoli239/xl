@@ -241,6 +241,21 @@ class UserSysPlansController extends BaseController
     }
 
     /**
+     * @desc 计划列表 - 立即投注
+     * @param $id
+     * @return \yii\web\Response
+     */
+    public function actionChangeIp(){
+        if($this->_user_id==1){
+            //$rst = BetService::changPoxyIp();
+            Tool_Common::log('ChangeIp', 'INFO', '更换代理ip', ['rst'=>$rst]);
+        }
+
+        return $this->redirect(['/forum/user-sys-plans/index']);
+    }
+
+
+    /**
      * @desc 更新投注 购买方向
      * @param $id
      * @param $status

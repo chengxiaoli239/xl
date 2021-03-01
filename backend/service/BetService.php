@@ -1735,6 +1735,17 @@ abstract class BetService extends BaseBetService {
         return $rst;
     }
 
+    /**
+     * @desc 更换代理ip
+     * @return bool
+     */
+    public static function changPoxyIp(){
+        $m = \Yii::$app->cache;
+        $mkey = PoxyIPService::builProxyIpKey($mod_uid=0);
+        //$rst = $m->get($mkey);p($rst);
+        $rst = $m->delete($mkey);
+        return $rst;
+    }
 
 
 }
