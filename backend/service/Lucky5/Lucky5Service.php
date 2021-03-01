@@ -2091,6 +2091,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if(!$timeout) $timeout = 30;
 
         //$cookie = dirname(__FILE__)."/cookie.txt";
+        $headers[] = ['Accept: application/json, text/javascript, */*; q=0.01'];
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -2112,7 +2113,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect curl获取页面内容，不直接输出到页面，必需设置curl的CURLOPT_RETURNTRANSFER选项为1或true
         curl_setopt($ch, CURLOPT_HEADER,0);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data));
 
@@ -2161,8 +2162,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $rstData = ["Status"=>0, 'code'=>311, 'msg'=>'代理IP网络故障'];
         }elseif(strpos($data, 'Too Many Request') !== false){
             $rstData = ["Status"=>0, 'code'=>312, 'msg'=>'代理请求太频繁'];
-        }elseif(strpos($data, 'ClearSession') !== false){
-            $rstData = ["Status"=>0, 'code'=>313, 'msg'=>'请求重定向跳转'];
+        }elseif(strpos($data, 'ClearSession') !== false) {
+            $rstData = ["Status" => 0, 'code' => 313, 'msg' => '请求重定向跳转'];
+        }elseif(strpos($data, "\"Status\":1") !== false && strpos($data, "\"CompletedStatus\":1") !== false){ # json解析异常处理
+            $rstData = ['Status'=>1, 'Data'=>['CompletedStatus'=>1, 'LackStatus'=>0]];
         }else{
             $rstData = json_decode($data, TRUE);
         }
