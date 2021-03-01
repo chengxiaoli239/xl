@@ -2,6 +2,7 @@
 namespace backend\service;
 
 use backend\models\TzSystemsUsers;
+use backend\service\Lucky5\Lucky5Service;
 use common\service\CommonService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
@@ -161,31 +162,74 @@ class PoxyIPService extends BaseService {
         $m = \Yii::$app->cache;
         $mkey = 'retry_get_isValid_key';
 
-        $API_KEY = BetService::getConfig('KUAI_POXY_API_KEY'); # 快代理 API Key
-        $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
-        $query = [
-            'orderid' => $KUAI_POXY_ORDER_ID,
-            'proxy' => implode(',', $poxy_ips),
-            'signature' => $API_KEY,
-        ];
-
-        $url = \Yii::$app->params['KUAI_POXY_API'].'/api/checkdpsvalid/?'.http_build_query($query);
+        $url = 'https://www.baidu.com';
         $start_time = microtime(true);
-        $rst = CurlService::getCurl($url, [], 9);
+        //$rst = CurlService::getCurl($url, [], 9);
+        $checkRst = PoxyIPService::check($url, $poxy_ips[0], 5);
         $end_time = microtime(true);
         $consume_time = ($end_time-$start_time).'s';
-        if($rst['errno']>0 && !$r = $m->get($mkey)){
-            $m->set($mkey, 1, 5);
+        if(!$checkRst OR !$r = $m->get($mkey)){
+            $m->set($mkey, 1, 6);
             return self::isValid($poxy_ips);
         }
 
-        Tool_Common::log('poxy_ip_is_valid','INFO', '判断代理IP有效性', ['url'=>$url, 'rst'=>$rst, 'consume_time'=>$consume_time]);
-        if(count($poxy_ips)==1){
-            $flag = (boolean)$rst['data'][$poxy_ips[0]];
-            return $flag;
+        Tool_Common::log('poxy_ip_is_valid','INFO', '判断代理IP有效性', ['url'=>$url, 'rst'=>$checkRst, 'consume_time'=>$consume_time]);
+
+        return  $checkRst;
+    }
+
+    /**
+     * @desc 检测代理IP可用性
+     * @param $url
+     * @param array $data
+     * @param int $timeout
+     * @return bool|string
+     */
+    public static function check($url, $poxy_addr='', $timeout=30){
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+
+        if(strpos($url, 'ww662889') !== false){
+            //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
         }
 
-        return  $rst;
+        if(false && !empty($poxy_addr)){
+            //设置代理
+            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+            curl_setopt($ch, CURLOPT_PROXY, $poxy_addr);
+            //设置代理用户名密码（私密代理/独享代理）
+            //如果是开放代理，请注释掉下面两句
+            $username = \Yii::$app->params['KUAI_USERNAME'];
+            $password = \Yii::$app->params['KUAI_PASSWORD'];
+            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+        }
+
+        //设置post方式提交
+        curl_setopt($ch, CURLOPT_POST, 0);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+
+        $start_time = microtime(true);
+        $data = curl_exec($ch);
+        $end_time = microtime(true);
+        //d($data);
+        $errno = curl_errno( $ch );
+        $logArr = ['url'=>$url, 'data'=>$data, 'errno'=>$errno];
+        $flag = true;
+        if($errno>0){
+            $flag = false;
+        }
+
+        return $flag;
     }
 
     /**
@@ -220,7 +264,8 @@ class PoxyIPService extends BaseService {
         }
 
         //p(['poxy_ip_data'=>$poxy_ip_data, 'isValid'=>$isValid, 'isValidRst'=>$isValidRst]);
-        if(($isValid === false OR empty($isValid)) OR $isValidRst['status'] != 200 OR $isValidRst['data'][$poxy_ip_data] < 5*60){
+        //if(($isValid === false OR empty($isValid)) OR $isValidRst['status'] != 200 OR $isValidRst['data'][$poxy_ip_data] < 5*60){
+        if(!$isValid OR $isValidRst['status'] != 200 OR $isValidRst['data'][$poxy_ip_data] < 60){
             # 调用失败或者可使用时间少于5分钟则认为IP失效
             $data = self::kuaiPoxy();
             if($data['status'] != 200) {

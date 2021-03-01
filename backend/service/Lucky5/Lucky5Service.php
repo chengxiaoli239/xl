@@ -211,9 +211,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
             31 => 102,
             33 => 102,
             18 => 109,
-            17 => 31,
-            36 => 21,
-            37 => 41,
+            17 => 102,
+            36 => 102,
+            37 => 102,
         ];
 
         if(isset($rstData[$tz_type])) return $rstData[$tz_type];
@@ -234,6 +234,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
             29 => 30,
             31 => 50,
             33 => 20,
+            17 => 31,
+            36 => 21,
+            37 => 41,
         ];
 
         if(isset($rstData[$tz_type])) return $rstData[$tz_type];
@@ -251,6 +254,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $str = '[二定位]，定位置“[取]”：千=[1]，百=[34]';
         }elseif(in_array($tz_type,[ 29])){
             $str = '[三定位]，定位置“[取]”：千=[0123456789]，百=[0123456789]，十=[0123456789]，固定合分取值：第[3]位选中，第[4]位选中，内容：[13579]；';
+        }elseif(in_array($tz_type,[36])){ # 二字现
+            $str = '[二字现]，不定合分值(两数合)：[0123456789]，包含“[取]”数：[0123456789]';
+        }elseif(in_array($tz_type,[17])){ # 三字现
+            $str = '[三字现]，不定合分值(两数合)：[0123456789]，包含“[取]”数：[0123456789]';
+        }elseif(in_array($tz_type,[37])){ # 四字现
+            $str = '[四字现]，不定合分值(两数合)：[0123456789]，包含“[取]”数：[0123456789]';
         }else{ # 四定
             $str = '[四定位]，合分值范围：[0-36]';
         }
@@ -1771,7 +1780,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     'bet_way'=>$way,
                     'is_xian'=>$is_xian,
                     'is_iframe' => 1,
-                    'number_type'=> LuckyBaseService::getNumType($tz_type),
+                    'number_type'=> LuckyBaseService::getNumType($tz_type, $playway),
                     //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
                     'bet_log'=>$bet_log,
                     'is_package' => 0,
@@ -1988,7 +1997,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     'bet_way'=>$way,
                     'is_xian'=>$is_xian,
                     'is_iframe' => 1,
-                    'number_type'=> LuckyBaseService::getNumType($tz_type),
+                    'number_type'=> LuckyBaseService::getNumType($tz_type, $playway),
                     //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
                     'bet_log'=>$bet_log,
                     'is_package' => 0,

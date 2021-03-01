@@ -226,6 +226,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = PoxyIPService::isValid($ips = ['180.160.72.186']);d($rst);
         $rst = WxService::syncCheckTask($uid=18);p($rst);
         $miss = SscDataService::staticPeiShuDateProfits($lottery_type=8, '2021-01-28');p($miss);
         $miss = SscDataService::staticPeiShuDate($lottery_type=8);p($miss);
@@ -395,7 +396,6 @@ class IndexController extends Controller
         $rst = preg_replace( '#\s+#', ' ', $str );p($rst);
         $data = Lucky5::getLotteryLucky($type='json', $test = 1);p($data);
         $rst = PoxyIPService::kuaiIPValidTime(['116.115.210.176:16092', '121.56.39.180:20749']);p($rst);
-        $rst = PoxyIPService::isValid(['116.115.210.176:16092']);d($rst);
         $data = XjSsc::getLotteryNoNineNum();p($data);
         $str = "/App/ClearSession?errMsg=%e6%82%a8%e7%9a%84%e8%b4%a6%e5%8f%b7%e5%b7%b2%e5%9c%a8%e5%88%ab%e5%a4%84%e7%99%bb%e5%bd%95%e3%80%82";
         p(urldecode($str));
