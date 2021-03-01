@@ -2037,6 +2037,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
             $rstData = ["Status"=>0, 'code'=>306, 'msg'=>'系统线路维护中'];
         }elseif(strpos($data, '停押') !== false){
             $rstData = ["Status"=>0, 'code'=>307, 'msg'=>'您的账号已被停押'];
+        }elseif(strpos($data, "\"Status\":1") !== false && strpos($data, "\"CompletedStatus\":1") !== false){ # json解析异常处理
+            $rstData = ['Status'=>1, 'Data'=>['CompletedStatus'=>1, 'LackStatus'=>0]];
         }else{
             $rstData = json_decode($data, TRUE);
         }
