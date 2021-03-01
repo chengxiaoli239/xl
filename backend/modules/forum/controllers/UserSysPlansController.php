@@ -247,7 +247,7 @@ class UserSysPlansController extends BaseController
      */
     public function actionChangeIp(){
         if($this->_user_id==1){
-            //$rst = BetService::changPoxyIp();
+            $rst = BetService::changPoxyIp();
             Tool_Common::log('ChangeIp', 'INFO', '更换代理ip', ['rst'=>$rst]);
         }
 
