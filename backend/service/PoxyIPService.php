@@ -174,7 +174,7 @@ class PoxyIPService extends BaseService {
             return self::isValid($poxy_ips);
         }
 
-        Tool_Common::log('poxy_ip_is_valid','INFO', '判断代理IP有效性', ['url'=>$url, 'rst'=>$checkRst, 'consume_time'=>$consume_time]);
+        Tool_Common::log('poxy_ip_is_valid','INFO', '判断代理IP有效性', ['url'=>$url, 'poxy_ips'=>$poxy_ips, 'rst'=>$checkRst, 'consume_time'=>$consume_time]);
 
         return  $checkRst;
     }

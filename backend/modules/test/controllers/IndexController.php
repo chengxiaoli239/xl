@@ -226,12 +226,12 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = PoxyIPService::isValid($ips = ['115.226.68.53:22598']);d($rst);
         $m = \Yii::$app->cache;
         $mkey = PoxyIPService::builProxyIpKey($mod_uid=0);
         $rst = $m->get($mkey);p($rst);
         //$rst = $m->delete($mkey);p($rst);
         $str = '<script language=\'javascript\'>document.domain = document.domain; parent.onprogress(1, \'0\')</script><script language=\'javascript\'>document.domain = document.domain; parent.onprogress(1, \'0\')</script><script language=\'javascript\'>document.domain = document.domain; parent.onprogress(0, \'end\')</script><script language=\'javascript\'>document.domain = document.domain; parent.onprogress(0, \'end\')</script>{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}';
-        $rst = PoxyIPService::isValid($ips = ['180.160.72.186']);d($rst);
         $rst = WxService::syncCheckTask($uid=18);p($rst);
         $miss = SscDataService::staticPeiShuDateProfits($lottery_type=8, '2021-01-28');p($miss);
         $miss = SscDataService::staticPeiShuDate($lottery_type=8);p($miss);
