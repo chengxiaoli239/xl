@@ -212,7 +212,6 @@ class IndexController extends Controller
         $rst = WebotService::syncAddressList($uid=1);p($rst);
         $rst = SendMsgService::text($uid=1, 'wangyegao2012');p($rst);
         $rst = WebotService::syncAddressList($uid=1);p($rst);
-        //$r = Yii::$app->db->getSchema()->refreshTableSchema('{{%wx_friends}}');p($r);
         $rst = WebotService::syncAddressData($uid=1, $wcIds = ['wxid_fz1qsc0ja2612', 'wxid_v5ni9x7kbjbp21', 'wxid_r4ewv74q8c6922']);p($rst);
         $rst = FriendsService::getContactDetail($uid=1, $wcIds = ['wxid_fz1qsc0ja2612', 'wxid_v5ni9x7kbjbp21', 'wxid_r4ewv74q8c6922']);p($rst);
         $rst = LoginService::syncAddressList($uid=1);p($rst);
@@ -226,7 +225,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = PoxyIPService::isValid($ips = ['115.226.68.53:22598']);d($rst);
+        $poxy_ip_data = '115.226.68.53:22598'; #
+        $rst = PoxyIPService::isValid($ips = [$poxy_ip_data], $is_auto=0);d($rst);
+        $isValidRst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
+        p($isValidRst);
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%system_config}}');p($r);
         $m = \Yii::$app->cache;
         $mkey = PoxyIPService::builProxyIpKey($mod_uid=0);
         $rst = $m->get($mkey);p($rst);

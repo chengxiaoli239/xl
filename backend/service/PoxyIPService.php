@@ -157,19 +157,19 @@ class PoxyIPService extends BaseService {
      * @param $poxy_ip array  ['122.7.3.56:17856', '122.8.8.56:176']
      * @return bool
      */
-    public static function isValid($poxy_ips = []){
+    public static function isValid($poxy_ips = [], $is_auto=1){
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        if(!$POXY_STATUS) return false; # CURL 代理开关
+        if(!$POXY_STATUS && $is_auto) return false; # CURL 代理开关
         $m = \Yii::$app->cache;
         $mkey = 'retry_get_isValid_key';
 
         $url = 'https://www.baidu.com';
         $start_time = microtime(true);
         //$rst = CurlService::getCurl($url, [], 9);
-        $checkRst = PoxyIPService::check($url, $poxy_ips[0], 5);
+        $checkRst = PoxyIPService::check($url, $poxy_ips[0], 8);
         $end_time = microtime(true);
         $consume_time = ($end_time-$start_time).'s';
-        if(!$checkRst OR !$r = $m->get($mkey)){
+        if(!$checkRst && !$r = $m->get($mkey)){
             $m->set($mkey, 1, 6);
             return self::isValid($poxy_ips);
         }
@@ -201,7 +201,7 @@ class PoxyIPService extends BaseService {
             //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
         }
 
-        if(false && !empty($poxy_addr)){
+        if(!empty($poxy_addr)){
             //设置代理
             curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
             curl_setopt($ch, CURLOPT_PROXY, $poxy_addr);
@@ -224,7 +224,8 @@ class PoxyIPService extends BaseService {
         $end_time = microtime(true);
         //d($data);
         $errno = curl_errno( $ch );
-        $logArr = ['url'=>$url, 'data'=>$data, 'errno'=>$errno];
+        $logArr = ['url'=>$url, 'errno'=>$errno, 'time_consume'=>($end_time-$start_time).'s'];
+        Tool_Common::log('/poxyIP/'.__FUNCTION__, 'INFO', 'IP检测', $logArr);
         $flag = true;
         if($errno>0){
             $flag = false;
@@ -264,8 +265,6 @@ class PoxyIPService extends BaseService {
             $isValidRst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
         }
 
-        //p(['poxy_ip_data'=>$poxy_ip_data, 'isValid'=>$isValid, 'isValidRst'=>$isValidRst]);
-        //if(($isValid === false OR empty($isValid)) OR $isValidRst['status'] != 200 OR $isValidRst['data'][$poxy_ip_data] < 5*60){
         if(!$isValid OR $isValidRst['status'] != 200 OR $isValidRst['data'][$poxy_ip_data] < 60){
             # 调用失败或者可使用时间少于5分钟则认为IP失效
             $data = self::kuaiPoxy();

@@ -1815,10 +1815,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 $TzSystemsUsers->user_agent,
             ];
 
+            //p(['post_data'=>$post_data, 'headers'=>$headers]);
             # 缓存锁
             $m = \Yii::$app->cache;
             $betKey = BetService::buildBetKey($plan->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id).'_'.$key; # 分配下注后面加key
-            //if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
+            if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
             //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
             # 和值投注反应时间比较久，无需返回直接锁住
@@ -1834,7 +1835,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             }
             //sleep(1);
 
-            //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data, 'recordRst'=>$recordRst]);
+            //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data, 'tmpRst'=>$tmpRst]);
             $rst[$key] = $tmpRst;
             //$rst = json_encode($rst);
             $end_time = microtime(true);
@@ -2177,7 +2178,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $rstData['errno'] = $errno;
         $time_consume = ($end_time-$start_time).'s';
 
-        $logArr = ['uid'=>$uid, 'url'=>$url, 'headers'=>$headers, 'post_data'=>$post_data, 'rst'=>$data, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
+        $logArr = ['uid'=>$uid, 'url'=>$url, 'headers'=>$headers, 'rstData'=>$rstData, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
         Tool_Common::log('postBetCurl','INFO','httpPost下注请求-5-1', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
