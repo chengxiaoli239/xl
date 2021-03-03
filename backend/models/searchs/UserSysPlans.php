@@ -82,6 +82,7 @@ class UserSysPlans extends UserSysPlansModel
         if($this->uid !== 1){
             $queryWhere['uid'] = $params['UserSysPlans']['uid'];
         }
+        //p($queryWhere);
         // grid filtering conditions
         $query->andFilterWhere($queryWhere);
 
