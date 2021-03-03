@@ -87,9 +87,10 @@ class UserSysPlans extends UserSysPlansModel
         $query->andFilterWhere($queryWhere);
 
         $query->andFilterWhere(['like', 'account', $this->account])
-            ->andFilterWhere(['like', 'tz_sites', $this->tz_sites])
+            ->andFilterWhere(['like', 'tz_sites', $this->tz_sites]);
+
             //->andFilterWhere(['in', 'status', [0, 1]])
-            ->andFilterWhere(['like', 'hz_Arr', $this->hz_Arr]);
+            //->andFilterWhere(['like', 'hz_Arr', $this->hz_Arr]);
 
         return $dataProvider;
     }
