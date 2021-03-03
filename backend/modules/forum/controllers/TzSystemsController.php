@@ -109,6 +109,7 @@ class TzSystemsController extends BaseController
             return $this->redirect(['index']);
         }
 
+        $model->tz_types = explode(',', $model->tz_types);
         $allTzTypes = CommonService::getAllTzTypes();
         return $this->render('update', [
             'allTzTypes' => $allTzTypes,
