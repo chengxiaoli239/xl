@@ -878,7 +878,7 @@ class  CommonService{
      * @return int
      */
     public static function hasPlansActiveLottery($lottery_types = []){
-        $where = ['AND', ['IN', 'lottery_type', $lottery_types], ['=', 'status', 1]];
+        $where = ['AND', ['IN', 'lottery_type', $lottery_types], ['=', 'status', 1], ['=', 'is_test', 0]];
         $row = UserSysPlans::find()->where($where)->one();
 
         $flag = !empty($row) ? 1 : 0;
