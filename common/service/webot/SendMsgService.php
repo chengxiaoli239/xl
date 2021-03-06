@@ -15,7 +15,7 @@ class SendMsgService extends BaseService
     /**
      * @desc 发送文本消息
      * @param $uid
-     * @param $wcId
+     * @param $wcId - 接收人微信号/群号
      * @param string $content
      * @return bool|string
      */
@@ -23,6 +23,36 @@ class SendMsgService extends BaseService
         self::__init($uid);
         $config = self::$webotConfigs;
         $url = $config->base_url.'/iPadLogin';
+
+        $headers = [
+            'Content-Type: application/json; charset=utf-8',
+            'Authorization: '.$config['authorization'],
+        ];
+        $post_datas = [
+            'wId' => $config->wId,
+            'wcId' => $wcId,
+            'content' => $content,
+        ];
+        $rst = BaseService::sendCurlPost($url, $headers, $post_datas);
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'post_datas'=>$post_datas, 'rst'=>$rst];
+        Tool_Common::log('/wx/'.__FUNCTION__, 'INFO', 'webot获取微信二维码', $logArr);
+        if($rst['code'] == 1000 && isset($rst['data']['wId'])){
+        }
+
+        return $rst;
+    }
+
+    /**
+     * @desc 发送文本消息
+     * @param $uid
+     * @param $wcId - 接收人微信号/群号
+     * @param string $content - 图片url地址
+     * @return bool|string
+     */
+    public static function image($uid='', $wcId='', $content=''){
+        self::__init($uid);
+        $config = self::$webotConfigs;
+        $url = $config->base_url.'/sendImage';
 
         $headers = [
             'Content-Type: application/json; charset=utf-8',

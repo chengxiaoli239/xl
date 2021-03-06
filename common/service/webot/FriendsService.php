@@ -12,7 +12,7 @@ use common\service\chat\Tool_Common;
 class FriendsService extends BaseService
 {
     /**
-     * @desciption webot获取微信二维码
+     * @desciption webot获取通讯录详情信息
      * @param $uid
      * @param $wcId
      * @param int $type
