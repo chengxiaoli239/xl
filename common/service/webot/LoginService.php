@@ -60,7 +60,7 @@ class LoginService extends BaseService
             'wcId' => $config->wcId,
             'type' => $type,
         ];
-        $rst = BaseService::sendCurlPost($url, $headers, $post_datas);
+        $rst = BaseService::sendCurlPost($url, $headers, $post_datas);  # xxx
         $logArr = ['url'=>$url, 'headers'=>$headers, 'post_datas'=>$post_datas, 'rst'=>$rst];
         Tool_Common::log('/wx/'.__FUNCTION__, 'INFO', 'webot获取微信二维码', $logArr);
         if($rst['code'] == 1000 && isset($rst['data']['wId'])){

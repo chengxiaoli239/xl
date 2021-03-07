@@ -5,6 +5,8 @@ namespace backend\modules\forum\controllers;
 use backend\models\TzSystemsUsers;
 use backend\service\Wx;
 use backend\service\WxService;
+use common\service\webot\LoginService;
+use common\service\webot\WebotService;
 use Yii;
 use backend\models\WxFriends;
 use backend\models\searchs\WxFriends as WxFriendsSearch;
@@ -143,11 +145,29 @@ class WxFriendsController extends BaseController
         return $this->redirect(['index']);
     }
 
-
     /**
      * @desc 登录微信
      */
     public function actionLogin(){
+
+        //重新扫描登陆时，清空缓存
+        $uid = $this->_user_id;
+        $model = TzSystemsUsers::findOne(['uid'=>$uid]);//$this->findModel(['uid'=>$uid]);
+        $erweima = LoginService::getLoginQrCode($uid);
+        $model->login_img = $erweima;
+
+        $data = [
+            'model' => $model,
+            'erweima' => $erweima,
+        ];
+
+        return $this->render('login', $data);
+    }
+
+    /**
+     * @desc 登录微信
+     */
+    public function actionLoginBak(){
 
         //重新扫描登陆时，清空缓存
         $uid = $this->_user_id;

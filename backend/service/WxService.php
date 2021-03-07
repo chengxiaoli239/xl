@@ -753,7 +753,7 @@ class WxService {
      * @description 更新表状态
      * @param $id
      * @param $account
-     * @return array
+     * @return array|boolean
      */
     public static function switchStatus($id, $status, $uid, $model)
     {

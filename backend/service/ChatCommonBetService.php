@@ -26,7 +26,6 @@ class ChatCommonBetService extends BaseService {
         $info = ChatCommonBetService::getUserInfoByToken($token);
         $userInfo = $info['data'];
         //$rst['userInfo'] = $userInfo;
-        $types = [1=>'上分', 2=>'下分', 3=>'查询开奖', 4=>'投注'];
         $type = ChatCommonBetService::getTypeByDesc($desc);
         $qihao = HN0898Service::getQihao($lottery_type);
         $rst = [
@@ -47,7 +46,7 @@ class ChatCommonBetService extends BaseService {
         if(in_array($type, [1, 2])){ # 1、上、下分
             $rst = array_merge(ChatCommonBetService::upOrDownBalance($desc, $userInfo), $rst);
             return $rst;
-        }elseif ($type == 3){   # 查询开奖
+        }elseif ($type == 3){   # 查询最新开奖
             $SscKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one();
             $rst = array_merge(['msg'=>'【号码】'.$SscKjData->code_str], $rst);
             return $rst;
@@ -188,7 +187,7 @@ class ChatCommonBetService extends BaseService {
             $type = 2;
         }
 
-        # 4、下分
+        # 4、查开奖号码
         if(strpos($desc, '奖') === 0){
             $type = 3;
         }
