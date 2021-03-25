@@ -191,9 +191,9 @@ class KjDataGet
             }
         }elseif($lottery_type == 8){ # 幸运五星
             # 用户报表需求 24小时抓取开奖数据
-            //if ('04:10' < $date_time && $date_time < '09:00') {
-            //    $rst = false;
-            //}
+            if ('04:10' < $date_time && $date_time < '09:00') {
+                $rst = false;
+            }
         }elseif(in_array($lottery_type, [10, 11, 12, 13])){ # 冰岛90s、3分
             if ('03:10' < $date_time && $date_time < '09:00') {
                 $rst = false;
