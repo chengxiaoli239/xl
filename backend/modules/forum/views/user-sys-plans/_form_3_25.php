@@ -279,18 +279,42 @@ use yii\widgets\ActiveForm;
                         </div>
                     </div>
 
-                <div class="form-group">
+                    <div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
                             <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <?= Html::button(Yii::t('app', 'query'), ['class' => 'btn btn-success', 'id'=>'id-query']) ?>
+                            <?= Html::button(Yii::t('app', 'query-yl'), ['class' => 'btn btn-success id-query', 'data-type'=>1]) ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <?= Html::button(Yii::t('app', 'query-profits'), ['class' => 'btn btn-success id-query', 'data-type'=>2]) ?>
                         </div>
                     </div>
+                <input type="hidden" id="lottery_type" name="UserSysPlans[lottery_type]" value="<?=$lottery_type?>">
                 <?php ActiveForm::end(); ?>
             </div>
         </section>
     </div>
 </div>
-<input type="hidden" id="lottery_type" name="lottery_type" value="<?=$lottery_type?>">
+<div class="modal fade" id="rstTipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
+     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
+">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_title">提示信息</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group up-reason">
+                    <label id="tip_msg_rst" for="tip_msg_rst"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="opRstConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
 <script>
 $(function () {
@@ -418,62 +442,12 @@ $(function () {
         });
     });
 
-    $("#id-query").click(function () {
-        console.log('ssss')
-        // 查询遗漏
-        var arise = $('#usersysplans-arise').val();
-        var p1 = $('#usersysplans-p1').val();
-        var p2 = $('#usersysplans-p2').val();
-        var p3 = $('#usersysplans-p3').val();
-        var p4 = $('#usersysplans-p4').val();
-        var hzs = []; // 和值
-        $("input:checkbox[name='UserSysPlans[hz][]']:checked").each(function (i) {
-            hzs.push($(this).val());
-        });
-        var type_2 = [];
-        $("input:checkbox[name='UserSysPlans[type_2][]']:checked").each(function (i) {
-            type_2.push($(this).val());
-        });
-        var type_3 = [];
-        $("input:checkbox[name='UserSysPlans[type_3][]']:checked").each(function (i) {
-            type_3.push($(this).val());
-        });
-        var type_4 = [];
-        $("input:checkbox[name='UserSysPlans[type_4][]']:checked").each(function (i) {
-            type_4.push($(this).val());
-        });
-        var type_22 = [];
-        $("input:checkbox[name='UserSysPlans[type_22][]']:checked").each(function (i) {
-            type_22.push($(this).val());
-        });
-        var type_2b = [];
-        $("input:checkbox[name='UserSysPlans[type_2b][]']:checked").each(function (i) {
-            type_2b.push($(this).val());
-        });
-        var type_3b = [];
-        $("input:checkbox[name='UserSysPlans[type_3b][]']:checked").each(function (i) {
-            type_3b.push($(this).val());
-        });
-        var type_4b = [];
-        $("input:checkbox[name='UserSysPlans[type_4b][]']:checked").each(function (i) {
-            type_4b.push($(this).val());
-        });
-        var type_log = [];
-        $("input:checkbox[name='UserSysPlans[type_log][]']:checked").each(function (i) {
-            type_log.push($(this).val());
-        });
-        var type_4ds = []; // 和值
-        $("input:checkbox[name='UserSysPlans[type_4ds][]']:checked").each(function (i) {
-            type_4ds.push($(this).val());
-        });
-
-        lottery_type = $('#lottery_type').val();
-        data = {arise:arise,p1:p1,p2:p2,p3:p3,p4:p4,hzs:hzs,type_2:type_2,type_3:type_3,type_4:type_4,type_22:type_22,type_2b:type_2b,type_3b:type_3b,type_4b:type_4b,type_log:type_log,type_4ds:type_4ds,lottery_type:lottery_type};
-        console.log(data)
+    $(".id-query").click(function () {
         url = '/forum/ssc-static-yl/query'
+        data = $('#w0').serialize()+'&type='+$(this).data('type');
         $.post(url, data, function(rst) {
-            //$('#tip_msg_rst').html('<strong>号码：</strong>'+val + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str)
-            //$('#rstTipModal').modal('show');
+            $('#tip_msg_rst').html('<strong>号码：</strong>'+rst.code_desc + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str)
+            $('#rstTipModal').modal('show');
         });
     });
 

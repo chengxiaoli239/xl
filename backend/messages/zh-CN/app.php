@@ -119,4 +119,7 @@ return [
     'Static Pei Shu Code Date Profits' => '配数利润(天)',
 
     'Wx Login' => '微信登陆',
+
+    'query-profits' => '利润查询',
+    'query-yl' => '遗漏查询',
 ];

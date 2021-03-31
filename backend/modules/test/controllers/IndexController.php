@@ -225,6 +225,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = StaticService::queryCodeTypeStatic($post);p($rst);
         $poxy_ip_data = '115.226.68.53:22598'; #
         $rst = PoxyIPService::isValid($ips = [$poxy_ip_data], $is_auto=0);d($rst);
         $isValidRst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
@@ -357,7 +358,6 @@ class IndexController extends Controller
         $rst = StaticService::static2NumsYl($lottery_type = 5);p($rst);
         $rst = SscDataService::update3NumYL($lottery_type = 6);p($rst);
         $rst = KjDataGet::updateNullCode($num = 1000, $lottery_type = 5);p($rst);
-        $rst = StaticService::queryCodeTypeStatic($post);p($rst);
         $dates = [ ];
         $tmp_date =  strtotime('2020-07-01 00:00:00');
         $i = 0;

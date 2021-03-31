@@ -37,6 +37,7 @@ use backend\models\SystemConfig;
 use backend\models\ThreeNum;
 use backend\models\TzSystemsAuth;
 use backend\models\TzTypes;
+use backend\models\UserSysPlans;
 use backend\tools\Util;
 use common\service\CommonService;
 use common\tools\KjDataGet;
@@ -44,6 +45,7 @@ use common\tools\Tool_Common;
 use common\tools\Tools;
 use yii\helpers\ArrayHelper;
 use  yii;
+use yii\helpers\BaseStringHelper;
 
 class StaticService extends BaseService {
 
@@ -2374,7 +2376,8 @@ class StaticService extends BaseService {
            case 2: # 三字定
                break;
            case 3: # 四字定
-               $codesArr = explode('@', $codes);
+               $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'code_4n_str', $codes]];
+               $SscKjDatas = SscKjData::find()->where($where)->asArray()->orderBy('id DESC')->limit(10000)->all();
                break;
            case 4: # 一字定
            case 10:
@@ -2398,9 +2401,51 @@ class StaticService extends BaseService {
                 $yl = self::qihaoSpace($record['qihao'], $last_Qihao);
                 break;
        }
-       //p(['codes'=>$codes, $record, $last_Qihao, 'yl'=>$yl]);
 
-       return $yl;
+       $last_index_id = SscDataService::getLastIndexId($lottery_type);
+       $tmpKjData = $SscKjDatas;
+       if(count($tmpKjData) > 2){
+           $max_len = 0;
+           $allKjData = [];
+           foreach($tmpKjData as $key=>$r){
+               if($key == 0) continue;
+               $len = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
+               $range[$tmpKjData[$key-1]['index_id'].'_'.$tmpKjData[$key]['index_id']] = $len;
+               $allKjData[$tmpKjData[$key]['index_id']] = $r;
+               if($len > $max_len){
+                   $max_len =  $len;
+                   $tmpArrKey = [$tmpKjData[$key]['index_id'], $tmpKjData[$key-1]['index_id']];
+               }
+           }
+           $tmpArr[0] = $allKjData[$tmpArrKey[0]]['qihao'];
+           $tmpArr[1] = $allKjData[$tmpArrKey[1]]['qihao'];
+
+           $max_miss = max($range);
+           $max_range = $tmpArr[1].'-'.$tmpArr[0];  // 近200期内最大遗漏
+           $yl_str = implode('-',$range);
+           # 最大遗漏期间计算 end
+           //p([$field=>$num,$min_id, $SscKjData[1]->id,$max_range]);
+       }else{
+           $max_range = $SscKjDatas[1]['qihao'] .'-'. $SscKjDatas[0]['qihao'];
+       }
+       $last_times = 0;
+       if(count($SscKjDatas)>1){
+           $last_times = $SscKjDatas[0]['index_id'] - $SscKjDatas[1]['index_id'] - 1;  // 上次遗漏次数
+       }
+       $last_time_miss_range = $SscKjDatas[1]['qihao'] .'-'. $SscKjDatas[0]['qihao'];
+       $current_times = $last_index_id - $SscKjDatas[0]['index_id'];
+       if(empty($yl_str)) $yl_str = $last_times;
+       $rstData = [
+           'current_times' => $current_times,    // 当前遗漏次数
+           'last_times' => $last_times,    // 上次遗漏次数
+           'last_time_miss_range' => $last_time_miss_range,    // 上次遗漏范围
+           'max_miss' => $max_miss ? $max_miss : $last_times,   // 近200期内的最大遗漏
+           'max_range' => $max_range,   // 近200期内的最大遗漏范围
+           'yl_str' => BaseStringHelper::truncate($yl_str,800),
+       ];
+
+
+       return $rstData;
    }
 
     /**
@@ -2817,80 +2862,32 @@ $sql .= '
 
     /**
      * @param $data
+     * @param $type 1:遗漏查询 2利润统计
      * @return array
      */
-    public static function queryCodeTypeStatic($data, $playway = 3){
-        $rst = [];
-        $hz_Arr = [];
+    public static function queryCodeTypeStatic($data, $type = 1){
+        $code_types = [
+            1 => 2, # 二定
+            2 => 3, # 三定
+            3 => 4, # 四定
+        ];
+        $code_type = $code_types[$data['UserSysPlans']['playway']];
+        $tz_type = $data['UserSysPlans']['tz_type'];
+        $lotter_type = $data['UserSysPlans']['lottery_type'];
+        $model = new UserSysPlans();
+        UserSysPlansService::preOpData($data, $user_id=1);
+        $model->load($data);
+        $codes_hz = json_decode($model->hz_Arr, true);
+        $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type);
 
-        # 上奖
-        if(isset($data['arise']) && !empty($data['arise'])){
-            $hz_Arr['arise'] = $data['arise'];
+        if($type == 1){
+            # 1 遗漏
+            $rst = StaticService::getYlByCodes($codes, $lotter_type, $tz_type);
+        }else{
+            # 利润
+            $rst = StaticService::getYlByCodes($codes, $lotter_type, $tz_type);
         }
-        # p1
-        if(isset($data['p1']) && !empty($data['p1'])){
-            $hz_Arr['p1'] = $data['p1'];
-        }
-        # p2
-        if(isset($data['p2']) && !empty($data['p2'])){
-            $hz_Arr['p2'] = $data['p2'];
-        }
-        # p3
-        if(isset($data['p3']) && !empty($data['p3'])){
-            $hz_Arr['p3'] = $data['p3'];
-        }
-        # p4
-        if(isset($data['p4']) && !empty($data['p4'])){
-            $hz_Arr['p4'] = $data['p4'];
-        }
-        # 双重
-        if(isset($data['type_2']) && count($data['type_2'])){
-            $hz_Arr['type_2'] = $data['type_2'][0];
-        }
-        # 三重
-        if(isset($data['type_3']) && count($data['type_3'])){
-            $hz_Arr['type_3'] = $data['type_3'][0];
-        }
-        unset($data['type_3']);
-        # 四重
-        if(isset($data['type_4']) && count($data['type_4'])){
-            $hz_Arr['type_4'] = $data['type_4'][0];
-        }
-        unset($data['type_4']);
-        # 双双重
-        if(isset($data['type_22']) && count($data['type_22'])){
-            $hz_Arr['type_22'] = $data['type_22'][0];
-        }
-        unset($data['type_22']);
-        # 对数
-        if(isset($data['type_log']) && count($data['type_log'])){
-            $hz_Arr['type_log'] = $data['type_log'][0];
-        }
-        unset($data['type_22']);
-        # 两兄弟
-        if(isset($data['type_2b']) && count($data['type_2b'])){
-            $hz_Arr['type_2b'] = $data['type_2b'][0];
-        }
-        unset($data['type_2b']);
-        # 三兄弟
-        if(isset($data['type_3b']) && count($data['type_3b'])){
-            $hz_Arr['type_3b'] = $data['type_3b'][0];
-        }
-        unset($data['type_3b']);
-        # 四兄弟
-        if(isset($data['type_4b']) && count($data['type_4b'])){
-            $hz_Arr['type_4b'] = $data['type_4b'][0];
-        }
-        unset($data['type_4b']);
-        # 单双
-        if(isset($data['type_4ds']) && count($data['type_4ds'])){
-            $hz_Arr['type_4ds'] = $data['type_4ds'];
-        }
-        unset($data['type_4ds']);
-
-        $hz_Arr = json_encode($hz_Arr);
-        $codes = BetService::getPlansAllCodesType1($tz_type = 25, $buy_type = 1, $sel_same = 0, $hz_Arr);
-        $rst = StaticService::getYlByCodes($codes, 5, $tz_type);p($rst);
+        $rst['code_desc'] = \backend\service\NumService::getDescByKuaixuan($codes_hz);
 
         return $rst;
     }

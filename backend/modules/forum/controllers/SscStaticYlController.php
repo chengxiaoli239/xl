@@ -103,13 +103,13 @@ class SscStaticYlController extends BaseController
     }
 
     /**
-     * @desc 遗漏功能查询
+     * @desc 表单页，遗漏、利润功能查询
      * @return array
      */
     public function actionQuery(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
-        $rst = StaticService::queryCodeTypeStatic($post);
+        $rst = StaticService::queryCodeTypeStatic($post, $post['type']);
 
         return $rst;
     }
