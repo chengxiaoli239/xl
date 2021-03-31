@@ -283,7 +283,7 @@ use yii\widgets\ActiveForm;
                         <div class="col-lg-offset-2 col-lg-10">
                             <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             <?= Html::button(Yii::t('app', 'query-yl'), ['class' => 'btn btn-success id-query', 'data-type'=>1]) ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <?= Html::button(Yii::t('app', 'query-profits'), ['class' => 'btn btn-success id-query', 'data-type'=>2]) ?>
+                            <!--?= Html::button(Yii::t('app', 'query-profits'), ['class' => 'btn btn-success id-query', 'data-type'=>2]) ?-->
                         </div>
                     </div>
                 <input type="hidden" id="lottery_type" name="UserSysPlans[lottery_type]" value="<?=$lottery_type?>">
