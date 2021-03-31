@@ -2441,6 +2441,7 @@ class StaticService extends BaseService {
            'last_time_miss_range' => $last_time_miss_range,    // 上次遗漏范围
            'max_miss' => $max_miss ? $max_miss : $last_times,   // 近200期内的最大遗漏
            'max_range' => $max_range,   // 近200期内的最大遗漏范围
+           'counts' => count($SscKjDatas),   // 组数
            'yl_str' => BaseStringHelper::truncate($yl_str,800),
        ];
 
