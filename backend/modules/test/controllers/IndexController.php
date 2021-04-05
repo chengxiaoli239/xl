@@ -225,6 +225,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = Lucky5Service::synBalance($id=1); p($rst);# 同步余额
+        $rst = Lucky5Service::login($uid=2, $tz_system_id=9);p($rst);
+        $rst = BaseService::login($id=79, $is_auto=2);p($rst);
         $rst = StaticService::queryCodeTypeStatic($post);p($rst);
         $poxy_ip_data = '115.226.68.53:22598'; #
         $rst = PoxyIPService::isValid($ips = [$poxy_ip_data], $is_auto=0);d($rst);
@@ -268,7 +271,6 @@ class IndexController extends Controller
         $data = JiaNaDa::getLottery($type='json', $is_auto=2);p($data);
         $activeQihao = BetService::getActiveQihao($uid=24, $tz_system_id=9, $lottery_type=8);p($activeQihao);
         $rst = BetService::repeatErrorBet();p($rst);
-        $rst = BaseService::login($id=39, $is_auto=2);p($rst);
         $rst = BingDaoService::login($uid = 12, $tz_system_id = 13);p($rst);
         //PoxyIPService::delProxyUidsKey();
         $rst = PoxyIPService::getProxyUids();p($rst);

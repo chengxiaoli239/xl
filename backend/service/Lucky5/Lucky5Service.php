@@ -1167,8 +1167,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
-        if(empty($poxy_addr)) return ['status'=>30200, 'msg'=>'代理IP获取异常,请稍候...'];
+        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
+        if($POXY_STATUS){
+            $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+            if(empty($poxy_addr)) return ['status'=>30200, 'msg'=>'代理IP获取异常,请稍候...'];
+        }
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -1240,7 +1243,6 @@ class Lucky5Service { # 重庆7时彩登陆体系
         //sleep(10);
         //self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
-        //p($logArr);
         $desc = '';
         if(isset($data['Status']) && $data['Status'] == 2){
             $desc = $data['Data'];
@@ -2274,7 +2276,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $data = curl_exec($ch);
         $errno = curl_errno( $ch );
         //if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
-        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno];p($logArr);
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];p($logArr);
         curl_close($ch);
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
