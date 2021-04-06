@@ -65,6 +65,25 @@ return [
             'password' => 'dPmk3frLf8Teb6wm',
             'charset' => 'utf8',
         ],
+        'cache' => [
+            //'class' => 'yii\caching\FileCache',
+            'class' => 'yii\caching\MemCache',
+            'servers' => [
+                [
+                    'host' => '127.0.0.1',
+                    'port' => 11211,
+                    'weight' => 60,
+                ],
+            ],
+            'useMemcached' => true,
+            'keyPrefix' => 'xl_',
+        ],
+        'redis' => [
+            'class' => 'yii\redis\Connection',
+            'hostname' => 'localhost',
+            'port' => 6379,
+            'database' => 0,
+        ],
         'request' => [
             'class' => 'common\web\Request',
             'enableCookieValidation' => true,
