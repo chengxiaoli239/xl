@@ -225,6 +225,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        p($_SERVER);
         $rst = Lucky5Service::synBalance($id=1); p($rst);# 同步余额
         $rst = Lucky5Service::login($uid=2, $tz_system_id=9);p($rst);
         $rst = BaseService::login($id=79, $is_auto=2);p($rst);
