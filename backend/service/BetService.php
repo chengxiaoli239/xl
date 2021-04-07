@@ -373,7 +373,7 @@ abstract class BetService extends BaseBetService {
                 $activeQihao = BetService::getActiveQihao($uid, $BetErrorPlansTasks[0]->tz_system_id, $lottery_type);
                 if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
                     Tool_Common::log('wang_pan_is_active', 'ERR', '网盘开盘状态-2', ['uid'=>$uid, 'tz_system_id'=>$lottery_type]);
-                    return ['status'=>300, 'msg'=>'未开盘或者已关盘['.date('Y-m-d H:i:s').']'];
+                    return ['status'=>300, 'msg'=>'未开盘或者已关盘['.date('Y-m-d H:i:s').']', 'activeQihao'=>$activeQihao];
                 }
             }
             foreach ($BetErrorPlansTasks as $betErrorPlansTask){
