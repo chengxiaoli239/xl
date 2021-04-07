@@ -840,6 +840,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      */
     public static function getBalance($uid, $tz_system_id, $r='', $is_auto=1){
         self::__init($uid, $tz_system_id);
+        $start_time = microtime(true);
         $rst = self::userInfo($uid, $tz_system_id, $is_auto);
         $balance = false;
         if(isset($rst['Status']) && $rst['Status'] == 1){
@@ -848,8 +849,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->save();
+        $end_time = microtime(true);
+        $time_consume = ($end_time-$start_time).'s';
 
-        Tool_Common::log('getBalance','INFO','幸运五星-用户余额-3', ['uid'=>$uid, 'r'=>$r, 'rst'=>$rst, 'balance'=>$balance]);
+        Tool_Common::log('getBalance','INFO','幸运五星-用户余额-3', ['uid'=>$uid, 'r'=>$r, 'rst'=>$rst, 'balance'=>$balance, 'time_consume'=>$time_consume]);
 
         return $balance;
     }
@@ -1297,7 +1300,6 @@ class Lucky5Service { # 重庆7时彩登陆体系
             return ['status'=>300, 'msg'=>'您的访问过于频繁，请稍后再试 或 用户名或密码不正确'];
         }
 
-        //$url = self::getTzSiteInfo($tz_system_id, 'DO_LOGIN');
         $_t = (int)microtime(true) * 1000;
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/GetMemberPrint?_='.$_t;
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
@@ -1316,7 +1318,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $start_time = microtime(true);
         $uid = max($TzSystemsUsers->uid, $uid);
-        $data = self::httpGet($url, $headers, $uid);
+        $data = self::httpGet($url, $headers, $uid, $time_out=3);
         if(is_string($data) && strpos($data, '您当前使用的浏览器不支持') !== false){
             $roboot_id = Lucky5Service::getRobootIdByStr($data, $url);
             $cookie = $TzSystemsUsers->cookie;
@@ -2249,8 +2251,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @decription
      * @param $url
      */
-    public static function httpGet($url,$header=[], $uid = 0){
-        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+    public static function httpGet($url,$header=[], $uid = 0, $timeout=''){
+        if(empty($timeout)){
+            $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        }
         //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
 
         $ch = curl_init();

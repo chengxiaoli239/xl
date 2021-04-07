@@ -105,6 +105,7 @@ class BaseService{
         if(!$TzSystemsUser = TzSystemsUsers::findOne($id)){
             return ['status'=>300, 'msg'=>'操作失败:找不到记录'];
         }
+        $start_time = microtime(true);
 
         $tz_system_id = $TzSystemsUser->tz_system_id;
         $m = \Yii::$app->cache;
@@ -170,6 +171,9 @@ class BaseService{
                 $rst = ['status'=>302, 'msg'=>'同步余额并发锁-2['.$id.']'];
             }
         }
+        $end_time = microtime(true);
+        $time_consume = ($end_time-$start_time).'s';
+        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '同步余额耗时', ['tz_system_id'=>$tz_system_id, 'TzSystemsUserID'=>$TzSystemsUser->id, 'time_consume'=>$time_consume]);
 
         return $rst;
     }

@@ -394,7 +394,7 @@ abstract class BetService extends BaseBetService {
                 }
 
                 $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
-                $balance = $BetService::getBalance($uid, $tz_system_id, $r=3, $is_auto=2); # 余额
+                //$balance = $BetService::getBalance($uid, $tz_system_id, $r=3, $is_auto=2); # 余额
 
                 if(false && $balance<$bet_money){
                     $betErrorPlansTask->status = 3; # 不可重推
@@ -1681,6 +1681,10 @@ abstract class BetService extends BaseBetService {
             $lottery_type = $plan->lottery_type;
             $uid = $plan->uid;
             $qihao = HN0898Service::getQihao($lottery_type);
+            $Task = BetErrorPlansTask::findOne(['plan_id'=>$plan->id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
+            if($Task){
+                return ['status'=>200, 'msg'=>'已记录推送表'.$lottery_type.'_'.$qihao];
+            }
             $next_qihao_is_active = TzService::beforeBet($lottery_type);
             if($next_qihao_is_active['status'] != 200){
                 Tool_Common::log('next_qihao_is_active', 'INFO', '利润统计结束', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id, 'next_qihao_is_active'=>$next_qihao_is_active]);
