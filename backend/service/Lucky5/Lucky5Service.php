@@ -1170,7 +1170,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if($POXY_STATUS){
             $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
-            if(empty($poxy_addr)) return ['status'=>30200, 'msg'=>'代理IP获取异常,请稍候...'];
+            if(empty($poxy_addr)) return ['status'=>30200, 'msg'=>'代理IP获取异常,请稍候...', 'POXY_STATUS'=>$POXY_STATUS];
         }
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
