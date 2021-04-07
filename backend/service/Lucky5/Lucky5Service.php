@@ -1630,12 +1630,46 @@ class Lucky5Service { # 重庆7时彩登陆体系
             "X-Requested-With: XMLHttpRequest",
         ];
         $data = self::getCurl($url, $headers, $uid);
-        //$data = CurlService::getCurl($url, $headers);
+        if(is_string($data) && strpos($data, '您当前使用的浏览器不支持') !== false){
+            $roboot_id = Lucky5Service::getRobootIdByStr($data, $url);
+            $cookie = $TzSystemsUsers->cookie;
+            preg_match("/robot7=([^\r\n]*);Seven/i", $cookie, $matches);
+            $new_cookie = str_replace($matches, $roboot_id.';Seven', $cookie);
+            //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
+            $TzSystemsUsers->cookie = $new_cookie;
+            $TzSystemsUsers->save();
+        }
 
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         Tool_Common::log('getQihaoInfo','INFO','幸运五登陆前-2', $logArr);
 
         return $data;
+    }
+
+    /**
+     * desc 网盘返回
+     * @param string $content
+     * @param string $url
+     * @return string
+     */
+    public static function getRobootIdByStr($content = '', $url=''){
+        if(strpos($content, 'Set-Cookie') !== false){
+            preg_match("/Set\-Cookie:([^\r\n]*)/i", $content, $matches);
+        }else{
+            preg_match("/document.cookie\=\'([^\r\n]*)\'/i", $content, $matches);
+        }
+        $Arrs = explode('.', $url);
+        $domain = $Arrs[1];
+        if(strpos($matches[1], $domain) !== false){
+            $roboot_id = trim(str_replace('; path=/; domain=.'.$domain.'.xyz','', $matches[1]));
+            Tool_Common::log('getSessionId', 'INFO', '获取session_id', ['url'=>$url, 'domain'=>$domain, 'roboot_id'=>$roboot_id, 'content'=>$content]);
+        }
+        if(strpos($roboot_id, '您当前使用的浏览器不支持') !== false){
+            $tmp_roboot_id = explode('\';', $roboot_id);
+            if($tmp_roboot_id[0]) $roboot_id = $tmp_roboot_id[0];
+        }
+
+        return $roboot_id;
     }
 
 
