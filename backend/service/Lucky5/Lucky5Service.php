@@ -1294,6 +1294,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @return mixed|string
      */
     public static function userInfo($uid, $tz_system_id, $is_auto = 1){
+        $m = \Yii::$app->cache;
+        $mkey = 'get_userInfo_'.$uid.'_'.$tz_system_id.'_'.$is_auto;
+        if($data = $m->get($mkey)) return $data;
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         if($is_auto == 1 && (strpos($TzSystemsUsers->desc, '您的访问过于频繁') !== false OR strpos($TzSystemsUsers->desc, '用户名或密码不正确') !== false)){
@@ -1335,6 +1338,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'time_consume'=>$time_consume, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         //p($logArr);
         Tool_Common::log('userInfo','INFO','幸运五星-用户信息-2', $logArr);
+        $m->set($mkey, $data, 15);
         return $data;
     }
 
