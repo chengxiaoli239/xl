@@ -1321,7 +1321,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $start_time = microtime(true);
         $uid = max($TzSystemsUsers->uid, $uid);
-        $data = self::httpGet($url, $headers, $uid, $time_out=3);
+        $data = self::httpGet($url, $headers, $uid, $time_out=15);
         if(is_string($data) && strpos($data, '您当前使用的浏览器不支持') !== false){
             $roboot_id = Lucky5Service::getRobootIdByStr($data, $url);
             $cookie = $TzSystemsUsers->cookie;
