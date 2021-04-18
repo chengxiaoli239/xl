@@ -1487,9 +1487,9 @@ class NumService extends BaseService {
         if(!empty($filter3)){
             $desc .= ' 上奖:';
             foreach ($filter3 as $key3=>$v3){
-                $desc .= $v3.'、';
+                $desc .= $v3.',';
             }
-            $desc = trim($desc, '、').' ';
+            $desc = trim($desc, ',').' ';
         }
         # 上奖除
         if(!empty($filter4)){
@@ -1497,15 +1497,15 @@ class NumService extends BaseService {
             foreach ($filter4 as $key4=>$v4){
                 $desc .= $v4.'、';
             }
-            $desc = trim($desc, '、').' ';
+            $desc = trim($desc, ',').' ';
         }
 
         if(!empty($filter0)){
             $desc .= ' 除:';
             foreach ($filter0 as $key0=>$v0){
-                $desc .= $typesArr[$key0].'、';
+                $desc .= $typesArr[$key0].',';
             }
-            $desc = trim($desc, '、').' ';
+            $desc = trim($desc, ',').' ';
         }
         # 类型取
         if(!empty($filter6) OR !empty($filter7)){
@@ -1516,23 +1516,23 @@ class NumService extends BaseService {
                 $desc .= '类型取:';
                 if(!empty($filter6['get_types'])){
                     foreach ($filter6['get_types'] as $key6=>$v6){
-                        $desc .= $codeTypes1[$v6].'、';
+                        $desc .= $codeTypes1[$v6].',';
                     }
                 }
                 if(!empty($filter6['type_4ds'])){
                     foreach ($filter6['type_4ds'] as $key6=>$v6){
-                        $desc .= $codeTypes2[$v6].'、';
+                        $desc .= $codeTypes2[$v6].',';
                     }
                 }
-                $desc = trim($desc, '、').' ';
+                $desc = trim($desc, ',').' ';
             }
             # 上奖除
             if(!empty($filter7)){
                 $desc .= '类型除:';
                 foreach ($filter7['remove_types'] as $key7=>$v7){
-                    $desc .= $codeTypes1[$v7].'、';
+                    $desc .= $codeTypes1[$v7].',';
                 }
-                $desc = trim($desc, '、').' ';
+                $desc = trim($desc, ',').' ';
             }
         }
 

@@ -167,6 +167,8 @@ use yii\widgets\ActiveForm;
                             <a href="javascript:;" class="btn btn-xs btn-info reverse_type_hz_20_24">20-24</a>&nbsp;&nbsp;
                             <a href="javascript:;" class="btn btn-xs btn-info reverse_type_hz_25_29">25-29</a>&nbsp;&nbsp;
                             <a href="javascript:;" class="btn btn-xs btn-info reverse_type_hz_30_36">30-36</a>&nbsp;&nbsp;
+                            <a href="javascript:;" class="btn btn-xs btn-info reverse_type_hz_dan">单</a>&nbsp;&nbsp;
+                            <a href="javascript:;" class="btn btn-xs btn-info reverse_type_hz_shuang">双</a>&nbsp;&nbsp;
                             <a href="javascript:;" class="btn btn-xs btn-info reverse_type_hz">反买</a>
                             <a href="javascript:;" class="btn btn-xs btn-info reverse_type_hz_Null">清</a>
                     ') ?>
@@ -252,7 +254,7 @@ use yii\widgets\ActiveForm;
                     -->
 
                     <!--号码类型-->
-                    <?= $form->field($model, 'type_4ds')->checkboxList($type_4ds_Arr)->label('单双类型 &nbsp;&nbsp;<a href="#" class="btn btn-xs btn-info reverse_type_4ds">反买</a>') ?>
+                    <?= $form->field($model, 'type_4ds')->checkboxList($type_4ds_Arr)->label('单双类型 &nbsp;&nbsp;<a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds">反买</a>') ?>
 
                     <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
 
@@ -425,6 +427,34 @@ $(function () {
     // 30-36
     $('.reverse_type_hz_30_36').click(function () {
         arr = ['30','31','32','33','34','35','36']
+        $("[name='UserSysPlans[hz][]']").each(function () {
+            v = $.inArray($(this).val(), arr);
+            if(v != -1){
+                if($(this).prop('checked') == false){
+                    $(this).prop("checked",true);
+                }else {
+                    $(this).prop("checked",false);
+                }
+            }
+        });
+    });
+    // 单
+    $('.reverse_type_hz_dan').click(function () {
+        arr = ['1','3','5','7','9','11','13','15','17','19','21','23','25','27','29','31','33','35']
+        $("[name='UserSysPlans[hz][]']").each(function () {
+            v = $.inArray($(this).val(), arr);
+            if(v != -1){
+                if($(this).prop('checked') == false){
+                    $(this).prop("checked",true);
+                }else {
+                    $(this).prop("checked",false);
+                }
+            }
+        });
+    });
+    // 双
+    $('.reverse_type_hz_shuang').click(function () {
+        arr = ['0','2','4','6','8','10','12','14','16','18','20','22','24','26','28','30','32','34','36']
         $("[name='UserSysPlans[hz][]']").each(function () {
             v = $.inArray($(this).val(), arr);
             if(v != -1){

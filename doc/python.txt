@@ -1,0 +1,7 @@
+linux环境抓包 安装：
+1、cd /www/wwwroot/python_test/ && wget https://npm.taobao.org/mirrors/chromedriver/89.0.4389.23/chromedriver_linux64.zip && unzip chromedriver_linux64.zip && chmod +x chromedriver
+    && sudo mv -f chromedriver /usr/local/share/chromedriver && sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver && sudo ln -s /usr/local/share/chromedriver /usr/bin/chromedriver
+
+2、谷歌安装：yum install https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+3、字体安装：yum install mesa-libOSMesa-devel gnu-free-sans-fonts wqy-zenhei-fonts  目前找不到
+4、selenium 安装：pip3 install selenium
