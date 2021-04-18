@@ -225,6 +225,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%import_plan_codes}}');p($r);
         p($_SERVER);
         $rst = Lucky5Service::synBalance($id=1); p($rst);# 同步余额
         $rst = Lucky5Service::login($uid=2, $tz_system_id=9);p($rst);
@@ -234,7 +235,6 @@ class IndexController extends Controller
         $rst = PoxyIPService::isValid($ips = [$poxy_ip_data], $is_auto=0);d($rst);
         $isValidRst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
         p($isValidRst);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%system_config}}');p($r);
         $m = \Yii::$app->cache;
         $mkey = PoxyIPService::builProxyIpKey($mod_uid=0);
         $rst = $m->get($mkey);p($rst);

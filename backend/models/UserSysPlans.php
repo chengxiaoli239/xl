@@ -64,7 +64,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $type_4d; # 四单
     public $type_4s; # 四双
     public $type_log; # 对数
-    public $import_codes_txt; # 导入号码
+    public $import_codes_txts; # 导入号码
     public $type_4ds; # 号码类型、四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
     public $get_types; #  取类型
     public $remove_types; #  排除类型
@@ -80,6 +80,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $hefen_pos3; #  定位合分位置3
     public $hefen4; #  定位合分值4
     public $hefen_pos4; #  定位合分位置4
+    public $change_per; #  导入方式每期轮换号码
 
     public $ps_1; #  配数1
     public $ps_2; #  配数2

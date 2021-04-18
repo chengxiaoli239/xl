@@ -109,10 +109,9 @@ class UserSysPlansController extends BaseController
         }
 
         UserSysPlansService::preOpData($this->_post, $this->_user_id);
-        //p([$this->_post, $queryParams]);
         if ($model->load($this->_post) && $model->save()) {
             if(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
-                UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txt'], $this->_user_id);
+                UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)$this->_post['change_per'][0], $this->_user_id);
             }
             return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$queryParams['lottery_type']]);
         }
@@ -127,6 +126,7 @@ class UserSysPlansController extends BaseController
         $model->tz_type = $tz_type;
         $model->buy_type = 0;
         $model->plan_type = 0;
+        $model->change_per = 1;
         $defaultSiteId = UserService::getUserDefaultSite($this->_user_id);
         $model->tz_sites = [$defaultSiteId];
 
@@ -173,9 +173,6 @@ class UserSysPlansController extends BaseController
                     $model->$key = $v;
                 }
             }
-        }elseif (false && in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
-            $codes = ImportPlanCodes::findOne(['uid'=>$this->_user_id, 'plan_id'=>$model])->codes;
-            $model->import_codes_txt = str_replace('@', ' ', str_replace(',', '', $codes));
         }elseif (in_array($model->tz_type, \Yii::$app->params['IS_XIAN'])){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
             $model->hz_Arr = $hz_Arr_Data['codes'];
@@ -186,8 +183,9 @@ class UserSysPlansController extends BaseController
             if($this->_user_id != 1){
                 $where['uid'] = $this->_user_id;
             }
-            $codes = ImportPlanCodes::findOne($where)->codes;
-            $model->import_codes_txt = str_replace('@', ' ', str_replace(',', '', $codes));
+            //$codes = ImportPlanCodes::findAll($where)->codes;
+            $ImportPlanCodes = ImportPlanCodes::findAll($where);
+            $model->import_codes_txts = str_replace('@', ' ', str_replace(',', '', $codes));
             foreach ($hz_Arr_Data as $key=>$val){
                 if(in_array($key, ['hefen_pos', 'no_fix_henfen_pos', 'arise_in_sel'])){
                     $model->$key = explode(',', $val);

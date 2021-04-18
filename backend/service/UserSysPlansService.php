@@ -19,8 +19,10 @@ use backend\models\TzSystemsUsers;
 use backend\models\TzTypes;
 use backend\models\UserCustomPlans;
 use backend\models\UserSysPlans;
+use backend\tools\Tools;
 use common\models\AdminModel;
 use common\service\CommonService;
+use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
 
@@ -475,37 +477,57 @@ class UserSysPlansService extends BaseService {
      * @param $codes
      * @param $uid
      */
-    public static function saveImportCodesTxt($plan_id, $codes, $uid){
+    public static function saveImportCodesTxt($plan_id, $codes, $change_per = 0, $uid = ''){
         $setData = [];
 
         $flag = false;
-        if($plan_id){
-            if(!$ImportPlanCodes = ImportPlanCodes::findOne(['uid'=>$uid, 'plan_id'=>$plan_id])){
-                $ImportPlanCodes = new ImportPlanCodes();
+        if(empty($plan_id)) return $flag;
+        $isolationLevel = \yii\db\Transaction::REPEATABLE_READ;
+        $transaction = Yii::$app->db->beginTransaction($isolationLevel);
+        try {
+            foreach ($codes as $key=>$code){
+                $key = (int)$key;
+                $status = ($key == 0 OR $change_per == 1) ? 1 : 0;
+                if(!$ImportPlanCodes = ImportPlanCodes::find()->where(['uid'=>$uid, 'plan_id'=>$plan_id, 'plan_id_sort_key'=>$key])->one()){
+                    $ImportPlanCodes = new ImportPlanCodes();
+                    $setData = array_merge($setData, [
+                        'created_at' => time(),
+                        'uid' => $uid,
+                        'plan_id' => $plan_id,
+                        'plan_id_sort_key' => $key,
+                    ]);
+                }
+                $codesData = trim($code);
+                $codesData = preg_replace( '#\s+#', ' ', $codesData);
+                $codesData = str_replace(' ', ',', $codesData);
+                $codesArr = explode(',', $codesData);
+                $insertCodes = [];
+                foreach ($codesArr as $tmpCodes){
+                    $insertCodes[] = strtoupper($tmpCodes[0]).','.strtoupper($tmpCodes[1]).','.strtoupper($tmpCodes[2]).','.strtoupper($tmpCodes[3]);
+                }
+
+                $insertCodesData = implode('@', $insertCodes);
+
                 $setData = array_merge($setData, [
-                    'created_at' => time(),
-                    'uid' => $uid,
-                    'plan_id' => $plan_id,
+                    'updated_at' => time(),
+                    'status' => $status,
+                    'codes' => $insertCodesData,
                 ]);
+                $ImportPlanCodes->setAttributes($setData);
+                //p($ImportPlanCodes->attributes);
+                $saveFlag = $ImportPlanCodes->save();
+                if(!$saveFlag){
+                    $transaction->rollBack();
+                    Tool_Common::log('/error/'.__FUNCTION__, 'ERR', '保存错误', ['msg'=>$ImportPlanCodes->getErrors()]);
+                    return false;
+                }
             }
-            $codesData = trim($codes);
-            $codesData = preg_replace( '#\s+#', ' ', $codesData );
-            $codesData = str_replace(' ', ',', $codesData);
-            $codesArr = explode(',', $codesData);
-            $insertCodes = [];
-            foreach ($codesArr as $tmpCodes){
-                $insertCodes[] = strtoupper($tmpCodes[0]).','.strtoupper($tmpCodes[1]).','.strtoupper($tmpCodes[2]).','.strtoupper($tmpCodes[3]);
-            }
-
-            $insertCodesData = implode('@', $insertCodes);
-
-            $setData = array_merge($setData, [
-                'updated_at' => time(),
-                'codes' => $insertCodesData,
-            ]);
-            $ImportPlanCodes->setAttributes($setData);
-            $flag = $ImportPlanCodes->save();
+        }catch (\Exception $exception){
+            $msg = $exception->getMessage();
+            Tool_Common::log('/error/'.__FUNCTION__, 'ERR', '保存导入方案号码', ['plan_id'=>$plan_id, 'msg'=>$msg]);
+            return false;
         }
+        $transaction->commit();
 
         return $flag;
     }
