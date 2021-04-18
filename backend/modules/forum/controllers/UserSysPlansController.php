@@ -158,7 +158,7 @@ class UserSysPlansController extends BaseController
         $this->_post['update_time'] = date('Y-m-d H:i:s');
         if ($model->load($this->_post) && $model->save()) {
             if(in_array($this->_post['UserSysPlans']['tz_type'], \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
-                UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txt'], $this->_user_id);
+                UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txt'], (int)$this->_post['change_per'][0], $this->_user_id);
             }
             return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$model->lottery_type]);
         }
