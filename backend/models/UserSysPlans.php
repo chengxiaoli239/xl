@@ -35,6 +35,7 @@ use Yii;
  * @property string $remove_arise 上奖 除
  * @property string $current_profits 当前盈利
  * @property int $plan_type 计划类型:0正常1止盈止损计划
+ * @property int $change_per 号码轮换
  * @property int $tz_sort 投注排序:从小到大
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
