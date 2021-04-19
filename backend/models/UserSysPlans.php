@@ -65,6 +65,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $type_4d; # 四单
     public $type_4s; # 四双
     public $type_log; # 对数
+    public $turn_key; # 轮换号码组的key
     public $import_codes_txts; # 导入号码
     public $type_4ds; # 号码类型、四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
     public $get_types; #  取类型

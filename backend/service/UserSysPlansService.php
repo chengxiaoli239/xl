@@ -33,7 +33,7 @@ class UserSysPlansService extends BaseService {
      * @param $post
      * @param int $playway
      * @param $account
-     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     * @param $lottery_type - 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return bool
      */
     public static function preOpData(&$post, $user_id='', $id = ''){
@@ -152,6 +152,12 @@ class UserSysPlansService extends BaseService {
         # 15、单双类型
         if(isset($UserSysPlans['bet_while_miss']) && $UserSysPlans['bet_while_miss']){
             $tmpFilter['bet_while_miss'] = $UserSysPlans['bet_while_miss'];
+        }
+        unset($post['UserSysPlans']['bet_while_miss']);
+        # 15、单双类型
+        if(isset($UserSysPlans['change_per'][0]) && $UserSysPlans['change_per'][0]){
+            $tmpFilter['change_per'] = $UserSysPlans['change_per'][0]; # 是否每期轮换
+            $tmpFilter['turn_key'] = 0; # 每次保存都从第一组开始
         }
         unset($post['UserSysPlans']['bet_while_miss']);
 
@@ -486,8 +492,11 @@ class UserSysPlansService extends BaseService {
         $transaction = Yii::$app->db->beginTransaction($isolationLevel);
         try {
             foreach ($codes as $key=>$code){
+                $code = trim($code);
                 $key = (int)$key;
                 $status = ($key == 0 OR $change_per == 1) ? 1 : 0;
+                $status = empty($code) ? 0 : $status;
+
                 if(!$ImportPlanCodes = ImportPlanCodes::find()->where(['uid'=>$uid, 'plan_id'=>$plan_id, 'plan_id_sort_key'=>$key])->one()){
                     $ImportPlanCodes = new ImportPlanCodes();
                     $setData = array_merge($setData, [
@@ -497,17 +506,16 @@ class UserSysPlansService extends BaseService {
                         'plan_id_sort_key' => $key,
                     ]);
                 }
-                $codesData = trim($code);
+                $codesData = $code;
                 $codesData = preg_replace( '#\s+#', ' ', $codesData);
                 $codesData = str_replace(' ', ',', $codesData);
-                $codesArr = explode(',', $codesData);
+                $codesArr = !empty($codesData) ? explode(',', $codesData) : [];
                 $insertCodes = [];
-                foreach ($codesArr as $tmpCodes){
+                if(!empty($codesArr)) foreach ($codesArr as $tmpCodes){
                     $insertCodes[] = strtoupper($tmpCodes[0]).','.strtoupper($tmpCodes[1]).','.strtoupper($tmpCodes[2]).','.strtoupper($tmpCodes[3]);
                 }
 
                 $insertCodesData = implode('@', $insertCodes);
-
                 $setData = array_merge($setData, [
                     'updated_at' => time(),
                     'status' => $status,

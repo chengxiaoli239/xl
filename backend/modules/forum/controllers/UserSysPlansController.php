@@ -16,6 +16,7 @@ use Yii;
 use backend\models\UserSysPlans;
 use backend\models\searchs\UserSysPlans as UserSysPlansSearch;
 use backend\controllers\BaseController;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -158,7 +159,7 @@ class UserSysPlansController extends BaseController
         $this->_post['update_time'] = date('Y-m-d H:i:s');
         if ($model->load($this->_post) && $model->save()) {
             if(in_array($this->_post['UserSysPlans']['tz_type'], \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
-                UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txt'], (int)$this->_post['change_per'][0], $this->_user_id);
+                UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)$this->_post['UserSysPlans']['change_per'][0], $this->_user_id);
             }
             return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$model->lottery_type]);
         }
@@ -178,14 +179,20 @@ class UserSysPlansController extends BaseController
             $model->hz_Arr = $hz_Arr_Data['codes'];
         }elseif (in_array($model->tz_type, [18, 19, 20, 25, 27, 29, 30, 31, 32, 33, 34])){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
-            //p($hz_Arr_Data);
             $where = ['plan_id'=>$model->id];
             if($this->_user_id != 1){
                 $where['uid'] = $this->_user_id;
             }
             //$codes = ImportPlanCodes::findAll($where)->codes;
-            $ImportPlanCodes = ImportPlanCodes::findAll($where);
-            $model->import_codes_txts = str_replace('@', ' ', str_replace(',', '', $codes));
+            $ImportPlanCodes = ImportPlanCodes::find()->where($where)->asArray()->all();
+            if(!empty($ImportPlanCodes)){
+                $codes = ArrayHelper::getColumn($ImportPlanCodes, 'codes');
+                foreach ($codes as $k=>$code){
+                    $codes[$k] = str_replace('@', ' ', str_replace(',', '', $code));
+                }
+                $model->change_per = [$hz_Arr_Data['change_per']];
+                $model->import_codes_txts = $codes;
+            }
             foreach ($hz_Arr_Data as $key=>$val){
                 if(in_array($key, ['hefen_pos', 'no_fix_henfen_pos', 'arise_in_sel'])){
                     $model->$key = explode(',', $val);
