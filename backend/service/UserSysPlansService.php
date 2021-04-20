@@ -546,7 +546,10 @@ class UserSysPlansService extends BaseService {
      * @return string
      */
     public static function getImportCodes($plan_id){
-        $data = ImportPlanCodes::findOne(['plan_id'=>$plan_id]);
+        $plan = UserSysPlans::findOne($plan_id);
+        $hzArr = json_decode($plan->hz_Arr, true);
+        $key = ($hzArr['change_per']==0 OR $hzArr['turn_key']==0) ? 0 : $hzArr['turn_key'];
+        $data = ImportPlanCodes::find()->where(['plan_id'=>$plan_id, 'plan_id_sort_key'=>$key])->one();
 
         $codes = explode('@',$data->codes);
 

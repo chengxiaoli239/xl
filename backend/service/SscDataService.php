@@ -2804,6 +2804,21 @@ class SscDataService extends BaseService {
             }
         }
 
+        # 玩法类型，号码导入:tz_type \Yii::$app->params['IMPORT_CODES_TYPES']
+        $where = ['AND', ['IN', 'tz_type', \Yii::$app->params['IMPORT_CODES_TYPES']], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+        if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+            foreach ($UserSysPlans as $UserSysPlan){
+                $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+                $hzArr[] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>4)) ? 0 : ($hzArr['turn_key']+1);#非轮换0，轮换:turn_key+1
+
+                $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
+                $updateData = ['hz_Arr'=>json_encode($codes_hz, 320)];
+                $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                $logArr['plan_8'][$UserSysPlan->id]['updateData'] = $updateData;
+                $logArr['plan_8'][$UserSysPlan->id]['rst'] = $rst;
+            }
+        }
+
         $logArr['lottery_type'] = $lottery_type;
         $logArr['qihao'] = HN0898Service::getQihao($lottery_type);
         Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', [$logArr]);

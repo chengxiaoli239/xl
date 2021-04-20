@@ -1410,6 +1410,11 @@ class NumService extends BaseService {
             $desc .= '当前:组'.$filter10['status_val'].' ';
         }
 
+        # 导入方式，号码轮换号码组
+        if($hz_Arr['change_per']==1){
+            $desc .= '组:'.(int)$hz_Arr['turn_key'].'. ';
+        }
+
         # 号码
         if(isset($hz_Arr['codes'])){
             $desc .= '号码:'.$hz_Arr['codes'];
