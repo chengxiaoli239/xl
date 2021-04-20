@@ -127,7 +127,6 @@ class UserSysPlansController extends BaseController
         $model->tz_type = $tz_type;
         $model->buy_type = 0;
         $model->plan_type = 0;
-        $model->change_per = 1;
         $defaultSiteId = UserService::getUserDefaultSite($this->_user_id);
         $model->tz_sites = [$defaultSiteId];
 
