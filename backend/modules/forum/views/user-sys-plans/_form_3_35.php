@@ -39,7 +39,7 @@ use yii\widgets\ActiveForm;
                 </div>
                     <!--?= $form->field($model, 'single')->textInput() ?-->
 
-                    <?= $form->field($model, 'import_codes_txt')->textInput()->label('号码跟倍数之间多组英文逗号或空格或分号隔开 2345:0.1,3456:0.2 或 2345 0.1 3456 0.2 或者 2345:0.1;3456:0.2') ?>
+                    <?= $form->field($model, 'import_codes_txts[0]')->textInput()->label('号码跟倍数之间多组英文逗号或空格或分号隔开 2345:0.1,3456:0.2 或 2345 0.1 3456 0.2 或者 2345:0.1;3456:0.2') ?>
                     <input type="hidden" name="UserSysPlans[tz_type]" value="35"><!--四定导入 含倍数-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
                     <!--?= $form->field($model, 'tz_type')->radioList([ //'1'=>'大小单双三字定', //'2'=>'大小三字定', '3'=>'单双三字定', ])->label('投注类型') ?-->
