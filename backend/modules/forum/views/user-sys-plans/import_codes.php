@@ -24,3 +24,23 @@
         <?= $form->field($model,"import_codes_txts[5]")->textarea([ 'autofocus' => false,'style'=>'height:150px' ])->label('5.号码五：多组英文逗号或空格隔开 2345,3456 或 2345 3456');?>
     </div>
 </div>
+<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<script>
+    $('#usersysplans-change_per').click(function () {
+        $("[name='UserSysPlans[change_per][]']").each(function () {
+            flag = $(this).prop('checked');
+            console.log(flag);
+            if(flag == true){
+                console.log('aaaa');
+                $(".import_codes_txts").each(function () {
+                    $(this).removeClass('hide')
+                    $(this).show()
+                });
+            }else {
+                $(".import_codes_txts").each(function () {
+                    $(this).hide();
+                });
+            }
+        });
+    });
+</script>
