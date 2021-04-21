@@ -46,7 +46,7 @@ use yii\widgets\ActiveForm;
                     <?= $form->field($model, 'single')->textInput() ?>
 
                     <div class="row">
-                        <div class="col-lg-3 col-xs-12">
+                        <div class="col-lg-12 col-xs-12">
                             <?= $form->field($model,"import_codes_txts[0]")->textarea([ 'autofocus' => false,'style'=>'height:100px' ])->label('多组英文逗号或空格隔开 23XX,34XX 或 23XX 34XX')?>
                         </div>
                     </div>

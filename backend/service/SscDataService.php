@@ -2809,10 +2809,12 @@ class SscDataService extends BaseService {
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
                 $hzArr = json_decode($UserSysPlan->hz_Arr, true);
-                $hzArr[] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>4)) ? 0 : ($hzArr['turn_key']+1);#非轮换0，轮换:turn_key+1
+                if(isset($hzArr['change_per'])){
+                    $hzArr['turn_key'] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>4)) ? 0 : ($hzArr['turn_key']+1);#非轮换0，轮换:turn_key+1
+                }
 
                 $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
-                $updateData = ['hz_Arr'=>json_encode($codes_hz, 320)];
+                $updateData = ['hz_Arr'=>json_encode($hzArr, 320)];
                 $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                 $logArr['plan_8'][$UserSysPlan->id]['updateData'] = $updateData;
                 $logArr['plan_8'][$UserSysPlan->id]['rst'] = $rst;
