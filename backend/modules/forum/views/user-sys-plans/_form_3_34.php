@@ -70,8 +70,6 @@ use yii\widgets\ActiveForm;
                 <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
                 <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
 
-
-
                 <!--?= $form->field($model, 'created_at')->textInput() ?-->
 
                 <!--?= $form->field($model, 'updated_at')->textInput() ?-->
@@ -88,25 +86,3 @@ use yii\widgets\ActiveForm;
         </section>
     </div>
 </div>
-
-<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
-<script>
-$('#usersysplans-change_per').click(function () {
-    console.log('xxxx');
-    $("[name='UserSysPlans[change_per][]']").each(function () {
-        flag = $(this).prop('checked');
-        console.log(flag);
-        if(flag == true){
-            console.log('aaaa');
-            $(".import_codes_txts").each(function () {
-                $(this).removeClass('hide')
-                $(this).show()
-            });
-        }else {
-            $(".import_codes_txts").each(function () {
-                $(this).hide();
-            });
-        }
-    });
-});
-</script>
