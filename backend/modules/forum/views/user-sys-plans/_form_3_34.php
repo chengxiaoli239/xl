@@ -37,76 +37,52 @@ use yii\widgets\ActiveForm;
                         ])->label('真/模拟') ?>
                     </div>
                 </div>
-                    <?= $form->field($model, 'single')->textInput() ?>
+                <?= $form->field($model, 'single')->textInput() ?>
 
-                    <div class="row">
-                        <div class="col-lg-12 col-xs-12">
-                            <?= $form->field($model,"import_codes_txts[0]")->textarea([ 'autofocus' => false,'style'=>'height:150px' ])->label('多组英文逗号或空格隔开 2345,3456 或 2345 3456');?>
-                        </div>
+                <div class="row">
+                    <div class="col-lg-12 col-xs-12">
+                        <?= $form->field($model,"import_codes_txts[0]")->textarea([ 'autofocus' => false,'style'=>'height:150px' ])->label('多组英文逗号或空格隔开 2345,3456 或 2345 3456');?>
                     </div>
-                    <input type="hidden" name="UserSysPlans[tz_type]" value="34"><!--四定导入-->
-                    <!-- 1大小单双三字定2大小三字定3单双三字定 -->
-                    <!--?= $form->field($model, 'tz_type')->radioList([ //'1'=>'大小单双三字定', //'2'=>'大小三字定', '3'=>'单双三字定', ])->label('投注类型') ?-->
+                </div>
+                <input type="hidden" name="UserSysPlans[tz_type]" value="34"><!--四定导入-->
+                <!-- 1大小单双三字定2大小三字定3单双三字定 -->
+                <!--?= $form->field($model, 'tz_type')->radioList([ //'1'=>'大小单双三字定', //'2'=>'大小三字定', '3'=>'单双三字定', ])->label('投注类型') ?-->
 
-                    <!--?= $form->field($model, 'buy_type')->textInput() ?-->
-                    <!--?= $form->field($model, 'buy_type')->radioList([ '0'=>'反买', '1'=>'正买',])->label('购买方向') ?-->
+                <!--?= $form->field($model, 'buy_type')->textInput() ?-->
+                <!--?= $form->field($model, 'buy_type')->radioList([ '0'=>'反买', '1'=>'正买',])->label('购买方向') ?-->
 
-                    <!--?= $form->field($model, 'nums')->textInput() ?-->
+                <!--?= $form->field($model, 'nums')->textInput() ?-->
 
-                    <?= $form->field($model, 'change_per')->checkboxList([1=>'是'])->label('每期轮换') ?>
-                    <div class="row import_codes_txts <?if (!$model->change_per) echo 'hide';?>">
-                        <div class="col-lg-12 col-xs-12">
-                            <?= $form->field($model,"import_codes_txts[1]")->textarea([ 'autofocus' => false,'style'=>'height:150px' ])->label('1.号码一：多组英文逗号或空格隔开 2345,3456 或 2345 3456');?>
-                        </div>
+                <!--导入号码组轮换-->
+                <?php include(dirname(__FILE__).'/import_codes.php'); ?>
+
+                <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
+
+                <div class="row">
+                    <div class="col-lg-3 col-xs-6">
+                        <?= $form->field($model, 'bet_while_miss')->textInput()->label('遗漏x期投,如:10') ?>
                     </div>
-                    <div class="row import_codes_txts <?if (!$model->change_per) echo 'hide';?>">
-                        <div class="col-lg-12 col-xs-12">
-                            <?= $form->field($model,"import_codes_txts[2]")->textarea([ 'autofocus' => false,'style'=>'height:150px' ])->label('2.号码二：多组英文逗号或空格隔开 2345,3456 或 2345 3456');?>
-                        </div>
+                </div>
+
+                <!--止盈止损-->
+                <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
+
+                <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
+                <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
+
+
+
+                <!--?= $form->field($model, 'created_at')->textInput() ?-->
+
+                <!--?= $form->field($model, 'updated_at')->textInput() ?-->
+
+                <!--?= $form->field($model, 'update_time')->textInput() ?-->
+
+                <div class="form-group">
+                    <div class="col-lg-offset-2 col-lg-10">
+                        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>
                     </div>
-                    <div class="row import_codes_txts <?if (!$model->change_per) echo 'hide';?>">
-                        <div class="col-lg-12 col-xs-12">
-                            <?= $form->field($model,"import_codes_txts[3]")->textarea([ 'autofocus' => false,'style'=>'height:150px' ])->label('3.号码三：多组英文逗号或空格隔开 2345,3456 或 2345 3456');?>
-                        </div>
-                    </div>
-                    <div class="row import_codes_txts <?if (!$model->change_per) echo 'hide';?>">
-                        <div class="col-lg-12 col-xs-12">
-                            <?= $form->field($model,"import_codes_txts[4]")->textarea([ 'autofocus' => false,'style'=>'height:150px' ])->label('4.号码四：多组英文逗号或空格隔开 2345,3456 或 2345 3456');?>
-                        </div>
-                    </div>
-                    <div class="row import_codes_txts <?if (!$model->change_per) echo 'hide';?>">
-                        <div class="col-lg-12 col-xs-12">
-                            <?= $form->field($model,"import_codes_txts[5]")->textarea([ 'autofocus' => false,'style'=>'height:150px' ])->label('5.号码五：多组英文逗号或空格隔开 2345,3456 或 2345 3456');?>
-                        </div>
-                    </div>
-
-                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
-
-                    <div class="row">
-                        <div class="col-lg-3 col-xs-6">
-                            <?= $form->field($model, 'bet_while_miss')->textInput()->label('遗漏x期投,如:10') ?>
-                        </div>
-                    </div>
-
-                    <!--止盈止损-->
-                    <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
-
-                    <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
-                    <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
-
-
-
-                    <!--?= $form->field($model, 'created_at')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'updated_at')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'update_time')->textInput() ?-->
-
-                    <div class="form-group">
-                        <div class="col-lg-offset-2 col-lg-10">
-                            <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>
-                        </div>
-                    </div>
+                </div>
                 <?php ActiveForm::end(); ?>
             </div>
         </section>
