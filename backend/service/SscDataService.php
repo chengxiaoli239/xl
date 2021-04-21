@@ -10,6 +10,7 @@
 namespace backend\service;
 use backend\models\AdminLog;
 use backend\models\BettingRecords;
+use backend\models\ImportPlanCodes;
 use backend\models\Num4Type;
 use backend\models\searchs\SscDwsHzNums;
 use backend\models\Ssc3numYl;
@@ -2810,7 +2811,11 @@ class SscDataService extends BaseService {
             foreach ($UserSysPlans as $UserSysPlan){
                 $hzArr = json_decode($UserSysPlan->hz_Arr, true);
                 if(isset($hzArr['change_per'])){
-                    $hzArr['turn_key'] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>4)) ? 0 : ($hzArr['turn_key']+1);#非轮换0，轮换:turn_key+1
+                    $imports = ImportPlanCodes::find()->select(['uid', 'plan_id', 'plan_id_sort_key'])->where(['AND', ['=', 'plan_id', $UserSysPlan->id], ['!=', 'codes', '']])->asArray()->all();
+                    $sortKeys = yii\helpers\ArrayHelper::getColumn($imports, 'plan_id_sort_key');
+                    $current_key = array_search($hzArr['turn_key'], $sortKeys);
+                    $next_key = ($current_key+1 > count($sortKeys)) ? 0 : $current_key+1;
+                    $hzArr['turn_key'] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>4)) ? 0 : $sortKeys[$next_key];#非轮换0，轮换:turn_key+1
                 }
 
                 $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
