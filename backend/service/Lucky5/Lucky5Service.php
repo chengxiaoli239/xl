@@ -1326,7 +1326,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $roboot_id = Lucky5Service::getRobootIdByStr($data, $url);
             $cookie = $TzSystemsUsers->cookie;
             preg_match("/robot7=([^\r\n]*); Seven/i", $cookie, $matches);
-            $new_cookie = str_replace($matches[1], $roboot_id, $cookie);
+            $new_cookie = str_replace('robot7='.$matches[1], $roboot_id, $cookie);
             //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
             $TzSystemsUsers->cookie = $new_cookie;
             $TzSystemsUsers->save();
