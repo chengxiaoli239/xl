@@ -319,4 +319,39 @@ class UserService extends BaseService {
 
         return $rst;
     }
+
+    /**
+     * @desc 记录用户的登陆cookies
+     * @param $datas
+     * @return array
+     */
+    public static function updateUserCookies($datas = []){
+        if(empty($datas['uid'])){
+            return ['status'=>301, 'msg'=>'用户id不能为空'];
+        }
+        if(empty($datas['cookies'])){
+            return ['status'=>302, 'msg'=>'用户cookies不能为空'];
+        }
+
+        $where = ['uid'=>$datas['uid']];
+        $TzSystemsUsers = TzSystemsUsers::findOne($where);
+        if(empty($TzSystemsUsers)){
+            return ['status'=>303, 'msg'=>'找不到用户记录'];
+        }
+        $TzSystemsUsers->ssc_domain = $datas['ssc_domain'];
+
+        $cookies = $datas['cookies'];
+        $cookies_str = '';
+        foreach ($cookies as $cookie){
+            $cookies_str .= $cookie['name'].'='.$cookie['value'].';';
+        }
+        $TzSystemsUsers->cookie = $cookies_str;
+        $r = $TzSystemsUsers->save();
+        if(!$r){
+            $msg = $TzSystemsUsers->getErrors();
+            return ['status'=>304, 'msg'=>$msg];
+        }
+
+        return ['status'=>200, 'msg'=>'操作成功', 'data'=>$r];
+    }
 }

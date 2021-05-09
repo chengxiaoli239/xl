@@ -10,6 +10,7 @@ namespace backend\modules\api\controllers;
 
 use backend\models\UserFollowData;
 use backend\service\HN0898Service;
+use backend\service\UserService;
 use common\tools\Tool_Common;
 use Yii;
 use yii\web\Controller;
@@ -142,4 +143,17 @@ class IndexController extends Controller
         return $rst;
     }
 
+    /**
+     * @desc 登陆信息测试
+     * @return array|mixed
+     */
+    public function actionUpdateUserCookies(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $data = \Yii::$app->request->post();
+
+        $rst = UserService::updateUserCookies($data);
+        Tool_Common::log('/user/upUserInfo','INFO','记录用户的登陆cookies', ['data'=>$data]);
+
+        return $rst;
+    }
 }
