@@ -219,7 +219,6 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if(isset($rstData[$tz_type])) return $rstData[$tz_type];
 
         return 108;
-        //return $rstData;
     }
 
     /**
@@ -364,7 +363,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param integer $playway 1二定2三定3四定
      * @return array
      */
-    public static function getBetCodes($codesData, $single = 0.1, $playway = 1){
+    public static function getBetCodes($codesData, $single = 0.1, $playway = 1, $uid=''){
         $orgin_codesData = $codesData;
         $codes = [];
         $codesData = str_replace(',','',$codesData);
@@ -376,7 +375,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 $dict_no_type_id = self::getdict_no_type_id($code, $playway);
                 $codes[] = ['dict_no_type_id'=>$dict_no_type_id, 'bet_no'=>$code, 'bet_money'=>$single];
             }
-        }elseif ($playway == 3){ # 四定
+        }elseif ($playway == 3 && !in_array($uid, \Yii::$app->params['IMPORT_CODES_KUAIYI_UIDS'])){ # 四定
             $tmpCodes = explode('@', $orgin_codesData);
             $codesArr = [];
             foreach ($tmpCodes as $tmpCode){
@@ -412,7 +411,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 }
             }
             $codes = $tmpArr;
-        }elseif ($playway == 2){ # 三定
+        }elseif ($playway == 2 OR in_array($uid, \Yii::$app->params['IMPORT_CODES_KUAIYI_UIDS'])){ # 三定、 四定
             $codesArr = explode(',', $codesData);
             foreach ($codesArr as $code){
                 $dict_no_type_id = self::getdict_no_type_id($code, $playway);
@@ -2041,21 +2040,34 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 ];
 
             }else{ # 四定、三定
-                $is_xian = in_array($tz_type, \Yii::$app->params['IS_XIAN']) ? 1 : 0;
-                $bet_codes = implode(',', $tmpcodesArr);
-                $post_data = [
-                    'bet_number'=>$bet_codes,
-                    'bet_money'=>$single,
-                    'bet_way'=>$way,
-                    'is_xian'=>$is_xian,
-                    'is_iframe' => 1,
-                    'number_type'=> LuckyBaseService::getNumType($tz_type, $playway),
-                    //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
-                    'bet_log'=>$bet_log,
-                    'is_package' => 0,
-                    'period_no'=>$qihao,
-                    'operation_condition' => self::getOperationCondition(),
-                ];
+                if(in_array($plan->uid, \Yii::$app->params['IMPORT_CODES_KUAIYI_UIDS']) && in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
+                    $bets = self::getBetCodes($codes, $plan->single, $plan->playway, $plan->uid);
+                    $post_data = [
+                        'totalCount' => count($tmpcodesArr),
+                        'totalBetMoney' => $single,
+                        'bets' => json_encode($bets),
+                        'way' => $way,
+                        'period_no' => $qihao,
+                        'bet_log' => '1234%201234%20',
+                    ];
+
+                }else{
+                    $is_xian = in_array($tz_type, \Yii::$app->params['IS_XIAN']) ? 1 : 0;
+                    $bet_codes = implode(',', $tmpcodesArr);
+                    $post_data = [
+                        'bet_number'=>$bet_codes,
+                        'bet_money'=>$single,
+                        'bet_way'=>$way,
+                        'is_xian'=>$is_xian,
+                        'is_iframe' => 1,
+                        'number_type'=> LuckyBaseService::getNumType($tz_type, $playway),
+                        //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
+                        'bet_log'=>$bet_log,
+                        'is_package' => 0,
+                        'period_no'=>$qihao,
+                        'operation_condition' => self::getOperationCondition(),
+                    ];
+                }
             }
 
             $_t = round(microtime(true) * 1000);
