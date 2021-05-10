@@ -2041,6 +2041,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
             }else{ # 四定、三定
                 if(in_array($plan->uid, \Yii::$app->params['IMPORT_CODES_KUAIYI_UIDS']) && in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
+                    $url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ');//.'?'.http_build_query($post_data);
                     $bets = self::getBetCodes($codes, $plan->single, $plan->playway, $plan->uid);
                     $post_data = [
                         'totalCount' => count($tmpcodesArr),
