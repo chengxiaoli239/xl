@@ -40,9 +40,6 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                 'attributes' => [
                                     //'id',
                                     //'tz_system_id',
-                                    [ 'attribute'=>'tz_system_id','label'=>'系统时间','value'=>function($model){
-                                        return $model->update_time;
-                                    }],
                                     'sys_name',
                                     'account',
                                     //'balance',
@@ -87,9 +84,9 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                             return Html::a($txt, 'javascript:;', ['title' => $model->cookie,'alt'=>$model->cookie]);
                                         }
                                     ],
-                                    //[ 'attribute'=>'update_time','label'=>'时间','value'=>function($model){
-                                    //    return $model->update_time;
-                                    //}],
+                                    [ 'attribute'=>'update_time','label'=>'更新时间','value'=>function($model){
+                                        return $model->update_time;
+                                    }],
                                 ],
                             ]) ?>
                         </div>

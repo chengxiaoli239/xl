@@ -1335,6 +1335,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'time_consume'=>$time_consume, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
+        $desc = '';
+        if($data['Status'] != 1){
+            $desc = json_encode($data, 320);
+        }
+        $TzSystemsUsers->desc = $desc;
+        $TzSystemsUsers->save();
         //p($logArr);
         Tool_Common::log('userInfo','INFO','幸运五星-用户信息-2', $logArr);
         $m->set($mkey, $data, 15);
