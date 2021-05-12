@@ -2308,6 +2308,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }
         if(empty($rstData)){
             $rstData['data'] = $data;
+            $rstData['post_data'] = $post_data;
         }
         $rstData['errno'] = $errno;
         $time_consume = ($end_time-$start_time).'s';
