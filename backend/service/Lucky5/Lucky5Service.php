@@ -1359,6 +1359,13 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $uid = $row->uid;
         $tz_system_id = $row->tz_system_id;
         $post_data = json_decode($row->post_datas, 320);
+        $repeats = []; # 是否有重复号码
+        if($row->lottery_type == 8 && in_array($row->uid, \Yii::$app->params['IMPORT_CODES_REPEAT_UIDS'])){
+            $tmpDatas = explode(',', $post_data['bet_number']);
+            $post_data['bet_number'] = array_unique($tmpDatas);
+
+            $repeats = Lucky5Service::fetchRepeatMemberInArray($tmpDatas);
+        }
 
         $m = \Yii::$app->cache;
         $_t = round(microtime(true) * 1000);
@@ -1392,6 +1399,13 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $sn = $snInfo['sn'];
             $tmpRst['snid'] = $snid;
             $tmpRst['sn'] = $sn;
+            if(!empty($repeats)){
+                $post_data_1 = $post_data;
+                $post_data_1['bet_number'] = $repeats;
+                $rst1 = self::postR($uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent);
+                Tool_Common::log('/bet/repeatErrorBet', 'INFO', '幸运五下注1', [$uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent, $rst1]);
+            }
+
         }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 305, 307])){
             $status = 3; # 不可再次下注：302余额不足305已关盘307网盘账号停押
         }else{
@@ -1431,6 +1445,53 @@ class Lucky5Service { # 重庆7时彩登陆体系
     }
 
     /**
+     * @param $uid
+     * @param $url
+     * @param $post_data
+     * @param string $cookie
+     * @param string $ssc_domain
+     * @param $_t
+     * @param string $user_agent
+     * @return array|mixed|string
+     */
+    public static function postR($uid, $url, $post_data, $cookie='', $ssc_domain='', $_t='', $user_agent=''){
+        $headers = [
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'Accept-Encoding: gunzip, deflate',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Cache-Control: max-age=0',
+            'Connection: keep-alive',
+            'Content-Length:'.strlen(http_build_query($post_data)),
+            'Content-Type: application/x-www-form-urlencoded',
+            'Cookie: '.$cookie,
+            'Host: '.str_replace('http://', '', $ssc_domain),
+            'Origin: '.$ssc_domain,
+            'Referer: '.$ssc_domain.'/App/Index?_='.$_t,
+            'Upgrade-Insecure-Requests: 1',
+            $user_agent,
+        ];
+
+        $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 调试阶段先注释12.26
+
+        return $tmpRst;
+    }
+
+    /**
+     * @desc 获取重复数据
+     * @param $array
+     * @return array
+     */
+    public static function fetchRepeatMemberInArray($array)
+    {
+        // 获取去掉重复数据的数组
+        $unique_arr = array_unique($array);
+        // 获取重复数据的数组
+        $repeat_arr = array_diff_assoc($array, $unique_arr);
+        return $repeat_arr;
+    }
+
+
+        /**
      * @decription 获取即将开奖的期号
      * @param int $type
      * @return string

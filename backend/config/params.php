@@ -26,7 +26,10 @@ return [
     'IMPORT_CODES_TYPES' => [ 19,27,34 ],
 
     # 导入方式使用快译
-    'IMPORT_CODES_KUAIYI_UIDS' =>[12], # aa22
+    'IMPORT_CODES_KUAIYI_UIDS' =>[], # aa22
+
+    # 导入有重复的用户
+    'IMPORT_CODES_REPEAT_UIDS' =>[12], # aa22
 
     # 现：二、三、四现
     'IS_XIAN' => [36, 17, 37],

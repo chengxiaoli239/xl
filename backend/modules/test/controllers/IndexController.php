@@ -225,8 +225,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $codes = '1,2,3,4@1,2,3,4@2,3,4,5@2,3,4,5';
-        $betService = new Lucky5Service($uid=12, $tz_system_id=9);
+        //$codes = '1,2,3,4@1,2,3,4@2,3,4,5@2,3,4,5';
+        $BetService = new Lucky5Service($uid=12, $tz_system_id=9);
+        $betRst = $BetService->repeatErrorBet($id=1417);p($betRst);
         $rst = $betService->postBatchBetInsert('20210510225', 1796, $codes);p($rst);
         $cookie = "robot7=2J4fnfqS6xPQWpZ51g2lYFRwLE6ggsfgoIf+jaKoZy7rtYrnSOO3uNDfuxxxx==; SevenStarHFDirector13Frontend13=dz4botbdoi5epu0mdjoptpih; Akamai_Cookie=2786069002.12917.0000; __cfduid=d07f0e2dd2f0a8875931dcda6d2a9ca8d1619486542; robot3=9RbFsoBv2eKKMLD2aMndJ+eoSzlNIdQmwE+n6ay1mmc=; NOTICE_LOGIN_IN=1";
         $roboot_id = Lucky5Service::getRobootIdByStr($str, $url);
