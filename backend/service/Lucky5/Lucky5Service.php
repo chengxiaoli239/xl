@@ -1362,7 +1362,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $repeats = []; # 是否有重复号码
         if($row->lottery_type == 8 && in_array($row->uid, \Yii::$app->params['IMPORT_CODES_REPEAT_UIDS'])){
             $tmpDatas = explode(',', $post_data['bet_number']);
-            $post_data['bet_number'] = array_unique($tmpDatas);
+            $post_data['bet_number'] = implode(',', array_unique($tmpDatas));
 
             $repeats = Lucky5Service::fetchRepeatMemberInArray($tmpDatas);
         }
@@ -1401,7 +1401,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $tmpRst['sn'] = $sn;
             if(!empty($repeats)){
                 $post_data_1 = $post_data;
-                $post_data_1['bet_number'] = $repeats;
+                $post_data_1['bet_number'] = implode(',', $repeats);
                 $rst1 = self::postR($uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent);
                 Tool_Common::log('/bet/repeatErrorBet', 'INFO', '幸运五下注1', [$uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent, $rst1]);
             }
