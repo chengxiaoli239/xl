@@ -1336,7 +1336,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'time_consume'=>$time_consume, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         $desc = '';
-        if($data['Status'] != 1){
+        if(isset($rst['Status']) && $data['Status'] != 1){
             $desc = json_encode($data, 320);
         }
         $TzSystemsUsers->desc = $desc;
