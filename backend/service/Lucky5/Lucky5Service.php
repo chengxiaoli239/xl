@@ -2306,6 +2306,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
             Tool_Common::log('httpPostError','INFO','httpPost请求-3', $logArr);
         }
+        if(empty($rstData)){
+            $rstData['data'] = $data;
+        }
         $rstData['errno'] = $errno;
         $time_consume = ($end_time-$start_time).'s';
 
