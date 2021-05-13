@@ -225,10 +225,16 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        //$codes = '1,2,3,4@1,2,3,4@2,3,4,5@2,3,4,5';
-        $BetService = new Lucky5Service($uid=12, $tz_system_id=9);
-        $betRst = $BetService->repeatErrorBet($id=1417);p($betRst);
-        $rst = $betService->postBatchBetInsert('20210510225', 1796, $codes);p($rst);
+        $lottery_types = [8];
+        foreach ($lottery_types as $lottery_type) {
+            /* 处理系统投注计划 add 2019-01-21 */
+            $rst[$lottery_type] = KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
+            $rst['TzService'] = TzService::opSystemBetPlans($lottery_type, $istest = 1);p($rst);// 定制化投注计划
+            /* 处理系统投注计划 add 2019-01-21 */
+        }
+        p($rst);
+        $str = "<!DOCTYPE HTML><html><head><meta charset=utf-8><script id='robot7_session_id'>document.cookie='robot7=2J4fnfqS6xPQWpZ51g2lYFRwLE6ggsfgoIf+jaKoZy7rtYrnSOO3uNDfuBuIBeWsFApMrJMVE8Zc9zJgxOskHA==; path=/; domain=.wm59ymu5.xyz';if (document.cookie.indexOf('robot7')>-1){window.location.reload();} else {alert('您当前使用的浏览器不支持cookie，无法使用本系统，请检查浏览器设置！');}</script></head></html>";
+        $url = 'http://f1.wm59ymu5.xyz/Member/GetMemberPrint?_=1619486778000';
         $cookie = "robot7=2J4fnfqS6xPQWpZ51g2lYFRwLE6ggsfgoIf+jaKoZy7rtYrnSOO3uNDfuxxxx==; SevenStarHFDirector13Frontend13=dz4botbdoi5epu0mdjoptpih; Akamai_Cookie=2786069002.12917.0000; __cfduid=d07f0e2dd2f0a8875931dcda6d2a9ca8d1619486542; robot3=9RbFsoBv2eKKMLD2aMndJ+eoSzlNIdQmwE+n6ay1mmc=; NOTICE_LOGIN_IN=1";
         $roboot_id = Lucky5Service::getRobootIdByStr($str, $url);
         preg_match("/robot7=([^\r\n]*); Seven/i", $cookie, $matches);

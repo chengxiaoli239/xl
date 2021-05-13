@@ -623,7 +623,7 @@ class HN0898Service extends BaseTZService {
                 $code_hz['current_miss'] = 0;
             }
             if(in_array($plan_type, [2,9])){
-                $UserSysPlans->single = $singles[0];
+                $UserSysPlans->single = $singles[0]? : $UserSysPlans->single;
             }
             $UserSysPlans->hz_Arr = json_encode($code_hz, 320);
         }

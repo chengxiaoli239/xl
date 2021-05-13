@@ -2697,7 +2697,8 @@ class SscDataService extends BaseService {
                 $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
 
                 # 倍数处理，中的计划回第一个倍数
-                $singles = explode('-', $UserSysPlan->singles);
+                $singles = explode('-', trim($UserSysPlan->singles));
+                if(empty($singles)) $singles = [$UserSysPlan->single];
                 $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
 
                 $is_init = 1; # 是否初始真实投注
