@@ -528,6 +528,11 @@ abstract class BetService extends BaseBetService {
             if('03:00:00'<$time && $time<'08:00:00'){
                 $status = false;
             }
+        }elseif(in_array($lottery_type, [18])){
+            # 台湾快五
+            if('02:00:00'<$time && $time<'07:00:00'){
+                $status = false;
+            }
         }
 
         return $status;

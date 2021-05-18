@@ -198,6 +198,10 @@ class KjDataGet
             if ('03:10' < $date_time && $date_time < '09:00') {
                 $rst = false;
             }
+        }elseif(in_array($lottery_type, [18])){ # 台湾快五
+            if ('02:10' < $date_time && $date_time < '07:00') {
+                $rst = false;
+            }
         }
 
         return $rst;

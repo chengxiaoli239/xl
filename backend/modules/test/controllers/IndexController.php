@@ -225,6 +225,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $lottery_type = 18;
+        $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
+        $qihao_2 = HN0898Service::getQihao($lottery_type);p([$qihao_1, $qihao_2]);
         $lottery_types = [8];
         foreach ($lottery_types as $lottery_type) {
             /* 处理系统投注计划 add 2019-01-21 */
@@ -281,9 +284,6 @@ class IndexController extends Controller
         $rst['visitIndex'] = BaoTaService::visitHomePage($id=1);p($rst);
         $rst = BaoTaService::getCronTabs();p($rst);
         $snInfo = JuHuaBaseService::getSn($uid =35, $tz_system_id = 11); p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
-        $lottery_type = 16;
-        $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
-        $qihao_2 = HN0898Service::getQihao($lottery_type);p([$qihao_1, $qihao_2]);
         $data = JiaNaDa::getLotteryCanada($type='json', $is_auto=2);p($data);
         $data = JiaNaDa::getLottery($type='json', $is_auto=2);p($data);
         $activeQihao = BetService::getActiveQihao($uid=24, $tz_system_id=9, $lottery_type=8);p($activeQihao);

@@ -47,12 +47,13 @@ class HN0898Service extends BaseTZService {
     public static $headers = [];
 
     public static $typeTimes = [
-        9 => ['m'=>5, 'max_qihao'=>203], # 台湾冰果
-        10 => ['m'=>1.5, 'max_qihao'=>639],
-        11 => ['m'=>3, 'max_qihao'=>319],
-        12 => ['m'=>5, 'max_qihao'=>191], # 待定
-        13 => ['m'=>10, 'max_qihao'=>95], # 待定
-        15 => ['m'=>5, 'max_qihao'=>203], # 一天最大期号 台湾欢乐生肖
+        9 => ['m'=>5, 'max_qihao'=>203, 'start_H'=>8], # 台湾冰果，早start_H:8点开奖
+        10 => ['m'=>1.5, 'max_qihao'=>639, 'start_H'=>8], # ，早start_H:8点开奖
+        11 => ['m'=>3, 'max_qihao'=>319, 'start_H'=>8], # ，早start_H:8点开奖
+        12 => ['m'=>5, 'max_qihao'=>191, 'start_H'=>8], # 待定，早start_H:8点开奖
+        13 => ['m'=>10, 'max_qihao'=>95, 'start_H'=>8], # 待定，早start_H:8点开奖
+        15 => ['m'=>5, 'max_qihao'=>203, 'start_H'=>8], # 一天最大期号 台湾欢乐生肖，早start_H:8点开奖
+        18 => ['m'=>5, 'max_qihao'=>203, 'start_H'=>7], # 台湾快乐五，早start_H:7点开奖
     ];
 
     /**
@@ -1257,6 +1258,7 @@ class HN0898Service extends BaseTZService {
             case 11: # 冰岛3分 早8点到凌晨3点
             case 12: # 冰岛5分 早8点到凌晨3点
             case 13: # 冰岛10分 早8点到凌晨3点
+            case 18: # 台湾快五 早7点到凌晨3点
                 $timsstamp = time();
                 $types = self::$typeTimes;
 
@@ -1270,7 +1272,7 @@ class HN0898Service extends BaseTZService {
                     $actionNo = (int)($now_timsstamp / $qujian_times) + 2 + $max_actionNo;
                     $qihao = date('Ymd', time() - 24 * 3600) . sprintf("%03d", $actionNo);
                 }else{
-                    $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
+                    $now_timsstamp = $timsstamp - $today_time - $types[$lottery_type]['start_H'] * 3600; # 早8点到凌晨3点 不开奖
 
                     $actionNo = (int)($now_timsstamp / $qujian_times) + 1;
                     $qihao = date("Ymd").sprintf("%03d", $actionNo);
@@ -1373,8 +1375,9 @@ class HN0898Service extends BaseTZService {
             case 11: # 冰岛3分 早8点到凌晨3点
             case 12: # 冰岛5分 早8点到凌晨3点
             case 13: # 冰岛10分 早8点到凌晨3点
+            case 18: # 台湾快五 早7点到凌晨2点
                 $types = self::$typeTimes;
-                $qujian_times =  ($types[$lottery_type]['m']*60);
+                $qujian_times =  ($types[$lottery_type]['m']*60); # 区间时间，秒数
                 $timsstamp = time();
                 $today_time = strtotime(date('Y-m-d 00:00:00'));
 
@@ -1385,7 +1388,7 @@ class HN0898Service extends BaseTZService {
                     $actionNo = (int)($now_timsstamp / $qujian_times) + 1 + $max_actionNo;
                     $qihao = date('Ymd', time() - 24 * 3600) . sprintf("%03d", $actionNo);
                 }else{
-                    $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 凌晨3点到早8点 不开奖
+                    $now_timsstamp = $timsstamp - $today_time - $types[$lottery_type]['start_H'] * 3600; # 早start_H点到凌晨3点 不开奖
 
                     $actionNo = (int)($now_timsstamp / $qujian_times);
                     $qihao = date("Ymd").sprintf("%03d", $actionNo);
