@@ -134,7 +134,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->updated_at = time();
         if(!$rst = $TzSystemsUsers->save()){
-            $msg = ['status'=>300, 'msg'=>'金额同步失败~'];
+            $msg = ['status'=>300, 'msg'=>'金额同步失败9~'];
         }
 
         return $msg;

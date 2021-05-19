@@ -164,7 +164,7 @@ class NineNineBaseService extends BaseTZService {
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->updated_at = time();
         if(!$TzSystemsUsers->save()){
-            $msg = ['status'=>300, 'msg'=>'金额同步失败~'];
+            $msg = ['status'=>300, 'msg'=>'金额同步失败2~'];
         }
 
         return $msg;

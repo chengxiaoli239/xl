@@ -139,7 +139,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->updated_at = time();
         if(!$rst = $TzSystemsUsers->save() OR $balance === false){
-            $msg = ['status'=>300, 'msg'=>'金额同步失败~'];
+            $msg = ['status'=>300, 'msg'=>'金额同步失败10~', 'balance'=>$balance,];
         }
 
         return $msg;
