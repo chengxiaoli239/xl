@@ -45,6 +45,7 @@ use backend\tools\Tools;
 use common\kj\BaseKj;
 use common\kj\cqssc\CqsscKcw;
 use common\kj\cqssc\CqsscSevenDay;
+use common\kj\lecai\LeCaiService;
 use common\kj\qxc\QxcTcw;
 use common\kj\ssc\BingDao;
 use common\kj\ssc\JiaNaDa;
@@ -225,6 +226,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = LeCaiService::getLotteryK5($type='json', $lottery_type=18, $is_auto=2);p($data);
         $lottery_type = 18;
         $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
         $qihao_2 = HN0898Service::getQihao($lottery_type);p([$qihao_1, $qihao_2]);

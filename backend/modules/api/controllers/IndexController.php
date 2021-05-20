@@ -156,4 +156,16 @@ class IndexController extends Controller
 
         return $rst;
     }
+
+    /**
+     * @return array|mixed
+     */
+    public function actionUserLogin(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $data = \Yii::$app->request->post();
+
+        $data['msg'] = '登陆成功';
+
+        return $data;
+    }
 }
