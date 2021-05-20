@@ -11,6 +11,7 @@ use backend\models\SystemConfig;
 use backend\models\TzSystemsUsers;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\Juhua\JuHuaBaseService;
+use backend\service\LeCai\ZhongFaService;
 use backend\service\Lucky5\Lucky5Service;
 use backend\service\NineNine\NineNineNewService;
 use backend\service\NineNine\NineNineService6;
@@ -90,6 +91,8 @@ class BaseService{
         }elseif(in_array($tz_system_id, [13])){
             # 9、冰岛
             $rst = \backend\service\BingDao\BingDaoService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+        }elseif(in_array($tz_system_id, [16])){ # 宝岛众发
+            $rst = ZhongFaService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
         }
 
         return $rst;
