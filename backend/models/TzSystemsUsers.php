@@ -17,6 +17,7 @@ use Yii;
  * @property string $password 网盘密码
  * @property string $balance 系统余额
  * @property int $status 系统开启状态
+ * @property int $is_auto_login 是否自动登陆
  * @property string $ssc_domain 网盘地址
  * @property string $cookie 登陆cookie
  * @property string $user_agent 浏览器代理
@@ -39,7 +40,6 @@ use Yii;
  */
 class TzSystemsUsers extends \common\models\base\BaseModel
 {
-    public $login_img;
     /**
      * @inheritdoc
      */
@@ -54,7 +54,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['uid', 'is_agent', 'tz_system_id', 'status', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'is_agent', 'tz_system_id', 'status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
             [['cookie', 'cookie_wx_web'], 'string'],
             [['updated_at'], 'required'],
@@ -82,6 +82,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'password' => '网盘密码',
             'balance' => '系统余额',
             'status' => '系统开启状态',
+            'is_auto_login' => '是否自动登陆',
             'ssc_domain' => '网盘地址',
             'cookie' => '登陆cookie',
             'user_agent' => '浏览器代理',
