@@ -14,8 +14,10 @@ use Yii;
  * @property int $status 系统开启状态
  * @property int $type 类型:1时时彩2网球
  * @property string $tz_types 已经对接的玩法 lt_tz_typs.type
+ * @property int $is_auto_login 是否自动登陆
  * @property int $created_at 创建时间
- * @property string $updated_at 更新时间
+ * @property int $updated_at 更新时间
+ * @property string $update_time 更新时间
  */
 class TzSystems extends \common\models\base\BaseModel
 {
@@ -33,8 +35,8 @@ class TzSystems extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['system_type_id', 'status', 'type', 'created_at'], 'integer'],
-            [['updated_at'], 'safe'],
+            [['system_type_id', 'status', 'type', 'is_auto_login', 'created_at', 'updated_at'], 'integer'],
+            [['update_time'], 'safe'],
             [['name'], 'string', 'max' => 64],
             [['ssc_domain', 'tz_types'], 'string', 'max' => 255],
         ];
@@ -53,8 +55,10 @@ class TzSystems extends \common\models\base\BaseModel
             'status' => Yii::t('app', '系统开启状态'),
             'type' => Yii::t('app', '类型:1时时彩2网球'),
             'tz_types' => Yii::t('app', '已经对接的玩法 lt_tz_typs.type'),
+            'is_auto_login' => Yii::t('app', '是否自动登陆'),
             'created_at' => Yii::t('app', '创建时间'),
             'updated_at' => Yii::t('app', '更新时间'),
+            'update_time' => Yii::t('app', '更新时间'),
         ];
     }
 
