@@ -1769,7 +1769,7 @@ class ZhongFaService { # 宝岛众发登陆体系
     public static function getActiveQihao($uid='', $tz_system_id='', $lottery_type = 8){
         if(!$uid OR !$tz_system_id) return ['code'=>300, 'msg'=>'uid或者tz_system_id不能为空'];
         $data = self::userInfo($uid, $tz_system_id);
-        Tool_Common::log('getActiveQihao', 'INFO', '获取正在进行的期号', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'data'=>$data]);
+        Tool_Common::log('getActiveQihao', 'INFO', '获取正在进行的期号'.$lottery_type, ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'data'=>$data]);
         if(isset($data['success']) && $data['status'] == '30200') return $data;
         if(isset($data['success']) && isset($data['data']['nextVolIsBetting']) && isset($data['data']['nextVol']) && !empty($data['data']['nextVol'])){
             $qihao = $data['data']['nextVol'];
