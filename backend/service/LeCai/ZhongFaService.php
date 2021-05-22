@@ -2218,7 +2218,7 @@ class ZhongFaService { # 宝岛众发登陆体系
                     ];
 
                 }else{
-                    $bet_codes = trim(implode(':'.$single.'/', $tmpcodesArr), '/');
+                    $bet_codes = trim(implode(':'.$single.'/', $tmpcodesArr), '/').':'.$single;
                     $post_data = [
                         'content'=>$bet_codes,
                         'bet_money'=>$single,
