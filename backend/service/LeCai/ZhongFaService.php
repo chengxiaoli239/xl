@@ -1386,9 +1386,6 @@ class ZhongFaService { # 宝岛众发登陆体系
      * @return mixed|string
      */
     public static function userInfo($uid, $tz_system_id, $is_auto = 1){
-        $m = \Yii::$app->cache;
-        $mkey = 'get_userInfo_'.$uid.'_'.$tz_system_id.'_'.$is_auto;
-        if($data = $m->get($mkey)) return $data;
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         if($is_auto == 1 && (strpos($TzSystemsUsers->desc, '您的访问过于频繁') !== false OR strpos($TzSystemsUsers->desc, '用户名或密码不正确') !== false)){
@@ -1435,7 +1432,6 @@ class ZhongFaService { # 宝岛众发登陆体系
         $TzSystemsUsers->desc = $desc;
         $TzSystemsUsers->save();
         Tool_Common::log('userInfo','INFO','宝岛众发-用户信息-2', $logArr);
-        $m->set($mkey, $data, 15);
         return $data;
     }
 
@@ -1768,6 +1764,10 @@ class ZhongFaService { # 宝岛众发登陆体系
      */
     public static function getActiveQihao($uid='', $tz_system_id='', $lottery_type = 8){
         if(!$uid OR !$tz_system_id) return ['code'=>300, 'msg'=>'uid或者tz_system_id不能为空'];
+
+        $m = \Yii::$app->cache;
+        $mkey = 'getActiveQihao_'.$uid.'_'.$tz_system_id.'_'.$lottery_type;
+        if($qihao = $m->get($mkey)) return $qihao;
         $data = self::userInfo($uid, $tz_system_id);
         Tool_Common::log('getActiveQihao', 'INFO', '获取正在进行的期号'.$lottery_type, ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'data'=>$data]);
         if(isset($data['success']) && $data['status'] == '30200') return $data;
@@ -1776,6 +1776,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         }else{
             $qihao = '';
         }
+        $m->set($mkey, $qihao, 15);
 
         return $qihao;
     }
