@@ -1395,7 +1395,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             return ['status'=>300, 'msg'=>'您的访问过于频繁，请稍后再试 或 用户名或密码不正确'];
         }
 
-        $_t = (int)microtime(true) * 1000;
+        $_t = (int)(microtime(true) * 1000);
         $params = ['_nowTime'=>$_t, '_uri'=>'session-user'];
         $params['sign'] = ZhongFaService::getSign($params);
         $urlArr = self::getTzSiteInfo($tz_system_id);
@@ -1416,7 +1416,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             'sec-fetch-dest: empty',
             'sec-fetch-mode: cors',
             'sec-fetch-site: same-origin',
-            'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
+            $TzSystemsUsers->user_agent,
         ];
 
         $start_time = microtime(true);
