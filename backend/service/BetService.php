@@ -408,7 +408,7 @@ abstract class BetService extends BaseBetService {
 
                 }elseif($qihao == $activeQihao){
                     $betKey = BetService::buildLotteryBetKey($activeQihao, $plan_id, $bet_sort_key);
-                    //if($lock = $m->get($betKey)) continue;
+                    if($lock = $m->get($betKey)) continue;
 
                     $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
                     $m->set($betKey, 1, $time);
