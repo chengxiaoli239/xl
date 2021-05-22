@@ -843,7 +843,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         $end_time = microtime(true);
         $time_consume = ($end_time-$start_time).'s';
 
-        Tool_Common::log('getBalance','INFO','幸运五星-用户余额-3', ['uid'=>$uid, 'r'=>$r, 'rst'=>$rst, 'balance'=>$balance, 'time_consume'=>$time_consume]);
+        Tool_Common::log('getBalance','INFO','宝岛众发-用户余额-3', ['uid'=>$uid, 'r'=>$r, 'rst'=>$rst, 'balance'=>$balance, 'time_consume'=>$time_consume]);
 
         return $balance;
     }
@@ -1108,6 +1108,51 @@ class ZhongFaService { # 宝岛众发登陆体系
     }
 
     /**
+     * @desc 心跳包
+     * @param $uid
+     * @param $tz_system_id
+     * @return array|mixed|string
+     */
+    public static function heart($uid, $tz_system_id){
+
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $urlArr = self::getTzSiteInfo($tz_system_id);
+
+        $_t = microtime(true) * 10000;
+        $post_data = ['_nowTime'=>$_t, '_uri'=>'/heart'];
+        $sign = ZhongFaService::getSign($post_data);
+        $querys = array_merge($post_data, [
+            '_sign' => $sign,
+        ]);
+        $url = $urlArr['SSC_INDEX'].'/user-api/heart?'.http_build_query($querys);
+        $headers = [
+            ':authority: '.$urlArr['domain'],
+            ':method: POST',
+            ':path: /user-api/heart?_uri=%2Fheart&_nowTime='.$_t.'&_sign='.$sign,
+            ':scheme: https',
+            'accept: application/json, text/plain, */*',
+            'accept-encoding: gzip, deflate, br',
+            'accept-language: zh-CN,zh;q=0.9',
+            'content-length: 0',
+            'cookie: '.$TzSystemsUsers->cookie.'; main-lottery=twk5',
+            'origin: '.$TzSystemsUsers->ssc_domain,
+            'referer: '.$TzSystemsUsers->ssc_domain.'/game/kuai-da',
+            'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+            'sec-ch-ua-mobile: ?0',
+            'sec-fetch-dest: empty',
+            'sec-fetch-mode: cors',
+            'sec-fetch-site: same-origin',
+            $TzSystemsUsers->user_agent,
+        ];
+        $rst = self::postBetCurl($url, $post_data, $headers, $uid); # 调试阶段先注释12.26
+
+        $logArr = ['url'=>$url,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
+        Tool_Common::log('/zhongfa/'.__FUNCTION__, 'INFO', '宝岛众发心跳', $logArr);
+
+        return $rst;
+    }
+
+    /**
      * @desc 获取签名
      * @param array $params
      * @return string
@@ -1306,7 +1351,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             'accept: application/json, text/plain, */*',
             'accept-encoding: gzip, deflate, br',
             'accept-language: zh-CN,zh;q=0.9',
-            'content-length: 39',
+            'content-length: '.strlen(http_build_query($post_data)),
             'content-type: application/x-www-form-urlencoded',
             'cookie: '.$TzSystemsUsers->cookie,
             'origin: '.$urlArr['SSC_INDEX'],
@@ -1432,6 +1477,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         $TzSystemsUsers->desc = $desc;
         $TzSystemsUsers->save();
         Tool_Common::log('userInfo','INFO','宝岛众发-用户信息-2', $logArr);
+        self::heart($uid, $tz_system_id); # 心跳包
         return $data;
     }
 
@@ -1446,37 +1492,51 @@ class ZhongFaService { # 宝岛众发登陆体系
         //$headers = json_decode($row->bet_headers); # 含有cookie，如果是重新登陆 cookie要变动，待处理
         $uid = $row->uid;
         $tz_system_id = $row->tz_system_id;
+        ZhongFaService::__init($uid, $tz_system_id);
         $post_data = json_decode($row->post_datas, 320);
         $repeats = []; # 是否有重复号码
         if($row->lottery_type == 8 && in_array($row->uid, \Yii::$app->params['IMPORT_CODES_REPEAT_UIDS'])){
             $tmpDatas = explode(',', $post_data['bet_number']);
             $post_data['bet_number'] = implode(',', array_unique($tmpDatas));
 
-            $repeats = Lucky5Service::fetchRepeatMemberInArray($tmpDatas);
         }
 
-        $m = \Yii::$app->cache;
         $_t = round(microtime(true) * 1000);
+        $querys = [
+            '_uri' => '/orders/bet',
+            '_nowTime' => $_t
+        ];
+        $sign = ZhongFaService::getSign($querys);
+
+        $m = \Yii::$app->cache;
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $urlArr = self::getTzSiteInfo($tz_system_id);
         $headers = [
-            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-            'Accept-Encoding: gunzip, deflate',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Cache-Control: max-age=0',
-            'Connection: keep-alive',
-            'Content-Length:'.strlen(http_build_query($post_data)),
-            //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
-            'Content-Type: application/x-www-form-urlencoded',
-            'Cookie: '.$TzSystemsUsers->cookie,
-            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
-            'Origin: '.$TzSystemsUsers->ssc_domain,
-            'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
-            'Upgrade-Insecure-Requests: 1',
+            ':authority: '.$urlArr['domain'],
+            ':method: POST',
+            ':path: /user-api/orders/bet?_uri=%2Forders%2Fbet&_nowTime='.$_t.'&_sign='.$sign,
+            ':scheme: https',
+            'accept: application/json, text/plain, */*',
+            'accept-encoding: gzip, deflate, br',
+            'accept-language: zh-CN,zh;q=0.9',
+            'content-length: '.strlen(http_build_query($post_data)),
+            'content-type: application/x-www-form-urlencoded',
+            'cookie: '.$TzSystemsUsers->cookie.'; main-lottery=twk5',
+            'origin: '.$TzSystemsUsers->ssc_domain,
+            'referer: '.$TzSystemsUsers->ssc_domain.'/game/kuai-yi',
+            'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+            'sec-ch-ua-mobile: ?0',
+            'sec-fetch-dest: empty',
+            'sec-fetch-mode: cors',
+            'sec-fetch-site: same-origin',
             $TzSystemsUsers->user_agent,
         ];
 
+        //$headers = json_decode($row->bet_headers, true);
         $time1 = microtime(true);
         $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 调试阶段先注释12.26
+        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'uid'=>$uid, 'tmpRst'=>$tmpRst];
+        p($logArr);
         $time2 = microtime(true);
         $status = 0;
         if($tmpRst['Status'] == 1){
@@ -2319,7 +2379,6 @@ class ZhongFaService { # 宝岛众发登陆体系
         if(!$timeout) $timeout = 30;
 
         //$cookie = dirname(__FILE__)."/cookie.txt";
-        $headers[] = ['Accept: application/json, text/javascript, */*; q=0.01'];
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -2330,7 +2389,7 @@ class ZhongFaService { # 宝岛众发登陆体系
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 4);
 
         if(strpos($url, 'ww662889') !== false){
             //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
@@ -2409,7 +2468,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         $rstData['errno'] = $errno;
         $time_consume = ($end_time-$start_time).'s';
 
-        $logArr = ['uid'=>$uid, 'url'=>$url, 'headers'=>$headers, 'rstData'=>$rstData, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
+        $logArr = ['uid'=>$uid, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rstData'=>$rstData, 'errno'=>$errno, 'time_consume'=>$time_consume];
         Tool_Common::log('postBetCurl','INFO','httpPost下注请求-5-1', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
@@ -2424,7 +2483,7 @@ class ZhongFaService { # 宝岛众发登陆体系
      */
     public static function isLogin($uid, $tz_system_id){
 
-        $balance = Lucky5Service::getBalance($uid,$tz_system_id, $r=2);
+        $balance = self::getBalance($uid,$tz_system_id, $r=2);
 
         $flag = $balance > 0 ? true : false;
 

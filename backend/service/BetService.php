@@ -368,7 +368,6 @@ abstract class BetService extends BaseBetService {
 
         $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
-            //$lottery_type = 8; # 测试
             $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
             if($uid){
                 $where = array_merge($where, [['=', 'uid', $uid]]);
@@ -388,7 +387,6 @@ abstract class BetService extends BaseBetService {
                 $lottery_type = $betErrorPlansTask->lottery_type;
                 $account = $betErrorPlansTask->account;
                 $plan_id = $betErrorPlansTask->plan_id;
-                $bet_money = $betErrorPlansTask->bet_money;
                 $bet_sort_key = $betErrorPlansTask->bet_sort_key;
 
                 $qihao = $betErrorPlansTask->qihao;
@@ -401,6 +399,7 @@ abstract class BetService extends BaseBetService {
 
                 $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
                 //$balance = $BetService::getBalance($uid, $tz_system_id, $r=3, $is_auto=2); # 余额
+                p([$qihao, $activeQihao], 0);
 
                 if(false && $balance<$bet_money){
                     $betErrorPlansTask->status = 3; # 不可重推
@@ -409,7 +408,7 @@ abstract class BetService extends BaseBetService {
 
                 }elseif($qihao == $activeQihao){
                     $betKey = BetService::buildLotteryBetKey($activeQihao, $plan_id, $bet_sort_key);
-                    if($lock = $m->get($betKey)) continue;
+                    //if($lock = $m->get($betKey)) continue;
 
                     $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
                     $m->set($betKey, 1, $time);
@@ -1395,6 +1394,9 @@ abstract class BetService extends BaseBetService {
         }elseif(in_array($tz_system_id, [13])){
             # 13、冰岛
             $flag = \backend\service\BingDao\BingDaoService::isLogin($uid, $tz_system_id);
+        }elseif(in_array($tz_system_id, [16])){
+            # 16、台湾快五
+            $flag = ZhongFaService::isLogin($uid, $tz_system_id);
         }
 
         return (boolean)$flag;

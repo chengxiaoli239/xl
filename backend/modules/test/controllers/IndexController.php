@@ -228,6 +228,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $ZhongFaService = new ZhongFaService();
+        $betRst = $ZhongFaService->repeatErrorBet($id=13);p($betRst);
+        $rst = BetService::repeatErrorBet([18], $uid=14);p($rst);
         $betService = new ZhongFaService();
         $betService->postBatchBetInsert('20210522203', $plan_id=1805, '2,3,4,5@3,4,5,6');
         $loginRst = ZhongFaService::login($uid=14,$tz_system_id=16);p($loginRst);
