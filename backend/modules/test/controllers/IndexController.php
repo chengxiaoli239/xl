@@ -229,11 +229,11 @@ class IndexController extends Controller
 
     public function actionDw(){
         $ZhongFaService = new ZhongFaService();
-        $betRst = $ZhongFaService->repeatErrorBet($id=13);p($betRst);
+        $betRst = $ZhongFaService->repeatErrorBet($id=14);p($betRst);
+        $loginRst = ZhongFaService::login($uid=14,$tz_system_id=16);p($loginRst);
         $rst = BetService::repeatErrorBet([18], $uid=14);p($rst);
         $betService = new ZhongFaService();
         $betService->postBatchBetInsert('20210522203', $plan_id=1805, '2,3,4,5@3,4,5,6');
-        $loginRst = ZhongFaService::login($uid=14,$tz_system_id=16);p($loginRst);
         $rst = ZhongFaService::getCookie($uid=14,$tz_system_id=16);p($rst);
         $rst = ZhongFaService::synBalance(5);
         $params = ['_nowTime'=>1621657296359, '_uri'=>'/session-user'];
