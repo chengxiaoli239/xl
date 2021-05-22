@@ -218,9 +218,11 @@ abstract class BetService extends BaseBetService {
      */
     public static function lotteryBet($uid){
         $lottery_types = UserSysPlansService::getMyLotteryTypes($uid);
-        foreach ($lottery_types as $lottery_type){
-            if($lottery_type['lottery_type'] == 8){
+        foreach ($lottery_types as $data){
+            if($data['lottery_type'] == 8) {
                 $rst = BetService::repeatErrorBet([8], $uid);
+            }elseif($data['lottery_type'] == 18){ # 宝岛众发:台湾快五
+                $rst = BetService::repeatErrorBet([18], $uid);
             }else{
                 $rst = BetService::betByUidNew($uid);
             }

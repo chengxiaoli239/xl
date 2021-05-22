@@ -321,22 +321,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 批量插入投注任务
-     * @return array
-     */
-    public function actionInsertPlansTaskLottery($lottery_type=8){
-        self::_init();
-        $rst = ['status'=>200, 'msg'=>'操作成功'];
-
-        for ($i=0; $i<5; $i++){
-            $rst['data'] = BetService::insertPlansTask([$lottery_type]);
-            sleep(10);
-        }
-
-        return $rst;
-    }
-
-    /**
      * @desc 补打失败计划
      * @return array
      */
