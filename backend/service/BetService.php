@@ -465,7 +465,11 @@ abstract class BetService extends BaseBetService {
      * @return array|string
      */
     public static function getActiveQihao($uid='', $tz_system_id='', $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $mkey = 'getActiveQihao_'.$uid.'_'.$tz_system_id.'_'.$lottery_type;
 
+        $m = \Yii::$app->cache;
+        $qihao = $m->get($mkey);
+        if(!empty($qihao)) return $qihao;
         if($tz_system_id == 9){
             $qihao = Lucky5Service::getActiveQihao($uid, $tz_system_id, $lottery_type);
         }elseif($tz_system_id == 11){ # 菊花网
@@ -475,6 +479,7 @@ abstract class BetService extends BaseBetService {
         }else{
             $qihao = HN0898Service::getQihao($lottery_type);
         }
+        $m->set($mkey, $qihao, 5);
 
         return $qihao;
     }
