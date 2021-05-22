@@ -1536,10 +1536,9 @@ class ZhongFaService { # 宝岛众发登陆体系
         $time1 = microtime(true);
         $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 调试阶段先注释12.26
         $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'uid'=>$uid, 'tmpRst'=>$tmpRst];
-        p($logArr);
         $time2 = microtime(true);
         $status = 0;
-        if($tmpRst['Status'] == 1){
+        if($tmpRst['success'] == 1){
             $status = 2;
             //# 获取方案号，记录id, 用于撤单
             $snInfo = self::getSn($row->uid, $row->tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
@@ -1554,7 +1553,7 @@ class ZhongFaService { # 宝岛众发登陆体系
                 Tool_Common::log('/bet/repeatErrorBet', 'INFO', '幸运五下注1', [$uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent, $rst1]);
             }
 
-        }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 305, 307])){
+        }elseif(!$tmpRst['success'] && in_array($tmpRst['code'], [302, 305, 307])){
             $status = 3; # 不可再次下注：302余额不足305已关盘307网盘账号停押
         }else{
             $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key);
