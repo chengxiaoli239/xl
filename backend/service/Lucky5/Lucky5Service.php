@@ -2060,7 +2060,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @desc 批量号码拆解下注
      * @param $qihao
      * @param $plan_id
-     * @param $codes
+     * @param $codes - 1,2,3,4@2,3,4,5@5,6,7,8
      * @return array
      */
     public function postBatchBetInsert($qihao, $plan_id, $codes){

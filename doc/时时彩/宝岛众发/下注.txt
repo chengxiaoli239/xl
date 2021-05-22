@@ -1,0 +1,13 @@
+﻿    A、General
+    C、Request Headers
+    D、Form Data
+
+
+投注方式：playway
+投注倍数：single
+投注期号：qihao:
+    A、General
+    C、Request Headers
+    D、Form Data
+1、四定快译
+

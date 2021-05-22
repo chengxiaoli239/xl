@@ -21,6 +21,7 @@ use backend\service\huiyuan\HuiYuanService5;
 use backend\service\JinYing\JinYingService;
 use backend\service\Juhua\JuHuaBaseService;
 use backend\service\KuaiLe8Service;
+use backend\service\LeCai\ZhongFaService;
 use backend\service\Lucky5\Lucky5Service;
 use backend\service\Lucky5\LuckyBaseService;
 use backend\service\McLockService;
@@ -55,6 +56,7 @@ use common\kj\xjssc\XjSsc;
 use common\models\AdminModel;
 use common\service\ChatService;
 use common\service\CommonService;
+use common\service\index\CrontabIndexService;
 use common\service\webot\FriendsService;
 use common\service\webot\LoginService;
 use common\service\webot\MsgService;
@@ -226,6 +228,14 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $loginRst = ZhongFaService::login($uid=14,$tz_system_id=16);p($loginRst);
+        $rst = ZhongFaService::getCookie($uid=14,$tz_system_id=16);p($rst);
+        $rst = ZhongFaService::synBalance(5);
+        $params = ['_nowTime'=>1621657296359, '_uri'=>'/session-user'];
+        $sign = ZhongFaService::getSign($params);
+        p($sign);
+        $rst = CrontabIndexService::autoLogin();p($rst);
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems}}');p($r);
         $data = LeCaiService::getLotteryK5($type='json', $lottery_type=18, $is_auto=2);p($data);
         $lottery_type = 18;
         $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
@@ -246,7 +256,6 @@ class IndexController extends Controller
         $new_cookie = str_replace($matches[1], $roboot_id, $cookie);
         p(['str'=>$str, 'roboot_id'=>$roboot_id, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
         p($roboot_id);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%import_plan_codes}}');p($r);
         p($_SERVER);
         $rst = Lucky5Service::synBalance($id=1); p($rst);# 同步余额
         $rst = Lucky5Service::login($uid=2, $tz_system_id=9);p($rst);

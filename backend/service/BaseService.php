@@ -159,6 +159,9 @@ class BaseService{
             }elseif(in_array($tz_system_id, [13])){
                 # 13、冰岛
                 $rst = \backend\service\BingDao\BingDaoService::synBalance($TzSystemsUser->id);
+            }elseif(in_array($tz_system_id, [16])){
+                # 16、众发
+                $rst = ZhongFaService::synBalance($TzSystemsUser->id);
             }
             $m->set($mkey, $rst, 8);
         }else{

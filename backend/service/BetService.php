@@ -16,6 +16,7 @@ use backend\models\SystemConfig;
 use backend\models\User;
 use backend\service\huiyuan\KuaiLe8Service;
 use backend\service\Juhua\JuHuaBaseService;
+use backend\service\LeCai\ZhongFaService;
 use backend\service\Lucky5\Lucky5Service;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineNewService;
@@ -51,7 +52,7 @@ abstract class BetService extends BaseBetService {
      * @param $uid
      * @param $tz_system_id - 表lt_tz_systems.id
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
-     * @return HN0898Service|KuaiLe8Service|SevenService|XlService|Lucky5Service|NineNineNewService|JuHuaBaseService
+     * @return HN0898Service|KuaiLe8Service|SevenService|XlService|Lucky5Service|NineNineNewService|JuHuaBaseService|ZhongFaService
      */
     public static function getBetObj($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
         //p([$uid, $tz_system_id, $lottery_type]);
@@ -95,6 +96,9 @@ abstract class BetService extends BaseBetService {
         }elseif(in_array($tz_system_id, [13])){
             # 13 冰岛
             $BetService = new \backend\service\BingDao\BingDaoService($uid, $tz_system_id);
+        }elseif(in_array($tz_system_id, [16])){
+            # 16 宝岛众发
+            $BetService = new ZhongFaService($uid, $tz_system_id);
         }
 
         return $BetService;
@@ -466,6 +470,8 @@ abstract class BetService extends BaseBetService {
             $qihao = Lucky5Service::getActiveQihao($uid, $tz_system_id, $lottery_type);
         }elseif($tz_system_id == 11){ # 菊花网
             $qihao = JuHuaBaseService::getActiveQihao($uid, $tz_system_id, $lottery_type);
+        }elseif($tz_system_id == 16){ # 宝岛众发
+            $qihao = ZhongFaService::getActiveQihao($uid, $tz_system_id, $lottery_type);
         }else{
             $qihao = HN0898Service::getQihao($lottery_type);
         }
@@ -1497,7 +1503,7 @@ abstract class BetService extends BaseBetService {
      * @param $qihao - 已经开奖的期号
      * @return float|int|string
      */
-    public static function getBetCacheTime($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao){
+    public static function getBetCacheTime($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao=''){
         $lottery = LotteryType::findOne(['lottery_type'=>$lottery_type]);
         $cacheTime = $lottery->data_ftime;
         $now_HI = date('H:i:s');
@@ -1540,6 +1546,9 @@ abstract class BetService extends BaseBetService {
                 break;
             case 16: # 加拿大28   3.5分
                 $cacheTime = 3.5 * 60;
+                break;
+            case 18: #  宝岛众发  台湾5分
+                $cacheTime = 5 * 60;
                 break;
         }
 

@@ -32,6 +32,7 @@ use backend\service\TzService;
 use backend\service\UserSysPlansService;
 use backend\service\WxService;
 use common\service\CommonService;
+use common\service\index\CrontabIndexService;
 use Yii;
 use backend\models\SscKjData;
 use backend\service\OpKjService;
@@ -416,11 +417,9 @@ class IndexController extends Controller
      */
     public function actionAutoLogin(){
         self::_init();
-        $TzSystemsUsers = TzSystemsUsers::find()->where(['AND',['=', 'status', 1], ['<>', 'ssc_domain', '']])->all();
 
-        foreach ($TzSystemsUsers as $TzSystemsUser){
-            $rst[$TzSystemsUser->id] = BaseService::login($TzSystemsUser->id);
-        }
+        $rst = CrontabIndexService::autoLogin();
+
         return $rst;
     }
 
