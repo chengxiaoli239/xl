@@ -399,7 +399,6 @@ abstract class BetService extends BaseBetService {
 
                 $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
                 //$balance = $BetService::getBalance($uid, $tz_system_id, $r=3, $is_auto=2); # 余额
-                p([$qihao, $activeQihao], 0);
 
                 if(false && $balance<$bet_money){
                     $betErrorPlansTask->status = 3; # 不可重推

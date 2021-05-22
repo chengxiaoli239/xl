@@ -1498,7 +1498,6 @@ class ZhongFaService { # 宝岛众发登陆体系
         if($row->lottery_type == 8 && in_array($row->uid, \Yii::$app->params['IMPORT_CODES_REPEAT_UIDS'])){
             $tmpDatas = explode(',', $post_data['bet_number']);
             $post_data['bet_number'] = implode(',', array_unique($tmpDatas));
-
         }
 
         $_t = round(microtime(true) * 1000);
@@ -1552,7 +1551,9 @@ class ZhongFaService { # 宝岛众发登陆体系
                 $rst1 = self::postR($uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent);
                 Tool_Common::log('/bet/repeatErrorBet', 'INFO', '幸运五下注1', [$uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent, $rst1]);
             }
-
+            $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key);
+            $lockTime = BetService::getBetCacheTime($row->lottery_type);
+            $m->set($betKey, 1, $lockTime);
         }elseif(!$tmpRst['success'] && in_array($tmpRst['code'], [302, 305, 307])){
             $status = 3; # 不可再次下注：302余额不足305已关盘307网盘账号停押
         }else{
