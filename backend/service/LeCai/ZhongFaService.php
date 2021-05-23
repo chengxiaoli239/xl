@@ -1273,7 +1273,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         $logArr = ['url'=>$url];
         $data = self::httpGet($url, $headers, $uid, $time_out=15);
 
-        Tool_Common::log('getSn','INFO','众发方案号', $logArr);
+        Tool_Common::log('/zhongfa/'.__FUNCTION__,'INFO','众发方案号', $logArr);
 
         return $data;
     }
