@@ -581,6 +581,7 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
     <!--footer end-->
 </section>
 <script>
+    /*
     <!--ST客服代码-->
     (function () {
         var _stkf_code = document.createElement("script");
@@ -588,6 +589,7 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
         var s = document.getElementsByTagName("script")[0];
         s.parentNode.insertBefore(_stkf_code, s);
     })();
+     */
 </script>
 
 <?php $this->endBody() ?>
