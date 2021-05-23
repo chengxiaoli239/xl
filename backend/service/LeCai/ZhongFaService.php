@@ -1572,6 +1572,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         $time2 = microtime(true);
         $status = 0;
         if($tmpRst['success'] == 1){
+            $tmpRst['status'] = 1;
             $status = 2;
             //# 获取方案号，记录id, 用于撤单
             $snInfo = self::getSn($row->uid, $row->tz_system_id, $row->lottery_type);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )

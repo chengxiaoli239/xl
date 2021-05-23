@@ -418,13 +418,14 @@ abstract class BetService extends BaseBetService {
                         $loginRst = BaseService::login($TzSystemsUsers->id, $is_auto=2);
                     }
                     $betRst = $BetService->repeatErrorBet($betErrorPlansTask->id);
-                    $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = $betRst;
-                    if($betRst['data']['bet_rst']['status'] == 1){
+                    $t_rst = $betRst['data']['bet_rst'];
+                    $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = $t_rst;
+                    if($t_rst['status'] == 1){
                         $betSuccess = 1;
                     }
                     $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account' => $account, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'loginRst'=>$loginRst, 'betKey'=>$betKey, 'time'=>$time];
-                    $snid = $betRst['data']['bet_rst']['snid'];
-                    $sn = $betRst['data']['bet_rst']['sn'];
+                    $snid = $t_rst['snid'];
+                    $sn = $t_rst['sn'];
                     $planSnidArrs[$plan_id]['snids'][] = $snid;
                     $planSnidArrs[$plan_id]['sns'][] = $sn;
                     Tool_Common::log('/repeatErrorBet/bet_rst', 'ERR', '网盘开盘状态-1', $logArr);
