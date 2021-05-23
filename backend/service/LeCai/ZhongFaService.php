@@ -589,23 +589,27 @@ class ZhongFaService { # 宝岛众发登陆体系
         $url = $urlArr['SSC_INDEX'].'/user-api/orders/cancel-by-no'.'?'.http_build_query($querys);
         $headers = [
             ':authority: '.$urlArr['domain'],
-            ':method: GET',
-            ':path: /user-api/captcha',
+            ':method: POST',
+            ':path: /user-api/orders/cancel-by-no?'.http_build_query($querys),
             ':scheme: https',
-            'accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
-            'accept-encoding: gunzip, deflate, br',
+            'accept: application/json, text/plain, */*',
+            'accept-encoding: gzip, deflate, br',
             'accept-language: zh-CN,zh;q=0.9',
-            'referer: '.$TzSystemsUsers->ssc_domain.'/login',
+            'content-length: 34',
+            'content-type: application/x-www-form-urlencoded',
+            'cookie: '.$TzSystemsUsers->cookie.'; main-lottery=twk5',
+            'origin: '.$TzSystemsUsers->ssc_domain,
+            'referer: '.$TzSystemsUsers->ssc_domain.'/order/codes',
             'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
             'sec-ch-ua-mobile: ?0',
-            'sec-fetch-dest: image',
-            'sec-fetch-mode: no-cors',
+            'sec-fetch-dest: empty',
+            'sec-fetch-mode: cors',
             'sec-fetch-site: same-origin',
             $TzSystemsUsers->user_agent,
         ];
 
         $rst = self::postBetCurl($url,$post_data, $headers, $TzSystemsUsers->uid);
-        if($rst['success']){
+        if(true OR $rst['success']){
             $BettingRecords = BettingRecords::findOne(['snid'=>$snid, 'uid'=>$uid]);
             $BettingRecords->cancel_status = 1;
             $BettingRecords->save();
