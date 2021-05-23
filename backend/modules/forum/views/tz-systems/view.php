@@ -40,8 +40,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'ssc_domain',
                                     'status',
                                     'type',
+                                    'tz_types',
+                                    'is_auto_login',
                                     'created_at',
                                     'updated_at',
+                                    'update_time',
                                 ],
                             ]) ?>
                         </div>
