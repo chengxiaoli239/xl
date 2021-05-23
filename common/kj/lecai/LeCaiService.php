@@ -26,6 +26,9 @@ class LeCaiService extends BaseKj {
             $url = $domain.'/api/lottery-results/?dataStr='.$date.'&lotteryId=twk5&page=1&pageSize=5';
             $content = CurlService::httpGet($url);
 
+            $logArr = ['url'=>$url, 'content'=>$content];
+            Tool_Common::log('/zhongfa/'.__FUNCTION__, 'INFO', '台湾快五', $logArr);
+
             if(isset($content['success']) && $content['success'] != 1) return false;
             $data = $content['data']['rows'][0];
 
