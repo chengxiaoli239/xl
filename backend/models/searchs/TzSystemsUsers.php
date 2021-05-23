@@ -18,8 +18,8 @@ class TzSystemsUsers extends TzSystemsUsersModel
     public function rules()
     {
         return [
-            [['id', 'uid', 'is_agent', 'tz_system_id', 'status', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'expire_time', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'sys_name', 'account', 'password', 'ssc_domain', 'cookie', 'user_agent', 'warn_val', 'desc', 'update_time'], 'safe'],
+            [['id', 'uid', 'is_agent', 'tz_system_id', 'status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['username', 'sys_name', 'account', 'password', 'ssc_domain', 'cookie', 'user_agent', 'cookie_wx_web', 'warn_val', 'desc', 'update_time'], 'safe'],
             [['balance', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
         ];
     }
@@ -48,7 +48,7 @@ class TzSystemsUsers extends TzSystemsUsersModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['created_at'=>SORT_DESC]]
+	    'sort'=> ['defaultOrder' => ['created_at'=>SORT_DESC]]
         ]);
 
         $this->load($params);
@@ -67,6 +67,7 @@ class TzSystemsUsers extends TzSystemsUsersModel
             'tz_system_id' => $this->tz_system_id,
             'balance' => $this->balance,
             'status' => $this->status,
+            'is_auto_login' => $this->is_auto_login,
             'tz_sort' => $this->tz_sort,
             'odds_2x' => $this->odds_2x,
             'odds_3x' => $this->odds_3x,
@@ -74,8 +75,8 @@ class TzSystemsUsers extends TzSystemsUsersModel
             'odds_2d' => $this->odds_2d,
             'odds_3d' => $this->odds_3d,
             'odds_4d' => $this->odds_4d,
-            'is_use_proxy' => $this->is_use_proxy,
             'is_auto_bet' => $this->is_auto_bet,
+            'is_use_proxy' => $this->is_use_proxy,
             'expire_time' => $this->expire_time,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
@@ -89,6 +90,7 @@ class TzSystemsUsers extends TzSystemsUsersModel
             ->andFilterWhere(['like', 'ssc_domain', $this->ssc_domain])
             ->andFilterWhere(['like', 'cookie', $this->cookie])
             ->andFilterWhere(['like', 'user_agent', $this->user_agent])
+            ->andFilterWhere(['like', 'cookie_wx_web', $this->cookie_wx_web])
             ->andFilterWhere(['like', 'warn_val', $this->warn_val])
             ->andFilterWhere(['like', 'desc', $this->desc]);
 
