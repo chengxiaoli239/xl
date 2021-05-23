@@ -26,7 +26,7 @@ class LeCaiService extends BaseKj {
             $url = $domain.'/api/lottery-results/?dataStr='.$date.'&lotteryId=twk5&page=1&pageSize=5';
             $content = CurlService::httpGet($url);
 
-            if($content['success'] != 1) return false;
+            if(isset($content['success']) && $content['success'] != 1) return false;
             $data = $content['data']['rows'][0];
 
             $kjData = ['expect'=>$data['vol'], 'opentime'=>$data['openAt'], 'opencode'=>$data['result']];
