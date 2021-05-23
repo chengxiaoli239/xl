@@ -120,6 +120,81 @@ D、Form Data
 返回：
 {"success":true,"data":{"volActed":false,"countData":{"user_rp_money":0.0000,"earn_money":-0.200000,"money":0.2,"win_money":0.000000},"total":2,"rows":[{"id":"16217355569190500000","no":"162173555691905","vol":"20210523038","lotteryName":"台湾快五","price":0.1,"code":"1234","createdAt":"2021-05-23 10:05:57","note":"快选 2组","isCancel":false,"winMoney":0.000000,"odds":10000.000000000,"userRpMoney":0.0000,"earnMoney":0},{"id":"16217355569190500001","no":"162173555691905","vol":"20210523038","lotteryName":"台湾快五","price":0.1,"code":"1334","createdAt":"2021-05-23 10:05:57","note":"快选 2组","isCancel":false,"winMoney":0.000000,"odds":10000.000000000,"userRpMoney":0.0000,"earnMoney":0}]}}
 
+4、三定快译
+A、General
+Request URL: https://a1.888138.xyz/user-api/orders/bet?_uri=%2Forders%2Fbet&_nowTime=1621740107234&_sign=02282cad8acd0ba5ae61991e1923e345
+Request Method: POST
+
+B、Request Headers
+:authority: a1.888138.xyz
+:method: POST
+:path: /user-api/orders/bet?_uri=%2Forders%2Fbet&_nowTime=1621740107234&_sign=02282cad8acd0ba5ae61991e1923e345
+:scheme: https
+accept: application/json, text/plain, */*
+accept-encoding: gzip, deflate, br
+accept-language: zh-CN,zh;q=0.9
+content-length: 113
+content-type: application/x-www-form-urlencoded
+cookie: SESSION=YzhiNWE1OGMtMTNhMi00OTdmLTkyYTQtMjM4NTUwMTJlYjM5; main-lottery=twk5
+origin: https://a1.888138.xyz
+referer: https://a1.888138.xyz/game/kuai-yi
+sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"
+sec-ch-ua-mobile: ?0
+sec-fetch-dest: empty
+sec-fetch-mode: cors
+sec-fetch-site: same-origin
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36
+
+C、Query paramters
+_uri: /orders/bet
+_nowTime: 1621740107234
+_sign: 02282cad8acd0ba5ae61991e1923e345
+
+D、Form Data
+vol: 20210523053
+content: 132X:0.1/133X:0.1
+submitWay: 快译
+note: 千1百3十23
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

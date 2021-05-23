@@ -262,13 +262,14 @@ class ZhongFaService { # 宝岛众发登陆体系
      * @desc 返回和值投注
      * @return string
      */
-    public static function getOperationCondition($tz_type = 20){
-        if($tz_type == 27) {
-            $json = '{"symbol":"X","isXian":0,"firstNumber":"1","secondNumber":"34","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":20,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[],"symbolPositions":[0,0,0,0],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}';
-        }elseif ($tz_type == 29){
-            $json = '{"symbol":"X","isXian":0,"firstNumber":"13579","secondNumber":"","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":30,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[[[0,0,1,1],[1,3,5,7,9]]],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[],"symbolPositions":[0,0,0,0],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}';
+    public static function getOperationCondition($playway = 3){
+        if($playway == 2) {
+            $json = '千0123456789百0123456789十0123456789';
+        }elseif ($playway == 1){
+            $json = '千0123456789百0123456789';
         }else{
-            $json = '{"symbol":"X","isXian":0,"firstNumber":"","secondNumber":"","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":40,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[30,35],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[0,0,0,0],"symbolPositions":[],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}';
+            # 四定
+            $json = '千0123456789百0123456789个0123456789';
         }
 
         return $json;
@@ -568,43 +569,48 @@ class ZhongFaService { # 宝岛众发登陆体系
     public static function cancelOrder($id, $tz_system_id){
         $BettingRecords = BettingRecords::findOne($id);
         $uid = $BettingRecords->uid;
-        $snid = $BettingRecords->snid;
-        $sn = $BettingRecords->sn;
+        $snid = $BettingRecords->snid ? : $BettingRecords->sn;
         self::__init($uid, $tz_system_id);
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
         //$counts = (int)($BettingRecords->betting_money/$BettingRecords->single);
-        $post_data = [ 'ids'=>$snid, 'period_no' => $qihao];
+        $post_data = [ 'no'=>$snid, 'vol' => $qihao];
 
         $_t = round(microtime(true) * 1000);
+        $querys = [
+            '_nowTime' => $_t,
+            '_uri' => '/orders/cancel-by-no',
+        ];
+        $sign = ZhongFaService::getSign($querys);
+        $querys['_sign'] = $sign;
+
+        $urlArr = self::getTzSiteInfo(self::$tz_system_id);
+        $url = $urlArr['SSC_DOMAIN'].'/user-api/orders/cancel-by-no'.'?'.http_build_query($querys);
         $headers = [
-            'Accept: application/json, text/javascript, */*; q=0.01',
-            'Accept-Encoding: gunzip, deflate',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Connection: keep-alive',
-            'Content-Length:'.strlen(http_build_query($post_data)),
-            'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
-            'Cookie: '.$TzSystemsUsers->cookie,
-            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
-            'Origin: '.$TzSystemsUsers->ssc_domain,
-            'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
-            'X-Requested-With: XMLHttpRequest',
+            ':authority: '.$urlArr['domain'],
+            ':method: GET',
+            ':path: /user-api/captcha',
+            ':scheme: https',
+            'accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+            'accept-encoding: gunzip, deflate, br',
+            'accept-language: zh-CN,zh;q=0.9',
+            'referer: '.$TzSystemsUsers->ssc_domain.'/login',
+            'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+            'sec-ch-ua-mobile: ?0',
+            'sec-fetch-dest: image',
+            'sec-fetch-mode: no-cors',
+            'sec-fetch-site: same-origin',
             $TzSystemsUsers->user_agent,
         ];
 
-        $url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER').'?'.http_build_query($post_data);
-
         //$rst = CurlService::postCurl($url, $post_data, $headers);
         $rst = self::postBetCurl($url,$post_data, $headers, $TzSystemsUsers->uid);
-        if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
-            $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
+        if($rst['success']){
+            $BettingRecords = BettingRecords::findOne(['snid'=>$snid, 'uid'=>$uid]);
             $BettingRecords->cancel_status = 1;
             $BettingRecords->save();
             $rst['status'] = 200;
-        }else{
-            //if(isset($rst['Data'])) p($rst['Data'], 0);
-            //sleep(1);
         }
         $logArr = ['url'=>$url, 'snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
         Tool_Common::log('cancelOrder','INFO','撤单记录', $logArr);
@@ -957,20 +963,20 @@ class ZhongFaService { # 宝岛众发登陆体系
         $url = $urlArr['SSC_INDEX'].'/user-api/captcha';
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url'];
         $headers = [
-            ':authority: a1.888138.xyz',
+            ':authority: '.$urlArr['domain'],
             ':method: GET',
             ':path: /user-api/captcha',
             ':scheme: https',
             'accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
             'accept-encoding: gunzip, deflate, br',
             'accept-language: zh-CN,zh;q=0.9',
-            'referer: https://a1.888138.xyz/login',
+            'referer: '.$TzSystemsUsers->ssc_domain.'/login',
             'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
             'sec-ch-ua-mobile: ?0',
             'sec-fetch-dest: image',
             'sec-fetch-mode: no-cors',
             'sec-fetch-site: same-origin',
-            'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
+            $TzSystemsUsers->user_agent,
         ];
         $msg = '操作成功';
         $cookie = self::curlGetSevenCookie($url, $headers, $uid);
@@ -2090,7 +2096,7 @@ class ZhongFaService { # 宝岛众发登陆体系
                     'bet_log'=>$bet_log,
                     'is_package' => 0,
                     'period_no'=>$qihao,
-                    'operation_condition' => self::getOperationCondition(),
+                    'no' => self::getOperationCondition($playway),
                 ];
             }
 
@@ -2320,7 +2326,7 @@ class ZhongFaService { # 宝岛众发登陆体系
                         'bet_money'=>$single,
                         'submitWay'=>'快译',
                         'vol'=>$qihao,
-                        'note' => '千0123456789百0123456789十0123456789个0123456789', #self::getOperationCondition(),
+                        'note' => self::getOperationCondition($playway),
                     ];
                 }
             }

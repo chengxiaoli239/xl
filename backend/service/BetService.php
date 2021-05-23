@@ -1347,6 +1347,8 @@ abstract class BetService extends BaseBetService {
                 $rst = JuHuaBaseService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
             }
         }elseif(in_array($tz_system_id, [6])){
+            $rst = ZhongFaService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
+        }elseif(in_array($tz_system_id, [16])){
             # 6、会员网
             if($lottery_type == 5) { # 重庆时时彩
                 $rst = HuiYuanService5::cancelOrder($bet_id, $BettingRecords->tz_system_id);
