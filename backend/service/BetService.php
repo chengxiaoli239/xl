@@ -428,7 +428,7 @@ abstract class BetService extends BaseBetService {
                     $sn = $t_rst['sn'];
                     $planSnidArrs[$plan_id]['snids'][] = $snid;
                     $planSnidArrs[$plan_id]['sns'][] = $sn;
-                    Tool_Common::log('/repeatErrorBet/bet_rst', 'ERR', '网盘开盘状态-1', $logArr);
+                    Tool_Common::log('/repeatErrorBet/bet_rst', 'INFO', '网盘开盘状态-1', $logArr);
                 }elseif(!empty($activeQihao) && $qihao<$activeQihao){
                     $betErrorPlansTask->post_desc = json_encode(['Status'=>0, 'qihao'=>$qihao, 'activeQihao'=>$activeQihao, 'account'=>$account, 'push_time'=>date('Y-m-d H:i:s'), 'msg'=>'未开盘或者已关盘'], 320);
                     $betErrorPlansTask->status = 3; # 不可重推
