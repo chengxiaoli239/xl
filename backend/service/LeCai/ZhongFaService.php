@@ -1270,8 +1270,8 @@ class ZhongFaService { # 宝岛众发登陆体系
             $TzSystemsUsers->user_agent,
         ];
 
-        $logArr = ['url'=>$url];
         $data = self::httpGet($url, $headers, $uid, $time_out=15);
+        $logArr = ['uid'=>$uid, 'url'=>$url, 'headers'=>$headers, 'rst'=>$data];
 
         Tool_Common::log('/zhongfa/'.__FUNCTION__,'INFO','众发方案号', $logArr);
 
