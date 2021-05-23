@@ -1160,7 +1160,9 @@ class ZhongFaService { # 宝岛众发登陆体系
     public static function getSign($params=[]){
         $_nowTime = $params['_nowTime'];
         $paramsSplits = ['+', '-', '*', '/', '%', '&', '|', '!', '^', '@', '#', '$', '(', ')'];
-        $index = ($_nowTime + 4)%14;
+        $i = (int)($_nowTime + 4);
+        $index = $i%14;
+
         $split = $paramsSplits[$index];
         ksort($params);
         $sign_Arr = [];
@@ -1184,7 +1186,7 @@ class ZhongFaService { # 宝岛众发登陆体系
     public static function downLoadCodeImg($uid, $tz_system_id, $cookie_key){
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        $_t = (int)microtime(true) * 1000;
+        $_t = (int)(microtime(true) * 1000);
         $urlArr = self::getTzSiteInfo($TzSystemsUsers->tz_system_id);
         $url = $urlArr['SSC_INDEX'].'/user-api/captcha?timestamp='.$_t;
 
@@ -1230,9 +1232,10 @@ class ZhongFaService { # 宝岛众发登陆体系
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $qihao = HN0898Service::getQihao($lottery_type);
 
+        $_t = (int)(microtime(true) * 1000);
         $signParams = [
             '_uri' => '/orders/codes',
-            '_nowTime' => '',
+            '_nowTime' => $_t,
         ];
         $querys = [
             'isXian' => 0,
@@ -1573,8 +1576,8 @@ class ZhongFaService { # 宝岛众发登陆体系
             //# 获取方案号，记录id, 用于撤单
             $snInfo = self::getSn($row->uid, $row->tz_system_id, $row->lottery_type);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
             //$snid = '{'.$snInfo['sn'].'}|'.count(json_decode($row->codes)); # 多次下单需要分开，多次撤单
-            $sn = $snInfo['sn'];
-            $tmpRst['snid'] = $snid;
+            $sn = $snInfo['data']['rows'][0]['no'];
+            $tmpRst['snid'] = $sn;
             $tmpRst['sn'] = $sn;
             if(!empty($repeats)){
                 $post_data_1 = $post_data;

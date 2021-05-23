@@ -81,4 +81,46 @@ D、Form Data
 vol: 20210523036
 no: 162173506077344
 
+3、获取方案号
+A、General
+Request URL: https://a1.888138.xyz/user-api/orders/codes?isXian=0&rangeType=money&gameId=&isWin=0&lotteryId=twk5&vol=20210523038&page=1&pageSize=20&_uri=%2Forders%2Fcodes&_nowTime=1621735561858&_sign=e6c1d47702bd773593ead11d36388a86
+
+B、Request Headers
+:authority: a1.888138.xyz
+:method: GET
+:path: /user-api/orders/codes?isXian=0&rangeType=money&gameId=&isWin=0&lotteryId=twk5&vol=20210523038&page=1&pageSize=20&_uri=%2Forders%2Fcodes&_nowTime=1621735561858&_sign=e6c1d47702bd773593ead11d36388a86
+:scheme: https
+accept: application/json, text/plain, */*
+accept-encoding: gzip, deflate, br
+accept-language: zh-CN,zh;q=0.9
+cookie: SESSION=YzhiNWE1OGMtMTNhMi00OTdmLTkyYTQtMjM4NTUwMTJlYjM5; main-lottery=twk5
+referer: https://a1.888138.xyz/order/codes
+sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"
+sec-ch-ua-mobile: ?0
+sec-fetch-dest: empty
+sec-fetch-mode: cors
+sec-fetch-site: same-origin
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36
+
+C、Query String Paramters
+isXian: 0
+rangeType: money
+gameId: 
+isWin: 0
+lotteryId: twk5
+vol: 20210523038
+page: 1
+pageSize: 20
+_uri: /orders/codes
+_nowTime: 1621735561858
+_sign: e6c1d47702bd773593ead11d36388a86
+
+D、Form Data
+
+返回：
+{"success":true,"data":{"volActed":false,"countData":{"user_rp_money":0.0000,"earn_money":-0.200000,"money":0.2,"win_money":0.000000},"total":2,"rows":[{"id":"16217355569190500000","no":"162173555691905","vol":"20210523038","lotteryName":"台湾快五","price":0.1,"code":"1234","createdAt":"2021-05-23 10:05:57","note":"快选 2组","isCancel":false,"winMoney":0.000000,"odds":10000.000000000,"userRpMoney":0.0000,"earnMoney":0},{"id":"16217355569190500001","no":"162173555691905","vol":"20210523038","lotteryName":"台湾快五","price":0.1,"code":"1334","createdAt":"2021-05-23 10:05:57","note":"快选 2组","isCancel":false,"winMoney":0.000000,"odds":10000.000000000,"userRpMoney":0.0000,"earnMoney":0}]}}
+
+
+
+
 

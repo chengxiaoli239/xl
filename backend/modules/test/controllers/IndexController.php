@@ -229,6 +229,8 @@ class IndexController extends Controller
 
     public function actionDw(){
         $ZhongFaService = new ZhongFaService();
+        $snInfo = ZhongFaService::getSn($uid=14, $tz_system_id=16, $lottery_type=18);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+        p($snInfo);
         $betRst = $ZhongFaService->repeatErrorBet($id=14);p($betRst);
         $loginRst = ZhongFaService::login($uid=14,$tz_system_id=16);p($loginRst);
         $rst = BetService::repeatErrorBet([18], $uid=14);p($rst);
