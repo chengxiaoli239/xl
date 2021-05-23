@@ -586,7 +586,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         $querys['_sign'] = $sign;
 
         $urlArr = self::getTzSiteInfo(self::$tz_system_id);
-        $url = $urlArr['SSC_DOMAIN'].'/user-api/orders/cancel-by-no'.'?'.http_build_query($querys);
+        $url = $urlArr['SSC_INDEX'].'/user-api/orders/cancel-by-no'.'?'.http_build_query($querys);
         $headers = [
             ':authority: '.$urlArr['domain'],
             ':method: GET',
@@ -604,7 +604,6 @@ class ZhongFaService { # 宝岛众发登陆体系
             $TzSystemsUsers->user_agent,
         ];
 
-        //$rst = CurlService::postCurl($url, $post_data, $headers);
         $rst = self::postBetCurl($url,$post_data, $headers, $TzSystemsUsers->uid);
         if($rst['success']){
             $BettingRecords = BettingRecords::findOne(['snid'=>$snid, 'uid'=>$uid]);

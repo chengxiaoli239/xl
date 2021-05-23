@@ -228,6 +228,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = ZhongFaService::cancelOrder($bet_id=29, $tz_system_id=16);p($rst);
         $ZhongFaService = new ZhongFaService();
         $snInfo = ZhongFaService::getSn($uid=14, $tz_system_id=16, $lottery_type=18);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         p($snInfo);
