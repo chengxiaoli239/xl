@@ -420,8 +420,8 @@ abstract class BetService extends BaseBetService {
                     $betRst = $BetService->repeatErrorBet($betErrorPlansTask->id);
                     $t_rst = $betRst['data']['bet_rst'];
                     $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = $t_rst;
-                    if($t_rst['status'] == 1){
-                        $betSuccess = 1;
+                    if($t_rst['status'] == 2){
+                        $betSuccess = true;
                     }
                     $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account' => $account, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'loginRst'=>$loginRst, 'betKey'=>$betKey, 'time'=>$time];
                     $snid = $t_rst['snid'];

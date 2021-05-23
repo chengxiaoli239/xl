@@ -1393,6 +1393,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $status = 0;
         if($tmpRst['Status'] == 1){
             $status = 2;
+            $tmpRst['status'] = $status; # 下注成功
             //# 获取方案号，记录id, 用于撤单
             $snInfo = self::getSn($row->uid, $row->tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
             $snid = '{'.$snInfo['sn'].'}|'.count(json_decode($row->codes)); # 多次下单需要分开，多次撤单
