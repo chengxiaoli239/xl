@@ -1224,22 +1224,53 @@ class ZhongFaService { # 宝岛众发登陆体系
      * @param $tz_system_id
      * @return array
      */
-    public static function getSn($uid, $tz_system_id){
-        $rst = self::userInfo($uid, $tz_system_id);
-        $data = [];
-        if(!isset($rst['Status']) OR $rst['Status'] !=1) return $data;
+    public static function getSn($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        //$rst = self::userInfo($uid, $tz_system_id);
+        self::__init($uid, $tz_system_id);
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $qihao = HN0898Service::getQihao($lottery_type);
 
-        //p($rst);
-        $data['sn'] = $rst['Data']['serial_no'];
-        $data['qihao'] = substr($rst['Data']['previous_period_no'], 2);
-        $tzDatas = $rst['Data']['Details'];
-        $snidStr = '';
-        foreach ($tzDatas as $tzData){
-            $snidStr .= $tzData['bet_id'].'|1,';
-        }
-        //$snidStr = trim('|1,', implode('|1,', $tzDatas));
-        $data['snid'] = trim($snidStr, ',');
-        Tool_Common::log('getSn','INFO','幸运五获取方案号', $data);
+        $signParams = [
+            '_uri' => '/orders/codes',
+            '_nowTime' => '',
+        ];
+        $querys = [
+            'isXian' => 0,
+            'rangeType' => 'money',
+            'gameId' => '',
+            'isWin' => '',
+            'lotteryId' => 'twk5',
+            'vol' => $qihao,
+            'page' => 1,
+            'pageSize' => 20,
+        ];
+        $sign = ZhongFaService::getSign($signParams);
+        $querys['_sign'] = $sign;
+        $querys = array_merge($signParams, $querys);
+        $urlArr = self::getTzSiteInfo($tz_system_id);
+        $url = $urlArr['SSC_INDEX'].'/user-api/orders/codes?'.http_build_query($querys);
+        $headers = [
+            ':authority: '.$urlArr['domain'],
+            ':method: GET',
+            ':path: /user-api/orders/codes?'.http_build_query($querys),
+            ':scheme: https',
+            'accept: application/json, text/plain, */*',
+            'accept-encoding: gzip, deflate, br',
+            'accept-language: zh-CN,zh;q=0.9',
+            'cookie: '.$TzSystemsUsers->cookie.'; main-lottery=twk5',
+            'referer: '.$TzSystemsUsers->ssc_domain.'/order/codes',
+            'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+            'sec-ch-ua-mobile: ?0',
+            'sec-fetch-dest: empty',
+            'sec-fetch-mode: cors',
+            'sec-fetch-site: same-origin',
+            $TzSystemsUsers->user_agent,
+        ];
+
+        $logArr = ['url'=>$url];
+        $data = self::httpGet($url, $headers, $uid, $time_out=15);
+
+        Tool_Common::log('getSn','INFO','众发方案号', $logArr);
 
         return $data;
     }
@@ -1540,8 +1571,8 @@ class ZhongFaService { # 宝岛众发登陆体系
         if($tmpRst['success'] == 1){
             $status = 2;
             //# 获取方案号，记录id, 用于撤单
-            $snInfo = self::getSn($row->uid, $row->tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
-            $snid = '{'.$snInfo['sn'].'}|'.count(json_decode($row->codes)); # 多次下单需要分开，多次撤单
+            $snInfo = self::getSn($row->uid, $row->tz_system_id, $row->lottery_type);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+            //$snid = '{'.$snInfo['sn'].'}|'.count(json_decode($row->codes)); # 多次下单需要分开，多次撤单
             $sn = $snInfo['sn'];
             $tmpRst['snid'] = $snid;
             $tmpRst['sn'] = $sn;
@@ -2166,7 +2197,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             $m->set($betKey, 1, $time);
 
             # 获取方案号，记录id, 用于撤单
-            $snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+            $snInfo = self::getSn(self::$user_id, self::$tz_system_id, $lottery_type);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
             $snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
             $snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
         }

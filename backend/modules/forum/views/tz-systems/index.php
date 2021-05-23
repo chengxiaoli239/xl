@@ -66,6 +66,21 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                             }
                         ],
+                        ['attribute'=>'is_auto_login', 'label'=>'自动登陆',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                $url0 = "/forum/tz-systems/switch-is-auto-login?id=".$model->id.'&status=1'; # 点击开启
+                                $url1 = "/forum/tz-systems/switch-is-auto-login?id=".$model->id.'&status=0'; # 点击关闭
+                                if($model->is_auto_login == 1){
+                                    $txt = "<font color='green'>已开启</font>" ;
+                                    return Html::a($txt, $url1, ['title' => '点击关闭']);
+                                }
+                                if(!$model->is_auto_login){
+                                    $txt = "<font color='red'>已关闭</font>";
+                                    return Html::a($txt, $url0, ['title' => '点击开启']);
+                                }
+                            }
+                        ],
                         //'type',
                         //'created_at',
                         //'updated_at',

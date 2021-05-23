@@ -60,6 +60,18 @@ class TzSystemsController extends BaseController
     }
 
     /**
+     * @desc 更新记录is_auto_login 0/1
+     * @param $id
+     * @return \yii\web\Response
+     */
+    public function actionSwitchIsAutoLogin($id){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $rst = HN0898Service::updateStatus($id, $model = '\backend\models\TzSystems', 'is_auto_login');
+
+        return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$rst['lottery_type']]);
+    }
+
+    /**
      * @desc 更新记录status状态 0/1
      * @param $id
      * @return \yii\web\Response

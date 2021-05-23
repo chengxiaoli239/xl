@@ -326,6 +326,21 @@ class UserController extends BaseController
      * @param $status
      * @return \yii\web\Response
      */
+    public function actionSwitchAutoLogin($id){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if(\Yii::$app->user->id == 1){
+            $rst = HN0898Service::updateStatus($id, $model = '\backend\models\TzSystemsUsers', 'is_auto_login');
+        }
+
+        return $this->redirect(['view']);
+    }
+
+    /**
+     * @desc 更新用户状态
+     * @param $id
+     * @param $status
+     * @return \yii\web\Response
+     */
     public function actionSwitchProxy($id){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if(\Yii::$app->user->id == 1){

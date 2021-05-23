@@ -10,4 +10,75 @@
     C、Request Headers
     D、Form Data
 1、四定快译
+A、General
+Request URL: https://a1.888138.xyz/user-api/orders/bet?_uri=%2Forders%2Fbet&_nowTime=1621734791188&_sign=d12b647498b57b568daf32060be96ea3
+Request Method: POST
+
+B、Request Headers
+:authority: a1.888138.xyz
+:method: POST
+:path: /user-api/orders/bet?_uri=%2Forders%2Fbet&_nowTime=1621734791188&_sign=d12b647498b57b568daf32060be96ea3
+:scheme: https
+accept: application/json, text/plain, */*
+accept-encoding: gzip, deflate, br
+accept-language: zh-CN,zh;q=0.9
+content-length: 1389
+content-type: application/x-www-form-urlencoded
+cookie: SESSION=YzhiNWE1OGMtMTNhMi00OTdmLTkyYTQtMjM4NTUwMTJlYjM5; main-lottery=twk5
+origin: https://a1.888138.xyz
+referer: https://a1.888138.xyz/game/kuai-xuan
+sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"
+sec-ch-ua-mobile: ?0
+sec-fetch-dest: empty
+sec-fetch-mode: cors
+sec-fetch-site: same-origin
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36
+
+C、Query String Paramters
+_uri: /orders/bet
+_nowTime: 1621734791188
+_sign: d12b647498b57b568daf32060be96ea3
+
+D、Form Data
+submitWay: 快选
+vol: 20210523035
+note: |-四字定-|,定位置|-取-|:千=|-12-|,百=|-3-|,十=|-4-|,个=|-5-|
+kuaiXuanParams: {"position_type":["position_get"],"ding_wei_codes":["12","3","4","5"],"pei_shu_quan_zhuan_codes":[null,null,null,null],"he_type":["get"],"he_codes":[],"he_positions":[[],[],[],[]],"bu_ding_wei_he_types":[],"bu_ding_wei_he_code":null,"he_value_range":[null,null],"quan_zhuan_codes":null,"shang_jiang_codes":null,"chu_codes":null,"han_code_filter":["get"],"han_code":null,"han_fu_code":null,"_2_chong_filter":[],"_2_2_chong_filter":[],"_3_chong_filter":[],"_4_chong_filter":[],"_2_xiong_di_filter":[],"_3_xiong_di_filter":[],"_4_xiong_di_filter":[],"dui_shu_filter":[],"dui_shu_codes":[null,null,null],"dan_filter":[],"dan_positions":[],"shuang_filter":[],"shuang_positions":[],"game_name":"四字定"}
+content: 1345:0.1/2345:0.1
+
+
+2、整单退
+A、General
+Request URL: https://a1.888138.xyz/user-api/orders/cancel-by-no?_uri=%2Forders%2Fcancel-by-no&_nowTime=1621735076794&_sign=492e696c423c13c77874e08646c80be5
+Request Method: POST
+
+B、Request Headers
+:authority: a1.888138.xyz
+:method: POST
+:path: /user-api/orders/cancel-by-no?_uri=%2Forders%2Fcancel-by-no&_nowTime=1621735076794&_sign=492e696c423c13c77874e08646c80be5
+:scheme: https
+accept: application/json, text/plain, */*
+accept-encoding: gzip, deflate, br
+accept-language: zh-CN,zh;q=0.9
+content-length: 34
+content-type: application/x-www-form-urlencoded
+cookie: SESSION=YzhiNWE1OGMtMTNhMi00OTdmLTkyYTQtMjM4NTUwMTJlYjM5; main-lottery=twk5
+origin: https://a1.888138.xyz
+referer: https://a1.888138.xyz/order/codes
+sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"
+sec-ch-ua-mobile: ?0
+sec-fetch-dest: empty
+sec-fetch-mode: cors
+sec-fetch-site: same-origin
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36
+
+C、Query String Paramters
+_uri: /orders/cancel-by-no
+_nowTime: 1621735076794
+_sign: 492e696c423c13c77874e08646c80be5
+
+D、Form Data
+vol: 20210523036
+no: 162173506077344
+
 
