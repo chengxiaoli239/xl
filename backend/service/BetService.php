@@ -629,7 +629,6 @@ abstract class BetService extends BaseBetService {
                     $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 2);
                 }elseif(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])) { # 二定 导入方案
                     $codesArr = UserSysPlansService::getImportCodes($plan_id);
-                    p(count($codesArr));
                 }elseif(in_array($tz_type, [31])) { # 五位二定
                     $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 5);
                 }elseif(in_array($tz_type, [33])) { # 二定号码翻倍切换
@@ -1044,7 +1043,7 @@ abstract class BetService extends BaseBetService {
            }
            # 4、投注号码 codes
            $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
-           p([$plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $codes]);
+           //p([$plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $codes]);
 
            $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id, $plan->uid); # 手动下注时，先删除缓存
 
