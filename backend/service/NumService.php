@@ -1221,8 +1221,8 @@ class NumService extends BaseService {
                                 }
                                 $query->andWhere($filter_poses_where);
                             }
-                            if(!empty($filters['filter_pos2'])){
-                                foreach ($filter_poses as $pos){
+                            if(!empty($filters['filter_pos2'])){ # 特殊过滤
+                                foreach ($filters['filter_pos2'] as $pos){
                                     if($pos==1){
                                         $tmp_pos = 3;
                                     } elseif($pos==2){
