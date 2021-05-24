@@ -1222,19 +1222,22 @@ class NumService extends BaseService {
                                 $query->andWhere($filter_poses_where);
                             }
                             if(!empty($filters['filter_pos2'])){ # 特殊过滤
-                                foreach ($filters['filter_pos2'] as $pos){
+                                $tmp_filter2_where = ['OR'];
+                                $filter_pos2 = $filters['filter_pos2'];
+                                sort($filter_pos2);
+                                foreach ($filter_pos2 as $pos){
                                     if($pos==1){
                                         $tmp_pos = 3;
                                     } elseif($pos==2){
                                         $tmp_pos = 4;
                                     } elseif($pos==3){
                                         $tmp_pos = 1;
-                                    } elseif($pos==3){
+                                    } elseif($pos==4){
                                         $tmp_pos = 2;
                                     }
-                                    $filter_poses_where[] = ['<>', 'code_'.$pos, $sscKjData['code'.$tmp_pos]];
+                                    $tmp_filter2_where[] = ['<>', 'code_'.$tmp_pos, $sscKjData['code'.$pos]];
                                 }
-
+                                $query->andWhere($tmp_filter2_where);
                             }
                         }
                     }
