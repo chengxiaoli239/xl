@@ -1175,9 +1175,10 @@ class NumService extends BaseService {
         }
         $query = Num4Type::find()->where($where);
 
-        ################## filters过滤参数开始 ##################
+        ###################################################### filters过滤参数开始05.24 ######################################################
+        # 1、排除前x期 05.24
         if(in_array($code_type, [2,3,4]) && isset($codes_hz['filters']) && isset($codes_hz['filters']['is_filter']) && $codes_hz['filters']['is_filter']==1){
-            $filters=$codes_hz['filters'];
+            $filters = $codes_hz['filters'];
             //p($filters);
             if(!empty($codes)){
                 $filter_poses = NumService::getFilterPosByCode($codes[0]); # 根据导入的号码判断要过滤的位置
@@ -1190,7 +1191,7 @@ class NumService extends BaseService {
                     $qihao = HN0898Service::getCurrentQihao($lottery_type);
                     $index_id = SscKjData::find()->where(['AND', ['=', 'qihao', $qihao], ['=','lottery_type', $lottery_type]])->asArray()->one()['index_id'];
                     $filter_index_ids = [];
-                    if(isset($filters['filter_xQ_before']) && !empty($filters['filter_xQ_before'])){ # 1,2;4~6
+                    if(isset($filters['filter_xQ_before']) && !empty($filters['filter_xQ_before'])){ # 1,2;4~6 前x期
                         $tmp_filter_index_Arrs = explode(';', $filters['filter_xQ_before']);
                         foreach ($tmp_filter_index_Arrs as $tmp_filter_index_Arr){
                             if(strpos($tmp_filter_index_Arr, ',') !== false){ # 1,2
@@ -1216,28 +1217,23 @@ class NumService extends BaseService {
                             $SscKjDatas = SscKjData::find()->where(['AND', ['IN', 'index_id', $filter_index_ids], ['=', 'lottery_type', $lottery_type]])->asArray()->all();
                             foreach ($SscKjDatas as $sscKjData){
                                 $filter_poses_where = ['OR', ];
+                                # pos1
                                 foreach ($filter_poses as $pos){
                                     $filter_poses_where[] = ['<>', 'code_'.$pos, $sscKjData['code'.$pos]];
                                 }
                                 $query->andWhere($filter_poses_where);
-                            }
-                            if(!empty($filters['filter_pos2'])){ # 特殊过滤
-                                $tmp_filter2_where = ['OR'];
-                                $filter_pos2 = $filters['filter_pos2'];
-                                sort($filter_pos2);
-                                foreach ($filter_pos2 as $pos){
-                                    if($pos==1){
-                                        $tmp_pos = 3;
-                                    } elseif($pos==2){
-                                        $tmp_pos = 4;
-                                    } elseif($pos==3){
-                                        $tmp_pos = 1;
-                                    } elseif($pos==4){
-                                        $tmp_pos = 2;
+
+                                # pos2
+                                if(!empty($filters['filter_pos2'])){ # 特殊过滤
+                                    $tmp_filter2_where = ['OR'];
+                                    $filter_pos2 = $filters['filter_pos2'];
+                                    sort($filter_pos2);
+                                    foreach ($filter_pos2 as $pos){
+                                        $index_pos = [1=>3, 2=>4, 3=>1, 4=>2]; # 对折位置
+                                        $tmp_filter2_where[] = ['<>', 'code_'.$index_pos[$pos], $sscKjData['code'.$pos]];
                                     }
-                                    $tmp_filter2_where[] = ['<>', 'code_'.$tmp_pos, $sscKjData['code'.$pos]];
+                                    $query->andWhere($tmp_filter2_where);
                                 }
-                                $query->andWhere($tmp_filter2_where);
                             }
                         }
                     }
@@ -1245,7 +1241,76 @@ class NumService extends BaseService {
                 $query->andWhere(['IN', 'code', $codes]);
             }
         }
-        ################## filters过滤参数结束 ##################
+
+        # 2、排除前x天同期 05.25
+        if(in_array($code_type, [2,3,4]) && isset($codes_hz['filter_dates']) && isset($codes_hz['filter_dates']['is_filter_date']) && $codes_hz['filter_dates']['is_filter_date']==1){
+            $filter_dates = $codes_hz['filter_dates'];
+            if(!empty($codes)){
+                $filter_poses = NumService::getFilterPosByCode($codes[0]); # 根据导入的号码判断要过滤的位置
+                if(!empty($filter_poses)){
+                    foreach ($filter_poses as $pos){
+                        $query->andWhere(['<>', 'code_'.$pos, 'X']);
+                    }
+                }
+                if($lottery_type && isset($filter_dates['filter_xD_before']) && !empty($filter_dates['filter_xD_before'])){
+                    $qihao = HN0898Service::getCurrentQihao($lottery_type);
+                    $sub_qihao = substr($qihao, -3, 3); # 短期号
+                    //p([$qihao, $sub_qihao]);
+                    # 以下待修改 05-24 20点40分
+                    $index_date = SscKjData::find()->where(['AND', ['=', 'qihao', $qihao], ['=','lottery_type', $lottery_type]])->asArray()->one()['date'];
+                    $filter_index_dates = [];
+                    if(isset($filter_dates['filter_xD_before']) && !empty($filter_dates['filter_xD_before'])){ # 1,2;4~6 # 前x天同期
+                        $tmp_filter_index_Arrs = explode(';', $filter_dates['filter_xD_before']);
+                        foreach ($tmp_filter_index_Arrs as $tmp_filter_index_Arr){
+                            if(strpos($tmp_filter_index_Arr, ',') !== false){ # 1,2
+                                $tmp_filter_index_Arr2 = explode(',', $tmp_filter_index_Arr);
+                                foreach ($tmp_filter_index_Arr2 as $tmp_index){
+                                    $filter_index_dates[] = date('Y-m-d', (strtotime($index_date) - $tmp_index*86400));
+                                }
+                            }elseif(strpos($tmp_filter_index_Arr, '~') !== false){ # 4~6
+                                $tmp_filter_index_Arr2 = explode('~', $tmp_filter_index_Arr);
+                                if(empty($tmp_filter_index_Arr2) OR count($tmp_filter_index_Arr2)<2) continue;
+                                sort($tmp_filter_index_Arr2); # 正序
+                                for ($i=$tmp_filter_index_Arr2[0]; $i<=end($tmp_filter_index_Arr2); $i++){
+                                    $filter_index_dates[] = date('Y-m-d', (strtotime($index_date) - $i*86400));
+                                }
+                            }else{
+                                if(is_string($tmp_filter_index_Arr)){
+                                    $tmp_filter_index_Arr = (int)$tmp_filter_index_Arr;
+                                }
+                                $filter_index_dates[] = date('Y-m-d', (strtotime($index_date) - $tmp_filter_index_Arr*86400)); # $tmp_filter_index_Arr 为整数
+                            }
+                        }
+                        if(!empty($filter_index_dates)){ # 过滤期的index_id
+                            $where_index_date = ['AND', ['IN', 'date', $filter_index_dates], ['=', 'lottery_type', $lottery_type], ['LIKE', 'qihao', '%'.$sub_qihao, false]];
+                            $SscKjDatas = SscKjData::find()->select(['qihao','date','kj_code','code1','code2','code3','code4'])->where($where_index_date)->asArray()->all();
+                            foreach ($SscKjDatas as $sscKjData){
+                                $filter_poses_where = ['OR', ];
+                                # pos1
+                                foreach ($filter_poses as $pos){
+                                    $filter_poses_where[] = ['<>', 'code_'.$pos, $sscKjData['code'.$pos]];
+                                }
+                                $query->andWhere($filter_poses_where);
+
+                                # pos2
+                                if(!empty($filter_dates['filter_date_pos2'])){ # 特殊过滤
+                                    $tmp_filter2_where = ['OR', ];
+                                    $filter_date_pos2 = $filter_dates['filter_date_pos2'];
+                                    sort($filter_date_pos2);
+                                    foreach ($filter_date_pos2 as $pos){
+                                        $index_pos = [1=>3, 2=>4, 3=>1, 4=>2]; # 对折位置
+                                        $tmp_filter2_where[] = ['<>', 'code_'.$index_pos[$pos], $sscKjData['code'.$pos]];
+                                    }
+                                    $query->andWhere($tmp_filter2_where);
+                                }
+                            }
+                        }
+                    }
+                }
+                $query->andWhere(['IN', 'code', $codes]);
+            }
+        }
+        ###################################################### filters过滤参数结束05.24 ######################################################
 
 
         $Num4Types = $query->asArray()->all();

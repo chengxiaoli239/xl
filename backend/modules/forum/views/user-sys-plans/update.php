@@ -34,9 +34,16 @@ if( $tz_type >= 17){
         'remove_arise' => $remove_arise,
         'hzArr' => $hzArr,
         'type_4ds_Arr' => $type_4ds_Arr,
+
+        # 1、排除前x期
         'is_filters' => $is_filters,
         'filter_pos1' => $filter_pos1,
         'filter_pos2' => $filter_pos2,
+
+        # 2、排除前x天同期
+        'is_filter_dates' => $is_filter_dates,
+        'filter_date_pos1' => $filter_date_pos1,
+        'filter_date_pos2' => $filter_date_pos2,
     ]) ?>
 
 </section>

@@ -119,12 +119,19 @@ class UserSysPlansController extends BaseController
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
         $plan_types = TzService::getTzPlanTypes();
 
-        ####### 排除参数开始 ########
+        ############################ 排除参数开始 #############################
+        # 1、排除前x期
         $model->is_filter = 0;
-        $model->filter_xQ_before = '';
+        $model->filter_xQ_before = ''; # x期
         $model->filter_pos1 = []; # 位置选项
         $model->filter_pos2 = []; # 位置选项
-        ####### 排除参数结束 ########
+
+        # 2、排除前x天同期
+        $model->is_filter_date = 0;
+        $model->filter_xD_before = ''; # x天
+        $model->filter_date_pos1 = []; # 位置选项
+        $model->filter_date_pos2 = []; # 位置选项
+        ############################ 排除参数结束 #############################
 
         $model->nums = UserSysPlansService::getDefaultTzNums($tz_type);
         $model->status = $model->status ? 1 : 0;
@@ -146,10 +153,17 @@ class UserSysPlansController extends BaseController
             'lottery_type' => $queryParams['lottery_type'],
             'playway' => $playway,
             'plan_types' => $plan_types,
+            'tz_sites_Arr' => $tz_sites_Arr,
+
+            # 1、排除前x期
             'is_filters' => $is_filters,
             'filter_pos1' => $filter_pos1,
             'filter_pos2' => $filter_pos2,
-            'tz_sites_Arr' => $tz_sites_Arr
+
+            # 2、排除前x天内同期
+            'is_filter_dates' => $is_filters,
+            'filter_date_pos1' => $filter_pos1,
+            'filter_date_pos2' => $filter_pos2,
         ];
         $data = array_merge($data, UserSysPlansService::getSysPlansTypeDatas($playway, $tz_type));
 
@@ -196,15 +210,27 @@ class UserSysPlansController extends BaseController
                 $where['uid'] = $this->_user_id;
             }
 
-            ####### 排除参数开始 ########
-            if(isset($hz_Arr_Data['filters']) && $filters=$hz_Arr_Data['filters']){
+            ############################ 排除参数开始 #############################
+            # 1、排除前x期
+            if(isset($hz_Arr_Data['filters'])){
+                $filters=$hz_Arr_Data['filters'];
                 $model->is_filter = $filters['is_filter'];
                 $model->filter_xQ_before = $filters['filter_xQ_before'];
                 $model->filter_pos1 = $filters['filter_pos1']; # 位置选项
                 $model->filter_pos2 = $filters['filter_pos2']; # 位置选项
             }
             unset($hz_Arr_Data['filters']);
-            ####### 排除参数结束 ########
+
+            # 2、排除前x天同期
+            if(isset($hz_Arr_Data['filter_dates'])){
+                $filter_dates=$hz_Arr_Data['filter_dates'];
+                $model->is_filter_date = $filter_dates['is_filter_date'];
+                $model->filter_xD_before = $filter_dates['filter_xD_before'];
+                $model->filter_date_pos1 = $filter_dates['filter_date_pos1']; # 位置选项
+                $model->filter_date_pos2 = $filter_dates['filter_date_pos2']; # 位置选项
+            }
+            unset($hz_Arr_Data['filter_dates']);
+            ############################ 排除参数结束 #############################
 
             $model->change_per = [];
             //$codes = ImportPlanCodes::findAll($where)->codes;
@@ -237,10 +263,17 @@ class UserSysPlansController extends BaseController
             'playway' => $model->playway,
             'lottery_type' => $model->lottery_type,
             'plan_types' => $plan_types,
+            'tz_sites_Arr' => $tz_sites_Arr,
+
+            # 1、排除前x期
             'is_filters' => $is_filters,
             'filter_pos1' => $filter_pos1,
             'filter_pos2' => $filter_pos2,
-            'tz_sites_Arr' => $tz_sites_Arr,
+
+            # 2、排除前x天内同期
+            'is_filter_dates' => $is_filters,
+            'filter_date_pos1' => $filter_pos1,
+            'filter_date_pos2' => $filter_pos2,
         ];
         $data = array_merge($data, UserSysPlansService::getSysPlansTypeDatas($model->playway, $model->tz_type));
         //p($data);
