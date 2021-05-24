@@ -1178,6 +1178,7 @@ class NumService extends BaseService {
         ################## filters过滤参数开始 ##################
         if(in_array($code_type, [2,3,4]) && isset($codes_hz['filters']) && isset($codes_hz['filters']['is_filter']) && $codes_hz['filters']['is_filter']==1){
             $filters=$codes_hz['filters'];
+            p($filters);
             if(!empty($codes)){
                 $filter_poses = NumService::getFilterPosByCode($codes[0]); # 根据导入的号码判断要过滤的位置
                 if(!empty($filter_poses)){
@@ -1187,7 +1188,6 @@ class NumService extends BaseService {
                 }
                 if($lottery_type && isset($filters['filter_xQ_before']) && !empty($filters['filter_xQ_before'])){
                     $qihao = HN0898Service::getCurrentQihao($lottery_type);
-                    $qihao = '20210523193';
                     $index_id = SscKjData::find()->where(['AND', ['=', 'qihao', $qihao], ['=','lottery_type', $lottery_type]])->asArray()->one()['index_id'];
                     $filter_index_ids = [];
                     if(isset($filters['filter_xQ_before']) && !empty($filters['filter_xQ_before'])){ # 1,2;4~6
@@ -1205,6 +1205,11 @@ class NumService extends BaseService {
                                 for ($i=$tmp_filter_index_Arr2[0]; $i<=end($tmp_filter_index_Arr2); $i++){
                                     $filter_index_ids[] = $index_id - $i + 1;
                                 }
+                            }else{
+                                if(is_string($tmp_filter_index_Arr)){
+                                    $tmp_filter_index_Arr = (int)$tmp_filter_index_Arr;
+                                }
+                                $filter_index_ids[] = $index_id - $tmp_filter_index_Arr + 1;
                             }
                         }
                         if(!empty($filter_index_ids)){ # 过滤期的index_id
@@ -1216,8 +1221,22 @@ class NumService extends BaseService {
                                 }
                                 $query->andWhere($filter_poses_where);
                             }
-                        }
+                            if(!empty($filters['filter_pos2'])){
+                                foreach ($filter_poses as $pos){
+                                    if($pos==1){
+                                        $tmp_pos = 3;
+                                    } elseif($pos==2){
+                                        $tmp_pos = 4;
+                                    } elseif($pos==3){
+                                        $tmp_pos = 1;
+                                    } elseif($pos==3){
+                                        $tmp_pos = 2;
+                                    }
+                                    $filter_poses_where[] = ['<>', 'code_'.$pos, $sscKjData['code'.$tmp_pos]];
+                                }
 
+                            }
+                        }
                     }
                 }
                 $query->andWhere(['IN', 'code', $codes]);
