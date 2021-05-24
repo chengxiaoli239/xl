@@ -228,6 +228,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = LeCaiService::getLotteryByUser($type='json', $lottery_type=18, $is_auto=2);p($data);
         $params = ['_nowTime'=>1621735076794, '_uri'=>'/orders/cancel-by-no'];
         $params = ['vol'=>''];
         $sign = ZhongFaService::getSign($params);p($sign);

@@ -2,7 +2,9 @@
 # 乐彩资讯 - https://www.tw666666.com/home/history?lotteryId=twk5
 namespace common\kj\lecai;
 
+use backend\models\TzSystemsUsers;
 use backend\service\CurlService;
+use backend\service\LeCai\ZhongFaService;
 use common\kj\BaseKj;
 use common\tools\Tool_Common;
 use  yii;
@@ -42,7 +44,7 @@ class LeCaiService extends BaseKj {
         $expect = $kjData['expect'];
 
         # 设置开奖数据缓存
-        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+        self::setKjDataCache($lottery_type, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
@@ -59,38 +61,69 @@ class LeCaiService extends BaseKj {
      * @param string $returnType
      * @return array|bool
      */
-    public static function getLotteryNo99($returnType = 'json', $is_auto = 1){
+    public static function getLotteryByUser($returnType = 'json', $lottery_type=18, $is_auto = 1) {
 
-        if($is_auto == 2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)){
-            $domain = BaseKj::getApiHostByRoute('/kj/xj-ssc/nine-nine');
-            $url = $domain.'/kaijiang/list.aspx?lot=jxssc';
-            $content = CurlService::httpGet($url);
-            $preg = "/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/ism"; // 这里是表达式，大神看看
-            preg_match_all($preg,$content,$matches);
+        if ($is_auto == 2 or !$kjData = self::getCurrentKjData($lottery_type)) {
 
-            $tdData = $matches[0][0];
+            $m = \Yii::$app->cache;
+            $TzSystemsUsers = TzSystemsUsers::find()->where(['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [16]] ])->all();
+            foreach ($TzSystemsUsers as $TzSystemsUsers) { # 用户账号去网盘抓数据
+                $mkey = 'getLotteryLucky_0_' . self::$lottery_type;
 
-            $preg = "/<tr align=\"center\" style=\"color:#330099;background-color:White;\">(.*?)<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/ism";
-            preg_match_all($preg,$tdData,$matcheDatas);
+                $t = microtime(true) * 1000;
+                $querys = ['_nowTime'=>$t, '_uri'=>'/lottery-results', 'page'=>1, 'pageSize'=>5];
+                $querys['sign'] = ZhongFaService::getSign($querys);
+                $domain =  str_replace('https://', '', str_replace('http://', '', $TzSystemsUsers->ssc_domain));
+                $url = $TzSystemsUsers->ssc_domain.'/user-api/lottery-results/?'.http_build_query($querys); #当前开奖号码
+                $headers = [
+                    ':authority: '.$domain,
+                    ':method: GET',
+                    ':path: /user-api/lottery-results/?'.http_build_query($querys),
+                    ':scheme: https',
+                    'accept: application/json, text/plain, */*',
+                    'accept-encoding: gzip, deflate, br',
+                    'accept-language: zh-CN,zh;q=0.9',
+                    'cookie: '.$TzSystemsUsers->cookie.'; main-lottery=twk5',
+                    'referer: '.$TzSystemsUsers->ssc_domain.'/lottery-result/',
+                    'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+                    'sec-ch-ua-mobile: ?0',
+                    'sec-fetch-dest: empty',
+                    'sec-fetch-mode: cors',
+                    'sec-fetch-site: same-origin',
+                    $TzSystemsUsers->user_agent,
+                ];
 
-            $kjData = ['expect'=>$matcheDatas[2][0], 'opentime'=>str_replace('/', '-', $matcheDatas[3][0]), 'opencode'=>$matcheDatas[4][0]];
+                $content = ZhongFaService::httpGet($url, $headers, $TzSystemsUsers->uid, $time_out=15);
+                $logArr = ['url' => $url, 'headers'=>$headers, 'content' => $content];
+                Tool_Common::log('/zhongfa/' . __FUNCTION__, 'INFO', '台湾快五', $logArr);
+
+                if (isset($content['success']) && $content['success'] != 1) return false;
+                if(!isset($content['data']['rows'][0])) return false;
+                $kj = $content['data']['rows'];
+                $data = $kj[0]['acted'] ? $kj[0] : $kj[1];
+
+                $kjData = ['expect' => $data['vol'], 'opentime' => $data['openAt'], 'opencode' => $data['result']];
+                $m->set($mkey, 1, 5);
+            }
         }
 
-        if(!$kjData) return false;
+        if (empty($kjData)) return false;
+
         $opencode = $kjData['opencode'];
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
 
         # 设置开奖数据缓存
-        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+        self::setKjDataCache($lottery_type, $expect, $kjData);
 
-        if($returnType == 'xml'){
+        if ($returnType == 'xml') {
             header("Content-type: application/xml");
-            echo'<?xml version="1.0" encoding="utf-8"?>';
-            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
-            ob_end_flush();exit;
-        }else{
-            return ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+            echo '<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="' . "$expect" . '" opencode="' . "$opencode" . '" opentime="' . "$opentime" . '" /></xml>';
+            ob_end_flush();
+            exit;
+        } else {
+            return ['expect' => $expect, 'opencode' => $opencode, 'opentime' => $opentime];
         }
     }
 
