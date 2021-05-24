@@ -1253,15 +1253,17 @@ class NumService extends BaseService {
                     }
                 }
                 if($lottery_type && isset($filter_dates['filter_xD_before']) && !empty($filter_dates['filter_xD_before'])){
-                    $qihao = HN0898Service::getCurrentQihao($lottery_type);
+                    $qihao = HN0898Service::getQihao($lottery_type);
                     $sub_qihao = substr($qihao, -3, 3); # 短期号
                     //p([$qihao, $sub_qihao]);
                     # 以下待修改 05-24 20点40分
-                    $index_date = SscKjData::find()->where(['AND', ['=', 'qihao', $qihao], ['=','lottery_type', $lottery_type]])->asArray()->one()['date'];
+                    //$index_date = SscKjData::find()->where(['AND', ['=', 'qihao', $qihao], ['=','lottery_type', $lottery_type]])->asArray()->one()['date'];
+                    $index_date = date('Y-m-d');
                     $filter_index_dates = [];
                     if(isset($filter_dates['filter_xD_before']) && !empty($filter_dates['filter_xD_before'])){ # 1,2;4~6 # 前x天同期
                         $tmp_filter_index_Arrs = explode(';', $filter_dates['filter_xD_before']);
                         foreach ($tmp_filter_index_Arrs as $tmp_filter_index_Arr){
+                            //p($tmp_filter_index_Arr);
                             if(strpos($tmp_filter_index_Arr, ',') !== false){ # 1,2
                                 $tmp_filter_index_Arr2 = explode(',', $tmp_filter_index_Arr);
                                 foreach ($tmp_filter_index_Arr2 as $tmp_index){
@@ -1281,9 +1283,11 @@ class NumService extends BaseService {
                                 $filter_index_dates[] = date('Y-m-d', (strtotime($index_date) - $tmp_filter_index_Arr*86400)); # $tmp_filter_index_Arr 为整数
                             }
                         }
+                        //p($filter_index_dates);
                         if(!empty($filter_index_dates)){ # 过滤期的index_id
                             $where_index_date = ['AND', ['IN', 'date', $filter_index_dates], ['=', 'lottery_type', $lottery_type], ['LIKE', 'qihao', '%'.$sub_qihao, false]];
                             $SscKjDatas = SscKjData::find()->select(['qihao','date','kj_code','code1','code2','code3','code4'])->where($where_index_date)->asArray()->all();
+                            p($SscKjDatas, 0);
                             foreach ($SscKjDatas as $sscKjData){
                                 $filter_poses_where = ['OR', ];
                                 # pos1
