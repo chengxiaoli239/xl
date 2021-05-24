@@ -1178,7 +1178,7 @@ class NumService extends BaseService {
         ################## filters过滤参数开始 ##################
         if(in_array($code_type, [2,3,4]) && isset($codes_hz['filters']) && isset($codes_hz['filters']['is_filter']) && $codes_hz['filters']['is_filter']==1){
             $filters=$codes_hz['filters'];
-            p($filters);
+            //p($filters);
             if(!empty($codes)){
                 $filter_poses = NumService::getFilterPosByCode($codes[0]); # 根据导入的号码判断要过滤的位置
                 if(!empty($filter_poses)){
