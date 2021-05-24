@@ -119,6 +119,13 @@ class UserSysPlansController extends BaseController
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
         $plan_types = TzService::getTzPlanTypes();
 
+        ####### 排除参数开始 ########
+        $model->is_filter = 0;
+        $model->filter_xQ_before = '';
+        $model->filter_pos1 = []; # 位置选项
+        $model->filter_pos2 = []; # 位置选项
+        ####### 排除参数结束 ########
+
         $model->nums = UserSysPlansService::getDefaultTzNums($tz_type);
         $model->status = $model->status ? 1 : 0;
         $model->playway = $playway;
@@ -130,12 +137,18 @@ class UserSysPlansController extends BaseController
         $defaultSiteId = UserService::getUserDefaultSite($this->_user_id);
         $model->tz_sites = [$defaultSiteId];
 
+        $is_filters = [1=>'是'];
+        $filter_pos1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
+        $filter_pos2 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
         $data =  [
             'model' => $model,
             'tz_type' => $tz_type,
             'lottery_type' => $queryParams['lottery_type'],
             'playway' => $playway,
             'plan_types' => $plan_types,
+            'is_filters' => $is_filters,
+            'filter_pos1' => $filter_pos1,
+            'filter_pos2' => $filter_pos2,
             'tz_sites_Arr' => $tz_sites_Arr
         ];
         $data = array_merge($data, UserSysPlansService::getSysPlansTypeDatas($playway, $tz_type));
@@ -182,6 +195,18 @@ class UserSysPlansController extends BaseController
             if($this->_user_id != 1){
                 $where['uid'] = $this->_user_id;
             }
+
+            ####### 排除参数开始 ########
+            if(isset($hz_Arr_Data['filters']) && $filters=$hz_Arr_Data['filters']){
+                $model->is_filter = $filters['is_filter'];
+                $model->filter_xQ_before = $filters['filter_xQ_before'];
+                $model->filter_pos1 = $filters['filter_pos1']; # 位置选项
+                $model->filter_pos2 = $filters['filter_pos2']; # 位置选项
+            }
+            unset($hz_Arr_Data['filters']);
+            ####### 排除参数结束 ########
+
+            $model->change_per = [];
             //$codes = ImportPlanCodes::findAll($where)->codes;
             $ImportPlanCodes = ImportPlanCodes::find()->where($where)->asArray()->all();
             if(!empty($ImportPlanCodes)){
@@ -189,7 +214,7 @@ class UserSysPlansController extends BaseController
                 foreach ($codes as $k=>$code){
                     $codes[$k] = str_replace('@', ' ', str_replace(',', '', $code));
                 }
-                $model->change_per = [$hz_Arr_Data['change_per']];
+                $model->change_per = $hz_Arr_Data['change_per'] ? [$hz_Arr_Data['change_per']] : [];
                 $model->import_codes_txts = $codes;
             }
             foreach ($hz_Arr_Data as $key=>$val){
@@ -203,12 +228,18 @@ class UserSysPlansController extends BaseController
         }
         $plan_types = TzService::getTzPlanTypes();
 
+        $is_filters = [1=>'是'];
+        $filter_pos1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
+        $filter_pos2 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
         $data =  [
             'model' => $model,
             'tz_type' => $model->tz_type,
             'playway' => $model->playway,
             'lottery_type' => $model->lottery_type,
             'plan_types' => $plan_types,
+            'is_filters' => $is_filters,
+            'filter_pos1' => $filter_pos1,
+            'filter_pos2' => $filter_pos2,
             'tz_sites_Arr' => $tz_sites_Arr,
         ];
         $data = array_merge($data, UserSysPlansService::getSysPlansTypeDatas($model->playway, $model->tz_type));

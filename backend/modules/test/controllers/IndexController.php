@@ -228,13 +228,15 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $params = ['_nowTime'=>1621735076794, '_uri'=>'/orders/cancel-by-no'];
+        $params = ['vol'=>''];
+        $sign = ZhongFaService::getSign($params);p($sign);
         $rst = ZhongFaService::cancelOrder($bet_id=31, $tz_system_id=16);p($rst);
         $ZhongFaService = new ZhongFaService();
         $snInfo = ZhongFaService::getSn($uid=14, $tz_system_id=16, $lottery_type=18);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         p($snInfo);
         $betRst = $ZhongFaService->repeatErrorBet($id=14);p($betRst);
         $loginRst = ZhongFaService::login($uid=14,$tz_system_id=16);p($loginRst);
-        $rst = BetService::repeatErrorBet([18], $uid=14);p($rst);
         $betService = new ZhongFaService();
         $betService->postBatchBetInsert('20210522203', $plan_id=1805, '2,3,4,5@3,4,5,6');
         $rst = ZhongFaService::getCookie($uid=14,$tz_system_id=16);p($rst);
@@ -306,7 +308,6 @@ class IndexController extends Controller
         $data = JiaNaDa::getLotteryCanada($type='json', $is_auto=2);p($data);
         $data = JiaNaDa::getLottery($type='json', $is_auto=2);p($data);
         $activeQihao = BetService::getActiveQihao($uid=24, $tz_system_id=9, $lottery_type=8);p($activeQihao);
-        $rst = BetService::repeatErrorBet();p($rst);
         $rst = BingDaoService::login($uid = 12, $tz_system_id = 13);p($rst);
         //PoxyIPService::delProxyUidsKey();
         $rst = PoxyIPService::getProxyUids();p($rst);
@@ -713,7 +714,7 @@ class IndexController extends Controller
         //$rst = NumService::getCodesArise_bak(['12345']);p($rst);
         $rst = StaticService::staticKj3NumCounts();p($rst);
         $arr = [['reach_val'=>100, 'reduce_val'=>10], ['reach_val'=>300, 'reduce_val'=>50]];p(json_encode($arr));
-        $codes = BetService::getCodes(2, 3, 20, 1, 0.1, 1, '35,36');p($codes);
+        $codes = BetService::getCodes(3, 20, 1, 0.1, 1, '35,36');p($codes);
         $rst = SevenService::sscIndex(3, 3);p($rst); # 用户信息
         $rst = BetService::userSysPlansTzNow(81, 3); p($rst);
         $rst = CqsscSevenDay::getLotteryNo(); p($rst);

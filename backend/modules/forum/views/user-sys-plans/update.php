@@ -34,6 +34,9 @@ if( $tz_type >= 17){
         'remove_arise' => $remove_arise,
         'hzArr' => $hzArr,
         'type_4ds_Arr' => $type_4ds_Arr,
+        'is_filters' => $is_filters,
+        'filter_pos1' => $filter_pos1,
+        'filter_pos2' => $filter_pos2,
     ]) ?>
 
 </section>

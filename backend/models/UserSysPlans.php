@@ -99,6 +99,13 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $desc; # 计划备注
     //public $type_3_txt; # 三定-导入
     //public $type_4_txt; # 四定-导入
+
+    ###### 排除过滤参数开始 #######
+    public $is_filter; # 是否排除
+    public $filter_xQ_before; # 前多少期，获取区间
+    public $filter_pos1; # 排除那些位置，四个多选框
+    public $filter_pos2; # 排除那些位置，四个多选框
+    ###### 排除过滤参数结束 #######
     /**
      * @inheritdoc
      */

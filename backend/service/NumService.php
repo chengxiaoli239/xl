@@ -767,10 +767,10 @@ class NumService extends BaseService {
     /**
      * @desc 快选功能过滤
      * @param $codes_hz array
-     * @param $type 1一定2二定3三定4四定
+     * @param int $code_type 1一定2二定3三定4四定
      * @return array
      */
-    public static function getCodesKuaiXuan($codes_hz, $code_type = 4) {
+    public static function getCodesKuaiXuan($codes_hz, $code_type = 4, $codes=[], $lottery_type='') {
         //p([$codes_hz, $code_type],0);
         if(empty($codes_hz)) return [];
 
@@ -1173,8 +1173,62 @@ class NumService extends BaseService {
                 $where = array_merge($where, [$tmpArisewhere]);
             }
         }
-        $Num4Types = Num4Type::find()->where($where)->asArray()->all();
+        $query = Num4Type::find()->where($where);
+
+        ################## filters过滤参数开始 ##################
+        if(in_array($code_type, [2,3,4]) && isset($codes_hz['filters']) && isset($codes_hz['filters']['is_filter']) && $codes_hz['filters']['is_filter']==1){
+            $filters=$codes_hz['filters'];
+            if(!empty($codes)){
+                $filter_poses = NumService::getFilterPosByCode($codes[0]); # 根据导入的号码判断要过滤的位置
+                if(!empty($filter_poses)){
+                    foreach ($filter_poses as $pos){
+                        $query->andWhere(['<>', 'code_'.$pos, 'X']);
+                    }
+                }
+                if($lottery_type && isset($filters['filter_xQ_before']) && !empty($filters['filter_xQ_before'])){
+                    $qihao = HN0898Service::getCurrentQihao($lottery_type);
+                    $qihao = '20210523193';
+                    $index_id = SscKjData::find()->where(['AND', ['=', 'qihao', $qihao], ['=','lottery_type', $lottery_type]])->asArray()->one()['index_id'];
+                    $filter_index_ids = [];
+                    if(isset($filters['filter_xQ_before']) && !empty($filters['filter_xQ_before'])){ # 1,2;4~6
+                        $tmp_filter_index_Arrs = explode(';', $filters['filter_xQ_before']);
+                        foreach ($tmp_filter_index_Arrs as $tmp_filter_index_Arr){
+                            if(strpos($tmp_filter_index_Arr, ',') !== false){ # 1,2
+                                $tmp_filter_index_Arr2 = explode(',', $tmp_filter_index_Arr);
+                                foreach ($tmp_filter_index_Arr2 as $tmp_index){
+                                    $filter_index_ids[] = $index_id - $tmp_index + 1;
+                                }
+                            }elseif(strpos($tmp_filter_index_Arr, '~') !== false){ # 4~6
+                                $tmp_filter_index_Arr2 = explode('~', $tmp_filter_index_Arr);
+                                if(empty($tmp_filter_index_Arr2) OR count($tmp_filter_index_Arr2)<2) continue;
+                                sort($tmp_filter_index_Arr2); # 正序
+                                for ($i=$tmp_filter_index_Arr2[0]; $i<=end($tmp_filter_index_Arr2); $i++){
+                                    $filter_index_ids[] = $index_id - $i + 1;
+                                }
+                            }
+                        }
+                        if(!empty($filter_index_ids)){ # 过滤期的index_id
+                            $SscKjDatas = SscKjData::find()->where(['AND', ['IN', 'index_id', $filter_index_ids], ['=', 'lottery_type', $lottery_type]])->asArray()->all();
+                            foreach ($SscKjDatas as $sscKjData){
+                                $filter_poses_where = ['OR', ];
+                                foreach ($filter_poses as $pos){
+                                    $filter_poses_where[] = ['<>', 'code_'.$pos, $sscKjData['code'.$pos]];
+                                }
+                                $query->andWhere($filter_poses_where);
+                            }
+                        }
+
+                    }
+                }
+                $query->andWhere(['IN', 'code', $codes]);
+            }
+        }
+        ################## filters过滤参数结束 ##################
+
+
+        $Num4Types = $query->asArray()->all();
         $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+        //p(['where'=>$where, 'index_id'=>$index_id, 'filter_index_ids'=>$filter_index_ids, 'filters'=>$filters, 'code'=>$codes, 'end'=>$codesArr]);
         //p(['where'=>$where, 'codes_hz'=>$codes_hz, 'codesArr'=>$codesArr]);
 
          # 上奖
@@ -1215,6 +1269,21 @@ class NumService extends BaseService {
         //p(count($datas));
 
         return $datas;
+    }
+
+    /**
+     * @desc 获取过滤位置 by code 目前注意针对导入之后再过滤的情况
+     * @param string $code
+     * @param string $split
+     * @return array
+     */
+    public static function getFilterPosByCode($code='', $split=','){
+        $codeArr = explode($split, $code);
+        $poses = [];
+        foreach ($codeArr as $k=>$n){
+            if($n != 'X') $poses[] = $k+1;
+        }
+        return $poses;
     }
 
     /**

@@ -321,22 +321,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 补打失败计划
-     * @return array
-     */
-    public function actionRepeatBetErrorPlans(){
-        self::_init();
-        $rst = ['status'=>200, 'msg'=>'操作成功'];
-        $post = \Yii::$app->request->post();
-        for ($i=0; $i<6; $i++){
-            $rst[$i]['rst'] = BetService::repeatErrorBet($post['lottery_types'], $post['uid']);
-            sleep(3);
-        }
-
-        return $rst;
-    }
-
-    /**
      * @desc 同步宝塔计划任务
      * @return array|bool|string
      */
@@ -383,7 +367,7 @@ class IndexController extends Controller
     /**
      * @description 同步余额
      * @return array
-     * @throws NotFoundHttpException
+     * @throws - NotFoundHttpException
      */
     public function actionSynBalance(){
         self::_init();

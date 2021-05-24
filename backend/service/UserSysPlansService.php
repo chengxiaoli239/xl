@@ -361,6 +361,23 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['current_miss'] = 0;
         }
 
+        ################## 排除参数开始 ##################
+        $filters = [];
+        if(isset($UserSysPlans['is_filter'][0]) && $UserSysPlans['is_filter'][0]==1){
+            $filter_xQ_before = '';
+            isset($UserSysPlans['filter_xQ_before']) && ($filter_xQ_before = $UserSysPlans['filter_xQ_before']);
+            $filter_xQ_before = str_replace('；', ';', str_replace('，', ',', $filter_xQ_before));
+            $filters = array_merge($filters, [
+                'is_filter' => 1,
+                'filter_xQ_before' => (!empty($filter_xQ_before))? trim($filter_xQ_before):'',
+                'filter_pos1' => (isset($UserSysPlans['filter_pos1']) && !empty($UserSysPlans['filter_pos1']))? $UserSysPlans['filter_pos1']:[],
+                'filter_pos2' => (isset($UserSysPlans['filter_pos2']) && !empty($UserSysPlans['filter_pos2']))? $UserSysPlans['filter_pos2']:[],
+            ]);
+        }
+        $tmpFilter['filters'] = $filters;
+        unset($UserSysPlans['is_filter'], $UserSysPlans['filter_xQ_before'], $UserSysPlans['filter_pos1'], $UserSysPlans['filter_pos2']);
+        ################## 排除参数结束 ##################
+
         if(!in_array($tz_type, [22, 23, 24])){ # 四定和值、上奖全倒、直码
             $hz_Arr = json_encode($tmpFilter, 320);
             $post['UserSysPlans']['hz_Arr'] = !empty($hz_Arr) ? $hz_Arr : '';
@@ -551,7 +568,12 @@ class UserSysPlansService extends BaseService {
         $key = ($hzArr['change_per']==0 OR $hzArr['turn_key']==0) ? 0 : $hzArr['turn_key'];
         $data = ImportPlanCodes::find()->where(['plan_id'=>$plan_id, 'plan_id_sort_key'=>$key])->one();
 
+        $code_types = [1=>2, 2=>3, 3=>4]; # playway:code_type
         $codes = explode('@',$data->codes);
+        if(isset($hzArr['filters']) && isset($hzArr['filters']['is_filter']) && $hzArr['filters']['is_filter']==1){
+            $codes = NumService::getCodesKuaiXuan($hzArr, $code_types[$plan->playway], $codes, $plan->lottery_type);
+        }
+
 
         return $codes;
     }

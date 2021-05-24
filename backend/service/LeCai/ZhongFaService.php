@@ -595,7 +595,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             'accept: application/json, text/plain, */*',
             'accept-encoding: gzip, deflate, br',
             'accept-language: zh-CN,zh;q=0.9',
-            'content-length: 34',
+            'content-length: '.strlen(http_build_query($post_data)),
             'content-type: application/x-www-form-urlencoded',
             'cookie: '.$TzSystemsUsers->cookie.'; main-lottery=twk5',
             'origin: '.$TzSystemsUsers->ssc_domain,
@@ -1525,7 +1525,7 @@ class ZhongFaService { # 宝岛众发登陆体系
     }
 
     /**
-     * @desc 重复下注失败的号码 - 幸运五  目前为正常下注入口
+     * @desc 目前为计划任务正常下注入口 2021.05.23
      * @param $id
      */
     public function repeatErrorBet($id){
@@ -1979,16 +1979,6 @@ class ZhongFaService { # 宝岛众发登陆体系
         return $rst;
     }
 
-    public static function queryBetInfo(){
-
-
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-
-        $lottery = self::getSiteLottery($lottery_type);
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetTheLastThree?lottery='.$lottery;
-
-    }
-
     /**
      * @decription 新版投注，真实投注入口， 未完待续 2018.12.23
      *
@@ -2004,7 +1994,7 @@ class ZhongFaService { # 宝岛众发登陆体系
      * @return array
      */
     public function bet($qihao, $plan_id, $codes){
-        return $this->postBatchBet($qihao, $plan_id, $codes);
+        return $this->postBatchBet($qihao, $plan_id, $codes, $is_task=0);
     }
 
     /**
@@ -2038,7 +2028,7 @@ class ZhongFaService { # 宝岛众发登陆体系
      * @param $codes
      * @return array
      */
-    public static function postBatchBet($qihao, $plan_id, $codes){
+    public static function postBatchBetBak($qihao, $plan_id, $codes){
         $tmpCodes = $codes;
         $plan = UserSysPlans::findOne($plan_id);
         if($plan->tz_type == 22){ # 四定单双,codes格式：13579,13579,02468,13579@13579,13579,02468,02468@13579,02468,13579,13579
@@ -2071,7 +2061,15 @@ class ZhongFaService { # 宝岛众发登陆体系
 
         $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
 
-        $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL');//.'?'.http_build_query($post_data);
+        $_t = round(microtime(true) * 1000);
+        $urlArr = self::getTzSiteInfo(self::$tz_system_id);//.'?'.http_build_query($post_data);
+        $querys = [
+            '_uri' => '/orders/bet',
+            '_nowTime' => $_t
+        ];
+        $sign = ZhongFaService::getSign($querys);
+        $querys['_sign'] = $sign;
+        $url = $urlArr['SSC_INDEX'].'/user-api/orders/bet?'.http_build_query($querys);
         $way = self::getWay($tz_type);
         $snInfo_sn = '';
         $snInfo_snid = '';
@@ -2086,20 +2084,13 @@ class ZhongFaService { # 宝岛众发登陆体系
                 ];
 
             }else{ # 四定、三定、X字现
-                $is_xian = in_array($tz_type, \Yii::$app->params['IS_XIAN']) ? 1 : 0;
-                $bet_codes = implode(',', $tmpcodesArr);
+                $bet_codes = trim(implode(':'.$single.'/', $tmpcodesArr), '/').':'.$single;
                 $post_data = [
-                    'bet_number'=>$bet_codes,
+                    'content'=>$bet_codes,
                     'bet_money'=>$single,
-                    'bet_way'=>$way,
-                    'is_xian'=>$is_xian,
-                    'is_iframe' => 1,
-                    'number_type'=> LuckyBaseService::getNumType($tz_type, $playway),
-                    //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
-                    'bet_log'=>$bet_log,
-                    'is_package' => 0,
-                    'period_no'=>$qihao,
-                    'no' => self::getOperationCondition($playway),
+                    'submitWay'=>'快译',
+                    'vol'=>$qihao,
+                    'note' => self::getOperationCondition($playway),
                 ];
             }
 
@@ -2113,19 +2104,23 @@ class ZhongFaService { # 宝岛众发登陆体系
                 return ['status'=>303, 'msg'=>$msg];
             }
             $headers = [
-                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-                'Accept-Encoding: gunzip, deflate',
-                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-                'Cache-Control: max-age=0',
-                'Connection: keep-alive',
-                'Content-Length:'.strlen(http_build_query($post_data)),
-                //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
-                'Content-Type: application/x-www-form-urlencoded',
-                'Cookie: '.$TzSystemsUsers->cookie,
-                'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
-                'Origin: '.$TzSystemsUsers->ssc_domain,
-                'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
-                'Upgrade-Insecure-Requests: 1',
+                ':authority: '.$urlArr['domain'],
+                ':method: POST',
+                ':path: /user-api/orders/bet?_uri=%2Forders%2Fbet&_nowTime='.$_t.'&_sign='.$sign,
+                ':scheme: https',
+                'accept: application/json, text/plain, */*',
+                'accept-encoding: gzip, deflate, br',
+                'accept-language: zh-CN,zh;q=0.9',
+                'content-length: '.strlen(http_build_query($post_data)),
+                'content-type: application/x-www-form-urlencoded',
+                'cookie: '.$TzSystemsUsers->cookie.'; main-lottery=twk5',
+                'origin: '.$TzSystemsUsers->ssc_domain,
+                'referer: '.$TzSystemsUsers->ssc_domain.'/game/kuai-yi',
+                'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+                'sec-ch-ua-mobile: ?0',
+                'sec-fetch-dest: empty',
+                'sec-fetch-mode: cors',
+                'sec-fetch-site: same-origin',
                 $TzSystemsUsers->user_agent,
             ];
 
@@ -2258,9 +2253,10 @@ class ZhongFaService { # 宝岛众发登陆体系
      * @param $qihao
      * @param $plan_id
      * @param $codes - 1,2,3,4@2,3,4,5@5,6,7,8
+     * @param int $is_task - 任务类型
      * @return array
      */
-    public function postBatchBetInsert($qihao, $plan_id, $codes){
+    public function postBatchBet($qihao, $plan_id, $codes, $is_task=1){
         $tmpCodes = $codes;
         $plan = UserSysPlans::findOne($plan_id);
         if($plan->tz_type == 22){ # 四定单双,codes格式：13579,13579,02468,13579@13579,13579,02468,02468@13579,02468,13579,13579
@@ -2302,36 +2298,14 @@ class ZhongFaService { # 宝岛众发登陆体系
         $snInfo_snid = '';
         $rst = [];
         foreach ($codesArrs as $key=>$tmpcodesArr){
-            $bet_log = self::getBetLog($tz_type);
             if($playway == 4){ # 一字定
-                $post_data = [
-                    'bets' => json_encode($tmpcodesArr),
-                    'way' => $way,
-                    'period_no' => $qihao,
-                ];
-
-            }else{ # 四定、三定
-                if(in_array($plan->uid, \Yii::$app->params['IMPORT_CODES_KUAIYI_UIDS']) && in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
-                    $bets = self::getBetCodes($codes, $plan->single, $plan->playway, $plan->uid);
-                    $post_data = [
-                        'totalCount' => count($tmpcodesArr),
-                        'totalBetMoney' => $single,
-                        'bets' => json_encode($bets),
-                        'way' => $way,
-                        'period_no' => $qihao,
-                        'bet_log' => '1234%201234%20',
-                    ];
-
-                }else{
-                    $bet_codes = trim(implode(':'.$single.'/', $tmpcodesArr), '/').':'.$single;
-                    $post_data = [
-                        'content'=>$bet_codes,
-                        'bet_money'=>$single,
-                        'submitWay'=>'快译',
-                        'vol'=>$qihao,
-                        'note' => self::getOperationCondition($playway),
-                    ];
-                }
+                $post_data = [ 'bets' => json_encode($tmpcodesArr), 'way' => $way, 'period_no' => $qihao, ];
+            }elseif(in_array($plan->uid, \Yii::$app->params['IMPORT_CODES_KUAIYI_UIDS']) && in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
+                $bets = self::getBetCodes($codes, $plan->single, $plan->playway, $plan->uid);
+                $post_data = [ 'totalCount' => count($tmpcodesArr), 'totalBetMoney' => $single, 'bets' => json_encode($bets), 'way' => $way, 'period_no' => $qihao];
+            }else{
+                $bet_codes = trim(implode(':'.$single.'/', $tmpcodesArr), '/').':'.$single;
+                $post_data = [ 'content'=>$bet_codes, 'bet_money'=>$single, 'submitWay'=>'快译', 'vol'=>$qihao, 'note' => self::getOperationCondition($playway)];
             }
 
             $_t = round(microtime(true) * 1000);
@@ -2365,14 +2339,17 @@ class ZhongFaService { # 宝岛众发登陆体系
             ];
 
             Tool_Common::log('afterPostBetCurl', 'INFO', '下注之后', ['account'=>$plan->account, 'uid'=>$plan->uid, 'plan_id'=>$plan->id, 'single'=>$single, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'tmpcodesArr'=>count($tmpcodesArr)]);
-            $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($tmpcodesArr)*$single, $playway,self::$tz_system_id, [], $lottery_type);
-            $logArr1 = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'key'=>$key, 'recordRst'=>$recordRst];
-            Tool_Common::log('recordBetPlansTaskLog', 'INFO', '拆分记录下注号码至推送表', $logArr1);
+            if(!$is_task){
+                $start_time = microtime(true);
+                $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+                $end_time = microtime(true);
+                $time_consume = ($end_time - $start_time). 's';
+            }else{
+                $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($tmpcodesArr)*$single, $playway,self::$tz_system_id, [], $lottery_type);
+                $logArr1 = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'key'=>$key, 'recordRst'=>$recordRst];
+            }
+            Tool_Common::log('/zhongfa/recordBetPlansLog', 'INFO', '记录下注号码至推送表', $logArr1);
 
-            # 获取方案号，记录id, 用于撤单
-            //$snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
-            //$snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
-            //$snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
         }
         $data['rst'] = $rst;
 

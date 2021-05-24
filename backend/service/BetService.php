@@ -106,7 +106,6 @@ abstract class BetService extends BaseBetService {
 
     /**
      * @desc 获取投注号码
-     * @param $system_type_id
      * @param $playway
      * @param $tz_type
      * @param $buy_type
@@ -115,22 +114,8 @@ abstract class BetService extends BaseBetService {
      * @param array|string $hz_Arr
      * @return string
      */
-    public static function getCodes($system_type_id, $tz_type, $buy_type, $sel_same = 1, $hz_Arr = [], $plan_id = ''){
-        //p([$system_type_id, $tz_type, $buy_type, $sel_same, $hz_Arr]);
-        switch ($system_type_id){ # system_type_id = lt_system_type.id
-            case 1: # 重庆0898系统
-            case 3: # 希腊彩系统
-            case 4: # 北京快乐8
-                $codes = BetService::getPlansAllCodesType1($tz_type, $buy_type, $sel_same, $hz_Arr, $plan_id);
-                break;
-            case 2: # 7时彩 重庆时时彩
-            case 5: # 7时彩 幸运五星彩
-                $codes = BetService::getPlansAllCodesType2($tz_type, $buy_type, $sel_same, $hz_Arr, $plan_id);
-                break;
-            default:
-                $codes = BetService::getPlansAllCodesType2($tz_type, $buy_type, $sel_same, $hz_Arr, $plan_id);
-                break;
-        }
+    public static function getCodes($tz_type, $buy_type, $sel_same = 1, $hz_Arr = [], $plan_id = ''){
+        $codes = BetService::getPlansAllCodesType1($tz_type, $buy_type, $sel_same, $hz_Arr, $plan_id);
 
         return $codes;
     }
@@ -219,10 +204,8 @@ abstract class BetService extends BaseBetService {
     public static function lotteryBet($uid){
         $lottery_types = UserSysPlansService::getMyLotteryTypes($uid);
         foreach ($lottery_types as $data){
-            if($data['lottery_type'] == 8) {
-                $rst = BetService::repeatErrorBet([8], $uid);
-            }elseif($data['lottery_type'] == 18){ # 宝岛众发:台湾快五
-                $rst = BetService::repeatErrorBet([18], $uid);
+            if(in_array($data['lottery_type'], [8, 18])) { # 8、幸运五 18台湾快五
+                $rst = BetService::betByUserUidTask([$data['lottery_type']], $uid);
             }else{
                 $rst = BetService::betByUidNew($uid);
             }
@@ -359,10 +342,10 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
-     * @desc 下注失败补打
+     * @desc 用户计划下注脚本
      * @param array $lottery_types
      */
-    public static function repeatErrorBet($lottery_types = [], $uid = ''){
+    public static function betByUserUidTask($lottery_types = [], $uid = ''){
 
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
 
@@ -929,7 +912,7 @@ abstract class BetService extends BaseBetService {
     /**
      * @desc 根据计划id投注 - 立即投注
      * @param $planId
-     * @param $isAuto 是否自动,默认自动
+     * @param $isAuto - 是否自动,默认自动
      * @return array
      */
     public static function tzByPlanIdNew($planId, $isAuto = 1){
@@ -953,7 +936,7 @@ abstract class BetService extends BaseBetService {
         $qihao = HN0898Service::getQihao($plan->lottery_type);
 
         # 4、投注号码 codes
-        $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
+        $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
         //p([$system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $codes]);
 
         $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id, $plan->uid); # 手动下注时，先删除缓存
@@ -1053,15 +1036,13 @@ abstract class BetService extends BaseBetService {
        $mkey = self::buildBetPlanIdKey($plan->account, $qihao, $plan->id);
        $rst = [];
        foreach ($tz_sites as $tz_system_id){
-           $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
-
            $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
            if(!$status && $plan->account != 'gaozi2018'){
                Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
                return ['status'=>300, 'msg'=>'账号过期提示'];
            }
            # 4、投注号码 codes
-           $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
+           $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
            //p([$system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $codes]);
 
            $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id, $plan->uid); # 手动下注时，先删除缓存
@@ -1717,8 +1698,7 @@ abstract class BetService extends BaseBetService {
             }
 
             # 4、投注号码 codes
-            $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
-            $codes = self::getCodes($system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+            $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
             $is_test = $plan->is_test;
             if(in_array($plan->plan_type, [6, 8, 9])){ # 6中则投 8、9遗漏多少期投
                 //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
@@ -1755,7 +1735,7 @@ abstract class BetService extends BaseBetService {
                 $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
                 $m->set($preInsertLockKey, 1, $time);
 
-                $insertRst = $BetService->postBatchBetInsert($activeQihao, $plan->id, $codes);
+                $insertRst = $BetService->postBatchBet($activeQihao, $plan->id, $codes);
                 $rst['data'][$plan->id] = $insertRst;
                 Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-2', ['plan_id'=>$plan->id, 'activeQihao'=>$activeQihao, 'insertRst'=>$insertRst]);
             }

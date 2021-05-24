@@ -51,6 +51,9 @@ use yii\widgets\ActiveForm;
                     </div>
                 </div>
 
+                <!--排除前xx期-->
+                <?php include(dirname(__FILE__).'/filter_xs_before.php'); ?>
+
                 <!--导入号码组轮换-->
                 <?php include(dirname(__FILE__).'/import_codes.php'); ?>
 

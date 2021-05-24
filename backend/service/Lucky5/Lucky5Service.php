@@ -1348,7 +1348,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
     }
 
     /**
-     * @desc 重复下注失败的号码 - 幸运五  目前为正常下注入口
+     * @desc 目前为计划任务正常下注入口 2021.05.23
      * @param $id
      */
     public function repeatErrorBet($id){
@@ -1808,7 +1808,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @return array
      */
     public function bet($qihao, $plan_id, $codes){
-        return $this->postBatchBet($qihao, $plan_id, $codes);
+        return $this->postBatchBet($qihao, $plan_id, $codes, $is_task=0);
     }
 
     /**
@@ -1842,7 +1842,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param $codes
      * @return array
      */
-    public static function postBatchBet($qihao, $plan_id, $codes){
+    public static function postBatchBetBak($qihao, $plan_id, $codes){
         $tmpCodes = $codes;
         $plan = UserSysPlans::findOne($plan_id);
         if($plan->tz_type == 22){ # 四定单双,codes格式：13579,13579,02468,13579@13579,13579,02468,02468@13579,02468,13579,13579
@@ -2064,7 +2064,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param $codes - 1,2,3,4@2,3,4,5@5,6,7,8
      * @return array
      */
-    public function postBatchBetInsert($qihao, $plan_id, $codes){
+    public function postBatchBet($qihao, $plan_id, $codes, $is_task=1){
         $tmpCodes = $codes;
         $plan = UserSysPlans::findOne($plan_id);
         if($plan->tz_type == 22){ # 四定单双,codes格式：13579,13579,02468,13579@13579,13579,02468,02468@13579,02468,13579,13579
@@ -2080,9 +2080,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $count = count($codesArr);
 
         $betNums = self::getBetNumsPer();
-        //if($plan->account == 'aa22'){ $betNums = 10000; }
         $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
-        //p($codesArrs);
 
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
@@ -2165,15 +2163,27 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 $TzSystemsUsers->user_agent,
             ];
 
-            Tool_Common::log('afterPostBetCurl', 'INFO', '下注之后', ['account'=>$plan->account, 'uid'=>$plan->uid, 'plan_id'=>$plan->id, 'single'=>$single, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'tmpcodesArr'=>count($tmpcodesArr)]);
-            $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($tmpcodesArr)*$single, $playway,self::$tz_system_id, [], $lottery_type);
-            $logArr1 = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'key'=>$key, 'recordRst'=>$recordRst];
-            Tool_Common::log('recordBetPlansTaskLog', 'INFO', '拆分记录下注号码至推送表', $logArr1);
+            if(!$is_task){
+                # 缓存锁
+                $m = \Yii::$app->cache;
+                $betKey = BetService::buildBetKey($plan->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id).'_'.$key; # 分配下注后面加key
+                if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
 
-            # 获取方案号，记录id, 用于撤单
-            //$snInfo = self::getSn(self::$user_id, self::$tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
-            //$snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
-            //$snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
+                //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
+                # 和值投注反应时间比较久，无需返回直接锁住
+                $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+                $m->set($betKey, 1, $time);
+                //}
+                # 真实投注
+                $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+            }else{
+                # 默认为任务表下载
+                Tool_Common::log('afterPostBetCurl', 'INFO', '下注之后', ['account'=>$plan->account, 'uid'=>$plan->uid, 'plan_id'=>$plan->id, 'single'=>$single, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'tmpcodesArr'=>count($tmpcodesArr)]);
+                $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($tmpcodesArr)*$single, $playway,self::$tz_system_id, [], $lottery_type);
+                $logArr1 = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'key'=>$key, 'recordRst'=>$recordRst];
+                Tool_Common::log('recordBetPlansTaskLog', 'INFO', '拆分记录下注号码至推送表', $logArr1);
+            }
+
         }
         $data['rst'] = $rst;
 

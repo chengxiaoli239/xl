@@ -42,13 +42,13 @@ use yii\widgets\ActiveForm;
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-3 col-xs-12">
+                        <div class="col-lg-12 col-xs-12">
                             <?= $form->field($model, 'single')->textInput() ?>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-3 col-xs-12">
+                        <div class="col-lg-12 col-xs-12">
                             <?= $form->field($model,"import_codes_txts[0]")->textarea([ 'autofocus' => false,'style'=>'height:100px' ])->label('多组英文逗号或空格隔开 234X,345X 或 234X 345X')?>
                         </div>
                     </div>
@@ -60,6 +60,9 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'buy_type')->radioList([ '0'=>'反买', '1'=>'正买',])->label('购买方向') ?-->
 
                     <!--?= $form->field($model, 'nums')->textInput() ?-->
+
+                    <!--排除前xx期-->
+                    <?php include(dirname(__FILE__).'/filter_xs_before.php'); ?>
 
                     <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:0.1-0.3-0.7-1.5-3.1-6.2-12.5-25.1') ?>
                     <div class="row">
