@@ -47,7 +47,7 @@ class SscKjData extends SscKjDataModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['id'=>SORT_DESC]],
+            'sort'=> ['defaultOrder' => ['qihao'=>SORT_DESC]],
         ]);
 
         $this->load($params);

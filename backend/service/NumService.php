@@ -1314,6 +1314,27 @@ class NumService extends BaseService {
                 $query->andWhere(['IN', 'code', $codes]);
             }
         }
+
+        # 3、排除期期号定位 05.25
+        if(in_array($code_type, [2,3,4]) && isset($codes_hz['filter_qihaos']) && isset($codes_hz['filter_qihaos']['is_filter_qihao']) && $codes_hz['filter_qihaos']['is_filter_qihao']==1){
+            $filter_qihaos = $codes_hz['filter_qihaos'];
+            $is_filter_qihao = $filter_qihaos['is_filter_qihao'];
+            if(!empty($codes)){
+                $filter_poses = NumService::getFilterPosByCode($codes[0]); # 根据导入的号码判断要过滤的位置
+                if(!empty($filter_poses)){
+                    foreach ($filter_poses as $pos){
+                        $query->andWhere(['<>', 'code_'.$pos, 'X']);
+                    }
+                }
+                if($is_filter_qihao){
+                    $qihao = HN0898Service::getQihao($lottery_type);
+                    p($qihao);
+                    $sub_qihao = substr($qihao, -2, 2); # 短期号
+                    p($sub_qihao);
+                }
+                $query->andWhere(['IN', 'code', $codes]);
+            }
+        }
         ###################################################### filters过滤参数结束05.24 ######################################################
 
 

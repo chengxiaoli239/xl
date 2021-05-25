@@ -1,0 +1,15 @@
+添加新过滤规则步骤：
+1、模板【添加计划任务用户输入内容】
+    模板：backend/modules/forum/views/user-sys-plans/filter_xs_before.php
+2、控制器【添加参数更新、插入】
+    控制器：backend/modules/forum/controllers/UserSysPlansController.php  排除参数开始 和 排除参数结束 之间
+    方法：actionUpdate、actionCreate
+3、添加、修改 数据预存储处理
+    方法：UserSysPlansService::preOpData($this->_post, $this->_user_id);
+4、模板添加传递参数
+    模板1：backend/modules/forum/views/user-sys-plans/create.php
+    模板2：backend/modules/forum/views/user-sys-plans/update.php
+5、计划列表添加计划内容的简单描述
+    模板：$str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
+6、号码获取方法过滤
+    $codesArr = UserSysPlansService::getImportCodes($plan_id);

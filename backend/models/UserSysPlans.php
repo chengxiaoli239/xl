@@ -107,11 +107,14 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $filter_pos1; # 排除那些位置，四个多选框
     public $filter_pos2; # 排除那些位置，四个多选框
 
-    # 1、排除前x天同期
+    # 2、排除前x天同期
     public $is_filter_date; # 是否排除
     public $filter_xD_before; # 前多少期，获取区间
     public $filter_date_pos1; # 排除那些位置，四个多选框
     public $filter_date_pos2; # 排除那些位置，四个多选框
+
+    # 3、排除期号的定位，比如058期，二定则去除：58XX
+    public $is_filter_qihao; # 是否排除
     ###### 排除过滤参数结束 #######
     /**
      * @inheritdoc

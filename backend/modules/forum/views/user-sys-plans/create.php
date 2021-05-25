@@ -44,6 +44,9 @@ $this->params['breadcrumbs'][] = $this->title;
         'is_filter_dates' => $is_filter_dates,
         'filter_date_pos1' => $filter_date_pos1,
         'filter_date_pos2' => $filter_date_pos2,
+
+        # 3、排除期号，比如：058期 则排除 58XX
+        'is_filter_qihaos' => $is_filter_qihaos,
     ]) ?>
 
 </div>

@@ -393,6 +393,16 @@ class UserSysPlansService extends BaseService {
         }
         $tmpFilter['filter_dates'] = $filter_dates;
         unset($UserSysPlans['is_filter_date'], $UserSysPlans['filter_xD_before'], $UserSysPlans['filter_date_pos1'], $UserSysPlans['filter_date_pos2']);
+
+        # 3、排除期号，比如：058期，二定则排除：58XX
+        $filter_qihaos = [];
+        if(isset($UserSysPlans['is_filter_qihao'][0]) && $UserSysPlans['is_filter_qihao'][0]==1){
+            $filter_qihaos = array_merge($filter_qihaos, [
+                'is_filter_qihao' => 1,
+            ]);
+        }
+        $tmpFilter['filter_qihaos'] = $filter_qihaos;
+        unset($UserSysPlans['is_filter_qihao']);
         ###################################################### 排除参数结束 2021.05.24 ######################################################
 
         if(!in_array($tz_type, [22, 23, 24])){ # 四定和值、上奖全倒、直码
@@ -589,7 +599,8 @@ class UserSysPlansService extends BaseService {
         $codes = explode('@',$data->codes);
         if(
             (isset($hzArr['filters']) && isset($hzArr['filters']['is_filter']) && $hzArr['filters']['is_filter']==1) OR # 1、排除前x期
-            (isset($hzArr['filter_dates']) && isset($hzArr['filter_dates']['is_filter_date']) && $hzArr['filter_dates']['is_filter_date']==1) # 2、排除前x天同期
+            (isset($hzArr['filter_dates']) && isset($hzArr['filter_dates']['is_filter_date']) && $hzArr['filter_dates']['is_filter_date']==1) OR # 2、排除前x天同期
+            (isset($hzArr['filter_qihaos']) && isset($hzArr['filter_qihaos']['is_filter_qihao']) && $hzArr['filter_qihaos']['is_filter_qihao']==1) # 3、排除期号定位
         ){
             $codes = NumService::getCodesKuaiXuan($hzArr, $code_types[$plan->playway], $codes, $plan->lottery_type);
         }

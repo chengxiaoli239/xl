@@ -131,6 +131,9 @@ class UserSysPlansController extends BaseController
         $model->filter_xD_before = ''; # x天
         $model->filter_date_pos1 = []; # 位置选项
         $model->filter_date_pos2 = []; # 位置选项
+
+        # 2、排除前期号
+        $model->is_filter_qihao = 0;
         ############################ 排除参数结束 #############################
 
         $model->nums = UserSysPlansService::getDefaultTzNums($tz_type);
@@ -155,6 +158,7 @@ class UserSysPlansController extends BaseController
             'plan_types' => $plan_types,
             'tz_sites_Arr' => $tz_sites_Arr,
 
+            ############################ 排除参数开始 #############################
             # 1、排除前x期
             'is_filters' => $is_filters,
             'filter_pos1' => $filter_pos1,
@@ -164,6 +168,10 @@ class UserSysPlansController extends BaseController
             'is_filter_dates' => $is_filters,
             'filter_date_pos1' => $filter_pos1,
             'filter_date_pos2' => $filter_pos2,
+
+            # 2、排除前x天内同期
+            'is_filter_qihaos' => $is_filters,
+            ############################ 排除参数结束 #############################
         ];
         $data = array_merge($data, UserSysPlansService::getSysPlansTypeDatas($playway, $tz_type));
 
@@ -230,6 +238,13 @@ class UserSysPlansController extends BaseController
                 $model->filter_date_pos2 = $filter_dates['filter_date_pos2']; # 位置选项
             }
             unset($hz_Arr_Data['filter_dates']);
+
+            # 3、排除期号为定位的，比如：058期，二定则排除：58XX
+            if(isset($hz_Arr_Data['filter_qihaos'])){
+                $filter_qihaos = $hz_Arr_Data['filter_qihaos'];
+                $model->is_filter_qihao = $filter_qihaos['is_filter_qihao'];
+            }
+            unset($hz_Arr_Data['filter_qihaos']);
             ############################ 排除参数结束 #############################
 
             $model->change_per = [];
@@ -274,6 +289,9 @@ class UserSysPlansController extends BaseController
             'is_filter_dates' => $is_filters,
             'filter_date_pos1' => $filter_pos1,
             'filter_date_pos2' => $filter_pos2,
+
+            # 2、排除前x天内同期
+            'is_filter_qihaos' => $is_filters,
         ];
         $data = array_merge($data, UserSysPlansService::getSysPlansTypeDatas($model->playway, $model->tz_type));
         //p($data);
