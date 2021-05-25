@@ -1274,7 +1274,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             ':path: /user-api/orders/codes?'.http_build_query($querys),
             ':scheme: https',
             'accept: application/json, text/plain, */*',
-            'accept-encoding: gzip, deflate, br',
+            'accept-encoding: gunzip, deflate, br',
             'accept-language: zh-CN,zh;q=0.9',
             'cookie: '.$TzSystemsUsers->cookie.'; main-lottery=twk5',
             'referer: '.$TzSystemsUsers->ssc_domain.'/order/codes',
