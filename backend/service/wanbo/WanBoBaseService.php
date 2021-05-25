@@ -443,6 +443,9 @@ class WanBoBaseService {
      * @return bool
      */
     public static function setPoxy($ch, $url='', $uid = 0){
+        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
+        if(!$POXY_STATUS) return []; # CURL 代理开关
+
         $poxy_addr = PoxyIPService::getPoxyIp();
         if(!empty($poxy_addr)){
             //$poxy_addr = '218.85.247.70:20000';

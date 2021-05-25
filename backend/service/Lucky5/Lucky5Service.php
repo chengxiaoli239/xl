@@ -2447,6 +2447,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @return bool
      */
     public static function setPoxy($ch, $url='', $uid = 0){
+        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
+        if(!$POXY_STATUS) return []; # CURL 代理开关
+
         $poxy_addr = PoxyIPService::getPoxyIp($uid);
 
         Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);

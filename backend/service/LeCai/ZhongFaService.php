@@ -1639,7 +1639,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         $row->post_desc = json_encode($tmpRst, 320);
 
         $logArr = ['id'=>$id, 'uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
-        Tool_Common::log('repeatErrorBet', 'INFO', '幸运五下注', $logArr);
+        Tool_Common::log('repeatErrorBet', 'INFO', '众发下注', $logArr);
 
         $flag = $row->save();
         if(!$flag){
@@ -2209,6 +2209,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
         }
 
+        $start_time0 = microtime(true);
         $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
 
         //设置post方式提交
@@ -2407,6 +2408,9 @@ class ZhongFaService { # 宝岛众发登陆体系
      * @return bool
      */
     public static function setPoxy($ch, $url='', $uid = 0){
+        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
+        if(!$POXY_STATUS) return []; # CURL 代理开关
+
         $poxy_addr = PoxyIPService::getPoxyIp($uid);
 
         Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);

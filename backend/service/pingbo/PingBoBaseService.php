@@ -489,6 +489,9 @@ class PingBoBaseService {
      * @return bool
      */
     public static function setPoxy($ch, $url='', $uid = 0){
+        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
+        if(!$POXY_STATUS) return []; # CURL 代理开关
+
         return false;
         $poxy_addr = PoxyIPService::getPoxyIp();
         if(!empty($poxy_addr)){
