@@ -150,7 +150,7 @@ class LeCaiService extends BaseKj {
         $page = $m->get($mkey);
         if(!$page) $page = 10;
 
-        $mkey_status = 'batchGrab_lottery_type_2_'.$lottery_type.'_status';
+        $mkey_status = 'batchGrab_lottery_type_4_'.$lottery_type.'_status';
         if($sync_status = $m->get($mkey_status)){ # 同步开关锁
             return ['status'=>300, 'msg'=>'有正在进行的任务，请稍后...'];
         }
@@ -197,8 +197,10 @@ class LeCaiService extends BaseKj {
                 if(!isset($content['data']['rows'])) return false;
                 $rows = $content['data']['rows'];
                 foreach ($rows as $k=>$row){
-                    $opencode = $row['result'];
-                    $datas[] = ['expect'=>$row['vol'], 'opencode'=>$opencode, 'opentime'=>$row['actAt']];
+                    if($row['acted']){
+                        $opencode = $row['result'];
+                        $datas[] = ['expect'=>$row['vol'], 'opencode'=>$opencode, 'opentime'=>$row['actAt']];
+                    }
                 }
 
                 $next_page = $page - 1;
