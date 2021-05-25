@@ -1238,7 +1238,7 @@ class NumService extends BaseService {
                         }
                     }
                 }
-                $query->andWhere(['IN', 'code', $codes]);
+                //$query->andWhere(['IN', 'code', $codes]);
             }
         }
 
@@ -1311,7 +1311,6 @@ class NumService extends BaseService {
                         }
                     }
                 }
-                $query->andWhere(['IN', 'code', $codes]);
             }
         }
 
@@ -1331,20 +1330,20 @@ class NumService extends BaseService {
                 if($is_filter_qihao && $cnt>0){
                     $qihao = HN0898Service::getQihao($lottery_type);
                     $sub_qihao = (string)substr($qihao, $fcnt, $cnt); # 短期号 156期，如果二定：56  三定：156
-                    p([$qihao, $sub_qihao, $fcnt, $cnt],0);
+                    //p([$qihao, $sub_qihao, $fcnt, $cnt],0);
+                    $tmp_filter2_where = ['OR', ];
 
                     foreach ($filter_poses as $n=>$pos){ # [1,2]:1千2百、[3,4]:3十4个
-                        $index_pos = [1=>3, 2=>4, 3=>1, 4=>2]; # 对折位置
-                        $tmp_filter2_where[] = ['<>', 'code_'.$index_pos[$pos], $sub_qihao[$n]];
+                        $tmp_filter2_where[] = ['<>', 'code_'.$pos, $sub_qihao[$n]];
                     }
-                    p(['filter_poses'=>$filter_poses, 'tmp_filter2_where'=>$tmp_filter2_where]);
+                    //p(['filter_poses'=>$filter_poses, 'tmp_filter2_where'=>$tmp_filter2_where]);
                     $query->andWhere($tmp_filter2_where);
                 }
-                $query->andWhere(['IN', 'code', $codes]);
             }
         }
-        ###################################################### filters过滤参数结束05.24 ######################################################
 
+        (!empty($codes)) && $query->andWhere(['IN', 'code', $codes]);
+        ###################################################### filters过滤参数结束05.24 ######################################################
 
         $Num4Types = $query->asArray()->all();
         $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
