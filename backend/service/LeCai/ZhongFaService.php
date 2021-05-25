@@ -1131,6 +1131,11 @@ class ZhongFaService { # 宝岛众发登陆体系
      */
     public static function heart($uid, $tz_system_id){
 
+        $m = \Yii::$app->cache;
+        $mkey = 'ZHONGFA_heart_'.$uid.'_'.$tz_system_id;
+        $rst = $m->get($mkey);
+        if(!empty($rst)) return $rst;
+
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $urlArr = self::getTzSiteInfo($tz_system_id);
 
@@ -1161,6 +1166,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             $TzSystemsUsers->user_agent,
         ];
         $rst = self::postBetCurl($url, $post_data, $headers, $uid, $b_type=2); # 调试阶段先注释12.26
+        $m->set($mkey, $rst, 15);
 
         $logArr = ['url'=>$url,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
         Tool_Common::log('/zhongfa/'.__FUNCTION__, 'INFO', '宝岛众发心跳', $logArr);
@@ -1584,9 +1590,10 @@ class ZhongFaService { # 宝岛众发登陆体系
         //$headers = json_decode($row->bet_headers, true);
         $time1 = microtime(true);
         $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid, $b_type=3); # 调试阶段先注释12.26
-        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'uid'=>$uid, 'tmpRst'=>$tmpRst];
-        Tool_Common::log('/zhongfa/'.__FUNCTION__, 'INFO', '众发下注', $logArr);
         $time2 = microtime(true);
+        $time_consume = ($time2 - $time1).'s';
+        $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'uid'=>$uid, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
+        Tool_Common::log('/zhongfa/'.__FUNCTION__, 'INFO', '众发下注', $logArr);
         $status = 0;
         if($tmpRst['success']){
             $status = 2;
@@ -1626,7 +1633,6 @@ class ZhongFaService { # 宝岛众发登陆体系
             }
         }
 
-        $time_consume = ($time2 - $time1).'s';
         $tmpRst['bet_time'] = date('Y-m-d H:i:s');
         $tmpRst['time_consume'] = $time_consume;
         $row->status = $status;
@@ -2175,6 +2181,11 @@ class ZhongFaService { # 宝岛众发登陆体系
     /**
      * @decription post请求根据，接受传递的header头
      * @param $url
+     * @param array $post_data
+     * @param array $headers
+     * @param int $uid
+     * @param int $b_type - 业务请求来源
+     * @return array|mixed|string
      */
     public static function postBetCurl($url,$post_data = [],$headers=[], $uid = 0, $b_type=0){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
