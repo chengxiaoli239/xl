@@ -228,6 +228,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = LeCaiService::getLotteryBatchGw($lottery_type=18);p($data);
         $data = LeCaiService::getLotteryBatch($lottery_type=18);$kjDatas = array_reverse($data); p($kjDatas);
         foreach ($kjDatas as $key=>$dataInfo){
             $rst = KjDataGet::insertKjData($dataInfo['expect'], 8, $dataInfo['opencode']);

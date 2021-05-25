@@ -42,4 +42,15 @@ class LeCaiController extends Controller
         return $data;
     }
 
+    /**
+     * @desc 乐彩 - 台湾快五 网盘
+     * @return json|xml
+     */
+    public function actionK5BatchGw($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        //$post = \Yii::$app->request->post();
+        $data = LeCaiService::getLotteryBatchGw($lottery_type=18);
+        return $data;
+    }
+
 }

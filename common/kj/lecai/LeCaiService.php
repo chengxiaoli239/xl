@@ -139,7 +139,7 @@ class LeCaiService extends BaseKj {
     }
 
     /**
-     * @desc 幸运五星 批量数据
+     * @desc 网盘批量 批量数据
      * @return mixed
      */
     public static function batchGrab($lottery_type=18){
@@ -221,4 +221,71 @@ class LeCaiService extends BaseKj {
         return [];
     }
 
+    /**
+     * @desc 台湾快5 批量数据出口
+     * @return mixed
+     */
+    public static function getLotteryBatchGw($lottery_type=18){
+        $datas = self::batchGrabGw($lottery_type);
+        $datas = array_reverse($datas);
+
+        return $datas;
+    }
+
+    /**
+     * @desc 官网批量 批量数据
+     * @return mixed
+     */
+    public static function batchGrabGw($lottery_type=18){
+
+        $m = \Yii::$app->cache;
+
+        $mkey = 'batchGrabGw_lottery_type_0_'.$lottery_type;
+        $page = $m->get($mkey);
+        if(!$page) $page = 5;
+
+        $mkey_status = 'batchGrabGw_lottery_type_4_'.$lottery_type.'_status';
+        if($sync_status = $m->get($mkey_status)){ # 同步开关锁
+            return ['status'=>300, 'msg'=>'有正在进行的任务，请稍后...'];
+        }
+        $m->set($mkey_status, 1, 300);
+        $lottery_type_routes = [
+            18 => '/kj/le-cai/k5-batch-gw',
+        ];
+
+        $domain = BaseKj::getApiHostByRoute($lottery_type_routes[$lottery_type]);
+        $date = date('Y-m-d');
+        $url = $domain.'/api/lottery-results/?dataStr='.$date.'&lotteryId=twk5&page='.$page.'&pageSize=60';
+
+        try {
+            $content = CurlService::httpGet($url);
+
+            $logArr = ['url'=>$url, 'content'=>$content];
+            Tool_Common::log('/zhongfa/'.__FUNCTION__, 'INFO', '台湾快五', $logArr);
+
+            if(isset($content['success']) && $content['success'] != 1) return false;
+            $datas = $content['data']['rows'];
+
+            foreach ($datas as $k=>$row){
+                if($row['acted']){
+                    $opencode = $row['result'];
+                    $datas[] = ['expect'=>$row['vol'], 'opencode'=>$opencode, 'opentime'=>$row['actAt']];
+                }
+            }
+
+            $next_page = $page - 1;
+            if($next_page<=0) $next_page = 100;
+            $m->set($mkey, $next_page, 300);
+            $m->delete($mkey_status);
+
+            return $datas;
+        }catch (\Exception $exception){
+            $m->delete($mkey_status);
+            $logArr = ['url'=>$url, 'content'=>$content];
+            Tool_Common::log('/zhongfa/'.__FUNCTION__.'_e', 'ERR', '批量获取[lottery_type:'.$lottery_type.']失败', $logArr);
+            return ['status'=>301, 'msg'=>$exception->getMessage()];
+        }
+
+        return [];
+    }
 }
