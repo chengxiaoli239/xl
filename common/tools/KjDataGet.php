@@ -113,6 +113,7 @@ class KjDataGet
                 if(!$data = CurlService::httpGet($url)) continue;
                 if($kjConfig->is_batch == 1){
                     $kjDatas = $data;
+                    Tool_Common::log('/kjData/'.__FUNCTION__, 'INFO', '批量抓取开奖号码', ['data'=>$data]);
                     if($kjDatas){
                         $mkey = 'KJ_LOG_KEY_BATCH_1_'.$kjConfig->lottery_type;
                         if($kjConfig->lottery_type == 2){ # qxc

@@ -1326,11 +1326,19 @@ class NumService extends BaseService {
                         $query->andWhere(['<>', 'code_'.$pos, 'X']);
                     }
                 }
-                if($is_filter_qihao){
+                $cnt = count($filter_poses);
+                $fcnt = 0 - $cnt;
+                if($is_filter_qihao && $cnt>0){
                     $qihao = HN0898Service::getQihao($lottery_type);
-                    p($qihao);
-                    $sub_qihao = substr($qihao, -2, 2); # 短期号
-                    p($sub_qihao);
+                    $sub_qihao = (string)substr($qihao, $fcnt, $cnt); # 短期号 156期，如果二定：56  三定：156
+                    p([$qihao, $sub_qihao, $fcnt, $cnt],0);
+
+                    foreach ($filter_poses as $n=>$pos){ # [1,2]:1千2百、[3,4]:3十4个
+                        $index_pos = [1=>3, 2=>4, 3=>1, 4=>2]; # 对折位置
+                        $tmp_filter2_where[] = ['<>', 'code_'.$index_pos[$pos], $sub_qihao[$n]];
+                    }
+                    p(['filter_poses'=>$filter_poses, 'tmp_filter2_where'=>$tmp_filter2_where]);
+                    $query->andWhere($tmp_filter2_where);
                 }
                 $query->andWhere(['IN', 'code', $codes]);
             }

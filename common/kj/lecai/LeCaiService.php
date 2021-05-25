@@ -149,6 +149,7 @@ class LeCaiService extends BaseKj {
         $mkey = 'batchGrab_lottery_type_'.$lottery_type;
         $page = $m->get($mkey);
         if(!$page) $page = 10;
+        $page = 1;
 
         $mkey_status = 'batchGrab_lottery_type_4_'.$lottery_type.'_status';
         if($sync_status = $m->get($mkey_status)){ # 同步开关锁
