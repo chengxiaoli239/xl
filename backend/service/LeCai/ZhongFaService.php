@@ -119,7 +119,7 @@ class ZhongFaService { # 宝岛众发登陆体系
 
     /**
      * @decription 同步用户余额 by account
-     * @param $tz_system_user_id 表lt_tz_systems_users.id
+     * @param $tz_system_user_id - 表lt_tz_systems_users.id
      * @return array
      */
     public static function synBalance($tz_system_user_id){
@@ -839,6 +839,12 @@ class ZhongFaService { # 宝岛众发登陆体系
      * @return mixed
      */
     public static function getBalance($uid, $tz_system_id, $r='', $is_auto=1){
+        $m = \Yii::$app->cache;
+
+        $mkey = 'getBalance_'.$tz_system_id.'_'.$r.'_'.$is_auto;
+        $balance = $m->get($mkey);
+        if($balance) return $balance;
+
         self::__init($uid, $tz_system_id);
         $start_time = microtime(true);
         $rst = self::userInfo($uid, $tz_system_id, $is_auto);
@@ -851,6 +857,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         $TzSystemsUsers->save();
         $end_time = microtime(true);
         $time_consume = ($end_time-$start_time).'s';
+        $m->set($mkey, $balance, 5);
 
         Tool_Common::log('getBalance','INFO','宝岛众发-用户余额-3', ['uid'=>$uid, 'r'=>$r, 'rst'=>$rst, 'balance'=>$balance, 'time_consume'=>$time_consume]);
 
