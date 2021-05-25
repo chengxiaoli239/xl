@@ -111,6 +111,7 @@ class KjDataGet
                 //if($lottery_type != 8) continue; # 测试
                 $url = $kjConfig->host.$kjConfig->path;
                 if(!$data = CurlService::httpGet($url)) continue;
+                if(isset($data['status']) && $data['status'] != 200) continue;
                 if($kjConfig->is_batch == 1){
                     $kjDatas = $data;
                     Tool_Common::log('/kjData/'.__FUNCTION__, 'INFO', '批量抓取开奖号码', ['data'=>$data]);
