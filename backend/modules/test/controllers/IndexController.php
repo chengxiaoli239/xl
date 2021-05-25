@@ -228,6 +228,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = LeCaiService::getLotteryBatch($lottery_type=18);$kjDatas = array_reverse($data); p($kjDatas);
+        foreach ($kjDatas as $key=>$dataInfo){
+            $rst = KjDataGet::insertKjData($dataInfo['expect'], 8, $dataInfo['opencode']);
+        }p($rst);
         $data = LeCaiService::getLotteryByUser($type='json', $lottery_type=18, $is_auto=2);p($data);
         $params = ['_nowTime'=>1621735076794, '_uri'=>'/orders/cancel-by-no'];
         $params = ['vol'=>''];
@@ -570,10 +574,7 @@ class IndexController extends Controller
         //$str = '{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}'; //p(json_decode($str, true)); d(strpos($str, "\"Status\":1") !== false);
         $rst = SevenService::login(19, 3);p($rst);
         $rst = SevenService::synBalance(5);p($rst);
-        $data = Lucky5::batch(); $kjDatas = array_reverse($data); //p($kjDatas);
-        foreach ($kjDatas as $key=>$dataInfo){
-            $rst = KjDataGet::insertKjData($dataInfo['expect'], 8, $dataInfo['opencode']);
-        }p($rst);
+
         $rst['kj'] = KjDataGet::grabOne();p($rst);
         $rst = TzService::insertLuckyDataTime(); p($rst);
         p(unserialize('a:3:{s:4:"time";i:1570224883;s:3:"ttl";i:3600000;s:4:"data";a:0:{}}'));

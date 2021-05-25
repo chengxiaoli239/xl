@@ -115,16 +115,16 @@ class KjDataGet
                     $kjDatas = $data;
                     if($kjDatas){
                         $mkey = 'KJ_LOG_KEY_BATCH_1_'.$kjConfig->lottery_type;
-                        if(in_array($kjConfig->lottery_type, [6, 8, 1, 17])){ # xjssc  1七星彩17排列五
-                            $kjDatas = array_reverse($kjDatas);
-                            foreach ($kjDatas as $key=>$dataInfo){
-                                $qihao = $dataInfo['expect'];
-                                $rst = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $dataInfo['opencode'], $dataInfo['opentime']);
-                            }
-                        }elseif($kjConfig->lottery_type == 2){ # qxc
+                        if($kjConfig->lottery_type == 2){ # qxc
                             foreach ($kjDatas as $key=>$dataInfo){
                                 $qihao = $dataInfo['expect'];
                                 $rst = KjDataGet::insertQxcKjData($dataInfo['qihao'], $dataInfo['codes'], $dataInfo['date']);
+                            }
+                        }else{ //}elseif(in_array($kjConfig->lottery_type, [6, 8, 1, 17])) { # xjssc  1七星彩17排列五
+                            $kjDatas = array_reverse($kjDatas); # 翻转
+                            foreach ($kjDatas as $key=>$dataInfo){
+                                $qihao = $dataInfo['expect'];
+                                $rst = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $dataInfo['opencode'], $dataInfo['opentime']);
                             }
                         }
                     }

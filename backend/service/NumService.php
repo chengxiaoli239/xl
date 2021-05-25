@@ -1287,7 +1287,7 @@ class NumService extends BaseService {
                         if(!empty($filter_index_dates)){ # 过滤期的index_id
                             $where_index_date = ['AND', ['IN', 'date', $filter_index_dates], ['=', 'lottery_type', $lottery_type], ['LIKE', 'qihao', '%'.$sub_qihao, false]];
                             $SscKjDatas = SscKjData::find()->select(['qihao','date','kj_code','code1','code2','code3','code4'])->where($where_index_date)->asArray()->all();
-                            p($SscKjDatas, 0);
+                            //p($SscKjDatas, 0);
                             foreach ($SscKjDatas as $sscKjData){
                                 $filter_poses_where = ['OR', ];
                                 # pos1

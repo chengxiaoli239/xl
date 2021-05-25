@@ -21,13 +21,24 @@ class LeCaiController extends Controller
     }
 
     /**
-     * @desc 开800 - 台湾宾果
+     * @desc 乐彩 - 台湾快五 网盘
      * @return json|xml
      */
     public function actionK5ByUser($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
         $data = LeCaiService::getLotteryByUser($type, $lottery_type=18, $post['is_auto']);
+        return $data;
+    }
+
+    /**
+     * @desc 乐彩 - 台湾快五 网盘
+     * @return json|xml
+     */
+    public function actionK5Batch($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        //$post = \Yii::$app->request->post();
+        $data = LeCaiService::getLotteryBatch($lottery_type=18);
         return $data;
     }
 

@@ -67,14 +67,14 @@ class LeCaiService extends BaseKj {
 
             $m = \Yii::$app->cache;
             $TzSystemsUsers = TzSystemsUsers::find()->where(['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [16]] ])->all();
-            foreach ($TzSystemsUsers as $TzSystemsUsers) { # 用户账号去网盘抓数据
-                $mkey = 'getLotteryLucky_0_' . self::$lottery_type;
+            foreach ($TzSystemsUsers as $TzSystemsUser) { # 用户账号去网盘抓数据
+                $mkey = 'getLotteryLucky_0_' . $lottery_type;
 
                 $t = microtime(true) * 1000;
                 $querys = ['_nowTime'=>$t, '_uri'=>'/lottery-results', 'page'=>1, 'pageSize'=>5];
                 $querys['sign'] = ZhongFaService::getSign($querys);
-                $domain =  str_replace('https://', '', str_replace('http://', '', $TzSystemsUsers->ssc_domain));
-                $url = $TzSystemsUsers->ssc_domain.'/user-api/lottery-results/?'.http_build_query($querys); #当前开奖号码
+                $domain =  str_replace('https://', '', str_replace('http://', '', $TzSystemsUser->ssc_domain));
+                $url = $TzSystemsUser->ssc_domain.'/user-api/lottery-results/?'.http_build_query($querys); #当前开奖号码
                 $headers = [
                     ':authority: '.$domain,
                     ':method: GET',
@@ -83,17 +83,17 @@ class LeCaiService extends BaseKj {
                     'accept: application/json, text/plain, */*',
                     'accept-encoding: gzip, deflate, br',
                     'accept-language: zh-CN,zh;q=0.9',
-                    'cookie: '.$TzSystemsUsers->cookie.'; main-lottery=twk5',
-                    'referer: '.$TzSystemsUsers->ssc_domain.'/lottery-result/',
+                    'cookie: '.$TzSystemsUser->cookie.'; main-lottery=twk5',
+                    'referer: '.$TzSystemsUser->ssc_domain.'/lottery-result/',
                     'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
                     'sec-ch-ua-mobile: ?0',
                     'sec-fetch-dest: empty',
                     'sec-fetch-mode: cors',
                     'sec-fetch-site: same-origin',
-                    $TzSystemsUsers->user_agent,
+                    $TzSystemsUser->user_agent,
                 ];
 
-                $content = ZhongFaService::httpGet($url, $headers, $TzSystemsUsers->uid, $time_out=15);
+                $content = ZhongFaService::httpGet($url, $headers, $TzSystemsUser->uid, $time_out=15);
                 $logArr = ['url' => $url, 'headers'=>$headers, 'content' => $content];
                 Tool_Common::log('/zhongfa/' . __FUNCTION__, 'INFO', '台湾快五', $logArr);
 
@@ -125,6 +125,97 @@ class LeCaiService extends BaseKj {
         } else {
             return ['expect' => $expect, 'opencode' => $opencode, 'opentime' => $opentime];
         }
+    }
+
+    /**
+     * @desc 台湾快5 批量数据出口
+     * @return mixed
+     */
+    public static function getLotteryBatch($lottery_type=18){
+        $datas = self::batchGrab($lottery_type);
+        $datas = array_reverse($datas);
+
+        return $datas;
+    }
+
+    /**
+     * @desc 幸运五星 批量数据
+     * @return mixed
+     */
+    public static function batchGrab($lottery_type=18){
+
+        $m = \Yii::$app->cache;
+
+        $mkey = 'batchGrab_lottery_type_'.$lottery_type;
+        $page = $m->get($mkey);
+        if(!$page) $page = 100;
+
+        $mkey_status = 'batchGrab_lottery_type_1_'.$lottery_type.'_status';
+        if($sync_status = $m->get($mkey_status)){ # 同步开关锁
+            return ['status'=>300, 'msg'=>'有正在进行的任务，请稍后...'];
+        }
+        $m->set($mkey_status, 1, 300);
+
+       $TzSystemsUsers = TzSystemsUsers::find()->alias('u')->select("u.*")
+            ->leftJoin('{{%tz_systems}} s', 'u.tz_system_id=s.id')
+            ->leftJoin('{{%user_sys_plans}} p', 'u.uid=p.uid')
+            ->where(['AND',['=', 'u.status', 1], ['=', 'u.is_auto_login', 1], ['<>', 'u.ssc_domain', ''], ['=', 's.status', 1], ['=','p.status',1]])
+            ->all();
+
+        foreach ($TzSystemsUsers as $TzSystemsUser) { # 用户账号去网盘抓数据
+            $t = microtime(true) * 1000;
+            $querys = ['_nowTime'=>$t, '_uri'=>'/lottery-results', 'page'=>$page, 'pageSize'=>60];
+            $querys['sign'] = ZhongFaService::getSign($querys);
+            $domain =  str_replace('https://', '', str_replace('http://', '', $TzSystemsUser->ssc_domain));
+            $url = $TzSystemsUser->ssc_domain.'/user-api/lottery-results/?'.http_build_query($querys); #当前开奖号码
+            $headers = [
+                ':authority: '.$domain,
+                ':method: GET',
+                ':path: /user-api/lottery-results/?'.http_build_query($querys),
+                ':scheme: https',
+                'accept: application/json, text/plain, */*',
+                'accept-encoding: gunzip, deflate, br',
+                'accept-language: zh-CN,zh;q=0.9',
+                'cookie: '.$TzSystemsUser->cookie.'; main-lottery=twk5',
+                'referer: '.$TzSystemsUser->ssc_domain.'/lottery-result/',
+                'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+                'sec-ch-ua-mobile: ?0',
+                'sec-fetch-dest: empty',
+                'sec-fetch-mode: cors',
+                'sec-fetch-site: same-origin',
+                $TzSystemsUser->user_agent,
+            ];
+
+            $datas = [];
+            try {
+                $content = ZhongFaService::httpGet($url, $headers, $TzSystemsUser->uid, $time_out=15);
+
+                $logArr = ['url' => $url, 'page'=>$page, 'headers'=>$headers, 'content' => $content];
+                Tool_Common::log('/zhongfa/' . __FUNCTION__, 'INFO', '台湾快五', $logArr);
+
+                if (isset($content['success']) && $content['success'] != 1) return false;
+                if(!isset($content['data']['rows'])) return false;
+                $rows = $content['data']['rows'];
+                foreach ($rows as $k=>$row){
+                    $opencode = $row['result'];
+                    $datas[] = ['expect'=>$row['vol'], 'opencode'=>$opencode, 'opentime'=>$row['actAt']];
+                }
+
+                $next_page = $page - 1;
+                if($next_page<=0) $next_page = 100;
+                $m->set($mkey, $next_page, 300);
+                $m->delete($mkey_status);
+
+                return $datas;
+            }catch (\Exception $exception){
+                $m->delete($mkey_status);
+                $logArr = ['url'=>$url, 'headers'=>$headers, 'content'=>$content];
+                Tool_Common::log('/zhongfa/'.__FUNCTION__.'_e', 'ERR', '批量获取[lottery_type:'.$lottery_type.']失败', $logArr);
+                continue;
+            }
+
+        }
+        return [];
     }
 
 }
