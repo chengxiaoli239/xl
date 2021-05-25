@@ -2272,7 +2272,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         $time_consume = ($end_time-$start_time).'s';
 
         $logArr = ['uid'=>$uid, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rstData'=>$rstData, 'errno'=>$errno, 'time_consume'=>$time_consume];
-        Tool_Common::log('postBetCurl','INFO','httpPost'.$b_types[$b_type].'请求-5-2', $logArr);
+        Tool_Common::log('/zhongfa/postBetCurl','INFO','httpPost'.$b_types[$b_type].'请求-5-2', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
         return $rstData;
