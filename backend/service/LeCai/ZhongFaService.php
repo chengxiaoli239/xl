@@ -1585,9 +1585,10 @@ class ZhongFaService { # 宝岛众发登陆体系
         $time1 = microtime(true);
         $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 调试阶段先注释12.26
         $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'uid'=>$uid, 'tmpRst'=>$tmpRst];
+        Tool_Common::log('/zhongfa/'.__FUNCTION__, 'INFO', '众发下注', $logArr);
         $time2 = microtime(true);
         $status = 0;
-        if($tmpRst['success'] == 1){
+        if($tmpRst['success']){
             $status = 2;
             $tmpRst['status'] = $status;
             //# 获取方案号，记录id, 用于撤单
@@ -2497,7 +2498,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         $time_consume = ($end_time-$start_time).'s';
 
         $logArr = ['uid'=>$uid, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rstData'=>$rstData, 'errno'=>$errno, 'time_consume'=>$time_consume];
-        Tool_Common::log('postBetCurl','INFO','httpPost下注请求-5-1', $logArr);
+        Tool_Common::log('postBetCurl','INFO','httpPost下注请求-5-2', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
         return $rstData;
