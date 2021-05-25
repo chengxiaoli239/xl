@@ -608,7 +608,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             $TzSystemsUsers->user_agent,
         ];
 
-        $rst = self::postBetCurl($url,$post_data, $headers, $TzSystemsUsers->uid);
+        $rst = self::postBetCurl($url,$post_data, $headers, $TzSystemsUsers->uid, $b_type=1);
         if(true OR $rst['success']){
             $BettingRecords = BettingRecords::findOne(['snid'=>$snid, 'uid'=>$uid]);
             $BettingRecords->cancel_status = 1;
@@ -1160,7 +1160,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             'sec-fetch-site: same-origin',
             $TzSystemsUsers->user_agent,
         ];
-        $rst = self::postBetCurl($url, $post_data, $headers, $uid); # 调试阶段先注释12.26
+        $rst = self::postBetCurl($url, $post_data, $headers, $uid, $b_type=2); # 调试阶段先注释12.26
 
         $logArr = ['url'=>$url,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
         Tool_Common::log('/zhongfa/'.__FUNCTION__, 'INFO', '宝岛众发心跳', $logArr);
@@ -1583,7 +1583,7 @@ class ZhongFaService { # 宝岛众发登陆体系
 
         //$headers = json_decode($row->bet_headers, true);
         $time1 = microtime(true);
-        $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 调试阶段先注释12.26
+        $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid, $b_type=3); # 调试阶段先注释12.26
         $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'uid'=>$uid, 'tmpRst'=>$tmpRst];
         Tool_Common::log('/zhongfa/'.__FUNCTION__, 'INFO', '众发下注', $logArr);
         $time2 = microtime(true);
@@ -1671,7 +1671,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             $user_agent,
         ];
 
-        $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 调试阶段先注释12.26
+        $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid, $b_type=4); # 调试阶段先注释12.26
 
         return $tmpRst;
     }
@@ -2033,233 +2033,6 @@ class ZhongFaService { # 宝岛众发登陆体系
      * @desc 批量号码拆解下注
      * @param $qihao
      * @param $plan_id
-     * @param $codes
-     * @return array
-     */
-    public static function postBatchBetBak($qihao, $plan_id, $codes){
-        $tmpCodes = $codes;
-        $plan = UserSysPlans::findOne($plan_id);
-        if($plan->tz_type == 22){ # 四定单双,codes格式：13579,13579,02468,13579@13579,13579,02468,02468@13579,02468,13579,13579
-            $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway);
-        }elseif($plan->tz_type == 18){
-            $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway);
-        }else{
-            $tmpCodes = str_replace(',', '', $tmpCodes);
-            $codesArr = explode('@', $tmpCodes);
-        }
-        $BET_BIG_LIMIT_STATUS = BetService::getConfig('BET_BIG_LIMIT_STATUS');
-        if($BET_BIG_LIMIT_STATUS){
-            if(count($codesArr)>6000) return ['status'=>300, 'msg'=>'号码组数太多不能超过6000组号码'];
-        }
-
-        # 组数
-        $count = count($codesArr);
-
-        $betNums = self::getBetNumsPer();
-        //if($plan->account == 'aa22'){ $betNums = 10000; }
-        $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
-        //p($codesArrs);
-
-        $playway = $plan->playway ? $plan->playway : 3;
-        $single = $plan->single ? $plan->single : 0.1;
-        $tz_type = $plan->tz_type ? $plan->tz_type : 0;
-        $lottery_type = $plan->lottery_type;
-        //p(['playway'=>$playway, 'totalCount'=>count($codes), 'single'=>$single, 'qihao'=>$qihao, 'tz_type'=>$tz_type, 'buy_type'=>$plan->buy_type,'codes'=>$codes]);
-        if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
-
-        $data = ['status'=>200, 'msg'=>$qihao.'期投注成功!', 'time'=>date('Y-m-d H:i:s')];
-
-        $_t = round(microtime(true) * 1000);
-        $urlArr = self::getTzSiteInfo(self::$tz_system_id);//.'?'.http_build_query($post_data);
-        $querys = [
-            '_uri' => '/orders/bet',
-            '_nowTime' => $_t
-        ];
-        $sign = ZhongFaService::getSign($querys);
-        $querys['_sign'] = $sign;
-        $url = $urlArr['SSC_INDEX'].'/user-api/orders/bet?'.http_build_query($querys);
-        $way = self::getWay($tz_type);
-        $snInfo_sn = '';
-        $snInfo_snid = '';
-        $rst = [];
-        foreach ($codesArrs as $key=>$tmpcodesArr){
-            $bet_log = self::getBetLog($tz_type);
-            if($playway == 4){ # 一字定
-                $post_data = [
-                    'bets' => json_encode($tmpcodesArr),
-                    'way' => $way,
-                    'period_no' => $qihao,
-                ];
-
-            }else{ # 四定、三定、X字现
-                $bet_codes = trim(implode(':'.$single.'/', $tmpcodesArr), '/').':'.$single;
-                $post_data = [
-                    'content'=>$bet_codes,
-                    'bet_money'=>$single,
-                    'submitWay'=>'快译',
-                    'vol'=>$qihao,
-                    'note' => self::getOperationCondition($playway),
-                ];
-            }
-
-            $_t = round(microtime(true) * 1000);
-            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
-            $need_money = count($tmpcodesArr) * $single;
-            $left_money = $TzSystemsUsers->balance;
-            if($key==0 && $need_money>$left_money){
-                $msg = '第一次余额不足中断该用户后面所有下注';
-                Tool_Common::log('less_bet_money', 'INFO', '下注之后', ['account'=>$plan->account, 'uid'=>$plan->uid, 'plan_id'=>$plan->id, 'single'=>$single, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'msg'=>$msg]);
-                return ['status'=>303, 'msg'=>$msg];
-            }
-            $headers = [
-                ':authority: '.$urlArr['domain'],
-                ':method: POST',
-                ':path: /user-api/orders/bet?_uri=%2Forders%2Fbet&_nowTime='.$_t.'&_sign='.$sign,
-                ':scheme: https',
-                'accept: application/json, text/plain, */*',
-                'accept-encoding: gzip, deflate, br',
-                'accept-language: zh-CN,zh;q=0.9',
-                'content-length: '.strlen(http_build_query($post_data)),
-                'content-type: application/x-www-form-urlencoded',
-                'cookie: '.$TzSystemsUsers->cookie.'; main-lottery=twk5',
-                'origin: '.$TzSystemsUsers->ssc_domain,
-                'referer: '.$TzSystemsUsers->ssc_domain.'/game/kuai-yi',
-                'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
-                'sec-ch-ua-mobile: ?0',
-                'sec-fetch-dest: empty',
-                'sec-fetch-mode: cors',
-                'sec-fetch-site: same-origin',
-                $TzSystemsUsers->user_agent,
-            ];
-
-            //p(['post_data'=>$post_data, 'headers'=>$headers]);
-            # 缓存锁
-            $m = \Yii::$app->cache;
-            $betKey = BetService::buildBetKey($plan->account, self::$tz_system_id, $lottery_type, $qihao, $plan_id).'_'.$key; # 分配下注后面加key
-            if($betLock = $m->get($betKey)) return ['status'=>303, 'msg'=>'已经投注过了', 'key'=>$betKey];
-
-            //if(in_array($tz_type, [20, 23, 25]) OR $bigFlag == 1){
-            # 和值投注反应时间比较久，无需返回直接锁住
-            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
-            $m->set($betKey, 1, $time);
-            //}
-            # 真实投注
-            $start_time = microtime(true);
-            if(in_array($plan->account, \Yii::$app->params['test_account'])){
-                $tmpRst = ["Status"=>0, 'code'=>303, 'msg'=>'请重新登录']; //$tmpRst = ['Status'=>0, 'code'=>311];
-            }else{
-                $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
-            }
-            //sleep(1);
-
-            //p(['url'=>$url, 'headers'=>$headers, 'rst'=>$tmpRst,'post_data'=>$post_data, 'tmpRst'=>$tmpRst]);
-            $rst[$key] = $tmpRst;
-            //$rst = json_encode($rst);
-            $end_time = microtime(true);
-            $time_consume = ($end_time - $start_time). 's';
-            Tool_Common::log('afterPostBetCurl', 'INFO', '下注之后', ['account'=>$plan->account, 'uid'=>$plan->uid, 'plan_id'=>$plan->id, 'single'=>$single, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'tmpRst'=>$tmpRst, 'qihao'=>$qihao, 'tmpcodesArr'=>count($tmpcodesArr), 'time_consume'=>$time_consume]);
-            if($tmpRst['Status'] != 1){
-                $tzRst = [
-                    'uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'status'=>301, 'msg'=>$qihao.$rst['msg'],'url'=>$url,
-                    'post_data'=>$post_data, 'headers'=>$headers, 'postRst'=>$rst, 'time_consume'=>$time_consume, 'tmpRst_1'=>$tmpRst
-                ];
-                if(in_array($tmpRst['code'], [303, 309, 310, 313])){ # 判断掉线登录一次，再下注一次
-                    if($tmpRst['errno']>0 OR in_array($tmpRst['code'], [309,311])){ # 309,310,311   310有排查是已经换过代理IP,有待排查，为确保
-                        $mkey_310 = 'has_jinyong_ip_310'; # 您当前使用的浏览器不支持cookie，换一次代理ip
-                        $RedisLock = new RedisLock();
-                        if($RedisLock->lock($mkey_310, 60)){
-                            $mkey_proxy = PoxyIPService::builProxyIpKey($plan->uid);
-
-                            $m = \Yii::$app->cache;
-                            $mkey = $mkey_proxy.'_mcache';
-                            if(!$rm = $m->get($mkey)){
-                                $m->delete($mkey_proxy);
-                                $m->set($mkey, 1, 30);
-                            }
-                            $new_ip = PoxyIPService::getProxyIpNew($plan->uid);
-                        }else{
-                            sleep(10);
-                        }
-                        $tzRst['new_ip'] = $new_ip;
-                    }
-                    $TzSystemsUsers->cookie = '';
-                    $TzSystemsUsers->save();
-                    $loginRst = BaseService::login($TzSystemsUsers->id, $is_auto = 2);
-                    $tzRst['loginRst'] = $loginRst;
-                    $tmpRst_2 = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
-                    $rst[$key] = $tmpRst_2;
-                    $tzRst['tmpRst_2'] = $tmpRst_2;
-                }
-                if($tmpRst_2['Status'] != 1){ # 尝试再次下注失败则记录表，便于新下单
-                    $recordRst = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($tmpcodesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
-                    $logArr1 = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'key'=>$key, 'tmpRst_1'=>$tmpRst, 'recordRst'=>$recordRst];
-                    if(isset($tmpRst_2)){
-                        $logArr1['tmpRst_2'] = $tmpRst_2;
-                    }
-                    Tool_Common::log('BetErrorPlansTaskService_log', 'INFO', '自动下注重试失败1', $logArr1);
-                    if($tmpRst_2['code'] == 303){
-                        $loginRst2 = BaseService::login($TzSystemsUsers->id, $is_auto = 2);
-                    }
-                }
-                Tool_Common::log('bet_error','INFO','幸运五5分批投注记录-投注失败', $tzRst);
-                # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护，307账号停押
-                if(!in_array($plan->account, \Yii::$app->params['test_account']) && in_array($rst[$key]['code'], [302, 303, 304, 306, 307])){
-                    //return $rst;
-                    continue;
-                }
-            }
-
-            $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
-            $m->set($betKey, 1, $time);
-
-            # 获取方案号，记录id, 用于撤单
-            $snInfo = self::getSn(self::$user_id, self::$tz_system_id, $lottery_type);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
-            $snInfo_snid .= '{'.$snInfo['sn'].'}|'.count($tmpcodesArr).';'; # 多次下单需要分开，多次撤单
-            $snInfo_sn .= $snInfo['sn'].';'; # 多次下单需要分开，多次撤单
-        }
-        $data['rst'] = $rst;
-
-        $n = count(explode('@',$codes));
-        if(in_array($playway, [2, 3]) && $tz_type != 20){
-            $totalmoney = SscDataService::calTzTotalMoney($codes, $single, $playway);
-        }else{
-            $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
-        }
-        if($playway == 4 && $tz_type == 18){ # 一字定
-            $totalmoney = $count * $single;
-        }
-
-        $insertData = [
-            'playway'=> $playway,  // 投注方式
-            'tz_type'=> $tz_type,  // 投注类型
-            'buy_type'=> 1,  // 购买方向类型
-            'uid'=> self::$user_id,  // 投注账号id
-            'lottery_type' => $lottery_type, # 彩种
-            'account' => $plan->account,
-            'plan_id' => $plan_id, # 计划id
-            'codes' => (string)$codes,  // 投注号码
-            'qihao' => $qihao,  // 投注期号
-            'tz_system_id' => self::$tz_system_id,  // 投注系统tz_systems_id
-            'sn'=> trim($snInfo_sn, ';'),
-            'snid'=> trim($snInfo_snid, ';'),
-            'order_type'=>3, # 单双三字定
-            'is_simulate' => 0,  // 是否模拟投注
-            'single' => $single,  // 投注倍数
-            'betting_money'=> round($totalmoney, 2),  // 投注金额
-        ];
-        $insertRst = BetService::_logRecords($insertData);
-        self::$headers = [];
-
-        $logArr = ['uid'=>self::$user_id,'url'=>$url,'headers'=>self::$headers, 'bigFlag'=>1, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
-
-        return $data;
-    }
-
-    /**
-     * @desc 批量号码拆解下注
-     * @param $qihao
-     * @param $plan_id
      * @param $codes - 1,2,3,4@2,3,4,5@5,6,7,8
      * @param int $is_task - 任务类型
      * @return array
@@ -2349,7 +2122,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             Tool_Common::log('afterPostBetCurl', 'INFO', '下注之后', ['account'=>$plan->account, 'uid'=>$plan->uid, 'plan_id'=>$plan->id, 'single'=>$single, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'tmpcodesArr'=>count($tmpcodesArr)]);
             if(!$is_task){
                 $start_time = microtime(true);
-                $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+                $tmpRst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid, $b_type=5);
                 $end_time = microtime(true);
                 $time_consume = ($end_time - $start_time). 's';
             }else{
@@ -2403,9 +2176,10 @@ class ZhongFaService { # 宝岛众发登陆体系
      * @decription post请求根据，接受传递的header头
      * @param $url
      */
-    public static function postBetCurl($url,$post_data = [],$headers=[], $uid = 0){
+    public static function postBetCurl($url,$post_data = [],$headers=[], $uid = 0, $b_type=0){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         if(!$timeout) $timeout = 30;
+        $b_types = [0=>'默认', 1=>'取消订单', 2=>'心跳包', 3=>'自动下注任务', 4=>'重复下注', 5=>'手工下注'];
 
         //$cookie = dirname(__FILE__)."/cookie.txt";
 
@@ -2498,7 +2272,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         $time_consume = ($end_time-$start_time).'s';
 
         $logArr = ['uid'=>$uid, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rstData'=>$rstData, 'errno'=>$errno, 'time_consume'=>$time_consume];
-        Tool_Common::log('postBetCurl','INFO','httpPost下注请求-5-2', $logArr);
+        Tool_Common::log('postBetCurl','INFO','httpPost'.$b_types[$b_type].'请求-5-2', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 
         return $rstData;
