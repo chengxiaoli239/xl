@@ -33,7 +33,8 @@ class PoxyIPService extends BaseService {
             'pt' => 1, # 1、http/https,返回http代理的端口号 2、socks4/socks5,返回socks代理的端口号
             'format' => 'json', # json、xml
             'sep' => 1,
-            'area' => '浙江,福建,江西,上海,湖北,江苏,广东',
+            //'area' => '浙江,福建,江西,上海,湖北,江苏,广东',
+            'area' => '海南',
             'signature' => $API_KEY,
         ];
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdps/?'.http_build_query($query);
@@ -342,5 +343,19 @@ class PoxyIPService extends BaseService {
         $uids = $uids ? $uids : [];
 
         return $uids;
+    }
+
+    /**
+     * @desc 用户是否开启代理IP
+     * @param string $uid
+     * @return bool
+     */
+    public static function isOpenPoxyIPUser($uid=''){
+        $flag = false;
+        $uids = self::getProxyUids();
+        if(in_array($uid, $uids)){
+            $flag = true;
+        }
+        return $flag;
     }
 }

@@ -228,6 +228,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = ZhongFaService::userInfo($uid=14, $tz_system_id=16);p($data);
+        $rst = PoxyIPService::preGetValidIp($is_auto=0);p($rst);
         $data = LeCaiService::getLotteryBatchGw($lottery_type=18);p($data);
         $data = LeCaiService::getLotteryBatch($lottery_type=18);$kjDatas = array_reverse($data); p($kjDatas);
         foreach ($kjDatas as $key=>$dataInfo){
@@ -337,7 +339,6 @@ class IndexController extends Controller
         $rst = BingDaoService::login($uid=12, $tz_system_id=13);p($rst);
         $rst = OpKjService::opSscKjData(12); p($rst); # 处理投注数据
         $rst = PoxyIPService::getProxyIpNew();p($rst);
-        $rst = PoxyIPService::preGetValidIp($is_auto=0);p($rst);
 
         set_time_limit(0);
         $rst = JinYingService::getBalance('18', '15');p($rst);

@@ -1339,11 +1339,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        if($POXY_STATUS){
-            $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
-            if(empty($poxy_addr)) return ['status'=>30200, 'msg'=>'代理IP获取异常,请稍候...', 'POXY_STATUS'=>$POXY_STATUS];
-        }
+        $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -1519,7 +1515,8 @@ class ZhongFaService { # 宝岛众发登陆体系
 
         $start_time = microtime(true);
         $uid = max($TzSystemsUsers->uid, $uid);
-        $data = self::httpGet($url, $headers, $uid, $time_out=15);
+        //$data = self::httpGet($url, $headers, $uid, $time_out=15);
+        $data = self::httpGetCurl($url, $headers, $uid, $time_out=15);
 
         $end_time = microtime(true);
         $time_consume = ($end_time-$start_time).'s';
@@ -2209,7 +2206,6 @@ class ZhongFaService { # 宝岛众发登陆体系
             //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
         }
 
-        $start_time0 = microtime(true);
         $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
 
         //设置post方式提交
@@ -2309,6 +2305,43 @@ class ZhongFaService { # 宝岛众发登陆体系
      * @decription
      * @param $url
      */
+    public static function httpGetCurl($url,$headers=[], $uid = 0, $timeout=''){
+        if(empty($timeout)){
+            $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        }
+        $ch = curl_init();
+
+        curl_setopt_array($ch, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => $timeout,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => $headers,
+        ));
+        $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+
+        $data = curl_exec($ch);
+        $errno = curl_errno( $ch );
+        $logArr = ['url'=>$url, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]; p($logArr);
+        if($errno){
+            $logArr = ['url'=>$url, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
+        }
+
+        curl_close($ch);
+        $rst = json_decode($data, 320);
+
+        return $rst;
+    }
+
+    /**
+     * @decription
+     * @param $url
+     */
     public static function httpGet($url,$header=[], $uid = 0, $timeout=''){
         if(empty($timeout)){
             $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
@@ -2322,20 +2355,20 @@ class ZhongFaService { # 宝岛众发登陆体系
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        self::setPoxy($ch, $url, $uid); # 设置代理IP
+        $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
 
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 2);
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER,0);
 
         $data = curl_exec($ch);
 
-        //$logArr = ['url'=>$url, 'url'=>$url, 'headers'=>$header,'data'=>$data]; p($logArr);
-        //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
         $errno = curl_errno( $ch );
+        //$logArr = ['url'=>$url, 'url'=>$url, 'headers'=>$header,'data'=>$data, 'errno'=>$errno]; p($logArr);
+        //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
         if($errno>0){
             return ['status'=>300, 'errno'=>$errno];
         }
@@ -2409,19 +2442,19 @@ class ZhongFaService { # 宝岛众发登陆体系
     /**
      * @desc 设置全局代理
      * @param $ch
-     * @return bool
+     * @return bool|array
      */
     public static function setPoxy($ch, $url='', $uid = 0){
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        if(!$POXY_STATUS) return []; # CURL 代理开关
+        if(!$POXY_STATUS) return ['status'=>301, 'msg'=>'未开启IP代理开关']; # CURL 代理开关
+
+        $is_open_poxy = PoxyIPService::isOpenPoxyIPUser($uid);
+        if(!$is_open_poxy){
+            return ['status'=>300, 'msg'=>'用户未开启IP代理[uid:'.$uid.']'];
+        }
 
         $poxy_addr = PoxyIPService::getPoxyIp($uid);
-
         Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);
-        $uids = PoxyIPService::getProxyUids();
-        if(empty($uids) OR !in_array($uid, $uids) OR !$uid){
-            return [];
-        }
 
         if(!empty($poxy_addr)){
             //设置代理
@@ -2435,7 +2468,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
         }
 
-        return $poxy_addr;
+        return ['status'=>200, 'poxy_addr'=>$poxy_addr];
     }
 
 }
