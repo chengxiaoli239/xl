@@ -296,7 +296,7 @@ abstract class BetService extends BaseBetService {
                     $planIds[] = $plan->id;
                     $tzRst[$plan->id] = self::tzByPlanId($plan->id);
                 }
-                BetService::synBalance($plan->uid, $plan->tz_sites);# 目前tz_sites 已变更为单个站点id
+                //BetService::synBalance($plan->uid, $plan->tz_sites);# 目前tz_sites 已变更为单个站点id
                 BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 彩种投注结束锁
                 $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
                 $logArr[$lottery_type]['plansIds'] = $planIds;
@@ -430,7 +430,7 @@ abstract class BetService extends BaseBetService {
                     $BettingRecords->sn = implode(';', $planSn['sns']);
                     $BettingRecords->save();
                 }
-                $rst = BetService::synBalance($uid,$tz_system_id, $is_auto);
+                //$rst = BetService::synBalance($uid,$tz_system_id, $is_auto);
             }
         }
 
