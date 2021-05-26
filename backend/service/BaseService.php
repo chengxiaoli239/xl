@@ -111,6 +111,11 @@ class BaseService{
         $start_time = microtime(true);
 
         $tz_system_id = $TzSystemsUser->tz_system_id;
+        $now_time = date('H:i');
+        $clock_times = [16=>'02:00'];
+        if(isset($clock_times[$tz_system_id]) && $now_time>$clock_times){
+            return ['status'=>300, 'msg'=>'关盘时间'];
+        }
         $m = \Yii::$app->cache;
         $mkey = 'synBalance_'.$tz_system_id.'_'.$TzSystemsUser->id;
         # 是否有激活的计划

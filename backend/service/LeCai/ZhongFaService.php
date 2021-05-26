@@ -1530,7 +1530,12 @@ class ZhongFaService { # 宝岛众发登陆体系
         $TzSystemsUsers->desc = $desc;
         $TzSystemsUsers->save();
         Tool_Common::log('userInfo','INFO','宝岛众发-用户信息-2', $logArr);
-        self::heart($uid, $tz_system_id); # 心跳包
+        $m = \Yii::$app->cache;
+        $mkey = 'heart';
+        if(!$flag = $m->get($mkey)){
+            $m->set($mkey, 1, 120);
+            self::heart($uid, $tz_system_id); # 心跳包
+        }
         return $data;
     }
 
