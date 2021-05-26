@@ -1515,8 +1515,8 @@ class ZhongFaService { # 宝岛众发登陆体系
 
         $start_time = microtime(true);
         $uid = max($TzSystemsUsers->uid, $uid);
-        //$data = self::httpGet($url, $headers, $uid, $time_out=15);
-        $data = self::httpGetCurl($url, $headers, $uid, $time_out=15);
+        $data = self::httpGet($url, $headers, $uid, $time_out=15);
+        //$data = self::httpGetCurl($url, $headers, $uid, $time_out=15);
 
         $end_time = microtime(true);
         $time_consume = ($end_time-$start_time).'s';
@@ -2359,7 +2359,7 @@ class ZhongFaService { # 宝岛众发登陆体系
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 2);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER,0);
@@ -2367,14 +2367,12 @@ class ZhongFaService { # 宝岛众发登陆体系
         $data = curl_exec($ch);
 
         $errno = curl_errno( $ch );
-        //$logArr = ['url'=>$url, 'url'=>$url, 'headers'=>$header,'data'=>$data, 'errno'=>$errno]; p($logArr);
+        $logArr = ['url'=>$url, 'headers'=>$header,'data'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]; p($logArr);
         //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
         if($errno>0){
             return ['status'=>300, 'errno'=>$errno];
         }
-        if(curl_close($ch)) {
-            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
-        }
+        curl_close($ch);
         if(!BaseService::is_json($data)){
             return $data;
         }
