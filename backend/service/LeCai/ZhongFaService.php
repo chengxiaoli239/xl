@@ -2367,7 +2367,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         $data = curl_exec($ch);
 
         $errno = curl_errno( $ch );
-        $logArr = ['url'=>$url, 'headers'=>$header,'data'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]; p($logArr);
+        //$logArr = ['url'=>$url, 'headers'=>$header,'data'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]; p($logArr);
         //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
         if($errno>0){
             return ['status'=>300, 'errno'=>$errno];
