@@ -2335,6 +2335,10 @@ class ZhongFaService { # 宝岛众发登陆体系
 
         //$logArr = ['url'=>$url, 'url'=>$url, 'headers'=>$header,'data'=>$data]; p($logArr);
         //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
+        $errno = curl_errno( $ch );
+        if($errno>0){
+            return ['status'=>300, 'errno'=>$errno];
+        }
         if(curl_close($ch)) {
             echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
         }
