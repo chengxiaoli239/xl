@@ -463,7 +463,7 @@ abstract class BetService extends BaseBetService {
         }else{
             $qihao = HN0898Service::getQihao($lottery_type);
         }
-        $m->set($mkey, $qihao, 30);
+        $m->set($mkey, $qihao, 5);
 
         return $qihao;
     }
