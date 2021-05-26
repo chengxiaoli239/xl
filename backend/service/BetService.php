@@ -463,7 +463,7 @@ abstract class BetService extends BaseBetService {
         }else{
             $qihao = HN0898Service::getQihao($lottery_type);
         }
-        $m->set($mkey, $qihao, 5);
+        $m->set($mkey, $qihao, 30);
 
         return $qihao;
     }
@@ -542,26 +542,6 @@ abstract class BetService extends BaseBetService {
         $TzSystemsUser = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
         $rst = BaseService::synBalance($TzSystemsUser->id, $is_auto);
-        /*
-        if(in_array($tz_system_id, [1,2])){
-            # 1、0898投注、2、99彩票网
-            $rst = HN0898Service::synBalance($TzSystemsUser->id);
-        }elseif(in_array($tz_system_id, [3, 7, 9])){
-            # 3、重庆7时彩网
-            if($tz_system_id == 3){
-                $rst = SevenService::synBalance($TzSystemsUser->id);
-            }else{
-                $rst = LuckyBaseService::synBalance($TzSystemsUser->id);
-            }
-        }elseif(in_array($tz_system_id, [4])){
-            # 4、7天彩票网
-        }elseif(in_array($tz_system_id, [5])){
-            # 5、希腊网
-        }elseif(in_array($tz_system_id, [6])){
-            # 6、会员网
-            $rst = KuaiLe8Service::synBalance($TzSystemsUser->id);
-        }
-        */
 
         return $rst;
     }
@@ -1356,6 +1336,8 @@ abstract class BetService extends BaseBetService {
     public static function isLogin($uid, $tz_system_id, $r=''){
         $m = \Yii::$app->cache;
         $mkey = 'isLogin_'.$uid.'_'.$tz_system_id;
+        $flag = $m->get($mkey);
+        if($flag) return (boolean)$flag;
         Tool_Common::log('isLogin_REQ', 'INFO', '是否登陆', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'r'=>$r]);
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网
@@ -1381,12 +1363,13 @@ abstract class BetService extends BaseBetService {
             # 16、台湾快五
             $flag = ZhongFaService::isLogin($uid, $tz_system_id);
         }
+        $m->set($mkey, 1, 15);
 
         return (boolean)$flag;
     }
 
     /**
-     * @desc 同步用户所有站点余额
+     * @desc 用户刷新个人信息
      * @param $uid
      */
     public static function synUserAllBalance($uid){

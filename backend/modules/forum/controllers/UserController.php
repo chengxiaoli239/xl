@@ -152,17 +152,8 @@ class UserController extends BaseController
             BetService::synUserAllBalance($uid);
 
             $model = $this->findAllModel($uid);
-            /*
-            $user = AdminModel::findOne($uid);
-            if($model->is_agent){
-                $view = "agent_view";
-            }else{
-                $view = "view";
-            }
-            */
             $view = "view";
             return $this->render($view, [
-                //'model' => $this->findModel($uid),
                 'models' => $model
             ]);
         }
@@ -289,7 +280,7 @@ class UserController extends BaseController
     }
 
     /**
-     * @desc 同步单个系统余额
+     * @desc 个人信息页单击 - 同步单个系统余额
      * @return array
      */
     public function actionSyncOneBalance(){
