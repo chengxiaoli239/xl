@@ -254,28 +254,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 下注 uid
-     * @param $uid
-     * @return array
-     */
-    public function actionBetUid($uid){
-        $tzStatus = SystemConfig::findOne(['key'=>'tz_status'])->value;
-        if(!$tzStatus) return ['status'=>300, 'msg'=>'投注开关未开启'];
-        self::_init();
-        set_time_limit(0);
-
-        $for_times = 3;
-        $rnd = rand(5, 10);
-        $sleep_time = 10 * $rnd;
-        for($i=0; $i<$for_times; $i++){
-            sleep($sleep_time);
-            $rst[$i]['rst'] = BetService::lotteryBet($uid);
-        }
-
-        return $rst;
-    }
-
-    /**
      * @desc 访问首页
      * @return mixed
      */

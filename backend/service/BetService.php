@@ -356,7 +356,10 @@ abstract class BetService extends BaseBetService {
                 $where = array_merge($where, [['=', 'uid', $uid]]);
             }
             $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
-            if(empty($BetErrorPlansTasks)) continue;
+            if(empty($BetErrorPlansTasks)){
+                Tool_Common::log('/repeatErrorBet/bet_error', 'ERR', '网盘开盘状态-2', ['uid' => $uid, 'msg'=>'没有下注计划']);
+                continue;
+            }
             if($uid){
                 $activeQihao = BetService::getActiveQihao($uid, $BetErrorPlansTasks[0]->tz_system_id, $lottery_type);
                 if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
