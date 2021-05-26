@@ -1229,7 +1229,7 @@ class ZhongFaService { # 宝岛众发登陆体系
             'sec-fetch-site: same-origin',
             'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
         ];
-        $imageData = CurlService::httpGet($url, $headers);
+        $imageData = self::httpGet($url, $headers, $uid);
         $filename = Yii::$app->basePath . "/runtime/captcha/".$uid.'_'.$tz_system_id.'_'.$cookie_key.".png";
         //$filename = Yii::$app->basePath . "/runtime/captcha/".$cookie.".png";
         $tp = fopen($filename,"w");
