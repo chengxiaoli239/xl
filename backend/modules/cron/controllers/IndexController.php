@@ -264,7 +264,7 @@ class IndexController extends Controller
         self::_init();
         set_time_limit(0);
 
-        $for_times = 1;
+        $for_times = 3;
         $rnd = rand(5, 10);
         $sleep_time = 10 * $rnd;
         for($i=0; $i<$for_times; $i++){
