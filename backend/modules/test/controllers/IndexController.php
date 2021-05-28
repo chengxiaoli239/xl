@@ -228,6 +228,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $d = [
+            '1234' => ['sn'=>'34565'],
+            '245' => ['sn'=>'345634545'],
+        ];
+        p(current($d));
         $data = ZhongFaService::userInfo($uid=14, $tz_system_id=16);p($data);
         $rst = PoxyIPService::preGetValidIp($is_auto=0);p($rst);
         $data = LeCaiService::getLotteryBatchGw($lottery_type=18);p($data);

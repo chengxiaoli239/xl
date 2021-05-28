@@ -1676,7 +1676,13 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @return array|string
      */
     public static function getActiveQihao($uid='', $tz_system_id='', $lottery_type = 8){
+        $m = \Yii::$app->cache;
+        $mkey = 'getActiveQihao_'.$tz_system_id.'_'.$lottery_type;
+        $qihao = $m->get($mkey);
+
+        if($qihao) return $qihao;
         if(!$uid OR !$tz_system_id) return ['code'=>300, 'msg'=>'uid或者tz_system_id不能为空'];
+
         $data = self::getQihaoInfo($uid, $tz_system_id);
         Tool_Common::log('getActiveQihao', 'INFO', '获取正在进行的期号'.$lottery_type, ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'data'=>$data]);
         if(isset($data['status']) && $data['status'] == '30200') return $data;
@@ -1685,6 +1691,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }else{
             $qihao = '';
         }
+        $m->set($mkey, $qihao, 15);
 
         return $qihao;
     }
