@@ -587,9 +587,10 @@ class UserSysPlansService extends BaseService {
     /**
      * @desc 导入方案号码表数据
      * @param $plan_id
+     * @param int $code_type 1一定2二定3三定4四定
      * @return string
      */
-    public static function getImportCodes($plan_id){
+    public static function getImportCodes($plan_id, $code_type=''){
         $plan = UserSysPlans::findOne($plan_id);
         $hzArr = json_decode($plan->hz_Arr, true);
         $key = ($hzArr['change_per']==0 OR $hzArr['turn_key']==0) ? 0 : $hzArr['turn_key'];

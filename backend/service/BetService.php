@@ -611,7 +611,7 @@ abstract class BetService extends BaseBetService {
                 if(in_array($tz_type, [30])) { # 二定快选
                     $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 2);
                 }elseif(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])) { # 二定 导入方案
-                    $codesArr = UserSysPlansService::getImportCodes($plan_id);
+                    $codesArr = UserSysPlansService::getImportCodes($plan_id, $code_type=2);
                 }elseif(in_array($tz_type, [31])) { # 五位二定
                     $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 5);
                 }elseif(in_array($tz_type, [33])) { # 二定号码翻倍切换
@@ -625,7 +625,7 @@ abstract class BetService extends BaseBetService {
                 break;
             case 2: # 三字定
                 if(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])) { # 导入方案
-                    $codesArr = UserSysPlansService::getImportCodes($plan_id);
+                    $codesArr = UserSysPlansService::getImportCodes($plan_id, $code_type=3);
                 }else{
                     if(in_array($tz_type, [29])){ # 三定快选
                         $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type = 3);
@@ -1635,7 +1635,14 @@ abstract class BetService extends BaseBetService {
     public static function getInverseCodes($codesArr, $code_type){
         if(!is_array($codesArr)) return [];
         $where = ['AND', ['=', 'code_type', $code_type], ['NOT IN', 'code', $codesArr]];
-        $Num4Type = Num4Type::find()->where($where)->asArray()->all();
+        $query = Num4Type::find()->where($where);
+        $filter_poses = NumService::getFilterPosByCode($codesArr[0]); # 根据导入的号码判断要过滤的位置
+        if(!empty($filter_poses)){
+            foreach ($filter_poses as $pos){
+                $query->andWhere(['<>', 'code_'.$pos, 'X']);
+            }
+        }
+        $Num4Type = $query->asArray()->all();
         $data = ArrayHelper::getColumn($Num4Type, 'code');
 
         return $data;
