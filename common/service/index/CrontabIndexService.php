@@ -14,8 +14,8 @@ class  CrontabIndexService{
         foreach ($TzSystemsUsers as $TzSystemsUser){
             $tz_system_id = $TzSystemsUser->tz_system_id;
             $now_time = date('H:i');
-            $clock_times = [16=>'02:00'];
-            if(isset($clock_times[$tz_system_id]) && $now_time>$clock_times[$tz_system_id]){
+            $close_times = [16=>['02:00', '06:50']];
+            if(isset($close_times[$tz_system_id]) && $now_time>$close_times[$tz_system_id][0] && $now_time<$close_times[$tz_system_id][1]){
                 $r = ['status'=>300, 'msg'=>'关盘时间'];
             }else{
                 $r = BaseService::login($TzSystemsUser->id);
