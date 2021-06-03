@@ -303,8 +303,9 @@ class NineNineNewService extends BaseTZService {
      * @return string
      */
     public static function getNineNineQihao($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
-        if($lottery_type == 6){
+        if($lottery_type == 6) {
             $qihao = substr($qihao, 0, 8) . '0' . substr($qihao, 8, 2);
+        }elseif (in_array($lottery_type, [1, 17])){
         }else{
             $qihao = substr($qihao, 0, 8) . '0' . substr($qihao, 8, 2);
         }
@@ -360,14 +361,15 @@ class NineNineNewService extends BaseTZService {
         $sn = '';
         $snid = '';
         foreach ($codesArrs as $key=>$codesArr){
-            $items = self::getBetStyleCodes($playway, $codesArr, $single, $tz_type);
+            $items = self::getBetStyleCodes($playway, $codesArr, $single, $tz_type, $lottery_type);
             $betKey_i = $betKey.'_'.$key;
             if($fi = $m->get($betKey_i) && $is_auto){
                 Tool_Common::log('/debug/bet_record', 'INFO', '投注继续', ['betKey_1'=>$betKey_i]);
             }
             $nn_qihao = self::getNineNineQihao($qihao, $lottery_type);
             $post_data = [
-                'betIssue'=>$nn_qihao, 'lotName'=>'xjssc',
+                'betIssue'=>$nn_qihao,
+                'lotName'=>self::getLotNameByLotteryType($lottery_type),
                 'items' => $items,
             ];
             $post_data = json_encode($post_data, 320);
@@ -377,22 +379,28 @@ class NineNineNewService extends BaseTZService {
             //p($xCsrf);
             $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/userlottery/add';
             $headers = [
-                "Accept: application/json, text/plain, */*",
-                "Accept-Encoding: gzip, deflate, br",
-                "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
-                "Connection: keep-alive",
-                'Content-Length:'.strlen($post_data),
-                "Content-Type: application/json;charset=UTF-8",
-                "contentType: application/json",
-                'Cookie: '.$TzSystemsUsers->cookie,
-                "Host: www.".$urlArr['domain'],
-                "Origin: ".$urlArr['baseUrl'],
-                "Referer: ".$urlArr['baseUrl']."/web/caipiao/ssc/xjssc",
-                "Sec-Fetch-Dest: empty",
-                "Sec-Fetch-Mode: cors",
-                "Sec-Fetch-Site: same-origin",
-                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
-                "userType: 0",
+                ":authority: ".$urlArr['domain'],
+                ":method: POST",
+                ":path: /cloud-lottery-service-server/gameInfo/userlottery/add",
+                ":scheme: https",
+                "accept: application/json, text/plain, */*",
+                "accept-encoding: gzip, deflate, br",
+                "accept-language: zh-CN,zh;q=0.9,en;q=0.8",
+                //"Connection: keep-alive",
+                'content-Length:'.strlen($post_data),
+                "content-type: application/json;charset=UTF-8",
+                "contenttype: application/json",
+                'cookie: '.$TzSystemsUsers->cookie,
+                //"Host: www.".$urlArr['domain'],
+                "origin: ".$urlArr['baseUrl'],
+                "referer: ".$urlArr['baseUrl']."/web/caipiao".self::getReferByLotteryType($lottery_type),
+                'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+                "sec-ch-ua-mobile: ?0",
+                "sec-fetch-dest: empty",
+                "sec-fetch-mode: cors",
+                "sec-fetch-site: same-origin",
+                $TzSystemsUsers->user_agent,
+                "usertype: 0",
                 "x-csrf-index: ".$xCsrf['Index'],
                 "x-csrf-token: ".$xCsrf['Token'],
             ];
@@ -403,6 +411,7 @@ class NineNineNewService extends BaseTZService {
             # 真实投注
             $start_time = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers);
+            //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$tmpRst];p($logArr);
             if($tmpRst['rstData']['code'] != 200){
                 BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
             }
@@ -445,7 +454,7 @@ class NineNineNewService extends BaseTZService {
                     $m->set($xCsrf_key, $xCsrf, 120);
                 }
             }
-            //p(['rst'=>$rst, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'is_auto'=>$is_auto]);
+            //p(['tmpRst'=>$tmpRst, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'is_auto'=>$is_auto]);
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time). 's';
             if(!$rstData){
@@ -503,6 +512,40 @@ class NineNineNewService extends BaseTZService {
     }
 
     /**
+     * @desc 获取彩票简称 - 九九网
+     * @param int $lottery_type
+     * @return string|string[]
+     */
+    public static function getLotNameByLotteryType($lottery_type=DEFAULT_LOTTERY_TYPE){
+        $datas = [
+            1 => 'qxc',   # 七星才
+            5 => 'cqssc', # 重庆时时彩
+            6 => 'xjssc', # 新疆时时彩
+            17 => 'plw',  # 排列五
+        ];
+        if(isset($datas[$lottery_type])) return $datas[$lottery_type];
+
+        return $datas;
+    }
+
+    /**
+     * @desc 获取彩票简称 - 九九网
+     * @param int $lottery_type
+     * @return string|string[]
+     */
+    public static function getReferByLotteryType($lottery_type=DEFAULT_LOTTERY_TYPE){
+        $datas = [
+            1 => '/qxc/hnqxc',   # 七星才
+            5 => '/ssc/cqssc', # 重庆时时彩
+            6 => '/ssc/xjssc', # 新疆时时彩
+            17 => '/pl/plw',  # 排列五
+        ];
+        if(isset($datas[$lottery_type])) return $datas[$lottery_type];
+
+        return $datas;
+    }
+
+    /**
      * @param $playway
      * @param $codesArr
      * @param float $single
@@ -510,47 +553,63 @@ class NineNineNewService extends BaseTZService {
      * @param int $type 1前四
      * @return array 例如： ['1234X', '4537X']
      */
-    public static function getBetStyleCodes($playway, $codesArr, $single = 0.1, $tz_type = 1){
+    public static function getBetStyleCodes($playway, $codesArr, $single = 0.1, $tz_type = 1, $lottery_type=DEFAULT_LOTTERY_TYPE){
         $units = [1=>1, 2=>0.1, 3=>0.1]; # 0.1角模式 1元模式
         $datas = [];
 
         $oddsTypes = [
             1 => ['minOdds'=>86.5, 'maxOdds'=>99.5], # 二定，元
             2 => ['minOdds'=>865, 'maxOdds'=>995], # 三定，元
-            3 => ['minOdds'=>8650, 'maxOdds'=>9950], # 四定，元
+            3 => ['minOdds'=>7700, 'maxOdds'=>9000], # 四定，元
         ];
 
         $betUnit =  $units[$playway];
         $odds = ['minOdds'=>$oddsTypes[$playway]['minOdds'], 'maxOdds'=>$oddsTypes[$playway]['maxOdds'], 'backRate'=>13];
         if($playway == 3){ # 四定
-            if($tz_type == 22){
-                # 四定单双
+            if(in_array($lottery_type, [1, 17])){
                 foreach ($codesArr as $code){
-                    $datas[] = [
-                        'betType' => 'all',
-                        'backRate' => 0, # 返点，默认最高赔率，无返点
-                        'betUnit' => $betUnit,
-                        'playType' => '四定',
-                        'betNum' => $code.',X',
-                        'odds' => $odds,
-                        'betBeishu' => ceil($single/$betUnit),
-                        'betZhushu' => 625,
-                    ];
-                }
-            }else{
-                # 全倒
-                foreach ($codesArr as $code){
-                    $codes[] = str_replace(',', '', $code.'X');
+                    $codes[] = str_replace(',', '', $code);
                 }
                 $datas[] = [
-                    'betType' => 'all',
                     'backRate' => 0, # 返点，默认最高赔率，无返点
                     'betUnit' => $betUnit,
                     'playType' => self::getPlayType($playway),
                     'betNum' => implode(',', $codes),
+                    'odds' => $odds,
                     'betBeishu' => ceil($single/$betUnit),
                     'betZhushu' => count($codesArr),
                 ];
+
+            }else{
+                if($tz_type == 22){
+                    # 四定单双
+                    foreach ($codesArr as $code){
+                        $datas[] = [
+                            'betType' => 'all',
+                            'backRate' => 0, # 返点，默认最高赔率，无返点
+                            'betUnit' => $betUnit,
+                            'playType' => '四定',
+                            'betNum' => $code.',X',
+                            'odds' => $odds,
+                            'betBeishu' => ceil($single/$betUnit),
+                            'betZhushu' => 625,
+                        ];
+                    }
+                }else{
+                    # 全倒
+                    foreach ($codesArr as $code){
+                        $codes[] = str_replace(',', '', $code.'X');
+                    }
+                    $datas[] = [
+                        'betType' => 'all',
+                        'backRate' => 0, # 返点，默认最高赔率，无返点
+                        'betUnit' => $betUnit,
+                        'playType' => self::getPlayType($playway),
+                        'betNum' => implode(',', $codes),
+                        'betBeishu' => ceil($single/$betUnit),
+                        'betZhushu' => count($codesArr),
+                    ];
+                }
             }
         }elseif(in_array($playway, [1, 2])){ # 二定、三定
             foreach ($codesArr as $code){

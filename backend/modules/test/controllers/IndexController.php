@@ -228,11 +228,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $d = [
-            '1234' => ['sn'=>'34565'],
-            '245' => ['sn'=>'345634545'],
-        ];
-        p(current($d));
+        $rst['bet'] = BetService::betByUidNew($uid=11);p($rst); // 用户新计划投注，可正买可反买
         $data = ZhongFaService::userInfo($uid=14, $tz_system_id=16);p($data);
         $rst = PoxyIPService::preGetValidIp($is_auto=0);p($rst);
         $data = LeCaiService::getLotteryBatchGw($lottery_type=18);p($data);
@@ -307,7 +303,6 @@ class IndexController extends Controller
         $str = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx16d295b4421899d4&redirect_uri=http%3A%2F%2Fgoapi.hngoshare.com%2Fpay%2Findex%2Fmiddle-redirect%3Fparams%3D%252Fweixin%252Fwechat.html%253Forder_sn%253D2021011610424878811%2526&response_type=code&scope=snsapi_base&state=STATE&connect_redirect=1#wechat_redirect";
         p(urldecode($str));
         $data = QxcTcw::QixingCaiBatch($type = 'json', $post['is_auto']=0);p($data);
-        $rst['bet'] = BetService::betByUidNew($uid=10);p($rst); // 用户新计划投注，可正买可反买
         $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
         $rst = BaoTaService::updateUserBetStatus($id=86, $is_auto=2);p($rst);
 

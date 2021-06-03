@@ -30,7 +30,7 @@ C、Request Headers
 D、Request Payload
     {"betIssue":"20201202046","lotName":"xjssc","items":[{"betType":"all","backRate":"0","betUnit":1,"playType":"四定","betNum":"6,4,2,6,X","odds":{"minOdds":8650,"maxOdds":9950,"backRate":13},"betBeishu":1,"betZhushu":1},{"betType":"all","backRate":"0","betUnit":1,"playType":"四定","betNum":"8,7,4,2,X","odds":{"minOdds":8650,"maxOdds":9950,"backRate":13},"betBeishu":1,"betZhushu":1}]}
 
-# 四定下注 2  优选
+# 四定下注 2  优先
 A、General
     Request URL: https://www.99065w.com/cloud-lottery-service-server/gameInfo/userlottery/add
     Request Method: POST
