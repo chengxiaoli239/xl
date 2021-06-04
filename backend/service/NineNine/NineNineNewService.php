@@ -368,7 +368,7 @@ class NineNineNewService extends BaseTZService {
             }
             $nn_qihao = self::getNineNineQihao($qihao, $lottery_type);
             $post_data = [
-                'betIssue'=>$nn_qihao,
+                'betIssue'=>(string)$nn_qihao,
                 'lotName'=>self::getLotNameByLotteryType($lottery_type),
                 'items' => $items,
             ];
@@ -411,7 +411,7 @@ class NineNineNewService extends BaseTZService {
             # 真实投注
             $start_time = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers);
-            //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$tmpRst];p($logArr);
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$tmpRst];p($logArr);
             if($tmpRst['rstData']['code'] != 200){
                 BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
             }

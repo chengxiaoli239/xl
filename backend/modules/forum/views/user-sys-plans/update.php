@@ -34,6 +34,7 @@ if( $tz_type >= 17){
         'remove_arise' => $remove_arise,
         'hzArr' => $hzArr,
         'type_4ds_Arr' => $type_4ds_Arr,
+        'lottery_type' => $lottery_type,
 
         # 1、排除前x期
         'is_filters' => $is_filters,
