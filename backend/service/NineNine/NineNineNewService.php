@@ -22,6 +22,7 @@ use backend\models\User;
 use backend\models\UserCustomPlans;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
+use backend\service\BaseService;
 use backend\service\BaseTZService;
 use backend\service\BetService;
 use backend\service\CurlService;
@@ -474,7 +475,7 @@ class NineNineNewService extends BaseTZService {
             }else{
                 $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
             }
-            $snRst = NineNineNewService::getSnidBySn($plan->uid, self::$tz_system_id);
+            $snRst = NineNineNewService::getSnidBySn($plan->uid, self::$tz_system_id, $lottery_type);
             if(isset($snRst['list'][0]['orderNo'])){
                 $snid = $snid.','.$snRst['list'][0]['orderNo']; // 获取方案内容
             }
@@ -518,7 +519,7 @@ class NineNineNewService extends BaseTZService {
      */
     public static function getLotNameByLotteryType($lottery_type=DEFAULT_LOTTERY_TYPE){
         $datas = [
-            1 => 'qxc',   # 七星才
+            1 => 'hnqxc',   # 七星才
             5 => 'cqssc', # 重庆时时彩
             6 => 'xjssc', # 新疆时时彩
             17 => 'plw',  # 排列五
@@ -964,7 +965,7 @@ class NineNineNewService extends BaseTZService {
                 "Sec-Fetch-Dest: empty",
                 "Sec-Fetch-Mode: cors",
                 "Sec-Fetch-Site: same-origin",
-                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36",
+                $TzSystemsUsers->user_agent,
                 "userType: 0",
                 "x-csrf-index: ".$xCsrf['Index'],
                 "x-csrf-token: ".$xCsrf['Token'],
@@ -1097,43 +1098,141 @@ class NineNineNewService extends BaseTZService {
      * @param $sn 方案号
      * @return mixed
      */
-    public static function getSnidBySn($uid = 1,$tz_system_id = 1){
+    public static function getSnidBySn($uid = 1,$tz_system_id = 1, $lottery_type=DEFAULT_LOTTERY_TYPE){
         self::__init($uid, $tz_system_id);
 
+        $m = \Yii::$app->cache;
         $urlArr = NineNineNewService::getTzSiteInfo($tz_system_id);
-        $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
-
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
+        $lotName = self::getLotNameByLotteryType($lottery_type);
         $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
-        $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/userlottery/query/betCode/xjssc?limit=5&page=1';
+        $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/userlottery/query/betCode/'.$lotName.'?limit=5&page=1';
         $headers = [
-            "Accept: application/json, text/plain, */*",
-            "Accept-Encoding: gzip, deflate, br",
-            "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
-            "Connection: keep-alive",
-            "contentType: application/json",
-            "Cookie: ".$TzSystemUser['cookie'],
-            "Host: www.99065w.com",
-            "Referer: ".$urlArr['baseUrl']."/web/caipiao/ssc/xjssc",
-            "Sec-Fetch-Dest: empty",
-            "Sec-Fetch-Mode: cors",
-            "Sec-Fetch-Site: same-origin",
-            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
-            "userType: 0",
+            ":authority: ".$urlArr['domain'],
+            ":method: GET",
+            ":path: /cloud-lottery-service-server/gameInfo/userlottery/query/betCode/".$lotName."?limit=5&page=1",
+            ":scheme: https",
+            "accept: application/json, text/plain, */*",
+            "accept-encoding: gzip, deflate, br",
+            "accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+            "contenttype: application/json",
+            "cookie: ".$TzSystemsUsers['cookie'],
+            "host: ".$urlArr['domain'],
+            "referer: ".$urlArr['baseUrl']."/web/caipiao".self::getReferByLotteryType($lottery_type),
+            'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+            'sec-ch-ua-mobile: ?0',
+            "sec-fetch-dest: empty",
+            "sec-fetch-mode: cors",
+            "sec-fetch-site: same-origin",
+            $TzSystemsUsers->user_agent,
+            "usertype: 0",
             "x-csrf-index: ".$xCsrf['Index'],
             "x-csrf-token: ".$xCsrf['Token'],
         ];
-        $rst = CurlService::getCurl($url, $headers);
-
-        $rstData = [];
-        if(isset($rst['code']) && $rst['code'] == 200 && !empty($rst['data'])){
-            $rstData = $rst['data'];
+        p($headers,0);
+        //$rst = CurlService::getCurl($url, $headers);
+        //$rst = self::curlGetSn($url, $headers);
+        $rst = NineNineNewService::getCurl($url, $headers);
+        $rstData = $rst['rstData'];
+        $xCsrf = $rst['xCsrf'];
+        if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!'){
+            $headers = [
+                ":authority: ".$urlArr['domain'],
+                ":method: GET",
+                ":path: /cloud-lottery-service-server/gameInfo/userlottery/query/betCode/".$lotName."?limit=5&page=1",
+                ":scheme: https",
+                "accept: application/json, text/plain, */*",
+                "accept-encoding: gzip, deflate, br",
+                "accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+                "contenttype: application/json",
+                "cookie: ".$TzSystemsUsers['cookie'],
+                "host: ".$urlArr['domain'],
+                "referer: ".$urlArr['baseUrl']."/web/caipiao".self::getReferByLotteryType($lottery_type),
+                'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+                'sec-ch-ua-mobile: ?0',
+                "sec-fetch-dest: empty",
+                "sec-fetch-mode: cors",
+                "sec-fetch-site: same-origin",
+                $TzSystemsUsers->user_agent,
+                "usertype: 0",
+                "x-csrf-index: ".$xCsrf['Index'],
+                "x-csrf-token: ".$xCsrf['Token'],
+            ];
+            $tmpRst = NineNineNewService::getCurl($url, $headers);#
+            $rstData = $tmpRst['rstData'];
+            $xCsrf = $tmpRst['xCsrf'];
+            if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+                $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
+                $r = $m->set($xCsrf_key, $xCsrf, 120);
+            }
         }
 
-        Tool_Common::log('getSnidBySn','INFO','0898获取订单号3', ['rstData'=>$rstData]);
-
+        $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$rst];//p($logArr);
+        Tool_Common::log('getSnidBySn','INFO','0898获取订单号3', $logArr);
         //p(['$matches'=>$matches[2], 'user_id'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id, 'content'=>$content],0);
 
         return $rstData;
+    }
+
+    /**
+     * @desc 获取方案号
+     * @param string $url
+     * @param array $headers
+     * @return bool|mixed|string
+     */
+    public static function curlGetSn($url='', $headers=[]){
+        $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+
+        curl_setopt($ch, CURLOPT_HEADER, 1); #
+
+        //$poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+
+        //设置post方式提交
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER, TRUE);    //表示需要response header
+
+        $start_time = microtime(true);
+        $content = curl_exec($ch);
+        $end_time = microtime(true);
+        //d($data);
+        $errno = curl_errno($ch);
+        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
+        if($errno){
+            $logArr = ['url'=>$url, 'header'=>$headers, 'rst'=>$content, 'errno'=>$errno];
+            //p($logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-0', $logArr);
+        }
+
+        # ================= xCsrf token start =====================
+        if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == '200') {
+
+            $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $header = substr($content, 0, $headerSize);
+
+            preg_match("/X\-Csrf\-Index:([^\r\n]*)/i", $header, $matches1);
+            preg_match("/X\-Csrf\-Token:([^\r\n]*)/i", $header, $matches2);
+
+            $body = substr($content, $headerSize);
+            $result['rstData'] = json_decode($body, true);
+
+            $result['xCsrf'] = ['Index'=>trim($matches1[1]), 'Token'=>trim($matches2[1])];
+        }
+        # ================= xCsrf token start =====================
+
+        return $result;
     }
 
     /**

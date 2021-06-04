@@ -228,6 +228,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = NineNineNewService::getSnidBySn($uid=11, $tz_system_id = 12, $lottery_type=1);p($rst);
         $rst['bet'] = BetService::betByUidNew($uid=11);p($rst); // 用户新计划投注，可正买可反买
         $data = ZhongFaService::userInfo($uid=14, $tz_system_id=16);p($data);
         $rst = PoxyIPService::preGetValidIp($is_auto=0);p($rst);
@@ -364,7 +365,6 @@ class IndexController extends Controller
         $r = $m->get($mkey);p([$mkey, $r]);
         $rst = NineNineNewService::getBalance($uid=18, $tz_system_id = 12);p($rst);
         $loginRst = NineNineNewService::login($id = 18, $tz_system_id=12);p($loginRst);
-        $rst = NineNineNewService::getSnidBySn($uid=18, $tz_system_id = 12);p($rst);
         $redis = \Yii::$app->redis;p($redis);
 
         $rst = NineNineNewService::synBalance($tz_system_users_id=31);p($rst);
