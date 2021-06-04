@@ -823,7 +823,7 @@ class NineNineBaseService extends BaseTZService {
             preg_match_all($preg,$content,$matches);
             $snid = $matches[2][0];
             $m->set($mkey, $snid, 6*3600);
-            Tool_Common::log('getSnidBySn','INFO','0898获取订单号', ['snid'=>$snid]);
+            Tool_Common::log('getSnidBySn','INFO','0898获取订单号4', ['snid'=>$snid]);
         }
 
         //p(['$matches'=>$matches[2], 'user_id'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id, 'content'=>$content],0);

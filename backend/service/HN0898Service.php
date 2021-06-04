@@ -884,7 +884,7 @@ class HN0898Service extends BaseTZService {
                 case 6:
                     break;
             }
-            Tool_Common::log('getSnidBySn','INFO','0898获取订单号', ['snid'=>$snid]);
+            Tool_Common::log('getSnidBySn','INFO','0898获取订单号1', ['snid'=>$snid]);
             $m->set($mkey, 6*3600);
         }
 
