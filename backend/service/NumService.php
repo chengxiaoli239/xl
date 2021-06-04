@@ -1214,6 +1214,7 @@ class NumService extends BaseService {
                         }
                         if(!empty($filter_index_ids)){ # 过滤期的index_id
                             $SscKjDatas = SscKjData::find()->where(['AND', ['IN', 'index_id', $filter_index_ids], ['=', 'lottery_type', $lottery_type]])->asArray()->all();
+                            //p(['SscKjDatas'=>$SscKjDatas, 'filters'=>$filters, 'filter_index_ids'=>$filter_index_ids]);
                             foreach ($SscKjDatas as $sscKjData){
                                 if(!empty($filters['filter_pos1'])) { # 特殊过滤
                                     $tmp_filter1_where = ['OR',];
@@ -1290,12 +1291,12 @@ class NumService extends BaseService {
                         if(!empty($filter_index_dates)){ # 过滤期的index_id
                             $where_index_date = ['AND', ['IN', 'date', $filter_index_dates], ['=', 'lottery_type', $lottery_type], ['LIKE', 'qihao', '%'.$sub_qihao, false]];
                             $SscKjDatas = SscKjData::find()->select(['qihao','date','kj_code','code1','code2','code3','code4'])->where($where_index_date)->asArray()->all();
-                            //p($SscKjDatas, 0);
+                            //p(['SscKjDatas'=>$SscKjDatas, 'filter_dates'=>$filter_dates]);
                             foreach ($SscKjDatas as $sscKjData){
                                 $tmp_filter1_where = ['OR', ];
-                                $filter_pos1 = $filters['filter_date_pos1'];
+                                $filter_pos1 = $filter_dates['filter_date_pos1'];
                                 # pos1
-                                foreach ($filter_poses as $pos){
+                                foreach ($filter_poses as $k=>$pos){
                                     $tmp_filter1_where[] = ['<>', 'code_' . $pos, $sscKjData['code' . $filter_pos1[$k]]];
                                 }
                                 $query->andWhere($tmp_filter1_where);
@@ -1303,7 +1304,7 @@ class NumService extends BaseService {
                                 # pos2
                                 if(!empty($filter_dates['filter_date_pos2'])){ # 特殊过滤
                                     $tmp_filter2_where = ['OR'];
-                                    $filter_pos2 = $filters['filter_date_pos2'];
+                                    $filter_pos2 = $filter_dates['filter_date_pos2'];
                                     sort($filter_pos2);
 
                                     # 现在

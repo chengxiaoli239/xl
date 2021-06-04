@@ -140,7 +140,7 @@ class UserSysPlansController extends BaseController
         $model->status = $model->status ? 1 : 0;
         $model->playway = $playway;
         $model->is_test = 0;
-        $model->single = in_array($tz_type, [30, 17, 36, 37]) ? 1 : 0.1;
+        $model->single = in_array($tz_type, [27, 30, 17, 36, 37]) ? 1 : 0.1;
         $model->tz_type = $tz_type;
         $model->buy_type = 0;
         $model->plan_type = 0;
