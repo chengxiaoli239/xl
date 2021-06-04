@@ -1179,7 +1179,6 @@ class NumService extends BaseService {
         # 1、排除前x期 05.24
         if(in_array($code_type, [2,3,4]) && isset($codes_hz['filters']) && isset($codes_hz['filters']['is_filter']) && $codes_hz['filters']['is_filter']==1){
             $filters = $codes_hz['filters'];
-            //p($filters);
             if(!empty($codes)){
                 $filter_poses = NumService::getFilterPosByCode($codes[0]); # 根据导入的号码判断要过滤的位置
                 if(!empty($filter_poses)){
@@ -1216,12 +1215,15 @@ class NumService extends BaseService {
                         if(!empty($filter_index_ids)){ # 过滤期的index_id
                             $SscKjDatas = SscKjData::find()->where(['AND', ['IN', 'index_id', $filter_index_ids], ['=', 'lottery_type', $lottery_type]])->asArray()->all();
                             foreach ($SscKjDatas as $sscKjData){
-                                $filter_poses_where = ['OR', ];
-                                # pos1
-                                foreach ($filter_poses as $pos){
-                                    $filter_poses_where[] = ['<>', 'code_'.$pos, $sscKjData['code'.$pos]];
+                                if(!empty($filters['filter_pos1'])) { # 特殊过滤
+                                    $filter_poses_where = ['OR',];
+                                    $filter_pos1 = $filters['filter_pos1'];
+                                    # pos1
+                                    foreach ($filter_poses as $k=>$pos) {
+                                        $filter_poses_where[] = ['<>', 'code_' . $pos, $sscKjData['code' . $filter_pos1[$k]]];
+                                    }
+                                    $query->andWhere($filter_poses_where);
                                 }
-                                $query->andWhere($filter_poses_where);
 
                                 # pos2
                                 if(!empty($filters['filter_pos2'])){ # 特殊过滤
@@ -1236,10 +1238,11 @@ class NumService extends BaseService {
                                         $tmp_filter2_where[] = ['<>', 'code_'.$index_pos[$pos], $sscKjData['code'.$pos]];
                                     }
                                     */
+                                    //p(['filter_poses'=>$filter_poses, 'filter_pos1'=>$filter_pos1, 'filter_pos2'=>$filter_pos2]);
                                     # 现在
                                     foreach ($filter_poses as $k=>$pos){
                                         $t_pos = $k + 1;
-                                        $tmp_filter2_where[] = ['<>', 'code_'.$pos, $sscKjData['code'.$t_pos]];
+                                        $tmp_filter2_where[] = ['<>', 'code_'.$pos, $sscKjData['code'.$filter_pos2[$k]]];
                                     }
 
                                     $query->andWhere($tmp_filter2_where);
