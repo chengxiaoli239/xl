@@ -1125,7 +1125,7 @@ class NineNineNewService extends BaseTZService {
         $rst = CurlService::getCurl($url, $headers);
 
         $rstData = [];
-        if($rst['code'] == 200 && !empty($rst['data'])){
+        if(isset($rst['code']) && $rst['code'] == 200 && !empty($rst['data'])){
             $rstData = $rst['data'];
         }
 
