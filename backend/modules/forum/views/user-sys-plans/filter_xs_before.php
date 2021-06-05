@@ -28,12 +28,12 @@
     </div>
     <?php if(in_array($playway, [1,2]))?>
     <div class="col-lg-3 col-xs-3">
-        <?= $form->field($model, 'filter_date_pos1')->checkboxList($filter_date_pos1)->label('位置1(二定:勾选位要跟导入码一致或相反)') ?>
+        <?= $form->field($model, 'filter_date_pos1')->checkboxList($filter_date_pos1)->label('位置1') ?>
     </div>
     <?php ;?>
     <?php if(in_array($playway, [1]))?>
     <div class="col-lg-3 col-xs-3">
-        <?= $form->field($model, 'filter_date_pos2')->checkboxList($filter_date_pos2)->label('位置1(二定:勾选位要跟导入码一致或相反)') ?>
+        <?= $form->field($model, 'filter_date_pos2')->checkboxList($filter_date_pos2)->label('位置2') ?>
     </div>
     <?php ;?>
 </div>
@@ -49,12 +49,12 @@
     </div>
     <?php if(in_array($playway, [1,2]))?>
     <div class="col-lg-3 col-xs-3">
-        <?= $form->field($model, 'filter_date_pos1')->checkboxList($filter_date_pos1)->label('位置1(二定:勾选位要跟导入码一致或相反)') ?>
+        <?= $form->field($model, 'filter_date_pos1')->checkboxList($filter_date_pos1)->label('位置1') ?>
     </div>
     <?php ;?>
     <?php if(in_array($playway, [1]))?>
     <div class="col-lg-3 col-xs-3">
-        <?= $form->field($model, 'filter_date_pos2')->checkboxList($filter_date_pos2)->label('位置1(二定:勾选位要跟导入码一致或相反)') ?>
+        <?= $form->field($model, 'filter_date_pos2')->checkboxList($filter_date_pos2)->label('位置2') ?>
     </div>
     <?php ;?>
     -->
