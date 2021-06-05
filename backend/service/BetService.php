@@ -1487,7 +1487,7 @@ abstract class BetService extends BaseBetService {
         $now_HI = date('H:i:s');
         switch ($lottery_type){
             case 1: # 希腊1.5分彩
-                $cacheTime = 7200;
+                $cacheTime = 86400*2;
                 break;
             case 2: # 希腊3分彩
                 break;
@@ -1524,6 +1524,9 @@ abstract class BetService extends BaseBetService {
                 break;
             case 16: # 加拿大28   3.5分
                 $cacheTime = 3.5 * 60;
+                break;
+            case 17: # 排列五
+                $cacheTime = 86400;
                 break;
             case 18: #  宝岛众发  台湾5分
                 $cacheTime = 5 * 60;
