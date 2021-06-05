@@ -1693,4 +1693,22 @@ class HN0898Service extends BaseTZService {
 
         return ['status'=>200, 'rst'=>$rst];
     }
+
+    /**
+     * @desc 开启本期下注状态
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function openBetStatus($lottery_type=DEFAULT_LOTTERY_TYPE){
+        $rst = ['status'=>200, 'msg'=>'操作成功lottery_type['.$lottery_type.']'];
+
+        $m = Yii::$app->cache;
+        $qihao = HN0898Service::getQihao($lottery_type);
+        $mkey = TzService::buildNextKey($lottery_type, $qihao);
+        $betCacheTime = BetService::getBetCacheTime($lottery_type);
+        $r = $m->set($mkey, 1, $betCacheTime);
+        $rst['rst'] = $r;
+
+        return $rst;
+    }
 }

@@ -79,6 +79,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->codeList;
                             }
                         ],
+                        ['attribute' => 'enable','label'=>'本期状态','headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $txt = "<font color='green'>开启</font><span id='tip_msg_'".$model->lottery_type."></span>" ;
+                                return Html::a($txt, '#', ['title'=>'点击开启', 'class'=>'btn btn-primary open-bet-status', 'lottery_type'=>$model->lottery_type]);
+                            },
+                        ],
                         //'info',
                         ['attribute' => 'info','label'=>'描述',#'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
@@ -121,6 +128,27 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<div class="modal fade" id="tipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_title"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group up-reason">
+                    <span id="tip_msg"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="opConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="max-height: 500px;margin-top: 100px;">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -156,6 +184,40 @@ $(function () {
             $('#push_content').text(JSON.stringify(rst.post, null, ' '))
             $('#exampleModal_msg').modal('show');
         });
+    });
+
+    function openBetStatus(lottery_type) {
+        var data = {lottery_type:lottery_type};
+        var tip_title = '';
+        $.post("/forum/lottery-type/open-bet-status",data,function(rst) {
+            console.log(rst);
+            if(rst.status == 200) {
+                tip_title = '操作成功';
+                msg = rst.msg;
+                $("#balance_"+id).html(msg);
+            } else {
+                tip_title = '操作失败';
+            }
+            //showTips(null, rst.msg, tip_title); # 同步完无需弹框，暂且注释
+        },'JSON');
+    }
+
+    $('.open-bet-status').click(function () {
+        var lottery_type = $(this).attr('lottery_type');
+        showTips(lottery_type);
+    });
+
+    function showTips(id, tip_msg = '确定开启本期下注？', title = '提示信息') {
+        console.log(id);
+        $('#tip_msg_title').html(title);
+        $('#tip_msg').html(tip_msg);
+        $('#tipModal').modal('show');
+        $("#opConfirm").attr('op-id', id);
+    }
+
+    $('#opConfirm').click(function () {
+        var id = $(this).attr('op-id');
+        if(id != null) openBetStatus(id)
     });
 })
 </script>

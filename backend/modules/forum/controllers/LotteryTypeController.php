@@ -72,6 +72,19 @@ class LotteryTypeController extends BaseController
     }
 
     /**
+     * @desc 开启本期投注状态
+     * @param $id
+     * @return \yii\web\Response
+     */
+    public function actionOpenBetStatus(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $rst = HN0898Service::openBetStatus($post['lottery_type']);
+
+        return $rst;
+    }
+
+    /**
      * Creates a new LotteryType model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
