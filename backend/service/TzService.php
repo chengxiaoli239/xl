@@ -51,7 +51,7 @@ class TzService extends BaseService {
 
         # 判断当期开奖数据处理是否完成，未完成则不能下一期的投注
         if(!$tzStatus){
-            $rst = ['status'=>300, 'msg'=>'投注开关未开启，有未处理完成的数据~','mkey'=>$mkey,'tzStatus'=>$tzStatus];
+            $rst = ['status'=>300, 'msg'=>'投注开关未开启，有未处理完成的数据-2','mkey'=>$mkey,'tzStatus'=>$tzStatus];
             Tool_Common::log('0898tzCron','INFO','0898投注记录', $rst);
         }
 
