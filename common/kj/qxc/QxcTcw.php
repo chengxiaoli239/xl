@@ -200,7 +200,7 @@ class QxcTcw extends BaseKj{
 
         $m->set($mkey_rstData, $rstData, 30);
 
-        $logArr = ['page'=>$page, 'data'=>$rstData];
+        $logArr = ['page'=>$page, 'lottery_type'=>$lottery_type, 'data'=>$rstData];
         Tool_Common::log('qxc_batch', 'INFO', '号码抓取-体彩网', $logArr);
 
         return $rstData;
