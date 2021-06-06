@@ -39,4 +39,5 @@ phpunit.phar
 backend/runtime/captcha/*
 backend/runtime/logs/*
 backend/runtime/debug/*
+backend/web/assets/*
 
