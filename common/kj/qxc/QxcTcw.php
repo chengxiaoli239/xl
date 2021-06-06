@@ -87,8 +87,7 @@ class QxcTcw extends BaseKj{
      */
     public static function getTcwOne($returnType = 'json', $is_auto = 1, $lottery_type = 1){
 
-        $kjData = self::getCurrentKjData($lottery_type);
-        if($is_auto == 2 OR !$kjData) {
+        if($is_auto == 2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
             $data = self::QixingCaiBatch($is_new = 1, $lottery_type);
 
             if (!isset($data) OR !$data OR !$kData = $data[0]) return false;
