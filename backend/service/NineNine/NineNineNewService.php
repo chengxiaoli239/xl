@@ -412,7 +412,8 @@ class NineNineNewService extends BaseTZService {
             # 真实投注
             $start_time = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers);
-            //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$tmpRst];p($logArr);
+            $logArr = ['plan_id'=>$plan_id, 'uid'=>self::$user_id, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$tmpRst];//p($logArr);
+            Tool_Common::log('/NineNineNew/bet', 'INFO', '九九网下注',$logArr);
             if($tmpRst['rstData']['code'] != 200){
                 BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
             }
@@ -448,7 +449,7 @@ class NineNineNewService extends BaseTZService {
                 //return $this->bet($plan->uid, self::$tz_system_id);
                 $rstData = $tmpRst['rstData'];
                 $xCsrf = $tmpRst['xCsrf'];
-                Tool_Common::log('NineNineNew_retry_bet', 'INFO', '九九网重新下注',['rstData'=>$rstData, 'xCsrf'=>$xCsrf]);
+                Tool_Common::log('/NineNineNew/retry_bet', 'INFO', '九九网重新下注',['rstData'=>$rstData, 'xCsrf'=>$xCsrf]);
                 if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
                     Tool_Common::log('/debug/bet_record', 'INFO', '投注继续', ['time'=>2, 'xCsrf'=>$xCsrf, 'tmpRst'=>$tmpRst]);
                     $xCsrf_key = CommonService::buildXCsrfTokenKey($plan->uid, self::$tz_system_id);

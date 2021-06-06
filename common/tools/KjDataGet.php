@@ -390,147 +390,45 @@ class KjDataGet
     }
 
     /**
-     * @param 批量抓取七星彩开奖数据
-     * @param string $date_start
-     * @return array|bool
-     */
-    public static function grabQxc($is_all = 1){
-        $msg = ['status'=>200, 'msg'=>'操作成功~'];
-        self::_init('qxc');
-        # 时时彩
-        $tmpInsertData = [];
-        $fields = ['kj_code', 'kj_7code', 'qihao', 'date_time', 'time'];
-        # 开奖数据 start
-        $qihao = self::getNextQihao('qxc');
-        $kjData = CommonService::getAwardNumberByQihao($qihao, 'qxc');
-        $kj_7code = str_replace(',','',$kjData['kj_code']);
-        $code = substr($kj_7code,0,4);
-        if(!$code) return ['status'=>'404', 'msg'=>$qihao.'未查找到开奖数据'];
-        # 开奖数据 end
-        if($is_all){
-            $tmpData = [
-                $code, // 3358
-                $kj_7code, // 3356889
-                //$kjData['code'], // 3,3,5,6,8,8,9
-                $kjData['qihao'], // 2018016
-                $kjData['date_time'],   // 2018-02-09 20:31:40
-                $kjData['time'] // 1518352300
-            ];
-            $tmpInsertData[] = $tmpData;
-        }
-        $end_qihao = self::getEndQihao('qxc');
-        //p($tmpData);
-        if ($is_all && (count($tmpInsertData) == 5 OR $qihao == $end_qihao)) {
-            //p($tmpInsertData);
-            foreach ($tmpInsertData as $key=>$insertData){
-                if($insertData[0] == '') unset($tmpInsertData[$key]);
-            }
-            if (!$rst = \Yii::$app->db->createCommand()->batchInsert("{{%qxc_kj_data}}", $fields, $tmpInsertData)->execute()) {
-                $msg['status'] = 300;
-                $msg['msg'] = '数据处理异常';
-            }
-            $tmpInsertData = [];
-            //$mcQihao = end($tmpInsertData)[2];
-        }else{
-            if (!$QxcKjData = QxcKjData::findOne(['qihao' => $kjData['qihao']])) {
-                $QxcKjData = new QxcKjData();
-            }
-            $insertData = [
-                'kj_code' => $code,
-                'kj_7code' => $kj_7code,
-                'qihao' => $kjData['qihao'],
-                'date_time' => $kjData['date_time'],
-                'time' => $kjData['time']
-
-            ];
-            $QxcKjData->setAttributes($insertData);
-            if (!$QxcKjData->save()) {
-                return ['status' => 300, 'msg' => current($QxcKjData->getErrors())];
-            }
-        }
-
-        return $msg;
-    }
-
-    /**
-     * @desc 获取表中记录的下一期
-     * @param string $lottery_type
-     * @return mixed
-     */
-    public static function getNextQihao($lottery_type = 'ssc'){
-        if($lottery_type == 'qxc'){
-            $kjData = QxcKjData::find()->where(['kj_code'=>null])->orderBy('id DESC')->asArray()->one();
-            if($kjData){
-                $nextQihao = $kjData['qihao'];
-            }else{
-                $kjData = QxcKjData::find()->orderBy('id DESC')->asArray()->one();
-                if(!$kjData) $kjData['qihao'] = '2018015';
-                $year = substr($kjData['qihao'],0,4);
-                $qihao = substr($kjData['qihao'],4,3);
-                if($qihao >= 154){
-                    $nextQihao = ($year+1).'001';
-                }else{
-                    $nextQihao = (int)($year.$qihao) + 1;
-                }
-            }
-        }else{
-            $kjData = SscKjData::find()->where(['kj_code'=>null])->orderBy('id DESC')->asArray()->one();
-            if($kjData){
-                $nextQihao = $kjData['qihao'];
-            }else{
-                $kjData = SscKjData::find()->orderBy('id DESC')->asArray()->one();
-                if(!$kjData) $kjData['qihao'] = '180101001';
-                $nextQihao = KjDataGet::getNextQihaoByQihao($kjData['qihao']);
-            }
-        }
-
-        return $nextQihao;
-    }
-
-
-    /**
      * @desc 获取给定期号的下一期
-     * @param string $qihao
+     * @param int $qihao
      * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return bool|int|string
      */
-    public static function getNextQihaoByQihao($qihao = '180101001', $lottery_type = DEFAULT_LOTTERY_TYPE){
-        if($lottery_type == 'qxc'){
-            # 未完
-        }else{
-            $nextQihao = $qihao + 1;
-            switch ($lottery_type){
-                case 1: # 七星彩
-                    break;
-                case 5: # 重庆
-                    $year = '20'.substr($qihao,0,2);
-                    $date = '20'.substr($qihao,0,6);
-                    $qihao = substr($qihao,6,3);
-                    $maxQihaoArr = BetService::$maxQihaoArr;
-                    $maxQihao = $maxQihaoArr[$lottery_type];
-                    if($date == $year.'1231' && $qihao >=$maxQihao){
-                        $nextQihao = substr(($year+1).'0101001', 2, 9);
-                    //}elseif($qihao >= 120){
-                    }elseif($qihao >= $maxQihao){
-                        $nextQihao = substr(Tools::getNextDate($date),2, 6).'001';
-                    }
-                    break;
-                case 6: # 新疆
-                    $minQihao = substr($nextQihao, 8, 2);
-                    $date = substr($nextQihao, 0, 4).'-'.substr($nextQihao, 4, 2).'-'.substr($nextQihao, 6, 2).' 00:00:00';
-                    if($minQihao == 49){
-                        $date = date('Ymd', strtotime($date) + 86400);
-                        $nextQihao = $date.'01';
-                    }
-                    break;
-                case 8: # 幸运五星彩
-                    if(substr($qihao, -3, 3) >= 288){
-                        $date = substr($qihao, 0, 4).'-'.substr($nextQihao, 4, 2).'-'.substr($nextQihao, 6, 2).' 00:00:00';
-                        $date = date('Ymd', strtotime($date) + 86400);
-                        $nextQihao = $date.'001';
-                    }
-                    break;
-            }
+    public static function getNextQihaoByQihao($qihao = 180101001, $lottery_type = DEFAULT_LOTTERY_TYPE){
+
+        $nextQihao = $qihao + 1;
+        switch ($lottery_type){
+            case 1: # 七星彩
+                break;
+            case 5: # 重庆
+                $year = '20'.substr($qihao,0,2);
+                $date = '20'.substr($qihao,0,6);
+                $qihao = substr($qihao,6,3);
+                $maxQihaoArr = BetService::$maxQihaoArr;
+                $maxQihao = $maxQihaoArr[$lottery_type];
+                if($date == $year.'1231' && $qihao >=$maxQihao){
+                    $nextQihao = substr(((int)$year+1).'0101001', 2, 9);
+                //}elseif($qihao >= 120){
+                }elseif($qihao >= $maxQihao){
+                    $nextQihao = substr(Tools::getNextDate($date),2, 6).'001';
+                }
+                break;
+            case 6: # 新疆
+                $minQihao = substr($nextQihao, 8, 2);
+                $date = substr($nextQihao, 0, 4).'-'.substr($nextQihao, 4, 2).'-'.substr($nextQihao, 6, 2).' 00:00:00';
+                if($minQihao == 49){
+                    $date = date('Ymd', strtotime($date) + 86400);
+                    $nextQihao = $date.'01';
+                }
+                break;
+            case 8: # 幸运五星彩
+                if(substr($qihao, -3, 3) >= 288){
+                    $date = substr($qihao, 0, 4).'-'.substr($nextQihao, 4, 2).'-'.substr($nextQihao, 6, 2).' 00:00:00';
+                    $date = date('Ymd', strtotime($date) + 86400);
+                    $nextQihao = $date.'001';
+                }
+                break;
         }
 
         return $nextQihao;

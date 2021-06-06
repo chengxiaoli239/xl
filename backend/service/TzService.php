@@ -84,24 +84,6 @@ class TzService extends BaseService {
     }
 
     /**
-     * @desc 投注完成之后业务处理
-     */
-    public static function afterTz($qihao){
-        if(!$qihao) return false;
-        $m = \Yii::$app->cache;
-
-        $next_qihao = KjDataGet::getNextQihaoByQihao($qihao);
-        $next_mkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$next_qihao;
-        $pkey = \Yii::$app->params['TZ_SWITCH_SIMULATE_KEY'].'_'.$qihao;
-        $time = 20 * 60;
-        if(substr($next_qihao,6) == '001') $time = 40 * 60; # 四十分钟
-        if(substr($next_qihao,6) == '009') $time = 60 * 60 * 4; # 十小时
-        $m->set($next_mkey,0,$time); # 投注完成下一期的投注关闭
-        $m->set($pkey,0,$time); # 投注完成下一期的投注关闭
-        return true;
-    }
-
-    /**
      * @desc 执行计划前判断
      * @param $qihao
      * @param int $lottery_type

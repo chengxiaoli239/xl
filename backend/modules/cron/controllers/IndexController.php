@@ -146,20 +146,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 七星彩：逐期获取开奖数据
-     * @return bool
-     */
-    public function actionGrabQxcKjData(){
-        self::_init();
-        for ($i = 1; $i<10; $i++){
-            $rst = KjDataGet::grabQxc($is_all = 0);
-            sleep(3*60);
-        }
-
-        return $rst;
-    }
-
-    /**
      * @desc 更新开奖表数据
      * @return array
      */

@@ -87,7 +87,8 @@ class QxcTcw extends BaseKj{
      */
     public static function getTcwOne($returnType = 'json', $is_auto = 1, $lottery_type = 1){
 
-        if($is_auto == 2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
+        $kjData = self::getCurrentKjData($lottery_type);
+        if($is_auto == 2 OR !$kjData) {
             $data = self::QixingCaiBatch($is_new = 1, $lottery_type);
 
             if (!isset($data) OR !$data OR !$kData = $data[0]) return false;
@@ -112,8 +113,11 @@ class QxcTcw extends BaseKj{
         }else{
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
-        $logArr = $rst;
-        Tool_Common::log('cqssc_kl8', 'INFO', '99彩票网-号码抓取', $logArr);
+        $logArr = array_merge($rst, [
+            'is_auto' => $is_auto,
+            'lottery_type' => $lottery_type,
+        ]);
+        Tool_Common::log('cqssc_kl8', 'INFO', '体彩网-号码抓取', $logArr);
 
         return $rst;
     }
@@ -132,11 +136,15 @@ class QxcTcw extends BaseKj{
 
     /**
      * @desc 中国体彩网 - 七星彩
-     * @return json|xml
+     * @return json|xml|array
      */
     public static function QixingCaiBatchDatas($is_new = 0, $lottery_type = 1){
 
         $m = \Yii::$app->cache;
+        $mkey_rstData = 'QixingCaiBatchDatas_'.$is_new.'_'.$lottery_type;
+        $rstData = $m->get($mkey_rstData);
+        if(!empty($rstData)) return $rstData;
+
         $mkey = 'QixingCaiBatch_page_4_'.$is_new;
         $default_page = 84;
         if($lottery_type==17){
@@ -189,6 +197,8 @@ class QxcTcw extends BaseKj{
         $page < 2 && $page = 1;
         $m->set($mkey, $page, 24*3600);
         $m->delete($running_status_key); # 跑完任务删除key
+
+        $m->set($mkey_rstData, $rstData, 30);
 
         $logArr = ['page'=>$page, 'data'=>$rstData];
         Tool_Common::log('qxc_batch', 'INFO', '号码抓取-体彩网', $logArr);
