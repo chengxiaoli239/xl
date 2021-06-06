@@ -90,7 +90,7 @@ class QxcTcw extends BaseKj{
         if($is_auto == 2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
             $data = self::QixingCaiBatch($is_new = 1, $lottery_type);
 
-            if (!isset($data) OR !$data OR !$kData = $data[0]) return false;
+            if (!isset($data[0]) OR !$kData = $data[0]) return false;
             $kjData['expect'] = $kData['expect'];
             $kjData['opencode'] = $kData['opencode'];
             $kjData['opentime'] = $kData['opentime'];
@@ -125,17 +125,19 @@ class QxcTcw extends BaseKj{
      * @desc 中国体彩网 - 七星彩
      * @param int $is_new
      * @param int $lottery_type
-     * @return json|xml
+     * @return - json|xml
      */
     public static function QixingCaiBatch($is_new = 0, $lottery_type = 1){
         $datas = self::QixingCaiBatchDatas($is_new, $lottery_type);
+        $logArr = ['is_new'=>$is_new, 'lottery_type'=>$lottery_type, 'datas'=>$datas];
+        Tool_Common::log('QixingCaiBatch', 'INFO', '号码抓取-体彩网', $logArr);
 
         return $datas;
     }
 
     /**
      * @desc 中国体彩网 - 七星彩
-     * @return json|xml|array
+     * @return - json|xml|array
      */
     public static function QixingCaiBatchDatas($is_new = 0, $lottery_type = 1){
 
