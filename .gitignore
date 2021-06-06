@@ -36,5 +36,7 @@ phpunit.phar
 /.vagrant
 
 # runtime
-backend/runtime/logs/app.log
+backend/runtime/captcha/*
+backend/runtime/logs/*
+backend/runtime/debug/*
 
