@@ -36,7 +36,5 @@ phpunit.phar
 /.vagrant
 
 # runtime
-backend/runtime/*
 backend/runtime/logs/app.log
-backend/web/assets/*
 

@@ -130,7 +130,7 @@ class QxcTcw extends BaseKj{
     public static function QixingCaiBatch($is_new = 0, $lottery_type = 1){
         $datas = self::QixingCaiBatchDatas($is_new, $lottery_type);
         $logArr = ['is_new'=>$is_new, 'lottery_type'=>$lottery_type, 'datas'=>$datas];
-        Tool_Common::log('QixingCaiBatch', 'INFO', '号码抓取-体彩网', $logArr);
+        Tool_Common::log('QixingCaiBatch', 'INFO', '号码抓取-体彩网-1', $logArr);
 
         return $datas;
     }
@@ -199,10 +199,10 @@ class QxcTcw extends BaseKj{
         $m->set($mkey, $page, 24*3600);
         $m->delete($running_status_key); # 跑完任务删除key
 
-        $m->set($mkey_rstData, $rstData, 300);
+        $m->set($mkey_rstData, $rstData, 900);
 
         $logArr = ['page'=>$page, 'lottery_type'=>$lottery_type, 'data'=>$rstData];
-        Tool_Common::log('qxc_batch', 'INFO', '号码抓取-体彩网', $logArr);
+        Tool_Common::log('qxc_batch', 'INFO', '号码抓取-体彩网-0', $logArr);
 
         return $rstData;
     }
