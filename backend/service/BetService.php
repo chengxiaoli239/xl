@@ -1125,7 +1125,8 @@ abstract class BetService extends BaseBetService {
         $m->delete($mkey);
 
         $pkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $qihao, $uid);
-        $m->delete($pkey);
+        $betCacheTime = BetService::getBetCacheTime($lottery_type);
+        $m->set($pkey, 1, $betCacheTime);
 
         $tzPlanIdmkey = self::buildBetPlanIdKey($account, $qihao, $plan_id);
         $m->delete($tzPlanIdmkey);

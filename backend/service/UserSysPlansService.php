@@ -910,4 +910,26 @@ class UserSysPlansService extends BaseService {
         return $rst;
     }
 
+    /**
+     * @param $id
+     * @param string $_user_id
+     * @return array
+     */
+    public static function openPlanBetStatus($id, $_user_id=''){
+        if($_user_id != 1){
+            $rst = ['status'=>300, 'msg'=>'没操作权限'];
+        }else{
+            $plan = UserSysPlans::findOne($id);
+            if(empty($plan)){
+                $rst = ['status'=>301, 'msg'=>'找不到对应记录【'.$id.'】'];
+            }else{
+                $qihao = HN0898Service::getQihao($plan->lottery_type);
+                $tz_system_id = trim($plan->tz_sites);
+                BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id, $plan->uid); # 手动下注时，先删除缓存
+            }
+        }
+
+        return $rst;
+    }
+
 }

@@ -146,6 +146,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $txt .= ' | '.Html::a('重算盈利', $url1, ['title' => '重算盈利'.$model->id,'alt'=>$model->id]);
                                 }
 
+                                $options = ['class'=>'open_bet_status','title'=>'开启本期下注状态'.$model->id,'alt'=>$model->id,'plan_id'=>$model->id,'id'=>'open_bet_status_'.$model->id];
+                                $txt .= ' | '.Html::button('开启本期', $options);
+
                                 return $txt;
                             }
                         ],
@@ -217,3 +220,61 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<div class="modal fade" id="tipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_title"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group up-reason">
+                    <span id="tip_msg"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="opConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/statics/js/jquery-2.0.3.js"></script>
+<script>
+$(function () {
+    function openBetStatus(id) {
+        var data = {id:id};
+        var tip_title = '';
+        $.post("/forum/user-sys-plans/open-plan-bet-status",data,function(rst) {
+            console.log(rst);
+            if(rst.status === 200) {
+                tip_title = '操作成功';
+                msg = rst.msg;
+                //$("#open_bet_status_"+id).html(msg);
+            } else {
+                tip_title = '操作失败';
+            }
+            //showTips(null, rst.msg, tip_title); # 同步完无需弹框，暂且注释
+        },'JSON');
+    }
+
+    $('.open_bet_status').click(function () {
+        var plan_id = $(this).attr('plan_id');
+        showTips(plan_id);
+    });
+
+    function showTips(id, tip_msg = '确定开启本期下注？', title = '提示信息') {
+        console.log(id);
+        $('#tip_msg_title').html(title);
+        $('#tip_msg').html(tip_msg);
+        $('#tipModal').modal('show');
+        $("#opConfirm").attr('op-id', id);
+    }
+
+    $('#opConfirm').click(function () {
+        var id = $(this).attr('op-id');
+        if(id != null) openBetStatus(id)
+    });
+})
+</script>
