@@ -191,7 +191,7 @@ $(function () {
         var tip_title = '';
         $.post("/forum/lottery-type/open-bet-status",data,function(rst) {
             console.log(rst);
-            if(rst.status == 200) {
+            if(rst.status === 200) {
                 tip_title = '操作成功';
                 msg = rst.msg;
                 $("#balance_"+id).html(msg);

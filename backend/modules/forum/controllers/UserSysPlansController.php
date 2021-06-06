@@ -356,12 +356,13 @@ class UserSysPlansController extends BaseController
 
     /**
      * @desc 更新投注 购买方向
-     * @param $id
      * @param $status
      * @return \yii\web\Response
      */
-    public function actionOpenPlanBetStatus($id){ # open-plan-bet-status
+    public function actionOpenPlanBetStatus(){ # open-plan-bet-status
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $id = $post['id'];
         $rst = UserSysPlansService::openPlanBetStatus($id, $this->_user_id);
 
         return $rst;
