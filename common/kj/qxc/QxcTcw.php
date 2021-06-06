@@ -159,7 +159,7 @@ class QxcTcw extends BaseKj{
         $running_status_key = 'QixingCaiBatch_status';
         if($lottery_type==17) $running_status_key = $running_status_key.'_0_'.$lottery_type;
         if($status = $m->get($running_status_key)) return ['status'=>300, 'msg'=>'有在执行的任务，请稍后'];
-        $m->set($running_status_key, 1, 300);
+        $m->set($running_status_key, 1, 180);
 
         if($lottery_type == 17){ # 排列五
             $route = '/kj/qxc/pl5-batch';
@@ -199,7 +199,7 @@ class QxcTcw extends BaseKj{
         $m->set($mkey, $page, 24*3600);
         $m->delete($running_status_key); # 跑完任务删除key
 
-        $m->set($mkey_rstData, $rstData, 30);
+        $m->set($mkey_rstData, $rstData, 300);
 
         $logArr = ['page'=>$page, 'lottery_type'=>$lottery_type, 'data'=>$rstData];
         Tool_Common::log('qxc_batch', 'INFO', '号码抓取-体彩网', $logArr);
