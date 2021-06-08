@@ -22,6 +22,7 @@ use Yii;
  * @property string $cookie 登陆cookie
  * @property string $user_agent 浏览器代理
  * @property string $cookie_wx_web 微信web登录cookie
+ * @property string $access_token 授权Token凭证
  * @property int $tz_sort 投注排序:从小到大
  * @property string $odds_2x 代理二现赔率
  * @property string $odds_3x 代理三现赔率
@@ -59,7 +60,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             [['cookie', 'cookie_wx_web'], 'string'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
-            [['username', 'sys_name', 'account', 'ssc_domain'], 'string', 'max' => 64],
+            [['username', 'sys_name', 'account', 'ssc_domain', 'access_token'], 'string', 'max' => 64],
             [['password'], 'string', 'max' => 20],
             [['user_agent', 'desc'], 'string', 'max' => 640],
             [['warn_val'], 'string', 'max' => 11],
@@ -87,6 +88,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'cookie' => '登陆cookie',
             'user_agent' => '浏览器代理',
             'cookie_wx_web' => '微信web登录cookie',
+            'access_token' => '授权Token凭证',
             'tz_sort' => '投注排序:从小到大',
             'odds_2x' => '代理二现赔率',
             'odds_3x' => '代理三现赔率',
