@@ -228,6 +228,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');p($r);
         $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);p($data);
         $rst = NineNineNewService::getSnidBySn($uid=11, $tz_system_id = 12, $lottery_type=1);p($rst);
         $rst['bet'] = BetService::betByUidNew($uid=11);p($rst); // 用户新计划投注，可正买可反买
@@ -256,7 +257,6 @@ class IndexController extends Controller
         $sign = ZhongFaService::getSign($params);
         p($sign);
         $rst = CrontabIndexService::autoLogin();p($rst);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems}}');p($r);
         $data = LeCaiService::getLotteryK5($type='json', $lottery_type=18, $is_auto=2);p($data);
         $lottery_type = 18;
         $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);

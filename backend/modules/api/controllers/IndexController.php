@@ -168,4 +168,13 @@ class IndexController extends Controller
 
         return $data;
     }
+
+    public function actionGetUserInfoByToken(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $data = \Yii::$app->request->post();
+
+        $rst = UserService::getUserInfoByToken($data);
+
+        return $rst;
+    }
 }

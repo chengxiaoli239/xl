@@ -355,4 +355,23 @@ class UserService extends BaseService {
 
         return ['status'=>200, 'msg'=>'操作成功', 'data'=>$r, 'synRst'=>$synRst];
     }
+
+    /**
+     * @desc 获取用户账号信息
+     * @param array $data
+     * @return array
+     */
+    public static function getUserInfoByToken($data=[]){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+        if(empty($data)){
+            return ['status'=>404, 'msg'=>'找不到用户数据'];
+        }
+        if($data['token'] != md5($data['username'])){
+            return ['status'=>301, 'msg'=>'token失效'];
+        }
+
+        $rst['data'] = $data;
+
+        return $rst;
+    }
 }

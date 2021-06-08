@@ -22,6 +22,7 @@ use Yii;
  * @property string $cookie 登陆cookie
  * @property string $user_agent 浏览器代理
  * @property string $cookie_wx_web 微信web登录cookie
+ * @property string $access_token 授权Token凭证
  * @property int $tz_sort 投注排序:从小到大
  * @property string $odds_2x 代理二现赔率
  * @property string $odds_3x 代理三现赔率
