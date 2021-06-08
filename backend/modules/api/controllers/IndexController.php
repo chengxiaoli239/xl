@@ -152,7 +152,7 @@ class IndexController extends Controller
         $data = \Yii::$app->request->post();
 
         $rst = UserService::updateUserCookies($data);
-        Tool_Common::log('/user/upUserInfo','INFO','记录用户的登陆cookies', ['data'=>$data]);
+        Tool_Common::log('/user/upUserInfo','INFO','记录用户的登陆cookies', ['data'=>$data, 'rst'=>$rst]);
 
         return $rst;
     }

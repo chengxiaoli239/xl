@@ -326,19 +326,21 @@ class UserService extends BaseService {
      * @return array
      */
     public static function updateUserCookies($datas = []){
-        if(empty($datas['uid'])){
-            return ['status'=>301, 'msg'=>'用户id不能为空'];
-        }
         if(empty($datas['cookies'])){
             return ['status'=>302, 'msg'=>'用户cookies不能为空'];
         }
+        if(empty($datas['access_token'])){
+            return ['status'=>302, 'msg'=>'用户凭证不能为空'];
+        }
 
-        $where = ['uid'=>$datas['uid']];
+        $where = ['access_token'=>$datas['access_token']];
         $TzSystemsUsers = TzSystemsUsers::findOne($where);
         if(empty($TzSystemsUsers)){
             return ['status'=>303, 'msg'=>'找不到用户记录'];
         }
         $TzSystemsUsers->ssc_domain = $datas['ssc_domain'];
+        $TzSystemsUsers->account = $datas['account'];
+        $TzSystemsUsers->password = $datas['password'];
 
         $cookies = $datas['cookies'];
         $cookies_str = '';
@@ -351,7 +353,7 @@ class UserService extends BaseService {
             $msg = $TzSystemsUsers->getErrors();
             return ['status'=>304, 'msg'=>$msg];
         }
-        $synRst = BetService::synBalance($datas['uid'], $TzSystemsUsers->tz_system_id);
+        $synRst = BetService::synBalance($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
 
         return ['status'=>200, 'msg'=>'操作成功', 'data'=>$r, 'synRst'=>$synRst];
     }
@@ -366,11 +368,19 @@ class UserService extends BaseService {
         if(empty($data)){
             return ['status'=>404, 'msg'=>'找不到用户数据'];
         }
-        if($data['token'] != md5($data['username'])){
-            return ['status'=>301, 'msg'=>'token失效'];
+        if(empty($data['access_token'])){
+            return ['status'=>405, 'msg'=>'非法请求'];
         }
+        $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$data['access_token']]);
+        $rstData = [
+            //'uid' => $TzSystemsUsers->uid,
+            'username' => $TzSystemsUsers->username,
+            'access_token' => $TzSystemsUsers->access_token,
+            'status' => $TzSystemsUsers->status,
+            'expire_time' => date('Y-m-d H:i:s', $TzSystemsUsers->expire_time),
+        ];
 
-        $rst['data'] = $data;
+        $rst['data'] = $rstData;
 
         return $rst;
     }
