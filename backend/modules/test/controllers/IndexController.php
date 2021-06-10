@@ -228,6 +228,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = QxcTcw::getNineNineLottery($type='json', $is_auto=2, $lottery_type=17);p($data);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');p($r);
         $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);p($data);
         $rst = NineNineNewService::getSnidBySn($uid=11, $tz_system_id = 12, $lottery_type=1);p($rst);

@@ -85,6 +85,51 @@ class QxcTcw extends BaseKj{
      * @param string $returnType
      * @return array|bool 返回格式(数组)：{"expect":"2020100623","opencode":"0,8,6,3,6,3,4","opentime":"2020-10-06 17:41:38"}
      */
+    public static function getNineNineLottery($returnType = 'json', $is_auto = 1, $lottery_type = 1){
+
+        if($is_auto == 2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
+            $domain = BaseKj::getApiHostByRoute('/kj/qxc/nine-nine-plw');
+            $lotNames = [1=>'hnqxc', 17=>'plw'];
+            $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/lastTen/'.$lotNames[$lottery_type];
+
+            $data = CurlService::getCurl($url);
+            if (!isset($data['code']) OR empty($data['data'][0])) return false;
+            $kData = $data['data'][0];
+            $tmp_codes = $kData['result']['numbers'];
+            $kjData['expect'] = $kData['issue'];
+            $kjData['opencode'] = $tmp_codes[0].','.$tmp_codes[1].','.$tmp_codes[2].','.$tmp_codes[3].',0';
+            $kjData['opentime'] = date('Y-m-d H:i:s', (int)($kData['createTime']/1000));
+            //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ] # 返回格式
+        }
+        $opencode = $kjData['opencode']; # 开奖号码
+        $opentime = $kjData['opentime']; # 开奖时间
+        $expect = $kjData['expect']; # 期号
+        //p([DEFAULT_LOTTERY_TYPE,$expect, $kjData]);
+
+        self::setKjDataCache($lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            header("Content-type: application/xml");
+            echo'<?xml version="1.0" encoding="utf-8"?>';
+            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
+            ob_end_flush();exit;
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+        $logArr = array_merge($rst, [
+            'is_auto' => $is_auto,
+            'lottery_type' => $lottery_type,
+        ]);
+        Tool_Common::log('cqssc_kl8', 'INFO', '体彩网-号码抓取', $logArr);
+
+        return $rst;
+    }
+
+    /**
+     * @desc 七星彩  中国体育彩票 , $lottery_type = 1   https://www.lottery.gov.cn/kj/kjlb.html?qxc
+     * @param string $returnType
+     * @return array|bool 返回格式(数组)：{"expect":"2020100623","opencode":"0,8,6,3,6,3,4","opentime":"2020-10-06 17:41:38"}
+     */
     public static function getTcwOne($returnType = 'json', $is_auto = 1, $lottery_type = 1){
 
         if($is_auto == 2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
