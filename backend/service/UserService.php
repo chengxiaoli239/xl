@@ -375,6 +375,9 @@ class UserService extends BaseService {
         $rstData = [
             //'uid' => $TzSystemsUsers->uid,
             'username' => $TzSystemsUsers->username,
+            'ssc_domain' => $TzSystemsUsers->ssc_domain,
+            'account' => $TzSystemsUsers->account,
+            'password' => $TzSystemsUsers->password,
             'access_token' => $TzSystemsUsers->access_token,
             'status' => $TzSystemsUsers->status,
             'expire_time' => date('Y-m-d H:i:s', $TzSystemsUsers->expire_time),
