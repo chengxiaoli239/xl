@@ -14,6 +14,7 @@ use backend\models\ImportPlanCodes;
 use backend\models\Num4Type;
 use backend\models\searchs\SscDwsHzNums;
 use backend\models\Ssc3numYl;
+use backend\models\SscDsTypeDatas;
 use backend\models\SscDsYl;
 use backend\models\SscDwHzStatic;
 use backend\models\SscKjData;
@@ -2114,7 +2115,7 @@ class SscDataService extends BaseService {
     /**
      * @desc 统计表插入 三字现
      * @param int $isDouble 0不带双重1带双重
-     * @param $type # 类型：1和值2号码类型[例如:双双重、三重]3三字现4四字现
+     * @param $type - 类型：1和值2号码类型[例如:双双重、三重]3三字现4四字现
      * @return bool
      */
     public static function insertCode($type = 3){
@@ -3272,6 +3273,44 @@ class SscDataService extends BaseService {
         }
 
         return ['start_time'=>$start_time, 'end_time'=>$end_time];
+    }
+
+    /**
+     * @desc 插入单双号码类型数据 - 初始化
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function insertDsTypeDatas($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+
+        $where = ['status'=>1];
+        $datas = SscDsTypeDatas::find()->where($where)->asArray()->orderBy(['sort'=>SORT_DESC])->all();
+        foreach ($datas as $data){
+            $where = ['positions'=>$data['positions'], 'zhi'=>$data['vals'], 'type'=>$data['code_type'], 'lottery_type'=>$lottery_type];
+            $setDatas = [];
+            if(!$SscDsYl = SscDsYl::findOne($where)){
+                $SscDsYl = new SscDsYl();
+                $setDatas = array_merge($setDatas, [
+                    'positions'=>$data['positions'],
+                    'zhi'=>$data['vals'],
+                    'type'=>$data['code_type'],
+                    'lottery_type'=>$lottery_type,
+                    'created_at'=>time(),
+                ]);
+            }
+            $setDatas = array_merge($setDatas, [
+                'updated_at'=>time(),
+                'static_nums' => $data['static_nums'],
+            ]);
+
+            $SscDsYl->setAttributes($setDatas);
+            if(!$SscDsYl->save()){
+                $msg = $SscDsYl->getErrors();
+                return ['status'=>300, 'msg'=>$msg];
+            }
+        }
+
+        return $rst;
     }
 
 }

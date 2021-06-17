@@ -228,6 +228,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::insertDsTypeDatas($lottery_type=17);p($rst);
         $data = QxcTcw::getNineNineLottery($type='json', $is_auto=2, $lottery_type=17);p($data);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');p($r);
         $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);p($data);

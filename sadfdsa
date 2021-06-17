@@ -1,15 +1,13 @@
-:authority: a3.888138.xyz
-:method: GET
-:path: /user-api/session-user?_nowTime=1622051765004&_uri=session-user&sign=9a443c046799c107e3f6a1936ab7a245
-:scheme: https
-accept: application/json, text/plain, */*
-accept-encoding: gzip, deflate, br
-accept-language: zh-CN,zh;q=0.9
-cookie: SESSION=NWQ5NTgzNzQtODZhZS00ZGFlLTkyM2QtYThmYzE5YTdkY2Zl; main-lottery=twk5
-referer: https://a3.888138.xyz/game/kuai-xuan
-sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"
-sec-ch-ua-mobile: ?0
-sec-fetch-dest: empty
-sec-fetch-mode: cors
-sec-fetch-site: same-origin
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36
+1112,1121,1211,2111,1222,2122,2212,2221
+1122,1212,1221,2112,2121,2211
+1111,2222
+1222,2122,2212,2221
+2111,1211,1121,1112
+1222,2122,2212,2221,2222
+2111,1211,1121,1112,1111
+2222
+1111
+1222,2122,2212,2221,1111
+2111,1211,1121,1112,2222
+1222,2122,2212,2221,1111,2222
+2111,1211,1121,1112,2222,1111
