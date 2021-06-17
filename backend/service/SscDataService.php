@@ -574,7 +574,7 @@ class SscDataService extends BaseService {
                     //p($updateData);
                     //if($YL_data[$num] > $SscDsYl->max_miss && $YL_data[$num] > $SscDsYl->history_max_miss){
                     //}
-                    $SscDsYl->history_max_miss = max($miss['current_times'],$SscDsYl->max_miss,$SscDsYl->history_max_miss); // 6、历史最大遗漏
+                    $SscDsYl->history_max_miss = (string)max($miss['current_times'],$SscDsYl->max_miss,$SscDsYl->history_max_miss); // 6、历史最大遗漏
                     $SscDsYl->update_time = date('Y-m-d H:i:s');
                     //p($SscDsYl->attributes);
                     $rst = $SscDsYl->save();
@@ -1643,7 +1643,7 @@ class SscDataService extends BaseService {
         $field = 'code_'.$zuHe[0].'_'.$zuHe[1].'_'.$zuHe[2].'_'.$zuHe[3];
         $opData[$field] = $tmpData[$zuHe[0]].$tmpData[$zuHe[1]].$tmpData[$zuHe[2]].$tmpData[$zuHe[3]];
 
-        $opData['qihao'] = $qihao;
+        $opData['qihao'] = (string)$qihao;
         $opData['code_str'] = $SscKjData['code_str'];
         $opData['date'] = $SscKjData['date'];
         $opData['updated_at'] = time();

@@ -228,6 +228,12 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 17); p($rst);// 更新单双遗漏
+        for($i=2021001; $i<=2021158; $i++){
+            $qihao = $i;
+            $rst = SscDataService::insertSscKjDataDs($qihao, $lottery_type=17);//p($rst);
+        }
+        p($rst);
         $rst = SscDataService::insertDsTypeDatas($lottery_type=17);p($rst);
         $data = QxcTcw::getNineNineLottery($type='json', $is_auto=2, $lottery_type=17);p($data);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');p($r);
@@ -348,7 +354,6 @@ class IndexController extends Controller
         $rst = JinYingService::getBalance('18', '15');p($rst);
         $rst = JinYingService::login('18', '15');p($rst);
         $rst['rst'] = BaseService::synBalance($tz_system_users_id=66);p($rst);
-        $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 1); p($rst);// 更新单双遗漏
         $rst = HN0898Service::insertDsYl($lottery_type = 1);p($rst); # 七星彩单双
         $rst = StaticService::opStatic($lottery_types = [1]); p($rst);# 和值、四定利润统计
         for ($i=0; $i<1000; $i++){
@@ -629,11 +634,7 @@ class IndexController extends Controller
         $data = XjSsc::getLotteryNoZhiBo();p($data);
         $data = XjSsc::getLotteryNoSevenDay();p($data);
         $data = XjSsc::getLotteryNo99();p($data);
-        for($i=1; $i<=59; $i++){
-            $qihao = 190917000 + $i;
-            $rst = SscDataService::insertSscKjDataDs($qihao);//p($rst);
-        }
-        p($rst);
+
         $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type = 5); p($rst);# 单双利润统计(month)
         $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type = 7);p($rst); # 上奖三字现
         $rst = StaticService::get2NumsYlRecords('66', $lottery_type = 7);p($rst);
