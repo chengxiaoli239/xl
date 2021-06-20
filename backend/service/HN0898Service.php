@@ -1711,4 +1711,17 @@ class HN0898Service extends BaseTZService {
 
         return $rst;
     }
+
+    /**
+     * @desc 初始化彩种单双数据
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function initDsDatas($lottery_type = DEFAULT_LOTTERY_TYPE){
+        //$rst = ['status'=>200, 'msg'=>'操作成功lottery_type['.$lottery_type.']'];
+
+        $rst = SscDataService::insertDsTypeDatas($lottery_type);
+
+        return $rst;
+    }
 }

@@ -85,6 +85,19 @@ class LotteryTypeController extends BaseController
     }
 
     /**
+     * @desc 初始化彩种单双数据
+     * @return array
+     */
+    public function actionInitDsDatas(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+
+        $rst = HN0898Service::initDsDatas($post['lottery_type']);
+
+        return $rst;
+    }
+
+    /**
      * Creates a new LotteryType model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed

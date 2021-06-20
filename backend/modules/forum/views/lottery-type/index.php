@@ -120,6 +120,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
 
+                        ['attribute' => 'enable','label'=>'操作','headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $txt = "<font color='green'>单双数据</font><span id='tip_msg_init_ds_'".$model->lottery_type."></span>" ;
+                                return Html::a($txt, '#', ['title'=>'点击初始化', 'class'=>'btn btn-primary init-ds-data', 'lottery_type'=>$model->lottery_type]);
+                            },
+                        ],
+
                         ['class' => 'yii\grid\ActionColumn','headerOptions'=>['width'=>'5%'],'template'=>'{update}&nbsp;&nbsp;&nbsp;&nbsp;{delete}'],
                     ],
                 ]); ?>
@@ -171,6 +179,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
+<input type="hidden" id="act-val" name="act-val" value="">
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
 $(function () {
@@ -202,22 +211,51 @@ $(function () {
         },'JSON');
     }
 
+    function initDsData(lottery_type) {
+        var data = {lottery_type:lottery_type};
+        var tip_title = '';
+        $.post("/forum/lottery-type/init-ds-datas",data,function(rst) {
+            console.log(rst);
+            if(rst.status === 200) {
+                tip_title = '操作成功';
+                msg = rst.msg;
+                //$("#balance_"+lottery_type).html(msg);
+            } else {
+                tip_title = '操作失败';
+            }
+            //showTips(null, rst.msg, tip_title); # 同步完无需弹框，暂且注释
+        },'JSON');
+    }
+
     $('.open-bet-status').click(function () {
         var lottery_type = $(this).attr('lottery_type');
+        $('#act-val').val('open-bet-status')
         showTips(lottery_type);
     });
 
-    function showTips(id, tip_msg = '确定开启本期下注？', title = '提示信息') {
-        console.log(id);
+    function showTips(lottery_type, tip_msg = '确定开启本期下注？', title = '提示信息') {
+        console.log(lottery_type);
         $('#tip_msg_title').html(title);
         $('#tip_msg').html(tip_msg);
         $('#tipModal').modal('show');
-        $("#opConfirm").attr('op-id', id);
+        $("#opConfirm").attr('op-id', lottery_type);
     }
 
     $('#opConfirm').click(function () {
-        var id = $(this).attr('op-id');
-        if(id != null) openBetStatus(id)
+        var lottery_type = $(this).attr('op-id');
+        act = $('#act-val').val();
+        if(act == 'init-ds-data'){
+            initDsData(lottery_type)
+        }else {
+            if(lottery_type != null) openBetStatus(lottery_type)
+        }
+    });
+
+    // 初始化单双数据
+    $('.init-ds-data').click(function () {
+        var lottery_type = $(this).attr('lottery_type');
+        $('#act-val').val('init-ds-data')
+        showTips(lottery_type, tmp_msg='确定初始化单双数据？');
     });
 })
 </script>
