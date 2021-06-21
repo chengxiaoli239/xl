@@ -109,7 +109,19 @@ class SscStaticYlController extends BaseController
     public function actionQuery(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
-        $rst = StaticService::queryCodeTypeStatic($post, $post['type']);
+        $rst = StaticService::queryCodeTypeStatic($post, $post['code_type']);
+
+        return $rst;
+    }
+
+    /**
+     * @desc 表单页，遗漏、利润功能查询
+     * @return array
+     */
+    public function actionQueryProfits(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $rst = StaticService::queryCodeTypeProfits($post, $post['static_type']);
 
         return $rst;
     }

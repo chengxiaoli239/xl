@@ -122,4 +122,6 @@ return [
 
     'query-profits' => '利润查询',
     'query-yl' => '遗漏查询',
+    'query-profits-months' => '利润查询[月]',
+    'query-profits-years' => '利润查询[年]',
 ];

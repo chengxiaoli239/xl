@@ -2377,7 +2377,8 @@ class StaticService extends BaseService {
                break;
            case 3: # 四字定
                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'code_4n_str', $codes]];
-               $SscKjDatas = SscKjData::find()->where($where)->asArray()->orderBy('id DESC')->limit(10000)->all();
+               $query = SscKjData::find()->where($where);
+               $SscKjDatas = $query->asArray()->orderBy('id DESC')->limit(20000)->all();
                break;
            case 4: # 一字定
            case 10:
@@ -2923,5 +2924,80 @@ $sql .= '
         }
 
         return $rst;
+    }
+
+    /**
+     * @desc 号码类型月年统计
+     * @param $data
+     * @param $static_type - 1:月、2:年
+     * @return array
+     */
+    public static function queryCodeTypeProfits($data, $static_type){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+        $code_types = [
+            1 => 2, # 二定
+            2 => 3, # 三定
+            3 => 4, # 四定
+        ];
+
+        $code_type = $code_types[$data['UserSysPlans']['playway']];
+        $tz_type = $data['UserSysPlans']['tz_type'];
+        $lottery_type = $data['UserSysPlans']['lottery_type'];
+        $model = new UserSysPlans();
+        UserSysPlansService::preOpData($data, $user_id=1);
+        $model->load($data);
+        $codes_hz = json_decode($model->hz_Arr, true);
+        $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type);
+
+        $datas = StaticService::getProfitsDatasByCodes($codes, $static_type, $lottery_type);
+
+        return $rst;
+    }
+
+    /**
+     * @desc 号码利润统计
+     * @param array $codes
+     * @param int $static_type - 1月2年
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function getProfitsDatasByCodes($codes=[], $static_type=1, $lottery_type=DEFAULT_LOTTERY_TYPE){
+        $datas = [];
+        if($static_type == 1){
+            # 统计维度：月
+            $groupBy = 'LEFT(date,7)';
+        }elseif($static_type==2){
+            $groupBy = 'LEFT(date,4)';
+            # 统计维度：年
+        }
+        $d = SscKjData::find()->select(['count'=>'count(id)', 'time'=>$groupBy])
+            ->where(['AND',
+                ['IN', 'code_4n_str', $codes],
+                ['=', 'lottery_type', $lottery_type],
+            ])
+            ->groupBy([$groupBy])
+            ->orderBy(['id'=>SORT_DESC])->asArray()->all();
+        $keys1 = ArrayHelper::getColumn($d, 'time');
+        $vals1 = ArrayHelper::getColumn($d, 'count');
+        $data1 = array_combine($keys1, $vals1); # 每个周期中将期数
+        //p([$static_type, $d, $data1]);
+
+        $qs = SscKjData::find()->select(['count'=>'count(id)', 'time'=>$groupBy])
+            ->where(['=', 'lottery_type', $lottery_type])
+            ->groupBy([$groupBy])
+            ->orderBy(['id'=>SORT_DESC])->asArray()->all();
+        $keys2 = ArrayHelper::getColumn($qs, 'time');
+        $vals2 = ArrayHelper::getColumn($qs, 'count');
+        $data2 = array_combine($keys2, $vals2); # 每个周期开奖期数
+        //p([$static_type, $qs, $data2]);
+
+        $counts = count($codes);
+        $profits = [];
+        foreach ($data2 as $k=>$d2){
+            # 利润 = 中奖金额(中奖次数*赔率) - 投注金额(号码注数*投注金额*每个周期期数)
+            $profits[$k] = $data1[$k] * 995 - $counts * 0.1 * $d2;
+        }
+
+        return $profits;
     }
 }
