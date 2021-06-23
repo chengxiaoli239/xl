@@ -2451,9 +2451,13 @@ class Lucky5Service { # 重庆7时彩登陆体系
     /**
      * @desc 设置全局代理
      * @param $ch
-     * @return bool
+     * @return bool|array
      */
     public static function setPoxy($ch, $url='', $uid = 0){
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+        if(empty($TzSystemsUsers) OR !$TzSystemsUsers->is_use_proxy){
+            return ['status'=>200, 'msg'=>'无需代理IP的用户或uid为空'];
+        }
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return []; # CURL 代理开关
 
