@@ -319,8 +319,9 @@ use yii\widgets\ActiveForm;
     </div>
 </div>
 <script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<?php include(dirname(__FILE__).'/query-profits.php');?>
 <script>
-$(function () {
+    $(function () {
     $('.reverse_type_4ds').click(function () {
         $("[name='UserSysPlans[type_4ds][]']").each(function () {
             if($(this).prop('checked') == false){
@@ -501,17 +502,6 @@ $(function () {
     $('.code_type_ds_2').click(function () {
         obj = $(this).parent().next();
         obj.val() == '' ? obj.val('02468') : obj.val('');
-    });
-
-    // 利润查询 - 月
-    $(".id-query-profits").click(function () {
-        url = '/forum/ssc-static-yl/query-profits'
-        console.log('askldjfjk');
-        data = $('#w0').serialize()+'&static_type='+$(this).data('static-type');
-        $.post(url, data, function(rst) {
-            //$('#tip_msg_rst').html('<strong>号码：</strong>'+rst.code_desc + "<br>" +'<strong>组数：</strong>'+ rst.counts + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str)
-            //$('#rstTipModal').modal('show');
-        });
     });
 
 });

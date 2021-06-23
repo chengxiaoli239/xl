@@ -2950,6 +2950,8 @@ $sql .= '
         $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type);
 
         $datas = StaticService::getProfitsDatasByCodes($codes, $static_type, $lottery_type);
+        $rst['datas'] = $datas;
+        $rst['code_desc'] = \backend\service\NumService::getDescByKuaixuan($codes_hz);
 
         return $rst;
     }
@@ -2993,9 +2995,15 @@ $sql .= '
 
         $counts = count($codes);
         $profits = [];
-        foreach ($data2 as $k=>$d2){
+        foreach ($data2 as $timer=>$qishu_per_section){
             # 利润 = 中奖金额(中奖次数*赔率) - 投注金额(号码注数*投注金额*每个周期期数)
-            $profits[$k] = $data1[$k] * 995 - $counts * 0.1 * $d2;
+            $tmpData = [
+                'time' => $timer,
+                'profits'=> $data1[$timer] * 995 - $counts * 0.1 * $qishu_per_section,
+                'counts' => $counts,
+                'qishus' => $qishu_per_section,
+            ];
+            $profits[$timer] = $tmpData;
         }
 
         return $profits;
