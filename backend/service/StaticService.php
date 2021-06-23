@@ -2999,11 +2999,13 @@ $sql .= '
             # 利润 = 中奖金额(中奖次数*赔率) - 投注金额(号码注数*投注金额*每个周期期数)
             $tmpData = [
                 'time' => $timer,
-                'profits'=> $data1[$timer] * 995 - $counts * 0.1 * $qishu_per_section,
+                'profits' => $data1[$timer] * 995 - $counts * 0.1 * $qishu_per_section,
+                'zj_qishus' => $data1[$timer],
+                'all_qishus' => $qishu_per_section,
                 'counts' => $counts,
                 'qishus' => $qishu_per_section,
             ];
-            $profits[$timer] = $tmpData;
+            $profits[] = $tmpData;
         }
 
         return $profits;

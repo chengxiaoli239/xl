@@ -1,20 +1,23 @@
 <style>
-    #modalTable #table th{
-    //width: 16%;
-    }
-    #modalTable #table td{
-    //width: 16%;
-    }
-    #modalTable-head{
-        height: 40px
-    }
-    .table thead > tr > td, .table tbody > tr > td{
+#modalTable #table th{
+    width: 16%;
+}
+#modalTable #table td{
+    width: 16%;
+}
+#modalTable-head{
+    height: 40px
+}
+.table thead > tr > td, .table tbody > tr > td{
     //padding: 6px;
-    }
+}
+.table{
+    margin-bottom: 1px;
+}
 </style>
 
 <div id="modalTable" class="modal fade" tabindex="-1" role="dialog" style="display: none;padding-right: -10px;" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document" style="margin:100px auto;">
         <div class="modal-content">
             <div class="modal-header" id="modalTable-head" style="height: 45px;">
                 <h5 class="modal-title" style="" id="modalTable-title">号码：全部</h5>
@@ -25,17 +28,17 @@
             <div class="modal-body" style="padding: 0px;">
                 <div class="bootstrap-table bootstrap4">
                     <div class="fixed-table-toolbar"></div>
-                    <div class="fixed-table-container fixed-height" style="height: 599px; padding-bottom: 50px;">
+                    <div class="fixed-table-container fixed-height" style="padding-bottom: 50px;">
                         <div class="fixed-table-header" style="margin-right: 0px;">
                             <table class="table table-bordered table-hover" style="">
                                 <thead style="">
                                 <tr>
-                                    <td data-field="id" class="th-inner" style="width: 40px;"> </td>
-                                    <td data-field="gamenum" class="th-inner" style="width: 75px;">期号</td>
-                                    <td data-field="water" class="th-inner" style="width: 70px;">回水</td>
-                                    <td data-field="summoney" class="th-inner" style="width: 70px;">下分</td>
-                                    <td data-field="okmoney" class="th-inner" style="width: 70px;">结算</td>
-                                    <td data-field="profits" class="th-inner" style="width: 70px;">盈亏</td>
+                                    <td data-field="id" class="th-inner" style="width: 10px;">#</td>
+                                    <td data-field="gamenum" class="th-inner" style="width: 75px;">时间</td>
+                                    <td data-field="water" class="th-inner" style="width: 70px;">盈亏</td>
+                                    <td data-field="summoney" class="th-inner" style="width: 70px;">中期数</td>
+                                    <td data-field="summoney" class="th-inner" style="width: 70px;">总期数</td>
+                                    <td data-field="okmoney" class="th-inner" style="width: 70px;">总组数</td>
                                 </tr>
                                 </thead>
                             </table>
@@ -84,16 +87,22 @@ $(".id-query-profits").click(function () {
         console.log(rst);
         table_str = '';
         //$('#tip_msg_rst').html('<strong>号码：</strong>'+rst.code_desc + "<br>" +'<strong>组数：</strong>'+ rst.counts + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str)
-        static i = 0;
-        for (data in rst.datas){
-            i = i + 1;
+        datas = rst.datas
+        for (i in datas){
+            k = parseInt(i) + 1;
+            tmpData = datas[i];
+            console.log('time', tmpData['timer'])
+            console.log('timer', tmpData.timer)
+            //isj = isJSON(tmpData)
+            //console.log(isj)
             table_str += '<tr data-index="1">'+
-            '<td class="th-inner" style="width: 40px;"><font color="green">'+i+'</font></td>'+ // 序号
-            '<td class="th-inner" style="width: 70px;"><font color="gray">1000</font></td>'+ // 期号
-            '<td class="th-inner" style="width: 70px;"><font color="gray">2000</font></td>'+ // 回水
-            '<td class="th-inner" style="width: 70px;"><font color="gray">33333</font></td>'+ // 下分
-            '<td class="th-inner" style="width: 70px;"><font color="red">44444</font></td>'+ // 结算
-            '<td class="th-inner" style="width: 70px;"><font color="gray">55555</font></td>'+ // 盈亏
+            '<td class="th-inner" style="width: 10px;"><font color="green">'+k+'</font></td>'+ //
+            '<td class="th-inner" style="width: 75px;"><font color="gray">'+tmpData['time']+'</font></td>'+ // 月份、年份
+            '<td class="th-inner" style="width: 70px;"><font color="gray">'+tmpData['profits']+'</font></td>'+ // 利润
+            '<td class="th-inner" style="width: 70px;"><font color="gray">'+tmpData['zj_qishus']+'</font></td>'+ // 中期数
+            '<td class="th-inner" style="width: 70px;"><font color="gray">'+tmpData['all_qishus']+'</font></td>'+ // 总期数
+            '<td class="th-inner" style="width: 70px;"><font color="gray">'+tmpData['counts']+'</font></td>'+ // 总组数
+            //'<td class="th-inner" style="width: 70px;"><font color="gray">55555</font></td>'+ //
             '</tr>';
         }
         $("#tbody-content").html(table_str);
@@ -102,4 +111,22 @@ $(".id-query-profits").click(function () {
         $('#modalTable').modal('show');
     });
 });
+function isJSON(str) {
+    if (typeof str == 'string') {
+        try {
+            var obj=JSON.parse(str);
+            if(typeof obj == 'object' && obj ){
+                return true;
+            }else{
+                return false;
+            }
+
+        } catch(e) {
+            console.log('error：'+str+'!!!'+e);
+            return false;
+        }
+    }
+    console.log('It is not a string!')
+}
+
 </script>
