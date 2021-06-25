@@ -121,7 +121,7 @@ return [
     'Wx Login' => '微信登陆',
 
     'query-profits' => '利润查询',
-    'query-yl' => '遗漏查询',
-    'query-profits-months' => '利润查询[月]',
-    'query-profits-years' => '利润查询[年]',
+    'query-yl' => '查遗漏',
+    'query-profits-months' => '查月利润',
+    'query-profits-years' => '查年利润',
 ];
