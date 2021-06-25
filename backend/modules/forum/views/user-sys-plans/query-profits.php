@@ -9,14 +9,18 @@
     height: 40px
 }
 .table thead > tr > th, .table tbody > tr > th, .table tfoot > tr > th, .table thead > tr > td, .table tbody > tr > td, .table tfoot > tr > td{
-    padding: 5px;
+    padding: 5px 0px;
 }
 .table{
     margin-bottom: 1px;
 }
+.head-css{
+    text-align: center;
+    color: #FF7E00;
+}
 </style>
 
-<div id="modalTable" class="modal fade" tabindex="-1" role="dialog" style="display: none;padding-right: -10px;" aria-hidden="true">
+<div id="modalTable" class="modal fade" tabindex="-1" role="dialog" style="display: none;padding-right: 0px;" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document" style="margin:100px auto;">
         <div class="modal-content">
             <div class="modal-header" id="modalTable-head" style="height: 45px;">
@@ -34,12 +38,12 @@
                                 <thead style="" id="append_content">
                                 <tr class="modal-title" style=""><td><strong>描述</strong></td><td colspan="5" id="modalTable-title"></td></tr>
                                 <tr>
-                                    <td data-field="id" class="th-inner" style="width: 5px;text-align: center"><strong>#</strong></td>
-                                    <td data-field="gamenum" class="th-inner" style="width: 70px;text-align: center;"><strong>时间</strong></td>
-                                    <td data-field="water" class="th-inner" style="width: 70px;text-align: center;"><strong>盈亏</strong></td>
-                                    <td data-field="summoney" class="th-inner" style="width: 70px;text-align: center;"><strong>中期数</strong></td>
-                                    <td data-field="summoney" class="th-inner" style="width: 70px;text-align: center;"><strong>总期数</strong></td>
-                                    <td data-field="okmoney" class="th-inner" style="width: 70px;text-align: center;"><strong>总组数</strong></td>
+                                    <td data-field="id" class="th-inner head-css" style="width: 5px;"><strong>#</strong></td>
+                                    <td data-field="gamenum" class="th-inner head-css" style="width: 35px;;"><strong>时间</strong></td>
+                                    <td data-field="water" class="th-inner head-css" style="width: 35px;;"><strong>盈亏</strong></td>
+                                    <td data-field="summoney" class="th-inner head-css" style="width: 35px;;"><strong>中期数</strong></td>
+                                    <td data-field="summoney" class="th-inner head-css" style="width: 35px;;"><strong>总期数</strong></td>
+                                    <td data-field="okmoney" class="th-inner head-css" style="width: 35px;;"><strong>总组数</strong></td>
                                 </tr>
                                 </thead>
                             </table>
@@ -69,23 +73,18 @@ $(".id-query-profits").click(function () {
     url = '/forum/ssc-static-yl/query-profits'
     data = $('#w0').serialize()+'&static_type='+$(this).data('static-type');
     $.post(url, data, function(rst) {
-        console.log(rst);
         table_str = '';
         datas = rst.datas
         for (i in datas){
             k = parseInt(i) + 1;
             tmpData = datas[i];
-            console.log('time', tmpData['timer'])
-            console.log('timer', tmpData.timer)
-            //isj = isJSON(tmpData)
-            //console.log(isj)
             table_str += '<tr data-index="1">'+
             '<td class="th-inner" style="width: 10px;text-align: center;"><font color="green">'+k+'</font></td>'+ //
-            '<td class="th-inner" style="width: 75px;text-align: center;"><font color="gray">'+tmpData['time']+'</font></td>'+ // 月份、年份
-            '<td class="th-inner" style="width: 70px;text-align: center;"><font color="gray">'+tmpData['profits']+'</font></td>'+ // 利润
-            '<td class="th-inner" style="width: 70px;text-align: center;"><font color="gray">'+tmpData['zj_qishus']+'</font></td>'+ // 中期数
-            '<td class="th-inner" style="width: 70px;text-align: center;"><font color="gray">'+tmpData['all_qishus']+'</font></td>'+ // 总期数
-            '<td class="th-inner" style="width: 70px;text-align: center;"><font color="gray">'+tmpData['counts']+'</font></td>'+ // 总组数
+            '<td class="th-inner" style="width: 35px;text-align: center;"><font color="gray">'+tmpData['time']+'</font></td>'+ // 月份、年份
+            '<td class="th-inner" style="width: 35px;text-align: center;"><font color="gray">'+tmpData['profits']+'</font></td>'+ // 利润
+            '<td class="th-inner" style="width: 35px;text-align: center;"><font color="gray">'+tmpData['zj_qishus']+'</font></td>'+ // 中期数
+            '<td class="th-inner" style="width: 35px;text-align: center;"><font color="gray">'+tmpData['all_qishus']+'</font></td>'+ // 总期数
+            '<td class="th-inner" style="width: 35px;text-align: center;"><font color="gray">'+tmpData['counts']+'</font></td>'+ // 总组数
             //'<td class="th-inner" style="width: 70px;"><font color="gray">55555</font></td>'+ //
             '</tr>';
         }
