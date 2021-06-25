@@ -36,7 +36,7 @@
                         <div class="fixed-table-header" style="margin-right: 0px;">
                             <table class="table table-bordered table-hover" style="">
                                 <thead style="" id="append_content">
-                                <tr class="modal-title" style=""><td><strong>描述</strong></td><td colspan="5" id="modalTable-title"></td></tr>
+                                <tr class="modal-title" style=""><td style="text-align: center"><strong>描述</strong></td><td colspan="5" id="modalTable-title"></td></tr>
                                 <tr>
                                     <td data-field="id" class="th-inner head-css" style="width: 5px;"><strong>#</strong></td>
                                     <td data-field="gamenum" class="th-inner head-css" style="width: 35px;;"><strong>时间</strong></td>
@@ -91,7 +91,7 @@ $(".id-query-profits").click(function () {
         $("#append_content").append(table_str)
         //$("#tbody-content").html(table_str);
         console.log(rst.code_desc);
-        $('#modalTable-title').html("<strong>" + rst.code_desc + "</strong>");
+        $('#modalTable-title').html("&nbsp;&nbsp;&nbsp;<strong>" + rst.code_desc + "</strong>");
         $('#modalTable').modal('show');
     });
 });

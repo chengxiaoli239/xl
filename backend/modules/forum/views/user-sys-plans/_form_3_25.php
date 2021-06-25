@@ -280,15 +280,8 @@ use yii\widgets\ActiveForm;
                             <?= $form->field($model,"desc")->textarea([ 'autofocus' => false,'style'=>'height:60px' ])?>
                         </div>
                     </div>
+                    <?php include(dirname(__FILE__).'/act-button.php');?>
 
-                    <div class="form-group">
-                        <div class="col-lg-offset-2 col-lg-10">
-                            <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <?= Html::button(Yii::t('app', 'query-yl'), ['class' => 'btn btn-success id-query', 'data-type'=>1]) ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <?= Html::button(Yii::t('app', 'query-profits-months'), ['class' => 'btn btn-success id-query-profits', 'data-type'=>2, 'data-static-type'=>1]) ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <?= Html::button(Yii::t('app', 'query-profits-years'), ['class' => 'btn btn-success id-query-profits', 'data-type'=>2, 'data-static-type'=>2]) ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        </div>
-                    </div>
                 <input type="hidden" id="lottery_type" name="UserSysPlans[lottery_type]" value="<?=$lottery_type?>">
                 <?php ActiveForm::end(); ?>
             </div>
