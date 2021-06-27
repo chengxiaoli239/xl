@@ -1407,13 +1407,15 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 Tool_Common::log('/bet/repeatErrorBet', 'INFO', '幸运五下注1', [$uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent, $rst1]);
             }
 
+        }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [309])){
+            $status = 2; # 超时不重复下
         }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 305, 307])){
             $status = 3; # 不可再次下注：302余额不足305已关盘307网盘账号停押
         }else{
             $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key);
             $m->delete($betKey); # 失败之后可重新下注的情况解锁
         }
-        if(in_array($tmpRst['code'], [309, 311])){
+        if(in_array($tmpRst['code'], [311])){ # 309, 311
             $m = \Yii::$app->cache;
             $mkey_time_out = 'mkey_time_out_retry_key_'.$row->uid.'_'.$row->plan_id.'_'.$row->bet_sort_key;
             $val = $m->get($mkey_time_out);
