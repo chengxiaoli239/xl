@@ -2964,7 +2964,6 @@ $sql .= '
      * @return array
      */
     public static function getProfitsDatasByCodes($codes=[], $static_type=1, $lottery_type=DEFAULT_LOTTERY_TYPE){
-        $datas = [];
         if($static_type == 1){
             # 统计维度：月
             $groupBy = 'LEFT(date,7)';

@@ -67,7 +67,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'status',
                         //'created_at',
                         //'updated_at',
-                        'update_time',
+                        ['attribute' => 'update_time','label'=>'更新时间', # 'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return substr($model->update_time, 5, -3);
+                            }
+                        ],
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],

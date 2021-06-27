@@ -111,12 +111,12 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 $url0 = "/forum/user-sys-plans/switch-status?id=".$model->id.'&status=1'; # 点击开启
                                 $url1 = "/forum/user-sys-plans/switch-status?id=".$model->id.'&status=0'; # 点击关闭
                                 if($model->status == 1){
-                                    $txt = "<font color='green'>已开启</font>" ;
-                                    return Html::a($txt, $url1, ['title' => '点击关闭']);
+                                    $txt = "<font color='green'>已开启</font>";
+                                    return Html::a($txt, $url1, ['title' => '点击关闭']).'<i class="icon-refresh"></i>';
                                 }
                                 if(!$model->status){
                                     $txt = "<font color='red'>已关闭</font>";
-                                    return Html::a($txt, $url0, ['title' => '点击开启']);
+                                    return Html::a($txt, $url0, ['title' => '点击开启']).'<i class="icon-refresh"></i>';
                                 }
                                 //return $model->snid;
                             }
