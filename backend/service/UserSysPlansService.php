@@ -157,7 +157,8 @@ class UserSysPlansService extends BaseService {
         # 15、单双类型
         if(isset($UserSysPlans['change_per'][0]) && $UserSysPlans['change_per'][0]){
             $tmpFilter['change_per'] = $UserSysPlans['change_per'][0]; # 是否每期轮换
-            $tmpFilter['turn_key'] = 0; # 每次保存都从第一组开始
+            $turn_key = trim($UserSysPlans['turn_key']);
+            $tmpFilter['turn_key'] = $turn_key; # 每次保存都从第一组开始
         }
         unset($post['UserSysPlans']['bet_while_miss']);
 
