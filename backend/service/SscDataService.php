@@ -37,6 +37,7 @@ use common\tools\Tool_Common;
 use backend\models\SscDwHzYl;
 use izyue\admin\models\Log;
 use  yii;
+use yii\helpers\BaseStringHelper;
 
 class SscDataService extends BaseService {
 
@@ -1513,7 +1514,7 @@ class SscDataService extends BaseService {
             'max_miss' => $max_miss,   // 近200期内的最大遗漏
             'max_range' => $max_range,   // 近200期内的最大遗漏范围
             'val' => implode(',', $zuHes),
-            'yl_str' => $yl_str,
+            'yl_str' => BaseStringHelper::truncate($yl_str,3000),
             //'zihes' => $zuHes,
         ];
         //p($rstData);
