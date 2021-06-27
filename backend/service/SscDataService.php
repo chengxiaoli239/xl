@@ -2818,7 +2818,8 @@ class SscDataService extends BaseService {
                     $sortKeys = yii\helpers\ArrayHelper::getColumn($imports, 'plan_id_sort_key');
                     $current_key = array_search($hzArr['turn_key'], $sortKeys);
                     $next_key = ($current_key+1 > count($sortKeys)) ? 0 : $current_key+1;
-                    $hzArr['turn_key'] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>9)) ? 0 : $sortKeys[$next_key];#非轮换0，轮换:turn_key+1
+                    $turn_key = \Yii::$app->params['IMPORT_CODES_TURN'] - 1;
+                    $hzArr['turn_key'] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>$turn_key)) ? 0 : $sortKeys[$next_key];#非轮换0，轮换:turn_key+1
                 }
 
                 $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
