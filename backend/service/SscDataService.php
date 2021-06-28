@@ -2813,13 +2813,13 @@ class SscDataService extends BaseService {
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
                 $hzArr = json_decode($UserSysPlan->hz_Arr, true);
-                if(isset($hzArr['change_per'])){
+                if(isset($hzArr['change_per'])){ # 每期轮换
                     $imports = ImportPlanCodes::find()->select(['uid', 'plan_id', 'plan_id_sort_key'])->where(['AND', ['=', 'plan_id', $UserSysPlan->id], ['!=', 'codes', '']])->asArray()->all();
                     $sortKeys = yii\helpers\ArrayHelper::getColumn($imports, 'plan_id_sort_key');
                     $current_key = array_search($hzArr['turn_key'], $sortKeys);
                     $next_key = ($current_key+1 > count($sortKeys)) ? 0 : $current_key+1;
                     $turn_key = \Yii::$app->params['IMPORT_CODES_TURN'] - 1;
-                    $hzArr['turn_key'] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>$turn_key)) ? 0 : $sortKeys[$next_key];#非轮换0，轮换:turn_key+1
+                    $hzArr['turn_key'] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>=$turn_key)) ? 0 : $sortKeys[$next_key];#非轮换0，轮换:turn_key+1
                 }
 
                 $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
