@@ -1130,7 +1130,6 @@ class NineNineNewService extends BaseTZService {
             "x-csrf-index: ".$xCsrf['Index'],
             "x-csrf-token: ".$xCsrf['Token'],
         ];
-        p($headers,0);
         //$rst = CurlService::getCurl($url, $headers);
         //$rst = self::curlGetSn($url, $headers);
         $rst = NineNineNewService::getCurl($url, $headers);
@@ -1168,6 +1167,7 @@ class NineNineNewService extends BaseTZService {
             }
         }
 
+        iconv("UTF-8","GB2312//IGNORE",$rstData);
         $logArr = ['url'=>$url, 'headers'=>$headers, 'rst'=>$rst];//p($logArr);
         Tool_Common::log('getSnidBySn','INFO','0898获取订单号3', $logArr);
         //p(['$matches'=>$matches[2], 'user_id'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id, 'content'=>$content],0);

@@ -228,6 +228,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = NineNineNewService::getSnidBySn($uid=11, $tz_system_id = 12, $lottery_type=1);p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 17); p($rst);// 更新单双遗漏
         for($i=2021001; $i<=2021158; $i++){
             $qihao = $i;
@@ -238,7 +239,6 @@ class IndexController extends Controller
         $data = QxcTcw::getNineNineLottery($type='json', $is_auto=2, $lottery_type=17);p($data);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');p($r);
         $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);p($data);
-        $rst = NineNineNewService::getSnidBySn($uid=11, $tz_system_id = 12, $lottery_type=1);p($rst);
         $rst['bet'] = BetService::betByUidNew($uid=11);p($rst); // 用户新计划投注，可正买可反买
         $data = ZhongFaService::userInfo($uid=14, $tz_system_id=16);p($data);
         $rst = PoxyIPService::preGetValidIp($is_auto=0);p($rst);
