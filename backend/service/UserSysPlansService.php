@@ -161,6 +161,11 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['turn_key'] = (int)$turn_key; # 每次保存都从第一组开始
         }
         unset($post['UserSysPlans']['bet_while_miss']);
+        # 16、双两兄弟
+        if($UserSysPlans['type_22b'] && count($UserSysPlans['type_22b']) == 1){
+            $tmpFilter['type_22b'] = $UserSysPlans['type_22b'][0];
+        }
+        unset($post['UserSysPlans']['type_22b']);
 
         ################### 公共参数 - 结束 #########################
 

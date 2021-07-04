@@ -792,9 +792,13 @@ class NumService extends BaseService {
         if(isset($codes_hz['type_22'])){
             $where = array_merge($where, [['=', 'type_22', $codes_hz['type_22']]]);
         }
-        # 5、两兄弟
+        # 5.0、两兄弟
         if(isset($codes_hz['type_2b'])){
             $where = array_merge($where, [['=', 'type_2b', $codes_hz['type_2b']]]);
+        }
+        # 5.1、双两兄弟
+        if(isset($codes_hz['type_22b'])){
+            $where = array_merge($where, [['=', 'type_22b', $codes_hz['type_22b']]]);
         }
         # 6、三兄弟
         if(isset($codes_hz['type_3b'])){

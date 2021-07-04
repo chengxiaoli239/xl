@@ -47,6 +47,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $type_3; # 三重
     public $type_4; # 四重
     public $type_22; # 双双重
+    public $type_22b; # 双两兄弟
     public $type_2b; # 两兄弟
     public $type_3b; # 三兄弟
     public $type_4b; # 四兄弟
