@@ -17,7 +17,7 @@ class TzSystemUsersService extends ClientsBaseService{
             return ['status'=>301, 'msg'=>'缺少access_token参数'];
         }
         $m = \Yii::$app->cache;
-        $mkey = 'getTzSystemUserLists_key';
+        $mkey = self::buildTzSystemUserKey();
         $datas = $m->get($mkey);
         if(empty($datas)){
             $ADMIN_ACCESS_TOKEN = BetService::getConfig('ADMIN_ACCESS_TOKEN'); # 管理员token
@@ -33,5 +33,24 @@ class TzSystemUsersService extends ClientsBaseService{
         return ['status'=>200, 'datas'=>$datas, 'msg'=>'操作成功'];
     }
 
+    /**
+     * @desc 用户列表key
+     * @return string
+     */
+    public static function buildTzSystemUserKey(){
+        $mkey = 'getTzSystemUserLists_key';
+
+        return $mkey;
+    }
+
+    /**
+     * @desc 删除用户缓存信息
+     */
+    public static function delTzsystemUserData(){
+        $m = \Yii::$app->cache;
+        $mkey = self::buildTzSystemUserKey();
+
+        $m->delete($mkey);
+    }
 
 }

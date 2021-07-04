@@ -22,6 +22,7 @@ use backend\models\User;
 use backend\models\UserCustomPlans;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
+use backend\service\clients\TzSystemUsersService;
 use backend\service\NineNine\NineNineBaseService;
 use backend\tools\Tools;
 use common\kj\qxc\QxcTcw;
@@ -587,8 +588,9 @@ class HN0898Service extends BaseTZService {
         if(!$rst){
             return ['status'=>300, 'msg'=>current($M->getErrors())];
         }
+        TzSystemUsersService::delTzsystemUserData();
 
-        return ['status'=>200, 'msg'=>'状态更新成功~'];
+        return ['status'=>200, 'msg'=>'状态更新成功~', 'data'=>[]];
     }
 
     /**

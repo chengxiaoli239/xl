@@ -177,4 +177,18 @@ class IndexController extends Controller
 
         return $rst;
     }
+
+    /**
+     * @desc 更新用户状态
+     * @param $id
+     * @param $status
+     * @return \yii\web\Response
+     */
+    public function actionSwitchStatus(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $rst = HN0898Service::updateStatus($post['id'], $model = '\backend\models\TzSystemsUsers', $post['field']);
+
+        return $rst;
+    }
 }
