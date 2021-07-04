@@ -231,15 +231,13 @@ use yii\widgets\ActiveForm;
                                 1=>'取',
                             ])->label('对数') ?>
                         </div>
-                        <!--
                         <div class="col-lg-3 col-xs-4">
-                            <?= $form->field($model, 'type_4d')->checkBoxList([
+                            <?= $form->field($model, 'type_22b')->checkBoxList([
                                 //0=>'非四单四双',
                                 0=>'除',
                                 1=>'取',
-                            ])->label('四单') ?>
+                            ])->label('双两兄') ?>
                         </div>
-                        -->
                     </div>
                     <!--
                     <div class="row">
