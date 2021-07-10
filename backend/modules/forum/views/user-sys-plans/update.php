@@ -23,6 +23,7 @@ if( $tz_type >= 17){
 
     <?= $this->render('_form_'.$tpl, [
         'model' => $model,
+        'lottery_type' => $lottery_type,
         'tz_sites_Arr' => $tz_sites_Arr,
         'kArr' => $kArr,
         'tz_type' => $model->tz_type,
@@ -33,8 +34,8 @@ if( $tz_type >= 17){
         'hefen_pos' => $hefen_pos,
         'remove_arise' => $remove_arise,
         'hzArr' => $hzArr,
-        'type_4ds_Arr' => $type_4ds_Arr,
-        'lottery_type' => $lottery_type,
+        'type_4ds_Arr' => $type_4ds_Arr, # 单双类型
+        'type_ds_details_Arr' => $type_ds_details_Arr, # 单双详细类型 1122,2121,2222 等
 
         # 1、排除前x期
         'is_filters' => $is_filters,

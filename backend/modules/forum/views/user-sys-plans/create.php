@@ -24,16 +24,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $this->render('_form_'.$tpl, [
         'model' => $model,
+        'lottery_type' => $lottery_type,
         'kArr' => $kArr,
         'tz_type' => $tz_type,
         'hzArr' => $hzArr,
         'hefen' => $hefen,
-        'lottery_type' => $lottery_type,
         'hefen_pos' => $hefen_pos,
         'code_types' => $code_types,
         'plan_types' => $plan_types,
         'tz_sites_Arr' => $tz_sites_Arr,
-        'type_4ds_Arr' => $type_4ds_Arr,
+        'type_4ds_Arr' => $type_4ds_Arr, # 单双类型
+        'type_ds_details_Arr' => $type_ds_details_Arr, # 单双详细类型 1122,2121,2222 等
 
         # 1、排除前x期
         'is_filters' => $is_filters,

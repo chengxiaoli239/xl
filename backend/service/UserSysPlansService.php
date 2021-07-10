@@ -143,18 +143,23 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['type_log'] = $UserSysPlans['type_log'][0];
         }
         unset($post['UserSysPlans']['type_log']);
-        # 15、单双类型
+        # 15.1、单双类型:两双两单，四单，四双
         if(isset($UserSysPlans['type_4ds']) && $UserSysPlans['type_4ds']){
             $tmpFilter['type_4ds'] = $UserSysPlans['type_4ds'];
         }
-        unset($post['UserSysPlans']['type_log']);
+        unset($post['UserSysPlans']['type_4ds']);
+        # 15.2、单双类型:1122,2121,1222 等
+        if(isset($UserSysPlans['type_ds_details']) && $UserSysPlans['type_ds_details']){
+            $tmpFilter['type_ds_details'] = $UserSysPlans['type_ds_details'];
+        }
+        unset($post['UserSysPlans']['type_4ds']);
 
-        # 15、单双类型
+        # 16、遗漏投
         if(isset($UserSysPlans['bet_while_miss']) && $UserSysPlans['bet_while_miss']){
             $tmpFilter['bet_while_miss'] = $UserSysPlans['bet_while_miss'];
         }
         unset($post['UserSysPlans']['bet_while_miss']);
-        # 15、单双类型
+        # 17、每期轮换
         if(isset($UserSysPlans['change_per'][0]) && $UserSysPlans['change_per'][0]){
             $tmpFilter['change_per'] = $UserSysPlans['change_per'][0]; # 是否每期轮换
             $turn_key = trim($UserSysPlans['turn_key']);
@@ -660,7 +665,8 @@ class UserSysPlansService extends BaseService {
                 if(in_array($tz_type, [28])){ # 系统快捷
                     $data['code_types'] = UserSysPlansService::getCodeTypes();
                 }
-                $data['type_4ds_Arr'] = UserSysPlansService::getCodeTypes($flag = 2);
+                $data['type_4ds_Arr'] = UserSysPlansService::getCodeTypes($flag = 2); # 单双类型：两单两双、四单、四双
+                $data['type_ds_details_Arr'] = UserSysPlansService::getCodeTypes($flag = 3); # 单双类型：1122,2121 等
             }
         }
 

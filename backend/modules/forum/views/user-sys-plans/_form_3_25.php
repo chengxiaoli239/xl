@@ -251,10 +251,12 @@ use yii\widgets\ActiveForm;
                     </div>
                     -->
 
-                    <!--号码类型-->
+                    <!--号码单双类型:两单两双，四单，四双-->
                     <?= $form->field($model, 'type_4ds')->checkboxList($type_4ds_Arr)->label('单双类型 &nbsp;&nbsp;<a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds">反买</a>') ?>
+                    <!--号码单双类型:1122,2121 等-->
+                    <?= $form->field($model, 'type_ds_details')->checkboxList($type_ds_details_Arr)->label('单双类型 &nbsp;&nbsp;<a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds">反买</a>') ?>
 
-                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
+                <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
 
                     <div class="row">
                         <div class="col-lg-3 col-xs-6">
