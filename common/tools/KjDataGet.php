@@ -9,6 +9,7 @@
 namespace common\tools;
 use backend\models\DataTime;
 use backend\models\KjConfig;
+use backend\models\Num4Type;
 use backend\models\QxcKjData;
 use backend\models\SscKjData;
 use backend\models\StaticCodeTypeArisePerdate;
@@ -505,7 +506,18 @@ class KjDataGet
      * @desc 自动更新 万千百十个数据
      */
     public static function updateNullCode( $times = 5000, $lottery_type = DEFAULT_LOTTERY_TYPE){
-
+        /*
+        $Num4Types = Num4Type::find()->where(['AND', ['IS', 'type_ds', NULL], '1=1'])->orderBy('id DESC')->limit($times)->all();
+        foreach ($Num4Types as $k=>$num4Type){
+            $code1_ds = $num4Type->code_1=='X' ? 'X' : ($num4Type->code_1===NULL ? '': ($num4Type->code_1%2==0? '2':'1'));
+            $code2_ds = $num4Type->code_2=='X' ? 'X' : ($num4Type->code_2===NULL ? '': ($num4Type->code_2%2==0? '2':'1'));
+            $code3_ds = $num4Type->code_3=='X' ? 'X' : ($num4Type->code_3===NULL ? '': ($num4Type->code_3%2==0? '2':'1'));
+            $code4_ds = $num4Type->code_4=='X' ? 'X' : ($num4Type->code_4===NULL ? '': ($num4Type->code_4%2==0? '2':'1'));
+            $code5_ds = $num4Type->code_5=='X' ? 'X' : ($num4Type->code_5===NULL ? '': ($num4Type->code_5%2==0? '2':'1'));
+            $num4Type->type_ds = $code1_ds.$code2_ds.$code3_ds.$code4_ds.$code5_ds;
+            $rst[$k] = $num4Type->save();
+        }
+        */
 
         $msg = ['status'=>200, 'msg'=>'操作成功！'];
         $kjDatas = SscKjData::find()->where(['OR', ['IS', 'type_22', NULL], ['IS', 'code_4n_str', NULL]])->orderBy('id DESC')->limit($times)->all();

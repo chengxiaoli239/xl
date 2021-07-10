@@ -228,6 +228,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = KjDataGet::updateNullCode();p($rst);
         $rst = NineNineNewService::getSnidBySn($uid=11, $tz_system_id = 12, $lottery_type=1);p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 17); p($rst);// 更新单双遗漏
         for($i=2021001; $i<=2021158; $i++){
@@ -564,7 +565,6 @@ class IndexController extends Controller
         $rst = CommonService::isCodeType_2($codes = '3,3,3,X');p($rst);
         $rst = NumService::delByValue(['1', 'X', '3', 'X'], 'X');p($rst);
         $rst = BetService::isCanBet($lottery_type = 5);p($rst);
-        $rst = KjDataGet::updateNullCode();p($rst);
         $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 6);p($rst); # 号码类型遗漏
         $rst = CommonService::isCodeType3n2b('0,0,5,6');p($rst);
         $rst = CommonService::isCodeType3n2b('1,2,3,4');p($rst); # 三现:双重+兄弟

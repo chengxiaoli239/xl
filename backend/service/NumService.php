@@ -957,7 +957,6 @@ class NumService extends BaseService {
                 }
             }
             $where = array_merge($where, [$tmp_no_fix_hefen]);
-
         }
 
         # 合分 - 四定，例如：合分：147，转化成和值：1、11、21、31、4、14、14、34、7、17、27
@@ -973,6 +972,11 @@ class NumService extends BaseService {
                 $codes_hefen = array_merge($codes_hefen, $hefenArr);
             }
             $where = array_merge($where, [ ['IN', 'codes_hz', $codes_hefen ] ]);
+        }
+
+        # 单双类型：1122，1212，2222 等，总共16种
+        if(!empty($codes_hz['type_ds_details'])){
+            $where = array_merge($where, [['IN', 'type_ds', $codes_hz['type_ds_details']]]);
         }
 
         # 三定、四定 "含" 除、取
@@ -1628,6 +1632,10 @@ class NumService extends BaseService {
         if(!empty($filter5['hz'])){
             //$desc .= '和值:'.yii\helpers\BaseStringHelper::truncate($filter2['hz'],10).' ';
             $desc .= '和值除:'.$filter5['hz'].' ';
+        }
+        # 14.2、单双类型 - 1122,2121,2222 等
+        if(isset($hz_Arr['type_ds_details']) && !empty($hz_Arr['type_ds_details'])){
+            $desc .= '类型:'.implode(',',$hz_Arr['type_ds_details']);
         }
         if(!empty($filter1)){
             $desc .= '取:';
