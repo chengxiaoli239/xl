@@ -254,7 +254,7 @@ use yii\widgets\ActiveForm;
                     <!--号码单双类型:两单两双，四单，四双-->
                     <?= $form->field($model, 'type_4ds')->checkboxList($type_4ds_Arr)->label('单双类型 &nbsp;&nbsp;<a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds">反买</a>') ?>
                     <!--号码单双类型:1122,2121 等-->
-                    <?= $form->field($model, 'type_ds_details')->checkboxList($type_ds_details_Arr)->label('单双类型 &nbsp;&nbsp;<a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds">反买</a>') ?>
+                    <?= $form->field($model, 'type_ds_details')->checkboxList($type_ds_details_Arr)->label('单双类型 &nbsp;&nbsp;<a href="javascript:;" class="btn btn-xs btn-info reverse_type_ds_detail">反买</a>') ?>
 
                 <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
 
@@ -314,9 +314,20 @@ use yii\widgets\ActiveForm;
 <script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
 <?php include(dirname(__FILE__).'/query-profits.php');?>
 <script>
-    $(function () {
+$(function () {
+    // 四定单双：两单两双，四单，四双等
     $('.reverse_type_4ds').click(function () {
         $("[name='UserSysPlans[type_4ds][]']").each(function () {
+            if($(this).prop('checked') == false){
+                $(this).prop("checked",true);
+            }else {
+                $(this).prop("checked",false);
+            }
+        });
+    });
+    // 单双类型:1122,2121,2222 等16种组合
+    $('.reverse_type_ds_detail').click(function () {
+        $("[name='UserSysPlans[type_ds_details][]']").each(function () {
             if($(this).prop('checked') == false){
                 $(this).prop("checked",true);
             }else {
