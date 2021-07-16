@@ -21,6 +21,9 @@ return [
     # 日志目录
     'LOG_PATH' => 'lottery_xl',
 
+    # 授权的token
+    'AUTH_ACCESS_TOKENS' => ['18426b50874c2705db54626052b40d0d'],
+
     # 基础数据缓存时间 2 分钟
     'BASE_DATA_CACHE_TIME' => 1200,
 

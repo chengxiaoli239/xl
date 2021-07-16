@@ -9,21 +9,24 @@
 namespace backend\modules\api\controllers;
 
 use backend\service\BaseService;
+use backend\service\clients\BettingRecordsService;
 use backend\service\clients\TzSystemUsersService;
+use backend\service\clients\UserSysPlansService;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 
-class TzSystemUsersController extends Controller
+class UserSysPlansController extends BaseUsersController
 {
     public $enableCsrfValidation = false;
 
     public function init(){
+        parent::init();
         $post = \Yii::$app->request->post();
         $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens();
         if(!in_array($post['access_token'], $AUTH_ACCESS_TOKENS)){
             header('content-type:application/json');
-            die(json_encode(['status'=>300, 'msg'=>'您无权限访问', 'data'=>$post, $AUTH_ACCESS_TOKENS], 320));
+            die(json_encode(['status'=>300, 'msg'=>'您无权限访问', 'data'=>$post], 320));
         }
     }
 
@@ -48,9 +51,9 @@ class TzSystemUsersController extends Controller
      */
     public function actionGetLists(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $post = \Yii::$app->request->post();
 
-        $rst = TzSystemUsersService::getLists($post);
+
+        $rst = UserSysPlansService::getLists($this->uid);
 
         return $rst;
     }

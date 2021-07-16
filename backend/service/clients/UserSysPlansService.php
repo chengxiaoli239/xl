@@ -7,10 +7,12 @@ use common\service\CommonService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 
-class TzSystemUsersService extends ClientsBaseService{
-    public static $module_key = 'backend\models\TzSystemsUsers';
+class UserSysPlansService extends ClientsBaseService{
 
-    public static function getLists($post=[]){
+    public static $module_key = 'backend\models\UserSysPlans';
+
+    public static function getLists($uid=''){
+        $post = \Yii::$app->request->post();
         if(empty($post)){
             return ['status'=>300, 'msg'=>'非法请求'];
         }
@@ -25,11 +27,11 @@ class TzSystemUsersService extends ClientsBaseService{
             $ADMIN_ACCESS_TOKEN = BetService::getConfig('ADMIN_ACCESS_TOKEN'); # 管理员token
             $where = ['AND',['<>', 'status', -2], '1=1'];
             if($ADMIN_ACCESS_TOKEN != $token){
-                $where = array_merge($where, [['=', 'access_token', $token]]);
+                $where = array_merge($where, [['=', 'uid', $uid]]);
             }
 
             $datas = (self::$module_key)::find()->where($where)->asArray()->all();
-            $m->set($mkey, $datas, 180);
+            $m->set($mkey, $datas, 30);
         }
 
         return ['status'=>200, 'datas'=>$datas, 'msg'=>'操作成功'];
@@ -40,7 +42,7 @@ class TzSystemUsersService extends ClientsBaseService{
      * @return string
      */
     public static function buildUserKey(){
-        $mkey = 'getTzSystemUserLists_key';
+        $mkey = 'get'.self::$module_key.'Lists_key';
 
         return $mkey;
     }
@@ -48,7 +50,7 @@ class TzSystemUsersService extends ClientsBaseService{
     /**
      * @desc 删除用户缓存信息
      */
-    public static function delTzsystemUserData(){
+    public static function delUserData(){
         $m = \Yii::$app->cache;
         $mkey = self::buildUserKey();
 
