@@ -99,6 +99,19 @@ class BaseService{
     }
 
     /**
+     * @desc 客户端手动同步余额
+     * @param string $access_token
+     * @return array|bool
+     */
+    public static function synBalanceByAccessToken($access_token='', $is_auto=2){
+        $tz_systerm_user_id = BaseService::getTzSystemUserIdByAccessTokn($access_token);
+
+        $rst = BaseService::synBalance($tz_systerm_user_id, $is_auto);
+
+        return $rst;
+    }
+
+    /**
      * @desc 同步余额中转
      * @param $id
      * @return array|bool
@@ -249,5 +262,18 @@ class BaseService{
         # ================= xCsrf token start =====================
 
         return $result;
+    }
+
+    /**
+     * @param string $access_token
+     * @return int|string
+     */
+    public static function getTzSystemUserIdByAccessTokn($access_token=''){
+        $tz_system_user_id = 0;
+        if(empty($access_token)) return $tz_system_user_id;
+
+        $tz_system_user_id = TzSystemsUsers::findOne(['access_token'=>$access_token])->id;
+
+        return $tz_system_user_id;
     }
 }

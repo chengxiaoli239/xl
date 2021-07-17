@@ -66,7 +66,7 @@ class TzSystemUsersController extends Controller
             return ['status'=>301, 'msg'=>'缺少access_token参数'];
         }
 
-        $rst = BaseService::synBalance($post['tz_system_users_id'], $is_auto=2);
+        $rst = BaseService::synBalanceByAccessToken($post['access_token'], $is_auto=2);
 
         return $rst;
     }
