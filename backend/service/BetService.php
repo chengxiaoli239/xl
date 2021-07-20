@@ -361,10 +361,17 @@ abstract class BetService extends BaseBetService {
                 continue;
             }
             if($uid){
-                $activeQihao = BetService::getActiveQihao($uid, $BetErrorPlansTasks[0]->tz_system_id, $lottery_type);
-                if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
-                    Tool_Common::log('wang_pan_is_active', 'ERR', '网盘开盘状态-2', ['uid'=>$uid, 'tz_system_id'=>$lottery_type, 'activeQihao'=>$activeQihao]);
-                    return ['status'=>300, 'msg'=>'未开盘或者已关盘['.date('Y-m-d H:i:s').']', 'activeQihao'=>$activeQihao];
+                $activeQihao_key = 'activeQihao_key_'.$uid.'_'.$lottery_type;
+                $activeQihao = $m->get($activeQihao_key);
+                if(empty($activeQihao) OR ($activeQihao['status']=='30200')){
+                    $activeQihao = BetService::getActiveQihao($uid, $BetErrorPlansTasks[0]->tz_system_id, $lottery_type);
+                    if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
+                        Tool_Common::log('wang_pan_is_active', 'ERR', '网盘开盘状态-2', ['uid'=>$uid, 'tz_system_id'=>$lottery_type, 'activeQihao'=>$activeQihao]);
+                        return ['status'=>300, 'msg'=>'未开盘或者已关盘['.date('Y-m-d H:i:s').']', 'activeQihao'=>$activeQihao];
+                    }
+                    if(is_string($activeQihao) && strpos($activeQihao, '020')){
+                        $m->set($activeQihao_key, $activeQihao, 300);
+                    }
                 }
                 Tool_Common::log('wang_pan_is_active', 'INFO', '网盘开盘状态-3', ['uid'=>$uid, 'tz_system_id'=>$lottery_type, 'activeQihao'=>$activeQihao]);
             }
