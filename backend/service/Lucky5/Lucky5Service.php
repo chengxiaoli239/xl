@@ -1387,10 +1387,14 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $TzSystemsUsers->user_agent,
         ];
 
+        $mkey = 'repeatErrorBet_retry_'.$id;
+        $open_retry = $m->get($mkey);
+
         $time1 = microtime(true);
         $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 调试阶段先注释12.26
         $time2 = microtime(true);
         $status = 0;
+        $TIME_OUT_RETRY = BetService::getConfig('TIME_OUT_RETRY'); # 超时重复下开关，幸运五
         if($tmpRst['Status'] == 1){
             $status = 2;
             $tmpRst['status'] = $status; # 下注成功
@@ -1408,7 +1412,13 @@ class Lucky5Service { # 重庆7时彩登陆体系
             }
 
         }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [309])){
-            $status = 2; # 超时不重复下
+            $m->set($mkey, 1, 300);
+            if($TIME_OUT_RETRY && !$open_retry){
+                $status = 1; # 失败重推
+            }else{
+                $status = 2; # 超时不重复下
+            }
+
         }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 305, 307])){
             $status = 3; # 不可再次下注：302余额不足305已关盘307网盘账号停押
         }else{
