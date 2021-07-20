@@ -423,7 +423,7 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/repeatErrorBet/bet_error', 'ERR', '网盘开盘状态-2', ['uid' => $uid, 'account' => $account, 'tz_system_id' => $tz_system_id, 'rst'=>$rst]);
                 }
                 $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetInfo'] = $betErrorPlansTask;
-                sleep(2);
+                sleep(10);
             }
             if($betSuccess){
                 foreach ($planSnidArrs as $pid=>$planSn){
