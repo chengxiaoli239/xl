@@ -58,7 +58,7 @@ class PoxyIPService extends BaseService {
      * @desc 获取快代理的代理IP
      * @return array|mixed
      */
-    public static function getPoxyIp($uid, $is_auto = 1){
+    public static function getPoxyIp($uid='', $is_auto = 1){
         return PoxyIPService::getProxyIpNew($uid, $is_auto);
     }
 

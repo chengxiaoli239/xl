@@ -1188,7 +1188,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $errno = curl_errno($ch);
         if($errno>0) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
-            Tool_Common::log('getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]);
+            if($errno==7){
+                $poxy_addr = PoxyIPService::getPoxyIp($uid);
+            }
+            Tool_Common::log('/erro/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]);
             return $str;
         }
         if(!BaseService::is_json($data)){
