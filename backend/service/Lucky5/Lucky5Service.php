@@ -2257,7 +2257,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if(!$timeout) $timeout = 30;
 
         //$cookie = dirname(__FILE__)."/cookie.txt";
-        $headers[] = ['Accept: application/json, text/javascript, */*; q=0.01'];
+        $headers[] = ['Accept: application/json, text/javascript, */*; q=0.01'];
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -2296,9 +2296,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }
 
         if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
-        if(curl_close($ch)) {
-            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
-        }
+        curl_close($ch);
         if($data == 'ok'){
             return 'ok';
         }

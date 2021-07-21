@@ -30,7 +30,7 @@ return [
     'IMPORT_CODES_KUAIYI_UIDS' =>[], # aa22
 
     # 导入有重复的用户
-    'IMPORT_CODES_REPEAT_UIDS' =>[14], # aa22
+    'IMPORT_CODES_REPEAT_UIDS' =>[], # aa22
 
     # 现：二、三、四现
     'IS_XIAN' => [36, 17, 37],
