@@ -10,6 +10,7 @@ namespace backend\modules\api\controllers;
 
 use backend\service\BaseService;
 use backend\service\clients\TzSystemUsersService;
+use common\tools\Tool_Common;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -67,6 +68,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = BaseService::synBalanceByAccessToken($post['access_token'], $is_auto=2);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '同步积分接口', ['post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }

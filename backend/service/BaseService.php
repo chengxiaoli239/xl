@@ -152,7 +152,7 @@ class BaseService{
             if(in_array($tz_system_id, [3, 7])){
                 $rst = SevenService::synBalance($TzSystemsUser->id);
             }else{
-                $rst = Lucky5Service::synBalance($TzSystemsUser->id);// p($rst);# 同步余额
+                $rst = Lucky5Service::synBalance($TzSystemsUser->id, $is_auto);// p($rst);# 同步余额
             }
         }elseif(in_array($tz_system_id, [4])){
             # 4、7天彩票网
