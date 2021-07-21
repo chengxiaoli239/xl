@@ -59,7 +59,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         self::__init($uid, $tz_system_id);
     }
 
-    private static function __init($uid = 1, $tz_system_id = 2){
+    public static function __init($uid = 1, $tz_system_id = 2){
         $User = User::findOne($uid);
         self::$user_id = $uid;
         self::$account = $User->account;

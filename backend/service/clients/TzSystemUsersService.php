@@ -3,6 +3,7 @@ namespace backend\service\clients;
 
 use backend\models\TzSystemsUsers;
 use backend\service\BetService;
+use backend\service\Lucky5\Lucky5Service;
 use common\service\CommonService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -74,4 +75,35 @@ class TzSystemUsersService extends ClientsBaseService{
         return $access_tokens;
     }
 
+    /**
+     * @desc 获取用户的cookies
+     * @param string $access_token
+     * @return mixed|string
+     */
+    public static function getCookiesByAccessToken($access_token=''){
+
+        $m = \Yii::$app->cache;
+        $mkey = self::buildUserCookesKey($access_token);
+        $cookies = $m->get($mkey);
+        if(true OR empty($cookies)){
+            $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
+            $cookies = $TzSystemsUsers->cookie;
+            $m->set($mkey, $cookies, 300);
+        }
+        Lucky5Service::__init($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
+        $tzSiteInfo = Lucky5Service::getTzSiteInfo($TzSystemsUsers->tz_system_id);
+        $data = [
+            'cookies'=>$cookies,
+            'user_agent'=>trim(str_replace('User-Agent:', '',str_replace('user_agent:','', $TzSystemsUsers->user_agent))),
+            "Referer"=>$TzSystemsUsers->ssc_domain."/App/Index?_=",
+            "Host"=>str_replace('www.','',$tzSiteInfo['domain']),
+        ];
+
+        return ['status'=>200, 'data'=>$data];
+    }
+
+    public static function buildUserCookesKey($access_token=''){
+        $mkey = 'buildUserCookesKey_'.$access_token;
+        return $mkey;
+    }
 }
