@@ -132,6 +132,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $options['data-id'] = $model->id;
                                     $options['data-qihao'] = $model->qihao;
                                     $options['id'] = 'act_'.$model->id;
+                                }elseif($model->status == 4){
+                                    $txt = '<font color="red">推送超时</a>';
                                 }else{
                                     $txt = '<font color="red">未推送</a>';
                                 }
