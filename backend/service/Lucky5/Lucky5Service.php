@@ -2295,9 +2295,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
             Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
         }
 
-        if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
+        //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
         curl_close($ch);
         if($data == 'ok'){
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1-1', $logArr);
             return 'ok';
         }
         $rstData = json_decode($data, true); # data : {"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}
