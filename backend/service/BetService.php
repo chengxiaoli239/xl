@@ -404,7 +404,7 @@ abstract class BetService extends BaseBetService {
                     if($lock = $m->get($betKey)) continue;
 
                     $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
-                    $m->set($betKey, 1, $time-120); # 减去两分钟缓存时间
+                    $m->set($betKey, 1, $time); # 减去两分钟缓存时间
 
                     $flag = self::isLogin($uid, $tz_system_id, $r=2);
                     if(!$flag){
