@@ -228,6 +228,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
         $rst = KjDataGet::updateNullCode();p($rst);
         $rst = NineNineNewService::getSnidBySn($uid=11, $tz_system_id = 12, $lottery_type=1);p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 17); p($rst);// 更新单双遗漏
@@ -315,7 +316,6 @@ class IndexController extends Controller
         $str = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx16d295b4421899d4&redirect_uri=http%3A%2F%2Fgoapi.hngoshare.com%2Fpay%2Findex%2Fmiddle-redirect%3Fparams%3D%252Fweixin%252Fwechat.html%253Forder_sn%253D2021011610424878811%2526&response_type=code&scope=snsapi_base&state=STATE&connect_redirect=1#wechat_redirect";
         p(urldecode($str));
         $data = QxcTcw::QixingCaiBatch($type = 'json', $post['is_auto']=0);p($data);
-        $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
         $rst = BaoTaService::updateUserBetStatus($id=86, $is_auto=2);p($rst);
 
         $rst = BaoTaService::updateCrontabStatus($id=46);p($rst);

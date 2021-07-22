@@ -27,6 +27,7 @@ class BaoTaService extends BaseService { #
      */
     public static function btLogin($id=1){
         $BT_PANEL_6 = BaoTaService::getBtPanel($id);
+        //p($BT_PANEL_6);
         $rstLogin = BaoTaService::remoteLogin($id, $BT_PANEL_6);
         if($rstLogin['status']==200){ # 登陆成功跳转首页
             $visitIndex = BaoTaService::visitHomePage($id);
@@ -46,7 +47,7 @@ class BaoTaService extends BaseService { #
      */
     public static function getBtPanel($id){
         $b = BtSystemConfigs::findOne($id);
-        $url = $b->domain;
+        $url = $b->domain.'/login';
         if($b->suffix){
             $url = $url.'/'.$b->suffix.'/';
         }
@@ -61,6 +62,7 @@ class BaoTaService extends BaseService { #
             $b->user_agent,
         ];
         $data = CurlService::curl_get_cookie($url, $headers);
+        //p(['url'=>$url, 'headers'=>$headers, 'data'=>$data]);
 
         return $data;
     }
@@ -78,7 +80,7 @@ class BaoTaService extends BaseService { #
 
         $url = $BtSystemConfigs->domain.'/login';
         $post_data = [
-            'username' => $BtSystemConfigs->account,
+            'username' => md5($BtSystemConfigs->account),
             'password' => md5(md5($BtSystemConfigs->password).'_bt.cn'),
         ];
         $post_data = http_build_query($post_data);
@@ -92,7 +94,7 @@ class BaoTaService extends BaseService { #
             "Cookie: ".$session_id,
             "Host: ".str_replace('http://', '', $BtSystemConfigs->domain),
             "Origin: ".$BtSystemConfigs->domain,
-            "Referer: ".$BtSystemConfigs->domain."/".$BtSystemConfigs->suffix."/",
+            "Referer: ".$BtSystemConfigs->domain."/".($BtSystemConfigs->suffix ? $BtSystemConfigs->suffix."/":'login'),
             $BtSystemConfigs->user_agent,
             "X-Requested-With: XMLHttpRequest",
         ];
@@ -166,6 +168,7 @@ class BaoTaService extends BaseService { #
         $data = json_decode($data, true);
 
         $logArr = ['url'=>$url, 'headers'=>$headers, 'data'=>$data];
+        //p($logArr);
         return $data;
     }
 
