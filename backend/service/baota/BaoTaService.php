@@ -424,6 +424,7 @@ class BaoTaService extends BaseService { #
         $crontabs = BaoTaService::getCronTabs($id);
         if(empty($crontabs)) return [];
         $crontabs = array_reverse($crontabs);
+        Tool_Common::log('/cron/'.__FUNCTION__, 'INFO', '同步宝塔计划任务', ['crontabs'=>$crontabs]);
 
         foreach ($crontabs as $crontab){
             if(empty($crontab)) continue;
