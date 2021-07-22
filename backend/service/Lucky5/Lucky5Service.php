@@ -1188,11 +1188,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $errno = curl_errno($ch);
         if($errno>0) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
-            if($errno==7){
-
+            if(in_array($errno, [7, 28])){
                 $poxy_addr = PoxyIPService::getPoxyIp($uid);
             }
-            Tool_Common::log('/erro/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]);
+            Tool_Common::log('/error/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]);
             return $str;
         }
         if(!BaseService::is_json($data)){
@@ -1395,10 +1394,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $open_retry = $m->get($mkey); # 重试锁开启开关
 
         $time1 = microtime(true);
-        $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 调试阶段先注释12.26
+        $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 下注请求
         $time2 = microtime(true);
         $status = 0;
         $TIME_OUT_RETRY = BetService::getConfig('TIME_OUT_RETRY'); # 超时重复下开关，幸运五
+        $m = \Yii::$app->cache;
+        $mkey_time_out = self::buildBetTimeOutPlanKey($row->uid, $row->plan_id, $row->bet_sort_key);
         if($tmpRst['Status'] == 1){
             $status = 2;
             $tmpRst['status'] = $status; # 下注成功
@@ -1411,7 +1412,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             if(!empty($repeats)){
                 $post_data_1 = $post_data;
                 $post_data_1['bet_number'] = implode(',', $repeats);
-                $rst1 = self::postR($uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent);
+                $rst1 = self::postR($uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent); # 重复号码下注请求
                 Tool_Common::log('/bet/repeatErrorBet', 'INFO', '幸运五下注1', [$uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent, $rst1]);
             }
 
@@ -1429,18 +1430,23 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key);
             $m->delete($betKey); # 失败之后可重新下注的情况解锁
         }
-        if(in_array($tmpRst['code'], [311])){ # 309, 311
-            $m = \Yii::$app->cache;
-            $mkey_time_out = 'mkey_time_out_retry_key_'.$row->uid.'_'.$row->plan_id.'_'.$row->bet_sort_key;
-            $val = $m->get($mkey_time_out);
-            if($val==1){
-                $status = 2;
-                $tmpRst = ['Status'=>1, 'msg'=>'网络故障或者超时默认下注成功', 'data'=>['qihao'=>$row->qihao, 'uid'=>$uid, 'plan_id'=>$row->plan_id]];
-                Tool_Common::log('repeatErrorBet_time_out', 'INFO', '幸运五下注', $tmpRst);
-            }else{
-                $m->set($mkey_time_out, 1, 60);
-                return ['status'=>301, 'msg'=>'下注请求超时'];
+        if($tmpRst['errno']>0 OR in_array($tmpRst['code'], [309,311])){ # 309,310,311   310有排查是已经换过代理IP,有待排查，为确保
+            $mkey_310 = 'has_jinyong_ip_310'; # 您当前使用的浏览器不支持cookie，换一次代理ip
+            $RedisLock = new RedisLock();
+            if($RedisLock->lock($mkey_310, 35)){
+                $mkey_proxy = PoxyIPService::builProxyIpKey($uid); # 更换代理ip
+
+                $m = \Yii::$app->cache;
+                $mkey = $mkey_proxy.'_mcache';
+                if(!$rm = $m->get($mkey)){
+                    $m->delete($mkey_proxy);
+                    $m->set($mkey, 1, 30);
+                }
+                $new_ip = PoxyIPService::getProxyIpNew($uid);
             }
+            $tzRst['new_ip'] = $new_ip;
+            $status = 4; # 下注请求超时计划，后续可根据这个状态做是否重复下注处理
+            $m->set($mkey_time_out, 1, 60);
         }
 
         $time_consume = ($time2 - $time1).'s';
@@ -1459,6 +1465,18 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $rst['data']['bet_rst'] = $tmpRst;
 
         return $rst;
+    }
+
+    /**
+     * @desc 重复超时计划的key
+     * @param string $uid
+     * @param string $plan_id
+     * @param string $bet_sort_key
+     * @return string
+     */
+    public static function buildBetTimeOutPlanKey($uid='', $plan_id='', $bet_sort_key=''){
+        $mkey_time_out = 'mkey_time_out_retry_key_'.$uid.'_'.$plan_id.'_'.$bet_sort_key;
+        return $mkey_time_out;
     }
 
     /**
@@ -1488,7 +1506,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $user_agent,
         ];
 
-        $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 调试阶段先注释12.26
+        $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 重复号码下注请求
 
         return $tmpRst;
     }
