@@ -133,6 +133,7 @@ class UserService extends BaseService {
                     'uid' => $uid,
                     'username' => $user->username,
                     'ssc_domain' => $TzSystemsUsers->ssc_domain ? $TzSystemsUsers->ssc_domain : $TzSystems->ssc_domain,
+                    'access_token' => $TzSystemsUsers->access_token ? $TzSystemsUsers->access_token : md5('tz_systemUsers_'.$user->username),
                     'tz_system_id' => $tz_system_id,
                     'sys_name' => $TzSystems->name,
                 ]);
