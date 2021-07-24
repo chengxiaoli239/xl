@@ -124,4 +124,5 @@ return [
     'query-yl' => '查遗漏',
     'query-profits-months' => '查月利润',
     'query-profits-years' => '查年利润',
+    'System Configs' => '系统配置',
 ];

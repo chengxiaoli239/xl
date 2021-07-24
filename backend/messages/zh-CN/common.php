@@ -11,4 +11,5 @@ return [
     'email' => '邮箱',
     'verifyCode' => '验证码',
     'password' => '密码',
+    'Create Permissions' => '新增权限',
 ];

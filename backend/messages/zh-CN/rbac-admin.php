@@ -1,3 +1,12 @@
 <?php
 return [
+    'Permissions' => '权限管理',
+    'Create Permission' => '新增权限',
+    'Roles' => '角色管理',
+    'Rules' => '规则管理',
+    'Routes' => '路由管理',
+    'Assignments' => '用户管理',
+    'Create User' => '新建用户',
+    'Menus' => '菜单管理',
+    'Create Menu' => '新建菜单',
 ];

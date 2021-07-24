@@ -1,6 +1,6 @@
 <!--提示框-start-->
 <div class="modal fade " id="switch_Modal_msg" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
-    <div class="modal-dialog modal-lg" role="document" style="width: 800px;margin: 100px auto;">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
