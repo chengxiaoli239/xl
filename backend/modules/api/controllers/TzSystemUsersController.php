@@ -20,11 +20,12 @@ class TzSystemUsersController extends Controller
     public $enableCsrfValidation = false;
 
     public function init(){
+        $isAdminRoute = in_array(Yii::$app->controller->route, ['admin/route/index', 'admin/route/index.html']);
         $post = \Yii::$app->request->post();
         $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens();
-        if(!in_array($post['access_token'], $AUTH_ACCESS_TOKENS)){
+        if(!in_array($post['access_token'], $AUTH_ACCESS_TOKENS) && !$isAdminRoute){
             header('content-type:application/json');
-            die(json_encode(['status'=>300, 'msg'=>'您无权限访问', 'data'=>$post, $AUTH_ACCESS_TOKENS], 320));
+            die(json_encode(['status'=>302, 'msg'=>'您无权限访问', 'data'=>$post, $AUTH_ACCESS_TOKENS], 320));
         }
     }
 

@@ -37,7 +37,27 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'id',
                         'name',
                         'key',
-                        'value',
+                        //'value',
+                        ['attribute'=>'value','label'=>'值','headerOptions'=>['width'=>'4%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                if(in_array($model->value, [0,1])){
+                                    $txt = $model->value==1 ? '已开启' : '已关闭';
+                                    $color = $model->value==1 ? 'green' : 'red';
+                                    $opions = [
+                                        'class' => 'act-switch-status',
+                                        'data-act-model' => 'SystemConfig',
+                                        'data-act-field' => 'value',
+                                        'data-act-id' => $model->id,
+                                        'title' => $txt.'，点击'.($model->value==1 ? '关闭' : '开启'),
+                                    ];
+                                    $txt = Html::a('<strong><font color="'.$color.'">'.$txt.'</font></strong>', 'javascript:;', $opions);
+                                }else{
+                                    $txt = $model->value;
+                                }
+                                return $txt;
+                            }
+                        ],
                         'desc:ntext',
                         //'extend',
                         //'created_at',
@@ -51,3 +71,4 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<?php include(dirname(__FILE__).'/../switch_status_tpl.php'); ?>

@@ -30,7 +30,7 @@ use common\models\AdminModel;
 use common\service\CaptchaCodeService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
-use  yii;
+use yii;
 
 class HN0898Service extends BaseTZService {
     public static $username = '';
@@ -581,14 +581,18 @@ class HN0898Service extends BaseTZService {
      * @return array
      */
     public static function updateStatus($id, $model = 'UserSysPlans', $field = 'status'){
-        $M = $model::findOne($id);
-        $M->$field = $M->$field==1 ? 0 : 1;
+        try {
+            $M = $model::findOne($id);
+            $M->$field = $M->$field==1 ? 0 : 1;
 
-        $rst = $M->save(false);
-        if(!$rst){
-            return ['status'=>300, 'msg'=>current($M->getErrors())];
+            $rst = $M->save(false);
+            if(!$rst){
+                return ['status'=>300, 'msg'=>current($M->getErrors())];
+            }
+            TzSystemUsersService::delTzsystemUserData();
+        }catch (\Exception $exception){
+            return ['status'=>300, 'msg'=>$exception->getMessage()];
         }
-        TzSystemUsersService::delTzsystemUserData();
 
         return ['status'=>200, 'msg'=>'状态更新成功~', 'data'=>[]];
     }
