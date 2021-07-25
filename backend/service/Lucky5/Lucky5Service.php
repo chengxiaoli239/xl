@@ -1405,6 +1405,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $tmpRst['status'] = $status; # 下注成功
             //# 获取方案号，记录id, 用于撤单
             $snInfo = self::getSn($row->uid, $row->tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+            if(isset($snInfo['snid'])) $snInfo['snid'] = substr($snInfo['snid'],0,20).'...';
             $snid = '{'.$snInfo['sn'].'}|'.count(json_decode($row->codes)); # 多次下单需要分开，多次撤单
             $sn = $snInfo['sn'];
             $tmpRst['snid'] = $snid;
@@ -1455,7 +1456,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $row->status = $status;
         $row->post_desc = json_encode($tmpRst, 320);
 
-        $logArr = ['id'=>$id, 'uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
+        $logArr = ['id'=>$id, 'uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers, 'snInfo'=>$snInfo, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
         Tool_Common::log('repeatErrorBet', 'INFO', '幸运五下注', $logArr);
 
         $flag = $row->save();
