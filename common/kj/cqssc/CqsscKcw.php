@@ -26,6 +26,8 @@ class CqsscKcw extends BaseKj {
         12 => 3, # 11:5分 冰岛5m
         13 => 4, # 11:5分 冰岛10m
         15 => 3, # 11:5分 冰岛10m
+        19 => 3, # 11:5分 纳斯达克
+        20 => 3, # 11:5分 道琼斯
     ];
 
     # 彩种对应名称
@@ -47,6 +49,8 @@ class CqsscKcw extends BaseKj {
         16 => '加拿大', # 加拿大3.5分
         17 => '排列五', # 加拿大3.5分
         18 => '台湾快五', # 台湾快五5分
+        19 => '纳斯达克', # 纳斯达克5分
+        20 => '道琼斯', # 道琼斯5分
     ];
 
     public static function getLotteryNo($returnType = 'json'){

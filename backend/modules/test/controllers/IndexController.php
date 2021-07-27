@@ -46,6 +46,8 @@ use backend\tools\Tools;
 use common\kj\BaseKj;
 use common\kj\cqssc\CqsscKcw;
 use common\kj\cqssc\CqsscSevenDay;
+use common\kj\indexes\DaoQiongSi;
+use common\kj\indexes\NaSiDaKe;
 use common\kj\lecai\LeCaiService;
 use common\kj\qxc\QxcTcw;
 use common\kj\ssc\BingDao;
@@ -228,6 +230,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = DaoQiongSi::getLotteryNo();p($data);
+        $data = NaSiDaKe::getLotteryNo($type);p($data);
         $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
         $rst = KjDataGet::updateNullCode();p($rst);
         $rst = NineNineNewService::getSnidBySn($uid=11, $tz_system_id = 12, $lottery_type=1);p($rst);
