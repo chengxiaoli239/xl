@@ -6,6 +6,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model backend\models\UserSysPlans */
 /* @var $form yii\widgets\ActiveForm */
+$SscKjData = \backend\models\SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one();
 ?>
 <style>
 
@@ -18,7 +19,7 @@ use yii\widgets\ActiveForm;
     <div class="col-lg-12">
         <section class="panel">
             <header class="panel-heading">
-                <?= Html::encode($this->title).'[<strong><font color="green">新快选</font></strong>]' ?>
+                <?= '新快选[<strong><font color="green">['.$SscKjData['code_str'].']</font></strong>]' ?>
             </header>
             <div class="panel-body">
                 <?php $form = ActiveForm::begin([
