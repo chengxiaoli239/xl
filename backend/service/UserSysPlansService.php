@@ -627,7 +627,7 @@ class UserSysPlansService extends BaseService {
      * @param $tz_type
      * @return array
      */
-    public static function getSysPlansTypeDatas($playway = 3, $tz_type=''){
+    public static function getSysPlansTypeDatas($playway = 3, $tz_type='', $uid=''){
         $data = [];
         if($playway ==1){
             $hzArr = [];
@@ -656,7 +656,7 @@ class UserSysPlansService extends BaseService {
                     $tmpData[$zhi] = $zhi;
                 }
                 $data['hzArr'] = $tmpData;
-            }elseif (in_array($tz_type, [20, 25, 28])){ # 20四定和值 25快选 28系统快捷
+            }elseif (in_array($tz_type, [20, 25, 28, 38])){ # 20四定和值 25快选 28系统快捷 38新快打
                 $hzArr = [];
                 for ($i=0; $i<=36; $i++){
                     $hzArr[$i] = $i;
@@ -669,6 +669,7 @@ class UserSysPlansService extends BaseService {
                 $data['type_ds_details_Arr'] = UserSysPlansService::getCodeTypes($flag = 3); # 单双类型：1122,2121 等
             }
         }
+
 
         return $data;
     }
@@ -942,6 +943,40 @@ class UserSysPlansService extends BaseService {
         }
 
         return $rst;
+    }
+
+    /**
+     * @desc 个人规则配置
+     * @param int $uid
+     * @return array
+     */
+    public static function getUserSetConfigs($uid=11){
+        $configs = [
+            18 => [
+
+            ]
+        ];
+        if(empty($configs[$uid])) return $configs;
+
+        return $configs[$uid];
+    }
+
+    /**
+     * @param $tz_type
+     * @param $model
+     * @param $lottery_type 彩种
+     * @param string $uid
+     * @return bool
+     */
+    public static function newKuaiDa($tz_type, &$model, $lottery_type, $uid=''){
+        $flag = true;
+        $config = self::getUserSetConfigs($uid);
+        if($tz_type==38){
+            #
+            //$model->p1 = '1234';
+        }
+
+        return $flag;
     }
 
 }

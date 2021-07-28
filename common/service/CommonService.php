@@ -1036,7 +1036,7 @@ class  CommonService{
      * @param $queryParams
      * @return int
      */
-    public static function getIndexLotteryType($uid, $queryParams){
+    public static function getIndexLotteryType($uid, $queryParams=[]){
         $m = \Yii::$app->cache;
         $mkey = 'getIndexLotteryType_'.$uid;
 

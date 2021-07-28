@@ -147,6 +147,10 @@ class UserSysPlansController extends BaseController
         $defaultSiteId = UserService::getUserDefaultSite($this->_user_id);
         $model->tz_sites = [$defaultSiteId];
 
+        ########### 新过滤快打 start #############
+        UserSysPlansService::newKuaiDa($tz_type, $model, $queryParams['lottery_type'], $this->_user_id);
+        ########### 新过滤快打 end #############
+
         $is_filters = [1=>'是'];
         $filter_pos1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
         $filter_pos2 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
@@ -174,6 +178,7 @@ class UserSysPlansController extends BaseController
             ############################ 排除参数结束 #############################
         ];
         $data = array_merge($data, UserSysPlansService::getSysPlansTypeDatas($playway, $tz_type));
+        //p($data);
 
         return $this->render('create',$data);
     }
