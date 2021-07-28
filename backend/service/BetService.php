@@ -173,7 +173,8 @@ abstract class BetService extends BaseBetService {
                         $tzRst[$id] = self::tzByPlanId($id);
                     }
                 }
-                $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
+                $lotteryNameArr = CqsscKcw::getLotteryNameArr();
+                $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => $lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
                 //p($datas);
                 BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 彩种投注结束锁
                 $logArr[$lottery_type]['plans'] = $plans;
@@ -298,7 +299,8 @@ abstract class BetService extends BaseBetService {
                 }
                 //BetService::synBalance($plan->uid, $plan->tz_sites);# 目前tz_sites 已变更为单个站点id
                 BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 彩种投注结束锁
-                $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => CqsscKcw::$lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
+                $lotteryNameArr = CqsscKcw::getLotteryNameArr();
+                $datas[] = ['qihao'=>$qihao, 'tzStatus'=>$tzStatus, 'lottery' => $lotteryNameArr[$lottery_type], 'tzRst'=>$tzRst];
                 $logArr[$lottery_type]['plansIds'] = $planIds;
                 $count = count($plans);
                 $logArr[$lottery_type]['qihao'] = $qihao;

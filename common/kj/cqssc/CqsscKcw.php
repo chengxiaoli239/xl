@@ -2,6 +2,7 @@
 # 开彩网
 namespace common\kj\cqssc;
 use backend\models\KjConfig;
+use backend\models\LotteryType;
 use backend\models\SystemConfig;
 use backend\models\TzSystemsUsers;
 use backend\service\BingDao\BingDaoService;
@@ -14,44 +15,23 @@ use  yii;
 class CqsscKcw extends BaseKj {
     public static $lottery_type = 5;
 
-    # 彩种时间类型
-    public static $lotteryTypeArr = [
-        5 => 1, # 5:1.5分
-        6 => 2, # 6:3分
-        7 => 3, # 7:5分
-        8 => 4, # 8:10分
-        9 => 3, # 9:5分  台湾宾果
-        10 => 1, # 10:1.5分 冰岛90
-        11 => 2, # 11:3分 冰岛3m
-        12 => 3, # 11:5分 冰岛5m
-        13 => 4, # 11:5分 冰岛10m
-        15 => 3, # 11:5分 冰岛10m
-        19 => 3, # 11:5分 纳斯达克
-        20 => 3, # 11:5分 道琼斯
-    ];
+    /**
+     * @return array
+     */
+    public static function getLotteryNameArr(){
+        $m = \Yii::$app->cache;
+        $mkey = 'sys_getLotteryNameArr';
+        $data = $m->get($mkey);
+        if(true OR empty($data)){
+            $lottery_types = LotteryType::find()->select(['lottery_type','shortName'])->all();
+            foreach ($lottery_types as $lottery_type){
+                $data[$lottery_type['lottery_type']] = $lottery_type['shortName'];
+            }
+            $m->set($mkey, $data, 60);
+        }
 
-    # 彩种对应名称
-    public static $lotteryNameArr = [
-        1 => '七星彩', # 七星彩
-        2 => '希腊3分', # 6:3分
-        3 => '希腊5分', # 7:5分
-        4 => '希腊10分', # 8:10分
-        5 => '重庆', # 20分
-        6 => '新疆', # 20分
-        7 => '北京快乐8', # 5分
-        8 => '幸运五星', # 幸运五星系统彩 5分
-        9 => '台湾宾果', # 台湾宾果 5分
-        10 => '冰岛90s', # 冰岛90s 1.5分
-        11 => '冰岛3m', # 冰岛3分
-        12 => '冰岛5m', # 冰岛5分
-        13 => '冰岛10m', # 冰岛5分
-        15 => '欢乐生肖', # 冰岛5分
-        16 => '加拿大', # 加拿大3.5分
-        17 => '排列五', # 加拿大3.5分
-        18 => '台湾快五', # 台湾快五5分
-        19 => '纳斯达克', # 纳斯达克5分
-        20 => '道琼斯', # 道琼斯5分
-    ];
+        return $data;
+    }
 
     public static function getLotteryNo($returnType = 'json'){
 
@@ -268,7 +248,8 @@ class CqsscKcw extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        $logArr['lottery'] = CqsscKcw::$lotteryNameArr[$lotteryId];
+        $lotteryNameArr = CqsscKcw::getLotteryNameArr();
+        $logArr['lottery'] = $lotteryNameArr[$lotteryId];
         Tool_Common::log('cqssc_kcw', 'INFO', '号码抓取-kcw', $logArr);
 
         return $rst;

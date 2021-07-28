@@ -83,9 +83,10 @@ class KjConfigController extends BaseController
             return $this->redirect(['index']);
         }
 
+        $lotteryNameArr = CqsscKcw::getLotteryNameArr();
         return $this->render('create', [
             'model' => $model,
-            'lottery_type_arr' => CqsscKcw::$lotteryNameArr,
+            'lottery_type_arr' => $lotteryNameArr,
         ]);
     }
 
@@ -120,9 +121,10 @@ class KjConfigController extends BaseController
             return $this->redirect(['index']);
         }
 
+        $lotteryNameArr = CqsscKcw::getLotteryNameArr();
         return $this->render('update', [
             'model' => $model,
-            'lottery_type_arr' => CqsscKcw::$lotteryNameArr,
+            'lottery_type_arr' => $lotteryNameArr,
         ]);
     }
 

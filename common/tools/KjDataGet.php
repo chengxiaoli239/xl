@@ -156,7 +156,8 @@ class KjDataGet
                             $cache_time = 30*60;
                         }
                     }
-                    $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, /*'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$msg,*/ 'lottery'=>CqsscKcw::$lotteryNameArr[$kjConfig->lottery_type]];
+                    $lotteryNameArr = CqsscKcw::getLotteryNameArr();
+                    $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, /*'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$msg,*/ 'lottery'=>$lotteryNameArr[$kjConfig->lottery_type]];
                     Tool_Common::log('insertSscKjData', 'INFO', '开奖记录', $logArr);
                 }
                 $mkey_qihao = 'KJ_LOG_QIHAO_'.$kjConfig->lottery_type.'_'.$qihao;
@@ -306,7 +307,8 @@ class KjDataGet
         $SscKjData->setAttributes($insertData);
         if (!$insertRst = $SscKjData->save()) {
             $msg = current($SscKjData->getErrors());
-            $logArr = ['msg'=>$msg, 'qihao'=>$qihao, 'kjData'=>$kjData, 'lottery'=>CqsscKcw::$lotteryTypeArr[$lottery_type]];
+            $lotteryNameArr = CqsscKcw::getLotteryNameArr();
+            $logArr = ['msg'=>$msg, 'qihao'=>$qihao, 'kjData'=>$kjData, 'lottery'=>$lotteryNameArr[$lottery_type]];
             Tool_Common::log('insertSscKjData_err', 'INFO', '开奖记录-错误', $logArr);
             return ['status' => 300, 'msg' => $msg];
         }

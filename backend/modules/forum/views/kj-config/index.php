@@ -1,5 +1,6 @@
 <?php
 
+use common\kj\cqssc\CqsscKcw;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -37,7 +38,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'name',
                         ['attribute' => 'lottery_type','label'=>'彩种类型',#'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
-                                $str = \common\kj\cqssc\CqsscKcw::$lotteryNameArr[$model->lottery_type];
+                                $lotteryNameArr = CqsscKcw::getLotteryNameArr();
+                                $str = $lotteryNameArr[$model->lottery_type];
                                 return $str;
                             }
                         ],

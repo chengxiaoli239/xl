@@ -46,4 +46,24 @@ class IndexesController extends Controller
         return $data;
     }
 
+    /**
+     * @desc 上证指数 - 抓网盘 - 在用
+     * @return - json|xml
+     */
+    public function actionSzzs($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = NaSiDaKe::getLotteryNo($type, $is_auto=1, $lottery_type=21);
+        return $data;
+    }
+
+    /**
+     * @desc 深圳成指 - 抓网盘 - 在用
+     * @return - json|xml
+     */
+    public function actionSczs($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = DaoQiongSi::getLotteryNo($type, $is_auto=1, $lottery_type=21);
+        return $data;
+    }
+
 }
