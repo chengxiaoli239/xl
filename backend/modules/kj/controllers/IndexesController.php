@@ -62,7 +62,7 @@ class IndexesController extends Controller
      */
     public function actionSzcz($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = DaoQiongSi::getLotteryNo($type, $is_auto=1, $lottery_type=22);
+        $data = NaSiDaKe::getLotteryNo($type, $is_auto=1, $lottery_type=22);
         return $data;
     }
 

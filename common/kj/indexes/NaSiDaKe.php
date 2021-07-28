@@ -16,12 +16,12 @@ class NaSiDaKe extends BaseKj{
         22 => 'szcs', # 深圳成指
     ];
 
-    public static function getLotteryNo($returnType = 'json', $is_auto=1, $type=19){
+    public static function getLotteryNo($returnType = 'json', $is_auto=1, $lottery_type=19){
 
-        if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        if($is_auto==2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/indexes/nsdk');
 
-            $type_name = self::$lottery_types[$type];
+            $type_name = self::$lottery_types[$lottery_type];
             $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/queryHistorys?lotName='.$type_name.'&limit=5&page=1&sidx=open_time&order=desc'; #当前开奖号码
 
             $rst = CurlService::getCurl($url);
@@ -43,7 +43,7 @@ class NaSiDaKe extends BaseKj{
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
 
-        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+        self::setKjDataCache($lottery_type, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");

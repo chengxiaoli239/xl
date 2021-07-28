@@ -10,7 +10,7 @@ use  yii;
 class DaoQiongSi extends BaseKj{
     public static $lottery_type = 20;
 
-    public static function getLotteryNo($returnType = 'json', $is_auto=1){
+    public static function getLotteryNo($returnType = 'json', $is_auto=1, $){
 
         if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/indexes/dqs');
