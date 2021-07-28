@@ -60,7 +60,7 @@ class IndexesController extends Controller
      * @desc 深圳成指 - 抓网盘 - 在用
      * @return - json|xml
      */
-    public function actionSzcs($type = 'json'){
+    public function actionSzcz($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $data = DaoQiongSi::getLotteryNo($type, $is_auto=1, $lottery_type=21);
         return $data;
