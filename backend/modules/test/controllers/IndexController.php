@@ -230,6 +230,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $data = NaSiDaKe::getLotteryNo($type, $is_auto=1, $lottery_type=22);
         $data = DaoQiongSi::getLotteryNo();p($data);
         $data = NaSiDaKe::getLotteryNo($type);p($data);
         $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
