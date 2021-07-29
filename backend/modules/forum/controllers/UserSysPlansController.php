@@ -304,6 +304,10 @@ class UserSysPlansController extends BaseController
         return $this->render('update',$data);
     }
 
+    public function actionNewQuickBet(){
+
+    }
+
     /**
      * @desc 更新投注状态
      * @param $id

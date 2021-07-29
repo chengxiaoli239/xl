@@ -35,11 +35,7 @@ $this->title = '新过滤快打';
                 <input type="hidden" value="<?=$model->playway?>" name="UserSysPlans[playway]">
 
                 <div class="row">
-                    <div class="col-lg-1 col-xs-6">
-                        <?= $form->field($model, 'single')->textInput()->label('倍数(元)') ?>
-                    </div>
                     <div class="col-lg-2 col-xs-6">
-
                         <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
                     </div>
                 </div>
@@ -276,7 +272,11 @@ $this->title = '新过滤快打';
                 -->
                 <div class="form-group">
                     <div class="col-lg-4 col-xs-4"> </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-1 col-xs-1">
+                        <input type="text" id="usersysplans-single" class="form-control" placeholder="倍(元)" name="UserSysPlans[single]" value="0.1">
+                    </div>
+                    <!--?= $form->field($model, 'single')->textInput()->label('倍数(元)') ?-->
+                    <div class="col-lg-2 col-xs-2">
                         <?= Html::button(Yii::t('app', 'bet_now'), ['class' => 'btn btn-success id-bet']) ?>
                     </div>
                     <div class="col-lg-4 col-xs-4"> </div>
