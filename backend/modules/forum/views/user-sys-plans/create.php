@@ -48,6 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         # 3、排除期号，比如：058期 则排除 58XX
         'is_filter_qihaos' => $is_filter_qihaos,
+        'lottery_types' => $lottery_types,
     ]) ?>
 
 </div>

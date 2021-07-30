@@ -984,15 +984,16 @@ class UserSysPlansService extends BaseService {
     public static function newKuaiDa($tz_type, &$model, $lottery_type, $uid=''){
         $flag = true;
         $config = self::getUserSetConfigs($uid);
-        $newKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->one();
+        $newKjDatas = SscKjData::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(3)->all();
         $all_nums = [0,1,2,3,4,5,6,7,8,9];
-        $kj_nums = explode(',', $newKjData['code_4n_str']);
+        $newOneKjData = $newKjDatas[0];
+        $kj_nums = explode(',', $newOneKjData['code_4n_str']);
         $getNums = array_diff($all_nums, $kj_nums); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码
         //p([$newKjData, $all_nums, $kj_nums, $getNums]);
         $allHz = self::getAllHz($config['start_hz'], $config['end_hz']); # 用户默认和值
 
         if($tz_type==38){
-            $newHz = $newKjData['codes_hz'];
+            $newHz = $newOneKjData['codes_hz'];
             $newHz_t = 36 - $newHz;
             foreach ([$newHz, $newHz_t] as $hz){
                 if(in_array($hz, $allHz)){
@@ -1000,11 +1001,14 @@ class UserSysPlansService extends BaseService {
                     unset($allHz[$k]);
                 }
             }
-            //p([$k, $newHz, $newHz_t, $allHz]);
+            //p([$allHz]);
             $model->hz = $allHz;
 
             #
-            $model->p1 = '1234';
+            $model->p1 = implode('', array_diff($all_nums, [])); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码;
+            $model->p2 = implode('', array_diff($all_nums, [])); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码;
+            $model->p3 = implode('', array_diff($all_nums, [])); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码;
+            $model->p4 = implode('', array_diff($all_nums, [$newOneKjData['code1']])); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码;
         }
 
         return $flag;

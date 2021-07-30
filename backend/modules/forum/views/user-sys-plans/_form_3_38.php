@@ -21,6 +21,7 @@ $this->title = '新过滤快打';
         <section class="panel">
             <header class="panel-heading">
                 <?= '[<strong><font color="#4b0082">新快打</font></strong>]' ?>
+                <?php include(dirname(__FILE__).'/create_tab.php');?>
             </header>
             <div class="panel-body">
                 <?php $form = ActiveForm::begin([
@@ -254,7 +255,6 @@ $this->title = '新过滤快打';
                 <?php //include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
 
                 <!--
-                <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
                 -->
 
                 <!--?= $form->field($model, 'created_at')->textInput() ?-->

@@ -105,6 +105,7 @@ class UserSysPlansController extends BaseController
 
         $playway = BetService::getPlaywayByTzType($tz_type);
 
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
         if($this->_post){
             $this->_post['UserSysPlans']['lottery_type'] = $queryParams['lottery_type'];
         }
@@ -172,6 +173,7 @@ class UserSysPlansController extends BaseController
             'is_filter_dates' => $is_filters,
             'filter_date_pos1' => $filter_pos1,
             'filter_date_pos2' => $filter_pos2,
+            'lottery_types' => $lottery_types,
 
             # 2、排除前x天内同期
             'is_filter_qihaos' => $is_filters,
@@ -304,7 +306,93 @@ class UserSysPlansController extends BaseController
         return $this->render('update',$data);
     }
 
+    /**
+     * @desc
+     * @return string
+     */
     public function actionNewQuickBet(){
+        $model = new usersysplans();
+        $queryParams = \yii::$app->request->queryParams;
+
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        $playway = betservice::getplaywaybytztype($tz_type=38);
+
+        if($this->_post){
+            $this->_post['usersysplans']['lottery_type'] = $queryParams['lottery_type'];
+        }
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
+
+        usersysplansservice::preopdata($this->_post, $this->_user_id);
+        if ($model->load($this->_post) && $model->save()) {
+            if(in_array($tz_type, \yii::$app->params['import_codes_types']) && $model->id){ # 导入号码保存
+                usersysplansservice::saveimportcodestxt($model->id, $this->_post['usersysplans']['import_codes_txts'], (int)$this->_post['change_per'][0], $this->_user_id);
+            }
+            return $this->redirect(['index', 'usersysplans[lottery_type]'=>$queryParams['lottery_type']]);
+        }
+        $tz_sites_arr = TzService::gettzsites($this->_user_id);
+        $plan_types = TzService::getTzPlanTypes();
+
+        ############################ 排除参数开始 #############################
+        # 1、排除前x期
+        $model->is_filter = 0;
+        $model->filter_xQ_before = ''; # x期
+        $model->filter_pos1 = []; # 位置选项
+        $model->filter_pos2 = []; # 位置选项
+
+        # 2、排除前x天同期
+        $model->is_filter_date = 0;
+        $model->filter_xD_before = ''; # x天
+        $model->filter_date_pos1 = []; # 位置选项
+        $model->filter_date_pos2 = []; # 位置选项
+
+        ########### 新过滤快打 start #############
+        UserSysPlansService::newKuaiDa($tz_type, $model, $lottery_type, $this->_user_id);
+        ########### 新过滤快打 end #############
+
+        # 2、排除前期号
+        $model->is_filter_qihao = 0;
+        ############################ 排除参数结束 #############################
+
+        $model->nums = usersysplansservice::getdefaulttznums($tz_type);
+        $model->status = $model->status ? 1 : 0;
+        $model->playway = $playway;
+        $model->is_test = 0;
+        $model->single = in_array($tz_type, [27, 30, 17, 36, 37]) ? 1 : 0.1;
+        $model->tz_type = $tz_type;
+        $model->buy_type = 0;
+        $model->plan_type = 0;
+        $defaultsiteid = userservice::getuserdefaultsite($this->_user_id);
+        $model->tz_sites = [$defaultsiteid];
+
+        $is_filters = [1=>'是'];
+        $filter_pos1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
+        $filter_pos2 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
+        $data =  [
+            'model' => $model,
+            'tz_type' => $tz_type,
+            'playway' => $playway,
+            'plan_types' => $plan_types,
+            'tz_sites_arr' => $tz_sites_arr,
+
+            ############################ 排除参数开始 #############################
+            # 1、排除前x期
+            'is_filters' => $is_filters,
+            'filter_pos1' => $filter_pos1,
+            'filter_pos2' => $filter_pos2,
+
+            # 2、排除前x天内同期
+            'is_filter_dates' => $is_filters,
+            'filter_date_pos1' => $filter_pos1,
+            'filter_date_pos2' => $filter_pos2,
+            'lottery_types' => $lottery_types,
+            'lottery_type' => $lottery_type,
+
+            # 2、排除前x天内同期
+            //'is_filter_qihaos' => $is_filters,
+            ############################ 排除参数结束 #############################
+        ];
+        $data = array_merge($data, UserSysPlansService::getsysplanstypedatas($playway, $tz_type));
+        return $this->render('create',$data);
 
     }
 
