@@ -230,6 +230,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $qihao = QxcTcw::getNineNineQihao($lottery_type=1, $is_auto = 1) + 1;# 期号
+        p($qihao);
         $data = NaSiDaKe::getLotteryNo($type, $is_auto=1, $lottery_type=22);
         $data = DaoQiongSi::getLotteryNo();p($data);
         $data = NaSiDaKe::getLotteryNo($type);p($data);

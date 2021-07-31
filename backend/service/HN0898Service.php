@@ -1183,8 +1183,8 @@ class HN0898Service extends BaseTZService {
         $rst = $db->createCommand($sql)->queryOne();
         switch ($lottery_type) {
             case 1: # 七星彩
-                $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);
-                $qihao = $data['expect'] + 1; # 期号
+                //$data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);
+                $qihao = QxcTcw::getNineNineQihao($lottery_type, $is_auto = 1) + 1;# 期号
                 break;
             case 2: # 希腊3分彩
                 //break;
@@ -1310,8 +1310,8 @@ class HN0898Service extends BaseTZService {
 
         switch ($lottery_type){
             case 1: # 七星彩
-                $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 2);
-                $qihao = $data['expect']; # 期号
+                //$data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 2); # 体彩网
+                $qihao = QxcTcw::getNineNineQihao($lottery_type, $is_auto=2); # 九九网 期号
                 break;
             case 5:
                 $time = date("H:i:s", time() - 20 * 60);

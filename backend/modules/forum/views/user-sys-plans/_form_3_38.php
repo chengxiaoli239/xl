@@ -9,18 +9,10 @@ use yii\widgets\ActiveForm;
 $SscKjDatas = \backend\models\SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->limit(18)->all();
 $this->title = '新过滤快打';
 ?>
-<style>
-
-    .form-control{
-        padding: 0px 1px;
-    }
-</style>
-
 <div class="user-sys-plans-form row">
     <div class="col-lg-10">
         <section class="panel">
             <header class="panel-heading">
-                <?= '[<strong><font color="#4b0082">新快打</font></strong>]' ?>
                 <?php include(dirname(__FILE__).'/create_tab.php');?>
             </header>
             <div class="panel-body">
@@ -75,6 +67,8 @@ $this->title = '新过滤快打';
                         ') ?>
                     </div>
                 </div>
+                <!--导入号码组轮换-->
+                <?php include(dirname(__FILE__).'/new_quick_bet.php'); ?>
 
                 <!--?= $form->field($model, 'tz_type')->textInput() ?-->
                 <!-- 1大小单双三字定2大小三字定3单双三字定 -->
@@ -270,16 +264,44 @@ $this->title = '新过滤快打';
                     </div>
                 </div>
                 -->
+                <!--?= $form->field($model, 'single')->textInput()->label('倍数(元)') ?-->
                 <div class="form-group">
-                    <div class="col-lg-4 col-xs-4"> </div>
-                    <div class="col-lg-1 col-xs-1">
-                        <input type="text" id="usersysplans-single" class="form-control" placeholder="倍(元)" name="UserSysPlans[single]" value="0.1">
+                    <div class="col-lg-offset-2 col-lg-12">
+                        <div class="col-lg-1 col-xs-2" style="">
+                            <?= Html::button('+', ['class' => 'btn single-btn btn-default', 'style'=>'float: right;']) ?>
+                        </div>
+                        <div class="col-lg-2 col-xs-3" style="">
+                            <input type="text" id="UserSysPlans-single" class="form-inline form-control" placeholder="倍(元)" name="UserSysPlans[single]" value="0.1">
+                        </div>
+                        <div class="col-lg-1 col-xs-2" style="">
+                        <?= Html::button('-', ['class' => 'btn single-btn btn-default']) ?>
+                        </div>
+                        <div class="col-lg-1 col-xs-2">
+                            <?= Html::button(Yii::t('app', 'bet_now'), ['class' => 'btn btn-success id-bet']) ?>
+                        </div>
+                        &nbsp; &nbsp; &nbsp;
+                        <div class="col-lg-1 col-xs-2">
+                        <?= Html::button(Yii::t('app', 'query-yl'), ['class' => 'btn btn-success id-query', 'data-type'=>1]) ?>
+                        </div>
+                        <div class="col-lg-4 col-xs-1" style=""></div>
                     </div>
-                    <!--?= $form->field($model, 'single')->textInput()->label('倍数(元)') ?-->
-                    <div class="col-lg-2 col-xs-2">
+                        <!--
+                    <div class="col-lg-4 col-xs-1" style=""></div>
+                    <div class="col-lg-1 col-xs-2" style="padding-right:0;" >
+                        <?= Html::button('+', ['class' => 'btn single-btn btn-default', 'style'=>'float: right;']) ?>
+                    </div>
+                    <div class="col-lg-1 col-xs-2" style="padding:0 0">
+                        <input type="text" id="UserSysPlans-single" class="form-control" placeholder="倍(元)" name="UserSysPlans[single]" value="0.1" style="float: right">
+                    </div>
+                    <div class="col-lg-1 col-xs-2 single-btn" style="padding-left:0;left:4px;">
+                        <?= Html::button('-', ['class' => 'btn single-btn btn-default']) ?>
+                    </div>
+                    <div class="col-lg-1 col-xs-2">
                         <?= Html::button(Yii::t('app', 'bet_now'), ['class' => 'btn btn-success id-bet']) ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4"> </div>
+                    <?= Html::button(Yii::t('app', 'query-yl'), ['class' => 'btn btn-success id-query', 'data-type'=>1]) ?>
+                    <div class="col-lg-4 col-xs-1" style=""></div>
+                        -->
                 </div>
 
             <?php //include(dirname(__FILE__).'/act-button.php');?>
@@ -518,6 +540,19 @@ $(function () {
     $('.code_type_ds_2').click(function () {
         obj = $(this).parent().next();
         obj.val() == '' ? obj.val('02468') : obj.val('');
+    });
+
+    $('.single-btn').click(function (){
+        act = $(this).text();
+        now_single = $("#UserSysPlans-single").val();
+        console.log(act, now_single)
+        if(act == '+'){
+            now_single = Number(now_single) + 0.1
+        }else {
+            now_single = Number(now_single) - 0.1
+        }
+        if(now_single<=0) now_single = 0.1
+        $("#UserSysPlans-single").val(now_single.toFixed(1));
     });
 
 });

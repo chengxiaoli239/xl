@@ -126,7 +126,30 @@ class QxcTcw extends BaseKj{
     }
 
     /**
+     * @desc 排列五、七星已经开奖的期号
+     * @param int $lottery_type
+     * @return string|array
+     */
+    public static function getNineNineQihao($lottery_type = 1, $is_auto=1){
+        $m = \Yii::$app->cache;
+        $mkey = 'getNineNineQihao_'.$lottery_type;
+        if($is_auto==2 OR !$qihao = $m->get($mkey)){
+            $domain = BaseKj::getApiHostByRoute('/kj/qxc/nine-nine-plw');
+            $lotNames = [1=>'hnqxc', 17=>'plw'];
+            $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/lastTen/'.$lotNames[$lottery_type];
+            $rstData = CurlService::getCurl($url);
+            if($rstData['code']==200 && isset($rstData['data'][0])){
+                $qihao = $rstData['data'][0]['issue'];
+                $m->set($mkey, $qihao, 300);
+            }
+        }
+
+        return $qihao;
+    }
+
+    /**
      * @desc 七星彩  中国体育彩票 , $lottery_type = 1   https://www.lottery.gov.cn/kj/kjlb.html?qxc
+     * https://www.sporttery.cn/digitallottery/ # 排列五、七星开奖
      * @param string $returnType
      * @return array|bool 返回格式(数组)：{"expect":"2020100623","opencode":"0,8,6,3,6,3,4","opentime":"2020-10-06 17:41:38"}
      */

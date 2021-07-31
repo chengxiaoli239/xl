@@ -989,10 +989,13 @@ class UserSysPlansService extends BaseService {
         $newOneKjData = $newKjDatas[0];
         $kj_nums = explode(',', $newOneKjData['code_4n_str']);
         $getNums = array_diff($all_nums, $kj_nums); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码
-        //p([$newKjData, $all_nums, $kj_nums, $getNums]);
+        //p([$newOneKjData, $all_nums, $kj_nums, $getNums]);
         $allHz = self::getAllHz($config['start_hz'], $config['end_hz']); # 用户默认和值
 
         if($tz_type==38){
+            $model->arb_pos_isbaohan = 1; # 是否包含
+            $model->arb_pos_codes = implode('', $getNums); # 排除掉上期开奖号码
+            $model->arb_pos_nums = 2; # 排除掉上期开奖号码至少上两个
             $newHz = $newOneKjData['codes_hz'];
             $newHz_t = 36 - $newHz;
             foreach ([$newHz, $newHz_t] as $hz){
@@ -1003,6 +1006,7 @@ class UserSysPlansService extends BaseService {
             }
             //p([$allHz]);
             $model->hz = $allHz;
+            $model->type_3b = [0]; # 排除三兄弟
 
             #
             $model->p1 = implode('', array_diff($all_nums, [])); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码;

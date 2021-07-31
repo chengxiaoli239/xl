@@ -119,6 +119,12 @@ class UserSysPlans extends \common\models\base\BaseModel
     # 3、排除期号的定位，比如058期，二定则去除：58XX
     public $is_filter_qihao; # 是否排除
     ###### 排除过滤参数结束 #######
+
+    ############### 新过滤快打—start #################
+    public $arb_pos_isbaohan; # 任意位置之"是否包含"，0,1
+    public $arb_pos_codes; # 任意位置之"号码" 0123456789
+    public $arb_pos_nums; # 任意位置之"至少个数" 2个3个
+    ############### 新过滤快打—end #################
     /**
      * @inheritdoc
      */
