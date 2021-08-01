@@ -172,11 +172,23 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['type_22b'] = $UserSysPlans['type_22b'][0];
         }
         unset($post['UserSysPlans']['type_22b']);
+
         # 17、任意位置 是否包含
         if($UserSysPlans['arb_pos_isbaohan'] && count($UserSysPlans['arb_pos_isbaohan']) == 1){
             $tmpFilter['arb_pos_isbaohan'] = $UserSysPlans['arb_pos_isbaohan'][0];
         }
         unset($post['UserSysPlans']['arb_pos_isbaohan']);
+        # 18、任意数字
+        if(isset($post['UserSysPlans']['arb_pos_nums']) && $post['UserSysPlans']['arb_pos_nums']){
+            $tmpFilter['arb_pos_nums'] = $post['UserSysPlans']['arb_pos_nums'];
+        }
+        unset($post['UserSysPlans']['arb_pos_nums']);
+        # 19、任意数字 至少x个
+        if(isset($post['UserSysPlans']['arb_pos_codes']) && $post['UserSysPlans']['arb_pos_codes']){
+            $tmpFilter['arb_pos_codes'] = $post['UserSysPlans']['arb_pos_codes'];
+        }
+        unset($post['UserSysPlans']['arb_pos_codes']);
+
 
         ################### 公共参数 - 结束 #########################
 

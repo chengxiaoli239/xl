@@ -230,6 +230,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = NumService::getCodesArrByNum($codes_str='12345678', $num=4);p($rst);
+        $data = QxcTcw::getNineNineLottery($type='json', $is_auto=2, $lottery_type=1);p($data);
         $qihao = QxcTcw::getNineNineQihao($lottery_type=1, $is_auto = 1) + 1;# 期号
         p($qihao);
         $data = NaSiDaKe::getLotteryNo($type, $is_auto=1, $lottery_type=22);
@@ -245,7 +247,6 @@ class IndexController extends Controller
         }
         p($rst);
         $rst = SscDataService::insertDsTypeDatas($lottery_type=17);p($rst);
-        $data = QxcTcw::getNineNineLottery($type='json', $is_auto=2, $lottery_type=17);p($data);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');p($r);
         $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);p($data);
         $rst['bet'] = BetService::betByUidNew($uid=11);p($rst); // 用户新计划投注，可正买可反买

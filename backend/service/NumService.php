@@ -106,6 +106,47 @@ class NumService extends BaseService {
     }
 
     /**
+     * @desc 根据号码str和个数，返回数组
+     * @param $codes_str - 号码，例如：1234
+     * @param int $nums - 个数，比如：2
+     * @return array - [12,13,14,23,24,34]
+     */
+    public static function getCodesArrByNum($codes_str, $nums=2){
+        $len = strlen($codes_str);
+
+        $codesArr = [];
+        for($i=0; $i<$len; $i++){
+            if($nums<=1){ # 1个号码
+                $codesArr[] = $codes_str[$i];
+            }elseif($nums>=2){
+                for($j=1; $j<$len; $j++){
+                    if($j<=$i) continue;
+                    if($nums == 2){ # 两个号码
+                        $codesArr[] = $codes_str[$i].$codes_str[$j];
+                    }elseif($nums >= 3){
+                        if($nums == 3){ # 3个号码
+                            for ($k=2; $k<$len; $k++){
+                                if($k<=$j) continue;
+                                $codesArr[] = $codes_str[$i].$codes_str[$j].$codes_str[$k];
+                            }
+                        }else{
+                            for ($k=2; $k<$len; $k++){
+                                if($k<=$j) continue;
+                                for ($l=3; $l<$len; $l++){ # 4个号码
+                                    if($l<=$k) continue;
+                                    $codesArr[] = $codes_str[$i].$codes_str[$j].$codes_str[$k].$codes_str[$l];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $codesArr;
+    }
+
+    /**
      * @desc 排除多少期内的码，利润统计
      * @param string $qihao
      * @param int $nums
@@ -498,7 +539,7 @@ class NumService extends BaseService {
 
     /**
      * @desc 3个号码返回组号码组合 - 全倒
-     * @param $codes 格式：111或者112或者123
+     * @param $codes - 格式：111或者112或者123
      * @param $type 0除1取
      * @return array ['1,2,3,4', '1,1,2,3', '1,1,1,2']
      */
@@ -771,7 +812,7 @@ class NumService extends BaseService {
      * @return array
      */
     public static function getCodesKuaiXuan($codes_hz, $code_type = 4, $codes=[], $lottery_type='') {
-        //p([$codes_hz, $code_type],0);
+        //p([$codes_hz, $code_type]);
         if(empty($codes_hz)) return [];
 
         $where = ['AND', ['=', 'code_type', $code_type]];
@@ -1182,6 +1223,21 @@ class NumService extends BaseService {
             }
         }
         $query = Num4Type::find()->where($where);
+
+        //p([$codes_hz['arb_pos_isbaohan'], $codes_hz['arb_pos_nums'], $codes_hz['arb_pos_codes']]);
+        ############################ 任意位置包含、排除 start ###################################
+        if(isset($codes_hz['arb_pos_isbaohan'])){
+            $arb_pos_nums = $codes_hz['arb_pos_nums']; # 个数
+            $arb_pos_codes = $codes_hz['arb_pos_codes']; # 号码
+            if($codes_hz['arb_pos_isbaohan'] == 1){ # 任意位置包含
+                $arb_pos_asises = NumService::getCodesArrByNum($arb_pos_codes, $arb_pos_nums);
+                $arb_codesArr = self::getCodesArise($arb_pos_asises, $type = 1, $code_type); # 比如：$arb_pos_nums=2, arb_pos_asises= ['12','34','45'] # 每个元素为两个号码
+                $query->andWhere(['IN', 'code', $arb_codesArr]);
+            }elseif($codes_hz['arb_pos_isbaohan'] === 0){ # 排除
+
+            }
+        }
+        ########################### 任意位置包含、排除 start ###################################
 
         ###################################################### filters过滤参数开始05.24 ######################################################
         # 1、排除前x期 05.24
