@@ -98,7 +98,7 @@ class QxcTcw extends BaseKj{
             $tmp_codes = $kData['result']['numbers'];
             $kjData['expect'] = $kData['issue'];
             $kjData['opencode'] = $tmp_codes[0].','.$tmp_codes[1].','.$tmp_codes[2].','.$tmp_codes[3].',0';
-            $kjData['opentime'] = date('Y-m-d H:i:s', (int)($kData['createTime']/1000));
+            $kjData['opentime'] = date('Y-m-d H:i:s', (int)($kData['openTime']/1000));
             //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ] # 返回格式
             self::setKjDataCache($lottery_type, $kjData['expect'], $kjData);
         }
