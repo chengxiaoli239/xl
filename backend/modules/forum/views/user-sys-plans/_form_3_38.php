@@ -25,6 +25,7 @@ $this->title = '新过滤快打';
 
                 <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
                 <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
+                <input type="hidden" value="<?=$model->tz_sites?>" name="UserSysPlans[tz_sites][]">
                 <input type="hidden" value="<?=$model->playway?>" name="UserSysPlans[playway]">
 
                 <div class="row">
@@ -270,7 +271,7 @@ $this->title = '新过滤快打';
                         <div class="col-lg-1 col-xs-2" style="">
                             <?= Html::button('+', ['class' => 'btn single-btn btn-default', 'style'=>'float: right;']) ?>
                         </div>
-                        <div class="col-lg-2 col-xs-3" style="">
+                        <div class="col-lg-1 col-xs-3" style="">
                             <input type="text" id="UserSysPlans-single" class="form-inline form-control" placeholder="倍(元)" name="UserSysPlans[single]" value="0.1">
                         </div>
                         <div class="col-lg-1 col-xs-2" style="">

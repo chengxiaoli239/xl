@@ -172,6 +172,11 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['type_22b'] = $UserSysPlans['type_22b'][0];
         }
         unset($post['UserSysPlans']['type_22b']);
+        # 17、任意位置 是否包含
+        if($UserSysPlans['arb_pos_isbaohan'] && count($UserSysPlans['arb_pos_isbaohan']) == 1){
+            $tmpFilter['arb_pos_isbaohan'] = $UserSysPlans['arb_pos_isbaohan'][0];
+        }
+        unset($post['UserSysPlans']['arb_pos_isbaohan']);
 
         ################### 公共参数 - 结束 #########################
 

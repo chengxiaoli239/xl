@@ -361,8 +361,7 @@ class UserSysPlansController extends BaseController
         $model->tz_type = $tz_type;
         $model->buy_type = 0;
         $model->plan_type = 0;
-        $defaultsiteid = userservice::getuserdefaultsite($this->_user_id);
-        $model->tz_sites = [$defaultsiteid];
+        $model->tz_sites = userservice::getuserdefaultsite($this->_user_id);
 
         $is_filters = [1=>'是'];
         $filter_pos1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
