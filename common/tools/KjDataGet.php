@@ -104,10 +104,10 @@ class KjDataGet
         if(empty($lottery_types)) $lottery_types = StaticService::getLotteryTypes();
         $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
-            $status = KjDataGet::isCanGrab($lottery_type);
-            if(!$status) continue;
             $KjConfigs = KjConfig::findAll(['enable'=>1, 'lottery_type'=>$lottery_type]);
             foreach ($KjConfigs as $kjConfig){
+                $status = KjDataGet::isCanGrab($lottery_type);
+                if(!$status && !$kjConfig->is_batch) continue;
                 $lottery_type = $kjConfig->lottery_type;
                 //if($lottery_type != 8) continue; # 测试
                 $url = $kjConfig->host.$kjConfig->path;
@@ -187,28 +187,40 @@ class KjDataGet
      * @return bool
      */
     public static function isCanGrab($lottery_type = DEFAULT_LOTTERY_TYPE) {
-        $rst = true;
+        $flag = true;
         $date_time = date('H:i');
         if (in_array($lottery_type, [5, 6])){
             if ('04:00' < $date_time && $date_time < '07:10') {
-                $rst = false;
+                $flag = false;
             }
         }elseif($lottery_type == 8){ # 幸运五星
             # 用户报表需求 24小时抓取开奖数据
             if ('04:10' < $date_time && $date_time < '09:00') {
-                $rst = false;
+                $flag = false;
             }
         }elseif(in_array($lottery_type, [10, 11, 12, 13])){ # 冰岛90s、3分
             if ('03:10' < $date_time && $date_time < '09:00') {
-                $rst = false;
+                $flag = false;
+            }
+        }elseif(in_array($lottery_type, [17])){ # 排列五
+            if('20:15'>$date_time OR $date_time>'23:00'){
+                $flag = false;
+            }
+        }elseif(in_array($lottery_type, [1])){ # 七星
+            $w = date('w'); # 周几：0,1,2,3,4,5,6  ==> 周日到周六
+            if(!in_array($w, [0, 2, 5])){
+                $flag = false;
+            }
+            if('20:00'>$date_time OR $date_time>'23:00'){
+                $flag = false;
             }
         }elseif(in_array($lottery_type, [18])){ # 台湾快五
             if ('02:10' < $date_time && $date_time < '07:00') {
-                $rst = false;
+                $flag = false;
             }
         }
 
-        return $rst;
+        return $flag;
     }
 
     /**

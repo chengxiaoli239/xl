@@ -230,6 +230,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        p(date('w', strtotime('2021-06-30')));
         $rst = NumService::getCodesArrByNum($codes_str='12345678', $num=4);p($rst);
         $data = QxcTcw::getNineNineLottery($type='json', $is_auto=2, $lottery_type=1);p($data);
         $qihao = QxcTcw::getNineNineQihao($lottery_type=1, $is_auto = 1) + 1;# 期号
