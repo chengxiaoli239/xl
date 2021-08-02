@@ -1098,6 +1098,9 @@ class UserSysPlansService extends BaseService {
         }
         $rst['data']['push_rst'] = $rstData;
 
+        $rst['data']['push_data']['qihao'] = $activeQihao;
+        $rst['data']['push_data']['nums'] = count($codes);
+        $rst['data']['push_data']['money'] = count($codes)*$single;
         $rst['data']['push_data']['code_desc'] = \backend\service\NumService::getDescByKuaixuan($codes_hz);
         $rst['data']['push_data']['codes'] = str_replace('@', ',',str_replace(',', '', implode('@', $codes)));
 
