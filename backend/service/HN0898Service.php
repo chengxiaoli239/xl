@@ -1299,7 +1299,7 @@ class HN0898Service extends BaseTZService {
             case 20: # 道琼斯
             case 21: # 上证指数
             case 22: # 深圳成指
-                $qihao = QxcTcw::getNineNineQihao($lottery_type, $is_auto = 1) + 1;# 即将开奖的期号
+                $qihao = QxcTcw::getNineNineQihao($lottery_type, $is_auto = 2) + 1;# 即将开奖的期号
             break;
         }
 
