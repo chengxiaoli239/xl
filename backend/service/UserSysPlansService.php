@@ -1073,7 +1073,7 @@ class UserSysPlansService extends BaseService {
         $model->load($data);
         $codes_hz = json_decode($model->hz_Arr, true);
         $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type);
-        $codes = ['0,0,6,8', '0,6,0,9'];
+        //$codes = ['0,0,6,8', '0,6,0,9'];
 
         # 5、投注请求
         $BetService = BetService::getBetObj($uid, $tz_system_id, $lottery_type);
