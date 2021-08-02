@@ -2,6 +2,7 @@
 # 开彩网
 namespace common\kj\qxc;
 use backend\service\CurlService;
+use backend\service\NineNine\NineNineNewService;
 use common\kj\BaseKj;
 use common\tools\Tool_Common;
 use  yii;
@@ -135,8 +136,8 @@ class QxcTcw extends BaseKj{
         $mkey = 'getNineNineQihao_'.$lottery_type;
         if($is_auto==2 OR !$qihao = $m->get($mkey)){
             $domain = BaseKj::getApiHostByRoute('/kj/qxc/nine-nine-plw');
-            $lotNames = [1=>'hnqxc', 17=>'plw'];
-            $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/lastTen/'.$lotNames[$lottery_type];
+            //$lotNames = [1=>'hnqxc', 17=>'plw', 19=>'nsdk', 20=>'dqs', 21=>'szzs', 22=>'szcz'];
+            $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/lastTen/'.NineNineNewService::$lotNames[$lottery_type];
             $rstData = CurlService::getCurl($url);
             if($rstData['code']==200 && isset($rstData['data'][0])){
                 $qihao = $rstData['data'][0]['issue'];

@@ -477,6 +477,18 @@ class UserSysPlansController extends BaseController
     }
 
     /**
+     * @desc 表单页，遗漏、利润功能查询
+     * @return array
+     */
+    public function actionQuickBet(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $rst = UserSysPlansService::newQuickBet($post, $this->_user_id, $post['code_type']);
+
+        return $rst;
+    }
+
+    /**
      * Deletes an existing UserSysPlans model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param string $id

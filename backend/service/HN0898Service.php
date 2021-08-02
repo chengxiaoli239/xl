@@ -1295,6 +1295,12 @@ class HN0898Service extends BaseTZService {
                 $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0, $lottery_type = 17);
                 $qihao = $data['expect'] + 1; # 期号
                 break;
+            case 19: # 纳斯达克
+            case 20: # 道琼斯
+            case 21: # 上证指数
+            case 22: # 深圳成指
+                $qihao = QxcTcw::getNineNineQihao($lottery_type, $is_auto = 1) + 1;# 即将开奖的期号
+            break;
         }
 
         return $qihao;
@@ -1409,6 +1415,12 @@ class HN0898Service extends BaseTZService {
             case 17: # 七星彩
                 $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 2, $lottery_type = 17);
                 $qihao = $data['expect']; # 期号
+                break;
+            case 19: # 纳斯达克
+            case 20: # 道琼斯
+            case 21: # 上证指数
+            case 22: # 深圳成指
+                $qihao = QxcTcw::getNineNineQihao($lottery_type, $is_auto = 1);# 已经开奖的期号
                 break;
         }
 

@@ -1001,10 +1001,10 @@ class UserSysPlansService extends BaseService {
     public static function newKuaiDa($tz_type, &$model, $lottery_type, $uid=''){
         $flag = true;
         $config = self::getUserSetConfigs($uid);
-        $newKjDatas = SscKjData::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(3)->all();
+        $newKjDatas = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(3)->all();
         $all_nums = [0,1,2,3,4,5,6,7,8,9];
         $newOneKjData = $newKjDatas[0];
-        $kj_nums = explode(',', $newOneKjData['code_4n_str']);
+        $kj_nums = explode(',', $newOneKjData->code_4n_str);
         $getNums = array_diff($all_nums, $kj_nums); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码
         //p([$newOneKjData, $all_nums, $kj_nums, $getNums]);
         $allHz = self::getAllHz($config['start_hz'], $config['end_hz']); # 用户默认和值
@@ -1013,7 +1013,7 @@ class UserSysPlansService extends BaseService {
             $model->arb_pos_isbaohan = 1; # 是否包含
             $model->arb_pos_codes = implode('', $getNums); # 排除掉上期开奖号码
             $model->arb_pos_nums = 2; # 排除掉上期开奖号码至少上两个
-            $newHz = $newOneKjData['codes_hz'];
+            $newHz = $newOneKjData->codes_hz;
             $newHz_t = 36 - $newHz;
             foreach ([$newHz, $newHz_t] as $hz){
                 if(in_array($hz, $allHz)){
@@ -1025,14 +1025,83 @@ class UserSysPlansService extends BaseService {
             $model->hz = $allHz;
             $model->type_3b = [0]; # 排除三兄弟
 
+            $all_type_ds_Arr = UserSysPlansService::getCodeTypes($flag = 3); # 单双类型：1122,2121 等
+            $model->type_ds_details = array_diff($all_type_ds_Arr, [$newOneKjData->code_1_2_3_4]);
+
             #
-            $model->p1 = implode('', array_diff($all_nums, [])); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码;
-            $model->p2 = implode('', array_diff($all_nums, [])); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码;
-            $model->p3 = implode('', array_diff($all_nums, [])); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码;
-            $model->p4 = implode('', array_diff($all_nums, [$newOneKjData['code1']])); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码;
+            $model->p1 = implode('', array_diff($all_nums, [$newOneKjData->code4])); # 千位排除个位号码
+            $model->p2 = implode('', array_diff($all_nums, [])); #
+            $model->p3 = implode('', array_diff($all_nums, [])); #
+            $model->p4 = implode('', array_diff($all_nums, [$newOneKjData->code1])); # 个位排除千位号码
         }
 
         return $flag;
+    }
+
+    /**
+     * @desc 新快打
+     * @param $data
+     * @param $uid
+     * @return array
+     */
+    public static function newQuickBet($data, $uid=''){
+        $rst = ['status'=>200, 'msg'=>'操作成功', 'data'=>['push_data'=>[], 'push_rst'=>['code'=>200, 'msg'=>'操作成功']]];
+        //p($data);
+        $lottery_type = $data['UserSysPlans']['lottery_type'];
+        $playway = $data['UserSysPlans']['playway'];
+        $single = $data['UserSysPlans']['single'];
+        $tz_system_id = $data['UserSysPlans']['tz_sites'][0];
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'status'=>1]);
+        $account = $TzSystemsUsers->account;
+        if(!$TzSystemsUsers){
+            $msg = '账号已被禁用不能下注';
+            Tool_Common::log('tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['uid'=>$uid,'account'=>$account, 'msg'=>$msg]);
+            return ['status'=>400, 'msg'=>$msg];
+        }
+        $code_types = [
+            1 => 2, # 二定
+            2 => 3, # 三定
+            3 => 4, # 四定
+        ];
+        $code_type = $code_types[$data['UserSysPlans']['playway']];
+        $tz_type = $data['UserSysPlans']['tz_type'];
+        //p([$uid, $tz_system_id, $lottery_type]);
+        $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
+        //p([$tz_type, $activeQihao]);
+        $model = new UserSysPlans();
+        UserSysPlansService::preOpData($data, $user_id=1);
+        $model->load($data);
+        $codes_hz = json_decode($model->hz_Arr, true);
+        $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type);
+        $codes = ['0,0,6,8', '0,6,0,9'];
+
+        # 5、投注请求
+        $BetService = BetService::getBetObj($uid, $tz_system_id, $lottery_type);
+        # 下注操作
+        $tmpRst = $BetService->betByCodes($activeQihao, $codes, $uid, $single, $playway, $lottery_type);
+        $rstData = $tmpRst['rstData'];
+        $xCsrf = $tmpRst['xCsrf'];
+        $m = \Yii::$app->cache;
+        if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+            $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
+            $m->set($xCsrf_key, $xCsrf, 120);
+        }
+        $logArr = ['account'=>$account, 'tz_sites'=>$tz_system_id,'codes'=>$codes, 'postRst'=>$tmpRst];
+        Tool_Common::log('plan_bet_new','INFO','0898投注记录', $logArr);
+        if($tmpRst === false){
+            Tool_Common::log('/tz_err/tzByPlanId','INFO','投注记录 异常', $logArr);
+            return ['status'=>301, 'msg'=>'投注异常', 'tmpRst'=>false];
+        }
+        if($rstData['code'] != 200){
+            $rst['status'] = $rstData['code'];
+            $rst['msg'] = $rstData['msg'];
+        }
+        $rst['data']['push_rst'] = $rstData;
+
+        $rst['data']['push_data']['code_desc'] = \backend\service\NumService::getDescByKuaixuan($codes_hz);
+        $rst['data']['push_data']['codes'] = str_replace('@', ',',str_replace(',', '', implode('@', $codes)));
+
+        return $rst;
     }
 
 }

@@ -2370,6 +2370,8 @@ class StaticService extends BaseService {
        $tzTypes = TzTypes::findOne(['type'=>$tz_type]);
        $playway = $tzTypes->playway;
 
+       $codeDatas = str_replace('@', ',', str_replace(',', '', implode('@', $codes)));
+
        switch ($playway){
            case 1: # 二字定
                break;
@@ -2444,6 +2446,7 @@ class StaticService extends BaseService {
            'max_range' => $max_range,   // 近200期内的最大遗漏范围
            'counts' => count($codes),   // 组数
            'yl_str' => BaseStringHelper::truncate($yl_str,1000),
+           'codeDatas' => $codeDatas,
        ];
 
 

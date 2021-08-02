@@ -40,6 +40,7 @@ use yii\helpers\ArrayHelper;
 use  yii;
 
 class NineNineNewService extends BaseTZService {
+    public static $lotNames = [1=>'hnqxc', 17=>'plw', 19=>'nsdk', 20=>'dqs', 21=>'szzs', 22=>'szcz'];
     public static $username = '';
     public static $password = '';
     public static $baseUrl =  '';
@@ -306,7 +307,7 @@ class NineNineNewService extends BaseTZService {
     public static function getNineNineQihao($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
         if($lottery_type == 6) {
             $qihao = substr($qihao, 0, 8) . '0' . substr($qihao, 8, 2);
-        }elseif (in_array($lottery_type, [1, 17])){
+        }elseif (in_array($lottery_type, [1,17,19,20,21,22])){
         }else{
             $qihao = substr($qihao, 0, 8) . '0' . substr($qihao, 8, 2);
         }
@@ -524,6 +525,10 @@ class NineNineNewService extends BaseTZService {
             5 => 'cqssc', # 重庆时时彩
             6 => 'xjssc', # 新疆时时彩
             17 => 'plw',  # 排列五
+            19 => 'nsdk',  # 纳斯达克
+            20 => 'dqs',  # 道琼斯
+            21 => 'szzs',  # 上证指数
+            22 => 'szcz',  # 深圳成指
         ];
         if(isset($datas[$lottery_type])) return $datas[$lottery_type];
 
@@ -541,6 +546,10 @@ class NineNineNewService extends BaseTZService {
             5 => '/ssc/cqssc', # 重庆时时彩
             6 => '/ssc/xjssc', # 新疆时时彩
             17 => '/pl/plw',  # 排列五
+            19 => '/pl/nsdk',  # 纳斯达克
+            20 => '/pl/dqs',  # 道琼斯
+            21 => '/pl/szzs',  # 上证指数
+            22 => '/pl/szcz',  # 深圳成指
         ];
         if(isset($datas[$lottery_type])) return $datas[$lottery_type];
 
@@ -562,17 +571,19 @@ class NineNineNewService extends BaseTZService {
         $oddsTypes = [
             1 => ['minOdds'=>86.5, 'maxOdds'=>99.5], # 二定，元
             2 => ['minOdds'=>865, 'maxOdds'=>995], # 三定，元
-            3 => ['minOdds'=>7700, 'maxOdds'=>9000], # 四定，元
+            //3 => ['minOdds'=>7700, 'maxOdds'=>9000], # 四定，元
+            3 => ['minOdds'=>8500, 'maxOdds'=>9950], # 四定，元
         ];
 
         $betUnit =  $units[$playway];
         $odds = ['minOdds'=>$oddsTypes[$playway]['minOdds'], 'maxOdds'=>$oddsTypes[$playway]['maxOdds'], 'backRate'=>13];
         if($playway == 3){ # 四定
-            if(in_array($lottery_type, [1, 17])){
+            if(in_array($lottery_type, [1, 17, 19, 20, 21, 22])){
                 foreach ($codesArr as $code){
                     $codes[] = str_replace(',', '', $code);
                 }
                 $datas[] = [
+                    'betType' => 'all',
                     'backRate' => 0, # 返点，默认最高赔率，无返点
                     'betUnit' => $betUnit,
                     'playType' => self::getPlayType($playway),
@@ -2146,5 +2157,73 @@ class NineNineNewService extends BaseTZService {
         }
 
         return $rst;
+    }
+
+    /**
+     * @desc 号码下注
+     * @param string $activeQihao
+     * @param string $codes
+     * @param string $uid
+     * @param float $single
+     * @param int $playway
+     * @param int $lottery_type
+     * @param int $tz_type
+     * @return array
+     */
+    public function betByCodes($activeQihao='', $codes='', $uid='', $single=0.1, $playway=3, $lottery_type=DEFAULT_LOTTERY_TYPE, $tz_type=38){
+
+        $codesArr = $codes;
+        $items = self::getBetStyleCodes($playway, $codesArr, $single, $tz_type, $lottery_type);
+
+        $nn_qihao = self::getNineNineQihao($activeQihao, $lottery_type);
+        $post_data = [
+            'betIssue'=>(string)$nn_qihao,
+            'lotName'=>self::getLotNameByLotteryType($lottery_type),
+            'items' => $items,
+            'send' => false,
+        ];
+        $post_data = json_encode($post_data, 320);
+
+
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+        $urlArr = self::getTzSiteInfo($tz_system_id=12, $lottery_type);
+        $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id=12);
+        //p(['xCsrf'=>$xCsrf]);
+        $sortName = NineNineNewService::$lotNames[$lottery_type];
+        $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/userlottery/add';
+        $headers = [
+            "accept: application/json, text/plain, */*",
+            'Accept-Conn: {"downlink":3.65,"effectiveType":"4g","onchange":null,"rtt":100,"saveData":false,"loadedTime":936,"restime":"cloud-lottery-service-server//betCode/'.$sortName.':386"}',
+            "accept-encoding: gzip, deflate, br",
+            "accept-language: zh-CN,zh;q=0.9,en;q=0.8",
+            //"Connection: keep-alive",
+            'content-Length:'.strlen($post_data),
+            "content-type: application/json;charset=UTF-8",
+            "contenttype: application/json",
+            'cookie: '.$TzSystemsUsers->cookie,
+            //"Host: www.".$urlArr['domain'],
+            "origin: ".$urlArr['baseUrl'],
+            "referer: ".$urlArr['baseUrl']."/web/caipiao".self::getReferByLotteryType($lottery_type),
+            'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+            "sec-ch-ua-mobile: ?0",
+            "sec-fetch-dest: empty",
+            "sec-fetch-mode: cors",
+            "sec-fetch-site: same-origin",
+            $TzSystemsUsers->user_agent,
+            "usertype: 0",
+            "x-csrf-index: ".$xCsrf['Index'],
+            "x-csrf-token: ".$xCsrf['Token'],
+        ];
+
+        # 和值投注反应时间比较久，无需返回直接锁住
+        $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
+
+        # 真实投注
+        $start_time = microtime(true);
+        $tmpRst = self::postBetCurl($url, $post_data, $headers);
+        $logArr = ['uid'=>$uid, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$tmpRst];//p($logArr);
+        Tool_Common::log('/NineNineNew/quick_bet', 'INFO', '九九网快打下注',$logArr);
+
+        return $tmpRst;
     }
 }

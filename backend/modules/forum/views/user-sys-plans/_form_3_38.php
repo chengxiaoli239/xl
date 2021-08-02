@@ -9,6 +9,11 @@ use yii\widgets\ActiveForm;
 $SscKjDatas = \backend\models\SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->limit(18)->all();
 $this->title = '新过滤快打';
 ?>
+<style>
+    p {
+        word-break:break-all;
+    }
+</style>
 <div class="user-sys-plans-form row">
     <div class="col-lg-10">
         <section class="panel">
@@ -278,7 +283,7 @@ $this->title = '新过滤快打';
                         <?= Html::button('-', ['class' => 'btn single-btn btn-default']) ?>
                         </div>
                         <div class="col-lg-1 col-xs-2">
-                            <?= Html::button(Yii::t('app', 'bet_now'), ['class' => 'btn btn-success id-bet']) ?>
+                            <?= Html::button(Yii::t('app', 'bet_now'), ['class' => 'btn btn-success id-bet', 'id'=>'new-quick-bet']) ?>
                         </div>
                         &nbsp; &nbsp; &nbsp;
                         <div class="col-lg-1 col-xs-2">
@@ -325,8 +330,7 @@ $this->title = '新过滤快打';
 </div>
 <div class="modal fade" id="rstTipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
-     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
-">
+     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit; width: 1000px; height: 800px;">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -334,7 +338,7 @@ $this->title = '新过滤快打';
                     <span aria-hidden="true">×</span></button>
                 <h4 class="modal-title" id="tip_msg_title">提示信息</h4>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" >
                 <div class="form-group up-reason">
                     <label id="tip_msg_rst" for="tip_msg_rst"></label>
                 </div>
@@ -348,6 +352,7 @@ $this->title = '新过滤快打';
 </div>
 <script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
 <?php include(dirname(__FILE__).'/query-profits.php');?>
+<?php include(dirname(__FILE__).'/quick-bet.php');?>
 <script>
 $(function () {
     // 四定单双：两单两双，四单，四双等
@@ -517,7 +522,13 @@ $(function () {
         url = '/forum/ssc-static-yl/query'
         data = $('#w0').serialize()+'&type='+$(this).data('type');
         $.post(url, data, function(rst) {
-            $('#tip_msg_rst').html('<strong>号码：</strong>'+rst.code_desc + "<br>" +'<strong>组数：</strong>'+ rst.counts + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str)
+            $('#tip_msg_rst').html(
+                '<strong>号码：</strong>'+rst.code_desc + "<br>"
+                +'<strong>组数：</strong>'+ rst.counts + "<br>"
+                +'<strong>当前：</strong>'+ rst.current_times + "<br>"
+                + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>"
+                + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str + "<br>"
+                + "<p><strong>号码：</strong>" +rst.codeDatas+'</p>')
             $('#rstTipModal').modal('show');
         });
     });
