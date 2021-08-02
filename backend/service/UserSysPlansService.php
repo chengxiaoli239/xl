@@ -1075,6 +1075,8 @@ class UserSysPlansService extends BaseService {
         $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type);
         //$codes = ['0,0,6,8', '0,6,0,9'];
 
+        $rst = BetService::synBalance($uid,$tz_system_id, $is_auto=2); # 同步余额
+
         # 5、投注请求
         $BetService = BetService::getBetObj($uid, $tz_system_id, $lottery_type);
         # 下注操作
