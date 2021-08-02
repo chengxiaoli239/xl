@@ -47,8 +47,8 @@ class BaseKj{
         if($lottery_type == 5) {
             $str = substr($qihao, 2, 10);
             $qihao = str_replace('-', '', $str);
-        }elseif (in_array($lottery_type, [10, 11, 12, 13])){ # 冰岛3分  90s
-            $set_time = 5;
+        }elseif (in_array($lottery_type, [10, 11, 12, 13, 19,20,21,22])){ # 冰岛3分  90s
+            $set_time = 10;
         }else{
             $qihao = $qihao;
         }
