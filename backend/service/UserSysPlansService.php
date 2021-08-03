@@ -1030,7 +1030,7 @@ class UserSysPlansService extends BaseService {
 
             #
             $model->p1 = implode('', array_diff($all_nums, [$newOneKjData->code4])); # 千位排除个位号码
-            $model->p2 = implode('', array_diff($all_nums, [$newOneKjData->code3])); # 百位排除十位号码
+            $model->p2 = implode('', array_diff($all_nums, [])); # 百位排除十位号码
             $model->p3 = implode('', array_diff($all_nums, [$newOneKjData->code2])); # 十位排除百位号码
             $model->p4 = implode('', array_diff($all_nums, [$newOneKjData->code1])); # 个位排除千位号码
         }
