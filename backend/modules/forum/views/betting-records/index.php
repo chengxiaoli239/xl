@@ -167,6 +167,32 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
     </section>
     <!-- page end-->
 </section>
+<div class="modal fade " id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
+    <div class="modal-dialog modal-lg" role="document" style="width: 800px;margin: 100px auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_title">信息提示：</h4>
+            </div>
+            <div class="modal-body">
+                <form id="tip_form_msg" style="display:block; width:100%;height: 560px;overflow-y: scroll">
+                    <strong>推送描述：</strong>
+                    <pre><code id="push_content"></code></pre>
+                    <strong>推送号码：</strong>
+                    <pre><code id="rst_code"></code></pre>
+                </form>
+            </div>
+            <!--div class="form-group down-reason">
+                <p><label>备注信息:</label><input class="form-control" id="message" name="message" /></p>
+            </div-->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" data-type="" id="confirm_ms">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
     $(function () {
