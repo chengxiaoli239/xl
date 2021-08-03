@@ -68,7 +68,7 @@ class TzSystemsUsersController extends BaseController
     public function actionView($id)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->findModel($id, $this->_user_id),
         ]);
     }
 
@@ -114,7 +114,7 @@ class TzSystemsUsersController extends BaseController
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel($id, $this->_user_id);
         $post = Yii::$app->request->post();
         if($post){
             $post['TzSystemsUsers']['user_agent'] = 'User-Agent: '.$_SERVER['HTTP_USER_AGENT'];
@@ -145,7 +145,7 @@ class TzSystemsUsersController extends BaseController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $this->findModel($id, $this->_user_id)->delete();
 
         return $this->redirect(['index']);
     }
@@ -157,9 +157,11 @@ class TzSystemsUsersController extends BaseController
      * @return TzSystemsUsers the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id, $uid='')
     {
-        if (($model = TzSystemsUsers::findOne($id)) !== null) {
+        $where = ['id'=>$id];
+        if(!empty($uid)) $where['uid'] = $uid;
+        if (($model = TzSystemsUsers::findOne($where)) !== null) {
             return $model;
         }
 

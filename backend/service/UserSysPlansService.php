@@ -1097,12 +1097,36 @@ class UserSysPlansService extends BaseService {
         if($rstData['code'] != 200){
             $rst['status'] = $rstData['code'];
             $rst['msg'] = $rstData['msg'];
+        }else{
+            $totalmoney = count($codes)*$single;
+            # 下注成功记录：
+            $insertData = [
+                'playway'=> $playway,  // 投注方式
+                'tz_type'=> $tz_type,  // 投注类型
+                'buy_type'=> 1,  // 购买方向类型
+                'uid'=> $uid,  // 投注账号id
+                'lottery_type' => $lottery_type, # 彩种
+                'account' => $account,
+                'codes' => implode('@', $codes),  // 投注号码
+                'qihao' => $activeQihao,  // 投注期号
+                'plan_id' => '',  // 计划id
+                'tz_system_id' => $TzSystemsUsers->tz_system_id,  // 投注系统tz_systems .id
+                'sn'=>trim($sn, ','),
+                'snid'=>trim($snid, ','),
+                'order_type'=>3, # 单双三字定
+                'is_simulate' => 0,  // 是否模拟投注
+                'single' => $single,  // 投注倍数
+                'betting_money'=> $totalmoney,  // 投注金额
+            ];
+            $insertRst = BetService::_logRecords($insertData);
+            Tool_Common::log('/quick_bet/'.__FUNCTION__, 'INFO', '新过滤快打', ['account'=>$account, 'qihao'=>$activeQihao, 'playway'=>$playway, 'counts'=>count($codes), 'insertRst'=>$insertRst]);
+
         }
         $rst['data']['push_rst'] = $rstData;
 
         $rst['data']['push_data']['qihao'] = $activeQihao;
         $rst['data']['push_data']['nums'] = count($codes);
-        $rst['data']['push_data']['money'] = count($codes)*$single;
+        $rst['data']['push_data']['money'] = round($totalmoney,2);
         $rst['data']['push_data']['code_desc'] = \backend\service\NumService::getDescByKuaixuan($codes_hz);
         $rst['data']['push_data']['codes'] = str_replace('@', ',',str_replace(',', '', implode('@', $codes)));
 
