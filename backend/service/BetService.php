@@ -1240,6 +1240,7 @@ abstract class BetService extends BaseBetService {
             'qihao' => (string)$data['qihao'],  // 投注期号
             'plan_id' => $data['plan_id'],  // 计划id
             'single' => $data['single'],  // 投注期号
+            'post_desc' => $data['post_desc'],  // 投注文本
             'betting_money'=> $data['betting_money'],  // 投注金额
             'tz_system_id'=> $data['tz_system_id'],  // 投注系统tz_systems .id
             'lottery_type'=> $data['lottery_type'],  // 彩种

@@ -1030,8 +1030,8 @@ class UserSysPlansService extends BaseService {
 
             #
             $model->p1 = implode('', array_diff($all_nums, [$newOneKjData->code4])); # 千位排除个位号码
-            $model->p2 = implode('', array_diff($all_nums, [])); #
-            $model->p3 = implode('', array_diff($all_nums, [])); #
+            $model->p2 = implode('', array_diff($all_nums, [$newOneKjData->code3])); # 百位排除十位号码
+            $model->p3 = implode('', array_diff($all_nums, [$newOneKjData->code2])); # 十位排除百位号码
             $model->p4 = implode('', array_diff($all_nums, [$newOneKjData->code1])); # 个位排除千位号码
         }
 
@@ -1099,6 +1099,7 @@ class UserSysPlansService extends BaseService {
             $rst['msg'] = $rstData['msg'];
         }else{
             $totalmoney = count($codes)*$single;
+            $post_desc = \backend\service\NumService::getDescByKuaixuan($codes_hz);
             # 下注成功记录：
             $insertData = [
                 'playway'=> $playway,  // 投注方式
@@ -1127,7 +1128,7 @@ class UserSysPlansService extends BaseService {
         $rst['data']['push_data']['qihao'] = $activeQihao;
         $rst['data']['push_data']['nums'] = count($codes);
         $rst['data']['push_data']['money'] = round($totalmoney,2);
-        $rst['data']['push_data']['code_desc'] = \backend\service\NumService::getDescByKuaixuan($codes_hz);
+        $rst['data']['push_data']['code_desc'] = $post_desc;
         $rst['data']['push_data']['codes'] = str_replace('@', ',',str_replace(',', '', implode('@', $codes)));
 
         return $rst;
