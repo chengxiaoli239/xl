@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = BaseStringHelper::truncate($model->codes,25);
-                                return Html::a($txt, 'javascript:;', ['title' => $model->codes,'alt'=>$model->codes]);
+                                return Html::a($txt, 'javascript:;', ['title' => json_encode(['post_desc'=>$model->post_desc, 'codes'=>str_replace(',', '',$model->codes)])]);
                             }
                         ],
                         //'betting_money',

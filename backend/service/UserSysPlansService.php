@@ -1108,6 +1108,7 @@ class UserSysPlansService extends BaseService {
                 'uid'=> $uid,  // 投注账号id
                 'lottery_type' => $lottery_type, # 彩种
                 'account' => $account,
+                'post_desc' => $post_desc,
                 'codes' => implode('@', $codes),  // 投注号码
                 'qihao' => $activeQihao,  // 投注期号
                 'plan_id' => '',  // 计划id
