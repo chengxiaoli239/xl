@@ -167,3 +167,18 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
     </section>
     <!-- page end-->
 </section>
+<script src="/statics/js/jquery-2.0.3.js"></script>
+<script>
+    $(function () {
+        //$("[id^='act-post-desc']").click(function (rst) {
+        $(".act-post-desc").click(function (rst) {
+            bet_rst = $(this).attr('alt');
+            content = $(this).attr('title');
+
+            $('#rst_code').text(JSON.stringify(bet_rst, null, ' '))
+            $('#push_content').text(JSON.stringify(content, null, ' '))
+
+            $('#exampleModal_msg').modal('show');
+        });
+    });
+</script>
