@@ -148,10 +148,6 @@ class UserSysPlansController extends BaseController
         $defaultSiteId = UserService::getUserDefaultSite($this->_user_id);
         $model->tz_sites = [$defaultSiteId];
 
-        ########### 新过滤快打 start #############
-        UserSysPlansService::newKuaiDa($tz_type, $model, $queryParams['lottery_type'], $this->_user_id);
-        ########### 新过滤快打 end #############
-
         $is_filters = [1=>'是'];
         $filter_pos1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
         $filter_pos2 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
@@ -318,14 +314,14 @@ class UserSysPlansController extends BaseController
         $playway = betservice::getplaywaybytztype($tz_type=38);
 
         if($this->_post){
-            $this->_post['usersysplans']['lottery_type'] = $queryParams['lottery_type'];
+            $this->_post['UserSysPlans']['lottery_type'] = $queryParams['lottery_type'];
         }
         $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
 
-        usersysplansservice::preopdata($this->_post, $this->_user_id);
+        UserSysPlansService::preopdata($this->_post, $this->_user_id);
         if ($model->load($this->_post) && $model->save()) {
             if(in_array($tz_type, \yii::$app->params['import_codes_types']) && $model->id){ # 导入号码保存
-                usersysplansservice::saveimportcodestxt($model->id, $this->_post['usersysplans']['import_codes_txts'], (int)$this->_post['change_per'][0], $this->_user_id);
+                UserSysPlansService::saveimportcodestxt($model->id, $this->_post['usersysplans']['import_codes_txts'], (int)$this->_post['change_per'][0], $this->_user_id);
             }
             return $this->redirect(['index', 'usersysplans[lottery_type]'=>$queryParams['lottery_type']]);
         }

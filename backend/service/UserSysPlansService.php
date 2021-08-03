@@ -971,8 +971,8 @@ class UserSysPlansService extends BaseService {
     public static function getUserSetConfigs($uid=11){
         $configs = [
             11 => [
-                'start_hz' => 11,
-                'end_hz' => 25,
+                'start_hz' => 9,
+                'end_hz' => 27,
             ]
         ];
         if(empty($configs[$uid])) return $configs;
@@ -994,7 +994,7 @@ class UserSysPlansService extends BaseService {
     /**
      * @param $tz_type
      * @param $model
-     * @param $lottery_type 彩种
+     * @param $lottery_type - 彩种
      * @param string $uid
      * @return bool
      */
@@ -1003,7 +1003,8 @@ class UserSysPlansService extends BaseService {
         $config = self::getUserSetConfigs($uid);
         $newKjDatas = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(3)->all();
         $all_nums = [0,1,2,3,4,5,6,7,8,9];
-        $newOneKjData = $newKjDatas[0];
+        $newOneKjData = $newKjDatas[0]; # 倒数第一期
+        $newTwoKjData = $newKjDatas[1]; # 倒数第二期
         $kj_nums = explode(',', $newOneKjData->code_4n_str);
         $getNums = array_diff($all_nums, $kj_nums); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码
         //p([$newOneKjData, $all_nums, $kj_nums, $getNums]);
@@ -1026,16 +1027,77 @@ class UserSysPlansService extends BaseService {
             $model->type_3b = [0]; # 排除三兄弟
 
             $all_type_ds_Arr = UserSysPlansService::getCodeTypes($flag = 3); # 单双类型：1122,2121 等
-            $model->type_ds_details = array_diff($all_type_ds_Arr, [$newOneKjData->code_1_2_3_4]);
+            //$model->type_ds_details = array_diff($all_type_ds_Arr, [$newOneKjData->code_1_2_3_4, '1111', '2222']);
+            $model->type_ds_details = array_diff($all_type_ds_Arr, ['1111', '2222']);
 
-            #
-            $model->p1 = implode('', array_diff($all_nums, [$newOneKjData->code4])); # 千位排除个位号码
-            $model->p2 = implode('', array_diff($all_nums, [])); # 百位排除十位号码
-            $model->p3 = implode('', array_diff($all_nums, [$newOneKjData->code2])); # 十位排除百位号码
-            $model->p4 = implode('', array_diff($all_nums, [$newOneKjData->code1])); # 个位排除千位号码
+            ############################  位置号码过滤 start  #################################
+            # 1、千位 过滤的号码
+            $p1_remove_codes = [$newOneKjData->code4];
+            if($newOneKjData->code1 == $newTwoKjData->code1){
+                $p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newTwoKjData->code1));
+            }
+            if($newTwoKjData->code3 == $newOneKjData->code2){ # 斜对
+                $p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newTwoKjData->code3));
+            }
+            $v1 = $newOneKjData->code1 + $newTwoKjData->code1; # 两个位置对着，是单双或者双单
+            if(($v1%2) == 1){
+                $p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newOneKjData->code1));
+            }
+            # 2、百位
+            $p2_remove_codes = [];
+            $v2 = $newOneKjData->code2 + $newTwoKjData->code2; # 两个位置对着，是单双或者双单
+            if(($v2%2) == 1){
+                $p2_remove_codes = array_merge($p2_remove_codes, self::removeBnums($newOneKjData->code2));
+            }
+            # 3、个位
+            $p3_remove_codes = [];
+            $v3 = $newOneKjData->code3 + $newTwoKjData->code3; # 两个位置对着，是单双或者双单
+            if(($v3%2) == 1){
+                $p3_remove_codes = array_merge($p3_remove_codes, self::removeBnums($newOneKjData->code3));
+            }
+            # 4、个位排除
+            $p4_remove_codes = [$newOneKjData->code1];
+            if($newOneKjData->code4 == $newTwoKjData->code4){
+                $p4_remove_codes = array_merge($p4_remove_codes, self::removeBnums($newTwoKjData->code1));
+            }
+            if($newTwoKjData->code2 == $newOneKjData->code3){
+                $p4_remove_codes = array_merge($p4_remove_codes, self::removeBnums($newTwoKjData->code3));
+            }
+            $v4 = $newOneKjData->code4 + $newTwoKjData->code4; # 两个位置对着，是单双或者双单
+            if(($v4%2) == 1){
+                $p4_remove_codes = array_merge($p4_remove_codes, self::removeBnums($newOneKjData->code4));
+            }
+
+            $model->p1 = implode('', array_diff($all_nums, $p1_remove_codes)); # 千位排除个位号码
+            $model->p2 = implode('', array_diff($all_nums, $p2_remove_codes)); # 百位排除十位号码
+            $model->p3 = implode('', array_diff($all_nums, $p3_remove_codes)); # 十位排除百位号码
+            $model->p4 = implode('', array_diff($all_nums, $p4_remove_codes)); # 个位排除千位号码
+            ############################  位置号码过滤 start  #################################
         }
 
         return $flag;
+    }
+
+    /**
+     * @desc 去除相邻号码
+     * @param $code
+     * @return int[]
+     */
+    public static function removeBnums($code){
+        $reomveCodes = [];
+        /*
+        if($code === 0) {
+            $reomveCodes = [1, 9];
+        }elseif ($code == 9) {
+            $reomveCodes = [0, 8];
+        }else{
+            $reomveCodes = [$code-1, $code+1];
+        }
+        */
+        if(!in_array($code, [0,1,9])){
+            $reomveCodes = [$code-1, $code+1];
+        }
+        return $reomveCodes;
     }
 
     /**
