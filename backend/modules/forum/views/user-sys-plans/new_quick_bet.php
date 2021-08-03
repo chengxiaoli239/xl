@@ -1,3 +1,8 @@
+<style>
+    .form-control{
+        padding: 0px 3px;
+    }
+</style>
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: green;">
 <div class="row">
     <div class="col-lg-2 col-xs-2">
@@ -5,12 +10,12 @@
     </div>
 
     <div class="col-lg-2 col-xs-2">
-        <?= $form->field($model, 'arb_pos_isbaohan')->checkboxList([1=>'是',0=>'否'])->label('包含') ?>
+        <?= $form->field($model, 'arb_pos_isbaohan')->checkboxList([1=>'是'])->label('包含') ?>
     </div>
     <div class="col-lg-4 col-xs-4">
         <?= $form->field($model, 'arb_pos_codes')->textInput()->label('号码') ?>
     </div>
-    <div class="col-lg-2 col-xs-1">
+    <div class="col-lg-2 col-xs-3">
         <?= $form->field($model, 'arb_pos_nums')->textInput()->label('个数') ?>
     </div>
 </div>
