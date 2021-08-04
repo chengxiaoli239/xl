@@ -1127,6 +1127,7 @@ class UserSysPlansService extends BaseService {
         ];
         $code_type = $code_types[$data['UserSysPlans']['playway']];
         $tz_type = $data['UserSysPlans']['tz_type'];
+        $is_test = $data['UserSysPlans']['is_test']; # 是否模拟
         //p([$uid, $tz_system_id, $lottery_type]);
         $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
         //p([$tz_type, $activeQihao]);
@@ -1156,7 +1157,7 @@ class UserSysPlansService extends BaseService {
             Tool_Common::log('/tz_err/tzByPlanId','INFO','投注记录 异常', $logArr);
             return ['status'=>301, 'msg'=>'投注异常', 'tmpRst'=>false];
         }
-        if($rstData['code'] != 200){
+        if(!$is_test && $rstData['code'] != 200){
             $rst['status'] = $rstData['code'];
             $rst['msg'] = $rstData['msg'];
         }else{

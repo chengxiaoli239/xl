@@ -53,11 +53,10 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = BaseStringHelper::truncate($model->codes,25);
-                                $title = json_encode(['post_desc'=>$model->post_desc], 320);
                                 return Html::a($txt, 'javascript:;', [
                                     'class'=>'act-post-desc',
-                                    'title'=>$title,
-                                    'alt'=>json_encode(['codes'=>str_replace('@', ',',str_replace(',', '',$model->codes))], 320)
+                                    'title'=>$model->post_desc,
+                                    'alt'=>str_replace('@', ',',str_replace(',', '',$model->codes)),
                                 ]);
                             }
                         ],
@@ -202,7 +201,8 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
             content = $(this).attr('title');
 
             $('#rst_code').text(JSON.stringify(bet_rst, null, ' '))
-            $('#push_content').text(JSON.stringify(content, null, ' '))
+            //$('#push_content').text(JSON.stringify(content, null, ' '))
+            $('#push_content').text(content)
 
             $('#exampleModal_msg').modal('show');
         });

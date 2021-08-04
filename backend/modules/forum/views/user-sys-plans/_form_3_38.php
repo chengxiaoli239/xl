@@ -34,8 +34,16 @@ $this->title = '新过滤快打';
                 <input type="hidden" value="<?=$model->playway?>" name="UserSysPlans[playway]">
 
                 <div class="row">
-                    <div class="col-lg-2 col-xs-6">
+                    <div class="col-lg-2 col-xs-4">
                         <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
+                    </div>
+                    <div class="col-lg-2 col-xs-4">
+                    </div>
+                    <div class="col-lg-2 col-xs-4">
+                        <?= $form->field($model, 'is_test')->radioList([
+                            '0'=>'真',
+                            '1'=>'模拟',
+                        ])->label('真/模拟') ?>
                     </div>
                 </div>
 
