@@ -1304,6 +1304,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if($is_auto == 1 && (strpos($TzSystemsUsers->desc, '您的访问过于频繁') !== false OR strpos($TzSystemsUsers->desc, '用户名或密码不正确') !== false)){
             return ['status'=>300, 'msg'=>'您的访问过于频繁，请稍后再试 或 用户名或密码不正确'];
         }
+        if(empty($TzSystemsUsers->cookie)){
+            return ['status'=>302, 'msg'=>'cookie为空，不能正常获取用户信息'];
+        }
 
         $_t = (int)microtime(true) * 1000;
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/GetMemberPrint?_='.$_t;
