@@ -334,7 +334,7 @@ class IndexController extends Controller
     public function actionSynBalance(){
         self::_init();
         $rst = ['status'=>200, 'msg'=>'同步余额'];
-        $TzSystemsUsers = TzSystemsUsers::findAll(['status'=>1]);
+        $TzSystemsUsers = TzSystemsUsers::find()->where(['AND', ['=', 'status', 1], ['!=', 'tz_system_id', 9]])->all(); # 9:幸运五 python已经做同步,这里不需要再重复请求
 
         foreach ($TzSystemsUsers as $TzSystemsUser){
             $rst['rst'][$TzSystemsUser->id] = BaseService::synBalance($TzSystemsUser->id);
