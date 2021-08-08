@@ -1013,6 +1013,7 @@ class UserSysPlansService extends BaseService {
         $all_nums = [0,1,2,3,4,5,6,7,8,9];
         $newOneKjData = $newKjDatas[0]; # 倒数第一期，最新
         $newTwoKjData = $newKjDatas[1]; # 倒数第二期
+        $newThreeKjData = $newKjDatas[2]; # 倒数第三期
         $kj_nums = explode(',', $newOneKjData->code_4n_str);
         $getNums = array_diff($all_nums, $kj_nums); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码
         $allHz = self::getAllHz($config['start_hz'], $config['end_hz']); # 用户默认和值
@@ -1043,31 +1044,34 @@ class UserSysPlansService extends BaseService {
 
             ############################  位置号码过滤 start  #################################
             # 1、千位 过滤的号码
-            $p1_remove_codes = [$newOneKjData->code4];
+            $p1_remove_codes = [$newOneKjData->code4, ($newThreeKjData->code3+$newTwoKjData->code2)%10];
             if($newOneKjData->code1 == $newTwoKjData->code1){
-                $p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newTwoKjData->code1));
+                #$p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newTwoKjData->code1)); # 除左右边数
+                $p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newTwoKjData->code1)); #
             }
             if($newTwoKjData->code3 == $newOneKjData->code2){ # 斜对
                 $p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newTwoKjData->code3));
             }
             $v1 = $newOneKjData->code1 + $newTwoKjData->code1; # 两个位置对着，是单双或者双单
             if(($v1%2) == 1){
-                $p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newOneKjData->code1));
+                //$p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newOneKjData->code1));
             }
             # 2、百位
             $p2_remove_codes = [];
             $v2 = $newOneKjData->code2 + $newTwoKjData->code2; # 两个位置对着，是单双或者双单
-            if(($v2%2) == 1){
+            //if(($v2%2) == 1){
+            if(($newThreeKjData->code2>$newTwoKjData->code2 && $newTwoKjData->code2>$newOneKjData->code2) OR ($newThreeKjData->code2<$newTwoKjData->code2 && $newTwoKjData->code2<$newOneKjData->code2)){
                 $p2_remove_codes = array_merge($p2_remove_codes, self::removeBnums($newOneKjData->code2));
             }
             # 3、个位
             $p3_remove_codes = [];
-            $v3 = $newOneKjData->code3 + $newTwoKjData->code3; # 两个位置对着，是单双或者双单
-            if(($v3%2) == 1){
+            //$v3 = $newOneKjData->code3 + $newTwoKjData->code3; # 两个位置对着，是单双或者双单
+            if(($newThreeKjData->code3>$newTwoKjData->code3 && $newTwoKjData->code3>$newOneKjData->code3) OR ($newThreeKjData->code3<$newTwoKjData->code3 && $newTwoKjData->code3<$newOneKjData->code3)){
+            #if(($v3%2) == 1){
                 $p3_remove_codes = array_merge($p3_remove_codes, self::removeBnums($newOneKjData->code3));
             }
             # 4、个位排除
-            $p4_remove_codes = [$newOneKjData->code1];
+            $p4_remove_codes = [$newOneKjData->code1, ($newThreeKjData->code2+$newTwoKjData->code3)%10];
             if($newOneKjData->code4 == $newTwoKjData->code4){
                 $p4_remove_codes = array_merge($p4_remove_codes, self::removeBnums($newTwoKjData->code1));
             }
@@ -1076,7 +1080,7 @@ class UserSysPlansService extends BaseService {
             }
             $v4 = $newOneKjData->code4 + $newTwoKjData->code4; # 两个位置对着，是单双或者双单
             if(($v4%2) == 1){
-                $p4_remove_codes = array_merge($p4_remove_codes, self::removeBnums($newOneKjData->code4));
+                //$p4_remove_codes = array_merge($p4_remove_codes, self::removeBnums($newOneKjData->code4));
             }
 
             $model->p1 = implode('', array_diff($all_nums, $p1_remove_codes)); # 千位排除个位号码
@@ -1096,7 +1100,6 @@ class UserSysPlansService extends BaseService {
      */
     public static function removeBnums($code){
         $reomveCodes = [];
-        /*
         if($code === 0) {
             $reomveCodes = [1, 9];
         }elseif ($code == 9) {
@@ -1104,10 +1107,11 @@ class UserSysPlansService extends BaseService {
         }else{
             $reomveCodes = [$code-1, $code+1];
         }
-        */
-        if(!in_array($code, [0,1,9])){
+        /*
+        if(true OR !in_array($code, [0,1,9])){
             $reomveCodes = [$code-1, $code+1];
         }
+        */
         return $reomveCodes;
     }
 
