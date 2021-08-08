@@ -1111,6 +1111,11 @@ class NumService extends BaseService {
             }
         }
 
+        # tz_type:38 三现:双重+两兄弟 1
+        if(isset($codes_hz['type_3n_2b']) && $codes_hz['type_3n_2b'] !== ''){
+            $where = array_merge($where, [['=', 'type_3n_2b', (int)$codes_hz['type_3n_2b']]]);
+        }
+
         # tz_type:28 三现:双重+两兄弟 1
         if(($codes_hz['get_types'] && in_array(1, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(1, $codes_hz['remove_types']) )){
             if($codes_hz['get_types'] && in_array(1, $codes_hz['get_types'])){
@@ -1586,14 +1591,17 @@ class NumService extends BaseService {
         if(isset($hz_Arr['type_3b'])){
             if($hz_Arr['type_3b'] == 1) $filter1['type_3b'] = 1; else $filter0['type_3b'] = 0;
         }
-        # 7、四兄弟
+        # 7.1、四兄弟
         if(isset($hz_Arr['type_4b'])){
             if($hz_Arr['type_4b'] == 1) $filter1['type_4b'] = 1; else $filter0['type_4b'] = 0;
         }
-        //p([$filter0, $filter1]);
-        # 7、对数
+        # 7.2、对数
         if(isset($hz_Arr['type_log'])){
             if($hz_Arr['type_log'] == 1) $filter1['type_log'] = 1; else $filter0['type_log'] = 0;
+        }
+        # 7.3、三现:双重+两兄
+        if(isset($hz_Arr['type_3n_2b'])){
+            if($hz_Arr['type_3n_2b'] == 1) $filter1['type_3n_2b'] = 1; else $filter0['type_3n_2b'] = 0;
         }
 
         # 8.1、和值
@@ -1817,10 +1825,11 @@ class NumService extends BaseService {
             'type_2'=>'双重',
             'type_3'=>'三重',
             'type_4'=>'四重',
-            'type_22'=>'双双重',
-            'type_2b'=>'两兄弟',
-            'type_3b'=>'三兄弟',
-            'type_4b'=>'四兄弟',
+            'type_22'=>'双双',
+            'type_2b'=>'两兄',
+            'type_3b'=>'三兄',
+            'type_3n_2b'=>'三现[双重+两兄]',
+            'type_4b'=>'四兄',
             'type_log'=>'对数',
             'type_4d'=>'四单',
             'type_4s'=>'四双',

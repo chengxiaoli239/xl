@@ -51,6 +51,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $type_2b; # 两兄弟
     public $type_3b; # 三兄弟
     public $type_4b; # 四兄弟
+    public $type_3n_2b; # 三现:双重+两兄
     public $hz; # 四兄弟
     public $arise; # 上奖
     public $get_arises; # 上奖：取

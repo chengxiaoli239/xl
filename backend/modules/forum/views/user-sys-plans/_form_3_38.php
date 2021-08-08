@@ -35,7 +35,7 @@ $this->title = '新过滤快打';
 
                 <div class="row">
                     <div class="col-lg-2 col-xs-4">
-                        <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
+                        <?= $form->field($model, 'arise')->textInput()->label('上将') ?>
                     </div>
                     <div class="col-lg-2 col-xs-4">
                     </div>
@@ -49,7 +49,7 @@ $this->title = '新过滤快打';
 
                 <div class="row">
                     <div class="col-lg-2 col-xs-6">
-                        <?= $form->field($model, 'p1')->textInput()->label('千
+                        <?= $form->field($model, 'p1')->textInput()->label('仟
                             <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_1">大</a>
                             <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_2">小</a>
                             <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_1">单</a>
@@ -57,7 +57,7 @@ $this->title = '新过滤快打';
                         ') ?>
                     </div>
                     <div class="col-lg-2 col-xs-6">
-                        <?= $form->field($model, 'p2')->textInput()->label('百
+                        <?= $form->field($model, 'p2')->textInput()->label('佰
                             <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_1">大</a>
                             <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_2">小</a>
                             <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_1">单</a>
@@ -65,7 +65,7 @@ $this->title = '新过滤快打';
                         ') ?>
                     </div>
                     <div class="col-lg-2 col-xs-6">
-                        <?= $form->field($model, 'p3')->textInput()->label('十
+                        <?= $form->field($model, 'p3')->textInput()->label('什
                             <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_1">大</a>
                             <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_2">小</a>
                             <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_1">单</a>
@@ -135,7 +135,7 @@ $this->title = '新过滤快打';
                     </div>
                     <div class="col-lg-3 col-xs-6">
                         <!--位置合分：合分-- >
-                    <?= $form->field($model, 'no_fix_hefen')->textInput()->label('2.不定位合分:值')?>
+                    <?= $form->field($model, 'no_fix_hefen')->textInput()->label('2.不定合分:值')?>
                     </div>
                 </div>
                 -->
@@ -143,10 +143,10 @@ $this->title = '新过滤快打';
                 <div class="row">
                     <div class="col-lg-1 col-xs-4">
                         <!--三定含除、取-->
-                    <?= $form->field($model, 'arise_in_sel')->checkboxList([1=>'除',2=>'取'])->label('3.四字定含') ?>
+                    <?= $form->field($model, 'arise_in_sel')->checkboxList([1=>'除',2=>'取'])->label('3.四字含') ?>
                     </div>
                     <div class="col-lg-2 col-xs-6">
-                        <?= $form->field($model, 'arise_in')->textInput()->label('3.四字定含')?>
+                        <?= $form->field($model, 'arise_in')->textInput()->label('3.四字含')?>
                     </div>
                 </div>
 
@@ -193,19 +193,19 @@ $this->title = '新过滤快打';
                         <?= $form->field($model, 'type_22')->checkBoxList([
                             0=>'除',
                             1=>'取'
-                        ])->label('双双重') ?>
+                        ])->label('双双') ?>
                     </div>
                     <div class="col-lg-1 col-xs-4">
                         <?= $form->field($model, 'type_2b')->checkBoxList([
                             0=>'除',
                             1=>'取'
-                        ])->label('两兄弟') ?>
+                        ])->label('两兄') ?>
                     </div>
                     <div class="col-lg-1 col-xs-4">
                         <?= $form->field($model, 'type_3b')->checkBoxList([
                             0=>'除',
                             1=>'取'
-                        ])->label('三兄弟') ?>
+                        ])->label('三兄') ?>
                     </div>
                 <!--
                 </div>
@@ -215,7 +215,7 @@ $this->title = '新过滤快打';
                         <?= $form->field($model, 'type_4b')->checkBoxList([
                             0=>'除',
                             1=>'取'
-                        ])->label('四兄弟') ?>
+                        ])->label('四兄') ?>
                     </div>
                     <div class="col-lg-1 col-xs-4">
                         <?= $form->field($model, 'type_log')->checkBoxList([
@@ -231,16 +231,23 @@ $this->title = '新过滤快打';
                             1=>'取',
                         ])->label('双两兄') ?>
                     </div>
-                    <!--
+                <!--
                 </div>
                 <div class="row">
                 -->
-                    <div class="col-lg-3 col-xs-4">
+                    <div class="col-lg-1 col-xs-4">
                         <?= $form->field($model, 'type_4s')->checkBoxList([
                             //0=>'非四单四双',
                             0=>'除',
                             1=>'取',
                         ])->label('四双') ?>
+                    </div>
+                    <div class="col-lg-1 col-xs-4">
+                        <?= $form->field($model, 'type_3n_2b')->checkBoxList([
+                            //0=>'非四单四双',
+                            0=>'除',
+                            1=>'取',
+                        ])->label('三现:双+两兄') ?>
                     </div>
                 </div>
 
@@ -328,7 +335,7 @@ $this->title = '新过滤快打';
     <div class="col-lg-2">
         <section class="panel">
             <header class="panel-heading">
-                <?= '<strong><font color="green">最新开奖</font>&nbsp;&nbsp;&nbsp;</strong>' ?>
+                <?= '<strong><font color="green">最新记录</font>&nbsp;&nbsp;&nbsp;</strong>' ?>
             </header>
             <?php foreach ($SscKjDatas as $sscKjData){ ?>
             <header class="panel-heading" title="<?=substr($sscKjData['update_time'],10)?>"><strong><?=$sscKjData['qihao'] ?> &nbsp; <font color="green"><?=$sscKjData['code_str'] ?></font></strong>&nbsp;&nbsp; &nbsp; <?=$sscKjData['codes_4nums_hz']?></header>

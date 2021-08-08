@@ -129,6 +129,11 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['type_4b'] = $UserSysPlans['type_4b'][0];
         }
         unset($post['UserSysPlans']['type_4b']);
+        # 7、三现：双重+两兄
+        if($UserSysPlans['type_3n_2b'] && count($UserSysPlans['type_3n_2b']) == 1){
+            $tmpFilter['type_3n_2b'] = $UserSysPlans['type_3n_2b'][0];
+        }
+        unset($post['UserSysPlans']['type_3n_2b']);
         # 8、和值
         if(isset($post['UserSysPlans']['hz']) && $post['UserSysPlans']['hz']){
             $tmpFilter['hz'] = $post['UserSysPlans']['hz'];
@@ -971,8 +976,11 @@ class UserSysPlansService extends BaseService {
     public static function getUserSetConfigs($uid=11){
         $configs = [
             11 => [
-                'start_hz' => 9,
-                'end_hz' => 27,
+                'start_hz' => 9, # 起始和值
+                'end_hz' => 27, # 结束和值
+                'remove_type_ds_Arr' => ['1111', '2222'], # 单双
+                'type_3b' => [0], # 三兄
+                'type_3n_2b' => [0], # 三现：双重+两兄
             ]
         ];
         if(empty($configs[$uid])) return $configs;
@@ -1003,18 +1011,19 @@ class UserSysPlansService extends BaseService {
         $config = self::getUserSetConfigs($uid);
         $newKjDatas = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(3)->all();
         $all_nums = [0,1,2,3,4,5,6,7,8,9];
-        $newOneKjData = $newKjDatas[0]; # 倒数第一期
+        $newOneKjData = $newKjDatas[0]; # 倒数第一期，最新
         $newTwoKjData = $newKjDatas[1]; # 倒数第二期
         $kj_nums = explode(',', $newOneKjData->code_4n_str);
         $getNums = array_diff($all_nums, $kj_nums); # 数组1跟数组2的差集， 主要是排除最近一期的开奖号码
-        //p([$newOneKjData, $all_nums, $kj_nums, $getNums]);
         $allHz = self::getAllHz($config['start_hz'], $config['end_hz']); # 用户默认和值
+        //p([$allHz, $all_nums, $kj_nums, $getNums]);
 
-        if($tz_type==38){
+        if($tz_type==38){ # 过滤快打
             $model->arb_pos_isbaohan = 1; # 是否包含
             $model->arb_pos_codes = implode('', $getNums); # 排除掉上期开奖号码
             $model->arb_pos_nums = 2; # 排除掉上期开奖号码至少上两个
-            $newHz = $newOneKjData->codes_hz;
+            //p($newOneKjData->attributes);
+            $newHz = $newOneKjData->codes_4nums_hz;
             $newHz_t = 36 - $newHz;
             foreach ([$newHz, $newHz_t] as $hz){
                 if(in_array($hz, $allHz)){
@@ -1024,11 +1033,13 @@ class UserSysPlansService extends BaseService {
             }
             //p([$allHz]);
             $model->hz = $allHz;
-            $model->type_3b = [0]; # 排除三兄弟
+            $model->type_3b = $config['type_3b']; # 排除三兄弟
+            $model->type_3n_2b = $config['type_3n_2b']; # 三现：双重+两兄
 
             $all_type_ds_Arr = UserSysPlansService::getCodeTypes($flag = 3); # 单双类型：1122,2121 等
             //$model->type_ds_details = array_diff($all_type_ds_Arr, [$newOneKjData->code_1_2_3_4, '1111', '2222']);
-            $model->type_ds_details = array_diff($all_type_ds_Arr, ['1111', '2222']);
+            $remove_type_ds_Arr = $config['remove_type_ds_Arr']?array_merge([$newOneKjData->code_1_2_3_4], $config['remove_type_ds_Arr']):[];
+            $model->type_ds_details = array_diff($all_type_ds_Arr, $remove_type_ds_Arr);
 
             ############################  位置号码过滤 start  #################################
             # 1、千位 过滤的号码
