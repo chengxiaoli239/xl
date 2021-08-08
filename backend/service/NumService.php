@@ -2006,7 +2006,7 @@ class NumService extends BaseService {
      * @param $codes_desc   千12345百12345十67890
      * @return array ['p1'=>12345, 'p2'=>12345, 'p3'=>67890]
      */
-    public static function getCodesHzByDesc($codes_desc){
+    public static function getCodesHzByDesc($codes_desc=''){
         //echo $codes_desc.'<br>';
         $data = [];
         if(!$codes_desc) return $data;

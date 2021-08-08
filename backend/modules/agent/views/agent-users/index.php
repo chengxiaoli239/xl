@@ -10,6 +10,11 @@ use yii\widgets\Pjax;
 $this->title = Yii::t('app', 'Agent Users');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<style>
+    .adv-table table tr td{
+        padding: 5px;
+    }
+</style>
 <section class="agent-users-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
@@ -24,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 </div>
 
-    <?php Pjax::begin(); ?>
+    <?php //Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
@@ -190,7 +195,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                  'act-up-balance' => function ($url, $model, $key) {
                                      $options = [
                                          'type'=>'button',
-                                         'class'=>'min-btn btn-info act-up-balance btn btn-default',
+                                         'class'=>'btn-xs min-btn btn-info act-up-balance btn btn-default',
                                          'data-id' => $model->id,
                                          'data-name' => $model->name,
                                      ];
@@ -199,7 +204,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                  'act-down-balance' => function ($url, $model, $key) {
                                      $options = [
                                          'type'=>'button',
-                                         'class'=>'min-btn btn-info act-down-balance btn btn-default',
+                                         'class'=>'btn-xs min-btn btn-info act-down-balance btn btn-default',
                                          'data-id'=>$model->id,
                                          'data-name' => $model->name,
                                      ];
@@ -208,7 +213,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                  'act-user-edit' => function ($url, $model, $key) {
                                      $options = [
                                          'type'=>'button',
-                                         'class'=>'min-btn btn-info act-user-edit btn btn-default',
+                                         'class'=>'btn-xs min-btn btn-info act-user-edit btn btn-default',
                                          'data-id'=>$model->id,
                                          'data-token'=>$model->token,
                                          'data-name' => $model->name,
@@ -218,7 +223,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                  'act-user-del' => function ($url, $model, $key) {
                                      $options = [
                                          'type'=>'button',
-                                         'class'=>'min-btn btn-info act-user-del btn btn-default',
+                                         'class'=>'btn-xs min-btn btn-info act-user-del btn btn-default',
                                          'data-id'=>$model->id,
                                          'data-name' => $model->name,
                                      ];
@@ -227,7 +232,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                  'act-user-balance-flows' => function ($url, $model, $key) {
                                      $options = [
                                          'type'=>'button',
-                                         'class'=>'min-btn btn-info act-user-balance-flows btn btn-default',
+                                         'class'=>'btn-xs min-btn btn-info act-user-balance-flows btn btn-default',
                                          'data-id'=>$model->id,
                                          'data-name' => $model->name,
                                      ];
@@ -236,7 +241,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                  'act-user-copy-url' => function ($url, $model, $key) {
                                      $options = [
                                          'type'=>'button',
-                                         'class'=>'min-btn btn-info act-user-copy-url btn btn-default',
+                                         'class'=>'btn-xs min-btn btn-info act-user-copy-url btn btn-default',
                                          'data-id'=>$model->id,
                                          'data-token'=>$model->token,
                                          'data-name' => $model->name,
@@ -256,7 +261,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
-    <?php Pjax::end(); ?>
+    <?php //Pjax::end(); ?>
             </div>
         </div>
     </section>

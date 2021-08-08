@@ -64,7 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'data-id' => $model->id,
                                         'data-balance' => $model->balance,
                                         'data-name' => $model->member_account,
-                                        'class'=>'min-btn btn-success act-check btn',
+                                        'class'=>'min-btn btn-xs btn-success act-check btn',
                                         'data-status' => 1,
                                     ];
                                     $txt1 = Html::button('通过', $options1);
@@ -75,10 +75,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'data-id' => $model->id,
                                         'data-balance' => $model->balance,
                                         'data-name' => $model->member_account,
-                                        'class'=>'min-btn btn-danger act-check btn',
+                                        'class'=>'min-btn btn-xs btn-danger act-check btn',
                                         'data-status' => 2,
                                     ];
-                                    $txt2 = Html::button('拒绝', $options2);
+                                    $txt2 = Html::button('</strong>拒绝</strong>', $options2);
 
                                     return $txt1 ."&nbsp;&nbsp;". $txt2;
                                 }
@@ -180,13 +180,13 @@ $this->params['breadcrumbs'][] = $this->title;
             var status = $(this).attr('data-status');
             var account = $(this).attr('data-name');
             var balance = $(this).attr('data-balance');
-            var rst_msg = status == 1 ? '通过' : '拒绝';
+            var rst_msg = status == 1 ? '<font color="green">通过</font>' : '<font color="red">拒绝</font>';
             console.log();
             $("#check_id").val(id);
             $("#check_status").val(status);
 
             $("#check_tip_msg_title").html("提示信息：");
-            $("#check_tip_msg").html(rst_msg + ': 用户 '+ account +', 申请' + type_desc + balance + '积分');
+            $("#check_tip_msg").html('<strong>'+rst_msg + '</strong>: 用户 '+ account +', 申请' + type_desc + balance + '积分');
             $("#checkTipModal").modal('show');
         });
 

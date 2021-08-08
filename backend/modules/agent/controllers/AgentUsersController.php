@@ -39,7 +39,9 @@ class AgentUsersController extends BaseController
     public function actionIndex()
     {
         $searchModel = new AgentUsersSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        if($this->_user_id !== 1) $queryParams['AgentUsers']['agent_id'] = $this->_user_id;
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,

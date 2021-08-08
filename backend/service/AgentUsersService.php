@@ -52,10 +52,10 @@ class AgentUsersService extends BaseService {
      * @param $account
      * @return array
      */
-    public static function updateAgentUsersStatus($id, $status, $uid = '', $field)
+    public static function updateAgentUsersStatus($id, $status, $uid = '', $field='')
     {
         if(!$uid) return ['status'=>300, 'msg'=>'用户id为空'];
-        $model = AgentUsers::findOne(['agent_id' => $uid, 'id' => $id]);
+        $model = AgentUsers::findOne(['agent_id'=>$uid, 'id'=>$id]);
         if(!$model) return ['status'=>301, 'msg'=>'找不到记录'];
         $m = \Yii::$app->cache;
         $mkey = 'updateSysPlansStatus_'.$field.'_'.$id.'_'.$status;
@@ -86,9 +86,10 @@ class AgentUsersService extends BaseService {
                 $rst = ['status'=>302, 'msg'=>'积分不能为空'];
             }else{
                 $AgentUsers = AgentUsers::findOne(['agent_id'=>$agent_id, 'id'=>$id]);
+                if(empty($AgentUsers)) return ['status'=>404, 'msg'=>'未找到用户记录1'];
                 if($act == 'act-up-balance'){
                     $f = '加';
-                    $AgentUsers->balance = $AgentUsers->balance + $balance;
+                    $AgentUsers->balance = $AgentUsers->balance + floatval($balance);
                 }elseif ($act == 'act-down-balance'){
                     $f = '减';
                     $AgentUsers->balance = $AgentUsers->balance - $balance;
@@ -105,14 +106,14 @@ class AgentUsersService extends BaseService {
 
         }elseif ($act == 'act-user-edit'){
             if(empty($post['name'])) return ['status'=>303, 'msg'=>'用户名不能为空'];
-            $flag = 0;
-            if($AgentUsers = AgentUsers::findOne(['agent_id'=>$agent_id, 'id'=>$post['id']])){
-                $AgentUsers->name = trim($post['name']);
-                $AgentUsers->token = trim($post['token']);
-                $flag = $AgentUsers->save();
-            }
+            p(['agent_id'=>$agent_id, 'id'=>$post['id']]);
+            $AgentUsers = AgentUsers::findOne(['agent_id'=>$agent_id, 'id'=>$post['id']]);
+            if(empty($AgentUsers)) return ['status'=>404, 'msg'=>'未找到用户记录2'];
+            $AgentUsers->name = trim($post['name']);
+            $AgentUsers->token = trim($post['token']);
+            $flag = $AgentUsers->save();
             if(!$flag) {
-                return ['status'>300, 'msg'=>'删除失败，用户名：'.$AgentUsers->name];
+                return ['status'>301, 'msg'=>'保存失败，用户名：'.$AgentUsers->name];
             }
             $rst['msg'] = '成功修改用户名：'.$AgentUsers->name;
             $rst['name_now'] = $AgentUsers->name;
@@ -122,7 +123,7 @@ class AgentUsersService extends BaseService {
                 $flag = $AgentUsers->delete();
             }
             if(!$flag) {
-                return ['status'>300, 'msg'=>'删除失败，用户名：'.$AgentUsers->name];
+                return ['status'>302, 'msg'=>'删除失败，用户名：'.$AgentUsers->name];
             }
 
             $rst['msg'] = '成功删除用户：'.$AgentUsers->name;

@@ -12,7 +12,7 @@ use Yii;
  * @property string $name 账号
  * @property string $desc 备注
  * @property string $images 头像
- * @property string $balance 积分
+ * @property float $balance 积分
  * @property int $is_tuo 托
  * @property int $is_chi 吃
  * @property int $is_private 私
