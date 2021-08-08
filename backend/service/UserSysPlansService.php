@@ -1044,7 +1044,7 @@ class UserSysPlansService extends BaseService {
 
             ############################  位置号码过滤 start  #################################
             # 1、千位 过滤的号码
-            $p1_remove_codes = [$newOneKjData->code4, ($newThreeKjData->code3+$newTwoKjData->code2)%10];
+            $p1_remove_codes = [$newOneKjData->code4, ($newThreeKjData->code3+$newTwoKjData->code2)%10]; # 斜线相加除余10
             if($newOneKjData->code1 == $newTwoKjData->code1){
                 #$p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newTwoKjData->code1)); # 除左右边数
                 $p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newTwoKjData->code1)); #
@@ -1056,6 +1056,10 @@ class UserSysPlansService extends BaseService {
             if(($v1%2) == 1){
                 //$p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newOneKjData->code1));
             }
+            if(count($p1_remove_codes)<2){
+                $p1_remove_codes = array_merge($p1_remove_codes, [$newOneKjData->code2]);
+            }
+
             # 2、百位
             $p2_remove_codes = [];
             $v2 = $newOneKjData->code2 + $newTwoKjData->code2; # 两个位置对着，是单双或者双单
@@ -1063,6 +1067,10 @@ class UserSysPlansService extends BaseService {
             if(($newThreeKjData->code2>$newTwoKjData->code2 && $newTwoKjData->code2>$newOneKjData->code2) OR ($newThreeKjData->code2<$newTwoKjData->code2 && $newTwoKjData->code2<$newOneKjData->code2)){
                 $p2_remove_codes = array_merge($p2_remove_codes, self::removeBnums($newOneKjData->code2));
             }
+            if(count($p2_remove_codes)<2){
+                $p2_remove_codes = array_merge($p2_remove_codes, [$newOneKjData->code3]);
+            }
+
             # 3、个位
             $p3_remove_codes = [];
             //$v3 = $newOneKjData->code3 + $newTwoKjData->code3; # 两个位置对着，是单双或者双单
@@ -1070,8 +1078,12 @@ class UserSysPlansService extends BaseService {
             #if(($v3%2) == 1){
                 $p3_remove_codes = array_merge($p3_remove_codes, self::removeBnums($newOneKjData->code3));
             }
+            if(count($p3_remove_codes)<2){
+                $p3_remove_codes = array_merge($p3_remove_codes, [$newOneKjData->code2]);
+            }
+
             # 4、个位排除
-            $p4_remove_codes = [$newOneKjData->code1, ($newThreeKjData->code2+$newTwoKjData->code3)%10];
+            $p4_remove_codes = [$newOneKjData->code1, ($newThreeKjData->code2+$newTwoKjData->code3)%10]; # 斜线相加除余10
             if($newOneKjData->code4 == $newTwoKjData->code4){
                 $p4_remove_codes = array_merge($p4_remove_codes, self::removeBnums($newTwoKjData->code1));
             }
@@ -1081,6 +1093,9 @@ class UserSysPlansService extends BaseService {
             $v4 = $newOneKjData->code4 + $newTwoKjData->code4; # 两个位置对着，是单双或者双单
             if(($v4%2) == 1){
                 //$p4_remove_codes = array_merge($p4_remove_codes, self::removeBnums($newOneKjData->code4));
+            }
+            if(count($p4_remove_codes)<2){
+                $p4_remove_codes = array_merge($p4_remove_codes, [$newOneKjData->code3]);
             }
 
             $model->p1 = implode('', array_diff($all_nums, $p1_remove_codes)); # 千位排除个位号码
