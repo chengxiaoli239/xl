@@ -2016,7 +2016,6 @@ class NumService extends BaseService {
         $code_type = NumService::getCodeTypeByDesc($codes_desc, $positions); # 获取定位类型
 
         $data = NumService::getHzsByDesc($codes_desc, $data);
-        //p($data);
 
         # 获取位置号码除、取
         $data = NumService::getPosCodes($codes_desc, $data); # p1、p1_0
@@ -2026,7 +2025,7 @@ class NumService extends BaseService {
         # 筛选逻辑包括两数合、三数合、跑=移、值范围、取双重、除双重、取三重、除三重、取双双重、除双双重、取二兄弟、除二兄弟、
         # 取千单、 除千单、取千大、除千大、取百单、除百单、取百大、除百大、取十单、除十单、取十大、除十大、取个单、除个单、取个大、除个大
 
-        $data = NumService::getCodeType($codes_desc, $data);# type_2、type_3、type_22 等
+        $data = NumService::getCodeType($codes_desc, $data);# 号码类型：type_2、type_3、type_22、type_4 等
 
         $data = NumService::getCodeTypeDw($codes_desc, $data); # 定位：23568头尾 、千1234百4567十7890
 
@@ -2052,6 +2051,8 @@ class NumService extends BaseService {
             $codes_hz = NumService::getCodesHzByDesc($codes_desc);
             if(empty($code_type)) $code_type = $codes_hz['code_type'];
             $tmpCodesArr = NumService::getCodesKuaiXuan($codes_hz, $code_type);
+            $logArr = ['codes_desc'=>$codes_desc, 'codes_hz'=>$codes_hz, 'tmpCodesArr'=>$tmpCodesArr, 'counts'=>count($tmpCodesArr)];
+            Tool_Common::log('/getCodes/'.__FUNCTION__, 'INFO', '根据code描述获取号码', $logArr);
             if($tmpCodesArr) $codesArr = array_merge($codesArr, $tmpCodesArr);
         }
 
@@ -2179,6 +2180,7 @@ class NumService extends BaseService {
      */
     public static function getCodeType($codes_desc, &$data){
 
+        # 双重:type_2
         if(strpos($codes_desc, '除双重') !== false){
             $data['type_2'] = 0;
         }
@@ -2186,24 +2188,34 @@ class NumService extends BaseService {
             $data['type_2'] = 1;
         }
 
+        # 三重:type_3
         if(strpos($codes_desc, '除三重') !== false){
             $data['type_3'] = 0;
         }
         if(strpos($codes_desc, '取三重') !== false){
             $data['type_3'] = 1;
         }
+        # 四重:type_4
+        if(strpos($codes_desc, '除四重') !== false){
+            $data['type_4'] = 0;
+        }
+        if(strpos($codes_desc, '取四重') !== false){
+            $data['type_4'] = 1;
+        }
 
-        if(strpos($codes_desc, '除双双重') !== false){
+        # 双双重、两双重：type_22
+        if(strpos($codes_desc, '除双双重') !== false OR strpos($codes_desc, '除两双重') !== false){
             $data['type_22'] = 0;
         }
-        if(strpos($codes_desc, '取双双重') !== false){
+        if(strpos($codes_desc, '取双双重') !== false OR strpos($codes_desc, '取两双重') !== false){
             $data['type_22'] = 1;
         }
 
-        if(strpos($codes_desc, '取二兄弟') !== false OR strpos($codes_desc, '取兄弟') !== false){
+        # 二兄弟、两兄弟、兄弟
+        if(strpos($codes_desc, '取二兄弟') !== false OR strpos($codes_desc, '取兄弟') !== false OR strpos($codes_desc, '取两兄弟') !== false){
             $data['type_2b'] = 1;
         }
-        if(strpos($codes_desc, '除二兄弟') !== false OR strpos($codes_desc, '除二兄弟') !== false){
+        if(strpos($codes_desc, '除二兄弟') !== false OR strpos($codes_desc, '除兄弟') !== false OR strpos($codes_desc, '除两兄弟') !== false){
             $data['type_2b'] = 0;
         }
 
