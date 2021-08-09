@@ -1082,7 +1082,7 @@ class UserSysPlansService extends BaseService {
                 $p3_remove_codes = array_merge($p3_remove_codes, self::removeBnums($newOneKjData->code3));
             }
             if(count($p3_remove_codes)<2){
-                $p3_remove_codes = array_merge($p3_remove_codes, [($newTwoKjData->code4+$newOneKjData->code3)%10]); # （倒数第二期千位+倒数第一期百位）%10   斜对角相加求余10
+                $p3_remove_codes = array_merge($p3_remove_codes, [($newTwoKjData->code1+$newOneKjData->code2)%10]); # （倒数第二期千位+倒数第一期百位）%10   斜对角相加求余10
             }
             if(count($p3_remove_codes)<2){
                 $p3_remove_codes = array_merge($p3_remove_codes, [$newOneKjData->code2]);
