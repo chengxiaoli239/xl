@@ -1039,7 +1039,7 @@ class UserSysPlansService extends BaseService {
 
             $all_type_ds_Arr = UserSysPlansService::getCodeTypes($flag = 3); # 单双类型：1122,2121 等
             //$model->type_ds_details = array_diff($all_type_ds_Arr, [$newOneKjData->code_1_2_3_4, '1111', '2222']);
-            $remove_type_ds_Arr = $config['remove_type_ds_Arr']?array_merge([$newOneKjData->code_1_2_3_4], $config['remove_type_ds_Arr']):[];
+            $remove_type_ds_Arr = $config['remove_type_ds_Arr']?array_merge([$newOneKjData->code_1_2_3_4], $config['remove_type_ds_Arr']):[$newOneKjData->code_1_2_3_4];
             $model->type_ds_details = array_diff($all_type_ds_Arr, $remove_type_ds_Arr);
 
             ############################  位置号码过滤 start  #################################
