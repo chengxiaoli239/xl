@@ -1068,6 +1068,9 @@ class UserSysPlansService extends BaseService {
                 $p2_remove_codes = array_merge($p2_remove_codes, self::removeBnums($newOneKjData->code2));
             }
             if(count($p2_remove_codes)<2){
+                $p2_remove_codes = array_merge($p2_remove_codes, [($newTwoKjData->code4+$newOneKjData->code3)%10]); # （倒数第二期个位+倒数第一期十位）%10   斜对角相加求余10
+            }
+            if(count($p2_remove_codes)<2){
                 $p2_remove_codes = array_merge($p2_remove_codes, [$newOneKjData->code3]);
             }
 
@@ -1075,8 +1078,11 @@ class UserSysPlansService extends BaseService {
             $p3_remove_codes = [];
             //$v3 = $newOneKjData->code3 + $newTwoKjData->code3; # 两个位置对着，是单双或者双单
             if(($newThreeKjData->code3>$newTwoKjData->code3 && $newTwoKjData->code3>$newOneKjData->code3) OR ($newThreeKjData->code3<$newTwoKjData->code3 && $newTwoKjData->code3<$newOneKjData->code3)){
-            #if(($v3%2) == 1){
+                #if(($v3%2) == 1){
                 $p3_remove_codes = array_merge($p3_remove_codes, self::removeBnums($newOneKjData->code3));
+            }
+            if(count($p3_remove_codes)<2){
+                $p3_remove_codes = array_merge($p3_remove_codes, [($newTwoKjData->code4+$newOneKjData->code3)%10]); # （倒数第二期千位+倒数第一期百位）%10   斜对角相加求余10
             }
             if(count($p3_remove_codes)<2){
                 $p3_remove_codes = array_merge($p3_remove_codes, [$newOneKjData->code2]);
