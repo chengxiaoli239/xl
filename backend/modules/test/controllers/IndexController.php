@@ -233,7 +233,7 @@ class IndexController extends Controller
         $testData = [
             # 二定
 
-            '千12345百12345十67890',
+            '千12345百12345十67890各1',
             '头尾12345各1',
             '头百尾23456各0.1',
             '023468头尾各0.1',
@@ -245,7 +245,7 @@ class IndexController extends Controller
             //'千0123456789百13579十02468,千0123456789百13579个02468,千0123456789百02468十13579,千0123456789十13579个02468,千0123456789百02468个13579,千0123456789十02468个13579',
             //'千0123456789百12345十67890,千0123456789百12345个67890,千0123456789百67890十12345,千0123456789十67890个12345,千0123456789百67890个12345,千0123456789十12345个67890',
         ];
-        $rst = NumService::getCodesByDesc($testData[6]);p($rst);
+        $rst = NumService::getCodesByDesc($testData[1]);p($rst);
         $rst = NumService::getCodesHzByDesc($testData[6]);p($rst);
         $rst = NumService::getCodesHzByDesc("千12百345四字定两数合45值范围15-35除个1234除双重除二兄弟");p($rst);
         $rst = NumService::getSingleByDesc("千12百345四字定两数合45值范围15-35除个1234除双重除二兄弟各0.1");p($rst);

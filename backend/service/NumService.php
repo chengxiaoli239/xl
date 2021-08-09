@@ -2011,9 +2011,9 @@ class NumService extends BaseService {
         $data = [];
         if(!$codes_desc) return $data;
 
-        $codes_desc = NumService::opChangeDesc($codes_desc);
+        $codes_desc = NumService::opChangeDesc($codes_desc); # 替换通用位置名词 头->千、尾->个
 
-        $code_type = NumService::getCodeTypeByDesc($codes_desc, $positions);
+        $code_type = NumService::getCodeTypeByDesc($codes_desc, $positions); # 获取定位类型
 
         $data = NumService::getHzsByDesc($codes_desc, $data);
         //p($data);
@@ -2062,7 +2062,7 @@ class NumService extends BaseService {
 
     /**
      * @desc 根据描述判断号码类型：
-     * @param $codes_desc 四字定千1234百4567十7890个2468、三字定千1234百6789十1357、二定千02468百13579、千2345十5678个0289
+     * @param $codes_desc - 四字定千1234百4567十7890个2468、三字定千1234百6789十1357、二定千02468百13579、千2345十5678个0289
      * @return int code_type 1一字定2二字定3三字定4四字定
      */
     public static function getCodeTypeByDesc($codes_desc, &$positions = []){
@@ -2231,20 +2231,20 @@ class NumService extends BaseService {
     }
 
     /**
-     * @desc 例如:23456头尾各1
+     * @desc 例如:23456头尾各1、千百十456789各0.1、头尾23456各1、千百十456789各0.1
      * @param $codes_desc
      * @param array $data
      * @return array
      */
     public static function getCodeTypeDw($codes_desc, &$data = []){
 
-        $posData = [
+        $posData = [ # 支持不同汉族类型的位置翻译成数据表字段
             '千百十'=>['p1', 'p2', 'p3'], '千百个'=>['p1', 'p2', 'p4'], '千十个'=>['p1', 'p3', 'p4'], '百十个'=>['p2', 'p3', 'p4'],
             '千百'=>['p1', 'p2'], '千十'=>['p1', 'p3'], '千个'=>['p1', 'p4'], '百十'=>['p2', 'p3'], '百个'=>['p2','p4'], '十个'=>['p3','p4'],
             '千'=>['p1'], '百'=>['p2'],'十'=>['p3'], '个'=>['p4'], '五'=>['p5'],
         ];
 
-        $pds = [
+        $pds = [ # 文字跟上面的数组一一对应
             '千百十'=>['千', '百', '十'], '千百个'=>['千', '百', '个'], '千十个'=>['千', '十', '个'], '百十个'=>['百', '十', '个'],
             '千百'=>['千', '百'], '千十'=>['千', '十'],'千个'=>['千', '个'], '百十'=>['百', '十'], '百个'=>['百', '个'], '十个'=>['十', '个'],
             '千'=>['千'], '百'=>['百'],'十'=>['十'], '个'=>['个'], '五'=>['五'],
