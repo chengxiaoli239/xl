@@ -1044,7 +1044,7 @@ class UserSysPlansService extends BaseService {
 
             ############################  位置号码过滤 start  #################################
             # 1、千位 过滤的号码
-            $p1_remove_codes = [$newOneKjData->code4, ($newThreeKjData->code3+$newTwoKjData->code2)%10]; # 斜线相加除余10
+            $p1_remove_codes = [$newOneKjData->code4, ($newTwoKjData->code3+$newOneKjData->code2)%10]; # 斜线相加除余10
             if(count($p1_remove_codes)<2 && $newOneKjData->code1 == $newTwoKjData->code1){
                 #$p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newTwoKjData->code1)); # 除左右边数
                 $p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newTwoKjData->code1)); #
@@ -1083,7 +1083,7 @@ class UserSysPlansService extends BaseService {
             }
 
             # 4、个位排除
-            $p4_remove_codes = [$newOneKjData->code1, ($newThreeKjData->code2+$newTwoKjData->code3)%10]; # 斜线相加除余10
+            $p4_remove_codes = [$newOneKjData->code1, ($newTwoKjData->code2+$newOneKjData->code3)%10]; # 斜线相加除余10
             if(count($p4_remove_codes)<2 && $newOneKjData->code4 == $newTwoKjData->code4){
                 $p4_remove_codes = array_merge($p4_remove_codes, self::removeBnums($newTwoKjData->code1));
             }
