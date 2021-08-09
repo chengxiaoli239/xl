@@ -1083,7 +1083,7 @@ class UserSysPlansService extends BaseService {
             }
 
             # 4、个位排除
-            $p4_remove_codes = [$newOneKjData->code1, ($newOneKjData->code2+$newTwoKjData->code3)%10]; # 斜线相加除余10
+            $p4_remove_codes = [$newOneKjData->code1, ($newOneKjData->code3+$newTwoKjData->code2)%10]; # 斜线相加除余10
             if(count($p4_remove_codes)<2 && $newOneKjData->code4 == $newTwoKjData->code4){
                 $p4_remove_codes = array_merge($p4_remove_codes, self::removeBnums($newTwoKjData->code1));
             }
