@@ -1004,9 +1004,10 @@ class UserSysPlansService extends BaseService {
      * @param $model
      * @param $lottery_type - 彩种
      * @param string $uid
+     * @param int $isShort 精简
      * @return bool
      */
-    public static function newKuaiDa($tz_type, &$model, $lottery_type, $uid=''){
+    public static function newKuaiDa($tz_type, &$model, $lottery_type, $uid='', $isShort = 0){
         $flag = true;
         $config = self::getUserSetConfigs($uid);
         $newKjDatas = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(3)->all();
@@ -1045,18 +1046,18 @@ class UserSysPlansService extends BaseService {
             ############################  位置号码过滤 start  #################################
             # 1、千位 过滤的号码
             $p1_remove_codes = [$newOneKjData->code4, ($newOneKjData->code2+$newTwoKjData->code3)%10]; # 斜线相加除余10
-            if(count($p1_remove_codes)<2 && $newOneKjData->code1 == $newTwoKjData->code1){
+            if($isShort && count($p1_remove_codes)<2 && $newOneKjData->code1 == $newTwoKjData->code1){
                 #$p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newTwoKjData->code1)); # 除左右边数
                 $p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newTwoKjData->code1)); #
             }
-            if(count($p1_remove_codes)<2 && $newTwoKjData->code3 == $newOneKjData->code2){ # 斜对
+            if($isShort && count($p1_remove_codes)<2 && $newTwoKjData->code3 == $newOneKjData->code2){ # 斜对
                 $p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newTwoKjData->code3));
             }
             $v1 = $newOneKjData->code1 + $newTwoKjData->code1; # 两个位置对着，是单双或者双单
             if(($v1%2) == 1){
                 //$p1_remove_codes = array_merge($p1_remove_codes, self::removeBnums($newOneKjData->code1));
             }
-            if(count($p1_remove_codes)<2){
+            if($isShort && count($p1_remove_codes)<2){
                 $p1_remove_codes = array_merge($p1_remove_codes, [$newOneKjData->code2]);
             }
 
@@ -1064,36 +1065,36 @@ class UserSysPlansService extends BaseService {
             $p2_remove_codes = [];
             $v2 = $newOneKjData->code2 + $newTwoKjData->code2; # 两个位置对着，是单双或者双单
             //if(($v2%2) == 1){
-            if(($newThreeKjData->code2>$newTwoKjData->code2 && $newTwoKjData->code2>$newOneKjData->code2) OR ($newThreeKjData->code2<$newTwoKjData->code2 && $newTwoKjData->code2<$newOneKjData->code2)){
+            if($isShort && ($newThreeKjData->code2>$newTwoKjData->code2 && $newTwoKjData->code2>$newOneKjData->code2) OR ($newThreeKjData->code2<$newTwoKjData->code2 && $newTwoKjData->code2<$newOneKjData->code2)){
                 $p2_remove_codes = array_merge($p2_remove_codes, self::removeBnums($newOneKjData->code2));
             }
-            if(count($p2_remove_codes)<2){
+            if($isShort && count($p2_remove_codes)<2){
                 $p2_remove_codes = array_merge($p2_remove_codes, [($newTwoKjData->code4+$newOneKjData->code3)%10]); # （倒数第二期个位+倒数第一期十位）%10   斜对角相加求余10
             }
-            if(count($p2_remove_codes)<2){
+            if($isShort && count($p2_remove_codes)<2){
                 $p2_remove_codes = array_merge($p2_remove_codes, [$newOneKjData->code3]);
             }
 
             # 3、个位
             $p3_remove_codes = [];
             //$v3 = $newOneKjData->code3 + $newTwoKjData->code3; # 两个位置对着，是单双或者双单
-            if(($newThreeKjData->code3>$newTwoKjData->code3 && $newTwoKjData->code3>$newOneKjData->code3) OR ($newThreeKjData->code3<$newTwoKjData->code3 && $newTwoKjData->code3<$newOneKjData->code3)){
+            if($isShort && ($newThreeKjData->code3>$newTwoKjData->code3 && $newTwoKjData->code3>$newOneKjData->code3) OR ($newThreeKjData->code3<$newTwoKjData->code3 && $newTwoKjData->code3<$newOneKjData->code3)){
                 #if(($v3%2) == 1){
                 $p3_remove_codes = array_merge($p3_remove_codes, self::removeBnums($newOneKjData->code3));
             }
             if(count($p3_remove_codes)<2){
                 $p3_remove_codes = array_merge($p3_remove_codes, [($newTwoKjData->code1+$newOneKjData->code2)%10]); # （倒数第二期千位+倒数第一期百位）%10   斜对角相加求余10
             }
-            if(count($p3_remove_codes)<2){
+            if($isShort && count($p3_remove_codes)<2){
                 $p3_remove_codes = array_merge($p3_remove_codes, [$newOneKjData->code2]);
             }
 
             # 4、个位排除
             $p4_remove_codes = [$newOneKjData->code1, ($newOneKjData->code3+$newTwoKjData->code2)%10]; # 斜线相加除余10
-            if(count($p4_remove_codes)<2 && $newOneKjData->code4 == $newTwoKjData->code4){
+            if($isShort && count($p4_remove_codes)<2 && $newOneKjData->code4 == $newTwoKjData->code4){
                 $p4_remove_codes = array_merge($p4_remove_codes, self::removeBnums($newTwoKjData->code1));
             }
-            if(count($p4_remove_codes)<2 && $newTwoKjData->code2 == $newOneKjData->code3){
+            if($isShort && count($p4_remove_codes)<2 && $newTwoKjData->code2 == $newOneKjData->code3){
                 $p4_remove_codes = array_merge($p4_remove_codes, self::removeBnums($newTwoKjData->code3));
             }
             $v4 = $newOneKjData->code4 + $newTwoKjData->code4; # 两个位置对着，是单双或者双单
