@@ -552,7 +552,9 @@ class NumService extends BaseService {
             foreach ($twoNums as $twoNum){
                 $codesArr = NumService::getTwo5ByTwoNums([$twoNum[0], $twoNum[1]]);
             }
-        }elseif($code_type == 3){
+        }elseif($code_type == 2){ # 二定 - 在处理 12,13,23
+            $codesArr = NumService::get2DingWeiByCodes($codes);
+        }elseif($code_type == 3){ # 三定
             if($type == 1) {
                 $where = [
                     'AND',
@@ -623,14 +625,17 @@ class NumService extends BaseService {
      */
     public static function getAllCombination4($codes, $type = 1, $code_type = 4){
         if(strlen($codes) != 4) return [];
-        if($code_type == 5){ # 五位二定
+        if($code_type == 5) { # 五位二定
             $twoNums = NumService::getTwoNums($codes);
-            foreach ($twoNums as $twoNum){
+            foreach ($twoNums as $twoNum) {
                 $codesArr = NumService::getTwo5ByTwoNums([$twoNum[0], $twoNum[1]]);
             }
+        }elseif($code_type==2) { # 四个位置组合：12，13，14，23，24，34
+            $codesArr = NumService::get2DingWeiByCodes($codes);
+        }elseif ($code_type==3){
+            $codesArr = NumService::get3DingWeiByCodes($codes);
         }else{
             if($type == 1){
-
                 $codesArr = [
                     $codes[0].','.$codes[1].','.$codes[2].','.$codes[3],
                     $codes[0].','.$codes[1].','.$codes[3].','.$codes[2],
@@ -679,8 +684,68 @@ class NumService extends BaseService {
     }
 
     /**
+     * @desc 获取二定位 by codes
+     * @param string $codes  123或1234或12345
+     * @return array array ['1,2,X,X', '1,X,2,X', '1,X,X,2']
+     */
+    public static function get2DingWeiByCodes($codes=''){
+        $where = [
+            'AND',
+            ['=', 'code_type', 2],
+        ];
+        $tmpWhere = ['OR'];
+        $len = strlen($codes);
+        for($i=0; $i<$len; $i++){
+            for($j=$i+1; $j<$len; $j++){
+                $tmpWhere = array_merge($tmpWhere, [['LIKE', 'code', '%'.$codes[$i].'%'.$codes[$j].'%', false]]);
+                $tmpWhere = array_merge($tmpWhere, [['LIKE', 'code', '%'.$codes[$j].'%'.$codes[$i].'%', false]]);
+            }
+        }
+        $where = array_merge($where, [$tmpWhere]);
+        $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
+        $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+
+        return $codesArr;
+    }
+
+    /**
+     * @desc 获取二定位 by codes
+     * @param string $codes  123或1234或12345
+     * @return array array ['1,2,X,X', '1,X,2,X', '1,X,X,2']
+     */
+    public static function get3DingWeiByCodes($codes=''){
+        $where = [
+            'AND',
+            ['=', 'code_type', 3],
+        ];
+        $tmpWhere = ['OR'];
+        $len = strlen($codes);
+        for($i=0; $i<$len; $i++){
+            for($j=$i+1; $j<$len; $j++){
+                if($j<=$i) continue;
+                for($k=$i+2; $k<$len; $k++){
+                    if($k<=$j) continue;
+                    $tmpWhere = array_merge($tmpWhere, [['LIKE', 'code', '%'.$codes[$i].'%'.$codes[$j].'%'.$codes[$k].'%', false]]);
+                    $tmpWhere = array_merge($tmpWhere, [['LIKE', 'code', '%'.$codes[$i].'%'.$codes[$k].'%'.$codes[$j].'%', false]]);
+
+                    $tmpWhere = array_merge($tmpWhere, [['LIKE', 'code', '%'.$codes[$j].'%'.$codes[$i].'%'.$codes[$k].'%', false]]);
+                    $tmpWhere = array_merge($tmpWhere, [['LIKE', 'code', '%'.$codes[$j].'%'.$codes[$k].'%'.$codes[$i].'%', false]]);
+
+                    $tmpWhere = array_merge($tmpWhere, [['LIKE', 'code', '%'.$codes[$k].'%'.$codes[$i].'%'.$codes[$j].'%', false]]);
+                    $tmpWhere = array_merge($tmpWhere, [['LIKE', 'code', '%'.$codes[$k].'%'.$codes[$j].'%'.$codes[$i].'%', false]]);
+                }
+            }
+        }
+        $where = array_merge($where, [$tmpWhere]);
+        $Num4Types = Num4Type::find()->select(['code'])->where($where)->asArray()->all();
+        $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
+
+        return $codesArr;
+    }
+
+    /**
      * @desc 大于4个号码返回四定号码组合号码
-     * @param $codes 格式：11234或者11123或者11223或者12345或者123456
+     * @param $codes - 格式：11234或者11123或者11223或者12345或者123456
      * @return array ['1,2,3,4', '1,1,2,3', '1,1,1,2']
      */
     public static function getAllCombination4p($codes, $codeSplit = '', $code_type = 4){
@@ -691,6 +756,10 @@ class NumService extends BaseService {
             foreach ($twoNums as $twoNum) {
                 $codesArr = array_merge($codesArr, NumService::getTwo5ByTwoNums($twoNum[0], $twoNum[1]));
             }
+        }elseif ($code_type == 2){
+            $codesArr = NumService::get2DingWeiByCodes($codes);
+        }elseif ($code_type == 3){
+            $codesArr = NumService::get3DingWeiByCodes($codes);
         }elseif ($code_type == 4){
             $tmpArr = [];
             $len = strlen($codes);
@@ -932,7 +1001,7 @@ class NumService extends BaseService {
 
         # 不定位合分(1两数、2三数) - 三定
         //if($code_type == 3 && !empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){
-        if(!empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){
+        if(!empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){ # no_fix_hefen:不定位合分值、no_fix_hefen_pos:1两数2三数
 
             /**
              * 1、处理合分值，例如：149转换成：
@@ -965,10 +1034,10 @@ class NumService extends BaseService {
             /**
              * 2、组合where条件
              */
-            if($codes_hz['no_fix_hefen_pos'] == 1){ # 两数合分
+            if($codes_hz['no_fix_hefen_pos'] == 1){ # 两数合分 ----------- 不定位合分
                 $tmp_no_fix_hefen = ['OR'];
                 $poss = [[1,2], [1,3], [1,4],[2,3],[2,4],[3,4]];
-                if($code_type == 3){ # 三定
+                if(in_array($code_type, [2, 3])){ # 三定
                     foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
                         $son_where = [
                             ['AND',
@@ -979,13 +1048,15 @@ class NumService extends BaseService {
                         ];
                         $tmp_no_fix_hefen = array_merge($tmp_no_fix_hefen, $son_where);
                     }
+                }elseif($code_type == 2){ # 二定
+
                 }elseif($code_type == 4){ # 四定
                     foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
                         $son_where = [ ['IN', '(`code_'.$pos[0].'` + `code_'.$pos[1].'`)', $codes_no_fix_hefen] ];
                         $tmp_no_fix_hefen = array_merge($tmp_no_fix_hefen, $son_where);
                     }
                 }
-            }elseif($codes_hz['no_fix_hefen_pos'] == 2){ # 三数合分
+            }elseif($codes_hz['no_fix_hefen_pos'] == 2){ # 三数合分 ----------- 不定位合分
                 if($code_type == 3) { # 三定
                     $tmp_no_fix_hefen = ['IN', 'codes_hz', $codes_no_fix_hefen];
                 }elseif ($code_type == 4){ # 四定
@@ -1431,10 +1502,8 @@ class NumService extends BaseService {
             $asises = explode(',', $codes_hz['arise']);
             $codesArr_arise = self::getCodesArise($asises, $type = 1, $code_type);
             //p(['code_type'=>$code_type, 'where'=>$where, 'codes_hz'=>$codes_hz, 'codesArr_arise'=>$codesArr_arise, 'codesArr'=>$codesArr]);
-            if(in_array($code_type, [4])) {
+            if(in_array($code_type, [2,3,4])) {
                 $codesArr = array_intersect($codesArr, $codesArr_arise); # 函数用于比较两个(或更多个)数组的键值,并返回交集
-            }elseif($code_type == 3){
-                $codesArr = array_intersect($codesArr, $codesArr_arise);
             }else{
                 $codesArr = $codesArr_arise;
             }
@@ -2010,10 +2079,10 @@ class NumService extends BaseService {
 
     /**
      * @desc 快译描述转换成位置号码，支持一二三四定
-     * @param $codes_desc   千12345百12345十67890
+     * @param $codes_desc - 千12345百12345十67890
      * @return array ['p1'=>12345, 'p2'=>12345, 'p3'=>67890]
      */
-    public static function getCodesHzByDesc($codes_desc=''){
+    public static function getCodesHzByDesc($codes_desc='', &$msg=''){
         //echo $codes_desc.'<br>';
         $data = [];
         if(!$codes_desc) return $data;
@@ -2026,7 +2095,6 @@ class NumService extends BaseService {
 
         # 获取位置号码除、取
         $data = NumService::getPosCodes($codes_desc, $data); # p1、p1_0
-        //p($data);
 
         //p(['code_type'=>$code_type, 'pos'=>$positions, 'data'=>$data]);
         # 筛选逻辑包括两数合、三数合、跑=移、值范围、取双重、除双重、取三重、除三重、取双双重、除双双重、取二兄弟、除二兄弟、
@@ -2038,9 +2106,16 @@ class NumService extends BaseService {
 
         $data = NumService::getCodeTypeDao($codes_desc, $data); # 倒类型
 
+        $data = NumService::getCodeTypeFixPosHeFen($codes_desc, $data); # 不定位
+
         $data = NumService::getSingleByDesc($codes_desc, $data);# 获取倍数
 
+        # 走移、 现  暂未完成
+
         $data['code_type'] = $code_type;
+        if($code_type == 2 && $data['single']<1){
+            $msg = '二定最少1元';
+        }
 
         return $data;
     }
@@ -2324,8 +2399,41 @@ class NumService extends BaseService {
         if(empty($matches2[0])){
             preg_match("/倒[0-9]+/", $codes_desc, $matches2);  # 头百尾23456、头尾
         }
-        $codes = str_replace('倒', '', $matches2[0]);
-        $data['arise'] = $codes;
+        if(!empty($matches2[0])){
+            $codes = str_replace('倒', '', $matches2[0]);
+            $data['arise'] = $codes;
+        }
+
+        return $data;
+    }
+
+    /**
+     * @desc 例如:千12345百12345十67890合分2345各0.1 - 暂支持不定位合分
+     * @param $codes_desc
+     * @param array $data
+     * @return array
+     */
+    public static function getCodeTypeFixPosHeFen($codes_desc, &$data = []){
+        # no_fix_hefen:不定位合分值、no_fix_hefen_pos:1两数2三数
+
+        if(strpos($codes_desc, '三数合分') !== false OR strpos($codes_desc, '三数合') !== false){
+            $data['no_fix_hefen_pos'] = 2;
+            preg_match("/三数合分[0-9]+/", $codes_desc, $matches2);  # 023468倒x定
+            $codes = str_replace('三数合分', '', $matches2[0]);
+            $codes = str_replace('三数合', '', $codes);
+        }else{
+            if(strpos($codes_desc, '合分') !== false){# 默认两数合分
+                $data['no_fix_hefen_pos'] = 1;
+                preg_match("/合分[0-9]+/", $codes_desc, $matches2);  # 023468倒x定
+                $codes = str_replace('两数合分', '', $matches2[0]);
+                $codes = str_replace('两数合', '', $codes);
+                $codes = str_replace('合分', '', $codes);
+            }
+
+        }
+        if(!empty($codes)){
+            $data['no_fix_hefen'] = $codes;
+        }
 
         return $data;
     }
