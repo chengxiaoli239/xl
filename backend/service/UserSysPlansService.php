@@ -1068,7 +1068,7 @@ class UserSysPlansService extends BaseService {
             if($isShort && ($newThreeKjData->code2>$newTwoKjData->code2 && $newTwoKjData->code2>$newOneKjData->code2) OR ($newThreeKjData->code2<$newTwoKjData->code2 && $newTwoKjData->code2<$newOneKjData->code2)){
                 $p2_remove_codes = array_merge($p2_remove_codes, self::removeBnums($newOneKjData->code2));
             }
-            if($isShort && count($p2_remove_codes)<2){
+            if(count($p2_remove_codes)<2){
                 $p2_remove_codes = array_merge($p2_remove_codes, [($newTwoKjData->code4+$newOneKjData->code3)%10]); # （倒数第二期个位+倒数第一期十位）%10   斜对角相加求余10
             }
             if($isShort && count($p2_remove_codes)<2){

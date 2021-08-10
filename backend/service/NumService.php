@@ -1998,6 +1998,13 @@ class NumService extends BaseService {
         $codes_desc = str_replace('头', '千', $codes_desc);
         $codes_desc = str_replace('尾', '个', $codes_desc);
 
+        $codes_desc = str_replace('二字定', '二定', $codes_desc);
+        $codes_desc = str_replace('两定', '二定', $codes_desc);
+        $codes_desc = str_replace('两字定', '二定', $codes_desc);
+
+        $codes_desc = str_replace('三字定', '三定', $codes_desc);
+        $codes_desc = str_replace('四字定', '四定', $codes_desc);
+
         return $codes_desc;
     }
 
@@ -2029,10 +2036,12 @@ class NumService extends BaseService {
 
         $data = NumService::getCodeTypeDw($codes_desc, $data); # 定位：23568头尾 、千1234百4567十7890
 
+        $data = NumService::getCodeTypeDao($codes_desc, $data); # 倒类型
+
         $data = NumService::getSingleByDesc($codes_desc, $data);# 获取倍数
 
         $data['code_type'] = $code_type;
-        //p($data);
+        p($data);
 
         return $data;
     }
@@ -2290,6 +2299,33 @@ class NumService extends BaseService {
                 if(count($poss)>1) return $data;
             }
         }
+
+        return $data;
+    }
+
+    /**
+     * @desc 例如:234倒两各1、456倒三定各1、2345倒四定各1
+     * @param $codes_desc
+     * @param array $data
+     * @return array
+     */
+    public static function getCodeTypeDao($codes_desc, &$data = []){
+
+        if(strpos($codes_desc, '倒二定') !== false){
+            $data['code_type'] = 2;
+        }
+        if(strpos($codes_desc, '倒三定') !== false){
+            $data['code_type'] = 3;
+        }
+        if(strpos($codes_desc, '倒四定') !== false){
+            $data['code_type'] = 4;
+        }
+
+        preg_match("/^[0-9]+倒/", $codes_desc, $matches2);  # 023468倒x定
+        if(empty($matches2[0])){
+            preg_match("/倒[0-9]+/", $codes_desc, $matches2);  # 头百尾23456、头尾
+        }
+        $codes = str_replace('倒', '', $matches2[0]);
 
         return $data;
     }
