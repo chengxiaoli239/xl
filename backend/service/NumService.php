@@ -547,7 +547,7 @@ class NumService extends BaseService {
         if(strlen($codes) != 3) return [];
 
         $codesArr = [];
-        if($code_type == 5){
+        if($code_type == 5){ # 五位二定
             $twoNums = NumService::getTwoNums($codes);
             foreach ($twoNums as $twoNum){
                 $codesArr = NumService::getTwo5ByTwoNums([$twoNum[0], $twoNum[1]]);
@@ -2041,7 +2041,6 @@ class NumService extends BaseService {
         $data = NumService::getSingleByDesc($codes_desc, $data);# 获取倍数
 
         $data['code_type'] = $code_type;
-        p($data);
 
         return $data;
     }
@@ -2326,6 +2325,7 @@ class NumService extends BaseService {
             preg_match("/倒[0-9]+/", $codes_desc, $matches2);  # 头百尾23456、头尾
         }
         $codes = str_replace('倒', '', $matches2[0]);
+        $data['arise'] = $codes;
 
         return $data;
     }

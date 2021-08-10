@@ -976,8 +976,8 @@ class UserSysPlansService extends BaseService {
     public static function getUserSetConfigs($uid=11){
         $configs = [
             11 => [
-                'start_hz' => 9, # 起始和值
-                'end_hz' => 27, # 结束和值
+                'start_hz' => 0, # 起始和值
+                'end_hz' => 36, # 结束和值
                 'remove_type_ds_Arr' => [], # 单双 '1111', '2222'
                 'type_3b' => [0], # 三兄
                 'type_3n_2b' => [0], # 三现：双重+两兄
