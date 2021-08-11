@@ -999,23 +999,53 @@ class NumService extends BaseService {
             $where = array_merge($where, [$tmpPsWhere2]);
         }
 
+        ####################################  走移 start  ##################################
         # 123千走456各1元 - 未完成待续
         if(isset($codes_hz['zou_yi']) && !empty($codes_hz['zou_yi'])){
-            $poses = ['p1', 'p2', 'p3', 'p4'];
+            $poses = ['1', '2', '3', '4'];
+            $fix_poses = [];
+            $no_fix_poses = [];
             foreach ($poses as $ps){
                 $len_zouyi = strlen($codes_hz['zou_yi']);
-                if(isset($codes_hz[$ps]) && !empty($codes_hz[$ps])){
-
-                }else{
-
+                if(isset($codes_hz['p'.$ps]) && !empty($codes_hz['p'.$ps])){ # 定位位置
+                    $fix_poses[] = $ps;
+                }else{ # 走移位置
+                    $no_fix_poses[] = $ps;
                 }
-                for ($z=0; $z<$len_zouyi; $z++){
+            }
+            $zouyi_codes = $codes_hz['zou_yi']; # 走移号码
+            $fix_pos_counts = count($fix_poses);
+            //p(['code_type'=>$code_type, 'fix_pos_counts'=>$fix_pos_counts, 'zouyi_codes'=>$zouyi_codes]);
+            if($code_type == 2){ # 二定
+                if($fix_pos_counts == 1){ # 已经定一个位 - 剩余一个未定位
+                    $where_tmp_zouyi = ['OR'];
+                    for ($z=0; $z<$len_zouyi; $z++){
+                        foreach ($no_fix_poses as $no_fix_zouyi_pose){
+                            $where_tmp_zouyi = array_merge($where_tmp_zouyi, [['=', 'code_'.$no_fix_zouyi_pose, $zouyi_codes[$z]]]);
+                        }
+                    }
+                    $where = array_merge($where, [$where_tmp_zouyi]);
+                }
+            }elseif ($code_type == 3){ # 二定
+                if($fix_pos_counts == 1){ # 已经定一个位
+
+                }elseif ($fix_pos_counts == 2){ # 已经定两个位 - 剩余一个未定位
+                    if($fix_pos_counts == 1){ # 已经定一个位
+                        $where_tmp_zouyi = ['OR'];
+                        for ($z=0; $z<$len_zouyi; $z++){
+                            foreach ($no_fix_poses as $no_fix_zouyi_pose){
+                                $where_tmp_zouyi = array_merge($where_tmp_zouyi, [['=', 'code_'.$no_fix_zouyi_pose, $zouyi_codes[$z]]]);
+                            }
+                        }
+                        $where = array_merge($where, [$where_tmp_zouyi]);
+                    }
 
                 }
 
             }
-
+            //p(['fix_poses'=>$fix_poses, 'no_fix_poses'=>$no_fix_poses]);
         }
+        ####################################  走移 end  ##################################
 
         # 不定位合分(1两数、2三数) - 三定
         //if($code_type == 3 && !empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){
@@ -2121,6 +2151,7 @@ class NumService extends BaseService {
         $data = NumService::getCodeType($codes_desc, $data);# 号码类型：type_2、type_3、type_22、type_4 等
 
         $data = NumService::getCodeTypeDw($codes_desc, $data); # 定位：23568头尾 、千1234百4567十7890
+        //p($data);
 
         $data = NumService::getCodeTypeDao($codes_desc, $data); # 倒类型
 
@@ -2372,16 +2403,24 @@ class NumService extends BaseService {
                 $hasOp = array_merge($hasOp, $pds[$key]);
 
                 preg_match("/^".$key."[0-9]+/", $codes_desc, $matches1);  # 头百尾23456、头尾
-                //p(['matches1'=>$matches1],0);
+                #p(['matches1'=>$matches1],0);
                 if(empty($matches1[0])){
                     preg_match("/".$key."[0-9]+/", $codes_desc, $matches1);  # 头百尾23456、头尾
+                }
+                //p([$key, $codes_desc, $matches1]);
+                if($matches1[0]){
+                    #$codes_desc = str_replace($matches1[0], '', $codes_desc);
+                    //p([$key, $codes_desc, $matches2, 'xxxxxx']);
                 }
 
                 preg_match("/^[0-9]+".$key."/", $codes_desc, $matches2);  # 023468头尾
                 if(empty($matches2[0])){
                     preg_match("/".$key."[0-9]+/", $codes_desc, $matches2);  # 头百尾23456、头尾
                 }
-                //p(['matches2'=>$matches2]);
+                if(!empty($matches2[0])){
+                    $codes_desc = str_replace($matches2[0], '', $codes_desc);
+                    //p([$key, $codes_desc, $matches2, $poss, 'xxxxxx']);
+                }
 
                 $matches = max($matches1[0], $matches2[0]);
                 //p(['matches1'=>$matches1, 'matches2'=>$matches2, 'matches'=>$matches, $poss]);
