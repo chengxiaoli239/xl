@@ -999,6 +999,24 @@ class NumService extends BaseService {
             $where = array_merge($where, [$tmpPsWhere2]);
         }
 
+        # 123千走456各1元 - 未完成待续
+        if(isset($codes_hz['zou_yi']) && !empty($codes_hz['zou_yi'])){
+            $poses = ['p1', 'p2', 'p3', 'p4'];
+            foreach ($poses as $ps){
+                $len_zouyi = strlen($codes_hz['zou_yi']);
+                if(isset($codes_hz[$ps]) && !empty($codes_hz[$ps])){
+
+                }else{
+
+                }
+                for ($z=0; $z<$len_zouyi; $z++){
+
+                }
+
+            }
+
+        }
+
         # 不定位合分(1两数、2三数) - 三定
         //if($code_type == 3 && !empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){
         if(!empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){ # no_fix_hefen:不定位合分值、no_fix_hefen_pos:1两数2三数
@@ -2111,6 +2129,7 @@ class NumService extends BaseService {
         $data = NumService::getSingleByDesc($codes_desc, $data);# 获取倍数
 
         # 走移、 现  暂未完成
+        $data = NumService::getCodeTypeZouYi($codes_desc, $data); # 走移
 
         $data['code_type'] = $code_type;
         if($code_type == 2 && $data['single']<1){
@@ -2132,6 +2151,7 @@ class NumService extends BaseService {
 
         foreach ($codes_descArr as $codes_desc){
             $codes_hz = NumService::getCodesHzByDesc($codes_desc);
+            //p($codes_hz);
             if(empty($code_type)) $code_type = $codes_hz['code_type'];
             $tmpCodesArr = NumService::getCodesKuaiXuan($codes_hz, $code_type);
             $logArr = ['codes_desc'=>$codes_desc, 'codes_hz'=>$codes_hz, 'tmpCodesArr'=>$tmpCodesArr, 'counts'=>count($tmpCodesArr)];
@@ -2402,6 +2422,27 @@ class NumService extends BaseService {
         if(!empty($matches2[0])){
             $codes = str_replace('倒', '', $matches2[0]);
             $data['arise'] = $codes;
+        }
+
+        return $data;
+    }
+
+    /**
+     * @desc 例如:234千走456两定各1、234千走456三定各1、234千走456三定各1
+     * @param $codes_desc
+     * @param array $data
+     * @return array
+     */
+    public static function getCodeTypeZouYi($codes_desc, &$data = []){
+
+        if(strpos($codes_desc, '走') !== false){
+            $data['code_type'] = 2;
+        }
+
+        preg_match("/走[0-9]+/", $codes_desc, $matches2);  # 走345
+        if(!empty($matches2[0])){
+            $codes = str_replace('走', '', $matches2[0]);
+            $data['zou_yi'] = $codes;
         }
 
         return $data;

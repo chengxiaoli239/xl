@@ -255,6 +255,7 @@ class IndexController extends Controller
             '123456倒三定各1', # 13 三定
 
             # 现、 走移 - 暂未完成
+            '123千走345两定各1元',
 
             '千12345678百03456789四字定两数合45值范围15-35除双重除二兄弟', # 待定
             '千123456789百3456789四字定两数合45值范围15-35除双重除两二弟各0.1', # 待定
@@ -265,7 +266,7 @@ class IndexController extends Controller
             //'千0123456789百12345十67890,千0123456789百12345个67890,千0123456789百67890十12345,千0123456789十67890个12345,千0123456789百67890个12345,千0123456789十12345个67890',
             //'千12345678百03456789四字定值15,16,19,20,21,23除双重除二兄弟', # 7待定 不支持和值用逗号隔离开，英文都好为不同组的分隔符
         ];
-        $rst = NumService::getCodesByDesc($testData[4]);p($rst); # 主要入口
+        $rst = NumService::getCodesByDesc($testData[15]);p($rst); # 主要入口
         $rst = NumService::getCodesHzByDesc($testData[6]);p($rst);
         $rst = NumService::getCodesHzByDesc("千12百345四字定两数合45值范围15-35除个1234除双重除二兄弟");p($rst);
         $rst = NumService::getSingleByDesc("千12百345四字定两数合45值范围15-35除个1234除双重除二兄弟各0.1");p($rst);
