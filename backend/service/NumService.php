@@ -1015,7 +1015,7 @@ class NumService extends BaseService {
             }
             $zouyi_codes = $codes_hz['zou_yi']; # 走移号码
             $fix_pos_counts = count($fix_poses);
-            //p(['code_type'=>$code_type, 'fix_pos_counts'=>$fix_pos_counts, 'zouyi_codes'=>$zouyi_codes]);
+            //p(['code_desc'=>$codes_hz, 'no_fix_poses'=>$no_fix_poses, 'fix_poses'=>$fix_poses, 'code_type'=>$code_type, 'fix_pos_counts'=>$fix_pos_counts, 'zouyi_codes'=>$zouyi_codes]);
             if($code_type == 2){ # 二定
                 if($fix_pos_counts == 1){ # 已经定一个位 - 剩余一个未定位
                     $where_tmp_zouyi = ['OR'];
@@ -1028,23 +1028,41 @@ class NumService extends BaseService {
                 }
             }elseif ($code_type == 3){ # 二定
                 if($fix_pos_counts == 1){ # 已经定一个位
-
-                }elseif ($fix_pos_counts == 2){ # 已经定两个位 - 剩余一个未定位
-                    if($fix_pos_counts == 1){ # 已经定一个位
-                        $where_tmp_zouyi = ['OR'];
-                        for ($z=0; $z<$len_zouyi; $z++){
-                            foreach ($no_fix_poses as $no_fix_zouyi_pose){
-                                $where_tmp_zouyi = array_merge($where_tmp_zouyi, [['=', 'code_'.$no_fix_zouyi_pose, $zouyi_codes[$z]]]);
+                    $where_tmp_zouyi = ['OR'];
+                    for ($z=0; $z<$len_zouyi; $z++){
+                        for ($zz=$z+1; $zz<$len_zouyi; $zz++) {
+                            for($y=0; $y<count($no_fix_poses); $y++){
+                                for($yy=$y+1; $yy<count($no_fix_poses); $yy++){
+                                    $where_tmp_zouyi = array_merge($where_tmp_zouyi, [
+                                        [ 'AND',
+                                            ['OR',
+                                                ['AND',
+                                                    ['=', 'code_' . $no_fix_poses[$y], $zouyi_codes[$z]],
+                                                    ['=', 'code_' . $no_fix_poses[$yy], $zouyi_codes[$zz]],
+                                                ],
+                                                ['AND',
+                                                    ['=', 'code_' . $no_fix_poses[$yy], $zouyi_codes[$z]],
+                                                    ['=', 'code_' . $no_fix_poses[$y], $zouyi_codes[$zz]],
+                                                ],
+                                            ]
+                                        ]
+                                    ]);
+                                }
                             }
                         }
-                        $where = array_merge($where, [$where_tmp_zouyi]);
                     }
-
+                }elseif ($fix_pos_counts == 2){ # 已经定两个位 - 剩余一个未定位 - 已校验
+                    $where_tmp_zouyi = ['OR'];
+                    for ($z=0; $z<$len_zouyi; $z++){
+                        foreach ($no_fix_poses as $no_fix_zouyi_pose){
+                            $where_tmp_zouyi = array_merge($where_tmp_zouyi, [['=', 'code_'.$no_fix_zouyi_pose, $zouyi_codes[$z]]]);
+                        }
+                    }
                 }
-
+                $where = array_merge($where, [$where_tmp_zouyi]);
             }
-            //p(['fix_poses'=>$fix_poses, 'no_fix_poses'=>$no_fix_poses]);
         }
+        //p(['code_type'=>$code_type, 'fix_pos_counts'=>$fix_pos_counts, 'fix_poses'=>$fix_poses, 'no_fix_poses'=>$no_fix_poses, 'where'=>$where]);
         ####################################  走移 end  ##################################
 
         # 不定位合分(1两数、2三数) - 三定
@@ -1539,7 +1557,7 @@ class NumService extends BaseService {
         (!empty($codes)) && $query->andWhere(['IN', 'code', $codes]);
         ###################################################### filters过滤参数结束05.24 ######################################################
 
-        $Num4Types = $query->asArray()->all();
+        $Num4Types = $query->asArray()->orderBy(['code'=>SORT_ASC])->all();
         $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
         //p(['where'=>$where, 'index_id'=>$index_id, 'filter_index_ids'=>$filter_index_ids, 'filters'=>$filters, 'code'=>$codes, 'end'=>$codesArr]);
         //p(['where'=>$where, 'codes_hz'=>$codes_hz, 'codesArr'=>$codesArr]);
@@ -2151,7 +2169,7 @@ class NumService extends BaseService {
         $data = NumService::getCodeType($codes_desc, $data);# 号码类型：type_2、type_3、type_22、type_4 等
 
         $data = NumService::getCodeTypeDw($codes_desc, $data); # 定位：23568头尾 、千1234百4567十7890
-        //p($data);
+        //p([$codes_desc, $data]);
 
         $data = NumService::getCodeTypeDao($codes_desc, $data); # 倒类型
 
@@ -2396,30 +2414,33 @@ class NumService extends BaseService {
             '千'=>['千'], '百'=>['百'],'十'=>['十'], '个'=>['个'], '五'=>['五'],
         ];
 
+        $is_num_head = 0;
+        preg_match("/^[0-9]+/", $codes_desc, $is_num_head_matches);  # 匹配是否数字开头
+        if(!empty($is_num_head_matches[0])){
+            $is_num_head = 1;
+        }
+
+        //p([$is_num_head, $codes_desc, $is_num_head_matches]);
+        //p($codes_desc);
         $hasOp = [];
         foreach ($posData as $key=>$poss){
             //if(in_array($key, $hasOp)) break;
             if(strpos($codes_desc, $key) !== false) {
                 $hasOp = array_merge($hasOp, $pds[$key]);
 
-                preg_match("/^".$key."[0-9]+/", $codes_desc, $matches1);  # 头百尾23456、头尾
-                #p(['matches1'=>$matches1],0);
-                if(empty($matches1[0])){
-                    preg_match("/".$key."[0-9]+/", $codes_desc, $matches1);  # 头百尾23456、头尾
-                }
-                //p([$key, $codes_desc, $matches1]);
-                if($matches1[0]){
-                    #$codes_desc = str_replace($matches1[0], '', $codes_desc);
-                    //p([$key, $codes_desc, $matches2, 'xxxxxx']);
-                }
-
-                preg_match("/^[0-9]+".$key."/", $codes_desc, $matches2);  # 023468头尾
-                if(empty($matches2[0])){
-                    preg_match("/".$key."[0-9]+/", $codes_desc, $matches2);  # 头百尾23456、头尾
-                }
-                if(!empty($matches2[0])){
-                    $codes_desc = str_replace($matches2[0], '', $codes_desc);
-                    //p([$key, $codes_desc, $matches2, $poss, 'xxxxxx']);
+                if($is_num_head){
+                    preg_match("/[0-9]+".$key."/", $codes_desc, $matches2);  # 023468头尾、 123百567千 数字开头
+                }else{
+                    preg_match("/".$key."[0-9]+/", $codes_desc, $matches1);  # 头百尾23456、头尾，中文开头
+                    /* 新改造，暂时注释掉
+                    if(empty($matches1[0])){
+                        preg_match("/".$key."[0-9]+/", $codes_desc, $matches1);  # 头百尾23456、头尾
+                    }
+                    preg_match("/^[0-9]+".$key."/", $codes_desc, $matches2);  # 023468头尾
+                    if(empty($matches2[0])){
+                        preg_match("/".$key."[0-9]+/", $codes_desc, $matches2);  # 头百尾23456、头尾
+                    }
+                    */
                 }
 
                 $matches = max($matches1[0], $matches2[0]);
@@ -2473,6 +2494,8 @@ class NumService extends BaseService {
      * @return array
      */
     public static function getCodeTypeZouYi($codes_desc, &$data = []){
+
+        $codes_desc = str_replace('走移', '走', $codes_desc);
 
         if(strpos($codes_desc, '走') !== false){
             $data['code_type'] = 2;
