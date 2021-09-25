@@ -230,6 +230,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
         $testData = [
             # 二定
             '头尾12345各1', # 1.已校验 - 两定
@@ -281,7 +282,6 @@ class IndexController extends Controller
         $data = NaSiDaKe::getLotteryNo($type, $is_auto=1, $lottery_type=22);
         $data = DaoQiongSi::getLotteryNo();p($data);
         $data = NaSiDaKe::getLotteryNo($type);p($data);
-        $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
         $rst = KjDataGet::updateNullCode();p($rst);
         $rst = NineNineNewService::getSnidBySn($uid=11, $tz_system_id = 12, $lottery_type=1);p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 17); p($rst);// 更新单双遗漏
