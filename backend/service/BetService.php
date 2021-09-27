@@ -364,6 +364,7 @@ abstract class BetService extends BaseBetService {
             }
             if($uid){
                 $activeQihao_key = 'activeQihao_key_'.$uid.'_'.$lottery_type;
+                $activeQihao_key = 'activeQihao_key_'.$lottery_type;
                 $activeQihao = $m->get($activeQihao_key);
                 if(empty($activeQihao) OR ($activeQihao['status']=='30200')){
                     $activeQihao = BetService::getActiveQihao($uid, $BetErrorPlansTasks[0]->tz_system_id, $lottery_type);
