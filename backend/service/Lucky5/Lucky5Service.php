@@ -1744,6 +1744,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $_t = round(microtime(true) * 1000);
+        # http://f1.wfq66376.xyz/drawno/GetCurrentPeriodStatus?_=1632757019714
         $url = $urlArr['baseUrl'].'/drawno/GetCurrentPeriodStatus?_='.$_t;
         $headers = [
             "Accept: application/json, text/javascript, */*; q=0.01",

@@ -363,8 +363,8 @@ abstract class BetService extends BaseBetService {
                 continue;
             }
             if($uid){
-                $activeQihao_key = 'activeQihao_key_'.$uid.'_'.$lottery_type;
-                $activeQihao_key = 'activeQihao_key_'.$lottery_type;
+                //$activeQihao_key = 'activeQihao_key_'.$uid.'_'.$lottery_type;
+                $activeQihao_key = BetService::buildActiveQihaoKey($uid, $BetErrorPlansTasks[0]->tz_system_id, $lottery_type);
                 $activeQihao = $m->get($activeQihao_key);
                 if(empty($activeQihao) OR ($activeQihao['status']=='30200')){
                     $activeQihao = BetService::getActiveQihao($uid, $BetErrorPlansTasks[0]->tz_system_id, $lottery_type);
@@ -455,6 +455,12 @@ abstract class BetService extends BaseBetService {
         return 'buildLotteryBetKey_'.$qihao.'_'.$plan_id.'_'.$bet_sort_key;
     }
 
+    public static function buildActiveQihaoKey($uid='', $tz_system_id='', $lottery_type = DEFAULT_LOTTERY_TYPE ){
+        $mkey = 'getActiveQihao_'.$uid.'_'.$tz_system_id.'_'.$lottery_type;
+
+        return $mkey;
+    }
+
     /**
      * @desc 获取激活的计划
      * @param string $uid
@@ -463,7 +469,7 @@ abstract class BetService extends BaseBetService {
      * @return array|string
      */
     public static function getActiveQihao($uid='', $tz_system_id='', $lottery_type = DEFAULT_LOTTERY_TYPE){
-        $mkey = 'getActiveQihao_'.$uid.'_'.$tz_system_id.'_'.$lottery_type;
+        $mkey = self::buildActiveQihaoKey($uid, $tz_system_id, $lottery_type);
 
         $m = \Yii::$app->cache;
         $qihao = $m->get($mkey);

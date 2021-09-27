@@ -230,6 +230,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $activeQihao = BetService::getActiveQihao($uid=10, $tz_system_id=9, $lottery_type=8);p($activeQihao,0);
+        $rst = Lucky5Service::userInfo($uid, $tz_system_id);p($rst);
         $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
         $testData = [
             # 二定
