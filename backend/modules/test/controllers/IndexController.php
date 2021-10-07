@@ -230,6 +230,10 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = PoxyIPService::getProxyIpNew($uid=0);p($rst);
+        $data['express_no'] = '77121045174505';
+        $r = stristr($data['express_no'], 'JDVC');
+        p($r);
         $testData = [
             # 二定
             '头尾12345各1', # 1.已校验 - 两定
@@ -402,7 +406,6 @@ class IndexController extends Controller
         $snInfo = BingDaoService::getSn($uid=12, $tz_system_id=13, $lottery_type = 13);p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         $rst = BingDaoService::login($uid=12, $tz_system_id=13);p($rst);
         $rst = OpKjService::opSscKjData(12); p($rst); # 处理投注数据
-        $rst = PoxyIPService::getProxyIpNew();p($rst);
 
         set_time_limit(0);
         $rst = JinYingService::getBalance('18', '15');p($rst);

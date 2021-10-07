@@ -10,6 +10,7 @@ namespace backend\modules\api\controllers;
 
 use backend\models\UserFollowData;
 use backend\service\HN0898Service;
+use backend\service\PoxyIPService;
 use backend\service\UserService;
 use common\tools\Tool_Common;
 use Yii;
@@ -189,6 +190,15 @@ class IndexController extends Controller
         $post = \Yii::$app->request->post();
         $rst = HN0898Service::updateStatus($post['id'], $model = '\backend\models\TzSystemsUsers', $post['field']);
 
+        return $rst;
+    }
+
+    public function actionGetProxyIp(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+
+        $uid = $post['uid'];
+        $rst = PoxyIPService::getProxyIpNew((int)$uid);
         return $rst;
     }
 }
