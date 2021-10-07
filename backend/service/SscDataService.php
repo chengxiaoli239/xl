@@ -2664,7 +2664,15 @@ class SscDataService extends BaseService {
         ];
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
-                $profits = BettingRecords::find()->where(['plan_id'=>$UserSysPlan->id, 'is_profits_record'=>1])->sum('profits');
+                $where = ['AND',
+                    ['=', 'plan_id', $UserSysPlan->id],
+                    ['=', 'is_profits_record', 1],
+                    ['OR',
+                        ['=', 'is_simulate', 0],
+                        ['AND', ['=','is_simulate', 1], ['=', 'sn', '888888']],
+                    ],
+                ];
+                $profits = BettingRecords::find()->where($where)->sum('profits');
 
                 $maxQihao = BetService::$maxQihaoArr[$lottery_type];
                 $qihao = substr(HN0898Service::getCurrentQihao($lottery_type),-3); # 最后三位

@@ -1298,7 +1298,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
     public static function userInfo($uid, $tz_system_id, $is_auto = 1){
         $m = \Yii::$app->cache;
         $mkey = 'get_userInfo_'.$uid.'_'.$tz_system_id.'_'.$is_auto;
-        if($data = $m->get($mkey) && $is_auto==1) return $data;
+        //if($data = $m->get($mkey) && $is_auto==1) return $data;
+        if($data = $m->get($mkey)) return $data;
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         if($is_auto == 1 && (strpos($TzSystemsUsers->desc, '您的访问过于频繁') !== false OR strpos($TzSystemsUsers->desc, '用户名或密码不正确') !== false)){
@@ -1744,6 +1745,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         $_t = round(microtime(true) * 1000);
+        # http://f1.wfq66376.xyz/drawno/GetCurrentPeriodStatus?_=1632757019714
         $url = $urlArr['baseUrl'].'/drawno/GetCurrentPeriodStatus?_='.$_t;
         $headers = [
             "Accept: application/json, text/javascript, */*; q=0.01",
