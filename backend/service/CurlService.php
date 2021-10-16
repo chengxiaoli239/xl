@@ -349,7 +349,7 @@ class CurlService extends BaseService{
     }
 
     public static function getCurlData($url){
-        $cookie = tempnam("/WORK/LOG/".Yii::$app->params['LOG_PATH']."/".date('Ymd').'/cookie/', "cookie");
+        $cookie = tempnam("/www/log/".Yii::$app->params['LOG_PATH']."/".date('Ymd').'/cookie/', "cookie");
         //先获取 cookie
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);

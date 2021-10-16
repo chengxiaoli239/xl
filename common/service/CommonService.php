@@ -1186,7 +1186,7 @@ class  CommonService{
         fclose($tp);
         $logData = ['url'=>$url,'headers'=>$headers, 'filename'=>$filename];
         //p($logData);
-        Tool_Common::log('/WORK/LOG/'.\Yii::$app->params['LOG_PATH'].'/'.date('Ymd').'/downLoadCodeImg','INFO','下载图片验证码', $logData);
+        Tool_Common::log('/downLoadCodeImg','INFO','下载图片验证码', $logData);
 
         return $filename;
     }
