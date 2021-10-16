@@ -34,7 +34,7 @@ class SystemService{
         $rst = ['status'=>200, 'msg'=>'操作成功'];
 
         $tables = [
-            'lt_betting_records', 'lt_bet_error_plans_task',''
+            'lt_betting_records', 'lt_bet_error_plans_task'
         ];
 
         foreach ($tables as $table){
