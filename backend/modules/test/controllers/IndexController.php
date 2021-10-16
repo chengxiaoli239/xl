@@ -230,16 +230,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-<<<<<<< HEAD
-        $rst = PoxyIPService::getProxyIpNew($uid=0);p($rst);
-        $data['express_no'] = '77121045174505';
-        $r = stristr($data['express_no'], 'JDVC');
-        p($r);
-=======
         $activeQihao = BetService::getActiveQihao($uid=10, $tz_system_id=9, $lottery_type=8);p($activeQihao,0);
         $rst = Lucky5Service::userInfo($uid, $tz_system_id);p($rst);
         $rst = BaoTaService::syncBaoTaCrontabs($id=1);p($rst);
->>>>>>> 336940e4e7903b96522bedc12c428396c6767ba6
         $testData = [
             # 二定
             '头尾12345各1', # 1.已校验 - 两定

@@ -83,7 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = "<font color='green'>开启</font><span id='tip_msg_'".$model->lottery_type."></span>" ;
-                                return Html::a($txt, '#', ['title'=>'点击开启', 'class'=>'btn btn-primary open-bet-status', 'lottery_type'=>$model->lottery_type]);
+                                return Html::a($txt, '#', ['title'=>'点击开启', 'class'=>'btn btn-xs btn-primary open-bet-status', 'lottery_type'=>$model->lottery_type]);
                             },
                         ],
                         //'info',
@@ -95,8 +95,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute'=>'status', 'label'=>'操作','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value'=>function($model){
-                                $url1 = '/forum/lottery-type/init-lottery'; # 路由
-                                $txt = "<button data-url='".$url1."' color='green' data-lottery-type='".$model->lottery_type."' class='min-button btn-info btn-xs act-execute'>初始化</button>" ;
+                                $url1 = '/forum/lottery-type/init-lottery'; # 初始化系统数据
+                                $url2 = '/forum/lottery-type/del-bet-record'; # 清除游戏记录
+                                $txt = "<button data-url='".$url1."' color='green' data-lottery-type='".$model->lottery_type."' class='btn btn-info btn-xs act-execute'>初始化</button>" ;
+                                $txt .= "<button data-url='".$url2."' color='red' data-lottery-type='".$model->lottery_type."' class='btn btn-warning btn-xs act-execute'>清理下注数据</button>" ;
                                 return Html::a($txt, 'javascript:;', ['title' => '点击执行，新加彩种初始化']);
                             }
                         ],
@@ -124,7 +126,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = "<font color='green'>单双数据</font><span id='tip_msg_init_ds_'".$model->lottery_type."></span>" ;
-                                return Html::a($txt, '#', ['title'=>'点击初始化', 'class'=>'btn btn-primary init-ds-data', 'lottery_type'=>$model->lottery_type]);
+                                return Html::a($txt, '#', ['title'=>'点击初始化', 'class'=>'btn btn-xs btn-primary init-ds-data', 'lottery_type'=>$model->lottery_type]);
                             },
                         ],
 

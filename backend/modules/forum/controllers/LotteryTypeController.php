@@ -132,6 +132,22 @@ class LotteryTypeController extends BaseController
     }
 
     /**
+     * @desc 删除下注记录status状态 0/1
+     * @param $id
+     * @return \yii\web\Response
+     */
+    public function actionDelBetRecord(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $rstData = SystemService::delBetRecord($post['lottery_type']);
+        $rst['rstData'] = $rstData;
+        $rst['post']['post_url'] = 'http://'.\Yii::$app->request->hostName.'/forum/lottery-type/del-bet-record';
+        $rst['post']['post_data'] = $post;
+
+        return $rst;
+    }
+
+    /**
      * Updates an existing LotteryType model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
