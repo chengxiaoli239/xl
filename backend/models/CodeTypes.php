@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string $type 号码类型
  * @property string $type_name 类型名称
+ * @property string $type_key 类型key
  * @property int $playway 投注类型:1二定2三定3四定
  * @property int $status 状态
  * @property string $codes 组合号码
@@ -40,6 +41,7 @@ class CodeTypes extends \common\models\base\BaseModel
             [['update_time'], 'safe'],
             [['type'], 'string', 'max' => 255],
             [['type_name'], 'string', 'max' => 64],
+            [['type_key'], 'string', 'max' => 24],
             [['codes', 'desc'], 'string', 'max' => 640],
         ];
     }
@@ -53,6 +55,7 @@ class CodeTypes extends \common\models\base\BaseModel
             'id' => 'ID',
             'type' => '号码类型',
             'type_name' => '类型名称',
+            'type_key' => '类型key',
             'playway' => '投注类型:1二定2三定3四定',
             'status' => '状态',
             'codes' => '组合号码',

@@ -165,6 +165,17 @@ $this->title = '新过滤快打';
                         <a href="javascript:;" class="btn btn-xs btn-info reverse_type_hz_Null">清</a>
                 ') ?>
 
+                <!--类型取 或 类型除 新-->
+                <div class="row">
+                    <div class="col-lg-6 col-xs-6">
+                        <?= $form->field($model, 'get_types')->checkboxList($code_types)->label('类型取【或】') ?>
+                    </div>
+                    <div class="col-lg-6 col-xs-6">
+                        <?= $form->field($model, 'remove_types')->checkboxList($code_types)->label('类型除【并】') ?>
+                    </div>
+                </div>
+
+                <!--
                 <div class="row">
                     <div class="col-lg-1 col-xs-4">
                         <?= $form->field($model, 'type_2')->checkBoxList([
@@ -185,10 +196,12 @@ $this->title = '新过滤快打';
                         ])->label('四重') ?>
                     </div>
 
-                <!--/div-->
+                </div>
+                -->
                 <!--?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?-->
 
                 <!--div class="row"-->
+                    <!--
                     <div class="col-lg-1 col-xs-4">
                         <?= $form->field($model, 'type_22')->checkBoxList([
                             0=>'除',
@@ -207,10 +220,10 @@ $this->title = '新过滤快打';
                             1=>'取'
                         ])->label('三兄') ?>
                     </div>
+                    -->
                 <!--
                 </div>
                 <div class="row">
-                -->
                     <div class="col-lg-1 col-xs-4">
                         <?= $form->field($model, 'type_4b')->checkBoxList([
                             0=>'除',
@@ -231,10 +244,10 @@ $this->title = '新过滤快打';
                             1=>'取',
                         ])->label('双两兄') ?>
                     </div>
+                -->
                 <!--
                 </div>
                 <div class="row">
-                -->
                     <div class="col-lg-1 col-xs-4">
                         <?= $form->field($model, 'type_4s')->checkBoxList([
                             //0=>'非四单四双',
@@ -250,6 +263,7 @@ $this->title = '新过滤快打';
                         ])->label('三现:双+两兄') ?>
                     </div>
                 </div>
+                -->
 
                 <!--号码单双类型:两单两双，四单，四双-->
                 <?= $form->field($model, 'type_4ds')->checkboxList($type_4ds_Arr)->label('单双类型 &nbsp;&nbsp;<a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds">反买</a>') ?>

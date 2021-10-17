@@ -21,6 +21,7 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
 
                     <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
+                    <input type="hidden" value="<?=$lottery_type?>" name="UserSysPlans[lottery_type]">
                     <div class="row">
                         <div class="col-lg-4 col-xs-4">
                             <?= $form->field($model, 'playway')->radioList([
@@ -56,10 +57,10 @@ use yii\widgets\ActiveForm;
 
                     <div class="row">
                         <div class="col-lg-6 col-xs-6">
-                            <?= $form->field($model, 'get_types')->checkboxList($code_types)->label('类型或【取】') ?>
+                            <?= $form->field($model, 'get_types')->checkboxList($code_types)->label('类型取【或】') ?>
                         </div>
                         <div class="col-lg-6 col-xs-6">
-                            <?= $form->field($model, 'remove_types')->checkboxList($code_types)->label('类型或【除】') ?>
+                            <?= $form->field($model, 'remove_types')->checkboxList($code_types)->label('类型除【并】') ?>
                         </div>
                     </div>
 

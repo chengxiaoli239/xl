@@ -1253,88 +1253,27 @@ class NumService extends BaseService {
             $where = array_merge($where, [['=', 'type_3n_2b', (int)$codes_hz['type_3n_2b']]]);
         }
 
-        # tz_type:28 三现:双重+两兄弟 1
-        if(($codes_hz['get_types'] && in_array(1, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(1, $codes_hz['remove_types']) )){
-            if($codes_hz['get_types'] && in_array(1, $codes_hz['get_types'])){
-                $type_3n_2b = 1;
-            }else{
-                $type_3n_2b = 0;
-            }
-            $where = array_merge($where, [['=', 'type_3n_2b', $type_3n_2b]]);
-        }
-        # tz_type:28 双重 2
-        if(($codes_hz['get_types'] && in_array(2, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(2, $codes_hz['remove_types']) )){
-            if($codes_hz['get_types'] && in_array(2, $codes_hz['get_types'])){
-                $type_2 = 1;
-            }else{
-                $type_2 = 0;
-            }
-            $where = array_merge($where, [['=', 'type_2', $type_2]]);
-        }
-        # tz_type:28 三重 3
-        if(($codes_hz['get_types'] && in_array(3, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(3, $codes_hz['remove_types']) )){
-            if($codes_hz['get_types'] && in_array(3, $codes_hz['get_types'])){
-                $type_3 = 1;
-            }else{
-                $type_3 = 0;
-            }
-            $where = array_merge($where, [['=', 'type_3', $type_3]]);
-        }
-        # tz_type:28 四重 4
-        if(($codes_hz['get_types'] && in_array(4, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(4, $codes_hz['remove_types']) )){
-            if($codes_hz['get_types'] && in_array(4, $codes_hz['get_types'])){
-                $type_4 = 1;
-            }else{
-                $type_4 = 0;
-            }
-            $where = array_merge($where, [['=', 'type_4', $type_4]]);
-        }
-        # tz_type:28 两兄弟 5
-        if(($codes_hz['get_types'] && in_array(5, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(5, $codes_hz['remove_types']) )){
-            if($codes_hz['get_types'] && in_array(5, $codes_hz['get_types'])){
-                $type_2b = 1;
-            }else{
-                $type_2b = 0;
-            }
-            $where = array_merge($where, [['=', 'type_2b', $type_2b]]);
-        }
-        # tz_type:28 三兄弟 6
-        if(($codes_hz['get_types'] && in_array(6, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(6, $codes_hz['remove_types']) )){
-            if($codes_hz['get_types'] && in_array(6, $codes_hz['get_types'])){
-                $type_3b = 1;
-            }else{
-                $type_3b = 0;
-            }
-            $where = array_merge($where, [['=', 'type_3b', $type_3b]]);
-        }
+        # tz_type:28 类型取 或  类型除
+        if(!empty($codes_hz['get_types']) OR !empty($codes_hz['remove_types'])){
+            $TypeKeys = UserSysPlansService::getCodeTypeKeys();
 
-        # tz_type:28 双双重 7
-        if(($codes_hz['get_types'] && in_array(7, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(7, $codes_hz['remove_types']) )){
-            if($codes_hz['get_types'] && in_array(7, $codes_hz['get_types'])){
-                $type_22 = 1;
-            }else{
-                $type_22 = 0;
+            # 类型取 或 get_types
+            if(!empty($codes_hz['get_types'])){
+                $where_get_types = ['OR'];
+                foreach ($codes_hz['get_types'] as $get_type){
+                    $where_get_types[] = ['=', $TypeKeys[$get_type], 1];
+                }
+                $where = array_merge($where, [$where_get_types]);
             }
-            $where = array_merge($where, [['=', 'type_22', $type_22]]);
-        }
 
-        # tz_type:28 双两兄弟 8
-        if(($codes_hz['get_types'] && in_array(8, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(8, $codes_hz['remove_types']) )){
-            if($codes_hz['get_types'] && in_array(8, $codes_hz['get_types'])){
-                $type_22b = 1;
-            }else{
-                $type_22b = 0;
+            # 类型除 并 remove_types
+            if(!empty($codes_hz['remove_types'])){
+                $where_remove_types = ['AND'];
+                foreach ($codes_hz['remove_types'] as $remove_type){
+                    $where_remove_types[] = ['=', $TypeKeys[$remove_type], 0];
+                }
+                $where = array_merge($where, [$where_remove_types]);
             }
-            $where = array_merge($where, [['=', 'type_22b', $type_22b]]);
-        }
-        # tz_type:28 四兄弟 9
-        if(($codes_hz['get_types'] && in_array(9, $codes_hz['get_types'])) OR ($codes_hz['remove_types'] && in_array(9, $codes_hz['remove_types']) )){
-            if($codes_hz['get_types'] && in_array(9, $codes_hz['get_types'])){
-                $type_4b = 1;
-            }else{
-                $type_4b = 0;
-            }
-            $where = array_merge($where, [['=', 'type_4b', $type_4b]]);
         }
 
         # 对数

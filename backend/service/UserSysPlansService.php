@@ -685,7 +685,7 @@ class UserSysPlansService extends BaseService {
                     $hzArr[$i] = $i;
                 }
                 $data['hzArr'] = $hzArr;
-                if(in_array($tz_type, [28])){ # 系统快捷
+                if(in_array($tz_type, [28, 38])){ # 系统快捷、过滤快打
                     $data['code_types'] = UserSysPlansService::getCodeTypes();
                 }
                 $data['type_4ds_Arr'] = UserSysPlansService::getCodeTypes($flag = 2); # 单双类型：两单两双、四单、四双
@@ -768,10 +768,29 @@ class UserSysPlansService extends BaseService {
         $m = \Yii::$app->cache;
         $mkey = 'getCodeTypes_03_'.$flag;
 
-        if(!$data = $m->get($mkey)){
+        if(true OR !$data = $m->get($mkey)){
             $codeTypes = CodeTypes::find()->where(['status'=>1, 'flag'=>$flag])->asArray()->All();
             foreach ($codeTypes as $codeType){
                 $data[$codeType['type']] = $codeType['type_name'];
+            }
+            $m->set($mkey, $data, \Yii::$app->params['BASE_DATA_CACHE_TIME']*2);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @desc 号码类型key
+     * @return array
+     */
+    public static function getCodeTypeKeys($flag = 1){
+        $m = \Yii::$app->cache;
+        $mkey = 'getCodeTypeKeys_03_'.$flag;
+
+        if(true OR !$data = $m->get($mkey)){
+            $codeTypes = CodeTypes::find()->where(['status'=>1, 'flag'=>$flag])->asArray()->All();
+            foreach ($codeTypes as $codeType){
+                $data[$codeType['type']] = $codeType['type_key'];
             }
             $m->set($mkey, $data, \Yii::$app->params['BASE_DATA_CACHE_TIME']*2);
         }
