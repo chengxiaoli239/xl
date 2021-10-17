@@ -775,6 +775,7 @@ class UserSysPlansService extends BaseService {
             }
             $m->set($mkey, $data, \Yii::$app->params['BASE_DATA_CACHE_TIME']*2);
         }
+        p($data);
 
         return $data;
     }
