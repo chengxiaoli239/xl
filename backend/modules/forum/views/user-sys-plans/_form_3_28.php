@@ -76,7 +76,7 @@ use yii\widgets\ActiveForm;
                         <a href="javascript:;" class="btn btn-xs btn-info reverse_type_hz">反买</a>
                         <a href="javascript:;" class="btn btn-xs btn-info reverse_type_hz_Null">清</a>
                     ') ?>
-                    <?= $form->field($model, 'remove_hzs')->checkboxList($hzArr)->label('和值【除】
+                    <!--?= $form->field($model, 'remove_hzs')->checkboxList($hzArr)->label('和值【除】
                         <a href="javascript:;" class="btn btn-xs btn-info fan reverse_type_hz_0_6">0-6</a>&nbsp;&nbsp;
                         <a href="javascript:;" class="btn btn-xs btn-info fan reverse_type_hz_5_10">5-10</a>&nbsp;&nbsp;
                         <a href="javascript:;" class="btn btn-xs btn-info fan reverse_type_hz_11_15">11-15</a>&nbsp;&nbsp;
@@ -88,7 +88,7 @@ use yii\widgets\ActiveForm;
                         <a href="javascript:;" class="btn btn-xs btn-info fan reverse_type_hz_shuang">双</a>&nbsp;&nbsp;
                         <a href="javascript:;" class="btn btn-xs btn-info fan reverse_type_hz">反买</a>
                         <a href="javascript:;" class="btn btn-xs btn-info fan reverse_type_hz_Null">清</a>
-                    ') ?>
+                    ') ?-->
 
                     <div class="row">
                         <div class="col-lg-3 col-xs-6">
@@ -103,20 +103,53 @@ use yii\widgets\ActiveForm;
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
 
-                <div class="form-group">
+                    <!--div class="form-group">
                         <div class="col-lg-offset-2 col-lg-10">
                             <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>
                         </div>
-                    </div>
+                    </div-->
+                    <?php include(dirname(__FILE__).'/act-button.php');?>
                 <?php ActiveForm::end(); ?>
             </div>
         </section>
     </div>
 </div>
+<div class="modal fade" id="rstTipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
+     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
+">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_title">提示信息</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group up-reason">
+                    <label id="tip_msg_rst" for="tip_msg_rst"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="opRstConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<?php include(dirname(__FILE__).'/query-profits.php');?>
 <!--script src="/statics/js/ds_select.js"></script-->
 <script>
     $(function () {
+        $(".id-query").click(function () {
+            url = '/forum/ssc-static-yl/query'
+            data = $('#w0').serialize()+'&type='+$(this).data('type');
+            $.post(url, data, function(rst) {
+                $('#tip_msg_rst').html('<strong>号码：</strong>'+rst.code_desc + "<br>" +'<strong>组数：</strong>'+ rst.counts + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str)
+                $('#rstTipModal').modal('show');
+            });
+        });
+
         // 四定单双：两单两双，四单，四双等
         $('.reverse_type_4ds').click(function () {
             $("[name='UserSysPlans[type_4ds][]']").each(function () {

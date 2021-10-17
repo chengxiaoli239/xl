@@ -19,7 +19,6 @@
     color: #FF7E00;
 }
 </style>
-
 <div id="modalTable" class="modal fade" tabindex="-1" role="dialog" style="display: none;padding-right: 0px;" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document" style="margin:100px auto;">
         <div class="modal-content">

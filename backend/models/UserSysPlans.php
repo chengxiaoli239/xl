@@ -104,6 +104,9 @@ class UserSysPlans extends \common\models\base\BaseModel
 
     public $type_ds_details; # 单双类型：1122,2121,1111 等
 
+    public $filters;
+    public $filter_dates;
+    public $filter_qihaos;
     ###### 排除过滤参数开始 #######
     # 1、排除前x期
     public $is_filter; # 是否排除
