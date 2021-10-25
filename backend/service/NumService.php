@@ -925,7 +925,7 @@ class NumService extends BaseService {
             //$query->andWhere($andWhere);
         }
         # tz_type:28 和值-取
-        if(isset($codes_hz['get_hzs']) && empty($codes_hz['get_hzs'])){
+        if(isset($codes_hz['get_hzs']) && !empty($codes_hz['get_hzs'])){
             $where = array_merge($where, [ ['IN', 'codes_hz', $codes_hz['get_hzs']] ]);
         }
         # tz_type:28 和值-除
