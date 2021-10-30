@@ -40,7 +40,7 @@ class PoxyIPService extends BaseService {
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdps/?'.http_build_query($query);
         $rst = CurlService::getCurl($url);
 
-        Tool_Common::log('kuaiPoxy', 'ERR', '代理IP获取', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
+        Tool_Common::log('kuaiPoxy', 'INFO', '代理IP获取', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
         if($rst['code'] != 0 OR empty($rst['data']['proxy_list'][0])){
             $m = \Yii::$app->cache;
             $mkey = 're_get_kuai_poxy';

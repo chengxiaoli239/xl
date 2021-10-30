@@ -194,6 +194,16 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['arb_pos_codes']);
 
+        # 20.1、号码类型：取
+        if(isset($post['UserSysPlans']['get_types']) && $post['UserSysPlans']['get_types']){
+            $tmpFilter['get_types'] = $post['UserSysPlans']['get_types'];
+        }
+        unset($post['UserSysPlans']['get_types']);
+        # 20.2、号码类型：除
+        if(isset($post['UserSysPlans']['remove_types']) && $post['UserSysPlans']['remove_types']){
+            $tmpFilter['remove_types'] = $post['UserSysPlans']['remove_types'];
+        }
+        unset($post['UserSysPlans']['remove_types']);
 
         ################### 公共参数 - 结束 #########################
 
@@ -323,16 +333,7 @@ class UserSysPlansService extends BaseService {
 
             //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
         }elseif ($tz_type == 28){ # 系统快捷
-            # 1.1、号码类型：取
-            if(isset($post['UserSysPlans']['get_types']) && $post['UserSysPlans']['get_types']){
-                $tmpFilter['get_types'] = $post['UserSysPlans']['get_types'];
-            }
-            unset($post['UserSysPlans']['get_types']);
-            # 1.2、号码类型：除
-            if(isset($post['UserSysPlans']['remove_types']) && $post['UserSysPlans']['remove_types']){
-                $tmpFilter['remove_types'] = $post['UserSysPlans']['remove_types'];
-            }
-            unset($post['UserSysPlans']['remove_types']);
+
 
             # 2.1、和值：取
             if(isset($post['UserSysPlans']['get_hzs']) && $post['UserSysPlans']['get_hzs']){

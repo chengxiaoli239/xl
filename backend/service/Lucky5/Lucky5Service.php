@@ -136,6 +136,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
         //d($balance);
         $msg = ['status'=>200, 'msg'=>'金额同步成功~','tz_system_user_id'=>$tz_system_user_id, 'balance'=>$balance, 'account'=>$TzSystemsUsers->account, 'username'=>$TzSystemsUsers->username];
 
+        if(isset($balance['status']) && $balance['status'] == 3004){
+            $TzSystemsUsers->desc = $balance['msg'];
+        }
+
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->updated_at = time();
         if(!$rst = $TzSystemsUsers->save() OR $balance === false){
@@ -846,6 +850,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $balance = $rst['Data']['credit_balance'];
         }
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        if(isset($rst['status']) && $rst['status'] == 3004){
+            $TzSystemsUsers->desc = $rst['msg'];
+        }
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->save();
         $end_time = microtime(true);
@@ -1302,6 +1309,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if($data = $m->get($mkey)) return $data;
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        if($is_auto==1 && $TzSystemsUsers->expire_time<time()){
+            return ['status'=>3004, 'msg'=>'账号已过期，请续费'];
+        }
+        if($is_auto==1 && $TzSystemsUsers->status==0){
+            return ['status'=>3004, 'msg'=>'账号未激活'];
+        }
         if($is_auto == 1 && (strpos($TzSystemsUsers->desc, '您的访问过于频繁') !== false OR strpos($TzSystemsUsers->desc, '用户名或密码不正确') !== false)){
             return ['status'=>300, 'msg'=>'您的访问过于频繁，请稍后再试 或 用户名或密码不正确'];
         }
