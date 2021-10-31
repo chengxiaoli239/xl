@@ -127,7 +127,8 @@ class IndexController extends Controller
      */
     public static function actionChangePoxyIp(){
         self::_init();
-        $rst = PoxyIPService::clearProxyIpKey();p($rst);
+        $uid = 10;
+        $rst = PoxyIPService::clearProxyIpKey($uid);p($rst);
 
         return $rst;
     }

@@ -262,6 +262,7 @@ class PoxyIPService extends BaseService {
 
         $mkey = self::builProxyIpKey($mod_uid);
         $poxy_ip_data = $m->get($mkey);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip-缓存', ['mkey'=>$mkey, 'rkey'=>$rKey, 'poxy_ip_data'=>$poxy_ip_data]);
         if(!empty($poxy_ip_data)){
             $isValid = PoxyIPService::isValid([$poxy_ip_data]);
             $isValidRst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
