@@ -167,9 +167,9 @@ class IndexController extends Controller
         self::_init();
         $post = \Yii::$app->request->post();
         $poxy_addr = PoxyIPService::getPoxyIp();
-        p($poxy_addr);
         $id = $post['id'];
         $rst = BaseService::login($id);
+        p($rst);
         $TzSystemsUsers = TzSystemsUsers::findOne($id);
 
         return array_merge($rst,  ['TzSystemsUsers'=>$TzSystemsUsers, 'poxy_addr'=>$poxy_addr]);
