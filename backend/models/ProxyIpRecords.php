@@ -47,15 +47,15 @@ class ProxyIpRecords extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'ip_addr' => 'ip地址',
-            'ip_port' => '端口号',
-            'valid_time' => 'ip可用时长',
-            'status' => '状态：0不可用1可用',
-            'expire_time' => '到期时间',
-            'created_at' => '创建时间',
-            'updated_at' => '更新时间',
-            'update_time' => '更新时间',
+            'id' => Yii::t('app', 'ID'),
+            'ip_addr' => Yii::t('app', 'ip地址'),
+            'ip_port' => Yii::t('app', '端口号'),
+            'valid_time' => Yii::t('app', 'ip可用时长'),
+            'status' => Yii::t('app', '状态：0不可用1可用'),
+            'expire_time' => Yii::t('app', '到期时间'),
+            'created_at' => Yii::t('app', '创建时间'),
+            'updated_at' => Yii::t('app', '更新时间'),
+            'update_time' => Yii::t('app', '更新时间'),
         ];
     }
 
