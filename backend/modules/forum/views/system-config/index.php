@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute'=>'value','label'=>'值','headerOptions'=>['width'=>'4%'],
                             'format'=>'raw',
                             'value'=>function($model){
-                                if(in_array($model->value, [0,1])){
+                                if($model->value === '0' OR $model->value === 0 OR $model->value == 1){
                                     $txt = $model->value==1 ? '已开启' : '已关闭';
                                     $color = $model->value==1 ? 'green' : 'red';
                                     $opions = [
