@@ -271,11 +271,12 @@ class PoxyIPService extends BaseService {
 
         if(!$isValid OR $isValidRst['status'] != 200 OR $isValidRst['data'][$poxy_ip_data] < 60){
             # 调用失败或者可使用时间少于5分钟则认为IP失效
-            $data = self::kuaiPoxy();
+            //$data = self::kuaiPoxy();
+            $data = self::getRemoteProxyIp($type=1);
             if($data['status'] != 200) {
                 return [];
             }
-            $poxy_ip_data = $data['data'][0];
+            $poxy_ip_data = $data['ip_addr'];
             $m->set($mkey, $poxy_ip_data, $time);
         }
 
@@ -298,17 +299,28 @@ class PoxyIPService extends BaseService {
         if('04:00'<$time_HI && $time_HI<'08:55'){
             return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
         }
+
         if($type == 2){
 
         }else{
+            # 快代理
             $data = self::kuaiPoxy();
             if($data['status'] != 200) {
                 return [];
             }
-            $poxy_ip_data = $data['data'][0];
+            $ip_addr = $data['data'][0];
         }
+        $now_time = time();
+        $setDatas = [
+            'ip_addr'=>$ip_addr,
+            'created_at' => $now_time,
+            'updated_at' => $now_time,
+        ];
+        $ProxyIpRecords = new ProxyIpRecords();
+        $ProxyIpRecords->setAttributes($setDatas);
+        $ProxyIpRecords->save();
 
-        return $proxy_datas;
+        return ['status'=>200, 'ip_addr'=>$ip_addr];
     }
 
     /**

@@ -532,7 +532,7 @@ class IndexController extends Controller
         $mcLock->Lock('dw');
         $flag = $mcLock->isLock('dw');
         d($flag);
-        $rst = PoxyIPService::kuaiPoxy();p($rst);
+        $rst = PoxyIPService::getRemoteProxyIp($type=1);p($rst);
         $rst = PoxyIPService::kuaiPoxyExpire();p($rst);
 
         $id = 43; $rst = SevenService::synBalance($id);p($rst);
