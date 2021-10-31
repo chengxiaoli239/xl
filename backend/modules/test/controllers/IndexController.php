@@ -166,10 +166,11 @@ class IndexController extends Controller
     public function actionTestLogin(){
         self::_init();
         $post = \Yii::$app->request->post();
+        $poxy_addr = PoxyIPService::getPoxyIp();
+        p($poxy_addr);
         $id = $post['id'];
         $rst = BaseService::login($id);
         $TzSystemsUsers = TzSystemsUsers::findOne($id);
-        $poxy_addr = PoxyIPService::getPoxyIp();
 
         return array_merge($rst,  ['TzSystemsUsers'=>$TzSystemsUsers, 'poxy_addr'=>$poxy_addr]);
     }

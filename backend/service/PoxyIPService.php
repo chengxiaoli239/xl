@@ -34,7 +34,7 @@ class PoxyIPService extends BaseService {
             'format' => 'json', # json、xml
             'sep' => 1,
             //'area' => '浙江,福建,江西,上海,湖北,江苏,广东',
-            'area' => '海南',
+            'area' => '福建,广东',
             'signature' => $API_KEY,
         ];
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdps/?'.http_build_query($query);
