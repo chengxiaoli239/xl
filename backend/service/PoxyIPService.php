@@ -1,6 +1,7 @@
 <?php
 namespace backend\service;
 
+use backend\models\ProxyIpRecords;
 use backend\models\TzSystemsUsers;
 use backend\service\Lucky5\Lucky5Service;
 use common\service\CommonService;
@@ -49,7 +50,7 @@ class PoxyIPService extends BaseService {
                 $m->set($mkey, 1, 10);
                 return self::kuaiPoxy(); # 获取代理失败，再次获取一次代理ip
             }
-            return ['status'=>300, 'msg'=>'代理端口不可用'];
+            return ['status'=>300, 'msg'=>'代理端口异常，不可用'];
         }
 
         return ['status'=>200, 'data'=>$rst['data']['proxy_list'], 'msg'=>'代理IP数据获取成功'];
@@ -284,6 +285,45 @@ class PoxyIPService extends BaseService {
         Tool_Common::log('preGetIpValidStatus', 'INFO', '预先缓存代理IP', $logArr);
 
         return ['status'=>200, 'msg'=>'操作成功', 'data'=>$logArr];
+    }
+
+    /**
+     * @desc 获取代理IP
+     * @param int $type 1快代理2芝麻代理
+     * @return array
+     */
+    public static function getRemoteProxyIp($type=1){
+        $proxy_datas = [];
+        $time_HI = date("H:i");
+        if('04:00'<$time_HI && $time_HI<'08:55'){
+            return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
+        }
+        if($type == 2){
+
+        }else{
+            $data = self::kuaiPoxy();
+            if($data['status'] != 200) {
+                return [];
+            }
+            $poxy_ip_data = $data['data'][0];
+        }
+
+        return $proxy_datas;
+    }
+
+    /**
+     * @param string $ip
+     * @return bool
+     */
+    public static function setIpInvalid($ip=''){
+        $row = ProxyIpRecords::findOne(['ip_addr'=>$ip]);
+        if(!empty($row)){
+            $row->status = 0;
+            $flag = $row->save();
+        }
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设代理IP不可用', ['ip'=>$ip, 'flag'=>$flag]);
+
+        return true;
     }
 
     /**
