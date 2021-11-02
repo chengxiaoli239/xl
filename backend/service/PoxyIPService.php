@@ -349,12 +349,12 @@ class PoxyIPService extends BaseService {
         $poxy_ip_data = $m->get($mkey);
         if(empty($poxy_ip_data)){
             $redisLock = new RedisLock();
-            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取新代理IP', ['uid'=>$uid, 'is_auto'=>$is_auto]);
             if($redisLock->lock($mkey.'_redis', 15)){
-                PoxyIPService::preGetValidIp($uid);
+                $rst = PoxyIPService::preGetValidIp($uid);
             }else{
                 sleep(10);
             }
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取新代理IP', ['uid'=>$uid, 'is_auto'=>$is_auto, 'rst'=>$rst]);
         }
         $poxy_ip_data = $m->get($mkey);
 
