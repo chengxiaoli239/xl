@@ -232,6 +232,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = PoxyIPService::getRemoteProxyIp($type=1);p($rst);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%lt_proxy_ip_records}}');p($r);
         $rst = BaseService::login($id=10);p($rst);
         $activeQihao = BetService::getActiveQihao($uid=10, $tz_system_id=9, $lottery_type=8);p($activeQihao,0);
@@ -532,7 +533,6 @@ class IndexController extends Controller
         $mcLock->Lock('dw');
         $flag = $mcLock->isLock('dw');
         d($flag);
-        $rst = PoxyIPService::getRemoteProxyIp($type=1);p($rst);
         $rst = PoxyIPService::kuaiPoxyExpire();p($rst);
 
         $id = 43; $rst = SevenService::synBalance($id);p($rst);

@@ -308,11 +308,15 @@ class PoxyIPService extends BaseService {
             if($data['status'] != 200) {
                 return [];
             }
-            $ip_addr = $data['data'][0];
+            $ip_addr_datas = explode(':', $data['data'][0]);;
+            $ip_addr = $ip_addr_datas[0];
+            $port = $ip_addr_datas[1];
         }
         $now_time = time();
         $setDatas = [
-            'ip_addr'=>$ip_addr,
+            'ip_addr' => $ip_addr,
+            'port' => $port,
+            'isp' => $type,
             'created_at' => $now_time,
             'updated_at' => $now_time,
         ];
