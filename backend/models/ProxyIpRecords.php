@@ -9,8 +9,11 @@ use Yii;
  *
  * @property int $id
  * @property string $ip_addr ip地址
- * @property string $ip_port 端口号
+ * @property string $ip
+ * @property string $port 端口号
  * @property string $valid_time ip可用时长
+ * @property string $city 城市
+ * @property string $isp 运营商（电信、联通）
  * @property int $status 状态：0不可用1可用
  * @property int $expire_time 到期时间
  * @property int $created_at 创建时间
@@ -36,8 +39,8 @@ class ProxyIpRecords extends \common\models\base\BaseModel
             [['status', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
-            [['ip_addr'], 'string', 'max' => 24],
-            [['ip_port', 'valid_time'], 'string', 'max' => 64],
+            [['ip_addr', 'ip', 'port', 'valid_time'], 'string', 'max' => 24],
+            [['city', 'isp'], 'string', 'max' => 64],
         ];
     }
 
@@ -49,8 +52,11 @@ class ProxyIpRecords extends \common\models\base\BaseModel
         return [
             'id' => Yii::t('app', 'ID'),
             'ip_addr' => Yii::t('app', 'ip地址'),
-            'ip_port' => Yii::t('app', '端口号'),
+            'ip' => Yii::t('app', 'Ip'),
+            'port' => Yii::t('app', '端口号'),
             'valid_time' => Yii::t('app', 'ip可用时长'),
+            'city' => Yii::t('app', '城市'),
+            'isp' => Yii::t('app', '运营商（电信、联通）'),
             'status' => Yii::t('app', '状态：0不可用1可用'),
             'expire_time' => Yii::t('app', '到期时间'),
             'created_at' => Yii::t('app', '创建时间'),
