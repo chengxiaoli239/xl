@@ -5,7 +5,7 @@ namespace backend\models;
 use Yii;
 
 /**
- * This is the model class for table "{{%proxy_ip_records}}".
+ * This is the model class for table "{{%proxy_ip_suppliers}}".
  *
  * @property int $id
  * @property string $ip_addr ip地址
@@ -21,14 +21,14 @@ use Yii;
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
  */
-class ProxyIpRecords extends \common\models\base\BaseModel
+class ProxyIpSuppliers extends \common\models\base\BaseModel
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return '{{%proxy_ip_records}}';
+        return '{{%proxy_ip_suppliers}}';
     }
 
     /**
@@ -69,10 +69,10 @@ class ProxyIpRecords extends \common\models\base\BaseModel
 
     /**
      * @inheritdoc
-     * @return ProxyIpRecordsQuery the active query used by this AR class.
+     * @return ProxyIpSuppliersQuery the active query used by this AR class.
      */
     public static function find()
     {
-        return new ProxyIpRecordsQuery(get_called_class());
+        return new ProxyIpSuppliersQuery(get_called_class());
     }
 }
