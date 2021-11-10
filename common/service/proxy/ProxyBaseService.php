@@ -134,16 +134,14 @@ class ProxyBaseService {
      * @return array
      */
     public static function preGetValidIp($is_auto = 1){
-
         $start_time = microtime(true);
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        if(!$POXY_STATUS) return []; # CURL 代理开关
+        if(!$POXY_STATUS) return ['status'=>300, 'msg'=>'代理IP开关未开启']; # CURL 代理开关
 
         $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);
         if($is_auto == 1 && !$hasPlansActiveLottery){
             return [];
         }
-
         p('sadlfk');
         $is_need_get_new_ip = 0;
 
