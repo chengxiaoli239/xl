@@ -9,7 +9,46 @@ use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use  yii;
 
-class PoxyIPService extends BaseService {
+class ProxyZhiMaService {
+
+    /**
+     * @desc 获取代理IP
+     * @param int $type 1电信2联通
+     * @return array
+     */
+    public static function getRemoteProxyIp($type=1){
+        $time_HI = date("H:i");
+        if('04:00'<$time_HI && $time_HI<'08:55'){
+            return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
+        }
+
+        # 快代理
+        $data = ProxyZhiMaService::getRemoteProxyIp($num=1);
+        if($data['status'] != 200) {
+            return [];
+        }
+        $ip_addr = $data['data'][0];
+        $ip_addr_datas = explode(':', $data['data'][0]);;
+        $ip = $ip_addr_datas[0];
+        $port = $ip_addr_datas[1];
+        $valid_time = PoxyIPService::getProxyIpValidTime();
+        $now_time = time();
+        $setDatas = [
+            'ip_addr' => $ip_addr,
+            'ip' => $ip,
+            'port' => $port,
+            'proxy_type' => 2,
+            'isp' => $type,
+            'valid_time' => $valid_time,
+            'created_at' => $now_time,
+            'updated_at' => $now_time,
+        ];
+        $ProxyIpRecords = new ProxyIpRecords();
+        $ProxyIpRecords->setAttributes($setDatas);
+        $ProxyIpRecords->save();
+
+        return ['status'=>200, 'ip_addr'=>$ip_addr];
+    }
 
     /**
      * @desc 获取代理ip和接口
@@ -57,6 +96,14 @@ class PoxyIPService extends BaseService {
     }
 
     /**
+     * @desc 获取快代理的代理IP
+     * @return array|mixed
+     */
+    public static function getPoxyIp($uid=0, $is_auto = 1){
+        return PoxyIPService::getProxyIpNew($uid, $is_auto);
+    }
+
+    /**
      * @desc 有效期缓存key
      * @return string
      */
@@ -79,6 +126,20 @@ class PoxyIPService extends BaseService {
         }
 
         return $mkey;
+    }
+
+    /**
+     * @desc 清除代理IP
+     * @return bool
+     */
+    public static function clearProxyIpKey(){
+        $m = \Yii::$app->cache;
+        $mkey = self::builProxyIpKey();
+        $oldIP = $m->get($mkey);
+
+        $flag = $m->delete($mkey);
+        $newIP = self::getPoxyIp();
+        return ['status'=>200, 'data'=>['new_ip'=>$newIP, 'old_ip'=>$oldIP]];
     }
 
     /**
@@ -215,10 +276,55 @@ class PoxyIPService extends BaseService {
         return $flag;
     }
 
+    /**
+     * @desc 自动脚本 - 预先判断缓存是否存在  每3-5秒检测一次缓存的ip，如果过期则重新获取代理IP缓存
+     * @return array
+     */
+    public static function preGetValidIp($mod_uid = '', $is_auto = 1){
 
+        $start_time = microtime(true);
+        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
+        if(!$POXY_STATUS) return []; # CURL 代理开关
 
+        $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);
+        if($is_auto == 1 && !$hasPlansActiveLottery){
+            return [];
+        }
 
+        $m = \Yii::$app->cache;
+        $time = 3600 * 4;
+        $ip_addr = PoxyIPService::getCurrentValidProxyIp(); # 获取当前可用的代理IP
 
+        $mkey = self::builProxyIpKey($mod_uid);
+        $poxy_ip_data = $m->get($mkey);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip-缓存', ['mkey'=>$mkey, 'poxy_ip_data'=>$poxy_ip_data]);
+        if(!empty($poxy_ip_data)){
+            $isValid = PoxyIPService::isValid([$poxy_ip_data]);
+            $isValidRst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
+        }
+
+        if(!$isValid OR $isValidRst['status'] != 200 OR $isValidRst['data'][$poxy_ip_data] < 60){
+            # 调用失败或者可使用时间少于5分钟则认为IP失效
+            //$data = self::kuaiPoxy();
+            $data = ProxyZhiMaService::getRemoteProxyIp();
+            if($data['status'] != 200) {
+                return [];
+            }
+            $poxy_ip_data = $data['ip_addr'];
+            $m->set($mkey, $poxy_ip_data, $time);
+        }
+
+        $logArr = ['IP'=>$poxy_ip_data, 'is_valid'=>$isValid, 'rst'=>$isValidRst];
+        $end_time = microtime(true);
+        $logArr['time_consume'] = ($end_time-$start_time).'s';
+        Tool_Common::log('preGetIpValidStatus', 'INFO', '预先缓存代理IP', $logArr);
+
+        return ['status'=>200, 'msg'=>'操作成功', 'data'=>$logArr];
+    }
+
+    public static function validIpIsValid($ip_addr, $type=0){
+
+    }
 
     /**
      * @desc 获取ip可用截止时间
@@ -242,15 +348,48 @@ class PoxyIPService extends BaseService {
         return $valid_time;
     }
 
+    /**
+     * @desc 设置某个代理ip为不可用
+     * @param string $ip
+     * @return bool
+     */
+    public static function setIpInvalid($ip_addr=''){
+        $row = ProxyIpRecords::findOne(['ip_addr'=>$ip_addr]);
+        if(!empty($row)){
+            $row->status = 0;
+            $flag = $row->save();
+        }
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设代理IP不可用', ['ip'=>$ip_addr, 'flag'=>$flag]);
+
+        return true;
+    }
+
+    /**
+     * @desc 获取可用ip
+     * @return array|ProxyIpRecords|null
+     */
+    public static function getCurrentValidProxyIp(){
+        $m = \Yii::$app->cache;
+        $mkey = 'getValidProxyIp_xxx_0';
+        $ip_addr = $m->get($mkey);
+        if(!$ip_addr){
+            $where = ['AND', ['=', 'status', 1], ['>', 'valid_time', time()-300]];
+            $row = ProxyIpRecords::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+            $ip_addr = $row->ip_addr;
+            $m->set($mkey, $ip_addr,15);
+        }
+
+        return $ip_addr;
+    }
 
     /**
      * @desc 获取新ip优化
      * @return mixed
      */
-    public static function getProxyIpNew(){
-        $ip_addr = ProxyBaseService::getCurrentValidProxyIp();
+    public static function getProxyIpNew($uid=0, $is_auto = 1){
+        $ip_addr = PoxyIPService::getCurrentValidProxyIp();
 
-        $logArr = ['ip_addr'=>$ip_addr];
+        $logArr = ['ip_addr'=>$ip_addr, 'is_auto'=>$is_auto];
         Tool_Common::log('getProxyIpNew', 'INFO', '获取新ip优化', $logArr);
 
         return $ip_addr;

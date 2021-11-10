@@ -11,6 +11,7 @@ namespace backend\modules\api\controllers;
 use backend\models\UserFollowData;
 use backend\service\HN0898Service;
 use backend\service\PoxyIPService;
+use backend\service\ProxyBaseService;
 use backend\service\UserService;
 use common\tools\Tool_Common;
 use Yii;
@@ -197,8 +198,7 @@ class IndexController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
 
-        $uid = $post['uid'];
-        $rst = PoxyIPService::getProxyIpNew((int)$uid);
-        return $rst;
+        $ip_addr = ProxyBaseService::getCurrentValidProxyIp();
+        return $ip_addr;
     }
 }

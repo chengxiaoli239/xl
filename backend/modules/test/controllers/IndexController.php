@@ -31,6 +31,7 @@ use backend\service\NumService;
 use backend\service\plans\BetErrorPlansTaskService;
 use backend\service\PoxyIPService;
 use backend\service\BingDao\BingDaoService;
+use backend\service\ProxyBaseService;
 use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
 use backend\service\sports\TennisSportsService;
@@ -167,13 +168,13 @@ class IndexController extends Controller
     public function actionTestLogin(){
         self::_init();
         $post = \Yii::$app->request->post();
-        $poxy_addr = PoxyIPService::getPoxyIp();
+        $ip_addr = ProxyBaseService::getCurrentValidProxyIp();
         $id = $post['id'];
         $rst = BaseService::login($id);
         p($rst);
         $TzSystemsUsers = TzSystemsUsers::findOne($id);
 
-        return array_merge($rst,  ['TzSystemsUsers'=>$TzSystemsUsers, 'poxy_addr'=>$poxy_addr]);
+        return array_merge($rst,  ['TzSystemsUsers'=>$TzSystemsUsers, 'poxy_addr'=>$ip_addr]);
     }
 
     /**
@@ -232,8 +233,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = ProxyBaseService::preGetValidIp($is_auto=0);p($rst);
+
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%proxy_ip_records}}');p($r);
+        $ip_addr = PoxyIPService::getCurrentValidProxyIp();p($ip_addr); # 获取当前可用的代理IP
         $rst = PoxyIPService::getRemoteProxyIp($type=1);p($rst);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%lt_proxy_ip_records}}');p($r);
         $rst = BaseService::login($id=10);p($rst);
         $activeQihao = BetService::getActiveQihao($uid=10, $tz_system_id=9, $lottery_type=8);p($activeQihao,0);
         $rst = Lucky5Service::userInfo($uid, $tz_system_id);p($rst);
@@ -301,7 +305,6 @@ class IndexController extends Controller
         $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);p($data);
         $rst['bet'] = BetService::betByUidNew($uid=11);p($rst); // 用户新计划投注，可正买可反买
         $data = ZhongFaService::userInfo($uid=14, $tz_system_id=16);p($data);
-        $rst = PoxyIPService::preGetValidIp($is_auto=0);p($rst);
         $data = LeCaiService::getLotteryBatchGw($lottery_type=18);p($data);
         $data = LeCaiService::getLotteryBatch($lottery_type=18);$kjDatas = array_reverse($data); p($kjDatas);
         foreach ($kjDatas as $key=>$dataInfo){

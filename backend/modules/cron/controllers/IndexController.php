@@ -24,6 +24,7 @@ use backend\service\NineNine\NineNineBaseService;
 use backend\service\NumService;
 use backend\service\plans\BetErrorPlansTaskService;
 use backend\service\PoxyIPService;
+use backend\service\ProxyBaseService;
 use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
 use backend\service\sports\TennisSportsService;
@@ -361,9 +362,7 @@ class IndexController extends Controller
     public function actionCacheProxyIp(){
         self::_init();
         for ($i=0; $i<4; $i++){
-            $multi_status = BetService::getConfig('MULTI_PROXY_STATUS');
-            $mol_uid = $multi_status ? $i : 0;
-            $rst = PoxyIPService::preGetValidIp($mol_uid);
+            $rst = ProxyBaseService::preGetValidIp();
             sleep(15);
         }
 

@@ -1763,7 +1763,7 @@ class SevenService extends BaseTZService {
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return []; # CURL 代理开关
 
-        $poxy_addr = PoxyIPService::getPoxyIp();
+        $poxy_addr = ProxyBaseService::getCurrentValidProxyIp();
         if(strpos($url, 'ww662889') === false){
             //$poxy_addr = '218.85.247.70:20000';
         }
