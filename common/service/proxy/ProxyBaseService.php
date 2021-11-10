@@ -1,7 +1,8 @@
 <?php
-namespace backend\service;
+namespace common\service\proxy;
 
 use backend\models\ProxyIpRecords;
+use backend\service\BetService;
 use common\service\CommonService;
 use common\tools\Tool_Common;
 use  yii;
@@ -116,6 +117,9 @@ class ProxyBaseService {
         if(!$ip_addr){
             $where = ['AND', ['=', 'proxy_type', $proxy_type], ['=', 'status', 1]];
             $row = ProxyIpRecords::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+            if(empty($row)){
+                return '';
+            }
             $ip_addr = $row->ip_addr;
             $m->set($mkey, $ip_addr,15);
             $left_time = $row->valid_time - time();
@@ -136,13 +140,12 @@ class ProxyBaseService {
     public static function preGetValidIp($is_auto = 1){
         $start_time = microtime(true);
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        if(!$POXY_STATUS) return ['status'=>300, 'msg'=>'代理IP开关未开启']; # CURL 代理开关
+        //if(!$POXY_STATUS) return ['status'=>300, 'msg'=>'代理IP开关未开启']; # CURL 代理开关
 
         $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);
         if($is_auto == 1 && !$hasPlansActiveLottery){
             return [];
         }
-        p('sadlfk');
         $is_need_get_new_ip = 0;
 
         $proxy_type = ProxyBaseService::getProxyType();
@@ -156,6 +159,7 @@ class ProxyBaseService {
         }else{
             $is_need_get_new_ip = 1;
         }
+        p($is_need_get_new_ip);
 
         $logArr = ['is_need_get_new_ip'=>$is_need_get_new_ip, 'proxy_type'=>$proxy_type, 'is_valid'=>$isValid, 'current_ip_addr'=>$current_ip_addr];
         if($is_need_get_new_ip){

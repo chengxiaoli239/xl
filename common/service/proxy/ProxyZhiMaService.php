@@ -1,10 +1,8 @@
 <?php
-namespace backend\service;
+namespace common\service\proxy;
 
 use backend\models\ProxyIpRecords;
 use backend\models\TzSystemsUsers;
-use backend\service\Lucky5\Lucky5Service;
-use common\service\CommonService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use  yii;
