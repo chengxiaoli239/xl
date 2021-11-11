@@ -18,28 +18,16 @@ use backend\service\BaseService;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\Juhua\JuHuaBaseService;
 use backend\service\KuaiLe8Service;
-use backend\service\Lucky5\LuckyBaseService;
-use backend\service\McKeyService;
-use backend\service\NineNine\NineNineBaseService;
-use backend\service\NumService;
 use backend\service\plans\BetErrorPlansTaskService;
-use backend\service\PoxyIPService;
-use backend\service\qilin\QiLinBaseService;
-use backend\service\SevenService;
 use backend\service\sports\TennisSportsService;
 use backend\service\SscDataService;
-use backend\service\TzService;
-use backend\service\UserSysPlansService;
 use backend\service\WxService;
 use common\service\CommonService;
 use common\service\index\CrontabIndexService;
 use Yii;
-use backend\models\SscKjData;
 use backend\service\OpKjService;
 use common\tools\KjDataGet;
 use yii\web\Controller;
-use backend\service\HN0898Service;
-use backend\models\BettingRecords;
 use common\tools\Tool_Common;
 use backend\service\BetService;
 use backend\service\StaticService;
@@ -361,9 +349,7 @@ class IndexController extends Controller
     public function actionCacheProxyIp(){
         self::_init();
         for ($i=0; $i<4; $i++){
-            $multi_status = BetService::getConfig('MULTI_PROXY_STATUS');
-            $mol_uid = $multi_status ? $i : 0;
-            $rst = PoxyIPService::preGetValidIp($mol_uid);
+            $rst = \common\service\ProxyBaseService::preGetValidIp();
             sleep(15);
         }
 

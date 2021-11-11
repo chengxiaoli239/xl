@@ -22,6 +22,7 @@ use backend\service\CurlService;
 use backend\service\HN0898Service;
 use backend\service\NumService;
 use backend\service\PoxyIPService;
+use backend\service\ProxyBaseService;
 use backend\service\SevenService;
 use backend\service\SscDataService;
 use backend\tools\Tools;
@@ -2173,7 +2174,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return []; # CURL 代理开关
 
-        $poxy_addr = PoxyIPService::getPoxyIp($uid);
+        $poxy_addr = ProxyBaseService::getCurrentValidProxyIp();
         if(strpos($url, 'ww662889') === false){
             //$poxy_addr = '218.85.247.70:20000';
         }

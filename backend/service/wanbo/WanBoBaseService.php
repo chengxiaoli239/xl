@@ -5,6 +5,7 @@ use backend\models\SystemConfig;
 use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\PoxyIPService;
+use backend\service\ProxyBaseService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
@@ -446,7 +447,7 @@ class WanBoBaseService {
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return []; # CURL 代理开关
 
-        $poxy_addr = PoxyIPService::getPoxyIp();
+        $poxy_addr = ProxyBaseService::getCurrentValidProxyIp();
         if(!empty($poxy_addr)){
             //$poxy_addr = '218.85.247.70:20000';
             Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);

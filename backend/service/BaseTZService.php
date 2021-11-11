@@ -68,20 +68,20 @@ abstract class BaseTZService{
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return []; # CURL 代理开关
 
-        $poxy_addr = PoxyIPService::getPoxyIp();
+        $ip_addr = ProxyBaseService::getCurrentValidProxyIp();
         if(strpos($url, 'ww662889') === false){
             //$poxy_addr = '218.85.247.70:20000';
         }
-        Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);
+        Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'ip_addr'=>$ip_addr, 'uid'=>$uid]);
         $uids = PoxyIPService::getProxyUids();
         if(empty($uids) OR !in_array($uid, $uids) OR !$uid){
             return [];
         }
 
-        if(!empty($poxy_addr)){
+        if(!empty($ip_addr)){
             //设置代理
             curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-            curl_setopt($ch, CURLOPT_PROXY, $poxy_addr);
+            curl_setopt($ch, CURLOPT_PROXY, $ip_addr);
             //设置代理用户名密码（私密代理/独享代理）
             //如果是开放代理，请注释掉下面两句
             $username = \Yii::$app->params['KUAI_USERNAME'];

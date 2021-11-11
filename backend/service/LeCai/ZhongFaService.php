@@ -23,6 +23,7 @@ use backend\service\HN0898Service;
 use backend\service\NumService;
 use backend\service\plans\BetErrorPlansTaskService;
 use backend\service\PoxyIPService;
+use backend\service\ProxyBaseService;
 use backend\service\SevenService;
 use backend\service\SscDataService;
 use backend\tools\Tools;
@@ -2456,7 +2457,8 @@ class ZhongFaService { # 宝岛众发登陆体系
             return ['status'=>300, 'msg'=>'用户未开启IP代理[uid:'.$uid.']'];
         }
 
-        $poxy_addr = PoxyIPService::getPoxyIp($uid);
+        #$poxy_addr = PoxyIPService::getPoxyIp($uid);
+        $poxy_addr = ProxyBaseService::getCurrentValidProxyIp();
         Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);
 
         if(!empty($poxy_addr)){

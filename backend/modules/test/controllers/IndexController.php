@@ -59,6 +59,7 @@ use common\models\AdminModel;
 use common\service\ChatService;
 use common\service\CommonService;
 use common\service\index\CrontabIndexService;
+use common\service\proxy\ProxyBaseService;
 use common\service\webot\FriendsService;
 use common\service\webot\LoginService;
 use common\service\webot\MsgService;
@@ -167,13 +168,13 @@ class IndexController extends Controller
     public function actionTestLogin(){
         self::_init();
         $post = \Yii::$app->request->post();
-        $poxy_addr = PoxyIPService::getPoxyIp();
+        $ip_addr = ProxyBaseService::getCurrentValidProxyIp();
         $id = $post['id'];
         $rst = BaseService::login($id);
         p($rst);
         $TzSystemsUsers = TzSystemsUsers::findOne($id);
 
-        return array_merge($rst,  ['TzSystemsUsers'=>$TzSystemsUsers, 'poxy_addr'=>$poxy_addr]);
+        return array_merge($rst,  ['TzSystemsUsers'=>$TzSystemsUsers, 'poxy_addr'=>$ip_addr]);
     }
 
     /**
@@ -232,7 +233,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = ProxyBaseService::preGetValidIp($is_auto=0);p($rst);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%proxy_ip_records}}');p($r);
+        $ip_addr = PoxyIPService::getCurrentValidProxyIp();p($ip_addr); # 获取当前可用的代理IP
         $rst = PoxyIPService::getRemoteProxyIp($type=1);p($rst);
         $rst = BaseService::login($id=10);p($rst);
         $activeQihao = BetService::getActiveQihao($uid=10, $tz_system_id=9, $lottery_type=8);p($activeQihao,0);
@@ -301,7 +304,6 @@ class IndexController extends Controller
         $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);p($data);
         $rst['bet'] = BetService::betByUidNew($uid=11);p($rst); // 用户新计划投注，可正买可反买
         $data = ZhongFaService::userInfo($uid=14, $tz_system_id=16);p($data);
-        $rst = PoxyIPService::preGetValidIp($is_auto=0);p($rst);
         $data = LeCaiService::getLotteryBatchGw($lottery_type=18);p($data);
         $data = LeCaiService::getLotteryBatch($lottery_type=18);$kjDatas = array_reverse($data); p($kjDatas);
         foreach ($kjDatas as $key=>$dataInfo){

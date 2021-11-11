@@ -24,6 +24,7 @@ use backend\service\HN0898Service;
 use backend\service\NumService;
 use backend\service\plans\BetErrorPlansTaskService;
 use backend\service\PoxyIPService;
+use backend\service\ProxyBaseService;
 use backend\service\SevenService;
 use backend\service\SscDataService;
 use backend\tools\Tools;
@@ -1196,7 +1197,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if($errno>0) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
             if(in_array($errno, [7, 28])){
-                $poxy_addr = PoxyIPService::getPoxyIp($uid);
+                $poxy_addr = ProxyBaseService::getCurrentValidProxyIp();
             }
             Tool_Common::log('/error/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]);
             return $str;
@@ -1449,21 +1450,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $m->delete($betKey); # 失败之后可重新下注的情况解锁
         }
         if($tmpRst['errno']>0 OR in_array($tmpRst['code'], [309,311])){ # 309,310,311   310有排查是已经换过代理IP,有待排查，为确保
-            $mkey_310 = 'has_jinyong_ip_310'; # 您当前使用的浏览器不支持cookie，换一次代理ip
-            $RedisLock = new RedisLock();
-            if($RedisLock->lock($mkey_310, 35)){
-                $mkey_proxy = PoxyIPService::builProxyIpKey($uid); # 更换代理ip
-
-                $m = \Yii::$app->cache;
-                $mkey = $mkey_proxy.'_mcache';
-                if(!$rm = $m->get($mkey)){
-                    $m->delete($mkey_proxy);
-                    $m->set($mkey, 1, 30);
-                }
-                $new_ip = PoxyIPService::getProxyIpNew($uid);
-            }
-            $tzRst['new_ip'] = $new_ip;
-            $status = 4; # 下注请求超时计划，后续可根据这个状态做是否重复下注处理
+            $status = 4; # 下注请求超时计划，后续可根据这个状态做是否重复下注处理，
             $m->set($mkey_time_out, 1, 60);
         }
 
@@ -2030,18 +2017,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
                         $RedisLock = new RedisLock();
                         if($RedisLock->lock($mkey_310, 60)){
                             $mkey_proxy = PoxyIPService::builProxyIpKey($plan->uid);
+                            $old_ip = $m->get($mkey_proxy);
 
-                            $m = \Yii::$app->cache;
-                            $mkey = $mkey_proxy.'_mcache';
-                            if(!$rm = $m->get($mkey)){
-                                $m->delete($mkey_proxy);
-                                $m->set($mkey, 1, 30);
-                            }
-                            $new_ip = PoxyIPService::getProxyIpNew($plan->uid);
                         }else{
                             sleep(10);
                         }
-                        $tzRst['new_ip'] = $new_ip;
                     }
                     $TzSystemsUsers->cookie = '';
                     $TzSystemsUsers->save();
@@ -2515,13 +2495,27 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return []; # CURL 代理开关
 
-        $poxy_addr = PoxyIPService::getPoxyIp($uid);
-
-        Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);
+        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp($uid);
+        Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'current_proxy_addr'=>$current_proxy_addr, 'uid'=>$uid]);
         $uids = PoxyIPService::getProxyUids();
         if(empty($uids) OR !in_array($uid, $uids) OR !$uid){
             return ['status'=>200, 'msg'=>'无需代理IP的用户或uid为空'];
         }
+
+        $PROXY_TYPE = (int)BetService::getConfig('CURL_PROXY_TYPE'); # 0快代理1芝麻
+        if($PROXY_TYPE == 1){
+
+        }else{
+            # 快代理
+            self::setKuaiProxy($ch, $url, $uid = 0);
+        }
+
+
+        return $current_proxy_addr;
+    }
+
+    # 0快代理设置
+    public static function setKuaiProxy($ch){
 
         if(!empty($poxy_addr)){
             //设置代理
@@ -2535,7 +2529,6 @@ class Lucky5Service { # 重庆7时彩登陆体系
             curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
         }
 
-        return $poxy_addr;
     }
 
 }
