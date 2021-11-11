@@ -3,6 +3,7 @@ namespace common\service\proxy;
 
 use backend\models\ProxyIpRecords;
 use backend\models\TzSystemsUsers;
+use backend\service\CurlService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use  yii;
@@ -40,7 +41,7 @@ class ProxyKuaiService {
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdps/?'.http_build_query($query);
         $rst = CurlService::getCurl($url);
 
-        Tool_Common::log('kuaiPoxy', 'INFO', '代理IP获取', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP获取', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
 
         return ['status'=>200, 'data'=>$rst['data']['proxy_list'], 'msg'=>'代理IP数据获取成功'];
     }
@@ -171,11 +172,11 @@ class ProxyKuaiService {
         if($data['status'] != 200) {
             return [];
         }
-        $ip_addr = $data['data'][0];
+        $ip_addr = $data['data'][0]; # 110.86.176.46:15064
         $ip_addr_datas = explode(':', $data['data'][0]);;
         $ip = $ip_addr_datas[0];
         $port = $ip_addr_datas[1];
-        $valid_time = PoxyIPService::getProxyIpValidTime();
+        $valid_time = ProxyKuaiService::getProxyIpValidTime();
         $now_time = time();
         $setDatas = [
             'ip_addr' => $ip_addr,
@@ -207,7 +208,7 @@ class ProxyKuaiService {
 
         }else{
             # 快代理
-            $isValidRst = PoxyIPService::kuaiIPValidTime([$ip_addr]);
+            $isValidRst = ProxyKuaiService::kuaiIPValidTime([$ip_addr]);
             if($isValidRst['status'] == 200){
                 $valid_time = time() + $isValidRst['data'][$ip_addr];
             }

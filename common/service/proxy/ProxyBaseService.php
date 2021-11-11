@@ -108,6 +108,9 @@ class ProxyBaseService {
      * @return mixed|string
      */
     public static function getCurrentValidProxyIp($proxy_type=''){
+        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
+        if(!$POXY_STATUS) return []; # CURL 代理开关
+
         $m = \Yii::$app->cache;
         if(empty($type)){
             $proxy_type = ProxyBaseService::getProxyType();
@@ -141,6 +144,7 @@ class ProxyBaseService {
         $start_time = microtime(true);
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         //if(!$POXY_STATUS) return ['status'=>300, 'msg'=>'代理IP开关未开启']; # CURL 代理开关
+        //p('asdkjfl');
 
         $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);
         if($is_auto == 1 && !$hasPlansActiveLottery){
@@ -159,7 +163,6 @@ class ProxyBaseService {
         }else{
             $is_need_get_new_ip = 1;
         }
-        p($is_need_get_new_ip);
 
         $logArr = ['is_need_get_new_ip'=>$is_need_get_new_ip, 'proxy_type'=>$proxy_type, 'is_valid'=>$isValid, 'current_ip_addr'=>$current_ip_addr];
         if($is_need_get_new_ip){
@@ -181,7 +184,7 @@ class ProxyBaseService {
      */
     public static function getRemoteProxyIp(){
         $time_HI = date("H:i");
-        return ['status'=>300, 'msg'=>'调试'];
+        //return ['status'=>300, 'msg'=>'调试'];
         if('04:00'<$time_HI && $time_HI<'08:55'){
             return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
         }
@@ -202,14 +205,15 @@ class ProxyBaseService {
      * @return bool
      */
     public static function isValid($proxy_ips = [], $is_auto=1){
-        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        if(!$POXY_STATUS && $is_auto) return false; # CURL 代理开关
+        //$POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
+        //if(!$POXY_STATUS && $is_auto) return false; # CURL 代理开关
         $m = \Yii::$app->cache;
         $mkey = 'retry_get_isValid_key';
 
         $url = 'https://www.baidu.com';
         $start_time = microtime(true);
-        $checkRst = PoxyIPService::check($url, $proxy_ips[0], 8);
+        $checkRst = ProxyBaseService::check($url, $proxy_ips[0], 8);
+        p(['checkRst'=>$checkRst]);
         $end_time = microtime(true);
         $consume_time = ($end_time-$start_time).'s';
         if(!$checkRst && !$r = $m->get($mkey)){
@@ -268,12 +272,46 @@ class ProxyBaseService {
         //d($data);
         $errno = curl_errno( $ch );
         $logArr = ['url'=>$url, 'errno'=>$errno, 'time_consume'=>($end_time-$start_time).'s'];
-        Tool_Common::log('/poxyIP/'.__FUNCTION__, 'INFO', 'IP检测', $logArr);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', 'IP检测', $logArr);
         $flag = true;
         if($errno>0){
             $flag = false;
         }
 
         return $flag;
+    }
+
+
+    /**
+     * @desc 设置全局代理
+     * @param $ch
+     * @return bool
+     */
+    public static function setProxy($ch){
+        $PROXY_TYPE = (int)BetService::getConfig('CURL_PROXY_TYPE'); # 0快代理1芝麻
+
+        if($PROXY_TYPE == 2){
+            # 快代理
+            $username = \Yii::$app->params['ZHIMA_USERNAME'];
+            $password = \Yii::$app->params['ZHIMA_PASSWORD'];
+
+        }else{
+            # 快代理
+            $username = \Yii::$app->params['KUAI_USERNAME'];
+            $password = \Yii::$app->params['KUAI_PASSWORD'];
+        }
+        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
+
+        if(!empty($current_proxy_addr)){
+            //设置代理
+            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+            curl_setopt($ch, CURLOPT_PROXY, $current_proxy_addr);
+            //设置代理用户名密码（私密代理/独享代理）
+            //如果是开放代理，请注释掉下面两句
+            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+            curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+        }
+
+        return true;
     }
 }

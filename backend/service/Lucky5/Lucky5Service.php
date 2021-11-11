@@ -24,12 +24,12 @@ use backend\service\HN0898Service;
 use backend\service\NumService;
 use backend\service\plans\BetErrorPlansTaskService;
 use backend\service\PoxyIPService;
-use backend\service\ProxyBaseService;
 use backend\service\SevenService;
 use backend\service\SscDataService;
 use backend\tools\Tools;
 use common\models\AdminModel;
 use common\service\CaptchaCodeService;
+use common\service\proxy\ProxyBaseService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -1197,7 +1197,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if($errno>0) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
             if(in_array($errno, [7, 28])){
-                $poxy_addr = ProxyBaseService::getCurrentValidProxyIp();
+                $poxy_addr = \common\service\proxy\ProxyBaseService::getCurrentValidProxyIp();
             }
             Tool_Common::log('/error/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]);
             return $str;
@@ -2495,40 +2495,17 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return []; # CURL 代理开关
 
-        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp($uid);
-        Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'current_proxy_addr'=>$current_proxy_addr, 'uid'=>$uid]);
         $uids = PoxyIPService::getProxyUids();
         if(empty($uids) OR !in_array($uid, $uids) OR !$uid){
             return ['status'=>200, 'msg'=>'无需代理IP的用户或uid为空'];
         }
+        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
+        Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'current_proxy_addr'=>$current_proxy_addr, 'uid'=>$uid]);
 
-        $PROXY_TYPE = (int)BetService::getConfig('CURL_PROXY_TYPE'); # 0快代理1芝麻
-        if($PROXY_TYPE == 1){
-
-        }else{
-            # 快代理
-            self::setKuaiProxy($ch, $url, $uid = 0);
-        }
-
+        ProxyBaseService::setProxy($ch); # 设置全局代理
 
         return $current_proxy_addr;
     }
 
-    # 0快代理设置
-    public static function setKuaiProxy($ch){
-
-        if(!empty($poxy_addr)){
-            //设置代理
-            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-            curl_setopt($ch, CURLOPT_PROXY, $poxy_addr);
-            //设置代理用户名密码（私密代理/独享代理）
-            //如果是开放代理，请注释掉下面两句
-            $username = \Yii::$app->params['KUAI_USERNAME'];
-            $password = \Yii::$app->params['KUAI_PASSWORD'];
-            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
-        }
-
-    }
 
 }

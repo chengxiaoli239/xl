@@ -24,6 +24,7 @@ use backend\service\SscDataService;
 use backend\service\WxService;
 use common\service\CommonService;
 use common\service\index\CrontabIndexService;
+use common\service\proxy\ProxyBaseService;
 use Yii;
 use backend\service\OpKjService;
 use common\tools\KjDataGet;
@@ -349,7 +350,7 @@ class IndexController extends Controller
     public function actionCacheProxyIp(){
         self::_init();
         for ($i=0; $i<4; $i++){
-            $rst = \common\service\ProxyBaseService::preGetValidIp();
+            $rst = ProxyBaseService::preGetValidIp();
             sleep(15);
         }
 
