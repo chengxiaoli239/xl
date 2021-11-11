@@ -232,8 +232,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%proxy_ip_records}}');p($r);
         $rst = PoxyIPService::getRemoteProxyIp($type=1);p($rst);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%lt_proxy_ip_records}}');p($r);
         $rst = BaseService::login($id=10);p($rst);
         $activeQihao = BetService::getActiveQihao($uid=10, $tz_system_id=9, $lottery_type=8);p($activeQihao,0);
         $rst = Lucky5Service::userInfo($uid, $tz_system_id);p($rst);

@@ -309,12 +309,14 @@ class PoxyIPService extends BaseService {
                 return [];
             }
             $ip_addr_datas = explode(':', $data['data'][0]);;
-            $ip_addr = $ip_addr_datas[0];
+            $ip = $ip_addr_datas[0];
             $port = $ip_addr_datas[1];
+            $isValidRst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
         }
         $now_time = time();
         $setDatas = [
-            'ip_addr' => $ip_addr,
+            'ip_addr' => $ip_addr_datas,
+            'ip' => $ip,
             'port' => $port,
             'isp' => $type,
             'created_at' => $now_time,
@@ -324,7 +326,7 @@ class PoxyIPService extends BaseService {
         $ProxyIpRecords->setAttributes($setDatas);
         $ProxyIpRecords->save();
 
-        return ['status'=>200, 'ip_addr'=>$ip_addr];
+        return ['status'=>200, 'ip_addr'=>$ip_addr_datas];
     }
 
     /**
