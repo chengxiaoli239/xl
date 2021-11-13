@@ -275,56 +275,6 @@ class ProxyZhiMaService {
     }
 
     /**
-     * @desc 自动脚本 - 预先判断缓存是否存在  每3-5秒检测一次缓存的ip，如果过期则重新获取代理IP缓存
-     * @return array
-     */
-    public static function preGetValidIp($mod_uid = '', $is_auto = 1){
-
-        $start_time = microtime(true);
-        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        if(!$POXY_STATUS) return []; # CURL 代理开关
-
-        $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);
-        if($is_auto == 1 && !$hasPlansActiveLottery){
-            return [];
-        }
-
-        $m = \Yii::$app->cache;
-        $time = 3600 * 4;
-        $ip_addr = PoxyIPService::getCurrentValidProxyIp(); # 获取当前可用的代理IP
-
-        $mkey = self::builProxyIpKey($mod_uid);
-        $poxy_ip_data = $m->get($mkey);
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip-缓存', ['mkey'=>$mkey, 'poxy_ip_data'=>$poxy_ip_data]);
-        if(!empty($poxy_ip_data)){
-            $isValid = PoxyIPService::isValid([$poxy_ip_data]);
-            $isValidRst = PoxyIPService::kuaiIPValidTime([$poxy_ip_data]);
-        }
-
-        if(!$isValid OR $isValidRst['status'] != 200 OR $isValidRst['data'][$poxy_ip_data] < 60){
-            # 调用失败或者可使用时间少于5分钟则认为IP失效
-            //$data = self::kuaiPoxy();
-            $data = ProxyZhiMaService::getRemoteProxyIp();
-            if($data['status'] != 200) {
-                return [];
-            }
-            $poxy_ip_data = $data['ip_addr'];
-            $m->set($mkey, $poxy_ip_data, $time);
-        }
-
-        $logArr = ['IP'=>$poxy_ip_data, 'is_valid'=>$isValid, 'rst'=>$isValidRst];
-        $end_time = microtime(true);
-        $logArr['time_consume'] = ($end_time-$start_time).'s';
-        Tool_Common::log('preGetIpValidStatus', 'INFO', '预先缓存代理IP', $logArr);
-
-        return ['status'=>200, 'msg'=>'操作成功', 'data'=>$logArr];
-    }
-
-    public static function validIpIsValid($ip_addr, $type=0){
-
-    }
-
-    /**
      * @desc 获取ip可用截止时间
      * @param string $ip_addr
      * @param int $type

@@ -143,7 +143,7 @@ class ProxyBaseService {
     public static function preGetValidIp($is_auto = 1){
         $start_time = microtime(true);
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        //if(!$POXY_STATUS) return ['status'=>300, 'msg'=>'代理IP开关未开启']; # CURL 代理开关
+        if(!$POXY_STATUS) return ['status'=>300, 'msg'=>'代理IP开关未开启']; # CURL 代理开关
         //p('asdkjfl');
 
         $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);
@@ -171,7 +171,7 @@ class ProxyBaseService {
             $logArr['new_ip_addr_data'] = $new_ip_addr_data;
         }
 
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip-缓存', $logArr);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip-缓存1', $logArr);
         $end_time = microtime(true);
         $logArr['time_consume'] = ($end_time-$start_time).'s';
         Tool_Common::log('preGetIpValidStatus', 'INFO', '预先缓存代理IP', $logArr);
@@ -196,6 +196,7 @@ class ProxyBaseService {
         }else{
             $ip_addr_data = ProxyKuaiService::getRemoteProxyIp();
         }
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP', ['proxy_type'=>$proxy_type, 'ip_addr_data'=>$ip_addr_data]);
 
         return $ip_addr_data; # ['status'=>200, 'ip_addr'=>$ip_addr];
     }
