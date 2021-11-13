@@ -3,6 +3,7 @@ namespace common\service\proxy;
 
 use backend\models\ProxyIpRecords;
 use backend\models\TzSystemsUsers;
+use backend\service\BetService;
 use backend\service\CurlService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
@@ -44,14 +45,6 @@ class ProxyKuaiService {
         Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP获取', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
 
         return ['status'=>200, 'data'=>$rst['data']['proxy_list'], 'msg'=>'代理IP数据获取成功'];
-    }
-
-    /**
-     * @desc 获取快代理的代理IP
-     * @return array|mixed
-     */
-    public static function getPoxyIp($uid=0, $is_auto = 1){
-        return PoxyIPService::getProxyIpNew($uid, $is_auto);
     }
 
     /**
