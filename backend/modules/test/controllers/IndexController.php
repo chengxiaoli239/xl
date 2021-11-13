@@ -233,6 +233,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);p($hasPlansActiveLottery);
         $rst = ProxyBaseService::preGetValidIp($is_auto=0);p($rst);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%proxy_ip_records}}');p($r);
         $ip_addr = PoxyIPService::getCurrentValidProxyIp();p($ip_addr); # 获取当前可用的代理IP
