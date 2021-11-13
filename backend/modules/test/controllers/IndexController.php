@@ -60,6 +60,7 @@ use common\service\ChatService;
 use common\service\CommonService;
 use common\service\index\CrontabIndexService;
 use common\service\proxy\ProxyBaseService;
+use common\service\proxy\ProxyKuaiService;
 use common\service\webot\FriendsService;
 use common\service\webot\LoginService;
 use common\service\webot\MsgService;
@@ -233,8 +234,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);p($hasPlansActiveLottery);
+        $isValidRst = ProxyKuaiService::kuaiIPValidTime(['219.128.35.247:19054']);p($isValidRst);
         $rst = ProxyBaseService::preGetValidIp($is_auto=0);p($rst);
+        $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);p($hasPlansActiveLottery);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%proxy_ip_records}}');p($r);
         $ip_addr = PoxyIPService::getCurrentValidProxyIp();p($ip_addr); # 获取当前可用的代理IP
         $rst = PoxyIPService::getRemoteProxyIp($type=1);p($rst);

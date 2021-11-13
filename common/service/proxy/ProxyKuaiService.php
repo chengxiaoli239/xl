@@ -119,15 +119,16 @@ class ProxyKuaiService {
         $ip_addr_datas = explode(':', $data['data'][0]);;
         $ip = $ip_addr_datas[0];
         $port = $ip_addr_datas[1];
-        $valid_time = ProxyKuaiService::getProxyIpValidTime();
+        $valid_time = ProxyKuaiService::getProxyIpValidTime($ip_addr);
         $now_time = time();
         $setDatas = [
             'ip_addr' => $ip_addr,
             'ip' => $ip,
             'port' => $port,
-            'isp' => $type,
+            'isp' => (string)$type,
             'proxy_type' => 1,
             'valid_time' => $valid_time,
+            'expire_time' => $valid_time,
             'created_at' => $now_time,
             'updated_at' => $now_time,
         ];
@@ -149,10 +150,11 @@ class ProxyKuaiService {
      * @param int $type
      * @return int|mixed
      */
-    public static function getProxyIpValidTime($ip_addr='', $type = 1){
+    public static function getProxyIpValidTime($ip_addr=''){
         $valid_time = time() + 10;
 
-        if($type == 2){
+        $proxy_type = ProxyBaseService::getProxyType();
+        if($proxy_type == 2){
 
         }else{
             # 快代理
@@ -161,6 +163,7 @@ class ProxyKuaiService {
                 $valid_time = time() + $isValidRst['data'][$ip_addr];
             }
         }
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取ip截止日期', ['ip_addr'=>$ip_addr, 'type'=>$proxy_type, 'isValidRst'=>$isValidRst]);
 
         return $valid_time;
     }

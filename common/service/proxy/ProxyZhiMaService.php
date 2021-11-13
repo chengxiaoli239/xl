@@ -29,15 +29,16 @@ class ProxyZhiMaService {
         $ip_addr_datas = explode(':', $data['data'][0]);;
         $ip = $ip_addr_datas[0];
         $port = $ip_addr_datas[1];
-        $valid_time = PoxyIPService::getProxyIpValidTime();
+        $valid_time = ProxyZhiMaService::getProxyIpValidTime($ip_addr);
         $now_time = time();
         $setDatas = [
             'ip_addr' => $ip_addr,
             'ip' => $ip,
             'port' => $port,
             'proxy_type' => 2,
-            'isp' => $type,
+            'isp' => (string)$type,
             'valid_time' => $valid_time,
+            'expire_time' => $valid_time,
             'created_at' => $now_time,
             'updated_at' => $now_time,
         ];
@@ -287,7 +288,7 @@ class ProxyZhiMaService {
 
         }else{
             # 快代理
-            $isValidRst = PoxyIPService::kuaiIPValidTime([$ip_addr]);
+            $isValidRst = ProxyBaseService::kuaiIPValidTime([$ip_addr]);
             if($isValidRst['status'] == 200){
                 $valid_time = time() + $isValidRst['data'][$ip_addr];
             }
