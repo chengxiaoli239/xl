@@ -204,21 +204,20 @@ class ProxyBaseService {
      * @param $poxy_ip array  ['122.7.3.56:17856', '122.8.8.56:176']
      * @return bool
      */
-    public static function isValid($proxy_ips = [], $is_auto=1){
-        //$POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        //if(!$POXY_STATUS && $is_auto) return false; # CURL 代理开关
+    public static function isValid($proxy_ip = '', $is_auto=1){
+        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
+        if(!$POXY_STATUS && $is_auto) return false; # CURL 代理开关
         $m = \Yii::$app->cache;
         $mkey = 'retry_get_isValid_key';
 
         $url = 'https://www.baidu.com';
         $start_time = microtime(true);
-        $checkRst = ProxyBaseService::check($url, $proxy_ips[0], 8);
-        p(['checkRst'=>$checkRst]);
+        $checkRst = ProxyBaseService::check($url, $proxy_ip, 8);
         $end_time = microtime(true);
         $consume_time = ($end_time-$start_time).'s';
         if(!$checkRst && !$r = $m->get($mkey)){
             $m->set($mkey, 1, 6);
-            return self::isValid($proxy_ips);
+            return self::isValid($proxy_ip);
         }
 
         Tool_Common::log('proxy_ip_is_valid','INFO', '判断代理IP有效性', ['url'=>$url, 'proxy_ips'=>$proxy_ips, 'rst'=>$checkRst, 'consume_time'=>$consume_time]);
@@ -244,10 +243,6 @@ class ProxyBaseService {
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSLVERSION, 1);
 
-        if(strpos($url, 'ww662889') !== false){
-            //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
-        }
-
         if(!empty($poxy_addr)){
             //设置代理
             curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
@@ -269,7 +264,6 @@ class ProxyBaseService {
         $start_time = microtime(true);
         $data = curl_exec($ch);
         $end_time = microtime(true);
-        //d($data);
         $errno = curl_errno( $ch );
         $logArr = ['url'=>$url, 'errno'=>$errno, 'time_consume'=>($end_time-$start_time).'s'];
         Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', 'IP检测', $logArr);

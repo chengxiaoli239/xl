@@ -234,8 +234,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $isValidRst = ProxyKuaiService::kuaiIPValidTime(['219.128.35.247:19054']);p($isValidRst);
         $rst = ProxyBaseService::preGetValidIp($is_auto=0);p($rst);
+        $isValidRst = ProxyKuaiService::kuaiIPValidTime(['219.128.35.247:19054']);p($isValidRst);
         $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);p($hasPlansActiveLottery);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%proxy_ip_records}}');p($r);
         $ip_addr = PoxyIPService::getCurrentValidProxyIp();p($ip_addr); # 获取当前可用的代理IP
