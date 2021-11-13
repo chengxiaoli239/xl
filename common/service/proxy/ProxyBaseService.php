@@ -112,7 +112,7 @@ class ProxyBaseService {
         if(!$POXY_STATUS) return []; # CURL 代理开关
 
         $m = \Yii::$app->cache;
-        if(empty($type)){
+        if(empty($proxy_type)){
             $proxy_type = ProxyBaseService::getProxyType();
         }
         $mkey = ProxyBaseService::buildProxyIpKey($proxy_type);

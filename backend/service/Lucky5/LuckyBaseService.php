@@ -22,7 +22,7 @@ use backend\service\CurlService;
 use backend\service\HN0898Service;
 use backend\service\NumService;
 use backend\service\PoxyIPService;
-use backend\service\ProxyBaseService;
+use common\service\proxy\ProxyBaseService;
 use backend\service\SevenService;
 use backend\service\SscDataService;
 use backend\tools\Tools;
