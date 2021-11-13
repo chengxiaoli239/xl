@@ -220,7 +220,7 @@ class ProxyBaseService {
             return self::isValid($proxy_ip);
         }
 
-        Tool_Common::log('proxy_ip_is_valid','INFO', '判断代理IP有效性', ['url'=>$url, 'proxy_ips'=>$proxy_ips, 'rst'=>$checkRst, 'consume_time'=>$consume_time]);
+        Tool_Common::log('/proxy/'.__FUNCTION__,'INFO', '判断代理IP有效性', ['url'=>$url, 'proxy_ips'=>$proxy_ip, 'rst'=>$checkRst, 'consume_time'=>$consume_time]);
 
         return  $checkRst;
     }
