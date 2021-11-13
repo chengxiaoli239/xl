@@ -165,6 +165,7 @@ class ProxyBaseService {
         }
 
         $logArr = ['is_need_get_new_ip'=>$is_need_get_new_ip, 'proxy_type'=>$proxy_type, 'is_valid'=>$isValid, 'current_ip_addr'=>$current_ip_addr];
+        $is_need_get_new_ip = 0; # 测试
         if($is_need_get_new_ip){
             $new_ip_addr_data = ProxyBaseService::getRemoteProxyIp();
             $logArr['new_ip_addr_data'] = $new_ip_addr_data;
