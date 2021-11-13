@@ -170,10 +170,9 @@ class ProxyBaseService {
             $logArr['new_ip_addr_data'] = $new_ip_addr_data;
         }
 
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip-缓存1', $logArr);
         $end_time = microtime(true);
         $logArr['time_consume'] = ($end_time-$start_time).'s';
-        Tool_Common::log('preGetIpValidStatus', 'INFO', '预先缓存代理IP', $logArr);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip-缓存1', $logArr);
 
         return ['status'=>200, 'msg'=>'操作成功', 'data'=>$logArr];
     }
