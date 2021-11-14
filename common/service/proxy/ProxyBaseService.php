@@ -118,6 +118,7 @@ class ProxyBaseService {
         $mkey = ProxyBaseService::buildProxyIpKey($proxy_type);
         $ip_addr = $m->get($mkey);
         if(!$ip_addr){
+            ProxyIpRecords::updateAll(['status'=>0, 'updated_at'=>time()], ['AND', ['=', 'status', 1], ['<', 'exprire_time', time()]]);
             $where = ['AND', ['=', 'proxy_type', $proxy_type], ['=', 'status', 1]];
             $row = ProxyIpRecords::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
             if(empty($row)){
