@@ -132,7 +132,7 @@ class ProxyBaseService {
                 $row->save();
                 $ip_addr = '';
             }
-            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP', ['ip_addr'=>$ip_addr, 'flag'=>$flag, 'row'=>$row]);
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP', ['ip_addr'=>$ip_addr, 'flag'=>$flag, 'expire_time'=>date('Y-m-d H:i:s', $row->expire_time)]);
         }
 
         return $ip_addr;
