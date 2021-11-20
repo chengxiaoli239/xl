@@ -47,10 +47,14 @@ class ProxyZhiMaService {
         ];
         $url = \Yii::$app->params['PROXY_ZHIMA_API'].'/getip3?'.http_build_query($query);
         $rst = CurlService::getCurl($url);
+        if($rst['code'] != 0){
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP获取-芝麻', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
+            return ['status'=>201, 'msg'=>'获取代理失败'];
+        }
 
         Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP获取-芝麻', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
 
-        return ['status'=>200, 'data'=>$rst['data']['proxy_list'], 'msg'=>'代理IP数据获取成功'];
+        return ['status'=>200, 'data'=>$rst['data'], 'msg'=>'代理IP数据获取成功'];
     }
 
     /**
@@ -69,18 +73,19 @@ class ProxyZhiMaService {
         if($data['status'] != 200) {
             return [];
         }
-        $ip_addr = $data['data'][0];
-        $ip_addr_datas = explode(':', $data['data'][0]);;
-        $ip = $ip_addr_datas[0];
-        $port = $ip_addr_datas[1];
-        $valid_time = ProxyZhiMaService::getProxyIpValidTime($ip_addr);
+        $ip_data= $data['data'][0];
+        $ip_addr = $ip_data['ip'].':'.$ip_data['port'];
+        $ip = $ip_data['ip'];
+        $port = $ip_data['ip'];
         $now_time = time();
+        $valid_time = strtotime($ip_data['expire_time']);
         $setDatas = [
             'ip_addr' => $ip_addr,
             'ip' => $ip,
             'port' => $port,
             'proxy_type' => 2,
             'isp' => (string)$type,
+            'city' => $ip_data['city'],
             'valid_time' => $valid_time,
             'expire_time' => $valid_time,
             'created_at' => $now_time,
