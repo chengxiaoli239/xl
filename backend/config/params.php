@@ -54,5 +54,8 @@ return [
     'KUAI_PASSWORD' => '14wmcx7y', # 快代理密码
 
     'WX_IMG_URL_DOMAIN' => 'https://wx2.qq.com',
+
+    # 芝麻代理
+    'PROXY_ZHIMA_API' => 'http://http.tiqu.letecs.com',
 ];
 

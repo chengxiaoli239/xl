@@ -3,11 +3,55 @@ namespace common\service\proxy;
 
 use backend\models\ProxyIpRecords;
 use backend\models\TzSystemsUsers;
+use backend\service\BetService;
+use backend\service\CurlService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use  yii;
 
 class ProxyZhiMaService {
+
+    /**
+     * @desc 获取代理ip和接口
+     * @param $num = 1; # 提取IP数量
+     */
+    public static function getPoxyRemoteIp($num = 1){
+        $time_HI = date("H:i");
+        if('04:00'<$time_HI && $time_HI<'08:55'){
+            return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
+        }
+        $API_KEY = BetService::getConfig('KUAI_POXY_API_KEY'); # 快代理 API Key
+        // https://dev.kdlapi.com/api/getorderexpiretime?orderid=938684913491492&signature=vdany88efprusvlm16cb0is9wr9smb4q
+        $RedisLock = new RedisLock();
+        $Rkey = $API_KEY.'_redis';
+        if(!$RedisLock->lock($Rkey.'_redis', 15)){
+            sleep(10);
+        }
+        # num=1&type=1&pro=&city=0&yys=0&port=1&time=1&ts=0&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions=
+        $query = [
+            'num' => $num,
+            'type' => 1, #
+            'pro' => '', #
+            'city' => 0,
+            'yys' => 0,
+            'port' => 1,
+            'time' => 1,
+            'ts' => 0,
+            'ys' => 0,
+            'cs' => 0,
+            'lb' => 1,
+            'sb' => 0,
+            'pb' => 4,
+            'mr' => 1,
+            'reginos' => '', #
+        ];
+        $url = \Yii::$app->params['PROXY_ZHIMA_API'].'/getip3?'.http_build_query($query);
+        $rst = CurlService::getCurl($url);
+
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP获取-芝麻', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
+
+        return ['status'=>200, 'data'=>$rst['data']['proxy_list'], 'msg'=>'代理IP数据获取成功'];
+    }
 
     /**
      * @desc 获取代理IP
@@ -21,7 +65,7 @@ class ProxyZhiMaService {
         }
 
         # 快代理
-        $data = ProxyZhiMaService::getRemoteProxyIp($num=1);
+        $data = ProxyZhiMaService::getPoxyRemoteIp($num=1);
         if($data['status'] != 200) {
             return [];
         }

@@ -42,7 +42,7 @@ class ProxyKuaiService {
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdps/?'.http_build_query($query);
         $rst = CurlService::getCurl($url);
 
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP获取', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP获取-快代理', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
 
         return ['status'=>200, 'data'=>$rst['data']['proxy_list'], 'msg'=>'代理IP数据获取成功'];
     }

@@ -3,6 +3,7 @@ namespace common\service\proxy;
 
 use backend\models\ProxyIpRecords;
 use backend\service\BetService;
+use backend\service\CurlService;
 use common\service\CommonService;
 use common\tools\Tool_Common;
 use  yii;
@@ -214,7 +215,7 @@ class ProxyBaseService {
 
         $url = 'https://www.baidu.com';
         $start_time = microtime(true);
-        $checkRst = ProxyBaseService::check($url, $proxy_ip, 8);
+        $checkRst = ProxyBaseService::check($url, 8);
         $end_time = microtime(true);
         $consume_time = ($end_time-$start_time).'s';
         if(!$checkRst && !$r = $m->get($mkey)){
@@ -230,11 +231,10 @@ class ProxyBaseService {
     /**
      * @desc 检测代理IP可用性
      * @param $url
-     * @param array $data
      * @param int $timeout
      * @return bool|string
      */
-    public static function check($url, $poxy_addr='', $timeout=30){
+    public static function check($url, $timeout=30){
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
 
@@ -245,17 +245,7 @@ class ProxyBaseService {
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_SSLVERSION, 1);
 
-        if(!empty($poxy_addr)){
-            //设置代理
-            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-            curl_setopt($ch, CURLOPT_PROXY, $poxy_addr);
-            //设置代理用户名密码（私密代理/独享代理）
-            //如果是开放代理，请注释掉下面两句
-            $username = \Yii::$app->params['KUAI_USERNAME'];
-            $password = \Yii::$app->params['KUAI_PASSWORD'];
-            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
-        }
+        ProxyBaseService::setProxy($ch); # 设置全局代理
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 0);
@@ -286,27 +276,30 @@ class ProxyBaseService {
     public static function setProxy($ch){
         $PROXY_TYPE = (int)BetService::getConfig('CURL_PROXY_TYPE'); # 0快代理1芝麻
 
+        if(empty($current_proxy_addr)) return [];
         if($PROXY_TYPE == 2){
-            # 快代理
-            $username = \Yii::$app->params['ZHIMA_USERNAME'];
-            $password = \Yii::$app->params['ZHIMA_PASSWORD'];
+            // 代理服务器
+            $proxyServer = "http://".$current_proxy_addr;
+            curl_setopt($ch, CURLOPT_PROXYTYPE, 5); //sock5
+            curl_setopt($ch, CURLOPT_PROXY, $proxyServer);
 
         }else{
+            $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
             # 快代理
             $username = \Yii::$app->params['KUAI_USERNAME'];
             $password = \Yii::$app->params['KUAI_PASSWORD'];
+            if(!empty($current_proxy_addr)){
+                //设置代理
+                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+                curl_setopt($ch, CURLOPT_PROXY, $current_proxy_addr);
+                //设置代理用户名密码（私密代理/独享代理）
+                //如果是开放代理，请注释掉下面两句
+                curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+            }
         }
-        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
 
-        if(!empty($current_proxy_addr)){
-            //设置代理
-            curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-            curl_setopt($ch, CURLOPT_PROXY, $current_proxy_addr);
-            //设置代理用户名密码（私密代理/独享代理）
-            //如果是开放代理，请注释掉下面两句
-            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-            curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
-        }
+
 
         return true;
     }
