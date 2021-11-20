@@ -46,7 +46,7 @@ class ProxyZhiMaService {
             'reginos' => '', #
         ];
         //$url = \Yii::$app->params['PROXY_ZHIMA_API'].'/getip3?'.http_build_query($query);
-        $url = \Yii::$app->params['PROXY_ZHIMA_API'].'/getip3?num=1&type=2&pro=&city=0&yys=0&port=12&time=1&ts=1&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions=&gm=4';
+        $url = \Yii::$app->params['PROXY_ZHIMA_API'].'/getip3?num=1&type=2&pro=0&city=0&yys=0&port=11&time=3&ts=1&ys=0&cs=1&lb=1&sb=0&pb=4&mr=2&regions=330000,350000,440000,460000&gm=4';
         $rst = CurlService::getCurl($url);
         if($rst['code'] != 0){
             Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP获取-芝麻', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
