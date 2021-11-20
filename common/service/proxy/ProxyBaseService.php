@@ -274,10 +274,11 @@ class ProxyBaseService {
      * @return bool
      */
     public static function setProxy($ch){
-        $PROXY_TYPE = (int)BetService::getConfig('CURL_PROXY_TYPE'); # 0快代理1芝麻
+        $proxy_type = ProxyBaseService::getProxyType();
 
+        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
         if(empty($current_proxy_addr)) return [];
-        if($PROXY_TYPE == 2){
+        if($proxy_type == 2){
             // 代理服务器
             $proxyServer = "http://".$current_proxy_addr;
             curl_setopt($ch, CURLOPT_PROXYTYPE, 5); //sock5
