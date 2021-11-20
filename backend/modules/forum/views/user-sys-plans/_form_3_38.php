@@ -270,6 +270,12 @@ $this->title = '新过滤快打';
                 <!--号码单双类型:1122,2121 等-->
                 <?= $form->field($model, 'type_ds_details')->checkboxList($type_ds_details_Arr)->label('单双类型 &nbsp;&nbsp;<a href="javascript:;" class="btn btn-xs btn-info reverse_type_ds_detail">反买</a>') ?>
 
+                <div class="row">
+                    <div class="col-lg-12 col-xs-12">
+                        <!--?= $form->field($model,"desc")->textarea([ 'autofocus' => false,'style'=>'height:60px' ])?-->
+                        <?= $form->field($model,"codes")->textarea([ 'autofocus' => false,'style'=>'height:200px' ])?>
+                    </div>
+                </div>
                 <!--
                 <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
 
@@ -553,13 +559,14 @@ $(function () {
         data = $('#w0').serialize()+'&type='+$(this).data('type');
         $.post(url, data, function(rst) {
             $('#tip_msg_rst').html(
-                '<strong>号码：</strong>'+rst.code_desc + "<br>"
-                +'<strong>组数：</strong>'+ rst.counts + "<br>"
+                //'<strong>号码：</strong>'+rst.code_desc + "<br>"
+                '<strong>组数：</strong>'+ rst.counts + "<br>"
                 +'<strong>当前：</strong>'+ rst.current_times + "<br>"
                 + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>"
                 + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str + "<br>"
                 + "<p><strong>号码：</strong>" +rst.codeDatas+'</p>')
             $('#rstTipModal').modal('show');
+            $('#usersysplans-codes').html(rst.codeDatas);
         });
     });
 

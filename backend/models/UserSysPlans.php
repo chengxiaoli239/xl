@@ -75,6 +75,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $get_hzs; #  取和值
     public $remove_hzs; #  排除和值
     public $xhefen; #  四定系统快捷定位合分值
+    public $codes;
 
     public $hefen; #  定位合分值1
     public $hefen_pos; #  定位合分位置1
@@ -165,6 +166,7 @@ class UserSysPlans extends \common\models\base\BaseModel
             'uid' => '用户id',
             'account' => '账号名称',
             'playway' => '投注方式:1二字定2三字定3四字定',
+            'codes' => '号码',
             'status' => '状态:0关闭1开启',
             'single' => '投注倍数(元/注)',
             'singles' => '翻倍梯度',

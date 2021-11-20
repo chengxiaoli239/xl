@@ -276,8 +276,9 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'update_time')->textInput() ?-->
 
                     <div class="row">
-                        <div class="col-lg-3 col-xs-12">
-                            <?= $form->field($model,"desc")->textarea([ 'autofocus' => false,'style'=>'height:60px' ])?>
+                        <div class="col-lg-12 col-xs-12">
+                            <!--?= $form->field($model,"desc")->textarea([ 'autofocus' => false,'style'=>'height:60px' ])?-->
+                            <?= $form->field($model,"codes")->textarea([ 'autofocus' => false,'style'=>'height:200px' ])?>
                         </div>
                     </div>
                     <?php include(dirname(__FILE__).'/act-button.php');?>
@@ -484,6 +485,7 @@ $(function () {
         $.post(url, data, function(rst) {
             $('#tip_msg_rst').html('<strong>号码：</strong>'+rst.code_desc + "<br>" +'<strong>组数：</strong>'+ rst.counts + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str)
             $('#rstTipModal').modal('show');
+            $('#usersysplans-codes').html(rst.codeDatas);
         });
     });
 
