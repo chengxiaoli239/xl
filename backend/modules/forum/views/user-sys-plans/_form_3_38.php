@@ -366,7 +366,7 @@ $this->title = '新过滤快打';
 
 <div class="modal fade" id="rstTipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
      style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
-     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit; width: 1000px; height: 800px;">
+     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit; width: 1000px; height: 400px;">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
