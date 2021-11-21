@@ -563,7 +563,7 @@ $(function () {
                 '<strong>组数：</strong>'+ rst.counts + "<br>"
                 +'<strong>当前：</strong>'+ rst.current_times + "<br>"
                 + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>"
-                + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str + "<br>"
+                + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str + "<br>")
                 //+ "<p><strong>号码：</strong>" +rst.codeDatas+'</p>')
             $('#rstTipModal').modal('show');
             $('#usersysplans-codes').html(rst.codeDatas);
