@@ -265,10 +265,16 @@ $this->title = '新过滤快打';
                 </div>
                 -->
 
+                <div class="row">
+                    <div class="col-lg-4 col-xs-12">
                 <!--号码单双类型:两单两双，四单，四双-->
                 <?= $form->field($model, 'type_4ds')->checkboxList($type_4ds_Arr)->label('单双类型 &nbsp;&nbsp;<a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds">反买</a>') ?>
+                    </div>
+                    <div class="col-lg-8 col-xs-12">
                 <!--号码单双类型:1122,2121 等-->
                 <?= $form->field($model, 'type_ds_details')->checkboxList($type_ds_details_Arr)->label('单双类型 &nbsp;&nbsp;<a href="javascript:;" class="btn btn-xs btn-info reverse_type_ds_detail">反买</a>') ?>
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col-lg-12 col-xs-12">

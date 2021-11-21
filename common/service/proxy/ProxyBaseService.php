@@ -72,6 +72,7 @@ class ProxyBaseService {
 
     public static function getProxyType(){
         $PROXY_TYPE = BetService::getConfig('CURL_PROXY_TYPE') == 'PROXY_TYPE_2' ? 2 : 1; # PROXY_TYPE_1:快代理PROXY_TYPE_2芝麻代理
+        $PROXY_TYPE = BetService::getConfig('CURL_PROXY_TYPE') == 'PROXY_TYPE_3' ? 3 : $PROXY_TYPE; # PROXY_TYPE_1:快代理PROXY_TYPE_2芝麻代理PROXY_TYPE_3:代理云
 
         return $PROXY_TYPE;
     }
@@ -192,8 +193,10 @@ class ProxyBaseService {
         }
         $proxy_type = ProxyBaseService::getProxyType();
 
-        if($proxy_type == 2){
+        if($proxy_type == 2) {
             $ip_addr_data = ProxyZhiMaService::getRemoteProxyIp();
+        }elseif($proxy_type == 3){
+            $ip_addr_data = ProxyDaiLiYunService::getRemoteProxyIp();
         }else{
             $ip_addr_data = ProxyKuaiService::getRemoteProxyIp();
         }

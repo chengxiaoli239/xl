@@ -57,5 +57,8 @@ return [
 
     # 芝麻代理
     'PROXY_ZHIMA_API' => 'http://http.tiqu.letecs.com',
+
+    # 代理云
+    'PROXY_DAILIYUN_API' => 'http://gaozi2021.v4.dailiyun.com',
 ];
 
