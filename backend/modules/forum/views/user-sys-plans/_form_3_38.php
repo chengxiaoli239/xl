@@ -273,7 +273,7 @@ $this->title = '新过滤快打';
                 <div class="row">
                     <div class="col-lg-12 col-xs-12">
                         <!--?= $form->field($model,"desc")->textarea([ 'autofocus' => false,'style'=>'height:60px' ])?-->
-                        <?= $form->field($model,"codes")->textarea([ 'autofocus' => false,'style'=>'height:200px' ])?>
+                        <?= $form->field($model,"codes")->label('号码(<span id="codes_nums">0</span>)')->textarea([ 'autofocus' => false,'style'=>'height:200px' ])?>
                     </div>
                 </div>
                 <!--
@@ -567,6 +567,7 @@ $(function () {
                 + "<p><strong>号码：</strong>" +rst.codeDatas+'</p>')
             $('#rstTipModal').modal('show');
             $('#usersysplans-codes').html(rst.codeDatas);
+            $('#codes_nums').html(rst.counts)
         });
     });
 
