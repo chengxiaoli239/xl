@@ -686,7 +686,7 @@ class UserSysPlansService extends BaseService {
                     $hzArr[$i] = $i;
                 }
                 $data['hzArr'] = $hzArr;
-                if(in_array($tz_type, [28, 38])){ # 系统快捷、过滤快打
+                if(in_array($tz_type, [25, 28, 38])){ # 系统快捷、过滤快打
                     $data['code_types'] = UserSysPlansService::getCodeTypes();
                 }
                 $data['type_4ds_Arr'] = UserSysPlansService::getCodeTypes($flag = 2); # 单双类型：两单两双、四单、四双

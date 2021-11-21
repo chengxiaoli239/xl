@@ -30,28 +30,25 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
                     <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
                     <div class="row">
-                        <div class="col-lg-4 col-xs-4">
+                        <div class="col-lg-2 col-xs-4">
                             <?= $form->field($model, 'playway')->radioList([
                                 //'1'=>'二字定',
                                 //'2'=>'三字定',
                                 '3'=>'四字定',
                             ])->label('类型') ?>
                         </div>
-                        <div class="col-lg-4 col-xs-4">
+                        <div class="col-lg-2 col-xs-4">
                             <?= $form->field($model, 'status')->radioList([
                                 '0'=>'关',
                                 '1'=>'开',
                             ])->label('状态') ?>
                         </div>
-                        <div class="col-lg-4 col-xs-4">
+                        <div class="col-lg-2 col-xs-4">
                             <?= $form->field($model, 'is_test')->radioList([
                                 '0'=>'真',
                                 '1'=>'模拟',
                             ])->label('真/模拟') ?>
                         </div>
-                    </div>
-
-                    <div class="row">
                         <div class="col-lg-3 col-xs-6">
                             <?= $form->field($model, 'single')->textInput() ?>
                         </div>
@@ -105,23 +102,38 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
                     <div class="row">
-                        <div class="col-lg-3 col-xs-3">
+                        <div class="col-lg-3 col-xs-6">
                             <!--配数1-->
                             <?= $form->field($model, 'ps_1')->textInput()->label('配数1')?>
                         </div>
-                        <div class="col-lg-3 col-xs-3">
+                        <div class="col-lg-3 col-xs-6">
                             <!--配数2-->
                             <?= $form->field($model, 'ps_2')->textInput()->label('配数2')?>
                         </div>
+                        <div class="col-lg-3 col-xs-4">
+                            <!--三定含除、取-->
+                            <?= $form->field($model, 'arise_in_sel')->checkboxList([1=>'除',2=>'取'])->label('3.四字定含') ?>
+                        </div>
+                        <div class="col-lg-3 col-xs-6">
+                            <?= $form->field($model, 'arise_in')->textInput()->label('3.四字定含')?>
+                        </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-3 col-xs-6">
+                        <div class="col-lg-3 col-xs-4">
                             <!--位置合分：位置-->
-                        <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>
+                            <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>
                         </div>
                         <div class="col-lg-3 col-xs-6">
                             <!--位置合分：合分-->
-                        <?= $form->field($model, 'hefen')->textInput()->label('1.1定位合分:值')?>
+                            <?= $form->field($model, 'hefen')->textInput()->label('1.1定位合分:值')?>
+                        </div>
+                        <div class="col-lg-3 col-xs-4">
+                            <!--两数合、三数合-->
+                            <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList([1=>'两数',2=>'三数'])->label('2.不定位合分') ?>
+                        </div>
+                        <div class="col-lg-3 col-xs-6">
+                            <!--位置合分：合分-->
+                            <?= $form->field($model, 'no_fix_hefen')->textInput()->label('2.不定位合分:值')?>
                         </div>
                     </div>
                     <!--位置合分：位置2-->
@@ -136,27 +148,6 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'hefen_pos4')->checkboxList($hefen_pos)->label('1.4定位合分取:位置') ?-->
                     <!--位置合分：合分4-->
                     <!--?= $form->field($model, 'hefen4')->textInput()->label('1.4定位合分:值')?-->
-
-                    <div class="row">
-                        <div class="col-lg-3 col-xs-6">
-                            <!--两数合、三数合-->
-                        <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList([1=>'两数',2=>'三数'])->label('2.不定位合分') ?>
-                        </div>
-                        <div class="col-lg-3 col-xs-6">
-                            <!--位置合分：合分-->
-                        <?= $form->field($model, 'no_fix_hefen')->textInput()->label('2.不定位合分:值')?>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-lg-3 col-xs-4">
-                            <!--三定含除、取-->
-                        <?= $form->field($model, 'arise_in_sel')->checkboxList([1=>'除',2=>'取'])->label('3.四字定含') ?>
-                        </div>
-                        <div class="col-lg-3 col-xs-6">
-                            <?= $form->field($model, 'arise_in')->textInput()->label('3.四字定含')?>
-                        </div>
-                    </div>
 
                     <?= $form->field($model, 'hz')->checkboxList($hzArr)
                         ->label('和值 
@@ -251,14 +242,25 @@ use yii\widgets\ActiveForm;
                     </div>
                     -->
 
-                    <!--号码单双类型:两单两双，四单，四双-->
+                <div class="row">
+                    <div class="col-lg-4 col-xs-12">
+                        <!--号码单双类型:两单两双，四单，四双-->
                     <?= $form->field($model, 'type_4ds')->checkboxList($type_4ds_Arr)->label('单双类型 &nbsp;&nbsp;<a href="javascript:;" class="btn btn-xs btn-info reverse_type_4ds">反买</a>') ?>
+                    </div>
+                    <div class="col-lg-8 col-xs-12">
                     <!--号码单双类型:1122,2121 等-->
                     <?= $form->field($model, 'type_ds_details')->checkboxList($type_ds_details_Arr)->label('单双类型 &nbsp;&nbsp;<a href="javascript:;" class="btn btn-xs btn-info reverse_type_ds_detail">反买</a>') ?>
+                    </div>
+                </div>
 
-                <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
 
                     <div class="row">
+                        <div class="col-lg-6 col-xs-12">
+                            <?= $form->field($model, 'remove_types')->checkboxList($code_types)->label('类型除【并】') ?>
+                        </div>
+                        <div class="col-lg-3 col-xs-12">
+                            <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
+                        </div>
                         <div class="col-lg-3 col-xs-6">
                             <?= $form->field($model, 'bet_while_miss')->textInput()->label('遗漏x期投,如:10') ?>
                         </div>
