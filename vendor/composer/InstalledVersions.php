@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '92acb096fc600f776db7d4767d87f63c5ce8eadc',
+    'reference' => '490d997d06181aabee0f9ea09c86da479c6e327f',
     'name' => 'izyue/yii2-app-advanced',
   ),
   'versions' => 
@@ -195,7 +195,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '92acb096fc600f776db7d4767d87f63c5ce8eadc',
+      'reference' => '490d997d06181aabee0f9ea09c86da479c6e327f',
     ),
     'phpspec/php-diff' => 
     array (
