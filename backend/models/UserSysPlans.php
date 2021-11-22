@@ -76,6 +76,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $remove_hzs; #  排除和值
     public $xhefen; #  四定系统快捷定位合分值
     public $codes;
+    public $in_codes; # 在号码基础上过滤
 
     public $hefen; #  定位合分值1
     public $hefen_pos; #  定位合分位置1

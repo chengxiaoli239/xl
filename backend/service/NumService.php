@@ -1494,7 +1494,7 @@ class NumService extends BaseService {
             }
         }
 
-        (!empty($codes)) && $query->andWhere(['IN', 'code', $codes]);
+        (!empty($codes)) && $query->andWhere(['OR',['IN',  'code', $codes], ['IN', 'code_str', $codes]]);
         ###################################################### filters过滤参数结束05.24 ######################################################
 
         $Num4Types = $query->asArray()->orderBy(['code'=>SORT_ASC])->all();
