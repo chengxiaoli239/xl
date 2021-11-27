@@ -84,7 +84,7 @@ class ProxyZhiMaService {
         $setDatas = [
             'ip_addr' => $ip_addr,
             'ip' => $ip,
-            'port' => $port,
+            'port' => (string)$port,
             'proxy_type' => 2,
             'isp' => (string)$type,
             'city' => $ip_data['city'],
