@@ -71,7 +71,7 @@ class ProxyZhiMaService {
 
         # 芝麻代理
         $data = ProxyZhiMaService::getPoxyRemoteIp($num=1);
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-芝麻代理', ['data'=>$data]);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-芝麻代理1', ['data'=>$data]);
         if($data['status'] != 200) {
             return [];
         }
@@ -99,7 +99,7 @@ class ProxyZhiMaService {
         if(!$flag){
             $logArr['err_msg'] = $ProxyIpRecords->getErrors();
         }
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-芝麻代理', $logArr);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-芝麻代理2', $logArr);
 
         return ['status'=>200, 'ip_addr'=>$ip_addr];
     }
