@@ -78,7 +78,7 @@ class ProxyZhiMaService {
         $ip_data= $data['data'][0];
         $ip_addr = $ip_data['ip'].':'.$ip_data['port'];
         $ip = $ip_data['ip'];
-        $port = $ip_data['ip'];
+        $port = $ip_data['port'];
         $now_time = time();
         $valid_time = strtotime($ip_data['expire_time']);
         $setDatas = [

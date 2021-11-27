@@ -2877,13 +2877,15 @@ $sql .= '
             3 => 4, # 四定
         ];
         $code_type = $code_types[$data['UserSysPlans']['playway']];
+        $in_codes = $data['UserSysPlans']['in_codes']? :[]; # 在此号码范围内
+        $in_codes = explode(',', str_replace(['，', ' '], ',', $in_codes));
         $tz_type = $data['UserSysPlans']['tz_type'];
         $lotter_type = $data['UserSysPlans']['lottery_type'];
         $model = new UserSysPlans();
         UserSysPlansService::preOpData($data, $user_id=1);
         $model->load($data);
         $codes_hz = json_decode($model->hz_Arr, true);
-        $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type);
+        $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type, $in_codes);
 
         if($type == 1){
             # 1 遗漏

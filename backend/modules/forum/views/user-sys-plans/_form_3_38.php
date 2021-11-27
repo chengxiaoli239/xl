@@ -275,6 +275,12 @@ $this->title = '新过滤快打';
                 <?= $form->field($model, 'type_ds_details')->checkboxList($type_ds_details_Arr)->label('单双类型 &nbsp;&nbsp;<a href="javascript:;" class="btn btn-xs btn-info reverse_type_ds_detail">反买</a>') ?>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-lg-12 col-xs-12">
+                        <!--?= $form->field($model,"desc")->textarea([ 'autofocus' => false,'style'=>'height:60px' ])?-->
+                        <?= $form->field($model,"in_codes")->label('在此号码中')->textarea([ 'autofocus' => false,'style'=>'height:200px' ])?>
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col-lg-12 col-xs-12">

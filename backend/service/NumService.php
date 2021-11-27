@@ -1357,8 +1357,9 @@ class NumService extends BaseService {
                                 $filter_index_ids[] = $index_id - $tmp_filter_index_Arr + 1;
                             }
                         }
+                        //p(['index_id'=>$index_id, $filters, $filter_index_ids]);
                         if(!empty($filter_index_ids)){ # 过滤期的index_id
-                            $SscKjDatas = SscKjData::find()->where(['AND', ['IN', 'index_id', $filter_index_ids], ['=', 'lottery_type', $lottery_type]])->asArray()->all();
+                            $SscKjDatas = SscKjData::find()->where(['AND', ['IN', 'index_id', $filter_index_ids], ['=', 'lottery_type', $lottery_type]])->orderBy(['id'=>SORT_DESC])->asArray()->all();
                             //p(['SscKjDatas'=>$SscKjDatas, 'filters'=>$filters, 'filter_index_ids'=>$filter_index_ids]);
                             foreach ($SscKjDatas as $sscKjData){
                                 if(!empty($filters['filter_pos1'])) { # 特殊过滤
@@ -1493,7 +1494,7 @@ class NumService extends BaseService {
             }
         }
 
-        (!empty($codes)) && $query->andWhere(['IN', 'code', $codes]);
+        (!empty($codes)) && $query->andWhere(['OR',['IN',  'code', $codes], ['IN', 'code_str', $codes]]);
         ###################################################### filters过滤参数结束05.24 ######################################################
 
         $Num4Types = $query->asArray()->orderBy(['code'=>SORT_ASC])->all();
