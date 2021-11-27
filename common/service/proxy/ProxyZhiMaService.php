@@ -49,7 +49,7 @@ class ProxyZhiMaService {
         $url = \Yii::$app->params['PROXY_ZHIMA_API'].'/getip3?num=1&type=2&pro=0&city=0&yys=0&port=11&time=3&ts=1&ys=0&cs=1&lb=1&sb=0&pb=4&mr=2&regions=330000,350000,440000,460000&gm=4';
         $rst = CurlService::getCurl($url);
         if($rst['code'] != 0){
-            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP获取-芝麻', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
+            Tool_Common::log('/proxy/'.__FUNCTION__.'_err', 'INFO', '代理IP获取失败-芝麻', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
             return ['status'=>201, 'msg'=>'获取代理失败'];
         }
 
@@ -69,8 +69,9 @@ class ProxyZhiMaService {
             return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
         }
 
-        # 快代理
+        # 芝麻代理
         $data = ProxyZhiMaService::getPoxyRemoteIp($num=1);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-芝麻代理', ['data'=>$data]);
         if($data['status'] != 200) {
             return [];
         }
@@ -94,7 +95,11 @@ class ProxyZhiMaService {
         ];
         $ProxyIpRecords = new ProxyIpRecords();
         $ProxyIpRecords->setAttributes($setDatas);
-        $ProxyIpRecords->save();
+        $flag = $ProxyIpRecords->save();
+        if(!$flag){
+            $logArr['err_msg'] = $ProxyIpRecords->getErrors();
+        }
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-芝麻代理', $logArr);
 
         return ['status'=>200, 'ip_addr'=>$ip_addr];
     }
