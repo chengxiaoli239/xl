@@ -30,7 +30,7 @@ class ProxyDaiLiYunService {
         //$url = \Yii::$app->params['PROXY_DAILIYUN_API'].'/query.txt?key=NPE4D177DB&word=广东,福建,浙江&count='.$num.'&rand=false&ltime=7200&norepeat=true&detail=true'; # 代理云只能选择一个地区
         $url = \Yii::$app->params['PROXY_DAILIYUN_API'].'/query.txt?key=NPE4D177DB&word=&count='.$num.'&rand=false&ltime=&norepeat=true&detail=true';
         $rst = CurlService::getCurl($url);
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip', ['url'=>$url, 'rst'=>$rst]);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip-代理云', ['url'=>$url, 'rst'=>$rst]);
         if(!$rst OR strpos($rst, ',') === false){
             Tool_Common::log('/proxy/'.__FUNCTION__.'_err', 'INFO', '代理IP获取-代理云', ['url'=>$url, 'rst'=>$rst]);
             return ['status'=>201, 'msg'=>'获取代理失败'];
@@ -53,6 +53,7 @@ class ProxyDaiLiYunService {
         try {
             # 代理云
             $data = self::getProxyRemoteIp($num=1);
+            $logArr['data'] = $data;
             if($data['status'] != 200) {
                 return $data;
             }
@@ -77,7 +78,11 @@ class ProxyDaiLiYunService {
             ];
             $ProxyIpRecords = new ProxyIpRecords();
             $ProxyIpRecords->setAttributes($setDatas);
-            $ProxyIpRecords->save();
+            $flag = $ProxyIpRecords->save();
+            if(!$flag){
+                $logArr['err_msg'] = $ProxyIpRecords->getErrors();
+            }
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-代理云', $logArr);
         }catch (\Exception $exception){
             Tool_Common::log('/proxy/'.__FUNCTION__, 'ERR', '获取代理IP-代理云-错误', ['type'=>$type, 'err_msg'=>$exception->getMessage()]);
             return ['status'=>300, 'msg'=>$exception->getMessage()];
