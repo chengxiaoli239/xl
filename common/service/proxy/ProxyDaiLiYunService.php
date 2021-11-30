@@ -28,7 +28,7 @@ class ProxyDaiLiYunService {
             sleep(10);
         }
         //$url = \Yii::$app->params['PROXY_DAILIYUN_API'].'/query.txt?key=NPE4D177DB&word=广东,福建,浙江&count='.$num.'&rand=false&ltime=7200&norepeat=true&detail=true'; # 代理云只能选择一个地区
-        $url = \Yii::$app->params['PROXY_DAILIYUN_API'].'/query.txt?key=NPE4D177DB&word=广东&count='.$num.'&rand=false&ltime=7200&norepeat=true&detail=true';
+        $url = \Yii::$app->params['PROXY_DAILIYUN_API'].'/query.txt?key=NPE4D177DB&word=&count='.$num.'&rand=false&ltime=&norepeat=true&detail=true';
         $rst = CurlService::getCurl($url);
         Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip', ['url'=>$url, 'rst'=>$rst]);
         if(!isset($rst['code']) OR $rst['code'] != 0){
@@ -56,21 +56,22 @@ class ProxyDaiLiYunService {
             # 代理云
             $data = self::getProxyRemoteIp($num=1);
             if($data['status'] != 200) {
-                return [];
+                return $data;
             }
-            $ip_data= $data['data'][0];
-            $ip_addr = $ip_data['ip'].':'.$ip_data['port'];
-            $ip = $ip_data['ip'];
-            $port = $ip_data['ip'];
+            $ip_data = explode(',', $data);
+            $ip_addr = $ip_data['0'];
+            $ip = $ip_data[1];
+            $city = $ip_data[2];
+            $port = explode(':', $ip_data)[1];
             $now_time = time();
-            $valid_time = strtotime($ip_data['expire_time']);
+            $valid_time = $ip_data[4];
             $setDatas = [
                 'ip_addr' => $ip_addr,
                 'ip' => $ip,
                 'port' => $port,
                 'proxy_type' => 3,
                 'isp' => (string)$type,
-                'city' => $ip_data['city'],
+                'city' => $city,
                 'valid_time' => $valid_time,
                 'expire_time' => $valid_time,
                 'created_at' => $now_time,
