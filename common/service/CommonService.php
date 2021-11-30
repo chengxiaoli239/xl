@@ -877,8 +877,8 @@ class  CommonService{
      * @param int $lottery_types
      * @return int
      */
-    public static function hasPlansActiveLottery($lottery_types = []){
-        $where = ['AND', ['IN', 'p.lottery_type', $lottery_types], ['=', 'p.status', 1], ['=', 'p.is_test', 0], ['=', 'u.is_use_proxy', 1]];
+    public static function hasPlansActiveLottery($lottery_types = [], $proxy_type=1){
+        $where = ['AND', ['IN', 'p.lottery_type', $lottery_types], ['=', 'p.status', 1], ['=', 'u.proxy_type', $proxy_type], ['=', 'p.is_test', 0], ['=', 'u.is_use_proxy', 1]];
         $row = UserSysPlans::find()->alias('p')->select(['p.*'])
             ->leftJoin('{{%tz_systems_users}} u', 'p.uid=u.uid')
             ->where($where)->one();

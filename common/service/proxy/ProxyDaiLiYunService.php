@@ -51,32 +51,37 @@ class ProxyDaiLiYunService {
             return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
         }
 
-        # 快代理
-        $data = self::getPoxyRemoteIp($num=1);
-        if($data['status'] != 200) {
-            return [];
+        try {
+            # 代理云
+            $data = self::getPoxyRemoteIp($num=1);
+            if($data['status'] != 200) {
+                return [];
+            }
+            $ip_data= $data['data'][0];
+            $ip_addr = $ip_data['ip'].':'.$ip_data['port'];
+            $ip = $ip_data['ip'];
+            $port = $ip_data['ip'];
+            $now_time = time();
+            $valid_time = strtotime($ip_data['expire_time']);
+            $setDatas = [
+                'ip_addr' => $ip_addr,
+                'ip' => $ip,
+                'port' => $port,
+                'proxy_type' => 3,
+                'isp' => (string)$type,
+                'city' => $ip_data['city'],
+                'valid_time' => $valid_time,
+                'expire_time' => $valid_time,
+                'created_at' => $now_time,
+                'updated_at' => $now_time,
+            ];
+            $ProxyIpRecords = new ProxyIpRecords();
+            $ProxyIpRecords->setAttributes($setDatas);
+            $ProxyIpRecords->save();
+        }catch (\Exception $exception){
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'ERR', '获取代理IP-代理云-错误', ['type'=>$type, 'err_msg'=>$exception->getMessage()]);
+            return ['status'=>300, 'msg'=>$exception->getMessage()];
         }
-        $ip_data= $data['data'][0];
-        $ip_addr = $ip_data['ip'].':'.$ip_data['port'];
-        $ip = $ip_data['ip'];
-        $port = $ip_data['ip'];
-        $now_time = time();
-        $valid_time = strtotime($ip_data['expire_time']);
-        $setDatas = [
-            'ip_addr' => $ip_addr,
-            'ip' => $ip,
-            'port' => $port,
-            'proxy_type' => 2,
-            'isp' => (string)$type,
-            'city' => $ip_data['city'],
-            'valid_time' => $valid_time,
-            'expire_time' => $valid_time,
-            'created_at' => $now_time,
-            'updated_at' => $now_time,
-        ];
-        $ProxyIpRecords = new ProxyIpRecords();
-        $ProxyIpRecords->setAttributes($setDatas);
-        $ProxyIpRecords->save();
 
         return ['status'=>200, 'ip_addr'=>$ip_addr];
     }

@@ -2,6 +2,7 @@
 namespace common\service\proxy;
 
 use backend\models\ProxyIpRecords;
+use backend\models\TzSystemsUsers;
 use backend\service\BetService;
 use backend\service\CurlService;
 use common\service\CommonService;
@@ -15,6 +16,8 @@ class ProxyBaseService {
     public static $ip_addr = '';
 
     public static $ip_port = '';
+
+    public static $proxy_types = [1, 2, 3]; # 1快代理2芝麻代理3代理云
 
     /**
      * @param int $type
@@ -144,39 +147,43 @@ class ProxyBaseService {
      * @desc 自动脚本 - 预先判断缓存是否存在  每3-5秒检测一次缓存的ip，如果过期则重新获取代理IP缓存
      * @return array
      */
-    public static function preGetValidIp($is_auto = 1){
+    public static function preGetValidIp($proxy_type=1, $is_auto = 1){
         $start_time = microtime(true);
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return ['status'=>300, 'msg'=>'代理IP开关未开启']; # CURL 代理开关
         //p('asdkjfl');
 
-        $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);
-        if($is_auto == 1 && !$hasPlansActiveLottery){
-            return [];
-        }
-        $is_need_get_new_ip = 0;
-
-        $proxy_type = ProxyBaseService::getProxyType();
-        $current_ip_addr = ProxyBaseService::getCurrentValidProxyIp(); # 获取当前可用的代理IP
-        if(!empty($current_ip_addr)){
-            $isValid = ProxyBaseService::isValid($current_ip_addr);
-            if(!$isValid){
-                $is_need_get_new_ip = 1;
-                ProxyBaseService::setIpInvalid($current_ip_addr); # 设置当前ip无效
+        try {
+            $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS'], $proxy_type);
+            if($is_auto == 1 && !$hasPlansActiveLottery){
+                return [];
             }
-        }else{
-            $is_need_get_new_ip = 1;
-        }
+            $is_need_get_new_ip = 0;
 
-        $logArr = ['is_need_get_new_ip'=>$is_need_get_new_ip, 'proxy_type'=>$proxy_type, 'is_valid'=>$isValid, 'current_ip_addr'=>$current_ip_addr];
-        if($is_need_get_new_ip){
-            $new_ip_addr_data = ProxyBaseService::getRemoteProxyIp();
-            $logArr['new_ip_addr_data'] = $new_ip_addr_data;
-        }
+            //$proxy_type = ProxyBaseService::getProxyType();
+            $current_ip_addr = ProxyBaseService::getCurrentValidProxyIp($proxy_type); # 获取当前可用的代理IP
+            if(!empty($current_ip_addr)){
+                $isValid = ProxyBaseService::isValid($current_ip_addr);
+                if(!$isValid){
+                    $is_need_get_new_ip = 1;
+                    ProxyBaseService::setIpInvalid($current_ip_addr); # 设置当前ip无效
+                }
+            }else{
+                $is_need_get_new_ip = 1;
+            }
 
-        $end_time = microtime(true);
-        $logArr['time_consume'] = ($end_time-$start_time).'s';
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip-缓存1', $logArr);
+            $logArr = ['is_need_get_new_ip'=>$is_need_get_new_ip, 'proxy_type'=>$proxy_type, 'is_valid'=>$isValid, 'current_ip_addr'=>$current_ip_addr];
+            if($is_need_get_new_ip){
+                $new_ip_addr_data = ProxyBaseService::getRemoteProxyIp($proxy_type);
+                $logArr['new_ip_addr_data'] = $new_ip_addr_data;
+            }
+
+            $end_time = microtime(true);
+            $logArr['time_consume'] = ($end_time-$start_time).'s';
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip-缓存1', $logArr);
+        }catch (\Exception $exception){
+            Tool_Common::log('/proxy/'.__FUNCTION__.'_err', 'ERR', '代理ip缓存失败', ['proxy_type'=>$proxy_type, 'err_msg'=>$exception->getMessage()]);
+        }
 
         return ['status'=>200, 'msg'=>'操作成功', 'data'=>$logArr];
     }
@@ -185,13 +192,15 @@ class ProxyBaseService {
      * @desc 获取代理IP
      * @return array
      */
-    public static function getRemoteProxyIp(){
+    public static function getRemoteProxyIp($proxy_type=''){
         $time_HI = date("H:i");
         //return ['status'=>300, 'msg'=>'调试'];
         if('04:00'<$time_HI && $time_HI<'08:55'){
             return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
         }
-        $proxy_type = ProxyBaseService::getProxyType();
+        if(!$proxy_type){
+            $proxy_type = ProxyBaseService::getProxyType();
+        }
 
         if($proxy_type == 2) {
             $ip_addr_data = ProxyZhiMaService::getRemoteProxyIp();
@@ -270,23 +279,43 @@ class ProxyBaseService {
         return $flag;
     }
 
+    /**
+     * @param int $uid
+     * @return int
+     */
+    public static function getProxyTypeByUid($uid=0){
+        if(!$uid) return 1;
+        $m = \Yii::$app->cache;
+        $mkey = 'getProxyTypeByUid_'.$uid;
+        if(!$proxy_type = $m->get($mkey)){
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+            $proxy_type = $TzSystemsUsers->proxy_type;
+
+            $m->set($mkey, $proxy_type, 30);
+        }
+        $proxy_type = $proxy_type ? :ProxyBaseService::getProxyType();
+
+        return (int)$proxy_type;
+    }
 
     /**
      * @desc 设置全局代理
      * @param $ch
      * @return bool
      */
-    public static function setProxy($ch){
-        $proxy_type = ProxyBaseService::getProxyType();
+    public static function setProxy($ch, $uid=0){
+        $proxy_type = ProxyBaseService::getProxyTypeByUid($uid);
 
-        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
+        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp($proxy_type);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设置全局代理-1', ['uid'=>$uid, 'proxy_type'=>$proxy_type, 'current_proxy_addr'=>$current_proxy_addr]);
         if(empty($current_proxy_addr)) return [];
-        if($proxy_type == 2){
+        if($proxy_type == 2) { # 芝麻云
             // 代理服务器
-            $proxyServer = "http://".$current_proxy_addr;
+            $proxyServer = "http://" . $current_proxy_addr;
             curl_setopt($ch, CURLOPT_PROXYTYPE, 5); //sock5
             curl_setopt($ch, CURLOPT_PROXY, $proxyServer);
 
+        }elseif($proxy_type == 3){ # 代理云
         }else{
             $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
             # 快代理

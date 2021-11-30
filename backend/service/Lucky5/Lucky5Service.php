@@ -2502,7 +2502,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
         Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'current_proxy_addr'=>$current_proxy_addr, 'uid'=>$uid]);
 
-        ProxyBaseService::setProxy($ch); # 设置全局代理
+        ProxyBaseService::setProxy($ch, $uid); # 设置全局代理
 
         return $current_proxy_addr;
     }

@@ -69,92 +69,44 @@ class ProxyZhiMaService {
             return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
         }
 
-        # 芝麻代理
-        $data = ProxyZhiMaService::getPoxyRemoteIp($num=1);
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-芝麻代理1', ['data'=>$data]);
-        if($data['status'] != 200) {
-            return [];
+        try {
+            # 芝麻代理
+            $data = ProxyZhiMaService::getPoxyRemoteIp($num=1);
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-芝麻代理1', ['data'=>$data]);
+            if($data['status'] != 200) {
+                return [];
+            }
+            $ip_data= $data['data'][0];
+            $ip_addr = $ip_data['ip'].':'.$ip_data['port'];
+            $ip = $ip_data['ip'];
+            $port = $ip_data['port'];
+            $now_time = time();
+            $valid_time = strtotime($ip_data['expire_time']);
+            $setDatas = [
+                'ip_addr' => $ip_addr,
+                'ip' => $ip,
+                'port' => (string)$port,
+                'proxy_type' => 2,
+                'isp' => (string)$type,
+                'city' => $ip_data['city'],
+                'valid_time' => $valid_time,
+                'expire_time' => $valid_time,
+                'created_at' => $now_time,
+                'updated_at' => $now_time,
+            ];
+            $ProxyIpRecords = new ProxyIpRecords();
+            $ProxyIpRecords->setAttributes($setDatas);
+            $flag = $ProxyIpRecords->save();
+            if(!$flag){
+                $logArr['err_msg'] = $ProxyIpRecords->getErrors();
+            }
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-芝麻代理2', $logArr);
+        }catch (\Exception $exception){
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'ERR', '获取代理IP-芝麻代理-错误', ['type'=>$type, 'data'=>$data, 'err_msg'=>$exception->getMessage()]);
+            return ['status'=>301, 'msg'=>$exception->getMessage()];
         }
-        $ip_data= $data['data'][0];
-        $ip_addr = $ip_data['ip'].':'.$ip_data['port'];
-        $ip = $ip_data['ip'];
-        $port = $ip_data['port'];
-        $now_time = time();
-        $valid_time = strtotime($ip_data['expire_time']);
-        $setDatas = [
-            'ip_addr' => $ip_addr,
-            'ip' => $ip,
-            'port' => (string)$port,
-            'proxy_type' => 2,
-            'isp' => (string)$type,
-            'city' => $ip_data['city'],
-            'valid_time' => $valid_time,
-            'expire_time' => $valid_time,
-            'created_at' => $now_time,
-            'updated_at' => $now_time,
-        ];
-        $ProxyIpRecords = new ProxyIpRecords();
-        $ProxyIpRecords->setAttributes($setDatas);
-        $flag = $ProxyIpRecords->save();
-        if(!$flag){
-            $logArr['err_msg'] = $ProxyIpRecords->getErrors();
-        }
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-芝麻代理2', $logArr);
 
         return ['status'=>200, 'ip_addr'=>$ip_addr];
-    }
-
-    /**
-     * @desc 获取代理ip和接口
-     * @param $num = 1; # 提取IP数量
-     */
-    public static function kuaiPoxy($num = 1){
-        $time_HI = date("H:i");
-        if('04:00'<$time_HI && $time_HI<'08:55'){
-            return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
-        }
-        $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
-        $API_KEY = BetService::getConfig('KUAI_POXY_API_KEY'); # 快代理 API Key
-        // https://dev.kdlapi.com/api/getorderexpiretime?orderid=938684913491492&signature=vdany88efprusvlm16cb0is9wr9smb4q
-        $RedisLock = new RedisLock();
-        $Rkey = $API_KEY.'_redis';
-        if(!$RedisLock->lock($Rkey.'_redis', 15)){
-            sleep(10);
-        }
-        $query = [
-            'orderid' => $KUAI_POXY_ORDER_ID, # 快代理订单号
-            'num' => $num,
-            'pt' => 1, # 1、http/https,返回http代理的端口号 2、socks4/socks5,返回socks代理的端口号
-            'format' => 'json', # json、xml
-            'sep' => 1,
-            //'area' => '浙江,福建,江西,上海,湖北,江苏,广东',
-            'area' => '福建,广东',
-            'signature' => $API_KEY,
-            'carrier' => 2, # 0: 不筛选(默认) 1: 联通 2: 电信 ]  此参数仅支持按IP付费订单
-        ];
-        $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdps/?'.http_build_query($query);
-        $rst = CurlService::getCurl($url);
-
-        Tool_Common::log('kuaiPoxy', 'INFO', '代理IP获取', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
-        if($rst['code'] != 0 OR empty($rst['data']['proxy_list'][0])){
-            $m = \Yii::$app->cache;
-            $mkey = 're_get_kuai_poxy';
-            if(isset($rst['errno']) && in_array($rst['errno'], [28, 52]) && !$m->get($mkey)){
-                $m->set($mkey, 1, 10);
-                return self::kuaiPoxy(); # 获取代理失败，再次获取一次代理ip
-            }
-            return ['status'=>300, 'msg'=>'代理端口异常，不可用'];
-        }
-
-        return ['status'=>200, 'data'=>$rst['data']['proxy_list'], 'msg'=>'代理IP数据获取成功'];
-    }
-
-    /**
-     * @desc 获取快代理的代理IP
-     * @return array|mixed
-     */
-    public static function getPoxyIp($uid=0, $is_auto = 1){
-        return PoxyIPService::getProxyIpNew($uid, $is_auto);
     }
 
     /**
@@ -180,99 +132,6 @@ class ProxyZhiMaService {
         }
 
         return $mkey;
-    }
-
-    /**
-     * @desc 清除代理IP
-     * @return bool
-     */
-    public static function clearProxyIpKey(){
-        $m = \Yii::$app->cache;
-        $mkey = self::builProxyIpKey();
-        $oldIP = $m->get($mkey);
-
-        $flag = $m->delete($mkey);
-        $newIP = self::getPoxyIp();
-        return ['status'=>200, 'data'=>['new_ip'=>$newIP, 'old_ip'=>$oldIP]];
-    }
-
-    /**
-     * @desc 代理账号过期时间
-     * @return array
-     */
-    public static function kuaiPoxyExpire(){
-        $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
-        $query = [
-            'orderid' => $KUAI_POXY_ORDER_ID, # 快代理订单号
-            'signature' => BetService::getConfig('KUAI_POXY_API_KEY'), # 配置
-        ];
-        $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getorderexpiretime/?'.http_build_query($query);
-
-        $rst = CurlService::getCurl($url);
-        if($rst['code'] != 0 OR $rst['data']['expire_time']<date("Y-m-d H:i:s")){
-            return ['status'=>300, 'msg'=>'使用时间过期'];
-        }
-
-        return ['status'=>200, 'expire'=>$rst['data']['expire_time']];
-    }
-
-    /**
-     * @desc 获取私密代理可用时长
-     * @param $poxy_ip 单个：['113.120.61.166:22989']  或多个：['113.120.61.166:22989','122.4.44.132:21808']
-     * @return array
-     */
-    public static function kuaiIPValidTime($poxy_ips = ''){
-        if(strpos($poxy_ips[0], ':') === false) return ['status'=>300, 'msg'=>'IP格式错误，缺少冒号 ":"'];
-        $m = \Yii::$app->cache;
-        $mkey = 'retry_kuaiIPValidTime_key';
-
-        $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
-        $query = [
-            'orderid' => $KUAI_POXY_ORDER_ID, # 快代理订单号
-            'proxy' => implode(',', $poxy_ips),
-            'signature' => BetService::getConfig('KUAI_POXY_API_KEY'), # 配置
-        ];
-        $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdpsvalidtime/?'.http_build_query($query);
-
-        $rst = CurlService::getCurl($url, [], 6);
-        if($rst['errno']>0 && !$r = $m->get($mkey)){
-            $m->set($mkey, 1, 5);
-            return self::kuaiIPValidTime($poxy_ips);
-        }
-        $logArr = ['poxy_ips'=>$poxy_ips, 'url'=>$url, 'rst'=>$rst];
-        Tool_Common::log('kuaiIPValidTime', 'INFO', '获取私密代理可用时长', $logArr);
-        if($rst['code'] != 0){ # 为确保稳定，使用时间少于60s则认为IP失效
-            return ['status'=>301, 'msg'=>'接口调用失败'];
-        }
-
-        return ['status'=>200, 'data'=>$rst['data']];
-    }
-
-    /**
-     * @desc 判断代理IP有效性
-     * @param $poxy_ip array  ['122.7.3.56:17856', '122.8.8.56:176']
-     * @return bool
-     */
-    public static function isValid($poxy_ips = [], $is_auto=1){
-        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        if(!$POXY_STATUS && $is_auto) return false; # CURL 代理开关
-        $m = \Yii::$app->cache;
-        $mkey = 'retry_get_isValid_key';
-
-        $url = 'https://www.baidu.com';
-        $start_time = microtime(true);
-        //$rst = CurlService::getCurl($url, [], 9);
-        $checkRst = PoxyIPService::check($url, $poxy_ips[0], 8);
-        $end_time = microtime(true);
-        $consume_time = ($end_time-$start_time).'s';
-        if(!$checkRst && !$r = $m->get($mkey)){
-            $m->set($mkey, 1, 6);
-            return self::isValid($poxy_ips);
-        }
-
-        Tool_Common::log('poxy_ip_is_valid','INFO', '判断代理IP有效性', ['url'=>$url, 'poxy_ips'=>$poxy_ips, 'rst'=>$checkRst, 'consume_time'=>$consume_time]);
-
-        return  $checkRst;
     }
 
     /**
