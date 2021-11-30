@@ -1885,7 +1885,7 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1-2', $logArr);
         }
 
         //if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }

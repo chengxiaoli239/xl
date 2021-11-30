@@ -1753,7 +1753,7 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
             $code = 300;
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$response, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1-3', $logArr);
         }else{
             $code = 200;
         }
@@ -1807,7 +1807,7 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
             $code = 300;
             $logArr = ['url'=>$url, 'header'=>$headers, 'rst'=>$response, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1-4', $logArr);
         }else{
             $code = 200;
         }
@@ -2259,7 +2259,7 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$content, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1-5', $logArr);
         }
 
         # ================= xCsrf token start =====================

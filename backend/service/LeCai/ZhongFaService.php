@@ -2230,7 +2230,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         if($errno){
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             //p($logArr);
-            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1-6', $logArr);
         }
 
         if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
@@ -2335,7 +2335,7 @@ class ZhongFaService { # 宝岛众发登陆体系
         $logArr = ['url'=>$url, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]; p($logArr);
         if($errno){
             $logArr = ['url'=>$url, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
-            Tool_Common::log('httpPostError','INFO','httpPost请求-1', $logArr);
+            Tool_Common::log('httpPostError','INFO','httpPost请求-1-7', $logArr);
         }
 
         curl_close($ch);
