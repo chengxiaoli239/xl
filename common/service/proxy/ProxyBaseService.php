@@ -156,7 +156,8 @@ class ProxyBaseService {
         try {
             $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS'], $proxy_type);
             if($is_auto == 1 && !$hasPlansActiveLottery){
-                return ['status'=>401, 'msg'=>'无对应代理激活的计划'];
+                return [];
+                //return ['status'=>401, 'msg'=>'无对应代理激活的计划'];
             }
             $is_need_get_new_ip = 0;
 
