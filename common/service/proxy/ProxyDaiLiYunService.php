@@ -31,7 +31,7 @@ class ProxyDaiLiYunService {
         $url = \Yii::$app->params['PROXY_DAILIYUN_API'].'/query.txt?key=NPE4D177DB&word=&count='.$num.'&rand=false&ltime=&norepeat=true&detail=true';
         $rst = CurlService::getCurl($url);
         Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip', ['url'=>$url, 'rst'=>$rst]);
-        if(!isset($rst['code']) OR $rst['code'] != 0){
+        if(!$rst OR strpos($rst, ',') === false){
             Tool_Common::log('/proxy/'.__FUNCTION__.'_err', 'INFO', '代理IP获取-代理云', ['url'=>$url, 'rst'=>$rst]);
             return ['status'=>201, 'msg'=>'获取代理失败'];
         }
