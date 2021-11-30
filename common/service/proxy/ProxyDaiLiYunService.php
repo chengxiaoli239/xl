@@ -71,6 +71,7 @@ class ProxyDaiLiYunService {
                 'proxy_type' => 3,
                 'isp' => (string)$type,
                 'city' => $city,
+                'status' => ($valid_time>(time()+60)) ? 1 : 0;
                 'valid_time' => $valid_time,
                 'expire_time' => $valid_time,
                 'created_at' => $now_time,
