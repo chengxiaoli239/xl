@@ -36,8 +36,6 @@ class ProxyDaiLiYunService {
             return ['status'=>201, 'msg'=>'获取代理失败'];
         }
 
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP获取-代理云', ['url'=>$url, 'rst'=>$rst]);
-
         return ['status'=>200, 'data'=>$rst, 'msg'=>'代理IP数据获取成功'];
     }
 
