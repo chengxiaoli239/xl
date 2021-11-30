@@ -62,7 +62,7 @@ class ProxyDaiLiYunService {
             $ip_addr = $ip_data['0'];
             $ip = $ip_data[1];
             $city = $ip_data[2];
-            $port = explode(':', $ip_data)[1];
+            $port = explode(':', $ip_data[1]);
             $now_time = time();
             $valid_time = $ip_data[4];
             $setDatas = [
