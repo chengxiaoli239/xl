@@ -15,7 +15,7 @@ class ProxyZhiMaService {
      * @desc 获取代理ip和接口
      * @param $num = 1; # 提取IP数量
      */
-    public static function getPoxyRemoteIp($num = 1){
+    public static function getProxyRemoteIp($num = 1){
         $time_HI = date("H:i");
         if('04:00'<$time_HI && $time_HI<'08:55'){
             return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
@@ -71,7 +71,7 @@ class ProxyZhiMaService {
 
         try {
             # 芝麻代理
-            $data = ProxyZhiMaService::getPoxyRemoteIp($num=1);
+            $data = ProxyZhiMaService::getProxyRemoteIp($num=1);
             Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-芝麻代理1', ['data'=>$data]);
             if($data['status'] != 200) {
                 return [];

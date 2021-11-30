@@ -15,7 +15,7 @@ class ProxyKuaiService {
      * @desc 获取代理ip和接口
      * @param $num = 1; # 提取IP数量
      */
-    public static function getPoxyRemoteIp($num = 1){
+    public static function getProxyRemoteIp($num = 1){
         $time_HI = date("H:i");
         if('04:00'<$time_HI && $time_HI<'08:55'){
             return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
@@ -112,7 +112,7 @@ class ProxyKuaiService {
 
         try {
             # 快代理
-            $data = self::getPoxyRemoteIp($num=1);
+            $data = self::getProxyRemoteIp($num=1);
             if($data['status'] != 200) {
                 return [];
             }

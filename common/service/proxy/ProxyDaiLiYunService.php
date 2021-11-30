@@ -15,7 +15,7 @@ class ProxyDaiLiYunService {
      * @desc 获取代理ip和接口
      * @param $num = 1; # 提取IP数量
      */
-    public static function getPoxyRemoteIp($num = 1){
+    public static function getProxyRemoteIp($num = 1){
         $time_HI = date("H:i");
         if('04:00'<$time_HI && $time_HI<'08:55'){
             return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
@@ -30,8 +30,9 @@ class ProxyDaiLiYunService {
         //$url = \Yii::$app->params['PROXY_DAILIYUN_API'].'/query.txt?key=NPE4D177DB&word=广东,福建,浙江&count='.$num.'&rand=false&ltime=7200&norepeat=true&detail=true'; # 代理云只能选择一个地区
         $url = \Yii::$app->params['PROXY_DAILIYUN_API'].'/query.txt?key=NPE4D177DB&word=广东&count='.$num.'&rand=false&ltime=7200&norepeat=true&detail=true';
         $rst = CurlService::getCurl($url);
-        if($rst['code'] != 0){
-            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP获取-代理云', ['url'=>$url, 'rst'=>$rst]);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip', ['url'=>$url, 'rst'=>$rst]);
+        if(!isset($rst['code']) OR $rst['code'] != 0){
+            Tool_Common::log('/proxy/'.__FUNCTION__.'_err', 'INFO', '代理IP获取-代理云', ['url'=>$url, 'rst'=>$rst]);
             return ['status'=>201, 'msg'=>'获取代理失败'];
         }
 
@@ -53,7 +54,7 @@ class ProxyDaiLiYunService {
 
         try {
             # 代理云
-            $data = self::getPoxyRemoteIp($num=1);
+            $data = self::getProxyRemoteIp($num=1);
             if($data['status'] != 200) {
                 return [];
             }
