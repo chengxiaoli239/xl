@@ -60,5 +60,7 @@ return [
 
     # 代理云
     'PROXY_DAILIYUN_API' => 'http://gaozi2021.v4.dailiyun.com',
+    'DAILIYUN_USERNAME' => 'gaozi2021', # 通过密码使用私密代理
+    'DAILIYUN_PASSWORD' => '0654321', # 快代理密码
 ];
 
