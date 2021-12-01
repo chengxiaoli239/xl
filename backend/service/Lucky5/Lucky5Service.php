@@ -1119,6 +1119,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @return array
      */
     public static function getSn($uid, $tz_system_id){
+        return ['sn'=>'66666666'];
         $rst = self::userInfo($uid, $tz_system_id);
         $data = [];
         if(!isset($rst['Status']) OR $rst['Status'] !=1) return $data;
