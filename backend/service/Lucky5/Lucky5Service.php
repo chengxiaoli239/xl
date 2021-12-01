@@ -1732,7 +1732,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $qihao = '';
         }
 
-        if($data['Status'] == 1 && isset($data['data']['nextVol'])){
+        if($data['Status'] == 1 && isset($data['Data']['real_period_no'])){
             $m->set($mkey, $qihao, 30);
         }
 
