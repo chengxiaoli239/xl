@@ -1897,7 +1897,6 @@ class ZhongFaService { # 宝岛众发登陆体系
         }else{
             $qihao = '';
         }
-        $m->set($mkey, $qihao, 15);
 
         return $qihao;
     }
