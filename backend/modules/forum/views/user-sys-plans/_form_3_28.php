@@ -46,12 +46,19 @@ use yii\widgets\ActiveForm;
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-4 col-xs-6">
+                        <div class="col-lg-3 col-xs-6">
                             <?= $form->field($model, 'single')->textInput() ?>
                         </div>
-                        <div class="col-lg-4 col-xs-6">
+                        <div class="col-lg-3 col-xs-6">
                             <!--位置合分：合分-->
-                        <?= $form->field($model, 'xhefen')->textInput()->label('合分值')?>
+                            <?= $form->field($model, 'xhefen')->textInput()->label('合分值')?>
+                        </div>
+
+                        <div class="col-lg-3 col-xs-6">
+                            <?= $form->field($model, 'get_arises')->textInput()->label('上奖【取】') ?>
+                        </div>
+                        <div class="col-lg-3 col-xs-6">
+                            <?= $form->field($model, 'remove_arises')->textInput()->label('上奖【除】') ?>
                         </div>
                     </div>
 
@@ -90,15 +97,6 @@ use yii\widgets\ActiveForm;
                         <a href="javascript:;" class="btn btn-xs btn-info fan reverse_type_hz">反买</a>
                         <a href="javascript:;" class="btn btn-xs btn-info fan reverse_type_hz_Null">清</a>
                     ') ?-->
-
-                    <div class="row">
-                        <div class="col-lg-3 col-xs-6">
-                            <?= $form->field($model, 'get_arises')->textInput()->label('上奖【取】') ?>
-                        </div>
-                        <div class="col-lg-3 col-xs-6">
-                            <?= $form->field($model, 'remove_arises')->textInput()->label('上奖【除】') ?>
-                        </div>
-                    </div>
 
                     <!--止盈止损-->
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>

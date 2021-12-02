@@ -2878,7 +2878,7 @@ $sql .= '
         ];
         $code_type = $code_types[$data['UserSysPlans']['playway']];
         $in_codes = $data['UserSysPlans']['in_codes']? :''; # 在此号码范围内
-        $in_codes = explode(',', str_replace(['，', ' '], ',', $in_codes));
+        $in_codes = (!empty($in_codes)) ? explode(',', str_replace(['，', ' '], ',', $in_codes)) : [];
         $tz_type = $data['UserSysPlans']['tz_type'];
         $lotter_type = $data['UserSysPlans']['lottery_type'];
         $model = new UserSysPlans();
