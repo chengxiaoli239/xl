@@ -66,7 +66,11 @@ class SysCustomizedFiltersController extends BaseController
     {
         $model = new SysCustomizedFilters();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $post = Yii::$app->request->post();
+        $now_time = time();
+        $post['SysCustomizedFilters']['created_at'] = $now_time;
+        $post['SysCustomizedFilters']['updated_at'] = $now_time;
+        if ($model->load($post) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 

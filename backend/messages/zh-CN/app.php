@@ -126,4 +126,6 @@ return [
     'query-profits-years' => '查年利润',
     'System Configs' => '系统配置',
     'bet_now' => '立即下注',
+    'Sys Customized Filters' => '系统定制过滤',
+    'Create Sys Customized Filters' => '创建过滤',
 ];
