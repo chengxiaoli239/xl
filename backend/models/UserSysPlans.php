@@ -44,8 +44,6 @@ use Yii;
 class UserSysPlans extends \common\models\base\BaseModel
 {
 
-    const play_names = [1=>'二字定', 2=>'三字定', 3=>'四字定', 4=>'一字定', 6=>'X字现'];
-
     public $type_2; # 双重
     public $type_3; # 三重
     public $type_4; # 四重
