@@ -166,6 +166,14 @@ class IndexController extends Controller
         echo $page_content;
     }
 
+    public function actionTestPython(){
+        self::_init();
+        $post = \Yii::$app->request->post();
+        $get = \Yii::$app->request->get();
+
+        return ['status'=>200, 'data'=>['get'=>$get, 'post'=>$post], 'msg'=>'操作成功'];
+    }
+
     public function actionTestLogin(){
         self::_init();
         $post = \Yii::$app->request->post();

@@ -2384,7 +2384,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $balance = Lucky5Service::getBalance($uid,$tz_system_id, $r=2);
 
-        $flag = $balance > 0 ? true : false;
+        $flag = ($balance > 0 OR $balance === 0) ? true : false;
 
         return (boolean)$flag;
     }
