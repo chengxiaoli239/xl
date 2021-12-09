@@ -2425,6 +2425,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if($errno) {
             return ['status'=>401, 'err_msg'=>'Curl error: '.$curl_error, 'errno'=>$errno];
         }
+
         if(!BaseService::is_json($data)){
             Tool_Common::log('/error/'.__FUNCTION__, 'ERR', 'get请求失败', ['url'=>$url, 'headers'=>$header, 'errno'=>$errno, 'data'=>$data]);
             return $data;
