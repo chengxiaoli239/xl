@@ -57,8 +57,10 @@ use yii\widgets\ActiveForm;
                 <!--导入号码组轮换-->
                 <?php include(dirname(__FILE__).'/import_codes.php'); ?>
 
-                <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
                 <div class="row">
+                    <div class="col-lg-3 col-xs-6">
+                        <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
+                    </div>
                     <div class="col-lg-3 col-xs-6">
                         <?= $form->field($model, 'bet_while_miss')->textInput()->label('遗漏x期投,如:10') ?>
                     </div>
