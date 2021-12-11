@@ -1825,7 +1825,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
                     'bet_money'=>$single,
                     'bet_way'=>$way,
                     'is_xian'=>$is_xian,
-                    'number_type'=> LuckyBaseService::getNumType($tz_type, $playway),
+                    'number_type'=> LuckyBaseService::getNumType($tz_type, $playway, $tmpcodesArr),
                     'is_iframe' => 1,
                     //'guid'=>'3e1752e5-e455-4075-b657-0fd13b90d65d',
                     'bet_log'=>$bet_log,
@@ -1954,8 +1954,12 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @param $tz_type
      * @return array|mixed
      */
-    public static function getNumType($tz_type, $playway=''){
+    public static function getNumType($tz_type, $playway='', $tmpcodesArr=[]){
         if($playway==2) return 30;
+        if($tz_type == 27 && !empty($tmpcodesArr[0]) && strlen($tmpcodesArr[0])==5){
+            $num_type = 30;
+            return $num_type; # 五位二定
+        }
         $num_type = 40; # 四定
         $num_types = [
             36 => 21, # 二字现

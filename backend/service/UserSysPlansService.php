@@ -591,7 +591,11 @@ class UserSysPlansService extends BaseService {
                 $codesArr = !empty($codesData) ? explode(',', $codesData) : [];
                 $insertCodes = [];
                 if(!empty($codesArr)) foreach ($codesArr as $tmpCodes){
-                    $insertCodes[] = strtoupper($tmpCodes[0]).','.strtoupper($tmpCodes[1]).','.strtoupper($tmpCodes[2]).','.strtoupper($tmpCodes[3]);
+                    if(strlen($tmpCodes) == 5){
+                        $insertCodes[] = strtoupper($tmpCodes[0]).','.strtoupper($tmpCodes[1]).','.strtoupper($tmpCodes[2]).','.strtoupper($tmpCodes[3]).','.strtoupper($tmpCodes[4]);
+                    }else{
+                        $insertCodes[] = strtoupper($tmpCodes[0]).','.strtoupper($tmpCodes[1]).','.strtoupper($tmpCodes[2]).','.strtoupper($tmpCodes[3]);
+                    }
                 }
 
                 $insertCodesData = implode('@', $insertCodes);
