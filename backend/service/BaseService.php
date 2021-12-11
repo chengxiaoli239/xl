@@ -42,7 +42,7 @@ class BaseService{
         # 是否有激活的计划
         $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id, $TzSystemsUser->uid);
         if($is_auto == 1 && !$hasActivePlan){
-            return false;
+            return ['status'=>301, 'msg'=>'没有激活的投注计划'];
         }
 
         if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
@@ -50,8 +50,8 @@ class BaseService{
         }
 
         # 密码或账号不正确
-        if(strpos($TzSystemsUser->desc, '用户名或密码不正确') !== false OR strpos($TzSystemsUser->desc, '您的访问过于频繁') !== false){
-            return false;
+        if($is_auto == 1 && (strpos($TzSystemsUser->desc, '用户名或密码不正确') !== false OR strpos($TzSystemsUser->desc, '您的访问过于频繁') !== false)){
+            return ['status'=>302, 'msg'=>$TzSystemsUser->desc];
         }
 
         $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'ssc_kj_time_period'])->value); # 开奖时间间隔:20分钟
@@ -184,7 +184,7 @@ class BaseService{
             $m->set($mkey, $rst, 8);
             $end_time = microtime(true);
             $time_consume = ($end_time-$start_time).'s';
-            Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '同步余额耗时', ['tz_system_id'=>$tz_system_id, 'TzSystemsUserID'=>$TzSystemsUser->id, 'time_consume'=>$time_consume]);
+            Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '同步余额耗时', ['tz_system_id'=>$tz_system_id, 'TzSystemsUserID'=>$TzSystemsUser->id, 'time_consume'=>$time_consume, 'rst'=>$rst]);
         }catch (\Exception $exception){
             $rst = ['status'=>300, 'msg'=>$exception->getMessage()];
             Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '获取余额失败', ['TzSystemsUsers.id'=>$id, 'err_msg'=>$exception->getMessage()]);

@@ -107,7 +107,7 @@ $(function () {
                 txt = '登录失败！';
                 $("#ApplyLoginConfirmEnd").attr('refresh', 0);
             }
-            msg = txt + '系统账号:' + rst.username + '   网盘账号:'+ rst.account + ' ' + msg + '， 余额：' + balance;
+            msg = txt + '系统账号:' + rst.username + '   网盘账号:'+ rst.account + ' <font color="red">' + msg + '</font>， 余额：' + balance;
 
             $("#tip_msg_title_end_login").html(msg);
             $("#rstTipModalEndLogin").modal('show');

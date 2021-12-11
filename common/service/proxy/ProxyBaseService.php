@@ -336,6 +336,8 @@ class ProxyBaseService {
             # 快代理
             $username = \Yii::$app->params['KUAI_USERNAME'];
             $password = \Yii::$app->params['KUAI_PASSWORD'];
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设置全局代理-1', ['uid'=>$uid, 'proxy_type'=>$proxy_type, 'current_proxy_addr'=>$current_proxy_addr,
+                'username'=>$username,'password'=>$password]);
             if(!empty($current_proxy_addr)){
                 //设置代理
                 curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);

@@ -4,6 +4,7 @@ namespace backend\modules\forum\controllers;
 
 use backend\service\BaseService;
 use backend\service\UserService;
+use common\tools\Tool_Common;
 use Yii;
 use backend\models\TzSystemsUsers;
 use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
@@ -55,6 +56,7 @@ class TzSystemsUsersController extends BaseController
         $id = $post['id'];
         $is_auto = $post['is_auto'];
         $rst = BaseService::login($id, $is_auto);
+        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '²Ù×÷µÇÂ½', ['id'=>$id, 'is_auto'=>$is_auto, 'rst'=>$rst]);
 
         return $rst;
     }

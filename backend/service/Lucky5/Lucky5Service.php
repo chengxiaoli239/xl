@@ -1101,6 +1101,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if(isset($rst['status']) && $rst['status'] == 300) return $rst;
         # 第二步：账号、验证码登录
         $rst = self::loginRemote($uid, $tz_system_id);
+        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '登陆', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
+        if(isset($rst['status']) && $rst['status'] != 200){
+            Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '登陆-错误', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
+            return $rst;
+        }
         # 第三步：同意
         if(isset($rst['Status']) && $rst['Status'] == 1){
             $rst = self::acceptAgreement($uid, $tz_system_id);
@@ -1108,6 +1113,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         # 获取用户信息
         $rst = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
+        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '获取用户信息', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
 
         return $rst;
     }
@@ -1254,8 +1260,6 @@ class Lucky5Service { # 重庆7时彩登陆体系
         ];
 
         $data = self::httpPost($url,$post_data, $headers, $TzSystemsUsers->uid);
-        //sleep(10);
-        //self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         $desc = '';
         if(isset($data['Status']) && $data['Status'] == 2){
@@ -1264,6 +1268,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $TzSystemsUsers->desc = $desc;
         $TzSystemsUsers->updated_at = time();
         $TzSystemsUsers->save();
+        $data['username'] = $TzSystemsUsers->username;
+        $data['account'] = $TzSystemsUsers->account;
 
         Tool_Common::log('loginRemote','INFO','Luck5登陆记录-2', $logArr);
         return $data;
@@ -2477,7 +2483,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
             //p($logArr);
             Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
-            return ['errno'=>$errno, 'curl_error'=>$curl_error];
+            return ['status'=>301, 'errno'=>$errno, 'curl_error'=>$curl_error];
         }
 
         //if(strpos($url, 'betNumber')){ p(['url'=>$url, 'header'=>$header,'post_data'=>$post_data,'rstData'=>$data,curl_close($ch),$errno]); }
@@ -2485,6 +2491,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
             return 'ok';
         }
         $rstData = json_decode($data, TRUE);
+        if(empty($rstData)){
+            $rstData = ['status'=>401, 'msg'=>$data];
+            Tool_Common::log('httpPostError','INFO','httpPost请求', ['status'=>301, 'errno'=>$errno, 'curl_error'=>$curl_error, 'data'=>$data]);
+        }
         //p(['data'=>$data, 'rstData'=>$rstData, 'post_data'=>$post_data, 'header'=>$header]);
 
         return $rstData;
