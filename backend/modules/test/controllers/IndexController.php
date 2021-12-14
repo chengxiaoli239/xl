@@ -242,6 +242,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $t = rand(1, 10);p($t);
         $rst = ProxyBaseService::preGetValidIp($is_auto=0);p($rst);
         $isValidRst = ProxyKuaiService::kuaiIPValidTime(['219.128.35.247:19054']);p($isValidRst);
         $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);p($hasPlansActiveLottery);
