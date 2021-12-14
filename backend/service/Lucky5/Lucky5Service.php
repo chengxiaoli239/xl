@@ -1420,7 +1420,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $time1 = microtime(true);
         $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 下注请求
-        if($uid==10) sleep(5);
+        if($uid==10) sleep(10);
         $time2 = microtime(true);
         $status = 0;
         $TIME_OUT_RETRY = BetService::getConfig('TIME_OUT_RETRY'); # 超时重复下开关，幸运五
