@@ -1421,7 +1421,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $time1 = microtime(true);
         $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 下注请求
         if($uid==10) {
-            $rnt_time = rand(2, 4);
+            $rnt_time = rand(2, 5);
             sleep($rnt_time);
         }
         $time2 = microtime(true);
