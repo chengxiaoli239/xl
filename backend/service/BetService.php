@@ -357,7 +357,7 @@ abstract class BetService extends BaseBetService {
             if($uid){
                 $where = array_merge($where, [['=', 'uid', $uid]]);
             }
-            $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
+            $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(6)->all();
             if(empty($BetErrorPlansTasks)){
                 Tool_Common::log('/repeatErrorBet/bet_error', 'ERR', '网盘开盘状态-1', ['uid' => $uid, 'msg'=>'没有下注计划']);
                 continue;
