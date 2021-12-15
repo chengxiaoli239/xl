@@ -6,6 +6,7 @@ use backend\service\CurlService;
 use backend\service\Lucky5\LuckyBaseService;
 use common\kj\BaseKj;
 use common\service\CommonService;
+use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use  yii;
 
@@ -20,7 +21,8 @@ class Lucky5 extends BaseKj {
     public static function getLotteryLucky($returnType = 'json', $is_auto = 1){
 
         $hasActivePlan = CommonService::hasPlansActive(self::$lottery_type);
-        if(in_array(self::$lottery_type, [8]) && !$hasActivePlan){
+        $status = KjDataGet::isCanGrab(self::$lottery_type);
+        if(in_array(self::$lottery_type, [8]) && (!$hasActivePlan OR !$status)){
             return false;
         }
 
