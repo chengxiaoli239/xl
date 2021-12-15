@@ -135,7 +135,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }elseif($model->status == 4){
                                     $txt = '<font color="red">推送超时</a>';
                                 }else{
-                                    $txt = '<font color="red">未推送</a>';
+                                    $txt = '<font color="#696969">等待推送</a>';
                                 }
                                 return Html::a($txt, 'javascript:;', $options);
                             }

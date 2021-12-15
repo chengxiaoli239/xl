@@ -214,7 +214,7 @@ class IndexController extends Controller
         $post = \Yii::$app->request->post();
         $uid = $post['uid'];
         $for_times = 4;
-        $rnt = rand(5, 10);
+        $rnt = rand(4, 7);
         $sleep_time = (int)(1 * $rnt);
         for($i=0; $i<$for_times; $i++){
             sleep($sleep_time);
