@@ -126,7 +126,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 if($model->status==2){
                                     $txt = '<font color="green">推送成功</font>';
                                 }elseif($model->status == 3){
-                                    $txt = '<font color="#2f4f4f">推送失败</a>';
+                                    $txt = '<font color="red">推送失败</a>';
                                     $options['class'] = 'act-re-bet';
                                     $options['data-rebet-url'] = "/forum/bet-error-plans-task/switch-status";
                                     $options['data-id'] = $model->id;
