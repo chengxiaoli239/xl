@@ -376,10 +376,11 @@ abstract class BetService extends BaseBetService {
                         $m->set($activeQihao_key, $activeQihao, 300);
                     }
                 }
-                Tool_Common::log('wang_pan_is_active', 'INFO', '网盘开盘状态-3', ['uid'=>$uid, 'tz_system_id'=>$lottery_type, 'activeQihao'=>$activeQihao]);
+                Tool_Common::log('wang_pan_is_active', 'INFO', '网盘开盘状态-3', ['uid'=>$uid, 'counts'=>count($BetErrorPlansTasks), 'tz_system_id'=>$lottery_type, 'activeQihao'=>$activeQihao]);
             }
             foreach ($BetErrorPlansTasks as $betErrorPlansTask){
                 $uid = $betErrorPlansTask->uid;
+                $task_id = $betErrorPlansTask->id;
                 $tz_system_id = $betErrorPlansTask->tz_system_id;
                 $lottery_type = $betErrorPlansTask->lottery_type;
                 $account = $betErrorPlansTask->account;
@@ -387,7 +388,7 @@ abstract class BetService extends BaseBetService {
                 $bet_sort_key = $betErrorPlansTask->bet_sort_key;
 
                 $qihao = $betErrorPlansTask->qihao;
-                Tool_Common::log('lottery_bet', 'ERR', '下注新逻辑-2', ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'account'=>$account, 'tz_system_id'=>$tz_system_id, 'activeQihao'=>$activeQihao, 'qihao'=>$qihao]);
+                Tool_Common::log('lottery_bet', 'ERR', '下注新逻辑-2', ['task_id'=>$task_id, 'plan_id'=>$plan_id, 'uid'=>$uid, 'lottery_type'=>$lottery_type, 'account'=>$account, 'tz_system_id'=>$tz_system_id, 'activeQihao'=>$activeQihao, 'qihao'=>$qihao]);
                 $status = UserService::accountIsExpire($uid, $tz_system_id); # 账号是否过期
                 if(!$status && $account != 'gaozi2018'){
                     Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['plan_id'=>$plan_id, 'uid'=>$uid, 'account'=>$account, 'tz_system_id'=>$tz_system_id]);
@@ -420,7 +421,7 @@ abstract class BetService extends BaseBetService {
                     if($t_rst['status'] == 2){
                         $betSuccess = true;
                     }
-                    $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account' => $account, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'loginRst'=>$loginRst, 'betKey'=>$betKey, 'time'=>$time];
+                    $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$betErrorPlansTask->id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'loginRst'=>$loginRst, 'betKey'=>$betKey, 'time'=>$time];
                     $snid = $t_rst['snid'];
                     $sn = $t_rst['sn'];
                     $planSnidArrs[$plan_id]['snids'][] = $snid;

@@ -213,13 +213,13 @@ class IndexController extends Controller
         set_time_limit(0);
         $post = \Yii::$app->request->post();
         $uid = $post['uid'];
-        $for_times = 4;
-        $rnt = rand(5, 10);
-        $sleep_time = (int)(1 * $rnt);
+        $for_times = 8;
+        //$rnt = rand(3, 5);
+        $sleep_time = 5;
         for($i=0; $i<$for_times; $i++){
-            sleep($sleep_time);
             $rst[$i]['rst'] = BetService::lotteryBet($uid);
             $rst[$i]['sleep_time'] = $sleep_time;
+            sleep($sleep_time);
         }
 
         return $rst;
