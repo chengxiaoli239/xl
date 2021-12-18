@@ -23,6 +23,7 @@ use backend\service\NineNine\NineNineNewService;
 use backend\service\NineNine\NineNineService6;
 use backend\service\qilin\BingDaoService;
 use common\kj\cqssc\CqsscKcw;
+use common\service\proxy\ProxyBaseService;
 use common\tools\RedisLock;
 use Yii;
 use backend\models\BettingRecords;
@@ -411,7 +412,8 @@ abstract class BetService extends BaseBetService {
                         $e_time = microtime(true);
                         $t_rst = $betRst['data']['bet_rst'];
                         $rst[$lottery_type][$task_id]['repeatBetRst'] = $t_rst;
-                        $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'loginRst'=>$loginRst, 'betKey'=>$betKey, 'consume_time'=>($e_time-$s_time1).'s'];
+                        $current_ip_addr = ProxyBaseService::getCurrentValidProxyIp(); # 获取当前可用的代理IP
+                        $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'loginRst'=>$loginRst, 'betKey'=>$betKey, 'consume_time'=>($e_time-$s_time1).'s', 'current_ip_addr'=>$current_ip_addr];
 
                         # 记录方案号
                         $where = ['plan_id'=>$plan_id, 'qihao'=>$activeQihao, 'lottery_type'=>$lottery_type];
