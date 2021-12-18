@@ -49,13 +49,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'account','label' => '账号',
                             'format'=>'raw',
                             'value' => function($model) {
-                                return $model->account."[".$model->uid."]";
+                                //return $model->account."[".$model->uid."]";
+                                return Html::a($model->account, '/forum/bet-error-plans-task/index?BetErrorPlansTask[account]='.$model->account)."[".$model->uid."]";
                             }
                         ],
                         ['attribute' => 'plan_id','label' => 'planid',
                             'format'=>'raw',
                             'value' => function($model) {
-                                return $model->plan_id.'_'.$model->bet_sort_key;
+                                return Html::a($model->plan_id.'_'.$model->bet_sort_key, '/forum/bet-error-plans-task/index?BetErrorPlansTask[plan_id]='.$model->plan_id);
                             }
                         ],
                         //'bet_url:url',
@@ -100,7 +101,13 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         //'single',
-                        'qihao',
+                        //'qihao',
+                        ['attribute' => 'qihao','label'=>'期号',
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return Html::a($model->qihao, '/forum/bet-error-plans-task/index?BetErrorPlansTask[qihao]='.$model->qihao);
+                            }
+                        ],
                         ['attribute' => 'post_desc','label' => '重推结果',
                             'format'=>'raw',
                             'value' => function($model) {
