@@ -413,7 +413,7 @@ abstract class BetService extends BaseBetService {
                         $t_rst = $betRst['data']['bet_rst'];
                         $rst[$lottery_type][$task_id]['repeatBetRst'] = $t_rst;
                         $current_ip_addr = ProxyBaseService::getCurrentValidProxyIp(); # 获取当前可用的代理IP
-                        $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'loginRst'=>$loginRst, 'betKey'=>$betKey, 'consume_time'=>($e_time-$s_time1).'s', 'current_ip_addr'=>$current_ip_addr];
+                        $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'betKey'=>$betKey, 'consume_time'=>($e_time-$s_time1).'s', 'current_ip_addr'=>$current_ip_addr];
 
                         # 记录方案号
                         $where = ['plan_id'=>$plan_id, 'qihao'=>$activeQihao, 'lottery_type'=>$lottery_type];
