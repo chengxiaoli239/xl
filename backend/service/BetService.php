@@ -430,7 +430,7 @@ abstract class BetService extends BaseBetService {
                     }
 
                     $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetInfo'] = $betErrorPlansTask;
-                    $rnt = rand(3, 5);
+                    $rnt = rand(1, 3);
                     sleep($rnt);
                 }catch (\Exception $exception){
                     Tool_Common::log('/repeatErrorBet/bet_rst_err', 'ERR', '下注错误', ['task_id'=>$task_id]);
