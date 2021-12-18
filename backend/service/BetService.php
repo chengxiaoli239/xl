@@ -420,7 +420,7 @@ abstract class BetService extends BaseBetService {
                         $BettingRecords->sn = trim($BettingRecords->sn.';'.$t_rst['sn'], ';');
                         $BettingRecords->save();
 
-                        Tool_Common::log('/repeatErrorBet/bet_rst', 'INFO', '网盘开盘状态-4', $logArr);
+                        Tool_Common::log('/repeatErrorBet/bet_rst', 'INFO', '网盘开盘状态-end', $logArr);
                     }elseif(!empty($activeQihao) && $qihao<$activeQihao){
                         BetService::closeTask($task_id, $qihao, $activeQihao, $account, $msg='未开盘或者已关盘[' . date('Y-m-d H:i:s') . ']'); # 关闭计划
                         $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = ['status' => 300, 'qihao'=>$qihao, 'activeQihao'=>$activeQihao, 'msg' => $msg];
