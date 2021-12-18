@@ -399,7 +399,8 @@ abstract class BetService extends BaseBetService {
 
                         $s_time = microtime(true);
                         $flag = self::isLogin($uid, $tz_system_id, $r=2);
-                        Tool_Common::log('/repeatErrorBet/bet_rst', 'INFO', '网盘开盘状态-4-1', ['flag'=>$flag, 'task_id'=>$task_id]);
+                        $s_time1 = microtime(true);
+                        Tool_Common::log('/repeatErrorBet/bet_rst', 'INFO', '网盘开盘状态-4-1', ['flag'=>$flag, 'task_id'=>$task_id, 'consume_time'=>($s_time1-$s_time).'s']);
                         if(!$flag){
                             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
                             $loginRst = BaseService::login($TzSystemsUsers->id, $is_auto=2);
@@ -410,7 +411,7 @@ abstract class BetService extends BaseBetService {
                         $e_time = microtime(true);
                         $t_rst = $betRst['data']['bet_rst'];
                         $rst[$lottery_type][$task_id]['repeatBetRst'] = $t_rst;
-                        $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'loginRst'=>$loginRst, 'betKey'=>$betKey, 'consume_time'=>($e_time-$s_time).'s'];
+                        $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'loginRst'=>$loginRst, 'betKey'=>$betKey, 'consume_time'=>($e_time-$s_time1).'s'];
 
                         # 记录方案号
                         $where = ['plan_id'=>$plan_id, 'qihao'=>$activeQihao, 'lottery_type'=>$lottery_type];
