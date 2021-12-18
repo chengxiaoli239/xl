@@ -132,7 +132,7 @@ class ProxyBaseService {
             $ip_addr = $row->ip_addr;
             $m->set($mkey, $ip_addr,15);
             $left_time = $row->valid_time - time();
-            if($left_time<300){
+            if($left_time<90){
                 $row->status = 0;
                 $row->save();
                 $ip_addr = '';
