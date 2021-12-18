@@ -1396,6 +1396,13 @@ abstract class BetService extends BaseBetService {
         $m = \Yii::$app->cache;
         $mkey = 'isLogin_'.$uid.'_'.$tz_system_id;
         $flag = $m->get($mkey);
+
+        $RedisLock = new RedisLock();
+        $Rkey = 'IsLogin_redis_'.$uid.'_'.$tz_system_id;
+        if(!$RedisLock->lock($Rkey.'_redis', 2)){
+            return true;
+        }
+
         if($flag) return (boolean)$flag;
         Tool_Common::log('isLogin_REQ', 'INFO', '是否登陆', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'r'=>$r]);
         if(in_array($tz_system_id, [1,2])){
@@ -1422,7 +1429,7 @@ abstract class BetService extends BaseBetService {
             # 16、台湾快五
             $flag = ZhongFaService::isLogin($uid, $tz_system_id);
         }
-        $m->set($mkey, 1, 15);
+        $m->set($mkey, 1, 60);
 
         return (boolean)$flag;
     }
