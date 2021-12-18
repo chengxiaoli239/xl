@@ -1468,12 +1468,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $time_consume = ($time2 - $time1).'s';
         $tmpRst['bet_time'] = date('Y-m-d H:i:s');
         $tmpRst['time_consume'] = $time_consume;
-        $row->status = $status;
-        $row->post_desc = json_encode($tmpRst, 320);
-
         $logArr = ['id'=>$id, 'uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers, 'snInfo'=>$snInfo, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
         Tool_Common::log('repeatErrorBet', 'INFO', '幸运五下注', $logArr);
 
+        $row->status = $status;
+        $row->post_desc = json_encode($tmpRst, 320);
         $flag = $row->save();
         if(!$flag){
             return ['status'=>300, 'msg'=>$row->getFirstErrors()];
