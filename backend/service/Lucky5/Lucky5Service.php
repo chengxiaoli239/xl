@@ -1395,6 +1395,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
             $repeats = Lucky5Service::fetchRepeatMemberInArray($tmpDatas);
         }
+        $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
 
         $m = \Yii::$app->cache;
         $_t = round(microtime(true) * 1000);
@@ -1422,7 +1423,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $time1 = microtime(true);
         $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 下注请求
-        sleep(1);
+        sleep((int)$slow_seconds); # 下注延迟秒数
         $time2 = microtime(true);
         $status = 0;
         $TIME_OUT_RETRY = BetService::getConfig('TIME_OUT_RETRY'); # 超时重复下开关，幸运五
