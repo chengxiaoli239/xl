@@ -508,7 +508,7 @@ abstract class BetService extends BaseBetService {
     }
 
     public static function buildLotteryBetKey($qihao='', $plan_id='', $bet_sort_key=0, $task_id=''){
-        return 'buildLotteryBetKey_'.'_'.$qihao.'_'.$plan_id.'_'.$bet_sort_key.'_'.$task_id;
+        return 'buildLotteryBetKey_'.$qihao.'_'.$plan_id.'_'.$bet_sort_key.'_'.$task_id;
     }
 
     public static function buildActiveQihaoKey($uid='', $tz_system_id='', $lottery_type = DEFAULT_LOTTERY_TYPE ){
