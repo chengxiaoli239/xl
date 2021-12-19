@@ -219,7 +219,7 @@ abstract class BetService extends BaseBetService {
         $task_id = $BetErrorPlansTasks->id;
         if(empty($BetErrorPlansTasks)){
             $Model = TzSystemsUsers::findOne(['uid'=>$uid]);
-            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注-没有可以下注的任务', ['uid'=>$uid, 'account'=>$Model->account]);
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注-没有可以下注的任务', ['uid'=>$uid, 'username'=>$Model->username]);
             return ['status'=>300, 'msg'=>'没有可以下注的任务'];
         }
 
