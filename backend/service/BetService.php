@@ -216,6 +216,7 @@ abstract class BetService extends BaseBetService {
         $where = ['AND', ['=', 'uid', $uid], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
         $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
         if(empty($BetErrorPlansTasks)){
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注-4-0', ['uid'=>$uid]);
             return ['status'=>300, 'msg'=>'没有可以下注的任务'];
         }
         $tz_system_id = $BetErrorPlansTasks->tz_system_id;
