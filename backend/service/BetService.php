@@ -416,7 +416,7 @@ abstract class BetService extends BaseBetService {
                     if(false && $balance<$bet_money){
                         BetService::closeTask($task_id, $qihao, $activeQihao, $account, $msg='余额不足，不可重推'); # 关闭计划
                     }elseif($qihao == $activeQihao){
-                        $betKey = BetService::buildLotteryBetKey($activeQihao, $plan_id, $bet_sort_key. $task_id);
+                        $betKey = BetService::buildLotteryBetKey($activeQihao, $plan_id, $bet_sort_key, $task_id);
                         if($lock = $m->get($betKey)){
                             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-3', ['task_id'=>$task_id,'betKey'=>$betKey]);
                             continue;
