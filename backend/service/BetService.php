@@ -423,7 +423,7 @@ abstract class BetService extends BaseBetService {
                         }
 
                         $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
-                        $m->set($betKey, 1, $time); # 减去两分钟缓存时间
+                        $m->set($betKey, 1, $time-60); # 减去两分钟缓存时间
 
                         $s_time = microtime(true);
                         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注脚本-4', ['task_id'=>$task_id]);
