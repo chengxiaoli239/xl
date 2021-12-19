@@ -124,18 +124,18 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => function($model) {
                                 $options = ['title' => '更新状态'.$model->status];
                                 if($model->status==2){
-                                    $txt = '<font color="green">推送成功</font>';
+                                    $txt = '<strong><font color="green">推送成功</font><strong>';
                                 }elseif($model->status == 3){
-                                    $txt = '<font color="red">推送失败</a>';
+                                    $txt = '<strong><font color="red">推送失败</font></strong>';
                                     $options['class'] = 'act-re-bet';
                                     $options['data-rebet-url'] = "/forum/bet-error-plans-task/switch-status";
                                     $options['data-id'] = $model->id;
                                     $options['data-qihao'] = $model->qihao;
                                     $options['id'] = 'act_'.$model->id;
                                 }elseif($model->status == 4){
-                                    $txt = '<font color="red">推送超时</a>';
+                                    $txt = '<strong><font color="red">推送超时</font></strong>';
                                 }else{
-                                    $txt = '<font color="#696969">等待推送</a>';
+                                    $txt = '<strong><font color="#696969">等待推送</font></strong>';
                                 }
                                 return Html::a($txt, 'javascript:;', $options);
                             }
