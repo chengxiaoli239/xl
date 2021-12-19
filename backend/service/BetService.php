@@ -219,7 +219,7 @@ abstract class BetService extends BaseBetService {
         $task_id = $BetErrorPlansTasks->id;
         if(empty($BetErrorPlansTasks)){
             $Model = TzSystemsUsers::findOne(['uid'=>$uid]);
-            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注-没有可以下注的任务', ['uid'=>$uid, 'username'=>$Model->username]);
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_not_task', 'INFO', '下注-没有可以下注的任务', ['uid'=>$uid, 'username'=>$Model->username]);
             return ['status'=>300, 'msg'=>'没有可以下注的任务'];
         }
 
@@ -227,7 +227,7 @@ abstract class BetService extends BaseBetService {
         $start_time = microtime(true);
         $flag = self::isLogin($uid, $tz_system_id, $r=2);
         $end_time = microtime(true);
-        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注-4-1', ['uid'=>$uid, 'flag'=>$flag, 'consume_time'=>($end_time-$start_time).'s']);
+        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注-登陆检测-1', ['uid'=>$uid, 'flag'=>$flag, 'consume_time'=>($end_time-$start_time).'s']);
         if(!$flag){
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
             $loginRst = BaseService::login($TzSystemsUsers->id, $is_auto=2);
