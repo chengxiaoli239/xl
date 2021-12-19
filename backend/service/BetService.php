@@ -204,6 +204,36 @@ abstract class BetService extends BaseBetService {
      * @return array
      */
     public static function lotteryBet($uid){
+        # 1、账号是否过期
+        $status = UserService::accountIsExpire($uid);
+        if(!$status && !in_array($uid, [2, 11])){
+            $Model = TzSystemsUsers::findOne(['uid'=>$uid]);
+            Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['uid'=>$uid, 'account'=>$Model->account]);
+            return ['status'=>301, 'msg'=>'账号过期提示'];
+        }
+
+        # 2、下注任务检测
+        $where = ['AND', ['=', 'uid', $uid], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
+        $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+        if(empty($BetErrorPlansTasks)){
+            return ['status'=>300, 'msg'=>'没有可以下注的任务'];
+        }
+        $tz_system_id = $BetErrorPlansTasks->tz_system_id;
+        $task_id = $BetErrorPlansTasks->id;
+
+        # 3、登陆检测
+        $start_time = microtime(true);
+        $flag = self::isLogin($uid, $tz_system_id, $r=2);
+        $end_time = microtime(true);
+        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注-4-1', ['uid'=>$uid, 'flag'=>$flag, 'consume_time'=>($end_time-$start_time).'s']);
+        if(!$flag){
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+            $loginRst = BaseService::login($TzSystemsUsers->id, $is_auto=2);
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '网盘开盘状态-4-2', ['uid'=>$uid, 'task_id'=>$task_id, 'loginRst'=>$loginRst]);
+            return ['status'=>302, 'msg'=>'未登录'];
+        }
+
+        # 4、下注
         $lottery_types = UserSysPlansService::getMyLotteryTypes($uid);
         foreach ($lottery_types as $data){
             if(in_array($data['lottery_type'], [8, 18])) { # 8、幸运五 18台湾快五
@@ -360,7 +390,7 @@ abstract class BetService extends BaseBetService {
             }
             $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
             if(empty($BetErrorPlansTasks)){
-                Tool_Common::log('/repeatErrorBet/bet_error', 'ERR', '网盘开盘状态-1', ['uid' => $uid, 'msg'=>'没有下注计划']);
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-1', ['uid' => $uid, 'msg'=>'没有下注计划']);
                 continue;
             }
             $first_tz_system_id = $BetErrorPlansTasks[0]->tz_system_id;
@@ -378,12 +408,7 @@ abstract class BetService extends BaseBetService {
                     $bet_sort_key = $betErrorPlansTask->bet_sort_key;
 
                     $qihao = $betErrorPlansTask->qihao;
-                    Tool_Common::log('lottery_bet', 'ERR', '下注新逻辑-2', ['task_id'=>$task_id, 'plan_id'=>$plan_id, 'uid'=>$uid, 'lottery_type'=>$lottery_type, 'account'=>$account, 'tz_system_id'=>$tz_system_id, 'activeQihao'=>$activeQihao, 'qihao'=>$qihao]);
-                    $status = UserService::accountIsExpire($uid, $tz_system_id); # 账号是否过期
-                    if(!$status && $account != 'gaozi2018'){
-                        Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['plan_id'=>$plan_id, 'uid'=>$uid, 'account'=>$account, 'tz_system_id'=>$tz_system_id]);
-                        return ['status'=>300, 'msg'=>'账号过期提示'];
-                    }
+                    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-2', ['task_id'=>$task_id, 'plan_id'=>$plan_id, 'uid'=>$uid, 'lottery_type'=>$lottery_type, 'account'=>$account, 'tz_system_id'=>$tz_system_id, 'activeQihao'=>$activeQihao, 'qihao'=>$qihao]);
 
                     $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
                     if(false && $balance<$bet_money){
@@ -391,7 +416,7 @@ abstract class BetService extends BaseBetService {
                     }elseif($qihao == $activeQihao){
                         $betKey = BetService::buildLotteryBetKey($activeQihao, $plan_id, $bet_sort_key);
                         if($lock = $m->get($betKey)){
-                            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '已经下注锁住-1', ['task_id'=>$task_id,'betKey'=>$betKey]);
+                            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-3', ['task_id'=>$task_id,'betKey'=>$betKey]);
                             continue;
                         }
 
@@ -399,21 +424,13 @@ abstract class BetService extends BaseBetService {
                         $m->set($betKey, 1, $time); # 减去两分钟缓存时间
 
                         $s_time = microtime(true);
-                        $flag = self::isLogin($uid, $tz_system_id, $r=2);
-                        $s_time1 = microtime(true);
-                        Tool_Common::log('/repeatErrorBet/bet_rst', 'INFO', '网盘开盘状态-4-1', ['flag'=>$flag, 'task_id'=>$task_id, 'consume_time'=>($s_time1-$s_time).'s']);
-                        if(!$flag){
-                            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-                            $loginRst = BaseService::login($TzSystemsUsers->id, $is_auto=2);
-                            Tool_Common::log('/repeatErrorBet/bet_rst', 'INFO', '网盘开盘状态-4-2', ['flag'=>$flag, 'task_id'=>$task_id, 'loginRst'=>$loginRst]);
-                        }
-                        Tool_Common::log('/repeatErrorBet/bet_rst', 'INFO', '网盘开盘状态-4-3', ['flag'=>$flag, 'task_id'=>$task_id]);
+                        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注脚本-4', ['task_id'=>$task_id]);
                         $betRst = $BetService->repeatErrorBet($task_id);
                         $e_time = microtime(true);
                         $t_rst = $betRst['data']['bet_rst'];
                         $rst[$lottery_type][$task_id]['repeatBetRst'] = $t_rst;
                         $current_ip_addr = ProxyBaseService::getCurrentValidProxyIp(); # 获取当前可用的代理IP
-                        $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'betKey'=>$betKey, 'consume_time'=>($e_time-$s_time1).'s', 'current_ip_addr'=>$current_ip_addr];
+                        $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'betKey'=>$betKey, 'consume_time'=>($e_time-$s_time).'s', 'current_ip_addr'=>$current_ip_addr];
 
                         # 记录方案号
                         $where = ['plan_id'=>$plan_id, 'qihao'=>$activeQihao, 'lottery_type'=>$lottery_type];
@@ -422,18 +439,18 @@ abstract class BetService extends BaseBetService {
                         $BettingRecords->sn = trim($BettingRecords->sn.';'.$t_rst['sn'], ';');
                         $BettingRecords->save();
 
-                        Tool_Common::log('/repeatErrorBet/bet_rst', 'INFO', '网盘开盘状态-end', $logArr);
+                        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注成功-end', $logArr);
                     }elseif(!empty($activeQihao) && $qihao<$activeQihao){
                         BetService::closeTask($task_id, $qihao, $activeQihao, $account, $msg='未开盘或者已关盘[' . date('Y-m-d H:i:s') . ']'); # 关闭计划
                         $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = ['status' => 300, 'qihao'=>$qihao, 'activeQihao'=>$activeQihao, 'msg' => $msg];
-                        Tool_Common::log('/repeatErrorBet/bet_error', 'ERR', '网盘开盘状态-5', ['uid'=>$uid,'account'=>$account,'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
+                        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-5', ['uid'=>$uid,'account'=>$account,'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
                     }
 
                     $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetInfo'] = $betErrorPlansTask;
                     $rnt = rand(1, 3);
                     sleep($rnt);
                 }catch (\Exception $exception){
-                    Tool_Common::log('/repeatErrorBet/bet_rst_err', 'ERR', '下注错误', ['task_id'=>$task_id]);
+                    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '下注错误', ['task_id'=>$task_id]);
                     $rst[$lottery_type][$task_id]['repeatBetRst'] = ['task_id'=>$task_id, 'err_msg'=>$exception->getMessage()];
                 }
             }
@@ -1396,6 +1413,7 @@ abstract class BetService extends BaseBetService {
         $m = \Yii::$app->cache;
         $mkey = 'isLogin_'.$uid.'_'.$tz_system_id;
         $flag = $m->get($mkey);
+        if($flag) return (boolean)$flag;
 
         $RedisLock = new RedisLock();
         $Rkey = 'IsLogin_redis_'.$uid.'_'.$tz_system_id;
@@ -1403,7 +1421,6 @@ abstract class BetService extends BaseBetService {
             return true;
         }
 
-        if($flag) return (boolean)$flag;
         Tool_Common::log('isLogin_REQ', 'INFO', '是否登陆', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'r'=>$r]);
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网
@@ -1429,9 +1446,11 @@ abstract class BetService extends BaseBetService {
             # 16、台湾快五
             $flag = ZhongFaService::isLogin($uid, $tz_system_id);
         }
-        $m->set($mkey, 1, 60);
+        $flag = (boolean)$flag;
+        $time = ($r==2 && $flag) ? 180 : 60;
+        $m->set($mkey, $flag, $time);
 
-        return (boolean)$flag;
+        return $flag;
     }
 
     /**
