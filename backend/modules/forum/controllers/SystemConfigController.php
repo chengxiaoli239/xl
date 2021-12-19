@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\SystemService;
 use Yii;
 use backend\models\SystemConfig;
 use backend\models\searchs\SystemConfig as SystemConfigSearch;
@@ -87,6 +88,7 @@ class SystemConfigController extends BaseController
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            SystemService::clearConfigCache($model->key); # 清理系统缓存
             return $this->redirect(['index']);
         }
 

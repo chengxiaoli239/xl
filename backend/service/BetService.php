@@ -1548,16 +1548,8 @@ abstract class BetService extends BaseBetService {
      * @return int
      */
     public static function getConfig($key = 'getDataType'){
-        $m = \Yii::$app->cache;
-        $mkey = 'CONFIG_TYPE_'.$key;
-        //if($val = $m->get($mkey)) return $val;
-
-        $val = SystemConfig::findOne(['key'=>$key])->value;
-        $m->set($mkey, $val, \Yii::$app->params['BASE_DATA_CACHE_TIME']);
-
-        return $val;
+        return SystemService::getConfig($key);
     }
-
 
     /**
      * @desc 获取投注缓存时间，一般为开奖时间频率

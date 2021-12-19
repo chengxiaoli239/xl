@@ -7,6 +7,7 @@
  */
 
 namespace backend\service;
+use backend\models\SystemConfig;
 use  yii;
 
 class SystemService{
@@ -43,6 +44,40 @@ class SystemService{
         }
 
         return $rst;
+    }
+
+    /**
+     * @desc 生成配置缓存key
+     * @param $key
+     */
+    public static function buildSystemConfigCacheKey($key = 'getDataType'){
+        return 'SYSTERM_CONFIG_TYPE_'.$key;
+    }
+
+    /**
+     * @desc 清理配置缓存
+     * @param $key
+     */
+    public static function clearConfigCache($key){
+        $m = \Yii::$app->cache;
+        $mkey = self::buildSystemConfigCacheKey($key);
+
+        $m->delete($mkey);
+    }
+
+    /**
+     * @desc 计算遗漏获取数据类型 1取本表数据做变更0扫表重新计算数据（比如：遗漏、数量等统计）
+     * @return int
+     */
+    public static function getConfig($key = 'getDataType'){
+        $m = \Yii::$app->cache;
+        $mkey = SystemService::buildSystemConfigCacheKey($key);
+        if($val = $m->get($mkey)) return $val;
+
+        $val = SystemConfig::findOne(['key'=>$key])->value;
+        $m->set($mkey, $val, \Yii::$app->params['BASE_DATA_CACHE_TIME']);
+
+        return $val;
     }
 
 }
