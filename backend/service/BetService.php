@@ -405,6 +405,7 @@ abstract class BetService extends BaseBetService {
                     $task_id = $betErrorPlansTask->id;
                     $tz_system_id = $betErrorPlansTask->tz_system_id;
                     $lottery_type = $betErrorPlansTask->lottery_type;
+                    $playway = $betErrorPlansTask->playway;
                     $account = $betErrorPlansTask->account;
                     $plan_id = $betErrorPlansTask->plan_id;
                     $bet_sort_key = $betErrorPlansTask->bet_sort_key;
@@ -423,7 +424,8 @@ abstract class BetService extends BaseBetService {
                         }
 
                         $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
-                        $m->set($betKey, 1, $time-60); # 减去两分钟缓存时间
+                        $time = ($playway == 3) ? $time : ($time-180);
+                        $m->set($betKey, 1, $time); # 减去三分钟缓存时间
 
                         $s_time = microtime(true);
                         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注脚本-4', ['task_id'=>$task_id]);
