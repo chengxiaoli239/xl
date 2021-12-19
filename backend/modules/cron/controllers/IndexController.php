@@ -215,11 +215,11 @@ class IndexController extends Controller
         $uid = $post['uid'];
         $for_times = 8;
         //$rnt = rand(3, 5);
-        $sleep_time = 5;
+        $sleep_time = 8;
         for($i=0; $i<$for_times; $i++){
+            sleep($sleep_time);
             $rst[$i]['rst'] = BetService::lotteryBet($uid);
             $rst[$i]['sleep_time'] = $sleep_time;
-            sleep($sleep_time);
         }
 
         return $rst;
