@@ -1381,7 +1381,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      */
     public function repeatErrorBet($id){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
-        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__,'INFO','幸运五星-计划任务下注入口-1', ['err_id'=>$id]);
+        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__,'INFO','幸运五星-计划任务下注入口-1', ['task_id'=>$id]);
         $row = BetErrorPlansTask::findOne($id);
         $url = $row->bet_url;
         //$headers = json_decode($row->bet_headers); # 含有cookie，如果是重新登陆 cookie要变动，待处理
@@ -1419,10 +1419,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $mkey = 'repeatErrorBet_retry_'.$id;
         $open_retry = $m->get($mkey); # 重试锁开启开关
-        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__,'INFO','幸运五星-计划任务下注入口-2', ['err_id'=>$id]);
+        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__,'INFO','幸运五星-计划任务下注入口-2', ['task_id'=>$id]);
 
         $time1 = microtime(true);
         $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 下注请求
+        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注结果', ['task_id'=>$id, 'tmpRst'=>$tmpRst, 'slow_seconds'=>$slow_seconds]);
         sleep((int)$slow_seconds); # 下注延迟秒数
         $time2 = microtime(true);
         $status = 0;
