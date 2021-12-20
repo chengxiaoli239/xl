@@ -436,15 +436,17 @@ abstract class BetService extends BaseBetService {
                         $current_ip_addr = ProxyBaseService::getCurrentValidProxyIp(); # 获取当前可用的代理IP
                         $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'betKey'=>$betKey, 'consume_time'=>($e_time-$s_time).'s', 'current_ip_addr'=>$current_ip_addr];
 
-                        # 记录方案号
-                        $where = ['plan_id'=>$plan_id, 'qihao'=>$activeQihao, 'lottery_type'=>$lottery_type];
-                        $BettingRecords = BettingRecords::find()->where($where)->one();
-                        $BettingRecords->snid = trim($BettingRecords->snid.';'.$t_rst['snid'], ';');
-                        $BettingRecords->sn = trim($BettingRecords->sn.';'.$t_rst['sn'], ';');
-                        $flag = $BettingRecords->save();
-                        if(!$flag){
-                            $logArr1 = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'err_msg'=>$BettingRecords->getErrors()];
-                            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '下注结果保存失败', $logArr1);
+                        if(!empty($t_rst['snid'])){
+                            # 记录方案号
+                            $where = ['plan_id'=>$plan_id, 'qihao'=>$activeQihao, 'lottery_type'=>$lottery_type];
+                            $BettingRecords = BettingRecords::find()->where($where)->one();
+                            $BettingRecords->snid = trim($BettingRecords->snid.';'.$t_rst['snid'], ';');
+                            $BettingRecords->sn = trim($BettingRecords->sn.';'.$t_rst['sn'], ';');
+                            $flag = $BettingRecords->save();
+                            if(!$flag){
+                                $logArr1 = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'err_msg'=>$BettingRecords->getErrors()];
+                                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '下注结果保存失败', $logArr1);
+                            }
                         }
 
                         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注成功-end', $logArr);
