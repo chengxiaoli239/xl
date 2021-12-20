@@ -1423,7 +1423,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $time1 = microtime(true);
         $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 下注请求
-        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注结果', ['task_id'=>$id, 'tmpRst'=>$tmpRst, 'slow_seconds'=>$slow_seconds]);
+        $time11 = microtime(true);
+        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注结果', ['task_id'=>$id, 'tmpRst'=>$tmpRst, 'time_consume'=>($time11-$time1).'s', 'slow_seconds'=>$slow_seconds]);
         sleep((int)$slow_seconds); # 下注延迟秒数
         $time2 = microtime(true);
         $status = 0;
