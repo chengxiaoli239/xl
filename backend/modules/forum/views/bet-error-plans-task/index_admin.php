@@ -130,7 +130,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => function($model) {
                                 $txt = $model->status == 2 ? '<font color="green">推送成功</font>' : ($model->status == 3 ? '<font color="red">推送失败</a>' : ($model->status==4?'<font color="red">推送超时</a>':'<font color="#696969">等待推送</a>'));
                                 //$url = "/forum/user-custom-plans/update-status?id=".$model->id;
-                                return Html::a('<strong>'.$txt.'</strong>', 'javascript:;', ['title' => '更新状态'.$model->status]);
+                                return Html::a('<strong>'.$txt.'</strong>['.$model->id.']', 'javascript:;', ['title' => '更新状态'.$model->status]);
                             }
                         ],
                         //'sn',
