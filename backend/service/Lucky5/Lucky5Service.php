@@ -1457,8 +1457,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
             }
         }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 305, 307])){
             $status = 3; # 不可再次下注：302余额不足305已关盘307网盘账号停押
+        }elseif($tmpRst['data'] == "Proxy Connect Error"){
+            $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key, $id);
+            $m->delete($betKey); # 失败之后可重新下注的情况解锁
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '代理错误锁打开', ['task_id'=>$id, 'tmpRst'=>$tmpRst, 'key'=>$betKey]);
         }else{
-            $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key);
+            $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key, $id);
             $m->delete($betKey); # 失败之后可重新下注的情况解锁
         }
         if($tmpRst['errno']>0 OR in_array($tmpRst['code'], [309,311])){ # 309,310,311   310有排查是已经换过代理IP,有待排查，为确保

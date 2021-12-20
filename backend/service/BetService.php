@@ -441,7 +441,11 @@ abstract class BetService extends BaseBetService {
                         $BettingRecords = BettingRecords::find()->where($where)->one();
                         $BettingRecords->snid = trim($BettingRecords->snid.';'.$t_rst['snid'], ';');
                         $BettingRecords->sn = trim($BettingRecords->sn.';'.$t_rst['sn'], ';');
-                        $BettingRecords->save();
+                        $flag = $BettingRecords->save();
+                        if(!$flag){
+                            $logArr1 = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'err_msg'=>$BettingRecords->getErrors()];
+                            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '下注结果保存失败', $logArr1);
+                        }
 
                         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注成功-end', $logArr);
                     }elseif(!empty($activeQihao) && $qihao<$activeQihao){
