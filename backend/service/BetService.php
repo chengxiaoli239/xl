@@ -424,7 +424,7 @@ abstract class BetService extends BaseBetService {
                         }
 
                         $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
-                        $time = ($playway == 3) ? $time : ($time-180);
+                        $time = ($playway == 3) ? $time : ($time-240);
                         $m->set($betKey, 1, $time); # 减去三分钟缓存时间
 
                         $s_time = microtime(true);
