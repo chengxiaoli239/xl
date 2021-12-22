@@ -242,6 +242,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $url = 'https://www.ixigua.com/api/searchv2/user/%E5%BD%B1%E8%A7%86%E8%A7%A3%E8%AF%B4/10?search_id=202112211121000102121660980145893C&debug_model=false&_signature=_02B4Z6wo00f01BXRRLQAAIDAldO-94j5e-AV9UAAAGS76a';
+        p(urldecode($url));
         $t = rand(1, 10);p($t);
         $rst = ProxyBaseService::preGetValidIp($is_auto=0);p($rst);
         $isValidRst = ProxyKuaiService::kuaiIPValidTime(['219.128.35.247:19054']);p($isValidRst);

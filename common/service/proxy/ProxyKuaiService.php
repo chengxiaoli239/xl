@@ -42,7 +42,7 @@ class ProxyKuaiService {
         $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdps/?'.http_build_query($query);
         $rst = CurlService::getCurl($url);
         if(empty($rst['data'])){
-            $query['area'] = '福建';
+            $query['area'] = '福建,广西,湖南,湖北';
             $rst = CurlService::getCurl($url);
         }
 
