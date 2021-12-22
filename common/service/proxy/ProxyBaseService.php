@@ -110,9 +110,11 @@ class ProxyBaseService {
     /**
      * @desc 获取可用ip
      * @param string $proxy_type
+     * @param integer $type 1正常获取2检测
+     * @param integer $is_warnning 是否告警：0否1是  1的时候为即将过时临界点告警
      * @return mixed|string
      */
-    public static function getCurrentValidProxyIp($proxy_type=''){
+    public static function getCurrentValidProxyIp($proxy_type='', $type=1, &$is_warnning=0){
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return []; # CURL 代理开关
 
@@ -130,12 +132,13 @@ class ProxyBaseService {
                 return '';
             }
             $ip_addr = $row->ip_addr;
-            $m->set($mkey, $ip_addr,15);
+            $m->set($mkey, $ip_addr,10);
             $left_time = $row->valid_time - time();
-            if($left_time<90){
-                $row->status = 0;
-                $row->save();
-                $ip_addr = '';
+            if($type == 2 && $left_time<90){
+                //$row->status = 0;
+                //$row->save();
+                //$ip_addr = '';
+                $is_warnning = 1;
             }
             Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP', ['ip_addr'=>$ip_addr, 'flag'=>$flag, 'expire_time'=>date('Y-m-d H:i:s', $row->expire_time)]);
         }
@@ -162,8 +165,8 @@ class ProxyBaseService {
             $is_need_get_new_ip = 0;
 
             //$proxy_type = ProxyBaseService::getProxyType();
-            $current_ip_addr = ProxyBaseService::getCurrentValidProxyIp($proxy_type); # 获取当前可用的代理IP
-            if(!empty($current_ip_addr)){
+            $current_ip_addr = ProxyBaseService::getCurrentValidProxyIp($proxy_type, $type=2, $is_warnning); # 获取当前可用的代理IP
+            if($is_warnning == 0 && !empty($current_ip_addr)){
                 $isValid = ProxyBaseService::isValid($current_ip_addr);
                 if(!$isValid){
                     $is_need_get_new_ip = 1;
@@ -176,6 +179,12 @@ class ProxyBaseService {
             $logArr = ['is_need_get_new_ip'=>$is_need_get_new_ip, 'proxy_type'=>$proxy_type, 'is_valid'=>$isValid, 'current_ip_addr'=>$current_ip_addr];
             if($is_need_get_new_ip){
                 $new_ip_addr_data = ProxyBaseService::getRemoteProxyIp($proxy_type);
+
+                # 代理IP告警节点，获取新ip成功则设置旧代理ip失效
+                if($is_warnning == 1 && $new_ip_addr_data['status'] == 200 && !empty($new_ip_addr_data['ip_addr']) && !empty($current_ip_addr)){
+                    ProxyBaseService::setIpInvalid($current_ip_addr);
+                }
+
                 $logArr['new_ip_addr_data'] = $new_ip_addr_data;
             }
 
