@@ -15,6 +15,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\User;
 use backend\service\baota\BaoTaService;
 use backend\service\BaseService;
+use backend\service\datas\DatasClearService;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\Juhua\JuHuaBaseService;
 use backend\service\KuaiLe8Service;
@@ -419,5 +420,16 @@ class IndexController extends Controller
         return $rst;
     }
 
+    /**
+     * @desc 保留最近x天的记录，默认两天
+     * @return array
+     */
+    public function actionDelLatestRecords(){
+        self::_init();
+        $post = \Yii::$app->request->post();
+        $rst = DatasClearService::clearBettingRecords($post);
+
+        return $rst;
+    }
 
 }

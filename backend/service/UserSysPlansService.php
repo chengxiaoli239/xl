@@ -732,7 +732,7 @@ class UserSysPlansService extends BaseService {
      * @param $uid
      * @return array|mixed
      */
-    public static function getMyLotteryTypes($uid){
+    public static function getMyLotteryTypes($uid=0){
 
         $m = \Yii::$app->cache;
         $mkey = 'getMyLotteryTypes_data_'.$uid;

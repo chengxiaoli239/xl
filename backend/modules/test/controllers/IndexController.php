@@ -13,10 +13,12 @@ use backend\models\SscKjData;
 use backend\models\SscSdHzVal;
 use backend\models\SscStaticVal;
 use backend\models\TzSystemsUsers;
+use backend\modules\cron\controllers\WeixinController;
 use backend\modules\kj\controllers\BingDaoController;
 use backend\service\baota\BaoTaService;
 use backend\service\BetService;
 use backend\service\ChatCommonBetService;
+use backend\service\datas\DatasClearService;
 use backend\service\huiyuan\HuiYuanService5;
 use backend\service\JinYing\JinYingService;
 use backend\service\Juhua\JuHuaBaseService;
@@ -241,7 +243,32 @@ class IndexController extends Controller
         $callback = WxService::get_uri($uuid);p($callback);
     }
 
+    public static function tst($fff='p'){
+        function eee(){
+            p(22222, 0);
+        }
+        $fff('xxxxx',0);
+
+        return eee();
+    }
+
+    public static function fff($str=''){
+        p($str.'bbb');
+    }
+
     public function actionDw(){
+        $rst = DatasClearService::clearBettingRecords($post);
+        for ($i=0; $i<2; $i++){
+            $dates[] = date('Ymd', time()-$i*86400);
+        }
+        p($dates);
+
+        $old = array('jpg','png','gif','bmp');
+        $new = array('JPG','txt','docx','bmp');
+        $difference = array_diff($new, $old);
+        p($difference);
+
+        return self::tst('p');
         $url = 'https://www.ixigua.com/api/searchv2/user/%E5%BD%B1%E8%A7%86%E8%A7%A3%E8%AF%B4/10?search_id=202112211121000102121660980145893C&debug_model=false&_signature=_02B4Z6wo00f01BXRRLQAAIDAldO-94j5e-AV9UAAAGS76a';
         p(urldecode($url));
         $t = rand(1, 10);p($t);
