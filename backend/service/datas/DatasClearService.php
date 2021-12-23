@@ -15,12 +15,13 @@ class DatasClearService extends BaseService{
             $lottery_type = $lottery['lottery_type'];
             try {
                 $date_nums = DatasClearService::getClearBeforeXDate($lottery_type);
+                $dates = [];
                 for ($i=0; $i<$date_nums; $i++){
                     $dates[] = date('Y-m-d', time()-$i*86400);
                 }
-                $count_sql = 'SELECT COUNT(id) FROM lt_betting_records WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
+                $count_sql = 'SELECT COUNT(id) FROM lt_betting_records WHERE create_time REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
                 $rst_count = $db->createCommand($count_sql)->queryScalar();
-                $delete_sql = 'DELETE FROM lt_betting_records WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
+                $delete_sql = 'DELETE FROM lt_betting_records WHERE create_time REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
                 //$rst_delete = $db->createCommand($delete_sql)->execute();
 
                 $logArr = ['lottery_type'=>$lottery_type, 'count_sql'=>$count_sql, 'rst_count'=>$rst_count, 'delete_sql'=>$delete_sql, 'rst_delete'=>$rst_delete];
@@ -43,7 +44,7 @@ class DatasClearService extends BaseService{
     public static function getClearBeforeXDate($lottery_type = DEFAULT_LOTTERY_TYPE){
         $date_nums = 2;
         if(in_array($lottery_type, [1, 17])){
-            $date_nums = 30;
+            //$date_nums = 30;
         }
 
         return $date_nums;
