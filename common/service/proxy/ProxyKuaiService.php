@@ -46,6 +46,11 @@ class ProxyKuaiService {
             $rst = CurlService::getCurl($url);
         }
 
+        if(empty($rst['data'])){
+            unset($query['area']);
+            $rst = CurlService::getCurl($url);
+        }
+
         Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP获取-快代理', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
 
         return ['status'=>200, 'data'=>$rst['data']['proxy_list'], 'msg'=>'代理IP数据获取成功'];
