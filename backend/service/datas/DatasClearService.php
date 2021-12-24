@@ -19,7 +19,7 @@ class DatasClearService extends BaseService{
                 for ($i=0; $i<$date_nums; $i++){
                     $dates[] = date('Y-m-d', time()-$i*86400);
                 }
-                $count_sql = 'SELECT COUNT(id) FROM lt_betting_records WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
+                $count_sql = 'SELECT COUNT(id) FROM {{%betting_records}} WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
                 $rst_count = $db->createCommand($count_sql)->queryScalar();
                 $delete_sql = 'DELETE FROM lt_betting_records WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
                 //$rst_delete = $db->createCommand($delete_sql)->execute();
