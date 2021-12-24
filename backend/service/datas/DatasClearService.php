@@ -21,8 +21,8 @@ class DatasClearService extends BaseService{
                 }
                 $count_sql = 'SELECT COUNT(id) FROM {{%betting_records}} WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
                 $rst_count = $db->createCommand($count_sql)->queryScalar();
-                $delete_sql = 'DELETE FROM lt_betting_records WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
-                //$rst_delete = $db->createCommand($delete_sql)->execute();
+                $delete_sql = 'DELETE FROM {{%betting_records}} WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
+                $rst_delete = $db->createCommand($delete_sql)->execute();
 
                 $logArr = ['lottery_type'=>$lottery_type, 'count_sql'=>$count_sql, 'rst_count'=>$rst_count, 'delete_sql'=>$delete_sql, 'rst_delete'=>$rst_delete];
                 Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '清理数据', $logArr);
