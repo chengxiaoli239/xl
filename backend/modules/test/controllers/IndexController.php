@@ -257,16 +257,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst = DatasClearService::clearBettingRecords($post);
-        for ($i=0; $i<2; $i++){
-            $dates[] = date('Ymd', time()-$i*86400);
-        }
-        p($dates);
-
-        $old = array('jpg','png','gif','bmp');
-        $new = array('JPG','txt','docx','bmp');
-        $difference = array_diff($new, $old);
-        p($difference);
+        $filter_codes = NumService::getCodesByCodesHz(['type'=>1, 'filter_type'=>2, 'filter_nums'=>5, 'playway'=>2, 'current_qihao'=>'20211224163', 'filter_poses'=>[1,2,3]], $lottery_type=DEFAULT_LOTTERY_TYPE);
+        p($filter_codes);
 
         return self::tst('p');
         $url = 'https://www.ixigua.com/api/searchv2/user/%E5%BD%B1%E8%A7%86%E8%A7%A3%E8%AF%B4/10?search_id=202112211121000102121660980145893C&debug_model=false&_signature=_02B4Z6wo00f01BXRRLQAAIDAldO-94j5e-AV9UAAAGS76a';

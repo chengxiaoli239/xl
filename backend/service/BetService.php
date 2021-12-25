@@ -699,9 +699,9 @@ abstract class BetService extends BaseBetService {
                     $codes_hz_arr = json_decode($codes_hz, true);
                     $codes_desc = $codes_hz_arr['status_val'] == 1 ? $codes_hz_arr['code1'] : $codes_hz_arr['code2'];
                     unset($codes_hz_arr['code1'], $codes_hz_arr['code2'], $codes_hz_arr['singles_key'], $codes_hz_arr['status_val']);
-                    $codes_hz = NumService::getCodesHzByDesc($codes_desc);
-                    $codes_hz = array_merge($codes_hz_arr, $codes_hz);
-                    $codesArr = NumService::getCodesKuaiXuan($codes_hz, $code_type = 2);
+                    $codes_hz_desc = NumService::getCodesHzByDesc($codes_desc);
+                    $codes_hz_desc = array_merge($codes_hz_arr, $codes_hz_desc);
+                    $codesArr = NumService::getCodesKuaiXuan($codes_hz_desc, $code_type = 2);
                 }
                 break;
             case 2: # 三字定
@@ -791,6 +791,12 @@ abstract class BetService extends BaseBetService {
         //p(['buy_type'=>$buy_type, 'before_count'=>$before_count, 'after_count'=>count($codesArr), 'codesArr'=>$codesArr]);
 
         $codes = implode('@', $codesArr);
+        $codes_hz_data = json_decode($codes_hz, true);
+        if(isset($codes_hz_data['filters']['filter_type']) && $codes_hz_data['filters']['filter_type'] == 1){
+            # 过滤号码，filter_type:1过滤前x期号码
+            $filter_codes = NumService::getCodesByCodesHz($codes_hz_data['filters']);
+            $codes = array_diff($codes, $filter_codes); # 返回$codes在$filter_codes中没有的号码
+        }
         //$m->set($mkey, $codes, 5*60);
 
         return $codes;

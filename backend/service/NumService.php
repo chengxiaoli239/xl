@@ -20,6 +20,7 @@ use yii\helpers\ArrayHelper;
 use  yii;
 
 class NumService extends BaseService {
+    public static $ALL_POSES = [1, 2, 3, 4];
 
     /**
      * @description 根据开奖号码返回三字现
@@ -1388,6 +1389,7 @@ class NumService extends BaseService {
                         }
                     }
                 }
+                //Tool_Common::log('/codes/'.__FUNCTION__.'_filter_xQ_before', 'INFO', '过滤前x期', ['code_hz'=>$codes_hz, 'where'=>$where]);
                 //$query->andWhere(['IN', 'code', $codes]);
             }
         }
@@ -2658,5 +2660,80 @@ class NumService extends BaseService {
         }
 
         return $profits;
+    }
+
+    /**
+     * @desc 获取过滤的号码
+     * @param int $filter_type
+     * @param array $filters
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function getCodesByCodesHz($filters=[], $lottery_type=DEFAULT_LOTTERY_TYPE){
+        $code_types = [
+            1 => 2,
+            2 => 3,
+            3 => 4,
+        ];
+        $filter_type = $filters['filter_type']; # 三四定类型中，过滤类型:默认类型1
+        $type = $filters['type']; # 过滤类型:默认类型1:过滤前x期
+        $filter_poses = $filters['filter_poses']; # 过滤位置
+        $playway = $filters['playway'] ? : 3; # 默认四定
+        $code_type = $code_types[$filters['playway']] ? : 4; # 默认四定
+
+        $filter = NumService::getFilterTypeDatas($playway)[$filter_type];
+        $current_qihao = $filters['current_qihao'] ? : HN0898Service::getCurrentQihao($lottery_type); # 针对那一期过滤，默认为：当前期号
+        //p(['current_qihao'=>$current_qihao, 'SscKjData'=>$SscKjData]);
+        $query = Num4Type::find()->select(['code']);
+        if($type == 1){ # 过滤前x期号码
+            $limit = $filters['filter_nums'] ? : ($filter['nums'] ? $filter['nums'] : 1);
+            $filter_codes_where = ['AND', ['<=', 'qihao', $current_qihao], 'lottery_type'=>$lottery_type];
+            $SscKjDatas = SscKjData::find()->where($filter_codes_where)->orderBy(['id'=>SORT_DESC])->limit($limit)->all();
+            $where = ['AND', ['=', 'code_type', $code_type] ];
+            $filter_tmp_where = ['AND'];
+            foreach ($filter_poses as $pos){
+                $code_pos = 'code'.$pos;
+                foreach ($SscKjDatas as $SscKjData){
+                    $filter_tmp_where[] = ['!=', 'code_'.$pos, $SscKjData->$code_pos];
+                }
+            }
+            $diff_poses = array_diff(NumService::$ALL_POSES, $filter_poses);
+            foreach ($diff_poses as $pos){
+                $where[] = ['OR', ['=', 'code_'.$pos, 'X'], ['=', 'code_'.$pos, '']];
+            }
+
+            //p(array_merge($where, [$filter_tmp_where]));
+            $query->where(array_merge($where, [$filter_tmp_where]));
+        }
+        $Num4Type = $query->asArray()->all();
+        $filter_codes = ArrayHelper::getColumn($Num4Type, 'code');
+
+        return $filter_codes;
+    }
+
+    /**
+     * @desc 过滤条件类型
+     * @param int $playway
+     * @return array[]|\array[][]
+     */
+    public static function getFilterTypeDatas($playway=3){
+        $filter_type_datas = [
+            1 => [ # 二定
+                1 => [ 'type'=>1,  'desc'=>'过滤上一期同位置同号码', 'nums'=>1],
+                2 => [ 'type'=>2,  'desc'=>'过滤上两期同位置同号码', 'nums'=>2],
+            ],
+            2 => [ # 三定
+                1 => [ 'type'=>1,  'desc'=>'过滤上一期同位置同号码', 'nums'=>1],
+                2 => [ 'type'=>2,  'desc'=>'过滤上两期同位置同号码', 'nums'=>2],
+            ],
+            3 => [ # 四定
+                1 => [ 'type'=>1,  'desc'=>'过滤上一期同位置同号码', 'nums'=>1],
+                2 => [ 'type'=>2,  'desc'=>'过滤上两期同位置同号码', 'nums'=>2],
+            ],
+        ];
+
+        if(isset($filter_type_datas[$playway])) return $filter_type_datas[$playway];
+
+        return $filter_type_datas;
     }
 }
