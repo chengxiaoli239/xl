@@ -2690,11 +2690,11 @@ class NumService extends BaseService {
             $filter_codes_where = ['AND', ['<=', 'qihao', $current_qihao], 'lottery_type'=>$lottery_type];
             $SscKjDatas = SscKjData::find()->where($filter_codes_where)->orderBy(['id'=>SORT_DESC])->limit($limit)->all();
             $where = ['AND', ['=', 'code_type', $code_type] ];
-            $filter_tmp_where = ['AND'];
+            $filter_tmp_where = ['OR'];
             foreach ($filter_poses as $pos){
                 $code_pos = 'code'.$pos;
                 foreach ($SscKjDatas as $SscKjData){
-                    $filter_tmp_where[] = ['!=', 'code_'.$pos, $SscKjData->$code_pos];
+                    $filter_tmp_where[] = ['=', 'code_'.$pos, $SscKjData->$code_pos];
                 }
             }
             $diff_poses = array_diff(NumService::$ALL_POSES, $filter_poses);
