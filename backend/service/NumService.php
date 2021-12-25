@@ -2666,7 +2666,6 @@ class NumService extends BaseService {
      * @desc 获取过滤的号码
      * @param int $filter_type
      * @param array $filters
-     * @param int $lottery_type
      * @return array
      */
     public static function getCodesByCodesHz($filters=[], $lottery_type=DEFAULT_LOTTERY_TYPE){
@@ -2675,6 +2674,7 @@ class NumService extends BaseService {
             2 => 3,
             3 => 4,
         ];
+        $lottery_type = $filters['lottery_type'] ? : $lottery_type; # 彩种
         $filter_type = $filters['filter_type']; # 三四定类型中，过滤类型:默认类型1
         $type = $filters['type']; # 过滤类型:默认类型1:过滤前x期
         $filter_poses = $filters['filter_poses']; # 过滤位置

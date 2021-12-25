@@ -257,7 +257,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $filter_codes = NumService::getCodesByCodesHz(['type'=>1, 'filter_type'=>2, 'filter_nums'=>5, 'playway'=>2, 'current_qihao'=>'20211224163', 'filter_poses'=>[1,2,3]], $lottery_type=DEFAULT_LOTTERY_TYPE);
+        $arr = ['type'=>1, 'filter_type'=>1, 'filter_nums'=>1, 'playway'=>1, 'current_qihao'=>'20211224163', 'filter_poses'=>[1,2], 'lottery_type'=>DEFAULT_LOTTERY_TYPE];
+        p(json_encode($arr));
+        $filter_codes = NumService::getCodesByCodesHz($arr);
         p($filter_codes);
 
         return self::tst('p');
