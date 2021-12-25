@@ -790,13 +790,13 @@ abstract class BetService extends BaseBetService {
         }
         //p(['buy_type'=>$buy_type, 'before_count'=>$before_count, 'after_count'=>count($codesArr), 'codesArr'=>$codesArr]);
 
-        $codes = implode('@', $codesArr);
         $codes_hz_data = json_decode($codes_hz, true);
         if(isset($codes_hz_data['filters']['filter_type']) && $codes_hz_data['filters']['filter_type'] == 1){
             # 过滤号码，filter_type:1过滤前x期号码
             $filter_codes = NumService::getCodesByCodesHz($codes_hz_data['filters']);
-            $codes = array_diff($codes, $filter_codes); # 返回$codes在$filter_codes中没有的号码
+            $codesArr = array_diff($codesArr, $filter_codes); # 返回$codes在$filter_codes中没有的号码
         }
+        $codes = implode('@', $codesArr);
         //$m->set($mkey, $codes, 5*60);
 
         return $codes;
