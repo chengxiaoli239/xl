@@ -794,6 +794,7 @@ abstract class BetService extends BaseBetService {
         if(isset($codes_hz_data['filters']['filter_type']) && $codes_hz_data['filters']['filter_type'] == 1){
             # 过滤号码，filter_type:1过滤前x期号码
             $filter_codes = NumService::getCodesByCodesHz($codes_hz_data['filters']);
+            Tool_Common::log('/codes/'.__FUNCTION__, 'INFO', '号码', ['codesArr'=>$codesArr, 'filter_codes'=>$filter_codes]);
             $codesArr = array_diff($codesArr, $filter_codes); # 返回$codes在$filter_codes中没有的号码
         }
         $codes = implode('@', $codesArr);
