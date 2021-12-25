@@ -99,6 +99,20 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         //'sn',
                         //'snid',
                         //'account',
+                        ['attribute' => 'plan_id','label'=>'planid','headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $plan = \backend\models\UserSysPlans::findOne($model->plan_id);
+                                $alt_str = \backend\service\NumService::getDescByKuaixuan(json_decode($plan->hz_Arr, true));
+                                if($plan->singles && in_array($plan->plan_type,[2, 3, 4, 5, 9, 10])){
+                                    $alt_str .= '翻倍梯度:'.$plan->singles;
+                                }
+                                $options = [
+                                    'title' => \backend\service\TzService::getTzPlanTypes($plan->plan_type) . '，'.$alt_str,
+                                ];
+                                return Html::a($model->plan_id, '/forum/betting-records/index?BettingRecords[plan_id]='.$model->plan_id, $options);
+                            }
+                        ],
                         ['attribute'=>'snid', 'label'=>'操作',
                             'format'=>'raw',
                             'value'=>function($model){
