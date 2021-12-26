@@ -257,10 +257,11 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst['batch_simulate_data'] = BetService::batchSimulateBet($lottery_types = [8], $uid=2);p($rst);
         $arr = ['filter_type'=>1, 'filter_nums'=>1, 'playway'=>1, 'start_qihao'=>'20211224163', 'filter_poses'=>[1,2], 'lottery_type'=>DEFAULT_LOTTERY_TYPE]; # 过滤条件
-        $filter_codes = NumService::getCodesByCodesHz($arr); # 过滤的号码
+        $fitlers = json_decode('{"type":1,"filter_type":1,"filter_nums":1,"playway":1,"filter_poses":[2,4],"lottery_type":8}', true);
+        $filter_codes = NumService::getCodesByCodesHz($fitlers, $plan_id=508, 8); # 过滤的号码
         p($filter_codes);
+        //$rst['batch_simulate_data'] = BetService::batchSimulateBet($lottery_types = [8], $uid=2);p($rst);
 
         return self::tst('p');
         $url = 'https://www.ixigua.com/api/searchv2/user/%E5%BD%B1%E8%A7%86%E8%A7%A3%E8%AF%B4/10?search_id=202112211121000102121660980145893C&debug_model=false&_signature=_02B4Z6wo00f01BXRRLQAAIDAldO-94j5e-AV9UAAAGS76a';

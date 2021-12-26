@@ -2730,7 +2730,7 @@ class NumService extends BaseService {
         }
 
         if(empty($current_qihao)){
-            HN0898Service::getCurrentQihao($lottery_type); # 针对哪一期过滤，默认为：当前期号
+            $current_qihao = HN0898Service::getCurrentQihao($lottery_type); # 针对哪一期过滤，默认为：当前期号
         }
 
         return $current_qihao;
