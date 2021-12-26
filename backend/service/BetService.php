@@ -1844,6 +1844,13 @@ abstract class BetService extends BaseBetService {
 
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
+        $m = \Yii::$app->cache;
+        $mkey = 'batchSimulateBet_'.$uid;
+        $flag = $m->get($mkey);
+        if($flag){
+            return ['status'=>300, 'msg'=>'有正在执行的任务,请稍后...'];
+        }
+        $m->set($mkey, 1, 30);
 
         foreach ($lottery_types as $lottery_type) {
             $where = ['AND', ['=', 'status', 1], ['=', 'is_batch_simulate', 1], ['=', 'lottery_type', $lottery_type]]; # is_batch_simulate:0正常1批量模拟历史记录
@@ -1887,6 +1894,7 @@ abstract class BetService extends BaseBetService {
                 }
             }
         }
+        $m->delete($mkey);
 
         return $rst;
     }
