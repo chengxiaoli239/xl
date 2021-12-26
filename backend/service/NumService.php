@@ -8,6 +8,7 @@
  */
 
 namespace backend\service;
+use backend\models\BettingRecords;
 use backend\models\CodeTypes;
 use backend\models\Num4Type;
 use backend\models\SscKjData;
@@ -2668,7 +2669,7 @@ class NumService extends BaseService {
      * @param array $filters
      * @return array
      */
-    public static function getCodesByCodesHz($filters=[], $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function getCodesByCodesHz($filters=[], $plan_id='', $lottery_type=DEFAULT_LOTTERY_TYPE){
         $code_types = [
             1 => 2,
             2 => 3,
@@ -2676,18 +2677,18 @@ class NumService extends BaseService {
         ];
         $lottery_type = $filters['lottery_type'] ? : $lottery_type; # 彩种
         $filter_type = $filters['filter_type']; # 三四定类型中，过滤类型:默认类型1
-        $type = $filters['type']; # 过滤类型:默认类型1:过滤前x期
         $filter_poses = $filters['filter_poses']; # 过滤位置
         $playway = $filters['playway'] ? : 3; # 默认四定
         $code_type = $code_types[$filters['playway']] ? : 4; # 默认四定
 
         $filter = NumService::getFilterTypeDatas($playway)[$filter_type];
-        $current_qihao = $filters['current_qihao'] ? : HN0898Service::getCurrentQihao($lottery_type); # 针对那一期过滤，默认为：当前期号
+        //$start_qihao = $filters['current_qihao'] ? : HN0898Service::getCurrentQihao($lottery_type); # 针对那一期过滤，默认为：当前期号
+        $start_qihao = NumService::getPlanBetCurrentQihao($filters['start_qihao'], $lottery_type, $plan_id);
         //p(['current_qihao'=>$current_qihao, 'SscKjData'=>$SscKjData]);
         $query = Num4Type::find()->select(['code']);
-        if($type == 1){ # 过滤前x期号码
+        if($filter['type'] == 1){ # 过滤前x期号码
             $limit = $filters['filter_nums'] ? : ($filter['nums'] ? $filter['nums'] : 1);
-            $filter_codes_where = ['AND', ['<=', 'qihao', $current_qihao], 'lottery_type'=>$lottery_type];
+            $filter_codes_where = ['AND', ['<=', 'qihao', $start_qihao], 'lottery_type'=>$lottery_type];
             $SscKjDatas = SscKjData::find()->where($filter_codes_where)->orderBy(['id'=>SORT_DESC])->limit($limit)->all();
             $where = ['AND', ['=', 'code_type', $code_type] ];
             $filter_tmp_where = ['OR'];
@@ -2712,6 +2713,30 @@ class NumService extends BaseService {
     }
 
     /**
+     * @desc 获取当前计划下注的期号，正常下注则获取当前时间对应的期号，模拟下注则根据下注记录最新期号获取期号
+     * @param string $filter_start_qihao
+     * @param int $lottery_type
+     * @return float|int|mixed|string
+     */
+    public static function getPlanBetCurrentQihao($filter_start_qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE, $plan_id='') {
+        $current_qihao = $filter_start_qihao;
+        if(!empty($plan_id)){
+            $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one();
+            $where = ['AND', 'lottery_type'=>$lottery_type, ['>', 'qihao', $BettingRecords->qihao]];
+            $SscKjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->one();
+            if(!empty($SscKjData->qihao)){
+                $current_qihao = $SscKjData->qihao;
+            }
+        }
+
+        if(empty($current_qihao)){
+            HN0898Service::getCurrentQihao($lottery_type); # 针对哪一期过滤，默认为：当前期号
+        }
+
+        return $current_qihao;
+    }
+
+    /**
      * @desc 过滤条件类型
      * @param int $playway
      * @return array[]|\array[][]
@@ -2719,16 +2744,13 @@ class NumService extends BaseService {
     public static function getFilterTypeDatas($playway=3){
         $filter_type_datas = [
             1 => [ # 二定
-                1 => [ 'type'=>1,  'desc'=>'过滤上一期同位置同号码', 'nums'=>1],
-                2 => [ 'type'=>2,  'desc'=>'过滤上两期同位置同号码', 'nums'=>2],
+                1 => [ 'type'=>1,  'desc'=>'过滤上前x期同位置同号码'],
             ],
             2 => [ # 三定
-                1 => [ 'type'=>1,  'desc'=>'过滤上一期同位置同号码', 'nums'=>1],
-                2 => [ 'type'=>2,  'desc'=>'过滤上两期同位置同号码', 'nums'=>2],
+                1 => [ 'type'=>1,  'desc'=>'过滤上前x期同位置同号码'],
             ],
             3 => [ # 四定
-                1 => [ 'type'=>1,  'desc'=>'过滤上一期同位置同号码', 'nums'=>1],
-                2 => [ 'type'=>2,  'desc'=>'过滤上两期同位置同号码', 'nums'=>2],
+                1 => [ 'type'=>1,  'desc'=>'过滤上前x期同位置同号码'],
             ],
         ];
 

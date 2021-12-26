@@ -266,6 +266,7 @@ class IndexController extends Controller
 
         for ($i=0; $i<5; $i++){
             $rst['data'] = BetService::insertPlansTask($post['lottery_types']);
+            //$rst['batch_simulate_data'] = BetService::batchSimulateBet($post['lottery_types']);
             sleep(10);
         }
 
