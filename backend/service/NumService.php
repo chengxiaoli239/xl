@@ -2684,11 +2684,11 @@ class NumService extends BaseService {
         $filter = NumService::getFilterTypeDatas($playway)[$filter_type];
         //$start_qihao = $filters['current_qihao'] ? : HN0898Service::getCurrentQihao($lottery_type); # 针对那一期过滤，默认为：当前期号
         $start_qihao = NumService::getPlanBetCurrentQihao($filters['start_qihao'], $lottery_type, $plan_id);
-        //p(['current_qihao'=>$current_qihao, 'SscKjData'=>$SscKjData]);
+        //p(['start_qihao'=>$start_qihao]);
         $query = Num4Type::find()->select(['code']);
         if($filter['type'] == 1){ # 过滤前x期号码
             $limit = $filters['filter_nums'] ? : ($filter['nums'] ? $filter['nums'] : 1);
-            $filter_codes_where = ['AND', ['<=', 'qihao', $start_qihao], 'lottery_type'=>$lottery_type];
+            $filter_codes_where = ['AND', ['<', 'qihao', $start_qihao], ['=', 'lottery_type', $lottery_type]];
             $SscKjDatas = SscKjData::find()->where($filter_codes_where)->orderBy(['id'=>SORT_DESC])->limit($limit)->all();
             $where = ['AND', ['=', 'code_type', $code_type] ];
             $filter_tmp_where = ['OR'];
@@ -2722,7 +2722,7 @@ class NumService extends BaseService {
         $current_qihao = $filter_start_qihao;
         if(!empty($plan_id)){
             $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one();
-            $where = ['AND', 'lottery_type'=>$lottery_type, ['>', 'qihao', $BettingRecords->qihao]];
+            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'qihao', $BettingRecords->qihao]];
             $SscKjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->one();
             if(!empty($SscKjData->qihao)){
                 $current_qihao = $SscKjData->qihao;

@@ -257,7 +257,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $rst['batch_simulate_data'] = BetService::batchSimulateBet($lottery_types = [8]);p($rst);
+        $rst['batch_simulate_data'] = BetService::batchSimulateBet($lottery_types = [8], $uid=2);p($rst);
         $arr = ['filter_type'=>1, 'filter_nums'=>1, 'playway'=>1, 'start_qihao'=>'20211224163', 'filter_poses'=>[1,2], 'lottery_type'=>DEFAULT_LOTTERY_TYPE]; # 过滤条件
         $filter_codes = NumService::getCodesByCodesHz($arr); # 过滤的号码
         p($filter_codes);

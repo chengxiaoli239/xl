@@ -795,6 +795,7 @@ abstract class BetService extends BaseBetService {
             # 过滤号码，filter_type:1过滤前x期号码
             $filter_codes = NumService::getCodesByCodesHz($codes_hz_data['filters'], $plan_id);
             Tool_Common::log('/codes/'.__FUNCTION__, 'INFO', '过滤号码', ['plan_id'=>$plan_id, 'tz_type'=>$tz_type, 'filters'=>$codes_hz_data['filters'], 'codesArr'=>$codesArr, 'get_counts'=>count($codesArr), 'filter_codes'=>$filter_codes, 'filter_counts'=>count($filter_codes)]);
+            //p(['codesArr'=>$codesArr, 'filter_codes'=>$filter_codes]);
             $codesArr = array_diff($codesArr, $filter_codes); # 返回$codes在$filter_codes中没有的号码
         }
         $codes = implode('@', $codesArr);
@@ -1839,28 +1840,37 @@ abstract class BetService extends BaseBetService {
      * @param array $lottery_types
      * @param int $isAuto
      */
-    public static function batchSimulateBet($lottery_types = [], $isAuto=1){
+    public static function batchSimulateBet($lottery_types = [], $uid='', $isAuto=1){
 
         $rst = ['status'=>300, 'msg'=>'操作成功'];
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
 
         foreach ($lottery_types as $lottery_type) {
             $where = ['AND', ['=', 'status', 1], ['=', 'is_batch_simulate', 1], ['=', 'lottery_type', $lottery_type]]; # is_batch_simulate:0正常1批量模拟历史记录
+            if(!empty($where)){
+                $where[] = ['=', 'uid', $uid];
+            }
 
             $plans = UserSysPlans::find()->where($where)->all();
             if (empty($plans)) {
-                Tool_Common::log('plan_is_active', 'INFO', '投注计划', ['lottery_type' => $lottery_type, 'msg' => '没有开启的计划', 'uid' => $plans[0]->uid]);
+                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['lottery_type' => $lottery_type, 'msg' => '没有开启的计划', 'uid' => $plans[0]->uid]);
                 continue;
             }
             foreach ($plans as $plan) {
                 $lottery_type = $plan->lottery_type;
                 $plan_id = $plan->id;
                 $codes_hz_data = json_decode($plan->hz_Arr, true);
+                $filter_poses = $codes_hz_data['filters']['filter_poses'];
+                $x_poses = array_diff(NumService::$ALL_POSES, $filter_poses);
+                foreach ($x_poses as $x_pos){
+                    $codes_hz_data['p'.$x_pos] = 'X';
+                }
                 $filters = $codes_hz_data['filters'];
                 $current_qihao = NumService::getPlanBetCurrentQihao($filters['start_qihao'], $lottery_type, $plan_id);
+                //p([$current_qihao, $codes_hz_data]);
 
                 # 4、投注号码 codes
-                $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+                $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);
                 $is_test = $plan->is_test;
                 if (in_array($plan->plan_type, [6, 8, 9])) { # 6中则投 8、9遗漏多少期投
                     $flag = BetService::getIsBetTrue($plan->id);
