@@ -274,6 +274,23 @@ class IndexController extends Controller
     }
 
     /**
+     * @desc 批量插入投注任务
+     * @return array
+     */
+    public function actionBatchSimulateBet(){
+        self::_init();
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+        $post = \Yii::$app->request->post();
+
+        for ($i=0; $i<5; $i++){
+            $rst['batch_simulate_data'] = BetService::batchSimulateBet($post['lottery_types'], $post['uid']);
+            sleep(10);
+        }
+
+        return $rst;
+    }
+
+    /**
      * @desc 同步宝塔计划任务
      * @return array|bool|string
      */
