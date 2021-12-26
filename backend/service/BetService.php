@@ -1883,7 +1883,7 @@ abstract class BetService extends BaseBetService {
 
                 if ($is_test == 1 or $plan->uid == 1) { # 模拟下注
                     $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
-                    $rst['data'][$plan_id] = $insertRst;
+                    $rst['data'][$plan_id] = ['rst'=>$insertRst, 'qihao'=>$current_qihao];
                 }
             }
         }
