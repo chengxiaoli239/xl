@@ -63,14 +63,14 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         //'betting_money',
                         ['attribute' => 'betting_money','label'=>'投注','headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
-                                return floatval($model->betting_money);
+                                return $model->betting_money;
                             }
                         ],
                         //'bonus',
                         ['attribute' => 'bonus','label'=>'中奖','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                return $model->bonus>0 ? '<font color="green">'.floatval($model->bonus).'</font>' : ' ';
+                                return $model->bonus>0 ? '<font color="green">'.$model->bonus.'</font>' : ' ';
                             }
                         ],
                         //'single',

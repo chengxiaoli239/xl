@@ -12,6 +12,7 @@ use backend\models\CodeTypes;
 use backend\models\CodeTypesQuery;
 use backend\models\ImportPlanCodes;
 use backend\models\LotteryType;
+use backend\models\Num4Type;
 use backend\models\SscDsYl;
 use backend\models\SscKjData;
 use backend\models\SysPlansCodes;
@@ -42,6 +43,7 @@ class UserSysPlansService extends BaseService {
         $tz_type = $post['UserSysPlans']['tz_type'];
         $playway = $post['UserSysPlans']['playway'];
         $plan_type = $post['UserSysPlans']['plan_type'];
+        $code_type = NumService::$playway_to_code_type[$playway];
         $lottery_type = $post['UserSysPlans']['lottery_type'] ? : DEFAULT_LOTTERY_TYPE;
         if(!$playway){
             $playway = BetService::getPlaywayByTzType($tz_type);
@@ -181,6 +183,23 @@ class UserSysPlansService extends BaseService {
         # 16.2、动态过滤 - 是否模拟
         if($UserSysPlans['is_batch_simulate'] && count($UserSysPlans['is_batch_simulate']) == 1){
             $post['UserSysPlans']['is_batch_simulate'] = (int)$UserSysPlans['is_batch_simulate'][0];
+            if(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES']) && empty($post['UserSysPlans']['import_codes_txts'][0])) { # 导入号码保存
+                $diff_poses = array_diff(NumService::$ALL_POSES, $post['UserSysPlans']['filter_poses']);
+                $query = Num4Type::find()->select(['code']);
+                $t_where = [];
+                foreach ($diff_poses as $pos){
+                    $t_where[] = ['OR', ['=', 'code_'.$pos, 'X'], ['=', 'code_'.$pos, '']];
+                }
+                $query->where(array_merge(['AND', ['=', 'code_type', $code_type]], $t_where));
+                $Num4Type = $query->asArray()->all();
+                $filter_codes = ArrayHelper::getColumn($Num4Type, 'code');
+                $post['UserSysPlans']['import_codes_txts'][0] = implode(' ', str_replace(',', '', $filter_codes));
+            }
+
+        }
+        # 16.3、模拟近x天数据
+        if($UserSysPlans['test_period_days'] && !empty($UserSysPlans['test_period_days'])){
+            $tmpFilter['test_period_days'] = (int)trim($UserSysPlans['test_period_days']);
         }
 
         # 17、任意位置 是否包含

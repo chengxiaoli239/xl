@@ -22,6 +22,11 @@ use  yii;
 
 class NumService extends BaseService {
     public static $ALL_POSES = [1, 2, 3, 4];
+    public static $playway_to_code_type = [
+        1 => 2,
+        2 => 3,
+        3 => 4,
+    ];
 
     /**
      * @description 根据开奖号码返回三字现
@@ -2670,16 +2675,11 @@ class NumService extends BaseService {
      * @return array
      */
     public static function getCodesByCodesHz($filters=[], $plan_id='', $lottery_type=DEFAULT_LOTTERY_TYPE){
-        $code_types = [
-            1 => 2,
-            2 => 3,
-            3 => 4,
-        ];
         $lottery_type = $filters['lottery_type'] ? : $lottery_type; # 彩种
         $filter_type = $filters['filter_type']; # 三四定类型中，过滤类型:默认类型1
         $filter_poses = $filters['filter_poses']; # 过滤位置
         $playway = $filters['playway'] ? : 3; # 默认四定
-        $code_type = $code_types[$filters['playway']] ? : 4; # 默认四定
+        $code_type = NumService::$playway_to_code_type[$filters['playway']] ? : 4; # 默认四定
 
         $filter = NumService::getFilterTypeDatas($playway)[$filter_type];
         //$start_qihao = $filters['current_qihao'] ? : HN0898Service::getCurrentQihao($lottery_type); # 针对那一期过滤，默认为：当前期号

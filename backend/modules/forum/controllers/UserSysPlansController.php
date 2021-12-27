@@ -199,6 +199,13 @@ class UserSysPlansController extends BaseController
             if(in_array($this->_post['UserSysPlans']['tz_type'], \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
                 UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)$this->_post['UserSysPlans']['change_per'][0], $this->_user_id);
             }
+            if($this->_post['UserSysPlans']['is_batch_simulate'] == 1){
+                $db = \Yii::$app->db;
+                # 批量模拟数据
+                $delete_sql = 'DELETE FROM {{%betting_records}} WHERE plan_id="'.$model->id.'"';
+                $rst_delete = $db->createCommand($delete_sql)->execute();
+                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '模拟下注', ['plan_id'=>$model->id, 'delete_sql'=>$delete_sql, 'rst_delete'=>$rst_delete]);
+            }
             return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$model->lottery_type]);
         }
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
