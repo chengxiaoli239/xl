@@ -1709,6 +1709,7 @@ abstract class BetService extends BaseBetService {
             'tz_system_id' => '',  // 投注系统tz_systems .id
             'sn'=>$sn ? $sn : '888888',
             'snid'=>$snid ? $snid : '888888id',
+            'is_profits_record'=> ($sn=='istest') ? 1 : 0, # 是否计算盈利
             'order_type'=>$UserSysPlans->playway, # 单双三字定
             'is_simulate' => $is_test,  // 是否模拟投注
             'single' => $UserSysPlans->single,  // 投注倍数
