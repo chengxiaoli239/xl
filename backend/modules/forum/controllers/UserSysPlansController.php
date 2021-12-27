@@ -147,6 +147,7 @@ class UserSysPlansController extends BaseController
         $model->plan_type = 0;
         $defaultSiteId = UserService::getUserDefaultSite($this->_user_id);
         $model->tz_sites = [$defaultSiteId];
+        $model->start_qihao = HN0898Service::getQihao($queryParams['lottery_type']);
 
         $is_filters = [1=>'是'];
         $filter_pos1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
@@ -229,6 +230,14 @@ class UserSysPlansController extends BaseController
                 $model->filter_xQ_before = $filters['filter_xQ_before'];
                 $model->filter_pos1 = $filters['filter_pos1']; # 位置选项
                 $model->filter_pos2 = $filters['filter_pos2']; # 位置选项
+            }
+            # 动态排除同位置号码
+            if(isset($hz_Arr_Data['filters']['filter_type'])){
+                $model->filter_type = $hz_Arr_Data['filters']['filter_type'];
+                $model->filter_nums = $hz_Arr_Data['filters']['filter_nums'];
+                $model->playway = $hz_Arr_Data['filters']['playway'];
+                $model->filter_poses = $hz_Arr_Data['filters']['filter_poses'];
+                $model->start_qihao = $hz_Arr_Data['filters']['start_qihao'] ? : HN0898Service::getQihao($hz_Arr_Data['filters']['lottery_type']);
             }
             unset($hz_Arr_Data['filters']);
 

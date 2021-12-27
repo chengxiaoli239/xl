@@ -42,6 +42,7 @@ class UserSysPlansService extends BaseService {
         $tz_type = $post['UserSysPlans']['tz_type'];
         $playway = $post['UserSysPlans']['playway'];
         $plan_type = $post['UserSysPlans']['plan_type'];
+        $lottery_type = $post['UserSysPlans']['lottery_type'] ? : DEFAULT_LOTTERY_TYPE;
         if(!$playway){
             $playway = BetService::getPlaywayByTzType($tz_type);
             $post['UserSysPlans']['playway'] = $playway;
@@ -50,7 +51,6 @@ class UserSysPlansService extends BaseService {
 
         $User = AdminModel::findOne($user_id);
         $post['UserSysPlans']['tz_sites'] = implode(',',$post['UserSysPlans']['tz_sites']);
-        //p($post['UserSysPlans']['hz_Arr']);
 
         ################### 公共参数 - 开始 #########################
         $tmpFilter = []; # hz_Arr
@@ -177,6 +177,11 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['type_22b'] = $UserSysPlans['type_22b'][0];
         }
         unset($post['UserSysPlans']['type_22b']);
+
+        # 16.2、动态过滤 - 是否模拟
+        if($UserSysPlans['is_batch_simulate'] && count($UserSysPlans['is_batch_simulate']) == 1){
+            $post['UserSysPlans']['is_batch_simulate'] = (int)$UserSysPlans['is_batch_simulate'][0];
+        }
 
         # 17、任意位置 是否包含
         if($UserSysPlans['arb_pos_isbaohan'] && count($UserSysPlans['arb_pos_isbaohan']) == 1){
@@ -333,8 +338,6 @@ class UserSysPlansService extends BaseService {
 
             //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
         }elseif ($tz_type == 28){ # 系统快捷
-
-
             # 2.1、和值：取
             if(isset($post['UserSysPlans']['get_hzs']) && $post['UserSysPlans']['get_hzs']){
                 $tmpFilter['get_hzs'] = $post['UserSysPlans']['get_hzs'];
@@ -408,6 +411,17 @@ class UserSysPlansService extends BaseService {
                 'filter_xQ_before' => (!empty($filter_xQ_before))? trim($filter_xQ_before):'',
                 'filter_pos1' => (isset($UserSysPlans['filter_pos1']) && !empty($UserSysPlans['filter_pos1']))? $UserSysPlans['filter_pos1']:[],
                 'filter_pos2' => (isset($UserSysPlans['filter_pos2']) && !empty($UserSysPlans['filter_pos2']))? $UserSysPlans['filter_pos2']:[],
+            ]);
+        }
+        # 2、动态过滤
+        if(isset($UserSysPlans['filter_type']) && !empty($UserSysPlans['filter_type'])){
+            $filters = array_merge($filters, [
+                'filter_type' => $UserSysPlans['filter_type'],
+                'filter_nums' => $UserSysPlans['filter_nums'],
+                'playway' => $playway,
+                'filter_poses' => $UserSysPlans['filter_poses'],
+                'start_qihao' => $UserSysPlans['start_qihao'],
+                'lottery_type' => $lottery_type,
             ]);
         }
         $tmpFilter['filters'] = $filters;

@@ -2683,7 +2683,7 @@ class NumService extends BaseService {
 
         $filter = NumService::getFilterTypeDatas($playway)[$filter_type];
         //$start_qihao = $filters['current_qihao'] ? : HN0898Service::getCurrentQihao($lottery_type); # 针对那一期过滤，默认为：当前期号
-        $start_qihao = NumService::getPlanBetCurrentQihao($filters['start_qihao'], $lottery_type, $plan_id);
+        $start_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
         //p(['start_qihao'=>$start_qihao]);
         $query = Num4Type::find()->select(['code']);
         if($filter['type'] == 1){ # 过滤前x期号码
@@ -2718,19 +2718,24 @@ class NumService extends BaseService {
      * @param int $lottery_type
      * @return float|int|mixed|string
      */
-    public static function getPlanBetCurrentQihao($filter_start_qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE, $plan_id='') {
-        $current_qihao = $filter_start_qihao;
-        if(!empty($plan_id)){
+    public static function getPlanBetCurrentQihao($plan_id='', $lottery_type=DEFAULT_LOTTERY_TYPE) {
+        $current_qihao = '';
+        $plan = UserSysPlans::findOne($plan_id);
+        if($plan->is_batch_simulate == 1 && !empty($plan_id)){
             $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one();
             $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'qihao', $BettingRecords->qihao]];
             $SscKjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->one();
             if(!empty($SscKjData->qihao)){
                 $current_qihao = $SscKjData->qihao;
             }
+            if(empty($current_qihao)){
+                $codes_hz_datas = json_decode($plan->hz_Arr, true);
+                $current_qihao = $codes_hz_datas['filters']['start_qihao'];
+            }
         }
 
         if(empty($current_qihao)){
-            $current_qihao = HN0898Service::getCurrentQihao($lottery_type); # 针对哪一期过滤，默认为：当前期号
+            $current_qihao = HN0898Service::getQihao($lottery_type); # 针对哪一期过滤，默认为：当前期号
         }
 
         return $current_qihao;

@@ -1873,8 +1873,7 @@ abstract class BetService extends BaseBetService {
                 foreach ($x_poses as $x_pos){
                     $codes_hz_data['p'.$x_pos] = 'X';
                 }
-                $filters = $codes_hz_data['filters'];
-                $current_qihao = NumService::getPlanBetCurrentQihao($filters['start_qihao'], $lottery_type, $plan_id);
+                $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
                 //p([$current_qihao, $codes_hz_data]);
 
                 # 4、投注号码 codes

@@ -133,6 +133,13 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $arb_pos_codes; # 任意位置之"号码" 0123456789
     public $arb_pos_nums; # 任意位置之"至少个数" 2个3个
     ############### 新过滤快打—end #################
+
+    ############### 动态过滤 - 模拟 start ##################
+    public $filter_type; #
+    public $filter_nums; # 过滤前x期同位置号码
+    public $filter_poses; # 过滤位置
+    public $start_qihao; # 模拟开始期号
+    ############### 动态过滤 - 模拟 end ####################
     /**
      * @inheritdoc
      */

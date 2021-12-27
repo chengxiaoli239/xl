@@ -1,5 +1,4 @@
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: green;">
-<div class="row">
     <div class="col-lg-2 col-xs-2">
         <?= $form->field($model, 'change_per')->checkboxList([1=>'是'])->label('每期轮换') ?>
     </div>

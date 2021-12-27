@@ -257,6 +257,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $current_qihao = HN0898Service::getCurrentQihao($lottery_type=8); # 针对哪一期过滤，默认为：当前期号
+        p($current_qihao);
         $arr = ['filter_type'=>1, 'filter_nums'=>1, 'playway'=>1, 'start_qihao'=>'20211224163', 'filter_poses'=>[1,2], 'lottery_type'=>DEFAULT_LOTTERY_TYPE]; # 过滤条件
         $fitlers = json_decode('{"filter_type":1,"filter_nums":1,"playway":1,"filter_poses":[2,4],"lottery_type":8}', true);
         $filter_codes = NumService::getCodesByCodesHz($fitlers, $plan_id=508, 8); # 过滤的号码

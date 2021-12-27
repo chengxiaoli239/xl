@@ -21,6 +21,7 @@ use yii\widgets\ActiveForm;
                 <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
 
                 <input type="hidden" name="UserSysPlans[tz_type]" value="27"><!--三定导入-->
+                <input type="hidden" name="UserSysPlans[lottery_type]" value="<?php echo $lottery_type;?>"><!--三定导入-->
                 <div class="row">
                     <div class="col-lg-4 col-xs-4">
                         <?= $form->field($model, 'playway')->radioList([
@@ -56,6 +57,8 @@ use yii\widgets\ActiveForm;
 
                 <!--导入号码组轮换-->
                 <?php include(dirname(__FILE__).'/import_codes.php'); ?>
+
+                <!--每期动态过滤-->
 
                 <div class="row">
                     <div class="col-lg-3 col-xs-6">
