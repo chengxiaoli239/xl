@@ -195,7 +195,8 @@ class UserSysPlansService extends BaseService {
                 $filter_codes = ArrayHelper::getColumn($Num4Type, 'code');
                 $post['UserSysPlans']['import_codes_txts'][0] = implode(' ', str_replace(',', '', $filter_codes));
             }
-
+        }else{
+            $post['UserSysPlans']['is_batch_simulate'] = 0;
         }
         # 16.3、模拟近x天数据
         if($UserSysPlans['test_period_days'] && !empty($UserSysPlans['test_period_days'])){

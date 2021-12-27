@@ -1764,7 +1764,7 @@ abstract class BetService extends BaseBetService {
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
 
         foreach ($lottery_types as $lottery_type){
-            $where = ['AND', ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]]; # is_batch_simulate:0正常1批量模拟历史记录
+            $where = ['AND', ['=', 'status', 1], ['OR', ['=', 'is_batch_simulate', 0], ['IS', 'is_batch_simulate', NULL]], ['=', 'lottery_type', $lottery_type]]; # is_batch_simulate:0正常1批量模拟历史记录
             $m = \Yii::$app->cache;
 
             $plans = UserSysPlans::find()->where($where)->all();
