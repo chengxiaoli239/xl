@@ -1482,7 +1482,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $tmpRst['bet_time'] = date('Y-m-d H:i:s');
         $tmpRst['time_consume'] = $time_consume;
         $tmpRst['proxy_ip'] = ProxyBaseService::getCurrentValidProxyIp(); # 获取当前可用的代理IP;
-        $logArr = ['task_id'=>$id, 'uid'=>$uid, 'plan_id'=>$plan_id, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers, 'snInfo'=>$snInfo, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
+        $logArr = ['task_id'=>$id, 'uid'=>$uid, 'plan_id'=>$plan_id, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'snInfo'=>$snInfo, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '幸运五星-计划任务下注节点-5', $logArr);
 
         $row->status = $status;
