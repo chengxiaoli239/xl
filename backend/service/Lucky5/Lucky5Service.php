@@ -1432,16 +1432,19 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $TIME_OUT_RETRY = BetService::getConfig('TIME_OUT_RETRY'); # 超时重复下开关，幸运五
         $m = \Yii::$app->cache;
         $mkey_time_out = self::buildBetTimeOutPlanKey($row->uid, $row->plan_id, $row->bet_sort_key);
+        Tool_Common::log('/repeatErrorBet/xxx', 'INFO', '幸运下注x1', ['task_id'=>$id, 'plan_id'=>$plan_id, 'mkey_time_out'=>$mkey_time_out, 'time_out'=>$TIME_OUT_RETRY, 'is_true'=>(boolean)($tmpRst['Status']==1)]);
         if($tmpRst['Status'] == 1){
             $status = 2;
             $tmpRst['status'] = $status; # 下注成功
             //# 获取方案号，记录id, 用于撤单
             $snInfo = self::getSn($row->uid, $row->tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+            Tool_Common::log('/repeatErrorBet/xxx', 'INFO', '幸运下注x2', ['task_id'=>$id, 'plan_id'=>$plan_id,'Status'=>$tmpRst['Status'], 'snInfo'=>$snInfo, 'tmpRst'=>$tmpRst, 'codes'=>json_decode($row->codes)]);
             if(isset($snInfo['snid'])) $snInfo['snid'] = substr($snInfo['snid'],0,20).'...';
             $snid = '{'.$snInfo['sn'].'}|'.count(json_decode($row->codes)); # 多次下单需要分开，多次撤单
             $sn = $snInfo['sn'];
             $tmpRst['snid'] = $snid;
             $tmpRst['sn'] = $sn;
+            Tool_Common::log('/repeatErrorBet/xxx', 'INFO', '幸运下注x3', ['task_id'=>$id, 'plan_id'=>$plan_id, 'tmpRst'=>$tmpRst, 'repeats'=>$repeats, 'is_repeats'=>(boolean)!empty($repeats)]);
             if(!empty($repeats)){
                 $post_data_1 = $post_data;
                 $post_data_1['bet_number'] = implode(',', $repeats);
