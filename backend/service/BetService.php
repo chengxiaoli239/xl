@@ -1856,7 +1856,7 @@ abstract class BetService extends BaseBetService {
         if($flag){
             return ['status'=>300, 'msg'=>'有正在执行的任务,请稍后...'];
         }
-        $m->set($mkey, 1, 30);
+        $m->set($mkey, 1, 10);
 
         foreach ($lottery_types as $lottery_type) {
             $where = ['AND', ['=', 'status', 1], ['=', 'is_batch_simulate', 1], ['=', 'lottery_type', $lottery_type]]; # is_batch_simulate:0正常1批量模拟历史记录
