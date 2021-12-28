@@ -1429,6 +1429,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         sleep((int)$slow_seconds); # 下注延迟秒数
         $time2 = microtime(true);
         $status = 0;
+        Tool_Common::log('/repeatErrorBet/xxx', 'INFO', '幸运下注x0', ['task_id'=>$id, 'plan_id'=>$plan_id]);
         $TIME_OUT_RETRY = BetService::getConfig('TIME_OUT_RETRY'); # 超时重复下开关，幸运五
         $m = \Yii::$app->cache;
         $mkey_time_out = self::buildBetTimeOutPlanKey($row->uid, $row->plan_id, $row->bet_sort_key);
