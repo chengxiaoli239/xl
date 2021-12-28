@@ -43,6 +43,11 @@ abstract class BetService extends BaseBetService {
     protected $_operateTime = null;    // 当前时间戳的格式
     protected $_baseUrl = '';    // 当前时间戳的格式
     public static $maxQihaoArr = [1=>960, 2=>480, 3=>288, 4=>144, 5=>59, 6=>48, 7=>179, 8=>288]; # $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
+    public static $static_sn = ['888888', '6666666666'];
+    public static $static_snid = ['888888id', '6666666666'];
+    public static $test_true_sn = '888888';
+    public static $true_bet_sn = '6666666666';
+    public static $test_true_snid = '888888id';
 
     protected function __construct() {
         parent::__construct();
@@ -1707,9 +1712,9 @@ abstract class BetService extends BaseBetService {
             'codes' => (string)$codes,  // 投注号码
             'qihao' => $qihao,  // 投注期号
             'tz_system_id' => '',  // 投注系统tz_systems .id
-            'sn'=>$sn ? $sn : '888888',
-            'snid'=>$snid ? $snid : '888888id',
-            'is_profits_record'=> ($sn=='istest') ? 1 : 0, # 是否计算盈利
+            'sn'=>$sn ? $sn : BetService::$test_true_sn,
+            'snid'=>$snid ? $snid : BetService::$test_true_snid,
+            'is_profits_record'=> in_array($sn, BetService::$static_sn) ? 1 : 0, # 是否计算盈利
             'order_type'=>$UserSysPlans->playway, # 单双三字定
             'is_simulate' => $is_test,  // 是否模拟投注
             'single' => $UserSysPlans->single,  // 投注倍数
@@ -1879,6 +1884,8 @@ abstract class BetService extends BaseBetService {
                 # 4、投注号码 codes
                 $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);
                 $is_test = $plan->is_test;
+                $sn = BetService::$test_true_sn;
+                $snid = BetService::$test_true_snid;
                 if (in_array($plan->plan_type, [6, 8, 9])) { # 6中则投 8、9遗漏多少期投
                     $flag = BetService::getIsBetTrue($plan->id);
                     if (in_array($flag, [0, -1]) && $isAuto == 1) {
@@ -1887,6 +1894,7 @@ abstract class BetService extends BaseBetService {
                         $snid = 'istest_id';
                     }
                 }
+                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '投注号码', ['flag'=>$flag, 'plan_id'=>$plan_id]);
 
                 if ($is_test == 1 or $plan->uid == 1) { # 模拟下注
                     $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
