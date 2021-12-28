@@ -65,5 +65,8 @@
     <div class="col-lg-2 col-xs-4">
         <?= $form->field($model, 'test_period_days')->textInput()->label('周期:7, 则模拟最近7天数据') ?>
     </div>
+    <div class="col-lg-2 col-xs-4">
+        <?= $form->field($model, 'start_qihao')->textInput()->label('开始期号') ?>
+    </div>
     <?php ;?>
 </div>

@@ -2730,7 +2730,7 @@ class NumService extends BaseService {
             }
             if(empty($current_qihao)){
                 $codes_hz_datas = json_decode($plan->hz_Arr, true);
-                $current_qihao = $codes_hz_datas['filters']['start_qihao'];
+                $current_qihao = $codes_hz_datas['filters']['start_qihao'] ? : NumService::getQihaoByDaysBefore($codes_hz_datas['filters']['test_period_days'], $lottery_type);
             }
         }
 
@@ -2739,6 +2739,26 @@ class NumService extends BaseService {
         }
 
         return $current_qihao;
+    }
+
+    /**
+     * @desc 给定天数天数
+     * @param int $day_nums
+     * @param int $lottery_type
+     * @return float|int|string
+     */
+    public static function getQihaoByDaysBefore($day_nums=7, $lottery_type=DEFAULT_LOTTERY_TYPE){
+        $kj_times = date('Y-m-d', time() - $day_nums * 86400);
+
+        $where = ['AND', ['>=', 'date', $kj_times], ['=', 'lottery_type', $lottery_type]];
+        $SscKjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->one();
+        if(!empty($SscKjData)){
+            $qihao = $SscKjData->qihao;
+        }else{
+            $qihao = HN0898Service::getQihao($lottery_type); # 针对哪一期过滤，默认为：当前期号
+        }
+
+        return $qihao;
     }
 
     /**

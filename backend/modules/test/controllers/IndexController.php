@@ -257,6 +257,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $qihao = NumService::getQihaoByDaysBefore($test_period_days=7, $lottery_type=8);p($qihao);
         $current_qihao = NumService::getPlanBetCurrentQihao($plan_id='538', $lottery_type=8);p($current_qihao);
         $current_qihao = HN0898Service::getCurrentQihao($lottery_type=8); # 针对哪一期过滤，默认为：当前期号
         p($current_qihao);
