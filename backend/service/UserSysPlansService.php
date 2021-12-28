@@ -198,10 +198,6 @@ class UserSysPlansService extends BaseService {
         }else{
             $post['UserSysPlans']['is_batch_simulate'] = 0;
         }
-        # 16.3、模拟近x天数据
-        if($UserSysPlans['test_period_days'] && !empty($UserSysPlans['test_period_days'])){
-            $tmpFilter['test_period_days'] = (int)trim($UserSysPlans['test_period_days']);
-        }
 
         # 17、任意位置 是否包含
         if($UserSysPlans['arb_pos_isbaohan'] && count($UserSysPlans['arb_pos_isbaohan']) == 1){
@@ -433,11 +429,13 @@ class UserSysPlansService extends BaseService {
                 'filter_pos2' => (isset($UserSysPlans['filter_pos2']) && !empty($UserSysPlans['filter_pos2']))? $UserSysPlans['filter_pos2']:[],
             ]);
         }
+
         # 2、动态过滤
         if(isset($UserSysPlans['filter_type']) && !empty($UserSysPlans['filter_type'])){
             $filters = array_merge($filters, [
                 'filter_type' => $UserSysPlans['filter_type'],
                 'filter_nums' => $UserSysPlans['filter_nums'],
+                'test_period_days' => (int)trim($UserSysPlans['test_period_days']),
                 'playway' => $playway,
                 'filter_poses' => $UserSysPlans['filter_poses'],
                 'start_qihao' => $UserSysPlans['start_qihao'],

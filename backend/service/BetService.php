@@ -1894,7 +1894,7 @@ abstract class BetService extends BaseBetService {
                         $snid = 'istest_id';
                     }
                 }
-                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '投注号码', ['flag'=>$flag, 'plan_id'=>$plan_id]);
+                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '投注号码', ['flag'=>$flag, 'qihao'=>$current_qihao, 'plan_id'=>$plan_id]);
 
                 if ($is_test == 1 or $plan->uid == 1) { # 模拟下注
                     $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表

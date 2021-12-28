@@ -244,7 +244,8 @@ class UserSysPlansController extends BaseController
                 $model->filter_nums = $hz_Arr_Data['filters']['filter_nums'];
                 $model->playway = $hz_Arr_Data['filters']['playway'];
                 $model->filter_poses = $hz_Arr_Data['filters']['filter_poses'];
-                $model->start_qihao = $hz_Arr_Data['filters']['start_qihao'] ? : HN0898Service::getQihao($hz_Arr_Data['filters']['lottery_type']);
+                $model->test_period_days = $hz_Arr_Data['filters']['test_period_days'];
+                $model->start_qihao = $hz_Arr_Data['filters']['start_qihao'] ? : '';
             }
             unset($hz_Arr_Data['filters']);
 
