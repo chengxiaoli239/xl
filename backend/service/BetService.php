@@ -44,6 +44,7 @@ abstract class BetService extends BaseBetService {
     protected $_baseUrl = '';    // 当前时间戳的格式
     public static $maxQihaoArr = [1=>960, 2=>480, 3=>288, 4=>144, 5=>59, 6=>48, 7=>179, 8=>288]; # $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
     public static $static_sn = ['888888', '6666666666'];
+    public static $test_static_sn = ['istest'];
     public static $static_snid = ['888888id', '6666666666'];
     public static $test_true_sn = '888888';
     public static $true_bet_sn = '6666666666';
@@ -1312,8 +1313,9 @@ abstract class BetService extends BaseBetService {
     public static function _logRecords($data){
         if(!$data OR !is_array($data)) return false;
         $insertData = [
-            'sn' => $data['sn'],  // 方案号
-            'snid'=>$data['snid'],
+            'sn'=>$data['sn'] ? $data['sn'] : BetService::$test_true_sn, // 方案号
+            'snid'=>$data['snid'] ? $data['snid'] : BetService::$test_true_snid,
+            'is_profits_record'=> in_array($data['sn'], BetService::$test_static_sn) ? 0 : 1, # 是否计算盈利
             'playway'=> $data['playway'],  // 投注方式
             'tz_type'=> $data['tz_type'],  // 投注类型
             'account'=> $data['account'],  // 投注账号
@@ -1714,7 +1716,6 @@ abstract class BetService extends BaseBetService {
             'tz_system_id' => '',  // 投注系统tz_systems .id
             'sn'=>$sn ? $sn : BetService::$test_true_sn,
             'snid'=>$snid ? $snid : BetService::$test_true_snid,
-            'is_profits_record'=> in_array($sn, BetService::$static_sn) ? 1 : 0, # 是否计算盈利
             'order_type'=>$UserSysPlans->playway, # 单双三字定
             'is_simulate' => $is_test,  // 是否模拟投注
             'single' => $UserSysPlans->single,  // 投注倍数
@@ -1880,6 +1881,10 @@ abstract class BetService extends BaseBetService {
                 }
                 $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
                 //p([$current_qihao, $codes_hz_data]);
+                $isCanBet = SscDataService::isCanBet($plan_id, $current_qihao);
+                if(!empty($isCanBet)){
+                    return ['status'=>301, 'msg'=>'暂时不可以下注'];
+                }
 
                 # 4、投注号码 codes
                 $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);
