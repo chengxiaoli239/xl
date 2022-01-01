@@ -1867,7 +1867,7 @@ abstract class BetService extends BaseBetService {
 
             $plans = UserSysPlans::find()->where($where)->all();
             if (empty($plans)) {
-                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['uid'=>$uid,'lottery_type' => $lottery_type, 'msg' => '没有开启的计划', 'uid' => $plans[0]->uid]);
+                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['uid'=>$uid,'lottery_type' => $lottery_type, 'msg' => '没有开启的计划']);
                 continue;
             }
             foreach ($plans as $plan) {

@@ -3054,12 +3054,11 @@ class SscDataService extends BaseService {
         $profits = BettingRecords::find()->where($where)->sum('profits');
         $lottery_type = $UserSysPlan->lottery_type;
 
-        $update_flag = true;
         try {
             $maxQihao = BetService::$maxQihaoArr[$lottery_type];
             $qihao = substr(HN0898Service::getCurrentQihao($lottery_type),-3); # 最后三位
             if($is_simulate_bet == 0 && in_array($lottery_type, [8]) && $maxQihao == $qihao){
-                $profits = 0.00; # 每天的盈利重新计算
+                //$profits = 0.00; # 每天的盈利重新计算
             }
             if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
                 $UserSysPlan->status = 0;
@@ -3071,15 +3070,15 @@ class SscDataService extends BaseService {
             if(!empty($saveFlag)){
                 $logArr['plan_1_3_5'][$UserSysPlan->id]['err_msg'] = $UserSysPlan->getErrors();
                 Tool_Common::log('/statics/'.__FUNCTION__.'_err', 'ERR', '单计划-利润统计-错误1', ['plan_id'=>$plan_id, 'err_msg'=>$UserSysPlan->getErrors()]);
-                $update_flag = false;
             }
+            $rst = ['status'=>200, 'data'=>['plan_id'=>$plan_id, 'updateRst'=>$saveFlag], 'msg'=>'操作成功'];
             # 1、利润计算 end
         }catch (\Exception $exception){
             Tool_Common::log('/statics/'.__FUNCTION__.'_err', 'ERR', '单计划-利润统计-错误2', ['plan_id'=>$plan_id, 'err_msg'=>$exception->getMessage()]);
-            $update_flag = false;
+            $rst = ['status'=>200, 'data'=>['plan_id'=>$plan_id], 'msg'=>$exception->getMessage()];
         }
 
-        return $update_flag;
+        return $rst;
     }
 
     /**
@@ -3098,7 +3097,6 @@ class SscDataService extends BaseService {
         if(!in_array($UserSysPlan->plan_type, $fb_plan_types)){
             return ['status'=>300, 'msg'=>'不是翻倍类型计划，不处理'];
         }
-        $update_flag = true;
 
         try {
             $flag = SscDataService::isZjBefore($UserSysPlan->id);
@@ -3171,15 +3169,15 @@ class SscDataService extends BaseService {
             $updateData['hz_Arr'] = json_encode($codes_hz, 320);
             $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['updateData'] = $codes_hz;
 
-            $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
-            $update_flag = $rst;
-            $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['rst'] = $rst;
+            $updateRst = UserSysPlans::updateAll($updateData, $whereUpdate);
+            $rst = ['status'=>200, 'data'=>['plan_id'=>$plan_id, 'updateRst'=>$updateRst], 'msg'=>'操作成功'];
+            $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['updateRst'] = $updateRst;
         }catch (\Exception $exception){
             Tool_Common::log('/statics/'.__FUNCTION__.'_err', 'ERR', '单计划-利润统计-错误2', ['plan_id'=>$plan_id, 'err_msg'=>$exception->getMessage()]);
-            $update_flag = false;
+            $rst = ['status'=>300, 'data'=>['plan_id'=>$plan_id], 'msg'=>$exception->getMessage()];
         }
 
-        return $update_flag;
+        return $rst;
     }
 
     /**
@@ -3246,7 +3244,7 @@ class SscDataService extends BaseService {
         $lottery_type = $UserSysPlan->lottery_type;
         $plan_types = SscDataService::$zzt_else_fanmai_types;
         if(!in_array($UserSysPlan->plan_type, $plan_types)){
-            return ['status'=>300, 'msg'=>'不是中则投/遗漏类型计划，不处理'];
+            return ['status'=>300, 'msg'=>'不是中则投否则反买，不处理'];
         }
         $update_flag = true;
 
