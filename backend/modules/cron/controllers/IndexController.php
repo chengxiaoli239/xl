@@ -215,8 +215,7 @@ class IndexController extends Controller
         $post = \Yii::$app->request->post();
         $uid = $post['uid'];
         $for_times = 8;
-        //$rnt = rand(3, 5);
-        $sleep_time = 8;
+        $sleep_time = rand(4, 8);
         for($i=0; $i<$for_times; $i++){
             sleep($sleep_time);
             $rst[$i]['rst'] = BetService::lotteryBet($uid);
