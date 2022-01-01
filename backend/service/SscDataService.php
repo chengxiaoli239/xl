@@ -2978,8 +2978,6 @@ class SscDataService extends BaseService {
         # 5、号码轮换
         $rst['data']['codes_change'] = self::handleOnePlanCodesChange($plan_id, $is_simulate_bet);
 
-        Tool_Common::log('/statics/'.__FUNCTION__, 'INFO', '单个计划处理', ['plan_id'=>$plan_id, 'rst'=>$rst]);
-
         $afterRst = SscDataService::afterHandleOnePlan($plan_id, $qihao); # 操作计划之后解锁
         if($afterRst){
             # 操作完计划开启下一期下注计划
