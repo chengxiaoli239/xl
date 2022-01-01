@@ -2942,10 +2942,17 @@ class SscDataService extends BaseService {
     /**
      * @desc 单个计划处理
      * @param string $plan_id
+     * @param string $qihao 下注记录期号
      * @param int $is_simulate_bet
      * @return array
      */
     public static function handleOnePlanStatic($plan_id='', $qihao='', $is_simulate_bet=0){
+        if(SscDataService::isCanHandleOnePlan($plan_id, $qihao)){
+            return ['status'=>300, 'msg'=>'计划处理已经锁定'];
+        }
+
+        SscDataService::beforeHandleOnePlan($plan_id, $qihao); # 操作计划之前锁定
+
         $UserSysPlan = UserSysPlans::findOne($plan_id);
         if(empty($UserSysPlan)){
             return ['status'=>300, 'msg'=>'找不到对应计划'];
@@ -2972,7 +2979,67 @@ class SscDataService extends BaseService {
         $rst['data']['codes_change'] = self::handleOnePlanCodesChange($plan_id, $is_simulate_bet);
 
         Tool_Common::log('/statics/'.__FUNCTION__, 'INFO', '单个计划处理', ['plan_id'=>$plan_id, 'rst'=>$rst]);
+
+        $afterRst = SscDataService::afterHandleOnePlan($plan_id, $qihao); # 操作计划之后解锁
+        if($afterRst){
+            # 操作完计划开启下一期下注计划
+            $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $UserSysPlan->lottery_type);
+            $r = SscDataService::openOnePlanBetStatus($plan_id, $next_qihao);
+        }
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '单个计划处理', ['plan_id'=>$plan_id, 'afterRst'=>$afterRst, 'next_qihao'=>$next_qihao, 'r'=>$r, 'rst'=>$rst]);
+
         return $rst;
+    }
+
+    /**
+     * @desc 计划对应期号的操作key
+     * @param string $plan_id
+     * @param string $qihao
+     * @return string
+     */
+    public static function buildOneHandPlanKey($plan_id='', $qihao=''){
+        $mkey = 'beforeHandleOnePlan_'.$plan_id.'_'.$qihao;
+
+        return $mkey;
+    }
+
+    /**
+     * @desc 操作计划前锁定
+     * @param string $plan_id
+     * @param string $qihao
+     */
+    public static function beforeHandleOnePlan($plan_id='', $qihao=''){
+        $m = \Yii::$app->cache;
+        $mkey = SscDataService::buildOneHandPlanKey($plan_id, $qihao);
+
+        $m->set($mkey, 60);
+    }
+
+    /**
+     * @desc 操作计划前锁定
+     * @param string $plan_id
+     * @param string $qihao
+     */
+    public static function afterHandleOnePlan($plan_id='', $qihao=''){
+        $m = \Yii::$app->cache;
+        $mkey = SscDataService::buildOneHandPlanKey($plan_id, $qihao);
+
+        return $m->delete($mkey);
+    }
+
+    /**
+     * @desc 一个计划是否可以处理
+     * @param string $plan_id
+     * @param string $qihao
+     * @return bool
+     */
+    public static function isCanHandleOnePlan($plan_id='', $qihao=''){
+        $m = \Yii::$app->cache;
+        $mkey = SscDataService::buildOneHandPlanKey($plan_id, $qihao);
+
+        $flag = $m->get($mkey);
+
+        return (boolean)$flag;
     }
 
     /**
@@ -3642,8 +3709,28 @@ class SscDataService extends BaseService {
      * @return bool
      */
     public static function isCanBet($plan_id, $current_qihao){
-        $flag = true;
+        $m = \Yii::$app->cache;
+        $mkey = self::buildOnePlanBetKey($plan_id, $current_qihao);
 
-        return $flag;
+        $flag = $m->get($mkey);
+
+        return (boolean)$flag;
+    }
+
+    public static function buildOnePlanBetKey($plan_id, $current_qihao){
+        return 'buildOnePlanBetKey_'.$plan_id.'_'.$current_qihao;
+    }
+
+    /**
+     * @param $plan_id
+     * @param $current_qihao
+     * @return bool
+     */
+    public static function openOnePlanBetStatus($plan_id, $current_qihao){
+        $m = \Yii::$app->cache;
+        $mkey = self::buildOnePlanBetKey($plan_id, $current_qihao);
+        $flag = $m->set($mkey, 1, 300);
+
+        return (boolean)$flag;
     }
 }

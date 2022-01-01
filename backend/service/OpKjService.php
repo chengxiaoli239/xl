@@ -21,69 +21,84 @@ class OpKjService extends BaseService {
     /**
      * @description 处理开奖数据
      * 投注方式，具体见 CommonService::getOdds( ) 方法
-     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
+     * @param integer $lottery_type - 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return array
      */
     public static function opSscKjData($lottery_type = DEFAULT_LOTTERY_TYPE){
 
         $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
-        //$lotteryTypeArr = [1,2,3,4]; # 彩票类型：彩种类型：1:1.5分 2:3分 3:5分 4:10分
 
-        $m = \Yii::$app->cache;
-        //p($qihaos);
         $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type])->orderBy('id DESC')->limit(50)->all();
         if(!$bettingRecords) return $rst;
-        foreach ($bettingRecords as $bettingRecord){
-            $is_simulate = $bettingRecord['is_simulate'];
-            $qihao = $bettingRecord->qihao;
-            $account = $bettingRecord['account'];
-            $single = $bettingRecord['single'];
-            $playway = $bettingRecord['playway'];
-            $codes = $bettingRecord['codes'];
-            $plan_id = $bettingRecord['plan_id'];
-            $mkey_qihao = '0898tz_'.$account.'_'.$plan_id;
-            $m->delete($mkey_qihao);
+        foreach ($bettingRecords as $BettingRecord){
+            $rst['data'][$BettingRecord->id] = OpKjService::opOneBettingRecord($BettingRecord->id, $BettingRecord);
+        }
 
-            # 开奖数据 start
-            $where = ['qihao'=>$qihao, 'lottery_type'=>$bettingRecord->lottery_type];
-            $kjData = SscKjData::find()->where($where)->asArray()->one()['code_str'];
-            if(!$kjData){
-                $kjData = CommonService::getAwardNumberByQihao($qihao, $bettingRecord->lottery_type); // 3,4,5,6,7
-            }
-            # 开奖数据 end
-            if(!$kjData){
-                //return $rst = ['status'=>300, 'msg'=>$qihao.'期未开奖!'];
-                continue;
-            }
+        return $rst;
+    }
 
-            $profitsData = self::calcuProfits($playway, $codes, $kjData, $single);
+    /**
+     * @desc 操作一个下注记录开奖处理
+     * @param string $record_id
+     * @return array
+     */
+    public static function opOneBettingRecord($record_id='', $BettingRecord=''){
+        $rst = ['status'=>200, 'msg'=>'处理成功'];
 
-            $bouns = $profitsData['bouns'];
-            $profits = $bouns - $bettingRecord['betting_money'];
-            $zjResult = $profitsData['zjResult'];
-
-            $updateData = [
-                'bonus' => $bouns,
-                'profits' => $profits,
-                'kj_codes' => $kjData,
-                'updated_at' => time(),
-                'status' => 1
-            ];
-            $bettingRecord->setAttributes($updateData);
-            $status = $bettingRecord->save();
-            $logArr = [
-                'qihao'=>$qihao,
-                'opRst'=>$status,'playway'=>$playway,'codes'=>$codes,'is_simulate'=>$is_simulate,
-                'kjData'=>$kjData, 'single'=>$single,'zjResult'=>$zjResult,'bouns'=>$bouns, 'profits'=>$profits,
-            ];
-            # 中奖则更换投注号码
-            if($bouns > 0){
-                $m = \Yii::$app->cache;
-                $mkey = 'USER_TZ_STATUS_'.$bettingRecord['account'];
-                $m->set($mkey, 0, 90*60);
+        if(empty($BettingRecord)){
+            $BettingRecord = BettingRecords::findOne($record_id);
+        }
+        if(empty($BettingRecord)){
+            $rst = ['status'=>404, 'msg'=>'找不到记录BettingRecords'];
+        }else{
+            if($BettingRecord->status == 1){
+                return ['status'=>304, 'msg'=>'已经处理的记录'];
             }
 
-            Tool_Common::log('opSscKjData','INFO','投注记录', $logArr);
+            try {
+                $is_simulate = $BettingRecord->is_simulate;
+                $qihao = $BettingRecord->qihao;
+                $single = $BettingRecord->single;
+                $playway = $BettingRecord->playway;
+                $codes = $BettingRecord->codes;
+
+                # 开奖数据 start
+                $where = ['qihao'=>$qihao, 'lottery_type'=>$BettingRecord->lottery_type];
+                $kjData = SscKjData::find()->where($where)->asArray()->one()['code_str'];
+                if(!$kjData){
+                    $kjData = CommonService::getAwardNumberByQihao($qihao, $BettingRecord->lottery_type); // 3,4,5,6,7
+                }
+                # 开奖数据 end
+                if(!$kjData){
+                    return $rst = ['status'=>300, 'msg'=>$qihao.'期未开奖!'];
+                }
+
+                $profitsData = self::calcuProfits($playway, $codes, $kjData, $single);
+
+                $bouns = $profitsData['bouns'];
+                $profits = $bouns - $BettingRecord['betting_money'];
+                $zjResult = $profitsData['zjResult'];
+
+                $updateData = [
+                    'bonus' => $bouns,
+                    'profits' => $profits,
+                    'kj_codes' => $kjData,
+                    'updated_at' => time(),
+                    'status' => 1
+                ];
+                $BettingRecord->setAttributes($updateData);
+                $status = $BettingRecord->save();
+                $logArr = [
+                    'qihao'=>$qihao,
+                    'opRst'=>$status,'playway'=>$playway,'codes'=>$codes,'is_simulate'=>$is_simulate,
+                    'kjData'=>$kjData, 'single'=>$single,'zjResult'=>$zjResult,'bouns'=>$bouns, 'profits'=>$profits,
+                ];
+
+                Tool_Common::log('opSscKjData','INFO','投注记录', $logArr);
+            }catch (\Exception $exception){
+                Tool_Common::log('opSscKjData','ERR','投注记录-处理失败', ['record_id'=>$record_id, 'err_msg'=>$exception->getMessage()]);
+                $rst = ['status'=>302, 'msg'=>$exception->getMessage()];
+            }
         }
 
         return $rst;
@@ -189,8 +204,8 @@ class OpKjService extends BaseService {
 
     /**
      * @desc 计算开奖利润数据 2019-05-04
-     * @param $playway
-     * @param $codes 格式： 01234,01234,56789,56789@01234,01234,56789,X
+     * @param integer $playway
+     * @param string $codes 格式： 01234,01234,56789,56789@01234,01234,56789,X
      * @param string $kjData 格式：3,6,3,3,5
      * @return array
      */

@@ -1308,7 +1308,7 @@ abstract class BetService extends BaseBetService {
    /**
      * @decipion 记录投注记录(条件：已经投注成功)
      * @param $data
-     * @return bool
+     * @return bool|array
      */
     public static function _logRecords($data){
         if(!$data OR !is_array($data)) return false;
@@ -1352,10 +1352,10 @@ abstract class BetService extends BaseBetService {
 
         if(!$rst){
             Tool_Common::log('logRecords', 'INFO', '记录投注表', ['msg'=>$bettingRecords->getErrors()]);
-            return ['status'=>200,'msg'=>current($bettingRecords->getErrors())];
+            return ['status'=>300,'msg'=>current($bettingRecords->getErrors())];
         }
 
-        return $rst;
+        return ['status'=>200, 'data'=>['record_id'=>$bettingRecords->id], 'msg'=>'操作成功'];
     }
 
     /**
@@ -1882,7 +1882,7 @@ abstract class BetService extends BaseBetService {
                 $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
                 //p([$current_qihao, $codes_hz_data]);
                 $isCanBet = SscDataService::isCanBet($plan_id, $current_qihao);
-                if(!empty($isCanBet)){
+                if(!$isCanBet){
                     return ['status'=>301, 'msg'=>'暂时不可以下注'];
                 }
 
@@ -1904,6 +1904,17 @@ abstract class BetService extends BaseBetService {
                 if ($is_test == 1 or $plan->uid == 1) { # 模拟下注
                     $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
                     $rst['data'][$plan_id] = ['rst'=>$insertRst, 'qihao'=>$current_qihao];
+                }
+                if($insertRst['status'] == 200){
+                    # 下注完、处理开奖
+                    $record_id = $insertRst['data']['record_id'];
+                    $opKjRst = OpKjService::opOneBettingRecord($record_id);
+                    $rst['data'][$record_id]['opKjRst'] = $opKjRst;
+
+                    if($opKjRst['status'] == 200){
+                        $opHandlePlanRst = SscDataService::handleOnePlanStatic($plan_id, $current_qihao);
+                        $rst['data'][$record_id]['opHandlePlanRst'] = $opHandlePlanRst;
+                    }
                 }
             }
         }
