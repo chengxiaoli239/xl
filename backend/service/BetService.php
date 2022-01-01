@@ -1187,7 +1187,7 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
-     * @desc 获取计划是否投注为真实
+     * @desc 获取计划是否可以真实投注
      * @param string $plan_id
      * @return bool 0不中奖1中奖 -1最初添加计划未投注，可当作未中奖，等同于0
      */
