@@ -1886,7 +1886,7 @@ abstract class BetService extends BaseBetService {
                     $before_record = BettingRecords::findOne(['qihao'=>$beforeQihao, 'plan_id'=>$plan_id]);
                     $isCanBet = SscDataService::isCanBet($plan_id, $current_qihao);
                     if(!empty($before_record) && !$isCanBet){
-                        Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟', ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'beforeQihao'=>$beforeQihao, 'rst'=>'暂时不可以下注']);
+                        Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-00', ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'beforeQihao'=>$beforeQihao, 'rst'=>'暂时不可以下注']);
                         return ['status'=>301, 'msg'=>'暂时不可以下注'];
                     }
 
@@ -1907,9 +1907,9 @@ abstract class BetService extends BaseBetService {
 
                     if ($is_test == 1 or $plan->uid == 1) { # 模拟下注
                         $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
-                        $rst['data'][$plan_id] = ['rst'=>$insertRst, 'qihao'=>$current_qihao];
+                        $rst['data'][$plan_id]['logRecord_rst'] = ['rst'=>$insertRst, 'qihao'=>$current_qihao];
                     }
-                    Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '计划模拟', ['plan_id'=>$plan_id, 'rst'=>$rst]);
+                    Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '计划模拟-1', ['plan_id'=>$plan_id, 'rst'=>$rst]);
                     if($insertRst['status'] == 200){
                         # 下注完、处理开奖
                         $record_id = $insertRst['data']['record_id'];
@@ -1918,7 +1918,7 @@ abstract class BetService extends BaseBetService {
 
                         if($opKjRst['status'] == 200){
                             $opHandlePlanRst = SscDataService::handleOnePlanStatic($plan_id, $current_qihao);
-                            $rst['data'][$record_id]['opHandlePlanRst'] = $opHandlePlanRst;
+                            $rst['data'][$plan_id]['opHandlePlanRst'] = $opHandlePlanRst;
                         }
                     }
                 }catch (\Exception $exception){
