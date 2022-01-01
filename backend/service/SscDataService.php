@@ -3725,7 +3725,7 @@ class SscDataService extends BaseService {
     public static function openOnePlanBetStatus($plan_id, $current_qihao){
         $m = \Yii::$app->cache;
         $mkey = self::buildOnePlanBetKey($plan_id, $current_qihao);
-        $flag = $m->set($mkey, 1, 300);
+        $flag = $m->set($mkey, 1, 7*86400);
 
         return (boolean)$flag;
     }
