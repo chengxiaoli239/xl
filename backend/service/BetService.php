@@ -1867,54 +1867,60 @@ abstract class BetService extends BaseBetService {
 
             $plans = UserSysPlans::find()->where($where)->all();
             if (empty($plans)) {
-                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['lottery_type' => $lottery_type, 'msg' => '没有开启的计划', 'uid' => $plans[0]->uid]);
+                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['uid'=>$uid,'lottery_type' => $lottery_type, 'msg' => '没有开启的计划', 'uid' => $plans[0]->uid]);
                 continue;
             }
             foreach ($plans as $plan) {
-                $lottery_type = $plan->lottery_type;
-                $plan_id = $plan->id;
-                $codes_hz_data = json_decode($plan->hz_Arr, true);
-                $filter_poses = $codes_hz_data['filters']['filter_poses'];
-                $x_poses = array_diff(NumService::$ALL_POSES, $filter_poses);
-                foreach ($x_poses as $x_pos){
-                    $codes_hz_data['p'.$x_pos] = 'X';
-                }
-                $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
-                //p([$current_qihao, $codes_hz_data]);
-                $isCanBet = SscDataService::isCanBet($plan_id, $current_qihao);
-                if(!$isCanBet){
-                    return ['status'=>301, 'msg'=>'暂时不可以下注'];
-                }
-
-                # 4、投注号码 codes
-                $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);
-                $is_test = $plan->is_test;
-                $sn = BetService::$test_true_sn;
-                $snid = BetService::$test_true_snid;
-                if (in_array($plan->plan_type, [6, 8, 9])) { # 6中则投 8、9遗漏多少期投
-                    $flag = BetService::getIsBetTrue($plan->id);
-                    if (in_array($flag, [0, -1]) && $isAuto == 1) {
-                        $is_test = 1;
-                        $sn = 'istest';
-                        $snid = 'istest_id';
+                try {
+                    $lottery_type = $plan->lottery_type;
+                    $plan_id = $plan->id;
+                    $codes_hz_data = json_decode($plan->hz_Arr, true);
+                    $filter_poses = $codes_hz_data['filters']['filter_poses'];
+                    $x_poses = array_diff(NumService::$ALL_POSES, $filter_poses);
+                    foreach ($x_poses as $x_pos){
+                        $codes_hz_data['p'.$x_pos] = 'X';
                     }
-                }
-                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '投注号码', ['flag'=>$flag, 'qihao'=>$current_qihao, 'plan_id'=>$plan_id]);
-
-                if ($is_test == 1 or $plan->uid == 1) { # 模拟下注
-                    $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
-                    $rst['data'][$plan_id] = ['rst'=>$insertRst, 'qihao'=>$current_qihao];
-                }
-                if($insertRst['status'] == 200){
-                    # 下注完、处理开奖
-                    $record_id = $insertRst['data']['record_id'];
-                    $opKjRst = OpKjService::opOneBettingRecord($record_id);
-                    $rst['data'][$record_id]['opKjRst'] = $opKjRst;
-
-                    if($opKjRst['status'] == 200){
-                        $opHandlePlanRst = SscDataService::handleOnePlanStatic($plan_id, $current_qihao);
-                        $rst['data'][$record_id]['opHandlePlanRst'] = $opHandlePlanRst;
+                    $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
+                    //p([$current_qihao, $codes_hz_data]);
+                    $isCanBet = SscDataService::isCanBet($plan_id, $current_qihao);
+                    if(!$isCanBet){
+                        Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟', ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'rst'=>'暂时不可以下注']);
+                        return ['status'=>301, 'msg'=>'暂时不可以下注'];
                     }
+
+                    # 4、投注号码 codes
+                    $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);
+                    $is_test = $plan->is_test;
+                    $sn = BetService::$test_true_sn;
+                    $snid = BetService::$test_true_snid;
+                    if (in_array($plan->plan_type, [6, 8, 9])) { # 6中则投 8、9遗漏多少期投
+                        $flag = BetService::getIsBetTrue($plan->id);
+                        if (in_array($flag, [0, -1]) && $isAuto == 1) {
+                            $is_test = 1;
+                            $sn = 'istest';
+                            $snid = 'istest_id';
+                        }
+                    }
+                    Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '投注号码', ['flag'=>$flag, 'qihao'=>$current_qihao, 'plan_id'=>$plan_id]);
+
+                    if ($is_test == 1 or $plan->uid == 1) { # 模拟下注
+                        $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
+                        $rst['data'][$plan_id] = ['rst'=>$insertRst, 'qihao'=>$current_qihao];
+                    }
+                    Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '计划模拟', ['plan_id'=>$plan_id, 'rst'=>$rst]);
+                    if($insertRst['status'] == 200){
+                        # 下注完、处理开奖
+                        $record_id = $insertRst['data']['record_id'];
+                        $opKjRst = OpKjService::opOneBettingRecord($record_id);
+                        $rst['data'][$record_id]['opKjRst'] = $opKjRst;
+
+                        if($opKjRst['status'] == 200){
+                            $opHandlePlanRst = SscDataService::handleOnePlanStatic($plan_id, $current_qihao);
+                            $rst['data'][$record_id]['opHandlePlanRst'] = $opHandlePlanRst;
+                        }
+                    }
+                }catch (\Exception $exception){
+                    Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟失败', ['plan_id'=>$plan_id, 'err_msg'=>$exception->getMessage()]);
                 }
             }
         }
