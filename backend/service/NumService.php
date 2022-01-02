@@ -2727,8 +2727,9 @@ class NumService extends BaseService {
             $SscKjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->one();
             if(!empty($SscKjData->qihao)){
                 $current_qihao = $SscKjData->qihao;
-            }
-            if(empty($current_qihao)){
+            }elseif($r = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one()){
+                $current_qihao = HN0898Service::getQihao($lottery_type); # 针对哪一期过滤，默认为：当前期号
+            }elseif(empty($current_qihao)){
                 $codes_hz_datas = json_decode($plan->hz_Arr, true);
                 $current_qihao = $codes_hz_datas['filters']['start_qihao'] ? : NumService::getQihaoByDaysBefore($codes_hz_datas['filters']['test_period_days'], $lottery_type);
             }
