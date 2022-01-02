@@ -1875,6 +1875,7 @@ abstract class BetService extends BaseBetService {
                 continue;
             }
             foreach ($plans as $plan) {
+                $rst = ['status'=>200, 'data'=>['plan_id'=>$plan->id], 'msg'=>'操作成功'];
                 try {
                     $lottery_type = $plan->lottery_type;
                     $plan_id = $plan->id;
