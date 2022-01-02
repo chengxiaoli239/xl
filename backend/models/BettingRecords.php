@@ -29,6 +29,7 @@ use Yii;
  * @property int $plan_id 计划id
  * @property int $buy_type 购买方向:0反买1正买
  * @property int $is_simulate 是否模拟投注
+ * @property int $is_batch_simulate 是否批量模拟投注
  * @property int $order_type 订单来源：1跟投订单 2大数据订单 3系统计划订单
  * @property int $tz_system_id 投注系统tz_systems.id
  * @property string $lotteryclass 彩种
@@ -57,7 +58,7 @@ class BettingRecords extends \common\models\base\BaseModel
     {
         return [
             [['codes', 'snid', 'post_desc'], 'string'],
-            [['uid', 'member_id', 'playway', 'tz_type', 'status', 'cancel_status', 'plan_id', 'buy_type', 'is_simulate', 'order_type', 'tz_system_id', 'lottery_type', 'is_profits_record', 'createtime', 'updated_at', 'created_at'], 'integer'],
+            [['uid', 'member_id', 'playway', 'tz_type', 'status', 'cancel_status', 'plan_id', 'buy_type', 'is_simulate', 'is_batch_simulate', 'order_type', 'tz_system_id', 'lottery_type', 'is_profits_record', 'createtime', 'updated_at', 'created_at'], 'integer'],
             [['betting_money', 'bonus', 'single', 'profits'], 'number'],
             [['account', 'sn'], 'string', 'max' => 255],
             [['playway_name', 'create_time'], 'string', 'max' => 32],
@@ -96,6 +97,7 @@ class BettingRecords extends \common\models\base\BaseModel
             'plan_id' => '计划id',
             'buy_type' => '购买方向:0反买1正买',
             'is_simulate' => '是否模拟投注',
+            'is_batch_simulate' => '是否批量模拟',
             'order_type' => '订单来源：1跟投订单 2大数据订单 3系统计划订单',
             'tz_system_id' => '投注系统tz_systems.id',
             'lotteryclass' => '彩种',

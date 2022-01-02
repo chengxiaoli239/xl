@@ -1332,6 +1332,7 @@ abstract class BetService extends BaseBetService {
             'lottery_type'=> $data['lottery_type'],  // 彩种
             'lotteryclass'=> 'ssc',  // 彩种
             'is_simulate' => $data['is_simulate'],  // 是否模拟投注
+            'is_batch_simulate' => $data['is_batch_simulate'] ? 1 : 0,  // 是否模拟投注
             'position' => $data['position'],  // 是否模拟投注
             'order_type' => $data['order_type'],  // 订单来源
             'bonus' => 0.00,  // 奖金
@@ -1682,14 +1683,16 @@ abstract class BetService extends BaseBetService {
         return $lotteries[$playway];
     }
 
-
     /**
      * @desc 记录投注记录
      * @param $plan_id
      * @param $qihao
      * @param $codes
      * @param int $lottery_type
-     * @return bool
+     * @param int $is_test 0正常1测试2批量模拟
+     * @param string $sn
+     * @param string $snid
+     * @return array|bool
      */
     public static function _logRecordsByPlandId($plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test = 0, $sn='888888', $snid='888888id'){
         //p([$plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test, $sn, $snid],0);
@@ -1717,7 +1720,8 @@ abstract class BetService extends BaseBetService {
             'sn'=>$sn ? $sn : BetService::$test_true_sn,
             'snid'=>$snid ? $snid : BetService::$test_true_snid,
             'order_type'=>$UserSysPlans->playway, # 单双三字定
-            'is_simulate' => $is_test,  // 是否模拟投注
+            'is_simulate' => $is_test ? 1 : 0,  // 是否模拟投注
+            'is_batch_simulate' => ($is_test==2) ? 1 : 0,  // 是否批量模拟
             'single' => $UserSysPlans->single,  // 投注倍数
             'betting_money'=> $totalmoney,  // 投注金额
         ];
@@ -1906,7 +1910,7 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '投注号码', ['flag'=>$flag, 'qihao'=>$current_qihao, 'plan_id'=>$plan_id]);
 
                     if ($is_test == 1 or $plan->uid == 1) { # 模拟下注
-                        $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
+                        $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, 2, $sn, $snid); # 直接记录表
                         $rst['data'][$plan_id]['logRecord_rst'] = ['rst'=>$insertRst, 'qihao'=>$current_qihao];
                     }
                     Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '计划模拟-1', ['plan_id'=>$plan_id, 'rst'=>$rst]);
