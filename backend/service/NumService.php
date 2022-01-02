@@ -1894,6 +1894,11 @@ class NumService extends BaseService {
             }
         }
 
+        # 批量模拟过滤
+        if(isset($hz_Arr['filters']['filter_type']) && $hz_Arr['filters']['filter_type']){
+            $desc .= '过滤同位前'.(int)$hz_Arr['filters']['filter_nums'].'期，模拟最近'.(int)$hz_Arr['filters']['test_period_days'].'天数据 ';
+        }
+
         return $desc;
     }
 

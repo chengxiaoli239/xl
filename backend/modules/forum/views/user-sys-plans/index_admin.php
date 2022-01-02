@@ -177,6 +177,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => function($model) {
                                 if(\backend\service\BaseService::is_json($model->hz_Arr) OR in_array($model->tz_type, [18, 19, 20, 25, 27, 28, 29, 30, 31, 32, 33, 34, 17,36,37])){
                                     $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
+                                    $desc_str = $str;
                                     if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                         $str .= \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
                                     }
@@ -184,7 +185,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $str = $model->hz_Arr;
                                 }
                                 $txt = BaseStringHelper::truncate($str,20);
-                                $str = Html::a($txt, 'javascript:;', ['title' => $str,'alt'=>$str]);
+                                $desc_str .= '翻倍：'.$model->singles;
+                                $str = Html::a($txt, 'javascript:;', ['title' => $str,'alt'=>$desc_str, 'class'=>'act-desc']);
                                 if($model->singles && in_array($model->plan_type,[2, 3, 4, 5, 9, 10])){
                                     $str .= '翻倍梯度:'.BaseStringHelper::truncate($model->singles, 30);
                                 }
@@ -240,6 +242,33 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
+<!--提示框-start-->
+<div class="modal fade " id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
+    <div class="modal-dialog modal-lg" role="document" style="width: 800px;margin: 100px auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_title">信息提示：</h4>
+            </div>
+            <div class="modal-body">
+                <form id="tip_form_msg" style="display:block; width:100%;height: 560px;overflow-y: scroll">
+                    <strong>计划描述：</strong>
+                    <pre><code id="rst_code"></code></pre>
+                    <strong>计划内容：</strong>
+                    <pre><code id="push_content"></code></pre>
+                </form>
+            </div>
+            <!--div class="form-group down-reason">
+                <p><label>备注信息:</label><input class="form-control" id="message" name="message" /></p>
+            </div-->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" data-type="" id="confirm_ms">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
 $(function () {
@@ -277,4 +306,21 @@ $(function () {
         if(id != null) openBetStatus(id)
     });
 })
+</script>
+<!--提示框-end-->
+<script>
+$(function () {
+    //$("[id^='act-post-desc']").click(function (rst) {
+    $(".act-desc").click(function (rst) {
+        bet_rst = $(this).attr('alt');
+        content = $(this).attr('title');
+
+        push_desc = {"描述":bet_rst}
+        push_content = {"desc":bet_rst, "detail":content};
+        $('#rst_code').text(JSON.stringify(push_desc, null,' '))
+        $('#push_content').text(JSON.stringify(push_content,null,' '))
+
+        $('#exampleModal_msg').modal('show');
+    });
+});
 </script>
