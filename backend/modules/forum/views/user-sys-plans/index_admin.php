@@ -186,7 +186,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                                 $txt = BaseStringHelper::truncate($str,20);
                                 $desc_str .= '翻倍：'.$model->singles;
-                                $str = Html::a($txt, 'javascript:;', ['title' => $str,'alt'=>$desc_str, 'class'=>'act-desc']);
+                                $str = Html::a($txt, 'javascript:;', ['title' => $str,'alt'=>$desc_str, 'class'=>'act-desc', 'current_profits'=>round($model->current_profits, 2)]);
                                 if($model->singles && in_array($model->plan_type,[2, 3, 4, 5, 9, 10])){
                                     $str .= '翻倍梯度:'.BaseStringHelper::truncate($model->singles, 30);
                                 }
@@ -314,8 +314,9 @@ $(function () {
     $(".act-desc").click(function (rst) {
         bet_rst = $(this).attr('alt');
         content = $(this).attr('title');
+        current_profits = $(this).attr('current_profits');
 
-        push_desc = {"描述":bet_rst}
+        push_desc = {"描述":bet_rst, "当前盈利":current_profits}
         push_content = {"desc":bet_rst, "detail":content};
         $('#rst_code').text(JSON.stringify(push_desc, null,' '))
         $('#push_content').text(JSON.stringify(push_content,null,' '))
