@@ -28,7 +28,7 @@ class OpKjService extends BaseService {
 
         $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
 
-        $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type])->orderBy('id DESC')->limit(50)->all();
+        $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type, 'is_batch_simulate'=>0])->orderBy('id DESC')->limit(50)->all();
         if(!$bettingRecords) return $rst;
         foreach ($bettingRecords as $BettingRecord){
             $rst['data'][$BettingRecord->id] = OpKjService::opOneBettingRecord($BettingRecord->id, $BettingRecord);
