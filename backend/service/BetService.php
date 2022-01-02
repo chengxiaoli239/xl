@@ -1889,7 +1889,7 @@ abstract class BetService extends BaseBetService {
                     $beforeQihao = KjDataGet::getBeforeQihaoByQihao($current_qihao, $lottery_type);
                     $before_record = BettingRecords::findOne(['qihao'=>$beforeQihao, 'plan_id'=>$plan_id]);
                     if(!empty($before_record) && $before_record->status==0){
-                        return BetService::opOneBettingRecordAndHandlePlanStatic($before_record->id, $plan_id, $current_qihao, $rst);
+                        return BetService::opOneBettingRecordAndHandlePlanStatic($before_record->id, $plan_id, $beforeQihao, $rst);
                     }
 
                     $isCanBet = SscDataService::isCanBet($plan_id, $current_qihao);
