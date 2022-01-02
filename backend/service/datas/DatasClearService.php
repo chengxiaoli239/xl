@@ -24,7 +24,12 @@ class DatasClearService extends BaseService{
                 $delete_sql = 'DELETE FROM {{%betting_records}} WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
                 $rst_delete = $db->createCommand($delete_sql)->execute();
 
-                $logArr = ['lottery_type'=>$lottery_type, 'count_sql'=>$count_sql, 'rst_count'=>$rst_count, 'delete_sql'=>$delete_sql, 'rst_delete'=>$rst_delete];
+                $task_count_sql = 'SELECT COUNT(id) FROM {{%bet_error_plans_task}} WHERE updated_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
+                $rst_task_count = $db->createCommand($task_count_sql)->queryScalar();
+                $task_delete_sql = 'DELETE FROM {{%bet_error_plans_task}} WHERE updated_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
+                $rst_task_delete = $db->createCommand($task_delete_sql)->execute();
+
+                $logArr = ['lottery_type'=>$lottery_type, 'count_sql'=>$count_sql, 'rst_count'=>$rst_count, 'delete_sql'=>$delete_sql, 'rst_delete'=>$rst_delete, 'rst_task_count'=>$rst_task_count, 'rst_task_delete'=>$rst_task_delete];
                 Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '清理数据', $logArr);
             }catch (\Exception $exception){
                 Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '清理数据', ['lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
