@@ -1862,6 +1862,7 @@ abstract class BetService extends BaseBetService {
             return ['status'=>300, 'msg'=>'有正在执行的任务,请稍后...'];
         }
         $m->set($mkey, 1, 15);
+        $RedisLock = new RedisLock();
 
         foreach ($lottery_types as $lottery_type) {
             $where = ['AND', ['=', 'status', 1], ['=', 'is_batch_simulate', 1], ['=', 'lottery_type', $lottery_type]]; # is_batch_simulate:0正常1批量模拟历史记录
@@ -1886,6 +1887,11 @@ abstract class BetService extends BaseBetService {
                         $codes_hz_data['p'.$x_pos] = 'X';
                     }
                     $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
+                    $mkey_current = 'getPlanBetCurrentQihao_'.$current_qihao;
+                    if(!$RedisLock->lock($mkey_current.'_redis', 60)){
+                        return ['status'=>304, 'msg'=>'频繁请求缓存60秒'];
+                    }
+
                     //p([$current_qihao, $codes_hz_data]);
                     $beforeQihao = KjDataGet::getBeforeQihaoByQihao($current_qihao, $lottery_type);
                     $before_record = BettingRecords::findOne(['qihao'=>$beforeQihao, 'plan_id'=>$plan_id]);
