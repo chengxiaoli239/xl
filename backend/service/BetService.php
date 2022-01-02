@@ -1888,8 +1888,12 @@ abstract class BetService extends BaseBetService {
                     //p([$current_qihao, $codes_hz_data]);
                     $beforeQihao = KjDataGet::getBeforeQihaoByQihao($current_qihao, $lottery_type);
                     $before_record = BettingRecords::findOne(['qihao'=>$beforeQihao, 'plan_id'=>$plan_id]);
+                    if(!empty($before_record) && $before_record->status==0){
+                        return BetService::opOneBettingRecordAndHandlePlanStatic($before_record->id, $plan_id, $current_qihao, $rst);
+                    }
+
                     $isCanBet = SscDataService::isCanBet($plan_id, $current_qihao);
-                    if(!empty($before_record) && $before_record->status==0 && !$isCanBet){
+                    if(!$isCanBet){
                         Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-00', ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'beforeQihao'=>$beforeQihao, 'isCanBet'=>$isCanBet, 'before_record'=>!empty($before_record), 'rst'=>'暂时不可以下注']);
                         return ['status'=>301, 'msg'=>'暂时不可以下注'];
                     }
@@ -1915,15 +1919,7 @@ abstract class BetService extends BaseBetService {
                     }
                     Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '计划模拟-1', ['plan_id'=>$plan_id, 'rst'=>$rst]);
                     if($insertRst['status'] == 200){
-                        # 下注完、处理开奖
-                        $record_id = $insertRst['data']['record_id'];
-                        $opKjRst = OpKjService::opOneBettingRecord($record_id);
-                        $rst['data'][$record_id]['opKjRst'] = $opKjRst;
-
-                        if($opKjRst['status'] == 200){
-                            $opHandlePlanRst = SscDataService::handleOnePlanStatic($plan_id, $current_qihao);
-                            $rst['data'][$plan_id]['opHandlePlanRst'] = $opHandlePlanRst;
-                        }
+                        BetService::opOneBettingRecordAndHandlePlanStatic($insertRst, $plan_id, $current_qihao, $rst); # 处理开奖和计划相关
                     }
                 }catch (\Exception $exception){
                     Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟失败', ['plan_id'=>$plan_id, 'err_msg'=>$exception->getMessage()]);
@@ -1933,6 +1929,28 @@ abstract class BetService extends BaseBetService {
         $m->delete($mkey);
 
         return $rst;
+    }
+
+    /**
+     * @desc 处理开奖和计划相关
+     * @param array $insertRst
+     * @param string $plan_id
+     * @param $qihao
+     * @param array $rst
+     * @return bool
+     */
+    public static function opOneBettingRecordAndHandlePlanStatic($record_id, $plan_id='', $qihao='', &$rst=[]){
+        # 下注完、处理开奖
+        if(!$record_id) return false;
+        $opKjRst = OpKjService::opOneBettingRecord($record_id);
+        $rst['data'][$plan_id]['opKjRst'] = $opKjRst;
+
+        if($opKjRst['status'] == 200){
+            $opHandlePlanRst = SscDataService::handleOnePlanStatic($plan_id, $qihao);
+            $rst['data'][$plan_id]['opHandlePlanRst'] = $opHandlePlanRst;
+        }
+
+        return true;
     }
 
     /**
