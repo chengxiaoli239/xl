@@ -1890,7 +1890,7 @@ abstract class BetService extends BaseBetService {
                     $mkey_current = 'getPlanBetCurrentQihao_'.$plan_id.'_'.$current_qihao;
                     if(!$RedisLock->lock($mkey_current.'_redis', 60)){
                         $logArr = ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'err_msg'=>'频繁请求，缓存60秒'];
-                        Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-00', $logArr);
+                        //Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-00', $logArr);
                         continue;
                     }
 
