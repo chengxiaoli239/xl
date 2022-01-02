@@ -3069,7 +3069,7 @@ class SscDataService extends BaseService {
                 $logArr['plan_1_3_5'][$UserSysPlan->id]['err_msg'] = $UserSysPlan->getErrors();
                 Tool_Common::log('/statics/'.__FUNCTION__.'_err', 'ERR', '单计划-利润统计-错误1', ['plan_id'=>$plan_id, 'err_msg'=>$UserSysPlan->getErrors()]);
             }
-            $rst = ['status'=>200, 'data'=>['plan_id'=>$plan_id, 'updateRst'=>$saveFlag], 'msg'=>'操作成功'];
+            $rst = ['status'=>200, 'data'=>['plan_id'=>$plan_id, 'profits'=>$profits, 'updateRst'=>$saveFlag], 'msg'=>'操作成功'];
             # 1、利润计算 end
         }catch (\Exception $exception){
             Tool_Common::log('/statics/'.__FUNCTION__.'_err', 'ERR', '单计划-利润统计-错误2', ['plan_id'=>$plan_id, 'err_msg'=>$exception->getMessage()]);
