@@ -1889,7 +1889,9 @@ abstract class BetService extends BaseBetService {
                     $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
                     $mkey_current = 'getPlanBetCurrentQihao_'.$plan_id.'_'.$current_qihao;
                     if(!$RedisLock->lock($mkey_current.'_redis', 60)){
-                        return ['status'=>304, 'data'=>['plan_id'=>$plan_id], 'msg'=>'频繁请求缓存60秒'];
+                        $logArr = ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'err_msg'=>'频繁请求，缓存60秒'];
+                        Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-00', $logArr);
+                        continue;
                     }
 
                     //p([$current_qihao, $codes_hz_data]);
@@ -1901,8 +1903,9 @@ abstract class BetService extends BaseBetService {
 
                     $isCanBet = SscDataService::isCanBet($plan_id, $current_qihao);
                     if(!empty($before_record) && $before_record->status!=1 && !$isCanBet){
-                        Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-00', ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'beforeQihao'=>$beforeQihao, 'isCanBet'=>$isCanBet, 'before_record'=>!empty($before_record), 'rst'=>'暂时不可以下注']);
-                        return ['status'=>301, 'msg'=>'暂时不可以下注'];
+                        $logArr = ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'beforeQihao'=>$beforeQihao, 'isCanBet'=>$isCanBet, 'before_record'=>!empty($before_record), 'err_msg'=>'暂时不可以下注'];
+                        Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-01', ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'beforeQihao'=>$beforeQihao, 'isCanBet'=>$isCanBet, 'before_record'=>!empty($before_record), 'rst'=>'暂时不可以下注']);
+                        continue;
                     }
 
                     # 4、投注号码 codes
