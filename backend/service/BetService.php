@@ -1887,9 +1887,9 @@ abstract class BetService extends BaseBetService {
                         $codes_hz_data['p'.$x_pos] = 'X';
                     }
                     $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
-                    $mkey_current = 'getPlanBetCurrentQihao_'.$current_qihao;
+                    $mkey_current = 'getPlanBetCurrentQihao_'.$plan_id.'_'.$current_qihao;
                     if(!$RedisLock->lock($mkey_current.'_redis', 60)){
-                        return ['status'=>304, 'msg'=>'频繁请求缓存60秒'];
+                        return ['status'=>304, 'data'=>['plan_id'=>$plan_id], 'msg'=>'频繁请求缓存60秒'];
                     }
 
                     //p([$current_qihao, $codes_hz_data]);
