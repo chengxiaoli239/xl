@@ -1861,7 +1861,7 @@ abstract class BetService extends BaseBetService {
         if($flag){
             return ['status'=>300, 'msg'=>'有正在执行的任务,请稍后...'];
         }
-        $m->set($mkey, 1, 10);
+        $m->set($mkey, 1, 30);
 
         foreach ($lottery_types as $lottery_type) {
             $where = ['AND', ['=', 'status', 1], ['=', 'is_batch_simulate', 1], ['=', 'lottery_type', $lottery_type]]; # is_batch_simulate:0正常1批量模拟历史记录
@@ -1890,7 +1890,7 @@ abstract class BetService extends BaseBetService {
                     $before_record = BettingRecords::findOne(['qihao'=>$beforeQihao, 'plan_id'=>$plan_id]);
                     $isCanBet = SscDataService::isCanBet($plan_id, $current_qihao);
                     if(!empty($before_record) && !$isCanBet){
-                        Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-00', ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'beforeQihao'=>$beforeQihao, 'rst'=>'暂时不可以下注']);
+                        Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-00', ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'beforeQihao'=>$beforeQihao, 'isCanBet'=>$isCanBet, 'before_record'=>!empty($before_record), 'rst'=>'暂时不可以下注']);
                         return ['status'=>301, 'msg'=>'暂时不可以下注'];
                     }
 
