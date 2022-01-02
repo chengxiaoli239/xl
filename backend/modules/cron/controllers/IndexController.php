@@ -281,8 +281,8 @@ class IndexController extends Controller
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $post = \Yii::$app->request->post();
 
-        for ($i=0; $i<30; $i++){
-            for ($i=0; $i<2500; $i++){
+        for ($i=0; $i<10; $i++){
+            for ($i=0; $i<2000; $i++){
                 $batch_simulate_data = BetService::batchSimulateBet($post['lottery_types'], $post['uid']);
                 $rst['batch_simulate_data'] = $batch_simulate_data;
                 Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '批量模拟下注', ['uid'=>$post['uid'], 'batch_simulate_data'=>$batch_simulate_data]);
