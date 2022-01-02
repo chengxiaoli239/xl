@@ -1904,7 +1904,7 @@ abstract class BetService extends BaseBetService {
                     $isCanBet = SscDataService::isCanBet($plan_id, $current_qihao);
                     if(!empty($before_record) && $before_record->status!=1 && !$isCanBet){
                         $logArr = ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'beforeQihao'=>$beforeQihao, 'isCanBet'=>$isCanBet, 'before_record'=>!empty($before_record), 'err_msg'=>'暂时不可以下注'];
-                        Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-01', ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'beforeQihao'=>$beforeQihao, 'isCanBet'=>$isCanBet, 'before_record'=>!empty($before_record), 'rst'=>'暂时不可以下注']);
+                        Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-01', $logArr);
                         continue;
                     }
 
