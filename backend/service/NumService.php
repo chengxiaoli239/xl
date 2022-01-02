@@ -1896,7 +1896,9 @@ class NumService extends BaseService {
 
         # 批量模拟过滤
         if(isset($hz_Arr['filters']['filter_type']) && $hz_Arr['filters']['filter_type']){
-            $desc .= '过滤同位前'.(int)$hz_Arr['filters']['filter_nums'].'期，模拟最近'.(int)$hz_Arr['filters']['test_period_days'].'天数据 ';
+            $filters_data = $hz_Arr['filters'];
+            $filter_poses = $filters_data['filter_poses'] ? : [1,2,3,4];
+            $desc .= '过滤同位前'.(int)$filters_data['filter_nums'].'期，过滤位置：'.implode(',',$filter_poses).'，模拟最近'.(int)$filters_data['test_period_days'].'天数据 ';
         }
 
         return $desc;
