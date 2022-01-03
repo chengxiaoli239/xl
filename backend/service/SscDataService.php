@@ -3122,6 +3122,7 @@ class SscDataService extends BaseService {
                 }elseif(in_array($UserSysPlan->plan_type, [10])) { # plan_type:中则倍投，不中则回第一个倍数
                     $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                 }
+                $history_max_miss = (int)$codes_hz['history_max_miss'];
             }else{ # 不中奖
                 $history_max_miss = $codes_hz['history_max_miss']?(int)$codes_hz['history_max_miss']:1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
                 if(in_array($UserSysPlan->plan_type, [9])) { # 遗漏倍投
