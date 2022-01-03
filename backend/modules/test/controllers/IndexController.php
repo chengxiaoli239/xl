@@ -257,6 +257,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $pos = [1,2,3];
+        $pos_to_desc = NumService::$pos_to_desc;
+        p($pos_to_desc);
         $current_qihao = NumService::getPlanBetCurrentQihao($plan_id='571', $lottery_type=8);p($current_qihao);
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao='20211215286', $lottery_type=8);p($next_qihao);
         $qihao = NumService::getQihaoByDaysBefore($test_period_days=7, $lottery_type=8);p($qihao);

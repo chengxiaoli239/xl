@@ -28,6 +28,8 @@ class NumService extends BaseService {
         3 => 4,
     ];
 
+    public static $pos_to_desc = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
+
     /**
      * @description 根据开奖号码返回三字现
      * @param $codes 格式：3,5,6,2
@@ -1898,10 +1900,23 @@ class NumService extends BaseService {
         if(isset($hz_Arr['filters']['filter_type']) && $hz_Arr['filters']['filter_type']){
             $filters_data = $hz_Arr['filters'];
             $filter_poses = $filters_data['filter_poses'] ? : [1,2,3,4];
-            $desc .= '过滤同位前'.(int)$filters_data['filter_nums'].'期，过滤位置：'.implode(',',$filter_poses).'，模拟最近'.(int)$filters_data['test_period_days'].'天数据 ';
+            $desc .= '过滤同位前'.(int)$filters_data['filter_nums'].'期，过滤位置：'.implode(',',NumService::getDescStrByPoses($filter_poses)).'，模拟最近'.(int)$filters_data['test_period_days'].'天数据 ';
         }
 
         return $desc;
+    }
+
+    /**
+     * @desc 位置 -> str
+     * @param $poses
+     * @return array
+     */
+    public static function getDescStrByPoses($poses){
+        $strArr = [];
+        foreach ($poses as $pos){
+            $strArr[] = (NumService::$pos_to_desc)[$pos];
+        }
+        return $strArr;
     }
 
     /**

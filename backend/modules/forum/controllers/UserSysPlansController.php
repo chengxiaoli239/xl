@@ -6,6 +6,7 @@ use backend\models\ImportPlanCodes;
 use backend\models\TzSystemsAuth;
 use backend\service\BetService;
 use backend\service\HN0898Service;
+use backend\service\NumService;
 use backend\service\StaticService;
 use backend\service\TzService;
 use backend\service\UserService;
@@ -150,8 +151,8 @@ class UserSysPlansController extends BaseController
         $model->start_qihao = HN0898Service::getQihao($queryParams['lottery_type']);
 
         $is_filters = [1=>'是'];
-        $filter_pos1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
-        $filter_pos2 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
+        $filter_pos1 = NumService::$pos_to_desc;
+        $filter_pos2 = NumService::$pos_to_desc;
         $data =  [
             'model' => $model,
             'tz_type' => $tz_type,
@@ -290,8 +291,8 @@ class UserSysPlansController extends BaseController
         $plan_types = TzService::getTzPlanTypes();
 
         $is_filters = [1=>'是'];
-        $filter_pos1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
-        $filter_pos2 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
+        $filter_pos1 = NumService::$pos_to_desc;
+        $filter_pos2 = NumService::$pos_to_desc;
         $data =  [
             'model' => $model,
             'tz_type' => $model->tz_type,
@@ -377,8 +378,8 @@ class UserSysPlansController extends BaseController
         $model->tz_sites = userservice::getuserdefaultsite($this->_user_id);
 
         $is_filters = [1=>'是'];
-        $filter_pos1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
-        $filter_pos2 = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
+        $filter_pos1 = NumService::$pos_to_desc;
+        $filter_pos2 = NumService::$pos_to_desc;
         $data =  [
             'model' => $model,
             'tz_type' => $tz_type,
