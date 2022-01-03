@@ -140,6 +140,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $filter_poses; # 过滤位置
     public $start_qihao; # 模拟开始期号
     public $test_period_days; # 模拟近x天
+    public $history_max_miss; # 历史最大遗漏
     ############### 动态过滤 - 模拟 end ####################
     /**
      * @inheritdoc
