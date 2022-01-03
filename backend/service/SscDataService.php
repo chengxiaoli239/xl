@@ -3732,4 +3732,16 @@ class SscDataService extends BaseService {
 
         return (boolean)$flag;
     }
+
+    /**
+     * @desc 获取号码的展示 0,0,0,X@0,0,1,X@0,0,5,X --> 000X,001X,005X
+     * @param string $str
+     * @return mixed|string|string[]
+     */
+    public static function getCodesDesc($str=''){
+
+        $str = str_replace('@', ',',str_replace(',','', $str));
+
+        return $str;
+    }
 }
