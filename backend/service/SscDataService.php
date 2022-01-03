@@ -3123,8 +3123,10 @@ class SscDataService extends BaseService {
                     $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                 }
             }else{ # 不中奖
+                $history_max_miss = $codes_hz['history_max_miss']?:1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
                 if(in_array($UserSysPlan->plan_type, [9])) { # 遗漏倍投
                     $current_miss = $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
+                    $history_max_miss = max($current_miss, $history_max_miss);
                     if ($current_miss <= $codes_hz['bet_while_miss']) {
                         $is_init = 2; # 不中未达到遗漏期数状态
                         $next_single_key = 0;
@@ -3152,6 +3154,7 @@ class SscDataService extends BaseService {
                 $codes_hz['is_init'] = $is_init; # 开奖之后初始标识改成 0
             }
             $codes_hz['singles_key'] = $next_single_key;
+            $codes_hz['history_max_miss'] = $history_max_miss;
             $whereUpdate = ['id'=>$UserSysPlan->id ]; # 更新条件
             $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['whereUpdate'] = $whereUpdate;
 
