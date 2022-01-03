@@ -1861,7 +1861,7 @@ abstract class BetService extends BaseBetService {
         if($flag){
             return ['status'=>300, 'msg'=>'有正在执行的任务,请稍后...'];
         }
-        $m->set($mkey, 1, 15);
+        $m->set($mkey, 1, 10);
         $RedisLock = new RedisLock();
 
         foreach ($lottery_types as $lottery_type) {
