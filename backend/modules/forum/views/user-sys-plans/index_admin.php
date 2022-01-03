@@ -186,7 +186,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                                 $txt = BaseStringHelper::truncate($str,20);
                                 $desc_str .= '翻倍：'.$model->singles;
-                                $str = Html::a($txt, 'javascript:;', ['title' => $str,'alt'=>$desc_str, 'class'=>'act-desc', 'current_profits'=>round($model->current_profits, 2)]);
+                                $str = Html::a($txt, 'javascript:;', ['title' => $str,'alt'=>str_replace(',', '', $desc_str), 'class'=>'act-desc', 'current_profits'=>round($model->current_profits, 2)]);
                                 if($model->singles && in_array($model->plan_type,[2, 3, 4, 5, 9, 10])){
                                     $str .= '翻倍梯度:'.BaseStringHelper::truncate($model->singles, 30);
                                 }
