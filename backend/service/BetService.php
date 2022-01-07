@@ -1838,7 +1838,7 @@ abstract class BetService extends BaseBetService {
 
                     $insertRst = $BetService->postBatchBet($activeQihao, $plan->id, $codes);
                     $rst['data'][$plan->id] = $insertRst;
-                    Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-2', ['plan_id'=>$plan->id, 'activeQihao'=>$activeQihao, 'insertRst'=>$insertRst]);
+                    Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-2', ['uid'=>$uid, 'account'=>$plan->account, 'plan_id'=>$plan->id, 'activeQihao'=>$activeQihao, 'insertRst'=>$insertRst]);
                 }
             }
         }

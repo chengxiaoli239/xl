@@ -257,6 +257,8 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $post = \Yii::$app->request->post();
+        p($post);
         $pos = [1,2,3];
         $pos_to_desc = NumService::$pos_to_desc;
         p($pos_to_desc);
