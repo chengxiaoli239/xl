@@ -1387,6 +1387,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         //$headers = json_decode($row->bet_headers); # 含有cookie，如果是重新登陆 cookie要变动，待处理
         $uid = $row->uid;
         $plan_id = $row->plan_id;
+        $account = $row->account;
         $tz_system_id = $row->tz_system_id;
         $post_data = json_decode($row->post_datas, 320);
         $repeats = []; # 是否有重复号码
@@ -1420,40 +1421,40 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $mkey = 'repeatErrorBet_retry_'.$id;
         $open_retry = $m->get($mkey); # 重试锁开启开关
-        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__,'INFO','幸运-下注节点-2', ['task_id'=>$id, 'plan_id'=>$plan_id]);
+        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__,'INFO','幸运-下注节点-2', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account]);
 
         try {
             $time1 = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 下注请求
             $time11 = microtime(true);
-            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '幸运-下注节点-3', ['task_id'=>$id, 'plan_id'=>$plan_id, 'tmpRst'=>$tmpRst, 'time_consume'=>($time11-$time1).'s', 'slow_seconds'=>$slow_seconds]);
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '幸运-下注节点-3', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst, 'time_consume'=>($time11-$time1).'s', 'slow_seconds'=>$slow_seconds]);
             sleep((int)$slow_seconds); # 下注延迟秒数
             $time2 = microtime(true);
             $status = 0;
-            Tool_Common::log('/repeatErrorBet/xxx', 'INFO', '幸运下注x0', ['task_id'=>$id, 'plan_id'=>$plan_id]);
+            Tool_Common::log('/repeatErrorBet/xxx', 'INFO', '幸运下注x0', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account]);
             $TIME_OUT_RETRY = BetService::getConfig('TIME_OUT_RETRY'); # 超时重复下开关，幸运五
             $m = \Yii::$app->cache;
             $mkey_time_out = self::buildBetTimeOutPlanKey($row->uid, $row->plan_id, $row->bet_sort_key);
-            Tool_Common::log('/repeatErrorBet/xxx', 'INFO', '幸运下注x1', ['task_id'=>$id, 'plan_id'=>$plan_id, 'mkey_time_out'=>$mkey_time_out, 'time_out'=>$TIME_OUT_RETRY, 'is_true'=>(boolean)($tmpRst['Status']==1)]);
+            Tool_Common::log('/repeatErrorBet/xxx', 'INFO', '幸运下注x1', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'mkey_time_out'=>$mkey_time_out, 'time_out'=>$TIME_OUT_RETRY, 'is_true'=>(boolean)($tmpRst['Status']==1)]);
             if($tmpRst['Status'] == 1){
                 $status = 2;
                 $tmpRst['status'] = $status; # 下注成功
                 //# 获取方案号，记录id, 用于撤单
                 $snInfo = self::getSn($row->uid, $row->tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
-                Tool_Common::log('/repeatErrorBet/xxx', 'INFO', '幸运下注x2', ['task_id'=>$id, 'plan_id'=>$plan_id,'Status'=>$tmpRst['Status'], 'snInfo'=>$snInfo, 'tmpRst'=>$tmpRst, 'codes'=>json_decode($row->codes)]);
+                Tool_Common::log('/repeatErrorBet/xxx', 'INFO', '幸运下注x2', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account,'Status'=>$tmpRst['Status'], 'snInfo'=>$snInfo, 'tmpRst'=>$tmpRst, 'codes'=>json_decode($row->codes)]);
                 if(isset($snInfo['snid'])) $snInfo['snid'] = substr($snInfo['snid'],0,20).'...';
                 $snid = '{'.$snInfo['sn'].'}|'.count(json_decode($row->codes)); # 多次下单需要分开，多次撤单
                 $sn = $snInfo['sn'];
                 $tmpRst['snid'] = $snid;
                 $tmpRst['sn'] = $sn;
-                Tool_Common::log('/repeatErrorBet/xxx', 'INFO', '幸运下注x3', ['task_id'=>$id, 'plan_id'=>$plan_id, 'tmpRst'=>$tmpRst, 'repeats'=>$repeats, 'is_repeats'=>(boolean)!empty($repeats)]);
+                Tool_Common::log('/repeatErrorBet/xxx', 'INFO', '幸运下注x3', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst, 'repeats'=>$repeats, 'is_repeats'=>(boolean)!empty($repeats)]);
                 if(!empty($repeats)){
                     $post_data_1 = $post_data;
                     $post_data_1['bet_number'] = implode(',', $repeats);
                     $rst1 = self::postR($uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent); # 重复号码下注请求
                     Tool_Common::log('/bet/repeatErrorBet', 'INFO', '幸运五下注1', [$uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent, $rst1]);
                 }
-                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '幸运-下注节点-4', ['task_id'=>$id, 'plan_id'=>$plan_id, 'tmpRst'=>$tmpRst, 'time_consume'=>($time11-$time1).'s', 'slow_seconds'=>$slow_seconds]);
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '幸运-下注节点-4', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst, 'time_consume'=>($time11-$time1).'s', 'slow_seconds'=>$slow_seconds]);
             }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [309])){
                 $m->set($mkey, 1, 300);
                 //if($TIME_OUT_RETRY && !$open_retry ){
@@ -1462,24 +1463,24 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 }else{
                     $status = 2; # 超时不重复下
                 }
-                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '幸运-下注节点-40', ['task_id'=>$id, 'plan_id'=>$plan_id, 'tmpRst'=>$tmpRst]);
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '幸运-下注节点-40', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst]);
             }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 305, 307])){
                 $status = 3; # 不可再次下注：302余额不足305已关盘307网盘账号停押
-                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '幸运-下注节点-41', ['task_id'=>$id, 'plan_id'=>$plan_id, 'tmpRst'=>$tmpRst]);
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '幸运-下注节点-41', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst]);
             }elseif($tmpRst['data'] == "Proxy Connect Error"){
                 $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key, $id);
                 $m->delete($betKey); # 失败之后可重新下注的情况解锁
-                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '幸运-下注节点-42', ['task_id'=>$id, 'plan_id'=>$plan_id, 'tmpRst'=>$tmpRst, 'key'=>$betKey, 'msg'=>'锁错误打开']);
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '幸运-下注节点-42', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst, 'key'=>$betKey, 'msg'=>'锁错误打开']);
             }else{
                 $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key, $id);
                 $m->delete($betKey); # 失败之后可重新下注的情况解锁
-                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '幸运-下注节点-43', ['task_id'=>$id, 'plan_id'=>$plan_id, 'tmpRst'=>$tmpRst]);
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '幸运-下注节点-43', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst]);
                 return ['status'=>300, 'msg'=>$row->getFirstErrors()];
             }
             if($tmpRst['errno']>0 OR in_array($tmpRst['code'], [309,311])){ # 309,310,311   310有排查是已经换过代理IP,有待排查，为确保
                 $status = 4; # 下注请求超时计划，后续可根据这个状态做是否重复下注处理，
                 $m->set($mkey_time_out, 1, 60);
-                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '幸运-下注节点-44', ['task_id'=>$id, 'plan_id'=>$plan_id, 'tmpRst'=>$tmpRst]);
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '幸运-下注节点-44', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst]);
                 return ['status'=>300, 'msg'=>$row->getFirstErrors()];
             }
 
@@ -1487,20 +1488,20 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $tmpRst['bet_time'] = date('Y-m-d H:i:s');
             $tmpRst['time_consume'] = $time_consume;
             $tmpRst['proxy_ip'] = ProxyBaseService::getCurrentValidProxyIp(); # 获取当前可用的代理IP;
-            $logArr = ['task_id'=>$id, 'uid'=>$uid, 'plan_id'=>$plan_id, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'snInfo'=>$snInfo, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
+            $logArr = ['task_id'=>$id, 'uid'=>$uid, 'plan_id'=>$plan_id, 'account'=>$account, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'snInfo'=>$snInfo, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '幸运-下注节点-5', $logArr);
 
             $row->status = $status;
             $row->post_desc = json_encode($tmpRst, 320);
             $flag = $row->save();
             if(!$flag){
-                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '幸运-下注节点-45', ['task_id'=>$id, 'plan_id'=>$plan_id, 'err_msg'=>$row->getFirstErrors()]);
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '幸运-下注节点-45', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'err_msg'=>$row->getFirstErrors()]);
                 return ['status'=>300, 'msg'=>$row->getFirstErrors()];
             }
             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '幸运-下注节点-6', ['task_id'=>$id, 'plan_id'=>$plan_id, 'msg'=>'任务状态修改成功']);
             $rst['data']['bet_rst'] = $tmpRst;
         }catch (\Exception $exception){
-            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '下注中途错误', ['task_id'=>$id, 'plan_id'=>$plan_id, 'err_msg'=>$exception->getMessage()]);
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '下注中途错误', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'err_msg'=>$exception->getMessage()]);
             $rst['data']['bet_rst'] = ['err_code'=>$exception->getCode(), 'err_msg', $exception->getMessage()];
         }
 

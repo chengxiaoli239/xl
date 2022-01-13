@@ -3,6 +3,7 @@
 namespace backend\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%betting_records}}".
@@ -41,7 +42,7 @@ use Yii;
  * @property int $updated_at 更新时间
  * @property int $created_at 创建时间
  */
-class BettingRecords extends \common\models\base\BaseModel
+class BettingRecords extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -51,23 +52,6 @@ class BettingRecords extends \common\models\base\BaseModel
         return '{{%betting_records}}';
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            [['codes', 'snid', 'post_desc'], 'string'],
-            [['uid', 'member_id', 'playway', 'tz_type', 'status', 'cancel_status', 'plan_id', 'buy_type', 'is_simulate', 'is_batch_simulate', 'order_type', 'tz_system_id', 'lottery_type', 'is_profits_record', 'createtime', 'updated_at', 'created_at'], 'integer'],
-            [['betting_money', 'bonus', 'single', 'profits'], 'number'],
-            [['account', 'sn'], 'string', 'max' => 255],
-            [['playway_name', 'create_time'], 'string', 'max' => 32],
-            [['qihao'], 'string', 'max' => 20],
-            [['kj_codes'], 'string', 'max' => 24],
-            [['position'], 'string', 'max' => 128],
-            [['lotteryclass'], 'string', 'max' => 10],
-        ];
-    }
 
     /**
      * @inheritdoc
@@ -111,12 +95,5 @@ class BettingRecords extends \common\models\base\BaseModel
         ];
     }
 
-    /**
-     * @inheritdoc
-     * @return BettingRecordsQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new BettingRecordsQuery(get_called_class());
-    }
+
 }
