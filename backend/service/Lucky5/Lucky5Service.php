@@ -982,6 +982,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
             'Host: '.self::getTzSiteInfo($tz_system_id,'domain'),
             'Cache-Control: max-age=0',
             'Referer: '.$url,
+            'sec-ch-ua: " Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+            'sec-ch-ua-mobile: ?0',
+            'sec-ch-ua-platform: "Windows"',
+            'Sec-Fetch-Dest: empty',
+            'Sec-Fetch-Mode: cors',
+            'Sec-Fetch-Site: same-origin',
             $TzSystemsUsers->user_agent,
         ];
         $robot7_session_id = self::getSessionId($url, $headers, $uid);
@@ -1257,6 +1263,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
             "Cookie: ".str_replace(';;', ';',trim($TzSystemsUsers->cookie)),
             "Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
+            'sec-ch-ua: " Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+            'sec-ch-ua-mobile: ?0',
+            'sec-ch-ua-platform: "Windows"',
+            'Sec-Fetch-Dest: empty',
+            'Sec-Fetch-Mode: cors',
+            'Sec-Fetch-Site: same-origin',
             "Referer:".$TzSystemsUsers->ssc_domain,
         ];
 
@@ -1293,6 +1305,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
             "Cache-Control:max-age=0",
             "Upgrade-Insecure-Requests:1",
             "Cookie: ".trim($TzSystemsUsers->cookie),
+            'sec-ch-ua: " Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+            'sec-ch-ua-mobile: ?0',
+            'sec-ch-ua-platform: "Windows"',
+            'Sec-Fetch-Dest: empty',
+            'Sec-Fetch-Mode: cors',
+            'Sec-Fetch-Site: same-origin',
             "Host:".str_replace('www.','',self::$domain),
         ];
 
