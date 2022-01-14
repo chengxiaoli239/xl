@@ -30,6 +30,7 @@ use backend\tools\Tools;
 use common\models\AdminModel;
 use common\service\CaptchaCodeService;
 use common\service\proxy\ProxyBaseService;
+use common\tools\KjDataGet;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -1756,6 +1757,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         if($qihao) return $qihao;
         if(!$uid OR !$tz_system_id) return ['code'=>300, 'msg'=>'uid或者tz_system_id不能为空'];
+
+
+        $status = KjDataGet::isCanGrab($lottery_type);
+        if(!$status) return ['code'=>301, 'msg'=>'非下注或者数据抓取时间'];
 
         $data = self::getQihaoInfo($uid, $tz_system_id);
         Tool_Common::log('getActiveQihao', 'INFO', '获取正在进行的期号'.$lottery_type, ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'data'=>$data]);
