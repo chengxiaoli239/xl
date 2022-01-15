@@ -88,7 +88,8 @@ class TzSystemUsersService extends ClientsBaseService{
         $data = $m->get($mkey);
 
         if(empty($data)){
-            $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
+            //$TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
+            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
             $cookies = $TzSystemsUsers->cookie;
             #$m->set($mkey, $cookies, 300);
 
@@ -104,6 +105,29 @@ class TzSystemUsersService extends ClientsBaseService{
         }
 
         return ['status'=>200, 'data'=>$data];
+    }
+
+    public static function buildTzSystemUsersKey($access_token){
+        $mkey = 'buildTzSystemUsersKey_'.$access_token;
+
+        return $mkey;
+    }
+
+    /**
+     * @desc 获取下注用户信息
+     * @param string $access_token
+     * @return TzSystemsUsers|mixed|null
+     */
+    public static function getTzSystemsUsersByAccessToken($access_token=''){
+        $m = \Yii::$app->cache;
+        $mkey = TzSystemUsersService::buildTzSystemUsersKey($access_token);
+        $TzSystemsUsers = $m->get($mkey);
+        if(empty($TzSystemsUsers)){
+            $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
+            $m->set($mkey, $TzSystemsUsers, 30);
+        }
+
+        return $TzSystemsUsers;
     }
 
     public static function buildUserCookesKey($access_token=''){
@@ -123,7 +147,8 @@ class TzSystemUsersService extends ClientsBaseService{
         $data = $m->get($mkey);
 
         if(empty($data)){
-            $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
+            //$TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
+            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
             $uid = $TzSystemsUsers->uid;
 
             $where = ['AND', ['=', 'status', 1], ['OR', ['=', 'is_batch_simulate', 0], ['IS', 'is_batch_simulate', NULL]], ['=', 'uid', $uid]]; # is_batch_simulate:0正常1批量模拟历史记录

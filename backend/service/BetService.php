@@ -10,6 +10,7 @@ namespace backend\service;
 
 use backend\models\BetErrorPlansTask;
 use backend\models\TzType;
+use backend\service\clients\TzSystemUsersService;
 use backend\service\huiyuan\HuiYuanService5;
 use backend\models\LotteryType;
 use backend\models\SystemConfig;
@@ -504,7 +505,7 @@ abstract class BetService extends BaseBetService {
      */
     public static function getActivePostQiHao($uid='', $tz_system_id='', $lottery_type=DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
-        $activeQihao_key = BetService::buildActiveQihaoKey($uid, $tz_system_id, $lottery_type);
+        $activeQihao_key = BetService::buildActiveQihaoKeyUid($uid, $tz_system_id, $lottery_type);
         $activeQihao = $m->get($activeQihao_key);
         if(empty($activeQihao) OR ($activeQihao['status']=='30200')){
             $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
@@ -525,7 +526,7 @@ abstract class BetService extends BaseBetService {
         return 'buildLotteryBetKey_'.$qihao.'_'.$plan_id.'_'.$bet_sort_key.'_'.$task_id;
     }
 
-    public static function buildActiveQihaoKey($uid='', $tz_system_id='', $lottery_type = DEFAULT_LOTTERY_TYPE ){
+    public static function buildActiveQihaoKeyUid($uid='', $tz_system_id='', $lottery_type=DEFAULT_LOTTERY_TYPE ){
         $mkey = 'getActiveQihao_'.$uid.'_'.$tz_system_id.'_'.$lottery_type;
 
         return $mkey;
@@ -538,8 +539,8 @@ abstract class BetService extends BaseBetService {
      * @param int $lottery_type
      * @return array|string
      */
-    public static function getActiveQihao($uid='', $tz_system_id='', $lottery_type = DEFAULT_LOTTERY_TYPE){
-        $mkey = self::buildActiveQihaoKey($uid, $tz_system_id, $lottery_type);
+    public static function getActiveQihao($uid='', $tz_system_id='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+        $mkey = self::buildActiveQihaoKeyUid($uid, $tz_system_id, $lottery_type);
 
         $m = \Yii::$app->cache;
         $qihao = $m->get($mkey);
@@ -556,6 +557,49 @@ abstract class BetService extends BaseBetService {
         $m->set($mkey, $qihao, 5);
 
         return $qihao;
+    }
+
+    /**
+     * @desc 激活的期号key
+     * @param string $tz_system_id
+     * @param int $lottery_type
+     * @return string
+     */
+    public static function buildActiveQihaoKey($tz_system_id='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+        $mkey = 'getActiveQihao_'.$tz_system_id.'_'.$lottery_type;
+
+        return $mkey;
+    }
+
+    public static function openActiveQihao($tz_system_id='', $qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+        $m = \Yii::$app->cache;
+        $mkey = BetService::buildActiveQihaoKey($tz_system_id, $lottery_type);
+
+        $flag = $m->set($mkey, $qihao, 30);
+        return $flag;
+    }
+
+    /**
+     * @desc 开启新的一期计划
+     * @param string $access_token
+     * @param string $qihao
+     * @return bool|int
+     */
+    public static function openBetQihao($access_token='', $qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+        if(empty($lottery_type)){
+            $lottery_type = DEFAULT_LOTTERY_TYPE;
+        }
+
+        $flag = 0;
+        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+        if(!empty($TzSystemsUsers)){
+            $m = \Yii::$app->cache;
+            $mkey = BetService::buildActiveQihaoKey($TzSystemsUsers->tz_system_id, $lottery_type);
+
+            $flag = $m->set($mkey, $qihao, 30);
+        }
+
+        return $flag;
     }
 
    /**

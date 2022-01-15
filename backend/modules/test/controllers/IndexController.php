@@ -257,8 +257,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $r = BettingRecords::findOne(['plan_id'=>'968']);
-        p($r);
+
         $post = \Yii::$app->request->post();
         p($post);
         $pos = [1,2,3];

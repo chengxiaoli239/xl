@@ -1884,6 +1884,11 @@ class ZhongFaService { # 宝岛众发登陆体系
      * @return array|string
      */
     public static function getActiveQihao($uid='', $tz_system_id='', $lottery_type = 8){
+        $m = \Yii::$app->cache;
+        $mkey = BetService::buildActiveQihaoKey($tz_system_id, $lottery_type);
+        $qihao = $m->get($mkey);
+
+        if($qihao) return $qihao;
         if(!$uid OR !$tz_system_id) return ['code'=>300, 'msg'=>'uid或者tz_system_id不能为空'];
 
         $m = \Yii::$app->cache;

@@ -1871,6 +1871,11 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @return string
      */
     public static function getActiveQihao($uid, $tz_system_id, $lottery_type){
+        $m = \Yii::$app->cache;
+        $mkey = BetService::buildActiveQihaoKey($tz_system_id, $lottery_type);
+        $qihao = $m->get($mkey);
+
+        if($qihao) return $qihao;
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
