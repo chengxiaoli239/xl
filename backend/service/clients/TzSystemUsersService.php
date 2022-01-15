@@ -81,13 +81,13 @@ class TzSystemUsersService extends ClientsBaseService{
      * @param string $access_token
      * @return mixed|string
      */
-    public static function getCookiesByAccessToken($access_token=''){
+    public static function getCookiesByAccessToken($access_token='', $is_auto=1){
 
         $m = \Yii::$app->cache;
         $mkey = self::buildUserCookesKey($access_token);
         $data = $m->get($mkey);
 
-        if(empty($data)){
+        if($is_auto==2 OR empty($data)){
             //$TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
             $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
             $cookies = $TzSystemsUsers->cookie;
@@ -100,11 +100,27 @@ class TzSystemUsersService extends ClientsBaseService{
                 'user_agent'=>trim(str_replace('User-Agent:', '',str_replace('user_agent:','', $TzSystemsUsers->user_agent))),
                 "Referer"=>$TzSystemsUsers->ssc_domain."/App/Index?_=",
                 "Host"=>str_replace('www.','',$tzSiteInfo['domain']),
-           ];
+            ];
             $m->set($mkey, $data, 60);
         }
 
         return ['status'=>200, 'data'=>$data];
+    }
+
+    /**
+     * @desc 获取用户的cookies
+     * @param string $access_token
+     * @return mixed|string
+     */
+    public static function updateRobot7ByAccessToken($access_token='', $new_robot7='', $old_robot7=''){
+
+        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token, $is_auto=2);
+        $cookies = $TzSystemsUsers->cookie;
+        $TzSystemsUsers->cookie = str_replace($old_robot7, $new_robot7, $cookies);
+        $flag = $TzSystemsUsers->save();
+        TzSystemUsersService::getCookiesByAccessToken($access_token, $is_auto=2);
+
+        return ['status'=>200, 'data'=>['flag'=>$flag]];
     }
 
     public static function buildTzSystemUsersKey($access_token){
@@ -118,11 +134,11 @@ class TzSystemUsersService extends ClientsBaseService{
      * @param string $access_token
      * @return TzSystemsUsers|mixed|null
      */
-    public static function getTzSystemsUsersByAccessToken($access_token=''){
+    public static function getTzSystemsUsersByAccessToken($access_token='', $is_auto=1){
         $m = \Yii::$app->cache;
         $mkey = TzSystemUsersService::buildTzSystemUsersKey($access_token);
         $TzSystemsUsers = $m->get($mkey);
-        if(empty($TzSystemsUsers)){
+        if($is_auto==2 OR empty($TzSystemsUsers)){
             $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
             $m->set($mkey, $TzSystemsUsers, 30);
         }
