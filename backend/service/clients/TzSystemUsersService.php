@@ -118,7 +118,12 @@ class TzSystemUsersService extends ClientsBaseService{
         $cookies = $TzSystemsUsers->cookie;
         $TzSystemsUsers->cookie = str_replace($old_robot7, $new_robot7, $cookies);
         $flag = $TzSystemsUsers->save();
+
+        $m = \Yii::$app->cache;
+        $mkey = self::buildUserCookesKey($access_token);
+        $m->delete($mkey);
         TzSystemUsersService::getCookiesByAccessToken($access_token, $is_auto=2);
+
 
         return ['status'=>200, 'data'=>['flag'=>$flag]];
     }
