@@ -1857,7 +1857,7 @@ abstract class BetService extends BaseBetService {
         $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
         $uid = $TzSystemsUsers->uid;
 
-        $Plans = UserSysPlans::find()->where(['uid'=>$uid, 'plan_id'=>$plan_ids])->all();
+        $Plans = UserSysPlans::find()->where(['uid'=>$uid, 'id'=>$plan_ids])->all();
         foreach ($Plans as $plan){
             $tmpData = ['plan_id'=>$plan->id];
             $tmpData['codes'] = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
