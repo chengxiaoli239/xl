@@ -89,7 +89,7 @@ class TzSystemUsersService extends ClientsBaseService{
         if(empty($data)){
             $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
             $cookies = $TzSystemsUsers->cookie;
-            $m->set($mkey, $cookies, 300);
+            #$m->set($mkey, $cookies, 300);
 
             Lucky5Service::__init($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
             $tzSiteInfo = Lucky5Service::getTzSiteInfo($TzSystemsUsers->tz_system_id);
@@ -99,6 +99,7 @@ class TzSystemUsersService extends ClientsBaseService{
                 "Referer"=>$TzSystemsUsers->ssc_domain."/App/Index?_=",
                 "Host"=>str_replace('www.','',$tzSiteInfo['domain']),
            ];
+            $m->set($mkey, $data, 60);
         }
 
         return ['status'=>200, 'data'=>$data];
