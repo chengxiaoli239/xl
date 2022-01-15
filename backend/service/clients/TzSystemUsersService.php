@@ -2,6 +2,7 @@
 namespace backend\service\clients;
 
 use backend\models\TzSystemsUsers;
+use backend\models\UserSysPlans;
 use backend\service\BetService;
 use backend\service\Lucky5\Lucky5Service;
 use common\service\CommonService;
@@ -107,6 +108,36 @@ class TzSystemUsersService extends ClientsBaseService{
 
     public static function buildUserCookesKey($access_token=''){
         $mkey = 'buildUserCookesKey_1_'.$access_token;
+        return $mkey;
+    }
+
+    /**
+     * @desc 获取用户的cookies
+     * @param string $access_token
+     * @return mixed|string
+     */
+    public static function getActivePlanIds($access_token=''){
+
+        $m = \Yii::$app->cache;
+        $mkey = self::buildUserPlanidsKey($access_token);
+        $data = $m->get($mkey);
+
+        if(empty($data)){
+            $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
+            $uid = $TzSystemsUsers->uid;
+
+            $where = ['AND', ['=', 'status', 1], ['OR', ['=', 'is_batch_simulate', 0], ['IS', 'is_batch_simulate', NULL]], ['=', 'uid', $uid]]; # is_batch_simulate:0正常1批量模拟历史记录
+            $plans = UserSysPlans::find()->where($where)->asArray()->all();
+            $data = ArrayHelper::getColumn($plans, 'id');
+
+            $m->set($mkey, $data, 60);
+        }
+
+        return ['status'=>200, 'data'=>$data];
+    }
+
+    public static function buildUserPlanidsKey($access_token=''){
+        $mkey = 'buildUserPlanidsKey_1_'.$access_token;
         return $mkey;
     }
 }
