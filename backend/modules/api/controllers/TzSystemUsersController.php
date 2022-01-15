@@ -9,6 +9,7 @@
 namespace backend\modules\api\controllers;
 
 use backend\service\BaseService;
+use backend\service\BetService;
 use backend\service\clients\TzSystemUsersService;
 use common\tools\Tool_Common;
 use Yii;
@@ -108,4 +109,20 @@ class TzSystemUsersController extends Controller
         return $rst;
     }
 
+    /**
+     * @desc 获取计划号码的号码
+     * @return array|bool
+     */
+    public static function actionGetCodesByPlanIds(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        if(empty($post['access_token'])){
+            return ['status'=>301, 'msg'=>'缺少access_token参数'];
+        }
+
+        $rst = BetService::getCodesByPlanIds($post['plan_ids'], $post['access_token']);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取cookies接口', ['post'=>$post, 'rst'=>$rst]);
+
+        return $rst;
+    }
 }

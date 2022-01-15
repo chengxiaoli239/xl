@@ -1847,6 +1847,26 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
+     * @param $plan_ids
+     * @param $access_token
+     * @return array
+     */
+    public static function getCodesByPlanIds($plan_ids, $access_token){
+        $rst = ['status'=>200, 'data'=>[]];
+
+        $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
+        $uid = $TzSystemsUsers->uid;
+
+        $Plans = UserSysPlans::find()->where(['uid'=>$uid, 'plan_id'=>$plan_ids])->all();
+        foreach ($Plans as $plan){
+            $tmpData = ['plan_id'=>$plan->id];
+            $tmpData['codes'] = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+            $rst['data'][] = $tmpData;
+        }
+        return $rst;
+    }
+
+    /**
      * @desc 批量模拟历史数据下注
      * @param array $lottery_types
      * @param int $isAuto
