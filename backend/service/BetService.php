@@ -1861,6 +1861,7 @@ abstract class BetService extends BaseBetService {
         foreach ($Plans as $plan){
             $tmpData = ['plan_id'=>$plan->id];
             $tmpData['codes'] = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+            Tool_Common::log('/codes/'.__FUNCTION__, 'INFO', '计划的号码', ['uid'=>$uid, 'id'=>$plan_ids, 'tmpData'=>$tmpData]);
             $rst['data'][] = $tmpData;
         }
         return $rst;
