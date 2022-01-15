@@ -358,9 +358,9 @@ class UserService extends BaseService {
             $msg = $TzSystemsUsers->getErrors();
             return ['status'=>304, 'msg'=>$msg];
         }
-        $synRst = BetService::synBalance($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
+        #$synRst = BetService::synBalance($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
 
-        return ['status'=>200, 'msg'=>'操作成功', 'data'=>$r, 'synRst'=>$synRst];
+        return ['status'=>200, 'msg'=>'操作成功', 'data'=>$r, /*'synRst'=>$synRst*/];
     }
 
     /**
