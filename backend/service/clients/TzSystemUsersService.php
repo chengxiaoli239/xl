@@ -106,7 +106,7 @@ class TzSystemUsersService extends ClientsBaseService{
     }
 
     public static function buildUserCookesKey($access_token=''){
-        $mkey = 'buildUserCookesKey_'.$access_token;
+        $mkey = 'buildUserCookesKey_x_'.$access_token;
         return $mkey;
     }
 }
