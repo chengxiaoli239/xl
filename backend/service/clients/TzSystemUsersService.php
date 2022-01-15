@@ -84,20 +84,22 @@ class TzSystemUsersService extends ClientsBaseService{
 
         $m = \Yii::$app->cache;
         $mkey = self::buildUserCookesKey($access_token);
-        $cookies = $m->get($mkey);
-        if(true OR empty($cookies)){
+        $data = $m->get($mkey);
+
+        if(empty($data)){
             $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
             $cookies = $TzSystemsUsers->cookie;
             $m->set($mkey, $cookies, 300);
+
+            Lucky5Service::__init($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
+            $tzSiteInfo = Lucky5Service::getTzSiteInfo($TzSystemsUsers->tz_system_id);
+            $data = [
+                'cookies'=>$cookies,
+                'user_agent'=>trim(str_replace('User-Agent:', '',str_replace('user_agent:','', $TzSystemsUsers->user_agent))),
+                "Referer"=>$TzSystemsUsers->ssc_domain."/App/Index?_=",
+                "Host"=>str_replace('www.','',$tzSiteInfo['domain']),
+           ];
         }
-        Lucky5Service::__init($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
-        $tzSiteInfo = Lucky5Service::getTzSiteInfo($TzSystemsUsers->tz_system_id);
-        $data = [
-            'cookies'=>$cookies,
-            'user_agent'=>trim(str_replace('User-Agent:', '',str_replace('user_agent:','', $TzSystemsUsers->user_agent))),
-            "Referer"=>$TzSystemsUsers->ssc_domain."/App/Index?_=",
-            "Host"=>str_replace('www.','',$tzSiteInfo['domain']),
-        ];
 
         return ['status'=>200, 'data'=>$data];
     }
