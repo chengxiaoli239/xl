@@ -238,7 +238,7 @@ class TzSystemUsersService extends ClientsBaseService{
                 $post_data = json_decode($row->post_datas, 320);
 
                 $headers = [
-                    'Accept'=> 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+                    'Accept'=> 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'Accept-Encoding' => 'gunzip, deflate, br',
                     'Accept-Language' => 'zh-CN,zh;q=0.9',
                     'Cache-Control' => 'max-age=0',
@@ -249,8 +249,14 @@ class TzSystemUsersService extends ClientsBaseService{
                     'Host' => str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
                     'Origin' => $TzSystemsUsers->ssc_domain,
                     'Referer' => $TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+                    'sec-ch-ua: " Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+                    'sec-ch-ua-mobile: ?0',
+                    'sec-ch-ua-platform: "Windows"',
+                    'Sec-Fetch-Dest: empty',
+                    'Sec-Fetch-Mode: cors',
+                    'Sec-Fetch-Site: same-origin',
                     'Upgrade-Insecure-Requests' => 1,
-                    'User-Agent' => str_replace('User-Agent:', '', $TzSystemsUsers->user_agent),
+                    'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemsUsers->user_agent)),
                 ];
 
                 $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
