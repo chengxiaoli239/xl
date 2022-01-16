@@ -108,7 +108,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $baseUrl = $TzSystemUser->ssc_domain;
         self::$cookie = $TzSystemUser->cookie;
         \Yii::$app->params['baseUrl']  = $TzSystemUser->ssc_domain;
-        \Yii::$app->params['domain']  = str_replace('http://','',$TzSystemUser->ssc_domain);
+        \Yii::$app->params['domain']  = str_replace('http://','',str_replace('https', 'http', $TzSystemUser->ssc_domain));
         $tzSiteInfo = [
             'baseUrl' => $TzSystemUser->ssc_domain,
             'CANCEL_ORDER' => $baseUrl.'/Member/CancelMemberBet',
