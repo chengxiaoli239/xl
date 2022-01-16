@@ -247,7 +247,7 @@ class TzSystemUsersService extends ClientsBaseService{
                     //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
                     'Content-Type: application/x-www-form-urlencoded',
                     'Cookie: '.$TzSystemsUsers->cookie,
-                    'Host: '.str_replace('http://', '', str_replace('https:', 'http', $TzSystemsUsers->ssc_domain)),
+                    'Host: '.str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
                     'Origin: '.$TzSystemsUsers->ssc_domain,
                     'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
                     'Upgrade-Insecure-Requests: 1',

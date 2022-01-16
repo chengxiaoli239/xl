@@ -520,7 +520,7 @@ class JinYingService extends BaseTZService { # 冰岛时时彩登陆体系
             'Content-Length:'.strlen(http_build_query($post_data)),
             'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
             'Cookie: '.$TzSystemsUsers->cookie,
-            'Host: '.str_replace('http://', '', str_replace('https:', 'http', $TzSystemsUsers->ssc_domain)),
+            'Host: '.str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
             'Origin: '.$TzSystemsUsers->ssc_domain,
             'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
             'X-Requested-With: XMLHttpRequest',
