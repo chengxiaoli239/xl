@@ -234,6 +234,7 @@ class TzSystemUsersService extends ClientsBaseService{
                 $plan_id = $row->plan_id;
                 $account = $row->account;
                 $bet_url = $row->bet_url;
+                $qihao = $row->qihao;
                 $post_data = json_decode($row->post_datas, 320);
 
                 $headers = [
@@ -258,6 +259,7 @@ class TzSystemUsersService extends ClientsBaseService{
                     'bet_url' => $bet_url,
                     'plan_id' => $plan_id,
                     'account' => $account,
+                    'qihao' => $qihao,
                     'slow_seconds' => $slow_seconds,
                     'post_data' => $post_data,
                     'headers' => $headers,
