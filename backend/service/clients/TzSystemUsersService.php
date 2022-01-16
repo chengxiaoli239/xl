@@ -243,7 +243,7 @@ class TzSystemUsersService extends ClientsBaseService{
                     'Accept-Language' => 'zh-CN,zh;q=0.9',
                     'Cache-Control' => 'max-age=0',
                     'Connection' => 'keep-alive',
-                    'Content-Length' => strlen(http_build_query($post_data)),
+                    'Content-Length' => (string)strlen(http_build_query($post_data)),
                     'Content-Type' => 'application/x-www-form-urlencoded',
                     'Cookie' => $TzSystemsUsers->cookie,
                     'Host' => str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
