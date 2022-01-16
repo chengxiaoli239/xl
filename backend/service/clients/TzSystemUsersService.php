@@ -97,7 +97,7 @@ class TzSystemUsersService extends ClientsBaseService{
             Lucky5Service::__init($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
             $tzSiteInfo = Lucky5Service::getTzSiteInfo($TzSystemsUsers->tz_system_id);
             $data = [
-                'cookies' => trim($cookies),
+                'cookies' => trim(trim($cookies), ';'),
                 'user_agent' => trim(str_replace('User-Agent:', '',str_replace('user_agent:','', $TzSystemsUsers->user_agent))),
                 "Referer" => $TzSystemsUsers->ssc_domain."/App/Index?_=",
                 "Host"=> str_replace('www.','',$tzSiteInfo['domain']),
@@ -124,7 +124,6 @@ class TzSystemUsersService extends ClientsBaseService{
         $mkey = self::buildUserCookesKey($access_token);
         $m->delete($mkey);
         TzSystemUsersService::getCookiesByAccessToken($access_token, $is_auto=2);
-
 
         return ['status'=>200, 'data'=>['flag'=>$flag]];
     }
@@ -153,7 +152,7 @@ class TzSystemUsersService extends ClientsBaseService{
     }
 
     public static function buildUserCookesKey($access_token=''){
-        $mkey = 'buildUserCookesKey_1_'.$access_token;
+        $mkey = 'buildUserCookesKey_2_'.$access_token;
         return $mkey;
     }
 
