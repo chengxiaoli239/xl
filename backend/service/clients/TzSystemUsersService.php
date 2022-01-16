@@ -255,7 +255,7 @@ class TzSystemUsersService extends ClientsBaseService{
                     'Sec-Fetch-Dest: empty',
                     'Sec-Fetch-Mode: cors',
                     'Sec-Fetch-Site: same-origin',
-                    'Upgrade-Insecure-Requests' => 1,
+                    'Upgrade-Insecure-Requests' => '1',
                     'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemsUsers->user_agent)),
                 ];
 
