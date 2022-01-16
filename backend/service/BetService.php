@@ -602,6 +602,42 @@ abstract class BetService extends BaseBetService {
         return $flag;
     }
 
+
+    /**
+     * @desc 下注任务结果通知
+     * @param string $access_token
+     * @param string $qihao
+     * @return bool|array
+     */
+    public static function pushTasksBetRst($plan_id, $qihao='', $betRst=[], $access_token='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+        if(empty($lottery_type)){
+            $lottery_type = DEFAULT_LOTTERY_TYPE;
+        }
+
+        $flag = 0;
+        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+        if(empty($TzSystemsUsers)){
+            return ['status'=>404, 'msg'=>'用户信息找不到'];
+        }
+        if(!empty($TzSystemsUsers)){
+            $m = \Yii::$app->cache;
+            $mkey = BetService::buildActiveQihaoKey($TzSystemsUsers->tz_system_id, $lottery_type);
+
+            $flag = $m->set($mkey, $qihao, 30);
+        }
+        $where = ['plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
+        $BetErrorPlansTask = BetErrorPlansTask::findOne($where);
+        if(empty($BetErrorPlansTask)){
+            return ['status'=>404, 'msg'=>'任务记录找不到'];
+        }
+
+        $BetErrorPlansTask->status = $betRst['status'];
+        $BetErrorPlansTask->post_desc = json_encode($betRst, 320);
+        $flag = $BetErrorPlansTask->save();
+
+        return $flag;
+    }
+
    /**
      * @desc 判断当前期是否可以自动化投注
      * @param int $lottery_type

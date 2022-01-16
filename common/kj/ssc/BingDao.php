@@ -39,7 +39,7 @@ class BingDao extends BaseKj {
                     'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
                     'Connection: keep-alive',
                     'Cookie: '.$TzSystemsUsers->cookie,
-                    'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+                    'Host: '.str_replace('http://', '', str_replace('https:', 'http', $TzSystemsUsers->ssc_domain)),
                     'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$t,
                     $TzSystemsUsers->user_agent,
                     'X-Requested-With: XMLHttpRequest',

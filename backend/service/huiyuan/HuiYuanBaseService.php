@@ -284,7 +284,7 @@ class HuiYuanBaseService extends BaseTZService {
             'Connection: keep-alive',
             'Content-Length:'.$strLen,
             'Content-Type: application/x-www-form-urlencoded',
-            'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+            'Host: '.str_replace('http://', '', str_replace('https:', 'http', $TzSystemsUsers->ssc_domain)),
             'Cookie: '.$TzSystemsUsers->cookie,
             'Origin: '.$TzSystemsUsers->ssc_domain,
             'Referer: '.$TzSystemsUsers->ssc_domain.'/',

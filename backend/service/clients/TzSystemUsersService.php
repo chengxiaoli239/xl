@@ -233,7 +233,7 @@ class TzSystemUsersService extends ClientsBaseService{
                 $uid = $row->uid;
                 $plan_id = $row->plan_id;
                 $account = $row->account;
-                $tz_system_id = $row->tz_system_id;
+                $bet_url = $row->bet_url;
                 $post_data = json_decode($row->post_datas, 320);
 
                 $headers = [
@@ -246,7 +246,7 @@ class TzSystemUsersService extends ClientsBaseService{
                     //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
                     'Content-Type: application/x-www-form-urlencoded',
                     'Cookie: '.$TzSystemsUsers->cookie,
-                    'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+                    'Host: '.str_replace('http://', '', str_replace('https:', 'http', $TzSystemsUsers->ssc_domain)),
                     'Origin: '.$TzSystemsUsers->ssc_domain,
                     'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
                     'Upgrade-Insecure-Requests: 1',
@@ -255,6 +255,7 @@ class TzSystemUsersService extends ClientsBaseService{
 
                 $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
                 $datas[] = [
+                    'bet_url' => $bet_url,
                     'plan_id' => $plan_id,
                     'account' => $account,
                     'slow_seconds' => $slow_seconds,
