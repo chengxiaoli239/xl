@@ -97,10 +97,10 @@ class TzSystemUsersService extends ClientsBaseService{
             Lucky5Service::__init($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
             $tzSiteInfo = Lucky5Service::getTzSiteInfo($TzSystemsUsers->tz_system_id);
             $data = [
-                'cookies'=>$cookies,
-                'user_agent'=>trim(str_replace('User-Agent:', '',str_replace('user_agent:','', $TzSystemsUsers->user_agent))),
-                "Referer"=>$TzSystemsUsers->ssc_domain."/App/Index?_=",
-                "Host"=>str_replace('www.','',$tzSiteInfo['domain']),
+                'cookies' => trim($cookies),
+                'user_agent' => trim(str_replace('User-Agent:', '',str_replace('user_agent:','', $TzSystemsUsers->user_agent))),
+                "Referer" => $TzSystemsUsers->ssc_domain."/App/Index?_=",
+                "Host"=> str_replace('www.','',$tzSiteInfo['domain']),
             ];
             $m->set($mkey, $data, 60);
         }
