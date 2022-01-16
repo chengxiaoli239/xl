@@ -127,6 +127,23 @@ class TzSystemUsersController extends Controller
     }
 
     /**
+     * @desc 获取激活任务
+     * @return array|bool
+     */
+    public static function actionGetActivePlanTasks(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        if(empty($post['access_token'])){
+            return ['status'=>301, 'msg'=>'缺少access_token参数'];
+        }
+
+        $rst = TzSystemUsersService::getActivePlanTasks($post['access_token'], $post['lottery_type']);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取cookies接口', ['post'=>$post, 'rst'=>$rst]);
+
+        return $rst;
+    }
+
+    /**
      * @desc 获取计划号码的号码
      * @return array|bool
      */
@@ -138,13 +155,13 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = BetService::getCodesByPlanIds($post['plan_ids'], $post['access_token']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取cookies接口', ['post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取计划号码的号码接口', ['post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
 
     /**
-     * @desc 获取计划号码的号码
+     * @desc 激活期号
      * @return array|bool
      */
     public static function actionPushActiveQihao(){
@@ -155,9 +172,28 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = BetService::openBetQihao($post['access_token'], $post['qihao'], $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取cookies接口', ['post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '激活期号接口', ['post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
+
+    /**
+     * @desc 获取下注任务
+     * @return array|bool
+     */
+    public static function actionGetBetTasks(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        if(empty($post['access_token'])){
+            return ['status'=>301, 'msg'=>'缺少access_token参数'];
+        }
+
+        $rst = BetService::openBetQihao($post['access_token'], $post['qihao'], $post['lottery_type']);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '激活期号接口', ['post'=>$post, 'rst'=>$rst]);
+
+        return $rst;
+    }
+
+
 
 }

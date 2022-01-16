@@ -1,6 +1,7 @@
 <?php
 namespace backend\service\clients;
 
+use backend\models\BetErrorPlansTask;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\BetService;
@@ -157,7 +158,7 @@ class TzSystemUsersService extends ClientsBaseService{
     }
 
     /**
-     * @desc 获取用户的cookies
+     * @desc 获取用户激活的计划ids
      * @param string $access_token
      * @return mixed|string
      */
@@ -182,8 +183,89 @@ class TzSystemUsersService extends ClientsBaseService{
         return ['status'=>200, 'data'=>$data];
     }
 
+    /**
+     * @desc 激活的任务id
+     * @param string $access_token
+     * @return string
+     */
     public static function buildUserPlanidsKey($access_token=''){
         $mkey = 'buildUserPlanidsKey_1_'.$access_token;
         return $mkey;
     }
+
+    /**
+     * @desc 激活的下注任务
+     * @param string $access_token
+     * @return string
+     */
+    public static function buildUserPlanTasksKey($access_token=''){
+        $mkey = 'buildUserPlanTasksKey_1_'.$access_token;
+        return $mkey;
+    }
+
+    /**
+     * @desc 获取用户激活的下注任务
+     * @param string $access_token
+     * @return mixed|string
+     */
+    public static function getActivePlanTasks($access_token='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+
+        $m = \Yii::$app->cache;
+        $mkey = self::buildUserPlanTasksKey($access_token);
+        $flag = $m->get($mkey);
+
+        if(true OR empty($flag)){
+            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+            $uid = $TzSystemsUsers->uid;
+            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
+            if($uid){
+                $where = array_merge($where, [['=', 'uid', $uid]]);
+            }
+
+            $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
+            if(empty($BetErrorPlansTasks)){
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-1', ['uid' => $uid, 'msg'=>'没有下注计划']);
+                return ['status'=>301, 'msg'=>'没有下注任务'];
+            }
+            $datas = [];
+            $_t = round(microtime(true) * 1000);
+            foreach ($BetErrorPlansTasks as $row){
+                $uid = $row->uid;
+                $plan_id = $row->plan_id;
+                $account = $row->account;
+                $tz_system_id = $row->tz_system_id;
+                $post_data = json_decode($row->post_datas, 320);
+
+                $headers = [
+                    'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+                    'Accept-Encoding: gunzip, deflate',
+                    'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                    'Cache-Control: max-age=0',
+                    'Connection: keep-alive',
+                    'Content-Length:'.strlen(http_build_query($post_data)),
+                    //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+                    'Content-Type: application/x-www-form-urlencoded',
+                    'Cookie: '.$TzSystemsUsers->cookie,
+                    'Host: '.str_replace('http://', '', $TzSystemsUsers->ssc_domain),
+                    'Origin: '.$TzSystemsUsers->ssc_domain,
+                    'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+                    'Upgrade-Insecure-Requests: 1',
+                    $TzSystemsUsers->user_agent,
+                ];
+
+                $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
+                $datas[] = [
+                    'plan_id' => $plan_id,
+                    'account' => $account,
+                    'slow_seconds' => $slow_seconds,
+                    'post_data' => $post_data,
+                    'headers' => $headers,
+                ];
+                $m->set($mkey, 1, 30);
+            }
+        }
+
+        return ['status'=>200, 'data'=>$datas];
+    }
+
 }
