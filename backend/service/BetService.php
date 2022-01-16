@@ -631,7 +631,7 @@ abstract class BetService extends BaseBetService {
             return ['status'=>404, 'msg'=>'任务记录找不到'];
         }
 
-        $BetErrorPlansTask->status = $betRst['status'];
+        $BetErrorPlansTask->status = $betRst['task_status'];
         $BetErrorPlansTask->post_desc = json_encode($betRst, 320);
         $flag = $BetErrorPlansTask->save();
 
