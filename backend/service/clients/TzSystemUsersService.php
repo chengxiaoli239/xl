@@ -238,20 +238,19 @@ class TzSystemUsersService extends ClientsBaseService{
                 $post_data = json_decode($row->post_datas, 320);
 
                 $headers = [
-                    'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-                    'Accept-Encoding: gunzip, deflate',
-                    'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-                    'Cache-Control: max-age=0',
-                    'Connection: keep-alive',
-                    'Content-Length:'.strlen(http_build_query($post_data)),
-                    //'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
-                    'Content-Type: application/x-www-form-urlencoded',
-                    'Cookie: '.$TzSystemsUsers->cookie,
-                    'Host: '.str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
-                    'Origin: '.$TzSystemsUsers->ssc_domain,
-                    'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
-                    'Upgrade-Insecure-Requests: 1',
-                    $TzSystemsUsers->user_agent,
+                    'Accept'=> 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+                    'Accept-Encoding' => 'gunzip, deflate, br',
+                    'Accept-Language' => 'zh-CN,zh;q=0.9',
+                    'Cache-Control' => 'max-age=0',
+                    'Connection' => 'keep-alive',
+                    'Content-Length' => strlen(http_build_query($post_data)),
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'Cookie' => $TzSystemsUsers->cookie,
+                    'Host' => str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
+                    'Origin' => $TzSystemsUsers->ssc_domain,
+                    'Referer' => $TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+                    'Upgrade-Insecure-Requests' => 1,
+                    'User-Agent' => str_replace('User-Agent:', '', $TzSystemsUsers->user_agent),
                 ];
 
                 $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
