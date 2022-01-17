@@ -206,7 +206,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = BetService::pushTasksBetRst($post['plan_id'], $post['qihao'], $post['betRst'], $post['access_token'], $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '激活期号接口', ['post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '游戏结果通知', ['post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
