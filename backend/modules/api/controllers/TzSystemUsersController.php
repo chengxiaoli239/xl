@@ -191,7 +191,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = BetService::openBetQihao($post['access_token'], $post['qihao'], $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '激活期号接口', ['post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '激活任务接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
