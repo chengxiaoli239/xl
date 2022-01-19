@@ -606,7 +606,7 @@ abstract class BetService extends BaseBetService {
             $mkey = BetService::buildActiveQihaoKey($TzSystemsUsers->tz_system_id, $lottery_type);
 
             $flag = $m->set($mkey, $qihao, 30);
-            $m->set($mkey_active_qihao, 1, 60); # 客户端激活期号key
+            #$m->set($mkey_active_qihao, 1, 60); # 客户端激活期号key
         }
 
         return $flag;
