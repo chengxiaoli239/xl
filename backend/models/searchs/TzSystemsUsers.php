@@ -18,7 +18,7 @@ class TzSystemsUsers extends TzSystemsUsersModel
     public function rules()
     {
         return [
-            [['id', 'uid', 'is_agent', 'tz_system_id', 'status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'uid', 'is_agent', 'tz_system_id', 'status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'is_local_bet', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['username', 'sys_name', 'account', 'password', 'ssc_domain', 'cookie', 'user_agent', 'cookie_wx_web', 'access_token', 'warn_val', 'desc', 'update_time'], 'safe'],
             [['balance', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
         ];
@@ -77,6 +77,7 @@ class TzSystemsUsers extends TzSystemsUsersModel
             'odds_4d' => $this->odds_4d,
             'is_auto_bet' => $this->is_auto_bet,
             'is_use_proxy' => $this->is_use_proxy,
+            'is_local_bet' => $this->is_local_bet,
             'access_token' => $this->access_token,
             'expire_time' => $this->expire_time,
             'created_at' => $this->created_at,

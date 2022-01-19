@@ -8,6 +8,7 @@
 namespace backend\service\plans;
 
 use backend\models\BetErrorPlansTask;
+use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\OpKjService;
@@ -23,11 +24,13 @@ class BetErrorPlansTaskService extends BaseService {
         if($r = BetErrorPlansTask::findOne($where)){
             return ['status'=>300, 'msg'=>'记录已存在:'.$uid.'_'.$lottery_type.'_'.$qihao.'_'.$plan_id.'_'.$bet_sort_key];
         }
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
         $BetErrorPlansTask = new BetErrorPlansTask();
         $setDatas = [
             'uid' => $uid,
             'account' => $account,
             'plan_id' => $plan_id,
+            'is_local_bet' => (int)$TzSystemsUsers->is_local_bet,
             'bet_sort_key' => $bet_sort_key,
             'qihao' => (string)$qihao,
             'codes' => json_encode($bet_codes, 320),

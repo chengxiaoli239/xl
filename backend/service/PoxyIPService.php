@@ -260,6 +260,22 @@ class PoxyIPService extends BaseService {
      * @desc 代理id key
      * @return string
      */
+    public static function buildIsLocalBetKey(){
+        return 'buildIsLocalBetKey_0';
+    }
+
+    public static function delIsLocalBetKey(){
+        $m = \Yii::$app->cache;
+        $mkey = self::buildIsLocalBetKey();
+        $flag = $m->delete($mkey);
+
+        return $flag;
+    }
+
+    /**
+     * @desc 代理id key
+     * @return string
+     */
     public static function buildProxyUidsKey(){
         return 'buildProxyUidsKey_0';
     }

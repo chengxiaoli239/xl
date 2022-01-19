@@ -220,7 +220,7 @@ abstract class BetService extends BaseBetService {
         }
 
         # 2、下注任务检测
-        $where = ['AND', ['=', 'uid', $uid], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
+        $where = ['AND', ['=', 'uid', $uid], ['IN', 'status', [0, 1]], ['=', 'is_local_bet', 0]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
         $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
         $tz_system_id = $BetErrorPlansTasks->tz_system_id;
         $task_id = $BetErrorPlansTasks->id;
@@ -393,7 +393,8 @@ abstract class BetService extends BaseBetService {
 
         $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
-            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
+            # status可重推的状态0:未推送1推送失败可重推，不可重推:3  is_local_bet:1客户本地0云服务器
+            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'is_local_bet', 1], ['IN', 'status', [0, 1]]];
             if($uid){
                 $where = array_merge($where, [['=', 'uid', $uid]]);
             }
@@ -409,6 +410,7 @@ abstract class BetService extends BaseBetService {
             foreach ($BetErrorPlansTasks as $betErrorPlansTask){
                 try {
                     $uid = $betErrorPlansTask->uid;
+                    $is_local_bet = $betErrorPlansTask->is_local_bet;
                     $task_id = $betErrorPlansTask->id;
                     $tz_system_id = $betErrorPlansTask->tz_system_id;
                     $lottery_type = $betErrorPlansTask->lottery_type;
