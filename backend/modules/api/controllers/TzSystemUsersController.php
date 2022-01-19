@@ -72,7 +72,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = BaseService::synBalanceByAccessToken($post['access_token'], $is_auto=2);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '同步积分接口', ['post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '同步积分接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
@@ -89,7 +89,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = TzSystemUsersService::getCookiesByAccessToken($post['access_token']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取cookies接口', ['post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取cookies接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
@@ -106,7 +106,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = TzSystemUsersService::updateRobot7ByAccessToken($post['access_token'], $post['new_robot7'], $post['old_robot7']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取cookies接口', ['post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取cookies接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
@@ -123,7 +123,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = TzSystemUsersService::getActivePlanIds($post['access_token']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取cookies接口', ['post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取cookies接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
@@ -140,7 +140,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = TzSystemUsersService::getActivePlanTasks($post['access_token'], $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取cookies接口', ['post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取cookies接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
@@ -157,7 +157,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = BetService::getCodesByPlanIds($post['plan_ids'], $post['access_token']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取计划号码的号码接口', ['post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取计划号码的号码接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
@@ -174,7 +174,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = BetService::openBetQihao($post['access_token'], $post['qihao'], $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '激活期号接口', ['account'=>$this->TzSystemsUsers['account'], 'post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '激活期号接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
