@@ -19,6 +19,7 @@ use yii\filters\VerbFilter;
 class TzSystemUsersController extends Controller
 {
     public $enableCsrfValidation = false;
+    public $TzSystemsUsers = [];
 
     public function init(){
         $isAdminRoute = in_array(Yii::$app->controller->route, ['admin/route/index', 'admin/route/index.html']);
@@ -28,6 +29,7 @@ class TzSystemUsersController extends Controller
             header('content-type:application/json');
             die(json_encode(['status'=>302, 'msg'=>'您无权限访问', 'data'=>$post, $AUTH_ACCESS_TOKENS], 320));
         }
+        $this->TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($post['access_token']);
     }
 
     /**
@@ -62,7 +64,7 @@ class TzSystemUsersController extends Controller
      * @desc 同步余额接口
      * @return array|bool
      */
-    public static function actionSynBalance(){
+    public function actionSynBalance(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         if(empty($post['access_token'])){
@@ -79,7 +81,7 @@ class TzSystemUsersController extends Controller
      * @desc 同步余额接口
      * @return array|bool
      */
-    public static function actionGetCookies(){
+    public function actionGetCookies(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         if(empty($post['access_token'])){
@@ -96,7 +98,7 @@ class TzSystemUsersController extends Controller
      * @desc 更新新的robot7
      * @return array|bool
      */
-    public static function actionUpdateNewRobot7(){
+    public function actionUpdateNewRobot7(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         if(empty($post['access_token'])){
@@ -113,7 +115,7 @@ class TzSystemUsersController extends Controller
      * @desc 激活计划id
      * @return array|bool
      */
-    public static function actionGetActivePlanIds(){
+    public function actionGetActivePlanIds(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         if(empty($post['access_token'])){
@@ -130,7 +132,7 @@ class TzSystemUsersController extends Controller
      * @desc 获取激活任务
      * @return array|bool
      */
-    public static function actionGetActivePlanTasks(){
+    public function actionGetActivePlanTasks(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         if(empty($post['access_token'])){
@@ -147,7 +149,7 @@ class TzSystemUsersController extends Controller
      * @desc 获取计划号码的号码
      * @return array|bool
      */
-    public static function actionGetCodesByPlanIds(){
+    public function actionGetCodesByPlanIds(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         if(empty($post['access_token'])){
@@ -164,7 +166,7 @@ class TzSystemUsersController extends Controller
      * @desc 激活期号
      * @return array|bool
      */
-    public static function actionPushActiveQihao(){
+    public function actionPushActiveQihao(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         if(empty($post['access_token'])){
@@ -172,7 +174,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = BetService::openBetQihao($post['access_token'], $post['qihao'], $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '激活期号接口', ['post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '激活期号接口', ['account'=>$this->TzSystemsUsers['account'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
@@ -181,7 +183,7 @@ class TzSystemUsersController extends Controller
      * @desc 获取下注任务
      * @return array|bool
      */
-    public static function actionGetBetTasks(){
+    public function actionGetBetTasks(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         if(empty($post['access_token'])){
@@ -198,7 +200,7 @@ class TzSystemUsersController extends Controller
      * @desc 通知游戏结果
      * @return array|bool
      */
-    public static function actionPushTasksBetRst(){
+    public function actionPushTasksBetRst(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         if(empty($post['access_token'])){
@@ -206,7 +208,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = BetService::pushTasksBetRst($post['plan_id'], $post['qihao'], $post['betRst'], $post['access_token'], $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '游戏结果通知', ['post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '游戏结果通知', ['account'=>$this->TzSystemsUsers['account'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
