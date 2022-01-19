@@ -257,7 +257,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');p($r);
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%bet_error_plans_task}}');p($r);
 
         $post = \Yii::$app->request->post();
         p($post);

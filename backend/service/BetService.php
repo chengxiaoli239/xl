@@ -394,7 +394,7 @@ abstract class BetService extends BaseBetService {
         $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
             # status可重推的状态0:未推送1推送失败可重推，不可重推:3  is_local_bet:1客户本地0云服务器
-            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'is_local_bet', 1], ['IN', 'status', [0, 1]]];
+            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'is_local_bet', 0], ['IN', 'status', [0, 1]]];
             if($uid){
                 $where = array_merge($where, [['=', 'uid', $uid]]);
             }
