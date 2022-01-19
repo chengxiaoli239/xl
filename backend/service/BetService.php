@@ -394,7 +394,7 @@ abstract class BetService extends BaseBetService {
         $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
             # status可重推的状态0:未推送1推送失败可重推，不可重推:3  is_local_bet:1客户本地0云服务器
-            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'is_local_bet', 0], ['IN', 'status', [0, 1]]];
+            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]];
             if($uid){
                 $where = array_merge($where, [['=', 'uid', $uid]]);
             }
@@ -425,7 +425,7 @@ abstract class BetService extends BaseBetService {
                     $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
                     if(false && $balance<$bet_money){
                         BetService::closeTask($task_id, $qihao, $activeQihao, $account, $msg='余额不足，不可重推'); # 关闭计划
-                    }elseif($qihao == $activeQihao){
+                    }elseif($is_local_bet == 0 && $qihao == $activeQihao){ # 云服务
                         $betKey = BetService::buildLotteryBetKey($activeQihao, $plan_id, $bet_sort_key, $task_id);
                         if($lock = $m->get($betKey)){
                             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-3', ['task_id'=>$task_id,'betKey'=>$betKey]);
