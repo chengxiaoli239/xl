@@ -507,17 +507,22 @@ abstract class BetService extends BaseBetService {
         $m = \Yii::$app->cache;
         $activeQihao_key = BetService::buildActiveQihaoKeyUid($uid, $tz_system_id, $lottery_type);
         $activeQihao = $m->get($activeQihao_key);
-        if(empty($activeQihao) OR ($activeQihao['status']=='30200')){
-            $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
-            if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
-                Tool_Common::log('wang_pan_is_active', 'ERR', '网盘开盘状态-2', ['uid'=>$uid, 'tz_system_id'=>$lottery_type, 'activeQihao'=>$activeQihao]);
-                return ['status'=>300, 'msg'=>'未开盘或者已关盘['.date('Y-m-d H:i:s').']', 'activeQihao'=>$activeQihao];
+        try {
+            if(empty($activeQihao) OR ($activeQihao['status']=='30200')){
+                $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
+                if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
+                    Tool_Common::log('wang_pan_is_active', 'ERR', '网盘开盘状态-2', ['uid'=>$uid, 'tz_system_id'=>$lottery_type, 'activeQihao'=>$activeQihao]);
+                    return ['status'=>300, 'msg'=>'未开盘或者已关盘['.date('Y-m-d H:i:s').']', 'activeQihao'=>$activeQihao];
+                }
+                if(is_string($activeQihao) && strpos($activeQihao, '020')){
+                    $m->set($activeQihao_key, $activeQihao, 300);
+                }
             }
-            if(is_string($activeQihao) && strpos($activeQihao, '020')){
-                $m->set($activeQihao_key, $activeQihao, 300);
-            }
+            Tool_Common::log('wang_pan_is_active', 'INFO', '网盘开盘状态-3', ['uid'=>$uid, 'tz_system_id'=>$lottery_type, 'activeQihao'=>$activeQihao]);
+        }catch (\Exception $exception){
+            Tool_Common::log('/betService/'.__FUNCTION__, 'ERR', '网盘激活期号获取', ['lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
+            return false;
         }
-        Tool_Common::log('wang_pan_is_active', 'INFO', '网盘开盘状态-3', ['uid'=>$uid, 'tz_system_id'=>$lottery_type, 'activeQihao'=>$activeQihao]);
 
         return $activeQihao;
     }
