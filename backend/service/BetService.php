@@ -589,14 +589,19 @@ abstract class BetService extends BaseBetService {
         if(empty($lottery_type)){
             $lottery_type = DEFAULT_LOTTERY_TYPE;
         }
+        $m = \Yii::$app->cache;
+        $mkey_active_qihao = 'openBetActiveQihao_'.$qihao;
+        if($m->get($mkey_active_qihao)){
+            return true;
+        }
 
         $flag = 0;
         $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
         if(!empty($TzSystemsUsers)){
-            $m = \Yii::$app->cache;
             $mkey = BetService::buildActiveQihaoKey($TzSystemsUsers->tz_system_id, $lottery_type);
 
             $flag = $m->set($mkey, $qihao, 30);
+            $m->set($mkey_active_qihao, 1, 60); # 客户端激活期号key
         }
 
         return $flag;
