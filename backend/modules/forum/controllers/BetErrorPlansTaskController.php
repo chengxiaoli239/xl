@@ -137,6 +137,21 @@ class BetErrorPlansTaskController extends BaseController
     }
 
     /**
+     * @desc 更新用户状态
+     * @param $id
+     * @return \yii\web\Response
+     */
+    public function actionSwitchTaskStatus(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        if(\Yii::$app->user->id == 1){
+            $rst = HN0898Service::updateStatus($post['rid'], $model = '\backend\models\BetErrorPlansTask', 'status');
+        }
+
+        return $rst;
+    }
+
+    /**
      * Deletes an existing BetErrorPlansTask model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id

@@ -583,7 +583,7 @@ class HN0898Service extends BaseTZService {
     public static function updateStatus($id, $model = 'UserSysPlans', $field = 'status'){
         try {
             $M = $model::findOne($id);
-            $M->$field = $M->$field==1 ? 0 : 1;
+            $M->$field = $M->$field ? 0 : 1;
 
             $rst = $M->save(false);
             if(!$rst){

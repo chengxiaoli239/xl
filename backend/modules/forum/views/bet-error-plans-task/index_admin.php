@@ -130,7 +130,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value' => function($model) {
                                 $txt = $model->status == 2 ? '<font color="green">推送成功</font>' : ($model->status == 3 ? '<font color="red">推送失败</a>' : ($model->status==4?'<font color="red">推送超时</a>':'<font color="#696969">等待推送</a>'));
                                 //$url = "/forum/user-custom-plans/update-status?id=".$model->id;
-                                return Html::a('<strong>'.$txt.'</strong>['.$model->id.']', 'javascript:;', ['title' => '更新状态'.$model->status]);
+                                return Html::a('<strong>'.$txt.'</strong>['.$model->id.']&nbsp;&nbsp;<span id="re_set_'.$model->id.'" data-rid="'.$model->id.'">重置</span>', 'javascript:;', ['title' => '更新状态'.$model->status]);
                             }
                         ],
                         //'sn',
@@ -203,17 +203,30 @@ $this->params['breadcrumbs'][] = $this->title;
 <!--提示框-end-->
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
-    $(function () {
-        //$("[id^='act-post-desc']").click(function (rst) {
-        $(".act-post-desc").click(function (rst) {
-            bet_rst = $(this).data('error');
-            content = $(this).data('content');
+$(function () {
+    //$("[id^='act-post-desc']").click(function (rst) {
+    $(".act-post-desc").click(function (rst) {
+        bet_rst = $(this).data('error');
+        content = $(this).data('content');
 
-            act_data = {"bet_url":$(this).data('url'), "bet_content":content};
-            $('#rst_code').text(JSON.stringify(bet_rst,null,' '))
-            $('#push_content').text(JSON.stringify(act_data,null,' '))
+        act_data = {"bet_url":$(this).data('url'), "bet_content":content};
+        $('#rst_code').text(JSON.stringify(bet_rst,null,' '))
+        $('#push_content').text(JSON.stringify(act_data,null,' '))
 
-            $('#exampleModal_msg').modal('show');
+        $('#exampleModal_msg').modal('show');
+    });
+
+    $("[id^=re_set]").click(function(){
+        Ewin.confirm({ message: '重置状态，有可能会再次下注'}).on(function (e) {
+            rid = $(this).attr('data-rid');
+            console.log(rid)
+            data = {rid:rid}
+            url = '/forum/bet-error-plans-task/switch-task-status'
+            $.post(url, data, function(rst) {
+                message = (rst.status) == 200 ? '重置成功' : rst.msg;
+                Ewin.confirm({ message: message}).on(function (e) {});
+            });
         });
     });
+});
 </script>
