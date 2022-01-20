@@ -343,6 +343,22 @@ class UserController extends BaseController
     }
 
     /**
+     * @desc 更新用户是否本地下注状态
+     * @param $id
+     * @param $status
+     * @return \yii\web\Response
+     */
+    public function actionSwitchIsLocalBet($id){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if(\Yii::$app->user->id == 1){
+            $rst = HN0898Service::updateStatus($id, $model = '\backend\models\TzSystemsUsers', 'is_local_bet');
+            PoxyIPService::delIsLocalBetKey();
+        }
+
+        return $this->redirect(['view']);
+    }
+
+    /**
      * @desc 修改投注系统状态，主要是禁止账号自动登录和获取余额
      * @param $id
      * @param $status

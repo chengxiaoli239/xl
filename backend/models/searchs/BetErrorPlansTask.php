@@ -18,7 +18,7 @@ class BetErrorPlansTask extends BetErrorPlansTaskModel
     public function rules()
     {
         return [
-            [['id', 'uid', 'agent_id', 'playway', 'tz_type', 'status', 'plan_id', 'tz_system_id', 'lottery_type', 'updated_at', 'created_at'], 'integer'],
+            [['id', 'uid', 'agent_id', 'playway', 'tz_type', 'status', 'plan_id', 'is_local_bet', 'tz_system_id', 'lottery_type', 'updated_at', 'created_at'], 'integer'],
             [['codes', 'account', 'bet_url', 'bet_headers', 'post_datas', 'playway_name', 'qihao', 'kj_codes', 'sn', 'snid', 'lotteryclass', 'post_desc', 'error_desc', 'updated_time'], 'safe'],
             [['bet_money', 'single'], 'number'],
         ];
@@ -67,6 +67,7 @@ class BetErrorPlansTask extends BetErrorPlansTaskModel
             'single' => $this->single,
             'status' => $this->status,
             'plan_id' => $this->plan_id,
+            'is_local_bet' => $this->is_local_bet,
             'tz_system_id' => $this->tz_system_id,
             'updated_time' => $this->updated_time,
             'updated_at' => $this->updated_at,

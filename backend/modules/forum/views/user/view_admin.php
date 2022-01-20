@@ -126,6 +126,22 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a($txt, $url, ['title' => '开通使用代理IP','alt'=>$alt]);
                             }
                         ],
+                        ['attribute' => 'is_local_bet','label'=>'本地下', 'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if($model->is_local_bet == 1){
+                                    $txt = '<font color="green">是</font>';
+                                    $alt = '点击禁用';
+                                    $val = 0;
+                                }else{
+                                    $txt = '<font color="red">否</font>';
+                                    $val = 1;
+                                    $alt = '点击启用';
+                                }
+                                $url = "/forum/user/switch-is-local-bet?id=".$model->id."&status=".$val; #
+                                return Html::a($txt, $url, ['title' => '开通使用代理IP','alt'=>$alt]);
+                            }
+                        ],
                         ['attribute' => 'is_auto_login','label'=>'自动登', 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {

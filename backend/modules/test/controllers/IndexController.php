@@ -257,6 +257,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%bet_error_plans_task}}');p($r);
 
         $post = \Yii::$app->request->post();
         p($post);
@@ -281,7 +282,6 @@ class IndexController extends Controller
         $rst = ProxyBaseService::preGetValidIp($is_auto=0);p($rst);
         $isValidRst = ProxyKuaiService::kuaiIPValidTime(['219.128.35.247:19054']);p($isValidRst);
         $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);p($hasPlansActiveLottery);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%proxy_ip_records}}');p($r);
         $ip_addr = PoxyIPService::getCurrentValidProxyIp();p($ip_addr); # 获取当前可用的代理IP
         $rst = PoxyIPService::getRemoteProxyIp($type=1);p($rst);
         $rst = BaseService::login($id=10);p($rst);

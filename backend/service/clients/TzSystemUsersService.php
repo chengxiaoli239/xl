@@ -207,7 +207,7 @@ class TzSystemUsersService extends ClientsBaseService{
      * @param string $access_token
      * @return mixed|string
      */
-    public static function getActivePlanTasks($access_token='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function getActivePlanTasks($access_token='', $current_qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
 
         $m = \Yii::$app->cache;
         $mkey = self::buildUserPlanTasksKey($access_token);
@@ -219,6 +219,9 @@ class TzSystemUsersService extends ClientsBaseService{
             $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
             if($uid){
                 $where = array_merge($where, [['=', 'uid', $uid]]);
+            }
+            if(!empty($current_qihao)){
+                $where = array_merge($where, [['=', 'qihao', $current_qihao]]);
             }
 
             $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
