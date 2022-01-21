@@ -343,16 +343,16 @@ class UserService extends BaseService {
         if(empty($TzSystemsUsers)){
             return ['status'=>303, 'msg'=>'找不到用户记录'];
         }
-        $TzSystemsUsers->ssc_domain = $datas['ssc_domain'];
-        $TzSystemsUsers->account = $datas['account'];
-        $TzSystemsUsers->password = $datas['password'];
+        $TzSystemsUsers->ssc_domain = trim($datas['ssc_domain']);
+        $TzSystemsUsers->account = trim($datas['account']);
+        $TzSystemsUsers->password = trim($datas['password']);
 
         $cookies = $datas['cookies'];
         $cookies_str = '';
         foreach ($cookies as $cookie){
             $cookies_str .= $cookie['name'].'='.$cookie['value'].';';
         }
-        $TzSystemsUsers->cookie = $cookies_str;
+        $TzSystemsUsers->cookie = trim($cookies_str);
         $r = $TzSystemsUsers->save();
         if(!$r){
             $msg = $TzSystemsUsers->getErrors();

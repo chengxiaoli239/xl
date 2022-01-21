@@ -56,7 +56,7 @@ class TzSystemsUsersController extends BaseController
         $id = $post['id'];
         $is_auto = $post['is_auto'];
         $rst = BaseService::login($id, $is_auto);
-        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '²Ù×÷µÇÂ½', ['id'=>$id, 'is_auto'=>$is_auto, 'rst'=>$rst]);
+        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â½', ['id'=>$id, 'is_auto'=>$is_auto, 'rst'=>$rst]);
         if(empty($rst['username'])){
             $TzSystemsUsers = TzSystemsUsers::findOne($id);
             $rst['username'] = $TzSystemsUsers->username;
@@ -99,7 +99,7 @@ class TzSystemsUsersController extends BaseController
     }
 
     /**
-     * @desc ¸üĞÂÓÃ»§µ½ÆÚÊ±¼ä
+     * @desc æ›´æ–°åˆ°æœŸæ—¶é—´
      * @return mixed
      */
     public function actionUpExpireTime(){
@@ -132,7 +132,7 @@ class TzSystemsUsersController extends BaseController
             }
             $post['TzSystemsUsers']['ssc_domain'] = trim($post['TzSystemsUsers']['ssc_domain'], '/');
             $post['TzSystemsUsers']['cookie'] = $cookie;
-            $post['TzSystemsUsers']['desc'] = ''; # ÖØĞÂ±£´æÇå¿ÕÍøÅÌ×´Ì¬£¬×¢ÒâÕë¶ÔÆµ·±µÇÂ½ÏŞÖÆ
+            $post['TzSystemsUsers']['desc'] = '';
         }
 
         if ($model->load($post) && $model->save()) {
