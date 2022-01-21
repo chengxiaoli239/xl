@@ -96,9 +96,10 @@ class TzSystemUsersService extends ClientsBaseService{
 
             Lucky5Service::__init($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
             $tzSiteInfo = Lucky5Service::getTzSiteInfo($TzSystemsUsers->tz_system_id);
+            $user_agent = trim(str_replace('User-Agent:', '',str_replace('user_agent:','', $TzSystemsUsers->user_agent)));
             $data = [
                 'cookies' => trim(trim($cookies), ';'),
-                'user_agent' => trim(str_replace('User-Agent:', '',str_replace('user_agent:','', $TzSystemsUsers->user_agent))),
+                'user_agent' => $user_agent,
                 "Referer" => $TzSystemsUsers->ssc_domain."/App/Index?_=",
                 "Host"=> str_replace('www.','',$tzSiteInfo['domain']),
             ];
@@ -248,7 +249,7 @@ class TzSystemUsersService extends ClientsBaseService{
                     'Content-Length' => (string)strlen(http_build_query($post_data)),
                     'Content-Type' => 'application/x-www-form-urlencoded',
                     'Cookie' => $TzSystemsUsers->cookie,
-                    'Host' => str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
+                    'Host' => trim(str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain))),
                     'Origin' => $TzSystemsUsers->ssc_domain,
                     'Referer' => $TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
                     'sec-ch-ua: " Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
