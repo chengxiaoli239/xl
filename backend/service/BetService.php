@@ -220,7 +220,7 @@ abstract class BetService extends BaseBetService {
         }
 
         # 2、下注任务检测
-        $where = ['AND', ['=', 'uid', $uid], ['IN', 'status', [0, 1]], ['=', 'is_local_bet', 0]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
+        $where = ['AND', ['=', 'uid', $uid], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
         $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
         $tz_system_id = $BetErrorPlansTasks->tz_system_id;
         $task_id = $BetErrorPlansTasks->id;
