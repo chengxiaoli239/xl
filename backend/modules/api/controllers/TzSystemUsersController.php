@@ -213,5 +213,22 @@ class TzSystemUsersController extends Controller
         return $rst;
     }
 
+    /**
+     * @desc 错误日志记录
+     * @return array|bool
+     */
+    public function actionPushErrLog(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        if(empty($post['access_token'])){
+            return ['status'=>301, 'msg'=>'缺少access_token参数'];
+        }
+        $rst = ['status'=>200, 'msg'=>'接收成功'];
+
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '错误日志记录成功', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+
+        return $rst;
+    }
+
 
 }
