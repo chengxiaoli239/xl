@@ -37,6 +37,9 @@ class BaseService{
         if(!$TzSystemsUser = TzSystemsUsers::findOne($id)){
             return ['status'=>300, 'msg'=>'操作失败:找不到记录'];
         }
+        if(!$TzSystemsUser->is_auto_login){
+            return ['status'=>300, 'msg'=>'操作失败:账号没设置自动登陆'];
+        }
 
         $tz_system_id = $TzSystemsUser->tz_system_id;
         # 是否有激活的计划

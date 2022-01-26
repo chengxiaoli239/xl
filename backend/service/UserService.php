@@ -246,7 +246,7 @@ class UserService extends BaseService {
      * @param string $tz_system_users_id
      * @return boolean
      */
-    public static function accountIsExpire($user_id = '', $tz_system_id = ''){
+    public static function accountIsExpire($user_id = '', $tz_system_id = '', &$TzSystemsUsers=''){
         $where = ['uid'=>$user_id];
         if(!empty($tz_system_id)){
             $where['tz_system_id'] = $tz_system_id;
@@ -255,6 +255,7 @@ class UserService extends BaseService {
         //$Model = TzSystemsUsers::findOne($tz_system_users_id);
         if(!$Model) return false;
         $flag = false;
+        $TzSystemsUsers = $TzSystemsUsers;
         if(!empty($Model->expire_time)){
             if($Model->expire_time >= time()){
                 $flag = true;

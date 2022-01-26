@@ -212,7 +212,7 @@ abstract class BetService extends BaseBetService {
      */
     public static function lotteryBet($uid){
         # 1、账号是否过期
-        $status = UserService::accountIsExpire($uid);
+        $status = UserService::accountIsExpire($uid, '', $TzSystemsUsers);
         if(!$status && !in_array($uid, [2, 11])){
             $Model = TzSystemsUsers::findOne(['uid'=>$uid]);
             Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['uid'=>$uid, 'account'=>$Model->account]);
@@ -220,7 +220,7 @@ abstract class BetService extends BaseBetService {
         }
 
         # 2、下注任务检测
-        $where = ['AND', ['=', 'uid', $uid], ['IN', 'status', [0, 1]], ['=', 'is_local_bet', 0]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
+        $where = ['AND', ['=', 'uid', $uid], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
         $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
         $tz_system_id = $BetErrorPlansTasks->tz_system_id;
         $task_id = $BetErrorPlansTasks->id;
@@ -235,7 +235,7 @@ abstract class BetService extends BaseBetService {
         $flag = self::isLogin($uid, $tz_system_id, $r=2);
         $end_time = microtime(true);
         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注-登陆检测-1', ['uid'=>$uid, 'flag'=>$flag, 'consume_time'=>($end_time-$start_time).'s']);
-        if(!$flag){
+        if(!$flag && $TzSystemsUsers->is_auto_login){
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
             $loginRst = BaseService::login($TzSystemsUsers->id, $is_auto=2);
             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '网盘开盘状态-4-2', ['uid'=>$uid, 'task_id'=>$task_id, 'loginRst'=>$loginRst]);
