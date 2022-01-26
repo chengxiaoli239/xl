@@ -625,6 +625,9 @@ abstract class BetService extends BaseBetService {
         if(empty($lottery_type)){
             $lottery_type = DEFAULT_LOTTERY_TYPE;
         }
+        if(strpos($betRst['err_msg'], '您当前使用的浏览器不支持cookie') !== false){
+            return ['status'=>300, 'msg'=>'下注失败，等待下注'];
+        }
 
         $flag = 0;
         $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
