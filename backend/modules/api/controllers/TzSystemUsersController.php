@@ -174,14 +174,14 @@ class TzSystemUsersController extends Controller
         }
 
         $activeQihaoData = $post['activeQihaoData']['Data'];
-        if($activeQihaoData['status'] == 1){
-            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', $activeQihaoData['real_period_no'].'期封盘通知', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post]);
-            return ['status'=>302, 'msg'=>$activeQihaoData['real_period_no'].'封盘状态'];
-        }
         $qihao = $activeQihaoData['real_period_no'];
+        if($activeQihaoData['status'] == 1){
+            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', $qihao.'期封盘通知', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post]);
+            return ['status'=>302, 'msg'=>$qihao.'期封盘状态'];
+        }
 
         $rst = BetService::openBetQihao($post['access_token'], $qihao, $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '激活期号接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', $qihao.'期开盘通知', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
