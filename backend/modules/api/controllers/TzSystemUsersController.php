@@ -175,7 +175,7 @@ class TzSystemUsersController extends Controller
 
         $activeQihaoData = $post['activeQihaoData']['Data'];
         if($activeQihaoData['status'] == 1){
-            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '期号封盘通知', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post]);
+            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', $activeQihaoData['real_period_no'].'期封盘通知', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post]);
             return ['status'=>302, 'msg'=>$activeQihaoData['real_period_no'].'封盘状态'];
         }
         $qihao = $activeQihaoData['real_period_no'];
