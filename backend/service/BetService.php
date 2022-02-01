@@ -1702,7 +1702,7 @@ abstract class BetService extends BaseBetService {
                 $cacheTime = 5 * 60;
                 break;
             case 8: # 幸运五星彩
-                $cacheTime = 5 * 60;
+                $cacheTime = 6 * 60;
                 $min_qihao = substr($qihao, -3);
                 if(($min_qihao == '048') OR ('04:05:00'<$now_HI && $now_HI<'09:05:00')){
                     $cacheTime = 5 * 3600;
