@@ -125,7 +125,9 @@ class TzSystemsUsersController extends BaseController
         $model = $this->findModel($id, $this->_user_id);
         $post = Yii::$app->request->post();
         if($post){
-            $post['TzSystemsUsers']['user_agent'] = 'User-Agent: '.$_SERVER['HTTP_USER_AGENT'];
+            if(empty($model->user_agent)){
+                $post['TzSystemsUsers']['user_agent'] = 'User-Agent: '.$_SERVER['HTTP_USER_AGENT'];
+            }
             $cookie = '';
             if($model->account == $post['TzSystemsUsers']['account']){
                  $cookie = trim($post['TzSystemsUsers']['cookie']);
