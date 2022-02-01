@@ -176,12 +176,12 @@ class TzSystemUsersController extends Controller
         $activeQihaoData = $post['activeQihaoData']['Data'];
         $qihao = $activeQihaoData['real_period_no'];
         if($activeQihaoData['status'] == 1){
-            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', $qihao.'期封盘通知', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post]);
+            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', $qihao.'期-封盘0', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post]);
             return ['status'=>302, 'msg'=>$qihao.'期封盘状态'];
         }
 
         $rst = BetService::openBetQihao($post['access_token'], $qihao, $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', $qihao.'期开盘通知', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', $qihao.'期-开盘1', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
