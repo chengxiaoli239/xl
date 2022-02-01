@@ -173,25 +173,15 @@ class TzSystemUsersController extends Controller
             return ['status'=>301, 'msg'=>'缺少access_token参数'];
         }
 
-        $rst = BetService::openBetQihao($post['access_token'], $post['qihao'], $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '激活期号接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
-
-        return $rst;
-    }
-
-    /**
-     * @desc 获取下注任务
-     * @return array|bool
-     */
-    public function actionGetBetTasks(){
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $post = \Yii::$app->request->post();
-        if(empty($post['access_token'])){
-            return ['status'=>301, 'msg'=>'缺少access_token参数'];
+        $activeQihaoData = $post['activeQihaoData']['Data'];
+        if($activeQihaoData['status'] == 1){
+            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '期号封盘通知', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post]);
+            return ['status'=>302, 'msg'=>$activeQihaoData['real_period_no'].'封盘状态'];
         }
+        $qihao = $activeQihaoData['real_period_no'];
 
-        $rst = BetService::openBetQihao($post['access_token'], $post['qihao'], $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '激活任务接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+        $rst = BetService::openBetQihao($post['access_token'], $qihao, $post['lottery_type']);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '激活期号接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }

@@ -578,14 +578,6 @@ abstract class BetService extends BaseBetService {
         return $mkey;
     }
 
-    public static function openActiveQihao($tz_system_id='', $qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
-        $m = \Yii::$app->cache;
-        $mkey = BetService::buildActiveQihaoKey($tz_system_id, $lottery_type);
-
-        $flag = $m->set($mkey, $qihao, 30);
-        return $flag;
-    }
-
     /**
      * @desc 开启新的一期计划
      * @param string $access_token
@@ -597,18 +589,14 @@ abstract class BetService extends BaseBetService {
             $lottery_type = DEFAULT_LOTTERY_TYPE;
         }
         $m = \Yii::$app->cache;
-        $mkey_active_qihao = 'openBetActiveQihao_'.$qihao;
-        if($m->get($mkey_active_qihao)){
-            return true;
-        }
 
         $flag = 0;
-        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken(trim($access_token));
+        $mkey = BetService::buildActiveQihaoKey($TzSystemsUsers->tz_system_id, $lottery_type);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '开启计划', ['access_token'=>$access_token, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'mkey'=>$mkey]);
         if(!empty($TzSystemsUsers)){
-            $mkey = BetService::buildActiveQihaoKey($TzSystemsUsers->tz_system_id, $lottery_type);
 
-            $flag = $m->set($mkey, $qihao, 30);
-            #$m->set($mkey_active_qihao, 1, 60); # 客户端激活期号key
+            $flag = $m->set($mkey, $qihao, 60);
         }
 
         return $flag;
@@ -636,7 +624,7 @@ abstract class BetService extends BaseBetService {
         }
         if(!empty($TzSystemsUsers)){
             $m = \Yii::$app->cache;
-            $mkey = BetService::buildActiveQihaoKey($TzSystemsUsers->tz_system_id, $lottery_type);
+            $mkey = BetService::buildActiveQihaaaaoKey($TzSystemsUsers->tz_system_id, $lottery_type);
 
             $flag = $m->set($mkey, $qihao, 30);
         }
@@ -1873,6 +1861,7 @@ abstract class BetService extends BaseBetService {
             $m = \Yii::$app->cache;
 
             $plans = UserSysPlans::find()->where($where)->all();
+            Tool_Common::log('/plans_tasks/'.__FUNCTION__, 'INFO', '批量插入任务000', ['lottery_type'=>$lottery_type, 'counts'=>count($plans)]);
             if(empty($plans)){
                 Tool_Common::log('plan_is_active', 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>'没有开启的计划', 'uid'=>$plans[0]->uid]);
                 continue;

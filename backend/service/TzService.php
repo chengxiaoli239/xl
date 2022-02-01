@@ -229,7 +229,7 @@ class TzService extends BaseService {
         //$rst20 = $m->set($simulate_pkey,1,$time);
         # 计划任务是否处理完成后锁住(value:1)，避免重复处理 end
 
-        $logData = ['lottery_type'=>$lottery_type, 'rst11'=>$rst11, 'rst10'=>$rst10, 'rst21'=>$rst21];
+        $logData = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'rst11'=>$rst11, 'rst10'=>$rst10, 'rst21'=>$rst21];
         Tool_Common::log('afterRunSysPlans','INFO','系统计划处理后', $logData);
 
         return true;
