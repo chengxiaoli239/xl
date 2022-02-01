@@ -622,12 +622,7 @@ abstract class BetService extends BaseBetService {
         if(empty($TzSystemsUsers)){
             return ['status'=>404, 'msg'=>'用户信息找不到'];
         }
-        if(!empty($TzSystemsUsers)){
-            $m = \Yii::$app->cache;
-            $mkey = BetService::buildActiveQihaaaaoKey($TzSystemsUsers->tz_system_id, $lottery_type);
 
-            $flag = $m->set($mkey, $qihao, 30);
-        }
         $where = ['plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
         $BetErrorPlansTask = BetErrorPlansTask::findOne($where);
         if(empty($BetErrorPlansTask)){
