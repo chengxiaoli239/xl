@@ -257,6 +257,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        p(urldecode('https://m.kuajing0898.com/wechatlogin?access_token=54_Ta8VVjILPFM8kbloyNv2DQqMIowaly3_8iExGHW_YzMijrtSUFIl8iWzpNpsnE-8ZZzegMXxWmP-ubqH6sRMMg&openid=opAKq1LHH1lqc1eC8zZgh5nOPUZw&r_url=https%3A%2F%2Fmk.kuajing0898.com%2Fecpage%3Fcode%3Dea561700637319f5'));
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%bet_error_plans_task}}');p($r);
 
         $post = \Yii::$app->request->post();
