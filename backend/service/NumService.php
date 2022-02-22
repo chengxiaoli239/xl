@@ -1285,6 +1285,7 @@ class NumService extends BaseService {
             }
         }
 
+
         # 对数
         if(isset($codes_hz['type_log'])){
             $where = array_merge($where, [['=', 'type_log', $codes_hz['type_log']]]);
