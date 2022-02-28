@@ -2672,7 +2672,7 @@ class SscDataService extends BaseService {
                     ['=', 'is_profits_record', 1],
                     ['OR',
                         ['=', 'is_simulate', 0],
-                        ['AND', ['=','is_simulate', 1], ['=', 'sn', '888888']],
+                        ['AND', ['=','is_simulate', 1], ['=', 'sn', BetService::$test_true_sn]],
                     ],
                 ];
                 $profits = BettingRecords::find()->where($where)->sum('profits');
