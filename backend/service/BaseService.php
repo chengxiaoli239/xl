@@ -286,4 +286,29 @@ class BaseService{
 
         return $tz_system_user_id;
     }
+
+    /**
+     * @desc CURLOPT_SSLVERSION 为1的用户
+     * @return false|string[]
+     */
+    public static function getSslVersion1Uids(){
+        $uids = BetService::getConfig('CURLOPT_SSLVERSION_1_UIDS');
+
+        return explode(',', $uids);
+    }
+
+    /**
+     * @desc 获取ssl version 版本
+     * @param string $uid
+     * @return int
+     */
+    public static function getSslVersionByUid($uid=''){
+        $ssl_1_uids = BaseService::getSslVersion1Uids();
+
+        $version = 3;
+        if(in_array($uid, $ssl_1_uids)){
+            $version = 1;
+        }
+        return $version;
+    }
 }

@@ -257,6 +257,9 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $r = BaseService::login($id=10);p($r);
+        $rst = BaseService::synBalance($id=10);p($rst); # 同步余额
+        $ssl_uids = BaseService::getSslVersion1Uids();p($ssl_uids);
         p(urldecode('https://m.kuajing0898.com/wechatlogin?access_token=54_Ta8VVjILPFM8kbloyNv2DQqMIowaly3_8iExGHW_YzMijrtSUFIl8iWzpNpsnE-8ZZzegMXxWmP-ubqH6sRMMg&openid=opAKq1LHH1lqc1eC8zZgh5nOPUZw&r_url=https%3A%2F%2Fmk.kuajing0898.com%2Fecpage%3Fcode%3Dea561700637319f5'));
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%bet_error_plans_task}}');p($r);
 

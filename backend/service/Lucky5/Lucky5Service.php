@@ -1012,6 +1012,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         return $cookie;
     }
+
     public static function getSessionId($url, $header, $uid = 0){
 
         $curl = curl_init();
@@ -1024,7 +1025,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($curl, CURLOPT_SSLVERSION, 3);
+        curl_setopt($curl, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
 
         $content = curl_exec($curl);
         if(strpos($content, 'Set-Cookie') !== false){
@@ -1074,7 +1075,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($curl, CURLOPT_SSLVERSION, 3);
+        curl_setopt($curl, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
 
         $content = curl_exec($curl);
         preg_match_all("/Set-Cookie: (.*)/i", $content, $matches);
@@ -1200,7 +1201,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
@@ -1334,7 +1335,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $m = \Yii::$app->cache;
         $mkey = 'get_userInfo_'.$uid.'_'.$tz_system_id.'_'.$is_auto;
         //if($data = $m->get($mkey) && $is_auto==1) return $data;
-        if($data = $m->get($mkey)) return $data;
+        //if($data = $m->get($mkey)) return $data;
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         if($is_auto==1 && $TzSystemsUsers->expire_time<time()){
@@ -1350,15 +1351,16 @@ class Lucky5Service { # 重庆7时彩登陆体系
             return ['status'=>302, 'msg'=>'cookie为空，不能正常获取用户信息'];
         }
 
+        //p('xxxxxxxxxxx'.rand());
         $_t = (int)microtime(true) * 1000;
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/GetMemberPrint?_='.$_t;
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
         $headers = [
             "Accept: application/json, text/javascript, */*; q=0.01",
-            "Accept-Encoding: gunzip, deflate",
+            "Accept-Encoding: gunzip, deflate, br",
             "Accept-Language: zh-CN,zh;q=0.9",
             "Connection: keep-alive",
-            "Cookie: ".trim($TzSystemsUsers->cookie),
+            "Cookie: ".trim($TzSystemsUsers->cookie).' NOTICE_LOGIN_IN=1',
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
@@ -2259,7 +2261,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER,0);
@@ -2268,9 +2270,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $errno = curl_errno( $ch );
         //$logArr = ['url'=>$url, 'url'=>$url, 'headers'=>$header,'data'=>$data]; p($logArr);
-        //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
+        //if(strpos($url, 'GetInfoByName') !== false or $uid==17){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
         $curl_error = curl_error($ch);
         curl_close($ch);
+        //p(['data'=>$data, 'errno'=>$errno]);
         if($errno) {
             return ['status'=>401, 'err_msg'=>'Curl error: '.$curl_error, 'errno'=>$errno];
         }
@@ -2307,7 +2310,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
