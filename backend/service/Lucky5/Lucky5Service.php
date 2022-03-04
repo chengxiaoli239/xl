@@ -2261,7 +2261,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
+        //curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER,0);
