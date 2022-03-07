@@ -638,7 +638,7 @@ class HN0898Service extends BaseTZService {
                 $code_hz['current_arise_A_times'] = 0;
                 $code_hz['current_arise_B_times'] = 0;
                 $code_hz['current_yl_desc'] = '';
-                $code_hz['A_x_B_y_start_time'] = strtotime('Y-m-d H:i:s');
+                $code_hz['A_x_B_y_start_time'] = date('Y-m-d H:i:s');
             }
             $UserSysPlans->hz_Arr = json_encode($code_hz, 320);
         }
