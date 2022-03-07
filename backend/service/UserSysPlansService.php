@@ -413,10 +413,10 @@ class UserSysPlansService extends BaseService {
                 $singles_key = 0;
                 $current_miss = 0;
             }
-            if($plan->plan_type == 12){
+            if($plan->plan_type == 12){ # A_x_B_y_status
                 $tmpHzArr = json_decode($plan->hz_Arr, true);
                 $A_x_B_y_status = isset($tmpHzArr['A_x_B_y_status']) ? $tmpHzArr['A_x_B_y_status'] : 0;
-                $A_x_B_y_start_time = isset($tmpHzArr['A_x_B_y_start_time']) ? $tmpHzArr['A_x_B_y_start_time'] : date('Y-m-d H:i:s');
+                $A_x_B_y_start_time = (isset($tmpHzArr['A_x_B_y_start_time']) && !$tmpHzArr['A_x_B_y_start_time']) ? $tmpHzArr['A_x_B_y_start_time'] : date('Y-m-d H:i:s');
 
                 $tmpFilter['start_bet_yl_nums'] = 0;
                 $tmpFilter['current_arise_A_times'] = 0;

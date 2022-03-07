@@ -148,8 +148,13 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $arise_B_codes;
     public $arise_A_times; # A出次数
     public $arise_B_times; # B出次数
+    public $current_arise_A_times; # A出当前次数
+    public $current_arise_B_times; # B出当前次数
     public $A_x_B_y_status; # 状态：0初始1等待符合条件中2开始投
     public $A_x_B_y_start_time;
+    public $current_yl_desc;
+    public $start_bet_yl_nums;
+    public $single_key;
     ############## A出x次B出y次投B end   ###################
     /**
      * @inheritdoc
