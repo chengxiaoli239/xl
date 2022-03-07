@@ -26,6 +26,7 @@ class BetErrorPlansTaskService extends BaseService {
         }
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
         $BetErrorPlansTask = new BetErrorPlansTask();
+        $isUnusual = BetErrorPlansTaskService::getStatusIsUnusual($playway, $single);
         $setDatas = [
             'uid' => $uid,
             'account' => $account,
@@ -43,6 +44,7 @@ class BetErrorPlansTaskService extends BaseService {
             'lotteryclass' => BetService::lotteryClass($playway),
             'single' => $single,
             'playway' => $playway,
+            'status' => $isUnusual ? 4 : 0,
             'lottery_type' => $lottery_type,
             'error_desc' => json_encode($error_rst, 320),
             'updated_at' => time(),
@@ -59,6 +61,20 @@ class BetErrorPlansTaskService extends BaseService {
         }
 
         return $rst;
+    }
+
+    /**
+     * @param $playway
+     * @param string $single
+     * @return bool
+     */
+    public static function getStatusIsUnusual($playway, $single=''){
+        $flag = false;
+        if($playway == 1 && $single == 0.1){ # 二定异常倍数
+            $flag = true;
+        }
+
+        return $flag;
     }
 
     /**
