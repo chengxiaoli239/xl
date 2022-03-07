@@ -2883,7 +2883,7 @@ class SscDataService extends BaseService {
                     $single_key = $hzArr['singles_key'];
 
                     //$is_zj_A_x_B_y = 0; # 是否真实中奖
-                    $A_x_B_y_status = 0;
+                    //$A_x_B_y_status = 0;
 
                     $singles = explode('-', trim($UserSysPlan->singles));
                     if(empty($singles)) $singles = [$UserSysPlan->single];
