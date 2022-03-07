@@ -168,7 +168,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             'format'=>'raw',
                             'value' => function($model) {
                                 if(\backend\service\BaseService::is_json($model->hz_Arr) OR in_array($model->tz_type, [18, 19, 20, 25, 27, 28, 29, 30, 31, 32, 33, 34, 17,36,37])){
-                                    $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
+                                    $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true), $model->id);
                                     $desc_str = $str;
                                     if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                         $title = \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
@@ -179,7 +179,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 $txt = BaseStringHelper::truncate($str,20);
                                 $desc_str .= '翻倍：'.$model->singles;
                                 $str = Html::a($txt, 'javascript:;', ['title' => \backend\service\SscDataService::getCodesDesc($title),'alt'=>\backend\service\SscDataService::getCodesDesc($desc_str), 'class'=>'act-desc', 'current_profits'=>round($model->current_profits, 2)]);
-                                if($model->singles && in_array($model->plan_type,[2, 3, 4, 5, 9, 10])){
+                                if($model->singles OR in_array($model->plan_type,[2, 3, 4, 5, 9, 10])){
                                     $str .= '翻倍梯度:'.$model->singles;
                                 }
                                 return $str;

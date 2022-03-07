@@ -271,10 +271,11 @@ class UserSysPlansController extends BaseController
             $model->change_per = [];
             //$codes = ImportPlanCodes::findAll($where)->codes;
             $ImportPlanCodes = ImportPlanCodes::find()->where($where)->asArray()->all();
+            //p($ImportPlanCodes,0);
             if(!empty($ImportPlanCodes)){
-                $codes = ArrayHelper::getColumn($ImportPlanCodes, 'codes');
-                foreach ($codes as $k=>$code){
-                    $codes[$k] = str_replace('@', ' ', str_replace(',', '', $code));
+                //$codes = ArrayHelper::getColumn($ImportPlanCodes, 'codes');
+                foreach ($ImportPlanCodes as $k=>$ImportPlanCodesData){
+                    $codes[$ImportPlanCodesData['plan_id_sort_key']] = str_replace('@', ' ', str_replace(',', '', $ImportPlanCodesData['codes']));
                 }
                 $model->change_per = $hz_Arr_Data['change_per'] ? [$hz_Arr_Data['change_per']] : [];
                 $model->import_codes_txts = $codes;

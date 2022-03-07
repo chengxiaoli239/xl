@@ -62,7 +62,8 @@ use yii\widgets\ActiveForm;
                     <!--?= $form->field($model, 'nums')->textInput() ?-->
 
                     <!--排除前xx期-->
-                    <?php include(dirname(__FILE__).'/filter_xs_before.php'); ?>
+                    <?php //include(dirname(__FILE__).'/filter_xs_before.php'); # 功能完好，不常用先注释 ?>
+                    <?php include(dirname(__FILE__).'/A_x_arise_B_y_arise_bet_B.php'); # A出x次B出y次投B ?>
 
                     <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:0.1-0.3-0.7-1.5-3.1-6.2-12.5-25.1') ?>
                     <div class="row">

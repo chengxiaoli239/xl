@@ -436,6 +436,7 @@ class TzService extends BaseService {
             9=>'遗漏倍投', # 遗漏x期数则开始倍投，投中了后就回到第一个倍数再等遗漏x期再继续倍投
             //10=>'中则倍投',
             //11=>'中则交叉正反',
+            12=>'A出x次B出y次投B',
         ];
         if(isset($datas[$type])) return $datas[$type];
 

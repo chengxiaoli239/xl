@@ -142,6 +142,15 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $test_period_days; # 模拟近x天
     public $history_max_miss; # 历史最大遗漏
     ############### 动态过滤 - 模拟 end ####################
+
+    ############## A出x次B出y次投B start ###################
+    public $arise_A_codes;
+    public $arise_B_codes;
+    public $arise_A_times; # A出次数
+    public $arise_B_times; # B出次数
+    public $A_x_B_y_status; # 状态：0初始1等待符合条件中2开始投
+    public $A_x_B_y_start_time;
+    ############## A出x次B出y次投B end   ###################
     /**
      * @inheritdoc
      */

@@ -257,6 +257,7 @@ class IndexController extends Controller
     }
 
     public function actionDw(){
+        $rst = SscDataService::opProfitsPlans12($lottery_type=8); p($rst);# A出x次B出y次投B 计划处理
         $r = BaseService::login($id=10);p($r);
         $rst = BaseService::synBalance($id=10);p($rst); # 同步余额
         $ssl_uids = BaseService::getSslVersion1Uids();p($ssl_uids);

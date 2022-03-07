@@ -1625,7 +1625,7 @@ class NumService extends BaseService {
      * @param $hz_Arr
      * @return string
      */
-    public static function getDescByKuaixuan($hz_Arr){
+    public static function getDescByKuaixuan($hz_Arr, $plan_id=''){
         //p($hz_Arr,0);
         # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
         //$desc = '[快选] ';
@@ -1643,6 +1643,11 @@ class NumService extends BaseService {
         $filter9 = []; # 合分除
         $filter10 = []; # 号码组
         $filter11 = []; # 定位 含
+
+        $UserSysPlans = '';
+        if(!empty($plan_id)){
+            $UserSysPlans = UserSysPlans::findOne($plan_id);
+        }
         # {"get_types":["1","2"],"remove_types":["4","5"],"get_hzs":["7","8","10"],"remove_hzs":["12","13","14"],"get_arises":"123","remove_arises":"456"}
         # 0.1、上奖取
         if(isset($hz_Arr['arise']) OR isset($hz_Arr['get_arises'])){
@@ -1868,6 +1873,16 @@ class NumService extends BaseService {
                 $desc .= $typesArr[$key0].',';
             }
             $desc = trim($desc, ',').' ';
+        }
+
+        if($UserSysPlans && $UserSysPlans->plan_type == 12){ # A出x次B出y次投B
+            # {"arise_A_times":3,"arise_B_times":1,"current_arise_A_times":4,"filters":[],"filter_dates":[],"filter_qihaos":[]}
+            $yl_desc = $hz_Arr['yl_desc'];// = 'A-A-A-B-A';
+            if(!$hz_Arr['yl_desc']){
+                $yl_desc = '---';
+            }
+            $desc .= '[A出:'.$hz_Arr['arise_A_times'].'次当前:'.(int)$hz_Arr['current_arise_A_times'].'次&B出:'.$hz_Arr['arise_B_times'].'次,遗漏:'.$yl_desc.']';
+
         }
         # 类型取
         if(!empty($filter6) OR !empty($filter7)){

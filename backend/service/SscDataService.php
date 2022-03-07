@@ -2825,7 +2825,7 @@ class SscDataService extends BaseService {
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
                 $hzArr = json_decode($UserSysPlan->hz_Arr, true);
-                if(isset($hzArr['change_per'])){ # 每期轮换
+                if(isset($hzArr['change_per']) && $hzArr['change_per'] == 1){ # 每期轮换
                     $imports = ImportPlanCodes::find()->select(['uid', 'plan_id', 'plan_id_sort_key'])->where(['AND', ['=', 'plan_id', $UserSysPlan->id], ['!=', 'codes', '']])->asArray()->all();
                     $sortKeys = yii\helpers\ArrayHelper::getColumn($imports, 'plan_id_sort_key');
                     $current_key = array_search($hzArr['turn_key'], $sortKeys);
@@ -2842,11 +2842,160 @@ class SscDataService extends BaseService {
             }
         }
 
+        SscDataService::opProfitsPlans12($lottery_type); # A出x次B出y次投B 计划处理
+
+
         $logArr['lottery_type'] = $lottery_type;
         $logArr['qihao'] = HN0898Service::getQihao($lottery_type);
         Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', [$logArr]);
 
         return $logArr;
+    }
+
+
+    /**
+     * @desc A出x次B出y次投B 计划处理
+     * @param int $lottery_type
+     * @return bool
+     */
+    public static function opProfitsPlans12($lottery_type = DEFAULT_LOTTERY_TYPE){
+        try {
+            # plan_type:12 A出x次B出y次投B
+            $where = ['AND', ['IN', 'plan_type', [12]], ['=', 'status', 0], ['=', 'lottery_type', $lottery_type]];
+            if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+                foreach ($UserSysPlans as $UserSysPlan){
+                    $zj_group = SscDataService::getNewZjGroupByPlanId($UserSysPlan->id);
+                    $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+                    $A_x_B_y_status = $hzArr['A_x_B_y_status']; # 状态：0初始1等待中2正在投
+                    //$A_x_B_y_status = $hzArr[];
+
+                    if(!$hzArr['A_x_B_y_start_time']){
+                        $hzArr['A_x_B_y_start_time'] = date('Y-m-d H:i:s'); # 计划最新条件起始时间
+                    }
+                    if($hzArr['A_x_B_y_status'] == 0){
+                        $hzArr['A_x_B_y_status'] = 1;
+                    }
+
+                    $hzArr["current_arise_A_times"]; # A上奖次
+                    $hzArr["current_arise_B_times"]; # B上奖次
+                    $hzArr['arise_A_times']; # 设置A条件
+                    $hzArr['arise_B_times']; # 设置B条件
+                    $single_key = $hzArr['singles_key'];
+
+                    //$is_zj_A_x_B_y = 0; # 是否真实中奖
+                    $A_x_B_y_status = 0;
+
+                    $singles = explode('-', trim($UserSysPlan->singles));
+                    if(empty($singles)) $singles = [$UserSysPlan->single];
+                    if($zj_group == 'arise_A_codes'){
+                        # 上 A
+                        SscDataService::operateZjGroupA($A_x_B_y_status, $hzArr);
+                        if(in_array($A_x_B_y_status, [0, 1])){
+                            $single = $singles[0];
+                            $next_single_key = 0;
+                        }elseif($A_x_B_y_status == 2){
+                            $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+                        }
+                    }else{
+                        # 上 B
+                        SscDataService::operateZjGroupB($A_x_B_y_status, $hzArr);
+                        $next_single_key = 0;
+                    }
+                    $hzArr['single_key'] = $next_single_key;
+
+                    $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
+                    $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
+                    $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                    $logArr['plan_8'][$UserSysPlan->id]['updateData'] = $updateData;
+                    $logArr['plan_8'][$UserSysPlan->id]['rst'] = $rst;
+                }
+            }
+        }catch (\Exception $exception){
+            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', 'A出x次B出y次投B-处理错误');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $UserSysPlan_id
+     * @return bool
+     */
+    public static function getNewZjGroupByPlanId($UserSysPlan_id=''){
+        $ImportPlanCodes = ImportPlanCodes::find()->where(['plan_id'=>$UserSysPlan_id, 'status'=>1])->all();
+        $UserSysPlan = UserSysPlans::findOne($UserSysPlan_id);
+        $lottery_type = $UserSysPlan->lottery_type;
+        foreach ($ImportPlanCodes as $importPlanCode){
+            if($importPlanCode->plan_id_sort_key != 'arise_B_codes') continue;
+            $codes = $importPlanCode->codes;
+            $where = ['lottery_type'=>$lottery_type];
+
+            $kjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->one()['code_str'];
+            $zjResult = OpKjService::opKjData4($codes, $kjData);
+            if(isset($zjResult['data']) && $zjResult['data']['zjTimes'] == 1){
+                return $importPlanCode->plan_id_sort_key;
+            }
+        }
+
+        return $ImportPlanCodes[0]->plan_id_sort_key;
+    }
+
+    /**
+     * @desc 1、上A：A出x次B出y次投B 计划处理
+     * @param int $A_x_B_y_status
+     * @param array $hzArr
+     * @return bool
+     */
+    private static function operateZjGroupA($A_x_B_y_status = 0, &$hzArr=[]){
+        $rst = true;
+        $hzArr['current_yl_desc'] .= '-A';
+        if(in_array($A_x_B_y_status, [0, 1])){
+            $hzArr['current_arise_A_times'] += 1;
+            $hzArr['current_arise_B_times'] = 0;
+            $hzArr['start_bet_yl_nums'] = 0;
+            $hzArr['A_x_B_y_status'] = 0;
+        }elseif($A_x_B_y_status == 2){
+            $hzArr['start_bet_yl_nums'] += 1;
+        }
+        $hzArr['current_yl_desc'] = trim($hzArr['current_yl_desc'], '-');
+
+        return $rst;
+    }
+
+    /**
+     * @desc 1、上B：A出x次B出y次投B 计划处理
+     * @param int $A_x_B_y_status
+     * @param array $hzArr
+     * @return bool
+     */
+    private static function operateZjGroupB($A_x_B_y_status = 0, &$hzArr=[]){
+        $rst = true;
+        if($A_x_B_y_status == 0){
+            # 1、初始化
+            $hzArr['current_arise_A_times'] = 0;
+            $hzArr['current_arise_B_times'] = 0;
+            $hzArr['current_yl_desc'] = '';
+            $hzArr['start_bet_yl_nums'] = 0;
+            $hzArr['A_x_B_y_status'] = 1;
+        }elseif($A_x_B_y_status == 1){
+            # 2、等待中
+            if($hzArr['current_arise_A_times'] >= $hzArr['arise_A_times'] && $hzArr['current_arise_B_times'] == $hzArr['arise_B_times']){
+                $hzArr['current_arise_B_times'] = 0;
+                $hzArr['A_x_B_y_status'] = 2;
+            }
+            $hzArr['start_bet_yl_nums'] = 0;
+        }elseif($A_x_B_y_status == 2){
+            # 3、正在投
+            $hzArr['current_arise_A_times'] = 0;
+            $hzArr['current_arise_B_times'] = 0;
+            $hzArr['current_yl_desc'] = '';
+            $hzArr['start_bet_yl_nums'] = 0;
+            $hzArr['A_x_B_y_status'] = 1; # -- 改成下个轮回的等待
+        }
+        $hzArr['current_yl_desc'] = trim($hzArr['current_yl_desc'], '-');
+
+        return $rst;
     }
 
     /**

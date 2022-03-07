@@ -10,7 +10,7 @@ use Yii;
  * @property int $id
  * @property int $uid 类型名称
  * @property int $plan_id 投注/购买类型
- * @property int $plan_id_sort_key 计划号码组序号
+ * @property string $plan_id_sort_key 计划号码组序号
  * @property string $codes 导入号码
  * @property int $status 状态
  * @property int $created_at 创建时间
@@ -33,8 +33,8 @@ class ImportPlanCodes extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['uid', 'plan_id', 'plan_id_sort_key', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['codes'], 'string'],
+            [['uid', 'plan_id', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['codes', 'plan_id_sort_key'], 'string'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
         ];

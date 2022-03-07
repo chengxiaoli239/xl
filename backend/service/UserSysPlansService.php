@@ -226,6 +226,17 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['remove_types']);
 
+        # 21.1、A_x_arise_B_yarise_bet_B
+        if(isset($post['UserSysPlans']['arise_A_times'])){
+            $tmpFilter['arise_A_times'] = $post['UserSysPlans']['arise_A_times'] ? (int)$post['UserSysPlans']['arise_A_times'] : 0;
+        }
+        unset($post['UserSysPlans']['arise_A_times']);
+        # 21.2、A_x_arise_B_yarise_bet_B
+        if(isset($post['UserSysPlans']['arise_B_times'])){
+            $tmpFilter['arise_B_times'] = $post['UserSysPlans']['arise_B_times'] ? (int)$post['UserSysPlans']['arise_B_times'] : 0;
+        }
+        unset($post['UserSysPlans']['arise_B_times']);
+
         ################### 公共参数 - 结束 #########################
 
         if($playway == 6) {
@@ -393,7 +404,7 @@ class UserSysPlansService extends BaseService {
             $post['UserSysPlans']['hz_Arr'] && $post['UserSysPlans']['hz_Arr'] = trim($hz_Arr);
         }
 
-        if(!in_array($tz_type, [23]) && in_array($plan_type, [2,3,4,5,9])){ # 翻倍计划
+        if(!in_array($tz_type, [23]) && in_array($plan_type, [2,3,4,5,9, 12])){ # 翻倍计划
             if($id && $plan = UserSysPlans::findOne($id)){
                 $tmpHzArr = json_decode($plan->hz_Arr, true);
                 $singles_key = isset($tmpHzArr['singles_key']) ? $tmpHzArr['singles_key'] : 0;
@@ -402,6 +413,15 @@ class UserSysPlansService extends BaseService {
                 $singles_key = 0;
                 $current_miss = 0;
             }
+            if($plan->plan_type == 12){
+                $tmpHzArr = json_decode($plan->hz_Arr, true);
+                $A_x_B_y_status = isset($tmpHzArr['A_x_B_y_status']) ? $tmpHzArr['A_x_B_y_status'] : 0;
+                $A_x_B_y_start_time = isset($tmpHzArr['A_x_B_y_start_time']) ? $tmpHzArr['A_x_B_y_start_time'] : date('Y-m-d H:i:s');
+
+                $tmpFilter['A_x_B_y_status'] = $A_x_B_y_status;
+                $tmpFilter['A_x_B_y_start_time'] = $A_x_B_y_start_time;
+            }
+
             $tmpFilter['singles_key'] = $singles_key;
             $tmpFilter['current_miss'] = $current_miss;
 
@@ -604,7 +624,7 @@ class UserSysPlansService extends BaseService {
         try {
             foreach ($codes as $key=>$code){
                 $code = trim($code);
-                $key = (int)$key;
+                $key = (string)$key;
                 $status = ($key == 0 OR $change_per == 1) ? 1 : 0;
                 $status = empty($code) ? 0 : $status;
 
@@ -675,6 +695,23 @@ class UserSysPlansService extends BaseService {
             (isset($hzArr['filter_qihaos']) && isset($hzArr['filter_qihaos']['is_filter_qihao']) && $hzArr['filter_qihaos']['is_filter_qihao']==1) # 3、排除期号定位
         ){
             $codes = NumService::getCodesKuaiXuan($hzArr, $code_types[$plan->playway], $codes, $plan->lottery_type);
+        }
+
+        # A出x次B出y次投B
+        if($plan->plan_type == 12){
+            $where_codes = ['plan_id'=>$plan_id, 'plan_id_sort_key'=>['arise_A_codes', 'arise_B_codes']];
+            $datas = ImportPlanCodes::find()->where($where_codes)->limit(2)->all();
+            $codes_arises = [];
+            foreach ($datas as $d){
+                $codes_arises[$d->plan_id_sort_key] = $d->codes;
+            }
+            # {"arise_A_times":3,"arise_B_times":1,"current_arise_A_times":4, "current_arise_B_times":4, "A_x_B_y_start_time":"2022-03-06 14:00:00","filters":[],"filter_dates":[],"filter_qihaos":[]}
+            $arise_codes = $codes_arises['arise_A_codes'];
+            if($hzArr["current_arise_A_times"]>=$hzArr['arise_A_times'] && $hzArr["current_arise_B_times"]==$hzArr['arise_B_times']){
+                # 符合下注条件 投B组号码
+                $arise_codes = $codes_arises['arise_B_codes'];
+            }
+            $codes = explode('@', $arise_codes);
         }
 
 
