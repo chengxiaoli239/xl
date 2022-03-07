@@ -418,6 +418,11 @@ class UserSysPlansService extends BaseService {
                 $A_x_B_y_status = isset($tmpHzArr['A_x_B_y_status']) ? $tmpHzArr['A_x_B_y_status'] : 0;
                 $A_x_B_y_start_time = isset($tmpHzArr['A_x_B_y_start_time']) ? $tmpHzArr['A_x_B_y_start_time'] : date('Y-m-d H:i:s');
 
+                $tmpFilter['start_bet_yl_nums'] = 0;
+                $tmpFilter['current_arise_A_times'] = 0;
+                $tmpFilter['current_arise_B_times'] = 0;
+                $tmpFilter['current_yl_desc'] = '';
+
                 $tmpFilter['A_x_B_y_status'] = $A_x_B_y_status;
                 $tmpFilter['A_x_B_y_start_time'] = $A_x_B_y_start_time;
             }
