@@ -711,6 +711,7 @@ class UserSysPlansService extends BaseService {
             }
             # {"arise_A_times":3,"arise_B_times":1,"current_arise_A_times":4, "current_arise_B_times":4, "A_x_B_y_start_time":"2022-03-06 14:00:00","filters":[],"filter_dates":[],"filter_qihaos":[]}
             $arise_codes = $codes_arises['arise_A_codes'];
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '号码获取', ['current_arise_A_times'=>$hzArr["current_arise_A_times"], 'arise_A_times'=>$hzArr['arise_A_times'], 'current_arise_B_times'=>$hzArr["current_arise_B_times"], 'arise_B_times'=>$hzArr['arise_B_times']]);
             if($hzArr["current_arise_A_times"]>=$hzArr['arise_A_times'] && $hzArr["current_arise_B_times"]==$hzArr['arise_B_times']){
                 # 符合下注条件 投B组号码
                 $arise_codes = $codes_arises['arise_B_codes'];
