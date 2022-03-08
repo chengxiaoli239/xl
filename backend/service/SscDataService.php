@@ -2881,10 +2881,6 @@ class SscDataService extends BaseService {
                     $hzArr["current_arise_B_times"]; # B上奖次
                     $hzArr['arise_A_times']; # 设置A条件
                     $hzArr['arise_B_times']; # 设置B条件
-                    $single_key = $hzArr['singles_key'];
-
-                    //$is_zj_A_x_B_y = 0; # 是否真实中奖
-                    //$A_x_B_y_status = 0;
 
                     $singles = explode('-', trim($UserSysPlan->singles));
                     if(empty($singles)) $singles = [$UserSysPlan->single];
@@ -2901,6 +2897,7 @@ class SscDataService extends BaseService {
                         # 上 B
                         SscDataService::operateZjGroupB($A_x_B_y_status, $hzArr);
                         $next_single_key = 0;
+                        $single = $singles[$next_single_key];
                     }
                     $hzArr['single_key'] = $next_single_key;
                     $hzArr_update_after = $hzArr;
