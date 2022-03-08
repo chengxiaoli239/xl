@@ -2861,11 +2861,12 @@ class SscDataService extends BaseService {
     public static function opProfitsPlans12($lottery_type = DEFAULT_LOTTERY_TYPE){
         try {
             # plan_type:12 A出x次B出y次投B
-            $where = ['AND', ['IN', 'plan_type', [12]], ['=', 'status', 0], ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND', ['IN', 'plan_type', [12]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     $zj_group = SscDataService::getNewZjGroupByPlanId($UserSysPlan->id);
                     $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+                    $hzArr_update_before = $hzArr;
                     $A_x_B_y_status = $hzArr['A_x_B_y_status']; # 状态：0初始1等待中2正在投
                     //$A_x_B_y_status = $hzArr[];
 
@@ -2902,6 +2903,8 @@ class SscDataService extends BaseService {
                         $next_single_key = 0;
                     }
                     $hzArr['single_key'] = $next_single_key;
+                    $hzArr_update_after = $hzArr;
+                    Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后', ['hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'plan_id'=>$UserSysPlan->id, 'next_single_key'=>$next_single_key, 'single'=>$single]);
 
                     $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                     $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
