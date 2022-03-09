@@ -2986,6 +2986,7 @@ class SscDataService extends BaseService {
                 }
                 if($hzArr['current_arise_B_times'] == $hzArr['arise_B_times']){
                     $hzArr['A_x_B_y_status'] = 2;
+                    $hzArr['A_x_B_y_start_time'] = date('Y-m-d H:i:s');
                 }
             }
             $hzArr['start_bet_yl_nums'] = 0;
