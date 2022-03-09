@@ -315,7 +315,7 @@ class OpKjService extends BaseService {
             }
             if($flag) $zjTimes += 1;
         }
-        $rst['data'] = ['zjTimes'=>$zjTimes];
+        $rst['data'] = ['zjTimes'=>$zjTimes, 'kjData'=>$kjData];
 
         return $rst;
     }

@@ -2864,7 +2864,7 @@ class SscDataService extends BaseService {
             $where = ['AND', ['IN', 'plan_type', [12]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
-                    $zj_group = SscDataService::getNewZjGroupByPlanId($UserSysPlan->id);
+                    $zj_group = SscDataService::getNewZjGroupByPlanId($UserSysPlan->id, $qihao, $zjResult);
                     $hzArr = json_decode($UserSysPlan->hz_Arr, true);
                     $hzArr_update_before = $hzArr;
                     $A_x_B_y_status = $hzArr['A_x_B_y_status']; # 状态：0初始1等待中2正在投
@@ -2901,7 +2901,7 @@ class SscDataService extends BaseService {
                     }
                     $hzArr['singles_key'] = $next_single_key;
                     $hzArr_update_after = $hzArr;
-                    Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后', ['zj_group'=>$zj_group, 'hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'plan_id'=>$UserSysPlan->id, 'next_single_key'=>$next_single_key, 'single'=>$single, 'singles'=>$UserSysPlan->singles]);
+                    Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后', ['qihao'=>$qihao, 'zjResult'=>$zjResult, 'zj_group'=>$zj_group, 'hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'plan_id'=>$UserSysPlan->id, 'next_single_key'=>$next_single_key, 'single'=>$single, 'singles'=>$UserSysPlan->singles]);
 
                     $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                     $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
@@ -2922,7 +2922,7 @@ class SscDataService extends BaseService {
      * @param $UserSysPlan_id
      * @return bool
      */
-    public static function getNewZjGroupByPlanId($UserSysPlan_id=''){
+    public static function getNewZjGroupByPlanId($UserSysPlan_id='', &$qihao, &$zjResult=[]){
         $ImportPlanCodes = ImportPlanCodes::find()->where(['plan_id'=>$UserSysPlan_id, 'status'=>1])->all();
         $UserSysPlan = UserSysPlans::findOne($UserSysPlan_id);
         $lottery_type = $UserSysPlan->lottery_type;
@@ -2931,8 +2931,9 @@ class SscDataService extends BaseService {
             $codes = $importPlanCode->codes;
             $where = ['lottery_type'=>$lottery_type];
 
-            $kjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->one()['code_str'];
-            $zjResult = OpKjService::opKjData4($codes, $kjData);
+            $kjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->one();
+            $qihao = $kjData['code_str'];
+            $zjResult = OpKjService::opKjData4($codes, $kjData['code_str']);
             if(isset($zjResult['data']) && $zjResult['data']['zjTimes'] == 1){
                 return $importPlanCode->plan_id_sort_key;
             }
