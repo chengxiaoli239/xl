@@ -2899,7 +2899,7 @@ class SscDataService extends BaseService {
                         $next_single_key = 0;
                         $single = $singles[$next_single_key];
                     }
-                    $hzArr['single_key'] = $next_single_key;
+                    $hzArr['singles_key'] = $next_single_key;
                     $hzArr_update_after = $hzArr;
                     Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后', ['zj_group'=>$zj_group, 'hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'plan_id'=>$UserSysPlan->id, 'next_single_key'=>$next_single_key, 'single'=>$single, 'singles'=>$UserSysPlan->singles]);
 
