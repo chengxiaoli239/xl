@@ -2864,8 +2864,8 @@ class SscDataService extends BaseService {
             $where = ['AND', ['IN', 'plan_type', [12]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
-                    $zj_group = SscDataService::getNewZjGroupByPlanId($UserSysPlan->id, $qihao, $zjResult);
                     $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+                    $zj_group = SscDataService::getNewZjGroupByPlanId($UserSysPlan->id, $hzArr['A_x_B_y_start_time'], $qihao, $zjResult);
                     $hzArr_update_before = $hzArr;
                     $A_x_B_y_status = $hzArr['A_x_B_y_status']; # 状态：0初始1等待中2正在投
                     //$A_x_B_y_status = $hzArr[];
@@ -2922,7 +2922,7 @@ class SscDataService extends BaseService {
      * @param $UserSysPlan_id
      * @return bool
      */
-    public static function getNewZjGroupByPlanId($UserSysPlan_id='', &$qihao, &$zjResult=[]){
+    public static function getNewZjGroupByPlanId($UserSysPlan_id='', $s_time='', &$qihao, &$zjResult=[]){
         $ImportPlanCodes = ImportPlanCodes::find()->where(['plan_id'=>$UserSysPlan_id, 'status'=>1])->all();
         $UserSysPlan = UserSysPlans::findOne($UserSysPlan_id);
         $lottery_type = $UserSysPlan->lottery_type;
@@ -2931,7 +2931,7 @@ class SscDataService extends BaseService {
             $codes = $importPlanCode->codes;
             $where = ['lottery_type'=>$lottery_type];
 
-            $kjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->one();
+            $kjData = SscKjData::find()->where($where)->andWhere(['>', 'created_at', strtotime($s_time)])->orderBy(['id'=>SORT_DESC])->asArray()->one();
             $qihao = $kjData['code_str'];
             $zjResult = OpKjService::opKjData4($codes, $kjData['code_str']);
             if(isset($zjResult['data']) && $zjResult['data']['zjTimes'] == 1){
@@ -2980,7 +2980,6 @@ class SscDataService extends BaseService {
             $hzArr['start_bet_yl_nums'] = 0;
             $hzArr['A_x_B_y_status'] = 1;
         }elseif($A_x_B_y_status == 1){
-            $hzArr['start_bet_yl_nums'] = 0;
             # 2、等待中
             if($hzArr['current_arise_A_times'] >= $hzArr['arise_A_times'] && $hzArr['current_arise_B_times'] < $hzArr['arise_B_times']){
                 $hzArr['current_arise_B_times'] += 1;
@@ -2989,7 +2988,8 @@ class SscDataService extends BaseService {
                 $hzArr['current_arise_A_times'] = 0;
             }
             if($hzArr['current_arise_A_times'] >= $hzArr['arise_A_times'] && $hzArr['current_arise_B_times'] == $hzArr['arise_B_times']){
-                $hzArr['A_x_B_y_status'] = 2;
+                $hzArr['A_x_B_y_status'] = 2; # 开始启动
+                $hzArr['start_bet_yl_nums'] = 0;
                 $hzArr['start_bet_yl_nums'] = 0;
             }
         }elseif($A_x_B_y_status == 2){
