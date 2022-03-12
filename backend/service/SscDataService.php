@@ -2982,14 +2982,21 @@ class SscDataService extends BaseService {
         }elseif($A_x_B_y_status == 1){
             # 2、等待中
             if($hzArr['current_arise_A_times'] >= $hzArr['arise_A_times'] && $hzArr['current_arise_B_times'] < $hzArr['arise_B_times']){
+                # 已经满足A的情况，开始进入B累加
                 $hzArr['current_arise_B_times'] += 1;
-            }elseif ($hzArr['current_arise_A_times'] >= $hzArr['arise_A_times'] && $hzArr['current_arise_B_times'] >= $hzArr['arise_B_times']){
-                $hzArr['current_arise_B_times'] = 0;
-                $hzArr['current_arise_A_times'] = 0;
             }
+
+            # 中途上B，重新开始监控
+            if($hzArr['current_arise_A_times']<$hzArr['arise_A_times']){
+                $hzArr['current_arise_A_times'] = 0;
+                $hzArr['current_arise_B_times'] = 0;
+                $hzArr['current_yl_desc'] = '';
+            }
+
+            # 开始启动
             if($hzArr['current_arise_A_times'] >= $hzArr['arise_A_times'] && $hzArr['current_arise_B_times'] == $hzArr['arise_B_times']){
-                $hzArr['A_x_B_y_status'] = 2; # 开始启动
-                $hzArr['start_bet_yl_nums'] = 0;
+                $hzArr['A_x_B_y_status'] = 2;
+                $hzArr['current_yl_desc'] .= '-B';
                 $hzArr['start_bet_yl_nums'] = 0;
             }
         }elseif($A_x_B_y_status == 2){
