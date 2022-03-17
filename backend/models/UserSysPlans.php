@@ -156,7 +156,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $start_bet_yl_nums;
     public $single_key;
     ############## A出x次B出y次投B、A出x次B出y次投B end   ####################
-    public static $A_x_arise_B_y_arise_bet_B_types = [12, 13]; # A出x次B出y次投B
+    public static $A_x_arise_B_y_arise_bet_B_types = [12, 13]; # A出x次B出y次投B、A出x次B出y次投B_2
     /**
      * @inheritdoc
      */
