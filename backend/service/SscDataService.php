@@ -2842,8 +2842,7 @@ class SscDataService extends BaseService {
             }
         }
 
-        SscDataService::opProfitsPlans12($lottery_type); # A出x次B出y次投B 计划处理
-
+        SscDataService::opProfitsPlans12_13($lottery_type); # A出x次B出y次投B、A出x次B出y次投B_2 计划处理
 
         $logArr['lottery_type'] = $lottery_type;
         $logArr['qihao'] = HN0898Service::getQihao($lottery_type);
@@ -2852,18 +2851,18 @@ class SscDataService extends BaseService {
         return $logArr;
     }
 
-
     /**
-     * @desc A出x次B出y次投B 计划处理
+     * @desc A出x次B出y次投B、A出x次B出y次投B_2 计划处理
      * @param int $lottery_type
      * @return bool
      */
-    public static function opProfitsPlans12($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function opProfitsPlans12_13($lottery_type = DEFAULT_LOTTERY_TYPE){
         try {
             # plan_type:12 A出x次B出y次投B
-            $where = ['AND', ['IN', 'plan_type', [12]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND', ['IN', 'plan_type', UserSysPlans::$A_x_arise_B_y_arise_bet_B_types], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
+                    $plan_type = $UserSysPlan->plan_type;
                     $hzArr = json_decode($UserSysPlan->hz_Arr, true);
                     $zj_group = SscDataService::getNewZjGroupByPlanId($UserSysPlan->id, $hzArr['A_x_B_y_start_time'], $qihao, $zjResult);
                     $hzArr_update_before = $hzArr;
@@ -2884,20 +2883,32 @@ class SscDataService extends BaseService {
 
                     $singles = explode('-', trim($UserSysPlan->singles));
                     if(empty($singles)) $singles = [$UserSysPlan->single];
+                    $single = $UserSysPlan->single;
                     if($zj_group == 'arise_A_codes'){
                         # 上 A
-                        SscDataService::operateZjGroupA($A_x_B_y_status, $hzArr);
-                        if(in_array($A_x_B_y_status, [0, 1])){
-                            $single = $singles[0];
-                            $next_single_key = 0;
-                        }elseif($A_x_B_y_status == 2){
-                            $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+                        SscDataService::operateZjGroupA($A_x_B_y_status, $plan_type, $hzArr);
+                        if($plan_type == 12){
+                            if(in_array($A_x_B_y_status, [0, 1])){
+                                $next_single_key = 0;
+                                $single = $singles[$next_single_key];
+                            }elseif($A_x_B_y_status == 2){
+                                $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+                            }
                         }
                     }else{
                         # 上 B
-                        SscDataService::operateZjGroupB($A_x_B_y_status, $hzArr);
-                        $next_single_key = 0;
-                        $single = $singles[$next_single_key];
+                        SscDataService::operateZjGroupB($A_x_B_y_status, $plan_type, $hzArr);
+                        if($plan_type == 13){
+                            if($hzArr['A_x_B_y_status'] == 2){
+                                $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+                            }else{
+                                $next_single_key = 0;
+                                $single = $singles[$next_single_key];
+                            }
+                        }else{
+                            $next_single_key = 0;
+                            $single = $singles[$next_single_key];
+                        }
                     }
                     $hzArr['singles_key'] = $next_single_key;
                     $hzArr_update_after = $hzArr;
@@ -2948,7 +2959,7 @@ class SscDataService extends BaseService {
      * @param array $hzArr
      * @return bool
      */
-    private static function operateZjGroupA($A_x_B_y_status = 0, &$hzArr=[]){
+    private static function operateZjGroupA($A_x_B_y_status = 0, $plan_type=12, &$hzArr=[]){
         $rst = true;
         $hzArr['current_yl_desc'] .= '-A';
         if(in_array($A_x_B_y_status, [0, 1])){
@@ -2957,7 +2968,13 @@ class SscDataService extends BaseService {
             $hzArr['start_bet_yl_nums'] = 0;
             $hzArr['A_x_B_y_status'] = 1;
         }elseif($A_x_B_y_status == 2){
-            $hzArr['start_bet_yl_nums'] += 1;
+            if($plan_type == 13){
+                $hzArr['A_x_B_y_status'] = 1;
+                $hzArr['current_arise_B_times'] -= 1;
+                $hzArr['current_arise_B_times'] = max([$hzArr['current_arise_B_times'], 0]);
+            }else{
+                $hzArr['start_bet_yl_nums'] += 1;
+            }
         }
         $hzArr['current_yl_desc'] = trim($hzArr['current_yl_desc'], '-');
 
@@ -2970,7 +2987,7 @@ class SscDataService extends BaseService {
      * @param array $hzArr
      * @return bool
      */
-    private static function operateZjGroupB($A_x_B_y_status = 0, &$hzArr=[]){
+    private static function operateZjGroupB($A_x_B_y_status = 0, $plan_type=12, &$hzArr=[]){
         $rst = true;
         if($A_x_B_y_status == 0){
             # 1、初始化

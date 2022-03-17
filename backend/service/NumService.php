@@ -1875,7 +1875,7 @@ class NumService extends BaseService {
             $desc = trim($desc, ',').' ';
         }
 
-        if($UserSysPlans && $UserSysPlans->plan_type == 12){ # A出x次B出y次投B
+        if($UserSysPlans && in_array($UserSysPlans->plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types)){ # A出x次B出y次投B
             # {"arise_A_times":3,"arise_B_times":1,"current_arise_A_times":4,"filters":[],"filter_dates":[],"filter_qihaos":[]}
             $yl_desc = $hz_Arr['current_yl_desc'];// = 'A-A-A-B-A';
             if(!$hz_Arr['current_yl_desc']){

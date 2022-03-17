@@ -143,7 +143,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $history_max_miss; # 历史最大遗漏
     ############### 动态过滤 - 模拟 end ####################
 
-    ############## A出x次B出y次投B start ###################
+    ############## A出x次B出y次投B、A出x次B出y次投B start ###################
     public $arise_A_codes;
     public $arise_B_codes;
     public $arise_A_times; # A出次数
@@ -155,7 +155,8 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $current_yl_desc;
     public $start_bet_yl_nums;
     public $single_key;
-    ############## A出x次B出y次投B end   ###################
+    ############## A出x次B出y次投B、A出x次B出y次投B end   ####################
+    public static $A_x_arise_B_y_arise_bet_B_types = [12, 13]; # A出x次B出y次投B
     /**
      * @inheritdoc
      */

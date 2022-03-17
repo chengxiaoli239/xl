@@ -437,6 +437,7 @@ class TzService extends BaseService {
             //10=>'中则倍投',
             //11=>'中则交叉正反',
             12=>'A出x次B出y次投B',
+            13=>'A出x次B出y次投B_2',
         ];
         if(isset($datas[$type])) return $datas[$type];
 

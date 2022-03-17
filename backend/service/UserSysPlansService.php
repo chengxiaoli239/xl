@@ -702,7 +702,7 @@ class UserSysPlansService extends BaseService {
         }
 
         # A出x次B出y次投B
-        if($plan->plan_type == 12){
+        if(in_array($plan->plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types)){
             $where_codes = ['plan_id'=>$plan_id, 'plan_id_sort_key'=>['arise_A_codes', 'arise_B_codes']];
             $datas = ImportPlanCodes::find()->where($where_codes)->limit(2)->all();
             $codes_arises = [];

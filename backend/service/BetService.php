@@ -1280,7 +1280,7 @@ abstract class BetService extends BaseBetService {
                 $flag = 1;
             }
         }
-        if(in_array($plan->plan_type, [12])) { # A出x次B出y次投B
+        if(in_array($plan->plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types)) { # A出x次B出y次投B
             $flag = 0;
             $codes_hz = json_decode($plan->hz_Arr, true);
             if($codes_hz["current_arise_A_times"]>=$codes_hz['arise_A_times'] && $codes_hz["current_arise_B_times"]==$codes_hz['arise_B_times']){
