@@ -2899,7 +2899,7 @@ class SscDataService extends BaseService {
                         # 上 B
                         SscDataService::operateZjGroupB($A_x_B_y_status, $plan_type, $hzArr);
                         if($plan_type == 13){
-                            if($hzArr['A_x_B_y_status'] == 2){
+                            if($A_x_B_y_status == 2 && $hzArr['A_x_B_y_status'] == 2){
                                 $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
                             }else{
                                 $next_single_key = 0;
