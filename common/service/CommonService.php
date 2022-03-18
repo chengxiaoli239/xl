@@ -1,6 +1,7 @@
 <?php
 
 namespace common\service;
+use backend\models\BetErrorPlansTask;
 use backend\models\BettingRecords;
 use backend\models\CodeTypes;
 use backend\models\LotteryType;
@@ -1081,7 +1082,8 @@ class  CommonService{
     public static function delUserBetRecords($uid){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
 
-        $rst['data']['flag'] = BettingRecords::deleteRecord(['uid'=>$uid]);
+        $rst['data']['flag0'] = BettingRecords::deleteRecord(['uid'=>$uid]);
+        $rst['data']['flag1'] = BetErrorPlansTask::deleteRecord(['uid'=>$uid]);
 
         return $rst;
     }
