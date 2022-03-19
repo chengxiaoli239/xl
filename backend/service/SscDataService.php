@@ -3019,11 +3019,9 @@ class SscDataService extends BaseService {
             }
         }elseif($A_x_B_y_status == 2){
             # 3、正在投
-            if($plan_type == 13){
-                if($hzArr['current_arise_A_times'] >= $hzArr['arise_A_times'] && $hzArr['current_arise_B_times'] < $hzArr['arise_B_times']){
+            if($plan_type == 13 && $hzArr['current_arise_A_times'] >= $hzArr['arise_A_times'] && $hzArr['current_arise_B_times'] < $hzArr['arise_B_times']){
                     # 已经满足A的情况，开始进入B累加
                     $hzArr['current_arise_B_times'] += 1;
-                }
             }else{
                 $hzArr['current_arise_A_times'] = 0;
                 $hzArr['current_arise_B_times'] = 0;
