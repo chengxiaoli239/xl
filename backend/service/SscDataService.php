@@ -2798,8 +2798,20 @@ class SscDataService extends BaseService {
                     $codes_hz['current_miss'] = $current_miss;
                 }
                 $codes_hz['betStatus'] = $betStatus;
+                $single = $UserSysPlan->single;
+                if(in_array($UserSysPlan->plan_type, [6]) && !empty($UserSysPlan->singles)){
+                    $singles = explode('-', trim($UserSysPlan->singles));
+                    # 中则投的倍投
+                    if($betStatus == 1){
+                        $next_single_key = 0;
+                        $single = $singles[$next_single_key];
+                    }else{
+                        $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                    }
+                    $codes_hz['singles_key'] = $next_single_key;
+                }
+                $updateData = ['hz_Arr'=>json_encode($codes_hz, 320), 'single'=>$single];
                 $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
-                $updateData = ['hz_Arr'=>json_encode($codes_hz, 320)];
                 $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                 $logArr['6_8'][$UserSysPlan->id]['rst'] = $rst;
             }
