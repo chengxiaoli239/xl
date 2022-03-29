@@ -2803,7 +2803,7 @@ class SscDataService extends BaseService {
                     # 中则投的倍投
                     if($betStatus == 1){
                         $next_single_key = 0;
-                        if($codes_hz['singles_key'] > 0){
+                        if($codes_hz['betStatus'] == 0){
                             self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                         }
                         $single = $singles[$next_single_key];
