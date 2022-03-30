@@ -2809,10 +2809,6 @@ class SscDataService extends BaseService {
                         }else{
                             self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                         }
-                    }else{
-                        if($codes_hz['betStatus'] == 1){
-                            self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
-                        }
                     }
                     $codes_hz['singles_key'] = $next_single_key;
                 }
