@@ -529,6 +529,8 @@ class NineNineNewService extends BaseTZService {
             20 => 'dqs',  # 道琼斯
             21 => 'szzs',  # 上证指数
             22 => 'szcz',  # 深圳成指
+            23 => 'sfytf',  # 以太坊3分
+            24 => 'tfytf',  # 以太坊10分
         ];
         if(isset($datas[$lottery_type])) return $datas[$lottery_type];
 
@@ -550,6 +552,8 @@ class NineNineNewService extends BaseTZService {
             20 => '/pl/dqs',  # 道琼斯
             21 => '/pl/szzs',  # 上证指数
             22 => '/pl/szcz',  # 深圳成指
+            23 => '/pl/sfytf',  # 深圳成指
+            24 => '/pl/tfytf',  # 深圳成指
         ];
         if(isset($datas[$lottery_type])) return $datas[$lottery_type];
 

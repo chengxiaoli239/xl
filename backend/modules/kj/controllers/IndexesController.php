@@ -66,4 +66,23 @@ class IndexesController extends Controller
         return $data;
     }
 
+    /**
+     * @desc 以太坊3分 - 抓网盘 - 在用
+     * @return - json|xml
+     */
+    public function actionYtf3m($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = NaSiDaKe::getLotteryNo($type, $is_auto=1, $lottery_type=23);
+        return $data;
+    }
+
+    /**
+     * @desc 以太坊10分 - 抓网盘 - 在用
+     * @return - json|xml
+     */
+    public function actionYtf10m($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = NaSiDaKe::getLotteryNo($type, $is_auto=1, $lottery_type=24);
+        return $data;
+    }
 }

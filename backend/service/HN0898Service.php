@@ -1305,6 +1305,8 @@ class HN0898Service extends BaseTZService {
             case 20: # 道琼斯
             case 21: # 上证指数
             case 22: # 深圳成指
+            case 23: # 以太坊3分
+            case 24: # 以太坊10分
                 $qihao = QxcTcw::getNineNineQihao($lottery_type, $is_auto = 2) + 1;# 即将开奖的期号
             break;
         }
@@ -1423,6 +1425,8 @@ class HN0898Service extends BaseTZService {
             case 20: # 道琼斯
             case 21: # 上证指数
             case 22: # 深圳成指
+            case 23: # 以太坊3分
+            case 24: # 以太坊10分
                 $qihao = QxcTcw::getNineNineQihao($lottery_type, $is_auto = 2);# 已经开奖的期号# 九九网 期号
                 break;
         }
