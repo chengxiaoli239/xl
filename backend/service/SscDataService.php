@@ -2783,6 +2783,7 @@ class SscDataService extends BaseService {
                 //$current_miss = ($codes_hz['is_init'] == 1) ? 0 : $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
                 $flag = SscDataService::isZjBefore($UserSysPlan->id);
                 $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
+                $befor_codes_hz = $codes_hz;
                 if(!is_array($codes_hz)) continue; # 部分投注方式 hz_Arr 不是json 防止错误，
                 if($flag == 1 OR (in_array($UserSysPlan->plan_type, [8]) && $codes_hz['current_miss']>=$codes_hz['bet_while_miss'])){ # plan_type:8、9 遗漏xx期投、遗漏xx期投
                     $betStatus = 1;
@@ -2814,7 +2815,7 @@ class SscDataService extends BaseService {
                 }
                 $codes_hz['betStatus'] = $betStatus;
                 $updateData = ['hz_Arr'=>json_encode($codes_hz, 320), 'single'=>$single];
-                Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则投倍投', ['plan_id'=>$UserSysPlan->id, 'code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type]);
+                Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则投倍投', ['plan_id'=>$UserSysPlan->id, 'befor_codes_hz'=>$befor_codes_hz, 'code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type]);
                 $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                 $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                 $logArr['6_8'][$UserSysPlan->id]['rst'] = $rst;
