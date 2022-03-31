@@ -21,7 +21,7 @@ class NaSiDaKe extends BaseKj{
     public static function getLotteryNo($returnType = 'json', $is_auto=1, $lottery_type=19){
 
         if($is_auto==2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
-            $domain = BaseKj::getApiHostByRoute('/kj/indexes/nsdk');
+            $domain = BaseKj::getApiHostByRoute('/kj/indexes/ytf3m');
 
             $type_name = self::$lottery_types[$lottery_type];
             $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/queryHistorys?lotName='.$type_name.'&limit=5&page=1&sidx=open_time&order=desc'; #当前开奖号码
@@ -29,9 +29,23 @@ class NaSiDaKe extends BaseKj{
             $rst = CurlService::getCurl($url);
 
             if($rst['code'] != 200) return false;
-            //文本转码
             $datas = $rst['data']['list'][0];
-            $data = $datas['result']['numbers'][2];
+            if(in_array($lottery_type, [23, 24])){
+                $lotteryNum = $rst['data']['list'][0]['lotteryNum'];
+
+                $pattern = '/\d.*?/';
+                preg_match_all($pattern, $lotteryNum, $matches);
+                $lotteryDatas = array_reverse($matches[0]);
+                for ($i=0; $i<count($lotteryDatas); $i++){
+                    $data[] = $lotteryDatas[$i];
+                    if(count($data) == 4){
+                        break;
+                    }
+                }
+            }else{
+                //文本转码
+                $data = $datas['result']['numbers'][2];
+            }
             $codes = [$data[0], $data[1], $data[2], $data[3], 0];
 
             if (empty($data)) return false;
