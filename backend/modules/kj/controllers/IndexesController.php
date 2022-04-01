@@ -85,4 +85,14 @@ class IndexesController extends Controller
         $data = NaSiDaKe::getLotteryNo($type, $is_auto=1, $lottery_type=24);
         return $data;
     }
+
+    /**
+     * @desc 以太坊10分 - 抓网盘 - 在用
+     * @return - json|xml
+     */
+    public function actionJsqws($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = NaSiDaKe::getLotteryNo($type, $is_auto=1, $lottery_type=25);
+        return $data;
+    }
 }

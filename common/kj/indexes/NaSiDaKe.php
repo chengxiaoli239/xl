@@ -16,6 +16,7 @@ class NaSiDaKe extends BaseKj{
         22 => 'szcz', # 深圳成指
         23 => 'sfytf', # 以太坊3分
         24 => 'tfytf', # 以太坊10分
+        25 => 'jsqws', # 江苏七位数
     ];
 
     public static function getLotteryNo($returnType = 'json', $is_auto=1, $lottery_type=19){

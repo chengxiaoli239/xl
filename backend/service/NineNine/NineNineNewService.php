@@ -40,7 +40,7 @@ use yii\helpers\ArrayHelper;
 use  yii;
 
 class NineNineNewService extends BaseTZService {
-    public static $lotNames = [1=>'hnqxc', 17=>'plw', 19=>'nsdk', 20=>'dqs', 21=>'szzs', 22=>'szcz'];
+    public static $lotNames = [1=>'hnqxc', 17=>'plw', 19=>'nsdk', 20=>'dqs', 21=>'szzs', 22=>'szcz', 23=>'sfytf', 24=>'tfytf', 25=>'jsqws'];
     public static $username = '';
     public static $password = '';
     public static $baseUrl =  '';
@@ -531,6 +531,7 @@ class NineNineNewService extends BaseTZService {
             22 => 'szcz',  # 深圳成指
             23 => 'sfytf',  # 以太坊3分
             24 => 'tfytf',  # 以太坊10分
+            25 => 'jsqws',  # 江苏七位数
         ];
         if(isset($datas[$lottery_type])) return $datas[$lottery_type];
 
@@ -552,8 +553,9 @@ class NineNineNewService extends BaseTZService {
             20 => '/pl/dqs',  # 道琼斯
             21 => '/pl/szzs',  # 上证指数
             22 => '/pl/szcz',  # 深圳成指
-            23 => '/pl/sfytf',  # 深圳成指
-            24 => '/pl/tfytf',  # 深圳成指
+            23 => '/pl/sfytf',  # 以太坊3分
+            24 => '/pl/tfytf',  # 以太坊10分
+            25 => '/pl/jsqws',  # 江苏七位数
         ];
         if(isset($datas[$lottery_type])) return $datas[$lottery_type];
 
