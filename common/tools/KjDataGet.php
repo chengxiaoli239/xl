@@ -304,7 +304,7 @@ class KjDataGet
             'date' => date('Y-m-d',strtotime($tmpDate)),
         ];
         if(!empty($opentime)){
-            $insertData['created_at'] = strtotime($opentime);
+            $insertData['created_at'] = (int)strtotime($opentime);
         }
 
         SscDataService::getAriseCodes([implode('', $codesArr)]); # 缓存开奖号码四定组合
@@ -352,7 +352,7 @@ class KjDataGet
             'code5'=>$kjDatasArr[4],
             'code6'=>$kjDatasArr[5],
             'code7'=>$kjDatasArr[6],
-            'created_at'=>time(),
+            'created_at'=>(int)time(),
             'time'=>time(),
             'date' => $date ? $date : date('Y-m-d'),
         ];
