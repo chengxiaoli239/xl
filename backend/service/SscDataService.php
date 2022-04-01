@@ -624,7 +624,7 @@ class SscDataService extends BaseService {
             $SscStaticYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
             $SscStaticYl->last_time_miss = $miss['last_times']; // 2、上次遗漏
             $SscStaticYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
-            $SscStaticYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
+            $SscStaticYl->max_miss = $miss['max_miss']?:0;      // 4、近200期内最大遗漏
             $SscStaticYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
             $SscStaticYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
             $SscStaticYl->count = $count;

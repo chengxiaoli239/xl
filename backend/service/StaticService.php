@@ -2279,38 +2279,43 @@ class StaticService extends BaseService {
        $m = \Yii::$app->cache;
 
        foreach ($lottery_types as $lottery_type) {
-           $mkey = 'opAllCodeTypeYl_static_'.$lottery_type;
-           if($isTo = $m->get($mkey)) continue; # ['status'=>200, 'msg'=>'数据正在处理，请稍候~'];
+           try {
+               $mkey = 'opAllCodeTypeYl_static_'.$lottery_type;
+               if($isTo = $m->get($mkey)) continue; # ['status'=>200, 'msg'=>'数据正在处理，请稍候~'];
 
-           $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl');
-           $msg = '数据处理成功~';
-           if ($status) {
-               $m->set($mkey, 1, 360);
-               $time1 = microtime(true);
-               # 号码类型：双重、双双重、四重、三兄弟、四兄弟
-               $rst[$lottery_type]['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
-               $time2 = microtime(true);
-               # 三字现
-               $rst[$lottery_type]['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type); # 10s
-               $time3 = microtime(true);
-               # 四字现
-               $rst[$lottery_type]['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
-               $time4 = microtime(true);
+               $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllCodeTypeYl');
+               $msg = '数据处理成功~';
+               if ($status) {
+                   $m->set($mkey, 1, 360);
+                   $time1 = microtime(true);
+                   # 号码类型：双重、双双重、四重、三兄弟、四兄弟
+                   $rst[$lottery_type]['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type);
+                   $time2 = microtime(true);
+                   # 三字现
+                   $rst[$lottery_type]['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type); # 10s
+                   $time3 = microtime(true);
+                   # 四字现
+                   $rst[$lottery_type]['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 4, $lottery_type); # 70s
+                   $time4 = microtime(true);
 
-               # 四字现带双组合，如:123，包含1123、1223、1233
-               $rst[$lottery_type]['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type); # 70s
-               $time5 = microtime(true);
+                   # 四字现带双组合，如:123，包含1123、1223、1233
+                   $rst[$lottery_type]['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type); # 70s
+                   $time5 = microtime(true);
 
-               StaticService::afterOpStatic($lottery_type, 'opAllCodeTypeYl');
-               $rst['data'][$lottery_type]['consume_time1'] = $time2 - $time1;
-               $rst['data'][$lottery_type]['consume_time2'] = $time3 - $time2;
-               $rst['data'][$lottery_type]['consume_time3'] = $time4 - $time3;
-               $rst['data'][$lottery_type]['consume_time4'] = $time5 - $time4;
-               $rst['data'][$lottery_type]['msg'] = $msg;
-               Tool_Common::log('opAllCodeTypeYl', 'INFO', '号码类型遗漏更新', $rst);
-           }else{
-               $msg = '数据已经处理过了~';
-               $rst['data'][$lottery_type] = $msg;
+                   StaticService::afterOpStatic($lottery_type, 'opAllCodeTypeYl');
+                   $rst['data'][$lottery_type]['consume_time1'] = $time2 - $time1;
+                   $rst['data'][$lottery_type]['consume_time2'] = $time3 - $time2;
+                   $rst['data'][$lottery_type]['consume_time3'] = $time4 - $time3;
+                   $rst['data'][$lottery_type]['consume_time4'] = $time5 - $time4;
+                   $rst['data'][$lottery_type]['msg'] = $msg;
+                   Tool_Common::log('opAllCodeTypeYl', 'INFO', '号码类型遗漏更新', $rst);
+               }else{
+                   $msg = '数据已经处理过了~';
+                   $rst['data'][$lottery_type] = $msg;
+               }
+           }catch (\Exception $exception){
+               Tool_Common::log('/static/'.__FUNCTION__.'_e', 'ERR', '统计错误', ['lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
+               continue;
            }
        }
 
