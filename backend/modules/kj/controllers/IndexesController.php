@@ -87,10 +87,20 @@ class IndexesController extends Controller
     }
 
     /**
-     * @desc 以太坊10分 - 抓网盘 - 在用
+     * @desc 江苏七位数 - 抓网盘 - 在用
      * @return - json|xml
      */
     public function actionJsqws($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $data = NaSiDaKe::getLotteryNo($type, $is_auto=1, $lottery_type=25);
+        return $data;
+    }
+
+    /**
+     * @desc 江苏七位数 - 抓网盘 - 在用
+     * @return - json|xml
+     */
+    public function actionBatchJsqws($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $data = NaSiDaKe::getLotteryNo($type, $is_auto=1, $lottery_type=25);
         return $data;
