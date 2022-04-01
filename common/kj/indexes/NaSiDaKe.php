@@ -35,7 +35,6 @@ class NaSiDaKe extends BaseKj{
                 $page = $m_page ? (int) $m_page : 10;
                 $limit = 50;
             }
-
             $type_name = self::$lottery_types[$lottery_type];
             # 当前开奖号码 链接
             $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/queryHistorys?lotName='.$type_name.'&limit='.$limit.'&page='.$page.'&sidx=open_time&order=desc';
