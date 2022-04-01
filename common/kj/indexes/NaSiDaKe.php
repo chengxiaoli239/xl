@@ -1,6 +1,7 @@
 <?php
 # 360 彩票网
 namespace common\kj\indexes;
+use backend\models\KjConfig;
 use backend\service\BingDao\BingDaoService;
 use backend\service\CurlService;
 use common\kj\BaseKj;
@@ -24,8 +25,20 @@ class NaSiDaKe extends BaseKj{
         if($is_auto==2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/indexes/ytf3m');
 
+            $limit = 5;
+            $page = 1;
+            $KjConfig = KjConfig::findOne(['path'=>'/kj/indexes/batch-jsqws', 'lottery_type'=>$lottery_type, 'enable'=>1]);
+            if(!empty($KjConfig)){
+                $m = \Yii::$app->cache;
+                $mkey_jsqws = 'jsqws_xxx';
+                $m_page = $m->get($mkey_jsqws);
+                $page = $m_page ? (int) $m_page : 10;
+                $limit = 50;
+            }
+
             $type_name = self::$lottery_types[$lottery_type];
-            $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/queryHistorys?lotName='.$type_name.'&limit=5&page=1&sidx=open_time&order=desc'; #当前开奖号码
+            # 当前开奖号码 链接
+            $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/queryHistorys?lotName='.$type_name.'&limit='.$limit.'&page='.$page.'&sidx=open_time&order=desc';
 
             $rst = CurlService::getCurl($url);
 
@@ -58,6 +71,12 @@ class NaSiDaKe extends BaseKj{
             //$kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
             $kjData = ['expect'=>$datas['issue'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s', (int)($datas['openTime']/1000))];
             //p($kjData);
+
+            if(!empty($KjConfig)){
+                $next_page = $page - 1;
+                if($next_page<1) $next_page = 1;
+                $m->set($mkey_jsqws, $next_page, 600);
+            }
         }
         $opencode = $kjData['opencode'];
         $opentime = $kjData['opentime'];
