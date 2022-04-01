@@ -30,7 +30,7 @@ class NaSiDaKe extends BaseKj{
             $KjConfig = KjConfig::findOne(['path'=>'/kj/indexes/batch-jsqws', 'lottery_type'=>$lottery_type, 'enable'=>1]);
             if(!empty($KjConfig)){
                 $m = \Yii::$app->cache;
-                $mkey_jsqws = 'jsqws_xxx';
+                $mkey_jsqws = 'jsqws_xxx_0';
                 $m_page = $m->get($mkey_jsqws);
                 $page = $m_page ? (int) $m_page : 10;
                 $limit = 50;
@@ -59,6 +59,13 @@ class NaSiDaKe extends BaseKj{
                 }
             }elseif ($lottery_type == 25){
                 $data = $datas['result']['numbers'];
+                if(!empty($KjConfig) && $KjConfig->is_batch == 1){
+                    $all_kjDatas = [];
+                    foreach ($rst['data']['list'] as $row){
+                        $all_kjDatas[] = ['expect'=>$row['issue'], 'opencode'=>$row['lotteryNum'].',0', 'opentime'=>(int)($row['openTime']/1000)];
+                    }
+                    return  $all_kjDatas;
+                }
             }else{
                 //文本转码
                 $data = $datas['result']['numbers'][2];

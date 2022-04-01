@@ -124,6 +124,7 @@ class KjDataGet
                                 $rst = KjDataGet::insertQxcKjData($dataInfo['qihao'], $dataInfo['codes'], $dataInfo['date']);
                             }
                         }else{ //}elseif(in_array($kjConfig->lottery_type, [6, 8, 1, 17])) { # xjssc  1七星彩17排列五
+                            Tool_Common::log('/kjData/'.__FUNCTION__, 'INFO', '开奖数据', ['kjdatas'=>$kjDatas]);
                             $kjDatas = array_reverse($kjDatas); # 翻转
                             foreach ($kjDatas as $key=>$dataInfo){
                                 $qihao = $dataInfo['expect'];
