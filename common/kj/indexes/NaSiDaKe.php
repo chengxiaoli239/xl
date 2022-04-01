@@ -21,7 +21,7 @@ class NaSiDaKe extends BaseKj{
 
     public static function getLotteryNo($returnType = 'json', $is_auto=1, $lottery_type=19){
 
-        if(true OR $is_auto==2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
+        if($is_auto==2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/indexes/ytf3m');
 
             $type_name = self::$lottery_types[$lottery_type];
