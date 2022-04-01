@@ -260,7 +260,7 @@ class KjDataGet
         }elseif ($lottery_type == 6){
             $tmpDate = substr($qihao, 0, 8);
         }elseif (in_array($lottery_type, [22, 23, 24, 25])){
-            $tmpDate = data('Y-m-d H:i:s', $opentime);
+            $tmpDate = date('Y-m-d H:i:s', $opentime);
         }elseif (!empty($opentime)){
             $tmpDate = substr($opentime, 0, 10);
         }else{

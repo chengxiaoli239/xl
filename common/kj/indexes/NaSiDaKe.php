@@ -30,7 +30,7 @@ class NaSiDaKe extends BaseKj{
             $KjConfig = KjConfig::findOne(['path'=>'/kj/indexes/batch-jsqws', 'lottery_type'=>$lottery_type, 'enable'=>1]);
             if(!empty($KjConfig)){
                 $m = \Yii::$app->cache;
-                $mkey_jsqws = 'jsqws_xxx_3';
+                $mkey_jsqws = 'jsqws_xxx_4';
                 $m_page = $m->get($mkey_jsqws);
                 $page = $m_page ? (int) $m_page : 10;
                 $limit = 50;
