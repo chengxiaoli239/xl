@@ -31,19 +31,21 @@ class NaSiDaKe extends BaseKj{
 
             if($rst['code'] != 200) return false;
             $datas = $rst['data']['list'][0];
-            if(in_array($lottery_type, [23, 24])){
+            if(in_array($lottery_type, [23, 24])) {
                 $data = [];
                 $lotteryNum = $rst['data']['list'][0]['lotteryNum'];
 
                 $pattern = '/\d.*?/';
                 preg_match_all($pattern, $lotteryNum, $matches);
                 $lotteryDatas = array_reverse($matches[0]);
-                for ($i=0; $i<count($lotteryDatas); $i++){
+                for ($i = 0; $i < count($lotteryDatas); $i++) {
                     $data[] = $lotteryDatas[$i];
-                    if(count($data) == 4){
+                    if (count($data) == 4) {
                         break;
                     }
                 }
+            }elseif ($lottery_type == 25){
+                $data = $datas['result']['numbers'];
             }else{
                 //文本转码
                 $data = $datas['result']['numbers'][2];

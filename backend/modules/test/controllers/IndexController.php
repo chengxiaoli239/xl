@@ -291,7 +291,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $data = NaSiDaKe::getLotteryNo($type='json', $is_auto=1, $lottery_type=23);p($data);
+        $data = NaSiDaKe::getLotteryNo($type='json', $is_auto=2, $lottery_type=25);p($data);
         $rst = SscDataService::opProfitsPlans12($lottery_type = 8);
         p($rst);# A出x次B出y次投B 计划处理
         $r = BaseService::login($id = 10);
