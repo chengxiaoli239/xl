@@ -1705,12 +1705,17 @@ abstract class BetService extends BaseBetService {
                 $cacheTime = 1.5 * 60;
                 break;
             case 11: # 冰岛3分
-                $cacheTime = 3 * 60;
+            case 23: # 以太坊3分
+                $cacheTime = 3.5 * 60;
                 break;
             case 16: # 加拿大28   3.5分
                 $cacheTime = 3.5 * 60;
                 break;
+            case 24: # 以太坊10分
+                $cacheTime = 10.5 * 60;
+                break;
             case 17: # 排列五
+            case 25: # 江苏七位数
                 $cacheTime = 86400;
                 break;
             case 18: #  宝岛众发  台湾5分
