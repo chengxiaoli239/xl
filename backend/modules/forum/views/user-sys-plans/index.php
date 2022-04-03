@@ -167,7 +167,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         ['attribute' => 'hz_Arr','label'=>'扩展',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                if(\backend\service\BaseService::is_json($model->hz_Arr) OR in_array($model->tz_type, [18, 19, 20, 25, 27, 28, 29, 30, 31, 32, 33, 34, 17,36,37])){
+                                if(\backend\service\BaseService::is_json($model->hz_Arr) OR in_array($model->tz_type, [18, 19, 20, 23, 25, 27, 28, 29, 30, 31, 32, 33, 34, 17,36,37])){
                                     $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true), $model->id);
                                     $desc_str = $str;
                                     if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
