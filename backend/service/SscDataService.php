@@ -2991,7 +2991,7 @@ class SscDataService extends BaseService {
 
                     # 2 # 监控中状态统计
                     if($areaBetStatus == 0){
-                        $area_bet_type = $hzArr['area_bet_type'] ? (int)$hzArr['area_bet_type'] : 1; # 下注起算类型：1用户下注记录统计 2:最近开奖统计
+                        $area_bet_type = $hzArr['area_bet_type'] ? (int)$hzArr['area_bet_type'] : 2; # 下注起算类型：1用户下注记录统计 2:最近开奖统计
                         $area_arise_qishus = SscDataService::get_area_arise_qishus($UserSysPlan, $area_all_qishus, $area_bet_type); # 指定期数上了多少期
                         if($area_arise_qishus == ($area_arise_qishus-$area_yl_qishus)){ # 上奖期数 = 统计期数 - 遗漏期数
                             # 满足指定期数条件 -> 启动下注
