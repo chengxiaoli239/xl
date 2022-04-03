@@ -185,7 +185,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $title = $model->hz_Arr;
                                 }
                                 $txt = BaseStringHelper::truncate($title,20);
-                                $desc_str .= '翻倍：'.$model->singles;
+                                $desc_str .= !empty($model->singles) ? '翻倍：'.$model->singles : '';
                                 $str = Html::a($txt, 'javascript:;', ['title' => \backend\service\SscDataService::getCodesDesc($title),'alt'=>\backend\service\SscDataService::getCodesDesc($desc_str), 'class'=>'act-desc', 'current_profits'=>round($model->current_profits, 2)]);
                                 if($model->singles OR in_array($model->plan_type,[2, 3, 4, 5, 9, 10])){
                                     $str .= '翻倍梯度:'.$model->singles;
