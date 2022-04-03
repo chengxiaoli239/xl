@@ -249,7 +249,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
         $(".act-desc").click(function (rst) {
             bet_rst = $(this).attr('alt');
             content = $(this).attr('title');
-            current_profits = $(this).attr('current_profits');
+            current_profits = parseInt($(this).attr('current_profits'));
 
             push_desc = {"描述":bet_rst, "当前盈利":current_profits}
             push_content = {"desc":bet_rst, "detail":content};
