@@ -280,6 +280,9 @@ use yii\widgets\ActiveForm;
                         </div>
                     </div>
 
+                    <!--区间盈利止盈止损-->
+                    <?php include(dirname(__FILE__).'/take_profits_area.php'); ?>
+
                     <!--止盈止损-->
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
 
