@@ -2957,7 +2957,7 @@ class SscDataService extends BaseService {
                 }
             }
         }catch (\Exception $exception){
-            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', 'A出x次B出y次投B-处理错误');
+            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', 'A出x次B出y次投B-处理错误', ['plan_id'=>$UserSysPlans->id, 'err_msg'=>$exception->getMessage()]);
             return false;
         }
 
@@ -3033,7 +3033,7 @@ class SscDataService extends BaseService {
                 }
             }
         }catch (\Exception $exception){
-            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', 'A出x次B出y次投B-处理错误');
+            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', '区间遗漏投-处理错误', ['plan_id'=>$UserSysPlans->id, 'err_msg'=>$exception->getMessage()]);
             return false;
         }
 
