@@ -3000,7 +3000,7 @@ class SscDataService extends BaseService {
                         }
                         $bet_msg = '监控中';
                     }else{
-                        $profits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao'. $hzArr['start_qihao']]); # 一个计划当前利润
+                        $profits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao', $hzArr['start_qihao']]); # 一个计划当前利润
                         $hzArr['current_area_profits'] = $profits;
                         if($profits<0 && $area_loss<(0-$profits)){
                             $areaBetStatus = 0;
@@ -3033,7 +3033,7 @@ class SscDataService extends BaseService {
                 }
             }
         }catch (\Exception $exception){
-            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', '区间遗漏投-处理错误', ['plan_id'=>$UserSysPlans->id, 'err_msg'=>$exception->getMessage()]);
+            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', '区间遗漏投-处理错误', ['plan_id'=>$UserSysPlan->id, 'err_msg'=>$exception->getMessage()]);
             return false;
         }
 
