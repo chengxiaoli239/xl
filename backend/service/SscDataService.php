@@ -3013,7 +3013,7 @@ class SscDataService extends BaseService {
                             $bmsg = '符合条件';
                             $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 当前期号，统计利润时候不包含记录的记录的期号
                             $areaBetStatus = 1;
-                            $logArr['area_arise_txt'] = 'area_arise_qishus('.$area_arise_qishus.') >= area_all_qishus('.$area_all_qishus.') - area_yl_qishus('.$area_yl_qishus.')';
+                            $logArr['area_arise_txt'] = 'area_arise_qishus('.$area_arise_qishus.') <= area_all_qishus('.$area_all_qishus.') - area_yl_qishus('.$area_yl_qishus.')';
                         }
                         $hzArr['area_arise_qishus'] = $area_arise_qishus;
                         $logArr['area_arise_qishus'] = $area_arise_qishus;
