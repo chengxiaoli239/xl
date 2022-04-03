@@ -2989,32 +2989,40 @@ class SscDataService extends BaseService {
                     $area_profits = $hzArr['area_profits']; # 区间止盈
                     $area_loss = $hzArr['area_loss']; # 区间止损
 
+                    $logArr = ['plan_id'=>$UserSysPlan->id, 'hzArr_update_before'=>$hzArr_update_before, 'single'=>$single, 'singles'=>$UserSysPlan->singles];
                     # 2 # 监控中状态统计
                     if($areaBetStatus == 0){
                         $area_bet_type = $hzArr['area_bet_type'] ? (int)$hzArr['area_bet_type'] : 1; # 下注起算类型：1用户下注记录统计 2:最近开奖统计
                         $area_arise_qishus = SscDataService::get_area_arise_qishus($UserSysPlan, $area_all_qishus, $area_bet_type); # 指定期数上了多少期
-                        if($area_arise_qishus >= ($area_arise_qishus-$area_yl_qishus)){ # 上奖期数 = 统计期数 - 遗漏期数
+                        $bmsg = '不符合条件';
+                        if($area_arise_qishus >= ($area_all_qishus-$area_yl_qishus)){ # 上奖期数 = 统计期数 - 遗漏期数
                             # 满足指定期数条件 -> 启动下注
+                            $bmsg = '符合条件';
                             $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 当前期号，统计利润时候不包含记录的记录的期号
                             $areaBetStatus = 1;
+                            $logArr['area_arise_txt'] = 'area_arise_qishus('.$area_arise_qishus.') >= area_all_qishus('.$area_all_qishus.') - area_yl_qishus('.$area_yl_qishus.')';
                         }
-                        $bet_msg = '监控中';
+                        $logArr['area_arise_qishus'] = $area_arise_qishus;
+                        $logArr['bet_msg'] = '监控中-'.$bmsg.'['.$UserSysPlan->id.']';
                     }else{
                         $profits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao', $hzArr['start_qihao']]); # 一个计划当前利润
                         $hzArr['current_area_profits'] = $profits;
+                        $bmsg = '不符合止盈止损';
                         if($profits<0 && $area_loss<(0-$profits)){
+                            $bmsg = '符合止损:'.$area_loss;
                             $areaBetStatus = 0;
                             $hzArr['current_area_profits'] = 0.00;
                             $hzArr['start_qihao'] = '';
                         }else{
                             if($profits>$area_profits){
+                                $bmsg = '符合止赢:'.$area_loss;
                                 $areaBetStatus = 0;
                                 $hzArr['current_area_profits'] = 0.00;
                                 $hzArr['start_qihao'] = '';
                             }
                         }
 
-                        $bet_msg = '下注中';
+                        $logArr['bet_msg'] = '下注中，本回合'.$bmsg.'['.$UserSysPlan->id.']';
                     }
 
                     $hzArr['area_profits'] = $area_profits; # 区间止盈
@@ -3022,9 +3030,8 @@ class SscDataService extends BaseService {
 
                     $hzArr['areaBetStatus'] = $areaBetStatus;
                     #$hzArr['singles_key'] = $next_single_key;
-                    $hzArr_update_after = $hzArr;
+                    $logArr['hzArr_update_after'] = $hzArr;
 
-                    $logArr = ['plan_id'=>$UserSysPlan->id, 'hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'single'=>$single, 'singles'=>$UserSysPlan->singles, 'bet_msg'=>$bet_msg.'['.$UserSysPlan->id.']'];
 
                     $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                     $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
