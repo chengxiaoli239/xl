@@ -3002,10 +3002,16 @@ class SscDataService extends BaseService {
                     }else{
                         $profits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao'. $hzArr['start_qihao']]); # 一个计划当前利润
                         $hzArr['current_area_profits'] = $profits;
-                        if($area_loss>$profits OR $profits>$area_profits){
+                        if($profits<0 && $area_loss<(0-$profits)){
                             $areaBetStatus = 0;
                             $hzArr['current_area_profits'] = 0.00;
+                        }else{
+                            if($profits>$area_profits){
+                                $areaBetStatus = 0;
+                                $hzArr['current_area_profits'] = 0.00;
+                            }
                         }
+
                         $bet_msg = '下注中';
                     }
 
