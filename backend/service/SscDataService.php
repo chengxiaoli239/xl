@@ -2989,7 +2989,7 @@ class SscDataService extends BaseService {
                     $area_profits = $hzArr['area_profits']; # 区间止盈
                     $area_loss = $hzArr['area_loss']; # 区间止损
 
-                    $logArr = ['plan_id'=>$UserSysPlan->id, 'hzArr_update_before'=>$hzArr_update_before, 'single'=>$single, 'singles'=>$UserSysPlan->singles];
+                    $logArr = ['plan_id'=>$UserSysPlan->id, 'areaBetStatus'=>$areaBetStatus, 'hzArr_update_before'=>$hzArr_update_before, 'single'=>$single, 'singles'=>$UserSysPlan->singles];
                     # 2 # 监控中状态统计
                     if($areaBetStatus == 0){
                         $area_bet_type = $hzArr['area_bet_type'] ? (int)$hzArr['area_bet_type'] : 1; # 下注起算类型：1用户下注记录统计 2:最近开奖统计
