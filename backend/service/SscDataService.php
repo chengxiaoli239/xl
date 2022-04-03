@@ -3007,7 +3007,7 @@ class SscDataService extends BaseService {
                     }else{
                         $profits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao', $hzArr['start_qihao']]); # 一个计划当前利润
                         $hzArr['current_area_profits'] = $profits;
-                        $bmsg = '不符合止盈止损';
+                        $bmsg = '不符合止盈'.$hzArr['area_profits'].'止损'.$hzArr['area_loss'];
                         if($profits<0 && $area_loss<(0-$profits)){
                             $bmsg = '符合止损:'.$area_loss;
                             $areaBetStatus = 0;
@@ -3015,14 +3015,14 @@ class SscDataService extends BaseService {
                             $hzArr['start_qihao'] = '';
                         }else{
                             if($profits>$area_profits){
-                                $bmsg = '符合止赢:'.$area_loss;
+                                $bmsg = '符合止赢:'.$area_profits;
                                 $areaBetStatus = 0;
                                 $hzArr['current_area_profits'] = 0.00;
                                 $hzArr['start_qihao'] = '';
                             }
                         }
 
-                        $logArr['bet_msg'] = '下注中，本回合'.$bmsg.'['.$UserSysPlan->id.']';
+                        $logArr['bet_msg'] = '下注中，本回合盈利：'.$profits.','.$bmsg.'['.$UserSysPlan->id.']';
                     }
 
                     $hzArr['area_profits'] = $area_profits; # 区间止盈
