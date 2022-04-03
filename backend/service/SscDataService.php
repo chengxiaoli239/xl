@@ -2998,6 +2998,7 @@ class SscDataService extends BaseService {
                             $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 当前期号，统计利润时候不包含记录的记录的期号
                             $areaBetStatus = 1;
                         }
+                        $bet_msg = '监控中';
                     }else{
                         $profits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao'. $hzArr['start_qihao']]); # 一个计划当前利润
                         $hzArr['current_area_profits'] = $profits;
@@ -3005,6 +3006,7 @@ class SscDataService extends BaseService {
                             $areaBetStatus = 0;
                             $hzArr['current_area_profits'] = 0.00;
                         }
+                        $bet_msg = '下注中';
                     }
 
                     $hzArr['area_profits'] = $area_profits; # 区间止盈
@@ -3014,7 +3016,7 @@ class SscDataService extends BaseService {
                     #$hzArr['singles_key'] = $next_single_key;
                     $hzArr_update_after = $hzArr;
 
-                    $logArr = ['hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'plan_id'=>$UserSysPlan->id, 'single'=>$single, 'singles'=>$UserSysPlan->singles];
+                    $logArr = ['hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'plan_id'=>$UserSysPlan->id, 'single'=>$single, 'singles'=>$UserSysPlan->singles, 'bet_msg'=>$bet_msg];
 
                     $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                     $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
