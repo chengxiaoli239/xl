@@ -1884,7 +1884,12 @@ class NumService extends BaseService {
             $desc .= '[A出:'.$hz_Arr['arise_A_times'].'次当前:'.(int)$hz_Arr['current_arise_A_times'].'次&B出:'.$hz_Arr['arise_B_times'].'次,遗漏:'.$yl_desc.']';
         }
         if($UserSysPlans && in_array($UserSysPlans->plan_type, [14])){
-            $desc .= '【区间=总期数:'.$hz_Arr['area_all_qishus'].'|遗漏:'.$hz_Arr['area_yl_qishus'].'|止盈:'.$hz_Arr['area_profits'].',止损:'.$hz_Arr['area_loss'].'|当前:'.$hz_Arr['current_area_profits'].($hz_Arr['areaBetStatus']==1 ? '|起投期:'.$hz_Arr['start_qihao'] : '').'】';
+            $desc .= '【区间=总期数:'.$hz_Arr['area_all_qishus'].'|遗漏:'.$hz_Arr['area_yl_qishus'].'|止盈:'.$hz_Arr['area_profits'].',止损:'.$hz_Arr['area_loss'];
+
+            $desc .= isset($hz_Arr['current_area_profits']) ? '|当前：'.$hz_Arr['current_area_profits'] : ''; # 当前遗漏
+            $desc .= ($hz_Arr['areaBetStatus']==1) ? "|起投期:".$hz_Arr['start_qihao'] : ''; # 当前遗漏
+
+            $desc .= '】';
         }
         # 类型取
         if(!empty($filter6) OR !empty($filter7)){
