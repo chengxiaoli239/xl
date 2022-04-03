@@ -2647,6 +2647,28 @@ class SscDataService extends BaseService {
         return $codes;
     }
 
+    /**
+     * @desc 获取一个计划当前的利润
+     * @param $UserSysPlan
+     * @param array $andWhere
+     * @return bool|int|mixed|string|null
+     */
+    public static function getPlanProfits($UserSysPlan, $andWhere = []){
+        $where = ['AND',
+            ['=', 'plan_id', $UserSysPlan->id],
+            ['=', 'is_profits_record', 1],
+            ['OR',
+                ['=', 'is_simulate', 0],
+                ['AND', ['=','is_simulate', 1], ['=', 'sn', BetService::$test_true_sn]],
+            ],
+        ];
+        if(!empty($andWhere)){
+            $where[] = $andWhere;
+        }
+        $profits = BettingRecords::find()->where($where)->sum('profits');
+
+        return $profits;
+    }
 
     /**
      * @desc 处理止盈止损计划
@@ -2667,15 +2689,7 @@ class SscDataService extends BaseService {
         ];
         if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
             foreach ($UserSysPlans as $UserSysPlan){
-                $where = ['AND',
-                    ['=', 'plan_id', $UserSysPlan->id],
-                    ['=', 'is_profits_record', 1],
-                    ['OR',
-                        ['=', 'is_simulate', 0],
-                        ['AND', ['=','is_simulate', 1], ['=', 'sn', BetService::$test_true_sn]],
-                    ],
-                ];
-                $profits = BettingRecords::find()->where($where)->sum('profits');
+                $profits = SscDataService::getPlanProfits($UserSysPlan);
 
                 $maxQihao = BetService::$maxQihaoArr[$lottery_type];
                 $qihao = substr(HN0898Service::getCurrentQihao($lottery_type),-3); # 最后三位
@@ -2861,6 +2875,8 @@ class SscDataService extends BaseService {
 
         SscDataService::opProfitsPlans12_13($lottery_type); # A出x次B出y次投B、A出x次B出y次投B_2 计划处理
 
+        SscDataService::opProfitsPlans14($lottery_type); # 区间遗漏投 止盈止损 计划处理
+
         $logArr['lottery_type'] = $lottery_type;
         $logArr['qihao'] = HN0898Service::getQihao($lottery_type);
         Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', [$logArr]);
@@ -2949,6 +2965,125 @@ class SscDataService extends BaseService {
     }
 
     /**
+     * @desc 14区间遗漏投 计划处理
+     * @param int $lottery_type
+     * @return bool
+     */
+    public static function opProfitsPlans14($lottery_type = DEFAULT_LOTTERY_TYPE){
+        try {
+            # plan_type:12 A出x次B出y次投B
+            $where = ['AND', ['=', 'plan_type', 14], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+                foreach ($UserSysPlans as $UserSysPlan){
+                    $plan_type = $UserSysPlan->plan_type;
+                    $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+                    $hzArr_update_before = $hzArr;
+
+                    $singles = explode('-', trim($UserSysPlan->singles));
+                    if(empty($singles)) $singles = [$UserSysPlan->single];
+                    $single = $UserSysPlan->single;
+
+                    $areaBetStatus = isset($hzArr['areaBetStatus']) ? (int)$hzArr['areaBetStatus'] : 0; # 0监控中1下注中
+                    $area_all_qishus = $hzArr['area_all_qishus']; # 区间统计期数
+                    $area_yl_qishus = $hzArr['area_yl_qishus']; # 区间遗漏期数
+                    $area_profits = $hzArr['area_profits']; # 区间止盈
+                    $area_loss = $hzArr['area_loss']; # 区间止损
+
+                    # 2 # 监控中状态统计
+                    if($areaBetStatus == 0){
+                        $area_bet_type = $hzArr['area_bet_type'] ? (int)$hzArr['area_bet_type'] : 1; # 下注起算类型：1用户下注记录统计 2:最近开奖统计
+                        $area_arise_qishus = SscDataService::get_area_arise_qishus($UserSysPlan, $area_all_qishus, $area_bet_type); # 指定期数上了多少期
+                        if($area_arise_qishus == ($area_arise_qishus-$area_yl_qishus)){ # 上奖期数 = 统计期数 - 遗漏期数
+                            # 满足指定期数条件 -> 启动下注
+                            $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 当前期号，统计利润时候不包含记录的记录的期号
+                            $areaBetStatus = 1;
+                        }
+                        $area_profits = 0; # 区间止盈
+                        $area_loss = 0; # 区间止损
+                    }else{
+                        $profits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao'. $hzArr['start_qihao']]); # 一个计划当前利润
+                        $hzArr['current_area_profits'] = $profits;
+                        if($area_loss>$profits OR $profits>$area_profits){
+                            $areaBetStatus = 0;
+                            $hzArr['current_area_profits'] = 0.00;
+                        }
+                    }
+
+                    $hzArr['area_profits'] = $area_profits; # 区间止盈
+                    $hzArr['area_loss'] = $area_loss; # 区间止损
+
+                    $hzArr['areaBetStatus'] = $areaBetStatus;
+                    #$hzArr['singles_key'] = $next_single_key;
+                    $hzArr_update_after = $hzArr;
+
+                    $logArr = ['hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'plan_id'=>$UserSysPlan->id, 'single'=>$single, 'singles'=>$UserSysPlan->singles];
+
+                    $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
+                    $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
+                    $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                    $logArr['plan_14'][$UserSysPlan->id]['updateData'] = $updateData;
+                    $logArr['plan_14'][$UserSysPlan->id]['rst'] = $rst;
+                    Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后', $logArr);
+                }
+            }
+        }catch (\Exception $exception){
+            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', 'A出x次B出y次投B-处理错误');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @desc 查询指定计划在最近期数上了几次
+     * @param $UserSysPlan
+     * @param $recent_qishus 最近多少期
+     * @param int $area_bet_type 1用下注记录统计2最近开奖记录
+     * @return array|int
+     */
+    public static function get_area_arise_qishus($plan, $recent_qishus, $area_bet_type = 1){
+        $plan_id = $plan->id;
+        if($area_bet_type == 2){
+            # 最近开奖统计
+            $last = SscKjData::find()->select(['last_id'=>'index_id', 'code_str'])->where(['lottery_type'=>$plan->lottery_type])
+                ->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $start_index_id = $last['last_id'] - $recent_qishus;
+            $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id); # 格式：0,0,X,X@0,2,X,X@2,0,X,X@0,4,X,X
+
+            $where = ['AND', ['=', 'lottery_type', $plan->lottery_type], ['>', 'index_id', $start_index_id]];
+            $limit = min($recent_qishus, 100); # 最多100条
+            //p([$last, $codes, $limit]);
+            $kjDatas = SscKjData::find()->select(['code_str', 'qihao', 'index_id'])->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->limit($limit)->all();
+            $zj_nums = 0;
+            foreach ($kjDatas as $kjData){
+                $zjResult = OpKjService::opKjData4($codes, $kjData['code_str']);
+                if(isset($zjResult['data']) && $zjResult['data']['zjTimes'] == 1){
+                    $zj_nums += 1;
+                }
+            }
+        }else{
+            # 用户下注记录统计
+            $where = ['AND', ['=', 'plan_id', $plan_id], ['=', 'status', 1]];
+            $BettingRecords = BettingRecords::find()->where($where)->limit($recent_qishus)->orderBy(['id'=>SORT_DESC])->all();
+            $count_records = count($BettingRecords);
+            if($count_records<$recent_qishus){
+                # 下注记录不够汇总记录数
+                return $recent_qishus;
+            }
+            $start_id = end($BettingRecords)->id;
+
+            $where = array_merge($where, [['>=', 'id', $start_id], ['>', 'profits', 0]]);
+            $pBettingRecords = BettingRecords::find()->where($where)->limit($recent_qishus)->orderBy(['id'=>SORT_DESC])->all();
+
+            $zj_nums = count($pBettingRecords);
+            //p([$start_id, $end_id, count($BettingRecords), 'num'=>count($pBettingRecords)]);
+            return $zj_nums;
+        }
+
+        return $zj_nums;
+    }
+
+    /**
      * @param $UserSysPlan_id
      * @return bool
      */
@@ -2962,7 +3097,7 @@ class SscDataService extends BaseService {
             $where = ['lottery_type'=>$lottery_type];
 
             $kjData = SscKjData::find()->where($where)->andWhere(['>', 'created_at', strtotime($s_time)])->orderBy(['id'=>SORT_DESC])->asArray()->one();
-            $qihao = $kjData['code_str'];
+            $qihao = $kjData['qihao'];
             $zjResult = OpKjService::opKjData4($codes, $kjData['code_str']);
             if(isset($zjResult['data']) && $zjResult['data']['zjTimes'] == 1){
                 return $importPlanCode->plan_id_sort_key;

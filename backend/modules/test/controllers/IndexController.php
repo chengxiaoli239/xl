@@ -13,6 +13,7 @@ use backend\models\SscKjData;
 use backend\models\SscSdHzVal;
 use backend\models\SscStaticVal;
 use backend\models\TzSystemsUsers;
+use backend\models\UserSysPlans;
 use backend\modules\cron\controllers\WeixinController;
 use backend\modules\kj\controllers\BingDaoController;
 use backend\service\baota\BaoTaService;
@@ -291,6 +292,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $UserSysPlan = UserSysPlans::findOne(4659);
+        $data = SscDataService::get_area_arise_qishus($UserSysPlan, $recent_qishus=20, $area_bet_type=2);p($data);
         $data = NaSiDaKe::getLotteryNo($type='json', $is_auto=2, $lottery_type=25);p($data);
         $rst = SscDataService::opProfitsPlans12($lottery_type = 8);
         p($rst);# A出x次B出y次投B 计划处理

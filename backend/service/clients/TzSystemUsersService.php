@@ -216,6 +216,9 @@ class TzSystemUsersService extends ClientsBaseService{
 
         if(true OR empty($flag)){
             $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+            if(!empty($TzSystemsUsers->expire_time) && $TzSystemsUsers->expire_time <= time()){
+                return ['status'=>301,  'msg'=>'已过期，请续费'];
+            }
             $uid = $TzSystemsUsers->uid;
             $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
             if($uid){

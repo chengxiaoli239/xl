@@ -180,6 +180,25 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['type_22b']);
 
+        # 17、区间遗漏投 start
+        if(!empty($UserSysPlans['area_all_qishus'])){
+            $tmpFilter['area_all_qishus'] = $UserSysPlans['area_all_qishus'];
+        }
+        unset($post['UserSysPlans']['area_all_qishus']);
+        if(!empty($UserSysPlans['area_yl_qishus'])){
+            $tmpFilter['area_yl_qishus'] = $UserSysPlans['area_yl_qishus'];
+        }
+        unset($post['UserSysPlans']['area_yl_qishus']);
+        if(!empty($UserSysPlans['area_profits'])){
+            $tmpFilter['area_profits'] = $UserSysPlans['area_profits'];
+        }
+        unset($post['UserSysPlans']['area_profits']);
+        if(!empty($UserSysPlans['area_loss'])){
+            $tmpFilter['area_loss'] = $UserSysPlans['area_loss'];
+        }
+        unset($post['UserSysPlans']['area_loss']);
+        # 17、区间遗漏投 end
+
         # 16.2、动态过滤 - 是否模拟
         if($UserSysPlans['is_batch_simulate'] && count($UserSysPlans['is_batch_simulate']) == 1){
             $post['UserSysPlans']['is_batch_simulate'] = (int)$UserSysPlans['is_batch_simulate'][0];

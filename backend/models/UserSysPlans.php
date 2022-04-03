@@ -155,8 +155,15 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $current_yl_desc;
     public $start_bet_yl_nums;
     public $single_key;
-    ############## A出x次B出y次投B、A出x次B出y次投B end   ####################
     public static $A_x_arise_B_y_arise_bet_B_types = [12, 13]; # A出x次B出y次投B、A出x次B出y次投B_2
+    ############## A出x次B出y次投B、A出x次B出y次投B end   ####################
+
+    ########################## 统计期数区间 止盈止损 start ########################
+    public $area_all_qishus; # 统计期数
+    public $area_yl_qishus; # 统计期间遗漏期数
+    public $area_profits; # 统计期间后起投止盈
+    public $area_loss; # 统计期间后起投止损
+    ########################### 统计期数区间 止盈止损 end #########################
     /**
      * @inheritdoc
      */

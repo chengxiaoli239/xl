@@ -57,6 +57,9 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'hz_Arr')->textInput()->label('英文逗号或者空格隔开比如：1234,2345 或 1234 2345') ?>
 
+                    <!--区间盈利止盈止损-->
+                    <?php include(dirname(__FILE__).'/take_profits_area.php'); ?>
+
                     <!--止盈止损-->
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
 

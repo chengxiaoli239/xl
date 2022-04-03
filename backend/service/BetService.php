@@ -1006,8 +1006,9 @@ abstract class BetService extends BaseBetService {
        $codes_hz['current_miss'] = 0; # 当前遗漏
        $codes_hz['singles_key'] = 0; # 倍数key
        $codes_hz['is_init'] = 1; # 是否最初
+       $codes_hz['current_area_profits'] = 0;
 
-       $rstFlag = BettingRecords::updateAll(['is_profits_record'=>0], ['plan_id'=>$id]);
+       $rstFlag = BettingRecords::updateAll(['is_profits_record'=>0, 'is_area_profits'=>0], ['plan_id'=>$id]);
        $UserSysPlans->current_profits = 0.00;
        $UserSysPlans->hz_Arr = json_encode($codes_hz, 320);
        $UserSysPlans->save();
@@ -1265,26 +1266,31 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
-     * @desc 获取计划是否可以真实投注
+     * @desc 获取计划下期是否可以真实投注
      * @param string $plan_id
      * @return bool 0不中奖1中奖 -1最初添加计划未投注，可当作未中奖，等同于0
      */
     public static function getIsBetTrue($plan_id = ''){
 
-        $flag = SscDataService::isZjBefore($plan_id); # 上期是否中奖，第一次下注认为是上期不中 中则投
         $plan = UserSysPlans::findOne($plan_id);
-        if(in_array($plan->plan_type, [8, 9])){ # 遗漏多少期启投
-            $flag = 0;
-            $codes_hz = json_decode($plan->hz_Arr, true);
-            if($codes_hz['current_miss']>=$codes_hz['bet_while_miss']){
+        $flag = SscDataService::isZjBefore($plan_id); # 上期是否中奖，第一次下注认为是上期不中 中则投
+        $codes_hz = json_decode($plan->hz_Arr, true);
+        if(in_array($plan->plan_type, [14])){
+            if($codes_hz['areaBetStatus'] == 1){
                 $flag = 1;
             }
-        }
-        if(in_array($plan->plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types)) { # A出x次B出y次投B
-            $flag = 0;
-            $codes_hz = json_decode($plan->hz_Arr, true);
-            if($codes_hz["current_arise_A_times"]>=$codes_hz['arise_A_times'] && $codes_hz["current_arise_B_times"]==$codes_hz['arise_B_times']){
-                $flag = 1;
+        }else{
+            if(in_array($plan->plan_type, [8, 9])){ # 遗漏多少期启投
+                $flag = 0;
+                if($codes_hz['current_miss']>=$codes_hz['bet_while_miss']){
+                    $flag = 1;
+                }
+            }
+            if(in_array($plan->plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types)) { # A出x次B出y次投B
+                $flag = 0;
+                if($codes_hz["current_arise_A_times"]>=$codes_hz['arise_A_times'] && $codes_hz["current_arise_B_times"]==$codes_hz['arise_B_times']){
+                    $flag = 1;
+                }
             }
         }
 
@@ -1401,6 +1407,7 @@ abstract class BetService extends BaseBetService {
             'sn'=>$data['sn'] ? $data['sn'] : BetService::$test_true_sn, // 方案号
             'snid'=>$data['snid'] ? $data['snid'] : BetService::$test_true_snid,
             'is_profits_record'=> in_array($data['sn'], BetService::$test_static_sn) ? 0 : 1, # 是否计算盈利
+            'is_area_profits'=> in_array($data['sn'], BetService::$test_static_sn) ? 0 : 1, # 是否计算盈利
             'playway'=> $data['playway'],  // 投注方式
             'tz_type'=> $data['tz_type'],  // 投注类型
             'account'=> $data['account'],  // 投注账号
@@ -1894,7 +1901,7 @@ abstract class BetService extends BaseBetService {
                 $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
                 $is_test = $plan->is_test;
                 $sn = BetService::$test_true_sn;
-                if(in_array($plan->plan_type, array_merge([6, 8, 9], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
+                if(in_array($plan->plan_type, array_merge([6, 8, 9, 14], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
                     //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
                     $flag = BetService::getIsBetTrue($plan->id);
                     if(in_array($flag, [0, -1]) && $isAuto == 1){
