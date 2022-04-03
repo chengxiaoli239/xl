@@ -4087,7 +4087,9 @@ class SscDataService extends BaseService {
      */
     public static function getCodesDesc($str=''){
 
-        $str = str_replace('@', ',',str_replace(',','', $str));
+        if(strpos($str, '@') !== false){
+            $str = str_replace('@', ',',str_replace(',','', $str));
+        }
 
         return $str;
     }
