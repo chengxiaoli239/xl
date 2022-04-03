@@ -3016,7 +3016,7 @@ class SscDataService extends BaseService {
                     #$hzArr['singles_key'] = $next_single_key;
                     $hzArr_update_after = $hzArr;
 
-                    $logArr = ['hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'plan_id'=>$UserSysPlan->id, 'single'=>$single, 'singles'=>$UserSysPlan->singles, 'bet_msg'=>$bet_msg];
+                    $logArr = ['hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'plan_id'=>$UserSysPlan->id, 'single'=>$single, 'singles'=>$UserSysPlan->singles, 'bet_msg'=>$bet_msg.'['.$UserSysPlan->id.']'];
 
                     $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                     $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
