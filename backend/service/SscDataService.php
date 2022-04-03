@@ -33,6 +33,7 @@ use backend\models\UserSysPlans;
 use backend\models\WxFriends;
 use common\service\CommonService;
 use common\tools\KjDataGet;
+use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use backend\models\SscDwHzYl;
 use izyue\admin\models\Log;
@@ -2675,7 +2676,6 @@ class SscDataService extends BaseService {
      * @return array
      */
     public static function opProfitsPlans($lottery_type = DEFAULT_LOTTERY_TYPE){
-        $rst = ['status'=>200, 'msg'=>'处理成功'];
         $now_HI = date('H:i:s');
         if($lottery_type==8 && '04:05:00'<$now_HI && $now_HI<'09:05:00'){
             return ['status'=>300, 'msg'=>'非开盘时间不统计'];
@@ -2890,6 +2890,13 @@ class SscDataService extends BaseService {
      * @return bool
      */
     public static function opProfitsPlans12_13($lottery_type = DEFAULT_LOTTERY_TYPE){
+
+        $RedisLock = new RedisLock();
+        $Rkey = __FUNCTION__.'_redis_'.$lottery_type;
+        if(!$RedisLock->lock($Rkey, 30)){
+            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', 'A出x次B出y次投B-处理锁错误', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+        }
+
         try {
             # plan_type:12 A出x次B出y次投B
             $where = ['AND', ['IN', 'plan_type', UserSysPlans::$A_x_arise_B_y_arise_bet_B_types], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
@@ -2970,6 +2977,12 @@ class SscDataService extends BaseService {
      * @return bool
      */
     public static function opProfitsPlans14($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $RedisLock = new RedisLock();
+        $Rkey = __FUNCTION__.'_redis_'.$lottery_type;
+        if(!$RedisLock->lock($Rkey, 30)){
+            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', '区间遗漏投-处理锁错误', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+        }
+
         try {
             # plan_type:12 A出x次B出y次投B
             $where = ['AND', ['=', 'plan_type', 14], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
