@@ -2998,8 +2998,6 @@ class SscDataService extends BaseService {
                             $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 当前期号，统计利润时候不包含记录的记录的期号
                             $areaBetStatus = 1;
                         }
-                        $area_profits = 0; # 区间止盈
-                        $area_loss = 0; # 区间止损
                     }else{
                         $profits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao'. $hzArr['start_qihao']]); # 一个计划当前利润
                         $hzArr['current_area_profits'] = $profits;
