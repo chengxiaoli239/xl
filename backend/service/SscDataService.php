@@ -3007,7 +3007,7 @@ class SscDataService extends BaseService {
                     if($areaBetStatus == 0){
                         $area_bet_type = $hzArr['area_bet_type'] ? (int)$hzArr['area_bet_type'] : 1; # 下注起算类型：1用户下注记录统计 2:最近开奖统计
                         $area_arise_qishus = SscDataService::get_area_arise_qishus($UserSysPlan, $area_all_qishus, $area_bet_type); # 指定期数上了多少期
-                        $bmsg = '不符合条件';
+                        $bmsg = '不符合条件【'.$area_arise_qishus.'<=('.$area_all_qishus.'-'.$area_yl_qishus.')】';
                         if($area_arise_qishus <= ($area_all_qishus-$area_yl_qishus)){ # 上奖期数 = 统计期数 - 遗漏期数
                             # 满足指定期数条件 -> 启动下注
                             $bmsg = '符合条件';
@@ -3022,13 +3022,13 @@ class SscDataService extends BaseService {
                         $hzArr['current_area_profits'] = $profits;
                         $bmsg = '不符合止盈'.$hzArr['area_profits'].'止损'.$hzArr['area_loss'];
                         if($profits<0 && $area_loss<(0-$profits)){
-                            $bmsg = '符合止损:'.$area_loss;
+                            $bmsg = '符合止损:'.$area_loss.'<('.(0-$profits).')';
                             $areaBetStatus = 0;
                             $hzArr['current_area_profits'] = 0.00;
                             $hzArr['start_qihao'] = '';
                         }else{
                             if($profits>$area_profits){
-                                $bmsg = '符合止赢:'.$area_profits;
+                                $bmsg = '符合止赢:'.$profits.'>'.$area_profits;
                                 $areaBetStatus = 0;
                                 $hzArr['current_area_profits'] = 0.00;
                                 $hzArr['start_qihao'] = '';
