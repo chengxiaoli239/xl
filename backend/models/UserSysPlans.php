@@ -165,6 +165,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $area_loss; # 统计期间后起投止损
     public $areaBetStatus; # 0监控状态1下注状态
     public $current_area_profits; # 区间利润
+    public $area_arise_qishus; # 统计区间上奖次数
     ########################### 统计期数区间 止盈止损 end #########################
     /**
      * @inheritdoc
