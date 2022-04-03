@@ -640,6 +640,10 @@ class HN0898Service extends BaseTZService {
                 $code_hz['current_yl_desc'] = '';
                 $code_hz['A_x_B_y_start_time'] = date('Y-m-d H:i:s');
             }
+            if($plan_type == 14){ # 区间遗漏投
+                unset($codes_hz['current_area_profits']);
+                unset($codes_hz['start_qihao']);
+            }
             $UserSysPlans->hz_Arr = json_encode($code_hz, 320);
         }
 

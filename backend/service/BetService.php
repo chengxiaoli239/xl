@@ -1006,7 +1006,10 @@ abstract class BetService extends BaseBetService {
        $codes_hz['current_miss'] = 0; # 当前遗漏
        $codes_hz['singles_key'] = 0; # 倍数key
        $codes_hz['is_init'] = 1; # 是否最初
-       $codes_hz['current_area_profits'] = 0;
+       if($UserSysPlans->plan_type == 14){
+           unset($codes_hz['current_area_profits']);
+           unset($codes_hz['start_qihao']);
+       }
 
        $rstFlag = BettingRecords::updateAll(['is_profits_record'=>0, 'is_area_profits'=>0], ['plan_id'=>$id]);
        $UserSysPlans->current_profits = 0.00;
