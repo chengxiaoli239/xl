@@ -1279,9 +1279,7 @@ abstract class BetService extends BaseBetService {
         $flag = SscDataService::isZjBefore($plan_id); # 上期是否中奖，第一次下注认为是上期不中 中则投
         $codes_hz = json_decode($plan->hz_Arr, true);
         if(in_array($plan->plan_type, [14])){
-            if($codes_hz['areaBetStatus'] == 1){
-                $flag = 1;
-            }
+            return (int)$codes_hz['areaBetStatus'];
         }else{
             if(in_array($plan->plan_type, [8, 9])){ # 遗漏多少期启投
                 $flag = 0;
