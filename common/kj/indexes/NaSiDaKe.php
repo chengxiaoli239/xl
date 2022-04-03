@@ -56,6 +56,7 @@ class NaSiDaKe extends BaseKj{
                         break;
                     }
                 }
+                $data = array_reverse($data);
             }elseif ($lottery_type == 25){
                 $data = $datas['result']['numbers'];
                 if(!empty($KjConfig) && $KjConfig->is_batch == 1){
