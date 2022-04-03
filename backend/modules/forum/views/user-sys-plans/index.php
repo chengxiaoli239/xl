@@ -173,12 +173,14 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                     if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                         $title = \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
                                     }
+                                    $codes_hz = json_decode($model->hz_Arr, true);
+                                    $betStatusTxt = ($codes_hz['areaBetStatus']==1 OR $codes_hz['betStatus']==1) ? '正在下注...' : '等待中...';
                                 }else{
                                     $title = $model->hz_Arr;
                                 }
                                 $txt = BaseStringHelper::truncate($str,20);
                                 $desc_str .= !empty($model->singles) ? '翻倍：'.$model->singles : '';
-                                $str = Html::a($txt, 'javascript:;', ['title' => \backend\service\SscDataService::getCodesDesc($title),'alt'=>\backend\service\SscDataService::getCodesDesc($desc_str), 'class'=>'act-desc', 'current_profits'=>round($model->current_profits, 2)]);
+                                $str = Html::a($txt, 'javascript:;', ['title' => \backend\service\SscDataService::getCodesDesc($title),'alt'=>\backend\service\SscDataService::getCodesDesc($desc_str), 'class'=>'act-desc', 'plan_id'=>$model->id, 'current_profits'=>round($model->current_profits, 2), 'betStatusTxt'=>$betStatusTxt]);
                                 if($model->singles OR in_array($model->plan_type,[2, 3, 4, 5, 9, 10])){
                                     $str .= '翻倍梯度:'.$model->singles;
                                 }
@@ -249,9 +251,11 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
         $(".act-desc").click(function (rst) {
             bet_rst = $(this).attr('alt');
             content = $(this).attr('title');
+            plan_id = $(this).attr('plan_id');
+            betStatusTxt = $(this).attr('betStatusTxt');
             current_profits = parseFloat($(this).attr('current_profits'));
 
-            push_desc = {"描述":bet_rst, "当前盈利":current_profits}
+            push_desc = {"计划ID":plan_id, "描述":bet_rst, "当前盈利":current_profits, '状态':betStatusTxt}
             push_content = {"desc":bet_rst, "detail":content};
             $('#rst_code').text(JSON.stringify(push_desc, null,' '))
             $('#push_content').text(JSON.stringify(push_content,null,' '))
