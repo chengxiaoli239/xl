@@ -3036,8 +3036,7 @@ class SscDataService extends BaseService {
                     $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                     $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
                     $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
-                    $logArr['plan_14'][$UserSysPlan->id]['updateData'] = $updateData;
-                    $logArr['plan_14'][$UserSysPlan->id]['rst'] = $rst;
+                    $logArr['save_rst'] = $rst;
                     Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后', $logArr);
                 }
             }
