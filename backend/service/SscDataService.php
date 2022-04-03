@@ -3015,6 +3015,7 @@ class SscDataService extends BaseService {
                             $areaBetStatus = 1;
                             $logArr['area_arise_txt'] = 'area_arise_qishus('.$area_arise_qishus.') >= area_all_qishus('.$area_all_qishus.') - area_yl_qishus('.$area_yl_qishus.')';
                         }
+                        $hzArr['area_arise_qishus'] = $area_arise_qishus;
                         $logArr['area_arise_qishus'] = $area_arise_qishus;
                         $logArr['bet_msg'] = '监控中-'.$bmsg.'['.$UserSysPlan->id.']';
                     }else{
