@@ -3005,10 +3005,12 @@ class SscDataService extends BaseService {
                         if($profits<0 && $area_loss<(0-$profits)){
                             $areaBetStatus = 0;
                             $hzArr['current_area_profits'] = 0.00;
+                            $hzArr['start_qihao'] = '';
                         }else{
                             if($profits>$area_profits){
                                 $areaBetStatus = 0;
                                 $hzArr['current_area_profits'] = 0.00;
+                                $hzArr['start_qihao'] = '';
                             }
                         }
 
