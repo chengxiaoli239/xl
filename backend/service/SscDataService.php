@@ -3030,6 +3030,7 @@ class SscDataService extends BaseService {
                             if($profits>$area_profits){
                                 $bmsg = '符合止赢:'.$profits.'>'.$area_profits;
                                 $areaBetStatus = 0;
+                                $hzArr['area_arise_qishus'] = 0;
                                 $hzArr['current_area_profits'] = 0.00;
                                 $hzArr['start_qihao'] = '';
                             }
