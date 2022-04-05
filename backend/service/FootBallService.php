@@ -146,7 +146,7 @@ class FootBallService extends SportsBaseService
                 if(!$EventsLiveDatas->save()){
                     throw new Exception(json_encode($EventsLiveDatas->getFirstErrors(), 320));
                 }
-                Tool_Common::log('/sports/'.__FUNCTION__, 'INFO', '比赛记录更新', ['event_id'=>$event['event_id'], 'groupId'=>$event['groupId'], 'event_name'=>$event['event_name']]);
+                Tool_Common::log('/sports/'.__FUNCTION__, 'INFO', '比赛记录更新', ['event_id'=>$event['id'], 'groupId'=>$event['groupId'], 'event_name'=>$event['name']]);
             }catch (\Exception $exception){
                 Tool_Common::log('ERR', '/sports/'.__FUNCTION__.'_e', '比赛数据报错失败', ['setDatas'=>$setDatas, 'err_msg'=>$exception->getMessage()]);
                 continue;
