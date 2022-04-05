@@ -1,6 +1,7 @@
 <?php
 namespace backend\service;
 
+use backend\models\sports\EventsLiveDatas;
 use backend\service\clients\TzSystemUsersService;
 use backend\service\sports\SportsBaseService;
 use common\general\helpers\Curl;
@@ -82,7 +83,6 @@ class FootBallService extends SportsBaseService
      * @throws Exception
      */
     public static function recordInPlayFootBallDatas($datas=[], object $TzSystemsUsers ){
-        $access_token = $datas['access_token'];
 
         $uid = $TzSystemsUsers->uid;
         if(empty($datas)){
@@ -90,13 +90,67 @@ class FootBallService extends SportsBaseService
         }
 
         $events = $datas['events'];
-        foreach ($events as $event){
-            $data_type = $event['event']['sport'];
-            if($data_type != self::$data_type) continue;
+        foreach ($events as $eventData){
+            try {
+                $data_type = $eventData['event']['sport'];
+                if($data_type != self::$data_type) continue;
+                $event = $eventData['event'];
+                $betOffers = $eventData['betOffers'];
+                $liveData = $eventData['liveData'];
+                $where = ['event_id'=>$event['id'], 'group_id'=>$event['groupId']];
+                $EventsLiveDatas = EventsLiveDatas::findOne($where);
+                $setDatas = [];
+                $now_time = time();
+                if(empty($EventsLiveDatas)){
+                    $EventsLiveDatas = new EventsLiveDatas();
+                    $setDatas['created_at'] = $now_time;
+                }
 
-            $setDatas = [
+                $setDatas = [
+                    'uid' => $uid,
 
-            ];
+                    'event_id' => $event['id'],
+                    'event_name' => $event['name'] ? : '',
+                    'event_name_en' => $event['englishName'] ? : '',
+                    'event_time' => strtotime($event['start']), # 比赛开始时间
+                    'group_id' => $event['groupId'],
+                    'group_name' => $event['group'],
+
+                    'home_name_en' => $event['homeName'] ? : '', # 主队英文名
+                    'way_name_en' => $event['awayName'] ? : '', # 客队英文名
+                    'score_home' => (int)$event['score']['home'], # 主队得分
+                    'score_way' => (int)$event['score']['way'], # 客队得分
+                    'score_who' => $event['score']['who'], # 哪对得分
+
+                    'clock_minute' => $liveData['matchClock']['minute'], # 比赛进行分钟数
+                    'clock_second' => $liveData['matchClock']['second'], # 当前分钟秒数
+                    'clock_minutesLeftInPeriod' => $liveData['matchClock']['minutesLeftInPeriod'], # 场次剩余分钟
+                    'clock_secondsLeftInMinute' => $liveData['matchClock']['secondsLeftInMinute'], # 当前分钟剩余秒数
+                    'clock_period' => (int)$liveData['matchClock']['period'], # 当前节数
+                    'clock_clock_running' => $liveData['matchClock']['running'], # 是否在进行
+
+                    'statics_football_home_yellowCards' => (string)$liveData['statistics']['football']['home']['yellowCards'], # 主队黄牌数
+                    'statics_football_home_redCards' => (string)$liveData['statistics']['football']['home']['redCards'], # 主队红牌数
+                    'statics_football_home_corners' => (string)$liveData['statistics']['football']['home']['corners'], # 主队角球数
+
+                    'statics_football_way_yellowCards' => (string)$liveData['statistics']['football']['way']['yellowCards'], # 客队队黄牌数
+                    'statics_football_way_redCards' => (string)$liveData['statistics']['football']['way']['redCards'], # 客队红牌数
+                    'statics_football_way_corners' => (string)$liveData['statistics']['football']['way']['corners'], # 客队角球数
+
+                    'liveStatistics' => json_encode($liveData['liveStatistics'], 320), # 直播统计
+
+                    'updated_at' => $now_time,
+                ];
+
+                $EventsLiveDatas->setAttributes($setDatas);
+                if(!$EventsLiveDatas->save()){
+                    throw new Exception(json_encode($EventsLiveDatas->getFirstErrors(), 320));
+                }
+                Tool_Common::log('/sports/'.__FUNCTION__, 'INFO', '比赛记录更新', ['event_id'=>$event['event_id'], 'groupId'=>$event['groupId'], 'event_name'=>$event['event_name']]);
+            }catch (\Exception $exception){
+                Tool_Common::log('ERR', '/sports/'.__FUNCTION__.'_e', '比赛数据报错失败', ['setDatas'=>$setDatas, 'err_msg'=>$exception->getMessage()]);
+                continue;
+            }
 
         }
 

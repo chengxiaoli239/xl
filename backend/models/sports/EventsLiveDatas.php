@@ -9,7 +9,17 @@ use Yii;
  *
  * @property int $id
  * @property int $uid 用户id
+ * @property int $group_id 比赛项目组id
+ * @property string $group_name 比赛组名称
+ * @property int $event_time 比赛开始时间
  * @property int $event_id 比赛项目id
+ * @property string $event_name 比赛名称
+ * @property string $event_name_en 比赛名称英文
+ * @property string $event_name_cn 比赛名称中文
+ * @property string $home_name_en 主队名称英文
+ * @property string $home_name_cn 主队名称中文
+ * @property string $way_name_en 客队名称英文
+ * @property string $way_name_cn 客队名称中文
  * @property int $clock_minute 比赛进行分钟数
  * @property int $clock_second 当前分钟秒数
  * @property int $clock_minutesLeftInPeriod 场次剩余分钟
@@ -47,10 +57,11 @@ class EventsLiveDatas extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['uid', 'event_id', 'clock_minute', 'clock_second', 'clock_minutesLeftInPeriod', 'clock_secondsLeftInMinute', 'clock_period', 'clock_running', 'score_home', 'score_away', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'group_id', 'event_time', 'event_id', 'clock_minute', 'clock_second', 'clock_minutesLeftInPeriod', 'clock_secondsLeftInMinute', 'clock_period', 'clock_running', 'score_home', 'score_away', 'created_at', 'updated_at'], 'integer'],
             [['liveStatistics'], 'string'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
+            [['group_name', 'event_name', 'event_name_en', 'event_name_cn', 'home_name_en', 'home_name_cn', 'way_name_en', 'way_name_cn'], 'string', 'max' => 255],
             [['score_info', 'score_who', 'statics_football_home_yellowCards', 'statics_football_way_yellowCards', 'statics_football_home_redCards', 'statics_football_way_redCards', 'statics_football_home_corners', 'statics_football_way_corners'], 'string', 'max' => 64],
         ];
     }
@@ -63,7 +74,17 @@ class EventsLiveDatas extends \common\models\base\BaseModel
         return [
             'id' => Yii::t('app', 'ID'),
             'uid' => Yii::t('app', '用户id'),
+            'group_id' => Yii::t('app', '比赛项目组id'),
+            'group_name' => Yii::t('app', '比赛组名称'),
+            'event_time' => Yii::t('app', '比赛开始时间'),
             'event_id' => Yii::t('app', '比赛项目id'),
+            'event_name' => Yii::t('app', '比赛名称'),
+            'event_name_en' => Yii::t('app', '比赛名称英文'),
+            'event_name_cn' => Yii::t('app', '比赛名称中文'),
+            'home_name_en' => Yii::t('app', '主队名称英文'),
+            'home_name_cn' => Yii::t('app', '主队名称中文'),
+            'way_name_en' => Yii::t('app', '客队名称英文'),
+            'way_name_cn' => Yii::t('app', '客队名称中文'),
             'clock_minute' => Yii::t('app', '比赛进行分钟数'),
             'clock_second' => Yii::t('app', '当前分钟秒数'),
             'clock_minutesLeftInPeriod' => Yii::t('app', '场次剩余分钟'),
