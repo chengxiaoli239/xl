@@ -3076,6 +3076,7 @@ class SscDataService extends BaseService {
      */
     public static function get_area_arise_qishus($plan, $recent_qishus, $start_qihao='', $area_bet_type = 1){
         $plan_id = $plan->id;
+
         if($area_bet_type == 2){
             # 最近开奖统计
             $query = SscKjData::find()->select(['last_id'=>'index_id', 'code_str'])

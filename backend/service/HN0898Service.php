@@ -603,8 +603,7 @@ class HN0898Service extends BaseTZService {
      * @param $account
      * @return array
      */
-    public static function updateSysPlansStatus($id, $status, $uid = '')
-    {
+    public static function updateSysPlansStatus($id, $status, $uid = '') {
         $where = $id;
         if($uid != 1){
             $where = ['uid' => $uid, 'id' => $id];

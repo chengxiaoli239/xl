@@ -296,7 +296,7 @@ class IndexController extends Controller
         $rst = FootBallService::getSorceFromUnibet(); p($rst);# 群发微信消息
 
         $UserSysPlan = UserSysPlans::findOne(4659);
-        $data = SscDataService::get_area_arise_qishus($UserSysPlan, $recent_qishus=20, $area_bet_type=2);p($data);
+        $data = SscDataService::get_area_arise_qishus($UserSysPlan, $recent_qishus=20, $start_qihao='', $area_bet_type=2);p($data);
         $data = NaSiDaKe::getLotteryNo($type='json', $is_auto=2, $lottery_type=25);p($data);
         $rst = SscDataService::opProfitsPlans12($lottery_type = 8);
         p($rst);# A出x次B出y次投B 计划处理
