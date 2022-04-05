@@ -1886,7 +1886,7 @@ class NumService extends BaseService {
         if($UserSysPlans && in_array($UserSysPlans->plan_type, [14])){
             $type_desc = '【条件:'.$hz_Arr['area_all_qishus'].'漏'.$hz_Arr['area_yl_qishus'].'期';
 
-            $type_desc .= ($hz_Arr['areaBetStatus']==0)? ',当前'.($hz_Arr['area_all_qishus']-$hz_Arr['area_yl_qishus']).'期' : '';
+            $type_desc .= ($hz_Arr['areaBetStatus']==0)? ',当前'.$hz_Arr['area_arise_qishus'].'期' : '';
 
             $type_desc .= '|止盈:'.$hz_Arr['area_profits'].'止损:'.$hz_Arr['area_loss'];
 
