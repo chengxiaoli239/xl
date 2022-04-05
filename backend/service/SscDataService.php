@@ -3038,10 +3038,11 @@ class SscDataService extends BaseService {
                         $isZjBefore = SscDataService::isZjBefore($UserSysPlan->id);
                         $next_single_key = (int)$hzArr['singles_key'];
                         if(!$isZjBefore){
-                            $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+                            self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
                         }else{
                             $next_single_key = 0;
                         }
+                        $single = $singles[$next_single_key];
 
                         $logArr['bet_msg'] = '下注中，本回合盈利：'.$profits.','.$bmsg.'['.$UserSysPlan->id.']';
                     }
