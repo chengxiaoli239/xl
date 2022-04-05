@@ -617,7 +617,7 @@ class HN0898Service extends BaseTZService {
         $UserSysPlans->status = (int)$status;
 
         $plan_type = $UserSysPlans->plan_type;
-        if(in_array($plan_type, [2,3,4,5,8,9,12,14])){ # 倍投
+        if(in_array($plan_type, [2,3,4,5,8,9,12,13,14])){ # 倍投
             $singles = explode('-', $UserSysPlans->singles);
 
             $code_hz = json_decode($UserSysPlans->hz_Arr, true);
@@ -628,10 +628,10 @@ class HN0898Service extends BaseTZService {
             if(in_array($UserSysPlans->plan_type, [8, 9])){ # 遗漏投，遗漏倍投
                 $code_hz['current_miss'] = 0;
             }
-            if(in_array($plan_type, [2,9, 12, 14])){
+            if(in_array($plan_type, [2,9,12,13,14])){
                 $UserSysPlans->single = $singles[0]? : $UserSysPlans->single;
             }
-            if(in_array($plan_type, [12])){
+            if(in_array($plan_type, [12, 13])){
                 $code_hz['A_x_B_y_status'] = 0;
                 $code_hz['start_bet_yl_nums'] = 0;
                 $code_hz['current_arise_A_times'] = 0;
@@ -642,7 +642,6 @@ class HN0898Service extends BaseTZService {
             if($plan_type == 14){ # 区间遗漏投
                 $code_hz['areaBetStatus'] = 0; # 计划内部下注状态
                 $code_hz['area_arise_qishus'] = 0; # 当前上奖期数
-                $code_hz['singles_key'] = 0; # 倍数梯度key
                 unset($code_hz['current_area_profits']);
                 unset($code_hz['start_qihao']);
             }
