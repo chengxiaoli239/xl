@@ -618,7 +618,7 @@ class HN0898Service extends BaseTZService {
         $UserSysPlans->status = (int)$status;
 
         $plan_type = $UserSysPlans->plan_type;
-        if(in_array($plan_type, [2,3,4,5,8,9, 12])){ # 倍投
+        if(in_array($plan_type, [2,3,4,5,8,9,12])){ # 倍投
             $singles = explode('-', $UserSysPlans->singles);
 
             $code_hz = json_decode($UserSysPlans->hz_Arr, true);
@@ -641,8 +641,11 @@ class HN0898Service extends BaseTZService {
                 $code_hz['A_x_B_y_start_time'] = date('Y-m-d H:i:s');
             }
             if($plan_type == 14){ # 区间遗漏投
-                unset($codes_hz['current_area_profits']);
-                unset($codes_hz['start_qihao']);
+                $code_hz['areaBetStatus'] = 0; # 计划内部下注状态
+                $code_hz['area_arise_qishus'] = 0; # 当前上奖期数
+                $code_hz['singles_key'] = 0; # 倍数梯度key
+                unset($code_hz['current_area_profits']);
+                unset($code_hz['start_qihao']);
             }
             $UserSysPlans->hz_Arr = json_encode($code_hz, 320);
         }

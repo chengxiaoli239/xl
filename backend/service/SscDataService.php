@@ -3006,7 +3006,7 @@ class SscDataService extends BaseService {
                     # 2 # 监控中状态统计
                     if($areaBetStatus == 0){
                         $area_bet_type = $hzArr['area_bet_type'] ? (int)$hzArr['area_bet_type'] : 1; # 下注起算类型：1用户下注记录统计 2:最近开奖统计
-                        $area_arise_qishus = SscDataService::get_area_arise_qishus($UserSysPlan, $area_all_qishus, $area_bet_type); # 指定期数上了多少期
+                        $area_arise_qishus = SscDataService::get_area_arise_qishus($UserSysPlan, $area_all_qishus, $hzArr['start_qihao'], $area_bet_type); # 指定期数上了多少期
                         $bmsg = '不符合条件【'.$area_arise_qishus.'<=('.$area_all_qishus.'-'.$area_yl_qishus.')】';
                         if($area_arise_qishus <= ($area_all_qishus-$area_yl_qishus)){ # 上奖期数 = 统计期数 - 遗漏期数
                             # 满足指定期数条件 -> 启动下注
@@ -3074,12 +3074,16 @@ class SscDataService extends BaseService {
      * @param int $area_bet_type 1用下注记录统计2最近开奖记录
      * @return array|int
      */
-    public static function get_area_arise_qishus($plan, $recent_qishus, $area_bet_type = 1){
+    public static function get_area_arise_qishus($plan, $recent_qishus, $start_qihao='', $area_bet_type = 1){
         $plan_id = $plan->id;
         if($area_bet_type == 2){
             # 最近开奖统计
-            $last = SscKjData::find()->select(['last_id'=>'index_id', 'code_str'])->where(['lottery_type'=>$plan->lottery_type])
-                ->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $query = SscKjData::find()->select(['last_id'=>'index_id', 'code_str'])
+                ->where(['lottery_type'=>$plan->lottery_type]);
+            if(!empty($start_qihao)){
+                $query->andWhere(['>=', 'qihao', $start_qihao]);
+            }
+            $last = $query->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
             $start_index_id = $last['last_id'] - $recent_qishus;
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id); # 格式：0,0,X,X@0,2,X,X@2,0,X,X@0,4,X,X
 
