@@ -617,7 +617,7 @@ class HN0898Service extends BaseTZService {
         $UserSysPlans->status = (int)$status;
 
         $plan_type = $UserSysPlans->plan_type;
-        if(in_array($plan_type, [2,3,4,5,8,9,12,13,14])){ # 倍投
+        if(in_array($plan_type, [2,3,4,5,6,8,9,12,13,14])){ # 倍投
             $singles = explode('-', $UserSysPlans->singles);
 
             $code_hz = json_decode($UserSysPlans->hz_Arr, true);
@@ -628,7 +628,7 @@ class HN0898Service extends BaseTZService {
             if(in_array($UserSysPlans->plan_type, [8, 9])){ # 遗漏投，遗漏倍投
                 $code_hz['current_miss'] = 0;
             }
-            if(in_array($plan_type, [2,9,12,13,14])){
+            if(in_array($plan_type, [2,6,9,12,13,14])){
                 $UserSysPlans->single = $singles[0]? : $UserSysPlans->single;
             }
             if(in_array($plan_type, [12, 13])){
