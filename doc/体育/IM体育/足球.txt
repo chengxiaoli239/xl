@@ -1,0 +1,97 @@
+一、下注前：
+1、POST：https://imsb-109cpim.roshan88.com/api/PlaceBet/GetBetInfo
+2、response：
+	c-Type: df
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Encoding: gzip
+	Content-Length: 344
+	Content-Type: application/json; charset=utf-8
+	Date: Mon, 04 Apr 2022 09:21:35 GMT
+	Expires: Thu, 01 Jan 1970 00:00:01 GMT
+	rid: 5290c3900c2d591a491fd503da4cd5c6
+	Server: gocache
+	X-Content-Type-Options: nosniff
+3、request
+	Accept: application/json
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9
+	Cache-Control: max-age=0
+	Connection: keep-alive
+	Content-Length: 271
+	Content-Type: application/json; charset=utf-8
+	Host: imsb-109cpim.roshan88.com
+	Origin: https://imsb-109cpim.roshan88.com
+	Referer: https://imsb-109cpim.roshan88.com/
+	sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"
+	sec-ch-ua-mobile: ?0
+	sec-ch-ua-platform: "Windows"
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36
+	x-fpjsplatform: Win32
+	x-lang: chs
+	x-oddsTemp: 3
+	x-oddsTempBetType: 1
+	x-platform: 3
+	x-token: e5c286fe-4ade-4163-9197-a6b5c1d20885
+	x-vid: zoVYYbBld1uxMrzAwweH
+
+4、payload:
+	{"wss":[{"spid":1,"eid":47598453,"btid":1,"pid":1,"otid":2,"mlid":917663470,"wsid":3160420179,"btsid":1,"h":-0.5,"o":0.66,"md":0,"sid":0,"refid":3160420179,"wt":1}],"wt":1,"sdt":"20220404052121409","bhk":"b6abdbdefef254751d29ed34b3c4fe0a872c42b87ec5e678cf6bd6a2e873b597"}
+5、返回：
+	{"wss":[{"refid":3160420179,"hds":"0.5","os":"0.65","eid":47598453,"spid":1,"m":3,"hs":0,"as":0,"mlid":917663470,"wsid":3160420179,"otid":2,"btid":1,"btsid":1,"h":-0.5000,"o":0.65,"ortid":0,"s":381,"spf":"","md":0,"sid":0,"bhk":"3cbd29ab7973cdca217bb2a67c3aac4d42c2af9f31a80fab6ef48365f0aae4b9","pbsc":0}],"bset":[{"refid":3160420179,"noc":0,"mib":5.00,"mab":10000.0,"cs":0,"epa":0.65}],"bhk":"3cbd29ab7973cdca217bb2a67c3aac4d42c2af9f31a80fab6ef48365f0aae4b9","sdt":"20220404052135257","StatusCode":100}
+
+
+二、余额获取
+1、POST：https://imsb-109cpim.roshan88.com/api/Member/GetMemberBalance
+2、response：
+	c-Type: df
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Encoding: gzip
+	Content-Length: 98
+	Content-Type: application/json; charset=utf-8
+	Date: Mon, 04 Apr 2022 09:21:35 GMT
+	Expires: Thu, 01 Jan 1970 00:00:01 GMT
+	rid: fe5ae5d8a8cd9bf4a81aac964d7426f7
+	Server: gocache
+	X-Content-Type-Options: nosniff
+3、request：
+	Accept: application/json
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9
+	Cache-Control: max-age=0
+	Connection: keep-alive
+	Content-Length: 0
+	Content-Type: application/json; charset=utf-8
+	Host: imsb-109cpim.roshan88.com
+	Origin: https://imsb-109cpim.roshan88.com
+	Referer: https://imsb-109cpim.roshan88.com/
+	sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"
+	sec-ch-ua-mobile: ?0
+	sec-ch-ua-platform: "Windows"
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36
+	x-fpjsplatform: Win32
+	x-lang: chs
+	x-oddsTemp: 3
+	x-oddsTempBetType: 1
+	x-platform: 3
+	x-token: e5c286fe-4ade-4163-9197-a6b5c1d20885
+	x-vid: zoVYYbBld1uxMrzAwweH
+4、返回：
+	{"mc":"im10w28222022031183196","cc":"RMB","ab":159.45,"ob":0.0,"StatusCode":100}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

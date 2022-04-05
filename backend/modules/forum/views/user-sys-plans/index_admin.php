@@ -175,8 +175,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'hz_Arr','label'=>'扩展',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                if(\backend\service\BaseService::is_json($model->hz_Arr) OR in_array($model->tz_type, [18, 19, 20, 25, 27, 28, 29, 30, 31, 32, 33, 34, 17,36,37])){
-                                    $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true));
+                                if(\backend\service\BaseService::is_json($model->hz_Arr) OR in_array($model->tz_type, [18, 19, 20, 23, 25, 27, 28, 29, 30, 31, 32, 33, 34, 17,36,37])){
+                                    $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true), $model->id);
                                     $desc_str = $str;
                                     if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                                         $title = \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
@@ -186,9 +186,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }else{
                                     $title = $model->hz_Arr;
                                 }
-                                $txt = BaseStringHelper::truncate($title,20);
+                                $txt = BaseStringHelper::truncate($str,20);
                                 $desc_str .= !empty($model->singles) ? '翻倍：'.$model->singles : '';
-                                $str = Html::a($txt, 'javascript:;', ['title' => \backend\service\SscDataService::getCodesDesc($title),'alt'=>\backend\service\SscDataService::getCodesDesc($desc_str), 'class'=>'act-desc', 'current_profits'=>round($model->current_profits, 2), 'betStatusTxt'=>$betStatusTxt]);
+                                $str = Html::a($txt, 'javascript:;', ['title' => \backend\service\SscDataService::getCodesDesc($title),'alt'=>\backend\service\SscDataService::getCodesDesc($desc_str), 'class'=>'act-desc', 'plan_id'=>$model->id, 'current_profits'=>round($model->current_profits, 2), 'betStatusTxt'=>$betStatusTxt]);
                                 if($model->singles OR in_array($model->plan_type,[2, 3, 4, 5, 9, 10])){
                                     $str .= '翻倍梯度:'.$model->singles;
                                 }
@@ -320,7 +320,7 @@ $(function () {
         current_profits = parseFloat($(this).attr('current_profits'));
         betStatusTxt = $(this).attr('betStatusTxt');
 
-        push_desc = {"计划ID":plan_id, "描述":bet_rst, "整体盈利":current_profits, '状态':betStatusTxt}
+        push_desc = {"plan_id":plan_id, "desc":bet_rst, "all_profits":current_profits, 'status_txt':betStatusTxt}
         push_content = {"desc":bet_rst, "detail":content};
         $('#rst_code').text(JSON.stringify(push_desc, null,' '))
         $('#push_content').text(JSON.stringify(push_content,null,' '))

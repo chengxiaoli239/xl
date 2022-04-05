@@ -255,7 +255,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
             betStatusTxt = $(this).attr('betStatusTxt');
             current_profits = parseFloat($(this).attr('current_profits'));
 
-            push_desc = {"计划ID":plan_id, "描述":bet_rst, "整体盈利":current_profits, '状态':betStatusTxt}
+            push_desc = {"plan_id":plan_id, "desc":bet_rst, "all_profits":current_profits, 'status_txt':betStatusTxt}
             push_content = {"desc":bet_rst, "detail":content};
             $('#rst_code').text(JSON.stringify(push_desc, null,' '))
             $('#push_content').text(JSON.stringify(push_content,null,' '))

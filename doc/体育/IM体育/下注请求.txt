@@ -1,0 +1,44 @@
+下注请求：
+一、请求一：
+1、POST：https://imsb-109cpim.roshan88.com/api/PlaceBet/SinglePlaceBet
+2、response：
+	c-Type: df
+	Cache-Control: no-cache
+	Connection: keep-alive
+	Content-Encoding: gzip
+	Content-Length: 109
+	Content-Type: application/json; charset=utf-8
+	Date: Mon, 04 Apr 2022 09:29:06 GMT
+	Expires: Thu, 01 Jan 1970 00:00:01 GMT
+	rid: c147c0cd4b5e4fdc65ebb7296a6b63a7
+	Server: gocache
+	X-Content-Type-Options: nosniff
+3、request:
+	Accept: application/json
+	Accept-Encoding: gzip, deflate, br
+	Accept-Language: zh-CN,zh;q=0.9
+	Cache-Control: max-age=0
+	Connection: keep-alive
+	Content-Length: 548
+	Content-Type: application/json; charset=utf-8
+	Host: imsb-109cpim.roshan88.com
+	Origin: https://imsb-109cpim.roshan88.com
+	Referer: https://imsb-109cpim.roshan88.com/
+	sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"
+	sec-ch-ua-mobile: ?0
+	sec-ch-ua-platform: "Windows"
+	Sec-Fetch-Dest: empty
+	Sec-Fetch-Mode: cors
+	Sec-Fetch-Site: same-origin
+	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36
+	x-fpjsplatform: Win32
+	x-lang: chs
+	x-oddsTemp: 3
+	x-oddsTempBetType: 1
+	x-platform: 3
+	x-token: e5c286fe-4ade-4163-9197-a6b5c1d20885
+	x-vid: zoVYYbBld1uxMrzAwweH
+4、payload:
+	{"s":"5","ws":{"spid":1,"eid":47598453,"m":3,"otid":2,"btid":1,"hs":1,"as":0,"mlid":917663469,"wsid":3166540613,"btsid":1,"h":-0.25,"o":0.77,"ortid":0,"spf":"","Matchday":0,"SeasonId":0,"pid":1,"bhk":"75c94dad6315b245d4d9ed1064f106aab26940a64f86c8c63b9d3afc22fadf32"},"obts":"20220404172850652","pbt":"20220404172855930","bae":5278,"bhk":"75c94dad6315b245d4d9ed1064f106aab26940a64f86c8c63b9d3afc22fadf32","sdt":"20220404052851301","bist":"20220404052851301","bisthc":"ef2516bf8b8d2eeb8008eaf6bcfef83ede520c745b3cc22ed028724c81bb482a","fpf":"Win32"}
+5、返回：
+	{"wid":"2204040529069308","pbs":3,"ao":0.77,"aos":"0.77","est":3.85,"ab":154.45,"StatusCode":100}

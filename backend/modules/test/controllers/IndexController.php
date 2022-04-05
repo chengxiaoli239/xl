@@ -20,6 +20,7 @@ use backend\service\baota\BaoTaService;
 use backend\service\BetService;
 use backend\service\ChatCommonBetService;
 use backend\service\datas\DatasClearService;
+use backend\service\FootBallService;
 use backend\service\huiyuan\HuiYuanService5;
 use backend\service\JinYing\JinYingService;
 use backend\service\Juhua\JuHuaBaseService;
@@ -292,6 +293,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst = FootBallService::getSorceFromUnibet(); p($rst);# 群发微信消息
+
         $UserSysPlan = UserSysPlans::findOne(4659);
         $data = SscDataService::get_area_arise_qishus($UserSysPlan, $recent_qishus=20, $area_bet_type=2);p($data);
         $data = NaSiDaKe::getLotteryNo($type='json', $is_auto=2, $lottery_type=25);p($data);

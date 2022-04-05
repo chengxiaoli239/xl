@@ -3034,17 +3034,23 @@ class SscDataService extends BaseService {
                                 $hzArr['start_qihao'] = '';
                             }
                         }
+                        $isZjBefore = SscDataService::isZjBefore($UserSysPlan->id);
+                        $next_single_key = (int)$hzArr['singles_key'];
+                        if(!$isZjBefore){
+                            $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+                        }else{
+                            $next_single_key = 0;
+                        }
 
                         $logArr['bet_msg'] = '下注中，本回合盈利：'.$profits.','.$bmsg.'['.$UserSysPlan->id.']';
                     }
 
+                    $hzArr['singles_key'] = $next_single_key; # 下一期倍数
                     $hzArr['area_profits'] = $area_profits; # 区间止盈
                     $hzArr['area_loss'] = $area_loss; # 区间止损
+                    $hzArr['areaBetStatus'] = $areaBetStatus; # 投注状态
 
-                    $hzArr['areaBetStatus'] = $areaBetStatus;
-                    #$hzArr['singles_key'] = $next_single_key;
                     $logArr['hzArr_update_after'] = $hzArr;
-
 
                     $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                     $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];

@@ -11,13 +11,12 @@ namespace backend\modules\api\controllers;
 use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\clients\TzSystemUsersService;
-use backend\service\FootBallService;
 use common\tools\Tool_Common;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 
-class TzSystemUsersController extends Controller
+class SportsController extends Controller
 {
     public $enableCsrfValidation = false;
     public $TzSystemsUsers = [];
@@ -221,23 +220,5 @@ class TzSystemUsersController extends Controller
         return $rst;
     }
 
-    /**
-     * @desc 接收体育足球的比分数据
-     * @return array
-     */
-    public function actionPushFootBallScore(){
-
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $post = \Yii::$app->request->post();
-        if(empty($post['access_token'])){
-            return ['status'=>301, 'msg'=>'缺少access_token参数'];
-        }
-        $post['score_data'] = json_decode($post['score_data'], true);
-
-        $rst = FootBallService::recordFootBallDatas($post);
-
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '比分数据记录成功', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
-        return $rst;
-    }
 
 }

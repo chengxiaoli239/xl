@@ -103,7 +103,9 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             'format'=>'raw',
                             'value' => function($model) {
                                 $plan = \backend\models\UserSysPlans::findOne($model->plan_id);
-                                $alt_str = \backend\service\NumService::getDescByKuaixuan(json_decode($plan->hz_Arr, true));
+                                $alt_str = \backend\service\NumService::getDescByKuaixuan(json_decode($plan->hz_Arr, true), $model->id);
+                                $alt_str .= !empty($model->singles) ? '翻倍：'.$model->singles : '';
+                                //$alt_str = \backend\service\SscDataService::getCodesDesc($alt_str);
                                 if($plan->singles && in_array($plan->plan_type,[2, 3, 4, 5, 9, 10])){
                                     $alt_str .= '翻倍梯度:'.$plan->singles;
                                 }

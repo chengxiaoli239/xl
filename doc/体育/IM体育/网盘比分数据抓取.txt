@@ -1,0 +1,89 @@
+联赛比分数据获取：
+POST：https://mtu.sp5178.com/whg/sport-odds-leagues
+1、response：
+	cache-control: no-store, no-cache, must-revalidate
+	content-encoding: gzip
+	content-type: application/json;charset=utf-8
+	date: Mon, 04 Apr 2022 17:25:48 GMT
+	expires: Thu, 19 Nov 1981 08:52:00 GMT
+	pragma: no-cache
+	server: webserver/0.1
+	set-cookie: p0001_lang=zh_CN; path=/; SameSite=None; Secure
+	set-cookie: nlbi_2644562=iX1OE4/SlQ65bdz4En+KLQAAAAASuwKnYlY/HIKEjpR7uI6w; path=/; Domain=.sp5178.com
+	set-cookie: visid_incap_2644562=S59x6hg4RsiufSq9Ors/vxsqS2IAAAAAQUIPAAAAAABvG8+BVjp6nuYT0SoXgHKt; expires=Tue, 04 Apr 2023 06:26:52 GMT; HttpOnly; path=/; Domain=.sp5178.com
+	set-cookie: incap_ses_428_2644562=a6txZiUKjEgb82vPWZDwBRsqS2IAAAAAE939+wQqI2ul7n/E/Ks8Mg==; path=/; Domain=.sp5178.com
+	x-cdn: Imperva
+	x-iinfo: 2-980357-938003 pNYN RT(1649093147221 0) q(0 0 0 -1) r(1 1) U6
+	x-powered-by: PHP/7.0.13
+2、request：
+	:authority: mtu.sp5178.com
+	:method: POST
+	:path: /whg/sport-odds-leagues
+	:scheme: https
+	accept: */*
+	accept-encoding: gzip, deflate, br
+	accept-language: zh-CN,zh;q=0.9
+	content-length: 280
+	content-type: application/x-www-form-urlencoded; charset=UTF-8
+	cookie: WEBSESSID=5k3uj3ogbmunkrai0s6n0n8f73; p0001_lang=zh_CN; p0001_key=1aab907202203119056; p0001_token=MWFhYjkwNzIwMjIwMzExOTA1Ng%3D%3D; p0001_acc=%7B%22accid%22%3A4953733%2C%22acccode%22%3A%221aab907202203119056%22%2C%22currCode%22%3A%22RMB%22%2C%22currUnit%22%3A1%2C%22currUnit_S%22%3A%22%22%2C%22currCL%22%3A%22160.5200%22%2C%22currCL_O%22%3A%22160.52%22%2C%22autoAccBetterOdd%22%3A1%2C%22oddsType%22%3A%22hk%22%2C%22spread%22%3A%22d%22%2C%22lastLogin%22%3A%222022-04-04+00%3A15%3A33%22%2C%22afterFirstLogin%22%3Afalse%2C%22isApi%22%3Atrue%2C%22isDemo%22%3Afalse%2C%22previewFlag%22%3Afalse%2C%22_showDecimals%22%3Atrue%2C%22showLogo%22%3Atrue%2C%22oneWallet%22%3A%220%22%2C%22hgOldSite%22%3Afalse%2C%22shownGuide%22%3Afalse%2C%22selectedMarket%22%3Anull%7D; p0001_acc_1aab907202203119056=%7B%22min%22%3A50%2C%22med%22%3A150%2C%22big%22%3A250%2C%22max%22%3A10000%7D; p0001_auth_key=2abf967545bbc817e36a7eff2791773571466b96
+	origin: https://mtu.sp5178.com
+	referer: https://mtu.sp5178.com/whg/home
+	sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"
+	sec-ch-ua-mobile: ?0
+	sec-ch-ua-platform: "Windows"
+	sec-fetch-dest: empty
+	sec-fetch-mode: cors
+	sec-fetch-site: same-origin
+	token: Q1I=
+	user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36
+	x-requested-with: XMLHttpRequest
+﻿3、form Data
+	sprtid: N1
+	schedule: 1
+	lang: 2
+	spread: d
+	odd: hk
+	page: 1
+	sorttyp: 1
+	leagues[]: 7243
+	leagues[]: 12902
+	leagues[]: 7177
+	leagues[]: 4577
+	leagues[]: 18588
+	leagues[]: 4579
+	date: 0
+	plytypgrp: 1
+	gameMenuId: 0
+	csrf_name: csrf624b29d11c160
+	csrf_value: d2fef7a70531508cdc3a64776cfa6ecb
+	
+﻿
+4、返回：
+	{"events":[[{"eveid":3059080,"sptid":1,"dt":"2022-04-04 14:45:00","rb":1,"rbstatus":0,"ha":"H","prior":[1,2],"sub":0,"display_flag":"1","lgeflag":"1","lgeid":4579,"lgeseq":"007","lgecapt":"\u610f\u5927\u5229\u7532\u7ec4\u8054\u8d5b - \u7279\u522b\u6295\u6ce8","taid":51409,"tacapt":"AC\u7c73\u5170 \u89d2\u7403\u6570","tbid":51448,"tbcapt":"\u535a\u6d1b\u5c3c\u4e9a \u89d2\u7403\u6570","all":8,"od":{"1":{"1":{"a":{"hdp":"3","fav":"a","oddsa":"0.960","oddsb":"0.880"}},"2":{"a":{"hdp":"10","fav":"a","oddsa":"1.060","oddsb":"0.760"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.950","oddsb":"1.930"}},"4":{"oddsa":5.65,"oddsh":1.2,"oddsd":9.1}},"2":{"1":{"a":{"hdp":"1.5","fav":"a","oddsa":"0.800","oddsb":"1.040"}},"2":{"a":{"hdp":"4.5","fav":"a","oddsa":"0.860","oddsb":"0.960"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.940","oddsb":"1.940"}},"4":{"oddsa":5.15,"oddsh":1.35,"oddsd":5.4}}},"ch":0,"chex":0,"sid":1},{"eveid":3059077,"sptid":1,"dt":"2022-04-04 14:45:00","rb":0,"rbstatus":0,"ha":"H","prior":[1,2],"sub":0,"display_flag":"0","lgeflag":"1","lgeid":4579,"lgeseq":"007","lgecapt":"\u610f\u5927\u5229\u7532\u7ec4\u8054\u8d5b - \u7279\u522b\u6295\u6ce8","taid":83246,"tacapt":"AC\u7c73\u5170\u7f5a\u724c\u6570","tbid":186393,"tbcapt":"\u535a\u6d1b\u5c3c\u4e9a\u7f5a\u724c\u6570","all":8,"od":{"1":{"1":{"a":{"hdp":"0.5\/1","fav":"b","oddsa":"0.950","oddsb":"0.890"}},"2":{"a":{"hdp":"4.5\/5","fav":"a","oddsa":"1.040","oddsb":"0.780"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.950","oddsb":"1.930"}},"4":{"oddsa":1.65,"oddsh":3.3,"oddsd":4.7}},"2":{"1":{"a":{"hdp":"0\/0.5","fav":"b","oddsa":"0.900","oddsb":"0.940"}},"2":{"a":{"hdp":"1.5","fav":"a","oddsa":"0.970","oddsb":"0.850"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"2.010","oddsb":"1.870"}},"4":{"oddsa":2.2,"oddsh":3.45,"oddsd":2.6}}},"ch":0,"chex":0,"sid":2}],[{"eveid":3091261,"sptid":1,"dt":"2022-04-04 14:45:00","rb":0,"rbstatus":0,"ha":"H","prior":[1,2],"sub":0,"display_flag":"0","lgeflag":"1","lgeid":7177,"lgeseq":"68a","lgecapt":"\u7231\u5c14\u5170\u8d85\u7ea7\u8054\u8d5b - \u7279\u522b\u6295\u6ce8","taid":82813,"tacapt":"\u4e3b\u573a-\u661f\u671f\u4e00-2\u573a\u8d5b\u4e8b","tbid":82793,"tbcapt":"\u5ba2\u573a-\u661f\u671f\u4e00-2\u573a\u8d5b\u4e8b","all":8,"od":{"1":{"1":{"a":{"hdp":"0.5\/1","fav":"b","oddsa":"0.900","oddsb":"1.000"}},"2":{"a":{"hdp":"4.5\/5","fav":"a","oddsa":"0.880","oddsb":"1.000"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.950","oddsb":"1.930"}},"4":{"oddsa":1.75,"oddsh":3.1,"oddsd":4.9}},"2":{"1":{"a":{"hdp":"0\/0.5","fav":"b","oddsa":"0.980","oddsb":"0.900"}},"2":{"a":{"hdp":"2","fav":"a","oddsa":"0.840","oddsb":"1.040"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.970","oddsb":"1.910"}},"4":{"oddsa":2.1,"oddsh":3.1,"oddsd":3.1}}},"ch":0,"chex":0,"sid":3}],[{"eveid":3048599,"sptid":1,"dt":"2022-04-04 15:00:00","rb":1,"rbstatus":0,"ha":"H","prior":[1,2],"sub":0,"display_flag":"1","lgeflag":"1","lgeid":4577,"lgeseq":"003","lgecapt":"\u82f1\u683c\u5170\u8d85\u7ea7\u8054\u8d5b - \u7279\u522b\u6295\u6ce8","taid":52392,"tacapt":"\u6c34\u6676\u5bab \u89d2\u7403\u6570","tbid":74182,"tbcapt":"\u963f\u68ee\u7eb3 \u89d2\u7403\u6570","all":8,"od":{"1":{"1":{"a":{"hdp":"1","fav":"b","oddsa":"0.990","oddsb":"0.850"}},"2":{"a":{"hdp":"10","fav":"a","oddsa":"0.940","oddsb":"0.880"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.960","oddsb":"1.920"}},"4":{"oddsa":1.6,"oddsh":2.65,"oddsd":6.25}},"2":{"1":{"a":{"hdp":"0.5","fav":"b","oddsa":"1.080","oddsb":"0.760"}},"2":{"a":{"hdp":"4.5","fav":"a","oddsa":"0.840","oddsb":"0.980"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.940","oddsb":"1.940"}},"4":{"oddsa":1.7,"oddsh":2.8,"oddsd":4.4}}},"ch":0,"chex":0,"sid":4},{"eveid":3048602,"sptid":1,"dt":"2022-04-04 15:00:00","rb":0,"rbstatus":0,"ha":"H","prior":[1,2],"sub":0,"display_flag":"0","lgeflag":"1","lgeid":4577,"lgeseq":"003","lgecapt":"\u82f1\u683c\u5170\u8d85\u7ea7\u8054\u8d5b - \u7279\u522b\u6295\u6ce8","taid":84042,"tacapt":"\u6c34\u6676\u5bab\u7f5a\u724c\u6570","tbid":83505,"tbcapt":"\u963f\u68ee\u7eb3\u7f5a\u724c\u6570","all":8,"od":{"1":{"1":{"a":{"hdp":"0","fav":"a","oddsa":"0.790","oddsb":"1.050"}},"2":{"a":{"hdp":"3.5\/4","fav":"a","oddsa":"1.030","oddsb":"0.790"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.950","oddsb":"1.930"}},"4":{"oddsa":2.45,"oddsh":2.15,"oddsd":4}},"2":{"1":{"a":{"hdp":"0","fav":"a","oddsa":"0.860","oddsb":"0.980"}},"2":{"a":{"hdp":"1","fav":"a","oddsa":"0.730","oddsb":"1.090"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"2.090","oddsb":"1.790"}},"4":{"oddsa":3.05,"oddsh":2.9,"oddsd":2.2}}},"ch":0,"chex":0,"sid":5}],[{"eveid":3050025,"sptid":1,"dt":"2022-04-04 15:00:00","rb":1,"rbstatus":0,"ha":"H","prior":[1,2],"sub":0,"display_flag":"1","lgeflag":"1","lgeid":7243,"lgeseq":"006","lgecapt":"\u897f\u73ed\u7259\u7532\u7ec4\u8054\u8d5b - \u7279\u522b\u6295\u6ce8","taid":52207,"tacapt":"\u7687\u5bb6\u82cf\u65af\u8fbe \u89d2\u7403\u6570","tbid":52205,"tbcapt":"\u7231\u65af\u5bbe\u5974 \u89d2\u7403\u6570","all":8,"od":{"1":{"1":{"a":{"hdp":"2.5","fav":"a","oddsa":"0.980","oddsb":"0.860"}},"2":{"a":{"hdp":"9.5","fav":"a","oddsa":"0.890","oddsb":"0.930"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.960","oddsb":"1.920"}},"4":{"oddsa":4.7,"oddsh":1.25,"oddsd":7.65}},"2":{"1":{"a":{"hdp":"1\/1.5","fav":"a","oddsa":"0.990","oddsb":"0.850"}},"2":{"a":{"hdp":"4.5","fav":"a","oddsa":"0.960","oddsb":"0.860"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.940","oddsb":"1.940"}},"4":{"oddsa":4.05,"oddsh":1.45,"oddsd":4.85}}},"ch":0,"chex":0,"sid":6},{"eveid":3050023,"sptid":1,"dt":"2022-04-04 15:00:00","rb":0,"rbstatus":0,"ha":"H","prior":[1,2],"sub":0,"display_flag":"0","lgeflag":"1","lgeid":7243,"lgeseq":"006","lgecapt":"\u897f\u73ed\u7259\u7532\u7ec4\u8054\u8d5b - \u7279\u522b\u6295\u6ce8","taid":157441,"tacapt":"\u7687\u5bb6\u82cf\u65af\u8fbe\u7f5a\u724c\u6570","tbid":144304,"tbcapt":"\u7231\u65af\u5bbe\u5974\u7f5a\u724c\u6570","all":8,"od":{"1":{"1":{"a":{"hdp":"0\/0.5","fav":"b","oddsa":"0.940","oddsb":"0.900"}},"2":{"a":{"hdp":"4.5\/5","fav":"a","oddsa":"1.010","oddsb":"0.810"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.950","oddsb":"1.930"}},"4":{"oddsa":1.95,"oddsh":2.5,"oddsd":4.5}},"2":{"1":{"a":{"hdp":"0","fav":"a","oddsa":"1.080","oddsb":"0.760"}},"2":{"a":{"hdp":"1.5","fav":"a","oddsa":"0.990","oddsb":"0.830"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"2.010","oddsb":"1.870"}},"4":{"oddsa":2.45,"oddsh":3.05,"oddsd":2.6}}},"ch":0,"chex":0,"sid":7}],[{"eveid":3071779,"sptid":1,"dt":"2022-04-04 15:00:00","rb":1,"rbstatus":0,"ha":"H","prior":[1,2],"sub":0,"display_flag":"1","lgeflag":"1","lgeid":18588,"lgeseq":"02c","lgecapt":"\u897f\u73ed\u7259\u4e59\u7ec4\u8054\u8d5b - \u7279\u522b\u6295\u6ce8","taid":94670,"tacapt":"\u96f7\u52a0\u5229\u65af \u89d2\u7403\u6570","tbid":353396,"tbcapt":"\u5bcc\u6069\u62c9\u5e03\u96f7\u8fbe \u89d2\u7403\u6570","all":8,"od":{"1":{"1":{"a":{"hdp":"1.5","fav":"a","oddsa":"0.900","oddsb":"0.940"}},"2":{"a":{"hdp":"9","fav":"a","oddsa":"0.930","oddsb":"0.890"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.950","oddsb":"1.930"}},"4":{"oddsa":3.6,"oddsh":1.45,"oddsd":6.55}},"2":{"1":{"a":{"hdp":"0.5\/1","fav":"a","oddsa":"0.930","oddsb":"0.910"}},"2":{"a":{"hdp":"4","fav":"a","oddsa":"0.840","oddsb":"0.980"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.940","oddsb":"1.940"}},"4":{"oddsa":3.25,"oddsh":1.7,"oddsd":4.45}}},"ch":0,"chex":0,"sid":8}],[{"eveid":3059623,"sptid":1,"dt":"2022-04-04 15:15:00","rb":1,"rbstatus":0,"ha":"H","prior":[1,2],"sub":0,"display_flag":"1","lgeflag":"1","lgeid":12902,"lgeseq":"036","lgecapt":"\u8461\u8404\u7259\u8d85\u7ea7\u8054\u8d5b - \u7279\u522b\u6295\u6ce8","taid":310491,"tacapt":"\u6ce2\u5c14\u56fe \u89d2\u7403\u6570","tbid":310507,"tbcapt":"\u5723\u5854\u514b\u83b1\u62c9 \u89d2\u7403\u6570","all":8,"od":{"1":{"1":{"a":{"hdp":"3.5\/4","fav":"a","oddsa":"0.860","oddsb":"0.980"}},"2":{"a":{"hdp":"10","fav":"a","oddsa":"1.000","oddsb":"0.820"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.950","oddsb":"1.930"}},"4":{"oddsa":5.4,"oddsh":1.15,"oddsd":13}},"2":{"1":{"a":{"hdp":"1.5\/2","fav":"a","oddsa":"0.700","oddsb":"1.160"}},"2":{"a":{"hdp":"4.5","fav":"a","oddsa":"0.870","oddsb":"0.950"}},"3":{"a":{"hdp":"0","fav":"a","oddsa":"1.940","oddsb":"1.940"}},"4":{"oddsa":6.1,"oddsh":1.25,"oddsd":5.8}}},"ch":0,"chex":0,"sid":9}]],"ttlPg":1,"ttlRec":9,"lstRefTime":"22-04-04 13:25:48"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
