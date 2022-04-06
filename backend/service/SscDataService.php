@@ -3078,7 +3078,7 @@ class SscDataService extends BaseService {
      * @param $UserSysPlan
      * @param $recent_qishus 最近多少期
      * @param int $area_bet_type 1用下注记录统计2最近开奖记录
-     * @return array|int
+     * @return 最近多少期
      */
     public static function get_area_arise_qishus($plan, $recent_qishus, $start_qihao='', $area_bet_type = 1){
         $plan_id = $plan->id;
@@ -3108,7 +3108,11 @@ class SscDataService extends BaseService {
         }else{
             # 用户下注记录统计
             $where = ['AND', ['=', 'plan_id', $plan_id], ['=', 'status', 1]];
-            $BettingRecords = BettingRecords::find()->where($where)->limit($recent_qishus)->orderBy(['id'=>SORT_DESC])->all();
+            $query = BettingRecords::find()->where($where);
+            if(!empty($start_qihao)){
+                $query->andWhere(['>=', 'qihao', $start_qihao]);
+            }
+            $BettingRecords = $query->limit($recent_qishus)->orderBy(['id'=>SORT_DESC])->all();
             $count_records = count($BettingRecords);
             if($count_records<$recent_qishus){
                 # 下注记录不够汇总记录数
