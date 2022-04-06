@@ -3049,7 +3049,7 @@ class SscDataService extends BaseService {
                         $logArr['bet_msg'] = '下注中，本回合盈利：'.$profits.','.$bmsg.'['.$UserSysPlan->id.']';
                     }
 
-                    $single = $singles[$next_single_key];
+                    $single = $singles[$next_single_key] ? :$single;
 
                     $hzArr['singles_key'] = $next_single_key; # 下一期倍数
                     $hzArr['area_profits'] = $area_profits; # 区间止盈
