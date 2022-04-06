@@ -3025,14 +3025,16 @@ class SscDataService extends BaseService {
                             $bmsg = '符合止损:'.$area_loss.'<('.(0-$profits).')';
                             $areaBetStatus = 0;
                             $hzArr['current_area_profits'] = 0.00;
-                            $hzArr['start_qihao'] = '';
+                            #$hzArr['start_qihao'] = '';
+                            $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 重新设置开始计算期号，避免大遗漏倍投问题
                         }else{
                             if($profits>$area_profits){
                                 $bmsg = '符合止赢:'.$profits.'>'.$area_profits;
                                 $areaBetStatus = 0;
                                 $hzArr['area_arise_qishus'] = 0;
                                 $hzArr['current_area_profits'] = 0.00;
-                                $hzArr['start_qihao'] = '';
+                                #$hzArr['start_qihao'] = '';
+                                $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 重新设置开始计算期号，避免大遗漏倍投问题
                             }
                         }
                         $isZjBefore = SscDataService::isZjBefore($UserSysPlan->id);
