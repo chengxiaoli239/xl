@@ -3014,6 +3014,7 @@ class SscDataService extends BaseService {
                             $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 当前期号，统计利润时候不包含记录的记录的期号
                             $areaBetStatus = 1;
                         }
+                        $next_single_key = 0;
                         $hzArr['area_arise_qishus'] = $area_arise_qishus;
                         $logArr['area_arise_qishus'] = $area_arise_qishus;
                         $logArr['bet_msg'] = '监控中-'.$bmsg.'['.$UserSysPlan->id.']';
@@ -3025,29 +3026,30 @@ class SscDataService extends BaseService {
                             $bmsg = '符合止损:'.$area_loss.'<('.(0-$profits).')';
                             $areaBetStatus = 0;
                             $hzArr['current_area_profits'] = 0.00;
-                            #$hzArr['start_qihao'] = '';
-                            $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 重新设置开始计算期号，避免大遗漏倍投问题
+                            $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 重新设置开始计算期号，避免无时间间隔的连续止损，大遗漏倍投问题
+                            $next_single_key = 0; # 止损，倍数重新
                         }else{
                             if($profits>$area_profits){
                                 $bmsg = '符合止赢:'.$profits.'>'.$area_profits;
                                 $areaBetStatus = 0;
                                 $hzArr['area_arise_qishus'] = 0;
                                 $hzArr['current_area_profits'] = 0.00;
-                                #$hzArr['start_qihao'] = '';
                                 $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 重新设置开始计算期号，避免大遗漏倍投问题
                             }
+                            $isZjBefore = SscDataService::isZjBefore($UserSysPlan->id);
+                            $next_single_key = (int)$hzArr['singles_key'];
+                            if(!$isZjBefore){
+                                self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+                            }else{
+                                $next_single_key = 0;
+                            }
                         }
-                        $isZjBefore = SscDataService::isZjBefore($UserSysPlan->id);
-                        $next_single_key = (int)$hzArr['singles_key'];
-                        if(!$isZjBefore){
-                            self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
-                        }else{
-                            $next_single_key = 0;
-                        }
-                        $single = $singles[$next_single_key];
+
 
                         $logArr['bet_msg'] = '下注中，本回合盈利：'.$profits.','.$bmsg.'['.$UserSysPlan->id.']';
                     }
+
+                    $single = $singles[$next_single_key];
 
                     $hzArr['singles_key'] = $next_single_key; # 下一期倍数
                     $hzArr['area_profits'] = $area_profits; # 区间止盈
