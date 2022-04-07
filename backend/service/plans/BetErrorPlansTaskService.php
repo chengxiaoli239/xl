@@ -44,7 +44,7 @@ class BetErrorPlansTaskService extends BaseService {
             'lotteryclass' => BetService::lotteryClass($playway),
             'single' => $single,
             'playway' => $playway,
-            'status' => ($status != 0) ? $status : $isUnusual ? 4 : 0,
+            'status' => ($status != 0) ? $status : ($isUnusual ? 4 : 0),
             'lottery_type' => $lottery_type,
             'error_desc' => json_encode($error_rst, 320),
             'updated_at' => time(),
