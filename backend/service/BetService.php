@@ -1884,11 +1884,17 @@ abstract class BetService extends BaseBetService {
                 continue;
             }
             try {
+                $m = \Yii::$app->cache;
                 foreach ($plans as $plan){
                     $tz_system_id = $plan->tz_sites;
                     $lottery_type = $plan->lottery_type;
                     $uid = $plan->uid;
                     $qihao = HN0898Service::getQihao($lottery_type);
+
+                    $insert_mkey = 'insertPlanTask_key_'.$lottery_type.'_'.$plan->id;
+                    if($m->get($insert_mkey)){
+                        continue;
+                    }
                     $Task = BetErrorPlansTask::findOne(['plan_id'=>$plan->id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
                     if($Task){
                         $logArr = ['status'=>200, 'msg'=>'已记录推送表'.$lottery_type.'_'.$qihao];
@@ -1917,7 +1923,10 @@ abstract class BetService extends BaseBetService {
                     }
 
                     if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
-                        self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
+                        $testInsertRst = self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
+                        if($testInsertRst['status'] == 200){
+                            $m->set($insert_mkey, 1, 120);
+                        }
                     }else{
                         Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-1', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'uid'=>$uid]);
 
