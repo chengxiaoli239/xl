@@ -1881,7 +1881,7 @@ abstract class BetService extends BaseBetService {
             Tool_Common::log('/plans_tasks/'.__FUNCTION__, 'INFO', '批量插入任务000', ['lottery_type'=>$lottery_type, 'counts'=>count($plans)]);
             if(empty($plans)){
                 Tool_Common::log('plan_is_active', 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>'没有开启的计划', 'uid'=>$plans[0]->uid]);
-                throw new \yii\base\Exception('没有开启的计划');
+                continue;
             }
             try {
                 foreach ($plans as $plan){
