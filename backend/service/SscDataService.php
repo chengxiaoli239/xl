@@ -2979,7 +2979,7 @@ class SscDataService extends BaseService {
     public static function opProfitsPlans14($lottery_type = DEFAULT_LOTTERY_TYPE){
         $RedisLock = new RedisLock();
         $Rkey = __FUNCTION__.'_redis_'.$lottery_type;
-        if(!$RedisLock->lock($Rkey, 30)){
+        if(!$RedisLock->lock($Rkey, 10)){
             Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', '区间遗漏投-处理锁错误', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
         }
 

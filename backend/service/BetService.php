@@ -1908,6 +1908,7 @@ abstract class BetService extends BaseBetService {
                     if(in_array($plan->plan_type, array_merge([6, 8, 9, 14], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
                         //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
                         $flag = BetService::getIsBetTrue($plan->id);
+                        Tool_Common::log('/plan/'.__FUNCTION__.'_is_bet_true', 'INFO', '是否真实下注计划', ['plan_id'=>$plan->id, 'flag'=>$flag]);
                         if(in_array($flag, [0, -1]) && $isAuto == 1){
                             $is_test = 1;
                             $sn = 'istest';
