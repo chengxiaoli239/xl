@@ -1826,6 +1826,7 @@ abstract class BetService extends BaseBetService {
         ];
         //p($insertData,0);
         $insertRst = BetService::_logRecords($insertData);
+        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '记录', ['insertRst'=>$insertRst, 'insertData'=>$insertData]);
 
         return $insertRst;
     }
@@ -1919,7 +1920,7 @@ abstract class BetService extends BaseBetService {
                             $sn = 'istest';
                             $snid = 'istest_id';
                         }
-                        Tool_Common::log('/plan/'.__FUNCTION__.'_is_bet_true', 'INFO', '是否真实下注计划', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'flag'=>$flag, 'fh'=>(boolean)(in_array($flag, [0, -1]) && $isAuto == 1), 'snid'=>$snid]);
+                        Tool_Common::log('/plan/'.__FUNCTION__.'_is_bet_true', 'INFO', '是否真实下注计划', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'flag'=>$flag, 'fh'=>(boolean)(in_array($flag, [0, -1]) && $isAuto == 1), 'sn'=>$sn, 'snid'=>$snid]);
                     }
 
                     if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
