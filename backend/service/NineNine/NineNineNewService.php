@@ -536,8 +536,8 @@ class NineNineNewService extends BaseTZService {
             20 => 'dqs',  # 道琼斯
             21 => 'szzs',  # 上证指数
             22 => 'szcz',  # 深圳成指
-            23 => 'sfytfssc',  # 以太坊3分
-            24 => 'tfytfssc',  # 以太坊10分
+            23 => 'sfytf',  # 以太坊3分
+            24 => 'tfytf',  # 以太坊10分
             25 => 'jsqws',  # 江苏七位数
         ];
         if(isset($datas[$lottery_type])) return $datas[$lottery_type];
@@ -599,7 +599,7 @@ class NineNineNewService extends BaseTZService {
         $betUnit =  $units[$playway];
         $odds = ['minOdds'=>$oddsTypes[$playway]['minOdds'], 'maxOdds'=>$oddsTypes[$playway]['maxOdds'], 'backRate'=>13];
         if($playway == 3){ # 四定
-            if(in_array($lottery_type, [1, 17, 19, 20, 21, 22, 23, 24, 25])){
+            if(in_array($lottery_type, [1, 17, 19, 20, 21, 22, 25])){
                 foreach ($codesArr as $code){
                     $codes[] = str_replace(',', '', $code);
                 }
