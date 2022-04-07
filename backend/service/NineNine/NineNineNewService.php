@@ -662,7 +662,7 @@ class NineNineNewService extends BaseTZService {
                 'betNum' => implode(',', $codes),
                 'odds' => $odds,
                 'betBeishu' => ceil($single/$betUnit),
-                'betZhushu' => 1,
+                'betZhushu' => count($codesArr),
             ];
             if(in_array($lottery_type, [23, 24])){
                 unset($tmpData['odds']);
