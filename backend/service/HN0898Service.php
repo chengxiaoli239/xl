@@ -1317,6 +1317,16 @@ class HN0898Service extends BaseTZService {
             break;
         }
 
+        if($lottery_type == 23 && substr($qihao, -3, 3) >= 480){
+            $date = substr($qihao, 0, 4).'-'.substr($qihao, 4, 2).'-'.substr($qihao, 6, 2).' 00:00:00';
+            $date = date('Ymd', strtotime($date) + 86400);
+            $qihao = $date.'001';
+        }elseif($lottery_type == 24 && substr($qihao, -3, 3) >= 144){
+            $date = substr($qihao, 0, 4).'-'.substr($qihao, 4, 2).'-'.substr($qihao, 6, 2).' 00:00:00';
+            $date = date('Ymd', strtotime($date) + 86400);
+            $qihao = $date.'001';
+        }
+
         return $qihao;
     }
 
