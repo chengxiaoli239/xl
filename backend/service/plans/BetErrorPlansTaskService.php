@@ -18,7 +18,7 @@ use yii\helpers\ArrayHelper;
 
 class BetErrorPlansTaskService extends BaseService {
 
-    public static function recordPlanTask($uid='',$account='', $plan_id='', $qihao='', $bet_sort_key=0, $bet_codes='', $tz_type = '', $bet_url='', $bet_headers=[], $post_datas='', $single = 0.1, $bet_moneys='', $playway = 3, $tz_system_id='', $error_rst = [], $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function recordPlanTask($uid='',$account='', $plan_id='', $qihao='', $bet_sort_key=0, $bet_codes='', $tz_type = '', $bet_url='', $bet_headers=[], $post_datas='', $single = 0.1, $bet_moneys='', $playway = 3, $tz_system_id='', $error_rst = [], $lottery_type=DEFAULT_LOTTERY_TYPE, $status=0){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $where = ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'plan_id'=>$plan_id, 'bet_sort_key'=>$bet_sort_key];
         if($r = BetErrorPlansTask::findOne($where)){
@@ -44,7 +44,7 @@ class BetErrorPlansTaskService extends BaseService {
             'lotteryclass' => BetService::lotteryClass($playway),
             'single' => $single,
             'playway' => $playway,
-            'status' => $isUnusual ? 4 : 0,
+            'status' => ($status != 0) ? $status : $isUnusual ? 4 : 0,
             'lottery_type' => $lottery_type,
             'error_desc' => json_encode($error_rst, 320),
             'updated_at' => time(),

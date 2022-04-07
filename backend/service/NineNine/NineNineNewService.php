@@ -8,6 +8,7 @@
  */
 
 namespace backend\service\NineNine;
+use backend\models\BetErrorPlansTask;
 use backend\models\BettingRecords;
 use backend\models\DataTime;
 use backend\models\KjConfig;
@@ -419,9 +420,7 @@ class NineNineNewService extends BaseTZService {
 
             $logArr = ['plan_id'=>$plan_id, 'uid'=>self::$user_id, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$tmpRst];//p($logArr);
             Tool_Common::log('/NineNineNew/bet', 'INFO', '九九网下注',$logArr);
-            if($tmpRst['rstData']['code'] != 200){
-                BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type);
-            }
+
             $rstData = $tmpRst['rstData'];
             $xCsrf = $tmpRst['xCsrf'];
             if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
@@ -464,6 +463,14 @@ class NineNineNewService extends BaseTZService {
                     $m->set($xCsrf_key, $xCsrf, 120);
                 }
             }
+            $status = ($tmpRst['rstData']['code'] == 200) ? 2 : 3;
+            BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type, $status);
+
+            $row = BetErrorPlansTask::findOne(['qihao'=>$qihao, 'plan_id'=>$plan_id]);
+            $row->status = $status;
+            $row->post_desc = json_encode($tmpRst, 320);
+            $flag = $row->save();
+
             //p(['tmpRst'=>$tmpRst, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'is_auto'=>$is_auto]);
             $end_time = microtime(true);
             $time_consume = ($end_time - $start_time). 's';
