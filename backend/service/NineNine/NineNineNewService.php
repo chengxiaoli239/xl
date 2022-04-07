@@ -383,11 +383,12 @@ class NineNineNewService extends BaseTZService {
             //p($xCsrf);
             $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/userlottery/add';
             $headers = [
-                ":authority: ".$urlArr['domain'],
-                ":method: POST",
-                ":path: /cloud-lottery-service-server/gameInfo/userlottery/add",
-                ":scheme: https",
+                #":authority: ".$urlArr['domain'],
+                #":method: POST",
+                #":path: /cloud-lottery-service-server/gameInfo/userlottery/add",
+                #":scheme: https",
                 "accept: application/json, text/plain, */*",
+                'Accept-Conn: {"downlink":10,"effectiveType":"4g","onchange":null,"rtt":150,"saveData":false,"loadedTime":612,"restime":"cloud-lottery-service-server//lastTen/sfytfssc:194"}',
                 "accept-encoding: gzip, deflate, br",
                 "accept-language: zh-CN,zh;q=0.9,en;q=0.8",
                 //"Connection: keep-alive",
@@ -398,7 +399,7 @@ class NineNineNewService extends BaseTZService {
                 //"Host: www.".$urlArr['domain'],
                 "origin: ".$urlArr['baseUrl'],
                 "referer: ".$urlArr['baseUrl']."/web/caipiao".self::getReferByLotteryType($lottery_type),
-                'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+                'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"',
                 "sec-ch-ua-mobile: ?0",
                 "sec-fetch-dest: empty",
                 "sec-fetch-mode: cors",
@@ -415,6 +416,7 @@ class NineNineNewService extends BaseTZService {
             # 真实投注
             $start_time = microtime(true);
             $tmpRst = self::postBetCurl($url, $post_data, $headers);
+
             $logArr = ['plan_id'=>$plan_id, 'uid'=>self::$user_id, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$tmpRst];//p($logArr);
             Tool_Common::log('/NineNineNew/bet', 'INFO', '九九网下注',$logArr);
             if($tmpRst['rstData']['code'] != 200){
@@ -429,22 +431,25 @@ class NineNineNewService extends BaseTZService {
             }
             if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!'){
                 $headers = [
-                    "Accept: application/json, text/plain, */*",
-                    "Accept-Encoding: gzip, deflate, br",
-                    "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
-                    "Connection: keep-alive",
-                    'Content-Length:'.strlen($post_data),
-                    "Content-Type: application/json;charset=UTF-8",
-                    "contentType: application/json",
-                    'Cookie: '.$TzSystemsUsers->cookie,
-                    "Host: www.".$urlArr['domain'],
-                    "Origin: ".$urlArr['baseUrl'],
-                    "Referer: ".$urlArr['baseUrl']."/web/caipiao/ssc/xjssc",
-                    "Sec-Fetch-Dest: empty",
-                    "Sec-Fetch-Mode: cors",
-                    "Sec-Fetch-Site: same-origin",
-                    "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36",
-                    "userType: 0",
+                    "accept: application/json, text/plain, */*",
+                    'Accept-Conn: {"downlink":10,"effectiveType":"4g","onchange":null,"rtt":150,"saveData":false,"loadedTime":612,"restime":"cloud-lottery-service-server//lastTen/sfytfssc:194"}',
+                    "accept-encoding: gzip, deflate, br",
+                    "accept-language: zh-CN,zh;q=0.9,en;q=0.8",
+                    //"Connection: keep-alive",
+                    'content-Length:'.strlen($post_data),
+                    "content-type: application/json;charset=UTF-8",
+                    "contenttype: application/json",
+                    'cookie: '.$TzSystemsUsers->cookie,
+                    //"Host: www.".$urlArr['domain'],
+                    "origin: ".$urlArr['baseUrl'],
+                    "referer: ".$urlArr['baseUrl']."/web/caipiao".self::getReferByLotteryType($lottery_type),
+                    'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"',
+                    "sec-ch-ua-mobile: ?0",
+                    "sec-fetch-dest: empty",
+                    "sec-fetch-mode: cors",
+                    "sec-fetch-site: same-origin",
+                    $TzSystemsUsers->user_agent,
+                    "usertype: 0",
                     "x-csrf-index: ".$xCsrf['Index'],
                     "x-csrf-token: ".$xCsrf['Token'],
                 ];
@@ -555,9 +560,9 @@ class NineNineNewService extends BaseTZService {
             20 => '/pl/dqs',  # 道琼斯
             21 => '/pl/szzs',  # 上证指数
             22 => '/pl/szcz',  # 深圳成指
-            23 => '/pl/sfytf',  # 以太坊3分
-            24 => '/pl/tfytf',  # 以太坊10分
-            25 => '/pl/jsqws',  # 江苏七位数
+            23 => '/ssc/sfytfssc',  # 以太坊3分
+            24 => '/ssc/sfytfssc',  # 以太坊10分
+            25 => '/qws/jsqws',  # 江苏七位数
         ];
         if(isset($datas[$lottery_type])) return $datas[$lottery_type];
 
