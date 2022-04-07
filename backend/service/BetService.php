@@ -37,6 +37,7 @@ use backend\models\UserSysPlans;
 use common\service\CommonService;
 use common\tools\Tool_Common;
 use common\tools\KjDataGet;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 
 abstract class BetService extends BaseBetService {
@@ -1871,75 +1872,82 @@ abstract class BetService extends BaseBetService {
         $rst = ['status'=>300, 'msg'=>'操作成功'];
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
 
+        $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
-            $where = ['AND', ['=', 'status', 1], ['OR', ['=', 'is_batch_simulate', 0], ['IS', 'is_batch_simulate', NULL]], ['=', 'lottery_type', $lottery_type]]; # is_batch_simulate:0正常1批量模拟历史记录
-            $m = \Yii::$app->cache;
+            # is_batch_simulate:0正常1批量模拟历史记录
+            $where = ['AND', ['=', 'status', 1], ['OR', ['=', 'is_batch_simulate', 0], ['IS', 'is_batch_simulate', NULL]], ['=', 'lottery_type', $lottery_type]];
 
             $plans = UserSysPlans::find()->where($where)->all();
             Tool_Common::log('/plans_tasks/'.__FUNCTION__, 'INFO', '批量插入任务000', ['lottery_type'=>$lottery_type, 'counts'=>count($plans)]);
             if(empty($plans)){
                 Tool_Common::log('plan_is_active', 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>'没有开启的计划', 'uid'=>$plans[0]->uid]);
-                continue;
+                throw new Exception('没有开启的计划');
             }
-            foreach ($plans as $plan){
-                $tz_system_id = $plan->tz_sites;
-                $lottery_type = $plan->lottery_type;
-                $uid = $plan->uid;
-                $qihao = HN0898Service::getQihao($lottery_type);
-                $Task = BetErrorPlansTask::findOne(['plan_id'=>$plan->id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
-                if($Task){
-                    $logArr = ['status'=>200, 'msg'=>'已记录推送表'.$lottery_type.'_'.$qihao];
-                    Tool_Common::log('insert_plan_task', 'ERR', '写入计划任务表', $logArr);
-                    continue;
-                }
-                $next_qihao_is_active = TzService::beforeBet($lottery_type);
-                if($next_qihao_is_active['status'] != 200){
-                    Tool_Common::log('next_qihao_is_active', 'INFO', '期号激活', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id, 'next_qihao_is_active'=>$next_qihao_is_active, 'msg'=>'期号未被激活'.$lottery_type.'_'.$qihao]);
-                    continue;
-                }
-
-                # 4、投注号码 codes
-                $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
-                $is_test = $plan->is_test;
-                $sn = BetService::$test_true_sn;
-                if(in_array($plan->plan_type, array_merge([6, 8, 9, 14], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
-                    //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
-                    $flag = BetService::getIsBetTrue($plan->id);
-                    if(in_array($flag, [0, -1]) && $isAuto == 1){
-                        $is_test = 1;
-                        $sn = 'istest';
-                        $snid = 'istest_id';
+            try {
+                foreach ($plans as $plan){
+                    $tz_system_id = $plan->tz_sites;
+                    $lottery_type = $plan->lottery_type;
+                    $uid = $plan->uid;
+                    $qihao = HN0898Service::getQihao($lottery_type);
+                    $Task = BetErrorPlansTask::findOne(['plan_id'=>$plan->id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
+                    if($Task){
+                        $logArr = ['status'=>200, 'msg'=>'已记录推送表'.$lottery_type.'_'.$qihao];
+                        Tool_Common::log('insert_plan_task', 'ERR', '写入计划任务表', $logArr);
+                        throw new Exception('已记录推送表'.$lottery_type.'_'.$qihao);
                     }
-                }
-
-                if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
-                    self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
-                }else{
-                    Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-1', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'uid'=>$uid]);
-
-                    $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
-                    $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
-                    if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
-                        Tool_Common::log('accountIsExpire', 'ERR', '封盘或者未开盘-2', ['uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'activeQihao'=>$activeQihao]);
-                        continue;
+                    $next_qihao_is_active = TzService::beforeBet($lottery_type);
+                    if($next_qihao_is_active['status'] != 200){
+                        Tool_Common::log('next_qihao_is_active', 'INFO', '期号激活', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id, 'next_qihao_is_active'=>$next_qihao_is_active, 'msg'=>'期号未被激活'.$lottery_type.'_'.$qihao]);
+                        throw new Exception('期号未被激活'.$lottery_type.'_'.$qihao);
                     }
 
-                    $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
-                    if(!$status && $plan->account != 'gaozi2018'){
-                        Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示-2', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
-                        continue;
-                        //return ['status'=>300, 'msg'=>'账号过期提示'];
+                    # 4、投注号码 codes
+                    $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+                    $is_test = $plan->is_test;
+                    $sn = BetService::$test_true_sn;
+                    if(in_array($plan->plan_type, array_merge([6, 8, 9, 14], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
+                        //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
+                        $flag = BetService::getIsBetTrue($plan->id);
+                        if(in_array($flag, [0, -1]) && $isAuto == 1){
+                            $is_test = 1;
+                            $sn = 'istest';
+                            $snid = 'istest_id';
+                        }
                     }
-                    $preInsertLockKey = 'preInsertLockKey_'.$plan->id.'_'.$activeQihao;
 
-                    if($lock = $m->get($preInsertLockKey))continue;
-                    $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
-                    $m->set($preInsertLockKey, 1, $time);
+                    if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
+                        self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
+                    }else{
+                        Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-1', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'uid'=>$uid]);
 
-                    $insertRst = $BetService->postBatchBet($activeQihao, $plan->id, $codes);
-                    $rst['data'][$plan->id] = $insertRst;
-                    Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-2', ['uid'=>$uid, 'account'=>$plan->account, 'plan_id'=>$plan->id, 'activeQihao'=>$activeQihao, 'insertRst'=>$insertRst]);
+                        $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
+                        $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
+                        if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
+                            Tool_Common::log('accountIsExpire', 'ERR', '封盘或者未开盘-2', ['uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'activeQihao'=>$activeQihao]);
+                            throw new Exception('封盘或者未开盘-2');
+                        }
+
+                        $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
+                        if(!$status && $plan->account != 'gaozi2018'){
+                            Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示-2', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
+                            throw new Exception('账号过期提示-2');
+                            //return ['status'=>300, 'msg'=>'账号过期提示'];
+                        }
+                        $preInsertLockKey = 'preInsertLockKey_'.$plan->id.'_'.$activeQihao;
+
+                        if($lock = $m->get($preInsertLockKey))continue;
+                        $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
+                        $m->set($preInsertLockKey, 1, $time);
+
+                        $insertRst = $BetService->postBatchBet($activeQihao, $plan->id, $codes);
+                        $rst['data'][$plan->id] = $insertRst;
+                        $logArr = ['uid'=>$uid, 'account'=>$plan->account, 'plan_id'=>$plan->id, 'activeQihao'=>$activeQihao, 'insertRst'=>$insertRst];
+                        Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-2', $logArr);
+                    }
                 }
+            }catch (\Exception $e){
+                Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '批量插入下注计划异常', ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+                continue;
             }
         }
 

@@ -293,6 +293,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        p(urldecode('%E6%97%85%E6%8A%95%E9%BB%91%E8%99%8E'));
+        p(base64_decode('MjEyNV9pbTFidGdhb3pfNHB0dHhhaDF5Z181,MTczNV9pbTEwdzI4MjIyMDIyMDMxMTgzMTk2,'));
         $rst = FootBallService::getSorceFromUnibet(); p($rst);# 群发微信消息
 
         $UserSysPlan = UserSysPlans::findOne(4659);
