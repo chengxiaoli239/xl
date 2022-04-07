@@ -1103,22 +1103,14 @@ abstract class BetService extends BaseBetService {
         $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id, $plan->uid); # 手动下注时，先删除缓存
 
         $is_test = $plan->is_test;
-        if(in_array($plan->plan_type, [6, 8, 9])){ # 6中则投 8、9遗漏多少期投
-            //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
-            $flag = BetService::getIsBetTrue($planId);
-            if(in_array($flag, [0, -1]) && $isAuto == 1){
-                $is_test = 1;
-                $sn = 'istest';
-                $snid = 'istest_id';
-            }
-        }
+        list($sn, $snid) = BetService::getBetSnId($planId, $plan->plan_type, $is_test, $isAuto);
 
         if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
             $mkey = self::buildBetPlanIdKey($plan->account, $qihao, $plan->id);
             $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
             if($tzflag = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了~'];
             $m->set($mkey, 1, $time);
-            $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid); # 直接记录表
+            $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid, $r=1); # 直接记录表
         }else{ # 正式下注
 
             $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'not_need_login_tz_system_ids'])->value); # 无需登陆站点
@@ -1182,6 +1174,32 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
+     * @desc 获取方案号
+     * @param $planId
+     * @param $plan_type
+     * @param $is_test
+     * @param $isAuto
+     * @return string[]
+     */
+    public static function getBetSnId($planId, $plan_type, &$is_test, $isAuto){
+        $sn = BetService::$test_true_sn;
+        $snid = BetService::$test_true_snid;
+
+        if(in_array($plan_type, array_merge([6, 8, 9, 14], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
+            //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
+            $flag = BetService::getIsBetTrue($planId);
+            if(in_array($flag, [0, -1]) && $isAuto == 1){
+                $is_test = 1;
+                $sn = 'istest';
+                $snid = 'istest_id';
+            }
+            Tool_Common::log('/plan/'.__FUNCTION__.'_is_bet_true', 'INFO', '是否真实下注计划', ['plan_id'=>$planId, 'flag'=>$flag, 'fh'=>(boolean)(in_array($flag, [0, -1]) && $isAuto == 1), 'sn'=>$sn, 'snid'=>$snid]);
+        }
+
+        return [$sn, $snid];
+    }
+
+    /**
      * @desc 根据计划id投注 - 立即投注
      * @param $planId
      * @param $isAuto 是否自动,默认自动
@@ -1213,18 +1231,10 @@ abstract class BetService extends BaseBetService {
            $m->set($mkey, 1, $time);
 
            $is_test = $plan->is_test;
-           if(in_array($plan->plan_type, [6, 8, 9])){ # 6中则投 8、9遗漏多少期投
-               //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
-               $flag = BetService::getIsBetTrue($planId);
-               if(in_array($flag, [0, -1]) && $isAuto == 1){
-                   $is_test = 1;
-                   $sn = 'istest';
-                   $snid = 'istest_id';
-               }
-           }
+           list($sn, $snid) = BetService::getBetSnId($planId, $plan->plan_type, $is_test, $isAuto);
 
            if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
-               $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid); # 直接记录表
+               $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid, $r=2); # 直接记录表
            }else{ # 正式下注
                $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'not_need_login_tz_system_ids'])->value); # 无需登陆站点
                # 1、首先判断是否登录，否则登录之后再下注
@@ -1793,7 +1803,7 @@ abstract class BetService extends BaseBetService {
      * @param string $snid
      * @return array|bool
      */
-    public static function _logRecordsByPlandId($plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test = 0, $sn='888888', $snid='888888id'){
+    public static function _logRecordsByPlandId($plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test = 0, $sn='888888', $snid='888888id', $r=0){
         //p([$plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test, $sn, $snid],0);
         $UserSysPlans = UserSysPlans::findOne($plan_id);
         if($UserSysPlans->tz_type == 18) {
@@ -1827,7 +1837,7 @@ abstract class BetService extends BaseBetService {
         //p($insertData,0);
         $insertRst = BetService::_logRecords($insertData);
         unset($insertData['codes']);
-        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '记录', ['insertRst'=>$insertRst, 'insertData'=>$insertData]);
+        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '记录', ['insertRst'=>$insertRst, 'insertData'=>$insertData, 'r'=>$r]);
 
         return $insertRst;
     }
@@ -1911,22 +1921,12 @@ abstract class BetService extends BaseBetService {
 
                     # 4、投注号码 codes
                     $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+
                     $is_test = $plan->is_test;
-                    $sn = BetService::$test_true_sn;
-                    $snid = BetService::$test_true_snid;
-                    if(in_array($plan->plan_type, array_merge([6, 8, 9, 14], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
-                        //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
-                        $flag = BetService::getIsBetTrue($plan->id);
-                        if(in_array($flag, [0, -1]) && $isAuto == 1){
-                            $is_test = 1;
-                            $sn = 'istest';
-                            $snid = 'istest_id';
-                        }
-                        Tool_Common::log('/plan/'.__FUNCTION__.'_is_bet_true', 'INFO', '是否真实下注计划', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'flag'=>$flag, 'fh'=>(boolean)(in_array($flag, [0, -1]) && $isAuto == 1), 'sn'=>$sn, 'snid'=>$snid]);
-                    }
+                    list($sn, $snid) = BetService::getBetSnId($plan->id, $plan->plan_type, $is_test, $isAuto);
 
                     if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
-                        $testInsertRst = self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid); # 直接记录表
+                        $testInsertRst = self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid, $r=3); # 直接记录表
                         if($testInsertRst['status'] == 200){
                             $m->set($insert_mkey, 1, 120);
                         }
@@ -2052,21 +2052,14 @@ abstract class BetService extends BaseBetService {
 
                     # 4、投注号码 codes
                     $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);
+
                     $is_test = $plan->is_test;
-                    $sn = BetService::$test_true_sn;
-                    $snid = BetService::$test_true_snid;
-                    if (in_array($plan->plan_type, [6, 8, 9])) { # 6中则投 8、9遗漏多少期投
-                        $flag = BetService::getIsBetTrue($plan->id);
-                        if (in_array($flag, [0, -1]) && $isAuto == 1) {
-                            $is_test = 1;
-                            $sn = 'istest';
-                            $snid = 'istest_id';
-                        }
-                    }
+                    list($sn, $snid) = BetService::getBetSnId($plan->id, $plan->plan_type, $is_test, $isAuto);
+
                     Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '投注号码', ['flag'=>$flag, 'qihao'=>$current_qihao, 'plan_id'=>$plan_id]);
 
                     if ($is_test == 1 or $plan->uid == 1) { # 模拟下注
-                        $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, 2, $sn, $snid); # 直接记录表
+                        $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, 2, $sn, $snid, $r=4); # 直接记录表
                         $rst['data'][$plan_id]['logRecord_rst'] = ['rst'=>$insertRst, 'qihao'=>$current_qihao];
                     }
                     Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '计划模拟-1', ['plan_id'=>$plan_id, 'rst'=>$rst]);
