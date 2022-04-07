@@ -315,6 +315,10 @@ class NineNineNewService extends BaseTZService {
         return $qihao;
     }
 
+    public function postBatchBet($qihao, $plan_id, $code){
+        return $this->bet($qihao, $plan_id, $code);
+    }
+
     /**
      * @decription 新版投注，真实投注入口， 未完待续 2018.12.23
      *
