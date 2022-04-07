@@ -307,9 +307,6 @@ class NineNineNewService extends BaseTZService {
     public static function getNineNineQihao($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
         if($lottery_type == 6) {
             $qihao = substr($qihao, 0, 8) . '0' . substr($qihao, 8, 2);
-        }elseif (in_array($lottery_type, [1,17,19,20,21,22])){
-        }else{
-            $qihao = substr($qihao, 0, 8) . '0' . substr($qihao, 8, 2);
         }
 
         return $qihao;
@@ -377,6 +374,7 @@ class NineNineNewService extends BaseTZService {
                 'betIssue'=>(string)$nn_qihao,
                 'lotName'=>self::getLotNameByLotteryType($lottery_type),
                 'items' => $items,
+                'send' => false,
             ];
             $post_data = json_encode($post_data, 320);
 
@@ -588,7 +586,7 @@ class NineNineNewService extends BaseTZService {
         $betUnit =  $units[$playway];
         $odds = ['minOdds'=>$oddsTypes[$playway]['minOdds'], 'maxOdds'=>$oddsTypes[$playway]['maxOdds'], 'backRate'=>13];
         if($playway == 3){ # 四定
-            if(in_array($lottery_type, [1, 17, 19, 20, 21, 22])){
+            if(in_array($lottery_type, [1, 17, 19, 20, 21, 22, 23, 24, 25])){
                 foreach ($codesArr as $code){
                     $codes[] = str_replace(',', '', $code);
                 }
