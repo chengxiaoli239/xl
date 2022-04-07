@@ -2916,10 +2916,10 @@ class SscDataService extends BaseService {
                         $hzArr['A_x_B_y_status'] = 1;
                     }
 
-                    $hzArr["current_arise_A_times"]; # A上奖次
-                    $hzArr["current_arise_B_times"]; # B上奖次
-                    $hzArr['arise_A_times']; # 设置A条件
-                    $hzArr['arise_B_times']; # 设置B条件
+                    #$hzArr["current_arise_A_times"]; # A上奖次
+                    #$hzArr["current_arise_B_times"]; # B上奖次
+                    #$hzArr['arise_A_times']; # 设置A条件
+                    #$hzArr['arise_B_times']; # 设置B条件
 
                     $singles = explode('-', trim($UserSysPlan->singles));
                     if(empty($singles)) $singles = [$UserSysPlan->single];
