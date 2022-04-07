@@ -1826,6 +1826,7 @@ abstract class BetService extends BaseBetService {
         ];
         //p($insertData,0);
         $insertRst = BetService::_logRecords($insertData);
+        unset($insertData['codes']);
         Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '记录', ['insertRst'=>$insertRst, 'insertData'=>$insertData]);
 
         return $insertRst;
