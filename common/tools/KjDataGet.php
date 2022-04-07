@@ -447,6 +447,20 @@ class KjDataGet
                     $nextQihao = $date.'001';
                 }
                 break;
+            case 23: # 以太坊3分
+                if(substr($qihao, -3, 3) >= 480){
+                    $date = substr($qihao, 0, 4).'-'.substr($nextQihao, 4, 2).'-'.substr($nextQihao, 6, 2).' 00:00:00';
+                    $date = date('Ymd', strtotime($date) + 86400);
+                    $nextQihao = $date.'001';
+                }
+                break;
+            case 24: # 以太坊10分
+                if(substr($qihao, -3, 3) >= 144){
+                    $date = substr($qihao, 0, 4).'-'.substr($nextQihao, 4, 2).'-'.substr($nextQihao, 6, 2).' 00:00:00';
+                    $date = date('Ymd', strtotime($date) + 86400);
+                    $nextQihao = $date.'001';
+                }
+                break;
         }
 
         return $nextQihao;
