@@ -1881,7 +1881,7 @@ abstract class BetService extends BaseBetService {
             Tool_Common::log('/plans_tasks/'.__FUNCTION__, 'INFO', '批量插入任务000', ['lottery_type'=>$lottery_type, 'counts'=>count($plans)]);
             if(empty($plans)){
                 Tool_Common::log('plan_is_active', 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>'没有开启的计划', 'uid'=>$plans[0]->uid]);
-                throw new Exception('没有开启的计划');
+                throw new \yii\base\Exception('没有开启的计划');
             }
             try {
                 foreach ($plans as $plan){
@@ -1898,7 +1898,7 @@ abstract class BetService extends BaseBetService {
                     $next_qihao_is_active = TzService::beforeBet($lottery_type);
                     if($next_qihao_is_active['status'] != 200){
                         Tool_Common::log('next_qihao_is_active', 'INFO', '期号激活', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id, 'next_qihao_is_active'=>$next_qihao_is_active, 'msg'=>'期号未被激活'.$lottery_type.'_'.$qihao]);
-                        throw new Exception('期号未被激活'.$lottery_type.'_'.$qihao);
+                        throw new \yii\base\Exception('期号未被激活'.$lottery_type.'_'.$qihao);
                     }
 
                     # 4、投注号码 codes
@@ -1924,13 +1924,13 @@ abstract class BetService extends BaseBetService {
                         $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
                         if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
                             Tool_Common::log('accountIsExpire', 'ERR', '封盘或者未开盘-2', ['uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'activeQihao'=>$activeQihao]);
-                            throw new Exception('封盘或者未开盘-2');
+                            throw new \yii\base\Exception('封盘或者未开盘-2');
                         }
 
                         $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
                         if(!$status && $plan->account != 'gaozi2018'){
                             Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示-2', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
-                            throw new Exception('账号过期提示-2');
+                            throw new \yii\base\Exception('账号过期提示-2');
                             //return ['status'=>300, 'msg'=>'账号过期提示'];
                         }
                         $preInsertLockKey = 'preInsertLockKey_'.$plan->id.'_'.$activeQihao;
