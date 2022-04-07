@@ -576,12 +576,20 @@ class NineNineNewService extends BaseTZService {
         $units = [1=>1, 2=>0.1, 3=>0.1]; # 0.1角模式 1元模式
         $datas = [];
 
-        $oddsTypes = [
-            1 => ['minOdds'=>86.5, 'maxOdds'=>99.5], # 二定，元
-            2 => ['minOdds'=>865, 'maxOdds'=>995], # 三定，元
-            //3 => ['minOdds'=>7700, 'maxOdds'=>9000], # 四定，元
-            3 => ['minOdds'=>8500, 'maxOdds'=>9950], # 四定，元
-        ];
+        if(in_array($lottery_type, [23, 24])){
+            # 以太坊
+            $oddsTypes = [
+                1 => ['minOdds'=>86.5, 'maxOdds'=>98], # 二定，元
+                2 => ['minOdds'=>865, 'maxOdds'=>980], # 三定，元
+                3 => ['minOdds'=>8500, 'maxOdds'=>9800], # 四定，元
+            ];
+        }else{
+            $oddsTypes = [
+                1 => ['minOdds'=>86.5, 'maxOdds'=>99.5], # 二定，元
+                2 => ['minOdds'=>865, 'maxOdds'=>995], # 三定，元
+                3 => ['minOdds'=>8500, 'maxOdds'=>9950], # 四定，元
+            ];
+        }
 
         $betUnit =  $units[$playway];
         $odds = ['minOdds'=>$oddsTypes[$playway]['minOdds'], 'maxOdds'=>$oddsTypes[$playway]['maxOdds'], 'backRate'=>13];
