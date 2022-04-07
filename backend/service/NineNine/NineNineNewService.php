@@ -457,7 +457,7 @@ class NineNineNewService extends BaseTZService {
                 //return $this->bet($plan->uid, self::$tz_system_id);
                 $rstData = $tmpRst['rstData'];
                 $xCsrf = $tmpRst['xCsrf'];
-                Tool_Common::log('/NineNineNew/retry_bet', 'INFO', '九九网重新下注',['rstData'=>$rstData, 'xCsrf'=>$xCsrf]);
+                Tool_Common::log('/NineNineNew/retry_bet', 'INFO', '九九网重新下注',['plan_id'=>$plan_id, 'playway'=>$playway, 'rstData'=>$rstData, 'xCsrf'=>$xCsrf]);
                 if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
                     Tool_Common::log('/debug/bet_record', 'INFO', '投注继续', ['time'=>2, 'xCsrf'=>$xCsrf, 'tmpRst'=>$tmpRst]);
                     $xCsrf_key = CommonService::buildXCsrfTokenKey($plan->uid, self::$tz_system_id);
@@ -652,7 +652,7 @@ class NineNineNewService extends BaseTZService {
         }elseif(in_array($playway, [1, 2])){ # 二定、三定
             # 全倒
             foreach ($codesArr as $code){
-                $codes[] = str_replace(',', '', $code.'X');
+                $codes[] = str_replace(',', '', $code);
             }
             $tmpData = [
                 'betType' => 'all',
