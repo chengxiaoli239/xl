@@ -650,19 +650,24 @@ class NineNineNewService extends BaseTZService {
                 }
             }
         }elseif(in_array($playway, [1, 2])){ # 二定、三定
+            # 全倒
             foreach ($codesArr as $code){
-                $datas[] = [
-                    'betType' => 'all',
-                    'backRate' => 0, # 返点，默认最高赔率，无返点
-                    'betUnit' => $betUnit,
-                    'playType' => self::getPlayType($playway),
-                    'betNum' => $code.',X',
-                    'odds' => $odds,
-                    'betBeishu' => ceil($single/$betUnit),
-                    'betZhushu' => 1,
-                ];
+                $codes[] = str_replace(',', '', $code.'X');
             }
-
+            $tmpData = [
+                'betType' => 'all',
+                'backRate' => 0, # 返点，默认最高赔率，无返点
+                'betUnit' => $betUnit,
+                'playType' => self::getPlayType($playway),
+                'betNum' => implode(',', $codes),
+                'odds' => $odds,
+                'betBeishu' => ceil($single/$betUnit),
+                'betZhushu' => 1,
+            ];
+            if(in_array($lottery_type, [23, 24])){
+                unset($tmpData['odds']);
+            }
+            $datas[] = $tmpData;
         }
 
         return $datas;
@@ -739,7 +744,7 @@ class NineNineNewService extends BaseTZService {
      */
     public static function getPlayType($playway = 3){
         $planTypes = [
-            1 => '二定',
+            1 => '二定#单式',
             2 => '三定',
             3 => '四定#单式',
         ];
