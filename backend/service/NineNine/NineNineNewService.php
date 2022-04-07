@@ -374,7 +374,7 @@ class NineNineNewService extends BaseTZService {
                 'betIssue'=>(string)$nn_qihao,
                 'lotName'=>self::getLotNameByLotteryType($lottery_type),
                 'items' => $items,
-                'send' => false,
+                //'send' => false,
             ];
             $post_data = json_encode($post_data, 320);
 
@@ -599,11 +599,11 @@ class NineNineNewService extends BaseTZService {
         $betUnit =  $units[$playway];
         $odds = ['minOdds'=>$oddsTypes[$playway]['minOdds'], 'maxOdds'=>$oddsTypes[$playway]['maxOdds'], 'backRate'=>13];
         if($playway == 3){ # 四定
-            if(in_array($lottery_type, [1, 17, 19, 20, 21, 22, 25])){
+            if(in_array($lottery_type, [1, 17, 19, 20, 21, 22, 23, 24, 25])){
                 foreach ($codesArr as $code){
                     $codes[] = str_replace(',', '', $code);
                 }
-                $datas[] = [
+                $tmpData = [
                     'betType' => 'all',
                     'backRate' => 0, # 返点，默认最高赔率，无返点
                     'betUnit' => $betUnit,
@@ -613,6 +613,10 @@ class NineNineNewService extends BaseTZService {
                     'betBeishu' => ceil($single/$betUnit),
                     'betZhushu' => count($codesArr),
                 ];
+                if(in_array($lottery_type, [23, 24])){
+                    unset($tmpData['odds']);
+                }
+                $datas[] = $tmpData;
 
             }else{
                 if($tz_type == 22){
