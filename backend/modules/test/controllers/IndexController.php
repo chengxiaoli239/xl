@@ -293,6 +293,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $r = TzService::insertDealDataTask($lottery_type=23);p($r);
         p(urldecode('%E6%97%85%E6%8A%95%E9%BB%91%E8%99%8E'));
         p(base64_decode('MjEyNV9pbTFidGdhb3pfNHB0dHhhaDF5Z181,MTczNV9pbTEwdzI4MjIyMDIyMDMxMTgzMTk2,'));
         $rst = FootBallService::getSorceFromUnibet(); p($rst);# 群发微信消息
@@ -419,11 +420,6 @@ class IndexController extends Controller
         p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 17);
         p($rst);// 更新单双遗漏
-        for ($i = 2021001; $i <= 2021158; $i++) {
-            $qihao = $i;
-            $rst = SscDataService::insertSscKjDataDs($qihao, $lottery_type = 17);//p($rst);
-        }
-        p($rst);
         $rst = SscDataService::insertDsTypeDatas($lottery_type = 17);
         p($rst);
         $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);

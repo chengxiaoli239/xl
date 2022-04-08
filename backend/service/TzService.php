@@ -8,6 +8,7 @@
  */
 
 namespace backend\service;
+use backend\models\DataDealStatus;
 use backend\models\DataTime;
 use backend\models\SscKjData;
 use backend\models\SysPlansCodes;
@@ -149,7 +150,7 @@ class TzService extends BaseService {
         $time6 = microtime(true);
 
         # 4、四定和值遗漏
-        $rst['updateHzYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏 耗时3.5s
+        $rst['updateSdHzYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏 耗时3.5s
         $time7 = microtime(true);
 
         //p([$time1, $time2, $time3, $time4, $time5, $time6, $time7, $lottery_type]);
@@ -171,7 +172,7 @@ class TzService extends BaseService {
             StaticService::afterOpStatic($lottery_type, 'opProfitsPlans');
         }
         */
-        if($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opProfitsPlans')) {
+        if($isCanOpStaticStatus = StaticService::isCanOpStatic($lottery_type, $mkey = 'opProfitsPlans')) {
             $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type); # 处理止盈止损、倍投等计划
             StaticService::afterOpStatic($lottery_type, 'opProfitsPlans');
         }
@@ -182,12 +183,62 @@ class TzService extends BaseService {
         //$rst['consume_time4'] = ($time5 - $time4).'s';
         $rst['consume_time5'] = ($time6 - $time5).'s';
         $rst['consume_time6'] = ($time7 - $time6).'s';
+        $rst['isCanOpStaticStatus'] = $isCanOpStaticStatus;
         Tool_Common::log('opSystemBetPlans','INFO','处理系统投注计划', $rst);
 
         StaticService::afterOpStatic($lottery_type, 'opSystemBetPlans');
         self::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
 
         return $rst;
+    }
+
+    /**
+     * @desc 记录处理数据任务
+     * @param $lottery_type
+     * @param string $qihao
+     * @return bool
+     */
+    public static function insertDealDataTask($lottery_type, $qihao=''){
+
+        try {
+
+            if(empty($qihao)){
+                $SscKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one();
+                $qihao = $SscKjData->qihao;
+            }
+
+            $where = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao];
+
+            $DataDealStatus = DataDealStatus::findOne($where);
+            if(!empty($DataDealStatus)){
+                throw new \Exception('数据处理任务记录已存在'.$lottery_type.'_'.$lottery_type);
+            }
+
+            $now_time = time();
+            $setDatas = [
+                'status' => 0, # 所有数据处理状态
+                'qihao' => $qihao, # 期号
+                'static4dPerDateProfits_status' => 0, # A每天四定利润统计状态
+                'updateDs_status' => 0, # B单双处理状态
+                'updateDsYL_status' => 0, # C单双遗漏处理状态
+                'update3NumYL_status' => 0, # D单双遗漏处理状态
+                'updateSdHzYL_status' => 0, # E单双遗漏处理状态
+                'opProfitsPlans_status' => 0, # F投注计划处理状态
+                'created_at' => $now_time,
+                'updated_at' => $now_time,
+            ];
+            $DataDealStatus = new DataDealStatus();
+            $DataDealStatus->setAttributes($setDatas);
+            if(!$DataDealStatus->save()){
+                throw new \Exception(json_encode($DataDealStatus->getErrors(), 320));
+            }
+
+        }catch (\Exception $e){
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理任务写入异常', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'err_msg'=>$e->getMessage()]);
+            return false;
+        }
+
+        return true;
     }
 
     /**

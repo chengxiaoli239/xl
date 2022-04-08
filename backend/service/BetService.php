@@ -1948,8 +1948,8 @@ abstract class BetService extends BaseBetService {
                         if(!$status && $plan->account != 'gaozi2018'){
                             Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示-2', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
                             throw new \yii\base\Exception('账号过期提示-2');
-                            //return ['status'=>300, 'msg'=>'账号过期提示'];
                         }
+
                         $preInsertLockKey = 'preInsertLockKey_'.$plan->id.'_'.$activeQihao;
 
                         if($lock = $m->get($preInsertLockKey))continue;

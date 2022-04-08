@@ -1177,45 +1177,57 @@ class StaticService extends BaseService {
      */
     public static function static4dPerDateProfits($lottery_type = DEFAULT_LOTTERY_TYPE, $s_date = ''){
         $rst = ['status'=>200, 'msg'=>'处理成功'];
-        $allStaticProfits = self::allDateStaticProfits($lottery_type, $s_date);
-        $tmpProfits = [];
-        foreach ($allStaticProfits as $key=>$allStaticProfit){
-            $tmpProfits[] = $allStaticProfit;
-        }
 
-        foreach ($tmpProfits as $tmpProfit){
-            foreach ($tmpProfit as $date=>$tmp){
-                //if($date != date('Y-m-d')) continue;
-                if($date <= '2019-02-10') continue;
-                $setData = [];
-                if(!$Static4dProfits = Static4dProfitsPerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
-                    $Static4dProfits = new Static4dProfitsPerdate();
-                    $setData['created_at'] = time();
-                }
-                $setData['updated_at'] = time();
-                $setData['date'] = $date;
-                $setData['codes_4d_all'] = $tmpProfits[0][$date]; # 所有号码
-                $setData['codes_13_31'] = $tmpProfits[1][$date]; # 一双三单||一单三双
-                $setData['codes_22_22'] = $tmpProfits[2][$date]; # 两双两单
-                $setData['codes_1111_2222'] = $tmpProfits[3][$date]; # 四双四单
-                $setData['codes_13'] = $tmpProfits[4][$date]; # 一单三双
-                $setData['codes_31'] = $tmpProfits[5][$date]; # 一双三单
-                $setData['codes_13_2222'] = $tmpProfits[6][$date]; # 一单三双||四双
-                $setData['codes_31_1111'] = $tmpProfits[7][$date]; # 一双三单||四单
-                $setData['codes_2222'] = $tmpProfits[8][$date]; # 四双
-                $setData['codes_1111'] = $tmpProfits[9][$date]; # 四单
-                $setData['codes_13_1111'] = $tmpProfits[12][$date]; # 一单三双||四单
-                $setData['codes_31_2222'] = $tmpProfits[13][$date]; # 一双三单||四双
-                $setData['codes_13_1111_2222'] = $tmpProfits[14][$date]; # 一单三双||四单
-                $setData['codes_31_2222_1111'] = $tmpProfits[15][$date]; # 一双三单||四双
-                $setData['codes_1_nums'] = $tmpProfits[10][$date]; # 单数量
-                $setData['codes_2_nums'] = $tmpProfits[11][$date]; # 双数量
-                $setData['lottery_type'] = $lottery_type;
-                $Static4dProfits->setAttributes($setData);
+        $start_time = microtime(true);
+        try {
+            $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, '', $field='static4dPerDateProfits_status');
 
-                $rst = $Static4dProfits->save();
+            $allStaticProfits = self::allDateStaticProfits($lottery_type, $s_date);
+            $tmpProfits = [];
+            foreach ($allStaticProfits as $key=>$allStaticProfit){
+                $tmpProfits[] = $allStaticProfit;
             }
+
+            foreach ($tmpProfits as $tmpProfit){
+                foreach ($tmpProfit as $date=>$tmp){
+                    //if($date != date('Y-m-d')) continue;
+                    if($date <= '2019-02-10') continue;
+                    $setData = [];
+                    if(!$Static4dProfits = Static4dProfitsPerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
+                        $Static4dProfits = new Static4dProfitsPerdate();
+                        $setData['created_at'] = time();
+                    }
+                    $setData['updated_at'] = time();
+                    $setData['date'] = $date;
+                    $setData['codes_4d_all'] = $tmpProfits[0][$date]; # 所有号码
+                    $setData['codes_13_31'] = $tmpProfits[1][$date]; # 一双三单||一单三双
+                    $setData['codes_22_22'] = $tmpProfits[2][$date]; # 两双两单
+                    $setData['codes_1111_2222'] = $tmpProfits[3][$date]; # 四双四单
+                    $setData['codes_13'] = $tmpProfits[4][$date]; # 一单三双
+                    $setData['codes_31'] = $tmpProfits[5][$date]; # 一双三单
+                    $setData['codes_13_2222'] = $tmpProfits[6][$date]; # 一单三双||四双
+                    $setData['codes_31_1111'] = $tmpProfits[7][$date]; # 一双三单||四单
+                    $setData['codes_2222'] = $tmpProfits[8][$date]; # 四双
+                    $setData['codes_1111'] = $tmpProfits[9][$date]; # 四单
+                    $setData['codes_13_1111'] = $tmpProfits[12][$date]; # 一单三双||四单
+                    $setData['codes_31_2222'] = $tmpProfits[13][$date]; # 一双三单||四双
+                    $setData['codes_13_1111_2222'] = $tmpProfits[14][$date]; # 一单三双||四单
+                    $setData['codes_31_2222_1111'] = $tmpProfits[15][$date]; # 一双三单||四双
+                    $setData['codes_1_nums'] = $tmpProfits[10][$date]; # 单数量
+                    $setData['codes_2_nums'] = $tmpProfits[11][$date]; # 双数量
+                    $setData['lottery_type'] = $lottery_type;
+                    $Static4dProfits->setAttributes($setData);
+
+                    $rst = $Static4dProfits->save();
+                }
+            }
+            $dealStatus = 2;
+        }catch (\Exception $e){
+            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
         }
+
+        $end_time = microtime(true);
+        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s']);
 
         return ['status'=>200, 'data'=>$setData, 'rst'=>$rst];
     }

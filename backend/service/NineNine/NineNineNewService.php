@@ -448,6 +448,7 @@ class NineNineNewService extends BaseTZService {
                     "x-csrf-index: ".$xCsrf['Index'],
                     "x-csrf-token: ".$xCsrf['Token'],
                 ];
+                sleep(2);
                 $tmpRst = self::postBetCurl($url, $post_data, $headers);
                 //return $this->bet($plan->uid, self::$tz_system_id);
                 $rstData = $tmpRst['rstData'];

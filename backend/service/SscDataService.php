@@ -10,6 +10,7 @@
 namespace backend\service;
 use backend\models\AdminLog;
 use backend\models\BettingRecords;
+use backend\models\DataDealStatus;
 use backend\models\ImportPlanCodes;
 use backend\models\Num4Type;
 use backend\models\searchs\SscDwsHzNums;
@@ -44,6 +45,16 @@ class SscDataService extends BaseService {
     public static $fb_plan_types = [2, 3, 4, 5, 9, 10]; # 翻倍计划类型
     public static $zzt_plan_types = [6, 8]; # 中则投计划类型
     public static $zzt_else_fanmai_types = [7]; # 中则投否则反卖
+
+    public static $dealDataStatusFields = [
+        'status' => '全局状态',
+        'static4dPerDateProfits_status' => 'A每天四定利润统计',
+        'updateDs_status' => 'B单双处理状态',
+        'updateDsYL_status' => 'C单双遗漏处理状态',
+        'update3NumYL_status' => 'D开奖三字现处理状态',
+        'updateSdHzYL_status' => 'E和值遗漏状态',
+        'opProfitsPlans_status' => 'F投注计划处理状态',
+    ];
 
     /**
      * @desc 定位和值统计
@@ -510,87 +521,98 @@ class SscDataService extends BaseService {
      */
     public static function updateDsYL($lottery_type = DEFAULT_LOTTERY_TYPE){
         $rst = [];
-        $SDNumsArr = StaticService::$typeArr;
-        unset($SDNumsArr[0],$SDNumsArr[1],$SDNumsArr[8],$SDNumsArr[9],$SDNumsArr[10],$SDNumsArr[11]);
-        # 大数组：包括二定、三定、四定
-        $updateDsDatas = [
-            # 二定单双
-            'dwds2' => [
-                'zuHes' => [ [1,2], [1,3], [1,4], [2,3], [2,4], [3,4] ],
-                'numsArr' => [11,12,21,22],  // [8,9,10,11,12,13];  // 值
-            ],
-            # 三定单双
-            'dwds3' => [
-                'zuHes' => [ [1,2,3], [1,2,4], [1,3,4], [2,3,4] ],
-                'numsArr' => [111,112,121,122,211,212,221,222],  // [8,9,10,11,12,13];  // 值
-            ],
-            # 四定单双
-            'dwds4' => [
-                'zuHes' => [ [1,2,3,4] ],
-                'numsArr' => [1111,1112,1121,1122,1211,1212,1221,1222,2111,2112,2121,2122,2211,2212,2221,2222],  // [8,9,10,11,12,13];  // 值
-            ],
-            /*
-            */
-            # 四定组合单双
-            'dwds5' => [
-                'zuHes' => [ [1,2,3,4] ],
-                'numsArr' => $SDNumsArr,
-            ],
-        ];
-        //p($updateDsDatas);
-        //$rst[$interval] = SscDataService::dsYLStatic($interval);
-        foreach ($updateDsDatas as $dsData){
-            foreach ($dsData['zuHes'] as $key => $zuHe) {
-                // 和值为8、9在200期里边遗漏期数
-                //$YL_data = BaseNumService::getDwDsCurrentYL($zuHe, $dsData['numsArr'], 100)['data']; // 当前遗漏
-                foreach ($dsData['numsArr'] as $k=>$num){
-                    //if(is_array($num) && in_array($k, [0,1,8,9,10,11])) continue;
-                    $position = implode(',',$zuHe);
-                    if(is_array($num)){
-                        $zhi = implode(',',$num);
-                        $where = ['positions'=>$position, 'zhi'=>$zhi, 'lottery_type'=>$lottery_type];
-                        $SscDsYl = SscDsYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
-                        $type = 4;
-                        //if(!$SscDsYl)p([$zhi, $position, $SscDsYl]);
-                    }else{
-                        $zhi = $num;
-                        $where = ['AND', ['=', 'positions', $position], ['=','zhi', $num], ['=', 'lottery_type', $lottery_type], ['=', 'LENGTH(zhi)', strlen($num)]];
-                        $SscDsYl = SscDsYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
-                        $type = 3;
-                    }
-                    if(empty($SscDsYl)){
-                        $SscDsYl = new SscDsYl();
-                        $SscDsYl->lottery_type = $lottery_type;
-                        $SscDsYl->zhi = (string)$zhi;
-                        $SscDsYl->positions = $position;
-                        $SscDsYl->type = $type;
+
+        $start_time = microtime(true);
+        try {
+            $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, '', $field='updateDsYL_status');
+            $SDNumsArr = StaticService::$typeArr;
+            unset($SDNumsArr[0],$SDNumsArr[1],$SDNumsArr[8],$SDNumsArr[9],$SDNumsArr[10],$SDNumsArr[11]);
+            # 大数组：包括二定、三定、四定
+            $updateDsDatas = [
+                # 二定单双
+                'dwds2' => [
+                    'zuHes' => [ [1,2], [1,3], [1,4], [2,3], [2,4], [3,4] ],
+                    'numsArr' => [11,12,21,22],  // [8,9,10,11,12,13];  // 值
+                ],
+                # 三定单双
+                'dwds3' => [
+                    'zuHes' => [ [1,2,3], [1,2,4], [1,3,4], [2,3,4] ],
+                    'numsArr' => [111,112,121,122,211,212,221,222],  // [8,9,10,11,12,13];  // 值
+                ],
+                # 四定单双
+                'dwds4' => [
+                    'zuHes' => [ [1,2,3,4] ],
+                    'numsArr' => [1111,1112,1121,1122,1211,1212,1221,1222,2111,2112,2121,2122,2211,2212,2221,2222],  // [8,9,10,11,12,13];  // 值
+                ],
+                /*
+                */
+                # 四定组合单双
+                'dwds5' => [
+                    'zuHes' => [ [1,2,3,4] ],
+                    'numsArr' => $SDNumsArr,
+                ],
+            ];
+            //p($updateDsDatas);
+            //$rst[$interval] = SscDataService::dsYLStatic($interval);
+            foreach ($updateDsDatas as $dsData){
+                foreach ($dsData['zuHes'] as $key => $zuHe) {
+                    // 和值为8、9在200期里边遗漏期数
+                    //$YL_data = BaseNumService::getDwDsCurrentYL($zuHe, $dsData['numsArr'], 100)['data']; // 当前遗漏
+                    foreach ($dsData['numsArr'] as $k=>$num){
+                        //if(is_array($num) && in_array($k, [0,1,8,9,10,11])) continue;
+                        $position = implode(',',$zuHe);
+                        if(is_array($num)){
+                            $zhi = implode(',',$num);
+                            $where = ['positions'=>$position, 'zhi'=>$zhi, 'lottery_type'=>$lottery_type];
+                            $SscDsYl = SscDsYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+                            $type = 4;
+                            //if(!$SscDsYl)p([$zhi, $position, $SscDsYl]);
+                        }else{
+                            $zhi = $num;
+                            $where = ['AND', ['=', 'positions', $position], ['=','zhi', $num], ['=', 'lottery_type', $lottery_type], ['=', 'LENGTH(zhi)', strlen($num)]];
+                            $SscDsYl = SscDsYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+                            $type = 3;
+                        }
+                        if(empty($SscDsYl)){
+                            $SscDsYl = new SscDsYl();
+                            $SscDsYl->lottery_type = $lottery_type;
+                            $SscDsYl->zhi = (string)$zhi;
+                            $SscDsYl->positions = $position;
+                            $SscDsYl->type = $type;
+                        }
+
+                        $SscDsYl->updated_at = time();
+                        $miss = SscDataService::getDsHistoryMiss($num, $position, $lottery_type, $SscDsYl->static_nums); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+                        //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
+                        $SscDsYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+                        $SscDsYl->current_miss = $miss['current_times'] < 0 ? 0 : (string)$miss['current_times'];  // 1、当前遗漏次数
+                        $SscDsYl->last_time_miss = (string)$miss['last_times']; // 2、上次遗漏
+                        $SscDsYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
+                        $SscDsYl->max_miss = (string)$miss['max_miss'];      // 4、近200期内最大遗漏
+                        $SscDsYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
+                        $SscDsYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
+                        //p($updateData);
+                        //if($YL_data[$num] > $SscDsYl->max_miss && $YL_data[$num] > $SscDsYl->history_max_miss){
+                        //}
+                        $SscDsYl->history_max_miss = (string)max($miss['current_times'],$SscDsYl->max_miss,$SscDsYl->history_max_miss); // 6、历史最大遗漏
+                        $SscDsYl->update_time = date('Y-m-d H:i:s');
+                        //p($SscDsYl->attributes);
+                        $rst = $SscDsYl->save();
+                        if(!$rst){
+                            $logArr = ['attributes'=>$SscDsYl->attributes, 'msg'=>$SscDsYl->getErrors()];
+                            Tool_Common::log('static_SscDwsDsNums','INFO','统计号码出现次数', $logArr);
+                        }
                     }
 
-                    $SscDsYl->updated_at = time();
-                    $miss = SscDataService::getDsHistoryMiss($num, $position, $lottery_type, $SscDsYl->static_nums); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
-                    //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
-                    $SscDsYl->lottery_type = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
-                    $SscDsYl->current_miss = $miss['current_times'] < 0 ? 0 : (string)$miss['current_times'];  // 1、当前遗漏次数
-                    $SscDsYl->last_time_miss = (string)$miss['last_times']; // 2、上次遗漏
-                    $SscDsYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
-                    $SscDsYl->max_miss = (string)$miss['max_miss'];      // 4、近200期内最大遗漏
-                    $SscDsYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
-                    $SscDsYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
-                    //p($updateData);
-                    //if($YL_data[$num] > $SscDsYl->max_miss && $YL_data[$num] > $SscDsYl->history_max_miss){
-                    //}
-                    $SscDsYl->history_max_miss = (string)max($miss['current_times'],$SscDsYl->max_miss,$SscDsYl->history_max_miss); // 6、历史最大遗漏
-                    $SscDsYl->update_time = date('Y-m-d H:i:s');
-                    //p($SscDsYl->attributes);
-                    $rst = $SscDsYl->save();
-                    if(!$rst){
-                        $logArr = ['attributes'=>$SscDsYl->attributes, 'msg'=>$SscDsYl->getErrors()];
-                        Tool_Common::log('static_SscDwsDsNums','INFO','统计号码出现次数', $logArr);
-                    }
                 }
-
             }
+            $dealStatus = 2;
+        }catch (\Exception $e){
+            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
         }
+
+        $end_time = microtime(true);
+        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s']);
 
         return $rst;
     }
@@ -1011,36 +1033,47 @@ class SscDataService extends BaseService {
         $rst = [];
         $threeNums = BaseNumService::getAll3Num();
 
-        $zhis = $threeNums;
-        // 和值为8、9在200期里边遗漏期数
-        //$YL_data = BaseNumService::get3NCurrentYL($zhis)['data']; // 当前遗漏
-        //p($YL_data);
-        foreach ($zhis as $num){
-            //p(['zhi'=>$num]);
-            if(!$Ssc3numYl = Ssc3numYl::findOne(['zhi'=>$num, 'lottery_type'=>$lottery_type])){
-                $Ssc3numYl = new Ssc3numYl();
-            }
+        $start_time = microtime(true);
+        try {
+            $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, '', $field='update3NumYL_status');
 
-            $Ssc3numYl->zhi = $num;
-            $Ssc3numYl->lottery_type = $lottery_type;
-            $miss = SscDataService::get3NumHistoryMiss($num, $lottery_type); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
-            //$Ssc3numYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
-            $Ssc3numYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
-            $Ssc3numYl->last_time_miss = $miss['last_times']; // 2、上次遗漏
-            $Ssc3numYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
-            $Ssc3numYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
-            $Ssc3numYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
-            //$Ssc3numYl->yl_records = $YL_data[$num].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
-            $Ssc3numYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
-            $Ssc3numYl->history_max_miss = max($miss['current_times'],$Ssc3numYl->max_miss,$Ssc3numYl->history_max_miss); // 6、历史最大遗漏
-            //$Ssc3numYl->update_time = date('Y-m-d H:i:s');
-            //p($Ssc3numYl->attributes);
-            $rst = $Ssc3numYl->save();
-            if(!$rst){
-                $logArr = ['attributes'=>$Ssc3numYl->attributes, 'msg'=>$Ssc3numYl->getErrors()];
-                Tool_Common::log('/WORK/LOG/lottery_xl/static_Ssc3Nums','INFO','统计号码出现次数', $logArr);
+            $zhis = $threeNums;
+            // 和值为8、9在200期里边遗漏期数
+            //$YL_data = BaseNumService::get3NCurrentYL($zhis)['data']; // 当前遗漏
+            //p($YL_data);
+            foreach ($zhis as $num){
+                //p(['zhi'=>$num]);
+                if(!$Ssc3numYl = Ssc3numYl::findOne(['zhi'=>$num, 'lottery_type'=>$lottery_type])){
+                    $Ssc3numYl = new Ssc3numYl();
+                }
+
+                $Ssc3numYl->zhi = $num;
+                $Ssc3numYl->lottery_type = $lottery_type;
+                $miss = SscDataService::get3NumHistoryMiss($num, $lottery_type); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+                //$Ssc3numYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
+                $Ssc3numYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
+                $Ssc3numYl->last_time_miss = $miss['last_times']; // 2、上次遗漏
+                $Ssc3numYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
+                $Ssc3numYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
+                $Ssc3numYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
+                //$Ssc3numYl->yl_records = $YL_data[$num].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
+                $Ssc3numYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
+                $Ssc3numYl->history_max_miss = max($miss['current_times'],$Ssc3numYl->max_miss,$Ssc3numYl->history_max_miss); // 6、历史最大遗漏
+                //$Ssc3numYl->update_time = date('Y-m-d H:i:s');
+                //p($Ssc3numYl->attributes);
+                $rst = $Ssc3numYl->save();
+                if(!$rst){
+                    $logArr = ['attributes'=>$Ssc3numYl->attributes, 'msg'=>$Ssc3numYl->getErrors()];
+                    Tool_Common::log('/WORK/LOG/lottery_xl/static_Ssc3Nums','INFO','统计号码出现次数', $logArr);
+                }
             }
+            $dealStatus = 2;
+        }catch (\Exception $e){
+            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
         }
+
+        $end_time = microtime(true);
+        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s']);
 
 
         return $rst;
@@ -1597,76 +1630,134 @@ class SscDataService extends BaseService {
      * @param string $qihao
      */
     public static function insertSscKjDataDs($qihao = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
-        $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
-        $data = explode(',',$SscKjData['code_str']);
-        $m = \Yii::$app->cache;
-        $mkey = 'InsertSscKjDataDs_'.$lottery_type.'_'.$qihao;
-        //if($r = $m->get($mkey)) return ['status'=>'300', 'msg'=>'已经处理完成...'];
-        //array_pop($data);
-        $tmpData = [];
-        foreach ($data as $key=>$v){
-            $pos = $key + 1;
-            if($v%2 == 0){
-                $tmpData[$pos] = 2; // 双
-            }else{
-                $tmpData[$pos] = 1; // 单
+
+        $start_time = microtime(true);
+        try {
+
+            $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, $qihao, $field='updateDs_status');
+
+            $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
+            $data = explode(',',$SscKjData['code_str']);
+            $m = \Yii::$app->cache;
+            $mkey = 'InsertSscKjDataDs_'.$lottery_type.'_'.$qihao;
+            //if($r = $m->get($mkey)) return ['status'=>'300', 'msg'=>'已经处理完成...'];
+            //array_pop($data);
+            $tmpData = [];
+            foreach ($data as $key=>$v){
+                $pos = $key + 1;
+                if($v%2 == 0){
+                    $tmpData[$pos] = 2; // 双
+                }else{
+                    $tmpData[$pos] = 1; // 单
+                }
             }
-        }
-        $opData = [];
-        $opData['updated_at'] = time();
-        $opData['updated_time'] = date('Y-m-d H:i:s');
-        //p(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
-        $SscKjDataDs = SscKjDataDs::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
-        if(!$SscKjDataDs){
-            $SscKjDataDs = new SscKjDataDs();
-            $opData['created_at'] = time();
-            $opData['index_id'] = $SscKjData->index_id;
+            $opData = [];
+            $opData['updated_at'] = time();
+            $opData['updated_time'] = date('Y-m-d H:i:s');
+            //p(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
+            $SscKjDataDs = SscKjDataDs::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
+            if(!$SscKjDataDs){
+                $SscKjDataDs = new SscKjDataDs();
+                $opData['created_at'] = time();
+                $opData['index_id'] = $SscKjData->index_id;
+            }
+
+            # 1、一定
+            foreach ($tmpData as $key=>$tmp){
+                $field = 'code_'.$key;
+                $opData[$field] = $tmpData[$key];
+            }
+
+            # 2、二定
+            $zuHes = [ [1,2], [1,3], [1,4], [2,3], [2,4], [3,4] ];
+            foreach ($zuHes as $key=>$zuHe){
+                $field = 'code_'.$zuHe[0].'_'.$zuHe[1];
+                $opData[$field] = $tmpData[$zuHe[0]].$tmpData[$zuHe[1]];
+            }
+
+            # 3、三定
+            $zuHes = [ [1,2,3], [1,2,4], [1,3,4], [2,3,4] ];
+            foreach ($zuHes as $key=>$zuHe){
+                $field = 'code_'.$zuHe[0].'_'.$zuHe[1].'_'.$zuHe[2];
+                $opData[$field] = $tmpData[$zuHe[0]].$tmpData[$zuHe[1]].$tmpData[$zuHe[2]];
+            }
+
+            # 4、四定
+            $zuHe = [ 1,2,3,4 ];
+            $field = 'code_'.$zuHe[0].'_'.$zuHe[1].'_'.$zuHe[2].'_'.$zuHe[3];
+            $opData[$field] = $tmpData[$zuHe[0]].$tmpData[$zuHe[1]].$tmpData[$zuHe[2]].$tmpData[$zuHe[3]];
+
+            $opData['qihao'] = (string)$qihao;
+            $opData['code_str'] = $SscKjData['code_str'];
+            $opData['date'] = $SscKjData['date'];
+            $opData['updated_at'] = time();
+            $opData['lottery_type'] = $lottery_type;
+            $opData['update_time'] = date('Y-m-d H:i:s');
+            $SscKjDataDs->setAttributes($opData);
+            $rst =$SscKjDataDs->save();
+            if($rst){
+                $val = SystemConfig::findOne(['key'=>'ssc_kj_time_period'])->value; # 开奖时间间隔:20分钟
+                $m->set($mkey, 1,$val*60);
+            }
+            //p([$rst, $tmpData,$SscKjDataDs->attributes,$SscKjDataDs->getErrors()]);
+            if(!$rst){
+                $logArr = ['attributes'=>$SscKjDataDs->attributes, 'msg'=>$SscKjDataDs->getErrors()];
+                Tool_Common::log('insertSscKjDataDsError','INFO','每期开奖单双记录-插入失败', $logArr);
+            }
+            $dealStatus = 2;
+        }catch (\Exception $e){
+            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
         }
 
-        # 1、一定
-        foreach ($tmpData as $key=>$tmp){
-            $field = 'code_'.$key;
-            $opData[$field] = $tmpData[$key];
-        }
-
-        # 2、二定
-        $zuHes = [ [1,2], [1,3], [1,4], [2,3], [2,4], [3,4] ];
-        foreach ($zuHes as $key=>$zuHe){
-            $field = 'code_'.$zuHe[0].'_'.$zuHe[1];
-            $opData[$field] = $tmpData[$zuHe[0]].$tmpData[$zuHe[1]];
-        }
-
-        # 3、三定
-        $zuHes = [ [1,2,3], [1,2,4], [1,3,4], [2,3,4] ];
-        foreach ($zuHes as $key=>$zuHe){
-            $field = 'code_'.$zuHe[0].'_'.$zuHe[1].'_'.$zuHe[2];
-            $opData[$field] = $tmpData[$zuHe[0]].$tmpData[$zuHe[1]].$tmpData[$zuHe[2]];
-        }
-
-        # 4、四定
-        $zuHe = [ 1,2,3,4 ];
-        $field = 'code_'.$zuHe[0].'_'.$zuHe[1].'_'.$zuHe[2].'_'.$zuHe[3];
-        $opData[$field] = $tmpData[$zuHe[0]].$tmpData[$zuHe[1]].$tmpData[$zuHe[2]].$tmpData[$zuHe[3]];
-
-        $opData['qihao'] = (string)$qihao;
-        $opData['code_str'] = $SscKjData['code_str'];
-        $opData['date'] = $SscKjData['date'];
-        $opData['updated_at'] = time();
-        $opData['lottery_type'] = $lottery_type;
-        $opData['update_time'] = date('Y-m-d H:i:s');
-        $SscKjDataDs->setAttributes($opData);
-        $rst =$SscKjDataDs->save();
-        if($rst){
-            $val = SystemConfig::findOne(['key'=>'ssc_kj_time_period'])->value; # 开奖时间间隔:20分钟
-            $m->set($mkey, 1,$val*60);
-        }
-        //p([$rst, $tmpData,$SscKjDataDs->attributes,$SscKjDataDs->getErrors()]);
-        if(!$rst){
-            $logArr = ['attributes'=>$SscKjDataDs->attributes, 'msg'=>$SscKjDataDs->getErrors()];
-            Tool_Common::log('insertSscKjDataDsError','INFO','每期开奖单双记录-插入失败', $logArr);
-        }
-
+        $end_time = microtime(true);
+        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s']);
         return $rst;
+    }
+
+    /**
+     * @param $lottery_type
+     * @param string $qihao
+     * @param string $field
+     * @return DataDealStatus|null
+     * @throws \Exception
+     */
+    public static function judgeDealTaskStatus($lottery_type, $qihao='', $field='updateDs_status'){
+        if(empty($qihao)){
+            $qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
+        $DataDealStatus = DataDealStatus::findOne(['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
+        if(empty($DataDealStatus)){
+            throw new \Exception('无任务记录'.$lottery_type.'_'.$qihao);
+        }
+        if(!empty($DataDealStatus) && $DataDealStatus->$field == 1){
+            throw new \Exception('已经处理过数据'.self::$dealDataStatusFields[$field]);
+        }
+
+        return $DataDealStatus;
+    }
+
+    /**
+     * @desc 处理数据任务状态
+     * @param $DataDealStatus
+     * @param string $field
+     * @param int $status
+     * @return bool
+     */
+    public static function dealDataRecord($DataDealStatus, $field='status', $status=0, $dealDesc=[]){
+        if(empty($DataDealStatus)){
+            return false;
+        }
+
+        try {
+            $DataDealStatus->$field = $status;
+            $DataDealStatus->update_time = time();
+            $DataDealStatus->{$field.'_desc'} = json_encode($dealDesc, 320);
+            $DataDealStatus->save();
+        }catch (\Exception $e){
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -2337,54 +2428,63 @@ class SscDataService extends BaseService {
      */
     public static function updateSdHzYl($lottery_type = DEFAULT_LOTTERY_TYPE, $type=1){
         $rst = [];
-        # 大数组：包括二定、三定、四定
-        $updateDsDatas = SscSdHzVal::find()->asArray()->All();
-        //$rst[$interval] = SscDataService::dsYLStatic($interval);
-        //if($type==2)p($updateDsDatas);
-        foreach ($updateDsDatas as $Data){
-            //if($Data['id'] != 61) continue;
-            $zuHes = explode(',', $Data['val']);
-            $where = [ 'AND',[ 'IN', 'val', $Data['val']], ['=', 'lottery_type', $lottery_type] ];
 
-            if(!$SscSdHzYl = SscSdHzYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->one()){
-                $SscSdHzYl = new SscSdHzYl();
-                $SscSdHzYl->created_at = time();
-                $SscSdHzYl->val = $Data['val'];
+        $start_time = microtime(true);
+        try {
+            $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, '', $field='updateSdHzYL_status');
+            # 大数组：包括二定、三定、四定
+            $updateDsDatas = SscSdHzVal::find()->asArray()->All();
+            //$rst[$interval] = SscDataService::dsYLStatic($interval);
+            //if($type==2)p($updateDsDatas);
+            foreach ($updateDsDatas as $Data){
+                //if($Data['id'] != 61) continue;
+                $zuHes = explode(',', $Data['val']);
+                $where = [ 'AND',[ 'IN', 'val', $Data['val']], ['=', 'lottery_type', $lottery_type] ];
+
+                if(!$SscSdHzYl = SscSdHzYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->one()){
+                    $SscSdHzYl = new SscSdHzYl();
+                    $SscSdHzYl->created_at = time();
+                    $SscSdHzYl->val = $Data['val'];
+                }
+                //$count = self::getCountByHzs($zuHes);
+                $count = $Data['count'];
+                //if($type == 2)p([$count, $zuHes]);
+                $SscSdHzYl->count = $count; # 组合总共组数
+                $SscSdHzYl->updated_at = time();
+                //$SscDsYl->zhi = (string)$num;
+                $qishu = SscDataService::getQishus($lottery_type);
+                $SscSdHzYl->theory_nums_perdate = (string)round(($count*$qishu*0.1) / 995, 2); # 理论次数/天
+                $SscSdHzYl->today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where(['date'=>date('Y-m-d'),'codes_4nums_hz'=>$zuHes, 'lottery_type'=>$lottery_type])->asArray()->one()['nums'];
+
+                $SscSdHzYl->updated_at = time();
+                $miss = SscDataService::getSdHzYlHistoryMiss($zuHes, $lottery_type, $Data['static_nums']);
+                //if($zuHes == [5,6,7,8,9,10]) p([$zuHes,$miss, $Data['static_nums']]);
+                $SscSdHzYl->static_nums = $Data['static_nums'];
+                $SscSdHzYl->status = $Data['status'];
+                //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
+                $SscSdHzYl->current_miss = (string)$miss['current_times'];  // 1、当前遗漏次数
+                $SscSdHzYl->last_time_miss = (string)$miss['last_times']; // 2、上次遗漏
+                $SscSdHzYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
+                $SscSdHzYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
+                $SscSdHzYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
+                $SscSdHzYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
+                $SscSdHzYl->history_max_miss = (string)max($miss['current_times'],$SscSdHzYl->max_miss,$SscSdHzYl->history_max_miss); // 6、历史最大遗漏
+                //$SscSdHzYl->status = $Data['status']; // 7、前台显示状态
+                $SscSdHzYl->lottery_type = $lottery_type; // 彩种类型
+                $SscSdHzYl->update_time = date('Y-m-d H:i:s');
+                //if($type == 2)p($SscSdHzYl->attributes);
+                $rst = $SscSdHzYl->save();
+                if(!$rst){
+                    $logArr = ['attributes'=>$SscSdHzYl->attributes, 'msg'=>$SscSdHzYl->getErrors()];
+                    Tool_Common::log('updateSdHzYl','INFO','四定和值遗漏统计', $logArr);
+                }
             }
-            //$count = self::getCountByHzs($zuHes);
-            $count = $Data['count'];
-            //if($type == 2)p([$count, $zuHes]);
-            $SscSdHzYl->count = $count; # 组合总共组数
-            $SscSdHzYl->updated_at = time();
-            //$SscDsYl->zhi = (string)$num;
-            $qishu = SscDataService::getQishus($lottery_type);
-            $SscSdHzYl->theory_nums_perdate = (string)round(($count*$qishu*0.1) / 995, 2); # 理论次数/天
-            $SscSdHzYl->today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where(['date'=>date('Y-m-d'),'codes_4nums_hz'=>$zuHes, 'lottery_type'=>$lottery_type])->asArray()->one()['nums'];
-
-            $SscSdHzYl->updated_at = time();
-            $miss = SscDataService::getSdHzYlHistoryMiss($zuHes, $lottery_type, $Data['static_nums']);
-            //if($zuHes == [5,6,7,8,9,10]) p([$zuHes,$miss, $Data['static_nums']]);
-            $SscSdHzYl->static_nums = $Data['static_nums'];
-            $SscSdHzYl->status = $Data['status'];
-            //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
-            $SscSdHzYl->current_miss = (string)$miss['current_times'];  // 1、当前遗漏次数
-            $SscSdHzYl->last_time_miss = (string)$miss['last_times']; // 2、上次遗漏
-            $SscSdHzYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
-            $SscSdHzYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
-            $SscSdHzYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
-            $SscSdHzYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
-            $SscSdHzYl->history_max_miss = (string)max($miss['current_times'],$SscSdHzYl->max_miss,$SscSdHzYl->history_max_miss); // 6、历史最大遗漏
-            //$SscSdHzYl->status = $Data['status']; // 7、前台显示状态
-            $SscSdHzYl->lottery_type = $lottery_type; // 彩种类型
-            $SscSdHzYl->update_time = date('Y-m-d H:i:s');
-            //if($type == 2)p($SscSdHzYl->attributes);
-            $rst = $SscSdHzYl->save();
-            if(!$rst){
-                $logArr = ['attributes'=>$SscSdHzYl->attributes, 'msg'=>$SscSdHzYl->getErrors()];
-                Tool_Common::log('updateSdHzYl','INFO','四定和值遗漏统计', $logArr);
-            }
-
+        }catch (\Exception $e){
+            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
         }
+
+        $end_time = microtime(true);
+        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s']);
 
         return $rst;
     }
@@ -2681,205 +2781,215 @@ class SscDataService extends BaseService {
             return ['status'=>300, 'msg'=>'非开盘时间不统计'];
         }
 
-        # 止盈止损、翻倍止盈止损 计划
-        $where = [
-            'OR',
-            [ 'AND', ['IN', 'plan_type', [1, 3, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type] ],
-            [ 'AND', ['>', 'take_profits', 0], ['>', 'stop_loss', 0], ['=', 'status', 1] ]
-        ];
-        if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-            foreach ($UserSysPlans as $UserSysPlan){
-                $profits = SscDataService::getPlanProfits($UserSysPlan);
+        $start_time = microtime(true);
+        try {
+            $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, '', $field='opProfitsPlans_status');
+            # 止盈止损、翻倍止盈止损 计划
+            $where = [
+                'OR',
+                [ 'AND', ['IN', 'plan_type', [1, 3, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type] ],
+                [ 'AND', ['>', 'take_profits', 0], ['>', 'stop_loss', 0], ['=', 'status', 1] ]
+            ];
+            if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+                foreach ($UserSysPlans as $UserSysPlan){
+                    $profits = SscDataService::getPlanProfits($UserSysPlan);
 
-                $maxQihao = BetService::$maxQihaoArr[$lottery_type];
-                $qihao = substr(HN0898Service::getCurrentQihao($lottery_type),-3); # 最后三位
-                if(in_array($lottery_type, [8]) && $maxQihao == $qihao){
-                    $profits = 0.00; # 每天的盈利重新计算
-                }
-
-                //if(($UserSysPlan->take_profits!=0 && $UserSysPlan->stop_loss!=0) AND ($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits))){
-                if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
-                    $UserSysPlan->status = 0;
-                }
-                $UserSysPlan->current_profits = $profits;
-                $saveFlag = $UserSysPlan->save();
-
-                $logArr['plan_1_3_5'][$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
-            }
-        }
-
-        $flags = []; # 计划是否中奖标识
-        # 不中倍投：翻倍计划、翻倍止盈止损，倍投 连续x期不中 决定倍数
-        //$fb_plan_types = [2, 3, 4, 5, 9, 10];
-        $fb_plan_types = SscDataService::$fb_plan_types;
-        $where = ['AND', ['IN', 'plan_type', $fb_plan_types], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
-        if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-            foreach ($UserSysPlans as $UserSysPlan){
-                $flag = SscDataService::isZjBefore($UserSysPlan->id);
-                $flags[$UserSysPlan->uid][$UserSysPlan->id] = $flag;
-
-                # 遗漏期数[不中奖期数]
-                $lossQs = self::getLossQs($UserSysPlan->id);
-
-                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['flag'] = $flag; # 中奖标识
-                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
-
-                # 倍数处理，中的计划回第一个倍数
-                $singles = explode('-', trim($UserSysPlan->singles));
-                if(empty($singles)) $singles = [$UserSysPlan->single];
-                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
-
-                $is_init = 1; # 是否初始真实投注
-                $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
-                if($flag == 1){ # 中奖
-                    $next_single_key = 0;
-                    $single = $singles[$next_single_key];
-                    if(in_array($UserSysPlan->plan_type, [9])){ # plan_type:遗漏倍投
-                        $current_miss = 0;
-                        $is_init = 1;
-                    }elseif(in_array($UserSysPlan->plan_type, [10])) { # plan_type:中则倍投，不中则回第一个倍数
-                        $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                    $maxQihao = BetService::$maxQihaoArr[$lottery_type];
+                    $qihao = substr(HN0898Service::getCurrentQihao($lottery_type),-3); # 最后三位
+                    if(in_array($lottery_type, [8]) && $maxQihao == $qihao){
+                        $profits = 0.00; # 每天的盈利重新计算
                     }
-                }else{ # 不中奖
-                    if(in_array($UserSysPlan->plan_type, [9])) { # 遗漏倍投
-                        $current_miss = $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
-                        if ($current_miss <= $codes_hz['bet_while_miss']) {
-                            $is_init = 2; # 不中未达到遗漏期数状态
-                            $next_single_key = 0;
-                            $single = $singles[$next_single_key];
-                        } elseif ($current_miss > $codes_hz['bet_while_miss']) {
-                            $is_init = 3; # 开始投注
-                            $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
-                            if ($codes_hz['is_init'] == 2) {
-                                $next_single_key = 1;
-                                $single = $singles[$next_single_key];
-                            }
-                        }
-                    }elseif(in_array($UserSysPlan->plan_type, [10])){ # plan_type:中则倍投，不中则回第一个倍数
+
+                    //if(($UserSysPlan->take_profits!=0 && $UserSysPlan->stop_loss!=0) AND ($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits))){
+                    if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
+                        $UserSysPlan->status = 0;
+                    }
+                    $UserSysPlan->current_profits = $profits;
+                    $saveFlag = $UserSysPlan->save();
+
+                    $logArr['plan_1_3_5'][$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
+                }
+            }
+
+            $flags = []; # 计划是否中奖标识
+            # 不中倍投：翻倍计划、翻倍止盈止损，倍投 连续x期不中 决定倍数
+            //$fb_plan_types = [2, 3, 4, 5, 9, 10];
+            $fb_plan_types = SscDataService::$fb_plan_types;
+            $where = ['AND', ['IN', 'plan_type', $fb_plan_types], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+                foreach ($UserSysPlans as $UserSysPlan){
+                    $flag = SscDataService::isZjBefore($UserSysPlan->id);
+                    $flags[$UserSysPlan->uid][$UserSysPlan->id] = $flag;
+
+                    # 遗漏期数[不中奖期数]
+                    $lossQs = self::getLossQs($UserSysPlan->id);
+
+                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['flag'] = $flag; # 中奖标识
+                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
+
+                    # 倍数处理，中的计划回第一个倍数
+                    $singles = explode('-', trim($UserSysPlan->singles));
+                    if(empty($singles)) $singles = [$UserSysPlan->single];
+                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
+
+                    $is_init = 1; # 是否初始真实投注
+                    $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
+                    if($flag == 1){ # 中奖
                         $next_single_key = 0;
                         $single = $singles[$next_single_key];
-                    }else{
-                        $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
-                    }
-                }
-                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['single'] = $single; # 最新更新倍数
-                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['before_singles_key'] = $codes_hz['singles_key']; # 更新前倍数key
-                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新即将下注的倍数key, singles的 key
-                if(in_array($UserSysPlan->plan_type, [9])){ # plan_type:遗漏倍投
-                    $codes_hz['current_miss'] = $current_miss;
-                    $codes_hz['is_init'] = $is_init; # 开奖之后初始标识改成 0
-                }
-                $codes_hz['singles_key'] = $next_single_key;
-                $whereUpdate = ['id'=>$UserSysPlan->id ]; # 更新条件
-                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['whereUpdate'] = $whereUpdate;
-
-                $updateData = ['single'=>$single];
-                if(isset($codes_hz['status_val'])){ # 号码切换&倍投
-                    # 号码切换
-                    if($flag == 1) { # 中奖
-                        $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 1 : 2;
-                    }else{
-                        $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 2 : 1;
-                    }
-                }
-                $updateData['hz_Arr'] = json_encode($codes_hz, 320);
-                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['updateData'] = $codes_hz;
-
-                $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
-                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['rst'] = $rst;
-            }
-        }
-
-        # plan_type: 6:中则投，不中则不投、 8:遗漏投
-        $where = ['AND', ['IN', 'plan_type', [6, 8]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
-        if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-            foreach ($UserSysPlans as $UserSysPlan){
-                //$current_miss = ($codes_hz['is_init'] == 1) ? 0 : $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
-                $flag = SscDataService::isZjBefore($UserSysPlan->id);
-                $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
-                $befor_codes_hz = $codes_hz;
-                if(!is_array($codes_hz)) continue; # 部分投注方式 hz_Arr 不是json 防止错误，
-                if($flag == 1 OR (in_array($UserSysPlan->plan_type, [8]) && $codes_hz['current_miss']>=$codes_hz['bet_while_miss'])){ # plan_type:8、9 遗漏xx期投、遗漏xx期投
-                    $betStatus = 1;
-                }else{
-                    $betStatus = 0;
-                }
-                if(in_array($UserSysPlan->plan_type, [8])){
-                    if(in_array($flag, [1, -1])){
-                        $current_miss = 0;
-                    }else{
-                        $current_miss = $codes_hz['current_miss'] + 1;
-                    }
-                    $codes_hz['current_miss'] = $current_miss;
-                }
-                $single = $UserSysPlan->single;
-                if(in_array($UserSysPlan->plan_type, [6]) && !empty($UserSysPlan->singles)){
-                    $singles = explode('-', trim($UserSysPlan->singles));
-                    # 中则投的倍投
-                    $next_single_key = $codes_hz['singles_key'];
-                    if($betStatus == 1){
-                        if($codes_hz['betStatus'] == 1 OR !isset($codes_hz['betStatus']) OR !isset($codes_hz['singles_key'])){
-                            $next_single_key = 0;
-                        }else{
-                            self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                        if(in_array($UserSysPlan->plan_type, [9])){ # plan_type:遗漏倍投
+                            $current_miss = 0;
+                            $is_init = 1;
+                        }elseif(in_array($UserSysPlan->plan_type, [10])) { # plan_type:中则倍投，不中则回第一个倍数
+                            $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                         }
-                        $single = $singles[$next_single_key];
+                    }else{ # 不中奖
+                        if(in_array($UserSysPlan->plan_type, [9])) { # 遗漏倍投
+                            $current_miss = $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
+                            if ($current_miss <= $codes_hz['bet_while_miss']) {
+                                $is_init = 2; # 不中未达到遗漏期数状态
+                                $next_single_key = 0;
+                                $single = $singles[$next_single_key];
+                            } elseif ($current_miss > $codes_hz['bet_while_miss']) {
+                                $is_init = 3; # 开始投注
+                                $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                                if ($codes_hz['is_init'] == 2) {
+                                    $next_single_key = 1;
+                                    $single = $singles[$next_single_key];
+                                }
+                            }
+                        }elseif(in_array($UserSysPlan->plan_type, [10])){ # plan_type:中则倍投，不中则回第一个倍数
+                            $next_single_key = 0;
+                            $single = $singles[$next_single_key];
+                        }else{
+                            $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                        }
+                    }
+                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['single'] = $single; # 最新更新倍数
+                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['before_singles_key'] = $codes_hz['singles_key']; # 更新前倍数key
+                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新即将下注的倍数key, singles的 key
+                    if(in_array($UserSysPlan->plan_type, [9])){ # plan_type:遗漏倍投
+                        $codes_hz['current_miss'] = $current_miss;
+                        $codes_hz['is_init'] = $is_init; # 开奖之后初始标识改成 0
                     }
                     $codes_hz['singles_key'] = $next_single_key;
+                    $whereUpdate = ['id'=>$UserSysPlan->id ]; # 更新条件
+                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['whereUpdate'] = $whereUpdate;
+
+                    $updateData = ['single'=>$single];
+                    if(isset($codes_hz['status_val'])){ # 号码切换&倍投
+                        # 号码切换
+                        if($flag == 1) { # 中奖
+                            $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 1 : 2;
+                        }else{
+                            $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 2 : 1;
+                        }
+                    }
+                    $updateData['hz_Arr'] = json_encode($codes_hz, 320);
+                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['updateData'] = $codes_hz;
+
+                    $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['rst'] = $rst;
                 }
-                $codes_hz['betStatus'] = $betStatus;
-                $updateData = ['hz_Arr'=>json_encode($codes_hz, 320), 'single'=>$single];
-                Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则投倍投', ['plan_id'=>$UserSysPlan->id, 'before_codes_hz' => $befor_codes_hz, 'code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type]);
-                $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
-                $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
-                $logArr['6_8'][$UserSysPlan->id]['rst'] = $rst;
             }
-        }
 
-        # plan_type:7 中则继续投否则反买
-        $where = ['AND', ['IN', 'plan_type', [7]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
-        if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-            foreach ($UserSysPlans as $UserSysPlan){
-                $flag = SscDataService::isZjBefore($UserSysPlan->id);
-                $buy_type = ($flag == 1) ? $UserSysPlan->buy_type : ($UserSysPlan->buy_type == 1 ? 0 : 1);
-
-                $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
-                $updateData = ['buy_type'=>$buy_type];
-                $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
-                $logArr['plan_7'][$UserSysPlan->id]['updateData'] = $updateData;
-                $logArr['plan_7'][$UserSysPlan->id]['rst'] = $rst;
-            }
-        }
-
-        # 玩法类型，号码导入:tz_type \Yii::$app->params['IMPORT_CODES_TYPES']
-        $where = ['AND', ['IN', 'tz_type', \Yii::$app->params['IMPORT_CODES_TYPES']], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
-        if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-            foreach ($UserSysPlans as $UserSysPlan){
-                $hzArr = json_decode($UserSysPlan->hz_Arr, true);
-                if(isset($hzArr['change_per']) && $hzArr['change_per'] == 1){ # 每期轮换
-                    $imports = ImportPlanCodes::find()->select(['uid', 'plan_id', 'plan_id_sort_key'])->where(['AND', ['=', 'plan_id', $UserSysPlan->id], ['!=', 'codes', '']])->asArray()->all();
-                    $sortKeys = yii\helpers\ArrayHelper::getColumn($imports, 'plan_id_sort_key');
-                    $current_key = array_search($hzArr['turn_key'], $sortKeys);
-                    $next_key = ($current_key+1 > count($sortKeys)) ? 0 : $current_key+1;
-                    $turn_key = \Yii::$app->params['IMPORT_CODES_TURN'] - 1;
-                    $hzArr['turn_key'] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>=$turn_key)) ? 0 : $sortKeys[$next_key];#非轮换0，轮换:turn_key+1
+            # plan_type: 6:中则投，不中则不投、 8:遗漏投
+            $where = ['AND', ['IN', 'plan_type', [6, 8]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+                foreach ($UserSysPlans as $UserSysPlan){
+                    //$current_miss = ($codes_hz['is_init'] == 1) ? 0 : $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
+                    $flag = SscDataService::isZjBefore($UserSysPlan->id);
+                    $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
+                    $befor_codes_hz = $codes_hz;
+                    if(!is_array($codes_hz)) continue; # 部分投注方式 hz_Arr 不是json 防止错误，
+                    if($flag == 1 OR (in_array($UserSysPlan->plan_type, [8]) && $codes_hz['current_miss']>=$codes_hz['bet_while_miss'])){ # plan_type:8、9 遗漏xx期投、遗漏xx期投
+                        $betStatus = 1;
+                    }else{
+                        $betStatus = 0;
+                    }
+                    if(in_array($UserSysPlan->plan_type, [8])){
+                        if(in_array($flag, [1, -1])){
+                            $current_miss = 0;
+                        }else{
+                            $current_miss = $codes_hz['current_miss'] + 1;
+                        }
+                        $codes_hz['current_miss'] = $current_miss;
+                    }
+                    $single = $UserSysPlan->single;
+                    if(in_array($UserSysPlan->plan_type, [6]) && !empty($UserSysPlan->singles)){
+                        $singles = explode('-', trim($UserSysPlan->singles));
+                        # 中则投的倍投
+                        $next_single_key = $codes_hz['singles_key'];
+                        if($betStatus == 1){
+                            if($codes_hz['betStatus'] == 1 OR !isset($codes_hz['betStatus']) OR !isset($codes_hz['singles_key'])){
+                                $next_single_key = 0;
+                            }else{
+                                self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                            }
+                            $single = $singles[$next_single_key];
+                        }
+                        $codes_hz['singles_key'] = $next_single_key;
+                    }
+                    $codes_hz['betStatus'] = $betStatus;
+                    $updateData = ['hz_Arr'=>json_encode($codes_hz, 320), 'single'=>$single];
+                    Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则投倍投', ['plan_id'=>$UserSysPlan->id, 'before_codes_hz' => $befor_codes_hz, 'code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type]);
+                    $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
+                    $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                    $logArr['6_8'][$UserSysPlan->id]['rst'] = $rst;
                 }
-
-                $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
-                $updateData = ['hz_Arr'=>json_encode($hzArr, 320)];
-                $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
-                $logArr['plan_8'][$UserSysPlan->id]['updateData'] = $updateData;
-                $logArr['plan_8'][$UserSysPlan->id]['rst'] = $rst;
             }
+
+            # plan_type:7 中则继续投否则反买
+            $where = ['AND', ['IN', 'plan_type', [7]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+                foreach ($UserSysPlans as $UserSysPlan){
+                    $flag = SscDataService::isZjBefore($UserSysPlan->id);
+                    $buy_type = ($flag == 1) ? $UserSysPlan->buy_type : ($UserSysPlan->buy_type == 1 ? 0 : 1);
+
+                    $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
+                    $updateData = ['buy_type'=>$buy_type];
+                    $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                    $logArr['plan_7'][$UserSysPlan->id]['updateData'] = $updateData;
+                    $logArr['plan_7'][$UserSysPlan->id]['rst'] = $rst;
+                }
+            }
+
+            # 玩法类型，号码导入:tz_type \Yii::$app->params['IMPORT_CODES_TYPES']
+            $where = ['AND', ['IN', 'tz_type', \Yii::$app->params['IMPORT_CODES_TYPES']], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+                foreach ($UserSysPlans as $UserSysPlan){
+                    $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+                    if(isset($hzArr['change_per']) && $hzArr['change_per'] == 1){ # 每期轮换
+                        $imports = ImportPlanCodes::find()->select(['uid', 'plan_id', 'plan_id_sort_key'])->where(['AND', ['=', 'plan_id', $UserSysPlan->id], ['!=', 'codes', '']])->asArray()->all();
+                        $sortKeys = yii\helpers\ArrayHelper::getColumn($imports, 'plan_id_sort_key');
+                        $current_key = array_search($hzArr['turn_key'], $sortKeys);
+                        $next_key = ($current_key+1 > count($sortKeys)) ? 0 : $current_key+1;
+                        $turn_key = \Yii::$app->params['IMPORT_CODES_TURN'] - 1;
+                        $hzArr['turn_key'] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>=$turn_key)) ? 0 : $sortKeys[$next_key];#非轮换0，轮换:turn_key+1
+                    }
+
+                    $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
+                    $updateData = ['hz_Arr'=>json_encode($hzArr, 320)];
+                    $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                    $logArr['plan_8'][$UserSysPlan->id]['updateData'] = $updateData;
+                    $logArr['plan_8'][$UserSysPlan->id]['rst'] = $rst;
+                }
+            }
+
+            SscDataService::opProfitsPlans12_13($lottery_type); # A出x次B出y次投B、A出x次B出y次投B_2 计划处理
+
+            SscDataService::opProfitsPlans14($lottery_type); # 区间遗漏投 止盈止损 计划处理
+
+            $logArr['lottery_type'] = $lottery_type;
+            $logArr['qihao'] = HN0898Service::getQihao($lottery_type);
+            Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', [$logArr]);
+            $dealStatus = 2;
+        }catch (\Exception $e){
+            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
         }
 
-        SscDataService::opProfitsPlans12_13($lottery_type); # A出x次B出y次投B、A出x次B出y次投B_2 计划处理
-
-        SscDataService::opProfitsPlans14($lottery_type); # 区间遗漏投 止盈止损 计划处理
-
-        $logArr['lottery_type'] = $lottery_type;
-        $logArr['qihao'] = HN0898Service::getQihao($lottery_type);
-        Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', [$logArr]);
+        $end_time = microtime(true);
+        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s']);
 
         return $logArr;
     }
