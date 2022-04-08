@@ -384,10 +384,6 @@ class NineNineNewService extends BaseTZService {
             //p($xCsrf);
             $url = $urlArr['baseUrl'].'/cloud-lottery-service-server/gameInfo/userlottery/add';
             $headers = [
-                #":authority: ".$urlArr['domain'],
-                #":method: POST",
-                #":path: /cloud-lottery-service-server/gameInfo/userlottery/add",
-                #":scheme: https",
                 "accept: application/json, text/plain, */*",
                 'Accept-Conn: {"downlink":10,"effectiveType":"4g","onchange":null,"rtt":150,"saveData":false,"loadedTime":612,"restime":"cloud-lottery-service-server//lastTen/sfytfssc:194"}',
                 "accept-encoding: gzip, deflate, br",

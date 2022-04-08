@@ -25,7 +25,10 @@ class BetErrorPlansTaskService extends BaseService {
             return ['status'=>300, 'msg'=>'记录已存在:'.$uid.'_'.$lottery_type.'_'.$qihao.'_'.$plan_id.'_'.$bet_sort_key];
         }
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
-        $BetErrorPlansTask = new BetErrorPlansTask();
+        $where = ['plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'bet_sort_key'=>$bet_sort_key];
+        if(!$BetErrorPlansTask = BetErrorPlansTask::findOne($where)){
+            $BetErrorPlansTask = new BetErrorPlansTask();
+        }
         $isUnusual = BetErrorPlansTaskService::getStatusIsUnusual($playway, $single);
         $setDatas = [
             'uid' => $uid,

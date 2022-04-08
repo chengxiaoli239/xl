@@ -48,7 +48,7 @@ class UserSysPlans extends UserSysPlansModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'=> ['defaultOrder' => ['playway'=>SORT_ASC]]
+            'sort'=> ['defaultOrder' => ['id'=>SORT_DESC]]
         ]);
 
         $this->load($params);

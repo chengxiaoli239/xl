@@ -1832,7 +1832,7 @@ abstract class BetService extends BaseBetService {
             'is_simulate' => $is_test ? 1 : 0,  // 是否模拟投注
             'is_batch_simulate' => ($is_test==2) ? 1 : 0,  // 是否批量模拟
             'single' => $UserSysPlans->single,  // 投注倍数
-            'betting_money'=> $totalmoney,  // 投注金额
+            'betting_money'=> round($totalmoney,2),  // 投注金额
         ];
         //p($insertData,0);
         $insertRst = BetService::_logRecords($insertData);
