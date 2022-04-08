@@ -22,6 +22,7 @@ class NaSiDaKe extends BaseKj{
 
     public static function getLotteryNo($returnType = 'json', $is_auto=1, $lottery_type=19){
 
+        $type_name = self::$lottery_types[$lottery_type];
         if($is_auto==2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/indexes/ytf3m');
 
@@ -35,7 +36,6 @@ class NaSiDaKe extends BaseKj{
                 $page = $m_page ? (int) $m_page : 10;
                 $limit = 50;
             }
-            $type_name = self::$lottery_types[$lottery_type];
             # 当前开奖号码 链接
             $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/queryHistorys?lotName='.$type_name.'&limit='.$limit.'&page='.$page.'&sidx=open_time&order=desc';
 
