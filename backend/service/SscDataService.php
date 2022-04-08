@@ -1757,6 +1757,7 @@ class SscDataService extends BaseService {
             $DataDealStatus->{$field.'_desc'} = json_encode($dealDesc, 320);
             $DataDealStatus->save();
         }catch (\Exception $e){
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '处理数据任务状态', ['err_msg'=>$e->getMessage()]);
             return false;
         }
 
