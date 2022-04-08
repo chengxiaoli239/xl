@@ -1448,6 +1448,13 @@ class HN0898Service extends BaseTZService {
                 break;
         }
 
+        if(in_array($lottery_type, [23, 24])){
+            # 取表最后一条记录的期号
+            $SscKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one();
+            $endQihao = $SscKjData->qihao;
+            $qihao = max($endQihao, $qihao);
+        }
+
         return $qihao;
     }
 
