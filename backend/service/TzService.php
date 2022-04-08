@@ -211,7 +211,7 @@ class TzService extends BaseService {
 
             $DataDealStatus = DataDealStatus::findOne($where);
             if(!empty($DataDealStatus)){
-                throw new \Exception('数据处理任务记录已存在'.$lottery_type.'_'.$lottery_type);
+                throw new \Exception('数据处理任务记录已存在'.$lottery_type.'_'.$qihao);
             }
 
             $now_time = time();
