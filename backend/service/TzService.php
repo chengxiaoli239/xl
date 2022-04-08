@@ -218,6 +218,7 @@ class TzService extends BaseService {
             $setDatas = [
                 'status' => 0, # 所有数据处理状态
                 'qihao' => $qihao, # 期号
+                'lottery_type' => $lottery_type,
                 'static4dPerDateProfits_status' => 0, # A每天四定利润统计状态
                 'updateDs_status' => 0, # B单双处理状态
                 'updateDsYL_status' => 0, # C单双遗漏处理状态
