@@ -609,6 +609,7 @@ class SscDataService extends BaseService {
             $dealStatus = 2;
         }catch (\Exception $e){
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常1', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
         $end_time = microtime(true);
@@ -1070,6 +1071,7 @@ class SscDataService extends BaseService {
             $dealStatus = 2;
         }catch (\Exception $e){
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常2', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
         $end_time = microtime(true);
@@ -1707,6 +1709,7 @@ class SscDataService extends BaseService {
             $dealStatus = 2;
         }catch (\Exception $e){
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常3', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
         $end_time = microtime(true);
@@ -2481,6 +2484,7 @@ class SscDataService extends BaseService {
             }
         }catch (\Exception $e){
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常4', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
         $end_time = microtime(true);
@@ -2986,6 +2990,7 @@ class SscDataService extends BaseService {
             $dealStatus = 2;
         }catch (\Exception $e){
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常5', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
         $end_time = microtime(true);
