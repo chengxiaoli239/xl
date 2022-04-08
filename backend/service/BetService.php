@@ -1913,9 +1913,9 @@ abstract class BetService extends BaseBetService {
                         Tool_Common::log('insert_plan_task', 'ERR', '写入计划任务表', $logArr);
                         throw new Exception('已记录推送表'.$lottery_type.'_'.$qihao);
                     }
-                    $next_qihao_is_active = TzService::beforeBet($lottery_type);
+                    $next_qihao_is_active = TzService::beforeBet($lottery_type, $current_active_qihao);
                     if($next_qihao_is_active['status'] != 200){
-                        Tool_Common::log('next_qihao_is_active', 'INFO', '期号激活', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id, 'next_qihao_is_active'=>$next_qihao_is_active, 'msg'=>'期号未被激活'.$lottery_type.'_'.$qihao]);
+                        Tool_Common::log('next_qihao_is_active', 'INFO', '期号激活', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id, 'next_qihao_is_active'=>$next_qihao_is_active, 'msg'=>'期号未被激活'.$lottery_type.'_'.$qihao, 'current_active_qihao'=>$current_active_qihao]);
                         throw new \yii\base\Exception('期号未被激活'.$lottery_type.'_'.$qihao);
                     }
 
@@ -1938,6 +1938,10 @@ abstract class BetService extends BaseBetService {
                         if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
                             Tool_Common::log('accountIsExpire', 'ERR', '封盘或者未开盘-2', ['uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'activeQihao'=>$activeQihao]);
                             throw new \yii\base\Exception('封盘或者未开盘-2');
+                        }
+
+                        if($current_active_qihao != $activeQihao){
+                            throw new \yii\base\Exception('当前期号下注计划未处理完成_'.$lottery_type.'_'.$plan->id.'_'.$current_active_qihao.'_'.$activeQihao);
                         }
 
                         $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
