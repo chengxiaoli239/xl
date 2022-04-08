@@ -100,7 +100,7 @@ class NaSiDaKe extends BaseKj{
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('bingdao_kj', 'INFO', '号码抓取-纳斯达克', $logArr);
+        Tool_Common::log('grab_ki_codes', 'INFO', '号码抓取-'.$type_name, array_merge($logArr, ['lottery_type'=>$lottery_type]));
 
         return $rst;
     }
