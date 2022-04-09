@@ -229,7 +229,7 @@ class KjDataGet
      */
     public static function afterKj($lottery_type = DEFAULT_LOTTERY_TYPE){
 
-        TzService::insertDealDataTask($lottery_type);
+        SscDataService::insertDealDataTask($lottery_type); # 数据处理任务写入
 
         $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
         $rst['TzService'] = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、

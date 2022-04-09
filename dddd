@@ -23,3 +23,5 @@ CREATE TABLE `lt_data_deal_status` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='每期数据处理状态表';
 
 svn commit -m '数据处理状态表' backend/models/DataDealStatus.php backend/models/DataDealStatusQuery.php backend/models/searchs/DataDealStatus.php backend/modules/forum/views/data-deal-status backend/modules/forum/controllers/DataDealStatusController.php
+
+svn commit -m '彩种数据统计控制开关' backend/models/LotteryDataDealStatus.php backend/models/LotteryDataDealStatusQuery.php backend/models/searchs/LotteryDataDealStatus.php backend/modules/forum/views/lottery-data-deal-status

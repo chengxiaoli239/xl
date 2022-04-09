@@ -128,4 +128,7 @@ return [
     'bet_now' => '立即下注',
     'Sys Customized Filters' => '系统定制过滤',
     'Create Sys Customized Filters' => '创建过滤',
+
+    'Lottery Data Deal Statuses' => '彩种统计控制开关',
+    'Data Deal Statuses' => '逐期处理日志',
 ];

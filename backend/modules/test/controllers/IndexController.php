@@ -293,7 +293,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $r = TzService::insertDealDataTask($lottery_type=23);p($r);
+        $r = SscDataService::insertLotteryDealDataStatus($lottery_type=17);p($r);
+        $r = SscDataService::insertDealDataTask($lottery_type=23);p($r);
         p(urldecode('%E6%97%85%E6%8A%95%E9%BB%91%E8%99%8E'));
         p(base64_decode('MjEyNV9pbTFidGdhb3pfNHB0dHhhaDF5Z181,MTczNV9pbTEwdzI4MjIyMDIyMDMxMTgzMTk2,'));
         $rst = FootBallService::getSorceFromUnibet(); p($rst);# 群发微信消息

@@ -2,6 +2,9 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\HN0898Service;
+use backend\service\UserSysPlansService;
+use common\service\CommonService;
 use Yii;
 use backend\models\LotteryDataDealStatus;
 use backend\models\searchs\LotteryDataDealStatus as LotteryDataDealStatusSearch;
@@ -36,12 +39,34 @@ class LotteryDataDealStatusController extends BaseController
     public function actionIndex()
     {
         $searchModel = new LotteryDataDealStatusSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
+        $queryParams['LotteryDataDealStatus']['lottery_type'] = $lottery_type;
+
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
+            'lottery_types' => $lottery_types,
+            'lottery_type' => $lottery_type,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    /**
+     * @desc 更新投注状态
+     * @param $id
+     * @return \yii\web\Response
+     */
+    public function actionSwitchStatus($id){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $params = \Yii::$app->request->get();
+
+        HN0898Service::updateStatus($id, '\backend\models\LotteryDataDealStatus', $params['field']);
+
+        return $this->redirect(['index']);
     }
 
     /**

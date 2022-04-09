@@ -12,6 +12,7 @@ use backend\models\AdminLog;
 use backend\models\BettingRecords;
 use backend\models\DataDealStatus;
 use backend\models\ImportPlanCodes;
+use backend\models\LotteryDataDealStatus;
 use backend\models\Num4Type;
 use backend\models\searchs\SscDwsHzNums;
 use backend\models\Ssc3numYl;
@@ -2483,6 +2484,7 @@ class SscDataService extends BaseService {
                     Tool_Common::log('updateSdHzYl','INFO','四定和值遗漏统计', $logArr);
                 }
             }
+            $dealStatus = 2;
         }catch (\Exception $e){
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
             Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常4', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
@@ -4248,5 +4250,97 @@ class SscDataService extends BaseService {
         }
 
         return $str;
+    }
+
+    /**
+     * @desc 记录处理数据任务
+     * @param $lottery_type
+     * @param string $qihao
+     * @return bool
+     */
+    public static function insertDealDataTask($lottery_type, $qihao=''){
+
+        try {
+
+            if(empty($qihao)){
+                $SscKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one();
+                $qihao = $SscKjData->qihao;
+            }
+
+            $where = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao];
+
+            $DataDealStatus = DataDealStatus::findOne($where);
+            if(!empty($DataDealStatus)){
+                throw new \Exception('数据处理任务记录已存在'.$lottery_type.'_'.$qihao);
+            }
+
+            $now_time = time();
+            $setDatas = [
+                'status' => 0, # 所有数据处理状态
+                'qihao' => $qihao, # 期号
+                'lottery_type' => $lottery_type,
+                'static4dPerDateProfits_status' => 0, # A每天四定利润统计状态
+                'updateDs_status' => 0, # B单双处理状态
+                'updateDsYL_status' => 0, # C单双遗漏处理状态
+                'update3NumYL_status' => 0, # D单双遗漏处理状态
+                'updateSdHzYL_status' => 0, # E单双遗漏处理状态
+                'opProfitsPlans_status' => 0, # F投注计划处理状态
+                'created_at' => $now_time,
+                'updated_at' => $now_time,
+            ];
+            $DataDealStatus = new DataDealStatus();
+            $DataDealStatus->setAttributes($setDatas);
+            if(!$DataDealStatus->save()){
+                throw new \Exception(json_encode($DataDealStatus->getErrors(), 320));
+            }
+
+        }catch (\Exception $e){
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理任务写入异常', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'err_msg'=>$e->getMessage()]);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @desc 记录处理数据开关
+     * @param $lottery_type
+     * @param string $qihao
+     * @return bool
+     */
+    public static function insertLotteryDealDataStatus($lottery_type){
+
+        try {
+
+            $DataDealStatus = LotteryDataDealStatus::findOne(['lottery_type'=>$lottery_type]);
+            if(!empty($DataDealStatus)){
+                throw new \Exception('数据处理开关记录已存在'.$lottery_type);
+            }
+
+            $now_time = time();
+            $setDatas = [
+                'status' => 0, # 所有数据处理状态
+                'lottery_type' => $lottery_type,
+                'static4dPerDateProfits_status' => 0, # A每天四定利润统计状态
+                'updateDs_status' => 0, # B单双处理状态
+                'updateDsYL_status' => 0, # C单双遗漏处理状态
+                'update3NumYL_status' => 0, # D单双遗漏处理状态
+                'updateSdHzYL_status' => 0, # E单双遗漏处理状态
+                'opProfitsPlans_status' => 0, # F投注计划处理状态
+                'created_at' => $now_time,
+                'updated_at' => $now_time,
+            ];
+            $LotteryDataDealStatus = new LotteryDataDealStatus();
+            $LotteryDataDealStatus->setAttributes($setDatas);
+            if(!$LotteryDataDealStatus->save()){
+                throw new \Exception(json_encode($LotteryDataDealStatus->getErrors(), 320));
+            }
+
+        }catch (\Exception $e){
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理控制开关写入异常', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+            return false;
+        }
+
+        return true;
     }
 }
