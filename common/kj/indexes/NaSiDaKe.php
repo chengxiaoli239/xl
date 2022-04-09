@@ -59,6 +59,7 @@ class NaSiDaKe extends BaseKj{
                 $data = array_reverse($data);
             }elseif ($lottery_type == 25){
                 $data = $datas['result']['numbers'];
+                Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-'.$type_name, ['lottery_type'=>$lottery_type, 'data'=>$data]);
                 if(!empty($KjConfig) && $KjConfig->is_batch == 1){
                     $all_kjDatas = [];
                     foreach ($rst['data']['list'] as $row){
