@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'value'=>function($model){
                                 $field = 'status';
                                 if($model->$field == 2){
-                                    $txt = "<font color='green'>已完成</font>" ;
+                                    $txt = "<font color='green'>√ 已完成</font>" ;
                                     return Html::a($txt, 'javascript:;', ['title' => '已完成']);
                                 }
 
