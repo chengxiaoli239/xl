@@ -1914,16 +1914,20 @@ abstract class BetService extends BaseBetService {
                         Tool_Common::log('insert_plan_task', 'ERR', '写入计划任务表', $logArr);
                         throw new Exception('已记录推送表'.$lottery_type.'_'.$qihao);
                     }
-                    $next_qihao_is_active = TzService::beforeBet($lottery_type, $current_active_qihao);
-                    $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type, 'next_qihao'=>$qihao])->one();
-                    Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '数据处理状态', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus->attributes]);
-                    if($next_qihao_is_active['status'] != 200){
-                        Tool_Common::log('next_qihao_is_active', 'INFO', '期号激活', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id, 'next_qihao_is_active'=>$next_qihao_is_active, 'msg'=>'期号未被激活'.$lottery_type.'_'.$qihao, 'current_active_qihao'=>$current_active_qihao]);
-                        throw new \yii\base\Exception('期号未被激活'.$lottery_type.'_'.$qihao);
-                    }
+
+                    $next_qihao_is_active = TzService::beforeBet($lottery_type, $c_active_qihao);
+
+                    $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao);
+                    Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['deal_next_qihao'=>$DataDealStatus->next_qihao, 'c_active_qiaho'=>$c_active_qihao, 'next_qihao_is_active'=>$next_qihao_is_active]);
                     if(!empty($DataDealStatus) && $DataDealStatus->opProfitsPlans_status != 2){
                         Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
                     }
+
+                    if($next_qihao_is_active['status'] != 200){
+                        Tool_Common::log('next_qihao_is_active', 'INFO', '期号激活', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id, 'next_qihao_is_active'=>$next_qihao_is_active, 'msg'=>'期号未被激活'.$lottery_type.'_'.$qihao, 'current_active_qihao'=>$c_active_qihao]);
+                        throw new \Exception('期号未被激活'.$lottery_type.'_'.$qihao);
+                    }
+
 
                     # 4、投注号码 codes
                     $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
@@ -1943,11 +1947,11 @@ abstract class BetService extends BaseBetService {
                         $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
                         if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
                             Tool_Common::log('accountIsExpire', 'ERR', '封盘或者未开盘-2', ['uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'activeQihao'=>$activeQihao]);
-                            throw new \yii\base\Exception('封盘或者未开盘-2');
+                            throw new \Exception('封盘或者未开盘-2');
                         }
 
                         if($current_active_qihao != $activeQihao){
-                            throw new \yii\base\Exception('网盘期号未开盘_'.$lottery_type.'_'.$plan->id.'_'.$current_active_qihao.'_'.$activeQihao);
+                            throw new \Exception('网盘期号未开盘_'.$lottery_type.'_'.$plan->id.'_'.$current_active_qihao.'_'.$activeQihao);
                         }
 
                         $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
@@ -1975,6 +1979,27 @@ abstract class BetService extends BaseBetService {
         }
 
         return $rst;
+    }
+
+    /**
+     * @param $lottery_type
+     * @param string $next_qihao
+     * @return array|DataDealStatus|null
+     */
+    public static function getDataDealStatus($lottery_type, $qihao=''){
+
+        $m = \Yii::$app->cache;
+        $mkey = 'getDataDealStatus_'.$lottery_type.'_'.$qihao;
+        $DataDealStatus = $m->get($mkey);
+        if(empty($DataDealStatus)){
+            $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type, 'next_qihao'=>$qihao])->one();
+            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '数据处理状态', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus->attributes]);
+            if(!empty($DataDealStatus)){
+                $m->set($mkey, $DataDealStatus, 5);
+            }
+        }
+
+        return $DataDealStatus;
     }
 
     /**

@@ -1190,6 +1190,12 @@ class HN0898Service extends BaseTZService {
      * @return string
      */
     public static function getQihao($lottery_type = DEFAULT_LOTTERY_TYPE){
+
+        $m = \Yii::$app->cache;
+        $mkey = 'getQihao_'.$lottery_type;
+        $qihao = $m->get($mkey);
+        if(!empty($qihao)) return $qihao;
+
         $db = Yii::$app->db;
         //$date = date('Y-m-d');
         $time = date("H:i:s");
@@ -1325,6 +1331,9 @@ class HN0898Service extends BaseTZService {
             $date = substr($qihao, 0, 4).'-'.substr($qihao, 4, 2).'-'.substr($qihao, 6, 2).' 00:00:00';
             $date = date('Ymd', strtotime($date) + 86400);
             $qihao = $date.'001';
+        }
+        if(!empty($qihao)){
+            $m->set($mkey, $qihao, 2);
         }
 
         return $qihao;
