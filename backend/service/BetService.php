@@ -1915,19 +1915,13 @@ abstract class BetService extends BaseBetService {
                         throw new Exception('已记录推送表'.$lottery_type.'_'.$qihao);
                     }
 
-                    $next_qihao_is_active = TzService::beforeBet($lottery_type, $c_active_qihao);
+                    //$next_qihao_is_active = TzService::beforeBet($lottery_type, $c_active_qihao);
 
                     $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao);
-                    Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['deal_next_qihao'=>$DataDealStatus->next_qihao, 'c_active_qiaho'=>$c_active_qihao, 'next_qihao_is_active'=>$next_qihao_is_active]);
+                    Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus->next_qihao, 'task_qihao'=>$qihao]);
                     if(!empty($DataDealStatus) && $DataDealStatus->opProfitsPlans_status != 2){
                         Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
                     }
-
-                    if($next_qihao_is_active['status'] != 200){
-                        Tool_Common::log('next_qihao_is_active', 'INFO', '期号激活', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id, 'next_qihao_is_active'=>$next_qihao_is_active, 'msg'=>'期号未被激活'.$lottery_type.'_'.$qihao, 'current_active_qihao'=>$c_active_qihao]);
-                        throw new \Exception('期号未被激活'.$lottery_type.'_'.$qihao);
-                    }
-
 
                     # 4、投注号码 codes
                     $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
@@ -1941,6 +1935,7 @@ abstract class BetService extends BaseBetService {
                             $m->set($insert_mkey, 1, 120);
                         }
                     }else{
+                        $task_qihao = $qihao;
                         Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-1', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'uid'=>$uid]);
 
                         $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
@@ -1950,8 +1945,8 @@ abstract class BetService extends BaseBetService {
                             throw new \Exception('封盘或者未开盘-2');
                         }
 
-                        if($current_active_qihao != $activeQihao){
-                            throw new \Exception('网盘期号未开盘_'.$lottery_type.'_'.$plan->id.'_'.$current_active_qihao.'_'.$activeQihao);
+                        if($task_qihao != $activeQihao){
+                            throw new \Exception('网盘期号未开盘_'.$lottery_type.'_'.$plan->id.'_'.$task_qihao.'_'.$activeQihao);
                         }
 
                         $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
