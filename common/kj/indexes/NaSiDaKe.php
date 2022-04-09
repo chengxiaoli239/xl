@@ -31,7 +31,7 @@ class NaSiDaKe extends BaseKj{
             $KjConfig = KjConfig::findOne(['path'=>'/kj/indexes/batch-jsqws', 'lottery_type'=>$lottery_type, 'enable'=>1]);
             if(!empty($KjConfig)){
                 $m = \Yii::$app->cache;
-                $mkey_jsqws = 'jsqws_xxx_5';
+                $mkey_jsqws = 'jsqws_xxx_6';
                 $m_page = $m->get($mkey_jsqws);
                 $page = $m_page ? (int) $m_page : 10;
                 $limit = 50;
@@ -63,7 +63,7 @@ class NaSiDaKe extends BaseKj{
                 if(!empty($KjConfig) && $KjConfig->is_batch == 1){
                     $all_kjDatas = [];
                     foreach ($rst['data']['list'] as $row){
-                        $all_kjDatas[] = ['expect'=>$row['issue'], 'opencode'=>$row['lotteryNum'].',0', 'opentime'=>date('Y-m-d H:i:s', (int)($datas['openTime']/1000))];
+                        $all_kjDatas[] = ['expect'=>$row['issue'], 'opencode'=>$row['lotteryNum'].',0', 'opentime'=>date('Y-m-d H:i:s', (int)($row['openTime']/1000))];
                     }
 
                     $next_page = $page - 1;
