@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
 
                                 if($model->$field == 0){
-                                    $txt = "<font color='gray'>未完成处理</font>";
+                                    $txt = "<font color='gray'>未完成所有</font>";
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成处理']);
                                 }
                                 if($model->$field == 3){
@@ -55,7 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成处理']);
                                 }
                                 if($model->$field == 4){
-                                    $txt = "<font color='red'>开关未开启</font>";
+                                    $txt = "<font color='#cd5c5c'>未开启统计</font>";
                                     return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
                                 }
                             }
@@ -81,7 +81,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
                                 if($model->$field == 4){
-                                    $txt = "<font color='red'>开关未开启</font>";
+                                    $txt = "<font color='#cd5c5c'>未开启统计</font>";
                                     return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
                                 }
                             }
@@ -107,7 +107,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
                                 if($model->$field == 4){
-                                    $txt = "<font color='red'>开关未开启</font>";
+                                    $txt = "<font color='#cd5c5c'>未开启统计</font>";
                                     return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
                                 }
                             }
@@ -133,7 +133,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
                                 if($model->$field == 4){
-                                    $txt = "<font color='red'>开关未开启</font>";
+                                    $txt = "<font color='#cd5c5c'>未开启统计</font>";
                                     return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
                                 }
                             }
@@ -159,7 +159,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
                                 if($model->$field == 4){
-                                    $txt = "<font color='red'>开关未开启</font>";
+                                    $txt = "<font color='#cd5c5c'>未开启统计</font>";
                                     return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
                                 }
                             }
@@ -185,7 +185,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
                                 if($model->$field == 4){
-                                    $txt = "<font color='red'>开关未开启</font>";
+                                    $txt = "<font color='#cd5c5c'>未开启统计</font>";
                                     return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
                                 }
                             }
@@ -211,7 +211,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
                                 if($model->$field == 4){
-                                    $txt = "<font color='red'>开关未开启</font>";
+                                    $txt = "<font color='#cd5c5c'>未开启统计</font>";
                                     return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
                                 }
                             }
