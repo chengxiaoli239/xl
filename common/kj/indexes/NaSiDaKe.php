@@ -63,7 +63,7 @@ class NaSiDaKe extends BaseKj{
                 if(!empty($KjConfig) && $KjConfig->is_batch == 1){
                     $all_kjDatas = [];
                     foreach ($rst['data']['list'] as $row){
-                        $all_kjDatas[] = ['expect'=>$row['issue'], 'opencode'=>$row['lotteryNum'].',0', 'opentime'=>(int)($row['openTime']/1000)];
+                        $all_kjDatas[] = ['expect'=>$row['issue'], 'opencode'=>$row['lotteryNum'].',0', 'opentime'=>date('Y-m-d H:i:s', (int)($datas['openTime']/1000))];
                     }
 
                     $next_page = $page - 1;

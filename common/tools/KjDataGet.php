@@ -248,7 +248,7 @@ class KjDataGet
      * @param $qihao 181120059
      * @param int $lottery_type 彩票类型1:1.5彩2:3分彩3:5分彩4:10分彩
      * @param $kjDatas
-     * @param string $opentime
+     * @param string $opentime 2022-04-03 21:00:00
      * @return array|bool
      */
     public static function insertKjData($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE, $kjData='', $opentime = ''){
@@ -263,7 +263,7 @@ class KjDataGet
         }elseif ($lottery_type == 6){
             $tmpDate = substr($qihao, 0, 8);
         }elseif (in_array($lottery_type, [22, 23, 24, 25])){
-            $tmpDate = date('Y-m-d H:i:s', $opentime);
+            $tmpDate = $opentime;
         }elseif (!empty($opentime)){
             $tmpDate = substr($opentime, 0, 10);
         }else{
