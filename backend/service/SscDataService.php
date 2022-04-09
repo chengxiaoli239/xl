@@ -1753,7 +1753,7 @@ class SscDataService extends BaseService {
 
         try {
             $DataDealStatus->$field = $status;
-            $DataDealStatus->update_time = time();
+            $DataDealStatus->updated_at = time();
             $DataDealStatus->{$field.'_desc'} = json_encode($dealDesc, 320);
             $DataDealStatus->save();
         }catch (\Exception $e){
