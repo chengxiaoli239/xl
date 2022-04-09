@@ -20,6 +20,8 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'qihao')->textInput(['maxlength' => true]) ?>
 
+                    <?= $form->field($model, 'next_qihao')->textInput(['maxlength' => true]) ?>
+
                     <?= $form->field($model, 'status')->textInput() ?>
 
                     <?= $form->field($model, 'status_desc')->textInput(['maxlength' => true]) ?>

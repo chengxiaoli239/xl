@@ -35,7 +35,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         //'id',
                         //'lottery_type',
-                        'qihao',
                         //'status',
                         ['attribute'=>'status','label'=>'全局状态',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
@@ -61,6 +60,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         //'status_desc',
+                        'qihao',
+                        'next_qihao',
                         //'static4dPerDateProfits_status',
                         ['attribute'=>'static4dPerDateProfits_status','label'=>'A每天四定利润统计',//'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',

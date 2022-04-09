@@ -197,43 +197,54 @@ class TzService extends BaseService {
      * @param $qihao
      */
     public static function afterRunSysPlans($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
-        $m = Yii::$app->cache;
-        $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
-        $next_time = \Yii::$app->params['TZ_LOCK_TIME'];
 
-        $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['=', 'is_parent', 1]];
-        $plans = UserSysPlans::find()->where($where)->orderBy(['tz_sort'=>SORT_ASC])->all();
-        foreach ($plans as $plan){
-            # 处理完计划后,下一期投注开关开启(value:1) start
-            $next_mkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $next_qihao, $plan->uid);
-            $rst11[$plan->id]['rst'] = $m->set($next_mkey,1,$next_time); # 真实
-            $rst11[$plan->id]['next_mkey'] = $next_mkey;
-            $rst11[$plan->id]['next_time'] = $next_time;
+        try {
+            $m = Yii::$app->cache;
+            $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
+            $next_time = \Yii::$app->params['TZ_LOCK_TIME'];
+
+            $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['=', 'is_parent', 1]];
+            $plans = UserSysPlans::find()->where($where)->orderBy(['tz_sort'=>SORT_ASC])->all();
+            foreach ($plans as $plan){
+                # 处理完计划后,下一期投注开关开启(value:1) start
+                $next_mkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $next_qihao, $plan->uid);
+                $rst11[$plan->id]['rst'] = $m->set($next_mkey,1,$next_time); # 真实
+                $rst11[$plan->id]['next_mkey'] = $next_mkey;
+                $rst11[$plan->id]['next_time'] = $next_time;
+            }
+            $next_simulate_mkey = TzService::buildNextKey($lottery_type, $next_qihao);
+            $rst10['rst'] = $m->set($next_simulate_mkey,1,$next_time); # 模拟
+            $rst10['next_simulate_mkey'] = $next_simulate_mkey;
+            $rst10['next_time'] = $next_time;
+            # 处理完计划后,下一期投注开关开启(value:1) end
+
+            # 计划任务是否处理完成后锁住(value:1)，避免重复处理 start
+            $pkey = BetService::buildPlanSwitchKey($lottery_type, $qihao);
+            //$simulate_pkey = \Yii::$app->params['PLAN_SWITCH_SIMULATE_KEY'].'_'.$qihao;
+            $time = 1080;
+            if($lottery_type == 5 && substr($qihao,6) == '010'){
+                $time = 60*60*4; # 4小时
+            } elseif($lottery_type == 9){
+                $time = 60*60*7; # 台湾宾果 7小时
+            }
+            $rst21['rst'] = $m->set($pkey,1,$time);
+            $rst21['pkey'] = $pkey;
+            $rst21['time'] = $time;
+            //$rst20 = $m->set($simulate_pkey,1,$time);
+            # 计划任务是否处理完成后锁住(value:1)，避免重复处理 end
+
+            $where_deal = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao];
+            $DataDealStatus = DataDealStatus::findOne($where_deal);
+            if(!empty($DataDealStatus)){
+                $DataDealStatus->next_qihao = $next_qihao;
+                $DataDealStatus->save();
+            }
+
+            $logData = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'rst11'=>$rst11, 'rst10'=>$rst10, 'rst21'=>$rst21];
+            Tool_Common::log('afterRunSysPlans','INFO','系统计划处理后', $logData);
+        }catch (\Exception $e){
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '开关处理异常', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao]);
         }
-
-        $next_simulate_mkey = TzService::buildNextKey($lottery_type, $next_qihao);
-        $rst10['rst'] = $m->set($next_simulate_mkey,1,$next_time); # 模拟
-        $rst10['next_simulate_mkey'] = $next_simulate_mkey;
-        $rst10['next_time'] = $next_time;
-        # 处理完计划后,下一期投注开关开启(value:1) end
-
-        # 计划任务是否处理完成后锁住(value:1)，避免重复处理 start
-        $pkey = BetService::buildPlanSwitchKey($lottery_type, $qihao);
-        //$simulate_pkey = \Yii::$app->params['PLAN_SWITCH_SIMULATE_KEY'].'_'.$qihao;
-        $time = 1080;
-        if($lottery_type == 5 && substr($qihao,6) == '010'){
-            $time = 60*60*4; # 4小时
-        } elseif($lottery_type == 9){
-            $time = 60*60*7; # 台湾宾果 7小时
-        }
-        $rst21['rst'] = $m->set($pkey,1,$time);
-        $rst21['pkey'] = $pkey;
-        $rst21['time'] = $time;
-        //$rst20 = $m->set($simulate_pkey,1,$time);
-        # 计划任务是否处理完成后锁住(value:1)，避免重复处理 end
-
-        $logData = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'rst11'=>$rst11, 'rst10'=>$rst10, 'rst21'=>$rst21];
-        Tool_Common::log('afterRunSysPlans','INFO','系统计划处理后', $logData);
 
         return true;
     }

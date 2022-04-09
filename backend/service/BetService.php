@@ -9,6 +9,7 @@
 namespace backend\service;
 
 use backend\models\BetErrorPlansTask;
+use backend\models\DataDealStatus;
 use backend\models\TzType;
 use backend\service\clients\TzSystemUsersService;
 use backend\service\huiyuan\HuiYuanService5;
@@ -1914,6 +1915,7 @@ abstract class BetService extends BaseBetService {
                         throw new Exception('已记录推送表'.$lottery_type.'_'.$qihao);
                     }
                     $next_qihao_is_active = TzService::beforeBet($lottery_type, $current_active_qihao);
+                    $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type])->asArray()->one();
                     if($next_qihao_is_active['status'] != 200){
                         Tool_Common::log('next_qihao_is_active', 'INFO', '期号激活', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id, 'next_qihao_is_active'=>$next_qihao_is_active, 'msg'=>'期号未被激活'.$lottery_type.'_'.$qihao, 'current_active_qihao'=>$current_active_qihao]);
                         throw new \yii\base\Exception('期号未被激活'.$lottery_type.'_'.$qihao);

@@ -19,7 +19,7 @@ class DataDealStatus extends DataDealStatusModel
     {
         return [
             [['id', 'lottery_type', 'status', 'static4dPerDateProfits_status', 'updateDs_status', 'updateDsYL_status', 'update3NumYL_status', 'updateSdHzYL_status', 'opProfitsPlans_status', 'created_at', 'updated_at'], 'integer'],
-            [['qihao', 'status_desc', 'static4dPerDateProfits_status_desc', 'updateDs_status_desc', 'updateDsYL_status_desc', 'update3NumYL_status_desc', 'updateSdHzYL_status_desc', 'opProfitsPlans_status_desc', 'update_time'], 'safe'],
+            [['qihao', 'next_qihao', 'status_desc', 'static4dPerDateProfits_status_desc', 'updateDs_status_desc', 'updateDsYL_status_desc', 'update3NumYL_status_desc', 'updateSdHzYL_status_desc', 'opProfitsPlans_status_desc', 'update_time'], 'safe'],
         ];
     }
 
@@ -75,6 +75,7 @@ class DataDealStatus extends DataDealStatusModel
         ]);
 
         $query->andFilterWhere(['like', 'qihao', $this->qihao])
+            ->andFilterWhere(['like', 'next_qihao', $this->next_qihao])
             ->andFilterWhere(['like', 'status_desc', $this->status_desc])
             ->andFilterWhere(['like', 'static4dPerDateProfits_status_desc', $this->static4dPerDateProfits_status_desc])
             ->andFilterWhere(['like', 'updateDs_status_desc', $this->updateDs_status_desc])

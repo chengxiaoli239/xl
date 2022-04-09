@@ -21,6 +21,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'qihao') ?>
 
+    <?= $form->field($model, 'next_qihao') ?>
+
     <?= $form->field($model, 'status') ?>
 
     <?= $form->field($model, 'status_desc') ?>

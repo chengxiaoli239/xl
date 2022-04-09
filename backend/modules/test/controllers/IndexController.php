@@ -293,6 +293,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%data_deal_status}}'); p($r);
         p(array_keys(SscDataService::$dealDataStatusFields));
         $r = SscDataService::insertLotteryDealDataStatus($lottery_type=17);p($r);
         $r = SscDataService::insertDealDataTask($lottery_type=23);p($r);
@@ -303,7 +304,7 @@ class IndexController extends Controller
         $UserSysPlan = UserSysPlans::findOne(4659);
         $data = SscDataService::get_area_arise_qishus($UserSysPlan, $recent_qishus=20, $start_qihao='', $area_bet_type=2);p($data);
         $data = NaSiDaKe::getLotteryNo($type='json', $is_auto=2, $lottery_type=25);p($data);
-        $rst = SscDataService::opProfitsPlans12($lottery_type = 8);
+        $rst = SscDataService::opProfitsPlans12_13($lottery_type = 8);
         p($rst);# A出x次B出y次投B 计划处理
         $r = BaseService::login($id = 10);
         p($r);
@@ -312,8 +313,6 @@ class IndexController extends Controller
         $ssl_uids = BaseService::getSslVersion1Uids();
         p($ssl_uids);
         p(urldecode('https://m.kuajing0898.com/wechatlogin?access_token=54_Ta8VVjILPFM8kbloyNv2DQqMIowaly3_8iExGHW_YzMijrtSUFIl8iWzpNpsnE-8ZZzegMXxWmP-ubqH6sRMMg&openid=opAKq1LHH1lqc1eC8zZgh5nOPUZw&r_url=https%3A%2F%2Fmk.kuajing0898.com%2Fecpage%3Fcode%3Dea561700637319f5'));
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%bet_error_plans_task}}');
-        p($r);
 
         $post = \Yii::$app->request->post();
         p($post);

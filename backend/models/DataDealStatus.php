@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property int $lottery_type 彩票类型
  * @property string $qihao 期号
+ * @property string $next_qihao 下期期号
  * @property int $status 状态:0待处理1已处理
  * @property string $status_desc 状态结果描述
  * @property int $static4dPerDateProfits_status A每天四定利润统计:0待处理1已处理
@@ -45,9 +46,9 @@ class DataDealStatus extends \common\models\base\BaseModel
     {
         return [
             [['lottery_type', 'status', 'static4dPerDateProfits_status', 'updateDs_status', 'updateDsYL_status', 'update3NumYL_status', 'updateSdHzYL_status', 'opProfitsPlans_status', 'created_at', 'updated_at'], 'integer'],
-            [['qihao', 'created_at', 'updated_at'], 'required'],
+            [['qihao', 'next_qihao', 'created_at', 'updated_at'], 'required'],
             [['update_time'], 'safe'],
-            [['qihao'], 'string', 'max' => 24],
+            [['qihao', 'next_qihao'], 'string', 'max' => 24],
             [['status_desc', 'static4dPerDateProfits_status_desc', 'updateDs_status_desc', 'updateDsYL_status_desc', 'update3NumYL_status_desc', 'updateSdHzYL_status_desc', 'opProfitsPlans_status_desc'], 'string', 'max' => 240],
         ];
     }
@@ -61,6 +62,7 @@ class DataDealStatus extends \common\models\base\BaseModel
             'id' => Yii::t('app', 'ID'),
             'lottery_type' => Yii::t('app', '彩票类型'),
             'qihao' => Yii::t('app', '期号'),
+            'next_qihao' => Yii::t('app', '下期期号'),
             'status' => Yii::t('app', '状态:0待处理1已处理'),
             'status_desc' => Yii::t('app', '状态结果描述'),
             'static4dPerDateProfits_status' => Yii::t('app', 'A每天四定利润统计:0待处理1已处理'),

@@ -37,6 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'id',
                                     'lottery_type',
                                     'qihao',
+                                    'next_qihao',
                                     'status',
                                     'status_desc',
                                     'static4dPerDateProfits_status',
