@@ -1919,8 +1919,10 @@ abstract class BetService extends BaseBetService {
 
                     $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao);
                     Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus->next_qihao, 'task_qihao'=>$qihao]);
-                    if(!empty($DataDealStatus) && $DataDealStatus->opProfitsPlans_status != 2){
+                    if(empty($DataDealStatus) OR $DataDealStatus->opProfitsPlans_status != 2){
                         Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
+                        #throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
+                        continue;
                     }
 
                     # 4、投注号码 codes
