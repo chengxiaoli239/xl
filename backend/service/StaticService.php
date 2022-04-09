@@ -1218,7 +1218,9 @@ class StaticService extends BaseService {
                     $setData['lottery_type'] = $lottery_type;
                     $Static4dProfits->setAttributes($setData);
 
-                    $rst = $Static4dProfits->save();
+                    if(!$Static4dProfits->save()){
+                        throw new \Exception(json_encode($Static4dProfits->getErrors(), 320));
+                    }
                 }
             }
             $dealStatus = 2;
