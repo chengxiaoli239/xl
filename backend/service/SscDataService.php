@@ -614,7 +614,7 @@ class SscDataService extends BaseService {
         }
 
         $end_time = microtime(true);
-        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s']);
+        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s', 'deal_time'=>date('Y-m-d H:i:s')]);
 
         return $rst;
     }
@@ -1076,7 +1076,7 @@ class SscDataService extends BaseService {
         }
 
         $end_time = microtime(true);
-        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s']);
+        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s', 'deal_time'=>date('Y-m-d H:i:s')]);
 
 
         return $rst;
@@ -1714,7 +1714,7 @@ class SscDataService extends BaseService {
         }
 
         $end_time = microtime(true);
-        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s']);
+        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s', 'deal_time'=>date('Y-m-d H:i:s')]);
         return $rst;
     }
 
@@ -1753,6 +1753,9 @@ class SscDataService extends BaseService {
         }
 
         try {
+            if($DataDealStatus->$field == 1){
+                throw new \Exception('已经处理过数据');
+            }
             $DataDealStatus->$field = $status;
             $DataDealStatus->updated_at = time();
             $DataDealStatus->{$field.'_desc'} = json_encode($dealDesc, 320);
@@ -2491,7 +2494,7 @@ class SscDataService extends BaseService {
         }
 
         $end_time = microtime(true);
-        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s']);
+        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s', 'deal_time'=>date('Y-m-d H:i:s')]);
 
         return $rst;
     }
@@ -2997,7 +3000,7 @@ class SscDataService extends BaseService {
         }
 
         $end_time = microtime(true);
-        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s']);
+        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s', 'deal_time'=>date('Y-m-d H:i:s')]);
 
         return $logArr;
     }

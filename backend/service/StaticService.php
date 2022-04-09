@@ -1228,7 +1228,7 @@ class StaticService extends BaseService {
         }
 
         $end_time = microtime(true);
-        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s']);
+        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s', 'deal_time'=>date('Y-m-d H:i:s')]);
 
         return ['status'=>200, 'data'=>$setData, 'rst'=>$rst];
     }

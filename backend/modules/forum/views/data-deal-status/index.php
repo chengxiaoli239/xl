@@ -62,8 +62,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value'=>function($model){
                                 $field = 'static4dPerDateProfits_status';
+                                $deal_desc = json_decode($model->{$field.'_desc'}, true);
+                                $consume_time = ' [耗时：'.number_format($deal_desc['time_consume'], 2).'s '.substr($deal_desc,2).']';
                                 if($model->$field == 2){
-                                    $txt = "<font color='green'>√</font>" ;
+                                    $txt = "<font color='green'>√</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '已完成']);
                                 }
                                 if($model->$field == 0){
@@ -71,10 +73,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, 'javascript:;', ['title' => '待处理']);
                                 }
                                 if($model->$field == 3){
-                                    $txt = "<font color='red'>X</font>";
+                                    $txt = "<font color='red'>X</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
-                                //return $model->snid;
                             }
                         ],
                         //'static4dPerDateProfits_status_desc',
@@ -83,8 +84,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value'=>function($model){
                                 $field = 'updateDs_status';
+                                $deal_desc = json_decode($model->{$field.'_desc'}, true);
+                                $consume_time = ' [耗时：'.number_format($deal_desc['time_consume'], 2).'s '.substr($deal_desc,2).']';
                                 if($model->$field == 2){
-                                    $txt = "<font color='green'>√</font>" ;
+                                    $txt = "<font color='green'>√</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '已完成']);
                                 }
                                 if($model->$field == 0){
@@ -92,10 +95,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, 'javascript:;', ['title' => '待处理']);
                                 }
                                 if($model->$field == 3){
-                                    $txt = "<font color='red'>X</font>";
+                                    $txt = "<font color='red'>X</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
-                                //return $model->snid;
                             }
                         ],
                         //'updateDs_status_desc',
@@ -104,8 +106,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value'=>function($model){
                                 $field = 'updateDsYL_status';
+                                $deal_desc = json_decode($model->{$field.'_desc'}, true);
+                                $consume_time = ' [耗时：'.number_format($deal_desc['time_consume'], 2).'s '.substr($deal_desc,2).']';
                                 if($model->$field == 2){
-                                    $txt = "<font color='green'>√</font>" ;
+                                    $txt = "<font color='green'>√</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '已完成']);
                                 }
                                 if($model->$field == 0){
@@ -113,7 +117,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, 'javascript:;', ['title' => '待处理']);
                                 }
                                 if($model->$field == 3){
-                                    $txt = "<font color='red'>X</font>";
+                                    $txt = "<font color='red'>X</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
                             }
@@ -124,8 +128,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value'=>function($model){
                                 $field = 'update3NumYL_status';
+                                $deal_desc = json_decode($model->{$field.'_desc'}, true);
+                                $consume_time = ' [耗时：'.number_format($deal_desc['time_consume'], 2).'s '.substr($deal_desc,2).']';
                                 if($model->$field == 2){
-                                    $txt = "<font color='green'>√</font>" ;
+                                    $txt = "<font color='green'>√</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '已完成']);
                                 }
                                 if($model->$field == 0){
@@ -133,7 +139,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, 'javascript:;', ['title' => '待处理']);
                                 }
                                 if($model->$field == 3){
-                                    $txt = "<font color='red'>X</font>";
+                                    $txt = "<font color='red'>X</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
                             }
@@ -144,8 +150,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value'=>function($model){
                                 $field = 'updateSdHzYL_status';
+                                $deal_desc = json_decode($model->{$field.'_desc'}, true);
+                                $consume_time = ' [耗时：'.number_format($deal_desc['time_consume'], 2).'s '.substr($deal_desc,2).']';
                                 if($model->$field == 2){
-                                    $txt = "<font color='green'>√</font>" ;
+                                    $txt = "<font color='green'>√</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '已完成']);
                                 }
                                 if($model->$field == 0){
@@ -153,7 +161,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, 'javascript:;', ['title' => '待处理']);
                                 }
                                 if($model->$field == 3){
-                                    $txt = "<font color='red'>X</font>";
+                                    $txt = "<font color='red'>X</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
                             }
@@ -164,8 +172,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value'=>function($model){
                                 $field = 'opProfitsPlans_status';
+                                $deal_desc = json_decode($model->{$field.'_desc'}, true);
+                                $consume_time = ' [耗时：'.number_format($deal_desc['time_consume'], 2).'s '.substr($deal_desc,2).']';
                                 if($model->$field == 2){
-                                    $txt = "<font color='green'>√</font>" ;
+                                    $txt = "<font color='green'>√</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '已完成']);
                                 }
                                 if($model->$field == 0){
@@ -173,7 +183,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, 'javascript:;', ['title' => '待处理']);
                                 }
                                 if($model->$field == 3){
-                                    $txt = "<font color='red'>X</font>";
+                                    $txt = "<font color='red'>X</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
                             }
