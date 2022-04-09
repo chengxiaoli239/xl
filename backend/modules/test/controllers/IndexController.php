@@ -293,6 +293,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        p(array_keys(SscDataService::$dealDataStatusFields));
         $r = SscDataService::insertLotteryDealDataStatus($lottery_type=17);p($r);
         $r = SscDataService::insertDealDataTask($lottery_type=23);p($r);
         p(urldecode('%E6%97%85%E6%8A%95%E9%BB%91%E8%99%8E'));

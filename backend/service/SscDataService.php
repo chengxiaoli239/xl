@@ -57,6 +57,11 @@ class SscDataService extends BaseService {
         'opProfitsPlans_status' => 'F投注计划处理状态',
     ];
 
+    const DEAL_DATA_STATUS_PENDDING = 0; # 待处理
+    const DEAL_DATA_STATUS_SUCCESS = 2; # 无需处理
+    const DEAL_DATA_STATUS_FAIL = 3; # 处理失败
+    const DEAL_DATA_STATUS_NOT_NEED_DEAL = 4; # 无需处理
+
     /**
      * @desc 定位和值统计
      * @return mixed
@@ -1757,6 +1762,15 @@ class SscDataService extends BaseService {
                 throw new \Exception('已经处理过数据');
             }
             $DataDealStatus->$field = $status;
+            $all_status = 2;
+            $all_keys = array_keys(SscDataService::$dealDataStatusFields);
+            foreach ($all_keys as $key){
+                if($key == 'status') continue;
+                if(!in_array($DataDealStatus->$key, [SscDataService::DEAL_DATA_STATUS_SUCCESS, SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL])){
+                    $all_status = 0;
+                }
+            }
+            $DataDealStatus->status = $all_status; # 所有任务状态
             $DataDealStatus->updated_at = time();
             $DataDealStatus->{$field.'_desc'} = json_encode($dealDesc, 320);
             $DataDealStatus->save();
@@ -4280,15 +4294,21 @@ class SscDataService extends BaseService {
 
             $now_time = time();
             $setDatas = [
-                'status' => 0, # 所有数据处理状态
+                'status' => SscDataService::DEAL_DATA_STATUS_PENDDING, # 所有数据处理状态
                 'qihao' => $qihao, # 期号
                 'lottery_type' => $lottery_type,
-                'static4dPerDateProfits_status' => $LotteryDataDealStatus->static4dPerDateProfits_status==0 ? 4 : 0, # A每天四定利润统计状态
-                'updateDs_status' => $LotteryDataDealStatus->updateDs_status==0 ? 4 : 0, # B单双处理状态
-                'updateDsYL_status' => $LotteryDataDealStatus->updateDsYL_status==0 ? 4 : 0, # C单双遗漏处理状态
-                'update3NumYL_status' => $LotteryDataDealStatus->update3NumYL_status==0 ? 4 : 0, # D单双遗漏处理状态
-                'updateSdHzYL_status' => $LotteryDataDealStatus->updateSdHzYL_status==0 ? 4 : 0, # E单双遗漏处理状态
-                'opProfitsPlans_status' => $LotteryDataDealStatus->opProfitsPlans_status==0 ? 4 : 0, # F投注计划处理状态
+                # A每天四定利润统计状态
+                'static4dPerDateProfits_status' => $LotteryDataDealStatus->static4dPerDateProfits_status==0 ? 4 : SscDataService::DEAL_DATA_STATUS_PENDDING,
+                # B单双处理状态
+                'updateDs_status' => $LotteryDataDealStatus->updateDs_status==0 ? SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL : SscDataService::DEAL_DATA_STATUS_PENDDING,
+                # C单双遗漏处理状态
+                'updateDsYL_status' => $LotteryDataDealStatus->updateDsYL_status==0 ? SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL : SscDataService::DEAL_DATA_STATUS_PENDDING,
+                # D单双遗漏处理状态
+                'update3NumYL_status' => $LotteryDataDealStatus->update3NumYL_status==0 ? SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL : SscDataService::DEAL_DATA_STATUS_PENDDING,
+                # E单双遗漏处理状态
+                'updateSdHzYL_status' => $LotteryDataDealStatus->updateSdHzYL_status==0 ? SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL : SscDataService::DEAL_DATA_STATUS_PENDDING,
+                # F投注计划处理状态
+                'opProfitsPlans_status' => $LotteryDataDealStatus->opProfitsPlans_status==0 ? SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL : SscDataService::DEAL_DATA_STATUS_PENDDING,
                 'created_at' => $now_time,
                 'updated_at' => $now_time,
             ];
