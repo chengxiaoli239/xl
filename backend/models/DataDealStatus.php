@@ -46,7 +46,7 @@ class DataDealStatus extends \common\models\base\BaseModel
     {
         return [
             [['lottery_type', 'status', 'static4dPerDateProfits_status', 'updateDs_status', 'updateDsYL_status', 'update3NumYL_status', 'updateSdHzYL_status', 'opProfitsPlans_status', 'created_at', 'updated_at'], 'integer'],
-            [['qihao', 'next_qihao', 'created_at', 'updated_at'], 'required'],
+            [['qihao', 'created_at', 'updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['qihao', 'next_qihao'], 'string', 'max' => 24],
             [['status_desc', 'static4dPerDateProfits_status_desc', 'updateDs_status_desc', 'updateDsYL_status_desc', 'update3NumYL_status_desc', 'updateSdHzYL_status_desc', 'opProfitsPlans_status_desc'], 'string', 'max' => 240],
