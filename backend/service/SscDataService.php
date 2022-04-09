@@ -4276,18 +4276,19 @@ class SscDataService extends BaseService {
             if(!empty($DataDealStatus)){
                 throw new \Exception('数据处理任务记录已存在'.$lottery_type.'_'.$qihao);
             }
+            $LotteryDataDealStatus = LotteryDataDealStatus::findOne(['lottery_type'=>$lottery_type]);
 
             $now_time = time();
             $setDatas = [
                 'status' => 0, # 所有数据处理状态
                 'qihao' => $qihao, # 期号
                 'lottery_type' => $lottery_type,
-                'static4dPerDateProfits_status' => 0, # A每天四定利润统计状态
-                'updateDs_status' => 0, # B单双处理状态
-                'updateDsYL_status' => 0, # C单双遗漏处理状态
-                'update3NumYL_status' => 0, # D单双遗漏处理状态
-                'updateSdHzYL_status' => 0, # E单双遗漏处理状态
-                'opProfitsPlans_status' => 0, # F投注计划处理状态
+                'static4dPerDateProfits_status' => $LotteryDataDealStatus->static4dPerDateProfits_status==0 ? 4 : 0, # A每天四定利润统计状态
+                'updateDs_status' => $LotteryDataDealStatus->updateDs_status==0 ? 4 : 0, # B单双处理状态
+                'updateDsYL_status' => $LotteryDataDealStatus->updateDsYL_status==0 ? 4 : 0, # C单双遗漏处理状态
+                'update3NumYL_status' => $LotteryDataDealStatus->update3NumYL_status==0 ? 4 : 0, # D单双遗漏处理状态
+                'updateSdHzYL_status' => $LotteryDataDealStatus->updateSdHzYL_status==0 ? 4 : 0, # E单双遗漏处理状态
+                'opProfitsPlans_status' => $LotteryDataDealStatus->opProfitsPlans_status==0 ? 4 : 0, # F投注计划处理状态
                 'created_at' => $now_time,
                 'updated_at' => $now_time,
             ];

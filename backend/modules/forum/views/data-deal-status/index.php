@@ -54,6 +54,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $txt = "<font color='red'>处理失败</font>";
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成处理']);
                                 }
+                                if($model->$field == 4){
+                                    $txt = "<font color='red'>开关未开启</font>";
+                                    return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
+                                }
                             }
                         ],
                         //'status_desc',
@@ -75,6 +79,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 if($model->$field == 3){
                                     $txt = "<font color='red'>X</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
+                                }
+                                if($model->$field == 4){
+                                    $txt = "<font color='red'>开关未开启</font>";
+                                    return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
                                 }
                             }
                         ],
@@ -98,6 +106,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $txt = "<font color='red'>X</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
+                                if($model->$field == 4){
+                                    $txt = "<font color='red'>开关未开启</font>";
+                                    return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
+                                }
                             }
                         ],
                         //'updateDs_status_desc',
@@ -119,6 +131,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 if($model->$field == 3){
                                     $txt = "<font color='red'>X</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
+                                }
+                                if($model->$field == 4){
+                                    $txt = "<font color='red'>开关未开启</font>";
+                                    return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
                                 }
                             }
                         ],
@@ -142,6 +158,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $txt = "<font color='red'>X</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
+                                if($model->$field == 4){
+                                    $txt = "<font color='red'>开关未开启</font>";
+                                    return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
+                                }
                             }
                         ],
                         //'update3NumYL_status_desc',
@@ -164,6 +184,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $txt = "<font color='red'>X</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
                                 }
+                                if($model->$field == 4){
+                                    $txt = "<font color='red'>开关未开启</font>";
+                                    return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
+                                }
                             }
                         ],
                         //'updateSdHzYL_status_desc',
@@ -185,6 +209,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 if($model->$field == 3){
                                     $txt = "<font color='red'>X</font>".$consume_time;
                                     return Html::a($txt, 'javascript:;', ['title' => '未完成']);
+                                }
+                                if($model->$field == 4){
+                                    $txt = "<font color='red'>开关未开启</font>";
+                                    return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
                                 }
                             }
                         ],
