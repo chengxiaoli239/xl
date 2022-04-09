@@ -237,7 +237,9 @@ class TzService extends BaseService {
             $DataDealStatus = DataDealStatus::findOne($where_deal);
             if(!empty($DataDealStatus)){
                 $DataDealStatus->next_qihao = $next_qihao;
-                $DataDealStatus->save();
+                if(!$DataDealStatus->save()){
+                    throw new \Exception(json_encode($DataDealStatus->getErrors(), 320));
+                }
             }
 
             $logData = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'rst11'=>$rst11, 'rst10'=>$rst10, 'rst21'=>$rst21];

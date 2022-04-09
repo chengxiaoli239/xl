@@ -60,7 +60,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         //'status_desc',
-                        'qihao',
+                        //'qihao',
+                        ['attribute'=>'qihao','label'=>'期号',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                $c_time = \backend\models\SscKjData::findOne(['lottery_type'=>$model->lottery_type, 'qihao'=>$model->qihao])->created_at;
+                                return $model->qihao.' ['.date('H:i:s', $c_time).']';
+                            }
+                        ],
                         'next_qihao',
                         //'static4dPerDateProfits_status',
                         ['attribute'=>'static4dPerDateProfits_status','label'=>'A每天四定利润统计',//'headerOptions'=>['width'=>'5%'],
