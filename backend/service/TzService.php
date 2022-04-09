@@ -245,7 +245,7 @@ class TzService extends BaseService {
             $logData = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'rst11'=>$rst11, 'rst10'=>$rst10, 'rst21'=>$rst21];
             Tool_Common::log('afterRunSysPlans','INFO','系统计划处理后', $logData);
         }catch (\Exception $e){
-            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '开关处理异常', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao]);
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '开关处理异常', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'err_msg'=>$e->getMessage()]);
         }
 
         return true;
