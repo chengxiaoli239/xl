@@ -1915,8 +1915,8 @@ abstract class BetService extends BaseBetService {
                         throw new Exception('已记录推送表'.$lottery_type.'_'.$qihao);
                     }
                     $next_qihao_is_active = TzService::beforeBet($lottery_type, $current_active_qihao);
-                    $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type, 'qihao'=>$qihao])->asArray()->one();
-                    Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '数据处理状态', ['DataDealStatus'=>$DataDealStatus]);
+                    $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type, 'next_qihao'=>$qihao])->asArray()->one();
+                    Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '数据处理状态', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus]);
                     if($next_qihao_is_active['status'] != 200){
                         Tool_Common::log('next_qihao_is_active', 'INFO', '期号激活', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'uid'=>$uid, 'plan_id'=>$plan->id, 'next_qihao_is_active'=>$next_qihao_is_active, 'msg'=>'期号未被激活'.$lottery_type.'_'.$qihao, 'current_active_qihao'=>$current_active_qihao]);
                         throw new \yii\base\Exception('期号未被激活'.$lottery_type.'_'.$qihao);
