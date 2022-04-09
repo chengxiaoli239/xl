@@ -115,7 +115,7 @@ class KjDataGet
                 if(isset($data['status']) && $data['status'] != 200) continue;
                 if($kjConfig->is_batch == 1){
                     $kjDatas = $data;
-                    Tool_Common::log('/kjData/'.__FUNCTION__, 'INFO', '批量抓取开奖号码', ['data'=>$data]);
+                    Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '批量抓取开奖号码', ['data'=>$data]);
                     if($kjDatas){
                         $mkey = 'KJ_LOG_KEY_BATCH_1_'.$kjConfig->lottery_type;
                         if($kjConfig->lottery_type == 2){ # qxc
@@ -124,7 +124,7 @@ class KjDataGet
                                 $rst = KjDataGet::insertQxcKjData($dataInfo['qihao'], $dataInfo['codes'], $dataInfo['date']);
                             }
                         }else{ //}elseif(in_array($kjConfig->lottery_type, [6, 8, 1, 17])) { # xjssc  1七星彩17排列五
-                            Tool_Common::log('/kjData/'.__FUNCTION__, 'INFO', '开奖数据', ['url'=>$url, 'kjdatas'=>$kjDatas]);
+                            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '开奖数据', ['url'=>$url, 'kjdatas'=>$kjDatas]);
                             $kjDatas = array_reverse($kjDatas); # 翻转
                             foreach ($kjDatas as $key=>$dataInfo){
                                 $qihao = $dataInfo['expect'];
@@ -267,7 +267,7 @@ class KjDataGet
         }elseif (!empty($opentime)){
             $tmpDate = substr($opentime, 0, 10);
         }else{
-            $tmpDate = date('Y-m-d 00:00:00');
+            $tmpDate = date('Y-m-d H:i:s');
         }
         $codesArr = [$kjDatasArr[0],$kjDatasArr[1],$kjDatasArr[2],$kjDatasArr[3]];
         sort($codesArr);
@@ -309,7 +309,7 @@ class KjDataGet
             'date' => date('Y-m-d',strtotime($tmpDate)),
         ];
         if(!empty($opentime)){
-            $insertData['created_at'] = (int)strtotime($opentime);
+            $insertData['created_at'] = (int)strtotime($tmpDate);
         }
 
         SscDataService::getAriseCodes([implode('', $codesArr)]); # 缓存开奖号码四定组合

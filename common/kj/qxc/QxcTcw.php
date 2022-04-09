@@ -138,7 +138,7 @@ class QxcTcw extends BaseKj{
             $domain = BaseKj::getApiHostByRoute('/kj/qxc/nine-nine-plw');
             $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/lastTen/'.NineNineNewService::$lotNames[$lottery_type];
             $rstData = CurlService::getCurl($url);
-            Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '获取九九期号', ['lottery_type'=>$lottery_type, 'rst'=>$rstData]);
+            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '获取九九期号', ['lottery_type'=>$lottery_type, 'rst'=>$rstData]);
             if($rstData['code']==200 && isset($rstData['data'][0])){
                 $qihao = $rstData['data'][0]['issue'];
                 $m->set($mkey, $qihao, 30);
