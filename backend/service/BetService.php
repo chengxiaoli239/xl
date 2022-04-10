@@ -759,7 +759,7 @@ abstract class BetService extends BaseBetService {
      */
     public static function getPlansAllCodesType1($tz_type = 1, $buy_type = 1, $sel_same = 0, $codes_hz = '', $plan_id = ''){
         $playway = BetService::getPlaywayByTzType($tz_type);
-        p([$tz_type, $buy_type, $sel_same, $codes_hz, $playway]);
+        //p([$tz_type, $buy_type, $sel_same, $codes_hz, $playway]);
         $m = \Yii::$app->cache;
         $qihao = HN0898Service::getQihao();
         $mkey = 'getPlansAllCodesType1_'.$playway.'_'.$tz_type.'_'.$buy_type.'_'.$qihao;
