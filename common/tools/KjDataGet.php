@@ -419,7 +419,7 @@ class KjDataGet
     public static function getNextQihaoByQihao($qihao = 180101001, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
         $m = \Yii::$app->cache;
-        $mkey = __FUNCTION__.'_'.$lottery_type.'_'.$qihao;
+        $mkey = __FUNCTION__.'_'.$lottery_type.'_'.$qihao.'_1';
         $nextQihao = $m->get($mkey);
 
         if(empty($nextQihao)){
