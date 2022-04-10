@@ -80,7 +80,7 @@ class NaSiDaKe extends BaseKj{
 
             if (empty($data)) return false;
             $opencode = implode(',', $codes);
-            if($opencode == '0,0,0,0,0') return false;
+            //if($opencode == '0,0,0,0,0') return false;
             //$kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
             $kjData = ['expect'=>$datas['issue'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s', (int)($datas['openTime']/1000))];
             //p($kjData);

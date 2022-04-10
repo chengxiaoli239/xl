@@ -293,6 +293,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst = KjDataGet::insertKjData('220410352', 23, '0,0,0,0,0');p($rst);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%data_deal_status}}'); p($r);
         p(array_keys(SscDataService::$dealDataStatusFields));
         $r = SscDataService::insertLotteryDealDataStatus($lottery_type=17);p($r);
@@ -558,7 +559,6 @@ class IndexController extends Controller
         //PoxyIPService::delProxyUidsKey();
         $rst = PoxyIPService::getProxyUids();
         p($rst);
-        $rst = KjDataGet::insertKjData('2020122047', 6, '3,7,8,2,4');
         p($rst);
         $http = 'http://120.77.157.40:8090/forum/user/';
         p(trim($http, '/'));
