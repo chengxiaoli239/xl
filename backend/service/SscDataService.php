@@ -3438,11 +3438,14 @@ class SscDataService extends BaseService {
             $next_single_key = $single_key;
         }
         $nextSingle = $singlesArr[$next_single_key];
-        $qihao = HN0898Service::getQihao($lottery_type);
-        $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+        $time = 7*86400;
+        #if($is_batch_simulate == 1){
+        #    $qihao = HN0898Service::getQihao($lottery_type);
+        #    $time = BetService::getBetCacheTime($lottery_type, $qihao); # 投注之后缓存时间
+        #}
         $logArr = ['plan_id'=>$plan_id, 'single_key'=>$single_key, 'next_single_key'=>$next_single_key, 'time'=>$time, 'lottery_type'=>$lottery_type];
         Tool_Common::log('getPlanNextSingle', 'INFO', '倍数获取', $logArr);
-        $m->set($mkey, $next_single_key,$time);
+        $m->set($mkey, $next_single_key, $time);
 
         return $nextSingle;
     }
@@ -3463,7 +3466,7 @@ class SscDataService extends BaseService {
     /**
      * @desc 单个计划处理
      * @param string $plan_id
-     * @param string $qihao 下注记录期号
+     * @param string $qihao 下注记录写表期号
      * @param int $is_simulate_bet
      * @return array
      */
@@ -3498,6 +3501,12 @@ class SscDataService extends BaseService {
 
         # 5、号码轮换
         $rst['data']['codes_change'] = self::handleOnePlanCodesChange($plan_id, $is_simulate_bet);
+
+        # 6、A、B计划类型
+        $rst['data']['A_x_arise_B_y_arise'] = self::handleOneAxBy12_13($plan_id, $qihao, $is_simulate_bet);
+
+        # 7、A、B计划类型B
+        $rst['data']['A_x_arise_B_y_arise_2'] = self::handleOneAxBy14($plan_id, $qihao, $is_simulate_bet);
 
         $afterRst = SscDataService::afterHandleOnePlan($plan_id, $qihao); # 操作计划之后解锁
         if($afterRst){
@@ -3834,6 +3843,205 @@ class SscDataService extends BaseService {
         return $update_flag;
     }
 
+    /**
+     * @desc A、B计划类型
+     * @param string $plan_id
+     * @param $is_simulate_bet
+     * @return array|bool
+     */
+    public static function handleOneAxBy12_13($plan_id='', $current_qihao='', $is_simulate_bet){
+
+        try{
+            $UserSysPlan = UserSysPlans::findOne($plan_id);
+            if(empty($UserSysPlan)){
+                return false;
+            }
+
+            if($UserSysPlan->status != 1){
+                return ['status'=>300, 'msg'=>'未激活计划不处理'];
+            }
+            if(!in_array($UserSysPlan->plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types)){
+                return ['status'=>301, 'msg'=>'不是AB计划类型'];
+            }
+            $lottery_type = $UserSysPlan->lottery_type;
+            $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+            $hzArr_update_before = $hzArr;
+
+            $singles = explode('-', trim($UserSysPlan->singles));
+            if(empty($singles)) $singles = [$UserSysPlan->single];
+            $single = $UserSysPlan->single;
+
+            $areaBetStatus = isset($hzArr['areaBetStatus']) ? (int)$hzArr['areaBetStatus'] : 0; # 0监控中1下注中
+            $area_all_qishus = $hzArr['area_all_qishus']; # 区间统计期数
+            $area_yl_qishus = $hzArr['area_yl_qishus']; # 区间遗漏期数
+            $area_profits = $hzArr['area_profits']; # 区间止盈
+            $area_loss = $hzArr['area_loss']; # 区间止损
+
+            $logArr = ['plan_id'=>$UserSysPlan->id, 'areaBetStatus'=>$areaBetStatus, 'hzArr_update_before'=>$hzArr_update_before, 'single'=>$single];
+            # 2 # 监控中状态统计
+            if($areaBetStatus == 0){
+                $area_bet_type = $hzArr['area_bet_type'] ? (int)$hzArr['area_bet_type'] : 1; # 下注起算类型：1用户下注记录统计 2:最近开奖统计
+                $area_arise_qishus = SscDataService::get_area_arise_qishus($UserSysPlan, $area_all_qishus, $hzArr['start_qihao'], $area_bet_type); # 指定期数上了多少期
+                $bmsg = '不符合条件【'.$area_arise_qishus.'<=('.$area_all_qishus.'-'.$area_yl_qishus.')】';
+                if($area_arise_qishus <= ($area_all_qishus-$area_yl_qishus)){ # 上奖期数 = 统计期数 - 遗漏期数
+                    # 满足指定期数条件 -> 启动下注
+                    $bmsg = '符合条件【'.$area_arise_qishus.'<=('.$area_all_qishus.'-'.$area_yl_qishus.')】';
+                    $hzArr['start_qihao'] = KjDataGet::getNextQihaoByQihao($current_qihao, $lottery_type); # 当前期号，统计利润时候不包含记录的记录的期号
+                    $areaBetStatus = 1;
+                }
+                $next_single_key = 0;
+                $hzArr['area_arise_qishus'] = $area_arise_qishus;
+                $logArr['area_arise_qishus'] = $area_arise_qishus;
+                $logArr['bet_msg'] = '监控中-'.$bmsg.'['.$UserSysPlan->id.']';
+            }else{
+                $profits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao', $hzArr['start_qihao']]); # 一个计划当前利润
+                $hzArr['current_area_profits'] = $profits;
+                $bmsg = '不符合止盈'.$hzArr['area_profits'].'止损'.$hzArr['area_loss'];
+                if($profits<0 && $area_loss<(0-$profits)){
+                    $bmsg = '符合止损:'.$area_loss.'<('.(0-$profits).')';
+                    $areaBetStatus = 0;
+                    $hzArr['current_area_profits'] = 0.00;
+                    $hzArr['start_qihao'] = KjDataGet::getNextQihaoByQihao($current_qihao, $lottery_type); # 重新设置开始计算期号，避免无时间间隔的连续止损，大遗漏倍投问题
+                    $next_single_key = 0; # 止损，倍数重新
+                }else{
+                    if($profits>$area_profits){
+                        $bmsg = '符合止赢:'.$profits.'>'.$area_profits;
+                        $areaBetStatus = 0;
+                        $hzArr['area_arise_qishus'] = 0;
+                        $hzArr['current_area_profits'] = 0.00;
+                        $hzArr['start_qihao'] = KjDataGet::getNextQihaoByQihao($current_qihao, $lottery_type); # 重新设置开始计算期号，避免大遗漏倍投问题
+                    }
+                    $isZjBefore = SscDataService::isZjBefore($UserSysPlan->id);
+                    $next_single_key = (int)$hzArr['singles_key'];
+                    if(!$isZjBefore){
+                        self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+                    }else{
+                        $next_single_key = 0;
+                    }
+                }
+
+
+                $logArr['bet_msg'] = '下注中，本回合盈利：'.$profits.','.$bmsg.'['.$UserSysPlan->id.']';
+            }
+
+            $single = $singles[$next_single_key] ? :$single;
+
+            $hzArr['singles_key'] = $next_single_key; # 下一期倍数
+            $hzArr['area_profits'] = $area_profits; # 区间止盈
+            $hzArr['area_loss'] = $area_loss; # 区间止损
+            $hzArr['areaBetStatus'] = $areaBetStatus; # 投注状态
+
+            $logArr['hzArr_update_after'] = $hzArr;
+
+            $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
+            $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
+            $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+            $logArr['save_rst'] = $rst;
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后2', $logArr);
+        }catch (\Exception $e){
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后2', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type]);
+        }
+    }
+    /**
+     * @desc A、B计划类型B
+     * @param string $plan_id
+     * @param string $current_qihao 已经写投注表待处理开奖的期号
+     * @param $is_simulate_bet
+     * @return array|bool
+     */
+    public static function handleOneAxBy14($plan_id='', $current_qihao='', $is_simulate_bet){
+
+        try{
+            $UserSysPlan = UserSysPlans::findOne($plan_id);
+            if(empty($UserSysPlan)){
+                return false;
+            }
+
+            if($UserSysPlan->status != 1){
+                return ['status'=>300, 'msg'=>'未激活计划不处理'];
+            }
+            if(!in_array($UserSysPlan->plan_type, [14])){
+                return ['status'=>301, 'msg'=>'不是AB计划类型'];
+            }
+            $lottery_type = $UserSysPlan->lottery_type;
+            $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+            $hzArr_update_before = $hzArr;
+
+            $singles = explode('-', trim($UserSysPlan->singles));
+            if(empty($singles)) $singles = [$UserSysPlan->single];
+            $single = $UserSysPlan->single;
+
+            $areaBetStatus = isset($hzArr['areaBetStatus']) ? (int)$hzArr['areaBetStatus'] : 0; # 0监控中1下注中
+            $area_all_qishus = $hzArr['area_all_qishus']; # 区间统计期数
+            $area_yl_qishus = $hzArr['area_yl_qishus']; # 区间遗漏期数
+            $area_profits = $hzArr['area_profits']; # 区间止盈
+            $area_loss = $hzArr['area_loss']; # 区间止损
+
+            $logArr = ['plan_id'=>$UserSysPlan->id, 'areaBetStatus'=>$areaBetStatus, 'hzArr_update_before'=>$hzArr_update_before, 'single'=>$single];
+            # 2 # 监控中状态统计
+            if($areaBetStatus == 0){
+                $area_bet_type = $hzArr['area_bet_type'] ? (int)$hzArr['area_bet_type'] : 1; # 下注起算类型：1用户下注记录统计 2:最近开奖统计
+                $area_arise_qishus = SscDataService::get_area_arise_qishus($UserSysPlan, $area_all_qishus, $hzArr['start_qihao'], $area_bet_type); # 指定期数上了多少期
+                $bmsg = '不符合条件【'.$area_arise_qishus.'<=('.$area_all_qishus.'-'.$area_yl_qishus.')】';
+                if($area_arise_qishus <= ($area_all_qishus-$area_yl_qishus)){ # 上奖期数 = 统计期数 - 遗漏期数
+                    # 满足指定期数条件 -> 启动下注
+                    $bmsg = '符合条件【'.$area_arise_qishus.'<=('.$area_all_qishus.'-'.$area_yl_qishus.')】';
+                    $hzArr['start_qihao'] = KjDataGet::getNextQihaoByQihao($current_qihao, $lottery_type); # 当前期号，统计利润时候不包含记录的记录的期号
+                    $areaBetStatus = 1;
+                }
+                $next_single_key = 0;
+                $hzArr['area_arise_qishus'] = $area_arise_qishus;
+                $logArr['area_arise_qishus'] = $area_arise_qishus;
+                $logArr['bet_msg'] = '监控中-'.$bmsg.'['.$UserSysPlan->id.']';
+            }else{
+                $profits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao', $hzArr['start_qihao']]); # 一个计划当前利润
+                $hzArr['current_area_profits'] = $profits;
+                $bmsg = '不符合止盈'.$hzArr['area_profits'].'止损'.$hzArr['area_loss'];
+                if($profits<0 && $area_loss<(0-$profits)){
+                    $bmsg = '符合止损:'.$area_loss.'<('.(0-$profits).')';
+                    $areaBetStatus = 0;
+                    $hzArr['current_area_profits'] = 0.00;
+                    $hzArr['start_qihao'] = KjDataGet::getNextQihaoByQihao($current_qihao, $lottery_type); # 重新设置开始计算期号，避免无时间间隔的连续止损，大遗漏倍投问题
+                    $next_single_key = 0; # 止损，倍数重新
+                }else{
+                    if($profits>$area_profits){
+                        $bmsg = '符合止赢:'.$profits.'>'.$area_profits;
+                        $areaBetStatus = 0;
+                        $hzArr['area_arise_qishus'] = 0;
+                        $hzArr['current_area_profits'] = 0.00;
+                        $hzArr['start_qihao'] = KjDataGet::getNextQihaoByQihao($current_qihao, $lottery_type); # 重新设置开始计算期号，避免大遗漏倍投问题
+                    }
+                    $isZjBefore = SscDataService::isZjBefore($UserSysPlan->id);
+                    $next_single_key = (int)$hzArr['singles_key'];
+                    if(!$isZjBefore){
+                        self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+                    }else{
+                        $next_single_key = 0;
+                    }
+                }
+
+
+                $logArr['bet_msg'] = '下注中，本回合盈利：'.$profits.','.$bmsg.'['.$UserSysPlan->id.']';
+            }
+
+            $single = $singles[$next_single_key] ? :$single;
+
+            $hzArr['singles_key'] = $next_single_key; # 下一期倍数
+            $hzArr['area_profits'] = $area_profits; # 区间止盈
+            $hzArr['area_loss'] = $area_loss; # 区间止损
+            $hzArr['areaBetStatus'] = $areaBetStatus; # 投注状态
+
+            $logArr['hzArr_update_after'] = $hzArr;
+
+            $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
+            $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
+            $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+            $logArr['save_rst'] = $rst;
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后2', $logArr);
+        }catch (\Exception $e){
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后2', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type]);
+        }
+    }
 
     /**
      * @description 某个计划利润统计

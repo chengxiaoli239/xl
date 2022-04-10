@@ -2085,7 +2085,7 @@ abstract class BetService extends BaseBetService {
                     # 4、投注号码 codes
                     $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);
 
-                    $is_test = $plan->is_test;
+                    $is_test = max($plan->is_test, $plan->is_batch_simulate);
                     list($sn, $snid) = BetService::getBetSnId($plan->id, $plan->plan_type, $is_test, $isAuto);
 
                     Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '投注号码', ['flag'=>$flag, 'qihao'=>$current_qihao, 'plan_id'=>$plan_id]);
@@ -2112,7 +2112,7 @@ abstract class BetService extends BaseBetService {
      * @desc 处理开奖和计划相关
      * @param array $insertRst
      * @param string $plan_id
-     * @param $qihao
+     * @param $qihao 已经投注待处理开奖的期号
      * @param array $rst
      * @return bool
      */

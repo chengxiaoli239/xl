@@ -418,52 +418,59 @@ class KjDataGet
      */
     public static function getNextQihaoByQihao($qihao = 180101001, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
-        $nextQihao = $qihao + 1;
-        switch ($lottery_type){
-            case 1: # 七星彩
-                break;
-            case 5: # 重庆
-                $year = '20'.substr($qihao,0,2);
-                $date = '20'.substr($qihao,0,6);
-                $qihao = substr($qihao,6,3);
-                $maxQihaoArr = BetService::$maxQihaoArr;
-                $maxQihao = $maxQihaoArr[$lottery_type];
-                if($date == $year.'1231' && $qihao >=$maxQihao){
-                    $nextQihao = substr(((int)$year+1).'0101001', 2, 9);
-                //}elseif($qihao >= 120){
-                }elseif($qihao >= $maxQihao){
-                    $nextQihao = substr(Tools::getNextDate($date),2, 6).'001';
-                }
-                break;
-            case 6: # 新疆
-                $minQihao = substr($nextQihao, 8, 2);
-                $date = substr($nextQihao, 0, 4).'-'.substr($nextQihao, 4, 2).'-'.substr($nextQihao, 6, 2).' 00:00:00';
-                if($minQihao == 49){
-                    $date = date('Ymd', strtotime($date) + 86400);
-                    $nextQihao = $date.'01';
-                }
-                break;
-            case 8: # 幸运五星彩
-                if(substr($qihao, -3, 3) >= 288){
-                    $date = substr($qihao, 0, 4).'-'.substr($nextQihao, 4, 2).'-'.substr($nextQihao, 6, 2).' 00:00:00';
-                    $date = date('Ymd', strtotime($date) + 86400);
-                    $nextQihao = $date.'001';
-                }
-                break;
-            case 23: # 以太坊3分
-                if(substr($qihao, -3, 3) >= 480){
-                    $date = '20'.substr($qihao, 0, 2).'-'.substr($nextQihao, 2, 2).'-'.substr($nextQihao, 4, 2).' 00:00:00';
-                    $date = date('Ymd', strtotime($date) + 86400);
-                    $nextQihao = $date.'001';
-                }
-                break;
-            case 24: # 以太坊10分
-                if(substr($qihao, -3, 3) >= 144){
-                    $date = '20'.substr($qihao, 0, 2).'-'.substr($nextQihao, 2, 2).'-'.substr($nextQihao, 4, 2).' 00:00:00';
-                    $date = date('Ymd', strtotime($date) + 86400);
-                    $nextQihao = $date.'001';
-                }
-                break;
+        $m = \Yii::$app->cache;
+        $mkey = __FUNCTION__.'_'.$lottery_type.'_'.$qihao;
+        $nextQihao = $m->get($mkey);
+
+        if(empty($nextQihao)){
+            $nextQihao = $qihao + 1;
+            switch ($lottery_type){
+                case 1: # 七星彩
+                    break;
+                case 5: # 重庆
+                    $year = '20'.substr($qihao,0,2);
+                    $date = '20'.substr($qihao,0,6);
+                    $qihao = substr($qihao,6,3);
+                    $maxQihaoArr = BetService::$maxQihaoArr;
+                    $maxQihao = $maxQihaoArr[$lottery_type];
+                    if($date == $year.'1231' && $qihao >=$maxQihao){
+                        $nextQihao = substr(((int)$year+1).'0101001', 2, 9);
+                    //}elseif($qihao >= 120){
+                    }elseif($qihao >= $maxQihao){
+                        $nextQihao = substr(Tools::getNextDate($date),2, 6).'001';
+                    }
+                    break;
+                case 6: # 新疆
+                    $minQihao = substr($nextQihao, 8, 2);
+                    $date = substr($nextQihao, 0, 4).'-'.substr($nextQihao, 4, 2).'-'.substr($nextQihao, 6, 2).' 00:00:00';
+                    if($minQihao == 49){
+                        $date = date('Ymd', strtotime($date) + 86400);
+                        $nextQihao = $date.'01';
+                    }
+                    break;
+                case 8: # 幸运五星彩
+                    if(substr($qihao, -3, 3) >= 288){
+                        $date = substr($qihao, 0, 4).'-'.substr($nextQihao, 4, 2).'-'.substr($nextQihao, 6, 2).' 00:00:00';
+                        $date = date('Ymd', strtotime($date) + 86400);
+                        $nextQihao = $date.'001';
+                    }
+                    break;
+                case 23: # 以太坊3分
+                    if(substr($qihao, -3, 3) >= 480){
+                        $date = '20'.substr($qihao, 0, 2).'-'.substr($nextQihao, 2, 2).'-'.substr($nextQihao, 4, 2).' 00:00:00';
+                        $date = date('Ymd', strtotime($date) + 86400);
+                        $nextQihao = $date.'001';
+                    }
+                    break;
+                case 24: # 以太坊10分
+                    if(substr($qihao, -3, 3) >= 144){
+                        $date = '20'.substr($qihao, 0, 2).'-'.substr($nextQihao, 2, 2).'-'.substr($nextQihao, 4, 2).' 00:00:00';
+                        $date = date('Ymd', strtotime($date) + 86400);
+                        $nextQihao = $date.'001';
+                    }
+                    break;
+            }
+            $m->set($mkey, $nextQihao, 600);
         }
 
         return $nextQihao;

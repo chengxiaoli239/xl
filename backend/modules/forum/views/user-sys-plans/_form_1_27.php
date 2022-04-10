@@ -53,7 +53,7 @@ use yii\widgets\ActiveForm;
                 </div>
 
                 <!--排除前xx期-->
-                <?php //include(dirname(__FILE__).'/filter_xs_before.php'); # 功能完好，不常用先注释 ?>
+                <?php include(dirname(__FILE__).'/filter_xs_before.php'); # 功能完好，不常用先注释 ?>
                 <?php include(dirname(__FILE__).'/A_x_arise_B_y_arise_bet_B.php'); # A出x次B出y次投B ?>
 
                 <!--导入号码组轮换-->

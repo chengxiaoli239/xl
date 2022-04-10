@@ -1333,7 +1333,7 @@ class HN0898Service extends BaseTZService {
             $qihao = $date.'001';
         }
         if(!empty($qihao)){
-            $m->set($mkey, $qihao, 2);
+            $m->set($mkey, $qihao, 5);
         }
 
         return $qihao;
