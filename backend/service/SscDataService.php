@@ -3951,7 +3951,7 @@ class SscDataService extends BaseService {
             $logArr['plan_8'][$UserSysPlan->id]['updateData'] = $updateData;
             $logArr['plan_8'][$UserSysPlan->id]['rst'] = $rst;
         }catch (\Exception $e){
-            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后22', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后22', ['plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
     }
     /**
