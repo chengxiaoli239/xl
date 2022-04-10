@@ -2035,7 +2035,7 @@ abstract class BetService extends BaseBetService {
         if($flag){
             return ['status'=>300, 'msg'=>'有正在执行的任务,请稍后...'];
         }
-        $m->set($mkey, 1, 10);
+        $m->set($mkey, 1, 6);
         $RedisLock = new RedisLock();
 
         foreach ($lottery_types as $lottery_type) {
@@ -2055,10 +2055,13 @@ abstract class BetService extends BaseBetService {
                     $lottery_type = $plan->lottery_type;
                     $plan_id = $plan->id;
                     $codes_hz_data = json_decode($plan->hz_Arr, true);
-                    $filter_poses = $codes_hz_data['filters']['filter_poses'];
-                    $x_poses = array_diff(NumService::$ALL_POSES, $filter_poses);
-                    foreach ($x_poses as $x_pos){
-                        $codes_hz_data['p'.$x_pos] = 'X';
+                    # 排除同期
+                    if($codes_hz_data['filter_type'] == 1){
+                        $filter_poses = $codes_hz_data['filters']['filter_poses'];
+                        $x_poses = array_diff(NumService::$ALL_POSES, $filter_poses);
+                        foreach ($x_poses as $x_pos){
+                            $codes_hz_data['p'.$x_pos] = 'X';
+                        }
                     }
                     $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
                     $mkey_current = 'getPlanBetCurrentQihao_'.$plan_id.'_'.$current_qihao;
@@ -2068,6 +2071,7 @@ abstract class BetService extends BaseBetService {
                         continue;
                     }
 
+                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '获取号码前1', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao]);
                     //p([$current_qihao, $codes_hz_data]);
                     $beforeQihao = KjDataGet::getBeforeQihaoByQihao($current_qihao, $lottery_type);
                     $before_record = BettingRecords::findOne(['qihao'=>$beforeQihao, 'plan_id'=>$plan_id]);
@@ -2081,6 +2085,7 @@ abstract class BetService extends BaseBetService {
                         Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-01', $logArr);
                         continue;
                     }
+                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '获取号码前2', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao]);
 
                     # 4、投注号码 codes
                     $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);

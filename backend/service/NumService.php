@@ -2731,7 +2731,7 @@ class NumService extends BaseService {
      */
     public static function getCodesByCodesHz($filters=[], $plan_id='', $lottery_type=DEFAULT_LOTTERY_TYPE){
         $lottery_type = $filters['lottery_type'] ? : $lottery_type; # 彩种
-        $filter_type = $filters['filter_type']; # 三四定类型中，过滤类型:默认类型1
+        $filter_type = $filters['filter_type']; # 三四定类型中，过滤类型:默认类型1同期2历史数据
         $filter_poses = $filters['filter_poses']; # 过滤位置
         $playway = $filters['playway'] ? : 3; # 默认四定
         $code_type = NumService::$playway_to_code_type[$filters['playway']] ? : 4; # 默认四定

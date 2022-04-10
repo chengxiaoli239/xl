@@ -203,16 +203,20 @@ class UserSysPlansService extends BaseService {
         if($UserSysPlans['is_batch_simulate'] && count($UserSysPlans['is_batch_simulate']) == 1){
             $post['UserSysPlans']['is_batch_simulate'] = (int)$UserSysPlans['is_batch_simulate'][0];
             if(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES']) && empty($post['UserSysPlans']['import_codes_txts'][0])) { # 导入号码保存
-                $diff_poses = array_diff(NumService::$ALL_POSES, $post['UserSysPlans']['filter_poses']);
-                $query = Num4Type::find()->select(['code']);
-                $t_where = [];
-                foreach ($diff_poses as $pos){
-                    $t_where[] = ['OR', ['=', 'code_'.$pos, 'X'], ['=', 'code_'.$pos, '']];
+                if($post['UserSysPlans']['filter_type'] == 1){ # filter_type:1排除同期
+                    $diff_poses = array_diff(NumService::$ALL_POSES, $post['UserSysPlans']['filter_poses']);
+                    $query = Num4Type::find()->select(['code']);
+                    $t_where = [];
+                    foreach ($diff_poses as $pos){
+                        $t_where[] = ['OR', ['=', 'code_'.$pos, 'X'], ['=', 'code_'.$pos, '']];
+                    }
+                    $query->where(array_merge(['AND', ['=', 'code_type', $code_type]], $t_where));
+                    $Num4Type = $query->asArray()->all();
+                    $filter_codes = ArrayHelper::getColumn($Num4Type, 'code');
+                    $post['UserSysPlans']['import_codes_txts'][0] = implode(' ', str_replace(',', '', $filter_codes));
+                }else{
+                    #pass
                 }
-                $query->where(array_merge(['AND', ['=', 'code_type', $code_type]], $t_where));
-                $Num4Type = $query->asArray()->all();
-                $filter_codes = ArrayHelper::getColumn($Num4Type, 'code');
-                $post['UserSysPlans']['import_codes_txts'][0] = implode(' ', str_replace(',', '', $filter_codes));
             }
         }else{
             $post['UserSysPlans']['is_batch_simulate'] = 0;
