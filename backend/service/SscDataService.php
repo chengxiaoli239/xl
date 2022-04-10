@@ -3525,20 +3525,31 @@ class SscDataService extends BaseService {
         # 2、翻倍
         $rst['data']['fan_bei'] = self::handleOnePlanFanBei($plan_id, $is_simulate_bet);
 
-        # 3、中则投、遗漏投
-        $rst['data']['zzt_ylt'] = self::handleOnePlanZzt($plan_id, $is_simulate_bet);
-
-        # 4、中则投否则反买
-        $rst['data']['zzt_else_fan_mai'] = self::handleOnePlanZztElseFanMai($plan_id, $is_simulate_bet);
-
         # 5、号码轮换
         $rst['data']['codes_change'] = self::handleOnePlanCodesChange($plan_id, $is_simulate_bet);
 
-        # 6、A、B计划类型
-        $rst['data']['A_x_arise_B_y_arise'] = self::handleOneAxBy12_13($plan_id, $qihao, $is_simulate_bet);
-
-        # 7、A、B计划类型B
-        $rst['data']['A_x_arise_B_y_arise_2'] = self::handleOneAxBy14($plan_id, $qihao, $is_simulate_bet);
+        switch ($UserSysPlan->plan_type){
+            case 6:
+            case 8:
+                # 3、中则投、遗漏投
+                $rst['data']['zzt_ylt'] = self::handleOnePlanZzt($plan_id, $is_simulate_bet);
+                break;
+            case 7:
+                # 4、中则投否则反买
+                $rst['data']['zzt_else_fan_mai'] = self::handleOnePlanZztElseFanMai($plan_id, $is_simulate_bet);
+                break;
+            case 12:
+            case 13:
+                # 6、A、B计划类型
+                $rst['data']['A_x_arise_B_y_arise'] = self::handleOneAxBy12_13($plan_id, $qihao, $is_simulate_bet);
+                break;
+            case 14:
+                # 7、A、B计划类型B
+                $rst['data']['A_x_arise_B_y_arise_2'] = self::handleOneAxBy14($plan_id, $qihao, $is_simulate_bet);
+                break;
+            default:
+                break;
+        }
 
         $afterRst = SscDataService::afterHandleOnePlan($plan_id, $qihao); # 操作计划之后解锁
         if($afterRst){
