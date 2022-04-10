@@ -3197,7 +3197,7 @@ class SscDataService extends BaseService {
                     $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
                     $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                     $logArr['save_rst'] = $rst;
-                    Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后2', $logArr);
+                    Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后21', $logArr);
                 }
             }
         }catch (\Exception $exception){
@@ -3896,7 +3896,7 @@ class SscDataService extends BaseService {
                 return ['status'=>301, 'msg'=>'不是AB计划类型'];
             }
             $plan_type = $UserSysPlan->plan_type;
-            $lottery_type = $UserSysPlan->lotter_type;
+            $lottery_type = $UserSysPlan->lottery_type;
             $hzArr = json_decode($UserSysPlan->hz_Arr, true);
             $zj_group = SscDataService::getNewZjGroupByPlanIdB($UserSysPlan->id, $$current_qihao, $qihao, $zjResult);
             $hzArr_update_before = $hzArr;
@@ -3951,7 +3951,7 @@ class SscDataService extends BaseService {
             $logArr['plan_8'][$UserSysPlan->id]['updateData'] = $updateData;
             $logArr['plan_8'][$UserSysPlan->id]['rst'] = $rst;
         }catch (\Exception $e){
-            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后2', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type]);
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后22', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type]);
         }
     }
     /**
@@ -4049,9 +4049,9 @@ class SscDataService extends BaseService {
             $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
             $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
             $logArr['save_rst'] = $rst;
-            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后2', $logArr);
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后23', $logArr);
         }catch (\Exception $e){
-            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后2', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type]);
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后24', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type]);
         }
     }
 
