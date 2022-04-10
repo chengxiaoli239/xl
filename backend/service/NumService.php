@@ -2787,7 +2787,9 @@ class NumService extends BaseService {
                 }
             }
             if($r = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one()){
-                $current_qihao = KjDataGet::getNextQihaoByQihao($r->qihao, $lottery_type); # 最后下注记录期号获取即将下注期号
+                $next_qihao = KjDataGet::getNextQihaoByQihao($r->qihao, $lottery_type); # 最后下注记录期号获取即将下注期号
+                $next_recode = SscKjData::find()->where(['>=', 'qihao', $next_qihao])->orderBy(['id'=>SORT_ASC])->one();
+                $current_qihao = $next_recode->qihao;
             }elseif(empty($current_qihao)){
                 $codes_hz_datas = json_decode($plan->hz_Arr, true);
                 $current_qihao = $codes_hz_datas['filters']['start_qihao'] ? : NumService::getQihaoByDaysBefore($codes_hz_datas['filters']['test_period_days'], $lottery_type);

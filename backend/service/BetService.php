@@ -2070,6 +2070,9 @@ abstract class BetService extends BaseBetService {
                         //Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-00', $logArr);
                         continue;
                     }
+                    if(empty($current_qihao)){
+                        throw new \Exception('即将下注的期号为空');
+                    }
 
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '获取号码前1', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao]);
                     //p([$current_qihao, $codes_hz_data]);
@@ -2104,7 +2107,7 @@ abstract class BetService extends BaseBetService {
                         BetService::opOneBettingRecordAndHandlePlanStatic($insertRst['data']['record_id'], $plan_id, $current_qihao, $rst); # 处理开奖和计划相关
                     }
                 }catch (\Exception $exception){
-                    Tool_Common::log('/datas/'.__FUNCTION__."_e", 'ERR', '计划模拟失败', ['plan_id'=>$plan_id, 'err_msg'=>$exception->getMessage()]);
+                    Tool_Common::log('/datas/'.__FUNCTION__."_e", 'ERR', '计划模拟失败', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
                 }
             }
         }
