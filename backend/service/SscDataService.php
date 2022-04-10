@@ -3898,7 +3898,7 @@ class SscDataService extends BaseService {
             $plan_type = $UserSysPlan->plan_type;
             $lottery_type = $UserSysPlan->lottery_type;
             $hzArr = json_decode($UserSysPlan->hz_Arr, true);
-            $zj_group = SscDataService::getNewZjGroupByPlanIdB($UserSysPlan->id, $$current_qihao, $qihao, $zjResult);
+            $zj_group = SscDataService::getNewZjGroupByPlanIdB($UserSysPlan->id, $current_qihao, $qihao, $zjResult);
             $hzArr_update_before = $hzArr;
             $A_x_B_y_status = $hzArr['A_x_B_y_status']; # 状态：0初始1等待中2正在投
             //$A_x_B_y_status = $hzArr[];
