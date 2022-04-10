@@ -293,6 +293,11 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(4827);
+        $codes_hz = '{"area_all_qishus":"13","area_yl_qishus":"10","area_profits":"450","area_loss":"3600","arise_A_times":0,"arise_B_times":0,"filters":{"filter_type":"2","filter_nums":"","test_period_days":10,"playway":"1","filter_poses":"","start_qihao":"220411014","lottery_type":"23"},"filter_dates":[],"filter_qihaos":[],"singles_key":0,"areaBetStatus":0,"area_arise_qishus":0}';
+        $codes_hz_data = json_decode($codes_hz);
+        $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);p($codes);
+
         $rst = KjDataGet::insertKjData('220410352', 23, '0,0,0,0,0');p($rst);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%data_deal_status}}'); p($r);
         p(array_keys(SscDataService::$dealDataStatusFields));

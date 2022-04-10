@@ -3119,7 +3119,7 @@ class SscDataService extends BaseService {
         }
 
         try {
-            # plan_type:12 A出x次B出y次投B
+            # plan_type:14区间遗漏投
             $where = ['AND', ['=', 'plan_type', 14], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
