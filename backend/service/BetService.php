@@ -2104,7 +2104,7 @@ abstract class BetService extends BaseBetService {
                         BetService::opOneBettingRecordAndHandlePlanStatic($insertRst['data']['record_id'], $plan_id, $current_qihao, $rst); # 处理开奖和计划相关
                     }
                 }catch (\Exception $exception){
-                    Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟失败', ['plan_id'=>$plan_id, 'err_msg'=>$exception->getMessage()]);
+                    Tool_Common::log('/datas/'.__FUNCTION__."_e", 'ERR', '计划模拟失败', ['plan_id'=>$plan_id, 'err_msg'=>$exception->getMessage()]);
                 }
             }
         }
