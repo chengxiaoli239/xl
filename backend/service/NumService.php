@@ -15,6 +15,7 @@ use backend\models\SscKjData;
 use backend\models\StaticProfits;
 use backend\models\SystemConfig;
 use backend\models\UserSysPlans;
+use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use backend\models\ThreeNum;
 use yii\helpers\ArrayHelper;
@@ -2768,7 +2769,7 @@ class NumService extends BaseService {
     }
 
     /**
-     * @desc 获取当前计划下注的期号，正常下注则获取当前时间对应的期号，模拟下注则根据下注记录最新期号获取期号
+     * @desc 获取当前计划即将下注的期号：正常下注则获取当前时间对应的期号，模拟下注则根据下注记录获取即将期号
      * @param string $filter_start_qihao
      * @param int $lottery_type
      * @return float|int|mixed|string
@@ -2778,12 +2779,15 @@ class NumService extends BaseService {
         $plan = UserSysPlans::findOne($plan_id);
         if($plan->is_batch_simulate == 1 && !empty($plan_id)){
             $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one();
-            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'qihao', $BettingRecords->qihao]];
-            $SscKjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->one();
-            if(!empty($SscKjData->qihao)){
-                $current_qihao = $SscKjData->qihao;
-            }elseif($r = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one()){
-                $current_qihao = HN0898Service::getQihao($lottery_type); # 针对哪一期过滤，默认为：当前期号
+            if(!empty($BettingRecords)){
+                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'qihao', $BettingRecords->qihao]];
+                $SscKjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->one();
+                if(!empty($SscKjData->qihao)){
+                    $current_qihao = $SscKjData->qihao;
+                }
+            }
+            if($r = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one()){
+                $current_qihao = KjDataGet::getNextQihaoByQihao($r->qihao, $lottery_type); # 最后下注记录期号获取即将下注期号
             }elseif(empty($current_qihao)){
                 $codes_hz_datas = json_decode($plan->hz_Arr, true);
                 $current_qihao = $codes_hz_datas['filters']['start_qihao'] ? : NumService::getQihaoByDaysBefore($codes_hz_datas['filters']['test_period_days'], $lottery_type);
