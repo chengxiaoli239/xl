@@ -278,6 +278,11 @@ use yii\widgets\ActiveForm;
                         </div>
                     </div>
 
+
+                    <!--排除前xx期-->
+                    <?php include(dirname(__FILE__).'/filter_xs_before.php'); # 功能完好，不常用先注释 ?>
+                    <?php //include(dirname(__FILE__).'/A_x_arise_B_y_arise_bet_B.php'); # A出x次B出y次投B ?>
+
                     <!--区间盈利止盈止损-->
                     <?php include(dirname(__FILE__).'/take_profits_area.php'); ?>
 
