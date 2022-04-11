@@ -3142,7 +3142,7 @@ class SscDataService extends BaseService {
                     if($areaBetStatus == 0){
                         $area_bet_type = $hzArr['area_bet_type'] ? (int)$hzArr['area_bet_type'] : 1; # 下注起算类型：1用户下注记录统计 2:最近开奖统计
                         $area_arise_qishus = SscDataService::get_area_arise_qishus($UserSysPlan, $area_all_qishus, $hzArr['start_qihao'], $area_bet_type); # 指定期数上了多少期
-                        $bmsg = '不符合条件【'.$area_arise_qishus.'<=('.$area_all_qishus.'-'.$area_yl_qishus.')】';
+                        $bmsg = '不符合条件0【'.$area_arise_qishus.'<=('.$area_all_qishus.'-'.$area_yl_qishus.')】';
                         if($area_arise_qishus <= ($area_all_qishus-$area_yl_qishus)){ # 上奖期数 = 统计期数 - 遗漏期数
                             # 满足指定期数条件 -> 启动下注
                             $bmsg = '符合条件【'.$area_arise_qishus.'<=('.$area_all_qishus.'-'.$area_yl_qishus.')】';
@@ -3256,6 +3256,7 @@ class SscDataService extends BaseService {
             $start_id = end($BettingRecords)->id;
 
             $where = array_merge($where, [['>=', 'id', $start_id], ['>', 'profits', 0]]);
+            p($where);
             $pBettingRecords = BettingRecords::find()->where($where)->limit($recent_qishus)->orderBy(['id'=>SORT_DESC])->all();
 
             $zj_nums = count($pBettingRecords);
@@ -4005,7 +4006,7 @@ class SscDataService extends BaseService {
             if($areaBetStatus == 0){
                 $area_bet_type = $hzArr['area_bet_type'] ? (int)$hzArr['area_bet_type'] : 1; # 下注起算类型：1用户下注记录统计 2:最近开奖统计
                 $area_arise_qishus = SscDataService::get_area_arise_qishus($UserSysPlan, $area_all_qishus, $hzArr['start_qihao'], $area_bet_type); # 指定期数上了多少期
-                $bmsg = '不符合条件【'.$area_arise_qishus.'<=('.$area_all_qishus.'-'.$area_yl_qishus.')】';
+                $bmsg = '不符合条件0【'.$area_arise_qishus.'<=('.$area_all_qishus.'-'.$area_yl_qishus.')】';
                 if($area_arise_qishus <= ($area_all_qishus-$area_yl_qishus)){ # 上奖期数 = 统计期数 - 遗漏期数
                     # 满足指定期数条件 -> 启动下注
                     $bmsg = '符合条件【'.$area_arise_qishus.'<=('.$area_all_qishus.'-'.$area_yl_qishus.')】';
@@ -4470,7 +4471,7 @@ class SscDataService extends BaseService {
     }
 
     public static function buildOnePlanBetKey($plan_id, $current_qihao){
-        return 'buildOnePlanBetKey_x0_'.$plan_id.'_'.$current_qihao;
+        return 'buildOnePlanBetKey_x1_'.$plan_id.'_'.$current_qihao;
     }
 
     /**

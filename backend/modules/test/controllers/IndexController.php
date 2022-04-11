@@ -293,6 +293,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $UserSysPlan = UserSysPlans::findOne(4624);
+        $data = SscDataService::get_area_arise_qishus($UserSysPlan, $recent_qishus=15, $start_qihao='220401099', $area_bet_type=1);p($data);
         $plan = UserSysPlans::findOne(4827);
         $codes_hz = '{"area_all_qishus":"13","area_yl_qishus":"10","area_profits":"450","area_loss":"3600","arise_A_times":0,"arise_B_times":0,"filters":{"filter_type":"2","filter_nums":"","test_period_days":10,"playway":"1","filter_poses":"","start_qihao":"220411014","lottery_type":"23"},"filter_dates":[],"filter_qihaos":[],"singles_key":0,"areaBetStatus":0,"area_arise_qishus":0}';
         $codes_hz_data = json_decode($codes_hz);
@@ -307,8 +309,6 @@ class IndexController extends Controller
         p(base64_decode('MjEyNV9pbTFidGdhb3pfNHB0dHhhaDF5Z181,MTczNV9pbTEwdzI4MjIyMDIyMDMxMTgzMTk2,'));
         $rst = FootBallService::getSorceFromUnibet(); p($rst);# 群发微信消息
 
-        $UserSysPlan = UserSysPlans::findOne(4659);
-        $data = SscDataService::get_area_arise_qishus($UserSysPlan, $recent_qishus=20, $start_qihao='', $area_bet_type=2);p($data);
         $data = NaSiDaKe::getLotteryNo($type='json', $is_auto=2, $lottery_type=25);p($data);
         $rst = SscDataService::opProfitsPlans12_13($lottery_type = 8);
         p($rst);# A出x次B出y次投B 计划处理
