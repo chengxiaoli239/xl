@@ -3966,7 +3966,7 @@ class SscDataService extends BaseService {
         }
     }
     /**
-     * @desc A、B计划类型B
+     * @desc A、B遗漏区间投
      * @param string $plan_id
      * @param string $current_qihao 已经写投注表待处理开奖的期号
      * @param $is_simulate_bet
@@ -3984,7 +3984,7 @@ class SscDataService extends BaseService {
                 return ['status'=>300, 'msg'=>'未激活计划不处理'];
             }
             if(!in_array($UserSysPlan->plan_type, [14])){
-                return ['status'=>301, 'msg'=>'不是AB计划类型'];
+                return ['status'=>301, 'msg'=>'不是遗漏区间投计划'];
             }
             $lottery_type = $UserSysPlan->lottery_type;
             $hzArr = json_decode($UserSysPlan->hz_Arr, true);
@@ -4470,7 +4470,7 @@ class SscDataService extends BaseService {
     }
 
     public static function buildOnePlanBetKey($plan_id, $current_qihao){
-        return 'buildOnePlanBetKey_'.$plan_id.'_'.$current_qihao;
+        return 'buildOnePlanBetKey_x0_'.$plan_id.'_'.$current_qihao;
     }
 
     /**
@@ -4481,7 +4481,7 @@ class SscDataService extends BaseService {
     public static function openOnePlanBetStatus($plan_id, $current_qihao){
         $m = \Yii::$app->cache;
         $mkey = self::buildOnePlanBetKey($plan_id, $current_qihao);
-        $flag = $m->set($mkey, 1, 7*86400);
+        $flag = $m->set($mkey, 1, 12*3600);
 
         return (boolean)$flag;
     }
