@@ -3256,7 +3256,6 @@ class SscDataService extends BaseService {
             $start_id = end($BettingRecords)->id;
 
             $where = array_merge($where, [['>=', 'id', $start_id], ['>', 'profits', 0]]);
-            p($where);
             $pBettingRecords = BettingRecords::find()->where($where)->limit($recent_qishus)->orderBy(['id'=>SORT_DESC])->all();
 
             $zj_nums = count($pBettingRecords);
