@@ -1,7 +1,7 @@
 <!--每期动态过滤-->
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #7000cb;">
     <div class="col-lg-2 col-xs-4">
-        <?= $form->field($model, 'filter_type')->dropDownList([''=>'请选择', 1=>'同位置前x期', 2=>'历史数据'])->label('排除类型') ?>
+        <?= $form->field($model, 'filter_type')->dropDownList($code_filter_types)->label('排除类型') ?>
     </div>
     <div class="col-lg-2 col-xs-4">
         <?= $form->field($model, 'filter_nums')->textInput()->label('例:2 则排前2期') ?>

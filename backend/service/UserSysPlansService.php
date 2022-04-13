@@ -1259,6 +1259,26 @@ class UserSysPlansService extends BaseService {
     }
 
     /**
+     * @desc 定制化下注、模拟
+     * @param array $data
+     * @param int $uid
+     * @return array
+     */
+    public static function newQuitBetType($data=[], $uid=0){
+
+        $lottery_type = $data['UserSysPlans']['lottery_type'];
+        if(in_array($lottery_type, [22, 23, 24, 25])){
+            $rst = UserSysPlansService::newQuickBet($data, $uid);
+        }else{
+            return ['status'=>300, 'msg'=>'未知彩种'];
+        }
+
+        return $rst;
+    }
+
+
+
+    /**
      * @desc 新快打
      * @param $data
      * @param $uid

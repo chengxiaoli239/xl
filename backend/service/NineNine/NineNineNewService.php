@@ -331,7 +331,7 @@ class NineNineNewService extends BaseTZService {
      * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
      * @return array
      */
-    public function bet($qihao, $plan_id, $code, $is_auto = 1){
+    public function bet($qihao, $plan_id, $code, $is_task=1, $is_auto = 1){
         self::__init(self::$user_id, self::$tz_system_id);
         $plan = UserSysPlans::findOne($plan_id);
         $playway = $plan->playway ? $plan->playway : 3;
@@ -412,85 +412,90 @@ class NineNineNewService extends BaseTZService {
 
             # 真实投注
             $start_time = microtime(true);
-            $tmpRst = self::postBetCurl($url, $post_data, $headers);
-
-            $logArr = ['plan_id'=>$plan_id, 'uid'=>self::$user_id, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$tmpRst];//p($logArr);
-            Tool_Common::log('/NineNineNew/bet', 'INFO', '九九网下注',$logArr);
-
-            $rstData = $tmpRst['rstData'];
-            $xCsrf = $tmpRst['xCsrf'];
-            if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
-                Tool_Common::log('/debug/bet_record', 'INFO', '投注继续', ['time'=>1, 'xCsrf'=>$xCsrf, 'tmpRst'=>$tmpRst]);
-                $xCsrf_key = CommonService::buildXCsrfTokenKey($plan->uid, self::$tz_system_id);
-                $m->set($xCsrf_key, $xCsrf, 120);
-            }
-            if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!'){
-                $headers = [
-                    "accept: application/json, text/plain, */*",
-                    'Accept-Conn: {"downlink":10,"effectiveType":"4g","onchange":null,"rtt":150,"saveData":false,"loadedTime":612,"restime":"cloud-lottery-service-server//lastTen/sfytfssc:194"}',
-                    "accept-encoding: gzip, deflate, br",
-                    "accept-language: zh-CN,zh;q=0.9,en;q=0.8",
-                    //"Connection: keep-alive",
-                    'content-Length:'.strlen($post_data),
-                    "content-type: application/json;charset=UTF-8",
-                    "contenttype: application/json",
-                    'cookie: '.$TzSystemsUsers->cookie,
-                    //"Host: www.".$urlArr['domain'],
-                    "origin: ".$urlArr['baseUrl'],
-                    "referer: ".$urlArr['baseUrl']."/web/caipiao".self::getReferByLotteryType($lottery_type),
-                    'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"',
-                    "sec-ch-ua-mobile: ?0",
-                    "sec-fetch-dest: empty",
-                    "sec-fetch-mode: cors",
-                    "sec-fetch-site: same-origin",
-                    $TzSystemsUsers->user_agent,
-                    "usertype: 0",
-                    "x-csrf-index: ".$xCsrf['Index'],
-                    "x-csrf-token: ".$xCsrf['Token'],
-                ];
-                sleep(2);
+            if($is_task){
+                # 任务表
+                BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($codesArr)*$single, $playway,self::$tz_system_id, [], $lottery_type);
+            }else{
                 $tmpRst = self::postBetCurl($url, $post_data, $headers);
-                //return $this->bet($plan->uid, self::$tz_system_id);
+
+                $logArr = ['plan_id'=>$plan_id, 'uid'=>self::$user_id, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$tmpRst];//p($logArr);
+                Tool_Common::log('/NineNineNew/bet', 'INFO', '九九网下注',$logArr);
+
                 $rstData = $tmpRst['rstData'];
                 $xCsrf = $tmpRst['xCsrf'];
-                Tool_Common::log('/NineNineNew/retry_bet', 'INFO', '九九网重新下注',['plan_id'=>$plan_id, 'playway'=>$playway, 'rstData'=>$rstData, 'xCsrf'=>$xCsrf]);
                 if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
-                    Tool_Common::log('/debug/bet_record', 'INFO', '投注继续', ['time'=>2, 'xCsrf'=>$xCsrf, 'tmpRst'=>$tmpRst]);
+                    Tool_Common::log('/debug/bet_record', 'INFO', '投注继续', ['time'=>1, 'xCsrf'=>$xCsrf, 'tmpRst'=>$tmpRst]);
                     $xCsrf_key = CommonService::buildXCsrfTokenKey($plan->uid, self::$tz_system_id);
                     $m->set($xCsrf_key, $xCsrf, 120);
                 }
-            }
-            $status = ($tmpRst['rstData']['code'] == 200) ? 2 : 3;
-            BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type, $status);
-
-            $row = BetErrorPlansTask::findOne(['qihao'=>$qihao, 'plan_id'=>$plan_id]);
-            $row->status = $status;
-            $row->post_desc = json_encode($tmpRst, 320);
-            $flag = $row->save();
-
-            //p(['tmpRst'=>$tmpRst, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'is_auto'=>$is_auto]);
-            $end_time = microtime(true);
-            $time_consume = ($end_time - $start_time). 's';
-            if(!$rstData){
-                $post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
-                $tzRst = ['uid'=>self::$user_id, 'account'=>self::$account, 'status'=>301, 'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rstData, 'time_consume'=>$time_consume];
-                if($tz_type != 20){
-                    $tzRst['code'] = $code;
+                if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!'){
+                    $headers = [
+                        "accept: application/json, text/plain, */*",
+                        'Accept-Conn: {"downlink":10,"effectiveType":"4g","onchange":null,"rtt":150,"saveData":false,"loadedTime":612,"restime":"cloud-lottery-service-server//lastTen/sfytfssc:194"}',
+                        "accept-encoding: gzip, deflate, br",
+                        "accept-language: zh-CN,zh;q=0.9,en;q=0.8",
+                        //"Connection: keep-alive",
+                        'content-Length:'.strlen($post_data),
+                        "content-type: application/json;charset=UTF-8",
+                        "contenttype: application/json",
+                        'cookie: '.$TzSystemsUsers->cookie,
+                        //"Host: www.".$urlArr['domain'],
+                        "origin: ".$urlArr['baseUrl'],
+                        "referer: ".$urlArr['baseUrl']."/web/caipiao".self::getReferByLotteryType($lottery_type),
+                        'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"',
+                        "sec-ch-ua-mobile: ?0",
+                        "sec-fetch-dest: empty",
+                        "sec-fetch-mode: cors",
+                        "sec-fetch-site: same-origin",
+                        $TzSystemsUsers->user_agent,
+                        "usertype: 0",
+                        "x-csrf-index: ".$xCsrf['Index'],
+                        "x-csrf-token: ".$xCsrf['Token'],
+                    ];
+                    sleep(2);
+                    $tmpRst = self::postBetCurl($url, $post_data, $headers);
+                    //return $this->bet($plan->uid, self::$tz_system_id);
+                    $rstData = $tmpRst['rstData'];
+                    $xCsrf = $tmpRst['xCsrf'];
+                    Tool_Common::log('/NineNineNew/retry_bet', 'INFO', '九九网重新下注',['plan_id'=>$plan_id, 'playway'=>$playway, 'rstData'=>$rstData, 'xCsrf'=>$xCsrf]);
+                    if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+                        Tool_Common::log('/debug/bet_record', 'INFO', '投注继续', ['time'=>2, 'xCsrf'=>$xCsrf, 'tmpRst'=>$tmpRst]);
+                        $xCsrf_key = CommonService::buildXCsrfTokenKey($plan->uid, self::$tz_system_id);
+                        $m->set($xCsrf_key, $xCsrf, 120);
+                    }
                 }
-                Tool_Common::log('bet_error','INFO','99投注记录-投注失败', $tzRst);
-                return $tzRst;
-            }
-            $rst[$key] = $rstData;
+                $status = ($tmpRst['rstData']['code'] == 200) ? 2 : 3;
+                BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($codesArr)*$single, $playway,self::$tz_system_id, $tmpRst, $lottery_type, $status);
 
-            $n = count(explode('@',$code));
-            if(in_array($playway, [2, 3]) && $tz_type != 20){
-                $totalmoney = SscDataService::calTzTotalMoney($code, $single, $playway);
-            }else{
-                $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
-            }
-            $snRst = NineNineNewService::getSnidBySn($plan->uid, self::$tz_system_id, $lottery_type);
-            if(isset($snRst['list'][0]['orderNo'])){
-                $snid = $snid.','.$snRst['list'][0]['orderNo']; // 获取方案内容
+                $row = BetErrorPlansTask::findOne(['qihao'=>$qihao, 'plan_id'=>$plan_id]);
+                $row->status = $status;
+                $row->post_desc = json_encode($tmpRst, 320);
+                $flag = $row->save();
+
+                //p(['tmpRst'=>$tmpRst, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'is_auto'=>$is_auto]);
+                $end_time = microtime(true);
+                $time_consume = ($end_time - $start_time). 's';
+                if(!$rstData){
+                    $post_data['code'] = strlen($post_data['code'])>2000 ? substr($post_data['code'], 0, 200) : $post_data['code'];
+                    $tzRst = ['uid'=>self::$user_id, 'account'=>self::$account, 'status'=>301, 'url'=>$url,'post_data'=>$post_data, 'user_id'=>self::$user_id, 'headers'=>$headers, 'postRst'=>$rstData, 'time_consume'=>$time_consume];
+                    if($tz_type != 20){
+                        $tzRst['code'] = $code;
+                    }
+                    Tool_Common::log('bet_error','INFO','99投注记录-投注失败', $tzRst);
+                    return $tzRst;
+                }
+                $rst[$key] = $rstData;
+
+                $n = count(explode('@',$code));
+                if(in_array($playway, [2, 3]) && $tz_type != 20){
+                    $totalmoney = SscDataService::calTzTotalMoney($code, $single, $playway);
+                }else{
+                    $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
+                }
+                $snRst = NineNineNewService::getSnidBySn($plan->uid, self::$tz_system_id, $lottery_type);
+                if(isset($snRst['list'][0]['orderNo'])){
+                    $snid = $snid.','.$snRst['list'][0]['orderNo']; // 获取方案内容
+                }
             }
         }
 

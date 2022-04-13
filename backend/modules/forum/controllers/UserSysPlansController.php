@@ -153,6 +153,7 @@ class UserSysPlansController extends BaseController
         $is_filters = [1=>'是'];
         $filter_pos1 = NumService::$pos_to_desc;
         $filter_pos2 = NumService::$pos_to_desc;
+        $code_filter_types = NumService::$code_filter_types;
         $data =  [
             'model' => $model,
             'tz_type' => $tz_type,
@@ -172,6 +173,8 @@ class UserSysPlansController extends BaseController
             'filter_date_pos1' => $filter_pos1,
             'filter_date_pos2' => $filter_pos2,
             'lottery_types' => $lottery_types,
+
+            'code_filter_types' => $code_filter_types,
 
             # 2、排除前x天内同期
             'is_filter_qihaos' => $is_filters,
@@ -342,9 +345,9 @@ class UserSysPlansController extends BaseController
             if(in_array($tz_type, \yii::$app->params['import_codes_types']) && $model->id){ # 导入号码保存
                 UserSysPlansService::saveimportcodestxt($model->id, $this->_post['usersysplans']['import_codes_txts'], (int)$this->_post['change_per'][0], $this->_user_id);
             }
-            return $this->redirect(['index', 'usersysplans[lottery_type]'=>$queryParams['lottery_type']]);
+            return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$queryParams['lottery_type']]);
         }
-        $tz_sites_arr = TzService::gettzsites($this->_user_id);
+        $tz_sites_arr = TzService::getTzSites($this->_user_id);
         $plan_types = TzService::getTzPlanTypes();
 
         ############################ 排除参数开始 #############################

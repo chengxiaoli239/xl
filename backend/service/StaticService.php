@@ -2900,7 +2900,7 @@ $sql .= '
         $in_codes = $data['UserSysPlans']['in_codes']? trim($data['UserSysPlans']['in_codes'], ','):''; # 在此号码范围内
         $in_codes = (!empty($in_codes)) ? explode(',', str_replace(['，', ' '], ',', $in_codes)) : [];
         $tz_type = $data['UserSysPlans']['tz_type'];
-        $lotter_type = $data['UserSysPlans']['lottery_type'];
+        $lottery_type = $data['UserSysPlans']['lottery_type'];
         $model = new UserSysPlans();
         UserSysPlansService::preOpData($data, $user_id=1);
         $model->load($data);
@@ -2909,10 +2909,10 @@ $sql .= '
 
         if($type == 1){
             # 1 遗漏
-            $rst = StaticService::getYlByCodes($codes, $lotter_type, $tz_type);
+            $rst = StaticService::getYlByCodes($codes, $lottery_type, $tz_type);
         }else{
             # 利润
-            $rst = StaticService::getYlByCodes($codes, $lotter_type, $tz_type);
+            $rst = StaticService::getYlByCodes($codes, $lottery_type, $tz_type);
         }
         $rst['code_desc'] = \backend\service\NumService::getDescByKuaixuan($codes_hz);
 

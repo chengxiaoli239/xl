@@ -365,7 +365,7 @@ abstract class BetService extends BaseBetService {
         $lottery_types = $lottery_type ? [$lottery_type] : StaticService::getUserLotteryTypes($uid);
         foreach ($lottery_types as $lottery_type) {
             $hasActivePlan = CommonService::hasPlansActive($lottery_type);
-            if(in_array($lottery_type, [1, 8, 10, 11, 17]) && !$hasActivePlan){
+            if(in_array($lottery_type, [1, 8, 10, 11, 17, 22, 23, 24, 25]) && !$hasActivePlan){
                 continue;
             }
             $qihao = HN0898Service::getQihao($lottery_type);
@@ -1260,7 +1260,7 @@ abstract class BetService extends BaseBetService {
                Tool_Common::log('tzByPlanId','INFO','投注记录tzByPlanId', $logArr);
                # 5、投注请求
                $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
-               $tmpRst = $BetService->bet($qihao, $plan->id, $codes, $isAuto);
+               $tmpRst = $BetService->bet($qihao, $plan->id, $codes, $is_task=0, $isAuto);
                $logArr = ['tz_sites'=>$tz_sites,'codes'=>$codes, 'postRst'=>$rst];
                Tool_Common::log('plan_bet','INFO','0898投注记录', $logArr);
                if($tmpRst === false){

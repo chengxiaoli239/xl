@@ -30,6 +30,12 @@ class NumService extends BaseService {
     ];
 
     public static $pos_to_desc = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
+    public static $code_filter_types = [
+        '' => '-请选择-',
+        1 => '同位置前x期',
+        2 => '历史数据',
+        3 => '四定类型1',
+    ];
 
     /**
      * @description 根据开奖号码返回三字现
