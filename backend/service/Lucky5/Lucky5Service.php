@@ -1338,7 +1338,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         //if($data = $m->get($mkey)) return $data;
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        if($is_auto==1 && $TzSystemsUsers->expire_time<time()){
+        if($is_auto==1 && !empty($TzSystemsUsers->expire_time) && $TzSystemsUsers->expire_time<time()){
             return ['status'=>3004, 'msg'=>'账号已过期，请续费'];
         }
         if($is_auto==1 && $TzSystemsUsers->status==0){
@@ -1364,7 +1364,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
-            'sec-ch-ua: " Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+            'sec-ch-ua: " Not A; Brand";v="99", "Google Chrome";v="99", "Chromium";v="99"',
             'sec-ch-ua-mobile: ?0',
             'sec-ch-ua-platform: "Windows"',
             'Sec-Fetch-Dest: empty',

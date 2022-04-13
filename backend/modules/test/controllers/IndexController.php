@@ -293,6 +293,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst = Lucky5Service::synBalance($id = 11); p($rst);# 同步余额
+        $rst = Lucky5Service::userInfo($uid, $tz_system_id);
         $UserSysPlan = UserSysPlans::findOne(4624);
         $data = SscDataService::get_area_arise_qishus($UserSysPlan, $recent_qishus=15, $start_qihao='220401099', $area_bet_type=1);p($data);
         $plan = UserSysPlans::findOne(4827);
@@ -358,7 +360,6 @@ class IndexController extends Controller
         p($rst);
         $activeQihao = BetService::getActiveQihao($uid = 10, $tz_system_id = 9, $lottery_type = 8);
         p($activeQihao, 0);
-        $rst = Lucky5Service::userInfo($uid, $tz_system_id);
         p($rst);
         $rst = BaoTaService::syncBaoTaCrontabs($id = 1);
         p($rst);
@@ -495,8 +496,6 @@ class IndexController extends Controller
         p(['str' => $str, 'roboot_id' => $roboot_id, 'old_cookie' => $cookie, 'matches' => $matches, 'new_cookie' => $new_cookie]);
         p($roboot_id);
         p($_SERVER);
-        $rst = Lucky5Service::synBalance($id = 1);
-        p($rst);# 同步余额
         $rst = Lucky5Service::login($uid = 2, $tz_system_id = 9);
         p($rst);
         $rst = BaseService::login($id = 79, $is_auto = 2);
