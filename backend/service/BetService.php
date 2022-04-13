@@ -428,15 +428,22 @@ abstract class BetService extends BaseBetService {
                     if(false && $balance<$bet_money){
                         BetService::closeTask($task_id, $qihao, $activeQihao, $account, $msg='余额不足，不可重推'); # 关闭计划
                     }elseif($is_local_bet == 0 && $qihao == $activeQihao){ # 云服务
-                        $betKey = BetService::buildLotteryBetKey($activeQihao, $plan_id, $bet_sort_key, $task_id);
-                        if($lock = $m->get($betKey)){
-                            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-3', ['task_id'=>$task_id,'betKey'=>$betKey]);
+                        #$betKey = BetService::buildLotteryBetKey($activeQihao, $plan_id, $bet_sort_key, $task_id);
+                        #if($lock = $m->get($betKey)){
+                        #    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-3', ['task_id'=>$task_id,'betKey'=>$betKey]);
+                        #    continue;
+                        #}
+                        $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao);
+                        Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus->next_qihao, 'task_qihao'=>$qihao]);
+                        if(empty($DataDealStatus) OR $DataDealStatus->opProfitsPlans_status != 2){
+                            Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus]);
+                            #throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
                             continue;
                         }
 
-                        $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
-                        $time = ($playway == 3) ? $time : ($time-240);
-                        $m->set($betKey, 1, $time); # 减去三分钟缓存时间
+                        #$time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
+                        #$time = ($playway == 3) ? $time : ($time-240);
+                        #$m->set($betKey, 1, $time); # 减去三分钟缓存时间
 
                         $s_time = microtime(true);
                         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注脚本-4', ['task_id'=>$task_id]);
