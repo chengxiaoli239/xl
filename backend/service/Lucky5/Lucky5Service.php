@@ -1443,6 +1443,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
             'Host: '.str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
             'Origin: '.$TzSystemsUsers->ssc_domain,
             'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+            'sec-ch-ua: " Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+            'sec-ch-ua-mobile: ?0',
+            'sec-ch-ua-platform: "Windows"',
+            'Sec-Fetch-Dest: empty',
+            'Sec-Fetch-Mode: cors',
+            'Sec-Fetch-Site: same-origin',
             'Upgrade-Insecure-Requests: 1',
             $TzSystemsUsers->user_agent,
         ];
