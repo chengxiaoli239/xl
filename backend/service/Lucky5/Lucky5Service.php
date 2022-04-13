@@ -2140,7 +2140,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
 
         if(strpos($url, 'ww662889') !== false){
             //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
@@ -2262,7 +2262,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
         //curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
-        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER,0);
