@@ -247,7 +247,7 @@ abstract class BetService extends BaseBetService {
         # 4、下注
         $lottery_types = UserSysPlansService::getMyLotteryTypes($uid);
         foreach ($lottery_types as $data){
-            if(in_array($data['lottery_type'], [8, 18])) { # 8、幸运五 18台湾快五
+            if(in_array($data['lottery_type'], [8, 18, 23])) { # 8、幸运五 18台湾快五
                 $rst = BetService::betByUserUidTask([$data['lottery_type']], $uid);
             }else{
                 $rst = BetService::betByUidNew($uid, $data['lottery_type']);
