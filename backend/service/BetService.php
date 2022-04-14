@@ -437,8 +437,7 @@ abstract class BetService extends BaseBetService {
                         Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus->next_qihao, 'task_qihao'=>$qihao]);
                         if(empty($DataDealStatus) OR $DataDealStatus->opProfitsPlans_status != 2){
                             Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus]);
-                            #throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
-                            continue;
+                            throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
                         }
 
                         #$time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
@@ -452,7 +451,7 @@ abstract class BetService extends BaseBetService {
                         $t_rst = $betRst['data']['bet_rst'];
                         $rst[$lottery_type][$task_id]['repeatBetRst'] = $t_rst;
                         $current_ip_addr = ProxyBaseService::getCurrentValidProxyIp(); # 获取当前可用的代理IP
-                        $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'betKey'=>$betKey, 'consume_time'=>($e_time-$s_time).'s', 'current_ip_addr'=>$current_ip_addr];
+                        $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'consume_time'=>($e_time-$s_time).'s', 'current_ip_addr'=>$current_ip_addr];
 
                         if(!empty($t_rst['snid'])){
                             # 记录方案号

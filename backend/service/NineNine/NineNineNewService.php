@@ -313,6 +313,81 @@ class NineNineNewService extends BaseTZService {
         return $qihao;
     }
 
+    /**
+     * @desc 目前为计划任务正常下注入口 2021.05.23
+     * @param $id
+     */
+    public function repeatErrorBet($id){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+
+        try {
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__,'INFO','九九网下注节点-1', ['task_id'=>$id]);
+            $row = BetErrorPlansTask::findOne($id);
+            $uid = $row->uid;
+            $plan_id = $row->plan_id;
+            $playway = $row->playway;
+            $qihao = $row->qihao;
+            $tz_system_id = $row->tz_system_id;
+            $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
+
+            sleep($slow_seconds);
+
+            $m = \Yii::$app->cache;
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+            $post_data = $row->post_datas;
+            $headers = json_decode($row->bet_headers); # 含有cookie，如果是重新登陆 cookie要变动，待处理
+            array_pop($headers); # 删除最后一个原始
+            array_pop($headers); # 删除最后一个原始
+
+            $xCsrf = NineNineNewService::getXcsrfToken($uid, self::$tz_system_id);
+            $headers[] = "x-csrf-index: ".$xCsrf['Index'];
+            $headers[] = "x-csrf-token: ".$xCsrf['Token'];
+
+            $url = $row->bet_url;
+            $tmpRst = self::postBetCurl($url, $post_data, $headers);
+
+            $logArr = ['task_id'=>$id, 'plan_id'=>$plan_id, 'uid'=>self::$user_id, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$tmpRst];//p($logArr);
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__,'INFO','九九网下注节点-2', $logArr);
+
+            $rstData = $tmpRst['rstData'];
+            $xCsrf = $tmpRst['xCsrf'];
+            if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+                Tool_Common::log('/debug/bet_record', 'INFO', '投注继续', ['time'=>1, 'xCsrf'=>$xCsrf, 'tmpRst'=>$tmpRst]);
+                $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
+                $m->set($xCsrf_key, $xCsrf, 120);
+            }
+            if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!'){
+                array_pop($headers); # 删除最后一个原始
+                array_pop($headers); # 删除最后一个原始
+                $headers[] = "x-csrf-index: ".$xCsrf['Index'];
+                $headers[] = "x-csrf-token: ".$xCsrf['Token'];
+                sleep(2);
+                $tmpRst = self::postBetCurl($url, $post_data, $headers);
+                $rstData = $tmpRst['rstData'];
+                $xCsrf = $tmpRst['xCsrf'];
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '九九网重新下注-3',['plan_id'=>$plan_id, 'playway'=>$playway, 'rstData'=>$rstData, 'xCsrf'=>$xCsrf]);
+                if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+                    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '九九网重新下注-4', ['time'=>2, 'xCsrf'=>$xCsrf, 'tmpRst'=>$tmpRst]);
+                    $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
+                    $m->set($xCsrf_key, $xCsrf, 120);
+                }
+            }
+            $tmpRst['bet_time'] = date('Y-m-d H:i:s');
+            $status = ($tmpRst['rstData']['code'] == 200) ? 2 : 3;
+
+            //$row = BetErrorPlansTask::findOne(['qihao'=>$qihao, 'plan_id'=>$plan_id]);
+            $row->status = $status;
+            $row->post_desc = json_encode($tmpRst, 320);
+            if(!$row->save()){
+                throw new \Exception(json_encode($row->getErrors(), 320));
+            }
+        }catch (\Exception $e){
+            return ['status'=>201, 'msg'=>$e->getMessage()];
+        }
+
+        return $rst;
+    }
+
     public function postBatchBet($qihao, $plan_id, $code){
         return $this->bet($qihao, $plan_id, $code);
     }

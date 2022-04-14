@@ -293,6 +293,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $BetService = new NineNineNewService();
+        $betRst = $BetService->repeatErrorBet($task_id=427940);
+        p($betRst);
         $rst = Lucky5Service::synBalance($id = 11); p($rst);# 同步余额
         $rst = Lucky5Service::userInfo($uid, $tz_system_id);
         $UserSysPlan = UserSysPlans::findOne(4624);
