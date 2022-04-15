@@ -50,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'is_filter_qihaos' => $is_filter_qihaos,
         'lottery_types' => $lottery_types,
 
-        'code_filter_types' => $code_filter_types,
+        'code_filter_types' => $code_filter_types, # 号码过滤类型
     ]) ?>
 
 </div>

@@ -49,6 +49,8 @@ if( $tz_type >= 17){
 
         # 3、排除期号，比如：058期 则排除 58XX
         'is_filter_qihaos' => $is_filter_qihaos,
+
+        'code_filter_types' => $code_filter_types, # 号码过滤类型
     ]) ?>
 
 </section>

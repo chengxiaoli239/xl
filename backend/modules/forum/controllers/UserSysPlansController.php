@@ -174,7 +174,7 @@ class UserSysPlansController extends BaseController
             'filter_date_pos2' => $filter_pos2,
             'lottery_types' => $lottery_types,
 
-            'code_filter_types' => $code_filter_types,
+            'code_filter_types' => $code_filter_types, # 排除类型
 
             # 2、排除前x天内同期
             'is_filter_qihaos' => $is_filters,
@@ -297,6 +297,7 @@ class UserSysPlansController extends BaseController
         $is_filters = [1=>'是'];
         $filter_pos1 = NumService::$pos_to_desc;
         $filter_pos2 = NumService::$pos_to_desc;
+        $code_filter_types = NumService::$code_filter_types;
         $data =  [
             'model' => $model,
             'tz_type' => $model->tz_type,
@@ -315,6 +316,7 @@ class UserSysPlansController extends BaseController
             'filter_date_pos1' => $filter_pos1,
             'filter_date_pos2' => $filter_pos2,
 
+            'code_filter_types' => $code_filter_types, # 排除类型
             # 2、排除前x天内同期
             'is_filter_qihaos' => $is_filters,
         ];

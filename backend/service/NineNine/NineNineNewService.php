@@ -560,17 +560,16 @@ class NineNineNewService extends BaseTZService {
                     return $tzRst;
                 }
                 $rst[$key] = $rstData;
-
-                $n = count(explode('@',$code));
-                if(in_array($playway, [2, 3]) && $tz_type != 20){
-                    $totalmoney = SscDataService::calTzTotalMoney($code, $single, $playway);
-                }else{
-                    $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
-                }
                 $snRst = NineNineNewService::getSnidBySn($plan->uid, self::$tz_system_id, $lottery_type);
                 if(isset($snRst['list'][0]['orderNo'])){
                     $snid = $snid.','.$snRst['list'][0]['orderNo']; // 获取方案内容
                 }
+            }
+            $n = count(explode('@',$code));
+            if(in_array($playway, [2, 3]) && $tz_type != 20){
+                $totalmoney = SscDataService::calTzTotalMoney($code, $single, $playway);
+            }else{
+                $totalmoney = $n * $single; // 投注总金额 = 注数 * 倍数
             }
         }
 
