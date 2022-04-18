@@ -77,11 +77,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute'=>'desc',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value'=>function($model){
+                                $TzSystemsUsers = \backend\models\TzSystemsUsers::findOne(['uid'=>$model->id]);
                                 $options = [
                                     'class'=>'act-user-copy',
                                     'data-id'=>$model->id,
                                     'data-username'=>$model->username,
                                     'data-desc'=>$model->desc,
+                                    'data-access_token'=>$TzSystemsUsers->access_token,
                                 ];
                                 return Html::a($model->desc, 'javascript:;', $options);
                             }
@@ -129,6 +131,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="modal-body">
                 <div class="form-group up-reason">
                     <label id="copy_tip_msg" for="copy_tip_msg"></label><span></span>
+                    <label id="copy_access_token" for="copy_access_token"></label><span></span>
                 </div>
             </div>
             <div class="modal-footer">
@@ -147,8 +150,10 @@ $(function () {
         console.log('xxx')
         var desc = $(this).data('desc');
         var username = $(this).data('username');
+        var access_token = $(this).data('access_token');
         $("#copy_tip_msg_title").html("用户[<strong>" + username + "</strong>]");
         $("#copy_tip_msg").html('http://' + window.location.host + '\r\n' + desc);
+        $("#copy_access_token").html("access_token：[<strong>" + access_token + "</strong>]");
         $("#act").val('act-user-copy');
         $("#COPY_TipModal").modal('show');
     });
