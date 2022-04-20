@@ -2831,7 +2831,7 @@ class SscDataService extends BaseService {
                     }
                     $hzArr = json_decode($UserSysPlan->hz_Arr, 320);
                     if(isset($hzArr['filters'])){
-                        $hzArr['current_kj_qihao'] = $current_kj_qihao;
+                        $hzArr['filters']['current_kj_qihao'] = $current_kj_qihao;
                     }
                     $UserSysPlan->hz_Arr = json_encode($hzArr, 320);
                     $UserSysPlan->current_profits = $profits;
@@ -3633,12 +3633,17 @@ class SscDataService extends BaseService {
 
         try {
             $maxQihao = BetService::$maxQihaoArr[$lottery_type];
-            $qihao = substr(HN0898Service::getCurrentQihao($lottery_type),-3); # 最后三位
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+            $qihao = substr($current_kj_qihao,-3); # 最后三位
             if($is_simulate_bet == 0 && in_array($lottery_type, [8]) && $maxQihao == $qihao){
                 //$profits = 0.00; # 每天的盈利重新计算
             }
             if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
                 $UserSysPlan->status = 0;
+            }
+            $hzArr = json_decode($UserSysPlan->hz_Arr, 320);
+            if(isset($hzArr['filters'])){
+                $hzArr['filters']['current_kj_qihao'] = $current_kj_qihao;
             }
             $UserSysPlan->current_profits = $profits;
             $UserSysPlan->updated_at = time();
