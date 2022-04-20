@@ -2074,11 +2074,11 @@ abstract class BetService extends BaseBetService {
                     if(!$RedisLock->lock($mkey_current.'_redis', 60)){
                         $logArr = ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'err_msg'=>'频繁请求，缓存60秒'];
                         //Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-00', $logArr);
-                        throw new \Exception('频繁请求，缓存60秒');
+                        //throw new \Exception('频繁请求，缓存60秒');
                         //continue;
                     }
                     if(empty($current_qihao)){
-                        throw new \Exception('即将下注的期号为空');
+                        //throw new \Exception('即将下注的期号为空');
                     }
 
                     $end_time1 = microtime(true);
@@ -2165,9 +2165,9 @@ abstract class BetService extends BaseBetService {
             if(count($c_codes) < 4){
                 $plan->is_test = 1;
             }else{
-                $hzArr['arb_pos_isbaohan'] = 1; # 是否包含
-                $hzArr['arb_pos_nums'] = 2; # 过滤号码至少包含2个号码
-                $hzArr['arb_pos_codes'] = implode('', array_diff([0,1,2,3,4,5,6,7,8,9], $c_codes));
+                $hzArr['filters']['arb_pos_isbaohan'] = 1; # 是否包含
+                $hzArr['filters']['arb_pos_nums'] = 2; # 过滤号码至少包含2个号码
+                $hzArr['filters']['arb_pos_codes'] = implode('', array_diff([0,1,2,3,4,5,6,7,8,9], $c_codes));
             }
         }
     }
