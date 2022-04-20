@@ -2074,7 +2074,8 @@ abstract class BetService extends BaseBetService {
                     if(!$RedisLock->lock($mkey_current.'_redis', 60)){
                         $logArr = ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'err_msg'=>'频繁请求，缓存60秒'];
                         //Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-00', $logArr);
-                        continue;
+                        throw new \Exception('频繁请求，缓存60秒');
+                        //continue;
                     }
                     if(empty($current_qihao)){
                         throw new \Exception('即将下注的期号为空');
@@ -2095,7 +2096,8 @@ abstract class BetService extends BaseBetService {
                     if(!empty($before_record) && $before_record->status!=1 && !$isCanBet){
                         $logArr = ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'beforeQihao'=>$beforeQihao, 'isCanBet'=>$isCanBet, 'before_record'=>!empty($before_record), 'err_msg'=>'暂时不可以下注'];
                         Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-01', $logArr);
-                        continue;
+                        throw new \Exception('暂时不可以下注1');
+                        //continue;
                     }
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤3', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao]);
 
