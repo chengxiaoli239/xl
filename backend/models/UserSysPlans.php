@@ -141,6 +141,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $start_qihao; # 模拟开始期号
     public $test_period_days; # 模拟近x天
     public $history_max_miss; # 历史最大遗漏
+    public $current_kj_qihao; # 当前开奖期号
     ############### 动态过滤 - 模拟 end ####################
 
     ############## A出x次B出y次投B、A出x次B出y次投B start ###################
