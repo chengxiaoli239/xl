@@ -30,12 +30,6 @@ class NumService extends BaseService {
     ];
 
     public static $pos_to_desc = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
-    public static $code_filter_types = [
-        '' => '-请选择-',
-        1 => '同位置前x期',
-        2 => '历史数据',
-        3 => '四定类型1',
-    ];
 
     /**
      * @description 根据开奖号码返回三字现
@@ -2746,13 +2740,13 @@ class NumService extends BaseService {
         $filter = NumService::getFilterTypeDatas($playway)[$filter_type];
         //$start_qihao = $filters['current_qihao'] ? : HN0898Service::getCurrentQihao($lottery_type); # 针对那一期过滤，默认为：当前期号
         $start_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
-        //p(['start_qihao'=>$start_qihao]);
+        //p(['start_qihao'=>$start_qihao, 'filter'=>$filter]);
         $query = Num4Type::find()->select(['code']);
-        if($filter['type'] == 1){ # 过滤前x期号码
+        $where = ['AND', ['=', 'code_type', $code_type] ];
+        if($filter['type'] == 1){ # 过滤前x期号码 type 一般情况下等于 filter_type
             $limit = $filters['filter_nums'] ? : ($filter['nums'] ? $filter['nums'] : 1);
             $filter_codes_where = ['AND', ['<', 'qihao', $start_qihao], ['=', 'lottery_type', $lottery_type]];
             $SscKjDatas = SscKjData::find()->where($filter_codes_where)->orderBy(['id'=>SORT_DESC])->limit($limit)->all();
-            $where = ['AND', ['=', 'code_type', $code_type] ];
             $filter_tmp_where = ['OR'];
             foreach ($filter_poses as $pos){
                 $code_pos = 'code'.$pos;
@@ -2844,11 +2838,24 @@ class NumService extends BaseService {
             ],
             3 => [ # 四定
                 1 => [ 'type'=>1,  'desc'=>'过滤上前x期同位置同号码'],
+                2 => [ 'type'=>2,  'desc'=>'四个号码不同时，下一期排查当前号码并且取兄弟'],
             ],
         ];
 
         if(isset($filter_type_datas[$playway])) return $filter_type_datas[$playway];
 
         return $filter_type_datas;
+    }
+
+    /**
+     * @desc 模拟过滤的号码类型
+     * @return string[]
+     */
+    public static function get_code_filter_types(){
+        return [
+            '' => '-请选择-',
+            //1 => '同位置前x期',
+            2 => '四定过滤类型1', # 四个号码不同时，下一期排查当前号码并且取兄弟
+        ];
     }
 }

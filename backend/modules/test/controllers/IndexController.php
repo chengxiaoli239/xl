@@ -293,6 +293,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $batch_simulate_data = BetService::batchSimulateBet($lottery_types=[23], $uid=11);p($batch_simulate_data);
         $BetService = new NineNineNewService();
         $betRst = $BetService->repeatErrorBet($task_id=427940);
         p($betRst);

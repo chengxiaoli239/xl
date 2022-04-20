@@ -153,7 +153,7 @@ class UserSysPlansController extends BaseController
         $is_filters = [1=>'是'];
         $filter_pos1 = NumService::$pos_to_desc;
         $filter_pos2 = NumService::$pos_to_desc;
-        $code_filter_types = NumService::$code_filter_types;
+        $code_filter_types = NumService::get_code_filter_types();
         $data =  [
             'model' => $model,
             'tz_type' => $tz_type,
@@ -216,6 +216,7 @@ class UserSysPlansController extends BaseController
         $model->tz_sites = explode(',', $model->tz_sites);
         if(in_array($model->tz_type, [22])){ # 和值、四定单双
             $model->hz_Arr = explode(',', $model->hz_Arr);
+            /*
         }elseif (in_array($model->tz_type, [28])){
             if($model->hz_Arr){
                 $jsons = json_decode($model->hz_Arr, true);
@@ -223,10 +224,11 @@ class UserSysPlansController extends BaseController
                     $model->$key = $v;
                 }
             }
+            */
         }elseif (in_array($model->tz_type, \Yii::$app->params['IS_XIAN'])){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
             $model->hz_Arr = $hz_Arr_Data['codes'];
-        }elseif (in_array($model->tz_type, [18, 19, 20, 25, 27, 29, 30, 31, 32, 33, 34])){
+        }elseif (in_array($model->tz_type, [18, 19, 20, 25, 27, 28, 29, 30, 31, 32, 33, 34])){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
             $where = ['plan_id'=>$model->id];
             if($this->_user_id != 1){
@@ -248,7 +250,7 @@ class UserSysPlansController extends BaseController
                 $model->filter_nums = $hz_Arr_Data['filters']['filter_nums'];
                 $model->playway = $hz_Arr_Data['filters']['playway'];
                 $model->filter_poses = $hz_Arr_Data['filters']['filter_poses'];
-                $model->test_period_days = $hz_Arr_Data['filters']['test_period_days'];
+                $model->test_period_days = $hz_Arr_Data['filters']['test_period_days'] ? : '';
                 $model->start_qihao = $hz_Arr_Data['filters']['start_qihao'] ? : '';
             }
             unset($hz_Arr_Data['filters']);
@@ -297,7 +299,7 @@ class UserSysPlansController extends BaseController
         $is_filters = [1=>'是'];
         $filter_pos1 = NumService::$pos_to_desc;
         $filter_pos2 = NumService::$pos_to_desc;
-        $code_filter_types = NumService::$code_filter_types;
+        $code_filter_types = NumService::get_code_filter_types();
         $data =  [
             'model' => $model,
             'tz_type' => $model->tz_type,

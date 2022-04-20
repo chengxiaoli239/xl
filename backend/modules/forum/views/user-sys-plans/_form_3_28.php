@@ -98,6 +98,8 @@ use yii\widgets\ActiveForm;
                         <a href="javascript:;" class="btn btn-xs btn-info fan reverse_type_hz_Null">清</a>
                     ') ?-->
 
+                    <?php include(dirname(__FILE__).'/history_simulate_bet.php'); # 模拟历史 ?>
+
                     <!--止盈止损-->
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>

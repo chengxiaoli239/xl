@@ -2811,7 +2811,7 @@ class SscDataService extends BaseService {
             # 止盈止损、翻倍止盈止损 计划
             $where = [
                 'OR',
-                [ 'AND', ['IN', 'plan_type', [1, 3, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type] ],
+                [ 'AND', ['IN', 'plan_type', [0, 1, 3, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type] ],
                 [ 'AND', ['>', 'take_profits', 0], ['>', 'stop_loss', 0], ['=', 'status', 1] ]
             ];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
@@ -2819,7 +2819,8 @@ class SscDataService extends BaseService {
                     $profits = SscDataService::getPlanProfits($UserSysPlan);
 
                     $maxQihao = BetService::$maxQihaoArr[$lottery_type];
-                    $qihao = substr(HN0898Service::getCurrentQihao($lottery_type),-3); # 最后三位
+                    $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+                    $qihao = substr($current_kj_qihao,-3); # 最后三位
                     if(in_array($lottery_type, [8]) && $maxQihao == $qihao){
                         $profits = 0.00; # 每天的盈利重新计算
                     }
@@ -2828,6 +2829,11 @@ class SscDataService extends BaseService {
                     if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
                         $UserSysPlan->status = 0;
                     }
+                    $hzArr = json_decode($UserSysPlan->hz_Arr, 320);
+                    if(isset($hzArr['filters'])){
+                        $hzArr['current_kj_qihao'] = $current_kj_qihao;
+                    }
+                    $UserSysPlan->hz_Arr = json_encode($hzArr, 320);
                     $UserSysPlan->current_profits = $profits;
                     $saveFlag = $UserSysPlan->save();
 
