@@ -2811,8 +2811,8 @@ class SscDataService extends BaseService {
             # 止盈止损、翻倍止盈止损 计划
             $where = [
                 'OR',
-                [ 'AND', ['IN', 'plan_type', [0, 1, 3, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type] ],
-                [ 'AND', ['>', 'take_profits', 0], ['>', 'stop_loss', 0], ['=', 'status', 1] ]
+                [ 'AND', ['IN', 'plan_type', [0, 1, 3, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type], ['=', 'is_batch_simulate', 0] ],
+                [ 'AND', ['>', 'take_profits', 0], ['>', 'stop_loss', 0], ['=', 'status', 1], ['=', 'is_batch_simulate', 0] ]
             ];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
@@ -3643,6 +3643,7 @@ class SscDataService extends BaseService {
             if(isset($hzArr['filters'])){
                 $hzArr['filters']['current_kj_qihao'] = $current_kj_qihao;
             }
+            $UserSysPlan->hz_Arr = json_encode($hzArr, 320);
             $UserSysPlan->current_profits = $profits;
             $UserSysPlan->updated_at = time();
             $saveFlag = $UserSysPlan->save();
