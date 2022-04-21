@@ -3632,12 +3632,10 @@ class SscDataService extends BaseService {
         $lottery_type = $UserSysPlan->lottery_type;
 
         try {
-            $maxQihao = BetService::$maxQihaoArr[$lottery_type];
-            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
-            $qihao = substr($current_kj_qihao,-3); # 最后三位
-            if($is_simulate_bet == 0 && in_array($lottery_type, [8]) && $maxQihao == $qihao){
-                //$profits = 0.00; # 每天的盈利重新计算
-            }
+            //$maxQihao = BetService::$maxQihaoArr[$lottery_type];
+            //$current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+            $current_kj_qihao = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one()->qihao;
+            //$qihao = substr($current_kj_qihao,-3); # 最后三位
             if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
                 $UserSysPlan->status = 0;
             }

@@ -2042,13 +2042,6 @@ abstract class BetService extends BaseBetService {
         $RedisLock = new RedisLock();
 
         foreach ($lottery_types as $lottery_type) {
-            $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid;
-            $flag = $m->get($mkey);
-            if($flag){
-                return ['status'=>300, 'msg'=>'有正在执行的任务,请稍后...'];
-            }
-            $m->set($mkey, 1, 6);
-
             $where = ['AND', ['=', 'status', 1], ['=', 'is_batch_simulate', 1], ['=', 'lottery_type', $lottery_type]]; # is_batch_simulate:0正常1批量模拟历史记录
             if(!empty($where)){
                 $where[] = ['=', 'uid', $uid];
@@ -2061,6 +2054,13 @@ abstract class BetService extends BaseBetService {
                 continue;
             }
             foreach ($plans as $plan) {
+                $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan->id;
+                $flag = $m->get($mkey);
+                if($flag){
+                    return ['status'=>300, 'msg'=>'有正在执行的任务,请稍后...'];
+                }
+
+                $m->set($mkey, 1, 6);
                 $rst = ['status'=>200, 'data'=>['plan_id'=>$plan->id], 'msg'=>'操作成功'];
                 try {
                     $start_time1 = microtime(true);
@@ -2070,7 +2070,7 @@ abstract class BetService extends BaseBetService {
 
                     $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
                     $mkey_current = 'getPlanBetCurrentQihao_'.$plan_id.'_'.$current_qihao;
-                    if(!$RedisLock->lock($mkey_current.'_redis', 60)){
+                    if(!$RedisLock->lock($mkey_current.'_redis', 5)){
                         $logArr = ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'err_msg'=>'频繁请求，缓存60秒'];
                         //Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-00', $logArr);
                         //throw new \Exception('频繁请求，缓存60秒');
@@ -2123,8 +2123,8 @@ abstract class BetService extends BaseBetService {
                 }catch (\Exception $exception){
                     Tool_Common::log('/datas/'.__FUNCTION__."_e", 'ERR', '计划模拟失败', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
                 }
+                $m->delete($mkey);
             }
-            $m->delete($mkey);
         }
 
         return $rst;
