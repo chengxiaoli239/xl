@@ -1316,7 +1316,7 @@ class NumService extends BaseService {
         }
         $query = Num4Type::find()->where($where);
 
-        //p([$codes_hz['arb_pos_isbaohan'], $codes_hz['arb_pos_nums'], $codes_hz['arb_pos_codes']]);
+        //p([$codes_hz['arb_pos_isbaohan'], $codes_hz['arb_pos_nums'], $codes_hz['arb_pos_codes']],0);
         ############################ 任意位置包含、排除 start ###################################
         if(isset($codes_hz['arb_pos_isbaohan'])){
             $arb_pos_nums = $codes_hz['arb_pos_nums']; # 个数
@@ -2742,7 +2742,8 @@ class NumService extends BaseService {
         $start_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
         //p(['start_qihao'=>$start_qihao, 'filter'=>$filter]);
         $query = Num4Type::find()->select(['code']);
-        $where = ['AND', ['=', 'code_type', $code_type] ];
+        $where = ['AND', ['=', 'code_type', $code_type] , '1=1'];
+        $query->where($where);
         if($filter['type'] == 1){ # 过滤前x期号码 type 一般情况下等于 filter_type
             $limit = $filters['filter_nums'] ? : ($filter['nums'] ? $filter['nums'] : 1);
             $filter_codes_where = ['AND', ['<', 'qihao', $start_qihao], ['=', 'lottery_type', $lottery_type]];

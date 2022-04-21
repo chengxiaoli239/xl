@@ -768,9 +768,11 @@ abstract class BetService extends BaseBetService {
         $playway = BetService::getPlaywayByTzType($tz_type);
         //p([$tz_type, $buy_type, $sel_same, $codes_hz, $playway]);
         $m = \Yii::$app->cache;
-        $qihao = HN0898Service::getQihao();
-        $mkey = 'getPlansAllCodesType1_'.$playway.'_'.$tz_type.'_'.$buy_type.'_'.$qihao;
-        //if($codes = $m->get($mkey)) return $codes;
+        $codes_hz_data = json_decode($codes_hz, true);
+        # 排除类型
+        BetService::getDynamicsHzArr($codes_hz_data, $plan_id);
+        //p($codes_hz_data);
+        $codes_hz = json_encode($codes_hz_data);
 
         switch ($playway){
             case 4: # 一字定
@@ -884,15 +886,14 @@ abstract class BetService extends BaseBetService {
         //p(['buy_type'=>$buy_type, 'before_count'=>$before_count, 'after_count'=>count($codesArr), 'codesArr'=>$codesArr]);
 
         $codes_hz_data = json_decode($codes_hz, true);
-        if(isset($codes_hz_data['filters']['filter_type']) && $codes_hz_data['filters']['filter_type']){
+        if(isset($codes_hz_data['filters']['filter_type']) && in_array($codes_hz_data['filters']['filter_type'], [1])){
             # 过滤号码，filter_type:1过滤前x期号码
             $filter_codes = NumService::getCodesByCodesHz($codes_hz_data['filters'], $plan_id);
             Tool_Common::log('/codes/'.__FUNCTION__, 'INFO', '过滤号码', ['plan_id'=>$plan_id, 'tz_type'=>$tz_type, 'filters'=>$codes_hz_data['filters'], 'codesArr'=>$codesArr, 'get_counts'=>count($codesArr), 'filter_codes'=>$filter_codes, 'filter_counts'=>count($filter_codes)]);
-            //p(['codesArr'=>$codesArr, 'filter_codes'=>$filter_codes]);
+            //p(['codesArrCount'=>count($codesArr), 'codesArr'=>$codesArr, 'filter_codes_count'=>count($filter_codes),  'filter_codes'=>$filter_codes]);
             $codesArr = array_diff($codesArr, $filter_codes); # 返回$codes在$filter_codes中没有的号码
         }
         $codes = implode('@', $codesArr);
-        //$m->set($mkey, $codes, 5*60);
 
         return $codes;
     }
@@ -2066,8 +2067,6 @@ abstract class BetService extends BaseBetService {
                     $lottery_type = $plan->lottery_type;
                     $plan_id = $plan->id;
                     $codes_hz_data = json_decode($plan->hz_Arr, true);
-                    # 排除同期
-                    BetService::getDynamicsHzArr($codes_hz_data, $plan, $lottery_type);
 
                     $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
                     $mkey_current = 'getPlanBetCurrentQihao_'.$plan_id.'_'.$current_qihao;
@@ -2137,7 +2136,7 @@ abstract class BetService extends BaseBetService {
      * @param string $plan_id
      * @param int $lottery_type
      */
-    public static function getDynamicsHzArr(&$hzArr = [], &$plan, $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function getDynamicsHzArr(&$hzArr = [], $plan_id){
         $filters = $hzArr['filters'];
         $filter_type = $filters['filter_type'];
         if($filter_type == 1){
@@ -2147,8 +2146,10 @@ abstract class BetService extends BaseBetService {
                 $hzArr['p'.$x_pos] = 'X';
             }
         }elseif($filter_type == 2){
+            $plan = UserSysPlans::findOne($plan_id);
+            $lottery_type = $plan->lottery_type;
             if(empty($filters['current_kj_qihao'])){
-                $filterNumsQihao = BettingRecords::find()->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->one()->qihao;
+                $filterNumsQihao = BettingRecords::find()->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan_id])->one()->qihao;
                 if(empty($betMaxQihao)){
                     $filterNumsQihao = $filters['start_qihao'];
                 }
@@ -2165,9 +2166,9 @@ abstract class BetService extends BaseBetService {
             if(count($c_codes) < 4){
                 $plan->is_test = 1;
             }else{
-                $hzArr['filters']['arb_pos_isbaohan'] = 1; # 是否包含
-                $hzArr['filters']['arb_pos_nums'] = 2; # 过滤号码至少包含2个号码
-                $hzArr['filters']['arb_pos_codes'] = implode('', array_diff([0,1,2,3,4,5,6,7,8,9], $c_codes));
+                $hzArr['arb_pos_isbaohan'] = 1; # 是否包含
+                $hzArr['arb_pos_nums'] = 2; # 过滤号码至少包含2个号码
+                $hzArr['arb_pos_codes'] = implode('', array_diff([0,1,2,3,4,5,6,7,8,9], $c_codes));
             }
         }
     }
