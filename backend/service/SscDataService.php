@@ -3634,7 +3634,7 @@ class SscDataService extends BaseService {
         try {
             //$maxQihao = BetService::$maxQihaoArr[$lottery_type];
             //$current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
-            $current_kj_qihao = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one()->qihao;
+            $current_kj_qihao = BettingRecords::find()->where(['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one()->qihao;
             //$qihao = substr($current_kj_qihao,-3); # 最后三位
             if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
                 $UserSysPlan->status = 0;
