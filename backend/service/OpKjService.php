@@ -73,7 +73,7 @@ class OpKjService extends BaseService {
                     return $rst = ['status'=>300, 'msg'=>$qihao.'期未开奖!'];
                 }
 
-                $profitsData = self::calcuProfits($playway, $codes, $kjData, $single);
+                $profitsData = self::calcuProfits($playway, $codes, $kjData, $single, $BettingRecord->uid);
 
                 $bouns = $profitsData['bouns'];
                 $profits = $bouns - $BettingRecord['betting_money'];
@@ -209,7 +209,7 @@ class OpKjService extends BaseService {
      * @param string $kjData 格式：3,6,3,3,5
      * @return array
      */
-    public static function calcuProfits($playway, $codes, $kjData = '', $single = 0.1){
+    public static function calcuProfits($playway, $codes, $kjData = '', $single = 0.1, $uid=''){
         if(!$kjData) return [];
         $rstData = [];
         # 开奖数据 start
@@ -247,7 +247,7 @@ class OpKjService extends BaseService {
         # 投注金额
         $rstData['betting_money'] = $betting_money;
         # 中奖金额 = 赔率 * 倍数 * 注数
-        $rstData['bouns'] = CommonService::getOdds($playway) * $single * $times;
+        $rstData['bouns'] = CommonService::getOdds($playway, $uid) * $single * $times;
         # 利润 = 中奖金额 - 投注金额
         $rstData['profits'] = $rstData['bouns'] - $betting_money;
         $rstData['zjResult'] = $zjResult;

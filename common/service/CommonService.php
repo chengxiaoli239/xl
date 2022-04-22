@@ -421,7 +421,7 @@ class  CommonService{
      * @param int $playway
      * @return mixed
      */
-    public static function getOdds($playway = 10, $type = 'odds'){
+    public static function getOdds($playway = 10, $uid='', $type = 'odds'){
         $playways = [
             1 => ['odds'=>98,'name'=>'两字定'],  // 两字定
             2 => ['odds'=>980,'name'=>'三字定'],   // 三字定
@@ -438,6 +438,11 @@ class  CommonService{
             16 => ['odds'=>300,'name'=>'组三'],  // 组三
             17 => ['odds'=>140,'name'=>'组六'],  // 组六
         ];
+        if($uid == 10){
+            $playways[1] = ['odds'=>99,'name'=>'两字定'];  // 两字定
+            $playways[2] = ['odds'=>990,'name'=>'三字定'];  // 三字定
+            $playways[3] = ['odds'=>9900,'name'=>'四字定'];  // 四字定
+        }
 
         if($playway && $playways[$playway][$type])
             return $playways[$playway][$type];
