@@ -1313,6 +1313,20 @@ abstract class BetService extends BaseBetService {
                     $flag = 1;
                 }
             }
+            if($codes_hz['filters']['filter_type'] == 2){
+                $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one();
+                $kj_codes = $BettingRecords->kj_codes;
+                $codesArr = explode(',', $kj_codes);
+                $end_num = array_pop($codesArr); # 以太坊去掉最后一个0
+                $countCodes = count($codesArr);
+                if(in_array($plan->lottery_type, [23, 24])){
+                    $flag = ($countCodes == 4) ? 1 : 0;
+                }else{
+                    if($countCodes<4){
+                        $codesArr[] = $end_num;
+                    }
+                }
+            }
         }
 
         return (int)$flag;
