@@ -2544,8 +2544,8 @@ class StaticService extends BaseService {
         if(!$status && $isExists) {
             $flag = true;
             ####################待观察0423######################
-            $cacheTime = BetService::getBetCacheTime($lottery_type, $qihao);
-            $m->set($mkey, true, $cacheTime); # 进来直接锁住再往下执行
+            //$cacheTime = BetService::getBetCacheTime($lottery_type, $qihao);
+            //$m->set($mkey, true, $cacheTime); # 进来直接锁住再往下执行
             ####################待观察0423######################
         }else{
             $flag = false;
