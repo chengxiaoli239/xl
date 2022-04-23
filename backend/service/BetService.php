@@ -1943,7 +1943,7 @@ abstract class BetService extends BaseBetService {
 
                     $insert_mkey = 'insertPlanTask_key_'.$lottery_type.'_'.$plan->id;
                     if($m->get($insert_mkey)){
-                        continue;
+                        throw new Exception('已记录yx表'.$lottery_type.'_'.$qihao.'_'.$plan->id);
                     }
                     $Task = BetErrorPlansTask::findOne(['plan_id'=>$plan->id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
                     if($Task){
@@ -1958,8 +1958,8 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus->next_qihao, 'task_qihao'=>$qihao]);
                     if(empty($DataDealStatus) OR $DataDealStatus->opProfitsPlans_status != 2){
                         Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
-                        #throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
-                        continue;
+                        throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
+                        //continue;
                     }
 
                     # 4、投注号码 codes
@@ -1996,7 +1996,9 @@ abstract class BetService extends BaseBetService {
 
                         $preInsertLockKey = 'preInsertLockKey_'.$plan->id.'_'.$activeQihao;
 
-                        if($lock = $m->get($preInsertLockKey))continue;
+                        if($lock = $m->get($preInsertLockKey)){
+                            throw new \yii\base\Exception('已经被锁:'.$preInsertLockKey);
+                        }
                         $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
                         $m->set($preInsertLockKey, 1, $time);
 
