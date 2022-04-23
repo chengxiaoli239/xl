@@ -2199,7 +2199,39 @@ abstract class BetService extends BaseBetService {
                 ['=', 'lottery_type', $lottery_type],
                 ['=', 'qihao', $filterNumsQihao],
             ];
+            $remove_types = $hzArr['remove_types'] ? : [];
+
             $SscKjData = SscKjData::find()->where($qh_where)->one();
+            # 兄弟
+            if($SscKjData->type_2b == 0){
+                $hzArr['type_2b'] = 1;
+            }
+
+            # 三兄弟
+            if($SscKjData->type_3b == 1){
+                //$hzArr['type_3b'] = 0; # 如果上三兄弟就排除三兄弟
+                $remove_types[] = 6; # 排除三兄弟
+            }
+            # 双两兄弟
+            if($SscKjData->type_22b == 1){
+                $remove_types[] = 8; # 排除双两兄弟
+            }
+            # 三现+两兄弟
+            if($SscKjData->type_3n_2b == 1){
+                //$hzArr['type_3n_2b'] = 0; # 如果上三兄弟就
+                $remove_types[] = 1; # 排除三现+两兄弟
+            }
+
+            if(isset($hzArr['type_2b']) && $hzArr['type_2b'] == 1){
+                $remove_types[] = 1; # 排除三现+两兄弟
+                $remove_types[] = 8; # 排除双两兄弟
+            }
+
+            if($hzArr['type_3b'] == 0){
+                $hzArr['type_3n_2b'] = 0;
+            }
+            $hzArr['remove_types'] = $remove_types;
+
             $c_codes = array_unique(explode(',', $SscKjData->code_4n_str));
             if(count($c_codes) < 4){
                 $plan->is_test = 1;
