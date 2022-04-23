@@ -1934,9 +1934,9 @@ abstract class BetService extends BaseBetService {
                 Tool_Common::log('plan_is_active', 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>'没有开启的计划', 'uid'=>$plans[0]->uid]);
                 continue;
             }
-            try {
-                $m = \Yii::$app->cache;
-                foreach ($plans as $plan){
+            $m = \Yii::$app->cache;
+            foreach ($plans as $plan){
+                try {
                     $tz_system_id = $plan->tz_sites;
                     $lottery_type = $plan->lottery_type;
                     $uid = $plan->uid;
@@ -2010,10 +2010,11 @@ abstract class BetService extends BaseBetService {
                         $logArr = ['uid'=>$uid, 'account'=>$plan->account, 'plan_id'=>$plan->id, 'activeQihao'=>$activeQihao, 'insertRst'=>$insertRst];
                         Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-2', $logArr);
                     }
+                    $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>'正常'];
+                }catch (\Exception $e){
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '批量插入下注计划异常', ['uid'=>$uid, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+                    $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>$e->getMessage()];
                 }
-            }catch (\Exception $e){
-                Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '批量插入下注计划异常', ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
-                continue;
             }
         }
 
