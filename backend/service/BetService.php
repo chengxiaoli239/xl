@@ -1211,6 +1211,7 @@ abstract class BetService extends BaseBetService {
                 $BettingRecords = BettingRecords::find()->where(['lottery_type'=>$UserSysPlans->lottery_type, 'plan_id'=>$planId])->orderBy(['id'=>SORT_DESC])->one();
                 $codesArr = explode(',', $BettingRecords->kj_codes);
                 array_pop($codesArr);
+                $codesArr = array_unique($codesArr);
                 if(count($codesArr) == 4){
                     $is_test = 0;
                 }
