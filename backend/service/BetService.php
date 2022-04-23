@@ -2034,7 +2034,7 @@ abstract class BetService extends BaseBetService {
         if(empty($DataDealStatus)){
             $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type, 'next_qihao'=>$qihao])->one();
             Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '数据处理状态', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus->attributes]);
-            $status = 2;
+            $status = 0;
             if(!empty($DataDealStatus)){
                 $status = $DataDealStatus->$status_key;
                 $m->set($mkey, $status, 5);
