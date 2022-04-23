@@ -2027,16 +2027,18 @@ abstract class BetService extends BaseBetService {
 
         $m = \Yii::$app->cache;
         $mkey = 'getDataDealStatus_'.$lottery_type.'_'.$qihao;
-        $DataDealStatus = $m->get($mkey);
+        $status = $m->get($mkey);
         if(empty($DataDealStatus)){
             $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type, 'next_qihao'=>$qihao])->one();
             Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '数据处理状态', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus->attributes]);
+            $status = 2;
             if(!empty($DataDealStatus)){
-                $m->set($mkey, $DataDealStatus->$status_key, 5);
+                $status = $DataDealStatus->$status_key;
+                $m->set($mkey, $status, 5);
             }
         }
 
-        return $DataDealStatus;
+        return $status;
     }
 
     /**
