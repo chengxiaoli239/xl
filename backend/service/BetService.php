@@ -1206,12 +1206,13 @@ abstract class BetService extends BaseBetService {
             }
             Tool_Common::log('/plan/'.__FUNCTION__.'_is_bet_true', 'INFO', '是否真实下注计划', ['plan_id'=>$planId, 'flag'=>$flag, 'fh'=>(boolean)(in_array($flag, [0, -1]) && $isAuto == 1), 'sn'=>$sn, 'snid'=>$snid]);
         }elseif($hzArr['filters']['filter_type'] == 2){
+            $BettingRecords = BettingRecords::find()->where(['lottery_type'=>$UserSysPlans->lottery_type, 'plan_id'=>$planId])->orderBy(['id'=>SORT_DESC])->one();
+            $codesArr = explode(',', $BettingRecords->kj_codes);
+            array_pop($codesArr);
+            $codesArr = array_unique($codesArr);
+
             if($UserSysPlans->is_batch_simulate == 1){
                 $is_test = 1;
-                $BettingRecords = BettingRecords::find()->where(['lottery_type'=>$UserSysPlans->lottery_type, 'plan_id'=>$planId])->orderBy(['id'=>SORT_DESC])->one();
-                $codesArr = explode(',', $BettingRecords->kj_codes);
-                array_pop($codesArr);
-                $codesArr = array_unique($codesArr);
                 if(count($codesArr) < 4){
                     $sn = 'istest';
                     $snid = 'istest_id';
@@ -1956,7 +1957,7 @@ abstract class BetService extends BaseBetService {
                     $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao);
                     Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus->next_qihao, 'task_qihao'=>$qihao]);
                     if(empty($DataDealStatus) OR $DataDealStatus->opProfitsPlans_status != 2){
-                        Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus]);
+                        Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
                         #throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
                         continue;
                     }
