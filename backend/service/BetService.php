@@ -1978,7 +1978,7 @@ abstract class BetService extends BaseBetService {
                         }
                     }else{
                         $task_qihao = $qihao;
-                        Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-1', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'uid'=>$uid]);
+                        Tool_Common::log('insertPlansTask', 'INFO', '插入计划任务-1', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'uid'=>$uid]);
 
                         $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
                         $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
@@ -2008,11 +2008,11 @@ abstract class BetService extends BaseBetService {
                         $insertRst = $BetService->postBatchBet($activeQihao, $plan->id, $codes);
                         $rst['data'][$plan->id] = $insertRst;
                         $logArr = ['uid'=>$uid, 'account'=>$plan->account, 'plan_id'=>$plan->id, 'activeQihao'=>$activeQihao, 'insertRst'=>$insertRst];
-                        Tool_Common::log('insertPlansTask', 'INFO', '批量填插入用户计划任务-2', $logArr);
+                        Tool_Common::log('insertPlansTask', 'INFO', '插入计划-任务-2', $logArr);
                     }
                     $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>'正常'];
                 }catch (\Exception $e){
-                    Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '批量插入下注计划异常', ['uid'=>$uid, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划-异常', ['uid'=>$uid, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
                     $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>$e->getMessage()];
                 }
             }
