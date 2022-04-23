@@ -435,8 +435,8 @@ abstract class BetService extends BaseBetService {
                         #    continue;
                         #}
                         $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao, 'opProfitsPlans_status');
-                        Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus->next_qihao, 'task_qihao'=>$qihao]);
-                        if(empty($DataDealStatus) OR $DataDealStatus->opProfitsPlans_status != 2){
+                        Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan_id, 'DataDealStatus'=>$DataDealStatus, 'task_qihao'=>$qihao]);
+                        if(empty($DataDealStatus) OR $DataDealStatus != 2){
                             Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus]);
                             throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
                         }
@@ -1956,7 +1956,7 @@ abstract class BetService extends BaseBetService {
                     //$next_qihao_is_active = TzService::beforeBet($lottery_type, $c_active_qihao);
 
                     $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao, 'opProfitsPlans_status');
-                    Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus->next_qihao, 'task_qihao'=>$qihao]);
+                    Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus, 'task_qihao'=>$qihao]);
                     if(empty($DataDealStatus) OR $DataDealStatus != 2){
                         Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
                         throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
