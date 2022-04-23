@@ -2845,7 +2845,7 @@ class SscDataService extends BaseService {
             # 不中倍投：翻倍计划、翻倍止盈止损，倍投 连续x期不中 决定倍数
             //$fb_plan_types = [2, 3, 4, 5, 9, 10];
             $fb_plan_types = SscDataService::$fb_plan_types;
-            $where = ['AND', ['IN', 'plan_type', $fb_plan_types], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND', ['IN', 'plan_type', $fb_plan_types], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     $flag = SscDataService::isZjBefore($UserSysPlan->id);
@@ -2970,7 +2970,7 @@ class SscDataService extends BaseService {
             }
 
             # plan_type:7 中则继续投否则反买
-            $where = ['AND', ['IN', 'plan_type', [7]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND', ['IN', 'plan_type', [7]], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     $flag = SscDataService::isZjBefore($UserSysPlan->id);
@@ -2985,7 +2985,7 @@ class SscDataService extends BaseService {
             }
 
             # 玩法类型，号码导入:tz_type \Yii::$app->params['IMPORT_CODES_TYPES']
-            $where = ['AND', ['IN', 'tz_type', \Yii::$app->params['IMPORT_CODES_TYPES']], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND', ['IN', 'tz_type', \Yii::$app->params['IMPORT_CODES_TYPES']], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     $hzArr = json_decode($UserSysPlan->hz_Arr, true);
@@ -3040,7 +3040,7 @@ class SscDataService extends BaseService {
 
         try {
             # plan_type:12 A出x次B出y次投B
-            $where = ['AND', ['IN', 'plan_type', UserSysPlans::$A_x_arise_B_y_arise_bet_B_types], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND', ['IN', 'plan_type', UserSysPlans::$A_x_arise_B_y_arise_bet_B_types], ['=', 'is_batch_simulate', 0], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     $plan_type = $UserSysPlan->plan_type;
@@ -3126,7 +3126,7 @@ class SscDataService extends BaseService {
 
         try {
             # plan_type:14区间遗漏投
-            $where = ['AND', ['=', 'plan_type', 14], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND', ['=', 'plan_type', 14], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     $plan_type = $UserSysPlan->plan_type;
@@ -3627,7 +3627,7 @@ class SscDataService extends BaseService {
     private static function handleOnePlanProfits($plan_id='', $is_simulate_bet=0){
         $UserSysPlan = UserSysPlans::findOne($plan_id);
         # 1、利润计算 start
-        $where = ['AND', ['=', 'plan_id', $plan_id], ['=', 'is_profits_record', 1]];
+        $where = ['AND', ['=', 'plan_id', $plan_id], ['=', 'is_profits_record', 1], ['=', 'is_batch_simulate', $is_simulate_bet]];
         $profits = BettingRecords::find()->where($where)->sum('profits');
         $lottery_type = $UserSysPlan->lottery_type;
 
@@ -3668,7 +3668,7 @@ class SscDataService extends BaseService {
      * @param int $is_simulate_bet
      */
     private static function handleOnePlanFanBei($plan_id='', $is_simulate_bet=0){
-        $UserSysPlan = UserSysPlans::findOne($plan_id);
+        $UserSysPlan = UserSysPlans::find()->where(['AND', ['=', 'id', $plan_id], ['=', 'is_batch_simulate', $is_simulate_bet]])->one();
         if($UserSysPlan->status != 1){
             return ['status'=>300, 'msg'=>'未激活计划不处理'];
         }
