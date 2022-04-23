@@ -3012,7 +3012,7 @@ class SscDataService extends BaseService {
 
             $logArr['lottery_type'] = $lottery_type;
             $logArr['qihao'] = HN0898Service::getQihao($lottery_type);
-            Tool_Common::log('opProfitsPlans', 'INFO', '处理止盈止损\倍投计划', [$logArr]);
+            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划', [$logArr]);
             $dealStatus = 2;
         }catch (\Exception $e){
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
@@ -3035,7 +3035,7 @@ class SscDataService extends BaseService {
         $RedisLock = new RedisLock();
         $Rkey = __FUNCTION__.'_redis_'.$lottery_type;
         if(!$RedisLock->lock($Rkey, 30)){
-            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', 'A出x次B出y次投B-处理锁错误', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+            Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', 'A出x次B出y次投B-处理锁错误', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
         }
 
         try {
@@ -3095,7 +3095,7 @@ class SscDataService extends BaseService {
                     }
                     $hzArr['singles_key'] = $next_single_key;
                     $hzArr_update_after = $hzArr;
-                    Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后1', ['plan_id'=>$UserSysPlan->id, 'zj_group'=>$zj_group, 'qihao'=>$qihao, 'zjResult'=>$zjResult, 'hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'next_single_key'=>$next_single_key, 'single'=>$single, 'singles'=>$UserSysPlan->singles]);
+                    Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'INFO', '计划更新前后1', ['plan_id'=>$UserSysPlan->id, 'zj_group'=>$zj_group, 'qihao'=>$qihao, 'zjResult'=>$zjResult, 'hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'next_single_key'=>$next_single_key, 'single'=>$single, 'singles'=>$UserSysPlan->singles]);
 
                     $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                     $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
@@ -3105,7 +3105,7 @@ class SscDataService extends BaseService {
                 }
             }
         }catch (\Exception $exception){
-            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', 'A出x次B出y次投B-处理错误', ['plan_id'=>$UserSysPlans->id, 'err_msg'=>$exception->getMessage()]);
+            Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type.'_'.$UserSysPlan->id, 'ERR', 'A出x次B出y次投B-处理错误', ['plan_id'=>$UserSysPlans->id, 'err_msg'=>$exception->getMessage()]);
             return false;
         }
 
@@ -3121,7 +3121,7 @@ class SscDataService extends BaseService {
         $RedisLock = new RedisLock();
         $Rkey = __FUNCTION__.'_redis_'.$lottery_type;
         if(!$RedisLock->lock($Rkey, 10)){
-            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', '区间遗漏投-处理锁错误', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+            Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '区间遗漏投-处理锁错误', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
         }
 
         try {
@@ -3203,11 +3203,11 @@ class SscDataService extends BaseService {
                     $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
                     $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                     $logArr['save_rst'] = $rst;
-                    Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后21', $logArr);
+                    Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'INFO', '计划更新前后21', $logArr);
                 }
             }
         }catch (\Exception $exception){
-            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', '区间遗漏投-处理错误', ['plan_id'=>$UserSysPlan->id, 'err_msg'=>$exception->getMessage()]);
+            Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type.'_'.$UserSysPlan->id, 'ERR', '区间遗漏投-处理错误', ['plan_id'=>$UserSysPlan->id, 'err_msg'=>$exception->getMessage()]);
             return false;
         }
 
