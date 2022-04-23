@@ -1926,6 +1926,7 @@ abstract class BetService extends BaseBetService {
         foreach ($lottery_types as $lottery_type){
             # is_batch_simulate:0正常1批量模拟历史记录
             $where = ['AND', ['=', 'status', 1], ['OR', ['=', 'is_batch_simulate', 0], ['IS', 'is_batch_simulate', NULL]], ['=', 'lottery_type', $lottery_type]];
+            //$where[] = ['=', 'uid', 17]; # 测试
 
             $plans = UserSysPlans::find()->where($where)->all();
             Tool_Common::log('/plans_tasks/'.__FUNCTION__, 'INFO', '批量插入任务000', ['lottery_type'=>$lottery_type, 'counts'=>count($plans)]);
