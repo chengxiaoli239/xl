@@ -1212,7 +1212,7 @@ abstract class BetService extends BaseBetService {
                 $codesArr = explode(',', $BettingRecords->kj_codes);
                 array_pop($codesArr);
                 $codesArr = array_unique($codesArr);
-                if(count($codesArr) == 4){
+                if(count($codesArr) < 4){
                     $sn = 'istest';
                     $snid = 'istest_id';
                 }
