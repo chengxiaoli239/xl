@@ -1919,7 +1919,7 @@ abstract class BetService extends BaseBetService {
      * @return array
      */
     public static function insertPlansTask($lottery_types = [], $isAuto=1){
-        $rst = ['status'=>300, 'msg'=>'操作成功'];
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
 
         $m = \Yii::$app->cache;
@@ -1941,6 +1941,8 @@ abstract class BetService extends BaseBetService {
                     $lottery_type = $plan->lottery_type;
                     $uid = $plan->uid;
                     $qihao = HN0898Service::getQihao($lottery_type);
+                    Tool_Common::log('insertPlansTask', 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
+                    //if($uid != 17) continue; # 测试
 
                     $insert_mkey = 'insertPlanTask_key_'.$lottery_type.'_'.$plan->id;
                     if($m->get($insert_mkey)){
