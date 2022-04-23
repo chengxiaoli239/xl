@@ -1213,7 +1213,8 @@ abstract class BetService extends BaseBetService {
                 array_pop($codesArr);
                 $codesArr = array_unique($codesArr);
                 if(count($codesArr) == 4){
-                    $is_test = 0;
+                    $sn = 'istest';
+                    $snid = 'istest_id';
                 }
             }
         }
