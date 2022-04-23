@@ -733,7 +733,7 @@ class IndexController extends Controller
         d($flag);
         $flag = BetSe($plan_id = 6, $istest = 0);
         d($flag);# 上期是否中奖，第一次下注认为是上期不中 中则投
-        $flag = SscDataService::isZjBefore($plan_id = 6, $istest = 0);
+        $flag = SscDataService::isZjBefore($plan_id = 6);
         d($flag);# 上期是否中奖，第一次下注认为是上期不中 中则投
         $rst = CommonService::getVoteCode();
         p($rst);

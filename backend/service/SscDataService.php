@@ -2928,7 +2928,7 @@ class SscDataService extends BaseService {
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     //$current_miss = ($codes_hz['is_init'] == 1) ? 0 : $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
-                    $flag = SscDataService::isZjBefore($UserSysPlan->id);
+                    $flag = SscDataService::isZjBefore($UserSysPlan->id, $recordDatas);
                     $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
                     $befor_codes_hz = $codes_hz;
                     if(!is_array($codes_hz)) continue; # 部分投注方式 hz_Arr 不是json 防止错误，
@@ -2962,7 +2962,7 @@ class SscDataService extends BaseService {
                     }
                     $codes_hz['betStatus'] = $betStatus;
                     $updateData = ['hz_Arr'=>json_encode($codes_hz, 320), 'single'=>$single];
-                    Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则投倍投', ['plan_id'=>$UserSysPlan->id, 'before_codes_hz' => $befor_codes_hz, 'code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type]);
+                    Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则投倍投', ['plan_id'=>$UserSysPlan->id, 'isZjBefore'=>$flag, 'recordDatas'=>$recordDatas, 'before_codes_hz' => $befor_codes_hz, 'code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type]);
                     $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                     $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                     $logArr['6_8'][$UserSysPlan->id]['rst'] = $rst;
@@ -3413,14 +3413,16 @@ class SscDataService extends BaseService {
      * @param int $plan_id
      * @return bool
      */
-    public static function isZjBefore($plan_id = 0, $is_test = 0){
+    public static function isZjBefore($plan_id = 0, &$recordData = ''){
         if(empty($plan_id)) return false;
         # flag 是否中奖金，中的计划回0.1、不中的计划翻倍
         $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->asArray()->one();
 
-        if($is_test){
-            p([$BettingRecords['profits'], $BettingRecords]);
-        }
+        $recordData = [
+            'record_id' => $BettingRecords->id,
+            'profits' => $BettingRecords->profits,
+            'status' => $BettingRecords->status,
+        ];
 
         if(empty($BettingRecords)) return -1;
 
