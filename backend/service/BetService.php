@@ -434,7 +434,7 @@ abstract class BetService extends BaseBetService {
                         #    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-3', ['task_id'=>$task_id,'betKey'=>$betKey]);
                         #    continue;
                         #}
-                        $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao);
+                        $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao, 'opProfitsPlans_status');
                         Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus->next_qihao, 'task_qihao'=>$qihao]);
                         if(empty($DataDealStatus) OR $DataDealStatus->opProfitsPlans_status != 2){
                             Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus]);
@@ -1925,7 +1925,7 @@ abstract class BetService extends BaseBetService {
         $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
             # is_batch_simulate:0正常1批量模拟历史记录
-            $where = ['AND', ['=', 'status', 1], ['OR', ['=', 'is_batch_simulate', 0], ['IS', 'is_batch_simulate', NULL]], ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND', ['=', 'status', 1], ['IN', 'is_batch_simulate', [0, NULL, '']], ['=', 'lottery_type', $lottery_type]];
             //$where[] = ['=', 'uid', 17]; # 测试
 
             $plans = UserSysPlans::find()->where($where)->all();
@@ -1955,9 +1955,9 @@ abstract class BetService extends BaseBetService {
 
                     //$next_qihao_is_active = TzService::beforeBet($lottery_type, $c_active_qihao);
 
-                    $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao);
+                    $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao, 'opProfitsPlans_status');
                     Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus->next_qihao, 'task_qihao'=>$qihao]);
-                    if(empty($DataDealStatus) OR $DataDealStatus->opProfitsPlans_status != 2){
+                    if(empty($DataDealStatus) OR $DataDealStatus != 2){
                         Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
                         throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
                         //continue;
@@ -2023,7 +2023,7 @@ abstract class BetService extends BaseBetService {
      * @param string $next_qihao
      * @return array|DataDealStatus|null
      */
-    public static function getDataDealStatus($lottery_type, $qihao=''){
+    public static function getDataDealStatus($lottery_type, $qihao='', $status_key='opProfitsPlans_status'){
 
         $m = \Yii::$app->cache;
         $mkey = 'getDataDealStatus_'.$lottery_type.'_'.$qihao;
@@ -2032,7 +2032,7 @@ abstract class BetService extends BaseBetService {
             $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type, 'next_qihao'=>$qihao])->one();
             Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '数据处理状态', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus->attributes]);
             if(!empty($DataDealStatus)){
-                $m->set($mkey, $DataDealStatus, 5);
+                $m->set($mkey, $DataDealStatus->$status_key, 5);
             }
         }
 
