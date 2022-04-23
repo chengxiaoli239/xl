@@ -1925,7 +1925,7 @@ abstract class BetService extends BaseBetService {
         $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
             # is_batch_simulate:0正常1批量模拟历史记录
-            $where = ['AND', ['=', 'status', 1], ['IN', 'is_batch_simulate', [0, NULL, '']], ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND', ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
             //$where[] = ['=', 'uid', 17]; # 测试
 
             $plans = UserSysPlans::find()->where($where)->all();
@@ -2258,7 +2258,7 @@ abstract class BetService extends BaseBetService {
         $rst['data'][$plan_id]['opKjRst'] = $opKjRst;
 
         if($opKjRst['status'] == 200){
-            $opHandlePlanRst = SscDataService::handleOnePlanStatic($plan_id, $qihao);
+            $opHandlePlanRst = SscDataService::handleOnePlanStatic($plan_id, $qihao, $is_simulate_bet=1);
             $rst['data'][$plan_id]['opHandlePlanRst'] = $opHandlePlanRst;
         }
 
