@@ -309,7 +309,7 @@ class KjDataGet
             'date' => date('Y-m-d',strtotime($tmpDate)),
         ];
         if(!empty($opentime)){
-            $insertData['created_at'] = (int)strtotime($tmpDate);
+            $insertData['created_at'] = (int)strtotime($opentime);
         }
 
         SscDataService::getAriseCodes([implode('', $codesArr)]); # 缓存开奖号码四定组合

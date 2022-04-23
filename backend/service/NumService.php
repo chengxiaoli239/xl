@@ -2779,7 +2779,7 @@ class NumService extends BaseService {
         $current_qihao = '';
         $plan = UserSysPlans::findOne($plan_id);
         if($plan->is_batch_simulate == 1 && !empty($plan_id)){
-            $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one();
+            $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one();
             if(!empty($BettingRecords)){
                 $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'qihao', $BettingRecords->qihao]];
                 $SscKjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->one();

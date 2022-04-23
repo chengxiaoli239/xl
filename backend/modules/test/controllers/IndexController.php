@@ -293,11 +293,11 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $batch_simulate_data = BetService::batchSimulateBet($lottery_types=[23], $uid=11);p($batch_simulate_data);
         $codes = '5,8,6,4,8';
         $codesArr = explode(',', $codes);
         p(array_pop($codesArr));
         p($codesArr);
-        $batch_simulate_data = BetService::batchSimulateBet($lottery_types=[23], $uid=11);p($batch_simulate_data);
         $plan = UserSysPlans::findOne(5119);
         $codes_hz_data = json_decode($plan->hz_Arr, true);
         //p($codes_hz_data, 0);

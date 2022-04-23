@@ -2074,7 +2074,7 @@ abstract class BetService extends BaseBetService {
                     return ['status'=>300, 'msg'=>'有正在执行的任务,请稍后...'];
                 }
 
-                $m->set($mkey, 1, 6);
+                //$m->set($mkey, 1, 6);
                 $rst = ['status'=>200, 'data'=>['plan_id'=>$plan->id], 'msg'=>'操作成功'];
                 try {
                     $start_time1 = microtime(true);
@@ -2083,6 +2083,7 @@ abstract class BetService extends BaseBetService {
                     $codes_hz_data = json_decode($plan->hz_Arr, true);
 
                     $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
+                    p($current_qihao);
                     $mkey_current = 'getPlanBetCurrentQihao_'.$plan_id.'_'.$current_qihao;
                     if(!$RedisLock->lock($mkey_current.'_redis', 5)){
                         $logArr = ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'err_msg'=>'频繁请求，缓存60秒'];
@@ -2090,6 +2091,7 @@ abstract class BetService extends BaseBetService {
                         //throw new \Exception('频繁请求，缓存60秒');
                         //continue;
                     }
+                    p($current_qihao);
                     if(empty($current_qihao)){
                         //throw new \Exception('即将下注的期号为空');
                     }
