@@ -1194,6 +1194,8 @@ abstract class BetService extends BaseBetService {
         $sn = BetService::$test_true_sn;
         $snid = BetService::$test_true_snid;
 
+        $UserSysPlans = UserSysPlans::findOne($planId);
+        $hzArr = json_decode($UserSysPlans, true);
         if(in_array($plan_type, array_merge([6, 8, 9, 14], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
             //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
             $flag = BetService::getIsBetTrue($planId);
@@ -1203,6 +1205,16 @@ abstract class BetService extends BaseBetService {
                 $snid = 'istest_id';
             }
             Tool_Common::log('/plan/'.__FUNCTION__.'_is_bet_true', 'INFO', '是否真实下注计划', ['plan_id'=>$planId, 'flag'=>$flag, 'fh'=>(boolean)(in_array($flag, [0, -1]) && $isAuto == 1), 'sn'=>$sn, 'snid'=>$snid]);
+        }elseif($hzArr['filters']['filter_type'] == 2){
+            if($UserSysPlans->is_batch_simulate == 1){
+                $is_test = 1;
+                $BettingRecords = BettingRecords::find()->where(['lottery_type'=>$UserSysPlans->lottery_type, 'plan_id'=>$planId])->orderBy(['id'=>SORT_DESC])->one();
+                $codesArr = explode(',', $BettingRecords->kj_codes);
+                array_pop($codesArr);
+                if(count($codesArr) == 4){
+                    $is_test = 0;
+                }
+            }
         }
 
         return [$sn, $snid];
@@ -2122,7 +2134,7 @@ abstract class BetService extends BaseBetService {
                     list($sn, $snid) = BetService::getBetSnId($plan->id, $plan->plan_type, $is_test, $isAuto);
 
                     $end_time3 = microtime(true);
-                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤4', ['flag'=>$flag, 'qihao'=>$current_qihao, 'plan_id'=>$plan_id, 'cs_time'=>($end_time3-$end_time2).'s']);
+                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤4', ['flag'=>$flag, 'qihao'=>$current_qihao, 'is_test'=>$is_test, 'plan_id'=>$plan_id, 'cs_time'=>($end_time3-$end_time2).'s']);
 
                     if ($is_test == 1 or $plan->uid == 1) { # 模拟下注
                         $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, 2, $sn, $snid, $r=4); # 直接记录表
