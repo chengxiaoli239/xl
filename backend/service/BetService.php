@@ -2140,6 +2140,7 @@ abstract class BetService extends BaseBetService {
 
                     # 4、投注号码 codes
                     $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);
+                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤31', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'len'=>strlen($codes)]);
 
                     $is_test = max($plan->is_test, $plan->is_batch_simulate);
                     list($sn, $snid) = BetService::getBetSnId($plan->id, $plan->plan_type, $is_test, $isAuto);
