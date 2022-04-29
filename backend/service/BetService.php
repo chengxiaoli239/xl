@@ -2143,7 +2143,9 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤31', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'len'=>strlen($codes)]);
 
                     $is_test = max($plan->is_test, $plan->is_batch_simulate);
+                    //p([$is_test, $plan->is_batch_simulate], 0);
                     list($sn, $snid) = BetService::getBetSnId($plan->id, $plan->plan_type, $is_test, $isAuto);
+                    //p([$is_test, $plan->plan_type, $plan->id, $current_qihao]);
 
                     $end_time3 = microtime(true);
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤4', ['flag'=>$flag, 'qihao'=>$current_qihao, 'is_test'=>$is_test, 'plan_id'=>$plan_id, 'cs_time'=>($end_time3-$end_time2).'s']);

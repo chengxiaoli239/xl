@@ -293,9 +293,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $batch_simulate_data = BetService::batchSimulateBet($lottery_types=[23], $uid=11);p($batch_simulate_data);
         $rst['data'] = BetService::insertPlansTask($lottery_types=[8]);p($rst);
         $rst = BetService::lotteryBet($uid=17);p($rst);
-        $batch_simulate_data = BetService::batchSimulateBet($lottery_types=[23], $uid=11);p($batch_simulate_data);
         $codes = '5,8,6,4,8';
         $codesArr = explode(',', $codes);
         p(array_pop($codesArr));
