@@ -2092,7 +2092,8 @@ abstract class BetService extends BaseBetService {
             foreach ($plans as $plan) {
                 $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan->id;
                 $flag = $m->get($mkey);
-                if(!$RedisLock->lock($mkey.'_redis', 10)){
+                if(!$RedisLock->lock($mkey.'_redis', 2)){
+                    //return ['status'=>301, 'msg'=>'有正在执行的任务,请稍后...'];
                     throw new \Exception('有正在执行的任务,请稍后...');
                 }
 
