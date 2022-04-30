@@ -3416,7 +3416,7 @@ class SscDataService extends BaseService {
     public static function isZjBefore($plan_id = 0, &$recordData = ''){
         if(empty($plan_id)) return false;
         # flag 是否中奖金，中的计划回0.1、不中的计划翻倍
-        $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+        $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
 
         $recordData = [
             'record_id' => $BettingRecords->id,
@@ -3440,7 +3440,7 @@ class SscDataService extends BaseService {
     public static function getLossQs($plan_id){
         $where = ['plan_id' =>$plan_id];
         $i = 0;
-        if($BettingRecords = BettingRecords::find()->where($where)->asArray()->orderBy(['id'=>SORT_DESC])->all()){
+        if($BettingRecords = BettingRecords::find()->where($where)->asArray()->orderBy(['id'=>SORT_DESC])->limit(100)->all()){
             foreach ($BettingRecords as $BettingRecord){
                 if($BettingRecord['profits']<0){
                     $i = $i + 1;
@@ -3465,7 +3465,7 @@ class SscDataService extends BaseService {
         $UserSysPlans = UserSysPlans::findOne($plan_id);
         $singles = $UserSysPlans->singles;
         $singlesArr = explode(',', str_replace('-', ',', $singles));
-        if($BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one()){
+        if($BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->limit(1)->one()){
             $mkey = 'getPlanNextSingle_1_'.$plan_id.'_'.$BettingRecords->qihao;
             if(!$next_single_key = $m->get($mkey)){
                 //$key = array_search($single, $singlesArr);
@@ -3636,7 +3636,7 @@ class SscDataService extends BaseService {
         try {
             //$maxQihao = BetService::$maxQihaoArr[$lottery_type];
             //$current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
-            $current_kj_qihao = BettingRecords::find()->where(['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one()->qihao;
+            $current_kj_qihao = BettingRecords::find()->where(['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one()->qihao;
             //$qihao = substr($current_kj_qihao,-3); # 最后三位
             if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
                 $UserSysPlan->status = 0;
@@ -3670,7 +3670,7 @@ class SscDataService extends BaseService {
      * @param int $is_simulate_bet
      */
     private static function handleOnePlanFanBei($plan_id='', $is_simulate_bet=0){
-        $UserSysPlan = UserSysPlans::find()->where(['AND', ['=', 'id', $plan_id], ['=', 'is_batch_simulate', $is_simulate_bet]])->one();
+        $UserSysPlan = UserSysPlans::find()->where(['AND', ['=', 'id', $plan_id], ['=', 'is_batch_simulate', $is_simulate_bet]])->limit(1)->one();
         if($UserSysPlan->status != 1){
             return ['status'=>300, 'msg'=>'未激活计划不处理'];
         }

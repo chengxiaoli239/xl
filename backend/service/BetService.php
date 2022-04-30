@@ -1206,7 +1206,7 @@ abstract class BetService extends BaseBetService {
             }
             Tool_Common::log('/plan/'.__FUNCTION__.'_is_bet_true', 'INFO', '是否真实下注计划', ['plan_id'=>$planId, 'flag'=>$flag, 'fh'=>(boolean)(in_array($flag, [0, -1]) && $isAuto == 1), 'sn'=>$sn, 'snid'=>$snid]);
         }elseif($hzArr['filters']['filter_type'] == 2){
-            $BettingRecords = BettingRecords::find()->where(['lottery_type'=>$UserSysPlans->lottery_type, 'plan_id'=>$planId])->orderBy(['id'=>SORT_DESC])->one();
+            $BettingRecords = BettingRecords::find()->where(['lottery_type'=>$UserSysPlans->lottery_type, 'plan_id'=>$planId])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
             $codesArr = explode(',', $BettingRecords->kj_codes);
             array_pop($codesArr);
             $codesArr = array_unique($codesArr);
@@ -1484,7 +1484,7 @@ abstract class BetService extends BaseBetService {
         ];
         //if($data['tz_type'] == 20) $insertData['codes'] = md5($insertData['codes']);
         $where = ['AND', ['=', 'qihao', $data['qihao']], ['=', 'plan_id', $data['plan_id']], ['=', 'uid', $data['uid']]];
-        $flag = BettingRecords::find()->where($where)->one();
+        $flag = BettingRecords::find()->where($where)->limit(1)->one();
         if($flag){
             return ['status'=>200, 'msg'=>'写入成功'];
         }
@@ -2083,7 +2083,6 @@ abstract class BetService extends BaseBetService {
             if(!empty($where)){
                 $where[] = ['=', 'uid', $uid];
             }
-            //$where = ['id'=>5119];
 
             $plans = UserSysPlans::find()->where($where)->all();
             if (empty($plans)) {
@@ -2093,11 +2092,10 @@ abstract class BetService extends BaseBetService {
             foreach ($plans as $plan) {
                 $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan->id;
                 $flag = $m->get($mkey);
-                if($flag){
+                if(!$RedisLock->lock($mkey.'_redis', 5)){
                     return ['status'=>300, 'msg'=>'有正在执行的任务,请稍后...'];
                 }
 
-                $m->set($mkey, 1, 6);
                 $rst = ['status'=>200, 'data'=>['plan_id'=>$plan->id], 'msg'=>'操作成功'];
                 try {
                     $start_time1 = microtime(true);
@@ -2106,16 +2104,9 @@ abstract class BetService extends BaseBetService {
                     $codes_hz_data = json_decode($plan->hz_Arr, true);
 
                     $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
-                    $mkey_current = 'getPlanBetCurrentQihao_'.$plan_id.'_'.$current_qihao;
-                    if(!$RedisLock->lock($mkey_current.'_redis', 5)){
-                        $logArr = ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'err_msg'=>'频繁请求，缓存60秒'];
-                        //Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-00', $logArr);
-                        //throw new \Exception('频繁请求，缓存60秒');
-                        //continue;
-                    }
 
                     if(empty($current_qihao)){
-                        //throw new \Exception('即将下注的期号为空');
+                        throw new \Exception('即将下注的期号为空');
                     }
 
                     $end_time1 = microtime(true);
@@ -2165,7 +2156,7 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/datas/'.__FUNCTION__."_e", 'ERR', '计划模拟失败', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
                     $rst = ['status'=>301, 'msg'=>$exception->getMessage()];
                 }
-                $m->delete($mkey);
+                $RedisLock->unlock($mkey);
             }
         }
 

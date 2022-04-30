@@ -64,7 +64,7 @@ class OpKjService extends BaseService {
 
                 # 开奖数据 start
                 $where = ['qihao'=>$qihao, 'lottery_type'=>$BettingRecord->lottery_type];
-                $kjData = SscKjData::find()->where($where)->asArray()->one()['code_str'];
+                $kjData = SscKjData::find()->where($where)->asArray()->limit(1)->one()['code_str'];
                 if(!$kjData){
                     $kjData = CommonService::getAwardNumberByQihao($qihao, $BettingRecord->lottery_type); // 3,4,5,6,7
                 }

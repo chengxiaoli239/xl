@@ -2777,28 +2777,32 @@ class NumService extends BaseService {
      */
     public static function getPlanBetCurrentQihao($plan_id='', $lottery_type=DEFAULT_LOTTERY_TYPE) {
         $current_qihao = '';
-        $plan = UserSysPlans::findOne($plan_id);
-        if($plan->is_batch_simulate == 1 && !empty($plan_id)){
-            $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
-            if(!empty($BettingRecords)){
-                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'qihao', $BettingRecords->qihao]];
-                $SscKjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->one();
-                if(!empty($SscKjData->qihao)){
-                    $current_qihao = $SscKjData->qihao;
+        try {
+            $plan = UserSysPlans::findOne($plan_id);
+            if($plan->is_batch_simulate == 1 && !empty($plan_id)){
+                $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
+                if(!empty($BettingRecords)){
+                    $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'qihao', $BettingRecords->qihao]];
+                    $SscKjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->limit(1)->one();
+                    if(!empty($SscKjData->qihao)){
+                        $current_qihao = $SscKjData->qihao;
+                    }
+                }
+                if($r = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->limit(1)->one()){
+                    $next_qihao = KjDataGet::getNextQihaoByQihao($r->qihao, $lottery_type); # 最后下注记录期号获取即将下注期号
+                    $next_recode = SscKjData::find()->where(['>=', 'qihao', $next_qihao])->andWhere(['=', 'lottery_type', $lottery_type])->orderBy(['id'=>SORT_ASC])->limit(1)->one();
+                    $current_qihao = (!empty($next_recode)) ? $next_recode->qihao : $next_qihao;
+                }elseif(empty($current_qihao)){
+                    $codes_hz_datas = json_decode($plan->hz_Arr, true);
+                    $current_qihao = $codes_hz_datas['filters']['start_qihao'] ? : NumService::getQihaoByDaysBefore($codes_hz_datas['filters']['test_period_days'], $lottery_type);
                 }
             }
-            if($r = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one()){
-                $next_qihao = KjDataGet::getNextQihaoByQihao($r->qihao, $lottery_type); # 最后下注记录期号获取即将下注期号
-                $next_recode = SscKjData::find()->where(['>=', 'qihao', $next_qihao])->andWhere(['=', 'lottery_type', $lottery_type])->orderBy(['id'=>SORT_ASC])->one();
-                $current_qihao = (!empty($next_recode)) ? $next_recode->qihao : $next_qihao;
-            }elseif(empty($current_qihao)){
-                $codes_hz_datas = json_decode($plan->hz_Arr, true);
-                $current_qihao = $codes_hz_datas['filters']['start_qihao'] ? : NumService::getQihaoByDaysBefore($codes_hz_datas['filters']['test_period_days'], $lottery_type);
-            }
-        }
 
-        if(empty($current_qihao)){
-            $current_qihao = HN0898Service::getQihao($lottery_type); # 针对哪一期过滤，默认为：当前期号
+            if(empty($current_qihao)){
+                $current_qihao = HN0898Service::getQihao($lottery_type); # 针对哪一期过滤，默认为：当前期号
+            }
+        }catch (\Exception $exception){
+            throw new \Exception($exception->getMessage());
         }
 
         return $current_qihao;
@@ -2814,7 +2818,7 @@ class NumService extends BaseService {
         $kj_times = date('Y-m-d', time() - $day_nums * 86400);
 
         $where = ['AND', ['>=', 'date', $kj_times], ['=', 'lottery_type', $lottery_type]];
-        $SscKjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->one();
+        $SscKjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->limit(1)->one();
         if(!empty($SscKjData)){
             $qihao = $SscKjData->qihao;
         }else{
