@@ -2090,15 +2090,14 @@ abstract class BetService extends BaseBetService {
                 continue;
             }
             foreach ($plans as $plan) {
-                $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan->id;
-                $flag = $m->get($mkey);
-                if(!$RedisLock->lock($mkey.'_redis', 2)){
-                    //return ['status'=>301, 'msg'=>'有正在执行的任务,请稍后...'];
-                    throw new \Exception('有正在执行的任务,请稍后...');
-                }
-
                 $rst = ['status'=>200, 'data'=>['plan_id'=>$plan->id], 'msg'=>'操作成功'];
+
                 try {
+                    $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan->id;
+                    if(!$RedisLock->lock($mkey.'_redis', 2)){
+                        //return ['status'=>301, 'msg'=>'有正在执行的任务,请稍后...'];
+                        throw new \Exception('有正在执行的任务,请稍后...');
+                    }
                     $start_time1 = microtime(true);
                     $lottery_type = $plan->lottery_type;
                     $plan_id = $plan->id;
