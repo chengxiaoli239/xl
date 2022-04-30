@@ -2097,7 +2097,7 @@ abstract class BetService extends BaseBetService {
                     return ['status'=>300, 'msg'=>'有正在执行的任务,请稍后...'];
                 }
 
-                //$m->set($mkey, 1, 6);
+                $m->set($mkey, 1, 6);
                 $rst = ['status'=>200, 'data'=>['plan_id'=>$plan->id], 'msg'=>'操作成功'];
                 try {
                     $start_time1 = microtime(true);
