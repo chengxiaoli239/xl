@@ -2093,14 +2093,14 @@ abstract class BetService extends BaseBetService {
                 $rst = ['status'=>200, 'data'=>['plan_id'=>$plan->id], 'msg'=>'操作成功'];
 
                 try {
-                    $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan->id;
+                    $plan_id = $plan->id;
+                    $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan_id;
                     if(!$RedisLock->lock($mkey.'_redis', 1)){
                         //return ['status'=>301, 'msg'=>'有正在执行的任务,请稍后...'];
                         throw new \Exception('有正在执行的任务,请稍后...');
                     }
                     $start_time1 = microtime(true);
                     $lottery_type = $plan->lottery_type;
-                    $plan_id = $plan->id;
                     $codes_hz_data = json_decode($plan->hz_Arr, true);
 
                     $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
