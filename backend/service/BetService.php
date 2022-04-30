@@ -2094,7 +2094,9 @@ abstract class BetService extends BaseBetService {
 
                 try {
                     $plan_id = $plan->id;
-                    $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan_id;
+                    $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
+
+                    $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan_id.'_'.$current_qihao;
                     if(!$RedisLock->lock($mkey.'_redis', 1)){
                         //return ['status'=>301, 'msg'=>'有正在执行的任务,请稍后...'];
                         throw new \Exception('有正在执行的任务,请稍后...');
@@ -2102,8 +2104,6 @@ abstract class BetService extends BaseBetService {
                     $start_time1 = microtime(true);
                     $lottery_type = $plan->lottery_type;
                     $codes_hz_data = json_decode($plan->hz_Arr, true);
-
-                    $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
 
                     if(empty($current_qihao)){
                         throw new \Exception('即将下注的期号为空');
