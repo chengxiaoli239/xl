@@ -285,7 +285,7 @@ class IndexController extends Controller
             $batch_simulate_data = BetService::batchSimulateBet($post['lottery_types'], $post['uid']);
             $rst['batch_simulate_data'] = $batch_simulate_data;
             Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '批量模拟下注', ['uid'=>$post['uid'], 'batch_simulate_data'=>$batch_simulate_data]);
-            sleep(1);
+            //sleep(1);
         }
         sleep(10);
 
