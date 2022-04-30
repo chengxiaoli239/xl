@@ -2092,8 +2092,8 @@ abstract class BetService extends BaseBetService {
             foreach ($plans as $plan) {
                 $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan->id;
                 $flag = $m->get($mkey);
-                if(!$RedisLock->lock($mkey.'_redis', 2)){
-                    return ['status'=>300, 'msg'=>'有正在执行的任务,请稍后...'];
+                if(!$RedisLock->lock($mkey.'_redis', 10)){
+                    throw new \Exception('有正在执行的任务,请稍后...');
                 }
 
                 $rst = ['status'=>200, 'data'=>['plan_id'=>$plan->id], 'msg'=>'操作成功'];
@@ -2154,6 +2154,7 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注处理结束', ['plan_id'=>$plan_id, 'rst'=>$rst, 'planStaticRst'=>$planStaticRst, 'cs_time'=>($end_time5-$end_time4).'s', 'all_cs_time'=>($end_time5-$start_time1).'s']);
                 }catch (\Exception $exception){
                     Tool_Common::log('/datas/'.__FUNCTION__."_e", 'ERR', '计划模拟失败', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
+                    sleep(2);
                     $rst = ['status'=>301, 'msg'=>$exception->getMessage()];
                 }
                 $RedisLock->unlock($mkey);
