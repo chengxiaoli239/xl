@@ -1465,7 +1465,7 @@ abstract class BetService extends BaseBetService {
             'uid' => $data['uid'],  // 投注用户id
             'buy_type'=> $data['buy_type'],  // 购买方向类型
             'codes' => $data['codes'],  // 投注号码
-            'qihao' => (string)$data['qihao'],  // 投注期号
+            'qihao' => (string)trim($data['qihao']),  // 投注期号
             'plan_id' => $data['plan_id'],  // 计划id
             'single' => $data['single'],  // 投注期号
             'post_desc' => $data['post_desc'],  // 投注文本
@@ -1862,7 +1862,7 @@ abstract class BetService extends BaseBetService {
             'account' => $UserSysPlans->account,
             'plan_id' => $plan_id, # 计划id
             'codes' => (string)$codes,  // 投注号码
-            'qihao' => $qihao,  // 投注期号
+            'qihao' => trim($qihao),  // 投注期号
             'tz_system_id' => '',  // 投注系统tz_systems .id
             'sn'=>$sn ? $sn : BetService::$test_true_sn,
             'snid'=>$snid ? $snid : BetService::$test_true_snid,
