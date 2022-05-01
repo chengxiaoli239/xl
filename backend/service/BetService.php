@@ -125,8 +125,8 @@ abstract class BetService extends BaseBetService {
      * @param array|string $hz_Arr
      * @return string
      */
-    public static function getCodes($tz_type, $buy_type, $sel_same = 1, $hz_Arr = [], $plan_id = ''){
-        $codes = BetService::getPlansAllCodesType1($tz_type, $buy_type, $sel_same, $hz_Arr, $plan_id);
+    public static function getCodes($tz_type, $buy_type, $sel_same = 1, $hz_Arr = [], $plan_id = '', &$hzArr=''){
+        $codes = BetService::getPlansAllCodesType1($tz_type, $buy_type, $sel_same, $hz_Arr, $plan_id, $hzArr);
 
         return $codes;
     }
@@ -756,15 +756,16 @@ abstract class BetService extends BaseBetService {
 
     /**
      * @desc 0898体系投注号码
-     * @param $playway 1:二字定 2三字定 3四字定
-     * @param $tz_type 投注类型(三字定):1大小单双三字定2大小三字定3单双三字定
-     * $playway 为3的时候，四字定： $kArr = [0=>'所有', 1=>'一双三单、一单三双', 2=>'两双两单', 3=>'四双四单', 4=>'一单三双', 5=>'一双三单', 6=>'一单三双|四双', 7=>'一双三单|四单', 8=>'四双', 9=>'四单', 10=>'单数量', 11=>'双数量', 12=>'一单三双|四单', 13=>'一双三单|四双', 14=>'一单三双|四单|四双', 15=>'一双三单|四单|四双'];
+     * @$playway 为3的时候，四字定： $kArr = [0=>'所有', 1=>'一双三单、一单三双', 2=>'两双两单', 3=>'四双四单', 4=>'一单三双', 5=>'一双三单', 6=>'一单三双|四双', 7=>'一双三单|四单', 8=>'四双', 9=>'四单', 10=>'单数量', 11=>'双数量', 12=>'一单三双|四单', 13=>'一双三单|四双', 14=>'一单三双|四单|四双', 15=>'一双三单|四单|四双'];
+     * @param int $tz_type 投注类型(三字定):1大小单双三字定2大小三字定3单双三字定
      * @param $buy_type 默认正买
-     * @param $limit int 默认获取注数
-     * @param $sel_same 是否排除上一次中奖的相同组合, 主要针对四字定
+     * @param int $sel_same
+     * @param string $codes_hz
+     * @param string $plan_id
+     * @param $hzArr
      * @return string
      */
-    public static function getPlansAllCodesType1($tz_type = 1, $buy_type = 1, $sel_same = 0, $codes_hz = '', $plan_id = ''){
+    public static function getPlansAllCodesType1($tz_type = 1, $buy_type = 1, $sel_same = 0, $codes_hz = '', $plan_id = '', &$hzArr){
         $playway = BetService::getPlaywayByTzType($tz_type);
         //p([$tz_type, $buy_type, $sel_same, $codes_hz, $playway]);
         $m = \Yii::$app->cache;
@@ -772,7 +773,7 @@ abstract class BetService extends BaseBetService {
         # 排除类型
         BetService::getDynamicsHzArr($codes_hz_data, $plan_id);
         //p($codes_hz_data);
-        $codes_hz = json_encode($codes_hz_data);
+        $codes_hz = $hzArr = json_encode($codes_hz_data);
 
         switch ($playway){
             case 4: # 一字定
@@ -1119,7 +1120,7 @@ abstract class BetService extends BaseBetService {
             $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
             if($tzflag = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了~'];
             $m->set($mkey, 1, $time);
-            $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid, $r=1); # 直接记录表
+            $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid, $plan->hz_Arr, $r=1); # 直接记录表
         }else{ # 正式下注
 
             $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'not_need_login_tz_system_ids'])->value); # 无需登陆站点
@@ -1258,7 +1259,7 @@ abstract class BetService extends BaseBetService {
            list($sn, $snid) = BetService::getBetSnId($planId, $plan->plan_type, $is_test, $isAuto);
 
            if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
-               $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid, $r=2); # 直接记录表
+               $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid, $plan->hz_Arr, $r=2); # 直接记录表
            }else{ # 正式下注
                $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'not_need_login_tz_system_ids'])->value); # 无需登陆站点
                # 1、首先判断是否登录，否则登录之后再下注
@@ -1841,7 +1842,7 @@ abstract class BetService extends BaseBetService {
      * @param string $snid
      * @return array|bool
      */
-    public static function _logRecordsByPlandId($plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test = 0, $sn='888888', $snid='888888id', $r=0){
+    public static function _logRecordsByPlandId($plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test = 0, $sn='888888', $snid='888888id', $post_desc='', $r=0){
         //p([$plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test, $sn, $snid],0);
         $UserSysPlans = UserSysPlans::findOne($plan_id);
         if($UserSysPlans->tz_type == 18) {
@@ -1868,6 +1869,7 @@ abstract class BetService extends BaseBetService {
             'snid'=>$snid ? $snid : BetService::$test_true_snid,
             'order_type'=>$UserSysPlans->playway, # 单双三字定
             'is_simulate' => $is_test ? 1 : 0,  // 是否模拟投注
+            'post_desc' => $post_desc ?  : '',  // 下注描述
             'is_batch_simulate' => ($is_test==2) ? 1 : 0,  // 是否批量模拟
             'single' => $UserSysPlans->single,  // 投注倍数
             'betting_money'=> round($totalmoney,2),  // 投注金额
@@ -1972,7 +1974,7 @@ abstract class BetService extends BaseBetService {
                     list($sn, $snid) = BetService::getBetSnId($plan->id, $plan->plan_type, $is_test, $isAuto);
 
                     if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
-                        $testInsertRst = self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid, $r=3); # 直接记录表
+                        $testInsertRst = self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid, $plan->hz_Arr, $r=3); # 直接记录表
                         if($testInsertRst['status'] == 200){
                             $m->set($insert_mkey, 1, 120);
                         }
@@ -2130,7 +2132,7 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤3', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao]);
 
                     # 4、投注号码 codes
-                    $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);
+                    $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id, $hzArr);
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤31', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'len'=>strlen($codes)]);
 
                     $is_test = max($plan->is_test, $plan->is_batch_simulate);
@@ -2142,7 +2144,7 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤4', ['flag'=>$flag, 'qihao'=>$current_qihao, 'is_test'=>$is_test, 'plan_id'=>$plan_id, 'cs_time'=>($end_time3-$end_time2).'s']);
 
                     if ($is_test == 1 or $plan->uid == 1) { # 模拟下注
-                        $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, 2, $sn, $snid, $r=4); # 直接记录表
+                        $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, 2, $sn, $snid, $hzArr, $r=4); # 直接记录表
                         $rst['data'][$plan_id]['logRecord_rst'] = ['rst'=>$insertRst, 'qihao'=>$current_qihao];
                     }
                     $end_time4 = microtime(true);
@@ -2179,7 +2181,7 @@ abstract class BetService extends BaseBetService {
             foreach ($x_poses as $x_pos){
                 $hzArr['p'.$x_pos] = 'X';
             }
-        }elseif($filter_type == 2){
+        }elseif(in_array($filter_type, [2, 3])){
             $plan = UserSysPlans::findOne($plan_id);
             $lottery_type = $plan->lottery_type;
             if(empty($filters['current_kj_qihao'])){
@@ -2218,9 +2220,24 @@ abstract class BetService extends BaseBetService {
                 $remove_types[] = 1; # 排除三现+两兄弟
             }
 
-            if(isset($hzArr['type_2b']) && $hzArr['type_2b'] == 1){
-                $remove_types[] = 1; # 排除三现+两兄弟
-                $remove_types[] = 8; # 排除双两兄弟
+            if($filter_type == 2){
+                # 排除类型1
+                if(isset($hzArr['type_2b']) && $hzArr['type_2b'] == 1){
+                    $remove_types[] = 1; # 排除三现+两兄弟
+                    $remove_types[] = 8; # 排除双两兄弟
+                }
+            }elseif ($filter_type == 3){
+                # 排除类型1
+                # 单双排除
+                $n_code_type = $SscKjData->code_1_2_3_4;
+                $type_ds_details = ["2222","1111","1121","1112","2111","1122","1212","1221","2112","2121","2211","1222","2122","2212","2221"];
+                $type_key = array_keys($type_ds_details, $n_code_type);
+                unset($type_ds_details[$type_key]);
+                $hzArr['type_ds_details'] = $type_ds_details;
+
+                if(isset($hzArr['type_2b']) && $hzArr['type_2b'] == 1){
+                    $remove_types[] = 1; # 排除三现+两兄弟
+                }
             }
 
             if($hzArr['type_3b'] == 0){
