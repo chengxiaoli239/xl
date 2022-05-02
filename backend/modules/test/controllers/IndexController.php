@@ -293,14 +293,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $type_4ds = 1;
-        $type_ds_details = ["2222","1111","1121","1112","2111","1122","1212","1221","2112","2121","2211","1222","2122","2212","2221"];
-        if($type_4ds == 1) { # 四单
-            $type_key = array_keys($type_ds_details, '2222');
-            p($type_key);
-        }elseif ($SscKjData->type_4ds == 2){ # 四双
-        }
-        $batch_simulate_data = BetService::batchSimulateBet($lottery_types=[23], $uid=11);p($batch_simulate_data);
+        $batch_simulate_data = BetService::batchSimulateBet($lottery_types=[23], $uid=11, $is_auto=2);p($batch_simulate_data);
         $rst['data'] = BetService::insertPlansTask($lottery_types=[8]);p($rst);
         $rst = BetService::lotteryBet($uid=17);p($rst);
         $codes = '5,8,6,4,8';

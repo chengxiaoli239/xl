@@ -2096,10 +2096,11 @@ abstract class BetService extends BaseBetService {
 
                 try {
                     $plan_id = $plan->id;
+                    if($plan_id == 5119) continue;
                     $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
 
                     $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan_id.'_'.$current_qihao;
-                    if(!$RedisLock->lock($mkey.'_redis', 1)){
+                    if(!$RedisLock->lock($mkey.'_redis', 1) && $isAuto==1){
                         //return ['status'=>301, 'msg'=>'有正在执行的任务,请稍后...'];
                         throw new \Exception('有正在执行的任务,请稍后...');
                     }
@@ -2230,9 +2231,9 @@ abstract class BetService extends BaseBetService {
                 # 排除类型1
                 # 单双排除
                 $n_code_type = $SscKjData->code_1_2_3_4;
-                $type_ds_details = ["2222","1111","1121","1112","2111","1122","1212","1221","2112","2121","2211","1222","2122","2212","2221"];
+                $type_ds_details = ["2222","1111","1112","1121","1211","2111","1122","1212","1221","2112","2121","2211","1222","2122","2212","2221"];
                 $type_key = array_keys($type_ds_details, $n_code_type);
-                unset($type_ds_details[$type_key]);
+                unset($type_ds_details[$type_key[0]]);
                 $hzArr['type_ds_details'] = $type_ds_details;
 
                 if(isset($hzArr['type_2b']) && $hzArr['type_2b'] == 1){
