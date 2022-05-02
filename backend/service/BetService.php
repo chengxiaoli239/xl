@@ -53,6 +53,8 @@ abstract class BetService extends BaseBetService {
     public static $test_true_sn = '888888';
     public static $true_bet_sn = '6666666666';
     public static $test_true_snid = '888888id';
+    const CODES_FILTER_TYPES_2 = 2; # 过滤类型2
+    const CODES_FILTER_TYPES_3 = 3; # 过滤类型3
 
     protected function __construct() {
         parent::__construct();
@@ -1206,7 +1208,7 @@ abstract class BetService extends BaseBetService {
                 $snid = 'istest_id';
             }
             Tool_Common::log('/plan/'.__FUNCTION__.'_is_bet_true', 'INFO', '是否真实下注计划', ['plan_id'=>$planId, 'flag'=>$flag, 'fh'=>(boolean)(in_array($flag, [0, -1]) && $isAuto == 1), 'sn'=>$sn, 'snid'=>$snid]);
-        }elseif($hzArr['filters']['filter_type'] == 2){
+        }elseif(in_array($hzArr['filters']['filter_type'], BetService::getCodesNewFilterTypes())){
             $BettingRecords = BettingRecords::find()->where(['lottery_type'=>$UserSysPlans->lottery_type, 'plan_id'=>$planId])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
             $codesArr = explode(',', $BettingRecords->kj_codes);
             array_pop($codesArr);
@@ -2182,7 +2184,7 @@ abstract class BetService extends BaseBetService {
             foreach ($x_poses as $x_pos){
                 $hzArr['p'.$x_pos] = 'X';
             }
-        }elseif(in_array($filter_type, [2, 3])){
+        }elseif(in_array($filter_type, BetService::getCodesNewFilterTypes())){
             $plan = UserSysPlans::findOne($plan_id);
             $lottery_type = $plan->lottery_type;
             if(empty($filters['current_kj_qihao'])){
@@ -2221,13 +2223,13 @@ abstract class BetService extends BaseBetService {
                 $remove_types[] = 1; # 排除三现+两兄弟
             }
 
-            if($filter_type == 2){
+            if($filter_type == BetService::CODES_FILTER_TYPES_2){
                 # 排除类型1
                 if(isset($hzArr['type_2b']) && $hzArr['type_2b'] == 1){
                     $remove_types[] = 1; # 排除三现+两兄弟
                     $remove_types[] = 8; # 排除双两兄弟
                 }
-            }elseif ($filter_type == 3){
+            }elseif ($filter_type == BetService::CODES_FILTER_TYPES_3){
                 # 排除类型1
                 # 单双排除
                 $n_code_type = $SscKjData->code_1_2_3_4;
@@ -2291,5 +2293,15 @@ abstract class BetService extends BaseBetService {
         return $rst;
     }
 
+    /**
+     * @desc 获取所有过滤类型
+     * @return int[]
+     */
+    public static function getCodesNewFilterTypes(){
+        return [
+            self::CODES_FILTER_TYPES_2,
+            self::CODES_FILTER_TYPES_3,
+        ];
+    }
 
 }
