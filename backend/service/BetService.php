@@ -2243,8 +2243,8 @@ abstract class BetService extends BaseBetService {
                 }
             }
 
-            if($hzArr['type_3b'] == 0){
-                $hzArr['type_3n_2b'] = 0;
+            if($SscKjData->type_3b == 1){
+                $hzArr['type_22b'] = 0;
             }
             $hzArr['remove_types'] = $remove_types;
 
