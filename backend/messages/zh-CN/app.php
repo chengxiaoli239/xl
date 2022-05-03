@@ -131,4 +131,5 @@ return [
 
     'Lottery Data Deal Statuses' => '彩种统计控制开关',
     'Data Deal Statuses' => '逐期处理日志',
+    'Events Live Datas' => '比分数据',
 ];

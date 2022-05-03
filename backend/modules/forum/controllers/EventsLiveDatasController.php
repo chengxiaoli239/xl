@@ -2,6 +2,7 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\sports\EventsLiveDatasService;
 use Yii;
 use backend\models\sports\EventsLiveDatas;
 use backend\models\searchs\EventsLiveDatas as EventsLiveDatasSearch;
@@ -92,6 +93,29 @@ class EventsLiveDatasController extends BaseController
 
         return $this->render('update', [
             'model' => $model,
+        ]);
+    }
+
+    /**
+     * @desc 比赛关联
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionGameRelated(){
+
+        $hasRelatedDatas = EventsLiveDatasService::getRelatedDatas();
+        $queryParams = \yii::$app->request->queryParams;
+
+        $sport_type = $queryParams['SportType']['sport_type'] ? : 1;
+        $sport_types = EventsLiveDatasService::getSportTypes($this->_user_id);
+        #if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        #    return $this->redirect(['view', 'id' => $model->id]);
+        #}
+
+        return $this->render('create', [
+            'sport_types' => $sport_types,
+            'sport_type' => $sport_type,
+            'model' => [],
         ]);
     }
 

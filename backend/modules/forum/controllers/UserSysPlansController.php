@@ -412,7 +412,7 @@ class UserSysPlansController extends BaseController
             //'is_filter_qihaos' => $is_filters,
             ############################ 排除参数结束 #############################
         ];
-        $data = array_merge($data, UserSysPlansService::getsysplanstypedatas($playway, $tz_type));
+        $data = array_merge($data, UserSysPlansService::getSysPlansTypeDatas($playway, $tz_type));
         return $this->render('create',$data);
 
     }

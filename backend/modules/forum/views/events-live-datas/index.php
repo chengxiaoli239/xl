@@ -18,11 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <div class="clearfix">
+                <!--div class="clearfix">
                     <div class="btn-group">
                         <?= Html::a(Yii::t('app', 'Create Events Live Datas'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
-                </div>
+                </div-->
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -32,31 +32,91 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
-                        'uid',
+                        //'id',
+                        //'uid',
                         'event_id',
-                        'clock_minute',
-                        'clock_second',
-                        //'clock_minutesLeftInPeriod',
-                        //'clock_secondsLeftInMinute',
-                        //'clock_period',
+                        #'clock_period',
+
+                        # 时间
+                        //'clock_minute',
+                        //'clock_second',
+                        #'clock_minutesLeftInPeriod',
+                        #'clock_secondsLeftInMinute',
+                        ['attribute' => 'clock_period','label'=>'比赛时间',//'headerOptions'=>['width'=>'15%'],
+                            'value' => function($model) {
+                                return '第'.$model->clock_period.'节 '.$model->clock_minute.'\''.trim($model->clock_second).'" '.
+                                    '剩余：'.$model->clock_minutesLeftInPeriod.'\''.$model->clock_secondsLeftInMinute.'"';
+                            }
+                        ],
+
                         //'clock_running',
-                        //'score_home',
-                        //'score_away',
+                        #['attribute' => 'clock_running','label'=>'进行中',//'headerOptions'=>['width'=>'15%'],
+                        #    'value' => function($model) {
+                        #        return $model->clock_running ? '是' : '否';
+                        #    }
+                        #],
+
+                        //'home_name_en',
+                        ['attribute' => 'home_name_en','label'=>'主队',//'headerOptions'=>['width'=>'15%'],
+                            'value' => function($model) {
+                                return '主：'.$model->home_name_en;
+                            }
+                        ],
+                        ['attribute' => 'home_name_en','label'=>'比分','headerOptions'=>['width'=>'10%'],//'headerOptions'=>['width'=>'15%'],
+                            'value' => function($model) {
+                                return '主：'.$model->score_home.' 客：'.$model->score_away.' 得分方：'.($model->score_who ? : '无');
+                            }
+                        ],
+                        //'way_name_en',
+                        ['attribute' => 'way_name_en','label'=>'客队',//'headerOptions'=>['width'=>'15%'],
+                            'value' => function($model) {
+                                return '客：'.$model->way_name_en;
+                            }
+                        ],
+                        #'score_home',
+                        #'score_away',
+
                         //'score_info',
                         //'score_who',
+
+                        # 黄牌
                         //'statics_football_home_yellowCards',
                         //'statics_football_way_yellowCards',
-                        //'statics_football_home_redCards',
-                        //'statics_football_way_redCards',
-                        //'statics_football_home_corners',
-                        //'statics_football_way_corners',
+                        ['attribute' => 'statics_football_home_yellowCards','label'=>'黄牌',//'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return '主 '.(int)$model->statics_football_home_yellowCards."-".(int)$model->statics_football_way_yellowCards.' 客';
+                            }
+                        ],
+
+                        # 红牌
+                        #'statics_football_home_redCards',
+                        #'statics_football_way_redCards',
+                        ['attribute' => 'statics_football_home_redCards','label'=>'红牌',//'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return '主 '.(int)$model->statics_football_home_redCards."-".(int)$model->statics_football_way_redCards.' 客';
+                            }
+                        ],
+
+                        # 角球
+                        #'statics_football_home_corners',
+                        #'statics_football_way_corners',
+                        ['attribute' => 'statics_football_home_corners','label'=>'角球',//'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return '主 '.(int)$model->statics_football_home_corners."-".(int)$model->statics_football_way_corners.' 客';
+                            }
+                        ],
+
                         //'liveStatistics:ntext',
                         //'created_at',
                         //'updated_at',
                         //'update_time',
+                        ['attribute' => 'update_time',//'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return substr($model->update_time, 5);
+                            }
+                        ],
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        #['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
             </div>

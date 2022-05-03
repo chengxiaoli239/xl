@@ -68,7 +68,7 @@ class FootBallService extends SportsBaseService
                 $rst = FootBallService::recordOpenFootBallDatas($scoreDatas, $TzSystemsUsers);
                 break;
             default:
-                throw new Exception('数据不能为空');
+                throw new Exception('数据类型不能为空');
                 break;
         }
 
@@ -118,9 +118,9 @@ class FootBallService extends SportsBaseService
 
                     'home_name_en' => $event['homeName'] ? : '', # 主队英文名
                     'way_name_en' => $event['awayName'] ? : '', # 客队英文名
-                    'score_home' => (int)$event['score']['home'], # 主队得分
-                    'score_way' => (int)$event['score']['way'], # 客队得分
-                    'score_who' => $event['score']['who'], # 哪对得分
+                    'score_home' => (int)$liveData['score']['home'], # 主队得分
+                    'score_away' => (int)$liveData['score']['away'], # 客队得分
+                    'score_who' => $liveData['score']['who'], # 哪对得分
 
                     'clock_minute' => $liveData['matchClock']['minute'], # 比赛进行分钟数
                     'clock_second' => $liveData['matchClock']['second'], # 当前分钟秒数
@@ -146,7 +146,7 @@ class FootBallService extends SportsBaseService
                 if(!$EventsLiveDatas->save()){
                     throw new Exception(json_encode($EventsLiveDatas->getFirstErrors(), 320));
                 }
-                Tool_Common::log('/sports/'.__FUNCTION__, 'INFO', '比赛记录更新', ['event_id'=>$event['id'], 'groupId'=>$event['groupId'], 'event_name'=>$event['name']]);
+                Tool_Common::log('/sports/'.__FUNCTION__, 'INFO', '比赛记录更新', ['event_id'=>$event['id'], 'groupId'=>$event['groupId'], 'event_name'=>$event['name'], 'liveData'=>$liveData]);
             }catch (\Exception $exception){
                 Tool_Common::log('ERR', '/sports/'.__FUNCTION__.'_e', '比赛数据报错失败', ['setDatas'=>$setDatas, 'err_msg'=>$exception->getMessage()]);
                 continue;
