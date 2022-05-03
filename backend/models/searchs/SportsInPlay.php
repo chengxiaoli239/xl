@@ -19,7 +19,7 @@ class SportsInPlay extends SportsInPlayModel
     {
         return [
             [['id', 'play_type', 'game_court', 'plate_id', 'created_at', 'updated_at'], 'integer'],
-            [['event_id', 'home_name', 'away_name', 'home_score', 'away_score', 'plate_1X2_odds_1', 'plate_1X2_odds_2', 'plate_1X2_odds_3', 'bet_url', 'plate_bet_conditions', 'desc', 'update_time'], 'safe'],
+            [['league_matches_id', 'league_matches_name', 'event_id', 'home_name', 'away_name', 'home_score', 'away_score', 'plate_1X2_odds_1', 'plate_1X2_odds_2', 'plate_1X2_odds_3', 'bet_url', 'plate_bet_conditions', 'desc', 'update_time'], 'safe'],
             [['plate_rolling_home', 'plate_rolling_away'], 'number'],
         ];
     }
@@ -71,7 +71,9 @@ class SportsInPlay extends SportsInPlayModel
             'update_time' => $this->update_time,
         ]);
 
-        $query->andFilterWhere(['like', 'event_id', $this->event_id])
+        $query->andFilterWhere(['like', 'league_matches_id', $this->league_matches_id])
+            ->andFilterWhere(['like', 'league_matches_name', $this->league_matches_name])
+            ->andFilterWhere(['like', 'event_id', $this->event_id])
             ->andFilterWhere(['like', 'home_name', $this->home_name])
             ->andFilterWhere(['like', 'away_name', $this->away_name])
             ->andFilterWhere(['like', 'home_score', $this->home_score])

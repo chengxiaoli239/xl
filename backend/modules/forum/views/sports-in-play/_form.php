@@ -16,6 +16,10 @@ use yii\widgets\ActiveForm;
             </header>
             <div class="panel-body">
                 <?php $form = ActiveForm::begin(); ?>
+                    <?= $form->field($model, 'league_matches_id')->textInput(['maxlength' => true]) ?>
+
+                    <?= $form->field($model, 'league_matches_name')->textInput(['maxlength' => true]) ?>
+
                     <?= $form->field($model, 'event_id')->textInput(['maxlength' => true]) ?>
 
                     <?= $form->field($model, 'play_type')->textInput() ?>

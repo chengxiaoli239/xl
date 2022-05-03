@@ -17,13 +17,17 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'id') ?>
 
+    <?= $form->field($model, 'league_matches_id') ?>
+
+    <?= $form->field($model, 'league_matches_name') ?>
+
     <?= $form->field($model, 'event_id') ?>
 
     <?= $form->field($model, 'play_type') ?>
 
-    <?= $form->field($model, 'game_court') ?>
+    <?php // echo $form->field($model, 'game_court') ?>
 
-    <?= $form->field($model, 'plate_id') ?>
+    <?php // echo $form->field($model, 'plate_id') ?>
 
     <?php // echo $form->field($model, 'home_name') ?>
 

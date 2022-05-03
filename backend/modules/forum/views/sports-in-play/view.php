@@ -35,6 +35,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attributes' => [
 
                                     'id',
+                                    'league_matches_id',
+                                    'league_matches_name',
                                     'event_id',
                                     'play_type',
                                     'game_court',
