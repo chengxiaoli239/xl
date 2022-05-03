@@ -8,6 +8,8 @@ use Yii;
  * This is the model class for table "{{%sports_in_play}}".
  *
  * @property int $id
+ * @property string $league_matches_id 联赛id
+ * @property string $league_matches_name 联赛名称
  * @property string $event_id 比赛场次id,
  * @property int $play_type 玩法类型：1:角球2:1X2 3让球4大小
  * @property int $game_court 全场类型：1全场2上半场3下半场
@@ -48,7 +50,7 @@ class SportsInPlay extends \yii\db\ActiveRecord
             [['plate_rolling_home', 'plate_rolling_away'], 'number'],
             [['desc'], 'string'],
             [['update_time'], 'safe'],
-            [['event_id', 'home_name', 'away_name', 'home_score', 'away_score'], 'string', 'max' => 64],
+            [['league_matches_id', 'league_matches_name', 'event_id', 'home_name', 'away_name', 'home_score', 'away_score'], 'string', 'max' => 64],
             [['plate_1X2_odds_1', 'plate_1X2_odds_2', 'plate_1X2_odds_3', 'bet_url', 'plate_bet_conditions'], 'string', 'max' => 255],
         ];
     }
@@ -60,6 +62,8 @@ class SportsInPlay extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
+            'league_matches_id' => Yii::t('app', '联赛id'),
+            'league_matches_name' => Yii::t('app', '联赛名称'),
             'event_id' => Yii::t('app', '比赛场次id,'),
             'play_type' => Yii::t('app', '玩法类型：1:角球2:1X2 3让球4大小'),
             'game_court' => Yii::t('app', '全场类型：1全场2上半场3下半场'),
