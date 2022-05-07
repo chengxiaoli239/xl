@@ -11,6 +11,8 @@ namespace backend\modules\api\controllers;
 use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\clients\TzSystemUsersService;
+use backend\service\sports\FootBallSportsService;
+use backend\service\sports\TennisSportsService;
 use common\tools\Tool_Common;
 use Yii;
 use yii\web\Controller;
@@ -220,5 +222,20 @@ class SportsController extends Controller
         return $rst;
     }
 
+    /**
+     * @desc 错误日志记录
+     * @return array|bool
+     */
+    public function actionPushPlateDatas(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        if(empty($post['access_token'])){
+            return ['status'=>301, 'msg'=>'缺少access_token参数'];
+        }
+        $rst = FootBallSportsService::pushFootBallDatas($post);
 
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '错误日志记录成功', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+
+        return $rst;
+    }
 }

@@ -3345,9 +3345,11 @@ class SscDataService extends BaseService {
         }elseif($A_x_B_y_status == 2){
             $hzArr['start_bet_yl_nums'] += 1;
             if($plan_type == 13){
-                //$hzArr['A_x_B_y_status'] = 1;
+                $hzArr['A_x_B_y_status'] = 1; #
                 $hzArr['current_arise_B_times'] -= 1;
+                $hzArr['current_arise_A_times'] = 1; #
                 $hzArr['current_arise_B_times'] = max([$hzArr['current_arise_B_times'], 0]);
+                $hzArr['current_yl_desc'] = 'A';
             }
         }
         $hzArr['current_yl_desc'] = trim($hzArr['current_yl_desc'], '-');
@@ -3393,8 +3395,8 @@ class SscDataService extends BaseService {
         }elseif($A_x_B_y_status == 2){
             # 3、正在投
             if($plan_type == 13 && $hzArr['current_arise_A_times'] >= $hzArr['arise_A_times'] && $hzArr['current_arise_B_times'] < $hzArr['arise_B_times']){
-                    # 已经满足A的情况，开始进入B累加
-                    $hzArr['current_arise_B_times'] += 1;
+                # 已经满足A的情况，开始进入B累加
+                $hzArr['current_arise_B_times'] += 1;
             }else{
                 $hzArr['current_arise_A_times'] = 0;
                 $hzArr['current_arise_B_times'] = 0;
