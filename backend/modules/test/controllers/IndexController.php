@@ -293,6 +293,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $count = 5;
+        $t = 5;
+        p($t%($count));
         $batch_simulate_data = BetService::batchSimulateBet($lottery_types=[23], $uid=11, $is_auto=2);p($batch_simulate_data);
         $rst['data'] = BetService::insertPlansTask($lottery_types=[8]);p($rst);
         $rst = BetService::lotteryBet($uid=17);p($rst);

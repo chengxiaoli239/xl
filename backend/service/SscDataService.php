@@ -3084,6 +3084,9 @@ class SscDataService extends BaseService {
                         if($plan_type == 13){
                             if($A_x_B_y_status == 2 && $hzArr['A_x_B_y_status'] == 2 && ($hzArr['current_arise_B_times'] == $hzArr['arise_B_times'])){
                                 $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+                            }elseif ($A_x_B_y_status == 1 && $hzArr['A_x_B_y_status'] == 2 && ($hzArr['current_arise_B_times'] == $hzArr['arise_B_times'])){
+                                $count_singles = count($singles);
+                                $next_single_key = $hzArr['start_bet_yl_nums']%$count_singles;
                             }else{
                                 $next_single_key = 0;
                                 $single = $singles[$next_single_key];
@@ -3340,16 +3343,17 @@ class SscDataService extends BaseService {
         if(in_array($A_x_B_y_status, [0, 1])){
             $hzArr['current_arise_A_times'] += 1;
             $hzArr['current_arise_B_times'] = 0;
-            $hzArr['start_bet_yl_nums'] = 0;
+            $hzArr['start_bet_yl_nums'] = -1;
             $hzArr['A_x_B_y_status'] = 1;
         }elseif($A_x_B_y_status == 2){
-            $hzArr['start_bet_yl_nums'] += 1;
             if($plan_type == 13){
                 $hzArr['A_x_B_y_status'] = 1; #
                 $hzArr['current_arise_B_times'] -= 1;
                 $hzArr['current_arise_A_times'] = 1; #
                 $hzArr['current_arise_B_times'] = max([$hzArr['current_arise_B_times'], 0]);
                 $hzArr['current_yl_desc'] = 'A';
+            }else{
+                $hzArr['start_bet_yl_nums'] += 1;
             }
         }
         $hzArr['current_yl_desc'] = trim($hzArr['current_yl_desc'], '-');
@@ -3370,7 +3374,7 @@ class SscDataService extends BaseService {
             $hzArr['current_arise_A_times'] = 0;
             $hzArr['current_arise_B_times'] = 0;
             $hzArr['current_yl_desc'] = '';
-            $hzArr['start_bet_yl_nums'] = 0;
+            $hzArr['start_bet_yl_nums'] = -1;
             $hzArr['A_x_B_y_status'] = 1;
         }elseif($A_x_B_y_status == 1){
             # 2、等待中
@@ -3390,7 +3394,7 @@ class SscDataService extends BaseService {
             if($hzArr['current_arise_A_times'] >= $hzArr['arise_A_times'] && $hzArr['current_arise_B_times'] == $hzArr['arise_B_times']){
                 $hzArr['A_x_B_y_status'] = 2;
                 $hzArr['current_yl_desc'] .= '-B';
-                $hzArr['start_bet_yl_nums'] = 0;
+                $hzArr['start_bet_yl_nums'] += 1;
             }
         }elseif($A_x_B_y_status == 2){
             # 3、正在投
@@ -3401,7 +3405,7 @@ class SscDataService extends BaseService {
                 $hzArr['current_arise_A_times'] = 0;
                 $hzArr['current_arise_B_times'] = 0;
                 $hzArr['current_yl_desc'] = '';
-                $hzArr['start_bet_yl_nums'] = 0;
+                $hzArr['start_bet_yl_nums'] = -1;
                 $hzArr['A_x_B_y_status'] = 1; # -- 改成下个轮回的等待
             }
         }
@@ -3955,8 +3959,10 @@ class SscDataService extends BaseService {
                 # 上 B
                 SscDataService::operateZjGroupB($A_x_B_y_status, $plan_type, $hzArr);
                 if($plan_type == 13){
-                    if($A_x_B_y_status == 2 && $hzArr['A_x_B_y_status'] == 2 && ($hzArr['current_arise_B_times'] == $hzArr['arise_B_times'])){
+                    if($A_x_B_y_status == 2 && $hzArr['A_x_B_y_status'] == 2 && ($hzArr['current_arise_B_times'] == $hzArr['arise_B_times'])) {
                         $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+                    }elseif ($A_x_B_y_status == 1 && $hzArr['A_x_B_y_status'] == 2 && ($hzArr['current_arise_B_times'] == $hzArr['arise_B_times'])){
+                        $next_single_key = $hzArr['start_bet_yl_nums'];
                     }else{
                         $next_single_key = 0;
                         $single = $singles[$next_single_key];

@@ -633,7 +633,7 @@ class HN0898Service extends BaseTZService {
             }
             if(in_array($plan_type, [12, 13])){
                 $code_hz['A_x_B_y_status'] = 0;
-                $code_hz['start_bet_yl_nums'] = 0;
+                $code_hz['start_bet_yl_nums'] = -1;
                 $code_hz['current_arise_A_times'] = 0;
                 $code_hz['current_arise_B_times'] = 0;
                 $code_hz['current_yl_desc'] = '';
