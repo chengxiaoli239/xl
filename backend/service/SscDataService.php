@@ -3343,7 +3343,7 @@ class SscDataService extends BaseService {
         if(in_array($A_x_B_y_status, [0, 1])){
             $hzArr['current_arise_A_times'] += 1;
             $hzArr['current_arise_B_times'] = 0;
-            $hzArr['start_bet_yl_nums'] = -1;
+            #$hzArr['start_bet_yl_nums'] = -1;
             $hzArr['A_x_B_y_status'] = 1;
         }elseif($A_x_B_y_status == 2){
             if($plan_type == 13){
