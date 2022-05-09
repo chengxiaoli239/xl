@@ -3036,6 +3036,7 @@ class SscDataService extends BaseService {
         $Rkey = __FUNCTION__.'_redis_'.$lottery_type;
         if(!$RedisLock->lock($Rkey, 30)){
             Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', 'A出x次B出y次投B-处理锁错误', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+            return false;
         }
 
         try {
