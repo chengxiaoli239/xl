@@ -3087,6 +3087,7 @@ class SscDataService extends BaseService {
                             }elseif ($A_x_B_y_status == 1 && $hzArr['A_x_B_y_status'] == 2 && ($hzArr['current_arise_B_times'] == $hzArr['arise_B_times'])){
                                 $count_singles = count($singles);
                                 $next_single_key = $hzArr['start_bet_yl_nums']%$count_singles;
+                                $single = $singles[$next_single_key];
                             }else{
                                 $next_single_key = 0;
                                 $single = $singles[$next_single_key];
@@ -3098,7 +3099,7 @@ class SscDataService extends BaseService {
                     }
                     $hzArr['singles_key'] = $next_single_key;
                     $hzArr_update_after = $hzArr;
-                    Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'INFO', '计划更新前后1', ['plan_id'=>$UserSysPlan->id, 'zj_group'=>$zj_group, 'qihao'=>$qihao, 'zjResult'=>$zjResult, 'hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'next_single_key'=>$next_single_key, 'single'=>$single, 'singles'=>$UserSysPlan->singles]);
+                    Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'INFO', '计划更新前后11', ['plan_id'=>$UserSysPlan->id, 'zj_group'=>$zj_group, 'qihao'=>$qihao, 'zjResult'=>$zjResult, 'hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'next_single_key'=>$next_single_key, 'single'=>$single, 'singles'=>$UserSysPlan->singles]);
 
                     $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                     $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
@@ -3974,7 +3975,7 @@ class SscDataService extends BaseService {
             }
             $hzArr['singles_key'] = $next_single_key;
             $hzArr_update_after = $hzArr;
-            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后1', ['plan_id'=>$UserSysPlan->id, 'zj_group'=>$zj_group, 'qihao'=>$qihao, 'zjResult'=>$zjResult, 'hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'next_single_key'=>$next_single_key, 'single'=>$single, 'singles'=>$UserSysPlan->singles]);
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后12', ['plan_id'=>$UserSysPlan->id, 'zj_group'=>$zj_group, 'qihao'=>$qihao, 'zjResult'=>$zjResult, 'hzArr_update_before'=>$hzArr_update_before, 'hzArr_update_after'=>$hzArr_update_after, 'next_single_key'=>$next_single_key, 'single'=>$single, 'singles'=>$UserSysPlan->singles]);
 
             $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
             $updateData = ['single'=>$single, 'hz_Arr'=>json_encode($hzArr, 320)];
