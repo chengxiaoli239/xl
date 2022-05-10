@@ -354,6 +354,8 @@ class UserService extends BaseService {
             $cookies_str .= $cookie['name'].'='.$cookie['value'].';';
         }
         $TzSystemsUsers->cookie = trim($cookies_str);
+        $user_agent = $datas['user_agent'] ? 'User-Agent: '.$datas['user_agent'] : $TzSystemsUsers->user_agent;
+        $TzSystemsUsers->user_agent = $user_agent;
         $r = $TzSystemsUsers->save();
         if(!$r){
             $msg = $TzSystemsUsers->getErrors();
