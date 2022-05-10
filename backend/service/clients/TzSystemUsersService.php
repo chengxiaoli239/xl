@@ -102,8 +102,8 @@ class TzSystemUsersService extends ClientsBaseService{
                 'user_agent' => $user_agent,
                 "Referer" => $TzSystemsUsers->ssc_domain."/App/Index?_=",
                 "Host"=> str_replace('www.','',$tzSiteInfo['domain']),
-                "v1" => 99,
-                "v2" => 101,
+                "v1" => "99",
+                "v2" => "101",
             ];
             $m->set($mkey, $data, 60);
         }
