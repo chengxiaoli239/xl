@@ -3086,13 +3086,16 @@ class SscDataService extends BaseService {
                             if($A_x_B_y_status == 2 && $hzArr['A_x_B_y_status'] == 2 && ($hzArr['current_arise_B_times'] == $hzArr['arise_B_times'])){
                                 $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
                             }elseif ($A_x_B_y_status == 1 && $hzArr['A_x_B_y_status'] == 2 && ($hzArr['current_arise_B_times'] == $hzArr['arise_B_times'])){
+                                # 启动下注
                                 $count_singles = count($singles);
                                 $next_single_key = $hzArr['start_bet_yl_nums']%$count_singles;
-                                $single = $singles[$next_single_key];
+                            }elseif ($A_x_B_y_status == 2 && $hzArr['A_x_B_y_status'] == 1){
+                                # 不中等待下次满足
+                                $next_single_key = $hzArr['singles_key'];
                             }else{
                                 $next_single_key = 0;
-                                $single = $singles[$next_single_key];
                             }
+                            $single = $singles[$next_single_key];
                         }else{
                             $next_single_key = 0;
                             $single = $singles[$next_single_key];

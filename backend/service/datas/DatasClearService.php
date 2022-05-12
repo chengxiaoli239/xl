@@ -49,7 +49,7 @@ class DatasClearService extends BaseService{
     public static function getClearBeforeXDate($lottery_type = DEFAULT_LOTTERY_TYPE){
         $date_nums = 5;
         if(in_array($lottery_type, [1, 17, 23, 24])){
-            $date_nums = 30;
+            //$date_nums = 30;
         }
 
         return $date_nums;
