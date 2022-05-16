@@ -2804,6 +2804,7 @@ class SscDataService extends BaseService {
         if($lottery_type==8 && '04:05:00'<$now_HI && $now_HI<'09:05:00'){
             return ['status'=>300, 'msg'=>'非开盘时间不统计'];
         }
+        $RedisLock = new RedisLock();
 
         $start_time = microtime(true);
         try {
@@ -2816,6 +2817,11 @@ class SscDataService extends BaseService {
             ];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
+                    $Rkey = __FUNCTION__.'_redis_op_plan_0_1_3_5_'.$lottery_type.'_'.$UserSysPlan->id;
+                    if(!$RedisLock->lock($Rkey, 30)){
+                        Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略1', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+                        continue;
+                    }
                     $profits = SscDataService::getPlanProfits($UserSysPlan);
 
                     $maxQihao = BetService::$maxQihaoArr[$lottery_type];
@@ -2848,6 +2854,11 @@ class SscDataService extends BaseService {
             $where = ['AND', ['IN', 'plan_type', $fb_plan_types], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
+                    $Rkey = __FUNCTION__.'_redis_op_plan_'.implode('_', $fb_plan_types).'_'.$lottery_type.'_'.$UserSysPlan->id;
+                    if(!$RedisLock->lock($Rkey, 30)){
+                        Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略2', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+                        continue;
+                    }
                     $flag = SscDataService::isZjBefore($UserSysPlan->id);
                     $flags[$UserSysPlan->uid][$UserSysPlan->id] = $flag;
 
@@ -2927,6 +2938,11 @@ class SscDataService extends BaseService {
             $where = ['AND', ['IN', 'plan_type', [6, 8]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
+                    $Rkey = __FUNCTION__.'_redis_op_plan_6_8_'.$lottery_type.'_'.$UserSysPlan->id;
+                    if(!$RedisLock->lock($Rkey, 30)){
+                        Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略3', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+                        continue;
+                    }
                     //$current_miss = ($codes_hz['is_init'] == 1) ? 0 : $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
                     $flag = SscDataService::isZjBefore($UserSysPlan->id, $recordDatas);
                     $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
@@ -2973,6 +2989,11 @@ class SscDataService extends BaseService {
             $where = ['AND', ['IN', 'plan_type', [7]], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
+                    $Rkey = __FUNCTION__.'_redis_op_plan_7_'.$lottery_type.'_'.$UserSysPlan->id;
+                    if(!$RedisLock->lock($Rkey, 30)){
+                        Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略4', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+                        continue;
+                    }
                     $flag = SscDataService::isZjBefore($UserSysPlan->id);
                     $buy_type = ($flag == 1) ? $UserSysPlan->buy_type : ($UserSysPlan->buy_type == 1 ? 0 : 1);
 
@@ -2988,6 +3009,11 @@ class SscDataService extends BaseService {
             $where = ['AND', ['IN', 'tz_type', \Yii::$app->params['IMPORT_CODES_TYPES']], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
+                    $Rkey = __FUNCTION__.'_redis_op_plan_'.implode('_', \Yii::$app->params['IMPORT_CODES_TYPES']).'_'.$lottery_type.'_'.$UserSysPlan->id;
+                    if(!$RedisLock->lock($Rkey, 30)){
+                        Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略5', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+                        continue;
+                    }
                     $hzArr = json_decode($UserSysPlan->hz_Arr, true);
                     if(isset($hzArr['change_per']) && $hzArr['change_per'] == 1){ # 每期轮换
                         $imports = ImportPlanCodes::find()->select(['uid', 'plan_id', 'plan_id_sort_key'])->where(['AND', ['=', 'plan_id', $UserSysPlan->id], ['!=', 'codes', '']])->asArray()->all();
@@ -3130,6 +3156,7 @@ class SscDataService extends BaseService {
         $Rkey = __FUNCTION__.'_redis_'.$lottery_type;
         if(!$RedisLock->lock($Rkey, 10)){
             Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '区间遗漏投-处理锁错误', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+            return false;
         }
 
         try {
