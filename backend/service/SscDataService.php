@@ -3115,7 +3115,8 @@ class SscDataService extends BaseService {
                                 # 启动下注
                                 $count_singles = count($singles);
                                 $next_single_key = $hzArr['start_bet_yl_nums']%$count_singles;
-                            }elseif ($A_x_B_y_status == 2 && $hzArr['A_x_B_y_status'] == 1){
+                            //}elseif ($A_x_B_y_status == 2 && $hzArr['A_x_B_y_status'] == 1){
+                            }elseif ($hzArr['A_x_B_y_status'] == 1){
                                 # 不中等待下次满足
                                 $next_single_key = $hzArr['singles_key'];
                             }else{
