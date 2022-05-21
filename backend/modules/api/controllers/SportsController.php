@@ -223,7 +223,7 @@ class SportsController extends Controller
     }
 
     /**
-     * @desc 错误日志记录
+     * @desc 日志记录
      * @return array|bool
      */
     public function actionPushPlateDatas(){
@@ -234,8 +234,38 @@ class SportsController extends Controller
         }
         $rst = FootBallSportsService::pushFootBallDatas($post);
 
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '错误日志记录成功', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '网盘球赛日志记录成功', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

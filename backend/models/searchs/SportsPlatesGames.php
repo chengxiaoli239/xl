@@ -19,7 +19,7 @@ class SportsPlatesGames extends SportsPlatesGamesModel
     {
         return [
             [['id', 'created_at', 'updated_at'], 'integer'],
-            [['plate_id', 'plate_name', 'bet_url', 'league_matches_id', 'league_matches_name', 'name1', 'name1_path', 'name2', 'name2_path', 'event_id', 'desc', 'update_time'], 'safe'],
+            [['plate_id', 'plate_name', 'bet_url', 'league_matches_id', 'league_matches_name', 'name1', 'name1_path', 'name2', 'name2_path', 'event_id', 'score', 'desc', 'update_time'], 'safe'],
         ];
     }
 
@@ -47,6 +47,7 @@ class SportsPlatesGames extends SportsPlatesGamesModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=> ['defaultOrder' => ['id'=>SORT_DESC]],
         ]);
 
         $this->load($params);
@@ -75,6 +76,7 @@ class SportsPlatesGames extends SportsPlatesGamesModel
             ->andFilterWhere(['like', 'name2', $this->name2])
             ->andFilterWhere(['like', 'name2_path', $this->name2_path])
             ->andFilterWhere(['like', 'event_id', $this->event_id])
+            ->andFilterWhere(['like', 'score', $this->score])
             ->andFilterWhere(['like', 'desc', $this->desc]);
 
         return $dataProvider;

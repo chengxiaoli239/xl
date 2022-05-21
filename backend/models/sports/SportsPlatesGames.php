@@ -17,6 +17,7 @@ use Yii;
  * @property string $name1_path 元素1定位
  * @property string $name2 队员1
  * @property string $name2_path 元素2定位
+ * @property string $score 比分
  * @property string $event_id 项目id
  * @property string $desc 描述备注
  * @property int $created_at 创建时间
@@ -42,8 +43,8 @@ class SportsPlatesGames extends \yii\db\ActiveRecord
             [['desc'], 'string'],
             [['created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
-            [['plate_id', 'plate_name', 'league_matches_id', 'league_matches_name', 'name1', 'name1_path', 'name2', 'name2_path', 'event_id'], 'string', 'max' => 64],
-            [['bet_url'], 'string', 'max' => 255],
+            [['plate_id', 'plate_name', 'league_matches_id', 'league_matches_name', 'name1', 'name2', 'event_id', 'score'], 'string', 'max' => 64],
+            [['bet_url', 'name1_path', 'name2_path'], 'string', 'max' => 255],
         ];
     }
 
@@ -59,10 +60,11 @@ class SportsPlatesGames extends \yii\db\ActiveRecord
             'bet_url' => Yii::t('app', '下注明细页面链接'),
             'league_matches_id' => Yii::t('app', '比赛id'),
             'league_matches_name' => Yii::t('app', '比赛名称'),
-            'name1' => Yii::t('app', '队员1'),
+            'name1' => Yii::t('app', '主队'),
             'name1_path' => Yii::t('app', '元素1定位'),
-            'name2' => Yii::t('app', '队员1'),
+            'name2' => Yii::t('app', '客队'),
             'name2_path' => Yii::t('app', '元素2定位'),
+            'score' => Yii::t('app', '比分'),
             'event_id' => Yii::t('app', '项目id'),
             'desc' => Yii::t('app', '描述备注'),
             'created_at' => Yii::t('app', '创建时间'),

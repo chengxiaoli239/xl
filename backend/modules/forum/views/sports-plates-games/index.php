@@ -18,11 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <div class="clearfix">
+                <!--div class="clearfix">
                     <div class="btn-group">
                         <?= Html::a(Yii::t('app', 'Create Sports Plates Games'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
-                </div>
+                </div-->
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -32,23 +32,31 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
-                        'plate_id',
-                        'plate_name',
+                        #'id',
+                        #'plate_id',
+                        #'plate_name',
                         'bet_url:url',
                         'league_matches_id',
-                        //'league_matches_name',
-                        //'name1',
+                        #'league_matches_name',
+                        ['attribute' => 'league_matches_name',
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return ' <strong><font color="green">[ '.str_replace(' ', '',$model->score).' ]</font></strong> '.$model->league_matches_name;
+                            }
+                        ],
+                        'name1',
                         //'name1_path',
-                        //'name2',
+                        'name2',
                         //'name2_path',
-                        //'event_id',
+                        'event_id',
+
+                        //'score',
                         //'desc:ntext',
                         //'created_at',
                         //'updated_at',
-                        //'update_time',
+                        'update_time',
 
-                        ['class' => 'yii\grid\ActionColumn'],
+                        //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
             </div>
