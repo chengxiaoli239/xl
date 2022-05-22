@@ -36,6 +36,8 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'event_id')->textInput(['maxlength' => true]) ?>
 
+                    <?= $form->field($model, 'game_schedule')->textInput(['maxlength' => true]) ?>
+
                     <?= $form->field($model, 'desc')->textarea(['rows' => 6]) ?>
 
                     <?= $form->field($model, 'created_at')->textInput() ?>

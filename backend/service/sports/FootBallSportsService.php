@@ -21,6 +21,8 @@ class FootBallSportsService extends SportsBaseService  {
         $setDatas = [
             'plate_id' => (string)$plate_datas['plate_id'],
             'event_id' => $p_data['event_id'], # 项目id
+            'game_schedule' => $plate_datas['game_schedule'], # 比赛进度
+            'is_has_jq' => $plate_datas['is_has_jq'], # 是否角球
             'score' => $plate_datas['score'], # 比分
             'league_matches_id' => $p_data['league_matches_id'], # 联赛id
             'league_matches_name' => $p_data['league_matches_name'], # 联赛名称
@@ -34,6 +36,7 @@ class FootBallSportsService extends SportsBaseService  {
         $now_time = time();
         Tool_Common::log('/sports/'.__FUNCTION__, 'INFO', '数据', ['setDatas'=>$setDatas]);
         $where = ['event_id'=>$p_data['event_id'], 'league_matches_id'=>$p_data['league_matches_id']];
+        $where = ['event_id'=>$p_data['event_id']];
         $SportsPlatesGames = SportsPlatesGames::findOne($where);
         if(empty($SportsPlatesGames)){
             $SportsPlatesGames = new SportsPlatesGames();

@@ -34,7 +34,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         //'id',
                         //'uid',
-                        'event_id',
+                        //'event_id',
+                        ['attribute' => 'event_id','label'=>'项目ID','headerOptions'=>['width'=>'5%'],
+                            'value' => function($model) {
+                                return $model->event_id;
+                            }
+                        ],
                         #'clock_period',
 
                         # 时间
@@ -56,15 +61,16 @@ $this->params['breadcrumbs'][] = $this->title;
                         #    }
                         #],
 
+                        ['attribute' => 'group_name','label'=>'联赛',//'headerOptions'=>['width'=>'12%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return '<strong><font color="#006400">['.$model->score_home.'-'.$model->score_away.']</font></strong> '.$model->group_name;
+                            }
+                        ],
                         //'home_name_en',
                         ['attribute' => 'home_name_en','label'=>'主队',//'headerOptions'=>['width'=>'15%'],
                             'value' => function($model) {
                                 return '主：'.$model->home_name_en;
-                            }
-                        ],
-                        ['attribute' => 'home_name_en','label'=>'比分','headerOptions'=>['width'=>'10%'],//'headerOptions'=>['width'=>'15%'],
-                            'value' => function($model) {
-                                return '主：'.$model->score_home.' 客：'.$model->score_away.' 得分方：'.($model->score_who ? : '无');
                             }
                         ],
                         //'way_name_en',
@@ -82,7 +88,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         # 黄牌
                         //'statics_football_home_yellowCards',
                         //'statics_football_way_yellowCards',
-                        ['attribute' => 'statics_football_home_yellowCards','label'=>'黄牌',//'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'statics_football_home_yellowCards','label'=>'黄牌','headerOptions'=>['width'=>'8%'],
                             'value' => function($model) {
                                 return '主 '.(int)$model->statics_football_home_yellowCards."-".(int)$model->statics_football_way_yellowCards.' 客';
                             }
@@ -91,7 +97,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         # 红牌
                         #'statics_football_home_redCards',
                         #'statics_football_way_redCards',
-                        ['attribute' => 'statics_football_home_redCards','label'=>'红牌',//'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'statics_football_home_redCards','label'=>'红牌','headerOptions'=>['width'=>'8%'],
                             'value' => function($model) {
                                 return '主 '.(int)$model->statics_football_home_redCards."-".(int)$model->statics_football_way_redCards.' 客';
                             }
@@ -100,7 +106,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         # 角球
                         #'statics_football_home_corners',
                         #'statics_football_way_corners',
-                        ['attribute' => 'statics_football_home_corners','label'=>'角球',//'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'statics_football_home_corners','label'=>'角球','headerOptions'=>['width'=>'8%'],
                             'value' => function($model) {
                                 return '主 '.(int)$model->statics_football_home_corners."-".(int)$model->statics_football_way_corners.' 客';
                             }
@@ -110,7 +116,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'created_at',
                         //'updated_at',
                         //'update_time',
-                        ['attribute' => 'update_time',//'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'update_time','headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
                                 return substr($model->update_time, 5);
                             }

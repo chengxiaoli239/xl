@@ -293,6 +293,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%sports_plates_games}}'); p($r);
         $count = 5;
         $t = 5;
         p($t%($count));
@@ -320,7 +321,6 @@ class IndexController extends Controller
         $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);p($codes);
 
         $rst = KjDataGet::insertKjData('220410352', 23, '0,0,0,0,0');p($rst);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%data_deal_status}}'); p($r);
         p(array_keys(SscDataService::$dealDataStatusFields));
         $r = SscDataService::insertLotteryDealDataStatus($lottery_type=17);p($r);
         $r = SscDataService::insertDealDataTask($lottery_type=23);p($r);

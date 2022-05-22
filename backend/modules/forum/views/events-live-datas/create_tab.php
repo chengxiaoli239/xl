@@ -9,6 +9,7 @@ foreach ($sport_types as $s_type) {
 <div class="btn-group">
     <?= Html::a(str_replace(['体育'],'',$s_type['name']), ['game-related', 'SportType[sport_type]' => $s_type['sport_type']], ['class' => 'btn '.$class, 'style' => 'margin-bottom:15px;']) ?>
 </div>
+    <br/>
 <?php
 }
 ?>

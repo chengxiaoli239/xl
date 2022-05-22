@@ -6,8 +6,12 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model backend\models\UserSysPlans */
 /* @var $form yii\widgets\ActiveForm */
-$SscKjDatas = \backend\models\SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->limit(18)->all();
+$SscKjDatas = \backend\models\SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->limit(30)->all();
 $this->title = '比赛绑定';
+# 网盘比赛
+$SportsPlatesGames = \backend\models\sports\SportsPlatesGames::find()->where('1=1')->orderBy(['id'=>SORT_DESC])->asArray()->limit(30)->all();
+# 比分网
+$EventsLiveDatas = \backend\models\sports\EventsLiveDatas::find()->where('1=1')->orderBy(['id'=>SORT_DESC])->asArray()->limit(30)->all();
 ?>
 <style>
     p {
@@ -15,29 +19,49 @@ $this->title = '比赛绑定';
     }
 </style>
 <div class="user-sys-plans-form row">
+    <div class="col-lg-1">
+        <header class="panel-heading">
+            <?php include(dirname(__FILE__).'/create_tab.php');?>
+        </header>
+        <input type="hidden" id="sport_type" name="SportType[sport_type]" value="<?=$sport_type?>">
+    </div>
+    <div class="col-lg-5">
+        <section class="panel">
+            <header class="panel-heading">
+                <?= '<strong><font color="green">网盘比赛</font>&nbsp;&nbsp;&nbsp;</strong>' ?>
+            </header>
+            <?php foreach ($SportsPlatesGames as $SportsPlatesGame){ ?>
+                <header class="panel-heading" title="<?=substr($SportsPlatesGame['update_time'],10)?>">
+                    [<?=$SportsPlatesGame['game_schedule']? : ' '?>]&nbsp;&nbsp;
+                    <strong><?=$SportsPlatesGame['league_matches_name'] ?> <font color="green"><?=str_replace(' ', '', $SportsPlatesGame['score']) ?></font></strong>
+                    ：<font color="#a52a2a"><?=$SportsPlatesGame['name1'] ?> - <?=$SportsPlatesGame['name2'] ?></font>
+                </header>
+            <?php } ?>
+        </section>
+    </div>
+    <div class="col-lg-5">
+        <section class="panel">
+            <header class="panel-heading">
+                <?= '<strong><font color="green">比分网</font>&nbsp;&nbsp;&nbsp;</strong>' ?>
+            </header>
+            <?php foreach ($EventsLiveDatas as $EventsLiveData){ ?>
+                <header class="panel-heading" title="<?=substr($EventsLiveData['update_time'],10)?>">
+                    <strong><?=$EventsLiveData['group_name'] ?> &nbsp; <font color="green"><?=$EventsLiveData['score_home'] ?>-<?=$EventsLiveData['score_away'] ?></font></strong>
+                    ：<font color="#a52a2a"><?=$EventsLiveData['home_name'] ?> - <?=$EventsLiveData['away_name'] ?></font>
+                </header>
+            <?php } ?>
+        </section>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-1">
+        <header class="panel-heading">
+        </header>
+    </div>
     <div class="col-lg-10">
         <section class="panel">
             <header class="panel-heading">
-                <?php include(dirname(__FILE__).'/create_tab.php');?>
-            </header>
-            <div class="panel-body">
-                <?php $form = ActiveForm::begin([
-                    'fieldConfig' => [
-                        //'inputOptions'=>['class'=>'p-1'],
-                    ],
-                ]); ?>
-
-                <?php //include(dirname(__FILE__).'/act-button.php');?>
-
-                <input type="hidden" id="sport_type" name="SportType[sport_type]" value="<?=$sport_type?>">
-                <?php ActiveForm::end(); ?>
-            </div>
-        </section>
-    </div>
-    <div class="col-lg-2">
-        <section class="panel">
-            <header class="panel-heading">
-                <?= '<strong><font color="green">最新记录</font>&nbsp;&nbsp;&nbsp;</strong>' ?>
+                <?= '<strong><font color="green">已绑定比赛</font>&nbsp;&nbsp;&nbsp;</strong>' ?>
             </header>
             <?php foreach ($SscKjDatas as $sscKjData){ ?>
                 <header class="panel-heading" title="<?=substr($sscKjData['update_time'],10)?>"><strong><?=$sscKjData['qihao'] ?> &nbsp; <font color="green"><?=$sscKjData['code_str'] ?></font></strong>&nbsp;&nbsp; &nbsp; <?=$sscKjData['codes_4nums_hz']?></header>

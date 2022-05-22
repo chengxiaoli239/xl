@@ -18,8 +18,8 @@ class SportsPlatesGames extends SportsPlatesGamesModel
     public function rules()
     {
         return [
-            [['id', 'created_at', 'updated_at'], 'integer'],
-            [['plate_id', 'plate_name', 'bet_url', 'league_matches_id', 'league_matches_name', 'name1', 'name1_path', 'name2', 'name2_path', 'event_id', 'score', 'desc', 'update_time'], 'safe'],
+            [['id', 'is_has_jq', 'created_at', 'updated_at'], 'integer'],
+            [['plate_id', 'plate_name', 'bet_url', 'league_matches_id', 'league_matches_name', 'name1', 'name1_path', 'name2', 'name2_path', 'event_id', 'game_schedule', 'score', 'desc', 'update_time'], 'safe'],
         ];
     }
 
@@ -62,6 +62,7 @@ class SportsPlatesGames extends SportsPlatesGamesModel
         $query->andFilterWhere([
             'id' => $this->id,
             'created_at' => $this->created_at,
+            'is_has_jq' => $this->is_has_jq,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,
         ]);
@@ -76,6 +77,7 @@ class SportsPlatesGames extends SportsPlatesGamesModel
             ->andFilterWhere(['like', 'name2', $this->name2])
             ->andFilterWhere(['like', 'name2_path', $this->name2_path])
             ->andFilterWhere(['like', 'event_id', $this->event_id])
+            ->andFilterWhere(['like', 'game_schedule', $this->game_schedule])
             ->andFilterWhere(['like', 'score', $this->score])
             ->andFilterWhere(['like', 'desc', $this->desc]);
 

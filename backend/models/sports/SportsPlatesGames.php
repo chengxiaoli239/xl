@@ -18,6 +18,8 @@ use Yii;
  * @property string $name2 队员1
  * @property string $name2_path 元素2定位
  * @property string $score 比分
+ * @property string $game_schedule 比赛进度
+ * @property int $is_has_jq 是否有角球
  * @property string $event_id 项目id
  * @property string $desc 描述备注
  * @property int $created_at 创建时间
@@ -41,9 +43,9 @@ class SportsPlatesGames extends \yii\db\ActiveRecord
     {
         return [
             [['desc'], 'string'],
-            [['created_at', 'updated_at'], 'integer'],
+            [['created_at', 'updated_at', 'is_has_jq'], 'integer'],
             [['update_time'], 'safe'],
-            [['plate_id', 'plate_name', 'league_matches_id', 'league_matches_name', 'name1', 'name2', 'event_id', 'score'], 'string', 'max' => 64],
+            [['plate_id', 'plate_name', 'league_matches_id', 'league_matches_name', 'name1', 'name2', 'event_id', 'game_schedule', 'score'], 'string', 'max' => 64],
             [['bet_url', 'name1_path', 'name2_path'], 'string', 'max' => 255],
         ];
     }
@@ -66,6 +68,8 @@ class SportsPlatesGames extends \yii\db\ActiveRecord
             'name2_path' => Yii::t('app', '元素2定位'),
             'score' => Yii::t('app', '比分'),
             'event_id' => Yii::t('app', '项目id'),
+            'is_has_jq' => Yii::t('app', '是否有角球'),
+            'game_schedule' => Yii::t('app', '比赛进度'),
             'desc' => Yii::t('app', '描述备注'),
             'created_at' => Yii::t('app', '创建时间'),
             'updated_at' => Yii::t('app', '更新时间'),

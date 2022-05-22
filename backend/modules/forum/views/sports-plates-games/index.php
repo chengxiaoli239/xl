@@ -35,13 +35,25 @@ $this->params['breadcrumbs'][] = $this->title;
                         #'id',
                         #'plate_id',
                         #'plate_name',
-                        'bet_url:url',
-                        'league_matches_id',
+                        //'bet_url:url',
+                        //'league_matches_id',
                         #'league_matches_name',
                         ['attribute' => 'league_matches_name',
                             'format'=>'raw',
                             'value' => function($model) {
-                                return ' <strong><font color="green">[ '.str_replace(' ', '',$model->score).' ]</font></strong> '.$model->league_matches_name;
+                                $html_txt = ' <strong><font color="green">[ '.str_replace(' ', '',$model->score).' ]</font></strong> '
+                                    .$model->league_matches_name;
+                                $html_txt .= '&nbsp;&nbsp;&nbsp;&nbsp;'.Html::a('<strong>下注链接</strong>', $model->bet_url, [
+                                    'title'=>'下注链接',
+                                    'alt'=>$model->bet_url,
+                                ]);
+                                return $html_txt;
+                            }
+                        ],
+                        ['attribute' => 'game_schedule','label'=>'比赛进度','headerOptions'=>['width'=>'8%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return $model->game_schedule;
                             }
                         ],
                         'name1',
@@ -49,6 +61,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         'name2',
                         //'name2_path',
                         'event_id',
+                        ['attribute' => 'is_has_jq','label'=>'有角球','headerOptions'=>['width'=>'8%'],
+                            'format' => 'raw',
+                            'value' => function($model) {
+                                return $model->is_has_jq ? '<strong><font color="green">是</font></strong>' : '<strong><font color="red">否</font></strong>';
+                            }
+                        ],
 
                         //'score',
                         //'desc:ntext',
