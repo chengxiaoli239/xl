@@ -11,6 +11,7 @@ namespace backend\modules\api\controllers;
 use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\clients\TzSystemUsersService;
+use backend\service\FootBallService;
 use backend\service\sports\FootBallSportsService;
 use backend\service\sports\TennisSportsService;
 use common\tools\Tool_Common;
@@ -239,6 +240,23 @@ class SportsController extends Controller
         return $rst;
     }
 
+    /**
+     * @desc 接收体育足球的比分数据
+     * @return array
+     */
+    public function actionPushFootBallScore(){
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        if(empty($post['access_token'])){
+            return ['status'=>301, 'msg'=>'缺少access_token参数'];
+        }
+
+        $rst = FootBallService::recordFootBallDatas($post);
+
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '比分数据记录成功', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+        return $rst;
+    }
 
 
 

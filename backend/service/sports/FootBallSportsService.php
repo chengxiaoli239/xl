@@ -20,6 +20,7 @@ class FootBallSportsService extends SportsBaseService  {
         $p_data = $plate_datas['data'];
         $setDatas = [
             'plate_id' => (string)$plate_datas['plate_id'],
+            'plate_name' => EventsLiveDatasService::getSportTypes()[$plate_datas['plate_id']]['name'],
             'event_id' => $p_data['event_id'], # 项目id
             'game_schedule' => $plate_datas['game_schedule'], # 比赛进度
             'is_has_jq' => $plate_datas['is_has_jq'], # 是否角球

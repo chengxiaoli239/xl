@@ -39,15 +39,15 @@ $EventsLiveDatas = \backend\models\sports\EventsLiveDatas::find()->where('1=1')-
             <?php } ?>
         </section>
     </div>
-    <div class="col-lg-5">
+    <div class="col-lg-6">
         <section class="panel">
             <header class="panel-heading">
                 <?= '<strong><font color="green">比分网</font>&nbsp;&nbsp;&nbsp;</strong>' ?>
             </header>
             <?php foreach ($EventsLiveDatas as $EventsLiveData){ ?>
                 <header class="panel-heading" title="<?=substr($EventsLiveData['update_time'],10)?>">
-                    <strong><?=$EventsLiveData['group_name'] ?> &nbsp; <font color="green"><?=$EventsLiveData['score_home'] ?>-<?=$EventsLiveData['score_away'] ?></font></strong>
-                    ：<font color="#a52a2a"><?=$EventsLiveData['home_name'] ?> - <?=$EventsLiveData['away_name'] ?></font>
+                    [<?=$EventsLiveData['clock_minute'].':'.$EventsLiveData['clock_second']?>] <strong><?=$EventsLiveData['event_name_en'] ?> &nbsp;<br> <font color="green"><?=$EventsLiveData['score_home'] ?>-<?=$EventsLiveData['score_away'] ?></font></strong>
+                    ：<font color="#a52a2a"><?=$EventsLiveData['home_name_en'] ?> - <?=$EventsLiveData['way_name_en'] ?></font>
                 </header>
             <?php } ?>
         </section>
