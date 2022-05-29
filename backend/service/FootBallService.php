@@ -57,6 +57,7 @@ class FootBallService extends SportsBaseService
 
         $dataType = $datas['dataType'];
         $access_token = $datas['access_token'];
+        Tool_Common::log('/sports/'.__FUNCTION__, 'INFO', '比分数据0', ['dataType'=>$dataType, 'datas'=>$datas, 'score_data'=>$datas['score_data']]);
 
         $scoreDatas = $datas['score_data'];
         $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
@@ -76,7 +77,7 @@ class FootBallService extends SportsBaseService
         }
 
         Tool_Common::log('/sports/'.__FUNCTION__, 'INFO', '比分数据', ['dataType'=>$dataType, 'scoreDatas'=>$scoreDatas, 'rst'=>$rst]);
-        return ['status'=>200, 'msg'=>'操作成功', 'data'=>$rst];
+        return $rst;
     }
 
     /**
@@ -188,10 +189,14 @@ class FootBallService extends SportsBaseService
             throw new Exception('数据不能为空');
         }
 
-        $links = explode('/', $eventData['game_link']);
-        $event_id = end($links);
-
         try {
+            if(strpos($eventData['game_link'], '/') !== false){
+                $links = explode('/', $eventData['game_link']);
+            }
+            $event_id = $links ? end($links) : '';
+            if(empty($event_id)){
+                throw new Exception('项目id不能为空');
+            }
             $schedule_time = $eventData['schedule_time'];
             if(strpos($schedule_time, ':') === false){
                 $clock_minute = '00';
@@ -255,10 +260,10 @@ class FootBallService extends SportsBaseService
             if(!$EventsLiveDatas->save()){
                 throw new Exception(json_encode($EventsLiveDatas->getFirstErrors(), 320));
             }
-            p($EventsLiveDatas->id);
             Tool_Common::log('/sports/'.__FUNCTION__, 'INFO', '比赛记录更新', ['event_id'=>$event_id, 'eventData'=>$eventData]);
         }catch (\Exception $exception){
             Tool_Common::log('ERR', '/sports/'.__FUNCTION__.'_e', '比赛数据报错失败', ['setDatas'=>$setDatas, 'err_msg'=>$exception->getMessage()]);
+            $rst = ['status'=>300, 'msg'=>$exception->getMessage()];
         }
 
         return $rst;
