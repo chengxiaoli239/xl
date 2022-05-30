@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "{{%sports_related}}".
  *
  * @property int $id
+ * @property int $uid 用户id
  * @property int $relate_A_game_id 关联A比赛场次id,
  * @property int $relate_B_game_id 关联B比赛场次id,
  * @property string $relate_type 关联类型:1比分网2下注盘口
@@ -42,7 +43,7 @@ class SportsRelated extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['relate_A_game_id', 'relate_B_game_id', 'plate_A_id', 'plate_B_id', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'relate_A_game_id', 'relate_B_game_id', 'plate_A_id', 'plate_B_id', 'created_at', 'updated_at'], 'integer'],
             [['desc'], 'string'],
             [['update_time'], 'safe'],
             [['relate_type', 'relate_sport_type', 'plate_A_name', 'plate_B_name'], 'string', 'max' => 64],
@@ -57,6 +58,7 @@ class SportsRelated extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
+            'uid' => Yii::t('app', '用户id'),
             'relate_A_game_id' => Yii::t('app', '关联A比赛场次id,'),
             'relate_B_game_id' => Yii::t('app', '关联B比赛场次id,'),
             'relate_type' => Yii::t('app', '关联类型:1比分网2下注盘口'),
