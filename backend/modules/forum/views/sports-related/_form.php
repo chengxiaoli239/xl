@@ -16,6 +16,8 @@ use yii\widgets\ActiveForm;
             </header>
             <div class="panel-body">
                 <?php $form = ActiveForm::begin(); ?>
+                    <?= $form->field($model, 'uid')->textInput() ?>
+
                     <?= $form->field($model, 'relate_A_game_id')->textInput() ?>
 
                     <?= $form->field($model, 'relate_B_game_id')->textInput() ?>

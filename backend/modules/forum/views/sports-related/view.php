@@ -35,6 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attributes' => [
 
                                     'id',
+                                    'uid',
                                     'relate_A_game_id',
                                     'relate_B_game_id',
                                     'relate_type',

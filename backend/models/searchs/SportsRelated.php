@@ -18,7 +18,7 @@ class SportsRelated extends SportsRelatedModel
     public function rules()
     {
         return [
-            [['id', 'relate_A_game_id', 'relate_B_game_id', 'plate_A_id', 'plate_B_id', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'uid', 'relate_A_game_id', 'relate_B_game_id', 'plate_A_id', 'plate_B_id', 'created_at', 'updated_at'], 'integer'],
             [['relate_type', 'relate_sport_type', 'plate_A_name', 'plate_B_name', 'base_url_A', 'base_url_B', 'plate_bet_url_A', 'plate_bet_url_B', 'plate_bet_conditions', 'desc', 'update_time'], 'safe'],
         ];
     }
@@ -60,6 +60,7 @@ class SportsRelated extends SportsRelatedModel
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'uid' => $this->uid,
             'relate_A_game_id' => $this->relate_A_game_id,
             'relate_B_game_id' => $this->relate_B_game_id,
             'plate_A_id' => $this->plate_A_id,

@@ -33,10 +33,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['class' => 'yii\grid\SerialColumn'],
 
                         'id',
+                        'uid',
                         'relate_A_game_id',
                         'relate_B_game_id',
                         'relate_type',
-                        'relate_sport_type',
+                        //'relate_sport_type',
                         //'plate_A_id',
                         //'plate_A_name',
                         //'plate_B_id',
