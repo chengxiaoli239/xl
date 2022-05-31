@@ -1,27 +1,2 @@
-CREATE TABLE `lt_data_deal_status` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `lottery_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '彩票类型',
-  `qihao` varchar(24) NOT NULL COMMENT '期号',
-  `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '状态:0待处理1已处理',
-  `status_desc` text NOT NULL DEFAULT '0' COMMENT '状态结果描述',
-  `heZhiStatics_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '和值统计状态:0待处理1已处理',
-  `heZhiStatics_status_desc` text NOT NULL DEFAULT '0' COMMENT '和值统计结果描述',
-  `static4dPerDateProfits_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '每天四定利润统计:0待处理1已处理',
-  `static4dPerDateProfits_status_desc` text NOT NULL DEFAULT '0' COMMENT '每天四定利润统计结果描述',
-  `updateDs_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '单双处理状态:0待处理1已处理',
-  `updateDs_status_desc` text NOT NULL DEFAULT '0' COMMENT '单双处理结果描述',
-  `update3NumYL_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '开奖三字现处理状态:0待处理1已处理',
-  `update3NumYL_status_desc` text NOT NULL DEFAULT '0' COMMENT '开奖三字现处理结果描述',
-  `heZhiYl_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '和值遗漏状态:0待处理1已处理',
-  `heZhiYl_status_desc` text NOT NULL DEFAULT '0' COMMENT '和值遗漏处理结果描述',
-  `opProfitsPlans_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '投注计划处理状态:0待处理1已处理',
-  `opProfitsPlans_status_desc` text NOT NULL DEFAULT '0' COMMENT '和值遗漏处理结果描述',
-  `created_at` int(11) NOT NULL COMMENT '创建时间',
-  `updated_at` int(11) NOT NULL COMMENT '更新时间',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='每期数据处理状态表';
-
-svn commit -m '数据处理状态表' backend/models/DataDealStatus.php backend/models/DataDealStatusQuery.php backend/models/searchs/DataDealStatus.php backend/modules/forum/views/data-deal-status backend/modules/forum/controllers/DataDealStatusController.php
-
-svn commit -m '彩种数据统计控制开关' backend/models/LotteryDataDealStatus.php backend/models/LotteryDataDealStatusQuery.php backend/models/searchs/LotteryDataDealStatus.php backend/modules/forum/views/lottery-data-deal-status
+svn commit backend/models/searchs/SportsRelated.php backend/modules/forum/views/sports-related/_form.php backend/modules/forum/views/sports-related/_search.php backend/modules/forum/views/sports-related/index.php backend/modules/forum/views/sports-related/view.php
+svn add backend/modules/sports/controllers/SportsRelatedController.php && svn commit backend/modules/sports/controllers/SportsRelatedController.php -m 'sports'

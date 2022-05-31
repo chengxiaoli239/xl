@@ -2,6 +2,8 @@
 namespace backend\service;
 
 use backend\models\sports\EventsLiveDatas;
+use backend\models\sports\SportsPlatesGames;
+use backend\models\sports\SportsRelated;
 use backend\service\clients\TzSystemUsersService;
 use backend\service\sports\SportsBaseService;
 use common\general\helpers\Curl;
@@ -81,6 +83,32 @@ class FootBallService extends SportsBaseService
     }
 
     /**
+     * @desc 已经绑定比赛
+     * @param $access_token
+     * @param $plate_type
+     * @return array
+     */
+    public static function hasRelatedGames($access_token, $plate_type=1){
+
+        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+        Tool_Common::log('/sports/'.__FUNCTION__, 'INFO', '比分数据0', ['access_token'=>$access_token, 'plate_type'=>$plate_type]);
+
+        $uid = $TzSystemsUsers->uid;
+        $where = [
+            'AND',
+            ['=', 'sr.uid', $uid],
+            ['=', 'sr.uid', $uid],
+        ];
+        $datas = SportsRelated::find()->alias('sr')->select(['*'])
+            ->leftJoin(EventsLiveDatas::tableName() ." as a", 'a.event_id = sr.relate_A_game_id')
+            ->leftJoin(SportsPlatesGames::tableName() ." as b", 'b.event_id = sr.relate_B_game_id')
+            ->where($where)
+            ->asArray()->all();
+
+        return $datas;
+    }
+
+    /**
      * @desc in-play 数据
      * @param array $datas
      * @return bool
@@ -117,6 +145,7 @@ class FootBallService extends SportsBaseService
                     'event_name' => $event['name'] ? : '',
                     'event_name_en' => $event['englishName'] ? : '',
                     'event_time' => strtotime($event['start']), # 比赛开始时间
+                    'bet_url' => '', # 游戏地址
                     'group_id' => $event['groupId'],
                     'group_name' => $event['group'],
 
@@ -227,6 +256,7 @@ class FootBallService extends SportsBaseService
                 'event_name_en' => $eventData['country_ls_name'] ? : '',
                 #'event_name_en' => $event['englishName'] ? : '',
                 'event_time' => $now_time, # 时间进度
+                'bet_url' => $eventData['game_link'], # 游戏链接
                 #'group_id' => $event['groupId'],
                 #'group_name' => $event['group'],
 

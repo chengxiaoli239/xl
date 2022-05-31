@@ -293,6 +293,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $a=array("Name"=>"Peter","Age"=>"41","Country"=>"USA");
+        p(array_values($a));
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%sports_plates_games}}'); p($r);
         $count = 5;
         $t = 5;

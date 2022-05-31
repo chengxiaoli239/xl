@@ -23,6 +23,11 @@ $EventsLiveDatas = \backend\models\sports\EventsLiveDatas::find()->where('1=1')-
         <header class="panel-heading">
             <?php include(dirname(__FILE__).'/create_tab.php');?>
         </header>
+        <header class="panel-heading">
+            <div class="btn-group">
+                <a href="javascript:;" id="game_related" class="btn btn-success">比赛绑定</a>
+            </div>
+        </header>
         <input type="hidden" id="sport_type" name="SportType[sport_type]" value="<?=$sport_type?>">
     </div>
     <div class="col-lg-5">
@@ -32,8 +37,9 @@ $EventsLiveDatas = \backend\models\sports\EventsLiveDatas::find()->where('1=1')-
             </header>
             <?php foreach ($SportsPlatesGames as $SportsPlatesGame){ ?>
                 <header class="panel-heading" title="<?=substr($SportsPlatesGame['update_time'],10)?>">
+                    <input type="checkbox" value="<?=$SportsPlatesGame['event_id']?>" name="PlatesGamesEventId[]">
                     [<?=$SportsPlatesGame['game_schedule']? : ' '?>]&nbsp;&nbsp;
-                    <strong><?=$SportsPlatesGame['league_matches_name'] ?> <font color="green"><?=str_replace(' ', '', $SportsPlatesGame['score']) ?></font></strong>
+                    <strong><?='['.$SportsPlatesGame['event_id'].'] '.trim($SportsPlatesGame['league_matches_name']) ?> <font color="green"><?=str_replace(' ', '', $SportsPlatesGame['score']) ?></font></strong>
                     ：<font color="#a52a2a"><?=$SportsPlatesGame['name1'] ?> - <?=$SportsPlatesGame['name2'] ?></font>
                 </header>
             <?php } ?>
@@ -45,8 +51,9 @@ $EventsLiveDatas = \backend\models\sports\EventsLiveDatas::find()->where('1=1')-
                 <?= '<strong><font color="green">比分网</font>&nbsp;&nbsp;&nbsp;</strong>' ?>
             </header>
             <?php foreach ($EventsLiveDatas as $EventsLiveData){ ?>
-                <header class="panel-heading" title="<?=substr($EventsLiveData['update_time'],10)?>">
-                    [<?=$EventsLiveData['clock_minute'].':'.$EventsLiveData['clock_second']?>] <strong><?=$EventsLiveData['event_name_en'] ?> &nbsp;<br> <font color="green"><?=$EventsLiveData['score_home'] ?>-<?=$EventsLiveData['score_away'] ?></font></strong>
+                <header class="panel-heading" title="<?=substr($EventsLiveData['event_id'],10)?>">
+                    <input type="checkbox" value="<?=$EventsLiveData['event_id']?>" name="event_id[]">
+                    [<?=$EventsLiveData['clock_minute'].':'.$EventsLiveData['clock_second']?>] <strong><?='['.$EventsLiveData['event_id'].'] '.$EventsLiveData['event_name_en'] ?> &nbsp; <font color="green"><?=$EventsLiveData['score_home'] ?>-<?=$EventsLiveData['score_away'] ?></font></strong>
                     ：<font color="#a52a2a"><?=$EventsLiveData['home_name_en'] ?> - <?=$EventsLiveData['way_name_en'] ?></font>
                 </header>
             <?php } ?>
@@ -95,6 +102,22 @@ $EventsLiveDatas = \backend\models\sports\EventsLiveDatas::find()->where('1=1')-
 <script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
 <script>
 $(function () {
+    $('#game_related').click(function () {
+        $('input[name="PlatesGamesEventId[]"]:checked').each(function(){   // 遍历input输入框中name=active 选中状态的值。
+            console.log('网盘event_id:', $(this).val())
+            plates_games_event_id = $(this).val()
+        });
+        $('input[name="event_id[]"]:checked').each(function(){   // 遍历input输入框中name=active 选中状态的值。
+            console.log('比分网event_id:', $(this).val())
+            event_id = $(this).val()
+        });
+
+        url = '/forum/events-live-datas/act-game-related'
+        data = {'plates_games_event_id':plates_games_event_id, 'event_id':event_id}
+        $.post(url, data, function(rst) {
+            console.log(rst)
+        });
+    })
 
 });
 </script>

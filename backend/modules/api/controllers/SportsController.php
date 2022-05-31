@@ -258,6 +258,23 @@ class SportsController extends Controller
         return $rst;
     }
 
+    /**
+     * @desc 已经绑定的比赛数据
+     * @return array
+     */
+    public function actionHasRelatedGames(){
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        if(empty($post['access_token'])){
+            return ['status'=>301, 'msg'=>'缺少access_token参数'];
+        }
+
+        $rst = FootBallService::hasRelatedGames($post['access_token'], );
+
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '比分数据记录成功', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+        return $rst;
+    }
 
 
 

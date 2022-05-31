@@ -13,6 +13,7 @@ use Yii;
  * @property string $group_name 比赛组名称
  * @property int $event_time 比赛开始时间
  * @property int $event_id 比赛项目id
+ * @property int $bet_url 游戏链接
  * @property string $event_name 比赛名称
  * @property string $event_name_en 比赛名称英文
  * @property string $event_name_cn 比赛名称中文
@@ -61,7 +62,7 @@ class EventsLiveDatas extends \common\models\base\BaseModel
             [['liveStatistics'], 'string'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
-            [['group_name', 'event_name', 'event_name_en', 'event_name_cn', 'home_name_en', 'home_name_cn', 'way_name_en', 'way_name_cn'], 'string', 'max' => 255],
+            [['group_name', 'event_name', 'bet_url', 'event_name_en', 'event_name_cn', 'home_name_en', 'home_name_cn', 'way_name_en', 'way_name_cn'], 'string', 'max' => 255],
             [['score_info', 'score_who', 'statics_football_home_yellowCards', 'statics_football_way_yellowCards', 'statics_football_home_redCards', 'statics_football_way_redCards', 'statics_football_home_corners', 'statics_football_way_corners'], 'string', 'max' => 64],
         ];
     }
@@ -79,6 +80,7 @@ class EventsLiveDatas extends \common\models\base\BaseModel
             'event_time' => Yii::t('app', '比赛开始时间'),
             'event_id' => Yii::t('app', '比赛项目id'),
             'event_name' => Yii::t('app', '比赛名称'),
+            'bet_url' => Yii::t('app', '游戏链接'),
             'event_name_en' => Yii::t('app', '比赛名称英文'),
             'event_name_cn' => Yii::t('app', '比赛名称中文'),
             'home_name_en' => Yii::t('app', '主队名称英文'),

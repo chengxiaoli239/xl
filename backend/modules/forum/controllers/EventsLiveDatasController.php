@@ -120,6 +120,19 @@ class EventsLiveDatasController extends BaseController
     }
 
     /**
+     * @desc 比赛关联
+     * @return array
+     */
+    public function actionActGameRelated(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+
+        $rst = EventsLiveDatasService::actGameRelated($post, $this->_user_id);
+
+        return $rst;
+    }
+
+    /**
      * Deletes an existing EventsLiveDatas model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id

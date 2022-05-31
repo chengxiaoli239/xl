@@ -19,7 +19,7 @@ class EventsLiveDatas extends EventsLiveDatasModel
     {
         return [
             [['id', 'uid', 'group_id', 'event_time', 'event_id', 'clock_minute', 'clock_second', 'clock_minutesLeftInPeriod', 'clock_secondsLeftInMinute', 'clock_period', 'clock_running', 'score_home', 'score_away', 'created_at', 'updated_at'], 'integer'],
-            [['group_name', 'event_name', 'event_name_en', 'event_name_cn', 'home_name_en', 'home_name_cn', 'way_name_en', 'way_name_cn', 'score_info', 'score_who', 'statics_football_home_yellowCards', 'statics_football_way_yellowCards', 'statics_football_home_redCards', 'statics_football_way_redCards', 'statics_football_home_corners', 'statics_football_way_corners', 'liveStatistics', 'update_time'], 'safe'],
+            [['group_name', 'event_name', 'bet_url', 'event_name_en', 'event_name_cn', 'home_name_en', 'home_name_cn', 'way_name_en', 'way_name_cn', 'score_info', 'score_who', 'statics_football_home_yellowCards', 'statics_football_way_yellowCards', 'statics_football_home_redCards', 'statics_football_way_redCards', 'statics_football_home_corners', 'statics_football_way_corners', 'liveStatistics', 'update_time'], 'safe'],
         ];
     }
 
@@ -80,6 +80,7 @@ class EventsLiveDatas extends EventsLiveDatasModel
 
         $query->andFilterWhere(['like', 'group_name', $this->group_name])
             ->andFilterWhere(['like', 'event_name', $this->event_name])
+            ->andFilterWhere(['like', 'bet_url', $this->bet_url])
             ->andFilterWhere(['like', 'event_name_en', $this->event_name_en])
             ->andFilterWhere(['like', 'event_name_cn', $this->event_name_cn])
             ->andFilterWhere(['like', 'home_name_en', $this->home_name_en])

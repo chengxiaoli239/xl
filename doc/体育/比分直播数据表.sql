@@ -4,6 +4,7 @@ CREATE TABLE `lt_events_live_datas` (
   `	` int(11) DEFAULT '0' COMMENT '比赛项目组id',
   `group_name` varchar(255) DEFAULT '0' COMMENT '比赛组名称',
   `event_time` int(11) DEFAULT NULL COMMENT '比赛开始时间',
+  `bet_url` varchar(255) DEFAULT '0' COMMENT '游戏链接',
   `event_id` int(11) DEFAULT '0' COMMENT '比赛项目id',
   `event_name` varchar(255) DEFAULT '0' COMMENT '比赛名称',
   `event_name_en` varchar(255) DEFAULT '0' COMMENT '比赛名称英文',
