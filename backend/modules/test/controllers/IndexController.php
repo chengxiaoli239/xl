@@ -293,6 +293,10 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $t = '[366/365.51]商品付款金额合计与成交金额不平衡 ';
+        $t = str_replace('[', '', $t);
+        $tArr = explode('/', explode(']', $t)[0]);
+        p($tArr);
         $a=array("Name"=>"Peter","Age"=>"41","Country"=>"USA");
         p(array_values($a));
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%sports_plates_games}}'); p($r);

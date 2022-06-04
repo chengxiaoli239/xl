@@ -89,6 +89,7 @@ class FootBallService extends SportsBaseService
      * @return array
      */
     public static function hasRelatedGames($access_token, $plate_type=1){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
 
         $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
         Tool_Common::log('/sports/'.__FUNCTION__, 'INFO', '比分数据0', ['access_token'=>$access_token, 'plate_type'=>$plate_type]);
@@ -104,8 +105,9 @@ class FootBallService extends SportsBaseService
             ->leftJoin(SportsPlatesGames::tableName() ." as b", 'b.event_id = sr.relate_B_game_id')
             ->where($where)
             ->asArray()->all();
+        $rst['data'] = $datas;
 
-        return $datas;
+        return $rst;
     }
 
     /**
@@ -263,7 +265,7 @@ class FootBallService extends SportsBaseService
                 'home_name_en' => $eventData['home_name'] ? : '', # 主队英文名
                 'way_name_en' => $eventData['away_name'] ? : '', # 客队英文名
                 'score_home' => (int)$eventData['home_score'], # 主队得分
-                'score_away' => (int)$eventData['away_name'], # 客队得分
+                'score_away' => (int)$eventData['away_score'], # 客队得分
                 'score_who' => '', # 哪对得分
 
                 'clock_minute' => $clock_minute, # 比赛进行分钟数
