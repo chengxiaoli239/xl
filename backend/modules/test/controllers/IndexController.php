@@ -293,6 +293,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst = DatasClearService::clearBettingRecords(); p($rst);
         $t = '[366/365.51]商品付款金额合计与成交金额不平衡 ';
         $t = str_replace('[', '', $t);
         $tArr = explode('/', explode(']', $t)[0]);
