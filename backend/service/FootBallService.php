@@ -98,9 +98,9 @@ class FootBallService extends SportsBaseService
         $where = [
             'AND',
             ['=', 'sr.uid', $uid],
-            ['=', 'sr.uid', $uid],
+            ['>', 'sr.updated_at', (string)(time()-7200)],
         ];
-        $datas = SportsRelated::find()->alias('sr')->select(['*'])
+        $datas = SportsRelated::find()->alias('sr')->select(['sr.*'])
             ->leftJoin(EventsLiveDatas::tableName() ." as a", 'a.event_id = sr.relate_A_game_id')
             ->leftJoin(SportsPlatesGames::tableName() ." as b", 'b.event_id = sr.relate_B_game_id')
             ->where($where)

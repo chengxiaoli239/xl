@@ -39,7 +39,7 @@ class EventsLiveDatasService extends SportsBaseService  {
         if(empty($SportsRelated)){
             $SportsRelated = new SportsRelated();
             $setDatas = [
-                'uid' => $uid,
+                'uid' => $uid==1 ? 18 : $uid,
                 'relate_A_game_id' => $data['event_id'],
                 'relate_B_game_id' => $data['plates_games_event_id'],
                 'created_at' => $now_time,

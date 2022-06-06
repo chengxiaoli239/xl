@@ -29,7 +29,11 @@ class DatasClearService extends BaseService{
                 $task_delete_sql = 'DELETE FROM {{%bet_error_plans_task}} WHERE updated_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
                 $rst_task_delete = $db->createCommand($task_delete_sql)->execute();
 
-                $logArr = ['lottery_type'=>$lottery_type, 'count_sql'=>$count_sql, 'rst_count'=>$rst_count, 'delete_sql'=>$delete_sql, 'rst_delete'=>$rst_delete, 'rst_task_count'=>$rst_task_count, 'rst_task_delete'=>$rst_task_delete];
+
+                $deal_status_delete_sql = 'DELETE FROM {{%lt_data_deal_status}} WHERE updated_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
+                $deal_status_delete = $db->createCommand($deal_status_delete_sql)->execute();
+
+                $logArr = ['lottery_type'=>$lottery_type, 'count_sql'=>$count_sql, 'rst_count'=>$rst_count, 'delete_sql'=>$delete_sql, 'rst_delete'=>$rst_delete, 'rst_task_count'=>$rst_task_count, 'rst_task_delete'=>$rst_task_delete, 'deal_status_delete_sql'=>$deal_status_delete_sql, 'deal_status_delete'=>$deal_status_delete];
                 Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '清理数据', $logArr);
             }catch (\Exception $exception){
                 Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '清理数据', ['lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
@@ -47,7 +51,7 @@ class DatasClearService extends BaseService{
      * @return int
      */
     public static function getClearBeforeXDate($lottery_type = DEFAULT_LOTTERY_TYPE){
-        $date_nums = 5;
+        $date_nums = 3;
         if(in_array($lottery_type, [1, 17, 23, 24])){
             //$date_nums = 30;
         }
