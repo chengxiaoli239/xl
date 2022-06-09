@@ -9,9 +9,10 @@ use yii\widgets\ActiveForm;
 $SscKjDatas = \backend\models\SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->limit(30)->all();
 $this->title = '比赛绑定';
 # 网盘比赛
-$SportsPlatesGames = \backend\models\sports\SportsPlatesGames::find()->where('1=1')->orderBy(['id'=>SORT_DESC])->asArray()->limit(100)->all();
+$where = ['AND', '1=1', ['>', 'updated_at', time()-1800]];
+$SportsPlatesGames = \backend\models\sports\SportsPlatesGames::find()->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->limit(100)->all();
 # 比分网
-$EventsLiveDatas = \backend\models\sports\EventsLiveDatas::find()->where('1=1')->orderBy(['id'=>SORT_DESC])->asArray()->limit(100)->all();
+$EventsLiveDatas = \backend\models\sports\EventsLiveDatas::find()->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->limit(100)->all();
 ?>
 <style>
     p {
