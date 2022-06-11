@@ -46,6 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'base_url_B:url',
                         //'plate_bet_url_A:url',
                         //'plate_bet_url_B:url',
+                        //'status',
                         //'plate_bet_conditions',
                         //'desc:ntext',
                         //'created_at',

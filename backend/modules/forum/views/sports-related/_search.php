@@ -43,6 +43,8 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'plate_bet_url_B') ?>
 
+    <?php // echo $form->field($model, 'status') ?>
+
     <?php // echo $form->field($model, 'plate_bet_conditions') ?>
 
     <?php // echo $form->field($model, 'desc') ?>

@@ -18,7 +18,7 @@ class SportsRelated extends SportsRelatedModel
     public function rules()
     {
         return [
-            [['id', 'uid', 'relate_A_game_id', 'relate_B_game_id', 'plate_A_id', 'plate_B_id', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'uid', 'relate_A_game_id', 'relate_B_game_id', 'plate_A_id', 'plate_B_id', 'status', 'created_at', 'updated_at'], 'integer'],
             [['relate_type', 'relate_sport_type', 'plate_A_name', 'plate_B_name', 'base_url_A', 'base_url_B', 'plate_bet_url_A', 'plate_bet_url_B', 'plate_bet_conditions', 'desc', 'update_time'], 'safe'],
         ];
     }
@@ -65,6 +65,7 @@ class SportsRelated extends SportsRelatedModel
             'relate_B_game_id' => $this->relate_B_game_id,
             'plate_A_id' => $this->plate_A_id,
             'plate_B_id' => $this->plate_B_id,
+            'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,

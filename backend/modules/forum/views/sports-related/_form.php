@@ -42,6 +42,8 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'plate_bet_url_B')->textInput(['maxlength' => true]) ?>
 
+                    <?= $form->field($model, 'status')->textInput(['maxlength' => true]) ?>
+
                     <?= $form->field($model, 'plate_bet_conditions')->textInput(['maxlength' => true]) ?>
 
                     <?= $form->field($model, 'desc')->textarea(['rows' => 6]) ?>

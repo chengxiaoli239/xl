@@ -21,6 +21,7 @@ use Yii;
  * @property string $base_url_B B网盘地址
  * @property string $plate_bet_url_A A盘口下注地址
  * @property string $plate_bet_url_B B盘口下注地址
+ * @property int $status 状态
  * @property string $plate_bet_conditions 下注条件
  * @property string $desc 描述备注
  * @property int $created_at 创建时间
@@ -43,7 +44,7 @@ class SportsRelated extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['uid', 'relate_A_game_id', 'relate_B_game_id', 'plate_A_id', 'plate_B_id', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'relate_A_game_id', 'relate_B_game_id', 'plate_A_id', 'plate_B_id', 'status', 'created_at', 'updated_at'], 'integer'],
             [['desc'], 'string'],
             [['update_time'], 'safe'],
             [['relate_type', 'relate_sport_type', 'plate_A_name', 'plate_B_name'], 'string', 'max' => 64],
@@ -71,6 +72,7 @@ class SportsRelated extends \yii\db\ActiveRecord
             'base_url_B' => Yii::t('app', 'B网盘地址'),
             'plate_bet_url_A' => Yii::t('app', 'A盘口下注地址'),
             'plate_bet_url_B' => Yii::t('app', 'B盘口下注地址'),
+            'status' => Yii::t('app', '状态'),
             'plate_bet_conditions' => Yii::t('app', '下注条件'),
             'desc' => Yii::t('app', '描述备注'),
             'created_at' => Yii::t('app', '创建时间'),

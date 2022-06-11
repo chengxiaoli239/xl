@@ -95,10 +95,21 @@ class FootBallService extends SportsBaseService
         Tool_Common::log('/sports/'.__FUNCTION__, 'INFO', '比分数据0', ['access_token'=>$access_token, 'plate_type'=>$plate_type]);
 
         $uid = $TzSystemsUsers->uid;
+        $active_time = 2 * 7600;
+        # 旧关联比赛更新为不激活状态
+
+        $where = [
+            'AND',
+            ['=', 'uid', $uid],
+            ['IN', 'status', [0, 1]],
+            ['<', 'update_time', time()-$active_time],
+        ];
+        SportsRelated::updateAll(['status'=>2, 'updated_at'=>time()], $where);
+
         $where = [
             'AND',
             ['=', 'sr.uid', $uid],
-            ['>', 'sr.updated_at', (string)(time()-7200)],
+            ['>', 'sr.updated_at', (string)(time()-$active_time)],
         ];
         $datas = SportsRelated::find()->alias('sr')->select(['sr.*'])
             ->leftJoin(EventsLiveDatas::tableName() ." as a", 'a.event_id = sr.relate_A_game_id')
