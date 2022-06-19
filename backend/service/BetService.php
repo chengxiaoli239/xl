@@ -639,8 +639,16 @@ abstract class BetService extends BaseBetService {
         if(empty($BetErrorPlansTask)){
             return ['status'=>404, 'msg'=>'任务记录找不到'];
         }
+        $task_status = $betRst['task_status'];
+        $m = \Yii::$app->cache;
+        $mkey = __FUNCTION__.'_'.$plan_id."_".$qihao;
+        $flag  = (int)$m->get($mkey);
+        if($task_status == 3 && strpos($betRst['err_msg'], '短时间内重复提交') !== false && $flag==0){
+            $task_status = 0;
+        }
+        $m->set($mkey, 1, 40);
 
-        $BetErrorPlansTask->status = $betRst['task_status'];
+        $BetErrorPlansTask->status = $task_status;
         $BetErrorPlansTask->post_desc = json_encode($betRst, 320);
         $flag = $BetErrorPlansTask->save();
 
