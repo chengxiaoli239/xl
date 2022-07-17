@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '490d997d06181aabee0f9ea09c86da479c6e327f',
+    'reference' => '5b60ee8d9ad77af383f62bd672177adddbaf2596',
     'name' => 'izyue/yii2-app-advanced',
   ),
   'versions' => 
@@ -195,7 +195,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '490d997d06181aabee0f9ea09c86da479c6e327f',
+      'reference' => '5b60ee8d9ad77af383f62bd672177adddbaf2596',
     ),
     'phpspec/php-diff' => 
     array (
@@ -316,12 +316,12 @@ private static $installed = array (
     ),
     'yiisoft/yii2-queue' => 
     array (
-      'pretty_version' => '2.3.1',
-      'version' => '2.3.1.0',
+      'pretty_version' => '2.3.4',
+      'version' => '2.3.4.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'a6758a2b9c2d8aca9b949f4faa9e3cca0dfbc8be',
+      'reference' => 'ed30b5f46ddadd62587a4963dec35f9b756c408b',
     ),
     'yiisoft/yii2-swiftmailer' => 
     array (

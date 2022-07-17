@@ -1619,17 +1619,17 @@
         },
         {
             "name": "yiisoft/yii2-queue",
-            "version": "2.3.1",
-            "version_normalized": "2.3.1.0",
+            "version": "2.3.4",
+            "version_normalized": "2.3.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-queue.git",
-                "reference": "a6758a2b9c2d8aca9b949f4faa9e3cca0dfbc8be"
+                "reference": "ed30b5f46ddadd62587a4963dec35f9b756c408b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-queue/zipball/a6758a2b9c2d8aca9b949f4faa9e3cca0dfbc8be",
-                "reference": "a6758a2b9c2d8aca9b949f4faa9e3cca0dfbc8be",
+                "url": "https://api.github.com/repos/yiisoft/yii2-queue/zipball/ed30b5f46ddadd62587a4963dec35f9b756c408b",
+                "reference": "ed30b5f46ddadd62587a4963dec35f9b756c408b",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -1665,7 +1665,7 @@
                 "php-amqplib/php-amqplib": "Need for AMQP queue.",
                 "yiisoft/yii2-redis": "Need for Redis queue."
             },
-            "time": "2020-12-23T17:04:23+00:00",
+            "time": "2022-03-31T07:41:51+00:00",
             "type": "yii2-extension",
             "extra": {
                 "branch-alias": {
@@ -1676,16 +1676,16 @@
             "autoload": {
                 "psr-4": {
                     "yii\\queue\\": "src",
-                    "yii\\queue\\amqp\\": "src/drivers/amqp",
-                    "yii\\queue\\amqp_interop\\": "src/drivers/amqp_interop",
-                    "yii\\queue\\beanstalk\\": "src/drivers/beanstalk",
                     "yii\\queue\\db\\": "src/drivers/db",
-                    "yii\\queue\\file\\": "src/drivers/file",
-                    "yii\\queue\\gearman\\": "src/drivers/gearman",
-                    "yii\\queue\\redis\\": "src/drivers/redis",
-                    "yii\\queue\\sync\\": "src/drivers/sync",
                     "yii\\queue\\sqs\\": "src/drivers/sqs",
-                    "yii\\queue\\stomp\\": "src/drivers/stomp"
+                    "yii\\queue\\amqp\\": "src/drivers/amqp",
+                    "yii\\queue\\file\\": "src/drivers/file",
+                    "yii\\queue\\sync\\": "src/drivers/sync",
+                    "yii\\queue\\redis\\": "src/drivers/redis",
+                    "yii\\queue\\stomp\\": "src/drivers/stomp",
+                    "yii\\queue\\gearman\\": "src/drivers/gearman",
+                    "yii\\queue\\beanstalk\\": "src/drivers/beanstalk",
+                    "yii\\queue\\amqp_interop\\": "src/drivers/amqp_interop"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
