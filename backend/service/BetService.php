@@ -895,6 +895,13 @@ abstract class BetService extends BaseBetService {
             $codesArr = self::getInverseCodes($codesArr, $code_type);
         }
         //p(['buy_type'=>$buy_type, 'before_count'=>$before_count, 'after_count'=>count($codesArr), 'codesArr'=>$codesArr]);
+        //p($codes_hz_data);
+
+        # 排除前xx期号码
+        if(isset($codes_hz_data['is_filter_history']) && $codes_hz_data['is_filter_history']==1 && $codes_hz_data['filter_history_nums']>0){
+            $filter_history_codes = NumService::getBeforeKjCodesFromSite($codes_hz_data['filter_history_nums']);
+            $codesArr = array_diff($codesArr, $filter_history_codes); # 返回$codes在$filter_codes中没有的号码
+        }
 
         $codes_hz_data = json_decode($codes_hz, true);
         if(isset($codes_hz_data['filters']['filter_type']) && in_array($codes_hz_data['filters']['filter_type'], [1])){

@@ -180,6 +180,15 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['type_22b']);
 
+        # 排除前xx期号码
+        if($UserSysPlans['is_filter_history'] && count($UserSysPlans['is_filter_history']) == 1){
+            if(isset($UserSysPlans['filter_history_nums']) && $UserSysPlans['filter_history_nums']>0){
+                $tmpFilter['is_filter_history'] = $UserSysPlans['is_filter_history'][0];
+                $tmpFilter['filter_history_nums'] = $UserSysPlans['filter_history_nums'];
+            }
+        }
+        unset($post['UserSysPlans']['type_log']);
+
         # 17、区间遗漏投 start
         if(!empty($UserSysPlans['area_all_qishus'])){
             $tmpFilter['area_all_qishus'] = $UserSysPlans['area_all_qishus'];

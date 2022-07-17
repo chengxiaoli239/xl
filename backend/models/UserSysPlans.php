@@ -168,6 +168,11 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $current_area_profits; # 区间利润
     public $area_arise_qishus; # 统计区间上奖次数
     ########################### 统计期数区间 止盈止损 end #########################
+
+    ########################## 过滤前xx期号码 start ########################
+    public $is_filter_history; # 是否过滤
+    public $filter_history_nums; # 过滤号码个数
+    ########################### 过滤前xx期号码 end #########################
     /**
      * @inheritdoc
      */

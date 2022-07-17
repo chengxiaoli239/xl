@@ -293,6 +293,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $data = Lucky5::getBeforeKjCodesFromSite($num=1000);p($data);
+        $data = Lucky5::getCodesByBeforeDate('2022-07-16', $num=288);p($data);
+        $data = Lucky5::getLotteryShiXun($type='json', $is_auto=2);p($data);
         $rst = DatasClearService::clearBettingRecords(); p($rst);
         $t = '[366/365.51]商品付款金额合计与成交金额不平衡 ';
         $t = str_replace('[', '', $t);

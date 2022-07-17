@@ -15,6 +15,7 @@ use backend\models\SscKjData;
 use backend\models\StaticProfits;
 use backend\models\SystemConfig;
 use backend\models\UserSysPlans;
+use common\kj\ssc\Lucky5;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use backend\models\ThreeNum;
@@ -1937,7 +1938,29 @@ class NumService extends BaseService {
             $desc .= '过滤同位前'.(int)$filters_data['filter_nums'].'期，过滤位置：'.implode(',',NumService::getDescStrByPoses($filter_poses)).''.'，模拟最近'.(int)$filters_data['test_period_days'].'天数据 ';
         }
 
+        # 是否过滤前xx期号码
+        if(isset($hz_Arr['is_filter_history']) && $hz_Arr['is_filter_history']){
+            $desc .= '过滤前:'.(int)$hz_Arr['filter_history_nums'].'期号码';
+        }
+
         return $desc;
+    }
+
+    /**
+     * @desc 前xx期号码
+     * @param int $num
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function getBeforeKjCodesFromSite($num=0, $lottery_type=DEFAULT_LOTTERY_TYPE){
+
+        $data = [];
+        if($lottery_type == DEFAULT_LOTTERY_TYPE){
+            $data = Lucky5::getBeforeKjCodesFromSite($num);
+        }else{
+
+        }
+        return $data;
     }
 
     /**

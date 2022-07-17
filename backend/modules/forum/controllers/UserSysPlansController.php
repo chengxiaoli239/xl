@@ -134,8 +134,11 @@ class UserSysPlansController extends BaseController
         $model->filter_date_pos1 = []; # 位置选项
         $model->filter_date_pos2 = []; # 位置选项
 
-        # 2、排除前期号
+        # 3、排除前期号
         $model->is_filter_qihao = 0;
+
+        # 4、排除前xx期号码
+        $model->is_filter_history = 0;
         ############################ 排除参数结束 #############################
 
         $model->nums = UserSysPlansService::getDefaultTzNums($tz_type);
@@ -173,6 +176,9 @@ class UserSysPlansController extends BaseController
             'filter_date_pos1' => $filter_pos1,
             'filter_date_pos2' => $filter_pos2,
             'lottery_types' => $lottery_types,
+
+            # 3、排查前x期
+            'is_filter_history' => $is_filters,
 
             'code_filter_types' => $code_filter_types, # 排除类型
 
@@ -253,7 +259,14 @@ class UserSysPlansController extends BaseController
                 $model->test_period_days = $hz_Arr_Data['filters']['test_period_days'] ? : '';
                 $model->start_qihao = $hz_Arr_Data['filters']['start_qihao'] ? : '';
             }
+
             unset($hz_Arr_Data['filters']);
+            if(isset($hz_Arr_Data['is_filter_history'])){
+                $model->is_filter_history = (int)$hz_Arr_Data['is_filter_history'];
+                $model->filter_history_nums = (int)$hz_Arr_Data['filter_history_nums'];
+            }
+
+            # 动态排除前x位号码
 
             # 2、排除前x天同期
             if(isset($hz_Arr_Data['filter_dates'])){
@@ -318,6 +331,9 @@ class UserSysPlansController extends BaseController
             'filter_date_pos1' => $filter_pos1,
             'filter_date_pos2' => $filter_pos2,
 
+            # 3、排查前x期
+            'is_filter_history' => $is_filters,
+
             'code_filter_types' => $code_filter_types, # 排除类型
             # 2、排除前x天内同期
             'is_filter_qihaos' => $is_filters,
@@ -373,6 +389,9 @@ class UserSysPlansController extends BaseController
 
         # 2、排除前期号
         $model->is_filter_qihao = 0;
+
+        # 4、排除前xx期号码
+        $model->is_filter_history = 0;
         ############################ 排除参数结束 #############################
 
         $model->nums = usersysplansservice::getdefaulttznums($tz_type);

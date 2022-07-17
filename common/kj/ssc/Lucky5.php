@@ -250,4 +250,67 @@ class Lucky5 extends BaseKj {
         return $datas;
     }
 
+    /**
+     * @desc 获取官方前xx期号码
+     * @param int $num
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function getBeforeKjCodesFromSite($num = 1000){
+        $codes = [];
+        try {
+            $allDateCodes = [];
+            for($i=0; $i<5; $i++){
+                $b = 0 - $i;
+                $date = date('Y-m-d', strtotime($b.'day'));
+                $dataCodes = Lucky5::getCodesByBeforeDate($date);
+                $allDateCodes = array_merge($allDateCodes, $dataCodes);
+            }
+            $codes = array_unique($allDateCodes);
+            $codes = array_slice($codes, 0, $num);
+        }catch (\Exception $e){
+            Tool_Common::log('/codes/'.__FUNCTION__, 'ERR', '获取号码异常', ['err_msg'=>$e->getMessage()]);
+        }
+
+        return $codes;
+    }
+
+    /**
+     * @desc 获取指定日期的号码数据
+     * @param int $nums
+     * @param string $date
+     * @return mixed
+     */
+    public static function getCodesByBeforeDate($date='', $nums=288){
+        $codes = [];
+        #$nums = ($nums>288) ? 288 : $nums;
+        try {
+            $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun');
+            if(empty($date)){
+                $date = date('Y-m-d');
+            }
+
+            $m = \Yii::$app->cache;
+            $mkey = 'getCodesByBeforeDate_0_'.$date;
+            if($date != date('Y-m-d')){
+                $codes = $m->get($mkey);
+                if(!empty($codes)) return $codes;
+            }
+            $url = $domain . '/server/history/award?page=1&page_size='.$nums.'&gt=ygxy5&open_time='.$date;
+            $rst = CurlService::getCurl302($url);
+            if(isset($rst['data']['list']) && !empty($rst['data']['list'])){
+                $lists = $rst['data']['list'];
+                $draw_codes = [];#yii\helpers\ArrayHelper::getColumn($lists, 'draw_code');
+                foreach ($lists as $list){
+                    $draw_codes[] = substr($list['draw_code'], 0, 7);
+                }
+                $m->set($mkey, $draw_codes, 5*86400);
+                $codes = $draw_codes;
+            }
+        }catch (\Exception $e){
+            Tool_Common::log('/codes/'.__FUNCTION__, 'ERR', '获取号码异常', ['err_msg'=>$e->getMessage()]);
+        }
+
+        return $codes;
+    }
 }
