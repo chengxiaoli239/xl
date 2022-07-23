@@ -83,6 +83,7 @@ use backend\models\BettingRecords;
 use backend\models\User;
 use common\tools\Tool_Common;
 use Yii;
+use yii\queue\closure\Job;
 use yii\web\Controller;
 use backend\service\SscDataService;
 use backend\service\TzService;
@@ -293,6 +294,10 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        Yii::$app->queue->push(new \TestJob([
+            'url' => 'http://example.com/image.jpg',
+            'file' => '/tmp/image.jpg',
+        ]));
         $data = Lucky5::getBeforeKjCodesFromSite($num=1000);p($data);
         $data = Lucky5::getCodesByBeforeDate('2022-07-16', $num=288);p($data);
         $data = Lucky5::getLotteryShiXun($type='json', $is_auto=2);p($data);
