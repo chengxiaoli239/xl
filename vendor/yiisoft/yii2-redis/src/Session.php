@@ -9,10 +9,9 @@ namespace yii\redis;
 
 use Yii;
 use yii\base\InvalidConfigException;
-use yii\di\Instance;
 
 /**
- * Redis Session implements a session component using [redis](https://redis.io/) as the storage medium.
+ * Redis Session implements a session component using [redis](http://redis.io/) as the storage medium.
  *
  * Redis Session requires redis version 2.6.12 or higher to work properly.
  *
@@ -49,7 +48,7 @@ use yii\di\Instance;
  * ]
  * ~~~
  *
- * @property-read bool $useCustomStorage Whether to use custom storage. This property is read-only.
+ * @property bool $useCustomStorage Whether to use custom storage. This property is read-only.
  *
  * @author Carsten Brandt <mail@cebe.cc>
  * @since 2.0
@@ -80,7 +79,17 @@ class Session extends \yii\web\Session
      */
     public function init()
     {
-        $this->redis = Instance::ensure($this->redis, Connection::className());
+        if (is_string($this->redis)) {
+            $this->redis = Yii::$app->get($this->redis);
+        } elseif (is_array($this->redis)) {
+            if (!isset($this->redis['class'])) {
+                $this->redis['class'] = Connection::className();
+            }
+            $this->redis = Yii::createObject($this->redis);
+        }
+        if (!$this->redis instanceof Connection) {
+            throw new InvalidConfigException("Session::redis must be either a Redis connection instance or the application component ID of a Redis connection.");
+        }
         if ($this->keyPrefix === null) {
             $this->keyPrefix = substr(md5(Yii::$app->id), 0, 5);
         }
@@ -95,26 +104,6 @@ class Session extends \yii\web\Session
     public function getUseCustomStorage()
     {
         return true;
-    }
-
-    /**
-     * Session open handler.
-     * @internal Do not call this method directly.
-     * @param string $savePath session save path
-     * @param string $sessionName session name
-     * @return bool whether session is opened successfully
-     */
-    public function openSession($savePath, $sessionName)
-    {
-        if ($this->getUseStrictMode()) {
-            $id = $this->getId();
-            if (!$this->redis->exists($this->calculateKey($id))) {
-                //This session id does not exist, mark it for forced regeneration
-                $this->_forceRegenerateId = $id;
-            }
-        }
-
-        return parent::openSession($savePath, $sessionName);
     }
 
     /**
@@ -139,11 +128,6 @@ class Session extends \yii\web\Session
      */
     public function writeSession($id, $data)
     {
-        if ($this->getUseStrictMode() && $id === $this->_forceRegenerateId) {
-            //Ignore write when forceRegenerate is active for this id
-            return true;
-        }
-
         return (bool) $this->redis->executeCommand('SET', [$this->calculateKey($id), $data, 'EX', $this->getTimeout()]);
     }
 

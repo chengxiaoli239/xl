@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '5b60ee8d9ad77af383f62bd672177adddbaf2596',
+    'reference' => 'a618796bcfec55b2ea0c4a055e115f5602a11f38',
     'name' => 'izyue/yii2-app-advanced',
   ),
   'versions' => 
@@ -171,7 +171,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '5b60ee8d9ad77af383f62bd672177adddbaf2596',
+      'reference' => 'a618796bcfec55b2ea0c4a055e115f5602a11f38',
     ),
     'phpspec/php-diff' => 
     array (
@@ -298,6 +298,15 @@
       array (
       ),
       'reference' => 'ed30b5f46ddadd62587a4963dec35f9b756c408b',
+    ),
+    'yiisoft/yii2-redis' => 
+    array (
+      'pretty_version' => '2.0.11',
+      'version' => '2.0.11.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '92f2926296996c78f2441fc81e357a6e3b349e5e',
     ),
     'yiisoft/yii2-swiftmailer' => 
     array (

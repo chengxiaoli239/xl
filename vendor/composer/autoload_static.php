@@ -16,6 +16,7 @@ class ComposerStaticInitcccd0ff27bebe50b03d4728fff1bd413
         'y' => 
         array (
             'yii\\swiftmailer\\' => 16,
+            'yii\\redis\\' => 10,
             'yii\\redactor\\' => 13,
             'yii\\queue\\sync\\' => 15,
             'yii\\queue\\stomp\\' => 16,
@@ -76,6 +77,10 @@ class ComposerStaticInitcccd0ff27bebe50b03d4728fff1bd413
         'yii\\swiftmailer\\' => 
         array (
             0 => __DIR__ . '/..' . '/yiisoft/yii2-swiftmailer/src',
+        ),
+        'yii\\redis\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/yiisoft/yii2-redis/src',
         ),
         'yii\\redactor\\' => 
         array (

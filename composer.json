@@ -21,7 +21,8 @@
         "daixianceng/yii2-echarts": "*",
         "ext-json": "*",
         "yiisoft/yii2-queue": "^2.3",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "yiisoft/yii2-redis": "^2.0"
     },
     "github-oauth":{
         "github.com": "722087c57e7cbca71d81c8c1f74116ccce8218cf"

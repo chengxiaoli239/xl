@@ -1,36 +1,6 @@
 Yii Framework 2 redis extension Change Log
 ==========================================
 
-2.0.15 under development
-------------------------
-
-- no changes in this release.
-
-
-2.0.14 November 10, 2020
-------------------------
-
-- Bug #215: Fix `Connection::isActive()` returns `false` when the connection is active (cornernote)
-- Enh #212: Added support for the 'session.use_strict_mode' ini directive in `yii\web\Session` (rhertogh)
-
-
-2.0.13 May 02, 2020
--------------------
-
-- Enh #210: Add Redis 5.0 stream commands. Read more at [streams intro](https://redis.io/topics/streams-intro) (sartor)
-
-
-2.0.12 March 13, 2020
----------------------
-
-- Bug #182: Better handle `cache/flush-all` command when cache component is using shared database (rob006)
-- Bug #190: Accept null values (razonyang)
-- Bug #191: getIsActive() returns true when socket is not connected (mdx86)
-- Enh #174: Add ability to set up SSL connection (kulavvy)
-- Enh #195: Use `Instance::ensure()` to initialize `Session::$redis` (rob006)
-- Enh #199: Increase frequency of lock tries when `$timeout` is used in `Mutex::acquire()` (rob006)
-
-
 2.0.11 November 05, 2019
 ------------------------
 
