@@ -13,7 +13,6 @@ class TestJob extends \yii\base\BaseObject implements \yii\queue\JobInterface
             'url' => $this->url,
             'test'=>'xxxxxx'
         ];
-        var_dump(date('Y-m-d H:i:s').' 测试队列');
         \common\tools\Tool_Common::log('/jobs/'.__FUNCTION__, 'INFO', '测试队列', $logArr);
     }
 }
