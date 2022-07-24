@@ -16,8 +16,8 @@ return [
             'keyPrefix' => 'xl_',
         ],
         'redis' => [
-            'class' => 'yii\redis\Connection',
-            'hostname' => 'localhost',
+            'class' => new \yii\redis\Connection(),
+            'hostname' => '127.0.0.1',
             'port' => 6379,
             'database' => 0,
             'connectionTimeout'=>3
@@ -25,7 +25,7 @@ return [
 
         'queue'  => [
             //Redis 队列方案
-            'class'   => new \yii\queue\redis\Queue(),
+            'class'   => yii\queue\redis\Queue::className(),
             // 连接组件或它的配置
             'redis'   => 'redis',
             // Queue channel key

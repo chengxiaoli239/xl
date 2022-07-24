@@ -298,6 +298,7 @@ class IndexController extends Controller
             'url' => 'http://example.com/image.jpg',
             'file' => '/tmp/image.jpg',
         ]));
+        p('aslkdfj');
         $data = Lucky5::getBeforeKjCodesFromSite($num=1000);p($data);
         $data = Lucky5::getCodesByBeforeDate('2022-07-16', $num=288);p($data);
         $data = Lucky5::getLotteryShiXun($type='json', $is_auto=2);p($data);
