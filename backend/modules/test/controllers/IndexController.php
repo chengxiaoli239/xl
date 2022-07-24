@@ -23,8 +23,8 @@ use backend\service\datas\DatasClearService;
 use backend\service\FootBallService;
 use backend\service\huiyuan\HuiYuanService5;
 use backend\service\JinYing\JinYingService;
+use backend\service\jobs\TestJob;
 use backend\service\Juhua\JuHuaBaseService;
-use backend\service\KuaiLe8Service;
 use backend\service\LeCai\ZhongFaService;
 use backend\service\Lucky5\Lucky5Service;
 use backend\service\Lucky5\LuckyBaseService;
@@ -294,11 +294,12 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        Yii::$app->queue->push(new \TestJob([
+        $r = Yii::$app->queue->push(new TestJob([
             'url' => 'http://example.com/image.jpg',
             'file' => '/tmp/image.jpg',
         ]));
-        p('aslkdfj');
+        p($r);
+
         $data = Lucky5::getBeforeKjCodesFromSite($num=1000);p($data);
         $data = Lucky5::getCodesByBeforeDate('2022-07-16', $num=288);p($data);
         $data = Lucky5::getLotteryShiXun($type='json', $is_auto=2);p($data);

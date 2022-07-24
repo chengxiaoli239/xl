@@ -16,7 +16,8 @@ return [
             'keyPrefix' => 'xl_',
         ],
         'redis' => [
-            'class' => new \yii\redis\Connection(),
+            #'class' => new \yii\redis\Connection(),
+            'class' => 'yii\redis\Connection',
             'hostname' => '127.0.0.1',
             'port' => 6379,
             'database' => 0,
