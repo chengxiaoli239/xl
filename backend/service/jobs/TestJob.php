@@ -11,7 +11,7 @@ class TestJob extends \yii\base\BaseObject implements \yii\queue\JobInterface
 
         $logArr = [
             'url' => $this->url,
-            'test'=>'xxxxxx'
+            'time'=> date('Y-m-d H:i:s')
         ];
         \common\tools\Tool_Common::log('/jobs/'.__FUNCTION__, 'INFO', '≤‚ ‘∂”¡–', $logArr);
     }
