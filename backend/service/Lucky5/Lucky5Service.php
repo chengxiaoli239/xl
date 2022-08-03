@@ -394,7 +394,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $codesArr_tmp2 = str_replace(',', '', $codesArr_tmp1);
             $codes = explode('@', $codesArr_tmp2);
         }elseif ($playway == 4){ # 一定
-            $tmpDatas = explode(',', $codesData);
+            //$tmpDatas = explode(',', $codesData);
+            $tmpDatas = explode(',', $orgin_codesData);
             $tmpArr = [];
             foreach ($tmpDatas as $k=>$tmpData){
                 if(!isset($tmpData) OR empty($tmpData)) continue;
@@ -407,11 +408,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     }elseif ($p == '2'){
                         $bet_no = 'X'.$tmpData[$i].'XXX';
                     }elseif ($p == '3'){
-                        $bet_no = 'X'.$tmpData[$i].'XXX';
+                        $bet_no = 'XX'.$tmpData[$i].'XX';
                     }elseif ($p == '4'){
-                        $bet_no = 'X'.$tmpData[$i].'XXX';
+                        $bet_no = 'XXX'.$tmpData[$i].'X';
                     }elseif ($p == '5'){
-                        $bet_no = 'X'.$tmpData[$i].'XXX';
+                        $bet_no = 'XXXX'.$tmpData[$i];
                     }
                     $tmpArr[] = ['dict_no_type_id'=>$dict_no_type_id, 'bet_no'=>$bet_no, 'bet_money'=>$single];
                 }
@@ -2000,12 +2001,15 @@ class Lucky5Service { # 重庆7时彩登陆体系
         foreach ($codesArrs as $key=>$tmpcodesArr){
             $bet_log = self::getBetLog($tz_type);
             if($playway == 4){ # 一字定
+                if($plan->uid == 14){
+                    $n = rand(0, 9);
+                    unset($tmpcodesArr[$n]);
+                }
                 $post_data = [
                     'bets' => json_encode($tmpcodesArr),
                     'way' => $way,
                     'period_no' => $qihao,
                 ];
-
             }else{ # 四定、三定
                 if(in_array($plan->uid, \Yii::$app->params['IMPORT_CODES_KUAIYI_UIDS']) && in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
                     $url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ');//.'?'.http_build_query($post_data);
