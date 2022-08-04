@@ -395,11 +395,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $codes = explode('@', $codesArr_tmp2);
         }elseif ($playway == 4){ # 一定
             //$tmpDatas = explode(',', $codesData);
-            if($uid == 14){
-                # 固定去掉一个号码，用户需求
-                $n = rand(0, 9);
-                $origin_codesData = str_replace($n, '', $origin_codesData);
-            }
+            #if($uid == 14){
+            #    # 固定去掉一个号码，用户需求
+            #    $n = rand(0, 9);
+            #    $origin_codesData = str_replace($n, '', $origin_codesData);
+            #}
             $tmpDatas = explode(',', $origin_codesData);
             $tmpArr = [];
             foreach ($tmpDatas as $k=>$tmpData){

@@ -785,10 +785,15 @@ abstract class BetService extends BaseBetService {
         //p($codes_hz_data);
         $codes_hz = $hzArr = json_encode($codes_hz_data);
 
+        $plan = UserSysPlans::findOne($plan_id);
         switch ($playway){
             case 4: # 一字定
                 // {"p1":"123","p2":"345","p3":"569","p4":"6589","p5":"1234"}
                 $codesArr = NumService::getOneFixedCode(json_decode($codes_hz, true));
+                if($plan->uid == 14){
+                    $n = rand(0, 9);
+                    $codesArr[0] = str_replace($n, '', $codesArr[0]);
+                }
                 break;
             case 10: # 一字定
                 $codesArr = explode('@', $codes_hz);
