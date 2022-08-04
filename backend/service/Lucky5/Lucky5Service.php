@@ -419,7 +419,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     }elseif ($p == '5'){
                         $bet_no = 'XXXX'.$tmpData[$i];
                     }
-                    $tmpArr[] = ['dict_no_type_id'=>$dict_no_type_id, 'bet_no'=>$bet_no, 'bet_money'=>$single];
+                    $tmpArr[] = ['dict_no_type_id'=>(string)$dict_no_type_id, 'bet_no'=>$bet_no, 'bet_money'=>(string)$single];
                 }
             }
             $codes = $tmpArr;
@@ -2008,6 +2008,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             if($playway == 4){ # 一字定
                 $post_data = [
                     'bets' => json_encode($tmpcodesArr),
+                    #'bets' => $tmpcodesArr,
                     'way' => $way,
                     'period_no' => $qihao,
                 ];
