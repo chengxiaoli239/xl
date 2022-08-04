@@ -370,7 +370,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @return array
      */
     public static function getBetCodes($codesData, $single = 0.1, $playway = 1, $uid=''){
-        $orgin_codesData = $codesData;
+        $origin_codesData = $codesData;
         $codes = [];
         $codesData = str_replace(',','',$codesData);
         $codesData = str_replace('@',',',$codesData);
@@ -382,7 +382,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 $codes[] = ['dict_no_type_id'=>$dict_no_type_id, 'bet_no'=>$code, 'bet_money'=>$single];
             }
         }elseif ($playway == 3 && !in_array($uid, \Yii::$app->params['IMPORT_CODES_KUAIYI_UIDS'])){ # 四定
-            $tmpCodes = explode('@', $orgin_codesData);
+            $tmpCodes = explode('@', $origin_codesData);
             $codesArr = [];
             foreach ($tmpCodes as $tmpCode){
                 $t_codes = explode(',', $tmpCode);
@@ -395,7 +395,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $codes = explode('@', $codesArr_tmp2);
         }elseif ($playway == 4){ # 一定
             //$tmpDatas = explode(',', $codesData);
-            $tmpDatas = explode(',', $orgin_codesData);
+            if($uid == 14){
+                # 固定去掉一个号码，用户需求
+                $n = rand(0, 9);
+                $origin_codesData = str_replace($n, '', $origin_codesData);
+            }
+            $tmpDatas = explode(',', $origin_codesData);
             $tmpArr = [];
             foreach ($tmpDatas as $k=>$tmpData){
                 if(!isset($tmpData) OR empty($tmpData)) continue;
@@ -1972,7 +1977,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if($plan->tz_type == 22){ # 四定单双,codes格式：13579,13579,02468,13579@13579,13579,02468,02468@13579,02468,13579,13579
             $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway);
         }elseif($plan->tz_type == 18){
-            $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway);
+            $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway, $plan->uid);
         }else{
             $tmpCodes = str_replace(',', '', $tmpCodes);
             $codesArr = explode('@', $tmpCodes);
@@ -2001,10 +2006,6 @@ class Lucky5Service { # 重庆7时彩登陆体系
         foreach ($codesArrs as $key=>$tmpcodesArr){
             $bet_log = self::getBetLog($tz_type);
             if($playway == 4){ # 一字定
-                if($plan->uid == 14){
-                    $n = rand(0, 9);
-                    unset($tmpcodesArr[$n]);
-                }
                 $post_data = [
                     'bets' => json_encode($tmpcodesArr),
                     'way' => $way,
