@@ -103,7 +103,7 @@ class TzSystemUsersService extends ClientsBaseService{
                 "Referer" => $TzSystemsUsers->ssc_domain."/App/Index?_=",
                 "Host"=> str_replace('www.','',$tzSiteInfo['domain']),
                 "v1" => "99",
-                "v2" => "101",
+                "v2" => "104",
             ];
             $m->set($mkey, $data, 60);
         }
