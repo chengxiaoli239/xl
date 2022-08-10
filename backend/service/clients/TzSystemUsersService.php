@@ -13,6 +13,7 @@ use yii\helpers\ArrayHelper;
 class TzSystemUsersService extends ClientsBaseService{
     public static $module_key = 'backend\models\TzSystemsUsers';
     const PlAN_TYPE_LOCAL = 'local';
+    const PlAN_TYPE_RE_LOCAL = 're_local';
 
     public static function getLists($post=[]){
         if(empty($post)){
@@ -302,7 +303,7 @@ class TzSystemUsersService extends ClientsBaseService{
                 $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
                 $datas[] = [
                     'bet_url' => $bet_url,
-                    'plan_type' => self::PlAN_TYPE_LOCAL,
+                    'plan_type' => self::PlAN_TYPE_RE_LOCAL,
                     'local_data' => [
                         'local_codes' => trim($local_codes),
                         'bet_money' => $bet_money,
