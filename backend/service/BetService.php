@@ -790,7 +790,7 @@ abstract class BetService extends BaseBetService {
             case 4: # 一字定
                 // {"p1":"123","p2":"345","p3":"569","p4":"6589","p5":"1234"}
                 $codesArr = NumService::getOneFixedCode(json_decode($codes_hz, true));
-                if(in_array($plan->uid, [14, 17])){
+                if(in_array($plan->uid, \Yii::$app->params['ONE_FIXED_UIDS'])){
                     $n = rand(0, 9);
                     $codesArr[0] = str_replace($n, '', $codesArr[0]);
                 }

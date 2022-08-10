@@ -12,6 +12,7 @@ use yii\helpers\ArrayHelper;
 
 class TzSystemUsersService extends ClientsBaseService{
     public static $module_key = 'backend\models\TzSystemsUsers';
+    const PlAN_TYPE_LOCAL = 'local';
 
     public static function getLists($post=[]){
         if(empty($post)){
@@ -238,12 +239,20 @@ class TzSystemUsersService extends ClientsBaseService{
             $datas = [];
             $_t = round(microtime(true) * 1000);
             foreach ($BetErrorPlansTasks as $row){
-                $uid = $row->uid;
                 $plan_id = $row->plan_id;
                 $account = $row->account;
                 $bet_url = $row->bet_url;
                 $qihao = $row->qihao;
                 $post_data = json_decode($row->post_datas, 320);
+                $uid = $row->uid;
+                $local_codes = '';
+                if(in_array($uid, \Yii::$app->params['ONE_FIXED_UIDS']) && $row->playway == 4){
+                    $bets = json_decode($post_data['bets'], 320);
+                    foreach ($bets as $d){
+                        $local_codes .= ' '.$d['bet_no'];
+                        $bet_money = $d['bet_money'];
+                    }
+                }
 
                 if(false){
                     $headers = [
@@ -288,12 +297,16 @@ class TzSystemUsersService extends ClientsBaseService{
                         'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemsUsers->user_agent)),
                         "X-Requested-With"=>"XMLHttpRequest"
                     ];
-
                 }
 
                 $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
                 $datas[] = [
                     'bet_url' => $bet_url,
+                    'plan_type' => self::PlAN_TYPE_LOCAL,
+                    'local_data' => [
+                        'local_codes' => $local_codes,
+                        'bet_money' => $bet_money,
+                    ],
                     'plan_id' => $plan_id,
                     'account' => $account,
                     'qihao' => $qihao,

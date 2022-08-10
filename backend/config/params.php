@@ -35,6 +35,9 @@ return [
     # 现：二、三、四现
     'IS_XIAN' => [36, 17, 37],
 
+    # 一字定用户
+    'ONE_FIXED_UIDS' => [14, 17],
+
     'NEED_PROXY_LOTTERYS' => [8, 10, 11 ], # 需要代理IP的彩种，后面修改判断站点ID
 
     # 不统计的彩种
