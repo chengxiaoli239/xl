@@ -245,27 +245,51 @@ class TzSystemUsersService extends ClientsBaseService{
                 $qihao = $row->qihao;
                 $post_data = json_decode($row->post_datas, 320);
 
-                $headers = [
-                    'Accept'=> 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                    'Accept-Encoding' => 'gunzip, deflate, br',
-                    'Accept-Language' => 'zh-CN,zh;q=0.9',
-                    'Cache-Control' => 'max-age=0',
-                    'Connection' => 'keep-alive',
-                    'Content-Length' => (string)strlen(http_build_query($post_data)),
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                    'Cookie' => $TzSystemsUsers->cookie,
-                    'Host' => trim(str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain))),
-                    'Origin' => trim($TzSystemsUsers->ssc_domain),
-                    'Referer' => trim($TzSystemsUsers->ssc_domain).'/App/Index?_='.$_t,
-                    'sec-ch-ua: " Not;A Brand";v="104", "Google Chrome";v="104", "Chromium";v="104"',
-                    'sec-ch-ua-mobile: ?0',
-                    'sec-ch-ua-platform: "Windows"',
-                    'Sec-Fetch-Dest: empty',
-                    'Sec-Fetch-Mode: cors',
-                    'Sec-Fetch-Site: same-origin',
-                    'Upgrade-Insecure-Requests' => '1',
-                    'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemsUsers->user_agent)),
-                ];
+                if(false){
+                    $headers = [
+                        'Accept'=> 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                        'Accept-Encoding' => 'gunzip, deflate, br',
+                        'Accept-Language' => 'zh-CN,zh;q=0.9',
+                        'Cache-Control' => 'max-age=0',
+                        'Connection' => 'keep-alive',
+                        'Content-Length' => (string)strlen(http_build_query($post_data)),
+                        'Content-Type' => 'application/x-www-form-urlencoded',
+                        'Cookie' => $TzSystemsUsers->cookie,
+                        'Host' => trim(str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain))),
+                        'Origin' => trim($TzSystemsUsers->ssc_domain),
+                        'Referer' => trim($TzSystemsUsers->ssc_domain).'/App/Index?_='.$_t,
+                        'sec-ch-ua: " Not;A Brand";v="104", "Google Chrome";v="104", "Chromium";v="104"',
+                        'sec-ch-ua-mobile: ?0',
+                        'sec-ch-ua-platform: "Windows"',
+                        'Sec-Fetch-Dest: empty',
+                        'Sec-Fetch-Mode: cors',
+                        'Sec-Fetch-Site: same-origin',
+                        'Upgrade-Insecure-Requests' => '1',
+                        'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemsUsers->user_agent)),
+                    ];
+                }else{
+                    $headers = [
+                        "Accept"=>"application/json, text/javascript, */*; q=0.01",
+                        "Accept-Encoding"=>"gzip, deflate, br",
+                        "Accept-Language"=>"zh-CN,zh;q=0.9",
+                        "Connection"=>"keep-alive",
+                        'Content-Length' => (string)strlen(http_build_query($post_data)),
+                        "Content-Type"=>"application/x-www-form-urlencoded; charset=UTF-8",
+                        'Cookie' => $TzSystemsUsers->cookie,
+                        'Origin' => trim($TzSystemsUsers->ssc_domain),
+                        'Referer' => trim($TzSystemsUsers->ssc_domain).'/App/Index?_='.$_t,
+                        'Host' => trim(str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain))),
+                        "sec-ch-ua"=>'"Chromium";v="104", " Not A;Brand";v="99", "Google Chrome";v="104"',
+                        "sec-ch-ua-mobile"=>"?0",
+                        "sec-ch-ua-platform"=>'"Windows"',
+                        "Sec-Fetch-Dest"=>"empty",
+                        "Sec-Fetch-Mode"=>"cors",
+                        "Sec-Fetch-Site"=>"same-origin",
+                        'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemsUsers->user_agent)),
+                        "X-Requested-With"=>"XMLHttpRequest"
+                    ];
+
+                }
 
                 $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
                 $datas[] = [
