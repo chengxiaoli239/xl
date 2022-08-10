@@ -304,7 +304,7 @@ class TzSystemUsersService extends ClientsBaseService{
                     'bet_url' => $bet_url,
                     'plan_type' => self::PlAN_TYPE_LOCAL,
                     'local_data' => [
-                        'local_codes' => $local_codes,
+                        'local_codes' => trim($local_codes),
                         'bet_money' => $bet_money,
                     ],
                     'plan_id' => $plan_id,
