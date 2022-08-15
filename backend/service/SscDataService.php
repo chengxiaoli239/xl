@@ -4419,7 +4419,7 @@ class SscDataService extends BaseService {
             //p([$zjTimes[$field]*980, count($codes_fields[$field]) * 0.1*count($kjDatas)]);
             //$no_start_qihao = (int)
             $setDatas = array_merge($setDatas, [
-                $field => $zjTimes[$field]*980 - count($codes_fields[$field]) * 0.1 * count($kjDatas), # 中奖 - 成本
+                $field => $zjTimes[$field]*995 - count($codes_fields[$field]) * 0.1 * count($kjDatas), # 中奖 - 成本
             ]);
         }
         $row->setAttributes($setDatas);

@@ -424,8 +424,8 @@ class  CommonService{
     public static function getOdds($playway = 10, $uid='', $type = 'odds'){
         $playways = [
             1 => ['odds'=>98,'name'=>'两字定'],  // 两字定
-            2 => ['odds'=>980,'name'=>'三字定'],   // 三字定
-            3 => ['odds'=>9800,'name'=>'四字定'],  // 四字定
+            2 => ['odds'=>995,'name'=>'三字定'],   // 三字定
+            3 => ['odds'=>9950,'name'=>'四字定'],  // 四字定
             4 => ['odds'=>9.8,'name'=>'一字定'],  // 一字定
             5 => ['odds'=>9.60,'name'=>'二字现'],  // 二字现
             6 => ['odds'=>48.00,'name'=>'三字现'], // 三字现

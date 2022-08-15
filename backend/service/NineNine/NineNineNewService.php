@@ -669,7 +669,7 @@ class NineNineNewService extends BaseTZService {
             $oddsTypes = [
                 1 => ['minOdds'=>86.5, 'maxOdds'=>98], # 二定，元
                 2 => ['minOdds'=>865, 'maxOdds'=>980], # 三定，元
-                3 => ['minOdds'=>8500, 'maxOdds'=>9800], # 四定，元
+                3 => ['minOdds'=>8500, 'maxOdds'=>9950], # 四定，元
             ];
         }else{
             $oddsTypes = [
