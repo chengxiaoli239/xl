@@ -3,6 +3,7 @@
 namespace izyue\admin\controllers;
 
 use backend\models\SignupForm;
+use backend\models\TzSystemsUsers;
 use backend\service\UserService;
 use izyue\admin\components\MenuHelper;
 use Yii;
@@ -265,6 +266,10 @@ class AssignmentController extends Controller
                 $model->desc = '账号：'.$model->username.' 密码：'.$pwd;
                 $model->setPassword($pwd);
                 $model->generateAuthKey();
+                
+                $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$id]);
+                $TzSystemsUsers->access_token = md5($id.'_'.$pwd);
+                $TzSystemsUsers->save();
             }
 
             if ($model->save()) {
