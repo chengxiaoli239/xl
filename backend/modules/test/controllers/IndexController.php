@@ -294,6 +294,20 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $n = 3;
+        switch ($n){
+            case 1:
+            case 2;
+            case 5:
+                print('xxxxx');
+                break;
+            case 3:
+                print('yyyy');
+                break;
+            default:
+                print('zzzzzzzz');
+        }
+        die('eeeeeeeeeee');
         $r = Yii::$app->queue->push(new TestJob([
             'url' => 'http://example.com/image.jpg',
             'file' => '/tmp/image.jpg',

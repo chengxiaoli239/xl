@@ -208,6 +208,24 @@ class TzSystemUsersService extends ClientsBaseService{
     }
 
     /**
+     * @desc 客户端余额同步
+     * @param string $access_token
+     * @param float $balance
+     */
+    public static function syncClientBalance($access_token='', $balance=0.00){
+
+        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+        if(!empty($TzSystemsUsers)){
+            $TzSystemsUsers->balance = $balance;
+            $TzSystemsUsers->updated_at = time();
+            $flag = $TzSystemsUsers->save();
+            Tool_Common::log('/client/'.__FUNCTION__, 'INFO', '客户端余额同步', ['account'=>$TzSystemsUsers->username, 'access_token'=>$access_token, 'balance'=>$balance]);
+        }
+
+        return ['status'=>200, 'data'=>['flag'=>$flag], 'msg'=>'操作成功'];
+    }
+
+    /**
      * @desc 获取用户激活的下注任务
      * @param string $access_token
      * @return mixed|string
