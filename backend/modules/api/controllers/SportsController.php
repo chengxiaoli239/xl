@@ -184,7 +184,7 @@ class SportsController extends Controller
         }
 
         $rst = BetService::openBetQihao($post['access_token'], $qihao, $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', $qihao.'期-开盘1', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', $qihao.'期-开盘1x', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }

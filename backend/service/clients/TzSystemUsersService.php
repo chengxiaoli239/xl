@@ -7,6 +7,7 @@ use backend\models\UserSysPlans;
 use backend\service\BetService;
 use backend\service\Lucky5\Lucky5Service;
 use common\service\CommonService;
+use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 
@@ -236,104 +237,109 @@ class TzSystemUsersService extends ClientsBaseService{
         $mkey = self::buildUserPlanTasksKey($access_token);
         $flag = $m->get($mkey);
 
-        if(true OR empty($flag)){
-            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
-            if(!empty($TzSystemsUsers->expire_time) && $TzSystemsUsers->expire_time <= time()){
-                return ['status'=>301,  'msg'=>'已过期，请续费'];
-            }
-            $uid = $TzSystemsUsers->uid;
-            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
-            if($uid){
-                $where = array_merge($where, [['=', 'uid', $uid]]);
-            }
-            if(!empty($current_qihao)){
-                $where = array_merge($where, [['=', 'qihao', $current_qihao]]);
-            }
+        $RedisLock = new RedisLock();
+        $Rkey = $access_token.'_'.__FUNCTION__.'_redis';
+        $datas = [];
+        if($RedisLock->lock($Rkey.'_redis', 10)){
+            if(true OR empty($flag)){
+                $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+                if(!empty($TzSystemsUsers->expire_time) && $TzSystemsUsers->expire_time <= time()){
+                    return ['status'=>301,  'msg'=>'已过期，请续费'];
+                }
+                $uid = $TzSystemsUsers->uid;
+                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
+                if($uid){
+                    $where = array_merge($where, [['=', 'uid', $uid]]);
+                }
+                if(!empty($current_qihao)){
+                    $where = array_merge($where, [['=', 'qihao', $current_qihao]]);
+                }
 
-            $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
-            if(empty($BetErrorPlansTasks)){
-                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-1', ['uid' => $uid, 'msg'=>'没有下注计划']);
-                return ['status'=>301, 'msg'=>'没有下注任务'];
-            }
-            $datas = [];
-            $_t = round(microtime(true) * 1000);
-            foreach ($BetErrorPlansTasks as $row){
-                $plan_id = $row->plan_id;
-                $account = $row->account;
-                $bet_url = $row->bet_url;
-                $qihao = $row->qihao;
-                $post_data = json_decode($row->post_datas, 320);
-                $uid = $row->uid;
-                $local_codes = '';
-                if(in_array($uid, \Yii::$app->params['ONE_FIXED_UIDS']) && $row->playway == 4){
-                    $bets = json_decode($post_data['bets'], 320);
-                    foreach ($bets as $d){
-                        $local_codes .= ' '.$d['bet_no'];
-                        $bet_money = $d['bet_money'];
+                $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
+                if(empty($BetErrorPlansTasks)){
+                    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-1', ['uid' => $uid, 'msg'=>'没有下注计划']);
+                    return ['status'=>301, 'msg'=>'没有下注任务'];
+                }
+                $datas = [];
+                $_t = round(microtime(true) * 1000);
+                foreach ($BetErrorPlansTasks as $row){
+                    $plan_id = $row->plan_id;
+                    $account = $row->account;
+                    $bet_url = $row->bet_url;
+                    $qihao = $row->qihao;
+                    $post_data = json_decode($row->post_datas, 320);
+                    $uid = $row->uid;
+                    $local_codes = '';
+                    if(in_array($uid, \Yii::$app->params['ONE_FIXED_UIDS']) && $row->playway == 4){
+                        $bets = json_decode($post_data['bets'], 320);
+                        foreach ($bets as $d){
+                            $local_codes .= ' '.$d['bet_no'];
+                            $bet_money = $d['bet_money'];
+                        }
                     }
-                }
 
-                if(false){
-                    $headers = [
-                        'Accept'=> 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                        'Accept-Encoding' => 'gunzip, deflate, br',
-                        'Accept-Language' => 'zh-CN,zh;q=0.9',
-                        'Cache-Control' => 'max-age=0',
-                        'Connection' => 'keep-alive',
-                        'Content-Length' => (string)strlen(http_build_query($post_data)),
-                        'Content-Type' => 'application/x-www-form-urlencoded',
-                        'Cookie' => $TzSystemsUsers->cookie,
-                        'Host' => trim(str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain))),
-                        'Origin' => trim($TzSystemsUsers->ssc_domain),
-                        'Referer' => trim($TzSystemsUsers->ssc_domain).'/App/Index?_='.$_t,
-                        'sec-ch-ua: " Not;A Brand";v="104", "Google Chrome";v="104", "Chromium";v="104"',
-                        'sec-ch-ua-mobile: ?0',
-                        'sec-ch-ua-platform: "Windows"',
-                        'Sec-Fetch-Dest: empty',
-                        'Sec-Fetch-Mode: cors',
-                        'Sec-Fetch-Site: same-origin',
-                        'Upgrade-Insecure-Requests' => '1',
-                        'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemsUsers->user_agent)),
-                    ];
-                }else{
-                    $headers = [
-                        "Accept"=>"application/json, text/javascript, */*; q=0.01",
-                        "Accept-Encoding"=>"gzip, deflate, br",
-                        "Accept-Language"=>"zh-CN,zh;q=0.9",
-                        "Connection"=>"keep-alive",
-                        'Content-Length' => (string)strlen(http_build_query($post_data)),
-                        "Content-Type"=>"application/x-www-form-urlencoded; charset=UTF-8",
-                        'Cookie' => $TzSystemsUsers->cookie,
-                        'Origin' => trim($TzSystemsUsers->ssc_domain),
-                        'Referer' => trim($TzSystemsUsers->ssc_domain).'/App/Index?_='.$_t,
-                        'Host' => trim(str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain))),
-                        "sec-ch-ua"=>'"Chromium";v="104", " Not A;Brand";v="99", "Google Chrome";v="104"',
-                        "sec-ch-ua-mobile"=>"?0",
-                        "sec-ch-ua-platform"=>'"Windows"',
-                        "Sec-Fetch-Dest"=>"empty",
-                        "Sec-Fetch-Mode"=>"cors",
-                        "Sec-Fetch-Site"=>"same-origin",
-                        'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemsUsers->user_agent)),
-                        "X-Requested-With"=>"XMLHttpRequest"
-                    ];
-                }
+                    if(false){
+                        $headers = [
+                            'Accept'=> 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                            'Accept-Encoding' => 'gunzip, deflate, br',
+                            'Accept-Language' => 'zh-CN,zh;q=0.9',
+                            'Cache-Control' => 'max-age=0',
+                            'Connection' => 'keep-alive',
+                            'Content-Length' => (string)strlen(http_build_query($post_data)),
+                            'Content-Type' => 'application/x-www-form-urlencoded',
+                            'Cookie' => $TzSystemsUsers->cookie,
+                            'Host' => trim(str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain))),
+                            'Origin' => trim($TzSystemsUsers->ssc_domain),
+                            'Referer' => trim($TzSystemsUsers->ssc_domain).'/App/Index?_='.$_t,
+                            'sec-ch-ua: " Not;A Brand";v="104", "Google Chrome";v="104", "Chromium";v="104"',
+                            'sec-ch-ua-mobile: ?0',
+                            'sec-ch-ua-platform: "Windows"',
+                            'Sec-Fetch-Dest: empty',
+                            'Sec-Fetch-Mode: cors',
+                            'Sec-Fetch-Site: same-origin',
+                            'Upgrade-Insecure-Requests' => '1',
+                            'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemsUsers->user_agent)),
+                        ];
+                    }else{
+                        $headers = [
+                            "Accept"=>"application/json, text/javascript, */*; q=0.01",
+                            "Accept-Encoding"=>"gzip, deflate, br",
+                            "Accept-Language"=>"zh-CN,zh;q=0.9",
+                            "Connection"=>"keep-alive",
+                            'Content-Length' => (string)strlen(http_build_query($post_data)),
+                            "Content-Type"=>"application/x-www-form-urlencoded; charset=UTF-8",
+                            'Cookie' => $TzSystemsUsers->cookie,
+                            'Origin' => trim($TzSystemsUsers->ssc_domain),
+                            'Referer' => trim($TzSystemsUsers->ssc_domain).'/App/Index?_='.$_t,
+                            'Host' => trim(str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain))),
+                            "sec-ch-ua"=>'"Chromium";v="104", " Not A;Brand";v="99", "Google Chrome";v="104"',
+                            "sec-ch-ua-mobile"=>"?0",
+                            "sec-ch-ua-platform"=>'"Windows"',
+                            "Sec-Fetch-Dest"=>"empty",
+                            "Sec-Fetch-Mode"=>"cors",
+                            "Sec-Fetch-Site"=>"same-origin",
+                            'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemsUsers->user_agent)),
+                            "X-Requested-With"=>"XMLHttpRequest"
+                        ];
+                    }
 
-                $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
-                $datas[] = [
-                    'bet_url' => $bet_url,
-                    'plan_type' => self::PlAN_TYPE_RE_LOCAL,
-                    'local_data' => [
-                        'local_codes' => trim($local_codes),
-                        'bet_money' => $bet_money,
-                    ],
-                    'plan_id' => $plan_id,
-                    'account' => $account,
-                    'qihao' => $qihao,
-                    'slow_seconds' => $slow_seconds,
-                    'post_data' => $post_data,
-                    'headers' => $headers,
-                ];
-                $m->set($mkey, 1, 30);
+                    $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
+                    $datas[] = [
+                        'bet_url' => $bet_url,
+                        'plan_type' => self::PlAN_TYPE_RE_LOCAL,
+                        'local_data' => [
+                            'local_codes' => trim($local_codes),
+                            'bet_money' => $bet_money,
+                        ],
+                        'plan_id' => $plan_id,
+                        'account' => $account,
+                        'qihao' => $qihao,
+                        'slow_seconds' => $slow_seconds,
+                        'post_data' => $post_data,
+                        'headers' => $headers,
+                    ];
+                    $m->set($mkey, 1, 30);
+                }
             }
         }
 
