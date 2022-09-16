@@ -179,7 +179,7 @@ class SportsController extends Controller
         $activeQihaoData = $post['activeQihaoData']['Data'];
         $qihao = $activeQihaoData['real_period_no'];
         if($activeQihaoData['status'] == 1){
-            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', $qihao.'期-封盘0', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post]);
+            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', $qihao.'期-封盘0x', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post]);
             return ['status'=>302, 'msg'=>$qihao.'期封盘状态'];
         }
 
