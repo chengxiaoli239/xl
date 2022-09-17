@@ -267,9 +267,20 @@ class AssignmentController extends Controller
                 $model->setPassword($pwd);
                 $model->generateAuthKey();
                 
+                $now_time = time();
                 $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$id]);
-                $TzSystemsUsers->access_token = md5($id.'_'.$pwd);
-                $TzSystemsUsers->save();
+                if(empty($TzSystemsUsers)){
+                    $TzSystemsUsers = new TzSystemsUsers();
+                    $TzSystemsUsers->uid = $id;
+                    $TzSystemsUsers->created_at = $now_time;
+                    $access_token = md5($id.'_'.$pwd);
+                    $TzSystemsUsers->access_token = $access_token;
+                }
+                $TzSystemsUsers->username = $model->username;
+                $TzSystemsUsers->updated_at = $now_time;
+                if(!$TzSystemsUsers->save()){
+                    p($TzSystemsUsers->getErrors());
+                }
             }
 
             if ($model->save()) {
