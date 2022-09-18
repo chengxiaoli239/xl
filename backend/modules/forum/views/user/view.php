@@ -87,6 +87,21 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                     [ 'attribute'=>'access_token','label'=>'token','value'=>function($model){
                                         return $model->access_token;
                                     }],
+                                    ['attribute' => 'odds_2d', 'label'=>'二定赔率', //'headerOptions' => ['width' => '170'],
+                                        'value'=> function($model){
+                                            return  $model->odds_2d;
+                                        },
+                                    ],
+                                    ['attribute' => 'odds_3d', 'label'=>'三定赔率', //'headerOptions' => ['width' => '170'],
+                                        'value'=> function($model){
+                                            return  $model->odds_3d;
+                                        },
+                                    ],
+                                    ['attribute' => 'odds_4d', 'label'=>'四定赔率', //'headerOptions' => ['width' => '170'],
+                                        'value'=> function($model){
+                                            return  $model->odds_4d;
+                                        },
+                                    ],
                                     [ 'attribute'=>'update_time','label'=>'更新时间','value'=>function($model){
                                         return $model->update_time;
                                     }],

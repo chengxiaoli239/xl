@@ -438,14 +438,19 @@ class  CommonService{
             16 => ['odds'=>300,'name'=>'组三'],  // 组三
             17 => ['odds'=>140,'name'=>'组六'],  // 组六
         ];
-        if($uid == 10){
-            $playways[1] = ['odds'=>99,'name'=>'两字定'];  // 两字定
-            $playways[2] = ['odds'=>990,'name'=>'三字定'];  // 三字定
-            $playways[3] = ['odds'=>9900,'name'=>'四字定'];  // 四字定
+
+        if(!empty($uid)){
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+            if(!empty($TzSystemsUsers)){
+                $playways[1] = ['odds'=>$TzSystemsUsers->odds_2d,'name'=>'两字定'];  // 两字定
+                $playways[2] = ['odds'=>$TzSystemsUsers->odds_3d,'name'=>'三字定'];  // 三字定
+                $playways[3] = ['odds'=>$TzSystemsUsers->odds_4d,'name'=>'四字定'];  // 四字定
+            }
         }
 
-        if($playway && $playways[$playway][$type])
+        if($playway && $playways[$playway][$type]){
             return $playways[$playway][$type];
+        }
         return $playways;
     }
 
