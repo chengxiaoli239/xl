@@ -8,8 +8,8 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="tz-systems-users-form row">
-    <section class="panel">
+<div class="user-update tz-systems-users-form row">
+    <section class="user-update user panel">
         <header class="panel-heading">
             <?= Html::encode($this->title) ?>
         </header>
@@ -26,6 +26,15 @@ use yii\widgets\ActiveForm;
                 </div>
                 <div class="col-lg-6 col-xs-6">
                     <?= $form->field($model, 'password')->textInput(['maxlength' => true]) ?>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-xs-6">
+                    <?= $form->field($model, 'sys_password')->textInput(['maxlength' => true]) ?>
+                </div>
+                <div class="col-lg-6 col-xs-6">
+                    <?= $form->field($model, 'sys_repassword')->textInput(['maxlength' => true]) ?>
                 </div>
             </div>
 

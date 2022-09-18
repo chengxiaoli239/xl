@@ -124,6 +124,7 @@ class TzSystemsUsersController extends BaseController
     {
         $model = $this->findModel($id, $this->_user_id);
         $post = Yii::$app->request->post();
+        //p($post);
         if($post){
             if(empty($model->user_agent)){
                 $post['TzSystemsUsers']['user_agent'] = 'User-Agent: '.$_SERVER['HTTP_USER_AGENT'];
@@ -132,6 +133,23 @@ class TzSystemsUsersController extends BaseController
             if($model->account == $post['TzSystemsUsers']['account']){
                  $cookie = trim($post['TzSystemsUsers']['cookie']);
             }
+
+            # 修改网页登陆密码 - 开始
+            if(!empty($post['TzSystemsUsers']['sys_password']) OR !empty($post['TzSystemsUsers']['sys_repassword'])){
+                if($model->load($post)){
+                    $rst = TzSystemsUsers::changePassword($post['TzSystemsUsers']['sys_password'], $post['TzSystemsUsers']['sys_repassword']);
+                    if($rst){
+                        Yii::$app->user->logout();
+                        return $this->goHome();
+                    }
+                }else{
+                    return $this->render('update', [
+                        'model' => $model,
+                    ]);
+                }
+            }
+            # 修改网页登陆密码 - 结束
+
             $post['TzSystemsUsers']['ssc_domain'] = trim($post['TzSystemsUsers']['ssc_domain'], '/');
             $post['TzSystemsUsers']['cookie'] = $cookie;
             $post['TzSystemsUsers']['desc'] = '';

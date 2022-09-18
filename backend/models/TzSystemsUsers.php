@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use common\models\AdminModel;
 use Yii;
 
 /**
@@ -15,6 +16,8 @@ use Yii;
  * @property string $sys_name 系统名称
  * @property string $account 投注账号
  * @property string $password 网盘密码
+ * @property string $sys_password 机器人网盘密码
+ * @property string $sys_repassword 机器人重复密码
  * @property string $balance 系统余额
  * @property int $status 系统开启状态
  * @property int $is_auto_login 是否自动登陆
@@ -43,6 +46,8 @@ use Yii;
  */
 class TzSystemsUsers extends \common\models\base\BaseModel
 {
+    public $sys_password;
+    public $sys_repassword;
     /**
      * @inheritdoc
      */
@@ -62,11 +67,46 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             [['cookie', 'cookie_wx_web'], 'string'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
+            [['sys_password', 'sys_repassword'], 'trim'],
             [['username', 'sys_name', 'account', 'ssc_domain', 'access_token'], 'string', 'max' => 64],
-            [['password'], 'string', 'max' => 20],
+            [['password', 'sys_password', 'sys_repassword'], 'string', 'max' => 20],
+            ['sys_repassword', 'compare', 'compareAttribute' => 'sys_password', 'message' => '请再正确输入重复密码'],
             [['user_agent', 'desc'], 'string', 'max' => 640],
             [['warn_val'], 'string', 'max' => 11],
         ];
+    }
+
+    /**
+     * 修改网页登陆密码
+     * @param string $sys_password
+     * @param string $sys_repassword
+     * @return bool
+     * @throws \yii\base\Exception
+     */
+    public static function changePassword($sys_password='', $sys_repassword=''){
+        $id = YII::$app->user->id;
+        $admin=  AdminModel::findIdentity($id);
+        if(true OR Yii::$app->getSecurity()->validatePassword($sys_password, $admin->password_hash)){
+            //p([$sys_password , $sys_repassword]);
+            if($sys_password == $sys_repassword){
+                $admin->desc = '账号：'.$admin->username.' 密码：'.$sys_password;
+                $admin->setPassword($sys_password);
+                $admin->generateAuthKey();
+                //$newPass = Yii::$app->getSecurity()->generatePasswordHash($sys_password);
+                //$admin->password = $newPass;
+                if($admin->save()){
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                Yii::$app->session->setFlash('contact','两次新密码不相等');
+                return false;
+            }
+        }else{
+            Yii::$app->session->setFlash('contact','旧密码错误');
+            return false;
+        }
     }
 
     /**
@@ -83,6 +123,8 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'sys_name' => Yii::t('app', '系统名称'),
             'account' => Yii::t('app', '投注账号'),
             'password' => Yii::t('app', '网盘密码'),
+            'sys_password' => Yii::t('app', '机器人登陆密码'),
+            'sys_repassword' => Yii::t('app', '机器人登陆重复密码'),
             'balance' => Yii::t('app', '系统余额'),
             'status' => Yii::t('app', '系统开启状态'),
             'is_auto_login' => Yii::t('app', '是否自动登陆'),
