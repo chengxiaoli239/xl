@@ -240,6 +240,8 @@ class OpKjService extends BaseService {
         //$n = count(explode('@',$codes));
         $betting_money = SscDataService::calTzTotalMoney($codes, $single, $playway);
 
+        $odds = CommonService::getOdds($playway, $uid);
+        $bouns = $odds * $single * $times;
         # 投注号码
         $rstData['codes'] = $codes;
         # 开奖号码
@@ -247,11 +249,14 @@ class OpKjService extends BaseService {
         # 投注金额
         $rstData['betting_money'] = $betting_money;
         # 中奖金额 = 赔率 * 倍数 * 注数
-        $rstData['bouns'] = CommonService::getOdds($playway, $uid) * $single * $times;
+        $rstData['bouns'] = $bouns;
+
         # 利润 = 中奖金额 - 投注金额
-        $rstData['profits'] = $rstData['bouns'] - $betting_money;
+        $profits = $rstData['bouns'] - $betting_money;
+        $rstData['profits'] = $profits;
         $rstData['zjResult'] = $zjResult;
 
+        //Tool_Common::log('/kj/'.__FUNCTION__, 'INFO', '开奖处理', ['uid'=>$uid, 'playway'=>$playway, 'odds'=>$odds, 'betting_money'=>$betting_money, 'profits'=>$profits, 'bouns'=>$bouns]);
 
         return $rstData;
     }
