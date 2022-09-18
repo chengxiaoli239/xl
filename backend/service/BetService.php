@@ -636,6 +636,9 @@ abstract class BetService extends BaseBetService {
 
         $where = ['plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
         $BetErrorPlansTask = BetErrorPlansTask::findOne($where);
+        if($BetErrorPlansTask->status == 2){
+            return ['status'=>204, 'msg'=>'已经下注成功无需修改'];
+        }
         if(empty($BetErrorPlansTask)){
             return ['status'=>404, 'msg'=>'任务记录找不到'];
         }

@@ -395,4 +395,50 @@ class UserService extends BaseService {
 
         return $rst;
     }
+
+    # 修改密码充值用户的登陆seesion数据
+    public static function reSetUserLoginInfo($uid, $first_session_id=''){
+
+        UserService::clearUserLoginInfo($uid, $first_session_id);
+        UserService::setUserLoginInfo($uid, $first_session_id);
+    }
+
+
+    # 清空用户的登陆seesion数据
+    public static function clearUserLoginInfo($uid){
+
+        $m = \Yii::$app->cache;
+        $mkey = self::builtUserLoginInfoMkey($uid);
+
+        return $m->delete($mkey);
+    }
+
+    # 清空用户的登陆seesion数据
+    public static function getUserLoginInfo($uid){
+
+        $m = \Yii::$app->cache;
+        $mkey = self::builtUserLoginInfoMkey($uid);
+
+        return $m->get($mkey);
+    }
+
+    public static function builtUserLoginInfoMkey($uid=''){
+        $mkey = 'setUserLoginInfo_'.$uid;
+
+        return $mkey;
+    }
+
+    # 设置用户登陆session
+    public static function setUserLoginInfo($uid, $session_id=''){
+        $m = \Yii::$app->cache;
+        $mkey = self::builtUserLoginInfoMkey($uid);
+        $data = $m->get($mkey);
+        $data = empty($data) ? [] : $data;
+
+        $data[] = $session_id;
+
+        $m->set($mkey, $data, 30*86400);
+    }
+
+
 }
