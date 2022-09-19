@@ -220,7 +220,7 @@ class TzSystemUsersService extends ClientsBaseService{
             $TzSystemsUsers->balance = $balance;
             $TzSystemsUsers->updated_at = time();
             $flag = $TzSystemsUsers->save();
-            Tool_Common::log('/client/'.__FUNCTION__, 'INFO', '客户端余额同步', ['account'=>$TzSystemsUsers->username, 'access_token'=>$access_token, 'balance'=>$balance]);
+            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端余额同步', ['account'=>$TzSystemsUsers->username, 'access_token'=>$access_token, 'balance'=>$balance]);
         }
 
         return ['status'=>200, 'data'=>['flag'=>$flag], 'msg'=>'操作成功'];
