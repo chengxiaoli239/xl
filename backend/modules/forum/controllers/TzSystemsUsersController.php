@@ -142,7 +142,7 @@ class TzSystemsUsersController extends BaseController
                 'ss'=>$ss,
                 'ip'=>$ip,
             ];
-            p($log);
+            //p($log);
 
             # 修改网页登陆密码 - 开始
             if(!empty($post['TzSystemsUsers']['sys_password']) OR !empty($post['TzSystemsUsers']['sys_repassword'])){
