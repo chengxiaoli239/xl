@@ -2832,7 +2832,7 @@ class SscDataService extends BaseService {
                     }
 
                     //if(($UserSysPlan->take_profits!=0 && $UserSysPlan->stop_loss!=0) AND ($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits))){
-                    if($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits)){
+                    if($profits>=$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<=(0-$profits)){
                         $UserSysPlan->status = 0;
                     }
                     $hzArr = json_decode($UserSysPlan->hz_Arr, 320);
@@ -3206,7 +3206,7 @@ class SscDataService extends BaseService {
                             $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 重新设置开始计算期号，避免无时间间隔的连续止损，大遗漏倍投问题
                             $next_single_key = 0; # 止损，倍数重新
                         }else{
-                            if($profits>$area_profits){
+                            if($profits>=$area_profits){
                                 $bmsg = '符合止赢:'.$profits.'>'.$area_profits;
                                 $areaBetStatus = 0;
                                 $hzArr['area_arise_qishus'] = 0;

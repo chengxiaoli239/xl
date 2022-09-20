@@ -149,6 +149,7 @@ class TzSystemsUsersController extends BaseController
                 if($model->load($post)){
                     $rst = TzSystemsUsers::changePassword($post['TzSystemsUsers']['sys_password'], $post['TzSystemsUsers']['sys_repassword']);
                     if($rst){
+                        UserService::clearUserLoginInfo(YII::$app->user->id);
                         Yii::$app->user->logout();
                         return $this->goHome();
                     }

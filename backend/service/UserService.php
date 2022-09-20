@@ -396,14 +396,6 @@ class UserService extends BaseService {
         return $rst;
     }
 
-    # 修改密码充值用户的登陆seesion数据
-    public static function reSetUserLoginInfo($uid, $first_session_id=''){
-
-        UserService::clearUserLoginInfo($uid, $first_session_id);
-        UserService::setUserLoginInfo($uid, $first_session_id);
-    }
-
-
     # 清空用户的登陆seesion数据
     public static function clearUserLoginInfo($uid){
 
@@ -413,7 +405,7 @@ class UserService extends BaseService {
         return $m->delete($mkey);
     }
 
-    # 清空用户的登陆seesion数据
+    # 获取用户的登陆seesion数据
     public static function getUserLoginInfo($uid){
 
         $m = \Yii::$app->cache;
@@ -430,6 +422,9 @@ class UserService extends BaseService {
 
     # 设置用户登陆session
     public static function setUserLoginInfo($uid, $session_id=''){
+        if(empty($session_id)){
+            $session_id = Yii::$app->getSession()->id;
+        }
         $m = \Yii::$app->cache;
         $mkey = self::builtUserLoginInfoMkey($uid);
         $data = $m->get($mkey);
@@ -440,5 +435,24 @@ class UserService extends BaseService {
         $m->set($mkey, $data, 30*86400);
     }
 
+    # 设置用户登陆session
+    public static function delUserOneSessionId($uid, $session_id=''){
+        if(empty($session_id)){
+            return false;
+        }
+        $m = \Yii::$app->cache;
+        $mkey = self::builtUserLoginInfoMkey($uid);
+        $data = $m->get($mkey);
+
+        $data = empty($data) ? [] : $data;
+        foreach ($data as $key=>$u_session_id){
+            if($u_session_id == $session_id){
+                unset($data[$key]);
+            }
+        }
+
+        $m->set($mkey, $data, 30*86400);
+        return true;
+    }
 
 }

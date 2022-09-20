@@ -39,6 +39,7 @@ use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
 use backend\service\sports\TennisSportsService;
 use backend\service\StaticService;
+use backend\service\UserService;
 use backend\service\wanbo\tennis\TennisService;
 use backend\service\TestService;
 use backend\service\UserCustomPlansService;
@@ -294,26 +295,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $n = 3;
-        switch ($n){
-            case 1:
-            case 2;
-            case 5:
-                print('xxxxx');
-                break;
-            case 3:
-                print('yyyy');
-                break;
-            default:
-                print('zzzzzzzz');
-        }
-        die('eeeeeeeeeee');
-        $r = Yii::$app->queue->push(new TestJob([
-            'url' => 'http://example.com/image.jpg',
-            'file' => '/tmp/image.jpg',
-        ]));
+        $session_id = '4a62huo5ev61crrelqhnbnbn5l';
+        $r = UserService::delUserOneSessionId('10', $session_id);
         p($r);
-
         $data = Lucky5::getBeforeKjCodesFromSite($num=1000);p($data);
         $data = Lucky5::getCodesByBeforeDate('2022-07-16', $num=288);p($data);
         $data = Lucky5::getLotteryShiXun($type='json', $is_auto=2);p($data);

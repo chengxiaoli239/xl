@@ -1,6 +1,7 @@
 <?php
 namespace backend\controllers;
 
+use backend\service\UserService;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -67,6 +68,7 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            UserService::setUserLoginInfo(\Yii::$app->user->id); # 设置用户登陆的session信息
             return $this->goBack();
         } else {
             return $this->render('login', [
