@@ -660,6 +660,9 @@ class UserSysPlansService extends BaseService {
         try {
             foreach ($codes as $key=>$code){
                 $code = trim($code);
+                if($change_per==1 && strpos($key, 'arise') !== false){
+                    continue;
+                }
                 $key = (string)$key;
                 $status = ($key == 0 OR $change_per == 1) ? 1 : 0;
                 $status = empty($code) ? 0 : $status;
@@ -702,6 +705,7 @@ class UserSysPlansService extends BaseService {
                 }
             }
         }catch (\Exception $exception){
+            $transaction->rollBack();
             $msg = $exception->getMessage();
             Tool_Common::log('/error/'.__FUNCTION__, 'ERR', '保存导入方案号码', ['plan_id'=>$plan_id, 'msg'=>$msg]);
             return false;

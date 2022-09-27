@@ -135,9 +135,6 @@ class ProxyBaseService {
             $m->set($mkey, $ip_addr,10);
             $left_time = $row->valid_time - time();
             if($type == 2 && $left_time<90){
-                //$row->status = 0;
-                //$row->save();
-                //$ip_addr = '';
                 $is_warnning = 1;
             }
             Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP', ['ip_addr'=>$ip_addr, 'flag'=>$flag, 'expire_time'=>date('Y-m-d H:i:s', $row->expire_time)]);

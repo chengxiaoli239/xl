@@ -295,6 +295,10 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
+        p($current_proxy_addr);
+        $rst = Lucky5Service::login($uid = 14, $tz_system_id = 9);
+        p($rst);
         $session_id = '4a62huo5ev61crrelqhnbnbn5l';
         $r = UserService::delUserOneSessionId('10', $session_id);
         p($r);
@@ -528,8 +532,6 @@ class IndexController extends Controller
         p(['str' => $str, 'roboot_id' => $roboot_id, 'old_cookie' => $cookie, 'matches' => $matches, 'new_cookie' => $new_cookie]);
         p($roboot_id);
         p($_SERVER);
-        $rst = Lucky5Service::login($uid = 2, $tz_system_id = 9);
-        p($rst);
         $rst = BaseService::login($id = 79, $is_auto = 2);
         p($rst);
         $rst = StaticService::queryCodeTypeStatic($post);
