@@ -33,7 +33,7 @@ class BaseController extends Controller
         $User = AdminModel::findOne($this->_user_id);
         $userLoginAccessTokenDatas = UserService::getUserLoginInfo($this->_user_id);
         $session_id = Yii::$app->getSession()->id;
-        if(!empty($userLoginAccessTokenDatas)){
+        if(in_array($this->_user_id, \Yii::$app->params['SINGLE_LOGIN_UIDS']) && !empty($userLoginAccessTokenDatas)){
             if(!in_array($session_id, $userLoginAccessTokenDatas)){
                 Yii::$app->user->logout();
                 return $this->goHome();

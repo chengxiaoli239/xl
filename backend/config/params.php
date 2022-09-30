@@ -38,6 +38,8 @@ return [
 
     # 一字定用户
     'ONE_FIXED_UIDS' => [14, 17],
+    # 修改密码重新登陆用户
+    'SINGLE_LOGIN_UIDS' => [13, 17, 19],
 
     'NEED_PROXY_LOTTERYS' => [8, 10, 11 ], # 需要代理IP的彩种，后面修改判断站点ID
 

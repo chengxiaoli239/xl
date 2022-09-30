@@ -200,7 +200,7 @@ class KjDataGet
                 $flag = false; # 全天开奖，这里先去掉
             }
         }elseif(in_array($lottery_type, [10, 11, 12, 13])){ # 冰岛90s、3分
-            if ('03:10' < $date_time && $date_time < '09:00') {
+            if ('03:10' < $date_time && $date_time < '08:55') {
                 $flag = false;
             }
         }elseif(in_array($lottery_type, [17])){ # 排列五

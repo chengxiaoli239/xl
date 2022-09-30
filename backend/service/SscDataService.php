@@ -3022,6 +3022,10 @@ class SscDataService extends BaseService {
                         $next_key = ($current_key+1 > count($sortKeys)) ? 0 : $current_key+1;
                         $turn_key = \Yii::$app->params['IMPORT_CODES_TURN'] - 1;
                         $hzArr['turn_key'] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>=$turn_key)) ? 0 : $sortKeys[$next_key];#非轮换0，轮换:turn_key+1
+                        $HI = date('HI');
+                        if('08:55'<$HI && $HI<'09:00'){
+                            $hzArr['turn_key'] = 0;
+                        }
                     }
 
                     $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
