@@ -3023,7 +3023,7 @@ class SscDataService extends BaseService {
                         $turn_key = \Yii::$app->params['IMPORT_CODES_TURN'] - 1;
                         $hzArr['turn_key'] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>=$turn_key)) ? 0 : $sortKeys[$next_key];#非轮换0，轮换:turn_key+1
                         $HI = date('HI');
-                        if('08:55'<$HI && $HI<'09:00'){
+                        if(('08:55'<$HI && $HI<'09:00') or ('03:59'<=$HI && $HI<'04:30')){
                             $hzArr['turn_key'] = 0;
                         }
                     }
