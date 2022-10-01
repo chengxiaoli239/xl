@@ -1761,6 +1761,9 @@ class SscDataService extends BaseService {
             if($DataDealStatus->$field == 1){
                 throw new \Exception('已经处理过数据');
             }
+            if($DataDealStatus->lottery_type == 8 && substr($DataDealStatus->next_qihao, -3, 3) == '109'){
+                $status = 2;
+            }
             $DataDealStatus->$field = $status;
             $all_status = 2;
             $all_keys = array_keys(SscDataService::$dealDataStatusFields);
@@ -2801,7 +2804,7 @@ class SscDataService extends BaseService {
      */
     public static function opProfitsPlans($lottery_type = DEFAULT_LOTTERY_TYPE){
         $now_HI = date('H:i:s');
-        if($lottery_type==8 && '04:05:00'<$now_HI && $now_HI<'09:05:00'){
+        if($lottery_type==8 && '04:05:00'<$now_HI && $now_HI<'09:00:00'){
             return ['status'=>300, 'msg'=>'非开盘时间不统计'];
         }
         $RedisLock = new RedisLock();
@@ -3022,8 +3025,8 @@ class SscDataService extends BaseService {
                         $next_key = ($current_key+1 > count($sortKeys)) ? 0 : $current_key+1;
                         $turn_key = \Yii::$app->params['IMPORT_CODES_TURN'] - 1;
                         $hzArr['turn_key'] = ($hzArr['change_per']==0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>=$turn_key)) ? 0 : $sortKeys[$next_key];#非轮换0，轮换:turn_key+1
-                        $HI = date('HI');
-                        if(('08:55'<$HI && $HI<'09:00') or ('03:59'<=$HI && $HI<'04:30')){
+                        $HI = date('H:i');
+                        if('03:59'<=$HI && $HI<'09:05'){
                             $hzArr['turn_key'] = 0;
                         }
                     }

@@ -295,6 +295,17 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $q = '20221001109';
+        $s = substr($q, -3, 3);
+        p($s);
+
+        $date_time = '2022-10-01 04:00:37';
+        $t = strtotime($date_time);
+        $HI = date('H:i', $t);
+        if('03:59'<=$HI && $HI<'09:00'){
+            $hzArr['turn_key'] = 0;
+        }
+        p('klajsdf');
         $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
         p($current_proxy_addr);
         $rst = Lucky5Service::login($uid = 14, $tz_system_id = 9);
