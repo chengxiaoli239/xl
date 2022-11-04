@@ -31,6 +31,7 @@ class NumService extends BaseService {
     ];
 
     public static $pos_to_desc = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
+    public static $pos_to_desc1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个', 5=>'五'];
 
     /**
      * @description 根据开奖号码返回三字现
@@ -1936,6 +1937,9 @@ class NumService extends BaseService {
             $filters_data = $hz_Arr['filters'];
             $filter_poses = $filters_data['filter_poses'] ? : [1,2,3,4];
             $desc .= '过滤同位前'.(int)$filters_data['filter_nums'].'期，过滤位置：'.implode(',',NumService::getDescStrByPoses($filter_poses)).''.'，模拟最近'.(int)$filters_data['test_period_days'].'天数据 ';
+        }
+        if(isset($hz_Arr['change_turn_pos']) && $hz_Arr['change_turn_pos']>0){
+            $desc .= '轮换位置:'.NumService::$pos_to_desc[$hz_Arr['change_turn_pos']]; # 位置的号码数决定下次轮换第几组
         }
 
         # 是否过滤前xx期号码

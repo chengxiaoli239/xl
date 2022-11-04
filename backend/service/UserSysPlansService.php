@@ -172,7 +172,12 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['change_per'] = $UserSysPlans['change_per'][0]; # 是否每期轮换
             $turn_key = trim($UserSysPlans['turn_key']);
             $tmpFilter['turn_key'] = (int)$turn_key; # 每次保存都从第一组开始
+            if(!empty($UserSysPlans['change_turn_pos']) && count($UserSysPlans['change_turn_pos'])==1){
+                $tmpFilter['change_turn_pos'] = (int)$UserSysPlans['change_turn_pos'][0]; # 按照位置号码数指定第x组数
+            }
         }
+        # 17.1、每期指定号码轮换
+
         unset($post['UserSysPlans']['bet_while_miss']);
         # 16、双两兄弟
         if($UserSysPlans['type_22b'] && count($UserSysPlans['type_22b']) == 1){

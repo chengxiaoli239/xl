@@ -295,9 +295,10 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $q = '20221001109';
-        $s = substr($q, -3, 3);
-        p($s);
+       $str = '<p style="white-space: normal;">备注因商品特殊性，购买商品后不支持无理由退换。为了维护您的合法权益，请您仔细阅读售后内容。</p><p style="white-space: normal;">售后服务</p><p style="white-space: normal;">1. 请您在签收时仔细核验货品，并在拆封前先行确认产品的外观、颜色和配置是否符合需求，如不符合，请勿拆封。</p><p style="white-space: normal;">2. 请您开箱同时自行录制开箱视频，仔细检查产品，如出现问题，请您保存好完整的开箱视频并联系我司人工客服。（开箱视频：请录制外包装背面的(S) Serial No.编码和IMEI/MEID码，并包含拆封、检查及问题商品部位等情况。）</p><p style="white-space: normal;">3. 如您在使用过程中有系统或硬件等其他故障，可自行到最近 Apple 授权服务提供商 (https://locate.apple.com/cn/zh/)，按照您购买的产品申请售后相关服务。若您有其他的疑问，可联系我司客服热线：400-900-1888。</p><p><img src="https://img.hltmsp.com/da/f9/e9/daf9e967073893405429b918623e0aec.jpg" title="1662789057301240.jpg"/></p><p><img src="https://img.hltmsp.com/27/a3/75/27a375be114a7b0b4313f6411d41e91a.jpg" title="1662789057765039.jpg"/></p><p><img src="https://img.hltmsp.com/08/36/43/0836437bae0938079d7a95deee0890dc.jpg" title="1662789057967139.jpg"/></p><p><img src="https://img.hltmsp.com/b1/16/5c/b1165c47d22e8f5f5ab4fcb8b9e6ed3e.jpg" title="1662789057831743.jpg"/></p><p><img src="https://img.hltmsp.com/56/27/c5/5627c58f4a7970759729c0efa8a48ed6.jpg" title="1662789057488105.jpg"/></p><p><img src="https://img.hltmsp.com/7f/ed/bc/7fedbcc828b964926f0f18e24613eb23.jpg" title="1662789058344010.jpg"/></p><p><img src="https://img.hltmsp.com/85/41/04/8541043f15b62e927b1bdad3f2fea2c6.jpg" title="1662789058310798.jpg"/></p><p><img src="https://img.hltmsp.com/f4/df/85/f4df85982789b71beaf6570c4aa582bf.jpg" title="1662789058944636.jpg"/></p><p><img src="https://img.hltmsp.com/5e/37/f7/5e37f72f9984e2473361a13e002909c5.jpg" title="1662789058594573.jpg"/></p><p><img src="https://img.hltmsp.com/08/6e/8d/086e8d821155efa417224733dd3b4c67.jpg" title="1662789058845308.jpg"/></p><p><img src="https://img.hltmsp.com/b3/97/9b/b3979b685b60dc42980142214ae9e1d2.jpg" title="1662789059679163.jpg"/></p><p><img src="https://img.hltmsp.com/98/80/5e/98805e81ce754e35867d7e656a9dbe9d.jpg" title="1662789059411288.jpg"/></p><p><br/></p><p><br/></p>';
+        //preg_match_all('src=\"(.*?)(.+\.(jpg|gif|bmp|bnp|png))\"/i', $str,$match);
+        preg_match_all('/src="([^"]*)"/i', $str, $matches);
+        p(['match'=>$matches]);
 
         $date_time = '2022-10-01 04:00:37';
         $t = strtotime($date_time);
