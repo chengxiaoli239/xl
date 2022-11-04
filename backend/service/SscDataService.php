@@ -3022,8 +3022,8 @@ class SscDataService extends BaseService {
                         $turn_key = \Yii::$app->params['IMPORT_CODES_TURN'] - 1;
                         if (isset($hzArr['change_turn_pos']) && $hzArr['change_turn_pos']>0){
                             # 指定位置号码数字，决定号码组数
-                            $newBettingRecords = BettingRecords::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one();
-                            $newKjCodes = explode(',', $newBettingRecords['kj_codes']);
+                            $newKjCodesStr = SscKjData::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one()['code_str'];
+                            $newKjCodes = explode(',', $newKjCodesStr);
                             $next_key = $newKjCodes[$hzArr['change_turn_pos']-1];
                         }elseif(($hzArr['change_per']===0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>=$turn_key))) {
                             $next_key = 0;#非轮换0，轮换:turn_key+1
