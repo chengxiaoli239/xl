@@ -3025,6 +3025,7 @@ class SscDataService extends BaseService {
                             $newKjCodesStr = SscKjData::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one()['code_str'];
                             $newKjCodes = explode(',', $newKjCodesStr);
                             $turn_key = $newKjCodes[$hzArr['change_turn_pos']-1];
+                            Tool_Common::log('/plans/'.__FUNCTION__, 'INFO', '计划位置组', ['newKjCodes'=>$newKjCodes, 'turn_key'=>$turn_key, 'pos'=>$hzArr['change_turn_pos']-1]);
                         }elseif(($hzArr['change_per']===0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>=$turn_key))) {
                             $turn_key = 0;#非轮换0，轮换:turn_key+1
                         }else{
