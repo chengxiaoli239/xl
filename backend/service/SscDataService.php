@@ -3024,17 +3024,17 @@ class SscDataService extends BaseService {
                             # 指定位置号码数字，决定号码组数
                             $newKjCodesStr = SscKjData::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one()['code_str'];
                             $newKjCodes = explode(',', $newKjCodesStr);
-                            $next_key = $newKjCodes[$hzArr['change_turn_pos']-1];
+                            $turn_key = $newKjCodes[$hzArr['change_turn_pos']-1];
                         }elseif(($hzArr['change_per']===0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>=$turn_key))) {
-                            $next_key = 0;#非轮换0，轮换:turn_key+1
+                            $turn_key = 0;#非轮换0，轮换:turn_key+1
                         }else{
                             $imports = ImportPlanCodes::find()->select(['uid', 'plan_id', 'plan_id_sort_key'])->where(['AND', ['=', 'plan_id', $UserSysPlan->id], ['!=', 'codes', '']])->asArray()->all();
                             $sortKeys = yii\helpers\ArrayHelper::getColumn($imports, 'plan_id_sort_key');
                             $current_key = array_search($hzArr['turn_key'], $sortKeys);
                             $next_key = ($current_key+1>count($sortKeys)) ? 0 : $current_key+1;
-                            $next_key = $sortKeys[$next_key];
+                            $turn_key = $sortKeys[$next_key];
                         }
-                        $hzArr['turn_key'] = $sortKeys[$next_key];
+                        $hzArr['turn_key'] = $turn_key;
                         $HI = date('H:i');
                         if('03:59'<=$HI && $HI<'09:05'){
                             $hzArr['turn_key'] = 0;
