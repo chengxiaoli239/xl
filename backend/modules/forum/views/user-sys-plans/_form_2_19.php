@@ -65,8 +65,11 @@ use yii\widgets\ActiveForm;
                     <?php //include(dirname(__FILE__).'/filter_xs_before.php'); # 功能完好，不常用先注释 ?>
                     <?php include(dirname(__FILE__).'/history_simulate_bet.php'); # 模拟历史 ?>
                     <?php include(dirname(__FILE__).'/A_x_arise_B_y_arise_bet_B.php'); # A出x次B出y次投B ?>
+                    <!--导入号码组轮换-->
+                    <?php include(dirname(__FILE__).'/import_codes.php'); ?>
 
-                    <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:0.1-0.3-0.7-1.5-3.1-6.2-12.5-25.1') ?>
+
+                <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:0.1-0.3-0.7-1.5-3.1-6.2-12.5-25.1') ?>
                     <div class="row">
                         <div class="col-lg-3 col-xs-6">
                             <?= $form->field($model, 'bet_while_miss')->textInput()->label('遗漏x期投,如:10') ?>
@@ -74,9 +77,6 @@ use yii\widgets\ActiveForm;
                     </div>
 
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
-
-                    <!--导入号码组轮换-->
-                    <?php include(dirname(__FILE__).'/import_codes.php'); ?>
 
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
 
