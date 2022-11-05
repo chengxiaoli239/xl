@@ -75,6 +75,9 @@ use yii\widgets\ActiveForm;
 
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
 
+                    <!--导入号码组轮换-->
+                    <?php include(dirname(__FILE__).'/import_codes.php'); ?>
+
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
 
                     <div class="form-group">
