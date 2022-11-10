@@ -61,6 +61,10 @@ use yii\widgets\ActiveForm;
                 <!--导入号码组轮换-->
                 <?php include(dirname(__FILE__).'/import_codes.php'); ?>
 
+                <!--区间盈利止盈止损-->
+                <?php include(dirname(__FILE__).'/take_profits_area.php'); ?>
+
+
                 <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
 
                 <div class="row">
