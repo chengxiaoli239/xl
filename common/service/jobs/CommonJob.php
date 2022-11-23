@@ -58,18 +58,12 @@ abstract class CommonJob extends BaseObject implements JobInterface
 
         \Yii::$app->cache->set($cacheKey, 1, 20);
         QueueLog::updateAll(['status'=>QueueLog::STATUS_CONSUMING, 'count'=>(new Expression("`count`+1")),], ['id'=>$this->queueId]);
-        #try {
+        try {
             $status = QueueLog::STATUS_SUCCESS;
             $params = json_decode($log['params'] ?? '', true);
             $name = static::getName($params);
             $result = $this->exec($params);
-            QueueLog::updateAll(
-                [
-                    'status'=>$status, 'time'=>time()-$startTime,'remark'=>json_encode($result, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE),'complete_time'=>time(),
-                ],
-                ['id'=>$this->queueId]
-            );
-            /*
+            QueueLog::updateAll( [ 'status'=>$status, 'time'=>time()-$startTime,'remark'=>json_encode($result, 320),'complete_time'=>time()], ['id'=>$this->queueId]);
         } catch (\Throwable $e) {
             self::$isCatchError = true;
             var_dump('a', $this->queueId . ',' . $e->getMessage());
@@ -78,7 +72,6 @@ abstract class CommonJob extends BaseObject implements JobInterface
         } finally {
             \Yii::$app->cache->delete($cacheKey);
         }
-            */
     }
 
     abstract public function exec($params);
@@ -100,7 +93,7 @@ abstract class CommonJob extends BaseObject implements JobInterface
                 ],
                 ['id'=>$this->queueId]
             );
-            Dingtalk::sendMessageToRobot('system_exceptions', "队列致命错误{$this->queueId}:" .$message);
+            #Dingtalk::sendMessageToRobot('system_exceptions', "队列致命错误{$this->queueId}:" .$message);
             die;
         }
     }
@@ -114,7 +107,7 @@ abstract class CommonJob extends BaseObject implements JobInterface
         if (!in_array($errno, array(E_STRICT, E_DEPRECATED))) {
             if (in_array($errno, array(E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR))) {
                 $message = json_encode($error);
-                Dingtalk::sendMessageToRobot('system_exceptions', "队列错误{$this->queueId}:" . $message);
+                #Dingtalk::sendMessageToRobot('system_exceptions', "队列错误{$this->queueId}:" . $message);
                 QueueLog::updateAll(
                     [
                         'status'=>QueueLog::STATUS_FAILED,

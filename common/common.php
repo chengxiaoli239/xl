@@ -274,7 +274,7 @@ if (!function_exists('push_queue')) {
             $log->save(false);
             return true;
         } catch (\Exception $e) {
-            \common\tools\Tool_Common::log('/queue/push', 'info', '入列异常', ['params'=>$params, 'jobClass'=>$jobClass, 'message'=>$e->getMessage()]);
+            \common\tools\Tool_Common::log('/queue/push', 'info', '入列异常', ['params'=>$params, 'jobClass'=>$jobClass, 'message'=>$e->getMessage().'-File-'.$e->getFile().'--line-'.$e->getLine()]);
             return false;
         }
     }

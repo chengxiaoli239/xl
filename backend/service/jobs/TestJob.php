@@ -3,11 +3,7 @@ namespace backend\service\jobs;
 
 use common\service\jobs\CommonJob;
 
-class TestJob extends CommonJob
-{
-    public $url;
-    public $file;
-    public $txt;
+class TestJob extends CommonJob {
 
     public static function getName($params)
     {
