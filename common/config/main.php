@@ -26,12 +26,26 @@ return [
 
         'queue'  => [
             //Redis 队列方案
-            'class'   => yii\queue\redis\Queue::className(),
+            'class' => yii\queue\redis\Queue::class,
             // 连接组件或它的配置
-            'redis'   => 'redis',
+            'redis' => 'redis',
             // Queue channel key
-            'channel' => 'queue',
-            'as log'=> new \yii\queue\LogBehavior(),
-        ]
+            'channel' => 'lottery:queue',
+            'as log'=> yii\queue\LogBehavior::class,
+        ],
+        'queue_fast' => [
+            'class' => \yii\queue\redis\Queue::class,
+            'redis' => 'redis', // Redis connection component or its config
+            'channel' => 'lottery:queue_fast', // Queue channel key
+            'as log' => \yii\queue\LogBehavior::class,
+            'ttr' => 3600,
+        ],
+        'queue_open' => [
+            'class' => \yii\queue\redis\Queue::class,
+            'redis' => 'redis', // Redis connection component or its config
+            'channel' => 'lottery:queue_open', // Queue channel key
+            'as log' => \yii\queue\LogBehavior::class,
+            'ttr' => 3600,
+        ],
     ]
 ];
