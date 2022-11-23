@@ -57,14 +57,8 @@ abstract class CommonJob extends BaseObject implements JobInterface
         }
 
         \Yii::$app->cache->set($cacheKey, 1, 20);
-        QueueLog::updateAll(
-            [
-                'status'=>QueueLog::STATUS_CONSUMING, 'count'=>(new Expression("`count`+1")),
-            ],
-            ['id'=>$this->queueId]
-        );
-        $name = '';
-        try {
+        QueueLog::updateAll(['status'=>QueueLog::STATUS_CONSUMING, 'count'=>(new Expression("`count`+1")),], ['id'=>$this->queueId]);
+        #try {
             $status = QueueLog::STATUS_SUCCESS;
             $params = json_decode($log['params'] ?? '', true);
             $name = static::getName($params);
@@ -75,25 +69,16 @@ abstract class CommonJob extends BaseObject implements JobInterface
                 ],
                 ['id'=>$this->queueId]
             );
+            /*
         } catch (\Throwable $e) {
             self::$isCatchError = true;
             var_dump('a', $this->queueId . ',' . $e->getMessage());
             Tool_Common::log('/queue/exception', 'info', '队列异常--', $e->getMessage().'-File-'.$e->getFile().'--line-'.$e->getLine());
-//            $count = 3;
-            QueueLog::updateAll(
-                [
-                    'status'=>QueueLog::STATUS_FAILED, 'remark'=>$e->getMessage(),'time'=>time()-$startTime, 'complete_time'=>time(),
-                ],
-                ['id'=>$this->queueId]
-            );
-//            if ($log['count'] < $count) {
-//                throw_info($e);
-//            }
-
-            #Dingtalk::sendMessageToRobot('system_exceptions', "{$name}队列异常,执行异常--:". $this->queueId);
+            QueueLog::updateAll(['status'=>QueueLog::STATUS_FAILED, 'remark'=>$e->getMessage(),'time'=>time()-$startTime, 'complete_time'=>time(),], ['id'=>$this->queueId] );
         } finally {
             \Yii::$app->cache->delete($cacheKey);
         }
+            */
     }
 
     abstract public function exec($params);
