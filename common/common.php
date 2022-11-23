@@ -245,7 +245,7 @@ if (!function_exists('push_queue')) {
                 $log->type = $type;
                 $log->delay = $queueDelayTime;
                 $log->name = $jobClass::getName($params);
-                $log->params = json_encode($params, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+                $log->params = json_encode($params, 320);
                 $log->job_class = $jobClass;
                 $log->job_class_md5 = md5($jobClass);
                 if (!$log->save()) {
@@ -275,7 +275,6 @@ if (!function_exists('push_queue')) {
             return true;
         } catch (\Exception $e) {
             \common\tools\Tool_Common::log('/queue/push', 'info', '入列异常', ['params'=>$params, 'jobClass'=>$jobClass, 'message'=>$e->getMessage()]);
-            \common\tools\Dingtalk::sendMessageToRobot('system_exceptions', '入列异常'. "\n" . $jobClass. ':' . $e->getMessage() . ' params:' .json_encode($params, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE));
             return false;
         }
     }

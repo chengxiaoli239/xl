@@ -90,7 +90,7 @@ abstract class CommonJob extends BaseObject implements JobInterface
 //                throw_info($e);
 //            }
 
-            Dingtalk::sendMessageToRobot('system_exceptions', "{$name}队列异常,执行异常--:". $this->queueId);
+            #Dingtalk::sendMessageToRobot('system_exceptions', "{$name}队列异常,执行异常--:". $this->queueId);
         } finally {
             \Yii::$app->cache->delete($cacheKey);
         }
