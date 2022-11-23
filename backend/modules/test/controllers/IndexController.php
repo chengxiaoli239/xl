@@ -85,7 +85,6 @@ use backend\models\BettingRecords;
 use backend\models\User;
 use common\tools\Tool_Common;
 use Yii;
-use yii\queue\closure\Job;
 use yii\web\Controller;
 use backend\service\SscDataService;
 use backend\service\TzService;
@@ -296,6 +295,12 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+
+        Yii::$app->queue->push(new TestJob([
+            'url' => 'http://example.com/image.jpg',
+            'file' => '/tmp/image.jpg',
+        ]));
+        p('kljasdlf');
         $UserSysPlan = UserSysPlans::findOne(5754);
         $lottery_type = 8;
         $hzArr = json_decode($UserSysPlan->hz_Arr, true);
