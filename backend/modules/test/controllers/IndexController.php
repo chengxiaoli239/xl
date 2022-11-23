@@ -299,6 +299,7 @@ class IndexController extends Controller
         Yii::$app->queue->push(new TestJob([
             'url' => 'http://example.com/image.jpg',
             'file' => '/tmp/image.jpg',
+            'txt' => '备注文案',
         ]));
         p('kljasdlf');
         $UserSysPlan = UserSysPlans::findOne(5754);
