@@ -11,7 +11,7 @@ return [
     'basePath' => dirname(__DIR__),
     'vendorPath' => dirname(__DIR__).'/../vendor',
     'controllerNamespace' => 'backend\controllers',
-    'bootstrap' => ['log', 'queue', 'queue_fast', 'queue_open'],
+    'bootstrap' => ['log'],
     'timeZone' => 'Asia/Shanghai',      // ÉèÖÃÊ±Çø
     'modules' => [
         'admin' => [

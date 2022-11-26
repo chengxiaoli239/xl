@@ -1,6 +1,7 @@
 <?php
 return [
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
+    'bootstrap' => ['log', 'queue', 'queue_fast', 'queue_open'],
     'components' => [
         'cache' => [
             //'class' => 'yii\caching\FileCache',

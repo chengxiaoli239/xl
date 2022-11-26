@@ -1,6 +1,6 @@
 <?php
 if($_SERVER['SERVER_PORT'] == '8090')@ini_set('session.name', 'PHPSESSID_BACKEND');# 一般不需要不提交SVN，只是为了在一个浏览器登录两个端口站点session不冲突问题
-defined('YII_DEBUG') or define('YII_DEBUG', true);
+defined('YII_DEBUG') or define('YII_DEBUG', false);
 defined('YII_ENV') or define('YII_ENV', 'prod');
 
 defined('DEFAULT_LOTTERY_TYPE') or define('DEFAULT_LOTTERY_TYPE',8); # 默认为幸运五
