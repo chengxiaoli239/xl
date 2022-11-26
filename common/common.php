@@ -264,8 +264,9 @@ if (!function_exists('push_queue')) {
                 $log->last_push_time = time();
                 $log->save(false);
             }
-            \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始3', ['params'=>$params, 'jobClass'=>$jobClass, 'queueId'=>$queueId]);
+            \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始3-1', ['params'=>$params, 'jobClass'=>$jobClass, 'queueId'=>$queueId]);
             $job = new $jobClass($queueId);
+            \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始3-2', ['params'=>$params, 'jobClass'=>$jobClass, 'queueId'=>$queueId]);
 
             if ($queueDelayTime > 0 && !$isRepush) {
                 \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始4', ['params'=>$params, 'jobClass'=>$jobClass, 'queueId'=>$queueId]);
