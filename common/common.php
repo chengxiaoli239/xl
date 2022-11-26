@@ -265,7 +265,8 @@ if (!function_exists('push_queue')) {
                 $log->save(false);
             }
             \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始3-1', ['params'=>$params, 'jobClass'=>$jobClass, 'queueId'=>$queueId]);
-            $job = new $jobClass($queueId);
+            #$job = new $jobClass($queueId);
+            $job = new \backend\service\jobs\TestJob($queueId);
             \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始3-2', ['params'=>$params, 'jobClass'=>$jobClass, 'queueId'=>$queueId]);
 
             if ($queueDelayTime > 0 && !$isRepush) {
