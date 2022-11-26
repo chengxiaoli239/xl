@@ -230,7 +230,7 @@ if (!function_exists('push_queue')) {
                 $type = 'queue_open';
                 $queue = \Yii::$app->queue_open;
             }
-            \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始', ['params'=>$params, 'jobClass'=>$jobClass]);
+            \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始1', ['params'=>$params, 'jobClass'=>$jobClass]);
             if (empty($jobClass)) {
                 throw_info('队列类名不能为空');
             }
@@ -252,6 +252,7 @@ if (!function_exists('push_queue')) {
                     throw_info('入列失败');
                 }
             } else {
+                \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始2', ['params'=>$params, 'jobClass'=>$jobClass]);
                 if (empty($params['id'])) {
                     throw_info('重推消息ID不能为空');
                 }
@@ -263,11 +264,14 @@ if (!function_exists('push_queue')) {
                 $log->last_push_time = time();
                 $log->save(false);
             }
+            \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始3', ['params'=>$params, 'jobClass'=>$jobClass, 'queueId'=>$queueId]);
             $job = new $jobClass($queueId);
 
             if ($queueDelayTime > 0 && !$isRepush) {
+                \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始4', ['params'=>$params, 'jobClass'=>$jobClass, 'queueId'=>$queueId]);
                 $systemQueueId = $queue->delay($queueDelayTime)->push($job);
             } else {
+                \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始5', ['params'=>$params, 'jobClass'=>$jobClass, 'queueId'=>$queueId]);
                 $systemQueueId = $queue->push($job);
             }
             $log->system_queue_id = $systemQueueId;
