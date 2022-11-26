@@ -230,7 +230,7 @@ if (!function_exists('push_queue')) {
                 $type = 'queue_open';
                 $queue = \Yii::$app->queue_open;
             }
-//            \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列异常', ['params'=>$params, 'jobClass'=>$jobClass]);
+            \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始', ['params'=>$params, 'jobClass'=>$jobClass]);
             if (empty($jobClass)) {
                 throw_info('队列类名不能为空');
             }

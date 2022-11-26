@@ -302,7 +302,7 @@ class IndexController extends Controller
             'fast' => '1',
         ];
         push_queue_fast(TestJob::class, $data);
-        push_queue(TestJob::class, ['order_sn'=>'2390u3405344444444444', 'slow'=>true]);
+        #push_queue(TestJob::class, ['order_sn'=>'2390u3405344444444444', 'slow'=>true]);
         //Yii::$app->queue->push(new TestJob($data));
         p('kljasdlf');
         $UserSysPlan = UserSysPlans::findOne(5754);
