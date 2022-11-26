@@ -10,7 +10,7 @@ class TestJob extends CommonJob {
         return self::$name;
     }
 
-    public function execute($params) {
+    public function exec($params) {
         return self::handle($params);
     }
 
@@ -21,9 +21,4 @@ class TestJob extends CommonJob {
         return true;
     }
 
-    public function exec($params)
-    {
-        var_dump($params);
-        // TODO: Implement exec() method.
-    }
 }
