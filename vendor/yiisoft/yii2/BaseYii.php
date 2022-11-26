@@ -546,8 +546,10 @@ class BaseYii
         if(empty($properties) or !is_array($properties)){
             Tool_Common::log('/configure/xxx', 'INFO', 'ÅäÖÃ', ['properties'=>$properties, 'object'=>json_encode($object)]);
         }
-        foreach ($properties as $name => $value) {
-            $object->$name = $value;
+        if(is_array($properties)){
+            foreach ($properties as $name => $value) {
+                $object->$name = $value;
+            }
         }
 
         return $object;
