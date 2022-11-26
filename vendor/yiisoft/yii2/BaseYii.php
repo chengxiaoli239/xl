@@ -7,6 +7,7 @@
 
 namespace yii;
 
+use common\tools\Tool_Common;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\base\UnknownClassException;
@@ -542,6 +543,7 @@ class BaseYii
      */
     public static function configure($object, $properties)
     {
+        Tool_Common::log('/configure/xxx', 'INFO', 'ÅäÖÃ', ['properties'=>$properties]);
         foreach ($properties as $name => $value) {
             $object->$name = $value;
         }
