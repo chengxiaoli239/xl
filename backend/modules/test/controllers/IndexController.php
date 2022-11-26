@@ -45,7 +45,6 @@ use backend\service\wanbo\tennis\TennisService;
 use backend\service\TestService;
 use backend\service\UserCustomPlansService;
 use backend\service\UserSysPlansService;
-use backend\service\wanbo\PingBoBaseService;
 use backend\service\WxService;
 use backend\service\XlService;
 use backend\tools\Tools;
@@ -301,7 +300,7 @@ class IndexController extends Controller
             'txt' => '备注文案',
             'fast' => '1',
         ];
-        push_queue_fast(TestJob::class, $data);
+        push_queue_fast(\backend\service\jobs\TestJob::class, $data);
         #push_queue(TestJob::class, ['order_sn'=>'2390u3405344444444444', 'slow'=>true]);
         //Yii::$app->queue->push(new TestJob($data));
         p('kljasdlf');
