@@ -300,7 +300,7 @@ class IndexController extends Controller
             'txt' => '备注文案',
             'fast' => '1',
         ];
-        push_queue_fast(\backend\service\jobs\TestJob::class, $data);
+        push_queue_fast(\common\services\jobs\TestJob::class, $data);
         #push_queue(TestJob::class, ['order_sn'=>'2390u3405344444444444', 'slow'=>true]);
         //Yii::$app->queue->push(new TestJob($data));
         p('kljasdlf');
