@@ -4,7 +4,7 @@ return [
     'components' => [
         'cache' => [
             //'class' => 'yii\caching\FileCache',
-            'class' => 'yii\caching\MemCache',
+            'class' => '\yii\caching\MemCache',
             'servers' => [
                 [
                     'host' => '127.0.0.1',
@@ -17,7 +17,7 @@ return [
         ],
         'redis' => [
             #'class' => new \yii\redis\Connection(),
-            'class' => 'yii\redis\Connection',
+            'class' => '\yii\redis\Connection',
             'hostname' => '127.0.0.1',
             'port' => 6379,
             'database' => 0,
@@ -26,12 +26,12 @@ return [
 
         'queue'  => [
             //Redis 队列方案
-            'class' => yii\queue\redis\Queue::class,
+            'class' => \yii\queue\redis\Queue::class,
             // 连接组件或它的配置
             'redis' => 'redis',
             // Queue channel key
             'channel' => 'lottery:queue',
-            'as log'=> yii\queue\LogBehavior::class,
+            'as log'=> \yii\queue\LogBehavior::class,
         ],
         'queue_fast' => [
             'class' => \yii\queue\redis\Queue::class,
