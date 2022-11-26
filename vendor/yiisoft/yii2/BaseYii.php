@@ -543,7 +543,9 @@ class BaseYii
      */
     public static function configure($object, $properties)
     {
-        Tool_Common::log('/configure/xxx', 'INFO', 'ÅäÖÃ', ['properties'=>$properties]);
+        if(empty($properties) or !is_array($properties)){
+            Tool_Common::log('/configure/xxx', 'INFO', 'ÅäÖÃ', ['properties'=>$properties, 'object'=>json_encode($object)]);
+        }
         foreach ($properties as $name => $value) {
             $object->$name = $value;
         }
