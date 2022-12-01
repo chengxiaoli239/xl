@@ -1812,7 +1812,3 @@ window.Tnmc.layuiRowspan = function(fieldNameTmp,index,flag){
              new multipleUpload( $(this) )
         })
     })
-
-
-
-    

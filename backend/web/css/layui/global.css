@@ -4,23 +4,29 @@ body{
 *{
   box-sizing: border-box;
 }
+
+#new-content{
+}
 footer{
   display: none;
 }
+
 .layui-btn{
   font-size: 12px;
 }
+
 .layui-nav *{
     font-size: 13px;
 }
+
 .layui-table-noborder{
-  width: 100%;
-  
+    width: 100%;
 }
+
 .layui-table-noborder td{
-   padding: 8px 0;
-     border-top: none;
-     border-left: none;
+    padding: 8px 0;
+    border-top: none;
+    border-left: none;
 }
 .layui-side-menu,.layadmin-pagetabs .layui-tab-title li:after,.layadmin-pagetabs .layui-tab-title li.layui-this:after,.layui-layer-admin .layui-layer-title,.layadmin-side-shrink .layui-side-menu .layui-nav>.layui-nav-item>.layui-nav-child{background-color:#3A3D49 !important;}.layui-nav-tree .layui-this,.layui-nav-tree .layui-this>a,.layui-nav-tree .layui-nav-child dd.layui-this,.layui-nav-tree .layui-nav-child dd.layui-this a{background-color:#5FB878 !important;}.layui-layout-admin .layui-logo{background-color:#2F9688 !important;}
 .layui-layout-admin .layui-body .layadmin-tabsbody-item{
