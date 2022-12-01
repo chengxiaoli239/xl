@@ -7,27 +7,27 @@
 <script type="text/javascript" src="/js/layui/global.js?v={{STATIC_VERSION}}"></script>
 <script type="text/javascript" src="/js/common.js?v={{STATIC_VERSION}}"></script>
 <div style="float: left; width: 100%;"><div>
-<div id="new-content" style="margin-top: 80px">
-    <div class="title1">
+<div id="new-content" style="margin-top: 65px;margin-left: -8px">
+    <div class="title">
         <h2>消息队列列表&nbsp;&nbsp;</h2>
     </div>
     <div class="search-cond clearfix">
         <form class="layui-form  layuiadmin-card-header-auto" action="" data-auto-get id="search-form">
             <div class="row">
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <input type="text" name="id" id="id" autocomplete="off" class="layui-input" placeholder="id">
                 </div>
                 <div class="col-md-2">
                     <input type="text" name="job_class" autocomplete="off" class="layui-input" placeholder="完整类名">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <select class="layui-input" name="is_delay" lay-search>
                         <option value="">--是否延迟--</option>
                         <option value="2">否</option>
                         <option value="1">是</option>
                     </select>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <!--<input type="text" name="name" autocomplete="off" class="layui-input" placeholder="名称">-->
                     <select class="layui-input" name="name" lay-search>
                         <option value="">--选择名称--</option>
@@ -36,9 +36,7 @@
                         {%endfor%}
                     </select>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-1">
                     <select class="layui-input" name="status" lay-search>
                         <option value="">--选择状态--</option>
                         <option value="1">待处理</option>
@@ -56,8 +54,6 @@
                 <div class="col-md-3">
                     <input type="text" name="business_id" autocomplete="off" class="layui-input" placeholder="business_id">
                 </div>
-            </div>
-            <div class="row">
                 <div class="col-md-3">
                     <button type="submit" class="layui-btn layui-btn-sm" lay-submit="" lay-filter="LAY-user-front-search" id="search-submit">
                         <i class="layui-icon layui-icon-search"></i>
