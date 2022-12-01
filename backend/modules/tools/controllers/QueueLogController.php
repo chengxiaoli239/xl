@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\modules\forum\controllers;
+namespace backend\modules\tools\controllers;
 
 use Yii;
 use common\models\QueueLog;
