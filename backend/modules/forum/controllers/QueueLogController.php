@@ -81,7 +81,7 @@ class QueueLogController extends BaseController
         try {
             $params = \Yii::$app->request->post();
             $this->service->rePush($params);
-            return Common::jsonSuccess(['重新入列成功']);
+            return Common::jsonSuccess(['閲嶆柊鍏ュ垪鎴愬姛']);
         } catch (\Exception $e) {
             return Common::jsonError([], $e->getMessage());
         }
@@ -92,7 +92,7 @@ class QueueLogController extends BaseController
         try {
             $params = \Yii::$app->request->post();
             $this->service->markComplete($params);
-            return Common::jsonSuccess(['标记成功']);
+            return Common::jsonSuccess(['鏍囪鎴愬姛']);
         } catch (\Exception $e) {
             return Common::jsonError([], $e->getMessage());
         }
