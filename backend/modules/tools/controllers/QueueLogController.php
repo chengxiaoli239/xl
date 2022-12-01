@@ -1,19 +1,32 @@
 <?php
+/**
+ * Description
+ *
+ *
+ * Datetime: 2022-04-08 17:04
+ */
 
 namespace backend\modules\tools\controllers;
 
-use Yii;
-use common\models\QueueLog;
-use backend\models\searchs\QueueLog as QueueLogSearch;
+
 use backend\controllers\BaseController;
-use yii\web\NotFoundHttpException;
+use backend\models\searchs\QueueLog as QueueLogSearch;
+use backend\service\tools\QueueService;
+use common\tools\Common;
+use yii\base\Module;
 use yii\filters\VerbFilter;
 
-/**
- * QueueLogController implements the CRUD actions for QueueLog model.
- */
-class QueueLogController extends BaseController
+class QueueController extends BaseController
 {
+    protected $service;
+
+    public function __construct($id, Module $module, QueueService $queueService, array $config = [])
+    {
+        parent::__construct($id, $module, $config);
+
+        $this->service = $queueService;
+    }
+
     /**
      * @inheritdoc
      */
@@ -44,84 +57,56 @@ class QueueLogController extends BaseController
         ]);
     }
 
-    /**
-     * Displays a single QueueLog model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
+    public function actionListPage()
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        $data = [];
+
+        $data['options'] = $this->service->getOptions();
+
+        return $this->render('list.html', $data);
     }
 
-    /**
-     * Creates a new QueueLog model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
+    public function actionGetList()
     {
-        $model = new QueueLog();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        try {
+            $params = \Yii::$app->request->get();
+            $result = $this->service->getList($params);
+            return Common::jsonSuccess($result);
+        } catch (\Exception $e) {
+            return Common::jsonError([], $e->getMessage());
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
 
-    /**
-     * Updates an existing QueueLog model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
+    public function actionRePush()
     {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        try {
+            $params = \Yii::$app->request->post();
+            $this->service->rePush($params);
+            return Common::jsonSuccess(['重新入列成功']);
+        } catch (\Exception $e) {
+            return Common::jsonError([], $e->getMessage());
         }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
     }
 
-    /**
-     * Deletes an existing QueueLog model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
+    public function actionMarkComplete()
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the QueueLog model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return QueueLog the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = QueueLog::findOne($id)) !== null) {
-            return $model;
+        try {
+            $params = \Yii::$app->request->post();
+            $this->service->markComplete($params);
+            return Common::jsonSuccess(['标记成功']);
+        } catch (\Exception $e) {
+            return Common::jsonError([], $e->getMessage());
         }
+    }
 
-        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+    public function actionStatus()
+    {
+        try {
+            $params = \Yii::$app->request->post();
+            $result = $this->service->status($params);
+            return Common::jsonSuccess($result);
+        } catch (\Exception $e) {
+            return Common::jsonError([], $e->getMessage());
+        }
     }
 }
