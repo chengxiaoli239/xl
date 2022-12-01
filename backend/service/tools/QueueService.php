@@ -10,7 +10,7 @@ namespace backend\service\tools;
 
 
 use common\models\QueueLog;
-use common\services\BaseService;
+use backend\service\BaseService;
 use common\tools\Common;
 
 class QueueService extends BaseService
