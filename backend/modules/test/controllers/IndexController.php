@@ -295,13 +295,14 @@ class IndexController extends Controller
     public function actionDw()
     {
         $data = [
-            #'url' => 'http://example.com/image.jpg',
-            #'file' => '/tmp/image.jpg',
-            #'txt' => '备注文案',
-            #'fast' => '1',
+            'url' => 'http://example.com/image.jpg',
+            'file' => '/tmp/image.jpg',
+            'txt' => '备注文案',
+            'fast' => '1',
             'name' => '1xxxxxxxxxxx',
+            'business_id' => '1xxxxxxx777',
         ];
-        push_queue_fast(\backend\service\jobs\TestJob::class, $data);
+        push_queue(\backend\service\jobs\TestJob::class, $data);
         #push_queue(TestJob::class, ['order_sn'=>'2390u3405344444444444', 'slow'=>true]);
         //Yii::$app->queue->push(new TestJob($data));
         p('kljasdlf');
