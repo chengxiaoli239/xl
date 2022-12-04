@@ -297,21 +297,8 @@ class IndexController extends Controller
     {
         $lottery_type = 8;
         $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);
-        $r = push_queue(\backend\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
-
+        $r = push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
         d($r);
-        $uid = 11;
-        $plan_id = 5182;
-        $RedisLock = new RedisLock();
-        for ($start_date=401; $start_date<=507; $start_date++){
-            for ($i = '220'.$start_date.'001'; $i<='220'.$start_date.'481'; $i++) {
-                $mkey = 'batchSimulateBet_' . $lottery_type . '_' . $uid . '_' . $plan_id . '_' . $i. '_redis';
-                $unRst = $RedisLock->unlock($mkey);
-                echo $mkey.' == ';
-                var_dump($unRst);
-            }
-        }
-        p('删除完成');
 
         $data = [
             'url' => 'http://example.com/image.jpg',
