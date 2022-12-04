@@ -222,12 +222,15 @@ class KjDataGet
      */
     public static function afterKj($lottery_type = DEFAULT_LOTTERY_TYPE){
 
-        SscDataService::insertDealDataTask($lottery_type); # 数据处理任务写入
+        $insertRst = SscDataService::insertDealDataTask($lottery_type); # 数据处理任务写入
 
         $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
-        #$rst['TzService'] = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
-        $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);
-        push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
+        if($insertRst){
+            # 队列处理
+            #$rst['TzService'] = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
+            $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);
+            push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
+        }
         //StaticService::opStaticProfits(); # 投注利润统计
         //SscDataService::updateDsData(); // 更新单双
         //StaticService::static4dMonthsProfits(); # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
