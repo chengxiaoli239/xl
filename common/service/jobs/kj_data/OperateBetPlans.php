@@ -1,5 +1,5 @@
 <?php
-namespace backend\service\jobs\kj_data;
+namespace common\service\jobs\kj_data;
 
 use backend\service\TzService;
 use common\service\jobs\CommonJob;
@@ -7,7 +7,7 @@ use common\service\jobs\CommonJob;
 class OperateBetPlans extends CommonJob {
 
     public static function getName($params) {
-        self::$name = '测试队列TestJob';
+        self::$name = '处理下注计划';
         return self::$name;
     }
 

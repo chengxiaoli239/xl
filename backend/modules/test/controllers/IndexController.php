@@ -295,7 +295,11 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $lottery_type = 23;
+        $lottery_type = 8;
+        $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);
+        $r = push_queue(\backend\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
+
+        d($r);
         $uid = 11;
         $plan_id = 5182;
         $RedisLock = new RedisLock();
