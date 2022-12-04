@@ -30,7 +30,7 @@ class TzService extends BaseService {
      * @decription Yii 控制器初始化方法
      */
     public static function _init(){
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        #\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $time = date("H:i");
         if(\Yii::$app->params['ssc_kj_time_start'] < $time && $time < \Yii::$app->params['ssc_kj_time_start'] ){
             $rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
