@@ -82,6 +82,7 @@ use backend\models\UserFollowData;
 use backend\service\RemoteHtmlService;
 use backend\models\BettingRecords;
 use backend\models\User;
+use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use Yii;
 use yii\web\Controller;
@@ -294,6 +295,20 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $lottery_type = 23;
+        $uid = 11;
+        $plan_id = 5182;
+        $RedisLock = new RedisLock();
+        for ($start_date=401; $start_date<=507; $start_date++){
+            for ($i = '220'.$start_date.'001'; $i<='220'.$start_date.'481'; $i++) {
+                $mkey = 'batchSimulateBet_' . $lottery_type . '_' . $uid . '_' . $plan_id . '_' . $i. '_redis';
+                $unRst = $RedisLock->unlock($mkey);
+                echo $mkey.' == ';
+                var_dump($unRst);
+            }
+        }
+        p('删除完成');
+
         $data = [
             'url' => 'http://example.com/image.jpg',
             'file' => '/tmp/image.jpg',
@@ -728,8 +743,6 @@ class IndexController extends Controller
         $balance = BingDaoService::getBalance($uid = 20, $tz_system_id = 13);
         p($balance);
         $data = CqsscKcw::getLotteryTaiwanBinguo();
-        p($data);
-        $rst['kj'] = KjDataGet::grabOne($lottery_types = [9]);
         p($rst); # 开奖抓取
         $lottery_types = StaticService::getLotteryTypes();
 
@@ -1016,8 +1029,6 @@ class IndexController extends Controller
         $rst = SevenService::synBalance(5);
         p($rst);
 
-        $rst['kj'] = KjDataGet::grabOne();
-        p($rst);
         $rst = TzService::insertLuckyDataTime();
         p($rst);
         p(unserialize('a:3:{s:4:"time";i:1570224883;s:3:"ttl";i:3600000;s:4:"data";a:0:{}}'));
@@ -1212,8 +1223,6 @@ class IndexController extends Controller
         $rst = NumService::getRecentlyCodes(5);
         p($rst);
         $rst = UserSysPlansService::userSysPlanChange(2);
-        p($rst);
-        $rst = KjDataGet::grabOne();
         p($rst);
         $captchaCodeRst = Tools::getCaptchaCode(10, 5, '2x2tdrnawlpbli554jlsuf2c');
         p($captchaCodeRst); # 真实调用验证码接口，收费

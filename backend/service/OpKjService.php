@@ -38,7 +38,7 @@ class OpKjService extends BaseService {
     }
 
     /**
-     * @desc 操作一个下注记录开奖处理
+     * @desc 操作单个下注记录开奖处理
      * @param string $record_id
      * @return array
      */

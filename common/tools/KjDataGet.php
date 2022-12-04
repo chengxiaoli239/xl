@@ -10,7 +10,6 @@ namespace common\tools;
 use backend\models\DataTime;
 use backend\models\KjConfig;
 use backend\models\Num4Type;
-use backend\models\QxcKjData;
 use backend\models\SscKjData;
 use backend\models\StaticCodeTypeArisePerdate;
 use backend\models\UserFollowData;
@@ -98,88 +97,82 @@ class KjDataGet
      * @description 时时彩逐期抓取(以此方法为主抓取时时彩数据)
      * @return array
      */
-    public static function grabOne($lottery_types = []){
+    public static function grabKjDatas($lottery_types = []){
         $msg = ['status'=>200, 'msg'=>'操作成功~'];
 
         if(empty($lottery_types)) $lottery_types = StaticService::getLotteryTypes();
-        $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
-            $KjConfigs = KjConfig::findAll(['enable'=>1, 'lottery_type'=>$lottery_type]);
-            foreach ($KjConfigs as $kjConfig){
-                $status = KjDataGet::isCanGrab($lottery_type);
-                if(!$status && !$kjConfig->is_batch) continue;
-                $lottery_type = $kjConfig->lottery_type;
-                //if($lottery_type != 8) continue; # 测试
-                $url = $kjConfig->host.$kjConfig->path;
-                if(!$data = CurlService::httpGet($url)) continue;
-                if(isset($data['status']) && $data['status'] != 200) continue;
-                if($kjConfig->is_batch == 1){
-                    $kjDatas = $data;
-                    Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '批量抓取开奖号码', ['data'=>$data]);
-                    if($kjDatas){
-                        $mkey = 'KJ_LOG_KEY_BATCH_1_'.$kjConfig->lottery_type;
-                        if($kjConfig->lottery_type == 2){ # qxc
-                            foreach ($kjDatas as $key=>$dataInfo){
-                                $qihao = $dataInfo['expect'];
-                                $rst = KjDataGet::insertQxcKjData($dataInfo['qihao'], $dataInfo['codes'], $dataInfo['date']);
-                            }
-                        }else{ //}elseif(in_array($kjConfig->lottery_type, [6, 8, 1, 17])) { # xjssc  1七星彩17排列五
-                            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '开奖数据', ['url'=>$url, 'kjdatas'=>$kjDatas]);
-                            $kjDatas = array_reverse($kjDatas); # 翻转
-                            foreach ($kjDatas as $key=>$dataInfo){
-                                $qihao = $dataInfo['expect'];
-                                $rst = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $dataInfo['opencode'], $dataInfo['opentime']);
-                            }
-                        }
-                    }
-                    $cache_time = 10;
-                    $logArr = ['data'=>$data, 'rst'=>$rst];
-                }else{
-                    $mkey = 'KJ_LOG_KEY_BATCH_0_'.$kjConfig->lottery_type;
-                    $kjData = (isset($data['opencode']) && !empty($data['opencode'])) ? $data['opencode'] : [];
-                    if($kjData){
-                        if($kjConfig->lottery_type != 99){
-                            if($kjConfig->lottery_type == 5){
-                                $qihao = substr($data['expect'],2,6).substr($data['expect'],9,3);
-                            }else{
-                                $qihao = $data['expect'];
-                            }
-                            # ssc
-                            $msg = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData, $data['opentime']);
-                            //if($kjConfig->lottery_type ==2) p([$qihao, $kjConfig->lottery_type, $kjData, $msg]);
-                            $cache_time = 10;
-                        }elseif($kjConfig->lottery_type == 99){
-                            $qihao = $data['expect'];
-                            $date = date('Y-m-d',$data['opentime']);
-                            # qxc
-                            //p($kjConfig);
-                            $msg = KjDataGet::insertQxcKjData($qihao, $kjData, $date);
-                            $cache_time = 30*60;
-                        }
-                    }
-                    $lotteryNameArr = CqsscKcw::getLotteryNameArr();
-                    $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, /*'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$msg,*/ 'lottery'=>$lotteryNameArr[$kjConfig->lottery_type]];
-                    Tool_Common::log('insertSscKjData', 'INFO', '开奖记录', $logArr);
-                }
-                $mkey_qihao = 'KJ_LOG_QIHAO_'.$kjConfig->lottery_type.'_'.$qihao;
-                //if(!$m->get($mkey) OR ($kjConfig->lottery_type == 1 && !$m->get($mkey_qihao))){
-                if(!$m->get($mkey_qihao) ){
-                    $logArr['url'] = $url;
-                    $logArr['mkey_qihao'] = $mkey_qihao;
-                    $logArr['qihao'] = $qihao;
-                    $logArr['mkey'] = $mkey;
-                    $logArr['lottery_type'] = $lottery_type;
-                    Tool_Common::log('insertSscKjData-c', 'INFO', '开奖记录', $logArr);
-                    $m->set($mkey, 1, $cache_time);
-                    $m->set($mkey_qihao, 1, $cache_time);
-                }
-            }
-            /* 处理系统投注计划 add 2019-01-21 */
-            KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
-            /* 处理系统投注计划 add 2019-01-21 */
+            KjDataGet::grabOneLotteryKjData($lottery_type);
         }
 
         return $msg;
+    }
+
+    /**
+     * 单个彩种号码抓取
+     * @param int $lottery_type
+     */
+    public static function grabOneLotteryKjData($lottery_type=DEFAULT_LOTTERY_TYPE){
+        $m = \Yii::$app->cache;
+        $KjConfigs = KjConfig::findAll(['enable'=>1, 'lottery_type'=>$lottery_type]);
+        foreach ($KjConfigs as $kjConfig){
+            $status = KjDataGet::isCanGrab($lottery_type);
+            if(!$status && !$kjConfig->is_batch) continue;
+            $lottery_type = $kjConfig->lottery_type;
+            //if($lottery_type != 8) continue; # 测试
+            $url = $kjConfig->host.$kjConfig->path;
+            if(!$data = CurlService::httpGet($url)) continue;
+            if(isset($data['status']) && $data['status'] != 200) continue;
+            if($kjConfig->is_batch == 1){
+                $kjDatas = $data;
+                Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '批量抓取开奖号码', ['data'=>$data]);
+                if($kjDatas){
+                    # xjssc  1七星彩17排列五
+                    $mkey = 'KJ_LOG_KEY_BATCH_1_'.$kjConfig->lottery_type;
+                    Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '开奖数据', ['url'=>$url, 'kjdatas'=>$kjDatas]);
+                    $kjDatas = array_reverse($kjDatas); # 翻转
+                    foreach ($kjDatas as $key=>$dataInfo){
+                        $qihao = $dataInfo['expect'];
+                        $rst = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $dataInfo['opencode'], $dataInfo['opentime']);
+                    }
+                }
+                $cache_time = 10;
+                $logArr = ['data'=>$data, 'rst'=>$rst];
+            }else{
+                $mkey = 'KJ_LOG_KEY_BATCH_0_'.$kjConfig->lottery_type;
+                $kjData = (isset($data['opencode']) && !empty($data['opencode'])) ? $data['opencode'] : [];
+                if($kjData){
+                    if($kjConfig->lottery_type == 5){
+                        $qihao = substr($data['expect'],2,6).substr($data['expect'],9,3);
+                    }else{
+                        $qihao = $data['expect'];
+                    }
+                    # ssc
+                    $msg = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData, $data['opentime']);
+                    $cache_time = 10;
+                }
+                $lotteryNameArr = CqsscKcw::getLotteryNameArr();
+                $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, /*'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$msg,*/ 'lottery'=>$lotteryNameArr[$kjConfig->lottery_type]];
+                Tool_Common::log('insertSscKjData', 'INFO', '开奖记录', $logArr);
+            }
+            $mkey_qihao = 'KJ_LOG_QIHAO_'.$kjConfig->lottery_type.'_'.$qihao;
+            if(!$m->get($mkey_qihao) ){
+                $logArr = array_merge($logArr, [
+                    'url' => $url,
+                    'mkey_qihao' => $mkey_qihao,
+                    'qihao' => $qihao,
+                    'mkey' => $mkey,
+                    'lottery_type' => $lottery_type,
+                ]);
+                Tool_Common::log('insertSscKjData-c', 'INFO', '开奖记录', $logArr);
+                $m->set($mkey, 1, $cache_time);
+                $m->set($mkey_qihao, 1, $cache_time);
+            }
+        }
+        /* 处理系统投注计划 add 2019-01-21 */
+        KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
+        /* 处理系统投注计划 add 2019-01-21 */
+
     }
 
     /**
@@ -232,7 +225,9 @@ class KjDataGet
         SscDataService::insertDealDataTask($lottery_type); # 数据处理任务写入
 
         $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
-        $rst['TzService'] = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
+        #$rst['TzService'] = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
+        $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);
+        push_queue(\backend\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
         //StaticService::opStaticProfits(); # 投注利润统计
         //SscDataService::updateDsData(); // 更新单双
         //StaticService::static4dMonthsProfits(); # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
@@ -332,48 +327,6 @@ class KjDataGet
         }
 
         return ['status'=>200, 'msg'=>'开奖数据写入成功', 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'insertData'=>$insertData, 'insertRst'=>$insertRst, 'id'=>$SscKjData->id];
-    }
-
-    /**
-     * @desc qxc开奖data
-     * @param $qihao 2018139
-     * @param $kjDatas 8,5,3,9,8,1,4
-     */
-    public static function insertQxcKjData($qihao, $kjData, $date = ''){
-        $kjDatas = str_replace(',', '', $kjData);
-        if(!$qihao OR !$kjDatas) return false;
-        $kjDatasArr = explode(',',$kjData);
-
-        $code4 = [$kjDatasArr[0],$kjDatasArr[1],$kjDatasArr[2],$kjDatasArr[3]];
-        $insertData = [
-            'kj_code' => implode(',',$code4),
-            'qihao' => $qihao,
-            'kj_7code' => $kjDatasArr[0].','.$kjDatasArr[1].','.$kjDatasArr[2].','.$kjDatasArr[3].','.$kjDatasArr[4].','.$kjDatasArr[5].','.$kjDatasArr[6],
-            'hezhi'=> array_sum($code4),
-            'code1'=>$kjDatasArr[0],
-            'code2'=>$kjDatasArr[1],
-            'code3'=>$kjDatasArr[2],
-            'code4'=>$kjDatasArr[3],
-            'code5'=>$kjDatasArr[4],
-            'code6'=>$kjDatasArr[5],
-            'code7'=>$kjDatasArr[6],
-            'created_at'=>(int)time(),
-            'time'=>time(),
-            'date' => $date ? $date : date('Y-m-d'),
-        ];
-
-        if(!$kjDatas) return false;
-        if (!$QxcKjData = QxcKjData::findOne(['qihao' => $qihao])) {
-            $QxcKjData = new QxcKjData();
-        }
-        $insertRst = $QxcKjData->setAttributes($insertData);
-        if (!$QxcKjData->save()) {
-            $msg = current($QxcKjData->getErrors());
-            $logArr = ['msg'=>$msg, 'qihao'=>$qihao, 'kjData'=>$kjData];
-            Tool_Common::log('insertQxcKjData', 'INFO', '开奖记录-错误', $logArr);
-            return ['status' => 300, 'msg' => $msg];
-        }
-        return ['status'=>200, 'msg'=>'开奖数据写入成功', 'insertRst'=>$insertRst];
     }
 
     /**

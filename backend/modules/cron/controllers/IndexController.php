@@ -72,7 +72,7 @@ class IndexController extends Controller
             $sleep_time = 10;
         }
         for ($i = 1; $i<$for_times; $i++) {
-            $rst['kj'] = KjDataGet::grabOne($post['lottery_types']);
+            $rst['kj'] = KjDataGet::grabKjDatas($post['lottery_types']);
             sleep($sleep_time);
         }
 
