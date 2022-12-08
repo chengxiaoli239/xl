@@ -120,7 +120,7 @@ class TzService extends BaseService {
                 //return $statusRst;
             }
             if(!$is_test && !$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opSystemBetPlans')){
-                throw_info('不可操作统计数据，还没到开奖时间');
+                throw new \Exception('不可操作统计数据，还没到开奖时间');
             }
             $rst['qihao'] = $qihao;
             $rst['lottery_type'] = $lottery_type;
