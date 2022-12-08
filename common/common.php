@@ -301,22 +301,6 @@ if (!function_exists('push_queue_fast')) {
     }
 }
 
-if (!function_exists('push_queue_open')) {
-
-    /**
-     * 开放平台队列
-     * @param $jobClass string 类名
-     * @param $params array 参数
-     * @param $isRepush bool 是否重推
-     * @return bool
-     */
-    function push_queue_open($jobClass, array $params, $isRepush = false)
-    {
-        $params['queue_open'] = true;
-        push_queue($jobClass, $params, $isRepush);
-    }
-}
-
 if (!function_exists('filter_special_str')) {
 
     /**
