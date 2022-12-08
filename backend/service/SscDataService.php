@@ -1736,6 +1736,7 @@ class SscDataService extends BaseService {
         }
         $DataDealStatus = DataDealStatus::findOne(['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
         if(empty($DataDealStatus)){
+            SscDataService::insertDealDataTask($lottery_type, $qihao); # 数据处理任务写入
             throw new \Exception('无任务记录'.$lottery_type.'_'.$qihao);
         }
         if(!empty($DataDealStatus) && $DataDealStatus->$field == 1){

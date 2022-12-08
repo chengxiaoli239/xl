@@ -224,8 +224,9 @@ class KjDataGet
 
         $insertRst = SscDataService::insertDealDataTask($lottery_type); # 数据处理任务写入
 
-        $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
+        $rst = ['status'=>200, 'msg'=>'处理成功'];
         if($insertRst){
+            $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
             # 队列处理
             #$rst['TzService'] = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
             $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);

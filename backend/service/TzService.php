@@ -190,7 +190,7 @@ class TzService extends BaseService {
             StaticService::afterOpStatic($lottery_type, 'opSystemBetPlans');
             self::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
         }catch (\Exception $e){
-
+            Tool_Common::log('/static/'.__FUNCTION__, 'INFO', '数据统计异常', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
         return $rst;
