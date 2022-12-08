@@ -15,6 +15,7 @@ use backend\models\SysPlansCodes;
 use backend\models\SystemConfig;
 use backend\models\TzSystemsAuth;
 use backend\models\UserCustomPlans;
+use common\service\jobs\kj_data\AfterRunSysPlansJob;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use backend\models\User;
@@ -186,9 +187,8 @@ class TzService extends BaseService {
             $rst['consume_time6'] = ($time7 - $time6).'s';
             $rst['isCanOpStaticStatus'] = $isCanOpStaticStatus;
             Tool_Common::log('opSystemBetPlans','INFO','处理系统投注计划', $rst);
-
             StaticService::afterOpStatic($lottery_type, 'opSystemBetPlans');
-            self::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
+            push_queue(AfterRunSysPlansJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
         }catch (\Exception $e){
             Tool_Common::log('/static/'.__FUNCTION__, 'INFO', '数据统计异常', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }

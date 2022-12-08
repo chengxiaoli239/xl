@@ -1735,9 +1735,13 @@ class SscDataService extends BaseService {
             $qihao = HN0898Service::getCurrentQihao($lottery_type);
         }
         $DataDealStatus = DataDealStatus::findOne(['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
+        $key = 'judgeDealTaskStatus_'.$lottery_type.'_'.$qihao;
         if(empty($DataDealStatus)){
-            SscDataService::insertDealDataTask($lottery_type, $qihao); # 数据处理任务写入
-            throw new \Exception('无任务记录'.$lottery_type.'_'.$qihao);
+            $num = \Yii::$app->redis->incrby($key, 1);
+            if($num>5){
+                SscDataService::insertDealDataTask($lottery_type, $qihao); # 数据处理任务写入
+            }
+            throw new \Exception('无任务记录'.$lottery_type.'_'.$qihao.'_num:'.$num);
         }
         if(!empty($DataDealStatus) && $DataDealStatus->$field == 1){
             throw new \Exception('已经处理过数据'.self::$dealDataStatusFields[$field]);
