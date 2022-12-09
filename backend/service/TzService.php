@@ -188,10 +188,12 @@ class TzService extends BaseService {
             $rst['isCanOpStaticStatus'] = $isCanOpStaticStatus;
             Tool_Common::log('opSystemBetPlans','INFO','处理系统投注计划', $rst);
             StaticService::afterOpStatic($lottery_type, 'opSystemBetPlans');
-            #push_queue(\common\service\jobs\kj_data\AfterRunSysPlansJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
-            $rst['afterRunSysPlans'] = TzService::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
+            push_queue(\common\service\jobs\kj_data\AfterRunSysPlansJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
+            #$rst['afterRunSysPlans'] = TzService::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
         }catch (\Exception $e){
+            StaticService::afterOpStatic($lottery_type, 'opSystemBetPlans');
             Tool_Common::log('/static/'.__FUNCTION__, 'INFO', '数据统计异常', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+            throw new \ErrorException($e->getMessage());
         }
 
         return $rst;
