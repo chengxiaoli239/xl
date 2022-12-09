@@ -7,7 +7,7 @@ use common\service\jobs\CommonJob;
 class OperateBetPlans extends CommonJob {
 
     public static function getName($params) {
-        self::$name = '处理下注计划';
+        self::$name = '1处理下注计划';
         return self::$name;
     }
 

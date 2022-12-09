@@ -7,7 +7,7 @@ use common\service\jobs\CommonJob;
 class AfterRunSysPlansJob extends CommonJob {
 
     public static function getName($params) {
-        self::$name = '游戏开关开启';
+        self::$name = '2游戏开关开启';
         return self::$name;
     }
 

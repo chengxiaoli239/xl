@@ -4,10 +4,10 @@ namespace common\service\jobs\kj_data;
 use backend\service\BetService;
 use common\service\jobs\CommonJob;
 
-class UserBetJob extends CommonJob {
+class UserBetTaskRecordJob extends CommonJob {
 
     public static function getName($params) {
-        self::$name = '4用户游戏任务执行';
+        self::$name = '3用户游戏任务写入';
         return self::$name;
     }
 
@@ -16,9 +16,9 @@ class UserBetJob extends CommonJob {
     }
 
     public static function handle($params){
-        $user_id = $params['user_id'];
+        $lottery_type = $params['lottery_type'];
 
-        $rst['UserBetJob'] = BetService::lotteryBet($user_id);; # 用户游戏任务
+        $rst = BetService::insertPlansTask([$lottery_type]);
         return $rst;
     }
 

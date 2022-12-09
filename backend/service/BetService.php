@@ -26,6 +26,7 @@ use backend\service\NineNine\NineNineNewService;
 use backend\service\NineNine\NineNineService6;
 use backend\service\qilin\BingDaoService;
 use common\kj\cqssc\CqsscKcw;
+use common\service\jobs\kj_data\UserBetJob;
 use common\service\proxy\ProxyBaseService;
 use common\tools\RedisLock;
 use Yii;
@@ -1962,6 +1963,7 @@ abstract class BetService extends BaseBetService {
                 continue;
             }
             $m = \Yii::$app->cache;
+            $user_ids = [];
             foreach ($plans as $plan){
                 try {
                     $tz_system_id = $plan->tz_sites;
@@ -2035,6 +2037,7 @@ abstract class BetService extends BaseBetService {
                         $insertRst = $BetService->postBatchBet($activeQihao, $plan->id, $codes);
                         $rst['data'][$plan->id] = $insertRst;
                         $logArr = ['uid'=>$uid, 'account'=>$plan->account, 'plan_id'=>$plan->id, 'activeQihao'=>$activeQihao, 'insertRst'=>$insertRst];
+                        $user_ids[$uid] = ['user_id'=>$uid];
                         Tool_Common::log('insertPlansTask', 'INFO', '插入计划-任务-2', $logArr);
                     }
                     $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>'正常'];
@@ -2042,6 +2045,9 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划-异常', ['uid'=>$uid, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
                     $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>$e->getMessage()];
                 }
+            }
+            foreach ($user_ids as $uid=>$user_id_data){
+                push_queue(UserBetJob::class, $user_id_data);
             }
         }
 
