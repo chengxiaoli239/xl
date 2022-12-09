@@ -16,6 +16,7 @@ use backend\models\SystemConfig;
 use backend\models\TzSystemsAuth;
 use backend\models\UserCustomPlans;
 use common\service\jobs\kj_data\AfterRunSysPlansJob;
+use common\service\jobs\kj_data\UserBetJob;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use backend\models\User;
@@ -212,12 +213,14 @@ class TzService extends BaseService {
 
             $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['=', 'is_parent', 1]];
             $plans = UserSysPlans::find()->where($where)->orderBy(['tz_sort'=>SORT_ASC])->all();
+            $UserInfos = [];
             foreach ($plans as $plan){
                 # 处理完计划后,下一期投注开关开启(value:1) start
                 $next_mkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $next_qihao, $plan->uid);
                 $rst11[$plan->id]['rst'] = $m->set($next_mkey,1,$next_time); # 真实
                 $rst11[$plan->id]['next_mkey'] = $next_mkey;
                 $rst11[$plan->id]['next_time'] = $next_time;
+                $UserInfos[$plan->uid] = ['user_id'=>$plan->uid, 'account'=>$plan->account, 'lottery_type'=>$plan->lottery_type];
             }
             $next_simulate_mkey = TzService::buildNextKey($lottery_type, $next_qihao);
             $rst10['rst'] = $m->set($next_simulate_mkey,1,$next_time); # 模拟
@@ -251,6 +254,9 @@ class TzService extends BaseService {
 
             $logData = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'rst11'=>$rst11, 'rst10'=>$rst10, 'rst21'=>$rst21];
             Tool_Common::log('afterRunSysPlans','INFO','系统计划处理后', $logData);
+            foreach ($UserInfos as $UserInfo){
+                push_queue(UserBetJob::class, $UserInfo);
+            }
         }catch (\Exception $e){
             Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '开关处理异常', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'err_msg'=>$e->getMessage()]);
         }
