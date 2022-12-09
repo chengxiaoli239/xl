@@ -116,11 +116,11 @@
                         {field:'status_text', title: '状态', width:80, templet: function (d) {
                                 let result = d.status_text;
                                 if (d.status == 2) {
-                                    result = '<span style="color:#FEC548">'+ d.status_text + '</span>';
+                                    result = '<span style="color:#FEC548"><strong>'+ d.status_text + '</strong></span>';
                                 } else if (d.status == 3) {
-                                    result = '<span style="color:#3CA99E">'+ d.status_text + '</span>';
+                                    result = '<span style="color:#3CA99E"><strong>'+ d.status_text + '</strong></span>';
                                 } else if (d.status == 4) {
-                                    result = '<span style="color:#FF7851">'+ d.status_text + '</span>';
+                                    result = '<span style="color:#FF7851"><strong>'+ d.status_text + '</strong></span>';
                                 }
 
                                 return result;
