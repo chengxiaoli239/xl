@@ -3065,7 +3065,7 @@ class SscDataService extends BaseService {
             $dealStatus = 2;
         }catch (\Exception $e){
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
-            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常5', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常5', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage().'-File-'.$e->getFile().'--line-'.$e->getLine()]);
         }
 
         $end_time = microtime(true);
