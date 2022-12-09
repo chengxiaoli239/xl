@@ -2,7 +2,6 @@
 namespace common\service\jobs\kj_data;
 
 use backend\service\BetService;
-use backend\service\TzService;
 use common\service\jobs\CommonJob;
 
 class UserBetJob extends CommonJob {
@@ -19,7 +18,7 @@ class UserBetJob extends CommonJob {
     public static function handle($params){
         $user_id = $params['user_id'];
 
-        $rst['UserBetJob'] = BetService::lotteryBet($user_id);; # 开关的开启或关闭
+        $rst['UserBetJob'] = BetService::lotteryBet($user_id);; # 用户游戏任务
         return $rst;
     }
 
