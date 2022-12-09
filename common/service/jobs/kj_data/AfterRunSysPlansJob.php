@@ -7,7 +7,7 @@ use common\service\jobs\CommonJob;
 class AfterRunSysPlansJob extends CommonJob {
 
     public static function getName($params) {
-        self::$name = '下注计划处理完成之后的业务';
+        self::$name = '游戏业务开启';
         return self::$name;
     }
 
