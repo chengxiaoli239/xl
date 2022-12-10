@@ -108,12 +108,12 @@ class KjDataGet
             #KjDataGet::grabOneLotteryKjData($lottery_type);
             $mkey = 'grabKjDatas_'.$lottery_type;
             $flag = $m->get($mkey);
+            $cacheTime = strpos($lotteryData['typeGroupName'], '高频') ? 9 : 1800;
             if(!$flag){
                 push_queue(GrabKjDatasJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title']]);
-                $cacheTime = strpos($lotteryData['typeGroupName'], '高频') ? 9 : 1800;
                 $m->set($mkey, 1, $cacheTime);
             }else{
-                var_dump('缓存时间lottery_type:'.$lottery_type);
+                var_dump(date('Y-m-d H:i:s').' 缓存时间lottery_type:'.$lottery_type);
             }
 
         }
