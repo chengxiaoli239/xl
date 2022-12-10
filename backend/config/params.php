@@ -22,11 +22,6 @@ return [
 
     'TZ_LOCK_TIME' => 4 * 60 * 60,
 
-    # 导入号码投注类型
-    'IMPORT_CODES_TYPES' => [ 19,27,34 ],
-    'IMPORT_CODES_TURN' => 10, # 轮换10组
-
-
     # 导入方式使用快译
     'IMPORT_CODES_KUAIYI_UIDS' =>[], # aa22
 

@@ -18,6 +18,10 @@ return [
     # 聚合接口配置
     'JUHE_KEY' => '4cf9ceff85b685abb8cb04abf9bb76cd',
 
+    # 导入号码投注类型
+    'IMPORT_CODES_TYPES' => [ 19,27,34 ],
+    'IMPORT_CODES_TURN' => 10, # 轮换10组
+
     # 日志目录
     'LOG_PATH' => 'lottery_xl',
 
