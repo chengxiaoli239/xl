@@ -112,6 +112,8 @@ class KjDataGet
                 push_queue(GrabKjDatasJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title']]);
                 $cacheTime = strpos($lotteryData['typeGroupName'], '高频') ? 9 : 1800;
                 $m->set($mkey, 1, $cacheTime);
+            }else{
+                var_dump('缓存时间lottery_type:'.$lottery_type);
             }
 
         }
