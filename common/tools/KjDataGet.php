@@ -105,11 +105,10 @@ class KjDataGet
         $lottery_types = StaticService::getGrabDataLotteryTypes($lottery_types);
         foreach ($lottery_types as $lotteryData){
             $lottery_type = $lotteryData['lottery_type'];
-            push_queue(GrabKjDatasJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title']]);
             #KjDataGet::grabOneLotteryKjData($lottery_type);
-            $mkey = 'grabKjDatas_'.$lottery_type;
+            $mkey = 'grabKjDatas_x0_'.$lottery_type;
             $flag = $m->get($mkey);
-            $cacheTime = strpos($lotteryData['typeGroupName'], '高频') ? 9 : 1800;
+            $cacheTime = (strpos($lotteryData['typeGroupName'], '高频') !== false) ? 9 : 1800;
             Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'mkey'=>$mkey, 'cacheTime'=>$cacheTime, 'flag'=>$flag]);
             if(!$flag){
                 var_dump(date('Y-m-d H:i:s').' 开奖抓取入列lottery_type:'.$lottery_type);

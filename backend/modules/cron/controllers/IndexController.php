@@ -64,9 +64,9 @@ class IndexController extends Controller
     public function actionGrabKjDatas(){
         self::_init();
         $post = \Yii::$app->request->post();
-        for($i=0; $i<10; $i++){
+        for($i=0; $i<5; $i++){
             $rst['kj'] = KjDataGet::grabKjDatas($post['lottery_types']);
-            sleep(5);
+            sleep(10);
         }
 
         return $rst;
