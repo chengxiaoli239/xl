@@ -296,6 +296,8 @@ class IndexController extends Controller
     public function actionDw()
     {
         $lottery_type = 8;
+        $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);
+        p($rst);
         $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);
         $r = push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
         d($r);
@@ -967,8 +969,6 @@ class IndexController extends Controller
         }
         p(trim($codes, '@'));
         $rst = KjDataGet::getBeforeQihaoByQihao('20191112001', 8);
-        p($rst);
-        $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);
         p($rst);
         p(3 % 5);
         $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5);
