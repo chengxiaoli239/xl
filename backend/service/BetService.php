@@ -570,7 +570,9 @@ abstract class BetService extends BaseBetService {
             $qihao = JuHuaBaseService::getActiveQihao($uid, $tz_system_id, $lottery_type);
         }elseif($tz_system_id == 16){ # 宝岛众发
             $qihao = ZhongFaService::getActiveQihao($uid, $tz_system_id, $lottery_type);
-        }else{
+        }
+
+        if(empty($qihao)){
             $qihao = HN0898Service::getQihao($lottery_type);
         }
         $m->set($mkey, $qihao, 5);
