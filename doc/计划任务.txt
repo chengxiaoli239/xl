@@ -62,36 +62,21 @@ echo "--------------------------------------------------------------------------
 3、自动登录 每隔3分钟执行 -- 关闭
 脚本内容：curl http://www.lottery.com/cron/index/auto-login
 
-4、系统投注利润统计	每隔5分钟执行 -- 开启
-脚本内容：curl http://www.lottery.com/cron/index/op-static
+4、备份数据库[lottery_xl]  每隔2天, 4点30分 执行 -- 开启
 
-5、四定和值[天/月]利润统计 每隔30分钟执行 -- 开启
-脚本内容：curl http://www.lottery.com/cron/index/static-hz-profits
-
-6、四定单双[天/月]利润统计 每隔30分钟执行 -- 开启
-脚本内容：curl http://www.lottery.com/cron/index/static-sd-profits
-
-7、号码类型遗漏更新 每隔5分钟执行  -- 开启
-脚本内容：curl http://www.lottery.com/cron/index/update-code-type-yl
-
-8、配数对错 每隔1分钟执行 -- 关闭
-curl -H "Content-Type:application/json" -X POST --data '{"lottery_types": ["6"]}' http://www.lottery.com/cron/index/set-pei-shu-true-false
-
-9、备份数据库[lottery_xl]  每隔2天, 4点30分 执行 -- 开启
-
-10、每天自动清理games前x天记录 每天, 4点30分 执行 -- 开启
+5、每天自动清理games前x天记录 每天, 4点30分 执行 -- 开启
 curl http://www.lottery.com/cron/index/del-latest-records
 
-11、模拟历史下注 - 每隔1分钟执行 -- 关闭
+6、模拟历史下注 - 每隔1分钟执行 -- 关闭
 脚本内容：curl -H "Content-Type:application/json" -X POST --data '{"lottery_types": ["23"],"uid":11}'  http://www.lottery.com/cron/index/batch-simulate-bet
 
-12、续签Let's Encrypt证书  每天, 0点10分 执行 -- 开启
+7、续签Let's Encrypt证书  每天, 0点10分 执行 -- 开启
 /www/server/panel/pyenv/bin/python -u /www/server/panel/class/acme_v2.py --renew=1
 
-13、站点开奖  每隔5分钟执行 -- 关闭
+8、站点开奖  每隔5分钟执行 -- 关闭
 cd /www/wwwroot/qixing/kj && node data5-7b.js 
 
-14、开奖数据抓取 每隔1分钟执行  -- 开启
+9、开奖数据抓取 每隔1分钟执行  -- 开启
 curl http://www.lottery.com/cron/index/grab-kj-datas
 
 
