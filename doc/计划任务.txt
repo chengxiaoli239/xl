@@ -1,27 +1,97 @@
-服务器迁移：
-curl http://www.lottery.com/cron/index/op-kj  开奖数据处理   每1分钟
-curl http://www.lottery.com/cron/index/syn-balance	余额同步   每1分钟
-curl http://www.lottery.com/cron/index/auto-login	自动登录	每1分钟
-curl http://www.lottery.com/cron/index/update-null-codes	更新null-codes	每1分钟
-curl http://www.lottery.com/cron/index/grab-tz-hz-list   	和值投注记录抓取 	每2分钟   - 暂停
-curl http://www.lottery.com/cron/index/op-static	系统投注利润统计	每1分钟
-curl http://www.lottery.com/cron/index/static-hz-profits	四定和值[天/月]利润统计
-curl http://www.lottery.com/cron/index/static-sd-profits	四定单双[天/月]利润统计
-curl http://www.lottery.com/cron/index/update-code-type-yl	号码类型遗漏更新
+1、日常清理 每天凌晨四点  -  每天, 4点30分 执行  -- 开启
+脚本内容：
+#!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+ #!/bin/bash
+# 清空cron目录下大于60M的日志文件
+ for size in $(du -sh -b /www/server/cron/*.log | awk '{ print $1 }')
+ do
+    for file in $(du -sh -b /www/server/cron/*.log | grep ${size} |awk '{print $2}')
+    do
+          echo ${file} ${size}
+          if [ ${size} -gt 62914560 ];then # 大于60M文件	
+          echo ${file} ${size}
+          echo "" > ${file}
+          fi
+     done
+ done
 
-用户下注 -【id:11-gaozi2018】	curl -H "Content-Type:application/json" -X POST --data '{"uid": "11"}' http://www.lottery.com/cron/index/bet-by-uid
-用户下注 -【uid:1- admin】	curl -H "Content-Type:application/json" -X POST --data '{"uid": "1"}' http://www.lottery.com/cron/index/bet-by-uid
-用户下注 -【uid:16- 一路发888】	curl -H "Content-Type:application/json" -X POST --data '{"uid": "16"}' http://www.lottery.com/cron/index/bet-by-uid
-用户下注 -【uid:2 - gaozi2017】	curl -H "Content-Type:application/json" -X POST --data '{"uid": "2"}' http://www.lottery.com/cron/index/bet-by-uid	
-用户下注 -【uid:12 - aa22】- 小武哥	curl -H "Content-Type:application/json" -X POST --data '{"uid": "12"}' http://www.lottery.com/cron/index/bet-by-uid
+# 备份数据库保留前x天
+searchPath=/www/backup/database/lottery_xl
+cd ${searchPath}
 
+declare -i total=`ls lottery_xl_*.sql | wc -l`
+declare -i nums=$total-7
 
-开奖号码抓取 - 新疆【lottery_type:6】	curl -H "Content-Type:application/json" -X POST --data '{"lottery_types": ["6"]}' http://www.lottery.com/cron/index/grab-kj-data-one
-开奖号码抓取 - 七星彩【lottery_type:1】		curl -H "Content-Type:application/json" -X POST --data '{"lottery_types": ["1"]}' http://www.lottery.com/cron/index/grab-kj-data-one  10分钟
-开奖号码抓取 - 冰岛90s【lottery_type:10】	curl -H "Content-Type:application/json" -X POST --data '{"lottery_types": ["10"]}' http://www.lottery.com/cron/index/grab-kj-data-one
-开奖号码抓取 - 冰岛3m【lottery_type:11】	curl -H "Content-Type:application/json" -X POST --data '{"lottery_types": ["11"]}' http://www.lottery.com/cron/index/grab-kj-data-one
-开奖号码抓取 - 冰岛5m【lottery_type:12】	curl -H "Content-Type:application/json" -X POST --data '{"lottery_types": ["12"]}' http://www.lottery.com/cron/index/grab-kj-data-one
-开奖号码抓取 - 冰岛10m【lottery_type:13】	curl -H "Content-Type:application/json" -X POST --data '{"lottery_types": ["13"]}' http://www.lottery.com/cron/index/grab-kj-data-one
-开奖号码抓取 - 台湾冰果【lottery_type:9】	curl -H "Content-Type:application/json" -X POST --data '{"lottery_types": ["9"]}' http://www.lottery.com/cron/index/grab-kj-data-one
-开奖号码抓取 - 台湾欢乐生肖【lottery_type:15】	curl -H "Content-Type:application/json" -X POST --data '{"lottery_types": ["15"]}' http://www.lottery.com/cron/index/grab-kj-data-one
+if [ "${nums}" -ge 1 ];then
+    rm -rf `ls -tr lottery_xl_*.sql | head -${nums}`
+fi
+
+# 清除mysql log日志，保留2个bin日志文件
+searchPath=/www/server/data
+cd ${searchPath}
+
+declare -i total=`ls mysql-bin.0* | wc -l`
+declare -i nums=$total-2
+
+if [ "${nums}" -ge 1 ];then
+    ls -tr mysql-bin.0* | head -${nums}
+    #rm -rf `ls -tr mysql-bin.0* | head -${nums}`
+fi
+
+# 删除日志目录，保留5天
+searchPath=/www/log/lottery_xl
+cd ${searchPath}
+
+declare -i total=`ls | wc -l`
+declare -i nums=$total-5
+
+if [ "${nums}" -ge 1 ];then
+    rm -rf `ls | head -${nums}`
+fi
+
+echo "----------------------------------------------------------------------------"
+endDate=`date +"%Y-%m-%d %H:%M:%S"`
+echo "★[$endDate] Successful"
+echo "----------------------------------------------------------------------------"
+
+2、余额同步 每隔5分钟执行 -- 关闭
+脚本内容：curl http://www.lottery.com/cron/index/syn-balance
+
+3、自动登录 每隔3分钟执行 -- 关闭
+脚本内容：curl http://www.lottery.com/cron/index/auto-login
+
+4、系统投注利润统计	每隔5分钟执行 -- 开启
+脚本内容：curl http://www.lottery.com/cron/index/op-static
+
+5、四定和值[天/月]利润统计 每隔30分钟执行 -- 开启
+脚本内容：curl http://www.lottery.com/cron/index/static-hz-profits
+
+6、四定单双[天/月]利润统计 每隔30分钟执行 -- 开启
+脚本内容：curl http://www.lottery.com/cron/index/static-sd-profits
+
+7、号码类型遗漏更新 每隔5分钟执行  -- 开启
+脚本内容：curl http://www.lottery.com/cron/index/update-code-type-yl
+
+8、配数对错 每隔1分钟执行 -- 关闭
+curl -H "Content-Type:application/json" -X POST --data '{"lottery_types": ["6"]}' http://www.lottery.com/cron/index/set-pei-shu-true-false
+
+9、备份数据库[lottery_xl]  每隔2天, 4点30分 执行 -- 开启
+
+10、每天自动清理games前x天记录 每天, 4点30分 执行 -- 开启
+curl http://www.lottery.com/cron/index/del-latest-records
+
+11、模拟历史下注 - 每隔1分钟执行 -- 关闭
+脚本内容：curl -H "Content-Type:application/json" -X POST --data '{"lottery_types": ["23"],"uid":11}'  http://www.lottery.com/cron/index/batch-simulate-bet
+
+12、续签Let's Encrypt证书  每天, 0点10分 执行 -- 开启
+/www/server/panel/pyenv/bin/python -u /www/server/panel/class/acme_v2.py --renew=1
+
+13、站点开奖  每隔5分钟执行 -- 关闭
+cd /www/wwwroot/qixing/kj && node data5-7b.js 
+
+14、开奖数据抓取 每隔1分钟执行  -- 开启
+curl http://www.lottery.com/cron/index/grab-kj-datas
+
 

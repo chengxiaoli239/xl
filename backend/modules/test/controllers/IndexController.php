@@ -295,6 +295,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $miss = SscDataService::staticPeiShuDate($lottery_type = 17);
+        p($miss);
         $rst['kj'] = KjDataGet::grabKjDatas();
         p($rst);
         $lottery_type = 8;
@@ -603,8 +605,6 @@ class IndexController extends Controller
         $rst = WxService::syncCheckTask($uid = 18);
         p($rst);
         $miss = SscDataService::staticPeiShuDateProfits($lottery_type = 8, '2021-01-28');
-        p($miss);
-        $miss = SscDataService::staticPeiShuDate($lottery_type = 8);
         p($miss);
         $codes_hz = ['ps_1' => 147, 'ps_2' => 369];
         $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type = 4);

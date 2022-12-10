@@ -1647,14 +1647,13 @@ class StaticService extends BaseService {
      */
     public static function getStartAndEndDate($start_date = '2019-03-01', $end_date = '2019-03-30'){
          $dateArr = [$start_date];
-        for ($i=1; $i<=100; $i++){
+        for ($i=1; $i<=1000; $i++){
             $d = date('Y-m-d', strtotime($start_date)+$i*86400);
             $dateArr[] = $d;
             if($d>=$end_date) break;
         }
 
         return $dateArr;
-
     }
 
     /**
@@ -2256,8 +2255,10 @@ class StaticService extends BaseService {
     /**
      * @desc 处理统计数据
      */
-   public static function opAllStaticProfits(){
-       $lottery_types = self::getLotteryTypes();
+   public static function opAllStaticProfits($lottery_types=[]){
+       if(empty($lottery_types)){
+           $lottery_types = self::getLotteryTypes();
+       }
        foreach ($lottery_types as $lottery_type){
            if($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllStaticProfits')){
                #$rst['opStaticProfits'] = StaticService::opStaticProfits($lottery_type); # 暂停统计利润

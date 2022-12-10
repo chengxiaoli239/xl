@@ -19,6 +19,10 @@ use backend\service\TzService;
 use common\kj\cqssc\CqsscKcw;
 use common\service\CommonService;
 use common\service\jobs\kj_data\GrabKjDatasJob;
+use common\service\jobs\kj_data\PeiShuProfitsJob;
+use common\service\jobs\kj_data\StaticAll2NumsYlJob;
+use common\service\jobs\kj_data\StaticHzProfitsJob;
+use common\service\jobs\kj_data\StaticSdProfitsJob;
 use common\service\ssc\QihaoService;
 use backend\service\CurlService;
 use backend\service\HN0898Service;
@@ -261,6 +265,12 @@ class KjDataGet
             #$rst['TzService'] = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
             $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);
             push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
+
+            # 数据统计
+            push_queue(PeiShuProfitsJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name]);
+            push_queue(StaticAll2NumsYlJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name]);
+            push_queue(StaticHzProfitsJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name]);
+            push_queue(StaticSdProfitsJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name]);
         }
         //StaticService::opStaticProfits(); # 投注利润统计
         //SscDataService::updateDsData(); // 更新单双
