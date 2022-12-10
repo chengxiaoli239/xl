@@ -2350,18 +2350,31 @@ class StaticService extends BaseService {
     }
 
     /**
-     * @desc 需要抓取开奖号码的彩种
-     * @return array
+     * 开奖彩种缓存key
+     * @param array $where
+     * @return string
      */
-    public static function getGrabDataLotteryTypes($lottery_types=[]){
+    public static function buildGrabDataLotteryTypesKey($where=[]){
+        $mkey = 'buildGrabDataLotteryTypesKey'.yii\helpers\Json::encode($where, 320);
+
+        return $mkey;
+    }
+
+    /**
+     * @desc 需要抓取开奖号码的彩种
+     * @param array $lottery_types
+     * @param int $useCache
+     * @return array|LotteryType[]|mixed
+     */
+    public static function getGrabDataLotteryTypes($lottery_types=[], $useCache=1){
         $where = ['grabDataStatus'=>1];
         if(!empty($lottery_types)){
             $where['lottery_type'] = $lottery_types;
         }
         $m = \Yii::$app->cache;
-        $mkey = 'getGrabDataLotteryTypes'.yii\helpers\Json::encode($where, 320);
+        $mkey = self::buildGrabDataLotteryTypesKey($where);
         $lotteryTypeDatas = $m->get($mkey);
-        if(empty($lotteryTypeDatas)){
+        if(empty($lotteryTypeDatas) OR !$useCache){
             $lotteryTypeDatas = LotteryType::find()->where($where)->asArray()->all();
             $m->set($mkey, $lotteryTypeDatas, 1800);
         }

@@ -4,6 +4,7 @@ namespace backend\modules\forum\controllers;
 
 use backend\service\HN0898Service;
 use backend\service\SscDataService;
+use backend\service\StaticService;
 use backend\service\SystemService;
 use Yii;
 use backend\models\LotteryType;
@@ -71,6 +72,7 @@ class LotteryTypeController extends BaseController
         $field = $get['field'];
         $val = $get['val'];
         $rst = HN0898Service::updateStatus($id, '\backend\models\LotteryType', $field, $val);
+        StaticService::getGrabDataLotteryTypes($lottery_types=[], $useCache=0);
 
         return $this->redirect(['index']);
     }
