@@ -2358,7 +2358,13 @@ class StaticService extends BaseService {
         if(!empty($lottery_types)){
             $where['lottery_type'] = $lottery_types;
         }
-        $lotteryTypeDatas = LotteryType::find()->where($where)->asArray()->all();
+        $m = \Yii::$app->cache;
+        $mkey = 'getGrabDataLotteryTypes'.yii\helpers\Json::encode($where, 320);
+        $lotteryTypeDatas = $m->get($mkey);
+        if(empty($lotteryTypeDatas)){
+            $lotteryTypeDatas = LotteryType::find()->where($where)->asArray()->all();
+            $m->set($mkey, $lotteryTypeDatas, 1800);
+        }
 
         return $lotteryTypeDatas;
     }

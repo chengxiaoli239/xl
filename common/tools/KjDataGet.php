@@ -110,6 +110,7 @@ class KjDataGet
             $flag = $m->get($mkey);
             $cacheTime = strpos($lotteryData['typeGroupName'], '高频') ? 9 : 1800;
             if(!$flag){
+                var_dump(date('Y-m-d H:i:s').' 开奖抓取入列lottery_type:'.$lottery_type);
                 push_queue(GrabKjDatasJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title']]);
                 $m->set($mkey, 1, $cacheTime);
             }else{
