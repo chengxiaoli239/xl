@@ -57,8 +57,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'enable','label'=>'开启状态','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                $url0 = "/forum/lottery-type/switch-status?id=".$model->id.'&enable=1'; # 点击开启
-                                $url1 = "/forum/lottery-type/switch-status?id=".$model->id.'&enable=0'; # 点击关闭
+                                $url0 = "/forum/lottery-type/switch-status?id=".$model->id.'&val=1&field=enable'; # 点击开启
+                                $url1 = "/forum/lottery-type/switch-status?id=".$model->id.'&val=0&field=enable'; # 点击关闭
                                 if($model->enable == 1){
                                     $txt = "<font color='green'>已开启</font>" ;
                                     return Html::a($txt, $url1, ['title' => '点击关闭']);
@@ -70,6 +70,23 @@ $this->params['breadcrumbs'][] = $this->title;
                                 //return \backend\service\Config_Base::dropDown('enable', $model->enable);
                             },
                             'filter' => \backend\service\Config_Base::dropDown('enable'),
+                        ],
+                        ['attribute' => 'grabDataStatus','label'=>'号码抓取','headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $url0 = "/forum/lottery-type/switch-status?id=".$model->id.'&val=1&field=grabDataStatus'; # 点击开启
+                                $url1 = "/forum/lottery-type/switch-status?id=".$model->id.'&val=0&field=grabDataStatus'; # 点击关闭
+                                if($model->grabDataStatus == 1){
+                                    $txt = "<font color='green'>已开启</font>" ;
+                                    return Html::a($txt, $url1, ['title' => '点击关闭']);
+                                }
+                                if(!$model->grabDataStatus){
+                                    $txt = "<font color='red'>已关闭</font>";
+                                    return Html::a($txt, $url0, ['title' => '点击开启']);
+                                }
+                                //return \backend\service\Config_Base::dropDown('enable', $model->enable);
+                            },
+                            'filter' => \backend\service\Config_Base::dropDown('grabDataStatus'),
                         ],
                         //'isDelete',
                         //'name',

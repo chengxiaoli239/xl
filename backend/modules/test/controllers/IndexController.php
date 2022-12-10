@@ -295,6 +295,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst['kj'] = KjDataGet::grabKjDatas();
+        p($rst);
         $lottery_type = 8;
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);
         p($rst);

@@ -580,10 +580,14 @@ class HN0898Service extends BaseTZService {
      * @param $account
      * @return array
      */
-    public static function updateStatus($id, $model = 'UserSysPlans', $field = 'status'){
+    public static function updateStatus($id, $model='UserSysPlans', $field='status', $val=null){
         try {
             $M = $model::findOne($id);
-            $M->$field = $M->$field ? 0 : 1;
+            if($val !== null){
+                $M->$field = (int)$val;
+            }else{
+                $M->$field = $M->$field ? 0 : 1;
+            }
 
             $rst = $M->save(false);
             if(!$rst){

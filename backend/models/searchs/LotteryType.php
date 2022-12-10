@@ -18,7 +18,7 @@ class LotteryType extends LotteryTypeModel
     public function rules()
     {
         return [
-            [['id', 'lottery_type', 'enable', 'isDelete', 'sort', 'data_ftime', 'defaultViewGroup', 'android', 'num'], 'integer'],
+            [['id', 'lottery_type', 'enable', 'grabDataStatus', 'isDelete', 'sort', 'data_ftime', 'defaultViewGroup', 'android', 'num'], 'integer'],
             [['name', 'codeList', 'title', 'shortName', 'info', 'onGetNoed', 'typeGroupName'], 'safe'],
         ];
     }
@@ -63,6 +63,7 @@ class LotteryType extends LotteryTypeModel
             'id' => $this->id,
             'lottery_type' => $this->lottery_type,
             'enable' => $this->enable,
+            'grabDataStatus' => $this->grabDataStatus,
             'isDelete' => $this->isDelete,
             'sort' => $this->sort,
             'data_ftime' => $this->data_ftime,

@@ -9,6 +9,7 @@
 
 namespace backend\service;
 use backend\models\BettingRecords;
+use backend\models\LotteryType;
 use backend\models\Num4Type;
 use backend\models\Ssc2numsVal;
 use backend\models\Ssc2numsYl;
@@ -2347,6 +2348,21 @@ class StaticService extends BaseService {
 
         return $lottery_typesArr;
     }
+
+    /**
+     * @desc 需要抓取开奖号码的彩种
+     * @return array
+     */
+    public static function getGrabDataLotteryTypes($lottery_types=[]){
+        $where = ['grabDataStatus'=>1];
+        if(!empty($lottery_types)){
+            $where['lottery_type'] = $lottery_types;
+        }
+        $lotteryTypeDatas = LotteryType::find()->where($where)->asArray()->all();
+
+        return $lotteryTypeDatas;
+    }
+
 
     /**
      * @desc 需要处理的猜中

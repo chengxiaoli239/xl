@@ -67,7 +67,10 @@ class LotteryTypeController extends BaseController
      */
     public function actionSwitchStatus($id){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $rst = HN0898Service::updateStatus($id, '\backend\models\LotteryType', $field = 'enable');
+        $get = \Yii::$app->request->get();
+        $field = $get['field'];
+        $val = $get['val'];
+        $rst = HN0898Service::updateStatus($id, '\backend\models\LotteryType', $field, $val);
 
         return $this->redirect(['index']);
     }

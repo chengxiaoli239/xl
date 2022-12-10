@@ -18,6 +18,7 @@ use backend\service\SscDataService;
 use backend\service\TzService;
 use common\kj\cqssc\CqsscKcw;
 use common\service\CommonService;
+use common\service\jobs\kj_data\GrabKjDatasJob;
 use common\service\ssc\QihaoService;
 use backend\service\CurlService;
 use backend\service\HN0898Service;
@@ -100,9 +101,19 @@ class KjDataGet
     public static function grabKjDatas($lottery_types = []){
         $msg = ['status'=>200, 'msg'=>'操作成功~'];
 
-        if(empty($lottery_types)) $lottery_types = StaticService::getLotteryTypes();
-        foreach ($lottery_types as $lottery_type){
-            KjDataGet::grabOneLotteryKjData($lottery_type);
+        $m = \Yii::$app->cache;
+        $lottery_types = StaticService::getGrabDataLotteryTypes($lottery_types);
+        foreach ($lottery_types as $lotteryData){
+            $lottery_type = $lotteryData['lottery_type'];
+            #KjDataGet::grabOneLotteryKjData($lottery_type);
+            $mkey = 'grabKjDatas_'.$lottery_type;
+            $flag = $m->get($mkey);
+            if(!$flag){
+                push_queue(GrabKjDatasJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title']]);
+                $cacheTime = strpos($lotteryData['typeGroupName'], '高频') ? 9 : 1800;
+                $m->set($mkey, 1, $cacheTime);
+            }
+
         }
 
         return $msg;
@@ -173,6 +184,7 @@ class KjDataGet
         KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
         /* 处理系统投注计划 add 2019-01-21 */
 
+        return '处理完成';
     }
 
     /**

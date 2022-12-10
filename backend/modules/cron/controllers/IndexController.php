@@ -61,7 +61,7 @@ class IndexController extends Controller
      * @desc 时时彩：逐期获取开奖数据
      * @return array
      */
-    public function actionGrabKjDataOne(){
+    public function actionGrabKjDatas(){
         self::_init();
         $post = \Yii::$app->request->post();
         if($post['lottery_types'][0] == 10){

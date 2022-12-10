@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property int $enable
+ * @property int $grabDataStatus 抓取号码开关
  * @property int $isDelete
  * @property int $sort
  * @property string $name
@@ -43,7 +44,7 @@ class LotteryType extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['lottery_type', 'enable', 'isDelete', 'sort', 'data_ftime', 'defaultViewGroup', 'android', 'num', 'updated_at', 'created_at'], 'integer'],
+            [['lottery_type', 'enable', 'grabDataStatus', 'isDelete', 'sort', 'data_ftime', 'defaultViewGroup', 'android', 'num', 'updated_at', 'created_at'], 'integer'],
             [['name', 'title', 'info', 'num'], 'required'],
             [['update_time'], 'safe'],
             [['name'], 'string', 'max' => 32],
@@ -64,6 +65,7 @@ class LotteryType extends \common\models\base\BaseModel
             'id' => Yii::t('app', 'ID'),
             'lottery_type' => Yii::t('app', '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc'),
             'enable' => Yii::t('app', 'Enable'),
+            'grabDataStatus' => Yii::t('app', '号码抓取'),
             'isDelete' => Yii::t('app', 'Is Delete'),
             'sort' => Yii::t('app', 'Sort'),
             'name' => Yii::t('app', 'Name'),
