@@ -4251,7 +4251,7 @@ class SscDataService extends BaseService {
      * @param int $lottery_type
      * @return array
      */
-    public static function staticPerShuTrueFalse($lottery_types = []){
+    public static function staticPeiShuTrueFalse($lottery_types = []){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
 
         $lottery_types = empty($lottery_types) ? StaticService::getLotteryTypes() : $lottery_types;
@@ -4314,7 +4314,7 @@ class SscDataService extends BaseService {
         }
         $row->setAttributes($setDatas);
         if(!$flag = $row->save()){
-            p(['msg'=>$row->getErrors()]);
+            return['msg'=>$row->getErrors()];
         }
 
         return ['qihao'=>$qihao, 'flag'=>$flag];

@@ -22,6 +22,7 @@ use common\service\jobs\kj_data\GrabKjDatasJob;
 use common\service\jobs\kj_data\PeiShuProfitsJob;
 use common\service\jobs\kj_data\StaticAll2NumsYlJob;
 use common\service\jobs\kj_data\StaticHzProfitsJob;
+use common\service\jobs\kj_data\StaticPeiShuTrueFalseJob;
 use common\service\jobs\kj_data\StaticSdProfitsJob;
 use common\service\jobs\kj_data\UpdateCodeTypeYlJob;
 use common\service\ssc\QihaoService;
@@ -271,8 +272,10 @@ class KjDataGet
             push_queue(PeiShuProfitsJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name]);
             push_queue(StaticAll2NumsYlJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>15]);
             push_queue(StaticHzProfitsJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>30]);
+            push_queue(StaticPeiShuTrueFalseJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>40]);
             push_queue(StaticSdProfitsJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>45]);
             push_queue(UpdateCodeTypeYlJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>60]);
+
         }
         //StaticService::opStaticProfits(); # 投注利润统计
         //SscDataService::updateDsData(); // 更新单双

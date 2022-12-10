@@ -8,7 +8,7 @@ use common\service\jobs\CommonJob;
 class StaticSdProfitsJob extends CommonJob {
 
     public static function getName($params) {
-        self::$name = '23四定单双利润';
+        self::$name = '25四定单双利润';
         return self::$name;
     }
 

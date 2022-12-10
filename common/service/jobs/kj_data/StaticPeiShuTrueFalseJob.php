@@ -1,13 +1,13 @@
 <?php
 namespace common\service\jobs\kj_data;
 
-use backend\service\StaticService;
+use backend\service\SscDataService;
 use common\service\jobs\CommonJob;
 
-class UpdateCodeTypeYlJob extends CommonJob {
+class StaticPeiShuTrueFalseJob extends CommonJob {
 
     public static function getName($params) {
-        self::$name = '26号码类型遗漏';
+        self::$name = '24设置配数对错';
         return self::$name;
     }
 
@@ -18,7 +18,7 @@ class UpdateCodeTypeYlJob extends CommonJob {
     public static function handle($params){
         $lottery_type = $params['lottery_type'];
 
-        $rst = StaticService::opAllCodeTypeYl([$lottery_type]);
+        $rst = SscDataService::staticPeiShuTrueFalse([$lottery_type]);
         return $rst;
     }
 

@@ -89,20 +89,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 号码类型遗漏更新
-     * @return array|mixed
-     */
-    public function actionUpdateCodeTypeYl(){
-        self::_init();
-        if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
-
-        $post = \Yii::$app->request->post();
-        $rst = StaticService::opAllCodeTypeYl($post['lottery_types']);
-
-        return $rst;
-    }
-
-    /**
      * @desc 四定单双利润统计
      * @return array
      */
@@ -319,18 +305,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 多线程跑用户计划
-     * @return mixed
-     */
-    public static function actionReBetErrorPlans(){
-        self::_init();
-
-        $rst = BetErrorPlansTaskService::reBetErrorPlans();
-
-        return $rst;
-    }
-
-    /**
      * @description 同步余额
      * @return array
      * @throws - NotFoundHttpException
@@ -401,21 +375,9 @@ class IndexController extends Controller
         self::_init();
         $post = \Yii::$app->request->post();
         for ($i=0;$i<10;$i++){
-            $rst = SscDataService::staticPerShuTrueFalse($post['lottery_types']);
+            $rst = SscDataService::staticPeiShuTrueFalse($post['lottery_types']);
             sleep(5);
         }
-
-        return $rst;
-    }
-
-    /**
-     * @desc 配数利润统计
-     * @return array
-     */
-    public function actionCronStaticPeiShuProfits(){
-        self::_init();
-        $post = \Yii::$app->request->post();
-        $rst = SscDataService::cronStaticPeiShuProfits($post['lottery_type']);
 
         return $rst;
     }

@@ -610,8 +610,6 @@ class IndexController extends Controller
         $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type = 4);
         p($codes);
 
-        $miss = SscDataService::staticPerShuTrueFalse($lottery_type = [6]);
-        p($miss);
         $rst = StaticService::getCreatePeiShuCodeTypeSql($type = 1);
         p($rst);
         $rst = StaticService::getCreatePeiShuTrueFalseSql();
