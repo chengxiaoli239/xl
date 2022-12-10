@@ -295,7 +295,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $miss = SscDataService::staticPeiShuDate($lottery_type = 17);
+        $miss = SscDataService::staticPeiShuDate($lottery_type = 8);
         p($miss);
         $rst['kj'] = KjDataGet::grabKjDatas();
         p($rst);
@@ -695,8 +695,6 @@ class IndexController extends Controller
             $rst['updateDs'] = SscDataService::updateDsData($lottery_type = 6); // 每期开奖遗漏 -- 新开
         }
         p($rst);
-        $rst = StaticService::opAllCodeTypeYl([1]);
-        p($rst);
         $data = QxcTcw::getTcwOne();
         p($data);
         $rst = KjDataGet::insertKjData('2020124', 1, '4,1,0,9,5,2,11', '2020-12-08 20:00:00');
@@ -961,8 +959,6 @@ class IndexController extends Controller
         p($rst);
         $num = ['1122', '1212', '1221', '2112', '2121', '2211'];
 
-        $rst = StaticService::opAllCodeTypeYl();
-        p($rst);
         $codes = '';
         for ($i = 0; $i < 10; $i++) {
             for ($x = 0; $x < 10; $x++) {
