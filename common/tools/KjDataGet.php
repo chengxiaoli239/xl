@@ -271,6 +271,15 @@ class KjDataGet
     public static function insertKjData($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE, $kjData='', $opentime = ''){
         $kjDatas = str_replace(',', '', $kjData);
         if(!$qihao OR !$kjDatas) return false;
+        if(!$kjDatas) return false;
+        $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
+        if(!empty($SscKjData)){
+            return ['status'=>301, 'msg'=>'开奖号码存在'];
+        }
+        $SscKjData = new SscKjData();
+        $lastIndexId = SscDataService::getKjDataLastIndexId($lottery_type);
+        $index_id = $lastIndexId + 1;
+
         $kjDatasArr = explode(',',$kjData);
         $codes_4nums = $kjDatasArr; unset($codes_4nums[4],$codes_4nums[5],$codes_4nums[6]); # 四定和值只取前四个号码
 
@@ -290,6 +299,7 @@ class KjDataGet
         sort($codesArr);
         $code_3n = CommonService::get3n($codesArr);
         $insertData = [
+            'index_id' => $index_id,
             'kj_code' => $kjDatas,
             'qihao' => (string)$qihao,
             'code_str' => $kjData,
@@ -330,14 +340,6 @@ class KjDataGet
         }
 
         SscDataService::getAriseCodes([implode('', $codesArr)]); # 缓存开奖号码四定组合
-
-        if(!$kjDatas) return false;
-        if (!$SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type])) {
-            $SscKjData = new SscKjData();
-            $lastIndexId = SscDataService::getKjDataLastIndexId($lottery_type);
-            $index_id = $lastIndexId + 1;
-            $insertData = array_merge($insertData, ['index_id'=>$index_id]);
-        }
 
         $SscKjData->setAttributes($insertData);
         if (!$insertRst = $SscKjData->save()) {
