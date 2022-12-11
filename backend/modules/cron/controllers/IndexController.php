@@ -403,7 +403,7 @@ class IndexController extends Controller
     public function actionDelLatestRecords(){
         self::_init();
         $post = \Yii::$app->request->post();
-        $rst = DatasClearService::clearBettingRecords($post);
+        $rst = DatasClearService::deleteLatestRecords($post);
 
         return $rst;
     }

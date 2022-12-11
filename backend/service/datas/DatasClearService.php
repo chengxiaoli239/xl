@@ -7,7 +7,18 @@ use common\tools\Tool_Common;
 
 class DatasClearService extends BaseService{
 
-    public static function clearBettingRecords($post=[]){
+    /**
+     * @param array $params
+     * @return array
+     */
+    public static function deleteLatestRecords($params=[]){
+        self::clearBettingRecords($params);
+        self::clearQueueJobRecords();
+
+        return ['status'=>200, 'msg'=>'操作成功'];
+    }
+
+    public static function clearBettingRecords($params=[]){
         $lottery_types = UserSysPlansService::getMyLotteryTypes($uid=1);
         $db = \Yii::$app->db;
         $lottery_types = [['lottery_type'=>8]];
@@ -20,17 +31,20 @@ class DatasClearService extends BaseService{
                 for ($i=0; $i<$date_nums; $i++){
                     $dates[] = date('Y-m-d', time()-$i*86400);
                 }
+
+                # 游戏记录
                 $count_sql = 'SELECT COUNT(id) FROM {{%betting_records}} WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
                 $rst_count = $db->createCommand($count_sql)->queryScalar();
                 $delete_sql = 'DELETE FROM {{%betting_records}} WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
                 $rst_delete = $db->createCommand($delete_sql)->execute();
 
+                # 真实下注任务记录
                 $task_count_sql = 'SELECT COUNT(id) FROM {{%bet_error_plans_task}} WHERE updated_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
                 $rst_task_count = $db->createCommand($task_count_sql)->queryScalar();
                 $task_delete_sql = 'DELETE FROM {{%bet_error_plans_task}} WHERE updated_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
                 $rst_task_delete = $db->createCommand($task_delete_sql)->execute();
 
-
+                # 状态处理记录
                 $deal_status_delete_sql = 'DELETE FROM {{%data_deal_status}} WHERE update_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
                 $deal_status_delete = $db->createCommand($deal_status_delete_sql)->execute();
 
@@ -45,6 +59,34 @@ class DatasClearService extends BaseService{
         return true;
     }
 
+    /**
+     * 消息队列任务清理
+     * @return bool|string
+     */
+    public static function clearQueueJobRecords(){
+
+        try {
+            $db = \Yii::$app->db;
+
+            $date_nums = DatasClearService::getClearBeforeXDate();
+            $dates = [];
+            for ($i=0; $i<$date_nums; $i++){
+                $dates[] = date('Y-m-d', time()-$i*86400);
+            }
+
+            # 消息队列记录
+            $count_sql = 'SELECT COUNT(id) FROM {{%queue_log}} WHERE create_time NOT REGEXP "'.implode('|', $dates).'"';
+            $rst_count = $db->createCommand($count_sql)->queryScalar();
+            $delete_sql = 'DELETE FROM {{%queue_log}} WHERE create_time NOT REGEXP "'.implode('|', $dates).'"';
+            $rst_delete = $db->createCommand($delete_sql)->execute();
+            $logArr = ['rst_count'=>$rst_count, 'rst_delete'=>$rst_delete];
+            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '清理数据', $logArr);
+        }catch (\Exception $e){
+            return $e->getMessage();
+        }
+
+        return true;
+    }
 
     /**
      * @desc 保留最近几天的下注记录
