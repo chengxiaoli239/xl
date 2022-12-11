@@ -946,7 +946,7 @@ class SscDataService extends BaseService {
         $SscStaticVals = self::getSscStaticVal($type, $zjCodeSets);
         # 1、不中奖号码遗漏更新
         $whereNoZj = ['AND', ['=', 'lottery_type', $lottery_type], ['NOT IN', 'val', $zjCodeSets], ['=', 'type', $type]];
-        SscStaticYl::updateAll(['current_miss'=>new Expression('`now_money`+1')], $whereNoZj);
+        SscStaticYl::updateAll(['current_miss'=>new Expression('`current_miss`+1')], $whereNoZj);
 
         # 2、中奖号码遗漏更新
         foreach ($SscStaticVals as $dsData){
