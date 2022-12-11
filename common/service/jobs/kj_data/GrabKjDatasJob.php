@@ -17,8 +17,9 @@ class GrabKjDatasJob extends CommonJob {
 
     public static function handle($params){
         $lottery_type = $params['lottery_type'];
+        $is_grab_history = $params['is_grab_history'] ?? 0;
 
-        $rst = KjDataGet::grabOneLotteryKjData($lottery_type);
+        $rst = KjDataGet::grabOneLotteryKjData($lottery_type, $is_grab_history);
         return $rst;
     }
 

@@ -134,8 +134,10 @@ class KjDataGet
     /**
      * 单个彩种号码抓取
      * @param int $lottery_type
+     * @param int $is_grab_history
+     * @return string
      */
-    public static function grabOneLotteryKjData($lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function grabOneLotteryKjData($lottery_type=DEFAULT_LOTTERY_TYPE, $is_grab_history=0){
         $m = \Yii::$app->cache;
         $RedisLock = new RedisLock();
         $KjConfigs = KjConfig::findAll(['enable'=>1, 'lottery_type'=>$lottery_type]);
@@ -204,9 +206,11 @@ class KjDataGet
                 Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '短时间内操作', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
             }
         }
-        /* 处理系统投注计划 add 2019-01-21 */
-        KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
-        /* 处理系统投注计划 add 2019-01-21 */
+        if(!$is_grab_history){
+            /* 处理系统投注计划 add 2019-01-21 */
+            KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
+            /* 处理系统投注计划 add 2019-01-21 */
+        }
 
         return '处理完成';
     }

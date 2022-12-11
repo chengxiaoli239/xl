@@ -394,7 +394,6 @@ class IndexController extends Controller
         $codes_hz_data = json_decode($codes_hz);
         $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);p($codes);
 
-        $rst = KjDataGet::insertKjData('220410352', 23, '0,0,0,0,0');p($rst);
         p(array_keys(SscDataService::$dealDataStatusFields));
         $r = SscDataService::insertLotteryDealDataStatus($lottery_type=17);p($r);
         $r = SscDataService::insertDealDataTask($lottery_type=23);p($r);
@@ -695,8 +694,6 @@ class IndexController extends Controller
         p($rst);
         $data = QxcTcw::getTcwOne();
         p($data);
-        $rst = KjDataGet::insertKjData('2020124', 1, '4,1,0,9,5,2,11', '2020-12-08 20:00:00');
-        p($rst);
 
         $data = XjSsc::cg($type = 'json', $is_auto = 0);
         p($data);
@@ -743,8 +740,6 @@ class IndexController extends Controller
         p($rst);
         $qihao = HN0898Service::getCurrentQihao($lottery_type = 9);
         p($qihao);
-        $rst = KjDataGet::insertKjData('109060291', 9, '9,6,0,1,0');
-        p($rst);
         $data = CqsscKcw::getLotteryKuaiLe8Eight();
         p($data);
         $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 6);
@@ -890,10 +885,6 @@ class IndexController extends Controller
         p($loginRst);
         $rst = NumService::getCodesArise(['0144']);
         p($rst);
-        $rst = KjDataGet::insertKjData('200325017', 5, '0,7,8,0,7');//p($rst);
-        $rst = KjDataGet::insertKjData('200325018', 5, '0,9,0,0,5');//p($rst);
-        $rst = KjDataGet::insertKjData('200325019', 5, '1,7,6,2,8');
-        p($rst);
         $rst = SevenService::userInfo(18, 3);
         p($rst);
         $rst = SevenService::getSn(18, 3);
@@ -1032,8 +1023,6 @@ class IndexController extends Controller
         p($codesArr);
         $rst = SscDataService::calulateBeforeProfits();
         p($rst); # 统计前面多少期号码的中奖利润
-        $msg = KjDataGet::insertKjData('2019092548', $lottery_type = 6, $kjData = '3,9,9,7,1');
-        p($msg);
         $rst[] = StaticService::static4dPerDateProfits($lottery_type = 5);
         p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst = StaticService::staticSDPerDateProfits(date('Y-m-d'));
@@ -1054,7 +1043,6 @@ class IndexController extends Controller
         p($rst);
         $rst = StaticService::staticAll2NumsYl();
         p($rst); # 统计所有二字现遗漏
-        //$rst = KjDataGet::insertKjData('', $kjConfig->lottery_type, $dataInfo['opencode']);
         $rst = BetService::bet();
         p($rst);// 用户新计划投注，可正买可反买
         $data = XjSsc::batchSevenDay();
@@ -1079,10 +1067,6 @@ class IndexController extends Controller
         $kjDatas = XjSsc::getLotteryNoBatch();
         $kjDatas = array_reverse($kjDatas);
         p($kjDatas, 0);
-        foreach ($kjDatas as $key => $dataInfo) {
-            $rst = KjDataGet::insertKjData($dataInfo['expect'], 6, $dataInfo['opencode']);
-            p($rst);
-        }
 
         $data = XjSsc::getLotteryNoBatch();
         $data = array_reverse($data);

@@ -656,7 +656,7 @@ class SscDataService extends BaseService {
             $SscStaticYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
             $SscStaticYl->max_miss = $miss['max_miss']?:0;      // 4、近200期内最大遗漏
             $SscStaticYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
-            $SscStaticYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
+            $SscStaticYl->yl_records = $miss['yl_str']; // 5、200期内最大遗漏范围
             $SscStaticYl->count = $count;
 
             $SscStaticYl->type_2b = (int)$dsData['type_2b'];
@@ -847,6 +847,11 @@ class SscDataService extends BaseService {
         $tDate = date('Y-m-d');
         $SscKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->one();
         foreach ($SscStaticVals as $dsData){
+            # 是否中奖
+            #$SscKjDatas = self::getTabLastKjData($lottery_type);
+            #$field = strlen($dsData['val']) == 3 ? 'code_3n' : 'code_4n'; # 三字现、四字现
+            #$flag = strpos($SscKjDatas[$field], $dsData['val']) !== false; # 匹配则说明中奖
+
             //p(['lottery_type'=>$lottery_type, 'type'=>$type, 'val'=>$dsData['val'], $SscStaticYls[$dsData['val']]]);
             $count = $dsData['count'];
             if(!$SscStaticYl = $SscStaticYls[$dsData['val']]){
@@ -869,10 +874,10 @@ class SscDataService extends BaseService {
                 $SscStaticYl->type_4ds = (int)$dsData['type_4ds'];
                 $SscStaticYl->type_log = (int)$dsData['type_log'];
                 $SscStaticYl->codes_hz = $dsData['codes_hz'];
+                $SscStaticYl->count = $count;
+                $SscStaticYl->static_nums = $dsData['static_nums'];
                 $n = 1;
             }
-            $SscStaticYl->count = $count;
-            $SscStaticYl->static_nums = $dsData['static_nums'];
             //$vals = explode(',', $dsData['val']); //p([$dsData, $count]);
             $SscStaticYl->updated_at = $now_time;
             $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums'], $type);
@@ -881,8 +886,7 @@ class SscDataService extends BaseService {
             $SscStaticYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
             $SscStaticYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
             $SscStaticYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
-            $SscStaticYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
-            //$SscStaticYl->status = $dsData['static_nums']; # 前台显示
+            $SscStaticYl->yl_records = $miss['yl_str']; // 5、200期内最大遗漏范围
             $SscStaticYl->status = $dsData['status']; # 前台显示
 
             $len = strlen($dsData['val']);
@@ -1006,12 +1010,15 @@ class SscDataService extends BaseService {
      * @return mixed|static[]
      */
     public static function getSscStaticYls($lottery_type = DEFAULT_LOTTERY_TYPE, $type = 3){
-        $SscStaticYls = SscStaticYl::findAll(['lottery_type'=>$lottery_type, 'type'=>$type]);
-        $datas = [];
-        foreach ($SscStaticYls as $SscStaticYl){
-            $datas[$SscStaticYl->val] = $SscStaticYl;
+        //$SscStaticYls = SscStaticYl::findAll(['lottery_type'=>$lottery_type, 'type'=>$type]);
+        $m = \Yii::$app->cache;
+        $mkey = 'getSscStaticYls_'.$lottery_type.'_'.$type;
+        if(empty($SscStaticYls)){
+            $SscStaticYls = SscStaticYl::find()->where(['lottery_type'=>$lottery_type, 'type'=>$type])->indexBy('val')->all();
+            $m->set($mkey, $SscStaticYls, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
         }
-        return $datas;
+
+        return $SscStaticYls;
     }
 
     /**
@@ -1263,9 +1270,6 @@ class SscDataService extends BaseService {
 
         if($isCache && !$flag && $staticFlag && $rstData = $m->get($mkey)){
             $rstData['current_times'] = $rstData['current_times'] + 1;
-
-            $logArr = ['value'=>$value, 'lottery_type'=>$lottery_type, 'field'=>$field, 'rstData'=>$rstData];
-            //Tool_Common::log('getCodeTypeYlHistoryMiss_cache', 'INFO', '号码类型遗漏-缓存数据', $logArr);
             return $rstData;
         }
         $last_times = 0;

@@ -74,7 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'yl_records:ntext',
                         ['attribute' => 'yl_records','label'=>'遗漏','headerOptions'=>['width'=>'30%'],
                             'value' => function($model) {
-                                return $model->yl_records;
+                                return $model->current_miss.'-'.$model->yl_records;
                             }
                         ],
                         //'history_max_miss',

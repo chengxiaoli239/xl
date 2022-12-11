@@ -56,7 +56,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'last_time_miss_range',
                         'max_miss',
                         //'max_range',
-                        'yl_records:ntext',
+                        //'yl_records:ntext',
+                        ['attribute' => 'yl_records','label'=>'遗漏记录', # 'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return $model->current_miss.'-'.$model->yl_records;
+                            }
+                        ],
                         'history_max_miss',
                         'count',
                         //'static_nums',
