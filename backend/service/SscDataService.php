@@ -946,7 +946,7 @@ class SscDataService extends BaseService {
         $SscStaticVals = self::getSscStaticVal($type, $zjCodeSets);
         # 1、不中奖号码遗漏更新
         $whereNoZj = ['AND', ['=', 'lottery_type', $lottery_type], ['NOT IN', 'val', $zjCodeSets], ['=', 'type', $type]];
-        SscStaticYl::updateAll(['current_miss'=>new Expression('`current_miss`+1')], $whereNoZj);
+        SscStaticYl::updateAll(['current_miss'=>new Expression('`current_miss`+1'), 'update_time'=>date('Y-m-d H:i:s')], $whereNoZj);
 
         # 2、中奖号码遗漏更新
         foreach ($SscStaticVals as $dsData){
@@ -1089,7 +1089,7 @@ class SscDataService extends BaseService {
         //$SscStaticYls = SscStaticYl::findAll(['lottery_type'=>$lottery_type, 'type'=>$type]);
         $m = \Yii::$app->cache;
         $mkey = 'getSscStaticYls_'.$lottery_type.'_'.$type;
-        if(empty($SscStaticYls)){
+        if(true OR empty($SscStaticYls)){
             $SscStaticYls = SscStaticYl::find()->where(['lottery_type'=>$lottery_type, 'type'=>$type])->indexBy('val')->all();
             $m->set($mkey, $SscStaticYls, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
         }
