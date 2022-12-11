@@ -40,6 +40,7 @@ use common\tools\Tool_Common;
 use backend\models\SscDwHzYl;
 use izyue\admin\models\Log;
 use  yii;
+use yii\db\Expression;
 use yii\helpers\BaseStringHelper;
 
 class SscDataService extends BaseService {
@@ -832,10 +833,10 @@ class SscDataService extends BaseService {
     }
 
     /**
-     * @param $type - 类型：1和值2号码类型[例如:双双重、三重]3三字现4四字现
+     * @param $type - 类型：1和值2号码类型[例如:双双重、三重]3带双三字现4四字现5不带双三字现
      * @return array|bool
      */
-    public static function updateCodeTypeYLs($type, $lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function updateCodeTypeYLsOld($type, $lottery_type = DEFAULT_LOTTERY_TYPE){
         if(!in_array($type, [3, 4, 5])) return false;
         $rst = [];
         $SscStaticVals = self::getSscStaticVal($type);
@@ -926,6 +927,76 @@ class SscDataService extends BaseService {
     }
 
     /**
+     * @param $type - 类型：1和值2号码类型[例如:双双重、三重]3带双三字现4四字现5不带双三字现
+     * @return array|bool
+     */
+    public static function updateCodeTypeYLs($type, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        if(!in_array($type, [3, 4, 5])) return false;
+        $rst = [];
+
+        $now_time = time();
+        $qishu = SscDataService::getQishus($lottery_type);
+        $SscStaticYls = self::getSscStaticYls($lottery_type, $type);
+        $yDate = date('Y-m-d',strtotime("-1 day"));
+        $tDate = date('Y-m-d');
+        $SscKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->limit(1)->one();
+        $zjCodeSets = array_merge([$SscKjData->code_4n], explode(',', $SscKjData->code_3n));
+
+        # 中奖号码遗漏记录
+        $SscStaticVals = self::getSscStaticVal($type, $zjCodeSets);
+        # 1、不中奖号码遗漏更新
+        $whereNoZj = ['AND', ['=', 'lottery_type', $lottery_type], ['NOT IN', 'val', $zjCodeSets], ['=', 'type', $type]];
+        SscStaticYl::updateAll(['current_miss'=>new Expression('`now_money`+1')], $whereNoZj);
+
+        # 2、中奖号码遗漏更新
+        foreach ($SscStaticVals as $dsData){
+            $count = $dsData['count'];
+            if(!$SscStaticYl = $SscStaticYls[$dsData['val']]){
+                continue;
+            }
+            $SscStaticYl->updated_at = $now_time;
+            $miss = SscDataService::getCodeTypeYlHistoryMiss($dsData['val'], $lottery_type, $dsData['static_nums'], $type);
+
+            //$SscDsYl->current_miss = $YL_data[$num];  // 1、当前遗漏次数
+            $SscStaticYl->current_miss = $miss['current_times'];  // 1、当前遗漏次数
+            $SscStaticYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
+            $SscStaticYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
+            $SscStaticYl->yl_records = $miss['yl_str']; // 5、200期内最大遗漏范围
+            $SscStaticYl->status = $dsData['status']; # 前台显示
+
+            $len = strlen($dsData['val']);
+            $field = $len == 3 ? 'code_3n' : 'code_4n';
+            $where = ['AND', ['LIKE', $field, $dsData['val']]];
+            $nums = self::getTheoryNums($count, $qishu);
+            $SscStaticYl->theory_nums_perdate = (string)$nums; # 理论次数/天
+
+            $SscStaticYl->last_time_miss = $miss['last_times']; // 2、上次遗漏
+            $SscStaticYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
+            # 今日出现次数
+            $today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', $tDate]]);
+            $today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($today_nums_where)->asArray()->all()[0]['nums'];
+            $SscStaticYl->today_nums = $today_nums;
+            $SscStaticYl->val = $dsData['val'];
+            # 昨日出现次数
+            $ytd_nums = self::getCodeTypeYtdNums($field, $dsData['val'], $lottery_type, $yDate);
+
+            $SscStaticYl->ytd_nums = $ytd_nums;
+
+            $SscStaticYl->history_max_miss = max($miss['current_times'], $SscStaticYl->max_miss, $SscStaticYl->history_max_miss); // 6、历史最大遗漏
+            $SscStaticYl->update_time = date('Y-m-d H:i:s');
+            $rst = $SscStaticYl->save();
+            if(!$rst){
+                $logArr = ['attributes'=>$SscStaticYl->attributes, 'msg'=>$SscStaticYl->getErrors()];
+                Tool_Common::log('updateCodeTypeYL','INFO','号码类型遗漏统计', $logArr);
+            }
+            $logArr = ['lottery_type'=>$lottery_type, 'type'=>$type, 'val'=>$dsData['val']];
+            Tool_Common::log('updateCodeTypeYL','INFO','号码类型遗漏统计', $logArr);
+        }
+
+        return $rst;
+    }
+
+    /**
      * @desc 获取理论出现次数
      * @param int $count
      * @param int $qishu
@@ -949,11 +1020,16 @@ class SscDataService extends BaseService {
      * @param int $type
      * @return array|SscStaticVal[]|mixed
      */
-    public static function getSscStaticVal($type = 3){
+    public static function getSscStaticVal($type = 3, $vals=[]){
         $m = \Yii::$app->cache;
         $mkey = 'getSscStaticVal_'.$type;
+        $where = ['type'=>$type, 'status'=>1];
+        if(!empty($vals)){
+            $mkey = $mkey . yii\helpers\Json::encode($vals);
+            $where['val'] = $vals;
+        }
         if(!$SscStaticVals = $m->get($mkey)){
-            $SscStaticVals = SscStaticVal::find()->where(['type'=>$type, 'status'=>1])->asArray()->all();
+            $SscStaticVals = SscStaticVal::find()->where($where)->asArray()->all();
         }
 
         $m->set($mkey, $SscStaticVals, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
@@ -967,7 +1043,7 @@ class SscDataService extends BaseService {
      * @param string $val
      * @param int $lottery_type
      * @param $date
-     * @return mixed
+     * @return mixed|int
      */
     public static function getCodeTypeYtdNums($field = 'code_4n', $val = '0123', $lottery_type = DEFAULT_LOTTERY_TYPE, $date){
         $m = \Yii::$app->cache;

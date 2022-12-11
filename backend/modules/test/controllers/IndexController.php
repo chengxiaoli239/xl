@@ -295,6 +295,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 8);
+        p($rst);
         $miss = SscDataService::staticPeiShuDate($lottery_type = 8);
         p($miss);
         $rst['kj'] = KjDataGet::grabKjDatas();
@@ -994,8 +996,6 @@ class IndexController extends Controller
         $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);
         p($rst); # 号码类型遗漏
         $rst = SscDataService::getLastIndexId(6);
-        p($rst);
-        $rst['updateCodeTypeYLs4'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 8);
         p($rst);
         $rst = StaticService::static2NumsYl($lottery_type = 8);
         p($rst);
