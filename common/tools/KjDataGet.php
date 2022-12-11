@@ -258,10 +258,10 @@ class KjDataGet
      */
     public static function afterKj($lottery_type = DEFAULT_LOTTERY_TYPE){
 
-        $insertRst = SscDataService::insertDealDataTask($lottery_type); # 数据处理任务写入
+        list($code, $qihao) = SscDataService::insertDealDataTask($lottery_type); # 数据处理任务写入
 
         $rst = ['status'=>200, 'msg'=>'处理成功'];
-        if($insertRst){
+        if($code==0){
             $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
             # 队列处理
             #$rst['TzService'] = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
@@ -269,12 +269,12 @@ class KjDataGet
             push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
 
             # 数据统计
-            push_queue(PeiShuProfitsJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name]);
-            push_queue(StaticAll2NumsYlJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>15]);
-            push_queue(StaticHzProfitsJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>20]);
-            push_queue(StaticPeiShuTrueFalseJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>25]);
-            push_queue(StaticSdProfitsJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>30]);
-            push_queue(UpdateCodeTypeYlJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>35]);
+            push_queue(PeiShuProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>5]);
+            push_queue(StaticAll2NumsYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>10]);
+            push_queue(StaticHzProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>15]);
+            push_queue(StaticPeiShuTrueFalseJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>20]);
+            push_queue(StaticSdProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>25]);
+            push_queue(UpdateCodeTypeYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>30]);
 
         }
         //StaticService::opStaticProfits(); # 投注利润统计

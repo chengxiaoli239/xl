@@ -4594,7 +4594,7 @@ class SscDataService extends BaseService {
      * @desc 记录处理数据任务
      * @param $lottery_type
      * @param string $qihao
-     * @return bool
+     * @return array
      */
     public static function insertDealDataTask($lottery_type, $qihao=''){
 
@@ -4641,10 +4641,10 @@ class SscDataService extends BaseService {
 
         }catch (\Exception $e){
             Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理任务写入异常', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'err_msg'=>$e->getMessage()]);
-            return false;
+            return [10000, $e->getMessage()];
         }
 
-        return true;
+        return [0, $qihao];
     }
 
     /**
