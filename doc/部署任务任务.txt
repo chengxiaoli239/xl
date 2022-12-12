@@ -1,6 +1,21 @@
 1、 php删除禁用函数：
     exec、putenv、proc_open、popen、system
 
+2、宝塔-安全 ：添加3306端口
+3、安装php扩展：reids、
+4、宝塔软件商店安装：进程守护管理器
 
+5、vim /etc/hosts
+    127.0.0.1 www.lottery.com
 
+6、站点配置：
+    /www/wwwroot/lottery_xl/backend/web
+    域名：www.lottery.com、服务器ip
 
+    伪静态：
+    location / {
+        try_files $uri $uri/ /index.php$is_args$args;
+    }
+
+    网站目录:
+        去掉勾选：防跨站攻击(open_basedir)
