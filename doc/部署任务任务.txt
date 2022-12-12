@@ -1,0 +1,6 @@
+1、 php删除禁用函数：
+    exec、putenv、proc_open、popen、system
+
+
+
+

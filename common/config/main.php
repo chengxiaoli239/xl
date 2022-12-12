@@ -5,6 +5,7 @@ return [
     'components' => [
         'cache' => [
             //'class' => 'yii\caching\FileCache',
+            /*
             'class' => '\yii\caching\MemCache',
             'servers' => [
                 [
@@ -14,6 +15,8 @@ return [
                 ],
             ],
             'useMemcached' => true,
+            */
+            'class' => 'yii\redis\Cache',
             'keyPrefix' => 'xl_',
         ],
         'redis' => [
