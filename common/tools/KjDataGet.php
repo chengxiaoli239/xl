@@ -115,7 +115,7 @@ class KjDataGet
             #KjDataGet::grabOneLotteryKjData($lottery_type);
             $initLotteryKey = SystemService::getInitLotteryDataKey($lottery_type);
             $is_init = $m->get($initLotteryKey);
-            $mkey = 'grabKjDatas_x0_'.$lottery_type;
+            $mkey = 'grabKjDatas_x1_'.$lottery_type;
             $flag = $m->get($mkey);
             $cacheTime = ($is_init OR strpos($lotteryData['typeGroupName'], '高频') !== false) ? 9 : 1800;
             Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'mkey'=>$mkey, 'cacheTime'=>$cacheTime, 'flag'=>$flag]);
