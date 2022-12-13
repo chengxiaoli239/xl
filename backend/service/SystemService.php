@@ -30,7 +30,12 @@ class SystemService{
     public static function initLottery($lottery_type = DEFAULT_LOTTERY_TYPE){
         $m = \Yii::$app->cache;
         $mkey = SystemService::getInitLotteryDataKey($lottery_type);
-        $m->set($mkey, 1, 3*3600);
+        $flag = $m->get($mkey);
+        if(!$flag){
+            $m->set($mkey, 1, 3*3600);
+        }else{
+            $m->delete($mkey);
+        }
 
         $rst = HN0898Service::insertDsYl($lottery_type);
 
