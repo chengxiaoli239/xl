@@ -13,12 +13,24 @@ use  yii;
 class SystemService{
 
     /**
+     * 彩种是否初始化
+     * @param int $lottery_type
+     * @return string
+     */
+    public static function getInitLotteryDataKey($lottery_type=DEFAULT_LOTTERY_TYPE){
+        return 'getInitLotteryDataKey_x0_'.$lottery_type;
+    }
+
+    /**
      * @desc 数据统计key
      * @param $key
      * @param int $lottery_type
      * @return string
      */
     public static function initLottery($lottery_type = DEFAULT_LOTTERY_TYPE){
+        $m = \Yii::$app->cache;
+        $mkey = SystemService::getInitLotteryDataKey($lottery_type);
+        $m->set($mkey, 1, 3*3600);
 
         $rst = HN0898Service::insertDsYl($lottery_type);
 

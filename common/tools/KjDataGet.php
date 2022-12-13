@@ -15,6 +15,7 @@ use backend\models\StaticCodeTypeArisePerdate;
 use backend\models\UserFollowData;
 use backend\service\BetService;
 use backend\service\SscDataService;
+use backend\service\SystemService;
 use backend\service\TzService;
 use common\kj\cqssc\CqsscKcw;
 use common\service\CommonService;
@@ -112,20 +113,23 @@ class KjDataGet
         foreach ($lottery_types as $lotteryData){
             $lottery_type = $lotteryData['lottery_type'];
             #KjDataGet::grabOneLotteryKjData($lottery_type);
+            $initLotteryKey = SystemService::getInitLotteryDataKey($lottery_type);
+            $is_init = $m->get($initLotteryKey);
             $mkey = 'grabKjDatas_x0_'.$lottery_type;
             $flag = $m->get($mkey);
-            $cacheTime = (strpos($lotteryData['typeGroupName'], '高频') !== false) ? 9 : 1800;
+            $cacheTime = ($is_init OR strpos($lotteryData['typeGroupName'], '高频') !== false) ? 9 : 1800;
             Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'mkey'=>$mkey, 'cacheTime'=>$cacheTime, 'flag'=>$flag]);
             if(!$flag){
                 var_dump(date('Y-m-d H:i:s').' 开奖抓取入列lottery_type:'.$lottery_type);
-                push_queue(GrabKjDatasJob::class, ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title']]);
+                $params = ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title']];
+                if($is_init){
+                    $params['is_grab_history'] = 1;
+                }
+                push_queue(GrabKjDatasJob::class, $params);
                 $m->set($mkey, 1, $cacheTime);
             }else{
                 var_dump(date('Y-m-d H:i:s').' 缓存时间lottery_type:'.$lottery_type);
             }
-            /*
-            */
-
         }
 
         return $msg;
