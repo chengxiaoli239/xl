@@ -66,7 +66,7 @@ class IndexController extends Controller
         $post = \Yii::$app->request->post();
         for($i=0; $i<10; $i++){
             $rst['kj'] = KjDataGet::grabKjDatas($post['lottery_types']);
-            sleep(9);
+            sleep(4);
         }
 
         return $rst;
