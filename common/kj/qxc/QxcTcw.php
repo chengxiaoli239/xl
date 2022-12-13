@@ -213,9 +213,9 @@ class QxcTcw extends BaseKj{
         $m = \Yii::$app->cache;
         $mkey_rstData = 'QixingCaiBatchDatas_'.$is_new.'_'.$lottery_type;
         $rstData = $m->get($mkey_rstData);
-        if(!empty($rstData)) return $rstData;
+        if($is_new && !empty($rstData)) return $rstData;
 
-        $mkey = 'QixingCaiBatch_page_4_'.$is_new;
+        $mkey = 'QixingCaiBatch_page_4_'.$lottery_type.'_'.$is_new;
         $default_page = 84;
         if($lottery_type==17){
             $mkey = $mkey.'_'.$lottery_type;
