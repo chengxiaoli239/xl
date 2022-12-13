@@ -112,9 +112,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute'=>'status', 'label'=>'操作','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value'=>function($model){
+                                $init_flag = \Yii::$app->cache->get(\backend\service\SystemService::getInitLotteryDataKey($model->lottery_type));
+                                $init_txt = '';
+                                if($init_flag){
+                                    $init_txt = '...';
+                                }
                                 $url1 = '/forum/lottery-type/init-lottery'; # 初始化系统数据
                                 $url2 = '/forum/lottery-type/del-bet-record'; # 清除游戏记录
-                                $txt = "<button data-url='".$url1."' color='green' data-lottery-type='".$model->lottery_type."' class='btn btn-info btn-xs act-execute'>初始化</button>" ;
+                                $txt = "<button data-url='".$url1."' color='green' data-lottery-type='".$model->lottery_type."' class='btn btn-info btn-xs act-execute'>初始化".$init_txt."</button>" ;
                                 $txt .= "<button data-url='".$url2."' color='red' data-lottery-type='".$model->lottery_type."' class='btn btn-warning btn-xs act-execute'>清理下注数据</button>" ;
                                 return Html::a($txt, 'javascript:;', ['title' => '点击执行，新加彩种初始化']);
                             }
