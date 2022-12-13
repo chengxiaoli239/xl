@@ -227,6 +227,7 @@ class KjDataGet
     public static function isCanGrab($lottery_type = DEFAULT_LOTTERY_TYPE) {
         $flag = true;
         $date_time = date('H:i');
+        $is_init = \Yii::$app->cache->get(SystemService::getInitLotteryDataKey($lottery_type));
         if (in_array($lottery_type, [5, 6])){
             if ('04:00' < $date_time && $date_time < '07:10') {
                 $flag = false;
@@ -240,11 +241,11 @@ class KjDataGet
             if ('03:10' < $date_time && $date_time < '08:55') {
                 $flag = false;
             }
-        }elseif(in_array($lottery_type, [17])){ # 排列五
+        }elseif(!$is_init && in_array($lottery_type, [17])){ # 排列五
             if('20:15'>$date_time OR $date_time>'23:00'){
                 $flag = false;
             }
-        }elseif(in_array($lottery_type, [1])){ # 七星
+        }elseif(!$is_init && in_array($lottery_type, [1])){ # 七星
             $w = date('w'); # 周几：0,1,2,3,4,5,6  ==> 周日到周六
             if(!in_array($w, [0, 2, 5])){
                 $flag = false;
