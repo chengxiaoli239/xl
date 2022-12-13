@@ -121,8 +121,8 @@ class KjDataGet
             if($is_init){
                 $cacheTime = 4;
             }
-            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'mkey'=>$mkey, 'cacheTime'=>$cacheTime, 'flag'=>$flag]);
-            if(!$flag){
+            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'mkey'=>$mkey, 'cacheTime'=>$cacheTime, 'is_init'=>$is_init, 'flag'=>$flag]);
+            if(!$flag OR $is_init){
                 var_dump(date('Y-m-d H:i:s').' 开奖抓取入列lottery_type:'.$lottery_type);
                 $params = ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title']];
                 if($is_init){
