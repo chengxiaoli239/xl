@@ -57,7 +57,7 @@ return [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=120.77.157.40;dbname=lottery_xl',
+            'dsn' => 'mysql:host=127.0.0.1;dbname=lottery_xl',
             'enableSchemaCache' => true,
             'schemaCacheDuration' => 3600,
             'username' => 'lottery_xl',

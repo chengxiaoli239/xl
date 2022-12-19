@@ -1,3 +1,6 @@
+一、git 代码仓：
+      git@gitee.com:gaozi/lottery_xl.git
+二、部署步骤：
 1、 php删除禁用函数：
     exec、putenv、proc_open、popen、system
 
@@ -19,3 +22,9 @@
 
     网站目录:
         去掉勾选：防跨站攻击(open_basedir)
+
+7、redis 队列安装
+   进程守护管理器 : php yii queue/listen
+
+三、数据库导入：
+    文件导入宝塔：db_lottery_xl_20221213_043002.sql.gz
