@@ -12,4 +12,7 @@ return [
     'verifyCode' => '验证码',
     'password' => '密码',
     'Create Permissions' => '新增权限',
+
+    'edit' => '编辑',
+    'query' => '查询',
 ];

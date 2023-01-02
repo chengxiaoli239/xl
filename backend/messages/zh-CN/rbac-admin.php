@@ -9,4 +9,8 @@ return [
     'Create User' => '新建用户',
     'Menus' => '菜单管理',
     'Create Menu' => '新建菜单',
+
+
+    'edit' => '编辑',
+    'query' => '查询',
 ];
