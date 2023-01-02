@@ -12,6 +12,7 @@ return [
     'vendorPath' => dirname(__DIR__).'/../vendor',
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
+    'language' => 'zh-CN',
     'timeZone' => 'Asia/Shanghai',      // ÉèÖÃÊ±Çø
     'modules' => [
         'admin' => [
