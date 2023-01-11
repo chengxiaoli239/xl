@@ -16,7 +16,7 @@ use Yii;
 class RedisLock { // class start
 
     private $_config;
-    private $_redis;
+    public $_redis;
 
     /**
      * 初始化

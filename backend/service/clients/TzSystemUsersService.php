@@ -252,10 +252,15 @@ class TzSystemUsersService extends ClientsBaseService{
                     $where = array_merge($where, [['=', 'uid', $uid]]);
                 }
                 if(!empty($current_qihao)){
-                    $where = array_merge($where, [['=', 'qihao', $current_qihao]]);
+                    $incr_qihao_key = 'incr_qihao_key_'.$lottery_type.'_'.$uid.'_'.$current_qihao;
+                    $count = $RedisLock->_redis->incrby($incr_qihao_key, 1);
+                    if($count<=1){
+                        $where = array_merge($where, [['=', 'qihao', $current_qihao]]);
+                    }
                 }
 
                 $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-0', ['uid' => $uid, 'where'=>$where, 'count'=>$count]);
                 if(empty($BetErrorPlansTasks)){
                     Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-1', ['uid' => $uid, 'msg'=>'没有下注计划']);
                     return ['status'=>301, 'msg'=>'没有下注任务'];
