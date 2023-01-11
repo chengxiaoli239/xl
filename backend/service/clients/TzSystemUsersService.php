@@ -260,7 +260,7 @@ class TzSystemUsersService extends ClientsBaseService{
                 }
 
                 $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
-                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-0', ['uid' => $uid, 'where'=>$where, 'count'=>$count]);
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-0', ['uid'=>$uid, 'current_qihao'=>$current_qihao, 'where'=>$where, 'count'=>$count]);
                 if(empty($BetErrorPlansTasks)){
                     Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-1', ['uid' => $uid, 'msg'=>'没有下注计划']);
                     return ['status'=>301, 'msg'=>'没有下注任务'];
