@@ -272,6 +272,9 @@ class TzSystemUsersService extends ClientsBaseService{
                     $account = $row->account;
                     $bet_url = $row->bet_url;
                     $qihao = $row->qihao;
+                    if($qihao > $current_qihao){
+                        continue;
+                    }
                     $post_data = json_decode($row->post_datas, 320);
                     $uid = $row->uid;
                     $local_codes = '';
