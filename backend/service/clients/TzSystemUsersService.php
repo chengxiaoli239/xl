@@ -255,7 +255,7 @@ class TzSystemUsersService extends ClientsBaseService{
                     $incr_qihao_key = 'incr_qihao_key_'.$lottery_type.'_'.$uid.'_'.$current_qihao;
                     $count = $RedisLock->_redis->incrby($incr_qihao_key, 1);
                     if($count<=1){
-                        $where = array_merge($where, [['=', 'qihao', $current_qihao]]);
+                        $where = array_merge($where, [['=', 'qihao', (string)$current_qihao]]);
                     }
                 }
 
