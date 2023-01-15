@@ -2009,7 +2009,6 @@ class NumService extends BaseService {
         $filterNum2 = NumService::$MAX_CODES;  # 至少上一个
         $NewKjCodes = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
         $NewCodes = array_unique([$NewKjCodes->code1, $NewKjCodes->code2, $NewKjCodes->code3, $NewKjCodes->code4]);
-        $NewCodes = [6, 8, 9];
         $filterNumKjCodes = array_diff(NumService::$ALL_CODES, $NewCodes); # 剔除上期开奖号码之后，至少上cNum个
         $query = Num4Type::find()
             ->where(['OR', ['IN', 'code_1', $filterNum1], ['IN', 'code_2', $filterNum1], ['IN', 'code_3', $filterNum1], ['IN', 'code_4', $filterNum1]])
