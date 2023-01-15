@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <section class="panel">
         <header class="panel-heading">
             <?= Html::encode($this->title); ?>
-            <?php include(dirname(__FILE__).'/index_tab.php'); echo '<a href="/forum/user-sys-plans/change-ip" class="btn btn-default">更换代理ip</a>'; ?>
+            <?php include(dirname(__FILE__).'/index_tab.php'); ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">

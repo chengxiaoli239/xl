@@ -295,6 +295,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[1], $lottery_type=8);
+        p($filter_dynamic_codes);
         $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 8);
         p($rst);
         $miss = SscDataService::staticPeiShuDate($lottery_type = 8);

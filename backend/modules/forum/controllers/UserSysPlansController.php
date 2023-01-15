@@ -139,6 +139,9 @@ class UserSysPlansController extends BaseController
 
         # 4、排除前xx期号码
         $model->is_filter_history = 0;
+
+        # 5、动态过滤
+        $model->is_filter_dynamic = 0;
         ############################ 排除参数结束 #############################
 
         $model->nums = UserSysPlansService::getDefaultTzNums($tz_type);
@@ -181,6 +184,9 @@ class UserSysPlansController extends BaseController
 
             # 3、排查前x期
             'is_filter_history' => $is_filters,
+
+            # 4、动态过滤
+            'is_filter_dynamic' => $is_filters,
 
             'code_filter_types' => $code_filter_types, # 排除类型
 
@@ -268,6 +274,12 @@ class UserSysPlansController extends BaseController
                 $model->filter_history_nums = (int)$hz_Arr_Data['filter_history_nums'];
             }
 
+            # 动态过滤
+            if(isset($hz_Arr_Data['is_filter_dynamic'])){
+                $model->is_filter_dynamic = (int)$hz_Arr_Data['is_filter_dynamic'];
+                $model->filter_dynamic_types = $hz_Arr_Data['filter_dynamic_types'];
+            }
+
             # 动态排除前x位号码
 
             # 2、排除前x天同期
@@ -336,6 +348,9 @@ class UserSysPlansController extends BaseController
             # 3、排查前x期
             'is_filter_history' => $is_filters,
 
+            # 4、动态过滤
+            'is_filter_dynamic' => $is_filters,
+
             'code_filter_types' => $code_filter_types, # 排除类型
             # 2、排除前x天内同期
             'is_filter_qihaos' => $is_filters,
@@ -394,6 +409,9 @@ class UserSysPlansController extends BaseController
 
         # 4、排除前xx期号码
         $model->is_filter_history = 0;
+
+        # 5、动态过滤
+        $model->is_filter_dynamic = 0;
         ############################ 排除参数结束 #############################
 
         $model->nums = usersysplansservice::getdefaulttznums($tz_type);

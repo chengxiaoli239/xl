@@ -23,7 +23,10 @@ use yii\helpers\ArrayHelper;
 use  yii;
 
 class NumService extends BaseService {
+    public static $MIN_CODES = [0, 1, 2, 3, 4];
+    public static $MAX_CODES = [5, 6, 7, 8, 9];
     public static $ALL_POSES = [1, 2, 3, 4];
+    public static $ALL_CODES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     public static $playway_to_code_type = [
         1 => 2,
         2 => 3,
@@ -1947,6 +1950,11 @@ class NumService extends BaseService {
             $desc .= '过滤前:'.(int)$hz_Arr['filter_history_nums'].'期号码';
         }
 
+        # 动态过滤
+        if(isset($hz_Arr['is_filter_dynamic']) && $hz_Arr['is_filter_dynamic']){
+            $desc .= "动态过滤";
+        }
+
         return $desc;
     }
 
@@ -1965,6 +1973,75 @@ class NumService extends BaseService {
 
         }
         return $data;
+    }
+
+    /**
+     * 动态过滤
+     * @param $filter_dynamic_types
+     * @return array
+     */
+    public static function getBeforeKjCodesDynamic($filter_dynamic_types, $lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3){
+
+        foreach ($filter_dynamic_types as $filter_dynamic_type){
+            switch ($filter_dynamic_type){
+                case 1: # 至少1小1大、排除前一期号码剩余号码至少上2个码
+                    $codes = NumService::getBeforeKjCodesDynamic1($lottery_type, $playway, $cNum=2);
+                    break;
+                case 2: # 至少1小1大、排除前一期号码剩余号码至少上2个码
+                    $codes = NumService::getBeforeKjCodesDynamic1($lottery_type, $playway, $cNum=3);
+                    break;
+            }
+
+        }
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 至少1小1大、排除前一期号码剩余号码至少上2个码
+     * @param int $lottery_type
+     * @param int $playway
+     * @param int $cNum 至少上cNum个
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic1($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, $cNum=3){
+        $filterNum1 = NumService::$MIN_CODES;  # 至少上一个
+        $filterNum2 = NumService::$MAX_CODES;  # 至少上一个
+        $NewKjCodes = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
+        $NewCodes = array_unique([$NewKjCodes->code1, $NewKjCodes->code2, $NewKjCodes->code3, $NewKjCodes->code4]);
+        $NewCodes = [6, 8, 9];
+        $filterNumKjCodes = array_diff(NumService::$ALL_CODES, $NewCodes); # 剔除上期开奖号码之后，至少上cNum个
+        $query = Num4Type::find()
+            ->where(['OR', ['IN', 'code_1', $filterNum1], ['IN', 'code_2', $filterNum1], ['IN', 'code_3', $filterNum1], ['IN', 'code_4', $filterNum1]])
+            ->andWhere(['=', 'code_type', $playway+1]);
+        if($cNum == 3){
+            $whereFilteKjCodes = [
+                'OR',
+                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], 'code_1<>code_2 and code_2<>code_3'],
+                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_1<>code_2 and code_2<>code_4'],
+                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_1<>code_3 and code_3<>code_4'],
+                ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_2<>code_3 and code_3<>code_4'],
+            ];
+            $query->andWhere(['=', 'type_3', 0]);
+        }else{
+            # 默认上两个
+            $whereFilteKjCodes = [
+                'OR',
+                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], 'code_1<>code_2'],
+                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], 'code_1<>code_3'],
+                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_1<>code_4'],
+                ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], 'code_2<>code_3'],
+                ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_2<>code_4'],
+                ['AND', ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_3<>code_4'],
+            ];
+        }
+        $query->andWhere($whereFilteKjCodes)
+            ->andWhere(['OR', ['IN', 'code_1', $filterNum2], ['IN', 'code_2', $filterNum2], ['IN', 'code_3', $filterNum2], ['IN', 'code_4', $filterNum2]]);
+        $sql = $query->createCommand()->getRawSql();
+        $NumTypes = $query->asArray()->all();
+        p(['kjCode'=>$NewCodes, 'count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+
+        return [];
     }
 
     /**

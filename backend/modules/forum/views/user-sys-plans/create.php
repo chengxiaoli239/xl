@@ -52,6 +52,9 @@ $this->params['breadcrumbs'][] = $this->title;
         # 4、排查前xx期号码
         'is_filter_history' => $is_filter_history,
 
+        # 5、动态过滤
+        'is_filter_dynamic' => $is_filter_dynamic,
+
         'lottery_types' => $lottery_types,
 
         'code_filter_types' => $code_filter_types, # 号码过滤类型

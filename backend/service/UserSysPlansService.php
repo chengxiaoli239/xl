@@ -192,7 +192,17 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['filter_history_nums'] = $UserSysPlans['filter_history_nums'];
             }
         }
-        unset($post['UserSysPlans']['type_log']);
+        unset($post['UserSysPlans']['is_filter_history'], $post['UserSysPlans']['filter_history_nums']);
+
+        # 动态过滤
+        if($UserSysPlans['is_filter_dynamic'] && count($UserSysPlans['is_filter_dynamic']) == 1){
+            if(isset($UserSysPlans['filter_dynamic_types']) && count($UserSysPlans['filter_dynamic_types'])>0){
+                $tmpFilter['is_filter_dynamic'] = $UserSysPlans['is_filter_dynamic'][0];
+                $tmpFilter['filter_dynamic_types'] = $UserSysPlans['filter_dynamic_types'];
+            }
+        }
+        unset($post['UserSysPlans']['is_filter_dynamic'], $post['UserSysPlans']['filter_dynamic_types']);
+
 
         # 17、区间遗漏投 start
         if(!empty($UserSysPlans['area_all_qishus'])){

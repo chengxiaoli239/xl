@@ -914,6 +914,14 @@ abstract class BetService extends BaseBetService {
             $codesArr = array_diff($codesArr, $filter_history_codes); # 返回$codes在$filter_codes中没有的号码
         }
 
+        # 动态过滤
+        if(isset($codes_hz_data['is_filter_dynamic']) && $codes_hz_data['is_filter_dynamic']==1 && count($codes_hz_data['filter_dynamic_types'])>0){
+            $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($codes_hz_data['filter_dynamic_types'], $plan->lottery_type, $playway);
+            if(!empty($filter_dynamic_codes)){
+                $codesArr = array_intersect($codesArr, $filter_dynamic_codes); # 返回$codesArr和$filter_dynamic_codes交集
+            }
+        }
+
         $codes_hz_data = json_decode($codes_hz, true);
         if(isset($codes_hz_data['filters']['filter_type']) && in_array($codes_hz_data['filters']['filter_type'], [1])){
             # 过滤号码，filter_type:1过滤前x期号码

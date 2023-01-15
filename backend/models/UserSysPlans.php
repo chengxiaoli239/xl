@@ -174,6 +174,10 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $is_filter_history; # 是否过滤
     public $filter_history_nums; # 过滤号码个数
     ########################### 过滤前xx期号码 end #########################
+    ########################## 过滤前xx期号码 start ########################
+    public $is_filter_dynamic; # 是否动态过滤
+    public $filter_dynamic_types; # 过滤类型
+    ########################### 过滤前xx期号码 end #########################
     /**
      * @inheritdoc
      */
