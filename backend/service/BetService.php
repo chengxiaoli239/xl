@@ -900,6 +900,14 @@ abstract class BetService extends BaseBetService {
                 break;
         }
 
+        # 动态过滤
+        if(isset($codes_hz_data['is_filter_dynamic']) && $codes_hz_data['is_filter_dynamic']==1 && count($codes_hz_data['filter_dynamic_types'])>0){
+            $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($codes_hz_data['filter_dynamic_types'], $plan->lottery_type, $playway);
+            if(!empty($filter_dynamic_codes)){
+                $codesArr = array_intersect($codesArr, $filter_dynamic_codes); # 返回$codesArr和$filter_dynamic_codes交集
+            }
+        }
+
         $before_count=count($codesArr);
         # 反买号码获取
         if(!in_array($tz_type, [22]) && in_array($tz_type, \Yii::$app->params['can_change_buy_type']) && $buy_type == 0){ # 22 四定单双
@@ -912,14 +920,6 @@ abstract class BetService extends BaseBetService {
         if(isset($codes_hz_data['is_filter_history']) && $codes_hz_data['is_filter_history']==1 && $codes_hz_data['filter_history_nums']>0){
             $filter_history_codes = NumService::getBeforeKjCodesFromSite($codes_hz_data['filter_history_nums']);
             $codesArr = array_diff($codesArr, $filter_history_codes); # 返回$codes在$filter_codes中没有的号码
-        }
-
-        # 动态过滤
-        if(isset($codes_hz_data['is_filter_dynamic']) && $codes_hz_data['is_filter_dynamic']==1 && count($codes_hz_data['filter_dynamic_types'])>0){
-            $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($codes_hz_data['filter_dynamic_types'], $plan->lottery_type, $playway);
-            if(!empty($filter_dynamic_codes)){
-                $codesArr = array_intersect($codesArr, $filter_dynamic_codes); # 返回$codesArr和$filter_dynamic_codes交集
-            }
         }
 
         $codes_hz_data = json_decode($codes_hz, true);
