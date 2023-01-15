@@ -2039,9 +2039,10 @@ class NumService extends BaseService {
             ->andWhere(['OR', ['IN', 'code_1', $filterNum2], ['IN', 'code_2', $filterNum2], ['IN', 'code_3', $filterNum2], ['IN', 'code_4', $filterNum2]]);
         $sql = $query->createCommand()->getRawSql();
         $NumTypes = $query->asArray()->all();
-        p(['kjCode'=>$NewCodes, 'count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        //p(['kjCode'=>$NewCodes, 'count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
-        return [];
+        return $codes;
     }
 
     /**
