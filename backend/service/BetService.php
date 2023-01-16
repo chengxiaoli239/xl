@@ -2050,7 +2050,7 @@ abstract class BetService extends BaseBetService {
                         $user_ids[$uid] = ['user_id'=>$uid];
                         Tool_Common::log('insertPlansTask', 'INFO', '插入计划-任务-2', $logArr);
                     }
-                    $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>'正常'];
+                    $rst['data'] = ['activeQihao'=>$activeQihao, 'plan_id'=>$plan->id, 'msg'=>'正常', 'qihao'=>$qihao];
                 }catch (\Exception $e){
                     Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划-异常', ['uid'=>$uid, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
                     $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>$e->getMessage()];
