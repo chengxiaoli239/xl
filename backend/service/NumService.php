@@ -9,7 +9,7 @@
 
 namespace backend\service;
 use backend\models\BettingRecords;
-use backend\models\CodeTypes;
+use backend\models\DataDealStatus;
 use backend\models\Num4Type;
 use backend\models\SscKjData;
 use backend\models\StaticProfits;
@@ -1981,7 +1981,12 @@ class NumService extends BaseService {
      * @return array
      */
     public static function getBeforeKjCodesDynamic($filter_dynamic_types, $lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3){
+        $query = Num4Type::find()->select(['code', 'code_type'])
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $NumTypes = $query->asArray()->all();
+        $allCodes = ArrayHelper::getColumn($NumTypes, 'code');
 
+        $codesArr = $allCodes;
         foreach ($filter_dynamic_types as $filter_dynamic_type){
             switch ($filter_dynamic_type){
                 case 1: # 至少1小1大、排除前一期号码剩余号码至少上2个码
@@ -1990,11 +1995,15 @@ class NumService extends BaseService {
                 case 2: # 至少1小1大、排除前一期号码剩余号码至少上2个码
                     $codes = NumService::getBeforeKjCodesDynamic1($lottery_type, $playway, $cNum=3);
                     break;
+                case 3: # 头尾去除当期期号最后两位相加
+                    $codes = NumService::getBeforeKjCodesDynamic3($lottery_type, $playway);
+                    break;
             }
-
+            $codesArr = array_intersect($codesArr, $codes);
         }
+        #p(['counts'=>count($codesArr), 'codesArr'=>$codesArr]);
 
-        return $codes;
+        return $codesArr;
     }
 
     /**
@@ -2038,7 +2047,32 @@ class NumService extends BaseService {
             ->andWhere(['OR', ['IN', 'code_1', $filterNum2], ['IN', 'code_2', $filterNum2], ['IN', 'code_3', $filterNum2], ['IN', 'code_4', $filterNum2]]);
         $sql = $query->createCommand()->getRawSql();
         $NumTypes = $query->asArray()->all();
-        //p(['kjCode'=>$NewCodes, 'count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        #p(['kjCode'=>$NewCodes, 'count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+
+    /**
+     * 过滤类型号码 - 头尾去除当期期号最后两位相加(主要针对四定)
+     * @param int $lottery_type
+     * @param int $playway
+     * @return array
+     */
+    public static function getBeforeKjCodesDynamic3($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3){
+        $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+        $last2Nums = [substr($DataDealStatus['next_qihao'], -1, 1), substr($DataDealStatus['next_qihao'], -2, 1)];
+        #p([$DataDealStatus['next_qihao'], $last2Nums, array_sum($last2Nums)]);
+        $last2NumsPlus = substr(array_sum($last2Nums), -1, 1);
+        #p($last2NumsPlus);
+
+
+        $query = Num4Type::find()->select(['code', 'code_type'])
+            ->where(['AND', ['!=', 'code_1', $last2NumsPlus], ['!=', 'code_4', $last2NumsPlus]])
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $NumTypes = $query->asArray()->all();
+        #p(['count'=>count($NumTypes), 'NumTypes'=>$NumTypes, 'sql'=>$query->createCommand()->getRawSql()]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
         return $codes;
