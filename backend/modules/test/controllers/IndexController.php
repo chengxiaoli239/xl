@@ -295,6 +295,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $current_qihao = NumService::getPlanBetCurrentQihao($plan_id='5833', $lottery_type = 17);
+        p($current_qihao);
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao = '20211215286', $lottery_type = 8);
         p($next_qihao);
         $rst = KjDataGet::getBeforeQihaoByQihao('230120224', 23);
@@ -425,8 +427,6 @@ class IndexController extends Controller
         $pos = [1, 2, 3];
         $pos_to_desc = NumService::$pos_to_desc;
         p($pos_to_desc);
-        $current_qihao = NumService::getPlanBetCurrentQihao($plan_id = '571', $lottery_type = 8);
-        p($current_qihao);
         $qihao = NumService::getQihaoByDaysBefore($test_period_days = 7, $lottery_type = 8);
         p($qihao);
         $current_qihao = HN0898Service::getCurrentQihao($lottery_type = 8); # 针对哪一期过滤，默认为：当前期号
