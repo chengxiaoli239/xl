@@ -295,6 +295,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst = KjDataGet::getBeforeQihaoByQihao('230120224', 23);
+        p($rst);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[1], $lottery_type=8);
         p($filter_dynamic_codes);
         $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 8);
@@ -959,8 +961,6 @@ class IndexController extends Controller
             }
         }
         p(trim($codes, '@'));
-        $rst = KjDataGet::getBeforeQihaoByQihao('20191112001', 8);
-        p($rst);
         p(3 % 5);
         $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5);
         p($rst); # 70s
@@ -1162,8 +1162,6 @@ class IndexController extends Controller
         $domain = BaseKj::getApiHost(8);
         p($domain);
         p('xxx');
-        $beforeQihao = KjDataGet::getBeforeQihaoByQihao('190525001');
-        p($beforeQihao);
         $rst = NumService::getCodesArise(['9377']);
         p(count($rst));
         $arr = ['type_2b' => 1, 'hz' => [11, 12, 13, 14, 15, 16, 24]];

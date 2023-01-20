@@ -493,7 +493,7 @@ class KjDataGet
     }
 
     /**
-     * @desc 获取给定期号的上一期
+     * @desc 获取给定期号的上一期 - 主要针对已经历史数据的模拟
      * @param string $qihao
      * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return bool|int|string
@@ -530,7 +530,14 @@ class KjDataGet
                     $beforeQihao = $date.'288';
                 }
             }else{
-                $beforeQihao = $beforeQihao;
+                #$beforeQihao = $beforeQihao;
+                #if(in_array($lottery_type, [23, 24])) {  # 以太坊
+                #    $SscKjDatas = SscKjData::find()->where(['lottery_type' => $lottery_type, 'qihao' > $qihao])->orderBy(['id' => SORT_ASC])->one()['qihao'];
+                #}
+                $SscKjDatas = SscKjData::find()->select(['qihao', 'lottery_type'])
+                    ->where(['AND', ['=', 'lottery_type',$lottery_type], ['<', 'qihao', $qihao]])
+                    ->orderBy(['id'=>SORT_DESC])->limit(1)->one();
+                $beforeQihao = $SscKjDatas['qihao'];
             }
         }
 
