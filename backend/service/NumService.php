@@ -1980,7 +1980,7 @@ class NumService extends BaseService {
      * @param $filter_dynamic_types
      * @return array
      */
-    public static function getBeforeKjCodesDynamic($filter_dynamic_types, $lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3){
+    public static function getBeforeKjCodesDynamic($filter_dynamic_types, $lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, object $plan){
         $query = Num4Type::find()->select(['code', 'code_type'])
             ->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
@@ -1996,7 +1996,7 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic1($lottery_type, $playway, $cNum=3);
                     break;
                 case 3: # 头尾去除当期期号最后两位相加
-                    $codes = NumService::getBeforeKjCodesDynamic3($lottery_type, $playway);
+                    $codes = NumService::getBeforeKjCodesDynamic3($lottery_type, $playway, $plan);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
@@ -2016,7 +2016,7 @@ class NumService extends BaseService {
     private static function getBeforeKjCodesDynamic1($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, $cNum=3){
         $filterNum1 = NumService::$MIN_CODES;  # 至少上一个
         $filterNum2 = NumService::$MAX_CODES;  # 至少上一个
-        $NewKjCodes = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
+        $NewKjCodes = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one(); # 最新一期
         $NewCodes = array_unique([$NewKjCodes->code1, $NewKjCodes->code2, $NewKjCodes->code3, $NewKjCodes->code4]);
         $filterNumKjCodes = array_diff(NumService::$ALL_CODES, $NewCodes); # 剔除上期开奖号码之后，至少上cNum个
         $query = Num4Type::find()
@@ -2058,11 +2058,25 @@ class NumService extends BaseService {
      * 过滤类型号码 - 头尾去除当期期号最后两位相加(主要针对四定)
      * @param int $lottery_type
      * @param int $playway
+     * @param int $playway
+     * @param object $plan
      * @return array
      */
-    public static function getBeforeKjCodesDynamic3($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3){
-        $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
-        $last2Nums = [substr($DataDealStatus['next_qihao'], -1, 1), substr($DataDealStatus['next_qihao'], -2, 1)];
+    public static function getBeforeKjCodesDynamic3($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, object $plan){
+        if($plan->is_batch_simulate){
+            $endBettedRecord = BettingRecords::find()->select(['qihao'])
+                ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+            if(empty($endBettedRecord)){
+                $endQihao = SscKjData::find()->where(['lottery_type'=>$lottery_type])->limit(1)->asArray()->one()['qihao'];
+            }else{
+                $endQihao = $endBettedRecord['qihao'];
+            }
+            $next_qihao = KjDataGet::getNextQihaoByQihao($endQihao, $lottery_type);
+        }else{
+            $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $next_qihao = $DataDealStatus['next_qihao'];
+        }
+        $last2Nums = [substr($next_qihao, -1, 1), substr($next_qihao, -2, 1)];
         #p([$DataDealStatus['next_qihao'], $last2Nums, array_sum($last2Nums)]);
         $last2NumsPlus = substr(array_sum($last2Nums), -1, 1);
         #p($last2NumsPlus);

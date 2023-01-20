@@ -442,6 +442,13 @@ class KjDataGet
             $nextQihao = $qihao + 1;
             switch ($lottery_type){
                 case 1: # 七星彩
+                case 17: # 排列五
+                    $SscKjDatas = SscKjData::find()->select(['qihao', 'lottery_type'])
+                        ->where(['AND', ['=', 'lottery_type',$lottery_type], ['>', 'qihao', $qihao]])
+                        ->orderBy(['id'=>SORT_ASC])->limit(1)->one();
+                    if(!empty($SscKjDatas)){
+                        $nextQihao = $SscKjDatas['qihao'];
+                    }
                     break;
                 case 5: # 重庆
                     $year = '20'.substr($qihao,0,2);
