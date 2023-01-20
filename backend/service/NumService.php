@@ -3016,7 +3016,7 @@ class NumService extends BaseService {
                 }elseif (in_array($lottery_type, [1,17])){
                     $current_qihao = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_ASC])->limit(1)->asArray()->one()['qihao'];
                     if(($lottery_type==1 && $current_qihao>=2023008) OR ($lottery_type==17 && $current_qihao>=2023018)){
-                        return false;
+                        throw_info('最新期号截止');
                     }
                 }
                 if($r = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->limit(1)->one()){
