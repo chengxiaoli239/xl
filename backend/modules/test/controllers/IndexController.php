@@ -295,7 +295,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $current_qihao = NumService::getPlanBetCurrentQihao($plan_id='5833', $lottery_type = 17);
+        $current_qihao = NumService::getPlanBetCurrentQihao($plan_id='5834', $lottery_type = 17);
         p($current_qihao);
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao = '20211215286', $lottery_type = 8);
         p($next_qihao);
