@@ -271,6 +271,7 @@ class KjDataGet
     public static function afterKj($lottery_type = DEFAULT_LOTTERY_TYPE){
 
         list($code, $qihao) = SscDataService::insertDealDataTask($lottery_type); # 数据处理任务写入
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖后处理', ['code'=>$code, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
 
         $rst = ['status'=>200, 'msg'=>'处理成功'];
         if($code==0){
