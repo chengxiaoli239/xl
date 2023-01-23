@@ -1996,13 +1996,16 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic1($lottery_type, $playway, $cNum=3);
                     break;
                 case 3: # 头尾去除当期期号最后两位相加
-                    $codes = NumService::getBeforeKjCodesDynamic3($lottery_type, $playway, $plan);
+                    $codes = NumService::getBeforeKjCodesDynamic3($plan, $lottery_type, $playway);
                     break;
                 case 4: # 头去除当期期号最后两位相加
-                    $codes = NumService::getBeforeKjCodesDynamic4($lottery_type, $playway, $plan);
+                    $codes = NumService::getBeforeKjCodesDynamic4($plan, $lottery_type, $playway);
                     break;
                 case 5: # 尾去除当期期号最后两位相加
-                    $codes = NumService::getBeforeKjCodesDynamic5($lottery_type, $playway, $plan);
+                    $codes = NumService::getBeforeKjCodesDynamic5($plan, $lottery_type, $playway);
+                    break;
+                case 6: # 头尾相加不等于期号最后两位相加(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic6($plan, $lottery_type, $playway);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
@@ -2067,7 +2070,7 @@ class NumService extends BaseService {
      * @param object $plan
      * @return array
      */
-    public static function getBeforeKjCodesDynamic3($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, object $plan){
+    public static function getBeforeKjCodesDynamic3(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3){
         if($plan->is_batch_simulate){
             $endBettedRecord = BettingRecords::find()->select(['qihao'])
                 ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->asArray()->one();
@@ -2105,7 +2108,7 @@ class NumService extends BaseService {
      * @param object $plan
      * @return array
      */
-    public static function getBeforeKjCodesDynamic4($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, object $plan){
+    public static function getBeforeKjCodesDynamic4(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3){
         if($plan->is_batch_simulate){
             $endBettedRecord = BettingRecords::find()->select(['qihao'])
                 ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->asArray()->one();
@@ -2139,7 +2142,7 @@ class NumService extends BaseService {
      * @param object $plan
      * @return array
      */
-    public static function getBeforeKjCodesDynamic5($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, object $plan){
+    public static function getBeforeKjCodesDynamic5(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3){
         if($plan->is_batch_simulate){
             $endBettedRecord = BettingRecords::find()->select(['qihao'])
                 ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->asArray()->one();
@@ -2158,6 +2161,40 @@ class NumService extends BaseService {
 
         $query = Num4Type::find()->select(['code', 'code_type'])
             ->where(['!=', 'code_4', $last2NumsPlus])
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $NumTypes = $query->asArray()->all();
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 头尾相加不等于期号最后两位相加(主要针对四定)
+     * @param int $lottery_type
+     * @param int $playway
+     * @param int $playway
+     * @param object $plan
+     * @return array
+     */
+    public static function getBeforeKjCodesDynamic6(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3){
+        if($plan->is_batch_simulate){
+            $endBettedRecord = BettingRecords::find()->select(['qihao'])
+                ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+            if(empty($endBettedRecord)){
+                $endQihao = SscKjData::find()->where(['lottery_type'=>$lottery_type])->limit(1)->asArray()->one()['qihao'];
+            }else{
+                $endQihao = $endBettedRecord['qihao'];
+            }
+            $next_qihao = KjDataGet::getNextQihaoByQihao($endQihao, $lottery_type);
+        }else{
+            $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $next_qihao = $DataDealStatus['next_qihao'];
+        }
+        $last2Nums = [substr($next_qihao, -1, 1), substr($next_qihao, -2, 1)];
+        $last2NumsPlus = substr(array_sum($last2Nums), -1, 1);
+
+        $query = Num4Type::find()->select(['code', 'code_type'])
+            ->where('(code1+code4)!='.$last2NumsPlus)
             ->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
