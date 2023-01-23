@@ -2194,7 +2194,7 @@ class NumService extends BaseService {
         $last2NumsPlus = substr(array_sum($last2Nums), -1, 1);
 
         $query = Num4Type::find()->select(['code', 'code_type'])
-            ->where('(code1+code4)!='.$last2NumsPlus)
+            ->where('(code_1+code_4)!='.$last2NumsPlus)
             ->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
