@@ -78,6 +78,9 @@ use yii\widgets\ActiveForm;
 
                     <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
+                <!--动态过滤号码-->
+                <?php include(dirname(__FILE__).'/filter_dynamic.php'); # 动态过滤号码 ?>
+
                 <div class="row">
                     <div class="col-lg-6 col-xs-12">
                         <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
