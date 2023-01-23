@@ -2191,10 +2191,16 @@ class NumService extends BaseService {
             $next_qihao = $DataDealStatus['next_qihao'];
         }
         $last2Nums = [substr($next_qihao, -1, 1), substr($next_qihao, -2, 1)];
-        $last2NumsPlus = substr(array_sum($last2Nums), -1, 1);
+        $last2NumsPlus_1 = substr(array_sum($last2Nums), -1, 1);
+        if($last2NumsPlus_1<10){
+            $last2NumsPlus_2 = $last2NumsPlus_1 + 10;
+        }else{
+            $last2NumsPlus_2 = $last2NumsPlus_1 - 10;
+        }
 
         $query = Num4Type::find()->select(['code', 'code_type'])
-            ->where('(code_1+code_4)!='.$last2NumsPlus)
+            ->where('(code_1+code_4)!='.$last2NumsPlus_1)
+            ->where('(code_1+code_4)!='.$last2NumsPlus_2)
             ->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
