@@ -9,16 +9,16 @@
         <?= $form->field($model, 'filter_poses')->checkboxList($filter_date_pos1)->label('位置') ?>
     </div>
     -->
-    <div class="col-lg-2 col-xs-1">
-        <?= $form->field($model, 'is_batch_simulate')->checkboxList($is_filter_dates)->label('是否模拟') ?>
+    <div class="col-lg-2 col-xs-5">
+        <?= $form->field($model, 'is_batch_simulate')->checkboxList($is_filter_dates)->label('模拟') ?>
     </div>
-    <div class="col-lg-2 col-xs-4">
-        <?= $form->field($model, 'test_period_days')->textInput()->label('周期:7, 则模拟最近7天数据') ?>
+    <div class="col-lg-2 col-xs-7">
+        <?= $form->field($model, 'test_period_days')->textInput()->label('周期:7则模拟最近7天数据') ?>
     </div>
-    <div class="col-lg-2 col-xs-4">
+    <div class="col-lg-2 col-xs-6">
         <?= $form->field($model, 'start_qihao')->textInput()->label('开始期号') ?>
     </div>
-    <div class="col-lg-2 col-xs-4">
+    <div class="col-lg-2 col-xs-6">
         <?= $form->field($model, 'filter_type')->dropDownList($code_filter_types)->label('排除类型') ?>
     </div>
     <?php ;?>

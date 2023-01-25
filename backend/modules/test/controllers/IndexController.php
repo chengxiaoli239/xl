@@ -295,14 +295,15 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(1);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[7], $lottery_type=8, 3, $plan);
+        p(count($filter_dynamic_codes));
         $current_qihao = NumService::getPlanBetCurrentQihao($plan_id='5834', $lottery_type = 17);
         p($current_qihao);
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao = '20211215286', $lottery_type = 8);
         p($next_qihao);
         $rst = KjDataGet::getBeforeQihaoByQihao('230120224', 23);
         p($rst);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[1], $lottery_type=8);
-        p($filter_dynamic_codes);
         $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 8);
         p($rst);
         $miss = SscDataService::staticPeiShuDate($lottery_type = 8);

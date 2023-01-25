@@ -2007,6 +2007,9 @@ class NumService extends BaseService {
                 case 6: # 头尾相加不等于期号最后两位相加(四定)
                     $codes = NumService::getBeforeKjCodesDynamic6($plan, $lottery_type, $playway);
                     break;
+                case 7: # 过滤前200期开过号码的全转
+                    $codes = NumService::getBeforeKjCodesDynamic7($lottery_type, $playway);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -2201,6 +2204,28 @@ class NumService extends BaseService {
         $query = Num4Type::find()->select(['code', 'code_type'])
             ->where('(code_1+code_4)!='.$last2NumsPlus_1)
             ->andWhere('(code_1+code_4)!='.$last2NumsPlus_2)
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $NumTypes = $query->asArray()->all();
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 前200期开过的号码全转
+     * @param int $lottery_type
+     * @param int $playway
+     * @param int $playway
+     * @return array
+     */
+    public static function getBeforeKjCodesDynamic7($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, $num=200){
+        $needCodes = SscKjData::find()->select(['code_4n'])
+            ->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit($num)->asArray()->all();
+        $filterCodes = ArrayHelper::getColumn($needCodes, 'code_4n');
+        $filterCodesStr = implode('","', $filterCodes);
+
+        $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
+            ->where('n.code_str NOT IN("'.$filterCodesStr.'")')
             ->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
