@@ -131,7 +131,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             'format'=>'raw',
                             'value' => function($model) {
                                 if(in_array($model->plan_type,[1, 3]) OR ($model->take_profits>0 OR $model->stop_loss)){
-                                    $txt = '止盈:'.floatval($model->take_profits)." 止损:".floatval($model->stop_loss) .' 当前:'.round($model->current_profits, 2) ;
+                                    $txt = '止盈:'.floatval($model->take_profits)." 止损:".floatval($model->stop_loss) .' 当前:<font color="'.(($model->current_profits>0)?'green':($model->current_profits<0?'red':'')).'">'.round($model->current_profits, 2).'</font>' ;
                                 }else{
                                     $txt = '';
                                 }
