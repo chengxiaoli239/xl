@@ -351,6 +351,7 @@ class UserSysPlansController extends BaseController
 
             # 4、动态过滤
             'is_filter_dynamic' => $is_filters,
+            'filter_dynamic_typesArr' => NumService::$filter_dynamic_types,
 
             'code_filter_types' => $code_filter_types, # 排除类型
             # 2、排除前x天内同期
