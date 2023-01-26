@@ -35,6 +35,16 @@ class NumService extends BaseService {
 
     public static $pos_to_desc = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
     public static $pos_to_desc1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个', 5=>'五'];
+    public static $filter_dynamic_types = [
+        1=>'1小1大，剔除前期号码至少2个上奖',
+        #2=>'1小1大，剔除前期号码至少3个上奖',
+        3=>'头尾去除期号最后两位相加(四定)',
+        4=>'头去除期号最后两位相加(四定)',
+        5=>'尾去除期号最后两位相加(四定)',
+        6=>'头尾相加不等于期号后两位相加(四定)',
+        7=>'过滤前200期开过号码的全转(四定)',
+        9=>'xxxx',
+    ];
 
     /**
      * @description 根据开奖号码返回三字现
@@ -1951,8 +1961,11 @@ class NumService extends BaseService {
         }
 
         # 动态过滤
-        if(isset($hz_Arr['is_filter_dynamic']) && $hz_Arr['is_filter_dynamic']){
-            $desc .= "动态过滤";
+        if(isset($hz_Arr['is_filter_dynamic']) && $hz_Arr['is_filter_dynamic'] && !empty($hz_Arr['filter_dynamic_types'])){
+            $desc .= "动态过滤:";
+            foreach ($hz_Arr['filter_dynamic_types'] as $filter_dynamic_type){
+                $desc .= NumService::$filter_dynamic_types[$filter_dynamic_type];
+            }
         }
 
         return $desc;

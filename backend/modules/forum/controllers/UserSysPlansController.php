@@ -187,6 +187,7 @@ class UserSysPlansController extends BaseController
 
             # 4、动态过滤
             'is_filter_dynamic' => $is_filters,
+            'filter_dynamic_typesArr' => NumService::$filter_dynamic_types,
 
             'code_filter_types' => $code_filter_types, # 排除类型
 
@@ -444,6 +445,7 @@ class UserSysPlansController extends BaseController
             'is_filter_dates' => $is_filters,
             'filter_date_pos1' => $filter_pos1,
             'filter_date_pos2' => $filter_pos2,
+            'filter_dynamic_typesArr' => NumService::$filter_dynamic_types,
             'lottery_types' => $lottery_types,
             'lottery_type' => $lottery_type,
 
