@@ -3,6 +3,7 @@ namespace common\service\jobs\kj_data;
 
 use backend\service\BetService;
 use common\service\jobs\CommonJob;
+use common\tools\KjDataGet;
 
 class UserBetTaskRecordJob extends CommonJob {
 
@@ -18,6 +19,10 @@ class UserBetTaskRecordJob extends CommonJob {
     public static function handle($params){
         $lottery_type = $params['lottery_type'];
 
+        KjDataGet::isCanGrab($lottery_type, $isCanBet);
+        if(!$isCanBet){
+            return '非开盘时间段';
+        }
         $rst = BetService::insertPlansTask([$lottery_type]);
         return $rst;
     }
