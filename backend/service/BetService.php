@@ -916,12 +916,6 @@ abstract class BetService extends BaseBetService {
         //p(['buy_type'=>$buy_type, 'before_count'=>$before_count, 'after_count'=>count($codesArr), 'codesArr'=>$codesArr]);
         //p($codes_hz_data);
 
-        # 排除前xx期号码
-        if(isset($codes_hz_data['is_filter_history']) && $codes_hz_data['is_filter_history']==1 && $codes_hz_data['filter_history_nums']>0){
-            $filter_history_codes = NumService::getBeforeKjCodesFromSite($codes_hz_data['filter_history_nums']);
-            $codesArr = array_diff($codesArr, $filter_history_codes); # 返回$codes在$filter_codes中没有的号码
-        }
-
         $codes_hz_data = json_decode($codes_hz, true);
         if(isset($codes_hz_data['filters']['filter_type']) && in_array($codes_hz_data['filters']['filter_type'], [1])){
             # 过滤号码，filter_type:1过滤前x期号码
@@ -2138,7 +2132,7 @@ abstract class BetService extends BaseBetService {
                 try {
                     $plan_id = $plan->id;
                     if($plan_id == 5119) continue;
-                    $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
+                    $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type); # 获取当前模拟计划即将下注的期号
 
                     $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan_id.'_'.$current_qihao;
                     if(!$RedisLock->lock($mkey.'_redis', 1) && $isAuto==1){

@@ -49,9 +49,6 @@ $this->params['breadcrumbs'][] = $this->title;
         # 3、排除期号，比如：058期 则排除 58XX
         'is_filter_qihaos' => $is_filter_qihaos,
 
-        # 4、排查前xx期号码
-        'is_filter_history' => $is_filter_history,
-
         # 5、动态过滤
         'is_filter_dynamic' => $is_filter_dynamic,
         # 动态过滤

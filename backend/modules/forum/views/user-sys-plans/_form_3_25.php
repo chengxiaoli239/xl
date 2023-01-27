@@ -271,9 +271,6 @@ use yii\widgets\ActiveForm;
                 <?php //include(dirname(__FILE__).'/A_x_arise_B_y_arise_bet_B.php'); # A出x次B出y次投B ?>
 
 
-                <!--排除前xx个/期号码-->
-                <?php include(dirname(__FILE__).'/filter_history_codes.php'); # 过滤前xx个号码 ?>
-
                 <!--动态过滤号码-->
                 <?php include(dirname(__FILE__).'/filter_dynamic.php'); # 动态过滤号码 ?>
 

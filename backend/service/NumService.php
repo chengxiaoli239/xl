@@ -1955,11 +1955,6 @@ class NumService extends BaseService {
             $desc .= '轮换位置:'.NumService::$pos_to_desc[$hz_Arr['change_turn_pos']]; # 位置的号码数决定下次轮换第几组
         }
 
-        # 是否过滤前xx期号码
-        if(isset($hz_Arr['is_filter_history']) && $hz_Arr['is_filter_history']){
-            $desc .= '过滤前:'.(int)$hz_Arr['filter_history_nums'].'期号码';
-        }
-
         # 动态过滤
         if(isset($hz_Arr['is_filter_dynamic']) && $hz_Arr['is_filter_dynamic'] && !empty($hz_Arr['filter_dynamic_types'])){
             $desc .= "动态过滤:";

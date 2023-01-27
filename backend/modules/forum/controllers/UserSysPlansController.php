@@ -137,9 +137,6 @@ class UserSysPlansController extends BaseController
         # 3、排除前期号
         $model->is_filter_qihao = 0;
 
-        # 4、排除前xx期号码
-        $model->is_filter_history = 0;
-
         # 5、动态过滤
         $model->is_filter_dynamic = 0;
         ############################ 排除参数结束 #############################
@@ -181,9 +178,6 @@ class UserSysPlansController extends BaseController
             'filter_date_pos1' => $filter_pos1,
             'filter_date_pos2' => $filter_pos2,
             'lottery_types' => $lottery_types,
-
-            # 3、排查前x期
-            'is_filter_history' => $is_filters,
 
             # 4、动态过滤
             'is_filter_dynamic' => $is_filters,
@@ -257,6 +251,7 @@ class UserSysPlansController extends BaseController
                 $model->is_filter = $filters['is_filter'];
                 $model->filter_xQ_before = $filters['filter_xQ_before'];
                 $model->filter_pos1 = $filters['filter_pos1']; # 位置选项
+                $model->start_qihao = $hz_Arr_Data['filters']['start_qihao'] ? : ''; # 模拟起始起始期号
                 $model->filter_pos2 = $filters['filter_pos2']; # 位置选项
             }
             # 动态排除同位置号码
@@ -268,12 +263,7 @@ class UserSysPlansController extends BaseController
                 $model->test_period_days = $hz_Arr_Data['filters']['test_period_days'] ? : '';
                 $model->start_qihao = $hz_Arr_Data['filters']['start_qihao'] ? : '';
             }
-
             unset($hz_Arr_Data['filters']);
-            if(isset($hz_Arr_Data['is_filter_history'])){
-                $model->is_filter_history = (int)$hz_Arr_Data['is_filter_history'];
-                $model->filter_history_nums = (int)$hz_Arr_Data['filter_history_nums'];
-            }
 
             # 动态过滤
             if(isset($hz_Arr_Data['is_filter_dynamic'])){
@@ -346,9 +336,6 @@ class UserSysPlansController extends BaseController
             'filter_date_pos1' => $filter_pos1,
             'filter_date_pos2' => $filter_pos2,
 
-            # 3、排查前x期
-            'is_filter_history' => $is_filters,
-
             # 4、动态过滤
             'is_filter_dynamic' => $is_filters,
             'filter_dynamic_typesArr' => NumService::$filter_dynamic_types,
@@ -408,9 +395,6 @@ class UserSysPlansController extends BaseController
 
         # 2、排除前期号
         $model->is_filter_qihao = 0;
-
-        # 4、排除前xx期号码
-        $model->is_filter_history = 0;
 
         # 5、动态过滤
         $model->is_filter_dynamic = 0;

@@ -502,13 +502,9 @@ class UserSysPlansService extends BaseService {
         }
 
         # 2、动态过滤
-        if(isset($UserSysPlans['filter_type']) && !empty($UserSysPlans['filter_type'])){
+        if(!empty($UserSysPlans['start_qihao'])){
             $filters = array_merge($filters, [
-                'filter_type' => $UserSysPlans['filter_type'],
-                'filter_nums' => $UserSysPlans['filter_nums'],
-                'test_period_days' => (int)trim($UserSysPlans['test_period_days']),
                 'playway' => $playway,
-                'filter_poses' => $UserSysPlans['filter_poses'],
                 'start_qihao' => $UserSysPlans['start_qihao'],
                 'lottery_type' => $lottery_type,
             ]);
