@@ -1960,7 +1960,7 @@ class NumService extends BaseService {
         if(isset($hz_Arr['is_filter_dynamic']) && $hz_Arr['is_filter_dynamic'] && !empty($hz_Arr['filter_dynamic_types'])){
             $desc .= "动态过滤:";
             foreach ($hz_Arr['filter_dynamic_types'] as $filter_dynamic_type){
-                $desc .= NumService::$filter_dynamic_types[$filter_dynamic_type];
+                $desc .= NumService::$filter_dynamic_types[$filter_dynamic_type].'、';
             }
         }
 
