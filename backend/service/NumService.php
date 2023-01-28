@@ -38,12 +38,13 @@ class NumService extends BaseService {
     public static $filter_dynamic_types = [
         1=>'1小1大，剔除前期号码至少2个上奖',
         #2=>'1小1大，剔除前期号码至少3个上奖',
-        3=>'头尾去除期号最后两位相加(四定)',
-        4=>'头去除期号最后两位相加(四定)',
-        5=>'尾去除期号最后两位相加(四定)',
-        6=>'头尾相加不等于期号后两位相加(四定)',
+        3=>'头尾去除期号最后两位相加',
+        4=>'头去除期号最后两位相加',
+        5=>'尾去除期号最后两位相加',
+        6=>'头尾相加不等于期号后两位相加',
         7=>'过滤前200期开过号码的全转(四定)',
         8=>'千十相加不等于期号后两位相加(四定)',
+        9=>'随机9000组(四定)',
     ];
 
     /**
@@ -2012,7 +2013,7 @@ class NumService extends BaseService {
                 case 5: # 尾去除当期期号最后两位相加
                     $codes = NumService::getBeforeKjCodesDynamic5($plan, $lottery_type, $playway);
                     break;
-                case 6: # 头尾相加不等于期号最后两位相加(四定)
+                case 6: # 头尾相加不等于期号最后两位相加
                     $codes = NumService::getBeforeKjCodesDynamic6($plan, $lottery_type, $playway);
                     break;
                 case 7: # 过滤前200期开过号码的全转
@@ -2020,6 +2021,9 @@ class NumService extends BaseService {
                     break;
                 case 8: # 头尾相加不等于期号最后两位相加(四定)
                     $codes = NumService::getBeforeKjCodesDynamic8($plan, $lottery_type, $playway);
+                    break;
+                case 9: # 随机9000组(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic9($playway);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
@@ -2077,7 +2081,7 @@ class NumService extends BaseService {
     }
 
     /**
-     * 过滤类型号码 - 头尾去除当期期号最后两位相加(主要针对四定)
+     * 过滤类型号码 - 头尾去除当期期号最后两位相加(支持二三四定，主要针对四定)
      * @param int $lottery_type
      * @param int $playway
      * @param int $playway
@@ -2115,7 +2119,7 @@ class NumService extends BaseService {
     }
 
     /**
-     * 过滤类型号码 - 头去除当期期号最后两位相加(主要针对四定)
+     * 过滤类型号码 - 头去除当期期号最后两位相加(支持二三四定，主要针对四定)
      * @param int $lottery_type
      * @param int $playway
      * @param int $playway
@@ -2149,7 +2153,7 @@ class NumService extends BaseService {
     }
 
     /**
-     * 过滤类型号码 - 尾去除当期期号最后两位相加(主要针对四定)
+     * 过滤类型号码 - 尾去除当期期号最后两位相加(支持二三四定，主要针对四定)
      * @param int $lottery_type
      * @param int $playway
      * @param int $playway
@@ -2183,7 +2187,7 @@ class NumService extends BaseService {
     }
 
     /**
-     * 过滤类型号码 - 头尾相加不等于期号最后两位相加(主要针对四定)
+     * 过滤类型号码 - 头尾相加不等于期号最后两位相加(支持二三四定，主要针对四定)
      * @param int $lottery_type
      * @param int $playway
      * @param int $playway
@@ -2245,7 +2249,7 @@ class NumService extends BaseService {
     }
 
     /**
-     * 过滤类型号码 - 千十相加不等于期号最后两位相加(主要针对四定)
+     * 过滤类型号码 - 千十相加不等于期号最后两位相加(定位，主要针对四定)
      * @param int $lottery_type
      * @param int $playway
      * @param int $playway
@@ -2279,6 +2283,22 @@ class NumService extends BaseService {
             ->andWhere('(code_1+code_3)!='.$last2NumsPlus_2)
             ->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 随机9000组(主要针对四定)
+     * @param int $playway
+     * @param int $limit
+     * @return array
+     */
+    public static function getBeforeKjCodesDynamic9($playway=3, $limit=9000){
+
+        $query = Num4Type::find()->select(['code', 'code_type'])
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $NumTypes = $query->orderBy('RAND()')->asArray()->limit($limit)->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
         return $codes;
