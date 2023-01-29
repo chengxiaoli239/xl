@@ -296,8 +296,8 @@ class IndexController extends Controller
     public function actionDw()
     {
         $plan = UserSysPlans::findOne(1);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[9], $lottery_type=8, 3, $plan);
-        p($filter_dynamic_codes);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[10], $lottery_type=8, 3, $plan);
+        p(count($filter_dynamic_codes));
         $current_qihao = NumService::getPlanBetCurrentQihao($plan_id='5834', $lottery_type = 17);
         p($current_qihao);
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao = '20211215286', $lottery_type = 8);

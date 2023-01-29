@@ -45,6 +45,7 @@ class NumService extends BaseService {
         7=>'过滤前200期开过号码的全转(四定)',
         8=>'千十相加不等于期号后两位相加(四定)',
         9=>'随机9000组(四定)',
+        10=>'过滤最近3000组(四定)',
     ];
 
     /**
@@ -2025,6 +2026,9 @@ class NumService extends BaseService {
                 case 9: # 随机9000组(四定)
                     $codes = NumService::getBeforeKjCodesDynamic9($playway);
                     break;
+                case 10: # 过滤最近3000组(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic10($lottery_type, $playway);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -2299,6 +2303,29 @@ class NumService extends BaseService {
         $query = Num4Type::find()->select(['code', 'code_type'])
             ->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->orderBy('RAND()')->asArray()->limit($limit)->all();
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 前3000期开过的号码
+     * @param int $lottery_type
+     * @param int $playway
+     * @param int $playway
+     * @return array
+     */
+    public static function getBeforeKjCodesDynamic10($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, $num=3000){
+        $needCodes = SscKjData::find()->select(['code_4n_str'])
+            ->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit($num)->asArray()->all();
+        p(SscKjData::find()->select(['code_4n_str'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit($num)->createCommand()->getRawSql());
+        $filterCodes = ArrayHelper::getColumn($needCodes, 'code_4n_str');
+        $filterCodesStr = implode('","', $filterCodes);
+
+        $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
+            ->where('n.code NOT IN("'.$filterCodesStr.'")')
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
         return $codes;
