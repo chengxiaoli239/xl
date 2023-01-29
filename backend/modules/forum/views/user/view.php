@@ -71,7 +71,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                         }
                                     ],
                                     //'desc',
-                                    [ 'attribute'=>'desc','label'=>'网盘状态',
+                                    [ 'attribute'=>'desc','label'=>'状态',
                                         'format'=>'raw',
                                         'value'=>function($model){
                                             return empty($model->desc) ? '<font color="green">正常</font>' : '<font color="red">'.$model->desc.'</font>';
@@ -96,7 +96,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                         'format'=>'raw',
                                         'value' => function($model) {
                                             $set = Html::a('设置', 'javascript:;', ['id' => 'setProfits','alt'=>'设置止盈止损', 'class'=>'btn btn-xs']);
-                                            return  '止盈:'.$model->take_profits.'  止损:'.$model->stop_loss.' 当前:'.$model->current_profits.'  '.$set;
+                                            return  '止盈:'.$model->take_profits.'  止损:'.$model->stop_loss.' 当前:<font color="'.($model->current_profits<0?'red':'green').'">'.$model->current_profits.'</font>  '.$set;
                                         }
                                     ],
                                     [ 'attribute'=>'update_time','label'=>'更新时间','value'=>function($model){
