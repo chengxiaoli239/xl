@@ -87,20 +87,17 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                     [ 'attribute'=>'access_token','label'=>'token','value'=>function($model){
                                         return $model->access_token;
                                     }],
-                                    ['attribute' => 'odds_2d', 'label'=>'二定赔率', //'headerOptions' => ['width' => '170'],
+                                    ['attribute' => 'odds_2d', 'label'=>'赔率', //'headerOptions' => ['width' => '170'],
                                         'value'=> function($model){
-                                            return  $model->odds_2d;
+                                            return  '二定:'.$model->odds_2d .'、 '.'三定:'.$model->odds_3d .'、 '.'三定:'.$model->odds_4d;
                                         },
                                     ],
-                                    ['attribute' => 'odds_3d', 'label'=>'三定赔率', //'headerOptions' => ['width' => '170'],
-                                        'value'=> function($model){
-                                            return  $model->odds_3d;
-                                        },
-                                    ],
-                                    ['attribute' => 'odds_4d', 'label'=>'四定赔率', //'headerOptions' => ['width' => '170'],
-                                        'value'=> function($model){
-                                            return  $model->odds_4d;
-                                        },
+                                    ['attribute' => 'odds_3d', 'label'=>'盈利', //'headerOptions' => ['width' => '170'],
+                                        'format'=>'raw',
+                                        'value' => function($model) {
+                                            $set = Html::a('设置', 'javascript:;', ['id' => 'setProfits','alt'=>'设置止盈止损', 'class'=>'btn btn-xs']);
+                                            return  '止盈:'.$model->take_profits.'  止损:'.$model->stop_loss.' 当前:'.$model->current_profits.'  '.$set;
+                                        }
                                     ],
                                     [ 'attribute'=>'update_time','label'=>'更新时间','value'=>function($model){
                                         return $model->update_time;
@@ -136,6 +133,35 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
     </div>
 </div>
 
+<div class="modal fade" id="setProfitsModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="set_msg_title">设置止盈止损</h4>
+            </div>
+            <div class="modal-body">
+                <form class="bs-example bs-example-form" role="form">
+                    <div class="input-group">
+                        <span class="input-group-addon">止盈</span>
+                        <input type="text" class="form-control" placeholder="止盈" name="take_profits" id="take_profits" value="<?echo $models[0]->take_profits?>">
+                    </div>
+                    <br>
+                    <div class="input-group">
+                        <span class="input-group-addon">止损</span>
+                        <input type="text" class="form-control" placeholder="止损" name="stop_loss" id="stop_loss" value="<?echo $models[0]->stop_loss?>">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="setProfitsBtn">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script>
 <script>
 $(function () {
@@ -161,15 +187,33 @@ $(function () {
 
     function showTips(id, tip_msg = '同步余额', title = '提示信息') {
         console.log(id);
-    	$('#tip_msg_title').html(title);
-    	$('#tip_msg').html(tip_msg);
-    	$('#tipModal').modal('show');
-    	$("#opConfirm").attr('op-id', id);
+        $('#tip_msg_title').html(title);
+        $('#tip_msg').html(tip_msg);
+        $('#tipModal').modal('show');
+        $("#opConfirm").attr('op-id', id);
     }
 
     $('#opConfirm').click(function () {
         var id = $(this).attr('op-id');
         if(id != null) updateBalance(id)
     });
+
+    $('#setProfits').click(function () {
+        $('#set_msg_title').html('设置止盈止损');
+        $('#setProfitsModal').modal('show');
+    });
+
+    $('#setProfitsBtn').click(function () {
+        profits = $('#take_profits').val()
+        loss = $('#stop_loss').val()
+        var data = {take_profits:profits, stop_loss:loss};
+        $.post("/forum/user/set-profits",data,function(rst) {
+            console.log(rst)
+            if(rst.status == 200) {
+                window.href.reload()
+            }
+        },'JSON');
+    });
+
 });
 </script>

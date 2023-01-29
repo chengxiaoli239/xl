@@ -360,6 +360,19 @@ class UserController extends BaseController
 
     /**
      * @desc 修改投注系统状态，主要是禁止账号自动登录和获取余额
+     * @return \yii\web\Response
+     */
+    public function actionSetProfits(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $uid = \Yii::$app->user->id;
+        UserService::setProfits($uid, $post);
+
+        return $this->redirect(['view']);
+    }
+
+    /**
+     * @desc 修改投注系统状态，主要是禁止账号自动登录和获取余额
      * @param $id
      * @param $status
      * @return \yii\web\Response

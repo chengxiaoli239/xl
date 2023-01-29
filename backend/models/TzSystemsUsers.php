@@ -35,6 +35,9 @@ use Yii;
  * @property string $odds_4d 四定赔率
  * @property string $warn_val 预警值
  * @property string $desc 盘口状态
+ * @property float $take_profits 止盈
+ * @property float $stop_loss 止损
+ * @property float $current_profits 当前盈利
  * @property int $is_auto_bet 自动下注
  * @property int $is_use_proxy 使用代理
  * @property int $is_local_bet 是否本地

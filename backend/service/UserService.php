@@ -455,4 +455,33 @@ class UserService extends BaseService {
         return true;
     }
 
+    /**
+     * 设置止盈止损
+     * @param $uid
+     * @param array $data
+     * @return bool
+     */
+    public static function setProfits($uid, $data=[]){
+        try {
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+            $TzSystemsUsers->setAttributes($data, false);
+            $TzSystemsUsers->save();
+        }catch (\Exception $e){
+
+        }
+
+        return false;
+    }
+
+    /**
+     * 账号当前盈利
+     * @param $uid
+     * @return mixed
+     */
+    public static function staticUserProfits($uid){
+        $current_profits = UserSysPlans::find()->select(['current_profits'=>'SUM(current_profits)'])->where(['uid'=>$uid, 'status'=>[0, 1]])->asArray()->one()['current_profits'];
+
+        return $current_profits;
+    }
+
 }
