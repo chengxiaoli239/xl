@@ -526,10 +526,6 @@ class BaoTaService extends BaseService { #
         if(empty($tz_system_user_id)) return ['status'=>300, 'msg'=>'操作失败'];
         $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);
         $uid = $TzSystemsUsers->uid;
-        $is_auto_bet = $TzSystemsUsers->is_auto_bet;
-        if(!$is_auto_bet && !$is_auto){
-            //return ['status'=>300, 'msg'=>'状态未开启，不能同步到宝塔'];
-        }
 
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $BtCrontabs = BtCrontabs::findOne(['uid'=>$uid]);

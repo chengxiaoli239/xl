@@ -486,4 +486,31 @@ class UserService extends BaseService {
         return $current_profits?:0.00;
     }
 
+    /**
+     * 同步最新的用户盈利
+     * @param $uid
+     * @return array
+     */
+    public static function updateUserProfits($TzSystemsUsers){
+        try {
+            if($TzSystemsUsers->take_profits>0 OR $TzSystemsUsers->stop_loss>0){
+                $current_profits = UserService::staticUserProfits($TzSystemsUsers->uid);
+                if($current_profits>$TzSystemsUsers->take_profits OR $current_profits<(0-$TzSystemsUsers->stop_loss)){
+                    #throw_info('触发止盈止损：'.$current_profits, BetService::STOP_BET_CODE);
+                    $TzSystemsUsers->desc = '触发止盈止损：'.$current_profits;
+                    $TzSystemsUsers->current_profits = $current_profits;
+                    $TzSystemsUsers->save();
+                    $code = BetService::STOP_BET_CODE;
+                }else{
+                    $TzSystemsUsers->desc = '';
+                    $TzSystemsUsers->current_profits = $current_profits;
+                    $TzSystemsUsers->save();
+                    $code = 0;
+                }
+            }
+        }catch (\Exception $e){}
+
+        return [$code, $current_profits, $TzSystemsUsers];
+    }
+
 }

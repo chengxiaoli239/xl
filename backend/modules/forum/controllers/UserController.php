@@ -167,11 +167,15 @@ class UserController extends BaseController
      */
     public function actionSwitchAutoBetStatus($id, $status) {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        if(\Yii::$app->user->id == 1){
-            $rst = HN0898Service::updateStatus($id, '\backend\models\TzSystemsUsers', $field = 'is_auto_bet');
-            if($rst['status'] == 200){
-                $rst = BaoTaService::updateUserBetStatus($id);
+        $uid = \Yii::$app->user->id;
+        if($uid == 1){
+            HN0898Service::updateStatus($id, '\backend\models\TzSystemsUsers', $field = 'is_auto_bet');
+        }else{
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+            if($TzSystemsUsers->uid != $uid){
+                throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
             }
+            HN0898Service::updateStatus($id, '\backend\models\TzSystemsUsers', $field = 'is_auto_bet');
         }
 
         return $this->redirect(['view']);

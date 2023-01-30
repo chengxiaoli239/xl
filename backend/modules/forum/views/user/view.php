@@ -64,14 +64,22 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                             return  $model->ssc_domain;
                                         },
                                     ],
-                                    [ 'attribute'=>'status','label'=>'状态',
+                                    [ 'attribute'=>'status','label'=>'账号状态',
                                         'format'=>'raw',
                                         'value'=>function($model){
                                             return $model->status ? '<font color="green">已激活</font>' : '<font color="red">已禁用</font>';
                                         }
                                     ],
+                                    [ 'attribute'=>'is_auto_bet','label'=>'下注开关',
+                                        'format'=>'raw',
+                                        'value'=>function($model){
+                                            $txt = $model->is_auto_bet ? '<font color="green">已开启</font>' : '<font color="red">已关闭</font>';
+                                            $url = '/forum/user/switch-auto-bet-status?id='.$model->id.'&status='.($model->is_auto_bet?0:1);
+                                            return Html::a($txt, $url, ['title' => '点击切换','alt'=>'点击切换']);
+                                        }
+                                    ],
                                     //'desc',
-                                    [ 'attribute'=>'desc','label'=>'状态',
+                                    [ 'attribute'=>'desc','label'=>'网盘状态',
                                         'format'=>'raw',
                                         'value'=>function($model){
                                             return empty($model->desc) ? '<font color="green">正常</font>' : '<font color="red">'.$model->desc.'</font>';
@@ -96,7 +104,9 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                         'format'=>'raw',
                                         'value' => function($model) {
                                             $set = Html::a('设置', 'javascript:;', ['id' => 'setProfits','alt'=>'设置止盈止损', 'class'=>'btn btn-xs']);
-                                            return  '止盈:'.$model->take_profits.'  止损:'.$model->stop_loss.' 当前:<font color="'.($model->current_profits<0?'red':'green').'">'.$model->current_profits.'</font>  '.$set;
+                                            $resetProfits = Html::a('归零', 'javascript:;', ['id' => 'resetProfits','alt'=>'止盈止损归零', 'class'=>'btn btn-xs']);
+                                            return  '止盈:'.$model->take_profits.'  止损:'.$model->stop_loss
+                                                .' 当前:<font color="'.($model->current_profits<0?'red':'green').'">'.$model->current_profits.'</font>  '.$set.' '.$resetProfits;
                                         }
                                     ],
                                     [ 'attribute'=>'update_time','label'=>'更新时间','value'=>function($model){

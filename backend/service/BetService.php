@@ -1976,6 +1976,7 @@ abstract class BetService extends BaseBetService {
                     $tz_system_id = $plan->tz_sites;
                     $lottery_type = $plan->lottery_type;
                     $uid = $plan->uid;
+                    $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
                     $qihao = HN0898Service::getQihao($lottery_type);
                     Tool_Common::log('insertPlansTask', 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
                     //if($uid != 17) continue; # 测试
@@ -2013,24 +2014,14 @@ abstract class BetService extends BaseBetService {
                             $m->set($insert_mkey, 1, 120);
                         }
                     }else{
-                        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
-                        if($TzSystemsUsers->take_profits>0 OR $TzSystemsUsers->stop_loss>0){
-                            $current_profits = UserService::staticUserProfits($uid);
-                            if($current_profits>$TzSystemsUsers->take_profits OR $current_profits<(0-$TzSystemsUsers->stop_loss)){
-                                #throw_info('触发止盈止损：'.$current_profits, BetService::STOP_BET_CODE);
-                                $TzSystemsUsers->desc = '触发止盈止损：'.$current_profits;
-                                $TzSystemsUsers->current_profits = $current_profits;
-                                $TzSystemsUsers->save();
-                                continue;
-                            }else{
-                                $TzSystemsUsers->desc = '';
-                                $TzSystemsUsers->current_profits = $current_profits;
-                                $TzSystemsUsers->save();
-                            }
-                        }
-
                         $task_qihao = $qihao;
-                        Tool_Common::log('insertPlansTask', 'INFO', '插入计划任务-1', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'uid'=>$uid]);
+                        $logArr = ['plan_id'=>$plan->id, 'is_auto_bet'=>$TzSystemsUsers->is_auto_bet, 'lottery_type'=>$lottery_type, 'uid'=>$uid];
+                        Tool_Common::log('insertPlansTask', 'INFO', '插入计划任务-1', $logArr);
+
+                        list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
+                        if($code>0 OR !$TzSystemsUsers->is_auto_bet){
+                            continue;
+                        }
 
                         $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
                         $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
