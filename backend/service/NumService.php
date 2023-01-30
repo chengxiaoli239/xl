@@ -45,7 +45,7 @@ class NumService extends BaseService {
         7=>'过滤前200期开过号码的全转(四定)',
         8=>'千十相加不等于期号后两位相加(四定)',
         9=>'随机9000组(四定)',
-        10=>'过滤最近2000组(四定)',
+        10=>'过滤最近2880组(四定)',
     ];
 
     /**
@@ -2026,7 +2026,7 @@ class NumService extends BaseService {
                 case 9: # 随机9000组(四定)
                     $codes = NumService::getBeforeKjCodesDynamic9($playway);
                     break;
-                case 10: # 过滤最近2000组(四定)
+                case 10: # 过滤最近2880组(四定)，不够往后搜集
                     $codes = NumService::getBeforeKjCodesDynamic10($lottery_type, $playway);
                     break;
             }
@@ -2315,7 +2315,7 @@ class NumService extends BaseService {
      * @param int $playway
      * @return array
      */
-    public static function getBeforeKjCodesDynamic10($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, $num=2000){
+    public static function getBeforeKjCodesDynamic10($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, $num=2880){
         $needCodes = SscKjData::find()->select(['code_4n_str'])
             ->where(['lottery_type'=>$lottery_type])->groupBy(['code_4n_str'])->orderBy(['id'=>SORT_DESC])->limit($num)->asArray()->all();
         #p(SscKjData::find()->select(['code_4n_str'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit($num)->createCommand()->getRawSql());
