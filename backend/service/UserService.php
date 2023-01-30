@@ -481,9 +481,9 @@ class UserService extends BaseService {
      * @return mixed
      */
     public static function staticUserProfits($uid){
-        $current_profits = UserSysPlans::find()->select(['current_profits'=>'SUM(current_profits)'])->where(['uid'=>$uid, 'status'=>[0, 1]])->asArray()->one()['current_profits'];
+        $current_profits = UserSysPlans::find()->select(['current_profits'=>'SUM(current_profits)'])->where(['uid'=>$uid, 'status'=>[0, 1], 'is_test'=>0])->asArray()->one()['current_profits'];
 
-        return $current_profits;
+        return $current_profits?:0.00;
     }
 
 }
