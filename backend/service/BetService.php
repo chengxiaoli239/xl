@@ -1978,7 +1978,11 @@ abstract class BetService extends BaseBetService {
                     if($TzSystemsUsers->take_profits>0 OR $TzSystemsUsers->stop_loss>0){
                         $current_profits = UserService::staticUserProfits($uid);
                         if($current_profits>$TzSystemsUsers->take_profits OR $current_profits<(0-$TzSystemsUsers->stop_loss)){
-                            throw_info('触发止盈止损：'.$current_profits, BetService::STOP_BET_CODE);
+                            #throw_info('触发止盈止损：'.$current_profits, BetService::STOP_BET_CODE);
+                            $TzSystemsUsers->desc = '触发止盈止损：'.$current_profits;
+                            $TzSystemsUsers->current_profits = $current_profits;
+                            $TzSystemsUsers->save();
+                            continue;
                         }else{
                             $TzSystemsUsers->desc = '';
                             $TzSystemsUsers->current_profits = $current_profits;
@@ -2059,11 +2063,6 @@ abstract class BetService extends BaseBetService {
                     }
                     $rst['data'] = ['activeQihao'=>$activeQihao, 'plan_id'=>$plan->id, 'msg'=>'正常', 'qihao'=>$qihao];
                 }catch (\Exception $e){
-                    if($e->getCode() == BetService::STOP_BET_CODE){
-                        $TzSystemsUsers->desc = $e->getMessage();
-                        $TzSystemsUsers->current_profits = $current_profits;
-                        $TzSystemsUsers->save();
-                    }
                     Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划-异常', ['uid'=>$uid, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage(), 'errcode'=>$e->getCode()]);
                     $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>$e->getMessage()];
                 }
