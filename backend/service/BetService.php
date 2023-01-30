@@ -1954,6 +1954,8 @@ abstract class BetService extends BaseBetService {
     public static function insertPlansTask($lottery_types = [], $isAuto=1){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
+        $lottery_types[] = 8; # DEFAULT_LOTTERY_TYPE
+        $lottery_types = array_unique($lottery_types);
 
         $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
