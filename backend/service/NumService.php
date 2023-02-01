@@ -1968,7 +1968,7 @@ class NumService extends BaseService {
             }
         }
         if(!empty($UserSysPlans) && $UserSysPlans->buy_type == 0){
-            $desc .= ' [反买]';
+            $desc .= ' 【反买】';
         }
 
         return $desc;
