@@ -1964,7 +1964,11 @@ class NumService extends BaseService {
             $desc .= "动态过滤:";
             foreach ($hz_Arr['filter_dynamic_types'] as $filter_dynamic_type){
                 $desc .= NumService::$filter_dynamic_types[$filter_dynamic_type].'、';
+                $desc = rtrim($desc, '、');
             }
+        }
+        if(!empty($UserSysPlans) && $UserSysPlans->buy_type == 0){
+            $desc .= ' [反买]';
         }
 
         return $desc;
