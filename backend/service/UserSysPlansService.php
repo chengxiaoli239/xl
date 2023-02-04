@@ -164,7 +164,7 @@ class UserSysPlansService extends BaseService {
 
         # 16、遗漏投
         if(isset($UserSysPlans['bet_while_miss']) && $UserSysPlans['bet_while_miss']){
-            $tmpFilter['bet_while_miss'] = $UserSysPlans['bet_while_miss'];
+            $tmpFilter['bet_while_miss'] = (int)$UserSysPlans['bet_while_miss'];
         }
         unset($post['UserSysPlans']['bet_while_miss']);
         # 17、每期轮换
