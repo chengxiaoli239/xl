@@ -2287,6 +2287,25 @@ class StaticService extends BaseService {
    }
 
     /**
+     * 统计一个计划利润
+     * @param string $plan_id
+     */
+   public static function staticOnePlanProifts($plan_id=''){
+       $UserSysPlans = UserSysPlans::findOne($plan_id);
+       $profits = SscDataService::getPlanProfits($UserSysPlans);
+       /*
+       $StaticProfits = StaticProfits::find()->select(['qihao'])
+           ->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
+       $BettingRecords = BettingRecords::find()->select(['plan_id', 'profits', 'current_profits'])
+           ->where(['AND', ['=', 'plan_id',$plan_id], ['=', 'plan_id', $plan_id]])->asArray()->all();
+       */
+       $setDatas = [
+
+       ];
+       p($BettingRecords);
+   }
+
+    /**
      * @desc 号码类型遗漏更新
      * @return mixed
      */

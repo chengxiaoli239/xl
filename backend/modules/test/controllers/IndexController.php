@@ -293,11 +293,50 @@ class IndexController extends Controller
         p($str . 'bbb');
     }
 
+    /**
+     * @inheritDoc
+     */
+    public static function encrypt(string $plaintext, string $key, string $iv = ''): string
+    {
+        #$ciphertext = openssl_encrypt($plaintext, 'aes-256-ecb', $key, OPENSSL_RAW_DATA, $iv = '');
+        $ciphertext = openssl_encrypt($plaintext, 'aes-256-ecb', $key);
+        p(['plaintext'=>$plaintext, 'key'=>$key, 'ciphertext'=>$ciphertext], 1);
+
+        if (false === $ciphertext) {
+            throw new UnexpectedValueException('Encrypting the input $plaintext failed, please checking your $key and $iv whether or nor correct.');
+        }
+
+        return base64_encode($ciphertext);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function decrypt(string $ciphertext, string $key, string $iv = ''): string
+    {
+        $plaintext = openssl_decrypt(base64_decode($ciphertext), 'aes-256-ecb', $key, OPENSSL_RAW_DATA, $iv = '');
+
+        if (false === $plaintext) {
+            throw new UnexpectedValueException('Decrypting the input $ciphertext failed, please checking your $key and $iv whether or nor correct.');
+        }
+
+        return $plaintext;
+    }
+
     public function actionDw()
     {
         $plan = UserSysPlans::findOne(1);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[12], $lottery_type=8, 3, $plan);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[13], $lottery_type=8, 3, $plan);
         p(count($filter_dynamic_codes));
+        $appKey = '13ddeaa877751c999e5b2ef96fbcf2355edc4e10c2256ea0ab19478e5caadca4';
+        $appKey = json_encode($appKey);
+        $name = '马氏三角杀';
+        p(['e'=>self::encrypt($name, $appKey), 'd'=>self::decrypt('kl0eeBIVQSLkmQD5iz1c2w==', $appKey)]);
+
+        d(strpos('120341234888', '1234'));
+        p(base64_decode("letWC2p_t2X835-hS-3637vZD9Wx49oD15hti5J93RY="));
+        $rst = StaticService::staticOnePlanProifts($plan_id=5885);
+        p($rst);
         $rst = UserService::staticUserProfits($uid=17); p($rst);
         $current_qihao = NumService::getPlanBetCurrentQihao($plan_id='5834', $lottery_type = 17);
         p($current_qihao);
