@@ -48,6 +48,7 @@ class NumService extends BaseService {
         10=>'过滤最近2880组(四定)',
         #11=>'过滤最近200期开过2次以上号码的全转(四定)',
         12=>'过滤后4最近2880组(四定)',
+        13=>'过滤最近10000期重复2次以上的直码(四定)',
     ];
 
     /**
@@ -2041,6 +2042,9 @@ class NumService extends BaseService {
                 case 12: # 过滤后4最近2880组(四定)，不够往后搜集
                     $codes = NumService::getBeforeKjCodesDynamic12($lottery_type, $playway);
                     break;
+                case 13: # 过滤最近10000期重复2次以上的直码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic13($lottery_type, $playway);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -2353,7 +2357,7 @@ class NumService extends BaseService {
     public static function getBeforeKjCodesDynamic11($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, $num=200){
         $needCodes = SscKjData::find()->select(['code_4n'])
             ->where(['lottery_type'=>$lottery_type])->groupBy(['code_4n_str'])->having('COUNT(id)>1')->orderBy(['id'=>SORT_DESC])->limit($num)->asArray()->all();
-        #p(SscKjData::find()->select(['code_4n_str'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit($num)->createCommand()->getRawSql());
+        #p(SscKjData::find()->select(['code_4n_str'])->where(['lottery_type'=>$lottery_type])->groupBy(['code_4n_str'])->orderBy(['id'=>SORT_DESC])->limit($num)->createCommand()->getRawSql());
         $filterCodes = ArrayHelper::getColumn($needCodes, 'code_4n');
         $filterCodesStr = implode('","', $filterCodes);
 
@@ -2377,6 +2381,33 @@ class NumService extends BaseService {
         $needCodes = SscKjData::find()->select(['code_4n_str'=>'RIGHT(code_str, 7)'])
             ->where(['lottery_type'=>$lottery_type])->groupBy(['RIGHT(code_str, 7)'])->orderBy(['id'=>SORT_DESC])->limit($num)->asArray()->all();
         //p(SscKjData::find()->select(['code_4n_str'=>'RIGHT(code_str, 7)'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit($num)->createCommand()->getRawSql());
+        $filterCodes = ArrayHelper::getColumn($needCodes, 'code_4n_str');
+        $filterCodesStr = implode('","', $filterCodes);
+
+        $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
+            ->where('n.code NOT IN("'.$filterCodesStr.'")')
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $NumTypes = $query->asArray()->all();
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 过滤最近10000期重复2次以上的直码(四定)
+     * @param int $lottery_type
+     * @param int $playway
+     * @param int $num
+     * @return array
+     */
+    public static function getBeforeKjCodesDynamic13($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, $num=10000){
+        $where = ['lottery_type'=>$lottery_type];
+        $max_index_id = SscKjData::find()->select(['max_index_id'=>'max(index_id)'])->where($where)->asArray()->limit(1)->one()['max_index_id'];
+        $min_index_id = $max_index_id - $num;
+        $query = SscKjData::find()->select(['code_4n_str'])->where($where)->andWhere(['>', 'index_id', $min_index_id])->groupBy(['code_4n_str'])
+            ->having('COUNT(id)>1')->orderBy(['id'=>SORT_DESC])->limit($num);
+        $needCodes = $query->asArray()->all();
+
         $filterCodes = ArrayHelper::getColumn($needCodes, 'code_4n_str');
         $filterCodesStr = implode('","', $filterCodes);
 
