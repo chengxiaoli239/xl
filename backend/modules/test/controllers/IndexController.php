@@ -326,8 +326,26 @@ class IndexController extends Controller
     public function actionDw()
     {
         $plan = UserSysPlans::findOne(1);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[13], $lottery_type=8, 3, $plan);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[14], $lottery_type=8, 3, $plan);
         p(count($filter_dynamic_codes));
+        # 加密
+        $name = '马氏三角杀';
+        $key = '13ddeaa877751c999e5b2ef96fbcf2355edc4e10c2256ea0ab19478e5caadca4';
+        $key = hex2bin($key);
+        $data = openssl_encrypt($name, 'AES-256-ECB', $key, OPENSSL_RAW_DATA);
+        $data = bin2hex($data);
+
+        # 解密
+        $name_encrypt = 'e6d253f3a70bdbd4fe46a543040ccca9';
+        $name = openssl_decrypt(hex2bin($name_encrypt), 'AES-256-ECB', $key, OPENSSL_RAW_DATA);
+        $id_encrypt = '16796b7ed5ad8ed8801633e3516ab724b9a2775a32c1ca575a386517a06b24cb';
+        $idcard = openssl_decrypt(hex2bin($id_encrypt), 'AES-256-ECB', $key, OPENSSL_RAW_DATA);
+        p(['机密信息'=>$data, 'name'=>$name, 'idcard'=>$idcard]);
+        $x = ( (0.1+0.7) * 10 );
+        p(['x'=>$x, 'intx'=>(int)$x] ); # 7
+        $a = 4;
+        $b = '4';
+        d($a!=$b);
         $appKey = '13ddeaa877751c999e5b2ef96fbcf2355edc4e10c2256ea0ab19478e5caadca4';
         $appKey = json_encode($appKey);
         $name = '马氏三角杀';
