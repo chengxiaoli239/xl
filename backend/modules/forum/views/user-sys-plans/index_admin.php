@@ -146,8 +146,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $txt .= ' | '.Html::a('重算盈利', $url1, ['title' => '重算盈利'.$model->id,'alt'=>$model->id]);
                                 }
 
-                                $options = ['class'=>'open_bet_status','title'=>'开启本期下注状态'.$model->id,'alt'=>$model->id,'plan_id'=>$model->id,'id'=>'open_bet_status_'.$model->id];
-                                $txt .= ' | '.Html::button('开启本期', $options);
+                                #$options = ['class'=>'open_bet_status','title'=>'开启本期下注状态'.$model->id,'alt'=>$model->id,'plan_id'=>$model->id,'id'=>'open_bet_status_'.$model->id];
+                                #$txt .= ' | '.Html::button('开启本期', $options);
 
                                 return $txt;
                             }
