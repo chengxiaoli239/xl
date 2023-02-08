@@ -1991,6 +1991,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
+        $single = floatval($single);
         $tz_type = $plan->tz_type ? $plan->tz_type : 0;
         $lottery_type = $plan->lottery_type;
         //p(['playway'=>$playway, 'totalCount'=>count($codes), 'single'=>$single, 'qihao'=>$qihao, 'tz_type'=>$tz_type, 'buy_type'=>$plan->buy_type,'codes'=>$codes]);
