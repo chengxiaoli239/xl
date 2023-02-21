@@ -326,7 +326,7 @@ class IndexController extends Controller
     public function actionDw()
     {
         $plan = UserSysPlans::findOne(1);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[17], $lottery_type=8, 3, $plan);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[18], $lottery_type=8, 3, $plan);
         p(count($filter_dynamic_codes));
         # 加密
         $name = '马氏三角杀';

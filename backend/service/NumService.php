@@ -2012,13 +2012,13 @@ class NumService extends BaseService {
         foreach ($filter_dynamic_types as $filter_dynamic_type){
             switch ($filter_dynamic_type){
                 case 1: # 至少1小1大、排除前一期号码剩余号码至少上2个码
-                    $codes = NumService::getBeforeKjCodesDynamic1($lottery_type, $playway, $cNum=2);
+                    $codes = NumService::getBeforeKjCodesDynamic1($lottery_type, $playway, $cNum=2, $plan);
                     break;
-                case 2: # 至少1小1大、排除前一期号码剩余号码至少上2个码
-                    $codes = NumService::getBeforeKjCodesDynamic1($lottery_type, $playway, $cNum=3);
+                case 2: # 至少1小1大、排除前一期号码剩余号码至少上3个码
+                    $codes = NumService::getBeforeKjCodesDynamic1($lottery_type, $playway, $cNum=3, $plan);
                     break;
                 case 3: # 头尾去除当期期号最后两位相加
-                    $codes = NumService::getBeforeKjCodesDynamic3($plan, $lottery_type, $playway);
+                    $codes = NumService::getBeforeKjCodesDynamic3($plan, $lottery_type, $playway, $plan);
                     break;
                 case 4: # 头去除当期期号最后两位相加
                     $codes = NumService::getBeforeKjCodesDynamic4($plan, $lottery_type, $playway);
@@ -2080,10 +2080,19 @@ class NumService extends BaseService {
      * @param int $cNum 至少上cNum个
      * @return array
      */
-    private static function getBeforeKjCodesDynamic1($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, $cNum=3){
+    private static function getBeforeKjCodesDynamic1($lottery_type=DEFAULT_LOTTERY_TYPE, $playway=3, $cNum=3, object $plan){
         $filterNum1 = NumService::$MIN_CODES;  # 至少上一个
         $filterNum2 = NumService::$MAX_CODES;  # 至少上一个
-        $NewKjCodes = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one(); # 最新一期
+
+        $nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
+        if($plan->is_batch_simulate){
+            $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+            if(!empty($next_qihao)){
+                $next_qihao = $hzArr['filters']['current_kj_qihao'];
+                $nextQuery->andWhere(['<=', 'qihao', $next_qihao]);
+            }
+        }
+        $NewKjCodes = $nextQuery->limit(1)->one(); # 最新一期
         $NewCodes = array_unique([$NewKjCodes->code1, $NewKjCodes->code2, $NewKjCodes->code3, $NewKjCodes->code4]);
         $filterNumKjCodes = array_diff(NumService::$ALL_CODES, $NewCodes); # 剔除上期开奖号码之后，至少上cNum个
         $query = Num4Type::find()
