@@ -3386,6 +3386,10 @@ class NumService extends BaseService {
                     $codes_hz_datas = json_decode($plan->hz_Arr, true);
                     $current_qihao = $codes_hz_datas['filters']['start_qihao'] ? : NumService::getQihaoByDaysBefore($codes_hz_datas['filters']['test_period_days'], $lottery_type);
                 }
+                $endQihao = NumService::getHasOpenEndQihao($lottery_type);
+                if($current_qihao>$endQihao){
+                    throw_info('未开奖期号_'.$lottery_type.'_'.$current_qihao.'_endQihao:'.$endQihao);
+                }
             }
 
             if(empty($current_qihao)){
@@ -3396,6 +3400,18 @@ class NumService extends BaseService {
         }
 
         return $current_qihao;
+    }
+
+    public static function getHasOpenEndQihao($lotter_type=DEFAULT_LOTTERY_TYPE){
+        $m = \Yii::$app->cache;
+        $mkey = 'getHasOpenEndQihao_x0_'.$lotter_type;
+        $endQihao = $m->get($mkey);
+        if(empty($endQihao)){
+            $endQihao = SscKjData::find()->where(['lottery_type'=>$lotter_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one()->qihao;
+            $m->set($mkey, $endQihao, 30);
+        }
+
+        return $endQihao;
     }
 
     /**

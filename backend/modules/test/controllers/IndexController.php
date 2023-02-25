@@ -325,6 +325,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $end_qihao = \backend\service\NumService::getHasOpenEndQihao($lottery_type=1);
+        p($end_qihao);
         $plan = UserSysPlans::findOne(1);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[18], $lottery_type=8, 3, $plan);
         p(count($filter_dynamic_codes));
