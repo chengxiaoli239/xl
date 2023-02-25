@@ -59,4 +59,16 @@ class RedisLock { // class start
         return $this->_redis->del($key);
     }
 
+    public function sadd($key, $val){
+        $is_lock = $this->_redis->sadd($key, $val);
+
+        return $is_lock;
+    }
+
+    public function srem($key, $val){
+        $is_lock = $this->_redis->srem($key, $val);
+
+        return $is_lock;
+    }
+
 } // class end

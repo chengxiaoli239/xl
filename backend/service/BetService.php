@@ -2145,7 +2145,8 @@ abstract class BetService extends BaseBetService {
                     $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type); # 获取当前模拟计划即将下注的期号
 
                     $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan_id.'_'.$current_qihao;
-                    if(!$RedisLock->lock($mkey.'_redis', 3) && $isAuto==1){
+                    $is_exist = $RedisLock->sadd($mkey, $current_qihao);
+                    if(!$is_exist){
                         //return ['status'=>301, 'msg'=>'有正在执行的任务,请稍后...'];
                         throw new \Exception('有正在执行的任务,请稍后...');
                     }
@@ -2200,12 +2201,14 @@ abstract class BetService extends BaseBetService {
                     }
                     $end_time5 = microtime(true);
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注处理结束', ['plan_id'=>$plan_id, 'rst'=>$rst, 'planStaticRst'=>$planStaticRst, 'cs_time'=>($end_time5-$end_time4).'s', 'all_cs_time'=>($end_time5-$start_time1).'s']);
-                    $RedisLock->unlock($mkey);
+                    #$RedisLock->unlock($mkey);
+                    $RedisLock->srem($mkey, $current_qihao);
                 }catch (\Exception $exception){
                     Tool_Common::log('/datas/'.__FUNCTION__."_e", 'ERR', '计划模拟失败', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
                     sleep(2);
                     $rst = ['status'=>301, 'msg'=>$exception->getMessage()];
-                    $RedisLock->unlock($mkey);
+                    #$RedisLock->unlock($mkey);
+                    $RedisLock->srem($mkey, $current_qihao);
                 }
             }
         }
