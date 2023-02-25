@@ -257,6 +257,7 @@ class IndexController extends Controller
      */
     public function actionBatchSimulateBet(){
         self::_init();
+        ini_set('memory_limit','1024M'); //升级为1024M内存
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $post = \Yii::$app->request->post();
 
