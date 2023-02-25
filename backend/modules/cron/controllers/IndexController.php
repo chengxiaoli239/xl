@@ -261,7 +261,7 @@ class IndexController extends Controller
         $post = \Yii::$app->request->post();
 
         //while (true){
-        for ($i=0; $i<55; $i++){
+        for ($i=0; $i<120; $i++){
             $batch_simulate_data = BetService::batchSimulateBet($post['lottery_types'], $post['uid']);
             $rst['batch_simulate_data'] = $batch_simulate_data;
             Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '批量模拟下注', ['uid'=>$post['uid'], 'batch_simulate_data'=>$batch_simulate_data]);
