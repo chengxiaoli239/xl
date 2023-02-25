@@ -2145,7 +2145,7 @@ abstract class BetService extends BaseBetService {
                     $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type); # 获取当前模拟计划即将下注的期号
 
                     $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan_id.'_'.$current_qihao;
-                    if(!$RedisLock->lock($mkey.'_redis', 1) && $isAuto==1){
+                    if(!$RedisLock->lock($mkey.'_redis', 3) && $isAuto==1){
                         //return ['status'=>301, 'msg'=>'有正在执行的任务,请稍后...'];
                         throw new \Exception('有正在执行的任务,请稍后...');
                     }
@@ -2187,7 +2187,7 @@ abstract class BetService extends BaseBetService {
                     //p([$is_test, $plan->plan_type, $plan->id, $current_qihao]);
 
                     $end_time3 = microtime(true);
-                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤4', ['flag'=>$flag, 'qihao'=>$current_qihao, 'is_test'=>$is_test, 'plan_id'=>$plan_id, 'cs_time'=>($end_time3-$end_time2).'s']);
+                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤4', ['qihao'=>$current_qihao, 'is_test'=>$is_test, 'plan_id'=>$plan_id, 'cs_time'=>($end_time3-$end_time2).'s']);
 
                     if ($is_test == 1 or $plan->uid == 1) { # 模拟下注
                         $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, 2, $sn, $snid, $hzArr, $r=4); # 直接记录表
@@ -2200,12 +2200,13 @@ abstract class BetService extends BaseBetService {
                     }
                     $end_time5 = microtime(true);
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注处理结束', ['plan_id'=>$plan_id, 'rst'=>$rst, 'planStaticRst'=>$planStaticRst, 'cs_time'=>($end_time5-$end_time4).'s', 'all_cs_time'=>($end_time5-$start_time1).'s']);
+                    $RedisLock->unlock($mkey);
                 }catch (\Exception $exception){
                     Tool_Common::log('/datas/'.__FUNCTION__."_e", 'ERR', '计划模拟失败', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
                     sleep(2);
                     $rst = ['status'=>301, 'msg'=>$exception->getMessage()];
+                    $RedisLock->unlock($mkey);
                 }
-                $RedisLock->unlock($mkey);
             }
         }
 
