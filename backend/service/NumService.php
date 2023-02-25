@@ -2087,8 +2087,8 @@ class NumService extends BaseService {
         $nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
         if($plan->is_batch_simulate){
             $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+            $next_qihao = $hzArr['filters']['current_kj_qihao'];
             if(!empty($next_qihao)){
-                $next_qihao = $hzArr['filters']['current_kj_qihao'];
                 $nextQuery->andWhere(['<=', 'qihao', $next_qihao]);
             }
         }
