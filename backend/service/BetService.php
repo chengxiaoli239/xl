@@ -2145,7 +2145,7 @@ abstract class BetService extends BaseBetService {
                     $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type); # 获取当前模拟计划即将下注的期号
                     Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划01', ['uid'=>$uid, 'plan_id'=>$plan_id, 'lottery_type' => $lottery_type, 'current_qihao'=>$current_qihao]);
 
-                    $mkey = 'batchSimulateBet_'.$lottery_type.'_'.$uid.'_'.$plan_id.'_'.$current_qihao;
+                    $mkey = 'batchSimulateBet_x0_'.$lottery_type.'_'.$uid.'_'.$plan_id.'_'.$current_qihao;
                     $is_exist = $RedisLock->sadd($mkey, $current_qihao);
                     if(!$is_exist){
                         //return ['status'=>301, 'msg'=>'有正在执行的任务,请稍后...'];
