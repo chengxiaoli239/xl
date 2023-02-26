@@ -3396,8 +3396,10 @@ class NumService extends BaseService {
                 $current_qihao = HN0898Service::getQihao($lottery_type); # 针对哪一期过滤，默认为：当前期号
             }
         }catch (\Exception $exception){
+            Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '模拟投注计划-异常', ['plan_id'=>$plan_id, 'lottery_type' => $lottery_type, 'current_qihao'=>$current_qihao, 'err_msg'=>$exception->getMessage()]);
             throw new \Exception($exception->getMessage());
         }
+        Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '模拟投注计划', ['plan_id'=>$plan_id, 'lottery_type' => $lottery_type, 'current_qihao'=>$current_qihao]);
 
         return $current_qihao;
     }
