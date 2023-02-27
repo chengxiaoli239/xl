@@ -2205,7 +2205,7 @@ abstract class BetService extends BaseBetService {
                     #$RedisLock->unlock($mkey);
                     $RedisLock->srem($mkey, $current_qihao);
                 }catch (\Exception $exception){
-                    Tool_Common::log('/datas/'.__FUNCTION__."_e", 'ERR', '计划模拟失败', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
+                    Tool_Common::log('/datas/'.__FUNCTION__."_e", 'ERR', '计划模拟失败', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
                     sleep(2);
                     $rst = ['status'=>301, 'msg'=>$exception->getMessage()];
                     #$RedisLock->unlock($mkey);
