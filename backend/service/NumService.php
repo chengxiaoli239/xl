@@ -3388,7 +3388,7 @@ class NumService extends BaseService {
                 }
                 $endQihao = NumService::getHasOpenEndQihao($lottery_type);
                 if($current_qihao>$endQihao){
-                    throw_info('未开奖期号_'.$lottery_type.'_'.$current_qihao.'_endQihao:'.$endQihao);
+                    throw_info('未开奖期号_'.$lottery_type.'_'.$current_qihao.'_endQihao:'.$endQihao, 40004);
                 }
             }
 

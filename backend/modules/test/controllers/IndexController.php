@@ -325,6 +325,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $UserSysPlan = UserSysPlans::findOne('5975');
+        $rst = \backend\service\SscDataService::recordOnePlanProfits($UserSysPlan);
+        p($rst);
         $end_qihao = \backend\service\NumService::getHasOpenEndQihao($lottery_type=1);
         p($end_qihao);
         $plan = UserSysPlans::findOne(1);

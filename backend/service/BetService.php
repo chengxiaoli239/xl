@@ -2209,7 +2209,9 @@ abstract class BetService extends BaseBetService {
                     sleep(2);
                     $rst = ['status'=>301, 'msg'=>$exception->getMessage()];
                     #$RedisLock->unlock($mkey);
-                    $RedisLock->srem($mkey, $current_qihao);
+                    if($exception->getCode()<40000){
+                        $RedisLock->srem($mkey, $current_qihao);
+                    }
                 }
             }
         }

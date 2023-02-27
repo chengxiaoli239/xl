@@ -14,6 +14,7 @@ use backend\models\DataDealStatus;
 use backend\models\ImportPlanCodes;
 use backend\models\LotteryDataDealStatus;
 use backend\models\Num4Type;
+use backend\models\PlanStaticProfits;
 use backend\models\searchs\SscDwsHzNums;
 use backend\models\Ssc3numYl;
 use backend\models\SscDsTypeDatas;
@@ -3691,20 +3692,20 @@ class SscDataService extends BaseService {
             case 6:
             case 8:
                 # 3、中则投、遗漏投
-                $rst['data']['zzt_ylt'] = self::handleOnePlanZzt($plan_id, $is_simulate_bet);
+                $rst['data']['zzt_ylt'] = self::handleOnePlanZzt($UserSysPlan, $is_simulate_bet);
                 break;
             case 7:
                 # 4、中则投否则反买
-                $rst['data']['zzt_else_fan_mai'] = self::handleOnePlanZztElseFanMai($plan_id, $is_simulate_bet);
+                $rst['data']['zzt_else_fan_mai'] = self::handleOnePlanZztElseFanMai($UserSysPlan, $is_simulate_bet);
                 break;
             case 12:
             case 13:
                 # 6、A、B计划类型
-                $rst['data']['A_x_arise_B_y_arise'] = self::handleOneAxBy12_13($plan_id, $qihao, $is_simulate_bet);
+                $rst['data']['A_x_arise_B_y_arise'] = self::handleOneAxBy12_13($UserSysPlan, $qihao, $is_simulate_bet);
                 break;
             case 14:
                 # 7、A、B计划类型B
-                $rst['data']['A_x_arise_B_y_arise_2'] = self::handleOneAxBy14($plan_id, $qihao, $is_simulate_bet);
+                $rst['data']['A_x_arise_B_y_arise_2'] = self::handleOneAxBy14($UserSysPlan, $qihao, $is_simulate_bet);
                 break;
             default:
                 break;
@@ -3712,6 +3713,9 @@ class SscDataService extends BaseService {
 
         $afterRst = SscDataService::afterHandleOnePlan($plan_id, $qihao); # 操作计划之后解锁
         if($afterRst){
+            # 记录一个计划的利润
+            SscDataService::recordOnePlanProfits($UserSysPlan);
+
             # 操作完计划开启下一期下注计划
             $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $UserSysPlan->lottery_type);
             $r = SscDataService::openOnePlanBetStatus($plan_id, $next_qihao);
@@ -3719,6 +3723,45 @@ class SscDataService extends BaseService {
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '单个计划处理', ['plan_id'=>$plan_id, 'afterRst'=>$afterRst, 'next_qihao'=>$next_qihao, 'r'=>$r, 'rst'=>$rst]);
 
         return $rst;
+    }
+
+    /**
+     * @param object $UserSysPlan
+     * @return bool
+     */
+    public static function recordOnePlanProfits(object $UserSysPlan){
+        try {
+            $hzArr = yii\helpers\Json::decode($UserSysPlan->hz_Arr, 320);
+            $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+            if(empty($current_kj_qihao)){
+                throw_info('期号为空:'.$UserSysPlan->hz_Arr);
+            }
+            $PlanStaticProfits = PlanStaticProfits::findOne(['plan_id'=>$UserSysPlan->id, 'current_qihao'=>$current_kj_qihao]);
+            if(!empty($PlanStaticProfits)){
+                throw_info('记录已经存在');
+            }
+            $now_time = time();
+            $PlanStaticProfits = new PlanStaticProfits();
+            $setData = [
+                'plan_id' => $UserSysPlan->id,
+                'uid' => $UserSysPlan->uid,
+                'current_qihao' => $current_kj_qihao,
+                'cut_profits' => $UserSysPlan->current_profits,
+                'created_at' => $now_time,
+                'updated_at' => $now_time,
+            ];
+            $PlanStaticProfits->setAttributes($setData);
+            if(!$PlanStaticProfits->save()){
+                throw_info(yii\helpers\Json::encode($PlanStaticProfits->getErrors()));
+            }
+
+        }catch (\Exception $exception){
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '利润记录异常', ['plan_id'=>$UserSysPlan->id, 'err_msg'=>$exception->getMessage()]);
+            //return false;
+            p($exception->getMessage());
+        }
+
+        return true;
     }
 
     /**
@@ -3920,11 +3963,11 @@ class SscDataService extends BaseService {
 
     /**
      * @desc 6中则投、8:遗漏投、计划
-     * @param string $plan_id
+     * @param object $UserSysPlan
      * @param int $is_simulate_bet
      */
-    private static function handleOnePlanZzt($plan_id='', $is_simulate_bet=0){
-        $UserSysPlan = UserSysPlans::findOne($plan_id);
+    private static function handleOnePlanZzt(object $UserSysPlan, $is_simulate_bet=0){
+        #$UserSysPlan = UserSysPlans::findOne($plan_id);
         if($UserSysPlan->status != 1){
             return ['status'=>300, 'msg'=>'未激活计划不处理'];
         }
@@ -3970,11 +4013,11 @@ class SscDataService extends BaseService {
 
     /**
      * @desc 7中则投否则反买
-     * @param string $plan_id
+     * @param object $UserSysPlan
      * @param int $is_simulate_bet
      */
-    private static function handleOnePlanZztElseFanMai($plan_id='', $is_simulate_bet=0){
-        $UserSysPlan = UserSysPlans::findOne($plan_id);
+    private static function handleOnePlanZztElseFanMai(object $UserSysPlan, $is_simulate_bet=0){
+        //$UserSysPlan = UserSysPlans::findOne($plan_id);
         if($UserSysPlan->status != 1){
             return ['status'=>300, 'msg'=>'未激活计划不处理'];
         }
@@ -4007,11 +4050,11 @@ class SscDataService extends BaseService {
 
     /**
      * @desc 号码轮换
-     * @param string $plan_id
+     * @param object $UserSysPlan
      * @param int $is_simulate_bet
      */
-    private static function handleOnePlanCodesChange($plan_id='', $is_simulate_bet=0){
-        $UserSysPlan = UserSysPlans::findOne($plan_id);
+    private static function handleOnePlanCodesChange(object $UserSysPlan, $is_simulate_bet=0){
+        #$UserSysPlan = UserSysPlans::findOne($plan_id);
         if($UserSysPlan->status != 1){
             return ['status'=>300, 'msg'=>'未激活计划不处理'];
         }
@@ -4051,14 +4094,14 @@ class SscDataService extends BaseService {
 
     /**
      * @desc A、B计划类型
-     * @param string $plan_id
+     * @param object $UserSysPlan
      * @param $is_simulate_bet
      * @return array|bool
      */
-    public static function handleOneAxBy12_13($plan_id='', $current_qihao='', $is_simulate_bet){
+    public static function handleOneAxBy12_13(object $UserSysPlan, $current_qihao='', $is_simulate_bet){
 
         try{
-            $UserSysPlan = UserSysPlans::findOne($plan_id);
+            #$UserSysPlan = UserSysPlans::findOne($plan_id);
             if(empty($UserSysPlan)){
                 return false;
             }
@@ -4132,15 +4175,15 @@ class SscDataService extends BaseService {
     }
     /**
      * @desc A、B遗漏区间投
-     * @param string $plan_id
+     * @param object $UserSysPlan
      * @param string $current_qihao 已经写投注表待处理开奖的期号
      * @param $is_simulate_bet
      * @return array|bool
      */
-    public static function handleOneAxBy14($plan_id='', $current_qihao='', $is_simulate_bet){
+    public static function handleOneAxBy14(object $UserSysPlan, $current_qihao='', $is_simulate_bet){
 
         try{
-            $UserSysPlan = UserSysPlans::findOne($plan_id);
+            #$UserSysPlan = UserSysPlans::findOne($plan_id);
             if(empty($UserSysPlan)){
                 return false;
             }
