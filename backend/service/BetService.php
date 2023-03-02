@@ -2121,7 +2121,7 @@ abstract class BetService extends BaseBetService {
 
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
-        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划001', ['uid'=>$uid,'lottery_types'=>$lottery_types]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '投注计划001', ['uid'=>$uid,'lottery_types'=>$lottery_types]);
 
         $RedisLock = new RedisLock();
 

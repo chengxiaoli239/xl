@@ -3680,13 +3680,13 @@ class SscDataService extends BaseService {
         $rst = ['status'=>200, 'data'=>['plan_id'=>$plan_id], 'msg'=>'操作成功'];
 
         # 1、利润统计
-        $rst['data']['profits'] = self::handleOnePlanProfits($plan_id, $is_simulate_bet);
+        $rst['data']['profits'] = self::handleOnePlanProfits($UserSysPlan, $is_simulate_bet);
 
         # 2、翻倍
-        $rst['data']['fan_bei'] = self::handleOnePlanFanBei($plan_id, $is_simulate_bet);
+        $rst['data']['fan_bei'] = self::handleOnePlanFanBei($UserSysPlan, $is_simulate_bet);
 
         # 5、号码轮换
-        $rst['data']['codes_change'] = self::handleOnePlanCodesChange($plan_id, $is_simulate_bet);
+        $rst['data']['codes_change'] = self::handleOnePlanCodesChange($UserSysPlan, $is_simulate_bet);
 
         switch ($UserSysPlan->plan_type){
             case 6:
@@ -3817,12 +3817,13 @@ class SscDataService extends BaseService {
 
     /**
      * @desc 单个利润统计
-     * @param string $plan_id
+     * @param object $UserSysPlan
      * @param int $is_simulate_bet
      */
-    private static function handleOnePlanProfits($plan_id='', $is_simulate_bet=0){
-        $UserSysPlan = UserSysPlans::findOne($plan_id);
+    private static function handleOnePlanProfits(object $UserSysPlan, $is_simulate_bet=0){
+        #$UserSysPlan = UserSysPlans::findOne($plan_id);
         # 1、利润计算 start
+        $plan_id = $UserSysPlan->id;
         $where = ['AND', ['=', 'plan_id', $plan_id], ['=', 'is_profits_record', 1], ['=', 'is_batch_simulate', $is_simulate_bet]];
         $profits = BettingRecords::find()->where($where)->sum('profits');
         $lottery_type = $UserSysPlan->lottery_type;
@@ -3860,11 +3861,11 @@ class SscDataService extends BaseService {
 
     /**
      * @desc 不中倍投：翻倍计划、翻倍止盈止损，倍投 连续x期不中 决定倍数
-     * @param string $plan_id
+     * @param object $UserSysPlan
      * @param int $is_simulate_bet
      */
-    private static function handleOnePlanFanBei($plan_id='', $is_simulate_bet=0){
-        $UserSysPlan = UserSysPlans::find()->where(['AND', ['=', 'id', $plan_id], ['=', 'is_batch_simulate', $is_simulate_bet]])->limit(1)->one();
+    private static function handleOnePlanFanBei(object $UserSysPlan, $is_simulate_bet=0){
+        #$UserSysPlan = UserSysPlans::find()->where(['AND', ['=', 'id', $plan_id], ['=', 'is_batch_simulate', $is_simulate_bet]])->limit(1)->one();
         if($UserSysPlan->status != 1){
             return ['status'=>300, 'msg'=>'未激活计划不处理'];
         }
