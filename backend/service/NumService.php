@@ -3397,7 +3397,7 @@ class NumService extends BaseService {
             }
         }catch (\Exception $exception){
             Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '模拟投注计划-异常', ['plan_id'=>$plan_id, 'lottery_type' => $lottery_type, 'current_qihao'=>$current_qihao, 'err_msg'=>$exception->getMessage()]);
-            throw new \Exception($exception->getMessage());
+            throw new \Exception($exception->getMessage(), $exception->getCode());
         }
         Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '模拟投注计划', ['plan_id'=>$plan_id, 'lottery_type' => $lottery_type, 'current_qihao'=>$current_qihao]);
 
