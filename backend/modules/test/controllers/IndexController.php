@@ -325,6 +325,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        echo json_encode(['code'=>200, 'msg'=>'操作成功', 'data'=>[]], JSON_FORCE_OBJECT|320);exit();
         $UserSysPlan = UserSysPlans::findOne('5975');
         $rst = \backend\service\SscDataService::recordOnePlanProfits($UserSysPlan);
         p($rst);
