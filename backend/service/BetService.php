@@ -2121,7 +2121,7 @@ abstract class BetService extends BaseBetService {
 
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
-        $m = \Yii::$app->cache;
+        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划001', ['uid'=>$uid,'lottery_types'=>$lottery_types]);
 
         $RedisLock = new RedisLock();
 
@@ -2131,7 +2131,10 @@ abstract class BetService extends BaseBetService {
                 $where[] = ['=', 'uid', $uid];
             }
 
+            $query = UserSysPlans::find()->where($where);
+            $sql = $query->createCommand()->getRawSql();
             $plans = UserSysPlans::find()->where($where)->all();
+            Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划002', ['uid'=>$uid,'lottery_type'=>$lottery_type, 'count'=>count($plans), 'sql'=>$sql]);
             if (empty($plans)) {
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['uid'=>$uid,'lottery_type' => $lottery_type, 'msg' => '没有开启的计划']);
                 continue;
