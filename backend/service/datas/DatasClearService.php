@@ -19,9 +19,9 @@ class DatasClearService extends BaseService{
     }
 
     public static function clearBettingRecords($params=[]){
-        $lottery_types = UserSysPlansService::getMyLotteryTypes($uid=1);
+        #$lottery_types = UserSysPlansService::getMyLotteryTypes($uid=1);
         $db = \Yii::$app->db;
-        $lottery_types = [['lottery_type'=>8]];
+        $lottery_types = [['lottery_type'=>8], ['lottery_type'=>23], ['lottery_type'=>24]];
 
         foreach ($lottery_types as $lottery){
             $lottery_type = $lottery['lottery_type'];
