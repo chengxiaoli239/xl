@@ -513,4 +513,25 @@ class UserService extends BaseService {
         return [$code, $current_profits, $TzSystemsUsers];
     }
 
+    /**
+     * 重置access_token
+     * @param $id
+     * @return string
+     * @throws \common\exceptions\InfoException
+     */
+    public static function resetToken($user_id){
+
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$user_id]);
+        if(empty($TzSystemsUsers)){
+            throw_info(yii\helpers\Json::encode('找不到用户记录uid:'.$user_id));
+        }
+        $new_str = date('Y-m-d').'_'.rand(100, 999).'_'.$user_id;
+        $new_access_token = md5($new_str);
+        $TzSystemsUsers->access_token = $new_access_token;
+        if(!$TzSystemsUsers->save()){
+            throw_info(yii\helpers\Json::encode($TzSystemsUsers->getErrors()));
+        }
+
+        return $new_access_token;
+    }
 }

@@ -130,8 +130,10 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             <div class="modal-body">
                 <div class="form-group up-reason">
+                    <input type="hidden" id="tz_user_id" value="0">
                     <label id="copy_tip_msg" for="copy_tip_msg"></label><span></span>
-                    <label id="copy_access_token" for="copy_access_token"></label><span></span>
+                    <label id="copy_access_token" for="copy_access_token"></label>
+                    <span>&nbsp;&nbsp; <a class="btn btn-xs" id="reset_token" href="javascript:;">重置token</a></span>
                 </div>
             </div>
             <div class="modal-footer">
@@ -147,19 +149,19 @@ $this->params['breadcrumbs'][] = $this->title;
 <script>
 $(function () {
     $('.act-user-copy').click(function () {
-        console.log('xxx')
         var desc = $(this).data('desc');
         var username = $(this).data('username');
         var access_token = $(this).data('access_token');
         $("#copy_tip_msg_title").html("用户[<strong>" + username + "</strong>]");
         $("#copy_tip_msg").html('http://' + window.location.host + '\r\n' + desc);
+        $("#tz_user_id").val($(this).data('id'))
         $("#copy_access_token").html("access_token：[<strong>" + access_token + "</strong>]");
         $("#act").val('act-user-copy');
         $("#COPY_TipModal").modal('show');
     });
+
     var clipboard;
     $("#CopyConfirm").click(function () {
-
         if (clipboard) {
             clipboard.destroy();
         }
@@ -180,6 +182,19 @@ $(function () {
         //$("#tip_msg_rst").html($("#copyTxt").val());
         $("#tip_msg_rst").html("复制成功");
         $("#rstTipModal").modal('show');
+    });
+
+    $('#reset_token').click(function(){
+        user_id = $('#tz_user_id').val();
+        data = {'user_id':user_id}
+        $.post("/forum/user/reset-token",data,function(rst) {
+            if(rst.status == 200) {
+                Ewin.confirm({ message: '新access_token：'+rst.data.new_access_token}).on(function (e) {});
+            } else {
+                Ewin.confirm({ message: '操作失败：'+rst.msg}).on(function (e) {});
+            }
+            //showTips(null, rst.msg, tip_title); // 同步完无需弹框，暂且注释
+        },'JSON');
     });
 });
 </script>

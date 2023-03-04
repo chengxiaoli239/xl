@@ -375,6 +375,23 @@ class UserController extends BaseController
         return $this->redirect(['view']);
     }
 
+    public function actionResetToken(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $user_id = $post['user_id'];
+        $uid = \Yii::$app->user->id;
+        if($uid != 1){
+            return ['status'=>300, 'data'=>[], 'message'=>'操作失败'];
+        }
+        try {
+            $new_access_token = UserService::resetToken($user_id);
+        }catch (\Exception $e){
+            return ['status'=>301, 'data'=>[], 'message'=>$e->getMessage()];
+        }
+
+        return ['status'=>200, 'data'=>['access_token'=>$new_access_token]];
+    }
+
     /**
      * @desc 修改投注系统状态，主要是禁止账号自动登录和获取余额
      * @param $id
