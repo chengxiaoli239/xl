@@ -385,6 +385,9 @@ class TzSystemUsersService extends ClientsBaseService{
         }else{
             return ['status'=>300, 'data'=>[], 'msg'=>'没有下注任务xxx'];
         }
+        if(empty($datas)){
+            return ['status'=>301, 'data'=>[], 'msg'=>'没有下注任务yyy'];
+        }
 
         return ['status'=>200, 'data'=>$datas];
     }
