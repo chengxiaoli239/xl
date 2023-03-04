@@ -2,6 +2,7 @@
 namespace backend\service\clients;
 
 use backend\models\BetErrorPlansTask;
+use backend\models\DataDealStatus;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\BetService;
@@ -188,6 +189,28 @@ class TzSystemUsersService extends ClientsBaseService{
         return ['status'=>200, 'data'=>$data];
     }
 
+
+    /**
+     * @desc 获取用户激活的计划ids
+     * @param int $lottery_type
+     * @return mixed|string
+     */
+    public static function getActiveQihao($lottery_type=DEFAULT_LOTTERY_TYPE){
+
+        $m = \Yii::$app->cache;
+        $mkey = self::buildActiveQihaoKey($lottery_type);
+        $next_qihao = $m->get($mkey);
+
+        if(empty($next_qihao)){
+            $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->one();
+            $next_qihao = $DataDealStatus['next_qihao'];
+
+            $m->set($mkey, $next_qihao, 60);
+        }
+
+        return ['status'=>200, 'data'=>['next_qihao'=>$next_qihao]];
+    }
+
     /**
      * @desc 激活的任务id
      * @param string $access_token
@@ -195,6 +218,16 @@ class TzSystemUsersService extends ClientsBaseService{
      */
     public static function buildUserPlanidsKey($access_token=''){
         $mkey = 'buildUserPlanidsKey_1_'.$access_token;
+        return $mkey;
+    }
+
+    /**
+     * @desc 激活的期号
+     * @param string $access_token
+     * @return string
+     */
+    public static function buildActiveQihaoKey($lottery_type=''){
+        $mkey = 'buildActiveQihaoKey_1_'.$lottery_type;
         return $mkey;
     }
 

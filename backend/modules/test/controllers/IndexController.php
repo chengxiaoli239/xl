@@ -20,6 +20,7 @@ use backend\modules\kj\controllers\BingDaoController;
 use backend\service\baota\BaoTaService;
 use backend\service\BetService;
 use backend\service\ChatCommonBetService;
+use backend\service\clients\TzSystemUsersService;
 use backend\service\datas\DatasClearService;
 use backend\service\FootBallService;
 use backend\service\huiyuan\HuiYuanService5;
@@ -325,6 +326,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst = TzSystemUsersService::getActiveQihao($lottery_type=8);
+        p($rst);
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         echo json_encode(['code'=>200, 'msg'=>'操作成功', 'data'=>[]], JSON_FORCE_OBJECT|320);exit();
