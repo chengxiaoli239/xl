@@ -205,7 +205,10 @@ class TzSystemUsersService extends ClientsBaseService{
             $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->one();
             $next_qihao = $DataDealStatus['next_qihao'];
 
-            $m->set($mkey, $next_qihao, 60);
+            $m->set($mkey, $next_qihao, 65);
+        }
+        if(empty($next_qihao)){
+            return ['status'=>300, 'data'=>[]];
         }
 
         return ['status'=>200, 'data'=>['next_qihao'=>$next_qihao]];
