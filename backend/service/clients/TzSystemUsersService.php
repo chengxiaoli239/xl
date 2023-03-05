@@ -350,6 +350,7 @@ class TzSystemUsersService extends ClientsBaseService{
                             "Accept-Encoding"=>"gzip, deflate, br",
                             "Accept-Language"=>"zh-CN,zh;q=0.9",
                             "Connection"=>"Close",
+                            "Keep-Alive"=> "timeout=5, max=81",
                             'Content-Length' => (string)strlen(http_build_query($post_data)),
                             "Content-Type"=>"application/x-www-form-urlencoded; charset=UTF-8",
                             'Cookie' => $TzSystemsUsers->cookie,
