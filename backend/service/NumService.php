@@ -2564,7 +2564,9 @@ class NumService extends BaseService {
         $query = Num4Type::find()->alias('n')->select(['id', 'code', 'code_type'])
             ->where($where)
             ->andWhere(['=', 'code_type', $playway+1]);
-        #p($query->createCommand()->getRawSql());
+        $sql = $query->createCommand()->getRawSql();
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤两个位置一样的所有号码', ['plan_id'=>$plan->id, 'short_current_kj_qihao'=>$short_current_kj_qihao, 'current_kj_qihao'=>$current_kj_qihao, 'sql'=>$sql]);
+        #p();
         $NumTypes = $query->asArray()->all();
         $filterIds = ArrayHelper::getColumn($NumTypes, 'id');
 
