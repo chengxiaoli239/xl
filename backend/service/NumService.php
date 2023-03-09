@@ -2000,17 +2000,18 @@ class NumService extends BaseService {
 
     /**
      * 动态过滤
-     * @param $filter_dynamic_types
      * @param object
      * @return array
      */
-    public static function getBeforeKjCodesDynamic($filter_dynamic_types, object $plan){
+    public static function getBeforeKjCodesDynamic(object $plan){
         $lottery_type = $plan->lottery_type;
         $playway = $plan->playway;
         $query = Num4Type::find()->select(['code', 'code_type'])
             ->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
         $allCodes = ArrayHelper::getColumn($NumTypes, 'code');
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
+        $filter_dynamic_types = $hzArr['filter_dynamic_types'];
 
         $codesArr = $allCodes;
         foreach ($filter_dynamic_types as $filter_dynamic_type){

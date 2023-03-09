@@ -326,8 +326,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $plan = UserSysPlans::findOne(5980);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($filter_dynamic_types=[19], $plan);
+        $plan = UserSysPlans::findOne(5989);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         p(count($filter_dynamic_codes));
         $rst = TzSystemUsersService::getActiveQihao($lottery_type=8);
         p($rst);

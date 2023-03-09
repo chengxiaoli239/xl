@@ -903,7 +903,7 @@ abstract class BetService extends BaseBetService {
 
         # 动态过滤
         if(isset($codes_hz_data['is_filter_dynamic']) && $codes_hz_data['is_filter_dynamic']==1 && count($codes_hz_data['filter_dynamic_types'])>0){
-            $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($codes_hz_data['filter_dynamic_types'], $plan);
+            $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
             if(!empty($filter_dynamic_codes)){
                 $codesArr = array_intersect($codesArr, $filter_dynamic_codes); # 返回$codesArr和$filter_dynamic_codes交集
             }
