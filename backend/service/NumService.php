@@ -2012,6 +2012,7 @@ class NumService extends BaseService {
         $allCodes = ArrayHelper::getColumn($NumTypes, 'code');
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
         $filter_dynamic_types = $hzArr['filter_dynamic_types'];
+        //p($hzArr);
 
         $codesArr = $allCodes;
         foreach ($filter_dynamic_types as $filter_dynamic_type){
