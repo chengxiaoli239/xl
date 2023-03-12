@@ -55,6 +55,11 @@ class NumService extends BaseService {
         17=>'取前四最近8000组(四定)',
         18=>'取后四最近8000组(四定)',
         19=>'过滤两个位置一样的所有号码',
+        20=>'过滤最近2000组(四定)',
+        21=>'过滤后4最近2000组(四定)',
+        22=>'过滤1235最近2000组(四定)',
+        23=>'过滤1245最近2000组(四定)',
+        24=>'过滤1345最近2000组(四定)',
     ];
 
     /**
@@ -2073,6 +2078,21 @@ class NumService extends BaseService {
                     break;
                 case 19: # 过滤两个位置一样的所有号码
                     $codes = NumService::getBeforeKjCodesDynamic19($plan, $lottery_type);
+                    break;
+                case 20: # 过滤最近2000组(四定)，不够往后搜集 前四，与12 后4类似
+                    $codes = NumService::getBeforeKjCodesDynamic10($plan, $lottery_type, $num=2000);
+                    break;
+                case 21: # 过滤后4最近2000组(四定)，不够往后搜集
+                    $codes = NumService::getBeforeKjCodesDynamic12($plan, $lottery_type, $num=2000);
+                    break;
+                case 22: # 过滤1,2,3,5最近2000组(四定)，不够往后搜集
+                    $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,3,5], $num=2000);
+                    break;
+                case 23: # 过滤1,2,4,5最近2000组(四定)，不够往后搜集
+                    $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,4,5], $num=2000);
+                    break;
+                case 24: # 过滤1,3,4,5最近2000组(四定)，不够往后搜集
+                    $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,3,4,5], $num=2000);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
