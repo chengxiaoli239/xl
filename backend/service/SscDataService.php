@@ -2906,6 +2906,7 @@ class SscDataService extends BaseService {
                 [ 'AND', ['>', 'take_profits', 0], ['>', 'stop_loss', 0], ['=', 'status', 1], ['=', 'is_batch_simulate', 0] ]
             ];
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划2', ['lottery_type'=>$lottery_type]);
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     $Rkey = __FUNCTION__.'_redis_op_plan_0_1_3_5_'.$lottery_type.'_'.$UserSysPlan->id;
@@ -2916,7 +2917,6 @@ class SscDataService extends BaseService {
                     $profits = SscDataService::getPlanProfits($UserSysPlan);
 
                     $maxQihao = BetService::$maxQihaoArr[$lottery_type];
-                    $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
                     $qihao = substr($current_kj_qihao,-3); # 最后三位
                     if(in_array($lottery_type, [8]) && $maxQihao == $qihao){
                         $profits = 0.00; # 每天的盈利重新计算
@@ -2967,6 +2967,9 @@ class SscDataService extends BaseService {
 
                     $is_init = 1; # 是否初始真实投注
                     $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
+                    if(isset($codes_hz['filters'])){
+                        $codes_hz['filters']['current_kj_qihao'] = $current_kj_qihao;
+                    }
                     if($flag == 1){ # 中奖
                         $next_single_key = 0;
                         $single = $singles[$next_single_key];
@@ -3039,6 +3042,9 @@ class SscDataService extends BaseService {
                     //$current_miss = ($codes_hz['is_init'] == 1) ? 0 : $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
                     $flag = SscDataService::isZjBefore($UserSysPlan->id, $recordDatas);
                     $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
+                    if(isset($codes_hz['filters'])){
+                        $codes_hz['filters']['current_kj_qihao'] = $current_kj_qihao;
+                    }
                     $befor_codes_hz = $codes_hz;
                     if(!is_array($codes_hz)) continue; # 部分投注方式 hz_Arr 不是json 防止错误，
                     if($flag == 1 OR (in_array($UserSysPlan->plan_type, [8]) && $codes_hz['current_miss']>=$codes_hz['bet_while_miss'])){ # plan_type:8、9 遗漏xx期投、遗漏xx期投
@@ -3110,6 +3116,9 @@ class SscDataService extends BaseService {
                         continue;
                     }
                     $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+                    if(isset($hzArr['filters'])){
+                        $hzArr['filters']['current_kj_qihao'] = $current_kj_qihao;
+                    }
                     if(isset($hzArr['change_per']) && $hzArr['change_per'] == 1){ # 每期轮换
                         $turn_key = \Yii::$app->params['IMPORT_CODES_TURN'] - 1;
                         if (isset($hzArr['change_turn_pos']) && $hzArr['change_turn_pos']>0){
