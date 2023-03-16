@@ -67,7 +67,9 @@ abstract class CommonJob extends BaseObject implements JobInterface
         } catch (\Throwable $e) {
             self::$isCatchError = true;
             var_dump('a', $this->queueId . ',' . $e->getMessage());
-            Tool_Common::log('/queue/exception', 'info', '队列异常--', $e->getMessage().'-File-'.$e->getFile().'--line-'.$e->getLine());
+            $err_msg = $e->getMessage();
+            $err_msg = strlen($err_msg)>1000? substr($err_msg, 0, 1000) : $err_msg;
+            Tool_Common::log('/queue/exception', 'info', '队列异常--', $err_msg.'-File-'.$e->getFile().'--line-'.$e->getLine());
             QueueLog::updateAll(['status'=>QueueLog::STATUS_FAILED, 'remark'=>$e->getMessage(),'time'=>time()-$startTime, 'complete_time'=>time(),], ['id'=>$this->queueId] );
         } finally {
             \Yii::$app->cache->delete($cacheKey);
