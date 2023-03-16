@@ -60,6 +60,7 @@ class NumService extends BaseService {
         22=>'过滤1235最近2000组(四定)',
         23=>'过滤1245最近2000组(四定)',
         24=>'过滤1345最近2000组(四定)',
+        25=>'过滤前100期开过号码的全转(四定)',
     ];
 
     /**
@@ -2093,6 +2094,9 @@ class NumService extends BaseService {
                     break;
                 case 24: # 过滤1,3,4,5最近2000组(四定)，不够往后搜集
                     $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,3,4,5], $num=2000);
+                    break;
+                case 25: # 过滤前100期开过号码的全转
+                    $codes = NumService::getBeforeKjCodesDynamic7($plan, $lottery_type, $num=100);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
