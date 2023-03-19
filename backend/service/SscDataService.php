@@ -3189,7 +3189,8 @@ class SscDataService extends BaseService {
                         $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                     }else{
                         if($codes_hz['betStatus'] == 1){
-                            $has_bet_nums = $codes_hz['singles_key'] + 1;
+                            #$has_bet_nums = $codes_hz['singles_key'] + 1;
+                            $has_bet_nums = $codes_hz['singles_key'];
                         }else{
                             $has_bet_nums = 0;
                         }
@@ -3234,7 +3235,7 @@ class SscDataService extends BaseService {
 
             $codes_hz['betStatus'] = $afterBetStatus;
             $updateData = ['hz_Arr'=>json_encode($codes_hz, 320), 'single'=>$single];
-            $logArr = ['plan_id'=>$UserSysPlans->id, 'isZjBefore'=>$flag, 'recordDatas'=>$recordDatas, 'before_codes_hz' => $before_codes_hz, 'code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type];
+            $logArr = ['plan_id'=>$UserSysPlans->id, 'isZjBefore'=>$flag, 'recordDatas'=>$recordDatas, 'before_codes_hz' => $before_codes_hz, 'after_code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type];
             Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则投倍投', $logArr);
             $whereUpdate = ['id'=>$UserSysPlans->id]; # 更新条件
             $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
@@ -3309,7 +3310,7 @@ class SscDataService extends BaseService {
 
             $codes_hz['betStatus'] = $afterBetStatus;
             $updateData = ['hz_Arr'=>json_encode($codes_hz, 320), 'single'=>$single];
-            $logArr = ['plan_id'=>$UserSysPlans->id, 'isZjBefore'=>$flag, 'recordDatas'=>$recordDatas, 'before_codes_hz' => $before_codes_hz, 'code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type];
+            $logArr = ['plan_id'=>$UserSysPlans->id, 'isZjBefore'=>$flag, 'recordDatas'=>$recordDatas, 'before_codes_hz' => $before_codes_hz, 'after_code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type];
             Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则波推倍投', $logArr);
             $whereUpdate = ['id'=>$UserSysPlans->id]; # 更新条件
             $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
@@ -3364,7 +3365,7 @@ class SscDataService extends BaseService {
 
             $codes_hz['betStatus'] = $betStatus;
             $updateData = ['hz_Arr'=>json_encode($codes_hz, 320), 'single'=>$single];
-            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则投倍投', ['plan_id'=>$UserSysPlans->id, 'isZjBefore'=>$flag, 'recordDatas'=>$recordDatas, 'before_codes_hz' => $befor_codes_hz, 'code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type]);
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则投倍投', ['plan_id'=>$UserSysPlans->id, 'isZjBefore'=>$flag, 'recordDatas'=>$recordDatas, 'before_codes_hz' => $befor_codes_hz, 'after_code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type]);
             $whereUpdate = ['id'=>$UserSysPlans->id]; # 更新条件
             $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
             $logArr['6_8'][$UserSysPlans->id]['rst'] = $rst;
