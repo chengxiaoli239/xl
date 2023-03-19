@@ -3039,7 +3039,7 @@ class SscDataService extends BaseService {
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划4', ['lottery_type'=>$lottery_type]);
 
             # plan_type: 6:中则投，不中则不投、 8:遗漏投
-            $where = ['AND', ['IN', 'plan_type', [6, 8]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND', ['IN', 'plan_type', [6, 8, 10, 15]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     switch ($UserSysPlan->plan_type){
