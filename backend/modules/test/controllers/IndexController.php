@@ -867,7 +867,8 @@ class IndexController extends Controller
         p($rst);// 单双遗漏
         $miss = SscDataService::getDsHistoryMiss($num, '1,2,3,4', $lottery_type = 5, 5000);
         p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
-        $flag = BetService::getIsBetTrue($plan_id = 6);
+        $UserSysPlans = UserSysPlans::findOne($plan_id = 6);
+        $flag = BetService::getIsBetTrue($UserSysPlans);
         d($flag);
         $flag = BetSe($plan_id = 6, $istest = 0);
         d($flag);# 上期是否中奖，第一次下注认为是上期不中 中则投

@@ -1144,7 +1144,7 @@ abstract class BetService extends BaseBetService {
         $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id, $plan->uid); # 手动下注时，先删除缓存
 
         $is_test = $plan->is_test;
-        list($sn, $snid) = BetService::getBetSnId($planId, $plan->plan_type, $is_test, $isAuto);
+        list($sn, $snid) = BetService::getBetSnId($plan, $plan->plan_type, $is_test, $isAuto);
 
         if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
             $mkey = self::buildBetPlanIdKey($plan->account, $qihao, $plan->id);
@@ -1222,15 +1222,16 @@ abstract class BetService extends BaseBetService {
      * @param $isAuto
      * @return string[]
      */
-    public static function getBetSnId($planId, $plan_type, &$is_test, $isAuto){
+    public static function getBetSnId(object $UserSysPlans, $plan_type, &$is_test, $isAuto){
         $sn = BetService::$test_true_sn;
         $snid = BetService::$test_true_snid;
 
-        $UserSysPlans = UserSysPlans::findOne($planId);
+        #$UserSysPlans = UserSysPlans::findOne($planId);
+        $planId = $UserSysPlans->id;
         $hzArr = json_decode($UserSysPlans->hz_Arr, true);
         if(in_array($plan_type, array_merge([6, 8, 9, 14], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
             //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
-            $flag = BetService::getIsBetTrue($planId);
+            $flag = BetService::getIsBetTrue($UserSysPlans);
             if(in_array($flag, [0, -1]) && $isAuto == 1){
                 $is_test = 1;
                 $sn = 'istest';
@@ -1287,7 +1288,7 @@ abstract class BetService extends BaseBetService {
            $m->set($mkey, 1, $time);
 
            $is_test = $plan->is_test;
-           list($sn, $snid) = BetService::getBetSnId($planId, $plan->plan_type, $is_test, $isAuto);
+           list($sn, $snid) = BetService::getBetSnId($plan, $plan->plan_type, $is_test, $isAuto);
 
            if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
                $tmpRst = self::_logRecordsByPlandId($planId, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid, $plan->hz_Arr, $r=2); # 直接记录表
@@ -1340,10 +1341,10 @@ abstract class BetService extends BaseBetService {
      * @param string $plan_id
      * @return bool 0不中奖1中奖 -1最初添加计划未投注，可当作未中奖，等同于0
      */
-    public static function getIsBetTrue($plan_id = ''){
+    public static function getIsBetTrue(object $plan){
 
-        $plan = UserSysPlans::findOne($plan_id);
-        $flag = SscDataService::isZjBefore($plan_id); # 上期是否中奖，第一次下注认为是上期不中 中则投
+        #$plan = UserSysPlans::findOne($plan_id);
+        $flag = SscDataService::isZjBefore($plan->id); # 上期是否中奖，第一次下注认为是上期不中 中则投
         $codes_hz = json_decode($plan->hz_Arr, true);
         if(in_array($plan->plan_type, [14])){
             return $codes_hz['areaBetStatus'];
@@ -1353,15 +1354,16 @@ abstract class BetService extends BaseBetService {
                 if($codes_hz['current_miss']>=$codes_hz['bet_while_miss']){
                     $flag = 1;
                 }
-            }
-            if(in_array($plan->plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types)) { # A出x次B出y次投B
+            }else if(in_array($plan->plan_type, [SscDataService::PLAN_TYPE_SINGLES_BET, SscDataService::PLAN_TYPE_SINGLES_BET_2, SscDataService::PLAN_TYPE_BT_SINGLES_BET])) { # 中则投、中则投+翻倍梯度倍投
+                $flag = ($codes_hz['betStatus'] == SscDataService::PLAN_BET_STATUS_BETTING) ? 1 : 0;
+            }else if(in_array($plan->plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types)) { # A出x次B出y次投B
                 $flag = 0;
                 if($codes_hz["current_arise_A_times"]>=$codes_hz['arise_A_times'] && $codes_hz["current_arise_B_times"]==$codes_hz['arise_B_times']){
                     $flag = 1;
                 }
             }
             if($codes_hz['filters']['filter_type'] == 2){
-                $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->one();
+                $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->one();
                 $kj_codes = $BettingRecords->kj_codes;
                 $codesArr = explode(',', $kj_codes);
                 $end_num = array_pop($codesArr); # 以太坊去掉最后一个0
@@ -2006,7 +2008,7 @@ abstract class BetService extends BaseBetService {
                     $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
 
                     $is_test = $plan->is_test;
-                    list($sn, $snid) = BetService::getBetSnId($plan->id, $plan->plan_type, $is_test, $isAuto);
+                    list($sn, $snid) = BetService::getBetSnId($plan, $plan->plan_type, $is_test, $isAuto);
 
                     if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
                         $testInsertRst = self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid, $plan->hz_Arr, $r=3); # 直接记录表
@@ -2188,7 +2190,7 @@ abstract class BetService extends BaseBetService {
 
                     $is_test = max($plan->is_test, $plan->is_batch_simulate);
                     //p([$is_test, $plan->is_batch_simulate], 0);
-                    list($sn, $snid) = BetService::getBetSnId($plan->id, $plan->plan_type, $is_test, $isAuto);
+                    list($sn, $snid) = BetService::getBetSnId($plan, $plan->plan_type, $is_test, $isAuto);
                     //p([$is_test, $plan->plan_type, $plan->id, $current_qihao]);
 
                     $end_time3 = microtime(true);

@@ -51,6 +51,9 @@ class UserSysPlansService extends BaseService {
         }
         //p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id]);
 
+        $post['UserSysPlans']['singles'] = str_replace(' ', '', $post['UserSysPlans']['singles']);
+        $post['UserSysPlans']['start_qihao'] = str_replace(' ', '', $post['UserSysPlans']['start_qihao']);
+
         $User = AdminModel::findOne($user_id);
         $post['UserSysPlans']['tz_sites'] = implode(',',$post['UserSysPlans']['tz_sites']);
 

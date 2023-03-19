@@ -20,7 +20,7 @@ return [
 
     # 导入号码投注类型
     'IMPORT_CODES_TYPES' => [ 19,27,34 ],
-    'IMPORT_CODES_TURN' => 2, # 轮换10组
+    'IMPORT_CODES_TURN' => 10, # 轮换10组
 
     # 日志目录
     'LOG_PATH' => 'lottery_xl',
