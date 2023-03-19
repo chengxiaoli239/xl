@@ -3310,7 +3310,7 @@ class SscDataService extends BaseService {
             $codes_hz['betStatus'] = $afterBetStatus;
             $updateData = ['hz_Arr'=>json_encode($codes_hz, 320), 'single'=>$single];
             $logArr = ['plan_id'=>$UserSysPlans->id, 'isZjBefore'=>$flag, 'recordDatas'=>$recordDatas, 'before_codes_hz' => $before_codes_hz, 'code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type];
-            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则投倍投2', $logArr);
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则波推倍投', $logArr);
             $whereUpdate = ['id'=>$UserSysPlans->id]; # 更新条件
             $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
             $logArr['plan_type_15'][$UserSysPlans->id]['rst'] = $rst;
