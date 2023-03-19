@@ -3198,7 +3198,7 @@ class SscDataService extends BaseService {
                     }
                 }else{
                     $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
-                    if(in_array($codes_hz['betStatus'], [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
+                    if(!isset($codes_hz['betStatus']) OR in_array($codes_hz['betStatus'], [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
                         # 继续等待：betStatus=2
                         $next_single_key = 0;
                         $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
@@ -3277,7 +3277,7 @@ class SscDataService extends BaseService {
                     $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                 }else{
                     # 不中则投的倍投
-                    if(in_array($codes_hz['betStatus'], [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
+                    if(!isset($codes_hz['betStatus']) OR in_array($codes_hz['betStatus'], [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
                         $next_single_key = 0;
                         $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
                     }else{
