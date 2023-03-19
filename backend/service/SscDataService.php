@@ -3212,7 +3212,8 @@ class SscDataService extends BaseService {
                         $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
                     }else{
                         # 上期是下注状态：回第一个倍数接着投 betStatus=1、next_single_key=0 或者 进入等待状态 betStatus=2
-                        $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;  # 有待确认
+                        #$afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;  # 有待确认
+                        $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
                         $next_single_key = 0;
 
                         #$afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;  #
