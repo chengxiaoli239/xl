@@ -3149,13 +3149,13 @@ class SscDataService extends BaseService {
     }
 
     /**
-     * 中则投
+     * 中则投、中则波推倍投
      * @param object $UserSysPlans
      * @return array
      */
     public static function operatePlans_6(object $UserSysPlans, $current_kj_qihao){
         try {
-            if(in_array($UserSysPlans->plan_type, [SscDataService::PLAN_TYPE_SINGLES_BET, SscDataService::PLAN_TYPE_BT_SINGLES_BET])){
+            if(!in_array($UserSysPlans->plan_type, [SscDataService::PLAN_TYPE_SINGLES_BET, SscDataService::PLAN_TYPE_BT_SINGLES_BET])){
                 throw_info('非中则投类型6、10,plan_type:'.$UserSysPlans->plan_type.'不处理');
             }
             $lottery_type = $UserSysPlans->lottery_type;
