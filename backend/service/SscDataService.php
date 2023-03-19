@@ -3178,12 +3178,13 @@ class SscDataService extends BaseService {
             $single = $UserSysPlans->single;
             $singles_count = count($singles);
             if(!empty($UserSysPlans->singles)){
+                $has_bet_nums = 0;
                 if($flag == '-1'){
                     $next_single_key = 0;
                     $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
                 }else if($flag){
                     # 中则投的倍投
-                    if(in_array($codes_hz['betStatus'], [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
+                    if(!isset($codes_hz['betStatus']) OR in_array($codes_hz['betStatus'], [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
                         $next_single_key = 0;
                         $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                     }else{
@@ -3191,6 +3192,7 @@ class SscDataService extends BaseService {
                         if($has_bet_nums >= $singles_count){
                             $next_single_key = 0;
                             $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
+                            $has_bet_nums = 0;
                         }else{
                             $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                             SscDataService::getPlanNextSingle($UserSysPlans->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
@@ -3198,6 +3200,7 @@ class SscDataService extends BaseService {
                         $single = $singles[$next_single_key];
                     }
                 }else{
+                    $has_bet_nums = 0;
                     $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
                     if(!isset($codes_hz['betStatus']) OR in_array($codes_hz['betStatus'], [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
                         # 继续等待：betStatus=2
@@ -3214,6 +3217,7 @@ class SscDataService extends BaseService {
                 }
                 #$next_single_key = $codes_hz['singles_key']; # 倍数索引
                 $codes_hz['singles_key'] = $next_single_key;
+                $codes_hz['has_bet_nums'] = $has_bet_nums; # 已经下注的期数
             }else{
                 # 中则投，无倍投
                 if($flag == 1){ # plan_type:8、9 遗漏xx期投、遗漏x期倍投
