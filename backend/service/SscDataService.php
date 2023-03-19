@@ -3192,6 +3192,7 @@ class SscDataService extends BaseService {
                             $next_single_key = 0;
                             $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
                         }else{
+                            $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                             SscDataService::getPlanNextSingle($UserSysPlans->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                         }
                         $single = $singles[$next_single_key];
