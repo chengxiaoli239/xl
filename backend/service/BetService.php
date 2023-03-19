@@ -1229,7 +1229,7 @@ abstract class BetService extends BaseBetService {
         #$UserSysPlans = UserSysPlans::findOne($planId);
         $planId = $UserSysPlans->id;
         $hzArr = json_decode($UserSysPlans->hz_Arr, true);
-        if(in_array($plan_type, array_merge([6, 8, 9, 14], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
+        if(in_array($plan_type, array_merge([6, 8, 9, 10, 14, 15], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
             //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
             $flag = BetService::getIsBetTrue($UserSysPlans);
             if(in_array($flag, [0, -1]) && $isAuto == 1){
