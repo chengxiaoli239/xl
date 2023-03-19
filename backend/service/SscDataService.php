@@ -3202,7 +3202,6 @@ class SscDataService extends BaseService {
                             SscDataService::getPlanNextSingle($UserSysPlans->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                         }
                     }
-                    $single = $singles[$next_single_key];
                 }else{
                     $has_bet_nums = 0;
                     $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
@@ -3220,6 +3219,7 @@ class SscDataService extends BaseService {
                     }
 
                 }
+                $single = $singles[$next_single_key];
                 #$next_single_key = $codes_hz['singles_key']; # 倍数索引
                 $codes_hz['singles_key'] = $next_single_key;
                 $codes_hz['has_bet_nums'] = $has_bet_nums; # 已经下注的期数
