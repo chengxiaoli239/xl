@@ -3178,7 +3178,10 @@ class SscDataService extends BaseService {
             $single = $UserSysPlans->single;
             $singles_count = count($singles);
             if(!empty($UserSysPlans->singles)){
-                if($flag){
+                if($flag == '-1'){
+                    $next_single_key = 0;
+                    $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
+                }else if($flag){
                     # 中则投的倍投
                     if(in_array($codes_hz['betStatus'], [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
                         $next_single_key = 0;
@@ -3265,7 +3268,10 @@ class SscDataService extends BaseService {
             $single = $UserSysPlans->single;
             $singles_count = count($singles);
             if(!empty($UserSysPlans->singles)){
-                if($flag){
+                if($flag == '-1'){
+                    $next_single_key = 0;
+                    $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
+                }else if($flag){
                     # 中
                     $next_single_key = 0;
                     $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
