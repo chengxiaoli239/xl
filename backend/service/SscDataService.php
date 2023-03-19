@@ -3188,7 +3188,11 @@ class SscDataService extends BaseService {
                         $next_single_key = 0;
                         $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                     }else{
-                        $has_bet_nums = $codes_hz['singles_key'] + 1;
+                        if($codes_hz['betStatus'] == 1){
+                            $has_bet_nums = $codes_hz['singles_key'] + 1;
+                        }else{
+                            $has_bet_nums = 0;
+                        }
                         if($has_bet_nums >= $singles_count){
                             $next_single_key = 0;
                             $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
