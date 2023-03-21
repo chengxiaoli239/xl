@@ -2600,6 +2600,7 @@ class StaticService extends BaseService {
 
            $max_miss = max($range);
            $max_range = $tmpArr[1].$tmpArr[0];  // 近200期内最大遗漏
+           #p($range);
            $yl_str = implode('',$range);
            # 最大遗漏期间计算 end
            //p([$field=>$num,$min_id, $SscKjData[1]->id,$max_range]);
@@ -2620,7 +2621,7 @@ class StaticService extends BaseService {
            'max_miss' => count(explode('-', $max_miss ? $max_miss : $last_times)),   // 近200期内的最大遗漏
            'max_range' => $max_range,   // 近200期内的最大遗漏范围
            'counts' => count($codes),   // 组数
-           'yl_str' => BaseStringHelper::truncate($yl_str,1000),
+           'yl_str' => ltrim(BaseStringHelper::truncate($yl_str,1000), '-'),
            'codeDatas' => $codeDatas,
        ];
 
