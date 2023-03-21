@@ -2438,9 +2438,104 @@ class StaticService extends BaseService {
      * @param int $lottery_type
      * @param int $playway
      * @param $tz_type 一字定倍数切换方案
+     * @return int|array
+     */
+    public static function getYlByCodes($codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $tz_type = 18){
+        $yl = 0;
+        $tzTypes = TzTypes::findOne(['type'=>$tz_type]);
+        $playway = $tzTypes->playway;
+
+        $codeDatas = str_replace('@', ',', str_replace(',', '', implode('@', $codes)));
+
+        switch ($playway){
+            case 1: # 二字定
+                break;
+            case 2: # 三字定
+                break;
+            case 3: # 四字定
+                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'code_4n_str', $codes]];
+                $query = SscKjData::find()->where($where);
+                $SscKjDatas = $query->asArray()->orderBy('id DESC')->limit(20000)->all();
+                break;
+            case 4: # 一字定
+            case 10:
+                $where = ['OR'];
+                $codesArr = explode('@', $codes);
+                foreach ($codesArr as $str){
+                    $codesStrArr = explode(',', $str);
+                    foreach ($codesStrArr as $key=>$arrStr){
+                        if($arrStr == 'X') continue;
+                        $codeKey = 'code'.($key+1);
+                        $len = strlen($arrStr);
+                        $tmpCodesArr = [];
+                        for($i=0; $i<$len; $i++){
+                            $tmpCodesArr[] = $arrStr[$i];
+                        }
+                        $where = array_merge($where,[[ 'IN', $codeKey, $tmpCodesArr]]);
+                    }
+                }
+                $record = SscKjData::find()->select(['qihao','code_str'])->where($where)->andWhere(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+                $last_Qihao = SscDataService::getKjDataLastQihao($lottery_type); # 表记录最后一条id
+                $yl = self::qihaoSpace($record['qihao'], $last_Qihao);
+                break;
+        }
+
+        $last_index_id = SscDataService::getLastIndexId($lottery_type);
+        $tmpKjData = $SscKjDatas;
+        if(count($tmpKjData) > 2){
+            $max_len = 0;
+            $allKjData = [];
+            foreach($tmpKjData as $key=>$r){
+                if($key == 0) continue;
+                $len = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
+                $range[$tmpKjData[$key-1]['index_id'].'_'.$tmpKjData[$key]['index_id']] = $len;
+                $allKjData[$tmpKjData[$key]['index_id']] = $r;
+                if($len > $max_len){
+                    $max_len =  $len;
+                    $tmpArrKey = [$tmpKjData[$key]['index_id'], $tmpKjData[$key-1]['index_id']];
+                }
+            }
+            $tmpArr[0] = $allKjData[$tmpArrKey[0]]['qihao'];
+            $tmpArr[1] = $allKjData[$tmpArrKey[1]]['qihao'];
+
+            $max_miss = max($range);
+            $max_range = $tmpArr[1].'-'.$tmpArr[0];  // 近200期内最大遗漏
+            $yl_str = implode('-',$range);
+            # 最大遗漏期间计算 end
+            //p([$field=>$num,$min_id, $SscKjData[1]->id,$max_range]);
+        }else{
+            $max_range = $SscKjDatas[1]['qihao'] .'-'. $SscKjDatas[0]['qihao'];
+        }
+        $last_times = 0;
+        if(count($SscKjDatas)>1){
+            $last_times = $SscKjDatas[0]['index_id'] - $SscKjDatas[1]['index_id'] - 1;  // 上次遗漏次数
+        }
+        $last_time_miss_range = $SscKjDatas[1]['qihao'] .'-'. $SscKjDatas[0]['qihao'];
+        $current_times = $last_index_id - $SscKjDatas[0]['index_id'];
+        if(empty($yl_str)) $yl_str = $last_times;
+        $rstData = [
+            'current_times' => $current_times,    // 当前遗漏次数
+            'last_times' => $last_times,    // 上次遗漏次数
+            'last_time_miss_range' => $last_time_miss_range,    // 上次遗漏范围
+            'max_miss' => $max_miss ? $max_miss : $last_times,   // 近200期内的最大遗漏
+            'max_range' => $max_range,   // 近200期内的最大遗漏范围
+            'counts' => count($codes),   // 组数
+            'yl_str' => BaseStringHelper::truncate($yl_str,1000),
+            'codeDatas' => $codeDatas,
+        ];
+
+        return $rstData;
+    }
+
+    /**
+     * @desc 给定号码计算遗漏 未完待续 -- 2019.05.09
+     * @param $codes
+     * @param int $lottery_type
+     * @param int $playway
+     * @param $tz_type 一字定倍数切换方案
      * @return int
      */
-   public static function getYlByCodes($codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $tz_type = 18){
+   public static function getYlByCodes2($codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $tz_type = 18){
        $yl = 0;
        $tzTypes = TzTypes::findOne(['type'=>$tz_type]);
        $playway = $tzTypes->playway;
@@ -2488,7 +2583,12 @@ class StaticService extends BaseService {
            foreach($tmpKjData as $key=>$r){
                if($key == 0) continue;
                $len = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
-               $range[$tmpKjData[$key-1]['index_id'].'_'.$tmpKjData[$key]['index_id']] = $len;
+               if($len==0){
+                   $implode_str = '-0';
+               }else{
+                   $implode_str = str_repeat('-1', $len);
+               }
+               $range[$tmpKjData[$key-1]['index_id'].'_'.$tmpKjData[$key]['index_id']] = $implode_str;
                $allKjData[$tmpKjData[$key]['index_id']] = $r;
                if($len > $max_len){
                    $max_len =  $len;
@@ -2499,25 +2599,25 @@ class StaticService extends BaseService {
            $tmpArr[1] = $allKjData[$tmpArrKey[1]]['qihao'];
 
            $max_miss = max($range);
-           $max_range = $tmpArr[1].'-'.$tmpArr[0];  // 近200期内最大遗漏
-           $yl_str = implode('-',$range);
+           $max_range = $tmpArr[1].$tmpArr[0];  // 近200期内最大遗漏
+           $yl_str = implode('',$range);
            # 最大遗漏期间计算 end
            //p([$field=>$num,$min_id, $SscKjData[1]->id,$max_range]);
        }else{
-           $max_range = $SscKjDatas[1]['qihao'] .'-'. $SscKjDatas[0]['qihao'];
+           $max_range = $SscKjDatas[1]['qihao'] . $SscKjDatas[0]['qihao'];
        }
        $last_times = 0;
        if(count($SscKjDatas)>1){
            $last_times = $SscKjDatas[0]['index_id'] - $SscKjDatas[1]['index_id'] - 1;  // 上次遗漏次数
        }
-       $last_time_miss_range = $SscKjDatas[1]['qihao'] .'-'. $SscKjDatas[0]['qihao'];
+       $last_time_miss_range = $SscKjDatas[1]['qihao'] . $SscKjDatas[0]['qihao'];
        $current_times = $last_index_id - $SscKjDatas[0]['index_id'];
        if(empty($yl_str)) $yl_str = $last_times;
        $rstData = [
            'current_times' => $current_times,    // 当前遗漏次数
            'last_times' => $last_times,    // 上次遗漏次数
            'last_time_miss_range' => $last_time_miss_range,    // 上次遗漏范围
-           'max_miss' => $max_miss ? $max_miss : $last_times,   // 近200期内的最大遗漏
+           'max_miss' => count(explode('-', $max_miss ? $max_miss : $last_times)),   // 近200期内的最大遗漏
            'max_range' => $max_range,   // 近200期内的最大遗漏范围
            'counts' => count($codes),   // 组数
            'yl_str' => BaseStringHelper::truncate($yl_str,1000),
@@ -2966,9 +3066,12 @@ $sql .= '
         $codes_hz = json_decode($model->hz_Arr, true);
         $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type, $in_codes);
 
-        if($type == 1){
+        if($type == 1) {
             # 1 遗漏
             $rst = StaticService::getYlByCodes($codes, $lottery_type, $tz_type);
+        }elseif($type == 3){
+            # 2 遗漏2：1-0-1-1-1-0-0-0-0   0代表中1代表不中
+            $rst = StaticService::getYlByCodes2($codes, $lottery_type, $tz_type);
         }else{
             # 利润
             $rst = StaticService::getYlByCodes($codes, $lottery_type, $tz_type);

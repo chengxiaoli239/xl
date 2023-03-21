@@ -109,7 +109,7 @@ class SscStaticYlController extends BaseController
     public function actionQuery(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
-        $rst = StaticService::queryCodeTypeStatic($post, $post['code_type']);
+        $rst = StaticService::queryCodeTypeStatic($post, $post['type']);
 
         return $rst;
     }
