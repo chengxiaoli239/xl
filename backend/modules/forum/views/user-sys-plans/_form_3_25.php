@@ -496,7 +496,7 @@ $(function () {
         url = '/forum/ssc-static-yl/query'
         data = $('#w0').serialize()+'&type='+$(this).data('type');
         $.post(url, data, function(rst) {
-            $('#tip_msg_rst').html('<strong>号码：</strong>'+rst.code_desc + "<br>" +'<strong>组数：</strong>'+ rst.counts + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str)
+            $('#tip_msg_rst').html('<strong>号码：</strong>'+rst.code_desc + "<br>" +'<strong>组数：</strong>'+ rst.counts + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>"  +rst.yl_str)
             $('#rstTipModal').modal('show');
             $('#codes_nums').html(rst.counts)
             $('#usersysplans-codes').html(rst.codeDatas);

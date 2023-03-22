@@ -2542,6 +2542,9 @@ class StaticService extends BaseService {
 
        $codeDatas = str_replace('@', ',', str_replace(',', '', implode('@', $codes)));
 
+       $last_index_id = SscDataService::getLastIndexId($lottery_type, false);
+       $static_nums = 500;
+       $min_index_id = $last_index_id-$static_nums;
        switch ($playway){
            case 1: # 二字定
                break;
@@ -2549,8 +2552,9 @@ class StaticService extends BaseService {
                break;
            case 3: # 四字定
                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'code_4n_str', $codes]];
-               $query = SscKjData::find()->select(['qihao','index_id'])->where($where)->orderBy('id DESC')->limit(20000);
-               #p($query->createCommand()->getRawSql());
+               $query = SscKjData::find()->select(['qihao','index_id'])->where($where)->andWhere(['>=', 'index_id', $min_index_id])->orderBy('id DESC');
+               $sql = $query->createCommand()->getRawSql();
+               Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '遗漏统计', ['sql'=>$sql]);
                $SscKjDatas = $query->asArray()->all();
                break;
            case 4: # 一字定
@@ -2570,51 +2574,59 @@ class StaticService extends BaseService {
                        $where = array_merge($where,[[ 'IN', $codeKey, $tmpCodesArr]]);
                    }
                }
-               $query = SscKjData::find()->select(['qihao','code_str'])->where($where)->andWhere(['lottery_type'=>$lottery_type]);
+               $query = SscKjData::find()->select(['qihao','code_str','code_4n_str'])->where($where)->andWhere(['lottery_type'=>$lottery_type]);
                $record = $query->orderBy(['id'=>SORT_DESC])->asArray()->one();
                $last_Qihao = SscDataService::getKjDataLastQihao($lottery_type); # 表记录最后一条id
                $yl = self::qihaoSpace($record['qihao'], $last_Qihao);
                break;
        }
 
-       $last_index_id = SscDataService::getLastIndexId($lottery_type);
        $tmpKjData = $SscKjDatas;
        if(count($tmpKjData) > 2){
            $max_len = 0;
            $allKjData = [];
            foreach($tmpKjData as $key=>$r){
-               if($key == 0) continue;
-               $len = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
+               $current_index_id = (int)$tmpKjData[$key]['index_id'];
+               $next_index_id = (int)$tmpKjData[$key+1]['index_id'];
+               if($key+1==count($tmpKjData)) break; # 最后一个不计算
+               $len =  $current_index_id - $next_index_id - 1;
                if($len==0){
-                   $implode_str = '0';
+                   $implode_str = '1';
                }else{
-                   $implode_str = trim(str_repeat('-1', $len), '-');
+                   $implode_str = trim(str_repeat('-0', $len), '-');
                }
-               $range[$tmpKjData[$key-1]['index_id'].'_'.$tmpKjData[$key]['index_id']] = $implode_str;
+               $range[$next_index_id.'_'.$current_index_id] = $implode_str;
                $allKjData[$tmpKjData[$key]['index_id']] = $r;
                if($len > $max_len){
                    $max_len =  $len;
-                   $tmpArrKey = [$tmpKjData[$key]['index_id'], $tmpKjData[$key-1]['index_id']];
+                   $tmpArrKey = [$current_index_id, $next_index_id];
                }
            }
+
+           # 最大遗漏范围
            $tmpArr[0] = $allKjData[$tmpArrKey[0]]['qihao'];
            $tmpArr[1] = $allKjData[$tmpArrKey[1]]['qihao'];
+           $max_range = $tmpArr[1].$tmpArr[0];  // 近200期内最大遗漏
 
            $max_miss = max($range);
-           $max_range = $tmpArr[1].$tmpArr[0];  // 近200期内最大遗漏
-           $yl_str = implode('-',$range);
+           #p($range,0);
+           $yl_str = implode('-1-',$range);
            # 最大遗漏期间计算 end
            //p([$field=>$num,$min_id, $SscKjData[1]->id,$max_range]);
        }else{
            $max_range = $SscKjDatas[1]['qihao'] . $SscKjDatas[0]['qihao'];
        }
-       $last_times = 0;
-       if(count($SscKjDatas)>1){
-           $last_times = $SscKjDatas[0]['index_id'] - $SscKjDatas[1]['index_id'] - 1;  // 上次遗漏次数
-       }
-       $last_time_miss_range = $SscKjDatas[1]['qihao'] . $SscKjDatas[0]['qihao'];
-       $current_times = $last_index_id - $SscKjDatas[0]['index_id'];
+
+       $last_times = $SscKjDatas[0]['index_id'] - $SscKjDatas[1]['index_id'] - 1;  // 上次遗漏次数
+
        if(empty($yl_str)) $yl_str = $last_times;
+       $last_time_miss_range = $SscKjDatas[1]['qihao'] . $SscKjDatas[0]['qihao'];
+       $current_times = ($last_index_id - $SscKjDatas[0]['index_id']);
+       #p([$last_index_id , $SscKjDatas[0]['index_id'], $last_len0]);
+       if($current_times > 1){
+           $yl_str = str_repeat('0-', $current_times-1).$yl_str;
+       }
+       #p($yl_str);
        $rstData = [
            'current_times' => $current_times,    // 当前遗漏次数
            'last_times' => $last_times,    // 上次遗漏次数

@@ -1467,16 +1467,15 @@ class SscDataService extends BaseService {
      * @param int $lottery_type
      * @return mixed
      */
-    public static function getLastIndexId($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function getLastIndexId($lottery_type = DEFAULT_LOTTERY_TYPE, $use_cache=false){
         $m = \Yii::$app->cache;
-        $mkey = 'getLastIndexId_'.$lottery_type;
-        if(!$index_id = $m->get($mkey)){
-            //$index_id =
+        $mkey = 'getLastIndexId_x_'.$lottery_type;
+        if(!$use_cache OR !$index_id = $m->get($mkey)){
             $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
             $index_id = $last['index_id'];
             //$qihao = HN0898Service::getQihao($lottery_type);
             //$time = BetService::getBetCacheTime($lottery_type, $qihao);
-            $m->set($mkey, $index_id, 300);
+            $m->set($mkey, $index_id, 1);
         }
 
         return $index_id;
