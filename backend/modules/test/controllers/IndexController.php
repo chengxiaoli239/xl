@@ -326,11 +326,11 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst = TzSystemUsersService::getActiveQihao($lottery_type=8);
+        p($rst);
         $plan = UserSysPlans::findOne(5988);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         p(count($filter_dynamic_codes));
-        $rst = TzSystemUsersService::getActiveQihao($lottery_type=8);
-        p($rst);
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         echo json_encode(['code'=>200, 'msg'=>'操作成功', 'data'=>[]], JSON_FORCE_OBJECT|320);exit();

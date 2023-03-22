@@ -202,7 +202,15 @@ class TzSystemUsersService extends ClientsBaseService{
         $next_qihao = $m->get($mkey);
 
         if(empty($next_qihao)){
-            $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->one();
+            $where = [
+                'AND',
+                ['=', 'lottery_type', $lottery_type],
+                ['!=', 'next_qihao', ''],
+                ['IS NOT', 'next_qihao', NULL],
+            ];
+            $query = DataDealStatus::find()->where($where);
+            #p($query->createCommand()->getRawSql());
+            $DataDealStatus = $query->asArray()->orderBy(['id'=>SORT_DESC])->one();
             $next_qihao = $DataDealStatus['next_qihao'];
 
             $m->set($mkey, $next_qihao, 65);
