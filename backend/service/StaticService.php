@@ -2533,7 +2533,7 @@ class StaticService extends BaseService {
      * @param int $lottery_type
      * @param int $playway
      * @param $tz_type 一字定倍数切换方案
-     * @return int
+     * @return array
      */
    public static function getYlByCodes2($codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $tz_type = 18){
        $yl = 0;
@@ -2549,8 +2549,9 @@ class StaticService extends BaseService {
                break;
            case 3: # 四字定
                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'code_4n_str', $codes]];
-               $query = SscKjData::find()->where($where);
-               $SscKjDatas = $query->asArray()->orderBy('id DESC')->limit(20000)->all();
+               $query = SscKjData::find()->select(['qihao','index_id'])->where($where)->orderBy('id DESC')->limit(20000);
+               #p($query->createCommand()->getRawSql());
+               $SscKjDatas = $query->asArray()->all();
                break;
            case 4: # 一字定
            case 10:
@@ -2568,11 +2569,12 @@ class StaticService extends BaseService {
                        }
                        $where = array_merge($where,[[ 'IN', $codeKey, $tmpCodesArr]]);
                    }
-                }
-                $record = SscKjData::find()->select(['qihao','code_str'])->where($where)->andWhere(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one();
-                $last_Qihao = SscDataService::getKjDataLastQihao($lottery_type); # 表记录最后一条id
-                $yl = self::qihaoSpace($record['qihao'], $last_Qihao);
-                break;
+               }
+               $query = SscKjData::find()->select(['qihao','code_str'])->where($where)->andWhere(['lottery_type'=>$lottery_type]);
+               $record = $query->orderBy(['id'=>SORT_DESC])->asArray()->one();
+               $last_Qihao = SscDataService::getKjDataLastQihao($lottery_type); # 表记录最后一条id
+               $yl = self::qihaoSpace($record['qihao'], $last_Qihao);
+               break;
        }
 
        $last_index_id = SscDataService::getLastIndexId($lottery_type);
@@ -2584,9 +2586,9 @@ class StaticService extends BaseService {
                if($key == 0) continue;
                $len = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
                if($len==0){
-                   $implode_str = '-0';
+                   $implode_str = '0';
                }else{
-                   $implode_str = str_repeat('-1', $len);
+                   $implode_str = trim(str_repeat('-1', $len), '-');
                }
                $range[$tmpKjData[$key-1]['index_id'].'_'.$tmpKjData[$key]['index_id']] = $implode_str;
                $allKjData[$tmpKjData[$key]['index_id']] = $r;
@@ -2600,8 +2602,7 @@ class StaticService extends BaseService {
 
            $max_miss = max($range);
            $max_range = $tmpArr[1].$tmpArr[0];  // 近200期内最大遗漏
-           #p($range);
-           $yl_str = implode('',$range);
+           $yl_str = implode('-',$range);
            # 最大遗漏期间计算 end
            //p([$field=>$num,$min_id, $SscKjData[1]->id,$max_range]);
        }else{
@@ -2624,7 +2625,6 @@ class StaticService extends BaseService {
            'yl_str' => ltrim(BaseStringHelper::truncate($yl_str,1000), '-'),
            'codeDatas' => $codeDatas,
        ];
-
 
        return $rstData;
    }
