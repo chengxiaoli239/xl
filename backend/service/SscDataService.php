@@ -1475,7 +1475,7 @@ class SscDataService extends BaseService {
             $index_id = $last['index_id'];
             //$qihao = HN0898Service::getQihao($lottery_type);
             //$time = BetService::getBetCacheTime($lottery_type, $qihao);
-            $m->set($mkey, $index_id, 1);
+            $m->set($mkey, $index_id, 30);
         }
 
         return $index_id;
