@@ -3318,6 +3318,7 @@ class SscDataService extends BaseService {
                 $next_single_key = $has_bet_nums - 1;
                 $single = $singles[$next_single_key];
                 $codes_hz['singles_key'] = $next_single_key;
+                $codes_hz['has_bet_nums'] = $has_bet_nums;
             }else{
                 # 中则投，无倍投
                 if($flag == 1){ # plan_type:8、9 遗漏xx期投、遗漏x期倍投
