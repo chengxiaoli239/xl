@@ -3277,6 +3277,101 @@ class SscDataService extends BaseService {
             }
             $single = $UserSysPlans->single;
             $singles_count = count($singles);
+            $has_bet_nums = (int)$codes_hz['has_bet_nums'];
+            if(!empty($UserSysPlans->singles)){
+                switch ((int)$codes_hz['betStatus']){
+                    case SscDataService::PLAN_BET_STATUS_INIT:
+                        # 初始状态
+                        if($flag){
+                            $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
+                            $has_bet_nums = 1;
+                        }else{
+                            $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
+                            $has_bet_nums = 1;
+                        }
+                        break;
+                    case SscDataService::PLAN_BET_STATUS_BETTING:
+                        # 正在下注状态
+                        if($flag){
+                            $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
+                            $has_bet_nums = 1;
+                        }else{
+                            $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
+                            $has_bet_nums = $codes_hz['has_bet_nums'];
+                        }
+                        break;
+                    case SscDataService::PLAN_BET_STATUS_WAIT:
+                        # 等待状态
+                        if($flag){
+                            $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
+                            $has_bet_nums = $codes_hz['has_bet_nums'] + 1;
+                        }else{
+                            $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
+                            $has_bet_nums = $codes_hz['has_bet_nums'];
+                        }
+                        break;
+                }
+
+                if($has_bet_nums>$singles_count){
+                    $has_bet_nums = 1;
+                }
+                $next_single_key = $has_bet_nums - 1;
+                $single = $singles[$next_single_key];
+                $codes_hz['singles_key'] = $next_single_key;
+            }else{
+                # 中则投，无倍投
+                if($flag == 1){ # plan_type:8、9 遗漏xx期投、遗漏x期倍投
+                    $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
+                }else{
+                    $afterBetStatus = SscDataService::PLAN_BET_STATUS_INIT;
+                }
+            }
+
+            $codes_hz['betStatus'] = $afterBetStatus;
+            $updateData = ['hz_Arr'=>json_encode($codes_hz, 320), 'single'=>$single];
+            $logArr = ['plan_id'=>$UserSysPlans->id, 'isZjBefore'=>$flag, 'recordDatas'=>$recordDatas, 'before_codes_hz' => $before_codes_hz, 'after_code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type];
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则波推倍投', $logArr);
+            $whereUpdate = ['id'=>$UserSysPlans->id]; # 更新条件
+            $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+            $logArr['plan_type_15'][$UserSysPlans->id]['rst'] = $rst;
+        }catch (\Exception $e){
+            Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '处理计划异常:', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+            return [10001, [], $e->getMessage()];
+        }
+
+        return [0, $logArr, '处理成功_plan_type:6'];
+    }
+
+    /**
+     * 中则倍投 旧模式：选择此计划类型时，"倍数梯度" 为必填，第一期模拟中，则开始下注，如果不中则按照填写的"倍数梯度"来翻倍打，期间只要中都会回到第1个倍数接着打
+     * @param object $UserSysPlans
+     * @return array
+     */
+    public static function operatePlans_15_bak(object $UserSysPlans, $current_kj_qihao){
+        try {
+            if($UserSysPlans->plan_type != SscDataService::PLAN_TYPE_SINGLES_BET_2){
+                throw_info('非中则倍投类型15,plan_type:'.$UserSysPlans->plan_type.'不处理');
+            }
+            $lottery_type = $UserSysPlans->lottery_type;
+            #$current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+            $RedisLock = new RedisLock();
+            $Rkey = __FUNCTION__.'_redis_op_plan_15_'.$lottery_type.'_'.$UserSysPlans->id;
+            if(!$RedisLock->lock($Rkey, 30)){
+                throw_info('并发处理失败');
+            }
+            //$current_miss = ($codes_hz['is_init'] == 1) ? 0 : $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
+            $flag = SscDataService::isZjBefore($UserSysPlans->id, $recordDatas);
+            $codes_hz = json_decode($UserSysPlans->hz_Arr, true);
+            if(isset($codes_hz['filters'])){
+                $codes_hz['filters']['current_kj_qihao'] = $current_kj_qihao;
+            }
+            $before_codes_hz = $codes_hz;
+            $singles = explode('-', trim($UserSysPlans->singles));
+            if(!is_array($codes_hz)) {
+                throw_info('下注规则异常'); # 部分投注方式 hz_Arr 不是json 防止错误，
+            }
+            $single = $UserSysPlans->single;
+            $singles_count = count($singles);
             if(!empty($UserSysPlans->singles)){
                 if($flag == '-1'){
                     $next_single_key = 0;
