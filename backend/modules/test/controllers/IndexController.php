@@ -326,6 +326,10 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $a = [0,1,2,3,4,5,6,7,8,9];
+        $b = [1,2,2,3];
+        $intersection = array_intersect($a, $b);
+        p($intersection);
         $rst = TzSystemUsersService::getActiveQihao($lottery_type=8);
         p($rst);
         $plan = UserSysPlans::findOne(5988);
