@@ -103,46 +103,46 @@ class KjDataGet
 
     /**
      * @description 时时彩逐期抓取(以此方法为主抓取时时彩数据)
-     * @return array
+     * @return bool
      */
     public static function grabKjDatas($lottery_types = []){
-        $msg = ['status'=>200, 'msg'=>'操作成功~'];
-
         $m = \Yii::$app->cache;
         $lottery_types = StaticService::getGrabDataLotteryTypes($lottery_types);
         foreach ($lottery_types as $lotteryData){
-            $lottery_type = $lotteryData['lottery_type'];
-            #KjDataGet::grabOneLotteryKjData($lottery_type);
-            $initLotteryKey = SystemService::getInitLotteryDataKey($lottery_type);
-            $is_init = $m->get($initLotteryKey);
-            $mkey = 'grabKjDatas_x1_'.$lottery_type;
-            $flag = $m->get($mkey);
-            $cacheTime = (strpos($lotteryData['typeGroupName'], '高频') !== false) ? 9 : 1800;
-            if($is_init){
-                $cacheTime = 4;
-            }
-            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'mkey'=>$mkey, 'cacheTime'=>$cacheTime, 'is_init'=>$is_init, 'flag'=>$flag]);
-            if(!$flag OR $is_init){
-                var_dump(date('Y-m-d H:i:s').' 开奖抓取入列lottery_type:'.$lottery_type);
-                $params = ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title']];
-                if($is_init){
-                    $params['is_grab_history'] = 1;
+            try {
+                $lottery_type = $lotteryData['lottery_type'];
+                $initLotteryKey = SystemService::getInitLotteryDataKey($lottery_type);
+                #KjDataGet::grabOneLotteryKjData($lottery_type);
+
+                $exist_key = $initLotteryKey.$lottery_type;
+                $flag = $m->get($initLotteryKey);
+                // 防止并发售后消息通知
+                $exist = \Yii::$app->redis->sadd($exist_key, $lottery_type);
+                if(!$exist OR $flag){
+                    throw_info('并发消息处理'.$lottery_type, 30001);
                 }
+                $cacheTime = (strpos($lotteryData['typeGroupName'], '高频') !== false) ? 15 : 1800;
+                $m->set($initLotteryKey, 1, $cacheTime);
+
+                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'cacheTime'=>$cacheTime, 'flag'=>$flag]);
+                $params = ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title']];
+                $params['is_grab_history'] = 1;
                 push_queue(GrabKjDatasJob::class, $params);
-                $m->set($mkey, 1, $cacheTime);
-            }else{
-                var_dump(date('Y-m-d H:i:s').' 缓存时间lottery_type:'.$lottery_type);
+                \Yii::$app->redis->srem($exist_key, $lottery_type);
+            }catch (\Exception $e){
+                \Yii::$app->redis->srem($exist_key, $lottery_type);
+                return false;
             }
         }
 
-        return $msg;
+        return true;
     }
 
     /**
      * 单个彩种号码抓取
      * @param int $lottery_type
      * @param int $is_grab_history
-     * @return string
+     * @return array
      */
     public static function grabOneLotteryKjData($lottery_type=DEFAULT_LOTTERY_TYPE, $is_grab_history=0){
         $m = \Yii::$app->cache;
@@ -151,16 +151,18 @@ class KjDataGet
         foreach ($KjConfigs as $kjConfig){
             try {
                 $status = KjDataGet::isCanGrab($kjConfig->lottery_type);
-                if(!$status && !$kjConfig->is_batch) continue;
-                $lottery_type = $kjConfig->lottery_type;
+                if(!$status && !$kjConfig->is_batch){
+                    throw_info('该时间段不可抓取');
+                }
+                $grabOneMkey = 'grabOneLotteryKjData_'.$lottery_type;
+                if(!$RedisLock->lock($grabOneMkey, 15)){
+                    throw_info('短时间内操作-暂不处理');
+                }
 
                 $url = $kjConfig->host.$kjConfig->path;
-                if(!$data = CurlService::httpGet($url)) continue;
-                if(isset($data['status']) && $data['status'] != 200) continue;
-
-                $grabOneMkey = 'grabOneLotteryKjData_'.$lottery_type;
-                if(!$RedisLock->lock($grabOneMkey, 5)){
-                    throw_info('短时间内操作');
+                $data = CurlService::httpGet($url);
+                if($data['status'] != 200){
+                    throw_info($data['msg']??'开奖数据抓取异常');
                 }
 
                 if($kjConfig->is_batch == 1){
@@ -168,58 +170,34 @@ class KjDataGet
                     Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '批量抓取开奖号码', ['data'=>$data]);
                     if($kjDatas){
                         # xjssc  1七星彩17排列五
-                        $mkey = 'KJ_LOG_KEY_BATCH_1_'.$kjConfig->lottery_type;
-                        Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '开奖数据', ['url'=>$url, 'kjdatas'=>$kjDatas]);
                         $kjDatas = array_reverse($kjDatas); # 翻转
                         foreach ($kjDatas as $key=>$dataInfo){
                             $qihao = $dataInfo['expect'];
-                            $rst = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $dataInfo['opencode'], $dataInfo['opentime']);
+                            KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $dataInfo['opencode'], $dataInfo['opentime']);
                         }
                     }
-                    $cache_time = 10;
-                    $logArr = ['data'=>$data, 'rst'=>$rst];
+                    $logArr = ['lottery_type'=>$kjConfig->lottery_type];
                 }else{
-                    $mkey = 'KJ_LOG_KEY_BATCH_0_'.$kjConfig->lottery_type;
-                    $kjData = (isset($data['opencode']) && !empty($data['opencode'])) ? $data['opencode'] : [];
-                    if($kjData){
-                        if($kjConfig->lottery_type == 5){
-                            $qihao = substr($data['expect'],2,6).substr($data['expect'],9,3);
-                        }else{
-                            $qihao = $data['expect'];
-                        }
+                    if(!empty($data['opencode'])){
                         # ssc
-                        $msg = KjDataGet::insertKjData($qihao, $kjConfig->lottery_type, $kjData, $data['opentime']);
-                        $cache_time = 10;
+                        KjDataGet::insertKjData($data['expect'], $kjConfig->lottery_type, $data['opencode'], $data['opentime']);
                     }
-                    $lotteryNameArr = CqsscKcw::getLotteryNameArr();
-                    $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, /*'qihao'=>$qihao, 'kjData'=>$kjData, 'insertRst'=>$msg,*/ 'lottery'=>$lotteryNameArr[$kjConfig->lottery_type]];
+                    $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, 'lottery'=>CqsscKcw::getLotteryNameArr()[$kjConfig->lottery_type]];
                     Tool_Common::log('insertSscKjData', 'INFO', '开奖记录', $logArr);
                 }
-                $mkey_qihao = 'KJ_LOG_QIHAO_'.$kjConfig->lottery_type.'_'.$qihao;
-                if(!$m->get($mkey_qihao) ){
-                    $logArr = array_merge($logArr, [
-                        'url' => $url,
-                        'mkey_qihao' => $mkey_qihao,
-                        'qihao' => $qihao,
-                        'mkey' => $mkey,
-                        'lottery_type' => $lottery_type,
-                    ]);
-                    Tool_Common::log('insertSscKjData-c', 'INFO', '开奖记录', $logArr);
-                    $m->set($mkey, 1, $cache_time);
-                    $m->set($mkey_qihao, 1, $cache_time);
+                if(!$is_grab_history){
+                    /* 处理系统投注计划 add 2019-01-21 */
+                    KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
                 }
                 $RedisLock->unlock($grabOneMkey);
             }catch (\Exception $e){
+                $RedisLock->unlock($grabOneMkey);
                 Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '短时间内操作', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+                return ['code'=>$e->getCode(), 'msg'=>$e->getMessage()];
             }
         }
-        if(!$is_grab_history){
-            /* 处理系统投注计划 add 2019-01-21 */
-            KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
-            /* 处理系统投注计划 add 2019-01-21 */
-        }
 
-        return '处理完成';
+        return $logArr;
     }
 
     /**
