@@ -241,7 +241,7 @@ class CurlService extends BaseService{
         $data = curl_exec($ch);
         //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
         if(curl_close($ch)) {
-            echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+            return ['status'=>300, 'msg'=>'Curl error: ' . curl_error($ch)];
         }
         if(!self::is_json($data)){
             return $data;

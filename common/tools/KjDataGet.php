@@ -161,7 +161,7 @@ class KjDataGet
 
                 $url = $kjConfig->host.$kjConfig->path;
                 $data = CurlService::httpGet($url);
-                if($data['status'] != 200){
+                if(isset($data['status']) && $data['status'] != 200){
                     throw_info($data['msg']??'开奖数据抓取异常');
                 }
 
