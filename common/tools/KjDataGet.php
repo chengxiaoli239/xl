@@ -124,12 +124,13 @@ class KjDataGet
                 $cacheTime = (strpos($lotteryData['typeGroupName'], '高频') !== false) ? 15 : 1800;
                 $m->set($initLotteryKey, 1, $cacheTime);
 
-                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'cacheTime'=>$cacheTime, 'flag'=>$flag]);
                 $params = ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title']];
                 $params['is_grab_history'] = 1;
                 push_queue(GrabKjDatasJob::class, $params);
+                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'cacheTime'=>$cacheTime, 'flag'=>$flag]);
                 \Yii::$app->redis->srem($exist_key, $lottery_type);
             }catch (\Exception $e){
+                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'err_msg'=>$e->getMessage()]);
                 \Yii::$app->redis->srem($exist_key, $lottery_type);
                 return false;
             }
