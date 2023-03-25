@@ -150,11 +150,11 @@ class KjDataGet
         $KjConfigs = KjConfig::findAll(['enable'=>1, 'lottery_type'=>$lottery_type]);
         foreach ($KjConfigs as $kjConfig){
             try {
+                $grabOneMkey = 'grabOneLotteryKjData_x0_'.$lottery_type;
                 $status = KjDataGet::isCanGrab($kjConfig->lottery_type);
                 if(!$status && !$kjConfig->is_batch){
                     throw_info('该时间段不可抓取');
                 }
-                $grabOneMkey = 'grabOneLotteryKjData_'.$lottery_type;
                 if(!$RedisLock->lock($grabOneMkey, 15)){
                     throw_info('短时间内操作-暂不处理');
                 }
