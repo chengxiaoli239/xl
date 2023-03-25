@@ -132,7 +132,6 @@ class KjDataGet
             }catch (\Exception $e){
                 Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'err_msg'=>$e->getMessage()]);
                 \Yii::$app->redis->srem($exist_key, $lottery_type);
-                return false;
             }
         }
 
