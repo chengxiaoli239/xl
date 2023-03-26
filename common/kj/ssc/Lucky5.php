@@ -107,7 +107,7 @@ class Lucky5 extends BaseKj {
      * http://web01.cc138008.com/?url=pc/live/ygxy5#/pc/live/ygxy5
      * @param string $returnType
      * @param int $is_auto 1:自动2手动
-     * @return array
+     * @return array|bool
      */
     public static function getLotteryShiXunOne($returnType = 'json', $is_auto=1){
         $kjData = self::getCurrentKjData(self::$lottery_type);
@@ -129,6 +129,7 @@ class Lucky5 extends BaseKj {
             $kjData = ['expect'=>str_replace('期', '', $data['pc_issue'][0]), 'opencode'=>$opencode, 'opentime'=>$data['open_date'].' '.trim($data['pc_issue'][1])];
             Tool_Common::log('luck5', 'INFO', '号码抓取-实讯网', ['kjData'=>$kjData]);
         }
+        if(empty($kjData['opencode'])) return false;
         $opencode = $kjData['opencode'];
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
@@ -152,7 +153,7 @@ class Lucky5 extends BaseKj {
     /**
      * @desc 幸运五星彩 - 实时资讯网 https://cc138001.com
      * @param string $returnType
-     * @return array
+     * @return array|bool
      */
     public static function getLotteryShiXun($returnType = 'json', $is_auto=1){
         if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
@@ -173,6 +174,7 @@ class Lucky5 extends BaseKj {
             $kjData = ['expect'=>$data['preDrawIssue']?$data['preDrawIssue']:$data['issue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']?$data['preDrawTime']:$data['draw_time']];
             //p($kjData);
         }
+        if(empty($kjData['opencode'])) return false;
         $opencode = $kjData['opencode'];
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
