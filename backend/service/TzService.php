@@ -114,6 +114,7 @@ class TzService extends BaseService {
         self::_init();
         $rst = ['status'=>200, 'msg'=>'操作成功!'];
 
+        $rstLog = [];
         try {
             //$qihao = KjDataGet::getEndQihao($lottery_type);
             $qihao = HN0898Service::getCurrentQihao($lottery_type);
@@ -134,14 +135,14 @@ class TzService extends BaseService {
             //$rst['heZhiStatics'] = SscDataService::heZhiStatics(); // 更新定位和值汇总表
             //$rst['updateHeZhiYL'] = SscDataService::updateHeZhiYL(); // 更新定位和值遗漏表
             # 每天四定利润统计，四定类型详见：StaticService::$typeArr
-            $rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type);
+            $rstLog['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type);
             $time2 = microtime(true);
 
             # 2、单双
-            $rst['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖单双数据
+            $rstLog['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖单双数据
             $time3 = microtime(true);
             if(in_array($lottery_type, \Yii::$app->params['STATIC_DATA_LOTTERYS'])){ # 重庆、新疆才统计单双遗漏, 冰岛90、3m5m10m不统计
-                $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏 耗时4s -- 耗时长，需剥离优化 2022.04.09
+                $rstLog['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏 耗时4s -- 耗时长，需剥离优化 2022.04.09
             }
             $time4 = microtime(true);
 
@@ -149,12 +150,12 @@ class TzService extends BaseService {
             //$rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏 已写开奖表 三字现遗漏表暂时不写了
             $time5 = microtime(true);
             if(in_array($lottery_type, \Yii::$app->params['STATIC_DATA_LOTTERYS'])) { # 重庆、新疆才统计单双遗漏, 冰岛90、3m5m10m不统计
-                $rst['update3NumYL'] = SscDataService::update3NumYL($lottery_type); # 耗时 6-7s - 30s -- 耗时长，需剥离优化 2022.04.09
+                $rstLog['update3NumYL'] = SscDataService::update3NumYL($lottery_type); # 耗时 6-7s - 30s -- 耗时长，需剥离优化 2022.04.09
             }
             $time6 = microtime(true);
 
             # 4、四定和值遗漏
-            $rst['updateSdHzYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏 耗时3.5s
+            $rstLog['updateSdHzYL'] = SscDataService::updateSdHzYl($lottery_type); // 单双遗漏 耗时3.5s
             $time7 = microtime(true);
 
             //p([$time1, $time2, $time3, $time4, $time5, $time6, $time7, $lottery_type]);
@@ -177,7 +178,7 @@ class TzService extends BaseService {
             }
             */
             if($isCanOpStaticStatus = StaticService::isCanOpStatic($lottery_type, $mkey = 'opProfitsPlans')) {
-                $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type); # 处理止盈止损、倍投等计划
+                $rstLog['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type); # 处理止盈止损、倍投等计划
                 StaticService::afterOpStatic($lottery_type, 'opProfitsPlans');
             }
 
@@ -188,7 +189,7 @@ class TzService extends BaseService {
             $rst['consume_time5'] = ($time6 - $time5).'s';
             $rst['consume_time6'] = ($time7 - $time6).'s';
             $rst['isCanOpStaticStatus'] = $isCanOpStaticStatus;
-            Tool_Common::log('opSystemBetPlans','INFO','处理系统投注计划', $rst);
+            Tool_Common::log('opSystemBetPlans','INFO','处理系统投注计划', ['rst'=>$rst, 'rstLog'=>$rstLog]);
             StaticService::afterOpStatic($lottery_type, 'opSystemBetPlans');
             push_queue(\common\service\jobs\kj_data\AfterRunSysPlansJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
             #$rst['afterRunSysPlans'] = TzService::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
