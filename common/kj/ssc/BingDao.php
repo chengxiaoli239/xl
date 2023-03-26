@@ -76,7 +76,7 @@ class BingDao extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('luck5', 'INFO', '号码抓取-幸运网', $logArr);
+        Tool_Common::log('bingdao', 'INFO', '号码抓取-冰岛', $logArr);
 
         return $rst;
     }
