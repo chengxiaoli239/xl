@@ -282,7 +282,7 @@ class TzSystemUsersService extends ClientsBaseService{
         $expect = $kjData['expect'];
         $flag = Lucky5::setKjDataCache($lottery_type, $expect, $kjData);
 
-        $params = ['lottery_type'=>$lottery_type, 'title'=>BetService::getLotteryName($lottery_type), 'is_grab_history'=>1];
+        $params = ['lottery_type'=>$lottery_type, 'title'=>BetService::getLotteryName($lottery_type).'_网盘推送', 'is_grab_history'=>1];
         push_queue(GrabKjDatasJob::class, $params);
 
         return ['status'=>200, 'data'=>['flag'=>$flag], 'msg'=>'操作成功'];
