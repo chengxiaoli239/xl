@@ -326,6 +326,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
+        p($data);
         $data = Lucky5::getLotteryLucky($type = 'json', $test = 1);
         p($data);
         $a = [0,1,2,3,4,5,6,7,8,9];
