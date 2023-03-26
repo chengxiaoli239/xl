@@ -73,6 +73,7 @@ class Lucky5 extends BaseKj {
                         throw_info('开奖号码异常');
                     }
                     $kjData = ['expect'=>$row['period_no'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
+                    Tool_Common::log('luck5', 'INFO', '号码网盘抓取-幸运网1', ['kjData'=>$kjData]);
                 }catch (\Exception $e){
                     $m->srem($exsit_key, $TzSystemsUsers->id);
                     Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '网盘开奖数据获取异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
@@ -95,7 +96,6 @@ class Lucky5 extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('luck5', 'INFO', '号码抓取-幸运网1', $logArr);
 
         return $rst;
     }
