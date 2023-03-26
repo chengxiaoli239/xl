@@ -85,7 +85,9 @@ class Lucky5 extends BaseKj {
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
 
-        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+        if(!empty($opencode)){
+            self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+        }
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
@@ -121,14 +123,16 @@ class Lucky5 extends BaseKj {
 
             if (!isset($rst['data']['list'][0]) OR empty($data)) return [];
             $opencode = implode(',', $data['code']);
-                if($opencode == '0,0,0,0,0') return [];
+            if($opencode == '0,0,0,0,0') return [];
             //$kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
             $kjData = ['expect'=>str_replace('期', '', $data['pc_issue'][0]), 'opencode'=>$opencode, 'opentime'=>$data['open_date'].' '.trim($data['pc_issue'][1])];
             Tool_Common::log('luck5', 'INFO', '号码抓取-实讯网', ['kjData'=>$kjData]);
             $opencode = $kjData['opencode'];
             $opentime = $kjData['opentime'];
             $expect = $kjData['expect'];
+        }
 
+        if(!empty($opencode)){
             self::setKjDataCache(self::$lottery_type, $expect, $kjData);
         }
 
@@ -140,7 +144,6 @@ class Lucky5 extends BaseKj {
         }else{
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
-        $logArr = $rst;
 
         return $rst;
     }
@@ -173,7 +176,9 @@ class Lucky5 extends BaseKj {
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
 
-        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+        if(!empty($opencode)){
+            self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+        }
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");

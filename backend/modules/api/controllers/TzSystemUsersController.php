@@ -140,7 +140,7 @@ class TzSystemUsersController extends Controller
             return ['status'=>301, 'msg'=>'缺少access_token参数'];
         }
 
-        $rst = TzSystemUsersService::syncClientKjDatas($post['kj_datas'], $post['lottery_type'], $post['access_token']);
+        $rst = TzSystemUsersService::syncClientKjDatas($post['kj_datas'], $post['lottery_type']);
         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端开奖数据同步', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;

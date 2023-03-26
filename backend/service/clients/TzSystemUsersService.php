@@ -274,10 +274,11 @@ class TzSystemUsersService extends ClientsBaseService{
 
     /**
      * @desc 客户端开奖数据同步
-     * @param string $access_token
-     * @param float $balance
+     * @param array $kjData
+     * @param int $lottery_type
+     * @return array
      */
-    public static function syncClientKjDatas($kjData=[], $lottery_type=DEFAULT_LOTTERY_TYPE, $access_token=''){
+    public static function syncClientKjDatas($kjData=[], $lottery_type=DEFAULT_LOTTERY_TYPE){
 
         $expect = $kjData['expect'] = trim($kjData['expect']);
         $kjData['opencode'] = trim($kjData['opencode']);
