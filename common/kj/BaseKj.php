@@ -38,9 +38,10 @@ class BaseKj{
 
     /**
      * @param $qihao string 格式：20190125-030
-     * @param $kjData
+     * @param $kjData  kjData:{"expect":20230326139,"opencode":"9,1,7,3,6","opentime":"2023-03-26 11:36:10"}
+     * @return bool
      */
-    public static function setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao, $kjData){
+    public static function setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao='', $kjData=[]){
         $m = \Yii::$app->cache;
 
         $set_time = 5*60;
@@ -60,7 +61,7 @@ class BaseKj{
         return true;
     }
 
-    public static function buildKjDataKey($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao){
+    public static function buildKjDataKey($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao=''){
 
         $mkey = 'KJ_DATA_QIHAO_KEY_'.$lottery_type.'_'.$qihao;
 

@@ -1,0 +1,21 @@
+游戏记录-幸运五 [ 20230326134:8,0,5,6,3]
+
+
+开奖rst {
+
+'Status': 1, 'Data': {'bet_datetime': None, 'member_account': 'y555y', 'serial_no': None, 'period_no': '20230326137', 'print_no': None, 'credit': '107362.45', 'credit_balance': '1367.3', 'bet_money_all': '5665892.5', 'w
+in_money_all': '5559897.35', 'show_mode': 0, 'input_mode': 0, 'lottery_name': '幸运五星彩', 'store_name': '', 'previous_period_no': '20230326136', 'draw_info':
+[
+    {'period_no': 20230326136, 'thousand_no': 7, 'hundred_no': 3, 'ten_no': 7, 'one_no': 8, 'ball5': 3, 'is_checkout': 1},
+    {'period_no': 20230326135, 'thousand_no': 4, 'hundred_no': 8, 'ten_no': 0, 'one_no': 5, 'ball5': 2, 'is_checkout': 1},
+    {'period_no': 20230326134, 'thousand_no': 8, 'hundred_no': 0, 'ten_no': 5, 'one_no': 6, 'ball5': 3, 'is_checkout': 1},
+    {'period_no': 20230326133, 'thousand_no': 3, 'hundred_no': 7, 'ten_no': 4, 'one_no': 6, 'ball5': 2, 'is_checkout': 1},
+    {'period_no': 20230326132, 'thousand_no': 8, 'hundred_no': 7, 'ten_no': 3, 'one_no': 9, 'ball5': 3, 'is_checkout': 1},
+    {'period_no': 20230326131, 'thousand_no': 1, 'hundred_no': 3, 'ten_no': 9, 'one_no': 0, 'ball5': 1, 'is_checkout': 1},
+    {'period_no': 20230326130, 'thousand_no': 2, 'hundred_no': 8, 'ten_no': 7, 'one_no': 2, 'ball5': 7, 'is_checkout': 1},
+    {'period_no': 20230326129, 'thousand_no': 5, 'hundred_no': 9, 'ten_no': 6, 'one_no': 2, 'ball5': 8, 'is_checkout': 1}
+],
+ 'previous_draw_no': '7,3,7,8,3', 'previous_period_status': '3', 'Details': [], 'TotalBetMoney': '0', 'RecordsCount': 0,
+  'AllRecordsCount': 0, 'AllBetMoney': None, 'PageCount': 1, 'PageIndex': 1}
+
+  }
