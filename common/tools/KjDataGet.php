@@ -121,7 +121,7 @@ class KjDataGet
                 if(!$exist OR $flag){
                     throw_info('并发消息处理'.$lottery_type, 30001);
                 }
-                $cacheTime = (strpos($lotteryData['typeGroupName'], '高频') !== false) ? 15 : 1800;
+                $cacheTime = (strpos($lotteryData['typeGroupName'], '高频') !== false) ? 10 : 1800;
                 $m->set($initLotteryKey, 1, $cacheTime);
 
                 $params = ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title']];
