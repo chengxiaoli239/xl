@@ -326,6 +326,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $data = BetService::getLotteryName(8);
+        p($data);
         $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
         p($data);
         $data = Lucky5::getLotteryLucky($type = 'json', $test = 1);
@@ -745,8 +747,6 @@ class IndexController extends Controller
         p($rst);
 
         $data = BingDao::getLotteryOne($type = 'json', $l_type = 6);
-        p($data);
-        $data = BetService::getLotteryName();
         p($data);
         $data = CqsscKcw::getLotteryBg($type = 'json', $is_auto = 0);
         p($data, 0);
