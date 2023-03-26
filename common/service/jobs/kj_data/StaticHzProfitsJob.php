@@ -22,10 +22,14 @@ class StaticHzProfitsJob extends CommonJob {
     }
 
     public static function handle($params){
-        self::_init();
-        $lottery_type = $params['lottery_type'];
-        if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
-        $rst = StaticService::opStatic([$lottery_type]); # 和值、四定利润统计
+        try {
+            self::_init();
+            $lottery_type = $params['lottery_type'];
+            if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
+            $rst = StaticService::opStatic([$lottery_type]); # 和值、四定利润统计
+        }catch (\Exception $e){
+            return $e->getMessage();
+        }
         return $rst;
     }
 
