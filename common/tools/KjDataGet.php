@@ -184,8 +184,8 @@ class KjDataGet
                         KjDataGet::insertKjData($data['expect'], $kjConfig->lottery_type, $data['opencode'], $data['opentime']);
                     }
                     $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, 'lottery'=>CqsscKcw::getLotteryNameArr()[$kjConfig->lottery_type]];
-                    Tool_Common::log('insertSscKjData', 'INFO', '开奖记录', $logArr);
                 }
+                Tool_Common::log('insertSscKjData', 'INFO', '开奖记录', $logArr);
                 /* 处理系统投注计划 add 2019-01-21 */
                 KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
                 $RedisLock->unlock($grabOneMkey);

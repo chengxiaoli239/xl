@@ -125,12 +125,12 @@ class Lucky5 extends BaseKj {
             //$kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
             $kjData = ['expect'=>str_replace('期', '', $data['pc_issue'][0]), 'opencode'=>$opencode, 'opentime'=>$data['open_date'].' '.trim($data['pc_issue'][1])];
             Tool_Common::log('luck5', 'INFO', '号码抓取-实讯网', ['kjData'=>$kjData]);
-        }
-        $opencode = $kjData['opencode'];
-        $opentime = $kjData['opentime'];
-        $expect = $kjData['expect'];
+            $opencode = $kjData['opencode'];
+            $opentime = $kjData['opentime'];
+            $expect = $kjData['expect'];
 
-        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+            self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+        }
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
