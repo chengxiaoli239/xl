@@ -279,7 +279,8 @@ class TzSystemUsersService extends ClientsBaseService{
      */
     public static function syncClientKjDatas($kjData=[], $lottery_type=DEFAULT_LOTTERY_TYPE, $access_token=''){
 
-        $expect = $kjData['expect'];
+        $expect = $kjData['expect'] = trim($kjData['expect']);
+        $kjData['opencode'] = trim($kjData['opencode']);
         $flag = Lucky5::setKjDataCache($lottery_type, $expect, $kjData);
 
         $params = ['lottery_type'=>$lottery_type, 'title'=>BetService::getLotteryName($lottery_type).'_网盘推送', 'is_grab_history'=>1];
