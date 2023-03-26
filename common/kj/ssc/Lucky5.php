@@ -16,7 +16,7 @@ class Lucky5 extends BaseKj {
     /**
      * @desc 幸运五星彩
      * @param string $returnType
-     * @return array
+     * @return array|bool
      */
     public static function getLotteryLucky($returnType = 'json', $is_auto = 1){
 
@@ -27,46 +27,56 @@ class Lucky5 extends BaseKj {
         }
 
         if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
-            $TzSystemsUserses = TzSystemsUsers::find()->where(['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [7,9]] ])->all();
-            $m = \Yii::$app->cache;
+            $where = ['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [7, 9]], ['!=', 'ssc_domain', '']];
+            $TzSystemsUserses = TzSystemsUsers::find()->where($where)->all();
+            $m = \Yii::$app->redis;
             foreach ($TzSystemsUserses as $TzSystemsUsers){ # 用户账号去网盘抓数据
-                $mkey = 'getLotteryLucky_0_'.self::$lottery_type;
-                if($flag = $m->get($mkey)) continue;
-                //$domain = BaseKj::getApiHost(18);
-                $domain = $TzSystemsUsers->ssc_domain;
+                try {
+                    sleep(8);
+                    $exsit_key = 'ssc_kj_data_wangpan_x0'.self::$lottery_type;
+                    $is_exsit = $m->sadd($exsit_key, $TzSystemsUsers->id);
+                    if(!$is_exsit){
+                        throw_info('频繁操作');
+                    }
+                    //$domain = BaseKj::getApiHost(18);
+                    $domain = $TzSystemsUsers->ssc_domain;
 
-                $t = microtime(true) * 10000;
-                $url = $domain.'/Member/GetMemberPrint?_='.$t; #当前开奖号码
-                # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015
+                    $t = microtime(true) * 10000;
+                    $url = $domain.'/Member/GetMemberPrint?_='.$t; #当前开奖号码
+                    # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015
 
-                $headers = [
-                    'Accept: application/json, text/javascript, */*',
-                    'Accept-Encoding: gunzip, deflate',
-                    'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-                    'Connection: keep-alive',
-                    'Cookie: '.$TzSystemsUsers->cookie,
-                    'Host: '.str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
-                    'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$t,
-                    $TzSystemsUsers->user_agent,
-                    'X-Requested-With: XMLHttpRequest',
-                ];
-                $content = LuckyBaseService::getCurl($url, $headers, $TzSystemsUsers->uid);
-                //$data = json_decode($content,320);
-                $data = $content;
-                if(isset($data['Status']) && $data['Status'] == 1){
+                    $headers = [
+                        'Accept: application/json, text/javascript, */*',
+                        'Accept-Encoding: gunzip, deflate',
+                        'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                        'Connection: keep-alive',
+                        'Cookie: '.$TzSystemsUsers->cookie,
+                        'Host: '.str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
+                        'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$t,
+                        $TzSystemsUsers->user_agent,
+                        'X-Requested-With: XMLHttpRequest',
+                    ];
+                    $content = LuckyBaseService::getCurl($url, $headers, $TzSystemsUsers->uid);
+                    //$data = json_decode($content,320);
+                    $data = $content;
+                    if(isset($data['Status']) && $data['Status'] == 1){
 
+                    }
+
+                    if (!isset($data['Status']) OR $data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) {
+                        Tool_Common::log('getLotteryLucky', 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
+                        throw_info('幸运五号码抓取异常');
+                    }
+                    $row = $data['Data']['draw_info'][0];
+                    $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
+                    if($opencode == '0,0,0,0,0'){
+                        throw_info('开奖号码异常');
+                    }
+                    $kjData = ['expect'=>$row['period_no'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
+                }catch (\Exception $e){
+                    $m->srem($exsit_key, $TzSystemsUsers->id);
+                    Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '网盘开奖数据获取异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
                 }
-
-                if (!isset($data['Status']) OR $data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) {
-                    Tool_Common::log('getLotteryLucky', 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
-                    continue;
-                }
-                $row = $data['Data']['draw_info'][0];
-                $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
-                if($opencode == '0,0,0,0,0') return false;
-                $kjData = ['expect'=>$row['period_no'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
-                $m->set($mkey, 1, 5);
-                //p($kjData);
             }
         }
         if(empty($kjData['opencode'])) return false;

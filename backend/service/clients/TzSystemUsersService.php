@@ -7,6 +7,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\BetService;
 use backend\service\Lucky5\Lucky5Service;
+use common\kj\ssc\Lucky5;
 use common\service\CommonService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
@@ -266,6 +267,19 @@ class TzSystemUsersService extends ClientsBaseService{
             $flag = $TzSystemsUsers->save();
             Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端余额同步', ['account'=>$TzSystemsUsers->username, 'access_token'=>$access_token, 'balance'=>$balance]);
         }
+
+        return ['status'=>200, 'data'=>['flag'=>$flag], 'msg'=>'操作成功'];
+    }
+
+    /**
+     * @desc 客户端开奖数据同步
+     * @param string $access_token
+     * @param float $balance
+     */
+    public static function syncClientKjDatas($kjData=[], $lottery_type=DEFAULT_LOTTERY_TYPE, $access_token=''){
+
+        $expect = $kjData['expect'];
+        $flag = Lucky5::setKjDataCache($lottery_type, $expect, $kjData);
 
         return ['status'=>200, 'data'=>['flag'=>$flag], 'msg'=>'操作成功'];
     }
