@@ -198,11 +198,9 @@ class UserSysPlansService extends BaseService {
         unset($post['UserSysPlans']['is_filter_history'], $post['UserSysPlans']['filter_history_nums']);
 
         # 动态过滤
-        if($UserSysPlans['is_filter_dynamic'] && count($UserSysPlans['is_filter_dynamic']) == 1){
-            if(isset($UserSysPlans['filter_dynamic_types']) && count($UserSysPlans['filter_dynamic_types'])>0){
-                $tmpFilter['is_filter_dynamic'] = $UserSysPlans['is_filter_dynamic'][0];
-                $tmpFilter['filter_dynamic_types'] = $UserSysPlans['filter_dynamic_types'];
-            }
+        if(isset($UserSysPlans['filter_dynamic_types']) && !empty($UserSysPlans['filter_dynamic_types']) && count($UserSysPlans['filter_dynamic_types'])>0){
+            $tmpFilter['is_filter_dynamic'] = 1;
+            $tmpFilter['filter_dynamic_types'] = $UserSysPlans['filter_dynamic_types'];
         }
         unset($post['UserSysPlans']['is_filter_dynamic'], $post['UserSysPlans']['filter_dynamic_types']);
 

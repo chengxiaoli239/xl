@@ -61,6 +61,7 @@ class NumService extends BaseService {
         23=>'过滤1245最近2000组(四定)',
         24=>'过滤1345最近2000组(四定)',
         25=>'过滤前100期开过号码的全转(四定)',
+        26=>'过滤前期同位置号码(四定6561组)',
     ];
 
     /**
@@ -2098,6 +2099,9 @@ class NumService extends BaseService {
                 case 25: # 过滤前100期开过号码的全转
                     $codes = NumService::getBeforeKjCodesDynamic7($plan, $lottery_type, $num=100);
                     break;
+                case 26: # 去除上期同位置 9 * 9 * 9 * 9 = 81 * 81 = 6561 组
+                    $codes = NumService::getBeforeKjCodesDynamic26($plan, $lottery_type);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -2535,6 +2539,41 @@ class NumService extends BaseService {
             ->where('n.code NOT IN("'.$filterCodesStr.'")')
             ->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 去除上期同位置 9 * 9 * 9 * 9 = 81 * 81 = 6561 组
+     * @param int $lottery_type
+     * @param int $playway
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic26(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE){
+        $filterNum1 = NumService::$MIN_CODES;  # 至少上一个
+        $filterNum2 = NumService::$MAX_CODES;  # 至少上一个
+
+        $playway = $plan->playway;
+        $beforeQuery = SscKjData::find()->select(['code1','code2','code3','code4'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(!empty($current_qihao)){
+            $beforeQuery->andWhere(['<=', 'qihao', $current_qihao]);
+        }else{
+            $current_qihao = HN0898Service::getCurrentQihao($lottery_type);
+            $beforeQuery->andWhere(['<=', 'qihao', $current_qihao]);
+        }
+        #p($beforeQuery->createCommand()->getRawSql());
+        $currentKjCodes = $beforeQuery->limit(1)->asArray()->one(); # 最新一期
+        #p($NewKjCodes);
+        $query = Num4Type::find()->select(['code'])
+            ->where(['AND', ['!=', 'code_1', $currentKjCodes['code1']], ['!=', 'code_2', $currentKjCodes['code2']], ['!=', 'code_3', $currentKjCodes['code3']], ['!=', 'code_4', $currentKjCodes['code4']]])
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $sql = $query->createCommand()->getRawSql();
+        #p($sql);
+        $NumTypes = $query->asArray()->all();
+        #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
         return $codes;

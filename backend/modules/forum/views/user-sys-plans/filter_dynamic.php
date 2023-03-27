@@ -1,9 +1,11 @@
 <!--动态过滤-->
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
+    <!--
     <div class="col-lg-2 col-xs-3">
         <?= $form->field($model, 'is_filter_dynamic')->checkboxList(['1'=>'是'])->label('动态过滤') ?>
     </div>
-    <div class="col-lg-10 col-xs-9">
-        <?= $form->field($model, 'filter_dynamic_types')->checkboxList($filter_dynamic_typesArr)->label('类型') ?>
+    -->
+    <div class="col-lg-10 col-xs-12">
+        <?= $form->field($model, 'filter_dynamic_types')->checkboxList($filter_dynamic_typesArr)->label('动态过滤类型') ?>
     </div>
 </div>

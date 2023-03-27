@@ -326,6 +326,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(6269);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p(count($filter_dynamic_codes));
         $params = [];
         $is_auto_audit = $params['is_auto_audit'] ?? 1;
         p($is_auto_audit);
@@ -341,9 +344,6 @@ class IndexController extends Controller
         p($intersection);
         $rst = TzSystemUsersService::getActiveQihao($lottery_type=8);
         p($rst);
-        $plan = UserSysPlans::findOne(5988);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
-        p(count($filter_dynamic_codes));
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         echo json_encode(['code'=>200, 'msg'=>'操作成功', 'data'=>[]], JSON_FORCE_OBJECT|320);exit();
