@@ -33,69 +33,90 @@ class BaseService{
      * @return array|bool
      */
     public static function login($id = '', $is_auto = 1){
-        if(!$id) return ['status'=>300, 'msg'=>'id不能为空'];
-        if(!$TzSystemsUser = TzSystemsUsers::findOne($id)){
-            return ['status'=>300, 'msg'=>'操作失败:找不到记录'];
-        }
-        if(!$TzSystemsUser->is_auto_login){
-            return ['status'=>300, 'msg'=>'操作失败:账号没设置自动登陆'];
-        }
-
-        $tz_system_id = $TzSystemsUser->tz_system_id;
-        # 是否有激活的计划
-        $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id, $TzSystemsUser->uid);
-        if($is_auto == 1 && !$hasActivePlan){
-            return ['status'=>301, 'msg'=>'没有激活的投注计划'];
-        }
-
-        if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
-            return false;
-        }
-
-        # 密码或账号不正确
-        if($is_auto == 1 && (strpos($TzSystemsUser->desc, '用户名或密码不正确') !== false OR strpos($TzSystemsUser->desc, '您的访问过于频繁') !== false)){
-            return ['status'=>302, 'msg'=>$TzSystemsUser->desc];
-        }
-
-        $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'ssc_kj_time_period'])->value); # 开奖时间间隔:20分钟
-        if(in_array($tz_system_id, $not_need_login_tz_system_ids)){
-            return ['status'=>200, 'msg'=>'无需登陆站点', 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username];
-        }
-
-        if($is_auto == 1){
-            $flag = BetService::isLogin($TzSystemsUser->uid, $tz_system_id, $r=1); #
-            if($flag && $is_auto == 1){
-                return ['status'=>200, 'msg'=>'已经是登录状态', 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username];
+        try {
+            if(!$TzSystemsUser = TzSystemsUsers::findOne($id)){
+                throw_info('操作失败:找不到记录', 301);
             }
-        }
-        if(in_array($tz_system_id, [1,2])){
-            # 1、0898投注、2、99彩票网
-            $rst = HN0898Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-        }elseif(in_array($tz_system_id, [3, 7, 9, 10])){
-            # 3、重庆7时彩网
-            if($tz_system_id == 3){
-                $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-            }else{
-                $rst = Lucky5Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+            if(!$TzSystemsUser->is_auto_login){
+                throw_info('操作失败:账号没设置自动登陆', 302);
             }
-        }elseif(in_array($tz_system_id, [4])){
-            # 4、7天彩票网
-        }elseif(in_array($tz_system_id, [5])){
-            # 5、希腊网
-        }elseif(in_array($tz_system_id, [6])){
-            # 6、会员网
-            $rst = HuiYuanBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-        }elseif(in_array($tz_system_id, [11])){
-            # 11、菊花网暂时没对接登录
-            //$rst = JuHuaBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-        }elseif(in_array($tz_system_id, [8])){
-            # 8、麒麟财务系统网
-            $rst = QiLinBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-        }elseif(in_array($tz_system_id, [13])){
-            # 9、冰岛
-            $rst = \backend\service\BingDao\BingDaoService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
-        }elseif(in_array($tz_system_id, [16])){ # 宝岛众发
-            $rst = ZhongFaService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+
+            $tz_system_id = $TzSystemsUser->tz_system_id;
+            # 是否有激活的计划
+            $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id, $TzSystemsUser->uid);
+            if($is_auto == 1 && !$hasActivePlan){
+                throw_info('没有激活的投注计划', 303);
+            }
+
+            if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
+                throw_info('账号或密码为空，不能自动登录', 304);
+            }
+
+            # 密码或账号不正确
+            if($is_auto == 1 && (strpos($TzSystemsUser->desc, '用户名或密码不正确') !== false OR strpos($TzSystemsUser->desc, '您的访问过于频繁') !== false)){
+                throw_info($TzSystemsUser->desc, 305);
+            }
+
+            $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'ssc_kj_time_period'])->value); # 开奖时间间隔:20分钟
+            if(in_array($tz_system_id, $not_need_login_tz_system_ids)){
+                throw_info('无需登陆站点', 306);
+            }
+
+            if($is_auto == 1){
+                $flag = BetService::isLogin($TzSystemsUser->uid, $tz_system_id, $r=1); #
+                if($flag && $is_auto == 1){
+                    throw_info('已经是登录状态', 306);
+                }
+            }
+            switch ($tz_system_id){
+                case 1:
+                case 2:
+                    # 1、0898投注、2、99彩票网
+                    $rst = HN0898Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                    break;
+                case 3:
+                case 7:
+                case 9:
+                case 10:
+                    # 3、重庆7时彩网
+                    if($tz_system_id == 3){
+                        $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                    }else{
+                        $rst = Lucky5Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                    }
+                    break;
+                case 4:
+                    # 4、7天彩票网
+                case 5:
+                    # 5、希腊网
+                    break;
+                case 6:
+                    # 6、会员网
+                    $rst = HuiYuanBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                    break;
+                case 11:
+                    # 11、菊花网暂时没对接登录
+                    //$rst = JuHuaBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                    break;
+                case 8:
+                    # 8、麒麟财务系统网
+                    $rst = QiLinBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                    break;
+                case 13:
+                    # 9、冰岛
+                    $rst = \backend\service\BingDao\BingDaoService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                    break;
+                case 16:
+                    # 宝岛众发
+                    $rst = ZhongFaService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                    break;
+            }
+            if($rst['status'] != 200){
+                throw_info($rst['msg']);
+            }
+        }catch (\Exception $e){
+            Tool_Common::log('/login/'.__FUNCTION__, 'ERR', '自动登录异常', ['id'=>$id, 'err_msg'=>$e->getMessage(), 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username]);
+            $rst = ['status'=>301, 'msg'=>$e->getMessage()];
         }
 
         return $rst;
@@ -305,10 +326,7 @@ class BaseService{
     public static function getSslVersionByUid($uid=''){
         $ssl_1_uids = BaseService::getSslVersion1Uids();
 
-        $version = 3;
-        if(in_array($uid, $ssl_1_uids)){
-            $version = 1;
-        }
+        $version = in_array($uid, $ssl_1_uids) ? 1 : 3;
         return $version;
     }
 }

@@ -1229,7 +1229,7 @@ abstract class BetService extends BaseBetService {
         #$UserSysPlans = UserSysPlans::findOne($planId);
         $planId = $UserSysPlans->id;
         $hzArr = json_decode($UserSysPlans->hz_Arr, true);
-        if(in_array($plan_type, array_merge([6, 8, 9, 10, 14, 15], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
+        if(in_array($plan_type, array_merge([6, 8, 9, 10, 14, 15, 16], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
             //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
             $flag = BetService::getIsBetTrue($UserSysPlans);
             if(in_array($flag, [0, -1]) && $isAuto == 1){
@@ -1349,7 +1349,7 @@ abstract class BetService extends BaseBetService {
         if(in_array($plan->plan_type, [14])){
             return $codes_hz['areaBetStatus'];
         }else{
-            if(in_array($plan->plan_type, [8, 9])){ # 遗漏多少期启投
+            if(in_array($plan->plan_type, [8, 9, 16])){ # 遗漏多少期启投
                 $flag = 0;
                 if($codes_hz['current_miss']>=$codes_hz['bet_while_miss']){
                     $flag = 1;
@@ -1660,10 +1660,13 @@ abstract class BetService extends BaseBetService {
      * @param $uid
      */
     public static function synUserAllBalance($uid){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
 
         $TzSystemsUsers = TzSystemsUsers::findAll(['status'=>1, 'uid'=>$uid]);
         foreach ($TzSystemsUsers as $TzSystemsUser){
-            $rst = self::synBalance($uid, $TzSystemsUser->tz_system_id);
+            if(!$TzSystemsUser->is_local_bet){
+                $rst = self::synBalance($uid, $TzSystemsUser->tz_system_id);
+            }
         }
 
         return $rst;

@@ -1001,7 +1001,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $headers[] = 'Cookie: '.$robot7_session_id;
         $cookie = self::curlGetSevenCookie($url, $headers, $uid);
         $cookieData = $cookie;
-        //if($uid == 19) p([$robot7_session_id, $cookieData, $cookie]);
+        #if($uid == 12) p([$robot7_session_id, $cookieData, $cookie]);
         if($cookieData){
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
             $TzSystemsUsers->cookie = $robot7_session_id.';'.trim($cookieData);

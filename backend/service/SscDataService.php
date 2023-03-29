@@ -45,7 +45,7 @@ use yii\db\Expression;
 use yii\helpers\BaseStringHelper;
 
 class SscDataService extends BaseService {
-    public static $fb_plan_types = [2, 3, 4, 5, 9, 10]; # 翻倍计划类型
+    public static $fb_plan_types = [2, 3, 4, 5, 9, 10, 16]; # 翻倍计划类型
     public static $zzt_plan_types = [6, 8]; # 中则投计划类型
     public static $zzt_else_fanmai_types = [7]; # 中则投否则反卖
 
@@ -2971,6 +2971,7 @@ class SscDataService extends BaseService {
                     $singles = explode('-', trim($UserSysPlan->singles));
                     if(empty($singles)) $singles = [$UserSysPlan->single];
                     $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
+                    $singles_count = count($singles); # 倍数个数
 
                     $is_init = 1; # 是否初始真实投注
                     $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
@@ -2982,7 +2983,7 @@ class SscDataService extends BaseService {
                         $single = $singles[$next_single_key];
                         if(in_array($UserSysPlan->plan_type, [9])){ # plan_type:遗漏倍投
                             $current_miss = 0;
-                            $is_init = 1;
+                            $is_init = 1; # 等待状态
                         }elseif(in_array($UserSysPlan->plan_type, [10])) { # plan_type:中则倍投，不中则回第一个倍数
                             $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                         }
@@ -2990,15 +2991,37 @@ class SscDataService extends BaseService {
                         if(in_array($UserSysPlan->plan_type, [9])) { # 遗漏倍投
                             $current_miss = (int)($codes_hz['current_miss'] + 1); # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
                             if ($current_miss <= $codes_hz['bet_while_miss']) {
-                                $is_init = 2; # 不中未达到遗漏期数状态
+                                $is_init = 2; # 不中未达到遗漏期数状态 等待状态...
                                 $next_single_key = 0;
                                 $single = $singles[$next_single_key];
                             } elseif ($current_miss > $codes_hz['bet_while_miss']) {
-                                $is_init = 3; # 开始投注
+                                $is_init = 3; # 开始投注，正在下注状态
                                 $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                                 if ($codes_hz['is_init'] == 2) {
                                     $next_single_key = 1;
                                     $single = $singles[$next_single_key];
+                                }
+                            }
+                        }elseif(in_array($UserSysPlan->plan_type, [16])){ # 16 plan_type:遗漏倍投2
+                            $current_miss = (int)($codes_hz['current_miss'] + 1); # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
+                            if ($current_miss <= $codes_hz['bet_while_miss']) {
+                                $is_init = 2; # 不中未达到遗漏期数状态 等待状态...
+                                $next_single_key = 0;
+                                $single = $singles[$next_single_key];
+                            } elseif ($current_miss > $codes_hz['bet_while_miss']) {
+                                if($current_miss>=($codes_hz['bet_while_miss']+$singles_count)){
+                                    # 投完所有倍数不中，则进入等待状态
+                                    $is_init = 2; # 不中未达到遗漏期数状态 等待状态...
+                                    $next_single_key = 0;
+                                    $single = $singles[$next_single_key];
+                                    $current_miss = 0;
+                                }else{
+                                    $is_init = 3; # 开始投注，正在下注状态
+                                    $single = self::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                                    if ($codes_hz['is_init'] == 2) {
+                                        $next_single_key = 1;
+                                        $single = $singles[$next_single_key];
+                                    }
                                 }
                             }
                         }elseif(in_array($UserSysPlan->plan_type, [10])){ # plan_type:中则倍投，不中则回第一个倍数

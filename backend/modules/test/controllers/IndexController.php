@@ -326,6 +326,10 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst = SevenService::synBalance(17);
+        p($rst);
+        $rst = CrontabIndexService::autoLogin();
+        p($rst);
         $plan = UserSysPlans::findOne(6269);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         p(count($filter_dynamic_codes));
@@ -647,8 +651,6 @@ class IndexController extends Controller
         $params = ['_nowTime' => 1621657296359, '_uri' => '/session-user'];
         $sign = ZhongFaService::getSign($params);
         p($sign);
-        $rst = CrontabIndexService::autoLogin();
-        p($rst);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems}}');
         p($r);
         $data = LeCaiService::getLotteryK5($type = 'json', $lottery_type = 18, $is_auto = 2);
@@ -1084,8 +1086,6 @@ class IndexController extends Controller
 
         //$str = '{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}'; //p(json_decode($str, true)); d(strpos($str, "\"Status\":1") !== false);
         $rst = SevenService::login(19, 3);
-        p($rst);
-        $rst = SevenService::synBalance(5);
         p($rst);
 
         $rst = TzService::insertLuckyDataTime();
