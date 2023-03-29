@@ -467,6 +467,7 @@ class TzService extends BaseService {
             13=>'A出x次B出y次投B_2',
             14=>'区间遗漏投',
             15=>'中则倍投',
+            16=>'遗漏倍投2',
         ];
         if(isset($datas[$type])) return $datas[$type];
 
