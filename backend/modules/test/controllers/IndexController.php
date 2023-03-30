@@ -326,9 +326,13 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $rst = SevenService::synBalance(17);
+        $rst = Lucky5Service::login($uid = 17, $tz_system_id = 9);
+        p($rst);
+        $rst = ProxyBaseService::preGetValidIp($proxy_type=1, $is_auto = 0);
         p($rst);
         $rst = CrontabIndexService::autoLogin();
+        p($rst);
+        $rst = SevenService::synBalance(17);
         p($rst);
         $plan = UserSysPlans::findOne(6269);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
@@ -450,8 +454,6 @@ class IndexController extends Controller
         p('klajsdf');
         $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
         p($current_proxy_addr);
-        $rst = Lucky5Service::login($uid = 14, $tz_system_id = 9);
-        p($rst);
         $session_id = '4a62huo5ev61crrelqhnbnbn5l';
         $r = UserService::delUserOneSessionId('10', $session_id);
         p($r);
@@ -529,8 +531,6 @@ class IndexController extends Controller
         p(urldecode($url));
         $t = rand(1, 10);
         p($t);
-        $rst = ProxyBaseService::preGetValidIp($is_auto = 0);
-        p($rst);
         $isValidRst = ProxyKuaiService::kuaiIPValidTime(['219.128.35.247:19054']);
         p($isValidRst);
         $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS']);

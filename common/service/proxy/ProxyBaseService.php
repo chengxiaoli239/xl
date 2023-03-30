@@ -156,8 +156,7 @@ class ProxyBaseService {
         try {
             $hasPlansActiveLottery = CommonService::hasPlansActiveLottery(\Yii::$app->params['NEED_PROXY_LOTTERYS'], $proxy_type);
             if($is_auto == 1 && !$hasPlansActiveLottery){
-                return [];
-                //return ['status'=>401, 'msg'=>'无对应代理激活的计划'];
+                throw_info('无对应代理激活的计划');
             }
             $is_need_get_new_ip = 0;
 
@@ -189,8 +188,8 @@ class ProxyBaseService {
             $logArr['time_consume'] = ($end_time-$start_time).'s';
             Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理ip-缓存1', $logArr);
         }catch (\Exception $exception){
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'ERR', '代理ip缓存失败', ['proxy_type'=>$proxy_type, 'err_msg'=>$exception->getMessage()]);
             return ['status'=>303, 'msg'=>$exception->getMessage()];
-            Tool_Common::log('/proxy/'.__FUNCTION__.'_err', 'ERR', '代理ip缓存失败', ['proxy_type'=>$proxy_type, 'err_msg'=>$exception->getMessage()]);
         }
 
         return ['status'=>200, 'msg'=>'操作成功', 'data'=>$logArr];
