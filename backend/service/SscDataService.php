@@ -2913,9 +2913,10 @@ class SscDataService extends BaseService {
                 [ 'AND', ['>', 'take_profits', 0], ['>', 'stop_loss', 0], ['=', 'status', 1], ['=', 'is_batch_simulate', 0] ]
             ];
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划2', ['lottery_type'=>$lottery_type]);
+
+            $logArr = [];
             $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-                $logArr = [];
                 foreach ($UserSysPlans as $UserSysPlan){
                     $Rkey = __FUNCTION__.'_redis_op_plan_0_1_3_5_'.$lottery_type.'_'.$UserSysPlan->id;
                     if(!$RedisLock->lock($Rkey, 30)){
@@ -2945,15 +2946,15 @@ class SscDataService extends BaseService {
                     $logArr['plan_1_3_5'][$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
                 }
             }
-            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划3', ['lottery_type'=>$lottery_type]);
+            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划3', $logArr);
 
             $flags = []; # 计划是否中奖标识
             # 不中倍投：翻倍计划、翻倍止盈止损，倍投 连续x期不中 决定倍数
             //$fb_plan_types = [2, 3, 4, 5, 9, 10];
             $fb_plan_types = SscDataService::$fb_plan_types;
+            $logArr = [];
             $where = ['AND', ['IN', 'plan_type', $fb_plan_types], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-                $logArr = [];
                 foreach ($UserSysPlans as $UserSysPlan){
                     $Rkey = __FUNCTION__.'_redis_op_plan_'.implode('_', $fb_plan_types).'_'.$lottery_type.'_'.$UserSysPlan->id;
                     if(!$RedisLock->lock($Rkey, 30)){
@@ -3060,12 +3061,12 @@ class SscDataService extends BaseService {
                     $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['rst'] = $rst;
                 }
             }
-            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划4', ['lottery_type'=>$lottery_type]);
+            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划4', $logArr);
 
             # plan_type: 6:中则投，不中则不投、 8:遗漏投
+            $logArr = [];
             $where = ['AND', ['IN', 'plan_type', [6, 8, 10, 15]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-                $logArr = [];
                 foreach ($UserSysPlans as $UserSysPlan){
                     switch ($UserSysPlan->plan_type){
                         case self::PLAN_TYPE_SINGLES_BET: # 中则投、中则投 + 翻倍梯度
@@ -3083,12 +3084,12 @@ class SscDataService extends BaseService {
                     }
                 }
             }
-            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划5', ['lottery_type'=>$lottery_type]);
+            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划5', $logArr);
 
             # plan_type:7 中则继续投否则反买
+            $logArr = [];
             $where = ['AND', ['IN', 'plan_type', [7]], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-                $logArr = [];
                 foreach ($UserSysPlans as $UserSysPlan){
                     $Rkey = __FUNCTION__.'_redis_op_plan_7_'.$lottery_type.'_'.$UserSysPlan->id;
                     if(!$RedisLock->lock($Rkey, 30)){
@@ -3105,12 +3106,12 @@ class SscDataService extends BaseService {
                     $logArr['plan_7'][$UserSysPlan->id]['rst'] = $rst;
                 }
             }
-            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划6', ['lottery_type'=>$lottery_type]);
+            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划6', $logArr);
 
             # 玩法类型，号码导入:tz_type \Yii::$app->params['IMPORT_CODES_TYPES']
+            $logArr = [];
             $where = ['AND', ['IN', 'tz_type', \Yii::$app->params['IMPORT_CODES_TYPES']], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-                $logArr = [];
                 foreach ($UserSysPlans as $UserSysPlan){
                     $Rkey = __FUNCTION__.'_redis_op_plan_'.implode('_', \Yii::$app->params['IMPORT_CODES_TYPES']).'_'.$lottery_type.'_'.$UserSysPlan->id;
                     if(!$RedisLock->lock($Rkey, 30)){
@@ -3152,13 +3153,13 @@ class SscDataService extends BaseService {
                     $logArr['plan_8'][$UserSysPlan->id]['rst'] = $rst;
                 }
             }
-            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划7', ['lottery_type'=>$lottery_type]);
+            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划7', $logArr);
 
             SscDataService::opProfitsPlans12_13($lottery_type); # A出x次B出y次投B、A出x次B出y次投B_2 计划处理
 
             SscDataService::opProfitsPlans14($lottery_type); # 区间遗漏投 止盈止损 计划处理
-            $logArr['qihao'] = HN0898Service::getQihao($lottery_type);
-            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划', $logArr);
+            $qihao = HN0898Service::getQihao($lottery_type);
+            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划', ['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
             $dealStatus = 2;
         }catch (\Exception $e){
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
