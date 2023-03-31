@@ -326,6 +326,124 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $fb_plan_types = SscDataService::$fb_plan_types;
+        $logArr = [];
+        $lottery_type = 8;
+        $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+        $where = ['AND', ['IN', 'plan_type', $fb_plan_types], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
+        if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+            foreach ($UserSysPlans as $UserSysPlan){
+                #$Rkey = __FUNCTION__.'_redis_op_plan_'.implode('_', $fb_plan_types).'_'.$lottery_type.'_'.$UserSysPlan->id;
+                #if(!$RedisLock->lock($Rkey, 30)){
+                #    Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略2', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+                #    continue;
+                #}
+                $flag = SscDataService::isZjBefore($UserSysPlan->id);
+                $flags[$UserSysPlan->uid][$UserSysPlan->id] = $flag;
+
+                # 遗漏期数[不中奖期数]
+                $lossQs = SscDataService::getLossQs($UserSysPlan->id);
+
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['flag'] = $flag; # 中奖标识
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
+
+                # 倍数处理，中的计划回第一个倍数
+                $singles = explode('-', trim($UserSysPlan->singles));
+                if(empty($singles)) $singles = [$UserSysPlan->single];
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
+                $singles_count = count($singles); # 倍数个数
+
+                $is_init = 1; # 是否初始真实投注
+                $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
+                if(isset($codes_hz['filters'])){
+                    $codes_hz['filters']['current_kj_qihao'] = $current_kj_qihao;
+                }
+                if($flag == 1){ # 中奖
+                    $next_single_key = 0;
+                    $single = $singles[$next_single_key];
+                    if(in_array($UserSysPlan->plan_type, [9])){ # plan_type:遗漏倍投
+                        $current_miss = 0;
+                        $is_init = 1; # 等待状态
+                    }elseif(in_array($UserSysPlan->plan_type, [10])) { # plan_type:中则倍投，不中则回第一个倍数
+                        $single = SscDataService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                    }
+                }else{ # 不中奖
+                    if(in_array($UserSysPlan->plan_type, [9])) { # 遗漏倍投
+                        $current_miss = (int)($codes_hz['current_miss'] + 1); # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
+                        if ($current_miss <= $codes_hz['bet_while_miss']) {
+                            $is_init = 2; # 不中未达到遗漏期数状态 等待状态...
+                            $next_single_key = 0;
+                            $single = $singles[$next_single_key];
+                        } elseif ($current_miss > $codes_hz['bet_while_miss']) {
+                            $is_init = 3; # 开始投注，正在下注状态
+                            $single = SscDataService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                            if ($codes_hz['is_init'] == 2) {
+                                $next_single_key = 1;
+                                $single = $singles[$next_single_key];
+                            }
+                        }
+                    }elseif(in_array($UserSysPlan->plan_type, [16])){ # 16 plan_type:遗漏倍投2
+                        $current_miss = (int)$codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
+                        if ($current_miss <= $codes_hz['bet_while_miss']) {
+                            $is_init = 2; # 不中未达到遗漏期数状态 等待状态...
+                            $next_single_key = 0;
+                            $single = $singles[$next_single_key];
+                        } elseif ($current_miss > $codes_hz['bet_while_miss']) {
+                            $next_single_key = (int)$codes_hz['singles_key'];
+                            if($current_miss>=($codes_hz['bet_while_miss']+$singles_count)){
+                                # 投完所有倍数不中，则进入等待状态
+                                $is_init = 2; # 不中未达到遗漏期数状态 等待状态...
+                                $next_single_key = 0;
+                                $single = $singles[$next_single_key];
+                                $current_miss = 0;
+                            }else{
+                                $is_init = 3; # 开始投注，正在下注状态
+                                $single = SscDataService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                                if ($codes_hz['is_init'] == 2) {
+                                    $next_single_key = 1;
+                                    $single = $singles[$next_single_key];
+                                }
+                            }
+                        }
+                    }elseif(in_array($UserSysPlan->plan_type, [10])){ # plan_type:中则倍投，不中则回第一个倍数
+                        $next_single_key = 0;
+                        $single = $singles[$next_single_key];
+                    }else{
+                        $single = SscDataService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                    }
+                }
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['single'] = $single; # 最新更新倍数
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['before_singles_key'] = $codes_hz['singles_key']; # 更新前倍数key
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新即将下注的倍数key, singles的 key
+                if(in_array($UserSysPlan->plan_type, [9, 16])){ # plan_type:遗漏倍投
+                    $codes_hz['current_miss'] = (int)$current_miss;
+                    $codes_hz['is_init'] = $is_init; # 开奖之后初始标识改成 0
+                }
+                $codes_hz['singles_key'] = $next_single_key;
+                $whereUpdate = ['id'=>$UserSysPlan->id ]; # 更新条件
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['whereUpdate'] = $whereUpdate;
+
+                $updateData = ['single'=>$single];
+                if(isset($codes_hz['status_val'])){ # 号码切换&倍投
+                    # 号码切换
+                    if($flag == 1) { # 中奖
+                        $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 1 : 2;
+                    }else{
+                        $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 2 : 1;
+                    }
+                }
+                $updateData['hz_Arr'] = json_encode($codes_hz, 320);
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['updateData'] = $codes_hz;
+
+                $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['rst'] = $rst;
+            }
+        }
+        Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划4', $logArr);
+        p('处理结束');
+
+        $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);
+        p($rst);
         $rst = Lucky5Service::login($uid = 17, $tz_system_id = 9);
         p($rst);
         $rst = ProxyBaseService::preGetValidIp($proxy_type=1, $is_auto = 0);
@@ -401,8 +519,6 @@ class IndexController extends Controller
         $rst['kj'] = KjDataGet::grabKjDatas();
         p($rst);
         $lottery_type = 8;
-        $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);
-        p($rst);
         $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);
         $r = push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
         d($r);

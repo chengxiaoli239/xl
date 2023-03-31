@@ -2984,7 +2984,7 @@ class SscDataService extends BaseService {
                     if($flag == 1){ # 中奖
                         $next_single_key = 0;
                         $single = $singles[$next_single_key];
-                        if(in_array($UserSysPlan->plan_type, [9])){ # plan_type:遗漏倍投
+                        if(in_array($UserSysPlan->plan_type, [9, 16])){ # plan_type:遗漏倍投
                             $current_miss = 0;
                             $is_init = 1; # 等待状态
                         }elseif(in_array($UserSysPlan->plan_type, [10])) { # plan_type:中则倍投，不中则回第一个倍数
@@ -4603,7 +4603,7 @@ class SscDataService extends BaseService {
             $logArr['save_rst'] = $rst;
             Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后23', $logArr);
         }catch (\Exception $e){
-            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后24', ['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type]);
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划更新前后24', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
     }
 
