@@ -283,6 +283,9 @@ class TzSystemUsersService extends ClientsBaseService{
         $expect = $kjData['expect'] = trim($kjData['expect']);
         $kjData['opencode'] = trim($kjData['opencode']);
         $kjData['opentime'] = $kjData['opentime'] ? : date('Y-m-d H:i:s');
+        if(empty($kjData['opencode'])){
+            return ['status'=>300, 'msg'=>'开奖数据不能为空'];
+        }
         $flag = Lucky5::setKjDataCache($lottery_type, $expect, $kjData);
 
         $params = ['lottery_type'=>$lottery_type, 'title'=>BetService::getLotteryName($lottery_type).'_网盘推送', 'is_grab_history'=>1];
@@ -324,7 +327,7 @@ class TzSystemUsersService extends ClientsBaseService{
                     }
                 }
 
-                $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
+                $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(8)->all();
                 Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-0', ['uid'=>$uid, 'current_qihao'=>$current_qihao, 'where'=>$where, 'count'=>$count]);
                 if(empty($BetErrorPlansTasks)){
                     Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-1', ['uid' => $uid, 'msg'=>'没有下注计划']);
