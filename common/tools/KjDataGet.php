@@ -124,7 +124,7 @@ class KjDataGet
                 $cacheTime = (strpos($lotteryData['typeGroupName'], '高频') !== false) ? 10 : 1800;
                 $m->set($initLotteryKey, 1, $cacheTime);
 
-                $params = ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title']];
+                $params = ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title'], 'business_id'=>$lottery_type];
                 $params['is_grab_history'] = 1;
                 push_queue(GrabKjDatasJob::class, $params);
                 Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'cacheTime'=>$cacheTime, 'flag'=>$flag]);

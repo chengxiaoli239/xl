@@ -191,7 +191,7 @@ class TzService extends BaseService {
             $rst['isCanOpStaticStatus'] = $isCanOpStaticStatus;
             Tool_Common::log('opSystemBetPlans','INFO','处理系统投注计划', ['rst'=>$rst, 'rstLog'=>$rstLog]);
             StaticService::afterOpStatic($lottery_type, 'opSystemBetPlans');
-            push_queue(\common\service\jobs\kj_data\AfterRunSysPlansJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
+            push_queue(\common\service\jobs\kj_data\AfterRunSysPlansJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'business_id'=>$qihao]);
             #$rst['afterRunSysPlans'] = TzService::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
         }catch (\Exception $e){
             StaticService::afterOpStatic($lottery_type, 'opSystemBetPlans');
@@ -254,7 +254,7 @@ class TzService extends BaseService {
 
             $logData = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'rst11'=>$rst11, 'rst10'=>$rst10, 'rst21'=>$rst21];
             Tool_Common::log('afterRunSysPlans','INFO','系统计划处理后', $logData);
-            push_queue(UserBetTaskRecordJob::class, ['lottery_type'=>$lottery_type]);
+            push_queue(UserBetTaskRecordJob::class, ['lottery_type'=>$lottery_type, 'business_id'=>$qihao]);
         }catch (\Exception $e){
             Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '开关处理异常', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'err_msg'=>$e->getMessage()]);
         }
