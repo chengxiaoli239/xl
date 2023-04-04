@@ -21,8 +21,8 @@ use backend\models\TzSystemsUsers;
 use backend\models\TzTypes;
 use backend\models\UserCustomPlans;
 use backend\models\UserSysPlans;
-use backend\tools\Tools;
 use common\models\AdminModel;
+use common\models\base\BaseModel;
 use common\service\CommonService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -1399,6 +1399,36 @@ class UserSysPlansService extends BaseService {
         $rst['data']['push_data']['codes'] = str_replace('@', ',',str_replace(',', '', implode('@', $codes)));
 
         return $rst;
+    }
+
+    /**
+     * 删除计划相关的表数据
+     * @param string $plan_id
+     * @param string $user_id
+     * @return bool
+     * @throws yii\db\Exception
+     */
+    public static function deleteOnePlanDatas($plan_id='', $user_id=''){
+
+        try {
+            $db = BaseModel::getDb();
+            $transaction = $db->beginTransaction();
+            # 号码导入表
+            if($user_id==1){
+                $sql1 = "DELETE FROM ".ImportPlanCodes::tableName()." WHERE plan_id='{$plan_id}'";
+            }else{
+                $sql1 = "DELETE FROM ".ImportPlanCodes::tableName()." WHERE plan_id='{$plan_id}' AND uid='{$user_id}'";
+            }
+            $db->createCommand($sql1)->execute();
+
+            $transaction->commit();
+        }catch (\Exception $e){
+            $transaction->rollBack();
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划涉及到数据删除失败', ['plan_id'=>$plan_id, 'err_msg'=>$e->getMessage()]);
+            return false;
+        }
+
+        return true;
     }
 
 }

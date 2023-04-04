@@ -546,6 +546,7 @@ class UserSysPlansController extends BaseController
     public function actionDelete($id)
     {
         $this->findModel($id, \Yii::$app->user->id)->delete();
+        UserSysPlansService::deleteOnePlanDatas($id, $this->_user_id);
 
         return $this->redirect(['index']);
     }
