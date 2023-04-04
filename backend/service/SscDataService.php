@@ -156,7 +156,8 @@ class SscDataService extends BaseService {
      * @return bool|int|string
      */
     public static function getNextStaticDsQihao($lottery_type = DEFAULT_LOTTERY_TYPE){
-        $last_qihao = SscKjDataDs::find()->select(['qihao as last_qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one()['last_qihao'];
+        $last_qihao = SscKjDataDs::find()->select(['qihao as last_qihao'])->where(['lottery_type'=>$lottery_type])
+            ->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one()['last_qihao'];
 
         $next_qihao = KjDataGet::getNextQihaoByQihao($last_qihao, $lottery_type);
 

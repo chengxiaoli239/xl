@@ -460,7 +460,7 @@ abstract class BetService extends BaseBetService {
 
                         if(!empty($t_rst['snid'])){
                             # 记录方案号
-                            $where = ['plan_id'=>$plan_id, 'qihao'=>$activeQihao, 'lottery_type'=>$lottery_type];
+                            $where = ['plan_id'=>$plan_id, 'qihao'=>(string)$activeQihao, 'lottery_type'=>$lottery_type];
                             $BettingRecords = BettingRecords::find()->where($where)->one();
                             $BettingRecords->snid = trim($BettingRecords->snid.';'.$t_rst['snid'], ';');
                             $BettingRecords->sn = trim($BettingRecords->sn.';'.$t_rst['sn'], ';');
@@ -1363,7 +1363,7 @@ abstract class BetService extends BaseBetService {
                 }
             }
             if($codes_hz['filters']['filter_type'] == 2){
-                $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->one();
+                $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan->id])->limit(1)->orderBy(['id'=>SORT_DESC])->one();
                 $kj_codes = $BettingRecords->kj_codes;
                 $codesArr = explode(',', $kj_codes);
                 $end_num = array_pop($codesArr); # 以太坊去掉最后一个0
@@ -2171,7 +2171,7 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤1', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'cs_time'=>($end_time1-$start_time1).'s']);
                     //p([$current_qihao, $codes_hz_data]);
                     $beforeQihao = KjDataGet::getBeforeQihaoByQihao($current_qihao, $lottery_type);
-                    $before_record = BettingRecords::findOne(['qihao'=>$beforeQihao, 'plan_id'=>$plan_id]);
+                    $before_record = BettingRecords::findOne(['qihao'=>(string)$beforeQihao, 'plan_id'=>$plan_id]);
                     if(!empty($before_record) && $before_record->status==0){
                         return BetService::opOneBettingRecordAndHandlePlanStatic($before_record->id, $plan_id, $beforeQihao, $rst);
                     }
