@@ -124,6 +124,11 @@ class KjDataGet
                 $cacheTime = (strpos($lotteryData['typeGroupName'], '高频') !== false) ? 10 : 1800;
                 $m->set($initLotteryKey, 1, $cacheTime);
 
+                $status = KjDataGet::isCanGrab($lottery_type);
+                if(!$status) {
+                    throw_info('该时间点不可抓取');
+                }
+
                 $params = ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title'], 'business_id'=>$lottery_type];
                 $params['is_grab_history'] = 1;
                 push_queue(GrabKjDatasJob::class, $params);
@@ -205,7 +210,7 @@ class KjDataGet
      * @param boolean $isCanBet
      * @return bool
      */
-    public static function isCanGrab($lottery_type = DEFAULT_LOTTERY_TYPE, &$isCanBet=true) {
+    public static function isCanBet($lottery_type = DEFAULT_LOTTERY_TYPE, &$isCanBet=true) {
         $flag = true;
         $isCanBet = true;
         $date_time = date('H:i');
@@ -239,6 +244,60 @@ class KjDataGet
         }elseif(in_array($lottery_type, [18])){ # 台湾快五
             if ('02:10' < $date_time && $date_time < '07:00') {
                 $isCanBet = $flag = false;
+            }
+        }
+
+        return $flag;
+    }
+
+    /**
+     * @desc 判断时间段是否可以抓取开奖号码  主要针对半夜不开奖时间段
+     * @param int $lottery_type
+     * @param boolean $isCanGrab
+     * @return bool
+     */
+    public static function isCanGrab($lottery_type = DEFAULT_LOTTERY_TYPE, bool &$isCanGrab = true) {
+        $flag = true;
+        $isCanGrab = true;
+        $date_time = date('H:i');
+        $is_init = \Yii::$app->cache->get(SystemService::getInitLotteryDataKey($lottery_type));
+
+        $now_time = date('Y-m-d H:i:s');
+        $minute_nums = substr($now_time, -5, -3);
+        if (in_array($lottery_type, [5, 6])){
+            if ('04:00' < $date_time && $date_time < '07:10') {
+                $isCanGrab = $flag = false;
+            }
+        }elseif($lottery_type == 8){ # 幸运五星
+            # 用户报表需求 24小时抓取开奖数据
+            if ('04:10' < $date_time && $date_time < '09:00') {
+                #$flag = false; # 全天开奖，这里先去掉
+                $isCanGrab = false;
+            }
+
+            $minute_nums_d = (int)$minute_nums % 5;
+            if(!in_array($minute_nums_d, [0, 1])){ # 最初开奖
+                $isCanGrab = false;
+            }
+        }elseif(in_array($lottery_type, [10, 11, 12, 13])){ # 冰岛90s、3分
+            if ('03:10' < $date_time && $date_time < '08:55') {
+                $isCanGrab = $flag = false;
+            }
+        }elseif(!$is_init && in_array($lottery_type, [17])){ # 排列五
+            if('20:15'>$date_time OR $date_time>'23:00'){
+                $isCanGrab = $flag = false;
+            }
+        }elseif(!$is_init && in_array($lottery_type, [1])){ # 七星
+            $w = date('w'); # 周几：0,1,2,3,4,5,6  ==> 周日到周六
+            if(!in_array($w, [0, 2, 5])){
+                $isCanGrab = $flag = false;
+            }
+            if('20:00'>$date_time OR $date_time>'23:00'){
+                $isCanGrab = $flag = false;
+            }
+        }elseif(in_array($lottery_type, [18])){ # 台湾快五
+            if ('02:10' < $date_time && $date_time < '07:00') {
+                $isCanGrab = $flag = false;
             }
         }
 
