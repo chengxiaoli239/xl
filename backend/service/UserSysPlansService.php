@@ -1413,13 +1413,22 @@ class UserSysPlansService extends BaseService {
         try {
             $db = BaseModel::getDb();
             $transaction = $db->beginTransaction();
-            # 号码导入表
+
+            # 1、号码导入表
             if($user_id==1){
                 $sql1 = "DELETE FROM ".ImportPlanCodes::tableName()." WHERE plan_id='{$plan_id}'";
             }else{
                 $sql1 = "DELETE FROM ".ImportPlanCodes::tableName()." WHERE plan_id='{$plan_id}' AND uid='{$user_id}'";
             }
             $db->createCommand($sql1)->execute();
+
+            # 2、计划表
+            if($user_id==1){
+                $sql2 = "DELETE FROM ".UserSysPlans::tableName()." WHERE id='{$plan_id}'";
+            }else{
+                $sql2 = "DELETE FROM ".UserSysPlans::tableName()." WHERE id='{$plan_id}' AND uid='{$user_id}'";
+            }
+            $db->createCommand($sql2)->execute();
 
             $transaction->commit();
         }catch (\Exception $e){
