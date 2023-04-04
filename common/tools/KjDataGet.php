@@ -275,7 +275,7 @@ class KjDataGet
                 $isCanGrab = false;
             }
 
-            $minute_nums_d = (int)$minute_nums % 5;
+            $minute_nums_d = ((int)$minute_nums) % 5;
             if(!in_array($minute_nums_d, [0, 1])){ # 最初开奖
                 $isCanGrab = false;
             }
