@@ -296,11 +296,10 @@ class TzSystemUsersService extends ClientsBaseService{
             $mkey = 'syncClientKjDatas_x0_'.$lottery_type;
             Lucky5::setKjDataCache($lottery_type, $expect, $kjData);
 
-            $m->set($mkey, 1, 15);
-
             if($flag = $m->get($mkey)){
                 throw_info('15秒短时间不处理');
             }
+            $m->set($mkey, 1, 15);
 
             $SscKjData = SscKjData::findOne(['qihao'=>$expect, 'lottery_type'=>$lottery_type]);
             if(!empty($SscKjData)){
