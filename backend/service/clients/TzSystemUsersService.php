@@ -3,6 +3,7 @@ namespace backend\service\clients;
 
 use backend\models\BetErrorPlansTask;
 use backend\models\DataDealStatus;
+use backend\models\SscKjData;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\BetService;
@@ -280,21 +281,46 @@ class TzSystemUsersService extends ClientsBaseService{
      */
     public static function syncClientKjDatas($kjData=[], $lottery_type=DEFAULT_LOTTERY_TYPE){
 
-        $expect = $kjData['expect'] = trim($kjData['expect']);
-        $kjData['opencode'] = trim($kjData['opencode']);
-        $kjData['opentime'] = $kjData['opentime'] ? : date('Y-m-d H:i:s');
-        if(empty($kjData['opencode'])){
-            return ['status'=>300, 'msg'=>'开奖数据不能为空'];
-        }
-        $m = \Yii::$app->cache;
-        $mkey = 'syncClientKjDatas_x0_'.$lottery_type;
-        Lucky5::setKjDataCache($lottery_type, $expect, $kjData);
+        try {
+            $now_time = date('Y-m-d H:i:s');
+            $expect = $kjData['expect'] = trim($kjData['expect']);
+            $kjData['opencode'] = trim($kjData['opencode']);
+            $kjData['opentime'] = $kjData['opentime'] ? : $now_time;
+            if(empty($kjData['expect'])){
+                throw_info('开奖数据期号不能为空');
+            }
+            if(empty($kjData['opencode'])){
+                throw_info('开奖数据不能为空');
+            }
+            $m = \Yii::$app->cache;
+            $mkey = 'syncClientKjDatas_x0_'.$lottery_type;
+            Lucky5::setKjDataCache($lottery_type, $expect, $kjData);
 
-        $m->set($mkey, 1, 15);
+            $m->set($mkey, 1, 15);
 
-        if(!$flag = $m->get($mkey)){
-            $params = ['lottery_type'=>$lottery_type, 'title'=>BetService::getLotteryName($lottery_type).'_网盘推送', 'is_grab_history'=>1];
+            if($flag = $m->get($mkey)){
+                throw_info('15秒短时间不处理');
+            }
+
+            $SscKjData = SscKjData::findOne(['qihao'=>$expect, 'lottery_type'=>$lottery_type]);
+            if(!empty($SscKjData)){
+                $mcKey = 'mc_syncClientKjDatas_x0_'.$lottery_type.'_'.$kjData['expect'];
+                $num = \Yii::$app->redis->incr($mcKey);
+                \Yii::$app->redis->expire($mcKey, 30);
+                if($num>2){
+                    throw_info('已经开奖数据重复多次，忽略');
+                }
+                $minute_nums = substr($now_time, -5, -3);
+                $minute_nums_d_1 = (int)$minute_nums % 5 - 1;
+                if(!in_array($minute_nums_d_1, [0, 1])){
+                    throw_info('非最新开奖，忽略处理');
+                }
+            }
+
+            $params = ['lottery_type'=>$lottery_type, 'title'=>BetService::getLotteryName($lottery_type).'_网盘推送', 'is_grab_history'=>1, 'business_id'=>$expect];
             push_queue(GrabKjDatasJob::class, $params);
+        }catch (\Exception $e){
+            return ['status'=>301, 'msg'=>$e->getMessage()];
         }
 
         return ['status'=>200, 'data'=>[], 'msg'=>'数据同步成功'];

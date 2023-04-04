@@ -262,12 +262,12 @@ class KjDataGet
             push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
 
             # 数据统计
-            push_queue(PeiShuProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>5]);
-            push_queue(StaticAll2NumsYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>10]);
-            push_queue(StaticHzProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>15]);
-            push_queue(StaticPeiShuTrueFalseJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>20]);
-            push_queue(StaticSdProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>25]);
-            push_queue(UpdateCodeTypeYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'queue_delay_time'=>30]);
+            push_queue(PeiShuProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>5]);
+            push_queue(StaticAll2NumsYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>10]);
+            push_queue(StaticHzProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>15]);
+            push_queue(StaticPeiShuTrueFalseJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>20]);
+            push_queue(StaticSdProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>25]);
+            push_queue(UpdateCodeTypeYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>30]);
             Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '统计数据入列', ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'msg'=>'数据入列成功']);
         }
         //StaticService::opStaticProfits(); # 投注利润统计
