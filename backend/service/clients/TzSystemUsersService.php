@@ -293,7 +293,7 @@ class TzSystemUsersService extends ClientsBaseService{
                 throw_info('开奖数据不能为空');
             }
             $m = \Yii::$app->cache;
-            $mkey = 'syncClientKjDatas_x0_'.$lottery_type;
+            $mkey = 'syncClientKjDatas_x0_'.$lottery_type.'_'.$expect;
             Lucky5::setKjDataCache($lottery_type, $expect, $kjData);
 
             if($flag = $m->get($mkey)){
