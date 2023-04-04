@@ -286,10 +286,16 @@ class TzSystemUsersService extends ClientsBaseService{
         if(empty($kjData['opencode'])){
             return ['status'=>300, 'msg'=>'开奖数据不能为空'];
         }
+        $m = \Yii::$app->cache;
+        $mkey = 'syncClientKjDatas_x0_'.$lottery_type;
         Lucky5::setKjDataCache($lottery_type, $expect, $kjData);
 
-        $params = ['lottery_type'=>$lottery_type, 'title'=>BetService::getLotteryName($lottery_type).'_网盘推送', 'is_grab_history'=>1];
-        push_queue(GrabKjDatasJob::class, $params);
+        $m->set($mkey, 1, 15);
+
+        if(!$flag = $m->get($mkey)){
+            $params = ['lottery_type'=>$lottery_type, 'title'=>BetService::getLotteryName($lottery_type).'_网盘推送', 'is_grab_history'=>1];
+            push_queue(GrabKjDatasJob::class, $params);
+        }
 
         return ['status'=>200, 'data'=>[], 'msg'=>'数据同步成功'];
     }
