@@ -204,6 +204,11 @@ class TzSystemUsersService extends ClientsBaseService{
         $mkey = self::buildActiveQihaoKey($lottery_type);
         $next_qihao = $m->get($mkey);
 
+        $dateHI = date('H:i');
+        if('09:00'<=$dateHI && $dateHI<='09:05' && $lottery_type==DEFAULT_LOTTERY_TYPE){
+            return ['status'=>200, 'data'=>['next_qihao'=>date('Ymd').'109']];
+        }
+
         if(empty($next_qihao)){
             $where = [
                 'AND',
