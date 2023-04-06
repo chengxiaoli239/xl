@@ -259,11 +259,9 @@ class KjDataGet
         $flag = true;
         $isCanGrab = true;
         $date_time = date('H:i');
-        $date_time = '09:03';
         $is_init = \Yii::$app->cache->get(SystemService::getInitLotteryDataKey($lottery_type));
 
         $now_time = date('Y-m-d H:i:s');
-        $now_time = '2023-04-06 09:00:01';
         $minute_nums = substr($now_time, -5, -3);
         if (in_array($lottery_type, [5, 6])){
             if ('04:00' < $date_time && $date_time < '07:10') {
@@ -280,7 +278,6 @@ class KjDataGet
             if(!in_array($minute_nums_d, [0, 1]) ){ # 最初开奖
                 $isCanGrab = false;
             }
-            p(['minute_nums_d'=>$minute_nums_d, 'isCanGrab'=>$isCanGrab]);
         }elseif(in_array($lottery_type, [10, 11, 12, 13])){ # 冰岛90s、3分
             if ('03:10' < $date_time && $date_time < '08:55') {
                 $isCanGrab = $flag = false;
