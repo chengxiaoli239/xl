@@ -48,7 +48,23 @@ class DatasClearService extends BaseService{
                 $deal_status_delete_sql = 'DELETE FROM {{%data_deal_status}} WHERE update_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
                 $deal_status_delete = $db->createCommand($deal_status_delete_sql)->execute();
 
-                $logArr = ['lottery_type'=>$lottery_type, 'count_sql'=>$count_sql, 'rst_count'=>$rst_count, 'delete_sql'=>$delete_sql, 'rst_delete'=>$rst_delete, 'rst_task_count'=>$rst_task_count, 'rst_task_delete'=>$rst_task_delete, 'deal_status_delete_sql'=>$deal_status_delete_sql, 'deal_status_delete'=>$deal_status_delete];
+                # admin_log记录
+                $admin_log_delete_sql = 'DELETE FROM {{%admin_log}} WHERE update_time NOT REGEXP "'.implode('|', $dates);
+                $admin_log_delete = $db->createCommand($admin_log_delete_sql)->execute();
+
+                $logArr = [
+                    'lottery_type'=>$lottery_type,
+                    'count_sql'=>$count_sql,
+                    'rst_count'=>$rst_count,
+                    'delete_sql'=>$delete_sql,
+                    'rst_delete'=>$rst_delete,
+                    'rst_task_count'=>$rst_task_count,
+                    'rst_task_delete'=>$rst_task_delete,
+                    'deal_status_delete_sql'=>$deal_status_delete_sql,
+                    'deal_status_delete'=>$deal_status_delete,
+                    'admin_log_delete_sql' => $admin_log_delete_sql,
+                    'admin_log_delete' => $admin_log_delete,
+                ];
                 Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '清理数据', $logArr);
             }catch (\Exception $exception){
                 Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '清理数据', ['lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
