@@ -123,9 +123,13 @@ class Lucky5 extends BaseKj {
                 $rst = CurlService::getCurl($url);
                 $data = $rst['data']['list'][0];
 
-                if (!isset($rst['data']['list'][0]) OR empty($data)) return [];
+                if (!isset($rst['data']['list'][0]) OR empty($data)){
+                    throw_info('开奖数据为空：'.yii\helpers\Json::encode($rst, 320));
+                };
                 $opencode = implode(',', $data['code']);
-                if($opencode == '0,0,0,0,0') return [];
+                if($opencode == '0,0,0,0,0'){
+                    throw_info('开奖数据为空：'.$opencode);
+                }
                 //$kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
                 $kjData = ['expect'=>str_replace('期', '', $data['pc_issue'][0]), 'opencode'=>$opencode, 'opentime'=>$data['open_date'].' '.trim($data['pc_issue'][1])];
             }
