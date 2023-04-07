@@ -110,33 +110,38 @@ class Lucky5 extends BaseKj {
      * @return array|bool
      */
     public static function getLotteryShiXunOne($returnType = 'json', $is_auto=1){
-        $kjData = self::getCurrentKjData(self::$lottery_type);
-        if($is_auto==2 OR empty($kjData['opencode']) OR empty($kjData['expect'])) {
-            $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun-one');
+        try {
+            $kjData = self::getCurrentKjData(self::$lottery_type);
+            if($is_auto==2 OR empty($kjData['opencode']) OR empty($kjData['expect'])) {
+                $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun-one');
 
-            $t = round(microtime(true) * 1000);
-            $url = $domain.'/kaijiang/history/ygxy5.json?v='.$t; #当前开奖号码
-            # 当前开奖链接：https://1.cc138001.com/kaijiang/ygxy5.json?v=1570866018057
-            # 当前开奖链接：https://web01.cc138008.com/kaijiang/history/ygxy5.json?v=1582557689975
+                $t = round(microtime(true) * 1000);
+                $url = $domain.'/kaijiang/history/ygxy5.json?v='.$t; #当前开奖号码
+                # 当前开奖链接：https://1.cc138001.com/kaijiang/ygxy5.json?v=1570866018057
+                # 当前开奖链接：https://web01.cc138008.com/kaijiang/history/ygxy5.json?v=1582557689975
 
-            $rst = CurlService::getCurl($url);
-            $data = $rst['data']['list'][0];
+                $rst = CurlService::getCurl($url);
+                $data = $rst['data']['list'][0];
 
-            if (!isset($rst['data']['list'][0]) OR empty($data)) return [];
-            $opencode = implode(',', $data['code']);
-            if($opencode == '0,0,0,0,0') return [];
-            //$kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
-            $kjData = ['expect'=>str_replace('期', '', $data['pc_issue'][0]), 'opencode'=>$opencode, 'opentime'=>$data['open_date'].' '.trim($data['pc_issue'][1])];
-            Tool_Common::log('luck5', 'INFO', '号码抓取-实讯网', ['kjData'=>$kjData]);
+                if (!isset($rst['data']['list'][0]) OR empty($data)) return [];
+                $opencode = implode(',', $data['code']);
+                if($opencode == '0,0,0,0,0') return [];
+                //$kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
+                $kjData = ['expect'=>str_replace('期', '', $data['pc_issue'][0]), 'opencode'=>$opencode, 'opentime'=>$data['open_date'].' '.trim($data['pc_issue'][1])];
+            }
+            if(empty($kjData['opencode'])){
+                throw_info('开奖号码不能为空');
+            }
+            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData]);
+        }catch (\Exception $e){
+            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData]);
+            return false;
         }
-        if(empty($kjData['opencode'])) return false;
         $opencode = $kjData['opencode'];
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
 
-        if(!empty($opencode)){
-            self::setKjDataCache(self::$lottery_type, $expect, $kjData);
-        }
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
