@@ -2572,6 +2572,7 @@ class NumService extends BaseService {
             ->andWhere(['=', 'code_type', $playway+1]);
         $sql = $query->createCommand()->getRawSql();
         #p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '去除上期同位置6561组', ['current_qihao'=>$current_qihao, 'currentKjCodes'=>$currentKjCodes, 'sql'=>$sql]);
         $NumTypes = $query->asArray()->all();
         #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
