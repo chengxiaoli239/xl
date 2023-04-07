@@ -138,7 +138,7 @@ class Lucky5 extends BaseKj {
             }
             Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData]);
         }catch (\Exception $e){
-            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData]);
+            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage()]);
             return false;
         }
         $opencode = $kjData['opencode'];
