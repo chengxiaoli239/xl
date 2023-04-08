@@ -2051,7 +2051,7 @@ class NumService extends BaseService {
                 case 9: # 随机9000组(四定)
                     $codes = NumService::getBeforeKjCodesDynamic9($playway);
                     break;
-                case 10: # 过滤最近2880组(四定)，不够往后搜集 前四，与12 后4类似
+                case 10: # 过滤最近2880组(四定)，不够往前搜集 前四，与12 后4类似
                     $codes = NumService::getBeforeKjCodesDynamic10($plan, $lottery_type);
                     break;
                 case 11: # 过滤前200期开过2次以上号码的全转(四定)
@@ -2581,7 +2581,7 @@ class NumService extends BaseService {
     }
 
     /**
-     * 过滤类型号码 - 取前四最近8000期开过的号码
+     * 过滤类型号码 - 取前四最近8000期开过的号码，不够往后搜集够8000组
      * @param object $plan
      * @param int $lottery_type
      * @param int $num
@@ -2659,7 +2659,7 @@ class NumService extends BaseService {
         $query = SscKjData::find()->select(['qihao', 'code1', 'code2', 'code3', 'code4'])
             ->where(['lottery_type'=>$lottery_type, 'qihao'=>[$current_kj_qihao, $short_current_kj_qihao]])
             ->orderBy(['id'=>SORT_DESC])->limit(1);
-        #p($query->createCommand()->getRawSql());
+        $sql1 = $query->createCommand()->getRawSql();
         $planCurrentKjData = $query->asArray()->one();
         #p($planCurrentKjData);
 
@@ -2676,7 +2676,7 @@ class NumService extends BaseService {
             ->where($where)
             ->andWhere(['=', 'code_type', $playway+1]);
         $sql = $query->createCommand()->getRawSql();
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤两个位置一样的所有号码', ['plan_id'=>$plan->id, 'short_current_kj_qihao'=>$short_current_kj_qihao, 'current_kj_qihao'=>$current_kj_qihao, 'sql'=>$sql]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤两个位置一样的所有号码', ['plan_id'=>$plan->id, 'short_current_kj_qihao'=>$short_current_kj_qihao, 'current_kj_qihao'=>$current_kj_qihao, 'sql1'=>$sql1, 'sql'=>$sql]);
         #p();
         $NumTypes = $query->asArray()->all();
         $filterIds = ArrayHelper::getColumn($NumTypes, 'id');
