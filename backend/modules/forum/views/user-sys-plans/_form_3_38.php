@@ -35,7 +35,7 @@ $this->title = '新过滤快打';
 
                 <div class="row">
                     <div class="col-lg-2 col-xs-4">
-                        <?= $form->field($model, 'arise')->textInput()->label('上将') ?>
+                        <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
                     </div>
                     <div class="col-lg-2 col-xs-4">
                     </div>

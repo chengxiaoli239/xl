@@ -62,6 +62,7 @@ class NumService extends BaseService {
         24=>'过滤1345最近2000组(四定)',
         25=>'过滤前100期开过号码的全转(四定)',
         26=>'过滤前期同位置号码(四定6561组)',
+        27=>'过滤前四1152组号码(四定)',
     ];
 
     /**
@@ -2063,13 +2064,13 @@ class NumService extends BaseService {
                 case 13: # 过滤最近10000期重复2次以上的直码(四定)
                     $codes = NumService::getBeforeKjCodesDynamic13($plan, $lottery_type);
                     break;
-                case 14: # 过滤1,2,3,5最近2880组(四定)，不够往后搜集
+                case 14: # 过滤掉1,2,3,5最近2880组(四定)，不够往后搜集
                     $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,3,5]);
                     break;
-                case 15: # 过滤1,2,4,5最近2880组(四定)，不够往后搜集
+                case 15: # 过滤掉1,2,4,5最近2880组(四定)，不够往后搜集
                     $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,4,5]);
                     break;
-                case 16: # 过滤1,3,4,5最近2880组(四定)，不够往后搜集
+                case 16: # 过滤掉1,3,4,5最近2880组(四定)，不够往后搜集
                     $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,3,4,5]);
                     break;
                 case 17: # 取前四最近8000组号码
@@ -2101,6 +2102,9 @@ class NumService extends BaseService {
                     break;
                 case 26: # 去除上期同位置 9 * 9 * 9 * 9 = 81 * 81 = 6561 组
                     $codes = NumService::getBeforeKjCodesDynamic26($plan, $lottery_type);
+                    break;
+                case 27: # 过滤前4最近1152组(四定)，不够往后搜集
+                    $codes = NumService::getBeforeKjCodesDynamic10($plan, $lottery_type, $num=1152);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
@@ -2515,7 +2519,7 @@ class NumService extends BaseService {
     }
 
     /**
-     * 过滤类型号码 - 前3000期开过的号码
+     * 过滤类型号码 - 过滤前3000期开过的号码
      * @param object $plan
      * @param int $lottery_type
      * @param int $num
