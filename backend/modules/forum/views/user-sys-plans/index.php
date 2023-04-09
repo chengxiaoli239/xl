@@ -178,10 +178,10 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 }else{
                                     $title = $model->hz_Arr;
                                 }
-                                $txt = BaseStringHelper::truncate($str,20);
+                                $txt = BaseStringHelper::truncate($str,24);
                                 $desc_str .= !empty($model->singles) ? '翻倍：'.$model->singles : '';
                                 $str = Html::a($txt, 'javascript:;', ['title' => \backend\service\SscDataService::getCodesDesc($title),'alt'=>\backend\service\SscDataService::getCodesDesc($desc_str), 'class'=>'act-desc', 'plan_id'=>$model->id, 'current_profits'=>round($model->current_profits, 2), 'betStatusTxt'=>$betStatusTxt]);
-                                if($model->singles OR in_array($model->plan_type,[2, 3, 4, 5, 9, 10])){
+                                if(!empty($model->singles) OR in_array($model->plan_type,[2, 3, 4, 5, 9, 10])){
                                     $str .= '翻倍梯度:'.$model->singles;
                                 }
                                 return $str;
