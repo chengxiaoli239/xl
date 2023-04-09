@@ -178,7 +178,7 @@ class TzService extends BaseService {
             }
             */
             if($isCanOpStaticStatus = StaticService::isCanOpStatic($lottery_type, $mkey = 'opProfitsPlans')) {
-                $rstLog['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type); # 处理止盈止损、倍投等计划
+                $rstLog['opProfitsPlans'] = SscDataService::operateProfitsPlans($lottery_type); # 处理止盈止损、倍投等计划
                 StaticService::afterOpStatic($lottery_type, 'opProfitsPlans');
             }
 

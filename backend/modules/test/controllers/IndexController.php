@@ -331,7 +331,7 @@ class IndexController extends Controller
         p(count($filter_dynamic_codes));
         $rst = Lucky5Service::login($uid = 12, $tz_system_id = 9);
         p($rst);
-        $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);
+        $rst['operateProfitsPlans'] = SscDataService::operateProfitsPlans($lottery_type = 8);
         p($rst);
         $rst = ProxyBaseService::preGetValidIp($proxy_type=1, $is_auto = 0);
         p($rst);
