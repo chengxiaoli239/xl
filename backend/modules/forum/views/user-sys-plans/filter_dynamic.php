@@ -11,7 +11,6 @@
 </div>
 
 <!--提示框-start-->
-<!--
 <div class="modal fade" id="exampleModal_msg_filter_dynamic_type" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
     <div class="modal-dialog modal-lg" role="document" style="width: 800px;margin: 100px auto;">
         <div class="modal-content">
@@ -21,10 +20,8 @@
                 <h4 class="modal-title" id="tip_msg_title">信息提示：</h4>
             </div>
             <div class="modal-body">
-                <form id="tip_form_msg" style="display:block; width:100%;height: 560px;overflow-y: scroll">
-                    <strong># 动态过滤类型说明：</strong>
-                    <pre>
-                        <code id="rst_code">
+                <strong># 动态过滤类型说明：</strong>
+                <pre><code id="rst_code">
 <strong><font color="blue">1、1小1大，剔除前期号码至少2个上奖: </font></strong>01234上一个，56789上一个，上期开奖；3456，则剔除之后012789上两个，比如3478，5699这些都中奖，3458，3449不中奖
 <strong><font color="blue">2、头尾去除期号最后两位相加：</font></strong>期号123，期号后两位相加：2+3=5，则：千位、个位排除5
 <strong><font color="blue">3、头去除期号最后两位相加：</font></strong>期号123，期号后两位相加：2+3=5，则：千位排除5
@@ -48,11 +45,10 @@
 <strong><font color="blue">21、过滤1345最近2000组(四定)：</font></strong>过滤掉最近2000期的号码，不够往后搜集，1345代表：千十个五
 <strong><font color="blue">22、过滤前100期开过号码的全转(四定)：</font></strong>过滤掉前100期开过号码全转的直码
 <strong><font color="blue">23、过滤前期同位置号码(四定6561组)：</font></strong>比如上期开：3456，则：千位不等于3、百位不等于4、十位不等于5、个不等于6
-<strong><font color="blue">24、过滤期号尾号一致的历史开奖号码：</font></strong>比如上期期号：288期，则历史开奖期号，128期、108期、008期对应的所有直码都剔除
-<strong><font color="blue">25、1小1大，剔除前期号码至少1个上奖：</font></strong>01234上一个，56789上一个，上期开奖；3456，则剔除之后012789上两个，比如3458，5669这些都中奖，3455，3446不中奖
-                        </code>
-                    </pre>
-                </form>
+<strong><font color="blue">24、过滤期号尾号一致的历史开奖号码：</font></strong>比如上期期号：288期，则历史开奖期号，288期、128期、108期、008期等对应的所有直码都剔除
+<strong><font color="blue">25、剔除前期号码至少1个上奖：</font></strong>上期开奖；3456，则剔除之后012789上两个，比如3458，5669这些都中奖，3455，3446不中奖
+<strong><font color="blue">26、剔除前期号码至少2个上奖：</font></strong>上期开奖；3456，则剔除之后012789上两个，比如3478，5699这些都中奖，3458，3449不中奖
+                </code></pre>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
@@ -62,10 +58,9 @@
     </div>
 </div>
 <script>
-    $(function () {
-        $('#tag_filter_dynamic_type').click(function () {
-            $('#exampleModal_msg_filter_dynamic_type').modal('show');
-        });
-    })
+$(function () {
+    $('#tag_filter_dynamic_type').click(function () {
+        $('#exampleModal_msg_filter_dynamic_type').modal('show');
+    });
+})
 </script>
--->

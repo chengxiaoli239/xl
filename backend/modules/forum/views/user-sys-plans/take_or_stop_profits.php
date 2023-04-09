@@ -12,20 +12,18 @@
 </div>
 
 <!--提示框-start-->
-<!--
 <div class="modal fade" id="exampleModal_msg_plan_type" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
     <div class="modal-dialog modal-lg" role="document" style="width: 800px;margin: 100px auto;">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span></button>
-                <h4 class="modal-title" id="tip_msg_title">信息提示：</h4>
+                <!--
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">×</span></button>
+                -->
+                <h4 class="modal-title" id="tip_msg_title_plan_type">信息提示：</h4>
             </div>
             <div class="modal-body">
-                <form id="tip_form_msg" style="display:block; width:100%;height: 560px;overflow-y: scroll">
-                    <strong># 动态过滤类型说明：</strong>
-                    <pre>
-                        <code id="rst_code">
+                <strong># 动态过滤类型说明：</strong>
+                <pre><code id="rst_code_plan_type">
 <strong><font color="blue">1、正常：</font></strong>按照所填倍数，平刷
 <strong><font color="blue">2、倍投：</font></strong>选择此计划类型时，"倍数梯度" 为必填，翻倍梯度则不中时按照梯度逐步翻倍，比如翻倍梯度填：1-3-5-7，第一期不中，第二期倍数为3投注，再不中则倍数为5投注，如果翻完所有倍数还是不中，则会回到第1个倍数接着循环，期间只要中也会回到第1个倍数
 <strong><font color="blue">3、中则投否则反买：</font></strong>第一期中则按照现有的号码接着投，如果不中则反方向下注，次类型主要用于四定
@@ -37,22 +35,19 @@
 <strong><font color="blue">9、区间遗漏投：</font></strong>区间统计期数，比如20期、区间遗漏期数，比如15、区间止盈(例：3000)、区间止损(例：4000) 为必填，为20期中有15期不中，满足条件开始投，如果倍数梯度填写，则按照倍速翻倍打，如果中则回到第一个倍数继续翻倍投，期间只要触碰止盈或止损都会重新归零，进入等待状态，再次满足20期漏15期会进入下一个周期的下注
 <strong><font color="blue">10、中则倍投：</font></strong>选择此计划类型时，"倍数梯度" 为必填，第一期模拟中，则开始下注，如果不中则进入等待状态，等下一次模拟中再接着打下一个倍数，期间只要真实中都会回到第1个倍数接着打，如果翻完所有倍数还是不中，则回到第一个倍数
 <strong><font color="blue">11、遗漏倍投2：</font></strong>选择此类型计划是，"倍数梯度" 和 "遗漏x期投" 为必填项。比如遗漏填：5，翻倍梯度填：1-3-5，则遗漏5期之后开始下注，第一期1倍不中，第二期3倍下注，再不中则5倍下注，走完所有倍数不中则进入等待状态，等待满足遗漏5期，再次起投，期间中奖也一样进入等待状态
-                        </code>
-                    </pre>
-                </form>
+                </code></pre>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" data-type="" id="confirm_ms">确定</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" data-type="">确定</button>
             </div>
         </div>
     </div>
 </div>
 <script>
-    $(function () {
-        $('#tag_plan_type').click(function () {
-            $('#exampleModal_msg_plan_type').modal('show');
-        });
-    })
+$(function () {
+    $('#tag_plan_type').click(function () {
+        $('#exampleModal_msg_plan_type').modal('show');
+    });
+})
 </script>
--->
