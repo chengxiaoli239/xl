@@ -2728,12 +2728,11 @@ class NumService extends BaseService {
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
         $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
         if(empty($current_kj_qihao)){
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $next_qihao = $DataDealStatus['next_qihao'];
+        }else{
             $next_qihao = KjDataGet::getNextQihaoByQihao($current_kj_qihao, $lottery_type);
-            if(empty($next_qihao)){
-                $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
-                $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
-                $next_qihao = $DataDealStatus['next_qihao'];
-            }
         }
         $lastQihaoNum = substr($next_qihao, -1); # 即将下注期号最后一位，126期，则为：6
         #p([$next_qihao, substr($next_qihao, -1)]);
