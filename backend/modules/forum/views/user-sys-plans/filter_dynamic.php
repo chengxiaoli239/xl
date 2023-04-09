@@ -9,8 +9,10 @@
         <?= $form->field($model, 'filter_dynamic_types')->checkboxList($filter_dynamic_typesArr)->label('动态过滤类型 <span id="tag_filter_dynamic_type" class="glyphicon glyphicon-comment"></span>') ?>
     </div>
 </div>
+
 <!--提示框-start-->
-<div class="modal fade " id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
+<!--
+<div class="modal fade" id="exampleModal_msg_filter_dynamic_type" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
     <div class="modal-dialog modal-lg" role="document" style="width: 800px;margin: 100px auto;">
         <div class="modal-content">
             <div class="modal-header">
@@ -46,13 +48,12 @@
 <strong><font color="blue">21、过滤1345最近2000组(四定)：</font></strong>过滤掉最近2000期的号码，不够往后搜集，1345代表：千十个五
 <strong><font color="blue">22、过滤前100期开过号码的全转(四定)：</font></strong>过滤掉前100期开过号码全转的直码
 <strong><font color="blue">23、过滤前期同位置号码(四定6561组)：</font></strong>比如上期开：3456，则：千位不等于3、百位不等于4、十位不等于5、个不等于6
+<strong><font color="blue">24、过滤期号尾号一致的历史开奖号码：</font></strong>比如上期期号：288期，则历史开奖期号，128期、108期、008期对应的所有直码都剔除
+<strong><font color="blue">25、1小1大，剔除前期号码至少1个上奖：</font></strong>01234上一个，56789上一个，上期开奖；3456，则剔除之后012789上两个，比如3458，5669这些都中奖，3455，3446不中奖
                         </code>
                     </pre>
                 </form>
             </div>
-            <!--div class="form-group down-reason">
-                <p><label>备注信息:</label><input class="form-control" id="message" name="message" /></p>
-            </div-->
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" data-type="" id="confirm_ms">确定</button>
@@ -60,11 +61,11 @@
         </div>
     </div>
 </div>
-<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
 <script>
     $(function () {
         $('#tag_filter_dynamic_type').click(function () {
-            $('#exampleModal_msg').modal('show');
+            $('#exampleModal_msg_filter_dynamic_type').modal('show');
         });
     })
 </script>
+-->

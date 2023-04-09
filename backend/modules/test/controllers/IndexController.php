@@ -326,6 +326,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(6337);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p(count($filter_dynamic_codes));
         $rst = Lucky5Service::login($uid = 12, $tz_system_id = 9);
         p($rst);
         $rst['opProfitsPlans'] = SscDataService::opProfitsPlans($lottery_type = 8);
@@ -336,9 +339,6 @@ class IndexController extends Controller
         p($rst);
         $rst = SevenService::synBalance(17);
         p($rst);
-        $plan = UserSysPlans::findOne(6269);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
-        p(count($filter_dynamic_codes));
         $params = [];
         $is_auto_audit = $params['is_auto_audit'] ?? 1;
         p($is_auto_audit);

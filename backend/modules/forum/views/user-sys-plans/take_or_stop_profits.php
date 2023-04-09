@@ -12,7 +12,8 @@
 </div>
 
 <!--提示框-start-->
-<div class="modal fade " id="exampleModal_msg_plan_type" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
+<!--
+<div class="modal fade" id="exampleModal_msg_plan_type" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
     <div class="modal-dialog modal-lg" role="document" style="width: 800px;margin: 100px auto;">
         <div class="modal-content">
             <div class="modal-header">
@@ -40,9 +41,6 @@
                     </pre>
                 </form>
             </div>
-            <!--div class="form-group down-reason">
-                <p><label>备注信息:</label><input class="form-control" id="message" name="message" /></p>
-            </div-->
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" data-type="" id="confirm_ms">确定</button>
@@ -50,7 +48,6 @@
         </div>
     </div>
 </div>
-<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
 <script>
     $(function () {
         $('#tag_plan_type').click(function () {
@@ -58,3 +55,4 @@
         });
     })
 </script>
+-->
