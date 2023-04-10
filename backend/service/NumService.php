@@ -66,10 +66,10 @@ class NumService extends BaseService {
         28=>'过滤期号尾号一致历史直码(四定)',
         29=>'剔除前期号码至少1个上奖',
         30=>'剔除前期号码至少2个上奖',
-        31=>'剔除前300期123位一致的直码',
-        32=>'剔除前300期124位一致的直码',
-        33=>'剔除前300期134位一致的直码',
-        34=>'剔除前300期234位一致的直码',
+        31=>'剔除前300期123位一致的直码 ',
+        32=>'剔除前300期124位一致的直码 ',
+        33=>'剔除前300期134位一致的直码 ',
+        34=>'剔除前300期234位一致的直码 ',
     ];
 
     /**
@@ -1963,7 +1963,7 @@ class NumService extends BaseService {
                 foreach ($filter7['remove_types'] as $key7=>$v7){
                     $desc .= $codeTypes1[$v7].',';
                 }
-                $desc = trim($desc, ',').' ';
+                $desc = trim($desc, ',').'  ';
             }
         }
         if(isset($hz_Arr['history_max_miss'])) {
