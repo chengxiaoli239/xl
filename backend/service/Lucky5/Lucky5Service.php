@@ -1384,7 +1384,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $uid = max($TzSystemsUsers->uid, $uid);
         $data = self::httpGet($url, $headers, $uid, $time_out=15);
         if(is_string($data) && strpos($data, '您当前使用的浏览器不支持') !== false){
-            $roboot_id = Lucky5Service::getRobootIdByStr($data, $url);
+            $roboot_id = Lucky5Service::getRobotIdByStr($data, $url);
             $cookie = $TzSystemsUsers->cookie;
             preg_match("/robot7=([^\r\n]*); Seven/i", $cookie, $matches);
             $new_cookie = str_replace('robot7='.$matches[1], $roboot_id, $cookie);
@@ -1842,10 +1842,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
         ];
         $data = self::getCurl($url, $headers, $uid);
         if(is_string($data) && strpos($data, '您当前使用的浏览器不支持') !== false){
-            $roboot_id = Lucky5Service::getRobootIdByStr($data, $url);
+            $robot_id = Lucky5Service::getRobotIdByStr($data, $url);
             $cookie = $TzSystemsUsers->cookie;
             preg_match("/robot7=([^\r\n]*);Seven/i", $cookie, $matches);
-            $new_cookie = str_replace($matches, $roboot_id.';Seven', $cookie);
+            $new_cookie = str_replace($matches, $robot_id.';Seven', $cookie);
             //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
             $TzSystemsUsers->cookie = $new_cookie;
             $TzSystemsUsers->save();
@@ -1863,7 +1863,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param string $url
      * @return string
      */
-    public static function getRobootIdByStr($content = '', $url=''){
+    public static function getRobotIdByStr($content = '', $url=''){
         if(strpos($content, 'Set-Cookie') !== false){
             preg_match("/Set\-Cookie:([^\r\n]*)/i", $content, $matches);
         }else{

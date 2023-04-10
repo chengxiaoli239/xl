@@ -279,6 +279,30 @@ class TzSystemUsersService extends ClientsBaseService{
     }
 
     /**
+     * @desc 更新客户端用户robot_id
+     * @param string $access_token
+     * @param float $balance
+     */
+    public static function updateClientRobotId($access_token='', $err_msg=''){
+
+        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+        if(!empty($TzSystemsUsers)){
+            $robot_id = Lucky5Service::getRobotIdByStr($err_msg, $TzSystemsUsers->ssc_domain);
+            $cookie = $TzSystemsUsers->cookie;
+            preg_match("/robot7=([^\r\n]*);Seven/i", $cookie, $matches);
+            $new_cookie = str_replace($matches, $robot_id.';Seven', $cookie);
+            //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
+            $TzSystemsUsers->cookie = $new_cookie;
+
+            $TzSystemsUsers->updated_at = time();
+            $flag = $TzSystemsUsers->save();
+            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端余额同步', ['account'=>$TzSystemsUsers->username, 'access_token'=>$access_token]);
+        }
+
+        return ['status'=>200, 'data'=>['flag'=>$flag], 'msg'=>'操作成功'];
+    }
+
+    /**
      * @desc 客户端开奖数据同步
      * @param array $kjData
      * @param int $lottery_type

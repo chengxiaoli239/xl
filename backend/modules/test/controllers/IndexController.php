@@ -671,7 +671,7 @@ class IndexController extends Controller
         $str = "<!DOCTYPE HTML><html><head><meta charset=utf-8><script id='robot7_session_id'>document.cookie='robot7=2J4fnfqS6xPQWpZ51g2lYFRwLE6ggsfgoIf+jaKoZy7rtYrnSOO3uNDfuBuIBeWsFApMrJMVE8Zc9zJgxOskHA==; path=/; domain=.wm59ymu5.xyz';if (document.cookie.indexOf('robot7')>-1){window.location.reload();} else {alert('您当前使用的浏览器不支持cookie，无法使用本系统，请检查浏览器设置！');}</script></head></html>";
         $url = 'http://f1.wm59ymu5.xyz/Member/GetMemberPrint?_=1619486778000';
         $cookie = "robot7=2J4fnfqS6xPQWpZ51g2lYFRwLE6ggsfgoIf+jaKoZy7rtYrnSOO3uNDfuxxxx==; SevenStarHFDirector13Frontend13=dz4botbdoi5epu0mdjoptpih; Akamai_Cookie=2786069002.12917.0000; __cfduid=d07f0e2dd2f0a8875931dcda6d2a9ca8d1619486542; robot3=9RbFsoBv2eKKMLD2aMndJ+eoSzlNIdQmwE+n6ay1mmc=; NOTICE_LOGIN_IN=1";
-        $roboot_id = Lucky5Service::getRobootIdByStr($str, $url);
+        $roboot_id = Lucky5Service::getRobotIdByStr($str, $url);
         preg_match("/robot7=([^\r\n]*); Seven/i", $cookie, $matches);
         $new_cookie = str_replace($matches[1], $roboot_id, $cookie);
         p(['str' => $str, 'roboot_id' => $roboot_id, 'old_cookie' => $cookie, 'matches' => $matches, 'new_cookie' => $new_cookie]);
