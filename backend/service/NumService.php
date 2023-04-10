@@ -2840,19 +2840,29 @@ class NumService extends BaseService {
         $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
         $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $current_kj_qihao = $DataDealStatus['qihao'];
+        }else{
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
 
         $positions_str = 'code'.implode(',",",code', $positions);
-        $query = SscKjData::find()->select(['code_str', 'code_4n_str'=>'CONCAT('.$positions_str.')'])
+        $query = SscKjData::find()->select(['code_str', 'codes'=>'CONCAT('.$positions_str.')'])
             ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
             ->groupBy(['CONCAT('.$positions_str.')'])->orderBy(['id'=>SORT_DESC])->limit($num);
         #p($query->createCommand()->getRawSql());
         $needCodes = $query->asArray()->all();
-        $filterCodes = ArrayHelper::getColumn($needCodes, 'code_4n_str');
+        $filterCodes = ArrayHelper::getColumn($needCodes, 'codes');
         $filterCodesStr = implode('","', $filterCodes);
+        #p($filterCodesStr);
 
-        $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
-            ->where('n.code NOT IN("'.$filterCodesStr.'")')
+        $num_positions_str = 'code_'.implode(',",",code_', $positions);
+        $query = Num4Type::find()->select(['code', 'code_type'])
+            ->where('CONCAT('.$num_positions_str.') NOT IN("'.$filterCodesStr.'")')
             ->andWhere(['=', 'code_type', $playway+1]);
+        #p($query->createCommand()->getRawSql());
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
