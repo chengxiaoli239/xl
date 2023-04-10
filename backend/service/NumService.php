@@ -66,6 +66,10 @@ class NumService extends BaseService {
         28=>'过滤期号尾号一致历史直码(四定)',
         29=>'剔除前期号码至少1个上奖',
         30=>'剔除前期号码至少2个上奖',
+        31=>'剔除前300期123位一致的直码',
+        32=>'剔除前300期124位一致的直码',
+        33=>'剔除前300期134位一致的直码',
+        34=>'剔除前300期234位一致的直码',
     ];
 
     /**
@@ -2117,6 +2121,18 @@ class NumService extends BaseService {
                 case 30: # 排除前一期号码剩余号码至少上2个码
                     $codes = NumService::getBeforeKjCodesDynamic29($plan, $lottery_type, $cNum=2);
                     break;
+                case 31: #31=>'剔除前300期123位一致的直码',
+                    $codes = NumService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[1,2,3], $num=300);
+                    break;
+                case 32: #32=>'剔除前300期124位一致的直码',
+                    $codes = NumService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[1,2,4], $num=300);
+                    break;
+                case 33: # 33=>'剔除前300期134位一致的直码',
+                    $codes = NumService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[1,3,4], $num=300);
+                    break;
+                case 34: # 34 =>'剔除前300期234位一致的直码',
+                    $codes = NumService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[2,3,4], $num=300);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -2808,6 +2824,36 @@ class NumService extends BaseService {
         #$sql = $query->createCommand()->getRawSql();
         $NumTypes = $query->asArray()->all();
         #p(['kjCode'=>$NewCodes, 'count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 过滤positions一致的直码
+     * @param object $plan
+     * @param int $lottery_type
+     * @param int $num
+     * @return array
+     */
+    public static function getBeforeKjCodesDynamic31(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $positions=[1,2,3], $num=300){
+        $playway = $plan->playway;
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
+        $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+
+        $positions_str = 'code'.implode(',",",code', $positions);
+        $query = SscKjData::find()->select(['code_str', 'code_4n_str'=>'CONCAT('.$positions_str.')'])
+            ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
+            ->groupBy(['CONCAT('.$positions_str.')'])->orderBy(['id'=>SORT_DESC])->limit($num);
+        #p($query->createCommand()->getRawSql());
+        $needCodes = $query->asArray()->all();
+        $filterCodes = ArrayHelper::getColumn($needCodes, 'code_4n_str');
+        $filterCodesStr = implode('","', $filterCodes);
+
+        $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
+            ->where('n.code NOT IN("'.$filterCodesStr.'")')
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
         return $codes;

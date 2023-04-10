@@ -149,7 +149,7 @@ class UserController extends BaseController
             ]);
 
         }else {
-            BetService::synUserAllBalance($uid);
+            #BetService::synUserAllBalance($uid);
 
             $model = $this->findAllModel($uid);
             $view = "view";
