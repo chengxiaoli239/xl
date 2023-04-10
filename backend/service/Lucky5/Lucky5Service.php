@@ -1338,6 +1338,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @return mixed|string
      */
     public static function userInfo($uid, $tz_system_id, $is_auto = 1){
+        return [];
         $m = \Yii::$app->cache;
         $mkey = 'get_userInfo_'.$uid.'_'.$tz_system_id.'_'.$is_auto;
         //if($data = $m->get($mkey) && $is_auto==1) return $data;
