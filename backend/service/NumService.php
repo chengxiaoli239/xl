@@ -33,6 +33,9 @@ class NumService extends BaseService {
         3 => 4,
     ];
 
+    # 三个位置一直过滤期数
+    const BEFORE_3X_QS = 350;
+
     public static $pos_to_desc = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
     public static $pos_to_desc1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个', 5=>'五'];
     public static $filter_dynamic_types = [
@@ -2122,16 +2125,16 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic29($plan, $lottery_type, $cNum=2);
                     break;
                 case 31: #31=>'剔除前300期123位一致的直码',
-                    $codes = NumService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[1,2,3], $num=300);
+                    $codes = NumService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[1,2,3], $num=self::BEFORE_3X_QS);
                     break;
                 case 32: #32=>'剔除前300期124位一致的直码',
-                    $codes = NumService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[1,2,4], $num=300);
+                    $codes = NumService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[1,2,4], $num=self::BEFORE_3X_QS);
                     break;
                 case 33: # 33=>'剔除前300期134位一致的直码',
-                    $codes = NumService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[1,3,4], $num=300);
+                    $codes = NumService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[1,3,4], $num=self::BEFORE_3X_QS);
                     break;
                 case 34: # 34 =>'剔除前300期234位一致的直码',
-                    $codes = NumService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[2,3,4], $num=300);
+                    $codes = NumService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[2,3,4], $num=self::BEFORE_3X_QS);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
@@ -2836,7 +2839,7 @@ class NumService extends BaseService {
      * @param int $num
      * @return array
      */
-    public static function getBeforeKjCodesDynamic31(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $positions=[1,2,3], $num=300){
+    public static function getBeforeKjCodesDynamic31(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $positions=[1,2,3], $num=350){
         $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
         $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
