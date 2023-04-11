@@ -2852,7 +2852,8 @@ class NumService extends BaseService {
         $query = SscKjData::find()->select(['code_str', 'codes'=>'CONCAT('.$positions_str.')'])
             ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
             ->groupBy(['CONCAT('.$positions_str.')'])->orderBy(['id'=>SORT_DESC])->limit($num);
-        #p($query->createCommand()->getRawSql());
+        $sql0 = $query->createCommand()->getRawSql();
+        #p($sql0);
         $needCodes = $query->asArray()->all();
         $filterCodes = ArrayHelper::getColumn($needCodes, 'codes');
         $filterCodesStr = implode('","', $filterCodes);
@@ -2863,7 +2864,7 @@ class NumService extends BaseService {
             ->where('CONCAT('.$num_positions_str.') NOT IN("'.$filterCodesStr.'")')
             ->andWhere(['=', 'code_type', $playway+1]);
         $sql = $query->createCommand()->getRawSql();
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤最近'.$num.'期内三个位置一致的号码', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'current_kj_qihao'=>$current_kj_qihao, 'sql'=>$sql]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤最近'.$num.'期内三个位置一致的号码', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'current_kj_qihao'=>$current_kj_qihao, 'sql0'=>$sql0, 'sql'=>$sql]);
         #p($query->createCommand()->getRawSql());
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
