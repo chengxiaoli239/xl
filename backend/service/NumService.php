@@ -2851,7 +2851,7 @@ class NumService extends BaseService {
         $startIndexId = $lastIndexId - $num;
 
         $positions_str = 'code'.implode(',",",code', $positions);
-        $query = SscKjData::find()->select(['code_str', 'codes'=>'CONCAT('.$positions_str.')'])
+        $query = SscKjData::find()->select(['qihao', 'code_str', 'codes'=>'CONCAT('.$positions_str.')'])
             ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])->andWhere(['>', 'index_id', $startIndexId])
             ->groupBy(['CONCAT('.$positions_str.')'])->orderBy(['id'=>SORT_DESC])->limit($num);
         $sql0 = $query->createCommand()->getRawSql();
