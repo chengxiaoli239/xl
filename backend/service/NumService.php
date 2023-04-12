@@ -2115,7 +2115,7 @@ class NumService extends BaseService {
                 case 27: # 过滤前4最近1152组(四定)，不够往后搜集
                     $codes = NumService::getBeforeKjCodesDynamic10($plan, $lottery_type, $num=1152);
                     break;
-                case 28: # 过滤尾号一致历史直码(四定) - 待完成
+                case 28: # 过滤期号尾号一致历史直码(四定)
                     $codes = NumService::getBeforeKjCodesDynamic28($plan, $lottery_type);
                     break;
                 case 29: # 排除前一期号码剩余号码至少上1个码
@@ -2736,7 +2736,7 @@ class NumService extends BaseService {
     }
 
     /**
-     * 过滤类型号码 - # 过滤尾号一致历史直码(四定) - 待完成
+     * 过滤类型号码 - # 过滤期号尾号一致历史直码(四定)
      * @param int $lottery_type
      * @param int $playway
      * @return array
