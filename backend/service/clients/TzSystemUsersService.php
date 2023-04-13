@@ -368,7 +368,7 @@ class TzSystemUsersService extends ClientsBaseService{
         $RedisLock = new RedisLock();
         $Rkey = $access_token.'_'.__FUNCTION__.'_redis';
         $datas = [];
-        if($RedisLock->lock($Rkey.'_redis', 5)){
+        if($RedisLock->lock($Rkey.'_redis', 8)){
             if(true OR empty($flag)){
                 $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
                 if(!empty($TzSystemsUsers->expire_time) && $TzSystemsUsers->expire_time <= time()){

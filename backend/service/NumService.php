@@ -34,7 +34,7 @@ class NumService extends BaseService {
     ];
 
     # 三个位置一直过滤期数
-    const BEFORE_3X_QS = 350;
+    const BEFORE_3X_QS = 100;
 
     public static $pos_to_desc = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
     public static $pos_to_desc1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个', 5=>'五'];
@@ -69,10 +69,11 @@ class NumService extends BaseService {
         28=>'过滤期号尾号一致历史直码(四定)',
         29=>'剔除前期号码至少1个上奖',
         30=>'剔除前期号码至少2个上奖',
-        31=>'剔除前300期123位一致的直码 ',
-        32=>'剔除前300期124位一致的直码 ',
-        33=>'剔除前300期134位一致的直码 ',
-        34=>'剔除前300期234位一致的直码 ',
+        31=>'剔除前100期123位一致的直码 ',
+        32=>'剔除前100期124位一致的直码 ',
+        33=>'剔除前100期134位一致的直码 ',
+        34=>'剔除前100期234位一致的直码 ',
+        35=>'剔除历史期号一致的号码全倒 ',
     ];
 
     /**
@@ -2136,6 +2137,9 @@ class NumService extends BaseService {
                 case 34: # 34 =>'剔除前300期234位一致的直码',
                     $codes = NumService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[2,3,4], $num=self::BEFORE_3X_QS);
                     break;
+                case 35: # 过滤期号一致历史号码全倒(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic35($plan, $lottery_type);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -2870,6 +2874,45 @@ class NumService extends BaseService {
             ->andWhere(['=', 'code_type', $playway+1]);
         $sql = $query->createCommand()->getRawSql();
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤最近'.$num.'期内三个位置一致的号码', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'current_kj_qihao'=>$current_kj_qihao, 'sql0'=>$sql0, 'sql'=>$sql]);
+        #p($query->createCommand()->getRawSql());
+        $NumTypes = $query->asArray()->all();
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 过滤期号一致历史号码全倒(四定)
+     * @param int $lottery_type
+     * @param int $playway
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic35(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE){
+        $playway = $plan->playway;
+        #$nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $next_qihao = $DataDealStatus['next_qihao'];
+        }else{
+            $next_qihao = KjDataGet::getNextQihaoByQihao($current_kj_qihao, $lottery_type);
+        }
+        $lastQihaoNum = substr($next_qihao, -3); # 即将下注期号最后三位，126期，则为：126
+        #p([$next_qihao, substr($next_qihao, -3)]);
+
+        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'RIGHT(qihao, 3)', $lastQihaoNum]];
+        $historyKjDatasQuery = SscKjData::find()->select(['code_4n_str', 'code_4n'])->where($historyWhere);
+        #p($historyKjDatasQuery->createCommand()->getRawSql());
+        $historyKjDatas = $historyKjDatasQuery->asArray()->all();
+        $filterCodes = ArrayHelper::getColumn($historyKjDatas, 'code_4n');
+        $filterCodesStr = implode('","', $filterCodes);
+        #p($filterCodesStr);
+
+        $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
+            ->where('n.code_str NOT IN("'.$filterCodesStr.'")')
+            ->andWhere(['=', 'code_type', $playway+1]);
         #p($query->createCommand()->getRawSql());
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
