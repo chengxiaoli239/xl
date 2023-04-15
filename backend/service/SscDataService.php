@@ -2910,14 +2910,14 @@ class SscDataService extends BaseService {
             # 止盈止损、翻倍止盈止损 计划
             $where = [
                 'OR',
-                [ 'AND', ['IN', 'plan_type', [0, 1, 3, 5]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type], ['=', 'is_batch_simulate', 0] ],
+                [ 'AND', ['IN', 'plan_type', [0, 1, 3, 5]], ['=', 'status', 1], ['=', 'is_batch_simulate', 0] ],
                 [ 'AND', ['>', 'take_profits', 0], ['>', 'stop_loss', 0], ['=', 'status', 1], ['=', 'is_batch_simulate', 0] ]
             ];
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划2', ['lottery_type'=>$lottery_type]);
 
             $logArr = [];
             $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
-            if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
+            if($UserSysPlans = UserSysPlans::find()->where($where)->andWhere(['=', 'lottery_type', $lottery_type])->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     $Rkey = __FUNCTION__.'_redis_op_plan_0_1_3_5_'.$lottery_type.'_'.$UserSysPlan->id;
                     if(!$RedisLock->lock($Rkey, 30)){
