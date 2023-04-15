@@ -2800,7 +2800,7 @@ class NumService extends BaseService {
      * @param int $cNum 至少上cNum个
      * @return array
      */
-    private static function getBeforeKjCodesDynamic29(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $cNum=3){
+    private static function getBeforeKjCodesDynamic29(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $cNum=3, $is_get_double=1){
         $playway = $plan->playway;
         $nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
@@ -2833,16 +2833,29 @@ class NumService extends BaseService {
                 ['IN', 'code_4', $filterNumKjCodes],
             ];
         }else{
-            # 默认上两个
-            $whereFilteKjCodes = [
-                'OR',
-                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], 'code_1<>code_2'],
-                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], 'code_1<>code_3'],
-                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_1<>code_4'],
-                ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], 'code_2<>code_3'],
-                ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_2<>code_4'],
-                ['AND', ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_3<>code_4'],
-            ];
+            if(!$is_get_double){
+                # 默认上两个 - 剔除上期号码之后上两个 - 双重不算
+                $whereFilteKjCodes = [
+                    'OR',
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], 'code_1<>code_2'],
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], 'code_1<>code_3'],
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_1<>code_4'],
+                    ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], 'code_2<>code_3'],
+                    ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_2<>code_4'],
+                    ['AND', ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_3<>code_4'],
+                ];
+            }else{
+                # 默认上两个 - 剔除上期号码之后上两个 - 双重算
+                $whereFilteKjCodes = [
+                    'OR',
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes]], #, 'code_1<>code_2' 剔除两个号码不一样之后双重的也算
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes]], #, 'code_1<>code_3'
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes]], #, 'code_1<>code_4'
+                    ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes]], #, 'code_2<>code_3'
+                    ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes]], #, 'code_2<>code_4'
+                    ['AND', ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes]], #, 'code_3<>code_4'
+                ];
+            }
         }
         $query->andWhere($whereFilteKjCodes);
         #$sql = $query->createCommand()->getRawSql();
