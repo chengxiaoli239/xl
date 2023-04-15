@@ -2779,8 +2779,11 @@ class NumService extends BaseService {
 
         $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'RIGHT(qihao, 1)', $lastQihaoNum]];
         $positions_str = 'code'.implode(',",",code', $positions);
-        $historyKjDatas = SscKjData::find()->select(['code_str', 'code_4n_str'=>'CONCAT('.$positions_str.')'])
-            ->where($historyWhere)->asArray()->all();
+        $historyKjDatasQuery = SscKjData::find()->select(['code_str', 'code_4n_str'=>'CONCAT('.$positions_str.')'])
+            ->where($historyWhere);
+        $sql = $historyKjDatasQuery->createCommand()->getRawSql();
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤期号尾号一致', ['positions'=>$positions, 'next_qihao'=>$next_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+        $historyKjDatas = $historyKjDatasQuery->asArray()->all();
         $filterCodes = ArrayHelper::getColumn($historyKjDatas, 'code_4n_str');
         $filterCodesStr = implode('","', $filterCodes);
 
@@ -2811,8 +2814,7 @@ class NumService extends BaseService {
         $NewKjCodes = $nextQuery->limit(1)->one(); # 最新一期
         $NewCodes = array_unique([$NewKjCodes->code1, $NewKjCodes->code2, $NewKjCodes->code3, $NewKjCodes->code4]);
         $filterNumKjCodes = array_diff(NumService::$ALL_CODES, $NewCodes); # 剔除上期开奖号码之后的号码
-        $query = Num4Type::find()
-            ->where(['=', 'code_type', $playway+1]);
+        $query = Num4Type::find()->where(['=', 'code_type', $playway+1]);
         if($cNum == 3) {
             # 上三个
             $whereFilteKjCodes = [
@@ -2858,7 +2860,8 @@ class NumService extends BaseService {
             }
         }
         $query->andWhere($whereFilteKjCodes);
-        #$sql = $query->createCommand()->getRawSql();
+        $sql = $query->createCommand()->getRawSql();
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤期号尾号一致', ['current_kj_qihao'=>$current_kj_qihao, 'filterNumKjCodes'=>$filterNumKjCodes, 'plan_id'=>$plan->id, 'NewCodes'=>$NewCodes, 'sql'=>$sql]);
         $NumTypes = $query->asArray()->all();
         #p(['kjCode'=>$NewCodes, 'count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
