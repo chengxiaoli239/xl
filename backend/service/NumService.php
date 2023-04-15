@@ -2768,10 +2768,12 @@ class NumService extends BaseService {
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
         $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
         if(empty($current_kj_qihao)){
+            $is_empty_c_qihao = 1;
             $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
             $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
             $next_qihao = $DataDealStatus['next_qihao'];
         }else{
+            $is_empty_c_qihao = 0;
             $next_qihao = KjDataGet::getNextQihaoByQihao($current_kj_qihao, $lottery_type);
         }
         $lastQihaoNum = substr($next_qihao, -1); # 即将下注期号最后一位，126期，则为：6
@@ -2782,7 +2784,7 @@ class NumService extends BaseService {
         $historyKjDatasQuery = SscKjData::find()->select(['code_str', 'code_4n_str'=>'CONCAT('.$positions_str.')'])
             ->where($historyWhere);
         $sql = $historyKjDatasQuery->createCommand()->getRawSql();
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤期号尾号一致', ['positions'=>$positions, 'lottery_type'=>$lottery_type, 'next_qihao'=>$next_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤期号尾号一致', ['positions'=>$positions, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'next_qihao'=>$next_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
         $historyKjDatas = $historyKjDatasQuery->asArray()->all();
         $filterCodes = ArrayHelper::getColumn($historyKjDatas, 'code_4n_str');
         $filterCodesStr = implode('","', $filterCodes);
