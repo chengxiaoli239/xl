@@ -1984,6 +1984,7 @@ abstract class BetService extends BaseBetService {
                         $qihao = HN0898Service::getQihao($lottery_type); # 下期期号
                     }else{
                         TzSystemUsersService::getActiveQihao($lottery_type, $next_qihao); # 下期期号
+                        $qihao = $next_qihao;
                     }
                     $is_equal = ($qihao==$next_qihao) ? 1 : 0;
                     Tool_Common::log('insertPlansTask', 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'is_equal'=>$is_equal, 'lottery_type'=>$lottery_type]);
