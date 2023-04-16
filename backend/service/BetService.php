@@ -1980,7 +1980,7 @@ abstract class BetService extends BaseBetService {
                     $lottery_type = $plan->lottery_type;
                     $uid = $plan->uid;
                     $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
-                    if($lottery_type == DEFAULT_LOTTERY_TYPE){
+                    if($lottery_type == 8){
                         $qihao = HN0898Service::getQihao($lottery_type); # 下期期号
                     }else{
                         TzSystemUsersService::getActiveQihao($lottery_type, $next_qihao); # 下期期号
