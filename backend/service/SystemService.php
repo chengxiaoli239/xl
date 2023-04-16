@@ -18,7 +18,7 @@ class SystemService{
      * @return string
      */
     public static function getInitLotteryDataKey($lottery_type=DEFAULT_LOTTERY_TYPE){
-        return 'getInitLotteryDataKey_x0_'.$lottery_type;
+        return 'getInitLotteryDataKey_x1_'.$lottery_type;
     }
 
     /**
