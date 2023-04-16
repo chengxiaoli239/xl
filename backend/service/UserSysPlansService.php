@@ -550,6 +550,11 @@ class UserSysPlansService extends BaseService {
         $post['UserSysPlans']['account'] = $User->username;
         $post['UserSysPlans']['updated_at'] = time();
 
+        # 翻倍计划如果翻倍梯度为空则赋值倍数
+        if(in_array($plan_type, SscDataService::$fb_plan_types) && empty($post['UserSysPlans']['singles'])){
+            $post['UserSysPlans']['singles'] = trim($post['UserSysPlans']['single']);
+        }
+
         if(!$post['UserSysPlans']['id']){
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$user_id, 'tz_system_id'=>$post['UserSysPlans']['tz_sites'][0], 'status'=>1]);
             $tz_sort = 99;

@@ -1731,7 +1731,7 @@ class SscDataService extends BaseService {
         $start_time = microtime(true);
         try {
 
-            $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, $qihao, $field='updateDs_status');
+            $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, $qihao, $statusField='updateDs_status');
 
             $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
             $data = explode(',',$SscKjData['code_str']);
@@ -1808,7 +1808,7 @@ class SscDataService extends BaseService {
         }
 
         $end_time = microtime(true);
-        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s', 'deal_time'=>date('Y-m-d H:i:s')]);
+        SscDataService::dealDataRecord($DataDealStatus, $statusField, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s', 'deal_time'=>date('Y-m-d H:i:s')]);
         return $rst;
     }
 
@@ -1872,7 +1872,7 @@ class SscDataService extends BaseService {
             $DataDealStatus->{$field.'_desc'} = json_encode($dealDesc, 320);
             $DataDealStatus->save();
         }catch (\Exception $e){
-            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '处理数据任务状态', ['err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '处理数据任务状态', ['err_msg'=>$e->getMessage(), 'line'=>$e->getLine(), 'file'=>$e->getFile()]);
             return false;
         }
 
@@ -2964,6 +2964,7 @@ class SscDataService extends BaseService {
                     }
                     $flag = SscDataService::isZjBefore($UserSysPlan->id);
                     $flags[$UserSysPlan->uid][$UserSysPlan->id] = $flag;
+                    $originSingle = $UserSysPlan->single;
 
                     # 遗漏期数[不中奖期数]
                     $lossQs = self::getLossQs($UserSysPlan->id);
@@ -3046,6 +3047,7 @@ class SscDataService extends BaseService {
                     $whereUpdate = ['id'=>$UserSysPlan->id ]; # 更新条件
                     $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['whereUpdate'] = $whereUpdate;
 
+                    $single = (!empty($single)) ? $single : $originSingle;
                     $updateData = ['single'=>$single];
                     if(isset($codes_hz['status_val'])){ # 号码切换&倍投
                         # 号码切换

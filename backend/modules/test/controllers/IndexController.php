@@ -326,6 +326,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst = StaticService::static4dPerDateProfits($lottery_type = 8);
+        p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $plan = UserSysPlans::findOne(6495);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         p(count($filter_dynamic_codes));
@@ -1105,8 +1107,6 @@ class IndexController extends Controller
         p($codesArr);
         $rst = SscDataService::calulateBeforeProfits();
         p($rst); # 统计前面多少期号码的中奖利润
-        $rst[] = StaticService::static4dPerDateProfits($lottery_type = 5);
-        p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst = StaticService::staticSDPerDateProfits(date('Y-m-d'));
         p($rst);
         $rst = NumService::getCodesKuaiXuan(['type_4' => 0, 'type_2' => 1, 'type_4d' => 1]);
