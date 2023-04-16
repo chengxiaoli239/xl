@@ -1967,9 +1967,9 @@ abstract class BetService extends BaseBetService {
             //$where[] = ['=', 'uid', 17]; # 测试
 
             $plans = UserSysPlans::find()->where($where)->all();
-            Tool_Common::log('/plans_tasks/'.__FUNCTION__, 'INFO', '批量插入任务000', ['lottery_type'=>$lottery_type, 'counts'=>count($plans)]);
+            Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '批量插入任务000', ['lottery_type'=>$lottery_type, 'counts'=>count($plans)]);
             if(empty($plans)){
-                Tool_Common::log('plan_is_active', 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>'没有开启的计划', 'uid'=>$plans[0]->uid]);
+                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>'没有开启的计划', 'uid'=>$plans[0]->uid]);
                 continue;
             }
             $m = \Yii::$app->cache;
@@ -1987,7 +1987,7 @@ abstract class BetService extends BaseBetService {
                         $qihao = $next_qihao;
                     }
                     $is_equal = ($qihao==$next_qihao) ? 1 : 0;
-                    Tool_Common::log('insertPlansTask', 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'is_equal'=>$is_equal, 'lottery_type'=>$lottery_type]);
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'is_equal'=>$is_equal, 'lottery_type'=>$lottery_type]);
                     //if($uid != 17) continue; # 测试
 
                     $insert_mkey = 'insertPlanTask_key_'.$lottery_type.'_'.$plan->id;
@@ -1997,20 +1997,20 @@ abstract class BetService extends BaseBetService {
                     $Task = BetErrorPlansTask::findOne(['plan_id'=>$plan->id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
                     if($Task){
                         $logArr = ['status'=>200, 'msg'=>'已记录推送表'.$lottery_type.'_'.$qihao];
-                        Tool_Common::log('insert_plan_task', 'ERR', '写入计划任务表', $logArr);
+                        Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '写入计划任务表', $logArr);
                         throw new Exception('已记录推送表'.$lottery_type.'_'.$qihao);
                     }
 
                     //$next_qihao_is_active = TzService::beforeBet($lottery_type, $c_active_qihao);
 
                     $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao, 'opProfitsPlans_status');
-                    Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus, 'task_qihao'=>$qihao]);
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus, 'task_qihao'=>$qihao]);
                     if(empty($DataDealStatus) OR $DataDealStatus != 2){
                         $dateHI = date('H:i');
                         if('09:00'<=$dateHI && $dateHI<='09:05' && $lottery_type==DEFAULT_LOTTERY_TYPE){
                             #return ['status'=>200, 'data'=>['next_qihao'=>date('Ymd').'109']];
                         }else{
-                            Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
+                            Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao_not_active']);
                             throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
                         }
                     }
@@ -2029,7 +2029,7 @@ abstract class BetService extends BaseBetService {
                     }else{
                         $task_qihao = $qihao;
                         $logArr = ['plan_id'=>$plan->id, 'is_auto_bet'=>$TzSystemsUsers->is_auto_bet, 'lottery_type'=>$lottery_type, 'uid'=>$uid];
-                        Tool_Common::log('insertPlansTask', 'INFO', '插入计划任务-1', $logArr);
+                        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入计划任务-1', $logArr);
 
                         list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
                         if($code>0 OR !$TzSystemsUsers->is_auto_bet){
@@ -2039,7 +2039,7 @@ abstract class BetService extends BaseBetService {
                         $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
                         $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
                         if(!$activeQihao OR (isset($activeQihao['status']) && $activeQihao['status'] == '30200')){
-                            Tool_Common::log('accountIsExpire', 'ERR', '封盘或者未开盘-2', ['uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'activeQihao'=>$activeQihao]);
+                            Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '封盘或者未开盘-2', ['uid'=>$plan->uid, 'lottery_type'=>$lottery_type, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id, 'activeQihao'=>$activeQihao]);
                             throw new \Exception('封盘或者未开盘-2');
                         }
 
@@ -2065,7 +2065,7 @@ abstract class BetService extends BaseBetService {
                         $rst['data'][$plan->id] = $insertRst;
                         $logArr = ['uid'=>$uid, 'account'=>$plan->account, 'plan_id'=>$plan->id, 'activeQihao'=>$activeQihao, 'insertRst'=>$insertRst];
                         $user_ids[$uid] = ['user_id'=>$uid];
-                        Tool_Common::log('insertPlansTask', 'INFO', '插入计划-任务-2', $logArr);
+                        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入计划-任务-2', $logArr);
                     }
                     $rst['data'] = ['activeQihao'=>$activeQihao, 'plan_id'=>$plan->id, 'msg'=>'正常', 'qihao'=>$qihao];
                 }catch (\Exception $e){
