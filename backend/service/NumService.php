@@ -2579,7 +2579,7 @@ class NumService extends BaseService {
     }
 
     /**
-     * 过滤类型号码 - 过滤前3000期开过的号码
+     * 过滤类型号码 - 过滤前2880期开过的号码
      * @param object $plan
      * @param int $lottery_type
      * @param int $num
@@ -2594,11 +2594,13 @@ class NumService extends BaseService {
         $query = SscKjData::find()->select(['code_str', 'code_4n_str'=>'CONCAT('.$positions_str.')'])
             ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
             ->groupBy(['CONCAT('.$positions_str.')'])->orderBy(['id'=>SORT_DESC])->limit($num);
-        #p($query->createCommand()->getRawSql());
+        $sql = $query->createCommand()->getRawSql();
+        #p($sql);
         $needCodes = $query->asArray()->all();
         $filterCodes = ArrayHelper::getColumn($needCodes, 'code_4n_str');
         $filterCodesStr = implode('","', $filterCodes);
 
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤前2880期开过的号码', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type , 'current_kj_qihao'=>$current_kj_qihao, 'sql'=>$sql]);
         $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
             ->where('n.code NOT IN("'.$filterCodesStr.'")')
             ->andWhere(['=', 'code_type', $playway+1]);
