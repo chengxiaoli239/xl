@@ -2919,32 +2919,36 @@ class SscDataService extends BaseService {
             $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
             if($UserSysPlans = UserSysPlans::find()->where($where)->andWhere(['=', 'lottery_type', $lottery_type])->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
-                    $Rkey = __FUNCTION__.'_redis_op_plan_0_1_3_5_'.$lottery_type.'_'.$UserSysPlan->id;
-                    if(!$RedisLock->lock($Rkey, 30)){
-                        Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略1', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
-                        continue;
-                    }
-                    $profits = SscDataService::getPlanProfits($UserSysPlan);
+                    try {
+                        $Rkey = __FUNCTION__.'_redis_op_plan_0_1_3_5_'.$lottery_type.'_'.$UserSysPlan->id;
+                        if(!$RedisLock->lock($Rkey, 30)){
+                            Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略1', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+                            continue;
+                        }
+                        $profits = SscDataService::getPlanProfits($UserSysPlan);
 
-                    $maxQihao = BetService::$maxQihaoArr[$lottery_type];
-                    $qihao = substr($current_kj_qihao,-3); # 最后三位
-                    if(in_array($lottery_type, [8]) && $maxQihao == $qihao){
-                        $profits = 0.00; # 每天的盈利重新计算
-                    }
+                        $maxQihao = BetService::$maxQihaoArr[$lottery_type];
+                        $qihao = substr($current_kj_qihao,-3); # 最后三位
+                        if(in_array($lottery_type, [8]) && $maxQihao == $qihao){
+                            $profits = 0.00; # 每天的盈利重新计算
+                        }
 
-                    //if(($UserSysPlan->take_profits!=0 && $UserSysPlan->stop_loss!=0) AND ($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits))){
-                    if($profits>=$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<=(0-$profits)){
-                        $UserSysPlan->status = 0;
-                    }
-                    $hzArr = json_decode($UserSysPlan->hz_Arr, 320);
-                    if(isset($hzArr['filters'])){
-                        $hzArr['filters']['current_kj_qihao'] = $current_kj_qihao;
-                    }
-                    $UserSysPlan->hz_Arr = json_encode($hzArr, 320);
-                    $UserSysPlan->current_profits = $profits;
-                    $saveFlag = $UserSysPlan->save();
+                        //if(($UserSysPlan->take_profits!=0 && $UserSysPlan->stop_loss!=0) AND ($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits))){
+                        if($profits>=$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<=(0-$profits)){
+                            $UserSysPlan->status = 0;
+                        }
+                        $hzArr = json_decode($UserSysPlan->hz_Arr, 320);
+                        if(isset($hzArr['filters'])){
+                            $hzArr['filters']['current_kj_qihao'] = $current_kj_qihao;
+                        }
+                        $UserSysPlan->hz_Arr = json_encode($hzArr, 320);
+                        $UserSysPlan->current_profits = $profits;
+                        $saveFlag = $UserSysPlan->save();
 
-                    $logArr['plan_1_3_5'][$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
+                        $logArr['plan_1_3_5'][$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
+                    }catch (\Exception $e){
+                        $logArr['plan_1_3_5'][$UserSysPlan->id] = ['err_msg'=>$e->getMessage()];
+                    }
                 }
             }
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划3', $logArr);
@@ -5112,9 +5116,12 @@ class SscDataService extends BaseService {
      * @param string $qihao
      * @return bool
      */
-    public static function insertLotteryDealDataStatus($lottery_type){
+    public static function insertLotteryDealDataStatus($lottery_type=DEFAULT_LOTTERY_TYPE){
 
         try {
+            if(empty($lottery_type)){
+                throw_info('彩种类型lottery_type不能为空');
+            }
 
             $DataDealStatus = LotteryDataDealStatus::findOne(['lottery_type'=>$lottery_type]);
             if(!empty($DataDealStatus)){
