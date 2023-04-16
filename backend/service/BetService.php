@@ -1990,7 +1990,7 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'is_equal'=>$is_equal, 'lottery_type'=>$lottery_type]);
                     //if($uid != 17) continue; # 测试
 
-                    $insert_mkey = 'insertPlanTask_key_'.$lottery_type.'_'.$plan->id;
+                    $insert_mkey = 'insertPlanTask_key_'.$lottery_type.'_'.$qihao.'_'.$plan->id;
                     if($m->get($insert_mkey)){
                         throw new Exception('已记录yx表'.$lottery_type.'_'.$qihao.'_'.$plan->id);
                     }
@@ -2024,7 +2024,7 @@ abstract class BetService extends BaseBetService {
                     if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
                         $testInsertRst = self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid, $plan->hz_Arr, $r=3); # 直接记录表
                         if($testInsertRst['status'] == 200){
-                            $m->set($insert_mkey, 1, 120);
+                            $m->set($insert_mkey, 1, 60);
                         }
                     }else{
                         $task_qihao = $qihao;
