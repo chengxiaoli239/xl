@@ -221,7 +221,7 @@ class TzSystemUsersService extends ClientsBaseService{
             $DataDealStatus = $query->asArray()->orderBy(['id'=>SORT_DESC])->one();
             $next_qihao = $DataDealStatus['next_qihao'];
 
-            $m->set($mkey, $next_qihao, 65);
+            $m->set($mkey, $next_qihao, ($lottery_type==23) ? 10 : 65);
         }
         if(empty($next_qihao)){
             return ['status'=>300, 'data'=>[]];
