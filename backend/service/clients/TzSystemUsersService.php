@@ -198,7 +198,7 @@ class TzSystemUsersService extends ClientsBaseService{
      * @param int $lottery_type
      * @return mixed|string
      */
-    public static function getActiveQihao($lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function getActiveQihao($lottery_type=DEFAULT_LOTTERY_TYPE, &$next_qihao=''){
 
         $m = \Yii::$app->cache;
         $mkey = self::buildActiveQihaoKey($lottery_type);
