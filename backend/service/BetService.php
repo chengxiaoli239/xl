@@ -440,7 +440,7 @@ abstract class BetService extends BaseBetService {
                         #}
                         $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao, 'opProfitsPlans_status');
                         Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan_id, 'DataDealStatus'=>$DataDealStatus, 'task_qihao'=>$qihao]);
-                        if(empty($DataDealStatus)){ #  OR $DataDealStatus != 2
+                        if(empty($DataDealStatus) OR $DataDealStatus != 2){
                             Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus]);
                             throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
                         }
@@ -2005,7 +2005,7 @@ abstract class BetService extends BaseBetService {
 
                     $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao, 'opProfitsPlans_status');
                     Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus, 'task_qihao'=>$qihao]);
-                    if(empty($DataDealStatus)){ #  OR $DataDealStatus != 2
+                    if(empty($DataDealStatus) OR $DataDealStatus != 2){
                         $dateHI = date('H:i');
                         if('09:00'<=$dateHI && $dateHI<='09:05' && $lottery_type==DEFAULT_LOTTERY_TYPE){
                             #return ['status'=>200, 'data'=>['next_qihao'=>date('Ymd').'109']];
