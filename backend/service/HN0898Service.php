@@ -1323,7 +1323,8 @@ class HN0898Service extends BaseTZService {
             case 23: # 以太坊3分
             case 24: # 以太坊10分
             case 25: # 江苏七位数
-                $qihao = QxcTcw::getNineNineQihao($lottery_type, $is_auto = 1) + 1;# 即将开奖的期号
+                TzSystemUsersService::getActiveQihao($lottery_type, $next_qihao); # 即将开奖的期号
+                $qihao = $next_qihao;
             break;
         }
 
