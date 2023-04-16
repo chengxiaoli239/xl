@@ -40,6 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'id',
                         'qihao',
                         //'kj_code',
+                        ['attribute'=>'index_id', 'label'=>'序号'], //'headerOptions'=>['width'=>'5%'],
                         'code_str',
                         //'codes_hz',
                         //'codes_4nums_hz',
