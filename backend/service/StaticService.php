@@ -1181,6 +1181,7 @@ class StaticService extends BaseService {
 
         $start_time = microtime(true);
         try {
+            Tool_Common::log('/datas/'.__FUNCTION__, "INFO", '四定利润统计状态', ['lottery_type'=>$lottery_type, 'fun'=>__FUNCTION__]);
             $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, '', $field='static4dPerDateProfits_status');
 
             $allStaticProfits = self::allDateStaticProfits($lottery_type, $s_date);
