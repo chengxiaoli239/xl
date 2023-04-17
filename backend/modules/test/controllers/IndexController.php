@@ -326,6 +326,15 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $SscKjData = SscKjData::find()->select(['qihao'])->where(['lottery_type'=>8])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one();
+        p($SscKjData);
+        $kjData = SscKjData::findOne(['qihao'=>'20230417102', 'lottery_type'=>8])->code_str;
+        $query2 = SscKjData::find()->select(['code_str'])->where(['qihao'=>'20230417102', 'lottery_type'=>8])->asArray()->limit(1);
+        $kjData2 = $query2->limit(1)->one()['code_str'];
+        p([$kjData, $kjData2, $query2->createCommand()->getRawSql()]);
+        $isExists = SscKjData::findOne(['lottery_type'=>8,'qihao'=>'20230417102']);
+        $isExists2 = SscKjData::find()->where(['lottery_type'=>8,'qihao'=>'20230417102'])->one();
+        p([$isExists, $isExists2]);
         $rst = StaticService::static4dPerDateProfits($lottery_type = 8);
         p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $plan = UserSysPlans::findOne(6495);

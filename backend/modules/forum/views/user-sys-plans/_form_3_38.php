@@ -6,7 +6,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model backend\models\UserSysPlans */
 /* @var $form yii\widgets\ActiveForm */
-$SscKjDatas = \backend\models\SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->limit(18)->all();
+$SscKjDatas = \backend\models\SscKjData::find()->select(['update_time', 'code_str', 'codes_4nums_hz', 'qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->limit(18)->all();
 $this->title = '新过滤快打';
 ?>
 <style>

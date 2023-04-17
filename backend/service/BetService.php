@@ -2274,7 +2274,7 @@ abstract class BetService extends BaseBetService {
             ];
             $remove_types = $hzArr['remove_types'] ? : [];
 
-            $SscKjData = SscKjData::find()->where($qh_where)->one();
+            $SscKjData = SscKjData::find()->where($qh_where)->limit(1)->one();
             # 兄弟
             if($SscKjData->type_2b == 0){
                 $hzArr['type_2b'] = 1;

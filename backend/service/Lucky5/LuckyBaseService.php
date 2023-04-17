@@ -1467,22 +1467,6 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         return $rst;
     }
 
-
-    /**
-     * @desc 某定位组合遗漏 例如： [8,9]
-     * @return array
-     */
-    public static function dwHzZuHeYL($zuhe = [2,3],$hezhis = [8,9]){
-        $field = 'code_'.implode('_',$zuhe);
-        $where = [ $field => $hezhis];
-        $id = SscKjData::find()->where($where)->orderBy('id DESC')->one()['id'];
-
-        $maxId = SscKjData::find()->orderBy('id DESC')->one()['id'];
-        $times = $maxId - $id;
-
-        return $times;
-    }
-
     /**
      * @desc 彩种
      * @param string $playway

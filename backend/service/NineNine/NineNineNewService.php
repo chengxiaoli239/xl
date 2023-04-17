@@ -1452,7 +1452,7 @@ class NineNineNewService extends BaseTZService {
      */
     public static function isExist($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
-        $exist = SscKjData::findOne(['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
+        $exist = SscKjData::find()->select(['id'])->where(['lottery_type'=>$lottery_type, 'qihao'=>$qihao])->asArray()->limit(1)->one();
 
         return $exist ? true : false;
     }
@@ -2204,21 +2204,6 @@ class NineNineNewService extends BaseTZService {
         if(!$rst) return ['status'=>200,'msg'=>current($bettingRecords->getErrors())];
 
         return $rst;
-    }
-
-    /**
-     * @desc 某定位组合遗漏 例如： [8,9]
-     * @return array
-     */
-    public static function dwHzZuHeYL($zuhe = [2,3],$hezhis = [8,9]){
-        $field = 'code_'.implode('_',$zuhe);
-        $where = [ $field => $hezhis];
-        $id = SscKjData::find()->where($where)->orderBy('id DESC')->one()['id'];
-
-        $maxId = SscKjData::find()->orderBy('id DESC')->one()['id'];
-        $times = $maxId - $id;
-
-        return $times;
     }
 
     /**

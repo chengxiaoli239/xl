@@ -916,19 +916,6 @@ class HN0898Service extends BaseTZService {
     }
 
     /**
-     * @desc 开奖是否存在
-     * @param $qihao
-     * @param int $lottery_type
-     * @return bool
-     */
-    public static function isExist($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
-
-        $exist = SscKjData::findOne(['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
-
-        return $exist ? true : false;
-    }
-
-    /**
      * @desc 获取首页内容
      * @param $uid
      * @param $tz_system_id
@@ -1464,8 +1451,8 @@ class HN0898Service extends BaseTZService {
 
         if(in_array($lottery_type, [23, 24])){
             # 取表最后一条记录的期号
-            $SscKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one();
-            $endQihao = $SscKjData->qihao;
+            $SscKjData = SscKjData::find()->select(['qihao'])->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one();
+            $endQihao = $SscKjData['qihao'];
             $qihao = max($endQihao, $qihao);
         }
 

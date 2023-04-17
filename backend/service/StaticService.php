@@ -278,7 +278,7 @@ class StaticService extends BaseService {
             $id = 1;
         }
         $where = ['>=', 'id', $id];
-        $SscKjDatas = SscKjData::find()->where($where)->limit($num)->all();
+        $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'kj_code', 'qihao', 'code_str'])->where($where)->limit($num)->all();
         $allCost = 0.00; # 成本
         $allZjBouns = 0.00; # 中奖金额
         $allProfits = 0.00; # 利润
@@ -286,7 +286,7 @@ class StaticService extends BaseService {
         foreach ($SscKjDatas as $codeKey => $SscKjData) {
             if ($codeKey == ($num - 1)) break;
             //$kjData = $SscKjData->code_str;
-            $kjData = $SscKjData->kj_code;
+            $kjData = $SscKjData['kj_code'];
             if ($fx == 0) {
                 $resultCodes = self::getDiffCodes($kjData);
             } else {
@@ -305,7 +305,7 @@ class StaticService extends BaseService {
             $allZjBouns += $zjBouns;
             $allProfits += $profits;
         }
-        p(['staticQihao'=>$SscKjData->qihao, 'zjCount'=>$zjCount, 'allCost'=>$allCost, 'allZjBouns'=>$allZjBouns, 'allProfits'=>$allProfits]);
+        return ['staticQihao'=>$SscKjData['qihao'], 'zjCount'=>$zjCount, 'allCost'=>$allCost, 'allZjBouns'=>$allZjBouns, 'allProfits'=>$allProfits];
     }
 
     /**
@@ -655,7 +655,7 @@ class StaticService extends BaseService {
         foreach ($typeArr as $k=>$hzArr){
 
             $where = ['LEFT(date, 7)'=>$month, 'codes_4nums_hz'=> $hzArr, 'lottery_type'=>$lottery_type];
-            $zJcounts = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 中奖次数
+            $zJcounts = SscKjData::find()->select(['id'])->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 中奖次数
             $where = ['codes_hz'=>$hzArr, 'code_type'=>4];
             $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 期数
 
@@ -2455,7 +2455,7 @@ class StaticService extends BaseService {
                 break;
             case 3: # 四字定
                 $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'code_4n_str', $codes]];
-                $query = SscKjData::find()->where($where);
+                $query = SscKjData::find()->select(['id', 'index_id', 'qihao', 'code_4n_str'])->where($where);
                 $SscKjDatas = $query->asArray()->orderBy('id DESC')->limit(20000)->all();
                 break;
             case 4: # 一字定
@@ -2757,7 +2757,7 @@ class StaticService extends BaseService {
 
         $date = date('Y-m-d', $time);
 
-        $minKjDate = SscKjData::find()->where(['lottery_type' => $lottery_type])->orderBy('id ASC')->limit(1)->one()->date;
+        $minKjDate = SscKjData::find()->select(['id', 'date'])->where(['lottery_type' => $lottery_type])->orderBy('id ASC')->asArray()->limit(1)->one()['date'];
 
         if($minKjDate > $date){
             $time = strtotime($minKjDate.' '.'00:00:00');
