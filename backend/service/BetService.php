@@ -42,6 +42,7 @@ use common\tools\Tool_Common;
 use common\tools\KjDataGet;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 abstract class BetService extends BaseBetService {
     protected $_nowTime = null;    // 当前时间戳
@@ -1487,49 +1488,54 @@ abstract class BetService extends BaseBetService {
      */
     public static function _logRecords($data){
         if(!$data OR !is_array($data)) return false;
-        $insertData = [
-            'sn'=>$data['sn'] ? $data['sn'] : BetService::$test_true_sn, // 方案号
-            'snid'=>$data['snid'] ? $data['snid'] : BetService::$test_true_snid,
-            'is_profits_record'=> in_array($data['sn'], BetService::$test_static_sn) ? 0 : 1, # 是否计算盈利
-            'is_area_profits'=> in_array($data['sn'], BetService::$test_static_sn) ? 0 : 1, # 是否计算盈利
-            'playway'=> $data['playway'],  // 投注方式
-            'tz_type'=> $data['tz_type'],  // 投注类型
-            'account'=> $data['account'],  // 投注账号
-            'playway_name'=> self::lotteryClass($data['playway']),  // 投注名称
-            'uid' => $data['uid'],  // 投注用户id
-            'buy_type'=> $data['buy_type'],  // 购买方向类型
-            'codes' => $data['codes'],  // 投注号码
-            'qihao' => (string)trim($data['qihao']),  // 投注期号
-            'plan_id' => $data['plan_id'],  // 计划id
-            'single' => $data['single'],  // 投注期号
-            'post_desc' => $data['post_desc'],  // 投注文本
-            'betting_money'=> $data['betting_money'],  // 投注金额
-            'tz_system_id'=> $data['tz_system_id'],  // 投注系统tz_systems .id
-            'lottery_type'=> $data['lottery_type'],  // 彩种
-            'lotteryclass'=> 'ssc',  // 彩种
-            'is_simulate' => $data['is_simulate'],  // 是否模拟投注
-            'is_batch_simulate' => $data['is_batch_simulate'] ? 1 : 0,  // 是否模拟投注
-            'position' => $data['position'],  // 是否模拟投注
-            'order_type' => $data['order_type'],  // 订单来源
-            'bonus' => 0.00,  // 奖金
-            'status' => 0,  // 中奖状态：0:正常、1:中奖、2:未中奖
-            'createtime' => time(),  // 下单时间 int
-            'create_time' => date('Y-m-d H:i:s'),  // 下单时间 string
-        ];
-        //if($data['tz_type'] == 20) $insertData['codes'] = md5($insertData['codes']);
-        $where = ['AND', ['=', 'qihao', $data['qihao']], ['=', 'plan_id', $data['plan_id']], ['=', 'uid', $data['uid']]];
-        $flag = BettingRecords::find()->where($where)->limit(1)->one();
-        if($flag){
-            return ['status'=>200, 'msg'=>'写入成功'];
-        }
+        try{
+            $insertData = [
+                'sn'=>$data['sn'] ? $data['sn'] : BetService::$test_true_sn, // 方案号
+                'snid'=>$data['snid'] ? $data['snid'] : BetService::$test_true_snid,
+                'is_profits_record'=> in_array($data['sn'], BetService::$test_static_sn) ? 0 : 1, # 是否计算盈利
+                'is_area_profits'=> in_array($data['sn'], BetService::$test_static_sn) ? 0 : 1, # 是否计算盈利
+                'playway'=> $data['playway'],  // 投注方式
+                'tz_type'=> $data['tz_type'],  // 投注类型
+                'account'=> $data['account'],  // 投注账号
+                'playway_name'=> self::lotteryClass($data['playway']),  // 投注名称
+                'uid' => $data['uid'],  // 投注用户id
+                'buy_type'=> $data['buy_type'],  // 购买方向类型
+                'codes' => $data['codes'],  // 投注号码
+                'qihao' => (string)trim($data['qihao']),  // 投注期号
+                'plan_id' => $data['plan_id'],  // 计划id
+                'single' => $data['single'],  // 投注期号
+                'post_desc' => $data['post_desc'],  // 投注文本
+                'betting_money'=> $data['betting_money'],  // 投注金额
+                'tz_system_id'=> $data['tz_system_id'],  // 投注系统tz_systems .id
+                'lottery_type'=> $data['lottery_type'],  // 彩种
+                'lotteryclass'=> 'ssc',  // 彩种
+                'is_simulate' => $data['is_simulate'],  // 是否模拟投注
+                'is_batch_simulate' => $data['is_batch_simulate'] ? 1 : 0,  // 是否模拟投注
+                'position' => $data['position'],  // 是否模拟投注
+                'order_type' => $data['order_type'],  // 订单来源
+                'bonus' => 0.00,  // 奖金
+                'status' => 0,  // 中奖状态：0:正常、1:中奖、2:未中奖
+                'createtime' => time(),  // 下单时间 int
+                'create_time' => date('Y-m-d H:i:s'),  // 下单时间 string
+            ];
+            //if($data['tz_type'] == 20) $insertData['codes'] = md5($insertData['codes']);
+            $where = ['AND', ['=', 'qihao', $data['qihao']], ['=', 'plan_id', $data['plan_id']], ['=', 'uid', $data['uid']]];
+            $flag = BettingRecords::find()->where($where)->limit(1)->one();
+            if($flag){
+                return ['status'=>200, 'msg'=>'写入成功'];
+            }
 
-        $bettingRecords = new BettingRecords();
-        $bettingRecords->setAttributes($insertData);
-        $rst = $bettingRecords->save();
+            $bettingRecords = new BettingRecords();
+            $bettingRecords->setAttributes($insertData);
+            $rst = $bettingRecords->save();
 
-        if(!$rst){
-            Tool_Common::log('logRecords', 'INFO', '记录投注表', ['msg'=>$bettingRecords->getErrors()]);
-            return ['status'=>300,'msg'=>current($bettingRecords->getErrors())];
+            if(!$rst){
+                throw_info(Json::encode($bettingRecords->getErrors(), 320));
+            }
+        }catch(\Exception $e){
+            $err_msg = $bettingRecords->getErrors();
+            Tool_Common::log('logRecords', 'INFO', '记录投注表', ['plan_id'=>$data['plan_id'], 'msg'=>$err_msg]);
+            return ['status'=>300, 'data'=>[], 'msg'=>$err_msg];
         }
 
         return ['status'=>200, 'data'=>['record_id'=>$bettingRecords->id], 'msg'=>'操作成功'];

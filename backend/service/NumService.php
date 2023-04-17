@@ -2177,13 +2177,13 @@ class NumService extends BaseService {
 
         $playway = $plan->playway;
         $nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
-        if($plan->is_batch_simulate){
-            $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
-            $next_qihao = $hzArr['filters']['current_kj_qihao'];
-            if(!empty($next_qihao)){
-                $nextQuery->andWhere(['<=', 'qihao', $next_qihao]);
-            }
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
         }
+        $nextQuery->andWhere(['<=', 'qihao', $current_kj_qihao]);
+
         $NewKjCodes = $nextQuery->limit(1)->one(); # 最新一期
         $NewCodes = array_unique([$NewKjCodes->code1, $NewKjCodes->code2, $NewKjCodes->code3, $NewKjCodes->code4]);
         $filterNumKjCodes = array_diff(NumService::$ALL_CODES, $NewCodes); # 剔除上期开奖号码之后的号码
@@ -2384,7 +2384,11 @@ class NumService extends BaseService {
     public static function getBeforeKjCodesDynamic7(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $num=200){
         $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
-        $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
+
         $needCodes = SscKjData::find()->select(['code_4n'])
             ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
             ->orderBy(['id'=>SORT_DESC])->limit($num)->asArray()->all();
@@ -2411,7 +2415,10 @@ class NumService extends BaseService {
     public static function getBeforeKjCodesDynamic8(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE){
         $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
-        $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
 
         if($plan->is_batch_simulate){
             $endBettedRecord = BettingRecords::find()->select(['qihao'])
@@ -2471,7 +2478,10 @@ class NumService extends BaseService {
     public static function getBeforeKjCodesDynamic10(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $num=2880){
         $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
-        $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $current_kj_qihao  = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
 
         $needCodes = SscKjData::find()->select(['code_4n_str'])
             ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
@@ -2499,7 +2509,10 @@ class NumService extends BaseService {
     public static function getBeforeKjCodesDynamic11(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $num=200){
         $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
-        $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
 
         $needCodes = SscKjData::find()->select(['code_4n'])
             ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
@@ -2527,7 +2540,10 @@ class NumService extends BaseService {
     public static function getBeforeKjCodesDynamic12(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $num=2880){
         $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
-        $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
 
         $needCodes = SscKjData::find()->select(['code_4n_str'=>'RIGHT(code_str, 7)'])
             ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
@@ -2555,7 +2571,11 @@ class NumService extends BaseService {
     public static function getBeforeKjCodesDynamic13(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $num=10000){
         $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
-        $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
+
         $max_index_id = SscKjData::find()->select(['max_index_id'=>'index_id'])
             ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
             ->asArray()->limit(1)->one()['max_index_id'];
@@ -2588,7 +2608,10 @@ class NumService extends BaseService {
     public static function getBeforeKjCodesDynamic14(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $positions=[1,2,3,4], $num=2880){
         $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
-        $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
 
         $positions_str = 'code'.implode(',",",code', $positions);
         $query = SscKjData::find()->select(['code_str', 'code_4n_str'=>'CONCAT('.$positions_str.')'])
@@ -2620,7 +2643,10 @@ class NumService extends BaseService {
     public static function getBeforeKjCodesDynamic17(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $num=8000){
         $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
-        $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
 
         $query = SscKjData::find()->select(['code_4n_str'=>'LEFT(code_str, 7)'])
             ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
@@ -2654,7 +2680,10 @@ class NumService extends BaseService {
     public static function getBeforeKjCodesDynamic18(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $num=8000){
         $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
-        $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
 
         $needCodes = SscKjData::find()->select(['code_4n_str'=>'RIGHT(code_str, 7)'])
             ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
@@ -2683,6 +2712,10 @@ class NumService extends BaseService {
         $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
         $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
+
         if(substr($current_kj_qihao, 0, 2) != '20'){
             $current_kj_qihao = '20'.$current_kj_qihao;
         }
@@ -2734,13 +2767,11 @@ class NumService extends BaseService {
         $playway = $plan->playway;
         $beforeQuery = SscKjData::find()->select(['code1','code2','code3','code4'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
-        $current_qihao = $hzArr['filters']['current_kj_qihao'];
-        if(!empty($current_qihao)){
-            $beforeQuery->andWhere(['<=', 'qihao', $current_qihao]);
-        }else{
-            $current_qihao = HN0898Service::getCurrentQihao($lottery_type);
-            $beforeQuery->andWhere(['<=', 'qihao', $current_qihao]);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
         }
+        $beforeQuery->andWhere(['<=', 'qihao', $current_kj_qihao]);
         #p($beforeQuery->createCommand()->getRawSql());
         $currentKjCodes = $beforeQuery->limit(1)->asArray()->one(); # 最新一期
         #p($NewKjCodes);
@@ -2749,7 +2780,7 @@ class NumService extends BaseService {
             ->andWhere(['=', 'code_type', $playway+1]);
         $sql = $query->createCommand()->getRawSql();
         #p($sql);
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '去除上期同位置6561组', ['current_qihao'=>$current_qihao, 'lottery_type'=>$lottery_type, 'currentKjCodes'=>$currentKjCodes, 'sql'=>$sql]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '去除上期同位置6561组', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'currentKjCodes'=>$currentKjCodes, 'sql'=>$sql]);
         $NumTypes = $query->asArray()->all();
         #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
@@ -2812,9 +2843,10 @@ class NumService extends BaseService {
         $nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
         $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
-        if(!empty($current_kj_qihao)){
-            $nextQuery->andWhere(['<=', 'qihao', $current_kj_qihao]);
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
         }
+        $nextQuery->andWhere(['<=', 'qihao', $current_kj_qihao]);
         $NewKjCodes = $nextQuery->limit(1)->one(); # 最新一期
         $NewCodes = array_unique([$NewKjCodes->code1, $NewKjCodes->code2, $NewKjCodes->code3, $NewKjCodes->code4]);
         $filterNumKjCodes = array_diff(NumService::$ALL_CODES, $NewCodes); # 剔除上期开奖号码之后的号码
@@ -2883,7 +2915,7 @@ class NumService extends BaseService {
     public static function getBeforeKjCodesDynamic31(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $positions=[1,2,3], $num=350){
         $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
-        $current_kj_qihao = $short_current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
         if(empty($current_kj_qihao)){
             $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
             $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
