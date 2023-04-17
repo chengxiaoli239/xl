@@ -535,7 +535,7 @@ abstract class BetService extends BaseBetService {
             }
             Tool_Common::log('wang_pan_is_active', 'INFO', '网盘开盘状态-3', ['uid'=>$uid, 'tz_system_id'=>$lottery_type, 'activeQihao'=>$activeQihao]);
         }catch (\Exception $exception){
-            Tool_Common::log('/betService/'.__FUNCTION__, 'ERR', '网盘激活期号获取', ['lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
+            Tool_Common::log('/betService/'.__FUNCTION__, 'ERR', '网盘激活期号获取', ['lottery_type'=>$lottery_type, 'activeQihao'=>$activeQihao, 'err_msg'=>$exception->getMessage()]);
             return false;
         }
 
