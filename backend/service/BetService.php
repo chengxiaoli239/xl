@@ -1533,7 +1533,7 @@ abstract class BetService extends BaseBetService {
                 throw_info(Json::encode($bettingRecords->getErrors(), 320));
             }
         }catch(\Exception $e){
-            $err_msg = $bettingRecords->getErrors();
+            $err_msg = $e->getMessage();
             Tool_Common::log('logRecords', 'INFO', '记录投注表', ['plan_id'=>$data['plan_id'], 'msg'=>$err_msg]);
             return ['status'=>300, 'data'=>[], 'msg'=>$err_msg];
         }
