@@ -326,6 +326,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst = KjDataGet::updateNullCode($num = 5000, $lottery_type = 5);
+        p($rst);
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%num4_type}}'); p($r);
         $SscKjData = SscKjData::find()->select(['qihao'])->where(['lottery_type'=>8])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one();
         p($SscKjData);
         $kjData = SscKjData::findOne(['qihao'=>'20230417102', 'lottery_type'=>8])->code_str;
@@ -478,7 +481,6 @@ class IndexController extends Controller
         p($tArr);
         $a=array("Name"=>"Peter","Age"=>"41","Country"=>"USA");
         p(array_values($a));
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%sports_plates_games}}'); p($r);
         $count = 5;
         $t = 5;
         p($t%($count));
@@ -872,8 +874,6 @@ class IndexController extends Controller
         $rst = StaticService::static2NumsYl($lottery_type = 5);
         p($rst);
         $rst = SscDataService::update3NumYL($lottery_type = 6);
-        p($rst);
-        $rst = KjDataGet::updateNullCode($num = 1000, $lottery_type = 5);
         p($rst);
         $dates = [];
         $tmp_date = strtotime('2020-07-01 00:00:00');

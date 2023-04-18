@@ -31,6 +31,9 @@ use Yii;
  * @property int $type_4d 四单
  * @property int $type_4s 四双
  * @property string $type_ds 单双类型：1122,2121,2222等
+ * @property int $type_dx 大小:0保留1全大2全小3一大三小4两大两小5三大一小
+ * @property string $type_4dx 大小类型1小2大：1122,2121,2222等
+ * @property string $type_dx_str 大小类型：4大;3大1小;2大2小;1大3小;4小等
  * @property int $codes_hz 号码和值
  * @property int $code_type 号码类型:1一字定2二字定3三字定4四字定
  * @property int $created_at 创建时间
@@ -53,9 +56,9 @@ class Num4Type extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['type_2', 'type_22', 'type_3', 'type_4', 'type_22b', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_log', 'type_3n_2b', 'type_3d', 'type_3s', 'type_4d', 'type_4s', 'codes_hz', 'code_type', 'created_at', 'updated_at'], 'integer'],
+            [['type_2', 'type_22', 'type_3', 'type_4', 'type_22b', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_log', 'type_3n_2b', 'type_3d', 'type_3s', 'type_4d', 'type_4s', 'type_dx', 'codes_hz', 'code_type', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
-            [['code', 'code_str', 'type_ds'], 'string', 'max' => 12],
+            [['code', 'code_str', 'type_ds', 'type_4dx', 'type_dx_str'], 'string', 'max' => 12],
             [['code_1', 'code_2', 'code_3', 'code_4', 'code_5'], 'string', 'max' => 1],
         ];
     }

@@ -253,10 +253,11 @@ class TzSystemUsersService extends ClientsBaseService{
     /**
      * @desc 激活的下注任务
      * @param string $access_token
+     * @param string $current_qihao
      * @return string
      */
-    public static function buildUserPlanTasksKey($access_token=''){
-        $mkey = 'buildUserPlanTasksKey_1_'.$access_token;
+    public static function buildUserPlanTasksKey($access_token='', $current_qihao=''){
+        $mkey = 'buildUserPlanTasksKey_1_'.$access_token.'_'.$current_qihao;
         return $mkey;
     }
 
@@ -359,10 +360,10 @@ class TzSystemUsersService extends ClientsBaseService{
      * @param string $access_token
      * @return mixed|string
      */
-    public static function getActivePlanTasks($access_token='', $current_qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function getActivePlanTasksBak($access_token='', $current_qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
 
         $m = \Yii::$app->cache;
-        $mkey = self::buildUserPlanTasksKey($access_token);
+        $mkey = self::buildUserPlanTasksKey($access_token, $current_qihao);
         $flag = $m->get($mkey);
 
         $RedisLock = new RedisLock();
@@ -488,4 +489,124 @@ class TzSystemUsersService extends ClientsBaseService{
         return ['status'=>200, 'data'=>$datas];
     }
 
+    /**
+     * 校验
+     * @param string $access_token
+     * @return array
+     */
+    public static function validateAccount($access_token=''){
+        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+        if(!empty($TzSystemsUsers->expire_time) && $TzSystemsUsers->expire_time <= time()){
+            throw_info('已过期，请续费');
+        }
+
+        return [0, $TzSystemsUsers];
+    }
+
+    /**
+     * 获取数据条件
+     * @param string $uid
+     * @param string $current_qihao
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function getActivePlanTasksWhere($uid='', $current_qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+        $RedisLock = new RedisLock();
+        $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
+        if($uid){
+            $where = array_merge($where, [['=', 'uid', $uid]]);
+        }
+        if(!empty($current_qihao)){
+            $incr_qihao_key = 'incr_qihao_key_'.$lottery_type.'_'.$uid.'_'.$current_qihao;
+            $count = $RedisLock->_redis->incrby($incr_qihao_key, 1);
+            if($count<=1){
+                $where = array_merge($where, [['=', 'qihao', (string)$current_qihao]]);
+            }
+        }
+        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-0', ['uid'=>$uid, 'current_qihao'=>$current_qihao, 'where'=>$where, 'count'=>$count]);
+
+        return $where;
+    }
+
+    /**
+     * @desc 获取用户激活的下注任务
+     * @param string $access_token
+     * @return mixed|string
+     */
+    public static function getActivePlanTasks($access_token='', $current_qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+
+        try {
+            $m = \Yii::$app->cache;
+            $mkey = self::buildUserPlanTasksKey($access_token, $current_qihao);
+            $flag = $m->get($mkey);
+            if($flag){
+                throw_info('没有任务yyy');
+            }
+
+            list($code, $TzSystemsUsers) = TzSystemUsersService::validateAccount($access_token);
+            $uid = $TzSystemsUsers->uid;
+
+            $where = TzSystemUsersService::getActivePlanTasksWhere($uid, $current_qihao, $lottery_type);
+            $BetErrorPlansTasksQuery = BetErrorPlansTask::find()->where($where);
+            $BetErrorPlansTasks = $BetErrorPlansTasksQuery->orderBy(['id'=>SORT_DESC])->limit(8)->all();
+            $sql = $BetErrorPlansTasksQuery->createCommand()->getRawSql();
+
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-0', ['uid'=>$uid, 'current_qihao'=>$current_qihao, 'where'=>$where,'sql'=>$sql]);
+            if(empty($BetErrorPlansTasks)){
+                throw_info('没有下注任务');
+            }
+            $datas = [];
+            $_t = round(microtime(true) * 1000);
+            foreach ($BetErrorPlansTasks as $row){
+                $plan_id = $row->plan_id;
+                $account = $row->account;
+                $bet_url = $row->bet_url;
+                $qihao = $row->qihao;
+                if($qihao > $current_qihao){
+                    continue;
+                }
+                $post_data = json_decode($row->post_datas, 320);
+                $uid = $row->uid;
+                $headers = [
+                    "Accept"=>"application/json, text/javascript, */*; q=0.01",
+                    "Accept-Encoding"=>"gzip, deflate, br",
+                    "Accept-Language"=>"zh-CN,zh;q=0.9",
+                    "Connection"=>"Close",
+                    "Keep-Alive"=> "timeout=5, max=81",
+                    'Content-Length' => (string)strlen(http_build_query($post_data)),
+                    "Content-Type"=>"application/x-www-form-urlencoded; charset=UTF-8",
+                    'Cookie' => $TzSystemsUsers->cookie,
+                    'Origin' => trim($TzSystemsUsers->ssc_domain),
+                    'Referer' => trim($TzSystemsUsers->ssc_domain).'/App/Index?_='.$_t,
+                    'Host' => trim(str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain))),
+                    "sec-ch-ua"=>'"Chromium";v="104", " Not A;Brand";v="99", "Google Chrome";v="104"',
+                    "sec-ch-ua-mobile"=>"?0",
+                    "sec-ch-ua-platform"=>'"Windows"',
+                    "Sec-Fetch-Dest"=>"empty",
+                    "Sec-Fetch-Mode"=>"cors",
+                    "Sec-Fetch-Site"=>"same-origin",
+                    'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemsUsers->user_agent)),
+                    "X-Requested-With"=>"XMLHttpRequest"
+                ];
+
+                $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
+                $datas[] = [
+                    'bet_url' => $bet_url,
+                    'plan_type' => self::PlAN_TYPE_RE_LOCAL,
+                    'plan_id' => $plan_id,
+                    'account' => $account,
+                    'qihao' => $qihao,
+                    'slow_seconds' => $slow_seconds,
+                    'post_data' => $post_data,
+                    'headers' => $headers,
+                ];
+            }
+            $m->set($mkey, 1, 15);
+        }catch (\Exception $e){
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-异常', ['uid' => $uid, 'msg'=>$e->getMessage()]);
+            return ['code'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
+        }
+
+        return ['status'=>200, 'data'=>$datas];
+    }
 }

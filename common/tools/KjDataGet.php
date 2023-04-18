@@ -620,15 +620,44 @@ class KjDataGet
      */
     public static function updateNullCode( $times = 5000, $lottery_type = DEFAULT_LOTTERY_TYPE){
         /*
-        $Num4Types = Num4Type::find()->where(['AND', ['IS', 'type_ds', NULL], '1=1'])->orderBy('id DESC')->limit($times)->all();
+        $Num4Types = Num4Type::find()->where(['IS', 'type_dx', NULL])->orderBy('id DESC')->limit($times)->all();
         foreach ($Num4Types as $k=>$num4Type){
-            $code1_ds = $num4Type->code_1=='X' ? 'X' : ($num4Type->code_1===NULL ? '': ($num4Type->code_1%2==0? '2':'1'));
-            $code2_ds = $num4Type->code_2=='X' ? 'X' : ($num4Type->code_2===NULL ? '': ($num4Type->code_2%2==0? '2':'1'));
-            $code3_ds = $num4Type->code_3=='X' ? 'X' : ($num4Type->code_3===NULL ? '': ($num4Type->code_3%2==0? '2':'1'));
-            $code4_ds = $num4Type->code_4=='X' ? 'X' : ($num4Type->code_4===NULL ? '': ($num4Type->code_4%2==0? '2':'1'));
-            $code5_ds = $num4Type->code_5=='X' ? 'X' : ($num4Type->code_5===NULL ? '': ($num4Type->code_5%2==0? '2':'1'));
-            $num4Type->type_ds = $code1_ds.$code2_ds.$code3_ds.$code4_ds.$code5_ds;
-            $rst[$k] = $num4Type->save();
+            $code1_dx = $num4Type->code_1=='X' ? 'X' : ($num4Type->code_1===NULL ? '': (in_array($num4Type->code_1, NumService::$MIN_CODES)? '1':'2'));
+            $code2_dx = $num4Type->code_2=='X' ? 'X' : ($num4Type->code_2===NULL ? '': (in_array($num4Type->code_2, NumService::$MIN_CODES)? '1':'2'));
+            $code3_dx = $num4Type->code_3=='X' ? 'X' : ($num4Type->code_3===NULL ? '': (in_array($num4Type->code_3, NumService::$MIN_CODES)? '1':'2'));
+            $code4_dx = $num4Type->code_4=='X' ? 'X' : ($num4Type->code_4===NULL ? '': (in_array($num4Type->code_4, NumService::$MIN_CODES)? '1':'2'));
+            $code5_dx = $num4Type->code_5=='X' ? 'X' : ($num4Type->code_5===NULL ? '': (in_array($num4Type->code_5, NumService::$MIN_CODES)? '1':'2'));
+
+            $numArr = [$code1_dx, $code2_dx, $code3_dx, $code4_dx, $code5_dx];
+            $countVals = array_count_values($numArr);
+            $type_dx_str = '';
+            foreach ($countVals as $countVal){
+                if(isset($countVals[2])){
+                    $type_dx_str .= $countVals[2].'大';
+                    unset($countVals[2]);
+                }elseif (isset($countVals[1])){
+                    $type_dx_str .= $countVals[1].'小';
+                    unset($countVals[1]);
+                }
+            }
+            $num4Type->type_dx_str = $type_dx_str;
+            if($num4Type->code_type == 4){
+                $code5_dx = '';
+                $type_dx = NumService::getType4dx($type_dx_str);;
+            }else{
+                $type_dx = NumService::getType4dx($type_dx_str);;
+            }
+            $num4Type->type_4dx = $code1_dx.$code2_dx.$code3_dx.$code4_dx.$code5_dx;
+
+            $num4Type->type_dx = $type_dx;
+            #p($num4Type->getAttributes());
+            $flag = $num4Type->save();
+            if(empty($flag)){
+                print($num4Type->getErrors());
+            }
+            $rst[$k] = $flag;
+            #p(['code'=>$num4Type->code, 'array_count_values'=>array_count_values($numArr), 'type_4dx'=>$num4Type->type_4dx, 'type_dx_str'=>$num4Type->type_dx_str, 'type_dx'=>$num4Type->type_dx, 'code_type'=>$num4Type->code_type, 'flag'=>$flag, $num4Type->id]);
+            #p($rst);
         }
         */
 

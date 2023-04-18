@@ -42,6 +42,9 @@ use Yii;
  * @property int $type_4b 四兄弟
  * @property int $type_4ds 四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
  * @property int $type_3n_2b 三现:双重&兄弟
+ * @property int $type_dx 大小:0保留1全大2全小3一大三小4两大两小5三大一小
+ * @property string $type_4dx 大小类型1小2大：1122,2121,2222等
+ * @property string $type_dx_str 大小类型：4大;3大1小;2大2小;1大3小;4小等
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property int $created_at 创建时间
  * @property string $update_time 创建时间
@@ -63,10 +66,11 @@ class SscKjData extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['index_id', 'codes_hz', 'codes_4nums_hz', 'code1', 'code2', 'code3', 'code4', 'code5', 'code6', 'code7', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'type_2', 'type_22', 'type_22b', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_3n_2b', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['index_id', 'codes_hz', 'codes_4nums_hz', 'code1', 'code2', 'code3', 'code4', 'code5', 'code6', 'code7', 'code_1_2', 'code_1_3', 'code_1_4', 'code_2_3', 'code_2_4', 'code_3_4', 'type_2', 'type_22', 'type_22b', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_3n_2b', 'type_dx', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['date', 'update_time'], 'safe'],
             [['kj_code', 'code_4n'], 'string', 'max' => 8],
             [['code_str', 'code_4n_str', 'qihao', 'code_3n'], 'string', 'max' => 24],
+            [['type_4dx'], 'string', 'max' => 16],
             [['code_1_2_3_4'], 'string', 'max' => 4],
             [['lottery_type', 'qihao'], 'unique', 'targetAttribute' => ['lottery_type', 'qihao']],
         ];

@@ -615,8 +615,6 @@ class  CommonService{
             $flag = 1;
         }
 
-
-
         return $flag;
     }
 
@@ -850,6 +848,23 @@ class  CommonService{
         return $flag;
     }
 
+    /**
+     * @desc 获取大小类型
+     * @param string $codes 格式 1,2,3
+     * @return int
+     */
+    public static function getTypeDx($codes){
+
+    }
+
+    /**
+     * @desc 获取大小类型
+     * @param string $codes 格式 1,2,3
+     * @return int
+     */
+    public static function getTypeDxStr($codes){
+
+    }
 
     /**
      * @desc 所有投注系统

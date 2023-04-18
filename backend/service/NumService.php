@@ -33,6 +33,24 @@ class NumService extends BaseService {
         3 => 4,
     ];
 
+    # 大小类型
+    public static $type_dx_datas = [
+        1 => '4大',
+        2 => '3大1小',
+        3 => '2大2小',
+        4 => '1大3小',
+        5 => '4小',
+
+        6 => '3大',
+        7 => '2大1小',
+        8 => '1大2小',
+        9 => '3小',
+
+        10 => '2大',
+        11 => '1大1小',
+        12 => '2小',
+    ];
+
     # 三个位置一直过滤期数
     const BEFORE_3X_QS = 100;
 
@@ -3936,5 +3954,31 @@ class NumService extends BaseService {
             2 => '四定过滤类型2', # 四个号码不同时，下一期排查当前号码并且取兄弟
             3 => '四定过滤类型3', # 四个号码不同时，排除同位置同类型号码
         ];
+    }
+
+    /**
+     * str => type
+     * @param string $str
+     * @return array|mixed
+     */
+    public static function getType4dx($str='2大2小'){
+        $datas = NumService::$type_dx_datas;
+        $datas = array_flip($datas);
+
+        if(isset($datas[$str])) return $datas[$str];
+
+        return $datas;
+    }
+
+    /**
+     * type => type_str
+     * @param int $type
+     * @return string|string[]
+     */
+    public static function getTyep4dxStr($type=1){
+        $datas = NumService::$type_dx_datas;
+        if(isset($datas[$type])) return $datas[$type];
+
+        return $datas;
     }
 }
