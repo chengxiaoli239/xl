@@ -604,7 +604,7 @@ class TzSystemUsersService extends ClientsBaseService{
             $m->set($mkey, 1, 15);
         }catch (\Exception $e){
             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-异常', ['uid' => $uid, 'msg'=>$e->getMessage()]);
-            return ['code'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
+            return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
         }
 
         return ['status'=>200, 'data'=>$datas];
