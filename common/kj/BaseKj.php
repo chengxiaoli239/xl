@@ -2,6 +2,7 @@
 namespace common\kj;
 use backend\models\KjConfig;
 use backend\service\HN0898Service;
+use common\tools\Tool_Common;
 use  yii;
 use common\tools\KjDataGet;
 
@@ -27,11 +28,13 @@ class BaseKj{
     /**
      * @desc 获取当前开奖数据，如果有则返回
      */
-    public static function getCurrentKjData($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function getCurrentKjData($lottery_type = DEFAULT_LOTTERY_TYPE, &$current_qihao=''){
         $m = \Yii::$app->cache;
 
         $qihao = HN0898Service::getCurrentQihao($lottery_type);
         $mkey = self::buildKjDataKey($lottery_type, $qihao);
+
+        $current_qihao = $qihao;
 
         return $m->get($mkey);
     }
@@ -49,10 +52,9 @@ class BaseKj{
             $str = substr($qihao, 2, 10);
             $qihao = str_replace('-', '', $str);
         }elseif (in_array($lottery_type, [10, 11, 12, 13, 19,20,21,22, 23])){ # 冰岛3分  90s
-            $set_time = 10;
-        }else{
-            $qihao = $qihao;
+            $set_time = 20;
         }
+        Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '设置开奖缓存', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'kjData'=>$kjData]);
         if($kjData['opencode']){
             $mkey = self::buildKjDataKey($lottery_type, $qihao);
             $m->set($mkey, $kjData, $set_time);

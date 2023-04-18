@@ -111,8 +111,21 @@ class Lucky5 extends BaseKj {
      */
     public static function getLotteryShiXunOne($returnType = 'json', $is_auto=1){
         try {
-            $kjData = self::getCurrentKjData(self::$lottery_type);
+            $m = \Yii::$app->cache;
+            $redis = \Yii::$app->redis;
+            $kjData = self::getCurrentKjData(self::$lottery_type, $current_qihao);
+            $redisKey = 'getLotteryShiXunOne_'.self::$lottery_type;
+            $is_exist = $redis->sadd($redisKey, $current_qihao);
+            if(!$is_exist){
+                throw_info('并发请求...');
+            }
+            $mkey = $redisKey.'_'.$current_qihao;
+            $lockFlag = $m->get($mkey);
+            if($lockFlag){
+                throw_info('短时间内请求...');
+            }
             if($is_auto==2 OR empty($kjData['opencode']) OR empty($kjData['expect'])) {
+                $m->set($mkey, 1, 15);
                 $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun-one');
 
                 $t = round(microtime(true) * 1000);
@@ -137,7 +150,9 @@ class Lucky5 extends BaseKj {
                 throw_info('开奖号码不能为空');
             }
             Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData]);
+            $redis->srem($redisKey, $current_qihao);
         }catch (\Exception $e){
+            $redis->srem($redisKey, $current_qihao);
             Tool_Common::log('/kj_datas/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage()]);
             return false;
         }

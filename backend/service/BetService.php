@@ -24,7 +24,6 @@ use backend\service\Lucky5\Lucky5Service;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineNewService;
 use backend\service\NineNine\NineNineService6;
-use backend\service\qilin\BingDaoService;
 use common\kj\cqssc\CqsscKcw;
 use common\service\jobs\kj_data\UserBetJob;
 use common\service\proxy\ProxyBaseService;
