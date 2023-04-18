@@ -128,11 +128,15 @@ class BaseService{
      * @return array|bool
      */
     public static function synBalanceByAccessToken($access_token='', $is_auto=2){
-        $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
-        $tz_systerm_user_id = BaseService::getTzSystemUserIdByAccessTokn($access_token);
+        try {
+            $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
+            $tz_systerm_user_id = BaseService::getTzSystemUserIdByAccessTokn($access_token);
 
-        $rst = BaseService::synBalance($tz_systerm_user_id, $is_auto);
-        Tool_Common::log('/lucky5/'.__FUNCTION__, 'INFO', '客户端手动同步余额', ['access_token'=>$access_token, 'account'=>$TzSystemsUsers->account, 'is_auto'=>$is_auto, 'rst'=>$rst]);
+            $rst = BaseService::synBalance($tz_systerm_user_id, $is_auto);
+            Tool_Common::log('/lucky5/'.__FUNCTION__, 'INFO', '客户端手动同步余额', ['access_token'=>$access_token, 'account'=>$TzSystemsUsers->account, 'is_auto'=>$is_auto, 'rst'=>$rst]);
+        }catch (\Exception $e){
+            return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
+        }
 
         return $rst;
     }

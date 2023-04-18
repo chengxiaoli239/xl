@@ -91,28 +91,32 @@ class TzSystemUsersService extends ClientsBaseService{
      */
     public static function getCookiesByAccessToken($access_token='', $is_auto=1){
 
-        $m = \Yii::$app->cache;
-        $mkey = self::buildUserCookesKey($access_token);
-        $data = $m->get($mkey);
+        try {
+            $m = \Yii::$app->cache;
+            $mkey = self::buildUserCookesKey($access_token);
+            $data = $m->get($mkey);
 
-        if($is_auto==2 OR empty($data)){
-            //$TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
-            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
-            $cookies = $TzSystemsUsers->cookie;
-            #$m->set($mkey, $cookies, 300);
+            if($is_auto==2 OR empty($data)){
+                //$TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
+                $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+                $cookies = $TzSystemsUsers->cookie;
+                #$m->set($mkey, $cookies, 300);
 
-            Lucky5Service::__init($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
-            $tzSiteInfo = Lucky5Service::getTzSiteInfo($TzSystemsUsers->tz_system_id);
-            $user_agent = trim(str_replace('User-Agent:', '',str_replace('user_agent:','', $TzSystemsUsers->user_agent)));
-            $data = [
-                'cookies' => trim(trim($cookies), ';'),
-                'user_agent' => $user_agent,
-                "Referer" => $TzSystemsUsers->ssc_domain."/App/Index?_=",
-                "Host"=> str_replace('www.','',$tzSiteInfo['domain']),
-                "v1" => "99",
-                "v2" => "104",
-            ];
-            $m->set($mkey, $data, 60);
+                Lucky5Service::__init($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
+                $tzSiteInfo = Lucky5Service::getTzSiteInfo($TzSystemsUsers->tz_system_id);
+                $user_agent = trim(str_replace('User-Agent:', '',str_replace('user_agent:','', $TzSystemsUsers->user_agent)));
+                $data = [
+                    'cookies' => trim(trim($cookies), ';'),
+                    'user_agent' => $user_agent,
+                    "Referer" => $TzSystemsUsers->ssc_domain."/App/Index?_=",
+                    "Host"=> str_replace('www.','',$tzSiteInfo['domain']),
+                    "v1" => "99",
+                    "v2" => "104",
+                ];
+                $m->set($mkey, $data, 60);
+            }
+        }catch (\Exception $e){
+            return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
         }
 
         return ['status'=>200, 'data'=>$data];
@@ -268,12 +272,17 @@ class TzSystemUsersService extends ClientsBaseService{
      */
     public static function syncClientBalance($access_token='', $balance=0.00){
 
-        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
-        if(!empty($TzSystemsUsers)){
-            $TzSystemsUsers->balance = $balance;
-            $TzSystemsUsers->updated_at = time();
-            $flag = $TzSystemsUsers->save();
-            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端余额同步', ['account'=>$TzSystemsUsers->username, 'access_token'=>$access_token, 'balance'=>$balance]);
+        $flag = 1;
+        try {
+            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+            if(!empty($TzSystemsUsers)){
+                $TzSystemsUsers->balance = $balance;
+                $TzSystemsUsers->updated_at = time();
+                $flag = $TzSystemsUsers->save();
+                Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端余额同步', ['account'=>$TzSystemsUsers->username, 'access_token'=>$access_token, 'balance'=>$balance]);
+            }
+        }catch (\Exception $e){
+            return ['status'=>200, 'data'=>['flag'=>1], 'msg'=>'操作成功'];
         }
 
         return ['status'=>200, 'data'=>['flag'=>$flag], 'msg'=>'操作成功'];
@@ -286,18 +295,23 @@ class TzSystemUsersService extends ClientsBaseService{
      */
     public static function updateClientRobotId($access_token='', $err_msg=''){
 
-        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
-        if(!empty($TzSystemsUsers)){
-            $robot_id = Lucky5Service::getRobotIdByStr($err_msg, $TzSystemsUsers->ssc_domain);
-            $cookie = $TzSystemsUsers->cookie;
-            preg_match("/robot7=([^\r\n]*);Seven/i", $cookie, $matches);
-            $new_cookie = str_replace($matches, $robot_id.';Seven', $cookie);
-            //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
-            $TzSystemsUsers->cookie = $new_cookie;
+        try {
+            $flag = 0;
+            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+            if(!empty($TzSystemsUsers)){
+                $robot_id = Lucky5Service::getRobotIdByStr($err_msg, $TzSystemsUsers->ssc_domain);
+                $cookie = $TzSystemsUsers->cookie;
+                preg_match("/robot7=([^\r\n]*);Seven/i", $cookie, $matches);
+                $new_cookie = str_replace($matches, $robot_id.';Seven', $cookie);
+                //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
+                $TzSystemsUsers->cookie = $new_cookie;
 
-            $TzSystemsUsers->updated_at = time();
-            $flag = $TzSystemsUsers->save();
-            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端余额同步', ['account'=>$TzSystemsUsers->username, 'access_token'=>$access_token]);
+                $TzSystemsUsers->updated_at = time();
+                $flag = $TzSystemsUsers->save();
+                Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端余额同步', ['account'=>$TzSystemsUsers->username, 'access_token'=>$access_token]);
+            }
+        }catch (\Exception $e){
+            return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
         }
 
         return ['status'=>200, 'data'=>['flag'=>$flag], 'msg'=>'操作成功'];

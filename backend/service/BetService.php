@@ -601,18 +601,22 @@ abstract class BetService extends BaseBetService {
      * @return bool|int
      */
     public static function openBetQihao($access_token='', $qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
-        if(empty($lottery_type)){
-            $lottery_type = DEFAULT_LOTTERY_TYPE;
-        }
-        $m = \Yii::$app->cache;
+        try {
+            $flag = 0;
+            if(empty($lottery_type)){
+                $lottery_type = DEFAULT_LOTTERY_TYPE;
+            }
+            $m = \Yii::$app->cache;
 
-        $flag = 0;
-        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken(trim($access_token));
-        $mkey = BetService::buildActiveQihaoKey($TzSystemsUsers->tz_system_id, $lottery_type);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '开启计划', ['access_token'=>$access_token, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'mkey'=>$mkey]);
-        if(!empty($TzSystemsUsers)){
+            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken(trim($access_token));
+            $mkey = BetService::buildActiveQihaoKey($TzSystemsUsers->tz_system_id, $lottery_type);
+            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '开启计划', ['access_token'=>$access_token, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'mkey'=>$mkey]);
+            if(!empty($TzSystemsUsers)){
 
-            $flag = $m->set($mkey, $qihao, 60);
+                $flag = $m->set($mkey, $qihao, 60);
+            }
+        }catch (\Exception $e){
+
         }
 
         return $flag;
@@ -626,39 +630,43 @@ abstract class BetService extends BaseBetService {
      * @return bool|array
      */
     public static function pushTasksBetRst($plan_id, $qihao='', $betRst=[], $access_token='', $lottery_type=DEFAULT_LOTTERY_TYPE){
-        if(empty($lottery_type)){
-            $lottery_type = DEFAULT_LOTTERY_TYPE;
-        }
-        if(strpos($betRst['err_msg'], '您当前使用的浏览器不支持cookie') !== false){
-            return ['status'=>300, 'msg'=>'下注失败，等待下注'];
-        }
+        try {
+            if(empty($lottery_type)){
+                $lottery_type = DEFAULT_LOTTERY_TYPE;
+            }
+            if(strpos($betRst['err_msg'], '您当前使用的浏览器不支持cookie') !== false){
+                throw_info('下注失败，等待下注');
+            }
 
-        $flag = 0;
-        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
-        if(empty($TzSystemsUsers)){
-            return ['status'=>404, 'msg'=>'用户信息找不到'];
-        }
+            $flag = 0;
+            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+            if(empty($TzSystemsUsers)){
+                throw_info('用户信息找不到');
+            }
 
-        $where = ['plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
-        $BetErrorPlansTask = BetErrorPlansTask::findOne($where);
-        if($BetErrorPlansTask->status == 2){
-            return ['status'=>204, 'msg'=>'已经下注成功无需修改'];
-        }
-        if(empty($BetErrorPlansTask)){
-            return ['status'=>404, 'msg'=>'任务记录找不到'];
-        }
-        $task_status = $betRst['task_status'];
-        $m = \Yii::$app->cache;
-        $mkey = __FUNCTION__.'_'.$plan_id."_".$qihao;
-        $flag  = (int)$m->get($mkey);
-        if($task_status == 3 && strpos($betRst['err_msg'], '短时间内重复提交') !== false && $flag==0){
-            $task_status = 0;
-        }
-        $m->set($mkey, 1, 40);
+            $where = ['plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
+            $BetErrorPlansTask = BetErrorPlansTask::findOne($where);
+            if($BetErrorPlansTask->status == 2){
+                throw_info('已经下注成功无需修改');
+            }
+            if(empty($BetErrorPlansTask)){
+                throw_info('任务记录找不到');
+            }
+            $task_status = $betRst['task_status'];
+            $m = \Yii::$app->cache;
+            $mkey = __FUNCTION__.'_'.$plan_id."_".$qihao;
+            $flag  = (int)$m->get($mkey);
+            if($task_status == 3 && strpos($betRst['err_msg'], '短时间内重复提交') !== false && $flag==0){
+                $task_status = 0;
+            }
+            $m->set($mkey, 1, 40);
 
-        $BetErrorPlansTask->status = $task_status;
-        $BetErrorPlansTask->post_desc = json_encode($betRst, 320);
-        $flag = $BetErrorPlansTask->save();
+            $BetErrorPlansTask->status = $task_status;
+            $BetErrorPlansTask->post_desc = json_encode($betRst, 320);
+            $flag = $BetErrorPlansTask->save();
+        }catch (\Exception $e){
+            return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
+        }
 
         return $flag;
     }
