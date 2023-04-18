@@ -850,11 +850,36 @@ class  CommonService{
 
     /**
      * @desc 获取大小类型
-     * @param string $codes 格式 1,2,3
-     * @return int
+     * @param string $codes 格式 6,2,7,4,5
+     * @return array [3, '1122', '2大2小']
      */
     public static function getTypeDx($codes){
 
+        $codesArr = explode(',', $codes);
+
+        $code1_dx = in_array($codesArr[0], NumService::$MIN_CODES)? '1':'2';
+        $code2_dx = in_array($codesArr[1], NumService::$MIN_CODES)? '1':'2';
+        $code3_dx = in_array($codesArr[2], NumService::$MIN_CODES)? '1':'2';
+        $code4_dx = in_array($codesArr[3], NumService::$MIN_CODES)? '1':'2';
+        $code5_dx = in_array($codesArr[4], NumService::$MIN_CODES)? '1':'2';
+
+        $numArr = [$code1_dx, $code2_dx, $code3_dx, $code4_dx];
+        $countVals = array_count_values($numArr);
+        $type_dx_str = '';
+        foreach ($countVals as $countVal){
+            if(isset($countVals[2])){
+                $type_dx_str .= $countVals[2].'大';
+                unset($countVals[2]);
+            }elseif (isset($countVals[1])){
+                $type_dx_str .= $countVals[1].'小';
+                unset($countVals[1]);
+            }
+        }
+        $type_dx = NumService::getType4dx($type_dx_str);;
+
+        $type_4dx = $code1_dx.$code2_dx.$code3_dx.$code4_dx.$code5_dx;
+
+        return [$type_dx, $type_4dx, $type_dx_str];
     }
 
     /**

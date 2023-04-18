@@ -70,7 +70,7 @@ class SscKjData extends \common\models\base\BaseModel
             [['date', 'update_time'], 'safe'],
             [['kj_code', 'code_4n'], 'string', 'max' => 8],
             [['code_str', 'code_4n_str', 'qihao', 'code_3n'], 'string', 'max' => 24],
-            [['type_4dx'], 'string', 'max' => 16],
+            [['type_4dx', 'type_dx_str'], 'string', 'max' => 16],
             [['code_1_2_3_4'], 'string', 'max' => 4],
             [['lottery_type', 'qihao'], 'unique', 'targetAttribute' => ['lottery_type', 'qihao']],
         ];

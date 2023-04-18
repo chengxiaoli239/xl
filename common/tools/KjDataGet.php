@@ -377,6 +377,7 @@ class KjDataGet
             $tmpDate = date('Y-m-d H:i:s');
         }
         $codesArr = [$kjDatasArr[0],$kjDatasArr[1],$kjDatasArr[2],$kjDatasArr[3]];
+        list($type_dx, $type_4dx, $type_dx_str) = CommonService::getTypeDx($codes.','.$kjDatasArr[4]);
         sort($codesArr);
         $code_3n = CommonService::get3n($codesArr);
         $insertData = [
@@ -413,6 +414,12 @@ class KjDataGet
             'type_4b' => CommonService::isCodeType4b($codes), # 是否四兄弟
             'type_4ds' => CommonService::isCodeType4ds($codes), # 是否四单双：0非四单四双1四单2四双
             'type_3n_2b' => CommonService::isCodeType3n2b($codes), # 是否三现：双重+兄弟
+
+            # 大小类型
+            'type_dx' => $type_dx, # 大小类型： \backend\service\NumService::$type_dx_datas
+            'type_4dx' => $type_4dx, # 大小类型：1122 1指小2指大
+            'type_dx_str' => $type_dx_str, # 大小类型：2大2小
+
             'lottery_type' => $lottery_type,
             'date' => date('Y-m-d',strtotime($tmpDate)),
         ];
@@ -662,12 +669,16 @@ class KjDataGet
         */
 
         $msg = ['status'=>200, 'msg'=>'操作成功！'];
-        $kjDatas = SscKjData::find()->where(['OR', ['IS', 'type_22', NULL], ['IS', 'code_4n_str', NULL]])->orderBy('id DESC')->limit($times)->all();
+        $kjDatasQuery = SscKjData::find()->where(['OR', ['IS', 'type_dx', NULL], ['=', 'type_dx_str', '']])->limit($times);
+        $sql = $kjDatasQuery->createCommand()->getRawSql();
+        $kjDatas = $kjDatasQuery->orderBy('id DESC')->all();
         foreach ($kjDatas as $key=>$kjData){
             //$kjDs = SscDataService::getCodesDS($kjData['code_str']);
-            $codes = $kjData['code1'].','.$kjData['code2'].','.$kjData['code3'].','.$kjData['code4'];
+            $codes = $kjData['code1'].','.$kjData['code2'].','.$kjData['code3'].','.$kjData['code4'].','.$kjData['code5'];
+            list($type_dx, $type_4dx, $type_dx_str) = CommonService::getTypeDx($codes);
+            #p(['lottery_type'=>$kjData['lottery_type'], 'codes'=>$codes, $type_dx, $type_4dx, $type_dx_str], 0);
             $updateData = [
-                'code_4n_str' => $codes, # 四字定str
+                //'code_4n_str' => $codes, # 四字定str
                 //'index_id' => $key + 1,
                 /*
                 'code_3n' => implode(',', $code_3n),
@@ -690,14 +701,19 @@ class KjDataGet
                 'type_3b' => CommonService::isCodeType3b($codes), # 是否三兄弟
                 'type_22b' => CommonService::isCodeType22b($codes), # 是否双兄弟
                 */
+
+                'type_dx' => $type_dx, # 大小类型
+                'type_4dx' => $type_4dx, # 大小类型：1122  1小2大
+                'type_dx_str' => $type_dx_str, # 大小类型：2大2小
             ];
-            //$kjData->type_22b = CommonService::isCodeType22b($codes);
+            #p($updateData);
             $kjData->setAttributes($updateData);
             if(!$rst = $kjData->save()){
                 $msg = current($kjData->getErrors());
                 Tool_Common::log('updateNullCode', 'ERR', '更新空值', ['msg'=>$msg]);
                 $msg = ['status'=>300, 'msg'=>$msg];
             }
+            #p([$kjData->id, 'rst'=>$rst]);
         }
 
         return $msg;
