@@ -53,6 +53,11 @@
 <strong><font color="blue">29、剔除前100期134位一致的直码：</font></strong>上期134开奖；3X45，则剔除之后，比如3845，3945这些都不中奖，3375，3935中奖
 <strong><font color="blue">30、剔除前100期234位一致的直码：</font></strong>上期234开奖；X345，则剔除之后，比如8345，9345这些都不中奖，6245，9145中奖
 <strong><font color="blue">31、剔除历史期号一致的号码全倒：</font></strong>历史所有期号一致的开奖号码对应的全倒号码剔除掉
+<strong><font color="blue">32、过滤1235期号尾号一致历史直码：</font></strong>过滤1235位历史所有期号尾号一致的历史直码
+<strong><font color="blue">33、过滤1245期号尾号一致历史直码：</font></strong>过滤1245位历史所有期号尾号一致的历史直码
+<strong><font color="blue">34、过滤1345期号尾号一致历史直码：</font></strong>过滤1345位历史所有期号尾号一致的历史直码
+<strong><font color="blue">35、过滤2345期号尾号一致历史直码：</font></strong>过滤2345位历史所有期号尾号一致的历史直码
+<strong><font color="blue">36、过滤1234大小类型一致近1500组直码：</font></strong>过滤1234历史所有大小类型一致的历史直码 - 大小顺序不区分位置
                 </code></pre>
             </div>
             <div class="modal-footer">
