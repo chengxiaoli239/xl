@@ -57,7 +57,7 @@
 <strong><font color="blue">33、过滤1245期号尾号一致历史直码：</font></strong>过滤1245位历史所有期号尾号一致的历史直码
 <strong><font color="blue">34、过滤1345期号尾号一致历史直码：</font></strong>过滤1345位历史所有期号尾号一致的历史直码
 <strong><font color="blue">35、过滤2345期号尾号一致历史直码：</font></strong>过滤2345位历史所有期号尾号一致的历史直码
-<strong><font color="blue">36、过滤1234大小类型一致近1500组直码：</font></strong>过滤1234历史所有大小类型一致的历史直码 - 大小顺序不区分位置
+<strong><font color="blue">36、过滤1234大小类型一致近1500组直码：</font></strong>过滤1234历史所有大小类型一致历史直码，开：1279=>两大两小， 只要是两大两小,不区分位置最近1500期内都会被过滤
                 </code></pre>
             </div>
             <div class="modal-footer">
