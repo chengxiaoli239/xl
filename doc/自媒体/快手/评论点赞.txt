@@ -1,0 +1,83 @@
+快手评论：
+Request URL: https://www.kuaishou.com/graphql
+Request Method: POST
+
+headers:
+accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9
+Connection: keep-alive
+Content-Length: 602
+content-type: application/json
+Cookie: kpf=PC_WEB; clientid=3; did=web_7a1ad337d0f257cafdf96f1f0f118f70; didv=1680943772000; kpn=KUAISHOU_VISION; userId=1880594635; kuaishou.server.web_st=ChZrdWFpc2hvdS5zZXJ2ZXIud2ViLnN0EqABfpPnTp_it_64E13e3YjeuMBGDJRLacvpaqLZ7RbSuSXy3J43LEaFdzwmKdKe5r29-dlXrUdn_tYaUnznJPmcMJZ2DKwzLLmvgcCZN1MWluRPz6H0eKi5wmUG3AOeEe9g95g7Zdgb-fruwFNhg2Z8wrt3OrLz-2VVqxcF0YumAlSmu47VkqrUZV9BiA9xgUuvfW-f93kYGEG3RkIY3qy1WxoS1KQylfZfbCBEuMI0IcjfqenKIiBfDaYMjdEK1mgq60K8DSRnKQi6PRflTWB_lTwZtl_NuCgFMAE; kuaishou.server.web_ph=467324207e507e3bfb4d42776dececfc6b9e
+Host: www.kuaishou.com
+Origin: https://www.kuaishou.com
+Referer: https://www.kuaishou.com/new-reco
+sec-ch-ua: "Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36
+
+payload:
+{"operationName":"visionAddComment","variables":{"photoId":"3xizjus4di3z5sg","photoAuthorId":"3xhg8dd43vpgq84","content":"是的啊","expTag":"1_u/2005957485257233009_xpcwebunknownxxunknown0"},"query":"mutation visionAddComment($photoId: String, $photoAuthorId: String, $content: String, $replyToCommentId: ID, $replyTo: ID, $expTag: String) {\n  visionAddComment(photoId: $photoId, photoAuthorId: $photoAuthorId, content: $content, replyToCommentId: $replyToCommentId, replyTo: $replyTo, expTag: $expTag) {\n    result\n    commentId\n    content\n    timestamp\n    status\n    __typename\n  }\n}\n"}
+
+返回：
+{"data":{"visionAddComment":{"result":1,"commentId":"644602568187","content":"是的啊","timestamp":1681892736125,"status":"success","__typename":"VisionAddCommentResult"}}}
+
+
+点赞1：
+Request URL: https://www.kuaishou.com/graphql
+Request Method: POST
+
+headers 1:
+accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9
+Connection: keep-alive
+Content-Length: 417
+content-type: application/json
+Cookie: kpf=PC_WEB; clientid=3; did=web_7a1ad337d0f257cafdf96f1f0f118f70; didv=1680943772000; kpn=KUAISHOU_VISION; userId=1880594635; kuaishou.server.web_st=ChZrdWFpc2hvdS5zZXJ2ZXIud2ViLnN0EqABfpPnTp_it_64E13e3YjeuMBGDJRLacvpaqLZ7RbSuSXy3J43LEaFdzwmKdKe5r29-dlXrUdn_tYaUnznJPmcMJZ2DKwzLLmvgcCZN1MWluRPz6H0eKi5wmUG3AOeEe9g95g7Zdgb-fruwFNhg2Z8wrt3OrLz-2VVqxcF0YumAlSmu47VkqrUZV9BiA9xgUuvfW-f93kYGEG3RkIY3qy1WxoS1KQylfZfbCBEuMI0IcjfqenKIiBfDaYMjdEK1mgq60K8DSRnKQi6PRflTWB_lTwZtl_NuCgFMAE; kuaishou.server.web_ph=467324207e507e3bfb4d42776dececfc6b9e
+Host: www.kuaishou.com
+Origin: https://www.kuaishou.com
+Referer: https://www.kuaishou.com/new-reco
+sec-ch-ua: "Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36
+
+payload 1:
+{"operationName":"visionLikeComment","variables":{"photoId":"3xizjus4di3z5sg","commentId":"644602568187","cancel":0,"expTag":"1_u/2005957485257233009_xpcwebunknownxxunknown0"},"query":"mutation visionLikeComment($photoId: String, $commentId: ID, $cancel: Int, $expTag: String) {\n  visionLikeComment(photoId: $photoId, commentId: $commentId, cancel: $cancel, expTag: $expTag) {\n    result\n    __typename\n  }\n}\n"}
+返回1：
+{"data":{"visionLikeComment":{"result":1,"__typename":"VisionLikeCommentResult"}}}
+
+点赞2：
+headers 2:
+accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: zh-CN,zh;q=0.9
+Connection: keep-alive
+Content-Length: 417
+content-type: application/json
+Cookie: kpf=PC_WEB; clientid=3; did=web_7a1ad337d0f257cafdf96f1f0f118f70; didv=1680943772000; kpn=KUAISHOU_VISION; userId=1880594635; kuaishou.server.web_st=ChZrdWFpc2hvdS5zZXJ2ZXIud2ViLnN0EqABfpPnTp_it_64E13e3YjeuMBGDJRLacvpaqLZ7RbSuSXy3J43LEaFdzwmKdKe5r29-dlXrUdn_tYaUnznJPmcMJZ2DKwzLLmvgcCZN1MWluRPz6H0eKi5wmUG3AOeEe9g95g7Zdgb-fruwFNhg2Z8wrt3OrLz-2VVqxcF0YumAlSmu47VkqrUZV9BiA9xgUuvfW-f93kYGEG3RkIY3qy1WxoS1KQylfZfbCBEuMI0IcjfqenKIiBfDaYMjdEK1mgq60K8DSRnKQi6PRflTWB_lTwZtl_NuCgFMAE; kuaishou.server.web_ph=467324207e507e3bfb4d42776dececfc6b9e
+Host: www.kuaishou.com
+Origin: https://www.kuaishou.com
+Referer: https://www.kuaishou.com/new-reco
+sec-ch-ua: "Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36
+
+payload 2:
+{"operationName":"visionLikeComment","variables":{"photoId":"3xizjus4di3z5sg","commentId":"600165387583","cancel":0,"expTag":"1_u/2005957485257233009_xpcwebunknownxxunknown0"},"query":"mutation visionLikeComment($photoId: String, $commentId: ID, $cancel: Int, $expTag: String) {\n  visionLikeComment(photoId: $photoId, commentId: $commentId, cancel: $cancel, expTag: $expTag) {\n    result\n    __typename\n  }\n}\n"}
+
+返回2：
+{"data":{"visionLikeComment":{"result":1,"__typename":"VisionLikeCommentResult"}}}

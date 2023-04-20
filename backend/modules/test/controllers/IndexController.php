@@ -326,7 +326,10 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $rst = KjDataGet::updateNullCode($num = 5000, $lottery_type = 5);
+        $plan = UserSysPlans::findOne(6495);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p(count($filter_dynamic_codes));
+        $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);
         p($rst);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%num4_type}}'); p($r);
         $SscKjData = SscKjData::find()->select(['qihao'])->where(['lottery_type'=>8])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one();
@@ -340,9 +343,6 @@ class IndexController extends Controller
         p([$isExists, $isExists2]);
         $rst = StaticService::static4dPerDateProfits($lottery_type = 8);
         p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
-        $plan = UserSysPlans::findOne(6495);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
-        p(count($filter_dynamic_codes));
         $rst = Lucky5Service::login($uid = 12, $tz_system_id = 9);
         p($rst);
         $rst['operateProfitsPlans'] = SscDataService::operateProfitsPlans($lottery_type = 8);

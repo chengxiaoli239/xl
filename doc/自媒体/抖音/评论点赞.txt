@@ -1,0 +1,72 @@
+点赞：
+Request URL: https://www.douyin.com/aweme/v1/web/comment/digg?cid=7223655651363373864&aweme_id=7219547354364529981&digg_type=1&channel_id=0&app_name=aweme&item_type=0&level=1&device_platform=webapp&aid=6383&channel=channel_pc_web&pc_client_type=1&version_code=170400&version_name=17.4.0&cookie_enabled=true&screen_width=1920&screen_height=1080&browser_language=zh-CN&browser_platform=Win32&browser_name=Chrome&browser_version=112.0.0.0&browser_online=true&engine_name=Blink&engine_version=112.0.0.0&os_name=Windows&os_version=10&cpu_core_num=8&device_memory=8&platform=PC&downlink=6.35&effective_type=4g&round_trip_time=100&webid=7080809847180445192&msToken=XlMV2vfdugMexK7jDeo9lNcaB-etcv3Aj9E64v403b3D6s7lesb61TlMTRUUn-Do2NAKH98Pe-UaWQ33uwUlQAQ3kkl7PP7pYAa111E6C0nTCD1ElFbRAy6-mR9Vghe5&X-Bogus=DFSzswVuVpkANjeqtVzqve9WX7Jy
+Request Method: POST
+
+:authority: www.douyin.com
+:method: POST
+:path: /aweme/v1/web/comment/digg?cid=7223655651363373864&aweme_id=7219547354364529981&digg_type=1&channel_id=0&app_name=aweme&item_type=0&level=1&device_platform=webapp&aid=6383&channel=channel_pc_web&pc_client_type=1&version_code=170400&version_name=17.4.0&cookie_enabled=true&screen_width=1920&screen_height=1080&browser_language=zh-CN&browser_platform=Win32&browser_name=Chrome&browser_version=112.0.0.0&browser_online=true&engine_name=Blink&engine_version=112.0.0.0&os_name=Windows&os_version=10&cpu_core_num=8&device_memory=8&platform=PC&downlink=6.35&effective_type=4g&round_trip_time=100&webid=7080809847180445192&msToken=XlMV2vfdugMexK7jDeo9lNcaB-etcv3Aj9E64v403b3D6s7lesb61TlMTRUUn-Do2NAKH98Pe-UaWQ33uwUlQAQ3kkl7PP7pYAa111E6C0nTCD1ElFbRAy6-mR9Vghe5&X-Bogus=DFSzswVuVpkANjeqtVzqve9WX7Jy
+:scheme: https
+accept: application/json, text/plain, */*
+accept-encoding: gzip, deflate, br
+accept-language: zh-CN,zh;q=0.9
+content-length: 0
+content-type: application/x-www-form-urlencoded; charset=UTF-8
+cookie: passport_csrf_token=9c23c6fd44471b6ccf8c3e8ef353f7ef; passport_csrf_token_default=9c23c6fd44471b6ccf8c3e8ef353f7ef; s_v_web_id=verify_lehu8256_bw3UjFHV_zRmf_4qvy_AmFi_1wrI86oOMUC5; store-region=cn-hi; store-region-src=uid; ttwid=1%7CDnjzWUQM43O20k-H1fd_q-ZXKQGDmDiSTXKt_MNULW0%7C1680178650%7C15f8b7f91937d91764d57a1806c43e9831c5bf4b2f8a5ab5e39d733faf945768; n_mh=VE6pqk3M5XMU1Go5EyQfkbovILqrxCWV-PBPRZFjEFU; LOGIN_STATUS=1; d_ticket=8134c04bde5bdaed05e2aa04b7b829fc1b8a5; __ac_signature=_02B4Z6wo00f01fDYKqAAAIDBcNrQ4ACT9r3w-C4AABghzhDJEfe8oRj-iTfTBl0.kt.0nyq-pTXP6S5QB0n5iLnw3mUa8FTNg5g6RewBnr23tmaa.oIkCWOQ5UcSnu7CY4lNbVVKRn7MtTch68; douyin.com; strategyABtestKey=%221681891896.332%22; bd_ticket_guard_client_data=eyJiZC10aWNrZXQtZ3VhcmQtdmVyc2lvbiI6MiwiYmQtdGlja2V0LWd1YXJkLWl0ZXJhdGlvbi12ZXJzaW9uIjoxLCJiZC10aWNrZXQtZ3VhcmQtY2xpZW50LWNlcnQiOiItLS0tLUJFR0lOIENFUlRJRklDQVRFLS0tLS1cbk1JSUNGVENDQWJ1Z0F3SUJBZ0lWQVBaVXE4aTdmL3BmY29jMnVoZFIvUVMxU245SU1Bb0dDQ3FHU000OUJBTUNcbk1ERXhDekFKQmdOVkJBWVRBa05PTVNJd0lBWURWUVFEREJsMGFXTnJaWFJmWjNWaGNtUmZZMkZmWldOa2MyRmZcbk1qVTJNQjRYRFRJek1EUXdNakF5TWpVek1sb1hEVE16TURRd01qRXdNalV6TWxvd0p6RUxNQWtHQTFVRUJoTUNcblEwNHhHREFXQmdOVkJBTU1EMkprWDNScFkydGxkRjluZFdGeVpEQlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlcbkF3RUhBMElBQkViWmp5aUZ2NEdwSFhQcDNzbUNnbXZFT3o2SUNpQjk4R2drT3VsU2JWWm1oOTdTN0FaczNFMG5cbm5RTS9BRDgydWp2Sk1WZEU2YjhRSFNLSHFNbW5DMFdqZ2Jrd2diWXdEZ1lEVlIwUEFRSC9CQVFEQWdXZ01ERUdcbkExVWRKUVFxTUNnR0NDc0dBUVVGQndNQkJnZ3JCZ0VGQlFjREFnWUlLd1lCQlFVSEF3TUdDQ3NHQVFVRkJ3TUVcbk1Da0dBMVVkRGdRaUJDQTZ1Y3FicXpkWkl0UXVMNGltTXhrOExBL0dOaEl5V01aZGJ6dFV6V01UK2pBckJnTlZcbkhTTUVKREFpZ0NBeXBXZnFqbVJJRW8zTVRrMUFlM01VbTBkdFUzcWswWURYZVpTWGV5SkhnekFaQmdOVkhSRUVcbkVqQVFnZzUzZDNjdVpHOTFlV2x1TG1OdmJUQUtCZ2dxaGtqT1BRUURBZ05JQURCRkFpQWppNEJvK3NIeDJvajRcbmU3WTRIWEtTSXZrRmhSVG5XYVM5dW5lOXM2UUNKUUloQUtZR1hCQ21ObHRyWDU4MnBDTWk1cUVuLys2cDFmNXdcbldhdHMydDBsSnYySVxuLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLVxuIn0=; pwa2=%221%7C0%22; passport_assist_user=CkA2tBoP94KPBjYPUXHDw0BFz_vECWoQXlB4Dj__i86LnqLfjxCaJ_ldPR_GmwQk9Psvi2jd8KEFjY04nODCDhZ7GkgKPK3ilVmsIgwR8rFpKvJsFxfElpq8IQV2T0LTG7lgv46nyJKMgGLChGeTnXEMlaJi7R3LP-2BMquVaypHGRCf8q4NGImv1lQiAQNxtxga; sso_uid_tt=d7d7de7f7580b74ff2b0f1fe5e55f3d0; sso_uid_tt_ss=d7d7de7f7580b74ff2b0f1fe5e55f3d0; toutiao_sso_user=2373a945d943bd550a409dac1ef1f195; toutiao_sso_user_ss=2373a945d943bd550a409dac1ef1f195; sid_ucp_sso_v1=1.0.0-KGIyMDgzMTFlMzI2MzUzZjI4NDY5YTUyOWQ3ODgzN2M5ZDUzZTJlOWIKHgjNwICPhvRVEPfF_qEGGO8xIAwwuMKY8AU4BkD0BxoCaGwiIDIzNzNhOTQ1ZDk0M2JkNTUwYTQwOWRhYzFlZjFmMTk1; ssid_ucp_sso_v1=1.0.0-KGIyMDgzMTFlMzI2MzUzZjI4NDY5YTUyOWQ3ODgzN2M5ZDUzZTJlOWIKHgjNwICPhvRVEPfF_qEGGO8xIAwwuMKY8AU4BkD0BxoCaGwiIDIzNzNhOTQ1ZDk0M2JkNTUwYTQwOWRhYzFlZjFmMTk1; odin_tt=97bf8a3e78ac6d8e16ad8301fd40e0ce594f3551dadcdffad14ba62215f5ec345698f1fa174bb5814a65c76f8736b644f085336d90230d34908155999afe3a2b; passport_auth_status=6530a31f2588fc376b900cb5370133a4%2Ccd38058a9e5d9ad8f2b442da18afd727; passport_auth_status_ss=6530a31f2588fc376b900cb5370133a4%2Ccd38058a9e5d9ad8f2b442da18afd727; uid_tt=d2a5c55844276b8f022b84e54424aa5e; uid_tt_ss=d2a5c55844276b8f022b84e54424aa5e; sid_tt=2eea4f7a5a66343642cf1415c8e8dcc2; sessionid=2eea4f7a5a66343642cf1415c8e8dcc2; sessionid_ss=2eea4f7a5a66343642cf1415c8e8dcc2; publish_badge_show_info=%220%2C0%2C0%2C1681892089869%22; VIDEO_FILTER_MEMO_SELECT=%7B%22expireTime%22%3A1682496889899%2C%22type%22%3A1%7D; home_can_add_dy_2_desktop=%221%22; passport_fe_beating_status=true; sid_guard=2eea4f7a5a66343642cf1415c8e8dcc2%7C1681892092%7C5183998%7CSun%2C+18-Jun-2023+08%3A14%3A50+GMT; sid_ucp_v1=1.0.0-KDU4MDAxMmE2ZTM2YTJkOTMzNTJiODY5MjJhOWVlMGUwMWVhNjAxN2QKGgjNwICPhvRVEPzF_qEGGO8xIAw4BkD0B0gEGgJobCIgMmVlYTRmN2E1YTY2MzQzNjQyY2YxNDE1YzhlOGRjYzI; ssid_ucp_v1=1.0.0-KDU4MDAxMmE2ZTM2YTJkOTMzNTJiODY5MjJhOWVlMGUwMWVhNjAxN2QKGgjNwICPhvRVEPzF_qEGGO8xIAw4BkD0B0gEGgJobCIgMmVlYTRmN2E1YTY2MzQzNjQyY2YxNDE1YzhlOGRjYzI; csrf_session_id=9cb3b69d30d02c76bd001b2b6424a8fd; bd_ticket_guard_server_data=; msToken=AZpWn03WW5S1Q5cajoIdpXvc_QuNbfBCUBBty5B64sdtjczT8VuT4G7TEyFm79Xi2b2XiKD0LLnDBsaNWz3EKjciIgntMvV3HvqedJ5BZn-UQGgyXcYKCYQuhdd79T99; tt_scid=AZ7HKzVvJNrLqhTQlSqY44wZAsXo9aMReByvLMBKyp3KUzHflUOSlFEWF4YdTPUj8698; download_guide=%222%2F20230419%22; msToken=XlMV2vfdugMexK7jDeo9lNcaB-etcv3Aj9E64v403b3D6s7lesb61TlMTRUUn-Do2NAKH98Pe-UaWQ33uwUlQAQ3kkl7PP7pYAa111E6C0nTCD1ElFbRAy6-mR9Vghe5
+origin: https://www.douyin.com
+referer: https://www.douyin.com/
+sec-ch-ua: "Chromium";v="112", "Google Chrome";v="112", "Not:A-Brand";v="99"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+sec-fetch-dest: empty
+sec-fetch-mode: cors
+sec-fetch-site: same-origin
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36
+x-secsdk-csrf-token: 000100000001d19d9ca99bcfd04f09f0d95ebe77b31cd47989ca7b2ee82122116fac14e3df53175747f2a5f7bcc2
+﻿
+245
+The resource <URL> was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+index.js:1 init
+﻿
+----- payload 
+cid: 7223655651363373864
+aweme_id: 7219547354364529981
+digg_type: 1
+channel_id: 0
+app_name: aweme
+item_type: 0
+level: 1
+device_platform: webapp
+aid: 6383
+channel: channel_pc_web
+pc_client_type: 1
+version_code: 170400
+version_name: 17.4.0
+cookie_enabled: true
+screen_width: 1920
+screen_height: 1080
+browser_language: zh-CN
+browser_platform: Win32
+browser_name: Chrome
+browser_version: 112.0.0.0
+browser_online: true
+engine_name: Blink
+engine_version: 112.0.0.0
+os_name: Windows
+os_version: 10
+cpu_core_num: 8
+device_memory: 8
+platform: PC
+downlink: 6.35
+effective_type: 4g
+round_trip_time: 100
+webid: 7080809847180445192
+msToken: XlMV2vfdugMexK7jDeo9lNcaB-etcv3Aj9E64v403b3D6s7lesb61TlMTRUUn-Do2NAKH98Pe-UaWQ33uwUlQAQ3kkl7PP7pYAa111E6C0nTCD1ElFbRAy6-mR9Vghe5
+X-Bogus: DFSzswVuVpkANjeqtVzqve9WX7Jy
+﻿
+245
+The resource <URL> was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.
+index.js:1 init
+﻿
+
+
+{"comment":{"cid":"7223655651363373864","create_time":1681892132,"digg_count":0,"image_list":null,"label_list":null,"reply_comment":null,"reply_id":"0","reply_to_reply_id":"0","status":7,"text":"皇帝","text_extra":[],"text_music_info":null,"user":{"avatar_thumb":{"height":720,"uri":"100x100/aweme-avatar/mosaic-legacy_3791_5070639578","url_list":["https://p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/mosaic-legacy_3791_5070639578.jpeg?from=2956013662"],"width":720},"aweme_count":0,"cf_list":null,"close_friend_type":0,"contacts_status":2,"contrail_list":null,"cover_url":[{"height":720,"uri":"c8510002be9a3a61aad2","url_list":["https://p9-pc-sign.douyinpic.com/obj/c8510002be9a3a61aad2?x-expires=1683100800\u0026x-signature=RDnoZKj87VpUOJfiJL0hk9uu8FQ%3D\u0026from=2956013662","https://p3-pc-sign.douyinpic.com/obj/c8510002be9a3a61aad2?x-expires=1683100800\u0026x-signature=GijYp82Id1%2Fe7pm7LtJa5wbm8%2FQ%3D\u0026from=2956013662","https://p6-pc-sign.douyinpic.com/obj/c8510002be9a3a61aad2?x-expires=1683100800\u0026x-signature=mkIeQoz9AoT6lB8Iwi3xUvvJKhk%3D\u0026from=2956013662"],"width":720}],"create_time":1582287555,"custom_verify":"","data_label_list":null,"endorsement_info_list":null,"enterprise_verify_reason":"","favoriting_count":0,"follow_status":0,"follower_count":0,"follower_list_secondary_information_struct":null,"follower_status":0,"following_count":0,"im_role_ids":null,"is_blocked_v2":false,"is_blocking_v2":false,"is_cf":0,"max_follower_count":0,"nickname":"高子","not_seen_item_id_list":null,"not_seen_item_id_list_v2":null,"offline_info_list":null,"personal_tag_list":null,"risk_notice_text":"","sec_uid":"MS4wLjABAAAAtdzbQSlpsFjiHZC8EZBor_Aae4Zqyi9_BSXF4ukYpeg","secret":0,"short_id":"3554282450","show_gender_strategy":0,"signature":"","signature_extra":null,"special_follow_status":0,"special_people_labels":null,"status":1,"text_extra":null,"total_favorited":0,"uid":"377821325172813","unique_id":"gaozi47645","urge_detail":{"user_urged":0},"user_age":23,"user_canceled":false,"user_permissions":null,"verification_type":1},"user_digged":0,"video_list":null},"log_pb":{"impr_id":"202304191615322C19F730402EF5096DFB"},"status_code":0}
