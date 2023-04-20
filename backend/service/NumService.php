@@ -96,7 +96,7 @@ class NumService extends BaseService {
         37=>'过滤1245期号尾号一致历史直码 ',
         38=>'过滤1345期号尾号一致历史直码 ',
         39=>'过滤2345期号尾号一致历史直码 ',
-        40=>'过滤1234大小类型一致近1500组直码 ',
+        40=>'过滤1234大小类型一致近2500组直码 ',
     ];
 
     /**
@@ -3020,7 +3020,7 @@ class NumService extends BaseService {
      * @param int $type 1:大小 2:单双
      * @return array
      */
-    private static function getBeforeKjCodesDynamic36(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $positions=[1,2,3,4], $cNum=1500, $type=1){
+    private static function getBeforeKjCodesDynamic36(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $positions=[1,2,3,4], $cNum=2500, $type=1){
         $playway = $plan->playway;
         #$nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
