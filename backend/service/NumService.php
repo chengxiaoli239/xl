@@ -3042,16 +3042,16 @@ class NumService extends BaseService {
         $currentKjDatasQuery = SscKjData::find()->select(['code_str', 'code_4n_str'=>'CONCAT('.$positions_str.')', $filter_field])
             ->where($currentWhere);
         $sql1 = $currentKjDatasQuery->createCommand()->getRawSql();
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤1234大小类型一致近1500组(四定)', ['positions'=>$positions, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'current_kj_qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql1'=>$sql1]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤1234大小类型一致近2500组(四定)', ['positions'=>$positions, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'current_kj_qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql1'=>$sql1]);
         $currentKjDatas = $currentKjDatasQuery->limit(1)->asArray()->one();
         #p($currentKjDatas);
 
-        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['<=', 'qihao', $current_kj_qihao], ['!=', $filter_field, $currentKjDatas[$filter_field]]];
+        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['<=', 'qihao', $current_kj_qihao], ['=', $filter_field, $currentKjDatas[$filter_field]]];
         $positions_str = 'code'.implode(',",",code', $positions);
         $currentKjDatasQuery = SscKjData::find()->select(['code_str', 'code_4n_str'=>'CONCAT('.$positions_str.')', $filter_field])
             ->where($historyWhere)->groupBy(['CONCAT('.$positions_str.')'])->limit($cNum)->orderBy(['id'=>SORT_DESC]);
         $sql2 = $currentKjDatasQuery->createCommand()->getRawSql();
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤1234大小类型一致近1500组(四定)', ['positions'=>$positions, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'current_kj_qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql2'=>$sql2]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤1234大小类型一致近2500组(四定)', ['positions'=>$positions, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'current_kj_qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql2'=>$sql2]);
         $historyKjDatas = $currentKjDatasQuery->asArray()->all();
 
         $filterCodes = ArrayHelper::getColumn($historyKjDatas, 'code_4n_str');
