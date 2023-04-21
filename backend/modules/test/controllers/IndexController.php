@@ -326,6 +326,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        d(number_format(20.34,2));
         $plan = UserSysPlans::findOne(6495);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         p(count($filter_dynamic_codes));
