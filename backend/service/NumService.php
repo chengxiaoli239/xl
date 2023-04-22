@@ -2086,13 +2086,15 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic9($playway);
                     break;
                 case 10: # 过滤最近2880组(四定)，不够往前搜集 前四，与12 后4类似
-                    $codes = NumService::getBeforeKjCodesDynamic10($plan, $lottery_type);
+                    #$codes = NumService::getBeforeKjCodesDynamic10($plan, $lottery_type);
+                    $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,3,4], $num=2880);
                     break;
                 case 11: # 过滤前200期开过2次以上号码的全转(四定)
                     $codes = NumService::getBeforeKjCodesDynamic11($plan, $lottery_type);
                     break;
                 case 12: # 过滤后4最近2880组(四定)，不够往后搜集
-                    $codes = NumService::getBeforeKjCodesDynamic12($plan, $lottery_type);
+                    #$codes = NumService::getBeforeKjCodesDynamic12($plan, $lottery_type);
+                    $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[2,3,4,5]);
                     break;
                 case 13: # 过滤最近10000期重复2次以上的直码(四定)
                     $codes = NumService::getBeforeKjCodesDynamic13($plan, $lottery_type);
@@ -2116,10 +2118,12 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic19($plan, $lottery_type);
                     break;
                 case 20: # 过滤最近2000组(四定)，不够往后搜集 前四，与12 后4类似
-                    $codes = NumService::getBeforeKjCodesDynamic10($plan, $lottery_type, $num=2000);
+                    #$codes = NumService::getBeforeKjCodesDynamic10($plan, $lottery_type, $num=2000);
+                    $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,3,4], $num=2000);
                     break;
                 case 21: # 过滤后4最近2000组(四定)，不够往后搜集
-                    $codes = NumService::getBeforeKjCodesDynamic12($plan, $lottery_type, $num=2000);
+                    #$codes = NumService::getBeforeKjCodesDynamic12($plan, $lottery_type, $num=2000);
+                    $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[2,3,4,5], $num=2000);
                     break;
                 case 22: # 过滤1,2,3,5最近2000组(四定)，不够往后搜集
                     $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,3,5], $num=2000);
@@ -2137,7 +2141,8 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic26($plan, $lottery_type);
                     break;
                 case 27: # 过滤前4最近1152组(四定)，不够往后搜集
-                    $codes = NumService::getBeforeKjCodesDynamic10($plan, $lottery_type, $num=1152);
+                    #$codes = NumService::getBeforeKjCodesDynamic10($plan, $lottery_type, $num=1152);
+                    $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,3,4], $num=1152);
                     break;
                 case 28: # 过滤期号尾号一致历史直码(四定) - 1234
                     $codes = NumService::getBeforeKjCodesDynamic28($plan, $lottery_type, $positions=[1,2,3,4]);
