@@ -2510,10 +2510,11 @@ class NumService extends BaseService {
             $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
         }
 
-        $needCodes = SscKjData::find()->select(['code_4n_str'])
+        $needCodesQuery = SscKjData::find()->select(['code_4n_str'])
             ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
-            ->groupBy(['code_4n_str'])->orderBy(['id'=>SORT_DESC])->limit($num)->asArray()->all();
-        #p(SscKjData::find()->select(['code_4n_str'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit($num)->createCommand()->getRawSql());
+            ->groupBy(['code_4n_str'])->orderBy(['id'=>SORT_DESC])->limit($num);
+        //p($needCodesQuery->createCommand()->getRawSql());
+        $needCodes = $needCodesQuery->asArray()->all();
         $filterCodes = ArrayHelper::getColumn($needCodes, 'code_4n_str');
         $filterCodesStr = implode('","', $filterCodes);
 

@@ -1,11 +1,11 @@
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: green;">
-    <div class="col-lg-2 col-xs-2">
+    <div class="col-lg-2 col-xs-3">
         <?= $form->field($model, 'change_per')->checkboxList([1=>'是'])->label('每期轮换') ?>
     </div>
-    <div class="col-lg-2 col-xs-2">
+    <div class="col-lg-2 col-xs-3">
         <?= $form->field($model, 'turn_key')->textInput()->label('开始组') ?>
     </div>
-    <div class="col-lg-4 col-xs-2">
+    <div class="col-lg-4 col-xs-6">
         <?= $form->field($model, 'change_turn_pos')->checkboxList([1=>'千', 2=>'百', 3=>'十', 4=>'个', 5=>'五'])->label('位置号码指定组数(比如说勾“千”，千位开2下期则投第2组)') ?>
     </div>
 </div>
