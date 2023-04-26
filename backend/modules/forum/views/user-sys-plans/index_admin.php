@@ -71,8 +71,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'plan_type','label'=>'计划类型',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                $txt = \backend\service\TzService::getTzPlanTypes($model->plan_type);
-                                if($model->is_test) $txt .= '_模拟';
+                                $txt = \backend\service\TzService::getTzPlanTypes($model->plan_type).'_';
+                                $url0 = "/forum/user-sys-plans/switch-test?id=".$model->id.'&status=1'; # 切换真实
+                                $url1 = "/forum/user-sys-plans/switch-test?id=".$model->id.'&status=0'; # 切换模拟
+                                if($model->is_test) {
+                                    $txt .= Html::a("<font color='gray'><strong>模拟</strong></font>", $url0, ['title' => '切换真实']);
+                                }else{
+                                    $txt .= Html::a("<font color='green'><strong>真实</strong></font>", $url1, ['title' => '切换模拟']);
+                                }
                                 return $txt;
                             }
                         ],

@@ -498,6 +498,13 @@ class UserSysPlansController extends BaseController
         return $this->redirect(['index']);
     }
 
+    public function actionSwitchTest($id, $status){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        HN0898Service::updateStatus($id, $model = '\backend\models\UserSysPlans', 'is_test');
+
+        return $this->redirect(['index']);
+    }
+
     /**
      * @desc 更新投注 购买方向
      * @param $status
