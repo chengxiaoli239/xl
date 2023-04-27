@@ -111,6 +111,10 @@ class Lucky5 extends BaseKj {
      */
     public static function getLotteryShiXunOne($returnType = 'json', $is_auto=1){
         try {
+            $status = KjDataGet::isCanGrab(self::$lottery_type);
+            if(empty($status)){
+                throw_info('非开奖抓取时间节点');
+            }
             $m = \Yii::$app->cache;
             $redis = \Yii::$app->redis;
             $kjData = self::getCurrentKjData(self::$lottery_type, $current_qihao);
@@ -131,7 +135,6 @@ class Lucky5 extends BaseKj {
 
                 $t = round(microtime(true) * 1000);
                 $url = $domain.'/kaijiang/history/ygxy5.json?v='.$t; #当前开奖号码
-                # 当前开奖链接：https://1.cc138001.com/kaijiang/ygxy5.json?v=1570866018057
                 # 当前开奖链接：https://web01.cc138008.com/kaijiang/history/ygxy5.json?v=1582557689975
 
                 $is_get_remote = 1;
