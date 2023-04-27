@@ -185,6 +185,7 @@ class Lucky5 extends BaseKj {
      * @return array|bool
      */
     public static function getLotteryShiXun($returnType = 'json', $is_auto=1){
+        $is_remote = 0;
         if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun');
 
@@ -193,6 +194,7 @@ class Lucky5 extends BaseKj {
             # https://web01.cc138008.com/kaijiang/ygxy5.json?v=1582561329435
             # 当前开奖链接：https://1.cc138001.com/kaijiang/ygxy5.json?v=1570866018057
 
+            $is_remote = 1;
             //$data = CurlService::getCurl($url);
             $data = CurlService::getCurl302($url);
             //$data = file_get_contents($url);
@@ -218,7 +220,7 @@ class Lucky5 extends BaseKj {
             echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
             ob_end_flush();exit;
         }else{
-            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime, 'is_remote'=>$is_remote];
         }
         $logArr = $rst;
         Tool_Common::log('luck5', 'INFO', '号码抓取-时讯网', $logArr);
