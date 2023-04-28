@@ -166,7 +166,7 @@ class ProxyBaseService {
                 $isValid = ProxyBaseService::isValid($current_ip_addr);
                 if(!$isValid){
                     $is_need_get_new_ip = 1;
-                    ProxyBaseService::setIpInvalid($current_ip_addr); # 设置当前ip无效
+                    #ProxyBaseService::setIpInvalid($current_ip_addr); # 设置当前ip无效
                 }
             }else{
                 $is_need_get_new_ip = 1;
