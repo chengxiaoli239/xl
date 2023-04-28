@@ -1199,7 +1199,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        $poxy_addr = BaseService::setPoxy($ch, $url, $uid); # 设置代理IP
+        BaseService::setPoxy($ch, $url, $uid); # 设置代理IP
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -2141,7 +2141,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
         }
 
-        $poxy_addr = BaseService::setPoxy($ch, $url, $uid); # 设置代理IP
+        BaseService::setPoxy($ch, $url, $uid); # 设置代理IP
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -2203,7 +2203,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }
         if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306, 310, 311])){
             if(isset($post_data['bet_number']) && strlen($post_data['bet_number'])>200) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 300);
-            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             Tool_Common::log('httpPostError','INFO','httpPost请求-3', $logArr);
         }
         if(empty($rstData)){
@@ -2213,7 +2213,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $rstData['errno'] = $errno;
         $time_consume = ($end_time-$start_time).'s';
 
-        $logArr = ['uid'=>$uid, 'url'=>$url, 'headers'=>$headers, 'rstData'=>$rstData, 'errno'=>$errno, 'time_consume'=>$time_consume, 'poxy_addr'=>$poxy_addr];
+        $logArr = ['uid'=>$uid, 'url'=>$url, 'headers'=>$headers, 'rstData'=>$rstData, 'errno'=>$errno, 'time_consume'=>$time_consume];
         Tool_Common::log('postBetCurl','INFO','httpPost下注请求-5-1', $logArr);
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
 

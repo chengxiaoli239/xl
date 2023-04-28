@@ -355,14 +355,14 @@ class BaseService{
             if(empty($uids) OR !in_array($uid, $uids) OR !$uid){
                 return ['status'=>200, 'msg'=>'无需代理IP的用户或uid为空'];
             }
-            Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'current_proxy_addr'=>$current_proxy_addr, 'uid'=>$uid]);
+            Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'uid'=>$uid]);
 
             ProxyBaseService::setProxy($ch, $uid); # 设置全局代理
         }catch (\Exception $e){
-            Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'current_proxy_addr'=>$current_proxy_addr, 'uid'=>$uid]);
-            return $e->getMessage();
+            Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'uid'=>$uid, 'err_msg'=>$e->getMessage()]);
+            return false;
         }
 
-        return $current_proxy_addr;
+        return true;
     }
 }
