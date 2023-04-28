@@ -140,7 +140,6 @@ class Lucky5 extends BaseKj {
                 $is_get_remote = 1;
                 $rst = CurlService::getCurl($url);
                 $data = $rst['data']['list'][0];
-                Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取正常-实讯网00', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst]);
 
                 if (!isset($rst['data']['list'][0]) OR empty($data)){
                     throw_info('开奖数据为空：'.yii\helpers\Json::encode($rst, 320));
@@ -155,7 +154,7 @@ class Lucky5 extends BaseKj {
             if(empty($kjData['opencode'])){
                 throw_info('开奖号码不能为空');
             }
-            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'is_get_remote'=>$is_get_remote]);
+            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'is_remote'=>$is_get_remote]);
             $redis->srem($redisKey, $current_qihao);
         }catch (\Exception $e){
             $redis->srem($redisKey, $current_qihao);
