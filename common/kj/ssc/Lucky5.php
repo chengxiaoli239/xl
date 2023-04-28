@@ -6,6 +6,7 @@ use backend\service\CurlService;
 use backend\service\Lucky5\LuckyBaseService;
 use common\kj\BaseKj;
 use common\service\CommonService;
+use common\service\proxy\ProxyBaseService;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use  yii;
@@ -163,8 +164,9 @@ class Lucky5 extends BaseKj {
             $redis->srem($redisKey, $current_qihao);
         }catch (\Exception $e){
             $redis->srem($redisKey, $current_qihao);
+            $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
 
-            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage(), 'is_remote'=>$is_get_remote]);
+            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage(), 'is_remote'=>$is_get_remote, 'current_proxy_addr'=>$current_proxy_addr]);
             if($e->getCode() != self::SUCCESS_CODE){
                 return false;
             }
