@@ -342,7 +342,7 @@ class IndexController extends Controller
      */
     public function actionCacheProxyIp($is_auto=1){
         self::_init();
-        for ($i=0; $i<4; $i++){
+        for ($i=0; $i<1; $i++){
             foreach (ProxyBaseService::$proxy_types as $proxy_type){
                 $rst = ProxyBaseService::preGetValidIp($proxy_type, $is_auto);
                 Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '缓存代理IP数据', ['proxy_type'=>$proxy_type, 'is_auto'=>$is_auto, 'rst'=>$rst]);
