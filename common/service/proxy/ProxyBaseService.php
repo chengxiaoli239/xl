@@ -17,7 +17,7 @@ class ProxyBaseService {
 
     public static $ip_port = '';
 
-    public static $proxy_types = [1, 2, 3]; # 1快代理2芝麻代理3代理云
+    public static $proxy_types = [1]; # 1快代理2芝麻代理3代理云
 
     /**
      * @param int $type
