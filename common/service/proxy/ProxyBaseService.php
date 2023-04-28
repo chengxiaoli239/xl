@@ -126,7 +126,6 @@ class ProxyBaseService {
         $ip_addr = $m->get($mkey);
         #p(['proxy_type'=>$proxy_type, 'ip_addr'=>$ip_addr]);
         if(!$ip_addr){
-            p('xxxx', 0);
             $flag = ProxyIpRecords::updateAll(['status'=>0, 'updated_at'=>time()], ['AND', ['=', 'status', 1], ['<', 'expire_time', time()]]);
             $where = ['AND', ['=', 'proxy_type', $proxy_type], ['=', 'status', 1]];
             $row = ProxyIpRecords::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
@@ -140,9 +139,9 @@ class ProxyBaseService {
                 $is_warnning = 1;
             }
             $expire_time = $row->expire_time;
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP-1', ['ip_addr'=>$ip_addr, 'proxy_type'=>$proxy_type, 'flag'=>$flag, 'expire_time'=>date('Y-m-d H:i:s', $expire_time)]);
         }
-        p('llll', 0);
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP', ['ip_addr'=>$ip_addr, 'proxy_type'=>$proxy_type, 'flag'=>$flag, 'expire_time'=>date('Y-m-d H:i:s', $expire_time)]);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP2', ['ip_addr'=>$ip_addr, 'proxy_type'=>$proxy_type]);
 
         return $ip_addr;
     }
