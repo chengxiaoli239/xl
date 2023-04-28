@@ -1,12 +1,13 @@
 <?php
+$db_name = 'stock_datas'; # lottery_xl
 return [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=127.0.0.1;dbname=lottery_xl',
+            'dsn' => 'mysql:host=127.0.0.1;dbname='.$db_name,
             'enableSchemaCache' => true,
             'schemaCacheDuration' => 3600,
-            'username' => 'lottery_xl',
+            'username' => $db_name,
             'tablePrefix' => 'lt_',
             'password' => 'dPmk3frLf8Teb6wm',
             'charset' => 'utf8',
