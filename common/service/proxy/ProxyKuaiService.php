@@ -157,7 +157,7 @@ class ProxyKuaiService {
             }
             Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-快代理', $logArr);
         }catch (\Exception $exception){
-            Tool_Common::log('/proxy/'.__FUNCTION__, 'ERR', '获取代理IP-快代理-错误', ['type'=>$type, 'err_msg'=>$exception->getMessage()]);
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'ERR', '获取代理IP-快代理-错误', ['type'=>$type, 'ip_addr'=>$ip_addr, 'err_msg'=>$exception->getMessage()]);
             if($exception->getCode() != 20000){
                 return ['status'=>300, 'msg'=>$exception->getMessage()];
             }

@@ -124,7 +124,9 @@ class ProxyBaseService {
         }
         $mkey = ProxyBaseService::buildProxyIpKey($proxy_type);
         $ip_addr = $m->get($mkey);
+        #p(['proxy_type'=>$proxy_type, 'ip_addr'=>$ip_addr]);
         if(!$ip_addr){
+            p('xxxx', 0);
             $flag = ProxyIpRecords::updateAll(['status'=>0, 'updated_at'=>time()], ['AND', ['=', 'status', 1], ['<', 'expire_time', time()]]);
             $where = ['AND', ['=', 'proxy_type', $proxy_type], ['=', 'status', 1]];
             $row = ProxyIpRecords::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
@@ -137,8 +139,10 @@ class ProxyBaseService {
             if($type == 2 && $left_time<90){
                 $is_warnning = 1;
             }
-            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP', ['ip_addr'=>$ip_addr, 'proxy_type'=>$proxy_type, 'flag'=>$flag, 'expire_time'=>date('Y-m-d H:i:s', $row->expire_time)]);
+            $expire_time = $row->expire_time;
         }
+        p('llll', 0);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP', ['ip_addr'=>$ip_addr, 'proxy_type'=>$proxy_type, 'flag'=>$flag, 'expire_time'=>date('Y-m-d H:i:s', $expire_time)]);
 
         return $ip_addr;
     }
@@ -166,7 +170,7 @@ class ProxyBaseService {
                 $isValid = ProxyBaseService::isValid($current_ip_addr);
                 if(!$isValid){
                     $is_need_get_new_ip = 1;
-                    ProxyBaseService::setIpInvalid($current_ip_addr); # 设置当前ip无效
+                    #ProxyBaseService::setIpInvalid($current_ip_addr); # 设置当前ip无效
                 }
             }else{
                 $is_need_get_new_ip = 1;

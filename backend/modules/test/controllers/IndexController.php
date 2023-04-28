@@ -325,6 +325,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp(1, 2);
+        p($current_proxy_addr);
         $plan = UserSysPlans::findOne(6495);
         #$filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic14($plan);
@@ -466,8 +468,6 @@ class IndexController extends Controller
             $hzArr['turn_key'] = 0;
         }
         p('klajsdf');
-        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
-        p($current_proxy_addr);
         $session_id = '4a62huo5ev61crrelqhnbnbn5l';
         $r = UserService::delUserOneSessionId('10', $session_id);
         p($r);
