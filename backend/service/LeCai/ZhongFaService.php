@@ -2463,7 +2463,7 @@ class ZhongFaService { # 宝岛众发登陆体系
 
         #$poxy_addr = PoxyIPService::getPoxyIp($uid);
         $poxy_addr = ProxyBaseService::getCurrentValidProxyIp();
-        Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);
+        Tool_Common::log('setPoxy', 'INFO', '设置全局代理4', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);
 
         if(!empty($poxy_addr)){
             //设置代理

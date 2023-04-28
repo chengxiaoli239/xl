@@ -2166,7 +2166,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         if(strpos($url, 'ww662889') === false){
             //$poxy_addr = '218.85.247.70:20000';
         }
-        Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);
+        Tool_Common::log('setPoxy', 'INFO', '设置全局代理5', ['url'=>$url, 'poxy_addr'=>$poxy_addr, 'uid'=>$uid]);
         $uids = PoxyIPService::getProxyUids();
         if(empty($uids) OR !in_array($uid, $uids) OR !$uid){
             return [];
