@@ -260,7 +260,7 @@ class CurlService extends BaseService{
      * @decription 获取远程html内容
      * @param $url
      */
-    public static function getCurl($url,$header=[], $timeout=''){
+    public static function getCurl($url,$header=[], $timeout='', $isNeedProxy=0){
         if(!$timeout){
             $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         }
@@ -279,7 +279,9 @@ class CurlService extends BaseService{
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER,0);
-        ProxyBaseService::setProxy($ch); # 设置全局代理
+        if($isNeedProxy){
+            ProxyBaseService::setProxy($ch); # 设置全局代理
+        }
 
         $data = curl_exec($ch);
         //p(['header'=>$header, 'url'=>$url, 'rst'=>$data]);

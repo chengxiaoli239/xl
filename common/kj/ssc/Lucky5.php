@@ -144,7 +144,7 @@ class Lucky5 extends BaseKj {
                 # 当前开奖链接：https://web01.cc138008.com/kaijiang/history/ygxy5.json?v=1582557689975
 
                 $is_get_remote = 1;
-                $rst = CurlService::getCurl($url);
+                $rst = CurlService::getCurl($url, $header=[], 30, 1);
                 $data = $rst['data']['list'][0];
 
                 if (!isset($rst['data']['list'][0]) OR empty($data)){
