@@ -137,7 +137,7 @@ class ProxyBaseService {
             if($type == 2 && $left_time<90){
                 $is_warnning = 1;
             }
-            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP', ['ip_addr'=>$ip_addr, 'flag'=>$flag, 'expire_time'=>date('Y-m-d H:i:s', $row->expire_time)]);
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP', ['ip_addr'=>$ip_addr, 'proxy_type'=>$proxy_type, 'flag'=>$flag, 'expire_time'=>date('Y-m-d H:i:s', $row->expire_time)]);
         }
 
         return $ip_addr;
