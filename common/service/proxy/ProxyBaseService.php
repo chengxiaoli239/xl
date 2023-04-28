@@ -139,7 +139,7 @@ class ProxyBaseService {
                 $is_warnning = 1;
             }
             $expire_time = $row->expire_time;
-            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP-1', ['ip_addr'=>$ip_addr, 'proxy_type'=>$proxy_type, 'flag'=>$flag, 'expire_time'=>date('Y-m-d H:i:s', $expire_time)]);
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP-1', ['ip_addr'=>$ip_addr, 'left_time'=>$left_time, 'proxy_type'=>$proxy_type, 'flag'=>$flag, 'expire_time'=>date('Y-m-d H:i:s', $expire_time)]);
         }
         Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP2', ['ip_addr'=>$ip_addr, 'proxy_type'=>$proxy_type]);
 
@@ -167,10 +167,6 @@ class ProxyBaseService {
             $current_ip_addr = ProxyBaseService::getCurrentValidProxyIp($proxy_type, $type=2, $is_warnning); # 获取当前可用的代理IP
             if($is_warnning == 0 && !empty($current_ip_addr)){
                 $isValid = ProxyBaseService::isValid($current_ip_addr);
-                if(!$isValid){
-                    $is_need_get_new_ip = 1;
-                    #ProxyBaseService::setIpInvalid($current_ip_addr); # 设置当前ip无效
-                }
             }else{
                 $is_need_get_new_ip = 1;
             }
@@ -247,8 +243,9 @@ class ProxyBaseService {
             $m->set($mkey, 1, 6);
             return self::isValid($proxy_ip);
         }
+        $ssl_version = BaseService::getSslVersionByUid();
 
-        Tool_Common::log('/proxy/'.__FUNCTION__,'INFO', '判断代理IP有效性', ['url'=>$url, 'proxy_ips'=>$proxy_ip, 'rst'=>$checkRst, 'consume_time'=>$consume_time]);
+        Tool_Common::log('/proxy/'.__FUNCTION__,'INFO', '判断代理IP有效性', ['url'=>$url, 'proxy_ips'=>$proxy_ip, 'rst'=>$checkRst, 'ssl_version'=>$ssl_version, 'consume_time'=>$consume_time]);
 
         return  $checkRst;
     }
