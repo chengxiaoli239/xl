@@ -114,12 +114,11 @@ class Lucky5 extends BaseKj {
      */
     public static function getLotteryShiXunOne($returnType = 'json', $is_auto=1){
         try {
-            $is_get_remote = 0;
+            $is_remote = 0;
             $status = KjDataGet::isCanGrab(self::$lottery_type);
             if(empty($status)){
-                throw_info('非开奖抓取时间节点');
+                throw_info('非开奖抓取时间节点:'.date('Y-m-d H:i:s'));
             }
-            $m = \Yii::$app->cache;
             $redis = \Yii::$app->redis;
             $kjData = self::getCurrentKjData(self::$lottery_type, $current_qihao);
             $redisKey = 'getLotteryShiXunOne_'.self::$lottery_type;
@@ -127,26 +126,18 @@ class Lucky5 extends BaseKj {
             if(!$is_exist){
                 throw_info('并发请求...');
             }
-            $mkey = $redisKey.'_'.$current_qihao;
-            $lockFlag = $m->get($mkey);
-            if($lockFlag){
-                throw_info('短时间内请求...');
-            }
-            $status = KjDataGet::isCanGrab(self::$lottery_type);
-            if(!$status) {
-                throw_info('该时间点不可抓取', self::SUCCESS_CODE);
-            }
-            if($is_auto==2 OR empty($kjData['opencode']) OR empty($kjData['expect'])) {
-                $m->set($mkey, 1, 15);
+
+            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-实讯网01', ['lottery_type'=>self::$lottery_type, 'current_qihao'=>$current_qihao, 'kjData'=>$kjData]);
+            if($is_auto==2 OR empty($kjData)) {
                 $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun-one');
 
                 $t = round(microtime(true) * 1000);
                 $url = $domain.'/kaijiang/history/ygxy5.json?v='.$t; #当前开奖号码
                 # 当前开奖链接：https://web01.cc138008.com/kaijiang/history/ygxy5.json?v=1582557689975
 
-                $is_get_remote = 1;
+                $is_remote = 1;
                 #$rst = CurlService::getCurl($url, $header=[], 30, 1);
-                $rst = self::getCurl($url, $header=[], 30, 1);
+                $rst = self::getCurl($url, $header=[], 30);
                 $data = $rst['data']['list'][0];
 
                 if (!isset($rst['data']['list'][0]) OR empty($data)){
@@ -162,13 +153,13 @@ class Lucky5 extends BaseKj {
             if(empty($kjData['opencode'])){
                 throw_info('开奖号码不能为空');
             }
-            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'is_remote'=>$is_get_remote]);
+            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-实讯网02', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'is_remote'=>$is_remote]);
             $redis->srem($redisKey, $current_qihao);
         }catch (\Exception $e){
             $redis->srem($redisKey, $current_qihao);
             $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
 
-            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage(), 'is_remote'=>$is_get_remote, 'current_proxy_addr'=>$current_proxy_addr]);
+            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网03', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage(), 'is_remote'=>$is_remote, 'current_proxy_addr'=>$current_proxy_addr]);
             if($e->getCode() != self::SUCCESS_CODE){
                 return false;
             }
