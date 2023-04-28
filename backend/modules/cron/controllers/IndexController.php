@@ -340,12 +340,12 @@ class IndexController extends Controller
      * @demo curl http://www.lottery.com/cron/index/cache-proxy-ip
      * @return array
      */
-    public function actionCacheProxyIp(){
+    public function actionCacheProxyIp($is_auto=1){
         self::_init();
         for ($i=0; $i<4; $i++){
             foreach (ProxyBaseService::$proxy_types as $proxy_type){
-                $rst = ProxyBaseService::preGetValidIp($proxy_type);
-                Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '缓存代理IP数据', ['proxy_type'=>$proxy_type, 'rst'=>$rst]);
+                $rst = ProxyBaseService::preGetValidIp($proxy_type, $is_auto);
+                Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '缓存代理IP数据', ['proxy_type'=>$proxy_type, 'is_auto'=>$is_auto, 'rst'=>$rst]);
             }
             sleep(15);
         }
