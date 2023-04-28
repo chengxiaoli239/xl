@@ -130,7 +130,7 @@ class ProxyKuaiService {
             $ip_addr = $data['data'][0]; # 110.86.176.46:15064
             $ProxyIpRecords = ProxyIpRecords::findOne(['ip_addr'=>$ip_addr]);
             if(!empty($ProxyIpRecords)){
-                throw_info('代理IP记录已存在');
+                throw_info('代理IP记录已存在', 20000);
             }
             $ip_addr_datas = explode(':', $data['data'][0]);;
             $ip = $ip_addr_datas[0];
@@ -158,7 +158,9 @@ class ProxyKuaiService {
             Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-快代理', $logArr);
         }catch (\Exception $exception){
             Tool_Common::log('/proxy/'.__FUNCTION__, 'ERR', '获取代理IP-快代理-错误', ['type'=>$type, 'err_msg'=>$exception->getMessage()]);
-            return ['status'=>300, 'msg'=>$exception->getMessage()];
+            if($exception->getCode() != 20000){
+                return ['status'=>300, 'msg'=>$exception->getMessage()];
+            }
         }
 
         return ['status'=>200, 'ip_addr'=>$ip_addr];
