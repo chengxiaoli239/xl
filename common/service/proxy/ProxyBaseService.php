@@ -3,8 +3,8 @@ namespace common\service\proxy;
 
 use backend\models\ProxyIpRecords;
 use backend\models\TzSystemsUsers;
+use backend\service\BaseService;
 use backend\service\BetService;
-use backend\service\CurlService;
 use common\service\CommonService;
 use common\tools\Tool_Common;
 use  yii;
@@ -166,7 +166,7 @@ class ProxyBaseService {
                 $isValid = ProxyBaseService::isValid($current_ip_addr);
                 if(!$isValid){
                     $is_need_get_new_ip = 1;
-                    #ProxyBaseService::setIpInvalid($current_ip_addr); # 设置当前ip无效
+                    ProxyBaseService::setIpInvalid($current_ip_addr); # 设置当前ip无效
                 }
             }else{
                 $is_need_get_new_ip = 1;
@@ -265,7 +265,7 @@ class ProxyBaseService {
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid());
 
         ProxyBaseService::setProxy($ch); # 设置全局代理
 
