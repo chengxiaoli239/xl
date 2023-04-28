@@ -280,7 +280,7 @@ class ProxyBaseService {
         $end_time = microtime(true);
         $errno = curl_errno( $ch );
         $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
-        $logArr = ['url'=>$url, 'errno'=>$errno, 'time_consume'=>($end_time-$start_time).'s', 'current_proxy_addr'=>$current_proxy_addr];
+        $logArr = ['url'=>$url, 'errno'=>$errno, 'time_consume'=>($end_time-$start_time).'s', 'current_proxy_addr'=>$current_proxy_addr, 'ssl_version'=>BaseService::getSslVersionByUid()];
         Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', 'IP检测', $logArr);
         $flag = true;
         if($errno>0){
