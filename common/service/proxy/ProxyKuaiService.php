@@ -34,8 +34,8 @@ class ProxyKuaiService {
             'pt' => 1, # 1、http/https,返回http代理的端口号 2、socks4/socks5,返回socks代理的端口号
             'format' => 'json', # json、xml
             'sep' => 1,
-            //'area' => '浙江,福建,江西,上海,湖北,江苏,广东',
-            'area' => '广东',
+            'area' => '浙江,福建,江西,上海,湖北,江苏,广东',
+            //'area' => '广东',
             'signature' => $API_KEY,
             'carrier' => 2, # 0: 不筛选(默认) 1: 联通 2: 电信 ]  此参数仅支持按IP付费订单
         ];
