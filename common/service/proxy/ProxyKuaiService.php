@@ -128,6 +128,10 @@ class ProxyKuaiService {
                 return [];
             }
             $ip_addr = $data['data'][0]; # 110.86.176.46:15064
+            $ProxyIpRecords = ProxyIpRecords::findOne(['ip_addr'=>$ip_addr]);
+            if(!empty($ProxyIpRecords)){
+                throw_info('代理IP记录已存在');
+            }
             $ip_addr_datas = explode(':', $data['data'][0]);;
             $ip = $ip_addr_datas[0];
             $port = $ip_addr_datas[1];
