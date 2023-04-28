@@ -1027,7 +1027,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         curl_setopt($curl, CURLOPT_HEADER, 1);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-        self::setPoxy($curl, $url, $uid); # 设置代理
+        BaseService::setPoxy($curl, $url, $uid); # 设置代理
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -1077,7 +1077,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         curl_setopt($curl, CURLOPT_HEADER, 1);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-        self::setPoxy($curl, $url, $uid); # 设置代理IP
+        BaseService::setPoxy($curl, $url, $uid); # 设置代理IP
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -1199,11 +1199,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        if($POXY_STATUS){
-            $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
-            if(empty($poxy_addr)) return ['status'=>30200, 'msg'=>'代理IP获取异常,请稍候...', 'POXY_STATUS'=>$POXY_STATUS];
-        }
+        $poxy_addr = BaseService::setPoxy($ch, $url, $uid); # 设置代理IP
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -2145,7 +2141,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
         }
 
-        $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+        $poxy_addr = BaseService::setPoxy($ch, $url, $uid); # 设置代理IP
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -2256,7 +2252,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        self::setPoxy($ch, $url, $uid); # 设置代理IP
+        BaseService::setPoxy($ch, $url, $uid); # 设置代理IP
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -2306,7 +2302,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        $poxy_addr = self::setPoxy($ch, $url, $uid); # 设置代理IP
+        $poxy_addr = BaseService::setPoxy($ch, $url, $uid); # 设置代理IP
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
@@ -2345,31 +2341,5 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         return $rstData;
     }
-
-    /**
-     * @desc 设置全局代理
-     * @param $ch
-     * @return bool|array
-     */
-    public static function setPoxy($ch, $url='', $uid = 0){
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
-        if(empty($TzSystemsUsers) OR !$TzSystemsUsers->is_use_proxy){
-            return ['status'=>200, 'msg'=>'无需代理IP的用户或uid为空'];
-        }
-        $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
-        if(!$POXY_STATUS) return []; # CURL 代理开关
-
-        $uids = PoxyIPService::getProxyUids();
-        if(empty($uids) OR !in_array($uid, $uids) OR !$uid){
-            return ['status'=>200, 'msg'=>'无需代理IP的用户或uid为空'];
-        }
-        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
-        Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'current_proxy_addr'=>$current_proxy_addr, 'uid'=>$uid]);
-
-        ProxyBaseService::setProxy($ch, $uid); # 设置全局代理
-
-        return $current_proxy_addr;
-    }
-
 
 }

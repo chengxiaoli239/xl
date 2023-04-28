@@ -19,6 +19,7 @@ use backend\service\pingbo\PingBoBaseService;
 use backend\service\qilin\BingDaoService;
 use backend\service\qilin\QiLinBaseService;
 use common\service\CommonService;
+use common\service\proxy\ProxyBaseService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use  yii;
@@ -332,5 +333,36 @@ class BaseService{
 
         $version = in_array($uid, $ssl_1_uids) ? 1 : 3;
         return $version;
+    }
+
+    /**
+     * @desc 设置全局代理
+     * @param $ch
+     * @return bool|array
+     */
+    public static function setPoxy($ch, $url='', $uid = 0){
+        try {
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+            if(empty($TzSystemsUsers) OR !$TzSystemsUsers->is_use_proxy){
+                throw_info('无需代理IP的用户或uid为空');
+            }
+            $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
+            if(!$POXY_STATUS){# CURL 代理开关
+                throw_info('IP代理开关未开启1');
+            }
+
+            $uids = PoxyIPService::getProxyUids();
+            if(empty($uids) OR !in_array($uid, $uids) OR !$uid){
+                return ['status'=>200, 'msg'=>'无需代理IP的用户或uid为空'];
+            }
+            Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'current_proxy_addr'=>$current_proxy_addr, 'uid'=>$uid]);
+
+            ProxyBaseService::setProxy($ch, $uid); # 设置全局代理
+        }catch (\Exception $e){
+            Tool_Common::log('setPoxy', 'INFO', '设置全局代理', ['url'=>$url, 'current_proxy_addr'=>$current_proxy_addr, 'uid'=>$uid]);
+            return $e->getMessage();
+        }
+
+        return $current_proxy_addr;
     }
 }

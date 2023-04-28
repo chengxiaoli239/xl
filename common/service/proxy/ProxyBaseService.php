@@ -312,50 +312,57 @@ class ProxyBaseService {
      * @return bool
      */
     public static function setProxy($ch, $uid=0){
-        $proxy_type = ProxyBaseService::getProxyTypeByUid($uid);
-
-        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp($proxy_type);
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设置全局代理-1', ['uid'=>$uid, 'proxy_type'=>$proxy_type, 'current_proxy_addr'=>$current_proxy_addr]);
-        if(empty($current_proxy_addr)) return [];
-        if($proxy_type == 2) { # 芝麻云
-            // 代理服务器
-            $proxyServer = "http://" . $current_proxy_addr;
-            curl_setopt($ch, CURLOPT_PROXYTYPE, 5); //sock5
-            curl_setopt($ch, CURLOPT_PROXY, $proxyServer);
-
-        }elseif($proxy_type == 3){ # 代理云
-            $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp($proxy_type);
-            # 快代理
-            $username = \Yii::$app->params['DAILIYUN_USERNAME'];
-            $password = \Yii::$app->params['DAILIYUN_PASSWORD'];
-            if(!empty($current_proxy_addr)){
-                //设置代理
-                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-                curl_setopt($ch, CURLOPT_PROXY, $current_proxy_addr);
-                //设置代理用户名密码（私密代理/独享代理）
-                //如果是开放代理，请注释掉下面两句
-                curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+        try {
+            $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
+            if(!$POXY_STATUS){# CURL 代理开关
+                throw_info('IP代理开关未开启2');
             }
-        }else{
+            $proxy_type = ProxyBaseService::getProxyTypeByUid($uid);
+
             $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp($proxy_type);
-            # 快代理
-            $username = \Yii::$app->params['KUAI_USERNAME'];
-            $password = \Yii::$app->params['KUAI_PASSWORD'];
-            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设置全局代理-1', ['uid'=>$uid, 'proxy_type'=>$proxy_type, 'current_proxy_addr'=>$current_proxy_addr,
-                'username'=>$username,'password'=>$password]);
-            if(!empty($current_proxy_addr)){
-                //设置代理
-                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-                curl_setopt($ch, CURLOPT_PROXY, $current_proxy_addr);
-                //设置代理用户名密码（私密代理/独享代理）
-                //如果是开放代理，请注释掉下面两句
-                curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-                curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设置全局代理-1', ['uid'=>$uid, 'proxy_type'=>$proxy_type, 'current_proxy_addr'=>$current_proxy_addr]);
+            if(empty($current_proxy_addr)){
+                throw_info('代理IP为空');
             }
+            if($proxy_type == 2) { # 芝麻云
+                // 代理服务器
+                $proxyServer = "http://" . $current_proxy_addr;
+                curl_setopt($ch, CURLOPT_PROXYTYPE, 5); //sock5
+                curl_setopt($ch, CURLOPT_PROXY, $proxyServer);
+
+            }elseif($proxy_type == 3){ # 代理云
+                # 快代理
+                $username = \Yii::$app->params['DAILIYUN_USERNAME'];
+                $password = \Yii::$app->params['DAILIYUN_PASSWORD'];
+                if(!empty($current_proxy_addr)){
+                    //设置代理
+                    curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+                    curl_setopt($ch, CURLOPT_PROXY, $current_proxy_addr);
+                    //设置代理用户名密码（私密代理/独享代理）
+                    //如果是开放代理，请注释掉下面两句
+                    curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+                    curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+                }
+            }else{
+                # 快代理
+                $username = \Yii::$app->params['KUAI_USERNAME'];
+                $password = \Yii::$app->params['KUAI_PASSWORD'];
+                Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设置全局代理-1', ['uid'=>$uid, 'proxy_type'=>$proxy_type, 'current_proxy_addr'=>$current_proxy_addr,
+                    'username'=>$username,'password'=>$password]);
+                if(!empty($current_proxy_addr)){
+                    //设置代理
+                    curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+                    curl_setopt($ch, CURLOPT_PROXY, $current_proxy_addr);
+                    //设置代理用户名密码（私密代理/独享代理）
+                    //如果是开放代理，请注释掉下面两句
+                    curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+                    curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+                }
+            }
+        }catch (\Exception $e){
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设置全局代理-异常', ['uid'=>$uid, 'proxy_type'=>$proxy_type, 'err_msg'=>$e->getMessage()]);
+            return false;
         }
-
-
 
         return true;
     }
