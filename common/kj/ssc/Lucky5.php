@@ -1,6 +1,7 @@
 <?php
 # 开彩网
 namespace common\kj\ssc;
+use backend\models\SystemConfig;
 use backend\models\TzSystemsUsers;
 use backend\service\CurlService;
 use backend\service\Lucky5\LuckyBaseService;
@@ -144,7 +145,8 @@ class Lucky5 extends BaseKj {
                 # 当前开奖链接：https://web01.cc138008.com/kaijiang/history/ygxy5.json?v=1582557689975
 
                 $is_get_remote = 1;
-                $rst = CurlService::getCurl($url, $header=[], 30, 1);
+                #$rst = CurlService::getCurl($url, $header=[], 30, 1);
+                $rst = self::getCurl($url, $header=[], 30, 1);
                 $data = $rst['data']['list'][0];
 
                 if (!isset($rst['data']['list'][0]) OR empty($data)){
@@ -205,9 +207,7 @@ class Lucky5 extends BaseKj {
             # 当前开奖链接：https://1.cc138001.com/kaijiang/ygxy5.json?v=1570866018057
 
             $is_remote = 1;
-            //$data = CurlService::getCurl($url);
             $data = CurlService::getCurl302($url);
-            //$data = file_get_contents($url);
 
             if (!isset($data['code'])) return false;
             $opencode = implode(',', $data['code']);
@@ -290,7 +290,7 @@ class Lucky5 extends BaseKj {
             $m = \Yii::$app->cache;
             //if($datas = $m->get($mkey)) return $datas;
 
-            $content = CurlService::getCurl($url, $headers);
+            $content = self::getCurl($url, $headers);
             //p([$headers, $url, $content]);
             $data = $content;
             if($data['Status'] == 1 && !empty($data['Data']['Rows'])){
@@ -370,5 +370,46 @@ class Lucky5 extends BaseKj {
         }
 
         return $codes;
+    }
+
+    /**
+     * @decription 获取远程html内容
+     * @param $url
+     */
+    public static function getCurl($url,$header=[], $timeout=''){
+        if(!$timeout){
+            $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+        //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_HEADER,0);
+
+        $data = curl_exec($ch);
+        //p(['header'=>$header, 'url'=>$url, 'rst'=>$data]);
+        $errno = curl_errno($ch);
+        if($errno>0) {
+            $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+            Tool_Common::log('/err/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'errno'=>$errno, 'postRst'=>$data, 'error'=>$str]);
+            return ['Status'=>2, 'code'=>300, 'Data'=>'代理网络超时，错误码:'.$errno, 'errno'=>$errno];
+        }
+        curl_close($ch);
+        if(!self::is_json($data)){
+            return $data;
+        }
+        $data = json_decode($data, true);
+
+        return $data;
     }
 }
