@@ -111,6 +111,7 @@ class Lucky5 extends BaseKj {
      */
     public static function getLotteryShiXunOne($returnType = 'json', $is_auto=1){
         try {
+            $is_get_remote = 0;
             $status = KjDataGet::isCanGrab(self::$lottery_type);
             if(empty($status)){
                 throw_info('非开奖抓取时间节点');
@@ -128,7 +129,6 @@ class Lucky5 extends BaseKj {
             if($lockFlag){
                 throw_info('短时间内请求...');
             }
-            $is_get_remote = 0;
             if($is_auto==2 OR empty($kjData['opencode']) OR empty($kjData['expect'])) {
                 $m->set($mkey, 1, 15);
                 $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun-one');
@@ -158,7 +158,7 @@ class Lucky5 extends BaseKj {
             $redis->srem($redisKey, $current_qihao);
         }catch (\Exception $e){
             $redis->srem($redisKey, $current_qihao);
-            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage(), 'is_remote'=>$is_get_remote]);
             return false;
         }
         $opencode = $kjData['opencode'];
