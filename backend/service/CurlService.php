@@ -10,6 +10,7 @@ namespace backend\service;
 
 use backend\models\SystemConfig;
 use common\service\CommonService;
+use common\service\proxy\ProxyBaseService;
 use common\tools\Tool_Common;
 use  yii;
 
@@ -278,6 +279,7 @@ class CurlService extends BaseService{
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER,0);
+        ProxyBaseService::setProxy($ch); # 设置全局代理
 
         $data = curl_exec($ch);
         //p(['header'=>$header, 'url'=>$url, 'rst'=>$data]);

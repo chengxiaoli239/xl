@@ -297,11 +297,13 @@ class ProxyBaseService {
         $mkey = 'getProxyTypeByUid_'.$uid;
         if(!$proxy_type = $m->get($mkey)){
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
-            $proxy_type = $TzSystemsUsers->proxy_type;
-
-            $m->set($mkey, $proxy_type, 30);
+            if(!empty($TzSystemsUsers)){
+                $proxy_type = $TzSystemsUsers->proxy_type;
+            }
         }
+
         $proxy_type = $proxy_type ? :ProxyBaseService::getProxyType();
+        $m->set($mkey, $proxy_type, 30);
 
         return (int)$proxy_type;
     }
