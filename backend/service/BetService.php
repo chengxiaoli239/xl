@@ -1495,6 +1495,7 @@ abstract class BetService extends BaseBetService {
     public static function _logRecords($data){
         if(!$data OR !is_array($data)) return false;
         try{
+            $transaction = Yii::$app->db->beginTransaction();
             $insertData = [
                 'sn'=>$data['sn'] ? $data['sn'] : BetService::$test_true_sn, // 方案号
                 'snid'=>$data['snid'] ? $data['snid'] : BetService::$test_true_snid,
@@ -1528,7 +1529,7 @@ abstract class BetService extends BaseBetService {
             $where = ['AND', ['=', 'qihao', $data['qihao']], ['=', 'plan_id', $data['plan_id']], ['=', 'uid', $data['uid']]];
             $flag = BettingRecords::find()->where($where)->limit(1)->one();
             if($flag){
-                return ['status'=>200, 'msg'=>'写入成功'];
+                throw_info('记录已经存在plan_id:'.$data['plan_id'].'_uid:'.$data['uid']);
             }
 
             $bettingRecords = new BettingRecords();
@@ -1538,7 +1539,9 @@ abstract class BetService extends BaseBetService {
             if(!$rst){
                 throw_info(Json::encode($bettingRecords->getErrors(), 320));
             }
+            $transaction->commit();
         }catch(\Exception $e){
+            $transaction->rollBack();
             $err_msg = $e->getMessage();
             Tool_Common::log('logRecords', 'INFO', '记录投注表', ['plan_id'=>$data['plan_id'], 'msg'=>$err_msg]);
             return ['status'=>300, 'data'=>[], 'msg'=>$err_msg];
