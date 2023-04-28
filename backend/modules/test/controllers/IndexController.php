@@ -192,13 +192,12 @@ class IndexController extends Controller
     {
         self::_init();
         $post = \Yii::$app->request->post();
-        $ip_addr = ProxyBaseService::getCurrentValidProxyIp();
         $id = $post['id'];
         $rst = BaseService::login($id);
         p($rst);
         $TzSystemsUsers = TzSystemsUsers::findOne($id);
 
-        return array_merge($rst, ['TzSystemsUsers' => $TzSystemsUsers, 'poxy_addr' => $ip_addr]);
+        return array_merge($rst, ['TzSystemsUsers' => $TzSystemsUsers]);
     }
 
     /**

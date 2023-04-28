@@ -455,8 +455,7 @@ abstract class BetService extends BaseBetService {
                         $e_time = microtime(true);
                         $t_rst = $betRst['data']['bet_rst'];
                         $rst[$lottery_type][$task_id]['repeatBetRst'] = $t_rst;
-                        $current_ip_addr = ProxyBaseService::getCurrentValidProxyIp(); # 获取当前可用的代理IP
-                        $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'consume_time'=>($e_time-$s_time).'s', 'current_ip_addr'=>$current_ip_addr];
+                        $logArr = ['uid' => $uid, 'qihao'=>$activeQihao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'consume_time'=>($e_time-$s_time).'s'];
 
                         if(!empty($t_rst['snid'])){
                             # 记录方案号

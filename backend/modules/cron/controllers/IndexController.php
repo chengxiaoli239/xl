@@ -337,6 +337,7 @@ class IndexController extends Controller
 
     /**
      * @desc 缓存代理IP数据
+     * @demo curl http://www.lottery.com/cron/index/cache-proxy-ip
      * @return array
      */
     public function actionCacheProxyIp(){
