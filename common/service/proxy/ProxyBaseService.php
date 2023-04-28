@@ -175,6 +175,9 @@ class ProxyBaseService {
             $logArr = ['is_need_get_new_ip'=>$is_need_get_new_ip, 'proxy_type'=>$proxy_type, 'is_valid'=>$isValid, 'current_ip_addr'=>$current_ip_addr];
             if($is_need_get_new_ip){
                 $new_ip_addr_data = ProxyBaseService::getRemoteProxyIp($proxy_type);
+                if(empty($new_ip_addr_data)){
+                    throw_info('代理IP为空proxy_type:'.$proxy_type);
+                }
 
                 # 代理IP告警节点，获取新ip成功则设置旧代理ip失效
                 if($is_warnning == 1 && $new_ip_addr_data['status'] == 200 && !empty($new_ip_addr_data['ip_addr']) && !empty($current_ip_addr)){
