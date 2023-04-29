@@ -418,7 +418,7 @@ class Lucky5 extends BaseKj {
      * @decription 获取远程html内容
      * @param $url
      */
-    public static function getCurl302($url,$headers=[], $timeout=''){
+    public static function getCurl302($url,$headers=[], $timeout=5){
         if(!$timeout){
             $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         }
@@ -432,14 +432,15 @@ class Lucky5 extends BaseKj {
 
         #curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         #curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch, CURLOPT_SSLVERSION, 2);
-
+        #curl_setopt($ch, CURLOPT_SSLVERSION, 2);
+        curl_setopt($ch, CURLOPT_TCP_KEEPALIVE, 1); // 开启TCP keepalive功能，保持长连接
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);    # 302 redirect
         //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
+        #ProxyBaseService::setProxy($ch); # 设置全局代理
 
         $data = curl_exec($ch);
-        p(['headers'=>$headers, 'url'=>$url, 'rst'=>$data]);
         $errno = curl_errno($ch);
+        #p(['headers'=>$headers, 'url'=>$url, 'rst'=>$data, 'errno'=>$errno]);
         if($errno>0) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
             Tool_Common::log('/err/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'errno'=>$errno, 'postRst'=>$data, 'error'=>$str]);
