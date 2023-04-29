@@ -432,12 +432,12 @@ class Lucky5 extends BaseKj {
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        #curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        #curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
         #curl_setopt($ch, CURLOPT_SSLVERSION, 2);
         curl_setopt($ch, CURLOPT_TCP_KEEPALIVE, 1); // 开启TCP keepalive功能，保持长连接
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);    # 302 redirect
-        //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
+        curl_setopt($ch, CURLOPT_ENCODING, true);    # 302 redirect
         ProxyBaseService::setProxy($ch); # 设置全局代理
 
         $data = curl_exec($ch);
