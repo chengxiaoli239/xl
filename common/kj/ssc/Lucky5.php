@@ -420,35 +420,33 @@ class Lucky5 extends BaseKj {
      * @decription 获取远程html内容
      * @param $url
      */
-    public static function getCurl302($url,$headers=[], $timeout=5){
+    public static function getCurl302($url, $headers=[], $timeout=5){
         if(!$timeout){
             $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         }
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
+        $curl = curl_init();
 
-        // 设置浏览器的特定header
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
-
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        #curl_setopt($ch, CURLOPT_SSLVERSION, 2);
-        curl_setopt($ch, CURLOPT_TCP_KEEPALIVE, 1); // 开启TCP keepalive功能，保持长连接
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);    # 302 redirect
-        curl_setopt($ch, CURLOPT_ENCODING, true);    # 302 redirect
-        ProxyBaseService::setProxy($ch); # 设置全局代理
-
-        $data = curl_exec($ch);
-        $errno = curl_errno($ch);
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => $headers,
+        ));
+        $data = curl_exec($curl);
+        $errno = curl_errno($curl);
         #p(['headers'=>$headers, 'url'=>$url, 'rst'=>$data, 'errno'=>$errno]);
         if($errno>0) {
-            $err_msg = 'Curl error: ' . curl_error($ch);
+            $err_msg = 'Curl error: ' . curl_error($curl);
             Tool_Common::log('/err/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'errno'=>$errno, 'postRst'=>$data, 'err_msg'=>$err_msg]);
             return ['Status'=>2, 'code'=>300, 'Data'=>'代理网络超时，错误码:'.$errno, 'errno'=>$errno];
         }
-        curl_close($ch);
+        curl_close($curl);
         if(!BaseService::is_json($data)){
             return $data;
         }
