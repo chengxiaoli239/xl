@@ -137,7 +137,17 @@ class Lucky5 extends BaseKj {
 
                 $is_remote = 1;
                 #$rst = CurlService::getCurl($url, $header=[], 30, 1);
-                $rst = self::getCurl($url, $header=[], 30);
+                $headers = [
+                    'accept: application/json, text/plain, */*',
+                    'accept-encoding: gzip, deflate, br',
+                    'accept-language: zh-CN,zh;q=0.9',
+                    'cookie: uuidafd4aea0-251e-11ed-bb4d-0050568551f7=2319762621252830284; cf_clearance=ykJ7Ag0JfZodLp6XpDUvSyqFp20CZFxSUf0R0KpdMUw-1680942882-0-150; AC=4b388c04651682734312550f729da1ad2072d62ea3; noticePage=6643005; __cf_bm=LtTX859s.hSXJgDnfqKJqUIAHEwk.Hec8L4nwaD525c-1682734326-0-AWF/TTUBvi7lPd9m4bp7UVYxNFnsi24J9MQYAbZuGh0CESY2xj0dQEd5dDx8nzGfwliQa9EUnJe7QQQB4VEJhdpJgw3LUxrlPjHmXq637DVB',
+                    'referer: '.$domain.'/',
+                    'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
+                    'x-requested-with: XMLHttpRequest'
+                ];
+                #$rst = self::getCurl($url, $headers, 30);
+                $rst = self::getCurl302($url, $headers, 30);
                 $data = $rst['data']['list'][0];
 
                 if (!isset($rst['data']['list'][0]) OR empty($data)){
@@ -386,6 +396,46 @@ class Lucky5 extends BaseKj {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER,0);
+
+        $data = curl_exec($ch);
+        //p(['header'=>$header, 'url'=>$url, 'rst'=>$data]);
+        $errno = curl_errno($ch);
+        if($errno>0) {
+            $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
+            Tool_Common::log('/err/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'errno'=>$errno, 'postRst'=>$data, 'error'=>$str]);
+            return ['Status'=>2, 'code'=>300, 'Data'=>'代理网络超时，错误码:'.$errno, 'errno'=>$errno];
+        }
+        curl_close($ch);
+        if(!self::is_json($data)){
+            return $data;
+        }
+        $data = json_decode($data, true);
+
+        return $data;
+    }
+
+    /**
+     * @decription 获取远程html内容
+     * @param $url
+     */
+    public static function getCurl302($url,$headers=[], $timeout=''){
+        if(!$timeout){
+            $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
+        }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // 设置浏览器的特定header
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+
+        #curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        #curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 2);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);    # 302 redirect
+        //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
 
         $data = curl_exec($ch);
         //p(['header'=>$header, 'url'=>$url, 'rst'=>$data]);
