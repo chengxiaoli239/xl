@@ -438,7 +438,7 @@ class Lucky5 extends BaseKj {
         //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
 
         $data = curl_exec($ch);
-        //p(['header'=>$header, 'url'=>$url, 'rst'=>$data]);
+        p(['headers'=>$headers, 'url'=>$url, 'rst'=>$data]);
         $errno = curl_errno($ch);
         if($errno>0) {
             $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";

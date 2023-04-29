@@ -325,6 +325,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+
+        $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
+        p($data);
         $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp(1, 2);
         p($current_proxy_addr);
         $plan = UserSysPlans::findOne(6495);
@@ -358,8 +361,6 @@ class IndexController extends Controller
         $params = [];
         $is_auto_audit = $params['is_auto_audit'] ?? 1;
         p($is_auto_audit);
-        $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=1);
-        p($data);
         $data = BetService::getLotteryName(8);
         p($data);
         $data = Lucky5::getLotteryLucky($type = 'json', $test = 1);
