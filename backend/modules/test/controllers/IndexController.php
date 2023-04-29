@@ -325,7 +325,6 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-
         $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
         p($data);
         $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp(1, 2);
@@ -407,7 +406,8 @@ class IndexController extends Controller
         $rst = StaticService::staticOnePlanProifts($plan_id=5885);
         p($rst);
         $rst = UserService::staticUserProfits($uid=17); p($rst);
-        $current_qihao = NumService::getPlanBetCurrentQihao($plan_id='5834', $lottery_type = 17);
+        $UserSysPlans = UserSysPlans::findOne($plan_id='5834');
+        $current_qihao = NumService::getPlanBetCurrentQihao($UserSysPlans, $lottery_type = 17);
         p($current_qihao);
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao = '20211215286', $lottery_type = 8);
         p($next_qihao);
@@ -536,7 +536,8 @@ class IndexController extends Controller
         p($current_qihao);
         $arr = ['filter_type' => 1, 'filter_nums' => 1, 'playway' => 1, 'start_qihao' => '20211224163', 'filter_poses' => [1, 2], 'lottery_type' => DEFAULT_LOTTERY_TYPE]; # 过滤条件
         $fitlers = json_decode('{"filter_type":1,"filter_nums":1,"playway":1,"filter_poses":[2,4],"lottery_type":8}', true);
-        $filter_codes = NumService::getCodesByCodesHz($fitlers, $plan_id = 508, 8); # 过滤的号码
+        $UserSysPlan = UserSysPlans::findOne(508);
+        $filter_codes = NumService::getCodesByCodesHz($fitlers, $UserSysPlan, 8); # 过滤的号码
         p($filter_codes);
         //$rst['batch_simulate_data'] = BetService::batchSimulateBet($lottery_types = [8], $uid=2);p($rst);
 

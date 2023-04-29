@@ -53,7 +53,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             'value' => function($model) {
                                 $playway_Arr = [1=>'二字定', 2=>'三字定', 3=>'四字定', 4=>'一字定', 6=>'X字现'];
 
-                                return $playway_Arr[$model->playway];
+                                return $playway_Arr[$model->playway].'['.$model->id.']';
                             }
                         ],
 

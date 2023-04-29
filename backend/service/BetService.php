@@ -927,7 +927,7 @@ abstract class BetService extends BaseBetService {
         $codes_hz_data = json_decode($codes_hz, true);
         if(isset($codes_hz_data['filters']['filter_type']) && in_array($codes_hz_data['filters']['filter_type'], [1])){
             # 过滤号码，filter_type:1过滤前x期号码
-            $filter_codes = NumService::getCodesByCodesHz($codes_hz_data['filters'], $plan_id);
+            $filter_codes = NumService::getCodesByCodesHz($codes_hz_data['filters'], $plan);
             Tool_Common::log('/codes/'.__FUNCTION__, 'INFO', '过滤号码', ['plan_id'=>$plan_id, 'tz_type'=>$tz_type, 'filters'=>$codes_hz_data['filters'], 'codesArr'=>$codesArr, 'get_counts'=>count($codesArr), 'filter_codes'=>$filter_codes, 'filter_counts'=>count($filter_codes)]);
             //p(['codesArrCount'=>count($codesArr), 'codesArr'=>$codesArr, 'filter_codes_count'=>count($filter_codes),  'filter_codes'=>$filter_codes]);
             $codesArr = array_diff($codesArr, $filter_codes); # 返回$codes在$filter_codes中没有的号码
@@ -2172,47 +2172,49 @@ abstract class BetService extends BaseBetService {
 
                 try {
                     $plan_id = $plan->id;
-                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划00', ['uid'=>$uid, 'plan_id'=>$plan_id, 'lottery_type' => $lottery_type]);
-                    $current_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type); # 获取当前模拟计划即将下注的期号
-                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划01', ['uid'=>$uid, 'plan_id'=>$plan_id, 'lottery_type' => $lottery_type, 'current_qihao'=>$current_qihao]);
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划00', ['uid'=>$uid, 'plan_id'=>$plan_id, 'lottery_type'=>$lottery_type]);
+                    $next_qihao = NumService::getPlanBetCurrentQihao($plan, $lottery_type); # 获取当前模拟计划即将下注的期号
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划01', ['uid'=>$uid, 'plan_id'=>$plan_id, 'lottery_type'=>$lottery_type, 'current_qihao'=>$next_qihao]);
 
-                    $mkey = 'batchSimulateBet_x0_'.$lottery_type.'_'.$uid.'_'.$plan_id.'_'.$current_qihao;
-                    $is_exist = $RedisLock->sadd($mkey, $current_qihao);
+                    $mkey = 'batchSimulateBet_x0_'.$lottery_type.'_'.$uid.'_'.$plan_id.'_'.$next_qihao;
+                    $is_exist = $RedisLock->sadd($mkey, $next_qihao);
                     if(!$is_exist){
                         //return ['status'=>301, 'msg'=>'有正在执行的任务,请稍后...'];
                         throw new \Exception('有正在执行的任务,请稍后...');
                     }
+                    \Yii::$app->redis->expire($mkey, 120);
+
                     $start_time1 = microtime(true);
                     $lottery_type = $plan->lottery_type;
                     $codes_hz_data = json_decode($plan->hz_Arr, true);
 
-                    if(empty($current_qihao)){
+                    if(empty($next_qihao)){
                         throw new \Exception('即将下注的期号为空');
                     }
 
                     $end_time1 = microtime(true);
-                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤1', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'cs_time'=>($end_time1-$start_time1).'s']);
+                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤1', ['plan_id'=>$plan_id, 'next_qihao'=>$next_qihao, 'cs_time'=>($end_time1-$start_time1).'s']);
                     //p([$current_qihao, $codes_hz_data]);
-                    $beforeQihao = KjDataGet::getBeforeQihaoByQihao($current_qihao, $lottery_type);
+                    $beforeQihao = KjDataGet::getBeforeQihaoByQihao($next_qihao, $lottery_type);
                     $before_record = BettingRecords::findOne(['qihao'=>(string)$beforeQihao, 'plan_id'=>$plan_id]);
                     if(!empty($before_record) && $before_record->status==0){
                         return BetService::opOneBettingRecordAndHandlePlanStatic($before_record->id, $plan_id, $beforeQihao, $rst);
                     }
 
-                    $isCanBet = SscDataService::isCanBet($plan_id, $current_qihao);
+                    $isCanBet = SscDataService::isCanBet($plan_id, $next_qihao);
                     $end_time2 = microtime(true);
-                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤2', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao,'isCanBet'=>$isCanBet, 'cs_time'=>($end_time2-$end_time1).'s']);
+                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤2', ['plan_id'=>$plan_id, 'next_qihao'=>$next_qihao,'isCanBet'=>$isCanBet, 'cs_time'=>($end_time2-$end_time1).'s']);
                     if(!empty($before_record) && $before_record->status!=1 && !$isCanBet){
-                        $logArr = ['uid'=>$uid, 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'beforeQihao'=>$beforeQihao, 'isCanBet'=>$isCanBet, 'before_record'=>!empty($before_record), 'err_msg'=>'暂时不可以下注'];
+                        $logArr = ['uid'=>$uid, 'plan_id'=>$plan_id, 'next_qihao'=>$next_qihao, 'beforeQihao'=>$beforeQihao, 'isCanBet'=>$isCanBet, 'before_record'=>!empty($before_record), 'err_msg'=>'暂时不可以下注'];
                         Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '计划模拟-01', $logArr);
                         throw new \Exception('暂时不可以下注1');
                         //continue;
                     }
-                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤3', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao]);
+                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤3', ['plan_id'=>$plan_id, 'next_qihao'=>$next_qihao]);
 
                     # 4、投注号码 codes
                     $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id, $hzArr);
-                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤31', ['plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'len'=>strlen($codes)]);
+                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤31', ['plan_id'=>$plan_id, 'next_qihao'=>$next_qihao, 'len'=>strlen($codes)]);
 
                     $is_test = max($plan->is_test, $plan->is_batch_simulate);
                     //p([$is_test, $plan->is_batch_simulate], 0);
@@ -2220,28 +2222,28 @@ abstract class BetService extends BaseBetService {
                     //p([$is_test, $plan->plan_type, $plan->id, $current_qihao]);
 
                     $end_time3 = microtime(true);
-                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤4', ['qihao'=>$current_qihao, 'is_test'=>$is_test, 'plan_id'=>$plan_id, 'cs_time'=>($end_time3-$end_time2).'s']);
+                    Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤4', ['next_qihao'=>$next_qihao, 'is_test'=>$is_test, 'plan_id'=>$plan_id, 'cs_time'=>($end_time3-$end_time2).'s']);
 
                     if ($is_test == 1 or $plan->uid == 1) { # 模拟下注
-                        $insertRst = self::_logRecordsByPlandId($plan->id, $current_qihao, $codes, $plan->lottery_type, 2, $sn, $snid, $hzArr, $r=4); # 直接记录表
-                        $rst['data'][$plan_id]['logRecord_rst'] = ['rst'=>$insertRst, 'qihao'=>$current_qihao];
+                        $insertRst = self::_logRecordsByPlandId($plan->id, $next_qihao, $codes, $plan->lottery_type, 2, $sn, $snid, $hzArr, $r=4); # 直接记录表
+                        $rst['data'][$plan_id]['logRecord_rst'] = ['rst'=>$insertRst, 'next_qihao'=>$next_qihao];
                     }
                     $end_time4 = microtime(true);
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤5', ['plan_id'=>$plan_id, 'rst'=>$rst, 'cs_time'=>($end_time4-$end_time3).'s']);
                     if($insertRst['status'] == 200){
-                        $planStaticRst = BetService::opOneBettingRecordAndHandlePlanStatic($insertRst['data']['record_id'], $plan_id, $current_qihao, $rst); # 处理开奖和计划相关
+                        $planStaticRst = BetService::opOneBettingRecordAndHandlePlanStatic($insertRst['data']['record_id'], $plan_id, $next_qihao, $rst); # 处理开奖和计划相关
                     }
                     $end_time5 = microtime(true);
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注处理结束', ['plan_id'=>$plan_id, 'rst'=>$rst, 'planStaticRst'=>$planStaticRst, 'cs_time'=>($end_time5-$end_time4).'s', 'all_cs_time'=>($end_time5-$start_time1).'s']);
                     #$RedisLock->unlock($mkey);
-                    $RedisLock->srem($mkey, $current_qihao);
+                    $RedisLock->srem($mkey, $next_qihao);
                 }catch (\Exception $exception){
-                    Tool_Common::log('/datas/'.__FUNCTION__."_e", 'ERR', '计划模拟失败', ['err_code'=>$exception->getCode(), 'plan_id'=>$plan_id, 'current_qihao'=>$current_qihao, 'lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
+                    Tool_Common::log('/datas/'.__FUNCTION__."_e", 'ERR', '计划模拟失败', ['err_code'=>$exception->getCode(), 'plan_id'=>$plan_id, 'next_qihao'=>$next_qihao, 'lottery_type'=>$lottery_type, 'err_msg'=>$exception->getMessage()]);
                     sleep(2);
                     $rst = ['status'=>301, 'msg'=>$exception->getMessage()];
                     #$RedisLock->unlock($mkey);
                     if($exception->getCode()<40000){
-                        $RedisLock->srem($mkey, $current_qihao);
+                        $RedisLock->srem($mkey, $next_qihao);
                     }
                 }
             }

@@ -3862,7 +3862,7 @@ class NumService extends BaseService {
      * @param array $filters
      * @return array
      */
-    public static function getCodesByCodesHz($filters=[], $plan_id='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function getCodesByCodesHz($filters=[], object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE){
         $lottery_type = $filters['lottery_type'] ? : $lottery_type; # 彩种
         $filter_type = $filters['filter_type']; # 三四定类型中，过滤类型:默认类型1同期2历史数据
         $filter_poses = $filters['filter_poses']; # 过滤位置
@@ -3871,7 +3871,7 @@ class NumService extends BaseService {
 
         $filter = NumService::getFilterTypeDatas($playway)[$filter_type];
         //$start_qihao = $filters['current_qihao'] ? : HN0898Service::getCurrentQihao($lottery_type); # 针对那一期过滤，默认为：当前期号
-        $start_qihao = NumService::getPlanBetCurrentQihao($plan_id, $lottery_type);
+        $start_qihao = NumService::getPlanBetCurrentQihao($plan, $lottery_type);
         //p(['start_qihao'=>$start_qihao, 'filter'=>$filter]);
         $query = Num4Type::find()->select(['code']);
         $where = ['AND', ['=', 'code_type', $code_type] , '1=1'];
@@ -3907,49 +3907,29 @@ class NumService extends BaseService {
      * @param int $lottery_type
      * @return float|int|mixed|string
      */
-    public static function getPlanBetCurrentQihao($plan_id='', $lottery_type=DEFAULT_LOTTERY_TYPE) {
-        $current_qihao = '';
+    public static function getPlanBetCurrentQihao(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE) {
         try {
-            $plan = UserSysPlans::findOne($plan_id);
-            if($plan->is_batch_simulate == 1 && !empty($plan_id)){
-                $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
-
-                if(!empty($BettingRecords)){
-                    $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>', 'qihao', $BettingRecords->qihao]];
-                    $SscKjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->limit(1)->one();
-                    if(!empty($SscKjData->qihao)){
-                        $current_qihao = $SscKjData->qihao;
-                    }
-                }elseif (in_array($lottery_type, [1,17])){
-                    $current_qihao = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_ASC])->limit(1)->asArray()->one()['qihao'];
-                    if(($lottery_type==1 && $current_qihao>=2023008) OR ($lottery_type==17 && $current_qihao>=2023018)){
-                        throw_info('最新期号截止');
-                    }
-                }
-                if($r = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->limit(1)->one()){
-                    $next_qihao = KjDataGet::getNextQihaoByQihao($r->qihao, $lottery_type); # 最后下注记录期号获取即将下注期号
-                    $next_recode = SscKjData::find()->where(['>=', 'qihao', $next_qihao])->andWhere(['=', 'lottery_type', $lottery_type])->orderBy(['id'=>SORT_ASC])->limit(1)->one();
-                    $current_qihao = (!empty($next_recode)) ? $next_recode->qihao : $next_qihao;
-                }elseif(empty($current_qihao)){
-                    $codes_hz_datas = json_decode($plan->hz_Arr, true);
-                    $current_qihao = $codes_hz_datas['filters']['start_qihao'] ? : NumService::getQihaoByDaysBefore($codes_hz_datas['filters']['test_period_days'], $lottery_type);
-                }
-                $endQihao = NumService::getHasOpenEndQihao($lottery_type);
-                if($current_qihao>$endQihao){
-                    throw_info('未开奖期号_'.$lottery_type.'_'.$current_qihao.'_endQihao:'.$endQihao, 40004);
+            $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+            $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+            if(empty($current_kj_qihao)){
+                if($plan->is_batch_simulate == 1){
+                    $current_kj_qihao = $hzArr['filters']['start_qihao'];
+                }else{
+                    $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
                 }
             }
+            $next_qihao = KjDataGet::getNextQihaoByQihao($current_kj_qihao, $lottery_type);
 
-            if(empty($current_qihao)){
-                $current_qihao = HN0898Service::getQihao($lottery_type); # 针对哪一期过滤，默认为：当前期号
+            if(empty($next_qihao)){
+                $next_qihao = HN0898Service::getQihao($lottery_type); # 针对哪一期过滤，默认为：当前期号
             }
         }catch (\Exception $exception){
-            Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '模拟投注计划-异常', ['plan_id'=>$plan_id, 'lottery_type' => $lottery_type, 'current_qihao'=>$current_qihao, 'err_msg'=>$exception->getMessage()]);
+            Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '模拟投注计划-异常', ['plan_id'=>$plan->id, 'lottery_type' => $lottery_type, 'next_qihao'=>$next_qihao, 'err_msg'=>$exception->getMessage()]);
             throw new \Exception($exception->getMessage(), $exception->getCode());
         }
-        Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '模拟投注计划', ['plan_id'=>$plan_id, 'lottery_type' => $lottery_type, 'current_qihao'=>$current_qihao]);
+        Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '模拟投注计划', ['plan_id'=>$plan->id, 'lottery_type' => $lottery_type, 'next_qihao'=>$next_qihao]);
 
-        return $current_qihao;
+        return $next_qihao;
     }
 
     public static function getHasOpenEndQihao($lotter_type=DEFAULT_LOTTERY_TYPE){

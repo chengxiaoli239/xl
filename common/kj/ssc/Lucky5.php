@@ -123,6 +123,7 @@ class Lucky5 extends BaseKj {
             $kjData = self::getCurrentKjData(self::$lottery_type, $current_qihao);
             $redisKey = 'getLotteryShiXunOne_'.self::$lottery_type;
             $is_exist = $redis->sadd($redisKey, $current_qihao);
+            \Yii::$app->redis->expire($redisKey, 120);
             if(!$is_exist){
                 throw_info('并发请求...');
             }
@@ -436,7 +437,7 @@ class Lucky5 extends BaseKj {
         curl_setopt($ch, CURLOPT_TCP_KEEPALIVE, 1); // 开启TCP keepalive功能，保持长连接
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);    # 302 redirect
         //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
-        #ProxyBaseService::setProxy($ch); # 设置全局代理
+        ProxyBaseService::setProxy($ch); # 设置全局代理
 
         $data = curl_exec($ch);
         $errno = curl_errno($ch);

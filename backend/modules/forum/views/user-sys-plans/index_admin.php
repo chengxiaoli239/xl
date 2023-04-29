@@ -44,10 +44,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'id',
                         //'uid',
                         //'playway',
-                        ['attribute' => 'playway','headerOptions'=>['width'=>'5%'],'label'=>'投注类型',
+                        ['attribute' => 'playway','headerOptions'=>['width'=>'5%'],'label'=>'投注类型[ID]',
+                            'format'=>'raw',
                             'value' => function($model) {
                                 $playway_Arr = [1=>'二字定', 2=>'三字定', 3=>'四字定', 4=>'一字定', 6=>'X字现'];
-                                return $playway_Arr[$model->playway];
+                                $txt = Html::a('['.$model->id.']', '/forum/user-sys-plans/index?UserSysPlans[id]='.$model->id);
+                                return $playway_Arr[$model->playway].$txt;
                             }
                         ],
 

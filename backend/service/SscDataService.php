@@ -2921,6 +2921,7 @@ class SscDataService extends BaseService {
                 foreach ($UserSysPlans as $UserSysPlan){
                     try {
                         $Rkey = __FUNCTION__.'_redis_op_plan_0_1_3_5_'.$lottery_type.'_'.$UserSysPlan->id;
+                        \Yii::$app->redis->expire($Rkey, 120);
                         if(!$RedisLock->lock($Rkey, 30)){
                             Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略1', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
                             continue;
@@ -2962,6 +2963,7 @@ class SscDataService extends BaseService {
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     $Rkey = __FUNCTION__.'_redis_op_plan_'.implode('_', $fb_plan_types).'_'.$lottery_type.'_'.$UserSysPlan->id;
+                    \Yii::$app->redis->expire($Rkey, 120);
                     if(!$RedisLock->lock($Rkey, 30)){
                         Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略2', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
                         continue;
@@ -3099,6 +3101,7 @@ class SscDataService extends BaseService {
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     $Rkey = __FUNCTION__.'_redis_op_plan_7_'.$lottery_type.'_'.$UserSysPlan->id;
+                    \Yii::$app->redis->expire($Rkey, 120);
                     if(!$RedisLock->lock($Rkey, 30)){
                         Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略4', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
                         continue;
@@ -3121,6 +3124,7 @@ class SscDataService extends BaseService {
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     $Rkey = __FUNCTION__.'_redis_op_plan_'.implode('_', \Yii::$app->params['IMPORT_CODES_TYPES']).'_'.$lottery_type.'_'.$UserSysPlan->id;
+                    \Yii::$app->redis->expire($Rkey, 120);
                     if(!$RedisLock->lock($Rkey, 30)){
                         Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略5', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
                         continue;
