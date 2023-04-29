@@ -438,6 +438,7 @@ class Lucky5 extends BaseKj {
             CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => $headers,
         ));
+        BaseService::setPoxy($curl);
         $data = curl_exec($curl);
         $errno = curl_errno($curl);
         #p(['headers'=>$headers, 'url'=>$url, 'rst'=>$data, 'errno'=>$errno]);
