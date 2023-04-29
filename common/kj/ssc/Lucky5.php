@@ -3,6 +3,7 @@
 namespace common\kj\ssc;
 use backend\models\SystemConfig;
 use backend\models\TzSystemsUsers;
+use backend\service\BaseService;
 use backend\service\CurlService;
 use backend\service\Lucky5\LuckyBaseService;
 use common\kj\BaseKj;
@@ -443,12 +444,12 @@ class Lucky5 extends BaseKj {
         $errno = curl_errno($ch);
         #p(['headers'=>$headers, 'url'=>$url, 'rst'=>$data, 'errno'=>$errno]);
         if($errno>0) {
-            $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
-            Tool_Common::log('/err/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'errno'=>$errno, 'postRst'=>$data, 'error'=>$str]);
+            $err_msg = 'Curl error: ' . curl_error($ch);
+            Tool_Common::log('/err/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'errno'=>$errno, 'postRst'=>$data, 'err_msg'=>$err_msg]);
             return ['Status'=>2, 'code'=>300, 'Data'=>'代理网络超时，错误码:'.$errno, 'errno'=>$errno];
         }
         curl_close($ch);
-        if(!self::is_json($data)){
+        if(!BaseService::is_json($data)){
             return $data;
         }
         $data = json_decode($data, true);
