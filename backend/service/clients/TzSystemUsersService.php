@@ -595,7 +595,7 @@ class TzSystemUsersService extends ClientsBaseService{
                     'Origin' => trim($TzSystemsUsers->ssc_domain),
                     'Referer' => trim($TzSystemsUsers->ssc_domain).'/App/Index?_='.$_t,
                     'Host' => trim(str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain))),
-                    "sec-ch-ua"=>'"Chromium";v="113", " Not A;Brand";v="24", "Google Chrome";v="113"',
+                    "sec-ch-ua"=>'"Chromium";v="112", " Not A;Brand";v="24", "Google Chrome";v="112"',
                     "sec-ch-ua-mobile"=>"?0",
                     "sec-ch-ua-platform"=>'"Windows"',
                     "Sec-Fetch-Dest"=>"empty",
