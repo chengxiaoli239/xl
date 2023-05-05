@@ -1,59 +1,827 @@
-"3300025168",
-"3300870644",
-"3301048138",
-"3301061854",
-"3300751099",
-"3300752970",
-"3300789753",
-"3300825293",
-"3300830953",
-"3300880283",
-"3300880516",
-"3300887164",
-"3300895381",
-"3300905738",
-"3300932099",
-"3300944525",
-"3300993323",
-"3301007075",
-"3301028103",
-"3301037421",
-"3301044822",
-"3300464745",
-"3300467557",
-"3300512272",
-"3300627578",
-"3300636813",
-"3300637666",
-"3300643533",
-"3300659445",
-"3300669968",
-"3300674098",
-"3300677044",
-"3300692928",
-"3300706838",
-"3300707470",
-"3300715857",
-"3300731746",
-"3300733385",
-"3300741829",
-"3300745682",
-"3300745825",
-"3021082223451473343",
-"3300170003",
-"3300209663",
-"3300249399",
-"3300255069",
-"3300270421",
-"3300278022",
-"3300284148",
-"3300286015",
-"3300295305",
-"3300295350",
-"3300318820",
-"3300321728",
-"3300336888",
-"3300338853",
-"3300394756",
-"3300396495",
-"3300428158"
+<pre>Array
+(
+    [88880601] => common\models\order\OrderGoods Object
+        (
+            [total] =>
+            [_attributes:yii\db\BaseActiveRecord:private] => Array
+                (
+                    [id] => 1385839
+                    [order_id] => 2528752
+                    [order_sn] => 3100055210
+                    [barcode] => 1211211211211
+                    [sku_id] => 23784
+                    [count] => 1
+                    [ys_count] => 0
+                    [has_sup_ys_count] => 0
+                    [suit_info] =>
+                    [suit_id] => 0
+                    [parent_order_sn] => 3100055210
+                    [name] => 资生堂新红妍肌活
+                    [attribute] => 15ml
+                    [active_desc] =>
+                    [create_time] => 1682582895
+                    [update_time] => 1682582911
+                    [status] => 1
+                    [order_status] => 1
+                    [image] => 22/0b/7a/220b7a04f69fe201a9409aedb231f874.png
+                    [price] => 200.00
+                    [activity_info] => []
+                    [parent_order_id] =>
+                    [merch_user_id] => 0
+                    [goods_type] => 0
+                    [refund_count] => 0
+                    [city] =>
+                    [district] =>
+                    [cit_brand_id] => 390
+                    [cit_code] => H1002448
+                    [cit_cnname] => 资生堂新红妍肌活眼部精华露
+                    [amount] => 0.00
+                    [market_price] => 0.00
+                    [active_cut] => 200.00
+                    [cost_price] => 0.00
+                    [active_price] => 200.00
+                    [emoney] => 0.00
+                    [emoney_one] => 0.00
+                    [tax_money] => 0.00
+                    [tax_money_one] => 0.00
+                    [manjian_discounts] => 0.00
+                    [manjian_discounts_one] => 0.00
+                    [integral_discounts] => 0.00
+                    [integral_discounts_one] => 0.00
+                    [tax_saved] => 0.00
+                    [tax_saved_one] => 0.00
+                    [bonus_discounts] => 0.00
+                    [bonus_discounts_one] => 0.00
+                    [zhekou_discounts] => 0.00
+                    [zhekou_discounts_one] => 0.00
+                    [coupon_discounts] => 0.00
+                    [coupon_discounts_one] => 0.00
+                    [vip_discounts] => 0.00
+                    [vip_discounts_one] => 0.00
+                    [jd_plus_discount] => 0.00
+                    [jd_plus_discounts] => 0.00
+                    [wallet_pay] => 0.00
+                    [dingjin_one] => 0.00
+                    [weikuan_one] => 0.00
+                    [dingjin_discount_one] => 0.00
+                    [dingjin_shifu_one] => 0.00
+                    [weikuan_discount_one] => 0.00
+                    [weikuan_yingfu_all] => 0.00
+                    [weikuan_shifu_all] => 0.00
+                    [houniao_yunfei] => 0.00
+                    [cit_customtaxrate] => 0.00
+                    [cit_headcustomcatid] =>
+                    [kg_one] => 0.00
+                    [volume_one] => 0.00
+                    [counts] => 1
+                    [areacode] => 88880601
+                    [back_areacode] =>
+                    [activity_id] => 0
+                    [giftcode] => mj168235111027856888
+                    [giftcode_mj] =>
+                    [receipts] => 200.00
+                    [receipts_one] => 200.00
+                    [suit_discounts] => 0.00
+                    [suit_discounts_one] => 0.00
+                    [dianpu_id] => 1
+                    [sale_price] => 0.00
+                    [suit_qty] => 0
+                    [platform_subsidy] => 0.00
+                    [coupon_subvent_money] => 0.00
+                    [promotion_subvent_money] => 0.00
+                    [suit_subvent_money] => 0.00
+                )
+
+            [_oldAttributes:yii\db\BaseActiveRecord:private] => Array
+                (
+                    [id] => 1385839
+                    [order_id] => 2528752
+                    [order_sn] => 3100055210
+                    [barcode] => 1211211211211
+                    [sku_id] => 23784
+                    [count] => 1
+                    [ys_count] => 0
+                    [has_sup_ys_count] => 0
+                    [suit_info] =>
+                    [suit_id] => 0
+                    [parent_order_sn] => 3100055210
+                    [name] => 资生堂新红妍肌活
+                    [attribute] => 15ml
+                    [active_desc] =>
+                    [create_time] => 1682582895
+                    [update_time] => 1682582911
+                    [status] => 1
+                    [order_status] => 1
+                    [image] => 22/0b/7a/220b7a04f69fe201a9409aedb231f874.png
+                    [price] => 200.00
+                    [activity_info] => []
+                    [parent_order_id] =>
+                    [merch_user_id] => 0
+                    [goods_type] => 0
+                    [refund_count] => 0
+                    [city] =>
+                    [district] =>
+                    [cit_brand_id] => 390
+                    [cit_code] => H1002448
+                    [cit_cnname] => 资生堂新红妍肌活眼部精华露
+                    [amount] => 0.00
+                    [market_price] => 0.00
+                    [active_cut] => 200.00
+                    [cost_price] => 0.00
+                    [active_price] => 200.00
+                    [emoney] => 0.00
+                    [emoney_one] => 0.00
+                    [tax_money] => 0.00
+                    [tax_money_one] => 0.00
+                    [manjian_discounts] => 0.00
+                    [manjian_discounts_one] => 0.00
+                    [integral_discounts] => 0.00
+                    [integral_discounts_one] => 0.00
+                    [tax_saved] => 0.00
+                    [tax_saved_one] => 0.00
+                    [bonus_discounts] => 0.00
+                    [bonus_discounts_one] => 0.00
+                    [zhekou_discounts] => 0.00
+                    [zhekou_discounts_one] => 0.00
+                    [coupon_discounts] => 0.00
+                    [coupon_discounts_one] => 0.00
+                    [vip_discounts] => 0.00
+                    [vip_discounts_one] => 0.00
+                    [jd_plus_discount] => 0.00
+                    [jd_plus_discounts] => 0.00
+                    [wallet_pay] => 0.00
+                    [dingjin_one] => 0.00
+                    [weikuan_one] => 0.00
+                    [dingjin_discount_one] => 0.00
+                    [dingjin_shifu_one] => 0.00
+                    [weikuan_discount_one] => 0.00
+                    [weikuan_yingfu_all] => 0.00
+                    [weikuan_shifu_all] => 0.00
+                    [houniao_yunfei] => 0.00
+                    [cit_customtaxrate] => 0.00
+                    [cit_headcustomcatid] =>
+                    [kg_one] => 0.00
+                    [volume_one] => 0.00
+                    [counts] => 1
+                    [areacode] => 88880601
+                    [back_areacode] =>
+                    [activity_id] => 0
+                    [giftcode] => mj168235111027856888
+                    [giftcode_mj] =>
+                    [receipts] => 200.00
+                    [receipts_one] => 200.00
+                    [suit_discounts] => 0.00
+                    [suit_discounts_one] => 0.00
+                    [dianpu_id] => 1
+                    [sale_price] => 0.00
+                    [suit_qty] => 0
+                    [platform_subsidy] => 0.00
+                    [coupon_subvent_money] => 0.00
+                    [promotion_subvent_money] => 0.00
+                    [suit_subvent_money] => 0.00
+                )
+
+            [_related:yii\db\BaseActiveRecord:private] => Array
+                (
+                )
+
+            [_relationsDependencies:yii\db\BaseActiveRecord:private] => Array
+                (
+                )
+
+            [_errors:yii\base\Model:private] =>
+            [_validators:yii\base\Model:private] =>
+            [_scenario:yii\base\Model:private] => default
+            [_events:yii\base\Component:private] => Array
+                (
+                )
+
+            [_eventWildcards:yii\base\Component:private] => Array
+                (
+                )
+
+            [_behaviors:yii\base\Component:private] => Array
+                (
+                )
+
+        )
+
+    [88881302] => common\models\order\OrderGoods Object
+        (
+            [total] =>
+            [_attributes:yii\db\BaseActiveRecord:private] => Array
+                (
+                    [id] => 1385840
+                    [order_id] => 2528752
+                    [order_sn] => 3100055210
+                    [barcode] => 1211211211211
+                    [sku_id] => 23784
+                    [count] => 1
+                    [ys_count] => 0
+                    [has_sup_ys_count] => 0
+                    [suit_info] =>
+                    [suit_id] => 0
+                    [parent_order_sn] => 3100055210
+                    [name] => 资生堂新红妍肌活
+                    [attribute] => 15ml
+                    [active_desc] =>
+                    [create_time] => 1682582895
+                    [update_time] => 1682582911
+                    [status] => 1
+                    [order_status] => 1
+                    [image] => 22/0b/7a/220b7a04f69fe201a9409aedb231f874.png
+                    [price] => 200.00
+                    [activity_info] => []
+                    [parent_order_id] =>
+                    [merch_user_id] => 0
+                    [goods_type] => 0
+                    [refund_count] => 0
+                    [city] =>
+                    [district] =>
+                    [cit_brand_id] => 390
+                    [cit_code] => H1002448
+                    [cit_cnname] => 资生堂新红妍肌活眼部精华露
+                    [amount] => 0.00
+                    [market_price] => 0.00
+                    [active_cut] => 200.00
+                    [cost_price] => 0.00
+                    [active_price] => 200.00
+                    [emoney] => 0.00
+                    [emoney_one] => 0.00
+                    [tax_money] => 0.00
+                    [tax_money_one] => 0.00
+                    [manjian_discounts] => 0.00
+                    [manjian_discounts_one] => 0.00
+                    [integral_discounts] => 0.00
+                    [integral_discounts_one] => 0.00
+                    [tax_saved] => 0.00
+                    [tax_saved_one] => 0.00
+                    [bonus_discounts] => 0.00
+                    [bonus_discounts_one] => 0.00
+                    [zhekou_discounts] => 0.00
+                    [zhekou_discounts_one] => 0.00
+                    [coupon_discounts] => 0.00
+                    [coupon_discounts_one] => 0.00
+                    [vip_discounts] => 0.00
+                    [vip_discounts_one] => 0.00
+                    [jd_plus_discount] => 0.00
+                    [jd_plus_discounts] => 0.00
+                    [wallet_pay] => 0.00
+                    [dingjin_one] => 0.00
+                    [weikuan_one] => 0.00
+                    [dingjin_discount_one] => 0.00
+                    [dingjin_shifu_one] => 0.00
+                    [weikuan_discount_one] => 0.00
+                    [weikuan_yingfu_all] => 0.00
+                    [weikuan_shifu_all] => 0.00
+                    [houniao_yunfei] => 0.00
+                    [cit_customtaxrate] => 0.00
+                    [cit_headcustomcatid] =>
+                    [kg_one] => 0.00
+                    [volume_one] => 0.00
+                    [counts] => 1
+                    [areacode] => 88881302
+                    [back_areacode] =>
+                    [activity_id] => 0
+                    [giftcode] =>
+                    [giftcode_mj] =>
+                    [receipts] => 200.00
+                    [receipts_one] => 200.00
+                    [suit_discounts] => 0.00
+                    [suit_discounts_one] => 0.00
+                    [dianpu_id] => 1
+                    [sale_price] => 0.00
+                    [suit_qty] => 0
+                    [platform_subsidy] => 0.00
+                    [coupon_subvent_money] => 0.00
+                    [promotion_subvent_money] => 0.00
+                    [suit_subvent_money] => 0.00
+                )
+
+            [_oldAttributes:yii\db\BaseActiveRecord:private] => Array
+                (
+                    [id] => 1385840
+                    [order_id] => 2528752
+                    [order_sn] => 3100055210
+                    [barcode] => 1211211211211
+                    [sku_id] => 23784
+                    [count] => 1
+                    [ys_count] => 0
+                    [has_sup_ys_count] => 0
+                    [suit_info] =>
+                    [suit_id] => 0
+                    [parent_order_sn] => 3100055210
+                    [name] => 资生堂新红妍肌活
+                    [attribute] => 15ml
+                    [active_desc] =>
+                    [create_time] => 1682582895
+                    [update_time] => 1682582911
+                    [status] => 1
+                    [order_status] => 1
+                    [image] => 22/0b/7a/220b7a04f69fe201a9409aedb231f874.png
+                    [price] => 200.00
+                    [activity_info] => []
+                    [parent_order_id] =>
+                    [merch_user_id] => 0
+                    [goods_type] => 0
+                    [refund_count] => 0
+                    [city] =>
+                    [district] =>
+                    [cit_brand_id] => 390
+                    [cit_code] => H1002448
+                    [cit_cnname] => 资生堂新红妍肌活眼部精华露
+                    [amount] => 0.00
+                    [market_price] => 0.00
+                    [active_cut] => 200.00
+                    [cost_price] => 0.00
+                    [active_price] => 200.00
+                    [emoney] => 0.00
+                    [emoney_one] => 0.00
+                    [tax_money] => 0.00
+                    [tax_money_one] => 0.00
+                    [manjian_discounts] => 0.00
+                    [manjian_discounts_one] => 0.00
+                    [integral_discounts] => 0.00
+                    [integral_discounts_one] => 0.00
+                    [tax_saved] => 0.00
+                    [tax_saved_one] => 0.00
+                    [bonus_discounts] => 0.00
+                    [bonus_discounts_one] => 0.00
+                    [zhekou_discounts] => 0.00
+                    [zhekou_discounts_one] => 0.00
+                    [coupon_discounts] => 0.00
+                    [coupon_discounts_one] => 0.00
+                    [vip_discounts] => 0.00
+                    [vip_discounts_one] => 0.00
+                    [jd_plus_discount] => 0.00
+                    [jd_plus_discounts] => 0.00
+                    [wallet_pay] => 0.00
+                    [dingjin_one] => 0.00
+                    [weikuan_one] => 0.00
+                    [dingjin_discount_one] => 0.00
+                    [dingjin_shifu_one] => 0.00
+                    [weikuan_discount_one] => 0.00
+                    [weikuan_yingfu_all] => 0.00
+                    [weikuan_shifu_all] => 0.00
+                    [houniao_yunfei] => 0.00
+                    [cit_customtaxrate] => 0.00
+                    [cit_headcustomcatid] =>
+                    [kg_one] => 0.00
+                    [volume_one] => 0.00
+                    [counts] => 1
+                    [areacode] => 88881302
+                    [back_areacode] =>
+                    [activity_id] => 0
+                    [giftcode] =>
+                    [giftcode_mj] =>
+                    [receipts] => 200.00
+                    [receipts_one] => 200.00
+                    [suit_discounts] => 0.00
+                    [suit_discounts_one] => 0.00
+                    [dianpu_id] => 1
+                    [sale_price] => 0.00
+                    [suit_qty] => 0
+                    [platform_subsidy] => 0.00
+                    [coupon_subvent_money] => 0.00
+                    [promotion_subvent_money] => 0.00
+                    [suit_subvent_money] => 0.00
+                )
+
+            [_related:yii\db\BaseActiveRecord:private] => Array
+                (
+                )
+
+            [_relationsDependencies:yii\db\BaseActiveRecord:private] => Array
+                (
+                )
+
+            [_errors:yii\base\Model:private] =>
+            [_validators:yii\base\Model:private] =>
+            [_scenario:yii\base\Model:private] => default
+            [_events:yii\base\Component:private] => Array
+                (
+                )
+
+            [_eventWildcards:yii\base\Component:private] => Array
+                (
+                )
+
+            [_behaviors:yii\base\Component:private] => Array
+                (
+                )
+
+        )
+
+    [88881301] => common\models\order\OrderGoods Object
+        (
+            [total] =>
+            [_attributes:yii\db\BaseActiveRecord:private] => Array
+                (
+                    [id] => 1385837
+                    [order_id] => 2528752
+                    [order_sn] => 3100055210
+                    [barcode] => 0000012311231
+                    [sku_id] => 25483
+                    [count] => 3
+                    [ys_count] => 0
+                    [has_sup_ys_count] => 0
+                    [suit_info] =>
+                    [suit_id] => 0
+                    [parent_order_sn] => 3100055210
+                    [name] => 菜鸟1
+                    [attribute] => 1 700ml
+                    [active_desc] =>
+                    [create_time] => 1682582895
+                    [update_time] => 1682582911
+                    [status] => 1
+                    [order_status] => 1
+                    [image] => 0d/32/99/0d3299586bf1fe2302c64fc68f065b35.png
+                    [price] => 1000.00
+                    [activity_info] => []
+                    [parent_order_id] =>
+                    [merch_user_id] => 0
+                    [goods_type] => 0
+                    [refund_count] => 0
+                    [city] =>
+                    [district] =>
+                    [cit_brand_id] => 24
+                    [cit_code] => H1003020
+                    [cit_cnname] => 菜鸟1
+                    [amount] => 0.00
+                    [market_price] => 0.00
+                    [active_cut] => 1000.00
+                    [cost_price] => 600.00
+                    [active_price] => 1000.00
+                    [emoney] => 0.00
+                    [emoney_one] => 0.00
+                    [tax_money] => 0.00
+                    [tax_money_one] => 0.00
+                    [manjian_discounts] => 0.00
+                    [manjian_discounts_one] => 0.00
+                    [integral_discounts] => 0.00
+                    [integral_discounts_one] => 0.00
+                    [tax_saved] => 0.00
+                    [tax_saved_one] => 0.00
+                    [bonus_discounts] => 0.00
+                    [bonus_discounts_one] => 0.00
+                    [zhekou_discounts] => 0.00
+                    [zhekou_discounts_one] => 0.00
+                    [coupon_discounts] => 0.00
+                    [coupon_discounts_one] => 0.00
+                    [vip_discounts] => 0.00
+                    [vip_discounts_one] => 0.00
+                    [jd_plus_discount] => 0.00
+                    [jd_plus_discounts] => 0.00
+                    [wallet_pay] => 0.00
+                    [dingjin_one] => 0.00
+                    [weikuan_one] => 0.00
+                    [dingjin_discount_one] => 0.00
+                    [dingjin_shifu_one] => 0.00
+                    [weikuan_discount_one] => 0.00
+                    [weikuan_yingfu_all] => 0.00
+                    [weikuan_shifu_all] => 0.00
+                    [houniao_yunfei] => 0.00
+                    [cit_customtaxrate] => 0.00
+                    [cit_headcustomcatid] =>
+                    [kg_one] => 0.00
+                    [volume_one] => 0.00
+                    [counts] => 3
+                    [areacode] => 88881301
+                    [back_areacode] =>
+                    [activity_id] => 0
+                    [giftcode] =>
+                    [giftcode_mj] =>
+                    [receipts] => 3000.00
+                    [receipts_one] => 1000.00
+                    [suit_discounts] => 0.00
+                    [suit_discounts_one] => 0.00
+                    [dianpu_id] => 1
+                    [sale_price] => 0.00
+                    [suit_qty] => 0
+                    [platform_subsidy] => 0.00
+                    [coupon_subvent_money] => 0.00
+                    [promotion_subvent_money] => 0.00
+                    [suit_subvent_money] => 0.00
+                )
+
+            [_oldAttributes:yii\db\BaseActiveRecord:private] => Array
+                (
+                    [id] => 1385837
+                    [order_id] => 2528752
+                    [order_sn] => 3100055210
+                    [barcode] => 0000012311231
+                    [sku_id] => 25483
+                    [count] => 3
+                    [ys_count] => 0
+                    [has_sup_ys_count] => 0
+                    [suit_info] =>
+                    [suit_id] => 0
+                    [parent_order_sn] => 3100055210
+                    [name] => 菜鸟1
+                    [attribute] => 1 700ml
+                    [active_desc] =>
+                    [create_time] => 1682582895
+                    [update_time] => 1682582911
+                    [status] => 1
+                    [order_status] => 1
+                    [image] => 0d/32/99/0d3299586bf1fe2302c64fc68f065b35.png
+                    [price] => 1000.00
+                    [activity_info] => []
+                    [parent_order_id] =>
+                    [merch_user_id] => 0
+                    [goods_type] => 0
+                    [refund_count] => 0
+                    [city] =>
+                    [district] =>
+                    [cit_brand_id] => 24
+                    [cit_code] => H1003020
+                    [cit_cnname] => 菜鸟1
+                    [amount] => 0.00
+                    [market_price] => 0.00
+                    [active_cut] => 1000.00
+                    [cost_price] => 600.00
+                    [active_price] => 1000.00
+                    [emoney] => 0.00
+                    [emoney_one] => 0.00
+                    [tax_money] => 0.00
+                    [tax_money_one] => 0.00
+                    [manjian_discounts] => 0.00
+                    [manjian_discounts_one] => 0.00
+                    [integral_discounts] => 0.00
+                    [integral_discounts_one] => 0.00
+                    [tax_saved] => 0.00
+                    [tax_saved_one] => 0.00
+                    [bonus_discounts] => 0.00
+                    [bonus_discounts_one] => 0.00
+                    [zhekou_discounts] => 0.00
+                    [zhekou_discounts_one] => 0.00
+                    [coupon_discounts] => 0.00
+                    [coupon_discounts_one] => 0.00
+                    [vip_discounts] => 0.00
+                    [vip_discounts_one] => 0.00
+                    [jd_plus_discount] => 0.00
+                    [jd_plus_discounts] => 0.00
+                    [wallet_pay] => 0.00
+                    [dingjin_one] => 0.00
+                    [weikuan_one] => 0.00
+                    [dingjin_discount_one] => 0.00
+                    [dingjin_shifu_one] => 0.00
+                    [weikuan_discount_one] => 0.00
+                    [weikuan_yingfu_all] => 0.00
+                    [weikuan_shifu_all] => 0.00
+                    [houniao_yunfei] => 0.00
+                    [cit_customtaxrate] => 0.00
+                    [cit_headcustomcatid] =>
+                    [kg_one] => 0.00
+                    [volume_one] => 0.00
+                    [counts] => 3
+                    [areacode] => 88881301
+                    [back_areacode] =>
+                    [activity_id] => 0
+                    [giftcode] =>
+                    [giftcode_mj] =>
+                    [receipts] => 3000.00
+                    [receipts_one] => 1000.00
+                    [suit_discounts] => 0.00
+                    [suit_discounts_one] => 0.00
+                    [dianpu_id] => 1
+                    [sale_price] => 0.00
+                    [suit_qty] => 0
+                    [platform_subsidy] => 0.00
+                    [coupon_subvent_money] => 0.00
+                    [promotion_subvent_money] => 0.00
+                    [suit_subvent_money] => 0.00
+                )
+
+            [_related:yii\db\BaseActiveRecord:private] => Array
+                (
+                )
+
+            [_relationsDependencies:yii\db\BaseActiveRecord:private] => Array
+                (
+                )
+
+            [_errors:yii\base\Model:private] =>
+            [_validators:yii\base\Model:private] =>
+            [_scenario:yii\base\Model:private] => default
+            [_events:yii\base\Component:private] => Array
+                (
+                )
+
+            [_eventWildcards:yii\base\Component:private] => Array
+                (
+                )
+
+            [_behaviors:yii\base\Component:private] => Array
+                (
+                )
+
+        )
+
+    [80010101] => common\models\order\OrderGoods Object
+        (
+            [total] =>
+            [_attributes:yii\db\BaseActiveRecord:private] => Array
+                (
+                    [id] => 1385841
+                    [order_id] => 2528752
+                    [order_sn] => 3100055210
+                    [barcode] => 1211211211211
+                    [sku_id] => 23784
+                    [count] => 8
+                    [ys_count] => 0
+                    [has_sup_ys_count] => 8
+                    [suit_info] =>
+                    [suit_id] => 0
+                    [parent_order_sn] => 3100055210
+                    [name] => 资生堂新红妍肌活
+                    [attribute] => 15ml
+                    [active_desc] =>
+                    [create_time] => 1682582895
+                    [update_time] => 1682582911
+                    [status] => 1
+                    [order_status] => 1
+                    [image] => 22/0b/7a/220b7a04f69fe201a9409aedb231f874.png
+                    [price] => 200.00
+                    [activity_info] => []
+                    [parent_order_id] =>
+                    [merch_user_id] => 0
+                    [goods_type] => 0
+                    [refund_count] => 0
+                    [city] =>
+                    [district] =>
+                    [cit_brand_id] => 390
+                    [cit_code] => H1002448
+                    [cit_cnname] => 资生堂新红妍肌活眼部精华露
+                    [amount] => 0.00
+                    [market_price] => 0.00
+                    [active_cut] => 200.00
+                    [cost_price] => 0.00
+                    [active_price] => 200.00
+                    [emoney] => 0.00
+                    [emoney_one] => 0.00
+                    [tax_money] => 0.00
+                    [tax_money_one] => 0.00
+                    [manjian_discounts] => 0.00
+                    [manjian_discounts_one] => 0.00
+                    [integral_discounts] => 0.00
+                    [integral_discounts_one] => 0.00
+                    [tax_saved] => 0.00
+                    [tax_saved_one] => 0.00
+                    [bonus_discounts] => 0.00
+                    [bonus_discounts_one] => 0.00
+                    [zhekou_discounts] => 0.00
+                    [zhekou_discounts_one] => 0.00
+                    [coupon_discounts] => 0.00
+                    [coupon_discounts_one] => 0.00
+                    [vip_discounts] => 0.00
+                    [vip_discounts_one] => 0.00
+                    [jd_plus_discount] => 0.00
+                    [jd_plus_discounts] => 0.00
+                    [wallet_pay] => 0.00
+                    [dingjin_one] => 0.00
+                    [weikuan_one] => 0.00
+                    [dingjin_discount_one] => 0.00
+                    [dingjin_shifu_one] => 0.00
+                    [weikuan_discount_one] => 0.00
+                    [weikuan_yingfu_all] => 0.00
+                    [weikuan_shifu_all] => 0.00
+                    [houniao_yunfei] => 0.00
+                    [cit_customtaxrate] => 0.00
+                    [cit_headcustomcatid] =>
+                    [kg_one] => 0.00
+                    [volume_one] => 0.00
+                    [counts] => 8
+                    [areacode] => 80010101
+                    [back_areacode] =>
+                    [activity_id] => 0
+                    [giftcode] =>
+                    [giftcode_mj] =>
+                    [receipts] => 1600.00
+                    [receipts_one] => 200.00
+                    [suit_discounts] => 0.00
+                    [suit_discounts_one] => 0.00
+                    [dianpu_id] => 1
+                    [sale_price] => 0.00
+                    [suit_qty] => 0
+                    [platform_subsidy] => 0.00
+                    [coupon_subvent_money] => 0.00
+                    [promotion_subvent_money] => 0.00
+                    [suit_subvent_money] => 0.00
+                )
+
+            [_oldAttributes:yii\db\BaseActiveRecord:private] => Array
+                (
+                    [id] => 1385841
+                    [order_id] => 2528752
+                    [order_sn] => 3100055210
+                    [barcode] => 1211211211211
+                    [sku_id] => 23784
+                    [count] => 8
+                    [ys_count] => 0
+                    [has_sup_ys_count] => 8
+                    [suit_info] =>
+                    [suit_id] => 0
+                    [parent_order_sn] => 3100055210
+                    [name] => 资生堂新红妍肌活
+                    [attribute] => 15ml
+                    [active_desc] =>
+                    [create_time] => 1682582895
+                    [update_time] => 1682582911
+                    [status] => 1
+                    [order_status] => 1
+                    [image] => 22/0b/7a/220b7a04f69fe201a9409aedb231f874.png
+                    [price] => 200.00
+                    [activity_info] => []
+                    [parent_order_id] =>
+                    [merch_user_id] => 0
+                    [goods_type] => 0
+                    [refund_count] => 0
+                    [city] =>
+                    [district] =>
+                    [cit_brand_id] => 390
+                    [cit_code] => H1002448
+                    [cit_cnname] => 资生堂新红妍肌活眼部精华露
+                    [amount] => 0.00
+                    [market_price] => 0.00
+                    [active_cut] => 200.00
+                    [cost_price] => 0.00
+                    [active_price] => 200.00
+                    [emoney] => 0.00
+                    [emoney_one] => 0.00
+                    [tax_money] => 0.00
+                    [tax_money_one] => 0.00
+                    [manjian_discounts] => 0.00
+                    [manjian_discounts_one] => 0.00
+                    [integral_discounts] => 0.00
+                    [integral_discounts_one] => 0.00
+                    [tax_saved] => 0.00
+                    [tax_saved_one] => 0.00
+                    [bonus_discounts] => 0.00
+                    [bonus_discounts_one] => 0.00
+                    [zhekou_discounts] => 0.00
+                    [zhekou_discounts_one] => 0.00
+                    [coupon_discounts] => 0.00
+                    [coupon_discounts_one] => 0.00
+                    [vip_discounts] => 0.00
+                    [vip_discounts_one] => 0.00
+                    [jd_plus_discount] => 0.00
+                    [jd_plus_discounts] => 0.00
+                    [wallet_pay] => 0.00
+                    [dingjin_one] => 0.00
+                    [weikuan_one] => 0.00
+                    [dingjin_discount_one] => 0.00
+                    [dingjin_shifu_one] => 0.00
+                    [weikuan_discount_one] => 0.00
+                    [weikuan_yingfu_all] => 0.00
+                    [weikuan_shifu_all] => 0.00
+                    [houniao_yunfei] => 0.00
+                    [cit_customtaxrate] => 0.00
+                    [cit_headcustomcatid] =>
+                    [kg_one] => 0.00
+                    [volume_one] => 0.00
+                    [counts] => 8
+                    [areacode] => 80010101
+                    [back_areacode] =>
+                    [activity_id] => 0
+                    [giftcode] =>
+                    [giftcode_mj] =>
+                    [receipts] => 1600.00
+                    [receipts_one] => 200.00
+                    [suit_discounts] => 0.00
+                    [suit_discounts_one] => 0.00
+                    [dianpu_id] => 1
+                    [sale_price] => 0.00
+                    [suit_qty] => 0
+                    [platform_subsidy] => 0.00
+                    [coupon_subvent_money] => 0.00
+                    [promotion_subvent_money] => 0.00
+                    [suit_subvent_money] => 0.00
+                )
+
+            [_related:yii\db\BaseActiveRecord:private] => Array
+                (
+                )
+
+            [_relationsDependencies:yii\db\BaseActiveRecord:private] => Array
+                (
+                )
+
+            [_errors:yii\base\Model:private] =>
+            [_validators:yii\base\Model:private] =>
+            [_scenario:yii\base\Model:private] => default
+            [_events:yii\base\Component:private] => Array
+                (
+                )
+
+            [_eventWildcards:yii\base\Component:private] => Array
+                (
+                )
+
+            [_behaviors:yii\base\Component:private] => Array
+                (
+                )
+
+        )
+
+)
