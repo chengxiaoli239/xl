@@ -143,7 +143,7 @@ class TzSystemUsersController extends Controller
             return ['status'=>302, 'msg'=>'开奖数据不能为空'];
         }
 
-        $rst = TzSystemUsersService::syncClientKjDatas($post['kj_datas'], $post['lottery_type']);
+        $rst = TzSystemUsersService::syncClientKjDatas($post['kj_datas'], $post['access_token'], $post['lottery_type']);
         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端开奖数据同步', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;

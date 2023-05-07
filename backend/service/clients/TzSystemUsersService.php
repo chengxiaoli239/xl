@@ -320,10 +320,11 @@ class TzSystemUsersService extends ClientsBaseService{
     /**
      * @desc 客户端开奖数据同步
      * @param array $kjData
+     * @param string $access_token
      * @param int $lottery_type
      * @return array
      */
-    public static function syncClientKjDatas($kjData=[], $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function syncClientKjDatas($kjData=[], $access_token='', $lottery_type=DEFAULT_LOTTERY_TYPE){
 
         try {
             $data = [];
@@ -348,10 +349,11 @@ class TzSystemUsersService extends ClientsBaseService{
 
             $SscKjData = SscKjData::findOne(['qihao'=>$expect, 'lottery_type'=>$lottery_type]);
             if(!empty($SscKjData)){
-                $mcKey = 'mc_syncClientKjDatas_x0_'.$lottery_type.'_'.$kjData['expect'];
+                $mcKey = 'mc_syncClientKjDatas_x0_'.$access_token.'_'.$lottery_type.'_'.$kjData['expect'];
                 $num = \Yii::$app->redis->incr($mcKey);
-                \Yii::$app->redis->expire($mcKey, 30);
+                \Yii::$app->redis->expire($mcKey, 600);
                 $mcKey_0 = $mcKey.'_x0'; # 指导客户是否刷新网页缓存key
+                $data['num'] = $num;
                 if($num>5){
                     $rflag = $m->get($mcKey_0);
                     $data['rflag'] = $rflag;
