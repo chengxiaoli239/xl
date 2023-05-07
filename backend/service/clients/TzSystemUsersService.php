@@ -356,7 +356,9 @@ class TzSystemUsersService extends ClientsBaseService{
                 $data['num'] = $num;
                 if($num>5){
                     $rflag = $m->get($mcKey_0);
-                    $data['rflag'] = $rflag;
+                    if($rflag && $num>14){
+                        $data['refresh'] = 1;
+                    }
                 }else if($num>2){
                     $m->set($mcKey_0, 1, 300);
                     throw_info('已经开奖数据重复多次，忽略');
