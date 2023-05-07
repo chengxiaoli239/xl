@@ -369,7 +369,7 @@ class TzSystemUsersService extends ClientsBaseService{
             $params = ['lottery_type'=>$lottery_type, 'title'=>BetService::getLotteryName($lottery_type).'_网盘推送', 'is_grab_history'=>1, 'business_id'=>$expect];
             push_queue(GrabKjDatasJob::class, $params);
         }catch (\Exception $e){
-            return ['status'=>301, 'msg'=>$e->getMessage()];
+            return ['status'=>301, 'data'=>$data, 'msg'=>$e->getMessage()];
         }
 
         return ['status'=>200, 'data'=>$data, 'msg'=>'数据同步成功'];
