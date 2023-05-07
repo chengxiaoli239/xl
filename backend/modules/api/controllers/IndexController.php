@@ -9,20 +9,31 @@
 namespace backend\modules\api\controllers;
 
 use backend\models\UserFollowData;
+use backend\service\clients\TzSystemUsersService;
 use backend\service\HN0898Service;
-use backend\service\PoxyIPService;
-use backend\service\ProxyBaseService;
 use backend\service\UserService;
 use common\tools\Tool_Common;
 use Yii;
 use yii\web\Controller;
-use common\service\CommonService;
 use backend\service\BaseNumService;
 use yii\filters\VerbFilter;
 
 class IndexController extends Controller
 {
     public $enableCsrfValidation = false;
+    public $TzSystemsUsers = [];
+
+    public function init(){
+        $isAdminRoute = in_array(Yii::$app->controller->route, ['admin/route/index', 'admin/route/index.html']);
+        $post = \Yii::$app->request->post();
+        $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens();
+        if(!in_array($post['access_token'], $AUTH_ACCESS_TOKENS) && !$isAdminRoute){
+            header('content-type:application/json');
+            die(json_encode(['status'=>302, 'msg'=>'您无权限访问', 'data'=>$post, $AUTH_ACCESS_TOKENS], 320));
+        }
+        $this->TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($post['access_token']);
+    }
+
     /**
      * @inheritdoc
      */
@@ -173,9 +184,10 @@ class IndexController extends Controller
 
     public function actionGetUserInfoByToken(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $data = \Yii::$app->request->post();
+        $post = \Yii::$app->request->post();
 
-        $rst = UserService::getUserInfoByToken($data);
+        $rst = UserService::getUserInfoByToken($post);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取用信息接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
@@ -194,11 +206,4 @@ class IndexController extends Controller
         return $rst;
     }
 
-    public function actionGetProxyIp(){
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $post = \Yii::$app->request->post();
-
-        $ip_addr = ProxyBaseService::getCurrentValidProxyIp();
-        return $ip_addr;
-    }
 }
