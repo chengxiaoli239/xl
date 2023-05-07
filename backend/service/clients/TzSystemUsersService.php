@@ -326,6 +326,7 @@ class TzSystemUsersService extends ClientsBaseService{
     public static function syncClientKjDatas($kjData=[], $lottery_type=DEFAULT_LOTTERY_TYPE){
 
         try {
+            $data = [];
             $now_time = date('Y-m-d H:i:s');
             $expect = $kjData['expect'] = trim($kjData['expect']);
             $kjData['opencode'] = trim($kjData['opencode']);
@@ -350,7 +351,12 @@ class TzSystemUsersService extends ClientsBaseService{
                 $mcKey = 'mc_syncClientKjDatas_x0_'.$lottery_type.'_'.$kjData['expect'];
                 $num = \Yii::$app->redis->incr($mcKey);
                 \Yii::$app->redis->expire($mcKey, 30);
-                if($num>2){
+                $mcKey_0 = $mcKey.'_x0'; # 指导客户是否刷新网页缓存key
+                if($num>5){
+                    $rflag = $m->get($mcKey_0);
+                    $data['rflag'] = $rflag;
+                }else if($num>2){
+                    $m->set($mcKey_0, 1, 300);
                     throw_info('已经开奖数据重复多次，忽略');
                 }
                 $minute_nums = substr($now_time, -5, -3);
@@ -366,7 +372,7 @@ class TzSystemUsersService extends ClientsBaseService{
             return ['status'=>301, 'msg'=>$e->getMessage()];
         }
 
-        return ['status'=>200, 'data'=>[], 'msg'=>'数据同步成功'];
+        return ['status'=>200, 'data'=>$data, 'msg'=>'数据同步成功'];
     }
 
     /**
