@@ -2921,11 +2921,11 @@ class SscDataService extends BaseService {
                 foreach ($UserSysPlans as $UserSysPlan){
                     try {
                         $Rkey = __FUNCTION__.'_redis_op_plan_0_1_3_5_'.$lottery_type.'_'.$UserSysPlan->id;
-                        \Yii::$app->redis->expire($Rkey, 120);
                         if(!$RedisLock->lock($Rkey, 30)){
                             Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略1', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
                             continue;
                         }
+                        \Yii::$app->redis->expire($Rkey, 120);
                         $profits = SscDataService::getPlanProfits($UserSysPlan);
 
                         $maxQihao = BetService::$maxQihaoArr[$lottery_type];
@@ -3196,6 +3196,7 @@ class SscDataService extends BaseService {
             $lottery_type = $UserSysPlans->lottery_type;
             $RedisLock = new RedisLock();
             $Rkey = __FUNCTION__.'_redis_op_plan_6_10_'.$lottery_type.'_'.$UserSysPlans->id;
+            \Yii::$app->redis->expire($Rkey, 120);
             if(!$RedisLock->lock($Rkey, 30)){
                 throw_info('并发处理失败');
             }
@@ -3297,6 +3298,7 @@ class SscDataService extends BaseService {
             #$current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
             $RedisLock = new RedisLock();
             $Rkey = __FUNCTION__.'_redis_op_plan_15_'.$lottery_type.'_'.$UserSysPlans->id;
+            \Yii::$app->redis->expire($Rkey, 120);
             if(!$RedisLock->lock($Rkey, 30)){
                 throw_info('并发处理失败');
             }
@@ -3393,6 +3395,7 @@ class SscDataService extends BaseService {
             #$current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
             $RedisLock = new RedisLock();
             $Rkey = __FUNCTION__.'_redis_op_plan_15_'.$lottery_type.'_'.$UserSysPlans->id;
+            \Yii::$app->redis->expire($Rkey, 120);
             if(!$RedisLock->lock($Rkey, 30)){
                 throw_info('并发处理失败');
             }
@@ -3468,6 +3471,7 @@ class SscDataService extends BaseService {
             $lottery_type = $UserSysPlans->lottery_type;
             $RedisLock = new RedisLock();
             $Rkey = __FUNCTION__.'_redis_op_plan_8_'.$lottery_type.'_'.$UserSysPlans->id;
+            \Yii::$app->redis->expire($Rkey, 120);
             if(!$RedisLock->lock($Rkey, 30)){
                 throw_info('并发处理失败');
             }
@@ -3516,6 +3520,7 @@ class SscDataService extends BaseService {
 
         $RedisLock = new RedisLock();
         $Rkey = __FUNCTION__.'_redis_'.$lottery_type;
+        \Yii::$app->redis->expire($Rkey, 120);
         if(!$RedisLock->lock($Rkey, 30)){
             Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', 'A出x次B出y次投B-处理锁错误', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
             return false;
@@ -3611,6 +3616,7 @@ class SscDataService extends BaseService {
     public static function opProfitsPlans14($lottery_type = DEFAULT_LOTTERY_TYPE){
         $RedisLock = new RedisLock();
         $Rkey = __FUNCTION__.'_redis_'.$lottery_type;
+        \Yii::$app->redis->expire($Rkey, 120);
         if(!$RedisLock->lock($Rkey, 10)){
             Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '区间遗漏投-处理锁错误', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
             return false;
