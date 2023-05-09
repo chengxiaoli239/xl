@@ -1827,6 +1827,7 @@ class SscDataService extends BaseService {
         $key = 'judgeDealTaskStatus_'.$lottery_type.'_'.$qihao;
         if(empty($DataDealStatus)){
             $num = \Yii::$app->redis->incrby($key, 1);
+            \Yii::$app->redis->expire($key, 120);
             if($num>5){
                 SscDataService::insertDealDataTask($lottery_type, $qihao); # 数据处理任务写入
             }
