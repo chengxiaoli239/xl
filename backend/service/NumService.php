@@ -3125,9 +3125,9 @@ class NumService extends BaseService {
         $filterDsCode3 = NumService::getDsTypeByCode($NewKjCodes['code3']);
         $filterDsCode4 = NumService::getDsTypeByCode($NewKjCodes['code4']);
         $filterQuery2 = Num4Type::find()->select(['code'])
-            ->andWhere(['AND', ['IN', 'code_1', $filterDsCode1], ['IN', 'code_2', $filterDsCode2], ['IN', 'code_3', $filterDsCode3], ['IN', 'code_4', $filterDsCode4]])
+            ->where(['AND', ['IN', 'code_1', $filterDsCode1], ['IN', 'code_2', $filterDsCode2], ['IN', 'code_3', $filterDsCode3], ['IN', 'code_4', $filterDsCode4]])
             ->andWhere(['=', 'code_type', $playway+1]);
-        #p($filterQuery->createCommand()->getRawSql());
+        #p($filterQuery2->createCommand()->getRawSql());
         $filterNumTypes2 = $filterQuery2->asArray()->all();
         $filterCodes2 = ArrayHelper::getColumn($filterNumTypes2, 'code');
         #p($filterCodes2);
@@ -4150,7 +4150,7 @@ class NumService extends BaseService {
         if(in_array($num, NumService::$SINGLE_CODES)){
             # 单
             $codes = NumService::$SINGLE_CODES;
-        }elseif (in_array($num, NumService::$MAX_CODES)){
+        }elseif (in_array($num, NumService::$DOUBLE_CODES)){
             # 双
             $codes = NumService::$DOUBLE_CODES;
         }
