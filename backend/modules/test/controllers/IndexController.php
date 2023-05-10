@@ -325,13 +325,13 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(6764);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p(count($filter_dynamic_codes));
         $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
         p($data);
         $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp(1, 2);
         p($current_proxy_addr);
-        $plan = UserSysPlans::findOne(6495);
-        #$filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic14($plan);
         p(count($filter_dynamic_codes));
         $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);
         p($rst);
