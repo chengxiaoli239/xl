@@ -1991,7 +1991,7 @@ abstract class BetService extends BaseBetService {
             $plans = UserSysPlans::find()->where($where)->all();
             Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '批量插入任务000', ['lottery_type'=>$lottery_type, 'counts'=>count($plans)]);
             if(empty($plans)){
-                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>'没有开启的计划', 'uid'=>$plans[0]->uid]);
+                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>'没有开启的计划']);
                 continue;
             }
             $m = \Yii::$app->cache;
@@ -2009,7 +2009,7 @@ abstract class BetService extends BaseBetService {
                         $qihao = $next_qihao;
                     }
                     $is_equal = ($qihao==$next_qihao) ? 1 : 0;
-                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'is_equal'=>$is_equal, 'lottery_type'=>$lottery_type]);
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'qihao'=>$qihao, 'is_equal'=>$is_equal, 'lottery_type'=>$lottery_type]);
                     //if($uid != 17) continue; # 测试
 
                     $insert_mkey = 'insertPlanTask_key_'.$lottery_type.'_'.$qihao.'_'.$plan->id;
@@ -2026,7 +2026,7 @@ abstract class BetService extends BaseBetService {
                     //$next_qihao_is_active = TzService::beforeBet($lottery_type, $c_active_qihao);
 
                     $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao, 'opProfitsPlans_status');
-                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'deal_next_qihao'=>$DataDealStatus, 'task_qihao'=>$qihao]);
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '下注期号判断', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'DataDealStatus'=>$DataDealStatus, 'task_qihao'=>$qihao]);
                     if(empty($DataDealStatus) OR $DataDealStatus != 2){
                         $dateHI = date('H:i');
                         if('09:00'<=$dateHI && $dateHI<='09:05' && $lottery_type==DEFAULT_LOTTERY_TYPE){
