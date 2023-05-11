@@ -58,6 +58,9 @@
 <strong><font color="blue">34、过滤1345期号尾号一致历史直码：</font></strong>过滤1345位历史所有期号尾号一致的历史直码
 <strong><font color="blue">35、过滤2345期号尾号一致历史直码：</font></strong>过滤2345位历史所有期号尾号一致的历史直码
 <strong><font color="blue">36、过滤1234大小类型一致近2500组直码：</font></strong>过滤1234历史所有大小类型一致历史直码，开：1279=>两大两小， 只要是两大两小,不区分位置最近2500期内都会被过滤
+<strong><font color="blue">37、过滤1234前期大小或单双类型分别都不一致号码：</font></strong>比如上期开：3637，则如果开：双单双双、大小大小  这种类型就不中奖，其它的就中奖
+<strong><font color="blue">38、过滤1234最近两大两小1000组直码：</font></strong>比如上期开：固定每期过滤，最近开的两大两小1000组直码
+<strong><font color="blue">39、过滤1234最近两单两双1000组直码：</font></strong>比如上期开：固定每期过滤，最近开的两单两双1000组直码
                 </code></pre>
             </div>
             <div class="modal-footer">
