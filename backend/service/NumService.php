@@ -3184,7 +3184,7 @@ class NumService extends BaseService {
         $lastQihaoNum = substr($next_qihao, -1); # 即将下注期号最后一位，126期，则为：6
         #p([$next_qihao, substr($next_qihao, -1)]);
 
-        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'RIGHT(qihao, 1)', $lastQihaoNum], ['=', $type_field, $type_val]];
+        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', $type_field, $type_val]];
         $positions_str = 'code'.implode(',",",code', $positions);
         $historyKjDatasQuery = SscKjData::find()->select(['code_str', 'code_4n_str'=>'CONCAT('.$positions_str.')'])
             ->where($historyWhere)->groupBy(['CONCAT('.$positions_str.')'])->limit($filterNums)->orderBy(['id'=>SORT_DESC]);
