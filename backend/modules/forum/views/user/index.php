@@ -189,7 +189,7 @@ $(function () {
         data = {'user_id':user_id}
         $.post("/forum/user/reset-token",data,function(rst) {
             if(rst.status == 200) {
-                Ewin.confirm({ message: '新access_token：'+rst.data.new_access_token}).on(function (e) {});
+                Ewin.confirm({ message: '新access_token：'+rst.data.access_token}).on(function (e) {});
             } else {
                 Ewin.confirm({ message: '操作失败：'+rst.msg}).on(function (e) {});
             }

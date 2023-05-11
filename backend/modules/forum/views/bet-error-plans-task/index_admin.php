@@ -218,7 +218,7 @@ $(function () {
 
     $("[id^=re_set]").click(function(){
         Ewin.confirm({ message: '重置状态，有可能会再次下注'}).on(function (e) {
-            rid = $(this).attr('data-rid');
+            rid = $(this).data('rid');
             console.log(rid)
             data = {rid:rid}
             url = '/forum/bet-error-plans-task/switch-task-status'
