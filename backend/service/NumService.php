@@ -3106,28 +3106,31 @@ class NumService extends BaseService {
         #p($nextQuery->createCommand()->getRawSql());
 
         $NewKjCodes = $nextQuery->asArray()->limit(1)->one(); # 最新一期
-        $filterDxCode1 = NumService::getDxTypeByCode($NewKjCodes['code1']);
-        $filterDxCode2 = NumService::getDxTypeByCode($NewKjCodes['code2']);
-        $filterDxCode3 = NumService::getDxTypeByCode($NewKjCodes['code3']);
-        $filterDxCode4 = NumService::getDxTypeByCode($NewKjCodes['code4']);
+        # 1、大小类型过滤
+        $filterDxCode1 = NumService::getDxTypeFanByCode($NewKjCodes['code1']);
+        $filterDxCode2 = NumService::getDxTypeFanByCode($NewKjCodes['code2']);
+        $filterDxCode3 = NumService::getDxTypeFanByCode($NewKjCodes['code3']);
+        $filterDxCode4 = NumService::getDxTypeFanByCode($NewKjCodes['code4']);
 
         #p(['filterCode1'=>$filterCode1, 'filterCode2'=>$filterCode2, 'filterCode3'=>$filterCode3, 'filterCode4'=>$filterCode4]);
         $filterQuery1 = Num4Type::find()->select(['code'])
             ->andWhere(['AND', ['IN', 'code_1', $filterDxCode1], ['IN', 'code_2', $filterDxCode2], ['IN', 'code_3', $filterDxCode3], ['IN', 'code_4', $filterDxCode4]])
             ->andWhere(['=', 'code_type', $playway+1]);
-        #p($filterQuery->createCommand()->getRawSql());
+        #p(['qihao'=>$current_kj_qihao, '开奖号码'=>$NewKjCodes['code_str']], 0);
+        #p($filterQuery1->createCommand()->getRawSql(), 0);
         $filterNumTypes1 = $filterQuery1->asArray()->all();
         $filterCodes1 = ArrayHelper::getColumn($filterNumTypes1, 'code');
         #p($filterCodes1);
 
-        $filterDsCode1 = NumService::getDsTypeByCode($NewKjCodes['code1']);
-        $filterDsCode2 = NumService::getDsTypeByCode($NewKjCodes['code2']);
-        $filterDsCode3 = NumService::getDsTypeByCode($NewKjCodes['code3']);
-        $filterDsCode4 = NumService::getDsTypeByCode($NewKjCodes['code4']);
+        # 2、单双类型过滤
+        $filterDsCode1 = NumService::getDsTypeFanByCode($NewKjCodes['code1']);
+        $filterDsCode2 = NumService::getDsTypeFanByCode($NewKjCodes['code2']);
+        $filterDsCode3 = NumService::getDsTypeFanByCode($NewKjCodes['code3']);
+        $filterDsCode4 = NumService::getDsTypeFanByCode($NewKjCodes['code4']);
         $filterQuery2 = Num4Type::find()->select(['code'])
             ->where(['AND', ['IN', 'code_1', $filterDsCode1], ['IN', 'code_2', $filterDsCode2], ['IN', 'code_3', $filterDsCode3], ['IN', 'code_4', $filterDsCode4]])
             ->andWhere(['=', 'code_type', $playway+1]);
-        #p($filterQuery2->createCommand()->getRawSql());
+        #p($filterQuery2->createCommand()->getRawSql(), 0);
         $filterNumTypes2 = $filterQuery2->asArray()->all();
         $filterCodes2 = ArrayHelper::getColumn($filterNumTypes2, 'code');
         #p($filterCodes2);
@@ -3137,8 +3140,7 @@ class NumService extends BaseService {
             ->andWhere(['NOT IN', 'code', $filterCodes2])
             ->andWhere(['=', 'code_type', $playway+1]);
 
-
-        #$sql = $query->createCommand()->getRawSql();
+        #$sql = $query->createCommand()->getRawSql(); p($sql);
         $NumTypes = $query->asArray()->all();
         #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
@@ -4136,6 +4138,40 @@ class NumService extends BaseService {
         }elseif (in_array($num, NumService::$MAX_CODES)){
             # 大
             $codes = NumService::$MAX_CODES;
+        }
+
+        return $codes;
+    }
+
+    /**
+     * 获取大小类型号码 - 反向
+     * @param $num
+     * @return int[]
+     */
+    public static function getDxTypeFanByCode($num){
+        if(in_array($num, NumService::$MIN_CODES)){
+            # 大
+            $codes = NumService::$MAX_CODES;
+        }elseif (in_array($num, NumService::$MAX_CODES)){
+            # 小
+            $codes = NumService::$MIN_CODES;
+        }
+
+        return $codes;
+    }
+
+    /**
+     * 获取单双类型号码 - 反向
+     * @param $num
+     * @return int[]
+     */
+    public static function getDsTypeFanByCode($num){
+        if(in_array($num, NumService::$SINGLE_CODES)){
+            # 双
+            $codes = NumService::$DOUBLE_CODES;
+        }elseif (in_array($num, NumService::$DOUBLE_CODES)){
+            # 单
+            $codes = NumService::$SINGLE_CODES;
         }
 
         return $codes;
