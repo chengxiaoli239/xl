@@ -2201,7 +2201,7 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic41($plan, $lottery_type);
                     break;
                 case 42: # 过滤最近x组大小类型(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic42($plan, $type_field='type_dx', $type_val=4, $positions=[1,2,3,4], $filterNums=1000); #
+                    $codes = NumService::getBeforeKjCodesDynamic42($plan, $type_field='type_dx', $type_val=3, $positions=[1,2,3,4], $filterNums=1000); #
                     break;
                 case 43: # 过滤最近x组单双类型(四定)
                     $codes = NumService::getBeforeKjCodesDynamic42($plan, $type_field='type_4ds', $type_val=3, $positions=[1,2,3,4], $filterNums=1000); #
@@ -3160,9 +3160,9 @@ class NumService extends BaseService {
      * 过滤类型号码 - # 过滤最近x组大小类型(四定)
      * @param object $plan
      * @param string $type_field
+        `type_dx` tinyint(1) DEFAULT '0' COMMENT '四定大小:0保留1全大2三大一小3两大两小4一大三小5全小',
         `type_4ds` tinyint(1) DEFAULT NULL COMMENT '四定单双:0保留1四单2四双3两单两双4一单三双5一双三单',
      * @param int $type_val
-        `type_dx` tinyint(1) DEFAULT '0' COMMENT '四定大小:0保留1全大2全小3一大三小4两大两小5三大一小',
      * @param int[] $positions
      * @return array
      */
@@ -4139,11 +4139,11 @@ class NumService extends BaseService {
      */
     public static function getType4dx($str='2大2小'){
         $datas = NumService::$type_dx_datas;
-        $datas = array_flip($datas);
+        $indexDatas = array_flip($datas);
 
-        if(isset($datas[$str])) return $datas[$str];
+        if(isset($indexDatas[$str])) return $indexDatas[$str];
 
-        return $datas;
+        return $indexDatas;
     }
 
     /**
