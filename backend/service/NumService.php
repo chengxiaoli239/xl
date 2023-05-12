@@ -111,6 +111,8 @@ class NumService extends BaseService {
         41=>'过滤1234前期大小或单双类型分别都不一致号码 ',
         42=>'过滤1234最近两大两小1000组直码 ',
         43=>'过滤1234最近两单两双1000组直码 ',
+        44=>'过滤1234前期大小类型都不一致号码 ',
+        45=>'过滤1234前期单双类型都不一致号码 ',
     ];
 
     /**
@@ -2198,13 +2200,19 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic36($plan, $lottery_type, $positions=[1,2,3,4]);
                     break;
                 case 41: # 过滤1234前期大小或单双类型分别都不一致号码(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic41($plan, $lottery_type);
+                    $codes = NumService::getBeforeKjCodesDynamic41($plan, $filter_type=1);
                     break;
                 case 42: # 过滤最近x组大小类型(四定)
                     $codes = NumService::getBeforeKjCodesDynamic42($plan, $type_field='type_dx', $type_val=3, $positions=[1,2,3,4], $filterNums=1000); #
                     break;
                 case 43: # 过滤最近x组单双类型(四定)
                     $codes = NumService::getBeforeKjCodesDynamic42($plan, $type_field='type_4ds', $type_val=3, $positions=[1,2,3,4], $filterNums=1000); #
+                    break;
+                case 44: # 过滤1234前期大小类型都不一致号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic41($plan, $filter_type=2);
+                    break;
+                case 45: # 过滤1234前期单双类型都不一致号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic41($plan, $filter_type=3);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
@@ -3097,13 +3105,14 @@ class NumService extends BaseService {
 
     /**
      * 过滤类型号码 - 过滤1234前期大小或单双类型分别都不一致号码
+     * @param object $plan
+     * @param int $filterType  1大小和单双2大小3单双
      * @param int $lottery_type
-     * @param int $playway
-     * @param int $cNum 至少上cNum个
      * @return array
      */
-    private static function getBeforeKjCodesDynamic41(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE){
+    private static function getBeforeKjCodesDynamic41(object $plan, $filterType=1){
         $playway = $plan->playway;
+        $lottery_type = $plan->lottery_type;
         $nextQuery = SscKjData::find()->select(['code_str', 'code1', 'code2', 'code3', 'code4'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
         $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
@@ -3127,7 +3136,7 @@ class NumService extends BaseService {
         #p(['qihao'=>$current_kj_qihao, '开奖号码'=>$NewKjCodes['code_str']], 0);
         #p($filterQuery1->createCommand()->getRawSql(), 0);
         $filterNumTypes1 = $filterQuery1->asArray()->all();
-        $filterCodes1 = ArrayHelper::getColumn($filterNumTypes1, 'code');
+        $filterCodes1 = ArrayHelper::getColumn($filterNumTypes1, 'code'); # 大小
         #p($filterCodes1);
 
         # 2、单双类型过滤
@@ -3143,10 +3152,14 @@ class NumService extends BaseService {
         $filterCodes2 = ArrayHelper::getColumn($filterNumTypes2, 'code');
         #p($filterCodes2);
 
-        $query = Num4Type::find()->select(['code'])
-            ->where(['NOT IN', 'code', $filterCodes1])
-            ->andWhere(['NOT IN', 'code', $filterCodes2])
-            ->andWhere(['=', 'code_type', $playway+1]);
+        $query = Num4Type::find()->select(['code']);
+        $query->where(['=', 'code_type', $playway+1]);
+        if(in_array($filterType, [1, 2])){
+            $query->andWhere(['NOT IN', 'code', $filterCodes1]);
+        }
+        if(in_array($filterType, [1, 3])){
+            $query->andWhere(['NOT IN', 'code', $filterCodes2]);
+        }
 
         #$sql = $query->createCommand()->getRawSql(); p($sql);
         $NumTypes = $query->asArray()->all();
