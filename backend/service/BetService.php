@@ -2038,7 +2038,7 @@ abstract class BetService extends BaseBetService {
                     }
 
                     # 4、投注号码 codes
-                    $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+                    $codes = BetService::getCodesByPlan($plan);
 
                     $is_test = $plan->is_test;
                     list($sn, $snid) = BetService::getBetSnId($plan, $plan->plan_type, $is_test, $isAuto);
@@ -2101,6 +2101,17 @@ abstract class BetService extends BaseBetService {
         }
 
         return $rst;
+    }
+
+    /**
+     * @param object $plan
+     * @return string
+     */
+    public static function getCodesByPlan(object $plan){
+        # 4、投注号码 codes
+        $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+
+        return $codes;
     }
 
     /**

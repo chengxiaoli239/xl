@@ -325,18 +325,19 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(6822);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p(count($filter_dynamic_codes));
+        $codes = BetService::getCodesByPlan($plan);
+        p($codes);
         $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);
         p($rst);
         list($type_dx, $type_4dx, $type_dx_str) = CommonService::getTypeDx('5,1,1,0,8');
         p([$type_dx, $type_4dx, $type_dx_str]);
-        $plan = UserSysPlans::findOne(6798);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
-        p(count($filter_dynamic_codes));
         $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
         p($data);
         $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp(1, 2);
         p($current_proxy_addr);
-        p(count($filter_dynamic_codes));
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%num4_type}}'); p($r);
         $SscKjData = SscKjData::find()->select(['qihao'])->where(['lottery_type'=>8])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one();
         p($SscKjData);
