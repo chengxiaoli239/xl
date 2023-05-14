@@ -2876,8 +2876,8 @@ class NumService extends BaseService {
         $positions_str = 'code'.implode(',",",code', $positions);
         $historyKjDatasQuery = SscKjData::find()->select(['code_str', 'code_4n_str'=>'CONCAT('.$positions_str.')'])
             ->where($historyWhere)->groupBy(['CONCAT('.$positions_str.')'])->orderBy(['id'=>SORT_DESC]);
-        #$sql = $historyKjDatasQuery->createCommand()->getRawSql();  p($sql);
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤期号尾号一致', ['positions'=>$positions, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'next_qihao'=>$next_qihao, 'plan_id'=>$plan->id]);
+        $sql = $historyKjDatasQuery->createCommand()->getRawSql();  //p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤期号尾号一致', ['positions'=>$positions, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'next_qihao'=>$next_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
         $historyKjDatas = $historyKjDatasQuery->asArray()->limit($limit)->all();
         $filterCodes = ArrayHelper::getColumn($historyKjDatas, 'code_4n_str');
         $filterCodesStr = implode('","', $filterCodes);
