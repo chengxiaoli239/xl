@@ -95,7 +95,7 @@ class NumService extends BaseService {
         25=>'过滤前100期开过号码的全转(四定)',
         26=>'过滤前期同位置号码(四定6561组)',
         27=>'过滤前四1152组号码(四定)',
-        28=>'过滤1234期号尾号一致历史直码',
+        28=>'过滤1234期号尾号一致1000组历史直码',
         29=>'剔除前期号码至少1个上奖',
         30=>'剔除前期号码至少2个上奖',
         31=>'剔除前100期123位一致的直码 ',
@@ -103,10 +103,10 @@ class NumService extends BaseService {
         33=>'剔除前100期134位一致的直码 ',
         34=>'剔除前100期234位一致的直码 ',
         35=>'剔除历史期号一致的号码全倒 ',
-        36=>'过滤1235期号尾号一致历史直码 ',
-        37=>'过滤1245期号尾号一致历史直码 ',
-        38=>'过滤1345期号尾号一致历史直码 ',
-        39=>'过滤2345期号尾号一致历史直码 ',
+        36=>'过滤1235期号尾号一致1000组历史直码 ',
+        37=>'过滤1245期号尾号一致1000组历史直码 ',
+        38=>'过滤1345期号尾号一致1000组历史直码 ',
+        39=>'过滤2345期号尾号一致1000组历史直码 ',
         40=>'过滤1234大小类型一致近1500组直码 ',
         41=>'过滤1234前期大小或单双类型分别都不一致号码 ',
         42=>'过滤1234最近两大两小1000组直码 ',
@@ -2161,7 +2161,7 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,3,4], $num=1152);
                     break;
                 case 28: # 过滤期号尾号一致历史直码(四定) - 1234
-                    $codes = NumService::getBeforeKjCodesDynamic28($plan, $lottery_type, $positions=[1,2,3,4]);
+                    $codes = NumService::getBeforeKjCodesDynamic28($plan, $positions=[1,2,3,4]);
                     break;
                 case 29: # 排除前一期号码剩余号码至少上1个码
                     $codes = NumService::getBeforeKjCodesDynamic29($plan, $lottery_type, $cNum=1);
@@ -2185,16 +2185,16 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic35($plan, $lottery_type);
                     break;
                 case 36: # 过滤1235期号尾号一致历史直码(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic28($plan, $lottery_type, $positions=[1,2,3,5]);
+                    $codes = NumService::getBeforeKjCodesDynamic28($plan, $positions=[1,2,3,5]);
                     break;
                 case 37: # 过滤1245期号尾号一致历史直码(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic28($plan, $lottery_type, $positions=[1,2,4,5]);
+                    $codes = NumService::getBeforeKjCodesDynamic28($plan, $positions=[1,2,4,5]);
                     break;
                 case 38: # 过滤1345期号尾号一致历史直码(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic28($plan, $lottery_type, $positions=[1,3,4,5]);
+                    $codes = NumService::getBeforeKjCodesDynamic28($plan, $positions=[1,3,4,5]);
                     break;
                 case 39: # 过滤2345期号尾号一致历史直码(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic28($plan, $lottery_type, $positions=[2,3,4,5]);
+                    $codes = NumService::getBeforeKjCodesDynamic28($plan, $positions=[2,3,4,5]);
                     break;
                 case 40: # 过滤1234大小类型一致近1500组直码(四定)
                     $codes = NumService::getBeforeKjCodesDynamic36($plan, $lottery_type, $positions=[1,2,3,4]);
@@ -2854,11 +2854,12 @@ class NumService extends BaseService {
      * @param int[] $positions
      * @return array
      */
-    private static function getBeforeKjCodesDynamic28(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE, $positions=[1,2,3,4]){
+    private static function getBeforeKjCodesDynamic28(object $plan, $positions=[1,2,3,4], $limit=1000){
         $playway = $plan->playway;
         #$nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
         $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $lottery_type = $plan->lottery_type;
         if(empty($current_kj_qihao)){
             $is_empty_c_qihao = 1;
             $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
@@ -2874,10 +2875,10 @@ class NumService extends BaseService {
         $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'RIGHT(qihao, 1)', $lastQihaoNum]];
         $positions_str = 'code'.implode(',",",code', $positions);
         $historyKjDatasQuery = SscKjData::find()->select(['code_str', 'code_4n_str'=>'CONCAT('.$positions_str.')'])
-            ->where($historyWhere);
-        $sql = $historyKjDatasQuery->createCommand()->getRawSql();
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤期号尾号一致', ['positions'=>$positions, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'next_qihao'=>$next_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
-        $historyKjDatas = $historyKjDatasQuery->asArray()->all();
+            ->where($historyWhere)->groupBy(['CONCAT('.$positions_str.')'])->orderBy(['id'=>SORT_DESC]);
+        #$sql = $historyKjDatasQuery->createCommand()->getRawSql();  p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤期号尾号一致', ['positions'=>$positions, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'next_qihao'=>$next_qihao, 'plan_id'=>$plan->id]);
+        $historyKjDatas = $historyKjDatasQuery->asArray()->limit($limit)->all();
         $filterCodes = ArrayHelper::getColumn($historyKjDatas, 'code_4n_str');
         $filterCodesStr = implode('","', $filterCodes);
 
