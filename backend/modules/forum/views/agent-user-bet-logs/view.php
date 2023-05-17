@@ -33,12 +33,12 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?= DetailView::widget([
                                 'model' => $model,
                                 'attributes' => [
-
                                     'id',
                                     'access_token',
                                     'member_id',
                                     'account',
                                     'bet_logs:ntext',
+                                    'bet_logs_n:ntext',
                                     'bet_codes:ntext',
                                     'bet_codes_counts',
                                     'bet_codes_op:ntext',
@@ -49,6 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'lottery_type',
                                     'qihao',
                                     'status',
+                                    'member_bet_time',
                                     'tz_system_id',
                                     'created_at',
                                     'updated_at',
