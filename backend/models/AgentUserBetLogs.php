@@ -9,11 +9,14 @@ use Yii;
  *
  * @property int $id
  * @property string $access_token 用户access_token
+ * @property int $uid 系统用户id
  * @property int $member_id 用户id
  * @property string $account 用户账号
  * @property string $bet_logs 下注日志
  * @property string $bet_codes 下注号码
+ * @property int $bet_codes_counts 下注号码组数
  * @property string $bet_codes_op 下注反买号码
+ * @property int $bet_codes_op_counts 下注反买号码组数
  * @property int $bet_type 下注类型：1反买2正买
  * @property int $planway 下注类型：1二定2三定3四定
  * @property string $desc 描述
@@ -41,7 +44,7 @@ class AgentUserBetLogs extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['member_id', 'bet_type', 'planway', 'status', 'tz_system_id', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'member_id', 'bet_codes_counts', 'bet_codes_op_counts', 'bet_type', 'planway', 'status', 'tz_system_id', 'created_at', 'updated_at'], 'integer'],
             [['bet_logs', 'bet_codes', 'bet_codes_op'], 'string'],
             [['update_time'], 'safe'],
             [['access_token'], 'string', 'max' => 40],
@@ -59,11 +62,14 @@ class AgentUserBetLogs extends \common\models\base\BaseModel
         return [
             'id' => 'ID',
             'access_token' => 'Access Token',
+            'uid' => 'Uid',
             'member_id' => 'Member ID',
             'account' => 'Account',
             'bet_logs' => 'Bet Logs',
             'bet_codes' => 'Bet Codes',
+            'bet_codes_counts' => 'Bet Codes Counts',
             'bet_codes_op' => 'Bet Codes Op',
+            'bet_codes_op_counts' => 'Bet Codes Op Counts',
             'bet_type' => 'Bet Type',
             'planway' => 'Planway',
             'desc' => 'Desc',
