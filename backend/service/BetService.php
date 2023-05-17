@@ -1940,7 +1940,6 @@ abstract class BetService extends BaseBetService {
         return $insertRst;
     }
 
-
     /**
      * @desc 获取相反号码
      * @param $codesArr
@@ -1951,6 +1950,35 @@ abstract class BetService extends BaseBetService {
         if(!is_array($codesArr)) return [];
         $where = ['AND', ['=', 'code_type', $code_type], ['NOT IN', 'code', $codesArr]];
         $query = Num4Type::find()->where($where);
+        $filter_poses = NumService::getFilterPosByCode($codesArr[0]); # 根据导入的号码判断要过滤的位置
+        if(!empty($filter_poses)){
+            foreach ($filter_poses as $pos){
+                $query->andWhere(['<>', 'code_'.$pos, 'X']);
+            }
+        }
+        $Num4Type = $query->asArray()->all();
+        $data = ArrayHelper::getColumn($Num4Type, 'code');
+
+        return $data;
+    }
+
+    /**
+     * @desc 获取相反号码n
+     * @param $codesArr 无逗号
+     * @param $code_type
+     * @return array
+     */
+    public static function getInverseCodesN($codesArr, $code_type){
+        if(!is_array($codesArr)) return [];
+        $where = ['AND', ['=', 'code_type', $code_type], ['NOT IN', 'code_n', $codesArr]];
+        $query = Num4Type::find()->where($where);
+        if($code_type == 3){
+
+        }elseif($code_type == 2){
+
+        }
+        $sql = $query->createCommand()->getRawSql();
+        p($sql);
         $filter_poses = NumService::getFilterPosByCode($codesArr[0]); # 根据导入的号码判断要过滤的位置
         if(!empty($filter_poses)){
             foreach ($filter_poses as $pos){

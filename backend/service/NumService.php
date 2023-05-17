@@ -3016,11 +3016,12 @@ class NumService extends BaseService {
      * @param int $playway
      * @return array
      */
-    private static function getBeforeKjCodesDynamic35(object $plan, $lottery_type=DEFAULT_LOTTERY_TYPE){
+    private static function getBeforeKjCodesDynamic35(object $plan, $positions=[1,2,3,4]){
         $playway = $plan->playway;
         #$nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
         $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $lottery_type = $plan->lottery_type;
         if(empty($current_kj_qihao)){
             $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
             $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
