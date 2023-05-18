@@ -18,8 +18,9 @@ class AgentUserBetLogs extends AgentUserBetLogsModel
     public function rules()
     {
         return [
-            [['id', 'member_id', 'bet_codes_counts', 'bet_codes_op_counts', 'bet_type', 'planway', 'status', 'tz_system_id', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'uid', 'member_id', 'bet_counts', 'bet_op_counts', 'bet_type', 'planway', 'status', 'tz_system_id', 'created_at', 'updated_at'], 'integer'],
             [['access_token', 'account', 'bet_logs', 'bet_logs_n', 'bet_codes', 'bet_codes_op', 'desc', 'lottery_type', 'qihao', 'member_bet_time', 'update_time'], 'safe'],
+            [['bet_single', 'bet_op_single'], 'number'],
         ];
     }
 
@@ -60,14 +61,17 @@ class AgentUserBetLogs extends AgentUserBetLogsModel
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'uid' => $this->uid,
             'member_id' => $this->member_id,
+            'bet_counts' => $this->bet_counts,
+            'bet_single' => $this->bet_single,
+            'bet_op_counts' => $this->bet_op_counts,
+            'bet_op_single' => $this->bet_op_single,
             'bet_type' => $this->bet_type,
             'planway' => $this->planway,
-            'bet_codes_counts' => $this->bet_codes_counts,
-            'bet_codes_op_counts' => $this->bet_codes_op_counts,
             'status' => $this->status,
-            'tz_system_id' => $this->tz_system_id,
             'member_bet_time' => $this->member_bet_time,
+            'tz_system_id' => $this->tz_system_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,

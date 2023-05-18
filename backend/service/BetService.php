@@ -1977,8 +1977,7 @@ abstract class BetService extends BaseBetService {
         }elseif($code_type == 2){
 
         }
-        $sql = $query->createCommand()->getRawSql();
-        p($sql);
+        #$sql = $query->createCommand()->getRawSql(); p($sql);
         $filter_poses = NumService::getFilterPosByCode($codesArr[0]); # 根据导入的号码判断要过滤的位置
         if(!empty($filter_poses)){
             foreach ($filter_poses as $pos){

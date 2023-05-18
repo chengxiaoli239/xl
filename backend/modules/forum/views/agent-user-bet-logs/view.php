@@ -33,16 +33,20 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?= DetailView::widget([
                                 'model' => $model,
                                 'attributes' => [
+
                                     'id',
                                     'access_token',
+                                    'uid',
                                     'member_id',
                                     'account',
                                     'bet_logs:ntext',
                                     'bet_logs_n:ntext',
                                     'bet_codes:ntext',
-                                    'bet_codes_counts',
+                                    'bet_counts',
+                                    'bet_single',
                                     'bet_codes_op:ntext',
-                                    'bet_codes_op_counts',
+                                    'bet_op_counts',
+                                    'bet_op_single',
                                     'bet_type',
                                     'planway',
                                     'desc',
