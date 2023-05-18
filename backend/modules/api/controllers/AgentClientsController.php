@@ -116,7 +116,7 @@ class AgentClientsController extends Controller
         if(empty($post['access_token'])){
             return ['status'=>301, 'msg'=>'缺少access_token参数'];
         }
-        if(empty($post['kj_datas']['opencode'])){
+        if(empty($post['member_bet_logs']['Data']['Rows'])){
             return ['status'=>302, 'msg'=>'数据不能为空'];
         }
 
