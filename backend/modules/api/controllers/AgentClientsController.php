@@ -8,10 +8,9 @@
 
 namespace backend\modules\api\controllers;
 
-use backend\service\BaseService;
 use backend\service\BetService;
+use backend\service\clients\AgentClientsService;
 use backend\service\clients\TzSystemUsersService;
-use backend\service\FootBallService;
 use common\tools\Tool_Common;
 use Yii;
 use yii\web\Controller;
@@ -107,4 +106,23 @@ class AgentClientsController extends Controller
         return $rst;
     }
 
+    /**
+     * @desc 客户端同步member bet日志
+     * @return array|bool
+     */
+    public function actionSyncMemberBetLogs(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        if(empty($post['access_token'])){
+            return ['status'=>301, 'msg'=>'缺少access_token参数'];
+        }
+        if(empty($post['kj_datas']['opencode'])){
+            return ['status'=>302, 'msg'=>'数据不能为空'];
+        }
+
+        $rst = AgentClientsService::syncMemberBetLogs($post['member_bet_logs'], $post['access_token'], $post['lottery_type']);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端bet数据日志同步', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+
+        return $rst;
+    }
 }
