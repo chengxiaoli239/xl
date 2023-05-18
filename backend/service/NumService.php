@@ -118,6 +118,10 @@ class NumService extends BaseService {
         48=>'剔除历史1245期号一致的号码 ',
         49=>'剔除历史1345期号一致的号码 ',
         50=>'剔除历史2345期号一致的号码 ',
+        51=>'过滤1234最近两大两小200组直码 ',
+        52=>'过滤1234最近两单两双200组直码 ',
+        53=>'过滤1234最近两大两小500组直码 ',
+        54=>'过滤1234最近两单两双500组直码 ',
     ];
 
     /**
@@ -2233,6 +2237,18 @@ class NumService extends BaseService {
                     break;
                 case 50: # 过滤2345期号一致历史直码(四定)
                     $codes = NumService::getBeforeKjCodesDynamic43($plan, $positions=[2,3,4,5]);
+                    break;
+                case 51: # 过滤最近x组大小类型(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic42($plan, $type_field='type_dx', $type_val=3, $positions=[1,2,3,4], $filterNums=200); #
+                    break;
+                case 52: # 过滤最近x组单双类型(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic42($plan, $type_field='type_4ds', $type_val=3, $positions=[1,2,3,4], $filterNums=200); #
+                    break;
+                case 53: # 过滤最近x组大小类型(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic42($plan, $type_field='type_dx', $type_val=3, $positions=[1,2,3,4], $filterNums=500); #
+                    break;
+                case 54: # 过滤最近x组单双类型(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic42($plan, $type_field='type_4ds', $type_val=3, $positions=[1,2,3,4], $filterNums=500); #
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);

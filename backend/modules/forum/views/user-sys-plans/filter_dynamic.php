@@ -61,6 +61,10 @@
 <strong><font color="blue">37、过滤1234前期大小或单双类型分别都不一致号码：</font></strong>比如上期开：3637，则如果开：双单双双、大小大小  这种类型就不中奖，其它的就中奖
 <strong><font color="blue">38、过滤1234最近两大两小1000组直码：</font></strong>比如上期开：固定每期过滤，最近开的两大两小1000组直码
 <strong><font color="blue">39、过滤1234最近两单两双1000组直码：</font></strong>比如上期开：固定每期过滤，最近开的两单两双1000组直码
+<strong><font color="blue">40、过滤1234最近两大两小200组直码：</font></strong>比如上期开：固定每期过滤，最近开的两大两小200组直码
+<strong><font color="blue">41、过滤1234最近两单两双200组直码：</font></strong>比如上期开：固定每期过滤，最近开的两单两双200组直码
+<strong><font color="blue">42、过滤1234最近两大两小500组直码：</font></strong>比如上期开：固定每期过滤，最近开的两大两小500组直码
+<strong><font color="blue">43、过滤1234最近两单两双500组直码：</font></strong>比如上期开：固定每期过滤，最近开的两单两双500组直码
                 </code></pre>
             </div>
             <div class="modal-footer">
