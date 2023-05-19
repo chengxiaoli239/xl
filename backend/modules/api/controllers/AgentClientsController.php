@@ -120,7 +120,7 @@ class AgentClientsController extends Controller
             return ['status'=>302, 'msg'=>'数据不能为空'];
         }
 
-        $rst = AgentClientsService::syncMemberBetLogs($post['member_bet_logs'], $post['access_token'], $post['lottery_type']);
+        $rst = AgentClientsService::syncMemberBetLogs($post['member_bet_logs'], $post['log_type'], $post['access_token'], $post['lottery_type']);
         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端bet数据日志同步', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;

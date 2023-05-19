@@ -186,6 +186,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return empty($model->desc) ? '<font color="green">正常</font>' : '<font color="red">'.$model->desc.'</font>';
                             }
                         ],
+                        ['attribute' => 'flow_wp_accounts', 'label'=>'跟随账号', 'headerOptions' => ['width' => '8%'],
+                            'value'=> function($model){
+                                return $model->flow_wp_accounts ? $model->flow_wp_accounts : '';
+                            },
+                        ],
                         //'expire_time:datetime',
                         ['attribute' => 'expire_time', 'label'=>'到期',// 'headerOptions' => ['width' => '170'],
                             'format'=>'raw',
