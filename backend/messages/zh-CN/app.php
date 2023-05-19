@@ -19,7 +19,7 @@ return [
     'Create playway 10 plan' => '添加定位胆计划',
     'Update playway 10 plan' => '更新定位胆计划',
     'User Follow Datas' => '跟投计划',
-    'Create tz plans' => '添加投注计划',
+    'Create tz plans' => '添加计划任务',
     'Update Balance' => '更新余额',
 
     'Ssc Dw Hz Yls' => '遗漏分析',
@@ -40,7 +40,7 @@ return [
     'playway 3 Plans'=> '四字定',
     'playway 10 Plans'=> '定位胆',
     'Ssc Ds Yls' => '单双遗漏',
-    'User Sys Plans' => '投注计划',
+    'User Sys Plans' => '计划任务',
     'Create User Sys Plans 1d' => '添加二定计划',
     'Create User Sys Plans 2d' => '添加3d计划',
     'Create User Sys Plans 3d' => '添加4d计划',
