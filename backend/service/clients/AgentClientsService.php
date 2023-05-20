@@ -38,11 +38,11 @@ class AgentClientsService extends ClientsBaseService{
      */
     public static function syncMemberBetLogs($member_bet_logs=[], $log_type='kuaixuan', $access_token='', $from='api', $lottery_type=DEFAULT_LOTTERY_TYPE){
         try {
+            $data = [];
             $transaction = \Yii::$app->db->beginTransaction();
 
             $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
-            $flow_wp_accounts = explode($TzSystemsUsers->flow_wp_accounts, ',');
-            $data = [];
+            $flow_wp_accounts = explode(',', $TzSystemsUsers->flow_wp_accounts);
 
             $now_time = time();
             list($code, $logDatas, $err_msg) = AgentClientsService::validateSyncMemberBetLogs($member_bet_logs);
