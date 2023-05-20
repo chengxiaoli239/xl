@@ -196,64 +196,132 @@ use yii\widgets\ActiveForm;
 
                 <div class="row">
                     <div class="col-lg-2 col-xs-4">
-                        <?= $form->field($model, 'type_2')->checkBoxList([
-                            0=>'除',
-                            1=>'取'
-                        ])->label('双重') ?>
+                        <?= $form->field($model, 'type_2')->checkBoxList(
+                            [0=>'除', 1=>'取'],
+                            ['item' => function ($index, $label, $name, $checked, $value) {
+                                $options = [
+                                    'class' => 'checkbox-item',
+                                    'label' => $label,
+                                    'value' => $value,
+                                    'checked' => $checked,
+                                ];
+                                return Html::checkbox($name, $checked, $options);
+                            }]
+                        )->label('双重') ?>
                     </div>
                     <div class="col-lg-2 col-xs-4">
-                        <?= $form->field($model, 'type_3')->checkBoxList([
-                            0=>'除',
-                            1=>'取'
-                        ])->label('三重') ?>
+                        <?= $form->field($model, 'type_3')->checkBoxList(
+                            [0=>'除', 1=>'取'],
+                            ['item' => function ($index, $label, $name, $checked, $value) {
+                                $options = [
+                                    'class' => 'checkbox-item',
+                                    'label' => $label,
+                                    'value' => $value,
+                                    'checked' => $checked,
+                                ];
+                                return Html::checkbox($name, $checked, $options);
+                            }]
+                        )->label('三重') ?>
                     </div>
                     <div class="col-lg-2 col-xs-4">
-                        <?= $form->field($model, 'type_4')->checkBoxList([
-                            0=>'除',
-                            1=>'取'
-                        ])->label('四重') ?>
+                        <?= $form->field($model, 'type_4')->checkBoxList(
+                            [0=>'除', 1=>'取'],
+                            ['item' => function ($index, $label, $name, $checked, $value) {
+                                $options = [
+                                    'class' => 'checkbox-item',
+                                    'label' => $label,
+                                    'value' => $value,
+                                    'checked' => $checked,
+                                ];
+                                return Html::checkbox($name, $checked, $options);
+                            }]
+                        )->label('四重') ?>
                     </div>
 
-                <!--?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?-->
+                    <div class="col-lg-2 col-xs-4">
+                        <?= $form->field($model, 'type_22')->checkBoxList(
+                            [0=>'除', 1=>'取'],
+                            ['item' => function ($index, $label, $name, $checked, $value) {
+                                $options = [
+                                    'class' => 'checkbox-item',
+                                    'label' => $label,
+                                    'value' => $value,
+                                    'checked' => $checked,
+                                ];
+                                return Html::checkbox($name, $checked, $options);
+                            }]
+                        )->label('双双重') ?>
+                    </div>
+                    <div class="col-lg-2 col-xs-4">
+                        <?= $form->field($model, 'type_2b')->checkBoxList(
+                            [0=>'除', 1=>'取'],
+                            ['item' => function ($index, $label, $name, $checked, $value) {
+                                $options = [
+                                    'class' => 'checkbox-item',
+                                    'label' => $label,
+                                    'value' => $value,
+                                    'checked' => $checked,
+                                ];
+                                return Html::checkbox($name, $checked, $options);
+                            }]
+                        )->label('两兄弟') ?>
+                    </div>
+                    <div class="col-lg-2 col-xs-4">
+                        <?= $form->field($model, 'type_3b')->checkBoxList(
+                            [0=>'除', 1=>'取'],
+                            ['item' => function ($index, $label, $name, $checked, $value) {
+                                $options = [
+                                    'class' => 'checkbox-item',
+                                    'label' => $label,
+                                    'value' => $value,
+                                    'checked' => $checked,
+                                ];
+                                return Html::checkbox($name, $checked, $options);
+                            }]
+                        )->label('三兄弟') ?>
+                    </div>
 
                     <div class="col-lg-2 col-xs-4">
-                        <?= $form->field($model, 'type_22')->checkBoxList([
-                            0=>'除',
-                            1=>'取'
-                        ])->label('双双重') ?>
+                        <?= $form->field($model, 'type_4b')->checkBoxList(
+                            [0=>'除', 1=>'取'],
+                            ['item' => function ($index, $label, $name, $checked, $value) {
+                                $options = [
+                                    'class' => 'checkbox-item',
+                                    'label' => $label,
+                                    'value' => $value,
+                                    'checked' => $checked,
+                                ];
+                                return Html::checkbox($name, $checked, $options);
+                            }]
+                        )->label('四兄弟') ?>
                     </div>
                     <div class="col-lg-2 col-xs-4">
-                        <?= $form->field($model, 'type_2b')->checkBoxList([
-                            0=>'除',
-                            1=>'取'
-                        ])->label('两兄弟') ?>
+                        <?= $form->field($model, 'type_log')->checkBoxList(
+                            [0=>'除', 1=>'取'],
+                            ['item' => function ($index, $label, $name, $checked, $value) {
+                                $options = [
+                                    'class' => 'checkbox-item',
+                                    'label' => $label,
+                                    'value' => $value,
+                                    'checked' => $checked,
+                                ];
+                                return Html::checkbox($name, $checked, $options);
+                            }]
+                        )->label('对数') ?>
                     </div>
                     <div class="col-lg-2 col-xs-4">
-                        <?= $form->field($model, 'type_3b')->checkBoxList([
-                            0=>'除',
-                            1=>'取'
-                        ])->label('三兄弟') ?>
-                    </div>
-
-                    <div class="col-lg-2 col-xs-4">
-                        <?= $form->field($model, 'type_4b')->checkBoxList([
-                            0=>'除',
-                            1=>'取'
-                        ])->label('四兄弟') ?>
-                    </div>
-                    <div class="col-lg-2 col-xs-4">
-                        <?= $form->field($model, 'type_log')->checkBoxList([
-                            //0=>'非四单四双',
-                            0=>'除',
-                            1=>'取',
-                        ])->label('对数') ?>
-                    </div>
-                    <div class="col-lg-2 col-xs-4">
-                        <?= $form->field($model, 'type_22b')->checkBoxList([
-                            //0=>'非四单四双',
-                            0=>'除',
-                            1=>'取',
-                        ])->label('双两兄') ?>
+                        <?= $form->field($model, 'type_22b')->checkBoxList(
+                            [0=>'除', 1=>'取'],
+                            ['item' => function ($index, $label, $name, $checked, $value) {
+                                $options = [
+                                    'class' => 'checkbox-item',
+                                    'label' => $label,
+                                    'value' => $value,
+                                    'checked' => $checked,
+                                ];
+                                return Html::checkbox($name, $checked, $options);
+                            }]
+                        )->label('双两兄') ?>
                     </div>
                 </div>
                 <!--
@@ -558,6 +626,11 @@ $(function () {
                 cb.checked = false;
             }
         }, this);
+    });
+
+    $('.checkbox-item').click(function() {
+        var name = $(this).attr('name');
+        $('input[name="' + name + '"]').not(this).prop('checked', false);
     });
 });
 </script>

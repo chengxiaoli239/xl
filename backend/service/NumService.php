@@ -1664,12 +1664,25 @@ class NumService extends BaseService {
         #p([$codes_hz, $codes_hz['ps_sel'], $ps_datas], 0);
         if($codes_hz['ps_sel'] == NumService::PEI_SHU_EXCLUDE){
             # 配数除
+            $psFilterWhere = ['AND']; # 配数间是'并'的关系
+            foreach ($ps_datas as $ps_data){
+                $ps_len = strlen($ps_data); # 配数2
+                $cArr = [];
+                for ($ps_count=0; $ps_count<$ps_len; $ps_count++){
+                    $cArr[] = $ps_data[$ps_count];
+                }
+                $psFilterSubWhere = ['OR']; # 配数的号码为'或'的关系
+                $psFilterSubWhere[] = ['NOT IN', 'code_1', $cArr];
+                $psFilterSubWhere[] = ['NOT IN', 'code_2', $cArr];
+                $psFilterSubWhere[] = ['NOT IN', 'code_3', $cArr];
+                $psFilterSubWhere[] = ['NOT IN', 'code_4', $cArr];
+
+                $psFilterWhere[] = $psFilterSubWhere;
+            }
         }else{
             # 配数取
             $psFilterWhere = ['AND']; # 配数间是'并'的关系
             foreach ($ps_datas as $ps_data){
-                #$ps1 = (string)$codes_hz['ps_1']; $ps1_len = strlen($ps1); # 配数1
-                #$ps2 = (string)$codes_hz['ps_2']; $ps2_len = strlen($ps2); # 配数2
                 $ps_len = strlen($ps_data); # 配数2
                 $cArr = [];
                 for ($ps_count=0; $ps_count<$ps_len; $ps_count++){
@@ -1680,14 +1693,7 @@ class NumService extends BaseService {
                 $psFilterSubWhere[] = ['IN', 'code_2', $cArr];
                 $psFilterSubWhere[] = ['IN', 'code_3', $cArr];
                 $psFilterSubWhere[] = ['IN', 'code_4', $cArr];
-                /*
-                for($ps_i=0; $ps_i<$ps_len; $ps_i++){
-                    $psFilterSubWhere[] = ['=', 'code_1', $ps_data[$ps_i]];
-                    $psFilterSubWhere[] = ['=', 'code_2', $ps_data[$ps_i]];
-                    $psFilterSubWhere[] = ['=', 'code_3', $ps_data[$ps_i]];
-                    $psFilterSubWhere[] = ['=', 'code_4', $ps_data[$ps_i]];
-                }
-                */
+
                 $psFilterWhere[] = $psFilterSubWhere;
             }
         }
