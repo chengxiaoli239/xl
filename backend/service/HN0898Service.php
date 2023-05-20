@@ -1180,16 +1180,17 @@ class HN0898Service extends BaseTZService {
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return string
      */
-    public static function getQihao($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function getQihao($lottery_type = DEFAULT_LOTTERY_TYPE, $time='', $date=''){
 
+        $time = $time ? :date("H:i:s");
+        $date = $date ? str_replace('/', '-', $date) : '';
         $m = \Yii::$app->cache;
-        $mkey = 'getQihao_'.$lottery_type;
-        $qihao = $m->get($mkey);
+        $mkey = 'getQihao_'.$lottery_type.'_'.$time;
+        #$qihao = $m->get($mkey);
         if(!empty($qihao)) return $qihao;
 
         $db = Yii::$app->db;
         //$date = date('Y-m-d');
-        $time = date("H:i:s");
         $sql = "SELECT actionNo FROM {{%data_time}} WHERE actionTime >= '".$time."' AND type=$lottery_type ORDER BY id ASC";
         $rst = $db->createCommand($sql)->queryOne();
         switch ($lottery_type) {
@@ -1238,7 +1239,6 @@ class HN0898Service extends BaseTZService {
                 $qihao = 947004 + self::getdifferentdays() * 179 + self::getDifferentNums() ; # 967767为2019-08-10最后一期期号
                 break;
             case 8:  # 幸运五星彩
-                $time = date("H:i:s", time());
                 if('23:55:00'<$time && $time<='23:59:59') {
                     $actionNo = '288';
                 }elseif('00:00:00'<=$time && $time<'00:05:00'){
@@ -1250,7 +1250,7 @@ class HN0898Service extends BaseTZService {
                     $actionNo = $rst['actionNo'];
                 }
 
-                $qihao = date("Ymd").sprintf("%03d", $actionNo);
+                $qihao = ($date? str_replace('-', '', $date): date("Ymd")).sprintf("%03d", $actionNo);
                 break;
             case 9: # 台湾宾果
                 $qihao = 109071659 + self::getTwDifferentDays() * 203 + self::getDifferentNums($lottery_type = 9) + 1; # 109060291为2020-10-23最后一期期号
@@ -1269,7 +1269,7 @@ class HN0898Service extends BaseTZService {
                     $now_timsstamp = $timsstamp - $today_time - 8 * 3600; # 早8点到凌晨3点 不开奖
 
                     $actionNo = (int)($now_timsstamp / 90) + 1;
-                    $qihao = date("Ymd").sprintf("%03d", $actionNo);
+                    $qihao = ($date? str_replace('-', '', $date): date("Ymd")).sprintf("%03d", $actionNo);
                 }
                 break;
             case 11: # 冰岛3分 早8点到凌晨3点

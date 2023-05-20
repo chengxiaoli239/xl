@@ -30,7 +30,7 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'bet_type')->textInput() ?>
 
-                    <?= $form->field($model, 'planway')->textInput() ?>
+                    <?= $form->field($model, 'playway')->textInput() ?>
 
                     <?= $form->field($model, 'desc')->textInput(['maxlength' => true]) ?>
 

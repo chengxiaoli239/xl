@@ -31,7 +31,7 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'bet_type') ?>
 
-    <?php // echo $form->field($model, 'planway') ?>
+    <?php // echo $form->field($model, 'playway') ?>
 
     <?php // echo $form->field($model, 'desc') ?>
 

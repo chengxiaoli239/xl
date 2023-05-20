@@ -8,6 +8,7 @@ use backend\models\SscKjData;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\BetService;
+use backend\service\HN0898Service;
 use backend\service\Lucky5\Lucky5Service;
 use common\kj\ssc\Lucky5;
 use common\service\CommonService;
@@ -15,6 +16,7 @@ use common\service\jobs\kj_data\GrabKjDatasJob;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 class AgentClientsService extends ClientsBaseService{
 
@@ -57,6 +59,7 @@ class AgentClientsService extends ClientsBaseService{
                     }else{
                         $AgentUserBetLogs = new AgentUserBetLogs();
                     }
+                    $qihao = HN0898Service::getQihao($lottery_type, substr($logData['time_value'], -8), date('Y').'-'.substr($logData['operation_datetime'], 0, 5));
                     list($playway, $kuaiyi_desc) = AgentClientsService::getKuaiYiDescByOperationLogs($logData['operation_content']);
                     $single = number_format($logData['bet_money']/$logData['bet_count'], 2); # 倍数
                     $setDatas = [
@@ -68,7 +71,7 @@ class AgentClientsService extends ClientsBaseService{
                         'bet_logs' => $logData['operation_content'], # 原始日志
                         'bet_logs_n' => $kuaiyi_desc, # 转换后的快译
                         'bet_counts' => $logData['bet_count'], # 原始下注组数
-                        'bet_money' => $logData['bet_money'], # 原始下注金额
+                        'bet_money' => (float)$logData['bet_money'], # 原始下注金额
                         'bet_single' => $single,
 
                         # 反买
@@ -80,16 +83,19 @@ class AgentClientsService extends ClientsBaseService{
 
                         'member_bet_time' => date('Y-').$logData['operation_datetime'],
 
+                        'lottery_type' => $lottery_type,
+                        'qihao' => $qihao,
                         'tz_system_id' => 9,
                         'created_at' => $now_time,
                         'updated_at' => $now_time,
-                        'planway' => $playway,
+                        'playway' => $playway,
                         'log_type' => $logData['log_type'],  # 目前看都是102
                     ];
                     $AgentUserBetLogs->setAttributes($setDatas);
+                    //p($AgentUserBetLogs->getAttributes());
                     $flag = $AgentUserBetLogs->save();
                     if(empty($flag)){
-                        throw_info($AgentUserBetLogs->getErrors());
+                        throw_info(Json::encode($AgentUserBetLogs->getErrors(), 320));
                     }
                     Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes()]);
                 }catch (\Exception $e){

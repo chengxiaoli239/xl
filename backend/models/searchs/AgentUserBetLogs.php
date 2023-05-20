@@ -18,7 +18,7 @@ class AgentUserBetLogs extends AgentUserBetLogsModel
     public function rules()
     {
         return [
-            [['id', 'uid', 'wp_record_id', 'member_id', 'bet_counts', 'bet_op_counts', 'bet_type', 'planway', 'status', 'tz_system_id', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'uid', 'wp_record_id', 'member_id', 'bet_counts', 'bet_op_counts', 'bet_type', 'playway', 'status', 'tz_system_id', 'created_at', 'updated_at'], 'integer'],
             [['access_token', 'account', 'bet_logs', 'bet_logs_n', 'bet_codes', 'bet_codes_op', 'desc', 'lottery_type', 'qihao', 'member_bet_time', 'update_time'], 'safe'],
             [['bet_single', 'bet_money', 'bet_op_single', 'bet_op_money'], 'number'],
         ];
@@ -71,7 +71,7 @@ class AgentUserBetLogs extends AgentUserBetLogsModel
             'bet_op_single' => $this->bet_op_single,
             'bet_op_money' => $this->bet_op_money,
             'bet_type' => $this->bet_type,
-            'planway' => $this->planway,
+            'playway' => $this->playway,
             'status' => $this->status,
             'member_bet_time' => $this->member_bet_time,
             'tz_system_id' => $this->tz_system_id,
