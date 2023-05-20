@@ -102,14 +102,41 @@ use yii\widgets\ActiveForm;
                 <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
                 <div class="row">
-                    <div class="col-lg-3 col-xs-6">
+                    <div class="col-lg-2 col-xs-6">
+                        <!--?= $form->field($model, 'ps_sel')->checkboxList([1=>'除',2=>'取'])->label('配数全转') ?-->
+                        <?= $form->field($model, 'ps_sel')->checkboxList(
+                            [1=>'除', 2=>'取'],
+                            [
+                                'item' => function ($index, $label, $name, $checked, $value) {
+                                    $options = [
+                                        'class' => 'ps_sel',
+                                        'label' => $label,
+                                        'value' => $value,
+                                        'checked' => $checked,
+                                    ];
+
+                                    return Html::checkbox($name, $checked, $options);
+                                }
+                            ]
+                        )->label('配数全转') ?>
+                    </div>
+                    <div class="col-lg-2 col-xs-6">
                         <!--配数1-->
                         <?= $form->field($model, 'ps_1')->textInput()->label('配数1')?>
                     </div>
-                    <div class="col-lg-3 col-xs-6">
+                    <div class="col-lg-2 col-xs-6">
                         <!--配数2-->
                         <?= $form->field($model, 'ps_2')->textInput()->label('配数2')?>
                     </div>
+                    <div class="col-lg-2 col-xs-6">
+                        <!--配数3-->
+                        <?= $form->field($model, 'ps_3')->textInput()->label('配数3')?>
+                    </div>
+                    <div class="col-lg-2 col-xs-6">
+                        <!--配数4-->
+                        <?= $form->field($model, 'ps_4')->textInput()->label('配数4')?>
+                    </div>
+
                     <div class="col-lg-3 col-xs-4">
                         <!--三定含除、取-->
                         <?= $form->field($model, 'arise_in_sel')->checkboxList([1=>'除',2=>'取'])->label('3.四字定含') ?>
@@ -524,5 +551,13 @@ $(function () {
         obj.val() == '' ? obj.val('02468') : obj.val('');
     });
 
+    $('.ps_sel').click(function () {
+        var checkboxes = document.getElementsByName('UserSysPlans[ps_sel][]');
+        checkboxes.forEach(function(cb) {
+            if (cb !== this) {
+                cb.checked = false;
+            }
+        }, this);
+    });
 });
 </script>

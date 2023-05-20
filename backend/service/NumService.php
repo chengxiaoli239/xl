@@ -32,6 +32,10 @@ class NumService extends BaseService {
     # 大双
     const DOUBLE_TYPE_DS = [0, 2, 4, 5, 6, 7, 8, 9];
 
+    # 配数，除、取
+    const PEI_SHU_EXCLUDE = 1;
+    const PEI_SHU_OBTAIN = 2;
+
     public static $MIN_CODES = [0, 1, 2, 3, 4];
     public static $MAX_CODES = [5, 6, 7, 8, 9];
     public static $SINGLE_CODES = [1, 3, 5, 7, 9];
@@ -1074,33 +1078,35 @@ class NumService extends BaseService {
             //p([$poss, $codes_hz['hefen'], $hf_codes_hzs]);
         }
 
-        # 配数 - 支持二定、三定、四定
-        if(isset($codes_hz['ps_1']) && !empty($codes_hz['ps_1']) && isset($codes_hz['ps_2']) && !empty($codes_hz['ps_2'])){
-            $ps1 = (string)$codes_hz['ps_1']; $ps1_len = strlen($ps1); # 配数1
-            $ps2 = (string)$codes_hz['ps_2']; $ps2_len = strlen($ps2); # 配数2
-            //p([$ps1_len, $ps2_len]);
-            $tmpPsWhere2 = ['OR'];
-            for ($x=0;$x<$ps1_len;$x++){
-                for ($y=0;$y<$ps2_len;$y++){
-                    $p1Types = [1,2,3,4];
-                    $p2Types = [1,2,3,4];
-                    foreach ($p1Types as $p1Type){
-                        foreach ($p2Types as $p2Type){
-                            if($p1Type == $p2Type) continue;
-                            $tmpPsWhere2 = array_merge($tmpPsWhere2, [
-                                ['AND',
-                                    ['=', 'code_'.$p1Type, $ps1[$x] ],
-                                    ['=', 'code_'.$p2Type, $ps2[$y] ]
-                                ]
-                            ]);
-                            //$tmpPsWhere2 = array_merge($tmpPsWhere1, [$tmpPsWhere1]);
-                        }
-                        //p($tmpPsWhere2);
-                    }
-                }
-            }
-            $where = array_merge($where, [$tmpPsWhere2]);
-        }
+        # 配数 - 支持二定、三定、四定 配数优化 此块先注释
+        #if(isset($codes_hz['ps_1']) && !empty($codes_hz['ps_1']) && isset($codes_hz['ps_2']) && !empty($codes_hz['ps_2'])){
+        #    $ps1 = (string)$codes_hz['ps_1']; $ps1_len = strlen($ps1); # 配数1
+        #    $ps2 = (string)$codes_hz['ps_2']; $ps2_len = strlen($ps2); # 配数2
+        #    //p([$ps1_len, $ps2_len]);
+        #    $tmpPsWhere2 = ['OR'];
+        #    for ($x=0;$x<$ps1_len;$x++){
+        #        for ($y=0;$y<$ps2_len;$y++){
+        #            $p1Types = [1,2,3,4];
+        #            $p2Types = [1,2,3,4];
+        #            foreach ($p1Types as $p1Type){
+        #                foreach ($p2Types as $p2Type){
+        #                    if($p1Type == $p2Type) continue;
+        #                    $tmpPsWhere2 = array_merge($tmpPsWhere2, [
+        #                        ['AND',
+        #                            ['=', 'code_'.$p1Type, $ps1[$x] ],
+        #                            ['=', 'code_'.$p2Type, $ps2[$y] ]
+        #                        ]
+        #                    ]);
+        #                    //$tmpPsWhere2 = array_merge($tmpPsWhere1, [$tmpPsWhere1]);
+        #                }
+        #                //p($tmpPsWhere2);
+        #            }
+        #        }
+        #    }
+        #    $where = array_merge($where, [$tmpPsWhere2]);
+        #}
+        $where = NumService::getPeiShuWhere($codes_hz, $where);
+        #p($where);
 
         ####################################  走移 start  ##################################
         # 123千走456各1元 - 未完成待续
@@ -1603,6 +1609,7 @@ class NumService extends BaseService {
         (!empty($codes)) && $query->andWhere(['IN', "REPLACE(`code`, ',', '')", $codes]);
         ###################################################### filters过滤参数结束05.24 ######################################################
 
+        #$sql = $query->createCommand()->getRawSql();p($sql);
         $Num4Types = $query->asArray()->orderBy(['code'=>SORT_ASC])->all();
         $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
         //p(['where'=>$where, 'index_id'=>$index_id, 'filter_index_ids'=>$filter_index_ids, 'filters'=>$filters, 'code'=>$codes, 'end'=>$codesArr]);
@@ -1644,6 +1651,50 @@ class NumService extends BaseService {
         //p(count($datas));
 
         return $datas;
+    }
+
+    /**
+     * 配数条件
+     * @param array $codes_hz
+     * @param array $where
+     * @return array
+     */
+    private static function getPeiShuWhere($codes_hz=[], &$where=[]){
+        $ps_datas = array_values(array_filter([$codes_hz['ps_1'], $codes_hz['ps_2'], $codes_hz['ps_3'], $codes_hz['ps_4']]));
+        #p([$codes_hz, $codes_hz['ps_sel'], $ps_datas], 0);
+        if($codes_hz['ps_sel'] == NumService::PEI_SHU_EXCLUDE){
+            # 配数除
+        }else{
+            # 配数取
+            $psFilterWhere = ['AND']; # 配数间是'并'的关系
+            foreach ($ps_datas as $ps_data){
+                #$ps1 = (string)$codes_hz['ps_1']; $ps1_len = strlen($ps1); # 配数1
+                #$ps2 = (string)$codes_hz['ps_2']; $ps2_len = strlen($ps2); # 配数2
+                $ps_len = strlen($ps_data); # 配数2
+                $cArr = [];
+                for ($ps_count=0; $ps_count<$ps_len; $ps_count++){
+                    $cArr[] = $ps_data[$ps_count];
+                }
+                $psFilterSubWhere = ['OR']; # 配数的号码为'或'的关系
+                $psFilterSubWhere[] = ['IN', 'code_1', $cArr];
+                $psFilterSubWhere[] = ['IN', 'code_2', $cArr];
+                $psFilterSubWhere[] = ['IN', 'code_3', $cArr];
+                $psFilterSubWhere[] = ['IN', 'code_4', $cArr];
+                /*
+                for($ps_i=0; $ps_i<$ps_len; $ps_i++){
+                    $psFilterSubWhere[] = ['=', 'code_1', $ps_data[$ps_i]];
+                    $psFilterSubWhere[] = ['=', 'code_2', $ps_data[$ps_i]];
+                    $psFilterSubWhere[] = ['=', 'code_3', $ps_data[$ps_i]];
+                    $psFilterSubWhere[] = ['=', 'code_4', $ps_data[$ps_i]];
+                }
+                */
+                $psFilterWhere[] = $psFilterSubWhere;
+            }
+        }
+        $where = array_merge($where, [$psFilterWhere]);
+        #p($where);
+
+        return $where;
     }
 
     /**
@@ -1914,11 +1965,20 @@ class NumService extends BaseService {
         if(isset($hz_Arr['p5']) && $hz_Arr['p5'] !== ''){
             $desc .= ' 五'.$hz_Arr['p5'];
         }
+        if(isset($hz_Arr['ps_sel']) && $hz_Arr['ps_sel']){
+            $desc .= $hz_Arr['ps_sel']==2 ? ' 配数取:' : '配数除:';
+        }
         if(isset($hz_Arr['ps_1']) && $hz_Arr['ps_1'] !== ''){
-            $desc .= ' 配数1:'.$hz_Arr['ps_1'];
+            $desc .= '配数1:'.$hz_Arr['ps_1'];
         }
         if(isset($hz_Arr['ps_2']) && $hz_Arr['ps_2'] !== ''){
-            $desc .= ' 配数2:'.$hz_Arr['ps_2'];
+            $desc .= '配数2:'.$hz_Arr['ps_2'];
+        }
+        if(isset($hz_Arr['ps_3']) && $hz_Arr['ps_3'] !== ''){
+            $desc .= '配数3:'.$hz_Arr['ps_3'];
+        }
+        if(isset($hz_Arr['ps_4']) && $hz_Arr['ps_4'] !== ''){
+            $desc .= '配数4:'.$hz_Arr['ps_4'];
         }
 
         # 不定位合分:两数、三数

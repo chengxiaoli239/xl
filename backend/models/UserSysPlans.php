@@ -91,8 +91,11 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $change_per; #  导入方式每期轮换号码
     public $change_turn_pos; #  号码轮换位置，指定号码数字轮换指定组
 
+    public $ps_sel; #  配数选项
     public $ps_1; #  配数1
     public $ps_2; #  配数2
+    public $ps_3; #  配数3
+    public $ps_4; #  配数4
 
     public $no_fix_hefen; #  定位合分值
     public $no_fix_hefen_pos; #  定位合分位置

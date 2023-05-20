@@ -102,6 +102,14 @@ $this->title = '新过滤快打';
                         <!--配数2-- >
                         <?= $form->field($model, 'ps_2')->textInput()->label('配数2')?>
                     </div>
+                    <div class="col-lg-3 col-xs-3">
+                        <//!--配数1-- >
+                        <?= $form->field($model, 'ps_3')->textInput()->label('配数3')?>
+                    </div>
+                    <div class="col-lg-3 col-xs-3">
+                        <!--配数2-- >
+                        <?= $form->field($model, 'ps_4')->textInput()->label('配数4')?>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-3 col-xs-6">

@@ -87,16 +87,31 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['p5']);
 
+        # 配数
+        if($UserSysPlans['ps_sel'] && count($UserSysPlans['ps_sel']) == 1){
+            $tmpFilter['ps_sel'] = $UserSysPlans['ps_sel'][0];
+        }
+        unset($post['UserSysPlans']['ps_sel']);
         # 15、配数1
         if(isset($UserSysPlans['ps_1']) && $UserSysPlans['ps_1'] !== ''){
             $tmpFilter['ps_1'] = trim($UserSysPlans['ps_1']);
         }
         unset($post['UserSysPlans']['ps_1']);
-        # 15、配数1
+        # 15、配数2
         if(isset($UserSysPlans['ps_2']) && $UserSysPlans['ps_2'] !== ''){
             $tmpFilter['ps_2'] = trim($UserSysPlans['ps_2']);
         }
-        unset($post['UserSysPlans']['pei_shu_2']);
+        unset($post['UserSysPlans']['ps_2']);
+        # 15、配数3
+        if(isset($UserSysPlans['ps_3']) && $UserSysPlans['ps_3'] !== ''){
+            $tmpFilter['ps_3'] = trim($UserSysPlans['ps_3']);
+        }
+        unset($post['UserSysPlans']['ps_3']);
+        # 15、配数4
+        if(isset($UserSysPlans['ps_4']) && $UserSysPlans['ps_4'] !== ''){
+            $tmpFilter['ps_4'] = trim($UserSysPlans['ps_4']);
+        }
+        unset($post['UserSysPlans']['ps_4']);
 
         # 二、类型：双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
         # 1、双重
@@ -253,12 +268,12 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['arb_pos_isbaohan']);
         # 18、任意数字
-        if(isset($post['UserSysPlans']['arb_pos_nums']) && $post['UserSysPlans']['arb_pos_nums']){
+        if($UserSysPlans['arb_pos_isbaohan'] && isset($post['UserSysPlans']['arb_pos_nums']) && $post['UserSysPlans']['arb_pos_nums']){
             $tmpFilter['arb_pos_nums'] = $post['UserSysPlans']['arb_pos_nums'];
         }
         unset($post['UserSysPlans']['arb_pos_nums']);
         # 19、任意数字 至少x个
-        if(isset($post['UserSysPlans']['arb_pos_codes']) && $post['UserSysPlans']['arb_pos_codes']){
+        if($UserSysPlans['arb_pos_isbaohan'] && isset($post['UserSysPlans']['arb_pos_codes']) && $post['UserSysPlans']['arb_pos_codes']){
             $tmpFilter['arb_pos_codes'] = $post['UserSysPlans']['arb_pos_codes'];
         }
         unset($post['UserSysPlans']['arb_pos_codes']);
@@ -525,8 +540,8 @@ class UserSysPlansService extends BaseService {
                 'filter_date_pos1' => (isset($UserSysPlans['filter_date_pos1']) && !empty($UserSysPlans['filter_date_pos1']))? $UserSysPlans['filter_date_pos1']:[],
                 'filter_date_pos2' => (isset($UserSysPlans['filter_date_pos2']) && !empty($UserSysPlans['filter_date_pos2']))? $UserSysPlans['filter_date_pos2']:[],
             ]);
+            $tmpFilter['filter_dates'] = $filter_dates;
         }
-        $tmpFilter['filter_dates'] = $filter_dates;
         unset($UserSysPlans['is_filter_date'], $UserSysPlans['filter_xD_before'], $UserSysPlans['filter_date_pos1'], $UserSysPlans['filter_date_pos2']);
 
         # 3、排除期号，比如：058期，二定则排除：58XX
@@ -535,8 +550,8 @@ class UserSysPlansService extends BaseService {
             $filter_qihaos = array_merge($filter_qihaos, [
                 'is_filter_qihao' => 1,
             ]);
+            $tmpFilter['filter_qihaos'] = $filter_qihaos;
         }
-        $tmpFilter['filter_qihaos'] = $filter_qihaos;
         unset($UserSysPlans['is_filter_qihao']);
         ###################################################### 排除参数结束 2021.05.24 ######################################################
 

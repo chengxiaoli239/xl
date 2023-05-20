@@ -308,7 +308,7 @@ class UserSysPlansController extends BaseController
                     $model->$key = explode(',', $val);
                 }else{
                     $model->$key = $val;
-                    //if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'p5', 'bet_while_miss', 'status_val', 'type_4ds', 'code1', 'code2', 'arise', 'type_4d', 'type_4s', 'hefen', 'no_fix_hefen', 'arise_in', 'xhenfen','singles_key', 'pei_shu_1', 'pei_shu_2'])){
+                    //if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'p5', 'bet_while_miss', 'status_val', 'type_4ds', 'code1', 'code2', 'arise', 'type_4d', 'type_4s', 'hefen', 'no_fix_hefen', 'arise_in', 'xhenfen','singles_key', 'ps_1', 'ps_2'])){
                 }
             }
         }
