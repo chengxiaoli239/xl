@@ -26,7 +26,7 @@ class AgentClientsService extends ClientsBaseService{
             throw_info('日志数据为空');
         }
 
-        return [0, $member_bet_logs, '校验成功'];
+        return [0, $member_bet_logs['Data']['Rows'], '校验成功'];
     }
 
     /**
@@ -87,11 +87,11 @@ class AgentClientsService extends ClientsBaseService{
                         'log_type' => $logData['log_type'],  # 目前看都是102
                     ];
                     $AgentUserBetLogs->setAttributes($setDatas);
-                    Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes()]);
                     $flag = $AgentUserBetLogs->save();
                     if(empty($flag)){
                         throw_info($AgentUserBetLogs->getErrors());
                     }
+                    Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes()]);
                 }catch (\Exception $e){
                     Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志记录-异常', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'logData'=>$logData, 'err_msg'=>$e->getMessage()]);
                 }
