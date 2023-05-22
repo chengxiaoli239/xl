@@ -29,6 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'tz_type' => $tz_type,
         'hzArr' => $hzArr,
         'hefen' => $hefen,
+        'sel_pos' => $sel_pos,
         'hefen_pos' => $hefen_pos,
         'code_types' => $code_types,
         'plan_types' => $plan_types,

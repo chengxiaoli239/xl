@@ -97,6 +97,16 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $ps_3; #  配数3
     public $ps_4; #  配数4
 
+
+    public $odd_sel; #  单选项
+    public $odd_pos; #  单位置
+    public $even_sel; #  双选项
+    public $even_pos; #  双位置
+    public $big_sel; #  大选项
+    public $big_pos; #  大位置
+    public $small_sel; #  小选项
+    public $small_pos; #  小位置
+
     public $no_fix_hefen; #  定位合分值
     public $no_fix_hefen_pos; #  定位合分位置
     public $arise_in; #  三定含

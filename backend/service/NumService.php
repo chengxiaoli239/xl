@@ -23,6 +23,7 @@ use yii\helpers\ArrayHelper;
 use  yii;
 
 class NumService extends BaseService {
+    const DW_POSES = [1, 2, 3, 4];
     # 小单
     const DOUBLE_TYPE_XD = [0, 1, 2, 3, 4, 5, 7, 9];
     # 小双
@@ -33,14 +34,26 @@ class NumService extends BaseService {
     const DOUBLE_TYPE_DS = [0, 2, 4, 5, 6, 7, 8, 9];
 
     # 配数，除、取
-    const PEI_SHU_EXCLUDE = 1;
-    const PEI_SHU_OBTAIN = 2;
+    const PEI_SHU_EXCLUDE = 1; # 除
+    const PEI_SHU_OBTAIN = 2; # 取
+    # 筛选位置：单，除、取
+    const POS_ODD_EXCLUDE = 1; # 除
+    const POS_ODD_OBTAIN = 2; # 取
+    # 筛选位置：双，除、取
+    const POS_EVEN_EXCLUDE = 1; # 除
+    const POS_EVEN_OBTAIN = 2; # 取
+    # 筛选位置：大，除、取
+    const POS_BIG_EXCLUDE = 1; # 除
+    const POS_BIG_OBTAIN = 2; # 取
+    # 筛选位置：小，除、取
+    const POS_SMALL_EXCLUDE = 1; # 除
+    const POS_SMALL_OBTAIN = 2; # 取
 
-    public static $MIN_CODES = [0, 1, 2, 3, 4];
-    public static $MAX_CODES = [5, 6, 7, 8, 9];
-    public static $SINGLE_CODES = [1, 3, 5, 7, 9];
-    public static $DOUBLE_CODES = [0, 2, 4, 6, 8];
-    public static $ALL_POSES = [1, 2, 3, 4];
+    public static $MIN_CODES = ['0', '1', '2', '3', '4'];
+    public static $MAX_CODES = ['5', '6', '7', '8', '9'];
+    public static $SINGLE_CODES = ['1', '3', '5', '7', '9'];
+    public static $DOUBLE_CODES = ['0', '2', '4', '6', '8'];
+    public static $ALL_POSES = ['1', '2', '3', '4'];
     public static $ALL_CODES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     public static $playway_to_code_type = [
         1 => 2,
@@ -1105,8 +1118,13 @@ class NumService extends BaseService {
         #    }
         #    $where = array_merge($where, [$tmpPsWhere2]);
         #}
-        $where = NumService::getPeiShuWhere($codes_hz, $where);
+        $where = NumService::getPeiShuWhere($codes_hz, $where, $code_type);  # 配数
         #p($where);
+
+        $where = NumService::getPosOddWhere($codes_hz, $where);  # 筛选位置：单
+        $where = NumService::getPosEvenWhere($codes_hz, $where);  # 筛选位置：双
+        $where = NumService::getPosBigWhere($codes_hz, $where);  # 筛选位置：大
+        $where = NumService::getPosSmallWhere($codes_hz, $where);  # 筛选位置：小
 
         ####################################  走移 start  ##################################
         # 123千走456各1元 - 未完成待续
@@ -1654,54 +1672,225 @@ class NumService extends BaseService {
     }
 
     /**
+     * sige位置补全号码,不够数量补 0-9
+     * @param $ps_datas
+     * @return array
+     */
+    public static function fillArrayNums($ps_datas=[], $code_type=4, $expectedCount=4){
+        // 原始数组
+        $originalArray = $ps_datas;
+        // 期望的数组元素数量
+        #$expectedCount = 4;
+        // 固定的补全元素
+        $fixedElement = $code_type==4?'0123456789':'X';
+
+        // 计算需要补全的元素数量
+        $fillCount = $expectedCount - count($originalArray);
+
+        // 补全数组
+        $ps_datas = array_merge($originalArray, array_fill(0, $fillCount, $fixedElement));
+
+        return $ps_datas;
+    }
+
+    /**
      * 配数条件
      * @param array $codes_hz
      * @param array $where
      * @return array
      */
-    private static function getPeiShuWhere($codes_hz=[], &$where=[]){
+    private static function getPeiShuWhere($codes_hz=[], &$where=[], $code_type=4){
         $ps_datas = array_values(array_filter([$codes_hz['ps_1'], $codes_hz['ps_2'], $codes_hz['ps_3'], $codes_hz['ps_4']]));
-        #p([$codes_hz, $codes_hz['ps_sel'], $ps_datas], 0);
-        if($codes_hz['ps_sel'] == NumService::PEI_SHU_EXCLUDE){
-            # 配数除
-            $psFilterWhere = ['AND']; # 配数间是'并'的关系
-            foreach ($ps_datas as $ps_data){
-                $ps_len = strlen($ps_data); # 配数2
-                $cArr = [];
-                for ($ps_count=0; $ps_count<$ps_len; $ps_count++){
-                    $cArr[] = $ps_data[$ps_count];
-                }
-                $psFilterSubWhere = ['OR']; # 配数的号码为'或'的关系
-                $psFilterSubWhere[] = ['NOT IN', 'code_1', $cArr];
-                $psFilterSubWhere[] = ['NOT IN', 'code_2', $cArr];
-                $psFilterSubWhere[] = ['NOT IN', 'code_3', $cArr];
-                $psFilterSubWhere[] = ['NOT IN', 'code_4', $cArr];
-
-                $psFilterWhere[] = $psFilterSubWhere;
-            }
-        }else{
-            # 配数取
-            $psFilterWhere = ['AND']; # 配数间是'并'的关系
-            foreach ($ps_datas as $ps_data){
-                $ps_len = strlen($ps_data); # 配数2
-                $cArr = [];
-                for ($ps_count=0; $ps_count<$ps_len; $ps_count++){
-                    $cArr[] = $ps_data[$ps_count];
-                }
-                $psFilterSubWhere = ['OR']; # 配数的号码为'或'的关系
-                $psFilterSubWhere[] = ['IN', 'code_1', $cArr];
-                $psFilterSubWhere[] = ['IN', 'code_2', $cArr];
-                $psFilterSubWhere[] = ['IN', 'code_3', $cArr];
-                $psFilterSubWhere[] = ['IN', 'code_4', $cArr];
-
-                $psFilterWhere[] = $psFilterSubWhere;
-            }
+        if(empty($ps_datas) or empty($codes_hz['ps_sel'])){
+            return $where;
         }
-        $where = array_merge($where, [$psFilterWhere]);
+        $ps_datas = NumService::fillArrayNums($ps_datas, $code_type, $expectNum = 4);
+
+        #p([$codes_hz, $where, $ps_datas], 0);
+        if($codes_hz['ps_sel'] == NumService::PEI_SHU_EXCLUDE){
+            # 配数除，条件组装
+            $psFilterWhere = ['OR'];
+            for($p1=0; $p1<=3; $p1++){
+                for($p2=0; $p2<=3; $p2++) {
+                    if($p2 == $p1) continue;
+                    for($p3=0; $p3<=3; $p3++) {
+                        if($p3 == $p1 OR $p3==$p2) continue;
+                        for($p4=0; $p4<=3; $p4++) {
+                            if($p4 == $p1 OR $p4==$p2 OR $p4==$p3) continue;
+                            $psFilterSubWhere = ['AND'];
+                            $psFilterSubWhere[] = ['IN', 'code_1', NumService::getNumsArr($ps_datas[$p1])];
+                            $psFilterSubWhere[] = ['IN', 'code_2', NumService::getNumsArr($ps_datas[$p2])];
+                            $psFilterSubWhere[] = ['IN', 'code_3', NumService::getNumsArr($ps_datas[$p3])];
+                            $psFilterSubWhere[] = ['IN', 'code_4', NumService::getNumsArr($ps_datas[$p4])];
+                            $psFilterWhere[] = $psFilterSubWhere;
+                        }
+                    }
+                }
+            }
+            $where = array_merge($where, [['NOT', $psFilterWhere]]);
+        }elseif($codes_hz['ps_sel'] == NumService::PEI_SHU_OBTAIN){
+            # 配数取，条件组装
+            $psFilterWhere = ['OR'];
+            for($p1=0; $p1<=3; $p1++){
+                for($p2=0; $p2<=3; $p2++) {
+                    if($p2 == $p1) continue;
+                    for($p3=0; $p3<=3; $p3++) {
+                        if($p3 == $p1 OR $p3==$p2) continue;
+                        for($p4=0; $p4<=3; $p4++) {
+                            if($p4 == $p1 OR $p4==$p2 OR $p4==$p3) continue;
+                            $psFilterSubWhere = ['AND'];
+                            $psFilterSubWhere[] = ['IN', 'code_1', NumService::getNumsArr($ps_datas[$p1])];
+                            $psFilterSubWhere[] = ['IN', 'code_2', NumService::getNumsArr($ps_datas[$p2])];
+                            $psFilterSubWhere[] = ['IN', 'code_3', NumService::getNumsArr($ps_datas[$p3])];
+                            $psFilterSubWhere[] = ['IN', 'code_4', NumService::getNumsArr($ps_datas[$p4])];
+                            $psFilterWhere[] = $psFilterSubWhere;
+                        }
+                    }
+                }
+            }
+            $where = array_merge($where, [$psFilterWhere]);
+        }
         #p($where);
 
         return $where;
     }
+
+    /**
+     * 字符串转换成数字
+     * @param string $nums_str
+     * @return array
+     */
+    public static function getNumsArr($nums_str=''){
+        $ps_len = strlen($nums_str); # 配数2
+        $nArr = [];
+        for ($ps_count=0; $ps_count<$ps_len; $ps_count++){
+            $nArr[] = $nums_str[$ps_count];
+        }
+
+        return $nArr;
+    }
+
+    /**
+     * 筛选位置：单
+     * @param array $codes_hz
+     * @param array $where
+     * @return array
+     */
+    private static function getPosOddWhere($codes_hz=[], &$where=[]){
+        if(empty($codes_hz['odd_pos'])){
+            return $where;
+        }
+        $poses = explode(',', $codes_hz['odd_pos']);
+        if($codes_hz['odd_sel'] == NumService::POS_ODD_EXCLUDE){
+            # 除
+            $posWhere = ['AND'];
+            foreach ($poses as $pos){
+                $posWhere[] = ['IN', 'code_'.$pos, NumService::$SINGLE_CODES];
+            }
+
+            $where[] = ['NOT', $posWhere];
+        }elseif ($codes_hz['odd_sel'] == NumService::POS_ODD_OBTAIN){
+            # 取
+            foreach ($poses as $pos){
+                $where[] = ['IN', 'code_'.$pos, NumService::$SINGLE_CODES];
+            }
+        }
+
+        return $where;
+    }
+
+    /**
+     * 筛选位置：双
+     * @param array $codes_hz
+     * @param array $where
+     * @return array
+     */
+    private static function getPosEvenWhere($codes_hz=[], &$where=[]){
+        if(empty($codes_hz['even_pos'])){
+            return $where;
+        }
+        $poses = explode(',', $codes_hz['even_pos']);
+        if($codes_hz['even_sel'] == NumService::POS_ODD_EXCLUDE){
+            # 除
+            $posWhere = ['AND'];
+            foreach ($poses as $pos){
+                $posWhere[] = ['IN', 'code_'.$pos, NumService::$DOUBLE_CODES];
+            }
+
+            $where[] = ['NOT', $posWhere];
+        }elseif ($codes_hz['even_sel'] == NumService::POS_ODD_OBTAIN){
+            # 取
+            foreach ($poses as $pos){
+                $where[] = ['IN', 'code_'.$pos, NumService::$DOUBLE_CODES];
+            }
+        }
+        #p($where);
+
+        return $where;
+    }
+
+    /**
+     * 筛选位置：大
+     * @param array $codes_hz
+     * @param array $where
+     * @return array
+     */
+    private static function getPosBigWhere($codes_hz=[], &$where=[]){
+        #p($codes_hz, 0);
+        if(empty($codes_hz['big_pos'])){
+            return $where;
+        }
+        $poses = explode(',', $codes_hz['big_pos']);
+        if($codes_hz['big_sel'] == NumService::POS_BIG_EXCLUDE){
+            # 除
+            $posWhere = ['AND'];
+            foreach ($poses as $pos){
+                $posWhere[] = ['IN', 'code_'.$pos, NumService::$MAX_CODES];
+            }
+
+            $where[] = ['NOT', $posWhere];
+        }elseif ($codes_hz['big_sel'] == NumService::POS_BIG_OBTAIN){
+            # 取
+            foreach ($poses as $pos){
+                $where[] = ['IN', 'code_'.$pos, NumService::$MAX_CODES];
+            }
+        }
+        #p($where);
+
+        return $where;
+    }
+
+    /**
+     * 筛选位置：大
+     * @param array $codes_hz
+     * @param array $where
+     * @return array
+     */
+    private static function getPosSmallWhere($codes_hz=[], &$where=[]){
+        #p($codes_hz, 0);
+        if(empty($codes_hz['small_pos'])){
+            return $where;
+        }
+        $poses = explode(',', $codes_hz['small_pos']);
+        if($codes_hz['small_sel'] == NumService::POS_SMALL_EXCLUDE){
+            # 除
+            $posWhere = ['AND'];
+            foreach ($poses as $pos){
+                $posWhere[] = ['IN', 'code_'.$pos, NumService::$MIN_CODES];
+            }
+
+            $where[] = ['NOT', $posWhere];
+        }elseif ($codes_hz['small_sel'] == NumService::POS_SMALL_OBTAIN){
+            # 取
+            foreach ($poses as $pos){
+                $where[] = ['IN', 'code_'.$pos, NumService::$MIN_CODES];
+            }
+        }
+        #p($where);
+
+        return $where;
+    }
+
 
     /**
      * @desc 获取过滤位置 by code 目前注意针对导入之后再过滤的情况
@@ -1971,21 +2160,43 @@ class NumService extends BaseService {
         if(isset($hz_Arr['p5']) && $hz_Arr['p5'] !== ''){
             $desc .= ' 五'.$hz_Arr['p5'];
         }
+        # 配数
         if(isset($hz_Arr['ps_sel']) && $hz_Arr['ps_sel']){
-            $desc .= $hz_Arr['ps_sel']==2 ? ' 配数取:' : '配数除:';
+            $desc .= $hz_Arr['ps_sel']==NumService::PEI_SHU_OBTAIN ? ' 配数取:' : '配数除:';
+            if(isset($hz_Arr['ps_1']) && $hz_Arr['ps_1'] !== ''){
+                $desc .= '配数1:'.$hz_Arr['ps_1'];
+            }
+            if(isset($hz_Arr['ps_2']) && $hz_Arr['ps_2'] !== ''){
+                $desc .= '配数2:'.$hz_Arr['ps_2'];
+            }
+            if(isset($hz_Arr['ps_3']) && $hz_Arr['ps_3'] !== ''){
+                $desc .= '配数3:'.$hz_Arr['ps_3'];
+            }
+            if(isset($hz_Arr['ps_4']) && $hz_Arr['ps_4'] !== ''){
+                $desc .= '配数4:'.$hz_Arr['ps_4'];
+            }
         }
-        if(isset($hz_Arr['ps_1']) && $hz_Arr['ps_1'] !== ''){
-            $desc .= '配数1:'.$hz_Arr['ps_1'];
+        # 筛选位置：单
+        if(isset($hz_Arr['odd_sel']) && !empty($hz_Arr['odd_sel']) && $hz_Arr['odd_pos']){
+            $desc .= $hz_Arr['odd_sel']==NumService::POS_ODD_OBTAIN ? ' 取单:' : '除单:';
+            $desc .= $hz_Arr['odd_pos'].'位';
         }
-        if(isset($hz_Arr['ps_2']) && $hz_Arr['ps_2'] !== ''){
-            $desc .= '配数2:'.$hz_Arr['ps_2'];
+        # 筛选位置：双
+        if(isset($hz_Arr['even_sel']) && !empty($hz_Arr['even_sel']) && $hz_Arr['even_pos']){
+            $desc .= $hz_Arr['even_sel']==NumService::POS_ODD_OBTAIN ? ' 取双:' : '除双:';
+            $desc .= $hz_Arr['even_pos'].'位';
         }
-        if(isset($hz_Arr['ps_3']) && $hz_Arr['ps_3'] !== ''){
-            $desc .= '配数3:'.$hz_Arr['ps_3'];
+        # 筛选位置：大
+        if(isset($hz_Arr['big_sel']) && !empty($hz_Arr['big_sel']) && $hz_Arr['big_pos']){
+            $desc .= $hz_Arr['big_sel']==NumService::POS_BIG_OBTAIN ? ' 取大:' : '除大:';
+            $desc .= $hz_Arr['big_pos'].'位';
         }
-        if(isset($hz_Arr['ps_4']) && $hz_Arr['ps_4'] !== ''){
-            $desc .= '配数4:'.$hz_Arr['ps_4'];
+        # 筛选位置：双
+        if(isset($hz_Arr['small_sel']) && !empty($hz_Arr['small_sel']) && $hz_Arr['small_pos']){
+            $desc .= $hz_Arr['small_sel']==NumService::POS_ODD_OBTAIN ? ' 取小:' : '除小:';
+            $desc .= $hz_Arr['small_pos'].'位';
         }
+
 
         # 不定位合分:两数、三数
         if(isset($hz_Arr['no_fix_hefen_pos']) && isset($hz_Arr['no_fix_hefen'])){ # no_fix_hefen_pos=1:两数、no_fix_hefen_pos=2:三数

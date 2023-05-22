@@ -32,6 +32,7 @@ if( $tz_type >= 17){
         'get_arise' => $get_arise,
         'hefen' => $hefen,
         'hefen_pos' => $hefen_pos,
+        'sel_pos' => $sel_pos,
         'remove_arise' => $remove_arise,
         'hzArr' => $hzArr,
         'type_4ds_Arr' => $type_4ds_Arr, # 单双类型

@@ -101,42 +101,10 @@ use yii\widgets\ActiveForm;
 
                 <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
 
+                <!--配数表单引入-->
+                <?php include(dirname(__FILE__).'/peishu_form.php'); ?>
+
                 <div class="row">
-                    <div class="col-lg-2 col-xs-6">
-                        <!--?= $form->field($model, 'ps_sel')->checkboxList([1=>'除',2=>'取'])->label('配数全转') ?-->
-                        <?= $form->field($model, 'ps_sel')->checkboxList(
-                            [1=>'除', 2=>'取'],
-                            [
-                                'item' => function ($index, $label, $name, $checked, $value) {
-                                    $options = [
-                                        'class' => 'ps_sel',
-                                        'label' => $label,
-                                        'value' => $value,
-                                        'checked' => $checked,
-                                    ];
-
-                                    return Html::checkbox($name, $checked, $options);
-                                }
-                            ]
-                        )->label('配数全转') ?>
-                    </div>
-                    <div class="col-lg-2 col-xs-6">
-                        <!--配数1-->
-                        <?= $form->field($model, 'ps_1')->textInput()->label('配数1')?>
-                    </div>
-                    <div class="col-lg-2 col-xs-6">
-                        <!--配数2-->
-                        <?= $form->field($model, 'ps_2')->textInput()->label('配数2')?>
-                    </div>
-                    <div class="col-lg-2 col-xs-6">
-                        <!--配数3-->
-                        <?= $form->field($model, 'ps_3')->textInput()->label('配数3')?>
-                    </div>
-                    <div class="col-lg-2 col-xs-6">
-                        <!--配数4-->
-                        <?= $form->field($model, 'ps_4')->textInput()->label('配数4')?>
-                    </div>
-
                     <div class="col-lg-3 col-xs-4">
                         <!--三定含除、取-->
                         <?= $form->field($model, 'arise_in_sel')->checkboxList([1=>'除',2=>'取'])->label('3.四字定含') ?>
@@ -144,8 +112,6 @@ use yii\widgets\ActiveForm;
                     <div class="col-lg-3 col-xs-6">
                         <?= $form->field($model, 'arise_in')->textInput()->label('3.四字定含')?>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-3 col-xs-4">
                         <!--位置合分：位置-->
                         <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>
@@ -175,6 +141,9 @@ use yii\widgets\ActiveForm;
                 <!--?= $form->field($model, 'hefen_pos4')->checkboxList($hefen_pos)->label('1.4定位合分取:位置') ?-->
                 <!--位置合分：合分4-->
                 <!--?= $form->field($model, 'hefen4')->textInput()->label('1.4定位合分:值')?-->
+
+                <!--大小、单双模板引入-->
+                <?php include(dirname(__FILE__).'/dx_ds.php');?>
 
                 <!-- 任意位置(不定位)-99-->
                 <?php include(dirname(__FILE__).'/filters/ever_positions.php'); # 任意位置(不定位)-99 ?>

@@ -49,7 +49,7 @@ class UserSysPlansService extends BaseService {
             $playway = BetService::getPlaywayByTzType($tz_type);
             $post['UserSysPlans']['playway'] = $playway;
         }
-        //p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id]);
+        #p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id]);
 
         $post['UserSysPlans']['singles'] = str_replace(' ', '', $post['UserSysPlans']['singles']);
         $post['UserSysPlans']['start_qihao'] = str_replace(' ', '', $post['UserSysPlans']['start_qihao']);
@@ -112,6 +112,43 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['ps_4'] = trim($UserSysPlans['ps_4']);
         }
         unset($post['UserSysPlans']['ps_4']);
+
+        # 筛选位置：单
+        if($UserSysPlans['odd_sel'] && count($UserSysPlans['odd_sel']) == 1){
+            $tmpFilter['odd_sel'] = $UserSysPlans['odd_sel'][0];
+        }
+        unset($post['UserSysPlans']['odd_sel']);
+        if($UserSysPlans['odd_pos'] && count($UserSysPlans['odd_pos']) > 0){
+            $tmpFilter['odd_pos'] = implode(',', $post['UserSysPlans']['odd_pos']); # 合分位置
+        }
+        unset($post['UserSysPlans']['odd_pos']);
+        # 筛选位置：双
+        if($UserSysPlans['even_sel'] && count($UserSysPlans['even_sel']) == 1){
+            $tmpFilter['even_sel'] = $UserSysPlans['even_sel'][0];
+        }
+        unset($post['UserSysPlans']['even_sel']);
+        if($UserSysPlans['even_pos'] && count($UserSysPlans['even_pos']) > 0){
+            $tmpFilter['even_pos'] = implode(',', $post['UserSysPlans']['even_pos']); # 合分位置
+        }
+        unset($post['UserSysPlans']['even_pos']);
+        # 筛选位置：大
+        if($UserSysPlans['big_sel'] && count($UserSysPlans['big_sel']) == 1){
+            $tmpFilter['big_sel'] = $UserSysPlans['big_sel'][0];
+        }
+        unset($post['UserSysPlans']['big_sel']);
+        if($UserSysPlans['big_pos'] && count($UserSysPlans['big_pos']) > 0){
+            $tmpFilter['big_pos'] = implode(',', $post['UserSysPlans']['big_pos']); # 合分位置
+        }
+        unset($post['UserSysPlans']['big_pos']);
+        # 筛选位置：小
+        if($UserSysPlans['small_sel'] && count($UserSysPlans['small_sel']) == 1){
+            $tmpFilter['small_sel'] = $UserSysPlans['small_sel'][0];
+        }
+        unset($post['UserSysPlans']['small_sel']);
+        if($UserSysPlans['small_pos'] && count($UserSysPlans['small_pos']) > 0){
+            $tmpFilter['small_pos'] = implode(',', $post['UserSysPlans']['small_pos']); # 合分位置
+        }
+        unset($post['UserSysPlans']['small_pos']);
 
         # 二、类型：双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
         # 1、双重
@@ -185,6 +222,7 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['bet_while_miss'] = (int)$UserSysPlans['bet_while_miss'];
         }
         unset($post['UserSysPlans']['bet_while_miss']);
+
         # 17、每期轮换
         if(isset($UserSysPlans['change_per'][0]) && $UserSysPlans['change_per'][0]){
             $tmpFilter['change_per'] = $UserSysPlans['change_per'][0]; # 是否每期轮换
@@ -799,6 +837,7 @@ class UserSysPlansService extends BaseService {
      */
     public static function getSysPlansTypeDatas($playway = 3, $tz_type='', $uid=''){
         $data = [];
+        $data['sel_pos'] = [1=>'',2=>'',3=>'',4=>''];
         if($playway ==1){
             $hzArr = [];
             for ($i = 0; $i <= 18; $i++) {
