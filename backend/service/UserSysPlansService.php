@@ -112,6 +112,11 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['ps_4'] = trim($UserSysPlans['ps_4']);
         }
         unset($post['UserSysPlans']['ps_4']);
+        # 定位置
+        if($UserSysPlans['fixed_sel_pos'] && count($UserSysPlans['fixed_sel_pos']) > 0){
+            $tmpFilter['fixed_sel_pos'] = implode(',', $post['UserSysPlans']['fixed_sel_pos']); # 合分位置
+        }
+        unset($post['UserSysPlans']['fixed_sel_pos']);
 
         # 筛选位置：单
         if($UserSysPlans['odd_sel'] && count($UserSysPlans['odd_sel']) == 1){

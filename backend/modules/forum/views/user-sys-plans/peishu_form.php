@@ -44,4 +44,7 @@ use yii\widgets\ActiveForm;
         <!--配数4-->
         <?= $form->field($model, 'ps_4')->textInput()->label('配数4')?>
     </div>
+    <div class="col-lg-2 col-xs-6">
+        <?= $form->field($model, 'fixed_sel_pos')->checkboxList($sel_pos)->label('定位置');?>
+    </div>
 </div>

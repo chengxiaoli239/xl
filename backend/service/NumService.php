@@ -54,7 +54,7 @@ class NumService extends BaseService {
     public static $SINGLE_CODES = ['1', '3', '5', '7', '9'];
     public static $DOUBLE_CODES = ['0', '2', '4', '6', '8'];
     public static $ALL_POSES = ['1', '2', '3', '4'];
-    public static $ALL_CODES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    public static $ALL_CODES = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
     public static $playway_to_code_type = [
         1 => 2,
         2 => 3,
@@ -1676,13 +1676,18 @@ class NumService extends BaseService {
      * @param $ps_datas
      * @return array
      */
-    public static function fillArrayNums($ps_datas=[], $code_type=4, $expectedCount=4){
+    public static function fillArrayNums($ps_datas=[], $code_type=4){
         // 原始数组
         $originalArray = $ps_datas;
+        $posFillCount = $code_type - count($originalArray); # 几定位 则填充几个配数
+        if($code_type != 4){
+            // 固定的补全元素定位补全配数
+            $originalArray = array_merge($originalArray, array_fill(0, $posFillCount, $fixedPosElement='0123456789'));
+        }
+
         // 期望的数组元素数量
-        #$expectedCount = 4;
-        // 固定的补全元素
-        $fixedElement = $code_type==4?'0123456789':'X';
+        $expectedCount = 4;
+        $fixedElement = $code_type==4?'0123456789':'X';  # 补齐四位数需要补的号码
 
         // 计算需要补全的元素数量
         $fillCount = $expectedCount - count($originalArray);
@@ -1704,7 +1709,7 @@ class NumService extends BaseService {
         if(empty($ps_datas) or empty($codes_hz['ps_sel'])){
             return $where;
         }
-        $ps_datas = NumService::fillArrayNums($ps_datas, $code_type, $expectNum = 4);
+        $ps_datas = NumService::fillArrayNums($ps_datas, $code_type);
 
         #p([$codes_hz, $where, $ps_datas], 0);
         if($codes_hz['ps_sel'] == NumService::PEI_SHU_EXCLUDE){
@@ -1718,10 +1723,10 @@ class NumService extends BaseService {
                         for($p4=0; $p4<=3; $p4++) {
                             if($p4 == $p1 OR $p4==$p2 OR $p4==$p3) continue;
                             $psFilterSubWhere = ['AND'];
-                            $psFilterSubWhere[] = ['IN', 'code_1', NumService::getNumsArr($ps_datas[$p1])];
-                            $psFilterSubWhere[] = ['IN', 'code_2', NumService::getNumsArr($ps_datas[$p2])];
-                            $psFilterSubWhere[] = ['IN', 'code_3', NumService::getNumsArr($ps_datas[$p3])];
-                            $psFilterSubWhere[] = ['IN', 'code_4', NumService::getNumsArr($ps_datas[$p4])];
+                            $psFilterSubWhere[] = ['IN', 'code_1', NumService::getFixedPosNums(1, NumService::getNumsArr($ps_datas[$p1]), $codes_hz)];
+                            $psFilterSubWhere[] = ['IN', 'code_2', NumService::getFixedPosNums(2, NumService::getNumsArr($ps_datas[$p2]), $codes_hz)];
+                            $psFilterSubWhere[] = ['IN', 'code_3', NumService::getFixedPosNums(3, NumService::getNumsArr($ps_datas[$p3]), $codes_hz)];
+                            $psFilterSubWhere[] = ['IN', 'code_4', NumService::getFixedPosNums(4, NumService::getNumsArr($ps_datas[$p4]), $codes_hz)];
                             $psFilterWhere[] = $psFilterSubWhere;
                         }
                     }
@@ -1739,10 +1744,11 @@ class NumService extends BaseService {
                         for($p4=0; $p4<=3; $p4++) {
                             if($p4 == $p1 OR $p4==$p2 OR $p4==$p3) continue;
                             $psFilterSubWhere = ['AND'];
-                            $psFilterSubWhere[] = ['IN', 'code_1', NumService::getNumsArr($ps_datas[$p1])];
-                            $psFilterSubWhere[] = ['IN', 'code_2', NumService::getNumsArr($ps_datas[$p2])];
-                            $psFilterSubWhere[] = ['IN', 'code_3', NumService::getNumsArr($ps_datas[$p3])];
-                            $psFilterSubWhere[] = ['IN', 'code_4', NumService::getNumsArr($ps_datas[$p4])];
+                            #$psFilterSubWhere[] = ['IN', 'code_1', NumService::getNumsArr($ps_datas[$p1])];
+                            $psFilterSubWhere[] = ['IN', 'code_1', NumService::getFixedPosNums(1, NumService::getNumsArr($ps_datas[$p1]), $codes_hz)];
+                            $psFilterSubWhere[] = ['IN', 'code_2', NumService::getFixedPosNums(2, NumService::getNumsArr($ps_datas[$p2]), $codes_hz)];
+                            $psFilterSubWhere[] = ['IN', 'code_3', NumService::getFixedPosNums(3, NumService::getNumsArr($ps_datas[$p3]), $codes_hz)];
+                            $psFilterSubWhere[] = ['IN', 'code_4', NumService::getFixedPosNums(4, NumService::getNumsArr($ps_datas[$p4]), $codes_hz)];
                             $psFilterWhere[] = $psFilterSubWhere;
                         }
                     }
@@ -1753,6 +1759,23 @@ class NumService extends BaseService {
         #p($where);
 
         return $where;
+    }
+
+    /**
+     * @param int $pos
+     * @param array $codes
+     * @param array $code_hz
+     * @return array
+     */
+    public static function getFixedPosNums($pos=1, $codes=[], $code_hz=[]){
+        if(isset($code_hz['fixed_sel_pos']) && $code_hz['fixed_sel_pos']){
+            $fixed_sel_pos = explode(',', $code_hz['fixed_sel_pos']);
+            if(in_array($pos, $fixed_sel_pos)){
+                $codes = NumService::$ALL_CODES;
+            }
+        }
+
+        return $codes;
     }
 
     /**

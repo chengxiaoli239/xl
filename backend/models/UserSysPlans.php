@@ -107,6 +107,8 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $small_sel; #  小选项
     public $small_pos; #  小位置
 
+    public $fixed_sel_pos; #  定位置选项
+
     public $no_fix_hefen; #  定位合分值
     public $no_fix_hefen_pos; #  定位合分位置
     public $arise_in; #  三定含
