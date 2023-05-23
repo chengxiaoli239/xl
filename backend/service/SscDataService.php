@@ -3394,7 +3394,7 @@ class SscDataService extends BaseService {
      */
     public static function operatePlans_17(object $UserSysPlans, $current_kj_qihao){
         try {
-            if($UserSysPlans->plan_type != SscDataService::PLAN_TYPE_YL_BET){
+            if($UserSysPlans->plan_type != SscDataService::PLAN_TYPE_YL_ZZ_SINGLES_BET){
                 throw_info('非遗漏中则倍/投类型17,plan_type:'.$UserSysPlans->plan_type.'不处理');
             }
 
