@@ -18,7 +18,7 @@ class OperateBetPlans extends CommonJob {
     public static function handle($params){
         $lottery_type = $params['lottery_type'];
         try {
-            $rst = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
+            $rst = TzService::operateSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
         }catch (\Exception $e){
             return $e->getMessage();
         }

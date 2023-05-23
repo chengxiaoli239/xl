@@ -681,7 +681,7 @@ class IndexController extends Controller
         foreach ($lottery_types as $lottery_type) {
             /* 处理系统投注计划 add 2019-01-21 */
             $rst[$lottery_type] = KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
-            $rst['TzService'] = TzService::opSystemBetPlans($lottery_type, $istest = 1);
+            $rst['TzService'] = TzService::operateSystemBetPlans($lottery_type, $istest = 1);
             p($rst);// 定制化投注计划
             /* 处理系统投注计划 add 2019-01-21 */
         }
@@ -763,7 +763,7 @@ class IndexController extends Controller
         foreach ($lottery_types as $lottery_type) {
             /* 处理系统投注计划 add 2019-01-21 */
             $rst[$lottery_type] = KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
-            $rst['TzService'] = TzService::opSystemBetPlans($lottery_type, $istest = 1);
+            $rst['TzService'] = TzService::operateSystemBetPlans($lottery_type, $istest = 1);
             p($rst);// 定制化投注计划
             /* 处理系统投注计划 add 2019-01-21 */
         }
