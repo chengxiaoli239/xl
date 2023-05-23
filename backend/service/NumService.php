@@ -1627,7 +1627,7 @@ class NumService extends BaseService {
         (!empty($codes)) && $query->andWhere(['IN', "REPLACE(`code`, ',', '')", $codes]);
         ###################################################### filters过滤参数结束05.24 ######################################################
 
-        $sql = $query->createCommand()->getRawSql();p($sql);
+        //$sql = $query->createCommand()->getRawSql();p($sql);
         $Num4Types = $query->asArray()->orderBy(['code'=>SORT_ASC])->all();
         $codesArr = ArrayHelper::getColumn($Num4Types, 'code');
         //p(['where'=>$where, 'index_id'=>$index_id, 'filter_index_ids'=>$filter_index_ids, 'filters'=>$filters, 'code'=>$codes, 'end'=>$codesArr]);
