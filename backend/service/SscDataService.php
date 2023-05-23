@@ -3444,8 +3444,8 @@ class SscDataService extends BaseService {
                     if($flag){
                         $current_miss = 0;
                         if($codes_hz['has_bet_nums']>=$singles_count){
-                            $has_bet_nums = 0;
-                            $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
+                            $has_bet_nums = 1;
+                            $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                         }else{
                             $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                             $has_bet_nums = $codes_hz['has_bet_nums'] + 1;
