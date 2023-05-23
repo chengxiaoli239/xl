@@ -3453,10 +3453,11 @@ class SscDataService extends BaseService {
                     }else{
                         # 有疑问？？？？？ 投还是不投
                         $current_miss = $codes_hz['current_miss'] + 1;
-                        $has_bet_nums = $codes_hz['has_bet_nums'] + 1;
                         if($current_miss>=$codes_hz['bet_while_miss']){
+                            $has_bet_nums = $codes_hz['has_bet_nums'] + 1;
                             $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                         }else{
+                            $has_bet_nums = 0;
                             $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
                         }
                     }
@@ -3469,10 +3470,11 @@ class SscDataService extends BaseService {
                         $has_bet_nums = 0;
                     }else{
                         $current_miss = (int)$codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
-                        $has_bet_nums = 0;
                         if($current_miss>=$codes_hz['bet_while_miss']){
                             $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
+                            $has_bet_nums = (int)$codes_hz['has_bet_nums'] + 1;
                         }else{
+                            $has_bet_nums = 0;
                             $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
                         }
                     }
