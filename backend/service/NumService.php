@@ -2287,6 +2287,10 @@ class NumService extends BaseService {
                 $desc .= '配数4:'.$hz_Arr['ps_4'];
             }
         }
+        if(isset($hz_Arr['fixed_sel_pos']) && !empty($hz_Arr['fixed_sel_pos'])){
+            $desc .= ' 定位置:'.$hz_Arr['fixed_sel_pos'];
+        }
+
         # 筛选位置：单
         if(isset($hz_Arr['odd_sel']) && !empty($hz_Arr['odd_sel']) && $hz_Arr['odd_pos']){
             $desc .= $hz_Arr['odd_sel']==NumService::POS_ODD_OBTAIN ? ' 取单:' : '除单:';
