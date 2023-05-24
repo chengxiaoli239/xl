@@ -323,8 +323,26 @@ class IndexController extends Controller
         return $plaintext;
     }
 
+    public static function getPermutations($array) {
+        $results = [[]];
+        foreach ($array as $element) {
+            $tmp = [];
+            foreach ($results as $result) {
+                $count = count($result);
+                for ($i = 0; $i <= $count; $i++) {
+                    $copy = $result;
+                    array_splice($copy, $i, 0, $element);
+                    $tmp[] = $copy;
+                }
+            }
+            $results = $tmp;
+        }
+        return $results;
+    }
+
     public function actionDw()
     {
+        $rst = self::getPermutations([1, 2, 3]);p($rst);
         $plan = UserSysPlans::findOne(6822);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         p(count($filter_dynamic_codes));

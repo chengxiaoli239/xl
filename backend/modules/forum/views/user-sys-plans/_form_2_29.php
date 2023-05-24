@@ -66,7 +66,7 @@ use yii\widgets\ActiveForm;
                         <!--位置合分：合分-->
                         <?= $form->field($model, 'hefen')->textInput()->label('1.1定位合分:值')?>
                     </div>
-                    <div class="col-lg-1 col-xs-6">
+                    <div class="col-lg-2 col-xs-6">
                         <!--位置合分：位置2-->
                         <?= $form->field($model, 'hefen_pos2')->checkboxList($hefen_pos)->label('1.2定位合分:取') ?>
                     </div>
@@ -74,7 +74,7 @@ use yii\widgets\ActiveForm;
                         <!--位置合分：合分2-->
                         <?= $form->field($model, 'hefen2')->textInput()->label('1.2定位合分:值')?>
                     </div>
-                    <div class="col-lg-1 col-xs-4">
+                    <div class="col-lg-2 col-xs-4">
                         <!--位置合分：位置3-->
                         <?= $form->field($model, 'hefen_pos3')->checkboxList($hefen_pos)->label('1.3定位合分:取') ?>
                     </div>
@@ -92,14 +92,14 @@ use yii\widgets\ActiveForm;
                     <div class="col-lg-2 col-xs-6">
                         <?= $form->field($model, 'hefen4')->textInput()->label('1.4定位合分:值')?>
                     </div>
-                    <div class="col-lg-1 col-xs-6">
+                    <div class="col-lg-2 col-xs-6">
                         <!--三定含除、取-->
                         <?= $form->field($model, 'arise_in_sel')->checkboxList([1=>'除',2=>'取'])->label('2.三字定含') ?>
                     </div>
                     <div class="col-lg-2 col-xs-6">
                         <?= $form->field($model, 'arise_in')->textInput()->label('2.三字定含')?>
                     </div>
-                    <div class="col-lg-1 col-xs-6">
+                    <div class="col-lg-2 col-xs-6">
                         <!--两数合、三数合-->
                     <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList([1=>'两数',2=>'三数'])->label('3.不定位合分') ?>
                     </div>
@@ -157,7 +157,7 @@ use yii\widgets\ActiveForm;
                     <div class="col-lg-3 col-xs-6">
                         <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
                     </div>
-                    <div class="col-lg-1 col-xs-6">
+                    <div class="col-lg-2 col-xs-6">
                         <?= $form->field($model, 'bet_while_miss')->textInput()->label('遗漏x期投,如:10') ?>
                     </div>
                 </div>
@@ -175,3 +175,12 @@ use yii\widgets\ActiveForm;
         </section>
     </div>
 </div>
+<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<script>
+$(function () {
+    $('.checkbox-item').click(function() {
+        var name = $(this).attr('name');
+        $('input[name="' + name + '"]').not(this).prop('checked', false);
+    });
+});
+</script>

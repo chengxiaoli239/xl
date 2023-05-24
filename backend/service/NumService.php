@@ -1699,66 +1699,154 @@ class NumService extends BaseService {
     }
 
     /**
+     * 给定数组，返回所有排列组合
+     * @param $array
+     * @return array|array[]
+     */
+    public static function getPermutations($array) {
+        $results = [[]];
+        foreach ($array as $element) {
+            $tmp = [];
+            foreach ($results as $result) {
+                $count = count($result);
+                for ($i = 0; $i <= $count; $i++) {
+                    $copy = $result;
+                    array_splice($copy, $i, 0, $element);
+                    $tmp[] = $copy;
+                }
+            }
+            $results = $tmp;
+        }
+        return $results;
+    }
+
+    /**
      * 配数条件
      * @param array $codes_hz
      * @param array $where
      * @return array
      */
     private static function getPeiShuWhere($codes_hz=[], &$where=[], $code_type=4){
-        $ps_datas = array_values(array_filter([$codes_hz['ps_1'], $codes_hz['ps_2'], $codes_hz['ps_3'], $codes_hz['ps_4']]));
+        if(!isset($codes_hz['ps_sel']) OR !in_array($codes_hz['ps_sel'], [NumService::PEI_SHU_EXCLUDE, NumService::PEI_SHU_OBTAIN])){
+            return $where;
+        }
+        $codes_hz = self::initPeiShu($codes_hz);
+        if($code_type==2){
+            $ps_datas = [1=>$codes_hz['ps_1'], 2=>$codes_hz['ps_2']];
+        }elseif($code_type==3){
+            $ps_datas = [1=>$codes_hz['ps_1'], 2=>$codes_hz['ps_2'], 3=>$codes_hz['ps_3']];
+        }else{
+            $ps_datas = [1=>$codes_hz['ps_1'], 2=>$codes_hz['ps_2'], 3=>$codes_hz['ps_3'], 4=>$codes_hz['ps_4']];
+        }
         if(empty($ps_datas) or empty($codes_hz['ps_sel'])){
             return $where;
         }
-        $ps_datas = NumService::fillArrayNums($ps_datas, $code_type);
+
+        # 全转配数
+        #$ps_datas = NumService::fillArrayNums($ps_datas, $code_type);
+        # 固定位置
+        $fixed_sel_pos = [];
+        if(isset($codes_hz['fixed_sel_pos']) && $codes_hz['fixed_sel_pos']){
+            $fixed_sel_pos = explode(',', $codes_hz['fixed_sel_pos']);
+        }
+        $not_fixed_pos = array_values(array_diff([1,2,3,4], $fixed_sel_pos)); # 不定位置
+        //p(['where'=>$where, 'codes_hz'=>$codes_hz, 'ps_datas'=>$ps_datas, 'fixed_sel_pos'=>$fixed_sel_pos, 'not_fixed_pos'=>$not_fixed_pos], 0);
+
+        $allPsWhere = ['AND'];
+        foreach ($fixed_sel_pos as $fixed_pos){
+            if($code_type ==4){
+                $allPsWhere[] = ['IN', 'code_'.$fixed_pos, (in_array($code_type, [2, 3]) ? 'X' :NumService::getNumsArr($ps_datas[$fixed_pos]))];
+                unset($ps_datas[$fixed_pos]);
+            }else{
+                $where[] = ['=', 'code_'.$fixed_pos, 'X'];
+            }
+        }
+        $psFilterWhere = ['OR'];
+        if($code_type == 4){
+            $all_ps_datas = NumService::getPermutations($ps_datas);
+            #p(['all_ps_datas'=>$all_ps_datas]);
+            # 配数取，条件组装
+            foreach ($all_ps_datas as $ps_data){
+                #p(['ps_data'=>$ps_data, 'not_fixed_pos'=>$not_fixed_pos]);
+                $psFilterSubWhere = ['AND'];
+                foreach ($ps_data as $p=>$ps){
+                    $psFilterSubWhere[] = ['IN', 'code_'.$not_fixed_pos[$p], NumService::getNumsArr($ps)];
+                }
+                $psFilterWhere[] = $psFilterSubWhere;
+            }
+        }else{
+            $all_pos = NumService::getCombination($not_fixed_pos, $code_type);
+            #p(['all_pos'=>$all_pos], 0);
+            foreach ($all_pos as $pos){
+                $psFilterSubWhere = ['AND'];
+                $pos_datas = $ps_datas;
+                #p(['pos_datas'=>$pos_datas, 'pos'=>$pos]);
+                foreach ($pos as $pps){
+                    $tmpCode = array_shift($pos_datas);
+                    $psFilterSubWhere[] = ['IN', 'code_'.$pps, NumService::getNumsArr($tmpCode)];
+                }
+                $psFilterWhere[] = $psFilterSubWhere;
+            }
+            //p(['all_pos'=>$all_pos], 0);
+        }
+
+        $allPsWhere[] = $psFilterWhere;
 
         #p([$codes_hz, $where, $ps_datas], 0);
         if($codes_hz['ps_sel'] == NumService::PEI_SHU_EXCLUDE){
             # 配数除，条件组装
-            $psFilterWhere = ['OR'];
-            for($p1=0; $p1<=3; $p1++){
-                for($p2=0; $p2<=3; $p2++) {
-                    if($p2 == $p1) continue;
-                    for($p3=0; $p3<=3; $p3++) {
-                        if($p3 == $p1 OR $p3==$p2) continue;
-                        for($p4=0; $p4<=3; $p4++) {
-                            if($p4 == $p1 OR $p4==$p2 OR $p4==$p3) continue;
-                            $psFilterSubWhere = ['AND'];
-                            $psFilterSubWhere[] = ['IN', 'code_1', NumService::getFixedPosNums(1, NumService::getNumsArr($ps_datas[$p1]), $codes_hz)];
-                            $psFilterSubWhere[] = ['IN', 'code_2', NumService::getFixedPosNums(2, NumService::getNumsArr($ps_datas[$p2]), $codes_hz)];
-                            $psFilterSubWhere[] = ['IN', 'code_3', NumService::getFixedPosNums(3, NumService::getNumsArr($ps_datas[$p3]), $codes_hz)];
-                            $psFilterSubWhere[] = ['IN', 'code_4', NumService::getFixedPosNums(4, NumService::getNumsArr($ps_datas[$p4]), $codes_hz)];
-                            $psFilterWhere[] = $psFilterSubWhere;
-                        }
-                    }
-                }
-            }
-            $where = array_merge($where, [['NOT', $psFilterWhere]]);
+            $where = array_merge($where, [['NOT', $allPsWhere]]);
         }elseif($codes_hz['ps_sel'] == NumService::PEI_SHU_OBTAIN){
             # 配数取，条件组装
-            $psFilterWhere = ['OR'];
-            for($p1=0; $p1<=3; $p1++){
-                for($p2=0; $p2<=3; $p2++) {
-                    if($p2 == $p1) continue;
-                    for($p3=0; $p3<=3; $p3++) {
-                        if($p3 == $p1 OR $p3==$p2) continue;
-                        for($p4=0; $p4<=3; $p4++) {
-                            if($p4 == $p1 OR $p4==$p2 OR $p4==$p3) continue;
-                            $psFilterSubWhere = ['AND'];
-                            #$psFilterSubWhere[] = ['IN', 'code_1', NumService::getNumsArr($ps_datas[$p1])];
-                            $psFilterSubWhere[] = ['IN', 'code_1', NumService::getFixedPosNums(1, NumService::getNumsArr($ps_datas[$p1]), $codes_hz)];
-                            $psFilterSubWhere[] = ['IN', 'code_2', NumService::getFixedPosNums(2, NumService::getNumsArr($ps_datas[$p2]), $codes_hz)];
-                            $psFilterSubWhere[] = ['IN', 'code_3', NumService::getFixedPosNums(3, NumService::getNumsArr($ps_datas[$p3]), $codes_hz)];
-                            $psFilterSubWhere[] = ['IN', 'code_4', NumService::getFixedPosNums(4, NumService::getNumsArr($ps_datas[$p4]), $codes_hz)];
-                            $psFilterWhere[] = $psFilterSubWhere;
-                        }
+            $where[] = $allPsWhere;
+        }
+        //p($where);
+
+        return $where;
+    }
+
+    public static function getCombination($not_fixed_pos, $num) {
+        $results = [[]];
+        for ($i = 0; $i < $num; $i++) {
+            $tmp = [];
+            foreach ($results as $result) {
+                foreach ($not_fixed_pos as $pos) {
+                    if (!in_array($pos, $result)) {
+                        $copy = $result;
+                        $copy[] = $pos;
+                        $tmp[] = $copy;
                     }
                 }
             }
-            $where = array_merge($where, [$psFilterWhere]);
+            $results = $tmp;
         }
-        #p($where);
+        return $results;
+    }
 
-        return $where;
+    /**
+     * @param array $codes_hz
+     * @return array
+     */
+    public static function initPeiShu($codes_hz=[], $code_type=4){
+        if(!isset($codes_hz['ps_sel']) OR !in_array($codes_hz['ps_sel'], [NumService::PEI_SHU_EXCLUDE, NumService::PEI_SHU_OBTAIN])){
+            return $codes_hz;
+        }
+        switch($code_type){
+            case 4:
+                $codes_hz['ps_1'] = $codes_hz['ps_1'] ? : '0123456789';
+                $codes_hz['ps_2'] = $codes_hz['ps_2'] ? : '0123456789';
+                $codes_hz['ps_3'] = $codes_hz['ps_3'] ? : '0123456789';
+                $codes_hz['ps_4'] = $codes_hz['ps_4'] ? : '0123456789';
+                /*
+                $codes_hz['ps_1'] = NumService::getNumsArr($codes_hz['ps_1'] ? : '0123456789');
+                $codes_hz['ps_2'] = NumService::getNumsArr($codes_hz['ps_2'] ? : '0123456789');
+                $codes_hz['ps_3'] = NumService::getNumsArr($codes_hz['ps_3'] ? : '0123456789');
+                $codes_hz['ps_4'] = NumService::getNumsArr($codes_hz['ps_4'] ? : '0123456789');
+                */
+            break;
+        }
+
+        return $codes_hz;
     }
 
     /**
@@ -1767,9 +1855,9 @@ class NumService extends BaseService {
      * @param array $code_hz
      * @return array
      */
-    public static function getFixedPosNums($pos=1, $codes=[], $code_hz=[]){
-        if(isset($code_hz['fixed_sel_pos']) && $code_hz['fixed_sel_pos']){
-            $fixed_sel_pos = explode(',', $code_hz['fixed_sel_pos']);
+    public static function getFixedPosNums($pos=1, $codes=[], $codes_hz=[]){
+        if(isset($codes_hz['fixed_sel_pos']) && $codes_hz['fixed_sel_pos']){
+            $fixed_sel_pos = explode(',', $codes_hz['fixed_sel_pos']);
             if(in_array($pos, $fixed_sel_pos)){
                 $codes = NumService::$ALL_CODES;
             }
@@ -3057,7 +3145,7 @@ class NumService extends BaseService {
             ->where('n.code IN("'.$filterCodesStr.'")')
             ->andWhere(['=', 'code_type', $playway+1]);
         $sql = $query->createCommand()->getRawSql();
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '取前四最近8000期开过的号码2', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'short_current_kj_qihao'=>$short_current_kj_qihao, 'current_kj_qihao'=>$current_kj_qihao]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '取前四最近8000期开过的号码2', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'current_kj_qihao'=>$current_kj_qihao]);
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
         #p($codes);

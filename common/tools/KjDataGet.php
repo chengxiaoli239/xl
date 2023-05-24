@@ -119,6 +119,7 @@ class KjDataGet
                 $flag = $m->get($initLotteryKey);
                 // 防止并发售后消息通知
                 $exist = \Yii::$app->redis->sadd($exist_key, $lottery_type);
+                \Yii::$app->redis->expire($exist_key, 120);
                 if(!$exist OR $flag){
                     throw_info('并发消息处理'.$lottery_type, 30001);
                 }
