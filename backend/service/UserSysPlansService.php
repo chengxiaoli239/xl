@@ -343,6 +343,51 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['arise_B_times']);
 
+        # 定位合分 -------  start  ------------
+        if($UserSysPlans['fixed_pos_hefen_sel'] && count($UserSysPlans['fixed_pos_hefen_sel']) == 1){
+            $tmpFilter['fixed_pos_hefen_sel'] = $UserSysPlans['fixed_pos_hefen_sel'][0];
+        }
+        if($UserSysPlans['hefen_pos1'] && count($UserSysPlans['hefen_pos1']) > 0){
+            $tmpFilter['hefen_pos1'] = implode(',', $post['UserSysPlans']['hefen_pos1']); # 合分位置
+        }
+        unset($post['UserSysPlans']['hefen_pos1']);
+        # 15.1.2、合分值
+        if(isset($post['UserSysPlans']['hefen1']) && $post['UserSysPlans']['hefen1']){
+            $tmpFilter['hefen1'] = $post['UserSysPlans']['hefen1']; # 合分
+        }
+        unset($post['UserSysPlans']['hefen1']);
+        # 15.2.1、合分位置
+        if($UserSysPlans['hefen_pos2'] && count($UserSysPlans['hefen_pos2']) > 0){
+            $tmpFilter['hefen_pos2'] = implode(',', $post['UserSysPlans']['hefen_pos2']); # 合分位置
+        }
+        unset($post['UserSysPlans']['hefen_pos2']);
+        # 15.2.2、合分值
+        if(isset($post['UserSysPlans']['hefen2']) && $post['UserSysPlans']['hefen2']){
+            $tmpFilter['hefen2'] = $post['UserSysPlans']['hefen2']; # 合分
+        }
+        unset($post['UserSysPlans']['hefen2']);
+        # 15.3.1、合分位置
+        if($UserSysPlans['hefen_pos3'] && count($UserSysPlans['hefen_pos3']) > 0){
+            $tmpFilter['hefen_pos3'] = implode(',', $post['UserSysPlans']['hefen_pos3']); # 合分位置
+        }
+        unset($post['UserSysPlans']['hefen_pos3']);
+        # 15.3.2、合分值
+        if(isset($post['UserSysPlans']['hefen3']) && $post['UserSysPlans']['hefen3']){
+            $tmpFilter['hefen3'] = $post['UserSysPlans']['hefen3']; # 合分
+        }
+        unset($post['UserSysPlans']['hefen3']);
+        # 15.4.1、合分位置
+        if($UserSysPlans['hefen_pos4'] && count($UserSysPlans['hefen_pos4']) > 0){
+            $tmpFilter['hefen_pos4'] = implode(',', $post['UserSysPlans']['hefen_pos4']); # 合分位置
+        }
+        unset($post['UserSysPlans']['hefen_pos3']);
+        # 15.4.2、合分值
+        if(isset($post['UserSysPlans']['hefen4']) && $post['UserSysPlans']['hefen4']){
+            $tmpFilter['hefen4'] = $post['UserSysPlans']['hefen4']; # 合分
+        }
+        unset($post['UserSysPlans']['hefen4']);
+        # 定位合分 -------  end  ----------
+
         ################### 公共参数 - 结束 #########################
 
         if($playway == 6) {
@@ -351,20 +396,18 @@ class UserSysPlansService extends BaseService {
         }elseif (in_array($tz_type, [29, 32])){ # 三定-快选 、三定快译切换
             # 三定-快选过滤
             # 15.1、合分位置
-            if($UserSysPlans['hefen_pos'] && count($UserSysPlans['hefen_pos']) > 0){
-                //$tmpFilter['hefen_pos'] = $UserSysPlans['hefen_pos'][0];
-                $tmpFilter['hefen_pos'] = implode(',', $post['UserSysPlans']['hefen_pos']); # 合分位置
+            if($UserSysPlans['hefen_pos1'] && count($UserSysPlans['hefen_pos1']) > 0){
+                $tmpFilter['hefen_pos1'] = implode(',', $post['UserSysPlans']['hefen_pos1']); # 合分位置
             }
-            unset($post['UserSysPlans']['hefen_pos']);
+            unset($post['UserSysPlans']['hefen_pos1']);
             # 15.2、合分值
-            if(isset($post['UserSysPlans']['hefen']) && $post['UserSysPlans']['hefen']){
-                $tmpFilter['hefen'] = $post['UserSysPlans']['hefen']; # 合分
+            if(isset($post['UserSysPlans']['hefen1']) && $post['UserSysPlans']['hefen1']){
+                $tmpFilter['hefen1'] = $post['UserSysPlans']['hefen1']; # 合分
             }
-            unset($post['UserSysPlans']['hefen']);
+            unset($post['UserSysPlans']['hefen1']);
 
             # 16.1、不定位合分:位置
             if($UserSysPlans['no_fix_hefen_pos'] && count($UserSysPlans['no_fix_hefen_pos']) == 1){
-                //$tmpFilter['hefen_pos'] = $UserSysPlans['hefen_pos'][0];
                 $tmpFilter['no_fix_hefen_pos'] = implode(',', $post['UserSysPlans']['no_fix_hefen_pos']); # 合分位置
             }
             unset($post['UserSysPlans']['no_fix_hefen_pos']);
@@ -433,22 +476,8 @@ class UserSysPlansService extends BaseService {
             }
         }elseif (in_array($tz_type, [25, 20])){
             # 四定-快选过滤
-
-            # 15.1、合分位置
-            if($UserSysPlans['hefen_pos'] && count($UserSysPlans['hefen_pos']) > 0){
-                //$tmpFilter['hefen_pos'] = $UserSysPlans['hefen_pos'][0];
-                $tmpFilter['hefen_pos'] = implode(',', $post['UserSysPlans']['hefen_pos']); # 合分位置
-            }
-            unset($post['UserSysPlans']['hefen_pos']);
-            # 15.2、合分值
-            if(isset($post['UserSysPlans']['hefen']) && $post['UserSysPlans']['hefen']){
-                $tmpFilter['hefen'] = $post['UserSysPlans']['hefen']; # 合分
-            }
-            unset($post['UserSysPlans']['hefen']);
-
             # 16.1、不定位合分:位置
             if($UserSysPlans['no_fix_hefen_pos'] && count($UserSysPlans['no_fix_hefen_pos']) == 1){
-                //$tmpFilter['hefen_pos'] = $UserSysPlans['hefen_pos'][0];
                 $tmpFilter['no_fix_hefen_pos'] = implode(',', $post['UserSysPlans']['no_fix_hefen_pos']); # 合分位置
             }
             unset($post['UserSysPlans']['no_fix_hefen_pos']);
@@ -493,8 +522,8 @@ class UserSysPlansService extends BaseService {
             }
             unset($post['UserSysPlans']['remove_arises']);
             # 15.2、合分值
-            if(isset($post['UserSysPlans']['hefen']) && $post['UserSysPlans']['hefen']){
-                $tmpFilter['hefen'] = $post['UserSysPlans']['hefen']; # 合分
+            if(isset($post['UserSysPlans']['hefen1']) && $post['UserSysPlans']['hefen1']){
+                $tmpFilter['hefen1'] = $post['UserSysPlans']['hefen1']; # 合分
             }
             unset($post['UserSysPlans']['hefen']);
             //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);

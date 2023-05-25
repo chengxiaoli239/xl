@@ -80,16 +80,20 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $codes;
     public $in_codes; # 在号码基础上过滤
 
-    public $hefen; #  定位合分值1
-    public $hefen_pos; #  定位合分位置1
+    # 定位合分
+    public $hefen1; #  定位合分值1
+    public $hefen_pos1; #  定位合分位置1
     public $hefen2; #  定位合分值2
     public $hefen_pos2; #  定位合分位置2
     public $hefen3; #  定位合分值3
     public $hefen_pos3; #  定位合分位置3
     public $hefen4; #  定位合分值4
     public $hefen_pos4; #  定位合分位置4
+
     public $change_per; #  导入方式每期轮换号码
     public $change_turn_pos; #  号码轮换位置，指定号码数字轮换指定组
+
+    public $fixed_pos_hefen_sel; #  定位合分选项
 
     public $ps_sel; #  配数选项
     public $ps_1; #  配数1

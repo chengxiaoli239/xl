@@ -36,6 +36,9 @@ class NumService extends BaseService {
     # 配数，除、取
     const PEI_SHU_EXCLUDE = 1; # 除
     const PEI_SHU_OBTAIN = 2; # 取
+    # 合分，除、取
+    const HE_FEN_EXCLUDE = 1; # 除
+    const HE_FEN_OBTAIN = 2; # 取
     # 筛选位置：单，除、取
     const POS_ODD_EXCLUDE = 1; # 除
     const POS_ODD_OBTAIN = 2; # 取
@@ -1053,74 +1056,8 @@ class NumService extends BaseService {
             $where = array_merge($where, [ ['NOT IN', 'codes_hz', $codes_hz['remove_hzs']] ]);
         }
 
-        # 定位合分
-        if($code_type == 3 && isset($codes_hz['hefen_pos']) && isset($codes_hz['hefen']) && !empty($codes_hz['hefen_pos']) && !empty($codes_hz['hefen'])){
-            # 三定
-            $poss = explode(',', $codes_hz['hefen_pos']);
-            $lenHefen = strlen($codes_hz['hefen']);
-            $hf_codes_hzs = [];
-            for ($i=0; $i<$lenHefen; $i++){
-                if($codes_hz['hefen'][$i]<=7){
-                    $hefenArr = [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10, $codes_hz['hefen'][$i] + 20];
-                }else{
-                    $hefenArr = [$codes_hz['hefen'][$i], $codes_hz['hefen'][$i] + 10];
-                }
-                $hf_codes_hzs = array_merge($hf_codes_hzs, $hefenArr);
-            }
-            $codes_str = '';
-            foreach ($poss as $pos){
-                $codes_str .= '`code_'.$pos.'`' . ' +';
-                $where = array_merge($where, [['<>', 'code_'.$pos, 'X']]);
-            }
-            $codes_str = rtrim(trim($codes_str), '+');
-            $where = array_merge($where, [ ['IN', '('.$codes_str.')', $hf_codes_hzs ] ]);
-            //$query->andWhere($andWhere);
-        }if($code_type == 4 && isset($codes_hz['hefen_pos']) && isset($codes_hz['hefen']) && !empty($codes_hz['hefen_pos']) && !empty($codes_hz['hefen'])){
-            # 四定
-            $poss = explode(',', $codes_hz['hefen_pos']);
-            $lenPos = count($poss);
-            $hf_codes_hzs = self::getHezhisByHefen($codes_hz['hefen'], $lenPos);
-
-            $codes_str = '';
-            foreach ($poss as $pos){
-                $codes_str .= '`code_'.$pos.'`' . ' + ';
-                $where = array_merge($where, [['<>', 'code_'.$pos, 'X']]);
-            }
-            $codes_str = rtrim(trim($codes_str), '+');
-            $where = array_merge($where, [ ['IN', '('.$codes_str.')', $hf_codes_hzs ] ]);
-            //p([$poss, $codes_hz['hefen'], $hf_codes_hzs]);
-        }
-
-        # 配数 - 支持二定、三定、四定 配数优化 此块先注释
-        #if(isset($codes_hz['ps_1']) && !empty($codes_hz['ps_1']) && isset($codes_hz['ps_2']) && !empty($codes_hz['ps_2'])){
-        #    $ps1 = (string)$codes_hz['ps_1']; $ps1_len = strlen($ps1); # 配数1
-        #    $ps2 = (string)$codes_hz['ps_2']; $ps2_len = strlen($ps2); # 配数2
-        #    //p([$ps1_len, $ps2_len]);
-        #    $tmpPsWhere2 = ['OR'];
-        #    for ($x=0;$x<$ps1_len;$x++){
-        #        for ($y=0;$y<$ps2_len;$y++){
-        #            $p1Types = [1,2,3,4];
-        #            $p2Types = [1,2,3,4];
-        #            foreach ($p1Types as $p1Type){
-        #                foreach ($p2Types as $p2Type){
-        #                    if($p1Type == $p2Type) continue;
-        #                    $tmpPsWhere2 = array_merge($tmpPsWhere2, [
-        #                        ['AND',
-        #                            ['=', 'code_'.$p1Type, $ps1[$x] ],
-        #                            ['=', 'code_'.$p2Type, $ps2[$y] ]
-        #                        ]
-        #                    ]);
-        #                    //$tmpPsWhere2 = array_merge($tmpPsWhere1, [$tmpPsWhere1]);
-        #                }
-        #                //p($tmpPsWhere2);
-        #            }
-        #        }
-        #    }
-        #    $where = array_merge($where, [$tmpPsWhere2]);
-        #}
+        $where = NumService::getHeFenWhere($codes_hz, $where, $code_type);  # 定位合分
         $where = NumService::getPeiShuWhere($codes_hz, $where, $code_type);  # 配数
-        #p($where);
-
         $where = NumService::getPosOddWhere($codes_hz, $where);  # 筛选位置：单
         $where = NumService::getPosEvenWhere($codes_hz, $where);  # 筛选位置：双
         $where = NumService::getPosBigWhere($codes_hz, $where);  # 筛选位置：大
@@ -1276,7 +1213,7 @@ class NumService extends BaseService {
                 }
                 $codes_hefen = array_merge($codes_hefen, $hefenArr);
             }
-            $where = array_merge($where, [ ['IN', 'codes_hz', $codes_hefen ] ]);
+            $where = array_merge($where, [ ['IN', 'codes_hz', $codes_hefen] ]);
         }
 
         # 单双类型：1122，1212，2222 等，总共16种
@@ -1850,20 +1787,52 @@ class NumService extends BaseService {
     }
 
     /**
-     * @param int $pos
-     * @param array $codes
-     * @param array $code_hz
+     * 定位合分
+     * @param $codes_hz
+     * @param $where
+     * @param $code_type
      * @return array
      */
-    public static function getFixedPosNums($pos=1, $codes=[], $codes_hz=[]){
-        if(isset($codes_hz['fixed_sel_pos']) && $codes_hz['fixed_sel_pos']){
-            $fixed_sel_pos = explode(',', $codes_hz['fixed_sel_pos']);
-            if(in_array($pos, $fixed_sel_pos)){
-                $codes = NumService::$ALL_CODES;
+    public static function getHeFenWhereBak($codes_hz, $where, $code_type){
+        # 定位合分
+        if($code_type == 3 && isset($codes_hz['hefen_pos1']) && isset($codes_hz['hefen1']) && !empty($codes_hz['hefen_pos']) && !empty($codes_hz['hefen1'])){
+            # 三定
+            $poss = explode(',', $codes_hz['hefen_pos1']);
+            $lenHefen = strlen($codes_hz['hefen1']);
+            $hf_codes_hzs = [];
+            for ($i=0; $i<$lenHefen; $i++){
+                if($codes_hz['hefen1'][$i]<=7){
+                    $hefenArr = [$codes_hz['hefen1'][$i], $codes_hz['hefen1'][$i] + 10, $codes_hz['hefen'][$i] + 20];
+                }else{
+                    $hefenArr = [$codes_hz['hefen1'][$i], $codes_hz['hefen1'][$i] + 10];
+                }
+                $hf_codes_hzs = array_merge($hf_codes_hzs, $hefenArr);
             }
+            $codes_str = '';
+            foreach ($poss as $pos){
+                $codes_str .= '`code_'.$pos.'`' . ' +';
+                $where = array_merge($where, [['<>', 'code_'.$pos, 'X']]);
+            }
+            $codes_str = rtrim(trim($codes_str), '+');
+            $where = array_merge($where, [ ['IN', '('.$codes_str.')', $hf_codes_hzs ] ]);
+            //$query->andWhere($andWhere);
+        }if($code_type == 4 && isset($codes_hz['hefen_pos1']) && isset($codes_hz['hefen1']) && !empty($codes_hz['hefen_pos1']) && !empty($codes_hz['hefen1'])){
+            # 四定
+            $poss = explode(',', $codes_hz['hefen_pos1']);
+            $lenPos = count($poss);
+            $hf_codes_hzs = self::getHezhisByHefen($codes_hz['hefen1'], $lenPos);
+
+            $codes_str = '';
+            foreach ($poss as $pos){
+                $codes_str .= '`code_'.$pos.'`' . ' + ';
+                $where = array_merge($where, [['<>', 'code_'.$pos, 'X']]);
+            }
+            $codes_str = rtrim(trim($codes_str), '+');
+            $where = array_merge($where, [ ['IN', '('.$codes_str.')', $hf_codes_hzs ] ]);
+            //p([$poss, $codes_hz['hefen'], $hf_codes_hzs]);
         }
 
-        return $codes;
+        return $where;
     }
 
     /**
@@ -2019,7 +1988,7 @@ class NumService extends BaseService {
     }
 
     /**
-     * @param $hefens 1234  合分值
+     * @param $hefens 1234  合分值:34569
      * @param int $lenHefen 位置个数
      * @param $code_type 1一定2二定3三定4四定
      * @return array
@@ -2054,6 +2023,83 @@ class NumService extends BaseService {
         }
 
         return $hezhis;
+    }
+
+    /**
+     * 定位合分
+     * @param $codes_hz
+     * @param $where
+     * @param $code_type
+     * @return array
+     */
+    public static function getHeFenWhere($codes_hz, $where, $code_type=4){
+        $codes_hz = \backend\service\NumService::getHefenInitData($codes_hz, $code_type);
+        if(empty($codes_hz['hfDatas'])){
+            return $where;
+        }
+
+        $allHfWhere = ['AND'];
+        foreach ($codes_hz['hfDatas'] as $hfData){
+            $allHfSubWhere = ['OR'];
+            $positions_str = '(`code_'.implode('` + `code_', $hfData['pos']).'`)';
+            foreach ($hfData['hefens'] as $hefen){
+                $allHfSubWhere[] = ['IN', $positions_str, $hefen];
+            }
+            $allHfWhere[] = $allHfSubWhere;
+        }
+
+        # 定位合分
+        if($codes_hz['fixed_pos_hefen_sel'] == NumService::HE_FEN_EXCLUDE){
+            # 配数除，条件组装
+            $where = array_merge($where, [['NOT', $allHfWhere]]);
+        }elseif($codes_hz['fixed_pos_hefen_sel'] == NumService::HE_FEN_OBTAIN){
+            # 配数取，条件组装
+            $where[] = $allHfWhere;
+        }
+        //p($where);
+
+        return $where;
+    }
+
+
+    /**
+     * @param array $codes_hz
+     * @param int $code_type
+     */
+    private static function getHefenInitData($codes_hz=[], $code_type=4){
+        $hfDatas = [];
+        if(!empty($codes_hz['hefen_pos1']) && !empty($codes_hz['hefen1'])){
+            $hfDatas[] = ['pos'=>explode(',', $codes_hz['hefen_pos1']), 'hefens'=>NumService::getHefens($codes_hz['hefen1'])];
+            unset($codes_hz['hefen_pos1'], $codes_hz['hefen1']);
+        }
+        if(!empty($codes_hz['hefen_pos2']) && !empty($codes_hz['hefen2'])){
+            $hfDatas[] = ['pos'=>explode(',', $codes_hz['hefen_pos2']), 'hefens'=>NumService::getHefens($codes_hz['hefen2'])];
+            unset($codes_hz['hefen_pos2'], $codes_hz['hefen2']);
+        }
+        if(!empty($codes_hz['hefen_pos3']) && !empty($codes_hz['hefen3'])){
+            $hfDatas[] = ['pos'=>explode(',', $codes_hz['hefen_pos3']), 'hefens'=>NumService::getHefens($codes_hz['hefen3'])];
+            unset($codes_hz['hefen_pos3'], $codes_hz['hefen3']);
+        }
+        if(!empty($codes_hz['hefen_pos4']) && !empty($codes_hz['hefen4'])){
+            $hfDatas[] = ['pos'=>explode(',', $codes_hz['hefen_pos4']), 'hefens'=>NumService::getHefens($codes_hz['hefen4'])];
+            unset($codes_hz['hefen_pos4'], $codes_hz['hefen4']);
+        }
+        $codes_hz['hfDatas'] = $hfDatas;
+
+        return $codes_hz;
+    }
+
+    private static function getHefens($hefen_str='', $code_type=4){
+        $hefenArr = [];
+        if(empty($hefen_str)){
+            return $hefenArr;
+        }
+        for($i=0; $i<strlen($hefen_str); $i++){
+            $hf = (int)$hefen_str[$i];
+            $hefenArr[] = [$hf, $hf+10, $hf+20, $hf+30];
+        }
+
+        return $hefenArr;
     }
 
     /**

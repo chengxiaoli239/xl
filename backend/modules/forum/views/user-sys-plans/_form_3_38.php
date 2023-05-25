@@ -114,26 +114,14 @@ $this->title = '新过滤快打';
                 <div class="row">
                     <div class="col-lg-3 col-xs-6">
                         <!--位置合分：位置-- >
-                    <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>
+                    <?= $form->field($model, 'hefen_pos1')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>
                     </div>
                     <div class="col-lg-3 col-xs-6">
                         <!--位置合分：合分-- >
-                    <?= $form->field($model, 'hefen')->textInput()->label('1.1定位合分:值')?>
+                    <?= $form->field($model, 'hefen1')->textInput()->label('1.1定位合分:值')?>
                     </div>
                 </div>
                 -->
-                <!--位置合分：位置2-->
-                <!--?= $form->field($model, 'hefen_pos2')->checkboxList($hefen_pos)->label('1.2定位合分取:位置') ?-->
-                <!--位置合分：合分2-->
-                <!--?= $form->field($model, 'hefen2')->textInput()->label('1.2定位合分:值')?-->
-                <!--位置合分：位置3-->
-                <!--?= $form->field($model, 'hefen_pos3')->checkboxList($hefen_pos)->label('1.3定位合分取:位置') ?-->
-                <!--位置合分：合分3-->
-                <!--?= $form->field($model, 'hefen3')->textInput()->label('1.3定位合分:值')?-->
-                <!--位置合分：位置4-->
-                <!--?= $form->field($model, 'hefen_pos4')->checkboxList($hefen_pos)->label('1.4定位合分取:位置') ?-->
-                <!--位置合分：合分4-->
-                <!--?= $form->field($model, 'hefen4')->textInput()->label('1.4定位合分:值')?-->
 
                 <!--
                 <div class="row">

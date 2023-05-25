@@ -60,11 +60,11 @@ use yii\widgets\ActiveForm;
                 <div class="row">
                     <div class="col-lg-1 col-xs-6">
                         <!--位置合分：位置-->
-                        <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>
+                        <?= $form->field($model, 'hefen_pos1')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>
                     </div>
                     <div class="col-lg-2 col-xs-6">
                         <!--位置合分：合分-->
-                        <?= $form->field($model, 'hefen')->textInput()->label('1.1定位合分:值')?>
+                        <?= $form->field($model, 'hefen1')->textInput()->label('1.1定位合分:值')?>
                     </div>
                     <div class="col-lg-2 col-xs-6">
                         <!--位置合分：位置2-->

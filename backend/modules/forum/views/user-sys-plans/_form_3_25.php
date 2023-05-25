@@ -104,29 +104,54 @@ use yii\widgets\ActiveForm;
                 <!--配数表单引入-->
                 <?php include(dirname(__FILE__).'/peishu_form.php'); ?>
 
+                <!--大小、单双模板引入-->
+                <?php include(dirname(__FILE__).'/dw_hefen_form.php');?>
+
                 <div class="row">
-                    <div class="col-lg-3 col-xs-4">
-                        <!--三定含除、取-->
-                        <?= $form->field($model, 'arise_in_sel')->checkboxList([1=>'除',2=>'取'])->label('3.四字定含') ?>
-                    </div>
-                    <div class="col-lg-3 col-xs-6">
-                        <?= $form->field($model, 'arise_in')->textInput()->label('3.四字定含')?>
-                    </div>
-                    <div class="col-lg-3 col-xs-4">
-                        <!--位置合分：位置-->
-                        <?= $form->field($model, 'hefen_pos')->checkboxList($hefen_pos)->label('1.1定位合分:取') ?>
-                    </div>
-                    <div class="col-lg-3 col-xs-6">
-                        <!--位置合分：合分-->
-                        <?= $form->field($model, 'hefen')->textInput()->label('1.1定位合分:值')?>
-                    </div>
-                    <div class="col-lg-3 col-xs-4">
+                    <div class="col-lg-2 col-xs-4">
                         <!--两数合、三数合-->
-                        <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList([1=>'两数',2=>'三数'])->label('2.不定位合分') ?>
+                        <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList(
+                            [1=>'两数',2=>'三数'],
+                            [
+                                'item' => function ($index, $label, $name, $checked, $value) {
+                                    $options = [
+                                        #'class' => 'ps_sel',
+                                        'class' => 'checkbox-item',
+                                        'label' => $label,
+                                        'value' => $value,
+                                        'checked' => $checked,
+                                    ];
+
+                                    return Html::checkbox($name, $checked, $options);
+                                }
+                            ]
+                        )->label('2.不定位合分') ?>
                     </div>
-                    <div class="col-lg-3 col-xs-6">
+                    <div class="col-lg-2 col-xs-6">
                         <!--位置合分：合分-->
                         <?= $form->field($model, 'no_fix_hefen')->textInput()->label('2.不定位合分:值')?>
+                    </div>
+                    <div class="col-lg-2 col-xs-4">
+                        <!--三定含除、取-->
+                        <?= $form->field($model, 'arise_in_sel')->checkboxList(
+                            [1=>'除',2=>'取'],
+                            [
+                                'item' => function ($index, $label, $name, $checked, $value) {
+                                    $options = [
+                                        #'class' => 'ps_sel',
+                                        'class' => 'checkbox-item',
+                                        'label' => $label,
+                                        'value' => $value,
+                                        'checked' => $checked,
+                                    ];
+
+                                    return Html::checkbox($name, $checked, $options);
+                                }
+                            ]
+                        )->label('3.四字定含') ?>
+                    </div>
+                    <div class="col-lg-2 col-xs-6">
+                        <?= $form->field($model, 'arise_in')->textInput()->label('3.四字定含')?>
                     </div>
                 </div>
                 <!--位置合分：位置2-->

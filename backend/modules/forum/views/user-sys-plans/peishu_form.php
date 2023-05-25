@@ -7,7 +7,7 @@ use yii\widgets\ActiveForm;
 /* @var $model backend\models\UserSysPlans */
 /* @var $form yii\widgets\ActiveForm */
 ?>
-<div class="row">
+<div class="row" style="border-width:1px;margin-top:3px;border-style:solid;border-color: red;">
     <div class="col-lg-1 col-xs-6">
         <!--?= $form->field($model, 'ps_sel')->checkboxList([1=>'除',2=>'取'])->label('配数全转') ?-->
         <?= $form->field($model, 'ps_sel')->checkboxList(

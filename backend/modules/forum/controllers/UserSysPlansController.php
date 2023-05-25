@@ -304,7 +304,7 @@ class UserSysPlansController extends BaseController
                 $model->import_codes_txts = $codes;
             }
             foreach ($hz_Arr_Data as $key=>$val){
-                if(in_array($key, ['hefen_pos', 'no_fix_henfen_pos', 'fixed_sel_pos', 'arise_in_sel', 'odd_pos', 'even_pos', 'big_pos', 'small_pos'])){
+                if(in_array($key, ['hefen_pos1', 'hefen_pos2', 'hefen_pos3', 'hefen_pos4', 'no_fix_henfen_pos', 'fixed_sel_pos', 'arise_in_sel', 'odd_pos', 'even_pos', 'big_pos', 'small_pos'])){
                     $model->$key = explode(',', $val);
                 }else{
                     $model->$key = $val;

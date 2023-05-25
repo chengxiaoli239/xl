@@ -70,6 +70,9 @@ use yii\widgets\ActiveForm;
                     </div>
                 </div>
 
+                <!--配数表单引入-->
+                <?php include(dirname(__FILE__).'/peishu_form.php'); ?>
+
                     <!--?= $form->field($model, 'tz_type')->textInput() ?-->
                     <!-- 1大小单双三字定2大小三字定3单双三字定 -->
                     <!--?= $form->field($model, 'tz_type')->radioList($kArr)->label('投注类型') ?-->
@@ -112,6 +115,8 @@ use yii\widgets\ActiveForm;
                     ])->label('对数') ?>
                     </div>
                 </div>
+                <!--大小、单双模板引入-->
+                <?php include(dirname(__FILE__).'/dx_ds.php');?>
 
                     <!--止盈止损-->
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
@@ -134,3 +139,12 @@ use yii\widgets\ActiveForm;
         </section>
     </div>
 </div>
+<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<script>
+    $(function () {
+        $('.checkbox-item').click(function() {
+            var name = $(this).attr('name');
+            $('input[name="' + name + '"]').not(this).prop('checked', false);
+        });
+    });
+</script>

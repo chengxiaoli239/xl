@@ -53,8 +53,6 @@ use yii\widgets\ActiveForm;
         <!--位置-->
         <?= $form->field($model, 'even_pos')->checkboxList($sel_pos)->label('双:位置') ?>
     </div>
-</div>
-<div class="row">
     <div class="col-lg-1 col-xs-6">
         <!--位置筛选：大-->
         <?= $form->field($model, 'big_sel')->checkboxList(
