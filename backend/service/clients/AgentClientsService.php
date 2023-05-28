@@ -142,6 +142,18 @@ class AgentClientsService extends ClientsBaseService{
     public static function getKuaiYiDescByOperationLogs($bet_log=''){
         $playway = self::getPlaywayByBetLogs($bet_log);
 
-        return [$playway, $kuaiYiDesc];
+        if(strpos($bet_log, '固定合分除值' !== false)){
+            if(strpos($bet_log, '固定合分除值：，') !== false){
+            }else{
+
+            }
+        }
+
+        $data = [
+            'playway' => $playway,
+            'kuaiYiDesc' => $kuaiYiDesc
+        ];
+
+        return [0, $data, $err_msg];
     }
 }

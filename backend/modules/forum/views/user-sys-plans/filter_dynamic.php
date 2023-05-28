@@ -65,6 +65,9 @@
 <strong><font color="blue">41、过滤1234最近两单两双200组直码：</font></strong>比如上期开：固定每期过滤，最近开的两单两双200组直码
 <strong><font color="blue">42、过滤1234最近两大两小500组直码：</font></strong>比如上期开：固定每期过滤，最近开的两大两小500组直码
 <strong><font color="blue">43、过滤1234最近两单两双500组直码：</font></strong>比如上期开：固定每期过滤，最近开的两单两双500组直码
+<strong><font color="blue">44、过滤1234最近500组直码：</font></strong>比如上期开：固定每期过滤，最近开的500组直码
+<strong><font color="blue">45、过滤1234最近300组直码：</font></strong>比如上期开：固定每期过滤，最近开的300组直码
+<strong><font color="blue">46、过滤1234最近50期全倒：</font></strong>最近50期开过的号码全倒，重复情况不够50期的往前继续搜集够50期
                 </code></pre>
             </div>
             <div class="modal-footer">

@@ -142,6 +142,9 @@ class NumService extends BaseService {
         52=>'过滤1234最近两单两双200组直码 ',
         53=>'过滤1234最近两大两小500组直码 ',
         54=>'过滤1234最近两单两双500组直码 ',
+        55=>'过滤1234最500组直码 ',
+        56=>'过滤1234最300组直码 ',
+        57=>'过滤前50期开过号码的全转(四定)',
     ];
 
     /**
@@ -2376,8 +2379,12 @@ class NumService extends BaseService {
             }
         }
 
+        if(empty($hz_Arr['arise_in'])){
+            $desc .= ' 含:'.$hz_Arr['arise_in'];
+        }
+
         if(!empty($filter11)){
-            $desc .= '定位含:';
+            $desc .= ' 定位含:';
             $desc .= $filter11['sel'] == 1 ? '除' : '取';
             $desc .= $filter11['val'];
         }
@@ -2556,7 +2563,6 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic11($plan, $lottery_type);
                     break;
                 case 12: # 过滤后4最近2880组(四定)，不够往后搜集
-                    #$codes = NumService::getBeforeKjCodesDynamic12($plan, $lottery_type);
                     $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[2,3,4,5]);
                     break;
                 case 13: # 过滤最近10000期重复2次以上的直码(四定)
@@ -2687,6 +2693,15 @@ class NumService extends BaseService {
                     break;
                 case 54: # 过滤最近x组单双类型(四定)
                     $codes = NumService::getBeforeKjCodesDynamic42($plan, $type_field='type_4ds', $type_val=3, $positions=[1,2,3,4], $filterNums=500); #
+                    break;
+                case 55: # 过滤最近500组(四定)，不够往后搜集
+                    $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,3,4], $filterNums=500);
+                    break;
+                case 56: # 过滤最近300组(四定)，不够往后搜集
+                    $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,3,4], $filterNums=300);
+                    break;
+                case 57: # 过滤前50期开过号码的全转
+                    $codes = NumService::getBeforeKjCodesDynamic7($plan, $lottery_type, $num=50);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
