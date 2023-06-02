@@ -58,40 +58,8 @@ use yii\widgets\ActiveForm;
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-lg-3 col-xs-6">
-                        <?= $form->field($model, 'p1')->textInput()->label('千
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_1">大</a>
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_2">小</a>
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_1">单</a>
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_2">双</a>
-                        ') ?>
-                    </div>
-                    <div class="col-lg-3 col-xs-6">
-                        <?= $form->field($model, 'p2')->textInput()->label('百
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_1">大</a>
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_2">小</a>
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_1">单</a>
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_2">双</a>
-                        ') ?>
-                    </div>
-                    <div class="col-lg-3 col-xs-6">
-                        <?= $form->field($model, 'p3')->textInput()->label('十
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_1">大</a>
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_2">小</a>
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_1">单</a>
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_2">双</a>
-                        ') ?>
-                    </div>
-                    <div class="col-lg-3 col-xs-6">
-                        <?= $form->field($model, 'p4')->textInput()->label('个
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_1">大</a>
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_dx_2">小</a>
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_1">单</a>
-                            <a href="javascript:;" class="btn btn-xs btn-info code_type_ds_2">双</a>
-                        ') ?>
-                    </div>
-                </div>
+                <!--固定位置模板引入-->
+                <?php include(dirname(__FILE__).'/fixed_positions.php');?>
 
                 <!--?= $form->field($model, 'tz_type')->textInput() ?-->
                 <!-- 1大小单双三字定2大小三字定3单双三字定 -->
@@ -104,7 +72,7 @@ use yii\widgets\ActiveForm;
                 <!--配数表单引入-->
                 <?php include(dirname(__FILE__).'/peishu_form.php'); ?>
 
-                <!--大小、单双模板引入-->
+                <!--定位合分模板引入-->
                 <?php include(dirname(__FILE__).'/dw_hefen_form.php');?>
 
                 <div class="row">

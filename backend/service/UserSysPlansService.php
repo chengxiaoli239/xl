@@ -87,9 +87,13 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['p5']);
 
+        # 定位置：千、百、十、个
+        if($UserSysPlans['fixed_pos_sel'] && count($UserSysPlans['fixed_pos_sel']) == 1){
+            $tmpFilter['fixed_pos_sel'] = (int)$UserSysPlans['fixed_pos_sel'][0];
+        }
         # 配数
         if($UserSysPlans['ps_sel'] && count($UserSysPlans['ps_sel']) == 1){
-            $tmpFilter['ps_sel'] = $UserSysPlans['ps_sel'][0];
+            $tmpFilter['ps_sel'] = (int)$UserSysPlans['ps_sel'][0];
         }
         unset($post['UserSysPlans']['ps_sel']);
         # 15、配数1
@@ -120,7 +124,7 @@ class UserSysPlansService extends BaseService {
 
         # 筛选位置：单
         if($UserSysPlans['odd_sel'] && count($UserSysPlans['odd_sel']) == 1){
-            $tmpFilter['odd_sel'] = $UserSysPlans['odd_sel'][0];
+            $tmpFilter['odd_sel'] = (int)$UserSysPlans['odd_sel'][0];
         }
         unset($post['UserSysPlans']['odd_sel']);
         if($UserSysPlans['odd_pos'] && count($UserSysPlans['odd_pos']) > 0){
@@ -129,7 +133,7 @@ class UserSysPlansService extends BaseService {
         unset($post['UserSysPlans']['odd_pos']);
         # 筛选位置：双
         if($UserSysPlans['even_sel'] && count($UserSysPlans['even_sel']) == 1){
-            $tmpFilter['even_sel'] = $UserSysPlans['even_sel'][0];
+            $tmpFilter['even_sel'] = (int)$UserSysPlans['even_sel'][0];
         }
         unset($post['UserSysPlans']['even_sel']);
         if($UserSysPlans['even_pos'] && count($UserSysPlans['even_pos']) > 0){
@@ -138,7 +142,7 @@ class UserSysPlansService extends BaseService {
         unset($post['UserSysPlans']['even_pos']);
         # 筛选位置：大
         if($UserSysPlans['big_sel'] && count($UserSysPlans['big_sel']) == 1){
-            $tmpFilter['big_sel'] = $UserSysPlans['big_sel'][0];
+            $tmpFilter['big_sel'] = (int)$UserSysPlans['big_sel'][0];
         }
         unset($post['UserSysPlans']['big_sel']);
         if($UserSysPlans['big_pos'] && count($UserSysPlans['big_pos']) > 0){
@@ -147,7 +151,7 @@ class UserSysPlansService extends BaseService {
         unset($post['UserSysPlans']['big_pos']);
         # 筛选位置：小
         if($UserSysPlans['small_sel'] && count($UserSysPlans['small_sel']) == 1){
-            $tmpFilter['small_sel'] = $UserSysPlans['small_sel'][0];
+            $tmpFilter['small_sel'] = (int)$UserSysPlans['small_sel'][0];
         }
         unset($post['UserSysPlans']['small_sel']);
         if($UserSysPlans['small_pos'] && count($UserSysPlans['small_pos']) > 0){
@@ -345,9 +349,9 @@ class UserSysPlansService extends BaseService {
 
         # 定位合分 -------  start  ------------
         if($UserSysPlans['fixed_pos_hefen_sel'] && count($UserSysPlans['fixed_pos_hefen_sel']) == 1){
-            $tmpFilter['fixed_pos_hefen_sel'] = $UserSysPlans['fixed_pos_hefen_sel'][0];
+            $tmpFilter['fixed_pos_hefen_sel'] = (int)$UserSysPlans['fixed_pos_hefen_sel'][0];
         }
-        if($UserSysPlans['hefen_pos1'] && count($UserSysPlans['hefen_pos1']) > 0){
+        if($UserSysPlans['hefen_pos1'] && count($UserSysPlans['hefen_pos1'])>0){
             $tmpFilter['hefen_pos1'] = implode(',', $post['UserSysPlans']['hefen_pos1']); # 合分位置
         }
         unset($post['UserSysPlans']['hefen_pos1']);
@@ -395,16 +399,16 @@ class UserSysPlansService extends BaseService {
             unset($post['UserSysPlans']['hz_Arr']);
         }elseif (in_array($tz_type, [29, 32])){ # 三定-快选 、三定快译切换
             # 三定-快选过滤
-            # 15.1、合分位置
-            if($UserSysPlans['hefen_pos1'] && count($UserSysPlans['hefen_pos1']) > 0){
-                $tmpFilter['hefen_pos1'] = implode(',', $post['UserSysPlans']['hefen_pos1']); # 合分位置
-            }
-            unset($post['UserSysPlans']['hefen_pos1']);
-            # 15.2、合分值
-            if(isset($post['UserSysPlans']['hefen1']) && $post['UserSysPlans']['hefen1']){
-                $tmpFilter['hefen1'] = $post['UserSysPlans']['hefen1']; # 合分
-            }
-            unset($post['UserSysPlans']['hefen1']);
+            ## 15.1、合分位置
+            #if($UserSysPlans['hefen_pos1'] && count($UserSysPlans['hefen_pos1']) > 0){
+            #    $tmpFilter['hefen_pos1'] = implode(',', $post['UserSysPlans']['hefen_pos1']); # 合分位置
+            #}
+            #unset($post['UserSysPlans']['hefen_pos1']);
+            ## 15.2、合分值
+            #if(isset($post['UserSysPlans']['hefen1']) && $post['UserSysPlans']['hefen1']){
+            #    $tmpFilter['hefen1'] = $post['UserSysPlans']['hefen1']; # 合分
+            #}
+            #unset($post['UserSysPlans']['hefen1']);
 
             # 16.1、不定位合分:位置
             if($UserSysPlans['no_fix_hefen_pos'] && count($UserSysPlans['no_fix_hefen_pos']) == 1){
@@ -419,7 +423,7 @@ class UserSysPlansService extends BaseService {
 
             # 17.1、三定含：除、取
             if(!empty($UserSysPlans['arise_in_sel']) && count($UserSysPlans['arise_in_sel']) == 1){
-                $tmpFilter['arise_in_sel'] = $UserSysPlans['arise_in_sel'][0];
+                $tmpFilter['arise_in_sel'] = (int)$UserSysPlans['arise_in_sel'][0];
             }
             unset($post['UserSysPlans']['arise_in_sel']);
             # 17.2、含
@@ -489,7 +493,7 @@ class UserSysPlansService extends BaseService {
 
             # 17.1、三定含：除、取
             if(!empty($UserSysPlans['arise_in_sel']) && count($UserSysPlans['arise_in_sel']) == 1){
-                $tmpFilter['arise_in_sel'] = $UserSysPlans['arise_in_sel'][0];
+                $tmpFilter['arise_in_sel'] = (int)$UserSysPlans['arise_in_sel'][0];
             }
             unset($post['UserSysPlans']['arise_in_sel']);
             # 17.2、含
@@ -872,6 +876,7 @@ class UserSysPlansService extends BaseService {
     public static function getSysPlansTypeDatas($playway = 3, $tz_type='', $uid=''){
         $data = [];
         $data['sel_pos'] = [1=>'',2=>'',3=>'',4=>''];
+        $data['hefen_pos'] = [1=>'',2=>'',3=>'',4=>''];
         if($playway ==1){
             $hzArr = [];
             for ($i = 0; $i <= 18; $i++) {
@@ -884,9 +889,7 @@ class UserSysPlansService extends BaseService {
                 $hzArr[$i] = $i;
             }
             $data['hzArr'] = $hzArr;
-            $data['hefen_pos'] = [1=>'',2=>'',3=>'',4=>''];
         }elseif($playway ==3){
-            $data['hefen_pos'] = [1=>'',2=>'',3=>'',4=>''];
             if($tz_type<20){
                 $kArr = StaticService::$kArr;
                 unset($kArr[0], $kArr[1], $kArr[10], $kArr[11], $kArr[21], $kArr[22]);
@@ -1060,7 +1063,7 @@ class UserSysPlansService extends BaseService {
             $yls = [];
             foreach ($ids as $id){
                 $plan = UserSysPlans::findOne($id);
-                $codes = BetService::getPlansAllCodesType1($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+                $codes = BetService::getPlansAllCodesType1($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);
                 $yl = StaticService::getYlByCodes($codes, $lottery_type, $plan->tz_type);
                 $key = array_search($plan->single, $singleArr);
 

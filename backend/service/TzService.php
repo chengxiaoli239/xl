@@ -73,7 +73,7 @@ class TzService extends BaseService {
         $plan = UserSysPlans::findOne($plan_id);
 
         # 0898体系投注号码，系统正买按照0898格式下单
-        $codes = BetService::getPlansAllCodesType1($plan->tz_type, 1, $plan->sel_same, $plan->hz_Arr, $plan_id);
+        $codes = BetService::getPlansAllCodesType1($plan->tz_type, 1, $plan->hz_Arr, $plan_id);
 
         # 期号
         $qihao = HN0898Service::getQihao($plan->lottery_type);

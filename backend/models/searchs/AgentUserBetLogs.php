@@ -19,7 +19,7 @@ class AgentUserBetLogs extends AgentUserBetLogsModel
     {
         return [
             [['id', 'uid', 'wp_record_id', 'member_id', 'bet_counts', 'bet_op_counts', 'bet_type', 'playway', 'status', 'tz_system_id', 'created_at', 'updated_at'], 'integer'],
-            [['access_token', 'account', 'bet_logs', 'bet_logs_n', 'bet_codes', 'bet_codes_op', 'desc', 'lottery_type', 'qihao', 'member_bet_time', 'update_time'], 'safe'],
+            [['access_token', 'account', 'bet_logs', 'bet_logs_n', 'bet_logs_codes_hz', 'bet_codes', 'bet_codes_op', 'desc', 'lottery_type', 'qihao', 'member_bet_time', 'update_time'], 'safe'],
             [['bet_single', 'bet_money', 'bet_op_single', 'bet_op_money'], 'number'],
         ];
     }
@@ -84,6 +84,7 @@ class AgentUserBetLogs extends AgentUserBetLogsModel
             ->andFilterWhere(['like', 'account', $this->account])
             ->andFilterWhere(['like', 'bet_logs', $this->bet_logs])
             ->andFilterWhere(['like', 'bet_logs_n', $this->bet_logs_n])
+            ->andFilterWhere(['like', 'bet_logs_codes_hz', $this->bet_logs_codes_hz])
             ->andFilterWhere(['like', 'bet_codes', $this->bet_codes])
             ->andFilterWhere(['like', 'bet_codes_op', $this->bet_codes_op])
             ->andFilterWhere(['like', 'desc', $this->desc])

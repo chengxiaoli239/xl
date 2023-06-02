@@ -55,43 +55,14 @@ use yii\widgets\ActiveForm;
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-lg-3 col-xs-6">
-                        <?= $form->field($model, 'p1')->textInput()->label('千') ?>
-                    </div>
-                    <div class="col-lg-3 col-xs-6">
-                        <?= $form->field($model, 'p2')->textInput()->label('百') ?>
-                    </div>
-                    <div class="col-lg-3 col-xs-6">
-                        <?= $form->field($model, 'p3')->textInput()->label('十') ?>
-                    </div>
-                    <div class="col-lg-3 col-xs-6">
-                        <?= $form->field($model, 'p4')->textInput()->label('个') ?>
-                    </div>
-                </div>
+                <!--固定位置模板引入-->
+                <?php include(dirname(__FILE__).'/fixed_positions.php');?>
 
                 <!--配数表单引入-->
                 <?php include(dirname(__FILE__).'/peishu_form.php'); ?>
 
-                    <!--?= $form->field($model, 'tz_type')->textInput() ?-->
-                    <!-- 1大小单双三字定2大小三字定3单双三字定 -->
-                    <!--?= $form->field($model, 'tz_type')->radioList($kArr)->label('投注类型') ?-->
-
-                    <!--?= $form->field($model, 'buy_type')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'tz_sites')->textInput(['maxlength' => true]) ?-->
-
-                <!--动态过滤号码-->
-                <?php include(dirname(__FILE__).'/filter_dynamic.php'); # 动态过滤号码 ?>
-
-                <div class="row">
-                    <div class="col-lg-6 col-xs-12">
-                        <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
-                    </div>
-                    <div class="col-lg-6 col-xs-12">
-                        <?= $form->field($model, 'hz')->checkboxList($hzArr)->label('投注类型(和值)') ?>
-                    </div>
-                </div>
+                <!--定位合分模板引入-->
+                <?php include(dirname(__FILE__).'/dw_hefen_form.php');?>
 
                 <div class="row">
                     <div class="col-lg-3 col-xs-4">
@@ -118,22 +89,32 @@ use yii\widgets\ActiveForm;
                 <!--大小、单双模板引入-->
                 <?php include(dirname(__FILE__).'/dx_ds.php');?>
 
-                    <!--止盈止损-->
-                    <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
-
-                    <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
-
-                    <!--?= $form->field($model, 'created_at')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'updated_at')->textInput() ?-->
-
-                    <!--?= $form->field($model, 'update_time')->textInput() ?-->
-
-                    <div class="form-group">
-                        <div class="col-lg-offset-2 col-lg-10">
-                            <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>
-                        </div>
+                <div class="row">
+                    <div class="col-lg-6 col-xs-12">
+                        <?= $form->field($model, 'hz')->checkboxList($hzArr)->label('投注类型(和值)') ?>
                     </div>
+                    <div class="col-lg-6 col-xs-12">
+                        <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
+                    </div>
+                </div>
+
+
+                <!--止盈止损-->
+                <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
+
+                <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
+
+                <!--?= $form->field($model, 'created_at')->textInput() ?-->
+
+                <!--?= $form->field($model, 'updated_at')->textInput() ?-->
+
+                <!--?= $form->field($model, 'update_time')->textInput() ?-->
+
+                <div class="form-group">
+                    <div class="col-lg-offset-2 col-lg-10">
+                        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>
+                    </div>
+                </div>
                 <?php ActiveForm::end(); ?>
             </div>
         </section>

@@ -20,6 +20,7 @@ use backend\modules\kj\controllers\BingDaoController;
 use backend\service\baota\BaoTaService;
 use backend\service\BetService;
 use backend\service\ChatCommonBetService;
+use backend\service\clients\AgentClientsService;
 use backend\service\clients\TzSystemUsersService;
 use backend\service\datas\DatasClearService;
 use backend\service\FootBallService;
@@ -342,6 +343,15 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $txt = '[四定位]，配数“[取]”：第1位：[012345]，第2位：[56789]，二兄弟“[取]”操作，三兄弟“[除]”操作';
+        $bet_log = str_replace(['[', ']'], '', $txt);
+        p($bet_log);
+
+        $text = '二定位，配数“取”：第1位：024658，固定合分取值：第1位选中，第2位选中，内容：0123456789；';
+        list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
+        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']));
+        p(['codes_hz'=>$data['codes_hz'], 'counts'=>count(explode('@', $codes)), 'codes'=>$codes]);
+        p([$code, $data, $err_msg]);
         $rst = self::getPermutations([1, 2, 3]);p($rst);
         $plan = UserSysPlans::findOne(6822);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
@@ -515,7 +525,7 @@ class IndexController extends Controller
         $plan = UserSysPlans::findOne(5119);
         $codes_hz_data = json_decode($plan->hz_Arr, true);
         //p($codes_hz_data, 0);
-        $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);p($codes);
+        $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, json_encode($codes_hz_data), $plan->id);p($codes);
         $BetService = new NineNineNewService();
         $betRst = $BetService->repeatErrorBet($task_id=427940);
         p($betRst);
@@ -526,7 +536,7 @@ class IndexController extends Controller
         $plan = UserSysPlans::findOne(4827);
         $codes_hz = '{"area_all_qishus":"13","area_yl_qishus":"10","area_profits":"450","area_loss":"3600","arise_A_times":0,"arise_B_times":0,"filters":{"filter_type":"2","filter_nums":"","test_period_days":10,"playway":"1","filter_poses":"","start_qihao":"220411014","lottery_type":"23"},"filter_dates":[],"filter_qihaos":[],"singles_key":0,"areaBetStatus":0,"area_arise_qishus":0}';
         $codes_hz_data = json_decode($codes_hz);
-        $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id);p($codes);
+        $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, json_encode($codes_hz_data), $plan->id);p($codes);
 
         p(array_keys(SscDataService::$dealDataStatusFields));
         $r = SscDataService::insertLotteryDealDataStatus($lottery_type=17);p($r);
@@ -1362,8 +1372,6 @@ class IndexController extends Controller
         }
         p($rst);
         $rst = BetService::getPlansAllCodesType1(3, 14);
-        p($rst);
-        $rst = BetService::getHzCodes(20, '25,26');
         p($rst);
         $rst = StaticService::static4DdsLastTime();
         p($rst);

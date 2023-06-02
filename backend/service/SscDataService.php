@@ -3856,7 +3856,7 @@ class SscDataService extends BaseService {
             }
             $last = $query->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
             $start_index_id = $last['last_id'] - $recent_qishus;
-            $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id); # 格式：0,0,X,X@0,2,X,X@2,0,X,X@0,4,X,X
+            $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, json_decode($plan->hz_Arr), $plan->id); # 格式：0,0,X,X@0,2,X,X@2,0,X,X@0,4,X,X
 
             $where = ['AND', ['=', 'lottery_type', $plan->lottery_type], ['>', 'index_id', $start_index_id]];
             $limit = min($recent_qishus, 100); # 最多100条

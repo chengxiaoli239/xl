@@ -8,7 +8,7 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 <!--大小、单双模板-->
-<div class="row">
+<div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color:greenyellow">
     <div class="col-lg-1 col-xs-6">
         <!--位置筛选：单-->
         <?= $form->field($model, 'odd_sel')->checkboxList(

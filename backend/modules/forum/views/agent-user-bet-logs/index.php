@@ -39,6 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'account',
                         //'bet_logs:ntext',
                         //'bet_logs_n:ntext',
+                        //'bet_logs_codes_hz',
                         //'bet_codes:ntext',
                         //'bet_counts',
                         //'bet_single',

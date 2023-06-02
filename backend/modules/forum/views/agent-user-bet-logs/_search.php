@@ -25,6 +25,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'bet_logs') ?>
 
+    <?php // echo $form->field($model, 'bet_logs_codes_hz') ?>
+
     <?php // echo $form->field($model, 'bet_codes') ?>
 
     <?php // echo $form->field($model, 'bet_codes_op') ?>

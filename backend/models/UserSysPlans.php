@@ -58,6 +58,8 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $arise; # 上奖
     public $get_arises; # 上奖：取
     public $remove_arises; # 上奖：除
+
+    public $fixed_pos_sel; #  定位置选项
     public $p1; # 第1位
     public $p2; # 第2位
     public $p3; # 第3位

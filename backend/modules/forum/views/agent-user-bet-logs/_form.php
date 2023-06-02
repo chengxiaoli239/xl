@@ -24,6 +24,7 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'bet_logs')->textarea(['rows' => 6]) ?>
 
+                    <?= $form->field($model, 'bet_logs_codes_hz')->textarea(['rows' => 6]) ?>
                     <?= $form->field($model, 'bet_codes')->textarea(['rows' => 6]) ?>
 
                     <?= $form->field($model, 'bet_codes_op')->textarea(['rows' => 6]) ?>

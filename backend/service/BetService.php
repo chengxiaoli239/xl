@@ -123,14 +123,13 @@ abstract class BetService extends BaseBetService {
      * @desc 获取投注号码
      * @param $playway
      * @param $tz_type
-     * @param $buy_type
+     * @param $buy_type 0反买1正买
      * @param float $single
-     * @param $sel_same
      * @param array|string $hz_Arr
      * @return string
      */
-    public static function getCodes($tz_type, $buy_type, $sel_same = 1, $hz_Arr = [], $plan_id = '', &$hzArr=''){
-        $codes = BetService::getPlansAllCodesType1($tz_type, $buy_type, $sel_same, $hz_Arr, $plan_id, $hzArr);
+    public static function getCodes($tz_type, $buy_type, $hz_Arr = [], $plan_id = ''){
+        $codes = BetService::getPlansAllCodesType1($tz_type, $buy_type, $hz_Arr, $plan_id);
 
         return $codes;
     }
@@ -782,14 +781,12 @@ abstract class BetService extends BaseBetService {
      * @desc 0898体系投注号码
      * @$playway 为3的时候，四字定： $kArr = [0=>'所有', 1=>'一双三单、一单三双', 2=>'两双两单', 3=>'四双四单', 4=>'一单三双', 5=>'一双三单', 6=>'一单三双|四双', 7=>'一双三单|四单', 8=>'四双', 9=>'四单', 10=>'单数量', 11=>'双数量', 12=>'一单三双|四单', 13=>'一双三单|四双', 14=>'一单三双|四单|四双', 15=>'一双三单|四单|四双'];
      * @param int $tz_type 投注类型(三字定):1大小单双三字定2大小三字定3单双三字定
-     * @param $buy_type 默认正买
-     * @param int $sel_same
+     * @param $buy_type 1正买0反买，默认正买
      * @param string $codes_hz
      * @param string $plan_id
-     * @param $hzArr
      * @return string
      */
-    public static function getPlansAllCodesType1($tz_type = 1, $buy_type = 1, $sel_same = 0, $codes_hz = '', $plan_id = '', &$hzArr){
+    public static function getPlansAllCodesType1($tz_type = 1, $buy_type = 1, $codes_hz = '', $plan_id = ''){
         $playway = BetService::getPlaywayByTzType($tz_type);
         //p([$tz_type, $buy_type, $sel_same, $codes_hz, $playway]);
         $m = \Yii::$app->cache;
@@ -797,17 +794,17 @@ abstract class BetService extends BaseBetService {
         # 排除类型
         BetService::getDynamicsHzArr($codes_hz_data, $plan_id);
         //p($codes_hz_data);
-        $codes_hz = $hzArr = json_encode($codes_hz_data);
+        $codes_hz = json_encode($codes_hz_data);
 
-        $plan = UserSysPlans::findOne($plan_id);
+        if(!empty($plan_id)){
+            $plan = UserSysPlans::findOne($plan_id);
+        }
         switch ($playway){
             case 4: # 一字定
                 // {"p1":"123","p2":"345","p3":"569","p4":"6589","p5":"1234"}
                 $codesArr = NumService::getOneFixedCode(json_decode($codes_hz, true));
-                if(in_array($plan->uid, \Yii::$app->params['ONE_FIXED_UIDS'])){
-                    $n = rand(0, 9);
-                    $codesArr[0] = str_replace($n, '', $codesArr[0]);
-                }
+                $n = rand(0, 9);
+                $codesArr[0] = str_replace($n, '', $codesArr[0]);
                 break;
             case 10: # 一字定
                 $codesArr = explode('@', $codes_hz);
@@ -844,8 +841,8 @@ abstract class BetService extends BaseBetService {
                         $params = ['playway'=>$playway, 'tz_type'=>$tz_type, 'status'=>$buy_type];
                         $SysPlansCodes = SysPlansCodes::find()->where($params)->orderBy(['rand()' => SORT_DESC])->asArray()->all(); # ->limit($limit) 限制数量去掉
                         $codesArr = [];
-                        foreach ($SysPlansCodes as $key=>$plan){
-                            $codesArr[] = $plan['code'];
+                        foreach ($SysPlansCodes as $key=>$sPlan){
+                            $codesArr[] = $sPlan['code'];
                         }
                     }
                 }
@@ -872,34 +869,6 @@ abstract class BetService extends BaseBetService {
                     $codesArr = NumService::getNotLatelyCodes(json_decode($codes_hz, true));
                 }elseif($tz_type == 28){ # 系统快捷
                     $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true));
-                }else{
-                    $params = ['playway'=>$playway, 'tz_type'=>$tz_type];
-                    $SysPlansCodes = SysPlansCodes::find()->where($params)->orderBy(['rand()' => SORT_DESC])->asArray()->all();
-                    $codesArr = [];
-                    foreach ($SysPlansCodes as $key=>$plan){
-                        $mKeyRecord = 'SD_LAST_TIME_RECORD_'.$tz_type;
-                        $LastTime = $m->get($mKeyRecord);
-                        $code = $LastTime[0] % 2 == 0 ? '02468' : '13579';
-                        $code .= $LastTime[1] % 2 == 0 ? ',02468' : ',13579';
-                        $code .= $LastTime[2] % 2 == 0 ? ',02468' : ',13579';
-                        $code .= $LastTime[3] % 2 == 0 ? ',02468' : ',13579';
-                        if($sel_same == 0){
-                            # 去除上次一样的单双
-                            $plan['code'] = $plan['code'].'@';
-                            $plan['code'] = str_replace($code, '', $plan['code']);
-                        }
-
-                        if($sel_same == 2){
-                            # 随机去掉某一个
-                            $tmpCodesArr = explode('@', $plan['code']);
-                            $len = count($tmpCodesArr);
-                            $k = rand(0, $len-1);
-                            unset($tmpCodesArr[$k]);
-                            $plan['code'] = implode('@', $tmpCodesArr);
-                        }
-
-                        $codesArr[] = trim($plan['code'], '@');
-                    }
                 }
 
                 break;
@@ -939,13 +908,14 @@ abstract class BetService extends BaseBetService {
 
     /**
      * @desc 和值号码读取
-     * @param $playway
      * @param $tz_type
      * @param $codes_hz
+     * @param int $buy_type 1正买0反买 默认正买
+     * @param string $plan_id
      * @return string
      */
-    public static function getHzCodes($tz_type, $codes_hz, $plan_id = ''){
-        return self::getPlansAllCodesType1($tz_type, $buy_type = 1, $sel_same = 0, $codes_hz, $plan_id);
+    public static function getHzCodes($tz_type, $codes_hz, $buy_type=1, $plan_id = ''){
+        return self::getPlansAllCodesType1($tz_type, $buy_type, $codes_hz, $plan_id);
     }
 
     /**
@@ -956,8 +926,8 @@ abstract class BetService extends BaseBetService {
      * @param $limit int 默认获取注数
      * @return string
      */
-    public static function getPlansAllCodesType2($tz_type = 1, $buy_type = 1, $sel_same = 1, $codes_hz = '', $plan_id = ''){
-        $codes = self::getPlansAllCodesType1($tz_type, $buy_type, $sel_same, $codes_hz, $plan_id);
+    public static function getPlansAllCodesType2($tz_type = 1, $buy_type = 1, $codes_hz = '', $plan_id = ''){
+        $codes = self::getPlansAllCodesType1($tz_type, $buy_type, $codes_hz, $plan_id);
 
         return $codes;
     }
@@ -1145,7 +1115,7 @@ abstract class BetService extends BaseBetService {
         $qihao = HN0898Service::getQihao($plan->lottery_type);
 
         # 4、投注号码 codes
-        $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
+        $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $planId);
         //p([$system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $codes]);
 
         $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id, $plan->uid); # 手动下注时，先删除缓存
@@ -1285,7 +1255,7 @@ abstract class BetService extends BaseBetService {
                return ['status'=>300, 'msg'=>'账号过期提示'];
            }
            # 4、投注号码 codes
-           $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $planId);
+           $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $planId);
            //p([$plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, count(explode('@', $codes))]);
 
            $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id, $plan->uid); # 手动下注时，先删除缓存
@@ -2138,7 +2108,7 @@ abstract class BetService extends BaseBetService {
      */
     public static function getCodesByPlan(object $plan){
         # 4、投注号码 codes
-        $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+        $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);
 
         return $codes;
     }
@@ -2180,7 +2150,7 @@ abstract class BetService extends BaseBetService {
         $Plans = UserSysPlans::find()->where(['uid'=>$uid, 'id'=>$plan_ids])->all();
         foreach ($Plans as $plan){
             $tmpData = ['plan_id'=>$plan->id];
-            $tmpData['codes'] = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $plan->id);
+            $tmpData['codes'] = self::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);
             Tool_Common::log('/codes/'.__FUNCTION__, 'INFO', '计划的号码', ['uid'=>$uid, 'id'=>$plan_ids, 'tmpData'=>$tmpData]);
             $rst['data'][] = $tmpData;
         }
@@ -2260,7 +2230,7 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤3', ['plan_id'=>$plan_id, 'next_qihao'=>$next_qihao]);
 
                     # 4、投注号码 codes
-                    $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->sel_same, json_encode($codes_hz_data), $plan->id, $hzArr);
+                    $codes = self::getCodes($plan->tz_type, $plan->buy_type, json_encode($codes_hz_data), $plan->id);
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤31', ['plan_id'=>$plan_id, 'next_qihao'=>$next_qihao, 'len'=>strlen($codes)]);
 
                     $is_test = max($plan->is_test, $plan->is_batch_simulate);

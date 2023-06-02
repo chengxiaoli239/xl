@@ -16,6 +16,7 @@ use Yii;
  * @property string $bet_logs 下注原始日志
  * @property string $bet_logs_n 下注转换后日志
  * @property string $bet_codes 下注号码
+ * @property string $bet_logs_codes_hz 下注codes_hz
  * @property int $bet_counts 下注号码组数
  * @property string $bet_single 下注倍数
  * @property string $bet_money 金额
@@ -52,7 +53,7 @@ class AgentUserBetLogs extends \common\models\base\BaseModel
     {
         return [
             [['uid', 'wp_record_id', 'member_id', 'bet_counts', 'bet_op_counts', 'bet_type', 'playway', 'lottery_type', 'status', 'tz_system_id', 'created_at', 'updated_at'], 'integer'],
-            [['bet_logs', 'bet_logs_n', 'bet_codes', 'bet_codes_op'], 'string'],
+            [['bet_logs', 'bet_logs_n', 'bet_logs_codes_hz', 'bet_codes', 'bet_codes_op'], 'string'],
             [['bet_single', 'bet_money', 'bet_op_single', 'bet_op_money'], 'number'],
             [['member_bet_time', 'update_time'], 'safe'],
             [['access_token', 'account', 'qihao'], 'string', 'max' => 32],
@@ -74,6 +75,7 @@ class AgentUserBetLogs extends \common\models\base\BaseModel
             'account' => 'Account',
             'bet_logs' => 'Bet Logs',
             'bet_logs_n' => 'Bet Logs N',
+            'bet_logs_codes_hz' => 'Bet Logs Codes Hz',
             'bet_codes' => 'Bet Codes',
             'bet_counts' => 'Bet Counts',
             'bet_single' => 'Bet Single',
