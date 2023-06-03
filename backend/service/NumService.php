@@ -2991,9 +2991,9 @@ class NumService extends BaseService {
             $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
         }
 
-        $needCodes = SscKjData::find()->select(['code_4n', 'qihao'=>'MAX(qihao)'])
+        $needCodes = SscKjData::find()->select(['code_4n'])
             ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
-            ->orderBy(['MAX(qihao)'=>SORT_DESC])->limit($num)->asArray()->all();
+            ->orderBy(['id'=>SORT_DESC])->limit($num)->asArray()->all();
         $filterCodes = ArrayHelper::getColumn($needCodes, 'code_4n');
         $filterCodesStr = implode('","', $filterCodes);
 
