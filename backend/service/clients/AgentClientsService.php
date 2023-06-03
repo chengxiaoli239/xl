@@ -69,11 +69,12 @@ class AgentClientsService extends ClientsBaseService{
                     }
                     $playway = $data['playway'];
                     $single = number_format($logData['bet_money']/$logData['bet_count'], 2); # 倍数
+                    $bet_single_op = $single; # 反买倍数默认等于正常下注倍数
 
                     $bet_op_theory_counts = AgentClientsService::getOpBetCounts($data['code_type'], $logData['bet_count']);  # 理论反买组数
                     $bet_codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']));  # 正买号码
 
-                    $bet_codes_op = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), $buy_type);  # 反买
+                    $bet_codes_op = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), $buy_type);  # 反买号码
                     $bet_op_counts = count(explode('@', $bet_codes_op));  # 实际反买组数
                     if($bet_op_theory_counts != $bet_op_counts){
                         throw_info('组数不符，理论组数：'.$bet_op_theory_counts.' 组，实际：'.$bet_op_counts.' 组 ');
@@ -96,8 +97,8 @@ class AgentClientsService extends ClientsBaseService{
                         # 反买
                         'bet_codes_op' => $bet_codes_op, # 反买号码
                         'bet_op_counts' => (int)$bet_op_counts, # 反买组数
-                        'bet_op_single' => $single, # 反买倍数
-                        'bet_op_money' => ($single * $bet_op_counts), # 反买金额
+                        'bet_op_single' => $bet_single_op, # 反买倍数
+                        'bet_op_money' => ($bet_single_op * $bet_op_counts), # 反买金额
                         'bet_type' => $buy_type, # 下注类型：1反买2正买  默认反买
 
                         'member_bet_time' => date('Y-').$logData['operation_datetime'],
@@ -118,6 +119,9 @@ class AgentClientsService extends ClientsBaseService{
                     if(empty($flag)){
                         throw_info(Json::encode($AgentUserBetLogs->getErrors(), 320));
                     }
+                    $codes = ($buy_type==1) ? $bet_codes : $bet_codes_op;
+                    $bet_single = ($buy_type==1) ? $single : $bet_single_op;
+                    $rst = (new \backend\service\Lucky5\Lucky5Service)->pushIntoBetTask($qihao, $codes, $bet_single, $playway, $TzSystemsUsers->uid, $lottery_type);
                     Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes()]);
                 }catch (\Exception $e){
                     Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '代理日志记录-异常', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'logData'=>$logData, 'err_msg'=>$e->getMessage()]);

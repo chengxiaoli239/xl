@@ -979,7 +979,7 @@ abstract class BetService extends BaseBetService {
      * @param int $tz_type 三定：投注类型:1大小单双三字定2大小三字定3单双三字定    四定：详见staticServices::$kArr
      * @return string
      */
-    public static function buildBetKey($account = 'gaozi2017', $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE, $qihao, $plan_id = 0){
+    public static function buildBetKey($account = 'gaozi2017', $tz_system_id=9, $lottery_type = DEFAULT_LOTTERY_TYPE, $qihao='', $plan_id = 0){
         $mkey = \Yii::$app->params['TZ_SWITCH_KEY'].'_'.$account.'_'.$tz_system_id.'_'.$lottery_type.'_'.$qihao.'_'.$plan_id;
 
         return $mkey;
