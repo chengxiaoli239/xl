@@ -70,11 +70,11 @@ class AgentClientsService extends ClientsBaseService{
                     $playway = $data['playway'];
                     $single = number_format($logData['bet_money']/$logData['bet_count'], 2); # 倍数
 
-                    $bet_op_theory_counts = AgentClientsService::getOpBetCounts($data['tz_type'], $logData['bet_count']);  # 理论反买组数
-                    $bet_codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']));
+                    $bet_op_theory_counts = AgentClientsService::getOpBetCounts($data['code_type'], $logData['bet_count']);  # 理论反买组数
+                    $bet_codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']));  # 正买号码
 
-                    $bet_codes_op = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), $buy_type);
-                    $bet_op_counts = explode('@', $bet_codes_op);  # 实际反买组数
+                    $bet_codes_op = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), $buy_type);  # 反买
+                    $bet_op_counts = count(explode('@', $bet_codes_op));  # 实际反买组数
                     if($bet_op_theory_counts != $bet_op_counts){
                         throw_info('组数不符，理论组数：'.$bet_op_theory_counts.' 组，实际：'.$bet_op_counts.' 组 ');
                     }
@@ -173,9 +173,11 @@ class AgentClientsService extends ClientsBaseService{
             // 剔除字符串前后的特定字符
             $bet_logs = preg_replace($pattern, '', $bet_logs);
         }
+        $code_type = $playway + 1;
         $codes_hz['playway'] = $playway;
+        $codes_hz['code_type'] = $code_type;
 
-        return [$playway, $tz_type];
+        return [$playway, $tz_type, $code_type];
     }
 
     /**
@@ -188,7 +190,7 @@ class AgentClientsService extends ClientsBaseService{
         $bet_log = str_replace(';', '；', $bet_log);
         $bet_log = str_replace(',', '，', $bet_log);
         #p(['initLog'=>$bet_log], 0);
-        list($playway, $tz_type) = AgentClientsService::getPlaywayByBetLogs($bet_log, $codes_hz);
+        list($playway, $tz_type, $code_type) = AgentClientsService::getPlaywayByBetLogs($bet_log, $codes_hz);
         //p(['playway'=>$playway, 'codes_hz'=>$codes_hz, 'bet_log'=>$bet_log], 0);
 
         $dataArr = explode('，', $bet_log);
@@ -209,7 +211,7 @@ class AgentClientsService extends ClientsBaseService{
         //echo "===============end==================\r\n";
 
         # 关键词2匹配
-        $data = ['playway'=>$playway, 'tz_type'=>$tz_type, 'codes_hz'=>$codes_hz, 'dataArr'=>$dataArr, 'bet_log'=>$bet_log];
+        $data = ['playway'=>$playway, 'code_type'=>$code_type, 'tz_type'=>$tz_type, 'codes_hz'=>$codes_hz, 'dataArr'=>$dataArr, 'bet_log'=>$bet_log];
 
         // 输出结果
         return [0, $data, '处理成功'];
