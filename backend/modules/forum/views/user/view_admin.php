@@ -188,7 +188,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         ['attribute' => 'flow_wp_accounts', 'label'=>'跟随账号', 'headerOptions' => ['width' => '8%'],
                             'value'=> function($model){
-                                return $model->flow_wp_accounts ? $model->flow_wp_accounts : '';
+                                $txt = $model->flow_wp_accounts ? '正:'.$model->flow_wp_accounts : '';
+                                $txt .= $model->flow_op_accounts ? '反:'.$model->flow_wp_accounts : '';
+                                return $txt;
                             },
                         ],
                         //'expire_time:datetime',

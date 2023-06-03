@@ -44,16 +44,17 @@ class AgentClientsService extends ClientsBaseService{
             $transaction = \Yii::$app->db->beginTransaction();
 
             $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
-            $flow_wp_accounts = explode(',', $TzSystemsUsers->flow_wp_accounts);  # 反买账号，后续加正买账号
+            $flow_wp_accounts = explode(',', $TzSystemsUsers->flow_wp_accounts);  # 正买账号
+            $flow_op_accounts = explode(',', $TzSystemsUsers->flow_op_accounts);  # 反买账号
 
             $now_time = time();
             list($code, $logDatas, $err_msg) = AgentClientsService::validateSyncMemberBetLogs($member_bet_logs);
             foreach ($logDatas as $logData){
                 try {
-                    if(!in_array($logData['account'], $flow_wp_accounts)){
+                    if(!in_array($logData['account'], $flow_wp_accounts) && !in_array($logData['account'], $flow_op_accounts)){
                         throw_info('不在跟随账号范围之内');
                     }
-                    $buy_type = 0;  # 购买类型，反买账号，后续加正买账号
+                    $buy_type = in_array($logData['account'], $flow_wp_accounts) ? 1 : 0;  # 购买类型，反买账号，后续加正买账号
 
                     $AgentUserBetLogs = AgentUserBetLogs::findOne(['access_token'=>$access_token, 'wp_record_id'=>$logData['log_member_quick_select_id']]);
                     if(!empty($AgentUserBetLogs)){
@@ -124,7 +125,7 @@ class AgentClientsService extends ClientsBaseService{
                     $rst = (new \backend\service\Lucky5\Lucky5Service($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id))->pushIntoBetTask($qihao, $codes, $data['tz_type'], $bet_single, $playway, $TzSystemsUsers->uid, $lottery_type);
                     Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['account'=>$logData['account'], 'logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes(), 'rst'=>$rst]);
                 }catch (\Exception $e){
-                    Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '代理日志记录-异常', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'logData'=>$logData, 'err_msg'=>$e->getMessage()]);
+                    Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '代理日志记录-异常', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, 'logData'=>$logData, 'err_msg'=>$e->getMessage()]);
                 }
             }
 

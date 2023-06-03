@@ -31,6 +31,15 @@ use yii\widgets\ActiveForm;
 
             <div class="row">
                 <div class="col-lg-6 col-xs-6">
+                    <?= $form->field($model, 'flow_wp_accounts')->textInput(['maxlength' => true])->label('跟随正买账号，多个则为英文逗号隔开') ?>
+                </div>
+                <div class="col-lg-6 col-xs-6">
+                    <?= $form->field($model, 'flow_op_accounts')->textInput(['maxlength' => true])->label('跟随反买账号，多个则为英文逗号隔开') ?>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-xs-6">
                     <?= $form->field($model, 'sys_password')->textInput(['maxlength' => true]) ?>
                 </div>
                 <div class="col-lg-6 col-xs-6">

@@ -85,6 +85,15 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                             return empty($model->desc) ? '<font color="green">正常</font>' : '<font color="red">'.$model->desc.'</font>';
                                         }
                                     ],
+                                    //'flow_wp_accounts',
+                                    ['attribute' => 'flow_wp_accounts', 'label'=>'跟随账号', 'headerOptions' => ['width' => '8%'],
+                                        'format'=>'raw',
+                                        'value'=> function($model){
+                                            $txt = $model->flow_wp_accounts ? '<strong><font color="green">正买</font></strong>：'.implode('、', explode(',', $model->flow_wp_accounts)) : '';
+                                            $txt .= $model->flow_op_accounts ? ' &nbsp;<strong><font color="red">反买</font></strong>：'.implode('、', explode(',', $model->flow_op_accounts)) : '';
+                                            return $txt;
+                                        },
+                                    ],
                                     ['attribute' => 'cookie', 'label'=>'cookie',
                                         'format'=>'raw',
                                         'value' => function($model) {

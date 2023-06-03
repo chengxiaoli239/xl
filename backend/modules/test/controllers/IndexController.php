@@ -343,6 +343,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');
+        p($r);
         $txt = '[四定位]，配数“[取]”：第1位：[012345]，第2位：[56789]，二兄弟“[取]”操作，三兄弟“[除]”操作';
         $bet_log = str_replace(['[', ']'], '', $txt);
         p($bet_log);
@@ -697,8 +699,6 @@ class IndexController extends Controller
         $params = ['_nowTime' => 1621657296359, '_uri' => '/session-user'];
         $sign = ZhongFaService::getSign($params);
         p($sign);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems}}');
-        p($r);
         $data = LeCaiService::getLotteryK5($type = 'json', $lottery_type = 18, $is_auto = 2);
         p($data);
         $lottery_type = 18;

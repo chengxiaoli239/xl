@@ -19,7 +19,7 @@ class TzSystemsUsers extends TzSystemsUsersModel
     {
         return [
             [['id', 'uid', 'is_agent', 'tz_system_id', 'status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'is_local_bet', 'expire_time', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'sys_name', 'account', 'flow_wp_accounts', 'password', 'ssc_domain', 'cookie', 'user_agent', 'cookie_wx_web', 'access_token', 'warn_val', 'desc', 'update_time'], 'safe'],
+            [['username', 'sys_name', 'account', 'flow_wp_accounts', 'flow_op_accounts', 'password', 'ssc_domain', 'cookie', 'user_agent', 'cookie_wx_web', 'access_token', 'warn_val', 'desc', 'update_time'], 'safe'],
             [['balance', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
         ];
     }
@@ -89,6 +89,7 @@ class TzSystemsUsers extends TzSystemsUsersModel
             ->andFilterWhere(['like', 'sys_name', $this->sys_name])
             ->andFilterWhere(['like', 'account', $this->account])
             ->andFilterWhere(['like', 'flow_wp_accounts', $this->flow_wp_accounts])
+            ->andFilterWhere(['like', 'flow_op_accounts', $this->flow_op_accounts])
             ->andFilterWhere(['like', 'password', $this->password])
             ->andFilterWhere(['like', 'ssc_domain', $this->ssc_domain])
             ->andFilterWhere(['like', 'cookie', $this->cookie])

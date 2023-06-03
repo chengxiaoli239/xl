@@ -15,7 +15,8 @@ use Yii;
  * @property int $tz_system_id 系统类型id，lt_tz_systems.id
  * @property string $sys_name 系统名称
  * @property string $account 投注账号
- * @property string $flow_wp_accounts
+ * @property string $flow_wp_accounts 跟随正买账号
+ * @property string $flow_op_accounts 跟随反买账号
  * @property string $password 网盘密码
  * @property string $sys_password 机器人网盘密码
  * @property string $sys_repassword 机器人重复密码
@@ -72,7 +73,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['sys_password', 'sys_repassword'], 'trim'],
-            [['username', 'sys_name', 'account', 'flow_wp_accounts', 'ssc_domain', 'access_token'], 'string', 'max' => 64],
+            [['username', 'sys_name', 'account', 'flow_wp_accounts', 'flow_op_accounts', 'ssc_domain', 'access_token'], 'string', 'max' => 64],
             [['password', 'sys_password', 'sys_repassword'], 'string', 'max' => 20],
             ['sys_repassword', 'compare', 'compareAttribute' => 'sys_password', 'message' => '请再正确输入重复密码'],
             [['user_agent', 'desc'], 'string', 'max' => 640],
@@ -126,7 +127,8 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'tz_system_id' => Yii::t('app', '系统类型id，lt_tz_systems.id'),
             'sys_name' => Yii::t('app', '系统名称'),
             'account' => Yii::t('app', '投注账号'),
-            'flow_wp_accounts' => Yii::t('app', '跟随账号'),
+            'flow_wp_accounts' => Yii::t('app', '跟随正买账号'),
+            'flow_op_accounts' => Yii::t('app', '跟随反买账号'),
             'password' => Yii::t('app', '网盘密码'),
             'sys_password' => Yii::t('app', '机器人登陆密码'),
             'sys_repassword' => Yii::t('app', '机器人登陆重复密码'),
