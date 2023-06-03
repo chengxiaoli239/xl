@@ -121,7 +121,7 @@ class AgentClientsService extends ClientsBaseService{
                     }
                     $codes = ($buy_type==1) ? $bet_codes : $bet_codes_op;
                     $bet_single = ($buy_type==1) ? $single : $bet_single_op;
-                    $rst = (new \backend\service\Lucky5\Lucky5Service)->pushIntoBetTask($qihao, $codes, $data['tz_type'], $bet_single, $playway, $TzSystemsUsers->uid, $lottery_type);
+                    $rst = (new \backend\service\Lucky5\Lucky5Service($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id))->pushIntoBetTask($qihao, $codes, $data['tz_type'], $bet_single, $playway, $TzSystemsUsers->uid, $lottery_type);
                     Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['account'=>$logData['account'], 'logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes(), 'rst'=>$rst]);
                 }catch (\Exception $e){
                     Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '代理日志记录-异常', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'logData'=>$logData, 'err_msg'=>$e->getMessage()]);
