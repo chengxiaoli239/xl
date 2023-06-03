@@ -32,18 +32,19 @@ class AgentClientsService extends ClientsBaseService{
      * @param array $member_bet_logs
      * @param string $access_token
      * @param string $from_type
+     * @param string $from
      * @param int $buy_type
      * @param int $lottery_type
      * @return array
      * @throws \yii\db\Exception
      */
-    public static function syncMemberBetLogs($member_bet_logs=[], $access_token='', $from_type='kuaixuan', $buy_type=2, $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function syncMemberBetLogs($member_bet_logs=[], $access_token='', $from_type='kuaixuan', $from='api', $lottery_type=DEFAULT_LOTTERY_TYPE){
         try {
             $data = [];
             $transaction = \Yii::$app->db->beginTransaction();
 
             $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
-            $flow_wp_accounts = explode(',', $TzSystemsUsers->flow_wp_accounts);
+            $flow_wp_accounts = explode(',', $TzSystemsUsers->flow_wp_accounts);  # 反买账号，后续加正买账号
 
             $now_time = time();
             list($code, $logDatas, $err_msg) = AgentClientsService::validateSyncMemberBetLogs($member_bet_logs);
@@ -52,6 +53,8 @@ class AgentClientsService extends ClientsBaseService{
                     if(!in_array($logData['account'], $flow_wp_accounts)){
                         throw_info('不在跟随账号范围之内');
                     }
+                    $buy_type = 0;  # 购买类型，反买账号，后续加正买账号
+
                     $AgentUserBetLogs = AgentUserBetLogs::findOne(['access_token'=>$access_token, 'wp_record_id'=>$logData['log_member_quick_select_id']]);
                     if(!empty($AgentUserBetLogs)){
                         throw_info('日志记录已存在');
@@ -66,9 +69,16 @@ class AgentClientsService extends ClientsBaseService{
                     }
                     $playway = $data['playway'];
                     $single = number_format($logData['bet_money']/$logData['bet_count'], 2); # 倍数
-                    $bet_op_counts = AgentClientsService::getOpBetCounts($data['tz_type'], $logData['bet_count']);
+
+                    $bet_op_theory_counts = AgentClientsService::getOpBetCounts($data['tz_type'], $logData['bet_count']);  # 理论反买组数
                     $bet_codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']));
-                    $bet_codes_op = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 2);
+
+                    $bet_codes_op = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), $buy_type);
+                    $bet_op_counts = explode('@', $bet_codes_op);  # 实际反买组数
+                    if($bet_op_theory_counts != $bet_op_counts){
+                        throw_info('组数不符，理论组数：'.$bet_op_theory_counts.' 组，实际：'.$bet_op_counts.' 组 ');
+                    }
+
                     $setDatas = [
                         'access_token' => $access_token,
                         'uid' => $TzSystemsUsers->uid,
@@ -99,6 +109,7 @@ class AgentClientsService extends ClientsBaseService{
                         'updated_at' => $now_time,
                         'playway' => $playway,
                         'from_type' => $from_type,  # 来源：快选，快译
+                        'from' => $from,  # 来源：api、page
                         'log_type' => $logData['log_type'],  # 目前看都是102
                     ];
                     $AgentUserBetLogs->setAttributes($setDatas);
@@ -407,5 +418,9 @@ class AgentClientsService extends ClientsBaseService{
         }
 
         return $opCounts;
+    }
+
+    public static function getBuyTypeByUserAccount($uid='', $userAccount=''){
+
     }
 }

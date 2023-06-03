@@ -48,6 +48,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'bet_op_single',
                         //'bet_type',
                         //'playway',
+                        //'from_type',
+                        //'from',
                         //'desc',
                         //'lottery_type',
                         //'qihao',

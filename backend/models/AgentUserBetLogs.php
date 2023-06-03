@@ -26,6 +26,8 @@ use Yii;
  * @property string $bet_op_money 反买金额
  * @property int $bet_type 下注类型：1反买2正买
  * @property int $playway 下注类型：1二定2三定3四定
+ * @property string $from_type 日志来源类型：kuaixuan、kuaiyi
+ * @property string $from 来源：page、api
  * @property string $desc 描述
  * @property int $lottery_type 彩种5重启6新疆8幸运五
  * @property string $qihao 期号
@@ -53,7 +55,7 @@ class AgentUserBetLogs extends \common\models\base\BaseModel
     {
         return [
             [['uid', 'wp_record_id', 'member_id', 'bet_counts', 'bet_op_counts', 'bet_type', 'playway', 'lottery_type', 'status', 'tz_system_id', 'created_at', 'updated_at'], 'integer'],
-            [['bet_logs', 'bet_logs_n', 'bet_logs_codes_hz', 'bet_codes', 'bet_codes_op'], 'string'],
+            [['bet_logs', 'bet_logs_n', 'bet_logs_codes_hz', 'bet_codes', 'bet_codes_op', 'from_type', 'from'], 'string'],
             [['bet_single', 'bet_money', 'bet_op_single', 'bet_op_money'], 'number'],
             [['member_bet_time', 'update_time'], 'safe'],
             [['access_token', 'account', 'qihao'], 'string', 'max' => 32],
@@ -86,6 +88,8 @@ class AgentUserBetLogs extends \common\models\base\BaseModel
             'bet_op_money' => 'Bet Op Money',
             'bet_type' => 'Bet Type',
             'playway' => 'Playway',
+            'from_type' => 'From Type',
+            'from' => 'From',
             'desc' => 'Desc',
             'lottery_type' => 'Lottery Type',
             'qihao' => 'Qihao',

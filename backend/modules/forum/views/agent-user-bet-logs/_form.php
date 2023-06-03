@@ -33,6 +33,10 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'playway')->textInput() ?>
 
+                    <?= $form->field($model, 'from_type')->textInput() ?>
+
+                    <?= $form->field($model, 'from')->textInput() ?>
+
                     <?= $form->field($model, 'desc')->textInput(['maxlength' => true]) ?>
 
                     <?= $form->field($model, 'lottery_type')->textInput(['maxlength' => true]) ?>

@@ -35,6 +35,10 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'playway') ?>
 
+    <?php // echo $form->field($model, 'from_type') ?>
+
+    <?php // echo $form->field($model, 'from') ?>
+
     <?php // echo $form->field($model, 'desc') ?>
 
     <?php // echo $form->field($model, 'lottery_type') ?>
