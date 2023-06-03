@@ -2216,7 +2216,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             }else{
                 # 默认为任务表下载
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '下注之后', ['account'=>$TzSystemsUsers->account, 'uid'=>$TzSystemsUsers->uid, 'plan_id'=>$plan_id, 'single'=>$single, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'tmpcodesArr'=>count($tmpcodesArr)]);
-                $recordRst = BetErrorPlansTaskService::recordPlanTask($uid, $TzSystemsUsers->account, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($tmpcodesArr)*$single, $playway,self::$tz_system_id, [], $lottery_type);
+                $recordRst = BetErrorPlansTaskService::recordPlanTask($uid, $TzSystemsUsers->username, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($tmpcodesArr)*$single, $playway,self::$tz_system_id, [], $lottery_type);
                 $logArr1 = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'key'=>$key, 'recordRst'=>$recordRst];
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '拆分记录下注号码至推送表', $logArr1);
             }
@@ -2240,7 +2240,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             'buy_type'=> 1,  // 购买方向类型
             'uid'=> self::$user_id,  // 投注账号id
             'lottery_type' => $lottery_type, # 彩种
-            'account' => $TzSystemsUsers->account,
+            'account' => $TzSystemsUsers->username,
             'plan_id' => $plan_id, # 计划id
             'codes' => (string)$codes,  // 投注号码
             'qihao' => $qihao,  // 投注期号
