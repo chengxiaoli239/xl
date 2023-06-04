@@ -48,9 +48,15 @@ class AgentClientsService extends ClientsBaseService{
             $flow_op_accounts = explode(',', $TzSystemsUsers->flow_op_accounts);  # 反买账号
 
             $now_time = time();
+            $before_5min_time = date('Y-m-d H:i:s', time()-500);
             list($code, $logDatas, $err_msg) = AgentClientsService::validateSyncMemberBetLogs($member_bet_logs);
             foreach ($logDatas as $logData){
                 try {
+                    $member_bet_time = date('Y-').$logData['operation_datetime'];
+                    if($member_bet_time < $before_5min_time){
+                        throw_info('历史下注记录不同步：用户下注时间:'.$member_bet_time. '，当前5分钟前:'.$before_5min_time);
+                    }
+
                     if(!in_array($logData['account'], $flow_wp_accounts) && !in_array($logData['account'], $flow_op_accounts)){
                         throw_info('不在跟随账号范围之内');
                     }
@@ -74,11 +80,18 @@ class AgentClientsService extends ClientsBaseService{
 
                     $bet_op_theory_counts = AgentClientsService::getOpBetCounts($data['code_type'], $logData['bet_count']);  # 理论反买组数
                     $bet_codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']));  # 正买号码
+                    $bet_counts = count(explode('@', $bet_codes));  # 实际反买组数
 
                     $bet_codes_op = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), $buy_type);  # 反买号码
                     $bet_op_counts = count(explode('@', $bet_codes_op));  # 实际反买组数
-                    if($bet_op_theory_counts != $bet_op_counts){
-                        throw_info('组数不符，理论组数：'.$bet_op_theory_counts.' 组，实际：'.$bet_op_counts.' 组 ');
+
+                    # 反买组数校验
+                    if($buy_type==0 && $bet_op_theory_counts != $bet_op_counts){
+                        throw_info('反买:组数不符，理论组数：'.$bet_op_theory_counts.' 组，实际：'.$bet_op_counts.' 组 ');
+                    }
+                    # 正买组数校验
+                    if($buy_type==1 && $logData['bet_count'] != $bet_counts){
+                        throw_info('正买组数不符，理论组数：'.$logData['bet_count'].' 组，实际：'.$bet_op_counts.' 组 ');
                     }
 
                     $setDatas = [
@@ -102,7 +115,7 @@ class AgentClientsService extends ClientsBaseService{
                         'bet_op_money' => ($bet_single_op * $bet_op_counts), # 反买金额
                         'bet_type' => $buy_type, # 下注类型：1反买2正买  默认反买
 
-                        'member_bet_time' => date('Y-').$logData['operation_datetime'],
+                        'member_bet_time' => $member_bet_time,
 
                         'lottery_type' => $lottery_type,
                         'qihao' => $qihao,
