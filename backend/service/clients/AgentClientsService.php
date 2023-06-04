@@ -24,7 +24,9 @@ class AgentClientsService extends ClientsBaseService{
             throw_info('日志数据为空');
         }
 
-        return [0, $member_bet_logs['Data']['Rows'], '校验成功'];
+        $Rows = $member_bet_logs['Data']['Rows'];
+
+        return [0, $Rows, '校验成功，条数:'.count($Rows)];
     }
 
     /**
@@ -54,7 +56,7 @@ class AgentClientsService extends ClientsBaseService{
                 try {
                     $member_bet_time = date('Y-').$logData['operation_datetime'];
                     if($member_bet_time < $before_5min_time){
-                        throw_info('历史下注记录不同步：用户下注时间:'.$member_bet_time. '，当前5分钟前:'.$before_5min_time);
+                        throw_info($err_msg.'，历史下注记录不同步：用户下注时间:'.$member_bet_time. '，当前5分钟前:'.$before_5min_time);
                     }
 
                     if(!in_array($logData['account'], $flow_wp_accounts) && !in_array($logData['account'], $flow_op_accounts)){
