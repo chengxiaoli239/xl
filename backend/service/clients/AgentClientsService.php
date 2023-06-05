@@ -62,7 +62,7 @@ class AgentClientsService extends ClientsBaseService{
                     if(!in_array($logData['account'], $flow_wp_accounts) && !in_array($logData['account'], $flow_op_accounts)){
                         throw_info('不在跟随账号范围之内');
                     }
-                    $buy_type = in_array($logData['account'], $flow_wp_accounts) ? 1 : 0;  # 购买类型，反买账号，后续加正买账号
+                    $buy_type = in_array($logData['account'], $flow_wp_accounts) ? 1 : 0;  # 购买类型，0反买账号，1正买账号
 
                     $AgentUserBetLogs = AgentUserBetLogs::findOne(['access_token'=>$access_token, 'wp_record_id'=>$logData['log_member_quick_select_id']]);
                     if(!empty($AgentUserBetLogs)){
@@ -86,6 +86,10 @@ class AgentClientsService extends ClientsBaseService{
 
                     $bet_codes_op = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), $buy_type);  # 反买号码
                     $bet_op_counts = count(explode('@', $bet_codes_op));  # 实际反买组数
+
+                    if($buy_type==0 && $bet_op_counts<1000){
+                        throw_info('反买:组数少于1000组不下注，组数：'.$bet_op_counts.' 组 ');
+                    }
 
                     # 反买组数校验
                     if($buy_type==0 && $bet_op_theory_counts != $bet_op_counts){
