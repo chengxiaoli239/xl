@@ -87,7 +87,7 @@ class AgentClientsService extends ClientsBaseService{
                     $bet_codes_op = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), $buy_type);  # 反买号码
                     $bet_op_counts = count(explode('@', $bet_codes_op));  # 实际反买组数
 
-                    if($buy_type==0 && $bet_op_counts<1000){
+                    if($data['code_type']==4 && $buy_type==0 && $bet_op_counts<1000){
                         throw_info('反买:组数少于1000组不下注，组数：'.$bet_op_counts.' 组 ');
                     }
 
