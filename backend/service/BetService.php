@@ -887,7 +887,8 @@ abstract class BetService extends BaseBetService {
 
         $before_count=count($codesArr);
         # 反买号码获取
-        if(!in_array($tz_type, [22]) && in_array($tz_type, \Yii::$app->params['can_change_buy_type']) && $buy_type == 0){ # 22 四定单双
+
+        if($buy_type==0 && !in_array($tz_type, [22])){ # 22 四定单双
             $codesArr = self::getInverseCodes($codesArr, $code_type);
         }
         //p(['buy_type'=>$buy_type, 'before_count'=>$before_count, 'after_count'=>count($codesArr), 'codesArr'=>$codesArr]);
@@ -1922,10 +1923,16 @@ abstract class BetService extends BaseBetService {
         if(!is_array($codesArr)) return [];
         $where = ['AND', ['=', 'code_type', $code_type], ['NOT IN', 'code', $codesArr]];
         $query = Num4Type::find()->where($where);
-        $filter_poses = NumService::getFilterPosByCode($codesArr[0]); # 根据导入的号码判断要过滤的位置
-        if(!empty($filter_poses)){
-            foreach ($filter_poses as $pos){
-                $query->andWhere(['<>', 'code_'.$pos, 'X']);
+
+        if(
+            ($code_type==3 && count($codesArr)<1000) OR
+            ($code_type==2 && count($codesArr)<100)
+        ){
+            $filter_poses = NumService::getFilterPosByCode($codesArr[0]); # 根据导入的号码判断要过滤的位置
+            if(!empty($filter_poses)){
+                foreach ($filter_poses as $pos){
+                    $query->andWhere(['<>', 'code_'.$pos, 'X']);
+                }
             }
         }
         $Num4Type = $query->asArray()->all();

@@ -343,17 +343,12 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');
-        p($r);
-        $txt = '[四定位]，配数“[取]”：第1位：[012345]，第2位：[56789]，二兄弟“[取]”操作，三兄弟“[除]”操作';
-        $bet_log = str_replace(['[', ']'], '', $txt);
-        p($bet_log);
-
         $text = '二定位，配数“取”：第1位：024658，固定合分取值：第1位选中，第2位选中，内容：0123456789；';
         list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
-        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']));
+        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz'], 0));
         p(['codes_hz'=>$data['codes_hz'], 'counts'=>count(explode('@', $codes)), 'codes'=>$codes]);
         p([$code, $data, $err_msg]);
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');
         $rst = self::getPermutations([1, 2, 3]);p($rst);
         $plan = UserSysPlans::findOne(6822);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);

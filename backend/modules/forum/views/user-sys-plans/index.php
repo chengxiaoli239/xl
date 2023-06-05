@@ -82,7 +82,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 $txt = $buy_type_Arr[$model->buy_type];
                                 $url0 = "/forum/user-sys-plans/switch-buy-type?id=".$model->id.'&status=1'; # 切换正买
                                 $url1 = "/forum/user-sys-plans/switch-buy-type?id=".$model->id.'&status=0'; # 切换反买
-                                if(!in_array($model->tz_type, \Yii::$app->params['can_change_buy_type'])){
+                                if($model->tz_type==22){  # 四定单双
                                     //return Html::a($txt, '#', ['title' => '正买']);
                                     return '';
                                 }
