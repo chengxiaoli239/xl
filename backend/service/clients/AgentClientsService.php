@@ -56,19 +56,17 @@ class AgentClientsService extends ClientsBaseService{
                 try {
                     $member_bet_time = date('Y-').$logData['operation_datetime'];
                     if($member_bet_time < $before_5min_time){
-                        throw_info($err_msg.'，历史下注记录不同步：用户下注时间:'.$member_bet_time. '，当前5分钟前:'.$before_5min_time);
+                        throw_info($err_msg.'，历史下注记录不同步：用户下注时间:'.$member_bet_time. '，当前5分钟前:'.$before_5min_time, 40001);
                     }
 
                     if(!in_array($logData['account'], $flow_wp_accounts) && !in_array($logData['account'], $flow_op_accounts)){
-                        #throw_info('不在跟随账号范围之内');
-                        Tool_Common::log('/client_xy/'.__FUNCTION__.'_invalid', 'INFO', '代理日志记录-无效', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>'不在跟随账号范围之内']);
-                        continue;
+                        throw_info('不在跟随账号范围之内, account:'.$logData['account'], 40002);
                     }
                     $buy_type = in_array($logData['account'], $flow_wp_accounts) ? 1 : 0;  # 购买类型，0反买账号，1正买账号
 
                     $AgentUserBetLogs = AgentUserBetLogs::findOne(['access_token'=>$access_token, 'wp_record_id'=>$logData['log_member_quick_select_id']]);
                     if(!empty($AgentUserBetLogs)){
-                        throw_info('日志记录已存在 wp_record_id:'.$logData['log_member_quick_select_id']);
+                        throw_info('日志记录已存在 wp_record_id:'.$logData['log_member_quick_select_id'], 40003);
                     }else{
                         $AgentUserBetLogs = new AgentUserBetLogs();
                     }
@@ -147,7 +145,11 @@ class AgentClientsService extends ClientsBaseService{
                     $rst = (new \backend\service\Lucky5\Lucky5Service($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id))->pushIntoBetTask($qihao, $codes, $data['tz_type'], $bet_single, $playway, $TzSystemsUsers->uid, $plan_id=$record_id, $lottery_type);
                     Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['account'=>$logData['account'], 'logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes(), 'rst'=>$rst]);
                 }catch (\Exception $e){
-                    Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '代理日志记录-异常', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>$e->getMessage()]);
+                    if($e->getCode()<40000){
+                        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '代理日志记录-异常', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>$e->getMessage()]);
+                    }else{
+                        Tool_Common::log('/client_xy/'.__FUNCTION__.'_invalid', 'INFO', '代理日志记录-无效', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>$e->getMessage()]);
+                    }
                 }
             }
 
