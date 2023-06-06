@@ -60,7 +60,9 @@ class AgentClientsService extends ClientsBaseService{
                     }
 
                     if(!in_array($logData['account'], $flow_wp_accounts) && !in_array($logData['account'], $flow_op_accounts)){
-                        throw_info('不在跟随账号范围之内');
+                        #throw_info('不在跟随账号范围之内');
+                        Tool_Common::log('/client_xy/'.__FUNCTION__.'_invalid', 'INFO', '代理日志记录-无效', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>'不在跟随账号范围之内']);
+                        continue;
                     }
                     $buy_type = in_array($logData['account'], $flow_wp_accounts) ? 1 : 0;  # 购买类型，0反买账号，1正买账号
 
