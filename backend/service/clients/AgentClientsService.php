@@ -313,6 +313,9 @@ class AgentClientsService extends ClientsBaseService{
                             $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateBaoHanCondition($operateStr));
                             unset($dataArr[$k1]);
                             break;
+                        case CodeTypeService::KX_KW_2_EXCLUDE_CODE: #  # 排除数
+                            $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateExcludeCodesCondition($operateStr));
+                            break;
                     }
 
                     $codes_hz = array_merge($codes_hz, $keyword2Condition);

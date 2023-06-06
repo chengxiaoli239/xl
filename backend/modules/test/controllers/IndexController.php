@@ -343,7 +343,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $text = '三定位，配数“取”：第1位：01356';
+        $text = '三定位，配数“取”：第1位：01356，排除数：2';  # 2660组
         list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
         $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 0);
         p(['codes_hz'=>$data['codes_hz'], 'counts'=>count(explode('@', $codes)), 'codes'=>$codes]);

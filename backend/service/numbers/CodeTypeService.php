@@ -46,6 +46,7 @@ class CodeTypeService extends BaseService {
     const KX_KW_2_BAO_HAN_GET = '包含“取”数';
     const KX_KW_2_FIXED_GET = '定位置“取”';
     const KX_KW_2_FIXED_FILTER = '定位置“除”';
+    const KX_KW_2_EXCLUDE_CODE = '排除数';
     const KX_KW_2_FIXED_POS_1 = '千=';
     const KX_KW_2_FIXED_POS_2 = '百=';
     const KX_KW_2_FIXED_POS_3 = '十=';
@@ -95,6 +96,7 @@ class CodeTypeService extends BaseService {
         \backend\service\numbers\CodeTypeService::KX_KW_2_BAO_HAN_GET => ['arise_in_sel'=>2 ],  # '包含“取”数',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_FILTER => ['fixed_pos_sel'=>1 ],  #  '定位取
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_GET => [ 'fixed_pos_sel'=>2 ],  #  '定位置“取”',
+        \backend\service\numbers\CodeTypeService::KX_KW_2_EXCLUDE_CODE => [ ],  #  排除数
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_POS_1 => [ ],  #  '千=',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_POS_2 => [ ],  #  '百=',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_POS_3 => [ ],  #  '十=',
@@ -224,6 +226,19 @@ class CodeTypeService extends BaseService {
     public static function oprateBaoHanCondition($operateStr=''){
 
         $matcheCondition = ['arise_in'=>trim($operateStr)];
+
+
+        return $matcheCondition;
+    }
+
+    /**
+     * 排除数
+     * @param string $operateStr
+     * @return array
+     */
+    public static function oprateExcludeCodesCondition($operateStr=''){
+
+        $matcheCondition = ['exclude_codes'=>trim($operateStr)];
 
 
         return $matcheCondition;
