@@ -46,8 +46,8 @@ class AgentClientsService extends ClientsBaseService{
             $transaction = \Yii::$app->db->beginTransaction();
 
             $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
-            $flow_wp_accounts = explode(',', $TzSystemsUsers->flow_wp_accounts);  # 正买账号
-            $flow_op_accounts = explode(',', $TzSystemsUsers->flow_op_accounts);  # 反买账号
+            $flow_wp_accounts = explode(',', str_replace('，', ',', trim($TzSystemsUsers->flow_wp_accounts)));  # 正买账号
+            $flow_op_accounts = explode(',', str_replace('，', ',', trim($TzSystemsUsers->flow_op_accounts)));  # 反买账号flow_op_accounts
 
             $now_time = time();
             $before_5min_time = date('Y-m-d H:i:s', time()-500);
@@ -68,7 +68,7 @@ class AgentClientsService extends ClientsBaseService{
 
                     $AgentUserBetLogs = AgentUserBetLogs::findOne(['access_token'=>$access_token, 'wp_record_id'=>$logData['log_member_quick_select_id']]);
                     if(!empty($AgentUserBetLogs)){
-                        throw_info('日志记录已存在');
+                        throw_info('日志记录已存在 wp_record_id:'.$logData['log_member_quick_select_id']);
                     }else{
                         $AgentUserBetLogs = new AgentUserBetLogs();
                     }
