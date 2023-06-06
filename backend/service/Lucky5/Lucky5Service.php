@@ -2127,12 +2127,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param int $is_task
      * @return array
      */
-    public function pushIntoBetTask($qihao, $codes, $tz_type=25, $single=0.1, $playway=3, $uid='', $lottery_type=DEFAULT_LOTTERY_TYPE, $is_task=1){
+    public function pushIntoBetTask($qihao, $codes, $tz_type=25, $single=0.1, $playway=3, $uid='', $plan_id='', $lottery_type=DEFAULT_LOTTERY_TYPE, $is_task=1){
         $tmpCodes = $codes;
         $tmpCodes = str_replace(',', '', $tmpCodes);
         $codesArr = explode('@', $tmpCodes);
 
-        $plan_id = $uid.'8888';
+        if(empty($plan_id)) $plan_id = $uid.'8888';
         # 组数
         $count = count($codesArr);
 
