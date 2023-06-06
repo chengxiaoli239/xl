@@ -1257,7 +1257,7 @@ abstract class BetService extends BaseBetService {
            }
            # 4、投注号码 codes
            $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $planId);
-           p([$plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, count(explode('@', $codes))]);
+           //p([$plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, count(explode('@', $codes))]);
 
            $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id, $plan->uid); # 手动下注时，先删除缓存
 
