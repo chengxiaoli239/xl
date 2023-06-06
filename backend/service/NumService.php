@@ -1062,6 +1062,7 @@ class NumService extends BaseService {
         }
 
         $where = NumService::getFixedPostionWhere($codes_hz, $where, $code_type);  # 定位置
+        $where = NumService::getExcludeCodesWhere($codes_hz, $where, $code_type);  # 排除
         $where = NumService::getHeFenWhere($codes_hz, $where, $code_type);  # 定位合分
         $where = NumService::getPeiShuWhere($codes_hz, $where, $code_type);  # 配数
         $where = NumService::getPosOddWhere($codes_hz, $where);  # 筛选位置：单
@@ -2088,6 +2089,34 @@ class NumService extends BaseService {
      * @param $code_type
      * @return array
      */
+    public static function getExcludeCodesWhere($codes_hz, $where, $code_type=4){
+        $codes_hz = \backend\service\NumService::getHefenInitData($codes_hz, $code_type);
+        if(empty($codes_hz['exclude_codes'])){
+            return $where;
+        }
+
+        $allExcludeWhere = ['AND'];
+        $exclude_codes = [];
+        $exclude_str_codes = trim($codes_hz['exclude_codes']);
+        for($i=0; $i<strlen($exclude_str_codes); $i++){
+            $exclude_codes[] = $exclude_str_codes[$i];
+        }
+        foreach (NumService::DW_POSES as $pos){
+            $allExcludeWhere[] = ['NOT IN', 'code_'.$pos, $exclude_codes];
+        }
+
+        $where[] = $allExcludeWhere;
+
+        return $where;
+    }
+
+    /**
+     * 定位合分
+     * @param $codes_hz
+     * @param $where
+     * @param $code_type
+     * @return array
+     */
     public static function getHeFenWhere($codes_hz, $where, $code_type=4){
         $codes_hz = \backend\service\NumService::getHefenInitData($codes_hz, $code_type);
         if(empty($codes_hz['hfDatas'])){
@@ -2436,8 +2465,11 @@ class NumService extends BaseService {
             }
         }
 
-        if(empty($hz_Arr['arise_in'])){
+        if(!empty($hz_Arr['arise_in'])){
             $desc .= ' 含:'.$hz_Arr['arise_in'];
+        }
+        if(!empty($hz_Arr['exclude_codes'])){
+            $desc .= ' 排除:'.$hz_Arr['exclude_codes'];
         }
 
         if(!empty($filter11)){

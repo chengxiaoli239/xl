@@ -46,13 +46,12 @@ use yii\widgets\ActiveForm;
                             '1'=>'模拟',
                         ])->label('真/模拟') ?>
                     </div>
-                    <div class="col-lg-1 col-xs-6">
+                    <div class="col-lg-2 col-xs-6">
                         <?= $form->field($model, 'single')->textInput() ?>
                     </div>
-                    <div class="col-lg-2 col-xs-6">
-                        <?= $form->field($model, 'arise')->textInput()->label('上奖')?>
-                    </div>
                 </div>
+                <!--排除、上奖模板引入-->
+                <?php include(dirname(__FILE__).'/arise_or_not.php');?>
 
                 <!--配数表单引入-->
                 <?php include(dirname(__FILE__).'/peishu_form.php'); ?>

@@ -118,6 +118,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $no_fix_hefen; #  定位合分值
     public $no_fix_hefen_pos; #  定位合分位置
     public $arise_in; #  三定含
+    public $exclude_codes; # 排除
     public $arise_in_sel; #  三定含，除取
     public $singles_key; # 倍数key
     public $betStatus; # 投注状态

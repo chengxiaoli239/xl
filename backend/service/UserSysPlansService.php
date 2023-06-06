@@ -209,6 +209,10 @@ class UserSysPlansService extends BaseService {
         if(isset($UserSysPlans['arise']) && $UserSysPlans['arise'] !== '' && ($UserSysPlans['arise'] OR $UserSysPlans['arise'] == 0)){
             $tmpFilter['arise'] = trim($UserSysPlans['arise']);
         }
+        # 10、排除
+        if(isset($UserSysPlans['exclude_codes']) && $UserSysPlans['exclude_codes'] !== '' && ($UserSysPlans['exclude_codes'] OR $UserSysPlans['exclude_codes'] == 0)){
+            $tmpFilter['exclude_codes'] = trim($UserSysPlans['exclude_codes']);
+        }
         unset($post['UserSysPlans']['arise']);
         # 14、对数
         if($UserSysPlans['type_log'] && count($UserSysPlans['type_log']) == 1){

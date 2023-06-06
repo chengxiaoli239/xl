@@ -50,10 +50,9 @@ use yii\widgets\ActiveForm;
                     <div class="col-lg-2 col-xs-6">
                         <?= $form->field($model, 'single')->textInput() ?>
                     </div>
-                    <div class="col-lg-2 col-xs-6">
-                        <?= $form->field($model, 'arise')->textInput()->label('上奖') ?>
-                    </div>
                 </div>
+                <!--排除、上奖模板引入-->
+                <?php include(dirname(__FILE__).'/arise_or_not.php');?>
 
                 <!--固定位置模板引入-->
                 <?php include(dirname(__FILE__).'/fixed_positions.php');?>
