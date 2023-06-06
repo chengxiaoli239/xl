@@ -92,12 +92,12 @@ class AgentClientsService extends ClientsBaseService{
                     }
 
                     # 反买组数校验
-                    if($buy_type==0 && $bet_op_theory_counts != $bet_op_counts){
+                    if($buy_type==0 && $data['code_type']==4 && $bet_op_theory_counts != $bet_op_counts){
                         throw_info('反买:组数不符，理论组数：'.$bet_op_theory_counts.' 组，实际：'.$bet_op_counts.' 组 ');
                     }
                     # 正买组数校验
                     if($buy_type==1 && $logData['bet_count'] != $bet_counts){
-                        throw_info('正买组数不符，理论组数：'.$logData['bet_count'].' 组，实际：'.$bet_op_counts.' 组 ');
+                        throw_info('code_type:'.$data['code_type'].' 正买组数不符，理论组数：'.$logData['bet_count'].' 组，实际：'.$bet_op_counts.' 组 ');
                     }
 
                     $record_id = $logData['log_member_quick_select_id'];

@@ -343,9 +343,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $text = '二定位，配数“取”：第1位：024658，固定合分取值：第1位选中，第2位选中，内容：0123456789；';
+        $text = '三定位，配数“取”：第1位：01356';
         list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
-        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz'], 0));
+        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 0);
         p(['codes_hz'=>$data['codes_hz'], 'counts'=>count(explode('@', $codes)), 'codes'=>$codes]);
         p([$code, $data, $err_msg]);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');
