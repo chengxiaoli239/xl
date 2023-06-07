@@ -343,6 +343,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(6992);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p(count($filter_dynamic_codes));
         $text = '四定位，合分值范围：15-25，排除数：0';  # 4599组
         list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
         $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 0);
@@ -350,9 +353,6 @@ class IndexController extends Controller
         //p([$code, $data, $err_msg]);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');
         $rst = self::getPermutations([1, 2, 3]);p($rst);
-        $plan = UserSysPlans::findOne(6822);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
-        p(count($filter_dynamic_codes));
         $codes = BetService::getCodesByPlan($plan);
         p($codes);
         $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);
