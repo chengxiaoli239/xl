@@ -2091,7 +2091,7 @@ class NumService extends BaseService {
      */
     public static function getExcludeCodesWhere($codes_hz, $where, $code_type=4){
         $codes_hz = \backend\service\NumService::getHefenInitData($codes_hz, $code_type);
-        if(empty($codes_hz['exclude_codes'])){
+        if($codes_hz['exclude_codes'] !==0 && $codes_hz['exclude_codes'] !=='0' && empty($codes_hz['exclude_codes'])){
             return $where;
         }
 

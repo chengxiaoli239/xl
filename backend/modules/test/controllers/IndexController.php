@@ -343,11 +343,11 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $text = '三定位，配数“取”：第1位：01356，排除数：2';  # 2660组
+        $text = '四定位，合分值范围：15-25，排除数：0';  # 4599组
         list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
         $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 0);
         p(['codes_hz'=>$data['codes_hz'], 'counts'=>count(explode('@', $codes)), 'codes'=>$codes]);
-        p([$code, $data, $err_msg]);
+        //p([$code, $data, $err_msg]);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');
         $rst = self::getPermutations([1, 2, 3]);p($rst);
         $plan = UserSysPlans::findOne(6822);

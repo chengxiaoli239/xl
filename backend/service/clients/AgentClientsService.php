@@ -269,7 +269,8 @@ class AgentClientsService extends ClientsBaseService{
                 if(strpos($tmpStr, $keyword2) !== false){
                     $keyword2Condition = CodeTypeService::$keywords2[$keyword2];
                     $operateStr = trim(str_replace($keyword2.'：', '', $tmpStr));
-                    if(empty($operateStr)){
+                    //if($operateStr!=='0') continue;
+                    if($operateStr!=='0' && $operateStr!==0 && empty($operateStr)){
                         unset($dataArr[$k1]);
                         continue;
                     }
@@ -314,12 +315,14 @@ class AgentClientsService extends ClientsBaseService{
                             unset($dataArr[$k1]);
                             break;
                         case CodeTypeService::KX_KW_2_EXCLUDE_CODE: #  # 排除数
+                            //p(['codes_hz'=>$codes_hz, $keyword2Condition, 'before'], 0);
                             $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateExcludeCodesCondition($operateStr));
                             break;
                     }
 
+                    //p(['codes_hz'=>$codes_hz, $keyword2Condition, 'after'], 0);
                     $codes_hz = array_merge($codes_hz, $keyword2Condition);
-                    //p(['codes_hz'=>$codes_hz]);
+                    //p(['codes_hz'=>$codes_hz, 'end']);
                     break;
                 }
             }
