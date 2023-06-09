@@ -285,7 +285,8 @@ class AgentClientsService extends ClientsBaseService{
                             $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateFixedPositionStrCondition($operateStr));
                             unset($dataArr[$k1]);
                             break;
-                        case CodeTypeService::KX_KW_2_FIXED_POS: # 固定位置
+                        case CodeTypeService::KX_KW_2_FIXED_POS: # 固定位置 - 四定
+                        case CodeTypeService::KX_KW_2_FIXED_POS_2_3: # 乘号位置
                             $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateFixedPosStrCondition($operateStr));
                             unset($dataArr[$k1]);
                             break;

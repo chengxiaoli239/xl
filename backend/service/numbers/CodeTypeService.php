@@ -35,6 +35,7 @@ class CodeTypeService extends BaseService {
     const KX_POS_TYPE_GET_SMALL = '小数“取”数';
 
     const KX_KW_2_FIXED_POS = '固定位置';
+    const KX_KW_2_FIXED_POS_2_3 = '乘号位置';
     const KX_KW_2_PEISHU_FILTER = '配数“除”';
     const KX_KW_2_PEISHU_GET = '配数“取”';
     const KX_KW_2_FIXED_HF_GET = '固定合分取值';
@@ -85,6 +86,7 @@ class CodeTypeService extends BaseService {
     # 匹配数据
     public static $keywords2 = [
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_POS => [ ],  # '固定位置',
+        \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_POS_2_3 => [ ],  # '乘号位置',
         \backend\service\numbers\CodeTypeService::KX_KW_2_PEISHU_FILTER => ['ps_sel'=>1],  # '配数“除”',
         \backend\service\numbers\CodeTypeService::KX_KW_2_PEISHU_GET => ['ps_sel'=>2], # '配数“取”',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_HF_FILTER => ['fixed_pos_hefen_sel'=>1],  #  '固定合分除值',
