@@ -159,6 +159,10 @@ class NumService extends BaseService {
         63=>'杀上期十位码 ',
         64=>'杀上期个位码 ',
         65=>'杀期号尾数码 ',
+        66=>'取千位最近9个码 ',
+        67=>'取百位最近9个码 ',
+        68=>'取十位最近9个码 ',
+        69=>'取个位最近9个码 ',
     ];
 
     /**
@@ -2828,6 +2832,18 @@ class NumService extends BaseService {
                 case 65: # 杀期号尾数位码
                     $codes = NumService::getBeforeKjCodesDynamic61($plan, $positions=['q'], $lottery_type);
                     break;
+                case 66: # 取千位最近x个码
+                    $codes = NumService::getBeforeKjCodesDynamic62($plan, $positions=[1], $cNum=9);
+                    break;
+                case 67: # 取百位最近x个码
+                    $codes = NumService::getBeforeKjCodesDynamic62($plan, $positions=[2], $cNum=9);
+                    break;
+                case 68: # 取个位最近x个码
+                    $codes = NumService::getBeforeKjCodesDynamic62($plan, $positions=[3], $cNum=9);
+                    break;
+                case 69: # 取个位最近x个码
+                    $codes = NumService::getBeforeKjCodesDynamic62($plan, $positions=[4], $cNum=9);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -3928,6 +3944,51 @@ class NumService extends BaseService {
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '杀x位码6561组', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'currentKjCodes'=>$currentKjCodes, 'sql'=>$sql]);
         $NumTypes = $query->asArray()->all();
         #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 取千、百、十、个 最近9个码
+     * @param object $plan
+     * @param int[] $positions
+     * @param int $cNum
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic62(object $plan, $positions=[1], $cNum=9){
+        $playway = $plan->playway;
+        $lottery_type = $plan->lottery_type;
+
+        $positions_str = 'code'.implode(',",",code', $positions);
+        $groupByPos = [];
+        foreach ($positions as $pp){
+            $groupByPos[] = 'code'.$pp;
+        }
+        $beforeQuery = SscKjData::find()->select(['codes_str'=>'CONCAT('.$positions_str.')', 'qihao'=>'MAX(qihao)'])
+            ->where(['lottery_type'=>$lottery_type])->groupBy($groupByPos)->orderBy(['MAX(qihao)'=>SORT_DESC])->limit($cNum);
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $filterCodes = [];
+
+        foreach ($positions as $p){
+            if(empty($current_kj_qihao)){
+                $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+            }
+            $beforeQuery->andWhere(['<=', 'qihao', $current_kj_qihao]);
+            //p($beforeQuery->createCommand()->getRawSql());
+            $currentKjCodes = $beforeQuery->asArray()->all(); # 最新一期
+            $filterCodes = ArrayHelper::getColumn($currentKjCodes, 'codes_str');
+        }
+
+        $positions_str_4 = 'code_'.implode(',",",code_', $positions);
+        $query = Num4Type::find()->select(['code'])
+            ->where(['=', 'code_type', $playway+1])
+            ->andWhere(['AND', ['IN', 'CONCAT('.$positions_str_4.')', $filterCodes]]);
+        $sql = $query->createCommand()->getRawSql();
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '取x为最近n个码', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'currentKjCodes'=>$currentKjCodes, 'sql'=>$sql]);
+        $NumTypes = $query->asArray()->all();
+        //p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
         return $codes;

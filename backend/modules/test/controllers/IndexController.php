@@ -343,13 +343,13 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(6992);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p(count($filter_dynamic_codes));
         $text = '二定位，配数“取”：第1位：0124689，第2位：0124689，乘号位置：第2位，第3位';  # 4599组
         list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
         $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 0);
         p(['codes_hz'=>$data['codes_hz'], 'counts'=>count(explode('@', $codes)), /*'codes'=>$codes*/]);
-        $plan = UserSysPlans::findOne(6992);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
-        p(count($filter_dynamic_codes));
         //p([$code, $data, $err_msg]);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');
         $rst = self::getPermutations([1, 2, 3]);p($rst);
