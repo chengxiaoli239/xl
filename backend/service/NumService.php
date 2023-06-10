@@ -154,10 +154,10 @@ class NumService extends BaseService {
         58=>'过滤2345位500组直码',
         59=>'过滤2345位300组直码',
         60=>'取1234位置0123同路[或]',
-        61=>'杀千位码 ',
-        62=>'杀百位码 ',
-        63=>'杀十位码 ',
-        64=>'杀个位码 ',
+        61=>'杀上期千位码 ',
+        62=>'杀上期百位码 ',
+        63=>'杀上期十位码 ',
+        64=>'杀上期个位码 ',
         65=>'杀期号尾数码 ',
     ];
 
@@ -2813,16 +2813,16 @@ class NumService extends BaseService {
                 case 60: # 过滤最近2345位300组(四定)，不够往后搜集
                     $codes = NumService::getBeforeKjCodesDynamic60($plan, $positions=[1,2,3,4], $lottery_type);
                     break;
-                case 61: # 杀千位码
+                case 61: # 杀上期千位码
                     $codes = NumService::getBeforeKjCodesDynamic61($plan, $positions=[1], $lottery_type);
                     break;
-                case 62: # 杀百位码
+                case 62: # 杀上期百位码
                     $codes = NumService::getBeforeKjCodesDynamic61($plan, $positions=[2], $lottery_type);
                     break;
-                case 63: # 杀十位码
+                case 63: # 杀上期十位码
                     $codes = NumService::getBeforeKjCodesDynamic61($plan, $positions=[3], $lottery_type);
                     break;
-                case 64: # 杀个位码
+                case 64: # 杀上期个位码
                     $codes = NumService::getBeforeKjCodesDynamic61($plan, $positions=[4], $lottery_type);
                     break;
                 case 65: # 杀期号尾数位码
