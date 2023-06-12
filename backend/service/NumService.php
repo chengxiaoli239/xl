@@ -2056,7 +2056,10 @@ class NumService extends BaseService {
      */
     public static function getFixedPostionWhere($codes_hz, $where, $code_type=4){
         $codes_hz = \backend\service\NumService::getHefenInitData($codes_hz, $code_type);
-        if(empty($codes_hz['p1']) && empty($codes_hz['p2']) && empty($codes_hz['p3']) && empty($codes_hz['p4'])){
+        if(
+            (empty($codes_hz['p1']) && empty($codes_hz['p2']) && empty($codes_hz['p3']) && empty($codes_hz['p4'])) &&
+            (!isset($codes_hz['p1']) && !isset($codes_hz['p2']) && !isset($codes_hz['p3']) && !isset($codes_hz['p4']))
+        ){
             return $where;
         }
 
@@ -2135,7 +2138,7 @@ class NumService extends BaseService {
      */
     public static function getHeFenWhere($codes_hz, $where, $code_type=4){
         $codes_hz = \backend\service\NumService::getHefenInitData($codes_hz, $code_type);
-        if(empty($codes_hz['hfDatas'])){
+        if($codes_hz['hfDatas'] !==0 && $codes_hz['hfDatas'] !=='0' && empty($codes_hz['hfDatas'])){
             return $where;
         }
 
@@ -2173,19 +2176,19 @@ class NumService extends BaseService {
      */
     private static function getHefenInitData($codes_hz=[], $code_type=4){
         $hfDatas = [];
-        if(!empty($codes_hz['hefen_pos1']) && !empty($codes_hz['hefen1'])){
+        if(!empty($codes_hz['hefen_pos1']) && isset($codes_hz['hefen1'])){
             $hfDatas[] = ['pos'=>explode(',', $codes_hz['hefen_pos1']), 'hefens'=>NumService::getHefens($codes_hz['hefen1'])];
             unset($codes_hz['hefen_pos1'], $codes_hz['hefen1']);
         }
-        if(!empty($codes_hz['hefen_pos2']) && !empty($codes_hz['hefen2'])){
+        if(!empty($codes_hz['hefen_pos2']) && isset($codes_hz['hefen2'])){
             $hfDatas[] = ['pos'=>explode(',', $codes_hz['hefen_pos2']), 'hefens'=>NumService::getHefens($codes_hz['hefen2'])];
             unset($codes_hz['hefen_pos2'], $codes_hz['hefen2']);
         }
-        if(!empty($codes_hz['hefen_pos3']) && !empty($codes_hz['hefen3'])){
+        if(!empty($codes_hz['hefen_pos3']) && isset($codes_hz['hefen3'])){
             $hfDatas[] = ['pos'=>explode(',', $codes_hz['hefen_pos3']), 'hefens'=>NumService::getHefens($codes_hz['hefen3'])];
             unset($codes_hz['hefen_pos3'], $codes_hz['hefen3']);
         }
-        if(!empty($codes_hz['hefen_pos4']) && !empty($codes_hz['hefen4'])){
+        if(!empty($codes_hz['hefen_pos4']) && isset($codes_hz['hefen4'])){
             $hfDatas[] = ['pos'=>explode(',', $codes_hz['hefen_pos4']), 'hefens'=>NumService::getHefens($codes_hz['hefen4'])];
             unset($codes_hz['hefen_pos4'], $codes_hz['hefen4']);
         }
@@ -2196,7 +2199,7 @@ class NumService extends BaseService {
 
     private static function getHefens($hefen_str='', $code_type=4){
         $hefenArr = [];
-        if(empty($hefen_str)){
+        if(empty($hefen_str) && $hefen_str !== '0' && $hefen_str !==0){
             return $hefenArr;
         }
         for($i=0; $i<strlen($hefen_str); $i++){

@@ -295,14 +295,15 @@ class AgentClientsService extends ClientsBaseService{
                             $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::opratePeiShuStrCondition($operateStr));
                             unset($dataArr[$k1]);
                             break;
-                        case CodeTypeService::KX_KW_2_FIXED_HF_FILTER:
-                        case CodeTypeService::KX_KW_2_FIXED_HF_GET:
+                        case CodeTypeService::KX_KW_2_FIXED_HF_FILTER: # 固定合分除值
+                        case CodeTypeService::KX_KW_2_FIXED_HF_GET: # 固定合分取值
+                            //var_dump('keyword2：'.$keyword2.'=='.$tmpStr);
                             $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateFixedPosHfStrCondition($operateStr));
                             unset($dataArr[$k1]);
                             break;
                         case CodeTypeService::KX_KW_2_NOT_FIXED_HF_2NUM: # 不定合分值(两数合)
                         case CodeTypeService::KX_KW_2_NOT_FIXED_HF_3NUM: # 不定合分值(三数合)
-                            var_dump('keyword2：'.$keyword2.'=='.$tmpStr);
+                            //var_dump('keyword2：'.$keyword2.'=='.$tmpStr);
                             $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateNotFixed2_3Condition($operateStr));
                             unset($dataArr[$k1]);
                             break;
