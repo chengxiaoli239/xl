@@ -23,6 +23,8 @@ class CodeTypeService extends BaseService {
     const KX_ACT_TYPE_GET_3B_TXT = '三兄弟“取”操作';
     const KX_ACT_TYPE_FILTER_4B_TXT = '四兄弟“除”操作';
     const KX_ACT_TYPE_GET_4B_TXT = '四兄弟“取”操作';
+    const KX_ACT_TYPE_FILTER_LOG = '对数“除”操作';
+    const KX_ACT_TYPE_GET_LOG = '对数“取”操作';
 
     # keyword type 2 位置过滤  四定位，定位置“取”：千=123，百=3，十=23，个=324，对数“除”数：16，，大数“除”数：第1位，第3位，第4位
     const KX_POS_TYPE_FILTER_ODD = '单数“除”数';
@@ -69,6 +71,8 @@ class CodeTypeService extends BaseService {
         \backend\service\numbers\CodeTypeService::KX_ACT_TYPE_GET_3B_TXT => ['type_3b'=>1],
         \backend\service\numbers\CodeTypeService::KX_ACT_TYPE_FILTER_4B_TXT => ['type_4b'=>0],
         \backend\service\numbers\CodeTypeService::KX_ACT_TYPE_GET_4B_TXT => ['type_4b'=>1],
+        \backend\service\numbers\CodeTypeService::KX_ACT_TYPE_FILTER_LOG => ['type_log'=>0],
+        \backend\service\numbers\CodeTypeService::KX_ACT_TYPE_GET_LOG => ['type_log'=>1],
     ];
 
     # 匹配 类型 "除" 、"取"

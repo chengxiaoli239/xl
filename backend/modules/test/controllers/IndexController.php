@@ -343,9 +343,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $text = '四定位，配数“取”：第2位：01235，固定合分除值：第4位选中，内容：0；，不定合分值(两数合)：01356，合分值范围：9-26，固定位置：第4位，包含“取”数：2378，三兄弟“除”操作';  # 4599组
+        $text = '四定位，二兄弟“取”操作，对数“除”操作';
         list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
-        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 1);
+        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 0);
         p(['codes_hz'=>$data['codes_hz'], 'counts'=>count(explode('@', $codes)), /*'codes'=>$codes*/]);
         $plan = UserSysPlans::findOne(6992);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
