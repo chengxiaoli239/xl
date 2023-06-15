@@ -52,6 +52,10 @@ class DatasClearService extends BaseService{
                 $admin_log_delete_sql = 'DELETE FROM {{%admin_log}} WHERE update_time NOT REGEXP "'.implode('|', $dates);
                 $admin_log_delete = $db->createCommand($admin_log_delete_sql)->execute();
 
+                # agent_user_bet_logs记录
+                $agent_user_bet_logs_delete_sql = 'DELETE FROM {{%agent_user_bet_logs}} WHERE update_time NOT REGEXP "'.implode('|', $dates);
+                $agent_user_bet_logs_delete = $db->createCommand($agent_user_bet_logs_delete_sql)->execute();
+
                 $logArr = [
                     'lottery_type'=>$lottery_type,
                     'count_sql'=>$count_sql,
@@ -64,6 +68,7 @@ class DatasClearService extends BaseService{
                     'deal_status_delete'=>$deal_status_delete,
                     'admin_log_delete_sql' => $admin_log_delete_sql,
                     'admin_log_delete' => $admin_log_delete,
+                    'agent_user_bet_logs_delete' => $agent_user_bet_logs_delete,
                 ];
                 Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '清理数据', $logArr);
             }catch (\Exception $exception){

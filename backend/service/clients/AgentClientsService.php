@@ -16,6 +16,8 @@ class AgentClientsService extends ClientsBaseService{
     const ALL_CODE_TYPE_3_NUMS = 1000;
     const ALL_CODE_TYPE_4_NUMS = 10000;
 
+    const BET_WARING_CODE = 48888;
+
     public static function validateSyncMemberBetLogs($member_bet_logs){
         if($member_bet_logs['Status'] != 1){
             throw_info('日志请求状态异常Status:'.$member_bet_logs['Status']);
@@ -54,6 +56,7 @@ class AgentClientsService extends ClientsBaseService{
             list($code, $logDatas, $err_msg) = AgentClientsService::validateSyncMemberBetLogs($member_bet_logs);
             foreach ($logDatas as $logData){
                 try {
+                    $record_id = $logData['log_member_quick_select_id'];
                     $member_bet_time = date('Y-').$logData['operation_datetime'];
                     if($member_bet_time < $before_5min_time){
                         throw_info($err_msg.'，历史下注记录不同步：用户下注时间:'.$member_bet_time. '，当前5分钟前:'.$before_5min_time, 40001);
@@ -88,19 +91,18 @@ class AgentClientsService extends ClientsBaseService{
                     $bet_op_counts = count(explode('@', $bet_codes_op));  # 实际反买组数
 
                     if($data['code_type']==4 && $buy_type==0 && $bet_op_counts<1000){
-                        throw_info('反买:组数少于1000组不下注，组数：'.$bet_op_counts.' 组 ');
+                        throw_info('反买:组数少于1000组不下注，组数：'.$bet_op_counts.' 组 ', self::BET_WARING_CODE);
                     }
 
                     # 反买组数校验
                     if($buy_type==0 && $data['code_type']==4 && $bet_op_theory_counts != $bet_op_counts){
-                        throw_info('反买:组数不符，理论组数：'.$bet_op_theory_counts.' 组，实际：'.$bet_op_counts.' 组 ');
+                        throw_info('反买:组数不符，理论组数：'.$bet_op_theory_counts.' 组，实际：'.$bet_op_counts.' 组 ', self::BET_WARING_CODE);
                     }
                     # 正买组数校验
                     if($buy_type==1 && $logData['bet_count'] != $bet_counts){
-                        throw_info('code_type:'.$data['code_type'].' 正买组数不符，理论组数：'.$logData['bet_count'].' 组，实际：'.$bet_op_counts.' 组 ');
+                        throw_info('code_type:'.$data['code_type'].' 正买组数不符，理论组数：'.$logData['bet_count'].' 组，实际：'.$bet_op_counts.' 组 ', self::BET_WARING_CODE);
                     }
 
-                    $record_id = $logData['log_member_quick_select_id'];
                     $setDatas = [
                         'access_token' => $access_token,
                         'uid' => $TzSystemsUsers->uid,
@@ -120,7 +122,7 @@ class AgentClientsService extends ClientsBaseService{
                         'bet_op_counts' => (int)$bet_op_counts, # 反买组数
                         'bet_op_single' => $bet_single_op, # 反买倍数
                         'bet_op_money' => ($bet_single_op * $bet_op_counts), # 反买金额
-                        'bet_type' => $buy_type, # 下注类型：1反买2正买  默认反买
+                        'bet_type' => $buy_type, # 下注类型：0反买1正买  默认反买
 
                         'member_bet_time' => $member_bet_time,
 
@@ -147,6 +149,12 @@ class AgentClientsService extends ClientsBaseService{
                 }catch (\Exception $e){
                     if($e->getCode()<40000){
                         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '代理日志记录-异常', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>$e->getMessage()]);
+                    }elseif($e->getCode() == self::BET_WARING_CODE){
+                        $mcKey = 'wp_record_xxx_'.$record_id;
+                        $num = \Yii::$app->redis->incr($mcKey);
+                        if($num<2){
+                            Tool_Common::log('/client_xy/'.__FUNCTION__.'_warn', 'INFO', '代理日志记录-警告', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, 'logData'=>$logData, 'err_msg'=>$e->getMessage()]);
+                        }
                     }else{
                         Tool_Common::log('/client_xy/'.__FUNCTION__.'_invalid', 'INFO', '代理日志记录-无效', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>$e->getMessage()]);
                     }
@@ -216,6 +224,7 @@ class AgentClientsService extends ClientsBaseService{
      */
     public static function getKuaiYiDescByOperationLogs($bet_log=''){
         #$bet_log = '四定位，配数“取”:第1位: 356789，第2位: 045678，固定合分除值：，不定合分值(两数合):01356，合分值范围:9-28，包含“取”数:0258,三兄弟“除”操作，四兄弟“除”操作，双数“除”数:第2位，第3位，第4位';
+        $bet_log = str_replace(['[', ']'], '', $bet_log);
         $bet_log = str_replace(';', '；', $bet_log);
         $bet_log = str_replace(',', '，', $bet_log);
         #p(['initLog'=>$bet_log], 0);
