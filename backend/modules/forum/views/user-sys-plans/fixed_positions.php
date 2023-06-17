@@ -10,13 +10,11 @@ use yii\widgets\ActiveForm;
 <!--大小、单双模板-->
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color:green">
     <div class="col-lg-1 col-xs-12">
-        <!--?= $form->field($model, 'ps_sel')->checkboxList([1=>'除',2=>'取'])->label('配数全转') ?-->
         <?= $form->field($model, 'fixed_pos_sel')->checkboxList(
             [1=>'除', 2=>'取'],
             [
                 'item' => function ($index, $label, $name, $checked, $value) {
                     $options = [
-                        #'class' => 'ps_sel',
                         'class' => 'checkbox-item',
                         'label' => $label,
                         'value' => $value,

@@ -476,6 +476,29 @@ class UserService extends BaseService {
     }
 
     /**
+     * 设置止盈止损
+     * @param $uid
+     * @param array $data
+     * @return bool
+     */
+    public static function setFollowBuy($uid, $data=[]){
+        try {
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+            $TzSystemsUsers->flow_wp_accounts = ($data['flow_wp_accounts']? trim(str_replace('，', ',', $data['flow_wp_accounts'])):'');
+            $TzSystemsUsers->flow_wp_player_bs = ($data['flow_wp_player_bs']? round(trim($data['flow_wp_player_bs']), 1):'');
+            $TzSystemsUsers->flow_op_accounts = ($data['flow_wp_accounts']? trim(str_replace('，', ',', $data['flow_wp_accounts'])):'');
+            $TzSystemsUsers->flow_op_player_bs = ($data['flow_op_player_bs']? round(trim($data['flow_op_player_bs']), 1):'');
+            if(!$TzSystemsUsers->save()){
+                throw_info(yii\helpers\Json::encode($TzSystemsUsers->getErrors(), 320));
+            }
+        }catch (\Exception $e){
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * 账号当前盈利
      * @param $uid
      * @return mixed

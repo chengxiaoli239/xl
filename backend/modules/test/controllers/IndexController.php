@@ -17,6 +17,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\modules\cron\controllers\WeixinController;
 use backend\modules\kj\controllers\BingDaoController;
+use backend\service\AgentUsersService;
 use backend\service\baota\BaoTaService;
 use backend\service\BetService;
 use backend\service\ChatCommonBetService;
@@ -343,6 +344,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>20]);
+        list($code, $bet_single) = AgentUsersService::getFlowSingle($TzSystemsUsers, $single=0.5, $buy_type=0);
+        p(['code'=>$code, 'bet_single'=>$bet_single]);
         $text = '[三定位]，配数“[取]”：第1位：[01356]，第2位：[01356]，第3位：[01356]';
         $text = str_replace(['[', ']'], '', $text);
         list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);

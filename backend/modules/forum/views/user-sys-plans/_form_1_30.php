@@ -85,6 +85,10 @@ use yii\widgets\ActiveForm;
                     ])->label('对数') ?>
                     </div>
                 </div>
+
+                <!--对数表单引入-->
+                <?php include(dirname(__FILE__).'/log_form.php'); ?>
+
                 <!--大小、单双模板引入-->
                 <?php include(dirname(__FILE__).'/dx_ds.php');?>
 

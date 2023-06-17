@@ -85,13 +85,13 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                             return empty($model->desc) ? '<font color="green">正常</font>' : '<font color="red">'.$model->desc.'</font>';
                                         }
                                     ],
-                                    //'flow_wp_accounts',
-                                    ['attribute' => 'flow_wp_accounts', 'label'=>'跟随账号', 'headerOptions' => ['width' => '8%'],
+                                    ['attribute' => 'flow_wp_accounts', 'label'=>'网盘跟买', 'headerOptions' => ['width' => '8%'],
                                         'format'=>'raw',
                                         'value'=> function($model){
-                                            $txt = $model->flow_wp_accounts ? '<strong><font color="green">正买</font></strong>：'.implode('、', explode(',', $model->flow_wp_accounts)) : '';
-                                            $txt .= $model->flow_op_accounts ? ' &nbsp;<strong><font color="red">反买</font></strong>：'.implode('、', explode(',', $model->flow_op_accounts)) : '';
-                                            return $txt;
+                                            $set = Html::a('设置', 'javascript:;', ['id' => 'setWpFollow','alt'=>'设置跟买', 'class'=>'btn btn-xs']);
+                                            $txt = $model->flow_wp_accounts ? '<strong><font color="green">正买</font></strong>：'.implode('、', explode(',', $model->flow_wp_accounts)).'['.$model->flow_wp_player_bs.'倍]' : '';
+                                            $txt .= $model->flow_op_accounts ? ' &nbsp;<strong><font color="red">反买</font></strong>：'.implode('、', explode(',', $model->flow_op_accounts)).'['.$model->flow_op_player_bs.'倍]' : '';
+                                            return $txt.' &nbsp; '.$set;
                                         },
                                     ],
                                     ['attribute' => 'cookie', 'label'=>'cookie',
@@ -152,6 +152,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
     </div>
 </div>
 
+<!--赔率-->
 <div class="modal fade" id="setProfitsModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -162,12 +163,12 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
             </div>
             <div class="modal-body">
                 <form class="bs-example bs-example-form" role="form">
-                    <div class="input-group">
+                    <div class="input-group layui-input-inline">
                         <span class="input-group-addon">止盈</span>
                         <input type="text" class="form-control" placeholder="止盈" name="take_profits" id="take_profits" value="<?echo $models[0]->take_profits?>">
                     </div>
                     <br>
-                    <div class="input-group">
+                    <div class="input-group layui-input-inline">
                         <span class="input-group-addon">止损</span>
                         <input type="text" class="form-control" placeholder="止损" name="stop_loss" id="stop_loss" value="<?echo $models[0]->stop_loss?>">
                     </div>
@@ -176,6 +177,46 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" id="setProfitsBtn">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--网盘跟买-->
+<div class="modal fade" id="setFollowModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="set_follow_msg_title">设置跟买</h4>
+            </div>
+            <div class="modal-body">
+                <form class="bs-example bs-example-form" role="form">
+                    <div class="input-group layui-input-inline">
+                        <span class="input-group-addon">正买账号</span>
+                        <input type="text" class="form-control" placeholder="正买账号,多个用英文账号隔开" name="flow_wp_accounts" id="flow_wp_accounts" value="<?echo $models[0]->flow_wp_accounts?>">
+                    </div>
+                    <br>
+                    <div class="input-group layui-input-inline">
+                        <span class="input-group-addon">倍数比例</span>
+                        <input type="text" class="form-control" placeholder="倍数" name="flow_wp_player_bs" id="flow_wp_player_bs" value="<?echo $models[0]->flow_wp_player_bs?>">
+                    </div>
+                    <br>
+                    <div class="input-group layui-input-inline">
+                        <span class="input-group-addon">反买账号</span>
+                        <input type="text" class="form-control" placeholder="反买账号,多个用英文账号隔开" name="flow_op_accounts" id="flow_op_accounts" value="<?echo $models[0]->flow_op_accounts?>">
+                    </div>
+                    <br>
+                    <div class="input-group layui-input-inline">
+                        <span class="input-group-addon">倍数比例</span>
+                        <input type="text" class="form-control" placeholder="倍数" name="flow_op_player_bs" id="flow_op_player_bs" value="<?echo $models[0]->flow_op_player_bs?>">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="setFollowBtn">确定</button>
             </div>
         </div>
     </div>
@@ -217,16 +258,43 @@ $(function () {
         if(id != null) updateBalance(id)
     });
 
+    // 止盈止损
     $('#setProfits').click(function () {
         $('#set_msg_title').html('设置止盈止损');
         $('#setProfitsModal').modal('show');
     });
+    // 网盘跟买
+    $('#setWpFollow').click(function () {
+        //$('#set_follow_msg_title').html('设置跟买');
+        $('#setFollowModal').modal('show');
+    });
 
+    // 止盈止损
     $('#setProfitsBtn').click(function () {
         profits = $('#take_profits').val()
         loss = $('#stop_loss').val()
         var data = {take_profits:profits, stop_loss:loss};
         $.post("/forum/user/set-profits",data,function(rst) {
+            console.log(rst)
+            if(rst.status == 200) {
+                window.href.reload()
+            }
+        },'JSON');
+    });
+
+    // 跟买
+    $('#setFollowBtn').click(function () {
+        flow_wp_accounts = $('#flow_wp_accounts').val()
+        flow_wp_player_bs = $('#flow_wp_player_bs').val()
+        flow_op_accounts = $('#flow_op_accounts').val()
+        flow_op_player_bs = $('#flow_op_player_bs').val()
+        var data = {
+            flow_wp_accounts:flow_wp_accounts,
+            flow_wp_player_bs:flow_wp_player_bs,
+            flow_op_accounts:flow_op_accounts,
+            flow_op_player_bs:flow_op_player_bs,
+        };
+        $.post("/forum/user/set-follow-buy",data,function(rst) {
             console.log(rst)
             if(rst.status == 200) {
                 window.href.reload()

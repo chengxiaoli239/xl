@@ -69,6 +69,8 @@ class TzSystemsUsers extends TzSystemsUsersModel
             'status' => $this->status,
             'is_auto_login' => $this->is_auto_login,
             'tz_sort' => $this->tz_sort,
+            'flow_wp_player_bs' => $this->flow_wp_player_bs,
+            'flow_op_player_bs' => $this->flow_op_player_bs,
             'odds_2x' => $this->odds_2x,
             'odds_3x' => $this->odds_3x,
             'odds_4x' => $this->odds_4x,

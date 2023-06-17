@@ -103,6 +103,10 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $ps_3; #  配数3
     public $ps_4; #  配数4
 
+    public $log_sel; #  对数选项
+    public $log_1; #  对数1
+    public $log_2; #  对数2
+    public $log_3; #  对数3
 
     public $odd_sel; #  单选项
     public $odd_pos; #  单位置

@@ -29,6 +29,7 @@ use yii\widgets\ActiveForm;
                 </div>
             </div>
 
+            <!--
             <div class="row">
                 <div class="col-lg-6 col-xs-6">
                     <?= $form->field($model, 'flow_wp_accounts')->textInput(['maxlength' => true])->label('跟随正买账号，多个则为英文逗号隔开') ?>
@@ -37,6 +38,7 @@ use yii\widgets\ActiveForm;
                     <?= $form->field($model, 'flow_op_accounts')->textInput(['maxlength' => true])->label('跟随反买账号，多个则为英文逗号隔开') ?>
                 </div>
             </div>
+            -->
 
             <div class="row">
                 <div class="col-lg-6 col-xs-6">
@@ -49,7 +51,6 @@ use yii\widgets\ActiveForm;
 
             <div class="row">
                 <div class="col-lg-12">
-
                     <?= $form->field($model, 'ssc_domain')->textInput(['maxlength' => true])->label('网盘地址(格式：http://f9.ww666733.xyz:5678，或http://f9.ww666733.xyz)') ?>
                 </div>
             </div>
@@ -59,6 +60,8 @@ use yii\widgets\ActiveForm;
                     <?= $form->field($model, 'cookie')->textInput(['maxlength' => true]) ?>
                 </div>
             </div>
+            <!--
+            -->
 
             <div class="row">
                 <div class="col-lg-4 col-xs-4">

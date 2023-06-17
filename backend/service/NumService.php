@@ -36,6 +36,9 @@ class NumService extends BaseService {
     # 配数，除、取
     const PEI_SHU_EXCLUDE = 1; # 除
     const PEI_SHU_OBTAIN = 2; # 取
+    # 对数，除、取
+    const LOG_EXCLUDE = 1; # 除
+    const LOG_OBTAIN = 2; # 取
     # 合分，除、取
     const HE_FEN_EXCLUDE = 1; # 除
     const HE_FEN_OBTAIN = 2; # 取
@@ -1081,6 +1084,7 @@ class NumService extends BaseService {
         $where = NumService::getExcludeCodesWhere($codes_hz, $where, $code_type);  # 排除
         $where = NumService::getHeFenWhere($codes_hz, $where, $code_type);  # 定位合分
         $where = NumService::getPeiShuWhere($codes_hz, $where, $code_type);  # 配数
+        $where = NumService::getLogWhere($codes_hz, $where, $code_type);  # 对数
         $where = NumService::getPosOddWhere($codes_hz, $where);  # 筛选位置：单
         $where = NumService::getPosEvenWhere($codes_hz, $where);  # 筛选位置：双
         $where = NumService::getPosBigWhere($codes_hz, $where);  # 筛选位置：大
@@ -1764,6 +1768,45 @@ class NumService extends BaseService {
         return $where;
     }
 
+    /**
+     * 对数条件
+     * @param array $codes_hz
+     * @param array $where
+     * @return array
+     */
+    private static function getLogWhere($codes_hz=[], &$where=[], $code_type=4){
+        if(!isset($codes_hz['log_sel']) OR !in_array($codes_hz['log_sel'], [NumService::LOG_EXCLUDE, NumService::LOG_OBTAIN])){
+            return $where;
+        }
+
+        if(empty($codes_hz['log_1']) OR empty($codes_hz['log_1']) OR empty($codes_hz['log_1']) or empty($codes_hz['log_sel'])){
+            return $where;
+        }
+        $all_log_datas = array_filter([trim($codes_hz['log_1']), trim($codes_hz['log_2']), trim($codes_hz['log_3'])]);
+
+        # 对数取，条件组装
+        $dsFilterWhere = ['OR'];
+        foreach ($all_log_datas as $ds_data){
+            #p(['ps_data'=>$ps_data, 'not_fixed_pos'=>$not_fixed_pos]);
+            $dsTmpWhere = ['AND'];
+            $dsTmpWhere[] = ['REGEXP', 'CONCAT(code_1,code_2,code_3, code_4)', $ds_data[0]];
+            $dsTmpWhere[] = ['REGEXP', 'CONCAT(code_1,code_2,code_3, code_4)', $ds_data[1]];
+            $dsFilterWhere[] = $dsTmpWhere;
+        }
+
+        #p([$codes_hz, $where, $ps_datas], 0);
+        if($codes_hz['log_sel'] == NumService::LOG_EXCLUDE){
+            # 配数除，条件组装
+            $where = array_merge($where, [['NOT', $dsFilterWhere]]);
+        }elseif($codes_hz['log_sel'] == NumService::LOG_OBTAIN){
+            # 配数取，条件组装
+            $where[] = $dsFilterWhere;
+        }
+        #p($where);
+
+        return $where;
+    }
+
     public static function getCombination($not_fixed_pos, $num) {
         $results = [[]];
         for ($i = 0; $i < $num; $i++) {
@@ -2443,6 +2486,20 @@ class NumService extends BaseService {
         }
         if(isset($hz_Arr['fixed_sel_pos']) && !empty($hz_Arr['fixed_sel_pos'])){
             $desc .= ' 定位置:'.$hz_Arr['fixed_sel_pos'];
+        }
+
+        # 对数 除、取
+        if(isset($hz_Arr['log_sel']) && $hz_Arr['log_sel']){
+            $desc .= $hz_Arr['log_sel']==NumService::PEI_SHU_OBTAIN ? ' 对数取:' : '对数除:';
+            if(isset($hz_Arr['log_1']) && $hz_Arr['log_1'] !== ''){
+                $desc .= '对数1:'.$hz_Arr['log_1'];
+            }
+            if(isset($hz_Arr['log_2']) && $hz_Arr['log_2'] !== ''){
+                $desc .= '对数2:'.$hz_Arr['log_2'];
+            }
+            if(isset($hz_Arr['log_3']) && $hz_Arr['log_3'] !== ''){
+                $desc .= '对数3:'.$hz_Arr['log_3'];
+            }
         }
 
         # 筛选位置：单

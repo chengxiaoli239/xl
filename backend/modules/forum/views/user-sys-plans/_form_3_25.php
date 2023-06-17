@@ -81,7 +81,6 @@ use yii\widgets\ActiveForm;
                             [
                                 'item' => function ($index, $label, $name, $checked, $value) {
                                     $options = [
-                                        #'class' => 'ps_sel',
                                         'class' => 'checkbox-item',
                                         'label' => $label,
                                         'value' => $value,
@@ -104,7 +103,6 @@ use yii\widgets\ActiveForm;
                             [
                                 'item' => function ($index, $label, $name, $checked, $value) {
                                     $options = [
-                                        #'class' => 'ps_sel',
                                         'class' => 'checkbox-item',
                                         'label' => $label,
                                         'value' => $value,
@@ -132,6 +130,9 @@ use yii\widgets\ActiveForm;
                 <!--?= $form->field($model, 'hefen_pos4')->checkboxList($hefen_pos)->label('1.4定位合分取:位置') ?-->
                 <!--位置合分：合分4-->
                 <!--?= $form->field($model, 'hefen4')->textInput()->label('1.4定位合分:值')?-->
+
+                <!--对数表单引入-->
+                <?php include(dirname(__FILE__).'/log_form.php'); ?>
 
                 <!--大小、单双模板引入-->
                 <?php include(dirname(__FILE__).'/dx_ds.php');?>

@@ -122,6 +122,27 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['fixed_sel_pos']);
 
+        # 对数
+        if($UserSysPlans['log_sel'] && count($UserSysPlans['log_sel']) == 1){
+            $tmpFilter['log_sel'] = (int)$UserSysPlans['log_sel'][0];
+        }
+        unset($post['UserSysPlans']['log_sel']);
+        # 对数1
+        if(isset($UserSysPlans['log_1']) && $UserSysPlans['log_1'] !== ''){
+            $tmpFilter['log_1'] = trim($UserSysPlans['log_1']);
+        }
+        unset($post['UserSysPlans']['log_1']);
+        # 对数2
+        if(isset($UserSysPlans['log_2']) && $UserSysPlans['log_2'] !== ''){
+            $tmpFilter['log_2'] = trim($UserSysPlans['log_2']);
+        }
+        unset($post['UserSysPlans']['log_2']);
+        # 对数3
+        if(isset($UserSysPlans['log_3']) && $UserSysPlans['log_3'] !== ''){
+            $tmpFilter['log_3'] = trim($UserSysPlans['log_3']);
+        }
+        unset($post['UserSysPlans']['log_3']);
+
         # 筛选位置：单
         if($UserSysPlans['odd_sel'] && count($UserSysPlans['odd_sel']) == 1){
             $tmpFilter['odd_sel'] = (int)$UserSysPlans['odd_sel'][0];

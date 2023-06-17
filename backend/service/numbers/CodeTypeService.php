@@ -40,6 +40,8 @@ class CodeTypeService extends BaseService {
     const KX_KW_2_FIXED_POS_2_3 = '乘号位置';
     const KX_KW_2_PEISHU_FILTER = '配数“除”';
     const KX_KW_2_PEISHU_GET = '配数“取”';
+    const KX_KW_2_LOG_FILTER = '对数“除”';
+    const KX_KW_2_LOG_GET = '对数“取”';
     const KX_KW_2_FIXED_HF_GET = '固定合分取值';
     const KX_KW_2_FIXED_HF_FILTER = '固定合分除值';
     const KX_KW_2_NOT_FIXED_HF_2NUM = '不定合分值(两数合)';
@@ -93,6 +95,8 @@ class CodeTypeService extends BaseService {
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_POS_2_3 => [ ],  # '乘号位置',
         \backend\service\numbers\CodeTypeService::KX_KW_2_PEISHU_FILTER => ['ps_sel'=>1],  # '配数“除”',
         \backend\service\numbers\CodeTypeService::KX_KW_2_PEISHU_GET => ['ps_sel'=>2], # '配数“取”',
+        \backend\service\numbers\CodeTypeService::KX_KW_2_LOG_FILTER => ['log_sel'=>1],  # '对数“除”',
+        \backend\service\numbers\CodeTypeService::KX_KW_2_LOG_GET => ['log_sel'=>2], # '对数“取”',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_HF_FILTER => ['fixed_pos_hefen_sel'=>1],  #  '固定合分除值',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_HF_GET => ['fixed_pos_hefen_sel'=>2],  #  '固定合分取值',
         \backend\service\numbers\CodeTypeService::KX_KW_2_NOT_FIXED_HF_2NUM => ['no_fix_hefen_pos'=>1],  # '不定合分值(两数合)',

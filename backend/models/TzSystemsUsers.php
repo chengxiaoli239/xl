@@ -16,7 +16,9 @@ use Yii;
  * @property string $sys_name 系统名称
  * @property string $account 投注账号
  * @property string $flow_wp_accounts 跟随正买账号
+ * @property double $flow_wp_player_bs 跟随正买倍数
  * @property string $flow_op_accounts 跟随反买账号
+ * @property double $flow_op_player_bs 跟随反买倍数
  * @property string $password 网盘密码
  * @property string $sys_password 机器人网盘密码
  * @property string $sys_repassword 机器人重复密码
@@ -68,7 +70,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
     {
         return [
             [['uid', 'is_agent', 'tz_system_id', 'status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'is_local_bet', 'proxy_type', 'expire_time', 'created_at', 'updated_at'], 'integer'],
-            [['balance', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
+            [['balance', 'flow_wp_player_bs', 'flow_op_player_bs', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
             [['cookie', 'cookie_wx_web'], 'string'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
@@ -128,7 +130,9 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'sys_name' => Yii::t('app', '系统名称'),
             'account' => Yii::t('app', '投注账号'),
             'flow_wp_accounts' => Yii::t('app', '跟随正买账号'),
+            'flow_wp_player_bs' => Yii::t('app', '跟随正买倍数'),
             'flow_op_accounts' => Yii::t('app', '跟随反买账号'),
+            'flow_op_player_bs' => Yii::t('app', '跟随反买倍数'),
             'password' => Yii::t('app', '网盘密码'),
             'sys_password' => Yii::t('app', '机器人登陆密码'),
             'sys_repassword' => Yii::t('app', '机器人登陆重复密码'),
