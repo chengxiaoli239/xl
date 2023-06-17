@@ -143,7 +143,7 @@ class AgentClientsService extends ClientsBaseService{
                         throw_info(Json::encode($AgentUserBetLogs->getErrors(), 320));
                     }
                     $codes = ($buy_type==1) ? $bet_codes : $bet_codes_op;
-                    list($code, $bet_single) = AgentUsersService::getFlowSingle($TzSystemsUsers, $single, $buy_type);
+                    list($code, $bet_single) = AgentUsersService::getFlowSingle($TzSystemsUsers, $single, $buy_type, $playway);
                     $rst = (new \backend\service\Lucky5\Lucky5Service($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id))->pushIntoBetTask($qihao, $codes, $data['tz_type'], $bet_single, $playway, $TzSystemsUsers->uid, $plan_id=$record_id, $lottery_type);
                     Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['account'=>$logData['account'], 'logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes(), 'rst'=>$rst]);
                 }catch (\Exception $e){

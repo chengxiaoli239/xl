@@ -248,7 +248,7 @@ class AgentUsersService extends BaseService {
      * @param int $buy_type
      * @return array
      */
-    public static function getFlowSingle(object $TzSystemsUsers, $single=0.1, $buy_type=0){
+    public static function getFlowSingle(object $TzSystemsUsers, $single=0.1, $buy_type=0, $playway=3){
 
         if($buy_type == 1){
             $bet_single = $single * $TzSystemsUsers->flow_wp_player_bs;
@@ -256,8 +256,11 @@ class AgentUsersService extends BaseService {
             $bet_single = $single * $TzSystemsUsers->flow_op_player_bs;
         }
         $bet_single = floor($bet_single * 10)/10;  # bet_single 向下保留一位小数
-        if($bet_single<0.1){
+        if(in_array($playway, [2, 3]) && $bet_single<0.1){
             $bet_single = 0.1;
+        }
+        if(in_array($playway, [1]) && $bet_single<1){
+            $bet_single = 1;
         }
 
         return [0, $bet_single];
