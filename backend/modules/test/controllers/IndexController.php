@@ -344,14 +344,14 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $text = '[四定位]，对数“[取]”数：[05]，[38]，';
+        $text = str_replace(['[', ']'], '', $text);
+        list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
+        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 1);
+        p(['codes_hz'=>$data['codes_hz'], 'counts'=>count(explode('@', $codes)), /*'codes'=>$codes*/]);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>20]);
         list($code, $bet_single) = AgentUsersService::getFlowSingle($TzSystemsUsers, $single=0.5, $buy_type=0);
         p(['code'=>$code, 'bet_single'=>$bet_single]);
-        $text = '[三定位]，配数“[取]”：第1位：[01356]，第2位：[01356]，第3位：[01356]';
-        $text = str_replace(['[', ']'], '', $text);
-        list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
-        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 0);
-        p(['codes_hz'=>$data['codes_hz'], 'counts'=>count(explode('@', $codes)), /*'codes'=>$codes*/]);
         $plan = UserSysPlans::findOne(6992);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         p(count($filter_dynamic_codes));

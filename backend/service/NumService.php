@@ -2097,7 +2097,7 @@ class NumService extends BaseService {
      * @param $code_type
      * @return array
      */
-    public static function getFixedPostionWhere($codes_hz, $where, $code_type=4){
+    public static function getFixedPostionWhere($codes_hz, &$where, $code_type=4){
         $codes_hz = \backend\service\NumService::getHefenInitData($codes_hz, $code_type);
         if(
             (empty($codes_hz['p1']) && empty($codes_hz['p2']) && empty($codes_hz['p3']) && empty($codes_hz['p4'])) &&
@@ -2151,7 +2151,7 @@ class NumService extends BaseService {
      * @param $code_type
      * @return array
      */
-    public static function getExcludeCodesWhere($codes_hz, $where, $code_type=4){
+    public static function getExcludeCodesWhere($codes_hz, &$where, $code_type=4){
         $codes_hz = \backend\service\NumService::getHefenInitData($codes_hz, $code_type);
         if($codes_hz['exclude_codes'] !==0 && $codes_hz['exclude_codes'] !=='0' && empty($codes_hz['exclude_codes'])){
             return $where;
@@ -2179,7 +2179,7 @@ class NumService extends BaseService {
      * @param $code_type
      * @return array
      */
-    public static function getHeFenWhere($codes_hz, $where, $code_type=4){
+    public static function getHeFenWhere($codes_hz, &$where, $code_type=4){
         $codes_hz = \backend\service\NumService::getHefenInitData($codes_hz, $code_type);
         if($codes_hz['hfDatas'] !==0 && $codes_hz['hfDatas'] !=='0' && empty($codes_hz['hfDatas'])){
             return $where;

@@ -233,12 +233,13 @@ class AgentClientsService extends ClientsBaseService{
         list($playway, $tz_type, $code_type) = AgentClientsService::getPlaywayByBetLogs($bet_log, $codes_hz);
         //p(['playway'=>$playway, 'codes_hz'=>$codes_hz, 'bet_log'=>$bet_log], 0);
 
+        //p(['bet_log2'=>$bet_log], 0);
         $dataArr = explode('，', $bet_log);
         # 重新拼接一下每个关键词
         $dataArr = AgentClientsService::resetDataArr($dataArr);
         //p(['调整后的dataArr'=>$dataArr], 0);
 
-        # 第一步：关键词1
+        # 第一步：关键词1 -- 号码类型
         list($bet_log, $dataArr, $codes_hz) = AgentClientsService::matchKeyword1($bet_log, $dataArr, $codes_hz);
         #p(['step'=>'111', 'codes_hz'=>$codes_hz, 'dataArr'=>$dataArr, 'bet_log'=>$bet_log], 0);
         # 第一步：关键词2 + 数字
@@ -304,6 +305,11 @@ class AgentClientsService extends ClientsBaseService{
                         case CodeTypeService::KX_KW_2_PEISHU_GET: # 配数取
                         case CodeTypeService::KX_KW_2_PEISHU_FILTER: # 配数取
                             $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::opratePeiShuStrCondition($operateStr));
+                            unset($dataArr[$k1]);
+                            break;
+                        case CodeTypeService::KX_KW_2_LOG_GET: # 对数取
+                        case CodeTypeService::KX_KW_2_LOG_FILTER: # 对数取
+                            $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateLogStrCondition($operateStr));
                             unset($dataArr[$k1]);
                             break;
                         case CodeTypeService::KX_KW_2_FIXED_HF_FILTER: # 固定合分除值
@@ -418,9 +424,7 @@ class AgentClientsService extends ClientsBaseService{
      * @return array
      */
     private static function resetDataArr($dataArr=[]){
-        $newDataArr = [];
-
-        //p([$dataArr, $newDataArr], 0);
+        //p(['$dataArrxx'=>$dataArr], 0);
         $current_key = '';
         foreach ($dataArr as $k2=>$tmpStr){
             if($k2>0 && (
@@ -429,7 +433,8 @@ class AgentClientsService extends ClientsBaseService{
                 strpos(trim($tmpStr), '千=') === 0 OR
                 strpos(trim($tmpStr), '百=') === 0 OR
                 strpos(trim($tmpStr), '十=') === 0 OR
-                strpos(trim($tmpStr), '个') === 0)
+                strpos(trim($tmpStr), '个') === 0) OR
+                strpos(trim($dataArr[$k2-1]), '对数') === 0
             ){
                 $dataArr[$current_key] = $dataArr[$current_key].'，'.$tmpStr;
                 unset($dataArr[$k2]);
@@ -437,7 +442,7 @@ class AgentClientsService extends ClientsBaseService{
                 $current_key = $k2;
             }
         }
-        $newDataArr = $dataArr;
+        $newDataArr = array_filter($dataArr);
 
         return $newDataArr;
     }

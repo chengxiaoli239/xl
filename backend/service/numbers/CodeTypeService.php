@@ -40,8 +40,8 @@ class CodeTypeService extends BaseService {
     const KX_KW_2_FIXED_POS_2_3 = '乘号位置';
     const KX_KW_2_PEISHU_FILTER = '配数“除”';
     const KX_KW_2_PEISHU_GET = '配数“取”';
-    const KX_KW_2_LOG_FILTER = '对数“除”';
-    const KX_KW_2_LOG_GET = '对数“取”';
+    const KX_KW_2_LOG_FILTER = '对数“除”数';
+    const KX_KW_2_LOG_GET = '对数“取”数';
     const KX_KW_2_FIXED_HF_GET = '固定合分取值';
     const KX_KW_2_FIXED_HF_FILTER = '固定合分除值';
     const KX_KW_2_NOT_FIXED_HF_2NUM = '不定合分值(两数合)';
@@ -169,6 +169,21 @@ class CodeTypeService extends BaseService {
             if($m = $matches[0]){
                 $matcheCondition['ps_'.$m[0]] = $m[1];
             }
+        }
+
+        return $matcheCondition;
+    }
+
+    /**
+     * 对数处理
+     * @param string $operateStr
+     * @return array
+     */
+    public static function oprateLogStrCondition($operateStr=''){
+        $matcheCondition = [];
+        $operateArr = explode('，', trim($operateStr));
+        foreach ($operateArr as $k=>$opStr){
+            $matcheCondition['log_'.($k+1)] = $opStr;
         }
 
         return $matcheCondition;
