@@ -49,7 +49,9 @@ class AgentClientsService extends ClientsBaseService{
 
             $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
             $flow_wp_accounts = explode(',', str_replace('，', ',', trim($TzSystemsUsers->flow_wp_accounts)));  # 正买账号
+            $flow_wp_accounts = array_filter($flow_wp_accounts);
             $flow_op_accounts = explode(',', str_replace('，', ',', trim($TzSystemsUsers->flow_op_accounts)));  # 反买账号flow_op_accounts
+            $flow_op_accounts = array_filter($flow_op_accounts);
 
             $now_time = time();
             $before_5min_time = date('Y-m-d H:i:s', time()-500);
