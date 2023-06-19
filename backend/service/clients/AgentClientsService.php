@@ -17,6 +17,7 @@ class AgentClientsService extends ClientsBaseService{
     const ALL_CODE_TYPE_4_NUMS = 10000;
 
     const BET_WARING_CODE = 48888;
+    const BET_INVALIDE_CODE = 40004; # 无效不需记日志
 
     public static function validateSyncMemberBetLogs($member_bet_logs){
         if($member_bet_logs['Status'] != 1){
@@ -61,7 +62,7 @@ class AgentClientsService extends ClientsBaseService{
                     $record_id = $logData['log_member_quick_select_id'];
                     $member_bet_time = date('Y-').$logData['operation_datetime'];
                     if($member_bet_time < $before_5min_time){
-                        throw_info($err_msg.'，历史下注记录不同步：用户下注时间:'.$member_bet_time. '，当前5分钟前:'.$before_5min_time, 40001);
+                        throw_info($err_msg.'，历史下注记录不同步：用户下注时间:'.$member_bet_time. '，当前5分钟前:'.$before_5min_time, self::BET_INVALIDE_CODE);
                     }
 
                     if(!in_array($logData['account'], $flow_wp_accounts) && !in_array($logData['account'], $flow_op_accounts)){
@@ -149,14 +150,13 @@ class AgentClientsService extends ClientsBaseService{
                     $rst = (new \backend\service\Lucky5\Lucky5Service($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id))->pushIntoBetTask($qihao, $codes, $data['tz_type'], $bet_single, $playway, $TzSystemsUsers->uid, $plan_id=$record_id, $lottery_type);
                     Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['account'=>$logData['account'], 'logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes(), 'rst'=>$rst]);
                 }catch (\Exception $e){
+                    $mcKey = 'wp_record_xxx_'.$record_id;
+                    $num = \Yii::$app->redis->incr($mcKey);
+                    if($num>2) continue;
                     if($e->getCode()<40000){
                         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '代理日志记录-异常', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>$e->getMessage()]);
                     }elseif($e->getCode() == self::BET_WARING_CODE){
-                        $mcKey = 'wp_record_xxx_'.$record_id;
-                        $num = \Yii::$app->redis->incr($mcKey);
-                        if($num<2){
-                            Tool_Common::log('/client_xy/'.__FUNCTION__.'_warn', 'INFO', '代理日志记录-警告', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, 'logData'=>$logData, 'err_msg'=>$e->getMessage()]);
-                        }
+                        Tool_Common::log('/client_xy/'.__FUNCTION__.'_warn', 'INFO', '代理日志记录-警告', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, 'logData'=>$logData, 'err_msg'=>$e->getMessage()]);
                     }else{
                         Tool_Common::log('/client_xy/'.__FUNCTION__.'_invalid', 'INFO', '代理日志记录-无效', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>$e->getMessage()]);
                     }
