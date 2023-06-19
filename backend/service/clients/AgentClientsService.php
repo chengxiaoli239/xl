@@ -262,7 +262,7 @@ class AgentClientsService extends ClientsBaseService{
     public static function matchKeyword1($bet_log='', &$dataArr=[], &$codes_hz=[]){
         foreach ($dataArr as $k=>$vdata){
             foreach (array_keys(CodeTypeService::$keywordsWhere1) as $kk=>$keyword1){
-                if(strpos($vdata, $keyword1) !== false){
+                if(strpos(trim($vdata), $keyword1) === 0){
                     #var_dump($k.'=='.$vdata.'=='.$kk.'=='.$keyword1."\r\n");
                     $codes_hz = array_merge($codes_hz, CodeTypeService::$keywordsWhere1[$keyword1]);
                     unset($dataArr[$k]);
