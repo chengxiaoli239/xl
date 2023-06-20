@@ -344,6 +344,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(7019);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p(count($filter_dynamic_codes));
         $text = '三定位，不定合分值(两数合)：05，乘号位置：第1位，三兄弟“除”操作'; # 正：4992组  反：5008
         $text = str_replace(['[', ']'], '', $text);
         list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
@@ -352,9 +355,6 @@ class IndexController extends Controller
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>20]);
         list($code, $bet_single) = AgentUsersService::getFlowSingle($TzSystemsUsers, $single=0.5, $buy_type=0);
         p(['code'=>$code, 'bet_single'=>$bet_single]);
-        $plan = UserSysPlans::findOne(6992);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
-        p(count($filter_dynamic_codes));
         //p([$code, $data, $err_msg]);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');
         $rst = self::getPermutations([1, 2, 3]);p($rst);
