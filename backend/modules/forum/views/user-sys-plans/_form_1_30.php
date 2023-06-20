@@ -101,6 +101,8 @@ use yii\widgets\ActiveForm;
                     </div>
                 </div>
 
+                <!--动态过滤号码-->
+                <?php include(dirname(__FILE__).'/filter_dynamic.php'); # 动态过滤号码 ?>
 
                 <!--止盈止损-->
                 <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
