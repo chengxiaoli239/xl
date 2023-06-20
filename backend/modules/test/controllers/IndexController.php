@@ -344,10 +344,10 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $text = '[四定位]，配数“[取]”：第2位：[052749]，第3位：[052749]，不定合分值(两数合)：[01563]，合分值范围：[11-27]，包含“[取]”数：[34567]，双双重“[除]”操作，三重“[除]”操作，四重“[除]”操作，四兄弟“[除]”操作，对数“[除]”数：[05]，[16]，'; # 正：4992组  反：5008
+        $text = '三定位，不定合分值(两数合)：05，乘号位置：第1位，三兄弟“除”操作'; # 正：4992组  反：5008
         $text = str_replace(['[', ']'], '', $text);
         list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
-        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 1);
+        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 0);
         p(['text'=>$text, 'codes_hz'=>$data['codes_hz'], 'counts'=>count(explode('@', $codes)), /*'codes'=>$codes*/]);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>20]);
         list($code, $bet_single) = AgentUsersService::getFlowSingle($TzSystemsUsers, $single=0.5, $buy_type=0);

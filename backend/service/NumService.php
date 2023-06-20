@@ -1080,6 +1080,13 @@ class NumService extends BaseService {
             $where = array_merge($where, [ ['NOT IN', 'codes_hz', $codes_hz['remove_hzs']] ]);
         }
 
+        if(in_array($code_type, [2, 3]) && isset($codes_hz['fixed_sel_pos']) && !empty($codes_hz['fixed_sel_pos'])){
+            $fixed_sel_poses = explode(',', $codes_hz['fixed_sel_pos']);
+            foreach($fixed_sel_poses as $f_pos){
+                $where[] = ['=', 'code_'.$f_pos, 'X'];
+            }
+        }
+
         $where = NumService::getFixedPostionWhere($codes_hz, $where, $code_type);  # 定位置
         $where = NumService::getExcludeCodesWhere($codes_hz, $where, $code_type);  # 排除
         $where = NumService::getHeFenWhere($codes_hz, $where, $code_type);  # 定位合分
@@ -2874,7 +2881,7 @@ class NumService extends BaseService {
                 case 59: # 过滤最近2345位300组(四定)，不够往后搜集
                     $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[2,3,4,5], $filterNums=300);
                     break;
-                case 60: # 过滤最近2345位300组(四定)，不够往后搜集
+                case 60: # 取1234位置0123路[或]
                     $codes = NumService::getBeforeKjCodesDynamic60($plan, $positions=[1,2,3,4], $lottery_type);
                     break;
                 case 61: # 杀上期千位码
