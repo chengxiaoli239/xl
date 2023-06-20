@@ -4092,14 +4092,14 @@ class NumService extends BaseService {
 
         $query = Num4Type::find()->select(['code'])
             ->where(['=', 'code_type', $playway+1])
-            ->andWhere([
+            ->andWhere(['NOT',[
                 'OR',
                 ['AND', ['code_1'=>$line1Codes], ['code_2'=>$line2Codes], ['code_3'=>$line3Codes], ['NOT', ['code_4'=>$line4Codes]]],
                 ['AND', ['code_1' => $line1Codes], ['code_2' => $line2Codes], ['NOT', ['code_3' => $line3Codes]], ['code_4' => $line4Codes]],
                 ['AND', ['code_1' => $line1Codes], ['NOT', ['code_2' => $line2Codes]], ['code_3' =>$line3Codes], ['code_4' => $line4Codes]],
                 ['AND', ['NOT', ['code_1' => $line1Codes]], ['code_2' =>$line2Codes], ['code_3' => $line3Codes], ['code_4' => $line4Codes]],
                 ['AND', ['code_1' => $line1Codes], ['code_2' => $line2Codes], ['code_3' => $line3Codes], ['code_4' => $line4Codes]],
-            ]);
+            ]]);
         $sql = $query->createCommand()->getRawSql();
         //p($sql);
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '去除上期同位置6561组', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'currentKjCodes'=>$currentKjCodes, 'sql'=>$sql]);
