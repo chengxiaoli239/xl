@@ -23,6 +23,11 @@ class UserBetTaskRecordJob extends CommonJob {
         if(!$isCanBet){
             return '非开盘时间段';
         }
+        $HI = date('H:i');
+        if($lottery_type == DEFAULT_LOTTERY_TYPE && '04:00'<$HI && $HI<'09:00'){
+            return '幸运五非开盘时间';
+        }
+
         $rst = BetService::insertPlansTask([$lottery_type]);
         return $rst;
     }
