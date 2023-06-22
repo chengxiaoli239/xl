@@ -1261,7 +1261,7 @@ class NumService extends BaseService {
         }
 
         # 三定、四定 "含" 除、取
-        if(in_array($code_type, [3,4]) && !empty($codes_hz['arise_in']) && in_array($codes_hz['arise_in_sel'], [1, 2])){
+        if(in_array($code_type, [3,4]) && !empty(trim($codes_hz['arise_in'])) && in_array($codes_hz['arise_in_sel'], [1, 2])){
             $lenAriseIn = strlen($codes_hz['arise_in']); # 含的个数
             $tmpAriseInType = $codes_hz['arise_in_sel'];
             if($tmpAriseInType == 1){ # 除
@@ -1290,6 +1290,20 @@ class NumService extends BaseService {
                         [$sel_type, 'code_3', $codes_hz['arise_in'] ], [$sel_type, 'code_4', $codes_hz['arise_in'] ]
                     ]
                 ]);
+            }
+        }else if($code_type==2 && isset($codes_hz['arise_in']) && in_array($codes_hz['arise_in_sel'], [1, 2])){
+            # 二定含，除、取
+            $len = strlen($codes_hz['arise_in']);
+            $hanWhere = ['and'];
+            $hanNums = [];
+            for ($i=0; $i<$len; $i++){
+                $hanNums[] = $codes_hz['arise_in'][$i];
+            }
+            $hanWhere[] = ['REGEXP', 'CONCAT(code_1, code_2, code_3, code_4)', implode('|', $hanNums)];
+            if($codes_hz['arise_in_sel']==NumService::EXCLUDE){
+                $where = array_merge($where, [['NOT', $hanWhere]]);
+            }else{
+                $where[] = $hanWhere;
             }
         }
 

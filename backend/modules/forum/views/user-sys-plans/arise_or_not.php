@@ -15,4 +15,14 @@ use yii\widgets\ActiveForm;
     <div class="col-lg-3 col-xs-6">
         <?= $form->field($model, 'exclude_codes')->textInput()->label('排除') ?>
     </div>
+
+    <?php if($model->playway==1){ ?>
+    <div class="col-lg-2 col-xs-6">
+        <!--二定含除、取-->
+        <?= $form->field($model, 'arise_in_sel')->checkboxList([1=>'除',2=>'取'])->label('2.二字定含') ?>
+    </div>
+    <div class="col-lg-2 col-xs-6">
+        <?= $form->field($model, 'arise_in')->textInput()->label('2.二字定含')?>
+    </div>
+    <?}?>
 </div>

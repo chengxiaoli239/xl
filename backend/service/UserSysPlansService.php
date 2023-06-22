@@ -417,6 +417,19 @@ class UserSysPlansService extends BaseService {
         unset($post['UserSysPlans']['hefen4']);
         # 定位合分 -------  end  ----------
 
+        # 17.1、三定含：除、取
+        if(!empty($UserSysPlans['arise_in_sel']) && count($UserSysPlans['arise_in_sel']) == 1){
+            $tmpFilter['arise_in_sel'] = (int)$UserSysPlans['arise_in_sel'][0];
+            # 17.2、含
+            $arise_in = trim($UserSysPlans['arise_in']);
+            if(!empty($arise_in) OR $arise_in===0 OR $arise_in==='0'){
+                $tmpFilter['arise_in'] = $arise_in;
+            }
+        }
+        unset($post['UserSysPlans']['arise_in_sel']);
+        unset($post['UserSysPlans']['arise_in']);
+
+
         ################### 公共参数 - 结束 #########################
 
         if($playway == 6) {
@@ -445,17 +458,6 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['no_fix_hefen'] = trim($post['UserSysPlans']['no_fix_hefen']); # 合分
             }
             unset($post['UserSysPlans']['no_fix_hefen']);
-
-            # 17.1、三定含：除、取
-            if(!empty($UserSysPlans['arise_in_sel']) && count($UserSysPlans['arise_in_sel']) == 1){
-                $tmpFilter['arise_in_sel'] = (int)$UserSysPlans['arise_in_sel'][0];
-            }
-            unset($post['UserSysPlans']['arise_in_sel']);
-            # 17.2、含
-            if(!empty($UserSysPlans['arise_in'])){
-                $tmpFilter['arise_in'] = trim($UserSysPlans['arise_in']);
-            }
-            unset($post['UserSysPlans']['arise_in']);
 
             # 号码切换倍投
             if(!empty($UserSysPlans['code1'])){
@@ -515,17 +517,6 @@ class UserSysPlansService extends BaseService {
                 $tmpFilter['no_fix_hefen'] = trim($post['UserSysPlans']['no_fix_hefen']); # 合分
             }
             unset($post['UserSysPlans']['no_fix_hefen']);
-
-            # 17.1、三定含：除、取
-            if(!empty($UserSysPlans['arise_in_sel']) && count($UserSysPlans['arise_in_sel']) == 1){
-                $tmpFilter['arise_in_sel'] = (int)$UserSysPlans['arise_in_sel'][0];
-            }
-            unset($post['UserSysPlans']['arise_in_sel']);
-            # 17.2、含
-            if(!empty($UserSysPlans['arise_in'])){
-                $tmpFilter['arise_in'] = trim($UserSysPlans['arise_in']);
-            }
-            unset($post['UserSysPlans']['arise_in']);
 
             //$post['UserSysPlans']['hz_Arr'] = json_encode($tmpFilter, 320);
         }elseif ($tz_type == 28){ # 系统快捷
