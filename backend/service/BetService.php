@@ -1993,7 +1993,9 @@ abstract class BetService extends BaseBetService {
         foreach ($lottery_types as $lottery_type){
             $HI = date('H:i');
             if($lottery_type == 8 && '04:00'<$HI && $HI<'09:00'){
-                return ['status'=>300, 'msg'=>'幸运五非开盘时间'];
+                //return ['status'=>300, 'msg'=>'幸运五非开盘时间'];
+                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '批量插入任务100', ['lottery_type'=>$lottery_type, 'err_msg'=>'幸运五非开盘时间']);
+                continue;
             }
             # is_batch_simulate:0正常1批量模拟历史记录
             $where = ['AND', ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
