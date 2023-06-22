@@ -324,6 +324,11 @@ class AgentClientsService extends ClientsBaseService{
                             $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateNotFixed2_3Condition($operateStr));
                             unset($dataArr[$k1]);
                             break;
+                        case CodeTypeService::KX_KW_2_FU_SHI_FILTER: # 复式“除”数
+                        case CodeTypeService::KX_KW_2_FU_SHI_GET: # 复式“取”数
+                            $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateFuShiCondition($operateStr));
+                            unset($dataArr[$k1]);
+                            break;
                         case CodeTypeService::KX_KW_2_HF_ZHI_ZONE: # 合分值范围
                             $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateHfZoneStrCondition($operateStr));
                             unset($dataArr[$k1]);

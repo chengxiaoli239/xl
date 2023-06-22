@@ -33,6 +33,9 @@ class NumService extends BaseService {
     # 大双
     const DOUBLE_TYPE_DS = [0, 2, 4, 5, 6, 7, 8, 9];
 
+    const EXCLUDE = 1; # 除
+    const OBTAIN = 2; # 取
+
     # 配数，除、取
     const PEI_SHU_EXCLUDE = 1; # 除
     const PEI_SHU_OBTAIN = 2; # 取
@@ -1091,6 +1094,7 @@ class NumService extends BaseService {
         $where = NumService::getFixedPostionWhere($codes_hz, $where, $code_type);  # 定位置
         $where = NumService::getExcludeCodesWhere($codes_hz, $where, $code_type);  # 排除
         $where = NumService::getHeFenWhere($codes_hz, $where, $code_type);  # 定位合分
+        $where = NumService::getFuShiWhere($codes_hz, $where, $code_type);  # 复式：三定位，复式“取”数：123、四定位，复式“取”数：123
         $where = NumService::getPeiShuWhere($codes_hz, $where, $code_type);  # 配数
         $where = NumService::getLogWhere($codes_hz, $where, $code_type);  # 对数
         $where = NumService::getPosOddWhere($codes_hz, $where);  # 筛选位置：单
@@ -2220,6 +2224,40 @@ class NumService extends BaseService {
         return $where;
     }
 
+    /**
+     * 复式
+     * @param $codes_hz
+     * @param $where
+     * @param $code_type
+     * @return array
+     */
+    public static function getFuShiWhere($codes_hz, &$where, $code_type=4){
+        if($codes_hz['fushiCodes'] !==0 && $codes_hz['fushiCodes'] !=='0' && empty($codes_hz['fushiCodes'])){
+            return $where;
+        }
+
+        $allFsWhere = ['AND'];
+        $fsCodes = [];
+        for($i=0; $i<strlen($codes_hz['fushiCodes']); $i++){
+            $fsCodes[] = $codes_hz['fushiCodes'][$i];
+        }
+        $fsCodes[] = 'X';
+        $allFsWhere[] = ['IN', 'code_1', $fsCodes];
+        $allFsWhere[] = ['IN', 'code_2', $fsCodes];
+        $allFsWhere[] = ['IN', 'code_3', $fsCodes];
+        $allFsWhere[] = ['IN', 'code_4', $fsCodes];
+
+        # 定位合分
+        if($codes_hz['fushi_sel'] == NumService::EXCLUDE){
+            # 复式除，条件组装
+            $where = array_merge($where, [['NOT', $allFsWhere]]);
+        }elseif($codes_hz['fushi_sel'] == NumService::OBTAIN){
+            # 取，条件组装
+            $where[] = $allFsWhere;
+        }
+
+        return $where;
+    }
 
     /**
      * @param array $codes_hz
