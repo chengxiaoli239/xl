@@ -1991,6 +1991,10 @@ abstract class BetService extends BaseBetService {
         $lottery_types = array_unique($lottery_types);
 
         foreach ($lottery_types as $lottery_type){
+            $HI = date('H:i');
+            if($lottery_type == 8 && '04:00'<$HI && $HI<'09:00'){
+                return ['status'=>300, 'msg'=>'幸运五非开盘时间'];
+            }
             # is_batch_simulate:0正常1批量模拟历史记录
             $where = ['AND', ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
             //$where[] = ['=', 'uid', 17]; # 测试
