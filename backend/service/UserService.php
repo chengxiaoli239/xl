@@ -388,6 +388,7 @@ class UserService extends BaseService {
             'password' => $TzSystemsUsers->password,
             'access_token' => $TzSystemsUsers->access_token,
             'status' => $TzSystemsUsers->status,
+            'bet_status' => $TzSystemsUsers->is_auto_bet,
             'expire_time' => date('Y-m-d H:i:s', $TzSystemsUsers->expire_time),
         ];
 
