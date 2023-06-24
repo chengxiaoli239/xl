@@ -88,6 +88,7 @@ use backend\models\User;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use Yii;
+use yii\helpers\Json;
 use yii\web\Controller;
 use backend\service\SscDataService;
 use backend\service\TzService;
@@ -344,14 +345,17 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(7111);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p($filter_dynamic_codes);
+        p(count($filter_dynamic_codes));
         $text = '四定位，复式“取”数：123'; # 正：4992组  反：5008
         $text = str_replace(['[', ']'], '', $text);
         list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
-        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 1);
+        $data['codes_hz'] = Json::decode('{"p1":"0123456789","p2":"0123456789","p3":"0123456789","fixed_sel_pos":"4","is_filter_dynamic":1,"filter_dynamic_types":["70"],"filters":[]}');
+        $data['tz_type'] = 29;
+        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 0);
         p(['text'=>$text, 'codes_hz'=>$data['codes_hz'], 'counts'=>count(explode('@', $codes)), /*'codes'=>$codes*/]);
-        $plan = UserSysPlans::findOne(7019);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
-        p(count($filter_dynamic_codes));
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>20]);
         list($code, $bet_single) = AgentUsersService::getFlowSingle($TzSystemsUsers, $single=0.5, $buy_type=0);
         p(['code'=>$code, 'bet_single'=>$bet_single]);

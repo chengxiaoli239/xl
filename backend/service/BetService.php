@@ -1928,7 +1928,7 @@ abstract class BetService extends BaseBetService {
             ($code_type==3 && count($codesArr)<1000) OR
             ($code_type==2 && count($codesArr)<100)
         ){
-            $filter_poses = NumService::getFilterPosByCode($codesArr[0]); # 根据导入的号码判断要过滤的位置
+            $filter_poses = NumService::getFilterPosByCode(current($codesArr)); # 根据导入的号码判断要过滤的位置
             if(!empty($filter_poses)){
                 foreach ($filter_poses as $pos){
                     $query->andWhere(['<>', 'code_'.$pos, 'X']);
