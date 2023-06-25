@@ -345,6 +345,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        # /App/Index?_=1687589343561#!log.select|select?link=select
+        p(urldecode('https://b1.w3vk8275.xyz/App/Index?_=1687589343561#!log.select%7Cselect%3Flink%3Dselect'));
         $plan = UserSysPlans::findOne(7111);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         p($filter_dynamic_codes);
