@@ -4215,7 +4215,7 @@ class NumService extends BaseService {
         $positions_str_4 = 'code_'.implode(',",",code_', $positions);
         $query = Num4Type::find()->select(['code'])
             ->where(['=', 'code_type', $playway+1])
-            ->andWhere(['AND', ['IN', 'CONCAT('.$positions_str_4.')', $codes]]);
+            ->andWhere(['NOT IN', 'CONCAT('.$positions_str_4.')', $codes]);
         $sql = $query->createCommand()->getRawSql();//p($sql);
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重2', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'sql'=>$sql]);
         $NumTypes = $query->asArray()->all();

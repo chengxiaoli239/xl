@@ -347,7 +347,7 @@ class IndexController extends Controller
     {
         # /App/Index?_=1687589343561#!log.select|select?link=select
         //p(urldecode('https://b1.w3vk8275.xyz/App/Index?_=1687589343561#!log.select%7Cselect%3Flink%3Dselect'));
-        $plan = UserSysPlans::findOne(7019);
+        $plan = UserSysPlans::findOne(7135);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         p(count($filter_dynamic_codes));
         $text = '四定位，复式“取”数：123'; # 正：4992组  反：5008
