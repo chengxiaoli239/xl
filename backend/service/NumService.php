@@ -170,6 +170,8 @@ class NumService extends BaseService {
         68=>'取十位最近9个码 ',
         69=>'取个位最近9个码 ',
         70=>'取1234位置0123路同路最多两位',
+        71=>'过滤1234位置同单双类型+双重',
+        72=>'过滤1234位置同大小类型+双重',
     ];
 
     /**
@@ -2967,6 +2969,12 @@ class NumService extends BaseService {
                 case 70: # 取个位最近x个码
                     $codes = NumService::getBeforeKjCodesDynamic63($plan, $positions=[1,2,3,4], $lottery_type);
                     break;
+                case 71: # 过滤同单双类型+双重
+                    $codes = NumService::getBeforeKjCodesDynamic64($plan, $type_field='type_ds', $positions=[1,2,3,4], $filterNums=500); #
+                    break;
+                case 72: # 过滤同单双类型+双重
+                    $codes = NumService::getBeforeKjCodesDynamic64($plan, $type_field='type_4dx', $positions=[1,2,3,4], $filterNums=500); #
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -4157,6 +4165,61 @@ class NumService extends BaseService {
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '去除上期同位置6561组', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'currentKjCodes'=>$currentKjCodes, 'sql'=>$sql]);
         $NumTypes = $query->asArray()->all();
         #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - # 过滤同单双类型+双重(四定)
+     * @param object $plan
+     * @param string $type_field
+     * @param string $type_ds
+     * @param int $type_val
+     * @param int[] $positions
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic64(object $plan, string $type_field='type_ds', $positions=[1,2,3,4], $filterNums=1000){
+        $playway = $plan->playway;
+        #$nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $lottery_type = $plan->lottery_type;
+        if(empty($current_kj_qihao)){
+            $is_empty_c_qihao = 1;
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $qihao = $DataDealStatus['qihao'];
+        }else{
+            $is_empty_c_qihao = 0;
+            $qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
+        $CurrentKjDatas = SscKjData::find()->where(['lottery_type'=>$lottery_type, 'qihao'=>$qihao])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+        if($type_field=='type_4dx'){
+            $type_dd = substr($CurrentKjDatas['type_4dx'], 0, 4);
+        }else{
+            $type_dd = $CurrentKjDatas['code_1_2_3_4'];
+        }
+        //$type_dd = '2222';
+
+        $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
+            ->where(['=', 'n.'.$type_field, $type_dd])
+            ->andWhere(['=','n.type_2', 1])
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $NumTypes = $query->asArray()->all();
+        $sql = $query->createCommand()->getRawSql();//p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重', ['positions'=>$positions, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        $positions_str_4 = 'code_'.implode(',",",code_', $positions);
+        $query = Num4Type::find()->select(['code'])
+            ->where(['=', 'code_type', $playway+1])
+            ->andWhere(['AND', ['IN', 'CONCAT('.$positions_str_4.')', $codes]]);
+        $sql = $query->createCommand()->getRawSql();//p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重2', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'sql'=>$sql]);
+        $NumTypes = $query->asArray()->all();
+        //p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
         return $codes;
