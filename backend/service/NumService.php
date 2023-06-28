@@ -4200,11 +4200,19 @@ class NumService extends BaseService {
         }else{
             $type_dd = $CurrentKjDatas['code_1_2_3_4'];
         }
+
+        # 然后全大全小，全单全双才过滤双重，其它情况过滤对数
+        if(in_array($type_dd, ['1111', '2222'])){
+            $andWhere = ['=', 'n.type_2', 1];
+        }else{
+            $andWhere = ['=', 'n.type_log', 1];
+        }
+
         //$type_dd = '2222';
 
         $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
             ->where(['=', 'n.'.$type_field, $type_dd])
-            ->andWhere(['=','n.type_2', 1])
+            ->andWhere($andWhere)
             ->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
         $sql = $query->createCommand()->getRawSql();//p($sql);
