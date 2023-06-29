@@ -1929,7 +1929,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
      */
     public static function splitCodes($codes, $length = 300){
 
-        $codesArr = array_chunk($codes, $length);
+        $diffArr = array_diff_assoc($codes, array_unique($codes)); # 重复号码
+        $codesArr = array_chunk(array_unique($codes), $length);
+        if(!empty($diffArr)){
+            $codesArr[] = $diffArr;
+        }
 
         return $codesArr;
     }
