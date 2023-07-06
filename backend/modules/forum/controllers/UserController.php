@@ -376,6 +376,18 @@ class UserController extends BaseController
     }
 
     /**
+     * @desc 更新记录follow_status 0/1
+     * @param $id
+     * @return \yii\web\Response
+     */
+    public function actionSwitchFieldStatus($id, $field='follow_status'){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        HN0898Service::updateStatus($id, $model = '\backend\models\TzSystemsUsers', $field);
+
+        return $this->redirect(['view']);
+    }
+
+    /**
      * @desc 修改投注系统状态，主要是禁止账号自动登录和获取余额
      * @return \yii\web\Response
      */

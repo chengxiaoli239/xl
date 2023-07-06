@@ -345,6 +345,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');p($r);
         $sku_set = ['8908764518923','4013197767010','8908764518923'];
         $sku_set = array_unique($sku_set);
         $ignore_sku_set = ['8908764518923'];
@@ -365,7 +366,6 @@ class IndexController extends Controller
         list($code, $bet_single) = AgentUsersService::getFlowSingle($TzSystemsUsers, $single=0.5, $buy_type=0);
         p(['code'=>$code, 'bet_single'=>$bet_single]);
         //p([$code, $data, $err_msg]);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');
         $rst = self::getPermutations([1, 2, 3]);p($rst);
         $codes = BetService::getCodesByPlan($plan);
         p($codes);

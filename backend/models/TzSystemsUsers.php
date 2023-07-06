@@ -30,6 +30,7 @@ use Yii;
  * @property string $user_agent 浏览器代理
  * @property string $cookie_wx_web 微信web登录cookie
  * @property string $access_token 授权Token凭证
+ * @property int $follow_status 跟随开关
  * @property int $tz_sort 投注排序:从小到大
  * @property string $odds_2x 代理二现赔率
  * @property string $odds_3x 代理三现赔率
@@ -69,7 +70,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['uid', 'is_agent', 'tz_system_id', 'status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'is_local_bet', 'proxy_type', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'is_agent', 'tz_system_id', 'status', 'follow_status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'is_local_bet', 'proxy_type', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'flow_wp_player_bs', 'flow_op_player_bs', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
             [['cookie', 'cookie_wx_web'], 'string'],
             [['updated_at'], 'required'],
@@ -139,6 +140,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'balance' => Yii::t('app', '系统余额'),
             'status' => Yii::t('app', '系统开启状态'),
             'is_auto_login' => Yii::t('app', '是否自动登陆'),
+            'follow_status' => Yii::t('app', '是否自动跟'),
             'ssc_domain' => Yii::t('app', '网盘地址'),
             'cookie' => Yii::t('app', '登陆cookie'),
             'user_agent' => Yii::t('app', '浏览器代理'),

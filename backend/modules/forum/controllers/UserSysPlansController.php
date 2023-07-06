@@ -4,6 +4,7 @@ namespace backend\modules\forum\controllers;
 
 use backend\models\ImportPlanCodes;
 use backend\models\TzSystemsAuth;
+use backend\models\TzSystemsUsers;
 use backend\service\BetService;
 use backend\service\HN0898Service;
 use backend\service\NumService;
@@ -521,12 +522,22 @@ class UserSysPlansController extends BaseController
     /**
      * @desc 重新计算止盈止损计划盈利点
      * @param $id
-     * @return \yii\web\Response
+     * @param $type 1某个计划盈利归零2所有下注就盈利归零
+     * @return \yii\web\Response|array
      */
-    public function actionReCalculateProfits($id){
+    public function actionReCalculateProfits($id='', $type=1){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        $rst = BetService::reCalculateProfits($id, $this->_user_id);
+        if($type==2){
+            $rst = BetService::reCalculateAllBettingRecords($this->_user_id);
+        }else{
+            $rst = BetService::reCalculateProfits($id, $this->_user_id);
+        }
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$this->_user_id]);
+        list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
+        if($type==2){
+            return ['status'=>200, 'msg'=>'操作成功'];
+        }
 
         return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$rst['lottery_type']]);
     }

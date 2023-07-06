@@ -18,7 +18,7 @@ class TzSystemsUsers extends TzSystemsUsersModel
     public function rules()
     {
         return [
-            [['id', 'uid', 'is_agent', 'tz_system_id', 'status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'is_local_bet', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'uid', 'is_agent', 'tz_system_id', 'follow_status', 'status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'is_local_bet', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['username', 'sys_name', 'account', 'flow_wp_accounts', 'flow_op_accounts', 'password', 'ssc_domain', 'cookie', 'user_agent', 'cookie_wx_web', 'access_token', 'warn_val', 'desc', 'update_time'], 'safe'],
             [['balance', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
         ];
@@ -68,6 +68,7 @@ class TzSystemsUsers extends TzSystemsUsersModel
             'balance' => $this->balance,
             'status' => $this->status,
             'is_auto_login' => $this->is_auto_login,
+            'flow_status' => $this->follow_status,
             'tz_sort' => $this->tz_sort,
             'flow_wp_player_bs' => $this->flow_wp_player_bs,
             'flow_op_player_bs' => $this->flow_op_player_bs,

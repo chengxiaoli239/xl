@@ -142,6 +142,22 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a($txt, $url, ['title' => '开通使用代理IP','alt'=>$alt]);
                             }
                         ],
+                        ['attribute' => 'follow_status','label'=>'自动跟', 'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if($model->follow_status == 1){
+                                    $txt = '<font color="green">是</font>';
+                                    $alt = '点击关闭';
+                                    $val = 0;
+                                }else{
+                                    $txt = '<font color="red">否</font>';
+                                    $val = 1;
+                                    $alt = '点击启用';
+                                }
+                                $url = '/forum/user/switch-field-status?id='.$model->id.'&field=follow_status&status='.$val;
+                                return Html::a($txt, $url, ['title' => '自动跟开启','alt'=>$alt]);
+                            }
+                        ],
                         ['attribute' => 'is_auto_login','label'=>'自动登', 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {

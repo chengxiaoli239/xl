@@ -467,7 +467,8 @@ class UserService extends BaseService {
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
             $TzSystemsUsers->stop_loss = ($data['stop_loss']?:0.00);
             $TzSystemsUsers->take_profits = ($data['take_profits']?:0.00);
-            #$TzSystemsUsers->setAttributes($data, false);
+            $TzSystemsUsers->current_profits = ($data['take_profits']?:0.00);
+            $TzSystemsUsers->desc = ($data['take_profits']?:'');
             $TzSystemsUsers->save();
         }catch (\Exception $e){
 

@@ -1013,32 +1013,49 @@ abstract class BetService extends BaseBetService {
      * @param $id
      * @param $uid
      */
-   public static function reCalculateProfits($id, $uid){
-       if(!$UserSysPlans = UserSysPlans::findOne(['id'=>$id, 'uid'=>$uid])){
-           return ['status'=>300, 'msg'=>'找不到对应记录'];
-       }
+    public static function reCalculateProfits($id, $uid){
+        if(!$UserSysPlans = UserSysPlans::findOne(['id'=>$id, 'uid'=>$uid])){
+            return ['status'=>300, 'msg'=>'找不到对应记录'];
+        }
+        $m = \Yii::$app->cache;
+        $qihao = HN0898Service::getQihao($UserSysPlans->lottery_type);
+        $mkey = 'reCalculateProfits_'.$uid.'_'.$id.'_'.$qihao.'_'.$UserSysPlans->playway;
+        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
+
+        $codes_hz = json_decode($UserSysPlans->hz_Arr, true);
+        $codes_hz['current_miss'] = 0; # 当前遗漏
+        $codes_hz['singles_key'] = 0; # 倍数key
+        $codes_hz['is_init'] = 1; # 是否最初
+        if($UserSysPlans->plan_type == 14){
+            unset($codes_hz['current_area_profits']);
+            unset($codes_hz['start_qihao']);
+        }
+
+        $rstFlag = BettingRecords::updateAll(['is_profits_record'=>0, 'is_area_profits'=>0], ['plan_id'=>$id]);
+        $UserSysPlans->current_profits = 0.00;
+        $UserSysPlans->hz_Arr = json_encode($codes_hz, 320);
+        $UserSysPlans->save();
+
+        $m->set($mkey, 1, 10);
+
+        $rst['lottery_type'] = $UserSysPlans->lottery_type;
+        $rst['flag'] = $rstFlag;
+
+        return $rst;
+    }
+
+    /**
+     * @desc 盈利归零
+     * @param $uid
+     */
+   public static function reCalculateAllBettingRecords($uid){
        $m = \Yii::$app->cache;
-       $qihao = HN0898Service::getQihao($UserSysPlans->lottery_type);
-       $mkey = 'reCalculateProfits_'.$uid.'_'.$id.'_'.$qihao.'_'.$UserSysPlans->playway;
+       $mkey = 'reCalculateAllBettingRecords_'.$uid;
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
 
-       $codes_hz = json_decode($UserSysPlans->hz_Arr, true);
-       $codes_hz['current_miss'] = 0; # 当前遗漏
-       $codes_hz['singles_key'] = 0; # 倍数key
-       $codes_hz['is_init'] = 1; # 是否最初
-       if($UserSysPlans->plan_type == 14){
-           unset($codes_hz['current_area_profits']);
-           unset($codes_hz['start_qihao']);
-       }
-
-       $rstFlag = BettingRecords::updateAll(['is_profits_record'=>0, 'is_area_profits'=>0], ['plan_id'=>$id]);
-       $UserSysPlans->current_profits = 0.00;
-       $UserSysPlans->hz_Arr = json_encode($codes_hz, 320);
-       $UserSysPlans->save();
+       $rstFlag = BettingRecords::updateAll(['is_profits_record'=>0, 'is_area_profits'=>0], ['uid'=>$uid]);
 
        $m->set($mkey, 1, 10);
-
-       $rst['lottery_type'] = $UserSysPlans->lottery_type;
        $rst['flag'] = $rstFlag;
 
        return $rst;

@@ -49,13 +49,21 @@ class AgentClientsService extends ClientsBaseService{
             $transaction = \Yii::$app->db->beginTransaction();
 
             $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+            if(!$TzSystemsUsers->follow_status){
+                throw_info('跟随开关已关闭');
+            }
+            if($TzSystemsUsers->current_profits>0.00 && $TzSystemsUsers->stop_loss>0.00){
+                if($TzSystemsUsers->current_profits>$TzSystemsUsers->take_profits OR $TzSystemsUsers->current_profits<(0-$TzSystemsUsers->stop_loss)){
+                    throw_info('触发止盈止损，止盈：'.$TzSystemsUsers->current_profits.'，止损：'.$TzSystemsUsers->stop_loss.'，当前：'.$TzSystemsUsers->current_profits);
+                }
+            }
             $flow_wp_accounts = explode(',', str_replace('，', ',', trim($TzSystemsUsers->flow_wp_accounts)));  # 正买账号
             $flow_wp_accounts = array_filter($flow_wp_accounts);
             $flow_op_accounts = explode(',', str_replace('，', ',', trim($TzSystemsUsers->flow_op_accounts)));  # 反买账号flow_op_accounts
             $flow_op_accounts = array_filter($flow_op_accounts);
 
             $now_time = time();
-            $before_5min_time = date('Y-m-d H:i:s', time()-500);
+            $before_5min_time = date('Y-m-d H:i:s', time()-300); # 5分钟前记录
             list($code, $logDatas, $err_msg) = AgentClientsService::validateSyncMemberBetLogs($member_bet_logs);
             foreach ($logDatas as $logData){
                 try {

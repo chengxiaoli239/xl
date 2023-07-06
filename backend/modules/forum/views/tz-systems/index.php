@@ -81,6 +81,20 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                             }
                         ],
+                        ['attribute'=>'flow_status', 'label'=>'跟随开关',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                $url = "/forum/tz-systems/switch-is-auto-login?id=".$model->id.'&field=follow_status&status='.$model->follow_status; # 点击开启
+                                if($model->follow_status == 1){
+                                    $txt = "<font color='green'>已开启</font>" ;
+                                    return Html::a($txt, $url, ['title' => '点击关闭']);
+                                }
+                                if(!$model->follow_status){
+                                    $txt = "<font color='red'>已关闭</font>";
+                                    return Html::a($txt, $url, ['title' => '点击开启']);
+                                }
+                            }
+                        ],
                         //'type',
                         //'created_at',
                         //'updated_at',

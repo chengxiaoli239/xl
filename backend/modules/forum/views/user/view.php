@@ -91,7 +91,12 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                             $set = Html::a('设置', 'javascript:;', ['id' => 'setWpFollow','alt'=>'设置跟买', 'class'=>'btn btn-xs']);
                                             $txt = $model->flow_wp_accounts ? '<strong><font color="green">正买</font></strong>：'.implode('、', explode(',', $model->flow_wp_accounts)).'['.$model->flow_wp_player_bs.'倍]' : '';
                                             $txt .= $model->flow_op_accounts ? ' &nbsp;<strong><font color="red">反买</font></strong>：'.implode('、', explode(',', $model->flow_op_accounts)).'['.$model->flow_op_player_bs.'倍]' : '';
-                                            return $txt.' &nbsp; '.$set;
+
+                                            $follow_txt = $model->follow_status ? '<font color="green">已开启</font>' : '<font color="red">已关闭</font>';
+                                            $url = '/forum/user/switch-field-status?id='.$model->id.'&field=follow_status&status='.($model->follow_status?0:1);
+                                            $follow_a = Html::a($follow_txt, $url, ['title' => '点击切换','alt'=>'点击切换']);
+
+                                            return $txt.' &nbsp; '.$set. '&nbsp; 开关：'.$follow_a;
                                         },
                                     ],
                                     ['attribute' => 'cookie', 'label'=>'cookie',
@@ -151,6 +156,28 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="tipModalResetProfits" tabindex="-1" role="dialog" aria-labelledby="ModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_profits_title"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group up-reason">
+                    <span id="tip_msg_profits"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="opConfirmProfits">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!--赔率-->
 <div class="modal fade" id="setProfitsModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel">
@@ -256,6 +283,22 @@ $(function () {
     $('#opConfirm').click(function () {
         var id = $(this).attr('op-id');
         if(id != null) updateBalance(id)
+    });
+
+    $('#resetProfits').click(function () {
+        $('#tip_msg_profits_title').html('利润归零');
+        $('#tip_msg_profits').html('确定归零所有盈利')
+        $('#tipModalResetProfits').modal('show');
+    });
+    // 盈利归零
+    $('#opConfirmProfits').click(function () {
+        $url = "/forum/user-sys-plans/re-calculate-profits?type=2"; // 归零盈利
+        $.get($url, function(rst) {
+            console.log(rst)
+            if(rst.status === 200) {
+                window.location.href = '/forum/user/view.html';
+            }
+        },'JSON');
     });
 
     // 止盈止损
