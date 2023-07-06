@@ -1,0 +1,48 @@
+https://f1.w22g7p83.xyz
+
+
+/betDetail/GetTotalBetDetail?selectedId=&company_id=&period_no=20230619283&is_only_search_win=&member_account=&bet_no=&range_type=1&range_min=&range_max=&category=0&pageindex=2&_=1687189013163&PageCount=1
+
+
+代理总货明细查询：
+https://b4.w3vk8275.xyz
+/betDetail/GetTotalBetDetail?selectedId=&company_id=&period_no=20230619283&is_only_search_win=&member_account=&bet_no=&range_type=1&range_min=&range_max=&category=0&pageindex=2&_=1687189013163&pagesize=10
+
+category
+
+<select name="category" id="category">
+	<option value="0">全部</option>
+	<option value="100">一定位</option>
+	<option value="19">口XXXX</option>
+	<option value="20">X口XXX</option>
+	<option value="21">XX口XX</option>
+	<option value="22">XXX口X</option>
+	<option value="23">XXXX口</option>
+	<option value="200">二定位</option>
+	<option value="1">口口XX</option>
+	<option value="2">口X口X</option>
+	<option value="3">口XX口</option>
+	<option value="4">X口X口</option>
+	<option value="5">X口口X</option>
+	<option value="6">XX口口</option>
+	<option value="500">五位二定</option>
+	<option value="16">口XXX口</option>
+	<option value="17">X口XX口</option>
+	<option value="18">XX口X口</option>
+	<option value="15">XXX口口</option>
+	<option value="300">三定位</option>
+	<option value="7">口口口X</option>
+	<option value="8">口口X口</option>
+	<option value="9">口X口口</option>
+	<option value="10">X口口口</option>
+	<option value="11">四定位</option>
+	<option value="12">二字现</option>
+	<option value="13">三字现</option>
+	<option value="14">四字现</option>
+	<option value="101">快打</option>
+	<option value="102">快选</option>
+	<option value="108">快译</option>
+	<option value="103">txt导入</option>
+	<option value="109">一定</option>
+	<option value="104">二定</option>
+</select>
