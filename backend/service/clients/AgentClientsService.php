@@ -160,6 +160,7 @@ class AgentClientsService extends ClientsBaseService{
                 }catch (\Exception $e){
                     $mcKey = 'wp_record_xxx_'.$record_id;
                     $num = \Yii::$app->redis->incr($mcKey);
+                    \Yii::$app->redis->expire($mcKey, 30);
                     if($num>2) continue;
                     if($e->getCode()<40000){
                         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '代理日志记录-异常', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>$e->getMessage()]);
