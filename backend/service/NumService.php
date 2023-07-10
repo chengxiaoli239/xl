@@ -172,6 +172,7 @@ class NumService extends BaseService {
         70=>'取1234位置0123路同路最多两位',
         71=>'过滤1234位置同单双类型+双重|对数',
         72=>'过滤1234位置同大小类型+双重|对数',
+        73=>'过滤2345位50组直码',
     ];
 
     /**
@@ -2974,6 +2975,9 @@ class NumService extends BaseService {
                     break;
                 case 72: # 过滤同单双类型+双重
                     $codes = NumService::getBeforeKjCodesDynamic64($plan, $type_field='type_4dx', $positions=[1,2,3,4], $filterNums=500); #
+                    break;
+                case 73: # 过滤最近2345位50组(四定)，不够往后搜集
+                    $codes = NumService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[2,3,4,5], $filterNums=50);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
