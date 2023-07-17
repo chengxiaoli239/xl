@@ -2926,7 +2926,10 @@ class SscDataService extends BaseService {
         try {
             $profits = \backend\service\SscDataService::getUserBetProfits($uid);
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
-            $TzSystemsUsers->current_profits = $profits;
+            $TzSystemsUsers->current_profits = round($profits, 2);
+            if($TzSystemsUsers->current_profits == 0.00){
+                $TzSystemsUsers->desc = '';
+            }
             $TzSystemsUsers->save();
         }catch (\Exception $e){
             return [10000, [], $e->getMessage()];
