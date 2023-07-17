@@ -60,7 +60,7 @@ class AgentClientsService extends ClientsBaseService{
                 }
                 Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '止盈止损', ['account'=>$TzSystemsUsers->account, 'current_profits'=>$TzSystemsUsers->current_profits, 'take_profits'=>$TzSystemsUsers->take_profits, 'stop_loss'=>$TzSystemsUsers->stop_loss]);
                 if($TzSystemsUsers->current_profits>=$TzSystemsUsers->take_profits OR $TzSystemsUsers->current_profits<=(0-$TzSystemsUsers->stop_loss)){
-                    $err_msg = '触发止盈止损，止盈：'.$TzSystemsUsers->current_profits.'，止损：'.$TzSystemsUsers->stop_loss.'，当前：'.$TzSystemsUsers->current_profits;
+                    $err_msg = '触发止盈止损，止盈：'.$TzSystemsUsers->take_profits.'，止损：'.$TzSystemsUsers->stop_loss.'，当前：'.$TzSystemsUsers->current_profits;
                     $TzSystemsUsers->desc = $err_msg;
                     $TzSystemsUsers->save();
                     throw_info($err_msg);
