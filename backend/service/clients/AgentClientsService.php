@@ -53,9 +53,17 @@ class AgentClientsService extends ClientsBaseService{
                 throw_info('跟随开关已关闭');
             }
             if($TzSystemsUsers->current_profits>0.00 && $TzSystemsUsers->stop_loss>0.00){
+                # 账号级别的盈利
+                list($code, $TzSystemsUsers, $msg) = \backend\service\SscDataService::updateUserProfits($TzSystemsUsers->uid);
+                if($code>0){
+                    throw_info('利润统计错误：'.$msg);
+                }
                 Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '止盈止损', ['account'=>$TzSystemsUsers->account, 'current_profits'=>$TzSystemsUsers->current_profits, 'take_profits'=>$TzSystemsUsers->take_profits, 'stop_loss'=>$TzSystemsUsers->stop_loss]);
-                if($TzSystemsUsers->current_profits>$TzSystemsUsers->take_profits OR $TzSystemsUsers->current_profits<(0-$TzSystemsUsers->stop_loss)){
-                    throw_info('触发止盈止损，止盈：'.$TzSystemsUsers->current_profits.'，止损：'.$TzSystemsUsers->stop_loss.'，当前：'.$TzSystemsUsers->current_profits);
+                if($TzSystemsUsers->current_profits>=$TzSystemsUsers->take_profits OR $TzSystemsUsers->current_profits<=(0-$TzSystemsUsers->stop_loss)){
+                    $err_msg = '触发止盈止损，止盈：'.$TzSystemsUsers->current_profits.'，止损：'.$TzSystemsUsers->stop_loss.'，当前：'.$TzSystemsUsers->current_profits;
+                    $TzSystemsUsers->desc = $err_msg;
+                    $TzSystemsUsers->save();
+                    throw_info($err_msg);
                 }
             }
             $flow_wp_accounts = explode(',', str_replace('，', ',', trim($TzSystemsUsers->flow_wp_accounts)));  # 正买账号
@@ -156,7 +164,8 @@ class AgentClientsService extends ClientsBaseService{
                     }
                     $codes = ($buy_type==1) ? $bet_codes : $bet_codes_op;
                     list($code, $bet_single) = AgentUsersService::getFlowSingle($TzSystemsUsers, $single, $buy_type, $playway);
-                    $rst = (new \backend\service\Lucky5\Lucky5Service($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id))->pushIntoBetTask($qihao, $codes, $data['tz_type'], $bet_single, $playway, $TzSystemsUsers->uid, $plan_id=$record_id, $lottery_type);
+                    $rst = (new \backend\service\Lucky5\Lucky5Service($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id))
+                        ->pushIntoBetTask($qihao, $codes, $data['tz_type'], $bet_single, $playway, $TzSystemsUsers->uid, $plan_id=$record_id, $lottery_type);
                     Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['account'=>$logData['account'], 'logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes(), 'rst'=>$rst]);
                 }catch (\Exception $e){
                     $mcKey = 'wp_record_xxx_'.$record_id;

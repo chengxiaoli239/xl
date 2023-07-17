@@ -32,6 +32,7 @@ use backend\models\StaticPeiShuCodeTrueFalse;
 use backend\models\StaticProfits;
 use backend\models\SystemConfig;
 use backend\models\ThreeNum;
+use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\models\WxFriends;
 use common\service\CommonService;
@@ -2895,6 +2896,46 @@ class SscDataService extends BaseService {
     }
 
     /**
+     * @desc 获取一个计划当前的利润
+     * @param $UserSysPlan
+     * @param array $andWhere
+     * @return bool|int|mixed|string|null
+     */
+    public static function getUserBetProfits($uid, $andWhere = []){
+        $where = ['AND',
+            ['=', 'uid', $uid],
+            ['=', 'is_profits_record', 1],
+            ['OR',
+                ['=', 'is_simulate', 0],
+                ['AND', ['=','is_simulate', 1], ['=', 'sn', BetService::$test_true_sn]],
+            ],
+        ];
+        if(!empty($andWhere)){
+            $where[] = $andWhere;
+        }
+        $profits = BettingRecords::find()->where($where)->sum('profits');
+
+        return $profits;
+    }
+
+    /**
+     * z账号级别的止盈止损
+     * @param string $uid
+     */
+    public static function updateUserProfits($uid=''){
+        try {
+            $profits = \backend\service\SscDataService::getUserBetProfits($uid);
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+            $TzSystemsUsers->current_profits = $profits;
+            $TzSystemsUsers->save();
+        }catch (\Exception $e){
+            return [10000, [], $e->getMessage()];
+        }
+
+        return [0, $TzSystemsUsers, '处理成功'];
+    }
+
+    /**
      * @desc 处理止盈止损计划
      * @return array
      */
@@ -2948,6 +2989,9 @@ class SscDataService extends BaseService {
                         $UserSysPlan->hz_Arr = json_encode($hzArr, 320);
                         $UserSysPlan->current_profits = $profits;
                         $saveFlag = $UserSysPlan->save();
+
+                        # 账号级别的盈利
+                        \backend\service\SscDataService::updateUserProfits($UserSysPlan->uid);
 
                         $logArr['plan_1_3_5'][$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
                     }catch (\Exception $e){

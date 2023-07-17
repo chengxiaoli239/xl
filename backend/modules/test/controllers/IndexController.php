@@ -345,6 +345,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst = \backend\service\SscDataService::getUserBetProfits($uid=10); p($rst);
+        $rst = UserService::staticUserProfits($uid=17); p($rst);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');p($r);
         $sku_set = ['8908764518923','4013197767010','8908764518923'];
         $sku_set = array_unique($sku_set);
@@ -447,7 +449,6 @@ class IndexController extends Controller
         p(base64_decode("letWC2p_t2X835-hS-3637vZD9Wx49oD15hti5J93RY="));
         $rst = StaticService::staticOnePlanProifts($plan_id=5885);
         p($rst);
-        $rst = UserService::staticUserProfits($uid=17); p($rst);
         $UserSysPlans = UserSysPlans::findOne($plan_id='5834');
         $current_qihao = NumService::getPlanBetCurrentQihao($UserSysPlans, $lottery_type = 17);
         p($current_qihao);
