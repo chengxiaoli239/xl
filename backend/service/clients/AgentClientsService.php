@@ -52,7 +52,7 @@ class AgentClientsService extends ClientsBaseService{
             if(!$TzSystemsUsers->follow_status){
                 throw_info('跟随开关已关闭');
             }
-            if($TzSystemsUsers->current_profits>0.00 && $TzSystemsUsers->stop_loss>0.00){
+            if($TzSystemsUsers->take_profits>0.00 && $TzSystemsUsers->stop_loss>0.00){
                 # 账号级别的盈利
                 list($code, $TzSystemsUsers, $msg) = \backend\service\SscDataService::updateUserProfits($TzSystemsUsers->uid);
                 if($code>0){

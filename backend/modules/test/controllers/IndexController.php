@@ -345,6 +345,11 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $post = [
+            'access_token' => '4b843e29ac8dd191e894c7dcea547815',
+        ];
+        $rst = AgentClientsService::syncMemberBetLogs($post['member_bet_logs'], $post['access_token'], $post['from_type'], $post['from'], $post['lottery_type']);
+        p($rst);
         $rst = \backend\service\SscDataService::getUserBetProfits($uid=10); p($rst);
         $rst = UserService::staticUserProfits($uid=17); p($rst);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');p($r);
