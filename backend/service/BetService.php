@@ -1054,6 +1054,11 @@ abstract class BetService extends BaseBetService {
        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
 
        $rstFlag = BettingRecords::updateAll(['is_profits_record'=>0, 'is_area_profits'=>0], ['uid'=>$uid]);
+       $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+       $TzSystemsUsers->desc = '';
+       $TzSystemsUsers->current_profits = 0.00;
+       $TzSystemsUsers->save();
+       $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($TzSystemsUsers->access_token);
 
        $m->set($mkey, 1, 10);
        $rst['flag'] = $rstFlag;
