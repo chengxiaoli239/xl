@@ -173,6 +173,8 @@ class NumService extends BaseService {
         71=>'过滤1234位置同单双类型+双重|对数',
         72=>'过滤1234位置同大小类型+双重|对数',
         73=>'过滤2345位50期开过号码全转(四定)',
+
+        74=>'杀上期同位置号码+三兄(四定)',
     ];
 
     /**
@@ -2979,6 +2981,9 @@ class NumService extends BaseService {
                 case 73: # 过滤最近2345位50组全倒(四定)，不够往后搜集
                     $codes = NumService::getBeforeKjCodesDynamic7($plan, $positions=[2,3,4,5], $num=50);
                     break;
+                case 74: # 杀上期同位置号码+三兄(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic74($plan, $positions=[1,2,3,4], $num=50);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -4243,6 +4248,68 @@ class NumService extends BaseService {
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重2', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'sql'=>$sql]);
         $NumTypes = $query->asArray()->all();
         //p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 杀上期同位置号码+三兄(四定)
+     * @param int $lottery_type
+     * @param int $playway
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic74(object $plan, $positions=[1,2,3,4]){
+        $playway = $plan->playway;
+
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $lottery_type = $plan->lottery_type;
+        if(empty($current_kj_qihao)){
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $qihao = $DataDealStatus['qihao'];
+        }else{
+            $qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
+        $CurrentKjDatas = SscKjData::find()->where(['lottery_type'=>$lottery_type, 'qihao'=>$qihao])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+        //p($CurrentKjDatas);
+
+        $positions_str = 'code'.implode(',",",code', $positions);
+        $beforeQuery = SscKjData::find()->select(['code1','code2','code3','code4', 'code_str', 'code_4n_str'=>'CONCAT('.$positions_str.')', 'qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
+        $filterCodes = [];
+
+        foreach ($positions as $p){
+            if(!in_array($p, NumService::DW_POSES)){
+                # 期号尾数
+                if(empty($current_kj_qihao)){
+                    $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+                    $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+                    $next_qihao = $DataDealStatus['next_qihao'];
+                }else{
+                    $next_qihao = KjDataGet::getNextQihaoByQihao($current_kj_qihao, $lottery_type);
+                }
+                $lastQihaoNum = substr($next_qihao, -1); # 即将下注期号最后一位，126期，则为：126
+                $filterCodes[] = $lastQihaoNum;
+            }else{
+                if(empty($current_kj_qihao)){
+                    $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+                }
+                $beforeQuery->andWhere(['<=', 'qihao', $current_kj_qihao]);
+                //p($beforeQuery->createCommand()->getRawSql());
+                $currentKjCodes = $beforeQuery->limit(1)->asArray()->one(); # 最新一期
+                $filterCodes[] = $currentKjCodes['code'.$p];
+            }
+        }
+
+        $query = Num4Type::find()->select(['code'])
+            ->where(['=', 'code_type', $playway+1])
+            ->andWhere(['AND', ['NOT IN', 'code_1', $filterCodes], ['NOT IN', 'code_2', $filterCodes], ['NOT IN', 'code_3', $filterCodes], ['NOT IN', 'code_4', $filterCodes]]);
+        $sql = $query->createCommand()->getRawSql();
+        //p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '杀x位码6561组', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'currentKjCodes'=>$currentKjCodes, 'sql'=>$sql]);
+        $NumTypes = $query->asArray()->all();
+        #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
         return $codes;

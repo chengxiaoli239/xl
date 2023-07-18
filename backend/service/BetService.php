@@ -641,7 +641,7 @@ abstract class BetService extends BaseBetService {
                 throw_info('用户信息找不到');
             }
 
-            $where = ['plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
+            $where = ['uid'=>$TzSystemsUsers->uid, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
             $BetErrorPlansTask = BetErrorPlansTask::findOne($where);
             if($BetErrorPlansTask->status == 2){
                 throw_info('已经下注成功无需修改');
