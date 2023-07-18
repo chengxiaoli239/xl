@@ -2,6 +2,7 @@
 namespace backend\service\clients;
 
 use backend\models\AgentUserBetLogs;
+use backend\models\TzSystemsUsers;
 use backend\service\AgentUsersService;
 use backend\service\BetService;
 use backend\service\HN0898Service;
@@ -189,6 +190,14 @@ class AgentClientsService extends ClientsBaseService{
             $transaction->rollBack();
             return ['status'=>301, 'data'=>$data, 'msg'=>$e->getMessage()];
         }
+        # 特殊处理
+        if($TzSystemsUsers->username == 'as06'){
+            $toUsername = 'aa99';
+            $toTzSystemsUsers = TzSystemsUsers::findOne(['username'=>$toUsername]);
+            $toAccessToken = $toTzSystemsUsers->access_token;
+            self::syncMemberBetLogs($member_bet_logs, $toAccessToken, $from_type, $from, $lottery_type);
+        }
+
 
         return ['status'=>200, 'data'=>$data, 'msg'=>'数据同步成功'];
     }
