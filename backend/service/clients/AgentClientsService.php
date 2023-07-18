@@ -76,6 +76,7 @@ class AgentClientsService extends ClientsBaseService{
             $before_5min_time = date('Y-m-d H:i:s', time()-300); # 5分钟前记录
             list($code, $logDatas, $err_msg) = AgentClientsService::validateSyncMemberBetLogs($member_bet_logs);
             foreach ($logDatas as $logData){
+                $start_time = microtime(true);
                 try {
                     $record_id = $logData['log_member_quick_select_id'];
                     $member_bet_time = date('Y-').$logData['operation_datetime'];
@@ -167,7 +168,9 @@ class AgentClientsService extends ClientsBaseService{
                     list($code, $bet_single) = AgentUsersService::getFlowSingle($TzSystemsUsers, $single, $buy_type, $playway);
                     $rst = (new \backend\service\Lucky5\Lucky5Service($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id))
                         ->pushIntoBetTask($qihao, $codes, $data['tz_type'], $bet_single, $playway, $TzSystemsUsers->uid, $plan_id=$record_id, $lottery_type);
-                    Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['account'=>$logData['account'], 'logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes(), 'rst'=>$rst]);
+                    $end_time = microtime(true);
+                    $consume_time = ($end_time-$start_time).'s';
+                    Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['account'=>$logData['account'], 'logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes(), 'rst'=>$rst, 'consume_time'=>$consume_time]);
                 }catch (\Exception $e){
                     $mcKey = 'wp_record_xxx_'.$record_id;
                     $num = \Yii::$app->redis->incr($mcKey);
