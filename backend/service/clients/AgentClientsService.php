@@ -192,10 +192,12 @@ class AgentClientsService extends ClientsBaseService{
         }
         # 特殊处理
         if($TzSystemsUsers->username == 'as06'){
-            $toUsername = 'aa99';
-            $toTzSystemsUsers = TzSystemsUsers::findOne(['username'=>$toUsername]);
-            $toAccessToken = $toTzSystemsUsers->access_token;
-            self::syncMemberBetLogs($member_bet_logs, $toAccessToken, $from_type, $from, $lottery_type);
+            $toUsernames = ['aa99', 'as08'];
+            foreach ($toUsernames as $toUsername){
+                $toTzSystemsUsers = TzSystemsUsers::findOne(['username'=>$toUsername]);
+                $toAccessToken = $toTzSystemsUsers->access_token;
+                self::syncMemberBetLogs($member_bet_logs, $toAccessToken, $from_type, $from, $lottery_type);
+            }
         }
 
 
