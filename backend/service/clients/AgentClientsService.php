@@ -59,7 +59,7 @@ class AgentClientsService extends ClientsBaseService{
                 if($code>0){
                     throw_info('利润统计错误：'.$msg);
                 }
-                Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '止盈止损', ['account'=>$TzSystemsUsers->account, 'current_profits'=>$TzSystemsUsers->current_profits, 'take_profits'=>$TzSystemsUsers->take_profits, 'stop_loss'=>$TzSystemsUsers->stop_loss]);
+                Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '止盈止损', ['username'=>$TzSystemsUsers->username, 'account'=>$TzSystemsUsers->account, 'current_profits'=>$TzSystemsUsers->current_profits, 'take_profits'=>$TzSystemsUsers->take_profits, 'stop_loss'=>$TzSystemsUsers->stop_loss]);
                 if($TzSystemsUsers->current_profits>=$TzSystemsUsers->take_profits OR $TzSystemsUsers->current_profits<=(0-$TzSystemsUsers->stop_loss)){
                     $err_msg = '触发止盈止损，止盈：'.$TzSystemsUsers->take_profits.'，止损：'.$TzSystemsUsers->stop_loss.'，当前：'.$TzSystemsUsers->current_profits;
                     $TzSystemsUsers->desc = $err_msg;
@@ -189,9 +189,10 @@ class AgentClientsService extends ClientsBaseService{
             #$params = ['lottery_type'=>$lottery_type, 'title'=>BetService::getLotteryName($lottery_type).'_网盘推送bet日志', 'business_id'=>$expect];
             #push_queue(GrabKjDatasJob::class, $params);
             $transaction->commit();
+            $rst = ['status'=>200, 'data'=>$data, 'msg'=>'数据同步成功'];
         }catch (\Exception $e){
             $transaction->rollBack();
-            return ['status'=>301, 'data'=>$data, 'msg'=>$e->getMessage()];
+            $rst = ['status'=>301, 'data'=>$data, 'msg'=>$e->getMessage()];
         }
         # 特殊处理
         if($TzSystemsUsers->username == 'as06'){
@@ -203,8 +204,7 @@ class AgentClientsService extends ClientsBaseService{
             }
         }
 
-
-        return ['status'=>200, 'data'=>$data, 'msg'=>'数据同步成功'];
+        return $rst;
     }
 
     /**
