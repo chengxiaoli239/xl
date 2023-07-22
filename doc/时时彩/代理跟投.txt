@@ -8,6 +8,9 @@ https://f1.w22g7p83.xyz
 https://b4.w3vk8275.xyz
 /betDetail/GetTotalBetDetail?selectedId=&company_id=&period_no=20230619283&is_only_search_win=&member_account=&bet_no=&range_type=1&range_min=&range_max=&category=0&pageindex=2&_=1687189013163&pagesize=10
 
+# 代理根据期号查询 "快选" 类型的下注单
+https://b4.w33r87c7.xyz/betDetail/GetTotalBetDetail?selectedId=&company_id=&period_no=20230719280&is_only_search_win=&member_account=&bet_no=&range_type=1&range_min=&range_max=&category=102&_=1689780080549
+
 category
 
 <select name="category" id="category">

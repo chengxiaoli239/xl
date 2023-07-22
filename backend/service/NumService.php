@@ -176,6 +176,9 @@ class NumService extends BaseService {
 
         74=>'杀上期同位置号码+三兄(四定)',
         #75=>'杀同位置冷码+三兄(四定)',
+
+        76=>'杀同位置大小加配上期号码(四定)',
+        77=>'杀同位置单双加配上期号码(四定)',
     ];
 
     /**
@@ -2988,6 +2991,12 @@ class NumService extends BaseService {
                 case 75: # 杀同位置冷码+三兄(四定)
                     $codes = NumService::getBeforeKjCodesDynamic74($plan, $positions=[1,2,3,4], $c_type='type_3b', $type=2);
                     break;
+                case 76: # 滤最近x组大小加配上期号码类型(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic76($plan, $type_field='type_4dx', $positions=[1,2,3,4], $filterNums=1000);
+                    break;
+                case 77: # 滤最近x组大小加配上期号码类型(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic76($plan, $type_field='type_ds', $positions=[1,2,3,4], $filterNums=1000);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -4322,6 +4331,54 @@ class NumService extends BaseService {
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '杀同位置/冷码位码6561组+3兄弟 2', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'sql'=>$sql]);
         $NumTypes = $query->asArray()->all();
         //p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+    * 过滤类型号码 - # 过滤最近x组大小类型(四定)
+    * @param object $plan
+    * @param string $type_field
+    * @param int $type_val
+    * @param int[] $positions
+    * @return array
+    */
+    private static function getBeforeKjCodesDynamic76(object $plan, $type_field='type_4ds', $positions=[1,2,3,4], $filterNums=1000){
+        $playway = $plan->playway;
+        #$nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $lottery_type = $plan->lottery_type;
+        if(empty($current_kj_qihao)){
+            $is_empty_c_qihao = 1;
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $next_qihao = $DataDealStatus['next_qihao'];
+        }else{
+            $is_empty_c_qihao = 0;
+            $next_qihao = KjDataGet::getNextQihaoByQihao($current_kj_qihao, $lottery_type);
+        }
+
+        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type]];
+        $historyKjDatasQuery = SscKjData::find()->select(['code1', 'code2', 'code3', 'code4', 'code_str', 'qihao', 'type_ds'=>'code_1_2_3_4', 'type_4dx'=>'LEFT(type_4dx,4)'])
+            ->where($historyWhere)->limit(1)->orderBy(['id'=>SORT_DESC]);
+        $sql = $historyKjDatasQuery->createCommand()->getRawSql();//p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤同位置大小、单双配上期号码', ['positions'=>$positions, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'next_qihao'=>$next_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+        $historyKjData = $historyKjDatasQuery->asArray()->one();
+        #p($historyKjData);
+
+        $filterWhere = ['AND', ['=', $type_field, $historyKjData[$type_field]], ];
+        $filterWhere[] = ['OR',
+            ['=', 'code_1', $historyKjData['code1']],
+            ['=', 'code_2', $historyKjData['code2']],
+            ['=', 'code_3', $historyKjData['code3']],
+            ['=', 'code_4', $historyKjData['code4']],
+        ] ;
+        $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
+            ->where(['NOT', $filterWhere])
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
         return $codes;
