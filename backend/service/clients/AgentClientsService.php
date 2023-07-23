@@ -194,14 +194,21 @@ class AgentClientsService extends ClientsBaseService{
             $transaction->rollBack();
             $rst = ['status'=>301, 'data'=>$data, 'msg'=>$e->getMessage()];
         }
+
         # 特殊处理
-        if($TzSystemsUsers->username == 'as06'){
-            $toUsernames = ['aa99', 'as08'];
-            foreach ($toUsernames as $toUsername){
-                $toTzSystemsUsers = TzSystemsUsers::findOne(['username'=>$toUsername]);
-                $toAccessToken = $toTzSystemsUsers->access_token;
-                self::syncMemberBetLogs($member_bet_logs, $toAccessToken, $from_type, $from, $lottery_type);
-            }
+        $toUsernames = [];
+        switch ($TzSystemsUsers->username){
+            case 'as06':
+                $toUsernames = ['aa99'];
+                break;
+            case 'aa99':
+                $toUsernames = ['as06'];
+                break;
+        }
+        if(!empty($toUsernames))foreach ($toUsernames as $toUsername){
+            $toTzSystemsUsers = TzSystemsUsers::findOne(['username'=>$toUsername]);
+            $toAccessToken = $toTzSystemsUsers->access_token;
+            self::syncMemberBetLogs($member_bet_logs, $toAccessToken, $from_type, $from, $lottery_type);
         }
 
         return $rst;
