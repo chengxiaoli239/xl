@@ -233,6 +233,10 @@ class AgentClientsService extends ClientsBaseService{
             ->pushIntoBetTask($qihao, $codes, $data['tz_type'], $bet_single, $playway, $TzSystemsUsers->uid, $plan_id=$record_id, $lottery_type);
         $end_time = microtime(true);
         $consume_time = ($end_time-$start_time).'s';
+
+        $m = \Yii::$app->cache;
+        $mkey = TzSystemUsersService::buildUserPlanTasksKey($access_token, $qihao);
+        $m->delete($mkey);
         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['account'=>$logData['account'], 'logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes(), 'rst'=>$rst, 'consume_time'=>$consume_time]);
 
         return true;
