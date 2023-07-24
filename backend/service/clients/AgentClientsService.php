@@ -46,8 +46,7 @@ class AgentClientsService extends ClientsBaseService{
      */
     public static function syncMemberBetLogs($member_bet_logs=[], $access_token='', $from_type='kuaixuan', $from='api', $lottery_type=DEFAULT_LOTTERY_TYPE){
         try {
-            $m = \Yii::$app->cache;
-            #$mkey = $access_token.'_'.$logData['log_member_quick_select_id'];
+            $s1 = microtime(true);
             $data = [];
             $transaction = \Yii::$app->db->beginTransaction();
 
@@ -81,6 +80,7 @@ class AgentClientsService extends ClientsBaseService{
                     }
                 }
             }
+            $s2 = microtime(true);
 
             #$params = ['lottery_type'=>$lottery_type, 'title'=>BetService::getLotteryName($lottery_type).'_网盘推送bet日志', 'business_id'=>$expect];
             #push_queue(GrabKjDatasJob::class, $params);
@@ -121,6 +121,10 @@ class AgentClientsService extends ClientsBaseService{
                 }
             }catch (\Exception $exception){}
         }
+        $s3 = microtime(true);
+        $c1 = ($s2-$s1).'s';
+        $c2 = ($s3-$s2).'s';
+        Tool_Common::log('/client_xy/'.__FUNCTION__.'_t', 'INFO', '时间耗时', ['username'=>$TzSystemsUsers->username, 'c1'=>$c1, 'c2'=>$c2]);
 
         return $rst;
     }
