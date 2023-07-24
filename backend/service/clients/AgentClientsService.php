@@ -61,11 +61,13 @@ class AgentClientsService extends ClientsBaseService{
             $flow_op_accounts = explode(',', str_replace('，', ',', trim($TzSystemsUsers->flow_op_accounts)));  # 反买账号flow_op_accounts
             $flow_op_accounts = array_filter($flow_op_accounts);
 
+            $record = 'not_in';
             list($code, $logDatas, $err_msg) = AgentClientsService::validateSyncMemberBetLogs($member_bet_logs);
             foreach ($logDatas as $logData){
                 try {
                     $record_id = $logData['log_member_quick_select_id'];
-                    AgentClientsService::operateOneBetLog($logData, $access_token, $from_type, $from, $lottery_type);
+                    list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token, $from_type, $from, $lottery_type);
+                    $record = 'record';
                 }catch (\Exception $e){
                     $mcKey = 'wp_record_xxx_'.$record_id;
                     $num = \Yii::$app->redis->incr($mcKey);
@@ -124,7 +126,7 @@ class AgentClientsService extends ClientsBaseService{
         $s3 = microtime(true);
         $c1 = ($s2-$s1).'s';
         $c2 = ($s3-$s2).'s';
-        Tool_Common::log('/client_xy/'.__FUNCTION__.'_t', 'INFO', '时间耗时', ['username'=>$TzSystemsUsers->username, 'c1'=>$c1, 'c2'=>$c2]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__.'_t', 'INFO', '时间耗时', ['username'=>$TzSystemsUsers->username, 'qihao'=>$qihao, 'flag'=>$record, 'c1'=>$c1, 'c2'=>$c2]);
 
         return $rst;
     }
@@ -243,7 +245,7 @@ class AgentClientsService extends ClientsBaseService{
         $m->delete($mkey);
         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['account'=>$logData['account'], 'logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes(), 'rst'=>$rst, 'consume_time'=>$consume_time]);
 
-        return true;
+        return [0, $qiaho];
     }
 
     /**
