@@ -46,6 +46,8 @@ class AgentClientsService extends ClientsBaseService{
      */
     public static function syncMemberBetLogs($member_bet_logs=[], $access_token='', $from_type='kuaixuan', $from='api', $lottery_type=DEFAULT_LOTTERY_TYPE){
         try {
+            $m = \Yii::$app->cache;
+            #$mkey = $access_token.'_'.$logData['log_member_quick_select_id'];
             $data = [];
             $transaction = \Yii::$app->db->beginTransaction();
 
@@ -53,128 +55,22 @@ class AgentClientsService extends ClientsBaseService{
             if(!$TzSystemsUsers->follow_status){
                 throw_info('跟随开关已关闭');
             }
-            if($TzSystemsUsers->take_profits>0.00 && $TzSystemsUsers->stop_loss>0.00){
-                # 账号级别的盈利
-                list($code, $TzSystemsUsers, $msg) = \backend\service\SscDataService::updateUserProfits($TzSystemsUsers->uid);
-                if($code>0){
-                    throw_info('利润统计错误：'.$msg);
-                }
-                Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '止盈止损', ['username'=>$TzSystemsUsers->username, 'account'=>$TzSystemsUsers->account, 'current_profits'=>$TzSystemsUsers->current_profits, 'take_profits'=>$TzSystemsUsers->take_profits, 'stop_loss'=>$TzSystemsUsers->stop_loss]);
-                if($TzSystemsUsers->current_profits>=$TzSystemsUsers->take_profits OR $TzSystemsUsers->current_profits<=(0-$TzSystemsUsers->stop_loss)){
-                    $err_msg = '触发止盈止损，止盈：'.$TzSystemsUsers->take_profits.'，止损：'.$TzSystemsUsers->stop_loss.'，当前：'.$TzSystemsUsers->current_profits;
-                    $TzSystemsUsers->desc = $err_msg;
-                    $TzSystemsUsers->save();
-                    throw_info($err_msg);
-                }
-            }
+            AgentClientsService::checkProfits($TzSystemsUsers);
+
             $flow_wp_accounts = explode(',', str_replace('，', ',', trim($TzSystemsUsers->flow_wp_accounts)));  # 正买账号
             $flow_wp_accounts = array_filter($flow_wp_accounts);
             $flow_op_accounts = explode(',', str_replace('，', ',', trim($TzSystemsUsers->flow_op_accounts)));  # 反买账号flow_op_accounts
             $flow_op_accounts = array_filter($flow_op_accounts);
 
-            $now_time = time();
-            $before_5min_time = date('Y-m-d H:i:s', time()-300); # 5分钟前记录
             list($code, $logDatas, $err_msg) = AgentClientsService::validateSyncMemberBetLogs($member_bet_logs);
             foreach ($logDatas as $logData){
-                $start_time = microtime(true);
                 try {
                     $record_id = $logData['log_member_quick_select_id'];
-                    $member_bet_time = date('Y-').$logData['operation_datetime'];
-                    if($member_bet_time < $before_5min_time){
-                        throw_info($err_msg.'，历史下注记录不同步：用户下注时间:'.$member_bet_time. '，当前5分钟前:'.$before_5min_time, self::BET_INVALIDE_CODE);
-                    }
-
-                    if(!in_array($logData['account'], $flow_wp_accounts) && !in_array($logData['account'], $flow_op_accounts)){
-                        throw_info('不在跟随账号范围之内, account:'.$logData['account'], 40002);
-                    }
-                    $buy_type = in_array($logData['account'], $flow_wp_accounts) ? 1 : 0;  # 购买类型，0反买账号，1正买账号
-
-                    $AgentUserBetLogs = AgentUserBetLogs::findOne(['access_token'=>$access_token, 'wp_record_id'=>$logData['log_member_quick_select_id']]);
-                    if(!empty($AgentUserBetLogs)){
-                        throw_info('日志记录已存在 wp_record_id:'.$logData['log_member_quick_select_id'], 40003);
-                    }else{
-                        $AgentUserBetLogs = new AgentUserBetLogs();
-                    }
-                    $qihao = HN0898Service::getQihao($lottery_type, substr($logData['time_value'], -8), date('Y').'-'.substr($logData['operation_datetime'], 0, 5));
-                    $bet_log_n = str_replace(['[', ']'], '', $logData['operation_content']);
-                    list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($bet_log_n);
-                    if($code>0){
-                        throw_info($err_msg);
-                    }
-                    $playway = $data['playway'];
-                    $single = number_format($logData['bet_money']/$logData['bet_count'], 2); # 倍数
-                    $bet_single_op = $single; # 反买倍数默认等于正常下注倍数
-
-                    $bet_op_theory_counts = AgentClientsService::getOpBetCounts($data['code_type'], $logData['bet_count']);  # 理论反买组数
-                    $bet_codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']));  # 正买号码
-                    $bet_counts = count(explode('@', $bet_codes));  # 实际反买组数
-
-                    $bet_codes_op = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), $buy_type);  # 反买号码
-                    $bet_op_counts = count(explode('@', $bet_codes_op));  # 实际反买组数
-
-                    if($data['code_type']==4 && $buy_type==0 && $bet_op_counts<1000){
-                        throw_info('反买:组数少于1000组不下注，组数：'.$bet_op_counts.' 组 ', self::BET_WARING_CODE);
-                    }
-
-                    # 反买组数校验
-                    if($buy_type==0 && $data['code_type']==4 && $bet_op_theory_counts != $bet_op_counts){
-                        throw_info('反买:组数不符，理论组数：'.$bet_op_theory_counts.' 组，实际：'.$bet_op_counts.' 组 ', self::BET_WARING_CODE);
-                    }
-                    # 正买组数校验
-                    if($buy_type==1 && $logData['bet_count'] != $bet_counts){
-                        throw_info('code_type:'.$data['code_type'].' 正买组数不符，理论组数：'.$logData['bet_count'].' 组，实际：'.$bet_op_counts.' 组 ', self::BET_WARING_CODE);
-                    }
-
-                    $setDatas = [
-                        'access_token' => $access_token,
-                        'uid' => $TzSystemsUsers->uid,
-                        'wp_record_id' => $record_id,
-                        'member_id' => $logData['member_id'],
-                        'account' => $TzSystemsUsers->account,
-                        'bet_logs' => $logData['operation_content'], # 原始日志
-                        'bet_logs_codes_hz' => json_encode($data['codes_hz'], 320), # 解析成系统的codes_hz
-                        'bet_logs_n' => (string)$bet_log_n, # 转换后的快译
-                        'bet_codes' => $bet_codes, # 用户正常下注号码
-                        'bet_counts' => $logData['bet_count'], # 原始下注组数
-                        'bet_money' => (float)$logData['bet_money'], # 原始下注金额
-                        'bet_single' => $single,
-
-                        # 反买
-                        'bet_codes_op' => $bet_codes_op, # 反买号码
-                        'bet_op_counts' => (int)$bet_op_counts, # 反买组数
-                        'bet_op_single' => $bet_single_op, # 反买倍数
-                        'bet_op_money' => ($bet_single_op * $bet_op_counts), # 反买金额
-                        'bet_type' => $buy_type, # 下注类型：0反买1正买  默认反买
-
-                        'member_bet_time' => $member_bet_time,
-
-                        'lottery_type' => $lottery_type,
-                        'qihao' => $qihao,
-                        'tz_system_id' => 9,
-                        'created_at' => $now_time,
-                        'updated_at' => $now_time,
-                        'playway' => $playway,
-                        'from_type' => $from_type,  # 来源：快选，快译
-                        'from' => $from,  # 来源：api、page
-                        'log_type' => $logData['log_type'],  # 目前看都是102
-                    ];
-                    $AgentUserBetLogs->setAttributes($setDatas);
-                    //p($AgentUserBetLogs->getAttributes());
-                    $flag = $AgentUserBetLogs->save();
-                    if(empty($flag)){
-                        throw_info(Json::encode($AgentUserBetLogs->getErrors(), 320));
-                    }
-                    $codes = ($buy_type==1) ? $bet_codes : $bet_codes_op;
-                    list($code, $bet_single) = AgentUsersService::getFlowSingle($TzSystemsUsers, $single, $buy_type, $playway);
-                    $rst = (new \backend\service\Lucky5\Lucky5Service($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id))
-                        ->pushIntoBetTask($qihao, $codes, $data['tz_type'], $bet_single, $playway, $TzSystemsUsers->uid, $plan_id=$record_id, $lottery_type);
-                    $end_time = microtime(true);
-                    $consume_time = ($end_time-$start_time).'s';
-                    Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['account'=>$logData['account'], 'logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes(), 'rst'=>$rst, 'consume_time'=>$consume_time]);
+                    AgentClientsService::operateOneBetLog($logData, $access_token, $from_type, $from, $lottery_type);
                 }catch (\Exception $e){
                     $mcKey = 'wp_record_xxx_'.$record_id;
                     $num = \Yii::$app->redis->incr($mcKey);
-                    \Yii::$app->redis->expire($mcKey, 30);
+                    \Yii::$app->redis->expire($mcKey, 10);
                     if($num>2) continue;
                     if($e->getCode()<40000){
                         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '代理日志记录-异常', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>$e->getMessage()]);
@@ -208,10 +104,162 @@ class AgentClientsService extends ClientsBaseService{
         if(!empty($toUsernames))foreach ($toUsernames as $toUsername){
             $toTzSystemsUsers = TzSystemsUsers::findOne(['username'=>$toUsername]);
             $toAccessToken = $toTzSystemsUsers->access_token;
-            self::syncMemberBetLogs($member_bet_logs, $toAccessToken, $from_type, $from, $lottery_type);
+            try {
+                #self::syncMemberBetLogs($member_bet_logs, $toAccessToken, $from_type, $from, $lottery_type);
+                AgentClientsService::checkProfits($TzSystemsUsers);
+                foreach ($logDatas as $logData){
+                    try {
+                        $to_record_id = $logData['log_member_quick_select_id'];
+                        $toMcKey = 'wp_record_xxx_'.$to_record_id;
+                        AgentClientsService::operateOneBetLog($logData, $toAccessToken, $from_type, $from, $lottery_type);
+                    }catch (\Exception $e){
+                        $num = \Yii::$app->redis->incr($toMcKey);
+                        \Yii::$app->redis->expire($toMcKey, 10);
+                        if($num>2) continue;
+                        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '共用代理错误', ['access_token'=>$toAccessToken, 'username'=>$TzSystemsUsers->username, 'err_msg'=>$e->getMessage()]);
+                    }
+                }
+            }catch (\Exception $exception){}
         }
 
         return $rst;
+    }
+
+    /**
+     * 处理一个日志
+     * @param array $logData
+     * @throws \common\exceptions\InfoException
+     */
+    private static function operateOneBetLog($logData=[], $access_token='', $from_type='kuaixuan', $from='api', $lottery_type=DEFAULT_LOTTERY_TYPE){
+
+        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+        $now_time = time();
+        $before_5min_time = date('Y-m-d H:i:s', time()-300); # 5分钟前记录
+        $start_time = microtime(true);
+        $record_id = $logData['log_member_quick_select_id'];
+        $member_bet_time = date('Y-').$logData['operation_datetime'];
+        if($member_bet_time < $before_5min_time){
+            throw_info('校验成功，历史下注记录不同步：用户下注时间:'.$member_bet_time. '，当前5分钟前:'.$before_5min_time, self::BET_INVALIDE_CODE);
+        }
+
+        $flow_wp_accounts = explode(',', str_replace('，', ',', trim($TzSystemsUsers->flow_wp_accounts)));  # 正买账号
+        $flow_wp_accounts = array_filter($flow_wp_accounts);
+        $flow_op_accounts = explode(',', str_replace('，', ',', trim($TzSystemsUsers->flow_op_accounts)));  # 反买账号flow_op_accounts
+        $flow_op_accounts = array_filter($flow_op_accounts);
+
+        if(!in_array($logData['account'], $flow_wp_accounts) && !in_array($logData['account'], $flow_op_accounts)){
+            throw_info('不在跟随账号范围之内, account:'.$logData['account'], 40002);
+        }
+        $buy_type = in_array($logData['account'], $flow_wp_accounts) ? 1 : 0;  # 购买类型，0反买账号，1正买账号
+
+        $AgentUserBetLogs = AgentUserBetLogs::findOne(['access_token'=>$access_token, 'wp_record_id'=>$logData['log_member_quick_select_id']]);
+        if(!empty($AgentUserBetLogs)){
+            throw_info('日志记录已存在 wp_record_id:'.$logData['log_member_quick_select_id'], 40003);
+        }else{
+            $AgentUserBetLogs = new AgentUserBetLogs();
+        }
+        $qihao = HN0898Service::getQihao($lottery_type, substr($logData['time_value'], -8), date('Y').'-'.substr($logData['operation_datetime'], 0, 5));
+        $bet_log_n = str_replace(['[', ']'], '', $logData['operation_content']);
+        list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($bet_log_n);
+        if($code>0){
+            throw_info($err_msg);
+        }
+        $playway = $data['playway'];
+        $single = number_format($logData['bet_money']/$logData['bet_count'], 2); # 倍数
+        $bet_single_op = $single; # 反买倍数默认等于正常下注倍数
+
+        $bet_op_theory_counts = AgentClientsService::getOpBetCounts($data['code_type'], $logData['bet_count']);  # 理论反买组数
+        $bet_codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']));  # 正买号码
+        $bet_counts = count(explode('@', $bet_codes));  # 实际反买组数
+
+        $bet_codes_op = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), $buy_type);  # 反买号码
+        $bet_op_counts = count(explode('@', $bet_codes_op));  # 实际反买组数
+
+        if($data['code_type']==4 && $buy_type==0 && $bet_op_counts<1000){
+            throw_info('反买:组数少于1000组不下注，组数：'.$bet_op_counts.' 组 ', self::BET_WARING_CODE);
+        }
+
+        # 反买组数校验
+        if($buy_type==0 && $data['code_type']==4 && $bet_op_theory_counts != $bet_op_counts){
+            throw_info('反买:组数不符，理论组数：'.$bet_op_theory_counts.' 组，实际：'.$bet_op_counts.' 组 ', self::BET_WARING_CODE);
+        }
+        # 正买组数校验
+        if($buy_type==1 && $logData['bet_count'] != $bet_counts){
+            throw_info('code_type:'.$data['code_type'].' 正买组数不符，理论组数：'.$logData['bet_count'].' 组，实际：'.$bet_op_counts.' 组 ', self::BET_WARING_CODE);
+        }
+
+        $setDatas = [
+            'access_token' => $access_token,
+            'uid' => $TzSystemsUsers->uid,
+            'wp_record_id' => $record_id,
+            'member_id' => $logData['member_id'],
+            'account' => $TzSystemsUsers->account,
+            'bet_logs' => $logData['operation_content'], # 原始日志
+            'bet_logs_codes_hz' => json_encode($data['codes_hz'], 320), # 解析成系统的codes_hz
+            'bet_logs_n' => (string)$bet_log_n, # 转换后的快译
+            'bet_codes' => $bet_codes, # 用户正常下注号码
+            'bet_counts' => $logData['bet_count'], # 原始下注组数
+            'bet_money' => (float)$logData['bet_money'], # 原始下注金额
+            'bet_single' => $single,
+
+            # 反买
+            'bet_codes_op' => $bet_codes_op, # 反买号码
+            'bet_op_counts' => (int)$bet_op_counts, # 反买组数
+            'bet_op_single' => $bet_single_op, # 反买倍数
+            'bet_op_money' => ($bet_single_op * $bet_op_counts), # 反买金额
+            'bet_type' => $buy_type, # 下注类型：0反买1正买  默认反买
+
+            'member_bet_time' => $member_bet_time,
+
+            'lottery_type' => $lottery_type,
+            'qihao' => $qihao,
+            'tz_system_id' => 9,
+            'created_at' => $now_time,
+            'updated_at' => $now_time,
+            'playway' => $playway,
+            'from_type' => $from_type,  # 来源：快选，快译
+            'from' => $from,  # 来源：api、page
+            'log_type' => $logData['log_type'],  # 目前看都是102
+        ];
+        $AgentUserBetLogs->setAttributes($setDatas);
+        //p($AgentUserBetLogs->getAttributes());
+        $flag = $AgentUserBetLogs->save();
+        if(empty($flag)){
+            throw_info(Json::encode($AgentUserBetLogs->getErrors(), 320));
+        }
+        $codes = ($buy_type==1) ? $bet_codes : $bet_codes_op;
+        list($code, $bet_single) = AgentUsersService::getFlowSingle($TzSystemsUsers, $single, $buy_type, $playway);
+        $rst = (new \backend\service\Lucky5\Lucky5Service($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id))
+            ->pushIntoBetTask($qihao, $codes, $data['tz_type'], $bet_single, $playway, $TzSystemsUsers->uid, $plan_id=$record_id, $lottery_type);
+        $end_time = microtime(true);
+        $consume_time = ($end_time-$start_time).'s';
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['account'=>$logData['account'], 'logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes(), 'rst'=>$rst, 'consume_time'=>$consume_time]);
+
+        return true;
+    }
+
+    /**
+     * @param $TzSystemsUsers
+     * @return bool
+     * @throws \common\exceptions\InfoException
+     */
+    public static function checkProfits($TzSystemsUsers){
+
+        if($TzSystemsUsers->take_profits>0.00 && $TzSystemsUsers->stop_loss>0.00){
+            # 账号级别的盈利
+            list($code, $TzSystemsUsers, $msg) = \backend\service\SscDataService::updateUserProfits($TzSystemsUsers->uid);
+            if($code>0){
+                throw_info('利润统计错误：'.$msg);
+            }
+            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '止盈止损', ['username'=>$TzSystemsUsers->username, 'account'=>$TzSystemsUsers->account, 'current_profits'=>$TzSystemsUsers->current_profits, 'take_profits'=>$TzSystemsUsers->take_profits, 'stop_loss'=>$TzSystemsUsers->stop_loss]);
+            if($TzSystemsUsers->current_profits>=$TzSystemsUsers->take_profits OR $TzSystemsUsers->current_profits<=(0-$TzSystemsUsers->stop_loss)){
+                $err_msg = '触发止盈止损，止盈：'.$TzSystemsUsers->take_profits.'，止损：'.$TzSystemsUsers->stop_loss.'，当前：'.$TzSystemsUsers->current_profits;
+                $TzSystemsUsers->desc = $err_msg;
+                $TzSystemsUsers->save();
+                throw_info($err_msg);
+            }
+        }
+        return true;
     }
 
     /**

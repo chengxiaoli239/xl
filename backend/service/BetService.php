@@ -2133,6 +2133,8 @@ abstract class BetService extends BaseBetService {
             foreach ($user_ids as $uid=>$user_id_data){
                 push_queue(UserBetJob::class, $user_id_data);
             }
+            $err_post_desc = Json::encode(['Status'=>0, 'msg'=>'过期未下单', 'time'=>date('Y-m-d H:i:s')]);
+            BetErrorPlansTask::updateAll(['status'=>3, 'post_desc'=>$err_post_desc], 'created_at<'.(time()-300));
         }
 
         return $rst;

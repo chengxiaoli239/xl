@@ -36,7 +36,7 @@ class Lucky5 extends BaseKj {
             $m = \Yii::$app->redis;
             foreach ($TzSystemsUserses as $TzSystemsUsers){ # 用户账号去网盘抓数据
                 try {
-                    sleep(8);
+                    sleep(2);
                     $exsit_key = 'ssc_kj_data_wangpan_x0'.self::$lottery_type;
                     $is_exsit = $m->sadd($exsit_key, $TzSystemsUsers->id);
                     if(!$is_exsit){
