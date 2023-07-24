@@ -245,7 +245,7 @@ class AgentClientsService extends ClientsBaseService{
         $m->delete($mkey);
         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '日志同步', ['account'=>$logData['account'], 'logData'=>$logData, 'attributes'=>$AgentUserBetLogs->getAttributes(), 'rst'=>$rst, 'consume_time'=>$consume_time]);
 
-        return [0, $qiaho];
+        return [0, $qihao];
     }
 
     /**
