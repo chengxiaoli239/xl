@@ -108,7 +108,7 @@ class AgentClientsService extends ClientsBaseService{
             $toAccessToken = $toTzSystemsUsers->access_token;
             try {
                 #self::syncMemberBetLogs($member_bet_logs, $toAccessToken, $from_type, $from, $lottery_type);
-                AgentClientsService::checkProfits($TzSystemsUsers);
+                AgentClientsService::checkProfits($toTzSystemsUsers);
                 foreach ($logDatas as $logData){
                     try {
                         $to_record_id = $logData['log_member_quick_select_id'];
