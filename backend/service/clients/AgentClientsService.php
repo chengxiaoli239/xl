@@ -50,6 +50,7 @@ class AgentClientsService extends ClientsBaseService{
             $data = [];
             $transaction = \Yii::$app->db->beginTransaction();
 
+            list($code, $logDatas, $err_msg) = AgentClientsService::validateSyncMemberBetLogs($member_bet_logs);
             $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
             if(!$TzSystemsUsers->follow_status){
                 throw_info('跟随开关已关闭');
@@ -62,14 +63,13 @@ class AgentClientsService extends ClientsBaseService{
             $flow_op_accounts = array_filter($flow_op_accounts);
 
             $record = 'not_in';
-            list($code, $logDatas, $err_msg) = AgentClientsService::validateSyncMemberBetLogs($member_bet_logs);
             foreach ($logDatas as $logData){
                 try {
                     $record_id = $logData['log_member_quick_select_id'];
                     list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token, $from_type, $from, $lottery_type);
                     $record = 'record';
                 }catch (\Exception $e){
-                    $mcKey = 'wp_record_xxx_'.$record_id;
+                    $mcKey = 'wp_record_xxx_'.$access_token.'_'.$record_id;
                     $num = \Yii::$app->redis->incr($mcKey);
                     \Yii::$app->redis->expire($mcKey, 10);
                     if($num>2) continue;
@@ -112,7 +112,7 @@ class AgentClientsService extends ClientsBaseService{
                 foreach ($logDatas as $logData){
                     try {
                         $to_record_id = $logData['log_member_quick_select_id'];
-                        $toMcKey = 'wp_record_xxx_'.$to_record_id;
+                        $toMcKey = 'wp_record_xxx_'.$access_token.'_'.$to_record_id;
                         AgentClientsService::operateOneBetLog($logData, $toAccessToken, $from_type, $from, $lottery_type);
                     }catch (\Exception $e){
                         $num = \Yii::$app->redis->incr($toMcKey);
@@ -136,7 +136,7 @@ class AgentClientsService extends ClientsBaseService{
      * @param array $logData
      * @throws \common\exceptions\InfoException
      */
-    private static function operateOneBetLog($logData=[], $access_token='', $from_type='kuaixuan', $from='api', $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function operateOneBetLog($logData=[], $access_token='', $from_type='kuaixuan', $from='api', $lottery_type=DEFAULT_LOTTERY_TYPE){
 
         $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
         $now_time = time();
@@ -176,13 +176,13 @@ class AgentClientsService extends ClientsBaseService{
 
         $bet_op_theory_counts = AgentClientsService::getOpBetCounts($data['code_type'], $logData['bet_count']);  # 理论反买组数
         $bet_codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']));  # 正买号码
-        $bet_counts = count(explode('@', $bet_codes));  # 实际反买组数
+        $bet_counts = count(explode('@', $bet_codes));  # 实际正买组数
 
         $bet_codes_op = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), $buy_type);  # 反买号码
         $bet_op_counts = count(explode('@', $bet_codes_op));  # 实际反买组数
 
-        if($data['code_type']==4 && $buy_type==0 && $bet_op_counts<1000){
-            throw_info('反买:组数少于1000组不下注，组数：'.$bet_op_counts.' 组 ', self::BET_WARING_CODE);
+        if($data['code_type']==4 && $buy_type==0 && $bet_counts<1000){
+            throw_info('反买:正买组数少于1000组，不反买，正买：'.$bet_counts.' 组 ', self::BET_WARING_CODE);
         }
 
         # 反买组数校验

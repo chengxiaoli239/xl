@@ -345,14 +345,26 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $plan = UserSysPlans::findOne(7217);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
-        p(count($filter_dynamic_codes));
+        $logData_str = '{"log_member_quick_select_id":"111529315","member_id":"62926","account":"aa167945","nickname":"ghh","fix_num":"40","bet_count":"625","bet_money":"187.5","operation_content":"[四定位]，复式“[取]”数：[13597]","operation_datetime":"07-25 17:38:54","time_value":"2023/7/25 17:38:54","operation_ip":"36.1.*.*","ip_value":"36.1.141.73","operation_ip_extension":"36.1.141.73","is_package":"0","log_type":"102"}';
+        $logData = Json::decode($logData_str, true);
+        p(['logData'=>$logData], 0);
+        $access_token = '4b843e29ac8dd191e894c7dcea547815';
+        list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token);
+        p($logData);
         $post = [
             'access_token' => '4b843e29ac8dd191e894c7dcea547815',
+            'from_type' => 'kuaixuan',
+            'from' => 'api',
         ];
         $rst = AgentClientsService::syncMemberBetLogs($post['member_bet_logs'], $post['access_token'], $post['from_type'], $post['from'], $post['lottery_type']);
         p($rst);
+        $access_token = '00e9146df95b0dfb1b9557790acbbfc8';
+        $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+        AgentClientsService::checkProfits($TzSystemsUsers);
+        p($TzSystemsUsers);
+        $plan = UserSysPlans::findOne(7217);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p(count($filter_dynamic_codes));
         $rst = \backend\service\SscDataService::getUserBetProfits($uid=10); p($rst);
         $rst = UserService::staticUserProfits($uid=17); p($rst);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');p($r);

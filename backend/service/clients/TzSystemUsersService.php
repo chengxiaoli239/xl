@@ -159,7 +159,7 @@ class TzSystemUsersService extends ClientsBaseService{
         $TzSystemsUsers = $m->get($mkey);
         if($is_auto==2 OR empty($TzSystemsUsers)){
             $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
-            $m->set($mkey, $TzSystemsUsers, 10);
+            $m->set($mkey, $TzSystemsUsers, 5);
         }
 
         return $TzSystemsUsers;
