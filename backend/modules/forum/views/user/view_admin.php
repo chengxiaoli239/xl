@@ -81,7 +81,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $options = [
                                     'id' => 'balance_'.$model->id
                                 ];
-                                return Html::a($model->balance, '#', $options);
+                                $txt = Html::a($model->balance?:'0.00', '#', $options);
+                                if($model->current_profits>=0){
+                                    $rst = $txt.'[<font color="green">'.$model->current_profits.'</font>]';
+                                }else{
+                                    $rst = $txt.'[<font color="red">'.$model->current_profits.'</font>]';
+                                }
+                                return $rst;
                                 //return $model->balance ? $model->balance : '';
                             },
                         ],
