@@ -261,9 +261,9 @@ class AgentClientsService extends ClientsBaseService{
             if($code>0){
                 throw_info('利润统计错误：'.$msg);
             }
-            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '止盈止损日志', ['username'=>$TzSystemsUsers->username, 'account'=>$TzSystemsUsers->account, 'current_profits'=>$TzSystemsUsers->current_profits, 'take_profits'=>$TzSystemsUsers->take_profits, 'stop_loss'=>$TzSystemsUsers->stop_loss]);
+            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '止盈止损计算', ['username'=>$TzSystemsUsers->username, 'account'=>$TzSystemsUsers->account, 'current_profits'=>$TzSystemsUsers->current_profits, 'take_profits'=>$TzSystemsUsers->take_profits, 'stop_loss'=>$TzSystemsUsers->stop_loss]);
             if($TzSystemsUsers->current_profits>=$TzSystemsUsers->take_profits OR $TzSystemsUsers->current_profits<=(0-$TzSystemsUsers->stop_loss)){
-                Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '止盈止损日志', ['username'=>$TzSystemsUsers->username, 'account'=>$TzSystemsUsers->account, 'current_profits'=>$TzSystemsUsers->current_profits, 'take_profits'=>$TzSystemsUsers->take_profits, 'stop_loss'=>$TzSystemsUsers->stop_loss]);
+                Tool_Common::log('/client_xy/'.__FUNCTION__.'_s', 'INFO', '止盈止损记录', ['username'=>$TzSystemsUsers->username, 'account'=>$TzSystemsUsers->account, 'current_profits'=>$TzSystemsUsers->current_profits, 'take_profits'=>$TzSystemsUsers->take_profits, 'stop_loss'=>$TzSystemsUsers->stop_loss]);
                 $err_msg = '触发止盈止损，止盈：'.$TzSystemsUsers->take_profits.'，止损：'.$TzSystemsUsers->stop_loss.'，当前：'.$TzSystemsUsers->current_profits;
                 $TzSystemsUsers->desc = $err_msg;
                 $TzSystemsUsers->save();
