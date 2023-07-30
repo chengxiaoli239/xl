@@ -345,6 +345,13 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $post = [
+            'access_token' => '4b843e29ac8dd191e894c7dcea547815',
+            'access_token' => '4b843e29ac8dd191e894c7dcea547815',
+
+        ];
+        $rst = TzSystemUsersService::getActivePlanTasks($post['access_token'], $post['current_qihao'], $post['lottery_type']);
+        p($rst);
         $logData_str = '{"log_member_quick_select_id":"111529315","member_id":"62926","account":"aa167945","nickname":"ghh","fix_num":"40","bet_count":"625","bet_money":"187.5","operation_content":"[四定位]，复式“[取]”数：[13597]","operation_datetime":"07-25 17:38:54","time_value":"2023/7/25 17:38:54","operation_ip":"36.1.*.*","ip_value":"36.1.141.73","operation_ip_extension":"36.1.141.73","is_package":"0","log_type":"102"}';
         $logData = Json::decode($logData_str, true);
         p(['logData'=>$logData], 0);
