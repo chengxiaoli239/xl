@@ -345,8 +345,12 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(7217);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p(count($filter_dynamic_codes));
+        $status = KjDataGet::isCanGrab($lottery_type=8);
+        p($status);
         $post = [
-            'access_token' => '4b843e29ac8dd191e894c7dcea547815',
             'access_token' => '4b843e29ac8dd191e894c7dcea547815',
 
         ];
@@ -369,9 +373,6 @@ class IndexController extends Controller
         $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
         AgentClientsService::checkProfits($TzSystemsUsers);
         p($TzSystemsUsers);
-        $plan = UserSysPlans::findOne(7217);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
-        p(count($filter_dynamic_codes));
         $rst = \backend\service\SscDataService::getUserBetProfits($uid=10); p($rst);
         $rst = UserService::staticUserProfits($uid=17); p($rst);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}');p($r);

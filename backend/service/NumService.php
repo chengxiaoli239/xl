@@ -179,6 +179,10 @@ class NumService extends BaseService {
 
         76=>'杀同位置大小加配上期号码(四定)',
         77=>'杀同位置单双加配上期号码(四定)',
+
+        78=>'过滤昨日同期[千百-十个]跨度(四定)',
+        79=>'过滤昨日同期[千-百十个]跨度(四定)',
+        80=>'过滤昨日同期[千百十-个]跨度(四定)',
     ];
 
     /**
@@ -2997,6 +3001,15 @@ class NumService extends BaseService {
                 case 77: # 滤最近x组大小加配上期号码类型(四定)
                     $codes = NumService::getBeforeKjCodesDynamic76($plan, $type_field='type_ds', $positions=[1,2,3,4], $filterNums=1000);
                     break;
+                case 78: # 过滤昨日同期[千百-十个]位置跨度(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic78($plan, $positions1=[1,2], $positions2=[3,4]);
+                    break;
+                case 79: # 过滤昨日同期[千-百十个]位置跨度(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic78($plan, $positions1=[1], $positions2=[2,3,4]);
+                    break;
+                case 80: # 过滤昨日同期[千百十-个]位置跨度(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic78($plan, $positions1=[1,2,3], $positions2=[4]);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -4380,6 +4393,83 @@ class NumService extends BaseService {
             ->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - # 过滤昨日同期[千百-十个]跨度(四定)
+     * @param object $plan
+     * @param int[] $positions1
+     * @param int[] $positions2
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic78(object $plan, $positions1=[1,2,3,4], $positions2=[1,2,3,4]){
+        $playway = $plan->playway;
+        #$nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $lottery_type = $plan->lottery_type;
+        if(empty($current_kj_qihao)){
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $next_qihao = $DataDealStatus['next_qihao'];
+        }else{
+            $next_qihao = KjDataGet::getNextQihaoByQihao($current_kj_qihao, $lottery_type);
+        }
+
+        $beforeQihao = date('Ymd', strtotime('-1 day')). substr($next_qihao, -3);
+        $positions_str_11 = 'code'.implode('+code', $positions1);
+        $positions_str_22 = 'code'.implode('+code', $positions2);
+        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'qihao', $beforeQihao]];
+        $historyKjDatasQuery = SscKjData::find()->select(['code1', 'code2', 'code3', 'code4', 'x1'=>'RIGHT(SUM('.$positions_str_11.'), 1)', 'x2'=>'RIGHT(SUM('.$positions_str_22.'), 1)'])
+            ->where($historyWhere)->limit(1)->orderBy(['id'=>SORT_DESC]);
+        #$sql = $historyKjDatasQuery->createCommand()->getRawSql();//p($sql);
+        $historyKjData = $historyKjDatasQuery->asArray()->one();
+        if($historyKjData['x2']<$historyKjData['x1']){
+            $kuaDu = 10 + $historyKjData['x2'] - $historyKjData['x1'];
+        }else{
+            $kuaDu = $historyKjData['x2'] - $historyKjData['x1'];
+        }
+
+        $p1_str_Arr = [];
+        foreach ($positions1 as $p1){
+            $p1_str_Arr[] = 'CAST(code_'.$p1.' AS SIGNED)';
+        }
+        $p2_str_Arr = [];
+        foreach ($positions2 as $p2){
+            $p2_str_Arr[] = 'CAST(code_'.$p2.' AS SIGNED)';
+        }
+
+        # 原生sql
+        #$sql = "SELECT code, kd1, kd2, code_type, IF(kd2 >= kd1, kd2-kd1, 10 + kd2 - kd1) AS kd
+        #    FROM (
+        #        SELECT code, code_type,
+        #            RIGHT(CAST(code_1 AS SIGNED)+CAST(code_2 AS SIGNED), 1) AS kd1,
+        #            RIGHT(CAST(code_3 AS SIGNED)+CAST(code_4 AS SIGNED), 1) AS kd2
+        #        FROM lt_num4_type
+        #        WHERE code_type = 4
+        #    ) AS subquery WHERE IF(kd2 >= kd1, kd2-kd1, 10 + kd2 - kd1) NOT in(3)
+        #";
+        #$results = Yii::$app->db->createCommand($sql)->queryAll();
+
+
+        $subquery = (new \yii\db\Query())
+        ->select(['code', 'code_type'])
+            ->addSelect(['kd1' => new \yii\db\Expression('RIGHT('.implode('+', $p1_str_Arr).', 1)')])
+            ->addSelect(['kd2' => new \yii\db\Expression('RIGHT('.implode('+', $p2_str_Arr).', 1)')])
+            ->from('lt_num4_type')
+            ->where(['code_type' => 4]);
+
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->addSelect(['kd' => new \yii\db\Expression('IF(kd2 >= kd1, kd2, 10 + kd2)')])
+            ->from(['n' => $subquery])
+            ->where(['NOT IN', 'IF(kd2 >= kd1, kd2-kd1, 10 + kd2 - kd1)', [$kuaDu]]);
+
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        #p(['count'=>count($codes), 'kd'=>$kuaDu,'beforeQihao'=>$beforeQihao, 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
 
         return $codes;
     }
