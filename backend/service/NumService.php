@@ -183,6 +183,9 @@ class NumService extends BaseService {
         78=>'过滤昨日同期[千百-十个]跨度(四定)',
         79=>'过滤昨日同期[千-百十个]跨度(四定)',
         80=>'过滤昨日同期[千百十-个]跨度(四定)',
+        81=>'过滤前期[千-百]位置跨度(四定)',
+        82=>'过滤前期[百-十]位置跨度(四定)',
+        83=>'过滤前期[十-个]位置跨度(四定)',
     ];
 
     /**
@@ -3010,6 +3013,15 @@ class NumService extends BaseService {
                 case 80: # 过滤昨日同期[千百十-个]位置跨度(四定)
                     $codes = NumService::getBeforeKjCodesDynamic78($plan, $positions1=[1,2,3], $positions2=[4]);
                     break;
+                case 81: # 过滤前期[千-百]位置跨度(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic78($plan, $positions1=[1], $positions2=[2], $beforeType=2);
+                    break;
+                case 82: # 过滤前期[百-十]位置跨度(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic78($plan, $positions1=[2], $positions2=[3], $beforeType=2);
+                    break;
+                case 83: # 过滤前期[十-个]位置跨度(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic78($plan, $positions1=[3], $positions2=[4], $beforeType=2);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -4402,35 +4414,45 @@ class NumService extends BaseService {
      * @param object $plan
      * @param int[] $positions1
      * @param int[] $positions2
+     * @param int $beforeType 前期类型：1昨日同期 2今日前一期
      * @return array
      */
-    private static function getBeforeKjCodesDynamic78(object $plan, $positions1=[1,2,3,4], $positions2=[1,2,3,4]){
-        $playway = $plan->playway;
-        #$nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
+    private static function getBeforeKjCodesDynamic78(object $plan, $positions1=[1,2,3,4], $positions2=[1,2,3,4], $beforeType=1){
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
         $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
         $lottery_type = $plan->lottery_type;
-        if(empty($current_kj_qihao)){
-            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
-            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
-            $next_qihao = $DataDealStatus['next_qihao'];
+        if($beforeType == 2){
+            if(empty($current_kj_qihao)){
+                $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+                $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+                $beforeQihao = $DataDealStatus['qihao'];
+            }else{
+                $beforeQihao = $current_kj_qihao;
+            }
         }else{
-            $next_qihao = KjDataGet::getNextQihaoByQihao($current_kj_qihao, $lottery_type);
+            if(empty($current_kj_qihao)){
+                $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+                $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+                $next_qihao = $DataDealStatus['next_qihao'];
+            }else{
+                $next_qihao = KjDataGet::getNextQihaoByQihao($current_kj_qihao, $lottery_type);
+            }
+            $beforeQihao = date('Ymd', strtotime('-1 day')). substr($next_qihao, -3);
         }
 
-        $beforeQihao = date('Ymd', strtotime('-1 day')). substr($next_qihao, -3);
         $positions_str_11 = 'code'.implode('+code', $positions1);
         $positions_str_22 = 'code'.implode('+code', $positions2);
         $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'qihao', $beforeQihao]];
         $historyKjDatasQuery = SscKjData::find()->select(['code1', 'code2', 'code3', 'code4', 'x1'=>'RIGHT(SUM('.$positions_str_11.'), 1)', 'x2'=>'RIGHT(SUM('.$positions_str_22.'), 1)'])
             ->where($historyWhere)->limit(1)->orderBy(['id'=>SORT_DESC]);
-        #$sql = $historyKjDatasQuery->createCommand()->getRawSql();//p($sql);
+        #$sql = $historyKjDatasQuery->createCommand()->getRawSql();p($sql);
         $historyKjData = $historyKjDatasQuery->asArray()->one();
         if($historyKjData['x2']<$historyKjData['x1']){
             $kuaDu = 10 + $historyKjData['x2'] - $historyKjData['x1'];
         }else{
             $kuaDu = $historyKjData['x2'] - $historyKjData['x1'];
         }
+        #p([$positions1, $positions2, $historyKjData, $kuaDu]);
 
         $p1_str_Arr = [];
         foreach ($positions1 as $p1){

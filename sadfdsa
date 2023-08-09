@@ -1,4 +1,2 @@
 第一个sql:
 SELECT code, code_type, RIGHT(CAST(code_1 AS SIGNED)+CAST(code_2 AS SIGNED), 1) AS kd1, RIGHT(CAST(code_3 AS SIGNED)+CAST(code_4 AS SIGNED), 1) AS kd2 FROM lt_num4_type n WHERE code_type = 4;
-
-查询结果在查处第三个字段 kd3，如果 kd2大于等于kd1,则kd3=kd2，如果kd2小于kd1,则kd3=(10+kd2)，yii2框架，sql嵌套查询如何实现，或者改造第一个sql语句
