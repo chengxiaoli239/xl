@@ -537,7 +537,7 @@ class TzSystemUsersService extends ClientsBaseService{
      */
     public static function getActivePlanTasksWhere($uid='', $current_qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
         $RedisLock = new RedisLock();
-        $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
+        $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1异常可重复处理2推送成功3推送失败不可重推
         if($uid){
             $where = array_merge($where, [['=', 'uid', $uid]]);
         }
@@ -581,7 +581,8 @@ class TzSystemUsersService extends ClientsBaseService{
             $BetErrorPlansTasks = $BetErrorPlansTasksQuery->orderBy(['id'=>SORT_DESC])->limit(8)->all();
             $sql = $BetErrorPlansTasksQuery->createCommand()->getRawSql();
 
-            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-0', ['uid'=>$uid, 'current_qihao'=>$current_qihao, 'where'=>$where,'sql'=>$sql]);
+            $log = ['uid'=>$uid, 'current_qihao'=>$current_qihao, 'count'=>count($BetErrorPlansTasks),'sql'=>$sql];
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-0', $log);
             if(empty($BetErrorPlansTasks)){
                 throw_info('没有下注任务');
             }
