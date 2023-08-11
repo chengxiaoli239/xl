@@ -186,6 +186,10 @@ class NumService extends BaseService {
         81=>'过滤前期[千-百]位置跨度(四定)',
         82=>'过滤前期[百-十]位置跨度(四定)',
         83=>'过滤前期[十-个]位置跨度(四定)',
+
+        84=>'过滤近一期同尾号[千-百]位置跨度(四定)',
+        85=>'过滤近一期同尾号[百-十]位置跨度(四定)',
+        86=>'过滤近一期同尾号[十-个]位置跨度(四定)',
     ];
 
     /**
@@ -3022,6 +3026,15 @@ class NumService extends BaseService {
                 case 83: # 过滤前期[十-个]位置跨度(四定)
                     $codes = NumService::getBeforeKjCodesDynamic78($plan, $positions1=[3], $positions2=[4], $beforeType=2);
                     break;
+                case 84: # 过滤近一期同尾号[千-百]位置跨度(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic78($plan, $positions1=[1], $positions2=[2], $beforeType=3);
+                    break;
+                case 85: # 过滤近一期同尾号[百-十]位置跨度(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic78($plan, $positions1=[2], $positions2=[3], $beforeType=3);
+                    break;
+                case 86: # 过滤近一期同尾号[十-个]位置跨度(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic78($plan, $positions1=[3], $positions2=[4], $beforeType=3);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -4421,12 +4434,12 @@ class NumService extends BaseService {
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
         $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
         $lottery_type = $plan->lottery_type;
-        if($beforeType == 2){
-            if(empty($current_kj_qihao)){
+        if($beforeType == 2) {
+            if (empty($current_kj_qihao)) {
                 $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
-                $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+                $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id' => SORT_DESC])->asArray()->limit(1)->one();
                 $beforeQihao = $DataDealStatus['qihao'];
-            }else{
+            } else {
                 $beforeQihao = $current_kj_qihao;
             }
         }else{
@@ -4437,14 +4450,25 @@ class NumService extends BaseService {
             }else{
                 $next_qihao = KjDataGet::getNextQihaoByQihao($current_kj_qihao, $lottery_type);
             }
-            $beforeQihao = date('Ymd', strtotime('-1 day')). substr($next_qihao, -3);
+            if ($beforeType==3){
+                # 最近期数同尾号
+                $lastQihaoNum = substr($next_qihao, -1);
+            }else{
+                # 昨日同期
+                $beforeQihao = date('Ymd', strtotime('-1 day')). substr($next_qihao, -3);
+            }
+        }
+        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type]];
+        if($beforeType==3){
+            $historyWhere[] = ['LIKE', 'qihao', '%'.$lastQihaoNum, false];
+        }else{
+            $historyWhere[] = ['=', 'qihao', $beforeQihao];
         }
 
         $positions_str_11 = 'code'.implode('+code', $positions1);
         $positions_str_22 = 'code'.implode('+code', $positions2);
-        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'qihao', $beforeQihao]];
-        $historyKjDatasQuery = SscKjData::find()->select(['code1', 'code2', 'code3', 'code4', 'x1'=>'RIGHT(SUM('.$positions_str_11.'), 1)', 'x2'=>'RIGHT(SUM('.$positions_str_22.'), 1)'])
-            ->where($historyWhere)->limit(1)->orderBy(['id'=>SORT_DESC]);
+        $historyKjDatasQuery = SscKjData::find()->select(['code1', 'code2', 'code3', 'code4', 'x1'=>'RIGHT('.$positions_str_11.', 1)', 'x2'=>'RIGHT('.$positions_str_22.', 1)'])
+            ->where($historyWhere)->orderBy(['id'=>SORT_DESC])->limit(1);
         #$sql = $historyKjDatasQuery->createCommand()->getRawSql();p($sql);
         $historyKjData = $historyKjDatasQuery->asArray()->one();
         if($historyKjData['x2']<$historyKjData['x1']){
