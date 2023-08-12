@@ -182,8 +182,13 @@ class Lucky5 extends BaseKj {
     public static function getLotteryShiXun($returnType = 'json', $is_auto=1){
         $is_remote = 0;
         $s1 = microtime(true);
-        if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+        $kjData = self::getCurrentKjData(self::$lottery_type, $current_qihao);
+        $m = \Yii::$app->cache;
+        $mkey = 'getLotteryShiXun_'.$current_qihao;
+        $flag = $m->get($mkey);
+        if($is_auto==2 OR (!$kjData && !$flag)) {
             $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun');
+            $m->set($mkey, 1, 120);
 
             $t = round(microtime(true) * 1000);
             $url = $domain.'/kaijiang/ygxy5.json?v='.$t; #当前开奖号码

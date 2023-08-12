@@ -301,7 +301,7 @@ class SevenService extends BaseTZService {
             ];
             //if($tz_type != 20) $tzRst['code'] = $codes;
             Tool_Common::log('bet_error','INFO','7时彩投注记录-投注失败', $tzRst);
-            if(!in_array($account, ['aa07']) && in_array($rst['code'], [302, 303, 304, 305, 306])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
+            if(in_array($rst['code'], [302, 303, 304, 305, 306])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
                 return $rst;
             }
             //return $rst;
@@ -1703,7 +1703,7 @@ class SevenService extends BaseTZService {
                 ];
                 //if($tz_type != 20) $tzRst['code'] = $codes;
                 Tool_Common::log('bet_error','INFO','7时彩分批投注记录-投注失败', $tzRst);
-                if(!in_array($plan->account, ['aa07']) && in_array($rst['code'], [302, 303, 304, 305, 306])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
+                if(in_array($rst['code'], [302, 303, 304, 305, 306])){ # # 302余额不足、303请登录、304重复提交、305已关盘、306系统维护
                     return $rst;
                 }
                 //return $rst;
