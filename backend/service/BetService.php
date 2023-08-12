@@ -1057,8 +1057,8 @@ abstract class BetService extends BaseBetService {
        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
        $TzSystemsUsers->desc = '';
        $TzSystemsUsers->current_profits = 0.00;
-       $TzSystemsUsers->save();
-       $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($TzSystemsUsers->access_token);
+       $r = $TzSystemsUsers->save();
+       $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($TzSystemsUsers->access_token, $is_auto=2);
 
        $m->set($mkey, 1, 10);
        $rst['flag'] = $rstFlag;
