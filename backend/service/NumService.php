@@ -190,6 +190,8 @@ class NumService extends BaseService {
         84=>'过滤近一期同尾号[千-百]位置跨度(四定)',
         85=>'过滤近一期同尾号[百-十]位置跨度(四定)',
         86=>'过滤近一期同尾号[十-个]位置跨度(四定)',
+
+        87=>'过滤昨天同期号[千]位双重',
     ];
 
     /**
@@ -3035,6 +3037,9 @@ class NumService extends BaseService {
                 case 86: # 过滤近一期同尾号[十-个]位置跨度(四定)
                     $codes = NumService::getBeforeKjCodesDynamic78($plan, $positions1=[3], $positions2=[4], $beforeType=3);
                     break;
+                case 87: # 过滤昨天同期号[千]位双重(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic79($plan, $positions=[1]);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -4501,7 +4506,7 @@ class NumService extends BaseService {
 
 
         $subquery = (new \yii\db\Query())
-        ->select(['code', 'code_type'])
+            ->select(['code', 'code_type'])
             ->addSelect(['kd1' => new \yii\db\Expression('RIGHT('.implode('+', $p1_str_Arr).', 1)')])
             ->addSelect(['kd2' => new \yii\db\Expression('RIGHT('.implode('+', $p2_str_Arr).', 1)')])
             ->from('lt_num4_type')
@@ -4512,6 +4517,59 @@ class NumService extends BaseService {
             ->addSelect(['kd' => new \yii\db\Expression('IF(kd2 >= kd1, kd2, 10 + kd2)')])
             ->from(['n' => $subquery])
             ->where(['NOT IN', 'IF(kd2 >= kd1, kd2-kd1, 10 + kd2 - kd1)', [$kuaDu]]);
+
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        #p(['count'=>count($codes), 'kd'=>$kuaDu,'beforeQihao'=>$beforeQihao, 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - # 过滤昨日同期[千百-十个]跨度(四定)
+     * @param object $plan
+     * @param int[] $positions
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic79(object $plan, $positions=[1]){
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $lottery_type = $plan->lottery_type;
+        if(empty($current_kj_qihao)){
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $next_qihao = $DataDealStatus['next_qihao'];
+        }else{
+            $next_qihao = KjDataGet::getNextQihaoByQihao($current_kj_qihao, $lottery_type);
+        }
+        # 昨日同期
+        $beforeQihao = date('Ymd', strtotime('-1 day')). substr($next_qihao, -3);
+
+        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type]];
+        $historyWhere[] = ['=', 'qihao', $beforeQihao];
+
+        $historyKjDatasQuery = SscKjData::find()->select(['code1', 'code2', 'code3', 'code4'])
+            ->where($historyWhere)->orderBy(['id'=>SORT_DESC])->limit(1);
+        #$sql = $historyKjDatasQuery->createCommand()->getRawSql();p($sql);
+        $historyKjData = $historyKjDatasQuery->asArray()->one();
+        $filterNum = $historyKjData['code'.$positions[0]];
+
+        $andWhere = [
+            'OR',
+            ['AND', ['code_1'=>$filterNum, 'code_2'=>$filterNum]],
+            ['AND', ['code_1'=>$filterNum, 'code_3'=>$filterNum]],
+            ['AND', ['code_1'=>$filterNum, 'code_4'=>$filterNum]],
+            ['AND', ['code_2'=>$filterNum, 'code_3'=>$filterNum]],
+            ['AND', ['code_2'=>$filterNum, 'code_4'=>$filterNum]],
+            ['AND', ['code_3'=>$filterNum, 'code_4'=>$filterNum]],
+        ];
+
+        $query = (new \yii\db\Query())
+        ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => 4])
+            ->andWhere(['NOT', $andWhere]);
+        #$sql = $query->createCommand()->getRawSql();p($sql);
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');

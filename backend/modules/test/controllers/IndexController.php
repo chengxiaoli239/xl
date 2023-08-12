@@ -345,13 +345,13 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(7273);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p(count($filter_dynamic_codes));
         $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
         p($data);
         $data = Lucky5::getLotteryLucky($type = 'json', $test = 2);
         d($data);
-        $plan = UserSysPlans::findOne(7249);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
-        p(count($filter_dynamic_codes));
         $status = KjDataGet::isCanGrab($lottery_type=8);
         p($status);
         $post = [
