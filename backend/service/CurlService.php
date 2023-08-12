@@ -329,9 +329,9 @@ class CurlService extends BaseService{
         $info = curl_getinfo($ch);
 
         if($info['http_code']==302){
-            Tool_Common::log('getCurl302', 'ERR', 'getCurl 302', ['url'=>$url]);
             $data = self::getCurlData($info['url']);
         }
+        Tool_Common::log('getCurl302', 'ERR', 'getCurl 302', ['url'=>$url, 'curl_error'=>curl_error($ch), 'errno'=>curl_errno($ch), 'data'=>$data]);
         //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
         if(curl_close($ch)) {
             echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";

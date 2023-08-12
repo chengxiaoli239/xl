@@ -345,6 +345,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
+        p($data);
         $data = Lucky5::getLotteryLucky($type = 'json', $test = 2);
         d($data);
         $plan = UserSysPlans::findOne(7249);
@@ -402,8 +404,6 @@ class IndexController extends Controller
         p($rst);
         list($type_dx, $type_4dx, $type_dx_str) = CommonService::getTypeDx('5,1,1,0,8');
         p([$type_dx, $type_4dx, $type_dx_str]);
-        $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
-        p($data);
         $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp(1, 2);
         p($current_proxy_addr);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%num4_type}}'); p($r);

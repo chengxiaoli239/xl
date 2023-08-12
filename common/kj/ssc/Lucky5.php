@@ -120,16 +120,8 @@ class Lucky5 extends BaseKj {
             if(empty($status)){
                 throw_info('非开奖抓取时间节点:'.date('Y-m-d H:i:s'));
             }
-            $redis = \Yii::$app->redis;
             $kjData = self::getCurrentKjData(self::$lottery_type, $current_qihao);
-            $redisKey = 'getLotteryShiXunOne_'.self::$lottery_type;
-            $is_exist = $redis->sadd($redisKey, $current_qihao);
-            \Yii::$app->redis->expire($redisKey, 120);
-            if(!$is_exist){
-                throw_info('并发请求...');
-            }
-
-            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-实讯网01', ['lottery_type'=>self::$lottery_type, 'current_qihao'=>$current_qihao, 'kjData'=>$kjData]);
+            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-实讯网01', ['lottery_type'=>self::$lottery_type, 'current_qihao'=>$current_qihao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
             if($is_auto==2 OR empty($kjData)) {
                 $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun-one');
 
@@ -138,18 +130,8 @@ class Lucky5 extends BaseKj {
                 # 当前开奖链接：https://web01.cc138008.com/kaijiang/history/ygxy5.json?v=1582557689975
 
                 $is_remote = 1;
-                #$rst = CurlService::getCurl($url, $header=[], 30, 1);
-                $headers = [
-                    'accept: application/json, text/plain, */*',
-                    'accept-encoding: gzip, deflate, br',
-                    'accept-language: zh-CN,zh;q=0.9',
-                    'cookie: uuidafd4aea0-251e-11ed-bb4d-0050568551f7=2319762621252830284; cf_clearance=ykJ7Ag0JfZodLp6XpDUvSyqFp20CZFxSUf0R0KpdMUw-1680942882-0-150; AC=4b388c04651682734312550f729da1ad2072d62ea3; noticePage=6643005; __cf_bm=LtTX859s.hSXJgDnfqKJqUIAHEwk.Hec8L4nwaD525c-1682734326-0-AWF/TTUBvi7lPd9m4bp7UVYxNFnsi24J9MQYAbZuGh0CESY2xj0dQEd5dDx8nzGfwliQa9EUnJe7QQQB4VEJhdpJgw3LUxrlPjHmXq637DVB',
-                    'referer: '.$domain.'/',
-                    'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
-                    'x-requested-with: XMLHttpRequest'
-                ];
-                #$rst = self::getCurl($url, $headers, 30);
-                $rst = self::getCurl302($url, $headers, 30);
+                $rst = CurlService::getCurl302($url);
+                //p(['url'=>$url, 'data'=>$rst]);
                 $data = $rst['data']['list'][0];
 
                 if (!isset($rst['data']['list'][0]) OR empty($data)){
@@ -166,9 +148,7 @@ class Lucky5 extends BaseKj {
                 throw_info('开奖号码不能为空');
             }
             Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-实讯网02', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'is_remote'=>$is_remote]);
-            $redis->srem($redisKey, $current_qihao);
         }catch (\Exception $e){
-            $redis->srem($redisKey, $current_qihao);
             $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
 
             Tool_Common::log('/kj_datas/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网03', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage(), 'is_remote'=>$is_remote, 'current_proxy_addr'=>$current_proxy_addr]);
@@ -201,6 +181,7 @@ class Lucky5 extends BaseKj {
      */
     public static function getLotteryShiXun($returnType = 'json', $is_auto=1){
         $is_remote = 0;
+        $s1 = microtime(true);
         if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun');
 
@@ -235,7 +216,9 @@ class Lucky5 extends BaseKj {
         }else{
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime, 'is_remote'=>$is_remote];
         }
+        $s2 = microtime(true);
         $logArr = $rst;
+        $logArr['consume_time'] = ($s2-$s1).'s';
         Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-时讯网', $logArr);
 
         return $rst;
@@ -409,46 +392,6 @@ class Lucky5 extends BaseKj {
         }
         curl_close($ch);
         if(!self::is_json($data)){
-            return $data;
-        }
-        $data = json_decode($data, true);
-
-        return $data;
-    }
-
-    /**
-     * @decription 获取远程html内容
-     * @param $url
-     */
-    public static function getCurl302($url, $headers=[], $timeout=5){
-        if(!$timeout){
-            $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
-        }
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-            CURLOPT_HTTPHEADER => $headers,
-        ));
-        BaseService::setPoxy($curl);
-        $data = curl_exec($curl);
-        $errno = curl_errno($curl);
-        #p(['headers'=>$headers, 'url'=>$url, 'rst'=>$data, 'errno'=>$errno]);
-        if($errno>0) {
-            $err_msg = 'Curl error: ' . curl_error($curl);
-            Tool_Common::log('/err/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'errno'=>$errno, 'postRst'=>$data, 'err_msg'=>$err_msg]);
-            return ['Status'=>2, 'code'=>300, 'Data'=>'代理网络超时，错误码:'.$errno, 'errno'=>$errno];
-        }
-        curl_close($curl);
-        if(!BaseService::is_json($data)){
             return $data;
         }
         $data = json_decode($data, true);
