@@ -345,6 +345,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $data = Lucky5::getLotteryLucky($type = 'json', $test = 2);
+        d($data);
         $plan = UserSysPlans::findOne(7249);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         p(count($filter_dynamic_codes));
@@ -430,8 +432,6 @@ class IndexController extends Controller
         $is_auto_audit = $params['is_auto_audit'] ?? 1;
         p($is_auto_audit);
         $data = BetService::getLotteryName(8);
-        p($data);
-        $data = Lucky5::getLotteryLucky($type = 'json', $test = 1);
         p($data);
         $a = [0,1,2,3,4,5,6,7,8,9];
         $b = [1,2,2,3];

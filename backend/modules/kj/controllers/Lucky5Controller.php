@@ -42,7 +42,7 @@ class Lucky5Controller extends Controller
     }
 
     /**
-     * @desc 幸运五星彩 - 实时资讯网 https://cc138001.com
+     * @desc 幸运五星彩 - 实时资讯网 https://web01.cc138001.com
      * @param string $type
      * @return array
      */

@@ -236,7 +236,7 @@ class Lucky5 extends BaseKj {
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime, 'is_remote'=>$is_remote];
         }
         $logArr = $rst;
-        Tool_Common::log('luck5', 'INFO', '号码抓取-时讯网', $logArr);
+        Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-时讯网', $logArr);
 
         return $rst;
     }
