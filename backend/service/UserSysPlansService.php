@@ -51,7 +51,7 @@ class UserSysPlansService extends BaseService {
         }
         #p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id]);
 
-        $post['UserSysPlans']['singles'] = str_replace(' ', '', $post['UserSysPlans']['singles']);
+        $post['UserSysPlans']['singles'] = preg_replace( '#\s+#', '', trim($post['UserSysPlans']['singles']));
         $post['UserSysPlans']['start_qihao'] = str_replace(' ', '', $post['UserSysPlans']['start_qihao']);
 
         $User = AdminModel::findOne($user_id);
@@ -659,7 +659,8 @@ class UserSysPlansService extends BaseService {
 
         # 翻倍计划如果翻倍梯度为空则赋值倍数
         if(in_array($plan_type, SscDataService::$fb_plan_types) && empty($post['UserSysPlans']['singles'])){
-            $post['UserSysPlans']['singles'] = trim($post['UserSysPlans']['single']);
+            $singles = preg_replace( '#\s+#', '', trim($post['UserSysPlans']['single']));
+            $post['UserSysPlans']['singles'] = $singles;
         }
 
         if(!$post['UserSysPlans']['id']){
