@@ -1049,19 +1049,26 @@ abstract class BetService extends BaseBetService {
      * @param $uid
      */
    public static function reCalculateAllBettingRecords($uid){
-       $m = \Yii::$app->cache;
-       $mkey = 'reCalculateAllBettingRecords_'.$uid;
-       if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
+       try {
+           $m = \Yii::$app->cache;
+           $mkey = 'reCalculateAllBettingRecords_'.$uid;
+           if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
 
-       $rstFlag = BettingRecords::updateAll(['is_profits_record'=>0, 'is_area_profits'=>0], ['uid'=>$uid]);
-       $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
-       $TzSystemsUsers->desc = '';
-       $TzSystemsUsers->current_profits = 0.00;
-       $r = $TzSystemsUsers->save();
-       $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($TzSystemsUsers->access_token, $is_auto=2);
+           $rstFlag = BettingRecords::updateAll(['is_profits_record'=>0, 'is_area_profits'=>0], ['uid'=>$uid, 'status'=>1]);
+           $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+           $TzSystemsUsers->desc = '';
+           $TzSystemsUsers->current_profits = 0.00;
+           $r = $TzSystemsUsers->save();
+           if(!$r){
+               throw_info(Json::encode($TzSystemsUsers->getErrors(), 320));
+           }
+           $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($TzSystemsUsers->access_token, $is_auto=2);
 
-       $m->set($mkey, 1, 10);
-       $rst['flag'] = $rstFlag;
+           $m->set($mkey, 1, 10);
+           $rst['flag'] = $rstFlag;
+       }catch (\Exception $e){
+           Tool_Common::log('/user/'.__FUNCTION__, 'ERR', '重算盈利异常', ['user_id'=>$uid, 'err_msg'=>$e->getMessage()]);
+       }
 
        return $rst;
     }
