@@ -530,8 +530,10 @@ class UserSysPlansController extends BaseController
 
         if($type==2){
             $rst = BetService::reCalculateAllBettingRecords($this->_user_id);
+            $rstIndex = ['index'];
         }else{
             $rst = BetService::reCalculateProfits($id, $this->_user_id);
+            $rstIndex = ['index', 'UserSysPlans[lottery_type]'=>$rst['lottery_type']];
         }
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$this->_user_id]);
         list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
@@ -539,7 +541,7 @@ class UserSysPlansController extends BaseController
             return ['status'=>200, 'msg'=>'操作成功'];
         }
 
-        return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$rst['lottery_type']]);
+        return $this->redirect($rstIndex);
     }
 
     /**

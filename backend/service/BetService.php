@@ -1071,7 +1071,7 @@ abstract class BetService extends BaseBetService {
            Tool_Common::log('/user/'.__FUNCTION__, 'ERR', '重算盈利异常', ['user_id'=>$uid, 'err_msg'=>$e->getMessage()]);
            return $e->getMessage();
        }
-       $rst['lottery_type'] = DEFAULT_LOTTERY_TYPE;
+       #$rst['lottery_type'] = DEFAULT_LOTTERY_TYPE;
 
        return $rst;
     }
