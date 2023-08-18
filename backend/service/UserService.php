@@ -506,7 +506,9 @@ class UserService extends BaseService {
      * @return mixed
      */
     public static function staticUserProfits($uid){
-        $current_profits_query = UserSysPlans::find()->select(['current_profits'=>'SUM(current_profits)'])->where(['uid'=>$uid, 'status'=>[0, 1], 'is_test'=>0]);
+        $where = ['is_profits_record'=>0, 'is_area_profits'=>0, 'uid'=>$uid, 'status'=>[0, 1], 'is_test'=>0];
+        $current_profits_query = UserSysPlans::find()->select(['current_profits'=>'SUM(current_profits)'])
+            ->where($where);
         $sql = $current_profits_query->createCommand()->getRawSql();
         $current_profits = $current_profits_query->asArray()->one()['current_profits'];
         Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '统计当前盈利', ['user_id'=>$uid, 'sql'=>$sql, 'current_profits'=>$current_profits]);
@@ -536,7 +538,9 @@ class UserService extends BaseService {
                     $code = 0;
                 }
             }
-        }catch (\Exception $e){}
+        }catch (\Exception $e){
+            Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '归零正常', ['user_id'=>$uid, 'username'=>$TzSystemsUsers->username, 'rst'=>$rst, 'r'=>$r]);
+        }
 
         return [$code, $current_profits, $TzSystemsUsers];
     }
