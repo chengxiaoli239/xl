@@ -59,7 +59,7 @@ class NumService extends BaseService {
     const POS_SMALL_OBTAIN = 2; # 取
 
     # 0123路
-    const CODES_0_LINE = ['0', '2', '5', '8'];
+    const CODES_0_LINE = ['0'];
     const CODES_1_LINE = ['1', '4', '7'];
     const CODES_2_LINE = ['2', '5', '8'];
     const CODES_3_LINE = ['3', '6', '9'];
