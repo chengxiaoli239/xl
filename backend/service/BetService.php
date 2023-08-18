@@ -1067,6 +1067,7 @@ abstract class BetService extends BaseBetService {
 
            $m->set($mkey, 1, 10);
            $rst['flag'] = $rstFlag;
+           Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '归零异常', ['user_id'=>$uid, 'rst'=>$rst, 'r'=>$r]);
        }catch (\Exception $e){
            Tool_Common::log('/user/'.__FUNCTION__, 'ERR', '重算盈利异常', ['user_id'=>$uid, 'err_msg'=>$e->getMessage()]);
            return $e->getMessage();

@@ -506,7 +506,10 @@ class UserService extends BaseService {
      * @return mixed
      */
     public static function staticUserProfits($uid){
-        $current_profits = UserSysPlans::find()->select(['current_profits'=>'SUM(current_profits)'])->where(['uid'=>$uid, 'status'=>[0, 1], 'is_test'=>0])->asArray()->one()['current_profits'];
+        $current_profits_query = UserSysPlans::find()->select(['current_profits'=>'SUM(current_profits)'])->where(['uid'=>$uid, 'status'=>[0, 1], 'is_test'=>0]);
+        $sql = $current_profits_query->createCommand()->getRawSql();
+        $current_profits = $current_profits_query->asArray()->one()['current_profits'];
+        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '统计当前盈利', ['user_id'=>$uid, 'sql'=>$sql, 'current_profits'=>$current_profits]);
 
         return $current_profits?:0.00;
     }
