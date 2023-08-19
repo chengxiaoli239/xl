@@ -193,7 +193,11 @@ class NumService extends BaseService {
 
         87=>'过滤昨天同期号[千]位双重',
 
-        88=>'过滤[千]位号码及对数近300组(四定)',
+        88=>'过滤[千]位号码及对数近10天号码(四定)',
+        89=>'过滤[千]位号码及合分(四定)',
+        90=>'过滤[百]位号码及合分(四定)',
+        91=>'过滤[十]位号码及合分(四定)',
+        92=>'过滤[个]位号码及合分(四定)',
     ];
 
     /**
@@ -3045,6 +3049,18 @@ class NumService extends BaseService {
                 case 88: # 过滤[千]位号码及对数近300组(四定)
                     $codes = NumService::getBeforeKjCodesDynamic80($plan, $positions=[1]);
                     break;
+                case 89: # 过滤[千]位号码及合分(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic81($plan, $positions=[1]);
+                    break;
+                case 90: # 过滤[百]位号码及合分(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic81($plan, $positions=[2]);
+                    break;
+                case 91: # 过滤[十]位号码及合分(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic81($plan, $positions=[3]);
+                    break;
+                case 92: # 过滤[个]位号码及合分(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic81($plan, $positions=[4]);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -4584,12 +4600,13 @@ class NumService extends BaseService {
     }
 
     /**
-     * 过滤类型号码 - # 过滤[千]位号码及对数近300组(四定)
+     * 过滤类型号码 - # 过滤[千]位号码及对数近x天(四定)
      * @param object $plan
      * @param int[] $positions
+     * @param int dateNums 天数
      * @return array
      */
-    private static function getBeforeKjCodesDynamic80(object $plan, $positions=[1], $num=300){
+    private static function getBeforeKjCodesDynamic80(object $plan, $positions=[1], $dateNum=10){
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
         $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
         $lottery_type = $plan->lottery_type;
@@ -4609,27 +4626,72 @@ class NumService extends BaseService {
         $filterNum = $historyKjData[$filterNum_code_field];
         $filterLogNum = $filterNum>4 ? ($filterNum-5) : ($filterNum+5);
 
+        $before10Date = date('Y-m-d', strtotime('-'.$dateNum.' days'));
         # 号码
-        $filterNumWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', $filterNum_code_field, $filterNum]];
-        $filterNumQuery = SscKjData::find()->select(['code_4n_str'])->where($filterNumWhere)->groupBy(['code_4n_str'])->limit($num)->orderBy(['id'=>SORT_DESC]);
+        $filterNumWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', $filterNum_code_field, $filterNum], ['>=', 'date', $before10Date]];
+        $filterNumQuery = SscKjData::find()->select(['code_4n_str'])->where($filterNumWhere)->groupBy(['code_4n_str'])->orderBy(['id'=>SORT_DESC]);
         $sql1 = $filterNumQuery->createCommand()->getRawSql();
         $filterNumCodes = $filterNumQuery->asArray()->all();
         $numCodes = ArrayHelper::getColumn($filterNumCodes, 'code_4n_str');
 
         # 号码对数
-        $filterNumWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', $filterNum_code_field, $filterLogNum]];
-        $filterLogNumQuery = SscKjData::find()->select(['code_4n_str'])->where($filterNumWhere)->groupBy(['code_4n_str'])->limit($num)->orderBy(['id'=>SORT_DESC]);
+        $filterNumWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', $filterNum_code_field, $filterLogNum], ['>=', 'date', $before10Date]];
+        $filterLogNumQuery = SscKjData::find()->select(['code_4n_str'])->where($filterNumWhere)->groupBy(['code_4n_str'])->orderBy(['id'=>SORT_DESC]);
         $sql2 = $filterLogNumQuery->createCommand()->getRawSql();
         $filterLogNumCodes = $filterLogNumQuery->asArray()->all();
         $LogNumCodes = ArrayHelper::getColumn($filterLogNumCodes, 'code_4n_str');
         #p([$sql1, $sql2, $numCodes, $LogNumCodes]);
 
         $query = (new \yii\db\Query())
-        ->select(['code', 'code_type'])
+            ->select(['code', 'code_type'])
             ->from('lt_num4_type')
             ->where(['code_type' => 4])
             ->andWhere(['NOT IN', 'code', $numCodes])
             ->andWhere(['NOT IN', 'code', $LogNumCodes]);
+        #$sql = $query->createCommand()->getRawSql();p($sql);
+
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        #p(['count'=>count($codes), 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - # 过滤[千]位号码及合分(四定)
+     * @param object $plan
+     * @param int[] $positions
+     * @dateNums int 天数
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic81(object $plan, $positions=[1], $num=300){
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $lottery_type = $plan->lottery_type;
+        if(empty($current_kj_qihao)){
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $current_kj_qihao = $DataDealStatus['qihao'];
+        }
+        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'qihao', $current_kj_qihao]];
+        $historyKjDatasQuery = SscKjData::find()->select(['code1', 'code2', 'code3', 'code4', 'code_str', 'qihao', 'type_ds'=>'code_1_2_3_4', 'type_4dx'=>'LEFT(type_4dx,4)'])
+            ->where($historyWhere)->limit(1)->orderBy(['id'=>SORT_DESC]);
+        $sql = $historyKjDatasQuery->createCommand()->getRawSql();//p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤同位置大小、单双配上期号码', ['positions'=>$positions, 'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+        $historyKjData = $historyKjDatasQuery->asArray()->one();
+
+
+        $filterNum_kjcode_field = 'code'.$positions[0];
+        $filterNum = $historyKjData[$filterNum_kjcode_field];
+        $filterNums = [$filterNum, $filterNum+10, $filterNum+20, $filterNum+30];
+
+        $filterNum_code_field = 'code_'.$positions[0];
+        $notWhere = ['NOT', ['AND', ['=',$filterNum_code_field, $filterNum], ['IN', 'codes_hz', $filterNums]]];
+        $query = (new \yii\db\Query())
+        ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => 4])
+            ->andWhere($notWhere);
         #$sql = $query->createCommand()->getRawSql();p($sql);
 
         $results = $query->all();
