@@ -204,6 +204,7 @@ class NumService extends BaseService {
         92=>'过滤[个]位号码及合分(四定)',
 
         93=>'头尾剔除上期和值后一位号码(四定)',
+        97=>'过滤上期每两个号码及对数(四定)', # 待处理
     ];
 
     /**
@@ -3079,6 +3080,9 @@ class NumService extends BaseService {
                 case 93: # 头尾剔除上期和值后一位号码(四定)
                     $codes = NumService::getBeforeKjCodesDynamic82($plan);
                     break;
+                case 97: # 过滤上期每两个号码及对数(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic83($plan);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -4747,11 +4751,58 @@ class NumService extends BaseService {
 
         $notWhere = ['AND', ['!=', 'code_1', $filterCode], ['!=', 'code_4', $filterCode]];
         $query = (new \yii\db\Query())
-        ->select(['code', 'code_type'])
+            ->select(['code', 'code_type'])
             ->from('lt_num4_type')
             ->where(['code_type' => 4])
             ->andWhere($notWhere);
         #$sql = $query->createCommand()->getRawSql();p($sql);
+
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        #p(['count'=>count($codes), 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - # 过滤上期每两个号码及对数(四定)
+     * @param object $plan
+     * @param int[] $positions
+     * @dateNums int 天数
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic83(object $plan, $positions=[1], $num=300){
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $lottery_type = $plan->lottery_type;
+        if(empty($current_kj_qihao)){
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $current_kj_qihao = $DataDealStatus['qihao'];
+        }
+        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'qihao', $current_kj_qihao]];
+        $historyKjDatasQuery = SscKjData::find()->select(['code1', 'code2', 'code3', 'code4', 'code_str', 'qihao'])
+            ->where($historyWhere)->limit(1)->orderBy(['id'=>SORT_DESC]);
+        $sql = $historyKjDatasQuery->createCommand()->getRawSql();//p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤上期每两个号码及对数', ['positions'=>$positions, 'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+        $historyKjData = $historyKjDatasQuery->asArray()->one();
+
+        $fixedPos = [[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]];
+        $notWhere = ['OR'];
+        foreach ($fixedPos as $pos){
+            $notWhere[] = ['AND',
+                ['=', 'code_'.$pos[0], $historyKjData['code'.$pos[0]]],
+                ['=', 'code_'.$pos[1], $historyKjData['code'.$pos[1]]],
+                ['=', 'type_log', 1],
+            ];
+        }
+
+        $query = (new \yii\db\Query())
+        ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => 4])
+            ->andWhere(['NOT', $notWhere]);
+        //$sql = $query->createCommand()->getRawSql();p($sql);
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
