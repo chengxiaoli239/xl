@@ -108,6 +108,9 @@ class AgentClientsService extends ClientsBaseService{
             $toAccessToken = $toTzSystemsUsers->access_token;
             try {
                 #self::syncMemberBetLogs($member_bet_logs, $toAccessToken, $from_type, $from, $lottery_type);
+                if(!$toTzSystemsUsers->follow_status){
+                    throw_info('跟随开关已关闭');
+                }
                 AgentClientsService::checkProfits($toTzSystemsUsers);
                 foreach ($logDatas as $logData){
                     try {
