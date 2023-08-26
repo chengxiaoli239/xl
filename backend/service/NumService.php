@@ -194,9 +194,9 @@ class NumService extends BaseService {
         87=>'过滤昨天同期号[千]位双重',
 
         88=>'过滤[千]位号码及对数近10天号码(四定)',
-        94=>'过滤[千]位号码及对数近10天号码(四定)',
-        95=>'过滤[千]位号码及对数近10天号码(四定)',
-        96=>'过滤[千]位号码及对数近10天号码(四定)',
+        94=>'过滤[百]位号码及对数近10天号码(四定)',
+        95=>'过滤[十]位号码及对数近10天号码(四定)',
+        96=>'过滤[个]位号码及对数近10天号码(四定)',
 
         89=>'过滤[千]位号码及合分(四定)',
         90=>'过滤[百]位号码及合分(四定)',
@@ -3056,13 +3056,13 @@ class NumService extends BaseService {
                 case 88: # 过滤[千]位号码及对数近300组(四定)
                     $codes = NumService::getBeforeKjCodesDynamic80($plan, $positions=[1]);
                     break;
-                case 94: # 过滤[千]位号码及对数近300组(四定)
+                case 94: # 过滤[百]位号码及对数近300组(四定)
                     $codes = NumService::getBeforeKjCodesDynamic80($plan, $positions=[2]);
                     break;
-                case 95: # 过滤[千]位号码及对数近300组(四定)
+                case 95: # 过滤[十]位号码及对数近300组(四定)
                     $codes = NumService::getBeforeKjCodesDynamic80($plan, $positions=[3]);
                     break;
-                case 96: # 过滤[千]位号码及对数近300组(四定)
+                case 96: # 过滤[个]位号码及对数近300组(四定)
                     $codes = NumService::getBeforeKjCodesDynamic80($plan, $positions=[4]);
                     break;
                 case 89: # 过滤[千]位号码及合分(四定)
