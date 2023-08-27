@@ -193,10 +193,10 @@ class NumService extends BaseService {
 
         87=>'过滤昨天同期号[千]位双重',
 
-        88=>'过滤[千]位号码及对数近5天号码(四定)',
-        94=>'过滤[百]位号码及对数近5天号码(四定)',
-        95=>'过滤[十]位号码及对数近5天号码(四定)',
-        96=>'过滤[个]位号码及对数近5天号码(四定)',
+        88=>'过滤[千]位号码近5天号码(四定)',
+        94=>'过滤[百]位号码近5天号码(四定)',
+        95=>'过滤[十]位号码近5天号码(四定)',
+        96=>'过滤[个]位号码近5天号码(四定)',
 
         89=>'过滤[千]位号码及合分(四定)',
         90=>'过滤[百]位号码及合分(四定)',
@@ -4657,19 +4657,19 @@ class NumService extends BaseService {
         $numCodes = ArrayHelper::getColumn($filterNumCodes, 'code_4n_str');
 
         # 号码对数
-        $filterNumWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', $filterNum_code_field, $filterLogNum], ['>=', 'date', $before10Date]];
-        $filterLogNumQuery = SscKjData::find()->select(['code_4n_str'])->where($filterNumWhere)->groupBy(['code_4n_str'])->orderBy(['id'=>SORT_DESC]);
-        $sql2 = $filterLogNumQuery->createCommand()->getRawSql();
-        $filterLogNumCodes = $filterLogNumQuery->asArray()->all();
-        $LogNumCodes = ArrayHelper::getColumn($filterLogNumCodes, 'code_4n_str');
-        #p([$sql1, $sql2, $numCodes, $LogNumCodes]);
+        #$filterNumWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', $filterNum_code_field, $filterLogNum], ['>=', 'date', $before10Date]];
+        #$filterLogNumQuery = SscKjData::find()->select(['code_4n_str'])->where($filterNumWhere)->groupBy(['code_4n_str'])->orderBy(['id'=>SORT_DESC]);
+        #$sql2 = $filterLogNumQuery->createCommand()->getRawSql();
+        #$filterLogNumCodes = $filterLogNumQuery->asArray()->all();
+        #$LogNumCodes = ArrayHelper::getColumn($filterLogNumCodes, 'code_4n_str');
+        ##p([$sql1, $sql2, $numCodes, $LogNumCodes]);
 
         $query = (new \yii\db\Query())
             ->select(['code', 'code_type'])
             ->from('lt_num4_type')
             ->where(['code_type' => 4])
-            ->andWhere(['NOT IN', 'code', $numCodes])
-            ->andWhere(['NOT IN', 'code', $LogNumCodes]);
+            ->andWhere(['NOT IN', 'code', $numCodes]);
+            #->andWhere(['NOT IN', 'code', $LogNumCodes]); 对数
         #$sql = $query->createCommand()->getRawSql();p($sql);
 
         $results = $query->all();
