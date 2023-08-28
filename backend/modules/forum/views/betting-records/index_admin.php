@@ -116,7 +116,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $alt_str .= '翻倍梯度:'.$plan->singles;
                                 }
                                 $options = [
-                                    'title' => ($model->buy_type==1?'':'【反买】').\backend\service\TzService::getTzPlanTypes($plan->plan_type) . '，'.$alt_str,
+                                    'title' => ($model->buy_type==1?'x':'【反买】').\backend\service\TzService::getTzPlanTypes($plan->plan_type) . '，'.$alt_str,
                                 ];
                                 return Html::a($model->plan_id, '/forum/betting-records/index?BettingRecords[plan_id]='.$model->plan_id, $options);
                             }
