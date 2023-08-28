@@ -209,7 +209,7 @@ class NumService extends BaseService {
 
         93=>'头尾剔除上期和值后一位号码(四定)',
         97=>'过滤上期每两个号码及对数(四定)', # 待处理
-        #102=>'过滤345位三分离号码(四定)',
+        102=>'过滤345位三分离号码(四定)',
     ];
 
     /**
@@ -4839,6 +4839,7 @@ class NumService extends BaseService {
      * @return array
      */
     private static function getBeforeKjCodesDynamic102(object $plan, $positions=[3,4,5]){
+        $playway = $plan->playway;
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
         $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
         $lottery_type = $plan->lottery_type;
@@ -4853,29 +4854,46 @@ class NumService extends BaseService {
         $sql = $historyKjDatasQuery->createCommand()->getRawSql();//p($sql);
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤上期每两个号码及对数', ['positions'=>$positions, 'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
         $historyKjData = $historyKjDatasQuery->asArray()->one();
-        p($historyKjData);
+        #p($historyKjData);
 
-        $fixedPos = [[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]];
-        $notWhere = ['OR'];
-        foreach ($fixedPos as $pos){
-            $notWhere[] = ['AND',
-                ['=', 'code_'.$pos[0], $historyKjData['code'.$pos[0]]],
-                ['=', 'code_'.$pos[1], $historyKjData['code'.$pos[1]]],
-                ['=', 'type_log', 1],
-            ];
+        $positionCodes = [];
+        foreach ($positions as $p){
+            $positionCodes[] = $historyKjData['code'.$p];
         }
 
-        $positions_str_4 = 'code_'.implode(',",",code_', $positions);
+        $positions = NumService::get4Len($positionCodes);
+        $t = implode('', $positions);
+        $codesArrTmps = NumService::getAllCombination4($t);
+
+        $notWhere = ['OR'];
+        foreach($codesArrTmps as $fixedPos){
+            $notWhere[] = ['LIKE', 'CONCAT(code_1, ",", code_2, ",", code_3, ",", code_4)', $fixedPos, false];
+        }
+
         $query = Num4Type::find()->select(['code'])
             ->where(['=', 'code_type', $playway+1])
-            ->andWhere(['NOT IN', 'CONCAT('.$positions_str_4.')', $codes]);
-        $sql = $query->createCommand()->getRawSql();//p($sql);
+            ->andWhere(['NOT', $notWhere]);
+        $sql = $query->createCommand()->getRawSql();p($sql);
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
-        #p(['count'=>count($codes), 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
+        //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
 
         return $codes;
+    }
+
+    public static function get4Len($positions=[1,2,3]){
+        $len = count($positions);
+        $positions_l = [];
+        if($len==1){
+            $positions_l = ['%', '%', '%'];
+        }elseif ($len==2){
+            $positions_l = ['%', '%'];
+        }elseif ($len==3){
+            $positions_l = ['%'];
+        }
+
+        return array_merge($positions, $positions_l);
     }
 
     /**
