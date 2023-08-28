@@ -4873,7 +4873,7 @@ class NumService extends BaseService {
         $query = Num4Type::find()->select(['code'])
             ->where(['=', 'code_type', $playway+1])
             ->andWhere(['NOT', $notWhere]);
-        $sql = $query->createCommand()->getRawSql();p($sql);
+        #$sql = $query->createCommand()->getRawSql();p($sql);
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
