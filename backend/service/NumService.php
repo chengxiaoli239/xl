@@ -175,10 +175,10 @@ class NumService extends BaseService {
         73=>'过滤2345位50期开过号码全转(四定)',
 
         74=>'杀上期同位置号码+三兄(四定)',
-        98=>'杀上期千位号码+三兄(四定)',
-        99=>'杀上期百位号码+三兄(四定)',
-        100=>'杀上期十位号码+三兄(四定)',
-        101=>'杀上期个位号码+三兄(四定)',
+        #98=>'杀上期千位号码+三兄(四定)',
+        #99=>'杀上期百位号码+三兄(四定)',
+        #100=>'杀上期十位号码+三兄(四定)',
+        #101=>'杀上期个位号码+三兄(四定)',
         #75=>'杀同位置冷码+三兄(四定)',
 
         76=>'杀同位置大小加配上期号码(四定)',
@@ -210,6 +210,10 @@ class NumService extends BaseService {
         93=>'头尾剔除上期和值后一位号码(四定)',
         97=>'过滤上期每两个号码及对数(四定)', # 待处理
         102=>'过滤345位三分离号码(四定)',
+        103=>'过滤123位三分离号码(四定)',
+        104=>'过滤234位三分离号码(四定)',
+        105=>'过滤125位三分离号码(四定)',
+        106=>'过滤145位三分离号码(四定)',
     ];
 
     /**
@@ -3100,8 +3104,20 @@ class NumService extends BaseService {
                 case 97: # 过滤上期每两个号码及对数(四定)
                     $codes = NumService::getBeforeKjCodesDynamic83($plan);
                     break;
-                case 102: # 过滤三分离号码(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic102($plan);
+                case 102: # 过滤345三分离号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[3,4,5]);
+                    break;
+                case 103: # 过滤123三分离号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[1,2,3]);
+                    break;
+                case 104: # 过滤234三分离号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[2,3,4]);
+                    break;
+                case 105: # 过滤125三分离号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[1,2,5]);
+                    break;
+                case 106: # 过滤145三分离号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[1,4,5]);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
