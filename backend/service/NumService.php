@@ -214,6 +214,12 @@ class NumService extends BaseService {
         104=>'过滤234位三分离号码(四定)',
         105=>'过滤125位三分离号码(四定)',
         106=>'过滤145位三分离号码(四定)',
+
+        107=>'过滤124位三分离号码(四定)',
+        108=>'过滤134位三分离号码(四定)',
+        109=>'过滤135位三分离号码(四定)',
+        110=>'过滤235位三分离号码(四定)',
+        111=>'过滤245位三分离号码(四定)',
     ];
 
     /**
@@ -3118,6 +3124,21 @@ class NumService extends BaseService {
                     break;
                 case 106: # 过滤145三分离号码(四定)
                     $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[1,4,5]);
+                    break;
+                case 107: # 过滤124三分离号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[1,2,4]);
+                    break;
+                case 108: # 过滤134三分离号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[1,3,4]);
+                    break;
+                case 109: # 过滤135三分离号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[1,3,5]);
+                    break;
+                case 110: # 过滤235三分离号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[2,3,5]);
+                    break;
+                case 111: # 过滤245三分离号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[2,4,5]);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
