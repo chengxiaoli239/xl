@@ -820,8 +820,8 @@ class NumService extends BaseService {
 
     /**
      * @desc 4个号码返回24组号码组合
-     * @param $codes 格式：1123或者1112或者1122或者1234
-     * @param $type 0除1取
+     * @param string $codes 格式：1123或者1112或者1122或者1234
+     * @param int $type 0除1取
      * @return array ['1,2,3,4', '1,1,2,3', '1,1,1,2']
      */
     public static function getAllCombination4($codes, $type = 1, $code_type = 4){
