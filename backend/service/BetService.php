@@ -652,9 +652,12 @@ abstract class BetService extends BaseBetService {
             $task_status = $betRst['task_status'];
             $m = \Yii::$app->cache;
             $mkey = __FUNCTION__.'_'.$plan_id."_".$qihao;
-            $flag  = (int)$m->get($mkey);
-            if($task_status == 3 && strpos($betRst['err_msg'], '短时间内重复提交') !== false && $flag==0){
-                $task_status = 0;
+            if($task_status == 3 && strpos($betRst['err_msg'], '短时间内重复提交') !== false){
+                $num = \Yii::$app->redis->incr($mkey);
+                \Yii::$app->redis->expire($mkey, 120);
+                if($num<2){
+                    $task_status = 0;
+                }
             }
             $m->set($mkey, 1, 40);
 
