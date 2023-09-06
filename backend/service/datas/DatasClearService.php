@@ -32,29 +32,40 @@ class DatasClearService extends BaseService{
                     $dates[] = date('Y-m-d', time()-$i*86400);
                 }
 
-                # 游戏记录
-                $count_sql = 'SELECT COUNT(id) FROM {{%betting_records}} WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
-                $rst_count = $db->createCommand($count_sql)->queryScalar();
-                $delete_sql = 'DELETE FROM {{%betting_records}} WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
-                $rst_delete = $db->createCommand($delete_sql)->execute();
+                try {
+                    # 游戏记录
+                    $count_sql = 'SELECT COUNT(id) FROM {{%betting_records}} WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
+                    $rst_count = $db->createCommand($count_sql)->queryScalar();
+                    $delete_sql = 'DELETE FROM {{%betting_records}} WHERE create_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
+                    $rst_delete = $db->createCommand($delete_sql)->execute();
+                }catch (\Exception $e){}
 
-                # 真实下注任务记录
-                $task_count_sql = 'SELECT COUNT(id) FROM {{%bet_error_plans_task}} WHERE updated_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
-                $rst_task_count = $db->createCommand($task_count_sql)->queryScalar();
-                $task_delete_sql = 'DELETE FROM {{%bet_error_plans_task}} WHERE updated_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
-                $rst_task_delete = $db->createCommand($task_delete_sql)->execute();
+                try {
+                    # 真实下注任务记录
+                    $task_count_sql = 'SELECT COUNT(id) FROM {{%bet_error_plans_task}} WHERE updated_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
+                    $rst_task_count = $db->createCommand($task_count_sql)->queryScalar();
+                    $task_delete_sql = 'DELETE FROM {{%bet_error_plans_task}} WHERE updated_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
+                    $rst_task_delete = $db->createCommand($task_delete_sql)->execute();
+                } catch (\Exception $e){}
 
-                # 状态处理记录
-                $deal_status_delete_sql = 'DELETE FROM {{%data_deal_status}} WHERE update_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
-                $deal_status_delete = $db->createCommand($deal_status_delete_sql)->execute();
+                try {
+                    # 状态处理记录
+                    $deal_status_delete_sql = 'DELETE FROM {{%data_deal_status}} WHERE update_time NOT REGEXP "'.implode('|', $dates).'" AND lottery_type='.$lottery_type;
+                    $deal_status_delete = $db->createCommand($deal_status_delete_sql)->execute();
+                } catch (\Exception $e){}
 
-                # admin_log记录
-                $admin_log_delete_sql = 'DELETE FROM {{%admin_log}} WHERE update_time NOT REGEXP "'.implode('|', $dates);
-                $admin_log_delete = $db->createCommand($admin_log_delete_sql)->execute();
+                try {
+                    # admin_log记录
+                    $admin_log_delete_sql = 'DELETE FROM {{%admin_log}} WHERE update_time NOT REGEXP "'.implode('|', $dates).'"';
+                    $admin_log_delete = $db->createCommand($admin_log_delete_sql)->execute();
+                } catch (\Exception $e){}
 
-                # agent_user_bet_logs记录
-                $agent_user_bet_logs_delete_sql = 'DELETE FROM {{%agent_user_bet_logs}} WHERE update_time NOT REGEXP "'.implode('|', $dates);
-                $agent_user_bet_logs_delete = $db->createCommand($agent_user_bet_logs_delete_sql)->execute();
+                try {
+                    # agent_user_bet_logs记录
+                    $agent_user_bet_logs_delete_sql = 'DELETE FROM {{%agent_user_bet_logs}} WHERE update_time NOT REGEXP "'.implode('|', $dates).'"';
+                    $agent_user_bet_logs_delete = $db->createCommand($agent_user_bet_logs_delete_sql)->execute();
+                } catch (\Exception $e){
+                }
 
                 $logArr = [
                     'lottery_type'=>$lottery_type,
