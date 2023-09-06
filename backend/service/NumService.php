@@ -4835,6 +4835,7 @@ class NumService extends BaseService {
         $sql = $historyKjDatasQuery->createCommand()->getRawSql();//p($sql);
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤上期每两个号码及对数', ['lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
         $historyKjData = $historyKjDatasQuery->asArray()->one();
+        //p(['historyKjData'=>$historyKjData], 0);
 
         $fixedPos = [[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]];
         $notWhere = ['OR'];
@@ -4851,7 +4852,8 @@ class NumService extends BaseService {
             ->from('lt_num4_type')
             ->where(['code_type' => 4])
             ->andWhere(['NOT', $notWhere]);
-        //$sql = $query->createCommand()->getRawSql();p($sql);
+        $sql = $query->createCommand()->getRawSql();//p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤昨日同期/上期每两个号码及对数', ['lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
