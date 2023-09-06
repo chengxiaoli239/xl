@@ -175,10 +175,6 @@ class NumService extends BaseService {
         73=>'过滤2345位50期开过号码全转(四定)',
 
         74=>'杀上期同位置号码+三兄(四定)',
-        #98=>'杀上期千位号码+三兄(四定)',
-        #99=>'杀上期百位号码+三兄(四定)',
-        #100=>'杀上期十位号码+三兄(四定)',
-        #101=>'杀上期个位号码+三兄(四定)',
         #75=>'杀同位置冷码+三兄(四定)',
 
         76=>'杀同位置大小加配上期号码(四定)',
@@ -208,7 +204,8 @@ class NumService extends BaseService {
         92=>'过滤[个]位号码及合分(四定)',
 
         93=>'头尾剔除上期和值后一位号码(四定)',
-        97=>'过滤上期每两个号码及对数(四定)', # 待处理
+        97=>'过滤上期每两个号码及对数(四定)',
+        98=>'过滤昨日同期每两个号码及对数(四定)',
         102=>'过滤345位三分离号码(四定)',
         103=>'过滤123位三分离号码(四定)',
         104=>'过滤234位三分离号码(四定)',
@@ -3029,18 +3026,6 @@ class NumService extends BaseService {
                 case 74: # 杀上期同位置号码+三兄(四定)
                     $codes = NumService::getBeforeKjCodesDynamic74($plan, $positions=[1,2,3,4]);
                     break;
-                case 98: # 杀上期千位号码+三兄(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic74($plan, $positions=[1]);
-                    break;
-                case 99: # 杀上期百位号码+三兄(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic74($plan, $positions=[2]);
-                    break;
-                case 100: # 杀上期十位号码+三兄(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic74($plan, $positions=[3]);
-                    break;
-                case 101: # 杀上期个位码+三兄(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic74($plan, $positions=[4]);
-                    break;
                 case 75: # 杀同位置冷码+三兄(四定)
                     $codes = NumService::getBeforeKjCodesDynamic74($plan, $positions=[1,2,3,4], $c_type='type_3b', $type=2);
                     break;
@@ -3109,6 +3094,9 @@ class NumService extends BaseService {
                     break;
                 case 97: # 过滤上期每两个号码及对数(四定)
                     $codes = NumService::getBeforeKjCodesDynamic83($plan);
+                    break;
+                case 98: # 过滤昨日同期每两个号码及对数(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $c_type=2);
                     break;
                 case 102: # 过滤345三分离号码(四定)
                     $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[3,4,5]);
@@ -4824,11 +4812,10 @@ class NumService extends BaseService {
     /**
      * 过滤类型号码 - # 过滤上期每两个号码及对数(四定)
      * @param object $plan
-     * @param int[] $positions
-     * @dateNums int 天数
+     * @param int $c_type 1上期2昨日同期
      * @return array
      */
-    private static function getBeforeKjCodesDynamic83(object $plan, $positions=[1]){
+    private static function getBeforeKjCodesDynamic83(object $plan, $c_type=1){
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
         $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
         $lottery_type = $plan->lottery_type;
@@ -4837,11 +4824,16 @@ class NumService extends BaseService {
             $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
             $current_kj_qihao = $DataDealStatus['qihao'];
         }
+        if($c_type ==2){
+            # 昨日同期
+            $current_kj_qihao = date('Ymd', strtotime('-1 day')). substr($DataDealStatus['next_qihao'], -3);
+        }
+
         $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'qihao', $current_kj_qihao]];
         $historyKjDatasQuery = SscKjData::find()->select(['code1', 'code2', 'code3', 'code4', 'code_str', 'qihao'])
             ->where($historyWhere)->limit(1)->orderBy(['id'=>SORT_DESC]);
         $sql = $historyKjDatasQuery->createCommand()->getRawSql();//p($sql);
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤上期每两个号码及对数', ['positions'=>$positions, 'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤上期每两个号码及对数', ['lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
         $historyKjData = $historyKjDatasQuery->asArray()->one();
 
         $fixedPos = [[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]];
