@@ -4817,16 +4817,17 @@ class NumService extends BaseService {
      */
     private static function getBeforeKjCodesDynamic83(object $plan, $c_type=1){
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
-        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao']; # 当期已经开奖的期号
         $lottery_type = $plan->lottery_type;
+        $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+        $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
         if(empty($current_kj_qihao)){
-            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
-            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
             $current_kj_qihao = $DataDealStatus['qihao'];
-        }
-        if($c_type ==2){
-            # 昨日同期
-            $current_kj_qihao = date('Ymd', strtotime('-1 day')). substr($DataDealStatus['next_qihao'], -3);
+        }else{
+            if($c_type ==2){
+                # 昨日同期
+                $current_kj_qihao = date('Ymd', strtotime('-1 day')). substr($DataDealStatus['next_qihao'], -3);
+            }
         }
 
         $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'qihao', $current_kj_qihao]];
