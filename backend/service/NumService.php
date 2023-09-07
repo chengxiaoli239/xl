@@ -217,6 +217,8 @@ class NumService extends BaseService {
         109=>'过滤135位三分离号码(四定)',
         110=>'过滤235位三分离号码(四定)',
         111=>'过滤245位三分离号码(四定)',
+
+        112=>'杀同位置大小加配上期两位同位置号码(四定)',
     ];
 
     /**
@@ -3128,6 +3130,9 @@ class NumService extends BaseService {
                 case 111: # 过滤245三分离号码(四定)
                     $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[2,4,5]);
                     break;
+                case 112: # 杀同位置大小加配上期两位同位置号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic112($plan, $type_field='type_4dx', $positions=[1,2,3,4], $filterNums=1000);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -4910,6 +4915,62 @@ class NumService extends BaseService {
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - # 杀同位置大小加配上期两位同位置号码(四定)
+     * @param object $plan
+     * @param string $type_field
+     * @param int $type_val
+     * @param int[] $positions
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic112(object $plan, $type_field='type_4ds', $positions=[1,2,3,4], $filterNums=1000){
+        $playway = $plan->playway;
+        #$nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $lottery_type = $plan->lottery_type;
+        if(empty($current_kj_qihao)){
+            $is_empty_c_qihao = 1;
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $current_kj_qihao = $DataDealStatus['qihao'];
+        }
+        $CurrentKjDatas = SscKjData::find()->select(['code1', 'code2', 'code3', 'code4', 'code_str', 'qihao', 'type_ds'=>'code_1_2_3_4', 'type_4dx'=>'LEFT(type_4dx,4)'])
+            ->where(['lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+        if($type_field=='type_4dx'){
+            $filterCode1 = NumService::getDxTypeByCode($CurrentKjDatas['code1']);
+            $filterCode2 = NumService::getDxTypeByCode($CurrentKjDatas['code2']);
+            $filterCode3 = NumService::getDxTypeByCode($CurrentKjDatas['code3']);
+            $filterCode4 = NumService::getDxTypeByCode($CurrentKjDatas['code4']);
+        }else{
+            $filterCode1 = NumService::getDxTypeFanByCode($CurrentKjDatas['code1']);
+            $filterCode2 = NumService::getDxTypeFanByCode($CurrentKjDatas['code2']);
+            $filterCode3 = NumService::getDxTypeFanByCode($CurrentKjDatas['code3']);
+            $filterCode4 = NumService::getDxTypeFanByCode($CurrentKjDatas['code4']);
+        }
+        #p($CurrentKjDatas, 0);
+
+        $filterWhere = ['AND', ['=', $type_field, $CurrentKjDatas[$type_field]]];
+        $fixedPos = [[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]];
+        $notWhere = ['OR'];
+        foreach ($fixedPos as $pos){
+            $notWhere[] = ['AND',
+                ['IN', 'code_'.$pos[0], ${'filterCode'.$pos[0]}],
+                ['IN', 'code_'.$pos[1], ${'filterCode'.$pos[1]}],
+            ];
+        }
+        $filterWhere[] = $notWhere;
+
+        $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
+            ->where(['NOT', $filterWhere])
+            ->andWhere(['=', 'code_type', $playway+1]);
+        #$sql = $query->createCommand()->getRawSql(); p($sql);
+        $NumTypes = $query->asArray()->all();
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
         return $codes;
     }
