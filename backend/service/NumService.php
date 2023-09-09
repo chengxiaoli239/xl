@@ -219,6 +219,7 @@ class NumService extends BaseService {
         111=>'过滤245位三分离号码(四定)',
 
         112=>'杀同位置大小加配上期两位同位置号码(四定)',
+        113=>'杀同位置单双加配上期两位同位置号码(四定)',
     ];
 
     /**
@@ -3131,7 +3132,10 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[2,4,5]);
                     break;
                 case 112: # 杀同位置大小加配上期两位同位置号码(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic112($plan, $type_field='type_4dx', $positions=[1,2,3,4], $filterNums=1000);
+                    $codes = NumService::getBeforeKjCodesDynamic112($plan, $type_field='type_4dx');
+                    break;
+                case 113: # 杀同位置大小加配上期两位同位置号码(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic112($plan, $type_field='type_ds');
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
@@ -4927,7 +4931,7 @@ class NumService extends BaseService {
      * @param int[] $positions
      * @return array
      */
-    private static function getBeforeKjCodesDynamic112(object $plan, $type_field='type_4ds', $positions=[1,2,3,4], $filterNums=1000){
+    private static function getBeforeKjCodesDynamic112(object $plan, $type_field='type_4ds'){
         $playway = $plan->playway;
         #$nextQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC]);
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
@@ -4952,6 +4956,11 @@ class NumService extends BaseService {
             $filterCode3 = NumService::getDxTypeFanByCode($CurrentKjDatas['code3']);
             $filterCode4 = NumService::getDxTypeFanByCode($CurrentKjDatas['code4']);
         }
+
+        $filterCode1 = $CurrentKjDatas['code1'];
+        $filterCode2 = $CurrentKjDatas['code2'];
+        $filterCode3 = $CurrentKjDatas['code3'];
+        $filterCode4 = $CurrentKjDatas['code4'];
         #p($CurrentKjDatas, 0);
 
         $filterWhere = ['AND', ['=', $type_field, $CurrentKjDatas[$type_field]]];
@@ -4968,7 +4977,7 @@ class NumService extends BaseService {
         $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
             ->where(['NOT', $filterWhere])
             ->andWhere(['=', 'code_type', $playway+1]);
-        #$sql = $query->createCommand()->getRawSql(); p($sql);
+        $sql = $query->createCommand()->getRawSql(); p($sql);
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
