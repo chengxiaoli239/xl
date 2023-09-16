@@ -64,12 +64,5 @@ return [
     'DAILIYUN_USERNAME' => 'gaozi2021', # 通过密码使用私密代理
     'DAILIYUN_PASSWORD' => '0654321', # 快代理密码
 
-    # E云
-    'E_YUN' => [
-        'BASE_URL' => 'http://121.229.29.88:9899',
-        'ACCOUNT' => '15008080609',
-        'PASSWORD' => '0654321',
-        "TTUID" => '0065473f-beba-4f58-86ed-c576f4297772', # 8429aa96-5098-4211-9736-355599a11367
-    ],
 ];
 
