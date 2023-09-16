@@ -25,7 +25,7 @@ trait EventServiceTrait
         $now_time = time();
         $EYunMessage = new EYunMessage();
         $setData = [
-            'user_id' => EYunBaseService::getUserIdByFromUser($data['fromUser']),
+            'user_id' => EYunBaseService::getUserIdByFromUser($params['fromUser']),
             'toUser'=>$toUser,
             'msgId'=>$msgId,
             'newMsgId'=>$newMsgId,
