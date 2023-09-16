@@ -7,7 +7,7 @@ use common\models\eyun\RobotUser;
 use common\models\wechat\WechatUser;
 use common\service\BaseService;
 use common\service\chat\Tool_Common;
-use common\service\jobs\robots\EYunUserJobs;
+use common\service\jobs\robots\user\EYunUserJobs;
 
 class EYunBaseService  extends BaseService
 {
@@ -205,7 +205,7 @@ class EYunBaseService  extends BaseService
                 'user_id' => $this->user_id,
                 'business_id' => $this->user_id,
             ];
-            push_queue(\common\service\jobs\robots\EYunUserJobs::class, $params);
+            push_queue(EYunUserJobs::class, $params);
         }
 
 

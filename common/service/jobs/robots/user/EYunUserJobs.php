@@ -1,5 +1,5 @@
 <?php
-namespace common\service\jobs\robots;
+namespace common\service\jobs\robots\user;
 
 use common\models\wechat\WechatUser;
 use common\service\chat\Tool_Common;
@@ -10,7 +10,7 @@ use yii\helpers\Json;
 class EYunUserJobs extends CommonJob {
 
     public static function getName($params) {
-        self::$name = 'Î¢ĞÅÁªÏµÈËĞÅÏ¢Í¬²½';
+        self::$name = 'å¾®ä¿¡è”ç³»äººä¿¡æ¯åŒæ­¥';
         return self::$name;
     }
 
@@ -58,8 +58,8 @@ class EYunUserJobs extends CommonJob {
             $page += 1;
         }
 
-        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', 'Î¢ĞÅÓÃ»§ÏûÏ¢', ['params'=>$params]);
-        return 'Í¬²½ÁªÏµÈËĞÅÏ¢³É¹¦';
+        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', 'å¾®ä¿¡ç”¨æˆ·æ¶ˆæ¯', ['params'=>$params]);
+        return 'åŒæ­¥è”ç³»äººä¿¡æ¯æˆåŠŸ';
     }
 
 }
