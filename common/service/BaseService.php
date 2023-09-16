@@ -1,13 +1,12 @@
 <?php
-// +----------------------------------------------------------------------
-// | AO [ WE CAN DO IT JUST THINK ]
-// +----------------------------------------------------------------------
-// +----------------------------------------------------------------------
-// | Author: openskyli <912705075@qq.com>
-// +----------------------------------------------------------------------
-namespace common\models;
+namespace common\service;
 
+use common\service\chat\Tool_Common;
+use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use yii\db\ActiveRecord;
+use yii\helpers\Json;
+
 class BaseService  extends ActiveRecord
 {
 
@@ -321,4 +320,32 @@ class BaseService  extends ActiveRecord
         return self::get($where, null, false);
     }
 
+    public function request($url='', $params=[], $headers=[]){
+        $client = new Client();
+        $bHeaders = [
+            'Content-Type' => 'application/json; charset=utf8',
+            'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1'
+        ];
+        if(!empty($headers)){
+            $headers = array_merge($headers, $bHeaders);
+        }else{
+            $headers = $bHeaders;
+        }
+        $response = $client->request('POST', $url, [
+            RequestOptions::HEADERS   => $headers,
+            RequestOptions::BODY => Json::encode($params),
+        ]);
+
+        $statusCode = $response->getStatusCode();
+        if ($statusCode != 200) {
+            \Yii::error('Http请求接口出错：' . $response->getReasonPhrase());
+            return false;
+        }
+        $body = $response->getBody()->getContents();
+        $response = Json::decode($body) ?: false;
+
+        Tool_Common::log('/request/'.__FUNCTION__, 'INFO', '接口请求', ['url'=>$url, 'params'=>$params, 'response'=>$response]);
+
+        return $response;
+    }
 }
