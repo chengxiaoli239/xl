@@ -11,7 +11,8 @@ trait EventServiceTrait
 {
     public static function eventHandler($data)
     {
-        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '����e����Ϣ:', ['data'=>$data]);
+        $data = Json::decode($data, 320);
+        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '接收e云消息:', ['data'=>$data]);
         $messageType = $data['messageType'];
         $params = $data['data'];
         $toUser = $params['toUser'];
@@ -20,7 +21,7 @@ trait EventServiceTrait
         $where = ['toUser'=>$toUser, 'msgId'=>$msgId, 'newMsgId'=>$newMsgId];
         $EYunMessage = EYunMessage::findOne($where);
         if(!empty($EYunMessage)){
-            return ['code'=>'1000', 'message'=>'��Ϣ���ճɹ�'];
+            return ['code'=>'1000', 'message'=>'消息接收成功'];
         }
         $now_time = time();
         $EYunMessage = new EYunMessage();
@@ -39,16 +40,16 @@ trait EventServiceTrait
             return ['code'=>3000, 'message'=>Json::encode($EYunMessage->getErrors(), 320)];
         }
         switch ($messageType){
-            case EYunMessageOperateService::MESSAGE_P_TEXT_CODE: # ˽��
+            case EYunMessageOperateService::MESSAGE_P_TEXT_CODE: # 私聊
                 break;
-            case EYunMessageOperateService::MESSAGE_P_TEXT_CANCEL: # ˽��
+            case EYunMessageOperateService::MESSAGE_P_TEXT_CANCEL: # 私聊
                 break;
-            case EYunMessageOperateService::MESSAGE_G_TEXT_CODE: # Ⱥ��
+            case EYunMessageOperateService::MESSAGE_G_TEXT_CODE: # 群聊
                 break;
-            case EYunMessageOperateService::MESSAGE_G_TEXT_CANCEL: # Ⱥ��
+            case EYunMessageOperateService::MESSAGE_G_TEXT_CANCEL: # 群聊
                 break;
         }
 
-        return ['code'=>'1000', 'message'=>'��Ϣ���ճɹ�'];
+        return ['code'=>'1000', 'message'=>'消息接收成功'];
     }
 }
