@@ -55,6 +55,9 @@ return [
         'kj' => [
             'class' => 'backend\modules\kj\Module',
         ],
+        'wechat' => [
+            'class' => 'backend\modules\wechat\Module',
+        ],
     ],
     'components' => [
         'request' => [

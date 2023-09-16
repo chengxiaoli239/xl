@@ -22,7 +22,8 @@
         "ext-json": "*",
         "yiisoft/yii2-queue": "^2.3",
         "ext-curl": "*",
-        "yiisoft/yii2-redis": "^2.0"
+        "yiisoft/yii2-redis": "^2.0",
+        "guzzlehttp/guzzle": "^7.8"
     },
     "github-oauth":{
         "github.com": "722087c57e7cbca71d81c8c1f74116ccce8218cf"
@@ -35,7 +36,10 @@
     },
     "config": {
         "process-timeout": 1800,
-        "secure-http": false
+        "secure-http": false,
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
+        }
     },
     "extra": {
         "asset-installer-paths": {

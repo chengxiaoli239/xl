@@ -1,0 +1,86 @@
+登陆第三步接口返回数据：
+<pre>Array
+(
+    [rst] => Array
+        (
+            [code] => 1000
+            [message] => 处理成功
+            [data] => Array
+                (
+                    [deviceType] => 
+                    [country] => CN
+                    [wAccount] => A_robot_cats
+                    [city] => 
+                    [newDevice] => 1
+                    [signature] => 
+                    [nickName] => 机器猫
+                    [sex] => 1
+                    [headUrl] => https://wx.qlogo.cn/mmhead/ver_1/f8licKdsb6txngMdjVwpfkJvhPp56kFYK7ic5K6QXPP3psYtso6cll4tJm1t35k7mu2Wh08mBbH63icTXKY02kFKZjsF61E9mH7jxGfklwR1fk/0
+                    [type] => 1
+                    [deviceId] => wx_sLZoTjwPpc36yEi5xJhww
+                    [smallHeadImgUrl] => https://wx.qlogo.cn/mmhead/ver_1/f8licKdsb6txngMdjVwpfkJvhPp56kFYK7ic5K6QXPP3psYtso6cll4tJm1t35k7mu2Wh08mBbH63icTXKY02kFKZjsF61E9mH7jxGfklwR1fk/132
+                    [wcId] => wxid_ckgr7i2q9fr522
+                    [wId] => 071301b6-291e-4098-99ba-95a392a980b0
+                    [mobilePhone] => 17766958058
+                    [uin] => 
+                    [status] => 3
+                    [username] => 15008080609
+                )
+
+        )
+
+)
+
+登陆第五步返回
+<pre>Array
+(
+    [rst] => Array
+        (
+            [code] => 1000
+            [message] => 获取通讯录成功
+            [data] => Array
+                (
+                    [friends] => Array
+                        (
+                            [0] => filehelper
+                            [1] => wxid_kbf5nui8z4ya22
+                            [2] => q583134055
+                            [3] => wxid_7vwteplqbj8o21
+                            [4] => wangyegao2012
+                            [5] => wxid_875i1kgd38x122
+                            [6] => Cai__L
+                            [7] => wxid_tjcrm29qjb5q12
+                            [8] => wxid_2qim8muoymxo22
+                            [9] => wxid_07k4m7cfcv5321
+                            [10] => zhe78899
+                            [11] => wxid_9u3s9ftp3egm22
+                            [12] => wxid_fuyaoy23ptn122
+                        )
+
+                    [chatrooms] => Array
+                        (
+                            [0] => 24480989899@chatroom
+                            [1] => 17769461351@chatroom
+                        )
+
+                    [ghs] => Array
+                        (
+                            [0] => gh_e154bcaef134
+                            [1] => gh_7a0b59474671
+                            [2] => gh_82a5e320234d
+                            [3] => gh_aa76902ce7c6
+                        )
+
+                    [others] => Array
+                        (
+                            [0] => weixin
+                            [1] => fmessage
+                            [2] => medianote
+                            [3] => floatbottle
+                        )
+
+                )
+
+        )
+
+)

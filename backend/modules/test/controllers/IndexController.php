@@ -74,6 +74,7 @@ use common\service\webot\LoginService;
 use common\service\webot\MsgService;
 use common\service\webot\SendMsgService;
 use common\service\webot\WebotService;
+use common\service\wechat\eyun\EYunBaseService;
 use common\tools\KjDataGet;
 use backend\service\BaseNumService;
 use backend\service\BaseService;
@@ -342,6 +343,16 @@ class IndexController extends Controller
         }
         return $results;
     }
+    public function actionDw1(){
+        $user_id = 20;
+        $e = new EYunBaseService($user_id);
+        #$loginRst = $e->memberLogin();
+        #$rst = $e->localIPadLogin($user_id); # 第二步
+        #$rst = $e->afterClickLogin($user_id); # 第三步
+        #$rst = $e->initAddressList($user_id); # 第四步
+        $rst = $e->getAddressList(); # 第四步
+        p(['rst'=>$rst]);
+    }
 
     public function actionDw()
     {
@@ -353,6 +364,7 @@ class IndexController extends Controller
         $data = Lucky5::getLotteryLucky($type = 'json', $test = 2);
         d($data);
         $status = KjDataGet::isCanGrab($lottery_type=8);
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%robot_user}}'); p($r);
         p($status);
         $post = [
             'access_token' => '4b843e29ac8dd191e894c7dcea547815',
@@ -406,7 +418,6 @@ class IndexController extends Controller
         p([$type_dx, $type_4dx, $type_dx_str]);
         $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp(1, 2);
         p($current_proxy_addr);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%num4_type}}'); p($r);
         $SscKjData = SscKjData::find()->select(['qihao'])->where(['lottery_type'=>8])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one();
         p($SscKjData);
         $kjData = SscKjData::findOne(['qihao'=>'20230417102', 'lottery_type'=>8])->code_str;

@@ -120,4 +120,9 @@ abstract class CommonJob extends BaseObject implements JobInterface
             }
         }
     }
+
+    static function class_basename($class) {
+        $path = explode('\\', $class);
+        return end($path);
+    }
 }

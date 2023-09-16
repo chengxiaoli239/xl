@@ -1,321 +1,410 @@
-<?php return array (
-  'root' => 
-  array (
-    'pretty_version' => 'dev-master',
-    'version' => 'dev-master',
-    'aliases' => 
-    array (
+<?php return array(
+    'root' => array(
+        'name' => 'izyue/yii2-app-advanced',
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'reference' => '204f8751359c0d87f9849f62cf4ac7c24d8fc5fa',
+        'type' => 'project',
+        'install_path' => __DIR__ . '/../../',
+        'aliases' => array(),
+        'dev' => true,
     ),
-    'reference' => 'a618796bcfec55b2ea0c4a055e115f5602a11f38',
-    'name' => 'izyue/yii2-app-advanced',
-  ),
-  'versions' => 
-  array (
-    'bower-asset/bootstrap' => 
-    array (
-      'pretty_version' => 'v3.3.5',
-      'version' => '3.3.5.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '16b48259a62f576e52c903c476bd42b90ab22482',
+    'versions' => array(
+        'bower-asset/bootstrap' => array(
+            'pretty_version' => 'v3.3.5',
+            'version' => '3.3.5.0',
+            'reference' => '16b48259a62f576e52c903c476bd42b90ab22482',
+            'type' => 'bower-asset-library',
+            'install_path' => __DIR__ . '/../bower-asset/bootstrap',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'bower-asset/echarts' => array(
+            'pretty_version' => '4.1.0',
+            'version' => '4.1.0.0',
+            'reference' => '097e093a2e488adb0feb286283cf8e6e3ee31847',
+            'type' => 'bower-asset-library',
+            'install_path' => __DIR__ . '/../bower-asset/echarts',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'bower-asset/inputmask' => array(
+            'pretty_version' => '3.3.11',
+            'version' => '3.3.11.0',
+            'reference' => '5e670ad62f50c738388d4dcec78d2888505ad77b',
+            'type' => 'bower-asset-library',
+            'install_path' => __DIR__ . '/../bower-asset/inputmask',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'bower-asset/jquery' => array(
+            'pretty_version' => '3.2.1',
+            'version' => '3.2.1.0',
+            'reference' => '77d2a51d0520d2ee44173afdf4e40a9201f5964e',
+            'type' => 'bower-asset-library',
+            'install_path' => __DIR__ . '/../bower-asset/jquery',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'bower-asset/punycode' => array(
+            'pretty_version' => 'v1.3.2',
+            'version' => '1.3.2.0',
+            'reference' => '38c8d3131a82567bfef18da09f7f4db68c84f8a3',
+            'type' => 'bower-asset-library',
+            'install_path' => __DIR__ . '/../bower-asset/punycode',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'bower-asset/typeahead.js' => array(
+            'pretty_version' => 'v0.11.1',
+            'version' => '0.11.1.0',
+            'reference' => '588440f66559714280628a4f9799f0c4eb880a4a',
+            'type' => 'bower-asset-library',
+            'install_path' => __DIR__ . '/../bower-asset/typeahead.js',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'bower-asset/yii2-pjax' => array(
+            'pretty_version' => '2.0.7.1',
+            'version' => '2.0.7.1',
+            'reference' => 'aef7b953107264f00234902a3880eb50dafc48be',
+            'type' => 'bower-asset-library',
+            'install_path' => __DIR__ . '/../bower-asset/yii2-pjax',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'bubifengyun/yii2-echarts' => array(
+            'pretty_version' => 'v0.0.7',
+            'version' => '0.0.7.0',
+            'reference' => 'cf5dfdda167b35ed68906d6c1280563c58a500f8',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../bubifengyun/yii2-echarts',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'cebe/markdown' => array(
+            'pretty_version' => '1.1.2',
+            'version' => '1.1.2.0',
+            'reference' => '25b28bae8a6f185b5030673af77b32e1163d5c6e',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../cebe/markdown',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'daixianceng/yii2-echarts' => array(
+            'pretty_version' => 'v1.1.0',
+            'version' => '1.1.0.0',
+            'reference' => 'f0fb3f66d095b3fb47f1392318f1879c1e805f63',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../daixianceng/yii2-echarts',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'doctrine/lexer' => array(
+            'pretty_version' => 'v1.0.1',
+            'version' => '1.0.1.0',
+            'reference' => '83893c552fd2045dd78aef794c31e694c37c0b8c',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../doctrine/lexer',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'egulias/email-validator' => array(
+            'pretty_version' => '2.1.4',
+            'version' => '2.1.4.0',
+            'reference' => '8790f594151ca6a2010c6218e09d96df67173ad3',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../egulias/email-validator',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'ezyang/htmlpurifier' => array(
+            'pretty_version' => 'v4.10.0',
+            'version' => '4.10.0.0',
+            'reference' => 'd85d39da4576a6934b72480be6978fb10c860021',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../ezyang/htmlpurifier',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'fzaninotto/faker' => array(
+            'pretty_version' => 'v1.7.1',
+            'version' => '1.7.1.0',
+            'reference' => 'd3ed4cc37051c1ca52d22d76b437d14809fc7e0d',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../fzaninotto/faker',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'guzzlehttp/guzzle' => array(
+            'pretty_version' => '7.8.0',
+            'version' => '7.8.0.0',
+            'reference' => '1110f66a6530a40fe7aea0378fe608ee2b2248f9',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../guzzlehttp/guzzle',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'guzzlehttp/promises' => array(
+            'pretty_version' => '2.0.1',
+            'version' => '2.0.1.0',
+            'reference' => '111166291a0f8130081195ac4556a5587d7f1b5d',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../guzzlehttp/promises',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'guzzlehttp/psr7' => array(
+            'pretty_version' => '2.6.1',
+            'version' => '2.6.1.0',
+            'reference' => 'be45764272e8873c72dbe3d2edcfdfcc3bc9f727',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../guzzlehttp/psr7',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'hisune/echarts-php' => array(
+            'pretty_version' => '1.0.12',
+            'version' => '1.0.12.0',
+            'reference' => '8cf5001029839c601ce5d813ab92e6403b647798',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../hisune/echarts-php',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'imagine/imagine' => array(
+            'pretty_version' => 'v0.7.1',
+            'version' => '0.7.1.0',
+            'reference' => 'a9a702a946073cbca166718f1b02a1e72d742daa',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../imagine/imagine',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'izyue/yii2-admin' => array(
+            'pretty_version' => '1.0.3',
+            'version' => '1.0.3.0',
+            'reference' => 'dcb2e25ccf7a5b5a54365351c6f9c39cc5412413',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../izyue/yii2-admin',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'izyue/yii2-app-advanced' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => '204f8751359c0d87f9849f62cf4ac7c24d8fc5fa',
+            'type' => 'project',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'phpspec/php-diff' => array(
+            'pretty_version' => 'v1.1.0',
+            'version' => '1.1.0.0',
+            'reference' => '0464787bfa7cd13576c5a1e318709768798bec6a',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../phpspec/php-diff',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'psr/http-client' => array(
+            'pretty_version' => '1.0.2',
+            'version' => '1.0.2.0',
+            'reference' => '0955afe48220520692d2d09f7ab7e0f93ffd6a31',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../psr/http-client',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'psr/http-client-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '1.0',
+            ),
+        ),
+        'psr/http-factory' => array(
+            'pretty_version' => '1.0.2',
+            'version' => '1.0.2.0',
+            'reference' => 'e616d01114759c4c489f93b099585439f795fe35',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../psr/http-factory',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'psr/http-factory-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '1.0',
+            ),
+        ),
+        'psr/http-message' => array(
+            'pretty_version' => '2.0',
+            'version' => '2.0.0.0',
+            'reference' => '402d35bcb92c70c026d1a6a9883f06b2ead23d71',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../psr/http-message',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'psr/http-message-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '1.0',
+            ),
+        ),
+        'ralouphie/getallheaders' => array(
+            'pretty_version' => '3.0.3',
+            'version' => '3.0.3.0',
+            'reference' => '120b605dfeb996808c31b6477290a714d356e822',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../ralouphie/getallheaders',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'swiftmailer/swiftmailer' => array(
+            'pretty_version' => 'v6.0.2',
+            'version' => '6.0.2.0',
+            'reference' => '412333372fb6c8ffb65496a2bbd7321af75733fc',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../swiftmailer/swiftmailer',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'symfony/deprecation-contracts' => array(
+            'pretty_version' => 'v2.5.2',
+            'version' => '2.5.2.0',
+            'reference' => 'e8b495ea28c1d97b5e0c121748d6f9b53d075c66',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/deprecation-contracts',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'symfony/polyfill-php80' => array(
+            'pretty_version' => 'v1.22.1',
+            'version' => '1.22.1.0',
+            'reference' => 'dc3063ba22c2a1fd2f45ed856374d79114998f91',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/polyfill-php80',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'symfony/process' => array(
+            'pretty_version' => 'v5.2.3',
+            'version' => '5.2.3.0',
+            'reference' => '313a38f09c77fbcdc1d223e57d368cea76a2fd2f',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/process',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'yiidoc/yii2-redactor' => array(
+            'pretty_version' => '2.0.1',
+            'version' => '2.0.1.0',
+            'reference' => 'c4c80c19c68728e88d135f4eec5c51352fbbaa37',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../yiidoc/yii2-redactor',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'yiisoft/yii2' => array(
+            'pretty_version' => '2.0.15.1',
+            'version' => '2.0.15.1',
+            'reference' => 'ed3a9e1c4abe206e1c3ce48a6b3624119b79850d',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../yiisoft/yii2',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'yiisoft/yii2-bootstrap' => array(
+            'pretty_version' => '2.0.8',
+            'version' => '2.0.8.0',
+            'reference' => '3f49c47924bb9fa5363c3fc7b073d954168cf438',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../yiisoft/yii2-bootstrap',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'yiisoft/yii2-codeception' => array(
+            'pretty_version' => '2.0.6',
+            'version' => '2.0.6.0',
+            'reference' => '086c8c2d28736e7a484a7a8611b5cc84024e9fb3',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../yiisoft/yii2-codeception',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'yiisoft/yii2-composer' => array(
+            'pretty_version' => '2.0.10',
+            'version' => '2.0.10.0',
+            'reference' => '94bb3f66e779e2774f8776d6e1bdeab402940510',
+            'type' => 'composer-plugin',
+            'install_path' => __DIR__ . '/../yiisoft/yii2-composer',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'yiisoft/yii2-debug' => array(
+            'pretty_version' => '2.0.13',
+            'version' => '2.0.13.0',
+            'reference' => 'b37f414959c2fafefb332020b42037cd17c1cb7f',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../yiisoft/yii2-debug',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'yiisoft/yii2-faker' => array(
+            'pretty_version' => '2.0.4',
+            'version' => '2.0.4.0',
+            'reference' => '3df62b1dcb272a8413f9c6e532c9d73f325ccde1',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../yiisoft/yii2-faker',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'yiisoft/yii2-gii' => array(
+            'pretty_version' => '2.0.7',
+            'version' => '2.0.7.0',
+            'reference' => '9ec1374d0844f448d2af29c707f77c9f8d1375c8',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../yiisoft/yii2-gii',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'yiisoft/yii2-imagine' => array(
+            'pretty_version' => '2.1.1',
+            'version' => '2.1.1.0',
+            'reference' => 'a8a1a068862a86e3395e665bc86e63d5c9b60841',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../yiisoft/yii2-imagine',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'yiisoft/yii2-queue' => array(
+            'pretty_version' => '2.3.4',
+            'version' => '2.3.4.0',
+            'reference' => 'ed30b5f46ddadd62587a4963dec35f9b756c408b',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../yiisoft/yii2-queue',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'yiisoft/yii2-redis' => array(
+            'pretty_version' => '2.0.11',
+            'version' => '2.0.11.0',
+            'reference' => '92f2926296996c78f2441fc81e357a6e3b349e5e',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../yiisoft/yii2-redis',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'yiisoft/yii2-swiftmailer' => array(
+            'pretty_version' => '2.1.1',
+            'version' => '2.1.1.0',
+            'reference' => 'fd917fbe63b7ea796c52902143b83b98e65bfb73',
+            'type' => 'yii2-extension',
+            'install_path' => __DIR__ . '/../yiisoft/yii2-swiftmailer',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
     ),
-    'bower-asset/echarts' => 
-    array (
-      'pretty_version' => '4.1.0',
-      'version' => '4.1.0.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '097e093a2e488adb0feb286283cf8e6e3ee31847',
-    ),
-    'bower-asset/inputmask' => 
-    array (
-      'pretty_version' => '3.3.11',
-      'version' => '3.3.11.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '5e670ad62f50c738388d4dcec78d2888505ad77b',
-    ),
-    'bower-asset/jquery' => 
-    array (
-      'pretty_version' => '3.2.1',
-      'version' => '3.2.1.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '77d2a51d0520d2ee44173afdf4e40a9201f5964e',
-    ),
-    'bower-asset/punycode' => 
-    array (
-      'pretty_version' => 'v1.3.2',
-      'version' => '1.3.2.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '38c8d3131a82567bfef18da09f7f4db68c84f8a3',
-    ),
-    'bower-asset/typeahead.js' => 
-    array (
-      'pretty_version' => 'v0.11.1',
-      'version' => '0.11.1.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '588440f66559714280628a4f9799f0c4eb880a4a',
-    ),
-    'bower-asset/yii2-pjax' => 
-    array (
-      'pretty_version' => '2.0.7.1',
-      'version' => '2.0.7.1',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'aef7b953107264f00234902a3880eb50dafc48be',
-    ),
-    'bubifengyun/yii2-echarts' => 
-    array (
-      'pretty_version' => 'v0.0.7',
-      'version' => '0.0.7.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'cf5dfdda167b35ed68906d6c1280563c58a500f8',
-    ),
-    'cebe/markdown' => 
-    array (
-      'pretty_version' => '1.1.2',
-      'version' => '1.1.2.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '25b28bae8a6f185b5030673af77b32e1163d5c6e',
-    ),
-    'daixianceng/yii2-echarts' => 
-    array (
-      'pretty_version' => 'v1.1.0',
-      'version' => '1.1.0.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'f0fb3f66d095b3fb47f1392318f1879c1e805f63',
-    ),
-    'doctrine/lexer' => 
-    array (
-      'pretty_version' => 'v1.0.1',
-      'version' => '1.0.1.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '83893c552fd2045dd78aef794c31e694c37c0b8c',
-    ),
-    'egulias/email-validator' => 
-    array (
-      'pretty_version' => '2.1.4',
-      'version' => '2.1.4.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '8790f594151ca6a2010c6218e09d96df67173ad3',
-    ),
-    'ezyang/htmlpurifier' => 
-    array (
-      'pretty_version' => 'v4.10.0',
-      'version' => '4.10.0.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'd85d39da4576a6934b72480be6978fb10c860021',
-    ),
-    'fzaninotto/faker' => 
-    array (
-      'pretty_version' => 'v1.7.1',
-      'version' => '1.7.1.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'd3ed4cc37051c1ca52d22d76b437d14809fc7e0d',
-    ),
-    'hisune/echarts-php' => 
-    array (
-      'pretty_version' => '1.0.12',
-      'version' => '1.0.12.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '8cf5001029839c601ce5d813ab92e6403b647798',
-    ),
-    'imagine/imagine' => 
-    array (
-      'pretty_version' => 'v0.7.1',
-      'version' => '0.7.1.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'a9a702a946073cbca166718f1b02a1e72d742daa',
-    ),
-    'izyue/yii2-admin' => 
-    array (
-      'pretty_version' => '1.0.3',
-      'version' => '1.0.3.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'dcb2e25ccf7a5b5a54365351c6f9c39cc5412413',
-    ),
-    'izyue/yii2-app-advanced' => 
-    array (
-      'pretty_version' => 'dev-master',
-      'version' => 'dev-master',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'a618796bcfec55b2ea0c4a055e115f5602a11f38',
-    ),
-    'phpspec/php-diff' => 
-    array (
-      'pretty_version' => 'v1.1.0',
-      'version' => '1.1.0.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '0464787bfa7cd13576c5a1e318709768798bec6a',
-    ),
-    'swiftmailer/swiftmailer' => 
-    array (
-      'pretty_version' => 'v6.0.2',
-      'version' => '6.0.2.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '412333372fb6c8ffb65496a2bbd7321af75733fc',
-    ),
-    'symfony/polyfill-php80' => 
-    array (
-      'pretty_version' => 'v1.22.1',
-      'version' => '1.22.1.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'dc3063ba22c2a1fd2f45ed856374d79114998f91',
-    ),
-    'symfony/process' => 
-    array (
-      'pretty_version' => 'v5.2.3',
-      'version' => '5.2.3.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '313a38f09c77fbcdc1d223e57d368cea76a2fd2f',
-    ),
-    'yiidoc/yii2-redactor' => 
-    array (
-      'pretty_version' => '2.0.1',
-      'version' => '2.0.1.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'c4c80c19c68728e88d135f4eec5c51352fbbaa37',
-    ),
-    'yiisoft/yii2' => 
-    array (
-      'pretty_version' => '2.0.15.1',
-      'version' => '2.0.15.1',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'ed3a9e1c4abe206e1c3ce48a6b3624119b79850d',
-    ),
-    'yiisoft/yii2-bootstrap' => 
-    array (
-      'pretty_version' => '2.0.8',
-      'version' => '2.0.8.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '3f49c47924bb9fa5363c3fc7b073d954168cf438',
-    ),
-    'yiisoft/yii2-codeception' => 
-    array (
-      'pretty_version' => '2.0.6',
-      'version' => '2.0.6.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '086c8c2d28736e7a484a7a8611b5cc84024e9fb3',
-    ),
-    'yiisoft/yii2-composer' => 
-    array (
-      'pretty_version' => '2.0.10',
-      'version' => '2.0.10.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '94bb3f66e779e2774f8776d6e1bdeab402940510',
-    ),
-    'yiisoft/yii2-debug' => 
-    array (
-      'pretty_version' => '2.0.13',
-      'version' => '2.0.13.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'b37f414959c2fafefb332020b42037cd17c1cb7f',
-    ),
-    'yiisoft/yii2-faker' => 
-    array (
-      'pretty_version' => '2.0.4',
-      'version' => '2.0.4.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '3df62b1dcb272a8413f9c6e532c9d73f325ccde1',
-    ),
-    'yiisoft/yii2-gii' => 
-    array (
-      'pretty_version' => '2.0.7',
-      'version' => '2.0.7.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '9ec1374d0844f448d2af29c707f77c9f8d1375c8',
-    ),
-    'yiisoft/yii2-imagine' => 
-    array (
-      'pretty_version' => '2.1.1',
-      'version' => '2.1.1.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'a8a1a068862a86e3395e665bc86e63d5c9b60841',
-    ),
-    'yiisoft/yii2-queue' => 
-    array (
-      'pretty_version' => '2.3.4',
-      'version' => '2.3.4.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'ed30b5f46ddadd62587a4963dec35f9b756c408b',
-    ),
-    'yiisoft/yii2-redis' => 
-    array (
-      'pretty_version' => '2.0.11',
-      'version' => '2.0.11.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '92f2926296996c78f2441fc81e357a6e3b349e5e',
-    ),
-    'yiisoft/yii2-swiftmailer' => 
-    array (
-      'pretty_version' => '2.1.1',
-      'version' => '2.1.1.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'fd917fbe63b7ea796c52902143b83b98e65bfb73',
-    ),
-  ),
 );
