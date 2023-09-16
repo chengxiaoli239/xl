@@ -220,6 +220,16 @@ class NumService extends BaseService {
 
         112=>'杀同位置大小加配上期两位同位置号码(四定)',
         113=>'杀同位置单双加配上期两位同位置号码(四定)',
+
+        114=>'过滤千位最近1个冷码+三兄弟 ',
+        115=>'过滤百位最近1个冷码+三兄弟 ',
+        116=>'过滤十位最近1个冷码+三兄弟 ',
+        117=>'过滤个位最近1个冷码+三兄弟 ',
+
+        118=>'过滤千位最近1个冷码+两单两双+对数 ',
+        119=>'过滤百位最近1个冷码+两单两双+对数 ',
+        120=>'过滤十位最近1个冷码+两单两双+对数 ',
+        121=>'过滤个位最近1个冷码+两单两双+对数 ',
     ];
 
     /**
@@ -3137,6 +3147,30 @@ class NumService extends BaseService {
                 case 113: # 杀同位置大小加配上期两位同位置号码(四定)
                     $codes = NumService::getBeforeKjCodesDynamic112($plan, $type_field='type_ds');
                     break;
+                case 114: # 过滤千位最近1个冷码+三兄弟
+                    $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_3b', $type_val=1, $positions=1, $type_log=''); #
+                    break;
+                case 115: # 过滤百位最近1个冷码+三兄弟
+                    $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_3b', $type_val=1, $positions=2, $type_log=''); #
+                    break;
+                case 116: # 过滤十位最近1个冷码+三兄弟
+                    $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_3b', $type_val=1, $positions=3, $type_log=''); #
+                    break;
+                case 117: # 过滤个位最近1个冷码+三兄弟
+                    $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_3b', $type_val=1, $positions=4, $type_log=''); #
+                    break;
+                case 118: # 过滤千位最近1个冷码+两单两双+对数
+                    $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_4ds', $type_val=3, $positions=1, $type_log=1); #
+                    break;
+                case 119: # 过滤百位最近1个冷码+两单两双+对数
+                    $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_4ds', $type_val=3, $positions=2, $type_log=1); #
+                    break;
+                case 120: # 过滤十位最近1个冷码+两单两双+对数
+                    $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_4ds', $type_val=3, $positions=3, $type_log=1); #
+                    break;
+                case 121: # 过滤个位最近1个冷码+两单两双+对数
+                    $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_4ds', $type_val=3, $positions=4, $type_log=1); #
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -4982,6 +5016,93 @@ class NumService extends BaseService {
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
         return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - # 过滤千位最近1个冷码+三兄弟(四定)
+     * @param object $plan
+     * @param string $type_field
+     * @param int $type_val 当type_field=type_3b则type_val=1表示三兄弟，当type_field=type_4ds则type_val=0非四单四双1四单2四双3两单两双4一单三双5一双三单
+     * @param int $positions
+     * @param string $type_log 是否过滤对数 1是0否，空则不过滤
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic114(object $plan, string $type_field='type_ds', int $type_val=1, $pos=1, $type_log=0){
+        $playway = $plan->playway;
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $lottery_type = $plan->lottery_type;
+        if(empty($current_kj_qihao)){
+            $is_empty_c_qihao = 1;
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $qihao = $DataDealStatus['qihao'];
+        }else{
+            $is_empty_c_qihao = 0;
+            $qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
+
+        $latelyCode = NumService::getPosLatelyCode($pos, $num=9, $lottery_type);
+        $filterCodes = array_diff(\backend\service\NumService::DOUBLE_TYPE_XD, $latelyCode);
+        #p([$latelyCode, $filterCodes], 0);
+        $andWhere = ['AND'];
+        $andWhere[] = ['=', $type_field, $type_val];
+        if($type_log > 0){
+            $andWhere[] = ['=', 'type_log', $type_log];
+        }
+
+        $pos_field = 'code_'.$pos;
+        $query = Num4Type::find()->alias('n')->select(['code', $pos_field, 'code_type'])
+            ->where(['IN', 'n.'.$pos_field, $filterCodes])
+            ->andWhere($andWhere)
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $NumTypes = $query->asArray()->all();
+        #$sql = $query->createCommand()->getRawSql();p($sql, 0);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重', ['pos'=>$pos, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+        $filterCodes = ArrayHelper::getColumn($NumTypes, 'code');
+        #p(count($filterCodes));
+
+        $query = Num4Type::find()->select(['code'])
+            ->where(['=', 'code_type', $playway+1])
+            ->andWhere(['NOT IN', 'code', $filterCodes]);
+        #$sql = $query->createCommand()->getRawSql();p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重2', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'sql'=>$sql]);
+        $NumTypes = $query->asArray()->all();
+        #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 获取某个彩种最近x个号码
+     * @param $pos
+     * @param int $num
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function getPosLatelyCode($pos, $num=9, $lottery_type=DEFAULT_LOTTERY_TYPE){
+
+        $pos_field = 'code'.$pos;
+        // 执行子查询以获取要排除的记录的 ID
+        $excludedIds = SscKjData::find()
+            ->select([$pos_field])
+            ->where(['lottery_type' => $lottery_type])
+            ->orderBy(['id' => SORT_DESC])
+            ->limit(30)
+            ->asArray()
+            ->column();
+        // 对结果进行处理，确保至少包含9个不同的 code1 值
+        $selectedCodes = [];
+        foreach ($excludedIds as $code) {
+            if (!in_array($code, $selectedCodes)) {
+                $selectedCodes[] = $code;
+                if (count($selectedCodes) >= $num) {
+                    break; // 已经选够了9个不同的 code1 值
+                }
+            }
+        }
+        return $selectedCodes;
     }
 
     public static function get4Len($positions=[1,2,3]){
