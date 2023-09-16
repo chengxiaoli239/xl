@@ -63,5 +63,13 @@ return [
     'PROXY_DAILIYUN_API' => 'http://gaozi2021.v4.dailiyun.com',
     'DAILIYUN_USERNAME' => 'gaozi2021', # 通过密码使用私密代理
     'DAILIYUN_PASSWORD' => '0654321', # 快代理密码
+
+    # E云
+    'E_YUN' => [
+        'BASE_URL' => 'http://121.229.29.88:9899',
+        'ACCOUNT' => '15008080609',
+        'PASSWORD' => '0654321',
+        "TTUID" => '8429aa96-5098-4211-9736-355599a11367', # b8c0f49d-2ab0-4e39-93c1-283dd582f3ce
+    ],
 ];
 

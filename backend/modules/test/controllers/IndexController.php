@@ -74,6 +74,7 @@ use common\service\webot\LoginService;
 use common\service\webot\MsgService;
 use common\service\webot\SendMsgService;
 use common\service\webot\WebotService;
+use common\service\wechat\eyun\EYunBaseService;
 use common\tools\KjDataGet;
 use backend\service\BaseNumService;
 use backend\service\BaseService;
@@ -341,6 +342,11 @@ class IndexController extends Controller
             $results = $tmp;
         }
         return $results;
+    }
+    public function actionDw1(){
+        $e = new EYunBaseService();
+        $loginRst = $e->memberLogin();
+        p(['loginRst'=>$loginRst]);
     }
 
     public function actionDw()
