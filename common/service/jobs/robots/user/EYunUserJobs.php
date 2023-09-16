@@ -5,6 +5,7 @@ use common\models\wechat\WechatUser;
 use common\service\chat\Tool_Common;
 use common\service\jobs\CommonJob;
 use common\service\wechat\eyun\EYunBaseService;
+use yii\helpers\Json;
 
 class EYunUserJobs extends CommonJob {
 

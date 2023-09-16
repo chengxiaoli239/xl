@@ -346,12 +346,13 @@ class IndexController extends Controller
     }
     public function actionDw1(){
         $user_id = 20;
-        #$e = new EYunBaseService($user_id);
+        $e = new EYunBaseService($user_id);
         #$loginRst = $e->memberLogin();
         #$rst = $e->localIPadLogin($user_id); # 第二步
         #$rst = $e->afterClickLogin($user_id); # 第三步
         #$rst = $e->initAddressList($user_id); # 第四步
-        #$rst = $e->getAddressList(); # 第四步
+        $rst = $e->getAddressList(); # 第四步
+        p($rst);
 
         $e = new MessageSetService($user_id);
         $rst = $e->setHttpCallbackUrl();

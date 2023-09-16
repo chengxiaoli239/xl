@@ -205,7 +205,7 @@ class EYunBaseService  extends BaseService
                 'user_id' => $this->user_id,
                 'business_id' => $this->user_id,
             ];
-            push_queue(EYunUserJobs::class, $params);
+            push_queue(\common\service\jobs\robots\EYunUserJobs::class, $params);
         }
 
 
