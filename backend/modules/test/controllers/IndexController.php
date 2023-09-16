@@ -75,6 +75,7 @@ use common\service\webot\MsgService;
 use common\service\webot\SendMsgService;
 use common\service\webot\WebotService;
 use common\service\wechat\eyun\EYunBaseService;
+use common\service\wechat\eyun\MessageSetService;
 use common\tools\KjDataGet;
 use backend\service\BaseNumService;
 use backend\service\BaseService;
@@ -345,12 +346,15 @@ class IndexController extends Controller
     }
     public function actionDw1(){
         $user_id = 20;
-        $e = new EYunBaseService($user_id);
+        #$e = new EYunBaseService($user_id);
         #$loginRst = $e->memberLogin();
         #$rst = $e->localIPadLogin($user_id); # 第二步
         #$rst = $e->afterClickLogin($user_id); # 第三步
         #$rst = $e->initAddressList($user_id); # 第四步
-        $rst = $e->getAddressList(); # 第四步
+        #$rst = $e->getAddressList(); # 第四步
+
+        $e = new MessageSetService($user_id);
+        $rst = $e->setHttpCallbackUrl();
         p(['rst'=>$rst]);
     }
 

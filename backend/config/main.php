@@ -58,6 +58,9 @@ return [
         'wechat' => [
             'class' => 'backend\modules\wechat\Module',
         ],
+        'eyunapi' => [
+            'class' => 'backend\modules\eyunapi\Module',
+        ],
     ],
     'components' => [
         'request' => [
