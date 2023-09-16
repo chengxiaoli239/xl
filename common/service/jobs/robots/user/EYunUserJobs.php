@@ -33,7 +33,7 @@ class EYunUserJobs extends CommonJob {
             $now_time = time();
             $response = $e->getContact($wcIds);
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', '微信联系人信息同步', ['wcIds'=>$wcIds, 'response'=>$response]);
-            if($response['code'] == 1000 && !empty($response['data']['friends'])) {
+            if($response['code'] == 1000 && !empty($response['data'])) {
                 $datas = $response['data'];
                 foreach ($datas as $data){
                     $where = ['user_id'=>$user_id, 'userName'=>$data['userName']];
