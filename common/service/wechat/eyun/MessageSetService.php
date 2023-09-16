@@ -21,7 +21,6 @@ class MessageSetService extends EYunBaseService
             'httpUrl' => $httpUrl,
             'type' => EYunBaseService::MSG_TYPE_IMPROVE,
         ];
-        p(['url'=>$url, 'params'=>$params]);
         $response = $this->request($url, $params, $this->headers);
         if($response['code'] == 1000){
             $EyunAuth = EyunAuth::findOne(1);

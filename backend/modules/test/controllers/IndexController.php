@@ -362,13 +362,13 @@ class IndexController extends Controller
     {
         $plan = UserSysPlans::findOne(7454);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%eyun_auth}}'); p($r);
         p(count($filter_dynamic_codes));
         $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
         p($data);
         $data = Lucky5::getLotteryLucky($type = 'json', $test = 2);
         d($data);
         $status = KjDataGet::isCanGrab($lottery_type=8);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%robot_user}}'); p($r);
         p($status);
         $post = [
             'access_token' => '4b843e29ac8dd191e894c7dcea547815',
