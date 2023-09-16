@@ -46,3 +46,20 @@ CREATE TABLE `lt_wechat_user` (
   KEY `user_id` (`user_id`) USING BTREE COMMENT 'user.id',
   UNIQUE KEY `userName` (`userName`) USING BTREE COMMENT 'userName'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='机器人好友';
+
+CREATE TABLE `lt_eyun_message` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(4) DEFAULT NULL COMMENT 'user.id,系统用户id',
+  `toUser` varchar(64) NOT NULL DEFAULT '' COMMENT '接收微信id',
+  `msgId` varchar(64) NOT NULL DEFAULT '' COMMENT '消息msgId',
+  `newMsgId` varchar(64) NOT NULL DEFAULT '' COMMENT '消息newMsgId',
+  `status` smallint(6) NOT NULL DEFAULT '0' COMMENT '状态0待处理处理中2处理成功3处理失败',
+  `data` text not null  COMMENT '消息内容',
+  `remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '备注信息',
+  `created_at` int(11) NOT NULL,
+  `updated_at` int(11) NOT NULL,
+  `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `msgId` (`toUser`,`newMsgId`, `msgId`),
+  KEY `user_id` (`user_id`) USING BTREE COMMENT 'user.id'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='e云消息表';

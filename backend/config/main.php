@@ -159,6 +159,7 @@ return [
             'chat/*',
             'api/*',
             'kj/*',
+            'eyunapi/*',
             'wx-friends/*',
             '/agent/agent-users/get-user-info',
             #'forum/index/tz',

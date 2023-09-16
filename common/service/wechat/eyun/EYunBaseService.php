@@ -231,4 +231,18 @@ class EYunBaseService  extends BaseService
 
         return $response;
     }
+
+    /**
+     * 微信消息用户获取系统用户id
+     * @param string $fromUser
+     * @return int|mixed|null
+     */
+    public static function getUserIdByFromUser($fromUser=''){
+        $WechatUser = WechatUser::findOne(['userName'=>$fromUser]);
+        if(empty($WechatUser)){
+            return 0;
+        }
+
+        return $WechatUser->user_id;
+    }
 }
