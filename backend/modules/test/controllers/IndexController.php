@@ -75,6 +75,7 @@ use common\service\webot\MsgService;
 use common\service\webot\SendMsgService;
 use common\service\webot\WebotService;
 use common\service\wechat\eyun\EYunBaseService;
+use common\service\wechat\eyun\MessageSetService;
 use common\tools\KjDataGet;
 use backend\service\BaseNumService;
 use backend\service\BaseService;
@@ -345,12 +346,15 @@ class IndexController extends Controller
     }
     public function actionDw1(){
         $user_id = 20;
-        $e = new EYunBaseService($user_id);
+        #$e = new EYunBaseService($user_id);
         #$loginRst = $e->memberLogin();
         #$rst = $e->localIPadLogin($user_id); # 第二步
         #$rst = $e->afterClickLogin($user_id); # 第三步
         #$rst = $e->initAddressList($user_id); # 第四步
-        $rst = $e->getAddressList(); # 第四步
+        #$rst = $e->getAddressList(); # 第四步
+
+        $e = new MessageSetService($user_id);
+        $rst = $e->setHttpCallbackUrl();
         p(['rst'=>$rst]);
     }
 
@@ -358,13 +362,13 @@ class IndexController extends Controller
     {
         $plan = UserSysPlans::findOne(7454);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%eyun_auth}}'); p($r);
         p(count($filter_dynamic_codes));
         $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
         p($data);
         $data = Lucky5::getLotteryLucky($type = 'json', $test = 2);
         d($data);
         $status = KjDataGet::isCanGrab($lottery_type=8);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%robot_user}}'); p($r);
         p($status);
         $post = [
             'access_token' => '4b843e29ac8dd191e894c7dcea547815',

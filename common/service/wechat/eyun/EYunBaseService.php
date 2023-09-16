@@ -30,6 +30,10 @@ class EYunBaseService  extends BaseService
     # 头
     public $headers = [];
 
+    # 消息内容类型：1原生版2:优化版
+    const MSG_TYPE_BASE = 1;
+    const MSG_TYPE_IMPROVE = 2;
+
     public function __construct($user_id='', $config = [])
     {
         $this->user_id = $user_id;
