@@ -11,7 +11,6 @@ trait EventServiceTrait
 {
     public static function eventHandler($data)
     {
-        $data = Json::decode($data, 320);
         Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '接收e云消息:', ['data'=>$data]);
         $messageType = $data['messageType'];
         $params = $data['data'];

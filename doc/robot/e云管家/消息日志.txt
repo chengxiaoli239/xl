@@ -1,0 +1,70 @@
+1、私聊
+{
+  "wcId": "wxid_ckgr7i2q9fr522",
+  "data": {
+    "toUser": "wxid_ckgr7i2q9fr522",
+    "wId": "071301b6-291e-4098-99ba-95a392a980b0",
+    "fromUser": "wangyegao2012",
+    "newMsgId": 77260603623427112,
+    "msgId": 1799440426,
+    "self": false,
+    "content": "来吧",
+    "timestamp": 1694884131
+  },
+  "messageType": "60001",
+  "account": "15008080609"
+}
+2、群聊
+{
+  "wcId": "wxid_ckgr7i2q9fr522",
+  "data": {
+    "fromUser": "wxid_875i1kgd38x122",
+    "newMsgId": 2491144357171214256,
+    "memberCount": 3,
+    "fromGroup": "24480989899@chatroom",
+    "msgId": 1799440427,
+    "content": "嗯蒽",
+    "toUser": "wxid_ckgr7i2q9fr522",
+    "wId": "071301b6-291e-4098-99ba-95a392a980b0",
+    "self": false,
+    "timestamp": 1694884145
+  },
+  "messageType": "80001",
+  "account": "15008080609"
+}
+3、群聊
+{
+  "wcId": "wxid_ckgr7i2q9fr522",
+  "data": {
+    "fromUser": "wxid_875i1kgd38x122",
+    "newMsgId": 381233417709895232,
+    "memberCount": 3,
+    "fromGroup": "24480989899@chatroom",
+    "msgId": 1799440428,
+    "content": "是的",
+    "toUser": "wxid_ckgr7i2q9fr522",
+    "wId": "071301b6-291e-4098-99ba-95a392a980b0",
+    "self": false,
+    "timestamp": 1694884147
+  },
+  "messageType": "80001",
+  "account": "15008080609"
+}
+4、群聊
+{
+  "wcId": "wxid_ckgr7i2q9fr522",
+  "data": {
+    "fromUser": "wxid_875i1kgd38x122",
+    "newMsgId": 4586971869717528337,
+    "memberCount": 3,
+    "fromGroup": "24480989899@chatroom",
+    "msgId": 1799440429,
+    "content": "福",
+    "toUser": "wxid_ckgr7i2q9fr522",
+    "wId": "071301b6-291e-4098-99ba-95a392a980b0",
+    "self": false,
+    "timestamp": 1694884149
+  },
+  "messageType": "80001",
+  "account": "15008080609"
+}
