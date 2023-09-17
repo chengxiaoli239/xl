@@ -67,6 +67,7 @@ use common\models\AdminModel;
 use common\service\ChatService;
 use common\service\CommonService;
 use common\service\index\CrontabIndexService;
+use common\service\jobs\robots\user\WechatUserStatusJobs;
 use common\service\proxy\ProxyBaseService;
 use common\service\proxy\ProxyKuaiService;
 use common\service\webot\FriendsService;

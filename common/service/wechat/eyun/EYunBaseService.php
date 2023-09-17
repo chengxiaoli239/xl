@@ -7,6 +7,7 @@ use common\models\eyun\RobotUser;
 use common\models\wechat\WechatUser;
 use common\service\BaseService;
 use common\service\chat\Tool_Common;
+use common\service\jobs\robots\user\AfterWechatLoginJobs;
 use common\service\jobs\robots\user\EYunUserJobs;
 
 class EYunBaseService  extends BaseService
@@ -105,7 +106,7 @@ class EYunBaseService  extends BaseService
     }
 
     /**
-     * 获取二维码(方式一)
+     * 获取二维码(第二部-方式一) - 优先对接
      * @return bool|mixed|null
      */
     public function localIPadLogin(){
@@ -153,12 +154,17 @@ class EYunBaseService  extends BaseService
      * 执行微信登录（第三步）
      * @return bool|mixed|null
      */
-    public function afterClickLogin(){
+    public function getIPadLoginInfo(){
         $url = $this->base_url . '/getIPadLoginInfo';
         $params = [
             'wId' => $this->wId,
         ];
         $response = $this->request($url, $params, $this->headers);
+        if($response['code'] == '1000' && !empty($response['data'])){
+            $data = $response['data'];
+            $data['busness_id'] = $data['wcId'];
+            push_queue_open(AfterWechatLoginJobs::class, $data);
+        }
 
         Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '执行微信登录（第三步）', ['url'=>$url, 'params'=>$params, 'response'=>$response]);
 
@@ -182,7 +188,7 @@ class EYunBaseService  extends BaseService
     }
 
     /**
-     * 初始化通讯录列表（第五步）
+     * 初始化通讯录列表（第五步），此步仅获取微信id，便于下一步获取微信用户信息
      * @return bool|mixed|null
      */
     public function getAddressList(){
@@ -236,17 +242,45 @@ class EYunBaseService  extends BaseService
         return $response;
     }
 
+    public static function getUserIdByFromUserKey($wcId=''){
+        return 'getUserIdByFromUserKey_'.$wcId;
+    }
+
     /**
      * 微信消息用户获取系统用户id
-     * @param string $fromUser
-     * @return int|mixed|null
+     * @param string $fromUser wxid_ckgr7i2q9fr522
+     * @return int
      */
-    public static function getUserIdByFromUser($fromUser=''){
-        $WechatUser = WechatUser::findOne(['userName'=>$fromUser]);
-        if(empty($WechatUser)){
-            return 0;
+    public static function getUserIdByFromUser($fromUser='', $is_auto=1){
+        $m = \Yii::$app->cache;
+        $mkey = self::getUserIdByFromUserKey($fromUser);
+        $data = $m->get($mkey);
+        if(empty($data) OR $is_auto==2){
+            $data = WechatUser::find()->where(['userName'=>$fromUser])->asArray()->limit(1)->one();;
+            $m->set($mkey, $data, 1800);
         }
 
-        return $WechatUser->user_id;
+        return (int)$data['user_id'];
+    }
+
+    public static function getRobotInfoKey($wcId=''){
+        return 'getRobotInfoKey_'.$wcId;
+    }
+
+    /**
+     * 获取机器人信息by wcId robot_user
+     * @param string $wcId 微信原始id （首次登录平台的号传""，掉线后必须传值，否则会频繁掉线！！！） 第三步会返回此字段，记得入库保存
+     * @return array
+     */
+    public static function getRobotByWcId($wcId='', $is_auto=1){
+        $m = \Yii::$app->cache;
+        $mkey = self::getRobotInfoKey($wcId);
+        $data = $m->get($mkey);
+        if(empty($data) OR $is_auto==2){
+            $data = RobotUser::find()->where(['wcId'=>$wcId])->asArray()->limit(1)->one();
+            $m->set($mkey, $data, 1800);
+        }
+
+        return $data;
     }
 }

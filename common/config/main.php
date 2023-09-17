@@ -47,7 +47,7 @@ return [
         'queue_open' => [
             'class' => \yii\queue\redis\Queue::class,
             'redis' => 'redis', // Redis connection component or its config
-            'channel' => 'lottery:queue_open', // Queue channel key
+            'channel' => 'wechat:queue_open', // Queue channel key
             'as log' => \yii\queue\LogBehavior::class,
             'ttr' => 3600,
         ],

@@ -10,6 +10,9 @@ use common\service\jobs\robots\EYunUserJobs;
 
 class EYunMessageOperateService  extends BaseService
 {
+    # 离线通知
+    const MESSAGE_OFFLINE_CODE = '30000';
+
     # 私聊
     const MESSAGE_P_TEXT_CODE = '60001'; # 私聊文本
     const MESSAGE_P_TEXT_CANCEL = '60018'; # 撤回消息
@@ -49,4 +52,15 @@ class EYunMessageOperateService  extends BaseService
         parent::__construct($config);
     }
 
+    public function wechatStatus(){
+
+    }
+
+    public static function receive($data){
+
+    }
+
+    public function send(){
+
+    }
 }
