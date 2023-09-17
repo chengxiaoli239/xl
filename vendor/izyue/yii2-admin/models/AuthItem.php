@@ -116,7 +116,7 @@ class AuthItem extends \yii\base\Model
      * @param string $id
      * @return null|\self
      */
-    public static function find($id)
+    public static function find($id='')
     {
         $item = Yii::$app->authManager->getRole($id);
         if ($item !== null) {
