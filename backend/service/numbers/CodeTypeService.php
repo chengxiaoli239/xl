@@ -54,6 +54,7 @@ class CodeTypeService extends BaseService {
     const KX_KW_2_FIXED_GET = '定位置“取”';
     const KX_KW_2_FIXED_FILTER = '定位置“除”';
     const KX_KW_2_EXCLUDE_CODE = '排除数';
+    const KX_KW_2_ARISE_CODE = '全转数';
     const KX_KW_2_FIXED_POS_1 = '千=';
     const KX_KW_2_FIXED_POS_2 = '百=';
     const KX_KW_2_FIXED_POS_3 = '十=';
@@ -111,6 +112,7 @@ class CodeTypeService extends BaseService {
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_FILTER => ['fixed_pos_sel'=>1 ],  #  '定位取
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_GET => [ 'fixed_pos_sel'=>2 ],  #  '定位置“取”',
         \backend\service\numbers\CodeTypeService::KX_KW_2_EXCLUDE_CODE => [ ],  #  排除数
+        \backend\service\numbers\CodeTypeService::KX_KW_2_ARISE_CODE => [ ],  #  全转数
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_POS_1 => [ ],  #  '千=',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_POS_2 => [ ],  #  '百=',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_POS_3 => [ ],  #  '十=',
@@ -267,6 +269,17 @@ class CodeTypeService extends BaseService {
 
         $matcheCondition = ['arise_in'=>trim($operateStr)];
 
+        return $matcheCondition;
+    }
+
+    /**
+     * 全转数
+     * @param string $operateStr
+     * @return array
+     */
+    public static function oprateAriseCondition($operateStr=''){
+
+        $matcheCondition = ['arise'=>trim($operateStr)];
 
         return $matcheCondition;
     }

@@ -362,6 +362,11 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $logData_str = '{"log_member_quick_select_id":"215386","member_id":"114","account":"aa123123A","nickname":"","fix_num":"40","bet_count":"24","bet_money":"48","operation_content":"[四定位]，全转数：[2378]","operation_datetime":"09-17 11:36:42","time_value":"2023/9/17 11:36:42","operation_ip":"112.67.*.*","ip_value":"112.67.80.156","operation_ip_extension":"112.67.80.156","is_package":"0","log_type":"102"}';
+        $logData = Json::decode($logData_str, true);
+        p(['logData'=>$logData], 0);
+        list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token='00e9146df95b0dfb1b9557790acbbfc8');
+        p($logData);
         $plan = UserSysPlans::findOne(7454);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%eyun_auth}}'); p($r);
@@ -378,12 +383,7 @@ class IndexController extends Controller
         ];
         $rst = TzSystemUsersService::getActivePlanTasks($post['access_token'], $post['current_qihao'], $post['lottery_type']);
         p($rst);
-        $logData_str = '{"log_member_quick_select_id":"111529315","member_id":"62926","account":"aa167945","nickname":"ghh","fix_num":"40","bet_count":"625","bet_money":"187.5","operation_content":"[四定位]，复式“[取]”数：[13597]","operation_datetime":"07-25 17:38:54","time_value":"2023/7/25 17:38:54","operation_ip":"36.1.*.*","ip_value":"36.1.141.73","operation_ip_extension":"36.1.141.73","is_package":"0","log_type":"102"}';
-        $logData = Json::decode($logData_str, true);
-        p(['logData'=>$logData], 0);
         $access_token = '4b843e29ac8dd191e894c7dcea547815';
-        list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token);
-        p($logData);
         $post = [
             'access_token' => '4b843e29ac8dd191e894c7dcea547815',
             'from_type' => 'kuaixuan',

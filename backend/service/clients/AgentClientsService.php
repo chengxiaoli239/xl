@@ -444,6 +444,9 @@ class AgentClientsService extends ClientsBaseService{
                             //p(['codes_hz'=>$codes_hz, $keyword2Condition, 'before'], 0);
                             $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateExcludeCodesCondition($operateStr));
                             break;
+                        case CodeTypeService::KX_KW_2_ARISE_CODE: #  # 全转数
+                            $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateAriseCondition($operateStr));
+                            break;
                     }
 
                     //p(['codes_hz'=>$codes_hz, $keyword2Condition, 'after'], 0);
