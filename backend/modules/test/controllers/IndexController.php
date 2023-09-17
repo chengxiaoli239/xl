@@ -349,9 +349,9 @@ class IndexController extends Controller
         $user_id = 20;
         $e = new EYunBaseService($user_id);
         #$loginRst = $e->memberLogin();
-        #$rst = $e->localIPadLogin($user_id); # 第二步
-        #$rst = $e->afterClickLogin($user_id); # 第三步
-        #$rst = $e->initAddressList($user_id); # 第四步
+        #$rst = $e->localIPadLogin(); p($rst);# 第二步
+        $rst = $e->getIPadLoginInfo();p($rst); # 第三步
+        #$rst = $e->initAddressList(); # 第四步
         $rst = $e->getAddressList(); # 第四步
         p($rst);
 

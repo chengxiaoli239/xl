@@ -18,7 +18,6 @@ trait EventServiceTrait
         $user_id = $dd['user_id'];
         $messageType = $dd['messageType'];
 
-
         $wcId = $data['wcId'];
 
         $data['business_id'] = $wcId;

@@ -14,9 +14,8 @@ class IndexController extends Controller
         $data = \Yii::$app->request->getRawBody();
         $data = Json::decode($data, 320);
         $result = EventServiceTrait::eventHandler($data);
-        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', 'e云消息通知', ['data'=>$data, 'result'=>$result]);
+        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', 'e浜戞秷鎭�氱煡', ['data'=>$data, 'result'=>$result]);
 
         return $result;
     }
-
 }

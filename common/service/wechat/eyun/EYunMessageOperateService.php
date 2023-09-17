@@ -8,7 +8,7 @@ use common\service\BaseService;
 use common\service\chat\Tool_Common;
 use common\service\jobs\robots\EYunUserJobs;
 
-class EYunMessageOperateService  extends BaseService
+class EYunMessageOperateService  extends EYunBaseService
 {
     # 离线通知
     const MESSAGE_OFFLINE_CODE = '30000';
