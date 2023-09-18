@@ -13,12 +13,11 @@ trait EventServiceTrait
 {
     public static function eventHandler($data)
     {
+        $messageType = $data['messageType'];
+        $wcId = $data['wcId'];
         Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '接收e云消息', ['messageType'=>$messageType, 'data'=>$data]);
         list($code, $dd, $msg) = self::saveMessage($data);
         $user_id = $dd['user_id'];
-        $messageType = $dd['messageType'];
-
-        $wcId = $data['wcId'];
 
         $data['user_id'] = $user_id;
         $data['business_id'] = $wcId;
