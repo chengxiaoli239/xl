@@ -13,7 +13,7 @@ trait EventServiceTrait
 {
     public static function eventHandler($data)
     {
-        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '接收e云消息', ['data'=>$data]);
+        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '接收e云消息', ['messageType'=>$messageType, 'data'=>$data]);
         list($code, $dd, $msg) = self::saveMessage($data);
         $user_id = $dd['user_id'];
         $messageType = $dd['messageType'];
@@ -84,6 +84,7 @@ trait EventServiceTrait
         $dd = [
             'params' => $params,
             'user_id' => $user_id,
+            'messageType' => $messageType,
         ];
 
         return [0, $dd, '记录成功'];

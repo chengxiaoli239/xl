@@ -356,7 +356,7 @@ class IndexController extends Controller
         #$rst = $e->getAddressList(); p($rst); # 第四步
 
         $e = new EYunMessageOperateService($user_id);
-        $rst = $e->send($wcId='wxid_875i1kgd38x122', $content='晚上好，早点睡，明天再聊'); p($rst); # 第四步 wangyegao2012
+        $rst = $e->send($wcId='wxid_875i1kgd38x122', $content='甜甜准备洗洗睡'); p($rst); # 第四步 wangyegao2012
         $rst = $e->send($wcId='wxid_875i1kgd38x122', $content='晚上好，早点睡，明天再聊'); p($rst); # 第四步 wangyegao2012
 
         $e = new MessageSetService($user_id);
