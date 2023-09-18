@@ -1,65 +1,65 @@
 CREATE TABLE `lt_eyun_auth` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `status` smallint(6) NOT NULL DEFAULT '1' COMMENT '×´Ì¬',
-  `authorization` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'eyunÊÚÈ¨key',
-  `desc` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '±¸×¢ĞÅÏ¢',
+  `status` smallint(6) NOT NULL DEFAULT '1' COMMENT 'çŠ¶æ€',
+  `authorization` text COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'eyunæˆæƒkey',
+  `desc` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'å¤‡æ³¨ä¿¡æ¯',
   `created_at` int(11) NOT NULL,
   `updated_at` int(11) NOT NULL,
-  `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='eÔÆÊÚÈ¨ĞÅÏ¢±í';
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='eäº‘æˆæƒä¿¡æ¯è¡¨';
 
 CREATE TABLE `lt_robot_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(4) DEFAULT NULL COMMENT '¹ÜÀíÔ±user.id',
-  `wcId` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Î¢ĞÅÔ­Ê¼id£¬ÓÀ¾Ã²»±ä£¬Î¢ĞÅÔ­Ê¼id £¨Ê×´ÎµÇÂ¼Æ½Ì¨µÄºÅ´«""£¬µôÏßºó±ØĞë´«Öµ£¬·ñÔò»áÆµ·±µôÏß£¡£¡£¡£© µÚÈı²½»á·µ»Ø´Ë×Ö¶Î£¬¼ÇµÃÈë¿â±£´æ',
-  `wId` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'µÇÂ¼ÊµÀı±êÊ¶ £¨±¾Öµ·Ç¹Ì¶¨µÄ£¬Ã¿´ÎÖØĞÂµÇÂ¼»á·µ»ØĞÂµÄ£¬Êı¾İ¿â¼ÇµÃÊµÊ±¸üĞÂwid£©',
+  `user_id` int(4) DEFAULT NULL COMMENT 'ç®¡ç†å‘˜user.id',
+  `wcId` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'å¾®ä¿¡åŸå§‹idï¼Œæ°¸ä¹…ä¸å˜ï¼Œå¾®ä¿¡åŸå§‹id ï¼ˆé¦–æ¬¡ç™»å½•å¹³å°çš„å·ä¼ ""ï¼Œæ‰çº¿åå¿…é¡»ä¼ å€¼ï¼Œå¦åˆ™ä¼šé¢‘ç¹æ‰çº¿ï¼ï¼ï¼ï¼‰ ç¬¬ä¸‰æ­¥ä¼šè¿”å›æ­¤å­—æ®µï¼Œè®°å¾—å…¥åº“ä¿å­˜',
+  `wId` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'ç™»å½•å®ä¾‹æ ‡è¯† ï¼ˆæœ¬å€¼éå›ºå®šçš„ï¼Œæ¯æ¬¡é‡æ–°ç™»å½•ä¼šè¿”å›æ–°çš„ï¼Œæ•°æ®åº“è®°å¾—å®æ—¶æ›´æ–°widï¼‰',
   `uuid` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'uuid',
-  `status` smallint(6) NOT NULL DEFAULT '1' COMMENT '×´Ì¬',
-  `desc` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '±¸×¢ĞÅÏ¢',
-  `expire_time` int(11) DEFAULT NULL COMMENT 'µ½ÆÚÊ±¼ä',
+  `status` smallint(6) NOT NULL DEFAULT '1' COMMENT 'çŠ¶æ€',
+  `desc` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'å¤‡æ³¨ä¿¡æ¯',
+  `expire_time` int(11) DEFAULT NULL COMMENT 'åˆ°æœŸæ—¶é—´',
   `created_at` int(11) NOT NULL,
   `updated_at` int(11) NOT NULL,
-  `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`) USING BTREE COMMENT 'user.id'
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='»úÆ÷ÈËÓÃ»§±í';
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='æœºå™¨äººç”¨æˆ·è¡¨';
 
 CREATE TABLE `lt_wechat_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(4) DEFAULT NULL COMMENT 'user.id,ÏµÍ³ÓÃ»§id',
-  `userName` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Î¢ĞÅid£¬Î¨Ò»',
-  `nickName` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'êÇ³Æ',
-  `aliasName` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT 'Î¢ĞÅºÅ',
-  `status` smallint(6) NOT NULL DEFAULT '1' COMMENT '×´Ì¬-1½ûÓÃ1ÆôÓÃ',
-  `balance` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Óà¶î',
-  `is_credit` smallint(6) NOT NULL DEFAULT '1' COMMENT 'ÊÇ·ñĞÅÓÃÓÃ»§0·ñ1ÊÇ',
-  `bigHead` varchar(640) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '´óÍ·Ïñ',
-  `smallHead` varchar(640) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Ğ¡Í·Ïñ',
-  `labelList` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '±êÇ©ÁĞ±í',
-  `remark` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '±¸×¢ĞÅÏ¢',
-  `expire_time` int(11) DEFAULT NULL COMMENT 'µ½ÆÚÊ±¼ä',
+  `user_id` int(4) DEFAULT NULL COMMENT 'user.id,ç³»ç»Ÿç”¨æˆ·id',
+  `userName` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'å¾®ä¿¡idï¼Œå”¯ä¸€',
+  `nickName` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'æ˜µç§°',
+  `aliasName` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT 'å¾®ä¿¡å·',
+  `status` smallint(6) NOT NULL DEFAULT '1' COMMENT 'çŠ¶æ€-1ç¦ç”¨1å¯ç”¨',
+  `balance` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'ä½™é¢',
+  `is_credit` smallint(6) NOT NULL DEFAULT '1' COMMENT 'æ˜¯å¦ä¿¡ç”¨ç”¨æˆ·0å¦1æ˜¯',
+  `bigHead` varchar(640) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'å¤§å¤´åƒ',
+  `smallHead` varchar(640) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'å°å¤´åƒ',
+  `labelList` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'æ ‡ç­¾åˆ—è¡¨',
+  `remark` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'å¤‡æ³¨ä¿¡æ¯',
+  `expire_time` int(11) DEFAULT NULL COMMENT 'åˆ°æœŸæ—¶é—´',
   `created_at` int(11) NOT NULL,
   `updated_at` int(11) NOT NULL,
-  `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`) USING BTREE COMMENT 'user.id',
   UNIQUE KEY `userName` (`userName`) USING BTREE COMMENT 'userName'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='»úÆ÷ÈËºÃÓÑ';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='æœºå™¨äººå¥½å‹';
 
 CREATE TABLE `lt_eyun_message` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(4) DEFAULT NULL COMMENT 'user.id,ÏµÍ³ÓÃ»§id',
-  `toUser` varchar(64) NOT NULL DEFAULT '' COMMENT '½ÓÊÕÎ¢ĞÅid',
-  `msgId` varchar(64) NOT NULL DEFAULT '' COMMENT 'ÏûÏ¢msgId',
-  `newMsgId` varchar(64) NOT NULL DEFAULT '' COMMENT 'ÏûÏ¢newMsgId',
-  `status` smallint(6) NOT NULL DEFAULT '0' COMMENT '×´Ì¬0´ı´¦Àí´¦ÀíÖĞ2´¦Àí³É¹¦3´¦ÀíÊ§°Ü',
-  `data` text not null  COMMENT 'ÏûÏ¢ÄÚÈİ',
-  `remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '±¸×¢ĞÅÏ¢',
+  `user_id` int(4) DEFAULT NULL COMMENT 'user.id,ç³»ç»Ÿç”¨æˆ·id',
+  `toUser` varchar(64) NOT NULL DEFAULT '' COMMENT 'æ¥æ”¶å¾®ä¿¡id',
+  `msgId` varchar(64) NOT NULL DEFAULT '' COMMENT 'æ¶ˆæ¯msgId',
+  `newMsgId` varchar(64) NOT NULL DEFAULT '' COMMENT 'æ¶ˆæ¯newMsgId',
+  `status` smallint(6) NOT NULL DEFAULT '0' COMMENT 'çŠ¶æ€0å¾…å¤„ç†å¤„ç†ä¸­2å¤„ç†æˆåŠŸ3å¤„ç†å¤±è´¥',
+  `data` text not null  COMMENT 'æ¶ˆæ¯å†…å®¹',
+  `remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'å¤‡æ³¨ä¿¡æ¯',
   `created_at` int(11) NOT NULL,
   `updated_at` int(11) NOT NULL,
-  `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '¸üĞÂÊ±¼ä',
+  `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'æ›´æ–°æ—¶é—´',
   PRIMARY KEY (`id`),
   UNIQUE KEY `msgId` (`toUser`,`newMsgId`, `msgId`),
   KEY `user_id` (`user_id`) USING BTREE COMMENT 'user.id'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='eÔÆÏûÏ¢±í';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='eäº‘æ¶ˆæ¯è¡¨';
