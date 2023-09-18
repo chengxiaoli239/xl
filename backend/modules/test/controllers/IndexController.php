@@ -357,6 +357,7 @@ class IndexController extends Controller
 
         $e = new EYunMessageOperateService($user_id);
         $rst = $e->send($wcId='wxid_875i1kgd38x122', $content='晚上好，早点睡，明天再聊'); p($rst); # 第四步 wangyegao2012
+        $rst = $e->send($wcId='wxid_875i1kgd38x122', $content='晚上好，早点睡，明天再聊'); p($rst); # 第四步 wangyegao2012
 
         $e = new MessageSetService($user_id);
         $rst = $e->setHttpCallbackUrl();
@@ -365,15 +366,17 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(7475);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p(count($filter_dynamic_codes));
+        $str = 'fTtrNuJ2---sSYXaQFRUjChzqbBn7Od4SRDBvZp7hL4';
+        p(base64_decode($str));
         $logData_str = '{"log_member_quick_select_id":"215386","member_id":"114","account":"aa123123A","nickname":"","fix_num":"40","bet_count":"24","bet_money":"48","operation_content":"[四定位]，全转数：[2378]","operation_datetime":"09-17 11:36:42","time_value":"2023/9/17 11:36:42","operation_ip":"112.67.*.*","ip_value":"112.67.80.156","operation_ip_extension":"112.67.80.156","is_package":"0","log_type":"102"}';
         $logData = Json::decode($logData_str, true);
         p(['logData'=>$logData], 0);
         list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token='00e9146df95b0dfb1b9557790acbbfc8');
         p($logData);
-        $plan = UserSysPlans::findOne(7454);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%eyun_auth}}'); p($r);
-        p(count($filter_dynamic_codes));
         $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
         p($data);
         $data = Lucky5::getLotteryLucky($type = 'json', $test = 2);

@@ -5057,17 +5057,17 @@ class NumService extends BaseService {
             ->andWhere($andWhere)
             ->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
-        #$sql = $query->createCommand()->getRawSql();p($sql, 0);
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重', ['pos'=>$pos, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+        $sql = $query->createCommand()->getRawSql();//p($sql, 0);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重', ['pos'=>$pos, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'plan_id'=>$plan->id, 'latelyCode'=>$latelyCode, 'filterCodes'=>$filterCodes, 'sql'=>$sql]);
         $filterCodes = ArrayHelper::getColumn($NumTypes, 'code');
         #p(count($filterCodes));
 
         $query = Num4Type::find()->select(['code'])
             ->where(['=', 'code_type', $playway+1])
             ->andWhere(['NOT IN', 'code', $filterCodes]);
-        #$sql = $query->createCommand()->getRawSql();p($sql);
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重2', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'sql'=>$sql]);
+        $sql = $query->createCommand()->getRawSql();//p($sql);
         $NumTypes = $query->asArray()->all();
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重2', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'sql'=>$sql, 'count'=>count($NumTypes)]);
         #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
