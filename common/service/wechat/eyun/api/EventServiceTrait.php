@@ -2,6 +2,7 @@
 namespace common\service\wechat\eyun\api;
 
 use common\models\eyun\EYunMessage;
+use common\service\jobs\robots\message\WechatPrivateMsgReceiveJobs;
 use common\service\jobs\robots\user\WechatUserStatusJobs;
 use common\service\wechat\eyun\EYunBaseService;
 use common\service\wechat\eyun\EYunMessageOperateService;
@@ -14,16 +15,16 @@ trait EventServiceTrait
     {
         Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '接收e云消息', ['data'=>$data]);
         list($code, $dd, $msg) = self::saveMessage($data);
-        $params = $dd['params'];
         $user_id = $dd['user_id'];
         $messageType = $dd['messageType'];
 
         $wcId = $data['wcId'];
 
+        $data['user_id'] = $user_id;
         $data['business_id'] = $wcId;
-        $MessageService = new EYunMessageOperateService($user_id);
         switch ($messageType){
             case EYunMessageOperateService::MESSAGE_P_TEXT_CODE: # 私聊
+                push_queue_open(WechatPrivateMsgReceiveJobs::class, $data);
                 break;
             case EYunMessageOperateService::MESSAGE_P_TEXT_CANCEL: # 私聊
                 break;

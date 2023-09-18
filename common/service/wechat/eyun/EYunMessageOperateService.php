@@ -56,7 +56,7 @@ class EYunMessageOperateService  extends EYunBaseService
 
     }
 
-    public static function receive($data){
+    public function receive($data){
 
     }
 
@@ -72,7 +72,7 @@ class EYunMessageOperateService  extends EYunBaseService
         $url = $this->base_url . '/sendText';
         $params = [
             'wId' => $this->wId,
-            'wcId' => $wcId, # 好友微信id/群id,多个好友/群 以","分隔每次最多支持20个微信/群号,记得本接口随机间隔300ms-1500ms，频繁调用容易导致掉线
+            'wcId' => trim($wcId), # 好友微信id/群id,多个好友/群 以","分隔每次最多支持20个微信/群号,记得本接口随机间隔300ms-1500ms，频繁调用容易导致掉线
             'content' => $content,
         ];
         if(!empty($at)){
