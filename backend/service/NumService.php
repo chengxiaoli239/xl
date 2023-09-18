@@ -5067,7 +5067,7 @@ class NumService extends BaseService {
             ->andWhere(['NOT IN', 'code', $filterCodes]);
         $sql = $query->createCommand()->getRawSql();//p($sql);
         $NumTypes = $query->asArray()->all();
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重2', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'sql'=>$sql, 'count'=>count($NumTypes)]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重2', ['plan_id'=>$plan->id, 'current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'sql'=>$sql, 'count'=>count($NumTypes)]);
         #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
