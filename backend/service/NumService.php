@@ -5043,8 +5043,8 @@ class NumService extends BaseService {
         }
 
         $latelyCode = NumService::getPosLatelyCode($pos, $num=9, $lottery_type);
-        $filterCodes = array_diff(\backend\service\NumService::DOUBLE_TYPE_XD, $latelyCode);
-        #p([$latelyCode, $filterCodes], 0);
+        $filterCodes = array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode);
+        #p([\backend\service\NumService::$ALL_CODES, $latelyCode,  $filterCodes]);
         $andWhere = ['AND'];
         $andWhere[] = ['=', $type_field, $type_val];
         if($type_log > 0){
@@ -5093,13 +5093,17 @@ class NumService extends BaseService {
             ->asArray()
             ->column();
         // 对结果进行处理，确保至少包含9个不同的 code1 值
+        //p($excludedIds, 0);
         $selectedCodes = [];
         foreach ($excludedIds as $code) {
+            //p([$code, $selectedCodes, count($selectedCodes)], 0);
             if (!in_array($code, $selectedCodes)) {
-                $selectedCodes[] = $code;
                 if (count($selectedCodes) >= $num) {
-                    break; // 已经选够了9个不同的 code1 值
+                    //break; // 已经选够了9个不同的 code1 值
+                    return $selectedCodes;
                 }
+                $selectedCodes[] = $code;
+                $selectedCodes = array_unique($selectedCodes);
             }
         }
         return $selectedCodes;
