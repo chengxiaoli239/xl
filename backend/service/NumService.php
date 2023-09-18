@@ -5089,7 +5089,7 @@ class NumService extends BaseService {
             ->select([$pos_field])
             ->where(['lottery_type' => $lottery_type])
             ->orderBy(['id' => SORT_DESC])
-            ->limit(30)
+            ->limit(50)
             ->asArray()
             ->column();
         // 对结果进行处理，确保至少包含9个不同的 code1 值
