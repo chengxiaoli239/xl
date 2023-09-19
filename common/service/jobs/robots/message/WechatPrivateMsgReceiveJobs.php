@@ -30,6 +30,8 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             $MessageService->receive($text);
 
             $sendData = [
+                'wcId' => $wcId,
+                'user_id' => $user_id,
                 'fromUser' => $data['fromUser'], # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
                 'queue_delay_time' => self::$waitSeconds,
                 'content' => '这是你发给我的消息：'.$text, # 测试阶段调试信息

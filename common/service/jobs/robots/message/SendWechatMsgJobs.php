@@ -25,7 +25,7 @@ class SendWechatMsgJobs extends CommonJob {
             $data = $params['data'];
             $fromUser = !empty($data['fromGroup']) ? $data['fromGroup'] : $data['fromUser']; # 发送者
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['wcId'=>$wcId, 'params'=>$params]);
-            $user_id = $params['user']; # 用户id
+            $user_id = $params['user_id']; # 用户id
 
             $text = $params['content'];
             $MessageService = new EYunMessageOperateService($user_id);

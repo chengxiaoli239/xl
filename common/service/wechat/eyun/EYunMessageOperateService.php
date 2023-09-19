@@ -23,6 +23,9 @@ class EYunMessageOperateService  extends EYunBaseService
 
     public function __construct($user_id='', $config = [])
     {
+        if(empty($user_id)){
+            throw_info('new消息发送对象user_id为空');
+        }
         $this->user_id = $user_id;
         if(empty($config)){
             $c = \Yii::$app->params['E_YUN'];
