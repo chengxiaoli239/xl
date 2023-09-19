@@ -22,7 +22,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
         try {
             $wcId = $params['wcId']; # 微信原始id
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['wcId'=>$wcId, 'params'=>$params]);
-            $user_id = $params['user']; # 用户id
+            $user_id = $params['user_id']; # 用户id
             $data = $params['data']; # 消息内容体
 
             $text = $data['content'];
@@ -42,6 +42,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             }
             push_queue_open(SendWechatMsgJobs::class, $sendData);
         }catch (\Exception $e){
+            Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', self::$name, ['err_msg'=>$e->getMessage()]);
             return $e->getMessage();
         }
 

@@ -59,8 +59,14 @@ class EYunMessageOperateService  extends EYunBaseService
 
     }
 
-    public function receive($data){
+    /**
+     * 消息处理后的业务处理
+     * @param $data
+     * @return array
+     */
+    public function receive($data=[]){
 
+        return [];
     }
 
     /**
