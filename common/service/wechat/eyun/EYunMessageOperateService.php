@@ -70,6 +70,20 @@ class EYunMessageOperateService  extends EYunBaseService
     }
 
     /**
+     * 发送前校验
+     * @param string $wcId
+     * @param string $content
+     * @param array $atIds
+     */
+    private function validatePreSend($wcId='', $content='', $atIds=[]){
+        if(empty($wcId)){
+            throw_info('发送消息接口wcId微信原始id不能为空');
+        }
+        if(empty($content)){
+            throw_info('发送消息接口content不能为空');
+        }
+    }
+    /**
      * 文本消息发送
      * @param string $wcId 私聊则位用户的微信id，群里则位群里id
      * @param string $content
@@ -78,16 +92,22 @@ class EYunMessageOperateService  extends EYunBaseService
      */
     public function send($wcId='', $content='', $atIds=[]){
 
-        $url = $this->base_url . '/sendText';
-        $params = [
-            'wId' => $this->wId,
-            'wcId' => trim($wcId), # 好友微信id/群id,多个好友/群 以","分隔每次最多支持20个微信/群号,记得本接口随机间隔300ms-1500ms，频繁调用容易导致掉线
-            'content' => $content,
-        ];
-        if(!empty($at)){
-            $params['at'] = implode(',', $atIds);
+        try {
+            $this->validatePreSend($wcId, $content, $atIds);
+            $url = $this->base_url . '/sendText';
+            $params = [
+                'wId' => $this->wId,
+                'wcId' => trim($wcId), # 好友微信id/群id,多个好友/群 以","分隔每次最多支持20个微信/群号,记得本接口随机间隔300ms-1500ms，频繁调用容易导致掉线
+                'content' => $content,
+            ];
+            if(!empty($at)){
+                $params['at'] = implode(',', $atIds);
+            }
+            $response = $this->request($url, $params, $this->headers);
+        }catch (\Exception $e){
+            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '发送文本消息-异常', ['url'=>$url, 'params'=>$params, 'err_msg'=>$e->getMessage()]);
+            return ['code'=>30001, 'message'=>$e->getMessage()];
         }
-        $response = $this->request($url, $params, $this->headers);
 
         Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '发送文本消息', ['url'=>$url, 'params'=>$params, 'response'=>$response]);
 

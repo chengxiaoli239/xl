@@ -22,8 +22,7 @@ class SendWechatMsgJobs extends CommonJob {
     public static function handle($params){
         try {
             $wcId = $params['wcId']; # 微信原始id
-            $data = $params['data'];
-            $fromUser = !empty($data['fromGroup']) ? $data['fromGroup'] : $data['fromUser']; # 发送者
+            $fromUser = !empty($params['fromGroup']) ? $params['fromGroup'] : $params['fromUser']; # 发送者
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['wcId'=>$wcId, 'fromUser'=>$fromUser, 'params'=>$params]);
             $user_id = $params['user_id']; # 用户id
 
@@ -37,7 +36,7 @@ class SendWechatMsgJobs extends CommonJob {
 
         Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['wcId'=>$wcId, 'text'=>$text]);
 
-        return '微信登录状态同步成功:';
+        return '发送微信消息成功';
     }
 
 }
