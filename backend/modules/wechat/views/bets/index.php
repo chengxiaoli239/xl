@@ -66,7 +66,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'lottery_name','label'=>'玩法', //'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                return $model->lottery_name.'['.$model->lottery_type.']';
+                                $playMethod = \common\service\CommonService::getPlayMethods()[$model->play_method];
+                                return $model->lottery_name.'['.$playMethod.']';
                             }
                         ],
                         //'status',

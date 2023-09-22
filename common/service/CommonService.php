@@ -11,8 +11,8 @@ use backend\models\TzTypes;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
 use backend\service\NumService;
-use backend\service\SscDataService;
 use backend\service\StaticService;
+use common\models\thirdD\PlayMethod;
 use common\models\User;
 use common\tools\Tool_Common;
 use backend\service\CurlService;
@@ -1071,6 +1071,26 @@ class  CommonService{
     }
 
     /**
+     * @desc 获取所有玩法名称
+     * @param int $lottery_type
+     * @return array
+     */
+    public static function getPlayMethods(){
+        $m = \Yii::$app->cache;
+        $mkey = 'getPlayMethods_x0';
+        if($data = $m->get($mkey)) return $data;
+        $methods = PlayMethod::find()->asArray()->all();
+
+        $data = [];
+        foreach ($methods as $method){
+            $data[$method['id']] = $method['name'];
+        }
+        $m->set($mkey, $data, \Yii::$app->params['GET_BASE_DATA_CACHE_TIME']);
+
+        return $data;
+    }
+
+    /**
      * @desc 获取彩票名称
      * @param int $lottery_type
      * @return mixed
@@ -1230,7 +1250,7 @@ class  CommonService{
     public static function downLoadVoteImg($uid = 1000, $rnd = '', $acw_tc = ''){
         $url = 'http://vote.chkling.com/api/vote/captcha.png.php?rnd='.$rnd.'&itemid=1466789&authType=1';
         $headers = [
-            
+
         ];
         $imageData = CurlService::httpGet($url, $headers);
         $filename = \Yii::$app->basePath . "/runtime/captcha/".$uid.'_'.$acw_tc.".png";

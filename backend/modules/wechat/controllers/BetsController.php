@@ -37,7 +37,9 @@ class BetsController extends BaseController
     {
         $searchModel = new BetsSearch();
         $queryParams = Yii::$app->request->queryParams;
-        $queryParams['Bets']['user_id'] = $this->_user_id;
+        if($this->_user_id != 1){
+            $queryParams['Bets']['user_id'] = $this->_user_id;
+        }
         $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
