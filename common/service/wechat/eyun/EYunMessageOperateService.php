@@ -4,9 +4,14 @@ namespace common\service\wechat\eyun;
 
 use common\models\eyun\EyunAuth;
 use common\models\eyun\RobotUser;
+use common\models\thirdD\BetOrderId;
+use common\models\thirdD\Bets;
+use common\models\wechat\WechatUser;
 use common\service\BaseService;
 use common\service\chat\Tool_Common;
-use common\service\jobs\robots\EYunUserJobs;
+use common\service\helpers\ThirdD;
+use common\service\thirdD\ThirdDTypeService;
+use yii\helpers\Json;
 
 class EYunMessageOperateService  extends EYunBaseService
 {
@@ -60,13 +65,147 @@ class EYunMessageOperateService  extends EYunBaseService
     }
 
     /**
-     * 消息处理后的业务处理
-     * @param $data
+     * 接受消息校验
+     * @param string $user_id
+     * @param string $text
+     * @throws \common\exceptions\InfoException
+     */
+    public static function validateReceive($user_id='', $text=''){
+        if(empty($text)){
+            throw_info('文字不能为空');
+        }
+        if(empty($user_id)){
+            throw_info('用户id为空');
+        }
+        $RobotUser = RobotUser::findOne(['user_id'=>$user_id]);
+        if(!$RobotUser->status){
+            throw_info('账号状态异常');
+        }
+
+        $data = [
+            'user_id' => $user_id,
+            'text' => trim($text),
+        ];
+
+        return [0, $data, '校验成功:'];
+    }
+
+    /**
+     * 数据文字匹配，及转换
+     * @param string $text
      * @return array
      */
-    public function receive($data=[]){
+    public static function matchData($text=''){
+        try {
+            $dataGroups = [
+                'originText' => $text,
+            ];
 
-        return [];
+            $text = str_replace('，', '', $text); # 中文逗号，
+            $text = str_replace('。', '.', $text); # 中文句号。
+            $text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
+            $dataGroups['stepOneText'] = $text;
+
+            $betGroups = explode('|', $text);
+            $dataGroups['betGroups'] = $betGroups;
+            foreach ($betGroups as $betText){
+                $g = [];
+                list($lottery_type, $lottery_name, $matchTexts) = ThirdDTypeService::getLotteryType($betText);
+                foreach ($matchTexts as $matchText){
+                    $betText = str_replace($matchText, '', $betText);
+                }
+                $g['lottery_type'] = $lottery_type;
+                $g['name'] = $lottery_name;
+
+                $playMethod = ThirdDTypeService::getPlayMethod($betText);
+                $g['playMethod'] = $playMethod;
+                $betText = str_replace($playMethod['name'], '', $betText);
+                #foreach ($playMethods as $playMethod){
+                #    $betText = str_replace($playMethod['name'], '', $betText);
+                #}
+
+                $singleData = ThirdDTypeService::getMoneys($betText);
+                $g['single'] = $singleData['single'];
+                $g['all_moneys'] = $singleData['all_moneys'];
+
+                #$codes = explode(' ', explode('各', $betText)[0]);
+                $g['singleData'] = $singleData;
+                $replaceStrs = [$playMethod['matchName'], $singleData['single_txt']];
+                foreach ($replaceStrs as $replaceStr){
+                    $betText = str_replace($replaceStr, '', $betText);
+                }
+                $g['codesData'] = $betText;
+
+                #p(['g'=>$g, 'betText'=>$betText]);
+            }
+            $dataGroups['betCodeContents'][] = $g;
+        }catch (\Exception $e){
+            return [30001, [], $e->getMessage()];
+        }
+        #p($dataGroups);
+
+        $data = [
+            'dataGroups' => $dataGroups,
+        ];
+        return [0, $data, '处理成功'];
+    }
+
+    /**
+     * 消息处理后的业务处理
+     * @param string $user_id 代理user.id
+     * @param string $text
+     * @param string $fromUser 发送者的微信id
+     * @return array
+     */
+    public function receive($user_id='', $text='', $fromUser=''){
+        try {
+            #p([$user_id, $text]);
+            $transaction = static::getDb()->beginTransaction();
+            # 校验
+            list($code, $vdata, $msg) = self::validateReceive($user_id, $text);
+            $member_id = WechatUser::findOne(['user_id'=>$user_id, 'userName'=>$fromUser])->id;
+
+            $text = $vdata['text'];
+            list($code, $data, $msg) = self::matchData($text);
+            if($code>0){
+                throw_info($msg);
+            }
+            $betOrderId = ThirdDTypeService::getOrderId();
+            if(empty($betOrderId)){
+                throw_info('单号生成失败');
+            }
+            $now_time = time();
+            foreach ($data['dataGroups']['betCodeContents'] as $content){
+                $Bets = new Bets();
+                $setData = [
+                    'user_id' => $user_id,
+                    'wechat_user_id' => $member_id,
+                    'order_id' => $betOrderId,
+                    'play_method' => $content['playMethod']['id'],
+                    'codes' => str_replace(' ', '', $content['codesData']),
+                    'bet_money' => $content['all_moneys'],
+                    'single' => $content['single'],
+                    'lottery_type' => $content['lottery_type'],
+                    'lottery_name' => $content['name'],
+                    'bet_desc' => $text,
+                    'created_at' => $now_time,
+                    'updated_at' => $now_time,
+                ];
+                $Bets->setAttributes($setData, false);
+                if(!$Bets->save()){
+                    throw_info(Json::encode($Bets->getErrors(), 320));
+                }
+            }
+
+            $transaction->commit();
+            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理成功', ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData]);
+        }catch (\Exception $e){
+            $transaction->rollBack();
+            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理异常', ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'err_msg'=>$e->getMessage()]);
+            return [$e->getMessage()];
+        }
+
+        return [0, [], '接收成功'];
     }
 
     /**

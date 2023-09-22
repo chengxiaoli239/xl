@@ -27,7 +27,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
 
             $text = $data['content'];
             $MessageService = new EYunMessageOperateService($user_id);
-            $MessageService->receive($text);
+            $MessageService->receive($user_id, $text, $data['fromUser']);
 
             $sendData = [
                 'wcId' => $wcId,

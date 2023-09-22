@@ -10,11 +10,11 @@ use yii\helpers\Json;
 class BaseService  extends ActiveRecord
 {
 
-    // 正常状态:逻辑删除
-    const DEL_FLAG_N = 0;
+    // 禁用状态
+    const STATUS_DISABLE = 0;
 
-    // 删除状态:逻辑删除
-    const DEL_FLAG_Y = 1;
+    // 激活状态
+    const STATUS_ACTIVE = 1;
 
     public static  $s = [];
     /**

@@ -802,7 +802,7 @@ class UserSysPlansService extends BaseService {
                     ]);
                 }
                 $codesData = $code;
-                $codesData = preg_replace( '#\s+#', ' ', $codesData);
+                $codesData = preg_replace( '#\s+#', ' ', $codesData); # 多个空格替换成单个空格
                 $codesData = str_replace(' ', ',', $codesData);
                 $codesArr = !empty($codesData) ? explode(',', $codesData) : [];
                 $insertCodes = [];

@@ -348,6 +348,10 @@ class IndexController extends Controller
     }
     public function actionDw1(){
         $user_id = 20;
+
+        $MessageService = new EYunMessageOperateService($user_id);
+        $rst = $MessageService->receive($user_id, $text='福直123两元', $fromUser='wxid_875i1kgd38x122'); p($rst);
+        $rst = $MessageService->receive($user_id, $text='福彩，直选123 457各10共20'); p($rst);
         #$e = new EYunBaseService($user_id);
         #$loginRst = $e->memberLogin();
         #$rst = $e->localIPadLogin(); p($rst);# 第二步
@@ -376,7 +380,7 @@ class IndexController extends Controller
         p(['logData'=>$logData], 0);
         list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token='00e9146df95b0dfb1b9557790acbbfc8');
         p($logData);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%eyun_auth}}'); p($r);
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%bets_order_id}}'); p($r);
         $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
         p($data);
         $data = Lucky5::getLotteryLucky($type = 'json', $test = 2);
