@@ -2,6 +2,7 @@
 
 namespace common\service\wechat\eyun;
 
+use backend\service\HN0898Service;
 use common\models\eyun\EyunAuth;
 use common\models\eyun\RobotUser;
 use common\models\thirdD\BetOrderId;
@@ -101,8 +102,10 @@ class EYunMessageOperateService  extends EYunBaseService
                 'originText' => $text,
             ];
 
+            #$text = str_replace(' ', '', $text); # 中文逗号，
             $text = str_replace('，', '', $text); # 中文逗号，
-            $text = str_replace('。', '.', $text); # 中文句号。
+            $text = str_replace('：', '', $text); # 中文冒号，
+            $text = str_replace('。', '', $text); # 中文句号。
             $text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
             $dataGroups['stepOneText'] = $text;
 
@@ -117,33 +120,44 @@ class EYunMessageOperateService  extends EYunBaseService
                 $g['lottery_type'] = $lottery_type;
                 $g['name'] = $lottery_name;
 
-                $playMethod = ThirdDTypeService::getPlayMethod($betText);
+                list($playMethod, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($betText);
+                //p($playMethod);
                 $g['playMethod'] = $playMethod;
+                $g['codes'] = $codes;
                 $betText = str_replace($playMethod['name'], '', $betText);
                 #foreach ($playMethods as $playMethod){
                 #    $betText = str_replace($playMethod['name'], '', $betText);
                 #}
 
-                $singleData = ThirdDTypeService::getMoneys($betText);
+                $singleData = ThirdDTypeService::getMoneys($betText, $playMethod['id'], $playMethod['matchName']);
+                #p(['singleData'=>$singleData, 'codes'=>$codes, 'count'=>$count]);
                 $g['single'] = $singleData['single'];
-                $g['all_moneys'] = $singleData['all_moneys'];
+                $g['all_moneys'] = $singleData['single'] * $count;
 
                 #$codes = explode(' ', explode('各', $betText)[0]);
                 $g['singleData'] = $singleData;
                 $replaceStrs = [$playMethod['matchName'], $singleData['single_txt']];
                 foreach ($replaceStrs as $replaceStr){
+                    if(strpos($replaceStr, '全包')!==false) continue;
                     $betText = str_replace($replaceStr, '', $betText);
+                    $codes = str_replace($replaceStr, '', $codes);
                 }
-                $g['codesData'] = $betText;
+                if(!empty($codes)){
+                    $g['codesData'] = implode(';', $codes);
+                }else{
+                    $g['codesData'] = $betText;
+                }
 
                 #p(['g'=>$g, 'betText'=>$betText]);
             }
             $dataGroups['betCodeContents'][] = $g;
         }catch (\Exception $e){
-            return [30001, [], $e->getMessage()];
+            if($e->getCode() == ThirdDTypeService::CODE_FOR_USER){
+                return [$e->getCode(), [], $e->getMessage()];
+            }
+            return [30001, [], $e->getMessage().'_'.$e->getFile().'_'.$e->getLine()];
         }
-        #p($dataGroups);
-
+        //p($dataGroups);
         $data = [
             'dataGroups' => $dataGroups,
         ];
@@ -167,6 +181,7 @@ class EYunMessageOperateService  extends EYunBaseService
 
             $text = $vdata['text'];
             list($code, $data, $msg) = self::matchData($text);
+            //p($data);
             if($code>0){
                 throw_info($msg);
             }
@@ -174,23 +189,29 @@ class EYunMessageOperateService  extends EYunBaseService
             if(empty($betOrderId)){
                 throw_info('单号生成失败');
             }
+            $betCodeContents = $data['dataGroups']['betCodeContents'];
+            //p($betCodeContents);
+            $lottery_type = $betCodeContents[0]['lottery_type'];
+            $qihao = HN0898Service::getQihao($lottery_type);
             $now_time = time();
-            foreach ($data['dataGroups']['betCodeContents'] as $content){
+            foreach ($betCodeContents as $content){
                 $Bets = new Bets();
                 $setData = [
                     'user_id' => $user_id,
                     'wechat_user_id' => $member_id,
                     'order_id' => $betOrderId,
                     'play_method' => $content['playMethod']['id'],
-                    'codes' => str_replace(' ', '', $content['codesData']),
+                    'codes' => str_replace(' ', ',', $content['codesData']),
                     'bet_money' => $content['all_moneys'],
                     'single' => $content['single'],
-                    'lottery_type' => $content['lottery_type'],
+                    'qihao' => $qihao,
+                    'lottery_type' => $lottery_type,
                     'lottery_name' => $content['name'],
                     'bet_desc' => $text,
                     'created_at' => $now_time,
                     'updated_at' => $now_time,
                 ];
+                #p($setData);
                 $Bets->setAttributes($setData, false);
                 if(!$Bets->save()){
                     throw_info(Json::encode($Bets->getErrors(), 320));
@@ -198,14 +219,17 @@ class EYunMessageOperateService  extends EYunBaseService
             }
 
             $transaction->commit();
-            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理成功', ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData]);
+            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-成功', ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData]);
         }catch (\Exception $e){
             $transaction->rollBack();
-            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理异常', ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'err_msg'=>$e->getMessage()]);
-            return [$e->getMessage()];
+            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-异常', ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'err_msg'=>$e->getMessage()]);
+            if($e->getCode() == ThirdDTypeService::CODE_FOR_USER){
+                return [$e->getCode(), [], $e->getMessage()];
+            }
+            return [30001, [], $e->getMessage()];
         }
 
-        return [0, [], '接收成功'];
+        return [0, ['text'=>$text], '接收成功'];
     }
 
     /**

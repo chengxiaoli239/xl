@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'kj_codes','label'=>'开奖', //'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                return $model->kj_codes ? $model->kj_codes : '待开奖';
+                                return $model->kj_codes ? $model->kj_codes : '<strong><font color="green">待开奖</font></strong>';
                             }
                         ],
                         ['attribute' => 'wechat_user_id','label'=>'微信',//'headerOptions'=>['width'=>'5%'],
@@ -76,7 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'lottery_name',
                         //'lottery_type',
                         //'is_profits_record',
-                        //'bet_desc:ntext',
+                        'bet_desc:ntext',
                         //'created_at',
                         //'updated_at',
                         ['attribute' => 'update_at','label'=>'时间',//'headerOptions'=>['width'=>'5%'],

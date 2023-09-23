@@ -35,7 +35,11 @@ class RobotUserController extends BaseController
     public function actionIndex()
     {
         $searchModel = new RobotUserSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        if($this->_user_id != 1){
+            $queryParams['RobotUser']['user_id'] = $this->_user_id;
+        }
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,

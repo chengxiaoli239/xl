@@ -51,17 +51,17 @@ class RobotUser extends \common\models\base\BaseModel
     {
         return [
             'id' => 'ID',
-            'user_id' => 'User ID',
-            'wcId' => 'Wc ID',
-            'wId' => 'W ID',
+            'user_id' => '用户ID',
+            'wcId' => '微信ID',
+            'wId' => '登录实例ID',
             'uuid' => 'Uuid',
-            'status' => 'Status',
-            'wechat_status' => 'Wechat Status',
-            'desc' => 'Desc',
-            'expire_time' => 'Expire Time',
+            'status' => '状态',
+            'wechat_status' => '微信登录状态',
+            'desc' => '描述',
+            'expire_time' => '过期时间',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
-            'update_at' => 'Update At',
+            'update_at' => '更新时间',
         ];
     }
 }

@@ -1315,6 +1315,15 @@ class HN0898Service extends BaseTZService {
             case 25: # 江苏七位数
                 TzSystemUsersService::getActiveQihao($lottery_type, $next_qihao); # 即将开奖的期号
                 $qihao = $next_qihao;
+                break;
+            case 26: # 福彩3D
+                $num = HN0898Service::getDateNum();
+                $qihao = date('Y').($num-10-1);
+                break;
+            case 27: # 排列三
+                $num = HN0898Service::getDateNum();
+                $qihao = date('Y').($num-10-1);
+                break;
             break;
         }
 
@@ -1693,6 +1702,19 @@ class HN0898Service extends BaseTZService {
         $times = $maxId - $id;
 
         return $times;
+    }
+
+    /**
+     * 获取当前为当年第几天
+     * @return false|float|int
+     */
+    public static function getDateNum(){
+        $now = time(); //获取当前时间戳
+        $start = strtotime(date('Y-01-01',$now).'00:00:08'); //获取当年的第一天的时间戳
+        $diff = $now - $start; //计算时间差
+        $day = ceil($diff / 86400) + 1; //计算相差多少天并加1，即为今年的第几天
+
+        return $day;
     }
 
     /**

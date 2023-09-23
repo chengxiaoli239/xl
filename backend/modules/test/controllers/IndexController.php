@@ -347,10 +347,12 @@ class IndexController extends Controller
         return $results;
     }
     public function actionDw1(){
+        $post = \Yii::$app->request->post();
         $user_id = 20;
 
         $MessageService = new EYunMessageOperateService($user_id);
-        $rst = $MessageService->receive($user_id, $text='福直123两元', $fromUser='wxid_875i1kgd38x122'); p($rst);
+        $rst = $MessageService->receive($user_id, $post['text'], $fromUser='wxid_875i1kgd38x122'); p($rst);
+        $rst = $MessageService->receive($user_id, $text='福：组选122 233各2元共4元', $fromUser='wxid_875i1kgd38x122'); p($rst);
         $rst = $MessageService->receive($user_id, $text='福彩，直选123 457各10共20'); p($rst);
         #$e = new EYunBaseService($user_id);
         #$loginRst = $e->memberLogin();

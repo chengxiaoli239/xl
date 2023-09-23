@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\searchs\wechat\RobotUser */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Robot Users';
+$this->title = '客户列表';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <section class="robot-user-index wrapper site-min-height">
@@ -32,18 +32,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
-                        'id',
-                        'user_id',
+                        #'id',
+                        #'user_id',
                         'wcId',
                         'wId',
                         'uuid',
-                        //'status',
-                        //'wechat_status',
-                        //'desc',
-                        //'expire_time:datetime',
+                        'status',
+                        'wechat_status',
+                        'desc',
+                        'expire_time:datetime',
                         //'created_at',
                         //'updated_at',
-                        //'update_at',
+                        'update_at',
 
                         ['class' => 'yii\grid\ActionColumn'],
                     ],

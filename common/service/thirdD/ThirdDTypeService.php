@@ -11,6 +11,7 @@ use yii\helpers\Json;
 
 class ThirdDTypeService extends BaseService
 {
+    const CODE_FOR_USER = 33333;
     # lottery_type:26 福彩3d、27 排列三
     const LOTTERY_TYPE_FUCAI = 26;
     const LOTTERY_TYPE_PL3 = 27;
@@ -57,31 +58,73 @@ class ThirdDTypeService extends BaseService
      * @param string $text
      * @return array
      */
-    public static function getPlayMethod($text=''){
-        $methods = PlayMethodService::getMethods();
+    public static function getPlayMethodAndCodes($text='', &$codes=[]){
+        #$methods = PlayMethodService::getMethods();
+        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1, $orignMethod);
         $methodArr = [];
         foreach ($methods as $method){
             try {
-                $alias_name = trim($method['alias_name']);
                 $method_name = trim($method['name']);
-                if(!empty($alias_name)){
-                    $methodNames = array_merge([$method_name], explode(',', $alias_name));
-                }else{
-                    $methodNames = [$method_name];
-                }
-                $result = ThirdD::arrayItemInString($text, $methodNames);
-                #print_r('id:'.$method['id']);
-                #print_r($result);
+                $result = ThirdD::arrayItemInString($text, [$method_name]);
                 if($result){
-                    $methodArr = ['id'=>$method['id'], 'name'=>$method['name'], 'matchName'=>end($result)];
+                    $methodArr = ['id'=>$method['id'], 'name'=>$methods[$result[0]]['name'], 'originName'=>$orignMethod[$method['id']]['name']];
+                    if(strpos($text, '码定') === false){ # 非一码、二码定位
+                        $text = str_replace($methodArr['matchName'], $methodArr['name'], $text);
+                    }
+                    #p(['methodArr'=>$methodArr]);
                     break;
                 }
             }catch (\Exception $e){
-                var_dump(Json::encode($method, 320).'=='.$e->getMessage());
+                var_dump($e->getMessage());
             }
         }
+        #p(['methodArr'=>$methodArr]);
+        $matchMethodAndCodeText = explode('各', $text)[0];
+        p([$methodArr, $matchMethodAndCodeText, $text], 0);
+        if($methodArr['originName'] == '直选') {
+            # 直选
+            $methodArr = MethodMatchService::matchZhiXuan($matchMethodAndCodeText, $codes, $count);
+        }else if(in_array($methodArr['originName'], ['组选', '组三', '组六'])) {
+            # 2、3组选
+            $methodArr = MethodMatchService::matchZuXuan($matchMethodAndCodeText, $codes, $count);
+        }else if($methodArr['originName'] == '独胆') {
+            # 4独胆
+            $methodArr = MethodMatchService::matchDuDan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }else if($methodArr['originName'] == '双飞') {
+            # 5独胆
+            $methodArr = MethodMatchService::matchShuangFen($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }else if($methodArr['originName'] == '对子全拖') {
+            # 6对子全拖
+            $methodArr = MethodMatchService::matchDuiZiQuanTuo($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }elseif($methodArr['originName'] == '一码定'){
+            $methodArr = MethodMatchService::matchYiMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }elseif($methodArr['originName'] == '二码定'){
+            $methodArr = MethodMatchService::matchErMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }elseif($methodArr['originName'] == '豹子全包'){
+            $methodArr = MethodMatchService::matchBaoZi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }else if($methodArr['originName'] == '组六四码') {
+            $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='四');
+        }else if($methodArr['originName'] == '组六五码') {
+            $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='五');
+        }else if($methodArr['originName'] == '组六六码') {
+            $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='六');
+        }else if($methodArr['originName'] == '组六七码') {
+            $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='七');
+        }else if($methodArr['originName'] == '组六八码') {
+            $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='八');
+        }else if($methodArr['originName'] == '组六九码') {
+            $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='九');
+        }elseif($methodArr['originName'] == '组六全包'){
+            $methodArr = MethodMatchService::matchZuLiuQuanBao($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
 
-        return $methodArr;
+        }else if($methodArr['originName'] == '组三两码') {
+            $methodArr = MethodMatchService::matchLiangMaZuSan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }else{
+            $codes = explode(' ', trim($matchMethodAndCodeText));
+        }
+        #p(['methodArr'=>$methodArr, 'codes'=>$codes, 'count'=>$count]);
+
+        return [$methodArr, $codes, $count];
     }
 
     /**
@@ -89,7 +132,7 @@ class ThirdDTypeService extends BaseService
      * @param string $text
      * @return array
      */
-    public static function getMoneys($text=''){
+    public static function getMoneys($text='', $method_id=0, $matchName=''){
         header('Content-Type: text/html; charset=UTF-8');
         $single = 0;
 
@@ -103,6 +146,24 @@ class ThirdDTypeService extends BaseService
             $single_txt = $matches[1];
             $single = $matches[1];
         }
+
+        // 使用正则表达式匹配 "倍" 前面的中文一到九
+        if(empty($single) && preg_match('/([\p{Han}一二三四五六七八九十]{1,3})倍/u', $text, $matches)) {
+            $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
+            $t = $matches[1];
+            $s = ThirdD::cnToNums($t); # 中文转数字
+            #p([$s, $method_id, $methods[$method_id]]);
+            $single = $s * (int)$methods[$matchName]['money'];
+        }
+
+        // 使用正则表达式匹配 "倍" 前面的数字
+        if(empty($single) && preg_match('/(\d+)倍/', $text, $matches)) {
+            $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
+            $t = $matches[1];
+            #p([$s, $method_id, $methods[$method_id]]);
+            $single = $t * (int)$methods[$matchName]['money'];
+        }
+
         // 使用正则表达式匹配 "各" 或 "共" 后面的数字
         if (empty($single) && preg_match('/\s*(\d+)\s*元/', $text, $matches)) {
             $single_txt = $matches[1];
@@ -115,24 +176,8 @@ class ThirdDTypeService extends BaseService
             $single = ThirdD::cnToNums($t); # 中文转数字
         }
 
-        // 使用正则表达式匹配 "倍" 前面的数字
-        if(empty($single) && preg_match('/([\p{Han}一二三四五六七八九十]{1,3})倍/u', $text, $matches)) {
-            $t = $matches[1];
-            $single_txt = $matches[1];
-            $single = ThirdD::cnToNums($t); # 中文转数字
-        }else{
-            # 匹配不到倍，则总金额为single*号码组数
-        }
-
-        if (preg_match('/共\s*(\d+)/', $text, $matches)) {
-            $all_moneys = $matches[1];
-        }elseif (!empty($single)){
-            $all_moneys = $single;
-        }
-
         $data = [
             'single'=>$single,
-            'all_moneys'=>$all_moneys,
             'text'=>$text,
             'single_txt'=>$single_txt.'元',
         ];
