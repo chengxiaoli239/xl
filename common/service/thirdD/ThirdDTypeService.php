@@ -88,7 +88,7 @@ class ThirdDTypeService extends BaseService
         p([$methodArr, $matchMethodAndCodeText, $text], 0);
         if($methodArr['originName'] == '直选') {
             $methodArr = MethodMatchService::matchZhiXuan($matchMethodAndCodeText, $codes, $count);
-        }else if(in_array($methodArr['originName'], ['组选', '组三', '组六']) && strpos($methodArr['name'], '拖') === false) { # 2、3组选
+        }else if(in_array($methodArr['originName'], ['组选', '组三', '组六']) && strpos($matchMethodAndCodeText, '拖') === false) { # 2、3组选
             $methodArr = MethodMatchService::matchZuXuan($matchMethodAndCodeText, $codes, $count);
         }else if($methodArr['originName'] == '独胆') { # 4独胆
             $methodArr = MethodMatchService::matchDuDan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
@@ -136,12 +136,30 @@ class ThirdDTypeService extends BaseService
             $methodArr = MethodMatchService::matchZuSanQuanBao($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if(strpos($methodArr['name'], '夸度') !== false OR strpos($methodArr['originName'], '跨度') !== false) { #26-35跨度0
             $methodArr = MethodMatchService::matchKuaDuX($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }else if(strpos($methodArr['name'], '拖') !== false) { #36-51:1码拖.... [组三|组六]
+        }else if(strpos($matchMethodAndCodeText, '拖') !== false) { #36-51:1码拖.... [组三|组六]
             $methodArr = MethodMatchService::matchYiMaTuo($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }else if(strpos($methodArr['originName'], '复式') !== false) { # 51-58:复式三 - 九
+            $methodArr = MethodMatchService::matchFuShi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }else if(
+            (strpos($matchMethodAndCodeText, '和值') !== false OR strpos($matchMethodAndCodeText, '合值') !== false) &&
+            (
+                strpos($matchMethodAndCodeText, '大') === false && strpos($matchMethodAndCodeText, '小') === false &&
+                strpos($matchMethodAndCodeText, '单') === false && strpos($matchMethodAndCodeText, '双') === false
+            )
+        ) { #36-51:1码拖.... [组三|组六]
+            $methodArr = MethodMatchService::matchHeZhi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }else if(
+            (strpos($matchMethodAndCodeText, '和值') !== false OR strpos($matchMethodAndCodeText, '合值') !== false) &&
+            (
+                strpos($matchMethodAndCodeText, '大') !== false OR strpos($matchMethodAndCodeText, '小') !== false OR
+                strpos($matchMethodAndCodeText, '单') !== false OR strpos($matchMethodAndCodeText, '双') !== false
+            )
+        ) { #36-51:1码拖.... [组三|组六]
+            $methodArr = MethodMatchService::matchHeZhiDaXiaoDanShuang($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else{
             $codes = explode(' ', trim($matchMethodAndCodeText));
         }
-        #p(['methodArr'=>$methodArr, 'codes'=>$codes, 'count'=>$count]);
+        //p(['methodArr'=>$methodArr, 'codes'=>$codes, 'count'=>$count]);
 
         return [$methodArr, $codes, $count];
     }
@@ -154,6 +172,7 @@ class ThirdDTypeService extends BaseService
     public static function getMoneys($text='', $method_id=0, $matchName=''){
         header('Content-Type: text/html; charset=UTF-8');
         $single = 0;
+        $text = trim($text);
 
         // 使用正则表达式匹配 "各" 或 "共" 后面的数字
         if (preg_match('/各\s*(\d+)\s*元/', $text, $matches)) {
@@ -161,7 +180,7 @@ class ThirdDTypeService extends BaseService
             $single = $matches[1];
         }
         // 使用正则表达式匹配 "各" 或 "共" 后面的数字
-        if (empty($single) && preg_match('/各\s*(\d+)\s*/', $text, $matches)) {
+        if (empty($single) && preg_match('/各\s*(\d+)\s*(?!(?:倍))/', $text, $matches)) { # 匹配金额切非倍数,因为 各2倍，会误判的为：各2元
             $single_txt = $matches[1];
             $single = $matches[1];
         }
@@ -176,7 +195,7 @@ class ThirdDTypeService extends BaseService
         }
 
         // 使用正则表达式匹配 "倍" 前面的数字
-        if(empty($single) && preg_match('/(\d+)倍/', $text, $matches)) {
+        if(empty($single) && preg_match('/[各]{0,1}(\d+)倍/', $text, $matches)) {
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
             $t = $matches[1];
             #p([$s, $method_id, $matchName, $methods[$method_id]]);

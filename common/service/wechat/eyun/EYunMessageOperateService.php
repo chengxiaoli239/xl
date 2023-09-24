@@ -103,7 +103,7 @@ class EYunMessageOperateService  extends EYunBaseService
             ];
 
             #$text = str_replace(' ', '', $text); # 中文逗号，
-            $text = str_replace('，', '', $text); # 中文逗号，
+            $text = str_replace('，', ',', $text); # 中文逗号，
             $text = str_replace('：', '', $text); # 中文冒号，
             $text = str_replace('。', '', $text); # 中文句号。
             $text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
@@ -147,18 +147,22 @@ class EYunMessageOperateService  extends EYunBaseService
                 #    $betText = str_replace($playMethod['name'], '', $betText);
                 #}
 
-                #p(['singleData'=>$singleData, 'codes'=>$codes, 'count'=>$count]);
+                #p(['singleData'=>$singleData, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count]);
 
                 #$codes = explode(' ', explode('各', $betText)[0]);
                 $g['singleData'] = $singleData;
                 $replaceStrs = [$playMethod['matchName'], $singleData['single_txt']];
                 foreach ($replaceStrs as $replaceStr){
-                    if(strpos($replaceStr, '度')!==false OR strpos($replaceStr, '全包')!==false) continue;
+                    if(strpos($replaceStr, '度')!==false OR strpos($replaceStr, '全包')!==false OR strpos($codes, '和值')!==false) continue;
                     $betText = str_replace($replaceStr, '', $betText);
                     $codes = str_replace($replaceStr, '', $codes);
                 }
-                if(!empty($codes) && is_array($codes)){
+                if(!empty($codes) && is_array($codes)) {
                     $g['codesData'] = implode(';', $codes);
+                }elseif (is_string($codes) && (strpos($codes, '拖')!==false OR strpos($codes, '和值')!==false)){
+                    $g['codesData'] = trim($codes);
+                }elseif (is_string($codes) && strpos($playMethod['name'], '复') !== false){
+                    $g['codesData'] = trim($codes);
                 }else{
                     $g['codesData'] = $betText;
                 }
@@ -206,13 +210,14 @@ class EYunMessageOperateService  extends EYunBaseService
                 throw_info('单号生成失败');
             }
             $betCodeContents = $data['dataGroups']['betCodeContents'];
+            #p(['betCodeContents'=>$betCodeContents]);
             if(ThirdD::getMaxDim($betCodeContents[0]['playMethod'])>1){
                 $betCodeContents = $betCodeContents[0]['playMethod'];
             }
-            #p(['betCodeContents'=>$betCodeContents]);
             $lottery_type = $data['lottery_type'];
             $qihao = HN0898Service::getQihao($lottery_type);
             $now_time = time();
+            $allMoneys = 0.00;
             foreach ($betCodeContents as $content){
                 $Bets = new Bets();
                 $setData = [
@@ -235,6 +240,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 if(!$Bets->save()){
                     throw_info(Json::encode($Bets->getErrors(), 320));
                 }
+                $allMoneys += $content['all_moneys']; # 总投
             }
 
             $transaction->commit();
@@ -248,7 +254,7 @@ class EYunMessageOperateService  extends EYunBaseService
             return [30001, [], $e->getMessage()];
         }
 
-        return [0, ['text'=>$text], '接收成功'];
+        return [0, ['text'=>$text, 'allMoneys'=>$allMoneys], '接收成功'];
     }
 
     /**
