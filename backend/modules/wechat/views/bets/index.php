@@ -67,7 +67,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value' => function($model) {
                                 $playMethod = \common\service\CommonService::getPlayMethods()[$model->play_method];
-                                return $model->lottery_name.'['.$playMethod.']';
+                                return \common\service\CommonService::getLotteryName($model->lottery_type).'['.$playMethod.']';
                             }
                         ],
                         //'status',

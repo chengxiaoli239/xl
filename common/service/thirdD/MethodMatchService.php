@@ -262,7 +262,7 @@ class MethodMatchService extends BaseService
         }
         foreach ($codes as $code){
             if(strlen($code) != $num){
-                throw_info($matchName.'号码数量不匹配['.$num.'!='.strlen($code).']');
+                throw_info($matchName.'号码['.$code.']数量不匹配['.$num.'!='.strlen($code).']');
             }
         }
         $name = '组六'.$t.'码';
@@ -298,33 +298,182 @@ class MethodMatchService extends BaseService
         $codes = $numbers;
         $count = count($codes);
 
-
         $methodArr = ['id'=>16, 'name'=>$name, 'matchName'=>$matchName];
 
         return $methodArr;
     }
 
     /**
-     * 17-组三两码
+     * 17-24组三两、三、...九码
      * @param string $text
      * @param array $codes
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function matchLiangMaZuSan($text='', &$codes=[], &$count=0, $matchName=''){
+    public static function matchZuSanXMa($text='', &$codes=[], &$count=0, $matchName='', $t='两'){
+        $num = ThirdDTypeService::SINGLE_ASSCIATE[$t];
         // 使用正则表达式匹配组选后面的三个数字
-        if (preg_match_all('/(\d{2}(?:\s+\d{2})*)/', $text, $matches)) {
+        if (preg_match_all('/(\d{2,}(?:\s+\d{2,})*)/', $text, $matches)) {
             $codes = explode(' ', trim($matches[1][0]));
         } else {
             throw_info('组选未匹配到号码,text:'.$text);
         }
-        if(empty($codes)){
+        if(empty($codes) && $codes !== '0'){
             throw_info('匹配组选号码为空');
         }
         $count = count($codes);
-        $methodArr = ['id'=>17, 'name'=>'组三两码', 'matchName'=>$matchName];
+        foreach ($codes as $code){
+            if(strlen($code) != $num){
+                throw_info($matchName.'号码['.$code.']数量不匹配['.$num.'!='.strlen($code).']');
+            }
+        }
+        #p($codes);
+
+        $name = '组三'.$t.'码';
+        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1, $orignMethod);
+        $id = $methods[$name]['id'];
+        $methodArr = ['id'=>$id, 'name'=>$name, 'matchName'=>$matchName];
 
         return $methodArr;
     }
 
+    /**
+     * 25、组三全包
+     * @param string $text
+     * @param array $codes
+     * @return array
+     */
+    public static function matchZuSanQuanBao($text='', &$codes=[], &$count=0, $matchName=''){
+        // 使用正则表达式匹配所有单个数字
+        if (preg_match_all('/组三全包/u', $text, $matches)) {
+            $numbers = $matches[0];
+            $name = '组三全包';
+        }
+
+        if(empty($numbers) && $numbers !== '0'){
+            throw_info($matchName.'获取号码异常');
+        }
+        $codes = $numbers;
+        $count = count($codes);
+
+        $methodArr = ['id'=>25, 'name'=>$name, 'matchName'=>$matchName];
+
+        return $methodArr;
+    }
+
+    /**
+     * 26-35跨度0-9
+     * @param string $text
+     * @param array $codes
+     * @return array
+     * @throws \common\exceptions\InfoException
+     */
+    public static function matchKuaDuX($text='', &$codes=[], &$count=0, $matchName=''){
+        $text = explode(' ', trim($text))[0];
+        #p([$text, $matchName]);
+        $text = trim(str_replace(' ', '', $text));
+        #$text = str_replace($matchName, $matchName.' ', $text);
+
+        preg_match('/[\p{Han}]{2}/u', $text, $matchesCn);
+        $cnTextMatch = $matchesCn[0];
+        $text = explode(' ', trim($text))[0];
+        if (preg_match_all('/[跨夸]{1}度[零一二三四五六七八九]{1,10}/u', $text, $matches2)) {
+            $codes = str_replace(' ', '', trim($matches2[0][0]));
+            $codes = str_replace('零', '0', $codes);
+            $codes = str_replace('一', '1', $codes);
+            $codes = str_replace('二', '2', $codes);
+            $codes = str_replace('三', '3', $codes);
+            $codes = str_replace('四', '4', $codes);
+            $codes = str_replace('五', '5', $codes);
+            $codes = str_replace('六', '6', $codes);
+            $codes = str_replace('七', '7', $codes);
+            $codes = str_replace('八', '8', $codes);
+            $codes = str_replace('九', '9', $codes);
+
+            $codes = str_replace($cnTextMatch, '', $codes);
+            #p(['cnTextMatch'=>$cnTextMatch, 'matchName'=>$matchName, 'codes'=>$codes, 'text'=>$text, 'matchesCn'=>$matchesCn]);
+        }
+        // 使用正则表达式匹配组选后面的三个数字
+        if ($codes !== '0' && empty($codes) && preg_match_all('/'.$cnTextMatch.'(\d{1,}(?:\s+\d{1,})*)/u', $text, $matches1)) {
+            $codes = str_replace(' ', '', trim($matches1[1][0]));
+        }
+        # codes : [23]
+        if(empty($codes) && $codes !== '0'){
+            throw_info('匹配组选号码为空');
+        }
+        $count = strlen($codes);
+        #p([$codes, $matches1, $matches2]);
+
+        $methodArr = [];
+        for ($i=0; $i<strlen($codes); $i++){
+            $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
+            $name = '跨度'.$codes[$i];
+            $method = $methods[$name];
+            $id = $method['id'];
+            $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
+            $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$cnTextMatch.$changeNameArr[$codes[$i]]];
+            #p(['codes'=>$codes[0][$i], 'methods'=>$methods]);
+        }
+        #p($methodArr);
+
+        return $methodArr;
+    }
+
+    /**
+     * 36-51:1码拖.... [组三|组六]
+     * @param string $text
+     * @param array $codes
+     * @return array
+     * @throws \common\exceptions\InfoException
+     */
+    public static function matchYiMaTuo($text='', &$codes=[], &$count=0, $matchName=''){
+        $text = explode(' ', trim($text))[0];
+        #p([$text, $matchName]);
+        $text = trim(str_replace(' ', '', $text));
+        #$text = str_replace($matchName, $matchName.' ', $text);
+
+        preg_match('/[\p{Han}]{2}/u', $text, $matchesCn);
+        $cnTextMatch = $matchesCn[0];
+        $text = explode(' ', trim($text))[0];
+        if (preg_match_all('/[跨夸]{1}度[零一二三四五六七八九]{1,10}/u', $text, $matches2)) {
+            $codes = str_replace(' ', '', trim($matches2[0][0]));
+            $codes = str_replace('零', '0', $codes);
+            $codes = str_replace('一', '1', $codes);
+            $codes = str_replace('二', '2', $codes);
+            $codes = str_replace('三', '3', $codes);
+            $codes = str_replace('四', '4', $codes);
+            $codes = str_replace('五', '5', $codes);
+            $codes = str_replace('六', '6', $codes);
+            $codes = str_replace('七', '7', $codes);
+            $codes = str_replace('八', '8', $codes);
+            $codes = str_replace('九', '9', $codes);
+
+            $codes = str_replace($cnTextMatch, '', $codes);
+            #p(['cnTextMatch'=>$cnTextMatch, 'matchName'=>$matchName, 'codes'=>$codes, 'text'=>$text, 'matchesCn'=>$matchesCn]);
+        }
+        // 使用正则表达式匹配组选后面的三个数字
+        if ($codes !== '0' && empty($codes) && preg_match_all('/'.$cnTextMatch.'(\d{1,}(?:\s+\d{1,})*)/u', $text, $matches1)) {
+            $codes = str_replace(' ', '', trim($matches1[1][0]));
+        }
+        # codes : [23]
+        if(empty($codes) && $codes !== '0'){
+            throw_info('匹配组选号码为空');
+        }
+        $count = strlen($codes);
+        #p([$codes, $matches1, $matches2]);
+
+        $methodArr = [];
+        for ($i=0; $i<strlen($codes); $i++){
+            $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
+            $name = '跨度'.$codes[$i];
+            $method = $methods[$name];
+            $id = $method['id'];
+            $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
+            $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$cnTextMatch.$changeNameArr[$codes[$i]]];
+            #p(['codes'=>$codes[0][$i], 'methods'=>$methods]);
+        }
+        #p($methodArr);
+
+        return $methodArr;
+    }
 }
