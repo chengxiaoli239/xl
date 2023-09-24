@@ -230,6 +230,11 @@ class NumService extends BaseService {
         119=>'过滤百位最近1个冷码+两单两双+对数 ',
         120=>'过滤十位最近1个冷码+两单两双+对数 ',
         121=>'过滤个位最近1个冷码+两单两双+对数 ',
+
+        122=>'过滤千位最近1个冷码+两大两小+对数 ',
+        123=>'过滤百位最近1个冷码+两大两小+对数 ',
+        124=>'过滤十位最近1个冷码+两大两小+对数 ',
+        125=>'过滤个位最近1个冷码+两大两小+对数 ',
     ];
 
     /**
@@ -3170,6 +3175,18 @@ class NumService extends BaseService {
                     break;
                 case 121: # 过滤个位最近1个冷码+两单两双+对数
                     $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_4ds', $type_val=3, $positions=4, $type_log=1); #
+                    break;
+                case 122: # 过滤千位最近1个冷码+两大两小+对数
+                    $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_dx', $type_val=3, $positions=1, $type_log=1); #
+                    break;
+                case 123: # 过滤百位最近1个冷码+两大两小+对数
+                    $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_dx', $type_val=3, $positions=2, $type_log=1); #
+                    break;
+                case 124: # 过滤十位最近1个冷码+两大两小+对数
+                    $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_dx', $type_val=3, $positions=3, $type_log=1); #
+                    break;
+                case 125: # 过滤个位最近1个冷码+两大两小+对数
+                    $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_dx', $type_val=3, $positions=4, $type_log=1); #
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
