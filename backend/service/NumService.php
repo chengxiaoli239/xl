@@ -231,10 +231,10 @@ class NumService extends BaseService {
         120=>'过滤十位最近1个冷码+两单两双+对数 ',
         121=>'过滤个位最近1个冷码+两单两双+对数 ',
 
-        122=>'过滤千位最近1个冷码+两大两小+对数 ',
-        123=>'过滤百位最近1个冷码+两大两小+对数 ',
-        124=>'过滤十位最近1个冷码+两大两小+对数 ',
-        125=>'过滤个位最近1个冷码+两大两小+对数 ',
+        122=>'过滤千位最近1个冷码+两大两小+双重 ',
+        123=>'过滤百位最近1个冷码+两大两小+双重 ',
+        124=>'过滤十位最近1个冷码+两大两小+双重 ',
+        125=>'过滤个位最近1个冷码+两大两小+双重 ',
     ];
 
     /**
@@ -5041,7 +5041,7 @@ class NumService extends BaseService {
      * @param string $type_field
      * @param int $type_val 当type_field=type_3b则type_val=1表示三兄弟，当type_field=type_4ds则type_val=0非四单四双1四单2四双3两单两双4一单三双5一双三单
      * @param int $positions
-     * @param string $type_log 是否过滤对数 1是0否，空则不过滤
+     * @param string $type  0不过滤1过滤对数2过滤双重，空则不过滤
      * @return array
      */
     private static function getBeforeKjCodesDynamic114(object $plan, string $type_field='type_ds', int $type_val=1, $pos=1, $type_log=0){
@@ -5065,7 +5065,11 @@ class NumService extends BaseService {
         $andWhere = ['AND'];
         $andWhere[] = ['=', $type_field, $type_val];
         if($type_log > 0){
-            $andWhere[] = ['=', 'type_log', $type_log];
+            if($type_log==2){
+                $andWhere[] = ['=', 'type_2', 1];
+            }else{
+                $andWhere[] = ['=', 'type_log', 1];
+            }
         }
 
         $pos_field = 'code_'.$pos;

@@ -428,7 +428,7 @@ class MethodMatchService extends BaseService
      */
     public static function matchYiMaTuo($text='', &$codes=[], &$count=0, $matchName=''){
         $text = explode(' ', trim($text))[0];
-        #p([$text, $matchName]);
+        p([$text, $matchName]);
         $text = trim(str_replace(' ', '', $text));
         #$text = str_replace($matchName, $matchName.' ', $text);
 
