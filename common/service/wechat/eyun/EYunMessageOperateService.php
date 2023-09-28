@@ -151,7 +151,7 @@ class EYunMessageOperateService  extends EYunBaseService
 
                 #$codes = explode(' ', explode('各', $betText)[0]);
                 $g['singleData'] = $singleData;
-                $replaceStrs = [$playMethod['matchName'], $singleData['single_txt']];
+                $replaceStrs = array_filter([$playMethod['matchName'], $singleData['single_txt']]);
                 foreach ($replaceStrs as $replaceStr){
                     if(strpos($replaceStr, '度')!==false OR strpos($replaceStr, '全包')!==false OR strpos($codes, '和值')!==false) continue;
                     $betText = str_replace($replaceStr, '', $betText);
