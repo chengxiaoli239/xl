@@ -1,0 +1,39 @@
+<?php
+namespace common\service\jobs\robots\message;
+
+use common\service\chat\Tool_Common;
+use common\service\jobs\CommonJob;
+use common\service\wechat\eyun\EYunMessageOperateService;
+
+class TextReceiveJobs extends CommonJob {
+    public static $waitSeconds = 5;  # 消息延迟5s发送
+
+    public static function getName($params) {
+        self::$name = '微信私聊消息处理';
+        return self::$name;
+    }
+
+    public function exec($params) {
+        return self::handle($params);
+    }
+
+    public static function handle($params){
+        try {
+            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params]);
+            $user_id = $params['user_id']; # 用户id
+            $text = $params['text']; # 下注文本
+            $fromUser = $params['fromUser']; # 微信用户id
+
+            $MessageService = new EYunMessageOperateService($user_id);
+            $rst = $MessageService->receive($user_id, $text, $fromUser);
+
+            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params, 'betRst'=>$rst]);
+        }catch (\Exception $e){
+            Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', self::$name, ['err_msg'=>$e->getMessage()]);
+            return $e->getMessage();
+        }
+
+        return $rst;
+    }
+
+}

@@ -15,14 +15,14 @@ class MethodMatchService extends BaseService
      * @throws \common\exceptions\InfoException
      */
     public static function matchZhiXuan($text='', &$codes=[], &$count=0){
-        // 使用正则表达式匹配组选后面的三个数字
+        // 使用正则表达式匹配直选后面的三个数字
         if (preg_match_all('/(\d{3}(?:\s+\d{3})*)/', $text, $matches)) {
             $codes = explode(' ', trim($matches[1][0]));
         } else {
             throw_info('组选未匹配到号码,text:'.$text);
         }
         if(empty($codes)){
-            throw_info('匹配组选号码为空');
+            throw_info('匹配直选号码为空');
         }
         $methodArr = ['id'=>1, 'name'=>'直选', 'matchName'=>'组选'];
         $count = count($codes);
@@ -258,7 +258,7 @@ class MethodMatchService extends BaseService
             throw_info('组选未匹配到号码,text:'.$text);
         }
         if(empty($codes)){
-            throw_info('匹配组选号码为空');
+            throw_info('匹配组六x码为空');
         }
         foreach ($codes as $code){
             if(strlen($code) != $num){
@@ -319,7 +319,7 @@ class MethodMatchService extends BaseService
             throw_info('组选未匹配到号码,text:'.$text);
         }
         if(empty($codes) && $codes !== '0'){
-            throw_info('匹配组选号码为空');
+            throw_info('匹配组三x码为空');
         }
         $count = count($codes);
         foreach ($codes as $code){
@@ -399,7 +399,7 @@ class MethodMatchService extends BaseService
         }
         # codes : [23]
         if(empty($codes) && $codes !== '0'){
-            throw_info('匹配组选号码为空');
+            throw_info('匹配跨度号码为空');
         }
         $count = strlen($codes);
         #p([$codes, $matches1, $matches2]);
@@ -457,7 +457,7 @@ class MethodMatchService extends BaseService
         }
         $len = strlen($codes2);
         if(empty($codes2) && $codes2 !== '0'){
-            throw_info('匹配组选号码为空');
+            throw_info('匹配一码拖号码为空');
         }
         $codes = $codes1.'拖'.$codes2.'_'.$subMethod;
         $count = 1;
@@ -490,7 +490,7 @@ class MethodMatchService extends BaseService
         #p([$codes, $matches1]);
 
         if(empty($codes)){
-            throw_info('匹配组选号码为空');
+            throw_info('匹配复式号码为空');
         }
 
         $codesArr = [];
@@ -599,6 +599,168 @@ class MethodMatchService extends BaseService
         $method = $methods[$name];
         $id = $method['id'];
         $methodArr = ['id'=>$id, 'name'=>$name, 'matchName'=>$name];
+
+        return $methodArr;
+    }
+
+    /**
+     *  91 定位直选复式
+     * @param string $text
+     * @param array $codes
+     * @return array
+     * @throws \common\exceptions\InfoException
+     */
+    public static function matchDingWeiZhiXuanFuShi($text='', &$codes=[], &$count=0, $matchName=''){
+        $text = trim(str_replace('各', ' ', $text));
+        $text = str_replace('值选', '直选', $text);
+        $text = str_replace('复试', '复式', $text);
+        $text = trim(str_replace(' ', '', $text));
+        $text = trim( $text, ',');
+        #$text = str_replace($matchName, $matchName.' ', $text);
+        //p([$text, $matchName]);
+
+        // 使用正则表达式匹配组选后面的三个数字
+        if (
+            (strpos($text, '定位') !== false AND strpos($text, '复式') !== false AND strpos($text, '直选') !== false)
+            && preg_match_all('/[百十个]{1}(\d+)/u', $text, $matches1)
+        ) {
+            $m0 = $matches1[0];
+            $m1 = $matches1[1];
+        }
+        //p([$m0, $m1]);
+
+        if(count($m0)!=3 OR count($m1)!=3){
+            throw_info('号码匹配异常[百十个]');
+        }
+        foreach ($m1 as $k=>$code){
+            $flag = \common\service\helpers\ThirdD::judgeCodesRepeat($code, $c1); # 判断号码是否有重复
+            if($flag){
+                throw_info($m0[$k].'号码有重复');
+            }
+        }
+        $codes = implode(',', $m0);
+
+        $count = 1;
+        foreach ($m1 as $mCodes){
+            $count *= strlen($mCodes);
+        }
+
+        $name = '定位直选复式';
+        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
+        $method = $methods[$name];
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'matchName'=>$name];
+        #p([$methodArr, $codes]);
+
+        return $methodArr;
+    }
+
+    /**
+     *  92 定位直选复式
+     * @param string $text
+     * @param array $codes
+     * @return array
+     * @throws \common\exceptions\InfoException
+     */
+    public static function matchQuanDao($text='', &$codes=[], &$count=0, $matchName=''){
+        $text = trim(explode('各', trim($text))[0]);
+        $text = trim( $text, ',');
+
+        $text = str_replace('全倒', '', $text);
+        //p($text);
+        // 使用正则表达式匹配组选后面的三个数字
+        if (preg_match_all('/(\d{3})/u', $text, $matches1) ) {
+            $codesArr = $matches1[0];
+        }
+        $code2s = [];
+        $code3s = [];
+        foreach ($codesArr as $code){
+            if(strlen($code)!=3){
+                throw_info('号码一定要是三位['.$code.']');
+            }
+            $tmpCodes = [];
+            for($i=0; $i<strlen($code); $i++){
+                $tmpCodes[] = $code[$i];
+            }
+            $tmpCodes = array_unique($tmpCodes);
+            if(count($tmpCodes)<3){
+                $code2s[] = implode('', $tmpCodes);
+            }else{
+                $code3s[] = implode('', $tmpCodes);
+            }
+        }
+        $single = 0;
+        if(count($code2s)>0){
+            //$code2s_str = implode(',', $code2s);
+            foreach ($code2s as $code2){
+                $single += 6;
+            }
+        }
+        if(count($code3s)>0){
+            //$code2s_str = implode(',', $code2s);
+            foreach ($code3s as $code3){
+                $single += 12;
+            }
+        }
+
+        $name = '全倒';
+        $count = 1; //count($codesArr);
+        $codes = implode(',', $codesArr);
+        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
+        $method = $methods[$name];
+
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'single'=>$single, 'matchName'=>$name];
+        //p([$methodArr, $codes]);
+
+        return $methodArr;
+    }
+
+    /**
+     *  93 直选复式
+     * @param string $text
+     * @param array $codes
+     * @return array
+     * @throws \common\exceptions\InfoException
+     */
+    public static function matchZhiXuanFuShi($text='', &$codes=[], &$count=0, $matchName=''){
+        $text = trim(str_replace('各', ' ', $text));
+        $text = str_replace('值选', '直选', $text);
+        $text = str_replace('复试', '复式', $text);
+        //$text = trim(str_replace(' ', '', $text));
+        $text = trim( $text, ',');
+        #$text = str_replace($matchName, $matchName.' ', $text);
+        //p([$text, $matchName]);
+
+        $pattern = '/[四五六七八九]码/u';
+        if (preg_match($pattern, $text, $matches)) {
+            $numCn = $matches[0];
+        }
+        $numCnTxt = str_replace('码', '', $numCn);
+        $num = ThirdDTypeService::SINGLE_ASSCIATE[$numCnTxt];
+
+        if (preg_match_all('/(\d{'.$num.',})/', $text, $matches1) ) {
+            $codesArr = $matches1[0];
+        }
+        //p([$matches1, $codesArr, $num]);
+        $all_single = 0;
+        foreach ($codesArr as $codeData){
+            $flag = \common\service\helpers\ThirdD::judgeCodesRepeat($codeData);
+            if($flag){
+                throw_info($codeData.'号码有重复');
+            }
+            $single = 1;
+            for ($i=0; $i<3; $i++){
+                $single *= ($num-$i);
+            }
+            $all_single += $single;
+        }
+        $count = 1;
+
+        $name = '直选复式';
+        $codes = $numCn .':'.implode(',', $codesArr);
+        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
+        $method = $methods[$name];
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'single'=>$all_single, 'matchName'=>$name];
+        //p([$methodArr, $codes]);
 
         return $methodArr;
     }

@@ -24,7 +24,7 @@ class PlayMethodService extends BaseService
             $datasQuery = PlayMethod::find()
                 ->where(['status'=>self::STATUS_ACTIVE])->orderBy(['LENGTH(name)'=>SORT_DESC]);
             if($indexByKey){
-                $datasQuery->indexBy(['id']);
+                $datasQuery->indexBy(['name']);
             }
             $datas = $datasQuery->asArray()->all();
             $m->set($mkey, $datas, 120);
@@ -63,10 +63,11 @@ class PlayMethodService extends BaseService
         $aliaMethods = self::getMethodsAlias();
         foreach ($aliaMethods as $aliaMethod){
             $alias_names = explode(',', $aliaMethod['alias_name']);
+            $aliaMethod['originName'] = $aliaMethod['name'];
             foreach ($alias_names as $alias_name){
                 unset($aliaMethod['alias_name']);
                 $aliaMethod['name'] = $alias_name;
-                $methods[] = $aliaMethod;
+                $methods[$alias_name] = $aliaMethod;
             }
         }
 
@@ -76,6 +77,7 @@ class PlayMethodService extends BaseService
         if($indexByKey) {
             $newMethods = [];
             foreach ($methods as $method){
+                $method['originName'] = $method['originName']??$method['name'];
                 $newMethods[$method['name']] = $method;
             }
             $methods = $newMethods;

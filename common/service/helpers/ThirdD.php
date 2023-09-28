@@ -96,4 +96,27 @@ class ThirdD extends BaseService
             return $max1 + 1;
         }
     }
+
+    /**
+     * @param string $codes
+     * @param array $codesArr
+     * @return bool
+     */
+    public static function judgeCodesRepeat($codes='', &$codesArr=[]){
+        if(empty($codes)){
+            return false;
+        }
+        $len = strlen($codes);
+        $c1 = [];
+        for ($i=0; $i<$len; $i++){
+            $c1[] = $codes[$i];
+        }
+        $codesArr = array_unique($c1);
+        if(count($codesArr) != $len){
+            //throw_info('该位置号码不能重复');
+            return true;
+        }
+
+        return false;
+    }
 }

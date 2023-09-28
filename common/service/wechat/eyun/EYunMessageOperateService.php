@@ -115,19 +115,19 @@ class EYunMessageOperateService  extends EYunBaseService
                 $g = [];
                 list($lottery_type, $lottery_name, $matchTexts) = ThirdDTypeService::getLotteryType($betText);
                 foreach ($matchTexts as $matchText){
-                    $betText = str_replace($matchText, '', $betText);
+                    $betText = trim(str_replace($matchText, '', $betText), ',');
                 }
                 $g['lottery_type'] = $lottery_type;
                 $g['name'] = $lottery_name;
 
                 list($playMethod, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($betText);
-                #p(['playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count]);
+                //p(['playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count]);
                 $g['codes'] = $codes;
                 if(ThirdD::getMaxDim($playMethod)>1){
                     # 跨度情况
                     $playMethodKd = $playMethod[0];
                     $betText = str_replace($playMethodKd['name'], '', $betText);
-                    $singleData = ThirdDTypeService::getMoneys($betText, $playMethodKd['id'], $playMethodKd['matchName']);
+                    $singleData = ThirdDTypeService::getMoneys($betText, $playMethodKd['matchName']);
                     foreach ($playMethod as $k=>$pm){
                         $playMethod[$k]['single'] = $singleData['single'];
                         $playMethod[$k]['all_moneys'] = $singleData['single'];
@@ -138,7 +138,7 @@ class EYunMessageOperateService  extends EYunBaseService
                     $g['all_moneys'] = $singleData['single'];
                 }else{
                     $betText = str_replace($playMethod['name'], '', $betText);
-                    $singleData = ThirdDTypeService::getMoneys($betText, $playMethod['id'], $playMethod['matchName']);
+                    $singleData = ThirdDTypeService::getMoneys($betText, $playMethod['matchName'], $playMethod);
                     $g['single'] = $singleData['single'];
                     $g['all_moneys'] = $singleData['single'] * $count;
                 }
@@ -164,7 +164,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 }elseif (is_string($codes) && strpos($playMethod['name'], '复') !== false){
                     $g['codesData'] = trim($codes);
                 }else{
-                    $g['codesData'] = $betText;
+                    $g['codesData'] = trim(str_replace('各', '', $betText));
                 }
 
                 #p(['g'=>$g, 'betText'=>$betText]);
@@ -201,7 +201,6 @@ class EYunMessageOperateService  extends EYunBaseService
 
             $text = $vdata['text'];
             list($code, $data, $msg) = self::matchData($text);
-            //p($data);
             if($code>0){
                 throw_info($msg);
             }
@@ -210,7 +209,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 throw_info('单号生成失败');
             }
             $betCodeContents = $data['dataGroups']['betCodeContents'];
-            #p(['betCodeContents'=>$betCodeContents]);
+            //p(['betCodeContents'=>$betCodeContents]);
             if(ThirdD::getMaxDim($betCodeContents[0]['playMethod'])>1){
                 $betCodeContents = $betCodeContents[0]['playMethod'];
             }

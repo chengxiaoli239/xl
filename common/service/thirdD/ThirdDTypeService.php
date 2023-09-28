@@ -66,17 +66,24 @@ class ThirdDTypeService extends BaseService
     public static function getPlayMethodAndCodes($text='', &$codes=[]){
         #$methods = PlayMethodService::getMethods();
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1, $orignMethod);
+        //p([$text, $methods]);
         $methodArr = [];
-        foreach ($methods as $method){
+        foreach ($methods as $key=>$method){
             try {
                 $method_name = trim($method['name']);
                 $result = ThirdD::arrayItemInString($text, [$method_name]);
+                #if($result OR ($key==$method_name && $key!=$method['originName'] && empty($method['originName']))){
                 if($result){
-                    $methodArr = ['id'=>$method['id'], 'name'=>$methods[$result[0]]['name'], 'originName'=>$orignMethod[$method['id']]['name']];
+                    //p([$text, $result, $key, $method_name, $method['originName'], $method, $methods]);
+                    $name = (!empty($result) && isset($methods[$result[0]])) ? $methods[$result[0]]['name'] : $key;
+                    $methodArr = ['id'=>$method['id'], 'name'=>$name, 'originName'=>$method['originName']];
                     if(strpos($text, '码定') === false){ # 非一码、二码定位
                         $text = str_replace($methodArr['matchName'], $methodArr['name'], $text);
                     }
                     #p(['methodArr'=>$methodArr]);
+                    if(in_array($methodArr['originName'], ['复式三', '复式四', '复式五', '复式六', '复式七', '复式八', '复式九']) && strpos($text, '直选')!==false){
+                        continue;
+                    }
                     break;
                 }
             }catch (\Exception $e){
@@ -85,7 +92,7 @@ class ThirdDTypeService extends BaseService
         }
         #p(['methodArr'=>$methodArr]);
         $matchMethodAndCodeText = explode('各', $text)[0];
-        p([$methodArr, $matchMethodAndCodeText, $text], 0);
+        #p([$methodArr, $matchMethodAndCodeText, $text], 0);
         if($methodArr['originName'] == '直选') {
             $methodArr = MethodMatchService::matchZhiXuan($matchMethodAndCodeText, $codes, $count);
         }else if(in_array($methodArr['originName'], ['组选', '组三', '组六']) && strpos($matchMethodAndCodeText, '拖') === false) { # 2、3组选
@@ -138,7 +145,7 @@ class ThirdDTypeService extends BaseService
             $methodArr = MethodMatchService::matchKuaDuX($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if(strpos($matchMethodAndCodeText, '拖') !== false) { #36-51:1码拖.... [组三|组六]
             $methodArr = MethodMatchService::matchYiMaTuo($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }else if(strpos($methodArr['originName'], '复式') !== false) { # 51-58:复式三 - 九
+        }else if(in_array($methodArr['originName'], ['复式三', '复式四', '复式五', '复式六', '复式七', '复式八', '复式九']) && strpos($text, '直选')===false) { # 51-58:复式三 - 九
             $methodArr = MethodMatchService::matchFuShi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if(
             (strpos($matchMethodAndCodeText, '和值') !== false OR strpos($matchMethodAndCodeText, '合值') !== false) &&
@@ -156,6 +163,12 @@ class ThirdDTypeService extends BaseService
             )
         ) { #36-51:1码拖.... [组三|组六]
             $methodArr = MethodMatchService::matchHeZhiDaXiaoDanShuang($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }elseif($methodArr['originName'] == '定位直选复式'){ # 91 定位直选复式
+            $methodArr = MethodMatchService::matchDingWeiZhiXuanFuShi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }elseif($methodArr['originName'] == '全倒'){ # 92 定位直选复式
+            $methodArr = MethodMatchService::matchQuanDao($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }elseif($methodArr['originName'] == '直选复式'){ # 93 定位直选复式
+            $methodArr = MethodMatchService::matchZhiXuanFuShi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else{
             $codes = explode(' ', trim($matchMethodAndCodeText));
         }
@@ -169,13 +182,25 @@ class ThirdDTypeService extends BaseService
      * @param string $text
      * @return array
      */
-    public static function getMoneys($text='', $method_id=0, $matchName=''){
+    public static function getMoneys($text='', $matchName='', $playMethod=[]){
         header('Content-Type: text/html; charset=UTF-8');
         $single = 0;
         $text = trim($text);
 
+        // 使用正则表达式匹配 直选复式
+        if ($playMethod['name']=='直选复式' && preg_match('/(\d+(?:\.\d+)?)元/', $text, $matches)) {
+            $single_txt = $matches[1];
+            $single = $playMethod['single']? $playMethod['single']*$matches[1] : $matches[1];
+        }
+
+        // 使用正则表达式匹配 全倒
+        if ($playMethod['name']=='全倒' && preg_match('/(\d+(?:\.\d+)?)元/', $text, $matches)) {
+            $single_txt = $matches[1];
+            $single = $playMethod['single']? $playMethod['single']*$matches[1] : $matches[1];
+        }
+
         // 使用正则表达式匹配 "各" 或 "共" 后面的数字
-        if (preg_match('/各\s*(\d+)\s*元/', $text, $matches)) {
+        if (empty($single) && preg_match('/各\s*(\d+(?:\.\d+)?)\s*元/', $text, $matches)) {
             $single_txt = $matches[1];
             $single = $matches[1];
         }
