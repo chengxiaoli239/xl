@@ -183,7 +183,7 @@ class ThirdDTypeService extends BaseService
      * @return array
      */
     public static function getMoneys($text='', $matchName='', $playMethod=[]){
-        header('Content-Type: text/html; charset=UTF-8');
+        #header('Content-Type: text/html; charset=UTF-8');
         $single = 0;
         $text = trim($text);
 

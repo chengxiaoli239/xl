@@ -67,6 +67,7 @@ use common\models\AdminModel;
 use common\service\ChatService;
 use common\service\CommonService;
 use common\service\index\CrontabIndexService;
+use common\service\jobs\robots\message\TextReceiveJobs;
 use common\service\jobs\robots\user\WechatUserStatusJobs;
 use common\service\proxy\ProxyBaseService;
 use common\service\proxy\ProxyKuaiService;
@@ -357,7 +358,9 @@ class IndexController extends Controller
             $texts = explode('、', $post['texts']);
             $texts = array_filter($texts);
             foreach ($texts as $text){
-                $rst[] = $MessageService->receive($user_id, $text, $fromUser='wxid_875i1kgd38x122');
+                #$rst[] = $MessageService->receive($user_id, $text, $fromUser='wxid_875i1kgd38x122');
+                push_queue_open(TextReceiveJobs::class, ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser]);
+                p('end');
             }
         }else{
             $rst = $MessageService->receive($user_id, $post['text'], $fromUser='wxid_875i1kgd38x122'); p($rst);
