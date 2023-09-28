@@ -154,7 +154,10 @@ class EYunMessageOperateService  extends EYunBaseService
                 $replaceStrs = array_filter([$playMethod['matchName'], $singleData['single_txt']]);
                 Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '调试', ['matchName'=>$playMethod['matchName'], 'single_txt'=>$singleData['single_txt'], 'replaceStrs'=>$replaceStrs, 'codes'=>$codes]);
                 foreach ($replaceStrs as $replaceStr){
-                    if(strpos($replaceStr, '度')!==false OR strpos($replaceStr, '全包')!==false OR strpos($codes, '和值')!==false) continue;
+                    if(strpos($replaceStr, '度')!==false OR
+                        strpos($replaceStr, '全包')!==false OR
+                        (is_string($codes) && strpos($codes, '和值')!==false)
+                    ) continue;
                     $betText = str_replace($replaceStr, '', $betText);
                     $codes = str_replace($replaceStr, '', $codes);
                 }
