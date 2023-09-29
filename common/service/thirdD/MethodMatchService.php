@@ -14,7 +14,7 @@ class MethodMatchService extends BaseService
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function matchZhiXuan($text='', &$codes=[], &$count=0){
+    public static function matchZhiXuan($text='', &$codes=[], &$count=0, $match_name=''){
         // 使用正则表达式匹配直选后面的三个数字
         if (preg_match_all('/(\d{3}(?:\s+\d{3})*)/', $text, $matches)) {
             $codes = explode(' ', trim($matches[1][0]));
@@ -24,8 +24,9 @@ class MethodMatchService extends BaseService
         if(empty($codes)){
             throw_info('匹配直选号码为空');
         }
-        $methodArr = ['id'=>1, 'name'=>'直选', 'count'=>$count, 'matchName'=>'组选'];
         $count = count($codes);
+        $codes = implode(',', $codes);
+        $methodArr = ['id'=>1, 'name'=>'直选', 'codes'=>$codes, 'count'=>$count, 'matchName'=>'组选'];
 
         return $methodArr;
     }
@@ -37,7 +38,7 @@ class MethodMatchService extends BaseService
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function matchZuXuan($text='', &$codes=[], &$count=0){
+    public static function matchZuXuan($text='', &$codes=[], &$count=0, $match_name=''){
         // 使用正则表达式匹配组选后面的三个数字
         if (preg_match_all('/(\d{3}(?:\s+\d{3})*)/', $text, $matches)) {
             $codes = explode(' ', trim($matches[1][0]));
@@ -47,29 +48,48 @@ class MethodMatchService extends BaseService
         if(empty($codes)){
             throw_info('匹配组选号码为空');
         }
-        $method_id = 0;
+        $methodArr = [];
+        $methodArr3 = [];
+        $methodArr6 = [];
         foreach ($codes as $code){
             $code = trim($code);
             if(strlen($code) == 3){
+                if( ($match_name=='组六' && ($code[0]==$code[1] OR $code[1]==$code[2] OR $code[0]==$code[2])) OR
+                    ($match_name=='组三' && ($code[0]!=$code[1] && $code[1]!=$code[2] && $code[0]!=$code[2]))
+                ){
+                    throw_info($match_name.'号码输入异常，请重新确认');
+                }
                 if($code[0]==$code[1] OR $code[1]==$code[2] OR $code[0]==$code[2]){
                     # 组三
-                    $methodArr = ['id'=>2, 'name'=>'组三', 'matchName'=>'组选', 'count'=>$count];
-                    $new_method_id = 2;
+                    $methodArr3[] = ['id'=>2, 'name'=>'组三', 'matchName'=>$match_name, 'code'=>$code, 'count'=>1];
                 }else{
                     # 组六
-                    $methodArr = ['id'=>3, 'name'=>'组六', 'matchName'=>'组选', 'count'=>$count];
-                    $new_method_id = 3;
-                }
-                if($method_id !== 0 && $new_method_id != $method_id){
-                    throw_info('组三、组六须分开输入', self::CODE_FOR_USER);
-                }else{
-                    $method_id = $new_method_id;
+                    $methodArr6[] = ['id'=>3, 'name'=>'组六', 'matchName'=>$match_name, 'code'=>$code, 'count'=>1];
                 }
             }else{
-                throw_info('组选');
+                throw_info($match_name.'每个号码必须是三位数');
             }
         }
-        $count = count($codes);
+        if(!empty($methodArr3)){
+            $count3 = count($methodArr3);
+            $codes3 = '';
+            foreach ($methodArr3 as $m3){
+                $codes3 .= $m3['code'].',';
+            }
+            $codes3 = trim($codes3, ',');
+            $methodArr[] = ['id'=>2, 'name'=>'组三', 'matchName'=>$match_name, 'codes'=>$codes3, 'count'=>$count3];
+        }
+        if(!empty($methodArr6)){
+            $count6 = count($methodArr6);
+            $codes6 = '';
+            foreach ($methodArr6 as $m6){
+                $codes6 .= $m6['code'].',';
+            }
+            $codes6 = trim($codes6, ',');
+            $methodArr[] = ['id'=>3, 'name'=>'组六', 'matchName'=>$match_name, 'codes'=>$codes6, 'count'=>$count6];
+        }
+        $codes = trim($codes3.','.$codes6, ',');
+        $count = (int)$count3 + (int)$count6;
 
         return $methodArr;
     }
@@ -86,15 +106,16 @@ class MethodMatchService extends BaseService
             $numbers = str_replace(' ', '', $matches[1])[0];
         }
 
-        if(empty($numbers)){
-            throw_info('获取号码异常');
+        if(empty($numbers) && $numbers === ''){
+            throw_info('['.$matchName.']获取号码异常');
         }
         $codes = [];
         for ($i=0; $i<strlen($numbers); $i++){
             $codes[] = $numbers[$i];
         }
         $count = count($codes);
-        $methodArr = ['id'=>4, 'name'=>'独胆', 'matchName'=>$matchName, 'count'=>$count];
+        $codes = implode(',', $codes);
+        $methodArr = ['id'=>4, 'name'=>'独胆', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -107,16 +128,19 @@ class MethodMatchService extends BaseService
      */
     public static function matchShuangFen($text='', &$codes=[], &$count=0, $matchName=''){
         // 使用正则表达式匹配所有单个数字
+        $text = str_replace(',', ' ', $text);
         if (preg_match_all('/双飞(\d{2}(?:\s*\d{2})*)/', $text, $matches)) {
             $numbers = $matches[1][0];
         }
+        #p([$text, $matchName, $numbers]);
 
-        if(empty($numbers)){
+        if(empty($numbers) && $numbers === ''){
             throw_info('获取号码异常');
         }
         $codes = explode(' ', $numbers);
         $count = count($codes);
-        $methodArr = ['id'=>5, 'name'=>'双飞', 'matchName'=>$matchName, 'count'=>$count];
+        $codes = implode(',', $codes);
+        $methodArr = ['id'=>5, 'name'=>'双飞', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -133,12 +157,12 @@ class MethodMatchService extends BaseService
             $numbers = $matches[1][0];
         }
 
-        if(empty($numbers)){
+        if(empty($numbers) && $numbers === ''){
             throw_info('获取号码异常');
         }
         $codes = explode(' ', $numbers);
         $count = count($codes);
-        $methodArr = ['id'=>6, 'name'=>'对子全拖', 'matchName'=>$matchName, 'count'=>$count];
+        $methodArr = ['id'=>6, 'name'=>'对子全拖', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -156,7 +180,7 @@ class MethodMatchService extends BaseService
             $numbers = str_replace('位', '', $matches[0]);
         }
 
-        if(empty($numbers)){
+        if(empty($numbers) && $numbers === ''){
             throw_info('一码定位获取号码异常');
         }
 
@@ -175,7 +199,7 @@ class MethodMatchService extends BaseService
             }
             $count += strlen($code);
         }
-        $methodArr = ['id'=>7, 'name'=>'一码定位', 'matchName'=>$matchName, 'count'=>$count];
+        $methodArr = ['id'=>7, 'name'=>'一码定位', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -194,7 +218,7 @@ class MethodMatchService extends BaseService
             $numbers = str_replace('位', '', $matches[0]);
         }
 
-        if(empty($numbers)){
+        if(empty($numbers) && $numbers === ''){
             throw_info($matchName.'获取号码异常');
         }
 
@@ -208,7 +232,7 @@ class MethodMatchService extends BaseService
 
             $count += strlen($matches[1][0]) * strlen($matches[2][0]);
         }
-        $methodArr = ['id'=>8, 'name'=>'二码定位', 'matchName'=>$matchName, 'count'=>$count];
+        $methodArr = ['id'=>8, 'name'=>'二码定位', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -230,13 +254,13 @@ class MethodMatchService extends BaseService
         #}
         #p($codes);
 
-        if(empty($numbers)){
+        if(empty($numbers) && $numbers === ''){
             throw_info($matchName.'获取号码异常');
         }
         $codes = $numbers;
         $count = count($codes);
 
-        $methodArr = ['id'=>9, 'name'=>$name, 'matchName'=>$matchName, 'count'=>$count];
+        $methodArr = ['id'=>9, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -256,7 +280,7 @@ class MethodMatchService extends BaseService
         } else {
             throw_info('组选未匹配到号码,text:'.$text);
         }
-        if(empty($codes)){
+        if(empty($codes) && $codes === ''){
             throw_info('匹配组六x码为空');
         }
         foreach ($codes as $code){
@@ -269,7 +293,7 @@ class MethodMatchService extends BaseService
         $id = $methods[$name]['id'];
 
         $count = count($codes);
-        $methodArr = ['id'=>$id, 'name'=>$name, 'matchName'=>$matchName, 'count'=>$count];
+        $methodArr = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -291,13 +315,13 @@ class MethodMatchService extends BaseService
         #}
         #p($codes);
 
-        if(empty($numbers)){
+        if(empty($numbers) && $numbers === ''){
             throw_info($matchName.'获取号码异常');
         }
         $codes = $numbers;
         $count = count($codes);
 
-        $methodArr = ['id'=>16, 'name'=>$name, 'matchName'=>$matchName, 'count'=>$count];
+        $methodArr = ['id'=>16, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -317,7 +341,7 @@ class MethodMatchService extends BaseService
         } else {
             throw_info('组选未匹配到号码,text:'.$text);
         }
-        if(empty($codes) && $codes !== '0'){
+        if(empty($codes) && $codes === ''){
             throw_info('匹配组三x码为空');
         }
         $count = count($codes);
@@ -331,7 +355,7 @@ class MethodMatchService extends BaseService
         $name = '组三'.$t.'码';
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1, $orignMethod);
         $id = $methods[$name]['id'];
-        $methodArr = ['id'=>$id, 'name'=>$name, 'matchName'=>$matchName, 'count'=>$count];
+        $methodArr = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -349,13 +373,13 @@ class MethodMatchService extends BaseService
             $name = '组三全包';
         }
 
-        if(empty($numbers) && $numbers !== '0'){
+        if(empty($numbers) && $numbers === ''){
             throw_info($matchName.'获取号码异常');
         }
         $codes = $numbers;
         $count = count($codes);
 
-        $methodArr = ['id'=>25, 'name'=>$name, 'matchName'=>$matchName, 'count'=>$count];
+        $methodArr = ['id'=>25, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -397,7 +421,7 @@ class MethodMatchService extends BaseService
             $codes = str_replace(' ', '', trim($matches1[1][0]));
         }
         # codes : [23]
-        if(empty($codes) && $codes !== '0'){
+        if(empty($codes) && $codes === ''){
             throw_info('匹配跨度号码为空');
         }
         $count = strlen($codes);
@@ -410,7 +434,7 @@ class MethodMatchService extends BaseService
             $method = $methods[$name];
             $id = $method['id'];
             $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
-            $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$cnTextMatch.$changeNameArr[$codes[$i]], 'count'=>1];
+            $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$cnTextMatch.$changeNameArr[$codes[$i]], 'count'=>1];
             #p(['codes'=>$codes[0][$i], 'methods'=>$methods]);
         }
         #p($methodArr);
@@ -455,7 +479,7 @@ class MethodMatchService extends BaseService
             $subMethod = '组六';
         }
         $len = strlen($codes2);
-        if(empty($codes2) && $codes2 !== '0'){
+        if(empty($codes2) && $codes2 === ''){
             throw_info('匹配一码拖号码为空');
         }
         $codes = $codes1.'拖'.$codes2.'_'.$subMethod;
@@ -463,7 +487,7 @@ class MethodMatchService extends BaseService
         $name = '1码拖'.$len.$subMethod;
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
         #p([$methodArr, $codes]);
 
         return $methodArr;
@@ -488,7 +512,7 @@ class MethodMatchService extends BaseService
         }
         #p([$codes, $matches1]);
 
-        if(empty($codes)){
+        if(empty($codes) && $codes === ''){
             throw_info('匹配复式号码为空');
         }
 
@@ -511,7 +535,7 @@ class MethodMatchService extends BaseService
         $name = $matches1[1][0];
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
         #p([$methodArr, $codes]);
 
         return $methodArr;
@@ -554,20 +578,20 @@ class MethodMatchService extends BaseService
                 $name = '和值'.$num;
                 $method = $methods[$name];
                 $id = $method['id'];
-                $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
+                $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
             }
         }elseif($num2 !== ''){
             for ($i=$num1; $i<=$num2; $i++){
                 $name = '和值'.$i;
                 $method = $methods[$name];
                 $id = $method['id'];
-                $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
+                $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
             }
         }else{
             $name = '和值'.$num1;
             $method = $methods[$name];
             $id = $method['id'];
-            $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
+            $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
         }
         #p($methodArr);
 
@@ -597,7 +621,7 @@ class MethodMatchService extends BaseService
         $name = $num;
         $method = $methods[$name];
         $id = $method['id'];
-        $methodArr = ['id'=>$id, 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
+        $methodArr = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
 
         return $methodArr;
     }
@@ -647,7 +671,7 @@ class MethodMatchService extends BaseService
         $name = '定位直选复式';
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
         #p([$methodArr, $codes]);
 
         return $methodArr;
@@ -707,7 +731,7 @@ class MethodMatchService extends BaseService
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
 
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'single'=>$single, 'matchName'=>$name, 'count'=>$count];
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'single'=>$single, 'matchName'=>$name, 'count'=>$count];
         //p([$methodArr, $codes]);
 
         return $methodArr;
@@ -759,7 +783,7 @@ class MethodMatchService extends BaseService
         $codes = $numCn .':'.implode(',', $codesArr);
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'single'=>$all_counts, 'matchName'=>$name, 'count'=>$all_counts];
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'single'=>$all_counts, 'matchName'=>$name, 'count'=>$all_counts];
         //p([$methodArr, $codes]);
 
         return $methodArr;

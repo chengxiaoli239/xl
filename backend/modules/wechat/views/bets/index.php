@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'codes','label'=>'号码', //'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                return $model->codes ? $model->codes : '待开奖';
+                                return ($model->codes OR $model->codes===0 OR $model->codes==='0') ? $model->codes : '待开奖';
                             }
                         ],
                         #'single',

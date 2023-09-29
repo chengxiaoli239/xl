@@ -94,9 +94,9 @@ class ThirdDTypeService extends BaseService
         $matchMethodAndCodeText = explode('各', $text)[0];
         #p([$methodArr, $matchMethodAndCodeText, $text], 0);
         if($methodArr['originName'] == '直选') {
-            $methodArr = MethodMatchService::matchZhiXuan($matchMethodAndCodeText, $codes, $count);
+            $methodArr = MethodMatchService::matchZhiXuan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if(in_array($methodArr['originName'], ['组选', '组三', '组六']) && strpos($matchMethodAndCodeText, '拖') === false) { # 2、3组选
-            $methodArr = MethodMatchService::matchZuXuan($matchMethodAndCodeText, $codes, $count);
+            $methodArr = MethodMatchService::matchZuXuan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if($methodArr['originName'] == '独胆') { # 4独胆
             $methodArr = MethodMatchService::matchDuDan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if($methodArr['originName'] == '双飞') { # 5独胆
@@ -191,7 +191,7 @@ class ThirdDTypeService extends BaseService
         if ($playMethod['name']=='直选复式' && preg_match('/(\d+(?:\.\d+)?)元/', $text, $matches)) {
             $single_txt = $matches[1];
             $single = $matches[1];
-            $count = $playMethod['count']? $playMethod['count']*$matches[1] : $matches[1];
+            #$count = $playMethod['count']? $playMethod['count']*$matches[1] : $matches[1];
         }
 
         // 使用正则表达式匹配 全倒
@@ -242,7 +242,6 @@ class ThirdDTypeService extends BaseService
 
         $data = [
             'single'=>$single,
-            'count'=>$count,
             'text'=>$text,
             'single_txt'=>$single_txt.'元',
         ];
