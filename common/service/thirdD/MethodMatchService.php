@@ -740,25 +740,26 @@ class MethodMatchService extends BaseService
             $codesArr = $matches1[0];
         }
         //p([$matches1, $codesArr, $num]);
-        $all_single = 0;
+        $all_counts = 0;
         foreach ($codesArr as $codeData){
             $flag = \common\service\helpers\ThirdD::judgeCodesRepeat($codeData);
             if($flag){
                 throw_info($codeData.'号码有重复');
             }
-            $single = 1;
+            $count = 1;
             for ($i=0; $i<3; $i++){
-                $single *= ($num-$i);
+                $count *= ($num-$i);
             }
-            $all_single += $single;
+            $all_counts += $count;
         }
-        $count = 1;
+        #p([$count, $all_counts]);
+        $count = $all_counts;
 
         $name = '直选复式';
         $codes = $numCn .':'.implode(',', $codesArr);
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'single'=>$all_single, 'matchName'=>$name, 'count'=>$count];
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'single'=>$all_counts, 'matchName'=>$name, 'count'=>$all_counts];
         //p([$methodArr, $codes]);
 
         return $methodArr;

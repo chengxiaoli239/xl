@@ -37,15 +37,27 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->codes ? $model->codes : '待开奖';
                             }
                         ],
+                        #'single',
+                        ['attribute' => 'single','label'=>'倍数[元]',//'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return $model->single;
+                            }
+                        ],
+                        ['attribute' => 'count','label'=>'组数',//'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return $model->count;
+                            }
+                        ],
                         'bet_money',
+                        //'ratio',
                         ['attribute' => 'bonus','label'=>'中奖',//'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 return !empty($model->bonus) && $model->bonus != 0.00 ? $model->bonus : '';
                             }
                         ],
-                        'single',
-                        //'ratio',
                         'profits',
                         'qihao',
                         ['attribute' => 'kj_codes','label'=>'开奖', //'headerOptions'=>['width'=>'5%'],
