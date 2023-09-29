@@ -351,16 +351,17 @@ class IndexController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         $user_id = 20;
+        $rst = \common\service\thirdD\Odds3dService::addUserOdds($user_id);
 
-        set_time_limit(0);
         $MessageService = new EYunMessageOperateService($user_id);
+        set_time_limit(0);
         if(isset($post['texts'])){
+            $fromUser='wxid_875i1kgd38x122';
             $texts = explode('、', $post['texts']);
             $texts = array_filter($texts);
             foreach ($texts as $text){
                 #$rst[] = $MessageService->receive($user_id, $text, $fromUser='wxid_875i1kgd38x122');
                 push_queue_open(TextReceiveJobs::class, ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser]);
-                p('end');
             }
         }else{
             $rst = $MessageService->receive($user_id, $post['text'], $fromUser='wxid_875i1kgd38x122'); p($rst);

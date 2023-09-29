@@ -28,7 +28,7 @@ class Generator extends BaseGenerator
     public $modelClass = 'backend\models\\';
     public $controllerClass = 'backend\modules\forum\controllers\XxxController';
     //public $viewPath = 'D:\htdocs\lottery.sm0898.com\backend\modules\forum\views\\';
-    public $viewPath = '/www/wwwroot/lt.sm0898.com/backend/modules/forum/views/';
+    public $viewPath = '/www/wwwroot/sm0898/backend/modules/forum/views/';
     public $baseControllerClass = 'backend\controllers\BaseController';
     public $indexWidgetType = 'grid';
     public $searchModelClass = 'backend\models\searchs\\';

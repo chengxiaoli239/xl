@@ -190,7 +190,8 @@ class ThirdDTypeService extends BaseService
         // 使用正则表达式匹配 直选复式
         if ($playMethod['name']=='直选复式' && preg_match('/(\d+(?:\.\d+)?)元/', $text, $matches)) {
             $single_txt = $matches[1];
-            $single = $playMethod['single']? $playMethod['single']*$matches[1] : $matches[1];
+            $single = $matches[1];
+            $count = $playMethod['count']? $playMethod['count']*$matches[1] : $matches[1];
         }
 
         // 使用正则表达式匹配 全倒
@@ -241,6 +242,7 @@ class ThirdDTypeService extends BaseService
 
         $data = [
             'single'=>$single,
+            'count'=>$count,
             'text'=>$text,
             'single_txt'=>$single_txt.'元',
         ];

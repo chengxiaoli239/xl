@@ -136,4 +136,5 @@ return [
     'Data Deal Statuses' => '逐期处理日志',
     'Events Live Datas' => '比分数据',
     'Sports Plates Games' => '网盘比赛',
+    'Update Odds' => '更新赔率',
 ];

@@ -24,7 +24,7 @@ class MethodMatchService extends BaseService
         if(empty($codes)){
             throw_info('匹配直选号码为空');
         }
-        $methodArr = ['id'=>1, 'name'=>'直选', 'matchName'=>'组选'];
+        $methodArr = ['id'=>1, 'name'=>'直选', 'count'=>$count, 'matchName'=>'组选'];
         $count = count($codes);
 
         return $methodArr;
@@ -53,11 +53,11 @@ class MethodMatchService extends BaseService
             if(strlen($code) == 3){
                 if($code[0]==$code[1] OR $code[1]==$code[2] OR $code[0]==$code[2]){
                     # 组三
-                    $methodArr = ['id'=>2, 'name'=>'组三', 'matchName'=>'组选'];
+                    $methodArr = ['id'=>2, 'name'=>'组三', 'matchName'=>'组选', 'count'=>$count];
                     $new_method_id = 2;
                 }else{
                     # 组六
-                    $methodArr = ['id'=>3, 'name'=>'组六', 'matchName'=>'组选'];
+                    $methodArr = ['id'=>3, 'name'=>'组六', 'matchName'=>'组选', 'count'=>$count];
                     $new_method_id = 3;
                 }
                 if($method_id !== 0 && $new_method_id != $method_id){
@@ -94,7 +94,7 @@ class MethodMatchService extends BaseService
             $codes[] = $numbers[$i];
         }
         $count = count($codes);
-        $methodArr = ['id'=>4, 'name'=>'独胆', 'matchName'=>$matchName];
+        $methodArr = ['id'=>4, 'name'=>'独胆', 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -116,7 +116,7 @@ class MethodMatchService extends BaseService
         }
         $codes = explode(' ', $numbers);
         $count = count($codes);
-        $methodArr = ['id'=>5, 'name'=>'双飞', 'matchName'=>$matchName];
+        $methodArr = ['id'=>5, 'name'=>'双飞', 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -138,7 +138,7 @@ class MethodMatchService extends BaseService
         }
         $codes = explode(' ', $numbers);
         $count = count($codes);
-        $methodArr = ['id'=>6, 'name'=>'对子全拖', 'matchName'=>$matchName];
+        $methodArr = ['id'=>6, 'name'=>'对子全拖', 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -175,7 +175,7 @@ class MethodMatchService extends BaseService
             }
             $count += strlen($code);
         }
-        $methodArr = ['id'=>7, 'name'=>'一码定位', 'matchName'=>$matchName];
+        $methodArr = ['id'=>7, 'name'=>'一码定位', 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -208,7 +208,7 @@ class MethodMatchService extends BaseService
 
             $count += strlen($matches[1][0]) * strlen($matches[2][0]);
         }
-        $methodArr = ['id'=>8, 'name'=>'二码定位', 'matchName'=>$matchName];
+        $methodArr = ['id'=>8, 'name'=>'二码定位', 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -236,8 +236,7 @@ class MethodMatchService extends BaseService
         $codes = $numbers;
         $count = count($codes);
 
-
-        $methodArr = ['id'=>9, 'name'=>$name, 'matchName'=>$matchName];
+        $methodArr = ['id'=>9, 'name'=>$name, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -270,7 +269,7 @@ class MethodMatchService extends BaseService
         $id = $methods[$name]['id'];
 
         $count = count($codes);
-        $methodArr = ['id'=>$id, 'name'=>$name, 'matchName'=>$matchName];
+        $methodArr = ['id'=>$id, 'name'=>$name, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -298,7 +297,7 @@ class MethodMatchService extends BaseService
         $codes = $numbers;
         $count = count($codes);
 
-        $methodArr = ['id'=>16, 'name'=>$name, 'matchName'=>$matchName];
+        $methodArr = ['id'=>16, 'name'=>$name, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -332,7 +331,7 @@ class MethodMatchService extends BaseService
         $name = '组三'.$t.'码';
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1, $orignMethod);
         $id = $methods[$name]['id'];
-        $methodArr = ['id'=>$id, 'name'=>$name, 'matchName'=>$matchName];
+        $methodArr = ['id'=>$id, 'name'=>$name, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -356,7 +355,7 @@ class MethodMatchService extends BaseService
         $codes = $numbers;
         $count = count($codes);
 
-        $methodArr = ['id'=>25, 'name'=>$name, 'matchName'=>$matchName];
+        $methodArr = ['id'=>25, 'name'=>$name, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -411,7 +410,7 @@ class MethodMatchService extends BaseService
             $method = $methods[$name];
             $id = $method['id'];
             $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
-            $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$cnTextMatch.$changeNameArr[$codes[$i]]];
+            $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$cnTextMatch.$changeNameArr[$codes[$i]], 'count'=>1];
             #p(['codes'=>$codes[0][$i], 'methods'=>$methods]);
         }
         #p($methodArr);
@@ -464,7 +463,7 @@ class MethodMatchService extends BaseService
         $name = '1码拖'.$len.$subMethod;
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'matchName'=>$name];
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
         #p([$methodArr, $codes]);
 
         return $methodArr;
@@ -512,7 +511,7 @@ class MethodMatchService extends BaseService
         $name = $matches1[1][0];
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'matchName'=>$name];
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
         #p([$methodArr, $codes]);
 
         return $methodArr;
@@ -555,20 +554,20 @@ class MethodMatchService extends BaseService
                 $name = '和值'.$num;
                 $method = $methods[$name];
                 $id = $method['id'];
-                $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$name];
+                $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
             }
         }elseif($num2 !== ''){
             for ($i=$num1; $i<=$num2; $i++){
                 $name = '和值'.$i;
                 $method = $methods[$name];
                 $id = $method['id'];
-                $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$name];
+                $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
             }
         }else{
             $name = '和值'.$num1;
             $method = $methods[$name];
             $id = $method['id'];
-            $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$name];
+            $methodArr[] = ['id'=>$id, 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
         }
         #p($methodArr);
 
@@ -598,7 +597,7 @@ class MethodMatchService extends BaseService
         $name = $num;
         $method = $methods[$name];
         $id = $method['id'];
-        $methodArr = ['id'=>$id, 'name'=>$name, 'matchName'=>$name];
+        $methodArr = ['id'=>$id, 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
 
         return $methodArr;
     }
@@ -648,7 +647,7 @@ class MethodMatchService extends BaseService
         $name = '定位直选复式';
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'matchName'=>$name];
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'matchName'=>$name, 'count'=>$count];
         #p([$methodArr, $codes]);
 
         return $methodArr;
@@ -708,7 +707,7 @@ class MethodMatchService extends BaseService
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
 
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'single'=>$single, 'matchName'=>$name];
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'single'=>$single, 'matchName'=>$name, 'count'=>$count];
         //p([$methodArr, $codes]);
 
         return $methodArr;
@@ -759,7 +758,7 @@ class MethodMatchService extends BaseService
         $codes = $numCn .':'.implode(',', $codesArr);
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'single'=>$all_single, 'matchName'=>$name];
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'single'=>$all_single, 'matchName'=>$name, 'count'=>$count];
         //p([$methodArr, $codes]);
 
         return $methodArr;
