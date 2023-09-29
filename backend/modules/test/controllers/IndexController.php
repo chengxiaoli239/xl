@@ -387,6 +387,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%bets}}'); p($r);
         $plan = UserSysPlans::findOne(7474);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         p(count($filter_dynamic_codes));
@@ -397,7 +398,6 @@ class IndexController extends Controller
         p(['logData'=>$logData], 0);
         list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token='00e9146df95b0dfb1b9557790acbbfc8');
         p($logData);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%bets_order_id}}'); p($r);
         $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
         p($data);
         $data = Lucky5::getLotteryLucky($type = 'json', $test = 2);

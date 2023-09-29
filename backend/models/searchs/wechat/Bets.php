@@ -18,7 +18,7 @@ class Bets extends BetsModel
     public function rules()
     {
         return [
-            [['id', 'user_id', 'wechat_user_id', 'order_id', 'play_method', 'status', 'cancel_status', 'is_simulate', 'lottery_type', 'is_profits_record', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'user_id', 'wechat_user_id', 'order_id', 'play_method', 'count', 'status', 'cancel_status', 'is_simulate', 'lottery_type', 'is_profits_record', 'created_at', 'updated_at'], 'integer'],
             [['codes', 'qihao', 'kj_codes', 'lottery_name', 'bet_desc', 'update_at'], 'safe'],
             [['bet_money', 'bonus', 'single', 'ratio', 'profits'], 'number'],
         ];
@@ -69,6 +69,7 @@ class Bets extends BetsModel
             'bet_money' => $this->bet_money,
             'bonus' => $this->bonus,
             'single' => $this->single,
+            'count' => $this->count,
             'ratio' => $this->ratio,
             'profits' => $this->profits,
             'status' => $this->status,
