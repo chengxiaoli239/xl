@@ -152,6 +152,7 @@ class MethodMatchService extends BaseService
      * @return array
      */
     public static function matchDuiZiQuanTuo($text='', &$codes=[], &$count=0, $matchName=''){
+        $text = str_replace(',', ' ', $text);
         // 使用正则表达式匹配所有单个数字
         if (preg_match_all('/对子全拖(\d{2}(?:\s*\d{2})*)/', $text, $matches)) {
             $numbers = $matches[1][0];
@@ -162,6 +163,7 @@ class MethodMatchService extends BaseService
         }
         $codes = explode(' ', $numbers);
         $count = count($codes);
+        $codes = implode(';', $codes);
         $methodArr = ['id'=>6, 'name'=>'对子全拖', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
@@ -199,6 +201,7 @@ class MethodMatchService extends BaseService
             }
             $count += strlen($code);
         }
+        $codes = implode(';', $codes);
         $methodArr = ['id'=>7, 'name'=>'一码定位', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
@@ -225,14 +228,17 @@ class MethodMatchService extends BaseService
         $codes = [];
         $count = 0;
         foreach ($matches[0] as $number){
-            $number = str_replace('百', '百:', $number);
-            $number = str_replace('十', '十:', $number);
-            $number = str_replace('个', '个:', $number);
-            $codes[] = $number;
+            $number = str_replace('位', '', $number);
+            $number = str_replace('百', ',百:', $number);
+            $number = str_replace('十', ',十:', $number);
+            $number = str_replace('个', ',个:', $number);
+            $codes[] = trim($number, ',');
 
             $count += strlen($matches[1][0]) * strlen($matches[2][0]);
         }
+        $codes = implode(';', $codes);
         $methodArr = ['id'=>8, 'name'=>'二码定位', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
+        //p($methodArr);
 
         return $methodArr;
     }
@@ -259,6 +265,7 @@ class MethodMatchService extends BaseService
         }
         $codes = $numbers;
         $count = count($codes);
+        $codes = implode(';', $codes);
 
         $methodArr = ['id'=>9, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
@@ -293,6 +300,7 @@ class MethodMatchService extends BaseService
         $id = $methods[$name]['id'];
 
         $count = count($codes);
+        $codes = implode(';', $codes);
         $methodArr = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
@@ -320,6 +328,7 @@ class MethodMatchService extends BaseService
         }
         $codes = $numbers;
         $count = count($codes);
+        $codes = implode(';', $codes);
 
         $methodArr = ['id'=>16, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
@@ -355,6 +364,7 @@ class MethodMatchService extends BaseService
         $name = '组三'.$t.'码';
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1, $orignMethod);
         $id = $methods[$name]['id'];
+        $codes = implode(';', $codes);
         $methodArr = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
@@ -378,6 +388,7 @@ class MethodMatchService extends BaseService
         }
         $codes = $numbers;
         $count = count($codes);
+        $codes = implode(';', $codes);
 
         $methodArr = ['id'=>25, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
@@ -392,9 +403,8 @@ class MethodMatchService extends BaseService
      * @throws \common\exceptions\InfoException
      */
     public static function matchKuaDuX($text='', &$codes=[], &$count=0, $matchName=''){
-        $text = explode(' ', trim($text))[0];
-        #p([$text, $matchName]);
         $text = trim(str_replace(' ', '', $text));
+        $text = explode(' ', trim($text))[0];
         #$text = str_replace($matchName, $matchName.' ', $text);
 
         preg_match('/[\p{Han}]{2}/u', $text, $matchesCn);
@@ -430,14 +440,14 @@ class MethodMatchService extends BaseService
         $methodArr = [];
         for ($i=0; $i<strlen($codes); $i++){
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
-            $name = '跨度'.$codes[$i];
+            $code = $codes[$i];
+            $name = '跨度'.$code;
             $method = $methods[$name];
             $id = $method['id'];
             $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
-            $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$cnTextMatch.$changeNameArr[$codes[$i]], 'count'=>1];
+            $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$code, 'matchName'=>$cnTextMatch.$changeNameArr[$codes[$i]], 'count'=>1];
             #p(['codes'=>$codes[0][$i], 'methods'=>$methods]);
         }
-        #p($methodArr);
 
         return $methodArr;
     }
@@ -578,20 +588,20 @@ class MethodMatchService extends BaseService
                 $name = '和值'.$num;
                 $method = $methods[$name];
                 $id = $method['id'];
-                $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
+                $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$name, 'matchName'=>$name, 'count'=>1];
             }
         }elseif($num2 !== ''){
             for ($i=$num1; $i<=$num2; $i++){
                 $name = '和值'.$i;
                 $method = $methods[$name];
                 $id = $method['id'];
-                $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
+                $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$name, 'matchName'=>$name, 'count'=>1];
             }
         }else{
             $name = '和值'.$num1;
             $method = $methods[$name];
             $id = $method['id'];
-            $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
+            $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$name, 'matchName'=>$name, 'count'=>1];
         }
         #p($methodArr);
 

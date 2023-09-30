@@ -250,10 +250,12 @@ class EYunMessageOperateService  extends EYunBaseService
         }catch (\Exception $e){
             $transaction->rollBack();
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-异常', ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'err_msg'=>$e->getMessage()]);
+            # 用户输入错误提示
             if($e->getCode() == ThirdDTypeService::CODE_FOR_USER){
                 return [$e->getCode(), [], $e->getMessage()];
             }
-            return [30001, [], $e->getMessage()];
+            # 其它情况处理异常，直接抛异常
+            throw_info($e->getMessage());
         }
 
         return [0, ['text'=>$text, 'allMoneys'=>$allMoneys], '接收成功'];

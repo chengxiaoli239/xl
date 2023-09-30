@@ -103,9 +103,9 @@ class ThirdDTypeService extends BaseService
             $methodArr = MethodMatchService::matchShuangFen($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if($methodArr['originName'] == '对子全拖') { # 6对子全拖
             $methodArr = MethodMatchService::matchDuiZiQuanTuo($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }elseif($methodArr['originName'] == '一码定'){ # 7一码定位
+        }elseif($methodArr['originName'] == '一码定位'){ # 7一码定位
             $methodArr = MethodMatchService::matchYiMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }elseif($methodArr['originName'] == '二码定'){ # 8二码定位
+        }elseif($methodArr['originName'] == '二码定位'){ # 8二码定位
             $methodArr = MethodMatchService::matchErMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }elseif($methodArr['originName'] == '豹子全包'){ # 9豹子全包
             $methodArr = MethodMatchService::matchBaoZi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
@@ -172,7 +172,7 @@ class ThirdDTypeService extends BaseService
         }else{
             $codes = explode(' ', trim($matchMethodAndCodeText));
         }
-        //p(['methodArr'=>$methodArr, 'codes'=>$codes, 'count'=>$count]);
+        #p(['methodArr'=>$methodArr, 'codes'=>$codes, 'count'=>$count]);
 
         return [$methodArr, $codes, $count];
     }
