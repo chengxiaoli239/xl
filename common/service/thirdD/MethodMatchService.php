@@ -403,15 +403,25 @@ class MethodMatchService extends BaseService
      * @throws \common\exceptions\InfoException
      */
     public static function matchKuaDuX($text='', &$codes=[], &$count=0, $matchName=''){
-        $text = trim(str_replace(' ', '', $text));
-        $text = explode(' ', trim($text))[0];
+        #$text = trim(str_replace(' ', '', $text));
+        if (preg_match('/(\d+)元/', $text, $matches)) {
+            if(!empty($matches[0])){
+                $text = str_replace($matches[0], '', $text);
+            }
+        }
+        #p([$text, $matchName, $matches]);
+
+        $text = explode('各', trim($text))[0];
+        #$text = explode(' ', trim($text))[0];
         #$text = str_replace($matchName, $matchName.' ', $text);
+
 
         preg_match('/[\p{Han}]{2}/u', $text, $matchesCn);
         $cnTextMatch = $matchesCn[0];
+        $text = str_replace(' ', '', $text);
         $text = explode(' ', trim($text))[0];
         if (preg_match_all('/[跨夸]{1}度[零一二三四五六七八九]{1,10}/u', $text, $matches2)) {
-            $codes = str_replace(' ', '', trim($matches2[0][0]));
+            #$codes = str_replace(' ', '', trim($matches2[0][0]));
             $codes = str_replace('零', '0', $codes);
             $codes = str_replace('一', '1', $codes);
             $codes = str_replace('二', '2', $codes);
