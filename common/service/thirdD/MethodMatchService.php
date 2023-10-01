@@ -7,6 +7,8 @@ use yii\helpers\Json;
 
 class MethodMatchService extends BaseService
 {
+    # 组与组之间符号
+    const ZU_SPLIT_FLAG = ';';
     /**
      * 1 直选
      * @param string $text
@@ -25,7 +27,7 @@ class MethodMatchService extends BaseService
             throw_info('匹配直选号码为空');
         }
         $count = count($codes);
-        $codes = implode(',', $codes);
+        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
         $methodArr = ['id'=>1, 'name'=>'直选', 'codes'=>$codes, 'count'=>$count, 'matchName'=>'组选'];
 
         return $methodArr;
@@ -85,10 +87,10 @@ class MethodMatchService extends BaseService
             foreach ($methodArr6 as $m6){
                 $codes6 .= $m6['code'].',';
             }
-            $codes6 = trim($codes6, ',');
+            $codes6 = trim($codes6, self::ZU_SPLIT_FLAG);
             $methodArr[] = ['id'=>3, 'name'=>'组六', 'matchName'=>$match_name, 'codes'=>$codes6, 'count'=>$count6];
         }
-        $codes = trim($codes3.','.$codes6, ',');
+        $codes = trim($codes3.','.$codes6, self::ZU_SPLIT_FLAG);
         $count = (int)$count3 + (int)$count6;
 
         return $methodArr;
@@ -114,7 +116,7 @@ class MethodMatchService extends BaseService
             $codes[] = $numbers[$i];
         }
         $count = count($codes);
-        $codes = implode(',', $codes);
+        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
         $methodArr = ['id'=>4, 'name'=>'独胆', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
@@ -139,7 +141,7 @@ class MethodMatchService extends BaseService
         }
         $codes = explode(' ', $numbers);
         $count = count($codes);
-        $codes = implode(',', $codes);
+        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
         $methodArr = ['id'=>5, 'name'=>'双飞', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
@@ -163,7 +165,7 @@ class MethodMatchService extends BaseService
         }
         $codes = explode(' ', $numbers);
         $count = count($codes);
-        $codes = implode(';', $codes);
+        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
         $methodArr = ['id'=>6, 'name'=>'对子全拖', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
@@ -201,7 +203,7 @@ class MethodMatchService extends BaseService
             }
             $count += strlen($code);
         }
-        $codes = implode(';', $codes);
+        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
         $methodArr = ['id'=>7, 'name'=>'一码定位', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
@@ -236,7 +238,7 @@ class MethodMatchService extends BaseService
 
             $count += strlen($matches[1][0]) * strlen($matches[2][0]);
         }
-        $codes = implode(';', $codes);
+        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
         $methodArr = ['id'=>8, 'name'=>'二码定位', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
         //p($methodArr);
 
@@ -265,7 +267,7 @@ class MethodMatchService extends BaseService
         }
         $codes = $numbers;
         $count = count($codes);
-        $codes = implode(';', $codes);
+        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
 
         $methodArr = ['id'=>9, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
@@ -300,7 +302,7 @@ class MethodMatchService extends BaseService
         $id = $methods[$name]['id'];
 
         $count = count($codes);
-        $codes = implode(';', $codes);
+        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
         $methodArr = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
@@ -328,7 +330,7 @@ class MethodMatchService extends BaseService
         }
         $codes = $numbers;
         $count = count($codes);
-        $codes = implode(';', $codes);
+        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
 
         $methodArr = ['id'=>16, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
@@ -364,7 +366,7 @@ class MethodMatchService extends BaseService
         $name = '组三'.$t.'码';
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1, $orignMethod);
         $id = $methods[$name]['id'];
-        $codes = implode(';', $codes);
+        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
         $methodArr = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
@@ -388,7 +390,7 @@ class MethodMatchService extends BaseService
         }
         $codes = $numbers;
         $count = count($codes);
-        $codes = implode(';', $codes);
+        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
 
         $methodArr = ['id'=>25, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
@@ -594,24 +596,24 @@ class MethodMatchService extends BaseService
 
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         if(!empty($numsArr)){
-            foreach ($numsArr as $num){
-                $name = '和值'.$num;
+            foreach ($numsArr as $code){
+                $name = '和值'.$code;
                 $method = $methods[$name];
                 $id = $method['id'];
-                $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$name, 'matchName'=>$name, 'count'=>1];
+                $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$code, 'matchName'=>$name, 'count'=>1];
             }
         }elseif($num2 !== ''){
             for ($i=$num1; $i<=$num2; $i++){
                 $name = '和值'.$i;
                 $method = $methods[$name];
                 $id = $method['id'];
-                $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$name, 'matchName'=>$name, 'count'=>1];
+                $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$i, 'matchName'=>$name, 'count'=>1];
             }
         }else{
             $name = '和值'.$num1;
             $method = $methods[$name];
             $id = $method['id'];
-            $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$name, 'matchName'=>$name, 'count'=>1];
+            $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$num1, 'matchName'=>$name, 'count'=>1];
         }
         #p($methodArr);
 
@@ -800,7 +802,8 @@ class MethodMatchService extends BaseService
         $count = $all_counts;
 
         $name = '直选复式';
-        $codes = $numCn .':'.implode(',', $codesArr);
+        #$codes = $numCn .':'.implode(',', $codesArr);
+        $codes = implode(self::ZU_SPLIT_FLAG, $codesArr);
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
         $methodArr = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'single'=>$all_counts, 'matchName'=>$name, 'count'=>$all_counts];
