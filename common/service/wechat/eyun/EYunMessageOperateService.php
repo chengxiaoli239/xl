@@ -220,6 +220,9 @@ class EYunMessageOperateService  extends EYunBaseService
             $now_time = time();
             $allMoneys = 0.00;
             foreach ($betCodeContents as $content){
+                if(empty($content['playMethod']['id'])){
+                    throw_info('玩法匹配为空，请按正确格式输入', ThirdDTypeService::CODE_FOR_USER);
+                }
                 $Bets = new Bets();
                 $setData = [
                     'user_id' => $user_id,

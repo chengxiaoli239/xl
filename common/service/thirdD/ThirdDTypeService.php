@@ -145,7 +145,8 @@ class ThirdDTypeService extends BaseService
             $methodArr = MethodMatchService::matchKuaDuX($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if(strpos($matchMethodAndCodeText, '拖') !== false) { #36-51:1码拖.... [组三|组六]
             $methodArr = MethodMatchService::matchYiMaTuo($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }else if(in_array($methodArr['originName'], ['复式三', '复式四', '复式五', '复式六', '复式七', '复式八', '复式九']) && strpos($text, '直选')===false) { # 51-58:复式三 - 九
+        #}else if(in_array($methodArr['originName'], ['复式三', '复式四', '复式五', '复式六', '复式七', '复式八', '复式九']) && strpos($text, '直选')===false) { # 51-58:复式三 - 九
+        }else if(strpos($text, '复式')!==false && strpos($text, '直选')===false) { # 51-58:复式三 - 九
             $methodArr = MethodMatchService::matchFuShi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if(
             (strpos($matchMethodAndCodeText, '和值') !== false OR strpos($matchMethodAndCodeText, '合值') !== false) &&
