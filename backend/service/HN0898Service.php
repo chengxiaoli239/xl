@@ -1318,11 +1318,11 @@ class HN0898Service extends BaseTZService {
                 break;
             case 26: # 福彩3D
                 $num = HN0898Service::getDateNum();
-                $qihao = date('Y').($num-10-1);
+                $qihao = date('y').($num-10-1);
                 break;
             case 27: # 排列三
                 $num = HN0898Service::getDateNum();
-                $qihao = date('Y').($num-10-1);
+                $qihao = date('y').($num-10-1);
                 break;
             break;
         }

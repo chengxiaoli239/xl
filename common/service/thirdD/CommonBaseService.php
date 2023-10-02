@@ -1,0 +1,22 @@
+<?php
+
+namespace common\service\thirdD;
+
+use common\service\BaseService;
+
+class CommonBaseService extends BaseService
+{
+    # lottery_type:26 福彩3d、27 排列三
+    const CODE_FOR_USER = 33333;
+
+    # 共用的状态值
+    const STATUS_LT_WAIT = 0;
+    const STATUS_LT_SUCCESS = 1;
+    const STATUS_LT_FAIL = 2;
+    const STATUS_OPTIONS = [
+        self::STATUS_LT_WAIT => '待处理',
+        self::STATUS_LT_SUCCESS => '处理成功',
+        self::STATUS_LT_FAIL => '未中奖',
+    ];
+
+}

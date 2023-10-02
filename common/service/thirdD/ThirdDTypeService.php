@@ -9,9 +9,8 @@ use common\service\CommonService;
 use common\service\helpers\ThirdD;
 use yii\helpers\Json;
 
-class ThirdDTypeService extends BaseService
+class ThirdDTypeService extends CommonBaseService
 {
-    const CODE_FOR_USER = 33333;
     # lottery_type:26 福彩3d、27 排列三
     const LOTTERY_TYPE_FUCAI = 26;
     const LOTTERY_TYPE_PL3 = 27;

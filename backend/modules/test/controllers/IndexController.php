@@ -71,6 +71,7 @@ use common\service\jobs\robots\message\TextReceiveJobs;
 use common\service\jobs\robots\user\WechatUserStatusJobs;
 use common\service\proxy\ProxyBaseService;
 use common\service\proxy\ProxyKuaiService;
+use common\service\thirdD\OperateLotteryService;
 use common\service\webot\FriendsService;
 use common\service\webot\LoginService;
 use common\service\webot\MsgService;
@@ -348,6 +349,9 @@ class IndexController extends Controller
         return $results;
     }
     public function actionDw1(){
+
+        $rst = OperateLotteryService::operate($lottery_type=26);
+        p($rst);
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         $user_id = 20;
@@ -387,6 +391,8 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $lottery_types = StaticService::getLotteryTypes();
+        p($lottery_types);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%bets}}'); p($r);
         $plan = UserSysPlans::findOne(7474);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
@@ -1425,8 +1431,6 @@ class IndexController extends Controller
         p(json_encode($arr));
         $codes = BetService::getCodes(3, 20, 1, 0.1, 1, '35,36');
         p($codes);
-        $rst = SevenService::sscIndex(3, 3);
-        p($rst); # 用户信息
         $rst = BetService::userSysPlansTzNow(81, 3);
         p($rst);
         $rst = CqsscSevenDay::getLotteryNo();

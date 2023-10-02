@@ -3,10 +3,8 @@
 namespace common\service\thirdD;
 
 use common\models\thirdD\PlayMethod;
-use common\service\BaseService;
-use common\service\helpers\ThirdD;
 
-class PlayMethodService extends BaseService
+class PlayMethodService extends CommonBaseService
 {
     public static function getMethodsMKey($alias='alias'){
         return 'third_d_getMethodsMKey_x0_'.$alias;

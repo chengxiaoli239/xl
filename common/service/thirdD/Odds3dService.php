@@ -4,10 +4,9 @@ namespace common\service\thirdD;
 
 use backend\models\wechat\Odds;
 use common\models\thirdD\PlayMethod;
-use common\service\BaseService;
 use yii\helpers\Json;
 
-class Odds3dService extends BaseService
+class Odds3dService extends CommonBaseService
 {
 
     /**
@@ -45,5 +44,24 @@ class Odds3dService extends BaseService
         }
 
         return ['status'=>200, 'msg'=>'操作成功'];
+    }
+
+    /**
+     * 赔率数据
+     * @param string $user_id
+     * @param int $method_id
+     * @return array|mixed|\yii\db\ActiveRecord|\yii\db\ActiveRecord[]
+     */
+    public static function getOdds($user_id='', $method_id=0){
+        $m = \Yii::$app->cache;
+        $mkey = 'get_user_odds_'.$user_id;
+        if(!$Odds = $m->get($mkey)){
+            $Odds = Odds::find()->where(['user_id'=>$user_id])->indexBy('play_method_id')->asArray()->all();
+            $m->set($mkey, $Odds, 1800);
+        }
+        if(isset($Odds[$method_id])){
+            return $Odds[$method_id];
+        }
+        return $Odds;
     }
 }

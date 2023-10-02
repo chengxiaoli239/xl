@@ -345,7 +345,7 @@ class KjDataGet
      * @desc ssc开奖data
      * @param $qihao 181120059
      * @param int $lottery_type 彩票类型1:1.5彩2:3分彩3:5分彩4:10分彩
-     * @param $kjDatas
+     * @param $kjDatas 2,4,5,8,9
      * @param string $opentime 2022-04-03 21:00:00
      * @return array|bool
      */

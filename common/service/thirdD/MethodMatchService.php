@@ -5,8 +5,120 @@ namespace common\service\thirdD;
 use common\service\BaseService;
 use yii\helpers\Json;
 
-class MethodMatchService extends BaseService
+class MethodMatchService extends CommonBaseService
 {
+    const METHOD_ID_ZHIXUAN = 1;
+    const METHOD_ID_ZUSAN = 2;
+    const METHOD_ID_ZULIU = 3;
+    const METHOD_ID_DUDAN = 4;
+    const METHOD_ID_SHUANGFEN = 5;
+    const METHOD_ID_QUANTUO = 6;
+    const METHOD_ID_YIMADING = 7;
+    const METHOD_ID_ERMADING = 8;
+    const METHOD_ID_BAOZI_QB = 9;
+
+    # 组六x码
+    const METHOD_ID_ZL_4_MA = 10;
+    const METHOD_ID_ZL_5_MA = 11;
+    const METHOD_ID_ZL_6_MA = 12;
+    const METHOD_ID_ZL_7_MA = 13;
+    const METHOD_ID_ZL_8_MA = 14;
+    const METHOD_ID_ZL_9_MA = 15;
+    const METHOD_ID_ZL_QB = 16;
+
+    # 组三x码
+    const METHOD_ID_ZS_2_MA = 17;
+    const METHOD_ID_ZS_3_MA = 18;
+    const METHOD_ID_ZS_4_MA = 19;
+    const METHOD_ID_ZS_5_MA = 20;
+    const METHOD_ID_ZS_6_MA = 21;
+    const METHOD_ID_ZS_7_MA = 22;
+    const METHOD_ID_ZS_8_MA = 23;
+    const METHOD_ID_ZS_9_MA = 24;
+    const METHOD_ID_ZS_QB = 25;
+
+    # 跨度0-9
+    const METHOD_ID_KD_0 = 26;
+    const METHOD_ID_KD_1 = 27;
+    const METHOD_ID_KD_2 = 28;
+    const METHOD_ID_KD_3 = 29;
+    const METHOD_ID_KD_4 = 30;
+    const METHOD_ID_KD_5 = 31;
+    const METHOD_ID_KD_6 = 32;
+    const METHOD_ID_KD_7 = 33;
+    const METHOD_ID_KD_8 = 34;
+    const METHOD_ID_KD_9 = 35;
+
+    # 1码拖x - 组六
+    const METHOD_ID_YMT_ZL_2 = 36;
+    const METHOD_ID_YMT_ZL_3 = 37;
+    const METHOD_ID_YMT_ZL_4 = 38;
+    const METHOD_ID_YMT_ZL_5 = 39;
+    const METHOD_ID_YMT_ZL_6 = 40;
+    const METHOD_ID_YMT_ZL_7 = 41;
+    const METHOD_ID_YMT_ZL_8 = 42;
+    const METHOD_ID_YMT_ZL_9 = 43;
+
+    # 1码拖x - 组三
+    const METHOD_ID_YMT_ZS_2 = 44;
+    const METHOD_ID_YMT_ZS_3 = 45;
+    const METHOD_ID_YMT_ZS_4 = 46;
+    const METHOD_ID_YMT_ZS_5 = 47;
+    const METHOD_ID_YMT_ZS_6 = 48;
+    const METHOD_ID_YMT_ZS_7 = 49;
+    const METHOD_ID_YMT_ZS_8 = 50;
+    const METHOD_ID_YMT_ZS_9 = 51;
+
+    # 复式x码
+    const METHOD_ID_FS_3 = 52;
+    const METHOD_ID_FS_4 = 53;
+    const METHOD_ID_FS_5 = 54;
+    const METHOD_ID_FS_6 = 55;
+    const METHOD_ID_FS_7 = 56;
+    const METHOD_ID_FS_8 = 57;
+    const METHOD_ID_FS_9 = 58;
+
+    # 和值
+    const METHOD_ID_HZ_0 = 59;
+    const METHOD_ID_HZ_1 = 60;
+    const METHOD_ID_HZ_2 = 61;
+    const METHOD_ID_HZ_3 = 62;
+    const METHOD_ID_HZ_4 = 63;
+    const METHOD_ID_HZ_5 = 64;
+    const METHOD_ID_HZ_6 = 65;
+    const METHOD_ID_HZ_7 = 66;
+    const METHOD_ID_HZ_8 = 67;
+    const METHOD_ID_HZ_9 = 68;
+    const METHOD_ID_HZ_10 = 69;
+    const METHOD_ID_HZ_11 = 70;
+    const METHOD_ID_HZ_12 = 71;
+    const METHOD_ID_HZ_13 = 72;
+    const METHOD_ID_HZ_14 = 73;
+    const METHOD_ID_HZ_15 = 74;
+    const METHOD_ID_HZ_16 = 75;
+    const METHOD_ID_HZ_17 = 76;
+    const METHOD_ID_HZ_18 = 77;
+    const METHOD_ID_HZ_19 = 78;
+    const METHOD_ID_HZ_20 = 79;
+    const METHOD_ID_HZ_21 = 80;
+    const METHOD_ID_HZ_22 = 81;
+    const METHOD_ID_HZ_23 = 82;
+    const METHOD_ID_HZ_24 = 83;
+    const METHOD_ID_HZ_25 = 84;
+    const METHOD_ID_HZ_26 = 85;
+    const METHOD_ID_HZ_27 = 86;
+
+    # 和值大小单双
+    const METHOD_ID_HZ_DA = 87;
+    const METHOD_ID_HZ_XIAO = 88;
+    const METHOD_ID_HZ_DAN = 89;
+    const METHOD_ID_HZ_SHUANG = 90;
+
+    # 其它
+    const METHOD_ID_DW_ZX_FS = 91; # 定位直选复式
+    const METHOD_ID_QD = 92; # 全倒
+    const METHOD_ID_ZX_FS = 93; # 直选复式
+
     # 组与组之间符号
     const ZU_SPLIT_FLAG = ';';
     /**

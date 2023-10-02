@@ -55,7 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'bonus','label'=>'中奖',//'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                return !empty($model->bonus) && $model->bonus != 0.00 ? $model->bonus : '';
+                                return $model->bonus>0 ? '<font color="green">'.$model->bonus.'</font>' : ' ';
                             }
                         ],
                         'profits',

@@ -2409,10 +2409,16 @@ class StaticService extends BaseService {
      * @return array
      */
    public static function getLotteryTypes(){
-       $lottery_types = SystemConfig::findOne(['key'=>'lottery_types'])->value;
-       $lottery_typesArr = explode(',', $lottery_types);
+       $m = \Yii::$app->cache;
+       $mkey = __FUNCTION__.'_x0';
+       $types = $m->get($mkey);
+       if(empty($types)){
+           $lotteryTypes = LotteryType::find()->select(['lottery_type'])->where(['enable'=>1])->asArray()->all();
+           $types = array_column($lotteryTypes, 'lottery_type');
+           $m->set($mkey, $types, 1800);
+       }
 
-       return $lottery_typesArr;
+       return $types;
    }
 
     /**
