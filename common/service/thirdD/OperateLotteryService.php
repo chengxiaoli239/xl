@@ -33,7 +33,7 @@ class OperateLotteryService extends CommonBaseService
     public static function operate($lottery_type=DEFAULT_LOTTERY_TYPE, $qihao=''){
 
         $where = OperateLotteryService::runWhere($lottery_type, $qihao);
-        #$where = ['id'=>369]; # 测试
+        #$where = ['id'=>22]; # 测试
         $BetRows = \backend\models\wechat\Bets::find()->where($where)->limit(1)->all();
         if(empty($BetRows)){
             throw_info('记录为空');
@@ -58,22 +58,25 @@ class OperateLotteryService extends CommonBaseService
                         break;
                     case MethodMatchService::METHOD_ID_ZULIU: # 组六
                     case MethodMatchService::METHOD_ID_ZUSAN: # 组三
-                        OperateLotteryService::runZuXuan($betRow, $kjCode, $betRow->lottery_type);
+                        OperateLotteryService::runZuXuan($betRow, $kjCode);
                         break;
                     case MethodMatchService::METHOD_ID_DUDAN: # 独胆
-                        OperateLotteryService::runDuDan($betRow, $kjCode, $betRow->lottery_type);
+                        OperateLotteryService::runDuDan($betRow, $kjCode);
                         break;
                     case MethodMatchService::METHOD_ID_SHUANGFEN: # 双飞
                     case MethodMatchService::METHOD_ID_QUANTUO: # 对子全拖
-                        OperateLotteryService::runShuangFen($betRow, $kjCode, $betRow->lottery_type);
+                        OperateLotteryService::runShuangFen($betRow, $kjCode);
+                        break;
+                    case MethodMatchService::METHOD_ID_YIMADING: # 一码定
+                        OperateLotteryService::runYiMaDing($betRow, $kjCode);
                         break;
                     default:
-                        Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理异常0', ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>'位置玩法ID:'.$method_id]);
+                        Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理异常0', ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>'未知玩法ID:'.$method_id]);
                         break;
                 }
 
             }catch (\Exception $e){
-                Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理异常1', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+                Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理异常1', ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
             }
         }
 
@@ -99,6 +102,9 @@ class OperateLotteryService extends CommonBaseService
 
         $kjCode3 = str_replace(',','', $kjCode);
         $zjCount = $betCounts[$kjCode3] ?? 0; # 中奖次数，防止相同的号码，下注时候出现多次
+
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+        /*
         if($zjCount>0){
             # 中奖
             $status = self::STATUS_LT_SUCCESS;
@@ -124,6 +130,7 @@ class OperateLotteryService extends CommonBaseService
         $logArr = ['status'=>$status, 'bonus'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'betCodes'=>$betCodes, 'kjCode'=>$kjCode, 'betRecord'=>$betRow->getAttributes()];
         $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
         Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
+        */
 
         return true;
     }
@@ -135,10 +142,11 @@ class OperateLotteryService extends CommonBaseService
      * @return bool
      * @throws \common\exceptions\InfoException
      */
-    public static function runZuXuan(object $betRow, $kjCode='', $lottery_type=26){
+    public static function runZuXuan(object $betRow, $kjCode=''){
         if(empty($betRow)){
             throw_info('记录不能为空');
         }
+        $lottery_type = $betRow->lottery_type;
         $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
         $codes = $betRow->codes;
         $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
@@ -150,6 +158,8 @@ class OperateLotteryService extends CommonBaseService
 
         $zjCount = $betCounts[$kj_code_3n] ?? 0; # 中奖次数，防止相同的号码，下注时候出现多次
 
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+        /*
         if($zjCount>0){
             # 中奖
             $status = self::STATUS_LT_SUCCESS;
@@ -176,6 +186,7 @@ class OperateLotteryService extends CommonBaseService
         $logArr = ['status'=>$status, 'bouns'=>$bonus, 'Odds'=>$Odds, 'betCounts'=>$betCounts, 'zjCount'=>$zjCount, 'betCodes'=>$betCodes, 'kjCode'=>$kjCode, 'kj_code_3n'=>$kj_code_3n, 'betRecord'=>$betRow->getAttributes()];
         $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
         Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
+        */
 
         return true;
     }
@@ -187,10 +198,11 @@ class OperateLotteryService extends CommonBaseService
      * @return bool
      * @throws \common\exceptions\InfoException
      */
-    public static function runDuDan(object $betRow, $kjCode='', $lottery_type=26){
+    public static function runDuDan(object $betRow, $kjCode=''){
         if(empty($betRow)){
             throw_info('记录不能为空');
         }
+        $lottery_type = $betRow->lottery_type;
         $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
         $codes = $betRow->codes;
         $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
@@ -203,7 +215,9 @@ class OperateLotteryService extends CommonBaseService
             $zjCount++;
         }
         #p(['kjCodeArr'=>$kjCodeArr, 'kj_code_3n'=>$kj_code_3n, 'betCodes'=>$betCodes, 'betCounts'=>$betCounts]);
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
 
+        /*
         if($zjCount>0){
             # 中奖
             $status = self::STATUS_LT_SUCCESS;
@@ -230,6 +244,7 @@ class OperateLotteryService extends CommonBaseService
         $logArr = ['status'=>$status, 'bouns'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'betCodes'=>$betCodes, 'kjCode'=>$kjCode, 'kj_code_3n'=>$kj_code_3n, 'betRecord'=>$betRow->getAttributes()];
         $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
         Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
+        */
 
         return true;
     }
@@ -241,10 +256,11 @@ class OperateLotteryService extends CommonBaseService
      * @return bool
      * @throws \common\exceptions\InfoException
      */
-    public static function runShuangFen(object $betRow, $kjCode='', $lottery_type=26){
+    public static function runShuangFen(object $betRow, $kjCode=''){
         if(empty($betRow)){
             throw_info('记录不能为空');
         }
+        $lottery_type = $betRow->lottery_type;
         $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
         $codes = $betRow->codes;
         $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
@@ -261,6 +277,65 @@ class OperateLotteryService extends CommonBaseService
         }
         #p(['kj_code_2n'=>$kj_code_2n, 'betCodes'=>$betCodes, 'zjCount'=>$zjCount, 'betCounts'=>$betCount]);
 
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+
+        return true;
+    }
+
+    /**
+     * 一码定位
+     * @param object $row
+     * @param string $kjCode 2,3,4
+     * @return bool
+     * @throws \common\exceptions\InfoException
+     */
+    public static function runYiMaDing(object $betRow, $kjCode=''){
+        if(empty($betRow)){
+            throw_info('记录不能为空');
+        }
+        $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
+        $codes = $betRow->codes;
+        $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
+
+        $kjCodeArr = explode(',', $kjCode);
+
+        $zjCount = 0;
+        $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
+        foreach ($betCodes as $code){
+            if(strpos($code, '百') !== false){
+                $posKjCode = $kjCodeArr[0];
+                $betCodeStr = str_replace('百:', '', $code);
+            }elseif (strpos($code, '十') !== false){
+                $posKjCode = $kjCodeArr[1];
+                $betCodeStr = str_replace('十:', '', $code);
+            }elseif (strpos($code, '个') !== false){
+                $posKjCode = $kjCodeArr[2];
+                $betCodeStr = str_replace('个:', '', $code);
+            }else{
+                throw_info('匹配位置异常');
+            }
+            $betCodesArr = ThirdD::getArrayCodesByString($betCodeStr);
+            $betCount = array_count_values($betCodesArr); # 所有元素的次数
+            #p(['$betCodesArr'=>$betCodesArr, 'betCount'=>$betCount, 'posKjCode'=>$posKjCode], 0);
+
+            if(!isset($betCount[$posKjCode])) continue;
+            $zjCount += $betCount[$posKjCode];
+        }
+        #p(['betCodes'=>$betCodes, 'kjCodeArr'=>$kjCodeArr, 'zjCount'=>$zjCount]);
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+
+        return true;
+    }
+
+    /**
+     * 中奖计算结果之后的存表处理
+     * @param object $betRow
+     * @param int $zjCount
+     * @param array $Odds
+     * @param string $kjCode
+     * @throws \common\exceptions\InfoException
+     */
+    private static function endCaculate(object $betRow, int $zjCount, array $Odds, $kjCode=''){
         if($zjCount>0){
             # 中奖
             $status = self::STATUS_LT_SUCCESS;
@@ -284,7 +359,7 @@ class OperateLotteryService extends CommonBaseService
         if(empty($flag)){
             throw_info($betRow->getErrors());
         }
-        $logArr = ['status'=>$status, 'bouns'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'betCodes'=>$betCodes, 'kjCode'=>$kjCode, 'kj_code_2n'=>$kj_code_2n, 'betRecord'=>$betRow->getAttributes()];
+        $logArr = ['status'=>$status, 'bouns'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'kjCode'=>$kjCode, 'betRecord'=>$betRow->getAttributes()];
         $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
         Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
 

@@ -98,6 +98,7 @@ class ThirdD extends BaseService
     }
 
     /**
+     * 判断号码是否有重复
      * @param string $codes
      * @param array $codesArr
      * @return bool
@@ -118,5 +119,24 @@ class ThirdD extends BaseService
         }
 
         return false;
+    }
+
+    /**
+     * 字符串号码转换成数字
+     * @param string $codes 234
+     * @return array [2, 3, 4]
+     */
+    public static function getArrayCodesByString($codes=''){
+        if(empty($codes)){
+            return [];
+        }
+        $codes = (string)$codes;
+        $len = strlen($codes);
+        $data = [];
+        for ($i=0; $i<$len; $i++){
+            $data[] = $codes[$i];
+        }
+
+        return $data;
     }
 }
