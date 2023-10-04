@@ -389,6 +389,7 @@ class KjDataGet
         list($type_dx, $type_4dx, $type_dx_str) = CommonService::getTypeDx($codes.','.$kjDatasArr[4]);
         sort($codesArr); # 排序
         $code_3n = CommonService::get3n($codesArr, $lottery_type);
+        $code_2n = CommonService::get2n($codesArr, $lottery_type);
         $insertData = [
             'index_id' => $index_id,
             'kj_code' => $kjDatas,
@@ -411,6 +412,7 @@ class KjDataGet
             'code_2_4'=>$kjDatasArr[1]+$kjDatasArr[3],
             'code_3_4'=>$kjDatasArr[2]+$kjDatasArr[3],
             'code_1_2_3_4' => SscDataService::getCodesDS($kjData),
+            'code_2n' => implode(',', $code_2n),
             'code_3n' => implode(',', $code_3n),
             'code_4n' => implode('', $codesArr),
             'type_2' => CommonService::isCodeType2($codes), # 是否双重

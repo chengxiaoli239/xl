@@ -241,6 +241,38 @@ class  CommonService{
     }
 
     /**
+     * @desc 返回二字现，含双重或者不含，排序过后的三字现，可用于组三、组六的开奖处理
+     * @param $codesArr [3, 6, 7, 8] 或者 [3, 4, 4, 6] 或者 [3, 3, 3, 7] 或者 [3,3,3,3] 必须四个号码
+     * @return array
+     */
+    public static function get2n($codesArr, $lottery_type=DEFAULT_LOTTERY_TYPE){
+        if(count($codesArr) != 4 && !in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)) return [];
+        if(in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)){
+            $codesArr = [$codesArr[0], $codesArr[1], $codesArr[2]]; # 排列三、福彩3D 支取前面三个
+        }
+        sort($codesArr);
+        if(in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)){
+            $data = [
+                $codesArr[0].$codesArr[1],
+                $codesArr[0].$codesArr[2],
+                $codesArr[1].$codesArr[2],
+            ];
+        }else{
+            $data = [
+                $codesArr[0].$codesArr[1],
+                $codesArr[0].$codesArr[2],
+                $codesArr[0].$codesArr[3],
+                $codesArr[1].$codesArr[2],
+                $codesArr[1].$codesArr[3],
+                $codesArr[2].$codesArr[3],
+            ];
+        }
+        $data = array_values(array_unique($data));
+
+        return $data;
+    }
+
+    /**
      * @desc 返回三字现，含双重或者不含，排序过后的三字现，可用于组三、组六的开奖处理
      * @param $codesArr [3, 6, 7, 8] 或者 [3, 4, 4, 6] 或者 [3, 3, 3, 7] 或者 [3,3,3,3] 必须四个号码
      * @return array
@@ -257,42 +289,11 @@ class  CommonService{
             $data = [
                 $codesArr[0] . $codesArr[1] . $codesArr[2],
                 $codesArr[0] . $codesArr[1] . $codesArr[3],
-
-                //$codesArr[0] . $codesArr[2] . $codesArr[1],
                 $codesArr[0] . $codesArr[2] . $codesArr[3],
-
-                //$codesArr[0] . $codesArr[3] . $codesArr[1],
-                //$codesArr[0] . $codesArr[3] . $codesArr[2],
-
-                //$codesArr[1] . $codesArr[0] . $codesArr[2],
-                //$codesArr[1] . $codesArr[0] . $codesArr[3],
-
-                //$codesArr[1] . $codesArr[2] . $codesArr[0],
                 $codesArr[1] . $codesArr[2] . $codesArr[3],
-
-                //$codesArr[1] . $codesArr[3] . $codesArr[0],
-                //$codesArr[1] . $codesArr[3] . $codesArr[2],
-
-                //$codesArr[2] . $codesArr[0] . $codesArr[1],
-                //$codesArr[2] . $codesArr[0] . $codesArr[3],
-
-                //$codesArr[2] . $codesArr[1] . $codesArr[0],
-                //$codesArr[2] . $codesArr[1] . $codesArr[3],
-
-                //$codesArr[2] . $codesArr[3] . $codesArr[0],
-                //$codesArr[2] . $codesArr[3] . $codesArr[2],
-
-                //$codesArr[3] . $codesArr[0] . $codesArr[1],
-                //$codesArr[3] . $codesArr[0] . $codesArr[2],
-
-                //$codesArr[3] . $codesArr[1] . $codesArr[0],
-                //$codesArr[3] . $codesArr[1] . $codesArr[2],
-
-                //$codesArr[3] . $codesArr[2] . $codesArr[0],
-                //$codesArr[3] . $codesArr[2] . $codesArr[1],
             ];
         }
-        $data = array_unique($data);
+        $data = array_values(array_unique($data));
 
         return $data;
     }
@@ -887,12 +888,27 @@ class  CommonService{
     }
 
     /**
-     * @desc 获取大小类型
-     * @param string $codes 格式 1,2,3
-     * @return int
+     * @desc 排序号码
+     * @param array $codesArr 格式 [12, 43, 796]
+     * @return array
      */
-    public static function getTypeDxStr($codes){
+    public static function reSortCodes($codesArr){
+        if(empty($codesArr)){
+            return $codesArr;
+        }
 
+        $codeData = [];
+        foreach ($codesArr as $code){
+            $code = (string)$code;
+            $tmpCode = [];
+            for ($i=0; $i<strlen($code); $i++){
+                $tmpCode[] = $code[$i];
+            }
+            sort($tmpCode);
+            $codeData[] = implode('', $tmpCode);
+        }
+
+        return $codeData;
     }
 
     /**

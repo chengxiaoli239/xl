@@ -3,6 +3,7 @@
 namespace common\service\thirdD;
 
 use common\service\BaseService;
+use common\service\CommonService;
 use yii\helpers\Json;
 
 class MethodMatchService extends CommonBaseService
@@ -190,7 +191,7 @@ class MethodMatchService extends CommonBaseService
             $count3 = count($methodArr3);
             $codes3 = '';
             foreach ($methodArr3 as $m3){
-                $codes3 .= $m3['code'].',';
+                $codes3 .= $m3['code'] . self::ZU_SPLIT_FLAG;
             }
             $codes3 = trim($codes3, self::ZU_SPLIT_FLAG);
             $methodArr[] = ['id'=>2, 'name'=>'组三', 'matchName'=>$match_name, 'codes'=>$codes3, 'count'=>$count3];
@@ -256,8 +257,39 @@ class MethodMatchService extends CommonBaseService
         }
         $codes = explode(' ', $numbers);
         $count = count($codes);
+
+        $codes = CommonService::reSortCodes($codes); # 排序数据内的号码
+        $methodArr1 = []; # 无对子
+        $methodArr2 = []; # 对子
+        foreach ($codes as $code){
+            $code = (string)$code;
+            if($code[0] == $code[1]){
+                $methodArr2[] = ['id'=>6, 'name'=>'对子全拖', 'code'=>$code, 'matchName'=>$matchName, 'count'=>$count];
+            }else{
+                $methodArr1[] = ['id'=>5, 'name'=>'双飞', 'code'=>$code, 'matchName'=>$matchName, 'count'=>$count];
+            }
+        }
+        if(!empty($methodArr2)){
+            $count2 = count($methodArr2);
+            $codes2 = '';
+            foreach ($methodArr2 as $m2){
+                $codes2 .= $m2['code'] . self::ZU_SPLIT_FLAG;
+            }
+            $codes2 = trim($codes2, self::ZU_SPLIT_FLAG);
+            $methodArr[] = ['id'=>6, 'name'=>'对子全拖', 'codes'=>$codes2, 'matchName'=>$matchName, 'count'=>$count2];
+        }
+        if(!empty($methodArr1)){
+            $count1 = count($methodArr1);
+            $codes1 = '';
+            foreach ($methodArr1 as $m1){
+                $codes1 .= $m1['code'] . self::ZU_SPLIT_FLAG;
+            }
+            $codes1 = trim($codes1, self::ZU_SPLIT_FLAG);
+            $methodArr[] = ['id'=>5, 'name'=>'双飞', 'codes'=>$codes1, 'matchName'=>$matchName, 'count'=>$count1];
+        }
         $codes = implode(self::ZU_SPLIT_FLAG, $codes);
-        $methodArr = ['id'=>5, 'name'=>'双飞', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
+
+        #$methodArr = ['id'=>5, 'name'=>'双飞', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }

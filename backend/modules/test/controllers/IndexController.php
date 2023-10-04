@@ -350,7 +350,8 @@ class IndexController extends Controller
     }
     public function actionDw1(){
 
-        $rst = OperateLotteryService::operate($lottery_type=26); p($rst); # 处理3d开奖
+        #$code_2n = CommonService::get2n($codesArr=[9, 9, 3], $lottery_type=26); p($code_2n);
+        #$sort_codes = CommonService::reSortCodes($codesArr=[12, 43, 796]); p($sort_codes);
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         $user_id = 20;
@@ -390,6 +391,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $rst = OperateLotteryService::operate($lottery_type=26); p($rst); # 处理3d开奖
         $lottery_types = StaticService::getLotteryTypes();
         p($lottery_types);
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%bets}}'); p($r);
