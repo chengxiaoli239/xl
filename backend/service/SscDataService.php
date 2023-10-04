@@ -1921,7 +1921,7 @@ class SscDataService extends BaseService {
 
     /**
      * @desc 获取开奖单双 by kj_str
-     * @param $codes 例如：1,2,3,4,5
+     * @param string $codes 例如：1,2,3,4,5
      * @return string 1212
      */
     public static function getCodesDS($codes){

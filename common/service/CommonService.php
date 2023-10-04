@@ -14,6 +14,7 @@ use backend\service\NumService;
 use backend\service\StaticService;
 use common\models\thirdD\PlayMethod;
 use common\models\User;
+use common\service\thirdD\CommonBaseService;
 use common\tools\Tool_Common;
 use backend\service\CurlService;
 use backend\service\UserService;
@@ -240,50 +241,57 @@ class  CommonService{
     }
 
     /**
-     * @desc 返回三字现，含双重或者不含
+     * @desc 返回三字现，含双重或者不含，排序过后的三字现，可用于组三、组六的开奖处理
      * @param $codesArr [3, 6, 7, 8] 或者 [3, 4, 4, 6] 或者 [3, 3, 3, 7] 或者 [3,3,3,3] 必须四个号码
      * @return array
      */
-    public static function get3n($codesArr){
-        if(count($codesArr) != 4) return [];
+    public static function get3n($codesArr, $lottery_type=DEFAULT_LOTTERY_TYPE){
+        if(count($codesArr) != 4 && !in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)) return [];
+        if(in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)){
+            $codesArr = [$codesArr[0], $codesArr[1], $codesArr[2]]; # 排列三、福彩3D 支取前面三个
+        }
         sort($codesArr);
-        $data = [
-            $codesArr[0] . $codesArr[1] . $codesArr[2],
-            $codesArr[0] . $codesArr[1] . $codesArr[3],
+        if(in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)){
+            $data = [$codesArr[0].$codesArr[1].$codesArr[2]];
+        }else{
+            $data = [
+                $codesArr[0] . $codesArr[1] . $codesArr[2],
+                $codesArr[0] . $codesArr[1] . $codesArr[3],
 
-            //$codesArr[0] . $codesArr[2] . $codesArr[1],
-            $codesArr[0] . $codesArr[2] . $codesArr[3],
+                //$codesArr[0] . $codesArr[2] . $codesArr[1],
+                $codesArr[0] . $codesArr[2] . $codesArr[3],
 
-            //$codesArr[0] . $codesArr[3] . $codesArr[1],
-            //$codesArr[0] . $codesArr[3] . $codesArr[2],
+                //$codesArr[0] . $codesArr[3] . $codesArr[1],
+                //$codesArr[0] . $codesArr[3] . $codesArr[2],
 
-            //$codesArr[1] . $codesArr[0] . $codesArr[2],
-            //$codesArr[1] . $codesArr[0] . $codesArr[3],
+                //$codesArr[1] . $codesArr[0] . $codesArr[2],
+                //$codesArr[1] . $codesArr[0] . $codesArr[3],
 
-            //$codesArr[1] . $codesArr[2] . $codesArr[0],
-            $codesArr[1] . $codesArr[2] . $codesArr[3],
+                //$codesArr[1] . $codesArr[2] . $codesArr[0],
+                $codesArr[1] . $codesArr[2] . $codesArr[3],
 
-            //$codesArr[1] . $codesArr[3] . $codesArr[0],
-            //$codesArr[1] . $codesArr[3] . $codesArr[2],
+                //$codesArr[1] . $codesArr[3] . $codesArr[0],
+                //$codesArr[1] . $codesArr[3] . $codesArr[2],
 
-            //$codesArr[2] . $codesArr[0] . $codesArr[1],
-            //$codesArr[2] . $codesArr[0] . $codesArr[3],
+                //$codesArr[2] . $codesArr[0] . $codesArr[1],
+                //$codesArr[2] . $codesArr[0] . $codesArr[3],
 
-            //$codesArr[2] . $codesArr[1] . $codesArr[0],
-            //$codesArr[2] . $codesArr[1] . $codesArr[3],
+                //$codesArr[2] . $codesArr[1] . $codesArr[0],
+                //$codesArr[2] . $codesArr[1] . $codesArr[3],
 
-            //$codesArr[2] . $codesArr[3] . $codesArr[0],
-            //$codesArr[2] . $codesArr[3] . $codesArr[2],
+                //$codesArr[2] . $codesArr[3] . $codesArr[0],
+                //$codesArr[2] . $codesArr[3] . $codesArr[2],
 
-            //$codesArr[3] . $codesArr[0] . $codesArr[1],
-            //$codesArr[3] . $codesArr[0] . $codesArr[2],
+                //$codesArr[3] . $codesArr[0] . $codesArr[1],
+                //$codesArr[3] . $codesArr[0] . $codesArr[2],
 
-            //$codesArr[3] . $codesArr[1] . $codesArr[0],
-            //$codesArr[3] . $codesArr[1] . $codesArr[2],
+                //$codesArr[3] . $codesArr[1] . $codesArr[0],
+                //$codesArr[3] . $codesArr[1] . $codesArr[2],
 
-            //$codesArr[3] . $codesArr[2] . $codesArr[0],
-            //$codesArr[3] . $codesArr[2] . $codesArr[1],
-        ];
+                //$codesArr[3] . $codesArr[2] . $codesArr[0],
+                //$codesArr[3] . $codesArr[2] . $codesArr[1],
+            ];
+        }
         $data = array_unique($data);
 
         return $data;

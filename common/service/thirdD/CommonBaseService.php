@@ -6,8 +6,15 @@ use common\service\BaseService;
 
 class CommonBaseService extends BaseService
 {
-    # lottery_type:26 福彩3d、27 排列三
     const CODE_FOR_USER = 33333;
+
+    # lottery_type:26 福彩3d、27 排列三
+    const LOTTERY_TYPE_FUCAI = 26;
+    const LOTTERY_TYPE_PL3 = 27;
+    const THIRDD_LOTTERY_TYPES = [
+        self::LOTTERY_TYPE_FUCAI,
+        self::LOTTERY_TYPE_PL3,
+    ];
 
     # 共用的状态值
     const STATUS_LT_WAIT = 0;

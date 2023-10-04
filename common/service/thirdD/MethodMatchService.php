@@ -173,12 +173,14 @@ class MethodMatchService extends CommonBaseService
                 ){
                     throw_info($match_name.'号码输入异常，请重新确认');
                 }
+                $sortCode = [$code[0], $code[1], $code[2]];
+                sort($sortCode); # 先排序号码再入库
                 if($code[0]==$code[1] OR $code[1]==$code[2] OR $code[0]==$code[2]){
                     # 组三
-                    $methodArr3[] = ['id'=>2, 'name'=>'组三', 'matchName'=>$match_name, 'code'=>$code, 'count'=>1];
+                    $methodArr3[] = ['id'=>2, 'name'=>'组三', 'matchName'=>$match_name, 'code'=>$sortCode, 'count'=>1];
                 }else{
                     # 组六
-                    $methodArr6[] = ['id'=>3, 'name'=>'组六', 'matchName'=>$match_name, 'code'=>$code, 'count'=>1];
+                    $methodArr6[] = ['id'=>3, 'name'=>'组六', 'matchName'=>$match_name, 'code'=>$sortCode, 'count'=>1];
                 }
             }else{
                 throw_info($match_name.'每个号码必须是三位数');
@@ -190,19 +192,20 @@ class MethodMatchService extends CommonBaseService
             foreach ($methodArr3 as $m3){
                 $codes3 .= $m3['code'].',';
             }
-            $codes3 = trim($codes3, ',');
+            $codes3 = trim($codes3, self::ZU_SPLIT_FLAG);
             $methodArr[] = ['id'=>2, 'name'=>'组三', 'matchName'=>$match_name, 'codes'=>$codes3, 'count'=>$count3];
         }
+
         if(!empty($methodArr6)){
             $count6 = count($methodArr6);
             $codes6 = '';
             foreach ($methodArr6 as $m6){
-                $codes6 .= $m6['code'].',';
+                $codes6 .= $m6['code'].self::ZU_SPLIT_FLAG;
             }
             $codes6 = trim($codes6, self::ZU_SPLIT_FLAG);
             $methodArr[] = ['id'=>3, 'name'=>'组六', 'matchName'=>$match_name, 'codes'=>$codes6, 'count'=>$count6];
         }
-        $codes = trim($codes3.','.$codes6, self::ZU_SPLIT_FLAG);
+        $codes = trim($codes3.self::ZU_SPLIT_FLAG.$codes6, self::ZU_SPLIT_FLAG);
         $count = (int)$count3 + (int)$count6;
 
         return $methodArr;
@@ -684,8 +687,7 @@ class MethodMatchService extends CommonBaseService
      * @throws \common\exceptions\InfoException
      */
     public static function matchHeZhi($text='', &$codes=[], &$count=0, $matchName=''){
-        $text = explode(' ', trim($text))[0];
-        $text = trim(str_replace(' ', '', $text));
+        $text = trim(str_replace(' ', ',', $text));
         //p([$text, $matchName]);
 
         // 使用正则表达式匹配组选后面的三个数字  -- 和值范围

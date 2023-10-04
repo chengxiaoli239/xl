@@ -32,6 +32,7 @@ use backend\service\CurlService;
 use backend\service\HN0898Service;
 use backend\service\BaseNumService;
 use backend\service\OpKjService;
+use common\service\thirdD\CommonBaseService;
 use common\tools\Tools;
 use backend\models\BettingRecords;
 use backend\service\StaticService;
@@ -379,10 +380,15 @@ class KjDataGet
         }else{
             $tmpDate = date('Y-m-d H:i:s');
         }
-        $codesArr = [$kjDatasArr[0],$kjDatasArr[1],$kjDatasArr[2],$kjDatasArr[3]];
+        if(in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)){
+            $codesArr = [$kjDatasArr[0],$kjDatasArr[1],$kjDatasArr[2]];
+        }else{
+            $codesArr = [$kjDatasArr[0],$kjDatasArr[1],$kjDatasArr[2],$kjDatasArr[3]];
+        }
+
         list($type_dx, $type_4dx, $type_dx_str) = CommonService::getTypeDx($codes.','.$kjDatasArr[4]);
-        sort($codesArr);
-        $code_3n = CommonService::get3n($codesArr);
+        sort($codesArr); # 排序
+        $code_3n = CommonService::get3n($codesArr, $lottery_type);
         $insertData = [
             'index_id' => $index_id,
             'kj_code' => $kjDatas,

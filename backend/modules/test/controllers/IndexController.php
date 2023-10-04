@@ -350,12 +350,11 @@ class IndexController extends Controller
     }
     public function actionDw1(){
 
-        $rst = OperateLotteryService::operate($lottery_type=26);
-        p($rst);
+        $rst = OperateLotteryService::operate($lottery_type=26); p($rst); # 处理3d开奖
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         $user_id = 20;
-        $rst = \common\service\thirdD\Odds3dService::addUserOdds($user_id);
+        #$rst = \common\service\thirdD\Odds3dService::addUserOdds($user_id);
 
         $MessageService = new EYunMessageOperateService($user_id);
         set_time_limit(0);
