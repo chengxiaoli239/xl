@@ -1,4 +1,5 @@
 <?php
+include_once __DIR__ . '/const.php';
 
 function p($data,$exit = true){
     echo '<pre>';
