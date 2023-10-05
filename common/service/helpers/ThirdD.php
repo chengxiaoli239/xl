@@ -139,4 +139,41 @@ class ThirdD extends BaseService
 
         return $data;
     }
+
+    /**
+     * 字符串转换成数字二、三定号码
+     * @param array $codes ['234', '34']
+     * @return array [23, 24, 33, 34, 43, 44]
+     */
+    public static function getArrayCodesByArray($codes=[]){
+        if(empty($codes)){
+            return [];
+        }
+        $len = count($codes); # 号码尾数
+        $data = [];
+        if($len==2){
+            # 两位数
+            $code0 = $codes[0];
+            $code1 = $codes[1];
+            for ($i=0; $i<strlen($code0); $i++){
+                for ($j=0; $j<strlen($code1); $j++){
+                    $data[] = $code0[$i].$code1[$j];
+                }
+            }
+        }elseif($len==3){
+            # 三位数
+            $code0 = $codes[0];
+            $code1 = $codes[1];
+            $code2 = $codes[2];
+            for ($i=0; $i<strlen($code0); $i++){
+                for ($j=0; $j<strlen($code1); $j++){
+                    for ($k=0; $k<strlen($code2); $k++) {
+                        $data[] = $code0[$i] . $code1[$j] . $code2[$k];
+                    }
+                }
+            }
+        }
+
+        return $data;
+    }
 }

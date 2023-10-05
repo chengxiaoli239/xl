@@ -120,8 +120,9 @@ class MethodMatchService extends CommonBaseService
     const METHOD_ID_QD = 92; # 全倒
     const METHOD_ID_ZX_FS = 93; # 直选复式
 
-    # 组与组之间符号
-    const ZU_SPLIT_FLAG = ';';
+    const ZU_SPLIT_FLAG = ';'; # 组与组之间符号
+    const CODE_SPLIT_FLAG = ','; # 组内号码之间符号
+
     /**
      * 1 直选
      * @param string $text
