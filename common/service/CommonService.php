@@ -15,6 +15,7 @@ use backend\service\StaticService;
 use common\models\thirdD\PlayMethod;
 use common\models\User;
 use common\service\thirdD\CommonBaseService;
+use common\service\thirdD\MethodMatchService;
 use common\tools\Tool_Common;
 use backend\service\CurlService;
 use backend\service\UserService;
@@ -797,7 +798,6 @@ class  CommonService{
         return $flag;
     }
 
-
     /**
      * @desc 是否 三现:双重+兄弟
      * @param string $codes 格式 1,2,3,4
@@ -806,7 +806,7 @@ class  CommonService{
     public static function isCodeType3n2b($codes){
         $flag = 0;
         $m = \Yii::$app->cache;
-        $mkey = 'isCodeType3n2b_codes';
+        $mkey = 'isCodeType3n2b_codes_'.$codes;
         if(!$code3n2nArr = $m->get($mkey)){
             $code = CodeTypes::find()->where(['type'=>1])->one()['codes'];
             $code3n2nArr = explode(',', $code);
@@ -819,6 +819,29 @@ class  CommonService{
 
         foreach ($code_3ns as $code_3n){
             if(in_array($code_3n, $code3n2nArr)) $flag = 1;
+        }
+
+        return $flag;
+    }
+
+    /**
+     * @desc 前三：1组三、2组六、3豹子判断
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function isCodeTypeZxBz($codes){
+        $m = \Yii::$app->cache;
+        $codeArr = explode(',', $codes);
+        $mkey = 'isCodeTypeZxBz_codes_'.$codeArr[0].$codeArr[1].$codeArr[2];
+        if(true OR !$flag = $m->get($mkey)){
+            if($codeArr[0]==$codeArr[1] && $codeArr[1]==$codeArr[2]){
+                $flag = MethodMatchService::CODE_TYPE_BAO_ZI;
+            }elseif ($codeArr[0]==$codeArr[1] OR $codeArr[0]==$codeArr[2] OR $codeArr[1]==$codeArr[2]){
+                $flag = MethodMatchService::CODE_TYPE_ZU_SAN;
+            }else{
+                $flag = MethodMatchService::CODE_TYPE_ZU_LIU;
+            }
+            $m->set($mkey, $flag, 86400 * 7);
         }
 
         return $flag;

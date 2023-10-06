@@ -8,15 +8,20 @@ use yii\helpers\Json;
 
 class MethodMatchService extends CommonBaseService
 {
+
+    const CODE_TYPE_ZU_SAN = 1; # 组三
+    const CODE_TYPE_ZU_LIU = 2; # 组六
+    const CODE_TYPE_BAO_ZI = 3; # 豹子
+
     const METHOD_ID_ZHIXUAN = 1;
     const METHOD_ID_ZUSAN = 2;
     const METHOD_ID_ZULIU = 3;
     const METHOD_ID_DUDAN = 4;
     const METHOD_ID_SHUANGFEN = 5;
-    const METHOD_ID_QUANTUO = 6;
+    const METHOD_ID_QUANTUO = 6; # 对子全拖、双飞
     const METHOD_ID_YIMADING = 7;
     const METHOD_ID_ERMADING = 8;
-    const METHOD_ID_BAOZI_QB = 9;
+    const METHOD_ID_BAOZI_QB = 9; # 豹子全包
 
     # 组六x码
     const METHOD_ID_ZL_4_MA = 10;
@@ -26,6 +31,16 @@ class MethodMatchService extends CommonBaseService
     const METHOD_ID_ZL_8_MA = 14;
     const METHOD_ID_ZL_9_MA = 15;
     const METHOD_ID_ZL_QB = 16;
+    # 组六玩法ID集合
+    const METHOD_ID_ZL = [
+        self::METHOD_ID_ZL_4_MA,
+        self::METHOD_ID_ZL_5_MA,
+        self::METHOD_ID_ZL_6_MA,
+        self::METHOD_ID_ZL_7_MA,
+        self::METHOD_ID_ZL_8_MA,
+        self::METHOD_ID_ZL_9_MA,
+        self::METHOD_ID_ZL_QB,
+    ];
 
     # 组三x码
     const METHOD_ID_ZS_2_MA = 17;
@@ -37,6 +52,18 @@ class MethodMatchService extends CommonBaseService
     const METHOD_ID_ZS_8_MA = 23;
     const METHOD_ID_ZS_9_MA = 24;
     const METHOD_ID_ZS_QB = 25;
+    # 组三玩法ID集合
+    const METHOD_ID_ZS = [
+        self::METHOD_ID_ZS_2_MA,
+        self::METHOD_ID_ZS_3_MA,
+        self::METHOD_ID_ZS_4_MA,
+        self::METHOD_ID_ZS_5_MA,
+        self::METHOD_ID_ZS_6_MA,
+        self::METHOD_ID_ZS_7_MA,
+        self::METHOD_ID_ZS_8_MA,
+        self::METHOD_ID_ZS_9_MA,
+        self::METHOD_ID_ZS_QB,
+    ];
 
     # 跨度0-9
     const METHOD_ID_KD_0 = 26;

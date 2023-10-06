@@ -425,6 +425,7 @@ class KjDataGet
             'type_4b' => CommonService::isCodeType4b($codes), # 是否四兄弟
             'type_4ds' => CommonService::isCodeType4ds($codes), # 是否四单双：0非四单四双1四单2四双
             'type_3n_2b' => CommonService::isCodeType3n2b($codes), # 是否三现：双重+兄弟
+            'type_zx_bz' => CommonService::isCodeTypeZxBz($codes), # 前三：组三、组六、豹子判读判断
 
             # 大小类型
             'type_dx' => $type_dx, # 大小类型： \backend\service\NumService::$type_dx_datas
