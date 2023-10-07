@@ -33,7 +33,7 @@ class OperateLotteryService extends CommonBaseService
     public static function operate($lottery_type=DEFAULT_LOTTERY_TYPE, $qihao=''){
 
         $where = OperateLotteryService::runWhere($lottery_type, $qihao);
-        //$where = ['id'=>49]; # 测试
+        #$where = ['and', 'id>330', 'id<338']; # 测试
         $BetRows = \backend\models\wechat\Bets::find()->where($where)->limit(10)->all();
         if(empty($BetRows)){
             throw_info('记录为空');
@@ -49,6 +49,7 @@ class OperateLotteryService extends CommonBaseService
 
         $kjCode = trim(substr($kjCode, 0, 5));
         $kjCode = $kjCode[0].','.$kjCode[2].','.$kjCode[4];
+        //$kjCode = '7,7,9'; # 测试
         foreach ($BetRows as $betRow){
             $method_id = $betRow->play_method;
             try {
@@ -98,6 +99,83 @@ class OperateLotteryService extends CommonBaseService
                     case MethodMatchService::METHOD_ID_ZS_QB: # 组三全包
                         OperateLotteryService::runZuXuanQuanBao($betRow, $kjCode); # 组选x码
                         break;
+                    case MethodMatchService::METHOD_ID_KD_0: # 跨度0
+                    case MethodMatchService::METHOD_ID_KD_1: # 跨度1
+                    case MethodMatchService::METHOD_ID_KD_2: # 跨度2
+                    case MethodMatchService::METHOD_ID_KD_3: # 跨度3
+                    case MethodMatchService::METHOD_ID_KD_4: # 跨度4
+                    case MethodMatchService::METHOD_ID_KD_5: # 跨度5
+                    case MethodMatchService::METHOD_ID_KD_6: # 跨度6
+                    case MethodMatchService::METHOD_ID_KD_7: # 跨度7
+                    case MethodMatchService::METHOD_ID_KD_8: # 跨度8
+                    case MethodMatchService::METHOD_ID_KD_9: # 跨度9
+                        OperateLotteryService::runKuaDu($betRow, $kjCode); # 跨度
+                        break;
+                    case MethodMatchService::METHOD_ID_YMT_ZL_2: # 一码拖2_组六
+                    case MethodMatchService::METHOD_ID_YMT_ZL_3: # 一码拖3_组六
+                    case MethodMatchService::METHOD_ID_YMT_ZL_4: # 一码拖4_组六
+                    case MethodMatchService::METHOD_ID_YMT_ZL_5: # 一码拖5_组六
+                    case MethodMatchService::METHOD_ID_YMT_ZL_6: # 一码拖6_组六
+                    case MethodMatchService::METHOD_ID_YMT_ZL_7: # 一码拖7_组六
+                    case MethodMatchService::METHOD_ID_YMT_ZL_8: # 一码拖8_组六
+                    case MethodMatchService::METHOD_ID_YMT_ZL_9: # 一码拖9_组六
+                        OperateLotteryService::runYiTuoZuLiu($betRow, $kjCode); # 跨度
+                        break;
+                    case MethodMatchService::METHOD_ID_YMT_ZS_2: # 一码拖2_组三
+                    case MethodMatchService::METHOD_ID_YMT_ZS_3: # 一码拖3_组三
+                    case MethodMatchService::METHOD_ID_YMT_ZS_4: # 一码拖4_组三
+                    case MethodMatchService::METHOD_ID_YMT_ZS_5: # 一码拖5_组三
+                    case MethodMatchService::METHOD_ID_YMT_ZS_6: # 一码拖6_组三
+                    case MethodMatchService::METHOD_ID_YMT_ZS_7: # 一码拖7_组三
+                    case MethodMatchService::METHOD_ID_YMT_ZS_8: # 一码拖8_组三
+                    case MethodMatchService::METHOD_ID_YMT_ZS_9: # 一码拖9_组三
+                        OperateLotteryService::runYiTuoZuSan($betRow, $kjCode); # 跨度
+                        break;
+                    case MethodMatchService::METHOD_ID_FS_3: # 复式三
+                    case MethodMatchService::METHOD_ID_FS_4: # 复式四
+                    case MethodMatchService::METHOD_ID_FS_5: # 复式五
+                    case MethodMatchService::METHOD_ID_FS_6: # 复式六
+                    case MethodMatchService::METHOD_ID_FS_7: # 复式七
+                    case MethodMatchService::METHOD_ID_FS_8: # 复式八
+                    case MethodMatchService::METHOD_ID_FS_9: # 复式九
+                        OperateLotteryService::runFuShiX($betRow, $kjCode); # 跨度
+                        break;
+                    case MethodMatchService::METHOD_ID_HZ_0: # 和值0
+                    case MethodMatchService::METHOD_ID_HZ_1: # 和值1
+                    case MethodMatchService::METHOD_ID_HZ_2: # 和值2
+                    case MethodMatchService::METHOD_ID_HZ_3: # 和值3
+                    case MethodMatchService::METHOD_ID_HZ_4: # 和值4
+                    case MethodMatchService::METHOD_ID_HZ_5: # 和值5
+                    case MethodMatchService::METHOD_ID_HZ_6: # 和值6
+                    case MethodMatchService::METHOD_ID_HZ_7: # 和值7
+                    case MethodMatchService::METHOD_ID_HZ_8: # 和值8
+                    case MethodMatchService::METHOD_ID_HZ_9: # 和值9
+                    case MethodMatchService::METHOD_ID_HZ_10: # 和值10
+                    case MethodMatchService::METHOD_ID_HZ_11: # 和值11
+                    case MethodMatchService::METHOD_ID_HZ_12: # 和值12
+                    case MethodMatchService::METHOD_ID_HZ_13: # 和值13
+                    case MethodMatchService::METHOD_ID_HZ_14: # 和值14
+                    case MethodMatchService::METHOD_ID_HZ_15: # 和值15
+                    case MethodMatchService::METHOD_ID_HZ_16: # 和值16
+                    case MethodMatchService::METHOD_ID_HZ_17: # 和值17
+                    case MethodMatchService::METHOD_ID_HZ_18: # 和值18
+                    case MethodMatchService::METHOD_ID_HZ_19: # 和值19
+                    case MethodMatchService::METHOD_ID_HZ_20: # 和值10
+                    case MethodMatchService::METHOD_ID_HZ_21: # 和值21
+                    case MethodMatchService::METHOD_ID_HZ_22: # 和值22
+                    case MethodMatchService::METHOD_ID_HZ_23: # 和值23
+                    case MethodMatchService::METHOD_ID_HZ_24: # 和值24
+                    case MethodMatchService::METHOD_ID_HZ_25: # 和值25
+                    case MethodMatchService::METHOD_ID_HZ_26: # 和值26
+                    case MethodMatchService::METHOD_ID_HZ_27: # 和值27
+                        OperateLotteryService::runHeZhi($betRow, $kjCode); # 和值
+                        break;
+                    case MethodMatchService::METHOD_ID_HZ_DA: # 和值大
+                    case MethodMatchService::METHOD_ID_HZ_XIAO: # 和值小
+                    case MethodMatchService::METHOD_ID_HZ_DAN: # 和值单
+                    case MethodMatchService::METHOD_ID_HZ_SHUANG: # 和值双
+                        OperateLotteryService::runHeZhiDxDs($betRow, $kjCode); # 和值
+                        break;
                     default:
                         Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理异常0', ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>'未知玩法ID:'.$method_id]);
                         break;
@@ -105,6 +183,7 @@ class OperateLotteryService extends CommonBaseService
 
             }catch (\Exception $e){
                 Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理异常1', ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+                p($e->getMessage());
             }
         }
 
@@ -538,6 +617,225 @@ class OperateLotteryService extends CommonBaseService
     }
 
     /**
+     * 跨度
+     * @param object $row
+     * @param string $kjCode 2,3,4
+     * @return bool
+     * @throws \common\exceptions\InfoException
+     */
+    public static function runKuaDu(object $betRow, $kjCode=''){
+        if(empty($betRow)){
+            throw_info('记录不能为空');
+        }
+        $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
+
+        $kd = \common\service\CommonService::getKuaDu($kjCode);
+        #p(['Odds'=>$Odds, 'betRow'=>$betRow->getAttributes(), 'kd'=>$kd, 'kjCode'=>$kjCode, 'codes'=>$betRow->codes]);
+
+        $zjCount = 0;
+        if($kd == $betRow->codes) {
+            $zjCount = 1;
+        }
+        #p(['betCodes'=>$betCodes, 'zjCount'=>$zjCount]);
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+
+        return true;
+    }
+
+    /**
+     * 一拖x组六
+     * @param object $row
+     * @param string $kjCode 2,3,4
+     * @return bool
+     * @throws \common\exceptions\InfoException
+     */
+    public static function runYiTuoZuLiu(object $betRow, $kjCode=''){
+        if(empty($betRow)){
+            throw_info('记录不能为空');
+        }
+        $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
+        $codes = $betRow->codes;
+        $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
+
+        $kjCodeArr = explode(',', $kjCode);
+
+        $flag = \common\service\CommonService::isCodeTypeZxBz($kjCode);
+        #p(['Odds'=>$Odds, 'betRow'=>$betRow->getAttributes(), 'codes'=>$codes, 'betCodes'=>$betCodes, 'kjCodeArr'=>$kjCodeArr, 'flag'=>$flag], 0);
+
+        $zjCount = 0;
+        $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
+        if($flag == MethodMatchService::CODE_TYPE_ZU_LIU) {
+            foreach ($betCodes as $oneCode) {
+                $f = preg_match_all('/(\d{1})拖(\d{2,})/', $oneCode, $matches);
+                if(empty($f)){
+                    throw_info('一码拖匹配异常');
+                }
+                $one = $matches[1][0];
+                if(in_array($one, $kjCodeArr)){
+                    $tuoMas = $matches[2][0]; # 拖的码
+                    $leaveCodes = array_values(array_diff($kjCodeArr, [$one]));  # array_values 重建索引
+                    #p(['tuoMas'=>$tuoMas, 'leaveCodes'=>$leaveCodes]);
+                    if (strpos($tuoMas, $leaveCodes[0]) !== false && strpos($tuoMas, $leaveCodes[1]) !== false  ) {
+                        $zjCount += 1;
+                    }
+                }
+                #p(['RowId' => $betRow->id, 'oneCode' => $oneCode, 'kjCodeArr' => $kjCodeArr, 'zjCount' => $zjCount]);
+            }
+        }
+        #p(['betCodes'=>$betCodes, 'zjCount'=>$zjCount]);
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+
+        return true;
+    }
+
+    /**
+     * 一拖x组三
+     * @param object $row
+     * @param string $kjCode 2,3,4
+     * @return bool
+     * @throws \common\exceptions\InfoException
+     */
+    public static function runYiTuoZuSan(object $betRow, $kjCode=''){
+        if(empty($betRow)){
+            throw_info('记录不能为空');
+        }
+        $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
+        $codes = $betRow->codes;
+        $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
+
+        $kjCodeArr = explode(',', $kjCode);
+
+        $flag = \common\service\CommonService::isCodeTypeZxBz($kjCode);
+        #p(['Odds'=>$Odds, 'betRow'=>$betRow->getAttributes(), 'codes'=>$codes, 'betCodes'=>$betCodes, 'kjCodeArr'=>$kjCodeArr, 'flag'=>$flag], 0);
+
+        $zjCount = 0;
+        $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
+        if($flag == MethodMatchService::CODE_TYPE_ZU_SAN) {
+            foreach ($betCodes as $oneCode) {
+                $f = preg_match_all('/(\d{1})拖(\d{2,})/', $oneCode, $matches);
+                if(empty($f)){
+                    throw_info('一码拖匹配异常');
+                }
+                $one = $matches[1][0];
+                if(in_array($one, $kjCodeArr)){
+                    $tuoMas = $matches[2][0]; # 拖的码
+                    $leaveCodes = array_values(array_diff($kjCodeArr, [$one]));  # array_values 重建索引
+                    #p(['tuoMas'=>$tuoMas, 'leaveCodes'=>$leaveCodes]);
+                    if (strpos($tuoMas, $leaveCodes[0]) !== false) {
+                        $zjCount += 1;
+                    }
+                }
+                #p(['RowId' => $betRow->id, 'oneCode' => $oneCode, 'kjCodeArr' => $kjCodeArr, 'zjCount' => $zjCount]);
+            }
+        }
+        #p(['betCodes'=>$betCodes, 'zjCount'=>$zjCount]);
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+
+        return true;
+    }
+
+    /**
+     * 复式三...九
+     * @param object $row
+     * @param string $kjCode 2,3,4
+     * @return bool
+     * @throws \common\exceptions\InfoException
+     */
+    public static function runFuShiX(object $betRow, $kjCode=''){
+        if(empty($betRow)){
+            throw_info('记录不能为空');
+        }
+        $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
+        $codes = $betRow->codes;
+        $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
+
+        $kjCodeArr = explode(',', $kjCode);
+        #p(['Odds'=>$Odds, 'betRow'=>$betRow->getAttributes(), 'codes'=>$codes, 'betCodes'=>$betCodes, 'kjCodeArr'=>$kjCodeArr], 0);
+
+        $zjCount = 0;
+        $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
+        foreach ($betCodes as $oneCode) {
+            if (strpos($oneCode, $kjCodeArr[0]) !== false && strpos($oneCode, $kjCodeArr[1]) !== false && strpos($oneCode, $kjCodeArr[2]) !== false) {
+                $zjCount += 1;
+            }
+            #p(['RowId' => $betRow->id, 'oneCode' => $oneCode, 'kjCodeArr' => $kjCodeArr, 'zjCount' => $zjCount]);
+        }
+        #p(['betCodes'=>$betCodes, 'zjCount'=>$zjCount]);
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+
+        return true;
+    }
+
+    /**
+     * 和值0...27
+     * @param object $row
+     * @param string $kjCode 2,3,4
+     * @return bool
+     * @throws \common\exceptions\InfoException
+     */
+    public static function runHeZhi(object $betRow, $kjCode=''){
+        if(empty($betRow)){
+            throw_info('记录不能为空');
+        }
+        $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
+        $codes = $betRow->codes;
+        $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
+
+        $heZhi = \common\service\CommonService::getHeZhi($kjCode);
+        #p(['Odds'=>$Odds, 'betRow'=>$betRow->getAttributes(), 'codes'=>$codes, 'betCodes'=>$betCodes, 'heZhi'=>$heZhi], 0);
+
+        $zjCount = 0;
+        $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
+        foreach ($betCodes as $oneCode) {
+            if ($oneCode == $heZhi) {
+                $zjCount += 1;
+            }
+            #p(['RowId' => $betRow->id, 'oneCode' => $oneCode, 'kjCodeArr' => $kjCodeArr, 'zjCount' => $zjCount]);
+        }
+        #p(['betCodes'=>$betCodes, 'zjCount'=>$zjCount]);
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+
+        return true;
+    }
+
+    /**
+     * 和值大小单双
+     * @param object $row
+     * @param string $kjCode 2,3,4
+     * @return bool
+     * @throws \common\exceptions\InfoException
+     */
+    public static function runHeZhiDxDs(object $betRow, $kjCode=''){
+        if(empty($betRow)){
+            throw_info('记录不能为空');
+        }
+        $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
+        $codes = $betRow->codes;
+        $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
+
+        $heZhi = \common\service\CommonService::getHeZhi($kjCode);
+        #p(['Odds'=>$Odds, 'betRow'=>$betRow->getAttributes(), 'codes'=>$codes, 'betCodes'=>$betCodes, 'heZhi'=>$heZhi], 0);
+
+        $zjCount = 0;
+        $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
+        foreach ($betCodes as $oneCode) {
+            if (
+                ($oneCode == '大' && 14<=$heZhi && $heZhi<=27) OR
+                ($oneCode == '小' && 0<=$heZhi && $heZhi<=13) OR
+                ($oneCode == '单' && $heZhi%2==1) OR
+                ($oneCode == '双' && $heZhi%2==0)
+            ) {
+                $zjCount += 1;
+            }
+            #p(['RowId' => $betRow->id, 'oneCode' => $oneCode, 'kjCodeArr' => $kjCodeArr, 'zjCount' => $zjCount]);
+        }
+        #p(['betCodes'=>$betCodes, 'zjCount'=>$zjCount]);
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+
+        return true;
+    }
+
+    /**
      * 中奖计算结果之后的存表处理
      * @param object $betRow
      * @param int $zjCount
@@ -549,7 +847,7 @@ class OperateLotteryService extends CommonBaseService
         if($zjCount>0){
             # 中奖
             $status = self::STATUS_LT_SUCCESS;
-            $bonus = round($Odds['odds'] * $betRow->single, 2) * $zjCount; # 奖金赔率 * 下注金额
+            $bonus = round(($Odds['bouns'] * $betRow->single)/$Odds['money'], 2) * $zjCount; # 奖金赔率 * 下注金额
         }else{
             # 未中奖
             $status = self::STATUS_LT_FAIL;

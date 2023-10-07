@@ -825,6 +825,20 @@ class  CommonService{
     }
 
     /**
+     * @desc 跨度获取
+     * @param string $codes 格式 1,2,3,4
+     * @return int
+     */
+    public static function getKuaDu($codes){
+        $codeArr = explode(',', trim($codes));
+        $min = min($codeArr);
+        $max = max($codeArr);
+        $kd = $max - $min;
+
+        return $kd;
+    }
+
+    /**
      * @desc 前三：1组三、2组六、3豹子判断
      * @param string $codes 格式 1,2,3,4
      * @return int
@@ -845,6 +859,18 @@ class  CommonService{
         }
 
         return $flag;
+    }
+
+    /**
+     * @desc 和值
+     * @param string $codes 格式 1,2,3
+     * @return int
+     */
+    public static function getHeZhi($codes){
+        $codeArr = explode(',', $codes);
+        $heZhi = array_sum($codeArr);
+
+        return $heZhi;
     }
 
     /**
