@@ -33,11 +33,12 @@ class OperateLotteryService extends CommonBaseService
     public static function operate($lottery_type=DEFAULT_LOTTERY_TYPE, $qihao=''){
 
         $where = OperateLotteryService::runWhere($lottery_type, $qihao);
-        #$where = ['and', 'id>330', 'id<338']; # 测试
-        $BetRows = \backend\models\wechat\Bets::find()->where($where)->limit(10)->all();
+        #$where = ['id'=>353]; # 测试
+        $BetRows = \backend\models\wechat\Bets::find()->where($where)->limit(3)->all();
         if(empty($BetRows)){
             throw_info('记录为空');
         }
+        #p(['BetRows'=>$BetRows]);
 
         if(empty($qihao)){
             $qihao = $BetRows[0]->qihao;
@@ -49,9 +50,10 @@ class OperateLotteryService extends CommonBaseService
 
         $kjCode = trim(substr($kjCode, 0, 5));
         $kjCode = $kjCode[0].','.$kjCode[2].','.$kjCode[4];
-        //$kjCode = '7,7,9'; # 测试
+        #$kjCode = '3,5,8'; # 测试
         foreach ($BetRows as $betRow){
             $method_id = $betRow->play_method;
+            //p($method_id);
             try {
                 switch ($method_id){
                     case MethodMatchService::METHOD_ID_ZHIXUAN:
@@ -175,6 +177,12 @@ class OperateLotteryService extends CommonBaseService
                     case MethodMatchService::METHOD_ID_HZ_DAN: # 和值单
                     case MethodMatchService::METHOD_ID_HZ_SHUANG: # 和值双
                         OperateLotteryService::runHeZhiDxDs($betRow, $kjCode); # 和值
+                        break;
+                    case MethodMatchService::METHOD_ID_DW_ZX_FS: # 定位直选复式
+                        OperateLotteryService::runHeZhiXuanFuShiDw($betRow, $kjCode); # 直选复式定位
+                        break;
+                    case MethodMatchService::METHOD_ID_QD: # 全倒
+                        OperateLotteryService::runQuanDao($betRow, $kjCode); # 全倒
                         break;
                     default:
                         Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理异常0', ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>'未知玩法ID:'.$method_id]);
@@ -828,6 +836,51 @@ class OperateLotteryService extends CommonBaseService
                 $zjCount += 1;
             }
             #p(['RowId' => $betRow->id, 'oneCode' => $oneCode, 'kjCodeArr' => $kjCodeArr, 'zjCount' => $zjCount]);
+        }
+        #p(['betCodes'=>$betCodes, 'zjCount'=>$zjCount]);
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+
+        return true;
+    }
+
+    /**
+     * 直选复式定位
+     * @param object $row
+     * @param string $kjCode 2,3,4
+     * @return bool
+     * @throws \common\exceptions\InfoException
+     */
+    public static function runHeZhiXuanFuShiDw(object $betRow, $kjCode=''){
+        if(empty($betRow)){
+            throw_info('记录不能为空');
+        }
+        $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
+        $codes = $betRow->codes;
+        $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
+
+        $kjCodeArr = explode(',', $kjCode);
+        #p(['Odds'=>$Odds, 'betRow'=>$betRow->getAttributes(), 'codes'=>$codes, 'betCodes'=>$betCodes, 'kjCodeArr'=>$kjCodeArr], 0);
+
+        $zjCount = 0;
+        $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
+        foreach ($betCodes as $oneCode) {
+            if(preg_match_all('/(?:百|十|个)(\d+)/u', $oneCode, $matches)){
+                $flag = 1;
+                #p(['matches'=>$matches, 'kjCodeArr'=>$kjCodeArr]);
+                foreach ($matches[0] as $k=>$match0){
+                    $f1 = (strpos($match0, '百') !== false && strpos($match0, $kjCodeArr[0]) === false);
+                    $f2 = (strpos($match0, '十') !== false && strpos($match0, $kjCodeArr[1]) === false);
+                    $f3 = (strpos($match0, '个') !== false && strpos($match0, $kjCodeArr[2]) === false);
+                    # 只要其中一位匹配不到，则为不中奖 flag=0
+                    if( $f1 OR $f2 OR $f3 ){
+                        $flag = 0;
+                    }
+                }
+                if ($flag) {
+                    $zjCount += 1;
+                }
+            }
+            //p(['RowId' => $betRow->id, 'oneCode' => $oneCode, 'kjCodeArr' => $kjCodeArr, 'zjCount' => $zjCount, 'flag'=>$flag]);
         }
         #p(['betCodes'=>$betCodes, 'zjCount'=>$zjCount]);
         self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
