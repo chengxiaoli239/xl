@@ -876,7 +876,7 @@ class MethodMatchService extends CommonBaseService
     }
 
     /**
-     *  92 定位直选复式
+     *  92 全倒
      * @param string $text
      * @param array $codes
      * @return array
@@ -889,48 +889,62 @@ class MethodMatchService extends CommonBaseService
         $text = str_replace('全倒', '', $text);
         //p($text);
         // 使用正则表达式匹配组选后面的三个数字
-        if (preg_match_all('/(\d{3})/u', $text, $matches1) ) {
+        if (preg_match_all('/(\d{3,})/u', $text, $matches1) ) {
             $codesArr = $matches1[0];
         }
+        #p($codesArr);
         $code2s = [];
         $code3s = [];
+        $codeFuShis = [];
         foreach ($codesArr as $code){
             if(strlen($code)!=3){
-                throw_info('号码一定要是三位['.$code.']');
+                #throw_info('号码一定要是三位['.$code.']');
             }
             $tmpCodes = [];
             for($i=0; $i<strlen($code); $i++){
                 $tmpCodes[] = $code[$i];
             }
             $tmpCodes = array_unique($tmpCodes);
-            if(count($tmpCodes)<3){
+            $codeLen = count($tmpCodes);
+            if($codeLen<3){
                 $code2s[] = implode('', $tmpCodes);
-            }else{
+            }elseif($codeLen==3){
                 $code3s[] = implode('', $tmpCodes);
+            }elseif($codeLen>3){
+                if($codeLen<strlen($code)){
+                    throw_info('复式直选号码不能重复');
+                }
+                $codeFuShis[] = implode('', $tmpCodes);
             }
         }
-        $single = 0;
+        $count = 0;
         if(count($code2s)>0){
-            //$code2s_str = implode(',', $code2s);
             foreach ($code2s as $code2){
-                $single += 6;
+                $count += 6;
             }
         }
         if(count($code3s)>0){
-            //$code2s_str = implode(',', $code2s);
             foreach ($code3s as $code3){
-                $single += 12;
+                $count += 12;
+            }
+        }
+        if(count($codeFuShis)>0){
+            foreach ($codeFuShis as $codeFuShi){
+                $fsCount = 1;
+                for ($i=0; $i<3; $i++){
+                    $fsCount *= (strlen($codeFuShi)-$i);
+                }
+                $count += $fsCount;
             }
         }
 
         $name = '全倒';
-        $count = 1; //count($codesArr);
         $codes = implode(',', $codesArr);
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
 
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'single'=>$single, 'matchName'=>$name, 'count'=>$count];
-        //p([$methodArr, $codes]);
+        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
+        #p([$methodArr, $codes]);
 
         return $methodArr;
     }

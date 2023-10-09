@@ -622,6 +622,7 @@ class TzSystemUsersService extends ClientsBaseService{
 
                 $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
                 $datas[] = [
+                    'task_id' => $row->id,
                     'bet_url' => $bet_url,
                     'plan_type' => self::PlAN_TYPE_RE_LOCAL,
                     'plan_id' => $plan_id,

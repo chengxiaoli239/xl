@@ -33,7 +33,7 @@ class OperateLotteryService extends CommonBaseService
     public static function operate($lottery_type=DEFAULT_LOTTERY_TYPE, $qihao=''){
 
         $where = OperateLotteryService::runWhere($lottery_type, $qihao);
-        #$where = ['id'=>353]; # 测试
+        #$where = ['id'=>[384,384]]; # 测试
         $BetRows = \backend\models\wechat\Bets::find()->where($where)->limit(3)->all();
         if(empty($BetRows)){
             throw_info('记录为空');
@@ -50,7 +50,7 @@ class OperateLotteryService extends CommonBaseService
 
         $kjCode = trim(substr($kjCode, 0, 5));
         $kjCode = $kjCode[0].','.$kjCode[2].','.$kjCode[4];
-        #$kjCode = '3,5,8'; # 测试
+        #$kjCode = '4,1,2'; # 测试
         foreach ($BetRows as $betRow){
             $method_id = $betRow->play_method;
             //p($method_id);
@@ -183,6 +183,9 @@ class OperateLotteryService extends CommonBaseService
                         break;
                     case MethodMatchService::METHOD_ID_QD: # 全倒
                         OperateLotteryService::runQuanDao($betRow, $kjCode); # 全倒
+                        break;
+                    case MethodMatchService::METHOD_ID_ZX_FS: # 直选复式
+                        OperateLotteryService::runZhiXuanFuShi($betRow, $kjCode); # 直选复式
                         break;
                     default:
                         Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理异常0', ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>'未知玩法ID:'.$method_id]);
@@ -879,6 +882,88 @@ class OperateLotteryService extends CommonBaseService
                 if ($flag) {
                     $zjCount += 1;
                 }
+            }
+            //p(['RowId' => $betRow->id, 'oneCode' => $oneCode, 'kjCodeArr' => $kjCodeArr, 'zjCount' => $zjCount, 'flag'=>$flag]);
+        }
+        #p(['betCodes'=>$betCodes, 'zjCount'=>$zjCount]);
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+
+        return true;
+    }
+
+    /**
+     * 全倒
+     * @param object $row
+     * @param string $kjCode 2,3,4
+     * @return bool
+     * @throws \common\exceptions\InfoException
+     */
+    public static function runQuanDao(object $betRow, $kjCode=''){
+        if(empty($betRow)){
+            throw_info('记录不能为空');
+        }
+        $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
+        $codes = $betRow->codes;
+        $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
+
+        $kjCodeArr = explode(',', $kjCode);
+        #p(['Odds'=>$Odds, 'betRow'=>$betRow->getAttributes(), 'codes'=>$codes, 'betCodes'=>$betCodes, 'kjCodeArr'=>$kjCodeArr]);
+
+        $zjCount = 0;
+        $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
+        foreach ($betCodes as $oneCode) {
+            $flag = 1;
+            #p(['matches'=>$matches, 'kjCodeArr'=>$kjCodeArr]);
+            $f1 = strpos($oneCode, $kjCodeArr[0]) === false;
+            $f2 = strpos($oneCode, $kjCodeArr[1]) === false;
+            $f3 = strpos($oneCode, $kjCodeArr[2]) === false;
+            # 只要其中一位匹配不到，则为不中奖 flag=0
+            if( $f1 OR $f2 OR $f3 ){
+                $flag = 0;
+            }
+            if ($flag) {
+                $zjCount += 1;
+            }
+            //p(['RowId' => $betRow->id, 'oneCode' => $oneCode, 'kjCodeArr' => $kjCodeArr, 'zjCount' => $zjCount, 'flag'=>$flag]);
+        }
+        #p(['betCodes'=>$betCodes, 'zjCount'=>$zjCount]);
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+
+        return true;
+    }
+
+    /**
+     * 直选复式  跟全倒的匹配逻辑一样
+     * @param object $row
+     * @param string $kjCode 2,3,4
+     * @return bool
+     * @throws \common\exceptions\InfoException
+     */
+    public static function runZhiXuanFuShi(object $betRow, $kjCode=''){
+        if(empty($betRow)){
+            throw_info('记录不能为空');
+        }
+        $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
+        $codes = $betRow->codes;
+        $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
+
+        $kjCodeArr = explode(',', $kjCode);
+        #p(['Odds'=>$Odds, 'betRow'=>$betRow->getAttributes(), 'codes'=>$codes, 'betCodes'=>$betCodes, 'kjCodeArr'=>$kjCodeArr]);
+
+        $zjCount = 0;
+        $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
+        foreach ($betCodes as $oneCode) {
+            $flag = 1;
+            #p(['matches'=>$matches, 'kjCodeArr'=>$kjCodeArr]);
+            $f1 = strpos($oneCode, $kjCodeArr[0]) === false;
+            $f2 = strpos($oneCode, $kjCodeArr[1]) === false;
+            $f3 = strpos($oneCode, $kjCodeArr[2]) === false;
+            # 只要其中一位匹配不到，则为不中奖 flag=0
+            if( $f1 OR $f2 OR $f3 ){
+                $flag = 0;
+            }
+            if ($flag) {
+                $zjCount += 1;
             }
             //p(['RowId' => $betRow->id, 'oneCode' => $oneCode, 'kjCodeArr' => $kjCodeArr, 'zjCount' => $zjCount, 'flag'=>$flag]);
         }
