@@ -21,6 +21,7 @@ use common\tools\Tool_Common;
 use backend\models\ThreeNum;
 use yii\helpers\ArrayHelper;
 use  yii;
+use yii\helpers\Json;
 
 class NumService extends BaseService {
     const DW_POSES = [1, 2, 3, 4];
@@ -235,6 +236,11 @@ class NumService extends BaseService {
         123=>'过滤百位最近1个冷码+两大两小+双重 ',
         124=>'过滤十位最近1个冷码+两大两小+双重 ',
         125=>'过滤个位最近1个冷码+两大两小+双重 ',
+
+        126=>'过滤千位最近1个冷码+合分 ',
+        127=>'过滤百位最近1个冷码+合分 ',
+        128=>'过滤十位最近1个冷码+合分 ',
+        129=>'过滤个位最近1个冷码+合分 ',
     ];
 
     /**
@@ -3188,6 +3194,18 @@ class NumService extends BaseService {
                 case 125: # 过滤个位最近1个冷码+两大两小+对数
                     $codes = NumService::getBeforeKjCodesDynamic114($plan, $type_field='type_dx', $type_val=3, $positions=4, $type_log=2); #
                     break;
+                case 126: # 过滤千位最近1个冷码+两大两小+对数
+                    $codes = NumService::getBeforeKjCodesDynamic115($plan, $positions=1); #
+                    break;
+                case 127: # 过滤百位最近1个冷码+两大两小+对数
+                    $codes = NumService::getBeforeKjCodesDynamic115($plan, $positions=2); #
+                    break;
+                case 128: # 过滤十位最近1个冷码+两大两小+对数
+                    $codes = NumService::getBeforeKjCodesDynamic115($plan, $positions=3); #
+                    break;
+                case 129: # 过滤个位最近1个冷码+两大两小+对数
+                    $codes = NumService::getBeforeKjCodesDynamic115($plan, $positions=4); #
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -5089,6 +5107,61 @@ class NumService extends BaseService {
         $sql = $query->createCommand()->getRawSql();//p($sql);
         $NumTypes = $query->asArray()->all();
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重2', ['plan_id'=>$plan->id, 'current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'sql'=>$sql, 'count'=>count($NumTypes)]);
+        #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - # 过滤千位最近1个冷码+合分
+     * @param object $plan
+     * @param string $type_field
+     * @param int $type_val 当type_field=type_3b则type_val=1表示三兄弟，当type_field=type_4ds则type_val=0非四单四双1四单2四双3两单两双4一单三双5一双三单
+     * @param int $positions
+     * @param string $type  0不过滤1过滤对数2过滤双重，空则不过滤
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic115(object $plan, $pos=1){
+        $playway = $plan->playway;
+        $hzArr = Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao'];
+        $lottery_type = $plan->lottery_type;
+        if(empty($current_kj_qihao)){
+            $is_empty_c_qihao = 1;
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $qihao = $DataDealStatus['qihao'];
+        }else{
+            $is_empty_c_qihao = 0;
+            $qihao = HN0898Service::getCurrentQihao($lottery_type);
+        }
+
+        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'qihao', $qihao]];
+        $historyKjDatasQuery = SscKjData::find()->select(['code1', 'code2', 'code3', 'code4', 'code5', 'code_str', 'qihao'])
+            ->where($historyWhere)->limit(1)->orderBy(['id'=>SORT_DESC]);
+        $sql = $historyKjDatasQuery->createCommand()->getRawSql();//p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤上期每两个号码及对数', ['pos'=>$pos, 'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+        $historyKjData = $historyKjDatasQuery->asArray()->one();
+
+        $latelyCode = NumService::getPosLatelyCode($pos, $num=9, $lottery_type);
+        $filterCodes = array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode); # 过滤1冷码
+
+        $filterNum_kjcode_field = 'code'.$pos;
+        $filterNum = $historyKjData[$filterNum_kjcode_field];
+        $filterNums = [$filterNum, $filterNum+10, $filterNum+20, $filterNum+30]; # 合分
+        #p([\backend\service\NumService::$ALL_CODES, $latelyCode,  $filterCodes]);
+
+        $filterNum_code_field = 'code_'.$pos;
+
+        $notWhere = ['NOT', ['AND', ['=',$filterNum_code_field, $filterNum], ['IN', 'codes_hz', $filterNums]]];
+        $pos_field = 'code_'.$pos;
+        $query = Num4Type::find()->alias('n')->select(['code', $pos_field, 'code_type'])
+            ->where($notWhere)
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $NumTypes = $query->asArray()->all();
+        $sql = $query->createCommand()->getRawSql();//p($sql, 0);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤冷码+合分', ['pos'=>$pos, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'plan_id'=>$plan->id, 'latelyCode'=>$latelyCode, 'filterCodes'=>$filterCodes, 'sql'=>$sql]);
         #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
