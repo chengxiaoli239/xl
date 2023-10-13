@@ -9,15 +9,19 @@
 namespace common\service\webot;
 use backend\models\wx\WebotConfigs;
 use common\general\helpers\Curl;
+use common\models\eyun\RobotUser;
 use  yii;
 use common\tools\Util;
 
 class BaseService
 {
-    public static $webotConfigs;
+    public static $webotConfigs; # e云账号全局配置
+    public static $RobotUser; # 当前登录微信的信息
     public static function __init($uid = 1){
-        $WebotConfigs = WebotConfigs::find()->where(['uid'=>$uid])->one();
+        $WebotConfigs = WebotConfigs::find()->limit(1)->one();
+        $RobotUser = RobotUser::find()->where(['uid'=>$uid])->one();
         self::$webotConfigs = $WebotConfigs;
+        self::$RobotUser = $RobotUser;
     }
 
     /**

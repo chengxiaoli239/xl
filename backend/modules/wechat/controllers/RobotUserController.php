@@ -1,10 +1,13 @@
 <?php
 namespace backend\modules\wechat\controllers;
 
+use common\models\eyun\HistoryRobots;
+use common\service\wechat\RobotUserService;
 use Yii;
 use backend\models\wechat\RobotUser;
 use backend\models\searchs\wechat\RobotUser as RobotUserSearch;
 use backend\controllers\BaseController;
+use yii\data\ArrayDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -53,11 +56,48 @@ class RobotUserController extends BaseController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView()
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
+        $user_id = $this->_user_id;
+        $allModels = RobotUser::find()->alias('r')
+            ->select(['h.id', 'h.user_id', 'h.nickName', 'h.wechat_status', 'h.wcId', 'h.smallHeadImgUrl', 'h.update_at'])
+            ->leftJoin(HistoryRobots::tableName().' h', 'r.user_id=h.user_id')
+            ->where(['=', 'r.user_id', $user_id])
+            ->asArray()->all();
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $allModels
         ]);
+        return $this->render('view', [
+            'model' => $this->findModel(['user_id'=>$user_id]),
+            'dataProvider' => $dataProvider,
+            #'historyRecords' => $rows,
+        ]);
+    }
+
+    /**
+     * 如果是获取二维码登录，则前端需要用下面的方法一直等待执行微信登录
+     * @return array
+     */
+    public function actionSwitchWechat(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+
+        $rst = RobotUserService::switchWechat($this->_user_id, $post);
+
+        return $rst;
+    }
+
+    /**
+     * @return array
+     */
+    public function actionActWechatLogin(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        #return ['status'=>200, 'msg'=>'ddd'];
+
+        $rst = RobotUserService::actWechatLogin($this->_user_id, $post);
+
+        return $rst;
     }
 
     /**
@@ -119,9 +159,9 @@ class RobotUserController extends BaseController
      * @return RobotUser the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($params)
     {
-        if (($model = RobotUser::findOne($id)) !== null) {
+        if (($model = RobotUser::findOne($params)) !== null) {
             return $model;
         }
 

@@ -35,7 +35,7 @@ class EYunBaseService  extends BaseService
     const MSG_TYPE_BASE = 1;
     const MSG_TYPE_IMPROVE = 2;
 
-    public function __construct($user_id='', $config = [])
+    public function __construct($user_id='', $wcId='', $config = [])
     {
         $this->user_id = $user_id;
         if(empty($config)){
@@ -48,17 +48,18 @@ class EYunBaseService  extends BaseService
             ];
             $this->base_url = $config['base_url'];
             $this->ttuid = $config['ttuid'];
-            $this->account = $config['ttuid'];
+            $this->account = $config['account'];
             $this->password = $config['password'];
         }
-        $eyunAuth = EyunAuth::findOne(1);
+        $eyunAuth = EyunAuth::find()->where(['type'=>EyunAuth::TYPE_EYUN])->one();
         if(!empty($eyunAuth)){
             $headers = [
                 'Authorization' => $eyunAuth->authorization,
             ];
             $this->headers = $headers;
+            $this->account = $eyunAuth->account;
         }
-        $RobotUser = RobotUser::findOne(['user_id'=>$user_id]);
+        $RobotUser = RobotUser::findOne(['user_id'=>$user_id, 'wcId'=>$wcId]);
         if(!empty($RobotUser)){
             $this->wcId = $RobotUser->wcId;
             $this->wId = $RobotUser->wId;
@@ -67,7 +68,7 @@ class EYunBaseService  extends BaseService
     }
 
     /**
-     * 登录E云平台
+     * 第一步：登录E云平台
      * @return bool|mixed|null
      */
     public function memberLogin(){
@@ -82,13 +83,15 @@ class EYunBaseService  extends BaseService
             $this->Authorization = $response['data']['Authorization'];
             $m = \Yii::$app->cache;
             $m->set($mkey, $this->Authorization);
-            $e = EyunAuth::findOne(1);
+            $e = EyunAuth::find()->where(['type'=>EyunAuth::TYPE_EYUN])->one();;
             $setData = [];
             if(empty($e)){
                 $e = new EyunAuth();
                 $setData = [
+                    'account' => $this->account,
+                    'password' => $this->password,
                     'created_at' => time(),
-                    'status' => 1,
+                    'status' => self::STATUS_ACTIVE,
                 ];
             }
             $setData = array_merge($setData, [
@@ -105,23 +108,25 @@ class EYunBaseService  extends BaseService
         return $response;
     }
 
+    public static function getUserWIdKey($user_id=''){
+        return 'getUserWIdKey_x0_'.$user_id;
+    }
+
     /**
-     * 获取二维码(第二部-方式一) - 优先对接
+     * 获取二维码(第二步-方式一) - 推荐对接，在调用此接口之前，用户点对应的登陆微信先更新lt_robot_user.wcId
      * @return bool|mixed|null
      */
-    public function localIPadLogin(){
+    public function localIPadLogin($wcId=''){
         $url = $this->base_url . '/localIPadLogin';
         $params = [
-            'wcId' => $this->wcId,
+            'wcId' => $wcId ? : $this->wcId,
             'ttuid' => $this->ttuid
         ];
         $response = $this->request($url, $params, $this->headers);
         if($response['code'] == 1000 && !empty($response['data'])){
-            $RobotUser = RobotUser::findOne(['user_id'=>$this->user_id]);
-            if($RobotUser){
-                $RobotUser->wId = $response['data']['wId'];
-                $RobotUser->save();
-            }
+            $m = \Yii::$app->cache;
+            $mkey = EYunBaseService::getUserWIdKey($this->user_id);
+            $m->set($mkey, $response['data']['wId'], 3600); # 登录实例Id，第一次登录存缓存，登录成功则存lt_robot_user表
         }
 
         Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '获取二维码(方式一)', ['url'=>$url, 'params'=>$params, 'response'=>$response]);
@@ -151,18 +156,20 @@ class EYunBaseService  extends BaseService
     }
 
     /**
-     * 执行微信登录（第三步）
+     * 执行微信登录（第三步）  第二步获取二维码之后循环持续掉，或者调用一次一直等待（前端页面调用）
+     * @param string $wId
      * @return bool|mixed|null
      */
-    public function getIPadLoginInfo(){
+    public function getIPadLoginInfo($wId=''){
         $url = $this->base_url . '/getIPadLoginInfo';
         $params = [
-            'wId' => $this->wId,
+            'wId' => $wId ? : $this->wId,
         ];
         $response = $this->request($url, $params, $this->headers);
         if($response['code'] == '1000' && !empty($response['data'])){
             $data = $response['data'];
             $data['busness_id'] = $data['wcId'];
+            $data['user_id'] = $this->user_id;
             push_queue_open(AfterWechatLoginJobs::class, $data);
         }
 
@@ -209,6 +216,7 @@ class EYunBaseService  extends BaseService
             $params = [
                 'friends' => $newFriends,
                 'user_id' => $this->user_id,
+                'wcId' => $this->wcId,
                 'business_id' => $this->user_id,
             ];
             push_queue(EYunUserJobs::class, $params);
@@ -282,5 +290,45 @@ class EYunBaseService  extends BaseService
         }
 
         return $data;
+    }
+
+    /**
+     * 是否在线
+     * @return bool
+     */
+    public function isOnline(){
+        $url = $this->base_url . '/isOnline';
+        $params = [
+            'wId' => $this->wId,
+        ];
+        $response = $this->request($url, $params, $this->headers);
+        if($response['code'] == '1000' && !empty($response['data'])){
+            $data = $response['data'];
+        }
+
+        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '是否在线', ['url'=>$url, 'params'=>$params, 'response'=>$response]);
+
+        return $response;
+    }
+
+    /**
+     * 批量下线微信号
+     * @param array $wcIds
+     * @return bool|mixed|null
+     */
+    public function setOffline($wcIds=[]){
+        $url = $this->base_url . '/member/offline';
+        $params = [
+            'account' => $this->account,
+            'wcIds' => $wcIds,
+        ];
+        $response = $this->request($url, $params, $this->headers);
+        if($response['code'] == '1000' && !empty($response['data'])){
+            $data = $response['data'];
+        }
+
+        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '是否在线', ['url'=>$url, 'params'=>$params, 'response'=>$response]);
+
+        return $response;
     }
 }

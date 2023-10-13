@@ -104,10 +104,12 @@ class LoginService extends BaseService
     public static function getAddressList($uid, $type = 'friends', $is_auto=1){
         $m = \Yii::$app->cache;
         $mkey = 'getAddressList_'.$uid.'_'.$type;
-        if($is_auto != 1 OR $rst = $m->get($mkey)) return $rst;
+        #if($is_auto != 1 OR $rst = $m->get($mkey)) return $rst;
         self::__init($uid);
-        self::initAddressList();
         $config = self::$webotConfigs;
+        $RobotUser = self::$RobotUser;
+        #p(['config'=>$config, 'RobotUser'=>$RobotUser]);
+        self::initAddressList();
         $url = $config->base_url.'/getAddressList';
 
         $headers = [
@@ -115,7 +117,7 @@ class LoginService extends BaseService
             'Authorization: '.$config['authorization'],
         ];
         $post_datas = [
-            'wId' => $config->wId,
+            'wId' => $RobotUser->wId,
         ];
         $rst = BaseService::sendCurlPost($url, $headers, $post_datas);
         $logArr = ['url'=>$url, 'headers'=>$headers, 'post_datas'=>$post_datas, 'rst'=>$rst];

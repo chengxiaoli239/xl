@@ -3,15 +3,14 @@ namespace common\models\eyun;
 
 use common\models\base\BaseModel;
 
-class EyunAuth extends BaseModel
+class HistoryRobots extends BaseModel
 {
-    const TYPE_EYUN = 1;
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return '{{%eyun_auth}}';
+        return '{{%history_robots}}';
     }
 
 }

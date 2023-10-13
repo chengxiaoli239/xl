@@ -20,7 +20,8 @@ class EYunUserJobs extends CommonJob {
 
     public static function handle($params){
         $friends = $params['friends'];
-        $user_id = $params['user_id'];
+        $user_id = $params['user_id']; # 系统用户id
+        $wcId = $params['wcId']; # 微信Id
         $e = new EYunBaseService($user_id);
         $page = 1;
         $pageSize = 20;
@@ -36,13 +37,14 @@ class EYunUserJobs extends CommonJob {
             if($response['code'] == 1000 && !empty($response['data'])) {
                 $datas = $response['data'];
                 foreach ($datas as $data){
-                    $where = ['user_id'=>$user_id, 'userName'=>$data['userName']];
+                    $where = ['user_id'=>$user_id, 'wcId'=>$wcId, 'userName'=>$data['userName']];
                     $WechatUser = WechatUser::findOne($where);
                     $setData = [];
                     if(empty($WechatUser)){
                         $WechatUser = new WechatUser();
                         $setData = array_merge($setData, [
                             'user_id'=>$user_id,
+                            'wcId'=>$wcId,
                             'userName'=>$data['userName'],
                             'created_at' => $now_time,
                         ]);

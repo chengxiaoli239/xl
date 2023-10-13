@@ -18,12 +18,4 @@ class EYunController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
     }
 
-    public function actionTest(){
-
-    }
-
-    public function actionLocalIPadLogin(){
-
-    }
-
 }

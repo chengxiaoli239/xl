@@ -1,6 +1,7 @@
 <?php
 namespace common\service\jobs\robots\user;
 
+use common\models\eyun\HistoryRobots;
 use common\models\eyun\RobotUser;
 use common\service\chat\Tool_Common;
 use common\service\jobs\CommonJob;
@@ -22,17 +23,42 @@ class AfterWechatLoginJobs extends CommonJob {
 
     public static function handle($params){
         try {
+            $now_time = time();
             $wcId = $params['wcId']; # 微信原始id
+            $user_id = $params['user_id']; # 系统用户id
             $wechatStatus = RobotUserService::WECHAT_STATUS_ONLINE;
-            $RobotUser = RobotUser::findOne(['wcId'=>$wcId]);
+            $RobotUser = RobotUser::findOne(['user_id'=>$user_id]);
             if(empty($RobotUser)){
-                throw_info('机器人robot_user找不到记录');
+                #throw_info('机器人robot_user找不到记录');
+                $RobotUser = new RobotUser();
+                $RobotUser->user_id = $user_id;
+                $RobotUser->uuid = \Yii::$app->params['E_YUN']['TTUID'];
             }
+            $m = \Yii::$app->cache;
+            $wIdKey = EYunBaseService::getUserWIdKey($user_id);
+            $RobotUser->wcId = $wcId;
+            $RobotUser->wId = $m->get($wIdKey); # 登录成功，从第二步获取二维码的同时返回的实例存缓存，这里从缓存取
             $RobotUser->wechat_status = $wechatStatus;
             $RobotUser->save();
 
+            # 记录历史登陆记录
+            $whereHistory = ['user_id'=>$user_id, 'wcId'=>$wcId];
+            $historyRobots = HistoryRobots::findOne($whereHistory);
+            if(empty($historyRobots)){
+                $historyRobots = new HistoryRobots();
+                $historyRobots->user_id = $user_id;
+                $historyRobots->wcId = $wcId;
+                $historyRobots->uuid = \Yii::$app->params['E_YUN']['TTUID'];
+                $historyRobots->created_at = $now_time;
+            }
+            $historyRobots->headUrl = $params['headUrl'];
+            $historyRobots->smallHeadImgUrl = $params['headUrl'];
+            $historyRobots->wechat_status = $wechatStatus;
+            $historyRobots->updated_at = $now_time;
+            $historyRobots->save();
+
             # 登录成功之后 - 初始化通讯录
-            $e = new EYunBaseService($RobotUser->user_id);
+            $e = new EYunBaseService($RobotUser->user_id, $wcId);
             # 初始化通讯录列表（第四步）
             $initAddressListRst = $e->initAddressList();
             # 初始化通讯录列表（第五步）

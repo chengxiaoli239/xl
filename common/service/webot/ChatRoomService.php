@@ -24,6 +24,7 @@ class ChatRoomService extends BaseService
     public static function getChatRoomMember($uid, $chatRoomId){
         self::__init($uid);
         $config = self::$webotConfigs;
+        $RobotUser = self::$RobotUser;
         $url = $config->base_url.'/getChatRoomMember';
 
         $headers = [
@@ -31,7 +32,7 @@ class ChatRoomService extends BaseService
             'Authorization: '.$config['authorization'],
         ];
         $post_datas = [
-            'wId' => $config->wId,
+            'wId' => $RobotUser->wId,
             'chatRoomId' => $chatRoomId,
         ];
         $rst = BaseService::sendCurlPost($url, $headers, $post_datas);
@@ -52,6 +53,7 @@ class ChatRoomService extends BaseService
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         self::__init($uid);
         $config = self::$webotConfigs;
+        $RobotUser = self::$RobotUser;
         $url = $config->base_url.'/getChatRoomMemberInfo';
 
         $headers = [
@@ -60,7 +62,7 @@ class ChatRoomService extends BaseService
         ];
         $rst['data'] = [];
         $post_datas = [
-            'wId' => $config->wId, # 登录实例id
+            'wId' => $RobotUser->wId, # 登录实例id
             'chatRoomId' => $chatRoomId, # 群id
             'wcId' => $wxid, # 微信好友id
         ];
