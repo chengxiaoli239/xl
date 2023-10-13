@@ -5154,7 +5154,7 @@ class NumService extends BaseService {
 
         $filterNum_code_field = 'code_'.$pos;
 
-        $notWhere = ['NOT', ['AND', ['=',$filterNum_code_field, $filterNum], ['IN', 'codes_hz', $filterNums]]];
+        $notWhere = ['NOT', ['AND', ['IN',$filterNum_code_field, $filterCodes], ['IN', 'codes_hz', $filterNums]]];
         $pos_field = 'code_'.$pos;
         $query = Num4Type::find()->alias('n')->select(['code', $pos_field, 'code_type'])
             ->where($notWhere)
