@@ -5147,21 +5147,20 @@ class NumService extends BaseService {
         $latelyCode = NumService::getPosLatelyCode($pos, $num=9, $lottery_type);
         $filterCodes = array_values(array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode)); # 过滤1冷码
 
-        $filterNum_kjcode_field = 'code'.$pos;
-        $filterNum = (int)$historyKjData[$filterNum_kjcode_field];
+        $filterNum = (int)current($filterCodes);
         $filterNums = [$filterNum, $filterNum+10, $filterNum+20, $filterNum+30]; # 合分
         #p([\backend\service\NumService::$ALL_CODES, $latelyCode,  $filterCodes]);
 
         $filterNum_code_field = 'code_'.$pos;
 
-        $notWhere = ['NOT', ['AND', ['IN',$filterNum_code_field, $filterCodes], ['IN', 'codes_4nums_hz', $filterNums]]];
+        $notWhere = ['NOT', ['AND', ['IN',$filterNum_code_field, $filterCodes], ['IN', 'codes_hz', $filterNums]]];
         $pos_field = 'code_'.$pos;
         $query = Num4Type::find()->alias('n')->select(['code', $pos_field, 'code_type'])
             ->where($notWhere)
             ->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
         $sql = $query->createCommand()->getRawSql();//p($sql, 0);
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤冷码+合分', ['pos'=>$pos, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'plan_id'=>$plan->id, 'latelyCode'=>$latelyCode, 'filterCodes'=>$filterCodes, 'filterNums'=>$filterNums, 'filterNum_kjcode_field'=>$filterNum_kjcode_field, 'historyKjData'=>$historyKjData, 'sql'=>$sql]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤冷码+合分', ['pos'=>$pos, 'is_empty_c_qihao'=>$is_empty_c_qihao, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'plan_id'=>$plan->id, 'latelyCode'=>$latelyCode, 'filterCodes'=>$filterCodes, 'filterNums'=>$filterNums, 'historyKjData'=>$historyKjData, 'sql'=>$sql]);
         #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
