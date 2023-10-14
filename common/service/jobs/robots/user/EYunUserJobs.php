@@ -22,7 +22,7 @@ class EYunUserJobs extends CommonJob {
         $friends = $params['friends'];
         $user_id = $params['user_id']; # 系统用户id
         $wcId = $params['wcId']; # 微信Id
-        $e = new EYunBaseService($user_id);
+        $eyun = new EYunBaseService($user_id);
         $page = 1;
         $pageSize = 20;
         while (true){
@@ -32,7 +32,7 @@ class EYunUserJobs extends CommonJob {
                 break;
             }
             $now_time = time();
-            $response = $e->getContact($wcIds);
+            $response = $eyun->getContact($wcIds);
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', '微信联系人信息同步', ['wcIds'=>$wcIds, 'response'=>$response]);
             if($response['code'] == 1000 && !empty($response['data'])) {
                 $datas = $response['data'];

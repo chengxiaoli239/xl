@@ -62,7 +62,7 @@ class AfterWechatLoginJobs extends CommonJob {
             $e = new EYunBaseService($RobotUser->user_id);
             # 初始化通讯录列表（第四步）
             $initAddressListRst = $e->initAddressList();
-            # 初始化通讯录列表（第五步）
+            # 获取通讯录列表（第五步）
             $getAddressListRst = $e->getAddressList();
         }catch (\Exception $e){
             return $e->getMessage();

@@ -3,6 +3,7 @@
 <script type="text/javascript" src="/vendors/layui-layer/3.1.1/layer.js"></script>
 <script type="text/javascript" src="/vendors/layui/2.4.5/layui.js"></script>
 <script type="text/javascript" src="/vendors/atrtemplate/4.13.2/template-web.js"></script>
+<script type="text/javascript" src="/statics/js/jquery-2.0.3.js"></script>
 <script type="text/javascript" src="/js/layui/global.js?v={{STATIC_VERSION}}"></script>
 <script type="text/javascript" src="/js/common.js?v={{STATIC_VERSION}}"></script>
 <?php
@@ -243,21 +244,10 @@ $this->params['breadcrumbs'][] = $this->title;
             switchWechat(wechatId, switchStatus)
         });
 
-        $('.open_bet_status').click(function () {
-            var plan_id = $(this).attr('plan_id');
-            showTips(plan_id);
-        });
-
         $("#changeList").click(function (rst) {
-            //$('#rst_code').text(JSON.stringify(push_desc, null,' '))
-            //$('#push_content').text(JSON.stringify(push_content,null,' '))
 
             $('#exampleModal_msg').modal('show');
         });
-        // exampleModal_QrCode
-        function syncLoginStatus() {
-
-        }
     })
 </script>
 
