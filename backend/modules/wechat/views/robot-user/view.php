@@ -193,6 +193,7 @@ $this->params['breadcrumbs'][] = $this->title;
             var tip_title = '';
             $.post("/wechat/robot-user/switch-wechat",data,function(rst) {
                 console.log(rst);
+                switchStatus = data.switchStatus
                 if(rst.status === 200) {
                     tip_title = '操作成功';
                     msg = rst.msg;
@@ -224,6 +225,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 } else {
                     //Ewin.alert(rst.msg, );
                     layer.msg(rst.msg, {icon: 7});
+                    setTimeout(function () {
+                        location.reload();
+                    }, 2000); // 2秒的延迟
                 }
             },'JSON');
         }
