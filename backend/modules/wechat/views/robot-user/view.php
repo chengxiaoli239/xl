@@ -1,3 +1,10 @@
+<link rel="stylesheet" href="/vendors/layui/2.5.4/css/layui.css?v=2020">
+<link rel="stylesheet" href="/css/layui/global.css?v={{STATIC_VERSION}}">
+<script type="text/javascript" src="/vendors/layui-layer/3.1.1/layer.js"></script>
+<script type="text/javascript" src="/vendors/layui/2.4.5/layui.js"></script>
+<script type="text/javascript" src="/vendors/atrtemplate/4.13.2/template-web.js"></script>
+<script type="text/javascript" src="/js/layui/global.js?v={{STATIC_VERSION}}"></script>
+<script type="text/javascript" src="/js/common.js?v={{STATIC_VERSION}}"></script>
 <?php
 
 use izyue\admin\widgets\GridView;
@@ -88,14 +95,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             ['attribute' => 'wcId','label'=>'微信', 'headerOptions'=>['width'=>'10%'],
                                 'format'=>'raw',
                                 'value' => function($model) {
-                                    $txt = '<img width="30px" height="30px" src="'.$model['smallHeadImgUrl'].'">';
+                                    $txt = $model['wcId'] ? '<img width="30px" height="30px" src="'.$model['smallHeadImgUrl'].'">' : '';
                                     return $txt;
                                 }
                             ],
                             ['attribute' => 'wechat_status','label'=>'状态', 'headerOptions'=>['width'=>'20%'],
                                 'format'=>'raw',
                                 'value' => function($model) {
-                                    return '<strong>'.($model['wechat_status']?'<font color="green">在线</font>' : '<font color="gray">离线</font>').'</strong>';
+                                    return $model['wcId'] ? '<strong>'.($model['wechat_status']?'<font color="green">在线</font>' : '<font color="gray">离线</font>').'</strong>' : '';
                                 }
                             ],
                             ['attribute' => 'nickName','label'=>'昵称', 'headerOptions'=>['width'=>'20%'],
@@ -112,11 +119,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'update' => function ($url, $model, $key) {
                                         $offlineTxt = Html::button(
                                             '点击登录<span class="glyphicon glyphicon-arrow-up"></span>',
-                                            ['class'=>'btn btn-success btn-xs', 'data-wechatId'=>$model['wcId'], 'data-status'=>0, 'id'=>'change_id_'.$model['id']]
+                                            ['class'=>'btn btn-success btn-xs', 'data-nickname'=>$model['nickName'], 'data-wechatId'=>$model['wcId'], 'data-status'=>0, 'id'=>'change_id_'.$model['id']]
                                         );
                                         $onlineTxt = Html::button(
                                             '点击退出<span class="glyphicon glyphicon-arrow-down"></span>',
-                                            ['class'=>'btn btn-danger btn-xs', 'data-wechatId'=>$model['wcId'], 'data-status'=>1, 'id'=>'change_id_'.$model['id']]
+                                            ['class'=>'btn btn-danger btn-xs', 'data-nickname'=>$model['nickName'], 'data-wechatId'=>$model['wcId'], 'data-status'=>1, 'id'=>'change_id_'.$model['id']]
                                         );
                                         return !empty($model['wechat_status']) ? $onlineTxt : $offlineTxt;
                                     },
@@ -127,6 +134,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
             </div>
             <div class="modal-footer">
+                <!-- 下方按钮 -->
+                <button class="btn btn-warning" id="addNewWechat">登录新微信</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" data-type="" id="confirm_ms">确定</button>
             </div>
@@ -156,8 +165,30 @@ $this->params['breadcrumbs'][] = $this->title;
 <script>
     $(function () {
         historyLists = <?php echo \yii\helpers\Json::encode($historyRecords)?>;
-        function switchWechat(wechatId, switchStatus) {
-            var data = {wechatId:wechatId, switchStatus:switchStatus};
+        function switchWechat(wechatId, switchStatus, nickName='') {
+            var data = {wechatId:wechatId, switchStatus:switchStatus, 'nickName':nickName};
+            if(switchStatus===0 && wechatId !== ''){
+                // 弹出确认对话框
+                layer.confirm('您确定下线该微信 <strong><font color="green">'+nickName+'</font><strong> ？', {
+                    icon: 3,   // 设置对话框图标（3代表警告）
+                    title: '确认操作',  // 设置对话框标题
+                    btn: ['确定', '取消'],  // 自定义按钮文本，可以根据需要修改
+                }, function(){
+                    // 用户点击"确定"按钮后执行的回调函数
+                    // 在这里可以编写确认操作的代码
+                    //layer.msg('操作已执行', {icon: 1});  // 弹出消息提示
+                    actSwitchStatus(data)
+                }, function(){
+                    // 用户点击"取消"按钮后执行的回调函数
+                    //layer.alert('操作已取消', {icon: 2});  // 弹出消息提示
+                });
+            }else {
+                // 获取二维码登录
+                actSwitchStatus(data)
+            }
+        }
+
+        function actSwitchStatus(data){
             var tip_title = '';
             $.post("/wechat/robot-user/switch-wechat",data,function(rst) {
                 console.log(rst);
@@ -176,43 +207,40 @@ $this->params['breadcrumbs'][] = $this->title;
                         setTimeout(function () {
                             console.log('5秒后开始进入')
                             $.post("/wechat/robot-user/act-wechat-login",{wId:wId, 'wcId':wechatId},function(loginRst) {
-                                if(rst.status === 200) {
+                                if(loginRst.status === 200) {
+                                    d = loginRst.data
+                                    var nickName = d.nickName ? d.nickName : '';
                                     // 返回成功刷新网页
-                                    Ewin.confirm({ message: '登录成功'}).on(function (e) {
+                                    layer.msg(nickName + ' 登录成功', {icon: 1});
+                                    // 嵌套的 setTimeout
+                                    setTimeout(function () {
                                         location.reload();
-                                    });
+                                    }, 2000); // 2秒的延迟
                                 }
                             });
                         }, 5000)
                     }
                 } else {
-                    Ewin.alert(rst.msg);
+                    //Ewin.alert(rst.msg, );
+                    layer.msg(rst.msg, {icon: 7});
                 }
             },'JSON');
         }
 
-        function switchWechatx(wechatId, switchStatus) {
-            var data = {wechatId:wechatId, switchStatus:switchStatus};
-            console.log('获取开始...')
-            setTimeout(function () {
-                $.post("/wechat/robot-user/act-wechat-login",{wId:wId, 'wcId':wechatId},function(loginRst) {
-                    if(rst.status === 200) {
-                        // 返回成功刷新网页
-                        Ewin.confirm({ message: '登录成功'}).on(function (e) {
-                            location.reload();
-                        });
-                    }
-                });
-            }, 5000)
-        }
-
+        // 列表微信切换登录货下线操作
         $(document).on('click', '[id^="change_id_"]', function () {
             var wechatId = $(this).attr('data-wechatid');
             var nowStatus = $(this).attr('data-status');
+            var nickName = $(this).attr('data-nickname');
             switchStatus = (nowStatus==1) ? 0 : 1
             console.log(wechatId, nowStatus);
+            switchWechat(wechatId, switchStatus, nickName)
+        });
+
+        $(document).on('click', '[id="addNewWechat"]', function () {
+            var wechatId = ''
+            switchStatus = 1
             switchWechat(wechatId, switchStatus)
-            //switchWechatx(wechatId, switchStatus)
         });
 
         $('.open_bet_status').click(function () {

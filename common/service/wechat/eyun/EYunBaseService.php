@@ -59,7 +59,8 @@ class EYunBaseService  extends BaseService
             $this->headers = $headers;
             $this->account = $eyunAuth->account;
         }
-        $RobotUser = RobotUser::findOne(['user_id'=>$user_id, 'wcId'=>$wcId]);
+        #$RobotUser = RobotUser::findOne(['user_id'=>$user_id, 'wcId'=>$wcId]);
+        $RobotUser = RobotUser::findOne(['user_id'=>$user_id]);
         if(!empty($RobotUser)){
             $this->wcId = $RobotUser->wcId;
             $this->wId = $RobotUser->wId;
@@ -116,10 +117,10 @@ class EYunBaseService  extends BaseService
      * 获取二维码(第二步-方式一) - 推荐对接，在调用此接口之前，用户点对应的登陆微信先更新lt_robot_user.wcId
      * @return bool|mixed|null
      */
-    public function localIPadLogin($wcId=''){
+    public function localIPadLogin($wcId=null){
         $url = $this->base_url . '/localIPadLogin';
         $params = [
-            'wcId' => $wcId ? : $this->wcId,
+            'wcId' => $wcId ?? $this->wcId,
             'ttuid' => $this->ttuid
         ];
         $response = $this->request($url, $params, $this->headers);

@@ -55,10 +55,9 @@ class RobotUserService extends BaseService
             $flag = RobotUserService::isHasLogined($user_id, $HistoryRotots); # 是否有在线微信
             Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '切换微信0', ['user_id'=>$user_id, 'post'=>$post, 'flag'=>$flag]);
             $wechatId = $post['wechatId'];
-            $eyun = new EYunBaseService($user_id, $wechatId);
+            $eyun = new EYunBaseService($user_id);
             switch ($post['switchStatus']){ # 登录、下线操作
-                case 1:
-                    # 获取二维码 第二步登录
+                case 1: # 操作上线，获取二维码 第二步登录
                     if($flag){
                         throw_info('请先退出在线的微信', 40001);
                     } else{
@@ -67,11 +66,12 @@ class RobotUserService extends BaseService
                         Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '切换微信1', ['user_id'=>$user_id, 'code'=>$stepOneRst['code']]);
                         if($stepOneRst['code']=='1000'){
                             $returnData = $stepOneRst['data'];
+                        }else{
+                            throw_info($stepOneRst['message']??'获取二维码异常');
                         }
                     }
                     break;
-                case 0:
-                    # 下线操作
+                case 0: # 操作下线
                     if($flag){
                         $isOnlineRst = $eyun->isOnline(); # {"code":"1000","message":"成功","data":{"isOnline":true}}
                         if($isOnlineRst['code'] == 1000){
@@ -122,7 +122,7 @@ class RobotUserService extends BaseService
      * @return array
      */
     public static function actWechatLogin($user_id=0, $post=[]){
-        $eyun = new EYunBaseService($user_id, $post['wcId']);
+        $eyun = new EYunBaseService($user_id);
         $actRst = $eyun->getIPadLoginInfo($post['wId']);
         $returnData = [];
         if($actRst['code'] == 1000){

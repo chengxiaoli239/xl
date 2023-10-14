@@ -51,6 +51,7 @@ class AfterWechatLoginJobs extends CommonJob {
                 $historyRobots->uuid = \Yii::$app->params['E_YUN']['TTUID'];
                 $historyRobots->created_at = $now_time;
             }
+            $historyRobots->desc = '登录于: '.date('Y-m-d H:i:s');
             $historyRobots->headUrl = $params['headUrl'];
             $historyRobots->smallHeadImgUrl = $params['headUrl'];
             $historyRobots->wechat_status = $wechatStatus;
@@ -58,7 +59,7 @@ class AfterWechatLoginJobs extends CommonJob {
             $historyRobots->save();
 
             # 登录成功之后 - 初始化通讯录
-            $e = new EYunBaseService($RobotUser->user_id, $wcId);
+            $e = new EYunBaseService($RobotUser->user_id);
             # 初始化通讯录列表（第四步）
             $initAddressListRst = $e->initAddressList();
             # 初始化通讯录列表（第五步）

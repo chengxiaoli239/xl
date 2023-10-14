@@ -3,6 +3,7 @@ namespace backend\modules\wechat\controllers;
 
 use common\models\eyun\HistoryRobots;
 use common\service\wechat\RobotUserService;
+use common\tools\Tool_Common;
 use Yii;
 use backend\models\wechat\RobotUser;
 use backend\models\searchs\wechat\RobotUser as RobotUserSearch;
@@ -88,6 +89,7 @@ class RobotUserController extends BaseController
     }
 
     /**
+     * 执行微信登录，获取二维码之后，前端调用该方法一直等待，仅跟上面的方法执行
      * @return array
      */
     public function actionActWechatLogin(){
@@ -96,6 +98,7 @@ class RobotUserController extends BaseController
         #return ['status'=>200, 'msg'=>'ddd'];
 
         $rst = RobotUserService::actWechatLogin($this->_user_id, $post);
+        Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '执行微信登录', ['post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
