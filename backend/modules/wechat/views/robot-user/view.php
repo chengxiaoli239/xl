@@ -194,6 +194,7 @@ $this->params['breadcrumbs'][] = $this->title;
             $.post("/wechat/robot-user/switch-wechat",data,function(rst) {
                 console.log(rst);
                 switchStatus = data.switchStatus
+                wechatId = data.wechatId
                 if(rst.status === 200) {
                     tip_title = '操作成功';
                     msg = rst.msg;
