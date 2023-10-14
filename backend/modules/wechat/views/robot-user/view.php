@@ -225,10 +225,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 } else {
                     //Ewin.alert(rst.msg, );
+                    console.log(rst)
                     layer.msg(rst.msg, {icon: 7});
-                    setTimeout(function () {
-                        location.reload();
-                    }, 2000); // 2秒的延迟
+                    if(rst.status<40000){
+                        console.log('dddd')
+                        setTimeout(function () {
+                            location.reload();
+                        }, 2000); // 2秒的延迟
+                    }
                 }
             },'JSON');
         }

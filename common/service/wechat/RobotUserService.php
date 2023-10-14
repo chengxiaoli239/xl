@@ -57,7 +57,7 @@ class RobotUserService extends BaseService
             $wechatId = $post['wechatId'];
             $eyun = new EYunBaseService($user_id);
             switch ($post['switchStatus']){ # 登录、下线操作
-                case 1: # 操作上线，获取二维码 第二步登录
+                case \common\service\wechat\RobotUserService::WECHAT_STATUS_ONLINE: # 操作上线，获取二维码 第二步登录
                     if($flag){
                         throw_info('请先退出在线的微信', 40001);
                     } else{
@@ -71,7 +71,7 @@ class RobotUserService extends BaseService
                         }
                     }
                     break;
-                case 0: # 操作下线
+                case \common\service\wechat\RobotUserService::WECHAT_STATUS_OFFLINE: # 操作下线
                     if($flag){
                         $isOnlineRst = $eyun->isOnline(); # {"code":"1000","message":"成功","data":{"isOnline":true}}
                         if($isOnlineRst['code'] == 1000){
@@ -109,7 +109,7 @@ class RobotUserService extends BaseService
             }
         }catch (\Exception $e){
             Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '切换微信3', ['user_id'=>$user_id, 'post'=>$post, 'err_msg'=>$e->getMessage()]);
-            return ['status'=>301, 'msg'=>$e->getMessage()];
+            return ['status'=>($e->getCode()>40000)?$e->getCode():301, 'msg'=>$e->getMessage()];
         }
 
         return ['status'=>200, 'data'=>$returnData, 'msg'=>'操作成功'];
