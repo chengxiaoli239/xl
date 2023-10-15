@@ -41,7 +41,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
 
             $MessageService = new EYunMessageOperateService($user_id);
             $wcId = $params['wcId']; # 微信原始id
-            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['wcId'=>$wcId, 'params'=>$params]);
+            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'0', ['wcId'=>$wcId, 'params'=>$params, 'data'=>$data, 'type'=>gettype($data)]);
             $wechatUser = WechatUserService::getWechatUsers($user_id)[$fromUser];
             if(!$wechatUser['status'] OR empty($wechatUser)){
                 throw_info($wechatUser['nickName'].'好友接受消息状态未开启', 50001);
@@ -58,16 +58,16 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
         }catch (\Exception $e){
             $err_msg =  $e->getMessage();
             if($e->getCode()>50000){ # 大于50000
-                Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'err_msg'=>$err_msg, 'code'=>$e->getCode()]);
+                Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'11', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'err_msg'=>$err_msg, 'code'=>$e->getCode()]);
                 return '忽略回复：'.$err_msg;
             }
             $r = self::reply($user_id, $wcId, $err_msg, $data); # 回复消息
-            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r]);
+            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r]);
 
             return $err_msg;
         }
 
-        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['wcId'=>$wcId, 'text'=>$text]);
+        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'12', ['wcId'=>$wcId, 'text'=>$text]);
 
         return '消息处理成功:';
     }
