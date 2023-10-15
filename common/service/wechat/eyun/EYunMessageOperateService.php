@@ -118,6 +118,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $text = str_replace('，', ',', $text); # 中文逗号，
             $text = str_replace('：', '', $text); # 中文冒号，
             $text = str_replace('。', '', $text); # 中文句号。
+            $text = str_replace('计', '共', $text); # 同义词替换
             $text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
             $dataGroups['stepOneText'] = $text;
 

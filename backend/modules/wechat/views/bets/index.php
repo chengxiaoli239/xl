@@ -32,12 +32,15 @@ $this->params['breadcrumbs'][] = $this->title;
                         'order_id',
                         #'wechat_user_id',
                         #'codes:ntext',
-                        ['attribute' => 'codes','label'=>'号码x', //'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'codes','label'=>'号码', //'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = ($model->codes OR $model->codes===0 OR $model->codes==='0') ? $model->codes : '';
-                                $txt = html::a(BaseStringHelper::truncate($txt,25), 'javascript:;', ['class'=>'bet_desc', 'title'=>$txt]);
-                                return $txt;
+                                return Html::a(BaseStringHelper::truncate($txt,25), 'javascript:;', [
+                                    'class'=>'act-post-desc',
+                                    'title'=>$model->codes,
+                                    'alt'=>str_replace('@', ',',str_replace(',', '',$model->codes)),
+                                ]);
                             }
                         ],
                         #'single',
@@ -95,9 +98,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'bet_desc','label'=>'文本', //'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                $bet_desc = $model->bet_desc;
-                                $txt = html::a(BaseStringHelper::truncate($bet_desc,25), 'javascript:;', ['class'=>'bet_desc', 'title'=>$bet_desc]);
-                                return $txt;
+                                return Html::a(BaseStringHelper::truncate($model->bet_desc,25), 'javascript:;', [
+                                    'class'=>'act-post-desc',
+                                    'title'=>$model->bet_desc,
+                                    'alt'=>str_replace('@', ',',str_replace(',', '',$model->bet_desc)),
+                                ]);
                             }
                         ],
                         //'created_at',
@@ -116,3 +121,37 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<div class="modal fade " id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
+    <div class="modal-dialog modal-lg" role="document" style="width: 80%; height: 100px;margin: 100px auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_title">信息提示：</h4>
+            </div>
+            <div class="modal-body">
+                <form id="tip_form_msg" style="display:block; width:100%;height: 560px;overflow-y: scroll">
+                    <strong>内容：</strong>
+                    <pre><code id="push_content"></code></pre>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" data-type="" id="confirm_ms">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/statics/js/jquery-2.0.3.js"></script>
+<script>
+    $(function () {
+        $(".act-post-desc").click(function (rst) {
+            bet_rst = $(this).attr('alt');
+            content = $(this).attr('title');
+
+            $('#push_content').text(content)
+
+            $('#exampleModal_msg').modal('show');
+        });
+    });
+</script>
