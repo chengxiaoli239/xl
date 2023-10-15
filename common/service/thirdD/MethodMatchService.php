@@ -219,7 +219,7 @@ class MethodMatchService extends CommonBaseService
             $count3 = count($methodArr3);
             $codes3 = '';
             foreach ($methodArr3 as $m3){
-                $codes3 .= $m3['code'] . self::ZU_SPLIT_FLAG;
+                $codes3 .= implode('', $m3['code']) . self::ZU_SPLIT_FLAG;
             }
             $codes3 = trim($codes3, self::ZU_SPLIT_FLAG);
             $methodArr[] = ['id'=>2, 'name'=>'组三', 'matchName'=>$match_name, 'codes'=>$codes3, 'count'=>$count3];
@@ -229,13 +229,14 @@ class MethodMatchService extends CommonBaseService
             $count6 = count($methodArr6);
             $codes6 = '';
             foreach ($methodArr6 as $m6){
-                $codes6 .= $m6['code'].self::ZU_SPLIT_FLAG;
+                $codes6 .= implode('', $m6['code']) . self::ZU_SPLIT_FLAG;
             }
             $codes6 = trim($codes6, self::ZU_SPLIT_FLAG);
             $methodArr[] = ['id'=>3, 'name'=>'组六', 'matchName'=>$match_name, 'codes'=>$codes6, 'count'=>$count6];
         }
         $codes = trim($codes3.self::ZU_SPLIT_FLAG.$codes6, self::ZU_SPLIT_FLAG);
         $count = (int)$count3 + (int)$count6;
+        #p($methodArr);
 
         return $methodArr;
     }

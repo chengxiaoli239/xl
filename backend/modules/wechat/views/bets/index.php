@@ -1,5 +1,6 @@
 <?php
 
+use yii\helpers\BaseStringHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -31,10 +32,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         'order_id',
                         #'wechat_user_id',
                         #'codes:ntext',
-                        ['attribute' => 'codes','label'=>'号码', //'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'codes','label'=>'号码x', //'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                return ($model->codes OR $model->codes===0 OR $model->codes==='0') ? $model->codes : '待开奖';
+                                $txt = ($model->codes OR $model->codes===0 OR $model->codes==='0') ? $model->codes : '';
+                                $txt = html::a(BaseStringHelper::truncate($txt,25), 'javascript:;', ['class'=>'bet_desc', 'title'=>$txt]);
+                                return $txt;
                             }
                         ],
                         #'single',
@@ -88,7 +91,15 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'lottery_name',
                         //'lottery_type',
                         //'is_profits_record',
-                        'bet_desc:ntext',
+                        #'bet_desc:ntext',
+                        ['attribute' => 'bet_desc','label'=>'文本', //'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $bet_desc = $model->bet_desc;
+                                $txt = html::a(BaseStringHelper::truncate($bet_desc,25), 'javascript:;', ['class'=>'bet_desc', 'title'=>$bet_desc]);
+                                return $txt;
+                            }
+                        ],
                         //'created_at',
                         //'updated_at',
                         ['attribute' => 'update_at','label'=>'时间',//'headerOptions'=>['width'=>'5%'],
