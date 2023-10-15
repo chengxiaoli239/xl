@@ -48,7 +48,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             }
 
             $text = $data['content'];
-            list($code, $data, $msg) = $MessageService->receive($user_id, $text, $data['fromUser']);
+            list($code, $vdata, $msg) = $MessageService->receive($user_id, $text, $data['fromUser']);
             if($code>0){
                 throw_info($msg, $code);
             }
