@@ -59,7 +59,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             $err_msg =  $e->getMessage();
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'err_msg'=>$err_msg, 'code'=>$e->getCode()]);
             if($e->getCode()>50000){ # 大于50000
-                return $err_msg;
+                return '忽略回复：'.$err_msg;
             }
             self::reply($user_id, $wcId, $err_msg, $data); # 回复消息
 
