@@ -57,11 +57,12 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             self::reply($user_id, $wcId, $replyTxt, $data); # 回复消息
         }catch (\Exception $e){
             $err_msg =  $e->getMessage();
-            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'err_msg'=>$err_msg, 'code'=>$e->getCode()]);
             if($e->getCode()>50000){ # 大于50000
+                Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'err_msg'=>$err_msg, 'code'=>$e->getCode()]);
                 return '忽略回复：'.$err_msg;
             }
-            self::reply($user_id, $wcId, $err_msg, $data); # 回复消息
+            $r = self::reply($user_id, $wcId, $err_msg, $data); # 回复消息
+            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r]);
 
             return $err_msg;
         }
@@ -80,6 +81,9 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
      */
     public static function reply($user_id, $wcId, $replyTxt='', $data=[]){
         $fromUser = $data['fromUser'];
+        if(empty($fromUser)){
+            return '接收的微信好友Id不能为空0';
+        }
         $sendData = [
             'wcId' => $wcId,
             'user_id' => $user_id,
