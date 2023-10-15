@@ -251,8 +251,39 @@ class EYunBaseService  extends BaseService
         return $response;
     }
 
-    public static function getUserIdByFromUserKey($wcId=''){
-        return 'getUserIdByFromUserKey_'.$wcId;
+    /**
+     * 机器人 用户id key
+     * @param string $wcId
+     * @return string
+     */
+    public static function getRobotUserIdByWechatIdKey($wcId=''){
+        return 'getRobotUserIdByWechatIdKey_x0_'.$wcId;
+    }
+
+    /**
+     * 微信好友成员id key
+     * @param string $wcId
+     * @return string
+     */
+    public static function getWechatUserIdKey($wcId=''){
+        return 'getUserIdByFromUserKey_x1_'.$wcId;
+    }
+
+    /**
+     * 机器人系统用户id
+     * @param string $fromUser wxid_ckgr7i2q9fr522
+     * @return int
+     */
+    public static function getRobotUserIdByWechatId($wechatId='', $is_auto=1){
+        $m = \Yii::$app->cache;
+        $mkey = self::getRobotUserIdByWechatIdKey($wechatId);
+        $data = $m->get($mkey);
+        if(empty($data) OR $is_auto==2){
+            $data = RobotUser::find()->where(['wcId'=>$wechatId])->asArray()->limit(1)->one();;
+            $m->set($mkey, $data, 1800);
+        }
+
+        return (int)$data['user_id'];
     }
 
     /**
@@ -260,9 +291,9 @@ class EYunBaseService  extends BaseService
      * @param string $fromUser wxid_ckgr7i2q9fr522
      * @return int
      */
-    public static function getUserIdByFromUser($fromUser='', $is_auto=1){
+    public static function getWechatUserId($fromUser='', $is_auto=1){
         $m = \Yii::$app->cache;
-        $mkey = self::getUserIdByFromUserKey($fromUser);
+        $mkey = self::getWechatUserIdKey($fromUser);
         $data = $m->get($mkey);
         if(empty($data) OR $is_auto==2){
             $data = WechatUser::find()->where(['userName'=>$fromUser])->asArray()->limit(1)->one();;
