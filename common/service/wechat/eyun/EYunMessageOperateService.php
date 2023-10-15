@@ -224,7 +224,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $replyTxt .= '【内容】：';
             foreach ($betCodeContents as $content){
                 if(empty($content['playMethod']['id'])){
-                    throw_info('玩法匹配为空，请按正确格式输入', ThirdDTypeService::CODE_FOR_USER);
+                    throw_info('方式匹配为空，请按正确格式输入', ThirdDTypeService::CODE_FOR_USER);
                 }
                 $Bets = new Bets();
                 $setData = [
