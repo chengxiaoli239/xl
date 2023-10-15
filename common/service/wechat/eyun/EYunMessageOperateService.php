@@ -221,7 +221,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $now_time = time();
             $allMoneys = 0.00;
             $replyTxt = '【课号】：'.$qihao;
-            $replyTxt .= '【内容】：';
+            $replyTxt .= "\n【内容】：";
             foreach ($betCodeContents as $content){
                 if(empty($content['playMethod']['id'])){
                     throw_info('方式匹配为空，请按正确格式输入', ThirdDTypeService::CODE_FOR_USER);
@@ -256,7 +256,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $replyTxt .= "\n【成功】 √  共：".$allMoneys.'咪';
 
             $transaction->commit();
-            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-成功', ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData]);
+            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-成功', ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData, 'replyTxt'=>$replyTxt]);
         }catch (\Exception $e){
             $transaction->rollBack();
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-异常', ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'err_msg'=>$e->getMessage()]);
