@@ -57,7 +57,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             self::reply($user_id, $wcId, $replyTxt, $data); # 回复消息
         }catch (\Exception $e){
             $err_msg =  $e->getMessage();
-            Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', self::$name, ['err_msg'=>$err_msg]);
+            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['err_msg'=>$err_msg]);
             self::reply($user_id, $wcId, $err_msg, $data); # 回复消息
 
             return $err_msg;
