@@ -3,6 +3,7 @@
 namespace backend\modules\wechat\controllers;
 
 use backend\service\HN0898Service;
+use common\service\wechat\WechatUserService;
 use Yii;
 use backend\models\wechat\WechatUser;
 use backend\models\searchs\wechat\WechatUser as WechatUserSearch;
@@ -70,6 +71,7 @@ class WechatUserController extends BaseController
         $row = $this->findModel(['id'=>$id, 'user_id'=>$this->_user_id]);
         if(!empty($row)){
             HN0898Service::updateStatus($id, $model = '\backend\models\wechat\WechatUser', 'status');
+            WechatUserService::getWechatUsers($this->_user_id);
         }
 
         return $this->redirect(['index']);
