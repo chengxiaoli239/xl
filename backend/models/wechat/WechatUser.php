@@ -57,22 +57,22 @@ class WechatUser extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'user_id' => 'User ID',
-            'userName' => 'User Name',
-            'nickName' => 'Nick Name',
-            'aliasName' => 'Alias Name',
-            'status' => 'Status',
-            'balance' => 'Balance',
-            'is_credit' => 'Is Credit',
-            'bigHead' => 'Big Head',
-            'smallHead' => 'Small Head',
-            'labelList' => 'Label List',
-            'remark' => 'Remark',
-            'expire_time' => 'Expire Time',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
-            'update_at' => 'Update At',
+            'id' => Yii::t('app', 'ID'),
+            'user_id' => Yii::t('app', 'user.id,系统用户id'),
+            'userName' => Yii::t('app', '微信id，唯一'),
+            'nickName' => Yii::t('app', '昵称'),
+            'aliasName' => Yii::t('app', '微信号'),
+            'status' => Yii::t('app', '状态-1禁用1启用'),
+            'balance' => Yii::t('app', '余额'),
+            'is_credit' => Yii::t('app', '是否信用用户0否1是'),
+            'bigHead' => Yii::t('app', '大头像'),
+            'smallHead' => Yii::t('app', '小头像'),
+            'labelList' => Yii::t('app', '标签列表'),
+            'remark' => Yii::t('app', '备注信息'),
+            'expire_time' => Yii::t('app', '到期时间'),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
+            'update_at' => Yii::t('app', '更新时间'),
         ];
     }
 }

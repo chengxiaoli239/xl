@@ -2,6 +2,7 @@
 
 namespace backend\modules\wechat\controllers;
 
+use backend\service\HN0898Service;
 use Yii;
 use backend\models\wechat\WechatUser;
 use backend\models\searchs\wechat\WechatUser as WechatUserSearch;
@@ -57,6 +58,22 @@ class WechatUserController extends BaseController
         ]);
     }
 
+
+    /**
+     * @desc 更新是否接收用户消息状态
+     * @param $id
+     * @param $status
+     * @return \yii\web\Response
+     */
+    public function actionSwitchStatus($id){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $row = $this->findModel(['id'=>$id, 'user_id'=>$this->_user_id]);
+        if(!empty($row)){
+            HN0898Service::updateStatus($id, $model = '\backend\models\wechat\WechatUser', 'status');
+        }
+
+        return $this->redirect(['index']);
+    }
     /**
      * Creates a new WechatUser model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -116,9 +133,9 @@ class WechatUserController extends BaseController
      * @return WechatUser the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($params)
     {
-        if (($model = WechatUser::findOne($id)) !== null) {
+        if (($model = WechatUser::findOne($params)) !== null) {
             return $model;
         }
 

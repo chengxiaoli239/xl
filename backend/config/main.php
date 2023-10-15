@@ -164,7 +164,8 @@ return [
             'kj/*',
             'eyunapi/*',
             'wx-friends/*',
-            '/agent/agent-users/get-user-info',
+            'wechat/wechat-user/switch-*',
+            'agent/agent-users/get-user-info',
             #'forum/index/tz',
             #'admin/*',
             // The actions listed here will be allowed to everyone including guests.

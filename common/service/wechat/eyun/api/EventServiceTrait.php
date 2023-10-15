@@ -25,7 +25,7 @@ trait EventServiceTrait
             case EYunMessageOperateService::MESSAGE_P_TEXT_CODE: # 私聊
                 push_queue_open(WechatPrivateMsgReceiveJobs::class, $data);
                 break;
-            case EYunMessageOperateService::MESSAGE_P_TEXT_CANCEL: # 私聊
+            case EYunMessageOperateService::MESSAGE_P_TEXT_CANCEL: # 私聊撤回
                 break;
             case EYunMessageOperateService::MESSAGE_G_TEXT_CODE: # 群聊
                 break;
@@ -61,10 +61,14 @@ trait EventServiceTrait
             }
             $now_time = time();
             $EYunMessage = new EYunMessage();
-            $user_id = EYunBaseService::getUserIdByFromUser($params['fromUser']);
+            $user_id = EYunBaseService::getUserIdByFromUser($data['wcId']);
+            if(empty($user_id)){
+                throw_info('机器人系统user_id不能为空');
+            }
             $setData = [
                 'user_id' => $user_id,
                 'toUser'=>$toUser,
+                'msg_type' => $messageType,
                 'msgId'=>$msgId,
                 'newMsgId'=>$newMsgId,
                 'status' => EYunMessage::STATUS_WAIT,

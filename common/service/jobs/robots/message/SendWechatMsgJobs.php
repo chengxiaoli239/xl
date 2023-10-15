@@ -28,7 +28,7 @@ class SendWechatMsgJobs extends CommonJob {
 
             $text = $params['content'];
             $MessageService = new EYunMessageOperateService($user_id);
-            $MessageService->send($fromUser, $text);
+            $MessageService->send($fromUser, $text); # 谁发就给谁回
 
         }catch (\Exception $e){
             return $e->getMessage();
