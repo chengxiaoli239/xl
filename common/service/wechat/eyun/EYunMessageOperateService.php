@@ -251,9 +251,9 @@ class EYunMessageOperateService  extends EYunBaseService
                 }
                 $allMoneys += $content['all_moneys']; # 总投
             }
-            $replyTxt .= "\n【单号】：".$betOrderId.
+            $replyTxt .= ("\n【单号】：".$betOrderId);
 
-            $replyTxt .= "\n【成功】 √  共：".$allMoneys.'咪';
+            $replyTxt .= ("\n【成功】 √  共".$allMoneys.'咪');
 
             $transaction->commit();
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-成功', ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData, 'replyTxt'=>$replyTxt]);

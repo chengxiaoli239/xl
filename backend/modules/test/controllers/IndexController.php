@@ -353,7 +353,7 @@ class IndexController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         $user_id = 20;
-        $rst = RobotUserService::switchWechat($user_id, $post);p($rst);
+        #$rst = RobotUserService::switchWechat($user_id, $post);p($rst);
 
         #$rst = \common\service\thirdD\Odds3dService::addUserOdds($user_id);
 
