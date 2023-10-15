@@ -35,15 +35,15 @@ class WechatUserService extends BaseService
      * @param bool $useCache
      * @return array|mixed|\yii\db\ActiveRecord[]
      */
-    public static function getWechatUsers($user_id='', $useCache=false){
+    public static function getWechatUsers($user_id='', $useCache=true){
         $m = \Yii::$app->cache;
         $mkey = self::getWechatUsersKey($user_id);
-        $data = [];
-        if(!$useCache && $data = $m->get($mkey)){
-            $data = WechatUser::find()
+        if(!$useCache OR !$data = $m->get($mkey)){
+            $dataQuery = WechatUser::find()
                 ->select(['id', 'user_id', 'userName', 'nickName', 'status', 'smallHead'])
-                ->where(['=', 'user_id', $user_id])
-                ->indexBy(['userName'])->asArray()->all();
+                ->where(['user_id'=>$user_id]);
+            #$sql = $dataQuery->createCommand()->getRawSql();p($sql);
+            $data = $dataQuery->indexBy(['userName'])->asArray()->all();
             $m->set($mkey, $data, 600);
         }
 

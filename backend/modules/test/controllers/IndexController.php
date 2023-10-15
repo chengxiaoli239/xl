@@ -81,6 +81,7 @@ use common\service\wechat\eyun\EYunBaseService;
 use common\service\wechat\eyun\EYunMessageOperateService;
 use common\service\wechat\eyun\MessageSetService;
 use common\service\wechat\RobotUserService;
+use common\service\wechat\WechatUserService;
 use common\tools\KjDataGet;
 use backend\service\BaseNumService;
 use backend\service\BaseService;
