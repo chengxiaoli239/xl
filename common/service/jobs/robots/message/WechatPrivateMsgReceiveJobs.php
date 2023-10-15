@@ -52,7 +52,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             if($code>0){
                 throw_info($msg, $code);
             }
-            $replyTxt = $text;
+            $replyTxt = $vdata['replyTxt'];
 
             self::reply($user_id, $wcId, $replyTxt, $data); # 回复消息
         }catch (\Exception $e){
