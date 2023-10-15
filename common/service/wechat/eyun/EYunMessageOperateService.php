@@ -203,6 +203,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $member_id = WechatUser::findOne(['user_id'=>$user_id, 'userName'=>$fromUser])->id;
 
             $text = $vdata['text'];
+            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-01', ['user_id'=>$user_id, 'text'=>$text]);
             list($code, $data, $msg) = self::matchData($text);
             if($code>0){
                 throw_info($msg);

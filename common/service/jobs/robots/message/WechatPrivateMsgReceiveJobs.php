@@ -49,7 +49,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
 
             $text = $data['content'];
             list($code, $vdata, $msg) = $MessageService->receive($user_id, $text, $data['fromUser']);
-            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'01', ['user_id'=>$user_id, 'wcId'=>$wcId, 'code'=>$code, 'vdata'=>$vdata, 'msg'=>$msg]);
+            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'01', ['user_id'=>$user_id, 'wcId'=>$wcId, 'code'=>$code, 'text'=>$text, 'vdata'=>$vdata, 'msg'=>$msg]);
             if($code>0){
                 throw_info($msg, $code);
             }
@@ -90,7 +90,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             'user_id' => $user_id,
             'fromUser' => $fromUser, # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
             'queue_delay_time' => rand(3, 8), # self::$waitSeconds,
-            'content' => '消息：'.$replyTxt, # 测试阶段调试信息 - 用户下注完回复
+            'content' => $replyTxt, # 测试阶段调试信息 - 用户下注完回复
             'business_id' => $wcId,
         ];
         if(!empty($data['fromGroup'])){
