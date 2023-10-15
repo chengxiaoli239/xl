@@ -11,6 +11,7 @@ use common\models\wechat\WechatUser;
 use common\service\BaseService;
 use common\service\chat\Tool_Common;
 use common\service\helpers\ThirdD;
+use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\ThirdDTypeService;
 use yii\helpers\Json;
 
@@ -98,6 +99,17 @@ class EYunMessageOperateService  extends EYunBaseService
      */
     public static function matchData($text=''){
         try {
+            if(strpos($text, '撤') !== false){
+                $data = [];
+                if (preg_match('/(\d+)/', $text, $matches)) {
+                    $orderId = $matches[0];
+                    $data = [
+                        'type' => CommonBaseService::B_TYPE_CANCEL,
+                        'orderId' => $orderId,
+                    ];
+                }
+                return [0, $data, '处理成功'];
+            }
             $dataGroups = [
                 'originText' => $text,
             ];
@@ -148,27 +160,6 @@ class EYunMessageOperateService  extends EYunBaseService
                 }
                 $g['playMethod'] = $playMethod;
                 $g['singleData'] = $singleData;
-                /*
-                $replaceStrs = array_filter([$playMethod['matchName'], $singleData['single_txt']]);
-                foreach ($replaceStrs as $replaceStr){
-                    if(strpos($replaceStr, '度')!==false OR
-                        strpos($replaceStr, '全包')!==false OR
-                        (is_string($codes) && strpos($codes, '和值')!==false)
-                    ) continue;
-                    $betText = str_replace($replaceStr, '', $betText);
-                    $codes = str_replace($replaceStr, '', $codes);
-                }
-                if(!empty($codes) && is_array($codes)) {
-                    $g['codesData'] = implode(';', $codes);
-                }elseif (is_string($codes) && (strpos($codes, '拖')!==false OR strpos($codes, '和值')!==false)){
-                    $g['codesData'] = trim($codes);
-                }elseif (is_string($codes) && strpos($playMethod['name'], '复') !== false){
-                    $g['codesData'] = trim($codes);
-                }else{
-                    $g['codesData'] = trim(str_replace('各', '', $betText));
-                }
-                */
-
                 #p(['g'=>$g, 'betText'=>$betText]);
             }
             $dataGroups['betCodeContents'][] = $g;
@@ -181,6 +172,7 @@ class EYunMessageOperateService  extends EYunBaseService
         }
         //p($dataGroups);
         $data = [
+            'type' => CommonBaseService::B_TYPE_BET,
             'dataGroups' => $dataGroups,
             'lottery_type' => $lottery_type,
         ];
@@ -208,6 +200,31 @@ class EYunMessageOperateService  extends EYunBaseService
             if($code>0){
                 throw_info($msg);
             }
+            switch ($data['type']){
+                case CommonBaseService::B_TYPE_CANCEL:
+                    $orderId = $data['orderId'];
+                    $Bets = Bets::findOne(['order_id'=>$orderId]);
+                    if(empty($Bets)){
+                        throw_info('单号：'.$orderId.'无记录', ThirdDTypeService::CODE_FOR_USER);
+                    }
+                    if($Bets->status==1){
+                        throw_info($orderId.'订单已完成，无法撤单', ThirdDTypeService::CODE_FOR_USER);
+                    }
+                    if($Bets->status==3){
+                        throw_info($orderId.'订单已是撤单状态', ThirdDTypeService::CODE_FOR_USER);
+                    }
+                    $Bets->status = 3; # 已撤单
+                    if($Bets->save()){
+                        $transaction->commit();
+                    }else{
+                        $transaction->rollBack();
+                    }
+                    return [0, ['text'=>$text, 'replyTxt'=>$orderId.'撤单完成'], '接收成功'];
+                    break;
+                default:
+                    break;
+            }
+
             $betOrderId = ThirdDTypeService::getOrderId();
             if(empty($betOrderId)){
                 throw_info('单号生成失败');
