@@ -44,7 +44,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['wcId'=>$wcId, 'params'=>$params]);
             $wechatUser = WechatUserService::getWechatUsers($user_id)[$fromUser];
             if(!$wechatUser['status'] OR empty($wechatUser)){
-                throw_info($wechatUser['nickName'].'好友接受消息状态未开启');
+                throw_info($wechatUser['nickName'].'好友接受消息状态未开启', 50001);
             }
 
             $text = $data['content'];
@@ -58,6 +58,9 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
         }catch (\Exception $e){
             $err_msg =  $e->getMessage();
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['err_msg'=>$err_msg]);
+            if($e->getCode()>50000){ # 大于50000则忽略
+                return $err_msg;
+            }
             self::reply($user_id, $wcId, $err_msg, $data); # 回复消息
 
             return $err_msg;
