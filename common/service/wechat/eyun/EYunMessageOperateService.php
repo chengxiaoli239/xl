@@ -211,7 +211,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         throw_info($orderId.'订单已完成，无法撤单', ThirdDTypeService::CODE_FOR_USER);
                     }
                     if($Bets->status==3){
-                        throw_info($orderId.'订单已是撤单状态', ThirdDTypeService::CODE_FOR_USER);
+                        throw_info($orderId.'订单已是撤单状态，无需重复处理', ThirdDTypeService::CODE_FOR_USER);
                     }
                     $Bets->status = 3; # 已撤单
                     if($Bets->save()){
