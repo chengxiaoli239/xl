@@ -391,7 +391,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $plan = UserSysPlans::findOne(7579);
+        $plan = UserSysPlans::findOne(7585);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         p(count($filter_dynamic_codes));
         $rst = OperateLotteryService::operate($lottery_type=26); p($rst); # 处理3d开奖
