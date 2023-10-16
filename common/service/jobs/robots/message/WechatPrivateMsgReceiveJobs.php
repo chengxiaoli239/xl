@@ -37,15 +37,19 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             $data = $params['data']; # 消息内容体
             $fromUser = $data['fromUser'];
 
+            $wechatUser = WechatUserService::getWechatUsers($user_id)[$fromUser];
+            # 1、好友判断
+            if(!$wechatUser['status'] OR empty($wechatUser)){
+                throw_info($wechatUser['nickName'].'好友接受消息状态未开启', 50001);
+            }
+
+            # 2、盘口判断
             self::preValiate($params); # 校验关盘
 
             $MessageService = new EYunMessageOperateService($user_id);
             $wcId = $params['wcId']; # 微信原始id
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'0', ['wcId'=>$wcId, 'params'=>$params, 'data'=>$data, 'type'=>gettype($data)]);
-            $wechatUser = WechatUserService::getWechatUsers($user_id)[$fromUser];
-            if(!$wechatUser['status'] OR empty($wechatUser)){
-                throw_info($wechatUser['nickName'].'好友接受消息状态未开启', 50001);
-            }
+
 
             $text = $data['content'];
             list($code, $vdata, $msg) = $MessageService->receive($user_id, $text, $data['fromUser']);

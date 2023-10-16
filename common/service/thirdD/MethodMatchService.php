@@ -183,11 +183,12 @@ class MethodMatchService extends CommonBaseService
      */
     public static function matchZuXuan($text='', &$codes=[], &$count=0, $match_name=''){
         // 使用正则表达式匹配组选后面的三个数字
-        if (preg_match_all('/(\d{3}(?:\s+\d{3})*)/', $text, $matches)) {
+        if (preg_match_all('/(\d{3,}(?:\s+\d{3,})*)/', $text, $matches)) {
             $codes = explode(' ', trim($matches[1][0]));
         } else {
             throw_info('组选未匹配到号码,text:'.$text);
         }
+        #p([$matches, $match_name, $codes]);
         if(empty($codes)){
             throw_info('匹配组选号码为空');
         }
@@ -196,7 +197,8 @@ class MethodMatchService extends CommonBaseService
         $methodArr6 = [];
         foreach ($codes as $code){
             $code = trim($code);
-            if(strlen($code) == 3){
+            $len = strlen($code);
+            if($len == 3){
                 if( ($match_name=='组六' && ($code[0]==$code[1] OR $code[1]==$code[2] OR $code[0]==$code[2])) OR
                     ($match_name=='组三' && ($code[0]!=$code[1] && $code[1]!=$code[2] && $code[0]!=$code[2]))
                 ){
@@ -211,6 +213,9 @@ class MethodMatchService extends CommonBaseService
                     # 组六
                     $methodArr6[] = ['id'=>3, 'name'=>'组六', 'matchName'=>$match_name, 'code'=>$sortCode, 'count'=>1];
                 }
+            }elseif($len>3) {
+                # 多码组选，待处理 2023年10月17日00:19:56
+                throw_info($match_name.'多码组选，待处理');
             }else{
                 throw_info($match_name.'每个号码必须是三位数');
             }
