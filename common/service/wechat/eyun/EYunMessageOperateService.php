@@ -176,6 +176,7 @@ class EYunMessageOperateService  extends EYunBaseService
             'type' => CommonBaseService::B_TYPE_BET,
             'dataGroups' => $dataGroups,
             'lottery_type' => $lottery_type,
+            'lottery_name' => $lottery_name,
         ];
         return [0, $data, '处理成功'];
     }
@@ -239,8 +240,8 @@ class EYunMessageOperateService  extends EYunBaseService
             $qihao = HN0898Service::getQihao($lottery_type);
             $now_time = time();
             $allMoneys = 0.00;
-            $replyTxt = '【课号】：'.$qihao;
-            $replyTxt .= "\n【内容】：" . str_replace('元', '咪', $text);;
+            $replyTxt = '【课号】'.$data['lottery_name'].$qihao;
+            $replyTxt .= "\n【内容】" . str_replace('元', '咪', $text);;
             foreach ($betCodeContents as $content){
                 if(empty($content['playMethod']['id'])){
                     throw_info('方式匹配为空，请按正确格式输入', ThirdDTypeService::CODE_FOR_USER);
@@ -269,9 +270,9 @@ class EYunMessageOperateService  extends EYunBaseService
                 }
                 $allMoneys += $content['all_moneys']; # 总投
             }
-            $replyTxt .= ("\n【单号】：".$betOrderId);
+            $replyTxt .= ("\n【单号】".$betOrderId);
 
-            $replyTxt .= ("\n【成功】：√  共".$allMoneys.'咪');
+            $replyTxt .= ("\n【成功】√  共".$allMoneys.'咪');
 
             $transaction->commit();
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-成功', ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData, 'replyTxt'=>$replyTxt]);

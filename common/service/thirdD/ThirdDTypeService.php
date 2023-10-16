@@ -52,9 +52,9 @@ class ThirdDTypeService extends CommonBaseService
             # 默认为福彩
             $lottery_type = ThirdDTypeService::LOTTERY_TYPE_FUCAI;
         }
-        $name = CommonService::getLotteryName($lottery_type);
+        $lottery_name = CommonService::getLotteryName($lottery_type);
 
-        return [$lottery_type, $name, $result];
+        return [$lottery_type, $lottery_name, $result];
     }
 
     /**
