@@ -62,7 +62,7 @@ class NumService extends BaseService {
     # 0123路
     const CODES_0_LINE = ['0'];
     const CODES_1_LINE = ['1', '4', '7'];
-    const CODES_2_LINE = ['2', '5', '8'];
+    const CODES_2_LINE = ['0','2', '5', '8'];
     const CODES_3_LINE = ['3', '6', '9'];
 
     public static $MIN_CODES = ['0', '1', '2', '3', '4'];
@@ -5293,8 +5293,8 @@ class NumService extends BaseService {
      */
     public static function getCodeLine1($code=''){
         if($code==0){
-            $lineCodes = NumService::CODES_0_LINE;
-            #$lineCodes = NumService::CODES_2_LINE;
+            #$lineCodes = NumService::CODES_0_LINE;
+            $lineCodes = NumService::CODES_2_LINE;
         }elseif (in_array($code, NumService::CODES_1_LINE)){
             $lineCodes = NumService::CODES_1_LINE;
         }elseif (in_array($code, NumService::CODES_2_LINE)){
