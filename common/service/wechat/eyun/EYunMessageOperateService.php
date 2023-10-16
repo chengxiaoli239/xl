@@ -240,7 +240,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $qihao = HN0898Service::getQihao($lottery_type);
             $now_time = time();
             $allMoneys = 0.00;
-            $replyTxt = '【课号】'.$data['lottery_name'].$qihao;
+            $replyTxt = '【课号】'.$data['lottery_name'].'-'.$qihao;
             $replyTxt .= "\n【内容】" . str_replace('元', '咪', $text);;
             foreach ($betCodeContents as $content){
                 if(empty($content['playMethod']['id'])){
