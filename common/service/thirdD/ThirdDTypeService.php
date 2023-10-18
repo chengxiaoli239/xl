@@ -94,7 +94,10 @@ class ThirdDTypeService extends CommonBaseService
         #p([$methodArr, $matchMethodAndCodeText, $text], 0);
         if($methodArr['originName'] == '直选') {
             $methodArr = MethodMatchService::matchZhiXuan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }else if(in_array($methodArr['originName'], ['组选', '组三', '组六']) && strpos($matchMethodAndCodeText, '拖') === false) { # 2、3组选
+        }else if(
+            (in_array($methodArr['originName'], ['组选', '组三', '组六']) OR strpos($text, '组') !== false)
+            && strpos($matchMethodAndCodeText, '拖') === false
+        ) { # 2、3组选
             $methodArr = MethodMatchService::matchZuXuan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if($methodArr['originName'] == '独胆') { # 4独胆
             $methodArr = MethodMatchService::matchDuDan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);

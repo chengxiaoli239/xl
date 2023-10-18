@@ -182,66 +182,163 @@ class MethodMatchService extends CommonBaseService
      * @throws \common\exceptions\InfoException
      */
     public static function matchZuXuan($text='', &$codes=[], &$count=0, $match_name=''){
+        $text = explode('元', $text)[0];
+        $text = explode('倍', $text)[0];
         // 使用正则表达式匹配组选后面的三个数字
-        if (preg_match_all('/(\d{3,}(?:\s+\d{3,})*)/', $text, $matches)) {
+        if (preg_match_all('/(\d{2,}(?:\s+\d{2,})*)/', $text, $matches)) {
             $codes = explode(' ', trim($matches[1][0]));
         } else {
             throw_info('组选未匹配到号码,text:'.$text);
         }
-        #p([$matches, $match_name, $codes]);
+        #p([$text, $matches, $match_name, $codes]);
         if(empty($codes)){
             throw_info('匹配组选号码为空');
         }
-        $methodArr = [];
-        $methodArr3 = [];
-        $methodArr6 = [];
+        $methodArr = [
+            'methodArr3' => [],
+            'methodArr6' => [],
+            'methodArr32' => [],
+            'methodArr33' => [],
+            'methodArr34' => [],
+            'methodArr35' => [],
+            'methodArr36' => [],
+            'methodArr37' => [],
+            'methodArr38' => [],
+            'methodArr39' => [],
+            'methodArr64' => [],
+            'methodArr65' => [],
+            'methodArr66' => [],
+            'methodArr67' => [],
+            'methodArr68' => [],
+            'methodArr69' => [],
+        ];
+        /**
+        {
+            "type_3": 0,
+            "textx": "744 991 988 244 882 245组六各20",
+            "text1": "福组269一倍共10 - 组六",
+            "text2": "福组六269一倍共10 - 组六",
+            "text3": "福组选269一倍共10 - 组六",
+            "text4": "福组选2679一倍共10 - 组六四码",
+            "text5": "福组三26一倍共10 - 组三两码",
+            "text6": "福组三266一倍共10 - 组三",
+            "text7": "福组选266一倍共10 - 组三",
+            "text8": "福组三269一倍共10 - 组三三码",
+            "text9": "福组三2679一倍共10 - 组三四码"
+        }
+         */
         foreach ($codes as $code){
             $code = trim($code);
-            $len = strlen($code);
-            if($len == 3){
-                if( ($match_name=='组六' && ($code[0]==$code[1] OR $code[1]==$code[2] OR $code[0]==$code[2])) OR
-                    ($match_name=='组三' && ($code[0]!=$code[1] && $code[1]!=$code[2] && $code[0]!=$code[2]))
-                ){
-                    throw_info($match_name.'号码输入异常，请重新确认');
-                }
-                $sortCode = [$code[0], $code[1], $code[2]];
-                sort($sortCode); # 先排序号码再入库
-                if($code[0]==$code[1] OR $code[1]==$code[2] OR $code[0]==$code[2]){
-                    # 组三
-                    $methodArr3[] = ['id'=>2, 'name'=>'组三', 'matchName'=>$match_name, 'code'=>$sortCode, 'count'=>1];
-                }else{
-                    # 组六
-                    $methodArr6[] = ['id'=>3, 'name'=>'组六', 'matchName'=>$match_name, 'code'=>$sortCode, 'count'=>1];
-                }
-            }elseif($len>3) {
-                # 多码组选，待处理 2023年10月17日00:19:56
-                throw_info($match_name.'多码组选，待处理');
-            }else{
-                throw_info($match_name.'每个号码必须是三位数');
-            }
-        }
-        if(!empty($methodArr3)){
-            $count3 = count($methodArr3);
-            $codes3 = '';
-            foreach ($methodArr3 as $m3){
-                $codes3 .= implode('', $m3['code']) . self::ZU_SPLIT_FLAG;
-            }
-            $codes3 = trim($codes3, self::ZU_SPLIT_FLAG);
-            $methodArr[] = ['id'=>2, 'name'=>'组三', 'matchName'=>$match_name, 'codes'=>$codes3, 'count'=>$count3];
-        }
+            $reSortCode = CommonService::reSortCodes([$code])[0]; # 排序数据内的号码
+            $flag = \common\service\helpers\ThirdD::judgeCodesRepeat($code, $sortCode); # 判断号码是否有重复
 
-        if(!empty($methodArr6)){
-            $count6 = count($methodArr6);
-            $codes6 = '';
-            foreach ($methodArr6 as $m6){
-                $codes6 .= implode('', $m6['code']) . self::ZU_SPLIT_FLAG;
+            $len = strlen($code);
+            if($len == 2) {
+                if($match_name != '组三'){
+                    throw_info('玩法不确定：'.$code);
+                }
+                $methodArr['methodArr32'][] = ['id'=>17, 'name'=>'组三两码', 'matchName'=>'组三两码', 'code'=>$code, 'count'=>1]; # 组三两码
+            }elseif($len == 3){
+                # 三个码的情况分：组三、组六、组三三码，其中组三三码还是组三根据号码是否有重复来定，有重复则为单纯的组三，没重复则为组三三码(多吗组三必须备注组三)
+                if( ($match_name=='组六' && $flag)
+                    #OR ($match_name=='组三' && ($code[0]!=$code[1] && $code[1]!=$code[2] && $code[0]!=$code[2]))
+                ){
+                    throw_info($match_name.'号码号码重复:'.$code.'，请重新确认');
+                }
+                #sort($sortCode); # 先排序号码再入库
+                if( (strpos($text, '组') !== false OR strpos($text, '组选')!==false OR strpos($text, '组六') !== false) && !$flag ){
+                    # 组六
+                    $methodArr['methodArr6'][] = ['id'=>3, 'name'=>'组六', 'matchName'=>$match_name, 'code'=>$reSortCode, 'count'=>1];
+                }elseif((strpos($text, '组') !== false OR strpos($text, '组选')!==false OR strpos($text, '组三') !== false) && $flag){
+                    # 组三
+                    $methodArr['methodArr3'][] = ['id'=>2, 'name'=>'组三', 'matchName'=>$match_name, 'code'=>$reSortCode, 'count'=>1];
+                }elseif((strpos($text, '组') !== false OR strpos($text, '组选')!==false OR strpos($text, '组三') !== false) && !$flag){
+                    # 组三三码
+                    $methodArr['methodArr33'][] = ['id'=>17, 'name'=>'组三三码', 'matchName'=>'组三三码', 'code'=>$reSortCode, 'count'=>1];
+                }
+
+            }elseif($len>3) {
+                if($flag){
+                    throw_info('组选多码号码不能重复');
+                }
+                if(strpos($text, '组三') !==false && strpos($text, '组六') !==false){
+                    throw_info('组选多码号码必须备注组三或组六');
+                }
+                $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
+                $cnNum = $changeNameArr[$len];
+                if(strpos($text, '组三') !==false){
+                    # 组三多码
+                    switch ($len){
+                        case 3:
+                            $methodArr['methodArr33'][] = ['id'=>17, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
+                            break;
+                        case 4:
+                            $methodArr['methodArr34'][] = ['id'=>18, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
+                            break;
+                        case 5:
+                            $methodArr['methodArr35'][] = ['id'=>19, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
+                            break;
+                        case 6:
+                            $methodArr['methodArr36'][] = ['id'=>20, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
+                            break;
+                        case 7:
+                            $methodArr['methodArr37'][] = ['id'=>21, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
+                            break;
+                        case 8:
+                            $methodArr['methodArr38'][] = ['id'=>22, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
+                            break;
+                        case 9:
+                            $methodArr['methodArr39'][] = ['id'=>23, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
+                            break;
+                    }
+                }else{
+                    # 组六多码
+                    switch ($len){
+                        case 4:
+                            $methodArr['methodArr64'][] = ['id'=>10, 'name'=>'组六'.$cnNum.'码', 'matchName'=>'组六'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
+                            break;
+                        case 5:
+                            $methodArr['methodArr65'][] = ['id'=>11, 'name'=>'组六'.$cnNum.'码', 'matchName'=>'组六'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
+                            break;
+                        case 6:
+                            $methodArr['methodArr66'][] = ['id'=>12, 'name'=>'组六'.$cnNum.'码', 'matchName'=>'组六'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
+                            break;
+                        case 7:
+                            $methodArr['methodArr67'][] = ['id'=>13, 'name'=>'组六'.$cnNum.'码', 'matchName'=>'组六'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
+                            break;
+                        case 8:
+                            $methodArr['methodArr68'][] = ['id'=>14, 'name'=>'组六'.$cnNum.'码', 'matchName'=>'组六'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
+                            break;
+                        case 9:
+                            $methodArr['methodArr69'][] = ['id'=>15, 'name'=>'组六'.$cnNum.'码', 'matchName'=>'组六'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
+                            break;
+                    }
+                }
+            }else{
+                throw_info($match_name.'组选匹配异常');
             }
-            $codes6 = trim($codes6, self::ZU_SPLIT_FLAG);
-            $methodArr[] = ['id'=>3, 'name'=>'组六', 'matchName'=>$match_name, 'codes'=>$codes6, 'count'=>$count6];
         }
-        $codes = trim($codes3.self::ZU_SPLIT_FLAG.$codes6, self::ZU_SPLIT_FLAG);
-        $count = (int)$count3 + (int)$count6;
-        #p($methodArr);
+        $allCount = 0;
+        $codes = '';
+        foreach ($methodArr as $key=>$items){
+            if(empty($items)){
+                unset($methodArr[$key]);
+                continue;
+            }
+            $countNum = count($methodArr[$key]);
+            $allCount += $countNum;
+            $codesTmp = '';
+            foreach ($methodArr[$key] as $m){
+                $codesTmp .= $m['code'] . self::ZU_SPLIT_FLAG;
+            }
+            $codesTmp = trim($codesTmp, self::ZU_SPLIT_FLAG);
+            $codes .= self::ZU_SPLIT_FLAG.$codesTmp;
+            $methodArr[$key] = ['id'=>$m['id'], 'name'=>$m['name'], 'matchName'=>$m['matchName'], 'codes'=>$codesTmp, 'count'=>$countNum];
+        }
+        $methodArr = array_values($methodArr);
+        $count = $allCount;
+        $codes = trim($codes, self::ZU_SPLIT_FLAG);
+        //p($methodArr);
 
         return $methodArr;
     }

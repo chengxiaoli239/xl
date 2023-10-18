@@ -99,8 +99,8 @@ class ThirdD extends BaseService
 
     /**
      * 判断号码是否有重复
-     * @param string $codes
-     * @param array $codesArr
+     * @param string $codes 123、223
+     * @param array $codesArr 剔重之后的号码
      * @return bool
      */
     public static function judgeCodesRepeat($codes='', &$codesArr=[]){

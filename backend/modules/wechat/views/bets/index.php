@@ -122,7 +122,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <!-- page end-->
 </section>
 <div class="modal fade " id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
-    <div class="modal-dialog modal-lg" role="document" style="width: 80%; height: 100px;margin: 100px auto;">
+    <div class="modal-dialog modal-lg" role="document" style="width: 85%; height: 30%;margin: 100px auto;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
