@@ -1,2 +1,1297 @@
-第一个sql:
-SELECT code, code_type, RIGHT(CAST(code_1 AS SIGNED)+CAST(code_2 AS SIGNED), 1) AS kd1, RIGHT(CAST(code_3 AS SIGNED)+CAST(code_4 AS SIGNED), 1) AS kd2 FROM lt_num4_type n WHERE code_type = 4;
+
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns="http://www.w3.org/1999/html">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta content="yes" name="apple-mobile-web-app-capable">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+<meta http-equiv="X-UA-Compatible" content="IE=8, IE=9, IE=10, chrome=1" />
+<meta http-equiv='Content-Security-Policy' content='block-all-mixed-content'/>
+<script src="/js/isModel.js?20210916"></script>
+<link rel="icon" href="/images/n_logo.png">
+<link href="/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/css/paging.css" rel="stylesheet" type="text/css">
+<link href="/css/home.css" rel="stylesheet" type="text/css">
+<link href="/css/common.css?20220607" rel="stylesheet" type="text/css">
+<script src="/js/jquery.min.js"></script>
+
+<script src="/js/WdatePicker/WdatePicker.js"></script>
+<script src="/js/common.js"></script>
+<link href="/css/idangerous.swiper2.7.6.css" rel="stylesheet" type="text/css">
+<script src="/js/idangerous.swiper2.7.6.min.js"></script>
+<!--[if lt IE 9]>
+<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<script>
+  var frontAppContext = 'http://www.cwl.gov.cn/cwl_admin/';
+  var siteID = "21";
+  var siteURL = "http://www.cwl.gov.cn/";
+  console.log("siteURL",siteURL)
+  var siteAlias = "";
+  var isPreview = false;
+  var url = window.location.href;
+  if (url.indexOf(frontAppContext) === 0) {
+    var path = url.substring(frontAppContext.length);
+    if (path.indexOf('/preview/') === 0 || path.indexOf('preview/') === 0) {
+      isPreview = true;
+      siteURL = "http://www.cwl.gov.cn/cwl_admin/preview/cwl/";
+    }
+  }
+  var log = {dir: function(msg) {
+      if (window.console && window.console.log) {
+        console.log(msg);
+      }
+    },err: function(msg) {
+      if (window.console && window.console.log) {
+        console.error(msg);
+      }
+    }};
+</script>
+<script src="/js/lottery.js"></script>
+  <meta name="keywords" content="彩票,福彩,福利彩票,品种,游戏,乐透," />
+    <meta name="description" content="介绍福彩现有的彩票品种，包括“乐透型”、“数字型”、“即开型”、“视频型”、“基诺型”，分别介绍各个票种的特点、包括哪些游戏，游戏规则等" />
+  <link href="/css/detailBase.css" rel="stylesheet" type="text/css" />
+  <link href="/css/detailThere.css" rel="stylesheet" type="text/css" />
+  <title>福彩3D_中国福彩网</title>
+  <style>
+    body,.main,.play-detail {background: #F5FAFF;}
+    .no-border {
+      border: 0!important;
+    }
+    .fc3d-detail .notice .notice-top {
+      background: linear-gradient(270deg, #0093CE, #0766A5);
+      background: -moz-linear-gradient(#0093CE, #0766A5);
+      -pie-background: linear-gradient(#0093CE, #0766A5);
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0093CE', endColorstr='#0766A5',GradientType=0 );
+    }
+    .fc3d-detail .notice .notice-con  .detail-btn {
+      background: #0766A5;
+    }
+    .fc3d-detail .ssq-box .fr,.fc3d-detail .ssq-box .fl {
+      width: 45%;
+    }
+    .fc3d-detail .ssq-box .fl, .fc3d-detail .ssq-box .fr{
+      padding: 0;
+    }
+    .fc3d-detail .ssq-box .box-list .txt {
+      width: 100%;
+    }
+    .fc3d-detail .ssq-box .box-list .box-con-item {
+      width: auto;
+    }
+    .qiu-fc3D-kjgg{
+      background: url(/img/fc3d/Ball3DKjgg.png) no-repeat;
+      background-size: 51px 51px;
+    }
+  </style>
+</head>
+<body>
+  2023278
+<style>
+    .nav-item-list-width {
+        width: 1200px;
+        text-align: left;
+        position: relative;
+    }
+
+    .nav-item-width {
+        width: 1200px;
+        margin: 0 auto;
+    }
+
+    .kjzb-icon {
+        width: 40px;
+        vertical-align: sub;
+    }
+
+    .nav-item-list-width {
+        width: 1200px;
+        text-align: left;
+        position: relative;
+    }
+
+    .nav-item-width {
+        width: 1200px;
+        margin: 0 auto;
+    }
+
+    .kjzb-icon {
+        width: 40px;
+        vertical-align: sub;
+    }
+</style>
+<div class="header">
+    <div class="header-top">
+        <div class="fl" style="padding: 10px 0">
+            <a href="/" target="_blank">
+                <img style="height: 83px" src="/images/logo-top.png" alt="" />
+            </a>
+        </div>
+        <img src="/images/logo-txt.png?20220328" style="margin-top: 40px" />
+        <div class="fr">
+            <div class="right-top">
+                <div>
+                    客服热线：954168
+                </div>
+                <div style="margin-left: 25px;">
+                    <a href="/"> 中国福利彩票发行管理中心官方网站 </a>
+                </div>
+            </div>
+            <div class="right-bottom">
+                <div class="input-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="请输入搜索内容" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" onclick="doSearch()">
+                            搜索
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="header-nav">
+        <div class="nav-item-width">
+            <div class="nav-item">
+                <div class="nav-item-wrap nav-item-wrap-home">
+                    <a href="/" target="_blank"> 首页 </a>
+                </div>
+            </div>
+            <!-- 组织架构-->
+            <div class="nav-item" data-alias="zzjg">
+                <div class="nav-item-wrap">
+
+
+
+
+                                <a href="/zzjg/jgsz/" target="_blank">
+                                    组织机构
+                                </a>
+
+
+                </div>
+                <div class="nav-item-list">
+                    <div class="nav-item-list-width">
+                        <div class="nav-item-list-left">
+
+
+
+
+                                        <a href="/zzjg/jgsz/" target="_blank">
+                                            <div>机构设置</div>
+                                        </a>
+
+
+
+                                        <a href="/zzjg/jgzn/" target="_blank">
+                                            <div>机构职能</div>
+                                        </a>
+
+
+
+                                        <a href="/zzjg/ldjs/" target="_blank">
+                                            <div>领导介绍</div>
+                                        </a>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 新闻中心-->
+            <div class="nav-item" data-alias="gzdt">
+                <div class="nav-item-wrap">
+
+
+
+
+                                <a href="/gzdt/tt/" target="_blank">
+                                    新闻中心
+                                </a>
+
+
+                </div>
+                <div class="nav-item-list">
+                    <div class="nav-item-list-width">
+                        <div class="nav-item-list-left">
+
+
+
+
+                                        <a href="/gzdt/tt/" target="_blank">
+                                            <div>头条</div>
+                                        </a>
+
+
+
+                                        <a href="/gzdt/mzyw/" target="_blank">
+                                            <div>民政要闻</div>
+                                        </a>
+
+
+
+                                        <a href="/gzdt/ywdt/" target="_blank">
+                                            <div>业务动态</div>
+                                        </a>
+
+
+
+                                        <a href="/gzdt/gsld/" target="_blank">
+                                            <div>各省亮点</div>
+                                        </a>
+
+
+
+                                        <a href="/gzdt/xyyj/" target="_blank">
+                                            <div>行业研究</div>
+                                        </a>
+
+
+
+                                        <a href="/gzdt/mtsy/" target="_blank">
+                                            <div>媒体声音</div>
+                                        </a>
+
+
+
+                                        <a href="/fcgs/" target="_blank">
+                                            <div>一线风采</div>
+                                        </a>
+
+
+
+                                        <a href="/gzdt/fcbk/" target="_blank">
+                                            <div>福彩百科</div>
+                                        </a>
+
+
+
+                                        <a href="/gzdt/whcf/" target="_blank">
+                                            <div>文化彩风</div>
+                                        </a>
+
+
+
+                                        <a href="/gzdt/rdsp/" target="_blank">
+                                            <div>视频</div>
+                                        </a>
+
+
+
+                                        <a href="/gzdt/fczt/" target="_blank">
+                                            <div>专题</div>
+                                        </a>
+
+
+
+                                        <a href="/tp/" target="_blank">
+                                            <div>图片</div>
+                                        </a>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 信息公开-->
+            <div class="nav-item" data-alias="xxgk">
+                <div class="nav-item-wrap">
+
+
+
+
+                                <a href="/xxgk/yxspjbg/" target="_blank">
+                                    信息公开
+                                </a>
+
+
+                </div>
+                <div class="nav-item-list">
+                    <div class="nav-item-list-width">
+                        <div class="nav-item-list-left">
+
+
+
+
+                                        <a href="/xxgk/yxspjbg/" target="_blank">
+                                            <div>游戏审批及变更</div>
+                                        </a>
+
+
+
+                                        <a href="/xxgk/tsjxh/" target="_blank">
+                                            <div>停售及销毁</div>
+                                        </a>
+
+
+
+                                        <a href="/xxgk/pjgg/" target="_blank">
+                                            <div>派奖公告</div>
+                                        </a>
+
+
+
+                                        <a href="/xxgk/ndfxxsqk/" target="_blank">
+                                            <div>年度发行销售公告</div>
+                                        </a>
+
+
+
+                                        <a href="/xxgk/cwyjs/" target="_blank">
+                                            <div>财务预决算</div>
+                                        </a>
+
+
+
+                                        <a href="/xxgk/kjlc/" target="_blank">
+                                            <div>开奖流程</div>
+                                        </a>
+
+
+
+                                        <a href="/xxgk/fcda/" target="_blank">
+                                            <div>福彩大事记</div>
+                                        </a>
+
+
+
+                                        <a href="/xxgk/zhswgg/" target="_blank">
+                                            <div>综合</div>
+                                        </a>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 政策法规-->
+            <div class="nav-item" data-alias="zcfg">
+                <div class="nav-item-wrap">
+
+                        <a href="/zcfg/" target="_blank">
+                            政策法规
+                        </a>
+
+                </div>
+                <div class="nav-item-list">
+                    <div class="nav-item-list-width">
+                        <div class="nav-item-list-left">
+
+
+
+
+                                        <a href="/zcfg/zygwy/" target="_blank">
+                                            <div>法律法规</div>
+                                        </a>
+
+
+
+                                        <a href="/zcfg/czb/" target="_blank">
+                                            <div>财政部</div>
+                                        </a>
+
+
+
+                                        <a href="/zcfg/mzb/" target="_blank">
+                                            <div>民政部</div>
+                                        </a>
+
+
+
+                                        <a href="/zcfg/zfczx/" target="_blank">
+                                            <div>中福彩中心</div>
+                                        </a>
+
+
+
+                                        <a href="/zcfg/zcjd/" target="_blank">
+                                            <div>政策解读</div>
+                                        </a>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 福彩公益-->
+            <div class="nav-item" data-alias="fcgy">
+                <div class="nav-item-wrap">
+
+                        <a>
+                            <div onclick="handleNav('fcgy_gyjxm','/fcgy/')">
+                                福彩公益
+                            </div>
+                        </a>
+
+                </div>
+                <div class="nav-item-list">
+                    <div class="nav-item-list-width">
+                        <div class="nav-item-list-left">
+
+
+                                    <a href="/fcgy/gyjcj/" target="_blank">
+                                        <div>公益金筹集情况</div>
+                                    </a>
+                                    <a href="/fcgy/gyjsy/" target="_blank">
+                                        <div>公益金来源及分配</div>
+                                    </a>
+                                    <a href="/fcgy/gyjxm/" target="_blank">
+                                        <div>公益金使用公告</div>
+                                    </a>
+                                    <a href="/fcgy/gyhdd/" target="_blank">
+                                        <div>公益活动</div>
+                                    </a>
+                                    <a href="/fcgy/fcgygs/" target="_blank">
+                                        <div>福彩公益故事</div>
+                                    </a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 社会责任-->
+            <div class="nav-item" data-alias="shzr">
+                <div class="nav-item-wrap">
+
+
+
+
+                                <a href="/shzr/wmdcn/" target="_blank">
+                                    责任彩票
+                                </a>
+
+
+                </div>
+                <div class="nav-item-list">
+                    <div class="nav-item-list-width">
+                        <div class="nav-item-list-left">
+
+
+
+
+                                        <a href="/shzr/wmdcn/" target="_blank">
+                                            <div>我们的承诺</div>
+                                        </a>
+
+
+
+                                        <a href="/shzr/wmdzr/" target="_blank">
+                                            <div>我们的责任</div>
+                                        </a>
+
+
+
+                                        <a href="/shzr/zrcprz/" target="_blank">
+                                            <div>责任彩票认证</div>
+                                        </a>
+
+
+
+                                        <a href="/shzr/zrjs/" target="_blank">
+                                            <div>责任彩票原则</div>
+                                        </a>
+
+
+
+                                        <a href="/shzr/shzrbg/" target="_blank">
+                                            <div>责任彩票报告</div>
+                                        </a>
+
+
+
+                                        <a href="/shzr/zrcpsc/" target="_blank">
+                                            <div>责任彩票手册</div>
+                                        </a>
+
+
+
+                                        <a href="/shzr/lxgc/" target="_blank">
+                                            <div>理性购彩手册</div>
+                                        </a>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 阳光开奖-->
+            <div class="nav-item" data-alias="ygkj">
+                <div class="nav-item-wrap">
+
+
+
+
+                                <a href="/ygkj/kjgg/" target="_blank">
+                                    阳光开奖
+                                </a>
+
+
+                </div>
+                <div class="nav-item-list">
+                    <div class="nav-item-list-width">
+                        <div class="nav-item-list-left">
+
+
+
+
+                                        <a href="/ygkj/kjgg/" target="_blank">
+
+                                            <div>
+
+                                                开奖公告
+                                            </div>
+                                        </a>
+
+
+
+                                        <a href="/ygkj/kjzb/" target="_blank">
+
+                                            <div>
+
+                                                    <img class="kjzb-icon" src="/images/live-icon.png"
+                                                        alt="">
+
+                                                开奖直播
+                                            </div>
+                                        </a>
+
+
+
+                                        <a href="/ygkj/wqkjgg/" target="_blank">
+
+                                            <div>
+
+                                                往期开奖公告
+                                            </div>
+                                        </a>
+
+
+
+                                        <a href="/ygkj/wqkjsp/" target="_blank">
+
+                                            <div>
+
+                                                往期开奖视频
+                                            </div>
+                                        </a>
+
+
+
+                                        <a href="/ygkj/kjlc/" target="_blank">
+
+                                            <div>
+
+                                                开奖流程
+                                            </div>
+                                        </a>
+
+
+
+                                        <a href="/ygkj/zjkjxc/" target="_blank">
+
+                                            <div>
+
+                                                走进开奖现场
+                                            </div>
+                                        </a>
+
+
+
+                                        <a href="/ygkj/kjxxfbqd/" target="_blank">
+
+                                            <div>
+
+                                                开奖信息发布渠道
+                                            </div>
+                                        </a>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 福彩游戏-->
+            <div class="nav-item" data-alias="fcpz">
+                <div class="nav-item-wrap">
+
+
+                            <a href="/fcpz/yxjs/" target="_blank">
+
+                                <div>
+                                    福彩游戏
+                                </div>
+                            </a>
+
+                </div>
+                <div class="nav-item-list">
+                    <div class="nav-item-list-width">
+                        <div class="nav-item-list-left">
+
+
+
+
+                                        <a href="/fcpz/fctp/" target="_blank">
+                                            <div>游戏分类</div>
+                                        </a>
+
+
+
+                                        <a href="/fcpz/pzjs/" target="_blank">
+                                            <div>游戏类型</div>
+                                        </a>
+
+
+
+                                        <a href="/fcpz/yxjs/" target="_blank">
+                                            <div>福彩游戏</div>
+                                        </a>
+
+
+
+                                <a href="/fcpz/yxjs/ssq/" target="_blank">
+                                    <div>双色球</div>
+                                </a>
+
+
+                                <a href="/fcpz/yxjs/kl8/" target="_blank">
+                                    <div>快乐8</div>
+                                </a>
+
+
+                                <a href="/fcpz/yxjs/fc3d/" target="_blank">
+                                    <div>福彩3D</div>
+                                </a>
+
+
+                                <a href="/fcpz/yxjs/qlc/" target="_blank">
+                                    <div>七乐彩</div>
+                                </a>
+
+
+                                <a href="/fcpz/yxjs/ggl/" target="_blank">
+                                    <div>刮刮乐</div>
+                                </a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="clearfix"></div>
+<script>
+    var oneLeft = $('.nav-item:first').position().left
+    $('.nav-item').each(function () {
+        var itemDom = $(this).find('.nav-item-list-left')
+        var left = $(this).position().left
+        var width = itemDom.width()
+        itemDom.css('margin-left', left - oneLeft - width / 2 + 79 + 'px')
+
+        if (itemDom.css('margin-left')) {
+            var sumWidth = Number(itemDom.css('margin-left').replace('px', ''))
+            if (sumWidth + width > 1200) {
+                itemDom.css('margin-left', 1200 - width - 20 + 'px')
+            }
+            if (sumWidth < 0) {
+                itemDom.css('margin-left', '0px')
+            }
+        }
+    })
+    $('#searchInput').bind('keyup', function (event) {
+        if (event.keyCode == '13') {
+            //回车执行查询
+            doSearch()
+        }
+    })
+
+    function doSearch() {
+        if (!$('#searchInput').val()) {
+            return
+        }
+        var url =
+            'http://www.cwl.gov.cn/search/result.shtml?siteID=21&query=' +
+            encodeURIComponent($('#searchInput').val())
+        $('#searchInput').val('')
+        window.open(url)
+    }
+</script>
+
+<!-- 双色球数据 -->
+
+
+
+
+
+
+
+
+    <!-- 下期一等奖特别奖派奖金额 -->
+
+    <!-- 下期六等奖翻番奖奖金余额 -->
+
+
+
+
+
+<!-- 快乐8数据 -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 福彩3d数据 -->
+
+
+
+
+
+
+
+
+<!-- 七乐彩数据 -->
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="display: none">
+  <div class="ssqRed-dom">[03,27,24,13,29,08]</div>
+  <div class="ssqBlue-dom">[08]</div>
+  <div class="ssqQh-dom">2023120</div>
+  <div class="ssqPool-dom">2,372,742,600</div>
+  <div class="ssqSales-dom">382,480,862</div>
+  <div class="ssqXqLink-dom">/c/2023/10/19/556811.shtml</div>
+  <div class="ssqSpLink-dom">/c/2023/10/19/556809.shtml</div>
+  <div class="tentenjj-dom"></div>
+  <div class="tentenzs-dom"></div>
+  <div class="klRed-dom">[02,10,14,15,17,27,32,33,38,43,44,45,47,48,54,60,69,73,77,78]</div>
+  <div class="kl8Qh-dom">2023278</div>
+  <div class="kl8Jc-dom">144329594.85</div>
+  <div class="kl8Sales-dom">122,305,598</div>
+  <div class="kl8PjnAmount-dom"></div>
+  <div class="kl8PjnTen-dom"></div>
+  <div class="kl8PjnNine-dom"></div>
+  <div class="kl8XqLink-dom">/c/2023/10/19/556817.shtml</div>
+  <div class="kl8SpLink-dom">/c/2023/10/19/556816.shtml</div>
+  <div class="fcBlue-dom">[8,0,9]</div>
+  <div class="fcQh-dom">2023278</div>
+  <div class="fcPool-dom"></div>
+  <div class="fcSales-dom">118,852,868</div>
+  <div class="fcXqLink-dom">/c/2023/10/19/556813.shtml</div>
+  <div class="qclRed-dom">[11,17,23,13,20,29,24]</div>
+  <div class="qclBlue-dom">[26]</div>
+  <div class="qlcQh-dom">2023119</div>
+  <div class="qlcPool-dom">878,809</div>
+  <div class="qlcSales-dom">3,367,300</div>
+  <div class="qlcXqLink-dom">/c/2023/10/18/556601.shtml</div>
+  <div class="qlcSpLink-dom">/c/2023/10/18/556599.shtml</div>
+</div>
+
+  <div class="main-container-header-pz">
+    <!-- 图片背景 -->
+    <img src="/images/fcpz/fc3d-banner.png">
+    <!-- 内容头部 -->
+    <div class="play-title">
+      <div class="img fl no-border">
+        <img src="/images/fcpz/block-3d-m.png" alt="" />
+      </div>
+      <div class="fl nav"><a href='/'>首页</a> > <a href='/fcpz/'>福彩游戏</a> > <a href='/fcpz/yxjs/'>福彩游戏</a> > <a href='/fcpz/yxjs/fc3d/'>福彩3D</a></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="main-container-content">
+    <!-- 内容主体 -->
+    <div class="main-container-content-body fcpzMain">
+      <div class="body-content play-detail fc3d-detail">
+        <div class="fix-image" style="position: absolute;right: 0px;margin-top: 150px;">
+          <div style="position: relative;">
+            <img src="/images/fcpz/block-lan-w.png" />
+          </div>
+        </div>
+        <div class="notice">
+          <div class="notice-top">
+                <div class="title fcQh"></div>
+                <div class="qiu">
+                  <div class="qiu-item linear-blue qiu-item-big qiu-fc3D-kjgg">-</div>
+                  <div class="qiu-item linear-blue qiu-item-big qiu-fc3D-kjgg">-</div>
+                  <div class="qiu-item linear-blue qiu-item-big qiu-fc3D-kjgg">-</div>
+                </div>
+                <div>
+                  <a class="fcXqLink" href="" target="_blank">
+                  	<div class="detail-btn">查看详情</div>
+                  </a>
+                </div>
+          </div>
+
+
+          <div class="notice-con">
+            <div class="fl">
+              <div class="title">游戏规则</div>
+              <div class="content">
+                3D由中福彩中心发行和组织销售，由福彩销售机构在所辖区域内销售。
+3D采用计算机网络系统发行，在福彩销售机构设置的销售网点销售，每天销售一期。
+
+3D是指以三个号码排列或组合为一注进行单式投注，投注号码由000-999组成，三个位置从左至右分别为“百位”、“十位”、“个位”，一组三个号码的排列或组合称为一注。每注金额人民币2元。购买者可对其选定的投注号码进行多倍投注，投注倍数范围为2-99倍。单张彩票的投注金额最高不得超过20000元。
+              </div>
+            </div>
+            <div class="fr">
+              <div class="title">奖金对照表</div>
+              <div class="content">
+                <div class="jjdz">
+                  <table width="100%">
+                    <thead>
+                    <tr>
+                        <td width="22%">奖等</td>
+                        <td width="23%">奖金</td>
+                        <td width="55%">中奖条件</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>单选</td>
+                        <td>1040元</td>
+                        <td>与奖号按位相符</td>
+                    </tr>
+                    <tr>
+                        <td>组三</td>
+                        <td>346元</td>
+                        <td style="line-height: 16px;">与奖号相同，顺序不限，<br />且任意两位号码相同</td>
+                    </tr>
+                    <tr>
+                        <td>组六</td>
+                        <td>173元</td>
+                        <td>与奖号相同，顺序不限</td>
+                    </tr>
+                    </tbody>
+                </table>
+              </div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+            <a href="/c/2017/11/15/418903.shtml" target="_blank">
+            <div class="detail-btn">游戏规则详情</div>
+                          </a>
+          </div>
+        </div>
+
+        <div class="fix-image" style="position: absolute;left: 0px;margin-top: 200px;">
+          <div style="position: relative;">
+            <img src="/images/fcpz/block-fen-w.png" />
+          </div>
+        </div>
+        <div class="play-detail-con play-box">
+          <div class="box">
+            <div class="title">3D摇奖机</div>
+            <div class="content">
+              <div class="fl">
+
+                <div class="list">
+                  <div class="fl item">
+                    重量：90千克
+                  </div>
+                  <div class="fl item">
+                    高度：1.50米
+                  </div>
+                  <div class="fl item">
+                    宽度：0.66米
+                  </div>
+                  <div class="fl item">
+                    &nbsp;
+                  </div>
+                  <div class="fl item">
+                    搅拌室直径：30厘米
+                  </div>
+                  <div class="fl item">
+                    底座以上材质：高强度有机玻璃
+                  </div>
+                  <div class="fl item">
+                    产地：法国
+                  </div>
+                  <div class="fl item">
+                    厂商：AKANIS
+                  </div>
+                  <div class="fl item">
+                    型号：Topaze
+                  </div>
+                  <div class="fl item">
+                    动力原理：利用内部电器工作，在搅拌室内产生空气动力，将摇奖球充分搅拌。
+                  </div>
+                </div>
+              </div>
+              <div class="fr">
+                <img src="/images/fcpz/fc3d-detail-ji.png" alt="">
+              </div>
+            </div>
+          </div>
+          <div class="box">
+            <div class="title">3D摇奖球</div>
+            <div class="content">
+              <div class="fl">
+
+                <div class="list">
+                  <div class="fl item">
+                    标准重量：4克
+                  </div>
+                  <div class="fl item">
+                    重量误差：4g±5％
+                  </div>
+                  <div class="fl item">
+                    标准直径：44.5毫米
+                  </div>
+                  <div class="fl item">
+                    直径误差：44.5mm（-0.7/+0.8）
+                  </div>
+                  <div class="fl item">
+                    制作原料：聚氨酯和发泡材料
+                  </div>
+                  <div class="fl item">
+                    颜色：黄色、红色和蓝色
+                  </div>
+                  <div class="fl item">
+                    球面数字个数：12个
+                  </div>
+
+                  <div class="fl item">
+                    数量：每套球包含10个黄色球、10个红色球和10个蓝色球，共计两套正式摇奖球。
+                  </div>
+                  <div class="fl item">
+                    内部结构：实心结构
+                  </div>
+                  <div class="fl item">
+                    产地：法国
+                  </div>
+                  <div class="fl item">
+                    厂商：AKANIS
+                  </div>
+                </div>
+              </div>
+              <div class="fr">
+                <img src="/images/fcpz/ssq-detail-qiu.jpg" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="play-box dynamic-box">
+          <div class="title">市场动态</div>
+          <div class="list-list">
+            <div class="fl">
+
+
+                  <a href="/c/2022/11/16/521981.shtml" target="_blank">
+                    <div class="item-one">
+                      <div class="title-name txt-ellipsis">
+						河北开展3D游戏1200万元赠票活动
+                      </div>
+                      <div class="item-summary">
+						为回馈广大购彩者对3D游戏的支持与厚爱,也为了支持社会福利和公益慈善事业发展，河北省福彩中心决定，自11...
+                      </div>
+                    </div>
+                  </a>
+
+
+
+
+                  <a href="/c/2022/07/13/507548.shtml" target="_blank">
+                    <div class="txt txt-ellipsis">600万奖励！重庆福彩3D“组选狂欢季”大派奖活动即将开启！</div>
+                  </a>
+                  <a href="/c/2022/07/04/506645.shtml" target="_blank">
+                    <div class="txt txt-ellipsis">2800万元！湖南福彩3D游戏派奖活动即将开启</div>
+                  </a>
+
+            </div>
+            <div class="fr">
+
+
+                  <a href="/c/2022/08/29/512472.shtml" target="_blank">
+                    <div class="item-one">
+                      <div class="title-name txt-ellipsis">
+						1500万，连续40期，3D游戏派奖活动来了！
+                      </div>
+                      <div class="item-summary">
+						自2022年8月29日起，上海福彩针对3D游戏“单选”“组选三”“组选六”三种玩法进行派奖（派奖简介见下表）...
+                      </div>
+                    </div>
+                  </a>
+
+
+
+
+                  <a href="/c/2022/06/29/505839.shtml" target="_blank">
+                    <div class="txt txt-ellipsis">山西福彩3D游戏1500万元派奖活动即将火热开启</div>
+                  </a>
+                  <a href="/c/2022/04/18/500986.shtml" target="_blank">
+                    <div class="txt txt-ellipsis">内蒙古“福彩大家乐”第十六季——3D游戏专场迎春揭幕</div>
+                  </a>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="play-detail-img play-box">
+          <img src="/images/fcpz/fc3d-prize.png?20220511" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+    .zgs_title {
+        opacity: 1;
+        font-size: 14px;
+        font-family: MicrosoftYaHei, MicrosoftYaHei-Regular;
+        font-weight: 400;
+        text-align: left;
+        color: #616161;
+        line-height: 19px;
+        float: left;
+        margin: 0 10px;
+    }
+
+    .zgs_foot a :hover {
+        color: #D61518;
+    }
+
+    .zgs_head {
+        height: 41px;
+        opacity: 1;
+        font-size: 14px;
+        font-family: MicrosoftYaHei, MicrosoftYaHei-Bold;
+        font-weight: 700;
+        text-align: left;
+        color: #212121;
+        line-height: 40px;
+    }
+
+    .zgs_container {
+        width: 25%;
+        float: left;
+    }
+
+    .zgs_foot {
+        width: 1200px;
+        margin: 32px auto 20px auto;
+        overflow: hidden;
+    }
+
+    .zgs_foot a {
+        outline: none;
+        text-decoration: none !important;
+    }
+
+    .zgs_line {
+        width: 1200px;
+        height: 1px;
+        opacity: 1;
+        background: #dadadf;
+        margin: 18px auto;
+    }
+
+    .v_line {
+        font-size: 14px;
+        font-family: MicrosoftYaHei, MicrosoftYaHei-Regular;
+        font-weight: 400;
+        text-align: left;
+        color: #616161;
+        line-height: 19px;
+        float: left;
+    }
+</style>
+<div class="footer">
+    <div class="footer-top">
+        <div class="footer-top-wrap">
+            <div class="fl footer-des">
+                <div>
+                    <div class="fl">各地福彩：</div>
+                    <div class="margin-left">
+
+
+                                <a href="http://www.tjflcpw.com/main.action" target="_blank"
+                                                  style="white-space:nowrap;">天津</a>
+                                &#32;|&#32;<a href="http://www.yzfcw.com/" target="_blank"
+                                                  style="white-space:nowrap;">河北</a>
+                                &#32;|&#32;<a href="https://www.lnlotto.com/View/Index.aspx" target="_blank"
+                                                  style="white-space:nowrap;">辽宁</a>
+                                &#32;|&#32;<a href="http://www.jlfc.com.cn/View/Index.aspx" target="_blank"
+                                                  style="white-space:nowrap;">吉林</a>
+                                &#32;|&#32;<a href="http://www.lottost.cn/" target="_blank"
+                                                  style="white-space:nowrap;">黑龙江</a>
+                                &#32;|&#32;<a href="http://www.swlc.net.cn/" target="_blank"
+                                                  style="white-space:nowrap;">上海</a>
+                                &#32;|&#32;<a href="http://www.jslottery.com/" target="_blank"
+                                                  style="white-space:nowrap;">江苏</a>
+                                &#32;|&#32;<a href="http://fc.zjol.com.cn/" target="_blank"
+                                                  style="white-space:nowrap;">浙江</a>
+                                &#32;|&#32;<a href="http://www.ahflcp.com.cn/" target="_blank"
+                                                  style="white-space:nowrap;">安徽</a>
+                                &#32;|&#32;<a href="http://www.fjcp.cn/" target="_blank"
+                                                  style="white-space:nowrap;">福建</a>
+                                &#32;|&#32;<a href="https://www.jxfczx.cn/" target="_blank"
+                                                  style="white-space:nowrap;">江西</a>
+                                &#32;|&#32;<a href="http://www.sdcp.cn/" target="_blank"
+                                                  style="white-space:nowrap;">山东</a>
+                                &#32;|&#32;<a href="http://www.henanfucai.com/" target="_blank"
+                                                  style="white-space:nowrap;">河南</a>
+                                &#32;|&#32;<a href="http://www.hbfcw.cn/" target="_blank"
+                                                  style="white-space:nowrap;">湖北</a>
+                                &#32;|&#32;<a href="http://mzt.hunan.gov.cn/mzt/fc/" target="_blank"
+                                                  style="white-space:nowrap;">湖南</a>
+                                &#32;|&#32;<a href="http://www.gdfc.org.cn/" target="_blank"
+                                                  style="white-space:nowrap;">广东</a>
+                                &#32;|&#32;<a href="http://www.gxcaipiao.com.cn" target="_blank"
+                                                  style="white-space:nowrap;">广西</a>
+                                &#32;|&#32;<a href="http://www.cqcp.net/" target="_blank"
+                                                  style="white-space:nowrap;">重庆</a>
+                                &#32;|&#32;<a href="http://www.scflcp.com/" target="_blank"
+                                                  style="white-space:nowrap;">四川</a>
+                                &#32;|&#32;<a href="https://www.gzfucai.cn" target="_blank"
+                                                  style="white-space:nowrap;">贵州</a>
+                                &#32;|&#32;<a href="http://www.sxfc.gov.cn/" target="_blank"
+                                                  style="white-space:nowrap;">陕西</a>
+                                &#32;|&#32;<a href="http://www.gsflcp.com/" target="_blank"
+                                                  style="white-space:nowrap;">甘肃</a>
+                                &#32;|&#32;<a href="http://www.qhfcw.com/index.html" target="_blank"
+                                                  style="white-space:nowrap;">青海</a>
+                                &#32;|&#32;<a href="http://www.xjflcp.com/" target="_blank"
+                                                  style="white-space:nowrap;">新疆</a>
+                                &#32;|&#32;<a href="http://www.hainancp.com/" target="_blank"
+                                                  style="white-space:nowrap;">海南</a>
+                                &#32;|&#32;<a href="http://www.ynflcp.cn" target="_blank"
+                                                  style="white-space:nowrap;">云南</a>
+                                &#32;|&#32;<a href="http://www.szlottery.org/" target="_blank"
+                                                  style="white-space:nowrap;">深圳</a>
+
+                    </div>
+                </div>
+            </div>
+            <div class="fl footer-img">
+
+
+
+                            <a href="/ewm/" target="_blank">
+                                <img src="/upload/resources/image/2021/09/07/809572_78x78.jpg" alt=""/>
+                            </a>
+
+
+                <div class="more">中国福彩新媒体</div>
+            </div>
+        </div>
+    </div>
+    <div class="zgs_foot">
+        <div class="zgs_title" style="margin:0">下属单位：</div>
+        <a href="/zgs/zfckjfzbjyxgs/" target="_blank">
+            <div class="zgs_title">
+                中福彩科技发展（北京）有限公司
+            </div>
+        </a>
+        <span class="v_line"> | </span>
+
+        <a href=" /zgs/zfcbjyyglyxgs/" target="_blank">
+            <div class="zgs_title">
+                中福彩（北京）运营管理有限公司
+            </div>
+        </a>
+        <span class="v_line"> | </span>
+        <a href="/zgs/bjzflckjyxzrgs/">
+        <div class="zgs_title">
+            北京中福乐彩科技有限责任公司
+        </div>
+        </a>
+        <span class="v_line"> | </span>
+        <a href="/zgs/zfcjsyjzx/" target="_blank">
+            <div class="zgs_title">
+                中福彩技术研究中心
+            </div>
+        </a>
+		<span class="v_line"> | </span>
+		<a href="/zgs/bjzcyzyxgs/" target="_blank">
+			<div class="zgs_title">
+				北京中彩印制有限公司
+			</div>
+		</a>
+    </div>
+    <div class="zgs_line"></div>
+    <div class="footer-bot">
+        <div class="footer-bot-wrap">
+            <div class="footer-logo fl">
+                <img src="/images/logo-footer-new.png" alt=""/>
+            </div>
+            <div class="copyright fl">
+                <div>版权所有：中国福利彩票发行管理中心 网站主办：中国福利彩票发行管理中心</div>
+                <div>ICP备案编号：京ICP备13026484 <img src="/images/babh.png" alt=""><a
+                        href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11010502042638"
+                        target="_blank">京公网安备</a> 11010502042638号
+                </div>
+                <div><span style="font-weight:bold;">服务热线：954168</span></div>
+            </div>
+            <div class="foot-r fr">
+                <img src="/images/wla.png" alt="" title="中国福利彩票获得世界彩票协会 “责任彩票”三级认证"
+                     style="width: 104px;height: 55px;"/>
+                <img src="/images/blue.png" alt="" style="width: 51px;height: 61px;margin-left: 5px;"/>
+                <img src="/images/brand_realname_large_img.png" style="width: 127px;height: 47px;margin-left: 5px;"
+                     alt=""/>
+                <a href="/wzjc"><img src="/images/wwwzzc.png" alt=""
+                                     style="width: 99px;height: 50px;margin-left: 5px;"/></a>
+
+            </div>
+
+            <div class="clearfix"></div>
+            <div class="bottom-txt">温馨提示：理性购彩&nbsp;&nbsp;&nbsp;&nbsp;量力而行&nbsp;&nbsp;&nbsp;&nbsp;禁止未成年人购买彩票和兑奖</div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+  $('.fcQh').text('第' + $('.fcQh-dom').text() + '期全国开奖信息')
+  $('.fcXqLink').attr('href', $('.fcXqLink-dom').text())
+  var fcBlue = eval('(' + $('.fcBlue-dom').html() + ')');
+  for(var i=0;i<fcBlue.length;i++) {
+        $('.qiu .qiu-item')[i].innerHTML = fcBlue[i]
+   }
+  // 标题导航高亮
+  var activeAlias = 'fcpz'
+  var navList = $('.header-nav .nav-item')
+        for(var i=0;i<navList.length;i++) {
+          if(navList[i].getAttribute('data-alias') == activeAlias) {
+            navList[i].setAttribute("class","nav-item active")
+          }
+        }
+  var clientWidth = document.documentElement.scrollWidth || document.body.scrollWidth
+  if(clientWidth <= 1920) {
+    $('.fix-image').css("width",clientWidth);
+  } else {
+    $('.fix-image').css({"width":"1920px","margin-left":'-'+(clientWidth-1920)/2+'px',"left":(clientWidth-1200)/2+'px'});
+  }
+</script>
+
+<script src="http://www.cwl.gov.cn/cwl_admin/stat/front/stat.js" type="text/javascript"></script>
+<script>
+if(window._zcms_stat)_zcms_stat("SiteID=21&CatalogInnerCode=000312000009000003&Type=null&Dest=http://www.cwl.gov.cn/cwl_admin/front/stat/dealer");
+</script>
+
+<!-- App=ZCMS(ZCMS内容管理系统) 3.2.7,CostTime=112,PublishDate=2022-11-16 17:30:22 -->
+</body>
+</html>

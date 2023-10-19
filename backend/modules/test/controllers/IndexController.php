@@ -62,6 +62,7 @@ use common\kj\ssc\BingDao;
 use common\kj\ssc\JiaNaDa;
 use common\kj\ssc\Lucky5;
 use common\kj\ssc\TaiWanHuanLe;
+use common\kj\ssc\Thirdd;
 use common\kj\xjssc\XjSsc;
 use common\models\AdminModel;
 use common\service\ChatService;
@@ -391,6 +392,9 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $d = Thirdd::getCurrentKjData($lottery_type=26);p($d);
+        $Thirdd = new Thirdd();
+        $data = $Thirdd->getFuCai3d($type='json', 2);p($data);
         $plan = UserSysPlans::findOne(7585);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
         p(count($filter_dynamic_codes));

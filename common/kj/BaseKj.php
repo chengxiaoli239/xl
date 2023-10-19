@@ -2,11 +2,12 @@
 namespace common\kj;
 use backend\models\KjConfig;
 use backend\service\HN0898Service;
+use common\service\BaseService;
 use common\tools\Tool_Common;
 use  yii;
 use common\tools\KjDataGet;
 
-class BaseKj{
+class BaseKj extends BaseService {
     private static $currentQihao = '190125023';
     private static $tblEndQihao = '190125023';
 
