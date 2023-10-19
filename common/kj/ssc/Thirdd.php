@@ -17,7 +17,7 @@ class Thirdd extends BaseKj {
     CONST SUCCESS_CODE = 20000;
 
     /**
-     * @desc 福彩3D、排列三
+     * @desc 福彩3D，官网：http://www.cwl.gov.cn/ygkj/wqkjgg/
      * @param string $returnType
      * @return array|bool
      */
