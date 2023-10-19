@@ -23,7 +23,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
 
         $dataHI = date('H:i');
         if('21:15'<$dataHI && $dataHI<'23:59'){
-            throw_info('本堂已关');
+            #throw_info('本堂已关');
         }
 
         if('00:00'<$dataHI && $dataHI<'08:00'){

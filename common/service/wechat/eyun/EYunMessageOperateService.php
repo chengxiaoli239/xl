@@ -98,6 +98,7 @@ class EYunMessageOperateService  extends EYunBaseService
      * @return array
      */
     public static function matchData($text=''){
+        $text = str_replace(' ', ' ', trim($text)); # 中文空格替换成英文空格
         try {
             if(strpos($text, '撤') !== false){
                 $data = [];
