@@ -27,7 +27,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
         }
 
         if('00:00'<$dataHI && $dataHI<'08:00'){
-            throw_info('本堂未开');
+            //throw_info('本堂未开');
         }
     }
 

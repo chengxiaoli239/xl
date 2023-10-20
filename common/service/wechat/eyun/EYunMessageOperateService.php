@@ -60,6 +60,24 @@ class EYunMessageOperateService  extends EYunBaseService
     }
 
     /**
+     * 重置匹配文本
+     * @param $text
+     */
+    public static function resetText(&$text){
+        #$text = str_replace(' ', '', $text); # 中文逗号，
+        $text = str_replace('，', ',', $text); # 中文逗号，
+        $text = str_replace('：', '', $text); # 中文冒号，
+        #$text = str_replace('。', '', $text); # 中文句号。
+        $text = str_replace('计', '共', $text); # 同义词替换
+        $text = str_replace('块', '元', $text); # 同义词替换
+        $text = str_replace(['、', '-', '.', '。', '*'], ' ', $text); # 同义词替换
+        $text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
+        if(preg_match('/个(\d+)元/', $text, $matches)){
+            p($matches);
+        }
+    }
+
+    /**
      * 数据文字匹配，及转换
      * @param string $text
      * @return array
@@ -82,12 +100,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 'originText' => $text,
             ];
 
-            #$text = str_replace(' ', '', $text); # 中文逗号，
-            $text = str_replace('，', ',', $text); # 中文逗号，
-            $text = str_replace('：', '', $text); # 中文冒号，
-            $text = str_replace('。', '', $text); # 中文句号。
-            $text = str_replace('计', '共', $text); # 同义词替换
-            $text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
+            EYunMessageOperateService::resetText($text); # 重置匹配文本
             $dataGroups['stepOneText'] = $text;
 
             $betGroups = explode('|', $text);
@@ -150,6 +163,41 @@ class EYunMessageOperateService  extends EYunBaseService
     }
 
     /**
+     * @param $data
+     * @param $text
+     * @param $transaction
+     * @return array
+     * @throws \common\exceptions\InfoException
+     */
+    public static function matchCancel($data, $text, $transaction){
+        switch ($data['type']){
+            case CommonBaseService::B_TYPE_CANCEL:
+                $orderId = $data['orderId'];
+                $Bets = Bets::findOne(['order_id'=>$orderId]);
+                if(empty($Bets)){
+                    throw_info('单号：'.$orderId.'无记录', ThirdDTypeService::CODE_FOR_USER);
+                }
+                if($Bets->status==1){
+                    throw_info($orderId.'订单已完成，无法撤单', ThirdDTypeService::CODE_FOR_USER);
+                }
+                if($Bets->status==3){
+                    throw_info($orderId.'订单已是撤单状态，无需重复处理', ThirdDTypeService::CODE_FOR_USER);
+                }
+                #$Bets->status = 3; # 已撤单
+                Bets::updateAll(['status'=>3], ['order_id'=>$orderId]);
+                if($Bets->save()){
+                    $transaction->commit();
+                }else{
+                    $transaction->rollBack();
+                }
+                return [ThirdDTypeService::CODE_FOR_USER, ['text'=>$text, 'replyTxt'=>$orderId.'撤单完成'], '接收成功'];
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
      * 消息处理后的业务处理
      * @param string $user_id 代理user.id
      * @param string $text
@@ -170,30 +218,11 @@ class EYunMessageOperateService  extends EYunBaseService
             if($code>0){
                 throw_info($msg);
             }
-            switch ($data['type']){
-                case CommonBaseService::B_TYPE_CANCEL:
-                    $orderId = $data['orderId'];
-                    $Bets = Bets::findOne(['order_id'=>$orderId]);
-                    if(empty($Bets)){
-                        throw_info('单号：'.$orderId.'无记录', ThirdDTypeService::CODE_FOR_USER);
-                    }
-                    if($Bets->status==1){
-                        throw_info($orderId.'订单已完成，无法撤单', ThirdDTypeService::CODE_FOR_USER);
-                    }
-                    if($Bets->status==3){
-                        throw_info($orderId.'订单已是撤单状态，无需重复处理', ThirdDTypeService::CODE_FOR_USER);
-                    }
-                    #$Bets->status = 3; # 已撤单
-                    Bets::updateAll(['status'=>3], ['order_id'=>$orderId]);
-                    if($Bets->save()){
-                        $transaction->commit();
-                    }else{
-                        $transaction->rollBack();
-                    }
-                    return [0, ['text'=>$text, 'replyTxt'=>$orderId.'撤单完成'], '接收成功'];
-                    break;
-                default:
-                    break;
+
+            # 撤单匹配
+            list($code, $vd, $msg) = self::matchCancel($data, $text, $transaction);
+            if($code == ThirdDTypeService::CODE_FOR_USER){
+                return [0, $vd, $msg];
             }
 
             $betOrderId = ThirdDTypeService::getOrderId();
