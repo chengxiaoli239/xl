@@ -73,7 +73,7 @@ class WechatUserController extends BaseController
         $row = $this->findModel(['id'=>$id, 'user_id'=>$this->_user_id]);
         if(!empty($row)){
             HN0898Service::updateStatus($id, $model = '\backend\models\wechat\WechatUser', 'status');
-            WechatUserService::getWechatUsers($this->_user_id);
+            WechatUserService::getWechatUsers($this->_user_id, false);
         }
 
         return $this->redirect(['index']);
