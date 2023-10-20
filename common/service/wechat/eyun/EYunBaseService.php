@@ -9,6 +9,7 @@ use common\service\BaseService;
 use common\service\chat\Tool_Common;
 use common\service\jobs\robots\user\AfterWechatLoginJobs;
 use common\service\jobs\robots\user\EYunUserJobs;
+use common\service\wechat\RobotUserService;
 
 class EYunBaseService  extends BaseService
 {
@@ -253,7 +254,7 @@ class EYunBaseService  extends BaseService
      * @return string
      */
     public static function getRobotUserIdByWechatIdKey($wcId=''){
-        return 'getRobotUserIdByWechatIdKey_x0_'.$wcId;
+        return 'getRobotUserIdByWechatIdKey_x2_'.$wcId;
     }
 
     /**
@@ -275,7 +276,7 @@ class EYunBaseService  extends BaseService
         $mkey = self::getRobotUserIdByWechatIdKey($wechatId);
         $data = $m->get($mkey);
         if(empty($data) OR $is_auto==2){
-            $data = RobotUser::find()->where(['wcId'=>$wechatId])->asArray()->limit(1)->one();;
+            $data = RobotUser::find()->where(['wcId'=>$wechatId, 'wechat_status'=>RobotUserService::WECHAT_STATUS_ONLINE])->asArray()->limit(1)->one();;
             $m->set($mkey, $data, 1800);
         }
 

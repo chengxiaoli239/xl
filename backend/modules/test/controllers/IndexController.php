@@ -331,6 +331,7 @@ class IndexController extends Controller
     }
     public function actionDw1(){
 
+        $user_id = EYunBaseService::getRobotUserIdByWechatId($RobotWechatId='wxid_ckgr7i2q9fr522');p($user_id);
         #$code_2n = CommonService::get2n($codesArr=[9, 9, 3], $lottery_type=26); p($code_2n);
         #$sort_codes = CommonService::reSortCodes($codesArr=[12, 43, 796]); p($sort_codes);
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
