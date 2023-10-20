@@ -73,7 +73,7 @@ class EYunMessageOperateService  extends EYunBaseService
         $text = str_replace(['、', '-', '.', '。', '*'], ' ', $text); # 同义词替换
         $text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
         if(preg_match('/个(\d+)元/', $text, $matches)){
-            p($matches);
+            $text = str_replace($matches[0], '各'.$matches[1].'元', $text);
         }
     }
 

@@ -11,7 +11,7 @@ use yii\helpers\Json;
 class SendWechatMsgJobs extends CommonJob {
 
     public static function getName($params) {
-        self::$name = '发送微信消息处理';
+        self::$name = '12发送微信消息处理';
         return self::$name;
     }
 

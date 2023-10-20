@@ -8,10 +8,8 @@ use common\service\wechat\WechatUserService;
 use yii\helpers\Json;
 
 class WechatPrivateMsgReceiveJobs extends CommonJob {
-    public static $waitSeconds = 5;  # 消息延迟5s发送
-
     public static function getName($params) {
-        self::$name = '微信私聊消息处理';
+        self::$name = '11微信私聊消息处理';
         return self::$name;
     }
 
