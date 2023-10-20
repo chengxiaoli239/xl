@@ -28,42 +28,9 @@ class EYunMessageOperateService  extends EYunBaseService
     const MESSAGE_G_TEXT_CANCEL = '80018'; # 撤回消息
     const MESSAGE_G_TEXT_CODE = '80001'; # 群聊文本
 
-    public function __construct($user_id='', $config = [])
+    public function __construct($user_id='')
     {
-        if(empty($user_id)){
-            throw_info('new消息发送对象user_id为空');
-        }
-        $this->user_id = $user_id;
-        if(empty($config)){
-            $c = \Yii::$app->params['E_YUN'];
-            $config = [
-                'base_url' => $c['BASE_URL'],
-                'account' => $c['ACCOUNT'],
-                'password' => $c['PASSWORD'],
-                'ttuid' => $c['TTUID'],
-            ];
-            $this->base_url = $config['base_url'];
-            $this->ttuid = $config['ttuid'];
-            $this->account = $config['ttuid'];
-            $this->password = $config['password'];
-        }
-        $eyunAuth = EyunAuth::findOne(1);
-        if(!empty($eyunAuth)){
-            $headers = [
-                'Authorization' => $eyunAuth->authorization,
-            ];
-            $this->headers = $headers;
-        }
-        $RobotUser = RobotUser::findOne(['user_id'=>$user_id]);
-        if(!empty($RobotUser)){
-            $this->wcId = $RobotUser->wcId;
-            $this->wId = $RobotUser->wId;
-        }
-        parent::__construct($config);
-    }
-
-    public function wechatStatus(){
-
+        parent::__construct($user_id);
     }
 
     /**

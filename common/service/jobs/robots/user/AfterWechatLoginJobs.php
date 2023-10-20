@@ -63,7 +63,7 @@ class AfterWechatLoginJobs extends CommonJob {
             # 初始化通讯录列表（第四步）
             $initAddressListRst = $e->initAddressList();
             # 获取通讯录列表（第五步）
-            $getAddressListRst = $e->getAddressList();
+            $getAddressListRst = $e->getAddressList($wcId);
         }catch (\Exception $e){
             return $e->getMessage();
         }

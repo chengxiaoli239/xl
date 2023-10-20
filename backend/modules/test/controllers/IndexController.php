@@ -260,24 +260,6 @@ class IndexController extends Controller
      */
     public function actionTestWx()
     {
-        $rst = WebotService::syncAddressList($uid = 1);
-        p($rst);
-        $rst = SendMsgService::text($uid = 1, 'wangyegao2012');
-        p($rst);
-        $rst = WebotService::syncAddressData($uid = 1, $wcIds = ['wxid_fz1qsc0ja2612', 'wxid_v5ni9x7kbjbp21', 'wxid_r4ewv74q8c6922']);
-        p($rst);
-        $rst = FriendsService::getContactDetail($uid = 1, $wcIds = ['wxid_fz1qsc0ja2612', 'wxid_v5ni9x7kbjbp21', 'wxid_r4ewv74q8c6922']);
-        p($rst);
-        $rst = LoginService::getAddressList($uid = 1);
-        p($rst);
-        $rst = LoginService::getIPadLoginInfo($uid = 1);
-        p($rst);
-        $rst = LoginService::getLoginQrCode($uid = 1);
-        p($rst);
-        $rst = LoginService::loginWebot($uid = 1);
-        p($rst);
-        $sendRst = WxService::webwxsendmsg($uid = 18, $fromUser = ['UserName' => '@4678d431465a45f2ee5129dbaa353482c8f678049f9f973e6a5deadcc130ed1f'], $to = '@a6c2666f2464f8c8628ebbf099f0749a', $word = 'xxx');
-        p($sendRst);
         $uuid = WxService::get_uuid();
         p($uuid);
         $callback = WxService::get_uri($uuid);
@@ -353,7 +335,9 @@ class IndexController extends Controller
         #$sort_codes = CommonService::reSortCodes($codesArr=[12, 43, 796]); p($sort_codes);
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
-        $user_id = 20;
+        $user_id = 21;
+        $e = new EYunBaseService($user_id);
+        $loginRst = $e->memberLogin($id=2); p($loginRst);
         #$rst = RobotUserService::switchWechat($user_id, $post);p($rst);
 
         #$rst = \common\service\thirdD\Odds3dService::addUserOdds($user_id);
@@ -374,8 +358,6 @@ class IndexController extends Controller
         return $rst;
         $rst = $MessageService->receive($user_id, $text='福：组选122 233各2元共4元', $fromUser='wxid_875i1kgd38x122'); p($rst);
         $rst = $MessageService->receive($user_id, $text='福彩，直选123 457各10共20'); p($rst);
-        #$e = new EYunBaseService($user_id);
-        #$loginRst = $e->memberLogin();
         #$rst = $e->localIPadLogin(); p($rst);# 第二步
         #$rst = $e->getIPadLoginInfo();p($rst); # 第三步
         #$rst = $e->initAddressList(); # 第四步
@@ -385,8 +367,6 @@ class IndexController extends Controller
         $rst = $e->send($wcId='wangyegao2012', $content='嗯，知道了'); p($rst); # 第四步 高子：wangyegao2012  破局：wxid_875i1kgd38x122
         $rst = $e->send($wcId='wxid_875i1kgd38x122', $content='晚上好，早点睡，明天再聊'); p($rst); # 第四步 wangyegao2012
 
-        $e = new MessageSetService($user_id);
-        $rst = $e->setHttpCallbackUrl();
         p(['rst'=>$rst]);
     }
 
