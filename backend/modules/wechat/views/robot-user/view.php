@@ -49,10 +49,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'format'=>'raw',
                                         'value' => function($model) {
                                             $History = \common\models\eyun\HistoryRobots::findOne(['wcId'=>$model->wcId, 'user_id'=>$model->user_id]);
+                                            $txt = '';
                                             if(!empty($History)){
                                                 $imgUrl = $History->smallHeadImgUrl;
+                                                if(!empty($imgUrl)){
+                                                    $txt .= '<img width="30" height="30" src="'.$imgUrl.'">&nbsp;&nbsp;';
+                                                }
                                             }
-                                            $txt = '<img width="30" height="30" src="'.$imgUrl.'">&nbsp;&nbsp;';
                                             $txt .= ($model->wechat_status==1) ?
                                                 '<strong><font color="green">账号在线</font></strong>'
                                                 :

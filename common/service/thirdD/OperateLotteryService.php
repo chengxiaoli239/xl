@@ -222,34 +222,6 @@ class OperateLotteryService extends CommonBaseService
         $zjCount = $betCounts[$kjCode3] ?? 0; # 中奖次数，防止相同的号码，下注时候出现多次
 
         self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
-        /*
-        if($zjCount>0){
-            # 中奖
-            $status = self::STATUS_LT_SUCCESS;
-            $bonus = round($Odds['odds'] * $betRow->single, 2) * $zjCount; # 奖金赔率 * 下注金额
-        }else{
-            # 未中奖
-            $status = self::STATUS_LT_FAIL;
-            $bonus = 0.00;
-        }
-        $profits = (float)round($bonus - $betRow->bet_money, 2);
-        $updateDatas = [
-            'status' => $status,
-            'bonus' => $bonus,
-            'profits' => $profits,
-            'kj_codes' => $kjCode,
-            'updated_at' => time(),
-        ];
-        $betRow->setAttributes($updateDatas);
-        $flag = $betRow->save();
-        if(empty($flag)){
-            throw_info($betRow->getErrors());
-        }
-        $logArr = ['status'=>$status, 'bonus'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'betCodes'=>$betCodes, 'kjCode'=>$kjCode, 'betRecord'=>$betRow->getAttributes()];
-        $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
-        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
-        */
-
         return true;
     }
 
@@ -277,34 +249,6 @@ class OperateLotteryService extends CommonBaseService
         $zjCount = $betCounts[$kj_code_3n] ?? 0; # 中奖次数，防止相同的号码，下注时候出现多次
 
         self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
-        /*
-        if($zjCount>0){
-            # 中奖
-            $status = self::STATUS_LT_SUCCESS;
-            $bonus = round($Odds['odds'] * $betRow->single, 2) * $zjCount; # 奖金赔率 * 下注金额
-        }else{
-            # 未中奖
-            $status = self::STATUS_LT_FAIL;
-            $bonus = 0.00;
-        }
-        $profits = (float)round($bonus - $betRow->bet_money, 2);
-        $updateDatas = [
-            'status' => $status,
-            'bonus' => $bonus,
-            'profits' => $profits,
-            'kj_codes' => $kjCode,
-            'updated_at' => time(),
-        ];
-        #p(['id'=>$betRow->id, 'betCodes'=>$betCodes, 'kj_code_3n'=>$kj_code_3n, 'betCounts'=>$betCounts, $updateDatas]);
-        $betRow->setAttributes($updateDatas);
-        $flag = $betRow->save();
-        if(empty($flag)){
-            throw_info($betRow->getErrors());
-        }
-        $logArr = ['status'=>$status, 'bouns'=>$bonus, 'Odds'=>$Odds, 'betCounts'=>$betCounts, 'zjCount'=>$zjCount, 'betCodes'=>$betCodes, 'kjCode'=>$kjCode, 'kj_code_3n'=>$kj_code_3n, 'betRecord'=>$betRow->getAttributes()];
-        $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
-        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
-        */
 
         return true;
     }
@@ -334,35 +278,6 @@ class OperateLotteryService extends CommonBaseService
         }
         #p(['kjCodeArr'=>$kjCodeArr, 'kj_code_3n'=>$kj_code_3n, 'betCodes'=>$betCodes, 'betCounts'=>$betCounts]);
         self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
-
-        /*
-        if($zjCount>0){
-            # 中奖
-            $status = self::STATUS_LT_SUCCESS;
-            $bonus = round($Odds['odds'] * $betRow->single, 2) * $zjCount; # 奖金赔率 * 下注金额
-        }else{
-            # 未中奖
-            $status = self::STATUS_LT_FAIL;
-            $bonus = 0.00;
-        }
-        $profits = (float)round($bonus - $betRow->bet_money, 2);
-        $updateDatas = [
-            'status' => $status,
-            'bonus' => $bonus,
-            'profits' => $profits,
-            'kj_codes' => $kjCode,
-            'updated_at' => time(),
-        ];
-        #p(['id'=>$betRow->id, 'betCodes'=>$betCodes, 'kj_code_3n'=>$kj_code_3n, 'betCounts'=>$betCounts, $updateDatas]);
-        $betRow->setAttributes($updateDatas);
-        $flag = $betRow->save();
-        if(empty($flag)){
-            throw_info($betRow->getErrors());
-        }
-        $logArr = ['status'=>$status, 'bouns'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'betCodes'=>$betCodes, 'kjCode'=>$kjCode, 'kj_code_3n'=>$kj_code_3n, 'betRecord'=>$betRow->getAttributes()];
-        $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
-        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
-        */
 
         return true;
     }
