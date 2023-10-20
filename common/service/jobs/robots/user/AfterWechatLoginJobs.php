@@ -48,7 +48,7 @@ class AfterWechatLoginJobs extends CommonJob {
                 $historyRobots = new HistoryRobots();
                 $historyRobots->user_id = $user_id;
                 $historyRobots->wcId = $wcId;
-                $historyRobots->uuid = \Yii::$app->params['E_YUN']['TTUID'];
+                #$historyRobots->uuid = \Yii::$app->params['E_YUN']['TTUID'];
                 $historyRobots->created_at = $now_time;
             }
             $historyRobots->desc = '登录于: '.date('Y-m-d H:i:s');
