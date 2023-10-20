@@ -70,7 +70,7 @@ class EYunMessageOperateService  extends EYunBaseService
         #$text = str_replace('。', '', $text); # 中文句号。
         $text = str_replace('计', '共', $text); # 同义词替换
         $text = str_replace('块', '元', $text); # 同义词替换
-        $text = str_replace(['、', '-', '.', '。', '*'], ' ', $text); # 同义词替换
+        $text = str_replace(['、', '-', '.', '。', '*', "\n"], ' ', $text); # 同义词替换
         $text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
         if(preg_match('/个(\d+)元/', $text, $matches)){
             $text = str_replace($matches[0], '各'.$matches[1].'元', $text);
@@ -230,7 +230,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 throw_info('单号生成失败');
             }
             $betCodeContents = $data['dataGroups']['betCodeContents'];
-            #p(['betCodeContents'=>$betCodeContents]);
+            //p(['betCodeContents'=>$betCodeContents]);
             if(ThirdD::getMaxDim($betCodeContents[0]['playMethod'])>1){
                 $betCodeContents = $betCodeContents[0]['playMethod'];
             }

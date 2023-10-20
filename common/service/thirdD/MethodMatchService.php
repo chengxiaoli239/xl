@@ -377,8 +377,8 @@ class MethodMatchService extends CommonBaseService
      */
     public static function matchShuangFen($text='', &$codes=[], &$count=0, $matchName=''){
         // 使用正则表达式匹配所有单个数字
-        $text = str_replace(',', ' ', $text);
-        if (preg_match_all('/双飞(\d{2}(?:\s*\d{2})*)/', $text, $matches)) {
+        $text = str_replace(',', ' ', trim($text));
+        if (strpos($text, '双飞') !==false && preg_match_all('/(\d{2}(?:\s*\d{2})*)/', $text, $matches)) {
             $numbers = $matches[1][0];
         }
         #p([$text, $matchName, $numbers]);

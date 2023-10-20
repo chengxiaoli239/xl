@@ -101,7 +101,7 @@ class ThirdDTypeService extends CommonBaseService
             $methodArr = MethodMatchService::matchZuXuan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if($methodArr['originName'] == '独胆') { # 4独胆
             $methodArr = MethodMatchService::matchDuDan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }else if($methodArr['originName'] == '双飞') { # 5独胆
+        }else if($methodArr['originName'] == '双飞') { # 5双飞
             $methodArr = MethodMatchService::matchShuangFen($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if($methodArr['originName'] == '对子全拖') { # 6对子全拖
             $methodArr = MethodMatchService::matchDuiZiQuanTuo($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
