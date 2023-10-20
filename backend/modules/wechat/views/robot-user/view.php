@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     #'id',
                                     #'user_id',
                                     'wcId',
-                                    'wId',
+                                    //'wId',
                                     #'uuid',
                                     ['attribute' => 'status','label'=>'账号状态','headerOptions'=>['width'=>'5%'],
                                         'format'=>'raw',
