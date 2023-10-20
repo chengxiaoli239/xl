@@ -183,7 +183,8 @@ class EYunMessageOperateService  extends EYunBaseService
                     if($Bets->status==3){
                         throw_info($orderId.'订单已是撤单状态，无需重复处理', ThirdDTypeService::CODE_FOR_USER);
                     }
-                    $Bets->status = 3; # 已撤单
+                    #$Bets->status = 3; # 已撤单
+                    Bets::updateAll(['status'=>3], ['order_id'=>$orderId]);
                     if($Bets->save()){
                         $transaction->commit();
                     }else{
