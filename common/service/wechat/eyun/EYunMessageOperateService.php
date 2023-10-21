@@ -309,6 +309,7 @@ class EYunMessageOperateService  extends EYunBaseService
             //p($betCodeContents);
             $now_time = time();
             $allMoneys = 0.00;
+            $allCounts = 0;
             $replyTxts = [];
             foreach ($betCodeContents as $lottery_type=>$contents){
                 $qihao = HN0898Service::getQihao($lottery_type);
@@ -348,12 +349,13 @@ class EYunMessageOperateService  extends EYunBaseService
                             throw_info(Json::encode($Bets->getErrors(), 320));
                         }
                         $allMoneys += $content['all_moneys']; # 总投
+                        $allCounts += $content['count']; # 总投
                     }
                 }
             }
             $replyTxt .= ("\n【单号】".$betOrderId);
 
-            $replyTxt .= ("\n【成功】√  共".$allMoneys.'咪');
+            $replyTxt .= ("\n【成功】√  ".$allCounts."组，共".$allMoneys.'咪');
             $replyTxts[] = $replyTxt;
 
             $transaction->commit();
