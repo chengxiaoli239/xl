@@ -79,6 +79,12 @@ class EYunMessageOperateService  extends EYunBaseService
         if(preg_match('/个(\d+)元/', $text, $matches)){
             $text = str_replace($matches[0], '各'.$matches[1].'元', $text);
         }
+        if(!preg_match('/各(\d+)/', $text, $matches)){ # 没匹配到倍数，做兼容处理
+            $allTmpMoney = 0.00;
+            if(preg_match('/共(\d+)/', $text, $matches2)){
+                $allTmpMoney = $matches2[1];
+            }
+        }
 
         $matchesLotteryTypes = ThirdDTypeService::getLotteryTypes($text, ThirdDTypeService::getThirdDAlias());
         #p(['text'=>$text, 'matchesLotteryTyeps'=>$matchesLotteryTypes], 0);
@@ -115,12 +121,15 @@ class EYunMessageOperateService  extends EYunBaseService
         }else{
             $texts = $tmpTexts;
         }
-        #p($texts);
         $countTexts = count($texts);
-        foreach ($texts as $text){
-
+        $perAllMoney = (int)($allTmpMoney/$countTexts);
+        foreach ($texts as &$text){
+            if($perAllMoney>0){
+                $text = str_replace($matches2[0], '共'.$perAllMoney, $text);
+            }
         }
         $texts = implode(MethodMatchService::METHOD_SPLIT_FLAG, $texts);
+        #p([$texts, $allTmpMoney, $perAllMoney]);
 
         return $texts;
     }
@@ -170,6 +179,9 @@ class EYunMessageOperateService  extends EYunBaseService
                     $playMethodKd = $playMethod[0];
                     $betText = str_replace($playMethodKd['name'], '', $betText);
                     $singleData = ThirdDTypeService::getMoneys($betText, $playMethodKd['matchName'], $playMethod);
+                    if(empty($singleData['single'])){
+                        $singleData['single'] = $singleData['all_moneys']/$count;
+                    }
                     foreach ($playMethod as $k=>$pm){
                         $playMethod[$k]['codes'] = $pm['codes'];
                         $playMethod[$k]['single'] = $singleData['single'];
@@ -186,6 +198,9 @@ class EYunMessageOperateService  extends EYunBaseService
                 }else{
                     $betText = str_replace($playMethod['name'], '', $betText);
                     $singleData = ThirdDTypeService::getMoneys($betText, $playMethod['matchName'], $playMethod);
+                    if(empty($singleData['single'])){
+                        $singleData['single'] = $singleData['all_moneys']/$count;
+                    }
                     $g['lottery_type'] = $lottery_type;
                     $g['lottery_name'] = $lottery_name;
                     $g['single'] = $singleData['single'];

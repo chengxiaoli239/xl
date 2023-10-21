@@ -270,6 +270,12 @@ class ThirdDTypeService extends CommonBaseService
             'text'=>$text,
             'single_txt'=>$single_txt.'元',
         ];
+        if(empty($single)){
+            # 兼容，在没有输入各x元的情况，这里先匹配获取总共金额，后面在根绝号码的数量反算倍数
+            if(preg_match('/共(\d+)/', $text, $matches)){
+                $data['all_moneys'] = $matches[1];
+            }
+        }
 
         return $data;
     }
