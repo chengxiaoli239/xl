@@ -66,7 +66,7 @@ class EYunMessageOperateService  extends EYunBaseService
      */
     public static function resetText($text){
         #$text = str_replace(' ', '', $text); # 中文逗号，
-        $text = str_replace('，', ',', $text); # 中文逗号，
+        $text = str_replace('，', ' ', $text); # 中文逗号，
         $text = str_replace('：', '', $text); # 中文冒号，
         $text = str_replace(':', '', $text); # 中文冒号，
         #$text = str_replace('。', '', $text); # 中文句号。
@@ -286,7 +286,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 throw_info('单号生成失败');
             }
             $betCodeContents = $data['dataGroups']['betCodeContents'];
-            #p($betCodeContents);
+            //p($betCodeContents);
             $now_time = time();
             $allMoneys = 0.00;
             $replyTxts = [];
