@@ -107,6 +107,7 @@ class EYunMessageOperateService  extends EYunBaseService
             }
         }
 
+        $text = str_replace('复试', '复试', $text);
         if(preg_match('/复式(\d{3,})/', $text, $matches5)){
             $len = strlen($matches5[1]);
             $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
