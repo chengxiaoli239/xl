@@ -111,7 +111,7 @@ class ThirdDTypeService extends CommonBaseService
             }
         }
         $matchMethodAndCodeText = explode('各', $text)[0];
-        #p(['methodArr'=>$methodArr, 'text'=>$text, 'matchMethodAndCodeText'=>$matchMethodAndCodeText]);
+        //p(['methodArr'=>$methodArr, 'text'=>$text, 'matchMethodAndCodeText'=>$matchMethodAndCodeText]);
         if(strpos($matchMethodAndCodeText, $methodArr['name'])===false) $matchMethodAndCodeText = $methodArr['name'].$matchMethodAndCodeText;
         #p([$methodArr, $matchMethodAndCodeText, $text], 0);
         if($methodArr['originName'] == '直选') {

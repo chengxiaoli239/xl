@@ -85,16 +85,32 @@ class EYunMessageOperateService  extends EYunBaseService
             $text = str_replace($matches3[0], '', $text);
             $text = str_replace('共', '各'.$s.'元共', $text);
         }
+        $allTmpMoney = 0.00;
         if(!preg_match('/各(\d+)/', $text, $matches)){ # 没匹配到倍数，做兼容处理
-            $allTmpMoney = 0.00;
             #p($text);
             if(preg_match('/共(\d+)/', $text, $matches2)){
                 $allTmpMoney = $matches2[1];
                 if(preg_match('/(\d+)元/', $text, $matches4)){
                     $text = str_replace($matches4[0], '', $text);
-                    $text = str_replace('共', '各'.$matches4[0].'元共', $text);
+                    $text = str_replace('共', '各'.$matches4[0].'共', $text);
+                    $text = rtrim($text, '共');
                 }
             }
+        }else{
+            if(preg_match('/共(\d+)/', $text, $matches2)){
+                $allTmpMoney = $matches2[1];
+                if(preg_match('/(\d+)元/', $text, $matches4)){
+                    $text = str_replace($matches4[0], '', $text);
+                    $text = str_replace('共', '各'.$matches4[0].'共', $text);
+                    $text = rtrim($text, '共');
+                }
+            }
+        }
+
+        if(preg_match('/复式(\d{3,})/', $text, $matches5)){
+            $len = strlen($matches5[1]);
+            $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
+            $text = str_replace('复式', '复式'.$changeNameArr[$len], $text);
         }
 
         $matchesLotteryTypes = ThirdDTypeService::getLotteryTypes($text, ThirdDTypeService::getThirdDAlias());
@@ -172,6 +188,7 @@ class EYunMessageOperateService  extends EYunBaseService
 
             $betTexts = explode(MethodMatchService::METHOD_SPLIT_FLAG, $text);
             $dataGroups = [];
+            #p($betTexts);
             foreach ($betTexts as $k1=>$betText){
                 # 重置一下格式方便处理：福+玩法+号码+各x元
                 #EYunMessageOperateService::resetBetText($betText);

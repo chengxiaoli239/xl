@@ -810,11 +810,11 @@ class MethodMatchService extends CommonBaseService
         #$text = explode(' ', trim($text))[0];
         #$text = trim(str_replace(' ', '', $text));
         #$text = str_replace($matchName, $matchName.' ', $text);
-        #p([$text, $matchName, 'ddd']);
+        #p([$text, $matchName, $matchName], 0);
 
         // 使用正则表达式匹配组选后面的三个数字
-        if (preg_match_all('/(复[试式]{1}[三四五六七八九]{0,1})(\d+(?: \d+)*)/u', $text, $matches1)) {
-            $matchCodes = explode(' ', trim($matches1[2][0]));
+        if (preg_match_all('/(\d{3,})/u', $text, $matches1)) {
+            $matchCodes = explode(' ', trim($matches1[1][0]));
         }
         #p([$codes, $matches1, $matchCodes]);
 
