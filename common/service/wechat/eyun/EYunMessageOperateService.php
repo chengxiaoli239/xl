@@ -79,13 +79,20 @@ class EYunMessageOperateService  extends EYunBaseService
         if(preg_match('/个(\d+)元/', $text, $matches)){
             $text = str_replace($matches[0], '各'.$matches[1].'元', $text);
         }
+        if(preg_match('/各([\p{Han}一二三四五六七八九十]{1,3})元/', $text, $matches3)){
+            $t = $matches3[1];
+            $s = ThirdD::cnToNums($t); # 中文转数字
+            $text = str_replace($matches3[0], '', $text);
+            $text = str_replace('共', '各'.$s.'元共', $text);
+        }
         if(!preg_match('/各(\d+)/', $text, $matches)){ # 没匹配到倍数，做兼容处理
             $allTmpMoney = 0.00;
+            #p($text);
             if(preg_match('/共(\d+)/', $text, $matches2)){
                 $allTmpMoney = $matches2[1];
-                if(preg_match('/(\d+)元/', $text, $matches3)){
-                    $text = str_replace($matches3[0], '', $text);
-                    $text = str_replace('共', '各'.$matches3[0].'元共', $text);
+                if(preg_match('/(\d+)元/', $text, $matches4)){
+                    $text = str_replace($matches4[0], '', $text);
+                    $text = str_replace('共', '各'.$matches4[0].'元共', $text);
                 }
             }
         }
