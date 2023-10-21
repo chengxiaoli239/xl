@@ -83,6 +83,10 @@ class EYunMessageOperateService  extends EYunBaseService
             $allTmpMoney = 0.00;
             if(preg_match('/共(\d+)/', $text, $matches2)){
                 $allTmpMoney = $matches2[1];
+                if(preg_match('/(\d+)元/', $text, $matches3)){
+                    $text = str_replace($matches3[0], '', $text);
+                    $text = str_replace('共', '各'.$matches3[0].'元共', $text);
+                }
             }
         }
 
@@ -286,6 +290,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $text = $vdata['text'];
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-01', ['user_id'=>$user_id, 'text'=>$text]);
             list($code, $data, $msg) = self::matchData($text);
+            #p([$code, $data, $msg]);
             if($code>0){
                 throw_info($msg);
             }
