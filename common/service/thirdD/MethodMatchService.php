@@ -149,6 +149,7 @@ class MethodMatchService extends CommonBaseService
 
     const ZU_SPLIT_FLAG = ';'; # 组与组之间符号
     const CODE_SPLIT_FLAG = ','; # 组内号码之间符号
+    const METHOD_SPLIT_FLAG = '|'; # 玩法之间符号
 
     /**
      * 1 直选
@@ -338,7 +339,10 @@ class MethodMatchService extends CommonBaseService
         $methodArr = array_values($methodArr);
         $count = $allCount;
         $codes = trim($codes, self::ZU_SPLIT_FLAG);
-        //p($methodArr);
+        #p($methodArr);
+        if(count($methodArr)==1){
+            $methodArr = $methodArr[0];
+        }
 
         return $methodArr;
     }

@@ -7,8 +7,6 @@ use common\service\thirdD\ThirdDTypeService;
 
 class ThirdD extends BaseService
 {
-    public static $typeArr = ['福', '福彩', '富', '福彩3D', '福彩3d'];
-
     /**
      * 判断数组中的元素是否存在于字符串text中
      * @param string $text

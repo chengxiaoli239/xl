@@ -55,16 +55,16 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             if($code>0){
                 throw_info($msg, $code);
             }
-            $replyTxt = $vdata['replyTxt'];
+            $replyTxts = $vdata['replyTxts'];
 
-            self::reply($user_id, $wcId, $replyTxt, $data); # 回复消息
+            self::reply($user_id, $wcId, $replyTxts, $data); # 回复消息
         }catch (\Exception $e){
             $err_msg =  $e->getMessage();
             if($e->getCode()>50000){ # 大于50000
                 Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'11', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'err_msg'=>$err_msg, 'code'=>$e->getCode()]);
                 return '忽略回复：'.$err_msg;
             }
-            $r = self::reply($user_id, $wcId, $err_msg, $data); # 回复消息
+            $r = self::reply($user_id, $wcId, [$err_msg], $data); # 回复消息
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r]);
 
             return $err_msg;
@@ -78,28 +78,30 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
     /**
      * @param $user_id
      * @param $wcId
-     * @param string $replyTxt
+     * @param string $replyTxts
      * @param array $data
      * @return bool
      */
-    public static function reply($user_id, $wcId, $replyTxt='', $data=[]){
+    public static function reply($user_id, $wcId, $replyTxts=[], $data=[]){
         $fromUser = $data['fromUser'];
         if(empty($fromUser)){
             return '接收的微信好友Id不能为空0';
         }
-        $sendData = [
-            'wcId' => $wcId,
-            'user_id' => $user_id,
-            'fromUser' => $fromUser, # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
-            'queue_delay_time' => rand(3, 8), # self::$waitSeconds,
-            'content' => $replyTxt, # 测试阶段调试信息 - 用户下注完回复
-            'business_id' => $wcId,
-        ];
-        if(!empty($data['fromGroup'])){
-            $sendData['fromGroup'] = $data['fromGroup'];
-            $sendData['content'] = '群消息：'.$sendData['content'];
+        foreach ($replyTxts as $replyTxt){
+            $sendData = [
+                'wcId' => $wcId,
+                'user_id' => $user_id,
+                'fromUser' => $fromUser, # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
+                'queue_delay_time' => rand(3, 8), # self::$waitSeconds,
+                'content' => $replyTxt, # 测试阶段调试信息 - 用户下注完回复
+                'business_id' => $wcId,
+            ];
+            if(!empty($data['fromGroup'])){
+                $sendData['fromGroup'] = $data['fromGroup'];
+                $sendData['content'] = '群消息：'.$sendData['content'];
+            }
+            push_queue_open(SendWechatMsgJobs::class, $sendData);
         }
-        push_queue_open(SendWechatMsgJobs::class, $sendData);
 
         return true;
     }

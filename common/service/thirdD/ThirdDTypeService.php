@@ -58,6 +58,27 @@ class ThirdDTypeService extends CommonBaseService
     }
 
     /**
+     * 匹配彩种个数
+     * @param $text
+     * @param $datas
+     * @return array
+     */
+    public static function getLotteryTypes($text, $datas) {
+        $matches = [];
+        foreach ($datas as $lottery_type=>$data){
+            foreach ($data as $d){
+                if (strpos($text, $d) !== false) {
+                    $matches[$lottery_type] = $d;
+                    break;
+                }
+            }
+        }
+
+        return $matches;
+    }
+
+
+    /**
      * 判断playMethod 玩法
      * @param string $text
      * @return array
@@ -89,8 +110,9 @@ class ThirdDTypeService extends CommonBaseService
                 var_dump($e->getMessage());
             }
         }
-        #p(['methodArr'=>$methodArr]);
         $matchMethodAndCodeText = explode('各', $text)[0];
+        #p(['methodArr'=>$methodArr, 'text'=>$text, 'matchMethodAndCodeText'=>$matchMethodAndCodeText]);
+        if(strpos($matchMethodAndCodeText, $methodArr['name'])===false) $matchMethodAndCodeText = $methodArr['name'].$matchMethodAndCodeText;
         #p([$methodArr, $matchMethodAndCodeText, $text], 0);
         if($methodArr['originName'] == '直选') {
             $methodArr = MethodMatchService::matchZhiXuan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
@@ -274,10 +296,10 @@ class ThirdDTypeService extends CommonBaseService
      * @param int $lottery_type
      * @return string[]|\string[][]
      */
-    public static function getThirdDAlias($lottery_type=26){
+    public static function getThirdDAlias($lottery_type=''){
 
         $datas = [
-            ThirdDTypeService::LOTTERY_TYPE_FUCAI => ['福彩3D', '福彩3d', '福彩', '福佳', '3D', '3d', '福', '富'],
+            ThirdDTypeService::LOTTERY_TYPE_FUCAI => ['福彩3D', '福彩3d', '福彩', '福佳', '福3D', '3D', '3d', '福'],
             ThirdDTypeService::LOTTERY_TYPE_PL3 => ['排三', '体彩', '体家', '排佳', '排3', '体', '排', 'p3'],
         ];
         if(!isset($datas[$lottery_type])){
