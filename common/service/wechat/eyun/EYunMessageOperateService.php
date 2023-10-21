@@ -71,6 +71,7 @@ class EYunMessageOperateService  extends EYunBaseService
         $text = str_replace(':', '', $text); # 中文冒号，
         #$text = str_replace('。', '', $text); # 中文句号。
         $text = str_replace('一单', '一直', $text); # 中文冒号，
+        $text = str_replace('组一直一', '一直一组', $text); # 中文冒号，
         $text = str_replace('总计', '共', $text); # 同义词替换
         $text = str_replace(['计', '='], '共', $text); # 同义词替换
         $text = str_replace('块', '元', $text); # 同义词替换
