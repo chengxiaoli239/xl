@@ -355,7 +355,7 @@ class EYunMessageOperateService  extends EYunBaseService
             }
             $replyTxt .= ("\n【单号】".$betOrderId);
 
-            $replyTxt .= ("\n【成功】√  ".$allCounts."组，共".$allMoneys.'咪');
+            $replyTxt .= ("\n【成功】√  共".$allCounts."组，共".$allMoneys.'咪');
             $replyTxts[] = $replyTxt;
 
             $transaction->commit();
