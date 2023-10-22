@@ -48,6 +48,7 @@ class EYunUserJobs extends CommonJob {
                             'created_at' => $now_time,
                         ]);
                     }
+                    $setData['remark'] = preg_replace('/[^\x{0000}-\x{FFFF}]/u', '', $data['remark']);
                     $setData['updated_at'] = $now_time;
                     $setData = array_merge($setData, $data);
                     $WechatUser->setAttributes($setData, false);
