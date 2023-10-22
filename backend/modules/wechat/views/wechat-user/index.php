@@ -37,26 +37,31 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         #'id',
                         #'user_id',
-                        #'userName',
+                        //'userName',
                         #['attribute' => 'userName','label'=>'微信ID','headerOptions'=>['width'=>'3%'],
                         #    'format'=>'raw',
                         #    'value' => function($model) {
                         #        return BaseStringHelper::truncate($model->userName,18);
                         #    }
                         #],
-
-                        [
-                            'attribute' => 'smallHead', 'label'=>'头像','headerOptions'=>['width'=>'3%'], // 图片字段的属性
+                        ['attribute' => 'smallHead', 'label'=>'头像','headerOptions'=>['width'=>'3%'], // 图片字段的属性
                             'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
                             'value' => function ($model) {
                                 return Html::img($model->smallHead, ['width' => '30px']);
                             },
                         ],
-                        ['attribute' => 'nickName','label'=>'昵称','headerOptions'=>['width'=>'15%'], //'headerOptions'=>['width'=>'5%'],
+
+                        ['attribute' => 'nickName','label'=>'昵称','headerOptions'=>['width'=>'10%'], //'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 return BaseStringHelper::truncate($model->nickName,10);
                             }
+                        ],
+                        ['attribute' => 'userName', 'label'=>'微信ID','headerOptions'=>['width'=>'3%'], // 图片字段的属性
+                            'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
+                            'value' => function ($model) {
+                                return $model->userName;
+                            },
                         ],
                         #'aliasName',
                         //'balance',
