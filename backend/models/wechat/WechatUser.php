@@ -12,7 +12,7 @@ use Yii;
  * @property string $userName 微信id，唯一
  * @property string $nickName 昵称
  * @property string $aliasName 微信号
- * @property int $status 状态-1禁用1启用
+ * @property int $status 状态-0禁用1启用
  * @property string $balance 余额
  * @property int $is_credit 是否信用用户0否1是
  * @property string $bigHead 大头像
@@ -46,7 +46,6 @@ class WechatUser extends \common\models\base\BaseModel
             [['update_at'], 'safe'],
             [['userName', 'nickName', 'aliasName', 'labelList', 'remark'], 'string', 'max' => 255],
             [['bigHead', 'smallHead'], 'string', 'max' => 640],
-            [['userName'], 'unique'],
             [['user_id', 'userName'], 'unique', 'targetAttribute' => ['user_id', 'userName']],
         ];
     }
@@ -62,7 +61,7 @@ class WechatUser extends \common\models\base\BaseModel
             'userName' => Yii::t('app', '微信id，唯一'),
             'nickName' => Yii::t('app', '昵称'),
             'aliasName' => Yii::t('app', '微信号'),
-            'status' => Yii::t('app', '状态-1禁用1启用'),
+            'status' => Yii::t('app', '状态-0禁用1启用'),
             'balance' => Yii::t('app', '余额'),
             'is_credit' => Yii::t('app', '是否信用用户0否1是'),
             'bigHead' => Yii::t('app', '大头像'),
