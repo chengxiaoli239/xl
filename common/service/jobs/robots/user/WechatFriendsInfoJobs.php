@@ -19,16 +19,17 @@ class WechatFriendsInfoJobs extends CommonJob {
     public static function handle($params){
         try {
             $user_id = $params['user_id']; # 机器人系统user_id
-            $userName = $params['data']['userName']; # 微信id
+            $data = $params['data'];
+            $userName = $data['userName']; # 微信id
             $wcId = $params['wcId']; # 微信原始id
             $WechatUser = WechatUser::findOne(['user_id'=>$user_id, 'userName'=>$userName]);
             if(empty($WechatUser)){
                 throw_info('wechat_user找不到记录');
             }
-            $WechatUser->nickName = $params['nickName'];
-            $WechatUser->remark = $params['remarkName'];
-            $WechatUser->bigHead = $params['bigHead'];
-            $WechatUser->smallHead = $params['smallHead'];
+            $WechatUser->nickName = $data['nickName'];
+            $WechatUser->remark = $data['remarkName'];
+            $WechatUser->bigHead = $data['bigHead'];
+            $WechatUser->smallHead = $data['smallHead'];
             $WechatUser->save();
         }catch (\Exception $e){
             return $e->getMessage();
