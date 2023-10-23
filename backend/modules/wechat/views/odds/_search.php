@@ -7,6 +7,7 @@ use yii\widgets\ActiveForm;
 /* @var $model backend\models\searchs\wechat\Odds */
 /* @var $form yii\widgets\ActiveForm */
 $playMethodOptions = [
+    '' => '--请选择--',
     'option1' => 'Option 1',
     'option2' => 'Option 2',
     // Add more options as needed
@@ -21,13 +22,10 @@ $playMethodOptions = [
 
     <div class="row">
         <div class="col-lg-2 col-xs-3">
-            <?= $form->field($model, 'play_method_id')->label('Play Method ID') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
             <?= $form->field($model, 'play_method_id')->dropDownList(
                 $playMethodOptions, // Provide the options here
                 ['prompt' => 'Select Play Method'] // Optional: Add a prompt message
-            )?>
+            )->label('玩法')?>
         </div>
         <div class="col-lg-2 col-xs-3">
             <?= $form->field($model, 'name') ?>

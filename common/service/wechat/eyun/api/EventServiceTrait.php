@@ -23,7 +23,9 @@ trait EventServiceTrait
         $data['business_id'] = $wcId;
         switch ($messageType){
             case EYunMessageOperateService::MESSAGE_P_TEXT_CODE: # 私聊
-                push_queue_open(WechatPrivateMsgReceiveJobs::class, $data);
+                if($wcId == $data['toUser']){ # 只有别人发给机器人的才处理
+                    push_queue_open(WechatPrivateMsgReceiveJobs::class, $data);
+                }
                 break;
             case EYunMessageOperateService::MESSAGE_P_TEXT_CANCEL: # 私聊撤回
                 break;

@@ -69,7 +69,7 @@ class Bets extends \common\models\base\BaseModel
             //'user_id' => '用户ID',
             'wechat_user_id' => '微信ID',
             'order_id' => '订单ID',
-            'play_method' => 'Play Method',
+            'play_method' => '玩法',
             'codes' => '号码',
             'bet_money' => '总投[元]',
             'bonus' => '中奖',

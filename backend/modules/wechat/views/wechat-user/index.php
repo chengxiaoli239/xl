@@ -8,7 +8,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\searchs\wechat\WechatUser */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = '代理列表';
+$this->title = '客户列表';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <section class="wechat-user-index wrapper site-min-height">
@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
                 -->
 
-                <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+                <?php echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
