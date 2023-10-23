@@ -48,6 +48,7 @@ class EYunUserJobs extends CommonJob {
                             'created_at' => $now_time,
                         ]);
                     }
+                    $setData['nickName'] = base64_encode($data['nickName']);
                     $setData['remark'] = base64_encode($data['remark']);
                     $setData['updated_at'] = $now_time;
                     $setData = array_merge($setData, $data);
