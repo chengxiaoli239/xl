@@ -3,6 +3,7 @@ namespace common\service\wechat\eyun\api;
 
 use common\models\eyun\EYunMessage;
 use common\service\jobs\robots\message\WechatPrivateMsgReceiveJobs;
+use common\service\jobs\robots\user\WechatFriendsInfoJobs;
 use common\service\jobs\robots\user\WechatUserStatusJobs;
 use common\service\wechat\eyun\EYunBaseService;
 use common\service\wechat\eyun\EYunMessageOperateService;
@@ -32,6 +33,9 @@ trait EventServiceTrait
             case EYunMessageOperateService::MESSAGE_G_TEXT_CODE: # 群聊
                 break;
             case EYunMessageOperateService::MESSAGE_G_TEXT_CANCEL: # 群聊
+                break;
+            case EYunMessageOperateService::MESSAGE_FRIEND_INFO_CODE: # 好友信息变更
+                push_queue(WechatFriendsInfoJobs::class, $data);
                 break;
             case EYunMessageOperateService::MESSAGE_OFFLINE_CODE: # 离线通知
                 push_queue_open(WechatUserStatusJobs::class, $data);

@@ -29,6 +29,9 @@ class EYunMessageOperateService  extends EYunBaseService
     const MESSAGE_G_TEXT_CANCEL = '80018'; # 撤回消息
     const MESSAGE_G_TEXT_CODE = '80001'; # 群聊文本
 
+    # 好友信息
+    const MESSAGE_FRIEND_INFO_CODE = '60005'; # 好友信息变更通知
+
     public function __construct($user_id='')
     {
         parent::__construct($user_id);
