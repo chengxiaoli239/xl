@@ -36,7 +36,7 @@ class WechatFriendsInfoJobs extends CommonJob {
 
         Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', '微信用户信息变更', ['params'=>$params]);
 
-        return '微信登录状态同步成功:';
+        return '微信好友信息同步成功:';
     }
 
 }
