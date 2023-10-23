@@ -52,6 +52,7 @@ class EYunUserJobs extends CommonJob {
                     $setData['remark'] = base64_encode($data['remark']);
                     $setData['updated_at'] = $now_time;
                     $setData = array_merge($setData, $data);
+                    Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', '内容', ['setData'=>$setData]);
                     $WechatUser->setAttributes($setData, false);
                     if(!$WechatUser->save()){
                         throw_info(Json::encode($WechatUser->getErrors(), 320));
