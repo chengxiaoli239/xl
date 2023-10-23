@@ -35,7 +35,7 @@ trait EventServiceTrait
             case EYunMessageOperateService::MESSAGE_G_TEXT_CANCEL: # 群聊
                 break;
             case EYunMessageOperateService::MESSAGE_FRIEND_INFO_CODE: # 好友信息变更
-                push_queue(WechatFriendsInfoJobs::class, $data);
+                push_queue_open(WechatFriendsInfoJobs::class, $data);
                 break;
             case EYunMessageOperateService::MESSAGE_OFFLINE_CODE: # 离线通知
                 push_queue_open(WechatUserStatusJobs::class, $data);

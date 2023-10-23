@@ -1,12 +1,9 @@
 <?php
 namespace common\service\jobs\robots\user;
 
-use common\models\eyun\RobotUser;
 use common\models\wechat\WechatUser;
 use common\service\chat\Tool_Common;
 use common\service\jobs\CommonJob;
-use common\service\wechat\eyun\EYunMessageOperateService;
-use common\service\wechat\RobotUserService;
 
 class WechatFriendsInfoJobs extends CommonJob {
 
