@@ -52,7 +52,7 @@ class EYunUserJobs extends CommonJob {
                     $data['remark'] = \common\tools\Common::filterEmoji($data['remark']);//base64_encode($data['remark']);
                     $setData['updated_at'] = $now_time;
                     $setData = array_merge($setData, $data);
-                    Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', '内容', ['setData'=>$setData]);
+                    Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', '微信用户信息更新', ['setData'=>$setData]);
                     $WechatUser->setAttributes($setData, false);
                     if(!$WechatUser->save()){
                         throw_info(Json::encode($WechatUser->getErrors(), 320));
