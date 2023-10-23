@@ -19,7 +19,7 @@ class WechatFriendsInfoJobs extends CommonJob {
     public static function handle($params){
         try {
             $user_id = $params['user_id']; # 机器人系统user_id
-            $userName = $params['userName']; # 微信id
+            $userName = $params['data']['userName']; # 微信id
             $wcId = $params['wcId']; # 微信原始id
             $WechatUser = WechatUser::findOne(['user_id'=>$user_id, 'userName'=>$userName]);
             if(empty($WechatUser)){
