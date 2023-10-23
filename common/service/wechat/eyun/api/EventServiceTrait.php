@@ -57,6 +57,7 @@ trait EventServiceTrait
             $fromUser = $params['fromUser'];
             $toUser = $params['toUser'];
             $RobotWechatId = $data['wcId'];
+            $user_id = EYunBaseService::getRobotUserIdByWechatId($RobotWechatId);
             if(empty($toUser)){
                 throw_info('非正常聊天消息不记录,messageType:'.$messageType.'=content:'.$data['data']['content']);
             }
@@ -69,7 +70,6 @@ trait EventServiceTrait
             }
             $now_time = time();
             $EYunMessage = new EYunMessage();
-            $user_id = EYunBaseService::getRobotUserIdByWechatId($RobotWechatId);
             $wechatUserId = EYunBaseService::getWechatUserId($fromUser);
             if(empty($user_id)){
                 throw_info('机器人系统user_id不能为空');
