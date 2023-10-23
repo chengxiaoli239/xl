@@ -41,7 +41,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
-                    'filterModel' => $searchModel,
+                    #'filterModel' => $searchModel,
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
