@@ -111,7 +111,7 @@ class ThirdD extends BaseService
             $c1[] = $codes[$i];
         }
         $codesArr = array_unique($c1);
-        if(count($codesArr) != $len){
+        if(count($codesArr) < $len){
             //throw_info('该位置号码不能重复');
             return true;
         }

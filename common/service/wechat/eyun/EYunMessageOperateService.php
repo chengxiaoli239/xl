@@ -68,17 +68,18 @@ class EYunMessageOperateService  extends EYunBaseService
      * @param $text
      */
     public static function resetText($text){
-        #$text = str_replace(' ', '', $text); # 中文逗号，
-        $text = str_replace('，', ' ', $text); # 中文逗号，
-        $text = str_replace('：', '', $text); # 中文冒号，
-        $text = str_replace(':', '', $text); # 中文冒号，
+        $text = str_replace('。', '#', $text); # 玩法之间分隔符
+        $text = str_replace('，', ' ', $text); # 中文逗号
+        $text = str_replace('：', '', $text); # 中文冒号
+        $text = str_replace(':', '', $text); # 中文冒号
         #$text = str_replace('。', '', $text); # 中文句号。
         $text = str_replace('一单', '一直', $text); # 中文冒号，
         $text = str_replace('组一直一', '一直一组', $text); # 中文冒号，
+
         $text = str_replace('总计', '共', $text); # 同义词替换
         $text = str_replace(['计', '='], '共', $text); # 同义词替换
         $text = str_replace('块', '元', $text); # 同义词替换
-        $text = str_replace(['、', '-', '.', '。', '*', "\n"], ' ', $text); # 同义词替换
+        $text = str_replace(['、', '-', '.', '*', "\n"], ' ', $text); # 同义词替换
         $text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
         if(preg_match('/个(\d+)元/', $text, $matches)){
             $text = str_replace($matches[0], '各'.$matches[1].'元', $text);
@@ -114,12 +115,13 @@ class EYunMessageOperateService  extends EYunBaseService
         $text = str_replace('复试', '复式', $text);
         if(preg_match('/复式(\d{3,})/', $text, $matches5)){
             $len = strlen($matches5[1]);
-            $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
+            $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); // p($changeNameArr);
             $text = str_replace('复式', '复式'.$changeNameArr[$len], $text);
         }
 
         $matchesLotteryTypes = ThirdDTypeService::getLotteryTypes($text, ThirdDTypeService::getThirdDAlias());
         #p(['text'=>$text, 'matchesLotteryTyeps'=>$matchesLotteryTypes], 0);
+        /*
         if(preg_match_all('/(一直|一组|直|组)/', $text, $matches)){
             if(count($matches[0])==2){
                 #list($lottery_type, $lottery_name, $matchTexts) = ThirdDTypeService::getLotteryType($text);
@@ -136,6 +138,8 @@ class EYunMessageOperateService  extends EYunBaseService
         }else{
             $tmpTexts[] = $text;
         }
+        */
+        $tmpTexts = [$text];
 
         if(count($matchesLotteryTypes)==2){
             $texts = [];

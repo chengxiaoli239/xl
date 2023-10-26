@@ -8,11 +8,11 @@ use yii\helpers\Json;
 
 class MethodMatchService extends CommonBaseService
 {
-
     const CODE_TYPE_ZU_SAN = 1; # 组三
     const CODE_TYPE_ZU_LIU = 2; # 组六
     const CODE_TYPE_BAO_ZI = 3; # 豹子
 
+    # 赔率类型表的id
     const METHOD_ID_ZHIXUAN = 1;
     const METHOD_ID_ZUSAN = 2;
     const METHOD_ID_ZULIU = 3;
@@ -149,16 +149,16 @@ class MethodMatchService extends CommonBaseService
 
     const ZU_SPLIT_FLAG = ';'; # 组与组之间符号
     const CODE_SPLIT_FLAG = ','; # 组内号码之间符号
-    const METHOD_SPLIT_FLAG = '|'; # 玩法之间符号
+    const METHOD_SPLIT_FLAG = '#'; # 玩法、或规则之间符号（井号#或句号。）
 
     /**
-     * 1 直选
+     * 1 直选、2/3组选
      * @param string $text
      * @param array $codes
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function matchZhiXuan($text='', &$codes=[], &$count=0, $match_name=''){
+    public static function matchZhiZu($text='', &$codes=[], &$count=0, $match_name=''){
         // 使用正则表达式匹配直选后面的三个数字
         if (preg_match_all('/(\d{3}(?:\s+\d{3})*)/', $text, $matches)) {
             $codes = explode(' ', trim($matches[1][0]));
@@ -176,13 +176,16 @@ class MethodMatchService extends CommonBaseService
     }
 
     /**
-     * 2、3 组选
+     * 直：1
+     * 组、组选：2、3
+     * 组三多码：10-15组六四、五...九码、
+     * 组六多码：17-24组三两、三、...九码
      * @param string $text
      * @param array $codes
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function matchZuXuan($text='', &$codes=[], &$count=0, $match_name=''){
+    public static function matchZhiZuOrZuSanOrZuLiuXMa($text='', &$codes=[], &$count=0, $match_name=''){
         $text = explode('元', $text)[0];
         $text = explode('倍', $text)[0];
         // 使用正则表达式匹配组选后面的三个数字
@@ -191,11 +194,12 @@ class MethodMatchService extends CommonBaseService
         } else {
             throw_info('组选未匹配到号码,text:'.$text);
         }
-        #p([$text, $matches, $match_name, $codes]);
+        //p([$text, $matches, $match_name, $codes]);
         if(empty($codes)){
             throw_info('匹配组选号码为空');
         }
         $methodArr = [
+            'methodArrZhi' => [],
             'methodArr3' => [],
             'methodArr6' => [],
             'methodArr32' => [],
@@ -213,112 +217,117 @@ class MethodMatchService extends CommonBaseService
             'methodArr68' => [],
             'methodArr69' => [],
         ];
-        /**
-        {
-            "type_3": 0,
-            "textx": "744 991 988 244 882 245组六各20",
-            "text1": "福组269一倍共10 - 组六",
-            "text2": "福组六269一倍共10 - 组六",
-            "text3": "福组选269一倍共10 - 组六",
-            "text4": "福组选2679一倍共10 - 组六四码",
-            "text5": "福组三26一倍共10 - 组三两码",
-            "text6": "福组三266一倍共10 - 组三",
-            "text7": "福组选266一倍共10 - 组三",
-            "text8": "福组三269一倍共10 - 组三三码",
-            "text9": "福组三2679一倍共10 - 组三四码"
-        }
-         */
+        ###  第一步、玩法的匹配
+        # 玩法类型组合：组三、组六、组三&组六、直&组（一直一组，二直三组，直组）、组选、组、直||直选
         foreach ($codes as $code){
             $code = trim($code);
-            $reSortCode = CommonService::reSortCodes([$code])[0]; # 排序数据内的号码
-            $flag = \common\service\helpers\ThirdD::judgeCodesRepeat($code, $sortCode); # 判断号码是否有重复
-
             $len = strlen($code);
-            if($len == 2) {
-                if($match_name != '组三'){
-                    throw_info('玩法不确定：'.$code);
-                }
-                $methodArr['methodArr32'][] = ['id'=>17, 'name'=>'组三两码', 'matchName'=>'组三两码', 'code'=>$code, 'count'=>1]; # 组三两码
-            }elseif($len == 3){
-                # 三个码的情况分：组三、组六、组三三码，其中组三三码还是组三根据号码是否有重复来定，有重复则为单纯的组三，没重复则为组三三码(多吗组三必须备注组三)
-                if( ($match_name=='组六' && $flag)
-                    #OR ($match_name=='组三' && ($code[0]!=$code[1] && $code[1]!=$code[2] && $code[0]!=$code[2]))
-                ){
-                    throw_info($match_name.'号码号码重复:'.$code.'，请重新确认');
-                }
-                #sort($sortCode); # 先排序号码再入库
-                if( (strpos($text, '组') !== false OR strpos($text, '组选')!==false OR strpos($text, '组六') !== false) && !$flag ){
-                    # 组六
-                    $methodArr['methodArr6'][] = ['id'=>3, 'name'=>'组六', 'matchName'=>$match_name, 'code'=>$reSortCode, 'count'=>1];
-                }elseif((strpos($text, '组') !== false OR strpos($text, '组选')!==false OR strpos($text, '组三') !== false) && $flag){
-                    # 组三
-                    $methodArr['methodArr3'][] = ['id'=>2, 'name'=>'组三', 'matchName'=>$match_name, 'code'=>$reSortCode, 'count'=>1];
-                }elseif((strpos($text, '组') !== false OR strpos($text, '组选')!==false OR strpos($text, '组三') !== false) && !$flag){
-                    # 组三三码
-                    $methodArr['methodArr33'][] = ['id'=>17, 'name'=>'组三三码', 'matchName'=>'组三三码', 'code'=>$reSortCode, 'count'=>1];
-                }
-
-            }elseif($len>3) {
-                if($flag){
-                    throw_info('组选多码号码不能重复');
-                }
-                if(strpos($text, '组三') !==false && strpos($text, '组六') !==false){
-                    throw_info('组选多码号码必须备注组三或组六');
-                }
-                $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
-                $cnNum = $changeNameArr[$len];
-                if(strpos($text, '组三') !==false){
-                    # 组三多码
-                    switch ($len){
-                        case 3:
-                            $methodArr['methodArr33'][] = ['id'=>17, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
-                            break;
-                        case 4:
-                            $methodArr['methodArr34'][] = ['id'=>18, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
-                            break;
-                        case 5:
-                            $methodArr['methodArr35'][] = ['id'=>19, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
-                            break;
-                        case 6:
-                            $methodArr['methodArr36'][] = ['id'=>20, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
-                            break;
-                        case 7:
-                            $methodArr['methodArr37'][] = ['id'=>21, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
-                            break;
-                        case 8:
-                            $methodArr['methodArr38'][] = ['id'=>22, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
-                            break;
-                        case 9:
-                            $methodArr['methodArr39'][] = ['id'=>23, 'name'=>'组三'.$cnNum.'码', 'matchName'=>'组三'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
-                            break;
+            $reSortCode = CommonService::reSortCodes([$code])[0]; # 排序数据后的号码
+            $flag = \common\service\helpers\ThirdD::judgeCodesRepeat($code, $sortCode); # 判断号码是否有重复，重复则为组三
+            switch (true){
+                case (strpos($text, '直') !== false && strpos($text, '组') !== false):
+                    if($len != 3) {
+                        throw_info('直选或组选号码必须三个：'.$code);
                     }
-                }else{
-                    # 组六多码
-                    switch ($len){
-                        case 4:
-                            $methodArr['methodArr64'][] = ['id'=>10, 'name'=>'组六'.$cnNum.'码', 'matchName'=>'组六'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
-                            break;
-                        case 5:
-                            $methodArr['methodArr65'][] = ['id'=>11, 'name'=>'组六'.$cnNum.'码', 'matchName'=>'组六'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
-                            break;
-                        case 6:
-                            $methodArr['methodArr66'][] = ['id'=>12, 'name'=>'组六'.$cnNum.'码', 'matchName'=>'组六'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
-                            break;
-                        case 7:
-                            $methodArr['methodArr67'][] = ['id'=>13, 'name'=>'组六'.$cnNum.'码', 'matchName'=>'组六'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
-                            break;
-                        case 8:
-                            $methodArr['methodArr68'][] = ['id'=>14, 'name'=>'组六'.$cnNum.'码', 'matchName'=>'组六'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
-                            break;
-                        case 9:
-                            $methodArr['methodArr69'][] = ['id'=>15, 'name'=>'组六'.$cnNum.'码', 'matchName'=>'组六'.$cnNum.'码', 'code'=>$reSortCode, 'count'=>1];
-                            break;
+                    $methodArr['methodArrZhi'][] = ['id'=>self::METHOD_ID_ZHIXUAN, 'name'=>'直选', 'code'=>$code, 'count'=>1]; # 直选
+                    if(!$flag){
+                        # 组六
+                        $methodArr['methodArr6'][] = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
+                    }else{
+                        # 组三
+                        $methodArr['methodArr3'][] = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
                     }
-                }
-            }else{
-                throw_info($match_name.'组选匹配异常');
+                    break;
+                case (strpos($text, '组三') !== false && strpos($text, '组六') !== false):
+                    if($len<=2){
+                        throw_info('组六号码至少为三个：'.$code);
+                    }
+                    if($len==3){
+                        if($flag){
+                            throw_info('组六号码不能有重复：'.$code);
+                        }
+                        # 组六
+                        $methodArr['methodArr6'][] = ['id' => self::METHOD_ID_ZULIU, 'name' => '组六', 'code' => $reSortCode, 'count' => 1];
+                        # 组三三码
+                        $methodArr['methodArr3'][] = ['id' => self::METHOD_ID_ZS_3_MA, 'name' => '组三三码', 'code' => $reSortCode, 'count' => 1];
+                    }else{
+                        # len>3
+                        if($flag){
+                            throw_info('组三组六多码号码不能有重复：'.$code);
+                        }
+                        MethodMatchService::getMethodArrDatas($reSortCode, '组三', $methodArr);
+                        MethodMatchService::getMethodArrDatas($reSortCode, '组六', $methodArr);
+                    }
+                    break;
+                case strpos($text, '组三') !== false:
+                    if($flag){
+                        if($len==3){ # 常规的组三
+                            $methodArr['methodArr3'][] = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
+                        }else{
+                            throw_info('组三号码不能重复：'.$code);
+                        }
+                    }else{
+                        # 组三多码
+                        MethodMatchService::getMethodArrDatas($reSortCode, '组三', $methodArr);
+                    }
+                    break;
+                case strpos($text, '组六') !== false:
+                    if($len==2){
+                        throw_info('组六号码至少3个号码：'.$code);
+                    }
+                    if($flag){
+                        throw_info('组六号码不能重复：'.$code);
+                    }else{
+                        if($len==3){ # 常规的组六
+                            $methodArr['methodArr6'][] = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
+                        }else{
+                            # 组六多码
+                            MethodMatchService::getMethodArrDatas($reSortCode, '组六', $methodArr);
+                        }
+                    }
+                    break;
+                case strpos($text, '组') !== false:
+                #case strpos($text, '组选') !== false:
+                    # 组三或组六 根据号码类型决定
+                    if($len<3){
+                        throw_info('组选号码至少3个号码：'.$code);
+                    }
+                    if($len==3){
+                        if($flag){
+                            # 组三
+                            $methodArr['methodArr3'][] = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
+                        }else{
+                            # 组六
+                            $methodArr['methodArr6'][] = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
+                        }
+                    }else{
+                        if($flag){
+                            throw_info('多码情况号码不允许重复：'.$code);
+                        }
+                        # 不备注组六组三默认为：组六多码
+                        MethodMatchService::getMethodArrDatas($reSortCode, '组六', $methodArr);
+                    }
+                    break;
+                case strpos($text, '直') !== false:
+                    $methodArr['methodArrZhi'][] = ['id'=>self::METHOD_ID_ZHIXUAN, 'name'=>'直选', 'code'=>$code];
+                    break;
+                default:
+                    throw_info('玩法匹配异常...');
+                    break;
             }
         }
+        /**
+            {
+                "type_3":0,
+                "text":"福组三组六2345 234 4567 35790各10元",
+                "text0":"福组三2345 234 4567 35790各10元",
+                "text1":"福组六2345 234 4567 35790各10元",
+                "text2":"福组三组六2345 234 4567 35790各10元",
+                "text3":"福组选2345 234 456 357各10元",
+                "text4":"福一直一组345 234 456 357各10元"
+            }
+         */
+
         $allCount = 0;
         $codes = '';
         foreach ($methodArr as $key=>$items){
@@ -334,14 +343,77 @@ class MethodMatchService extends CommonBaseService
             }
             $codesTmp = trim($codesTmp, self::ZU_SPLIT_FLAG);
             $codes .= self::ZU_SPLIT_FLAG.$codesTmp;
-            $methodArr[$key] = ['id'=>$m['id'], 'name'=>$m['name'], 'matchName'=>$m['matchName'], 'codes'=>$codesTmp, 'count'=>$countNum];
+            $methodArr[$key] = ['id'=>$m['id'], 'name'=>$m['name'], 'codes'=>$codesTmp, 'count'=>$countNum];
         }
         $methodArr = array_values($methodArr);
         $count = $allCount;
         $codes = trim($codes, self::ZU_SPLIT_FLAG);
-        #p($methodArr);
+        //p($methodArr);
         if(count($methodArr)==1){
             $methodArr = $methodArr[0];
+        }
+
+        return $methodArr;
+    }
+
+    /**
+     * 组三组六多码数据获取
+     * @param string $code 号码必须去重拦截之后才调用此方法
+     * @param $name
+     * @param $methodArr
+     * @return mixed
+     */
+    public static function getMethodArrDatas($code, $name, &$methodArr){
+        $len = strlen($code);
+        $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
+        $cnNum = $changeNameArr[$len];
+        if(strpos($name, '组三') !==false){
+            # 组三多码
+            switch ($len){
+                case 3:
+                    $methodArr['methodArr33'][] = ['id'=>18, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    break;
+                case 4:
+                    $methodArr['methodArr34'][] = ['id'=>19, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    break;
+                case 5:
+                    $methodArr['methodArr35'][] = ['id'=>20, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    break;
+                case 6:
+                    $methodArr['methodArr36'][] = ['id'=>21, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    break;
+                case 7:
+                    $methodArr['methodArr37'][] = ['id'=>22, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    break;
+                case 8:
+                    $methodArr['methodArr38'][] = ['id'=>23, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    break;
+                case 9:
+                    $methodArr['methodArr39'][] = ['id'=>24, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    break;
+            }
+        }else{
+            # 组六多码
+            switch ($len){
+                case 4:
+                    $methodArr['methodArr64'][] = ['id'=>10, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    break;
+                case 5:
+                    $methodArr['methodArr65'][] = ['id'=>11, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    break;
+                case 6:
+                    $methodArr['methodArr66'][] = ['id'=>12, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    break;
+                case 7:
+                    $methodArr['methodArr67'][] = ['id'=>13, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    break;
+                case 8:
+                    $methodArr['methodArr68'][] = ['id'=>14, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    break;
+                case 9:
+                    $methodArr['methodArr69'][] = ['id'=>15, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    break;
+            }
         }
 
         return $methodArr;
@@ -539,10 +611,6 @@ class MethodMatchService extends CommonBaseService
             $numbers = $matches[0];
             $name = '豹子全包';
         }
-        #if (empty($codes) && preg_match_all('/豹子((\d+){3})*/u', $text, $matches)) {
-        #    $numbers = str_replace('位', '', $matches[0]);
-        #}
-        #p($codes);
 
         if(empty($numbers) && $numbers === ''){
             throw_info($matchName.'获取号码异常');

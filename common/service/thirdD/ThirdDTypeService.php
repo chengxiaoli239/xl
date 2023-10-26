@@ -111,60 +111,75 @@ class ThirdDTypeService extends CommonBaseService
             }
         }
         $matchMethodAndCodeText = explode('各', $text)[0];
-        //p(['methodArr'=>$methodArr, 'text'=>$text, 'matchMethodAndCodeText'=>$matchMethodAndCodeText]);
-        if(strpos($matchMethodAndCodeText, $methodArr['name'])===false) $matchMethodAndCodeText = $methodArr['name'].$matchMethodAndCodeText;
-        #p([$methodArr, $matchMethodAndCodeText, $text], 0);
-        if($methodArr['originName'] == '直选') {
-            $methodArr = MethodMatchService::matchZhiXuan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }else if(
-            (in_array($methodArr['originName'], ['组选', '组三', '组六']) OR strpos($text, '组') !== false)
-            && strpos($matchMethodAndCodeText, '拖') === false
-        ) { # 2、3组选
-            $methodArr = MethodMatchService::matchZuXuan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        #p(['methodArr'=>$methodArr, 'text'=>$text, 'matchMethodAndCodeText'=>$matchMethodAndCodeText]);
+        #if(strpos($matchMethodAndCodeText, $methodArr['name'])===false) $matchMethodAndCodeText = $methodArr['name'].$matchMethodAndCodeText;
+        if( (strpos($text, '直选')!==false OR strpos($text, '直')!==false) OR
+            (strpos($text, '组')!==false && strpos($matchMethodAndCodeText, '组三')===false && strpos($matchMethodAndCodeText, '组六')===false)
+        ) { # 直、组（原先的组三组六）
+            #$methodArr = MethodMatchService::matchZhiZu($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+            $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if($methodArr['originName'] == '独胆') { # 4独胆
             $methodArr = MethodMatchService::matchDuDan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }else if($methodArr['originName'] == '双飞') { # 5双飞
+        }else if($methodArr['originName'] == '双飞' OR $methodArr['originName'] == '对子全拖') { # 5双飞
             $methodArr = MethodMatchService::matchShuangFen($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }else if($methodArr['originName'] == '对子全拖') { # 6对子全拖
-            $methodArr = MethodMatchService::matchDuiZiQuanTuo($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }elseif($methodArr['originName'] == '一码定位'){ # 7一码定位
             $methodArr = MethodMatchService::matchYiMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }elseif($methodArr['originName'] == '二码定位'){ # 8二码定位
             $methodArr = MethodMatchService::matchErMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }elseif($methodArr['originName'] == '豹子全包'){ # 9豹子全包
             $methodArr = MethodMatchService::matchBaoZi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }else if($methodArr['originName'] == '组六四码') { # 10组六四码
-            $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='四');
-        }else if($methodArr['originName'] == '组六五码') { # 11组六五码
-            $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='五');
-        }else if($methodArr['originName'] == '组六六码') { # 12组六六码
-            $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='六');
-        }else if($methodArr['originName'] == '组六七码') { # 13组六七码
-            $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='七');
-        }else if($methodArr['originName'] == '组六八码') { # 14组六八码
-            $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='八');
-        }else if($methodArr['originName'] == '组六九码') { # 15组六九码
-            $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='九');
         }elseif($methodArr['originName'] == '组六全包'){ # 16组六全包
             $methodArr = MethodMatchService::matchZuLiuQuanBao($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }else if($methodArr['originName'] == '组三两码') { #17组三两码
-            $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='两');
-        }else if($methodArr['originName'] == '组三三码') { #18组三三码
-            $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='三');
-        }else if($methodArr['originName'] == '组三四码') { #19组三四码
-            $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='四');
-        }else if($methodArr['originName'] == '组三五码') { #20组三四码
-            $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='五');
-        }else if($methodArr['originName'] == '组三六码') { #21组三四码
-            $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='六');
-        }else if($methodArr['originName'] == '组三七码') { #22组三四码
-            $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='七');
-        }else if($methodArr['originName'] == '组三八码') { #23组三四码
-            $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='八');
-        }else if($methodArr['originName'] == '组三九码') { #24组三四码
-            $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='九');
         }elseif($methodArr['originName'] == '组三全包'){ # 25组三全包
             $methodArr = MethodMatchService::matchZuSanQuanBao($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }else if(
+            strpos($matchMethodAndCodeText, '拖') === false &&
+            (
+                strpos($text, '组三') !== false OR
+                strpos($text, '组六') !== false OR
+                (strpos($text, '组三') !== false && strpos($text, '组六') !== false) OR
+                (strpos($text, '直') !== false && strpos($text, '组') !== false) OR
+                (strpos($text, '组选') !== false) OR
+                (strpos($text, '组') !== false) OR
+                (strpos($text, '直') !== false )
+            )
+
+        ) { # 1、2、3组选
+            # 玩法类型组合：组三、组六、组三&组六、直&组（一直一组，二直三组，直组）、组选、组、直||直选
+            $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+
+        #}else if($methodArr['originName'] == '组六四码') { # 10组六四码
+        #    $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='四');
+        #}else if($methodArr['originName'] == '组六五码') { # 11组六五码
+        #    $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='五');
+        #}else if($methodArr['originName'] == '组六六码') { # 12组六六码
+        #    $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='六');
+        #}else if($methodArr['originName'] == '组六七码') { # 13组六七码
+        #    $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='七');
+        #}else if($methodArr['originName'] == '组六八码') { # 14组六八码
+        #    $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='八');
+        #}else if($methodArr['originName'] == '组六九码') { # 15组六九码
+        #    $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='九');
+        #}elseif($methodArr['originName'] == '组六全包'){ # 16组六全包
+        #    $methodArr = MethodMatchService::matchZuLiuQuanBao($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        #}else if($methodArr['originName'] == '组三两码') { #17组三两码
+        #    $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='两');
+        #}else if($methodArr['originName'] == '组三三码') { #18组三三码
+        #    $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='三');
+        #}else if($methodArr['originName'] == '组三四码') { #19组三四码
+        #    $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='四');
+        #}else if($methodArr['originName'] == '组三五码') { #20组三四码
+        #    $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='五');
+        #}else if($methodArr['originName'] == '组三六码') { #21组三四码
+        #    $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='六');
+        #}else if($methodArr['originName'] == '组三七码') { #22组三四码
+        #    $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='七');
+        #}else if($methodArr['originName'] == '组三八码') { #23组三四码
+        #    $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='八');
+        #}else if($methodArr['originName'] == '组三九码') { #24组三四码
+        #    $methodArr = MethodMatchService::matchZuSanXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t='九');
+        #}elseif($methodArr['originName'] == '组三全包'){ # 25组三全包
+        #    $methodArr = MethodMatchService::matchZuSanQuanBao($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if(strpos($methodArr['name'], '夸度') !== false OR strpos($methodArr['originName'], '跨度') !== false) { #26-35跨度0
             $methodArr = MethodMatchService::matchKuaDuX($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if(strpos($matchMethodAndCodeText, '拖') !== false) { #36-51:1码拖.... [组三|组六]
