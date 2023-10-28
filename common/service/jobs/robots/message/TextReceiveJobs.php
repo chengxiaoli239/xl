@@ -32,6 +32,7 @@ class TextReceiveJobs extends CommonJob {
             Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', self::$name.'03', ['err_msg'=>$e->getMessage()]);
             return $e->getMessage();
         }
+        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'99', ['betRst'=>$rst]);
 
         return $rst;
     }
