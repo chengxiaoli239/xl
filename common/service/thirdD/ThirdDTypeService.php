@@ -277,6 +277,11 @@ class ThirdDTypeService extends CommonBaseService
             $single_txt = $matches[1];
             $single = $matches[1];
         }
+        // 使用正则表达式匹配 "各" 或 "共" 后面的数字
+        if (empty($single) && preg_match('/各\s*(\d+)/', $text, $matches)) {
+            $single_txt = $matches[1];
+            $single = $matches[1];
+        }
 
         if (empty($single) && preg_match('/([\p{Han}一二三四五六七八九十]{1,3})元/u', $text, $matches)) {
             $t = $matches[1];

@@ -4,6 +4,7 @@ namespace common\service\thirdD;
 
 use common\service\BaseService;
 use common\service\CommonService;
+use common\service\helpers\ThirdD;
 use yii\helpers\Json;
 
 class MethodMatchService extends CommonBaseService
@@ -186,15 +187,17 @@ class MethodMatchService extends CommonBaseService
      * @throws \common\exceptions\InfoException
      */
     public static function matchZhiZuOrZuSanOrZuLiuXMa($text='', &$codes=[], &$count=0, $match_name=''){
-        $text = explode('元', $text)[0];
-        $text = explode('倍', $text)[0];
+        #$text = explode('元', $text)[0];
+        #$text = explode('倍', $text)[0];
         // 使用正则表达式匹配组选后面的三个数字
-        if (preg_match_all('/(\d{2,}(?:\s+\d{2,})*)/', $text, $matches)) {
-            $codes = explode(' ', trim($matches[1][0]));
+        #if (preg_match_all('/(\d{2,}(?:\s+\d{2,})*)/', $text, $matches)) {
+        if (preg_match_all('/(\d{2,})+/', $text, $matches)) {
+            #$codes = explode(' ', trim($matches[1][0]));
+            $codes = $matches[1]; # 多组号码，每组一个个元素
         } else {
             throw_info('组选未匹配到号码,text:'.$text);
         }
-        //p([$text, $matches, $match_name, $codes]);
+        #p([$text, $matches, $match_name, $codes]);
         if(empty($codes)){
             throw_info('匹配组选号码为空');
         }
@@ -229,13 +232,49 @@ class MethodMatchService extends CommonBaseService
                     if($len != 3) {
                         throw_info('直选或组选号码必须三个：'.$code);
                     }
-                    $methodArr['methodArrZhi'][] = ['id'=>self::METHOD_ID_ZHIXUAN, 'name'=>'直选', 'code'=>$code, 'count'=>1]; # 直选
+                    if(preg_match_all('/[直|组]/u', $text, $matcheTypes)){ # 匹配直组顺序：Array ( [0] => 直 [1] => 组 )
+                        $mTypes = $matcheTypes; # Array ( [0] => 直 [1] => 组 )
+                        if(
+                            preg_match_all('/([一二三四五六七八九])\s*直([一二三四五六七八九])组/u', $text, $matches) OR
+                            preg_match_all('/([一二三四五六七八九])\s*组([一二三四五六七八九])直/u', $text, $matches) OR
+                            preg_match_all('/直([一二三四五六七八九])\s*组([一二三四五六七八九])/u', $text, $matches) OR
+                            preg_match_all('/组([一二三四五六七八九])\s*直([一二三四五六七八九])/u', $text, $matches) OR
+
+                            preg_match_all('/(\d+)倍直\s*(\d+)倍组/u', $text, $matches) OR
+                            preg_match_all('/(\d+)倍组\s*(\d+)倍直/u', $text, $matches) OR
+                            preg_match_all('/直(\d+)倍\s*组(\d+)倍/u', $text, $matches) OR
+                            preg_match_all('/组(\d+)倍\s*直(\d+)倍/u', $text, $matches)
+                        ){
+                            $singleD = [];
+                            foreach ($mTypes as $key=>$mType){
+                                $singleD[$key] = [
+                                    $mType[0]=>is_numeric($matches[1][0])?(int)$matches[1][0] : ThirdD::cnToNums($matches[1][0]) * 2, # 直、组都是两元一倍，所以这里 *2
+                                    $mType[1]=>is_numeric($matches[2][0])?(int)$matches[2][0] : ThirdD::cnToNums($matches[2][0]) * 2, # 直、组都是两元一倍，所以这里 *2
+                                ];
+                            }
+                            #p([$matcheTypes, $text, $matches, $singleD], 0);
+                        }
+                    }
+
+                    $zhi = ['id'=>self::METHOD_ID_ZHIXUAN, 'name'=>'直选', 'code'=>$code, 'count'=>1]; # 直选
+                    if(!empty($singleD[0]['直'])){
+                        $zhi['single'] = $singleD[0]['直'];
+                    }
+                    $methodArr['methodArrZhi'][] = $zhi;
                     if(!$flag){
                         # 组六
-                        $methodArr['methodArr6'][] = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
+                        $zuliu = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
+                        if(!empty($singleD[0]['组'])){
+                            $zuliu['single'] = $singleD[0]['组'];
+                        }
+                        $methodArr['methodArr6'][] = $zuliu;
                     }else{
                         # 组三
-                        $methodArr['methodArr3'][] = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
+                        $zusan = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
+                        if(!empty($singleD[0]['组'])){
+                            $zusan['single'] = $singleD[0]['组'];
+                        }
+                        $methodArr['methodArr3'][] = $zusan;
                     }
                     break;
                 case (strpos($text, '组三') !== false && strpos($text, '组六') !== false):
@@ -339,11 +378,19 @@ class MethodMatchService extends CommonBaseService
             $allCount += $countNum;
             $codesTmp = '';
             foreach ($methodArr[$key] as $m){
+                $single_s = ''; # 类似一直一组情况，在本方法匹配倍数，外面判断优先用此处倍数
                 $codesTmp .= $m['code'] . self::ZU_SPLIT_FLAG;
+                if(!empty($m['single'])){
+                    $single_s = $m['single'];
+                }
             }
             $codesTmp = trim($codesTmp, self::ZU_SPLIT_FLAG);
             $codes .= self::ZU_SPLIT_FLAG.$codesTmp;
-            $methodArr[$key] = ['id'=>$m['id'], 'name'=>$m['name'], 'codes'=>$codesTmp, 'count'=>$countNum];
+            $methodArrD = ['id'=>$m['id'], 'name'=>$m['name'], 'codes'=>$codesTmp, 'count'=>$countNum];
+            if(!empty($single_s)){
+                $methodArrD['single'] = $single_s;
+            }
+            $methodArr[$key] = $methodArrD;
         }
         $methodArr = array_values($methodArr);
         $count = $allCount;
