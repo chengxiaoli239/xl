@@ -19,7 +19,7 @@ class TextReceiveJobs extends CommonJob {
 
     public static function handle($params){
         try {
-            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params]);
+            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'01', ['params'=>$params]);
             $user_id = $params['user_id']; # 用户id
             $text = $params['text']; # 下注文本
             $fromUser = $params['fromUser']; # 微信用户id
@@ -27,9 +27,9 @@ class TextReceiveJobs extends CommonJob {
             $MessageService = new EYunMessageOperateService($user_id);
             $rst = $MessageService->receive($user_id, $text, $fromUser);
 
-            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params, 'betRst'=>$rst]);
+            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'02', ['params'=>$params, 'betRst'=>$rst]);
         }catch (\Exception $e){
-            Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', self::$name, ['err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', self::$name.'03', ['err_msg'=>$e->getMessage()]);
             return $e->getMessage();
         }
 
