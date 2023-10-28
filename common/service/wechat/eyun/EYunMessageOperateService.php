@@ -245,7 +245,7 @@ class EYunMessageOperateService  extends EYunBaseService
                     $playMethod['playMethod'] = $playMethod;
                     $g['playMethod'][] = $playMethod;
                 }
-                #p(['g'=>$g, 'singleData'=>$singleData, 'betText'=>$betText]);
+                //p(['g'=>$g, 'singleData'=>$singleData, 'betText'=>$betText]);
                 if(empty($g['single']) OR empty($g['all_moneys'])){
                     throw_info('匹配倍数或金额异常', ThirdDTypeService::CODE_FOR_USER);
                 }

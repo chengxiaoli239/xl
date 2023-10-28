@@ -246,11 +246,10 @@ class ThirdDTypeService extends CommonBaseService
             $single_txt = $matches[1];
             $single = $matches[1];
         }
-        // 使用正则表达式匹配 "各" 或 "共" 后面的数字
-        if (empty($single) && preg_match('/各\s*(\d+)\s*(?!(?:倍))/', $text, $matches)) { # 匹配金额切非倍数,因为 各2倍，会误判的为：各2元
+        // 使用正则表达式匹配 "各" 和 "倍" 中间的数字
+        if (empty($single) && preg_match('/各\s*(\d+)\s*倍/', $text, $matches)) { # 匹配金额切非倍数,因为 各2倍，会误判的为：各2元
             $single_cn_text = '倍';
-            $single_txt = $matches[1];
-            $single = $matches[1];
+            $single_cn = $matches[1];
         }
 
         // 使用正则表达式匹配 "倍" 前面的中文一到九
@@ -265,7 +264,7 @@ class ThirdDTypeService extends CommonBaseService
         }
 
         // 使用正则表达式匹配 "倍" 前面的数字
-        if(empty($single) && preg_match('/[各]{0,1}(\d+)倍/u', $text, $matches)) {
+        if(empty($single) && preg_match('/各{0,1}(\d+)倍/u', $text, $matches)) {
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
             $t = $matches[1];
             #p([$t, $s, $matchName, $matches, $methods]);
