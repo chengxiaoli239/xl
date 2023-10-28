@@ -113,8 +113,10 @@ class ThirdDTypeService extends CommonBaseService
         $matchMethodAndCodeText = explode('各', $text)[0];
         #p(['methodArr'=>$methodArr, 'text'=>$text, 'matchMethodAndCodeText'=>$matchMethodAndCodeText]);
         #if(strpos($matchMethodAndCodeText, $methodArr['name'])===false) $matchMethodAndCodeText = $methodArr['name'].$matchMethodAndCodeText;
-        if( (strpos($text, '直选')!==false OR strpos($text, '直')!==false) OR
-            (strpos($text, '组')!==false && strpos($matchMethodAndCodeText, '组三')===false && strpos($matchMethodAndCodeText, '组六')===false)
+        if( strpos($text, '复式')===false && (
+                (strpos($text, '直选')!==false OR strpos($text, '直')!==false) OR
+                (strpos($text, '组')!==false && strpos($matchMethodAndCodeText, '组三')===false && strpos($matchMethodAndCodeText, '组六')===false)
+            )
         ) { # 直、组（原先的组三组六）
             #$methodArr = MethodMatchService::matchZhiZu($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
             $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
@@ -137,7 +139,7 @@ class ThirdDTypeService extends CommonBaseService
                 (strpos($text, '直') !== false && strpos($text, '组') !== false) OR
                 (strpos($text, '组选') !== false) OR
                 (strpos($text, '组') !== false) OR
-                (strpos($text, '直') !== false )
+                (strpos($text, '直') !== false && strpos($text, '复式')===false)
             )
 
         ) { # 1、2、3组选
@@ -199,16 +201,17 @@ class ThirdDTypeService extends CommonBaseService
             )
         ) { #36-51:1码拖.... [组三|组六]
             $methodArr = MethodMatchService::matchHeZhiDaXiaoDanShuang($matchMethodAndCodeText, $codes, $count);
-        }elseif($methodArr['originName'] == '定位直选复式'){ # 91 定位直选复式
-            $methodArr = MethodMatchService::matchDingWeiZhiXuanFuShi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }elseif(strpos($text, '复式') !== false){ # 91 定位直选复式
+            $methodArr = MethodMatchService::matchDingWeiFuShi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }elseif($methodArr['originName'] == '全倒'){ # 92 定位直选复式
             $methodArr = MethodMatchService::matchQuanDao($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }elseif($methodArr['originName'] == '直选复式'){ # 93 定位直选复式
-            $methodArr = MethodMatchService::matchZhiXuanFuShi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        #}elseif($methodArr['originName'] == '直选复式'){ # 93 定位直选复式
+        #    p('kkkk');
+        #    $methodArr = MethodMatchService::matchZhiXuanFuShi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else{
             $codes = explode(' ', trim($matchMethodAndCodeText));
         }
-        #p(['methodArr'=>$methodArr, 'codes'=>$codes, 'count'=>$count]);
+        //p(['methodArr'=>$methodArr, 'codes'=>$codes, 'count'=>$count]);
 
         return [$methodArr, $codes, $count];
     }

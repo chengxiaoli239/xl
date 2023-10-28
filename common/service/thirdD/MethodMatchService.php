@@ -947,13 +947,13 @@ class MethodMatchService extends CommonBaseService
     }
 
     /**
-     *  91 定位直选复式
+     *  91 定位直选复式、93 直选复式
      * @param string $text
      * @param array $codes
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function matchDingWeiZhiXuanFuShi($text='', &$codes=[], &$count=0, $matchName=''){
+    public static function matchDingWeiFuShi($text='', &$codes=[], &$count=0){
         $text = trim(str_replace('各', ' ', $text));
         $text = str_replace('值选', '直选', $text);
         $text = str_replace('复试', '复式', $text);
@@ -963,35 +963,53 @@ class MethodMatchService extends CommonBaseService
         //p([$text, $matchName]);
 
         // 使用正则表达式匹配组选后面的三个数字
-        if (
-            (strpos($text, '定位') !== false AND strpos($text, '复式') !== false AND strpos($text, '直选') !== false)
-            && preg_match_all('/[百十个]{1}(\d+)/u', $text, $matches1)
-        ) {
+        if ( (strpos($text, '定位') !== false) && preg_match_all('/[百十个]{1}(\d+)/u', $text, $matches1) ) {
+            # 定位复式直选
             $m0 = $matches1[0];
             $m1 = $matches1[1];
-        }
-        //p([$m0, $m1]);
-
-        if(count($m0)!=3 OR count($m1)!=3){
-            throw_info('号码匹配异常[百十个]');
-        }
-        foreach ($m1 as $k=>$code){
-            $flag = \common\service\helpers\ThirdD::judgeCodesRepeat($code, $c1); # 判断号码是否有重复
-            if($flag){
-                throw_info($m0[$k].'号码有重复');
+            if(count($m0)!=3 OR count($m1)!=3){
+                throw_info('号码匹配异常[百十个]');
             }
-        }
-        $codes = implode(',', $m0);
+            foreach ($m1 as $k=>$code){
+                $flag = \common\service\helpers\ThirdD::judgeCodesRepeat($code, $c1); # 判断号码是否有重复
+                if($flag){
+                    throw_info($m0[$k].'号码有重复');
+                }
+            }
+            $codes = implode(',', $m0);
 
-        $count = 1;
-        foreach ($m1 as $mCodes){
-            $count *= strlen($mCodes);
+            $count = 1;
+            foreach ($m1 as $mCodes){
+                $count *= strlen($mCodes);
+            }
+
+            $name = '定位直选复式';
+        }else{
+            if (preg_match_all('/(\d{4,})/', $text, $matches1) ) {
+                $codesArr = $matches1[0];
+            }
+            # 复式直选
+            $all_counts = 0;
+            foreach ($codesArr as $codeData){
+                $flag = \common\service\helpers\ThirdD::judgeCodesRepeat($codeData);
+                if($flag){
+                    throw_info($codeData.'号码有重复');
+                }
+                $count = 1;
+                for ($i=0; $i<3; $i++){
+                    $count *= (strlen($codeData)-$i);
+                }
+                $all_counts += $count;
+            }
+            $count = $all_counts;
+
+            $name = '直选复式';
+            $codes = implode(self::ZU_SPLIT_FLAG, $codesArr);
         }
 
-        $name = '定位直选复式';
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
+        $methodArr[] = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
         #p([$methodArr, $codes]);
 
         return $methodArr;
@@ -1014,13 +1032,13 @@ class MethodMatchService extends CommonBaseService
         if (preg_match_all('/(\d{3,})/u', $text, $matches1) ) {
             $codesArr = $matches1[0];
         }
-        #p($codesArr);
+        //p($matches1);
         $code2s = [];
         $code3s = [];
         $codeFuShis = [];
         foreach ($codesArr as $code){
             if(strlen($code)!=3){
-                #throw_info('号码一定要是三位['.$code.']');
+                throw_info('号码一定要是三位['.$code.']');
             }
             $tmpCodes = [];
             for($i=0; $i<strlen($code); $i++){
@@ -1042,12 +1060,12 @@ class MethodMatchService extends CommonBaseService
         $count = 0;
         if(count($code2s)>0){
             foreach ($code2s as $code2){
-                $count += 6;
+                $count += 3;
             }
         }
         if(count($code3s)>0){
             foreach ($code3s as $code3){
-                $count += 12;
+                $count += 6;
             }
         }
         if(count($codeFuShis)>0){
@@ -1065,7 +1083,7 @@ class MethodMatchService extends CommonBaseService
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
 
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
+        $methodArr[] = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
         #p([$methodArr, $codes]);
 
         return $methodArr;
