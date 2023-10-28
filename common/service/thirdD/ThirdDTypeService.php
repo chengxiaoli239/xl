@@ -126,12 +126,8 @@ class ThirdDTypeService extends CommonBaseService
             $methodArr = MethodMatchService::matchYiMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }elseif($methodArr['originName'] == '二码定位'){ # 8二码定位
             $methodArr = MethodMatchService::matchErMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }elseif($methodArr['originName'] == '豹子全包'){ # 9豹子全包
-            $methodArr = MethodMatchService::matchBaoZi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }elseif($methodArr['originName'] == '组六全包'){ # 16组六全包
-            $methodArr = MethodMatchService::matchZuLiuQuanBao($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }elseif($methodArr['originName'] == '组三全包'){ # 25组三全包
-            $methodArr = MethodMatchService::matchZuSanQuanBao($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }elseif(strpos($text, '全包')!==false){ # 9豹子全包
+            $methodArr = MethodMatchService::matchQuanBao($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if(
             strpos($matchMethodAndCodeText, '拖') === false &&
             (

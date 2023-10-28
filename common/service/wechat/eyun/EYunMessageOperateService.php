@@ -195,7 +195,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 }
 
                 list($playMethod, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($betText);
-                //p(['betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count], 0);
+                p(['betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count], 0);
                 $g['codes'] = $codes;
                 if(ThirdD::getMaxDim($playMethod)>1){
                     # 跨度、组三组六混合情况

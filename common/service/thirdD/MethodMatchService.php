@@ -603,31 +603,6 @@ class MethodMatchService extends CommonBaseService
     }
 
     /**
-     * 9、豹子全包
-     * @param string $text
-     * @param array $codes
-     * @return array
-     */
-    public static function matchBaoZi($text='', &$codes=[], &$count=0, $matchName=''){
-        // 使用正则表达式匹配所有单个数字
-        if (preg_match_all('/豹子全包/u', $text, $matches)) {
-            $numbers = $matches[0];
-            $name = '豹子全包';
-        }
-
-        if(empty($numbers) && $numbers === ''){
-            throw_info($matchName.'获取号码异常');
-        }
-        $codes = $numbers;
-        $count = count($codes);
-        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
-
-        $methodArr = ['id'=>9, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
-
-        return $methodArr;
-    }
-
-    /**
      * 10-15组六四、五...九码
      * @param string $text
      * @param array $codes
@@ -662,30 +637,37 @@ class MethodMatchService extends CommonBaseService
     }
 
     /**
-     * 16、组六全包
+     * 9豹子全包 16组六全包 25组三全包
      * @param string $text
      * @param array $codes
      * @return array
      */
-    public static function matchZuLiuQuanBao($text='', &$codes=[], &$count=0, $matchName=''){
+    public static function matchQuanBao($text='', &$codes=[], &$count=0){
+        $methodArr = [];
         // 使用正则表达式匹配所有单个数字
-        if (preg_match_all('/组六全包/u', $text, $matches)) {
+        if (preg_match_all('/组三/u', $text, $matches)) {
+            $numbers = $matches[0];
+            $name = '组三全包';
+            $methodArr[] = ['id'=>16, 'name'=>$name, 'codes'=>$name, 'count'=>1];
+        }
+        if (preg_match_all('/组六/u', $text, $matches)) {
             $numbers = $matches[0];
             $name = '组六全包';
+            $methodArr[] = ['id'=>16, 'name'=>$name, 'codes'=>$name, 'count'=>1];
         }
-        #if (empty($codes) && preg_match_all('/豹子((\d+){3})*/u', $text, $matches)) {
-        #    $numbers = str_replace('位', '', $matches[0]);
-        #}
-        #p($codes);
+        if (preg_match_all('/组六/u', $text, $matches)) {
+            $numbers = $matches[0];
+            $name = '豹子全包';
+            $methodArr[] = ['id'=>16, 'name'=>$name, 'codes'=>$name, 'count'=>1];
+        }
+        if(empty($methodArr)){
+            throw_info('匹配玩法异常');
+        }
 
-        if(empty($numbers) && $numbers === ''){
-            throw_info($matchName.'获取号码异常');
-        }
         $codes = $numbers;
-        $count = count($codes);
-        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
-
-        $methodArr = ['id'=>16, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
+        $count = count($methodArr);
+        $codes = implode(self::ZU_SPLIT_FLAG, array_column($methodArr, 'codes'));
+        //p($methodArr);
 
         return $methodArr;
     }
@@ -721,31 +703,6 @@ class MethodMatchService extends CommonBaseService
         $id = $methods[$name]['id'];
         $codes = implode(self::ZU_SPLIT_FLAG, $codes);
         $methodArr = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
-
-        return $methodArr;
-    }
-
-    /**
-     * 25、组三全包
-     * @param string $text
-     * @param array $codes
-     * @return array
-     */
-    public static function matchZuSanQuanBao($text='', &$codes=[], &$count=0, $matchName=''){
-        // 使用正则表达式匹配所有单个数字
-        if (preg_match_all('/组三全包/u', $text, $matches)) {
-            $numbers = $matches[0];
-            $name = '组三全包';
-        }
-
-        if(empty($numbers) && $numbers === ''){
-            throw_info($matchName.'获取号码异常');
-        }
-        $codes = $numbers;
-        $count = count($codes);
-        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
-
-        $methodArr = ['id'=>25, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
