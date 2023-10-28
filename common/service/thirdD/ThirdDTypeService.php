@@ -85,7 +85,7 @@ class ThirdDTypeService extends CommonBaseService
      */
     public static function getPlayMethodAndCodes($text='', &$codes=[]){
         #$methods = PlayMethodService::getMethods();
-        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1, $orignMethod);
+        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         //p([$text, $methods]);
         $methodArr = [];
         foreach ($methods as $key=>$method){
@@ -227,6 +227,7 @@ class ThirdDTypeService extends CommonBaseService
         $single = 0;
         $text = trim($text);
 
+        $single_cn_text = '元';
         // 使用正则表达式匹配 直选复式
         if ($playMethod['name']=='直选复式' && preg_match('/(\d+(?:\.\d+)?)元/', $text, $matches)) {
             $single_txt = $matches[1];
@@ -247,6 +248,7 @@ class ThirdDTypeService extends CommonBaseService
         }
         // 使用正则表达式匹配 "各" 或 "共" 后面的数字
         if (empty($single) && preg_match('/各\s*(\d+)\s*(?!(?:倍))/', $text, $matches)) { # 匹配金额切非倍数,因为 各2倍，会误判的为：各2元
+            $single_cn_text = '倍';
             $single_txt = $matches[1];
             $single = $matches[1];
         }
@@ -255,17 +257,21 @@ class ThirdDTypeService extends CommonBaseService
         if(empty($single) && preg_match('/([\p{Han}一二三四五六七八九十]{1,3})倍/u', $text, $matches)) {
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
             $t = $matches[1];
-            $s = ThirdD::cnToNums($t); # 中文转数字
-            #p([$s, $method_id, $matchName, $methods[$method_id]]);
+            $s = ThirdD::cnToNums($t); # 中文转数字，一=>1、二=>2.。。。
+            #p([$t, $s, $matchName, $matches, $methods]);
             $single = $s * (int)$methods[$matchName]['money'];
+            $single_cn_text = '倍';
+            $single_cn = $s;
         }
 
         // 使用正则表达式匹配 "倍" 前面的数字
-        if(empty($single) && preg_match('/[各]{0,1}(\d+)倍/', $text, $matches)) {
+        if(empty($single) && preg_match('/[各]{0,1}(\d+)倍/u', $text, $matches)) {
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
             $t = $matches[1];
-            #p([$s, $method_id, $matchName, $methods[$method_id]]);
+            #p([$t, $s, $matchName, $matches, $methods]);
             $single = $t * (int)$methods[$matchName]['money'];
+            $single_cn_text = '倍';
+            $single_cn = $t;
         }
 
         // 使用正则表达式匹配 "各" 或 "共" 后面的数字
@@ -284,6 +290,8 @@ class ThirdDTypeService extends CommonBaseService
             'single'=>$single,
             'text'=>$text,
             'single_txt'=>$single_txt.'元',
+            'single_cn' => $single_cn,
+            'single_cn_text' => $single_cn_text,
         ];
         if(empty($single)){
             # 兼容，在没有输入各x元的情况，这里先匹配获取总共金额，后面在根绝号码的数量反算倍数
@@ -294,7 +302,6 @@ class ThirdDTypeService extends CommonBaseService
 
         return $data;
     }
-
 
     /**
      * 下注单号

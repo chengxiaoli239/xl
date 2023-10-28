@@ -22,7 +22,7 @@ class PlayMethodService extends CommonBaseService
             $datasQuery = PlayMethod::find()
                 ->where(['status'=>self::STATUS_ACTIVE])->orderBy(['LENGTH(name)'=>SORT_DESC]);
             if($indexByKey){
-                $datasQuery->indexBy(['name']);
+                $datasQuery->indexBy(['LENGTH(name)'=>SORT_DESC]);
             }
             $datas = $datasQuery->asArray()->all();
             $m->set($mkey, $datas, 120);
@@ -32,7 +32,7 @@ class PlayMethodService extends CommonBaseService
     }
 
     /**
-     * 获取别名玩法
+     * 获取别名玩法 - 最原始表数据
      * @return array
      */
     public static function getMethodsAlias(){
@@ -53,11 +53,12 @@ class PlayMethodService extends CommonBaseService
     }
 
     /**
+     * @param int $indexByKey 玩法表名称长度排序
+     * @param array $aliasNameToOriginName 生成一组,用于替换 ['别名1'=>'玩法名称', '玩法2'=>'玩法名称2']
      * @return array
      */
-    public static function getAllMethodsAndAliasName($indexByKey=0, &$orignMethods=[]){
+    public static function getAllMethodsAndAliasName($indexByKey=0, &$aliasNameToOriginName=[]){
         $methods = self::getMethods($indexByKey);
-        $orignMethods = $methods;
         $aliaMethods = self::getMethodsAlias();
         foreach ($aliaMethods as $aliaMethod){
             $alias_names = explode(',', $aliaMethod['alias_name']);
@@ -75,6 +76,7 @@ class PlayMethodService extends CommonBaseService
         if($indexByKey) {
             $newMethods = [];
             foreach ($methods as $method){
+                $aliasNameToOriginName[$method['name']] = $method['originName'];
                 $method['originName'] = $method['originName']??$method['name'];
                 $newMethods[$method['name']] = $method;
             }

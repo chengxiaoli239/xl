@@ -370,6 +370,9 @@ class MethodMatchService extends CommonBaseService
         if(strpos($name, '组三') !==false){
             # 组三多码
             switch ($len){
+                case 2:
+                    $methodArr['methodArr32'][] = ['id'=>17, 'name'=>'组三两码', 'code'=>$code, 'count'=>1];
+                    break;
                 case 3:
                     $methodArr['methodArr33'][] = ['id'=>18, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
                     break;
@@ -648,7 +651,7 @@ class MethodMatchService extends CommonBaseService
             }
         }
         $name = '组六'.$t.'码';
-        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1, $orignMethod);
+        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $id = $methods[$name]['id'];
 
         $count = count($codes);
@@ -714,7 +717,7 @@ class MethodMatchService extends CommonBaseService
         #p($codes);
 
         $name = '组三'.$t.'码';
-        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1, $orignMethod);
+        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $id = $methods[$name]['id'];
         $codes = implode(self::ZU_SPLIT_FLAG, $codes);
         $methodArr = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
