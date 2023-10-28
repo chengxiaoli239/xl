@@ -889,23 +889,16 @@ class MethodMatchService extends CommonBaseService
         $text = trim(str_replace(' ', ',', $text));
         //p([$text, $matchName]);
 
-        // 使用正则表达式匹配组选后面的三个数字  -- 和值范围
-        if (strpos($text, ',')===false && preg_match_all('/[和合]值(\d+)(?:[-到](\d+))?/u', $text, $matches1)) {
-            $num1 = $matches1[1][0];
-            $num2 = $matches1[2][0];
+        # 和值范围
+        if (strpos($text, ',')===false && preg_match_all('/(\d+)\s*[-|到|至]\s*(\d+)/u', $text, $matches0)) {
+            $numsArr = [];
+            for ($i=$matches0[1][0]; $i<=$matches0[2][0]; $i++){
+                $numsArr[] = $i;
+            }
         }
-
         # 指定某几个和值
-        if (empty($num2) && preg_match_all('/[和合]值(\d+(?:,\d+)*)/u', $text, $matches2)) {
+        if (empty($numsArr) && preg_match_all('/[和合]值(\d+(?:,\d+)*)/u', $text, $matches2)) {
             $numsArr = explode(',', $matches2[1][0]);
-        }
-        #p($matches2);
-
-        if($num1===''){
-            throw_info('和值不能为空');
-        }
-        if($num2!=='' && $num2 !== NULL && $num2<=$num1){
-            throw_info('和值2必须大于和值1');
         }
 
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
@@ -916,18 +909,6 @@ class MethodMatchService extends CommonBaseService
                 $id = $method['id'];
                 $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$code, 'matchName'=>$name, 'count'=>1];
             }
-        }elseif($num2 !== ''){
-            for ($i=$num1; $i<=$num2; $i++){
-                $name = '和值'.$i;
-                $method = $methods[$name];
-                $id = $method['id'];
-                $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$i, 'matchName'=>$name, 'count'=>1];
-            }
-        }else{
-            $name = '和值'.$num1;
-            $method = $methods[$name];
-            $id = $method['id'];
-            $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$num1, 'matchName'=>$name, 'count'=>1];
         }
         #p($methodArr);
 
@@ -941,24 +922,26 @@ class MethodMatchService extends CommonBaseService
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function matchHeZhiDaXiaoDanShuang($text='', &$codes=[], &$count=0, $matchName=''){
-        $text = explode(' ', trim($text))[0];
-        $text = trim(str_replace(' ', '', $text));
+    public static function matchHeZhiDaXiaoDanShuang($text='', &$codes=[], &$count=0){
+        $text = trim($text);
         $text = str_replace('合值', '和值', $text);
         //p([$text, $matchName]);
 
         // 使用正则表达式匹配组选后面的三个数字  -- 和值范围
-        if (preg_match_all('/和值[大小单双]{1}?/u', $text, $matches1)) {
-            $num = $matches1[0][0];
+        if (preg_match_all('/(大|小|单|双)/u', $text, $matches1)) {
+            $nums = $matches1[0];
         }
-        $codes = str_replace('和值', '', $num);
-        $count = 1;
+        $codes = implode(';', $nums);
+        $count = count($nums);
 
-        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
-        $name = $num;
-        $method = $methods[$name];
-        $id = $method['id'];
-        $methodArr = ['id'=>$id, 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
+        foreach ($nums as $num){
+            $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
+            $name = '和值'.$num;
+            $method = $methods[$name];
+            $id = $method['id'];
+            $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$num, 'matchName'=>$name, 'count'=>1];
+        }
+        #p($methodArr);
 
         return $methodArr;
     }
