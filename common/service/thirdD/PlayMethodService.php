@@ -6,7 +6,7 @@ use common\models\thirdD\PlayMethod;
 
 class PlayMethodService extends CommonBaseService
 {
-    public static function getMethodsMKey($alias='alias'){
+    public static function getMethodsMKey($alias=''){
         return 'third_d_getMethodsMKey_x0_'.$alias;
     }
 
@@ -22,8 +22,9 @@ class PlayMethodService extends CommonBaseService
             $datasQuery = PlayMethod::find()
                 ->where(['status'=>self::STATUS_ACTIVE])->orderBy(['LENGTH(name)'=>SORT_DESC]);
             if($indexByKey){
-                $datasQuery->indexBy(['LENGTH(name)'=>SORT_DESC]);
+                $datasQuery->orderBy(['LENGTH(name)'=>SORT_DESC]);
             }
+            #$sql = $datasQuery->createCommand()->getRawSql();p($sql);
             $datas = $datasQuery->asArray()->all();
             $m->set($mkey, $datas, 120);
         }

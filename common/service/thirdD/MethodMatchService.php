@@ -714,19 +714,16 @@ class MethodMatchService extends CommonBaseService
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function matchKuaDuX($text='', &$codes=[], &$count=0, $matchName=''){
+    public static function matchKuaDuX($text='', &$codes=[], &$count=0){
         #$text = trim(str_replace(' ', '', $text));
         if (preg_match('/(\d+)元/', $text, $matches)) {
             if(!empty($matches[0])){
                 $text = str_replace($matches[0], '', $text);
             }
         }
-        #p([$text, $matchName, $matches]);
+        //p([$text, $matches]);
 
         $text = explode('各', trim($text))[0];
-        #$text = explode(' ', trim($text))[0];
-        #$text = str_replace($matchName, $matchName.' ', $text);
-
 
         preg_match('/[\p{Han}]{2}/u', $text, $matchesCn);
         $cnTextMatch = $matchesCn[0];
@@ -748,7 +745,13 @@ class MethodMatchService extends CommonBaseService
             $codes = str_replace($cnTextMatch, '', $codes);
             #p(['cnTextMatch'=>$cnTextMatch, 'matchName'=>$matchName, 'codes'=>$codes, 'text'=>$text, 'matchesCn'=>$matchesCn]);
         }
-        // 使用正则表达式匹配组选后面的三个数字
+        // 使用正则表达式匹配跨度 3-6、3到6，即：3、4、5、6
+        if ($codes !== '0' && empty($codes) && preg_match_all('/(\d+)\s*[-|到|至]\s*(\d+)/u', $text, $matches0)) {
+            $codes = '';
+            for ($i=$matches0[1][0]; $i<=$matches0[2][0]; $i++){
+                $codes .= $i;
+            }
+        }
         if ($codes !== '0' && empty($codes) && preg_match_all('/'.$cnTextMatch.'(\d{1,}(?:\s+\d{1,})*)/u', $text, $matches1)) {
             $codes = str_replace(' ', '', trim($matches1[1][0]));
         }
@@ -760,16 +763,17 @@ class MethodMatchService extends CommonBaseService
         #p([$codes, $matches1, $matches2]);
 
         $methodArr = [];
+        $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
         for ($i=0; $i<strlen($codes); $i++){
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
             $code = $codes[$i];
             $name = '跨度'.$code;
             $method = $methods[$name];
             $id = $method['id'];
-            $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
             $methodArr[] = ['id'=>$id, 'name'=>$name, 'codes'=>$code, 'matchName'=>$cnTextMatch.$changeNameArr[$codes[$i]], 'count'=>1];
             #p(['codes'=>$codes[0][$i], 'methods'=>$methods]);
         }
+        #p($methodArr);
 
         return $methodArr;
     }

@@ -84,7 +84,7 @@ class EYunMessageOperateService  extends EYunBaseService
 
         $text = str_replace(['总计', '计', '='], '共', $text); # 同义词替换
         $text = str_replace('块', '元', $text); # 同义词替换
-        $text = str_replace(['、', '-', '.', '*', "\n"], ' ', $text); # 同义词替换
+        $text = str_replace(['、', '.', '*', "\n"], ' ', $text); # 同义词替换
         $text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
         if(preg_match('/个(\d+)元/', $text, $matches)){
             $text = str_replace($matches[0], '各'.$matches[1].'元', $text);
@@ -195,7 +195,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 }
 
                 list($playMethod, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($betText);
-                //p(['betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count], 0);
+                #p(['betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count], 0);
                 $g['codes'] = $codes;
                 if(ThirdD::getMaxDim($playMethod)>1){
                     # 跨度、组三组六混合情况
@@ -203,7 +203,7 @@ class EYunMessageOperateService  extends EYunBaseService
                     $betText = str_replace($playMethodKd['name'], '', $betText);
                     $singleData = ThirdDTypeService::getMoneys($betText, $playMethodKd['name'], $playMethod);
                     $single = $singleData['single'];
-                    //p([$this->user_id, $singleData], 0);
+                    #p([$this->user_id, $singleData]);
                     foreach ($playMethod as $k=>$pm){
                         if($singleData['single_cn_text']=='倍'){
                             $Odds = Odds3dService::getOdds($this->user_id, $pm['id']); # 玩法赔率
