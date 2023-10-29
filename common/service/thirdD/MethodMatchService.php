@@ -183,10 +183,11 @@ class MethodMatchService extends CommonBaseService
      * 组六多码：17-24组三两、三、...九码
      * @param string $text
      * @param array $codes
+     * @param array $singleArr Array ( [组六] => 4倍元 [组三] => 20倍/元 )
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function matchZhiZuOrZuSanOrZuLiuXMa($text='', &$codes=[], &$count=0, $match_name=''){
+    public static function matchZhiZuOrZuSanOrZuLiuXMa($text='', &$codes=[], &$count=0, $singleArr=[]){
         #$text = explode('元', $text)[0];
         #$text = explode('倍', $text)[0];
         // 使用正则表达式匹配组选后面的三个数字
@@ -197,7 +198,7 @@ class MethodMatchService extends CommonBaseService
         } else {
             throw_info('组选未匹配到号码,text:'.$text);
         }
-        #p([$text, $matches, $match_name, $codes]);
+        //p([$text, $matches, $codes]);
         if(empty($codes)){
             throw_info('匹配组选号码为空');
         }
@@ -230,7 +231,8 @@ class MethodMatchService extends CommonBaseService
             switch (true){
                 case (strpos($text, '直') !== false && strpos($text, '组') !== false):
                     if($len != 3) {
-                        throw_info('直选或组选号码必须三个：'.$code);
+                        #throw_info('直选或组选号码必须三个：'.$code, self::CODE_FOR_USER);
+                        break;
                     }
                     if(preg_match_all('/[直|组]/u', $text, $matcheTypes)){ # 匹配直组顺序：Array ( [0] => 直 [1] => 组 )
                         $mTypes = $matcheTypes; # Array ( [0] => 直 [1] => 组 )
@@ -285,17 +287,27 @@ class MethodMatchService extends CommonBaseService
                         if($flag){
                             throw_info('组六号码不能有重复：'.$code);
                         }
+
                         # 组六
-                        $methodArr['methodArr6'][] = ['id' => self::METHOD_ID_ZULIU, 'name' => '组六', 'code' => $reSortCode, 'count' => 1];
+                        $zuliu = ['id' => self::METHOD_ID_ZULIU, 'name' => '组六', 'code' => $reSortCode, 'count' => 1];
+                        if(!empty($singleArr)){
+                            $zuliu['single'] = $singleArr['组六'];
+                        }
+                        $methodArr['methodArr6'][] = $zuliu;
+
                         # 组三三码
-                        $methodArr['methodArr3'][] = ['id' => self::METHOD_ID_ZS_3_MA, 'name' => '组三三码', 'code' => $reSortCode, 'count' => 1];
+                        $zusan = ['id' => self::METHOD_ID_ZS_3_MA, 'name' => '组三三码', 'code' => $reSortCode, 'count' => 1];
+                        if(!empty($singleArr)){
+                            $zusan['single'] = $singleArr['组三'];
+                        }
+                        $methodArr['methodArr3'][] = $zusan;
                     }else{
                         # len>3
                         if($flag){
                             throw_info('组三组六多码号码不能有重复：'.$code);
                         }
-                        MethodMatchService::getMethodArrDatas($reSortCode, '组三', $methodArr);
-                        MethodMatchService::getMethodArrDatas($reSortCode, '组六', $methodArr);
+                        MethodMatchService::getMethodArrDatas($reSortCode, '组三', $methodArr, $singleArr);
+                        MethodMatchService::getMethodArrDatas($reSortCode, '组六', $methodArr, $singleArr);
                     }
                     break;
                 case strpos($text, '组三') !== false:
@@ -348,6 +360,9 @@ class MethodMatchService extends CommonBaseService
                     }
                     break;
                 case strpos($text, '直') !== false:
+                    if($len != 3) {
+                        break;
+                    }
                     $methodArr['methodArrZhi'][] = ['id'=>self::METHOD_ID_ZHIXUAN, 'name'=>'直选', 'code'=>$code];
                     break;
                 default:
@@ -410,7 +425,7 @@ class MethodMatchService extends CommonBaseService
      * @param $methodArr
      * @return mixed
      */
-    public static function getMethodArrDatas($code, $name, &$methodArr){
+    public static function getMethodArrDatas($code, $name, &$methodArr, $singleArr=[]){
         $len = strlen($code);
         $changeNameArr = array_flip(ThirdDTypeService::SINGLE_ASSCIATE); //p($changeNameArr);
         $cnNum = $changeNameArr[$len];
@@ -418,50 +433,80 @@ class MethodMatchService extends CommonBaseService
             # 组三多码
             switch ($len){
                 case 2:
-                    $methodArr['methodArr32'][] = ['id'=>17, 'name'=>'组三两码', 'code'=>$code, 'count'=>1];
+                    $methodArr32 = ['id'=>17, 'name'=>'组三两码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组三'])) && ($methodArr32['single'] = $singleArr['组三']);
+                    $methodArr['methodArr32'][] = $methodArr32;
                     break;
                 case 3:
-                    $methodArr['methodArr33'][] = ['id'=>18, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    $methodArr33 = ['id'=>18, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组三'])) && ($methodArr33['single'] = $singleArr['组三']);
+                    $methodArr['methodArr33'][] = $methodArr33;
                     break;
                 case 4:
-                    $methodArr['methodArr34'][] = ['id'=>19, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    $methodArr34 = ['id'=>19, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组三'])) && ($methodArr34['single'] = $singleArr['组三']);
+                    $methodArr['methodArr34'][] = $methodArr34;
                     break;
                 case 5:
-                    $methodArr['methodArr35'][] = ['id'=>20, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    $methodArr35 = ['id'=>20, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组三'])) && ($methodArr35['single'] = $singleArr['组三']);
+                    $methodArr['methodArr35'][] = $methodArr35;
                     break;
                 case 6:
-                    $methodArr['methodArr36'][] = ['id'=>21, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    $methodArr36 = ['id'=>21, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组三'])) && ($methodArr36['single'] = $singleArr['组三']);
+                    $methodArr['methodArr36'][] = $methodArr36;
                     break;
                 case 7:
-                    $methodArr['methodArr37'][] = ['id'=>22, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    $methodArr37 = ['id'=>22, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组三'])) && ($methodArr37['single'] = $singleArr['组三']);
+                    $methodArr['methodArr37'][] = $methodArr37;
                     break;
                 case 8:
-                    $methodArr['methodArr38'][] = ['id'=>23, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    $methodArr38 = ['id'=>23, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组三'])) && ($methodArr38['single'] = $singleArr['组三']);
+                    $methodArr['methodArr38'][] = $methodArr38;
                     break;
                 case 9:
-                    $methodArr['methodArr39'][] = ['id'=>24, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    $methodArr39 = ['id'=>24, 'name'=>'组三'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组三'])) && ($methodArr39['single'] = $singleArr['组三']);
+                    $methodArr['methodArr39'][] = $methodArr39;
                     break;
             }
         }else{
+            #p(['singleArr'=>$singleArr]);
+            (!empty($singleArr) && isset($singleArr['组三'])) && ($methodArr32['single'] = $singleArr['组三']);
             # 组六多码
             switch ($len){
                 case 4:
-                    $methodArr['methodArr64'][] = ['id'=>10, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    $methodArr64 = ['id'=>10, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组六'])) && ($methodArr64['single'] = $singleArr['组六']);
+                    $methodArr['methodArr64'][] = $methodArr64;
                     break;
                 case 5:
-                    $methodArr['methodArr65'][] = ['id'=>11, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    $methodArr65 = ['id'=>11, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组六'])) && ($methodArr65['single'] = $singleArr['组六']);
+                    $methodArr['methodArr65'][] = $methodArr65;
                     break;
                 case 6:
-                    $methodArr['methodArr66'][] = ['id'=>12, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    $methodArr66 = ['id'=>12, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组六'])) && ($methodArr66['single'] = $singleArr['组六']);
+                    $methodArr['methodArr66'][] = $methodArr66;
                     break;
                 case 7:
-                    $methodArr['methodArr67'][] = ['id'=>13, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    $methodArr67 = ['id'=>13, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组六'])) && ($methodArr67['single'] = $singleArr['组六']);
+                    $methodArr['methodArr67'][] = $methodArr67;
                     break;
                 case 8:
-                    $methodArr['methodArr68'][] = ['id'=>14, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    $methodArr68 = ['id'=>14, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组六'])) && ($methodArr68['single'] = $singleArr['组六']);
+                    $methodArr['methodArr68'][] = $methodArr68;
                     break;
                 case 9:
-                    $methodArr['methodArr69'][] = ['id'=>15, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    $methodArr69 = ['id'=>15, 'name'=>'组六'.$cnNum.'码', 'code'=>$code, 'count'=>1];
+                    (!empty($singleArr['组六'])) && ($methodArr69['single'] = $singleArr['组六']);
+                    $methodArr['methodArr69'][] = $methodArr69;
                     break;
             }
         }
@@ -505,14 +550,12 @@ class MethodMatchService extends CommonBaseService
         // 使用正则表达式匹配所有单个数字
         $text = str_replace(',', ' ', trim($text));
         if (strpos($text, '双飞') !==false && preg_match_all('/(\d{2}(?:\s*\d{2})*)/', $text, $matches)) {
-            $numbers = $matches[1][0];
+            $codes = $matches[1];
         }
-        #p([$text, $matchName, $numbers]);
 
-        if(empty($numbers) && $numbers === ''){
+        if(empty($codes)){
             throw_info('获取号码异常');
         }
-        $codes = explode(' ', $numbers);
         $count = count($codes);
 
         $codes = CommonService::reSortCodes($codes); # 排序数据内的号码

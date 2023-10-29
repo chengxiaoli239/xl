@@ -35,6 +35,8 @@ class EYunMessageOperateService  extends EYunBaseService
 
     public static $methodDatas = [];
     public static $aliasNameToOriginName = [];
+    public static $gLotteryType = 0;
+    public static $gLotteryName = '';
 
     public function __construct($user_id='')
     {
@@ -74,15 +76,25 @@ class EYunMessageOperateService  extends EYunBaseService
      * 重置匹配文本
      * @param $text
      */
-    public static function resetText($text){
+    public static function resetMethodText($text)
+    {
         $text = str_replace('。', '#', $text); # 玩法之间分隔符
+        return $text;
+    }
+
+    /**
+     * 重置匹配文本
+     * @param $text
+     */
+    public static function resetText($text){
+        #$text = str_replace('。', '#', $text); # 玩法之间分隔符
         $text = str_replace('，', ' ', $text); # 中文逗号
         $text = str_replace('：', '', $text); # 中文冒号
         $text = str_replace(':', '', $text); # 中文冒号
         $text = str_replace('一单', '一直', $text); # 中文冒号，
         $text = str_replace('组一直一', '一直一组', $text); # 中文冒号，
 
-        $text = str_replace(['总计', '计', '='], '共', $text); # 同义词替换
+        $text = str_replace(['共计', '总计', '计', '='], '共', $text); # 同义词替换
         $text = str_replace('块', '元', $text); # 同义词替换
         $text = str_replace(['、', '*', "\n"], ' ', $text); # 同义词替换
         $text = str_replace(['各打', '各买', "打", "买"], '各', $text); # 同义词替换
@@ -93,12 +105,12 @@ class EYunMessageOperateService  extends EYunBaseService
         if(preg_match('/各([\p{Han}一二三四五六七八九十]{1,3})元/', $text, $matches3)){
             $t = $matches3[1];
             $s = ThirdD::cnToNums($t); # 中文转数字
-            $text = str_replace($matches3[0], '', $text);
-            $text = str_replace('共', '各'.$s.'元共', $text);
+            #p([$text, $matches3[0], $s]);
+            $text = str_replace($matches3[0], '各'.$s.'元', $text);
+            #$text = str_replace('共', '各'.$s.'元共', $text);
         }
         $allTmpMoney = 0.00;
         if(!preg_match('/各(\d+)/', $text, $matches)){ # 没匹配到倍数，做兼容处理
-            #p($text);
             if(preg_match('/共(\d+)/', $text, $matches2)){
                 $allTmpMoney = $matches2[1];
                 if(preg_match('/(\d+)元/', $text, $matches4)){
@@ -153,8 +165,9 @@ class EYunMessageOperateService  extends EYunBaseService
         }
         $texts = implode(MethodMatchService::METHOD_SPLIT_FLAG, $texts);
         #p([$texts, $allTmpMoney, $perAllMoney]);
+        $texts = strtr($texts, ['各各'=>'各', '共共'=>'共']);
 
-        return $texts;
+        return trim($texts, '#');
     }
 
     /**
@@ -179,23 +192,35 @@ class EYunMessageOperateService  extends EYunBaseService
             $stepText = [
                 'originText' => $text,
             ];
-            $text = EYunMessageOperateService::resetText($text); # 重置匹配文本
+            $text = EYunMessageOperateService::resetMethodText($text); # 重置匹配文本
             $stepText['stepOneText'] = $text;
 
-            $betTexts = explode(MethodMatchService::METHOD_SPLIT_FLAG, $text);
+            $betTexts = array_filter(explode(MethodMatchService::METHOD_SPLIT_FLAG, $text));
+            Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-00', ['text'=>$text, 'betTexts'=>$betTexts]);
             $dataGroups = [];
-            #p($betTexts);
             foreach ($betTexts as $k1=>$betText){
+                $betText = trim($betText, "\r\n");
+                $betText = EYunMessageOperateService::resetText($betText); # 重置匹配文本
                 # 重置一下格式方便处理：福+玩法+号码+各x元
                 #EYunMessageOperateService::resetBetText($betText);
                 $g = [];
                 $g['betText'] = $betText;
-                list($lottery_type, $lottery_name, $matchTexts) = ThirdDTypeService::getLotteryType($betText);
+                list($lottery_type, $lottery_name, $matchTexts) = ThirdDTypeService::getLotteryType($betText, $isEmpty);
                 foreach ($matchTexts as $matchText){
                     $betText = trim(str_replace($matchText, '', $betText), ',');
                 }
+                if($isEmpty){
+                    # 彩种匹配为空则取上次匹配的结果
+                    $lottery_type = self::$gLotteryType;
+                    $lottery_name = self::$gLotteryName;
+                }
+                self::$gLotteryType = $lottery_type;
+                self::$gLotteryName = $lottery_name;
 
                 list($playMethod, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($betText);
+                if(empty($playMethod)){
+                    continue; # 匹配不到玩法则忽略
+                }
                 $logArr = ['betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count];
                 Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-01', $logArr);
                 $g['codes'] = $codes;
@@ -261,10 +286,10 @@ class EYunMessageOperateService  extends EYunBaseService
                 $dataGroups['betCodeContents'][$lottery_type][] = $g;
             }
         }catch (\Exception $e){
+            Tool_Common::log('/wechat/'.__FUNCTION__, 'ERR', '消息接收处理异常', ['text'=>$text, 'betText'=>$betText, 'err_msg'=>$e->getMessage().'_'.$e->getFile().'_'.$e->getLine()]);
             if($e->getCode() == ThirdDTypeService::CODE_FOR_USER){
                 return [$e->getCode(), [], $e->getMessage()];
             }
-            Tool_Common::log('/wechat/'.__FUNCTION__, 'ERR', '消息接收处理异常', ['text'=>$text, 'err_msg'=>$e->getMessage().'_'.$e->getFile().'_'.$e->getLine()]);
             return [30001, [], $e->getMessage()];
         }
         #p($dataGroups);

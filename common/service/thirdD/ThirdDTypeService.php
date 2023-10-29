@@ -34,7 +34,7 @@ class ThirdDTypeService extends CommonBaseService
      * @param string $text
      * @return array
      */
-    public static function getLotteryType($text=''){
+    public static function getLotteryType($text='', &$isEmpty=false){
         $lottery_types = [
             ThirdDTypeService::LOTTERY_TYPE_FUCAI,
             ThirdDTypeService::LOTTERY_TYPE_PL3,
@@ -49,6 +49,7 @@ class ThirdDTypeService extends CommonBaseService
             }
         }
         if(empty($result)){
+            $isEmpty = true;
             # 默认为福彩
             $lottery_type = ThirdDTypeService::LOTTERY_TYPE_FUCAI;
         }
@@ -119,7 +120,7 @@ class ThirdDTypeService extends CommonBaseService
             )
         ) { # 直、组（原先的组三组六）
             #$methodArr = MethodMatchService::matchZhiZu($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-            $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+            $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count);
         }else if($methodArr['originName'] == '独胆') { # 4独胆
             $methodArr = MethodMatchService::matchDuDan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }else if($methodArr['originName'] == '双飞' OR $methodArr['originName'] == '对子全拖') { # 5双飞
@@ -143,8 +144,48 @@ class ThirdDTypeService extends CommonBaseService
             )
 
         ) { # 1、2、3组选
+            $singleArr = [];
+            $pattern = '/(组三|组六)\s*各[0-9一二三四五六七八九十]+\s*[元倍]/u';
+            #$pattern = '/(组三|组六)各\s*[0-9一二三四五六七八九十]+\s*(倍|元)/u';
+            if(preg_match_all($pattern, $text, $matcheSingles)){
+                #p([$matchMethodAndCodeText, $text, $matcheSingles]);
+                # $matcheSingles Array ( [0] => Array ( [0] => 组六各4倍 [1] => 组三各20元 ) [1] => Array ( [0] => 组六 [1] => 组三 ) [2] => Array ( [0] => 倍 [1] => 元 ) )
+                foreach ($matcheSingles[0] as $matcheSingle){
+                    $sData = explode('各', $matcheSingle);
+                    $tmpSingle = 1;
+                    if(strpos($sData[1], '倍') !== false){
+                        # 倍
+                        $singleTxt = str_replace('倍', '', $sData[1]);
+                        if(is_numeric($singleTxt)){
+                            $tmpSingle = $singleTxt * 10; #  转换成元
+                        }else{
+                            # 中文
+                            $tmpSingle = ThirdD::cnToNums($singleTxt) * 10; #  # 中文转数字  转换成元
+                        }
+                    }else{
+                        $singleTxt = str_replace('元', '', $sData[1]);
+                        if(is_numeric($singleTxt)){
+                            $tmpSingle = $singleTxt; #  转换成元
+                        }else{
+                            # 中文
+                            $tmpSingle = ThirdD::cnToNums($singleTxt); #  # 中文转数字  转换成元
+                        }
+                        # 元
+                    }
+                    $singleArr[$sData[0]] = $tmpSingle; # 倍数转换成：元
+                }
+            }
+            #p([$matchMethodAndCodeText, $text, $matcheSingles, $methodArr, $singleArr]);
             # 玩法类型组合：组三、组六、组三&组六、直&组（一直一组，二直三组，直组）、组选、组、直||直选
-            $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+            if(strpos($text, '组三') !== false && strpos($text, '组六') !== false && !empty($singleArr)){
+                $matchMethodAndCodeText = $text;
+                foreach ($matcheSingles[0] as $matcheSingle){
+                    $matchMethodAndCodeText = str_replace($matcheSingle, '', $matchMethodAndCodeText);
+                }
+                $matchMethodAndCodeText .= '组三组六';
+            }
+            #p([$matchMethodAndCodeText, $matcheSingles,$text, $methodArr, $singleArr]);
+            $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count, $singleArr);
 
         #}else if($methodArr['originName'] == '组六四码') { # 10组六四码
         #    $methodArr = MethodMatchService::matchZuLiuXMa($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name'], $t ='四');

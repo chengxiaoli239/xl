@@ -11,6 +11,23 @@ use yii\grid\GridView;
 $this->title = '3D记录';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<style>
+    /* 默认的弹框大小 */
+    .modal-lg {
+        width: 65%;
+        height: 30%;
+        margin: 100px auto;
+    }
+
+    /* 在小屏幕上设置较大的弹框大小 */
+    @media (max-width: 768px) {
+        .modal-lg {
+            width: 90%;
+            height: 30%;
+            margin: 50px auto;
+        }
+    }
+</style>
 <section class="bets-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
@@ -122,7 +139,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <!-- page end-->
 </section>
 <div class="modal fade " id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
-    <div class="modal-dialog modal-lg" role="document" style="width: 85%; height: 30%;margin: 100px auto;">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
