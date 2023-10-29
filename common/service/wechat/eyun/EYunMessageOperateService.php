@@ -88,6 +88,8 @@ class EYunMessageOperateService  extends EYunBaseService
      */
     public static function resetText($text){
         #$text = str_replace('。', '#', $text); # 玩法之间分隔符
+        $text = str_replace('组6 ', '组六 ', $text); # 中文逗号
+        $text = str_replace('组3 ', '组三 ', $text); # 中文逗号
         $text = str_replace('，', ' ', $text); # 中文逗号
         $text = str_replace('：', '', $text); # 中文冒号
         $text = str_replace(':', '', $text); # 中文冒号

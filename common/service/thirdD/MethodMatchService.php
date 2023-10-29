@@ -324,7 +324,8 @@ class MethodMatchService extends CommonBaseService
                     break;
                 case strpos($text, '组六') !== false:
                     if($len==2){
-                        throw_info('组六号码至少3个号码：'.$code);
+                        #throw_info('组六号码至少3个号码：'.$code);
+                        break;
                     }
                     if($flag){
                         throw_info('组六号码不能重复：'.$code);
