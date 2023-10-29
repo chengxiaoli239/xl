@@ -250,8 +250,8 @@ class MethodMatchService extends CommonBaseService
                             $singleD = [];
                             foreach ($mTypes as $key=>$mType){
                                 $singleD[$key] = [
-                                    $mType[0]=>is_numeric($matches[1][0])?(int)$matches[1][0] : ThirdD::cnToNums($matches[1][0]) * 2, # 直、组都是两元一倍，所以这里 *2
-                                    $mType[1]=>is_numeric($matches[2][0])?(int)$matches[2][0] : ThirdD::cnToNums($matches[2][0]) * 2, # 直、组都是两元一倍，所以这里 *2
+                                    $mType[0]=>is_numeric($matches[1][0])?(int)$matches[1][0] : ThirdD::cn2num($matches[1][0]) * 2, # 直、组都是两元一倍，所以这里 *2
+                                    $mType[1]=>is_numeric($matches[2][0])?(int)$matches[2][0] : ThirdD::cn2num($matches[2][0]) * 2, # 直、组都是两元一倍，所以这里 *2
                                 ];
                             }
                             #p([$matcheTypes, $text, $matches, $singleD], 0);

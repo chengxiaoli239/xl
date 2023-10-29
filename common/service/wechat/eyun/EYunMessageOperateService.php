@@ -104,7 +104,7 @@ class EYunMessageOperateService  extends EYunBaseService
         }
         if(preg_match('/各([\p{Han}一二三四五六七八九十]{1,3})元/', $text, $matches3)){
             $t = $matches3[1];
-            $s = ThirdD::cnToNums($t); # 中文转数字
+            $s = ThirdD::cn2num($t); # 中文转数字
             #p([$text, $matches3[0], $s]);
             $text = str_replace($matches3[0], '各'.$s.'元', $text);
             #$text = str_replace('共', '各'.$s.'元共', $text);

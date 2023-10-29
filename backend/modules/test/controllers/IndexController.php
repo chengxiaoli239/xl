@@ -336,6 +336,7 @@ class IndexController extends Controller
         #$sort_codes = CommonService::reSortCodes($codesArr=[12, 43, 796]); p($sort_codes);
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
+        #$num = \common\service\helpers\ThirdD::cn2num('三百五十二');p($num);
         $user_id = 21;
         #$e = new EYunBaseService($user_id);
         #$loginRst = $e->memberLogin($id=2); p($loginRst);

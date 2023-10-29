@@ -145,14 +145,13 @@ class ThirdDTypeService extends CommonBaseService
 
         ) { # 1、2、3组选
             $singleArr = [];
-            $pattern = '/(组三|组六)\s*各[0-9一二三四五六七八九十]+\s*[元倍]/u';
+            $pattern = '/(组六|组三)\s*各\s*([一二两三四五六七八九十]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+\s*倍)/u';
             #$pattern = '/(组三|组六)各\s*[0-9一二三四五六七八九十]+\s*(倍|元)/u';
-            if(preg_match_all($pattern, $text, $matcheSingles)){
+            if(strpos($text, '组三') !== false && strpos($text, '组六') !== false && preg_match_all($pattern, $text, $matcheSingles)){
                 #p([$matchMethodAndCodeText, $text, $matcheSingles]);
                 # $matcheSingles Array ( [0] => Array ( [0] => 组六各4倍 [1] => 组三各20元 ) [1] => Array ( [0] => 组六 [1] => 组三 ) [2] => Array ( [0] => 倍 [1] => 元 ) )
                 foreach ($matcheSingles[0] as $matcheSingle){
                     $sData = explode('各', $matcheSingle);
-                    $tmpSingle = 1;
                     if(strpos($sData[1], '倍') !== false){
                         # 倍
                         $singleTxt = str_replace('倍', '', $sData[1]);
@@ -160,7 +159,7 @@ class ThirdDTypeService extends CommonBaseService
                             $tmpSingle = $singleTxt * 10; #  转换成元
                         }else{
                             # 中文
-                            $tmpSingle = ThirdD::cnToNums($singleTxt) * 10; #  # 中文转数字  转换成元
+                            $tmpSingle = ThirdD::cn2num($singleTxt) * 10; #  # 中文转数字  转换成元
                         }
                     }else{
                         $singleTxt = str_replace('元', '', $sData[1]);
@@ -168,7 +167,7 @@ class ThirdDTypeService extends CommonBaseService
                             $tmpSingle = $singleTxt; #  转换成元
                         }else{
                             # 中文
-                            $tmpSingle = ThirdD::cnToNums($singleTxt); #  # 中文转数字  转换成元
+                            $tmpSingle = ThirdD::cn2num($singleTxt); #  # 中文转数字  转换成元
                         }
                         # 元
                     }
@@ -293,10 +292,10 @@ class ThirdDTypeService extends CommonBaseService
         }
 
         // 使用正则表达式匹配 "倍" 前面的中文一到九
-        if(empty($single) && preg_match('/([\p{Han}一二三四五六七八九十]{1,3})倍/u', $text, $matches)) {
+        if(empty($single) && preg_match('/([一二三四五六七八九十]{1,3})倍/u', $text, $matches)) {
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
             $t = $matches[1];
-            $s = ThirdD::cnToNums($t); # 中文转数字，一=>1、二=>2.。。。
+            $s = ThirdD::cn2num($t); # 中文转数字，一=>1、二=>2.。。。
             #p([$t, $s, $matchName, $matches, $methods]);
             $single = $s * (int)$methods[$matchName]['money'];
             $single_cn_text = '倍';
@@ -327,7 +326,7 @@ class ThirdDTypeService extends CommonBaseService
         if (empty($single) && preg_match('/([\p{Han}一二三四五六七八九十]{1,3})元/u', $text, $matches)) {
             $t = $matches[1];
             $single_txt = $matches[1];
-            $single = ThirdD::cnToNums($t); # 中文转数字
+            $single = ThirdD::cn2num($t); # 中文转数字
         }
 
         $data = [
