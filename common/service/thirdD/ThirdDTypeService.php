@@ -114,11 +114,14 @@ class ThirdDTypeService extends CommonBaseService
         $matchMethodAndCodeText = explode('各', $text)[0];
         #p(['methodArr'=>$methodArr, 'text'=>$text, 'matchMethodAndCodeText'=>$matchMethodAndCodeText]);
         #if(strpos($matchMethodAndCodeText, $methodArr['name'])===false) $matchMethodAndCodeText = $methodArr['name'].$matchMethodAndCodeText;
-        if( strpos($text, '复式')===false && (
+        if(strpos($text, '全包')!==false) { # 9豹子全包
+            $methodArr = MethodMatchService::matchQuanBao($matchMethodAndCodeText, $codes, $count);
+        }else if( strpos($text, '复式')===false && (
                 (strpos($text, '直选')!==false OR strpos($text, '直')!==false) OR
                 (strpos($text, '组')!==false && strpos($matchMethodAndCodeText, '组三')===false && strpos($matchMethodAndCodeText, '组六')===false)
             )
         ) { # 直、组（原先的组三组六）
+            p('dddd');
             #$methodArr = MethodMatchService::matchZhiZu($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
             $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count);
         }else if($methodArr['originName'] == '独胆') { # 4独胆
@@ -251,7 +254,7 @@ class ThirdDTypeService extends CommonBaseService
         }else{
             $codes = explode(' ', trim($matchMethodAndCodeText));
         }
-        //p(['methodArr'=>$methodArr, 'codes'=>$codes, 'count'=>$count]);
+        p(['methodArr'=>$methodArr, 'codes'=>$codes, 'count'=>$count]);
 
         return [$methodArr, $codes, $count];
     }
@@ -323,7 +326,7 @@ class ThirdDTypeService extends CommonBaseService
             $single = $matches[1];
         }
 
-        if (empty($single) && preg_match('/([\p{Han}一二三四五六七八九十]{1,3})元/u', $text, $matches)) {
+        if (empty($single) && preg_match('/([一二三四五六七八九十百千万]{1,3})元/u', $text, $matches)) {
             $t = $matches[1];
             $single_txt = $matches[1];
             $single = ThirdD::cn2num($t); # 中文转数字

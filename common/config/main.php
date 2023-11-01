@@ -29,9 +29,9 @@ return [
         ],
 
         'queue'  => [
-            //Redis ¶ÓÁÐ·½°¸
+            //Redis ï¿½ï¿½ï¿½Ð·ï¿½ï¿½ï¿½
             'class' => \yii\queue\redis\Queue::class,
-            // Á¬½Ó×é¼þ»òËüµÄÅäÖÃ
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             'redis' => 'redis',
             // Queue channel key
             'channel' => 'lottery:queue',

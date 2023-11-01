@@ -13,6 +13,10 @@ class ThirddController extends Controller
         parent::__construct($id, $module, $config);
     }
 
+    public function actionDw(){
+        var_dump('我擦 我擦');
+    }
+
     /**
      * php yii thirdd/run-lottery
      */
