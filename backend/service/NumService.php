@@ -3234,28 +3234,28 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=4); #
                     break;
                 case 134: # 过滤千位且全双
-                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=1, $filterTypes=['type_4ds'=>2]); #
+                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=1, $filterTypes=['type_4ds']); #
                     break;
                 case 135: # 过滤百位且全双
-                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=2, $filterTypes=['type_4ds'=>2]); #
+                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=2, $filterTypes=['type_4ds']); #
                     break;
                 case 136: # 过滤十位且全双
-                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=3, $filterTypes=['type_4ds'=>2]); #
+                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=3, $filterTypes=['type_4ds']); #
                     break;
                 case 137: # 过滤个位且全双
-                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=4, $filterTypes=['type_4ds'=>2]); #
+                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=4, $filterTypes=['type_4ds']); #
                     break;
                 case 139: # 过滤千位且全小
-                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=1, $filterTypes=['type_dx'=>1]); #
+                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=1, $filterTypes=['type_dx']); #
                     break;
                 case 139: # 过滤百位且全小
-                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=2, $filterTypes=['type_dx'=>1]); #
+                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=2, $filterTypes=['type_dx']); #
                     break;
                 case 140: # 过滤十位且全小
-                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=3, $filterTypes=['type_dx'=>1]); #
+                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=3, $filterTypes=['type_dx']); #
                     break;
                 case 141: # 过滤个位且全小
-                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=4, $filterTypes=['type_dx'=>1]); #
+                    $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=4, $filterTypes=['type_dx']); #
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
@@ -5222,7 +5222,7 @@ class NumService extends BaseService {
      * 过滤类型号码 - # 过滤千位+其它位置一起合分是千位
      * @param object $plan
      * @param int $positions
-     * @param array $filterTypes # lt_num4_type 类型字段+值
+     * @param array $filterTypes # lt_num4_type 号码类型字段，假如：type_4ds pos位置大就过滤大且pos号码，type_dx pos位置是小 则过滤小&pos号码
      * @return array
      */
     private static function getBeforeKjCodesDynamic116(object $plan, $pos=1, $filterTypes=[]){
@@ -5260,8 +5260,15 @@ class NumService extends BaseService {
         $andNotWhere = ['AND', ['=',$filterNum_code_field, $filterNum]];
         $notWhere = ['NOT' ];
         if(!empty($filterTypes)){
-            foreach ($filterTypes as $type=>$filterVal){
-                $andNotWhere[] = ['=', $type, $filterVal];
+            foreach ($filterTypes as $filterType){
+                if($filterType == 'type_4ds'){
+                    # type_4ds 单双
+                    $filterVal = in_array($filterNum, NumService::$SINGLE_CODES) ? 1 : 2; # 单双：0非四单四双1四单2四双3两单两双4一单三双5一双三单
+                }else{
+                    # type_dx # 大小
+                    $filterVal = in_array($filterNum, NumService::$MAX_CODES) ? 1 : 5; # type_dx:四定大小:0保留1全大2三大一小3两大两小4一大三小5全小
+                }
+                $andNotWhere[] = ['=', $filterType, $filterVal];
             }
         }else{
             $notWhere[] = ['IN', $otherHf, $filterHf];
