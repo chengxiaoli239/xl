@@ -247,14 +247,14 @@ class NumService extends BaseService {
         132=>'过滤十位+其它位置合分十 ',
         133=>'过滤个位+其它位置合分个 ',
 
-        134=>'过滤千位且全双 ',
-        135=>'过滤百位且全双 ',
-        136=>'过滤十位且全双 ',
-        137=>'过滤个位且全双 ',
-        138=>'过滤千位且全小 ',
-        139=>'过滤百位且全小 ',
-        140=>'过滤十位且全小 ',
-        141=>'过滤个位且全小 ',
+        134=>'过滤千位且单双 ',
+        135=>'过滤百位且单双 ',
+        136=>'过滤十位且单双 ',
+        137=>'过滤个位且单双 ',
+        138=>'过滤千位且大小 ',
+        139=>'过滤百位且大小 ',
+        140=>'过滤十位且大小 ',
+        141=>'过滤个位且大小 ',
     ];
 
     /**
@@ -3245,7 +3245,7 @@ class NumService extends BaseService {
                 case 137: # 过滤个位且全双
                     $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=4, $filterTypes=['type_4ds']); #
                     break;
-                case 139: # 过滤千位且全小
+                case 138: # 过滤千位且全小
                     $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=1, $filterTypes=['type_dx']); #
                     break;
                 case 139: # 过滤百位且全小
@@ -5274,6 +5274,8 @@ class NumService extends BaseService {
             $notWhere[] = ['IN', $otherHf, $filterHf];
         }
         $notWhere[] = $andNotWhere;
+
+        p($notWhere);
         $pos_field = 'code_'.$pos;
         $query = Num4Type::find()->alias('n')->select(['code', $pos_field, 'code_type'])
             ->where($notWhere)

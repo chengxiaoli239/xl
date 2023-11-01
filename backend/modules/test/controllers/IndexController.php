@@ -373,12 +373,12 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $plan = UserSysPlans::findOne(7609);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        p(count($filter_dynamic_codes));
         $d = Thirdd::getCurrentKjData($lottery_type=26);p($d);
         $Thirdd = new Thirdd();
         $data = $Thirdd->getFuCai3d($type='json', 2);p($data);
-        $plan = UserSysPlans::findOne(7585);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
-        p(count($filter_dynamic_codes));
         $rst = OperateLotteryService::operate($lottery_type=26); p($rst); # 处理3d开奖
         $lottery_types = StaticService::getLotteryTypes();
         p($lottery_types);
