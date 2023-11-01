@@ -13,6 +13,23 @@ $newRecord = SscKjData::find()->select(['qihao','code_str'])->where(['lottery_ty
 $this->title = Yii::t('app', 'Betting Records');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<style>
+    /* 默认的弹框大小 */
+    .modal-lg {
+        width: 85%;
+        height: 30%;
+        margin: 100px auto;
+    }
+
+    /* 在小屏幕上设置较大的弹框大小 */
+    @media (max-width: 768px) {
+        .modal-lg {
+            width: 98%;
+            height: 30%;
+            margin: 50px auto;
+        }
+    }
+</style>
 <section class="betting-records-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
@@ -50,10 +67,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->qihao;
                             }
                         ],
-                        ['attribute' => 'codes',
+                        ['attribute' => 'codes','headerOptions'=>['width'=>'25%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                $txt = BaseStringHelper::truncate($model->codes,25);
+                                $txt = BaseStringHelper::truncate($model->codes,15);
                                 return Html::a($txt, 'javascript:;', [
                                     'class'=>'act-post-desc',
                                     'title'=>$model->post_desc,
@@ -189,7 +206,7 @@ $this->params['breadcrumbs'][] = $this->title;
 </section>
 <!--提示框-start-->
 <div class="modal fade " id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
-    <div class="modal-dialog modal-lg" role="document" style="width: 800px;margin: 100px auto;">
+    <div class="modal-dialog modal-lg" role="document" >
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">

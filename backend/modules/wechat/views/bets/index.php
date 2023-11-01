@@ -129,8 +129,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return substr($model->update_at, 5, 11);
                             }
                         ],
-
-                        #['class' => 'yii\grid\ActionColumn'],
+                        //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
             </div>
