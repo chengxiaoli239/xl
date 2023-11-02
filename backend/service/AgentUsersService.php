@@ -160,8 +160,8 @@ class AgentUsersService extends BaseService {
             $after_balance = $AgentUsers->balance + $changeBalance ;
             $AgentUsers->balance = $after_balance;
             $AgentUsers->updated_at = time();
-            if(!$flag = $AgentUsers->save()){
-                return ['status'=>303, 'msg'=>current($AgentUsers->getFirstError())];
+            if(!$AgentUsers->save()){
+                return ['status'=>303, 'msg'=>current($AgentUsers->getFirstErrors())];
             }
 
             $AgentUsersBalanceFlows->balance_after = $after_balance;

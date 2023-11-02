@@ -117,11 +117,10 @@ class ThirdDTypeService extends CommonBaseService
         if(strpos($text, '全包')!==false) { # 9豹子全包
             $methodArr = MethodMatchService::matchQuanBao($matchMethodAndCodeText, $codes, $count);
         }else if( strpos($text, '复式')===false && (
-                (strpos($text, '直选')!==false OR strpos($text, '直')!==false) OR
-                (strpos($text, '组')!==false && strpos($matchMethodAndCodeText, '组三')===false && strpos($matchMethodAndCodeText, '组六')===false)
+                (strpos($text, '直')!==false && strpos($text, '组三')===false && strpos($text, '组六')===false) OR
+                (strpos($text, '组')!==false && strpos($text, '组三')===false && strpos($text, '组六')===false)
             )
         ) { # 直、组（原先的组三组六）
-            p('dddd');
             #$methodArr = MethodMatchService::matchZhiZu($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
             $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count);
         }else if($methodArr['originName'] == '独胆') { # 4独胆
@@ -147,46 +146,7 @@ class ThirdDTypeService extends CommonBaseService
             )
 
         ) { # 1、2、3组选
-            $singleArr = [];
-            $pattern = '/(组六|组三)\s*各\s*([一二两三四五六七八九十]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+\s*倍)/u';
-            #$pattern = '/(组三|组六)各\s*[0-9一二三四五六七八九十]+\s*(倍|元)/u';
-            if(strpos($text, '组三') !== false && strpos($text, '组六') !== false && preg_match_all($pattern, $text, $matcheSingles)){
-                #p([$matchMethodAndCodeText, $text, $matcheSingles]);
-                # $matcheSingles Array ( [0] => Array ( [0] => 组六各4倍 [1] => 组三各20元 ) [1] => Array ( [0] => 组六 [1] => 组三 ) [2] => Array ( [0] => 倍 [1] => 元 ) )
-                foreach ($matcheSingles[0] as $matcheSingle){
-                    $sData = explode('各', $matcheSingle);
-                    if(strpos($sData[1], '倍') !== false){
-                        # 倍
-                        $singleTxt = str_replace('倍', '', $sData[1]);
-                        if(is_numeric($singleTxt)){
-                            $tmpSingle = $singleTxt * 10; #  转换成元
-                        }else{
-                            # 中文
-                            $tmpSingle = ThirdD::cn2num($singleTxt) * 10; #  # 中文转数字  转换成元
-                        }
-                    }else{
-                        $singleTxt = str_replace('元', '', $sData[1]);
-                        if(is_numeric($singleTxt)){
-                            $tmpSingle = $singleTxt; #  转换成元
-                        }else{
-                            # 中文
-                            $tmpSingle = ThirdD::cn2num($singleTxt); #  # 中文转数字  转换成元
-                        }
-                        # 元
-                    }
-                    $singleArr[$sData[0]] = $tmpSingle; # 倍数转换成：元
-                }
-            }
-            #p([$matchMethodAndCodeText, $text, $matcheSingles, $methodArr, $singleArr]);
-            # 玩法类型组合：组三、组六、组三&组六、直&组（一直一组，二直三组，直组）、组选、组、直||直选
-            if(strpos($text, '组三') !== false && strpos($text, '组六') !== false && !empty($singleArr)){
-                $matchMethodAndCodeText = $text;
-                foreach ($matcheSingles[0] as $matcheSingle){
-                    $matchMethodAndCodeText = str_replace($matcheSingle, '', $matchMethodAndCodeText);
-                }
-                $matchMethodAndCodeText .= '组三组六';
-            }
-            #p([$matchMethodAndCodeText, $matcheSingles,$text, $methodArr, $singleArr]);
+            list($matchMethodAndCodeText, $singleArr) = ThirdDTypeService::getTwoMethodAndSingle($text, $matchMethodAndCodeText, $singleArr);
             $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count, $singleArr);
 
         #}else if($methodArr['originName'] == '组六四码') { # 10组六四码
@@ -254,9 +214,118 @@ class ThirdDTypeService extends CommonBaseService
         }else{
             $codes = explode(' ', trim($matchMethodAndCodeText));
         }
-        p(['methodArr'=>$methodArr, 'codes'=>$codes, 'count'=>$count]);
+        #p(['methodArr'=>$methodArr, 'codes'=>$codes, 'count'=>$count]);
 
         return [$methodArr, $codes, $count];
+    }
+
+    /**
+     * 获取两种玩法：直组、组三组六
+     * @param $text
+     * @param $matchMethodAndCodeText
+     * @param $singleArr
+     * @return array
+     */
+    public static function getTwoMethodAndSingle($text='', $matchMethodAndCodeText='', &$singleArr=[]){
+        $pattern36 = '/(组六|组三)\s*各\s*([一二两三四五六七八九十]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+\s*倍)/u';
+        $patternZhiZu = '/(直|组三|组六|组)\s*各\s*([一二两三四五六七八九十]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+\s*倍)/u';
+        #$pattern = '/(组三|组六)各\s*[0-9一二三四五六七八九十]+\s*(倍|元)/u';
+        switch (true){
+            # 匹配组三组六
+            case strpos($text, '组三') !== false && strpos($text, '组六') !== false && preg_match_all($pattern36, $text, $matcheSingles):
+                #p([$matchMethodAndCodeText, $text, $matcheSingles]);
+                # $matcheSingles Array ( [0] => Array ( [0] => 组六各4倍 [1] => 组三各20元 ) [1] => Array ( [0] => 组六 [1] => 组三 ) [2] => Array ( [0] => 倍 [1] => 元 ) )
+                //p($matcheSingles);
+                foreach ($matcheSingles[0] as $matcheSingle){
+                    $sData = explode('各', $matcheSingle);
+                    if(strpos($sData[1], '倍') !== false){
+                        # 倍
+                        $singleTxt = str_replace('倍', '', $sData[1]);
+                        if(is_numeric($singleTxt)){
+                            $tmpSingle = $singleTxt * 10; #  转换成元
+                        }else{
+                            # 中文
+                            $tmpSingle = ThirdD::cn2num($singleTxt) * 10; #  # 中文转数字  转换成元
+                        }
+                    }else{
+                        $singleTxt = str_replace('元', '', $sData[1]);
+                        if(is_numeric($singleTxt)){
+                            $tmpSingle = $singleTxt; #  转换成元
+                        }else{
+                            # 中文
+                            $tmpSingle = ThirdD::cn2num($singleTxt); #  # 中文转数字  转换成元
+                        }
+                        # 元
+                    }
+                    $singleArr[$sData[0]] = $tmpSingle; # 倍数转换成：元
+                }
+                #p($singleArr);
+                if(!empty($singleArr)){
+                    if(count($singleArr)==1){
+                        $singleArr = [
+                            '组三' => current($singleArr),
+                            '组六' => current($singleArr),
+                        ];
+                    }
+                    $matchMethodAndCodeText = $text;
+                    foreach ($matcheSingles[0] as $matcheSingle){
+                        $matchMethodAndCodeText = str_replace($matcheSingle, '', $matchMethodAndCodeText);
+                    }
+                    $matchMethodAndCodeText = str_replace('组三', '', $matchMethodAndCodeText);
+                    $matchMethodAndCodeText = str_replace('组六', '', $matchMethodAndCodeText);
+                    $matchMethodAndCodeText .= '组三组六';
+                }
+                break;
+            case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternZhiZu, $text, $matcheSingles):
+                foreach ($matcheSingles[0] as $matcheSingle){
+                    $sData = explode('各', $matcheSingle);
+                    if(strpos($sData[1], '倍') !== false){
+                        # 倍
+                        $singleTxt = str_replace('倍', '', $sData[1]);
+                        if(is_numeric($singleTxt)){
+                            $tmpSingle = $singleTxt * 10; #  转换成元
+                        }else{
+                            # 中文
+                            $tmpSingle = ThirdD::cn2num($singleTxt) * 10; #  # 中文转数字  转换成元
+                        }
+                    }else{
+                        $singleTxt = str_replace('元', '', $sData[1]);
+                        if(is_numeric($singleTxt)){
+                            $tmpSingle = $singleTxt; #  转换成元
+                        }else{
+                            # 中文
+                            $tmpSingle = ThirdD::cn2num($singleTxt); #  # 中文转数字  转换成元
+                        }
+                        # 元
+                    }
+                    $singleArr[$sData[0]] = $tmpSingle; # 倍数转换成：元
+                }
+                if(!empty($singleArr)){
+                    if(count($singleArr)==1){
+                        $singleArr = [
+                            '直' => current($singleArr),
+                            '组三' => current($singleArr),
+                            '组六' => current($singleArr),
+                        ];
+                    }
+                    $matchMethodAndCodeText = $text;
+                    foreach ($matcheSingles[0] as $matcheSingle){
+                        $matchMethodAndCodeText = str_replace($matcheSingle, '', $matchMethodAndCodeText);
+                    }
+                    $matchMethodAndCodeText = str_replace('组三', '', $matchMethodAndCodeText);
+                    $matchMethodAndCodeText = str_replace('组六', '', $matchMethodAndCodeText);
+                    $matchMethodAndCodeText .= '直组';
+                }
+                #p([$text, $matcheSingles, $singleArr]);
+
+                break;
+        }
+        #p([$matchMethodAndCodeText, $text, $matcheSingles, $methodArr, $singleArr]);
+        # 玩法类型组合：组三、组六、组三&组六、直&组（一直一组，二直三组，直组）、组选、组、直||直选
+
+        #p([$matchMethodAndCodeText, $matcheSingles, $text, $singleArr]);
+
+        return [$matchMethodAndCodeText, $singleArr];
     }
 
     /**

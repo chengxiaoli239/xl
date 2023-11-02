@@ -262,6 +262,9 @@ class MethodMatchService extends CommonBaseService
                     if(!empty($singleD[0]['直'])){
                         $zhi['single'] = $singleD[0]['直'];
                     }
+                    if(!empty($singleArr['直'])){
+                        $zhi['single'] = $singleArr['直'];
+                    }
                     $methodArr['methodArrZhi'][] = $zhi;
                     if(!$flag){
                         # 组六
@@ -269,12 +272,18 @@ class MethodMatchService extends CommonBaseService
                         if(!empty($singleD[0]['组'])){
                             $zuliu['single'] = $singleD[0]['组'];
                         }
+                        if(!empty($singleArr['组六'])){
+                            $zuliu['single'] = $singleArr['组六'];
+                        }
                         $methodArr['methodArr6'][] = $zuliu;
                     }else{
                         # 组三
                         $zusan = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
                         if(!empty($singleD[0]['组'])){
                             $zusan['single'] = $singleD[0]['组'];
+                        }
+                        if(!empty($singleArr['组三'])){
+                            $zusan['single'] = $singleArr['组三'];
                         }
                         $methodArr['methodArr3'][] = $zusan;
                     }
@@ -368,7 +377,6 @@ class MethodMatchService extends CommonBaseService
                     break;
                 default:
                     throw_info('玩法匹配异常...');
-                    break;
             }
         }
         /**
