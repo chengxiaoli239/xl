@@ -374,7 +374,7 @@ class IndexController extends Controller
     public function actionDw()
     {
         $plan = UserSysPlans::findOne(7609);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
+        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [136]);
         p(count($filter_dynamic_codes));
         $d = Thirdd::getCurrentKjData($lottery_type=26);p($d);
         $Thirdd = new Thirdd();

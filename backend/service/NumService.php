@@ -2825,7 +2825,7 @@ class NumService extends BaseService {
      * @param object
      * @return array
      */
-    public static function getBeforeKjCodesDynamic(object $plan){
+    public static function getBeforeKjCodesDynamic(object $plan, $filter_dynamic_types=[]){
         $lottery_type = $plan->lottery_type;
         $playway = $plan->playway;
         $query = Num4Type::find()->select(['code', 'code_type'])
@@ -2833,7 +2833,7 @@ class NumService extends BaseService {
         $NumTypes = $query->asArray()->all();
         $allCodes = ArrayHelper::getColumn($NumTypes, 'code');
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
-        $filter_dynamic_types = $hzArr['filter_dynamic_types'];
+        $filter_dynamic_types = $filter_dynamic_types ? :$hzArr['filter_dynamic_types'];
         #$filter_dynamic_types = [130];
 
         $codesArr = $allCodes;
@@ -5270,12 +5270,13 @@ class NumService extends BaseService {
                 }
                 $andNotWhere[] = ['=', $filterType, $filterVal];
             }
+            $notWhere[] = $andNotWhere;
         }else{
-            $notWhere[] = ['IN', $otherHf, $filterHf];
+            $andNotWhere[] = ['IN', $otherHf, $filterHf];
+            $notWhere[] = $andNotWhere;
         }
-        $notWhere[] = $andNotWhere;
 
-        #p($notWhere);
+        //p($notWhere);
         $pos_field = 'code_'.$pos;
         $query = Num4Type::find()->alias('n')->select(['code', $pos_field, 'code_type'])
             ->where($notWhere)
