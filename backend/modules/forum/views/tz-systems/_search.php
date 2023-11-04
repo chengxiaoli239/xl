@@ -6,6 +6,10 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model backend\models\searchs\TzSystems */
 /* @var $form yii\widgets\ActiveForm */
+$statusOptions = [
+    0 => '已关闭',
+    1 => '已开启',
+];
 ?>
 
 <div class="tz-systems-search">
@@ -15,33 +19,29 @@ use yii\widgets\ActiveForm;
         'method' => 'get',
     ]); ?>
 
-    <?= $form->field($model, 'id') ?>
+    <div class="row">
+        <div class="col-lg-2 col-xs-3">
+            <?= $form->field($model, 'name') ?>
+        </div>
 
-    <?= $form->field($model, 'name') ?>
+        <div class="col-lg-2 col-xs-3">
+            <?= $form->field($model, 'system_type_id') ?>
+        </div>
+        <div class="col-lg-2 col-xs-3">
+            <?= $form->field($model, 'status')->dropDownList(
+                    $statusOptions,
+                    ['prompt' => '-请选择-'] // Optional: Add a prompt message
+            ); ?>
+        </div>
 
-    <?= $form->field($model, 'system_type_id') ?>
 
-    <?= $form->field($model, 'ssc_domain') ?>
-
-    <?= $form->field($model, 'status') ?>
-
-    <?php // echo $form->field($model, 'type') ?>
-
-    <?php // echo $form->field($model, 'tz_types') ?>
-
-    <?php // echo $form->field($model, 'is_auto_login') ?>
-
-    <?php // echo $form->field($model, 'created_at') ?>
-
-    <?php // echo $form->field($model, 'updated_at') ?>
-
-    <?php // echo $form->field($model, 'update_time') ?>
-
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-default']) ?>
+        <div class="col-lg-2 col-xs-3">
+            <label>  </label>
+            <div class="form-group">
+                <?= Html::submitButton('搜索', ['class' => 'btn btn-primary']) ?>
+                <?= Html::resetButton('重置', ['class' => 'btn btn-default']) ?>
+            </div>
+        </div>
+        <?php ActiveForm::end(); ?>
     </div>
-
-    <?php ActiveForm::end(); ?>
-
 </div>

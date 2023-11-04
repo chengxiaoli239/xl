@@ -1,6 +1,7 @@
 <?php
 namespace backend\modules\wechat\controllers;
 
+use backend\models\TzSystemsUsers;
 use common\models\eyun\HistoryRobots;
 use common\service\wechat\RobotUserService;
 use common\tools\Tool_Common;
@@ -68,9 +69,12 @@ class RobotUserController extends BaseController
         $dataProvider = new ArrayDataProvider([
             'allModels' => $allModels
         ]);
+
+        $SystemModels = TzSystemsUsers::find()->where(['uid'=>$user_id])->orderBy(['balance'=>SORT_DESC])->all();
         return $this->render('view', [
             'model' => $this->findModel(['user_id'=>$user_id]),
             'dataProvider' => $dataProvider,
+            'SystemModels' => $SystemModels,
             #'historyRecords' => $rows,
         ]);
     }

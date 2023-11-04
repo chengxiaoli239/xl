@@ -24,7 +24,7 @@ use yii\widgets\ActiveForm;
 
                     <?= $form->field($model, 'status')->checkboxList([0=>'关闭', 1=>'开启'])->label('开启状态') ?>
 
-                    <?= $form->field($model, 'type')->textInput() ?>
+                    <?= $form->field($model, 'type')->checkboxList([1=>'时时彩', 2=>'网球', 3=>'3D'])->label('彩种类型') ?>
 
                     <?= $form->field($model, 'tz_types')->checkboxList($allTzTypes)->label('已对接玩法') ?>
 

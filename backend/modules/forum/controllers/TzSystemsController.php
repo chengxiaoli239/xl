@@ -91,13 +91,15 @@ class TzSystemsController extends BaseController
     public function actionCreate()
     {
         $model = new TzSystems();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $this->_post['TzSystems']['tz_types'] = implode(',', $this->_post['TzSystems']['tz_types']);
+        if ($model->load($this->_post) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
+        $allTzTypes = CommonService::getAllTzTypes();
         return $this->render('create', [
             'model' => $model,
+            'allTzTypes' => $allTzTypes,
         ]);
     }
 
@@ -113,6 +115,7 @@ class TzSystemsController extends BaseController
         $model = $this->findModel($id);
         $post = Yii::$app->request->post();
         if(!empty($post)){
+            $post['TzSystems']['type'] && $post['TzSystems']['type'] = implode(',',$post['TzSystems']['type']);
             $post['TzSystems']['tz_types'] && $post['TzSystems']['tz_types'] = implode(',',$post['TzSystems']['tz_types']);
             $post['TzSystems']['status'] = $post['TzSystems']['status'][0];
         }

@@ -26,11 +26,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 </div>
 
-                <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+                <?php echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
-                    'filterModel' => $searchModel,
+                    #'filterModel' => $searchModel,
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
@@ -78,20 +78,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                 if(!$model->is_auto_login){
                                     $txt = "<font color='red'>已关闭</font>";
                                     return Html::a($txt, $url0, ['title' => '点击开启']);
-                                }
-                            }
-                        ],
-                        ['attribute'=>'flow_status', 'label'=>'跟随开关',#'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                $url = "/forum/tz-systems/switch-is-auto-login?id=".$model->id.'&field=follow_status&status='.$model->follow_status; # 点击开启
-                                if($model->follow_status == 1){
-                                    $txt = "<font color='green'>已开启</font>" ;
-                                    return Html::a($txt, $url, ['title' => '点击关闭']);
-                                }
-                                if(!$model->follow_status){
-                                    $txt = "<font color='red'>已关闭</font>";
-                                    return Html::a($txt, $url, ['title' => '点击开启']);
                                 }
                             }
                         ],

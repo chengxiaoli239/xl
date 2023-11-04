@@ -965,9 +965,13 @@ class  CommonService{
      * @param int $status
      * @return array
      */
-    public static function getAllSystems($status = 1, $type = 1){
+    public static function getAllSystems($type = 0, $status = 1){
 
-        $datas = TzSystems::find()->where(['status'=>$status, 'type'=>$type])->asArray()->all();
+        $where = ['status'=>$status];
+        if(!empty($type)){
+            $where['type'] = $type;
+        }
+        $datas = TzSystems::find()->where($where)->asArray()->all();
 
         $dataArr = [];
 
