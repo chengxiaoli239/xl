@@ -337,8 +337,8 @@ class IndexController extends Controller
         $post = \Yii::$app->request->post();
         #$num = \common\service\helpers\ThirdD::cn2num('三百五十二');p($num);
         $user_id = 21;
-        #$e = new EYunBaseService($user_id);
-        #$loginRst = $e->memberLogin($id=2); p($loginRst);
+        $e = new EYunBaseService($user_id);
+        $loginRst = $e->memberLogin($id=1); p($loginRst);
         #$rst = RobotUserService::switchWechat($user_id, $post);p($rst);
 
         #$rst = \common\service\thirdD\Odds3dService::addUserOdds($user_id);
