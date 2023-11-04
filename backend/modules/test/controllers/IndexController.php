@@ -336,7 +336,9 @@ class IndexController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         #$num = \common\service\helpers\ThirdD::cn2num('三百五十二');p($num);
-        $user_id = 21;
+        $user_id = 20;
+        //$wechatUser = WechatUserService::getWechatUsers($user_id);//[$fromUser];
+        //p($wechatUser);
         $e = new EYunBaseService($user_id);
         $loginRst = $e->memberLogin($id=1); p($loginRst);
         #$rst = RobotUserService::switchWechat($user_id, $post);p($rst);
