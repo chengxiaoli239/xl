@@ -17,7 +17,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\modules\cron\controllers\WeixinController;
 use backend\modules\kj\controllers\BingDaoController;
-use backend\service\AgentUsersService;
+use backend\service\agent\AgentUsersService;
 use backend\service\baota\BaoTaService;
 use backend\service\BetService;
 use backend\service\ChatCommonBetService;
@@ -354,11 +354,11 @@ class IndexController extends Controller
                 push_queue_open(TextReceiveJobs::class, ['user_id'=>$user_id, 'text'=>$text, 'fromUser'=>$fromUser]);
             }
         }else{
-            $rst = $MessageService->receive($user_id, $post['text'], $fromUser='wxid_875i1kgd38x122'); p($rst);
+            $rst = $MessageService->receive($post['text'], $fromUser='wxid_875i1kgd38x122'); p($rst);
         }
         return $rst;
-        $rst = $MessageService->receive($user_id, $text='福：组选122 233各2元共4元', $fromUser='wxid_875i1kgd38x122'); p($rst);
-        $rst = $MessageService->receive($user_id, $text='福彩，直选123 457各10共20'); p($rst);
+        $rst = $MessageService->receive($text='福：组选122 233各2元共4元', $fromUser='wxid_875i1kgd38x122'); p($rst);
+        $rst = $MessageService->receive($text='福彩，直选123 457各10共20'); p($rst);
         #$rst = $e->localIPadLogin(); p($rst);# 第二步
         #$rst = $e->getIPadLoginInfo();p($rst); # 第三步
         #$rst = $e->initAddressList(); # 第四步
@@ -373,6 +373,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%wechat_user}}'); p($r);
         $plan = UserSysPlans::findOne(7609);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [136]);
         p(count($filter_dynamic_codes));
@@ -382,7 +383,6 @@ class IndexController extends Controller
         $rst = OperateLotteryService::operate($lottery_type=26); p($rst); # 处理3d开奖
         $lottery_types = StaticService::getLotteryTypes();
         p($lottery_types);
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%bets}}'); p($r);
         $str = 'fTtrNuJ2---sSYXaQFRUjChzqbBn7Od4SRDBvZp7hL4';
         p(base64_decode($str));
         $logData_str = '{"log_member_quick_select_id":"215386","member_id":"114","account":"aa123123A","nickname":"","fix_num":"40","bet_count":"24","bet_money":"48","operation_content":"[四定位]，全转数：[2378]","operation_datetime":"09-17 11:36:42","time_value":"2023/9/17 11:36:42","operation_ip":"112.67.*.*","ip_value":"112.67.80.156","operation_ip_extension":"112.67.80.156","is_package":"0","log_type":"102"}';

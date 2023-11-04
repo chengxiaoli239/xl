@@ -3,7 +3,7 @@ namespace backend\service\clients;
 
 use backend\models\AgentUserBetLogs;
 use backend\models\TzSystemsUsers;
-use backend\service\AgentUsersService;
+use backend\service\agent\AgentUsersService;
 use backend\service\BetService;
 use backend\service\HN0898Service;
 use backend\service\numbers\CodeTypeService;

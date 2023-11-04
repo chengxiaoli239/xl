@@ -2,8 +2,10 @@
 
 namespace common\service\wechat;
 
+use backend\models\AgentUsersBalanceFlows;
 use common\models\wechat\WechatUser;
 use common\service\BaseService;
+use common\service\thirdD\ThirdDTypeService;
 use common\tools\Tool_Common;
 
 class WechatUserService extends BaseService
@@ -14,6 +16,12 @@ class WechatUserService extends BaseService
     const WECHAT_STATUS_OFFLINE = 0;
     const WECHAT_STATUS_ONLINE = 1;
 
+    const TYPE_BALANCE_UP = 1;
+    const TYPE_BALANCE_DOWN = 2;
+
+    const OP_BALANCE_MEMBER_OP = 1;
+    const OP_BALANCE_AGENT_OP = 2;
+
     public static $s = [
         'status' => [
             self::STATUS_DISABLE => '已禁用',
@@ -23,15 +31,26 @@ class WechatUserService extends BaseService
             self::WECHAT_STATUS_OFFLINE => '已掉线',
             self::WECHAT_STATUS_ONLINE => '在线',
         ],
+        'balance_type' => [
+            self::TYPE_BALANCE_UP => '上分',
+            self::TYPE_BALANCE_DOWN => '下分',
+        ],
+        'balance_OPERATE_TYPE' => [
+            self::OP_BALANCE_MEMBER_OP => '用户申请->代理审核',
+            self::OP_BALANCE_AGENT_OP => '代理操作',
+        ],
     ];
 
     public static function getWechatUsersKey($user_id){
         return 'getWechatUsersKey_x0_'.$user_id;
     }
+    public static function getWechatUserKey($id){
+        return 'getWechatUserKey_x0_'.$id;
+    }
 
     /**
      * 获取代理微信好友
-     * @param string $user_id
+     * @param string $user_id 代理id
      * @param bool $useCache
      * @return array|mixed|\yii\db\ActiveRecord[]
      */
@@ -40,11 +59,41 @@ class WechatUserService extends BaseService
         $mkey = self::getWechatUsersKey($user_id);
         if(!$useCache OR !$data = $m->get($mkey)){
             $dataQuery = WechatUser::find()
-                ->select(['id', 'user_id', 'userName', 'nickName', 'status', 'smallHead'])
+                ->select(['id', 'user_id', 'agent_id'=>'user_id', 'member_id'=>'id', 'nickName', 'status', 'smallHead'])
                 ->where(['user_id'=>$user_id]);
             #$sql = $dataQuery->createCommand()->getRawSql();p($sql);
             $data = $dataQuery->indexBy(['userName'])->asArray()->all();
             $m->set($mkey, $data, 600);
+        }
+
+        return $data;
+    }
+
+    /**
+     * 获取代理微信好友
+     * @param string $user_id
+     * @param bool $useCache
+     * @return array|mixed|\yii\db\ActiveRecord[]
+     */
+    public static function getWechatUser($id='', $useCache=true){
+        $m = \Yii::$app->cache;
+        $mkey = self::getWechatUserKey($id);
+        if(!$useCache OR !$data = $m->get($mkey)){
+            $dataQuery = WechatUser::find()
+                ->select([
+                    'id',
+                    'user_id',
+                    'agent_id'=>'user_id',
+                    'member_id'=>'id',
+                    'name'=>'nickName',
+                    'balance',
+                    'nickName',
+                    'status',
+                    'smallHead'
+                ])->where(['id'=>$id]);
+            #$sql = $dataQuery->createCommand()->getRawSql();p($sql);
+            $data = $dataQuery->indexBy(['userName'])->asArray()->one();
+            $m->set($mkey, $data, 1);
         }
 
         return $data;

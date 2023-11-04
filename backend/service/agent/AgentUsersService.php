@@ -1,0 +1,293 @@
+<?php
+namespace backend\service\agent;
+use backend\models\AgentUsers;
+use backend\models\AgentUsersBalanceFlows;
+use backend\models\CodeTypes;
+use backend\models\TzSystemsUsers;
+use backend\service\BaseService;
+use common\models\wechat\WechatUser;
+use common\service\CommonService;
+use common\service\wechat\WechatUserService;
+use common\tools\Tool_Common;
+use yii\helpers\ArrayHelper;
+use  yii;
+
+class AgentUsersService extends BaseService {
+
+    public static function opPreData(&$post, $agent_id=''){
+        if(!$post OR !$agent_id) return false;
+
+        $fields = ['is_tuo', 'is_cha', 'is_chi', 'is_bind'];
+        $post = CommonService::opPreStatusFields($post, $fields, $model = 'AgentUsers');
+
+        $data = $post[$model];
+        if(!$id = $data['id']){
+            $post[$model]['created_at'] = time();
+            $post[$model]['token'] = self::getUserToken($post['name'], $agent_id);
+        }
+
+        $post[$model]['agent_id'] = $agent_id;
+        $post[$model]['updated_at'] = time();
+
+        return $post;
+    }
+
+    /**
+     * @desc 获取用户token，用于聊天窗口识别用户
+     * @param string $name
+     * @param string $agent_id
+     * @return string
+     */
+    public static function getUserToken($name = '', $agent_id = '', $randKey = 'MLGB'){
+        return substr(md5($name.'_'.$agent_id.'_'.$randKey), 0,12);
+    }
+
+    /**
+     * @description 更新计划表状态
+     * @param $id
+     * @param $account
+     * @return array
+     */
+    public static function updateAgentUsersStatus($id, $status, $uid = '', $field='')
+    {
+        if(!$uid) return ['status'=>300, 'msg'=>'用户id为空'];
+        $model = AgentUsers::findOne(['agent_id'=>$uid, 'id'=>$id]);
+        if(!$model) return ['status'=>301, 'msg'=>'找不到记录'];
+        $m = \Yii::$app->cache;
+        $mkey = 'updateSysPlansStatus_'.$field.'_'.$id.'_'.$status;
+        //if($rst = $m->get($mkey)) return ['status'=>302, 'msg'=>'正在修改'];
+        //p([$id, $status, $uid , $field]);
+
+        $model->$field = (int)$status;
+        $model->updated_at = time();
+        $model->token = $model->token ? $model->token : self::getUserToken($model->name, $uid);
+
+        $m->set($mkey, 1, 10);
+
+        $rst = $model->save(false);
+
+        $rstData = ['rst'=>$rst];
+
+        return $rstData;
+    }
+
+    public static function actUpUserData($post, $agent_id = ''){
+        if(!$agent_id) return ['status'=>301, 'msg'=>'不是代理账号，不能修改用户信息'];
+        $act = $post['act'];
+        $id = $post['id'];
+
+        $rst = ['status'=>200];
+        try {
+            $transaction = \Yii::$app->db->beginTransaction();
+            if(in_array($act, ['act-up-balance', 'act-down-balance'])){
+                if(!$balance = trim($post['balance'])){
+                    throw_info('积分不能为空');
+                }else{
+                    $WechatUser = WechatUser::findOne(['user_id'=>$agent_id, 'id'=>$id]);
+                    if(empty($WechatUser)) {
+                        throw_info('未找到用户记录1');
+                    }
+                    if($act == 'act-up-balance'){
+                        $f = '加';
+                        $WechatUser->balance = $WechatUser->balance + floatval($balance);
+                    }elseif ($act == 'act-down-balance'){
+                        $f = '减';
+                        $WechatUser->balance = $WechatUser->balance - $balance;
+                    }
+
+                    if(!$WechatUser->save()){
+                        //$rst = ['status'=>303, 'msg'=>$AgentUsers->getFirstError()];
+                        throw_info('用户['.$WechatUser->nickName.']'.$f.'分：'.$balance.', 结果：失败');
+                    }
+                    $rst['msg'] = '用户['.$WechatUser->nickName.']'.$f.'分：'.$balance.', 操作成功&nbsp;<font color="green"><strong>√</strong></font> 当前积分：'.$WechatUser->balance;
+                    $rst['balance_now'] = $WechatUser->balance;
+                }
+
+            }elseif ($act == 'act-user-edit'){
+                if(empty($post['name'])){
+                    throw_info('用户名不能为空');
+                }
+                if(!$WechatUser = WechatUser::findOne(['user_id'=>$agent_id, 'id'=>$post['id']])){
+                    throw_info('未找到用户记录2');
+                }
+                $WechatUser->nickName = trim($post['name']);
+                $WechatUser->token = trim($post['token']);
+                $flag = $WechatUser->save();
+                if(!$flag) {
+                    throw_info('保存失败，用户名：'.$WechatUser->nickName);
+                }
+                $rst['msg'] = '成功修改用户名：'.$WechatUser->nickName;
+                $rst['name_now'] = $WechatUser->nickName;
+            }elseif ($act == 'act-user-del'){
+                $flag = 0;
+                if($WechatUser = WechatUser::findOne(['agent_id'=>$agent_id, 'id'=>$post['id']])){
+                    $flag = $WechatUser->delete();
+                }
+                if(!$flag) {
+                    throw_info('删除失败，用户名：'.$WechatUser->nickName);
+                }
+
+                $rst['msg'] = '成功删除用户：'.$WechatUser->nickName;
+            }
+            $transaction->commit();
+        }catch (\Exception $e){
+            $transaction->rollBack();
+            return ['status'=>302, 'msg'=>$e->getMessage()];
+        }
+
+        return $rst;
+    }
+
+    /**
+     * @desc 审核用积分流水
+     * @param $data
+     * @param $agent_id
+     * @return array
+     */
+    public static function userFlowsCheck($data, $agent_id = '', $desc = '代理操作'){
+
+        try {
+            $transaction = \Yii::$app->db->beginTransaction();
+            if(!$data['id']) {
+                throw_info('缺少参数id');
+            }
+
+            if(empty($agent_id)){
+                throw_info('不是代理,无权限');
+            }
+
+            if(!$AgentUsersBalanceFlows = AgentUsersBalanceFlows::findOne(['id'=>$data['id'], 'agent_id'=>$agent_id])){
+                throw_info('未找到记录');
+            }
+
+            $status = $data['status']; # 审核状态 0未审核1审核通过2拒绝
+            $balanceType = $AgentUsersBalanceFlows['type'];
+            // todo 此处要改成wechat_user表model
+            $WechatUser = WechatUser::findOne(['id'=>$AgentUsersBalanceFlows->member_id, 'user_id'=>$agent_id]);
+            if($status == AgentUsersBalanceService::FLOW_CHECK_STATUS_PASS){
+                if($balanceType == WechatUserService::TYPE_BALANCE_UP){
+                    $after_balance = $WechatUser->balance + $AgentUsersBalanceFlows->balance; # 1 上分，积分增加
+                }elseif($balanceType == WechatUserService::TYPE_BALANCE_DOWN){
+                    $after_balance = $WechatUser->balance; # 下分审核成功则等待打款，这里不在做扣款处理（审核时已经扣减）
+                }
+                $WechatUser->balance = $after_balance; # 审核后的积分，
+                $WechatUser->updated_at = time();
+                if(!$WechatUser->save()){
+                    throw_info(current($WechatUser->getErrors()));
+                }
+            }elseif($status == AgentUsersBalanceService::FLOW_CHECK_STATUS_REFUSE){ # 审核拒绝
+                if($balanceType == WechatUserService::TYPE_BALANCE_UP){
+                    $after_balance = $WechatUser->balance;
+                }elseif($balanceType == WechatUserService::TYPE_BALANCE_DOWN){
+                    $after_balance = $WechatUser->balance + $AgentUsersBalanceFlows->balance; # 2 下分拒绝，积分回退
+                }
+
+                $WechatUser->balance = $after_balance; # 审核后的积分，
+                $WechatUser->updated_at = time();
+                if(!$WechatUser->save()){
+                    throw_info(current($WechatUser->getErrors()));
+                }
+            }
+
+            $AgentUsersBalanceFlows->balance_after = $after_balance;
+            $AgentUsersBalanceFlows->status = $status;
+            $AgentUsersBalanceFlows->desc = $desc;
+            $AgentUsersBalanceFlows->check_time = (string)time();
+            if(!$AgentUsersBalanceFlows->save()){
+                throw_info(current($AgentUsersBalanceFlows->getErrors()));
+            }
+            $transaction->commit();
+        }catch (\Exception $e){
+            $transaction->rollBack();
+            Tool_Common::log('/agent_user/'.__FUNCTION__, 'ERR', '审核异常', ['data'=>$data, 'err_msg'=>$e->getMessage()]);
+            return ['status'=>303, 'msg'=>$e->getMessage()];
+        }
+
+        return ['status'=>200, 'msg'=>'操作成功', 'data'=>['status'=>200, 'msg'=>$desc]];
+    }
+
+    /**
+     * @desc 类型名称
+     * @param $type
+     * @return mixed
+     */
+    public static function getFlowTypeTxt($type){
+        $types = self::getFlowtypes();
+
+        return $types[$type];
+    }
+
+    public static function getFlowtypes(){
+
+        return [1=> '上分', 2=>'扣分'];
+    }
+
+    /**
+     * @desc 随机获取用户头像
+     * @param $agent_id
+     * @return string
+     */
+    public static function getImages($agent_id){
+        $num = rand(2, 13);
+        $img = 'static/images/avatar/f1/f_'.$num.'.jpg';
+
+        return $img;
+    }
+
+    /**
+     * @desc 检测网络是否通，切换网盘线路
+     * @return array
+     */
+    public static function pingTzSystemUsersDomain(){
+        $rst = ['status'=>200, 'msg'=>'操作成功'];
+
+        return $rst;
+    }
+
+    /**
+     * @desc 是否为代理
+     * @param string $admin_id
+     * @return bool
+     */
+    public static function isAgent($admin_id = ''){
+        $flag = false;
+        //if(empty($admin_id)) $flag = false;
+        $m = \Yii::$app->cache;
+        $mkey = 'IS_AGENT_UID_'.$admin_id;
+        if(true OR !$m->get($mkey)){
+            $where = ['AND', ['=', 'uid', $admin_id], ['=', 'status', 1]];
+            $TzSystemsUsers = TzSystemsUsers::find()->where($where)->one();
+            if($TzSystemsUsers->is_agent){
+                $flag = true;
+            }
+            $m->set($mkey, $flag, 3600);
+        }
+        return $flag;
+    }
+
+
+    /**
+     * 获取跟买倍数
+     * @param object $TzSystemsUsers
+     * @param float $single
+     * @param int $buy_type
+     * @return array
+     */
+    public static function getFlowSingle(object $TzSystemsUsers, $single=0.1, $buy_type=0, $playway=3){
+
+        if($buy_type == 1){
+            $bet_single = $single * $TzSystemsUsers->flow_wp_player_bs;
+        }else{
+            $bet_single = $single * $TzSystemsUsers->flow_op_player_bs;
+        }
+        $bet_single = floor($bet_single * 10)/10;  # bet_single 向下保留一位小数
+        if(in_array($playway, [2, 3]) && $bet_single<0.1){
+            $bet_single = 0.1;
+        }
+        if(in_array($playway, [1]) && $bet_single<1){
+            $bet_single = 1;
+        }
+
+        return [0, $bet_single];
+    }
+}

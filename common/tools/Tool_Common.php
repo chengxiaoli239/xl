@@ -1,9 +1,4 @@
 <?php
-/**
- *  工具类
- * author: lianyuanfu
- * Date: 2015-07-22
- */
 namespace common\tools;
 class Tool_Common
 {

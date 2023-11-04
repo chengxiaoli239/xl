@@ -2,7 +2,8 @@
 
 namespace backend\modules\agent\controllers;
 
-use backend\service\AgentUsersService;
+use backend\service\agent\AgentUsersService;
+use common\service\wechat\WechatUserService;
 use Yii;
 use backend\models\AgentUsersBalanceFlows;
 use backend\models\searchs\AgentUsersBalanceFlows as AgentUsersBalanceFlowsSearch;
@@ -67,7 +68,7 @@ class AgentUsersBalanceFlowsController extends BaseController
      */
     public function actionUserFlowsCheck(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $desc = $this->_post['type'] == 1 ? '用户申请->代理审核' : '代理操作';
+        $desc = $this->_post['type'] == WechatUserService::OP_BALANCE_MEMBER_OP ? '用户申请->代理审核' : '代理操作';
 
         $rst = AgentUsersService::userFlowsCheck($this->_post, \Yii::$app->user->id, $desc);
 

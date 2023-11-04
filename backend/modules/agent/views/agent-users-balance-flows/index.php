@@ -10,6 +10,7 @@ use yii\widgets\Pjax;
 $this->title = Yii::t('app', 'Agent Users Balance Flows');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
 <section class="agent-users-balance-flows-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
@@ -25,11 +26,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div-->
 
     <?php Pjax::begin(); ?>
-                <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+                <?php echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
-                    'filterModel' => $searchModel,
+                    #'filterModel' => $searchModel,
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
@@ -41,9 +42,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute'=>'type','label'=>'类型',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value'=>function($model){
-                                return \backend\service\AgentUsersService::getFlowTypeTxt($model->type);
+                                return \backend\service\agent\AgentUsersService::getFlowTypeTxt($model->type);
                             },
-                            'filter' => \backend\service\AgentUsersService::getFlowtypes(),
+                            'filter' => \backend\service\agent\AgentUsersService::getFlowtypes(),
                         ],
                         'balance',
                         'balance_now',

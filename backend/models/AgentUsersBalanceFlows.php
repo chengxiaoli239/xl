@@ -12,7 +12,7 @@ use Yii;
  * @property string $member_id 用户id
  * @property string $member_account 用户账号
  * @property int $type 类型:1上分2下分
- * @property string $balance 变动积分
+ * @property float $balance 变动积分
  * @property string $balance_now 当前剩余
  * @property string $balance_after 变动结果
  * @property string $desc 备注

@@ -23,7 +23,7 @@ use yii\widgets\ActiveForm;
         <?php //$form->field($model, 'user_id') ?>
 
         <div class="col-lg-2 col-xs-3">
-            <?= $form->field($model, 'userName') ?>
+            <?= $form->field($model, 'userName')->label('微信ID') ?>
         </div>
 
         <div class="col-lg-2 col-xs-3">

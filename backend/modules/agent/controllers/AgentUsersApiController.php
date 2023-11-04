@@ -2,7 +2,7 @@
 
 namespace backend\modules\agent\controllers;
 
-use backend\service\AgentUsersService;
+use backend\service\agent\AgentUsersService;
 use backend\service\ChatCommonBetService;
 use backend\service\HN0898Service;
 use Yii;

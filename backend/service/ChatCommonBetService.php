@@ -196,58 +196,6 @@ class ChatCommonBetService extends BaseService {
     }
 
     /**
-     * @desc 上下分
-     * @param $desc
-     * @param array $userInfo
-     * @return array
-     */
-    public static function upOrDownBalance($desc, $userInfo = []){
-        $rst = ['status'=>200, 'msg'=>'申请成功，等待审核'];
-
-        if(preg_match('/^上\d+$/',$desc,$Arr)){
-            $type = 1;
-            $type_desc = '上';
-        }elseif (preg_match('/^下\d+$/',$desc,$Arr)){
-            $type = 2;
-            $type_desc = '下';
-        }
-        $agent_id = $userInfo['agent_id'];
-        $member_id = (string)$userInfo['id'];
-
-        if($AgentUsersBalanceFlows = AgentUsersBalanceFlows::findOne(['agent_id'=>$agent_id, 'member_id'=>$member_id, 'status'=>0])){
-            return ['status'=>300, 'msg'=>'有未审核记录，请联系矿主处理'];
-        }
-
-        $balance = str_replace($type_desc, '', $Arr[0]);
-
-        $setData = [
-            'agent_id' => $agent_id,
-            'member_id' => $member_id,
-            'member_account' => $userInfo['name'],
-            'type' => $type, # 1上分2下分
-            'balance' => $balance, # 上/下 积分，变动
-            'balance_now' => $userInfo['balance'], # 当前积分
-            'desc' => '用户申请'.$type_desc.' '.$balance,
-            'status' => 0,
-            'created_at' =>time(),
-            'updated_at' =>time(),
-        ];
-
-        $AgentUsersBalanceFlows = new AgentUsersBalanceFlows();
-        $AgentUsersBalanceFlows->setAttributes($setData);
-        if(!$flag = $AgentUsersBalanceFlows->save()){
-            $msg = current($AgentUsersBalanceFlows->getErrors());
-            Tool_Common::log('upOrDownBalance', 'ERR', '用户上下分', ['Arr'=>$Arr, 'msg'=>$msg, 'attributes'=>$AgentUsersBalanceFlows->attributes]);
-            return ['status'=>300, 'msg'=>$type_desc.'失败'.$msg];
-        }
-        Tool_Common::log('upOrDownBalance', 'INFO', '用户上下分', ['desc'=>$desc, 'userInfo'=>$userInfo, 'attributes'=>$AgentUsersBalanceFlows->attributes]);
-        $rst['msg'] = $rst['msg'].','.$type_desc.$balance;
-        $rst['userInfo'] = $userInfo;
-
-        return $rst;
-    }
-
-    /**
      * @desc 记录用发送消息
      * @param $post
      * @param $rst

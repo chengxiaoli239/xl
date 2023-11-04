@@ -68,11 +68,12 @@ class WechatUserController extends BaseController
      * @param $status
      * @return \yii\web\Response
      */
-    public function actionSwitchStatus($id){
+    public function actionSwitchStatus($id, $field='', $val=0){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        #p([$id, $field, $val]);
         $row = $this->findModel(['id'=>$id, 'user_id'=>$this->_user_id]);
         if(!empty($row)){
-            HN0898Service::updateStatus($id, $model = '\backend\models\wechat\WechatUser', 'status');
+            HN0898Service::updateStatus($id, $model = '\backend\models\wechat\WechatUser', $field, $val);
             WechatUserService::getWechatUsers($this->_user_id, false);
         }
 

@@ -15,7 +15,10 @@ class EYunBaseService  extends BaseService
 {
     # 系统用户id  user.id
     public $user_id = '';
+    # 会员信息
+    public $wechatUser = [];
     # 微信原始id （首次登录平台的号传空，掉线重登必须传值，否则会频繁掉线！！！） 第三步会返回此字段，记得入库保存
+    public $member_id = ''; # wechat_user.id
     public $wcId = '';
     # 登录实例标识 （本值非固定的，每次重新登录会返回新的，数据库记得实时更新wid）
     public $wId = '';
