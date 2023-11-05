@@ -78,15 +78,16 @@ class AgentUsersBalanceService extends BaseService {
             if(!$AgentUsersBalanceFlows->save()){
                 $msg = current($AgentUsersBalanceFlows->getErrors());
                 \common\tools\Tool_Common::log('upOrDownBalance', 'ERR', '用户上下分', ['matches'=>$matches, 'msg'=>$msg, 'attributes'=>$AgentUsersBalanceFlows->attributes]);
-                return ['status'=>300, 'msg'=>$type_desc.'失败'.$msg];
+                return ['status'=>300, 'msg'=>$desc.'失败'.$msg];
             }
             $logArr =  ['desc'=>$desc, 'WechatUser'=>$WechatUser->attributes, 'attributes'=>$AgentUsersBalanceFlows->attributes];
             Tool_Common::log('upOrDownBalance', 'INFO', '用户上下分',$logArr);
             $data = [
                 'userInfo' => $WechatUser->attributes,
-                'msg' => $type_desc,
+                'msg' => $desc,
             ];
             $transaction->commit();
+            Tool_Common::log('/wechat/'.__FUNCTION__, 'ERR', '消息接收处理', ['text'=>$text, 'data'=>$data]);
         }catch (\Exception $e){
             $transaction->rollBack();
             $data = [
