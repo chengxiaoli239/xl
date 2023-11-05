@@ -66,7 +66,7 @@ class AgentUsersBalanceService extends BaseService {
                 'member_account' => $WechatUser->nickName,
                 'type' => $type, # 1上分2下分
                 'balance' => $balance, # 上/下 积分，变动
-                'balance_now' => $WechatUser->balance, # 当前积分
+                'balance_now' => $now_balance, # 申请前积分
                 'desc' => '用户'.$desc,
                 'status' => 0,
                 'created_at' =>time(),
