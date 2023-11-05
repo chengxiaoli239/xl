@@ -47,10 +47,10 @@ class AgentUsersBalanceService extends BaseService {
             }elseif (preg_match('/下\s*(\d+)$/', $text,$matches)){
                 $balance = (int)$matches[1];
                 $type = WechatUserService::TYPE_BALANCE_DOWN;
-                $desc = '申请下'.$balance.'，暂扣'.$balance.'分，等待转账';;
                 # 校验积分下分上分充足
                 $now_balance = $WechatUser->balance;
                 $after_balance = $now_balance - $balance;
+                $desc = '申请下'.$balance.'，暂扣'.$balance.'，剰余'.$after_balance.'，等待转咪';;
                 if($after_balance<0){
                     throw_info('分数不足：'.$now_balance);
                 }
