@@ -25,7 +25,7 @@ class TextReceiveJobs extends CommonJob {
             $fromUser = $params['fromUser']; # 微信用户id
 
             $MessageService = new EYunMessageOperateService($user_id);
-            $rst = $MessageService->receive($user_id, $text, $fromUser);
+            $rst = $MessageService->receive($text, $fromUser);
 
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'02', ['params'=>$params, 'betRst'=>$rst]);
         }catch (\Exception $e){
