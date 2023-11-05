@@ -237,10 +237,12 @@ class MethodMatchService extends CommonBaseService
                     if(preg_match_all('/[直|组]/u', $text, $matcheTypes)){ # 匹配直组顺序：Array ( [0] => 直 [1] => 组 )
                         $mTypes = $matcheTypes; # Array ( [0] => 直 [1] => 组 )
                         if(
-                            preg_match_all('/([一二三四五六七八九])\s*直([一二三四五六七八九])组/u', $text, $matches) OR
-                            preg_match_all('/([一二三四五六七八九])\s*组([一二三四五六七八九])直/u', $text, $matches) OR
-                            preg_match_all('/直([一二三四五六七八九])\s*组([一二三四五六七八九])/u', $text, $matches) OR
-                            preg_match_all('/组([一二三四五六七八九])\s*直([一二三四五六七八九])/u', $text, $matches) OR
+                            preg_match_all('/([一二两三四五六七八九])\s*直([一二三四五六七八九])组/u', $text, $matches) OR
+                            preg_match_all('/([一二两三四五六七八九])\s*组([一二三四五六七八九])直/u', $text, $matches) OR
+                            preg_match_all('/直([一两二三四五六七八九])\s*组([一二三四五六七八九])/u', $text, $matches) OR
+                            preg_match_all('/组([一两二三四五六七八九])\s*直([一二三四五六七八九])/u', $text, $matches) OR
+                            preg_match_all('/直(?:选)?([一两二三四五六七八九0-9])?倍\s*(?:组|组选|组六|组三)?([一两二三四五六七八九0-9])?倍/u', $text, $matches) OR
+                            preg_match_all('/(?:组|组选|组六|组三)?([一两二三四五六七八九0-9])?倍\s*直(?:选)([一两二三四五六七八九0-9])?倍/u', $text, $matches) OR
 
                             preg_match_all('/(\d+)倍直\s*(\d+)倍组/u', $text, $matches) OR
                             preg_match_all('/(\d+)倍组\s*(\d+)倍直/u', $text, $matches) OR

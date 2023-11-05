@@ -205,9 +205,9 @@ class EYunMessageOperateService  extends EYunBaseService
         $text = str_replace(' ', ' ', trim($text)); # 中文空格替换成英文空格
         try {
             switch (true){
-                case strpos($text, '撤') !== false:
+                case strpos($text, '撤') !== false: // 撤单
                     return EYunMessageOperateService::operateCancel($text, $this->wechatUser);
-                case strpos($text, '上') !== false OR strpos($text, '下') !== false:
+                case strpos($text, '上') !== false OR strpos($text, '下') !== false: // 上下分
                     return AgentUsersBalanceService::operateBalanceChange($text, $this->wechatUser);
                 default:
                     $stepText = [
@@ -252,13 +252,11 @@ class EYunMessageOperateService  extends EYunBaseService
                             $singleData = ThirdDTypeService::getMoneys($betText, $playMethodKd['name'], $playMethod);
                             $single = $singleData['single'];
                             $logArr = ['betText'=>$betText, 'singleData'=>$singleData, 'playMethod'=>$playMethod];
-                            #p($logArr);
                             Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-02', $logArr);
                             foreach ($playMethod as $k=>$pm){
                                 if(!empty($pm['single'])){
                                     $single = $pm['single'];
-                                }
-                                if($singleData['single_cn_text']=='倍'){
+                                }else if($singleData['single_cn_text']=='倍'){
                                     $Odds = Odds3dService::getOdds($this->user_id, $pm['id']); # 玩法赔率
                                     $single = $Odds['money'] * $singleData['single_cn'];
                                 }
@@ -300,7 +298,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             $playMethod['playMethod'] = $playMethod;
                             $g['playMethod'][] = $playMethod;
                         }
-                        //p(['g'=>$g, 'singleData'=>$singleData, 'betText'=>$betText]);
+                        #p(['g'=>$g, 'singleData'=>$singleData, 'betText'=>$betText], 0);
                         if(empty($g['single']) OR empty($g['all_moneys'])){
                             throw_info('匹配倍数或金额异常', ThirdDTypeService::CODE_FOR_USER);
                         }

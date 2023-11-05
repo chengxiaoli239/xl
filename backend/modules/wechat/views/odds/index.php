@@ -30,7 +30,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         #'user_id',
                         #'play_method_id',
                         'name',
-                        'money',
+                        //'money',
+                        ['attribute' => 'money', 'label'=>'一倍(元)','headerOptions'=>['width'=>'6%'], // 图片字段的属性
+                            'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
+                            'value' => function ($model) {
+                                return $model->money;
+                            },
+                        ],
                         'bouns',
                         'odds',
                         //'status',

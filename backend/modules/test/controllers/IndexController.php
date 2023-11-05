@@ -357,8 +357,6 @@ class IndexController extends Controller
             $rst = $MessageService->receive($post['text'], $fromUser='wxid_875i1kgd38x122'); p($rst);
         }
         return $rst;
-        $rst = $MessageService->receive($text='福：组选122 233各2元共4元', $fromUser='wxid_875i1kgd38x122'); p($rst);
-        $rst = $MessageService->receive($text='福彩，直选123 457各10共20'); p($rst);
         #$rst = $e->localIPadLogin(); p($rst);# 第二步
         #$rst = $e->getIPadLoginInfo();p($rst); # 第三步
         #$rst = $e->initAddressList(); # 第四步
