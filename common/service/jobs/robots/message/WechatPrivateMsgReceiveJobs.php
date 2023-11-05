@@ -70,7 +70,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             return $err_msg;
         }
 
-        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'12', ['wcId'=>$wcId, 'text'=>$text]);
+        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'12', ['wcId'=>$wcId, 'text'=>$text, 'replyTxts'=>$replyTxts]);
 
         return '消息处理成功:';
     }
@@ -87,7 +87,13 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
         if(empty($fromUser)){
             return '接收的微信好友Id不能为空0';
         }
+        if(empty($replyTxts)){
+            throw_info('回复消息replyTxts为空');
+        }
         foreach ($replyTxts as $replyTxt){
+            if(empty($replyTxt)){
+                throw_info('回复消息replyTxt为空');
+            }
             $sendData = [
                 'wcId' => $wcId,
                 'user_id' => $user_id,

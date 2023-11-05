@@ -311,7 +311,7 @@ class EYunMessageOperateService  extends EYunBaseService
         }catch (\Exception $e){
             Tool_Common::log('/wechat/'.__FUNCTION__, 'ERR', '消息接收处理异常', ['text'=>$text, 'betText'=>$betText, 'err_msg'=>$e->getMessage().'_'.$e->getFile().'_'.$e->getLine()]);
             if($e->getCode() == ThirdDTypeService::CODE_FOR_USER){
-                return [$e->getCode(), [], $e->getMessage()];
+                return [ThirdDTypeService::CODE_FOR_USER, [], $e->getMessage()];
             }
             return [30001, [], $e->getMessage()];
         }
@@ -353,7 +353,8 @@ class EYunMessageOperateService  extends EYunBaseService
                 throw_info('操作异常');
             }
         }catch (\Exception $e){
-            return [ThirdDTypeService::CODE_FOR_USER, [], '上下分异常'];
+            $err_msg = ($e->getCode() == ThirdDTypeService::CODE_FOR_USER) ? $e->getMessage() : '撤单异常';
+            return [ThirdDTypeService::CODE_FOR_USER, [], $err_msg];
         }
         return [ThirdDTypeService::CODE_FOR_USER, ['text'=>$text, 'replyTxt'=>$orderId.'撤单完成'], '接收成功'];
     }

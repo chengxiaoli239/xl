@@ -37,17 +37,17 @@ class AgentUsersBalanceService extends BaseService {
             $member_id = (string)$WechatUser->id;
 
             if(AgentUsersBalanceFlows::findOne(['agent_id'=>$agent_id, 'member_id'=>$member_id, 'status'=>0])){
-                throw_info('有未审核记录，请联系矿主处理');
+                throw_info('有未审核记录，请联系矿主处理', ThirdDTypeService::CODE_FOR_USER);
             }
 
             if(preg_match('/上\s*(\d+)$/', $text,$matches)){
                 $balance = (int)$matches[1];
                 $type = WechatUserService::TYPE_BALANCE_UP;
-                $desc = '用户申请上 '.$balance.'，'.'等待审核成功上分';
+                $desc = '申请上 '.$balance.'，'.'等待审核成功上分';
             }elseif (preg_match('/下\s*(\d+)$/', $text,$matches)){
                 $balance = (int)$matches[1];
                 $type = WechatUserService::TYPE_BALANCE_DOWN;
-                $desc = '用户申请下'.$balance.'，暂扣'.$balance.'分，等待转账';;
+                $desc = '申请下'.$balance.'，暂扣'.$balance.'分，等待转账';;
                 # 校验积分下分上分充足
                 $now_balance = $WechatUser->balance;
                 $after_balance = $now_balance - $balance;
@@ -67,7 +67,7 @@ class AgentUsersBalanceService extends BaseService {
                 'type' => $type, # 1上分2下分
                 'balance' => $balance, # 上/下 积分，变动
                 'balance_now' => $WechatUser->balance, # 当前积分
-                'desc' => $desc,
+                'desc' => '用户'.$desc,
                 'status' => 0,
                 'created_at' =>time(),
                 'updated_at' =>time(),
@@ -77,23 +77,23 @@ class AgentUsersBalanceService extends BaseService {
             $AgentUsersBalanceFlows->setAttributes($setData);
             if(!$AgentUsersBalanceFlows->save()){
                 $msg = current($AgentUsersBalanceFlows->getErrors());
-                \common\tools\Tool_Common::log('upOrDownBalance', 'ERR', '用户上下分', ['matches'=>$matches, 'msg'=>$msg, 'attributes'=>$AgentUsersBalanceFlows->attributes]);
-                return ['status'=>300, 'msg'=>$desc.'失败'.$msg];
+                $logArr = ['matches'=>$matches, 'msg'=>$msg, 'attributes'=>$AgentUsersBalanceFlows->attributes];
+                \common\tools\Tool_Common::log('upOrDownBalance', 'ERR', '用户上下分', $logArr);
+                throw_info($desc.'失败'.$msg);
             }
             $logArr =  ['desc'=>$desc, 'WechatUser'=>$WechatUser->attributes, 'attributes'=>$AgentUsersBalanceFlows->attributes];
             Tool_Common::log('upOrDownBalance', 'INFO', '用户上下分',$logArr);
+            $msg = $desc;
             $data = [
                 'userInfo' => $WechatUser->attributes,
-                'msg' => $desc,
+                'msg' => $msg,
             ];
             $transaction->commit();
             Tool_Common::log('/wechat/'.__FUNCTION__, 'ERR', '消息接收处理', ['text'=>$text, 'data'=>$data]);
         }catch (\Exception $e){
             $transaction->rollBack();
-            $data = [
-                'text' => '申请上下分异常',
-            ];
-            $msg = $e->getMessage();
+            $data = [ ];
+            $msg = ($e->getCode()==ThirdDTypeService::CODE_FOR_USER) ? $e->getMessage() : '申请上下分异常';
             Tool_Common::log('/wechat/'.__FUNCTION__, 'ERR', '消息接收处理异常', ['text'=>$text, 'err_msg'=>$e->getMessage().'_'.$e->getFile().'_'.$e->getLine()]);
         }
 
