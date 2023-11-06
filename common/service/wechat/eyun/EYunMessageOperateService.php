@@ -112,8 +112,10 @@ class EYunMessageOperateService  extends EYunBaseService
      */
     public static function resetText($text){
         #$text = str_replace('。', '#', $text); # 玩法之间分隔符
-        $text = str_replace('组6 ', '组六 ', $text); # 中文逗号
-        $text = str_replace('组3 ', '组三 ', $text); # 中文逗号
+        $text = str_replace('组6 ', '组六 ', $text); # 同义词
+        $text = str_replace('组3 ', '组三 ', $text); # 同义词
+        $text = str_replace('组选 ', '组 ', $text); # 同义词
+        $text = str_replace('直选 ', '直 ', $text); # 同义词
         $text = str_replace('，', ' ', $text); # 中文逗号
         $text = str_replace('：', '', $text); # 中文冒号
         $text = str_replace(':', '', $text); # 中文冒号
@@ -315,7 +317,7 @@ class EYunMessageOperateService  extends EYunBaseService
         }
         #p($dataGroups);
         $data = [
-            'type' => CommonBaseService::B_TYPE_BET,
+            'type' => WechatUserService::TYPE_ORDER_BET,
             'stepText' => $stepText,
             'dataGroups' => $dataGroups,
         ];
@@ -451,8 +453,14 @@ class EYunMessageOperateService  extends EYunBaseService
             # 其它情况处理异常，直接抛异常
             throw_info($e->getMessage());
         }
+        $data = [
+            'type' => WechatUserService::TYPE_ORDER_BET,
+            'text' => $text,
+            'replyTxts' => $replyTxts,
+            'allMoneys' => $allMoneys,
+        ];
 
-        return [0, ['text'=>$text, 'replyTxts'=>$replyTxts, 'allMoneys'=>$allMoneys], '接收成功'];
+        return [0, $data, '接收成功'];
     }
 
     /**

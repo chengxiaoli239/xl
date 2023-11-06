@@ -25,11 +25,4 @@ class CommonBaseService extends BaseService
         self::STATUS_LT_SUCCESS => '处理成功',
         self::STATUS_LT_FAIL => '未中奖',
     ];
-
-    const B_TYPE_BET = 1;
-    const B_TYPE_CANCEL = 2;
-    const B_TYPES = [
-        self::B_TYPE_BET => '下注',
-        self::B_TYPE_CANCEL => '撤单',
-    ];
 }

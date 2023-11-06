@@ -111,7 +111,14 @@ class ThirdDTypeService extends CommonBaseService
                 var_dump($e->getMessage());
             }
         }
-        $matchMethodAndCodeText = explode('各', $text)[0];
+
+        $countY = mb_substr_count($text, '元'); # 元
+        $countB = mb_substr_count($text, '倍'); # 倍
+        if($countB>1 OR $countY>1){
+            $matchMethodAndCodeText = $text;
+        }else{
+            $matchMethodAndCodeText = explode('各', $text)[0];
+        }
         #p(['methodArr'=>$methodArr, 'text'=>$text, 'matchMethodAndCodeText'=>$matchMethodAndCodeText]);
         #if(strpos($matchMethodAndCodeText, $methodArr['name'])===false) $matchMethodAndCodeText = $methodArr['name'].$matchMethodAndCodeText;
         if(strpos($text, '全包')!==false) { # 9豹子全包

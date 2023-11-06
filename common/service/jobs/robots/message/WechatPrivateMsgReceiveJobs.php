@@ -3,6 +3,7 @@ namespace common\service\jobs\robots\message;
 
 use common\service\chat\Tool_Common;
 use common\service\jobs\CommonJob;
+use common\service\jobs\statics_3d\UserDayStaticsJobs;
 use common\service\wechat\eyun\EYunMessageOperateService;
 use common\service\wechat\WechatUserService;
 use yii\helpers\Json;
@@ -30,6 +31,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
     }
 
     public static function handle($params){
+        $message = '消息处理成功';
         try {
             $user_id = $params['user_id']; # 代理用户id，系统用户id
             $data = $params['data']; # 消息内容体
@@ -67,12 +69,13 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             $r = self::reply($user_id, $wcId, [$err_msg], $data); # 回复消息
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r]);
 
-            return $err_msg;
+            $message = $err_msg;
         }
+        push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$user_id, 'type'=>$vdata['type'], 'wechat_user_id'=>$wechatUser['id']]);
 
         Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'12', ['wcId'=>$wcId, 'text'=>$text, 'replyTxts'=>$replyTxts]);
 
-        return '消息处理成功:';
+        return $message;
     }
 
     /**

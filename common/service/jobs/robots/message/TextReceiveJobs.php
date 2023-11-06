@@ -17,6 +17,11 @@ class TextReceiveJobs extends CommonJob {
         return self::handle($params);
     }
 
+    /**
+     * 一般为批量处理 -- 测试
+     * @param $params
+     * @return array|string
+     */
     public static function handle($params){
         try {
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'01', ['params'=>$params]);

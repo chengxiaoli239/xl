@@ -16,8 +16,11 @@ class WechatUserService extends BaseService
     const WECHAT_STATUS_OFFLINE = 0;
     const WECHAT_STATUS_ONLINE = 1;
 
-    const TYPE_BALANCE_UP = 1;
-    const TYPE_BALANCE_DOWN = 2;
+    # 用户消息业务类型
+    const TYPE_ORDER_BET = 1;
+    const TYPE_ORDER_CANCEL = 2;
+    const TYPE_BALANCE_UP = 3;
+    const TYPE_BALANCE_DOWN = 4;
 
     const OP_BALANCE_MEMBER_OP = 1;
     const OP_BALANCE_AGENT_OP = 2;
@@ -32,6 +35,8 @@ class WechatUserService extends BaseService
             self::WECHAT_STATUS_ONLINE => '在线',
         ],
         'balance_type' => [
+            self::TYPE_ORDER_BET => '下注',
+            self::TYPE_ORDER_CANCEL => '撤单',
             self::TYPE_BALANCE_UP => '上分',
             self::TYPE_BALANCE_DOWN => '下分',
         ],

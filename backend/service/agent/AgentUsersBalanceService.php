@@ -4,6 +4,7 @@ use backend\models\AgentUsersBalanceFlows;
 use backend\service\BaseService;
 use common\models\wechat\WechatUser;
 use common\service\chat\Tool_Common;
+use common\service\jobs\statics_3d\UserDayStaticsJobs;
 use common\service\thirdD\ThirdDTypeService;
 use common\service\wechat\WechatUserService;
 use yii\helpers\ArrayHelper;
@@ -86,9 +87,11 @@ class AgentUsersBalanceService extends BaseService {
             $msg = $desc;
             $data = [
                 'userInfo' => $WechatUser->attributes,
+                'type' => $type,
                 'msg' => $msg,
             ];
             $transaction->commit();
+            push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$agent_id, 'type'=>$type, 'wechat_user_id'=>$wechatUser['id']]);
             Tool_Common::log('/wechat/'.__FUNCTION__, 'ERR', '消息接收处理', ['text'=>$text, 'data'=>$data]);
         }catch (\Exception $e){
             $transaction->rollBack();

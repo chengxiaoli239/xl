@@ -61,6 +61,9 @@ return [
         'eyunapi' => [
             'class' => 'backend\modules\eyunapi\Module',
         ],
+        'statics' => [
+            'class' => 'backend\modules\statics\Module',
+        ],
     ],
     'components' => [
         'request' => [
