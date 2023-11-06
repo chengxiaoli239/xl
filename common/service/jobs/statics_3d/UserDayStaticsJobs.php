@@ -31,6 +31,7 @@ class UserDayStaticsJobs extends CommonJob {
 
             Tool_Common::log('/statics_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params]);
         }catch (\Exception $e){
+            Tool_Common::log('/statics_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['params'=>$params, 'err_msg'=>$e->getMessage()]);
             throw_info($e->getMessage());
         }
 
