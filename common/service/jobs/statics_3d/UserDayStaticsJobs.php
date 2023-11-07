@@ -26,7 +26,7 @@ class UserDayStaticsJobs extends CommonJob {
                 throw_info('系统代理id为空');
             }
             $type = $params['type'];
-            if(!in_array($type, WechatUserService::$s['balance_type'])){
+            if(!in_array($type, array_keys(WechatUserService::$s['balance_type']))){
                 throw_info('业务类型错误type：'.$type);
             }
             $lottery_type = $params['lottery_type']??0;
