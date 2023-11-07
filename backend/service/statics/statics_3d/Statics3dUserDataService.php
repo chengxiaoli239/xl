@@ -135,11 +135,11 @@ class Statics3dUserDataService extends BaseService {
             $setData = [
                 'user_id' => $user_id,
                 'wechat_user_id' => $wechat_user_id,
-                'bet_money' => $BetMoneys,
-                'bonus' => $BonusMoneys,
-                'profits' => $ProfitsMoneys,
-                'up_money' => $UpMoneys,
-                'down_money' => $DownMoneys,
+                'bet_money' => $BetMoneys?:0.00,
+                'bonus' => $BonusMoneys?:0.00,
+                'profits' => $ProfitsMoneys?:0.00,
+                'up_money' => $UpMoneys?:0.00,
+                'down_money' => $DownMoneys?:0.00,
             ];
             $now_time = time();
             $where = ['date'=>$date, 'wechat_user_id'=>$wechat_user_id];
