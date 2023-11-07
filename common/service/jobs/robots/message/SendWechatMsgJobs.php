@@ -21,12 +21,12 @@ class SendWechatMsgJobs extends CommonJob {
 
     public static function handle($params){
         try {
-            $wcId = $params['wcId']; # 微信原始id
+            #$wcId = $params['wcId']; # 微信原始id
             $fromUser = !empty($params['fromGroup']) ? $params['fromGroup'] : $params['fromUser']; # 发送者
             if(empty($fromUser)){
                 throw_info('接收的微信好友Id不能为空');
             }
-            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['wcId'=>$wcId, 'fromUser'=>$fromUser, 'params'=>$params]);
+            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['fromUser'=>$fromUser, 'params'=>$params]);
             $user_id = $params['user_id']; # 用户id
 
             $text = $params['content'];
@@ -37,7 +37,7 @@ class SendWechatMsgJobs extends CommonJob {
             return $e->getMessage();
         }
 
-        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['wcId'=>$wcId, 'text'=>$text]);
+        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['text'=>$text]);
 
         return '发送微信消息成功';
     }

@@ -7,6 +7,7 @@ use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
 use common\models\wechat\WechatUser;
 use common\service\CommonService;
+use common\service\jobs\robots\message\WechatPrivateMsgReceiveJobs;
 use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -141,32 +142,33 @@ class AgentUsersService extends BaseService {
     /**
      * @desc 审核用积分流水
      * @param $data
-     * @param $agent_id
+     * @param $user_id
      * @return array
      */
-    public static function userFlowsCheck($data, $agent_id = '', $desc = '代理操作'){
-
+    public static function userFlowsCheck($data, $user_id = '', $desc = '代理操作'): array
+    {
         try {
             $transaction = \Yii::$app->db->beginTransaction();
+            Tool_Common::log('/agent_user/'.__FUNCTION__, 'INFO', '代理审核或拒绝用户的申请', ['data'=>$data, 'user_id'=>$user_id, 'desc'=>$desc]);
             if(!$data['id']) {
                 throw_info('缺少参数id');
             }
 
-            if(empty($agent_id)){
+            if(empty($user_id)){
                 throw_info('不是代理,无权限');
             }
 
-            if(!$AgentUsersBalanceFlows = AgentUsersBalanceFlows::findOne(['id'=>$data['id'], 'agent_id'=>$agent_id])){
+            if(!$Flows = AgentUsersBalanceFlows::findOne(['id'=>$data['id'], 'agent_id'=>$user_id])){
                 throw_info('未找到记录');
             }
 
             $status = $data['status']; # 审核状态 0未审核1审核通过2拒绝
-            $balanceType = $AgentUsersBalanceFlows['type'];
+            $balanceType = $Flows['type'];
             // todo 此处要改成wechat_user表model
-            $WechatUser = WechatUser::findOne(['id'=>$AgentUsersBalanceFlows->member_id, 'user_id'=>$agent_id]);
+            $WechatUser = WechatUser::findOne(['id'=>$Flows->member_id, 'user_id'=>$user_id]);
             if($status == AgentUsersBalanceService::FLOW_CHECK_STATUS_PASS){
                 if($balanceType == WechatUserService::TYPE_BALANCE_UP){
-                    $after_balance = $WechatUser->balance + $AgentUsersBalanceFlows->balance; # 1 上分，积分增加
+                    $after_balance = $WechatUser->balance + $Flows->balance; # 1 上分，积分增加
                 }elseif($balanceType == WechatUserService::TYPE_BALANCE_DOWN){
                     $after_balance = $WechatUser->balance; # 下分审核成功则等待打款，这里不在做扣款处理（审核时已经扣减）
                 }
@@ -179,7 +181,7 @@ class AgentUsersService extends BaseService {
                 if($balanceType == WechatUserService::TYPE_BALANCE_UP){
                     $after_balance = $WechatUser->balance;
                 }elseif($balanceType == WechatUserService::TYPE_BALANCE_DOWN){
-                    $after_balance = $WechatUser->balance + $AgentUsersBalanceFlows->balance; # 2 下分拒绝，积分回退
+                    $after_balance = $WechatUser->balance + $Flows->balance; # 2 下分拒绝，积分回退
                 }
 
                 $WechatUser->balance = $after_balance; # 审核后的积分，
@@ -189,14 +191,17 @@ class AgentUsersService extends BaseService {
                 }
             }
 
-            $AgentUsersBalanceFlows->balance_after = $after_balance;
-            $AgentUsersBalanceFlows->status = $status;
-            $AgentUsersBalanceFlows->desc = $desc;
-            $AgentUsersBalanceFlows->check_time = (string)time();
-            if(!$AgentUsersBalanceFlows->save()){
-                throw_info(current($AgentUsersBalanceFlows->getErrors()));
+            $Flows->balance_after = $after_balance;
+            $Flows->status = $status;
+            $Flows->desc = $desc;
+            $Flows->check_time = (string)time();
+            if(!$Flows->save()){
+                throw_info(current($Flows->getErrors()));
             }
             $transaction->commit();
+
+            $replyTxt = '您好：申请'.WechatUserService::$s['balance_type'][$balanceType].$Flows->balance.', 处理结果：'.AgentUsersBalanceService::$s['status'][$status];
+            WechatPrivateMsgReceiveJobs::reply($user_id, [$replyTxt], ['fromUser' => $WechatUser->userName]); # 回复消息
         }catch (\Exception $e){
             $transaction->rollBack();
             Tool_Common::log('/agent_user/'.__FUNCTION__, 'ERR', '审核异常', ['data'=>$data, 'err_msg'=>$e->getMessage()]);

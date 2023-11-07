@@ -36,6 +36,12 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             $user_id = $params['user_id']; # 代理用户id，系统用户id
             $data = $params['data']; # 消息内容体
             $fromUser = $data['fromUser'];
+            $mkey = md5(self::class_basename(__CLASS__).'_'.$user_id.'_'.$fromUser);
+            $num = \Yii::$app->redis->incr($mkey);
+            if($num>1){
+                throw_info('短时间内重复操作，忽略处理', 50002);
+            }
+            \Yii::$app->redis->expire($mkey, 5);
 
             $wechatUser = WechatUserService::getWechatUsers($user_id)[$fromUser];
             # 1、好友判断
@@ -52,21 +58,21 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
 
 
             $text = $data['content'];
-            list($code, $vdata, $msg) = $MessageService->receive($text, $data['fromUser']);
+            list($code, $vdata, $msg) = $MessageService->receive($text, $fromUser);
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'01', ['user_id'=>$user_id, 'wcId'=>$wcId, 'code'=>$code, 'text'=>$text, 'vdata'=>$vdata, 'msg'=>$msg]);
             if($code>0){
                 throw_info($msg, $code);
             }
             $replyTxts = $vdata['replyTxts'];
 
-            self::reply($user_id, $wcId, $replyTxts, $data); # 回复消息
+            self::reply($user_id, $replyTxts, $data); # 回复消息
         }catch (\Exception $e){
             $err_msg =  $e->getMessage();
             if($e->getCode()>50000){ # 大于50000
                 Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'11', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'err_msg'=>$err_msg, 'code'=>$e->getCode()]);
                 return '忽略回复：'.$err_msg;
             }
-            $r = self::reply($user_id, $wcId, [$err_msg], $data); # 回复消息
+            $r = self::reply($user_id, [$err_msg], $data); # 回复消息
             Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r]);
 
             $message = $err_msg;
@@ -79,13 +85,20 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
     }
 
     /**
+     * 消息回复前处理
      * @param $user_id
      * @param $wcId
-     * @param string $replyTxts
-     * @param array $data
+     * @param string $replyTxts ['你好', '您好，您的申请已通过']
+     * @param array $data ['fromUser'=>'wxid_875i1kgd38x122'];
      * @return bool
      */
-    public static function reply($user_id, $wcId, $replyTxts=[], $data=[]){
+    public static function reply($user_id, $replyTxts=[], array $data=[]){
+        $mkey = md5(__FUNCTION___.'_'.$user_id.'_'.Json::encode($replyTxts).'_'.$data['fromUser']);
+        $incr = \Yii::$app->redis->incr($mkey);
+        Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '消息回复前处理', ['user_id'=>$user_id, 'replyTxts'=>$replyTxts, 'data'=>$data]);
+        if($incr<=1){
+            return false;
+        }
         $fromUser = $data['fromUser'];
         if(empty($fromUser)){
             return '接收的微信好友Id不能为空0';
@@ -98,12 +111,11 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
                 throw_info('回复消息replyTxt为空');
             }
             $sendData = [
-                'wcId' => $wcId,
                 'user_id' => $user_id,
                 'fromUser' => $fromUser, # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
                 'queue_delay_time' => rand(3, 8), # self::$waitSeconds,
                 'content' => $replyTxt, # 测试阶段调试信息 - 用户下注完回复
-                'business_id' => $wcId,
+                'business_id' => $user_id,
             ];
             if(!empty($data['fromGroup'])){
                 $sendData['fromGroup'] = $data['fromGroup'];
