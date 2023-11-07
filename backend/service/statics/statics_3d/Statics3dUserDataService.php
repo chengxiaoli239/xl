@@ -2,6 +2,7 @@
 namespace backend\service\statics\statics_3d;
 use backend\models\AgentUsersBalanceFlows;
 use backend\models\statics\Static3dUserProfitsDay;
+use backend\models\statics\Static3dUserProfitsDayAll;
 use backend\models\wechat\Bets;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\BaseService;
@@ -143,7 +144,7 @@ class Statics3dUserDataService extends BaseService {
             ];
             $now_time = time();
             $where = ['date'=>$date, 'wechat_user_id'=>$wechat_user_id];
-            $Static3dUserProfitsDayAll = Static3dUserProfitsDay::findOne($where);
+            $Static3dUserProfitsDayAll = Static3dUserProfitsDayAll::findOne($where);
             if(empty($Static3dUserProfitsDayAll)){
                 $Static3dUserProfitsDayAll = new Static3dUserProfitsDayAll();
                 $setData = array_merge($setData, [
