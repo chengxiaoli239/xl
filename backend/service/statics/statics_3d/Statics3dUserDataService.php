@@ -25,6 +25,7 @@ class Statics3dUserDataService extends BaseService {
     {
         $data['day_detail'] = self::calculateUserDayDataDetail($wechat_user_id, $date, $lottery_type);
         $data['day_all'] = self::calculateUserDayDataAll($wechat_user_id, $date);
+        Tool_Common::log('/statics/'.__FUNCTION__, 'INFO', '用户日报表统计', ['wechat_user_id'=>$wechat_user_id, 'date'=>$date, 'lottery_type'=>$lottery_type, 'data'=>$data]);
 
         return [0, $data, '处理成功'];
     }
@@ -169,7 +170,7 @@ class Statics3dUserDataService extends BaseService {
 
     /**
      * 获取用户：下注金额、中奖金额、盈利金额
-     * @param $baseWhere
+     * @param array $baseWhere
      * @return array
      */
     public static function getBetAndProfitsAndBonus(array $baseWhere=[]): array
