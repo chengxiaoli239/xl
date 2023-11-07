@@ -93,7 +93,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
      * @return bool
      */
     public static function reply($user_id, $replyTxts=[], array $data=[]){
-        $mkey = md5(__FUNCTION___.'_'.$user_id.'_'.Json::encode($replyTxts).'_'.$data['fromUser']);
+        $mkey = md5(__FUNCTION__.'_'.$user_id.'_'.Json::encode($replyTxts).'_'.$data['fromUser']);
         $incr = \Yii::$app->redis->incr($mkey);
         Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '消息回复前处理', ['user_id'=>$user_id, 'replyTxts'=>$replyTxts, 'data'=>$data]);
         if($incr<=1){
