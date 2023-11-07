@@ -40,7 +40,7 @@ class UserDayStaticsJobs extends CommonJob {
             throw_info($e->getMessage());
         }
 
-        return '客户日报表统计';
+        return '客户日报表统计完成[wechat_user_id:'.$wechat_user_id.']';
     }
 
 }
