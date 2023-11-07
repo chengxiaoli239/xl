@@ -42,6 +42,7 @@ use backend\service\BingDao\BingDaoService;
 use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
 use backend\service\sports\TennisSportsService;
+use backend\service\statics\statics_3d\Statics3dUserDataService;
 use backend\service\StaticService;
 use backend\service\UserService;
 use backend\service\wanbo\tennis\TennisService;

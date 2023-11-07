@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel backend\models\searchs\statics\Static3dUserProfitsDay */
+/* @var $searchModel backend\models\searchs\statics\Static3dUserProfitsDayAll */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = '日报表';
@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <script type="text/javascript" src="/js/layui/global.js?v={{STATIC_VERSION}}"></script>
 <script type="text/javascript" src="/js/common.js?v={{STATIC_VERSION}}"></script>
 
-<section class="static3d-user-profits-day-index wrapper site-min-height">
+<section class="static3d-user-profits-day-all-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
@@ -54,6 +54,18 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                         ],
                         #'bet_money',
+                        ['attribute' => 'up_money', 'label'=>'上分', //'headerOptions' => ['width' => '5%'],
+                            'format' => 'raw',
+                            'value'=> function($model){
+                                return $model->up_money;
+                            },
+                        ],
+                        ['attribute' => 'down_money', 'label'=>'下分', //'headerOptions' => ['width' => '5%'],
+                            'format' => 'raw',
+                            'value'=> function($model){
+                                return $model->down_money;
+                            },
+                        ],
                         ['attribute' => 'bet_money', 'label'=>'投分', //'headerOptions' => ['width' => '5%'],
                             'format' => 'raw',
                             'value'=> function($model){
@@ -72,12 +84,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format' => 'raw',
                             'value'=> function($model){
                                 return '<strong>'.($model->profits>0?'<font color="red">'.$model->profits.'</font>':'<font color="green">'.$model->profits.'</font>').'</strong>';
-                            },
-                        ],
-                        #'lottery_type',
-                        ['attribute' => 'lottery_type', 'label'=>'彩种', //'headerOptions' => ['width' => '5%'],
-                            'value'=> function($model){
-                                return \common\service\CommonService::getLotteryName($model->lottery_type);
                             },
                         ],
                         //'created_at',

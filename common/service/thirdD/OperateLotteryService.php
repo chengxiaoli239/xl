@@ -194,7 +194,7 @@ class OperateLotteryService extends CommonBaseService
 
             }catch (\Exception $e){
                 Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理异常1', ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
-                p($e->getMessage());
+                var_dump($e->getMessage());
             }
         }
 
@@ -896,7 +896,8 @@ class OperateLotteryService extends CommonBaseService
      * @param string $kjCode
      * @throws \common\exceptions\InfoException
      */
-    private static function endCaculate(object $betRow, int $zjCount, array $Odds, $kjCode=''){
+    private static function endCaculate(object $betRow, int $zjCount, array $Odds=[], $kjCode=''): bool
+    {
         if($zjCount>0){
             # 中奖
             $status = self::STATUS_LT_SUCCESS;

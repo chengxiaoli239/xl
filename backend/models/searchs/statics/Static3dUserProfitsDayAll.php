@@ -5,12 +5,12 @@ namespace backend\models\searchs\statics;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\statics\Static3dUserProfitsDay as Static3dUserProfitsDayModel;
+use backend\models\statics\Static3dUserProfitsDayAll as Static3dUserProfitsDayAllModel;
 
 /**
- * Static3dUserProfitsDay represents the model behind the search form of `backend\models\statics\Static3dUserProfitsDay`.
+ * Static3dUserProfitsDayAll represents the model behind the search form of `backend\models\statics\Static3dUserProfitsDayAll`.
  */
-class Static3dUserProfitsDay extends Static3dUserProfitsDayModel
+class Static3dUserProfitsDayAll extends Static3dUserProfitsDayAllModel
 {
     /**
      * @inheritdoc
@@ -18,9 +18,9 @@ class Static3dUserProfitsDay extends Static3dUserProfitsDayModel
     public function rules()
     {
         return [
-            [['id', 'user_id', 'wechat_user_id', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'user_id', 'wechat_user_id', 'created_at', 'updated_at'], 'integer'],
             [['date', 'wechat_user_name', 'update_time'], 'safe'],
-            [['bet_money', 'bonus', 'profits'], 'number'],
+            [['bet_money', 'bonus', 'up_money', 'down_money', 'profits'], 'number'],
         ];
     }
 
@@ -42,7 +42,7 @@ class Static3dUserProfitsDay extends Static3dUserProfitsDayModel
      */
     public function search($params)
     {
-        $query = Static3dUserProfitsDayModel::find();
+        $query = Static3dUserProfitsDayAllModel::find();
 
         // add conditions that should always apply here
 
@@ -66,8 +66,9 @@ class Static3dUserProfitsDay extends Static3dUserProfitsDayModel
             'wechat_user_id' => $this->wechat_user_id,
             'bet_money' => $this->bet_money,
             'bonus' => $this->bonus,
+            'up_money' => $this->up_money,
+            'down_money' => $this->down_money,
             'profits' => $this->profits,
-            'lottery_type' => $this->lottery_type,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,

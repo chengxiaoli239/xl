@@ -3,16 +3,16 @@
 namespace backend\modules\statics\controllers;
 
 use Yii;
-use backend\models\statics\Static3dUserProfitsDay;
-use backend\models\searchs\statics\Static3dUserProfitsDay as Static3dUserProfitsDaySearch;
+use backend\models\statics\Static3dUserProfitsDayAll;
+use backend\models\searchs\statics\Static3dUserProfitsDayAll as Static3dUserProfitsDayAllSearch;
 use backend\controllers\BaseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * Static3dUserProfitsDayController implements the CRUD actions for Static3dUserProfitsDay model.
+ * Static3dUserProfitsDayController implements the CRUD actions for Static3dUserProfitsDayAll model.
  */
-class Static3dUserProfitsDayController extends BaseController
+class Static3dUserProfitsDayAllController extends BaseController
 {
     /**
      * @inheritdoc
@@ -30,19 +30,19 @@ class Static3dUserProfitsDayController extends BaseController
     }
 
     /**
-     * Lists all Static3dUserProfitsDay models.
+     * Lists all Static3dUserProfitsDayAll models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new Static3dUserProfitsDaySearch();
+        $searchModel = new Static3dUserProfitsDayAllSearch();
         $queryParams = Yii::$app->request->queryParams;
-        if(!empty($queryParams) && empty($queryParams['Static3dUserProfitsDay']['date'])){
-            $queryParams['Static3dUserProfitsDay']['date'] = date('Y-m-d');
+        if(!empty($queryParams) && empty($queryParams['Static3dUserProfitsDayAll']['date'])){
+            $queryParams['Static3dUserProfitsDayAll']['date'] = date('Y-m-d');
         }
 
         if($this->_user_id != 1){
-            $queryParams['Static3dUserProfitsDay']['user_id'] = $this->_user_id;
+            $queryParams['Static3dUserProfitsDayAll']['user_id'] = $this->_user_id;
         }
 
         $dataProvider = $searchModel->search($queryParams);
@@ -53,7 +53,7 @@ class Static3dUserProfitsDayController extends BaseController
     }
 
     /**
-     * Displays a single Static3dUserProfitsDay model.
+     * Displays a single Static3dUserProfitsDayAll model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -66,13 +66,13 @@ class Static3dUserProfitsDayController extends BaseController
     }
 
     /**
-     * Creates a new Static3dUserProfitsDay model.
+     * Creates a new Static3dUserProfitsDayAll model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Static3dUserProfitsDay();
+        $model = new Static3dUserProfitsDayAll();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -84,7 +84,7 @@ class Static3dUserProfitsDayController extends BaseController
     }
 
     /**
-     * Updates an existing Static3dUserProfitsDay model.
+     * Updates an existing Static3dUserProfitsDayAll model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -104,7 +104,7 @@ class Static3dUserProfitsDayController extends BaseController
     }
 
     /**
-     * Deletes an existing Static3dUserProfitsDay model.
+     * Deletes an existing Static3dUserProfitsDayAll model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -118,15 +118,15 @@ class Static3dUserProfitsDayController extends BaseController
     }
 
     /**
-     * Finds the Static3dUserProfitsDay model based on its primary key value.
+     * Finds the Static3dUserProfitsDayAll model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Static3dUserProfitsDay the loaded model
+     * @return Static3dUserProfitsDayAll the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Static3dUserProfitsDay::findOne($id)) !== null) {
+        if (($model = Static3dUserProfitsDayAll::findOne($id)) !== null) {
             return $model;
         }
 

@@ -11,6 +11,7 @@ use Yii;
  * @property string $date 日期
  * @property int $user_id 系统用户id(代理id)
  * @property int $wechat_user_id 微信用户表id
+ * @property string $wechat_user_name 微信id
  * @property string $bet_money 日投注金额
  * @property string $bonus 中奖金额
  * @property string $profits 利润
@@ -39,6 +40,8 @@ class Static3dUserProfitsDay extends \common\models\base\BaseModel
             [['user_id', 'wechat_user_id', 'lottery_type', 'created_at', 'updated_at'], 'integer'],
             [['bet_money', 'bonus', 'profits'], 'number'],
             [['updated_at'], 'required'],
+            [['wechat_user_name'], 'string', 'max' => 32],
+            [['date', 'user_id', 'lottery_type'], 'unique', 'targetAttribute' => ['date', 'user_id', 'lottery_type']],
         ];
     }
 
@@ -52,6 +55,7 @@ class Static3dUserProfitsDay extends \common\models\base\BaseModel
             'date' => Yii::t('app', '日期'),
             'user_id' => Yii::t('app', '系统用户id(代理id)'),
             'wechat_user_id' => Yii::t('app', '微信用户表id'),
+            'wechat_user_name' => Yii::t('app', '微信id'),
             'bet_money' => Yii::t('app', '日投注金额'),
             'bonus' => Yii::t('app', '中奖金额'),
             'profits' => Yii::t('app', '利润'),

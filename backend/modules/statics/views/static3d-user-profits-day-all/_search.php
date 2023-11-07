@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\searchs\statics\Static3dUserProfitsDay */
+/* @var $model backend\models\searchs\statics\Static3dUserProfitsDayAll */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -20,12 +20,6 @@ use yii\widgets\ActiveForm;
         </div>
         <div class="col-lg-2 col-xs-3">
             <?= $form->field($model, 'wechat_user_name')->label('微信id') ?>
-        </div>
-        <div class="col-lg-2 col-xs-6">
-            <?= $form->field($model, 'lottery_type')->dropDownList(
-                \common\models\thirdD\Bets::LOTTERYS,
-                ['prompt' => '-请选择-'] // Optional: Add a prompt message
-            )->label('类型')?>
         </div>
         <div class="col-lg-2 col-xs-6">
             <label> </label>

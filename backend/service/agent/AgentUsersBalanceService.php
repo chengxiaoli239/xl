@@ -5,8 +5,9 @@ use backend\service\BaseService;
 use common\models\wechat\WechatUser;
 use common\service\chat\Tool_Common;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
-use common\service\thirdD\ThirdDTypeService;
+use common\service\thirdD\CommonBaseService;
 use common\service\wechat\WechatUserService;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii;
 
@@ -26,19 +27,23 @@ class AgentUsersBalanceService extends BaseService {
     ];
 
     /**
-     * 处理上下分申请匹配     * @param $text
-     * @param $wechatUser
+     * 处理上下分申请匹配
+     * @param string $text
+     * @param array $wechatUser
      * @return array
+     * @throws Exception
      */
-    public static function operateBalanceChange($text='', $wechatUser=[]){
+    public static function operateBalanceChange(string $text='', array $wechatUser=[]): array
+    {
         try {
             $transaction = \Yii::$app->db->beginTransaction();
             $WechatUser = WechatUser::findOne($wechatUser['id']);
             $agent_id = $WechatUser->user_id;
             $member_id = (string)$WechatUser->id;
+            $now_balance = $WechatUser->balance; # 操作时积分
 
             if(AgentUsersBalanceFlows::findOne(['agent_id'=>$agent_id, 'member_id'=>$member_id, 'status'=>0])){
-                throw_info('有未审核记录，请联系矿主处理', ThirdDTypeService::CODE_FOR_USER);
+                throw_info('有未审核记录，请联系矿主处理', CommonBaseService::CODE_FOR_USER);
             }
 
             if(preg_match('/上\s*(\d+)$/', $text,$matches)){
@@ -49,7 +54,6 @@ class AgentUsersBalanceService extends BaseService {
                 $balance = (int)$matches[1];
                 $type = WechatUserService::TYPE_BALANCE_DOWN;
                 # 校验积分下分上分充足
-                $now_balance = $WechatUser->balance;
                 $after_balance = $now_balance - $balance;
                 $desc = '申请下'.$balance.'，暂扣'.$balance.'，剰余'.$after_balance.'，等待转咪';;
                 if($after_balance<0){
@@ -96,11 +100,11 @@ class AgentUsersBalanceService extends BaseService {
         }catch (\Exception $e){
             $transaction->rollBack();
             $data = [ ];
-            $msg = ($e->getCode()==ThirdDTypeService::CODE_FOR_USER) ? $e->getMessage() : '申请上下分异常';
+            $msg = ($e->getCode()== CommonBaseService::CODE_FOR_USER) ? $e->getMessage() : '申请上下分异常';
             Tool_Common::log('/wechat/'.__FUNCTION__, 'ERR', '消息接收处理异常', ['text'=>$text, 'err_msg'=>$e->getMessage().'_'.$e->getFile().'_'.$e->getLine()]);
         }
 
-        return [ThirdDTypeService::CODE_FOR_USER, $data, $msg];
+        return [CommonBaseService::CODE_FOR_USER, $data, $msg];
     }
 
 }
