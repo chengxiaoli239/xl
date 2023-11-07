@@ -30,9 +30,6 @@ class UserDayStaticsJobs extends CommonJob {
                 throw_info('业务类型错误type：'.$type);
             }
             $lottery_type = $params['lottery_type']??0;
-            if(empty($lottery_type)){
-                throw_info('彩种类型错误lottery_type：'.$lottery_type);
-            }
 
             $date = $params['date']??date('Y-m-d');
             list($code, $data, $msg) = Statics3dUserDataService::calculateUserDayData($wechat_user_id, $date, $lottery_type);
