@@ -4,6 +4,7 @@ namespace common\kj\qxc;
 use backend\service\CurlService;
 use backend\service\NineNine\NineNineNewService;
 use common\kj\BaseKj;
+use common\service\thirdD\CommonBaseService;
 use common\tools\Tool_Common;
 use  yii;
 
@@ -90,7 +91,7 @@ class QxcTcw extends BaseKj{
 
         if($is_auto == 2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
             $domain = BaseKj::getApiHostByRoute('/kj/qxc/nine-nine-plw');
-            $lotNames = [1=>'hnqxc', 17=>'plw'];
+            $lotNames = [1=>'hnqxc', 17=>'plw', 26=>'fcsd', '27'=>'plw'];
             $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/lastTen/'.$lotNames[$lottery_type];
 
             $data = CurlService::getCurl($url);
@@ -98,6 +99,9 @@ class QxcTcw extends BaseKj{
             $kData = $data['data'][0];
             $tmp_codes = $kData['result']['numbers'];
             $kjData['expect'] = $kData['issue'];
+            if($lottery_type == CommonBaseService::LOTTERY_TYPE_FUCAI){
+                $tmp_codes[3] = 0;
+            }
             $kjData['opencode'] = $tmp_codes[0].','.$tmp_codes[1].','.$tmp_codes[2].','.$tmp_codes[3].',0';
             $kjData['opentime'] = date('Y-m-d H:i:s', (int)($kData['openTime']/1000));
             //$kjData = ['expect'=>20190125060, 'opencode'=>'0,4,1,9,1', 'opentime'=>'2019-01-25 16:00:59', 'opentimestamp'=>1548403259 ] # 返回格式

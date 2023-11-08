@@ -166,11 +166,12 @@ class AgentUsersService extends BaseService {
             $balanceType = $Flows['type'];
             // todo 此处要改成wechat_user表model
             $WechatUser = WechatUser::findOne(['id'=>$Flows->member_id, 'user_id'=>$user_id]);
+            $before_balance = $WechatUser->balance;
             if($status == AgentUsersBalanceService::FLOW_CHECK_STATUS_PASS){
                 if($balanceType == WechatUserService::TYPE_BALANCE_UP){
-                    $after_balance = $WechatUser->balance + $Flows->balance; # 1 上分，积分增加
+                    $after_balance = $before_balance + $Flows->balance; # 1 上分，积分增加
                 }elseif($balanceType == WechatUserService::TYPE_BALANCE_DOWN){
-                    $after_balance = $WechatUser->balance; # 下分审核成功则等待打款，这里不在做扣款处理（审核时已经扣减）
+                    $after_balance = $before_balance; # 下分审核成功则等待打款，这里不在做扣款处理（审核时已经扣减）
                 }
                 $WechatUser->balance = $after_balance; # 审核后的积分，
                 $WechatUser->updated_at = time();
@@ -201,8 +202,9 @@ class AgentUsersService extends BaseService {
             $transaction->commit();
 
             $replyTxt = '【提示】您好：申请'.WechatUserService::$s['balance_type'][$balanceType].$Flows->balance.
-                "\n【处理结果】".AgentUsersBalanceService::$s['status'][$status].
-                "【盛鱼】".$after_balance;
+                "\n【结果】".AgentUsersBalanceService::$s['status'][$status].
+                "\n【申请前】".$before_balance.
+                "\n【盛鱼】".$after_balance;
             WechatPrivateMsgReceiveJobs::reply($user_id, [$replyTxt], ['fromUser' => $WechatUser->userName]); # 回复消息
         }catch (\Exception $e){
             $transaction->rollBack();

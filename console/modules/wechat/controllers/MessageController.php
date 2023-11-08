@@ -3,6 +3,7 @@
 namespace console\modules\wechat\controllers;
 
 use backend\service\HN0898Service;
+use common\kj\qxc\QxcTcw;
 use console\controllers\BaseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -19,8 +20,8 @@ class MessageController extends BaseController
     }
 
     public function actionDw(){
-        $q = HN0898Service::getQihao($lt=27);
-        var_dump($q);
+        $data = QxcTcw::getNineNineLottery($type='json', $is_auto=1, $lottery_type=26);
+        p($data);
     }
 
 }

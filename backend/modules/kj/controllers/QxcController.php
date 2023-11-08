@@ -126,4 +126,27 @@ class QxcController extends Controller
         return $data;
     }
 
+    /**
+     * @desc 官网 福彩3D  https://99065jjj.com/
+     * @param string $type
+     * @return array|bool
+     */
+    public function actionFcSd(string $type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $post = \Yii::$app->request->post();
+        $data = QxcTcw::getNineNineLottery($type, $post['is_auto'], $lottery_type=26);
+        return $data;
+    }
+
+    /**
+     * @desc 官网 排列3  https://99065jjj.com/
+     * @param string $type
+     * @return array|bool
+     */
+    public function actionPl3(string $type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $post = \Yii::$app->request->post();
+        $data = QxcTcw::getNineNineLottery($type, $post['is_auto'], $lottery_type=27);
+        return $data;
+    }
 }

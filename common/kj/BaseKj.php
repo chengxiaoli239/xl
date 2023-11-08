@@ -45,7 +45,8 @@ class BaseKj extends BaseService {
      * @param $kjData  kjData:{"expect":20230326139,"opencode":"9,1,7,3,6","opentime":"2023-03-26 11:36:10"}
      * @return bool
      */
-    public static function setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao='', $kjData=[]){
+    public static function setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, string $qihao='', $kjData=[]): bool
+    {
         $m = \Yii::$app->cache;
 
         $set_time = 300;
