@@ -15,7 +15,9 @@ class ThirddController extends Controller
     public function actionFuCai($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $Thirdd = new Thirdd();
-        $data = $Thirdd->getFuCai3d($type);
+        $post = \Yii::$app->request->post();
+        $is_auto = $post['is_auto']??1;
+        $data = $Thirdd->getFuCai3d($type, $is_auto);
 
         return $data;
     }

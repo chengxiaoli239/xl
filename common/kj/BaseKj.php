@@ -38,7 +38,7 @@ class BaseKj extends BaseService {
         $exist_key = 'grab_lottery_data_'.$lotery_type;
         $exist = \Yii::$app->redis->sadd($exist_key, $lotery_type);
         if(!$exist){
-            throw_info('短时间内多次处理单号：'.$exist_key, 30002);
+            throw_info('短时间内多次处理key:'.$exist_key, 30002);
         }
         \Yii::$app->redis->expire($exist_key, $seconds);
 
