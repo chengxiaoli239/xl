@@ -94,15 +94,15 @@ class  CommonService{
      * @decripion 获取时时彩开奖号码
      * @param $qihao
      * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
-     * @return bool
+     * @return string
      */
-    public static function getAwardNumberByQihao($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE): bool
+    public static function getAwardNumberByQihao($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE): string
     {
         if(!$qihao) return false;
         $m = \Yii::$app->cache;
 
-        $mkey = 'KJ_DATA_2_'.$lottery_type.'_'.$qihao;
-        if(!$kjData = $m->get($mkey)){
+        $mkey = 'KJ_DATA_x3_'.$lottery_type.'_'.$qihao;
+        if(true OR !$kjData = $m->get($mkey)){
             $kjData = SscKjData::find()->select(['code_str'])->where(['qihao'=>$qihao, 'lottery_type'=>$lottery_type])->asArray()->limit(1)->one()['code_str'];
             if(!$kjData){
                 return false;
