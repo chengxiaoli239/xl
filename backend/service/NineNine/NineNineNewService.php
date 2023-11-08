@@ -41,7 +41,19 @@ use yii\helpers\ArrayHelper;
 use  yii;
 
 class NineNineNewService extends BaseTZService {
-    public static $lotNames = [1=>'hnqxc', 17=>'plw', 19=>'nsdk', 20=>'dqs', 21=>'szzs', 22=>'szcz', 23=>'sfytf', 24=>'tfytf', 25=>'jsqws'];
+    public static $lotNames = [
+        1=>'hnqxc',
+        17=>'plw',
+        19=>'nsdk',
+        20=>'dqs',
+        21=>'szzs',
+        22=>'szcz',
+        23=>'sfytf',
+        24=>'tfytf',
+        25=>'jsqws',
+        26=>'fcsd',
+        27=>'plw',
+    ];
     public static $username = '';
     public static $password = '';
     public static $baseUrl =  '';

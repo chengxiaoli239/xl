@@ -79,7 +79,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
         }
         push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$user_id, 'type'=>$vdata['type'], 'wechat_user_id'=>$wechatUser['id']]);
 
-        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'12', ['wcId'=>$wcId, 'text'=>$text, 'replyTxts'=>$replyTxts]);
+        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'13', ['wcId'=>$wcId, 'text'=>$text, 'replyTxts'=>$replyTxts]);
 
         return $message;
     }
@@ -96,7 +96,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
         $mkey = md5(__FUNCTION__.'_'.$user_id.'_'.Json::encode($replyTxts).'_'.$data['fromUser']);
         $incr = \Yii::$app->redis->incr($mkey);
         Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '消息回复前处理', ['user_id'=>$user_id, 'replyTxts'=>$replyTxts, 'data'=>$data]);
-        if($incr<=1){
+        if($incr>1){
             return false;
         }
         $fromUser = $data['fromUser'];

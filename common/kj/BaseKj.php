@@ -69,7 +69,8 @@ class BaseKj extends BaseService {
      * @param integer $id
      * @return string
      */
-    public static function getApiHost($id){
+    public static function getApiHost($id): string
+    {
         $domain = KjConfig::findOne($id)->api_host;
 
         return $domain;
@@ -80,7 +81,8 @@ class BaseKj extends BaseService {
      * @param string $route
      * @return string
      */
-    public static function getApiHostByRoute($route = '/kj/cqssc/nine-num'){
+    public static function getApiHostByRoute(string $route = '/kj/cqssc/nine-num'): string
+    {
         $domain = KjConfig::findOne(['path'=>$route])->api_host;
 
         return $domain;

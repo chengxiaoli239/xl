@@ -131,7 +131,7 @@ class QxcTcw extends BaseKj{
      * @param int $lottery_type
      * @return string|array
      */
-    public static function getNineNineQihao($lottery_type = 1, $is_auto=1){
+    public static function getNineNineQihao(int $lottery_type = 1, $is_auto=1){
         $m = \Yii::$app->cache;
         $mkey = 'getNineNineQihao_'.$lottery_type;
         if($is_auto==2 OR !$qihao = $m->get($mkey)){
@@ -141,7 +141,7 @@ class QxcTcw extends BaseKj{
             Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '获取九九期号', ['lottery_type'=>$lottery_type, 'rst'=>$rstData]);
             if($rstData['code']==200 && isset($rstData['data'][0])){
                 $qihao = $rstData['data'][0]['issue'];
-                $m->set($mkey, $qihao, 30);
+                $m->set($mkey, $qihao, 1800);
             }
         }
 

@@ -1317,12 +1317,10 @@ class HN0898Service extends BaseTZService {
                 $qihao = $next_qihao;
                 break;
             case 26: # 福彩3D
-                $num = HN0898Service::getDateNum();
-                $qihao = date('y').($num-10-1);
-                break;
             case 27: # 排列三
-                $num = HN0898Service::getDateNum();
-                $qihao = date('y').($num-10-1);
+                $qihao = substr(QxcTcw::getNineNineQihao($lottery_type), 2)+1;# 期号
+                $localQihao = SscKjData::find()->select(['qihao'=>'MAX(qihao)'])->where(['lottery_type'=>$lottery_type])->scalar() + 1;
+                $qihao = max($qihao, $localQihao); # 取最大
                 break;
             break;
         }
@@ -1457,7 +1455,16 @@ class HN0898Service extends BaseTZService {
             case 23: # 以太坊3分
             case 24: # 以太坊10分
             case 25: # 江苏七位数
-                $qihao = QxcTcw::getNineNineQihao($lottery_type, $is_auto = 1);# 已经开奖的期号# 九九网 期号
+                $qihao = QxcTcw::getNineNineQihao($lottery_type, $is_auto = 1);# 已经开奖的期号 九九网 期号
+                break;
+            case 26: # 福彩3D
+            case 27: # 排列三
+                $qihao = substr(QxcTcw::getNineNineQihao($lottery_type), 2);# 期号
+                $localQihao = SscKjData::find()->select(['qihao'=>'MAX(qihao)'])->where(['lottery_type'=>$lottery_type])->scalar();
+                $qihao = max($qihao, $localQihao); # 取最大
+                break;
+            default:
+                $qihao = SscKjData::find()->select(['qihao'=>'MAX(qihao)'])->where(['lottery_type'=>$lottery_type])->scalar();
                 break;
         }
 

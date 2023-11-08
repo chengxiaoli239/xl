@@ -11,6 +11,11 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log', 'queue'],
     'controllerNamespace' => 'console\controllers',
+    'modules' => [
+        'wechat' => [
+            'class' => 'console\modules\wechat\Module',
+        ],
+    ],
     'components' => [
         'log' => [
             'targets' => [
