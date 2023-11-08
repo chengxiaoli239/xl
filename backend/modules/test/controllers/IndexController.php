@@ -865,8 +865,6 @@ class IndexController extends Controller
         p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         $rst = BingDaoService::login($uid = 12, $tz_system_id = 13);
         p($rst);
-        $rst = OpKjService::opSscKjData(12);
-        p($rst); # 处理投注数据
 
         set_time_limit(0);
         $rst = JinYingService::getBalance('18', '15');
