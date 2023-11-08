@@ -372,10 +372,10 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%static_3d_user_profits_day}}'); p($r);
         $plan = UserSysPlans::findOne(7609);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [136]);
         p(count($filter_dynamic_codes));
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%static_3d_user_profits_day}}'); p($r);
         $d = Thirdd::getCurrentKjData($lottery_type=26);p($d);
         $Thirdd = new Thirdd();
         $data = $Thirdd->getFuCai3d($type='json', 2);p($data);

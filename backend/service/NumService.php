@@ -255,6 +255,9 @@ class NumService extends BaseService {
         139=>'过滤百位且大小 ',
         140=>'过滤十位且大小 ',
         141=>'过滤个位且大小 ',
+
+        142=>'过滤上期每两个号码及双重(四定)', # 同97、98
+        143=>'过滤昨日同期每两个号码及双重(四定)', # 同97、98
     ];
 
     /**
@@ -3132,7 +3135,7 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic82($plan);
                     break;
                 case 97: # 过滤上期每两个号码及对数(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic83($plan);
+                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $c_type=1);
                     break;
                 case 98: # 过滤昨日同期每两个号码及对数(四定)
                     $codes = NumService::getBeforeKjCodesDynamic83($plan, $c_type=2);
@@ -3256,6 +3259,12 @@ class NumService extends BaseService {
                     break;
                 case 141: # 过滤个位且全小
                     $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=4, $filterTypes=['type_dx']); #
+                    break;
+                case 142: # 过滤上期每两个号码及双重(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $c_type=1, $d_type=2);
+                    break;
+                case 143: # 过滤昨日同期每两个号码及双重(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $c_type=2, $d_type=2);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
@@ -4942,9 +4951,11 @@ class NumService extends BaseService {
      * 过滤类型号码 - # 过滤上期每两个号码及对数(四定)
      * @param object $plan
      * @param int $c_type 1上期2昨日同期
+     * @param int $d_type 1对数2双重
      * @return array
      */
-    private static function getBeforeKjCodesDynamic83(object $plan, $c_type=1){
+    private static function getBeforeKjCodesDynamic83(object $plan, int $c_type=1, int $d_type=1): array
+    {
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
         $current_kj_qihao = $hzArr['filters']['current_kj_qihao']; # 当期已经开奖的期号
         $lottery_type = $plan->lottery_type;
@@ -4970,11 +4981,20 @@ class NumService extends BaseService {
         $fixedPos = [[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]];
         $notWhere = ['OR'];
         foreach ($fixedPos as $pos){
-            $notWhere[] = ['AND',
+            $tmpNotWhere = ['AND',
                 ['=', 'code_'.$pos[0], $historyKjData['code'.$pos[0]]],
                 ['=', 'code_'.$pos[1], $historyKjData['code'.$pos[1]]],
-                ['=', 'type_log', 1],
             ];
+            switch (1){
+                case 2: # 双重
+                    $tmpNotWhere[] = ['=', 'type_2', 1];
+                    break;
+                default: # 默认对数
+                    $tmpNotWhere[] = ['=', 'type_log', 1];
+                    break;
+            }
+
+            $notWhere[] = $tmpNotWhere;
         }
 
         $query = (new \yii\db\Query())
