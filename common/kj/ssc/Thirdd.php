@@ -86,7 +86,7 @@ class Thirdd extends BaseKj {
                     }
 
                     $kjData = ['expect'=>$qihao, 'opencode'=>$opencode, 'opentime'=>substr($kjData['date'], 0, 10).' 21:30:00'];
-                    Tool_Common::log('luck5', 'INFO', '号码网盘抓取-幸运网1', ['domain'=>$domain, 'kjData'=>$kjData]);
+                    Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '号码网盘抓取-幸运网1', ['domain'=>$domain, 'kjData'=>$kjData]);
                 }catch (\Exception $e){
                     Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '网盘开奖数据获取异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
                 }
