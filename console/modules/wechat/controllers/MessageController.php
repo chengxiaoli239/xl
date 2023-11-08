@@ -20,8 +20,7 @@ class MessageController extends BaseController
     }
 
     public function actionDw(){
-        $data = QxcTcw::getNineNineLottery($type='json', $is_auto=1, $lottery_type=26);
-        p($data);
+        var_dump('dw');
     }
 
 }

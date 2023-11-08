@@ -12,7 +12,7 @@ class ThirddController extends Controller
      * @desc 官方
      * @return array|json|xml|bool
      */
-    public function actionFucai($type = 'json'){
+    public function actionFuCai($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $Thirdd = new Thirdd();
         $data = $Thirdd->getFuCai3d($type);

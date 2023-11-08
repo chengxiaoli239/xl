@@ -21,12 +21,12 @@ class Thirdd extends BaseKj {
      * @param string $returnType
      * @return array|bool
      */
-    public function getFuCai3d($returnType = 'json', $is_auto = 1){
+    public function getFuCai3d(string $returnType = 'json', $is_auto = 1){
 
         $lottery_type = 26;
         if($is_auto==2 OR !$kjData = Thirdd::getCurrentKjData($lottery_type)) {
             try {
-                $domain = BaseKj::getApiHostByRoute('/kj/thirdd/fucai');
+                $domain = BaseKj::getApiHostByRoute('/kj/thirdd/fu-cai');
                 // 设置请求头
                 $headers = [
                     'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
@@ -87,25 +87,7 @@ class Thirdd extends BaseKj {
                 Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '网盘开奖数据获取异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
             }
         }
-        if(empty($kjData['opencode'])) return false;
-        $opencode = $kjData['opencode'];
-        $opentime = $kjData['opentime'];
-        $expect = $kjData['expect'];
-
-        if(!empty($opencode)){
-            self::setKjDataCache(self::$lottery_type, $expect, $kjData);
-        }
-
-        if($returnType == 'xml'){
-            header("Content-type: application/xml");
-            echo'<?xml version="1.0" encoding="utf-8"?>';
-            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
-            ob_end_flush();exit;
-        }else{
-            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
-        }
-
-        return $rst;
+        return self::extracted($kjData, $lottery_type, $returnType, $is_auto);
     }
 
 

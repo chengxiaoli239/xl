@@ -14,10 +14,10 @@ use backend\service\baota\BaoTaService;
 use backend\service\BaseService;
 use backend\service\datas\DatasClearService;
 use backend\service\SscDataService;
-use backend\service\WxService;
-use common\service\CommonService;
 use common\service\index\CrontabIndexService;
 use common\service\proxy\ProxyBaseService;
+use common\service\thirdD\CommonBaseService;
+use common\service\thirdD\OperateLotteryService;
 use Yii;
 use backend\service\OpKjService;
 use common\tools\KjDataGet;
@@ -38,7 +38,7 @@ class IndexController extends Controller
 
     /**
      * @desc 时时彩：逐期获取开奖数据
-     * @return array
+     * /www/server/php/74/bin/php yii data/index/grab-kj-data     * @return array
      */
     public function actionGrabKjData(): array
     {
@@ -51,6 +51,23 @@ class IndexController extends Controller
 
         return $rst;
     }
+
+    /**
+     * /www/server/php/74/bin/php yii data/index/run-lottery
+     */
+    public function actionRunLottery(): bool
+    {
+        $dateHI = date('H:i');
+        if('00:00'<$dateHI && $dateHI<'21:00'){
+            var_dump('未在开奖时间区间，暂不处理');
+            return false;
+        }
+        foreach (array_keys(CommonBaseService::THIRDD_LOTTERY_TYPES) as $lottery_type){
+            OperateLotteryService::operate($lottery_type);
+        }
+        return true;
+    }
+
 
     /**
      * @desc 统计
