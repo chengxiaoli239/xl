@@ -49,7 +49,7 @@ class AgentUsersBalanceService extends BaseService {
             if(preg_match('/上\s*(\d+)$/', $text,$matches)){
                 $balance = (int)$matches[1];
                 $type = WechatUserService::TYPE_BALANCE_UP;
-                $desc = '申请上 '.$balance.'，'.'等待审核成功上分';
+                $desc = '申请上 '.$balance.'，'.'等待审核';
             }elseif (preg_match('/下\s*(\d+)$/', $text,$matches)){
                 $balance = (int)$matches[1];
                 $type = WechatUserService::TYPE_BALANCE_DOWN;
