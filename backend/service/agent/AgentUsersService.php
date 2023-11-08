@@ -200,7 +200,9 @@ class AgentUsersService extends BaseService {
             }
             $transaction->commit();
 
-            $replyTxt = '您好：申请'.WechatUserService::$s['balance_type'][$balanceType].$Flows->balance.', 处理结果：'.AgentUsersBalanceService::$s['status'][$status];
+            $replyTxt = '【提示】您好：申请'.WechatUserService::$s['balance_type'][$balanceType].$Flows->balance.
+                "\n【处理结果】".AgentUsersBalanceService::$s['status'][$status].
+                "【盛鱼】".$after_balance;
             WechatPrivateMsgReceiveJobs::reply($user_id, [$replyTxt], ['fromUser' => $WechatUser->userName]); # 回复消息
         }catch (\Exception $e){
             $transaction->rollBack();

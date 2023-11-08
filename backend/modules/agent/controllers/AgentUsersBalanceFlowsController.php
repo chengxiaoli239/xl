@@ -66,7 +66,8 @@ class AgentUsersBalanceFlowsController extends BaseController
     /**
      * @return array
      */
-    public function actionUserFlowsCheck(){
+    public function actionUserFlowsCheck(): array
+    {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $desc = $this->_post['type'] == WechatUserService::OP_BALANCE_MEMBER_OP ? '用户申请->代理审核' : '代理操作';
 
