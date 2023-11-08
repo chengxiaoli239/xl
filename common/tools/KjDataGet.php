@@ -152,9 +152,9 @@ class KjDataGet
      * 单个彩种号码抓取
      * @param int $lottery_type
      * @param int $is_grab_history
-     * @return array
+     * @return array|null
      */
-    public static function grabOneLotteryKjData(int $lottery_type=DEFAULT_LOTTERY_TYPE, int $is_grab_history=0): array
+    public static function grabOneLotteryKjData(int $lottery_type=DEFAULT_LOTTERY_TYPE, int $is_grab_history=0): array|null
     {
         $m = \Yii::$app->cache;
         $RedisLock = new RedisLock();
@@ -200,6 +200,7 @@ class KjDataGet
                 /* 处理系统投注计划 add 2019-01-21 */
                 KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
                 $RedisLock->unlock($grabOneMkey);
+                return null;
             }catch (\Exception $e){
                 $RedisLock->unlock($grabOneMkey);
                 Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '短时间内操作', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);

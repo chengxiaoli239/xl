@@ -175,7 +175,8 @@ class IndexController extends Controller
 
     /**
      * @desc 批量插入投注任务
-     * @return array
+     * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii data/index/insert-plans-task
+     * @return array     * @return array
      */
     public function actionInsertPlansTask(){
         self::_init();
