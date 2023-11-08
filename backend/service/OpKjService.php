@@ -91,7 +91,7 @@ class OpKjService extends BaseService {
 
                 #Tool_Common::log('opSscKjData','INFO','投注记录', $logArr);
             }catch (\Exception $exception){
-                Tool_Common::log('opSscKjData','ERR','投注记录-处理失败', ['record_id'=>$record_id, 'err_msg'=>$exception->getMessage()]);
+                Tool_Common::log('opSscKjData','ERR','投注记录-处理失败', ['record_id'=>$record_id, 'err_msg'=>$exception->getMessage(), 'file'=>$exception->getFile().'_'.$exception->getLine()]);
                 $rst = ['status'=>302, 'msg'=>$exception->getMessage(), 'file'=>$exception->getFile().'_'.$exception->getLine()];
             }
         }
