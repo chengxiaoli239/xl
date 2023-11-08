@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User:wangyegao
- * Date: 18/02/04
- * Time: 下午23:55
- */
-
 namespace console\modules\data\controllers;
 
 use backend\models\SystemConfig;
@@ -29,7 +22,7 @@ use backend\service\StaticService;
 
 class IndexController extends Controller
 {
-    private static $staticStatus = 0;
+    private static int $staticStatus = 0;
     private static function _init()
     {
         self::$staticStatus = SystemConfig::findOne(['key'=>'static_status'])->value;

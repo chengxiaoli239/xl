@@ -192,7 +192,7 @@ class OperateLotteryService extends CommonBaseService
                         Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理异常0', ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>'未知玩法ID:'.$method_id]);
                         break;
                 }
-
+                Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理结束', ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>'处理结束']);
             }catch (\Exception $e){
                 Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理异常1', ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
                 var_dump($e->getMessage());

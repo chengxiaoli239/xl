@@ -378,7 +378,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $text = $vdata['text'];
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-01', ['user_id'=>$this->user_id, 'text'=>$text]);
             list($code, $data, $msg) = $this->matchData($text);
-            if($code == ThirdDTypeService::CODE_FOR_USER){
+            if($code == CommonBaseService::CODE_FOR_USER){
                 $transaction->commit();
                 return [$code, $data, $msg];
             }

@@ -1,0 +1,6 @@
+1、开奖号码抓取，执行频率：1分钟
+/www/server/php/74/bin/php yii data/index/grab-kj-data
+2、开奖脚本，执行频率：1分钟
+/www/server/php/74/bin/php yii data/index/run-lottery
+
+
