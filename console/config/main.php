@@ -15,6 +15,9 @@ return [
         'wechat' => [
             'class' => 'console\modules\wechat\Module',
         ],
+        'data' => [
+            'class' => 'console\modules\data\Module',
+        ],
     ],
     'components' => [
         'log' => [
