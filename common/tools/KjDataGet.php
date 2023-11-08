@@ -137,10 +137,10 @@ class KjDataGet
                 $params = ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title'], 'business_id'=>$lottery_type];
                 $params['is_grab_history'] = 1;
                 push_queue(GrabKjDatasJob::class, $params);
-                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'cacheTime'=>$cacheTime, 'flag'=>$flag]);
+                Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'cacheTime'=>$cacheTime, 'flag'=>$flag]);
                 \Yii::$app->redis->srem($exist_key, $lottery_type);
             }catch (\Exception $e){
-                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'err_msg'=>$e->getMessage()]);
+                Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'err_msg'=>$e->getMessage()]);
                 \Yii::$app->redis->srem($exist_key, $lottery_type);
             }
         }
