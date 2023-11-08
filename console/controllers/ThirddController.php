@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use backend\service\statics\statics_3d\Statics3dUserDataService;
+use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\OperateLotteryService;
 use yii\base\Module;
 use yii\console\Controller;
@@ -23,11 +24,19 @@ class ThirddController extends Controller
     }
 
     /**
-     * php yii thirdd/run-lottery
+     * /www/server/php/74/bin/php yii thirdd/run-lottery
      */
-    public function actionRunLottery()
+    public function actionRunLottery(): bool
     {
-        OperateLotteryService::operate($lottery_type=26);
+        $dateHI = date('H:i');
+        if('00:00'<$dateHI && $dateHI<'09:00'){
+            var_dump('未在开奖时间区间，暂不处理');
+            return false;
+        }
+        foreach (array_keys(CommonBaseService::THIRDD_LOTTERY_TYPES) as $lottery_type){
+            OperateLotteryService::operate($lottery_type);
+        }
+        return true;
     }
 
 

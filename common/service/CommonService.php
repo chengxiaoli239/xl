@@ -96,7 +96,8 @@ class  CommonService{
      * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return bool
      */
-    public static function getAwardNumberByQihao($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function getAwardNumberByQihao($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE): bool
+    {
         if(!$qihao) return false;
         $m = \Yii::$app->cache;
 

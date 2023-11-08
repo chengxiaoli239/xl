@@ -30,7 +30,8 @@ class OperateLotteryService extends CommonBaseService
      * @param string $qihao
      * @return bool
      */
-    public static function operate($lottery_type=DEFAULT_LOTTERY_TYPE, $qihao=''){
+    public static function operate(int $lottery_type=DEFAULT_LOTTERY_TYPE, string $qihao=''): bool
+    {
 
         $where = OperateLotteryService::runWhere($lottery_type, $qihao);
         #$where = ['id'=>[384,384]]; # 测试

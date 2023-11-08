@@ -33,6 +33,7 @@ use backend\service\HN0898Service;
 use backend\service\BaseNumService;
 use backend\service\OpKjService;
 use common\service\thirdD\CommonBaseService;
+use common\service\thirdD\OperateLotteryService;
 use common\tools\Tools;
 use backend\models\BettingRecords;
 use backend\service\StaticService;
@@ -152,7 +153,8 @@ class KjDataGet
      * @param int $is_grab_history
      * @return array
      */
-    public static function grabOneLotteryKjData($lottery_type=DEFAULT_LOTTERY_TYPE, $is_grab_history=0){
+    public static function grabOneLotteryKjData(int $lottery_type=DEFAULT_LOTTERY_TYPE, int $is_grab_history=0): array
+    {
         $m = \Yii::$app->cache;
         $RedisLock = new RedisLock();
         $KjConfigs = KjConfig::findAll(['enable'=>1, 'lottery_type'=>$lottery_type]);
@@ -174,7 +176,7 @@ class KjDataGet
                     throw_info($data['msg']??'开奖数据抓取异常');
                 }
 
-                if($kjConfig->is_batch == 1){
+                if($kjConfig->is_batch == 1){ # 批量
                     $kjDatas = $data;
                     Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '批量抓取开奖号码', ['data'=>$data]);
                     if($kjDatas){
@@ -310,26 +312,32 @@ class KjDataGet
     /**
      * @desc 开奖后处理的数据
      */
-    public static function afterKj($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function afterKj($lottery_type = DEFAULT_LOTTERY_TYPE): array
+    {
 
         list($code, $qihao) = SscDataService::insertDealDataTask($lottery_type); # 数据处理任务写入
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖后处理', ['code'=>$code, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
 
         $rst = ['status'=>200, 'msg'=>'处理成功'];
         if($code==0){
-            $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
-            # 队列处理
-            #$rst['TzService'] = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
-            $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);
-            push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
+            if(in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)){
+                OperateLotteryService::operate($lottery_type);  # 3D 处理3D下注记录
+            }else{
 
-            # 数据统计
-            push_queue(PeiShuProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>5]);
-            push_queue(StaticAll2NumsYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>10]);
-            push_queue(StaticHzProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>15]);
-            push_queue(StaticPeiShuTrueFalseJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>20]);
-            push_queue(StaticSdProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>25]);
-            push_queue(UpdateCodeTypeYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>30]);
+            $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
+                # 队列处理
+                #$rst['TzService'] = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
+                $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);
+                push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
+
+                # 数据统计
+                push_queue(PeiShuProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>5]);
+                push_queue(StaticAll2NumsYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>10]);
+                push_queue(StaticHzProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>15]);
+                push_queue(StaticPeiShuTrueFalseJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>20]);
+                push_queue(StaticSdProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>25]);
+                push_queue(UpdateCodeTypeYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>30]);
+            }
             Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '统计数据入列', ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'msg'=>'数据入列成功']);
         }
         //StaticService::opStaticProfits(); # 投注利润统计

@@ -203,7 +203,8 @@ class EYunMessageOperateService  extends EYunBaseService
      * @param string $text
      * @return array
      */
-    public function matchData($text=''){
+    public function matchData(string $text=''): array
+    {
         $text = str_replace(' ', ' ', trim($text)); # 中文空格替换成英文空格
         try {
             switch (true){
@@ -353,10 +354,10 @@ class EYunMessageOperateService  extends EYunBaseService
                 throw_info('操作异常');
             }
         }catch (\Exception $e){
-            $err_msg = ($e->getCode() == ThirdDTypeService::CODE_FOR_USER) ? $e->getMessage() : '撤单异常';
-            return [ThirdDTypeService::CODE_FOR_USER, [], $err_msg];
+            $err_msg = ($e->getCode() == CommonBaseService::CODE_FOR_USER) ? $e->getMessage() : '撤单异常';
+            return [CommonBaseService::CODE_FOR_USER, [], $err_msg];
         }
-        return [ThirdDTypeService::CODE_FOR_USER, ['text'=>$text, 'replyTxt'=>$orderId.'撤单完成'], '接收成功'];
+        return [CommonBaseService::CODE_FOR_USER, ['text'=>$text, 'replyTxt'=>$orderId.'撤单完成'], '接收成功'];
     }
 
     /**

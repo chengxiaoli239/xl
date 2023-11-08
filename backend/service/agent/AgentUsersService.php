@@ -201,7 +201,7 @@ class AgentUsersService extends BaseService {
             }
             $transaction->commit();
 
-            $replyTxt = '【提示】您好：申请'.WechatUserService::$s['balance_type'][$balanceType].$Flows->balance.
+            $replyTxt = '【内容】申请'.WechatUserService::$s['balance_type'][$balanceType].$Flows->balance.
                 "\n【结果】".AgentUsersBalanceService::$s['status'][$status].
                 "\n【申请前】".$before_balance.
                 "\n【盛鱼】".$after_balance;
@@ -221,7 +221,7 @@ class AgentUsersService extends BaseService {
      * @return mixed
      */
     public static function getFlowTypeTxt($type){
-        $types = self::getFlowtypes();
+        $types = WechatUserService::$s['balance_type'];
 
         return $types[$type];
     }

@@ -857,16 +857,6 @@ class IndexController extends Controller
         p($rst);
         $http = 'http://120.77.157.40:8090/forum/user/';
         p(trim($http, '/'));
-        $lottery_types = [6];
-        foreach ($lottery_types as $lottery_type) {
-            /* 处理系统投注计划 add 2019-01-21 */
-            $rst[$lottery_type] = KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
-            $rst['TzService'] = TzService::operateSystemBetPlans($lottery_type, $istest = 1);
-            p($rst);// 定制化投注计划
-            /* 处理系统投注计划 add 2019-01-21 */
-        }
-        p($rst);
-
         $data = BingDao::getLotteryOne($type = 'json', $l_type = 6);
         p($data);
         $data = CqsscKcw::getLotteryBg($type = 'json', $is_auto = 0);

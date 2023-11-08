@@ -46,11 +46,11 @@ class AgentUsersBalanceService extends BaseService {
                 throw_info('有未审核记录，请联系矿主处理', CommonBaseService::CODE_FOR_USER);
             }
 
-            if(preg_match('/上\s*(\d+)$/', $text,$matches)){
+            if(preg_match('/上\s*(\d+)/', $text,$matches)){
                 $balance = (int)$matches[1];
                 $type = WechatUserService::TYPE_BALANCE_UP;
                 $desc = '申请上 '.$balance.'咪，'.'等待审核';
-            }elseif (preg_match('/下\s*(\d+)$/', $text,$matches)){
+            }elseif (preg_match('/下\s*(\d+)/', $text,$matches)){
                 $balance = (int)$matches[1];
                 $type = WechatUserService::TYPE_BALANCE_DOWN;
                 # 校验积分下分上分充足
@@ -64,6 +64,9 @@ class AgentUsersBalanceService extends BaseService {
                 if(!$WechatUser->save()){
                     throw_info(current($WechatUser->getErrors()));
                 }
+            }
+            if(empty($type) OR empty($now_balance)){
+                throw_info('上下分匹配异常');
             }
             $setData = [
                 'agent_id' => $agent_id,
