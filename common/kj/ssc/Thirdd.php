@@ -22,6 +22,14 @@ class Thirdd extends BaseKj {
      * @return array|bool
      */
     public function getFuCai3d(string $returnType = 'json', $is_auto = 1){
+        try {
+            $dateHI = date('H:i');
+            $seconds = ('00:00'<$dateHI && $dateHI<'21:00') ? 1800 : 300;
+            self::lockGrab(self::$lottery_type, $seconds);
+        }catch (\Exception $e){
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据抓取异常', ['err_msg'=>$e->getMessage()]);
+            return false;
+        }
 
         $lottery_type = 26;
         if($is_auto==2 OR !$kjData = Thirdd::getCurrentKjData($lottery_type)) {
