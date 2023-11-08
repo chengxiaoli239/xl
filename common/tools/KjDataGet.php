@@ -108,7 +108,8 @@ class KjDataGet
      * @description 时时彩逐期抓取(以此方法为主抓取时时彩数据)
      * @return bool
      */
-    public static function grabKjDatas($lottery_types = []){
+    public static function grabKjData($lottery_types = []): bool
+    {
         $m = \Yii::$app->cache;
         $lottery_types = StaticService::getGrabDataLotteryTypes($lottery_types);
         foreach ($lottery_types as $lotteryData){

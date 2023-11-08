@@ -14,7 +14,7 @@ use common\service\thirdD\OperateLotteryService;
 use Yii;
 use backend\service\OpKjService;
 use common\tools\KjDataGet;
-use yii\web\Controller;
+use yii\base\Controller;
 use common\tools\Tool_Common;
 use backend\service\BetService;
 use backend\service\StaticService;
@@ -26,7 +26,7 @@ class IndexController extends Controller
     private static function _init()
     {
         self::$staticStatus = SystemConfig::findOne(['key'=>'static_status'])->value;
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        //\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
     }
 
     /**
@@ -36,9 +36,8 @@ class IndexController extends Controller
     public function actionGrabKjData(): array
     {
         self::_init();
-        $post = \Yii::$app->request->post();
         for($i=0; $i<3; $i++){
-            $rst['kj'] = KjDataGet::grabKjDatas($post['lottery_types']);
+            $rst['kj'] = KjDataGet::grabKjData();
             sleep(15);
         }
 
@@ -55,8 +54,9 @@ class IndexController extends Controller
             var_dump('未在开奖时间区间，暂不处理');
             return false;
         }
-        foreach (array_keys(CommonBaseService::THIRDD_LOTTERY_TYPES) as $lottery_type){
-            OperateLotteryService::operate($lottery_type);
+        foreach (CommonBaseService::THIRDD_LOTTERY_TYPES as $lottery_type){
+            $rst = OperateLotteryService::operate($lottery_type);
+            var_dump($rst);
         }
         return true;
     }

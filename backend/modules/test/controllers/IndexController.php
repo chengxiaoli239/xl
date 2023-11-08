@@ -520,7 +520,7 @@ class IndexController extends Controller
         p($rst);
         $miss = SscDataService::staticPeiShuDate($lottery_type = 8);
         p($miss);
-        $rst['kj'] = KjDataGet::grabKjDatas();
+        $rst['kj'] = KjDataGet::grabKjData();
         p($rst);
         $lottery_type = 8;
         $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);

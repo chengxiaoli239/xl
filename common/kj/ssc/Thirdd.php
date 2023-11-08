@@ -79,7 +79,7 @@ class Thirdd extends BaseKj {
                     $content = Json::decode($body);
                     if($content['state']==0){
                         $kjData = $content['result'][0];
-                        $qihao = substr($kjData['code'], 2);
+                        $qihao = $kjData['code'];
                         $opencode = $kjData['red'].',0,0';
                     }else{
                         throw_info($content['message']??'查询异常');

@@ -2407,7 +2407,7 @@ class StaticService extends BaseService {
      * @param int $useCache
      * @return array|LotteryType[]|mixed
      */
-    public static function getGrabDataLotteryTypes($lottery_types=[], $useCache=1){
+    public static function getGrabDataLotteryTypes(array $lottery_types=[], int $useCache=1){
         $where = ['grabDataStatus'=>1];
         if(!empty($lottery_types)){
             $where['lottery_type'] = $lottery_types;
@@ -2415,7 +2415,7 @@ class StaticService extends BaseService {
         $m = \Yii::$app->cache;
         $mkey = self::buildGrabDataLotteryTypesKey($where);
         $lotteryTypeDatas = $m->get($mkey);
-        if(empty($lotteryTypeDatas) OR !$useCache){
+        if(true OR empty($lotteryTypeDatas) OR !$useCache){
             $lotteryTypeDatas = LotteryType::find()->where($where)->asArray()->all();
             $m->set($mkey, $lotteryTypeDatas, 1800);
         }
