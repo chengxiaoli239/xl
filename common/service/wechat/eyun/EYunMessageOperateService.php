@@ -436,11 +436,11 @@ class EYunMessageOperateService  extends EYunBaseService
                     }
                 }
             }
-            $flow = AgentUsersBalanceService::updateBalance((string)$betOrderId, $allMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
+            $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $allMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
 
             $replyTxt .= ("\n【单号】".$betOrderId);
             $replyTxt .= ("\n【成功】√  共".$allCounts."组，共".$allMoneys.'咪');
-            $replyTxt .= ("\n【剩余】".$flow['balance_now'].'咪');
+            $replyTxt .= ("\n【剩余】".$v['balance'].'咪');
             $replyTxts[] = $replyTxt;
 
             $transaction->commit();
