@@ -9,6 +9,7 @@
 namespace backend\modules\test\controllers;
 
 use backend\models\Admin;
+use backend\models\AgentUsersBalanceFlows;
 use backend\models\ImportPlanCodes;
 use backend\models\SscKjData;
 use backend\models\SscSdHzVal;
@@ -17,6 +18,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\modules\cron\controllers\WeixinController;
 use backend\modules\kj\controllers\BingDaoController;
+use backend\service\agent\AgentUsersBalanceService;
 use backend\service\agent\AgentUsersService;
 use backend\service\baota\BaoTaService;
 use backend\service\BetService;

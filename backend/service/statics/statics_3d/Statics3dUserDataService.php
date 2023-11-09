@@ -129,10 +129,10 @@ class Statics3dUserDataService extends BaseService {
                 'status' => AgentUsersBalanceService::FLOW_CHECK_STATUS_PASS,
             ];
             # 上分
-            $UpMoneys = AgentUsersBalanceFlows::find()->where($flowsWhere)
-                ->andWhere(['type'=>WechatUserService::TYPE_BALANCE_UP])->groupBy('member_id')->scalar();
+            $UpMoneys = AgentUsersBalanceFlows::find()->select(['up_money'=>'SUM(balance)'])->where($flowsWhere)
+                ->andWhere(['type'=>WechatUserService::TYPE_BALANCE_UP])->scalar();
             # 下分
-            $DownMoneys = AgentUsersBalanceFlows::find()->where($flowsWhere)
+            $DownMoneys = AgentUsersBalanceFlows::find()->select(['down_money'=>'SUM(balance)'])->where($flowsWhere)
                 ->andWhere(['type'=>WechatUserService::TYPE_BALANCE_DOWN])->groupBy('member_id')->scalar();
 
             $setData = [
