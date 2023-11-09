@@ -101,7 +101,7 @@ class AgentUsersBalanceService extends BaseService {
                 'msg' => $msg,
             ];
             $transaction->commit();
-            push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$agent_id, 'type'=>$type, 'wechat_user_id'=>$wechatUser['id']]);
+            //push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$agent_id, 'type'=>$type, 'wechat_user_id'=>$wechatUser['id']]);
             Tool_Common::log('/wechat/'.__FUNCTION__, 'ERR', '消息接收处理', ['text'=>$text, 'data'=>$data]);
         }catch (\Exception $e){
             $transaction->rollBack();
