@@ -932,7 +932,7 @@ class OperateLotteryService extends CommonBaseService
             $betRow->setAttributes($updateDatas);
             $flag = $betRow->save();
             if(empty($flag)){
-                throw_info($betRow->getErrors());
+                throw_info(Json::encode($betRow->getErrors()));
             }
             $logArr = ['status'=>$status, 'bonus'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'kjCode'=>$kjCode, 'betRecord'=>$betRow->getAttributes()];
             $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
