@@ -4,6 +4,7 @@ namespace common\service\jobs\robots\message;
 use common\service\chat\Tool_Common;
 use common\service\jobs\CommonJob;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
+use common\service\thirdD\CommonBaseService;
 use common\service\wechat\eyun\EYunMessageOperateService;
 use common\service\wechat\WechatUserService;
 use yii\helpers\Json;
@@ -67,13 +68,13 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
 
             self::reply($user_id, $replyTxts, $data); # 回复消息
         }catch (\Exception $e){
-            $err_msg =  $e->getMessage();
+            $err_msg =  ($e->getCode() == CommonBaseService::CODE_FOR_USER) ? $e->getMessage() : '处理异常';
             if($e->getCode()>50000){ # 大于50000
                 Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'11', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'err_msg'=>$err_msg, 'code'=>$e->getCode()]);
                 return '忽略回复：'.$err_msg;
             }
             $r = self::reply($user_id, [$err_msg], $data); # 回复消息
-            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r]);
+            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r, 'err_msg'=>$e->getMessage()]);
 
             $message = $err_msg;
         }
@@ -93,12 +94,13 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
      * @return bool
      */
     public static function reply($user_id, $replyTxts=[], array $data=[]){
-        $mkey = md5(__FUNCTION__.'_'.$user_id.'_'.Json::encode($replyTxts).'_'.$data['fromUser']);
+        $mkey = md5(__FUNCTION__.'_x1_'.$user_id.'_'.Json::encode($replyTxts).'_'.$data['fromUser']);
         $incr = \Yii::$app->redis->incr($mkey);
         Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '消息回复前处理', ['user_id'=>$user_id, 'replyTxts'=>$replyTxts, 'data'=>$data]);
         if($incr>1){
             return false;
         }
+        \Yii::$app->redis->expire($mkey, 2);
         $fromUser = $data['fromUser'];
         if(empty($fromUser)){
             return '接收的微信好友Id不能为空0';
