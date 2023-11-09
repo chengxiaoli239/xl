@@ -938,7 +938,9 @@ class OperateLotteryService extends CommonBaseService
             $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
             Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
         }catch (\Exception $e){
-            Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', $playMethod.'-开奖处理-异常', ['betRowId'=>$betRow->id, 'zjCount'=>$zjCount, 'kjCode='>$kjCode, 'updateDatas'=>$updateDatas, 'err_msg'=>$e->getMessage()]);
+            $logArr = ['betRowId'=>$betRow->id, 'zjCount'=>$zjCount, 'kjCode='>$kjCode, 'updateDatas'=>$updateDatas, 'err_msg'=>$e->getMessage()];
+            Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', $playMethod.'-开奖处理-异常', $logArr);
+            return false;
         }
 
         return true;
