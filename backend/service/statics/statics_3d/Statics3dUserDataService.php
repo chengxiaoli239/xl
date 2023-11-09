@@ -52,6 +52,7 @@ class Statics3dUserDataService extends BaseService {
                 ['=', 'wechat_user_id', $wechat_user_id],
                 ['=', 'user_id', $user_id],
                 ['=', 'lottery_type', $lottery_type],
+                ['=', 'status', [CommonBaseService::STATUS_LT_SUCCESS, CommonBaseService::STATUS_LT_FAIL]],
                 ['between', 'created_at', strtotime($date.' 00:00:00'), strtotime($date.' 23:59:59')],
             ];
             $Bet = Bets::find()->where($baseWhere)->limit(1)->one();
