@@ -37,7 +37,7 @@ class OperateLotteryService extends CommonBaseService
         try {
             $where = OperateLotteryService::runWhere($lottery_type, $qihao);
             #$where = ['id'=>[384,384]]; # 测试
-            $BetRows = \backend\models\wechat\Bets::find()->where($where)->limit(50)->all();
+            $BetRows = \backend\models\wechat\Bets::find()->where($where)->limit(10)->all();
             if(empty($BetRows)){
                 throw_info('记录为空:'.Json::encode($where));
             }
