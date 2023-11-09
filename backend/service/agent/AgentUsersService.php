@@ -166,12 +166,13 @@ class AgentUsersService extends BaseService {
             $balanceType = $Flows['type'];
             // todo 此处要改成wechat_user表model
             $WechatUser = WechatUser::findOne(['id'=>$Flows->member_id, 'user_id'=>$user_id]);
-            $before_balance = $WechatUser->balance;
             if($status == AgentUsersBalanceService::FLOW_CHECK_STATUS_PASS){
                 if($balanceType == WechatUserService::TYPE_BALANCE_UP){
+                    $before_balance = $WechatUser->balance;
                     $after_balance = $before_balance + $Flows->balance; # 1 上分，积分增加
                 }elseif($balanceType == WechatUserService::TYPE_BALANCE_DOWN){
-                    $after_balance = $before_balance; # 下分审核成功则等待打款，这里不在做扣款处理（审核时已经扣减）
+                    $before_balance = $Flows->balance_now;
+                    $after_balance = $WechatUser->balance; # 下分审核成功则等待打款，这里不在做扣款处理（审核时已经扣减）
                 }
                 $WechatUser->balance = $after_balance; # 审核后的积分，
                 $WechatUser->updated_at = time();
