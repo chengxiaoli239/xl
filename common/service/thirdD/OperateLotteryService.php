@@ -908,34 +908,38 @@ class OperateLotteryService extends CommonBaseService
      * @param string $kjCode
      * @throws \common\exceptions\InfoException
      */
-    private static function endCaculate(object $betRow, int $zjCount, array $Odds=[], $kjCode=''): bool
+    private static function endCaculate(object $betRow, int $zjCount, array $Odds=[], string $kjCode=''): bool
     {
-        if($zjCount>0){
-            # 中奖
-            $status = self::STATUS_LT_SUCCESS;
-            $bonus = round(($Odds['bouns'] * $betRow->single)/$Odds['money'], 2) * $zjCount; # 奖金赔率 * 下注金额
-        }else{
-            # 未中奖
-            $status = self::STATUS_LT_FAIL;
-            $bonus = 0.00;
+        try {
+            if($zjCount>0){
+                # 中奖
+                $status = self::STATUS_LT_SUCCESS;
+                $bonus = round(($Odds['bouns'] * $betRow->single)/$Odds['money'], 2) * $zjCount; # 奖金赔率 * 下注金额
+            }else{
+                # 未中奖
+                $status = self::STATUS_LT_FAIL;
+                $bonus = 0.00;
+            }
+            $profits = (float)round($bonus - $betRow->bet_money, 2);
+            $updateDatas = [
+                'status' => $status,
+                'bonus' => $bonus,
+                'profits' => $profits,
+                'kj_codes' => $kjCode,
+                'updated_at' => time(),
+            ];
+            #p(['id'=>$betRow->id, 'betCodes'=>$betCodes, 'kj_code_3n'=>$kj_code_3n, 'betCounts'=>$betCounts, $updateDatas]);
+            $betRow->setAttributes($updateDatas);
+            $flag = $betRow->save();
+            if(empty($flag)){
+                throw_info($betRow->getErrors());
+            }
+            $logArr = ['status'=>$status, 'bonus'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'kjCode'=>$kjCode, 'betRecord'=>$betRow->getAttributes()];
+            $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
+            Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
+        }catch (\Exception $e){
+            Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', $playMethod.'-开奖处理-异常', ['betRowId'=>$betRow->id, 'zjCount'=>$zjCount, 'kjCode='>$kjCode, 'updateDatas'=>$updateDatas, 'err_msg'=>$e->getMessage()]);
         }
-        $profits = (float)round($bonus - $betRow->bet_money, 2);
-        $updateDatas = [
-            'status' => $status,
-            'bonus' => $bonus,
-            'profits' => $profits,
-            'kj_codes' => $kjCode,
-            'updated_at' => time(),
-        ];
-        #p(['id'=>$betRow->id, 'betCodes'=>$betCodes, 'kj_code_3n'=>$kj_code_3n, 'betCounts'=>$betCounts, $updateDatas]);
-        $betRow->setAttributes($updateDatas);
-        $flag = $betRow->save();
-        if(empty($flag)){
-            throw_info($betRow->getErrors());
-        }
-        $logArr = ['status'=>$status, 'bonus'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'kjCode'=>$kjCode, 'betRecord'=>$betRow->getAttributes()];
-        $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
-        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
 
         return true;
     }
