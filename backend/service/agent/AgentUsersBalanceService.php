@@ -141,19 +141,20 @@ class AgentUsersBalanceService extends BaseService {
                 $after_balance = $WechatUser->balance + $changeMoney;
                 break;
         }
-        $setData = [
-            'balance' => $after_balance,
-        ];
+        $setData = ['balance'=>$after_balance];
         $WechatUser->setAttributes($setData, false);
         if(!$WechatUser->save()){
             throw_info(Json::encode($WechatUser->getErrors()));
         }
+        $now_time = time();
         $setDataFlow = [
             'order_id' => $orderId,
             'balance_after' => $after_balance,
-            'balance' => $after_balance,
+            'balance' => $changeMoney,
             'balance_now' => $before_balance,
             'status' => AgentUsersBalanceService::FLOW_CHECK_STATUS_REFUSE, # 下单、撤单默认通过
+            'created_at' => $now_time,
+            'updated_at' => $now_time,
         ];
         $flow = new AgentUsersBalanceFlows();
         $flow->setAttributes($setDataFlow, false);
