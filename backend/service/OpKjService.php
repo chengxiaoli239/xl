@@ -34,7 +34,7 @@ class OpKjService extends BaseService {
         if(in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)){
             list($code, $data, $msg) = OperateLotteryService::operate($lottery_type);  # 3D 处理3D下注记录
             if($code==0){
-                foreach ($data as $d){
+                foreach ($data['idData'] as $d){
                     $params = ['user_id'=>$d['user_id'], 'type'=>WechatUserService::TYPE_ORDER_BET, 'wechat_user_id'=>$d['wechat_user_id']];
                     push_queue_fast(UserDayStaticsJobs::class, $params); # 处理数据入列
                     Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据入列', $params);
