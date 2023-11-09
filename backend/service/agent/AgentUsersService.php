@@ -181,8 +181,10 @@ class AgentUsersService extends BaseService {
                 }
             }elseif($status == AgentUsersBalanceService::FLOW_CHECK_STATUS_REFUSE){ # 审核拒绝
                 if($balanceType == WechatUserService::TYPE_BALANCE_UP){
+                    $before_balance = $WechatUser->balance;
                     $after_balance = $WechatUser->balance;
                 }elseif($balanceType == WechatUserService::TYPE_BALANCE_DOWN){
+                    $before_balance = $Flows->balance_now;
                     $after_balance = $WechatUser->balance + $Flows->balance; # 2 下分拒绝，积分回退
                 }
 
