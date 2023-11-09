@@ -13,8 +13,10 @@ use backend\models\SscKjData;
 use backend\models\User;
 use backend\models\UserFollowData;
 use common\service\CommonService;
+use common\service\jobs\statics_3d\UserDayStaticsJobs;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\OperateLotteryService;
+use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
 use  yii;
 
@@ -30,7 +32,15 @@ class OpKjService extends BaseService {
     {
         $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
         if(in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)){
-            $rst = OperateLotteryService::operate($lottery_type);  # 3D 处理3D下注记录
+            list($code, $data, $msg) = OperateLotteryService::operate($lottery_type);  # 3D 处理3D下注记录
+            if($code==0){
+                foreach ($data as $d){
+                    $params = ['user_id'=>$d['user_id'], 'type'=>WechatUserService::TYPE_ORDER_BET, 'wechat_user_id'=>$d['wechat_user_id']];
+                    push_queue_fast(UserDayStaticsJobs::class, $params); # 处理数据入列
+                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据入列', $params);
+                }
+            }
+            $rst = ['code'=>$code, 'data'=>$data, 'msg'=>$msg];
         }else{
             $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type, 'is_batch_simulate'=>0])->orderBy('id DESC')->limit(100)->all();
             if(!$bettingRecords) return $rst;
