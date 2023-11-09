@@ -8,11 +8,13 @@ use common\models\thirdD\BetOrderId;
 use common\service\CommonService;
 use common\service\helpers\ThirdD;
 use common\tools\Tool_Common;
+use yii\helpers\Json;
 
 class OperateLotteryService extends CommonBaseService
 {
 
-    private static function runWhere($lottery_type=DEFAULT_LOTTERY_TYPE, $qihao=''){
+    private static function runWhere($lottery_type=DEFAULT_LOTTERY_TYPE, $qihao=''): array
+    {
         $where = [
             'AND',
             ['=', 'lottery_type', $lottery_type],
@@ -28,16 +30,17 @@ class OperateLotteryService extends CommonBaseService
     /**
      * @param int $lottery_type
      * @param string $qihao
-     * @return bool
+     * @return array
      */
-    public static function operate(int $lottery_type=DEFAULT_LOTTERY_TYPE, string $qihao=''): bool
+    public static function operate(int $lottery_type=DEFAULT_LOTTERY_TYPE, string $qihao=''): array
     {
+        try {
 
         $where = OperateLotteryService::runWhere($lottery_type, $qihao);
         #$where = ['id'=>[384,384]]; # 测试
-        $BetRows = \backend\models\wechat\Bets::find()->where($where)->limit(3)->all();
+        $BetRows = \backend\models\wechat\Bets::find()->where($where)->limit(50)->all();
         if(empty($BetRows)){
-            return '记录为空';
+            throw_info('记录为空:'.Json::encode($where));
         }
         #p(['BetRows'=>$BetRows]);
 
@@ -47,7 +50,7 @@ class OperateLotteryService extends CommonBaseService
         $kjCode = CommonService::getAwardNumberByQihao($qihao, $lottery_type); // 3,4,5,6,7
         //p([$lottery_type, $qihao, $where, $kjCode]);
         if(empty($kjCode)){
-            return false;
+            throw_info('开奖号码为空:lottery_type:'.$lottery_type.'_qihao:'.$qihao);
         }
 
         $kjCode = trim(substr($kjCode, 0, 5));
@@ -190,17 +193,21 @@ class OperateLotteryService extends CommonBaseService
                         OperateLotteryService::runZhiXuanFuShi($betRow, $kjCode); # 直选复式
                         break;
                     default:
-                        Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理异常0', ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>'未知玩法ID:'.$method_id]);
+                        Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常0', ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>'未知玩法ID:'.$method_id]);
                         break;
                 }
-                Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理结束', ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>'处理结束']);
+                Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理结束', ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>'处理结束']);
+                var_dump(date('Y-m-d H:i:s ').'处理成功：betRowId:'.$betRow->id.'_method_id:'.$method_id);
             }catch (\Exception $e){
-                Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '开奖处理异常1', ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+                Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常1', ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
                 var_dump($e->getMessage());
             }
         }
+        }catch (\Exception $e){
+            return [10001, [], $e->getMessage()];
+        }
 
-        return true;
+        return [0, [], '处理成功'];
     }
 
     /**
@@ -923,9 +930,9 @@ class OperateLotteryService extends CommonBaseService
         if(empty($flag)){
             throw_info($betRow->getErrors());
         }
-        $logArr = ['status'=>$status, 'bouns'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'kjCode'=>$kjCode, 'betRecord'=>$betRow->getAttributes()];
+        $logArr = ['status'=>$status, 'bonus'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'kjCode'=>$kjCode, 'betRecord'=>$betRow->getAttributes()];
         $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
-        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
+        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
 
         return true;
     }

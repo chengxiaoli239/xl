@@ -11,9 +11,6 @@ use yii\helpers\Json;
 
 class ThirdDTypeService extends CommonBaseService
 {
-    # lottery_type:26 福彩3d、27 排列三
-    const LOTTERY_TYPE_FUCAI = 26;
-    const LOTTERY_TYPE_PL3 = 27;
     const SINGLE_ASSCIATE = [
         '零' => 0,
         '两' => 2,
@@ -35,10 +32,7 @@ class ThirdDTypeService extends CommonBaseService
      * @return array
      */
     public static function getLotteryType($text='', &$isEmpty=false){
-        $lottery_types = [
-            ThirdDTypeService::LOTTERY_TYPE_FUCAI,
-            ThirdDTypeService::LOTTERY_TYPE_PL3,
-        ];
+        $lottery_types = CommonBaseService::THIRDD_LOTTERY_TYPES;
 
         foreach ($lottery_types as $lottery_type){
             // 检查$arr1是否有元素存在于$str
@@ -51,7 +45,7 @@ class ThirdDTypeService extends CommonBaseService
         if(empty($result)){
             $isEmpty = true;
             # 默认为福彩
-            $lottery_type = ThirdDTypeService::LOTTERY_TYPE_FUCAI;
+            $lottery_type = CommonBaseService::LOTTERY_TYPE_FUCAI;
         }
         $lottery_name = CommonService::getLotteryName($lottery_type);
 
@@ -493,8 +487,8 @@ class ThirdDTypeService extends CommonBaseService
     public static function getThirdDAlias($lottery_type=''){
 
         $datas = [
-            ThirdDTypeService::LOTTERY_TYPE_FUCAI => ['福彩3D', '福彩3d', '福彩', '福佳', '福3D', '3D', '3d', '福'],
-            ThirdDTypeService::LOTTERY_TYPE_PL3 => ['排三', '体彩', '体家', '排佳', '排3', '体', '排', 'p3'],
+            CommonBaseService::LOTTERY_TYPE_FUCAI => ['福彩3D', '福彩3d', '福彩', '福佳', '福3D', '3D', '3d', '福'],
+            CommonBaseService::LOTTERY_TYPE_PL3 => ['排三', '体彩', '体家', '排佳', '排3', '体', '排', 'p3'],
         ];
         if(!isset($datas[$lottery_type])){
             return $datas;

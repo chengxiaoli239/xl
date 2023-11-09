@@ -381,7 +381,6 @@ class IndexController extends Controller
         $d = Thirdd::getCurrentKjData($lottery_type=26);p($d);
         $Thirdd = new Thirdd();
         $data = $Thirdd->getFuCai3d($type='json', 2);p($data);
-        $rst = OperateLotteryService::operate($lottery_type=26); p($rst); # 处理3d开奖
         $lottery_types = StaticService::getLotteryTypes();
         p($lottery_types);
         $str = 'fTtrNuJ2---sSYXaQFRUjChzqbBn7Od4SRDBvZp7hL4';

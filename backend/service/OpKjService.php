@@ -13,6 +13,8 @@ use backend\models\SscKjData;
 use backend\models\User;
 use backend\models\UserFollowData;
 use common\service\CommonService;
+use common\service\thirdD\CommonBaseService;
+use common\service\thirdD\OperateLotteryService;
 use common\tools\Tool_Common;
 use  yii;
 
@@ -24,14 +26,17 @@ class OpKjService extends BaseService {
      * @param integer $lottery_type - 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return array
      */
-    public static function opSscKjData($lottery_type = DEFAULT_LOTTERY_TYPE){
-
+    public static function opSscKjData($lottery_type = DEFAULT_LOTTERY_TYPE): array
+    {
         $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
-
-        $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type, 'is_batch_simulate'=>0])->orderBy('id DESC')->limit(100)->all();
-        if(!$bettingRecords) return $rst;
-        foreach ($bettingRecords as $BettingRecord){
-            $rst['data'][$BettingRecord->id] = OpKjService::opOneBettingRecord($BettingRecord->id, $BettingRecord);
+        if(in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)){
+            $rst = OperateLotteryService::operate($lottery_type);  # 3D 处理3D下注记录
+        }else{
+            $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type, 'is_batch_simulate'=>0])->orderBy('id DESC')->limit(100)->all();
+            if(!$bettingRecords) return $rst;
+            foreach ($bettingRecords as $BettingRecord){
+                $rst['data'][$BettingRecord->id] = OpKjService::opOneBettingRecord($BettingRecord->id, $BettingRecord);
+            }
         }
 
         return $rst;

@@ -241,6 +241,7 @@ class IndexController extends Controller
             return $rst;
         }
         $lottery_types = StaticService::getLotteryTypes();
+
         foreach ($lottery_types as $lottery_type) {
             $rst = OpKjService::opSscKjData($lottery_type); # 在抓取完开奖数据已经调用 KjDataGet::grabOne
             //sleep(2);
