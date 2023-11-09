@@ -51,6 +51,7 @@ class AgentUsersBalanceService extends BaseService {
                 $balance = (int)$matches[1];
                 $type = WechatUserService::TYPE_BALANCE_UP;
                 $desc = '申请上 '.$balance.'咪，'.'等待审核';
+                $after_balance = ''; # 等审核再记录
             }elseif (preg_match('/下\s*(\d+)/', $text,$matches)){
                 $balance = (int)$matches[1];
                 $type = WechatUserService::TYPE_BALANCE_DOWN;
@@ -76,21 +77,22 @@ class AgentUsersBalanceService extends BaseService {
                 'type' => $type, # 1上分2下分
                 'balance' => $balance, # 上/下 积分，变动
                 'balance_now' => $now_balance, # 申请前积分
+                'balance_after' => $after_balance, # 上分：申请不加审核时处理，下分申请时候扣掉，审核不扣
                 'desc' => '用户'.$desc,
                 'status' => 0,
                 'created_at' =>time(),
                 'updated_at' =>time(),
             ];
 
-            $AgentUsersBalanceFlows = new AgentUsersBalanceFlows();
-            $AgentUsersBalanceFlows->setAttributes($setData);
-            if(!$AgentUsersBalanceFlows->save()){
-                $msg = current($AgentUsersBalanceFlows->getErrors());
-                $logArr = ['matches'=>$matches, 'msg'=>$msg, 'attributes'=>$AgentUsersBalanceFlows->attributes];
+            $Flows = new AgentUsersBalanceFlows();
+            $Flows->setAttributes($setData);
+            if(!$Flows->save()){
+                $msg = current($Flows->getErrors());
+                $logArr = ['matches'=>$matches, 'msg'=>$msg, 'attributes'=>$Flows->attributes];
                 \common\tools\Tool_Common::log('upOrDownBalance', 'ERR', '用户上下分', $logArr);
                 throw_info($desc.'失败'.$msg);
             }
-            $logArr =  ['desc'=>$desc, 'WechatUser'=>$WechatUser->attributes, 'attributes'=>$AgentUsersBalanceFlows->attributes];
+            $logArr =  ['desc'=>$desc, 'WechatUser'=>$WechatUser->attributes, 'attributes'=>$Flows->attributes];
             Tool_Common::log('upOrDownBalance', 'INFO', '用户上下分',$logArr);
             $msg = $desc;
             $data = [
