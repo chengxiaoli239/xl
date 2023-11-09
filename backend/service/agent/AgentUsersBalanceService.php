@@ -126,7 +126,7 @@ class AgentUsersBalanceService extends BaseService {
         $before_balance = $WechatUser->balance;
         switch ($type){
             case WechatUserService::TYPE_ORDER_BET:
-                $after_balance = $WechatUser->money - $money;
+                $after_balance = $WechatUser->balance - $money;
                 if($after_balance<0){
                     throw_info('鱼分不足，目前盛鱼：'.$before_balance, CommonBaseService::CODE_FOR_USER);
                 }
