@@ -4985,7 +4985,7 @@ class NumService extends BaseService {
                 ['=', 'code_'.$pos[0], $historyKjData['code'.$pos[0]]],
                 ['=', 'code_'.$pos[1], $historyKjData['code'.$pos[1]]],
             ];
-            switch (1){
+            switch ($d_type){
                 case 2: # 双重
                     $tmpNotWhere[] = ['=', 'type_2', 1];
                     break;
@@ -5418,8 +5418,8 @@ class NumService extends BaseService {
      */
     public static function getCodeLine1($code=''){
         if($code==0){
-            #$lineCodes = NumService::CODES_0_LINE;
-            $lineCodes = NumService::CODES_2_LINE;
+            $lineCodes = NumService::CODES_0_LINE;
+            #$lineCodes = NumService::CODES_2_LINE;
         }elseif (in_array($code, NumService::CODES_1_LINE)){
             $lineCodes = NumService::CODES_1_LINE;
         }elseif (in_array($code, NumService::CODES_2_LINE)){
