@@ -184,7 +184,7 @@ class AgentUsersService extends BaseService {
                     $before_balance = $WechatUser->balance;
                     $after_balance = $WechatUser->balance;
                 }elseif($balanceType == WechatUserService::TYPE_BALANCE_DOWN){
-                    $before_balance = $Flows->balance_now;
+                    $before_balance = $WechatUser->balance;
                     $after_balance = $WechatUser->balance + $Flows->balance; # 2 下分拒绝，积分回退
                 }
 
