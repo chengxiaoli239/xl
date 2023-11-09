@@ -337,13 +337,13 @@ class EYunMessageOperateService  extends EYunBaseService
 
                 $Bets = Bets::findOne(['order_id'=>$orderId, 'wechat_user_id'=>$wechatUser['id']]);
                 if(empty($Bets)){
-                    throw_info('单号：'.$orderId.'无记录', ThirdDTypeService::CODE_FOR_USER);
+                    throw_info('单号：'.$orderId.'无记录', CommonBaseService::CODE_FOR_USER);
                 }
                 if($Bets->status==1){
-                    throw_info($orderId.'订单已完成，无法撤单', ThirdDTypeService::CODE_FOR_USER);
+                    throw_info($orderId.'订单已完成，无法撤单', CommonBaseService::CODE_FOR_USER);
                 }
                 if($Bets->status==3){
-                    throw_info($orderId.'订单已是撤单状态，无需重复处理', ThirdDTypeService::CODE_FOR_USER);
+                    throw_info($orderId.'订单已是撤单状态，无需重复处理', CommonBaseService::CODE_FOR_USER);
                 }
                 #$Bets->status = 3; # 已撤单
                 Bets::updateAll(['status'=>3], ['order_id'=>$orderId]);
@@ -367,7 +367,7 @@ class EYunMessageOperateService  extends EYunBaseService
      * @param string $fromUser 发送者的微信id
      * @return array
      */
-    public function receive($text='', $fromUser=''){
+    public function receive(string $text='', string $fromUser=''){
         try {
             #p([$user_id, $text]);
             $transaction = static::getDb()->beginTransaction();
@@ -436,9 +436,11 @@ class EYunMessageOperateService  extends EYunBaseService
                     }
                 }
             }
-            $replyTxt .= ("\n【单号】".$betOrderId);
+            $flow = AgentUsersBalanceService::updateBalance((string)$betOrderId, $allMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
 
+            $replyTxt .= ("\n【单号】".$betOrderId);
             $replyTxt .= ("\n【成功】√  共".$allCounts."组，共".$allMoneys.'咪');
+            $replyTxt .= ("\n【剩余】".$flow['now_balance'].'咪');
             $replyTxts[] = $replyTxt;
 
             $transaction->commit();

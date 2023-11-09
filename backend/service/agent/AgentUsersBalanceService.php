@@ -10,6 +10,7 @@ use common\service\wechat\WechatUserService;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii;
+use yii\helpers\Json;
 
 class AgentUsersBalanceService extends BaseService {
 
@@ -110,4 +111,41 @@ class AgentUsersBalanceService extends BaseService {
         return [CommonBaseService::CODE_FOR_USER, $data, $msg];
     }
 
+    /**
+     * @param string $orderId
+     * @param float $money
+     * @param string $member_id
+     * @param int $type
+     * @return array
+     */
+    public static function updateBalance(string $orderId='', float $money=0.00, string $member_id='', int $type=1): array
+    {
+        $WechatUser = WechatUser::findOne($member_id);
+        $before_balance = $WechatUser->balance;
+        switch ($type){
+            case WechatUserService::TYPE_ORDER_BET:
+                $after_balance = $WechatUser->money - $money;
+                if($after_balance<0){
+                    throw_info('鱼分不足，目前盛鱼：'.$before_balance, CommonBaseService::CODE_FOR_USER);
+                }
+                break;
+
+            case WechatUserService::TYPE_ORDER_CANCEL:
+                $after_balance = $WechatUser->money + $money;
+                break;
+        }
+        $setData = [
+            'order_id' => $orderId,
+            'before_balance' => $before_balance,
+            'balance' => $money,
+            'balance_now' => $after_balance,
+            'status' => AgentUsersBalanceService::FLOW_CHECK_STATUS_REFUSE, # 下单、撤单默认通过
+        ];
+        $WechatUser->setAttributes($setData, false);
+        if(!$WechatUser->save()){
+            throw_info(Json::encode($WechatUser->getErrors()));
+        }
+
+        return $WechatUser->attributes;
+    }
 }
