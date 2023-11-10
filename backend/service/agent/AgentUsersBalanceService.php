@@ -169,6 +169,6 @@ class AgentUsersBalanceService extends BaseService {
             throw_info(Json::encode($flow->getErrors()));
         }
 
-        return $WechatUser->attributes;
+        return $newWechatUser->attributes;
     }
 }

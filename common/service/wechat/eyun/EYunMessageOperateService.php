@@ -208,6 +208,8 @@ class EYunMessageOperateService  extends EYunBaseService
         $text = str_replace(' ', ' ', trim($text)); # 中文空格替换成英文空格
         try {
             switch (true){
+                case strpos($text, '查') !== false: // 撤单
+                    return AgentUsersService::userGetInfo($this->wechatUser);
                 case strpos($text, '撤') !== false: // 撤单
                     return EYunMessageOperateService::operateCancel($text, $this->wechatUser);
                 case strpos($text, '上') !== false OR strpos($text, '下') !== false: // 上下分
@@ -327,10 +329,10 @@ class EYunMessageOperateService  extends EYunBaseService
 
     /**
      * 处理撤单匹配
-     * @param $text
+     * @param string $text
      * @return array
      */
-    public static function operateCancel($text='', $wechatUser=[]): array
+    public static function operateCancel(string $text='', $wechatUser=[]): array
     {
         try {
             if (preg_match('/(\d+)/', $text, $matches)) {
@@ -364,12 +366,12 @@ class EYunMessageOperateService  extends EYunBaseService
 
     /**
      * 消息处理后的业务处理
-     * @param string $user_id 代理user.id
      * @param string $text
      * @param string $fromUser 发送者的微信id
      * @return array
      */
-    public function receive(string $text='', string $fromUser=''){
+    public function receive(string $text='', string $fromUser=''): array
+    {
         try {
             #p([$user_id, $text]);
             $transaction = static::getDb()->beginTransaction();

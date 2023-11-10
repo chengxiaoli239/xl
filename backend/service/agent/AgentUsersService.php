@@ -2,13 +2,14 @@
 namespace backend\service\agent;
 use backend\models\AgentUsers;
 use backend\models\AgentUsersBalanceFlows;
-use backend\models\CodeTypes;
+use backend\models\statics\Static3dUserProfitsDayAll;
 use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
 use common\models\wechat\WechatUser;
 use common\service\CommonService;
 use common\service\jobs\robots\message\WechatPrivateMsgReceiveJobs;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
+use common\service\thirdD\CommonBaseService;
 use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -218,6 +219,47 @@ class AgentUsersService extends BaseService {
         }
 
         return ['status'=>200, 'msg'=>'操作成功', 'data'=>['status'=>200, 'msg'=>$desc]];
+    }
+
+
+    /**
+     * @desc 审核用积分流水
+     * @param $data
+     * @param $user_id
+     * @return array
+     */
+    public static function userGetInfo(array $wechatUser=[]): array
+    {
+        try {
+            $replyTxt = "【余分】".$wechatUser['balance'];
+            $member_id = $wechatUser['id'];
+            $date = date('Y-m-d');
+            $where = [
+                'AND',
+                ['=', 'wechat_user_id', $member_id],
+                ['between', 'created_at', strtotime($date.' 00:00:00'), strtotime($date.' 00:00:00')],
+            ];
+            $statics = Static3dUserProfitsDayAll::findOne($where);
+            if(!empty($statics)){
+                if($statics->up_money>0){
+                    $replyTxt .= "\n【上】".$statics->up_money;
+                }
+                if($statics->down_money>0){
+                    $replyTxt .= "\n【下】".$statics->down_money;
+                }
+                if($statics->bet_money>0){
+                    $replyTxt .= "\n【投】".$statics->bet_money;
+                }
+                if($statics->bonus>0){
+                    $replyTxt .= "\n【中】".$statics->bonus;
+                }
+            }
+        }catch (\Exception $e){
+            Tool_Common::log('/agent_user/'.__FUNCTION__, 'ERR', '查询异常', ['wechatUser'=>$wechatUser, 'err_msg'=>$e->getMessage()]);
+            return ['status'=>303, 'msg'=>$e->getMessage()];
+        }
+
+        return [CommonBaseService::CODE_FOR_USER, ['replyTxt'=>$replyTxt], '撤单成功'];
     }
 
     /**
