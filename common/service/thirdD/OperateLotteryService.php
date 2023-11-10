@@ -43,20 +43,13 @@ class OperateLotteryService extends CommonBaseService
             }
             #p(['BetRows'=>$BetRows]);
 
-            if(empty($qihao)){
-                $qihao = $BetRows[0]->qihao;
-            }
-            $kjCode = CommonService::getAwardNumberByQihao($qihao, $lottery_type); // 3,4,5,6,7
-            //p([$lottery_type, $qihao, $where, $kjCode]);
-            if(empty($kjCode)){
-                throw_info('开奖号码为空:lottery_type:'.$lottery_type.'_qihao:'.$qihao);
-            }
-
-            $kjCode = trim(substr($kjCode, 0, 5));
-            $kjCode = $kjCode[0].','.$kjCode[2].','.$kjCode[4];
-            #$kjCode = '4,1,2'; # 测试
             $idData = [];
             foreach ($BetRows as $betRow){
+                $qh = $betRow->qihao;
+                $code_str = trim(CommonService::getAwardNumberByQihao($qh, $lottery_type)); // 3,4,5,6,7
+                $kjCode = $code_str[0].','.$code_str[2].','.$code_str[4]; // 3,4,5
+                #$kjCode = '4,1,2'; # 测试
+
                 $idData[] = ['wechat_user_id'=>$betRow->wechat_user_id, 'user_id'=>$betRow->user_id];
                 $method_id = $betRow->play_method;
                 //p($method_id);

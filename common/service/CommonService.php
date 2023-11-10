@@ -102,7 +102,7 @@ class  CommonService{
         $m = \Yii::$app->cache;
 
         $mkey = 'KJ_DATA_x3_'.$lottery_type.'_'.$qihao;
-        if(true OR !$kjData = $m->get($mkey)){
+        if(!$kjData = $m->get($mkey)){
             $kjData = SscKjData::find()->select(['code_str'])->where(['qihao'=>$qihao, 'lottery_type'=>$lottery_type])->asArray()->limit(1)->one()['code_str'];
             if(!$kjData){
                 return false;
