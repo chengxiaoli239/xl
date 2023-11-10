@@ -110,6 +110,7 @@ class AgentUsersBalanceService extends BaseService {
     }
 
     /**
+     * 下单、撤单、派奖余额操作
      * @param string $orderId
      * @param float $money
      * @param string $member_id
@@ -124,16 +125,19 @@ class AgentUsersBalanceService extends BaseService {
         }
         $before_balance = $WechatUser->balance;
         switch ($type){
-            case WechatUserService::TYPE_ORDER_BET:
+            case WechatUserService::TYPE_ORDER_BET: # 下单
                 $changeMoney = 0 - $money;
                 $after_balance = $WechatUser->balance + $changeMoney;
                 if($after_balance<0){
                     throw_info('鱼分不足，需'.$money.'，目前盛鱼：'.$before_balance, CommonBaseService::CODE_FOR_USER);
                 }
                 break;
-            case WechatUserService::TYPE_ORDER_CANCEL:
+            case WechatUserService::TYPE_ORDER_CANCEL: # 撤单
                 $changeMoney = $money;
                 $after_balance = $WechatUser->balance + $changeMoney;
+                break;
+            case WechatUserService::TYPE_BALANCE_AWARD: # 派奖
+                $changeMoney = $money;
                 break;
             default:
                 throw_info('更新余额业务类型异常');

@@ -21,6 +21,7 @@ class WechatUserService extends BaseService
     const TYPE_ORDER_CANCEL = 2;
     const TYPE_BALANCE_UP = 3;
     const TYPE_BALANCE_DOWN = 4;
+    const TYPE_ORDER_AWARD = 5;
 
     const OP_BALANCE_MEMBER_OP = 1;
     const OP_BALANCE_AGENT_OP = 2;
@@ -39,6 +40,7 @@ class WechatUserService extends BaseService
             self::TYPE_ORDER_CANCEL => '撤单',
             self::TYPE_BALANCE_UP => '上分',
             self::TYPE_BALANCE_DOWN => '下分',
+            self::TYPE_ORDER_AWARD => '派奖',
         ],
         'balance_OPERATE_TYPE' => [
             self::OP_BALANCE_MEMBER_OP => '用户申请->代理审核',

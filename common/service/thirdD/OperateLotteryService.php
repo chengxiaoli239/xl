@@ -3,10 +3,12 @@
 namespace common\service\thirdD;
 
 use backend\models\SscKjData;
+use backend\service\agent\AgentUsersBalanceService;
 use backend\service\OpKjService;
 use common\models\thirdD\BetOrderId;
 use common\service\CommonService;
 use common\service\helpers\ThirdD;
+use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
 use yii\helpers\Json;
 
@@ -190,20 +192,22 @@ class OperateLotteryService extends CommonBaseService
                             Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常0', ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>'未知玩法ID:'.$method_id]);
                             break;
                     }
-                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理结束', ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>'处理结束']);
+                    $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>'处理结束'];
+                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理结束', $logArr);
                     var_dump(date('Y-m-d H:i:s ').'处理成功：betRowId:'.$betRow->id.'_method_id:'.$method_id);
                 }catch (\Exception $e){
-                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常1', ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+                    $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()];
+                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常1', $logArr);
                     var_dump($e->getMessage());
                 }
             }
         }catch (\Exception $e){
-            return [10001, [], $e->getMessage()];
+            return [10001, ['lottery_type'=>$lottery_type], $e->getMessage()];
         }
         $idData = array_unique($idData);
         Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖处理结束', ['lottery_type'=>$lottery_type, 'idData'=>$idData]);
 
-        return [0, ['idData'=>$idData], '处理成功'];
+        return [0, ['lottery_type'=>$lottery_type, 'idData'=>$idData], '处理成功'];
     }
 
     /**
@@ -904,6 +908,7 @@ class OperateLotteryService extends CommonBaseService
     private static function endCaculate(object $betRow, int $zjCount, array $Odds=[], string $kjCode=''): bool
     {
         try {
+            $transaction = \Yii::$app->db->beginTransaction();
             if($zjCount>0){
                 # 中奖
                 $status = self::STATUS_LT_SUCCESS;
@@ -927,10 +932,15 @@ class OperateLotteryService extends CommonBaseService
             if(empty($flag)){
                 throw_info(Json::encode($betRow->getErrors()));
             }
+            if($zjCount>0){
+                $vData = AgentUsersBalanceService::updateBalance((string)$betRow->order_id, $bonus, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_AWARD); # 撤单返还
+            }
             $logArr = ['status'=>$status, 'bonus'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'kjCode'=>$kjCode, 'betRecord'=>$betRow->getAttributes()];
             $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
             Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
+            $transaction->commit();
         }catch (\Exception $e){
+            $transaction->rollBack();
             $logArr = ['betRowId'=>$betRow->id, 'zjCount'=>$zjCount, 'kjCode='>$kjCode, 'updateDatas'=>$updateDatas, 'err_msg'=>$e->getMessage()];
             Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', $playMethod.'-开奖处理-异常', $logArr);
             return false;
