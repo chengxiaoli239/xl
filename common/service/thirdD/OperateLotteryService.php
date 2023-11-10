@@ -37,9 +37,9 @@ class OperateLotteryService extends CommonBaseService
         try {
             $where = OperateLotteryService::runWhere($lottery_type, $qihao);
             #$where = ['id'=>[384,384]]; # 测试
-            $BetRows = \backend\models\wechat\Bets::find()->where($where)->limit(10)->all();
+            $BetRows = \backend\models\wechat\Bets::find()->where($where)->limit(100)->all();
             if(empty($BetRows)){
-                throw_info('记录为空:'.Json::encode($where));
+                throw_info('记录为空');
             }
             #p(['BetRows'=>$BetRows]);
 
@@ -201,7 +201,7 @@ class OperateLotteryService extends CommonBaseService
             return [10001, [], $e->getMessage()];
         }
         $idData = array_unique($idData);
-        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖处理结束', ['idData'=>$idData]);
+        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖处理结束', ['lottery_type'=>$lottery_type, 'idData'=>$idData]);
 
         return [0, ['idData'=>$idData], '处理成功'];
     }
