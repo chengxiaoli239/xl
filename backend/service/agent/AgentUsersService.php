@@ -259,7 +259,7 @@ class AgentUsersService extends BaseService {
             return ['status'=>303, 'msg'=>$e->getMessage()];
         }
 
-        return [CommonBaseService::CODE_FOR_USER, ['replyTxt'=>$replyTxt], '撤单成功'];
+        return [CommonBaseService::CODE_FOR_USER, [], $replyTxt];
     }
 
     /**

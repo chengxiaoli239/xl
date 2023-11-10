@@ -361,7 +361,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $err_msg = ($e->getCode() == CommonBaseService::CODE_FOR_USER) ? $e->getMessage() : '撤单异常';
             return [CommonBaseService::CODE_FOR_USER, [], $err_msg];
         }
-        return [CommonBaseService::CODE_FOR_USER, ['text'=>$text, 'replyTxt'=>$orderId.'撤单完成'], '撤单成功'];
+        return [CommonBaseService::CODE_FOR_USER, [], $orderId.'撤单成功'];
     }
 
     /**
