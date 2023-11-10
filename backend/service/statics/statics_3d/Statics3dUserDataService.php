@@ -129,7 +129,7 @@ class Statics3dUserDataService extends BaseService {
             $flowsWhere = [
                 'AND',
                 ['=', 'member_id', $wechat_user_id],
-                ['=', 'status', CommonBaseService::VALID_STATUS], # 待处理和
+                ['=', 'status', AgentUsersBalanceService::FLOW_CHECK_STATUS_PASS], # 待处理和
                 ['between', 'created_at', strtotime($date.' 00:00:00'), strtotime($date.' 23:59:59')],
             ];
             # 上分
