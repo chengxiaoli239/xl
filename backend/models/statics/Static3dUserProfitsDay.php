@@ -41,7 +41,7 @@ class Static3dUserProfitsDay extends \common\models\base\BaseModel
             [['bet_money', 'bonus', 'profits'], 'number'],
             [['updated_at'], 'required'],
             [['wechat_user_name'], 'string', 'max' => 32],
-            [['date', 'user_id', 'lottery_type'], 'unique', 'targetAttribute' => ['date', 'user_id', 'lottery_type']],
+            [['date', 'wechat_user_id', 'lottery_type'], 'unique', 'targetAttribute' => ['date', 'wechat_user_id', 'lottery_type']],
         ];
     }
 
