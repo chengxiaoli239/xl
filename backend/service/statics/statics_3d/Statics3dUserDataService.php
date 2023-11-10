@@ -88,6 +88,7 @@ class Statics3dUserDataService extends BaseService {
             //p($Static3dUserProfitsDay->getAttributes());
             if(!$Static3dUserProfitsDay->save()){
                 #throw_info(Json::encode($Static3dUserProfitsDay->getErrors()));
+                Tool_Common::log('/static_3d/'.__FUNCTION__, 'ERR', '计算异常', ['errors'=>$Static3dUserProfitsDay->getErrors()]);
                 throw_info(current($Static3dUserProfitsDay->getErrors()));
             }
         }
@@ -163,8 +164,8 @@ class Statics3dUserDataService extends BaseService {
             $Static3dUserProfitsDayAll->setAttributes($setData, false);
             //p($Static3dUserProfitsDayAll->getAttributes());
             if(!$Static3dUserProfitsDayAll->save()){
-                #throw_info(Json::encode($Static3dUserProfitsDayAll->getErrors()));
-                throw_info(current($Static3dUserProfitsDayAll->getErrors()));
+                Tool_Common::log('/static_3d/'.__FUNCTION__, 'ERR', '计算异常', ['errors'=>$Static3dUserProfitsDayAll->getErrors()]);
+                throw_info(Json::encode($Static3dUserProfitsDayAll->getErrors()));
             }
         }catch (\Exception $e){
             return [10001, [], $e->getMessage()];
