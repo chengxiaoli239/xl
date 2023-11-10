@@ -363,9 +363,9 @@ class EYunMessageOperateService  extends EYunBaseService
             }
         }catch (\Exception $e){
             $err_msg = ($e->getCode() == CommonBaseService::CODE_FOR_USER) ? $e->getMessage() : '撤单异常';
-            return [CommonBaseService::CODE_FOR_USER, [], $err_msg];
+            return [CommonBaseService::CODE_FOR_USER, ['type'=>WechatUserService::TYPE_ORDER_CANCEL], $err_msg];
         }
-        return [CommonBaseService::CODE_FOR_USER, [], $orderId.'撤单成功，余分：'.$vData['balance']];
+        return [CommonBaseService::CODE_FOR_USER, ['type'=>WechatUserService::TYPE_ORDER_CANCEL], $orderId.'撤单成功，余分：'.$vData['balance']];
     }
 
     /**
