@@ -49,6 +49,9 @@ class OperateLotteryService extends CommonBaseService
             foreach ($BetRows as $betRow){
                 $qh = $betRow->qihao;
                 $code_str = trim(CommonService::getAwardNumberByQihao($qh, $lottery_type)); // 3,4,5,6,7
+                if(empty($code_str)){
+                    throw_info('未开奖：lottery_type:'.$lottery_type.'_qihao:'.$qh);
+                }
                 $kjCode = $code_str[0].','.$code_str[2].','.$code_str[4]; // 3,4,5
                 #$kjCode = '4,1,2'; # 测试
 
