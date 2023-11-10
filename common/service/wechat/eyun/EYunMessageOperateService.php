@@ -348,6 +348,10 @@ class EYunMessageOperateService  extends EYunBaseService
                 if($Bets->status==CommonBaseService::STATUS_LT_CANCEL){
                     throw_info($orderId.'订单已是撤单状态，无需重复处理', CommonBaseService::CODE_FOR_USER);
                 }
+                $orderBetMoney = Bets::find()->select(['orderBetMoney'=>'SUM(bet_money)'])
+                    ->where(['order_id'=>$orderId, 'wechat_user_id'=>$wechatUser['id']])
+                    ->groupBy(['order_id'])->scalar();
+                $vData = AgentUsersBalanceService::updateBalance((string)$orderId, $orderBetMoney, $wechatUser['id'], WechatUserService::TYPE_ORDER_CANCEL); # 撤单返还
                 #$Bets->status = 3; # 已撤单
                 Bets::updateAll(['status'=>CommonBaseService::STATUS_LT_CANCEL], ['order_id'=>$orderId]);
                 if(!$Bets->save()){
@@ -361,7 +365,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $err_msg = ($e->getCode() == CommonBaseService::CODE_FOR_USER) ? $e->getMessage() : '撤单异常';
             return [CommonBaseService::CODE_FOR_USER, [], $err_msg];
         }
-        return [CommonBaseService::CODE_FOR_USER, [], $orderId.'撤单成功'];
+        return [CommonBaseService::CODE_FOR_USER, [], $orderId.'撤单成功，余分：'.$vData['balance']];
     }
 
     /**
