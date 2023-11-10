@@ -127,8 +127,10 @@ class Statics3dUserDataService extends BaseService {
                 list($BetMoneys, $BonusMoneys, $ProfitsMoneys) = self::getBetAndProfitsAndBonus($baseWhere);
             }
             $flowsWhere = [
-                'member_id' => $wechat_user_id,
-                'status' => AgentUsersBalanceService::FLOW_CHECK_STATUS_PASS,
+                'AND',
+                ['=', 'member_id', $wechat_user_id],
+                ['=', 'status', CommonBaseService::VALID_STATUS], # 待处理和
+                ['between', 'created_at', strtotime($date.' 00:00:00'), strtotime($date.' 23:59:59')],
             ];
             # 上分
             $UpMoneys = AgentUsersBalanceFlows::find()->select(['up_money'=>'SUM(balance)'])->where($flowsWhere)
