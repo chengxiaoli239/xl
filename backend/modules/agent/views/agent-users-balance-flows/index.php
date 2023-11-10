@@ -42,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute'=>'type','label'=>'类型',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value'=>function($model){
-                                return \backend\service\agent\AgentUsersService::getFlowTypeTxt($model->type);
+                                return '<strong><font color="'.($model->type==\common\service\wechat\WechatUserService::TYPE_BALANCE_UP?'green':'red').'">'.\backend\service\agent\AgentUsersService::getFlowTypeTxt($model->type).'</font></strong>';
                             },
                             'filter' => \backend\service\agent\AgentUsersService::getFlowtypes(),
                         ],

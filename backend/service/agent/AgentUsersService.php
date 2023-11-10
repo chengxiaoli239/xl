@@ -206,9 +206,9 @@ class AgentUsersService extends BaseService {
             }
             $transaction->commit();
 
-            $replyTxt = '【内容】申请'.WechatUserService::$s['balance_type'][$balanceType].$flows->balance.
+            $replyTxt = '【内容】申请'.WechatUserService::$s['balance_type'][$balanceType].floatval($flows->balance).
                 "\n【结果】".AgentUsersBalanceService::$s['status'][$status].
-                "\n【申请前】".$before_balance.
+                "\n【操作前】".floatval($before_balance).
                 "\n【盛鱼】".$after_balance;
             WechatPrivateMsgReceiveJobs::reply($user_id, [$replyTxt], ['fromUser' => $WechatUser->userName]); # 回复消息
             push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$user_id, 'type'=>$balanceType, 'wechat_user_id'=>$WechatUser->id]);
