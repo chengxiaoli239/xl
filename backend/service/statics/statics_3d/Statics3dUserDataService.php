@@ -120,10 +120,10 @@ class Statics3dUserDataService extends BaseService {
             ];
             $Bet = Bets::find()->where($baseWhere)->limit(1)->one();
             if(empty($Bet)){
-                throw_info('没有下注记录，无需汇总');
+                $BetMoneys = $BonusMoneys = $ProfitsMoneys = 0.00;
+            }else{
+                list($BetMoneys, $BonusMoneys, $ProfitsMoneys) = self::getBetAndProfitsAndBonus($baseWhere);
             }
-
-            list($BetMoneys, $BonusMoneys, $ProfitsMoneys) = self::getBetAndProfitsAndBonus($baseWhere);
             $flowsWhere = [
                 'member_id' => $wechat_user_id,
                 'status' => AgentUsersBalanceService::FLOW_CHECK_STATUS_PASS,
