@@ -48,6 +48,7 @@ class Static3dUserProfitsDay extends Static3dUserProfitsDayModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder'=>['id'=>SORT_DESC]],
         ]);
 
         $this->load($params);

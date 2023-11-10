@@ -303,7 +303,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         }
                         #p(['g'=>$g, 'singleData'=>$singleData, 'betText'=>$betText], 0);
                         if(empty($g['single']) OR empty($g['all_moneys'])){
-                            throw_info('匹配倍数或金额异常', ThirdDTypeService::CODE_FOR_USER);
+                            throw_info('匹配倍数或金额异常', CommonBaseService::CODE_FOR_USER);
                         }
                         $dataGroups['betCodeContents'][$lottery_type][] = $g;
                     }
@@ -311,8 +311,8 @@ class EYunMessageOperateService  extends EYunBaseService
             }
         }catch (\Exception $e){
             Tool_Common::log('/wechat/'.__FUNCTION__, 'ERR', '消息接收处理异常', ['text'=>$text, 'betText'=>$betText, 'err_msg'=>$e->getMessage().'_'.$e->getFile().'_'.$e->getLine()]);
-            if($e->getCode() == ThirdDTypeService::CODE_FOR_USER){
-                return [ThirdDTypeService::CODE_FOR_USER, [], $e->getMessage()];
+            if($e->getCode() == CommonBaseService::CODE_FOR_USER){
+                return [CommonBaseService::CODE_FOR_USER, [], $e->getMessage()];
             }
             return [30001, [], $e->getMessage()];
         }
@@ -330,7 +330,8 @@ class EYunMessageOperateService  extends EYunBaseService
      * @param $text
      * @return array
      */
-    public static function operateCancel($text='', $wechatUser=[]){
+    public static function operateCancel($text='', $wechatUser=[]): array
+    {
         try {
             if (preg_match('/(\d+)/', $text, $matches)) {
                 $orderId = $matches[0];
@@ -339,17 +340,18 @@ class EYunMessageOperateService  extends EYunBaseService
                 if(empty($Bets)){
                     throw_info('单号：'.$orderId.'无记录', CommonBaseService::CODE_FOR_USER);
                 }
-                if($Bets->status==1){
+                if($Bets->status==CommonBaseService::STATUS_LT_SUCCESS){
                     throw_info($orderId.'订单已完成，无法撤单', CommonBaseService::CODE_FOR_USER);
                 }
-                if($Bets->status==3){
+                if($Bets->status==CommonBaseService::STATUS_LT_CANCEL){
                     throw_info($orderId.'订单已是撤单状态，无需重复处理', CommonBaseService::CODE_FOR_USER);
                 }
                 #$Bets->status = 3; # 已撤单
-                Bets::updateAll(['status'=>3], ['order_id'=>$orderId]);
+                Bets::updateAll(['status'=>CommonBaseService::STATUS_LT_CANCEL], ['order_id'=>$orderId]);
                 if(!$Bets->save()){
                     throw_info(Json::encode($Bets->getErrors()));
                 }
+
             }else{
                 throw_info('操作异常');
             }
@@ -450,7 +452,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $transaction->rollBack();
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-异常', ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'err_msg'=>$e->getMessage().$e->getFile().$e->getLine()]);
             # 用户输入错误提示
-            if($e->getCode() == ThirdDTypeService::CODE_FOR_USER){
+            if($e->getCode() == CommonBaseService::CODE_FOR_USER){
                 return [$e->getCode(), [], $e->getMessage()];
             }
             # 其它情况处理异常，直接抛异常

@@ -198,7 +198,7 @@ class AgentUsersService extends BaseService {
 
             $flows->balance_after = $after_balance;
             $flows->status = $status;
-            $flows->desc = $desc;
+            $flows->desc = $flows->desc.'=>'.$desc;
             $flows->check_time = (string)time();
             if(!$flows->save()){
                 throw_info(current($flows->getErrors()));

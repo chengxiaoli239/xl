@@ -45,9 +45,9 @@ class Static3dUserProfitsDayAll extends Static3dUserProfitsDayAllModel
         $query = Static3dUserProfitsDayAllModel::find();
 
         // add conditions that should always apply here
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder'=>['id'=>SORT_DESC]],
         ]);
 
         $this->load($params);

@@ -8,6 +8,7 @@ use common\service\jobs\statics_3d\UserDayStaticsJobs;
 use common\service\thirdD\CommonBaseService;
 use common\service\wechat\WechatUserService;
 use yii\db\Exception;
+use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii;
 use yii\helpers\Json;
@@ -130,26 +131,32 @@ class AgentUsersBalanceService extends BaseService {
         switch ($type){
             case WechatUserService::TYPE_ORDER_BET:
                 $changeMoney = 0 - $money;
-                $after_balance = $WechatUser->balance +$changeMoney;
+                $after_balance = $WechatUser->balance + $changeMoney;
                 if($after_balance<0){
-                    throw_info('鱼分不足，目前盛鱼：'.$before_balance, CommonBaseService::CODE_FOR_USER);
+                    throw_info('鱼分不足，需'.$money.'，目前盛鱼：'.$before_balance, CommonBaseService::CODE_FOR_USER);
                 }
                 break;
-
             case WechatUserService::TYPE_ORDER_CANCEL:
                 $changeMoney = $money;
                 $after_balance = $WechatUser->balance + $changeMoney;
                 break;
+            default:
+                throw_info('更新余额业务类型异常');
+                break;
         }
-        $setData = ['balance'=>$after_balance];
-        $WechatUser->setAttributes($setData, false);
-        if(!$WechatUser->save()){
-            throw_info(Json::encode($WechatUser->getErrors()));
+        if(!WechatUser::updateAll(['balance'=>(new Expression("`balance`+".$changeMoney))])){
+            throw_info('余额更新错误');
         }
+        $newWechatUser = WechatUser::findOne($member_id);
+        #$setData = ['balance'=>$after_balance];
+        #$WechatUser->setAttributes($setData, false);
+        #if(!$WechatUser->save()){
+        #    throw_info(Json::encode($WechatUser->getErrors()));
+        #}
         $now_time = time();
         $setDataFlow = [
             'order_id' => $orderId,
-            'balance_after' => $after_balance,
+            'balance_after' => $newWechatUser->balance,
             'balance' => $changeMoney,
             'balance_now' => $before_balance,
             'status' => AgentUsersBalanceService::FLOW_CHECK_STATUS_REFUSE, # 下单、撤单默认通过
