@@ -74,6 +74,7 @@ trait EventServiceTrait
             if(empty($user_id)){
                 throw_info('机器人系统user_id不能为空');
             }
+            $data['description'] = \common\tools\Common::filterEmoji($data['description']);
             $setData = [
                 'user_id' => $user_id,
                 'wechat_user_id' => $wechatUserId,

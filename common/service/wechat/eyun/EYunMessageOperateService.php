@@ -81,7 +81,8 @@ class EYunMessageOperateService  extends EYunBaseService
      * @param string $text
      * @throws \common\exceptions\InfoException
      */
-    public static function validateReceive($user_id='', $text=''){
+    public static function validateReceive($user_id='', $text=''): array
+    {
         if(empty($text)){
             throw_info('文字不能为空');
         }

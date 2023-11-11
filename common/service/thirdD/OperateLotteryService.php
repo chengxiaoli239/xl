@@ -963,7 +963,7 @@ class OperateLotteryService extends CommonBaseService
             }
             $logArr = ['status'=>$status, 'bonus'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'kjCode'=>$kjCode, 'vData'=>$vData, 'betRecord'=>$betRow->getAttributes()];
             $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];
-            Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理', $logArr);
+            Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', $playMethod.'-开奖处理01', $logArr);
             $transaction->commit();
         }catch (\Exception $e){
             $transaction->rollBack();
