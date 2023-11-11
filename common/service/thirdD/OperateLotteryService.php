@@ -54,8 +54,9 @@ class OperateLotteryService extends CommonBaseService
                 $method_id = $betRow->play_method;
                 $code_str = trim(CommonService::getAwardNumberByQihao($qh, $lottery_type)); // 3,4,5,6,7
                 if(empty($code_str)){
-                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算01', ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'qihao'=>$qh, 'method_id'=>$method_id]);
-                    throw_info('未开奖：lottery_type:'.$lottery_type.'_qihao:'.$qh);
+                    $msg = '未开奖：lottery_type:'.$lottery_type.'_qihao:'.$qh;
+                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算01', ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'qihao'=>$qh, 'method_id'=>$method_id, 'msg'=>$msg]);
+                    #throw_info('未开奖：lottery_type:'.$lottery_type.'_qihao:'.$qh);
                 }
                 $kjCode = $code_str[0].','.$code_str[2].','.$code_str[4]; // 3,4,5
                 #$kjCode = '4,1,2'; # 测试
