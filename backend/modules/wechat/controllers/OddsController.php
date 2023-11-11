@@ -87,7 +87,12 @@ class OddsController extends BaseController
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if (!empty($this->_post)) {
+            $money = $this->_post['Odds']['money']? :$model->money;
+            $this->_post['Odds']['odds'] = round($this->_post['Odds']['bouns']/$money, 2);
+            if($model->load($this->_post) && $model->save()){
+                return $this->redirect(['index', 'id' => $model->id]);
+            }
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
