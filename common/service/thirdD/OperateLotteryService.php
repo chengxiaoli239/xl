@@ -46,7 +46,7 @@ class OperateLotteryService extends CommonBaseService
                 throw_info('记录为空');
             }
             #p(['BetRows'=>$BetRows]);
-            Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算', ['lottery_type'=>$lottery_type, 'counts'=>count($BetRows), 'sql'=>$sql]);
+            Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算00', ['lottery_type'=>$lottery_type, 'counts'=>count($BetRows), 'sql'=>$sql]);
 
             $idData = [];
             foreach ($BetRows as $betRow){
@@ -60,6 +60,7 @@ class OperateLotteryService extends CommonBaseService
 
                 $idData[] = ['wechat_user_id'=>$betRow->wechat_user_id, 'user_id'=>$betRow->user_id];
                 $method_id = $betRow->play_method;
+                Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算01', ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'qihao'=>$qh, 'kjCode'=>$kjCode, 'method_id'=>$method_id]);
                 //p($method_id);
                 try {
                     switch ($method_id){
@@ -195,11 +196,11 @@ class OperateLotteryService extends CommonBaseService
                             OperateLotteryService::runZhiXuanFuShi($betRow, $kjCode); # 直选复式
                             break;
                         default:
-                            Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常0', ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>'未知玩法ID:'.$method_id]);
+                            Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常10', ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>'未知玩法ID:'.$method_id]);
                             break;
                     }
                     $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>'处理结束'];
-                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理结束', $logArr);
+                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理结束99', $logArr);
                     var_dump(date('Y-m-d H:i:s ').'处理成功：betRowId:'.$betRow->id.'_method_id:'.$method_id);
                 }catch (\Exception $e){
                     $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()];
