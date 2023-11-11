@@ -52,6 +52,9 @@ class OperateLotteryService extends CommonBaseService
             foreach ($BetRows as $betRow){
                 list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);
                 Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算01', ['code'=>$code, 'data'=>$data, 'msg'=>$msg]);
+                if($code==0){
+                    $idData[] = $data['idData'];
+                }
             }
         }catch (\Exception $e){
             return [10001, ['lottery_type'=>$lottery_type], $e->getMessage()];
@@ -71,14 +74,14 @@ class OperateLotteryService extends CommonBaseService
         if(empty($code_str)){
             $msg = '未开奖：lottery_type:'.$lottery_type.'_qihao:'.$qh;
             $logArr = ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'qihao'=>$qh, 'method_id'=>$method_id, 'msg'=>$msg];
-            Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算01', $logArr);
+            Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算21', $logArr);
             return [10002, $logArr, $msg];
         }
         $kjCode = $code_str[0].','.$code_str[2].','.$code_str[4]; // 3,4,5
         #$kjCode = '4,1,2'; # 测试
 
-        $idData[] = ['wechat_user_id'=>$betRow->wechat_user_id, 'user_id'=>$betRow->user_id];
-        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算02', ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'qihao'=>$qh, 'kjCode'=>$kjCode, 'method_id'=>$method_id]);
+        $idData = ['wechat_user_id'=>$betRow->wechat_user_id, 'user_id'=>$betRow->user_id];
+        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算22', ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'qihao'=>$qh, 'kjCode'=>$kjCode, 'method_id'=>$method_id]);
         //p($method_id);
         try {
             switch ($method_id){
@@ -220,8 +223,8 @@ class OperateLotteryService extends CommonBaseService
                     return [10003, $logArr, $err_msg];
                     break;
             }
-            $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>'处理结束'];
-            Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理结束99', $logArr);
+            $resultData = ['betRowId'=>$betRow->id, 'idData'=>$idData, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>'处理结束'];
+            Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理结束99', $resultData);
             var_dump(date('Y-m-d H:i:s ').'处理成功：betRowId:'.$betRow->id.'_method_id:'.$method_id);
         }catch (\Exception $e){
             $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()];
@@ -229,7 +232,7 @@ class OperateLotteryService extends CommonBaseService
             var_dump($e->getMessage());
             return [10004, $logArr, $e->getMessage()];
         }
-        return [0, $logArr, '处理成功'];
+        return [0, $resultData, '处理成功'];
     }
 
     /**
