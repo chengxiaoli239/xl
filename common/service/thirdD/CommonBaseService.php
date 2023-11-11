@@ -15,6 +15,10 @@ class CommonBaseService extends BaseService
         self::LOTTERY_TYPE_FUCAI,
         self::LOTTERY_TYPE_PL3,
     ];
+    const THIRDD_LOTTERY_OPTIONS = [
+        self::LOTTERY_TYPE_FUCAI => '福',
+        self::LOTTERY_TYPE_PL3 => '排',
+    ];
 
     # 共用的状态值
     const STATUS_LT_WAIT = 0;
@@ -24,7 +28,7 @@ class CommonBaseService extends BaseService
     const STATUS_LT_CANCEL = 3;
     const STATUS_OPTIONS = [
         self::STATUS_LT_WAIT => '待处理',
-        self::STATUS_LT_SUCCESS => '处理成功',
+        self::STATUS_LT_SUCCESS => '已中奖',
         self::STATUS_LT_FAIL => '未中奖',
         self::STATUS_LT_CANCEL => '已撤单',
     ];

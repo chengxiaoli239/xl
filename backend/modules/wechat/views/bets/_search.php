@@ -1,13 +1,30 @@
 <?php
 
+use common\service\thirdD\CommonBaseService;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model backend\models\searchs\wechat\Bets */
 /* @var $form yii\widgets\ActiveForm */
-?>
 
+$PlayMethods = \common\models\thirdD\PlayMethod::find()->where(['status'=>1])->asArray()->all();
+$datas = array_column($PlayMethods, 'name', 'id');
+$playMethodOptions = array_merge(['' => '--请选择--'], $datas);
+?>
+<style>
+.form-control{
+    padding : 0px 0px;
+}
+/* 在小屏幕上的样式，标题显示在框内 */
+@media (max-width: 767px) {
+    .control-label.hidden-xs {
+        display: block;
+        width: 100%;
+        margin-bottom: 5px; /* 根据需要进行调整 */
+    }
+}
+</style>
 <div class="bets-search">
 
     <?php $form = ActiveForm::begin([
@@ -16,76 +33,47 @@ use yii\widgets\ActiveForm;
     ]); ?>
 
     <div class="row">
-        <div class="col-lg-2 col-xs-3">
-            <?= $form->field($model, 'wechat_user_id') ?>
+        <div class="col-lg-2 col-xs-4">
+            <?= $form->field($model, 'wechat_user_id')
+                ->label('微信ID', ['class' => 'control-label hidden-xs'])->textInput(['placeholder' => '微信ID'])
+            ?>
         </div>
-        <div class="col-lg-2 col-xs-3">
-            <?= $form->field($model, 'order_id') ?>
+        <div class="col-lg-2 col-xs-4">
+            <?= $form->field($model, 'order_id')
+                ->label('订单ID', ['class' => 'control-label hidden-xs'])->textInput(['placeholder' => '订单ID'])
+            ?>
         </div>
-        <div class="col-lg-2 col-xs-3">
-            <?= $form->field($model, 'play_method') ?>
+        <div class="col-lg-2 col-xs-4">
+            <?= $form->field($model, 'play_method')->dropDownList(
+                $playMethodOptions, // Provide the options here
+                ['prompt' => '-请选择-'] // Optional: Add a prompt message
+            )->label('玩法', ['class' => 'control-label hidden-xs'])?>
         </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'codes') ?>
+        <div class="col-lg-2 col-xs-4">
+            <?php echo $form->field($model, 'qihao')
+                ->label('期号', ['class' => 'control-label hidden-xs'])->textInput(['placeholder' => '期号'])
+            ?>
         </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'bet_money') ?>
+        <div class="col-lg-2 col-xs-4">
+            <?php echo $form->field($model, 'status')->dropDownList(
+        CommonBaseService::STATUS_OPTIONS, ['prompt'=>'-选择状态-']
+            )->label('状态', ['class' => 'control-label hidden-xs']); ?>
         </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'bonus') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'single') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'ratio') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'profits') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'qihao') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'kj_codes') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'status') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'cancel_status') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'is_simulate') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'lottery_name') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'lottery_type') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'is_profits_record') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'bet_desc') ?>
+        <div class="col-lg-2 col-xs-4">
+            <?php echo $form->field($model, 'lottery_type')->dropDownList(
+        CommonBaseService::THIRDD_LOTTERY_OPTIONS, ['prompt'=>'-选择彩种-']
+            )->label('类', ['class' => 'control-label hidden-xs']); ?>
         </div>
         <div class="col-lg-2 col-xs-3">
             <?php // echo $form->field($model, 'created_at') ?>
         </div>
         <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'updated_at') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
-            <?php // echo $form->field($model, 'update_at') ?>
-        </div>
-        <div class="col-lg-2 col-xs-3">
             <label> </label>
-            <div class="form-group">
                 <?= Html::submitButton('搜索', ['class' => 'btn btn-primary']) ?>
+        </div>
+        <div class="col-lg-2 col-xs-4">
+            <label> </label>
                 <?= Html::resetButton('重置', ['class' => 'btn btn-default']) ?>
-
-            </div>
         </div>
 
     <?php ActiveForm::end(); ?>
