@@ -167,7 +167,7 @@ class AgentUsersBalanceService extends BaseService {
         if(!$flow->save()){
             throw_info(Json::encode($flow->getErrors()));
         }
-        $logArr = ['orderId'=>$orderId, 'before_balance'=>$before_balance, 'balance_after' => $newWechatUser->balance, 'member_id'=>$member_id, 'money'=>$money, 'setDataFlow'=>$setDataFlow];
+        $logArr = ['orderId'=>$orderId, 'money'=>$money, 'before_balance'=>$before_balance, 'balance_after'=>$newWechatUser->balance, 'member_id'=>$member_id, 'setDataFlow'=>$setDataFlow];
         Tool_Common::log('/agent_user/'.__FUNCTION__, 'INFO', '余额变动', $logArr);
 
         return $newWechatUser->attributes;

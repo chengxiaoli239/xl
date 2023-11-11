@@ -12,7 +12,7 @@ use yii\helpers\Json;
 
 trait EventServiceTrait
 {
-    public static function eventHandler($data)
+    public static function eventHandler($data): array
     {
         $messageType = $data['messageType'];
         $wcId = $data['wcId'];
@@ -50,12 +50,13 @@ trait EventServiceTrait
      * @param array $data
      * @return array|string[]
      */
-    private static function saveMessage($data=[]){
+    private static function saveMessage(array $data=[]): array
+    {
         try {
             $messageType = $data['messageType'];
             $params = $data['data'];
             $fromUser = $params['fromUser'];
-            $toUser = $params['toUser'];
+            $toUser = $params['toUser']??'';
             $RobotWechatId = $data['wcId'];
             $user_id = EYunBaseService::getRobotUserIdByWechatId($RobotWechatId);
             if(empty($toUser) && !in_array($messageType, EYunMessageOperateService::MESSAGE_SYNC_OPTIONS)){
