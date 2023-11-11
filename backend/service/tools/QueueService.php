@@ -53,12 +53,12 @@ class QueueService extends BaseService
         return $result;
     }
 
-    private function getListQuery($params)
+    private function getListQuery($params): \yii\db\ActiveQuery
     {
         $query = QueueLog::find();
 
         if (!empty($params['job_class'])) {
-            $query->andWhere(['job_class_md5'=>md5($params['job_class'])]);
+            $query->andWhere(['job_class_md5'=>md5(trim($params['job_class'], '\\'))]);
         }
         if (!empty($params['id'])) {
             $query->andWhere(['id'=>$params['id']]);

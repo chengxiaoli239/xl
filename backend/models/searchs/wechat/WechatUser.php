@@ -48,6 +48,7 @@ class WechatUser extends WechatUserModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder'=>['id'=>SORT_DESC]],
         ]);
 
         $this->load($params);

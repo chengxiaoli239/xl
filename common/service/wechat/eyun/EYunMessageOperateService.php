@@ -38,6 +38,11 @@ class EYunMessageOperateService  extends EYunBaseService
     # 好友信息
     const MESSAGE_FRIEND_INFO_CODE = '65001'; # 好友信息变更通知
 
+    # 非聊天记录需要同步的类型
+    const MESSAGE_SYNC_OPTIONS = [
+        self::MESSAGE_FRIEND_INFO_CODE,
+    ];
+
     public static $methodDatas = [];
     public static $aliasNameToOriginName = [];
     public static $gLotteryType = 0;

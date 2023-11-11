@@ -132,6 +132,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
+                    'pager' => [
+                        'firstPageLabel' => '首页',  // 您可以根据需要自定义文本
+                        'lastPageLabel' => '尾页',  // 您可以根据需要自定义文本
+                    ],
                 ]); ?>
             </div>
         </div>
