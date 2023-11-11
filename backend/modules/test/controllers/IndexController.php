@@ -334,7 +334,7 @@ class IndexController extends Controller
         return $results;
     }
     public function actionDw1(){
-        $betRow = Bets::findOne(893);
+        $betRow = Bets::findOne(769);
         list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);
         p([$code, $data, $msg]);
         #$user_id = EYunBaseService::getRobotUserIdByWechatId($RobotWechatId='wxid_ckgr7i2q9fr522');p($user_id);

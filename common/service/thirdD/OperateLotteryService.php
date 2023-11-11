@@ -502,7 +502,7 @@ class OperateLotteryService extends CommonBaseService
                 #p(['RowId'=>$betRow->id, 'kjCodeArr'=>$kjCodeArr, 'posKjCode'=>$posKjCode, 'oneErDingCodeDatas'=>$oneErDingCodeDatas, 'counts'=>$counts, 'count'=>$count]);
             }
         }
-        #p(['betCodes'=>$betCodes, 'zjCount'=>$zjCount]);
+        #p(['betCodes'=>$betCodes, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'kjCode'=>$kjCode]);
         self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
 
         return true;
