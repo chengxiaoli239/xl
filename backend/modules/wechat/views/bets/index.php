@@ -86,7 +86,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'kj_codes','label'=>'开奖', //'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                return $model->status==3? '<strong><font color="red">已撤单</font></strong>' : ($model->kj_codes ? $model->kj_codes : '<strong><font color="green">待开奖</font></strong>');
+                                return $model->status==3? '<strong><font color="red">已撤单</font></strong>' :
+                                    ($model->kj_codes && !$model->status ? $model->kj_codes : '<strong><font color="green">待开奖</font></strong>');
                             }
                         ],
                         ['attribute' => 'wechat_user_id','label'=>'微信',//'headerOptions'=>['width'=>'5%'],

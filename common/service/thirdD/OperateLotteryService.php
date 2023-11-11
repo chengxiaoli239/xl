@@ -539,7 +539,7 @@ class OperateLotteryService extends CommonBaseService
                 #p(['RowId' => $betRow->id, 'oneCode' => $oneCode, 'kjCodeArr' => $kjCodeArr, 'zjCount' => $zjCount]);
             }
         }
-        #p(['betCodes'=>$betCodes, 'zjCount'=>$zjCount]);
+        #p(['betCodes'=>$betCodes, 'zjCount'=>$zjCount, 'Odds'=>$Odds]);
         self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
 
         return true;
@@ -935,6 +935,7 @@ class OperateLotteryService extends CommonBaseService
                 # 中奖
                 $status = self::STATUS_LT_SUCCESS;
                 $bonus = round(($Odds['bouns'] * $betRow->single)/$Odds['money'], 2) * $zjCount; # 奖金赔率 * 下注金额
+                //p(['bonus'=>$bonus, 'single'=>$betRow->single, 'money'=>$Odds['money'], 'Odds'=>$Odds]);
             }else{
                 # 未中奖
                 $status = self::STATUS_LT_FAIL;

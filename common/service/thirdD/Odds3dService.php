@@ -52,7 +52,7 @@ class Odds3dService extends CommonBaseService
      * @param int $method_id
      * @return array|mixed|\yii\db\ActiveRecord|\yii\db\ActiveRecord[]
      */
-    public static function getOdds($user_id='', $method_id=0){
+    public static function getOdds($user_id=0, int $method_id=0){
         $m = \Yii::$app->cache;
         $mkey = 'get_user_odds_'.$user_id;
         if(!$Odds = $m->get($mkey)){

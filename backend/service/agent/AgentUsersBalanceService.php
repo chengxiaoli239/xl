@@ -136,7 +136,7 @@ class AgentUsersBalanceService extends BaseService {
                 $changeMoney = $money;
                 $after_balance = $WechatUser->balance + $changeMoney;
                 break;
-            case WechatUserService::TYPE_BALANCE_AWARD: # 派奖
+            case WechatUserService::TYPE_ORDER_AWARD: # 派奖
                 $changeMoney = $money;
                 break;
             default:
