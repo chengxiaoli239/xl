@@ -51,6 +51,7 @@ class OperateLotteryService extends CommonBaseService
             $idData = [];
             foreach ($BetRows as $betRow){
                 list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);
+                Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算01', ['code'=>$code, 'data'=>$data, 'msg'=>$msg]);
             }
         }catch (\Exception $e){
             return [10001, ['lottery_type'=>$lottery_type], $e->getMessage()];
@@ -213,7 +214,10 @@ class OperateLotteryService extends CommonBaseService
                     OperateLotteryService::runZhiXuanFuShi($betRow, $kjCode); # 直选复式
                     break;
                 default:
-                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常10', ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>'未知玩法ID:'.$method_id]);
+                    $err_msg = '未知玩法ID:'.$method_id;
+                    $logArr = ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>$err_msg];
+                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常10', $logArr);
+                    return [10003, $logArr, $err_msg];
                     break;
             }
             $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>'处理结束'];
@@ -223,7 +227,7 @@ class OperateLotteryService extends CommonBaseService
             $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()];
             Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常11', $logArr);
             var_dump($e->getMessage());
-            return [10003, $logArr, $e->getMessage()];
+            return [10004, $logArr, $e->getMessage()];
         }
         return [0, $logArr, '处理成功'];
     }
