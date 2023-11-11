@@ -81,7 +81,7 @@ trait EventServiceTrait
                 'wechat_user_id' => $wechatUserId,
                 'toUser'=>$toUser,
                 'msg_type' => $messageType,
-                'msgId'=>$msgId??'',
+                'msgId'=>$msgId??'MSG'.get_unique_id(),
                 'newMsgId'=>$newMsgId??'',
                 'status' => EYunMessage::STATUS_WAIT,
                 'data' => Json::encode($data, 320),
