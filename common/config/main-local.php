@@ -10,8 +10,9 @@ return [
             'username' => $db_name,
             'tablePrefix' => 'lt_',
             'password' => 'dPmk3frLf8Teb6wm',
-            'charset' => 'utf8mb4', // 使用 utf8mb4 编码，支持更广泛的字符集
-            'collation' => 'utf8mb4_unicode_ci', // 使用 utf8mb4_unicode_ci 校对规则
+            #'charset' => 'utf8mb4', // 使用 utf8mb4 编码，支持更广泛的字符集
+            #'collation' => 'utf8mb4_unicode_ci', // 使用 utf8mb4_unicode_ci 校对规则
+            'charset' => 'utf8',
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
