@@ -15,6 +15,7 @@ use common\service\BaseService;
 use common\service\chat\Tool_Common;
 use common\service\helpers\ThirdD;
 use common\service\thirdD\CommonBaseService;
+use common\service\thirdD\jobs\SsxxBetJobs;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\Odds3dService;
 use common\service\thirdD\PlayMethodService;
@@ -411,6 +412,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $allMoneys = 0.00;
             $allCounts = 0;
             $replyTxts = [];
+            $pushSiteDatas = [];
             foreach ($betCodeContents as $lottery_type=>$contents){
                 $qihao = HN0898Service::getQihao($lottery_type);
                 $replyTxt = '【课号】'.$qihao;
@@ -448,6 +450,9 @@ class EYunMessageOperateService  extends EYunBaseService
                         }
                         $allMoneys += $content['all_moneys']; # 总投
                         $allCounts += $content['count']; # 总投
+
+                        # 推送网盘任务：
+                        $pushSiteDatas[] = ['betRowId'=>$Bets->id];
                     }
                 }
             }
@@ -459,8 +464,13 @@ class EYunMessageOperateService  extends EYunBaseService
             $replyTxts[] = $replyTxt;
 
             $transaction->commit();
-            $logArr = ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData, 'replyTxts'=>$replyTxts];
+
+            $logArr = ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData, 'replyTxts'=>$replyTxts, 'pushSiteDatas'=>$pushSiteDatas];
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-成功', $logArr);
+            foreach ($pushSiteDatas as $pushSiteData){
+                $pushSiteData['queue_delay_time'] = 120;
+                push_queue_open(SsxxBetJobs::class, $pushSiteData);
+            }
         }catch (\Exception $e){
             $transaction->rollBack();
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-异常', ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'err_msg'=>$e->getMessage().$e->getFile().$e->getLine()]);
