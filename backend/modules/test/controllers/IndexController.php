@@ -16,6 +16,7 @@ use backend\models\SscSdHzVal;
 use backend\models\SscStaticVal;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
+use backend\models\wechat\Bets;
 use backend\modules\cron\controllers\WeixinController;
 use backend\modules\kj\controllers\BingDaoController;
 use backend\service\agent\AgentUsersBalanceService;
@@ -77,6 +78,7 @@ use common\service\jobs\robots\user\WechatUserStatusJobs;
 use common\service\proxy\ProxyBaseService;
 use common\service\proxy\ProxyKuaiService;
 use common\service\thirdD\OperateLotteryService;
+use common\service\thirdD\sx\Ssxx3dBetService;
 use common\service\webot\FriendsService;
 use common\service\webot\LoginService;
 use common\service\webot\MsgService;
@@ -336,6 +338,8 @@ class IndexController extends Controller
     }
     public function actionDw1(){
 
+        $betRow = Bets::findOne('');
+        list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);p([$code, $data, $msg]);
         $rst = \common\open\thirdD\methods\MethodsMap::insertMapMethods();p($rst);
 
         $headers = [

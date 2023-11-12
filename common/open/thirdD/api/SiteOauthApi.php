@@ -3,6 +3,7 @@ namespace common\open\thirdD\api;
 
 use common\open\thirdD\SxThirdDBase;
 use common\tools\Util;
+use GuzzleHttp\RequestOptions;
 
 class SiteOauthApi extends SxThirdDBase
 {
@@ -29,8 +30,10 @@ class SiteOauthApi extends SxThirdDBase
 
         $headers = array_merge($headers, [
             'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+            "X-Requested-With"=> "XMLHttpRequest",
         ]);
-        return $object->post(self::API_ACTION_LOGIN.'?action=LogApp', $params, $headers);
+        $params[RequestOptions::FORM_PARAMS] = $params;
+        return $object->post(self::API_ACTION_LOGIN, $params, $headers);
     }
 
 

@@ -5,6 +5,7 @@ use common\models\open\SsxxRequestLog;
 use common\open\thirdD\api\SiteOauthApi;
 use common\tools\Tool_Common;
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use Yii;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
@@ -113,9 +114,8 @@ class SxThirdDBase extends Component
 
         try {
             $client = new Client();
-            $response = $client->request($method, $url, [
-                'headers' => $headers,
-            ]);
+            $options = array_merge(['headers' => $headers], $params);
+            $response = $client->request($method, $url, $options);
 
             if($apiMethod == SiteOauthApi::API_LOGIN_PAGE){
                 # 1、初始获取cookie

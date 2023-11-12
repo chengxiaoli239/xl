@@ -2,5 +2,6 @@
 /www/server/php/74/bin/php yii data/index/grab-kj-data
 2、开奖脚本，执行频率：1分钟
 /www/server/php/74/bin/php yii data/index/run-lottery
-
+3、自动登陆脚本，执行频率：5分钟执行一次
+/www/server/php/74/bin/php ./yii user/index/auto-login
 
