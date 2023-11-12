@@ -338,7 +338,7 @@ class IndexController extends Controller
     }
     public function actionDw1(){
 
-        $betRow = Bets::findOne('756');
+        $betRow = Bets::findOne('899');
         list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);p([$code, $data, $msg]);
         $rst = \common\open\thirdD\methods\MethodsMap::insertMapMethods();p($rst);
 

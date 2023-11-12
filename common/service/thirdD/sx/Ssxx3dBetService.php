@@ -220,18 +220,19 @@ class Ssxx3dBetService extends CommonBaseService
 
         $site = self::$siteSystemInfo;
         $methodData = self::$localToSiteMethodInfo;
-        #p(['site'=>$site, 'methodData'=>$methodData, 'betRow'=>$betRow]);
-        $params = ['code'=>[]];
-        $params['code'][] = [
+        p(['site'=>$site, 'methodData'=>$methodData, 'betRow'=>$betRow]);
+        $post_data = ['code'=>[]];
+        $post_data['code'][] = [
             "actionData" => str_replace(MethodMatchService::ZU_SPLIT_FLAG, ',', $betRow->codes),
             "mode" => $betRow['single'],
             "playedId" => $methodData['site_method_id'],
         ];
         $headers = [
-            'Cookie' => $site['cookie']
+            'Cookie' => $site['cookie'],
+            'Content-Length' =>strlen(http_build_query($post_data)),
         ];
 
-        $result = SiteOrderApi::push($site['ssc_domain'], $params, $headers);
+        $result = SiteOrderApi::push($site['ssc_domain'], $post_data, $headers);
 
         $logArr = ['user_id'=>$user_id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'params'=>$params, 'result'=>$result];
         Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '直选推网盘', $logArr);
