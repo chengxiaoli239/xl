@@ -12,6 +12,7 @@ use Yii;
  * @property int $system_type_id 系统类型id
  * @property string $ssc_domain 系统站点
  * @property int $status 系统开启状态
+ * @property int $lottery_type 系统彩种类型：0为全部否则系统为指定彩种
  * @property int $type 类型:1时时彩2网球
  * @property string $tz_types 已经对接的玩法 lt_tz_typs.type
  * @property int $is_auto_login 是否自动登陆
@@ -35,7 +36,7 @@ class TzSystems extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['system_type_id', 'status', 'type', 'is_auto_login', 'created_at', 'updated_at'], 'integer'],
+            [['system_type_id', 'status', 'lottery_type', 'type', 'is_auto_login', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
             [['name'], 'string', 'max' => 64],
             [['ssc_domain', 'tz_types'], 'string', 'max' => 255],
@@ -48,26 +49,18 @@ class TzSystems extends \common\models\base\BaseModel
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'id'),
-            'name' => Yii::t('app', '系统名称'),
-            'system_type_id' => Yii::t('app', '系统类型id'),
-            'ssc_domain' => Yii::t('app', '系统站点'),
-            'status' => Yii::t('app', '系统开启状态'),
-            'type' => Yii::t('app', '类型:1时时彩2网球'),
-            'tz_types' => Yii::t('app', '已经对接的玩法 lt_tz_typs.type'),
-            'is_auto_login' => Yii::t('app', '是否自动登陆'),
-            'created_at' => Yii::t('app', '创建时间'),
-            'updated_at' => Yii::t('app', '更新时间'),
-            'update_time' => Yii::t('app', '更新时间'),
+            'id' => 'id',
+            'name' => '系统名称',
+            'system_type_id' => '系统类型id',
+            'ssc_domain' => '系统站点',
+            'status' => '系统开启状态',
+            'lottery_type' => '系统彩种类型：0为全部否则系统为指定彩种',
+            'type' => '类型:1时时彩2网球',
+            'tz_types' => '已经对接的玩法 lt_tz_types.type',
+            'is_auto_login' => '是否自动登陆',
+            'created_at' => '创建时间',
+            'updated_at' => '更新时间',
+            'update_time' => '更新时间',
         ];
-    }
-
-    /**
-     * @inheritdoc
-     * @return TzSystemsQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new TzSystemsQuery(get_called_class());
     }
 }

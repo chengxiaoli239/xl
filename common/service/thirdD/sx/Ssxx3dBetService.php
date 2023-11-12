@@ -4,6 +4,7 @@ namespace common\service\thirdD\sx;
 
 use backend\models\wechat\Bets;
 use common\models\wechat\WechatUser;
+use common\open\thirdD\api\SiteOrderApi;
 use common\service\CommonService;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\MethodMatchService;
@@ -12,6 +13,10 @@ use yii\helpers\Json;
 
 class Ssxx3dBetService extends CommonBaseService
 {
+    # 盘口信息
+    public static array $siteSystemInfo = [];
+    # 本地对盘口 玩法ID
+    public static array $localToSiteMethodInfo = [];
     public static function preBetValidate($betRowId): array
     {
         try {
@@ -46,34 +51,39 @@ class Ssxx3dBetService extends CommonBaseService
     {
         $lottery_type = $betRow->lottery_type;
         $qihao = $betRow->qihao;
+        $user_id = $betRow->user_id;
         $method_id = $betRow->play_method;
 
-        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算22', ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'qihao'=>$qh, 'kjCode'=>$kjCode, 'method_id'=>$method_id]);
+        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算22', ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'method_id'=>$method_id]);
         //p($method_id);
         try {
+            self::$siteSystemInfo = CommonBaseService::getSystemBaseInfo($user_id, $lottery_type); # 盘口信息
+            self::$localToSiteMethodInfo = CommonBaseService::getLocalToSiteMethods(self::$siteSystemInfo['system_type_id'], $method_id); #
+            Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '盘口信息', ['siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo]);
+            #p(['siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo]);
             switch ($method_id){
                 case MethodMatchService::METHOD_ID_ZHIXUAN:
-                    OperateLotteryService::runZhiXuan($betRow, $kjCode);
+                    self::betZhiXuan($betRow);
                     break;
                 case MethodMatchService::METHOD_ID_ZULIU: # 组六
                 case MethodMatchService::METHOD_ID_ZUSAN: # 组三
-                    OperateLotteryService::runZuXuan($betRow, $kjCode);
+                    self::betZuXuan($betRow);
                     break;
                 case MethodMatchService::METHOD_ID_DUDAN: # 独胆
-                    OperateLotteryService::runDuDan($betRow, $kjCode);
+                    self::betDuDan($betRow);
                     break;
                 case MethodMatchService::METHOD_ID_SHUANGFEN: # 双飞
                 case MethodMatchService::METHOD_ID_QUANTUO: # 对子全拖
-                    OperateLotteryService::runShuangFen($betRow, $kjCode);
+                    self::betShuangFen($betRow);
                     break;
                 case MethodMatchService::METHOD_ID_YIMADING: # 一码定
-                    OperateLotteryService::runYiMaDing($betRow, $kjCode);
+                    self::betYiMaDing($betRow);
                     break;
                 case MethodMatchService::METHOD_ID_ERMADING: # 二码定
-                    OperateLotteryService::runErMaDing($betRow, $kjCode);
+                    self::betErMaDing($betRow);
                     break;
                 case MethodMatchService::METHOD_ID_BAOZI_QB: # 豹子全包
-                    OperateLotteryService::runBaoZiQB($betRow, $kjCode);
+                    self::betBaoZiQB($betRow);
                     break;
                 case MethodMatchService::METHOD_ID_ZL_4_MA: # 组六4码
                 case MethodMatchService::METHOD_ID_ZL_5_MA: # 组六5码
@@ -81,7 +91,7 @@ class Ssxx3dBetService extends CommonBaseService
                 case MethodMatchService::METHOD_ID_ZL_7_MA: # 组六7码
                 case MethodMatchService::METHOD_ID_ZL_8_MA: # 组六8码
                 case MethodMatchService::METHOD_ID_ZL_9_MA: # 组六9码
-                    OperateLotteryService::runZuLiuXMa($betRow, $kjCode); # 组选x码
+                    self::betZuLiuXMa($betRow); # 组选x码
                     break;
                 case MethodMatchService::METHOD_ID_ZS_2_MA: # 组三2码
                 case MethodMatchService::METHOD_ID_ZS_3_MA: # 组三2码
@@ -91,11 +101,11 @@ class Ssxx3dBetService extends CommonBaseService
                 case MethodMatchService::METHOD_ID_ZS_7_MA: # 组三7码
                 case MethodMatchService::METHOD_ID_ZS_8_MA: # 组三8码
                 case MethodMatchService::METHOD_ID_ZS_9_MA: # 组三9码
-                    OperateLotteryService::runZuSanXMa($betRow, $kjCode); # 组选x码
+                    self::betZuSanXMa($betRow); # 组选x码
                     break;
                 case MethodMatchService::METHOD_ID_ZL_QB: # 组六全包
                 case MethodMatchService::METHOD_ID_ZS_QB: # 组三全包
-                    OperateLotteryService::runZuXuanQuanBao($betRow, $kjCode); # 组选x码
+                    self::betZuXuanQuanBao($betRow); # 组选x码
                     break;
                 case MethodMatchService::METHOD_ID_KD_0: # 跨度0
                 case MethodMatchService::METHOD_ID_KD_1: # 跨度1
@@ -107,7 +117,7 @@ class Ssxx3dBetService extends CommonBaseService
                 case MethodMatchService::METHOD_ID_KD_7: # 跨度7
                 case MethodMatchService::METHOD_ID_KD_8: # 跨度8
                 case MethodMatchService::METHOD_ID_KD_9: # 跨度9
-                    OperateLotteryService::runKuaDu($betRow, $kjCode); # 跨度
+                    self::betKuaDu($betRow); # 跨度
                     break;
                 case MethodMatchService::METHOD_ID_YMT_ZL_2: # 一码拖2_组六
                 case MethodMatchService::METHOD_ID_YMT_ZL_3: # 一码拖3_组六
@@ -117,7 +127,7 @@ class Ssxx3dBetService extends CommonBaseService
                 case MethodMatchService::METHOD_ID_YMT_ZL_7: # 一码拖7_组六
                 case MethodMatchService::METHOD_ID_YMT_ZL_8: # 一码拖8_组六
                 case MethodMatchService::METHOD_ID_YMT_ZL_9: # 一码拖9_组六
-                    OperateLotteryService::runYiTuoZuLiu($betRow, $kjCode); # 跨度
+                    self::betYiTuoZuLiu($betRow); # 跨度
                     break;
                 case MethodMatchService::METHOD_ID_YMT_ZS_2: # 一码拖2_组三
                 case MethodMatchService::METHOD_ID_YMT_ZS_3: # 一码拖3_组三
@@ -127,7 +137,7 @@ class Ssxx3dBetService extends CommonBaseService
                 case MethodMatchService::METHOD_ID_YMT_ZS_7: # 一码拖7_组三
                 case MethodMatchService::METHOD_ID_YMT_ZS_8: # 一码拖8_组三
                 case MethodMatchService::METHOD_ID_YMT_ZS_9: # 一码拖9_组三
-                    OperateLotteryService::runYiTuoZuSan($betRow, $kjCode); # 跨度
+                    self::betYiTuoZuSan($betRow); # 跨度
                     break;
                 case MethodMatchService::METHOD_ID_FS_3: # 复式三
                 case MethodMatchService::METHOD_ID_FS_4: # 复式四
@@ -136,7 +146,7 @@ class Ssxx3dBetService extends CommonBaseService
                 case MethodMatchService::METHOD_ID_FS_7: # 复式七
                 case MethodMatchService::METHOD_ID_FS_8: # 复式八
                 case MethodMatchService::METHOD_ID_FS_9: # 复式九
-                    OperateLotteryService::runFuShiX($betRow, $kjCode); # 跨度
+                    self::betFuShiX($betRow); # 跨度
                     break;
                 case MethodMatchService::METHOD_ID_HZ_0: # 和值0
                 case MethodMatchService::METHOD_ID_HZ_1: # 和值1
@@ -166,40 +176,66 @@ class Ssxx3dBetService extends CommonBaseService
                 case MethodMatchService::METHOD_ID_HZ_25: # 和值25
                 case MethodMatchService::METHOD_ID_HZ_26: # 和值26
                 case MethodMatchService::METHOD_ID_HZ_27: # 和值27
-                    OperateLotteryService::runHeZhi($betRow, $kjCode); # 和值
+                    self::betHeZhi($betRow); # 和值
                     break;
                 case MethodMatchService::METHOD_ID_HZ_DA: # 和值大
                 case MethodMatchService::METHOD_ID_HZ_XIAO: # 和值小
                 case MethodMatchService::METHOD_ID_HZ_DAN: # 和值单
                 case MethodMatchService::METHOD_ID_HZ_SHUANG: # 和值双
-                    OperateLotteryService::runHeZhiDxDs($betRow, $kjCode); # 和值
+                    self::betHeZhiDxDs($betRow); # 和值
                     break;
                 case MethodMatchService::METHOD_ID_DW_ZX_FS: # 定位直选复式
-                    OperateLotteryService::runHeZhiXuanFuShiDw($betRow, $kjCode); # 直选复式定位
+                    self::betHeZhiXuanFuShiDw($betRow); # 直选复式定位
                     break;
                 case MethodMatchService::METHOD_ID_QD: # 全倒
-                    OperateLotteryService::runQuanDao($betRow, $kjCode); # 全倒
+                    self::betQuanDao($betRow); # 全倒
                     break;
                 case MethodMatchService::METHOD_ID_ZX_FS: # 直选复式
-                    OperateLotteryService::runZhiXuanFuShi($betRow, $kjCode); # 直选复式
+                    self::betZhiXuanFuShi($betRow); # 直选复式
                     break;
                 default:
                     $err_msg = '未知玩法ID:'.$method_id;
                     $logArr = ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>$err_msg];
-                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常10', $logArr);
+                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '推送盘口处理异常10', $logArr);
                     return [10003, $logArr, $err_msg];
-                    break;
             }
-            $resultData = ['betRowId'=>$betRow->id, 'idData'=>$idData, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>'处理结束'];
-            Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理结束99', $resultData);
+            $resultData = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>'处理结束'];
+            Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '推送盘口处理结束99', $resultData);
             var_dump(date('Y-m-d H:i:s ').'处理成功：betRowId:'.$betRow->id.'_method_id:'.$method_id);
         }catch (\Exception $e){
             $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()];
-            Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常11', $logArr);
+            Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '推送盘口处理异常11', $logArr);
             var_dump($e->getMessage());
             return [10004, $logArr, $e->getMessage()];
         }
 
         return [];
+    }
+
+    private static function betZhiXuan(object $betRow): bool
+    {
+        $method_id = $betRow->play_method; # 玩法ID
+        $user_id = $betRow->user_id; # 用户ID
+        $lottery_type = $betRow->lottery_type; # 彩种类型
+
+        $site = self::$siteSystemInfo;
+        $methodData = self::$localToSiteMethodInfo;
+        #p(['site'=>$site, 'methodData'=>$methodData, 'betRow'=>$betRow]);
+        $params = ['code'=>[]];
+        $params['code'][] = [
+            "actionData" => str_replace(MethodMatchService::ZU_SPLIT_FLAG, ',', $betRow->codes),
+            "mode" => $betRow['single'],
+            "playedId" => $methodData['site_method_id'],
+        ];
+        $headers = [
+            'Cookie' => $site['cookie']
+        ];
+
+        $result = SiteOrderApi::push($site['ssc_domain'], $params, $headers);
+
+        $logArr = ['user_id'=>$user_id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'params'=>$params, 'result'=>$result];
+        Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '直选推网盘', $logArr);
+
+        return true;
     }
 }

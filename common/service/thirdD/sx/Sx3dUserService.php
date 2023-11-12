@@ -17,26 +17,24 @@ class Sx3dUserService extends CommonBaseService
             $domain = $TzSystemsUser->ssc_domain;
             if(!self::checkIsLogin($TzSystemsUser)){
                 # 1、获取cookie
-                #$result = SiteOauthApi::loginPage($domain);
-                #if(empty($result['cookie'])){
-                #    throw_info('登陆过程获取cookie异常');
-                #}
-                #var_dump('cookie：'.$result['cookie']);
-                #$TzSystemsUser->cookie = $result['cookie'];
-                #$TzSystemsUser->save();
+                $result = SiteOauthApi::loginPage($domain);
+                if(empty($result['cookie'])){
+                    throw_info('登陆过程获取cookie异常');
+                }
+                var_dump('cookie：'.$result['cookie']);
+                $TzSystemsUser->cookie = $result['cookie'];
+                $TzSystemsUser->save();
 
-                ## 2、获取验证码
-                #$headers = [
-                #    'Cookie' => $TzSystemsUser->cookie,
-                #];
-                #$result = SiteOauthApi::getCaptcha($domain, $headers);
-                #if($fileContent = $result['fileContent']){
-                #    $fileName = $runtimePath.'/'.date('Ymd').'/'.$TzSystemsUser->id.'_'.$result['cookie'].'.png';
-                #    file_put_contents($fileName, $fileContent);
-                #}
+                # 2、获取验证码
                 $headers = [
                     'Cookie' => $TzSystemsUser->cookie,
-                ];                                     # 3、执行登陆操作
+                ];
+                $result = SiteOauthApi::getCaptcha($domain, $headers);
+                if($fileContent = $result['fileContent']){
+                    $fileName = $runtimePath.'/'.date('Ymd').'/'.$TzSystemsUser->id.'_'.$result['cookie'].'.png';
+                    file_put_contents($fileName, $fileContent);
+                }
+                # 3、执行登陆操作
                 $params = [
                     'username' => $TzSystemsUser->account,
                     'password' => $TzSystemsUser->password,
@@ -62,6 +60,7 @@ class Sx3dUserService extends CommonBaseService
     {
         $domain = $TzSystemsUser->ssc_domain;
         $cookie = $TzSystemsUser->cookie;
+        $tz_system_id = $TzSystemsUser->tz_system_id;
         $flag = true;
         $headers = [
             'Cookie' => $cookie,
@@ -71,6 +70,8 @@ class Sx3dUserService extends CommonBaseService
         if(empty($result) OR strpos($result['m'], '登录') !== false){
             $flag = false;
         }
+        $result2 = \common\open\thirdD\api\SiteUserApi::getAppNews($domain, $headers);
+        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '保持登陆请求', ['tz_system_id'=>$tz_system_id, 'result'=>$result, 'result2'=>$result2]);
 
         return $flag;
     }

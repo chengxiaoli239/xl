@@ -338,7 +338,7 @@ class IndexController extends Controller
     }
     public function actionDw1(){
 
-        $betRow = Bets::findOne('');
+        $betRow = Bets::findOne('756');
         list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);p([$code, $data, $msg]);
         $rst = \common\open\thirdD\methods\MethodsMap::insertMapMethods();p($rst);
 
@@ -400,7 +400,7 @@ class IndexController extends Controller
         $plan = UserSysPlans::findOne(7609);
         $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [136]);
         p(count($filter_dynamic_codes));
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%static_3d_user_profits_day}}'); p($r);
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%local_to_site_method}}'); p($r);
         $d = Thirdd::getCurrentKjData($lottery_type=26);p($d);
         $Thirdd = new Thirdd();
         $data = $Thirdd->getFuCai3d($type='json', 2);p($data);
