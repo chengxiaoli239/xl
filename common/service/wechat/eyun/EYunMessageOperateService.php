@@ -420,7 +420,7 @@ class EYunMessageOperateService  extends EYunBaseService
                     $lottery_name = $playMethods['lottery_name'];
                     foreach ($playMethods['playMethod'] as $content){
                         if(empty($content['playMethod']['id'])){
-                            throw_info('方式匹配为空，请按正确格式输入', ThirdDTypeService::CODE_FOR_USER);
+                            throw_info('方式匹配为空，请按正确格式输入', CommonBaseService::CODE_FOR_USER);
                         }
 
                         $Bets = new Bets();
@@ -443,6 +443,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         //p($setData);
                         $Bets->setAttributes($setData, false);
                         if(!$Bets->save()){
+                            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-02', ['user_id'=>$this->user_id, 'text'=>$text, 'member_id'=>$this->member_id, 'setData'=>$setData]);
                             throw_info(Json::encode($Bets->getErrors(), 320));
                         }
                         $allMoneys += $content['all_moneys']; # 总投
