@@ -30,13 +30,13 @@ class WechatFriendsInfoJobs extends CommonJob {
             $WechatUser->remark = $data['remarkName'];
             $WechatUser->bigHead = $data['bigHead'];
             $WechatUser->smallHead = $data['smallHeadImgUrl']??$data['smallHead'];
-            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', '微信用户信息变更', ['data'=>$data]);
             $WechatUser->save();
         }catch (\Exception $e){
+            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', '微信用户信息变更01', ['params'=>$params, 'err_msg'=>$e->getMessage()]);
             return $e->getMessage();
         }
 
-        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', '微信用户信息变更', ['params'=>$params]);
+        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', '微信用户信息变更02', ['params'=>$params]);
 
         return '微信好友信息同步成功:';
     }
