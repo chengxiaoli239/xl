@@ -143,7 +143,7 @@ class AgentUsersBalanceService extends BaseService {
                 throw_info('更新余额业务类型异常');
                 break;
         }
-        if(!WechatUser::updateAll(['balance'=>(new Expression("`balance`+".$changeMoney)), ['id'=>$member_id]])){
+        if(!WechatUser::updateAll(['balance'=>(new Expression("`balance`+".$changeMoney))], ['id'=>$member_id])){
             throw_info('余额更新错误');
         }
         $newWechatUser = WechatUser::findOne($member_id);
