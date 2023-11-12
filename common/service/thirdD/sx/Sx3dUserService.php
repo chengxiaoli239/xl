@@ -15,13 +15,14 @@ class Sx3dUserService extends CommonBaseService
             $runtimePath = \Yii::$app->runtimePath;
             #p([dirname(__FILE__), $runtimePath]);
             $domain = $TzSystemsUser->ssc_domain;
-            if(!self::checkIsLogin($TzSystemsUser)){
+            if(!self::checkIsLogin($TzSystemsUser, $siteUserInfo)){
                 # 1、获取cookie
                 $result = SiteOauthApi::loginPage($domain);
                 if(empty($result['cookie'])){
                     throw_info('登陆过程获取cookie异常');
                 }
                 var_dump('cookie：'.$result['cookie']);
+                $TzSystemsUser->balance = $siteUserInfo['credits_remaining'];
                 $TzSystemsUser->cookie = $result['cookie'];
                 $TzSystemsUser->save();
 
@@ -44,6 +45,8 @@ class Sx3dUserService extends CommonBaseService
 
                 $result = ['TzSystemsUserId'=>$TzSystemsUser->id, 'msg'=>'登陆成功'];
             }else{
+                $TzSystemsUser->balance = $siteUserInfo['credits_remaining'];
+                $TzSystemsUser->save();
                 var_dump('已是登陆状态');
                 $result = ['TzSystemsUserId'=>$TzSystemsUser->id, 'msg'=>'已是登陆状态'];
             }
@@ -56,7 +59,7 @@ class Sx3dUserService extends CommonBaseService
         return $result;
     }
 
-    public static function checkIsLogin($TzSystemsUser): bool
+    public static function checkIsLogin($TzSystemsUser, &$siteUserInfo=[]): bool
     {
         $domain = $TzSystemsUser->ssc_domain;
         $cookie = $TzSystemsUser->cookie;
@@ -69,6 +72,8 @@ class Sx3dUserService extends CommonBaseService
         $result = \common\open\thirdD\api\SiteUserApi::getUserInfo($domain, $headers);
         if(empty($result) OR strpos($result['m'], '登录') !== false){
             $flag = false;
+        }else{
+            $siteUserInfo = $result;
         }
         $result2 = \common\open\thirdD\api\SiteUserApi::getAppNews($domain, $headers);
         Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '保持登陆请求', ['tz_system_id'=>$tz_system_id, 'result'=>$result, 'result2'=>$result2]);
