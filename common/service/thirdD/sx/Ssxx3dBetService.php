@@ -3,12 +3,15 @@
 namespace common\service\thirdD\sx;
 
 use backend\models\wechat\Bets;
+use common\helpers\RequestHelper;
 use common\models\wechat\WechatUser;
 use common\open\thirdD\api\SiteOrderApi;
 use common\service\CommonService;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\MethodMatchService;
 use common\tools\Tool_Common;
+use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use yii\helpers\Json;
 
 class Ssxx3dBetService extends CommonBaseService
@@ -220,16 +223,27 @@ class Ssxx3dBetService extends CommonBaseService
 
         $site = self::$siteSystemInfo;
         $methodData = self::$localToSiteMethodInfo;
-        p(['site'=>$site, 'methodData'=>$methodData, 'betRow'=>$betRow]);
-        $post_data = ['code'=>[]];
+
+        #p(['site'=>$site, 'methodData'=>$methodData, 'betRow'=>$betRow]);
+        $codes = str_replace(MethodMatchService::ZU_SPLIT_FLAG, ',', $betRow->codes);
+        $post_data = [
+            'code'=>[],
+            'lujingstat'=>3,
+            'action' => 'soonsend',
+            #'post_number' => $codes,
+            'sizixian' => 0,
+            #'zhuan24stat' => 0,
+            #'sid' => 'Kx231Z',
+            #'inajax' => 1,
+        ];
         $post_data['code'][] = [
-            "actionData" => str_replace(MethodMatchService::ZU_SPLIT_FLAG, ',', $betRow->codes),
-            "mode" => $betRow['single'],
+            "actionData" => $codes,
+            "mode" => (string)$betRow['single'],
             "playedId" => $methodData['site_method_id'],
         ];
         $headers = [
             'Cookie' => $site['cookie'],
-            'Content-Length' =>strlen(http_build_query($post_data)),
+            #'Content-Length' =>strlen(Json::encode($post_data)),
         ];
 
         $result = SiteOrderApi::push($site['ssc_domain'], $post_data, $headers);

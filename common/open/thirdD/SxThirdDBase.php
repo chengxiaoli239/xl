@@ -115,6 +115,7 @@ class SxThirdDBase extends Component
         try {
             $client = new Client();
             $options = array_merge(['headers' => $headers], $params);
+            #p([$method, $url, $options]);
             $response = $client->request($method, $url, $options);
 
             if($apiMethod == SiteOauthApi::API_LOGIN_PAGE){
@@ -129,10 +130,10 @@ class SxThirdDBase extends Component
                 $fileContent = $content;
                 return ['fileContent'=>$fileContent];
             }
-            if($apiMethod == SiteOauthApi::API_ACTION_LOGIN){
-                $result = $content;
-                #d(['headers'=>$headers, 'result'=>$result]);
-            }
+            #if($apiMethod == SiteOauthApi::API_ACTION_LOGIN){
+            #    $result = $content;
+            #    #d(['headers'=>$headers, 'result'=>$result]);
+            #}
 
             if (!empty($content)) {
                 $result = Json::decode($content);
@@ -140,6 +141,7 @@ class SxThirdDBase extends Component
                 throw_info('异常', 30000);
             }
 
+            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'result'=>$result]);
             $status = SsxxRequestLog::REQUEST_STATUS_SUCCESS;
             return $result;
         } catch(\Exception $e) {

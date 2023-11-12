@@ -32,7 +32,7 @@ class Sx3dUserService extends CommonBaseService
                 ];
                 $result = SiteOauthApi::getCaptcha($domain, $headers);
                 if($fileContent = $result['fileContent']){
-                    $fileName = $runtimePath.'/'.date('Ymd').'/'.$TzSystemsUser->id.'_'.$result['cookie'].'.png';
+                    $fileName = '/www/log/'.\Yii::$app->params['LOG_PATH']. '/'. $TzSystemsUser->id.'_'.$result['cookie'].'.png';
                     file_put_contents($fileName, $fileContent);
                 }
                 # 3、执行登陆操作
@@ -55,6 +55,7 @@ class Sx3dUserService extends CommonBaseService
             Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '登陆异常', ['err_msg'=>$e->getMessage()]);
             $result = ['TzSystemsUserId'=>$TzSystemsUser->id, 'msg'=>$e->getMessage()];
         }
+        var_dump($result);
 
         return $result;
     }
