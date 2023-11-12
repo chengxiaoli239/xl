@@ -1,6 +1,7 @@
 <?php
 namespace backend\modules\wechat\controllers;
 
+use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
 use backend\models\TzSystemsUsers;
 use common\models\eyun\HistoryRobots;
 use common\service\wechat\RobotUserService;
@@ -54,7 +55,6 @@ class RobotUserController extends BaseController
 
     /**
      * Displays a single RobotUser model.
-     * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -70,12 +70,18 @@ class RobotUserController extends BaseController
             'allModels' => $allModels
         ]);
 
-        $SystemModels = TzSystemsUsers::find()->where(['uid'=>$user_id])->orderBy(['balance'=>SORT_DESC])->all();
+        #$SystemModels = TzSystemsUsers::find()->where(['uid'=>$user_id])->orderBy(['balance'=>SORT_DESC])->all();
+        $tzSystemsUserSearchModel = new TzSystemsUsersSearch();
+        $queryParams = Yii::$app->request->queryParams;
+        if($this->_user_id != 1){
+            $queryParams['TzSystemsUsers']['uid'] = $this->_user_id;
+        }
+        $systemDataProvider = $tzSystemsUserSearchModel->search($queryParams);
         return $this->render('view', [
             'model' => $this->findModel(['user_id'=>$user_id]),
             'dataProvider' => $dataProvider,
-            'SystemModels' => $SystemModels,
-            #'historyRecords' => $rows,
+            'systemDataProvider' => $systemDataProvider,
+            #'SystemModels' => $SystemModels,
         ]);
     }
 
@@ -134,7 +140,8 @@ class RobotUserController extends BaseController
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $params = ['id'=>$id, 'user_id'=>$this->_user_id];
+        $model = $this->findModel($params);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);

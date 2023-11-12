@@ -350,7 +350,7 @@ class IndexController extends Controller
             #'X-Requested-With' => 'XMLHttpRequest',
         ];
 
-        $rst = \common\open\thirdD\api\SiteUserApi::getUserInfo($headers);
+        $rst = \common\open\thirdD\api\SiteUserApi::getUserInfo('http://af1.ssxx9999.com', $headers);
         p($rst);
 
         list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);

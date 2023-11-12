@@ -28,7 +28,7 @@ class SxThirdDBase extends Component
      */
     public function init()
     {
-        $this->apiUrl = 'http://af1.ssxx9999.com';
+        #$this->apiUrl = 'http://af1.ssxx9999.com';
     }
 
     /**
@@ -102,9 +102,9 @@ class SxThirdDBase extends Component
      * @param array $params  请求参数
      * @param array $headers 请求头
      * @param array $options 请求选项
-     * @return array
+     * @return array|string|null
      */
-    protected function request(string $method, $apiMethod, array $params = [], array $headers = [], array $options = []): array
+    protected function request(string $method, $apiMethod, array $params = [], array $headers = [], array $options = []): ?array
     {
         $now = microtime(true) * 10000;
         $url = sprintf('%s%s', $this->apiUrl, $apiMethod);
@@ -118,12 +118,22 @@ class SxThirdDBase extends Component
             ]);
 
             if($apiMethod == SiteOauthApi::API_LOGIN_PAGE){
+                # 1、初始获取cookie
                 $responseHeaders = $response->getHeaders();
-                $cookies = self::getCookie($responseHeaders);
+                $cookie = self::getCookie($responseHeaders);
 
-                return $cookies ? ['cookies'=>$cookies] : [];
+                return $cookie ? ['cookie'=>$cookie] : [];
             }
             $content = $response->getBody()->getContents();
+            if($apiMethod == SiteOauthApi::API_GET_CAPTCHA){
+                $fileContent = $content;
+                return ['fileContent'=>$fileContent];
+            }
+            if($apiMethod == SiteOauthApi::API_ACTION_LOGIN){
+                $result = $content;
+                #d(['headers'=>$headers, 'result'=>$result]);
+            }
+
             if (!empty($content)) {
                 $result = Json::decode($content);
             }else{
@@ -141,7 +151,6 @@ class SxThirdDBase extends Component
                 $result = $e->data;
             }
 
-            unset($params['appPwd'], $params['accessToken']);
             Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'data'=>$result ?? [], 'code'=>$code, 'msg'=>$errorMsg ]);
             throw_info($errorMsg, $code);
         } finally {
@@ -152,8 +161,9 @@ class SxThirdDBase extends Component
                 'send_time' => (int)($now / 10000),
                 'api_method' => $apiMethod,
                 'response_micro_time' => (int)(($endtime - $now) / 10),
-                'param' => json_encode($params, 320),
-                'response_data' => $result ? json_encode($result, 320) : '',
+                'param' => Json::encode($params),
+                'response_data' => $result ? Json::encode($result) : '',
+                'headers' => Json::encode($headers),
                 'request_method' => $method,
                 'full_url' => $url,
                 'status' => $status,

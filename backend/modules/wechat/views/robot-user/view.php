@@ -12,10 +12,12 @@ use izyue\admin\widgets\GridView;
 use izyue\admin\widgets\ListView;
 use yii\helpers\BaseStringHelper;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model backend\models\wechat\RobotUser */
+/* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = '登陆信息';
 $this->params['breadcrumbs'][] = ['label' => 'Robot Users', 'url' => ['index']];
@@ -78,113 +80,121 @@ $this->params['breadcrumbs'][] = $this->title;
             </section>
         </div>
     </div>
-    <?php foreach ($SystemModels as $model){?>
-    <div class="row">
-        <div class="col-lg-12">
-        <section class="panel">
-            <header class="panel-heading">
-                <?= Html::encode(\backend\models\TzSystems::findOne($model->tz_system_id)->name) ?>
-                <span style="margin-right: 10px"><?= Html::a(Yii::t('app', 'edit'), "/forum/tz-systems-users/update?id=".$model->id, [ 'class' => 'btn btn-primary', 'id'=>$model->id ]) ?></span>
-                <span style="margin-right: 10px"><?= Html::a(Yii::t('app', 'Update Balance'), '#', [ 'class' => 'btn btn-primary update-balance', 'id'=>$model->id ]) ?></span>
-            </header>
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-lg-11">
-                        <?= DetailView::widget([
-                            'model' => $model,
-                            'attributes' => [
-                                'sys_name',
-                                'account',
-                                //'balance',
-                                [ 'attribute'=>'balance','label'=>'系统余额','format'=>'raw',
-                                    'value'=>function($model){
-                                        return "<span id='balance_".$model->id."'>".$model->balance."</span>";
-                                    }
-                                ],
-                                'password',
-                                //['attribute'=>'expire_time',//'label'=>'状态',
-                                //    'format'=>'raw',
-                                //    'value'=>function($model){
-                                //        $txt = \backend\service\UserService::accountIsExpireDesc($model->uid, $model->tz_system_id);
-                                //        return $txt;
-                                //    }
-                                //],
-                                ['attribute' => 'ssc_domain', 'label'=>'网盘', //'headerOptions' => ['width' => '170'],
-                                    'value'=> function($model){
-                                        return  $model->ssc_domain;
-                                    },
-                                ],
-                                [ 'attribute'=>'status','label'=>'账号状态',
-                                    'format'=>'raw',
-                                    'value'=>function($model){
-                                        return $model->status ? '<font color="green">已激活</font>' : '<font color="red">已禁用</font>';
-                                    }
-                                ],
-                                [ 'attribute'=>'is_auto_bet','label'=>'下注开关',
-                                    'format'=>'raw',
-                                    'value'=>function($model){
-                                        $txt = $model->is_auto_bet ? '<font color="green">已开启</font>' : '<font color="red">已关闭</font>';
-                                        $url = '/forum/user/switch-auto-bet-status?id='.$model->id.'&status='.($model->is_auto_bet?0:1);
-                                        return Html::a($txt, $url, ['title' => '点击切换','alt'=>'点击切换']);
-                                    }
-                                ],
-                                //'desc',
-                                [ 'attribute'=>'desc','label'=>'网盘状态',
-                                    'format'=>'raw',
-                                    'value'=>function($model){
-                                        return empty($model->desc) ? '<font color="green">正常</font>' : '<font color="red">'.$model->desc.'</font>';
-                                    }
-                                ],
-                                //['attribute' => 'flow_wp_accounts', 'label'=>'网盘跟买', 'headerOptions' => ['width' => '8%'],
-                                //    'format'=>'raw',
-                                //    'value'=> function($model){
-                                //        $set = Html::a('设置', 'javascript:;', ['id' => 'setWpFollow','alt'=>'设置跟买', 'class'=>'btn btn-xs']);
-                                //        $txt = $model->flow_wp_accounts ? '<strong><font color="green">正买</font></strong>：'.implode('、', explode(',', $model->flow_wp_accounts)).'['.$model->flow_wp_player_bs.'倍]' : '';
-                                //        $txt .= $model->flow_op_accounts ? ' &nbsp;<strong><font color="red">反买</font></strong>：'.implode('、', explode(','//, $model->flow_op_accounts)).'['.$model->flow_op_player_bs.'倍]' : '';
-
-                                //        $follow_txt = $model->follow_status ? '<font color="green">已开启</font>' : '<font color="red">已关闭</font>';
-                                //        $url = '/forum/user/switch-field-status?id='.$model->id.'&field=follow_status&status='.($model->follow_status?0:1);
-                                //        $follow_a = Html::a($follow_txt, $url, ['title' => '点击切换','alt'=>'点击切换']);
-
-                                //        return $txt.' &nbsp; '.$set. '&nbsp; 开关：'.$follow_a;
-                                //    },
-                                //],
-                                ['attribute' => 'cookie', 'label'=>'cookie',
-                                    'format'=>'raw',
-                                    'value' => function($model) {
-                                        $txt = BaseStringHelper::truncate($model->cookie,24);
-                                        return Html::a($txt, 'javascript:;', ['title' => $model->cookie,'alt'=>$model->cookie]);
-                                    }
-                                ],
-                                //[ 'attribute'=>'access_token','label'=>'token','value'=>function($model){
-                                //    return $model->access_token;
-                                //}],
-                                //['attribute' => 'odds_2d', 'label'=>'赔率', //'headerOptions' => ['width' => '170'],
-                                //    'value'=> function($model){
-                                //        return  '二定:'.$model->odds_2d .'、 '.'三定:'.$model->odds_3d .'、 '.'三定:'.$model->odds_4d;
-                                //    },
-                                //],
-                                //['attribute' => 'odds_3d', 'label'=>'盈利', //'headerOptions' => ['width' => '170'],
-                                //    'format'=>'raw',
-                                //    'value' => function($model) {
-                                //        $set = Html::a('设置', 'javascript:;', ['id' => 'setProfits','alt'=>'设置止盈止损', 'class'=>'btn btn-xs']);
-                                //        $resetProfits = Html::a('归零', 'javascript:;', ['id' => 'resetProfits','alt'=>'止盈止损归零', 'class'=>'btn btn-xs']);
-                                //        return  '止盈:'.$model->take_profits.'  止损:'.$model->stop_loss
-                                //            .' 当前:<font color="'.($model->current_profits<0?'red':'green').'">'.$model->current_profits.'</font>  '.$set.' '.$resetProfits;
-                                //    }
-                                //],
-                                [ 'attribute'=>'update_time','label'=>'更新时间','value'=>function($model){
-                                    return $model->update_time;
-                                }],
+    <section class="panel">
+        <header class="panel-heading">
+            <?= Html::encode('盘口信息') ?>
+            <!--?= Html::a('更新', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?-->
+        </header>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    <?= GridView::widget([
+                        'dataProvider' => $systemDataProvider,
+                        'columns' => [
+                            ['class' => 'yii\grid\SerialColumn'],
+                            'sys_name',
+                            [ 'attribute'=>'account','label'=>'系统余额','format'=>'raw',
+                                'value'=>function($model){
+                                    return "<span id='site_".$model->id."'>".$model->account."</span>";
+                                }
                             ],
-                        ]) ?>
-                    </div>
+                            //'balance',
+                            [ 'attribute'=>'balance','label'=>'系统余额','format'=>'raw',
+                                'value'=>function($model){
+                                    return "<span id='balance_".$model->id."'>".$model->balance."</span>";
+                                }
+                            ],
+                            'password',
+                            //['attribute'=>'expire_time',//'label'=>'状态',
+                            //    'format'=>'raw',
+                            //    'value'=>function($model){
+                            //        $txt = \backend\service\UserService::accountIsExpireDesc($model->uid, $model->tz_system_id);
+                            //        return $txt;
+                            //    }
+                            //],
+                            ['attribute' => 'ssc_domain', 'label'=>'网盘', //'headerOptions' => ['width' => '170'],
+                                'value'=> function($model){
+                                    return  $model->ssc_domain;
+                                },
+                            ],
+                            [ 'attribute'=>'status','label'=>'账号状态',
+                                'format'=>'raw',
+                                'value'=>function($model){
+                                    return $model->status ? '<font color="green">已激活</font>' : '<font color="red">已禁用</font>';
+                                }
+                            ],
+                            [ 'attribute'=>'is_auto_bet','label'=>'下注开关',
+                                'format'=>'raw',
+                                'value'=>function($model){
+                                    $txt = $model->is_auto_bet ? '<font color="green">已开启</font>' : '<font color="red">已关闭</font>';
+                                    $url = '/forum/user/switch-auto-bet-status?id='.$model->id.'&status='.($model->is_auto_bet?0:1);
+                                    return Html::a($txt, $url, ['title' => '点击切换','alt'=>'点击切换']);
+                                }
+                            ],
+                            //'desc',
+                            [ 'attribute'=>'desc','label'=>'网盘状态',
+                                'format'=>'raw',
+                                'value'=>function($model){
+                                    return empty($model->desc) ? '<font color="green">正常</font>' : '<font color="red">'.$model->desc.'</font>';
+                                }
+                            ],
+                            ['attribute' => 'cookie', 'label'=>'cookie',
+                                'format'=>'raw',
+                                'value' => function($model) {
+                                    $txt = BaseStringHelper::truncate($model->cookie,24);
+                                    return Html::a($txt, 'javascript:;', ['title' => $model->cookie,'alt'=>$model->cookie]);
+                                }
+                            ],
+                            [ 'attribute'=>'update_time','label'=>'更新时间','value'=>function($model){
+                                return $model->update_time;
+                            }],
+                            [
+                                'class' => 'yii\grid\ActionColumn',
+                                'template' => '{update} ', // This will only show the "Update" button
+                                'urlCreator' => function ($action, $model, $key, $index) {
+                                    if ($action === 'update') {
+                                        // Set the URL for the "Update" button
+                                        return ['/forum/tz-systems-users/update', 'id' => $key];
+                                    } else {
+                                        // Use the default URL for other actions
+                                        return Url::to([$action, 'id' => $key]);
+                                    }
+                                },
+                                'buttons' => [
+                                    'update' => function ($url, $model, $key) {
+                                        return Html::a(
+                                            '<span class="glyphicon glyphicon-pencil"></span> 更新',
+                                            $url,
+                                            ['class' => 'btn btn-success btn-xs']
+                                        );
+                                    },
+                                    #'view' => function ($url, $model, $key) {
+                                    #    return Html::a(
+                                    #        '<span class="glyphicon glyphicon-eye-open"></span> 查看',
+                                    #        $url,
+                                    #        ['class' => 'btn btn-primary btn-xs']
+                                    #    );
+                                    #},
+                                    #'view-modal' => function ($url, $model, $key) {
+                                    #    return Html::a(
+                                    #        '<span class="glyphicon glyphicon-eye-open"></span> View',
+                                    #        ['/kkkkk/dadsf'], // Use '#' as the href
+                                    #        [
+                                    #            'class' => 'btn btn-primary',
+                                    #            'data-toggle' => 'modal',
+                                    #            'data-target' => '#viewModal',
+                                    #            'data-url' => Yii::$app->urlManager->createUrl(['view', 'id' => $key]),
+                                    #        ]
+                                    #    );
+                                    #},
+                                ],
+                            ],
+                        ],
+                    ]); ?>
                 </div>
             </div>
-        </section>
         </div>
-    </div>
-    <?php }?>
+    </section>
 </section>
 
 

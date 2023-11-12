@@ -14,27 +14,17 @@ class SiteUserApi extends SxThirdDBase
      * @param array $params
      * @return array
      */
-    public static function getUserInfoPost(array $params=[]): array
+    public static function getUserInfo(string $domain, array $headers=[], array $params=[]): array
     {
-        $res = self::createObject()->post(self::API_USER_INFO, $params);
-
-        return $res;
-    }
-
-    /**
-     * 用户信息
-     * @param array $params
-     * @return array
-     */
-    public static function getUserInfo(array $headers, array $params=[]): array
-    {
+        $object = self::createObject();
+        $object->apiUrl = $domain;
         $params = array_merge([
             'action' => 'printrefresh',
             'iCurrPage' => 0,
             'doaction' => '',
-            'time' => 193
+            'time' => rand(100, 999),
         ], $params);
-        $res = self::createObject()->get(self::API_USER_INFO, $params, $headers);
+        $res = $object->get(self::API_USER_INFO, $params, $headers);
 
         return $res;
     }

@@ -18,6 +18,9 @@ return [
         'data' => [
             'class' => 'console\modules\data\Module',
         ],
+        'user' => [
+            'class' => 'console\modules\user\Module',
+        ],
     ],
     'components' => [
         'log' => [

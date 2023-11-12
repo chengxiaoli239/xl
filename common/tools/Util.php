@@ -290,9 +290,9 @@ class Util
     /*
     * 安全的截获数组
     */
-    public static function arr_slice($arr, $start, $length)
+    public static function arr_slice($arr, $start, $length): array
     {
-        if (is_array($arr) == false)
+        if (!is_array($arr))
             return array();
         $re = array_slice($arr, $start, $length);
         return $re;
@@ -592,6 +592,22 @@ class Util
             return;
         if (isset($newvalue))
             $value = trim($newvalue);
+    }
+
+    public static function generateRandomDecimal($length = 16, $decimalPlaces = 2): string
+    {
+        $numbers = '0123456789';
+        $randomString = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $numbers[rand(0, strlen($numbers) - 1)];
+
+            if ($i === $length - $decimalPlaces - 1) {
+                $randomString .= '.'; // 在特定位置插入小数点
+            }
+        }
+
+        return $randomString;
     }
 }
 

@@ -272,17 +272,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 自动登录
-     */
-    public function actionAutoLogin(){
-        self::_init();
-
-        $rst = CrontabIndexService::autoLogin();
-
-        return $rst;
-    }
-
-    /**
      * @desc 缓存代理IP数据
      * @demo curl http://www.lottery.com/cron/index/cache-proxy-ip
      * @return array

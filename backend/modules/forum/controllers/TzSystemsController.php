@@ -91,7 +91,11 @@ class TzSystemsController extends BaseController
     public function actionCreate()
     {
         $model = new TzSystems();
-        $this->_post['TzSystems']['tz_types'] = implode(',', $this->_post['TzSystems']['tz_types']);
+        if(\Yii::$app->request->isPost){
+            $this->_post['TzSystems']['status'] = current($this->_post['TzSystems']['status']);
+            $this->_post['TzSystems']['type'] = current($this->_post['TzSystems']['type']);
+            $this->_post['TzSystems']['tz_types'] = implode(',', $this->_post['TzSystems']['tz_types']);
+        }
         if ($model->load($this->_post) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }

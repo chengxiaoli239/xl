@@ -589,6 +589,7 @@ $(function () {
         }, this);
     });
 
+    // 多选框变单选效果
     $('.checkbox-item').click(function() {
         var name = $(this).attr('name');
         $('input[name="' + name + '"]').not(this).prop('checked', false);

@@ -76,7 +76,7 @@ return [
     'Static Hz Profits' => '每月四定和值利润统计',
 
     'Ssc Sd Hz Yls' => '四定和值遗漏',
-    'Create Tz Systems' => '新建投注系统',
+    'Create Tz Systems' => '新建系统',
     'Create System Config' => '新增系统配置',
     'Create Lottery Type' => '新增彩种',
     'Lottery Types' => '彩种管理',

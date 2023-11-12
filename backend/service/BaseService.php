@@ -20,6 +20,7 @@ use backend\service\qilin\BingDaoService;
 use backend\service\qilin\QiLinBaseService;
 use common\service\CommonService;
 use common\service\proxy\ProxyBaseService;
+use common\service\thirdD\sx\Sx3dUserService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use  yii;
@@ -43,10 +44,12 @@ class BaseService{
             }
 
             $tz_system_id = $TzSystemsUser->tz_system_id;
-            # 是否有激活的计划
-            $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id, $TzSystemsUser->uid);
-            if($is_auto == 1 && !$hasActivePlan){
-                throw_info('没有激活的投注计划', 303);
+            if(!in_array($tz_system_id, [17, 18])){
+                # 是否有激活的计划
+                $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id, $TzSystemsUser->uid);
+                if($is_auto == 1 && !$hasActivePlan){
+                    throw_info('没有激活的投注计划', 303);
+                }
             }
 
             if(empty($TzSystemsUser->account) OR empty($TzSystemsUser->password)){
@@ -78,38 +81,34 @@ class BaseService{
                 case 3:
                 case 7:
                 case 9:
-                case 10:
-                    # 3、重庆7时彩网
+                case 10: # 3、重庆7时彩网
                     if($tz_system_id == 3){
                         $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     }else{
                         $rst = Lucky5Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     }
                     break;
-                case 4:
-                    # 4、7天彩票网
-                case 5:
-                    # 5、希腊网
+                case 4: # 4、7天彩票网
+                case 5: # 5、希腊网
                     break;
-                case 6:
-                    # 6、会员网
+                case 6: # 6、会员网
                     $rst = HuiYuanBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     break;
-                case 11:
-                    # 11、菊花网暂时没对接登录
+                case 11: # 11、菊花网暂时没对接登录
                     //$rst = JuHuaBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     break;
-                case 8:
-                    # 8、麒麟财务系统网
+                case 8: # 8、麒麟财务系统网
                     $rst = QiLinBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     break;
-                case 13:
-                    # 9、冰岛
+                case 13: # 9、冰岛
                     $rst = \backend\service\BingDao\BingDaoService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     break;
-                case 16:
-                    # 宝岛众发
+                case 16: # 宝岛众发
                     $rst = ZhongFaService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                    break;
+                case 17: # 排sx
+                case 18: # 福sx
+                    $rst = Sx3dUserService::login($TzSystemsUser);
                     break;
             }
             if($rst['status'] != 200){
