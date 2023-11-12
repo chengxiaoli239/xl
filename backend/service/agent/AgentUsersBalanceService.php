@@ -143,7 +143,7 @@ class AgentUsersBalanceService extends BaseService {
                 throw_info('更新余额业务类型异常');
                 break;
         }
-        if(!WechatUser::updateAll(['balance'=>(new Expression("`balance`+".$changeMoney))])){
+        if(!WechatUser::updateAll(['balance'=>(new Expression("`balance`+".$changeMoney)), ['id'=>$member_id]])){
             throw_info('余额更新错误');
         }
         $newWechatUser = WechatUser::findOne($member_id);
@@ -164,10 +164,11 @@ class AgentUsersBalanceService extends BaseService {
         ];
         $flow = new AgentUsersBalanceFlows();
         $flow->setAttributes($setDataFlow, false);
+        $logArr = ['orderId'=>$orderId, 'money'=>$money, 'before_balance'=>$before_balance, 'balance_after'=>$newWechatUser->balance, 'member_id'=>$member_id, 'setDataFlow'=>$setDataFlow];
         if(!$flow->save()){
+            $logArr['err_msg'] = $flow->getErrors();
             throw_info(Json::encode($flow->getErrors()));
         }
-        $logArr = ['orderId'=>$orderId, 'money'=>$money, 'before_balance'=>$before_balance, 'balance_after'=>$newWechatUser->balance, 'member_id'=>$member_id, 'setDataFlow'=>$setDataFlow];
         Tool_Common::log('/agent_user/'.__FUNCTION__, 'INFO', '余额变动', $logArr);
 
         return $newWechatUser->attributes;

@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title) ?>
+            <strong><?= Html::encode($this->title) ?></strong><span>（状态开启<strong><font color="green">√</font></strong> 为接收消息）</span>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
