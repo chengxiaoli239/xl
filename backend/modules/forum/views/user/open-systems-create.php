@@ -61,10 +61,10 @@ $(function () {
             });
         }
 
-        $.each($('.tz_system_id'), function(ele){
-            console.log($(this))
-            $(this).find('input').prop("checked",false);
-        })
+        //$.each($('.tz_system_id'), function(ele){
+        //    console.log($(this))
+        //    $(this).find('input').prop("checked",false);
+        //})
         $(this).find('input').prop("checked",true);
     });
 })

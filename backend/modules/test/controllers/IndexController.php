@@ -336,8 +336,7 @@ class IndexController extends Controller
     }
     public function actionDw1(){
 
-        $rst = \common\open\thirdD\api\SiteOauthApi::loginPage();
-        p($rst);
+        $rst = \common\open\thirdD\methods\MethodsMap::insertMapMethods();p($rst);
 
         $headers = [
             #'Accept' => 'application/json, text/javascript, */*; q=0.01',
@@ -365,8 +364,6 @@ class IndexController extends Controller
         #$e = new EYunBaseService($user_id);
         #$loginRst = $e->memberLogin($id=1); p($loginRst);
         #$rst = RobotUserService::switchWechat($user_id, $post);p($rst);
-
-        #$rst = \common\service\thirdD\Odds3dService::addUserOdds($user_id);
 
         $MessageService = new EYunMessageOperateService($user_id);
         set_time_limit(0);

@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <section class="robot-user-view wrapper site-min-height">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-lg-10">
             <section class="panel">
                 <header class="panel-heading">
                     <?= Html::encode($this->title) ?>
@@ -80,14 +80,14 @@ $this->params['breadcrumbs'][] = $this->title;
             </section>
         </div>
     </div>
-    <section class="panel">
-        <header class="panel-heading">
-            <?= Html::encode('盘口信息') ?>
-            <!--?= Html::a('更新', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?-->
-        </header>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-lg-12">
+    <div class="row">
+        <section class="panel">
+            <header class="panel-heading">
+                <?= Html::encode('盘口信息') ?>
+                <!--?= Html::a('更新', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?-->
+            </header>
+            <div class="panel-body">
+                <div class="col-lg-10">
                     <?= GridView::widget([
                         'dataProvider' => $systemDataProvider,
                         'columns' => [
@@ -193,8 +193,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]); ?>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 </section>
 
 

@@ -3,6 +3,7 @@
 namespace backend\modules\forum\controllers;
 
 use backend\models\Admin;
+use backend\models\TzSystems;
 use backend\models\TzSystemsAuth;
 use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
 use backend\models\TzSystemsUsers;
@@ -72,6 +73,13 @@ class UserController extends BaseController
         if ($model->load($this->_post) && $model->save()) {
             UserService::saveTzSystemUsers(explode(',', $this->_post['TzSystemsAuth']['tz_systems_ids']), $uid);
             CommonService::delUserBetRecords($uid);
+            $oneTzSystemId = $this->_post['TzSystemsAuth']['tz_systems_ids'][0];
+            if(!empty($oneTzSystemId)){
+                $TzSystems = TzSystems::findOne($oneTzSystemId);
+                if(in_array($TzSystems->system_type_id, [15])){ # 3d类型站点
+                    \common\service\thirdD\Odds3dService::addUserOdds($uid); # 3d 用户添加赔率
+                }
+            }
             return $this->redirect(['index']);
         }
 

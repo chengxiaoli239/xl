@@ -4,6 +4,7 @@ namespace common\service\thirdD;
 
 use backend\models\wechat\Odds;
 use common\models\thirdD\PlayMethod;
+use common\service\BaseService;
 use yii\helpers\Json;
 
 class Odds3dService extends CommonBaseService
@@ -14,7 +15,8 @@ class Odds3dService extends CommonBaseService
      * @param $user_id
      * @return array
      */
-    public static function addUserOdds($user_id){
+    public static function addUserOdds($user_id): array
+    {
         $Odds = PlayMethod::find()->asArray()->all();
         foreach ($Odds as $odd){
             $where = ['user_id'=>$user_id, 'play_method_id'=>$odd['id']];
@@ -26,7 +28,7 @@ class Odds3dService extends CommonBaseService
                     'user_id' => $user_id,
                     'play_method_id' => $odd['id'],
                     'name' => $odd['name'],
-                    'status' => PlayMethodService::STATUS_ACTIVE,
+                    'status' => BaseService::STATUS_ACTIVE,
                     'money' => str_replace('元', '', $odd['money']),
                     'bouns' => str_replace('元', '', $odd['bouns']),
                     'odds' => round((int)str_replace('元', '', $odd['bouns'])/(int)str_replace('元', '', $odd['money']), 2),

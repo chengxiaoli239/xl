@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "{{%local_to_site_method}}".
  *
  * @property int $id
+ * @property int $system_type_id 系统类型id：tz_systems.system_type_id
  * @property int $method_id 玩法id
  * @property int $site_method_id 玩法id
  * @property string $name 玩法名称
@@ -35,7 +36,7 @@ class LocalToSiteMethod extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['method_id', 'site_method_id', 'created_at', 'updated_at'], 'integer'],
+            [['system_type_id', 'method_id', 'site_method_id', 'created_at', 'updated_at'], 'integer'],
             [['ratio'], 'number'],
             [['desc'], 'string'],
             [['created_at', 'updated_at'], 'required'],
@@ -52,6 +53,7 @@ class LocalToSiteMethod extends \common\models\base\BaseModel
     {
         return [
             'id' => Yii::t('app', 'ID'),
+            'system_type_id' => Yii::t('app', '系统类型id：tz_systems.system_type_id'),
             'method_id' => Yii::t('app', '玩法id'),
             'site_method_id' => Yii::t('app', '玩法id'),
             'name' => Yii::t('app', '玩法名称'),
