@@ -16,7 +16,6 @@ use backend\models\SscSdHzVal;
 use backend\models\SscStaticVal;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
-use backend\models\wechat\Bets;
 use backend\modules\cron\controllers\WeixinController;
 use backend\modules\kj\controllers\BingDaoController;
 use backend\service\agent\AgentUsersBalanceService;
@@ -69,6 +68,7 @@ use common\kj\ssc\TaiWanHuanLe;
 use common\kj\ssc\Thirdd;
 use common\kj\xjssc\XjSsc;
 use common\models\AdminModel;
+use common\models\open\SsxxRequestLog;
 use common\service\ChatService;
 use common\service\CommonService;
 use common\service\index\CrontabIndexService;
@@ -100,6 +100,7 @@ use backend\models\BettingRecords;
 use backend\models\User;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
+use GuzzleHttp\Client;
 use Yii;
 use yii\helpers\Json;
 use yii\web\Controller;
@@ -334,8 +335,24 @@ class IndexController extends Controller
         return $results;
     }
     public function actionDw1(){
-        $user_id = EYunBaseService::getRobotUserIdByWechatId($RobotWechatId='wxid_ckgr7i2q9fr522');p($user_id);
-        $betRow = Bets::findOne(769);
+
+        $rst = \common\open\thirdD\api\SiteOauthApi::loginPage();
+        p($rst);
+
+        $headers = [
+            #'Accept' => 'application/json, text/javascript, */*; q=0.01',
+            #'Accept-Encoding' => 'gzip, deflate',
+            #'Accept-Language' => 'zh-CN,zh;q=0.9',
+            'Cookie' => 'PHPSESSID=ifuhjc1j5uctbm0pnupvg1odb0',
+            #'Host' => 'af1.ssxx9999.com',
+            #'Proxy-Connection' => 'keep-alive',
+            #'Referer' => 'http://af1.ssxx9999.com/index/appprint.html',
+            #'X-Requested-With' => 'XMLHttpRequest',
+        ];
+
+        $rst = \common\open\thirdD\api\SiteUserApi::getUserInfo($headers);
+        p($rst);
+
         list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);
         p([$code, $data, $msg]);
         #$user_id = EYunBaseService::getRobotUserIdByWechatId($RobotWechatId='wxid_ckgr7i2q9fr522');p($user_id);

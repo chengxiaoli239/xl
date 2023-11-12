@@ -28,7 +28,7 @@ class BaseModel extends ActiveRecord
     /**
      * @return array
      */
-    public static function getStatuses()
+    public static function getStatuses(): array
     {
         return [
             self::STATUS_ACTIVE => '正常',
@@ -40,7 +40,7 @@ class BaseModel extends ActiveRecord
     /**
      * @return array
      */
-    public static function getStatusesAll()
+    public static function getStatusesAll(): array
     {
         return ArrayHelper::merge([0 => '全部'], self::getStatuses());
     }
@@ -113,7 +113,7 @@ class BaseModel extends ActiveRecord
      * @param array $params the parameters (name => value) to be bound to the query.
      * @return integer the number of rows deleted
      */
-    public static function deleteAll($condition = '', $params = [])
+    public static function deleteAll($condition = '', $params = []): int
     {
         return static::updateAll(['status' => self::STATUS_DELETED], $condition, $params);
     }
@@ -125,7 +125,8 @@ class BaseModel extends ActiveRecord
      * @return int
      * @throws \yii\db\Exception
      */
-    public static function deleteRecord($condition, $params = []){
+    public static function deleteRecord($condition, $params = []): int
+    {
         $command = static::getDb()->createCommand();
         $command->delete(static::tableName(), $condition, $params);
         $command->execute();
