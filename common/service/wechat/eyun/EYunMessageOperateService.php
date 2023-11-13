@@ -46,8 +46,8 @@ class EYunMessageOperateService  extends EYunBaseService
 
     public static $methodDatas = [];
     public static $aliasNameToOriginName = [];
-    public static $gLotteryType = 0;
-    public static $gLotteryName = '';
+    public static $gLotteryType = 26;
+    public static $gLotteryName = '福';
 
     public static function tableName()
     {

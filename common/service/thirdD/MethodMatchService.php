@@ -1058,7 +1058,7 @@ class MethodMatchService extends CommonBaseService
         $text = trim(str_replace('各', ' ', $text));
         $text = str_replace('值选', '直选', $text);
         $text = str_replace('复试', '复式', $text);
-        $text = trim(str_replace(' ', '', $text));
+        #$text = trim(str_replace(' ', '', $text));
         $text = trim( $text, ',');
         #$text = str_replace($matchName, $matchName.' ', $text);
         //p([$text, $matchName]);
@@ -1078,6 +1078,9 @@ class MethodMatchService extends CommonBaseService
                 }
             }
             $codes = implode(',', $m0);
+            $codes = str_replace('百', '百:', $codes);
+            $codes = str_replace('十', '十:', $codes);
+            $codes = str_replace('个', '个:', $codes);
 
             $count = 1;
             foreach ($m1 as $mCodes){
@@ -1086,7 +1089,7 @@ class MethodMatchService extends CommonBaseService
 
             $name = '定位直选复式';
         }else{
-            if (preg_match_all('/(\d{4,})/', $text, $matches1) ) {
+            if (preg_match_all('/(\d{4,})+/', $text, $matches1) ) {
                 $codesArr = $matches1[0];
             }
             # 复式直选

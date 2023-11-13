@@ -6,6 +6,8 @@ use common\service\jobs\CommonJob;
 use common\service\thirdD\sx\Ssxx3dBetService;
 
 class SsxxBetJobs extends CommonJob {
+    # 无效状态，无需处理
+    const INVALID_STATUS_CODE = 40000;
 
     public static function getName($params): string
     {

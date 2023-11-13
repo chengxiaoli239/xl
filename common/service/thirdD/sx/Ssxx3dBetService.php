@@ -8,6 +8,7 @@ use common\models\wechat\WechatUser;
 use common\open\thirdD\api\SiteOrderApi;
 use common\service\CommonService;
 use common\service\thirdD\CommonBaseService;
+use common\service\thirdD\jobs\SsxxBetJobs;
 use common\service\thirdD\MethodMatchService;
 use common\tools\Tool_Common;
 use GuzzleHttp\Client;
@@ -30,7 +31,7 @@ class Ssxx3dBetService extends CommonBaseService
             $codeStr = CommonService::getAwardNumberByQihao($qihao, $lottery_type);
             switch (true){
                 case $betRow->status == CommonBaseService::STATUS_LT_CANCEL:
-                    throw_info('已是撤单状态，无需推送盘口');
+                    throw_info('已是撤单状态，无需推送盘口', 40000);
                 case $wechatUser->is_chi == 1:
                     throw_info('该用户私下吃，无需推送盘口');
                 case !empty($codeStr):
@@ -42,7 +43,7 @@ class Ssxx3dBetService extends CommonBaseService
             return [10001, [], $e->getMessage()];
         }
 
-        return [0, ['betRow'=>$betRow], '校验成功'];
+        return [SsxxBetJobs::INVALID_STATUS_CODE, ['betRow'=>$betRow], '校验成功'];
     }
 
     /**
@@ -52,6 +53,9 @@ class Ssxx3dBetService extends CommonBaseService
      */
     public static function postToSite(object $betRow): array
     {
+        if(empty($betRow)){
+            return [];
+        }
         $lottery_type = $betRow->lottery_type;
         $qihao = $betRow->qihao;
         $user_id = $betRow->user_id;
@@ -62,11 +66,11 @@ class Ssxx3dBetService extends CommonBaseService
         try {
             self::$siteSystemInfo = CommonBaseService::getSystemBaseInfo($user_id, $lottery_type); # 盘口信息
             self::$localToSiteMethodInfo = CommonBaseService::getLocalToSiteMethods(self::$siteSystemInfo['system_type_id'], $method_id); #
-            $logArr = ['siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo];
+            $logArr = ['method_id'=>$method_id, 'siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo];
             Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '盘口信息', $logArr);
             $betCodes = $betRow->codes;
             //p($betCodes);
-            #p(['siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo]);
+            //p(['method_id'=>$method_id, 'siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo]);
             switch ($method_id){
                 case MethodMatchService::METHOD_ID_ZHIXUAN:
                     break;
@@ -81,9 +85,11 @@ class Ssxx3dBetService extends CommonBaseService
                     break;
                 case MethodMatchService::METHOD_ID_YIMADING: # 一码定
                     // todo codes需要转换格式，拆分成多组号码 <option value="204">一码定位</option>code[0]["actionData"] => "XX1,2XX,X3X"
+                    $betCodes = Ssxx3dBetService::resetOneFixed($betCodes);
                     break;
                 case MethodMatchService::METHOD_ID_ERMADING: # 二码定
                     // todo codes需要转换格式，拆分成多组号码 <option value="205">二码定位</option>code[0]["actionData"] => "X01,21X,X34"
+                    $betCodes = Ssxx3dBetService::resetTwoFixed($betCodes);
                     break;
                 case MethodMatchService::METHOD_ID_BAOZI_QB: # 豹子全包
                     $betCodes = '全包';
@@ -190,6 +196,7 @@ class Ssxx3dBetService extends CommonBaseService
                 case MethodMatchService::METHOD_ID_HZ_SHUANG: # 和值双
                     break;
                 case MethodMatchService::METHOD_ID_DW_ZX_FS: # 定位直选复式
+                    $betCodes = Ssxx3dBetService::resetOneFixedZhiXuanFuShi($betCodes);
                     break;
                 case MethodMatchService::METHOD_ID_QD: # 全倒
                     break;
@@ -215,6 +222,137 @@ class Ssxx3dBetService extends CommonBaseService
         }
 
         return [];
+    }
+
+    /**
+     * 一码定位号码转换
+     * @param $dataStr
+     * @return string
+     */
+    public static function resetOneFixed($dataStr): string
+    {
+        $datas = explode(':', $dataStr);
+        $dataCodes = [];
+        switch(true){
+            case $datas[0] == '百':
+                for ($i=0; $i<strlen($datas[1]); $i++){
+                    $dataCodes[] = $datas[1][$i] . 'XX';
+                }
+                break;
+            case '十':
+                for ($i=0; $i<strlen($datas[1]); $i++) {
+                    $dataCodes[] = 'X' . $datas[1][$i] . 'X';
+                }
+                break;
+            case '个':
+                for ($i=0; $i<strlen($datas[1]); $i++) {
+                    $dataCodes[] = 'XX'.$datas[1][$i];
+                }
+                break;
+            default:
+                throw_info('匹配异常');
+                break;
+        }
+        $dataStr = implode(',', $dataCodes);
+
+        return $dataStr;
+    }
+
+    /**
+     * 二码定位号码转换
+     * @param $dataStr
+     * @return string
+     */
+    public static function resetTwoFixed($dataStr): string
+    {
+        $datas = explode(',', $dataStr);
+        $codeDatas = [];
+        $first = explode(':', $datas[0]);
+        $codeDatas[$first[0]] = $first[1];
+
+        $second = explode(':', $datas[1]);
+        $codeDatas[$second[0]] = $second[1];
+        #p($codeDatas, 0);
+        $datas = [];
+        switch (true){
+            case isset($codeDatas['百']) && isset($codeDatas['十']):
+                for ($i=0; $i<strlen($codeDatas['百']); $i++){
+                    for ($j=0; $j<strlen($codeDatas['十']); $j++){
+                        $datas[] = $codeDatas['百'][$i].$codeDatas['十'][$j].'X';
+                    }
+                }
+                break;
+            case isset($codeDatas['百']) && isset($codeDatas['个']):
+                for ($i=0; $i<strlen($codeDatas['百']); $i++){
+                    for ($j=0; $j<strlen($codeDatas['个']); $j++){
+                        $datas[] = $codeDatas['百'][$i].'X'.$codeDatas['个'][$j];
+                    }
+                }
+                break;
+            case isset($codeDatas['十']) && isset($codeDatas['个']):
+                for ($i=0; $i<strlen($codeDatas['十']); $i++){
+                    for ($j=0; $j<strlen($codeDatas['个']); $j++){
+                        $datas[] = $codeDatas['十'][$i].'X'.$codeDatas['个'][$j];
+                    }
+                }
+                break;
+        }
+
+
+        $dataStr = implode(',', $datas);
+
+        return $dataStr;
+    }
+
+    /**
+     * 定位直选复式号码转换
+     * @param $dataStr
+     * @return string
+     */
+    public static function resetOneFixedZhiXuanFuShi($dataStr): string
+    {
+        //p($dataStr);
+        $datas = explode(',', $dataStr);
+        $codeDatas = [];
+        $first = explode(':', $datas[0]);
+        $codeDatas[$first[0]] = $first[1];
+
+        $second = explode(':', $datas[1]);
+        $codeDatas[$second[0]] = $second[1];
+
+        $third = explode(':', $datas[2]);
+        $codeDatas[$third[0]] = $third[2];
+        #p($codeDatas, 0);
+        $datas = [];
+        switch (true){
+            case isset($codeDatas['百']) && isset($codeDatas['十']):
+                for ($i=0; $i<strlen($codeDatas['百']); $i++){
+                    for ($j=0; $j<strlen($codeDatas['十']); $j++){
+                        $datas[] = $codeDatas['百'][$i].$codeDatas['十'][$j].'X';
+                    }
+                }
+                break;
+            case isset($codeDatas['百']) && isset($codeDatas['个']):
+                for ($i=0; $i<strlen($codeDatas['百']); $i++){
+                    for ($j=0; $j<strlen($codeDatas['个']); $j++){
+                        $datas[] = $codeDatas['百'][$i].'X'.$codeDatas['个'][$j];
+                    }
+                }
+                break;
+            case isset($codeDatas['十']) && isset($codeDatas['个']):
+                for ($i=0; $i<strlen($codeDatas['十']); $i++){
+                    for ($j=0; $j<strlen($codeDatas['个']); $j++){
+                        $datas[] = $codeDatas['十'][$i].'X'.$codeDatas['个'][$j];
+                    }
+                }
+                break;
+        }
+
+
+        $dataStr = implode(',', $datas);
+        p($dataStr);
+
+        return $dataStr;
     }
 
     private static function postBet(object $betRow, $betCodes=''): bool

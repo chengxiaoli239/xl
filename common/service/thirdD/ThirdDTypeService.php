@@ -31,7 +31,8 @@ class ThirdDTypeService extends CommonBaseService
      * @param string $text
      * @return array
      */
-    public static function getLotteryType($text='', &$isEmpty=false){
+    public static function getLotteryType(string $text='', &$isEmpty=false): array
+    {
         $lottery_types = CommonBaseService::THIRDD_LOTTERY_TYPES;
 
         foreach ($lottery_types as $lottery_type){
@@ -49,7 +50,7 @@ class ThirdDTypeService extends CommonBaseService
         }
         $lottery_name = CommonService::getLotteryName($lottery_type);
 
-        return [$lottery_type, $lottery_name, $result];
+        return [$lottery_type, $lottery_name, $result??[]];
     }
 
     /**
@@ -213,7 +214,7 @@ class ThirdDTypeService extends CommonBaseService
             $methodArr = MethodMatchService::matchHeZhiDaXiaoDanShuang($matchMethodAndCodeText, $codes, $count);
         }elseif(strpos($text, '复式') !== false){ # 91 定位直选复式
             $methodArr = MethodMatchService::matchDingWeiFuShi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }elseif($methodArr['originName'] == '全倒'){ # 92 定位直选复式
+        }elseif($methodArr['originName'] == '全倒'){ # 92 全倒
             $methodArr = MethodMatchService::matchQuanDao($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         #}elseif($methodArr['originName'] == '直选复式'){ # 93 定位直选复式
         #    p('kkkk');
@@ -228,12 +229,13 @@ class ThirdDTypeService extends CommonBaseService
 
     /**
      * 获取两种玩法：直组、组三组六
-     * @param $text
-     * @param $matchMethodAndCodeText
-     * @param $singleArr
+     * @param string $text
+     * @param string $matchMethodAndCodeText
+     * @param array $singleArr
      * @return array
      */
-    public static function getTwoMethodAndSingle($text='', $matchMethodAndCodeText='', &$singleArr=[]){
+    public static function getTwoMethodAndSingle(string $text='', string $matchMethodAndCodeText='', array &$singleArr=[]): array
+    {
         $pattern36 = '/(组六|组三)\s*各\s*([一二两三四五六七八九十]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+\s*倍)/u';
         $patternZhiZu = '/(直|组三|组六|组)\s*各\s*([一二两三四五六七八九十]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+\s*倍)/u';
         $patternZhiZuNotBei = '/(直|直选|组三|组六|组选|组)\s*([一二两三四五六七八九十]{1,3}倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+倍)/u';

@@ -338,9 +338,9 @@ class IndexController extends Controller
     }
     public function actionDw1(){
 
-        $betRow = Bets::findOne('508');
-        list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);p([$code, $data, $msg]);
-        $rst = \common\open\thirdD\methods\MethodsMap::insertMapMethods();p($rst);
+        #$betRow = Bets::findOne('1160');
+        #list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);p([$code, $data, $msg]);
+        #$rst = \common\open\thirdD\methods\MethodsMap::insertMapMethods();p($rst);
 
         $headers = [
             #'Accept' => 'application/json, text/javascript, */*; q=0.01',
@@ -353,11 +353,9 @@ class IndexController extends Controller
             #'X-Requested-With' => 'XMLHttpRequest',
         ];
 
-        $rst = \common\open\thirdD\api\SiteUserApi::getUserInfo('http://af1.ssxx9999.com', $headers);
-        p($rst);
+        #$rst = \common\open\thirdD\api\SiteUserApi::getUserInfo('http://af1.ssxx9999.com', $headers); p($rst);
 
-        list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);
-        p([$code, $data, $msg]);
+        #list($code, $data, $msg) = OperateLotteryService::operateOne($betRow); p([$code, $data, $msg]);
         #$user_id = EYunBaseService::getRobotUserIdByWechatId($RobotWechatId='wxid_ckgr7i2q9fr522');p($user_id);
         #$code_2n = CommonService::get2n($codesArr=[9, 9, 3], $lottery_type=26); p($code_2n);
         #$sort_codes = CommonService::reSortCodes($codesArr=[12, 43, 796]); p($sort_codes);
