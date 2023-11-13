@@ -32,7 +32,7 @@ class Sx3dUserService extends CommonBaseService
                 ];
                 $result = SiteOauthApi::getCaptcha($domain, $headers);
                 if($fileContent = $result['fileContent']){
-                    $fileName = '/www/log/'.\Yii::$app->params['LOG_PATH']. '/'. $TzSystemsUser->id.'_'.$result['cookie'].'.png';
+                    $fileName = '/www/log/'.\Yii::$app->params['LOG_PATH'].'/'.date('Ymd'). '/'. $TzSystemsUser->id.'_'.$result['cookie'].'.png';
                     file_put_contents($fileName, $fileContent);
                 }
                 # 3、执行登陆操作
