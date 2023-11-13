@@ -338,6 +338,9 @@ class IndexController extends Controller
     }
     public function actionDw1(){
 
+        $str = '3拖6789_组六';
+        preg_match_all('/(\d+)/', $str, $matches);
+        p($matches);
         $betRow = Bets::findOne('899');
         list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);p([$code, $data, $msg]);
         $rst = \common\open\thirdD\methods\MethodsMap::insertMapMethods();p($rst);
