@@ -67,7 +67,6 @@ class Ssxx3dBetService extends CommonBaseService
             $betCodes = $betRow->codes;
             #p(['siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo]);
             switch ($method_id){
-                // todo 对子全包 <option value="259">对子(全包)</option>code[0]["actionData"] => "全包"
                 case MethodMatchService::METHOD_ID_ZHIXUAN:
                     break;
                 case MethodMatchService::METHOD_ID_ZULIU: # 组六
@@ -250,7 +249,7 @@ class Ssxx3dBetService extends CommonBaseService
         $result = SiteOrderApi::push($site['ssc_domain'], $post_data, $headers);
 
         $logArr = ['user_id'=>$user_id, 'method_id'=>$method_id, 'post_data'=>$post_data, 'lottery_type'=>$lottery_type, 'result'=>$result];
-        Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '直选推网盘', $logArr);
+        Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '推网盘', $logArr);
 
         return true;
     }
