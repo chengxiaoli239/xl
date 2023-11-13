@@ -10,7 +10,7 @@ use yii\widgets\ActiveForm;
 
 $PlayMethods = \common\models\thirdD\PlayMethod::find()->where(['status'=>1])->asArray()->all();
 $datas = array_column($PlayMethods, 'name', 'id');
-$playMethodOptions = array_merge(['' => '--请选择--'], $datas);
+$playMethodOptions = $datas;
 ?>
 <style>
 .form-control{

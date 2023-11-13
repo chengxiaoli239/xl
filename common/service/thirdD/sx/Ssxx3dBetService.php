@@ -65,6 +65,7 @@ class Ssxx3dBetService extends CommonBaseService
             $logArr = ['siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo];
             Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '盘口信息', $logArr);
             $betCodes = $betRow->codes;
+            //p($betCodes);
             #p(['siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo]);
             switch ($method_id){
                 case MethodMatchService::METHOD_ID_ZHIXUAN:
