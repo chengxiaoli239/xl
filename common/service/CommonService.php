@@ -942,7 +942,8 @@ class  CommonService{
      * @param array $codesArr 格式 [12, 43, 796]
      * @return array
      */
-    public static function reSortCodes($codesArr){
+    public static function reSortCodes(array $codesArr): array
+    {
         if(empty($codesArr)){
             return $codesArr;
         }

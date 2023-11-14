@@ -95,7 +95,7 @@ class OperateLotteryService extends CommonBaseService
                 case MethodMatchService::METHOD_ID_DUDAN: # 独胆
                     OperateLotteryService::runDuDan($betRow, $kjCode);
                     break;
-                case MethodMatchService::METHOD_ID_SHUANGFEN: # 双飞
+                case MethodMatchService::METHOD_ID_SHUANGFEI: # 双飞
                 case MethodMatchService::METHOD_ID_QUANTUO: # 对子全拖
                     OperateLotteryService::runShuangFen($betRow, $kjCode);
                     break;

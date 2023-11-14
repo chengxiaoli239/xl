@@ -79,7 +79,7 @@ class Ssxx3dBetService extends CommonBaseService
                     break;
                 case MethodMatchService::METHOD_ID_DUDAN: # 独胆
                     break;
-                case MethodMatchService::METHOD_ID_SHUANGFEN: # 双飞
+                case MethodMatchService::METHOD_ID_SHUANGFEI: # 双飞
                 case MethodMatchService::METHOD_ID_QUANTUO: # 对子全拖、对子全包
                     $betCodes = '全包';
                     break;
@@ -199,6 +199,7 @@ class Ssxx3dBetService extends CommonBaseService
                     $betCodes = Ssxx3dBetService::resetOneFixedZhiXuanFuShi($betCodes);
                     break;
                 case MethodMatchService::METHOD_ID_QD: # 全倒
+                    $betCodes = Ssxx3dBetService::resetOneQuanDao($betCodes);
                     break;
                 case MethodMatchService::METHOD_ID_ZX_FS: # 直选复式
                     $betCodes = Ssxx3dBetService::resetOneZhiXuanFuShi($betCodes);
@@ -336,6 +337,34 @@ class Ssxx3dBetService extends CommonBaseService
 
         $dataStr = implode(',', $datas);
 
+        return $dataStr;
+    }
+
+    /**
+     * 全倒 号码转换
+     * @param $dataStr
+     * @return string
+     */
+    public static function resetOneQuanDao($dataStr): string
+    {
+        # 全倒 => 459 678  =>	元
+        $dataStrs = explode(MethodMatchService::ZU_SPLIT_FLAG, $dataStr);
+        p($dataStrs);
+
+        $datas = [];
+        foreach ($dataStrs as $dataStr){
+            $len = strlen($dataStr);
+            for ($i=0; $i<$len; $i++){
+                for ($j=0; $j<$len; $j++){
+                    if($j==$i) continue;
+                    for ($k=0; $k<$len; $k++) {
+                        if($j==$k OR $i==$k) continue;
+                        $datas[] = $dataStr[$i] . $dataStr[$j] . $dataStr[$k];
+                    }
+                }
+            }
+        }
+        $dataStr = implode(',', $datas);
         return $dataStr;
     }
 

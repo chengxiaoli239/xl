@@ -18,7 +18,7 @@ class MethodMatchService extends CommonBaseService
     const METHOD_ID_ZUSAN = 2;
     const METHOD_ID_ZULIU = 3;
     const METHOD_ID_DUDAN = 4;
-    const METHOD_ID_SHUANGFEN = 5;
+    const METHOD_ID_SHUANGFEI = 5;
     const METHOD_ID_QUANTUO = 6; # 对子全拖、双飞
     const METHOD_ID_YIMADING = 7;
     const METHOD_ID_ERMADING = 8;
@@ -557,10 +557,11 @@ class MethodMatchService extends CommonBaseService
      * @param array $codes
      * @return array
      */
-    public static function matchShuangFen($text='', &$codes=[], &$count=0, $matchName=''){
+    public static function matchShuangFei(string $text='', array &$codes=[], &$count=0, $matchName=''): array
+    {
         // 使用正则表达式匹配所有单个数字
         $text = str_replace(',', ' ', trim($text));
-        if (strpos($text, '双飞') !==false && preg_match_all('/(\d{2}(?:\s*\d{2})*)/', $text, $matches)) {
+        if (strpos($text, '双飞') !==false && preg_match_all('/(\d{2})/', $text, $matches)) {
             $codes = $matches[1];
         }
 
@@ -1126,16 +1127,20 @@ class MethodMatchService extends CommonBaseService
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function matchQuanDao($text='', &$codes=[], &$count=0, $matchName=''){
+    public static function matchQuanDao(string $text='', array &$codes=[], &$count=0, $matchName=''): array
+    {
         $text = trim(explode('各', trim($text))[0]);
         $text = trim( $text, ',');
 
         $text = str_replace('全倒', '', $text);
-        //p($text);
         // 使用正则表达式匹配组选后面的三个数字
         if (preg_match_all('/(\d{3,})/u', $text, $matches1) ) {
             $codesArr = $matches1[0];
         }
+        if(empty($codesArr)){
+            throw_info('匹配号码为空');
+        }
+
         //p($matches1);
         $code2s = [];
         $code3s = [];
@@ -1183,7 +1188,7 @@ class MethodMatchService extends CommonBaseService
         }
 
         $name = '全倒';
-        $codes = implode(',', $codesArr);
+        $codes = implode(self::ZU_SPLIT_FLAG, $codesArr);
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         $method = $methods[$name];
 
