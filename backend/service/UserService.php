@@ -566,4 +566,20 @@ class UserService extends BaseService {
 
         return $new_access_token;
     }
+
+    /**
+     * 判断是否为3d用户
+     * @param $user_id
+     * @return bool
+     */
+    public static function is3dUser($user_id): bool
+    {
+        $model = TzSystemsUsers::find()->where(['uid'=>$user_id])->one();
+        $is_3d = false;
+        if(strpos($model->sys_name, '排') !==false OR strpos($model->sys_name, '福') !==false){
+            $is_3d = true;
+        }
+
+        return $is_3d;
+    }
 }

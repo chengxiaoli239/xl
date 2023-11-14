@@ -332,14 +332,14 @@ class UserController extends BaseController
     public function actionSwitchAutoLogin($id){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if(\Yii::$app->user->id != 1){
-            $model = TzSystemsUsers::findOne(['id'=>$id, 'uid'=>$this->_user_id]);
-            $is_3d = false;
-            if(strpos($model->sys_name, '排') !==false OR strpos($model->sys_name, '福') !==false){
-                $is_3d = true;
+            $is3dUser = UserService::is3dUser($this->_user_id);
+            $model = TzSystemsUsers::find()->where(['uid'=>$this->_user_id, 'id'=>$id])->one();
+            if(empty($model)){
+                return $this->redirect(['/wechat/robot-user/view']);
             }
         }
         $rst = HN0898Service::updateStatus($id, $model = '\backend\models\TzSystemsUsers', 'is_auto_login');
-        if($is_3d){
+        if($is3dUser){
             return $this->redirect(['/wechat/robot-user/view']);
         }
 
