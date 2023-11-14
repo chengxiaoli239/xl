@@ -407,6 +407,9 @@ class EYunMessageOperateService  extends EYunBaseService
                 throw_info('单号生成失败');
             }
             $betCodeContents = $data['dataGroups']['betCodeContents'];
+            if(empty($betCodeContents)){
+                return [CommonBaseService::CODE_FOR_USER, [], '匹配异常:请按格式输入'];
+            }
             //p($betCodeContents);
             $now_time = time();
             $allMoneys = 0.00;
@@ -416,7 +419,7 @@ class EYunMessageOperateService  extends EYunBaseService
             foreach ($betCodeContents as $lottery_type=>$contents){
                 $qihao = HN0898Service::getQihao($lottery_type);
                 $replyTxt = '【课号】'.$qihao;
-                $replyTxt .= "\n【内容】" . str_replace('元', '咪', $text);;
+                $betContent = "\n【内容】";
 
                 foreach ($contents as $playMethods){
                     $lottery_name = $playMethods['lottery_name'];
@@ -425,12 +428,13 @@ class EYunMessageOperateService  extends EYunBaseService
                             throw_info('方式匹配为空，请按正确格式输入', CommonBaseService::CODE_FOR_USER);
                         }
 
+                        $playMethod = $content['playMethod'];
                         $Bets = new Bets();
                         $setData = [
                             'user_id' => $this->user_id,
                             'wechat_user_id' => $this->member_id,
                             'order_id' => $betOrderId,
-                            'play_method' => $content['playMethod']['id'],
+                            'play_method' => $playMethod['id'],
                             'codes' => $content['codes'],
                             'bet_money' => $content['all_moneys'],
                             'single' => $content['single'],
@@ -451,6 +455,8 @@ class EYunMessageOperateService  extends EYunBaseService
                         $allMoneys += $content['all_moneys']; # 总投
                         $allCounts += $content['count']; # 总投
 
+                        $betContent .= "\n->".$playMethod['name'].':'.$content['count'].'*'.$content['single'].'='.$content['all_moneys']."\n";
+
                         # 推送网盘任务：
                         $pushSiteDatas[] = ['betRowId'=>$Bets->id];
                     }
@@ -458,6 +464,7 @@ class EYunMessageOperateService  extends EYunBaseService
             }
             $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $allMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
 
+            $replyTxt .= $betContent;
             $replyTxt .= ("\n【单号】".$betOrderId);
             $replyTxt .= ("\n【成功】√  共".$allCounts."组，共".$allMoneys.'咪');
             $replyTxt .= ("\n【剩余】".$vData['balance'].'咪');
