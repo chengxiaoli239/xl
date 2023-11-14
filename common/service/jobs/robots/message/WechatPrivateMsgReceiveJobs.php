@@ -42,7 +42,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             if($num>1){
                 throw_info('短时间内重复操作，忽略处理', 50002);
             }
-            \Yii::$app->redis->expire($mkey, 5);
+            \Yii::$app->redis->expire($mkey, 2);
 
             $wechatUser = WechatUserService::getWechatUsers($user_id)[$fromUser];
             # 1、好友判断
