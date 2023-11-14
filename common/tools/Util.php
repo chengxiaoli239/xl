@@ -7,6 +7,7 @@
  *
  */
 namespace common\tools;
+use DateTime;
 use yii;
 
 class Util
@@ -608,6 +609,28 @@ class Util
         }
 
         return $randomString;
+    }
+
+    /**
+     * 获取前x天同期号
+     * @param $filterQihao
+     * @param $n
+     * @param $dateLen
+     * @return string
+     * @throws \Exception
+     */
+    public static function getBeforeNumQihao($filterQihao, $n=1,  $dateLen=8): string
+    {
+        $dateString = substr($filterQihao, 0, $dateLen);
+        $sortQihao = substr($filterQihao, $dateLen, 3);
+
+        $dateTime = new DateTime($dateString);
+        $formattedDate = $dateTime->format('Y-m-d H:i:s');
+        $beforeNDate = date('Ymd', strtotime($formattedDate) - $n * 86400);
+        #p([$dateString, $sortQihao, $beforeNDate]);
+        $qihao = $beforeNDate . $sortQihao;
+
+        return $qihao;
     }
 }
 

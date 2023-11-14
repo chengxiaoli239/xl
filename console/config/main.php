@@ -21,6 +21,9 @@ return [
         'user' => [
             'class' => 'console\modules\user\Module',
         ],
+        'test' => [
+            'class' => 'console\modules\test\Module',
+        ],
     ],
     'components' => [
         'log' => [

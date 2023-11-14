@@ -19,6 +19,7 @@ use common\kj\ssc\Lucky5;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use backend\models\ThreeNum;
+use common\tools\Util;
 use yii\helpers\ArrayHelper;
 use  yii;
 use yii\helpers\Json;
@@ -258,6 +259,8 @@ class NumService extends BaseService {
 
         142=>'过滤上期每两个号码及双重(四定)', # 同97、98
         143=>'过滤昨日同期每两个号码及双重(四定)', # 同97、98
+        144=>'过滤前天日同期每两个号码及双重(四定)',
+        145=>'过滤大前天日同期每两个号码及双重(四定)',
     ];
 
     /**
@@ -3135,10 +3138,10 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic82($plan);
                     break;
                 case 97: # 过滤上期每两个号码及对数(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $c_type=1);
+                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $dateNum=0);
                     break;
                 case 98: # 过滤昨日同期每两个号码及对数(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $c_type=2);
+                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $dateNum=1);
                     break;
                 case 102: # 过滤345三分离号码(四定)
                     $codes = NumService::getBeforeKjCodesDynamic102($plan, $positions=[3,4,5]);
@@ -3261,10 +3264,16 @@ class NumService extends BaseService {
                     $codes = NumService::getBeforeKjCodesDynamic116($plan, $positions=4, $filterTypes=['type_dx']); #
                     break;
                 case 142: # 过滤上期每两个号码及双重(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $c_type=1, $d_type=2);
+                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $dateNum=0, $d_type=2);
                     break;
                 case 143: # 过滤昨日同期每两个号码及双重(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $c_type=2, $d_type=2);
+                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $dateNum=1, $d_type=2);
+                    break;
+                case 144: # 过滤前天日同期每两个号码及双重(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $dateNum=2, $d_type=2);
+                    break;
+                case 145: # 过滤大前天日同期每两个号码及双重(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic83($plan, $dateNum=3, $d_type=2);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
@@ -4954,7 +4963,7 @@ class NumService extends BaseService {
      * @param int $d_type 1对数2双重
      * @return array
      */
-    private static function getBeforeKjCodesDynamic83(object $plan, int $c_type=1, int $d_type=1): array
+    private static function getBeforeKjCodesDynamic83(object $plan, int $date_num=0, int $d_type=1): array
     {
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
         $current_kj_qihao = $hzArr['filters']['current_kj_qihao']; # 当期已经开奖的期号
@@ -4963,18 +4972,19 @@ class NumService extends BaseService {
         $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
         if(empty($current_kj_qihao)){
             $current_kj_qihao = $DataDealStatus['qihao'];
-        }else{
-            if($c_type ==2){
-                # 昨日同期
-                $current_kj_qihao = date('Ymd', strtotime('-1 day')). substr($DataDealStatus['next_qihao'], -3);
-            }
+        }
+        $filterQihao = $current_kj_qihao;
+        if($date_num>0){
+            # x日同期
+            #$filterQihao = Util::getBeforeNumQihao($current_kj_qihao, $date_num);
+            $filterQihao = date('Ymd', strtotime('-'.$date_num.' day')). substr($DataDealStatus['next_qihao'], -3);
         }
 
-        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'qihao', $current_kj_qihao]];
+        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'qihao', $filterQihao]];
         $historyKjDatasQuery = SscKjData::find()->select(['code1', 'code2', 'code3', 'code4', 'code_str', 'qihao'])
             ->where($historyWhere)->limit(1)->orderBy(['id'=>SORT_DESC]);
         $sql = $historyKjDatasQuery->createCommand()->getRawSql();//p($sql);
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤上期每两个号码及对数', ['c_type'=>$c_type,'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤上期每两个号码及对数', ['date_num'=>$date_num,'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
         $historyKjData = $historyKjDatasQuery->asArray()->one();
         //p(['historyKjData'=>$historyKjData], 0);
 
