@@ -148,6 +148,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return Html::a($txt, $url, ['title' => '点击切换','alt'=>'点击切换']);
                                 }
                             ],
+                            [ 'attribute'=>'is_auto_bet','label'=>'自动登陆',
+                                'format'=>'raw',
+                                'value'=>function($model){
+                                    $txt = $model->is_auto_login ? '<font color="green">已开启</font>' : '<font color="red">已关闭</font>';
+                                    $url = '/forum/user/switch-auto-login?id='.$model->id.'&status='.($model->is_auto_login?0:1);
+                                    return Html::a($txt, $url, ['title' => '点击切换','alt'=>'点击切换']);
+                                }
+                            ],
                             //'desc',
                             [ 'attribute'=>'desc','label'=>'网盘状态',
                                 'format'=>'raw',
@@ -345,76 +353,6 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 
-
-<!--赔率-->
-<div class="modal fade" id="setProfitsModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span></button>
-                <h4 class="modal-title" id="set_msg_title">设置止盈止损</h4>
-            </div>
-            <div class="modal-body">
-                <form class="bs-example bs-example-form" role="form">
-                    <div class="input-group layui-input-inline">
-                        <span class="input-group-addon">止盈</span>
-                        <input type="text" class="form-control" placeholder="止盈" name="take_profits" id="take_profits" value="<?echo $models[0]->take_profits?>">
-                    </div>
-                    <br>
-                    <div class="input-group layui-input-inline">
-                        <span class="input-group-addon">止损</span>
-                        <input type="text" class="form-control" placeholder="止损" name="stop_loss" id="stop_loss" value="<?echo $models[0]->stop_loss?>">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="setProfitsBtn">确定</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!--网盘跟买-->
-<div class="modal fade" id="setFollowModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span></button>
-                <h4 class="modal-title" id="set_follow_msg_title">设置跟买</h4>
-            </div>
-            <div class="modal-body">
-                <form class="bs-example bs-example-form" role="form">
-                    <div class="input-group layui-input-inline">
-                        <span class="input-group-addon">正买账号</span>
-                        <input type="text" class="form-control" placeholder="正买账号,多个用英文账号隔开" name="flow_wp_accounts" id="flow_wp_accounts" value="<?echo $models[0]->flow_wp_accounts?>">
-                    </div>
-                    <br>
-                    <div class="input-group layui-input-inline">
-                        <span class="input-group-addon">倍数比例</span>
-                        <input type="text" class="form-control" placeholder="倍数" name="flow_wp_player_bs" id="flow_wp_player_bs" value="<?echo $models[0]->flow_wp_player_bs?>">
-                    </div>
-                    <br>
-                    <div class="input-group layui-input-inline">
-                        <span class="input-group-addon">反买账号</span>
-                        <input type="text" class="form-control" placeholder="反买账号,多个用英文账号隔开" name="flow_op_accounts" id="flow_op_accounts" value="<?echo $models[0]->flow_op_accounts?>">
-                    </div>
-                    <br>
-                    <div class="input-group layui-input-inline">
-                        <span class="input-group-addon">倍数比例</span>
-                        <input type="text" class="form-control" placeholder="倍数" name="flow_op_player_bs" id="flow_op_player_bs" value="<?echo $models[0]->flow_op_player_bs?>">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="setFollowBtn">确定</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
