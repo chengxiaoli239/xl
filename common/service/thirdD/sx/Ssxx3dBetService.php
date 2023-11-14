@@ -31,16 +31,16 @@ class Ssxx3dBetService extends CommonBaseService
             $codeStr = CommonService::getAwardNumberByQihao($qihao, $lottery_type);
             switch (true){
                 case $betRow->status == CommonBaseService::STATUS_LT_CANCEL:
-                    throw_info('已是撤单状态，无需推送盘口', 40000);
+                    throw_info('已是撤单状态，无需推送盘口', SsxxBetJobs::INVALID_STATUS_CODE);
                 case $wechatUser->is_chi == 1:
-                    throw_info('该用户私下吃，无需推送盘口');
+                    throw_info('该用户私下吃，无需推送盘口', SsxxBetJobs::INVALID_STATUS_CODE);
                 case !empty($codeStr):
-                    throw_info('已开奖期号['.$lottery_type.'_'.$qihao.']，禁止推送盘口');
+                    throw_info('已开奖期号['.$lottery_type.'_'.$qihao.']，禁止推送盘口', SsxxBetJobs::INVALID_STATUS_CODE);
                 default:
                     break;
             }
         }catch (\Exception $e){
-            return [10001, [], $e->getMessage()];
+            return [$e->getCode(), [], $e->getMessage()];
         }
 
         return [SsxxBetJobs::INVALID_STATUS_CODE, ['betRow'=>$betRow], '校验成功'];
@@ -430,11 +430,11 @@ class Ssxx3dBetService extends CommonBaseService
         ];
 
         $result = SiteOrderApi::push($site['ssc_domain'], $post_data, $headers);
+        $logArr = ['user_id'=>$user_id, 'method_id'=>$method_id, 'post_data'=>$post_data, 'lottery_type'=>$lottery_type, 'result'=>$result];
         if($result != 2){
             throw_info($result['m']??'推送盘口异常');
         }
 
-        $logArr = ['user_id'=>$user_id, 'method_id'=>$method_id, 'post_data'=>$post_data, 'lottery_type'=>$lottery_type, 'result'=>$result];
         Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘', $logArr);
 
         return true;

@@ -30,7 +30,7 @@ class SsxxBetJobs extends CommonJob {
 
             list($code, $data, $msg) = Ssxx3dBetService::preBetValidate($betRowId);
             if($code>0){
-                throw_info($msg);
+                throw_info($msg, $code);
             }
             $betRow = $data['betRow']; # object
             list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);
@@ -43,6 +43,9 @@ class SsxxBetJobs extends CommonJob {
             Tool_Common::log('/statics_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params, 'data'=>$data]);
         }catch (\Exception $e){
             Tool_Common::log('/statics_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['params'=>$params, 'err_msg'=>$e->getMessage()]);
+            if($e->getCode() == SsxxBetJobs::INVALID_STATUS_CODE){
+                return $e->getMessage();
+            }
             throw_info($e->getMessage());
         }
 
