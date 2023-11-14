@@ -43,7 +43,7 @@ class Ssxx3dBetService extends CommonBaseService
             return [$e->getCode(), [], $e->getMessage()];
         }
 
-        return [SsxxBetJobs::INVALID_STATUS_CODE, ['betRow'=>$betRow], '校验成功'];
+        return [0, ['betRow'=>$betRow], '校验成功'];
     }
 
     /**

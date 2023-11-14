@@ -35,7 +35,7 @@ class SsxxBetJobs extends CommonJob {
             $betRow = $data['betRow']; # object
             list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);
             if($code>0){
-                throw_info($msg);
+                throw_info($msg, $code);
             }
             $betRow->push_status = BetsBackend::PUSH_STATUS_SUCCESS;
             $betRow->save();
