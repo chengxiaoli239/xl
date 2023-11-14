@@ -1,6 +1,7 @@
 <?php
 namespace console\modules\test\controllers;
 
+use common\service\thirdD\sx\Ssxx3dBetService;
 use common\tools\Util;
 use DateTime;
 use Yii;
@@ -17,6 +18,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $betCodes = Ssxx3dBetService::resetOneZhiXuanFuShi($betCodes='1246;5678');p($betCodes);
             $qihao = Util::getBeforeNumQihao($dateString, $n=2);
             echo $qihao;
         } catch (\Exception $e) {

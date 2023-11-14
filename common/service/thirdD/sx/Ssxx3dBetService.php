@@ -195,12 +195,13 @@ class Ssxx3dBetService extends CommonBaseService
                 case MethodMatchService::METHOD_ID_HZ_DAN: # 和值单
                 case MethodMatchService::METHOD_ID_HZ_SHUANG: # 和值双
                     break;
-                case MethodMatchService::METHOD_ID_DW_ZX_FS: # 定位直选复式
+                case MethodMatchService::METHOD_ID_DW_ZX_FS: # 定位-直选复式
                     $betCodes = Ssxx3dBetService::resetOneFixedZhiXuanFuShi($betCodes);
                     break;
                 case MethodMatchService::METHOD_ID_QD: # 全倒
                     break;
                 case MethodMatchService::METHOD_ID_ZX_FS: # 直选复式
+                    $betCodes = Ssxx3dBetService::resetOneZhiXuanFuShi($betCodes);
                     break;
                 default:
                     $err_msg = '未知玩法ID:'.$method_id;
@@ -311,6 +312,7 @@ class Ssxx3dBetService extends CommonBaseService
      */
     public static function resetOneFixedZhiXuanFuShi($dataStr): string
     {
+        # 福[定位直选复式] => 百:34578,十:34569,个:23467  =>	375.00元
         //p($dataStr);
         $datas = explode(',', $dataStr);
         $codeDatas = [];
@@ -324,36 +326,46 @@ class Ssxx3dBetService extends CommonBaseService
         $codeDatas[$third[0]] = $third[2];
         #p($codeDatas, 0);
         $datas = [];
-        switch (true){
-            case isset($codeDatas['百']) && isset($codeDatas['十']):
-                for ($i=0; $i<strlen($codeDatas['百']); $i++){
-                    for ($j=0; $j<strlen($codeDatas['十']); $j++){
-                        $datas[] = $codeDatas['百'][$i].$codeDatas['十'][$j].'X';
-                    }
+        for ($i=0; $i<strlen($codeDatas['百']); $i++){
+            for ($j=0; $j<strlen($codeDatas['十']); $j++){
+                for ($k=0; $k<strlen($codeDatas['个']); $k++) {
+                    $datas[] = $codeDatas['百'][$i] . $codeDatas['十'][$j] . $codeDatas['个'][$k];
                 }
-                break;
-            case isset($codeDatas['百']) && isset($codeDatas['个']):
-                for ($i=0; $i<strlen($codeDatas['百']); $i++){
-                    for ($j=0; $j<strlen($codeDatas['个']); $j++){
-                        $datas[] = $codeDatas['百'][$i].'X'.$codeDatas['个'][$j];
-                    }
-                }
-                break;
-            case isset($codeDatas['十']) && isset($codeDatas['个']):
-                for ($i=0; $i<strlen($codeDatas['十']); $i++){
-                    for ($j=0; $j<strlen($codeDatas['个']); $j++){
-                        $datas[] = $codeDatas['十'][$i].'X'.$codeDatas['个'][$j];
-                    }
-                }
-                break;
+            }
         }
 
-
         $dataStr = implode(',', $datas);
-        p($dataStr);
 
         return $dataStr;
     }
+
+    /**
+     * 直选复式号码转换
+     * @param $dataStr
+     * @return string
+     */
+    public static function resetOneZhiXuanFuShi($dataStr): string
+    {
+        # 福[直选复式] => 45678  =>	60.00元
+        $dataStrs = explode(MethodMatchService::ZU_SPLIT_FLAG, $dataStr);
+
+        $datas = [];
+        foreach ($dataStrs as $dataStr){
+            $len = strlen($dataStr);
+            for ($i=0; $i<$len; $i++){
+                for ($j=0; $j<$len; $j++){
+                    if($j==$i) continue;
+                    for ($k=0; $k<$len; $k++) {
+                        if($j==$k OR $i==$k) continue;
+                        $datas[] = $dataStr[$i] . $dataStr[$j] . $dataStr[$k];
+                    }
+                }
+            }
+        }
+        $dataStr = implode(',', $datas);
+        return $dataStr;
+    }
+
 
     private static function postBet(object $betRow, $betCodes=''): bool
     {
