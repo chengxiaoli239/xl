@@ -55,12 +55,12 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
 
             $MessageService = new EYunMessageOperateService($user_id);
             $wcId = $params['wcId']; # 微信原始id
-            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'0', ['wcId'=>$wcId, 'params'=>$params, 'data'=>$data, 'type'=>gettype($data)]);
+            Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name.'0', ['wcId'=>$wcId, 'params'=>$params, 'data'=>$data, 'type'=>gettype($data)]);
 
 
             $text = $data['content'];
             list($code, $vdata, $msg) = $MessageService->receive($text, $fromUser);
-            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'01', ['user_id'=>$user_id, 'wcId'=>$wcId, 'code'=>$code, 'text'=>$text, 'vdata'=>$vdata, 'msg'=>$msg]);
+            Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name.'01', ['user_id'=>$user_id, 'wcId'=>$wcId, 'code'=>$code, 'text'=>$text, 'vdata'=>$vdata, 'msg'=>$msg]);
             if($code>0){
                 throw_info($msg, $code);
             }
@@ -70,17 +70,17 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
         }catch (\Exception $e){
             $err_msg =  ($e->getCode() == CommonBaseService::CODE_FOR_USER) ? $e->getMessage() : '处理异常';
             if($e->getCode()>50000){ # 大于50000
-                Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'11', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'err_msg'=>$err_msg, 'code'=>$e->getCode()]);
+                Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name.'11', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'err_msg'=>$err_msg, 'code'=>$e->getCode()]);
                 return '忽略回复：'.$err_msg;
             }
             $r = self::reply($user_id, [$err_msg], $data); # 回复消息
-            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r, 'err_msg'=>$e->getMessage()]);
 
             $message = $err_msg;
         }
         push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$user_id, 'type'=>$vdata['type'], 'wechat_user_id'=>$wechatUser['id']]);
 
-        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name.'13', ['wcId'=>$wcId, 'text'=>$text, 'replyTxts'=>$replyTxts]);
+        Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name.'13', ['wcId'=>$wcId, 'text'=>$text, 'replyTxts'=>$replyTxts]);
 
         return $message;
     }
