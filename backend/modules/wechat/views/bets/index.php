@@ -1,5 +1,6 @@
 <?php
 
+use backend\models\thirdD\BetsBackend;
 use yii\helpers\BaseStringHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -61,7 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         #'single',
-                        ['attribute' => 'single','label'=>'倍数[元]',//'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'single','label'=>'倍[元]',//'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 return $model->single;
@@ -71,6 +72,12 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value' => function($model) {
                                 return $model->count;
+                            }
+                        ],
+                        ['attribute' => 'push_status','label'=>'盘口',//'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return '<strong><font color="'.BetsBackend::PUSH_STATUS_CLASSES[$model->push_status].'">'.BetsBackend::PUSH_STATUS_OPTIONS[$model->push_status].'</font></strong>';
                             }
                         ],
                         'bet_money',

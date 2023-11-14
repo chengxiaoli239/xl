@@ -407,6 +407,9 @@ class Ssxx3dBetService extends CommonBaseService
 
         #p(['site'=>$site, 'methodData'=>$methodData, 'betRow'=>$betRow]);
         $codes = str_replace(MethodMatchService::ZU_SPLIT_FLAG, ',', $betCodes);
+        if(empty($codes)){
+            throw_info('推送盘口异常:号码为空');
+        }
         $post_data = [
             'code'=>[],
             'lujingstat'=>3,
@@ -427,9 +430,12 @@ class Ssxx3dBetService extends CommonBaseService
         ];
 
         $result = SiteOrderApi::push($site['ssc_domain'], $post_data, $headers);
+        if($result != 2){
+            throw_info($result['m']??'推送盘口异常');
+        }
 
         $logArr = ['user_id'=>$user_id, 'method_id'=>$method_id, 'post_data'=>$post_data, 'lottery_type'=>$lottery_type, 'result'=>$result];
-        Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '推网盘', $logArr);
+        Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘', $logArr);
 
         return true;
     }
