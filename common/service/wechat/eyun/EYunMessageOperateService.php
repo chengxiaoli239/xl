@@ -2,14 +2,12 @@
 
 namespace common\service\wechat\eyun;
 
-use backend\models\AgentUsersBalanceFlows;
+use backend\models\thirdD\BetsBackend;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\agent\AgentUsersService;
-use backend\service\ChatCommonBetService;
 use backend\service\HN0898Service;
 use common\models\eyun\RobotUser;
 use common\models\thirdD\BetOrderId;
-use common\models\thirdD\Bets;
 use common\models\wechat\WechatUser;
 use common\service\BaseService;
 use common\service\chat\Tool_Common;
@@ -345,7 +343,7 @@ class EYunMessageOperateService  extends EYunBaseService
             if (preg_match('/(\d+)/', $text, $matches)) {
                 $orderId = $matches[0];
 
-                $Bets = Bets::findOne(['order_id'=>$orderId, 'wechat_user_id'=>$wechatUser['id']]);
+                $Bets = BetsBackend::findOne(['order_id'=>$orderId, 'wechat_user_id'=>$wechatUser['id']]);
                 if(empty($Bets)){
                     throw_info('单号：'.$orderId.'无记录', CommonBaseService::CODE_FOR_USER);
                 }
@@ -355,12 +353,12 @@ class EYunMessageOperateService  extends EYunBaseService
                 if($Bets->status==CommonBaseService::STATUS_LT_CANCEL){
                     throw_info($orderId.'订单已是撤单状态，无需重复处理', CommonBaseService::CODE_FOR_USER);
                 }
-                $orderBetMoney = Bets::find()->select(['orderBetMoney'=>'SUM(bet_money)'])
+                $orderBetMoney = BetsBackend::find()->select(['orderBetMoney'=>'SUM(bet_money)'])
                     ->where(['order_id'=>$orderId, 'wechat_user_id'=>$wechatUser['id']])
                     ->groupBy(['order_id'])->scalar();
                 $vData = AgentUsersBalanceService::updateBalance((string)$orderId, $orderBetMoney, $wechatUser['id'], WechatUserService::TYPE_ORDER_CANCEL); # 撤单返还
                 #$Bets->status = 3; # 已撤单
-                Bets::updateAll(['status'=>CommonBaseService::STATUS_LT_CANCEL], ['order_id'=>$orderId]);
+                BetsBackend::updateAll(['status'=>CommonBaseService::STATUS_LT_CANCEL], ['order_id'=>$orderId]);
                 if(!$Bets->save()){
                     throw_info(Json::encode($Bets->getErrors()));
                 }
@@ -429,7 +427,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         }
 
                         $playMethod = $content['playMethod'];
-                        $Bets = new Bets();
+                        $Bets = new BetsBackend();
                         $setData = [
                             'user_id' => $this->user_id,
                             'wechat_user_id' => $this->member_id,

@@ -125,7 +125,7 @@ class BaseModel extends ActiveRecord
      * @return int
      * @throws \yii\db\Exception
      */
-    public static function deleteRecord($condition, $params = []): int
+    public static function deleteRecord($condition, array $params = []): int
     {
         $command = static::getDb()->createCommand();
         $command->delete(static::tableName(), $condition, $params);

@@ -23,7 +23,7 @@ use yii\widgets\ActiveForm;
         </div>
         <div class="col-lg-2 col-xs-6">
             <?= $form->field($model, 'lottery_type')->dropDownList(
-                \common\models\thirdD\Bets::LOTTERYS,
+                \backend\models\thirdD\BetsBackend::LOTTERYS,
                 ['prompt' => '-请选择-'] // Optional: Add a prompt message
             )->label('类型')?>
         </div>

@@ -14,6 +14,7 @@ use backend\models\ImportPlanCodes;
 use backend\models\SscKjData;
 use backend\models\SscSdHzVal;
 use backend\models\SscStaticVal;
+use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\models\wechat\Bets;
