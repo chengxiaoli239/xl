@@ -223,7 +223,7 @@ class Ssxx3dBetService extends CommonBaseService
             return [10004, $logArr, $e->getMessage()];
         }
 
-        return [];
+        return [0, ['resultData'=>$resultData], '推送成功'];
     }
 
     /**

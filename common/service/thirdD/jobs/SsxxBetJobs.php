@@ -1,6 +1,7 @@
 <?php
 namespace common\service\thirdD\jobs;
 
+use backend\models\thirdD\BetsBackend;
 use common\service\chat\Tool_Common;
 use common\service\jobs\CommonJob;
 use common\service\thirdD\sx\Ssxx3dBetService;
@@ -33,6 +34,11 @@ class SsxxBetJobs extends CommonJob {
             }
             $betRow = $data['betRow']; # object
             list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);
+            if($code>0){
+                throw_info($msg);
+            }
+            $betRow->push_status = BetsBackend::PUSH_STATUS_SUCCESS;
+            $betRow->save();
 
             Tool_Common::log('/statics_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params, 'data'=>$data]);
         }catch (\Exception $e){
