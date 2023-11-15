@@ -409,8 +409,9 @@ class ThirdDTypeService extends CommonBaseService
             $t = 4;
         }
 
+        $cnSingleText = ThirdDTypeService::getTextCnSingle($text);
         // 使用正则表达式匹配 "倍" 前面的中文一到九
-        if(empty($single) && preg_match('/([一二两三四五六七八九十百千万]{1,3})倍/u', $text, $matches)) {
+        if(empty($single) && preg_match('/([一二两三四五六七八九十百千万]{1,3})倍/u', $cnSingleText, $matches)) {
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
             $t = $matches[1];
             $s = ThirdD::cn2num($t); # 中文转数字，一=>1、二=>2.。。。
@@ -444,7 +445,7 @@ class ThirdDTypeService extends CommonBaseService
             $t = 8;
         }
 
-        if (empty($single) && preg_match('/([一二两三四五六七八九十百千万]{1,3})元/u', $text, $matches)) {
+        if (empty($single) && preg_match('/([一二两三四五六七八九十百千万]{1,3})元/u', $cnSingleText, $matches)) {
             $t = $matches[1];
             $single_txt = $matches[1];
             $single = ThirdD::cn2num($t); # 中文转数字
@@ -459,6 +460,11 @@ class ThirdDTypeService extends CommonBaseService
             $single_cn = $s;
             $t = 10;
         }
+        # 福0324578组六40
+        if(empty($single) && preg_match('/(\d{1,2})$/', $text, $matches)){
+            $single = $matches[1];
+        }
+        //p($single);
 
         $data = [
             'single'=>$single,
@@ -476,6 +482,17 @@ class ThirdDTypeService extends CommonBaseService
         Tool_Common::log('/matchSingle/'.__FUNCTION__, 'INFO', '匹配倍数', ['text'=>$text,  't'=>$t, 'data'=>$data]);
 
         return $data;
+    }
+
+    /**
+     * 获取中文倍数之前先剔除组三、组六的情况，比如：福234组三五十倍，最终返回：组234五十倍
+     * @param string $text
+     * @return array|mixed|string|string[]
+     */
+    public static function getTextCnSingle(string $text=''){
+        $cnTextSingle = str_replace(['组三', '组六'], '', $text);
+
+        return $cnTextSingle;
     }
 
     /**

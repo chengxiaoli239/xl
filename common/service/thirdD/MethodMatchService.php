@@ -340,7 +340,7 @@ class MethodMatchService extends CommonBaseService
                         break;
                     }
                     if($flag){
-                        throw_info('组六号码不能重复：'.$code);
+                        throw_info('组六号码不能重复：'.$code.'_'.$text);
                     }else{
                         if($len==3){ # 常规的组六
                             $methodArr['methodArr6'][] = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
