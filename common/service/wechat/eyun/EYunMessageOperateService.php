@@ -129,7 +129,7 @@ class EYunMessageOperateService  extends EYunBaseService
         $text = str_replace('组一直一', '一直一组', $text); # 中文冒号，
 
         $text = str_replace(['共计', '总计', '计', '='], '共', $text); # 同义词替换
-        $text = str_replace('块', '元', $text); # 同义词替换
+        $text = str_replace(['块', '米', '咪'], '元', $text); # 同义词替换
         $text = str_replace(['、', '*', "\n"], ' ', $text); # 同义词替换
         $text = str_replace(['各打', '各买', "打", "买"], '各', $text); # 同义词替换
         $text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
