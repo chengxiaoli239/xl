@@ -214,11 +214,11 @@ class Ssxx3dBetService extends CommonBaseService
             $postRst = self::postBet($betRow, $betCodes);
 
             $resultData = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'postRst'=>$postRst, 'err_msg'=>'处理结束'];
-            Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '推送盘口处理结束99', $resultData);
+            Tool_Common::log('/bet_sx/'.__FUNCTION__, 'ERR', '推送盘口处理结束99', $resultData);
             var_dump(date('Y-m-d H:i:s ').'处理成功：betRowId:'.$betRow->id.'_method_id:'.$method_id);
         }catch (\Exception $e){
             $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()];
-            Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '推送盘口处理异常11', $logArr);
+            Tool_Common::log('/bet_sx/'.__FUNCTION__, 'ERR', '推送盘口处理异常11', $logArr);
             var_dump($e->getMessage());
             return [10004, $logArr, $e->getMessage()];
         }
