@@ -427,6 +427,7 @@ class ThirdDTypeService extends CommonBaseService
             $t = $matches[1];
             #p([$t, $s, $matchName, $matches, $methods]);
             $single = $t * (int)$methods[$matchName]['money'];
+            #p([$single, $methods[$matchName]]);
             $single_cn_text = '倍';
             $single_cn = $t;
             $t = 6;
