@@ -60,7 +60,7 @@ class CommonBaseService extends BaseService
 
     public static function getLocalToSiteMethodsMkey($system_type_id=0): string
     {
-        return 'getLocalToSiteMethodsMkey_x0_'.$system_type_id;
+        return 'getLocalToSiteMethodsMkey_x1_'.$system_type_id;
     }
 
     /**
