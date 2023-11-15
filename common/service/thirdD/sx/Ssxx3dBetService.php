@@ -365,6 +365,7 @@ class Ssxx3dBetService extends CommonBaseService
 
     private static function postBet(object $betRow, $betCodes=''): bool
     {
+        $betRowId = $betRow->id; # 记录ID
         $method_id = $betRow->play_method; # 玩法ID
         $user_id = $betRow->user_id; # 用户ID
         $lottery_type = $betRow->lottery_type; # 彩种类型
@@ -397,11 +398,11 @@ class Ssxx3dBetService extends CommonBaseService
         ];
 
         $result = SiteOrderApi::push($site['ssc_domain'], $post_data, $headers);
-        $logArr = ['user_id'=>$user_id, 'method_id'=>$method_id, 'post_data'=>$post_data, 'lottery_type'=>$lottery_type, /*'result'=>$result*/];
-        Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘', $logArr);
+        $logArr = ['betRowId'=>$betRowId, 'user_id'=>$user_id, 'method_id'=>$method_id, 'post_data'=>$post_data, 'lottery_type'=>$lottery_type, /*'result'=>$result*/];
+        Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘10', $logArr);
         if($result['s'] != 2){ # 错误码：2成功、9918 登录超时....
             $logArr['result'] = $result;
-            Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘', $logArr);
+            Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);
             throw_info($result['m']??'推送盘口异常');
         }
 
