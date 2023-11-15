@@ -116,7 +116,8 @@ class EYunMessageOperateService  extends EYunBaseService
      * 重置匹配文本
      * @param $text
      */
-    public static function resetText($text){
+    public static function resetText($text): string
+    {
         #$text = str_replace('。', '#', $text); # 玩法之间分隔符
         $text = str_replace('组6 ', '组六 ', $text); # 同义词
         $text = str_replace('组3 ', '组三 ', $text); # 同义词
@@ -132,6 +133,11 @@ class EYunMessageOperateService  extends EYunBaseService
         $text = str_replace(['块', '米', '咪'], '元', $text); # 同义词替换
         $text = str_replace(['、', '*', "\n"], ' ', $text); # 同义词替换
         $text = str_replace(['各打', '各买', "打", "买"], '各', $text); # 同义词替换
+
+        # 特殊倍数匹配
+        $text = str_replace(['一倍10元', '一倍十元'], '各10元', $text); # 同义词替换
+        $text = str_replace(['一倍20元', '一倍二十元'], '各20元', $text); # 同义词替换
+
         $text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
         if(preg_match('/个(\d+)元/', $text, $matches)){
             $text = str_replace($matches[0], '各'.$matches[1].'元', $text);
@@ -417,7 +423,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $pushSiteDatas = [];
             foreach ($betCodeContents as $lottery_type=>$contents){
                 $qihao = (string)HN0898Service::getQihao($lottery_type);
-                $replyTxt = '【课号】'.$qihao;
+                $oneReplyTxt = '【课号】'.$qihao;
                 $betContent = "\n【内容】";
 
                 foreach ($contents as $playMethods){
@@ -460,14 +466,14 @@ class EYunMessageOperateService  extends EYunBaseService
                         $pushSiteDatas[] = ['betRowId'=>$Bets->id];
                     }
                 }
+                $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $allMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
+                $oneReplyTxt .= $betContent;
+                $oneReplyTxt .= ("\n【单号】".$betOrderId);
+                $oneReplyTxt .= ("\n【成功】√  共".$allCounts."组，共".$allMoneys.'咪');
+                $oneReplyTxt .= ("\n【剩余】".$vData['balance'].'咪');
+                $replyTxts[] = $oneReplyTxt;
             }
-            $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $allMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
 
-            $replyTxt .= $betContent;
-            $replyTxt .= ("\n【单号】".$betOrderId);
-            $replyTxt .= ("\n【成功】√  共".$allCounts."组，共".$allMoneys.'咪');
-            $replyTxt .= ("\n【剩余】".$vData['balance'].'咪');
-            $replyTxts[] = $replyTxt;
 
             $transaction->commit();
 

@@ -520,7 +520,7 @@ class ThirdDTypeService extends CommonBaseService
 
         $datas = [
             CommonBaseService::LOTTERY_TYPE_FUCAI => ['福彩3D', '福彩3d', '福彩', '福佳', '福3D', '3D', '3d', '福'],
-            CommonBaseService::LOTTERY_TYPE_PL3 => ['排三', '体彩', '体家', '排佳', '排3', '体', '排', 'p3'],
+            CommonBaseService::LOTTERY_TYPE_PL3 => ['排三', '体彩', '体家', '排佳', /*'排3',*/ '体', '排', 'p3'],
         ];
         if(!isset($datas[$lottery_type])){
             return $datas;
