@@ -289,7 +289,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             $singleData = ThirdDTypeService::getMoneys($betText, $playMethod['name'], $playMethod);
                             $single = $singleData['single'];
                             $logArr = ['betText'=>$betText, 'singleData'=>$singleData, 'playMethod'=>$playMethod];
-                            Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-02', $logArr);
+                            Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-03', $logArr);
                             if($singleData['single_cn_text']=='倍'){
                                 $Odds = Odds3dService::getOdds($this->user_id, $playMethod['id']); # 玩法赔率
                                 $single = $Odds['money'] * $singleData['single_cn'];

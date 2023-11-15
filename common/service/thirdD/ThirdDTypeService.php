@@ -5,6 +5,7 @@ namespace common\service\thirdD;
 use backend\models\LotteryType;
 use common\models\thirdD\BetOrderId;
 use common\service\BaseService;
+use common\service\chat\Tool_Common;
 use common\service\CommonService;
 use common\service\helpers\ThirdD;
 use yii\helpers\Json;
@@ -378,11 +379,13 @@ class ThirdDTypeService extends CommonBaseService
         $single = 0;
         $text = trim($text);
 
+        $t=0; # 匹配倍数走进哪个逻辑标识
         $single_cn_text = '元';
         // 使用正则表达式匹配 直选复式
         if ($playMethod['name']=='直选复式' && preg_match('/(\d+(?:\.\d+)?)元/', $text, $matches)) {
             $single_txt = $matches[1];
             $single = $matches[1];
+            $t = 1;
             #$count = $playMethod['count']? $playMethod['count']*$matches[1] : $matches[1];
         }
 
@@ -390,17 +393,20 @@ class ThirdDTypeService extends CommonBaseService
         if ($playMethod['name']=='全倒' && preg_match('/(\d+(?:\.\d+)?)元/', $text, $matches)) {
             $single_txt = $matches[1];
             $single = $playMethod['single']? $playMethod['single']*$matches[1] : $matches[1];
+            $t = 2;
         }
 
         // 使用正则表达式匹配 "各" 或 "共" 后面的数字
         if (empty($single) && preg_match('/各\s*(\d+(?:\.\d+)?)\s*元/', $text, $matches)) {
             $single_txt = $matches[1];
             $single = $matches[1];
+            $t = 3;
         }
         // 使用正则表达式匹配 "各" 和 "倍" 中间的数字
         if (empty($single) && preg_match('/各\s*(\d+)\s*倍/', $text, $matches)) { # 匹配金额切非倍数,因为 各2倍，会误判的为：各2元
             $single_cn_text = '倍';
             $single_cn = $matches[1];
+            $t = 4;
         }
 
         // 使用正则表达式匹配 "倍" 前面的中文一到九
@@ -411,6 +417,7 @@ class ThirdDTypeService extends CommonBaseService
             $single = $s * (int)$methods[$matchName]['money'];
             $single_cn_text = '倍';
             $single_cn = $s;
+            $t = 5;
         }
 
         // 使用正则表达式匹配 "倍" 前面的数字
@@ -421,23 +428,27 @@ class ThirdDTypeService extends CommonBaseService
             $single = $t * (int)$methods[$matchName]['money'];
             $single_cn_text = '倍';
             $single_cn = $t;
+            $t = 6;
         }
 
         // 使用正则表达式匹配 "各" 或 "共" 后面的数字
         if (empty($single) && preg_match('/\s*(\d+)\s*元/', $text, $matches)) {
             $single_txt = $matches[1];
             $single = $matches[1];
+            $t = 7;
         }
         // 使用正则表达式匹配 "各" 或 "共" 后面的数字
         if (empty($single) && preg_match('/各\s*(\d+)/', $text, $matches)) {
             $single_txt = $matches[1];
             $single = $matches[1];
+            $t = 8;
         }
 
         if (empty($single) && preg_match('/([一二两三四五六七八九十百千万]{1,3})元/u', $text, $matches)) {
             $t = $matches[1];
             $single_txt = $matches[1];
             $single = ThirdD::cn2num($t); # 中文转数字
+            $t = 9;
         }
         if (empty($single) && preg_match('/(?:组选|组六|组三)?([一二两三四五六七八九十百千万]{1,3})\s*倍/u', $text, $matches)) {
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
@@ -446,6 +457,7 @@ class ThirdDTypeService extends CommonBaseService
             $single = $s * (int)$methods[$matchName]['money'];
             $single_cn_text = '倍';
             $single_cn = $s;
+            $t = 10;
         }
 
         $data = [
@@ -461,6 +473,7 @@ class ThirdDTypeService extends CommonBaseService
                 $data['all_moneys'] = $matches[1];
             }
         }
+        Tool_Common::log('/matchSingle/'.__FUNCTION__, 'INFO', '匹配倍数', ['text'=>$text,  't'=>$t, 'data'=>$data]);
 
         return $data;
     }
