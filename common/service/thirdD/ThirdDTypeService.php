@@ -133,8 +133,8 @@ class ThirdDTypeService extends CommonBaseService
             $methodArr = MethodMatchService::matchYiMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }elseif($methodArr['originName'] == '二码定位'){ # 8二码定位
             $methodArr = MethodMatchService::matchErMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }elseif(strpos($text, '全包')!==false){ # 9豹子全包
-            $methodArr = MethodMatchService::matchQuanBao($matchMethodAndCodeText, $codes, $count);
+        #}elseif(strpos($text, '全包')!==false){ # 9豹子全包
+        #    $methodArr = MethodMatchService::matchQuanBao($matchMethodAndCodeText, $codes, $count);
         }else if(
             (
                 strpos($text, '复式')===false && (

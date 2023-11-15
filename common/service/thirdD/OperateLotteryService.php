@@ -99,6 +99,9 @@ class OperateLotteryService extends CommonBaseService
                 case MethodMatchService::METHOD_ID_QUANTUO: # 对子全拖
                     OperateLotteryService::runShuangFen($betRow, $kjCode);
                     break;
+                case MethodMatchService::METHOD_ID_DUIZI_QB: # 对子全包
+                    OperateLotteryService::runDuiZiQB($betRow, $kjCode);
+                    break;
                 case MethodMatchService::METHOD_ID_YIMADING: # 一码定
                     OperateLotteryService::runYiMaDing($betRow, $kjCode);
                     break;
@@ -323,7 +326,8 @@ class OperateLotteryService extends CommonBaseService
      * @return bool
      * @throws \common\exceptions\InfoException
      */
-    public static function runShuangFen(object $betRow, $kjCode=''){
+    public static function runShuangFen(object $betRow, string $kjCode=''): bool
+    {
         if(empty($betRow)){
             throw_info('记录不能为空');
         }
@@ -339,7 +343,7 @@ class OperateLotteryService extends CommonBaseService
         $zjCount = 0;
         $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
         foreach ($betCodes as $code){
-            if(!in_array($code, $kj_code_2n)) continue;
+            if(!in_array($code, $kj_code_2n) OR ($kjCodeArr[0]==$kjCodeArr[1] && $kjCodeArr[1]==$kjCodeArr[2])) continue; # 对子双飞，出豹子不中
             $zjCount += (int)($betCount[$code]);
         }
         #p(['kj_code_2n'=>$kj_code_2n, 'betCodes'=>$betCodes, 'zjCount'=>$zjCount, 'betCounts'=>$betCount]);
@@ -466,6 +470,28 @@ class OperateLotteryService extends CommonBaseService
         $zjCount = ($kjCodeArr[0]==$kjCodeArr[1] && $kjCodeArr[1]==$kjCodeArr[2]) ? 1 : 0;
         #p(['RowId'=>$betRow->id, 'posKjCode'=>$posKjCode, 'oneErDingCodeDatas'=>$oneErDingCodeDatas, 'counts'=>$counts, 'count'=>$count]);
         #p(['betCodes'=>$betCodes, 'kjCodeArr'=>$kjCodeArr, 'zjCount'=>$zjCount]);
+        self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
+
+        return true;
+    }
+
+    /**
+     * 对子全包
+     * @param object $row
+     * @param string $kjCode 2,3,4
+     * @return bool
+     * @throws \common\exceptions\InfoException
+     */
+    public static function runDuiZiQB(object $betRow, string $kjCode=''): bool
+    {
+        if(empty($betRow)){
+            throw_info('记录不能为空');
+        }
+        $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
+
+        $kjCodeArr = explode(',', $kjCode);
+
+        $zjCount = ($kjCodeArr[0]==$kjCodeArr[1] OR $kjCodeArr[0]==$kjCodeArr[2] OR $kjCodeArr[1]==$kjCodeArr[2]) ? 1 : 0;
         self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
 
         return true;

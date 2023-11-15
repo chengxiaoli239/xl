@@ -18,8 +18,9 @@ class MethodMatchService extends CommonBaseService
     const METHOD_ID_ZUSAN = 2;
     const METHOD_ID_ZULIU = 3;
     const METHOD_ID_DUDAN = 4;
-    const METHOD_ID_SHUANGFEI = 5;
-    const METHOD_ID_QUANTUO = 6; # 对子全拖、双飞
+    const METHOD_ID_SHUANGFEI = 5; # 双飞
+    const METHOD_ID_QUANTUO = 6; # 对子全拖
+    const METHOD_ID_DUIZI_QB = 94; # 对子全包
     const METHOD_ID_YIMADING = 7;
     const METHOD_ID_ERMADING = 8;
     const METHOD_ID_BAOZI_QB = 9; # 豹子全包
@@ -744,23 +745,29 @@ class MethodMatchService extends CommonBaseService
      * @param array $codes
      * @return array
      */
-    public static function matchQuanBao($text='', &$codes=[], &$count=0){
+    public static function matchQuanBao(string $text='', array &$codes=[], &$count=0): array
+    {
         $methodArr = [];
         // 使用正则表达式匹配所有单个数字
         if (preg_match_all('/组三/u', $text, $matches)) {
             $numbers = $matches[0];
             $name = '组三全包';
-            $methodArr[] = ['id'=>16, 'name'=>$name, 'codes'=>$name, 'count'=>1];
+            $methodArr[] = ['id'=>MethodMatchService::METHOD_ID_ZS_QB, 'name'=>$name, 'codes'=>$name, 'count'=>1];
         }
         if (preg_match_all('/组六/u', $text, $matches)) {
             $numbers = $matches[0];
             $name = '组六全包';
-            $methodArr[] = ['id'=>16, 'name'=>$name, 'codes'=>$name, 'count'=>1];
+            $methodArr[] = ['id'=>MethodMatchService::METHOD_ID_ZL_QB, 'name'=>$name, 'codes'=>$name, 'count'=>1];
         }
         if (preg_match_all('/组六/u', $text, $matches)) {
             $numbers = $matches[0];
             $name = '豹子全包';
-            $methodArr[] = ['id'=>16, 'name'=>$name, 'codes'=>$name, 'count'=>1];
+            $methodArr[] = ['id'=>MethodMatchService::METHOD_ID_BAOZI_QB, 'name'=>$name, 'codes'=>$name, 'count'=>1];
+        }
+        if (preg_match_all('/对子/u', $text, $matches)) {
+            $numbers = $matches[0];
+            $name = '对子全包';
+            $methodArr[] = ['id'=>MethodMatchService::METHOD_ID_DUIZI_QB, 'name'=>$name, 'codes'=>$name, 'count'=>1];
         }
         if(empty($methodArr)){
             throw_info('匹配玩法异常');

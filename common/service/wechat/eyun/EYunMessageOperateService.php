@@ -5,6 +5,7 @@ namespace common\service\wechat\eyun;
 use backend\models\thirdD\BetsBackend;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\agent\AgentUsersService;
+use backend\service\BetService;
 use backend\service\HN0898Service;
 use common\models\eyun\RobotUser;
 use common\models\thirdD\BetOrderId;
@@ -473,7 +474,8 @@ class EYunMessageOperateService  extends EYunBaseService
             $logArr = ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData, 'replyTxts'=>$replyTxts, 'pushSiteDatas'=>$pushSiteDatas];
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-成功', $logArr);
             foreach ($pushSiteDatas as $pushSiteData){
-                $pushSiteData['queue_delay_time'] = 120;
+                $second = BetService::getConfig('HOLD_ORDER_SECONDS')??120;
+                $pushSiteData['queue_delay_time'] = $second;
                 push_queue_open(SsxxBetJobs::class, $pushSiteData);
             }
         }catch (\Exception $e){

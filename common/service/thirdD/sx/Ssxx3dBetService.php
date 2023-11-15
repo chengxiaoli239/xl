@@ -86,6 +86,9 @@ class Ssxx3dBetService extends CommonBaseService
                         $betCodes = '全包';
                     }
                     break;
+                case MethodMatchService::METHOD_ID_DUIZI_QB:
+                    $betCodes = '全包';
+                    break;
                 case MethodMatchService::METHOD_ID_YIMADING: # 一码定
                     // todo codes需要转换格式，拆分成多组号码 <option value="204">一码定位</option>code[0]["actionData"] => "XX1,2XX,X3X"
                     $betCodes = Ssxx3dBetService::resetOneFixed($betCodes);
