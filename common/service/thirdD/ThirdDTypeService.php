@@ -153,7 +153,7 @@ class ThirdDTypeService extends CommonBaseService
                 (strpos($text, '直') !== false && strpos($text, '复式')===false)
             ))
         ) { # 1、2、3组选
-            list($matchMethodAndCodeText, $singleArr) = ThirdDTypeService::getTwoMethodAndSingle($text, $matchMethodAndCodeText, $singleArr);
+            list($matchMethodAndCodeText, $singleArr) = ThirdDTypeService::getTwoMethodAndSingle($text, $matchMethodAndCodeText);
             #p([$matchMethodAndCodeText, $text, $singleArr]);
             $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count, $singleArr);
 
