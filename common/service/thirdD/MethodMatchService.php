@@ -293,11 +293,13 @@ class MethodMatchService extends CommonBaseService
                     break;
                 case (strpos($text, '组三') !== false && strpos($text, '组六') !== false):
                     if($len<=2){
-                        throw_info('组六号码至少为三个：'.$code);
+                        //throw_info('组六号码至少为三个：'.$code);
+                        break;
                     }
                     if($len==3){
                         if($flag){
-                            throw_info('组六号码不能有重复：'.$code);
+                            break;
+                            //throw_info('组六号码不能有重复：'.$code);
                         }
 
                         # 组六
@@ -316,7 +318,8 @@ class MethodMatchService extends CommonBaseService
                     }else{
                         # len>3
                         if($flag){
-                            throw_info('组三组六多码号码不能有重复：'.$code);
+                            break;
+                            //throw_info('组三组六多码号码不能有重复：'.$code);
                         }
                         MethodMatchService::getMethodArrDatas($reSortCode, '组三', $methodArr, $singleArr);
                         MethodMatchService::getMethodArrDatas($reSortCode, '组六', $methodArr, $singleArr);
@@ -327,7 +330,8 @@ class MethodMatchService extends CommonBaseService
                         if($len==3){ # 常规的组三
                             $methodArr['methodArr3'][] = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
                         }else{
-                            throw_info('组三号码不能重复：'.$code);
+                            break;
+                            //throw_info('组三号码不能重复：'.$code);
                         }
                     }else{
                         # 组三多码
@@ -340,21 +344,22 @@ class MethodMatchService extends CommonBaseService
                         break;
                     }
                     if($flag){
-                        throw_info('组六号码不能重复：'.$code.'_'.$text);
+                        break;
+                        //throw_info('组六号码不能重复：'.$code.'_'.$text);
+                    }
+                    if($len==3){ # 常规的组六
+                        $methodArr['methodArr6'][] = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
                     }else{
-                        if($len==3){ # 常规的组六
-                            $methodArr['methodArr6'][] = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
-                        }else{
-                            # 组六多码
-                            MethodMatchService::getMethodArrDatas($reSortCode, '组六', $methodArr);
-                        }
+                        # 组六多码
+                        MethodMatchService::getMethodArrDatas($reSortCode, '组六', $methodArr);
                     }
                     break;
                 case strpos($text, '组') !== false:
                 #case strpos($text, '组选') !== false:
                     # 组三或组六 根据号码类型决定
                     if($len<3){
-                        throw_info('组选号码至少3个号码：'.$code);
+                        #throw_info('组选号码至少3个号码：'.$code);
+                        break;
                     }
                     if($len==3){
                         if($flag){

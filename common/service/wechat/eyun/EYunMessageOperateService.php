@@ -423,7 +423,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $pushSiteDatas = [];
             foreach ($betCodeContents as $lottery_type=>$contents){
                 $qihao = (string)HN0898Service::getQihao($lottery_type);
-                $oneReplyTxt = '【课号】'.$qihao;
+                $oneReplyTxt = '【课号】'.$contents[0]['lottery_name'].$qihao;
                 $betContent = "\n【内容】";
 
                 foreach ($contents as $playMethods){
