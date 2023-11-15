@@ -42,9 +42,9 @@ $username = AdminModel::findOne($uid)->username;
 <script>
 $(function () {
     $('.tz_system_id').click(function () {
-        $.each($("input[name='TzSystemsAuth[tz_types][]'"), function (n) {
-            $(this).attr('checked', false);
-        });
+        //$.each($("input[name='TzSystemsAuth[tz_types][]'"), function (n) {
+        //    $(this).attr('checked', false);
+        //});
 
         system_id = $(this).find('input').val();
         if($("#s_tz_types_"+system_id).length>0){

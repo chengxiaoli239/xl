@@ -115,7 +115,8 @@ class UserService extends BaseService {
      * @param $uid
      * @param string $opType
      */
-    public static function saveTzSystemUsers($tz_systems_ids_Arr, $uid, $opType = 'add'){
+    public static function saveTzSystemUsers($tz_systems_ids_Arr, $uid, string $opType = 'add'): bool
+    {
         //p([$tz_systems_ids_Arr, $uid, $opType],0);
 
         foreach ($tz_systems_ids_Arr as $tz_system_id){

@@ -69,6 +69,7 @@ class UserController extends BaseController
             $model = new TzSystemsAuth();
         }
         UserService::preOpenData($this->_post, $uid);
+        #p($this->_post['TzSystemsAuth']['tz_systems_ids']);
 
         if ($model->load($this->_post) && $model->save()) {
             UserService::saveTzSystemUsers(explode(',', $this->_post['TzSystemsAuth']['tz_systems_ids']), $uid);
