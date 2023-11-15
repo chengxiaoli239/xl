@@ -1,6 +1,7 @@
 <?php
 namespace console\modules\test\controllers;
 
+use backend\models\thirdD\BetsBackend;
 use common\service\thirdD\sx\Ssxx3dBetService;
 use common\tools\Util;
 use DateTime;
@@ -18,6 +19,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $betRow = BetsBackend::findOne('1176');
+            list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);p([$code, $data, $msg]);
             $betCodes = Ssxx3dBetService::resetOneZhiXuanFuShi($betCodes='1246;5678');p($betCodes);
             $qihao = Util::getBeforeNumQihao($dateString, $n=2);
             echo $qihao;

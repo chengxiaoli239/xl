@@ -348,24 +348,7 @@ class Ssxx3dBetService extends CommonBaseService
     public static function resetOneQuanDao($dataStr): string
     {
         # 全倒 => 459 678  =>	元
-        $dataStrs = explode(MethodMatchService::ZU_SPLIT_FLAG, $dataStr);
-        p($dataStrs);
-
-        $datas = [];
-        foreach ($dataStrs as $dataStr){
-            $len = strlen($dataStr);
-            for ($i=0; $i<$len; $i++){
-                for ($j=0; $j<$len; $j++){
-                    if($j==$i) continue;
-                    for ($k=0; $k<$len; $k++) {
-                        if($j==$k OR $i==$k) continue;
-                        $datas[] = $dataStr[$i] . $dataStr[$j] . $dataStr[$k];
-                    }
-                }
-            }
-        }
-        $dataStr = implode(',', $datas);
-        return $dataStr;
+        return self::extracted($dataStr);
     }
 
     /**
@@ -376,23 +359,7 @@ class Ssxx3dBetService extends CommonBaseService
     public static function resetOneZhiXuanFuShi($dataStr): string
     {
         # 福[直选复式] => 45678  =>	60.00元
-        $dataStrs = explode(MethodMatchService::ZU_SPLIT_FLAG, $dataStr);
-
-        $datas = [];
-        foreach ($dataStrs as $dataStr){
-            $len = strlen($dataStr);
-            for ($i=0; $i<$len; $i++){
-                for ($j=0; $j<$len; $j++){
-                    if($j==$i) continue;
-                    for ($k=0; $k<$len; $k++) {
-                        if($j==$k OR $i==$k) continue;
-                        $datas[] = $dataStr[$i] . $dataStr[$j] . $dataStr[$k];
-                    }
-                }
-            }
-        }
-        $dataStr = implode(',', $datas);
-        return $dataStr;
+        return self::extracted($dataStr);
     }
 
 
@@ -438,5 +405,30 @@ class Ssxx3dBetService extends CommonBaseService
         Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘', $logArr);
 
         return true;
+    }
+
+    /**
+     * @param $dataStr
+     * @return string
+     */
+    public static function extracted($dataStr): string
+    {
+        $dataStrs = explode(MethodMatchService::ZU_SPLIT_FLAG, $dataStr);
+
+        $datas = [];
+        foreach ($dataStrs as $dataStr) {
+            $len = strlen($dataStr);
+            for ($i = 0; $i < $len; $i++) {
+                for ($j = 0; $j < $len; $j++) {
+                    if ($j == $i) continue;
+                    for ($k = 0; $k < $len; $k++) {
+                        if ($j == $k or $i == $k) continue;
+                        $datas[] = $dataStr[$i] . $dataStr[$j] . $dataStr[$k];
+                    }
+                }
+            }
+        }
+        $dataStr = implode(',', $datas);
+        return $dataStr;
     }
 }
