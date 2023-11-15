@@ -80,8 +80,11 @@ class Ssxx3dBetService extends CommonBaseService
                 case MethodMatchService::METHOD_ID_DUDAN: # 独胆
                     break;
                 case MethodMatchService::METHOD_ID_SHUANGFEI: # 双飞
+                    break;
                 case MethodMatchService::METHOD_ID_QUANTUO: # 对子全拖、对子全包
-                    $betCodes = '全包';
+                    if(strpos($betCodes, '全包') !== false){
+                        $betCodes = '全包';
+                    }
                     break;
                 case MethodMatchService::METHOD_ID_YIMADING: # 一码定
                     // todo codes需要转换格式，拆分成多组号码 <option value="204">一码定位</option>code[0]["actionData"] => "XX1,2XX,X3X"
