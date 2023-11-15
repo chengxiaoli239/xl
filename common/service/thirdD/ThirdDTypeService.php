@@ -80,7 +80,8 @@ class ThirdDTypeService extends CommonBaseService
      * @param string $text
      * @return array
      */
-    public static function getPlayMethodAndCodes($text='', &$codes=[]){
+    public static function getPlayMethodAndCodes(string $text='', &$codes=[]): array
+    {
         #$methods = PlayMethodService::getMethods();
         $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
         //p([$text, $methods]);
@@ -292,10 +293,10 @@ class ThirdDTypeService extends CommonBaseService
                     if(strpos($sData[1], '倍') !== false){ # 倍
                         $singleTxt = str_replace(['倍', '组选', '组三', '组六', '组', '直选', '直'], '', $sData[1]);
                         if(is_numeric($singleTxt)){
-                            $tmpSingle = $singleTxt * 10; #  转换成元
+                            $tmpSingle = $singleTxt * 2; #  转换成元
                         }else{
                             # 中文
-                            $tmpSingle = ThirdD::cn2num($singleTxt) * 10; #  # 中文转数字  转换成元
+                            $tmpSingle = ThirdD::cn2num($singleTxt) * 2; #  # 中文转数字  转换成元
                         }
                     }else{
                         $singleTxt = str_replace('元', '', $sData[1]);
@@ -422,14 +423,15 @@ class ThirdDTypeService extends CommonBaseService
         }
 
         // 使用正则表达式匹配 "倍" 前面的数字
-        if(empty($single) && preg_match('/各{0,1}(\d+)倍/u', $text, $matches)) {
+        if(empty($single) && preg_match('/各\s*(\d+)倍/u', $text, $matches)) {
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
             $t = $matches[1];
             #p([$t, $s, $matchName, $matches, $methods]);
             $single = $t * (int)$methods[$matchName]['money'];
+            //p([$text, $single, $t, $methods[$matchName], $matches]);
             #p([$single, $methods[$matchName]]);
-            $single_cn_text = '倍';
-            $single_cn = $t;
+            $single_cn_text = '';
+            $single_cn = '';
             $t = 6;
         }
 

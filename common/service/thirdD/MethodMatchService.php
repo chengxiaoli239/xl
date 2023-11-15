@@ -188,7 +188,8 @@ class MethodMatchService extends CommonBaseService
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function matchZhiZuOrZuSanOrZuLiuXMa($text='', &$codes=[], &$count=0, $singleArr=[]){
+    public static function matchZhiZuOrZuSanOrZuLiuXMa(string $text='', array &$codes=[], &$count=0, array $singleArr=[]): array
+    {
         #$text = explode('元', $text)[0];
         #$text = explode('倍', $text)[0];
         // 使用正则表达式匹配组选后面的三个数字
