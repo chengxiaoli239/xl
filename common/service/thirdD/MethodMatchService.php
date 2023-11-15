@@ -562,7 +562,7 @@ class MethodMatchService extends CommonBaseService
     {
         // 使用正则表达式匹配所有单个数字
         $text = str_replace(',', ' ', trim($text));
-        if (strpos($text, '双飞') !==false && preg_match_all('/(\d{2})/', $text, $matches)) {
+        if ((strpos($text, '双飞') !==false OR strpos($text, '飞') !==false) && preg_match_all('/(\d{2})/', $text, $matches)) {
             $codes = $matches[1];
         }
 
