@@ -167,6 +167,10 @@ class TzSystemsUsersController extends BaseController
         }
 
         if ($model->load($post) && $model->save()) {
+            $is3dUser = UserService::is3dUser($this->_user_id);
+            if($is3dUser){
+                return $this->redirect(['/wechat/robot-user/view']);
+            }
             return $this->redirect(['/forum/user/view.html']);
         }
 
