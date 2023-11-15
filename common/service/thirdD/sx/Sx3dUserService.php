@@ -71,13 +71,16 @@ class Sx3dUserService extends CommonBaseService
             'X-Requested-With' => 'XMLHttpRequest',
         ];
         $result = \common\open\thirdD\api\SiteUserApi::getUserInfo($domain, $headers);
+        $logArr = ['tz_system_id'=>$tz_system_id, 'uid'=>$TzSystemsUser->uid];
         if(empty($result) OR strpos($result['m'], '登录') !== false){
             $flag = false;
+            $logArr['result'] = $result;
         }else{
             $siteUserInfo = $result;
         }
         $result2 = \common\open\thirdD\api\SiteUserApi::getAppNews($domain, $headers);
-        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '保持登陆请求', ['tz_system_id'=>$tz_system_id, 'result'=>$result, 'result2'=>$result2]);
+        $logArr['result2'] = $result2;
+        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '保持登陆请求', $logArr);
 
         return $flag;
     }
