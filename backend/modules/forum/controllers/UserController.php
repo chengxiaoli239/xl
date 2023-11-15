@@ -74,7 +74,7 @@ class UserController extends BaseController
         if ($model->load($this->_post) && $model->save()) {
             UserService::saveTzSystemUsers(explode(',', $this->_post['TzSystemsAuth']['tz_systems_ids']), $uid);
             CommonService::delUserBetRecords($uid);
-            $oneTzSystemId = $this->_post['TzSystemsAuth']['tz_systems_ids'][0];
+            $oneTzSystemId = explode(',', $this->_post['TzSystemsAuth']['tz_systems_ids'])[0];
             if(!empty($oneTzSystemId)){
                 $TzSystems = TzSystems::findOne($oneTzSystemId);
                 if(in_array($TzSystems->system_type_id, [15])){ # 3d类型站点
