@@ -19,7 +19,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $betRow = BetsBackend::findOne('1176');
+            $betRow = BetsBackend::findOne('1177');
             list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);p([$code, $data, $msg]);
             $betCodes = Ssxx3dBetService::resetOneZhiXuanFuShi($betCodes='1246;5678');p($betCodes);
             $qihao = Util::getBeforeNumQihao($dateString, $n=2);

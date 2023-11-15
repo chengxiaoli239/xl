@@ -398,11 +398,10 @@ class Ssxx3dBetService extends CommonBaseService
 
         $result = SiteOrderApi::push($site['ssc_domain'], $post_data, $headers);
         $logArr = ['user_id'=>$user_id, 'method_id'=>$method_id, 'post_data'=>$post_data, 'lottery_type'=>$lottery_type, 'result'=>$result];
-        if($result != 2){
+        Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘', $logArr);
+        if($result['s'] != 2){ # 错误码：2成功、9918 登录超时....
             throw_info($result['m']??'推送盘口异常');
         }
-
-        Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘', $logArr);
 
         return true;
     }
