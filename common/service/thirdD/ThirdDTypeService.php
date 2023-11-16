@@ -111,11 +111,12 @@ class ThirdDTypeService extends CommonBaseService
 
         $countY = mb_substr_count($text, '元'); # 元
         $countB = mb_substr_count($text, '倍'); # 倍
-        if($countB>1 OR $countY>1){
-            $matchMethodAndCodeText = $text;
-        }else{
-            $matchMethodAndCodeText = explode('各', $text)[0];
-        }
+        $matchMethodAndCodeText = $text;
+        #if($countB>1 OR $countY>1){
+        #    $matchMethodAndCodeText = $text;
+        #}else{
+        #    $matchMethodAndCodeText = explode('各', $text)[0];
+        #}
         #p(['methodArr'=>$methodArr, 'text'=>$text, 'matchMethodAndCodeText'=>$matchMethodAndCodeText]);
         #if(strpos($matchMethodAndCodeText, $methodArr['name'])===false) $matchMethodAndCodeText = $methodArr['name'].$matchMethodAndCodeText;
         if(strpos($text, '全包')!==false) { # 9豹子全包
@@ -523,7 +524,7 @@ class ThirdDTypeService extends CommonBaseService
 
         $datas = [
             CommonBaseService::LOTTERY_TYPE_FUCAI => ['福彩3D', '福彩3d', '福彩', '福佳', '福3D', '3D', '3d', '福'],
-            CommonBaseService::LOTTERY_TYPE_PL3 => ['排三', '体彩', '体家', '排佳', /*'排3',*/ '体', '排', 'p3'],
+            CommonBaseService::LOTTERY_TYPE_PL3 => ['排列三', '排三', '体彩', '体家', '排佳', /*'排3',*/ '体', '排', 'p3'],
         ];
         if(!isset($datas[$lottery_type])){
             return $datas;

@@ -154,6 +154,26 @@ class MethodMatchService extends CommonBaseService
     const METHOD_SPLIT_FLAG = '#'; # 玩法、或规则之间符号（井号#或句号。）
 
     /**
+     * 为了避免干扰，匹配前倍数字符用空字符串先替换
+     * @param string $text
+     * @return array
+     */
+    public static function replaceSingleText(string &$text=''): array
+    {
+        $originText = $text;
+        if (preg_match_all('/(\d+)元/', $text, $matches1)) {
+            $singleCnTxt = $matches1[0][0];
+            $text = str_replace($singleCnTxt, '', $text);
+        }
+        if (preg_match_all('/共(\d+)/', $text, $matches2)) {
+            $singleCnTxt = $matches2[0][0];
+            $text = str_replace($singleCnTxt, '', $text);
+        }
+
+        return [$originText, $singleCnTxt];
+    }
+
+    /**
      * 1 直选、2/3组选
      * @param string $text
      * @param array $codes
@@ -193,8 +213,10 @@ class MethodMatchService extends CommonBaseService
         #$text = explode('元', $text)[0];
         #$text = explode('倍', $text)[0];
         // 使用正则表达式匹配组选后面的三个数字
+        $matcheCodeText = $text;
+        list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($matcheCodeText); # 匹配号码前倍数字符先替换为空
         #if (preg_match_all('/(\d{2,}(?:\s+\d{2,})*)/', $text, $matches)) {
-        if (preg_match_all('/(\d{2,})+/', $text, $matches)) {
+        if (preg_match_all('/(\d{2,})+/', $matcheCodeText, $matches)) {
             #$codes = explode(' ', trim($matches[1][0]));
             $codes = $matches[1]; # 多组号码，每组一个个元素
         } else {
@@ -538,11 +560,14 @@ class MethodMatchService extends CommonBaseService
      * @param array $codes
      * @return array
      */
-    public static function matchDuDan($text='', &$codes=[], &$count=0, $matchName=''){
+    public static function matchDuDan(string $text='', array &$codes=[], &$count=0, $matchName=''): array
+    {
+        list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
         // 使用正则表达式匹配所有单个数字
-        if (preg_match_all('/胆(\d{1}(?:\s*\d{1})*)/', $text, $matches)) {
-            $numbers = str_replace(' ', '', $matches[1])[0];
+        if (preg_match_all('/胆(\d{1}(?:\s*\d{1})*)/', $text, $matches2)) {
+            $numbers = str_replace(' ', '', $matches2[1])[0];
         }
+        #p([$text, $matchName]);
 
         if(empty($numbers) && $numbers === ''){
             throw_info('['.$matchName.']获取号码异常');
@@ -566,6 +591,7 @@ class MethodMatchService extends CommonBaseService
      */
     public static function matchShuangFei(string $text='', array &$codes=[], &$count=0, $matchName=''): array
     {
+        list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
         // 使用正则表达式匹配所有单个数字
         $text = str_replace(',', ' ', trim($text));
         if ((strpos($text, '双飞') !==false OR strpos($text, '飞') !==false) && preg_match_all('/(\d{2})/', $text, $matches)) {
