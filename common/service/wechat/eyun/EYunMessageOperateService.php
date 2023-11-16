@@ -473,7 +473,8 @@ class EYunMessageOperateService  extends EYunBaseService
                         $pushSiteDatas[] = ['betRowId'=>$Bets->id];
                     }
                 }
-                $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $allMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
+
+                $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $oneAllMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
                 $oneReplyTxt .= $betContent;
                 $oneReplyTxt .= ("\n【单号】".$betOrderId);
                 $oneReplyTxt .= ("\n【成功】√  共".$oneAllCounts."组，共".$oneAllMoneys.'咪');
