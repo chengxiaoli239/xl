@@ -170,12 +170,16 @@ class MethodMatchService extends CommonBaseService
             $singleCnTxt = $matches2[0][0];
             $text = str_replace($singleCnTxt, '', $text);
         }
-        if (preg_match_all('/(\d+)块/', $text, $matches3)) {
-            $singleCnTxt = $matches3[0][0];
+        if (preg_match_all('/各(\d+)/', $text, $matches3)) {
+            $singleCnTxt = $matches2[0][0];
             $text = str_replace($singleCnTxt, '', $text);
         }
-        if (preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})倍/', $text, $matches4)) {
+        if (preg_match_all('/(\d+)块/', $text, $matches4)) {
             $singleCnTxt = $matches4[0][0];
+            $text = str_replace($singleCnTxt, '', $text);
+        }
+        if (preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})倍/', $text, $matches5)) {
+            $singleCnTxt = $matches5[0][0];
             $text = str_replace($singleCnTxt, '', $text);
         }
         //p($text);
@@ -685,6 +689,8 @@ class MethodMatchService extends CommonBaseService
      */
     public static function matchYiMaDing($text='', &$codes=[], &$count=0, $matchName=''){
         // 使用正则表达式匹配所有单个数字
+        $matcheCodeText = $text;
+        list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($matcheCodeText); # 匹配号码前倍数字符先替换为空
         $text = str_replace(' ', '', $text);
         if (preg_match_all('/[百十个]位{0,1}(\d+)/u', $text, $matches)) {
             $numbers = str_replace('位', '', $matches[0]);
@@ -722,7 +728,8 @@ class MethodMatchService extends CommonBaseService
      * @param array $codes
      * @return array
      */
-    public static function matchErMaDing($text='', &$codes=[], &$count=0, $matchName=''){
+    public static function matchErMaDing(string $text='', array &$codes=[], &$count=0, $matchName=''): array
+    {
         // 使用正则表达式匹配所有单个数字
         $text = str_replace(' ', '', $text);
         if (preg_match_all('/[百十个]位{0,1}(\d+)[百十个]位{0,1}(\d+)/u', $text, $matches)) {
@@ -871,14 +878,16 @@ class MethodMatchService extends CommonBaseService
      */
     public static function matchKuaDuX($text='', &$codes=[], &$count=0){
         #$text = trim(str_replace(' ', '', $text));
-        if (preg_match('/(\d+)元/', $text, $matches)) {
-            if(!empty($matches[0])){
-                $text = str_replace($matches[0], '', $text);
-            }
-        }
-        //p([$text, $matches]);
+        #if (preg_match('/(\d+)元/', $text, $matches)) {
+        #    if(!empty($matches[0])){
+        #        $text = str_replace($matches[0], '', $text);
+        #    }
+        #}
+        #//p([$text, $matches]);
 
-        $text = explode('各', trim($text))[0];
+        #$text = explode('各', trim($text))[0];
+        #$matcheCodeText = $text;
+        list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
 
         preg_match('/[\p{Han}]{2}/u', $text, $matchesCn);
         $cnTextMatch = $matchesCn[0];
@@ -940,7 +949,8 @@ class MethodMatchService extends CommonBaseService
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function matchYiMaTuo($text='', &$codes=[], &$count=0, $matchName=''){
+    public static function matchYiMaTuo(string $text='', array &$codes=[], &$count=0, $matchName=''): array
+    {
         $text = explode(' ', trim($text))[0];
         $text = trim(str_replace(' ', '', $text));
         #$text = str_replace($matchName, $matchName.' ', $text);
