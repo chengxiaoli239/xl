@@ -431,6 +431,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 $oneReplyTxt = '【课号】'.$contents[0]['lottery_name'].$qihao;
                 $betContent = "\n【内容】";
 
+                $oneAllMoneys = 0.00;
                 foreach ($contents as $playMethods){
                     $lottery_name = $playMethods['lottery_name'];
                     foreach ($playMethods['playMethod'] as $content){
@@ -462,7 +463,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-02', ['user_id'=>$this->user_id, 'text'=>$text, 'member_id'=>$this->member_id, 'setData'=>$setData]);
                             throw_info(Json::encode($Bets->getErrors(), 320));
                         }
-                        $allMoneys += $content['all_moneys']; # 总投
+                        $oneAllMoneys += $content['all_moneys']; # 总投
                         $allCounts += $content['count']; # 总投
 
                         $betContent .= "\n".$playMethod['name'].'='.$content['codes'].' = '.$content['count'].'*'.$content['single'].' = '.$content['all_moneys'];
@@ -474,7 +475,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $allMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
                 $oneReplyTxt .= $betContent;
                 $oneReplyTxt .= ("\n【单号】".$betOrderId);
-                $oneReplyTxt .= ("\n【成功】√  共".$allCounts."组，共".$allMoneys.'咪');
+                $oneReplyTxt .= ("\n【成功】√  共".$allCounts."组，共".$oneAllMoneys.'咪');
                 $oneReplyTxt .= ("\n【剩余】".$vData['balance'].'咪');
                 $replyTxts[] = $oneReplyTxt;
             }
