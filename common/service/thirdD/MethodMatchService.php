@@ -171,7 +171,7 @@ class MethodMatchService extends CommonBaseService
             $text = str_replace($singleCnTxt, '', $text);
         }
         if (preg_match_all('/各(\d+)/', $text, $matches3)) {
-            $singleCnTxt = $matches2[0][0];
+            $singleCnTxt = $matches3[0][0];
             $text = str_replace($singleCnTxt, '', $text);
         }
         if (preg_match_all('/(\d+)块/', $text, $matches4)) {
