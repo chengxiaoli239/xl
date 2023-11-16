@@ -263,7 +263,7 @@ class MethodMatchService extends CommonBaseService
             $reSortCode = CommonService::reSortCodes([$code])[0]; # 排序数据后的号码
             $flag = \common\service\helpers\ThirdD::judgeCodesRepeat($code, $sortCode); # 判断号码是否有重复，重复则为组三
             switch (true){
-                case (strpos($text, '直') !== false && strpos($text, '组') !== false):
+                case ((strpos($text, '直') !== false OR strpos($text, '单') !== false) && strpos($text, '组') !== false):
                     if($len != 3) {
                         #throw_info('直选或组选号码必须三个：'.$code, self::CODE_FOR_USER);
                         break;
@@ -410,7 +410,7 @@ class MethodMatchService extends CommonBaseService
                         MethodMatchService::getMethodArrDatas($reSortCode, '组六', $methodArr);
                     }
                     break;
-                case strpos($text, '直') !== false:
+                case strpos($text, '直') !== false OR strpos($text, '单选') !== false:
                     if($len != 3) {
                         break;
                     }

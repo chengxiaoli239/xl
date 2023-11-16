@@ -151,8 +151,10 @@ class ThirdDTypeService extends CommonBaseService
                 strpos($text, '组六') !== false OR
                 (strpos($text, '组三') !== false && strpos($text, '组六') !== false) OR
                 (strpos($text, '直') !== false && strpos($text, '组') !== false) OR
+                (strpos($text, '单') !== false && strpos($text, '组') !== false) OR
                 (strpos($text, '组选') !== false) OR
                 (strpos($text, '组') !== false) OR
+                (strpos($text, '单选') !== false) OR
                 (strpos($text, '直') !== false && strpos($text, '复式')===false)
             ))
         ) { # 1、2、3组选
@@ -240,8 +242,8 @@ class ThirdDTypeService extends CommonBaseService
     public static function getTwoMethodAndSingle(string $text='', string $matchMethodAndCodeText='', array &$singleArr=[]): array
     {
         $pattern36 = '/(组六|组三)\s*各\s*([一二两三四五六七八九十]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+\s*倍)/u';
-        $patternZhiZu = '/(直|组三|组六|组)\s*各\s*([一二两三四五六七八九十]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+\s*倍)/u';
-        $patternZhiZuNotBei = '/(直|直选|组三|组六|组选|组)\s*([一二两三四五六七八九十]{1,3}倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+倍)/u';
+        $patternZhiZu = '/(直|单|组三|组六|组)\s*各\s*([一二两三四五六七八九十0-9]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十0-9]{1,3}\s*元|(\d)+\s*倍)/u';
+        $patternZhiZuNotBei = '/(直|单|直选|组三|组六|组选|组)\s*([一二两三四五六七八九十]{1,3}倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+倍)/u';
         switch (true){
             # 匹配组三组六
             case strpos($text, '组三') !== false && strpos($text, '组六') !== false && preg_match_all($pattern36, $text, $matcheSingles):
@@ -292,7 +294,7 @@ class ThirdDTypeService extends CommonBaseService
                 foreach ($matcheSingles[0] as $matcheSingle){
                     $sData = explode('各', $matcheSingle);
                     if(strpos($sData[1], '倍') !== false){ # 倍
-                        $singleTxt = str_replace(['倍', '组选', '组三', '组六', '组', '直选', '直'], '', $sData[1]);
+                        $singleTxt = str_replace(['倍', '组选', '组三', '组六', '组', '直选', '直', '单'], '', $sData[1]);
                         if(is_numeric($singleTxt)){
                             $tmpSingle = $singleTxt * 2; #  转换成元
                         }else{
@@ -328,6 +330,18 @@ class ThirdDTypeService extends CommonBaseService
                     $matchMethodAndCodeText .= '直组';
                 }
                 #p([$text, $matcheSingles, $singleArr]);
+                break;
+            case strpos($text, '单') !== false && strpos($text,'组') !== false && preg_match_all('/(\d+)单\s*(\d+)组/', $text, $matcheSingles):
+                $singleArr['直'] = $matcheSingles[1][0] * 2;
+                $singleArr['组六'] = $matcheSingles[2][0] * 2;
+                $singleArr['组三'] = $matcheSingles[2][0] * 2;
+                $singleArr['组'] = $matcheSingles[2][0] * 2;
+                break;
+            case strpos($text, '单') !== false && strpos($text,'组') !== false && preg_match_all('/(\d+)组\s*(\d+)单/', $text, $matcheSingles):
+                $singleArr['直'] = $matcheSingles[2][0] * 2;
+                $singleArr['组三'] = $matcheSingles[1][0] * 2;
+                $singleArr['组六'] = $matcheSingles[1][0] * 2;
+                $singleArr['组'] = $matcheSingles[1][0] * 2;
                 break;
             case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternZhiZuNotBei, $text, $matcheSingles):
                 foreach ($matcheSingles[0] as $matcheSingle){

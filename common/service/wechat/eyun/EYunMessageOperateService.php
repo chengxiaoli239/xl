@@ -298,6 +298,8 @@ class EYunMessageOperateService  extends EYunBaseService
                             Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-03', $logArr);
                             if(!empty($playMethod['single'])){
                                 $single = $playMethod['single'];
+                            }else if($singleData['single_txt']=='元'){
+                                $single = $singleData['single'];
                             }else if($singleData['single_cn_text']=='倍'){
                                 $Odds = Odds3dService::getOdds($this->user_id, $playMethod['id']); # 玩法赔率
                                 $single = $Odds['money'] * $singleData['single_cn'];
@@ -319,6 +321,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         }
                         #p(['g'=>$g, 'singleData'=>$singleData, 'betText'=>$betText], 0);
                         if(empty($g['single']) OR empty($g['all_moneys'])){
+                            Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '匹配倍异常2', ['betText'=>$betText, 'g'=>$g]);
                             throw_info('匹配倍数或金额异常', CommonBaseService::CODE_FOR_USER);
                         }
                         $dataGroups['betCodeContents'][$lottery_type][] = $g;
