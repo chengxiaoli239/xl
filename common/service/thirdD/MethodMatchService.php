@@ -9,6 +9,7 @@ use yii\helpers\Json;
 
 class MethodMatchService extends CommonBaseService
 {
+    const CN_SINGLE_TEXT = '一二两三四五六七八九十百千万';
     const CODE_TYPE_ZU_SAN = 1; # 组三
     const CODE_TYPE_ZU_LIU = 2; # 组六
     const CODE_TYPE_BAO_ZI = 3; # 豹子
@@ -404,7 +405,11 @@ class MethodMatchService extends CommonBaseService
                     if($len != 3) {
                         break;
                     }
-                    $methodArr['methodArrZhi'][] = ['id'=>self::METHOD_ID_ZHIXUAN, 'name'=>'直选', 'code'=>$code];
+                    $zhi = ['id'=>self::METHOD_ID_ZHIXUAN, 'name'=>'直选', 'code'=>$code];
+                    if(preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})\s*直/u', $text, $matches)){
+                        $zhi['single'] = is_numeric($matches[1]) ? :ThirdD::cn2num($matches[1][0]) * 2; # 中文转数字，一=>1、二=>2.。。。
+                    }
+                    $methodArr['methodArrZhi'][] = $zhi;
                     break;
                 default:
                     throw_info('玩法匹配异常...');

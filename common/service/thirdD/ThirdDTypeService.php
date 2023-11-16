@@ -413,7 +413,7 @@ class ThirdDTypeService extends CommonBaseService
 
         $cnSingleText = ThirdDTypeService::getTextCnSingle($text);
         // 使用正则表达式匹配 "倍" 前面的中文一到九
-        if(empty($single) && preg_match('/([一二两三四五六七八九十百千万]{1,3})倍/u', $cnSingleText, $matches)) {
+        if(empty($single) && preg_match('/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})倍/u', $cnSingleText, $matches)) {
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
             $t = $matches[1];
             $s = ThirdD::cn2num($t); # 中文转数字，一=>1、二=>2.。。。
