@@ -159,7 +159,7 @@ class ThirdDTypeService extends CommonBaseService
             ))
         ) { # 1、2、3组选
             list($matchMethodAndCodeText, $singleArr) = ThirdDTypeService::getTwoMethodAndSingle($text, $matchMethodAndCodeText);
-            #p([$matchMethodAndCodeText, $text, $singleArr]);
+            //p([$matchMethodAndCodeText, $text, $singleArr]);
             $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count, $singleArr);
 
         #}else if($methodArr['originName'] == '组六四码') { # 10组六四码
@@ -351,6 +351,7 @@ class ThirdDTypeService extends CommonBaseService
                             $singleOne = (
                                 strpos($ms[1][0], '直选') !== false OR
                                 strpos($ms[1][0], '直') !== false OR
+                                strpos($ms[1][0], '组') !== false OR
                                 strpos($ms[1][0], '组选') !== false
                             ) ? 2 : 10;
                             $singleTxt = str_replace(['倍', '组选', '组三', '组六', '组', '直选', '直'], '', $ms[2][0]);
@@ -432,6 +433,7 @@ class ThirdDTypeService extends CommonBaseService
             $t = $matches[1];
             $s = ThirdD::cn2num($t); # 中文转数字，一=>1、二=>2.。。。
             $single = $s * (int)$methods[$matchName]['money'];
+            //p([$s, $single, $methods[$matchName]]);
             $single_cn_text = '倍';
             $single_cn = $s;
             $t = 5;

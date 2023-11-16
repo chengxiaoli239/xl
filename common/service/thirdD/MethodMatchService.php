@@ -236,7 +236,7 @@ class MethodMatchService extends CommonBaseService
         } else {
             throw_info('组选未匹配到号码,text:'.$text);
         }
-        //p([$text, $matches, $codes]);
+        //p([$text, $matches, $codes, $singleArr]);
         if(empty($codes)){
             throw_info('匹配组选号码为空');
         }
@@ -315,6 +315,9 @@ class MethodMatchService extends CommonBaseService
                         if(!empty($singleArr['组六'])){
                             $zuliu['single'] = $singleArr['组六'];
                         }
+                        if(!empty($singleArr['组'])){
+                            $zuliu['single'] = $singleArr['组'];
+                        }
                         $methodArr['methodArr6'][] = $zuliu;
                     }else{
                         # 组三
@@ -324,6 +327,9 @@ class MethodMatchService extends CommonBaseService
                         }
                         if(!empty($singleArr['组三'])){
                             $zusan['single'] = $singleArr['组三'];
+                        }
+                        if(!empty($singleArr['组'])){
+                            $zusan['single'] = $singleArr['组'];
                         }
                         $methodArr['methodArr3'][] = $zusan;
                     }
@@ -956,7 +962,7 @@ class MethodMatchService extends CommonBaseService
         #$text = str_replace($matchName, $matchName.' ', $text);
 
         // 使用正则表达式匹配组选后面的三个数字
-        if (preg_match_all('/(\d){1}拖(\d+)/u', $text, $matches1)) {
+        if (preg_match_all('/(\d){1}拖\s*(\d+)/u', $text, $matches1)) {
             $codes1 = trim(str_replace(' ', '', trim($matches1[1][0])));
             $codes2 = trim(str_replace(' ', '', trim($matches1[2][0])));
         }
