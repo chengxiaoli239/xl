@@ -170,6 +170,15 @@ class MethodMatchService extends CommonBaseService
             $singleCnTxt = $matches2[0][0];
             $text = str_replace($singleCnTxt, '', $text);
         }
+        if (preg_match_all('/(\d+)块/', $text, $matches3)) {
+            $singleCnTxt = $matches3[0][0];
+            $text = str_replace($singleCnTxt, '', $text);
+        }
+        if (preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})倍/', $text, $matches4)) {
+            $singleCnTxt = $matches4[0][0];
+            $text = str_replace($singleCnTxt, '', $text);
+        }
+        //p($text);
 
         return [$originText, $singleCnTxt];
     }

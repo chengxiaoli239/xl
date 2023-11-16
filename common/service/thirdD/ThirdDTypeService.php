@@ -435,25 +435,35 @@ class ThirdDTypeService extends CommonBaseService
             $single_cn = '';
             $t = 6;
         }
+        // 使用正则表达式匹配 "倍" 前面的数字
+        if(empty($single) && preg_match('/\s*(\d+)倍/u', $text, $matches)) {
+            $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
+            $t = $matches[1];
+            $single = $t * (int)$methods[$matchName]['money'];
+            //p([$text, $single, $t, $methods[$matchName], $matches]);
+            $single_cn_text = '';
+            $single_cn = '';
+            $t = 7;
+        }
 
         // 使用正则表达式匹配 "各" 或 "共" 后面的数字
         if (empty($single) && preg_match('/\s*(\d+)\s*元/', $text, $matches)) {
             $single_txt = $matches[1];
             $single = $matches[1];
-            $t = 7;
+            $t = 8;
         }
         // 使用正则表达式匹配 "各" 或 "共" 后面的数字
         if (empty($single) && preg_match('/各\s*(\d+)/', $text, $matches)) {
             $single_txt = $matches[1];
             $single = $matches[1];
-            $t = 8;
+            $t = 9;
         }
 
         if (empty($single) && preg_match('/([一二两三四五六七八九十百千万]{1,3})元/u', $cnSingleText, $matches)) {
             $t = $matches[1];
             $single_txt = $matches[1];
             $single = ThirdD::cn2num($t); # 中文转数字
-            $t = 9;
+            $t = 10;
         }
         if (empty($single) && preg_match('/(?:组选|组六|组三)?([一二两三四五六七八九十百千万]{1,3})\s*倍/u', $text, $matches)) {
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
@@ -462,7 +472,7 @@ class ThirdDTypeService extends CommonBaseService
             $single = $s * (int)$methods[$matchName]['money'];
             $single_cn_text = '倍';
             $single_cn = $s;
-            $t = 10;
+            $t = 11;
         }
         # 福0324578组六40
         if(empty($single) && preg_match('/(\d{1,2})$/', $text, $matches)){
