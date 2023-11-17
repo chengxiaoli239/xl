@@ -301,7 +301,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             if(!empty($playMethod['single'])){
                                 $single = $playMethod['single'];
                             }
-                            if(empty($single) && $singleData['single_txt']=='元' && !empty($singleData['single'])){
+                            if(empty($single) && $singleData['single_cn_text']=='元' && !empty($singleData['single'])){
                                 $single = $singleData['single'];
                             }
                             if(empty($single) && $singleData['single_cn_text']=='倍' && !empty($singleData['single_cn'])){

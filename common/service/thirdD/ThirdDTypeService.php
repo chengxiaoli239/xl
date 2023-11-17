@@ -397,7 +397,7 @@ class ThirdDTypeService extends CommonBaseService
         $text = trim($text);
 
         $t=0; # 匹配倍数走进哪个逻辑标识
-        $single_cn_text = '元';
+        $single_cn_text = '元'; # 倍数中文关键字，元或倍
         // 使用正则表达式匹配 直选复式
         if ($playMethod['name']=='直选复式' && preg_match('/(\d+(?:\.\d+)?)元/', $text, $matches)) {
             $single_txt = $matches[1];
