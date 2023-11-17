@@ -261,7 +261,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         if(empty($playMethod)){
                             continue; # 匹配不到玩法则忽略
                         }
-                        $logArr = ['betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count];
+                        $logArr = ['lottery_type'=>$lottery_type, 'betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count, 'isEmpty'=>$isEmpty];
                         Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-01', $logArr);
                         $g['codes'] = $codes;
                         if(ThirdD::getMaxDim($playMethod)>1){
@@ -421,6 +421,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 throw_info('单号生成失败');
             }
             $betCodeContents = $data['dataGroups']['betCodeContents'];
+            p($betCodeContents);
             if(empty($betCodeContents)){
                 return [CommonBaseService::CODE_FOR_USER, [], '匹配异常:请按格式输入'];
             }
