@@ -273,7 +273,9 @@ class EYunMessageOperateService  extends EYunBaseService
                             Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-02', $logArr);
                             foreach ($playMethod as $k=>$pm){
                                 $single = $pm['single'];
-                                //if(!empty($pm['single'])){ }
+                                if(empty($single) && $singleData['single_cn_text']=='元' && !empty($singleData['single'])){
+                                    $single = $singleData['single'];
+                                }
                                 if(empty($single) && $singleData['single_cn_text']=='倍' && !empty($singleData['single_cn'])){
                                     $Odds = Odds3dService::getOdds($this->user_id, $pm['id']); # 玩法赔率
                                     $single = $Odds['money'] * $singleData['single_cn'];
@@ -297,10 +299,6 @@ class EYunMessageOperateService  extends EYunBaseService
                             $singleData = ThirdDTypeService::getMoneys($betText, $playMethod['name'], $playMethod);
                             $logArr = ['betText'=>$betText, 'singleData'=>$singleData, 'playMethod'=>$playMethod];
                             $single = $playMethod['single'];
-                            Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-03', $logArr);
-                            if(!empty($playMethod['single'])){
-                                $single = $playMethod['single'];
-                            }
                             if(empty($single) && $singleData['single_cn_text']=='元' && !empty($singleData['single'])){
                                 $single = $singleData['single'];
                             }
@@ -308,6 +306,7 @@ class EYunMessageOperateService  extends EYunBaseService
                                 $Odds = Odds3dService::getOdds($this->user_id, $playMethod['id']); # 玩法赔率
                                 $single = $Odds['money'] * $singleData['single_cn'];
                             }
+                            Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-03', $logArr);
 
                             $all_moneys = $single * $count;
                             $g['lottery_type'] = $lottery_type;
