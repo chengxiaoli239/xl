@@ -591,10 +591,10 @@ class MethodMatchService extends CommonBaseService
     {
         list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
         // 使用正则表达式匹配所有单个数字
-        if (preg_match_all('/胆\s*(\d{1}(?:\s*\d{1})*)/', $text, $matches2)) {
+        if (preg_match_all('/\s*(\d)/', $text, $matches2)) {
             $numbers = str_replace(' ', '', $matches2[1])[0];
         }
-        #p([$text, $matchName]);
+        p([$text, $matches2, $matchName]);
 
         if(empty($numbers) && $numbers === ''){
             throw_info('['.$matchName.']获取号码异常');
