@@ -123,6 +123,7 @@ class EYunMessageOperateService  extends EYunBaseService
         $text = str_replace('组3 ', '组三 ', $text); # 同义词
         $text = str_replace('组选 ', '组 ', $text); # 同义词
         $text = str_replace('直选 ', '直 ', $text); # 同义词
+        $text = str_replace('二吗 ', '二码 ', $text); # 同义词
         $text = str_replace('，', ' ', $text); # 中文逗号
         $text = str_replace('：', '', $text); # 中文冒号
         $text = str_replace(':', '', $text); # 中文冒号
