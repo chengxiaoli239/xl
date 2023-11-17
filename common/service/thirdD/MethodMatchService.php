@@ -236,7 +236,7 @@ class MethodMatchService extends CommonBaseService
         } else {
             throw_info('组选未匹配到号码,text:'.$text);
         }
-        p([$text, $matches, $codes, $singleArr]);
+        #p([$text, $matches, $codes, $singleArr]);
         if(empty($codes)){
             throw_info('匹配组选号码为空');
         }
