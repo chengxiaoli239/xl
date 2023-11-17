@@ -490,7 +490,7 @@ class ThirdDTypeService extends CommonBaseService
             $t = 6;
         }
         // 使用正则表达式匹配 "倍" 前面的数字
-        if(empty($single) && preg_match('/\s*(\d+)倍/u', $text, $matches)) {
+        if(empty($single) && preg_match('/\s*(\d+)\s*倍/u', $text, $matches)) {
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
             $t = $matches[1];
             $single = $t * (int)$methods[$matchName]['money'];
