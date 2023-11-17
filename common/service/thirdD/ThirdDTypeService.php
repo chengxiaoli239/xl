@@ -495,7 +495,7 @@ class ThirdDTypeService extends CommonBaseService
             $t = $matches[1];
             $single = $t * (int)$methods[$matchName]['money'];
             //p([$text, $single, $t, $methods[$matchName], $matches]);
-            $single_cn_text = '';
+            $single_cn_text = '元';
             $single_cn = '';
             $t = 7;
         }
