@@ -425,7 +425,10 @@ class MethodMatchService extends CommonBaseService
                         break;
                     }
                     $zhi = ['id'=>self::METHOD_ID_ZHIXUAN, 'name'=>'直选', 'code'=>$code];
-                    if(preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})\s*直/u', $text, $matches)){
+                    if(preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})\s*直/u', $text, $matches)
+                        && strpos($text, '倍')===false
+                        && strpos($text, '元')===false
+                    ){
                         $zhi['single'] = is_numeric($matches[1]) ? :ThirdD::cn2num($matches[1][0]) * 2; # 中文转数字，一=>1、二=>2.。。。
                     }
                     $methodArr['methodArrZhi'][] = $zhi;
