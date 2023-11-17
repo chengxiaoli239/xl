@@ -120,6 +120,7 @@ class EYunMessageOperateService  extends EYunBaseService
     {
         #$text = str_replace('。', '#', $text); # 玩法之间分隔符
         $text = str_replace('组6 ', '组六 ', $text); # 同义词
+        $text = str_replace('各', ' 各', $text); # 同义词
         $text = str_replace('组3 ', '组三 ', $text); # 同义词
         $text = str_replace('组选 ', '组 ', $text); # 同义词
         $text = str_replace('直选 ', '直 ', $text); # 同义词
