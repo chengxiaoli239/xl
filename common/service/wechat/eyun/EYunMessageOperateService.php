@@ -471,7 +471,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         $oneAllMoneys += $content['all_moneys']; # 总投
                         $oneAllCounts += $content['count']; # 总投
 
-                        $betContent .= "\n".$playMethod['name'].'='.$content['codes'].' = '.$content['count'].'*'.$content['single'].' = '.$content['all_moneys'];
+                        $betContent .= "\n".$playMethod['name'].$content['codes'].'各'.$content['single'].'共'.$content['all_moneys'];
 
                         # 推送网盘任务：
                         $pushSiteDatas[] = ['betRowId'=>$Bets->id];
