@@ -20,13 +20,10 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $text = '福彩363.366.直选两倍组选两倍。
-
-373.383.365.377.367.305.
-306.307.501直选一倍组选二倍。
-36两码组三一倍。
-总计62';
-            $text = '福306.307.501直选一倍组选二倍。';
+            $text = '福
+036  361七直三组。
+0123689组六80组三20。
+总计140';
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
             $betRow = BetsBackend::findOne('1177');
