@@ -349,7 +349,7 @@ class ThirdDTypeService extends CommonBaseService
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternNotAndYuanBeiCn1, $text, $matcheSingles1): #  && (count($matcheSingles1[0][0])==2)
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternNotAndYuanBeiCn2, $text, $matcheSingles2): #  && (count($matcheSingles2[0][0])==2)
                     $matchType = 3.1;
-                    p([$text, $matcheSingles1, $matcheSingles2]);
+                    #p([$text, $matcheSingles1, $matcheSingles2]);
 
                     foreach ($matcheSingles[1] as $k=>$singleTxt){
                         if(is_numeric($singleTxt)){
@@ -367,7 +367,7 @@ class ThirdDTypeService extends CommonBaseService
                     break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternNotAndYuanBeiNum, $text, $matcheSingles2):
                     $matchType = 3.2;
-                    p([$text, $matcheSingles1, $matcheSingles2]);
+                    #p([$text, $matcheSingles1, $matcheSingles2]);
 
                     foreach ($matcheSingles[1] as $k=>$singleTxt){
                         if(is_numeric($singleTxt)){
