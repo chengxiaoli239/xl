@@ -274,10 +274,12 @@ class EYunMessageOperateService  extends EYunBaseService
                             foreach ($playMethod as $k=>$pm){
                                 if(!empty($pm['single'])){
                                     $single = $pm['single'];
-                                }else if($singleData['single_cn_text']=='倍'){
+                                }
+                                if(empty($single) && $singleData['single_cn_text']=='倍' && !empty($singleData['single_cn'])){
                                     $Odds = Odds3dService::getOdds($this->user_id, $pm['id']); # 玩法赔率
                                     $single = $Odds['money'] * $singleData['single_cn'];
                                 }
+
                                 $all_moneys = $single * $pm['count'];
                                 $playMethod[$k]['codes'] = $pm['codes'];
                                 $playMethod[$k]['single'] = $single;
@@ -298,9 +300,11 @@ class EYunMessageOperateService  extends EYunBaseService
                             Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-03', $logArr);
                             if(!empty($playMethod['single'])){
                                 $single = $playMethod['single'];
-                            }else if($singleData['single_txt']=='元'){
+                            }
+                            if(empty($single) && $singleData['single_txt']=='元' && !empty($singleData['single'])){
                                 $single = $singleData['single'];
-                            }else if($singleData['single_cn_text']=='倍'){
+                            }
+                            if(empty($single) && $singleData['single_cn_text']=='倍' && !empty($singleData['single_cn'])){
                                 $Odds = Odds3dService::getOdds($this->user_id, $playMethod['id']); # 玩法赔率
                                 $single = $Odds['money'] * $singleData['single_cn'];
                             }
