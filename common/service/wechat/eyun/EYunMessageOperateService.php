@@ -261,7 +261,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         if(empty($playMethod)){
                             continue; # 匹配不到玩法则忽略
                         }
-                        $logArr = ['lottery_type'=>$lottery_type, 'betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count, 'isEmpty'=>$isEmpty];
+                        $logArr = ['lottery_type'=>$lottery_type, 'matchTexts'=>$matchTexts, 'betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count, 'isEmpty'=>$isEmpty];
                         Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-01', $logArr);
                         $g['codes'] = $codes;
                         if(ThirdD::getMaxDim($playMethod)>1){
