@@ -244,6 +244,7 @@ class ThirdDTypeService extends CommonBaseService
         $pattern36 = '/(组六|组三)\s*各\s*([一二两三四五六七八九十]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+\s*倍)/u';
         $patternZhiZu = '/(直|单|组三|组六|组)\s*各\s*([一二两三四五六七八九十0-9]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十0-9]{1,3}\s*元|(\d)+\s*倍)/u';
         $patternZhiZuNotBei = '/(直|单|直选|组三|组六|组选|组)\s*([一二两三四五六七八九十]{1,3}倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+倍)/u';
+        $patternNotAndYuanBei = '/(直|单|直选|组三|组六|组选|组)\s*([一二两三四五六七八九十]{1,3}|(\d+)\s*|[一二两三四五六七八九十]{1,3}\s*元|(\d)+)/u';
         switch (true){
             # 匹配组三组六
             case strpos($text, '组三') !== false && strpos($text, '组六') !== false && preg_match_all($pattern36, $text, $matcheSingles):
@@ -331,6 +332,10 @@ class ThirdDTypeService extends CommonBaseService
                 }
                 #p([$text, $matcheSingles, $singleArr]);
                 break;
+            case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternNotAndYuanBei, $text, $matcheSingles):
+                $singleArr['直'] = $matcheSingles[2][0] * 2;
+                $singleArr['组'] = $matcheSingles[2][1] * 2;
+                break;
             case strpos($text, '单') !== false && strpos($text,'组') !== false && preg_match_all('/(\d+)单\s*(\d+)组/', $text, $matcheSingles):
                 $singleArr['直'] = $matcheSingles[1][0] * 2;
                 $singleArr['组六'] = $matcheSingles[2][0] * 2;
@@ -391,7 +396,8 @@ class ThirdDTypeService extends CommonBaseService
      * @param string $text
      * @return array
      */
-    public static function getMoneys($text='', $matchName='', $playMethod=[]){
+    public static function getMoneys(string $text='', $matchName='', $playMethod=[]): array
+    {
         #header('Content-Type: text/html; charset=UTF-8');
         $single = 0;
         $text = trim($text);
