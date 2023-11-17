@@ -247,6 +247,7 @@ class ThirdDTypeService extends CommonBaseService
             $pattern36 = '/(组六|组三)\s*各\s*([一二两三四五六七八九十]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+\s*倍)/u';
             $patternZhiZu = '/(直|单|组三|组六|组)\s*各\s*([一二两三四五六七八九十0-9]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十0-9]{1,3}\s*元|(\d)+\s*倍)/u';
             $patternZhiZuNotBei = '/(直|单|直选|组三|组六|组选|组)\s*([一二两三四五六七八九十]{1,3}倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+倍)/u';
+            $patternNotAndYuanBei0 = '/(直|单|直选|组三|组六|组选|组)([一二两三四五六七八九十0-9]){1,3}倍/u'; # 一直一组、直二组三
             $patternNotAndYuanBei = '/([一二两三四五六七八九十0-9]){1,3}(直|单|直选|组三|组六|组选|组)/u'; # 一直一组、直二组三
             $pattern36_01 = '/(直|单|直选|组三|组六|组选|组)([0-9]{1,3})/u'; # 一直一组、直二组三
             switch (true){
@@ -338,6 +339,21 @@ class ThirdDTypeService extends CommonBaseService
                     }
                     #p([$text, $matcheSingles, $singleArr]);
                     break;
+                case strpos($text, '直') !== false && strpos($text, '组')!==false && preg_match_all($patternNotAndYuanBei0, $text, $matcheSingles):
+                    foreach ($matcheSingles[2] as $k=>$singleTxt){
+                        if(is_numeric($singleTxt)){
+                            $tmpSingle = $singleTxt; #  转换成元
+                        }else{
+                            # 中文
+                            $tmpSingle = ThirdD::cn2num($singleTxt) * 2; #  # 中文转数字  转换成元
+                        }
+                        if(strpos($matcheSingles[0][$k], '组') !==false ){
+                            $singleArr['组'] = $tmpSingle;
+                        }else{
+                            $singleArr['直'] = $tmpSingle;
+                        }
+                    }
+                    break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternNotAndYuanBei, $text, $matcheSingles):
                     $matchType = 3;
                     foreach ($matcheSingles[1] as $k=>$singleTxt){
@@ -347,7 +363,7 @@ class ThirdDTypeService extends CommonBaseService
                             # 中文
                             $tmpSingle = ThirdD::cn2num($singleTxt) * 2; #  # 中文转数字  转换成元
                         }
-                        if(strpos($matcheSingles[0][$k], '组')){
+                        if(strpos($matcheSingles[0][$k], '组') !== false){
                             $singleArr['组'] = $tmpSingle;
                         }else{
                             $singleArr['直'] = $tmpSingle;
