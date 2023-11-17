@@ -267,7 +267,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         if(ThirdD::getMaxDim($playMethod)>1){
                             # 跨度、组三组六混合情况
                             $playMethodKd = $playMethod[0];
-                            $betText = str_replace($playMethodKd['name'], '', $betText);
+                            $betText = str_replace($playMethodKd['name'], ' ', $betText);
                             $singleData = ThirdDTypeService::getMoneys($betText, $playMethodKd['name'], $playMethod);
                             $single = $singleData['single'];
                             $logArr = ['betText'=>$betText, 'singleData'=>$singleData, 'playMethod'=>$playMethod];
@@ -296,7 +296,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             $g['all_moneys'] = $all_moneys;
                             $g['playMethod'] = $playMethod;
                         }else{
-                            $betText = str_replace($playMethod['name'], '', $betText);
+                            $betText = str_replace($playMethod['name'], ' ', $betText);
                             $singleData = ThirdDTypeService::getMoneys($betText, $playMethod['name'], $playMethod);
                             $logArr = ['betText'=>$betText, 'singleData'=>$singleData, 'playMethod'=>$playMethod];
                             $single = $playMethod['single'];
