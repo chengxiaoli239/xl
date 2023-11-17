@@ -484,6 +484,8 @@ class EYunMessageOperateService  extends EYunBaseService
                 $oneReplyTxt .= ("\n【成功】√  共".$oneAllCounts."组，共".$oneAllMoneys.'咪');
                 $oneReplyTxt .= ("\n【剩余】".$vData['balance'].'咪');
                 $replyTxts[] = $oneReplyTxt;
+
+                $allMoneys += $oneAllMoneys;
             }
 
 
