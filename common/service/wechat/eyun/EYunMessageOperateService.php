@@ -300,10 +300,10 @@ class EYunMessageOperateService  extends EYunBaseService
                             $singleData = ThirdDTypeService::getMoneys($betText, $playMethod['name'], $playMethod);
                             $logArr = ['betText'=>$betText, 'singleData'=>$singleData, 'playMethod'=>$playMethod];
                             $single = $playMethod['single'];
-                            if(empty($single) && $singleData['single_cn_text']=='元' && !empty($singleData['single'])){
+                            if(empty($single) && ($singleData['single_cn_text']=='元' OR $singleData['single_txt']=='元') && !empty($singleData['single'])){
                                 $single = $singleData['single'];
                             }
-                            if(empty($single) && $singleData['single_cn_text']=='倍' && !empty($singleData['single_cn'])){
+                            if(empty($single) && ($singleData['single_cn_text']=='倍' OR $singleData['single_txt']=='倍') && !empty($singleData['single_cn'])){
                                 $Odds = Odds3dService::getOdds($this->user_id, $playMethod['id']); # 玩法赔率
                                 $single = $Odds['money'] * $singleData['single_cn'];
                             }
