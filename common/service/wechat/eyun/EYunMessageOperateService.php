@@ -479,7 +479,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 }
 
                 $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $oneAllMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
-                $oneReplyTxt .= $betContent;
+                $oneReplyTxt .= str_replace(';', ',', $betContent);
                 $oneReplyTxt .= ("\n【单号】".$betOrderId);
                 $oneReplyTxt .= ("\n【成功】√  共".$oneAllCounts."组，共".$oneAllMoneys.'咪');
                 $oneReplyTxt .= ("\n【剩余】".$vData['balance'].'咪');
