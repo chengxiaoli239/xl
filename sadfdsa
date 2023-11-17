@@ -9,3 +9,7 @@ ALTER Table lt_wechat_user add `today_profits_loss` decimal(11,2) DEFAULT NULL C
 ALTER Table lt_wechat_user add `all_profits_loss` decimal(11,2) DEFAULT NULL COMMENT '总盈亏' after `today_profits_loss`;
 ALTER Table lt_wechat_user add `bet_url` varchar(255) DEFAULT NULL COMMENT '链接' after `all_profits_loss`;
 ALTER Table lt_wechat_user add `token` varchar(64) DEFAULT NULL COMMENT 'token' after `bet_url`;
+
+
+
+一直一组各1元共132元                         009 009 900 900 090 090 018 081  801  810 180 108  072 027 207 270 720    702 036 063   360 306   603 630 045 054 540   504 405 450  117 117  711  711  171 171 126 162    261 216 621   612 135 153 351 315 513 531 144 144 441 441 414 414 225 225 522 522 252   252 234 243  423 432 324 342                                                   直选 333/   3共 135元
