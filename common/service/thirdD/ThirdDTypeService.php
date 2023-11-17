@@ -32,7 +32,7 @@ class ThirdDTypeService extends CommonBaseService
      * @param string $text
      * @return array
      */
-    public static function getLotteryType(string $text='', &$isEmpty=false): array
+    public static function getLotteryType(string $text=''): array
     {
         $lottery_types = CommonBaseService::THIRDD_LOTTERY_TYPES;
 
@@ -44,6 +44,7 @@ class ThirdDTypeService extends CommonBaseService
                 break;
             }
         }
+        $isEmpty=false;
         if(empty($result)){
             $isEmpty = true;
             # 默认为福彩
@@ -51,7 +52,7 @@ class ThirdDTypeService extends CommonBaseService
         }
         $lottery_name = CommonService::getLotteryName($lottery_type);
 
-        return [$lottery_type, $lottery_name, $result??[]];
+        return [$lottery_type, $lottery_name, $result??[], $isEmpty];
     }
 
     /**

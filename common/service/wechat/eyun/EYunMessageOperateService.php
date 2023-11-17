@@ -245,7 +245,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         #EYunMessageOperateService::resetBetText($betText);
                         $g = [];
                         $g['betText'] = $betText;
-                        list($lottery_type, $lottery_name, $matchTexts) = ThirdDTypeService::getLotteryType($betText, $isEmpty);
+                        list($lottery_type, $lottery_name, $matchTexts, $isEmpty) = ThirdDTypeService::getLotteryType($betText);
                         foreach ($matchTexts as $matchText){
                             $betText = trim(str_replace($matchText, '', $betText), ',');
                         }
@@ -421,7 +421,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 throw_info('单号生成失败');
             }
             $betCodeContents = $data['dataGroups']['betCodeContents'];
-            p($betCodeContents);
+            //p($betCodeContents);
             if(empty($betCodeContents)){
                 return [CommonBaseService::CODE_FOR_USER, [], '匹配异常:请按格式输入'];
             }
