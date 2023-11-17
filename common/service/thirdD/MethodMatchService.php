@@ -594,7 +594,7 @@ class MethodMatchService extends CommonBaseService
         if (preg_match_all('/\s*(\d)/', $text, $matches2)) {
             $numbers = str_replace(' ', '', $matches2[1])[0];
         }
-        p([$text, $matches2, $matchName]);
+        #p([$text, $matches2, $matchName]);
 
         if(empty($numbers) && $numbers === ''){
             throw_info('['.$matchName.']获取号码异常');
