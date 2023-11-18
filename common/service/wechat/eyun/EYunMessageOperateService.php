@@ -111,7 +111,7 @@ class EYunMessageOperateService  extends EYunBaseService
         $texts = [];
         $ts = explode(MethodMatchService::METHOD_SPLIT_ZHIZU, $text);
         foreach ($ts as $t){
-            Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本01', ['t0'=>$t]);
+            Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本01', ['t0'=>$t, 'ttss'=>explode("\n", $t)]);
             if(strpos($t, '拖') !== false){
                 $texts = array_merge($texts, explode("\n", trim($t)));
             }else{
