@@ -152,7 +152,8 @@ class MethodMatchService extends CommonBaseService
 
     const ZU_SPLIT_FLAG = ';'; # 组与组之间符号
     const CODE_SPLIT_FLAG = ','; # 组内号码之间符号
-    const METHOD_SPLIT_FLAG = '#'; # 玩法、或规则之间符号（井号#或句号。）
+    const METHOD_SPLIT_FLAG = "\n"; # 玩法、或规则之间符号（井号#或句号。）
+    const METHOD_SPLIT_ZHIZU = "\n\n"; # 两个换行
 
     /**
      * 为了避免干扰，匹配前倍数字符用空字符串先替换

@@ -108,7 +108,21 @@ class EYunMessageOperateService  extends EYunBaseService
      */
     public static function resetMethodText($text)
     {
-        $text = str_replace('。', '#', $text); # 玩法之间分隔符
+        $texts = [];
+        $ts = explode(MethodMatchService::METHOD_SPLIT_ZHIZU, $text);
+        foreach ($ts as $t){
+            if(
+                (strpos($t, '直') !== false && strpos($t, '组') !== false) OR
+                (strpos($t, '单') !== false && strpos($t, '组') !== false)
+            ){
+                $texts[] = str_replace("\n", ' ', $t);
+            }else{
+                $texts = array_merge($texts, explode("\n", $t));
+            }
+
+        }
+        Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本', ['text'=>$text, 'texts'=>$texts]);
+        $text = str_replace('。', MethodMatchService::METHOD_SPLIT_FLAG, $text); # 玩法之间分隔符
         return $text;
     }
 
