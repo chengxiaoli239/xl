@@ -819,7 +819,7 @@ class MethodMatchService extends CommonBaseService
 
         $codes = implode(self::ZU_SPLIT_FLAG, $codeDatas);
         $methodArr = ['id'=>$methodId, 'name'=>$name, 'codes'=>$codes, 'count'=>$n];
-        p($methodArr);
+        #p($methodArr);
 
         return $methodArr;
     }
