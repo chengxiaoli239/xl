@@ -135,7 +135,7 @@ class EYunMessageOperateService  extends EYunBaseService
         $text = str_replace(['共计', '总计', '计', '='], '共', $text); # 同义词替换
         $text = str_replace(['块', '米', '咪'], '元', $text); # 同义词替换
         $text = str_replace(['托', '脱'], '拖', $text); # 同义词替换
-        $text = str_replace(['、', '*', "\n"], ' ', $text); # 同义词替换
+        //$text = str_replace(['、', "\n"], ' ', $text); # 同义词替换
         $text = str_replace(['各打', '各买', "打", "买"], '各', $text); # 同义词替换
 
         # 特殊倍数匹配
@@ -158,11 +158,12 @@ class EYunMessageOperateService  extends EYunBaseService
             if(preg_match('/共(\d+)/', $text, $matches2)){
                 $allTmpMoney = $matches2[1];
                 if(preg_match('/(\d+)元/', $text, $matches4)){
-                    $text = str_replace($matches4[0], '', $text);
+                    //$text = str_replace($matches4[0], '', $text); // todo 福62.472.482.492 全部3元直 2元组 共70，其中3元会被替换掉，异常
                     $text = str_replace('共', '各'.$matches4[0].'共', $text);
                     $text = rtrim($text, '共');
                 }
             }
+            //p('..'.$text);
         }else{
             if(preg_match('/共(\d+)/', $text, $matches2)){
                 $allTmpMoney = $matches2[1];

@@ -138,6 +138,7 @@ class ThirdDTypeService extends CommonBaseService
         }elseif($methodArr['originName'] == '二码定位'){ # 8二码定位
             $methodArr = MethodMatchService::matchErMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }elseif(
+            #(!preg_match('/百(\d+)/', $text, $m) && !preg_match('/十(\d+)/', $text, $m) && !preg_match('/个(\d+)/', $text, $m) ) &&
             (strpos($text, '百倍')===false && strpos($text, '十倍')===false && strpos($text, '个倍')===false ) &&
             (strpos($text, '百') !== false OR strpos($text, '十') !== false OR strpos($text, '个') !== false )
         ){ # 一、二定位、定位直选复式
@@ -317,6 +318,7 @@ class ThirdDTypeService extends CommonBaseService
                     break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternZhiZu, $text, $matcheSingles):
                     $matchType = 2;
+                    p([$text, $matcheSingles, $patternZhiZu]);
                     foreach ($matcheSingles[0] as $matcheSingle){
                         $sData = explode('各', $matcheSingle);
                         if(strpos($sData[1], '倍') !== false){ # 倍
