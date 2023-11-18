@@ -255,9 +255,10 @@ class ThirdDTypeService extends CommonBaseService
             $patternZhiZuNotBei = '/(直|单|直选|组三|组六|组选|组)\s*([一二两三四五六七八九十]{1,3}倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+倍)/u';
             $patternNotAndYuanBei0 = '/(直|单|直选|组三|组六|组选|组)([一二两三四五六七八九十0-9]){1,3}倍/u'; # 一直一组、直二组三
 
-            #$patternNotAndYuanBeiCn1 = '/((直|单|组|直选|组三|组六|组选)([一二两三四五六七八九十]{1,3}))/u'; # 一直一组、直二组三
+            $patternDanZhi = '/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}单|['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}组)/u'; # 两单一直
+            //p($patternDanZhi);
             #$patternNotAndYuanBeiCn2 = '/(([一二两三四五六七八九十]{1,3})(直|单|组|直选|组三|组六|组选))/u'; # 一直一组、直二组三
-            $patternNotAndYuanBeiCn1 = '/(直([一二两三四五六七八九十]{1,3})组([一二两三四五六七八九十]{1,3}))/u'; # 一直一组、直二组三
+            $patternNotAndYuanBeiCn1 = '/(直([一二两三四五六七八九十]{1,3})组([一二两三四五六七八九十]{1,3}))/u'; # 直一组一、直二组三
             $patternNotAndYuanBeiCn2 = '/(组([一二两三四五六七八九十]{1,3})直([一二两三四五六七八九十]{1,3}))/u'; # 一直一组、直二组三
             $patternBei21 = '/(直\s*\D*\d+倍|组\s*\D*\d+倍)/';
             $patternBei22 = '/(直\s*['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}倍|组\s*['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}倍)/';
@@ -354,6 +355,9 @@ class ThirdDTypeService extends CommonBaseService
                         $matchMethodAndCodeText .= '直组';
                     }
                     #p([$text, $matcheSingles, $singleArr]);
+                    break;
+                case strpos($text, '直') !== false && strpos($text, '单') !== false && preg_match_all($patternDanZhi, $text, $matcheSingles):
+                    p($matcheSingles);
                     break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternNotAndYuanBeiCn1, $text, $matcheSingles1): #  && (count($matcheSingles1[0][0])==2)
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternNotAndYuanBeiCn2, $text, $matcheSingles2): #  && (count($matcheSingles2[0][0])==2)

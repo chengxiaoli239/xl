@@ -273,6 +273,7 @@ class MethodMatchService extends CommonBaseService
                         break;
                     }
                     if(preg_match_all('/[直|组]/u', $text, $matcheTypes)){ # 匹配直组顺序：Array ( [0] => 直 [1] => 组 )
+                        $text = str_replace('单', '直', $text);
                         $mTypes = $matcheTypes; # Array ( [0] => 直 [1] => 组 )
                         if(
                             preg_match_all('/([一二两三四五六七八九])\s*直([一二三四五六七八九])组/u', $text, $matches) OR
@@ -1073,7 +1074,7 @@ class MethodMatchService extends CommonBaseService
             $methodArr[] = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
         }
 
-        //p([$methodArr, $codes]);
+        p([$methodArr, $codes]);
 
         return $methodArr;
     }
