@@ -23,7 +23,7 @@ class IndexController extends Controller
         try {
             $text = '福福家百位7 一倍10块';
             #$text = '百位8 各10元';
-            $methodArr = MethodMatchService::matchDingWei($text, $codes=[], $count); p($methodArr);
+            //$methodArr = MethodMatchService::matchDingWei($text, $codes=[], $count); p($methodArr);
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
             $betRow = BetsBackend::findOne('1177');

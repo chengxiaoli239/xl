@@ -773,7 +773,7 @@ class MethodMatchService extends CommonBaseService
      * @param array $codes
      * @return array
      */
-    public static function matchDingWei(string $text='', array $codes=[], &$count=0, $matchName=''): array
+    public static function matchDingWei(string $text='', array &$codes=[], &$count=0, $matchName=''): array
     {
         list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
         // 使用正则表达式匹配所有单个数字
@@ -802,10 +802,10 @@ class MethodMatchService extends CommonBaseService
 
         $codeData = [];
         if(preg_match_all('/(百\s*\D*\d+|十\s*\D*\d+|个\s*\D*\d+)/', $text, $matches)){
-            $n = 1;
+            $count = 1;
             foreach ($matches[0] as $match){
                 list($pos, $num) = ThirdD::getPosAndNums($match);
-                $n *= strlen($num);
+                $count *= strlen($num);
                 $codeData[] = $pos.':'.$num;
             }
         }
@@ -818,7 +818,7 @@ class MethodMatchService extends CommonBaseService
         $id = $methods[$name]['id'];
 
         $codes = implode(self::ZU_SPLIT_FLAG, $codeDatas);
-        $methodArr = ['id'=>$methodId, 'name'=>$name, 'codes'=>$codes, 'count'=>$n];
+        $methodArr = ['id'=>$methodId, 'name'=>$name, 'codes'=>$codes, 'count'=>$count];
         #p($methodArr);
 
         return $methodArr;
