@@ -21,7 +21,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $text = '福一元 646 663 456 363 633 149 419 415 129 412 459 951 125 192 120 330 933 416 368 621 436 486 326 组选';
+            $text = '245689 组六20 组三10
+共计30';
             //$methodArr = MethodMatchService::matchDingWei($text, $codes=[], $count); p($methodArr);
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
