@@ -427,7 +427,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 throw_info('单号生成失败');
             }
             $betCodeContents = $data['dataGroups']['betCodeContents'];
-            p($betCodeContents);
+            //p($betCodeContents);
             if(empty($betCodeContents)){
                 return [CommonBaseService::CODE_FOR_USER, [], '匹配异常:请按格式输入'];
             }
