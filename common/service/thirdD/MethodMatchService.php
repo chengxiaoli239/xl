@@ -1021,24 +1021,27 @@ class MethodMatchService extends CommonBaseService
      */
     public static function matchYiMaTuo(string $text='', array &$codes=[], &$count=0, $matchName=''): array
     {
-        $text = explode(' ', trim($text))[0];
-        $text = trim(str_replace(' ', '', $text));
+        //$text = explode(' ', trim($text))[0];
+        //$text = trim(str_replace(' ', '', $text));
         #$text = str_replace($matchName, $matchName.' ', $text);
+        //var_dump($text);
 
+        list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
         // 使用正则表达式匹配组选后面的三个数字
-        if (preg_match_all('/(\d){1}拖\s*(\d+)/u', $text, $matches1)) {
-            $codes1 = trim(str_replace(' ', '', trim($matches1[1][0])));
-            $codes2 = trim(str_replace(' ', '', trim($matches1[2][0])));
+        #$patternBei21 = '/(直\s*\D*\d+倍|组\s*\D*\d+倍)/';
+        if (preg_match_all('/(\d{1})拖/', $text, $matches0)) {
+            $tuoCode = $matches0[1][0];
         }
-
-        $codesArr = [];
-        for ($i=0; $i<strlen($codes2); $i++){
-            $codesArr[] = $codes2[$i];
+        if(empty($tuoCode)){
+            throw_info('拖码为空');
         }
-        $codesArr = array_unique($codesArr);
-        if(strlen($codes2) != count($codesArr)){
-            throw_info('拖码有重复：'.$codes2);
+        if (preg_match_all('/(\d{2,})/', $text, $matches1)) {
+            $codeArrs = $matches1[1];
         }
+        if(empty($codeArrs)){
+            throw_info('拖码为空');
+        }
+        //p([$text, $tuoCode, $codeArrs]);
 
         $subMethod = '';
         // 使用正则表达式匹配组选后面的三个数字
@@ -1049,17 +1052,26 @@ class MethodMatchService extends CommonBaseService
         if(empty($subMethod)){
             $subMethod = '组六';
         }
-        $len = strlen($codes2);
-        if(empty($codes2) && $codes2 === ''){
-            throw_info('匹配一码拖号码为空');
+
+        foreach ($codeArrs as $item){
+            for ($i=0; $i<strlen($item); $i++){
+                $codesArr[] = $item[$i];
+            }
+            $codesArr = array_unique($codesArr);
+            if(strlen($item) != count($codesArr)){
+                throw_info('拖码有重复：'.$item);
+            }
+
+            $len = strlen($item);
+            $codes = $tuoCode.'拖'.$item.'_'.$subMethod;
+            $count = 1;
+            $name = '1码拖'.$len.$subMethod;
+            $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
+            $method = $methods[$name];
+            $methodArr[] = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
         }
-        $codes = $codes1.'拖'.$codes2.'_'.$subMethod;
-        $count = 1;
-        $name = '1码拖'.$len.$subMethod;
-        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
-        $method = $methods[$name];
-        $methodArr = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
-        #p([$methodArr, $codes]);
+
+        //p([$methodArr, $codes]);
 
         return $methodArr;
     }
