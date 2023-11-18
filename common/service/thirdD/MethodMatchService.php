@@ -768,6 +768,65 @@ class MethodMatchService extends CommonBaseService
     }
 
     /**
+     * 7/8、一二三码定位
+     * @param string $text
+     * @param array $codes
+     * @return array
+     */
+    public static function matchDingWei(string $text='', array $codes=[], &$count=0, $matchName=''): array
+    {
+        list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
+        // 使用正则表达式匹配所有单个数字
+        //var_dump($text);
+        $codeDatas = [];
+        switch (true){
+            case strpos($text, '百') !== false && strpos($text, '十') !== false && strpos($text, '个') !== false :
+                $methodId = MethodMatchService::METHOD_ID_DW_ZX_FS;
+                $name = '定位直选复式';
+                break;
+            case strpos($text, '百') !== false && strpos($text, '十') !== false:
+            case strpos($text, '百') !== false && strpos($text, '个') !== false:
+            case strpos($text, '十') !== false && strpos($text, '个') !== false:
+                $methodId = MethodMatchService::METHOD_ID_ERMADING;
+                $name = '二码定位';
+                break;
+            case strpos($text, '百') !== false:
+            case strpos($text, '十') !== false:
+            case strpos($text, '个') !== false :
+                $methodId = MethodMatchService::METHOD_ID_YIMADING;
+                $name = '一码定位';
+                break;
+            default:
+                break;
+        }
+
+        $codeData = [];
+        if(preg_match_all('/(百\s*\D*\d+|十\s*\D*\d+|个\s*\D*\d+)/', $text, $matches)){
+            $n = 1;
+            foreach ($matches[0] as $match){
+                list($pos, $num) = ThirdD::getPosAndNums($match);
+                $n *= strlen($num);
+                $codeData[] = $pos.':'.$num;
+            }
+        }
+        if(empty($codeData)){
+            throw_info('匹配异常');
+        }
+        $codeDatas[] = implode(self::CODE_SPLIT_FLAG, $codeData);
+
+        $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
+        $id = $methods[$name]['id'];
+
+        $codes = implode(self::ZU_SPLIT_FLAG, $codeDatas);
+        $methodArr = ['id'=>$methodId, 'name'=>$name, 'codes'=>$codes, 'count'=>$n];
+        p($methodArr);
+
+        return $methodArr;
+    }
+
+
+
+    /**
      * 10-15组六四、五...九码
      * @param string $text
      * @param array $codes

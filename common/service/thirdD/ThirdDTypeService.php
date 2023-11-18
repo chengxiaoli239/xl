@@ -137,6 +137,8 @@ class ThirdDTypeService extends CommonBaseService
             $methodArr = MethodMatchService::matchYiMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }elseif($methodArr['originName'] == '二码定位'){ # 8二码定位
             $methodArr = MethodMatchService::matchErMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+        }elseif(strpos($text, '百') !== false OR strpos($text, '十') !== false OR strpos($text, '个') !== false ){ # 一、二定位、定位直选复式
+            $methodArr = MethodMatchService::matchDingWei($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         #}elseif(strpos($text, '全包')!==false){ # 9豹子全包
         #    $methodArr = MethodMatchService::matchQuanBao($matchMethodAndCodeText, $codes, $count);
         }else if(

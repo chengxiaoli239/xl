@@ -126,7 +126,7 @@ class ThirdD extends BaseService
      * @param $vDim
      * @return int 判断数组维度
      */
-    public static function getMaxDim($vDim)
+    public static function getMaxDim($vDim): int
     {
         if(!is_array($vDim)) return 0;
         else
@@ -189,7 +189,8 @@ class ThirdD extends BaseService
      * @param array $codes ['234', '34']
      * @return array [23, 24, 33, 34, 43, 44]
      */
-    public static function getArrayCodesByArray($codes=[]){
+    public static function getArrayCodesByArray(array $codes=[]): array
+    {
         if(empty($codes)){
             return [];
         }
@@ -219,5 +220,36 @@ class ThirdD extends BaseService
         }
 
         return $data;
+    }
+
+    /**
+     * 匹配百位置以及号码
+     * @param string $text
+     * @return array
+     */
+    public static function getPosAndNums(string $text=''): array
+    {
+        if(preg_match_all('/\d+/', $text, $matches)){
+            switch (true){
+                case strpos($text, '千') !== false:
+                    $pos = '千';
+                    break;
+                case strpos($text, '百') !== false:
+                    $pos = '百';
+                    break;
+                case strpos($text, '十') !== false:
+                    $pos = '十';
+                    break;
+                case strpos($text, '个') !== false:
+                    $pos = '个';
+                    break;
+            }
+            $num = $matches[0][0];
+        }
+        if(empty($pos) OR empty($num)){
+            throw_info('号码或位置匹配异常');
+        }
+
+        return [$pos, $num];
     }
 }

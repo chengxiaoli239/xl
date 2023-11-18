@@ -2,6 +2,7 @@
 namespace console\modules\test\controllers;
 
 use backend\models\thirdD\BetsBackend;
+use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\sx\Ssxx3dBetService;
 use common\service\wechat\eyun\EYunMessageOperateService;
 use common\tools\Util;
@@ -20,8 +21,15 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $text = '3D 803 直2倍组5倍。组335 355各1倍
-总计18';
+            $text = '福
+百位48 十234 个239--10元。
+824-一直一组。
+320 一直一组。
+58 双飞10元
+总计28';
+            #$text = '百位8 各10元';
+            $methodArr = MethodMatchService::matchDingWei($text, $codes=[], $count);
+            p($methodArr);
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
             $betRow = BetsBackend::findOne('1177');
