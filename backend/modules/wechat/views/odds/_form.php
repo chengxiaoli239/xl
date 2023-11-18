@@ -26,7 +26,7 @@ $this->title = Yii::t('app', 'Update Odds');
 
                 <div class="row">
                     <div class="col-lg-2 col-xs-3">
-                        <?= $form->field($model, 'money')->textInput(['maxlength' => true, 'disabled' => true]) ?>
+                        <?= $form->field($model, 'money')->textInput(['maxlength' => true]) ?>
                     </div>
 
                     <div class="col-lg-2 col-xs-3">
