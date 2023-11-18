@@ -124,6 +124,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t);
                     }else{
                         $texts = array_merge($texts, explode("\n", $t));
+                        break;
                     }
                 }
 
