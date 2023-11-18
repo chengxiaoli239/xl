@@ -258,7 +258,7 @@ class Ssxx3dBetService extends CommonBaseService
                 }
                 break;
             default:
-                throw_info('匹配异常');
+                throw_info('匹配异常11');
                 break;
         }
         $dataStr = implode(',', $dataCodes);

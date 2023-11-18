@@ -256,6 +256,9 @@ class ThirdDTypeService extends CommonBaseService
             #$patternNotAndYuanBeiCn2 = '/(([一二两三四五六七八九十]{1,3})(直|单|组|直选|组三|组六|组选))/u'; # 一直一组、直二组三
             $patternNotAndYuanBeiCn1 = '/(直([一二两三四五六七八九十]{1,3})组([一二两三四五六七八九十]{1,3}))/u'; # 一直一组、直二组三
             $patternNotAndYuanBeiCn2 = '/(组([一二两三四五六七八九十]{1,3})直([一二两三四五六七八九十]{1,3}))/u'; # 一直一组、直二组三
+            $patternBei21 = '/(直\s*\D*\d+倍|组\s*\D*\d+倍)/';
+            $patternBei22 = '/(直\s*\D*'.MethodMatchService::CN_SINGLE_TEXT.'倍|组\s*\D*'.MethodMatchService::CN_SINGLE_TEXT.'倍)/';
+            //$patternBei22 = '/(\s*\D*\d+倍直|\s*\D*\d+倍组)/';
 
             $patternNotAndYuanBeiNum = '/([0-9]){1,3}(直|单|直选|组三|组六|组选|组)/u'; # 一直一组、直二组三
             $pattern36_01 = '/(直|单|直选|组三|组六|组选|组)([0-9]{1,3})/u'; # 一直一组、直二组三
@@ -367,9 +370,30 @@ class ThirdDTypeService extends CommonBaseService
                         }
                     }
                     break;
+                case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternBei21, $text, $matcheSingles2): # 组1倍直1倍、直1倍组1倍
+                #case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternBei22, $text, $matcheSingles2):
+                    //p($matcheSingles2[0], 0);
+                    foreach ($matcheSingles2[0] as $item){
+                        if(preg_match('/[直组](['.MethodMatchService::CN_SINGLE_TEXT.'\d+])倍/', $item, $m)){
+                            if(is_numeric($m[1])){
+                                $tmpSingle = $m[1] * 2; #  转换成元
+                            }else{
+                                # 中文
+                                $tmpSingle = ThirdD::cn2num($m[1]) * 2; #  # 中文转数字  转换成元
+                            }
+
+                            if(strpos($item, '组') !== false){
+                                $singleArr['组'] = $tmpSingle;
+                            }else{
+                                $singleArr['直'] = $tmpSingle;
+                            }
+                        }
+                    }
+                    //p($singleArr);
+                    break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternNotAndYuanBeiNum, $text, $matcheSingles2):
                     $matchType = 3.2;
-                    #p([$text, $matcheSingles1, $matcheSingles2]);
+                    //p([$matchType, $text, $matcheSingles1, $matcheSingles2]);
 
                     foreach ($matcheSingles[1] as $k=>$singleTxt){
                         if(is_numeric($singleTxt)){

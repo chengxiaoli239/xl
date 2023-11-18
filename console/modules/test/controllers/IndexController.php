@@ -21,16 +21,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $text = '3D
-独胆6              100元。
-双飞66             100元。
-双飞68             100元。
-一码定位个位6      100元。
-3D直选、组选       各5元
-466.866.666.899.811
-373.383.365.377.366
-367.305.307.306.363
-总计700';
+            $text = '福528.871.825.835.571.591.209.289.315.317.582.597.682.695.819.419.619.719.089.933 组1倍直1倍
+共80元';
             #$text = '百位8 各10元';
             //$methodArr = MethodMatchService::matchDingWei($text, $codes=[], $count); p($methodArr);
             $MessageService = new EYunMessageOperateService($user_id=21);

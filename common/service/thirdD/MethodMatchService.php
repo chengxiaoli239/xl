@@ -812,7 +812,7 @@ class MethodMatchService extends CommonBaseService
             }
         }
         if(empty($codeData)){
-            throw_info('匹配异常');
+            throw_info('匹配异常22');
         }
         $codeDatas[] = implode(self::CODE_SPLIT_FLAG, $codeData);
 
