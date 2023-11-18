@@ -1032,14 +1032,15 @@ class MethodMatchService extends CommonBaseService
         if (preg_match_all('/(\d{1})拖/', $text, $matches0)) {
             $tuoCode = $matches0[1][0];
         }
-        if(empty($tuoCode)){
+        //p($matches0, 0);
+        if(empty($tuoCode) && $tuoCode !== '0'){
             throw_info('拖码为空');
         }
         if (preg_match_all('/(\d{2,})/', $text, $matches1)) {
             $codeArrs = $matches1[1];
         }
         if(empty($codeArrs)){
-            throw_info('拖码为空');
+            throw_info('尾码为空');
         }
         //p([$text, $tuoCode, $codeArrs]);
 
@@ -1054,6 +1055,7 @@ class MethodMatchService extends CommonBaseService
         }
 
         foreach ($codeArrs as $item){
+            $codesArr = [];
             for ($i=0; $i<strlen($item); $i++){
                 $codesArr[] = $item[$i];
             }
