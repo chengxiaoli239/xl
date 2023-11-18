@@ -130,6 +130,7 @@ class EYunMessageOperateService  extends EYunBaseService
 
             }
         }
+        $texts = array_unique($texts);
         $logArr = ['text'=>$text, 'texts'=>$texts, 'ts'=>$ts];
         Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本11', $logArr);
         return $texts;
