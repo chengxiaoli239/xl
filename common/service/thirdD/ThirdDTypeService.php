@@ -137,7 +137,10 @@ class ThirdDTypeService extends CommonBaseService
             $methodArr = MethodMatchService::matchYiMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }elseif($methodArr['originName'] == '二码定位'){ # 8二码定位
             $methodArr = MethodMatchService::matchErMaDing($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }elseif(strpos($text, '百') !== false OR strpos($text, '十') !== false OR strpos($text, '个') !== false ){ # 一、二定位、定位直选复式
+        }elseif(
+            (strpos($text, '百倍')===false && strpos($text, '十倍')===false && strpos($text, '个倍')===false ) &&
+            (strpos($text, '百') !== false OR strpos($text, '十') !== false OR strpos($text, '个') !== false )
+        ){ # 一、二定位、定位直选复式
             $methodArr = MethodMatchService::matchDingWei($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         #}elseif(strpos($text, '全包')!==false){ # 9豹子全包
         #    $methodArr = MethodMatchService::matchQuanBao($matchMethodAndCodeText, $codes, $count);
@@ -257,7 +260,8 @@ class ThirdDTypeService extends CommonBaseService
             $patternNotAndYuanBeiCn1 = '/(直([一二两三四五六七八九十]{1,3})组([一二两三四五六七八九十]{1,3}))/u'; # 一直一组、直二组三
             $patternNotAndYuanBeiCn2 = '/(组([一二两三四五六七八九十]{1,3})直([一二两三四五六七八九十]{1,3}))/u'; # 一直一组、直二组三
             $patternBei21 = '/(直\s*\D*\d+倍|组\s*\D*\d+倍)/';
-            $patternBei22 = '/(直\s*\D*'.MethodMatchService::CN_SINGLE_TEXT.'倍|组\s*\D*'.MethodMatchService::CN_SINGLE_TEXT.'倍)/';
+            $patternBei22 = '/(直\s*['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}倍|组\s*['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}倍)/';
+            //p($patternBei22);
             //$patternBei22 = '/(\s*\D*\d+倍直|\s*\D*\d+倍组)/';
 
             $patternNotAndYuanBeiNum = '/([0-9]){1,3}(直|单|直选|组三|组六|组选|组)/u'; # 一直一组、直二组三
@@ -371,10 +375,10 @@ class ThirdDTypeService extends CommonBaseService
                     }
                     break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternBei21, $text, $matcheSingles2): # 组1倍直1倍、直1倍组1倍
-                #case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternBei22, $text, $matcheSingles2):
-                    p($matcheSingles2,0);
+                case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternBei22, $text, $matcheSingles2):
+                    //p($matcheSingles2);
                     foreach ($matcheSingles2[0] as $item){
-                        if(preg_match('/[直组](\d+)倍/', $item, $m)){
+                        if(preg_match('/[直组](['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}|\d+)倍/', $item, $m)){
                             if(is_numeric($m[1])){
                                 $tmpSingle = $m[1] * 2; #  转换成元
                             }else{
