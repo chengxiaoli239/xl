@@ -117,6 +117,8 @@ class EYunMessageOperateService  extends EYunBaseService
                 list($playMethods, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($t);
                 #p('t: '.$t, 0);
                 //p(['playMethods' =>$playMethods], 0);
+                $logArr0 = ['playMethods'=>$playMethods];
+                Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本00', $logArr0);
                 foreach ($playMethods as $playMethod){
                     if(in_array($playMethod['id'], MethodMatchService::METHOD_ID_ZHI_ZU_OPTIONS)){
                         $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t);
@@ -128,7 +130,7 @@ class EYunMessageOperateService  extends EYunBaseService
             }
         }
         $logArr = ['text'=>$text, 'texts'=>$texts, 'ts'=>$ts];
-        Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本', $logArr);
+        Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本11', $logArr);
         return $texts;
     }
 
