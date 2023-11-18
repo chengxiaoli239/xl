@@ -113,13 +113,13 @@ class EYunMessageOperateService  extends EYunBaseService
         $ts = array_filter($ts);
         foreach ($ts as $t){
             $flag = true;  # 是否直组
-            $splits = explode("\n", $t);
+            $splits = array_filter(explode("\n", $t));
             Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本01', ['t0'=>$t, 'ttss'=>$splits]);
             if( strpos($t, '拖') !== false OR
                 (strpos($t, '直')===false && strpos($t, '组')===false && strpos($t, '单')===false)
             ){
                 $mType = 10;
-                $texts = array_merge($texts, $splits);
+                $flag = false;
             }else{
                 list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($t); # 匹配号码前倍数字符先替换为空
                 if(strpos($t, '直') !== false OR (strpos($t, '单') !== false && strpos($t, '值') === false)){
