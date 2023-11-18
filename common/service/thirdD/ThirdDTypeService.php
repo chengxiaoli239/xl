@@ -318,7 +318,7 @@ class ThirdDTypeService extends CommonBaseService
                     break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternZhiZu, $text, $matcheSingles):
                     $matchType = 2;
-                    p([$text, $matcheSingles, $patternZhiZu]);
+                    //p([$text, $matcheSingles, $patternZhiZu]);
                     foreach ($matcheSingles[0] as $matcheSingle){
                         $sData = explode('各', $matcheSingle);
                         if(strpos($sData[1], '倍') !== false){ # 倍
