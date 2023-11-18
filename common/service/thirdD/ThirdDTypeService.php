@@ -356,9 +356,9 @@ class ThirdDTypeService extends CommonBaseService
                     }
                     #p([$text, $matcheSingles, $singleArr]);
                     break;
-                case strpos($text, '直') !== false && strpos($text, '单') !== false && preg_match_all($patternDanZhi, $text, $matcheSingles):
-                    p($matcheSingles);
-                    break;
+                #case strpos($text, '直') !== false && strpos($text, '单') !== false && preg_match_all($patternDanZhi, $text, $matcheSingles):
+                #    p($matcheSingles);
+                #    break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternNotAndYuanBeiCn1, $text, $matcheSingles1): #  && (count($matcheSingles1[0][0])==2)
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternNotAndYuanBeiCn2, $text, $matcheSingles2): #  && (count($matcheSingles2[0][0])==2)
                     $matchType = 3.1;

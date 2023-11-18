@@ -1074,7 +1074,7 @@ class MethodMatchService extends CommonBaseService
             $methodArr[] = ['id'=>$method['id'], 'name'=>$name, 'codes'=>$codes, 'matchName'=>$name, 'count'=>$count];
         }
 
-        p([$methodArr, $codes]);
+        //p([$methodArr, $codes]);
 
         return $methodArr;
     }
