@@ -111,24 +111,33 @@ class EYunMessageOperateService  extends EYunBaseService
         $texts = [];
         $ts = explode(MethodMatchService::METHOD_SPLIT_ZHIZU, $text);
         foreach ($ts as $t){
-            Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本01', ['t0'=>$t, 'ttss'=>explode("\n", $t)]);
-            if(strpos($t, '拖') !== false){
-                $texts = array_merge($texts, explode("\n", trim($t)));
+            $flag = true;  # 是否直组
+            $splits = explode("\n", $t);
+            Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本01', ['t0'=>$t, 'ttss'=>$splits]);
+            if( strpos($t, '拖') !== false OR
+                strpos($t, '直')===false OR strpos($t, '单')===false
+            ){
+                $texts = array_merge($texts, $splits);
             }else{
-                list($playMethods, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($t);
-                #p('t: '.$t, 0);
-                //p(['playMethods' =>$playMethods], 0);
-                $logArr0 = ['t'=>$t, 'playMethods'=>$playMethods];
-                Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本01', $logArr0);
-                foreach ($playMethods as $playMethod){
-                    if(in_array($playMethod['id'], MethodMatchService::METHOD_ID_ZHI_ZU_OPTIONS)){
-                        $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t);
-                    }else{
-                        $texts = array_merge($texts, explode("\n", $t));
-                        break;
-                    }
-                }
+                # 否则，判断是组三、组六、直选，则核成一行，方便匹配
+                $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t);
+                #list($playMethods, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($t);
+                ##p('t: '.$t, 0);
+                #//p(['playMethods' =>$playMethods], 0);
+                #$logArr0 = ['t'=>$t, 'playMethods'=>$playMethods];
+                #Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本02', $logArr0);
+                #foreach ($playMethods as $playMethod){
+                #    if(!in_array($playMethod['id'], MethodMatchService::METHOD_ID_ZHI_ZU_OPTIONS)){
+                #        $flag = false;
+                #    }else{
+                #        $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t);
+                #    }
+                #    break;
+                #}
             }
+            #if(!$flag){
+            #    $texts = array_merge($texts, $splits);
+            #}
         }
         $texts = array_unique($texts);
         $logArr = ['text'=>$text, 'texts'=>$texts, 'ts'=>$ts];
