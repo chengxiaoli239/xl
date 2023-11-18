@@ -111,6 +111,7 @@ class EYunMessageOperateService  extends EYunBaseService
         $texts = [];
         $ts = explode(MethodMatchService::METHOD_SPLIT_ZHIZU, $text);
         foreach ($ts as $t){
+            Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本01', ['t0'=>$t]);
             if(strpos($t, '拖') !== false){
                 $texts = array_merge($texts, explode("\n", trim($t)));
             }else{
@@ -118,7 +119,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 #p('t: '.$t, 0);
                 //p(['playMethods' =>$playMethods], 0);
                 $logArr0 = ['t'=>$t, 'playMethods'=>$playMethods];
-                Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本00', $logArr0);
+                Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本01', $logArr0);
                 foreach ($playMethods as $playMethod){
                     if(in_array($playMethod['id'], MethodMatchService::METHOD_ID_ZHI_ZU_OPTIONS)){
                         $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t);
