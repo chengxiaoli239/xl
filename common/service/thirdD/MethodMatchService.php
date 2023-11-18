@@ -406,12 +406,23 @@ class MethodMatchService extends CommonBaseService
                         break;
                     }
                     if($len==3){
+                        if(preg_match('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})\s*组/u', $text, $matches)){
+                            $single = (is_numeric($matches[1]) || ThirdD::cn2num($matches[1])) * 2; # 中文转数字，一=>1、二=>2.。。。
+                        }
                         if($flag){
+                            $zuM = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
+                            if($single){
+                                $zuM['single'] = $single;
+                            }
                             # 组三
-                            $methodArr['methodArr3'][] = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
+                            $methodArr['methodArr3'][] = $zuM;
                         }else{
+                            $zuM = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
+                            if($single){
+                                $zuM['single'] = $single;
+                            }
                             # 组六
-                            $methodArr['methodArr6'][] = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
+                            $methodArr['methodArr6'][] = $zuM;
                         }
                     }else{
                         if($flag){
