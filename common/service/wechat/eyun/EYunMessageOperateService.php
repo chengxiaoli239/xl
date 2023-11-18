@@ -106,7 +106,7 @@ class EYunMessageOperateService  extends EYunBaseService
      * 重置匹配文本
      * @param $text
      */
-    public static function resetMethodText($text)
+    public static function resetMethodText($text): array
     {
         $texts = [];
         $ts = explode(MethodMatchService::METHOD_SPLIT_ZHIZU, $text);
@@ -117,7 +117,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 list($playMethods, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($t);
                 #p('t: '.$t, 0);
                 //p(['playMethods' =>$playMethods], 0);
-                $logArr0 = ['playMethods'=>$playMethods];
+                $logArr0 = ['t'=>$t, 'playMethods'=>$playMethods];
                 Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本00', $logArr0);
                 foreach ($playMethods as $playMethod){
                     if(in_array($playMethod['id'], MethodMatchService::METHOD_ID_ZHI_ZU_OPTIONS)){
@@ -127,7 +127,6 @@ class EYunMessageOperateService  extends EYunBaseService
                         break;
                     }
                 }
-
             }
         }
         $texts = array_unique($texts);
@@ -263,7 +262,7 @@ class EYunMessageOperateService  extends EYunBaseService
 
                     //p(['betTexts'=>$betTexts]);
                     //$betTexts = array_filter(explode(MethodMatchService::METHOD_SPLIT_FLAG, $text));
-                    Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-00', ['text'=>$text, 'betTexts'=>$betTexts]);
+                    Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-00', ['text'=>$text, 'betTexts'=>$betTexts, 'counts'=>count($betTexts)]);
                     $dataGroups = [];
                     foreach ($betTexts as $k1=>$betText){
                         $betText = trim($betText, "\r\n");
