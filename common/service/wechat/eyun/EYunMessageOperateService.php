@@ -249,11 +249,11 @@ class EYunMessageOperateService  extends EYunBaseService
                         $g = [];
                         $g['betText'] = $betText;
                         list($lottery_type, $lottery_name, $matchTexts, $isEmpty) = ThirdDTypeService::getLotteryType($betText);
-                        var_dump('1lottery_type:'.$lottery_type, $isEmpty);
+                        #var_dump('1lottery_type:'.$lottery_type, $isEmpty);
                         foreach ($matchTexts as $matchText){
                             //$betText = trim(str_replace($matchText, '', $betText), ',');
                         }
-                        var_dump('2lottery_type:'.$lottery_type, $isEmpty);
+                        #var_dump('2lottery_type:'.$lottery_type, $isEmpty);
                         if($isEmpty){
                             # 彩种匹配为空则取上次匹配的结果
                             $lottery_type = self::$gLotteryType;

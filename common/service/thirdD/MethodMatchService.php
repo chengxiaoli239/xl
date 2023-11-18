@@ -635,12 +635,12 @@ class MethodMatchService extends CommonBaseService
         list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
         // 使用正则表达式匹配所有单个数字
         $text = str_replace(',', ' ', trim($text));
-        if ((strpos($text, '双飞') !==false OR strpos($text, '飞') !==false) && preg_match_all('/(\d{2})/', $text, $matches)) {
+        if (preg_match_all('/(\d{2})/u', $text, $matches)) {
             $codes = $matches[1];
         }
 
         if(empty($codes)){
-            throw_info('获取号码异常');
+            throw_info('获取号码异常100');
         }
         $count = count($codes);
 

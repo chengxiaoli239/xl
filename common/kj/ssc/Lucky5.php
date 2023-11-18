@@ -357,7 +357,7 @@ class Lucky5 extends BaseKj {
                 $codes = $draw_codes;
             }
         }catch (\Exception $e){
-            Tool_Common::log('/codes/'.__FUNCTION__, 'ERR', '获取号码异常', ['err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/codes/'.__FUNCTION__, 'ERR', '获取号码异常22', ['err_msg'=>$e->getMessage()]);
         }
 
         return $codes;
