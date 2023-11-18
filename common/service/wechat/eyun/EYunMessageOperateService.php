@@ -118,6 +118,7 @@ class EYunMessageOperateService  extends EYunBaseService
             if( strpos($t, '拖') !== false OR
                 (strpos($t, '直')===false && strpos($t, '组')===false && strpos($t, '单')===false)
             ){
+                $mType = 10;
                 $texts = array_merge($texts, $splits);
             }else{
                 list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($t); # 匹配号码前倍数字符先替换为空
