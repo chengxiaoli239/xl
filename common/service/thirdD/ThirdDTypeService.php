@@ -372,9 +372,9 @@ class ThirdDTypeService extends CommonBaseService
                     break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternBei21, $text, $matcheSingles2): # 组1倍直1倍、直1倍组1倍
                 #case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternBei22, $text, $matcheSingles2):
-                    //p($matcheSingles2[0], 0);
+                    p($matcheSingles2,0);
                     foreach ($matcheSingles2[0] as $item){
-                        if(preg_match('/[直组](['.MethodMatchService::CN_SINGLE_TEXT.'\d+])倍/', $item, $m)){
+                        if(preg_match('/[直组](\d+)倍/', $item, $m)){
                             if(is_numeric($m[1])){
                                 $tmpSingle = $m[1] * 2; #  转换成元
                             }else{

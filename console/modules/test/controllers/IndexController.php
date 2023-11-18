@@ -21,7 +21,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $text = '福528.871.825.835.571.591.209.289.315.317.582.597.682.695.819.419.619.719.089.933 组1倍直1倍
+            $text = '福528.871.825.835.571.591.209.289.315.317.582.597.682.695.819.419.619.719.089.933直10倍组10倍
 共80元';
             #$text = '百位8 各10元';
             //$methodArr = MethodMatchService::matchDingWei($text, $codes=[], $count); p($methodArr);
