@@ -253,6 +253,7 @@ class ThirdDTypeService extends CommonBaseService
             $matchType = 0; # 匹配逻辑跟进
             $pattern36 = '/(组六|组三)\s*各\s*([一二两三四五六七八九十]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+\s*倍)/u';
             $patternZhiZu = '/(直|单|组三|组六|组)\s*各\s*([一二两三四五六七八九十0-9]{1,3}\s*倍|(\d+)\s*元|[一二两三四五六七八九十0-9]{1,3}\s*元|(\d)+\s*倍)/u';
+            $patternZhiZuNum = '/((\d+)元直|(\d+)元组)/';
             #$patternZhiZuNum = '/(直|单|组三|组六|组)\s*各\s*([0-9]{1,3}\s*倍|(\d+)\s*元|[0-9]{1,3}\s*元|(\d)+\s*倍)/u';
             $patternZhiZuNotBei = '/(直|单|直选|组三|组六|组选|组)\s*([一二两三四五六七八九十]{1,3}倍|(\d+)\s*元|[一二两三四五六七八九十]{1,3}\s*元|(\d)+倍)/u';
             $patternNotAndYuanBei0 = '/(直|单|直选|组三|组六|组选|组)([一二两三四五六七八九十0-9]){1,3}倍/u'; # 一直一组、直二组三
@@ -262,6 +263,7 @@ class ThirdDTypeService extends CommonBaseService
             #$patternNotAndYuanBeiCn2 = '/(([一二两三四五六七八九十]{1,3})(直|单|组|直选|组三|组六|组选))/u'; # 一直一组、直二组三
             $patternNotAndYuanBeiCn1 = '/(直([一二两三四五六七八九十]{1,3})组([一二两三四五六七八九十]{1,3}))/u'; # 直一组一、直二组三
             $patternNotAndYuanBeiCn2 = '/(组([一二两三四五六七八九十]{1,3})直([一二两三四五六七八九十]{1,3}))/u'; # 一直一组、直二组三
+
             $patternBei21 = '/(直\s*\D*\d+倍|组\s*\D*\d+倍)/';
             $patternBei22 = '/(直\s*['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}倍|组\s*['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}倍)/';
             //p($patternBei22);
@@ -314,6 +316,16 @@ class ThirdDTypeService extends CommonBaseService
                         $matchMethodAndCodeText = str_replace('组三', '', $matchMethodAndCodeText);
                         $matchMethodAndCodeText = str_replace('组六', '', $matchMethodAndCodeText);
                         $matchMethodAndCodeText .= '组三组六';
+                    }
+                    break;
+                case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternZhiZuNum, $text, $matcheSingles):
+                    foreach ($matcheSingles[0] as $matcheSingle){
+                        if(strpos($matcheSingle, '直') !== false && preg_match('/\d+/', $matcheSingle, $m)){
+                            $singleArr['直'] = $m[0];
+                        }
+                        if(strpos($matcheSingle, '组') !== false && preg_match('/\d+/', $matcheSingle, $m)){
+                            $singleArr['组'] = $m[0];
+                        }
                     }
                     break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternZhiZu, $text, $matcheSingles):
