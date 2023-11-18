@@ -249,9 +249,11 @@ class EYunMessageOperateService  extends EYunBaseService
                         $g = [];
                         $g['betText'] = $betText;
                         list($lottery_type, $lottery_name, $matchTexts, $isEmpty) = ThirdDTypeService::getLotteryType($betText);
+                        var_dump('1lottery_type:'.$lottery_type, $isEmpty);
                         foreach ($matchTexts as $matchText){
-                            $betText = trim(str_replace($matchText, '', $betText), ',');
+                            //$betText = trim(str_replace($matchText, '', $betText), ',');
                         }
+                        var_dump('2lottery_type:'.$lottery_type, $isEmpty);
                         if($isEmpty){
                             # 彩种匹配为空则取上次匹配的结果
                             $lottery_type = self::$gLotteryType;
@@ -277,10 +279,10 @@ class EYunMessageOperateService  extends EYunBaseService
                             Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-02', $logArr);
                             foreach ($playMethod as $k=>$pm){
                                 $single = $pm['single'];
-                                if(empty($single) && $singleData['single_cn_text']=='元' && !empty($singleData['single'])){
+                                if(empty($single) && ($singleData['single_cn_text']=='元' OR $singleData['single_txt']=='元') && !empty($singleData['single'])){
                                     $single = $singleData['single'];
                                 }
-                                if(empty($single) && $singleData['single_cn_text']=='倍' && !empty($singleData['single_cn'])){
+                                if(empty($single) && ($singleData['single_cn_text']=='元' OR $singleData['single_txt']=='元') && !empty($singleData['single_cn'])){
                                     $Odds = Odds3dService::getOdds($this->user_id, $pm['id']); # 玩法赔率
                                     $single = $Odds['money'] * $singleData['single_cn'];
                                 }
@@ -331,6 +333,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '匹配倍异常2', ['betText'=>$betText, 'g'=>$g]);
                             throw_info('匹配倍数或金额异常', CommonBaseService::CODE_FOR_USER);
                         }
+                        var_dump('========='.$lottery_type.'=======');
                         $dataGroups['betCodeContents'][$lottery_type][] = $g;
                     }
                     break;
@@ -424,7 +427,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 throw_info('单号生成失败');
             }
             $betCodeContents = $data['dataGroups']['betCodeContents'];
-            //p($betCodeContents);
+            p($betCodeContents);
             if(empty($betCodeContents)){
                 return [CommonBaseService::CODE_FOR_USER, [], '匹配异常:请按格式输入'];
             }

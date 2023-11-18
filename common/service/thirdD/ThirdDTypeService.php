@@ -268,6 +268,8 @@ class ThirdDTypeService extends CommonBaseService
             $patternBei22 = '/(直\s*['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}倍|组\s*['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}倍)/';
             //p($patternBei22);
             //$patternBei22 = '/(\s*\D*\d+倍直|\s*\D*\d+倍组)/';
+            $patternBei31 = '/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})直\s*(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})组/';
+            //$patternBei32 = '/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})单(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})组/';
 
             $patternNotAndYuanBeiNum = '/([0-9]){1,3}(直|单|直选|组三|组六|组选|组)/u'; # 一直一组、直二组三
             $pattern36_01 = '/(直|单|直选|组三|组六|组选|组)([0-9]{1,3})/u'; # 一直一组、直二组三
@@ -371,9 +373,10 @@ class ThirdDTypeService extends CommonBaseService
                     }
                     #p([$text, $matcheSingles, $singleArr]);
                     break;
-                #case strpos($text, '直') !== false && strpos($text, '单') !== false && preg_match_all($patternDanZhi, $text, $matcheSingles):
-                #    p($matcheSingles);
-                #    break;
+                case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternBei31, $text, $matcheSingles):
+                    $singleArr['直'] = ThirdD::cn2num($matcheSingles[1][0]) * 2;
+                    $singleArr['组'] = ThirdD::cn2num($matcheSingles[2][0]) * 2;
+                    break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternNotAndYuanBeiCn1, $text, $matcheSingles1): #  && (count($matcheSingles1[0][0])==2)
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternNotAndYuanBeiCn2, $text, $matcheSingles2): #  && (count($matcheSingles2[0][0])==2)
                     $matchType = 3.1;

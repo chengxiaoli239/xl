@@ -372,7 +372,8 @@ class MethodMatchService extends CommonBaseService
                 case strpos($text, '组三') !== false:
                     if($flag){
                         if($len==3){ # 常规的组三
-                            $methodArr['methodArr3'][] = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
+                            $zuSan = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
+                            $methodArr['methodArr3'][] = $zuSan;
                         }else{
                             break;
                             //throw_info('组三号码不能重复：'.$code);
@@ -392,7 +393,8 @@ class MethodMatchService extends CommonBaseService
                         //throw_info('组六号码不能重复：'.$code.'_'.$text);
                     }
                     if($len==3){ # 常规的组六
-                        $methodArr['methodArr6'][] = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
+                        $zuLiu = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
+                        $methodArr['methodArr6'][] = $zuLiu;
                     }else{
                         # 组六多码
                         MethodMatchService::getMethodArrDatas($reSortCode, '组六', $methodArr);
