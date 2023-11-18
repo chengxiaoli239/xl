@@ -700,7 +700,7 @@ class MethodMatchService extends CommonBaseService
         // 使用正则表达式匹配所有单个数字
         $matcheCodeText = $text;
         list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($matcheCodeText); # 匹配号码前倍数字符先替换为空
-        $text = str_replace(' ', '', $text);
+        $text = str_replace(' ', '', $matcheCodeText);
         if (preg_match_all('/[百十个]位{0,1}(\d+)/u', $text, $matches)) {
             $numbers = str_replace('位', '', $matches[0]);
         }
@@ -739,8 +739,10 @@ class MethodMatchService extends CommonBaseService
      */
     public static function matchErMaDing(string $text='', array &$codes=[], &$count=0, $matchName=''): array
     {
+        $matcheCodeText = $text;
+        list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($matcheCodeText); # 匹配号码前倍数字符先替换为空
         // 使用正则表达式匹配所有单个数字
-        $text = str_replace(' ', '', $text);
+        $text = str_replace(' ', '', $matcheCodeText);
         if (preg_match_all('/[百十个]位{0,1}(\d+)[百十个]位{0,1}(\d+)/u', $text, $matches)) {
             $numbers = str_replace('位', '', $matches[0]);
         }
@@ -819,7 +821,7 @@ class MethodMatchService extends CommonBaseService
 
         $codes = implode(self::ZU_SPLIT_FLAG, $codeDatas);
         $methodArr = ['id'=>$methodId, 'name'=>$name, 'codes'=>$codes, 'count'=>$count];
-        #p($methodArr);
+        //p($methodArr);
 
         return $methodArr;
     }
