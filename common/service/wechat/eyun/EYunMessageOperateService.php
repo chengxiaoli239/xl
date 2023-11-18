@@ -111,19 +111,25 @@ class EYunMessageOperateService  extends EYunBaseService
         $texts = [];
         $ts = explode(MethodMatchService::METHOD_SPLIT_ZHIZU, $text);
         foreach ($ts as $t){
-            if(
-                (strpos($t, '直') !== false && strpos($t, '组') !== false) OR
-                (strpos($t, '单') !== false && strpos($t, '组') !== false)
-            ){
-                $texts[] = str_replace("\n", ' ', $t);
+            if(strpos($t, '拖') !== false){
+                $texts = array_merge($texts, explode("\n", trim($t)));
             }else{
-                $texts = array_merge($texts, explode("\n", $t));
-            }
+                list($playMethods, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($t);
+                #p('t: '.$t, 0);
+                //p(['playMethods' =>$playMethods], 0);
+                foreach ($playMethods as $playMethod){
+                    if(in_array($playMethod['id'], MethodMatchService::METHOD_ID_ZHI_ZU_OPTIONS)){
+                        $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t);
+                    }else{
+                        $texts = array_merge($texts, explode("\n", $t));
+                    }
+                }
 
+            }
         }
-        Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本', ['text'=>$text, 'texts'=>$texts]);
-        $text = str_replace('。', MethodMatchService::METHOD_SPLIT_FLAG, $text); # 玩法之间分隔符
-        return $text;
+        $logArr = ['text'=>$text, 'texts'=>$texts, 'ts'=>$ts];
+        Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本', $logArr);
+        return $texts;
     }
 
     /**
@@ -249,10 +255,10 @@ class EYunMessageOperateService  extends EYunBaseService
                     $stepText = [
                         'originText' => $text,
                     ];
-                    $text = EYunMessageOperateService::resetMethodText($text); # 重置匹配文本
-                    $stepText['stepOneText'] = $text;
+                    $betTexts = EYunMessageOperateService::resetMethodText($text); # 重置匹配文本
 
-                    $betTexts = array_filter(explode(MethodMatchService::METHOD_SPLIT_FLAG, $text));
+                    //p(['betTexts'=>$betTexts]);
+                    //$betTexts = array_filter(explode(MethodMatchService::METHOD_SPLIT_FLAG, $text));
                     Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-00', ['text'=>$text, 'betTexts'=>$betTexts]);
                     $dataGroups = [];
                     foreach ($betTexts as $k1=>$betText){
@@ -347,7 +353,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '匹配倍异常2', ['betText'=>$betText, 'g'=>$g]);
                             throw_info('匹配倍数或金额异常', CommonBaseService::CODE_FOR_USER);
                         }
-                        var_dump('========='.$lottery_type.'=======');
+                        //var_dump('========='.$lottery_type.'=======');
                         $dataGroups['betCodeContents'][$lottery_type][] = $g;
                     }
                     break;

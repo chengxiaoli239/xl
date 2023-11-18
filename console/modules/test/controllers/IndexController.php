@@ -21,15 +21,23 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $text = '3D
+            $text = "3D
 019  061 049 179 468
 560  724  708  726 478
 304  306  307  309  406
 407 409  709  706  702
-（组各一倍 40）
+（组各一倍 40）\n\n
 
-组六五码 034689（5 倍 50）
-共 90';
+组六034689（5 倍 50）
+1拖034689（5 倍 50）\n\n
+
+019  061
+560  724  708  726 478
+304  306  307  309  406
+407 409  709  706  702
+（组各两倍 40）\n\n
+
+共 90";
             //$methodArr = MethodMatchService::matchDingWei($text, $codes=[], $count); p($methodArr);
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);

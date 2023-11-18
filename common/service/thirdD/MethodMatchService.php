@@ -18,6 +18,12 @@ class MethodMatchService extends CommonBaseService
     const METHOD_ID_ZHIXUAN = 1;
     const METHOD_ID_ZUSAN = 2;
     const METHOD_ID_ZULIU = 3;
+    # 直组配置
+    const METHOD_ID_ZHI_ZU_OPTIONS = [
+        self::METHOD_ID_ZHIXUAN,
+        self::METHOD_ID_ZUSAN,
+        self::METHOD_ID_ZULIU,
+    ];
     const METHOD_ID_DUDAN = 4;
     const METHOD_ID_SHUANGFEI = 5; # 双飞
     const METHOD_ID_QUANTUO = 6; # 对子全拖
@@ -466,6 +472,7 @@ class MethodMatchService extends CommonBaseService
 
         $allCount = 0;
         $codes = '';
+        $newMethodArr = [];
         foreach ($methodArr as $key=>$items){
             if(empty($items)){
                 unset($methodArr[$key]);
@@ -489,15 +496,11 @@ class MethodMatchService extends CommonBaseService
             }
             $methodArr[$key] = $methodArrD;
         }
-        $methodArr = array_values($methodArr);
+        $newMethodArr = array_values($methodArr);
         $count = $allCount;
         $codes = trim($codes, self::ZU_SPLIT_FLAG);
-        //p($methodArr);
-        if(count($methodArr)==1){
-            $methodArr = $methodArr[0];
-        }
 
-        return $methodArr;
+        return $newMethodArr;
     }
 
     /**
@@ -604,6 +607,7 @@ class MethodMatchService extends CommonBaseService
      */
     public static function matchDuDan(string $text='', array &$codes=[], &$count=0, $matchName=''): array
     {
+        $methodArr = [];
         list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
         // 使用正则表达式匹配所有单个数字
         if (preg_match_all('/\s*(\d)/', $text, $matches2)) {
@@ -620,7 +624,7 @@ class MethodMatchService extends CommonBaseService
         }
         $count = count($codes);
         $codes = implode(self::ZU_SPLIT_FLAG, $codes);
-        $methodArr = ['id'=>4, 'name'=>'独胆', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
+        $methodArr[] = ['id'=>4, 'name'=>'独胆', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -712,6 +716,7 @@ class MethodMatchService extends CommonBaseService
      * @return array
      */
     public static function matchYiMaDing($text='', &$codes=[], &$count=0, $matchName=''){
+        $methodArr = [];
         // 使用正则表达式匹配所有单个数字
         $matcheCodeText = $text;
         list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($matcheCodeText); # 匹配号码前倍数字符先替换为空
@@ -740,7 +745,7 @@ class MethodMatchService extends CommonBaseService
             $count += strlen($code);
         }
         $codes = implode(self::ZU_SPLIT_FLAG, $codes);
-        $methodArr = ['id'=>7, 'name'=>'一码定位', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
+        $methodArr[] = ['id'=>7, 'name'=>'一码定位', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
@@ -754,6 +759,7 @@ class MethodMatchService extends CommonBaseService
      */
     public static function matchErMaDing(string $text='', array &$codes=[], &$count=0, $matchName=''): array
     {
+        $methodArr = [];
         $matcheCodeText = $text;
         list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($matcheCodeText); # 匹配号码前倍数字符先替换为空
         // 使用正则表达式匹配所有单个数字
@@ -778,7 +784,7 @@ class MethodMatchService extends CommonBaseService
             $count += strlen($matches[1][0]) * strlen($matches[2][0]);
         }
         $codes = implode(self::ZU_SPLIT_FLAG, $codes);
-        $methodArr = ['id'=>8, 'name'=>'二码定位', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
+        $methodArr[] = ['id'=>8, 'name'=>'二码定位', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
         //p($methodArr);
 
         return $methodArr;
@@ -792,6 +798,7 @@ class MethodMatchService extends CommonBaseService
      */
     public static function matchDingWei(string $text='', array &$codes=[], &$count=0, $matchName=''): array
     {
+        $methodArr = [];
         list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
         // 使用正则表达式匹配所有单个数字
         //var_dump($text);
@@ -835,7 +842,7 @@ class MethodMatchService extends CommonBaseService
         $id = $methods[$name]['id'];
 
         $codes = implode(self::ZU_SPLIT_FLAG, $codeDatas);
-        $methodArr = ['id'=>$methodId, 'name'=>$name, 'codes'=>$codes, 'count'=>$count];
+        $methodArr[] = ['id'=>$methodId, 'name'=>$name, 'codes'=>$codes, 'count'=>$count];
         //p($methodArr);
 
         return $methodArr;

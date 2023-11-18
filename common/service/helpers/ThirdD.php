@@ -252,4 +252,25 @@ class ThirdD extends BaseService
 
         return [$pos, $num];
     }
+
+    public static function getQuerySplit( $value )
+    {
+        $values=preg_replace('/\s+/','#',$value);
+        $values=str_replace(array("\r\n", "\r", "\n",",",'，'), "#", $values);
+        $values=explode('#',$values);
+        return $values;
+    }
+
+
+    /**
+     * 多个空格替换成单个空格
+     * @param string $str
+     * @return array|string|string[]|null
+     */
+    public static function multiKongHangToOneSpace(string $str=''){
+
+        $str = preg_replace( '#\s+#', ' ', $str);
+
+        return $str;
+    }
 }
