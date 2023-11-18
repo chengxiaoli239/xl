@@ -125,8 +125,8 @@ class EYunMessageOperateService  extends EYunBaseService
                 if(strpos($t, '直') !== false OR (strpos($t, '单') !== false && strpos($t, '值') === false)){
                     # 直选
                     $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t); # 直、组类型直接合并为一行
+                    $mType = 10;
                 }else{
-                    $mType = 0;
                     $flag1 = strpos($t, '组') !== false && preg_match('/\d{4,}/', $t, $matches1); #匹配 组三组六4-9码，此处还差组三两码、组三三码
                     if($flag1){
                         $mType = 1;
@@ -136,8 +136,9 @@ class EYunMessageOperateService  extends EYunBaseService
                         if(strpos($t, '组三') !== false && preg_match_all('/(\d{2,3})/u', $t, $matches)){
                             # 组三有重复号码则为组选
                             $flag2 = \common\service\helpers\ThirdD::judgeCodesRepeat($matches[0][0], $sortCode); # 判断号码是否有重复，重复则为组三
+                            $mType = 2;
                             if(!$flag2){
-                                $mType = 2;
+                                $mType = 3;
                                 $flag = false; # 组三多吗
                             }
                         }else{
