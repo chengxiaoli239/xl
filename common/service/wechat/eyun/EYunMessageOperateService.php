@@ -110,34 +110,52 @@ class EYunMessageOperateService  extends EYunBaseService
     {
         $texts = [];
         $ts = explode(MethodMatchService::METHOD_SPLIT_ZHIZU, $text);
+        $ts = array_filter($ts);
         foreach ($ts as $t){
             $flag = true;  # 是否直组
             $splits = explode("\n", $t);
             Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本01', ['t0'=>$t, 'ttss'=>$splits]);
             if( strpos($t, '拖') !== false OR
-                strpos($t, '直')===false OR strpos($t, '单')===false
+                (strpos($t, '直')===false && strpos($t, '组')===false && strpos($t, '单')===false)
             ){
                 $texts = array_merge($texts, $splits);
             }else{
-                # 否则，判断是组三、组六、直选，则核成一行，方便匹配
-                $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t);
-                #list($playMethods, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($t);
-                ##p('t: '.$t, 0);
-                #//p(['playMethods' =>$playMethods], 0);
-                #$logArr0 = ['t'=>$t, 'playMethods'=>$playMethods];
-                #Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本02', $logArr0);
-                #foreach ($playMethods as $playMethod){
-                #    if(!in_array($playMethod['id'], MethodMatchService::METHOD_ID_ZHI_ZU_OPTIONS)){
-                #        $flag = false;
-                #    }else{
-                #        $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t);
-                #    }
-                #    break;
-                #}
+                list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($t); # 匹配号码前倍数字符先替换为空
+                if(strpos($t, '直') !== false OR (strpos($t, '单') !== false && strpos($t, '值') === false)){
+                    # 直选
+                    $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t); # 直、组类型直接合并为一行
+                }else{
+                    $mType = 0;
+                    $flag1 = strpos($t, '组') !== false && preg_match('/\d{4,}/', $t, $matches1); #匹配 组三组六4-9码，此处还差组三两码、组三三码
+                    if($flag1){
+                        $mType = 1;
+                        $texts = array_merge($texts, $splits);
+                    }else{
+                        # 此处匹配组三两码、组三三码
+                        if(strpos($t, '组三') !== false && preg_match_all('/(\d{2,3})/u', $t, $matches)){
+                            # 组三有重复号码则为组选
+                            $flag2 = \common\service\helpers\ThirdD::judgeCodesRepeat($matches[0][0], $sortCode); # 判断号码是否有重复，重复则为组三
+                            if(!$flag2){
+                                $mType = 2;
+                                $flag = false; # 组三多吗
+                            }
+                        }else{
+                            $mType = 4;
+                            # 非直选
+                            $flag = false;
+                        }
+                    }
+                }
             }
-            #if(!$flag){
-            #    $texts = array_merge($texts, $splits);
-            #}
+            $logArr0 = ['t'=>$t, 'mType'=>$mType];
+            Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本02', $logArr0);
+            if(!$flag){
+                # 非直组
+                $texts = array_merge($texts, $splits);
+            }else{
+                $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t); # 直、组类型直接合并为一行
+            }
+            break;
         }
         $texts = array_unique($texts);
         $logArr = ['text'=>$text, 'texts'=>$texts, 'ts'=>$ts];
