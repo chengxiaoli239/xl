@@ -305,104 +305,16 @@ class EYunMessageOperateService  extends EYunBaseService
                         'originText' => $text,
                     ];
                     $betTexts = EYunMessageOperateService::resetMethodText($text); # 重置匹配文本
-
-                    //p(['betTexts'=>$betTexts]);
-                    //$betTexts = array_filter(explode(MethodMatchService::METHOD_SPLIT_FLAG, $text));
+                    //p($betTexts);
                     Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-00', ['text'=>$text, 'betTexts'=>$betTexts, 'counts'=>count($betTexts)]);
                     $dataGroups = [];
                     foreach ($betTexts as $k1=>$betText){
-                        $betText = trim($betText, "\r\n");
-                        $betText = EYunMessageOperateService::resetText($betText); # 重置匹配文本
-                        # 重置一下格式方便处理：福+玩法+号码+各x元
-                        #EYunMessageOperateService::resetBetText($betText);
-                        $g = [];
-                        $g['betText'] = $betText;
-                        list($lottery_type, $lottery_name, $matchTexts, $isEmpty) = ThirdDTypeService::getLotteryType($betText);
-                        #var_dump('1lottery_type:'.$lottery_type, $isEmpty);
-                        if($isEmpty){
-                            # 彩种匹配为空则取上次匹配的结果
-                            $lottery_type = self::$gLotteryType;
-                            $lottery_name = self::$gLotteryName;
+                        list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($betText); # 单个规则文本匹配处理
+                        if($code>0){
+                            Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-001', ['text'=>$text, 'betTexts'=>$betTexts, 'counts'=>count($betTexts)]);
+                            continue;
                         }
-                        self::$gLotteryType = $lottery_type;
-                        self::$gLotteryName = $lottery_name;
-
-                        list($playMethod, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($betText);
-                        $logArr = ['lottery_type'=>$lottery_type, 'matchTexts'=>$matchTexts, 'betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count, 'isEmpty'=>$isEmpty];
-                        Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-01', $logArr);
-                        if(empty($playMethod)){
-                            continue; # 匹配不到玩法则忽略
-                        }
-                        $g['codes'] = $codes;
-                        if(ThirdD::getMaxDim($playMethod)>1) {
-                            # 跨度、组三组六混合情况
-                            $playMethodKd = $playMethod[0];
-                            $betText = str_replace($playMethodKd['name'], ' ', $betText);
-                            $singleData = ThirdDTypeService::getMoneys($betText, $playMethodKd['name'], $playMethod);
-                            $single = $singleData['single'];
-                            $logArr = ['betText' => $betText, 'singleData' => $singleData, 'playMethod' => $playMethod];
-                            Tool_Common::log('/bet_3d/' . __FUNCTION__, 'INFO', '解析日志-02', $logArr);
-                            foreach ($playMethod as $k => $pm) {
-                                $single = $pm['single'];
-                                if (empty($single) && ($singleData['single_cn_text'] == '元' or $singleData['single_txt'] == '元') && !empty($singleData['single'])) {
-                                    $single = $singleData['single'];
-                                }
-                                if (empty($single) && ($singleData['single_cn_text'] == '元' or $singleData['single_txt'] == '元') && !empty($singleData['single_cn'])) {
-                                    $Odds = Odds3dService::getOdds($this->user_id, $pm['id']); # 玩法赔率
-                                    $single = $Odds['money'] * $singleData['single_cn'];
-                                }
-
-                                $all_moneys = $single * $pm['count'];
-                                $playMethod[$k]['codes'] = $pm['codes'];
-                                $playMethod[$k]['single'] = $single;
-                                $playMethod[$k]['count'] = $pm['count'];
-                                $playMethod[$k]['all_moneys'] = $all_moneys;
-                                $playMethod[$k]['codesData'] = $pm['name'];
-                                $playMethod[$k]['playMethod'] = $pm;
-                            }
-                            $g['lottery_type'] = $lottery_type;
-                            $g['lottery_name'] = $lottery_name;
-                            $g['single'] = $single;
-                            $g['all_moneys'] = $all_moneys;
-                            $g['playMethod'] = $playMethod;
-                        }
-                            /*
-                        }else{
-                            $betText = str_replace($playMethod['name'], ' ', $betText);
-                            $singleData = ThirdDTypeService::getMoneys($betText, $playMethod['name'], $playMethod);
-                            $logArr = ['betText'=>$betText, 'singleData'=>$singleData, 'playMethod'=>$playMethod];
-                            $single = $playMethod['single'];
-                            if(empty($single) && ($singleData['single_cn_text']=='元' OR $singleData['single_txt']=='元') && !empty($singleData['single'])){
-                                $single = $singleData['single'];
-                            }
-                            if(empty($single) && ($singleData['single_cn_text']=='倍' OR $singleData['single_txt']=='倍') && !empty($singleData['single_cn'])){
-                                $Odds = Odds3dService::getOdds($this->user_id, $playMethod['id']); # 玩法赔率
-                                $single = $Odds['money'] * $singleData['single_cn'];
-                            }
-                            Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-03', $logArr);
-
-                            $all_moneys = $single * $count;
-                            $g['lottery_type'] = $lottery_type;
-                            $g['lottery_name'] = $lottery_name;
-                            $g['single'] = $single;
-                            $g['all_moneys'] = $all_moneys;
-                            $g['singleData'] = $singleData;
-
-                            $playMethod['codes'] = $codes;
-                            $playMethod['single'] = $single;
-                            $playMethod['count'] = $count;
-                            $playMethod['all_moneys'] = $all_moneys;
-                            $playMethod['playMethod'] = $playMethod;
-                            $g['playMethod'][] = $playMethod;
-                        }
-                            */
-                        #p(['g'=>$g, 'singleData'=>$singleData, 'betText'=>$betText], 0);
-                        if(empty($g['single']) OR empty($g['all_moneys'])){
-                            Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '匹配倍异常2', ['betText'=>$betText, 'g'=>$g]);
-                            throw_info('匹配倍数或金额异常', CommonBaseService::CODE_FOR_USER);
-                        }
-                        //var_dump('========='.$lottery_type.'=======');
-                        $dataGroups['betCodeContents'][$lottery_type][] = $g;
+                        $dataGroups['betCodeContents'][$data['lottery_type']][] = $data['g'];
                     }
                     break;
             }
@@ -422,8 +334,74 @@ class EYunMessageOperateService  extends EYunBaseService
         return [0, $data, '处理成功'];
     }
 
-    private static function getOnePlayMethodG(){
+    /**
+     * 单个规则文本处理
+     * @param string $betText
+     * @return array
+     * @throws \common\exceptions\InfoException
+     */
+    public static function getOnePlayMethodG(string $betText='', $user_id=0): array
+    {
+        $betText = trim($betText, "\r\n");
+        $betText = EYunMessageOperateService::resetText($betText); # 重置匹配文本
+        # 重置一下格式方便处理：福+玩法+号码+各x元
+        #EYunMessageOperateService::resetBetText($betText);
+        $g = [];
+        $g['betText'] = $betText;
+        list($lottery_type, $lottery_name, $matchTexts, $isEmpty) = ThirdDTypeService::getLotteryType($betText);
+        #var_dump('1lottery_type:'.$lottery_type, $isEmpty);
+        if($isEmpty){
+            # 彩种匹配为空则取上次匹配的结果
+            $lottery_type = self::$gLotteryType;
+            $lottery_name = self::$gLotteryName;
+        }
+        self::$gLotteryType = $lottery_type;
+        self::$gLotteryName = $lottery_name;
 
+        list($playMethod, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($betText);
+        $logArr = ['lottery_type'=>$lottery_type, 'matchTexts'=>$matchTexts, 'betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count, 'isEmpty'=>$isEmpty];
+        Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-01', $logArr);
+        if(empty($playMethod)){
+            return [10001, [], '匹配不到玩法则忽略'];
+        }
+        $g['codes'] = $codes;
+        # 跨度、组三组六混合情况
+        $playMethodKd = $playMethod[0];
+        $betText = str_replace($playMethodKd['name'], ' ', $betText);
+        $singleData = ThirdDTypeService::getMoneys($betText, $playMethodKd['name'], $playMethod);
+        $single = $singleData['single'];
+        $logArr = ['betText' => $betText, 'singleData' => $singleData, 'playMethod' => $playMethod];
+        Tool_Common::log('/bet_3d/' . __FUNCTION__, 'INFO', '解析日志-02', $logArr);
+        foreach ($playMethod as $k => $pm) {
+            $single = $pm['single'];
+            if (empty($single) && ($singleData['single_cn_text'] == '元' or $singleData['single_txt'] == '元') && !empty($singleData['single'])) {
+                $single = $singleData['single'];
+            }
+            if (empty($single) && ($singleData['single_cn_text'] == '元' or $singleData['single_txt'] == '元') && !empty($singleData['single_cn'])) {
+                $Odds = Odds3dService::getOdds($user_id, $pm['id']); # 玩法赔率
+                $single = $Odds['money'] * $singleData['single_cn'];
+            }
+
+            $all_moneys = $single * $pm['count'];
+            $playMethod[$k]['codes'] = $pm['codes'];
+            $playMethod[$k]['single'] = $single;
+            $playMethod[$k]['count'] = $pm['count'];
+            $playMethod[$k]['all_moneys'] = $all_moneys;
+            $playMethod[$k]['codesData'] = $pm['name'];
+            //$playMethod[$k]['playMethod'] = $pm;
+        }
+        $g['lottery_type'] = $lottery_type;
+        $g['lottery_name'] = $lottery_name;
+        $g['single'] = $single;
+        $g['all_moneys'] = $all_moneys;
+        $g['playMethod'] = $playMethod;
+        #p(['g'=>$g, 'singleData'=>$singleData, 'betText'=>$betText], 0);
+        if(empty($g['single']) OR empty($g['all_moneys'])){
+            Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '匹配倍异常2', ['betText'=>$betText, 'g'=>$g]);
+            throw_info('匹配倍数或金额异常', CommonBaseService::CODE_FOR_USER);
+        }
+        //var_dump('========='.$lottery_type.'=======');
+        return [0, ['text'=>$betText, 'lottery_type'=>$lottery_type, 'g'=>$g], '匹配结束000'];
     }
 
     /**
@@ -476,7 +454,6 @@ class EYunMessageOperateService  extends EYunBaseService
     public function receive(string $text='', string $fromUser=''): array
     {
         try {
-            #p([$user_id, $text]);
             $transaction = static::getDb()->beginTransaction();
             # 校验
             list($code, $vdata, $msg) = self::validateReceive($this->user_id, $text);
@@ -501,7 +478,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $betCodeContents = $data['dataGroups']['betCodeContents'];
             //p($betCodeContents);
             if(empty($betCodeContents)){
-                return [CommonBaseService::CODE_FOR_USER, [], '匹配异常:请按格式输入'];
+                return [CommonBaseService::CODE_FOR_USER, [], '匹配异常323:请按格式输入'];
             }
             //p($betCodeContents);
             $now_time = time();
@@ -517,23 +494,23 @@ class EYunMessageOperateService  extends EYunBaseService
                 $oneAllMoneys = 0.00;
                 $oneAllCounts = 0;
                 foreach ($contents as $playMethods){
+                    //p(['playMethod'=>$playMethods]);
                     $lottery_name = $playMethods['lottery_name'];
-                    foreach ($playMethods['playMethod'] as $content){
-                        if(empty($content['playMethod']['id'])){
+                    foreach ($playMethods['playMethod'] as $method){
+                        if(empty($method['id'])){
                             throw_info('方式匹配为空，请按正确格式输入', CommonBaseService::CODE_FOR_USER);
                         }
 
-                        $playMethod = $content['playMethod'];
                         $Bets = new BetsBackend();
                         $setData = [
                             'user_id' => $this->user_id,
                             'wechat_user_id' => $this->member_id,
                             'order_id' => $betOrderId,
-                            'play_method' => $playMethod['id'],
-                            'codes' => $content['codes'],
-                            'bet_money' => $content['all_moneys'],
-                            'single' => $content['single'],
-                            'count' => $content['count'],
+                            'play_method' => $method['id'],
+                            'codes' => $method['codes'],
+                            'bet_money' => $method['all_moneys'],
+                            'single' => $method['single'],
+                            'count' => $method['count'],
                             'qihao' => $qihao,
                             'lottery_type' => $lottery_type,
                             'lottery_name' => $lottery_name,
@@ -547,10 +524,10 @@ class EYunMessageOperateService  extends EYunBaseService
                             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-02', ['user_id'=>$this->user_id, 'text'=>$text, 'member_id'=>$this->member_id, 'setData'=>$setData]);
                             throw_info(Json::encode($Bets->getErrors(), 320));
                         }
-                        $oneAllMoneys += $content['all_moneys']; # 总投
-                        $oneAllCounts += $content['count']; # 总投
+                        $oneAllMoneys += $method['all_moneys']; # 总投
+                        $oneAllCounts += $method['count']; # 总投
 
-                        $betContent .= "\n".$playMethod['name'].' '.str_replace([':',','],'',$content['codes']).'各'.$content['single'].'共'.$content['all_moneys'];
+                        $betContent .= "\n".$method['name'].' '.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
 
                         # 推送网盘任务：
                         $pushSiteDatas[] = ['betRowId'=>$Bets->id];
