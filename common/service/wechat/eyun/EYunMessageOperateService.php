@@ -116,7 +116,15 @@ class EYunMessageOperateService  extends EYunBaseService
             $splits = array_filter(explode("\n", $t));
             Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本01', ['t0'=>$t, 'ttss'=>$splits]);
             //var_dump('ddd', (strpos($t, '直')===false && strpos($t, '组')===false && strpos($t, '单')===false));
-            if( strpos($t, '拖') !== false OR
+            if(
+                strpos($t, '拖') !== false OR
+                strpos($t, '飞') !== false OR
+                strpos($t, '跨') !== false OR
+                strpos($t, '对') !== false OR
+                strpos($t, '定') !== false OR
+                strpos($t, '位') !== false OR
+                strpos($t, '全包') !== false OR
+                strpos($t, '值') !== false OR
                 (strpos($t, '直') ===false && strpos($t, '组')===false && strpos($t, '单')===false)
             ){
                 $mType = 10;
@@ -127,7 +135,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 if(strpos($replaceText, '直') !== false OR (strpos($replaceText, '单') !== false && strpos($replaceText, '值') === false)){
                     # 直选
                     #$texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t); # 直、组类型直接合并为一行
-                    $mType = 10;
+                    $mType = 11;
                 }else{
                     $flag1 = strpos($replaceText, '组') !== false && preg_match('/\d{4,}/', $replaceText, $matches1); #匹配 组三组六4-9码，此处还差组三两码、组三三码
                     if($flag1){
