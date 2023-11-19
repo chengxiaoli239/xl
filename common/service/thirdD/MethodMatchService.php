@@ -730,7 +730,7 @@ class MethodMatchService extends CommonBaseService
             $numbers = str_replace('位', '', $matches[0]);
         }
 
-        if(empty($numbers) && $numbers === ''){
+        if(empty($numbers) && $numbers !== '0'){
             throw_info('一码定位获取号码异常');
         }
 
@@ -773,7 +773,7 @@ class MethodMatchService extends CommonBaseService
             $numbers = str_replace('位', '', $matches[0]);
         }
 
-        if(empty($numbers) && $numbers === ''){
+        if(empty($numbers) && $numbers !== '0'){
             throw_info($matchName.'获取号码异常');
         }
 
