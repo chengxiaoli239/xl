@@ -125,7 +125,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($t); # 匹配号码前倍数字符先替换为空
                 if(strpos($t, '直') !== false OR (strpos($t, '单') !== false && strpos($t, '值') === false)){
                     # 直选
-                    $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t); # 直、组类型直接合并为一行
+                    #$texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t); # 直、组类型直接合并为一行
                     $mType = 10;
                 }else{
                     $flag1 = strpos($t, '组') !== false && preg_match('/\d{4,}/', $t, $matches1); #匹配 组三组六4-9码，此处还差组三两码、组三三码
