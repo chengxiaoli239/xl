@@ -234,7 +234,7 @@ class ThirdDTypeService extends CommonBaseService
             $patternBei31 = '/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})直\s*(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})组/';
             //$patternBei32 = '/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})单(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})组/';
 
-            $patternNotAndYuanBeiNum = '/([0-9]){1,3}(直|单|直选|组三|组六|组选|组)/u'; # 一直一组、直二组三
+            $patternNotAndYuanBeiNum = '/(\d+){1,3}(直|单|直选|组三|组六|组选|组)/u'; # 一直一组、直二组三
             $pattern36_01 = '/(直|单|直选|组三|组六|组选|组)([0-9]{1,3})/u'; # 一直一组、直二组三
             $perSingle = 0;
             $perSinglesArr = [];
@@ -422,22 +422,16 @@ class ThirdDTypeService extends CommonBaseService
                     //p($singleArr);
                     break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternNotAndYuanBeiNum, $text, $matcheSingles2):
-                    $matchType = 3.2;
-                    //p([$matchType, $text, $matcheSingles1, $matcheSingles2]);
+                    $matchType = 3.21; # 数字倍数
 
-                    foreach ($matcheSingles[1] as $k=>$singleTxt){
-                        if(is_numeric($singleTxt)){
-                            $tmpSingle = $singleTxt; #  转换成元
-                        }else{
-                            # 中文
-                            $tmpSingle = ThirdD::cn2num($singleTxt) * 2; #  # 中文转数字  转换成元
-                        }
-                        if(strpos($matcheSingles[0][$k], '组') !== false){
-                            $singleArr['组'] = $tmpSingle;
-                        }else{
-                            $singleArr['直'] = $tmpSingle;
+                    foreach ($matcheSingles2[0] as $k=>$singleTxt){
+                        $cnKey = (strpos($singleTxt, '组') !== false) ? '组' : '直';
+                        if(preg_match('/(\d+)/', $singleTxt, $ms)){
+                            $tmpSingle = $singleTxt * 2; #  转换成元
+                            $singleArr[$cnKey] = $tmpSingle;
                         }
                     }
+                    //p([$matchType, $singleArr, $text, $matcheSingles2]);
                     break;
                 case strpos($text, '单') !== false && strpos($text,'组') !== false && preg_match_all('/(\d+)单\s*(\d+)组/', $text, $matcheSingles):
                     $matchType = 4;
