@@ -211,7 +211,7 @@ class AgentUsersService extends BaseService {
                 "\n【操作前】".floatval($before_balance).
                 "\n【盛鱼】".floatval($after_balance);
             WechatPrivateMsgReceiveJobs::reply($user_id, [$replyTxt], ['fromUser' => $WechatUser->userName]); # 回复消息
-            push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$user_id, 'type'=>$balanceType, 'wechat_user_id'=>$WechatUser->id]);
+            push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$user_id, 'type'=>$balanceType, 'msg'=>'上下分后报表计算', 'wechat_user_id'=>$WechatUser->id]);
         }catch (\Exception $e){
             $transaction->rollBack();
             Tool_Common::log('/agent_user/'.__FUNCTION__, 'ERR', '审核异常', ['data'=>$data, 'err_msg'=>$e->getMessage()]);

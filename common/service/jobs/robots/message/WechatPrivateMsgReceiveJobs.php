@@ -78,7 +78,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
 
             $message = $err_msg;
         }
-        push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$user_id, 'type'=>$vdata['type'], 'wechat_user_id'=>$wechatUser['id']]);
+        //push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$user_id, 'type'=>$vdata['type'], 'msg'=>'', 'wechat_user_id'=>$wechatUser['id']]);
 
         Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name.'13', ['wcId'=>$wcId, 'text'=>$text, 'replyTxts'=>$replyTxts]);
 
