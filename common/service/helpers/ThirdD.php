@@ -246,7 +246,7 @@ class ThirdD extends BaseService
             }
             $num = $matches[0][0];
         }
-        if(empty($pos) OR empty($num)){
+        if(empty($pos) OR (empty($num) && $num !== '0')){
             throw_info('号码或位置匹配异常');
         }
 
