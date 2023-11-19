@@ -387,7 +387,7 @@ class EYunMessageOperateService  extends EYunBaseService
         $singleData = ThirdDTypeService::getMoneys($betText, $playMethodKd['name'], $playMethod);
         $single = $singleData['single'];
         $logArr = ['betText' => $betText, 'singleData' => $singleData, 'playMethod' => $playMethod];
-        p($logArr);
+        //p($logArr);
         Tool_Common::log('/bet_3d/' . __FUNCTION__, 'INFO', '解析日志-02', $logArr);
         foreach ($playMethod as $k => $pm) {
             $single = $pm['single'];
