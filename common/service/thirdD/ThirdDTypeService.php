@@ -566,7 +566,6 @@ class ThirdDTypeService extends CommonBaseService
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
             $t = $matches[1];
             $single = $t * (int)$methods[$matchName]['money'];
-            p([$text, $single, $t, $matchName, $methods[$matchName], $matches]);
             $single_cn_text = '元';
             $single_cn = '';
             $t = 7;
