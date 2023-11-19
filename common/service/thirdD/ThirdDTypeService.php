@@ -221,8 +221,13 @@ class ThirdDTypeService extends CommonBaseService
             $patternNotAndYuanBeiNum = '/([0-9]){1,3}(直|单|直选|组三|组六|组选|组)/u'; # 一直一组、直二组三
             $pattern36_01 = '/(直|单|直选|组三|组六|组选|组)([0-9]{1,3})/u'; # 一直一组、直二组三
             $perSingle = 0;
+            $perSinglesArr = [];
             if(preg_match_all('/各(\d+)/', $text, $m)){
-                $perSingle = $m[1][0];
+                if(count($m[1])==1){
+                    $perSingle = $m[1][0];
+                }else{
+                    $perSinglesArr = $m[1];
+                }
             }
             switch (true){
                 # 匹配组三组六
@@ -438,11 +443,16 @@ class ThirdDTypeService extends CommonBaseService
                     $matcheCn = $matcheSingles[1];
                     $matcheCnSingles = $matcheSingles[2];
                     if(!empty($perSingle)){
-                        $singleArr['组三'] = $perSingle;
-                        $singleArr['组六'] = $perSingle;
+                        $singleArr[$matcheCn[0]] = $perSinglesArr[0];
+                        $singleArr[$matcheCn[1]] = $perSinglesArr[1];
                     }else{
-                        $singleArr[$matcheCn[0]] = $matcheCnSingles[0];
-                        $singleArr[$matcheCn[1]] = $matcheCnSingles[1];
+                        if(!empty($perSinglesArr)){
+                            $singleArr[$matcheCn[0]] = $matcheCnSingles[0];
+                            $singleArr[$matcheCn[1]] = $matcheCnSingles[1];
+                        }else{
+                            $singleArr[$matcheCn[0]] = $matcheCnSingles[0];
+                            $singleArr[$matcheCn[1]] = $matcheCnSingles[1];
+                        }
                     }
                     break;
                 default:
