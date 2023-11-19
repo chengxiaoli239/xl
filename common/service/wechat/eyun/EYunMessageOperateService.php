@@ -131,6 +131,7 @@ class EYunMessageOperateService  extends EYunBaseService
                     $flag1 = strpos($t, '组') !== false && preg_match('/\d{4,}/', $t, $matches1); #匹配 组三组六4-9码，此处还差组三两码、组三三码
                     if($flag1){
                         $mType = 1;
+                        $flag = false;
                         #$texts = array_merge($texts, $splits);
                     }else{
                         # 此处匹配组三两码、组三三码
