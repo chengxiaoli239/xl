@@ -494,9 +494,9 @@ class ThirdDTypeService extends CommonBaseService
         foreach ($matchArr as $matcheSingle){
             $cnKey = (strpos($matcheSingle, '组') !== false) ? '组' : '直';
             if(preg_match('/\d+/', $matcheSingle, $ms)){
-                $singleArr[$cnKey] = $ms[0] * 2;
+                $singleArr[$cnKey] = strpos($matcheSingle, '元') !== false ? $ms : ($ms[0] * 2);
             }else if(preg_match('/['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}/', $matcheSingle, $ms)){
-                $singleArr[$cnKey] = ThirdD::cn2num($ms[0]) * 2;
+                $singleArr[$cnKey] = strpos($matcheSingle, '元') !== false ? ThirdD::cn2num($ms[0]) : (ThirdD::cn2num($ms[0]) * 2 * 2);
             }
         }
 
