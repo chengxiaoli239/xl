@@ -22,8 +22,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $text = "福家，双飞，66，十倍
-总计100";
+            $text = "福直19元组2元238,328,832,823
+总计12";
             list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($text); # 单个规则文本匹配处理
             p([$text, $code, $data, $msg]);
             $MessageService = new EYunMessageOperateService($user_id=21);

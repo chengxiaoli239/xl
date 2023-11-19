@@ -251,12 +251,14 @@ class ThirdDTypeService extends CommonBaseService
                     $matchType = 1;
                     //p([$matchMethodAndCodeText, $text, $matcheSingles]);
                     # $matcheSingles Array ( [0] => Array ( [0] => 组六各4倍 [1] => 组三各20元 ) [1] => Array ( [0] => 组六 [1] => 组三 ) [2] => Array ( [0] => 倍 [1] => 元 ) )
+                    $zu3Key = $matcheSingles[1][0]? : '组三';
+                    $zu6Key = $matcheSingles[1][1]? : '组六';
                     if(!empty($perSingle)){
-                        $singleArr[$matcheSingles[1][0]] = $perSingle;
-                        $singleArr[$matcheSingles[1][1]] = $perSingle;
+                        $singleArr[$zu3Key] = $perSingle;
+                        $singleArr[$zu6Key] = $perSingle;
                     }else if(!empty($perSinglesArr)){
-                        $singleArr[$matcheSingles[1][0]] = $perSinglesArr[0];
-                        $singleArr[$matcheSingles[1][1]] = $perSinglesArr[1];
+                        $singleArr[$zu3Key] = $perSinglesArr[0];
+                        $singleArr[$zu6Key] = $perSinglesArr[1];
                     }else {
                         foreach ($matcheSingles[0] as $matcheSingle) {
                             $sData = explode('各', $matcheSingle);
@@ -299,8 +301,19 @@ class ThirdDTypeService extends CommonBaseService
                         }
                     }
                     break;
+                case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all('/((直(\d)*元)|(组(\d+)*元))/', $text, $matcheSingles):
+                    $matchType = 2.01;
+                    foreach ($matcheSingles[0] as $matcheSingle){
+                        $cnKey = (strpos($matcheSingle, '组') !== false) ? '组' : '直';
+                        if(preg_match('/\d+/', $matcheSingle, $ms)){
+                            $singleArr[$cnKey] = $ms[0];
+                        }
+                    }
+                    //p([$text, $matcheSingles, $patternZhiZuNum]);
+                    break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternZhiZuNum, $text, $matcheSingles):
-                    $matchType = 2.0;
+                    //p([$text, $matcheSingles, $patternZhiZuNum]);
+                    $matchType = 2.1;
                     foreach ($matcheSingles[0] as $matcheSingle){
                         if(strpos($matcheSingle, '直') !== false && preg_match('/\d+/', $matcheSingle, $m)){
                             $singleArr['直'] = $m[0];
