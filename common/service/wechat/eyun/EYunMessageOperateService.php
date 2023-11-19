@@ -115,8 +115,9 @@ class EYunMessageOperateService  extends EYunBaseService
             $flag = true;  # 是否直组
             $splits = array_filter(explode("\n", $t));
             Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本01', ['t0'=>$t, 'ttss'=>$splits]);
+            //var_dump('ddd', (strpos($t, '直')===false && strpos($t, '组')===false && strpos($t, '单')===false));
             if( strpos($t, '拖') !== false OR
-                (strpos($t, '直')===false && strpos($t, '组')===false && strpos($t, '单')===false)
+                (strpos($t, '直') ===false && strpos($t, '组')===false && strpos($t, '单')===false)
             ){
                 $mType = 10;
                 $flag = false;
@@ -157,7 +158,6 @@ class EYunMessageOperateService  extends EYunBaseService
             }else{
                 $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t); # 直、组类型直接合并为一行
             }
-            break;
         }
         $texts = array_unique($texts);
         $logArr = ['text'=>$text, 'texts'=>$texts, 'ts'=>$ts];
