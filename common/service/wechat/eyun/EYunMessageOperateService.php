@@ -208,12 +208,13 @@ class EYunMessageOperateService  extends EYunBaseService
         //$text = str_replace(['、', "\n"], ' ', $text); # 同义词替换
         $text = str_replace(['各打', '各买', "打", "买"], '各', $text); # 同义词替换
         var_dump(5, $text);
-        if(preg_match_all('/各(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})/u', $text, $ms)){
+        if((strpos($text, '直')===false OR strpos($text, '组')===false) && preg_match_all('/各(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})/u', $text, $ms)){
             foreach ($ms[1] as $k=>$m){
                 $text = str_replace($ms[0][$k], '各'.ThirdD::cn2num($m), $text);
             }
         }
-        if(preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})倍/u', $text, $ms)){ # 五十倍：50倍
+        var_dump(5.1, $text);
+        if((strpos($text, '直')===false OR strpos($text, '组')===false) && preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})倍/u', $text, $ms)){ # 五十倍：50倍
             foreach ($ms[1] as $k=>$m){
                 $text = str_replace($ms[0][$k], ThirdD::cn2num($m).'倍', $text);
             }

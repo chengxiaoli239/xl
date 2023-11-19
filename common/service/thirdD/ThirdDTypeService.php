@@ -301,6 +301,17 @@ class ThirdDTypeService extends CommonBaseService
                         }
                     }
                     break;
+                case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}直)|(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}组)/', $text, $matcheSingles):
+                case strpos($text, '单') !== false && strpos($text, '组') !== false && preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}直)|(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}组)/', $text, $matcheSingles):
+                    $matchType = 2.11;
+                    foreach ($matcheSingles[0] as $matcheSingle){
+                        $cnKey = (strpos($matcheSingle, '组') !== false) ? '组' : '直';
+                        if(preg_match('/['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}/', $matcheSingle, $ms)){
+                            $singleArr[$cnKey] = ThirdD::cn2num($ms[0]) * 2;
+                        }
+                    }
+                    p([$text, $matchType, $matcheSingles, $patternZhiZu, $singleArr]);
+                    break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all('/((直(\d)*元)|(组(\d+)*元))/', $text, $matcheSingles):
                     $matchType = 2.01;
                     foreach ($matcheSingles[0] as $matcheSingle){
