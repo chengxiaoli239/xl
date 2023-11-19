@@ -122,20 +122,21 @@ class EYunMessageOperateService  extends EYunBaseService
                 $mType = 10;
                 $flag = false;
             }else{
-                //list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($t); # 匹配号码前倍数字符先替换为空
-                if(strpos($t, '直') !== false OR (strpos($t, '单') !== false && strpos($t, '值') === false)){
+                $replaceText = $t; # 仅用于匹配区分直组前处理
+                list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($replaceText); # 匹配号码前倍数字符先替换为空
+                if(strpos($replaceText, '直') !== false OR (strpos($replaceText, '单') !== false && strpos($replaceText, '值') === false)){
                     # 直选
                     #$texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t); # 直、组类型直接合并为一行
                     $mType = 10;
                 }else{
-                    $flag1 = strpos($t, '组') !== false && preg_match('/\d{4,}/', $t, $matches1); #匹配 组三组六4-9码，此处还差组三两码、组三三码
+                    $flag1 = strpos($replaceText, '组') !== false && preg_match('/\d{4,}/', $replaceText, $matches1); #匹配 组三组六4-9码，此处还差组三两码、组三三码
                     if($flag1){
                         $mType = 1;
                         $flag = false;
                         #$texts = array_merge($texts, $splits);
                     }else{
                         # 此处匹配组三两码、组三三码
-                        if(strpos($t, '组三') !== false && preg_match_all('/(\d{2,3})/u', $t, $matches)){
+                        if(strpos($replaceText, '组三') !== false && preg_match_all('/(\d{2,3})/u', $replaceText, $matches)){
                             # 组三有重复号码则为组选
                             $flag2 = \common\service\helpers\ThirdD::judgeCodesRepeat($matches[0][0], $sortCode); # 判断号码是否有重复，重复则为组三
                             $mType = 2;
@@ -151,7 +152,7 @@ class EYunMessageOperateService  extends EYunBaseService
                     }
                 }
             }
-            $logArr0 = ['t'=>$t, 'mType'=>$mType, 'texts'=>$texts];
+            $logArr0 = ['t'=>$t, 'replaceText'=>$replaceText, 'mType'=>$mType, 'texts'=>$texts];
             Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本02', $logArr0);
             if(!$flag){
                 # 非直组
