@@ -113,7 +113,7 @@ class EYunMessageOperateService  extends EYunBaseService
         $ts = array_filter($ts);
         foreach ($ts as $t){
             $flag = true;  # 是否直组
-            $splits = array_filter(explode("\n", $t));
+            $splits = array_filter(explode("\r\n", $t));
             Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本01', ['t0'=>$t, 'ttss'=>$splits]);
             //var_dump('ddd', (strpos($t, '直')===false && strpos($t, '组')===false && strpos($t, '单')===false));
             if( strpos($t, '拖') !== false OR
