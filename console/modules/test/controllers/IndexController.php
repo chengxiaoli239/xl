@@ -22,9 +22,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $text = "17、34、45、19、38
-福家双飞各100元
-总计500";
+            $text = "福136  139  346   001各两组";
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
             $betRow = BetsBackend::findOne('1177');

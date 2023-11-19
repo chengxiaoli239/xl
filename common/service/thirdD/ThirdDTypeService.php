@@ -562,6 +562,15 @@ class ThirdDTypeService extends CommonBaseService
             $single = $matches[1];
             $t = 8;
         }
+        $text = '福136  139  346   001各2组';
+        // 使用正则表达式匹配 "各" 或 "共" 后面的数字
+        if (empty($single) && (preg_match('/各\s*(\d+)[直|组]/', $text, $matches) OR
+                preg_match('/各\s*(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})[直|组]/', $text, $matches))) {
+            $single = (is_numeric($matches[1]) ? $matches[1] : ThirdD::cn2num($matches[1])) * 2;
+            $single_txt = $single;
+            $t = 9.1;
+        }
+
         // 使用正则表达式匹配 "各" 或 "共" 后面的数字
         if (empty($single) && preg_match('/各\s*(\d+)/', $text, $matches)) {
             $single_txt = $matches[1];
@@ -571,8 +580,8 @@ class ThirdDTypeService extends CommonBaseService
 
         if (empty($single) && preg_match('/([一二两三四五六七八九十百千万]{1,3})元/u', $cnSingleText, $matches)) {
             $t = $matches[1];
-            $single_txt = $matches[1];
             $single = ThirdD::cn2num($t); # 中文转数字
+            $single_txt = $matches[1];
             $t = 10;
         }
         if (empty($single) && preg_match('/(?:组选|组六|组三)?([一二两三四五六七八九十百千万]{1,3})\s*倍/u', $text, $matches)) {
