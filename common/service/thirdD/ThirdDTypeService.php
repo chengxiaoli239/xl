@@ -310,7 +310,7 @@ class ThirdDTypeService extends CommonBaseService
                             $singleArr[$cnKey] = ThirdD::cn2num($ms[0]) * 2;
                         }
                     }
-                    p([$text, $matchType, $matcheSingles, $patternZhiZu, $singleArr]);
+                    //p([$text, $matchType, $matcheSingles, $patternZhiZu, $singleArr]);
                     break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all('/((直(\d)*元)|(组(\d+)*元))/', $text, $matcheSingles):
                     $matchType = 2.01;
