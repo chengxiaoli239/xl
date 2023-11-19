@@ -310,8 +310,11 @@ class EYunMessageOperateService  extends EYunBaseService
                     $dataGroups = [];
                     foreach ($betTexts as $k1=>$betText){
                         list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($betText); # 单个规则文本匹配处理
+                        Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-001', ['betText'=>$betText, 'code'=>$code, 'msg'=>$msg]);
                         if($code>0){
-                            Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-001', ['text'=>$text, 'betTexts'=>$betTexts, 'counts'=>count($betTexts)]);
+                            if($code == CommonBaseService::CODE_FOR_USER){
+                                throw_info($msg, $code);
+                            }
                             continue;
                         }
                         $dataGroups['betCodeContents'][$data['lottery_type']][] = $data['g'];
@@ -397,8 +400,7 @@ class EYunMessageOperateService  extends EYunBaseService
         $g['playMethod'] = $playMethod;
         #p(['g'=>$g, 'singleData'=>$singleData, 'betText'=>$betText], 0);
         if(empty($g['single']) OR empty($g['all_moneys'])){
-            Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '匹配倍异常2', ['betText'=>$betText, 'g'=>$g]);
-            throw_info('匹配倍数或金额异常', CommonBaseService::CODE_FOR_USER);
+            return [CommonBaseService::CODE_FOR_USER, [], '匹配倍数或金额异常'];
         }
         //var_dump('========='.$lottery_type.'=======');
         return [0, ['text'=>$betText, 'lottery_type'=>$lottery_type, 'g'=>$g], '匹配结束000'];
