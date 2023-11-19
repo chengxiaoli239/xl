@@ -147,6 +147,7 @@ class ThirdDTypeService extends CommonBaseService
             ))
         ) { # 1、2、3组选
             list($matchMethodAndCodeText, $singleArr) = ThirdDTypeService::getTwoMethodAndSingle($text, $matchMethodAndCodeText);
+            p([$matchMethodAndCodeText, $singleArr]);
             $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count, $singleArr);
         }else if(strpos($text, '跨') !== false) { #26-35跨度0
             $methodArr = MethodMatchService::matchKuaDuX($matchMethodAndCodeText, $codes, $count);
@@ -219,6 +220,10 @@ class ThirdDTypeService extends CommonBaseService
 
             $patternNotAndYuanBeiNum = '/([0-9]){1,3}(直|单|直选|组三|组六|组选|组)/u'; # 一直一组、直二组三
             $pattern36_01 = '/(直|单|直选|组三|组六|组选|组)([0-9]{1,3})/u'; # 一直一组、直二组三
+            $perSingle = 0;
+            if(preg_match_all('/各(\d+)/', $text, $m)){
+                $perSingle = $m[1][0];
+            }
             switch (true){
                 # 匹配组三组六
                 case strpos($text, '组三') !== false && strpos($text, '组六') !== false && preg_match_all($pattern36, $text, $matcheSingles):
@@ -432,8 +437,13 @@ class ThirdDTypeService extends CommonBaseService
                     $matchType = 7;
                     $matcheCn = $matcheSingles[1];
                     $matcheCnSingles = $matcheSingles[2];
-                    $singleArr[$matcheCn[0]] = $matcheCnSingles[0];
-                    $singleArr[$matcheCn[1]] = $matcheCnSingles[1];
+                    if(!empty($perSingle)){
+                        $singleArr['组三'] = $perSingle;
+                        $singleArr['组六'] = $perSingle;
+                    }else{
+                        $singleArr[$matcheCn[0]] = $matcheCnSingles[0];
+                        $singleArr[$matcheCn[1]] = $matcheCnSingles[1];
+                    }
                     break;
                 default:
                     $matchType = 99;

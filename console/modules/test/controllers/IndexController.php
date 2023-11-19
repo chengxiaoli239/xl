@@ -22,12 +22,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $text = "福
-133......直组各40元的
-
-123467组三 50元的
-总计70";
-            $text = '福6跨打300元';
+            $text = "福家组三组六134568各打20
+总计40";
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
             $betRow = BetsBackend::findOne('1177');
