@@ -27,7 +27,7 @@ class IndexController extends Controller
 
 123467组三 50元的
 总计70";
-            $betText = '228 288 147 268 177 117组选 各打50元 总计600';
+            $text = '福6跨打300元';
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
             $betRow = BetsBackend::findOne('1177');

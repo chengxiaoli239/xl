@@ -1025,7 +1025,7 @@ class MethodMatchService extends CommonBaseService
                 $codes .= $i;
             }
         }
-        if ($codes !== '0' && empty($codes) && preg_match_all('/'.$cnTextMatch.'(\d{1,}(?:\s+\d{1,})*)/u', $text, $matches1)) {
+        if ($codes !== '0' && empty($codes) && preg_match_all('/(\d{1,}(?:\s+\d{1,})*)/u', $text, $matches1)) {
             $codes = str_replace(' ', '', trim($matches1[1][0]));
         }
         # codes : [23]
