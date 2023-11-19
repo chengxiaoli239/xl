@@ -301,6 +301,15 @@ class ThirdDTypeService extends CommonBaseService
                         }
                     }
                     break;
+                case strpos($text, '直组') !== false && preg_match('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
+                    $matchType = 2.13;
+                    if(preg_match('/\d/', $matcheSingles[0], $ms)){
+                        $single = (strpos($matcheSingles[0], '倍') !== false) ? $ms[0] * 2 : $ms[0];
+                        $singleArr['直'] = $single;
+                        $singleArr['组'] = $single;
+                    }
+                    //p([$text, $matchType, $matcheSingles, $singleArr, $ms]);
+                    break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all('/(直(\d+){1,3}倍)|(组(\d+){1,3}倍)/', $text, $matcheSingles):
                     $matchType = 2.09;
                     $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles[0]);
@@ -401,7 +410,7 @@ class ThirdDTypeService extends CommonBaseService
                     $matchType = 3.21; # 数字倍数
 
                     $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles[0]);
-                    //p([$matchType, $singleArr, $text, $matcheSingles]);
+                    p([$matchType, $singleArr, $text, $matcheSingles]);
                     break;
                 case strpos($text, '单') !== false && strpos($text,'组') !== false && preg_match_all('/(\d+)单\s*(\d+)组/', $text, $matcheSingles):
                     $matchType = 4;
