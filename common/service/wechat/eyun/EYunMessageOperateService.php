@@ -140,7 +140,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             # 组三有重复号码则为组选
                             $flag2 = \common\service\helpers\ThirdD::judgeCodesRepeat($matches[0][0], $sortCode); # 判断号码是否有重复，重复则为组三
                             $mType = 2;
-                            if(!$flag2){
+                            if(strlen($matches[0][0])==2 OR (!$flag2 && strpos($replaceText, '组三') !== false)){ #  len:2 组三两码 或 组三多吗
                                 $mType = 3;
                                 $flag = false; # 组三多吗
                             }
