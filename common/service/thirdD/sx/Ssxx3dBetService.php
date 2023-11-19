@@ -381,7 +381,7 @@ class Ssxx3dBetService extends CommonBaseService
 
         #p(['site'=>$site, 'methodData'=>$methodData, 'betRow'=>$betRow]);
         $codes = str_replace(MethodMatchService::ZU_SPLIT_FLAG, ',', $betCodes);
-        if(empty($codes)){
+        if(empty($codes) && $codes !== '0'){
             throw_info('推送盘口异常:号码为空');
         }
         $post_data = [
