@@ -200,6 +200,12 @@ class EYunMessageOperateService  extends EYunBaseService
         //$text = str_replace(['、', "\n"], ' ', $text); # 同义词替换
         $text = str_replace(['各打', '各买', "打", "买"], '各', $text); # 同义词替换
         var_dump(5, $text);
+        if(preg_match_all('/各(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})/u', $text, $ms)){
+            foreach ($ms[1] as $k=>$m){
+                $text = str_replace($ms[0][$k], '各'.ThirdD::cn2num($m), $text);
+            }
+        }
+        //p([$text, $m]);
 
         # 特殊倍数匹配
         $text = str_replace(['一倍10元', '一倍十元'], '各10元', $text); # 同义词替换
@@ -305,7 +311,6 @@ class EYunMessageOperateService  extends EYunBaseService
                         'originText' => $text,
                     ];
                     $betTexts = EYunMessageOperateService::resetMethodText($text); # 重置匹配文本
-                    //p($betTexts);
                     Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-00', ['text'=>$text, 'betTexts'=>$betTexts, 'counts'=>count($betTexts)]);
                     $dataGroups = [];
                     foreach ($betTexts as $k1=>$betText){
