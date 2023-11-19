@@ -123,6 +123,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 strpos($t, '对') !== false OR
                 strpos($t, '定') !== false OR
                 strpos($t, '位') !== false OR
+                strpos($t, '复式') !== false OR
                 strpos($t, '全包') !== false OR
                 strpos($t, '值') !== false OR
                 (strpos($t, '直') ===false && strpos($t, '组')===false && strpos($t, '单')===false)
