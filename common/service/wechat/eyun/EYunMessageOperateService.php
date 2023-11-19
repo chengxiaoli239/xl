@@ -322,20 +322,20 @@ class EYunMessageOperateService  extends EYunBaseService
                         $logArr = ['lottery_type'=>$lottery_type, 'matchTexts'=>$matchTexts, 'betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count, 'isEmpty'=>$isEmpty];
                         Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-01', $logArr);
                         $g['codes'] = $codes;
-                        if(ThirdD::getMaxDim($playMethod)>1){
+                        if(ThirdD::getMaxDim($playMethod)>1) {
                             # 跨度、组三组六混合情况
                             $playMethodKd = $playMethod[0];
                             $betText = str_replace($playMethodKd['name'], ' ', $betText);
                             $singleData = ThirdDTypeService::getMoneys($betText, $playMethodKd['name'], $playMethod);
                             $single = $singleData['single'];
-                            $logArr = ['betText'=>$betText, 'singleData'=>$singleData, 'playMethod'=>$playMethod];
-                            Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-02', $logArr);
-                            foreach ($playMethod as $k=>$pm){
+                            $logArr = ['betText' => $betText, 'singleData' => $singleData, 'playMethod' => $playMethod];
+                            Tool_Common::log('/bet_3d/' . __FUNCTION__, 'INFO', '解析日志-02', $logArr);
+                            foreach ($playMethod as $k => $pm) {
                                 $single = $pm['single'];
-                                if(empty($single) && ($singleData['single_cn_text']=='元' OR $singleData['single_txt']=='元') && !empty($singleData['single'])){
+                                if (empty($single) && ($singleData['single_cn_text'] == '元' or $singleData['single_txt'] == '元') && !empty($singleData['single'])) {
                                     $single = $singleData['single'];
                                 }
-                                if(empty($single) && ($singleData['single_cn_text']=='元' OR $singleData['single_txt']=='元') && !empty($singleData['single_cn'])){
+                                if (empty($single) && ($singleData['single_cn_text'] == '元' or $singleData['single_txt'] == '元') && !empty($singleData['single_cn'])) {
                                     $Odds = Odds3dService::getOdds($this->user_id, $pm['id']); # 玩法赔率
                                     $single = $Odds['money'] * $singleData['single_cn'];
                                 }
@@ -353,6 +353,8 @@ class EYunMessageOperateService  extends EYunBaseService
                             $g['single'] = $single;
                             $g['all_moneys'] = $all_moneys;
                             $g['playMethod'] = $playMethod;
+                        }
+                            /*
                         }else{
                             $betText = str_replace($playMethod['name'], ' ', $betText);
                             $singleData = ThirdDTypeService::getMoneys($betText, $playMethod['name'], $playMethod);
@@ -381,6 +383,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             $playMethod['playMethod'] = $playMethod;
                             $g['playMethod'][] = $playMethod;
                         }
+                            */
                         #p(['g'=>$g, 'singleData'=>$singleData, 'betText'=>$betText], 0);
                         if(empty($g['single']) OR empty($g['all_moneys'])){
                             Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '匹配倍异常2', ['betText'=>$betText, 'g'=>$g]);
@@ -405,6 +408,10 @@ class EYunMessageOperateService  extends EYunBaseService
             'dataGroups' => $dataGroups,
         ];
         return [0, $data, '处理成功'];
+    }
+
+    private static function getOnePlayMethodG(){
+
     }
 
     /**

@@ -173,22 +173,29 @@ class MethodMatchService extends CommonBaseService
             $singleCnTxt = $matches1[0][0];
             $text = str_replace($singleCnTxt, '', $text);
         }
+        #var_dump(1, $text);
         if (preg_match_all('/共(\d+)/', $text, $matches2)) {
             $singleCnTxt = $matches2[0][0];
             $text = str_replace($singleCnTxt, '', $text);
         }
+        #var_dump(2, $text);
         if (preg_match_all('/各(\d+)/', $text, $matches3)) {
             $singleCnTxt = $matches3[0][0];
             $text = str_replace($singleCnTxt, '', $text);
         }
+        #var_dump(3, $text);
         if (preg_match_all('/(\d+)块/', $text, $matches4)) {
             $singleCnTxt = $matches4[0][0];
             $text = str_replace($singleCnTxt, '', $text);
         }
+        #var_dump(4, $text);
         if (preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})倍/', $text, $matches5)) {
-            $singleCnTxt = $matches5[0][0];
-            $text = str_replace($singleCnTxt, '', $text);
+            if(count($matches5[0])==1){
+                $singleCnTxt = $matches5[0][0];
+                $text = str_replace($singleCnTxt, '', $text);
+            }
         }
+        #var_dump(5, $text);
         //p($text);
 
         return [$originText, $singleCnTxt];
