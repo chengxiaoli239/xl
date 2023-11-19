@@ -150,7 +150,7 @@ class EYunMessageOperateService  extends EYunBaseService
                     }
                 }
             }
-            $logArr0 = ['t'=>$t, 'mType'=>$mType];
+            $logArr0 = ['t'=>$t, 'mType'=>$mType, 'texts'=>$texts];
             Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本02', $logArr0);
             if(!$flag){
                 # 非直组
@@ -158,6 +158,8 @@ class EYunMessageOperateService  extends EYunBaseService
             }else{
                 $texts[] = \common\service\helpers\ThirdD::multiKongHangToOneSpace($t); # 直、组类型直接合并为一行
             }
+            $logArr0 = ['t'=>$t, 'mType'=>$mType, 'texts'=>$texts];
+            Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本03', $logArr0);
         }
         $texts = array_unique($texts);
         $logArr = ['text'=>$text, 'texts'=>$texts, 'ts'=>$ts];
