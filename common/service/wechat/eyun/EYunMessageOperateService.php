@@ -213,7 +213,12 @@ class EYunMessageOperateService  extends EYunBaseService
                 $text = str_replace($ms[0][$k], '各'.ThirdD::cn2num($m), $text);
             }
         }
-        //p([$text, $m]);
+        if(preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})倍/u', $text, $ms)){ # 五十倍：50倍
+            foreach ($ms[1] as $k=>$m){
+                $text = str_replace($ms[0][$k], ThirdD::cn2num($m).'倍', $text);
+            }
+        }
+        //p([$text, $ms]);
 
         # 特殊倍数匹配
         $text = str_replace(['一倍10元', '一倍十元'], '各10元', $text); # 同义词替换
@@ -387,7 +392,6 @@ class EYunMessageOperateService  extends EYunBaseService
         $singleData = ThirdDTypeService::getMoneys($betText, $playMethodKd['name'], $playMethod);
         $single = $singleData['single'];
         $logArr = ['betText' => $betText, 'singleData' => $singleData, 'playMethod' => $playMethod];
-        //p($logArr);
         Tool_Common::log('/bet_3d/' . __FUNCTION__, 'INFO', '解析日志-02', $logArr);
         foreach ($playMethod as $k => $pm) {
             $single = $pm['single'];

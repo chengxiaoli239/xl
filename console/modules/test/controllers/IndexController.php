@@ -22,7 +22,10 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $text = "福136  139  346   001各两组";
+            $text = "福家，百位，3，五十倍
+总计500";
+            list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($text); # 单个规则文本匹配处理
+            p([$text, $code, $data, $msg]);
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
             $betRow = BetsBackend::findOne('1177');
