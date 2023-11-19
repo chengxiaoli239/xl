@@ -254,15 +254,13 @@ class MethodMatchService extends CommonBaseService
         list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($matcheCodeText); # 匹配号码前倍数字符先替换为空
         #if (preg_match_all('/(\d{2,}(?:\s+\d{2,})*)/', $text, $matches)) {
         //p([$matcheCodeText, $text]);
-        if (preg_match_all('/(\d{2,})/u', $matcheCodeText, $matches)) {
+        if (preg_match_all('/(\d{2,})/', $matcheCodeText, $matches)) {
             #$codes = explode(' ', trim($matches[1][0]));
             $codes = $matches[1]; # 多组号码，每组一个个元素
-        } else {
-            throw_info('组选未匹配到号码22,text:'.$text);
         }
-        #p([$text, $matches, $codes, $singleArr]);
+        //p([$text, $matcheCodeText, $matches, $codes, $singleArr]);
         if(empty($codes)){
-            throw_info('匹配组选号码为空');
+            throw_info('匹配组选号码为空22');
         }
         $methodArr = [
             'methodArrZhi' => [],

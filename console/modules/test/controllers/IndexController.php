@@ -22,10 +22,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $text = "排 
-270 240 268 758 680 157 853 842 489 458 259 859 289 258 249 738 078
-各直2元 组2元
-总计72";
+            $text = "福 3678  4码组三2倍";
             list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($text); p([$text, $code, $data, $msg]); # 单个规则文本匹配处理
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
