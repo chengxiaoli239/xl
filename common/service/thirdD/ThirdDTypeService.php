@@ -148,7 +148,7 @@ class ThirdDTypeService extends CommonBaseService
         ) { # 1、2、3组选
             list($matchMethodAndCodeText, $singleArr) = ThirdDTypeService::getTwoMethodAndSingle($text, $matchMethodAndCodeText);
             $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($matchMethodAndCodeText, $codes, $count, $singleArr);
-        }else if(strpos($text, '跨度') !== false) { #26-35跨度0
+        }else if(strpos($text, '跨') !== false) { #26-35跨度0
             $methodArr = MethodMatchService::matchKuaDuX($matchMethodAndCodeText, $codes, $count);
         }else if(strpos($matchMethodAndCodeText, '拖') !== false) { #36-51:1码拖.... [组三|组六]
             $methodArr = MethodMatchService::matchYiMaTuo($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);

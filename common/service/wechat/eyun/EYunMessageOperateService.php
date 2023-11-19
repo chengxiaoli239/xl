@@ -175,34 +175,42 @@ class EYunMessageOperateService  extends EYunBaseService
      */
     public static function resetText($text): string
     {
+        var_dump(0, $text);
         #$text = str_replace('。', '#', $text); # 玩法之间分隔符
         $text = str_replace('组6 ', '组六 ', $text); # 同义词
         $text = str_replace('各', ' 各', $text); # 同义词
-        $text = str_replace('组3 ', '组三 ', $text); # 同义词
+        #$text = str_replace('组3 ', '组三 ', $text); # 同义词
         //$text = str_replace('倍组选 ', '倍组', $text); # 同义词
+        var_dump(1, $text);
         $text = str_replace('组选 ', '组 ', $text); # 同义词
         $text = str_replace('直选 ', '直 ', $text); # 同义词
         $text = str_replace('二吗 ', '二码 ', $text); # 同义词
+        var_dump(2, $text);
         $text = str_replace('，', ' ', $text); # 中文逗号
         $text = str_replace('：', '', $text); # 中文冒号
         $text = str_replace(':', '', $text); # 中文冒号
+        var_dump(3, $text);
         $text = str_replace('一单', '一直', $text); # 中文冒号，
         $text = str_replace('组一直一', '一直一组', $text); # 中文冒号，
 
+        var_dump(4, $text);
         $text = str_replace(['共计', '总计', '计', '='], '共', $text); # 同义词替换
         $text = str_replace(['块', '米', '咪'], '元', $text); # 同义词替换
         $text = str_replace(['托', '脱'], '拖', $text); # 同义词替换
         //$text = str_replace(['、', "\n"], ' ', $text); # 同义词替换
         $text = str_replace(['各打', '各买', "打", "买"], '各', $text); # 同义词替换
+        var_dump(5, $text);
 
         # 特殊倍数匹配
         $text = str_replace(['一倍10元', '一倍十元'], '各10元', $text); # 同义词替换
         $text = str_replace(['一倍20元', '一倍二十元'], '各20元', $text); # 同义词替换
 
+        var_dump(6, $text);
         $text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
         if(preg_match('/个(\d+)元/', $text, $matches)){
             $text = str_replace($matches[0], '各'.$matches[1].'元', $text);
         }
+        var_dump(7, $text);
         if(preg_match('/各([\p{Han}一二三四五六七八九十]{1,3})元/', $text, $matches3)){
             $t = $matches3[1];
             $s = ThirdD::cn2num($t); # 中文转数字
@@ -210,6 +218,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $text = str_replace($matches3[0], '各'.$s.'元', $text);
             #$text = str_replace('共', '各'.$s.'元共', $text);
         }
+        var_dump(8, $text);
         $allTmpMoney = 0.00;
         if(!preg_match('/各(\d+)/', $text, $matches)){ # 没匹配到倍数，做兼容处理
             if(preg_match('/共(\d+)/', $text, $matches2)){
@@ -224,13 +233,16 @@ class EYunMessageOperateService  extends EYunBaseService
         }else{
             if(preg_match('/共(\d+)/', $text, $matches2)){
                 $allTmpMoney = $matches2[1];
+                var_dump(222, $matches2);
                 if(preg_match('/(\d+)元/', $text, $matches4)){
+                    var_dump(444, $matches4);
                     $text = str_replace($matches4[0], '', $text);
                     $text = str_replace('共', '各'.$matches4[0].'共', $text);
                     $text = rtrim($text, '共');
                 }
             }
         }
+        var_dump(9, $text);
 
         $text = str_replace('复试', '复式', $text);
         if(preg_match('/复式(\d{3,})/', $text, $matches5)){

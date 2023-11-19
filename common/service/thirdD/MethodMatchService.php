@@ -431,9 +431,10 @@ class MethodMatchService extends CommonBaseService
                         break;
                     }
                     if($len==3){
-                        if(preg_match('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})\s*组/u', $text, $matches)){
+                        if(preg_match('/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})\s*组/u', $text, $matches)){
                             $single = (is_numeric($matches[1]) || ThirdD::cn2num($matches[1])) * 2; # 中文转数字，一=>1、二=>2.。。。
                         }
+                        //p([$text, $matches]);
                         if($flag){
                             $zuM = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
                             if($single){

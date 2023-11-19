@@ -26,6 +26,9 @@ class IndexController extends Controller
 
 123467组三 50元的
 总计70";
+            $betText = '228 288 147 268 177 117组选 各打50元 总计600';
+            $methodArr = MethodMatchService::matchZhiZuOrZuSanOrZuLiuXMa($betText, $codes=[], $count, $singleArr=[]);
+            p($methodArr);
             #list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
             //p([$originText,$text]);
             //$methodArr = MethodMatchService::matchDingWei($text, $codes=[], $count); p($methodArr);
