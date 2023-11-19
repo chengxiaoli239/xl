@@ -235,7 +235,6 @@ class ThirdDTypeService extends CommonBaseService
                     $matchType = 1;
                     //p([$matchMethodAndCodeText, $text, $matcheSingles]);
                     # $matcheSingles Array ( [0] => Array ( [0] => 组六各4倍 [1] => 组三各20元 ) [1] => Array ( [0] => 组六 [1] => 组三 ) [2] => Array ( [0] => 倍 [1] => 元 ) )
-                    //p($matcheSingles);
                     if(!empty($perSingle)){
                         $singleArr[$matcheSingles[1][0]] = $perSingle;
                         $singleArr[$matcheSingles[1][1]] = $perSingle;
@@ -285,6 +284,7 @@ class ThirdDTypeService extends CommonBaseService
                     }
                     break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternZhiZuNum, $text, $matcheSingles):
+                    $matchType = 2.0;
                     foreach ($matcheSingles[0] as $matcheSingle){
                         if(strpos($matcheSingle, '直') !== false && preg_match('/\d+/', $matcheSingle, $m)){
                             $singleArr['直'] = $m[0];
@@ -317,7 +317,7 @@ class ThirdDTypeService extends CommonBaseService
                             }
                             # 元
                         }
-                        $singleArr[$sData[0]] = $tmpSingle; # 倍数转换成：元
+                        $singleArr[trim($sData[0])] = $tmpSingle; # 倍数转换成：元
                     }
                     if(!empty($singleArr)){
                         if(count($singleArr)==1){
@@ -442,7 +442,7 @@ class ThirdDTypeService extends CommonBaseService
                                 }
                                 # 元
                             }
-                            $singleArr[$ms[1][0]] = $tmpSingle; # 倍数转换成：元
+                            $singleArr[trim($ms[1][0])] = $tmpSingle; # 倍数转换成：元
                         }
                     }
                     break;
@@ -451,15 +451,15 @@ class ThirdDTypeService extends CommonBaseService
                     $matcheCn = $matcheSingles[1];
                     $matcheCnSingles = $matcheSingles[2];
                     if(!empty($perSingle)){
-                        $singleArr[$matcheCn[0]] = $perSingle;
-                        $singleArr[$matcheCn[1]] = $perSingle;
+                        $singleArr[trim($matcheCn[0])] = $perSingle;
+                        $singleArr[trim($matcheCn[1])] = $perSingle;
                     }else{
                         if(!empty($perSinglesArr)){
-                            $singleArr[$matcheCn[0]] = $perSinglesArr[0];
-                            $singleArr[$matcheCn[1]] = $perSinglesArr[1];
+                            $singleArr[trim($matcheCn[0])] = $perSinglesArr[0];
+                            $singleArr[trim($matcheCn[1])] = $perSinglesArr[1];
                         }else{
-                            $singleArr[$matcheCn[0]] = $matcheCnSingles[0];
-                            $singleArr[$matcheCn[1]] = $matcheCnSingles[1];
+                            $singleArr[trim($matcheCn[0])] = $matcheCnSingles[0];
+                            $singleArr[trim($matcheCn[1])] = $matcheCnSingles[1];
                         }
                     }
                     break;

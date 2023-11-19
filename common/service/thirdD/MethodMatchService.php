@@ -295,37 +295,37 @@ class MethodMatchService extends CommonBaseService
                         #throw_info('直选或组选号码必须三个：'.$code, self::CODE_FOR_USER);
                         break;
                     }
-                    if(preg_match_all('/[直|组]/u', $text, $matcheTypes)){ # 匹配直组顺序：Array ( [0] => 直 [1] => 组 )
-                        $text = str_replace('单', '直', $text);
-                        $mTypes = $matcheTypes; # Array ( [0] => 直 [1] => 组 )
-                        if(
-                            preg_match_all('/([一二两三四五六七八九])\s*直([一二三四五六七八九])组/u', $text, $matches) OR
-                            preg_match_all('/([一二两三四五六七八九])\s*组([一二三四五六七八九])直/u', $text, $matches) OR
-                            preg_match_all('/直([一两二三四五六七八九])\s*组([一二三四五六七八九])/u', $text, $matches) OR
-                            preg_match_all('/组([一两二三四五六七八九])\s*直([一二三四五六七八九])/u', $text, $matches) OR
-                            preg_match_all('/直(?:选)?([一两二三四五六七八九0-9])?倍\s*(?:组|组选|组六|组三)?([一两二三四五六七八九0-9])?倍/u', $text, $matches) OR
-                            preg_match_all('/(?:组|组选|组六|组三)?([一两二三四五六七八九0-9])?倍\s*直(?:选)([一两二三四五六七八九0-9])?倍/u', $text, $matches) OR
+                    if(empty($singleArr)){
+                        if(preg_match_all('/[直|组]/u', $text, $matcheTypes)){ # 匹配直组顺序：Array ( [0] => 直 [1] => 组 )
+                            $text = str_replace('单', '直', $text);
+                            $mTypes = $matcheTypes; # Array ( [0] => 直 [1] => 组 )
+                            if(
+                                preg_match_all('/([一二两三四五六七八九])\s*直([一二三四五六七八九])组/u', $text, $matches) OR
+                                preg_match_all('/([一二两三四五六七八九])\s*组([一二三四五六七八九])直/u', $text, $matches) OR
+                                preg_match_all('/直([一两二三四五六七八九])\s*组([一二三四五六七八九])/u', $text, $matches) OR
+                                preg_match_all('/组([一两二三四五六七八九])\s*直([一二三四五六七八九])/u', $text, $matches) OR
+                                preg_match_all('/直(?:选)?([一两二三四五六七八九0-9])?倍\s*(?:组|组选|组六|组三)?([一两二三四五六七八九0-9])?倍/u', $text, $matches) OR
+                                preg_match_all('/(?:组|组选|组六|组三)?([一两二三四五六七八九0-9])?倍\s*直(?:选)([一两二三四五六七八九0-9])?倍/u', $text, $matches) OR
 
-                            preg_match_all('/(\d+)倍直\s*(\d+)倍组/u', $text, $matches) OR
-                            preg_match_all('/(\d+)倍组\s*(\d+)倍直/u', $text, $matches) OR
-                            preg_match_all('/直(\d+)倍\s*组(\d+)倍/u', $text, $matches) OR
-                            preg_match_all('/组(\d+)倍\s*直(\d+)倍/u', $text, $matches)
-                        ){
-                            $singleD = [];
-                            foreach ($mTypes as $key=>$mType){
-                                $singleD[$key] = [
-                                    $mType[0]=>is_numeric($matches[1][0])?(int)$matches[1][0] : ThirdD::cn2num($matches[1][0]) * 2, # 直、组都是两元一倍，所以这里 *2
-                                    $mType[1]=>is_numeric($matches[2][0])?(int)$matches[2][0] : ThirdD::cn2num($matches[2][0]) * 2, # 直、组都是两元一倍，所以这里 *2
-                                ];
+                                preg_match_all('/(\d+)倍直\s*(\d+)倍组/u', $text, $matches) OR
+                                preg_match_all('/(\d+)倍组\s*(\d+)倍直/u', $text, $matches) OR
+                                preg_match_all('/直(\d+)倍\s*组(\d+)倍/u', $text, $matches) OR
+                                preg_match_all('/组(\d+)倍\s*直(\d+)倍/u', $text, $matches)
+                            ){
+                                $singleD = [];
+                                foreach ($mTypes as $key=>$mType){
+                                    $singleD[$key] = [
+                                        $mType[0]=>is_numeric($matches[1][0])?(int)$matches[1][0] : ThirdD::cn2num($matches[1][0]) * 2, # 直、组都是两元一倍，所以这里 *2
+                                        $mType[1]=>is_numeric($matches[2][0])?(int)$matches[2][0] : ThirdD::cn2num($matches[2][0]) * 2, # 直、组都是两元一倍，所以这里 *2
+                                    ];
+                                }
+                                #p([$matcheTypes, $text, $matches, $singleD], 0);
                             }
-                            #p([$matcheTypes, $text, $matches, $singleD], 0);
                         }
+                        $singleArr = $singleD[0];
                     }
 
                     $zhi = ['id'=>self::METHOD_ID_ZHIXUAN, 'name'=>'直选', 'code'=>$code, 'count'=>1]; # 直选
-                    if(!empty($singleD[0]['直'])){
-                        $zhi['single'] = $singleD[0]['直'];
-                    }
                     if(!empty($singleArr['直'])){
                         $zhi['single'] = $singleArr['直'];
                     }
@@ -333,30 +333,19 @@ class MethodMatchService extends CommonBaseService
                     if(!$flag){
                         # 组六
                         $zuliu = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
-                        if(!empty($singleD[0]['组'])){
-                            $zuliu['single'] = $singleD[0]['组'];
-                        }
-                        if(!empty($singleArr['组六'])){
-                            $zuliu['single'] = $singleArr['组六'];
-                        }
-                        if(!empty($singleArr['组'])){
-                            $zuliu['single'] = $singleArr['组'];
+                        if(!empty($singleArr['组六']) OR $singleArr['组']){
+                            $zuliu['single'] = $singleArr['组六'] ? : $singleArr['组'];
                         }
                         $methodArr['methodArr6'][] = $zuliu;
                     }else{
                         # 组三
                         $zusan = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
-                        if(!empty($singleD[0]['组'])){
-                            $zusan['single'] = $singleD[0]['组'];
-                        }
-                        if(!empty($singleArr['组三'])){
-                            $zusan['single'] = $singleArr['组三'];
-                        }
-                        if(!empty($singleArr['组'])){
-                            $zusan['single'] = $singleArr['组'];
+                        if(!empty($singleArr['组三']) OR $singleArr['组']){
+                            $zusan['single'] = $singleArr['组三'] ? : $singleArr['组'];
                         }
                         $methodArr['methodArr3'][] = $zusan;
                     }
+                    p($methodArr);
                     break;
                 case (strpos($text, '组三') !== false && strpos($text, '组六') !== false):
                     if($len<=2){
