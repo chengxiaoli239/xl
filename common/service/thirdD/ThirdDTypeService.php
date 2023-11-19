@@ -566,7 +566,7 @@ class ThirdDTypeService extends CommonBaseService
             $methods = PlayMethodService::getAllMethodsAndAliasName($indexByKey=1);
             $t = $matches[1];
             $single = $t * (int)$methods[$matchName]['money'];
-            //p([$text, $single, $t, $methods[$matchName], $matches]);
+            p([$text, $single, $t, $matchName, $methods[$matchName], $matches]);
             $single_cn_text = '元';
             $single_cn = '';
             $t = 7;
@@ -578,7 +578,7 @@ class ThirdDTypeService extends CommonBaseService
             $single = $matches[1];
             $t = 8;
         }
-        $text = '福136  139  346   001各2组';
+        //$text = '福136  139  346   001各2组';
         // 使用正则表达式匹配 "各" 或 "共" 后面的数字
         if (empty($single) && (preg_match('/各\s*(\d+)[直|组]/', $text, $matches) OR
                 preg_match('/各\s*(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})[直|组]/', $text, $matches))) {

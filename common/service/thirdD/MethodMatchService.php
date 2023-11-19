@@ -662,7 +662,7 @@ class MethodMatchService extends CommonBaseService
         foreach ($codes as $code){
             $code = (string)$code;
             if($code[0] == $code[1]){
-                $methodArr2[] = ['id'=>6, 'name'=>'对子全拖', 'code'=>$code, 'matchName'=>$matchName, 'count'=>$count];
+                $methodArr2[] = ['id'=>6, 'name'=>'对子', 'code'=>$code, 'matchName'=>$matchName, 'count'=>$count];
             }else{
                 $methodArr1[] = ['id'=>5, 'name'=>'双飞', 'code'=>$code, 'matchName'=>$matchName, 'count'=>$count];
             }
@@ -674,7 +674,7 @@ class MethodMatchService extends CommonBaseService
                 $codes2 .= $m2['code'] . self::ZU_SPLIT_FLAG;
             }
             $codes2 = trim($codes2, self::ZU_SPLIT_FLAG);
-            $methodArr[] = ['id'=>6, 'name'=>'对子全拖', 'codes'=>$codes2, 'matchName'=>$matchName, 'count'=>$count2];
+            $methodArr[] = ['id'=>6, 'name'=>'对子', 'codes'=>$codes2, 'matchName'=>$matchName, 'count'=>$count2];
         }
         if(!empty($methodArr1)){
             $count1 = count($methodArr1);
@@ -711,7 +711,7 @@ class MethodMatchService extends CommonBaseService
         $codes = explode(' ', $numbers);
         $count = count($codes);
         $codes = implode(self::ZU_SPLIT_FLAG, $codes);
-        $methodArr = ['id'=>6, 'name'=>'对子全拖', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
+        $methodArr = ['id'=>6, 'name'=>'对子', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
     }
