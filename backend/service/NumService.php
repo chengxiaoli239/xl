@@ -261,6 +261,8 @@ class NumService extends BaseService {
         143=>'过滤昨日同期每两个号码及双重(四定)', # 同97、98
         144=>'过滤前天日同期每两个号码及双重(四定)',
         145=>'过滤大前天日同期每两个号码及双重(四定)',
+
+        142=>'过滤上期每两个号码及双重(四定)', # 同97、98
     ];
 
     /**
@@ -4959,8 +4961,8 @@ class NumService extends BaseService {
     /**
      * 过滤类型号码 - # 过滤上期每两个号码及对数(四定)
      * @param object $plan
-     * @param int $c_type 1上期2昨日同期
-     * @param int $d_type 1对数2双重
+     * @param int $date_num 0为前期1昨天2前天...以此类推
+     * @param int $d_type 过滤的号码类型
      * @return array
      */
     private static function getBeforeKjCodesDynamic83(object $plan, int $date_num=0, int $d_type=1): array
@@ -4998,6 +5000,8 @@ class NumService extends BaseService {
             switch ($d_type){
                 case 2: # 双重
                     $tmpNotWhere[] = ['=', 'type_2', 1];
+                    break;
+                case 20: # 同合分
                     break;
                 default: # 默认对数
                     $tmpNotWhere[] = ['=', 'type_log', 1];
