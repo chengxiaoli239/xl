@@ -233,47 +233,55 @@ class ThirdDTypeService extends CommonBaseService
                 # 匹配组三组六
                 case strpos($text, '组三') !== false && strpos($text, '组六') !== false && preg_match_all($pattern36, $text, $matcheSingles):
                     $matchType = 1;
-                    #p([$matchMethodAndCodeText, $text, $matcheSingles]);
+                    //p([$matchMethodAndCodeText, $text, $matcheSingles]);
                     # $matcheSingles Array ( [0] => Array ( [0] => 组六各4倍 [1] => 组三各20元 ) [1] => Array ( [0] => 组六 [1] => 组三 ) [2] => Array ( [0] => 倍 [1] => 元 ) )
                     //p($matcheSingles);
-                    foreach ($matcheSingles[0] as $matcheSingle){
-                        $sData = explode('各', $matcheSingle);
-                        if(strpos($sData[1], '倍') !== false){
-                            # 倍
-                            $singleTxt = str_replace('倍', '', $sData[1]);
-                            if(is_numeric($singleTxt)){
-                                $tmpSingle = $singleTxt * 10; #  转换成元
-                            }else{
-                                # 中文
-                                $tmpSingle = ThirdD::cn2num($singleTxt) * 10; #  # 中文转数字  转换成元
+                    if(!empty($perSingle)){
+                        $singleArr[$matcheSingles[1][0]] = $perSingle;
+                        $singleArr[$matcheSingles[1][1]] = $perSingle;
+                    }else if(!empty($perSinglesArr)){
+                        $singleArr[$matcheSingles[1][0]] = $perSinglesArr[0];
+                        $singleArr[$matcheSingles[1][1]] = $perSinglesArr[1];
+                    }else {
+                        foreach ($matcheSingles[0] as $matcheSingle) {
+                            $sData = explode('各', $matcheSingle);
+                            if (strpos($sData[1], '倍') !== false) {
+                                # 倍
+                                $singleTxt = str_replace('倍', '', $sData[1]);
+                                if (is_numeric($singleTxt)) {
+                                    $tmpSingle = $singleTxt * 10; #  转换成元
+                                } else {
+                                    # 中文
+                                    $tmpSingle = ThirdD::cn2num($singleTxt) * 10; #  # 中文转数字  转换成元
+                                }
+                            } else {
+                                $singleTxt = str_replace('元', '', $sData[1]);
+                                if (is_numeric($singleTxt)) {
+                                    $tmpSingle = $singleTxt; #  转换成元
+                                } else {
+                                    # 中文
+                                    $tmpSingle = ThirdD::cn2num($singleTxt); #  # 中文转数字  转换成元
+                                }
+                                # 元
                             }
-                        }else{
-                            $singleTxt = str_replace('元', '', $sData[1]);
-                            if(is_numeric($singleTxt)){
-                                $tmpSingle = $singleTxt; #  转换成元
-                            }else{
-                                # 中文
-                                $tmpSingle = ThirdD::cn2num($singleTxt); #  # 中文转数字  转换成元
+                            $singleArr[$sData[0]] = $tmpSingle; # 倍数转换成：元
+                        }
+                        #p($singleArr);
+                        if (!empty($singleArr)) {
+                            if (count($singleArr) == 1) {
+                                $singleArr = [
+                                    '组三' => current($singleArr),
+                                    '组六' => current($singleArr),
+                                ];
                             }
-                            # 元
+                            $matchMethodAndCodeText = $text;
+                            foreach ($matcheSingles[0] as $matcheSingle) {
+                                $matchMethodAndCodeText = str_replace($matcheSingle, '', $matchMethodAndCodeText);
+                            }
+                            $matchMethodAndCodeText = str_replace('组三', '', $matchMethodAndCodeText);
+                            $matchMethodAndCodeText = str_replace('组六', '', $matchMethodAndCodeText);
+                            $matchMethodAndCodeText .= '组三组六';
                         }
-                        $singleArr[$sData[0]] = $tmpSingle; # 倍数转换成：元
-                    }
-                    #p($singleArr);
-                    if(!empty($singleArr)){
-                        if(count($singleArr)==1){
-                            $singleArr = [
-                                '组三' => current($singleArr),
-                                '组六' => current($singleArr),
-                            ];
-                        }
-                        $matchMethodAndCodeText = $text;
-                        foreach ($matcheSingles[0] as $matcheSingle){
-                            $matchMethodAndCodeText = str_replace($matcheSingle, '', $matchMethodAndCodeText);
-                        }
-                        $matchMethodAndCodeText = str_replace('组三', '', $matchMethodAndCodeText);
-                        $matchMethodAndCodeText = str_replace('组六', '', $matchMethodAndCodeText);
-                        $matchMethodAndCodeText .= '组三组六';
                     }
                     break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all($patternZhiZuNum, $text, $matcheSingles):
@@ -443,12 +451,12 @@ class ThirdDTypeService extends CommonBaseService
                     $matcheCn = $matcheSingles[1];
                     $matcheCnSingles = $matcheSingles[2];
                     if(!empty($perSingle)){
-                        $singleArr[$matcheCn[0]] = $perSinglesArr[0];
-                        $singleArr[$matcheCn[1]] = $perSinglesArr[1];
+                        $singleArr[$matcheCn[0]] = $perSingle;
+                        $singleArr[$matcheCn[1]] = $perSingle;
                     }else{
                         if(!empty($perSinglesArr)){
-                            $singleArr[$matcheCn[0]] = $matcheCnSingles[0];
-                            $singleArr[$matcheCn[1]] = $matcheCnSingles[1];
+                            $singleArr[$matcheCn[0]] = $perSinglesArr[0];
+                            $singleArr[$matcheCn[1]] = $perSinglesArr[1];
                         }else{
                             $singleArr[$matcheCn[0]] = $matcheCnSingles[0];
                             $singleArr[$matcheCn[1]] = $matcheCnSingles[1];
