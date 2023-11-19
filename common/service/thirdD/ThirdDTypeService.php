@@ -111,7 +111,7 @@ class ThirdDTypeService extends CommonBaseService
         }
 
         $matchMethodAndCodeText = $text;
-        if(strpos($text, '全包')!==false) { # 9豹子全包
+        if(strpos($text, '全包')!==false OR strpos($text, '豹子') !== false) { # 9豹子全包
             $mType = 1;
             $methodArr = MethodMatchService::matchQuanBao($matchMethodAndCodeText, $codes, $count);
         }else if($methodArr['originName'] == '独胆') { # 4独胆
