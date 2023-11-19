@@ -136,7 +136,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         #$texts = array_merge($texts, $splits);
                     }else{
                         # 此处匹配组三两码、组三三码
-                        if(strpos($replaceText, '组三') !== false && preg_match_all('/(\d{2,3})/u', $replaceText, $matches)){
+                        if(strpos($replaceText, '组') !== false && preg_match_all('/(\d{2,3})/u', $replaceText, $matches)){
                             # 组三有重复号码则为组选
                             $flag2 = \common\service\helpers\ThirdD::judgeCodesRepeat($matches[0][0], $sortCode); # 判断号码是否有重复，重复则为组三
                             $mType = 2;
