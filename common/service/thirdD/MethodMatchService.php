@@ -345,7 +345,7 @@ class MethodMatchService extends CommonBaseService
                         }
                         $methodArr['methodArr3'][] = $zusan;
                     }
-                    p($methodArr);
+                    //p($methodArr);
                     break;
                 case (strpos($text, '组三') !== false && strpos($text, '组六') !== false):
                     if($len<=2){
