@@ -21,9 +21,13 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $text = "体736.281.009.190.280 直2倍组1倍共30元";
-            list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
-            p([$originText,$text]);
+            $text = "福
+133......直组各40元的
+
+123467组三 50元的
+总计70";
+            #list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
+            //p([$originText,$text]);
             //$methodArr = MethodMatchService::matchDingWei($text, $codes=[], $count); p($methodArr);
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
