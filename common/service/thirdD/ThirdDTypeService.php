@@ -575,7 +575,7 @@ class ThirdDTypeService extends CommonBaseService
                 $data['all_moneys'] = $matches[1];
             }
         }
-        Tool_Common::log('/matchSingle/'.__FUNCTION__, 'INFO', '匹配倍数', ['text'=>$text,  't'=>$t, 'data'=>$data]);
+        Tool_Common::log('/matchSingle/'.__FUNCTION__, 'INFO', '匹配倍数01', ['text'=>$text,  't'=>$t, 'data'=>$data]);
 
         return $data;
     }

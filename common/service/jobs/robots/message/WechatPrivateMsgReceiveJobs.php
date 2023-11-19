@@ -74,7 +74,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
                 return '忽略回复：'.$err_msg;
             }
             $r = self::reply($user_id, [$err_msg], $data); # 回复消息
-            Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r, 'err_msg'=>$e->getMessage(), 'file'=>$e->getFile().'_'.$e->getLine()]);
 
             $message = $err_msg;
         }
