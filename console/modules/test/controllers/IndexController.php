@@ -36,7 +36,7 @@ class IndexController extends Controller
 813.913.843.643.804
 351.346.419.907.169
 096.036.034.709.906";
-            $text = '福独7打50元';
+            $text = '福家直选486直二倍组选一倍';
             list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($text); p([$text, $code, $data, $msg]); # 单个规则文本匹配处理
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
