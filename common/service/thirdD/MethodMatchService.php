@@ -909,7 +909,7 @@ class MethodMatchService extends CommonBaseService
             $name = '组六全包';
             $methodArr[] = ['id'=>MethodMatchService::METHOD_ID_ZL_QB, 'name'=>$name, 'codes'=>$name, 'count'=>1];
         }
-        if (preg_match_all('/豹子全包/u', $text, $matches)) {
+        if (preg_match_all('/豹子/u', $text, $matches)) {
             $numbers = $matches[0];
             $name = '豹子全包';
             $methodArr[] = ['id'=>MethodMatchService::METHOD_ID_BAOZI_QB, 'name'=>$name, 'codes'=>$name, 'count'=>1];
