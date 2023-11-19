@@ -319,10 +319,6 @@ class EYunMessageOperateService  extends EYunBaseService
                         $g['betText'] = $betText;
                         list($lottery_type, $lottery_name, $matchTexts, $isEmpty) = ThirdDTypeService::getLotteryType($betText);
                         #var_dump('1lottery_type:'.$lottery_type, $isEmpty);
-                        foreach ($matchTexts as $matchText){
-                            //$betText = trim(str_replace($matchText, '', $betText), ',');
-                        }
-                        #var_dump('2lottery_type:'.$lottery_type, $isEmpty);
                         if($isEmpty){
                             # 彩种匹配为空则取上次匹配的结果
                             $lottery_type = self::$gLotteryType;
@@ -332,11 +328,11 @@ class EYunMessageOperateService  extends EYunBaseService
                         self::$gLotteryName = $lottery_name;
 
                         list($playMethod, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($betText);
+                        $logArr = ['lottery_type'=>$lottery_type, 'matchTexts'=>$matchTexts, 'betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count, 'isEmpty'=>$isEmpty];
+                        Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-01', $logArr);
                         if(empty($playMethod)){
                             continue; # 匹配不到玩法则忽略
                         }
-                        $logArr = ['lottery_type'=>$lottery_type, 'matchTexts'=>$matchTexts, 'betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count, 'isEmpty'=>$isEmpty];
-                        Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-01', $logArr);
                         $g['codes'] = $codes;
                         if(ThirdD::getMaxDim($playMethod)>1) {
                             # 跨度、组三组六混合情况
