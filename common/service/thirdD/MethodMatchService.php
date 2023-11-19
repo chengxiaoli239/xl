@@ -171,29 +171,24 @@ class MethodMatchService extends CommonBaseService
         $originText = $text;
         var_dump(0, $text);
         if (preg_match_all('/(\d+)元/', $text, $matches1)) {
-            $singleCnTxt = $matches1[0][0];
-            $text = str_replace($singleCnTxt, '', $text);
+            MethodMatchService::beforeMatchCodeReplace($text, $matches1);
         }
         var_dump(1, $text);
         if (preg_match_all('/共(\d+)/', $text, $matches2)) {
-            $singleCnTxt = $matches2[0][0];
-            $text = str_replace($singleCnTxt, '', $text);
+            MethodMatchService::beforeMatchCodeReplace($text, $matches2);
         }
         var_dump(2, $text);
         if (preg_match_all('/各(\d+)/', $text, $matches3)) {
-            $singleCnTxt = $matches3[0][0];
-            $text = str_replace($singleCnTxt, '', $text);
+            MethodMatchService::beforeMatchCodeReplace($text, $matches3);
         }
         var_dump(3, $text);
         if (preg_match_all('/(\d+)块/', $text, $matches4)) {
-            $singleCnTxt = $matches4[0][0];
-            $text = str_replace($singleCnTxt, '', $text);
+            MethodMatchService::beforeMatchCodeReplace($text, $matches4);
         }
         var_dump(4, $text);
         if (preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})倍/', $text, $matches5)) {
             if(count($matches5[0])==1){
-                $singleCnTxt = $matches5[0][0];
-                $text = str_replace($singleCnTxt, '', $text);
+                MethodMatchService::beforeMatchCodeReplace($text, $matches5);
             }
         }
         var_dump(5, $text);
@@ -201,6 +196,18 @@ class MethodMatchService extends CommonBaseService
         //p($text);
 
         return [$originText, $singleCnTxt];
+    }
+
+    /**
+     * 匹配号码前先过滤掉金额相关的
+     * @param $text
+     * @param $matches
+     * @return void
+     */
+    public static function beforeMatchCodeReplace(&$text='', $matches=[]){
+        foreach ($matches[0] as $match){
+            $text = str_replace($match, '', $text);
+        }
     }
 
     /**
