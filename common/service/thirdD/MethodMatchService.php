@@ -446,7 +446,7 @@ class MethodMatchService extends CommonBaseService
                         MethodMatchService::getMethodArrDatas($reSortCode, '组六', $methodArr);
                     }
                     break;
-                case strpos($text, '直') !== false OR strpos($text, '单选') !== false:
+                case strpos($text, '直') !== false OR strpos($text, '单选') !== false OR strpos($text, '单') !== false:
                     if($len != 3) {
                         break;
                     }
@@ -459,7 +459,6 @@ class MethodMatchService extends CommonBaseService
                             break;
                         case (preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})\s*直/u', $text, $matches)
                             && strpos($text, '倍')===false && strpos($text, '元')===false):
-                            p($matches);
                             $zhi['single'] = is_numeric($matches[1]) ? :ThirdD::cn2num($matches[1][0]) * 2; # 中文转数字，一=>1、二=>2.。。。
                             break;
                     }
