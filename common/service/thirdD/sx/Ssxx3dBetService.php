@@ -335,8 +335,8 @@ class Ssxx3dBetService extends CommonBaseService
         $codeDatas[$second[0]] = $second[1];
 
         $third = explode(':', $datas[2]);
-        $codeDatas[$third[0]] = $third[2];
-        #p($codeDatas, 0);
+        $codeDatas[$third[0]] = $third[1];
+        //p([$dataStr, $codeDatas]);
         $datas = [];
         for ($i=0; $i<strlen($codeDatas['百']); $i++){
             for ($j=0; $j<strlen($codeDatas['十']); $j++){

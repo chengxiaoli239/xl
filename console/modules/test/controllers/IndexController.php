@@ -25,7 +25,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $betRow = BetsBackend::findOne('4182');
+            $betRow = BetsBackend::findOne('4183');
             list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);p([$code, $data, $msg]);
             #$plan = UserSysPlans::findOne(7636);
             #$filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [146]);
