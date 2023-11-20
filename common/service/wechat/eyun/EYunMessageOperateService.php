@@ -109,7 +109,8 @@ class EYunMessageOperateService  extends EYunBaseService
     public static function resetMethodText($text): array
     {
         $texts = [];
-        $ts = explode(MethodMatchService::METHOD_SPLIT_ZHIZU, $text);
+        $twoHH = ThirdD::getTwoEOL();
+        $ts = explode($twoHH, $text);
         $ts = array_filter($ts);
         foreach ($ts as $t){
             $flag = true;  # 是否直组
@@ -187,7 +188,7 @@ class EYunMessageOperateService  extends EYunBaseService
         var_dump(0, $text);
         #$text = str_replace('。', '#', $text); # 玩法之间分隔符
         $text = str_replace('组6 ', '组六 ', $text); # 同义词
-        $text = str_replace('各', ' 各', $text); # 同义词
+        //$text = str_replace('各', ' 各', $text); # 同义词
         #$text = str_replace('组3 ', '组三 ', $text); # 同义词
         //$text = str_replace('倍组选 ', '倍组', $text); # 同义词
         var_dump(1, $text);

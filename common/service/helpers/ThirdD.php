@@ -273,4 +273,24 @@ class ThirdD extends BaseService
 
         return $str;
     }
+
+    /**
+     * 两个换行
+     * @return string
+     */
+    public static function getTwoEOL(): string
+    {
+
+        $os = strtoupper(substr(PHP_OS, 0, 3));
+
+        switch ($os) {
+            case 'WIN':
+                return "\r\n";
+            case 'MAC':
+            default:
+                return "\n\n";
+        }
+
+        return "\r\n";
+    }
 }

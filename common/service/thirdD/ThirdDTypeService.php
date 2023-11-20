@@ -246,6 +246,12 @@ class ThirdDTypeService extends CommonBaseService
                 }
             }
             switch (true){
+                case strpos($text, '组三') !== false && strpos($text, '组六') !== false && preg_match_all('/组三(各|)(\d*)(倍|元|)|组六(各|)(\d*)(倍|元|)/u', $text, $matcheSingles):
+                case strpos($text, '组三') !== false && strpos($text, '组六') !== false && preg_match_all('/组三(各|)(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})(倍|元|))|(组六(各|)(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})(倍|元|)/u', $text, $matcheSingles):
+                    $matchType = 1.01;
+                    $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles[0]);
+                    //p([$text, $matchType, $matcheSingles, $singleArr]);
+                    break;
                 # 匹配组三组六
                 case strpos($text, '组三') !== false && strpos($text, '组六') !== false && preg_match_all($pattern36, $text, $matcheSingles):
                     $matchType = 1;
@@ -535,15 +541,41 @@ class ThirdDTypeService extends CommonBaseService
     {
         $singleArr = [];
         foreach ($matchArr as $matcheSingle){
-            $cnKey = (strpos($matcheSingle, '组') !== false) ? '组' : '直';
-            if(preg_match('/\d+/', $matcheSingle, $ms)){
-                $singleArr[$cnKey] = strpos($matcheSingle, '元') !== false ? $ms[0] : ($ms[0] * 2);
-            }else if(preg_match('/['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}/u', $matcheSingle, $ms)){
-                $singleArr[$cnKey] = strpos($matcheSingle, '元') !== false ? ThirdD::cn2num($ms[0]) : (ThirdD::cn2num($ms[0]) * 2);
+            $cnKey = ThirdDTypeService::getCnKey($matcheSingle);
+            if(in_array($cnKey, ['组三', '组六'])){
+                # 组三组六除了匹配导倍，其它一般都是元
+                if(preg_match('/\d+/', $matcheSingle, $ms)){
+                    $singleArr[$cnKey] = strpos($matcheSingle, '倍') !== false ? ($ms[0] * 2) : $ms[0];
+                }else if(preg_match('/['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}/u', $matcheSingle, $ms)){
+                    $singleArr[$cnKey] = strpos($matcheSingle, '倍') !== false ? (ThirdD::cn2num($ms[0]) * 2) : ThirdD::cn2num($ms[0]);
+                }
+            }else{
+                if(preg_match('/\d+/', $matcheSingle, $ms)){
+                    $singleArr[$cnKey] = strpos($matcheSingle, '元') !== false ? $ms[0] : ($ms[0] * 2);
+                }else if(preg_match('/['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}/u', $matcheSingle, $ms)){
+                    $singleArr[$cnKey] = strpos($matcheSingle, '元') !== false ? ThirdD::cn2num($ms[0]) : (ThirdD::cn2num($ms[0]) * 2);
+                }
             }
         }
 
         return $singleArr;
+    }
+
+    /**
+     * @param string $text
+     * @return string
+     */
+    public static function getCnKey(string $text=''): string
+    {
+        if(strpos($text, '组三') !== false){
+            $cnKey = '组三';
+        }elseif (strpos($text, '组六') !== false) {
+            $cnKey = '组六';
+        }else{
+            $cnKey = (strpos($text, '组') !== false) ? '组' : '直';
+        }
+
+        return $cnKey;
     }
 
     /**
