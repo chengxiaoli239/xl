@@ -148,7 +148,7 @@ class ThirdDTypeService extends CommonBaseService
                 (strpos($text, '单') !== false && strpos($text, '组') !== false) OR
                 (strpos($text, '组选') !== false) OR
                 (strpos($text, '组') !== false) OR
-                (strpos($text, '单选') !== false) OR
+                (strpos($text, '单') !== false) OR
                 (strpos($text, '直') !== false && strpos($text, '复式')===false)
             ))
         ) { # 1、2、3组选

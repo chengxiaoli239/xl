@@ -461,6 +461,9 @@ class MethodMatchService extends CommonBaseService
                             && strpos($text, '倍')===false && strpos($text, '元')===false):
                             $zhi['single'] = is_numeric($matches[1]) ? :ThirdD::cn2num($matches[1][0]) * 2; # 中文转数字，一=>1、二=>2.。。。
                             break;
+                        case preg_match('/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})s*单/u', $text, $matches):
+                            $zhi['single'] = ThirdD::cn2num($matches[1]) * 2;
+                            break;
                     }
                     //p([$zhi, $matches]);
 
