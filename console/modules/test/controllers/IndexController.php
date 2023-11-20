@@ -28,12 +28,11 @@ class IndexController extends Controller
             #$plan = UserSysPlans::findOne(7636);
             #$filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [146]);
             #p(count($filter_dynamic_codes));
-            $text = '福60，56双飞各二十
-
-，137+138+167+168 直2倍组8倍
-
-体78，27，03飞各二十';
-            $text = '福3D，039，139，978，784，485直各6组各4';
+            $text = '排排
+558.388.778.777.770.
+333.330.370.377.578
+直各3组各4';
+            //$text = '福3D，039，139，978，784，485直各6组各4';
             //$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
             //preg_match('/各([' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3})/u', $text, $matches); p($matches);
