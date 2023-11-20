@@ -459,6 +459,7 @@ class MethodMatchService extends CommonBaseService
                             break;
                         case (preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})\s*直/u', $text, $matches)
                             && strpos($text, '倍')===false && strpos($text, '元')===false):
+                            p($matches);
                             $zhi['single'] = is_numeric($matches[1]) ? :ThirdD::cn2num($matches[1][0]) * 2; # 中文转数字，一=>1、二=>2.。。。
                             break;
                     }
@@ -623,19 +624,15 @@ class MethodMatchService extends CommonBaseService
         list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
         // 使用正则表达式匹配所有单个数字
         if (preg_match_all('/\s*(\d)/', $text, $matches2)) {
-            $numbers = str_replace(' ', '', $matches2[1])[0];
+            $numbers = str_replace(' ', '', $matches2[1]);
         }
         #p([$text, $matches2, $matchName]);
 
         if(empty($numbers) && $numbers === ''){
             throw_info('['.$matchName.']获取号码异常');
         }
-        $codes = [];
-        for ($i=0; $i<strlen($numbers); $i++){
-            $codes[] = $numbers[$i];
-        }
-        $count = count($codes);
-        $codes = implode(self::ZU_SPLIT_FLAG, $codes);
+        $count = count($numbers);
+        $codes = implode(self::ZU_SPLIT_FLAG, $numbers);
         $methodArr[] = ['id'=>4, 'name'=>'独胆', 'codes'=>$codes, 'matchName'=>$matchName, 'count'=>$count];
 
         return $methodArr;
