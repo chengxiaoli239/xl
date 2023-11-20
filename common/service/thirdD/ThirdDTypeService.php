@@ -309,7 +309,7 @@ class ThirdDTypeService extends CommonBaseService
                     break;
                 case strpos($text, '直组') !== false && preg_match('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
                     $matchType = 2.13;
-                    if(preg_match('/\d/', $matcheSingles[0], $ms)){
+                    if(preg_match('/\d+/', $matcheSingles[0], $ms)){
                         $single = (strpos($matcheSingles[0], '倍') !== false) ? $ms[0] * 2 : $ms[0];
                         $singleArr['直'] = $single;
                         $singleArr['组'] = $single;
