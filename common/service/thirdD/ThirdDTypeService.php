@@ -307,6 +307,11 @@ class ThirdDTypeService extends CommonBaseService
                         }
                     }
                     break;
+                case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all('/(直|组)(\d+(元|倍){0,1})/', $text, $matcheSingles):
+                    $matchType = 2.12;
+                    $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles[0]);
+                    p([$text, $matchType, $matcheSingles, $singleArr]);
+                    break;
                 case strpos($text, '直组') !== false && preg_match('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
                     $matchType = 2.13;
                     if(preg_match('/\d+/', $matcheSingles[0], $ms)){
@@ -337,7 +342,7 @@ class ThirdDTypeService extends CommonBaseService
                 case strpos($text, '单') !== false && strpos($text, '组') !== false && preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}直)|(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}组)/', $text, $matcheSingles):
                     $matchType = 2.11;
                     $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles[0]);
-                    //p([$text, $matchType, $matcheSingles, $patternZhiZu, $singleArr]);
+                    p([$text, $matchType, $matcheSingles, $patternZhiZu, $singleArr]);
                     break;
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all('/((直(\d)*元)|(组(\d+)*元))/', $text, $matcheSingles):
                     $matchType = 2.01;
