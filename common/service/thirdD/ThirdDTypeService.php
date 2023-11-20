@@ -117,7 +117,7 @@ class ThirdDTypeService extends CommonBaseService
         }else if($methodArr['originName'] == '独胆' OR strpos($text, '独') !== false) { # 4独胆
             $mType = 2;
             $methodArr = MethodMatchService::matchDuDan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-        }else if($methodArr['originName'] == '双飞' OR $methodArr['originName'] == '对子全拖' OR strpos($text, '对子') !== false) { # 5双飞
+        }else if($methodArr['originName'] == '双飞' OR $methodArr['originName'] == '对子全拖' OR strpos($text, '对') !== false) { # 5双飞
             $mType = 3;
             $methodArr = MethodMatchService::matchShuangFei($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
         }elseif($methodArr['originName'] == '一码定位'){ # 7一码定位
@@ -505,7 +505,29 @@ class ThirdDTypeService extends CommonBaseService
     }
 
     /**
-     * 匹配倍数
+     * 匹配倍数 单种玩法的倍数
+     * @param string $matchStr - 格式 : 各2倍、各2、各2元
+     * @param $type 1直组(2元一倍)、2其它(10元一倍)
+     * @return float|int|string
+     * @throws \common\exceptions\InfoException     * @return int|float
+     */
+    public static function getMatchOneSingle(string $matchStr='', $type=1)
+    {
+        $baseSingle = ($type==2)?10:2;
+        if(preg_match('/\d+/', $matchStr, $ms)) {
+            $single = strpos($matchStr, '倍') !== false ? ($ms[0] * $baseSingle) : $ms[0];
+        }elseif (preg_match('/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})/u', $matchStr, $ms)){
+            $toNum = ThirdD::cn2num($ms[0]);
+            $single = strpos($matchStr, '倍') !== false ? ($toNum * $baseSingle) : $toNum;
+        }else{
+            throw_info('倍数匹配错误');
+        }
+
+        return $single;
+    }
+
+    /**
+     * 匹配倍数 直组玩法一起的倍数
      * @param array $matchArr - 格式 : Array( [0] => 直2倍 [1] => 组1倍 )
      * @return array
      */

@@ -383,6 +383,7 @@ class EYunMessageOperateService  extends EYunBaseService
 
         list($playMethod, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($betText);
         $logArr = ['lottery_type'=>$lottery_type, 'matchTexts'=>$matchTexts, 'betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count, 'isEmpty'=>$isEmpty];
+        //p($logArr);
         Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-01', $logArr);
         if(empty($playMethod)){
             return [10001, [], '匹配不到玩法则忽略'];

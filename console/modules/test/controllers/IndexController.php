@@ -22,21 +22,9 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $text = "3D
-独胆7.9          各500元
-一码定位百位7  各 200元
-一码定位十位0    各200元
-两定位胆:百7个9 各 100元
-两码定位:百2个4  各20元
-两码定位:十0个9  各30元
-
-3D直选.组选 各1元 
-729.947.284.234.739
-287.937.237.239.397
-813.913.843.643.804
-351.346.419.907.169
-096.036.034.709.906";
-            $text = '福家直选486直二倍组选一倍';
+            $text = '福
+734    743    347   374   437   473   378   389   738   783   873   837   457   853   753   直各1倍';
+            //$text = '福体78，27，03飞各二十';
             list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($text); p([$text, $code, $data, $msg]); # 单个规则文本匹配处理
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
