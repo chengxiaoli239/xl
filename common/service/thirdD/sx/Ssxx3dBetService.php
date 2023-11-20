@@ -404,7 +404,6 @@ class Ssxx3dBetService extends CommonBaseService
             "mode" => (string)$betRow['single'],
             "playedId" => $methodData['site_method_id'],
         ];
-        p($post_data);
         $headers = [
             'Cookie' => $site['cookie'],
         ];
