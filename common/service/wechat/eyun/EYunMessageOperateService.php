@@ -203,6 +203,13 @@ class EYunMessageOperateService  extends EYunBaseService
         $text = str_replace('一单', '一直', $text); # 中文冒号，
         $text = str_replace('组一直一', '一直一组', $text); # 中文冒号，
 
+        # '=100' 替换成 '各100'
+        if(preg_match_all('/=(\d+)/', $text, $ms)){
+            foreach ($ms[1] as $m){
+                $text = str_replace('='.$m, '各'.$m, $text);
+            }
+        }
+
         var_dump(4, $text);
         $text = str_replace(['共计', '总计', '计', '='], '共', $text); # 同义词替换
         $text = str_replace(['块', '米', '咪'], '元', $text); # 同义词替换
