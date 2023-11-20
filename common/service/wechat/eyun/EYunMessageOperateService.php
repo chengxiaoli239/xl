@@ -242,6 +242,7 @@ class EYunMessageOperateService  extends EYunBaseService
             }
         }
         var_dump(8, $text);
+        /*
         $allTmpMoney = 0.00;
         if(!preg_match('/各(\d+)/', $text, $matches)){ # 没匹配到倍数，做兼容处理
             if(preg_match('/共(\d+)/', $text, $matches2)){
@@ -265,6 +266,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 }
             }
         }
+        */
         var_dump(9, $text);
 
         $text = str_replace('复试', '复式', $text);
