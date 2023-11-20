@@ -307,9 +307,9 @@ class ThirdDTypeService extends CommonBaseService
                         }
                     }
                     break;
-                case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all('/(直|组)(\d+(元|倍){0,1})/', $text, $matcheSingles):
+                case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all('/(直|组)(各|)(\d+(元|倍){0,1})/', $text, $matcheSingles):
                     $matchType = 2.12;
-                    $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles[0]);
+                    $singleArr = ThirdDTypeService::getMatchTwoSingle1($matcheSingles[0]); # 没有
                     //p([$text, $matchType, $matcheSingles, $singleArr]);
                     break;
                 case strpos($text, '直组') !== false && preg_match('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
@@ -538,8 +538,36 @@ class ThirdDTypeService extends CommonBaseService
     }
 
     /**
-     * 匹配倍数 直组玩法一起的倍数
+     * 匹配倍数 没有关键字"倍"字的默认为：元
      * @param array $matchArr - 格式 : Array( [0] => 直2倍 [1] => 组1倍 )
+     * @return array
+     */
+    public static function getMatchTwoSingle1(array $matchArr=[]): array
+    {
+        $singleArr = [];
+        foreach ($matchArr as $matcheSingle){
+            $cnKey = ThirdDTypeService::getCnKey($matcheSingle);
+            if(in_array($cnKey, ['组三', '组六'])){
+                # 组三组六除了匹配导倍，其它一般都是元
+                if(preg_match('/\d+/', $matcheSingle, $ms)){
+                    $singleArr[$cnKey] = strpos($matcheSingle, '倍') !== false ? ($ms[0] * 2) : $ms[0];
+                }else if(preg_match('/['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}/u', $matcheSingle, $ms)){
+                    $singleArr[$cnKey] = strpos($matcheSingle, '倍') !== false ? (ThirdD::cn2num($ms[0]) * 2) : ThirdD::cn2num($ms[0]);
+                }
+            }else{
+                if(preg_match('/\d+/', $matcheSingle, $ms)){
+                    $singleArr[$cnKey] = strpos($matcheSingle, '倍') !== false ? ($ms[0] * 2) : $ms[0];
+                }else if(preg_match('/['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}/u', $matcheSingle, $ms)){
+                    $singleArr[$cnKey] = strpos($matcheSingle, '倍') !== false ? (ThirdD::cn2num($ms[0]) * 2) : ThirdD::cn2num($ms[0]);
+                }
+            }
+        }
+
+        return $singleArr;
+    }
+
+    /**
+     * 匹配倍数 直组 没有关键字"元"字的默认为：倍    * @param array $matchArr - 格式 : Array( [0] => 直2倍 [1] => 组1倍 )
      * @return array
      */
     public static function getMatchTwoSingle(array $matchArr=[]): array
