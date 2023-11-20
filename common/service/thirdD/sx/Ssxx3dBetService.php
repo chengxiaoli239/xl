@@ -239,27 +239,32 @@ class Ssxx3dBetService extends CommonBaseService
      */
     public static function resetOneFixed($dataStr): string
     {
-        $datas = explode(':', $dataStr);
+        $codeDatas = explode(MethodMatchService::ZU_SPLIT_FLAG, $dataStr);
+
         $dataCodes = [];
-        switch(true){
-            case $datas[0] == '百':
-                for ($i=0; $i<strlen($datas[1]); $i++){
-                    $dataCodes[] = $datas[1][$i] . 'XX';
-                }
-                break;
-            case '十':
-                for ($i=0; $i<strlen($datas[1]); $i++) {
-                    $dataCodes[] = 'X' . $datas[1][$i] . 'X';
-                }
-                break;
-            case '个':
-                for ($i=0; $i<strlen($datas[1]); $i++) {
-                    $dataCodes[] = 'XX'.$datas[1][$i];
-                }
-                break;
-            default:
-                throw_info('匹配异常11');
-                break;
+        foreach ($codeDatas as $codeStr){
+            //if(!preg_match_all('/[百十个](\d)/u', str_replace(':','',$datas), $mc)) continue;
+            $datas = explode(':', $codeStr);
+            switch(true){
+                case $datas[0] == '百':
+                    for ($i=0; $i<strlen($datas[1]); $i++){
+                        $dataCodes[] = $datas[1][$i] . 'XX';
+                    }
+                    break;
+                case '十':
+                    for ($i=0; $i<strlen($datas[1]); $i++) {
+                        $dataCodes[] = 'X' . $datas[1][$i] . 'X';
+                    }
+                    break;
+                case '个':
+                    for ($i=0; $i<strlen($datas[1]); $i++) {
+                        $dataCodes[] = 'XX'.$datas[1][$i];
+                    }
+                    break;
+                default:
+                    throw_info('匹配异常11');
+                    break;
+            }
         }
         $dataStr = implode(',', $dataCodes);
 
@@ -399,6 +404,7 @@ class Ssxx3dBetService extends CommonBaseService
             "mode" => (string)$betRow['single'],
             "playedId" => $methodData['site_method_id'],
         ];
+        p($post_data);
         $headers = [
             'Cookie' => $site['cookie'],
         ];
