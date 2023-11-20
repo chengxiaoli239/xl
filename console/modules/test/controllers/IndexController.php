@@ -28,11 +28,7 @@ class IndexController extends Controller
             #$plan = UserSysPlans::findOne(7636);
             #$filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [146]);
             #p(count($filter_dynamic_codes));
-            $text = '101 110 112 121 113
-131 114 141 115 151
-116 161 117 171 118
-181 119 191两单福
-总计72';
+            $text = '313 四单';
             //$text = '998  989  899直各买二元  组各买一元';
             //$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
