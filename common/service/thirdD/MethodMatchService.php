@@ -451,9 +451,9 @@ class MethodMatchService extends CommonBaseService
                         break;
                     }
                     $zhi = ['id'=>self::METHOD_ID_ZHIXUAN, 'name'=>'直选', 'code'=>$code];
-                    //$text = '福853 753 直 各十一倍';
+                    //$text = '福853 753 直 各3倍';
                     switch (true){
-                        //case preg_match('/(各[' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3}(倍|))/', $text, $matches):
+                        case preg_match('/(各[' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3}(倍|))/u', $text, $matches):
                         case preg_match('/各(\d+)(倍|)/', $text, $matches):
                             $zhi['single'] = ThirdDTypeService::getMatchOneSingle($matches[0]);
                             break;

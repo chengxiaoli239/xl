@@ -3274,8 +3274,8 @@ class NumService extends BaseService {
                 case 144: # 过滤前天日同期每两个号码及双重(四定)
                     $codes = NumService::getBeforeKjCodesDynamic83($plan, $dateNum=2, $d_type=2);
                     break;
-                case 146: # 过滤同值及双重(四定)
-                    $codes = NumService::getBeforeKjCodesDynamic118($plan, $dateNum=3, $d_type=2);
+                case 146: # 过滤上期同值及双重(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic118($plan, $dateNum=0, $d_type=2);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
@@ -5379,7 +5379,7 @@ class NumService extends BaseService {
     }
 
     /**
-     * 过滤类型号码 - # 过滤上期每两个号码及对数(四定)
+     * 过滤类型号码 - # 过滤x期同合分及双重(四定)
      * @param object $plan
      * @param int $date_num 0为前期1昨天2前天...以此类推
      * @param int $d_type 过滤的号码类型
@@ -5398,7 +5398,6 @@ class NumService extends BaseService {
         $filterQihao = $current_kj_qihao;
         if($date_num>0){
             # x日同期
-            #$filterQihao = Util::getBeforeNumQihao($current_kj_qihao, $date_num);
             $filterQihao = date('Ymd', strtotime('-'.$date_num.' day')). substr($DataDealStatus['next_qihao'], -3);
         }
 
@@ -5424,7 +5423,7 @@ class NumService extends BaseService {
             ->where(['code_type' => 4])
             ->andWhere(['NOT', $tmpNotWhere]);
         $sql = $query->createCommand()->getRawSql();//p($sql);
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤昨日同期/上期每两个号码及对数', ['c_type'=>$c_type,'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤昨日同期/上期每两个号码及对数', ['date_num'=>$date_num,'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');

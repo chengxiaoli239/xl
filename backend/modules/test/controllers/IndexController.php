@@ -396,9 +396,6 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $plan = UserSysPlans::findOne(7636);
-        $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [146]);
-        p(count($filter_dynamic_codes));
         $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%local_to_site_method}}'); p($r);
         $d = Thirdd::getCurrentKjData($lottery_type=26);p($d);
         $Thirdd = new Thirdd();
