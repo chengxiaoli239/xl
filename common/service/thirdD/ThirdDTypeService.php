@@ -310,7 +310,7 @@ class ThirdDTypeService extends CommonBaseService
                 case strpos($text, '直') !== false && strpos($text, '组') !== false && preg_match_all('/(直|组)(\d+(元|倍){0,1})/', $text, $matcheSingles):
                     $matchType = 2.12;
                     $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles[0]);
-                    p([$text, $matchType, $matcheSingles, $singleArr]);
+                    //p([$text, $matchType, $matcheSingles, $singleArr]);
                     break;
                 case strpos($text, '直组') !== false && preg_match('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
                     $matchType = 2.13;
