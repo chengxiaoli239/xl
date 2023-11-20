@@ -422,7 +422,7 @@ class ThirdDTypeService extends CommonBaseService
                     $matchType = 3.21; # 数字倍数
 
                     $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles[0]);
-                    p([$matchType, $singleArr, $text, $matcheSingles]);
+                    //p([$matchType, $singleArr, $text, $matcheSingles]);
                     break;
                 case strpos($text, '单') !== false && strpos($text,'组') !== false && preg_match_all('/(\d+)单\s*(\d+)组/', $text, $matcheSingles):
                     $matchType = 4;

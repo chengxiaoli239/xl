@@ -32,12 +32,11 @@ class IndexController extends Controller
 734    743    347   374   437   473   378   389   738   783   873   837   457   853   753   直各3倍';
             $text = '福60，56双飞各二十
 
-，137+138+167+168直各2组各8
+，137+138+167+168直 5元
 
 体78，27，03飞各二十';
-            $text = '853   753   直各五十一倍';
             //preg_match('/各([' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3})/u', $text, $matches); p($matches);
-            list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($text); p([$text, $code, $data, $msg]); # 单个规则文本匹配处理
+            #list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($text); p([$text, $code, $data, $msg]); # 单个规则文本匹配处理
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
             $betRow = BetsBackend::findOne('1177');
