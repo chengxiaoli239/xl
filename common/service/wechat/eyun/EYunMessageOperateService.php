@@ -233,12 +233,13 @@ class EYunMessageOperateService  extends EYunBaseService
             $text = str_replace($matches[0], '各'.$matches[1].'元', $text);
         }
         var_dump(7, $text);
-        if(preg_match('/各([\p{Han}一二三四五六七八九十]{1,3})元/', $text, $matches3)){
-            $t = $matches3[1];
-            $s = ThirdD::cn2num($t); # 中文转数字
-            #p([$text, $matches3[0], $s]);
-            $text = str_replace($matches3[0], '各'.$s.'元', $text);
-            #$text = str_replace('共', '各'.$s.'元共', $text);
+        if(preg_match_all('/各([\p{Han}一二三四五六七八九十]{1,3})元/', $text, $matches3)){
+            foreach ($matches3[1] as $m){
+                $s = ThirdD::cn2num($m); # 中文转数字
+                #p([$text, $matches3[0], $s]);
+                $text = str_replace('各'.$m.'元', '各'.$s.'元', $text);
+                #$text = str_replace('共', '各'.$s.'元共', $text);
+            }
         }
         var_dump(8, $text);
         $allTmpMoney = 0.00;
