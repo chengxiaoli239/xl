@@ -5411,21 +5411,18 @@ class NumService extends BaseService {
         //p(['historyKjData'=>$historyKjData], 0);
 
         ####################
-        $notWhere = ['AND'];
         $tmpNotWhere = ['AND'];
         $hf = substr(array_sum([$historyKjData['code1'], $historyKjData['code2'], $historyKjData['code3'], $historyKjData['code4']]), -1);
         $hfs = [$hf, $hf+10, $hf+20, $hf+30];
-        //$tmpNotWhere[] = ['=', 'type_2', 1];
-        $tmpNotWhere[] = ['NOT IN', '(`code_1`+`code_2`+`code_3`+`code_4`)', $hfs];
-        $notWhere[] = $tmpNotWhere;
+        $tmpNotWhere[] = ['IN', '(`code_1`+`code_2`+`code_3`+`code_4`)', $hfs];
+        $tmpNotWhere[] = ['=', 'type_2', 1];
         ####################
 
         $query = (new \yii\db\Query())
             ->select(['code', 'code_type'])
             ->from('lt_num4_type')
             ->where(['code_type' => 4])
-            ->andWhere(['=', 'type_2', 1])
-            ->andWhere(['NOT', $notWhere]);
+            ->andWhere(['NOT', $tmpNotWhere]);
         $sql = $query->createCommand()->getRawSql();//p($sql);
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤昨日同期/上期每两个号码及对数', ['c_type'=>$c_type,'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
 
