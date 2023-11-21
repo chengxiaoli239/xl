@@ -337,12 +337,21 @@ class MethodMatchService extends CommonBaseService
                         }
                         $methodArr['methodArr6'][] = $zuliu;
                     }else{
-                        # 组三
-                        $zusan = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
-                        if(!empty($singleArr['组三']) OR $singleArr['组']){
-                            $zusan['single'] = $singleArr['组三'] ? : $singleArr['组'];
+                        if(count($sortCode)==1){
+                            # 直选，如果组选号码为豹子，则打直选
+                            $zhi = ['id'=>self::METHOD_ID_ZHIXUAN, 'name'=>'直选', 'code'=>$reSortCode, 'count'=>1];
+                            if(!empty($singleArr['组三']) OR $singleArr['组']){
+                                $zhi['single'] = $singleArr['组三'] ? : $singleArr['组'];
+                            }
+                            $methodArr['methodArrZhi'][] = $zhi;
+                        }else{
+                            # 组三
+                            $zusan = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
+                            if(!empty($singleArr['组三']) OR $singleArr['组']){
+                                $zusan['single'] = $singleArr['组三'] ? : $singleArr['组'];
+                            }
+                            $methodArr['methodArr3'][] = $zusan;
                         }
-                        $methodArr['methodArr3'][] = $zusan;
                     }
                     //p($methodArr);
                     break;
@@ -424,12 +433,21 @@ class MethodMatchService extends CommonBaseService
                         }
                         //p([$text, $matches]);
                         if($flag){
-                            $zuM = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
-                            if($single){
-                                $zuM['single'] = $single;
+                            if(count($sortCode)==1){
+                                # 直选，如果组选号码为豹子，则打直选
+                                $zhi = ['id'=>self::METHOD_ID_ZHIXUAN, 'name'=>'直选', 'code'=>$reSortCode, 'count'=>1];
+                                if(!empty($singleArr['组三']) OR $singleArr['组']){
+                                    $zhi['single'] = $singleArr['组三'] ? : $singleArr['组'];
+                                }
+                                $methodArr['methodArrZhi'][] = $zhi;
+                            }else{
+                                $zuM = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
+                                if($single){
+                                    $zuM['single'] = $single;
+                                }
+                                # 组三
+                                $methodArr['methodArr3'][] = $zuM;
                             }
-                            # 组三
-                            $methodArr['methodArr3'][] = $zuM;
                         }else{
                             $zuM = ['id'=>self::METHOD_ID_ZULIU, 'name'=>'组六', 'code'=>$reSortCode, 'count'=>1];
                             if($single){

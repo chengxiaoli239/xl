@@ -147,7 +147,8 @@ class ThirdD extends BaseService
      * @param array $codesArr 剔重之后的号码
      * @return bool
      */
-    public static function judgeCodesRepeat($codes='', &$codesArr=[]){
+    public static function judgeCodesRepeat(string $codes='', &$codesArr=[]): bool
+    {
         if(empty($codes)){
             return false;
         }
@@ -156,7 +157,7 @@ class ThirdD extends BaseService
         for ($i=0; $i<$len; $i++){
             $c1[] = $codes[$i];
         }
-        $codesArr = array_unique($c1);
+        $codesArr = array_unique($c1); # 如果结果 count == 1 则为三重
         if(count($codesArr) < $len){
             //throw_info('该位置号码不能重复');
             return true;

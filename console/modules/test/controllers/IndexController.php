@@ -29,19 +29,7 @@ class IndexController extends Controller
             #$filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [146]);
             #p(count($filter_dynamic_codes));
             //$text = '百:1346,十:3689,个:6789';
-            $text = '福
-组六2拖01589买60元
-3拖01589买60元
-4拖01589买60元
-6拖01589买60元
-7拖01589买60元
-
-组三2拖01589买20元
-3拖01589买20元
-4拖01589买20元
-6拖01589买20元
-7拖01589买20元
-总计400';
+            $text = '福福235  935   934   111 666。777 234   245   945   923  924  925  组各一元';
             //$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
             //preg_match('/各([' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3})/u', $text, $matches); p($matches);
