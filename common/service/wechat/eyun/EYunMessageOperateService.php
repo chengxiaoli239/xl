@@ -111,7 +111,7 @@ class EYunMessageOperateService  extends EYunBaseService
         $texts = [];
         $twoHH = ThirdD::getTwoEOL();
         $ts = explode($twoHH, $text);
-        $ts = array_filter($ts);
+        $ts = array_filter($ts); # 去除空行
         foreach ($ts as $t){
             $flag = true;  # 是否直组
             $splits = array_filter(explode("\n", $t));
@@ -173,7 +173,17 @@ class EYunMessageOperateService  extends EYunBaseService
             $logArr0 = ['t'=>$t, 'mType'=>$mType, 'texts'=>$texts];
             Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本03', $logArr0);
         }
-        $texts = array_unique($texts);
+        $texts = array_unique($texts); # 合并之后的号码文本，直组可多行，其它规则单行
+        foreach ($texts as $k=>$txt){
+            if($k==0) continue;
+            if(
+                # 此行匹配到'拖' && 没匹配到组三或组六 且上一行能匹配到 （拖 && 组三或组六）
+                (strpos($txt, '拖') !== false && strpos($txt, '组六')===false && strpos($txt, '组三')===false) &&
+                ((strpos($texts[$k-1], '组六')===false OR strpos($texts[$k-1], '组三')===false))
+            ){
+                $texts[$k] = (strpos($texts[$k-1], '组三')!==false) ? '组三'.$txt : '组六'.$txt;
+            }
+        }
         $logArr = ['text'=>$text, 'texts'=>$texts, 'ts'=>$ts];
         Tool_Common::log('/match/'.__FUNCTION__, 'INFO', '重置匹配文本11', $logArr);
         return $texts;
@@ -564,7 +574,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         $betContent .= "\n".$method['name'].' '.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
 
                         # 推送网盘任务：
-                        $pushSiteDatas[] = ['betRowId'=>$Bets->id];
+                        $pushSiteDatas[] = ['betRowId'=>$Bets->id, 'orderId'=>$Bets->order_id, 'business_id'=>$Bets->order_id];
                     }
                 }
 
