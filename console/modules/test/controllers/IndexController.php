@@ -29,7 +29,7 @@ class IndexController extends Controller
             #$filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [146]);
             #p(count($filter_dynamic_codes));
             //$text = '百:1346,十:3689,个:6789';
-            $text = '福998  989  899直3倍';
+            $text = '福998  989  899直三元';
             //$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
             //preg_match('/各([' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3})/u', $text, $matches); p($matches);
