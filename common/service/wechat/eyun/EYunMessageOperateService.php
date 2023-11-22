@@ -233,12 +233,14 @@ class EYunMessageOperateService  extends EYunBaseService
             }
         }
         var_dump(5.1, $text);
-        if((strpos($text, '直')===false OR strpos($text, '组')===false) && preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})倍/u', $text, $ms)){ # 五十倍：50倍
-            foreach ($ms[1] as $k=>$m){
-                $text = str_replace($ms[0][$k], ThirdD::cn2num($m).'倍', $text);
-            }
-        }
-        //p([$text, $ms]);
+        #if( preg_match_all('/(直|组六|组三)\s*(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})倍/u', $text, $ms) ){ # 五十倍：50倍，组六两倍组三四倍
+        #    foreach ($ms[0] as $k=>$m){
+        #        if($m){
+        #            $text = str_replace($m, $ms[1][$k].ThirdD::cn2num($ms[2][$k]).'倍', $text);
+        #        }
+        #    }
+        #}
+        //p(['ddd', $text, $ms]);
 
         # 特殊倍数匹配
         $text = str_replace(['一倍10元', '一倍十元'], '各10元', $text); # 同义词替换

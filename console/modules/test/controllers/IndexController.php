@@ -32,6 +32,27 @@ class IndexController extends Controller
             # 福彩 02349/ 组六组三 各20
             # 福彩 02349/ 12345..32457组六  组三各20
             $text = '福彩 02349/ 组六组三 各20';
+
+            ##################### 直、组 #######################
+            $text = '福一直二组 369';
+            $text = '福直一组二 369';
+            $text = '福1直2组 369';
+            $text = '福直1组2 369';
+
+            $text = '福一元直二元组 369';
+            $text = '福直一元组二元 369';
+            $text = '福1元直2元组 369';
+            $text = '福直1元组2元 369';
+
+            $text = '福1倍直2倍组 369';
+            $text = '福2倍组1倍直 369';
+            $text = '福一倍直二倍组 369';
+            $text = '福二倍组一倍直 369';
+            ##################### 直、组 #######################
+
+            $text = '福和值，8-12，各20元';
+
+            //$text = '四码4569组三组六  各1倍';
             //$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
             //preg_match('/各([' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3})/u', $text, $matches); p($matches);

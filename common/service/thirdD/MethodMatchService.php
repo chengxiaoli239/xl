@@ -3,6 +3,7 @@
 namespace common\service\thirdD;
 
 use common\service\BaseService;
+use common\service\chat\Tool_Common;
 use common\service\CommonService;
 use common\service\helpers\ThirdD;
 use yii\helpers\Json;
@@ -290,6 +291,7 @@ class MethodMatchService extends CommonBaseService
             $flag = \common\service\helpers\ThirdD::judgeCodesRepeat($code, $sortCode); # 判断号码是否有重复，重复则为组三
             switch (true){
                 case ((strpos($text, '直') !== false OR strpos($text, '单') !== false) && strpos($text, '组') !== false):
+                    $matchType = 1.01;
                     if($len != 3) {
                         #throw_info('直选或组选号码必须三个：'.$code, self::CODE_FOR_USER);
                         break;
@@ -356,6 +358,7 @@ class MethodMatchService extends CommonBaseService
                     //p($methodArr);
                     break;
                 case (strpos($text, '组三') !== false && strpos($text, '组六') !== false):
+                    $matchType = 1.02;
                     if($len<=2){
                         //throw_info('组六号码至少为三个：'.$code);
                         break;
@@ -390,6 +393,7 @@ class MethodMatchService extends CommonBaseService
                     }
                     break;
                 case strpos($text, '组三') !== false:
+                    $matchType = 1.03;
                     if($flag){
                         if($len==3){ # 常规的组三
                             $zuSan = ['id'=>self::METHOD_ID_ZUSAN, 'name'=>'组三', 'code'=>$reSortCode, 'count'=>1];
@@ -404,6 +408,7 @@ class MethodMatchService extends CommonBaseService
                     }
                     break;
                 case strpos($text, '组六') !== false:
+                    $matchType = 1.04;
                     if($len==2){
                         #throw_info('组六号码至少3个号码：'.$code);
                         break;
@@ -422,6 +427,7 @@ class MethodMatchService extends CommonBaseService
                     break;
                 case strpos($text, '组') !== false:
                 #case strpos($text, '组选') !== false:
+                    $matchType = 1.05;
                     # 组三或组六 根据号码类型决定
                     if($len<3){
                         #throw_info('组选号码至少3个号码：'.$code);
@@ -465,6 +471,7 @@ class MethodMatchService extends CommonBaseService
                     }
                     break;
                 case strpos($text, '直') !== false OR strpos($text, '单选') !== false OR strpos($text, '单') !== false:
+                    $matchType = 1.06;
                     if($len != 3) {
                         break;
                     }
@@ -493,8 +500,10 @@ class MethodMatchService extends CommonBaseService
                     $methodArr['methodArrZhi'][] = $zhi;
                     break;
                 default:
+                    $matchType = 99;
                     throw_info('玩法匹配异常...');
             }
+            Tool_Common::log('/matchSingle/'.__FUNCTION__, 'INFO', '匹配', ['matchType'=>$matchType, 'text'=>$text]);
         }
         /**
             {
@@ -1192,15 +1201,22 @@ class MethodMatchService extends CommonBaseService
      */
     public static function matchHeZhi($text='', &$codes=[], &$count=0, $matchName=''){
         $text = trim(str_replace(' ', ',', $text));
-        //p([$text, $matchName]);
+        //p(['ddd', $text, $matchName]);
+        list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
 
         # 和值范围
-        if (strpos($text, ',')===false && preg_match_all('/(\d+)\s*[-|到|至]\s*(\d+)/u', $text, $matches0)) {
+        if (preg_match_all('/(\d+)\s*[-|到|至]\s*(\d+)/u', $text, $matches0)) {
             $numsArr = [];
             for ($i=$matches0[1][0]; $i<=$matches0[2][0]; $i++){
                 $numsArr[] = $i;
             }
         }
+
+        if (empty($numsArr) && preg_match_all('/(\d+)/u', $text, $matches0)) {
+            # 多个间断和值
+            $numsArr = $matches0[0];
+        }
+
         # 指定某几个和值
         if (empty($numsArr) && preg_match_all('/[和合]值(\d+(?:,\d+)*)/u', $text, $matches2)) {
             $numsArr = explode(',', $matches2[1][0]);
