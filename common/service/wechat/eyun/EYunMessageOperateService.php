@@ -214,9 +214,9 @@ class EYunMessageOperateService  extends EYunBaseService
         $text = str_replace('组一直一', '一直一组', $text); # 中文冒号，
 
         # '=100' 替换成 '各100'
-        if(preg_match_all('/=(\d+)/', $text, $ms)){
-            foreach ($ms[1] as $m){
-                $text = str_replace('='.$m, '各'.$m, $text);
+        if(preg_match_all('/=\s*(\d+)/', $text, $ms)){
+            foreach ($ms[0] as $k=>$m){
+                $text = str_replace($m, '各'.$ms[1][$k], $text);
             }
         }
 
@@ -311,13 +311,6 @@ class EYunMessageOperateService  extends EYunBaseService
             }
         }else{
             $texts = $tmpTexts;
-        }
-        $countTexts = count($texts);
-        $perAllMoney = (int)($allTmpMoney/$countTexts);
-        foreach ($texts as &$text){
-            if($perAllMoney>0){
-                $text = str_replace($matches2[0], '共'.$perAllMoney, $text);
-            }
         }
         $texts = implode(MethodMatchService::METHOD_SPLIT_FLAG, $texts);
         #p([$texts, $allTmpMoney, $perAllMoney]);

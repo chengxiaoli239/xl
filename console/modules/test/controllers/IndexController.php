@@ -29,8 +29,10 @@ class IndexController extends Controller
             #$filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [146]);
             #p(count($filter_dynamic_codes));
             //$text = '百:1346,十:3689,个:6789';
-            $text = '福福235  935   934   111 666。777 234   245   945   923  924  925  组各一元';
-            //$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
+            # 福彩 02349/ 组六组三 各20
+            # 福彩 02349/ 12345..32457组六  组三各20
+            $text = '福彩 02349/ 组六组三 各20';
+            $betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
             //preg_match('/各([' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3})/u', $text, $matches); p($matches);
             //list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($text); p([$text, $code, $data, $msg]); # 单个规则文本匹配处理
