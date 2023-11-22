@@ -338,7 +338,7 @@ class ThirdDTypeService extends CommonBaseService
                         case preg_match_all('/(组['.$cnSingleTxt.']{1,3}元{0,1})(直['.$cnSingleTxt.']{1,3}元{0,1})/u', $text, $ms) && $m=4: # 组一直一
                             $matchType = 2.01;
                             $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles = array_merge($ms[1], $ms[2])); # 没有
-                            p([$text, $matchType, $ms, $singleArr, 'm'=>$m]);
+                            #p([$text, $matchType, $ms, $singleArr, 'm'=>$m]);
                             break;
                         case preg_match_all('/(['.$cnSingleTxt.']{1,3}倍{0,1}直)(['.$cnSingleTxt.']{1,3}倍{0,1}组)/u', $text, $ms) && $m=1: # 一倍直一倍组
                         case preg_match_all('/(['.$cnSingleTxt.']{1,3}倍{0,1}组)(['.$cnSingleTxt.']{1,3}倍{0,1}直)/u', $text, $ms) && $m=2: # 一倍组一倍直
@@ -354,7 +354,7 @@ class ThirdDTypeService extends CommonBaseService
                         case preg_match_all('/(组\d+元{0,1})(直\d+元{0,1})/u', $text, $ms) && $m=4: # 组1直1
                             $matchType = 2.03;
                             $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles = array_merge($ms[1], $ms[2])); # 没有
-                            p([$text, $matchType, $ms, $singleArr, 'm'=>$m]);
+                            #p([$text, $matchType, $ms, $singleArr, 'm'=>$m]);
                             break;
                         case preg_match_all('/(直\d+倍{0,1})(组\d+倍{0,1})/u', $text, $ms) && $m=1: # 1倍直1倍组
                         case preg_match_all('/(组\d+倍{0,1})(直\d+倍{0,1})/u', $text, $ms) && $m=2: # 1倍组1倍直
@@ -362,12 +362,12 @@ class ThirdDTypeService extends CommonBaseService
                         case preg_match_all('/(\d+倍{0,1}组)(\d+倍{0,1}直)/u', $text, $ms) && $m=4: # 组1倍直1倍
                             $matchType = 2.04;
                             $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles = array_merge($ms[1], $ms[2])); # 没有
-                            p([$text, $matchType, $ms, $singleArr, 'm'=>$m]);
+                            #p([$text, $matchType, $ms, $singleArr, 'm'=>$m]);
                             break;
                         case preg_match_all('/(直|组)(各|)(\d+(元|倍){0,1})/', $text, $matcheSingles):
                             $matchType = 2.11;
                             $singleArr = ThirdDTypeService::getMatchTwoSingle1($matcheSingles[0]); # 没有
-                            p([$text, $matchType, $matcheSingles, $singleArr]);
+                            #p([$text, $matchType, $matcheSingles, $singleArr]);
                             break;
                         case preg_match('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
                             $matchType = 2.12;

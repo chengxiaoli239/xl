@@ -50,7 +50,11 @@ class IndexController extends Controller
             $text = '福二倍组一倍直 369';
             ##################### 直、组 #######################
 
-            $text = '福和值，8-12，各20元';
+            $text = '福一直一组805.855.904.954
+
+五直两组369
+
+组六两倍0369';
 
             //$text = '四码4569组三组六  各1倍';
             //$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
