@@ -33,8 +33,8 @@ class  CrontabIndexService{
                 $rst[$TzSystemsUser['id']] = ['tz_system_id'=>$tz_system_id, 'r'=>$r];
             }catch (\Exception $e){
                 $rst[$TzSystemsUser['id']] = ['tz_system_id'=>$tz_system_id, 'err_msg'=>$e->getMessage()];
+                Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '登陆信息', ['rst'=>$rst]);
             }
-            Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '登陆信息', ['rst'=>$rst]);
         }
 
         return $rst;
