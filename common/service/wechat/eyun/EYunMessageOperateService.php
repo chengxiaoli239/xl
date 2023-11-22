@@ -546,7 +546,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             'wechat_user_id' => $this->member_id,
                             'order_id' => $betOrderId,
                             'play_method' => $method['id'],
-                            'codes' => $method['codes'],
+                            'codes' => (string)$method['codes'],
                             'bet_money' => $method['all_moneys'],
                             'single' => $method['single'],
                             'count' => $method['count'],
