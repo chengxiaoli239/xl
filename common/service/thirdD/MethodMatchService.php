@@ -161,6 +161,7 @@ class MethodMatchService extends CommonBaseService
     const CODE_SPLIT_FLAG = ','; # 组内号码之间符号
     const METHOD_SPLIT_FLAG = "\n"; # 玩法、或规则之间符号（井号#或句号。）
     const METHOD_SPLIT_ZHIZU = "\r\n"; # 两个换行
+    const METHOD_FIXED_FLAG = "X"; # 定位标识
 
     /**
      * 为了避免干扰，匹配前倍数字符用空字符串先替换
@@ -896,7 +897,65 @@ class MethodMatchService extends CommonBaseService
         return $methodArr;
     }
 
+    /**
+     * 7/8、一二三码定位 - 带X定位
+     * @param string $text
+     * @param array $codes
+     * @return array
+     */
+    public static function matchXDingWei(string $text='', array &$codes=[], &$count=0, $matchName=''): array
+    {
+        $methodArr = [];
+        list($originText, $singleCnTxt) = MethodMatchService::replaceSingleText($text); # 匹配号码前倍数字符先替换为空
+        $methodArr = [
+            'methodArrZhi' => [], # 直码
+            'methodArrYiMa' => [], # 一码定
+            'methodArrErMa' => [], # 二码定
+        ];
+        // 使用正则表达式匹配所有单个数字
+        if(preg_match_all('/[X0-9]{3}/', $text, $ms)){
+            $codeDatas = [];
+            foreach ($ms[0] as $code){
+                $countX = substr_count($code, 'X');
+                switch (true){
+                    case $countX == 0: # 三定
+                        $methodArr['methodArrZhi'][] = ['id'=>MethodMatchService::METHOD_ID_DW_ZX_FS, 'name'=>'定位直选复式', 'code'=>$code, 'count'=>1];
+                        break;
+                    case $countX == 1: # 二定
+                        $methodArr['methodArrErMa'][] = ['id'=>MethodMatchService::METHOD_ID_ERMADING, 'name'=>'二码定位', 'code'=>$code, 'count'=>1];
+                        break;
+                    case $countX == 2: # 一定
+                        $methodArr['methodArrYiMa'][] = ['id'=>MethodMatchService::METHOD_ID_YIMADING, 'name'=>'一码定位', 'code'=>$code, 'count'=>1];
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        //p($methodArr, 0);
+        $allCount = 0;
+        foreach ($methodArr as $key=>$items) {
+            if (empty($items)) {
+                unset($methodArr[$key]);
+                continue;
+            }
 
+            $methodCodes = [];
+            foreach ($items as $item){
+                $methodCodes[] = $item['code'];
+            }
+            $countNum = count($items);
+
+            $methodArrD = ['id'=>$item['id'], 'name'=>$item['name'], 'codes'=>implode(MethodMatchService::ZU_SPLIT_FLAG, $methodCodes), 'count'=>$countNum];
+            $methodArr[$key] = $methodArrD;
+            $allCount += $countNum;
+        }
+        $count = $allCount;
+        $newMethodArr = array_values($methodArr);
+        //p([$text, $singleCnTxt, $ms, $methodArr]);
+
+        return $newMethodArr;
+    }
 
     /**
      * 10-15组六四、五...九码

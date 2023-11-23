@@ -50,9 +50,7 @@ class IndexController extends Controller
             $text = '福二倍组一倍直 369';
             ##################### 直、组 #######################
 
-            $text = '福独胆4     8     各1块';
-
-            //$text = '四码4569组三组六  各1倍';
+            $text = '福：4XX/x4X/XX4  X23/X3X/XX3 9XX/X9X/X29  1X3/X1X/XX1一倍';
             //$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
             //preg_match('/各([' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3})/u', $text, $matches); p($matches);

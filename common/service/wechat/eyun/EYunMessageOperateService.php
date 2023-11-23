@@ -109,7 +109,7 @@ class EYunMessageOperateService  extends EYunBaseService
     public static function resetMethodText($text): array
     {
         $texts = [];
-        $twoHH = ThirdD::getTwoEOL();
+        $twoHH = ThirdD::getTwoEOL(); # 双换行
         $ts = explode($twoHH, $text);
         $ts = array_filter($ts); # 去除空行
         foreach ($ts as $t){
@@ -317,6 +317,7 @@ class EYunMessageOperateService  extends EYunBaseService
         $texts = implode(MethodMatchService::METHOD_SPLIT_FLAG, $texts);
         #p([$texts, $allTmpMoney, $perAllMoney]);
         $texts = strtr($texts, ['各各'=>'各', '共共'=>'共']);
+        $texts = str_replace('x', MethodMatchService::METHOD_FIXED_FLAG, $texts);
 
         return trim($texts, '#');
     }
