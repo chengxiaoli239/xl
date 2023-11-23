@@ -159,12 +159,20 @@ class SxThirdDBase extends Component
             $status = $status ?? SsxxRequestLog::REQUEST_STATUS_FAIL;
             $endtime = microtime(true) * 10000;
             // 记录请求日志
+            $result = $result ? Json::encode([
+                'username'=>$result['username'],
+                'credits'=>$result['credits'],
+                'credits_use'=>$result['credits_use'],
+                'credits_remaining'=>$result['credits_remaining'],
+                's'=>$result['s'],
+                'm'=>$result['m'],
+            ]) : '';
             $logData = [
                 'send_time' => (int)($now / 10000),
                 'api_method' => $apiMethod,
                 'response_micro_time' => (int)(($endtime - $now) / 10),
                 'param' => Json::encode($params),
-                'response_data' => $result ? Json::encode($result) : '',
+                'response_data' => $result,
                 'headers' => Json::encode($headers),
                 'request_method' => $method,
                 'full_url' => $url,
