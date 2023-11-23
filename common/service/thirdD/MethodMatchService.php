@@ -169,31 +169,32 @@ class MethodMatchService extends CommonBaseService
      */
     public static function replaceSingleText(string &$text=''): array
     {
+        var_dump('===========匹配号码前倍数下拿掉=================');
         $originText = $text;
         var_dump(0, $text);
-        if (preg_match_all('/(\d+)元/', $text, $matches1)) {
+        if (preg_match_all('/(\d+)\s*元/', $text, $matches1)) {
             MethodMatchService::beforeMatchCodeReplace($text, $matches1);
         }
         var_dump(1, $text);
-        if (preg_match_all('/共(\d+)/', $text, $matches2)) {
+        if (preg_match_all('/共\s*(\d+)/', $text, $matches2)) {
             MethodMatchService::beforeMatchCodeReplace($text, $matches2);
         }
         var_dump(2, $text);
-        if (preg_match_all('/各(\d+)/', $text, $matches3)) {
+        if (preg_match_all('/各\s*(\d+)/', $text, $matches3)) {
             MethodMatchService::beforeMatchCodeReplace($text, $matches3);
         }
         var_dump(3, $text);
-        if (preg_match_all('/(\d+)块/', $text, $matches4)) {
+        if (preg_match_all('/(\d+)\s*块/', $text, $matches4)) {
             MethodMatchService::beforeMatchCodeReplace($text, $matches4);
         }
         var_dump(4, $text);
-        if (preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})倍/', $text, $matches5)) {
+        if (preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})\s*倍/', $text, $matches5)) {
             if(count($matches5[0])==1){
                 MethodMatchService::beforeMatchCodeReplace($text, $matches5);
             }
         }
         var_dump(5, $text);
-        var_dump('=======================');
+        var_dump('===========匹配号码前倍数下拿掉-结束=================');
         //p($text);
 
         return [$originText, $singleCnTxt];
