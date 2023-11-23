@@ -949,6 +949,7 @@ class MethodMatchService extends CommonBaseService
             $methodArrD = ['id'=>$item['id'], 'name'=>$item['name'], 'codes'=>implode(MethodMatchService::ZU_SPLIT_FLAG, $methodCodes), 'count'=>$countNum];
             $methodArr[$key] = $methodArrD;
             $allCount += $countNum;
+            $codes = array_merge($codes, $methodCodes);
         }
         $count = $allCount;
         $newMethodArr = array_values($methodArr);

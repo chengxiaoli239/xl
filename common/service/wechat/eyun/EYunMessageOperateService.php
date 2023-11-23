@@ -558,12 +558,14 @@ class EYunMessageOperateService  extends EYunBaseService
                             'created_at' => $now_time,
                             'updated_at' => $now_time,
                         ];
-                        //p($setData);
+                        //p($setData, 0);
                         $Bets->setAttributes($setData, false);
                         if(!$Bets->save()){
+                            //var_dump('1111');
                             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-02', ['user_id'=>$this->user_id, 'text'=>$text, 'member_id'=>$this->member_id, 'setData'=>$setData]);
                             throw_info(Json::encode($Bets->getErrors(), 320));
                         }
+                        //var_dump('id'.$method['codes'].'_'.$Bets->id);
                         $oneAllMoneys += $method['all_moneys']; # 总投
                         $oneAllCounts += $method['count']; # 总投
 

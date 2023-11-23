@@ -91,11 +91,15 @@ class Ssxx3dBetService extends CommonBaseService
                     break;
                 case MethodMatchService::METHOD_ID_YIMADING: # 一码定
                     // todo codes需要转换格式，拆分成多组号码 <option value="204">一码定位</option>code[0]["actionData"] => "XX1,2XX,X3X"
-                    $betCodes = Ssxx3dBetService::resetOneFixed($betCodes);
+                    if(strpos($betCodes, 'X')===false) {
+                        $betCodes = Ssxx3dBetService::resetOneFixed($betCodes);
+                    }
                     break;
                 case MethodMatchService::METHOD_ID_ERMADING: # 二码定
                     // todo codes需要转换格式，拆分成多组号码 <option value="205">二码定位</option>code[0]["actionData"] => "X01,21X,X34"
-                    $betCodes = Ssxx3dBetService::resetTwoFixed($betCodes);
+                    if(strpos($betCodes, 'X')===false){
+                        $betCodes = Ssxx3dBetService::resetTwoFixed($betCodes);
+                    }
                     break;
                 case MethodMatchService::METHOD_ID_BAOZI_QB: # 豹子全包
                     $betCodes = '全包';
