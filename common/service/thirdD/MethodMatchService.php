@@ -172,22 +172,26 @@ class MethodMatchService extends CommonBaseService
         var_dump('===========匹配号码前倍数下拿掉=================');
         $originText = $text;
         var_dump(0, $text);
-        if (preg_match_all('/(\d+)\s*元/', $text, $matches1)) {
-            MethodMatchService::beforeMatchCodeReplace($text, $matches1);
+        if (preg_match_all('/各\s*(\d+)(倍|元|块)/', $text, $matches3)) {
+            MethodMatchService::beforeMatchCodeReplace($text, $matches3);
         }
         var_dump(1, $text);
-        if (preg_match_all('/共\s*(\d+)/', $text, $matches2)) {
-            MethodMatchService::beforeMatchCodeReplace($text, $matches2);
-        }
-        var_dump(2, $text);
         if (preg_match_all('/各\s*(\d+)/', $text, $matches3)) {
             MethodMatchService::beforeMatchCodeReplace($text, $matches3);
         }
+        var_dump(2, $text);
+        if (preg_match_all('/(\d+)\s*元/', $text, $matches1)) {
+            MethodMatchService::beforeMatchCodeReplace($text, $matches1);
+        }
         var_dump(3, $text);
+        if (preg_match_all('/共\s*(\d+)/', $text, $matches2)) {
+            MethodMatchService::beforeMatchCodeReplace($text, $matches2);
+        }
+        var_dump(4, $text);
         if (preg_match_all('/(\d+)\s*块/', $text, $matches4)) {
             MethodMatchService::beforeMatchCodeReplace($text, $matches4);
         }
-        var_dump(4, $text);
+        var_dump(5, $text);
         if (preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})\s*倍/', $text, $matches5)) {
             if(count($matches5[0])==1){
                 MethodMatchService::beforeMatchCodeReplace($text, $matches5);
@@ -202,11 +206,11 @@ class MethodMatchService extends CommonBaseService
 
     /**
      * 匹配号码前先过滤掉金额相关的
-     * @param $text
-     * @param $matches
+     * @param string $text
+     * @param array $matches
      * @return void
      */
-    public static function beforeMatchCodeReplace(&$text='', $matches=[]){
+    public static function beforeMatchCodeReplace(string &$text='', array $matches=[]){
         foreach ($matches[0] as $match){
             $text = str_replace($match, '', $text);
         }
@@ -661,7 +665,7 @@ class MethodMatchService extends CommonBaseService
         if (preg_match_all('/\s*(\d)/', $text, $matches2)) {
             $numbers = str_replace(' ', '', $matches2[1]);
         }
-        #p([$text, $matches2, $matchName]);
+        //p([$text, $matches2, $matchName]);
 
         if(empty($numbers) && $numbers === ''){
             throw_info('['.$matchName.']获取号码异常');
