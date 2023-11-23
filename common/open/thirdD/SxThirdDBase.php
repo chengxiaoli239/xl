@@ -153,20 +153,14 @@ class SxThirdDBase extends Component
                 $result = $e->data;
             }
 
+            self::resetResult($result);
             Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'data'=>$result ?? [], 'code'=>$code, 'msg'=>$errorMsg ]);
             throw_info($errorMsg, $code);
         } finally {
             $status = $status ?? SsxxRequestLog::REQUEST_STATUS_FAIL;
             $endtime = microtime(true) * 10000;
             // 记录请求日志
-            $result = $result ? Json::encode([
-                'username'=>$result['username'],
-                'credits'=>$result['credits'],
-                'credits_use'=>$result['credits_use'],
-                'credits_remaining'=>$result['credits_remaining'],
-                's'=>$result['s'],
-                'm'=>$result['m'],
-            ]) : '';
+            $result = $result ? Json::encode($result) : '';
             $logData = [
                 'send_time' => (int)($now / 10000),
                 'api_method' => $apiMethod,
@@ -181,6 +175,22 @@ class SxThirdDBase extends Component
             ];
             SsxxRequestLog::find()->createCommand()->insert(SsxxRequestLog::tableName(), $logData)->execute();
         }
+    }
+
+    private static function resetResult(&$result): array
+    {
+        if(is_array($result)){
+            $result = [
+                'username'=>$result['username'],
+                'credits'=>$result['credits'],
+                'credits_use'=>$result['credits_use'],
+                'credits_remaining'=>$result['credits_remaining'],
+                's'=>$result['s'],
+                'm'=>$result['m'],
+            ];
+        }
+
+        return $result;
     }
 
     /**
