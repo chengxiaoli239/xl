@@ -141,7 +141,7 @@ class SxThirdDBase extends Component
                 throw_info('异常', 30000);
             }
 
-            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'result'=>$result]);
+            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, /*'result'=>$result*/]);
             $status = SsxxRequestLog::REQUEST_STATUS_SUCCESS;
             return $result;
         } catch(\Exception $e) {
@@ -155,7 +155,7 @@ class SxThirdDBase extends Component
             }
 
             self::resetResult($result);
-            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'data'=>$result ?? [], 'code'=>$code, 'msg'=>$errorMsg ]);
+            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, /*'data'=>$result ?? [],*/ 'code'=>$code, 'msg'=>$errorMsg ]);
             throw_info($errorMsg, $code);
         } finally {
             $status = $status ?? SsxxRequestLog::REQUEST_STATUS_FAIL;

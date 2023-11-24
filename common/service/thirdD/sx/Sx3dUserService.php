@@ -55,7 +55,7 @@ class Sx3dUserService extends CommonBaseService
             Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '登陆异常', ['err_msg'=>$e->getMessage()]);
             $result = ['TzSystemsUserId'=>$TzSystemsUser->id, 'msg'=>$e->getMessage()];
         }
-        var_dump($result);
+        //var_dump($result);
 
         return $result;
     }
@@ -74,12 +74,12 @@ class Sx3dUserService extends CommonBaseService
         $logArr = ['tz_system_id'=>$tz_system_id, 'uid'=>$TzSystemsUser->uid];
         if(empty($result) OR strpos($result['m'], '登录') !== false){
             $flag = false;
-            $logArr['result'] = $result;
+            //$logArr['result'] = $result;
         }else{
             $siteUserInfo = $result;
         }
         $result2 = \common\open\thirdD\api\SiteUserApi::getAppNews($domain, $headers);
-        $logArr['result2'] = $result2;
+        //$logArr['result2'] = $result2;
         Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '保持登陆请求', $logArr);
 
         return $flag;
