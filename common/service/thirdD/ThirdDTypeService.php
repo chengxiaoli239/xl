@@ -366,10 +366,26 @@ class ThirdDTypeService extends CommonBaseService
                             $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles = array_merge($ms[1], $ms[2])); # 没有
                             #p([$text, $matchType, $ms, $singleArr, 'm'=>$m]);
                             break;
+                        case (strpos($text, '组直') !== false OR strpos($text,'直组')!==false) && preg_match_all('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
+                            $matchType = 2.05;
+                            $singleArr = ThirdDTypeService::getMatchTwoSingle1($matcheSingles[0]); # 没有
+                            if(count($singleArr)==1){
+                                $singleArr = [ '直' => current($singleArr), '组' => current($singleArr)];
+                            }
+                            //p([$text, $matchType, $matcheSingles, current($singleArr), $singleArr]);
+                            break;
+                        case preg_match_all('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
+                            $matchType = 2.06;
+                            $singleArr = ThirdDTypeService::getMatchTwoSingle1($matcheSingles[0]); # 没有
+                            if(count($singleArr)==1){
+                                $singleArr = [ '直' => current($singleArr), '组' => current($singleArr)];
+                            }
+                            //p([$text, $matchType, $matcheSingles, current($singleArr), $singleArr]);
+                            break;
                         case preg_match_all('/(直|组)(各|)(\d+(元|倍){0,1})/', $text, $matcheSingles):
                             $matchType = 2.11;
                             $singleArr = ThirdDTypeService::getMatchTwoSingle1($matcheSingles[0]); # 没有
-                            #p([$text, $matchType, $matcheSingles, $singleArr]);
+                            p([$text, $matchType, $matcheSingles, $singleArr]);
                             break;
                         case preg_match('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
                             $matchType = 2.12;
