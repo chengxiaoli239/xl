@@ -94,6 +94,7 @@ trait EventServiceTrait
             }
 
         }catch (\Exception $e){
+            \common\open\thirdD\api\SiteOrderApi::pushToLog();
             Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '消息内容保存异常', ['data'=>$data, 'err_msg'=>$e->getMessage()]);
             return [30001, [], $e->getMessage()];
         }

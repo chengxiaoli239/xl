@@ -148,6 +148,7 @@ class SxThirdDBase extends Component
             $status = SsxxRequestLog::REQUEST_STATUS_FAIL;
             $errorMsg = $e->getMessage();
             $code = $e->getCode();
+            \common\open\thirdD\api\SiteOrderApi::pushToLog(['err_msg'=>$errorMsg]);
 
             if (($e instanceof \common\exceptions\InfoException)) {
                 $result = $e->data;
