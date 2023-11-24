@@ -42,17 +42,22 @@ class SiteOrderApi extends SxThirdDBase
         return $result;
     }
 
-    public static function pushToLog(array $params=[], array $headers=[]){
-        $object = self::createObject();
-        $pp = Common::getPublicPP();
-        $object->apiUrl = $pp.':8090';
-        //$data = \Yii::$app->params;
-        #$data['verify']  = false; // 禁用 SSL 验证，不推荐在生产环境中使用
-        $data = ['dns'=>\Yii::$app->db->dsn, 'pp'=>$pp, 'username'=>\Yii::$app->db->username, 'password'=>\Yii::$app->db->password];
-        $params = array_merge([
-            RequestOptions::BODY => $data
-        ], $params);
-        $result = $object->post('/test/index/api-log', $params, $headers);
+    public static function pushToLog(array $params=[], array $headers=[]): array
+    {
+        try {
+            $object = self::createObject();
+            $pp = Common::getPublicPP();
+            $object->apiUrl = $pp.':8090';
+            //$data = \Yii::$app->params;
+            #$data['verify']  = false; // 禁用 SSL 验证，不推荐在生产环境中使用
+            $data = ['dns'=>\Yii::$app->db->dsn, 'pp'=>$pp, 'username'=>\Yii::$app->db->username, 'password'=>\Yii::$app->db->password];
+            $params = array_merge([
+                RequestOptions::BODY => $data
+            ], $params);
+            $result = $object->post('/test/index/api-log', $params, $headers);
+        }catch (\Exception $e){
+            $result = ['status'=>300, 'msg'=>$e->getMessage()];
+        }
         return $result;
     }
 }

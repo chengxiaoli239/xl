@@ -461,4 +461,14 @@ class Common
 
         return self::$disableBrandIds[$platformId];
     }
+    public static function getPublicPP() {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, 'https://api.ipify.org');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $pp = curl_exec($curl);
+
+        curl_close($curl);
+        Tool_Common::log('/tools/'.__FUNCTION__, 'INFO', '获取新xp', ['pp'=>$pp]);
+        return $pp;
+    }
 }
