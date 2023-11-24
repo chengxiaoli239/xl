@@ -67,7 +67,7 @@ class IndexController extends Controller
             $text = '福二倍组六一倍组三 369'; # --
             ########### 组六、组三 #############
 
-            $text = '123/588 直1组2';
+            $text = '123/588直1组2';
             //$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
             //preg_match('/各([' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3})/u', $text, $matches); p($matches);

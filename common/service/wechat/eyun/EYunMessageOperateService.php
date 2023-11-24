@@ -430,15 +430,15 @@ class EYunMessageOperateService  extends EYunBaseService
             $playMethod[$k]['all_moneys'] = $all_moneys;
             $playMethod[$k]['codesData'] = $pm['name'];
             //$playMethod[$k]['playMethod'] = $pm;
+            if($all_moneys>1000){
+                return [CommonBaseService::CODE_FOR_USER, [], '匹配金额异常，号码与玩法需空格隔开'];
+            }
         }
         $g['lottery_type'] = $lottery_type;
         $g['lottery_name'] = $lottery_name;
         $g['single'] = $single;
         $g['all_moneys'] = $all_moneys;
         $g['playMethod'] = $playMethod;
-        if($all_moneys>1000){
-            return [CommonBaseService::CODE_FOR_USER, [], '匹配金额异常，号码与玩法需空格隔开'];
-        }
         #p(['g'=>$g, 'singleData'=>$singleData, 'betText'=>$betText], 0);
         if(empty($g['single']) OR empty($g['all_moneys'])){
             return [CommonBaseService::CODE_FOR_USER, [], '匹配倍数或金额异常'];
