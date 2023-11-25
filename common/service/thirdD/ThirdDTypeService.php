@@ -137,6 +137,11 @@ class ThirdDTypeService extends CommonBaseService
                 $mType = 6;
                 $methodArr = MethodMatchService::matchDingWei($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
                 break;
+            case (strpos($text, '和值') !== false OR strpos($text, '合值') !== false) && (
+                    strpos($text, '大') !== false OR strpos($text, '小') !== false OR strpos($text, '单') !== false OR strpos($text, '双') !== false ):
+                $mType = 12;
+                $methodArr = MethodMatchService::matchHeZhiDaXiaoDanShuang($matchMethodAndCodeText, $codes, $count);
+                break;
             case strpos($text, 'X') !== false: # 带X的定位
                 $mType = 6.1;
                 $methodArr = MethodMatchService::matchXDingWei($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
@@ -146,16 +151,15 @@ class ThirdDTypeService extends CommonBaseService
                         (strpos($text, '直')!==false && strpos($text, '组三')===false && strpos($text, '组六')===false) OR # 直选
                         (strpos($text, '组')!==false && strpos($text, '组三')===false && strpos($text, '组六')===false) # 组选
                     )) OR ( strpos($matchMethodAndCodeText, '拖') === false && (
-                        strpos($text, '组三') !== false OR
-                        strpos($text, '组六') !== false OR
-                        (strpos($text, '组三') !== false && strpos($text, '组六') !== false) OR
-                        (strpos($text, '直') !== false && strpos($text, '组') !== false) OR
-                        (strpos($text, '单') !== false && strpos($text, '组') !== false) OR
-                        (strpos($text, '组选') !== false) OR
-                        (strpos($text, '组') !== false) OR
-                        (strpos($text, '单') !== false) OR
-                        (strpos($text, '直') !== false && strpos($text, '复式')===false)
-                    )): # 1、2、3组选
+                        strpos($text, '组三') !== false OR strpos($text, '组六') !== false OR # 组三或组六
+                        (strpos($text, '组三') !== false && strpos($text, '组六') !== false) OR # 组三组六 组合
+                        (strpos($text, '直') !== false && strpos($text, '组') !== false) OR # 直组
+                        (strpos($text, '单') !== false && strpos($text, '组') !== false) OR # 单选组选  组合
+                        (strpos($text, '组选') !== false) OR # 组选
+                        (strpos($text, '组') !== false) OR   # 组选
+                        (strpos($text, '单') !== false) OR   # 单选
+                        (strpos($text, '直') !== false && strpos($text, '复式')===false) # 直选
+                )): # 1、2、3组选
                 $mType = 7;
                 list($matchMethodAndCodeText, $singleArr) = ThirdDTypeService::getTwoMethodAndSingle($text, $matchMethodAndCodeText);
                 //p([$matchMethodAndCodeText, $singleArr]);
@@ -179,11 +183,6 @@ class ThirdDTypeService extends CommonBaseService
                 ): #36-51:1码拖.... [组三|组六]
                 $mType = 11;
                 $methodArr = MethodMatchService::matchHeZhi($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
-                break;
-            case (strpos($text, '和值') !== false OR strpos($text, '合值') !== false) && (
-                strpos($text, '大') === false && strpos($text, '小') === false && strpos($text, '单') === false && strpos($text, '双') === false ):
-                $mType = 12;
-                $methodArr = MethodMatchService::matchHeZhiDaXiaoDanShuang($matchMethodAndCodeText, $codes, $count);
                 break;
             case strpos($text, '复式') !== false:
                 $mType = 13;
@@ -382,7 +381,8 @@ class ThirdDTypeService extends CommonBaseService
                             break;
                     }
                     break;
-                case strpos($text, '直') !== false && strpos($text, '组') !== false:
+                case strpos($text, '直') !== false && strpos($text, '组') !== false && $text = str_replace('单', '直', $text):
+                case strpos($text, '单') !== false && strpos($text, '组') !== false && $text = str_replace('单', '直', $text):
                     # 直 且 组
                     switch (true){
                         case preg_match_all('/(['.$cnSingleTxt.']{1,3}元{0,1}直)(['.$cnSingleTxt.']{1,3}元{0,1}组)/u', $text, $ms) && $m=1: # 一直一组
