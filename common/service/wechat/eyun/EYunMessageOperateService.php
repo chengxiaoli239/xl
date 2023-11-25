@@ -572,7 +572,8 @@ class EYunMessageOperateService  extends EYunBaseService
                         $oneAllMoneys += $method['all_moneys']; # 总投
                         $oneAllCounts += $method['count']; # 总投
 
-                        $betContent .= "\n".$method['name'].' '.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
+                        $replyMethodName = PlayMethodService::getReplyMethodName($method['name']);
+                        $betContent .= "\n".$replyMethodName.'：'.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
 
                         # 推送网盘任务：
                         $pushSiteDatas[] = ['betRowId'=>$Bets->id, 'orderId'=>$Bets->order_id, 'business_id'=>$Bets->order_id];
@@ -633,6 +634,7 @@ class EYunMessageOperateService  extends EYunBaseService
             throw_info('发送消息接口content不能为空');
         }
     }
+
     /**
      * 文本消息发送
      * @param string $wcId 私聊则位用户的微信id，群里则位群里id
