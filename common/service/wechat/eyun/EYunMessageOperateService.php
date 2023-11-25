@@ -241,6 +241,11 @@ class EYunMessageOperateService  extends EYunBaseService
         #    }
         #}
         //p(['ddd', $text, $ms]);
+        if(preg_match('/\d+注/', $text, $ms) && (
+            strpos($text, '直') !== false OR strpos($text, '组') !== false OR strpos($text, '单') !== false
+        )){
+            $text = str_replace($ms[0], '', $text); # 直组很多组备注 xx注  为了避免影响匹配，去掉
+        }
 
         # 特殊倍数匹配
         $text = str_replace(['一倍10元', '一倍十元'], '各10元', $text); # 同义词替换
