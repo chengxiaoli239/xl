@@ -1,11 +1,13 @@
 <?php
 namespace console\modules\test\controllers;
 
+use backend\models\searchs\wechat\Bets;
 use backend\models\thirdD\BetsBackend;
 use backend\models\UserSysPlans;
 use backend\service\NumService;
 use common\service\helpers\ThirdD;
 use common\service\thirdD\MethodMatchService;
+use common\service\thirdD\OperateLotteryService;
 use common\service\thirdD\sx\Ssxx3dBetService;
 use common\service\thirdD\ThirdDTypeService;
 use common\service\wechat\eyun\EYunMessageOperateService;
@@ -25,6 +27,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $betRow = Bets::findOne(6362);
+            list($code, $data, $msg) = OperateLotteryService::operateOne($betRow, $kjCode='2,5,4');p([$code, $data, $msg]);
             #$plan = UserSysPlans::findOne(7636);
             #$filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [146]);
             #p(count($filter_dynamic_codes));
@@ -67,7 +71,8 @@ class IndexController extends Controller
             $text = '福二倍组六一倍组三 369'; # --
             ########### 组六、组三 #############
 
-            $text = '123/588直1组2';
+            $text = '福 二码定百234个456 各10';
+            $text = '福 2X4,4X6,32X,67X,X63 各10';
             //$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
             //preg_match('/各([' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3})/u', $text, $matches); p($matches);

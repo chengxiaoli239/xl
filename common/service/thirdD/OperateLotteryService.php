@@ -65,20 +65,28 @@ class OperateLotteryService extends CommonBaseService
         return [0, ['lottery_type'=>$lottery_type, 'idData'=>$idData], '处理成功'];
     }
 
-    public static function operateOne(object $betRow): array
+    /**
+     * @param object $betRow
+     * @param string $kjCode
+     * @return array
+     */
+    public static function operateOne(object $betRow, string $kjCode=''): array
     {
         $qh = $betRow->qihao;
         $method_id = $betRow->play_method;
         $lottery_type = $betRow->lottery_type;
-        $code_str = trim(CommonService::getAwardNumberByQihao($qh, $lottery_type)); // 3,4,5,6,7
-        if(empty($code_str)){
-            $msg = '未开奖：lottery_type:'.$lottery_type.'_qihao:'.$qh;
-            $logArr = ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'qihao'=>$qh, 'method_id'=>$method_id, 'msg'=>$msg];
-            Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算21', $logArr);
-            return [10002, $logArr, $msg];
+
+        if(empty($kjCode)){
+            $code_str = trim(CommonService::getAwardNumberByQihao($qh, $lottery_type)); // 3,4,5,6,7
+            if(empty($code_str)){
+                $msg = '未开奖：lottery_type:'.$lottery_type.'_qihao:'.$qh;
+                $logArr = ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'qihao'=>$qh, 'method_id'=>$method_id, 'msg'=>$msg];
+                Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算21', $logArr);
+                return [10002, $logArr, $msg];
+            }
+            #$kjCode = '4,1,2'; # 测试
+            $kjCode = $code_str[0].','.$code_str[2].','.$code_str[4]; // 3,4,5
         }
-        $kjCode = $code_str[0].','.$code_str[2].','.$code_str[4]; // 3,4,5
-        #$kjCode = '4,1,2'; # 测试
 
         $idData = ['wechat_user_id'=>$betRow->wechat_user_id, 'user_id'=>$betRow->user_id];
         Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算22', ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'qihao'=>$qh, 'kjCode'=>$kjCode, 'method_id'=>$method_id]);
@@ -405,47 +413,61 @@ class OperateLotteryService extends CommonBaseService
      * @return bool
      * @throws \common\exceptions\InfoException
      */
-    public static function runErMaDing(object $betRow, $kjCode=''){
+    public static function runErMaDing(object $betRow, string $kjCode=''): bool
+    {
         if(empty($betRow)){
             throw_info('记录不能为空');
         }
+        $kjCodeArr = explode(',', $kjCode);
         $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
         $codes = $betRow->codes;
-        $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
-
-        $kjCodeArr = explode(',', $kjCode);
-
-        $zjCount = 0;
-        $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
-        $allErDingCodes = [];
-        foreach ($betCodes as $oneCode){
-            $oneCodes = explode(MethodMatchService::CODE_SPLIT_FLAG, $oneCode);
-
-            $betCodesArr = [];
-            $posKjCodes = [];
-            foreach ($oneCodes as $code){
-                if(strpos($code, '百') !== false){
-                    $posKjCodes[] = $kjCodeArr[0]; # 235
-                    $betCodesArr[] = str_replace('百:', '', $code);
-                }elseif (strpos($code, '十') !== false){
-                    $posKjCodes[] = $kjCodeArr[1];
-                    $betCodesArr[] = str_replace('十:', '', $code);
-                }elseif (strpos($code, '个') !== false){
-                    $posKjCodes[] = $kjCodeArr[2];
-                    $betCodesArr[] = str_replace('个:', '', $code);
-                }else{
-                    throw_info('匹配位置异常');
-                }
+        $tmpKjCodeArr = $kjCodeArr;
+        if(strpos($codes, 'X') !== false){
+            $p = strpos($codes, 'X');
+            $allBetCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, $codes);
+            if(isset($tmpKjCodeArr[$p])){
+                $tmpKjCodeArr[$p] = 'X';
             }
-            $oneErDingCodeDatas = ThirdD::getArrayCodesByArray($betCodesArr);
-            $posKjCode = $posKjCodes[0].$posKjCodes[1]; #二定开奖拼接的开奖号码
-            $counts = array_count_values($oneErDingCodeDatas);
-            $count = $counts[$posKjCode] ?? 0;
+            $kjCodeArrStr = implode('', $tmpKjCodeArr);
+            $betCoudeCounts = array_count_values($allBetCodes);
+            $zjCount = $betCoudeCounts[$kjCodeArrStr] ? : 0;
+            //p([$codes, $p, $kjCodeArr, $tmpKjCodeArr, $kjCodeArrStr, $allBetCodes, $betCoudeCounts, $zjCount]);
+        }else{
+            $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
 
-            $zjCount += (int)$count;
-            #p(['RowId'=>$betRow->id, 'posKjCode'=>$posKjCode, 'oneErDingCodeDatas'=>$oneErDingCodeDatas, 'counts'=>$counts, 'count'=>$count]);
+            $zjCount = 0;
+            $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
+            $allErDingCodes = [];
+            foreach ($betCodes as $oneCode){
+                $oneCodes = explode(MethodMatchService::CODE_SPLIT_FLAG, $oneCode);
+
+                $betCodesArr = [];
+                $posKjCodes = [];
+                foreach ($oneCodes as $code){
+                    if(strpos($code, '百') !== false){
+                        $posKjCodes[] = $kjCodeArr[0]; # 235
+                        $betCodesArr[] = str_replace('百:', '', $code);
+                    }elseif (strpos($code, '十') !== false){
+                        $posKjCodes[] = $kjCodeArr[1];
+                        $betCodesArr[] = str_replace('十:', '', $code);
+                    }elseif (strpos($code, '个') !== false){
+                        $posKjCodes[] = $kjCodeArr[2];
+                        $betCodesArr[] = str_replace('个:', '', $code);
+                    }else{
+                        throw_info('匹配位置异常');
+                    }
+
+                }
+                $oneErDingCodeDatas = ThirdD::getArrayCodesByArray($betCodesArr);
+                $posKjCode = $posKjCodes[0].$posKjCodes[1]; #二定开奖拼接的开奖号码
+                $counts = array_count_values($oneErDingCodeDatas);
+                $count = $counts[$posKjCode] ?? 0;
+
+                $zjCount += (int)$count;
+                #p(['RowId'=>$betRow->id, 'posKjCode'=>$posKjCode, 'oneErDingCodeDatas'=>$oneErDingCodeDatas, 'counts'=>$counts, 'count'=>$count]);
+            }
         }
-        #p(['betCodes'=>$betCodes, 'kjCodeArr'=>$kjCodeArr, 'zjCount'=>$zjCount]);
+        //p(['betCodes'=>$betCodes, 'kjCodeArr'=>$kjCodeArr, 'zjCount'=>$zjCount]);
         self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
 
         return true;
