@@ -58,7 +58,7 @@ class PlayMethodService extends CommonBaseService
      * @param array $aliasNameToOriginName 生成一组,用于替换 ['别名1'=>'玩法名称', '玩法2'=>'玩法名称2']
      * @return array
      */
-    public static function getAllMethodsAndAliasName(int $indexByKey=0, array &$aliasNameToOriginName=[]): array
+    public static function getAllMethodsAndAliasName($indexByKey=0, &$aliasNameToOriginName=[])
     {
         $methods = self::getMethods($indexByKey);
         $aliaMethods = self::getMethodsAlias();
