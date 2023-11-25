@@ -7,7 +7,7 @@ use common\models\thirdD\PlayMethod;
 class PlayMethodService extends CommonBaseService
 {
     public static function getMethodsMKey($alias=''){
-        return 'third_d_getMethodsMKey_x1_'.$alias;
+        return 'third_d_getMethodsMKey_x2_'.$alias;
     }
 
     /**

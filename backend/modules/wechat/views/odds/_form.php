@@ -26,7 +26,7 @@ $this->title = Yii::t('app', 'Update Odds');
 
                 <div class="row">
                     <div class="col-lg-2 col-xs-3">
-                        <?= $form->field($model, 'money')->textInput(['maxlength' => true]) ?>
+                        <?= $form->field($model, 'money')->textInput(['maxlength' => true, 'disabled'=>true]) ?>
                     </div>
 
                     <div class="col-lg-2 col-xs-3">
@@ -35,12 +35,14 @@ $this->title = Yii::t('app', 'Update Odds');
 
                     <!--?= $form->field($model, 'odds')->textInput(['maxlength' => true]) ?-->
 
+                    <!--
                     <div class="col-lg-2 col-xs-3">
                         <?= $form->field($model, 'status')->radioList([
                             '0'=>'关闭',
                             '1'=>'开启',
                         ])->label('状态') ?>
                     </div>
+                    -->
 
                     <!--?= $form->field($model, 'created_at')->textInput() ?-->
 
