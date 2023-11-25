@@ -259,8 +259,8 @@ class NumService extends BaseService {
 
         142=>'过滤上期每两个号码及双重(四定)', # 同97、98
         143=>'过滤昨日同期每两个号码及双重(四定)', # 同97、98
-        144=>'过滤前天日同期每两个号码及双重(四定)',
-        145=>'过滤大前天日同期每两个号码及双重(四定)',
+        144=>'过滤前天同期每两个号码及双重(四定)',
+        145=>'过滤大前天同期每两个号码及双重(四定)',
 
         146=>'过滤上期同合分及双重(四定)', # 同97、98
     ];
@@ -3271,7 +3271,7 @@ class NumService extends BaseService {
                 case 143: # 过滤昨日同期每两个号码及双重(四定)
                     $codes = NumService::getBeforeKjCodesDynamic83($plan, $dateNum=1, $d_type=2);
                     break;
-                case 144: # 过滤前天日同期每两个号码及双重(四定)
+                case 144: # 过滤前天同期每两个号码及双重(四定)
                     $codes = NumService::getBeforeKjCodesDynamic83($plan, $dateNum=2, $d_type=2);
                     break;
                 case 146: # 过滤上期同值及双重(四定)
@@ -4988,6 +4988,13 @@ class NumService extends BaseService {
         $sql = $historyKjDatasQuery->createCommand()->getRawSql();//p($sql);
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤上期每两个号码及对数', ['date_num'=>$date_num,'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
         $historyKjData = $historyKjDatasQuery->asArray()->one();
+        if(empty($historyKjData)){
+            $mkey = __FUNCTION__.'_X2_'.$plan->id;
+            $num = \Yii::$app->redis->incr($mkey);
+            if($num<3){
+                throw_info('号码为空');
+            }
+        }
         //p(['historyKjData'=>$historyKjData], 0);
 
         $fixedPos = [[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]];
@@ -5019,7 +5026,7 @@ class NumService extends BaseService {
             ->where(['code_type' => 4])
             ->andWhere(['NOT', $notWhere]);
         $sql = $query->createCommand()->getRawSql();//p($sql);
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤昨日同期/上期每两个号码及对数', ['c_type'=>$c_type,'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤昨日同期/上期每两个号码及对数', ['lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');

@@ -302,11 +302,15 @@ class ThirdDTypeService extends CommonBaseService
                             }
                             //p([$text, $matchType, $matcheSingles, current($singleArr), $singleArr]);
                             break;
-                        case preg_match_all('/组三(各|)(\d*)(倍|元|)|组六(各|)(\d*)(倍|元|)/u', $text, $matcheSingles): # 数字倍数
-                        case preg_match_all('/组三(各|)(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})(倍|元|))|(组六(各|)(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})(倍|元|)/u', $text, $matcheSingles): # 中文倍数
+                        case preg_match_all('/组三(各|)(\d*)(倍|元|)|组六(各|)(\d*)(倍|元|)/u', $text, $matcheSingles) && $mType=1: # 数字倍数
+                        case preg_match_all('/组三(各|)(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})(倍|元|))|(组六(各|)(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})(倍|元|)/u', $text, $matcheSingles) && $mType=1: # 中文倍数
                             $matchType = 3.01;
-                            $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles[0]);
-                            //p([$text, $matchType, $matcheSingles, $singleArr]);
+                            $singleOne = 2;
+                            if(preg_match('/\d+/', $text, $ms)){
+                                $singleOne = (strlen($ms[0])>3) ? 10 : $singleOne;
+                            }
+                            $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles[0], $singleOne);
+                            //p([$text, $matchType, $matcheSingles, $singleArr,  $mType]);
                             break;
                         case preg_match_all($pattern36, $text, $matcheSingles):
                             $matchType = 3.02;
@@ -665,7 +669,7 @@ class ThirdDTypeService extends CommonBaseService
      * 匹配倍数 直组 没有关键字"元"字的默认为：倍    * @param array $matchArr - 格式 : Array( [0] => 直2倍 [1] => 组1倍 )
      * @return array
      */
-    public static function getMatchTwoSingle(array $matchArr=[]): array
+    public static function getMatchTwoSingle(array $matchArr=[], $oneSingle=0): array
     {
         $singleArr = [];
         foreach ($matchArr as $matcheSingle){
@@ -675,10 +679,11 @@ class ThirdDTypeService extends CommonBaseService
                     continue;
                 }
                 $matcheSingle = str_replace($cnKey, '', $matcheSingle);
+                $oneSingle = !empty($oneSingle) ? $oneSingle : 2; # 一倍金额，组选组三组六2元一倍，组三组六多码则为10元一倍
                 if(preg_match('/\d+/', $matcheSingle, $ms)){
-                    $currentSingle = strpos($matcheSingle, '倍') !== false ? ($ms[0] * 2) : $ms[0];
+                    $currentSingle = strpos($matcheSingle, '倍') !== false ? ($ms[0] * $oneSingle) : $ms[0];
                 }else if(preg_match('/['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}/u', $matcheSingle, $ms)){
-                    $currentSingle = strpos($matcheSingle, '倍') !== false ? (ThirdD::cn2num($ms[0]) * 2) : ThirdD::cn2num($ms[0]);
+                    $currentSingle = strpos($matcheSingle, '倍') !== false ? (ThirdD::cn2num($ms[0]) * $oneSingle) : ThirdD::cn2num($ms[0]);
                 }
                 $singleArr[$cnKey] = $currentSingle;
             }else{

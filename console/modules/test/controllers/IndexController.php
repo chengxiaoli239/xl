@@ -74,12 +74,7 @@ class IndexController extends Controller
             $text = '福 二码定百234个456 各10';
             $text = '福直027 072 026 062 025 052 各2倍';
             $text = '单032.302=十五倍，';
-            $text = '福直组一倍457-014-145-479-579
-
-组六五码01457各两倍
-组六七码0134579各两倍
-组六八码01234567各两倍
-共八十元';
+            $text = '排三0345678组三。40倍  组六60倍';
             //$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
             //preg_match('/各([' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3})/u', $text, $matches); p($matches);
