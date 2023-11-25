@@ -208,7 +208,7 @@ class MethodMatchService extends CommonBaseService
         var_dump(5, $text);
         var_dump('===========匹配号码前倍数下拿掉-结束=================');
         //p($text);
-        if(empty($text)){
+        if(empty(trim($text))){
             throw_info('拿掉倍数之后为空，则忽略处理', CommonBaseService::CODE_FOR_IGNORE);
         }
 
