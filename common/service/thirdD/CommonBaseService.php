@@ -9,7 +9,8 @@ use common\service\BaseService;
 
 class CommonBaseService extends BaseService
 {
-    const CODE_FOR_USER = 33333;
+    const CODE_FOR_USER = 33333; # 回复用户
+    const CODE_FOR_IGNORE = 44444; # 忽略
 
     # lottery_type:26 福彩3d、27 排列三
     const LOTTERY_TYPE_FUCAI = 26;

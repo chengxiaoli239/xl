@@ -193,14 +193,24 @@ class MethodMatchService extends CommonBaseService
             MethodMatchService::beforeMatchCodeReplace($text, $matches4);
         }
         var_dump(5, $text);
-        if (preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})\s*倍/', $text, $matches5)) {
+        if (preg_match_all('/共(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})\s*元/u', $text, $matches5)) {
             if(count($matches5[0])==1){
                 MethodMatchService::beforeMatchCodeReplace($text, $matches5);
+            }
+        }
+        //p($text);
+        var_dump(6, $text);
+        if (preg_match_all('/(['.MethodMatchService::CN_SINGLE_TEXT.'0-9]{1,3})\s*倍/', $text, $matches6)) {
+            if(count($matches6[0])==1){
+                MethodMatchService::beforeMatchCodeReplace($text, $matches6);
             }
         }
         var_dump(5, $text);
         var_dump('===========匹配号码前倍数下拿掉-结束=================');
         //p($text);
+        if(empty($text)){
+            throw_info('拿掉倍数之后为空，则忽略处理', CommonBaseService::CODE_FOR_IGNORE);
+        }
 
         return [$originText, $singleCnTxt];
     }

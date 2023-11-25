@@ -403,7 +403,11 @@ class EYunMessageOperateService  extends EYunBaseService
         self::$gLotteryType = $lottery_type;
         self::$gLotteryName = $lottery_name;
 
-        list($playMethod, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($betText);
+        try {
+            list($playMethod, $codes, $count) = ThirdDTypeService::getPlayMethodAndCodes($betText);
+        }catch (\Exception $e){
+            return [$e->getCode(), [], $e->getMessage()];
+        }
         $logArr = ['lottery_type'=>$lottery_type, 'matchTexts'=>$matchTexts, 'betText'=>$betText, 'playMethod'=>$playMethod, 'codes'=>$codes, 'count'=>$count, 'isEmpty'=>$isEmpty];
         //p($logArr);
         Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-01', $logArr);
