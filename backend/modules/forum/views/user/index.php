@@ -83,7 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'data-id'=>$model->id,
                                     'data-username'=>$model->username,
                                     'data-desc'=>$model->desc,
-                                    'data-access_token'=>$TzSystemsUsers->access_token,
+                                    'data-access_token'=>$TzSystemsUsers->access_token??'',
                                 ];
                                 return Html::a($model->desc, 'javascript:;', $options);
                             }
