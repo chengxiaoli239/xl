@@ -257,7 +257,12 @@ class ThirdDTypeService extends CommonBaseService
                         case preg_match_all('/(组六['.$cnSingleTxt.']{1,3}元{0,1})(组三['.$cnSingleTxt.']{1,3}元{0,1})/u', $text, $ms) && $m=4: # 组一直一
                             $matchType = 3.11;
                             $matcheSingles = array_merge($ms[1], $ms[2]);
-                            $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles); # 没有
+                            $singleOne = 2;
+                            if(preg_match('/\d+/', $text, $ms)){
+                                $singleOne = (strlen($ms[0])>3) ? 10 : $singleOne; # 多码情况为10元一倍
+                            }
+
+                            $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles, $singleOne); # 没有
                             //p([$text, $matchType, $ms, $singleArr, $matcheSingles, 'm'=>$m]);
                             break;
                         case preg_match_all('/(['.$cnSingleTxt.']{1,3}倍{0,1}组三)(['.$cnSingleTxt.']{1,3}倍{0,1}组六)/u', $text, $ms) && $m=1: # 一倍直一倍组
@@ -266,7 +271,11 @@ class ThirdDTypeService extends CommonBaseService
                         case preg_match_all('/(组六['.$cnSingleTxt.']{1,3}倍{0,1})(组三['.$cnSingleTxt.']{1,3}倍{0,1})/u', $text, $ms) && $m=4: # 组一倍直一倍
                             $matchType = 3.02;
                             $matcheSingles = array_merge($ms[1], $ms[2]);
-                            $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles); # 没有
+                            $singleOne = 2;
+                            if(preg_match('/\d+/', $text, $ms)){
+                                $singleOne = (strlen($ms[0])>3) ? 10 : $singleOne; # 多码情况为10元一倍
+                            }
+                            $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles, $singleOne); # 没有
                             //p([$text, $matchType, $ms, $singleArr, $matcheSingles, 'm'=>$m]);
                             break;
                         case preg_match_all('/(\d+元{0,1}组三)(\d+元{0,1}组六)/u', $text, $ms) && $m=1: # 1直1组
@@ -275,7 +284,11 @@ class ThirdDTypeService extends CommonBaseService
                         case preg_match_all('/(组六\d+元{0,1})(组三\d+元{0,1})/u', $text, $ms) && $m=4: # 组1直1
                             $matchType = 3.03;
                             $matcheSingles = array_merge($ms[1], $ms[2]);
-                            $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles); # 没有
+                            $singleOne = 2;
+                            if(preg_match('/\d+/', $text, $ms)){
+                                $singleOne = (strlen($ms[0])>3) ? 10 : $singleOne; # 多码情况为10元一倍
+                            }
+                            $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles, $singleOne); # 没有
                             //p([$text, $matchType, $ms, $matcheSingles, $singleArr, 'm'=>$m]);
                             break;
                         case preg_match_all('/(组三\d+倍{0,1})(组六\d+倍{0,1})/u', $text, $ms) && $m=1: # 1倍直1倍组
@@ -283,7 +296,11 @@ class ThirdDTypeService extends CommonBaseService
                         case preg_match_all('/(\d+倍{0,1}组三)(\d+倍{0,1}组六)/u', $text, $ms) && $m=3: # 直1倍组1倍
                         case preg_match_all('/(\d+倍{0,1}组六)(\d+倍{0,1}组三)/u', $text, $ms) && $m=4: # 组1倍直1倍
                             $matchType = 3.04;
-                            $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles = array_merge($ms[1], $ms[2])); # 没有
+                            $singleOne = 2;
+                            if(preg_match('/\d+/', $text, $ms)){
+                                $singleOne = (strlen($ms[0])>3) ? 10 : $singleOne; # 多码情况为10元一倍
+                            }
+                            $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles = array_merge($ms[1], $ms[2]), $singleOne); # 没有
                             #p([$text, $matchType, $ms, $singleArr, 'm'=>$m]);
                             break;
                         case (strpos($text, '组六组三') !== false OR strpos($text,'组三组六')!==false) && preg_match_all('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
