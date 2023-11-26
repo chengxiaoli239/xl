@@ -1172,11 +1172,16 @@ class MethodMatchService extends CommonBaseService
         if (preg_match_all('/(\d{1})拖/', $text, $matches0)) {
             $tuoCode = $matches0[1][0];
         }
+        if (preg_match_all('/(\d{1})全拖/', $text, $matches0)) {
+            $tuoCode = $matches0[1][0];
+            $codes = str_replace($tuoCode, '', '0123456789');
+            $codeArrs = [$codes];
+        }
         //p($matches0, 0);
         if(empty($tuoCode) && $tuoCode !== '0'){
             throw_info('拖码为空');
         }
-        if (preg_match_all('/(\d{2,})/', $text, $matches1)) {
+        if (empty($codeArrs) && preg_match_all('/(\d{2,})/', $text, $matches1)) {
             $codeArrs = $matches1[1];
         }
         if(empty($codeArrs)){

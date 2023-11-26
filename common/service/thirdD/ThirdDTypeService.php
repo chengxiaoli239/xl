@@ -116,6 +116,10 @@ class ThirdDTypeService extends CommonBaseService
                 $mType = 1;
                 $methodArr = MethodMatchService::matchQuanBao($matchMethodAndCodeText, $codes, $count);
                 break;
+            case strpos($matchMethodAndCodeText, '拖') !== false: #36-51:1码拖.... [组三|组六]
+                $mType = 9;
+                $methodArr = MethodMatchService::matchYiMaTuo($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
+                break;
             case $methodArr['originName'] == '独胆' OR strpos($text, '独') !== false:
                 $mType = 2;
                 $methodArr = MethodMatchService::matchDuDan($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
@@ -168,10 +172,6 @@ class ThirdDTypeService extends CommonBaseService
             case strpos($text, '跨') !== false:  #26-35 跨度0
                 $mType = 8;
                 $methodArr = MethodMatchService::matchKuaDuX($matchMethodAndCodeText, $codes, $count);
-                break;
-            case strpos($matchMethodAndCodeText, '拖') !== false: #36-51:1码拖.... [组三|组六]
-                $mType = 9;
-                $methodArr = MethodMatchService::matchYiMaTuo($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
                 break;
             case strpos($text, '复式')!==false && strpos($text, '直选')===false:
                 $mType = 10;
