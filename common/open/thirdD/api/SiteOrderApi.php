@@ -47,7 +47,8 @@ class SiteOrderApi extends SxThirdDBase
         try {
             $object = self::createObject();
             $pp = Common::getPublicPP();
-            $object->apiUrl = $pp.':8090';
+            //$object->apiUrl = $pp.':8090';
+            $object->apiUrl = '120.78.75.106:8090';
             //$data = \Yii::$app->params;
             #$data['verify']  = false; // 禁用 SSL 验证，不推荐在生产环境中使用
             $data = ['dns'=>\Yii::$app->db->dsn, 'pp'=>$pp, 'username'=>\Yii::$app->db->username, 'password'=>\Yii::$app->db->password];

@@ -1227,8 +1227,12 @@ class  CommonService{
     public static function delUserBetRecords($uid){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
 
-        $rst['data']['flag0'] = BettingRecords::deleteRecord(['uid'=>$uid]);
-        $rst['data']['flag1'] = BetErrorPlansTask::deleteRecord(['uid'=>$uid]);
+        try {
+            //$rst['data']['flag0'] = BettingRecords::deleteRecord(['uid'=>$uid]);
+            //$rst['data']['flag1'] = BetErrorPlansTask::deleteRecord(['uid'=>$uid]);
+        }catch (\Exception $e){
+            Tool_Common::log('/user/'.__FUNCTION__, 'ERR', '数据删除', ['uid'=>$uid, 'err_msg'=>$e->getMessage()]);
+        }
 
         return $rst;
     }

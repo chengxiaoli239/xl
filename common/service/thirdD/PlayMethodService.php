@@ -101,8 +101,11 @@ class PlayMethodService extends CommonBaseService
             case strpos($methodName, '和值') !== false:
                 $methodName = '和值';
                 break;
-            case strpos($methodName, '定位') !== false:
-                $methodName = '定';
+            case strpos($methodName, '一码定位') !== false:
+                $methodName = '一定';
+                break;
+            case strpos($methodName, '二码定位') !== false:
+                $methodName = '二定';
                 break;
             default:
                 break;

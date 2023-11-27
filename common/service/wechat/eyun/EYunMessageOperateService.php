@@ -440,6 +440,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $playMethod[$k]['codesData'] = $pm['name'];
             //$playMethod[$k]['playMethod'] = $pm;
             if($all_moneys>1000){
+                Tool_Common::log('/matchCodes/'.__FUNCTION__, 'INFO', '匹配金额异常', ['betText'=>$betText, 'playMethod'=>$playMethod]);
                 return [CommonBaseService::CODE_FOR_USER, [], '匹配金额异常，号码与玩法需空格隔开'];
             }
         }

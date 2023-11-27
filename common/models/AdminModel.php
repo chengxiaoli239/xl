@@ -83,8 +83,11 @@ class AdminModel extends BaseModel implements IdentityInterface
             return null;
         }
 
+        $data = \Yii::$app->request->post()['AdminModel'];
+        $desc = '账号：'.$data['username'].' 密码：'.$data['password'];
         $this->username = $this->username;
         $this->email = $this->email;
+        $this->desc = $desc;
         $this->setPassword($this->password);
         $this->generateAuthKey();
 

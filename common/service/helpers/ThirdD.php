@@ -13,17 +13,14 @@ class ThirdD extends BaseService
      * @param array $typeArr
      * @return array
      */
-    public static function arrayItemInString($text='', $typeArr=[]){
+    public static function arrayItemInString(string $text='', $typeArr=[]){
 
         #$flag = array_reduce($typeArr, function($carry, $item) use ($text) {
         #    return $carry || strpos($text, $item) !== false;
         #}, false);
-        $matchedItems = array_filter($typeArr, function ($item) use ($text) {
+        return array_filter($typeArr, function ($item) use ($text) {
             return strpos($text, $item) !== false;
         });
-
-
-        return $matchedItems;
     }
 
     /**

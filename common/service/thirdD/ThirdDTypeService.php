@@ -146,7 +146,9 @@ class ThirdDTypeService extends CommonBaseService
                 $mType = 12;
                 $methodArr = MethodMatchService::matchHeZhiDaXiaoDanShuang($matchMethodAndCodeText, $codes, $count);
                 break;
-            case strpos($text, 'X') !== false: # 带X的定位
+            case strpos($text, 'X') !== false OR (
+                    strpos($text, '*') !== false && empty($methodArr)
+                ): # 带X的定位
                 $mType = 6.1;
                 $methodArr = MethodMatchService::matchXDingWei($matchMethodAndCodeText, $codes, $count, $matchName=$methodArr['name']);
                 break;
@@ -318,6 +320,16 @@ class ThirdDTypeService extends CommonBaseService
                                 $singleArr = [ '组三' => current($singleArr), '组六' => current($singleArr)];
                             }
                             //p([$text, $matchType, $matcheSingles, current($singleArr), $singleArr]);
+                            break;
+                        //case preg_match_all('/组三组六(各|)(\d*)(倍|元|)/u', $text, $matcheSingles) && $mType=1: # 数字倍数
+                        case preg_match_all('/组三组六(各|)(['.MethodMatchService::CN_SINGLE_TEXT.'])(倍|元|)/u', $text, $matcheSingles) && $mType=2: # 数字倍数
+                            $matchType = 3.10;
+                            $singleOne = 2;
+                            if(preg_match('/\d+/', $text, $ms)){
+                                $singleOne = (strlen($ms[0])>3) ? 10 : $singleOne;
+                            }
+                            $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles[0], $singleOne);
+                            p([$text, $matchType, $matcheSingles, $singleArr,  $mType]);
                             break;
                         case preg_match_all('/组三(各|)(\d*)(倍|元|)|组六(各|)(\d*)(倍|元|)/u', $text, $matcheSingles) && $mType=1: # 数字倍数
                         case preg_match_all('/组三(各|)(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})(倍|元|))|(组六(各|)(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})(倍|元|)/u', $text, $matcheSingles) && $mType=1: # 中文倍数
@@ -691,10 +703,13 @@ class ThirdDTypeService extends CommonBaseService
         $singleArr = [];
         foreach ($matchArr as $matcheSingle){
             $cnKey = ThirdDTypeService::getCnKey($matcheSingle);
+            var_dump('cnKey:'.$cnKey);
             if(in_array($cnKey, ['组三', '组六'])){
                 if(isset($singleArr[$cnKey])){
                     continue;
                 }
+                $matcheSingle = str_replace('组三组六', '', $matcheSingle);
+                $matcheSingle = str_replace('组六组三', '', $matcheSingle);
                 $matcheSingle = str_replace($cnKey, '', $matcheSingle);
                 $oneSingle = !empty($oneSingle) ? $oneSingle : 2; # 一倍金额，组选组三组六2元一倍，组三组六多码则为10元一倍
                 if(preg_match('/\d+/', $matcheSingle, $ms)){

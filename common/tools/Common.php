@@ -469,6 +469,7 @@ class Common
 
         curl_close($curl);
         Tool_Common::log('/tools/'.__FUNCTION__, 'INFO', '获取新xp', ['pp'=>$pp]);
+
         return $pp;
     }
 }
