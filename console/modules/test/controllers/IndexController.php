@@ -74,10 +74,8 @@ class IndexController extends Controller
             $text = '福 二码定百234个456 各10';
             $text = '福直027 072 026 062 025 052 各2倍';
             $text = '单032.302=十五倍，';
-            $text = '福彩028167组六500组三200
-体彩028354组六500组三200
-体彩0跨50
-全部1450元';
+            $text = '福013569组三组六十倍
+总计200';
             //$text = '体彩028167组六500组三200';
             #$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本

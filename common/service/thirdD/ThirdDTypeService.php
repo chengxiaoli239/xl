@@ -329,7 +329,7 @@ class ThirdDTypeService extends CommonBaseService
                                 $singleOne = (strlen($ms[0])>3) ? 10 : $singleOne;
                             }
                             $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles[0], $singleOne);
-                            p([$text, $matchType, $matcheSingles, $singleArr,  $mType]);
+                            //p([$text, $matchType, $matcheSingles, $singleArr,  $mType]);
                             break;
                         case preg_match_all('/组三(各|)(\d*)(倍|元|)|组六(各|)(\d*)(倍|元|)/u', $text, $matcheSingles) && $mType=1: # 数字倍数
                         case preg_match_all('/组三(各|)(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})(倍|元|))|(组六(各|)(['.MethodMatchService::CN_SINGLE_TEXT.']{1,3})(倍|元|)/u', $text, $matcheSingles) && $mType=1: # 中文倍数
