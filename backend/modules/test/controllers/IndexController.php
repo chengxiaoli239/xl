@@ -127,6 +127,15 @@ class IndexController extends Controller
         p($cookie);
     }
 
+    public function actionApiLog(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '用信息接口', ['post'=>$post]);
+
+        return ['status'=>200, 'ms'=>'成功'];
+    }
+
     /**
      * @description 0-9选3个数，三字现
      */
