@@ -78,6 +78,7 @@ class Sx3dUserService extends CommonBaseService
         }else{
             $siteUserInfo = $result;
         }
+        $logArr['flag'] = $flag;
         $result2 = \common\open\thirdD\api\SiteUserApi::getAppNews($domain, $headers);
         //$logArr['result2'] = $result2;
         Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '保持登陆请求', $logArr);
