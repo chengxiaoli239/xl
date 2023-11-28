@@ -30,7 +30,7 @@ class IndexController extends Controller
             #$betRow = Bets::findOne(6362);
             #list($code, $data, $msg) = OperateLotteryService::operateOne($betRow, $kjCode='2,5,4');p([$code, $data, $msg]);
             $plan = UserSysPlans::findOne(7653);
-            $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [146]); p(count($filter_dynamic_codes));
+            $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [60]); p(count($filter_dynamic_codes));
             //$text = '百:1346,十:3689,个:6789';
             # 福彩 02349/ 组六组三 各20
             # 福彩 02349/ 12345..32457组六  组三各20

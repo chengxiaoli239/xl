@@ -4323,12 +4323,13 @@ class NumService extends BaseService {
         $beforeQuery->andWhere(['<=', 'qihao', $current_kj_qihao]);
         //p($beforeQuery->createCommand()->getRawSql());
         $currentKjCodes = $beforeQuery->limit(1)->asArray()->one(); # 最新一期
-        //p($currentKjCodes, 0);
+        //p([$currentKjCodes, $positions], 0);
         $where = ['OR'];
         foreach ($positions as $p){
             $where[] = ['IN', 'code_'.$p, NumService::getCodeLine1($currentKjCodes['code'.$p])];
         }
 
+        //p($where);
         $query = Num4Type::find()->select(['code'])
             ->where(['=', 'code_type', $playway+1])
             ->andWhere($where);
@@ -5494,7 +5495,7 @@ class NumService extends BaseService {
      * @return string[]
      */
     public static function getCodeLine1($code=''){
-        if($code===0){
+        if($code==0){
             $lineCodes = NumService::CODES_0_LINE;
             #$lineCodes = NumService::CODES_2_LINE;
         }elseif (in_array($code, NumService::CODES_1_LINE)){
