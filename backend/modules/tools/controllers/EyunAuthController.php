@@ -2,8 +2,9 @@
 
 namespace backend\modules\tools\controllers;
 
+use backend\models\EyunAuthBackend;
+use common\service\wechat\eyun\EYunBaseService;
 use Yii;
-use backend\models\EyunAuth;
 use backend\models\searchs\EyunAuth as EyunAuthSearch;
 use backend\controllers\BaseController;
 use yii\web\NotFoundHttpException;
@@ -64,15 +65,46 @@ class EyunAuthController extends BaseController
      */
     public function actionCreate()
     {
-        $model = new EyunAuth();
+        $model = new EyunAuthBackend();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        //p(Yii::$app->request->post(), 0);
+        if ($model->load(Yii::$app->request->post())) {
+            $now_time = time();
+            $model->updated_at = $now_time;
+            $model->created_at = $now_time;
+            if(!$model->save()){
+                p($model->getErrors());
+            }
+            return $this->redirect(['index']);
         }
+        //p('xxx');
 
-        return $this->render('create', [
+        return $this->renderAjax('_form', [
             'model' => $model,
         ]);
+
+        /*
+        $model = new EyunAuthBackend();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return ['success' => true];
+            } else {
+                return $this->redirect(['index']);
+            }
+        }
+
+        if (Yii::$app->request->isAjax) {
+            return $this->renderAjax('_form', [
+                'model' => $model,
+            ]);
+        } else {
+            return $this->render('create', [
+                'model' => $model,
+            ]);
+        }
+        */
     }
 
     /**
@@ -87,12 +119,33 @@ class EyunAuthController extends BaseController
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
-        return $this->render('update', [
+        return $this->renderAjax('update', [
             'model' => $model,
         ]);
+    }
+
+
+    /**
+     * Deletes an existing EyunAuth model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionLogin($id)
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $model = $this->findModel($id);
+        $loginRst = EYunBaseService::memberLogin($id);
+        if($loginRst['code'] != 1000){
+            return ['status'=>301, 'msg'=>'登陆失败：'.$loginRst['message']];
+        }
+
+        return ['status'=>200, 'msg'=>'登陆成功'];
     }
 
     /**
@@ -104,7 +157,7 @@ class EyunAuthController extends BaseController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        EyunAuthBackend::deleteRecord(['id'=>$id]);
 
         return $this->redirect(['index']);
     }
@@ -118,7 +171,7 @@ class EyunAuthController extends BaseController
      */
     protected function findModel($id)
     {
-        if (($model = EyunAuth::findOne($id)) !== null) {
+        if (($model = EyunAuthBackend::findOne($id)) !== null) {
             return $model;
         }
 

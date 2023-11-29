@@ -320,7 +320,7 @@ class BaseService  extends ActiveRecord
         return self::get($where, null, false);
     }
 
-    public function request($url='', $params=[], $headers=[]){
+    public static function request($url='', $params=[], $headers=[]){
         $client = new Client();
         $bHeaders = [
             'Content-Type' => 'application/json; charset=utf8',

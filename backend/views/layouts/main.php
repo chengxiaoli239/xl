@@ -20,6 +20,8 @@ $route = Yii::$app->controller->getRoute();
 $routeArray = explode('/', $route);
 array_pop($routeArray);
 $controllerName = implode('/', $routeArray);
+use yii\widgets\PjaxAsset;
+PjaxAsset::register($this);
 
 $this->registerCssFile('@web/statics/css/slidebars.css', ['depends'=>'backend\assets\AppAsset']);
 
@@ -397,17 +399,12 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
 
                         $isSubUrl = false;
                         foreach($menuRows as $menuRow){
-
                             $isSubUrl = isSubUrl($menuRow, $route);
-
                             if ($isSubUrl) {
                                 break;
                             }
-
-
                         }
                         foreach($menuRows as $menuRow){
-
                             initMenu($menuRow, $controllerName, $isSubUrl, true);
                         }
                     }
@@ -572,7 +569,7 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
     <!--footer start-->
     <footer class="site-footer">
         <div class="text-center">
-            2013 &copy; FlatLab by VectorLab.
+            2023 &copy; FlatLab by VectorLab.
             <a href="#" class="go-top">
                 <i class="fa fa-angle-up"></i>
             </a>
@@ -580,17 +577,6 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
     </footer>
     <!--footer end-->
 </section>
-<script>
-    /*
-    <!--ST客服代码-->
-    (function () {
-        var _stkf_code = document.createElement("script");
-        _stkf_code.src = "//kf.sm0898.com/code/index";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(_stkf_code, s);
-    })();
-     */
-</script>
 
 <?php $this->endBody() ?>
 </body>

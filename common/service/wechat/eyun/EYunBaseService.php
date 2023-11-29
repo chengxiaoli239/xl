@@ -24,8 +24,6 @@ class EYunBaseService  extends BaseService
     public $wId = '';
     # 用户需安装app/pc，且上传app/pc中的字段 若是开发者公司有app/pc也可直接集成sdk至app/pc中，可以做到无需用户上传，且无需下载我司提供的软件
     public $ttuid = '';
-    # e云账号对象
-    public $eyunAuth = null;
     # e云平台接口域名
     public $base_url = '';
     # e云平台账号
@@ -46,17 +44,13 @@ class EYunBaseService  extends BaseService
         if(empty($user_id)){
             throw_info('new消息发送对象user_id为空');
         }
-        $RobotUser = RobotUser::findOne(['user_id'=>$user_id]);
-        if(empty($RobotUser)){
-            throw_info('找不到微信记录');
-        }
         $this->user_id = $user_id;
         $c = \Yii::$app->params['E_YUN'];
+        $RobotUser = RobotUser::findOne(['user_id'=>$user_id]);
         $eyunAuth = EyunAuth::findOne($RobotUser->auth_id);
         if(empty($eyunAuth)){
             throw_info('找不到e云账号记录');
         }
-        $this->eyunAuth = $eyunAuth;
         $this->base_url = $eyunAuth->base_url;
         $this->account = $eyunAuth->account;
         $this->password = $eyunAuth->password;
@@ -65,10 +59,6 @@ class EYunBaseService  extends BaseService
             'Authorization' => $eyunAuth->authorization,
         ];
         $this->headers = $headers;
-        if(!empty($RobotUser)){
-            $this->wcId = $RobotUser->wcId;
-            $this->wId = $RobotUser->wId;
-        }
         parent::__construct();
     }
 
@@ -76,31 +66,31 @@ class EYunBaseService  extends BaseService
      * 第一步：登录E云平台
      * @return bool|mixed|null
      */
-    public function memberLogin($id){
-        $url = $this->base_url . '/member/login';
+    public static function memberLogin($id){
         $eyunAuth = EyunAuth::findOne($id);
+        $url = $eyunAuth->base_url . '/member/login';
         if(empty($eyunAuth)){
             throw_info('找不到eyun账号');
         }
         $params = [
-            'account' => $this->account,
-            'password' => $this->password,
+            'account' => $eyunAuth->account,
+            'password' => $eyunAuth->password,
         ];
-        $response = $this->request($url, $params);
+        $response = self::request($url, $params);
         $mkey = self::getAuthorizationKey();
         if($response['code'] == 1000 && !empty($response['data'])){
-            $this->Authorization = $response['data']['Authorization'];
+            $Authorization = $response['data']['Authorization'];
             $m = \Yii::$app->cache;
-            $m->set($mkey, $this->Authorization);
+            $m->set($mkey, $Authorization);
             $setData = [
-                'authorization' => $this->Authorization,
+                'authorization' => $Authorization,
                 'desc' => 'e云平台登陆key',
                 'updated_at' => time(),
             ];
             $eyunAuth->setAttributes($setData, false);
             $eyunAuth->save();
             if(empty($eyunAuth->callback_url)){
-                $this->setHttpCallbackUrl($eyunAuth); # 登录之后直接设置回调地址
+                self::setHttpCallbackUrl($eyunAuth); # 登录之后直接设置回调地址
             }
         }
 
@@ -368,14 +358,14 @@ class EYunBaseService  extends BaseService
      * 设置http回调地址
      * @return bool|mixed|null
      */
-    public function setHttpCallbackUrl(object $EyunAuth){
-        $url = $this->base_url . '/setHttpCallbackUrl';
+    public static function setHttpCallbackUrl(object $EyunAuth){
+        $url = $EyunAuth->base_url . '/setHttpCallbackUrl';
         $httpUrl = 'http://'.$_SERVER['SERVER_NAME'].'/eyunapi/index/callback';
         $params = [
             'httpUrl' => $httpUrl,
             'type' => EYunBaseService::MSG_TYPE_IMPROVE,
         ];
-        $response = $this->request($url, $params, $this->headers);
+        $response = self::request($url, $params, ['Authorization' => $EyunAuth->authorization]);
         if($response['code'] == 1000){
             if($EyunAuth){
                 $EyunAuth->callback_url = $httpUrl;
