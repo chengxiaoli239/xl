@@ -152,6 +152,19 @@ class RobotUserController extends BaseController
         ]);
     }
 
+    public function actionUpdateTzSystemUser($id)
+    {
+        $model = (new TzSystemsUsers())->findOne($id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view']);
+        }
+
+        return $this->renderAjax('update_tz_system_user', [
+            'model' => $model,
+        ]);
+    }
+
     /**
      * Deletes an existing RobotUser model.
      * If deletion is successful, the browser will be redirected to the 'index' page.

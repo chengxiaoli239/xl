@@ -458,8 +458,24 @@ class ThirdDTypeService extends CommonBaseService
                             }
                             //p([$text, $matchType, $matcheSingles, current($singleArr), $singleArr]);
                             break;
-                        case preg_match_all('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
+                        case preg_match_all('/(直各['.$cnSingleTxt.']{1,3}元{0,1})(组各['.$cnSingleTxt.']{1,3}元{0,1})/u', $text, $ms) && $m=1: # 直各一元组各一元
+                        case preg_match_all('/(组各['.$cnSingleTxt.']{1,3}元{0,1})(直各['.$cnSingleTxt.']{1,3}元{0,1})/u', $text, $ms) && $m=2: # 组各一元直各一元
+                        case preg_match_all('/(直各['.$cnSingleTxt.']{1,3}倍{0,1})(组各['.$cnSingleTxt.']{1,3}倍{0,1})/u', $text, $ms) && $m=3: # 直各一倍组各一倍
+                        case preg_match_all('/(组各['.$cnSingleTxt.']{1,3}倍{0,1})(直各['.$cnSingleTxt.']{1,3}倍{0,1})/u', $text, $ms) && $m=4: # 组各一倍直各一倍
                             $matchType = 2.06;
+                            $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles = array_merge($ms[1], $ms[2])); # 没有
+                            //p([$text, $matchType, $ms, $singleArr, 'm'=>$m]);
+                            break;
+                        case preg_match_all('/(直各\d+倍{0,1})(组各\d+倍{0,1})/u', $text, $ms) && $m=1: # 直各1倍组各1倍
+                        case preg_match_all('/(组各\d+倍{0,1})(直各\d+倍{0,1})/u', $text, $ms) && $m=2: # 组各1倍直各1倍
+                        case preg_match_all('/(直各\d+元{0,1})(组各\d+元{0,1})/u', $text, $ms) && $m=1: # 直各1元组各1元
+                        case preg_match_all('/(组各\d+元{0,1})(直各\d+元{0,1})/u', $text, $ms) && $m=2: # 组各1元直各1元
+                            $matchType = 2.08;
+                            $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles = array_merge($ms[1], $ms[2])); # 没有
+                            //p([$text, $matchType, $ms, $singleArr, 'm'=>$m]);
+                            break;
+                        case preg_match_all('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
+                            $matchType = 2.10;
                             $singleArr = ThirdDTypeService::getMatchTwoSingle1($matcheSingles[0]); # 没有
                             if(count($singleArr)==1){
                                 $singleArr = [ '直' => current($singleArr), '组' => current($singleArr)];
@@ -675,6 +691,7 @@ class ThirdDTypeService extends CommonBaseService
         $singleArr = [];
         foreach ($matchArr as $matcheSingle){
             $cnKey = ThirdDTypeService::getCnKey($matcheSingle);
+            if(!empty($singleArr[$cnKey])) continue;
             if(in_array($cnKey, ['组三', '组六'])){
                 # 组三组六除了匹配导倍，其它一般都是元
                 if(preg_match('/\d+/', $matcheSingle, $ms)){

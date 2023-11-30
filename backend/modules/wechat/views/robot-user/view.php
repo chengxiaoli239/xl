@@ -10,6 +10,7 @@
 
 use izyue\admin\widgets\GridView;
 use izyue\admin\widgets\ListView;
+use yii\bootstrap\Modal;
 use yii\helpers\BaseStringHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -22,6 +23,18 @@ use yii\widgets\DetailView;
 $this->title = '登陆信息';
 $this->params['breadcrumbs'][] = ['label' => 'Robot Users', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+$js=<<<'JS'
+    $('.edit-btn').click(function(){
+        var url = $(this).attr('data-url');
+        console.log(url);
+        $('#tz-system-user-modal .modal-content').load(url, function() {
+            $('#tz-system-user-modal').modal('show');
+        });
+    });
+JS;
+$this->registerJs($js);
+
 ?>
 <style>
     /* 默认的弹框大小 */
@@ -179,7 +192,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'urlCreator' => function ($action, $model, $key, $index) {
                                     if ($action === 'update') {
                                         // Set the URL for the "Update" button
-                                        return ['/forum/tz-systems-users/update', 'id' => $key];
+                                        return ['/forum/robot-user/update-tz-system-user', 'id' => $key];
                                     } else {
                                         // Use the default URL for other actions
                                         return Url::to([$action, 'id' => $key]);
@@ -187,11 +200,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 },
                                 'buttons' => [
                                     'update' => function ($url, $model, $key) {
-                                        return Html::a(
-                                            '<span class="glyphicon glyphicon-pencil"></span> 更新',
-                                            $url,
-                                            ['class' => 'btn btn-success btn-xs']
-                                        );
+                                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>', 'javascript:void(0);', [
+                                            'class' => 'edit-btn btn btn-xs edit-button',
+                                            'data-url' => Yii::$app->urlManager->createUrl(['wechat/robot-user/update-tz-system-user', 'id' => $model->id]),
+                                        ]);
                                     },
                                     #'view' => function ($url, $model, $key) {
                                     #    return Html::a(
@@ -551,6 +563,14 @@ $this->params['breadcrumbs'][] = $this->title;
         });
     })
 </script>
+
+
+<!-- 模态框 -->
+<?php Modal::begin([
+    'id' => 'tz-system-user-modal',
+    'size' => 'modal-lg',
+]); ?>
+<?php Modal::end(); ?>
 
 
 

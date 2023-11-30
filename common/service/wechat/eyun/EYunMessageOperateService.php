@@ -219,6 +219,12 @@ class EYunMessageOperateService  extends EYunBaseService
                 $text = str_replace($m, '各'.$ms[1][$k], $text);
             }
         }
+        # '=三' 替换成 '各三'
+        if(preg_match_all('/=\s*(['.MethodMatchService::CN_SINGLE_TEXT.'])/u', $text, $ms)){
+            foreach ($ms[0] as $k=>$m){
+                $text = str_replace($m, '各'.$ms[1][$k], $text);
+            }
+        }
 
         var_dump(4, $text);
         $text = str_replace(['共计', '总计', '计', '='], '共', $text); # 同义词替换

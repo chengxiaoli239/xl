@@ -29,8 +29,8 @@ class IndexController extends Controller
         try {
             #$betRow = Bets::findOne(6362);
             #list($code, $data, $msg) = OperateLotteryService::operateOne($betRow, $kjCode='2,5,4');p([$code, $data, $msg]);
-            $plan = UserSysPlans::findOne(7653);
-            $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [60]); p(count($filter_dynamic_codes));
+            //$plan = UserSysPlans::findOne(7653);
+            //$filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan, [60]); p(count($filter_dynamic_codes));
             //$text = '百:1346,十:3689,个:6789';
             # 福彩 02349/ 组六组三 各20
             # 福彩 02349/ 12345..32457组六  组三各20
@@ -77,7 +77,15 @@ class IndexController extends Controller
 12、13、17、18、27、41 各飞200元
 豹子全包50
 总计1250';
-            //$text = '体彩028167组六500组三200';
+            $text = '福
+372.549.354直=8元组=4元
+
+354 205 570 584  638 642 647 629一直一组
+
+
+体
+299.677.578.839.488一直一组';
+
             #$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
             //preg_match('/各([' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3})/u', $text, $matches); p($matches);
