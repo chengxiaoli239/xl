@@ -58,6 +58,7 @@ class EYunBaseService  extends BaseService
         $headers = [
             'Authorization' => $eyunAuth->authorization,
         ];
+        $this->wId = $RobotUser->wId;
         $this->headers = $headers;
         parent::__construct();
     }
