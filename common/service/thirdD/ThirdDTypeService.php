@@ -722,6 +722,7 @@ class ThirdDTypeService extends CommonBaseService
             $cnKey = ThirdDTypeService::getCnKey($matcheSingle);
             var_dump('cnKey:'.$cnKey);
             if(in_array($cnKey, ['组三', '组六'])){
+                var_dump($matcheSingle.'----====--------');
                 if(isset($singleArr[$cnKey])){
                     continue;
                 }
@@ -736,10 +737,24 @@ class ThirdDTypeService extends CommonBaseService
                 }
                 $singleArr[$cnKey] = $currentSingle;
             }else{
-                if(preg_match('/\d+/', $matcheSingle, $ms)){
-                    $singleArr[$cnKey] = strpos($matcheSingle, '元') !== false ? $ms[0] : ($ms[0] * 2);
-                }else if(preg_match('/['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}/u', $matcheSingle, $ms)){
-                    $singleArr[$cnKey] = strpos($matcheSingle, '元') !== false ? ThirdD::cn2num($ms[0]) : (ThirdD::cn2num($ms[0]) * 2);
+                if(strpos($matcheSingle, '倍') === false && preg_match('/直各/', $matcheSingle, $ms0)){
+                    var_dump($matcheSingle.'------------');
+                    if(preg_match('/\d+/', $matcheSingle, $ms)){
+                        $singleArr[$cnKey] = $ms[0];
+                    }else if(preg_match('/['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}/u', $matcheSingle, $ms)){
+                        $singleArr[$cnKey] = ThirdD::cn2num($ms[0]);
+                    }
+                }else{
+                    if(preg_match('/\d+/', $matcheSingle, $ms)){
+                        var_dump($matcheSingle.'-----5555---');
+                        $singleArr[$cnKey] = (
+                            (strpos($matcheSingle, '元') !== false)
+                            OR (preg_match('/直各\d+/', $matcheSingle, $m0) && strpos($matcheSingle, '倍') === false)
+                            OR (preg_match('/组各\d+/', $matcheSingle, $m0) && strpos($matcheSingle, '倍') === false)
+                        ) ? $ms[0] : ($ms[0] * 2);
+                    }else if(preg_match('/['.MethodMatchService::CN_SINGLE_TEXT.']{1,3}/u', $matcheSingle, $ms)){
+                        $singleArr[$cnKey] = strpos($matcheSingle, '元') !== false ? ThirdD::cn2num($ms[0]) : (ThirdD::cn2num($ms[0]) * 2);
+                    }
                 }
             }
         }
