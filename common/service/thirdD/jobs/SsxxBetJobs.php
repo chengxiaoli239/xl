@@ -42,10 +42,15 @@ class SsxxBetJobs extends CommonJob {
 
             Tool_Common::log('/statics_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params, 'data'=>$data]);
         }catch (\Exception $e){
+            $err_msg = $e->getMessage();
+            $push_status = BetsBackend::PUSH_STATUS_FAIL;
             Tool_Common::log('/statics_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['params'=>$params, 'err_msg'=>$e->getMessage()]);
             if($e->getCode() == SsxxBetJobs::INVALID_STATUS_CODE){
-                return $e->getMessage();
+                $push_status = BetsBackend::PUSH_STATUS_CANNOT;
             }
+            $betRow->push_status = $push_status;
+            $betRow->push_desc = $err_msg;
+            $betRow->save();
             throw_info($e->getMessage());
         }
 

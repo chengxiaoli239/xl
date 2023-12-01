@@ -229,6 +229,9 @@ class Ssxx3dBetService extends CommonBaseService
         }catch (\Exception $e){
             $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()];
             Tool_Common::log('/bet_sx/'.__FUNCTION__, 'ERR', '推送盘口处理异常11', $logArr);
+            if($e->getCode()>30000 && $e->getCode()<40000){
+                $betRow->status = 3;
+            }
             var_dump($e->getMessage());
             return [10004, $logArr, $e->getMessage()];
         }
@@ -418,7 +421,7 @@ class Ssxx3dBetService extends CommonBaseService
         if($result['s'] != 2){ # 错误码：2成功、9918 登录超时....
             $logArr['result'] = $result;
             Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);
-            throw_info($result['m']??'推送盘口异常');
+            throw_info($result['m']??'推送盘口异常', 30001);
         }
 
         return true;

@@ -22,6 +22,8 @@ use Yii;
  * @property string $qihao 期号
  * @property string $kj_codes 开奖号码
  * @property int $status 中奖状态：0:正常、1:中奖、2:未中奖
+ * @property int $push_status 中奖状态：0:待推、2:成功 3 失败
+ * @property string $push_desc 推送结果文案
  * @property int $cancel_status 撤单状态：0未撤单1已撤单
  * @property int $is_simulate 是否模拟投注0否1是
  * @property string $lottery_name 彩种
@@ -48,9 +50,9 @@ class Bets extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['user_id', 'wechat_user_id', 'order_id', 'play_method', 'count', 'status', 'cancel_status', 'is_simulate', 'lottery_type', 'is_profits_record', 'created_at', 'updated_at'], 'integer'],
+            [['user_id', 'wechat_user_id', 'order_id', 'play_method', 'count', 'status', 'push_status', 'cancel_status', 'is_simulate', 'lottery_type', 'is_profits_record', 'created_at', 'updated_at'], 'integer'],
             [['codes', 'bet_desc', 'created_at', 'updated_at'], 'required'],
-            [['codes', 'bet_desc'], 'string'],
+            [['codes', 'push_desc', 'bet_desc'], 'string'],
             [['bet_money', 'bonus', 'single', 'ratio', 'profits'], 'number'],
             [['update_at'], 'safe'],
             [['qihao'], 'string', 'max' => 20],
@@ -80,6 +82,8 @@ class Bets extends \common\models\base\BaseModel
             'qihao' => '期号',
             'kj_codes' => '开奖',
             'status' => '状态',
+            'push_status' => '推送状态',
+            'push_desc' => '推送描述',
             'cancel_status' => 'Cancel Status',
             'is_simulate' => '模拟',
             'lottery_name' => '类型',
