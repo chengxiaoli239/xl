@@ -73,6 +73,7 @@ class Bets extends BetsModel
             'ratio' => $this->ratio,
             'profits' => $this->profits,
             'status' => $this->status,
+            'push_status' => $this->push_status,
             'cancel_status' => $this->cancel_status,
             'is_simulate' => $this->is_simulate,
             'lottery_type' => $this->lottery_type,
@@ -85,6 +86,7 @@ class Bets extends BetsModel
         $query->andFilterWhere(['like', 'codes', $this->codes])
             ->andFilterWhere(['like', 'qihao', $this->qihao])
             ->andFilterWhere(['like', 'kj_codes', $this->kj_codes])
+            ->andFilterWhere(['like', 'push_desc', $this->push_desc])
             ->andFilterWhere(['like', 'lottery_name', $this->lottery_name])
             ->andFilterWhere(['like', 'bet_desc', $this->bet_desc]);
 

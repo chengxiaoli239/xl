@@ -405,7 +405,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%local_to_site_method}}'); p($r);
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%bets}}'); p($r);
         $d = Thirdd::getCurrentKjData($lottery_type=26);p($d);
         $Thirdd = new Thirdd();
         $data = $Thirdd->getFuCai3d($type='json', 2);p($data);
