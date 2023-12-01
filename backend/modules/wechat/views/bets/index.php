@@ -78,6 +78,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value' => function($model) {
                                 $title = $model->push_status==BetsBackend::PUSH_STATUS_WAIT ? '2分钟自动推盘口' : '';
+                                $title = $model->push_status==BetsBackend::PUSH_STATUS_FAIL ? $model->push_desc : $title;
                                 return '<a href="javascript:;" title="'.$title.'"><strong><font color="'.BetsBackend::PUSH_STATUS_CLASSES[$model->push_status].'">'.BetsBackend::PUSH_STATUS_OPTIONS[$model->push_status].'</font></strong></a>';
                             }
                         ],
