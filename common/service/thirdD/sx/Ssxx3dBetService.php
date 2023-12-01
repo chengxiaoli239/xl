@@ -229,11 +229,9 @@ class Ssxx3dBetService extends CommonBaseService
         }catch (\Exception $e){
             $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()];
             Tool_Common::log('/bet_sx/'.__FUNCTION__, 'ERR', '推送盘口处理异常11', $logArr);
-            if($e->getCode()>30000 && $e->getCode()<40000){
-                $betRow->status = 3;
-            }
             var_dump($e->getMessage());
-            return [10004, $logArr, $e->getMessage()];
+            throw_info($e->getMessage(), $e->getCode());
+            //return [10004, $logArr, $e->getMessage()];
         }
 
         return [0, ['resultData'=>$resultData], '推送成功'];
