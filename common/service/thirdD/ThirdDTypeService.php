@@ -474,6 +474,11 @@ class ThirdDTypeService extends CommonBaseService
                             $singleArr = ThirdDTypeService::getMatchTwoSingle($matcheSingles = array_merge($ms[1], $ms[2])); # 没有
                             //p([$text, $matchType, $ms, $singleArr, 'm'=>$m]);
                             break;
+                        case preg_match_all('/(直|组)(各|)(\d+(元|倍){0,1})/', $text, $matcheSingles):
+                            $matchType = 2.11;
+                            $singleArr = ThirdDTypeService::getMatchTwoSingle1($matcheSingles[0]); # 没有
+                            //p([$text, $matchType, $matcheSingles, $singleArr]);
+                            break;
                         case preg_match_all('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
                             $matchType = 2.10;
                             $singleArr = ThirdDTypeService::getMatchTwoSingle1($matcheSingles[0]); # 没有
@@ -481,11 +486,6 @@ class ThirdDTypeService extends CommonBaseService
                                 $singleArr = [ '直' => current($singleArr), '组' => current($singleArr)];
                             }
                             //p([$text, $matchType, $matcheSingles, current($singleArr), $singleArr]);
-                            break;
-                        case preg_match_all('/(直|组)(各|)(\d+(元|倍){0,1})/', $text, $matcheSingles):
-                            $matchType = 2.11;
-                            $singleArr = ThirdDTypeService::getMatchTwoSingle1($matcheSingles[0]); # 没有
-                            //p([$text, $matchType, $matcheSingles, $singleArr]);
                             break;
                         case preg_match('/各(\d+(元|倍){0,1})/', $text, $matcheSingles):
                             $matchType = 2.12;
@@ -650,8 +650,8 @@ class ThirdDTypeService extends CommonBaseService
         }catch (\Exception $e){
             $matchType = $e->getMessage();
         }
-        Tool_Common::log('/matchSingle/'.__FUNCTION__, 'INFO', '多倍匹配条件', ['text'=>$text, 'matchType'=>$matchType, 'singleArr'=>$singleArr]);
-        #p([$matchMethodAndCodeText, $text, $matcheSingles, $methodArr, $singleArr]);
+        Tool_Common::log('/matchSingle/'.__FUNCTION__, 'INFO', '多倍匹配条件', ['text'=>$text, 'matchType'=>$matchType, 'singleArr'=>$singleArr, 'm'=>$m]);
+        //p([$matchMethodAndCodeText, $text, $matchType, $matcheSingles, $singleArr, $ms, $m]);
         # 玩法类型组合：组三、组六、组三&组六、直&组（一直一组，二直三组，直组）、组选、组、直||直选
 
         #p([$matchMethodAndCodeText, $matcheSingles, $text, $singleArr]);
