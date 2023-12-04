@@ -181,10 +181,11 @@ class IndexController extends Controller
     public function actionInsertPlansTask(){
         self::_init();
         $rst = ['status'=>200, 'msg'=>'操作成功'];
-        $post = \Yii::$app->request->post();
+        #$post = \Yii::$app->request->post();
+        $lottery_types = [1, 8, 17];
 
         for ($i=0; $i<7; $i++){
-            $rst['data'] = BetService::insertPlansTask($post['lottery_types']);
+            $rst['data'] = BetService::insertPlansTask($lottery_types);
             //$rst['batch_simulate_data'] = BetService::batchSimulateBet($post['lottery_types']);
             sleep(7);
         }
