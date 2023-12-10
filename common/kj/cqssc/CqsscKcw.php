@@ -508,7 +508,10 @@ class CqsscKcw extends BaseKj {
             $code5 = substr($codesArr[4] + $codesArr[9] + $codesArr[14] + $codesArr[19], -1);
             $opencode = $code1.','.$code2.','.$code3.','.$code4.','.$code5;
 
-            if($opencode == '0,0,0,0,0') return false;
+            $mkey = BaseKj::getOpenCodeLtKey($lottery_type, $qihao);
+            $num = \Yii::$app->redis->incr($mkey);
+            \Yii::$app->redis->expire($mkey, 8);
+            if($opencode == '0,0,0,0,0' && $num<5) return false;
             $kjData = ['expect'=>$qihao , 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
         }
         if(empty($kjData['opencode'])) return false;

@@ -138,7 +138,10 @@ class Lucky5 extends BaseKj {
                     throw_info('开奖数据为空：'.yii\helpers\Json::encode($rst, 320));
                 };
                 $opencode = implode(',', $data['code']);
-                if($opencode == '0,0,0,0,0'){
+                $mkey = BaseKj::getOpenCodeLtKey(self::$lottery_type, $current_qihao);
+                $num = \Yii::$app->redis->incr($mkey);
+                \Yii::$app->redis->expire($mkey, 8);
+                if($opencode == '0,0,0,0,0' && $num<5){
                     throw_info('开奖数据为空：'.$opencode);
                 }
                 //$kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
@@ -200,7 +203,9 @@ class Lucky5 extends BaseKj {
 
             if (!isset($data['code'])) return false;
             $opencode = implode(',', $data['code']);
-            if($opencode == '0,0,0,0,0') return false;
+            $mkey = BaseKj::getOpenCodeLtKey(self::$lottery_type, $current_qihao);
+            $num = \Yii::$app->redis->incr($mkey);
+            if($opencode == '0,0,0,0,0' && $num<5) return false;
             $kjData = ['expect'=>$data['preDrawIssue']?$data['preDrawIssue']:$data['issue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']?$data['preDrawTime']:$data['draw_time']];
             //p($kjData);
         }

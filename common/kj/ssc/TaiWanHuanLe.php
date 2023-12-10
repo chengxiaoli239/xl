@@ -34,7 +34,9 @@ class TaiWanHuanLe extends BaseKj {
             $row = $data['data']['drawInfo']['historyDraw']['resultList'];
             $qihao = $data['data']['drawInfo']['historyDraw']['draw_number'];
             $opencode = implode(',', $row);
-            if($opencode == '0,0,0,0,0') return false;
+            $mkey = BaseKj::getOpenCodeLtKey(self::$lottery_type);
+            $num = \Yii::$app->redis->incr($mkey);
+            if($opencode == '0,0,0,0,0' && $num<5) return false;
             $kjData = ['expect'=>$qihao , 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
         }
         if(empty($kjData['opencode'])) return false;
@@ -101,7 +103,10 @@ class TaiWanHuanLe extends BaseKj {
 
             if (empty($data)) return false;
             $opencode = implode(',', $data['resultList']);
-            if($opencode == '0,0,0,0,0') return false;
+            $mkey = BaseKj::getOpenCodeLtKey(self::$lottery_type, $data['draw_number']);
+            $num = \Yii::$app->redis->incr($mkey);
+            \Yii::$app->redis->expire($mkey, 8);
+            if($opencode == '0,0,0,0,0' && $num<5) return false;
             //$kjData = ['expect'=>$data['preDrawIssue'], 'opencode'=>$opencode, 'opentime'=>$data['preDrawTime']];
             $kjData = ['expect'=>$data['draw_number'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
             //p($kjData);

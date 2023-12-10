@@ -85,6 +85,11 @@ class BaseKj extends BaseService {
         return $mkey;
     }
 
+    public static function getOpenCodeLtKey($lottery_type=DEFAULT_LOTTERY_TYPE, $qihao=''): string
+    {
+        return __FUNCTION__.'_x0_'.$lottery_type.'_'.$qihao;
+    }
+
     /**
      * @param integer $id
      * @return string
