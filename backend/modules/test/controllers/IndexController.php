@@ -348,6 +348,7 @@ class IndexController extends Controller
     }
     public function actionDw1(){
 
+        $loginRst = EYunBaseService::memberLogin($id=1);p($loginRst);
         //$betRow = Bets::findOne('1160');
         //list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);p([$code, $data, $msg]);
         #$rst = \common\open\thirdD\methods\MethodsMap::insertMapMethods();p($rst);
