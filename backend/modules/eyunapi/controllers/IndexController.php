@@ -14,7 +14,7 @@ class IndexController extends Controller
         $data = \Yii::$app->request->getRawBody();
         $data = Json::decode($data, 320);
         if(empty($data)){
-            return ['code'=>10001, 'msg'=>'消息不能为空'];
+            return ['code'=>10000, 'msg'=>'消息不能为空'];
         }
         $result = EventServiceTrait::eventHandler($data);
         Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', 'e云消息通知', ['data'=>$data, 'result'=>$result]);
