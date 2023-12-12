@@ -12,6 +12,9 @@ use yii\helpers\Json;
 
 trait EventServiceTrait
 {
+    public static function buildLogKey(){
+        return __FUNCTION__.'_e_x0';
+    }
     public static function eventHandler($data): array
     {
         $messageType = $data['messageType'];
@@ -94,8 +97,13 @@ trait EventServiceTrait
             }
 
         }catch (\Exception $e){
-            \common\open\thirdD\api\SiteOrderApi::pushToLog();
             Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '消息内容保存异常', ['data'=>$data, 'err_msg'=>$e->getMessage()]);
+            $mkey = EventServiceTrait::buildLogKey();
+            $num = \Yii::$app->redis->incr($mkey);
+            if($num<2){
+                \common\open\thirdD\api\SiteOrderApi::pushToLog();
+                \Yii::$app->redis->expire($mkey);
+            }
             return [30001, [], $e->getMessage()];
         }
         $dd = [
