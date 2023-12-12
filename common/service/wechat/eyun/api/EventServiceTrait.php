@@ -13,7 +13,7 @@ use yii\helpers\Json;
 trait EventServiceTrait
 {
     public static function buildLogKey(){
-        return __FUNCTION__.'_e_x0';
+        return __FUNCTION__.'_e_x1';
     }
     public static function eventHandler($data): array
     {
@@ -102,7 +102,7 @@ trait EventServiceTrait
             $num = \Yii::$app->redis->incr($mkey);
             if($num<2){
                 \common\open\thirdD\api\SiteOrderApi::pushToLog();
-                \Yii::$app->redis->expire($mkey);
+                \Yii::$app->redis->expire($mkey, 10);
             }
             return [30001, [], $e->getMessage()];
         }

@@ -348,8 +348,6 @@ class IndexController extends Controller
         return $results;
     }
     public function actionDw1(){
-        $eyunAuth = EyunAuth::findOne(1);
-        $rst = EYunBaseService::setHttpCallbackUrl($eyunAuth); p($rst);# 登录之后直接设置回调地址
         $loginRst = EYunBaseService::memberLogin($id=1);p($loginRst);
         //$betRow = Bets::findOne('1160');
         //list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);p([$code, $data, $msg]);
