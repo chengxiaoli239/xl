@@ -90,7 +90,7 @@ class EYunBaseService  extends BaseService
             ];
             $eyunAuth->setAttributes($setData, false);
             $eyunAuth->save();
-            if(empty($eyunAuth->callback_url)){
+            if(!empty($eyunAuth->callback_url)){
                 self::setHttpCallbackUrl($eyunAuth); # 登录之后直接设置回调地址
             }
         }
@@ -361,7 +361,8 @@ class EYunBaseService  extends BaseService
      */
     public static function setHttpCallbackUrl(object $EyunAuth){
         $url = $EyunAuth->base_url . '/setHttpCallbackUrl';
-        $httpUrl = 'http://'.$_SERVER['SERVER_NAME'].'/eyunapi/index/callback';
+        //$httpUrl = 'http://'.$_SERVER['HTTP_HOST'].'/eyunapi/index/callback';
+        $httpUrl = $EyunAuth->callback_url;
         $params = [
             'httpUrl' => $httpUrl,
             'type' => EYunBaseService::MSG_TYPE_IMPROVE,
