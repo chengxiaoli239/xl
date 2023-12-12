@@ -6,6 +6,7 @@ use backend\models\thirdD\BetsBackend;
 use backend\models\UserSysPlans;
 use backend\service\NumService;
 use common\service\helpers\ThirdD;
+use common\service\thirdD\match\MatchCodeService;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\OperateLotteryService;
 use common\service\thirdD\sx\Ssxx3dBetService;
@@ -77,8 +78,9 @@ class IndexController extends Controller
 12、13、17、18、27、41 各飞200元
 豹子全包50
 总计1250';
-            $text = '福福
+            $text = '福
 909  838 直各16组各4';
+            $codeDatas = MatchCodeService::getExplainData($text);p($codeDatas);
 
             #$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本

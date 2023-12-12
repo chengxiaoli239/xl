@@ -100,4 +100,7 @@ return [
         'PASSWORD' => '0654321',
         "TTUID" => '0065473f-beba-4f58-86ed-c576f4297772', # 8429aa96-5098-4211-9736-355599a11367
     ],
+
+    # 解析接口
+    'EXPLAIN_CODE_API' => 'http://af1.ssxx9999.com',
 ];

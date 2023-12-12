@@ -350,22 +350,25 @@ class EYunMessageOperateService  extends EYunBaseService
                 case strpos($text, '上') !== false OR strpos($text, '下') !== false: // 上下分
                     return AgentUsersBalanceService::operateBalanceChange($text, $this->wechatUser);
                 default:
-                    $stepText = [
-                        'originText' => $text,
-                    ];
-                    $betTexts = EYunMessageOperateService::resetMethodText($text); # 重置匹配文本
-                    Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-00', ['text'=>$text, 'betTexts'=>$betTexts, 'counts'=>count($betTexts)]);
-                    $dataGroups = [];
-                    foreach ($betTexts as $k1=>$betText){
-                        list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($betText); # 单个规则文本匹配处理
-                        Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-001', ['betText'=>$betText, 'code'=>$code, 'msg'=>$msg]);
-                        if($code>0){
-                            if($code == CommonBaseService::CODE_FOR_USER){
-                                throw_info($msg, $code);
+                    $switch = BetService::getConfig('match_from_type_api')??0;
+                    $stepText = ['originText'=>$text];
+                    if($switch==1){
+
+                    }else{
+                        $betTexts = EYunMessageOperateService::resetMethodText($text); # 重置匹配文本
+                        Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-00', ['text'=>$text, 'betTexts'=>$betTexts, 'counts'=>count($betTexts)]);
+                        $dataGroups = [];
+                        foreach ($betTexts as $k1=>$betText){
+                            list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($betText); # 单个规则文本匹配处理
+                            Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-001', ['betText'=>$betText, 'code'=>$code, 'msg'=>$msg]);
+                            if($code>0){
+                                if($code == CommonBaseService::CODE_FOR_USER){
+                                    throw_info($msg, $code);
+                                }
+                                continue;
                             }
-                            continue;
+                            $dataGroups['betCodeContents'][$data['lottery_type']][] = $data['g'];
                         }
-                        $dataGroups['betCodeContents'][$data['lottery_type']][] = $data['g'];
                     }
                     break;
             }
