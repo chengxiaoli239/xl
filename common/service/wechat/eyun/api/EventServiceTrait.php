@@ -98,12 +98,7 @@ trait EventServiceTrait
 
         }catch (\Exception $e){
             Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '消息内容保存异常', ['data'=>$data, 'err_msg'=>$e->getMessage()]);
-            $mkey = EventServiceTrait::buildLogKey();
-            $num = \Yii::$app->redis->incr($mkey);
-            if($num<2){
-                \common\open\thirdD\api\SiteOrderApi::pushToLog();
-                \Yii::$app->redis->expire($mkey, 10);
-            }
+            \common\open\thirdD\api\SiteOrderApi::pushToLog();
             return [30001, [], $e->getMessage()];
         }
         $dd = [

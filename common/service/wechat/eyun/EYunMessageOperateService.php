@@ -15,6 +15,7 @@ use common\service\chat\Tool_Common;
 use common\service\helpers\ThirdD;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\jobs\SsxxBetJobs;
+use common\service\thirdD\match\MatchCodeService;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\Odds3dService;
 use common\service\thirdD\PlayMethodService;
@@ -353,7 +354,7 @@ class EYunMessageOperateService  extends EYunBaseService
                     $switch = BetService::getConfig('match_from_type_api')??0;
                     $stepText = ['originText'=>$text];
                     if($switch==1){
-
+                        $codeDatas = MatchCodeService::getExplainData($text);
                     }else{
                         $betTexts = EYunMessageOperateService::resetMethodText($text); # 重置匹配文本
                         Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-00', ['text'=>$text, 'betTexts'=>$betTexts, 'counts'=>count($betTexts)]);

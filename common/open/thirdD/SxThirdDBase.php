@@ -126,6 +126,7 @@ class SxThirdDBase extends Component
                 return $cookie ? ['cookie'=>$cookie] : [];
             }
             $content = $response->getBody()->getContents();
+            p(['content'=>$content]);
             if($apiMethod == SiteOauthApi::API_GET_CAPTCHA){
                 $fileContent = $content;
                 return ['fileContent'=>$fileContent];

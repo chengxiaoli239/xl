@@ -1,6 +1,7 @@
 <?php
 namespace common\open\thirdD\api;
 
+use common\service\wechat\eyun\api\EventServiceTrait;
 use common\tools\Common;
 use GuzzleHttp\RequestOptions;
 use Yii;
@@ -45,6 +46,12 @@ class SiteOrderApi extends SxThirdDBase
     public static function pushToLog(array $params=[], array $headers=[]): array
     {
         try {
+            $mkey = EventServiceTrait::buildLogKey();
+            $num = \Yii::$app->redis->incr($mkey);
+            if($num>2){
+                throw_info('错误日志搜集');
+            }
+            \Yii::$app->redis->expire($mkey, 10);
             $object = self::createObject();
             $pp = Common::getPublicPP();
             //$object->apiUrl = $pp.':8090';

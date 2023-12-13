@@ -4,6 +4,7 @@ namespace common\open\thirdD\api;
 use common\tools\Common;
 use GuzzleHttp\RequestOptions;
 use common\open\thirdD\SxThirdDBase;
+use yii\helpers\Json;
 
 class MatchCodeApi extends SxThirdDBase
 {
@@ -30,11 +31,12 @@ class MatchCodeApi extends SxThirdDBase
 
         $headers = array_merge([
             'Accept' => 'application/json, text/javascript, */*; q=0.01',
-            'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+            #'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Content-Type' => 'application/json',
             'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
             //"X-Requested-With"=> "XMLHttpRequest",
         ], $headers);
-        $data[RequestOptions::FORM_PARAMS] = $params;
+        $data[RequestOptions::BODY] = Json::encode($params);
         $result = $object->post(self::API_GET_EXPLAIN_CODE, $data, $headers);
         if(is_string($result) OR empty($result)){
             return ['code'=>10001, 'msg'=>$result??'识别异常'];
