@@ -351,7 +351,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 case strpos($text, '上') !== false OR strpos($text, '下') !== false: // 上下分
                     return AgentUsersBalanceService::operateBalanceChange($text, $this->wechatUser);
                 default:
-                    $switch = BetService::getConfig('match_from_type_api')??0;
+                    $switch = BetService::getConfig('match_from_type_api_switch')??0;
                     $stepText = ['originText'=>$text];
                     if($switch==1){
                         $codeDatas = MatchCodeService::getExplainData($text);
