@@ -352,6 +352,7 @@ class EYunMessageOperateService  extends EYunBaseService
                     return AgentUsersBalanceService::operateBalanceChange($text, $this->wechatUser);
                 default:
                     $switch = BetService::getConfig('match_from_type_api_switch')??0;
+                    Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-000', ['text'=>$text, 'switch'=>$switch]);
                     $stepText = ['originText'=>$text];
                     if($switch==1){
                         $codeDatas = MatchCodeService::getExplainData($text);
