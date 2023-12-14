@@ -65,7 +65,7 @@ class Ssxx3dBetService extends CommonBaseService
         //p($method_id);
         try {
             self::$siteSystemInfo = CommonBaseService::getSystemBaseInfo($user_id, $lottery_type); # 盘口信息
-            self::$localToSiteMethodInfo = CommonBaseService::getLocalToSiteMethods(self::$siteSystemInfo['system_type_id'], $method_id); #
+            self::$localToSiteMethodInfo = CommonBaseService::getLocalToSiteMethods($method_id, self::$siteSystemInfo['system_type_id']); #
             $logArr = ['method_id'=>$method_id, 'siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo];
             Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '盘口信息', $logArr);
             $betCodes = $betRow->codes;

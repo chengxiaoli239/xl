@@ -101,9 +101,10 @@ class IndexController extends Controller
             #curl_close($ch);//关闭连接
 
             #p(['responds'=>$responds]);
-            $codeDatas = MatchCodeService::getExplainData($text);p($codeDatas);
+            //$dataGroups = MatchCodeService::getCodeData($text);p($dataGroups);
 
-            $text = "排594 394直一组一倍。
+            $text = "排594 394直一组一倍
+            
 福 116 166 156 135 136 115组一倍";
             #$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本

@@ -352,26 +352,26 @@ class EYunMessageOperateService  extends EYunBaseService
                     return AgentUsersBalanceService::operateBalanceChange($text, $this->wechatUser);
                 default:
                     $switch = BetService::getConfig('match_from_type_api_switch')??0;
-                    Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-000', ['text'=>$text, 'switch'=>$switch]);
                     $stepText = ['originText'=>$text];
-                    if($switch==1){
-                        $codeDatas = MatchCodeService::getExplainData($text);
-                    }else{
-                        $betTexts = EYunMessageOperateService::resetMethodText($text); # 重置匹配文本
-                        Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-00', ['text'=>$text, 'betTexts'=>$betTexts, 'counts'=>count($betTexts)]);
-                        $dataGroups = [];
-                        foreach ($betTexts as $k1=>$betText){
+                    $betTexts = EYunMessageOperateService::resetMethodText($text); # 重置匹配文本
+                    Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-00', ['switch'=>$switch, 'text'=>$text, 'betTexts'=>$betTexts, 'counts'=>count($betTexts)]);
+                    $dataGroups = [];
+                    foreach ($betTexts as $k1=>$betText){
+                        if($switch==1){
+                            list($code, $data, $msg) = MatchCodeService::getCodeData($betText);
+                        }else{
                             list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($betText); # 单个规则文本匹配处理
-                            Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-001', ['betText'=>$betText, 'code'=>$code, 'msg'=>$msg]);
-                            if($code>0){
-                                if($code == CommonBaseService::CODE_FOR_USER){
-                                    throw_info($msg, $code);
-                                }
-                                continue;
-                            }
-                            $dataGroups['betCodeContents'][$data['lottery_type']][] = $data['g'];
                         }
+                        Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-001', ['betText'=>$betText, 'code'=>$code, 'msg'=>$msg]);
+                        if($code>0){
+                            if($code == CommonBaseService::CODE_FOR_USER){
+                                throw_info($msg, $code);
+                            }
+                            continue;
+                        }
+                        $dataGroups['betCodeContents'][$data['lottery_type']][] = $data['g'];
                     }
+
                     break;
             }
         }catch (\Exception $e){

@@ -64,13 +64,17 @@ class CommonBaseService extends BaseService
         return 'getLocalToSiteMethodsMkey_x1_'.$system_type_id;
     }
 
+    public static function getSiteToLocalMethodsMkey($system_type_id=0): string
+    {
+        return 'getSiteToLocalMethodsMkey_x1_'.$system_type_id;
+    }
+
     /**
      * 获取本地对盘口玩法ID映射关系
-     * @param int $system_type_id
      * @param int $method_id
-     * @return array
+     * @param int $system_type_id     * @return array
      */
-    public static function getLocalToSiteMethods(int $system_type_id=0, int $method_id=0): array
+    public static function getLocalToSiteMethods(int $method_id=0, int $system_type_id=15): array
     {
         $m = \Yii::$app->cache;
         $mkey = CommonBaseService::getLocalToSiteMethodsMkey($system_type_id);
@@ -86,5 +90,20 @@ class CommonBaseService extends BaseService
         }
 
         return $data;
+    }
+
+    public static function getSiteToLocalMethods($method_id=0, $system_type_id=15){
+        $m = \Yii::$app->cache;
+        $mkey = CommonBaseService::getSiteToLocalMethodsMkey($method_id);
+        if(true OR !$data = $m->get($mkey)){
+            $data = LocalToSiteMethod::find()
+                ->select(['id', 'system_type_id', 'method_id', 'site_method_id', 'name'])
+                ->indexBy('method_id')
+                ->where(['=', 'system_type_id', $system_type_id])->indexBy('site_method_id')->asArray()->all() ;
+            $m->set($mkey, $data, 600);
+        }
+        if(isset($data[$method_id])){
+            return $data[$method_id];
+        }
     }
 }
