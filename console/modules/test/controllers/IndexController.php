@@ -80,29 +80,6 @@ class IndexController extends Controller
 总计1250';
             $text = '福
 909  838 直各16组各4';
-            #$data = ['textfield'=>'福福\n909 838 直各16组各14'];//post参数
-
-            #$url='http://af1.ssxx9999.com/Test/getmima';
-
-            #$ch = curl_init();//创建连接
-
-            #curl_setopt($ch, CURLOPT_URL, $url);
-
-            #curl_setopt($ch, CURLOPT_POST, 1);
-
-            #curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));//将数组转换为URL请求字符串，否则有些时候可能服务端接收不到参数
-
-            #curl_setopt($ch,CURLOPT_RETURNTRANSFER, 1); //接收服务端范围的html代码而不是直接浏览器输出
-
-            #curl_setopt($ch, CURLOPT_HEADER, false);
-
-            #$responds = curl_exec($ch);//接受响应
-
-            #curl_close($ch);//关闭连接
-
-            #p(['responds'=>$responds]);
-            //$dataGroups = MatchCodeService::getCodeData($text);p($dataGroups);
-
             $text = "排594 394直一组一倍
             
 福 116 166 156 135 136 115组一倍";

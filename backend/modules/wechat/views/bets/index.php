@@ -128,7 +128,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a(BaseStringHelper::truncate($model->bet_desc,25), 'javascript:;', [
                                     'class'=>'act-post-desc',
                                     'title'=>$model->bet_desc,
-                                    'alt'=>str_replace('@', ',',str_replace(',', '',$model->bet_desc)),
+                                    'alt'=>$model->api_code_datas,
                                 ]);
                             }
                         ],
@@ -163,6 +163,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <form id="tip_form_msg" style="display:block; width:100%;height: 560px;overflow-y: scroll">
                     <strong>内容：</strong>
                     <pre><code id="push_content"></code></pre>
+                    <strong>接口识别内容：</strong>
+                    <pre><code id="api_content"></code></pre>
                 </form>
             </div>
             <div class="modal-footer">
@@ -176,10 +178,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <script>
     $(function () {
         $(".act-post-desc").click(function (rst) {
-            bet_rst = $(this).attr('alt');
             content = $(this).attr('title');
-
             $('#push_content').text(content)
+
+            api_content = $(this).attr('alt');
+            formatted_api_content = JSON.stringify(JSON.parse(api_content), null, 2);
+            $('#api_content').text(formatted_api_content);
 
             $('#exampleModal_msg').modal('show');
         });

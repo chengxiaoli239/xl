@@ -54,11 +54,11 @@ class MatchCodeService extends CommonBaseService
                 $all_moneys = $single * $count;
                 $playMethod[] = [
                     'id' => $localToSiteMethodInfo['id'],
-                    'codes' => $codeData['actionData'],
+                    'codes' => str_replace(',', ';', $codeData['actionData']),
                     'single' => $single,
                     'count' => $codeData['actionNum'],
                     'all_moneys' => $all_moneys,
-                    'codesData' => $localToSiteMethodInfo['name'],
+                    'name' => $localToSiteMethodInfo['name'],
                 ];
                 //$playMethod[$k]['playMethod'] = $pm;
             }
@@ -76,6 +76,7 @@ class MatchCodeService extends CommonBaseService
         $g['single'] = $single;
         $g['all_moneys'] = $all_moneys;
         $g['playMethod'] = $playMethod;
+        $g['apiCodeDatas'] = $codeDatas[0];
         #p(['g'=>$g, 'codeDatas'=>$codeDatas, 'betText'=>$betText], 0);
         if(empty($g['single']) OR empty($g['all_moneys'])){
             return [CommonBaseService::CODE_FOR_USER, [], '匹配倍数或金额异常'];

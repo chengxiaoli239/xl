@@ -60,8 +60,6 @@ class BetErrorPlansTaskController extends BaseController
             $view = 'index_admin';
         }
         return $this->render($view, $data);
-
-        return $this->render('index', $data);
     }
 
     /**

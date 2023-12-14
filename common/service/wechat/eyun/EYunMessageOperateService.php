@@ -579,6 +579,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             'lottery_type' => $lottery_type,
                             'lottery_name' => $lottery_name,
                             'bet_desc' => $text,
+                            'api_code_datas' => $playMethods['apiCodeDatas']?Json::encode($playMethods['apiCodeDatas']):'',
                             'created_at' => $now_time,
                             'updated_at' => $now_time,
                         ];
@@ -610,17 +611,7 @@ class EYunMessageOperateService  extends EYunBaseService
 
                 $allMoneys += $oneAllMoneys;
             }
-
-
             $transaction->commit();
-
-            $logArr = ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData, 'replyTxts'=>$replyTxts, 'pushSiteDatas'=>$pushSiteDatas];
-            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-成功', $logArr);
-            foreach ($pushSiteDatas as $pushSiteData){
-                $second = BetService::getConfig('HOLD_ORDER_SECONDS')??120;
-                $pushSiteData['queue_delay_time'] = $second;
-                push_queue_open(SsxxBetJobs::class, $pushSiteData);
-            }
         }catch (\Exception $e){
             $transaction->rollBack();
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-异常', ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'err_msg'=>$e->getMessage().$e->getFile().$e->getLine()]);
@@ -630,6 +621,14 @@ class EYunMessageOperateService  extends EYunBaseService
             }
             # 其它情况处理异常，直接抛异常
             throw_info($e->getMessage());
+        }
+
+        $logArr = ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData, 'replyTxts'=>$replyTxts, 'pushSiteDatas'=>$pushSiteDatas];
+        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-成功', $logArr);
+        foreach ($pushSiteDatas as $pushSiteData){
+            $second = BetService::getConfig('HOLD_ORDER_SECONDS')??120;
+            $pushSiteData['queue_delay_time'] = $second;
+            push_queue_open(SsxxBetJobs::class, $pushSiteData);
         }
         $data = [
             'type' => WechatUserService::TYPE_ORDER_BET,
