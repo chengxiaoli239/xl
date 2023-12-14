@@ -96,7 +96,7 @@ class PlayMethodService extends CommonBaseService
     public static function getOneMethod($id)
     {
         $m = \Yii::$app->cache;
-        $mkey = self::getOneMethodMKey();
+        $mkey = self::getOneMethodMKey($id);
         $data = $m->get($mkey);
         if (empty($data)) {
             $datasQuery = PlayMethod::find()
