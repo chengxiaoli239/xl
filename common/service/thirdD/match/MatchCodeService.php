@@ -98,8 +98,10 @@ class MatchCodeService extends CommonBaseService
                 $localToSiteMethodInfo['id'] = MethodMatchService::METHOD_ID_ZULIU;
                 break;
         }
-        $method = \common\service\thirdD\PlayMethodService::getOneMethod($localToSiteMethodInfo['id']);
-        $localToSiteMethodInfo['name'] = $method['name'];
+        if($codeData['playedId']==201){
+            $method = \common\service\thirdD\PlayMethodService::getOneMethod($localToSiteMethodInfo['id']);
+            $localToSiteMethodInfo['name'] = '组选'.$method['name'];
+        }
         //p(['codeData'=>$codeData, 'localToSiteMethodInfo'=>$localToSiteMethodInfo, 'method'=>$method]);
     }
 }
