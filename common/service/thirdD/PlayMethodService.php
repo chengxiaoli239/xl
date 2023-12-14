@@ -6,6 +6,11 @@ use common\models\thirdD\PlayMethod;
 
 class PlayMethodService extends CommonBaseService
 {
+    public static function getOneMethodMKey($alias=''): string
+    {
+        return 'third_d_getOneMethodMKey_x2_'.$alias;
+    }
+
     public static function getMethodsMKey($alias=''){
         return 'third_d_getMethodsMKey_x2_'.$alias;
     }
@@ -86,6 +91,21 @@ class PlayMethodService extends CommonBaseService
         }
 
         return $methods;
+    }
+
+    public static function getOneMethod($id)
+    {
+        $m = \Yii::$app->cache;
+        $mkey = self::getOneMethodMKey();
+        $data = $m->get($mkey);
+        if (empty($data)) {
+            $datasQuery = PlayMethod::find()
+                ->where(['status' => self::STATUS_ACTIVE, 'id'=>$id])->orderBy(['LENGTH(name)' => SORT_DESC]);
+            $data = $datasQuery->asArray()->one();
+            $m->set($mkey, $data, 120);
+        }
+
+        return $data;
     }
 
     /**

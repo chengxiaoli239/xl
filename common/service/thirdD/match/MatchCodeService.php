@@ -88,14 +88,18 @@ class MatchCodeService extends CommonBaseService
         return [0, ['text'=>$betText, 'lottery_type'=>$lottery_type, 'g'=>$g], '接口匹配成功'];
     }
 
-    public static function resetMethodInfo($codeData=[], &$localToSiteMethodInfo){
+    public static function resetMethodInfo($codeData=[], &$localToSiteMethodInfo=[]){
+        //p([$codeData['playedId'], $codeData['playedName'], 'codeData'=>$codeData, 'localToSiteMethodInfo'=>$localToSiteMethodInfo], 0);
         switch (true){
-            case $localToSiteMethodInfo['id'] == 201 && strpos($codeData['playedName'], '组三') !== false:
+            case $codeData['playedId'] == 201 && strpos($codeData['playedName'], '组三') !== false:
                 $localToSiteMethodInfo['id'] = MethodMatchService::METHOD_ID_ZUSAN;
                 break;
-            case $localToSiteMethodInfo['id'] == 201 && strpos($codeData['playedName'], '组六') !== false:
+            case $codeData['playedId'] == 201 && strpos($codeData['playedName'], '组六') !== false:
                 $localToSiteMethodInfo['id'] = MethodMatchService::METHOD_ID_ZULIU;
                 break;
         }
+        $method = \common\service\thirdD\PlayMethodService::getOneMethod($localToSiteMethodInfo['id']);
+        $localToSiteMethodInfo['name'] = $method['name'];
+        //p(['codeData'=>$codeData, 'localToSiteMethodInfo'=>$localToSiteMethodInfo, 'method'=>$method]);
     }
 }
