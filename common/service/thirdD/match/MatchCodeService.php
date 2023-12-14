@@ -2,6 +2,7 @@
 namespace common\service\thirdD\match;
 
 use common\service\thirdD\CommonBaseService;
+use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\ThirdDTypeService;
 use common\tools\Tool_Common;
 
@@ -51,6 +52,8 @@ class MatchCodeService extends CommonBaseService
                 $single = $codeData['mode'];
                 $count = $codeData['actionNum'];
 
+                self::resetMethodInfo($codeData, $localToSiteMethodInfo);
+
                 $all_moneys = $single * $count;
                 $playMethod[] = [
                     'id' => $localToSiteMethodInfo['id'],
@@ -83,5 +86,16 @@ class MatchCodeService extends CommonBaseService
         }
         //var_dump('========='.$lottery_type.'=======');
         return [0, ['text'=>$betText, 'lottery_type'=>$lottery_type, 'g'=>$g], '接口匹配成功'];
+    }
+
+    public static function resetMethodInfo($codeData=[], &$localToSiteMethodInfo){
+        switch (true){
+            case $localToSiteMethodInfo['id'] == 201 && strpos($codeData['playedName'], '组三') !== false:
+                $localToSiteMethodInfo['id'] = MethodMatchService::METHOD_ID_ZUSAN;
+                break;
+            case $localToSiteMethodInfo['id'] == 201 && strpos($codeData['playedName'], '组六') !== false:
+                $localToSiteMethodInfo['id'] = MethodMatchService::METHOD_ID_ZULIU;
+                break;
+        }
     }
 }
