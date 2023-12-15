@@ -121,7 +121,6 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             ];
             if(!empty($data['fromGroup'])){
                 $sendData['fromGroup'] = $data['fromGroup'];
-                $sendData['content'] = '群消息：'.$sendData['content'];
             }
             push_queue_open(SendWechatMsgJobs::class, $sendData);
         }
