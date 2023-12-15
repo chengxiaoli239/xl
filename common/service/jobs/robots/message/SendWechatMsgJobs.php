@@ -33,7 +33,7 @@ class SendWechatMsgJobs extends CommonJob {
             if(empty($fromUser)){
                 throw_info('接收的微信好友Id不能为空');
             }
-            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['fromUser'=>$fromUser, 'params'=>$params]);
+            Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['wcId'=>$wcId, 'fromUser'=>$fromUser, 'atIds'=>$atIds, 'params'=>$params]);
             $user_id = $params['user_id']; # 用户id
 
             $text = $params['content'];
