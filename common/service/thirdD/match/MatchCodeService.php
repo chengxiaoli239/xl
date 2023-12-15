@@ -174,6 +174,11 @@ class MatchCodeService extends CommonBaseService
             $method = \common\service\thirdD\PlayMethodService::getOneMethod($localToSiteMethodInfo['id']);
             $localToSiteMethodInfo['name'] = '组选'.$method['name'];
         }
+        if($codeData['playedId']==200){
+            $method = \common\service\thirdD\PlayMethodService::getOneMethod($localToSiteMethodInfo['id']);
+            $localToSiteMethodInfo['name'] = $method['name'];
+        }
+
         //p(['codeData'=>$codeData, 'localToSiteMethodInfo'=>$localToSiteMethodInfo, 'method'=>$method]);
     }
 }

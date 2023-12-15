@@ -80,7 +80,7 @@ class IndexController extends Controller
 总计1250';
             $text = '福
 909  838 直各16组各4';
-            $text = "排123 10倍";
+            $text = "排直123 10倍";
 //福 116 166 156 135 136 115组一倍";
             #$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
