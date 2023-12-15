@@ -355,6 +355,9 @@ class EYunMessageOperateService  extends EYunBaseService
                     $stepText = ['originText'=>$text];
                     if($switch==1){
                         list($code, $data, $msg) = MatchCodeService::getCodeDatas($text);
+                        if($code!=0 OR empty($data['dataGroups'])){
+                            return [CommonBaseService::CODE_FOR_USER, [], $msg??'匹配异常'];
+                        }
                         $dataGroups = $data['dataGroups'];
                     }else{
                         $betTexts = EYunMessageOperateService::resetMethodText($text); # 重置匹配文本
@@ -535,7 +538,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 $transaction->commit();
                 return [$code, $data, $msg];
             }
-            #p([$code, $data, $msg]);
+            p([$code, $data, $msg]);
             if($code>0){
                 throw_info($msg);
             }
