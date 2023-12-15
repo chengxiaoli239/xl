@@ -5,6 +5,7 @@ use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\ThirdDTypeService;
 use common\tools\Tool_Common;
+use yii\helpers\Json;
 
 class MatchCodeService extends CommonBaseService
 {
@@ -30,6 +31,74 @@ class MatchCodeService extends CommonBaseService
         }
 
         return $result;
+    }
+
+    /**
+     * 一次文本
+     * @param string $betText
+     * @return array
+     */
+    public static function getCodeDatas(string $betText=''): array
+    {
+        try {
+            $codeDatas = MatchCodeService::getExplainData($betText);
+            #$codeDatasStr = '[{"caiid":10,"code":[{"playedId":220,"playedName":"组三(七 码)","actionData":"1346789","bonusProp":7.9,"actionNum":1,"isZ6":false,"mode":"100 "},{"playedId":211,"playedName":"组六(七 码)","actionData":"1346789","bonusProp":4.75,"actionNum":1,"isZ6":true,"mode":"300 "}]},{"caiid":20,"code":[{"playedId":200,"playedName":"u76f4u9009","actionData":"130","bonusProp":1000,"ac tionNum":1,"mode":"4"}]},{"caiid":10,"code":[{"playedId":211,"playedName":"组六(七 码)","actionData":"1236789","bonusProp":4.75,"actionNum":1,"isZ6":true,"mode":"200 "}]},{"caiid":10,"code":[{"playedId":200,"playedName":"u76f4u9009","actionData":"103","bonusProp":1000,"ac tionNum":1,"mode":"6"}]},{"caiid":10,"code":[{"playedId":201,"playedName":"组选组 六","actionData":"013","bonusProp":"164.4","actionNum":1,"isZ6":true,"mode":"10"}]}]';
+            #$codeDatas = Json::decode($codeDatasStr);
+            #p($codeDatas);
+            Tool_Common::log('/matchCode/'.__FUNCTION__, 'INFO', '号码识别', ['text'=>$betText, 'codeDatas'=>$codeDatas]);
+            $dataGroups = ['betCodeContents'=>[]];
+            foreach ($codeDatas as $k=>$codeData){
+                $lottery_type = $codeData['caiid']==20 ? CommonBaseService::LOTTERY_TYPE_PL3 : CommonBaseService::LOTTERY_TYPE_FUCAI;
+
+                if(!isset($dataGroups['betCodeContents'][$lottery_type])){
+                    $dataGroups['betCodeContents'][$lottery_type] = [];
+                }
+
+                $playMethod = [];
+                $codes = $codeData['code'];
+                #p([$lottery_type, $codes]);
+                $allMoney = 0.00;
+                foreach ($codes as $code){
+                    $localToSiteMethodInfo = CommonBaseService::getSiteToLocalMethods($code['playedId']); #
+                    $single = $code['mode'];
+                    $count = $code['actionNum'];
+
+                    self::resetMethodInfo($code, $localToSiteMethodInfo);
+
+                    $oneAllMoney = $single * $count;
+                    $allMoney += $oneAllMoney;
+                    $playMethod[] = [
+                        'id' => $localToSiteMethodInfo['id'],
+                        'codes' => str_replace(',', ';', $code['actionData']),
+                        'single' => $single,
+                        'count' => $code['actionNum'],
+                        'all_moneys' => $oneAllMoney,
+                        'name' => $localToSiteMethodInfo['name'],
+                    ];
+                }
+                $g['lottery_type'] = $lottery_type;
+                $g['lottery_name'] = CommonBaseService::THIRDD_LOTTERY_OPTIONS[$lottery_type];
+                $g['single'] = $single;
+                $g['all_moneys'] = $allMoney;
+                $g['playMethod'] = $playMethod;
+                $g['apiCodeDatas'] = $codes;
+                //$playMethod[$k]['playMethod'] = $pm;
+                p($g);
+                $dataGroups['betCodeContents'][$lottery_type][] = $g;
+            }
+            p($dataGroups);
+        }catch (\Exception $e){
+            return [CommonBaseService::CODE_FOR_USER, [], '匹配异常，请重新输入'];
+        }finally{
+
+        }
+
+        #p(['g'=>$g, 'codeDatas'=>$codeDatas, 'betText'=>$betText], 0);
+        if(empty($g['single']) OR empty($g['all_moneys'])){
+            return [CommonBaseService::CODE_FOR_USER, [], '匹配倍数或金额异常'];
+        }
+        //var_dump('========='.$lottery_type.'=======');
+        return [0, ['text'=>$betText, 'dataGroups'=>$dataGroups], '接口匹配成功'];
     }
 
     public static function getCodeData($betText=''): array
