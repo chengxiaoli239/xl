@@ -67,7 +67,9 @@ trait EventServiceTrait
             }
             $msgId = $params['msgId'];
             $newMsgId = $params['newMsgId'];
+            $fromGroup = $params['fromGroup']??'';
             $where = ['toUser'=>$toUser, 'msgId'=>$msgId, 'newMsgId'=>$newMsgId];
+            //p($where);
             $EYunMessage = EYunMessage::findOne($where);
             if(!empty($EYunMessage)){
                 return ['code'=>'1000', 'message'=>'消息接收成功'];
@@ -83,6 +85,7 @@ trait EventServiceTrait
                 'user_id' => $user_id,
                 'wechat_user_id' => $wechatUserId,
                 'toUser'=>$toUser,
+                'fromGroup'=>$fromGroup,
                 'msg_type' => $messageType,
                 'msgId'=>$msgId??'MSG'.get_unique_id(),
                 'newMsgId'=>$newMsgId??'',
@@ -92,6 +95,7 @@ trait EventServiceTrait
                 'updated_at' => $now_time,
             ];
             $EYunMessage->setAttributes($setData, false);
+            //p($EYunMessage->attributes);
             if(!$EYunMessage->save()){
                 throw_info(Json::encode($EYunMessage->getErrors(), 320));
             }

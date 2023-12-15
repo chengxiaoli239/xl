@@ -22,6 +22,13 @@ class SendWechatMsgJobs extends CommonJob {
     public static function handle($params){
         try {
             #$wcId = $params['wcId']; # 微信原始id
+            $atIds = [];
+            if(!empty($params['fromGroup'])){
+                $wcId = $params['fromGroup'];
+                $atIds[] = $params['fromUser'];
+            }else{
+                $wcId = $params['fromUser'];
+            }
             $fromUser = !empty($params['fromGroup']) ? $params['fromGroup'] : $params['fromUser']; # 发送者
             if(empty($fromUser)){
                 throw_info('接收的微信好友Id不能为空');
@@ -31,7 +38,7 @@ class SendWechatMsgJobs extends CommonJob {
 
             $text = $params['content'];
             $MessageService = new EYunMessageOperateService($user_id);
-            $MessageService->send($fromUser, $text); # 谁发就给谁回
+            $MessageService->send($wcId, $text, $atIds); # 谁发就给谁回
 
         }catch (\Exception $e){
             return $e->getMessage();
