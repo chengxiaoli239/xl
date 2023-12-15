@@ -83,10 +83,10 @@ class MatchCodeService extends CommonBaseService
                 $g['playMethod'] = $playMethod;
                 $g['apiCodeDatas'] = $codes;
                 //$playMethod[$k]['playMethod'] = $pm;
-                p($g);
+                //p($g);
                 $dataGroups['betCodeContents'][$lottery_type][] = $g;
             }
-            p($dataGroups);
+            //p($dataGroups);
         }catch (\Exception $e){
             return [CommonBaseService::CODE_FOR_USER, [], '匹配异常，请重新输入'];
         }finally{

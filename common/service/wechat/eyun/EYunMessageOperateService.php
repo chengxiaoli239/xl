@@ -355,6 +355,7 @@ class EYunMessageOperateService  extends EYunBaseService
                     $stepText = ['originText'=>$text];
                     if($switch==1){
                         list($code, $data, $msg) = MatchCodeService::getCodeDatas($text);
+                        $dataGroups = $data['dataGroups'];
                     }else{
                         $betTexts = EYunMessageOperateService::resetMethodText($text); # 重置匹配文本
                         Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-00', ['switch'=>$switch, 'text'=>$text, 'betTexts'=>$betTexts, 'counts'=>count($betTexts)]);
