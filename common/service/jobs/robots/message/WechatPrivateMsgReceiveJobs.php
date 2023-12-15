@@ -49,6 +49,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             if(!$wechatUser['status'] OR empty($wechatUser)){
                 throw_info($wechatUser['nickName'].'好友接受消息状态未开启', 50001);
             }
+            $data['fromUserNickName'] = $wechatUser['nickName'];
 
             # 2、盘口判断
             self::preValiate($params); # 校验关盘
@@ -121,6 +122,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             ];
             if(!empty($data['fromGroup'])){
                 $sendData['fromGroup'] = $data['fromGroup'];
+                $sendData['content'] = '@'.$data['fromUserNickName'].' '. $sendData['content'];
             }
             push_queue_open(SendWechatMsgJobs::class, $sendData);
         }
