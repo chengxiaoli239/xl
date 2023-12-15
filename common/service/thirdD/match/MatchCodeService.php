@@ -166,6 +166,9 @@ class MatchCodeService extends CommonBaseService
             case $codeData['playedId'] == 201 && strpos($codeData['playedName'], '组六') !== false:
                 $localToSiteMethodInfo['id'] = MethodMatchService::METHOD_ID_ZULIU;
                 break;
+            case $codeData['playedId'] == 200:
+                $localToSiteMethodInfo['id'] = MethodMatchService::METHOD_ID_ZHIXUAN;
+                break;
         }
         if($codeData['playedId']==201){
             $method = \common\service\thirdD\PlayMethodService::getOneMethod($localToSiteMethodInfo['id']);
