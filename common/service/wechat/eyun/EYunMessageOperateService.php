@@ -680,7 +680,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 'wcId' => trim($wcId), # 好友微信id/群id,多个好友/群 以","分隔每次最多支持20个微信/群号,记得本接口随机间隔300ms-1500ms，频繁调用容易导致掉线
                 'content' => $content,
             ];
-            if(!empty($at)){
+            if(!empty($atIds)){
                 $params['at'] = implode(',', $atIds);
             }
             $response = $this->request($url, $params, $this->headers);
