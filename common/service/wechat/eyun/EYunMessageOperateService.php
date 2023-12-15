@@ -538,7 +538,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 $transaction->commit();
                 return [$code, $data, $msg];
             }
-            p([$code, $data, $msg]);
+            //p([$code, $data, $msg]);
             if($code>0){
                 throw_info($msg);
             }
