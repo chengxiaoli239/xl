@@ -179,7 +179,7 @@ class SxThirdDBase extends Component
         }
     }
 
-    private static function resetResult(&$result): array
+    private static function resetResult(&$result)
     {
         if(is_array($result)){
             $result = [
@@ -191,8 +191,6 @@ class SxThirdDBase extends Component
                 'm'=>$result['m'],
             ];
         }
-
-        return $result;
     }
 
     /**
