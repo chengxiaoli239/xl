@@ -29,4 +29,23 @@ class BetsBackend extends Bets
         self::PUSH_STATUS_FAIL => 'red',
         self::PUSH_STATUS_CANNOT => '#71125a',
     ];
+
+    const HAS_REPLY_NO = 0;
+    const HAS_REPLY_YES = 2;
+    const HAS_REPLY_FAIL = 3;
+    const HAS_REPLY_IGNORE = 4;
+    const HAS_REPLY_OPTIONS = [
+        self::HAS_REPLY_NO => '未回复',
+        self::HAS_REPLY_YES => '成功',
+        self::HAS_REPLY_FAIL => '失败',
+        self::HAS_REPLY_IGNORE => '忽略',
+    ];
+
+
+    const REPLY_TYPE_QUICK = 0;
+    const REPLY_TYPE_PACKAGE = 1;
+    const REPLY_TYPE_OPTIONS = [
+        self::REPLY_TYPE_QUICK => '即时',
+        self::REPLY_TYPE_PACKAGE => '打包',
+    ];
 }

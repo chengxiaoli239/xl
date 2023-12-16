@@ -78,15 +78,13 @@ class IndexController extends Controller
 12、13、17、18、27、41 各飞200元
 豹子全包50
 总计1250';
-            $text = '福
-909  838 直各16组各4';
             //$text = "123456789直2倍";
-            $text = "福彩组467 打2米";
+            $text = "福组467 各3元";
             #$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
             //preg_match('/各([' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3})/u', $text, $matches); p($matches);
             #list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($text); p([$text, $code, $data, $msg]); # 单个规则文本匹配处理
-            $MessageService = new EYunMessageOperateService($user_id=21);
+            $MessageService = new EYunMessageOperateService($user_id=22);
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
             $betCodes = Ssxx3dBetService::resetOneZhiXuanFuShi($betCodes='1246;5678');p($betCodes);
             $qihao = Util::getBeforeNumQihao($dateString, $n=2);

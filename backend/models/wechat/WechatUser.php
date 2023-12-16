@@ -19,7 +19,7 @@ use Yii;
  * @property int $is_private 私
  * @property int $is_cha 查
  * @property int $is_bind 绑定
- * @property int $is_reply_package 打包回
+ * @property int $reply_type 回复类型
  * @property string $all_bet_money 投分
  * @property string $today_profits_loss 今盈亏
  * @property string $all_profits_loss 总盈亏
@@ -80,7 +80,7 @@ class WechatUser extends \common\models\base\BaseModel
             'is_private' => Yii::t('app', '私'),
             'is_cha' => Yii::t('app', '查'),
             'is_bind' => Yii::t('app', '绑定'),
-            'is_reply_package' => Yii::t('app', '打包回'),
+            'reply_type' => Yii::t('app', '回类型'),
             'all_bet_money' => Yii::t('app', '投分'),
             'today_profits_loss' => Yii::t('app', '今盈亏'),
             'all_profits_loss' => Yii::t('app', '总盈亏'),

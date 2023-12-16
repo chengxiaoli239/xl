@@ -42,6 +42,7 @@ class MatchCodeService extends CommonBaseService
     {
         try {
             $codeDatas = MatchCodeService::getExplainData($betText);
+            //p([$betText,$codeDatas]);
             #$codeDatasStr = '[{"caiid":10,"code":[{"playedId":220,"playedName":"组三(七 码)","actionData":"1346789","bonusProp":7.9,"actionNum":1,"isZ6":false,"mode":"100 "},{"playedId":211,"playedName":"组六(七 码)","actionData":"1346789","bonusProp":4.75,"actionNum":1,"isZ6":true,"mode":"300 "}]},{"caiid":20,"code":[{"playedId":200,"playedName":"u76f4u9009","actionData":"130","bonusProp":1000,"ac tionNum":1,"mode":"4"}]},{"caiid":10,"code":[{"playedId":211,"playedName":"组六(七 码)","actionData":"1236789","bonusProp":4.75,"actionNum":1,"isZ6":true,"mode":"200 "}]},{"caiid":10,"code":[{"playedId":200,"playedName":"u76f4u9009","actionData":"103","bonusProp":1000,"ac tionNum":1,"mode":"6"}]},{"caiid":10,"code":[{"playedId":201,"playedName":"组选组 六","actionData":"013","bonusProp":"164.4","actionNum":1,"isZ6":true,"mode":"10"}]}]';
             #$codeDatas = Json::decode($codeDatasStr);
             #p($codeDatas);
@@ -88,9 +89,9 @@ class MatchCodeService extends CommonBaseService
             }
             //p($dataGroups);
         }catch (\Exception $e){
-            return [CommonBaseService::CODE_FOR_USER, [], '匹配异常，请重新输入'];
+            return [CommonBaseService::CODE_FOR_USER, [], '匹配异常，请重新输入0'];
         }finally{
-
+            //return [CommonBaseService::CODE_FOR_USER, [], '匹配异常，请重新输入00'];
         }
 
         #p(['g'=>$g, 'codeDatas'=>$codeDatas, 'betText'=>$betText], 0);

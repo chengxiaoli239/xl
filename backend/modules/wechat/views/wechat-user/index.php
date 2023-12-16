@@ -148,16 +148,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return '';
                             }
                         ],
-                        ['attribute'=>'is_reply_package','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                        ['attribute'=>'reply_type','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value'=>function($model){
-                                $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_reply_package&val=1'; # 点击开启
-                                $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_reply_package&val=0'; # 点击关闭
-                                if($model->is_reply_package == 1){
+                                $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=reply_type&val=1'; # 点击开启
+                                $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=reply_type&val=0'; # 点击关闭
+                                if($model->reply_type == 1){
                                     $txt = "<font color='green'>√</font>" ;
                                     return Html::a($txt, $url1, ['title' => '点击关闭']);
                                 }
-                                if(!$model->is_reply_package){
+                                if(!$model->reply_type){
                                     $txt = "<font color='red'>X</font>";
                                     return Html::a($txt, $url0, ['title' => '点击开启']);
                                 }

@@ -573,6 +573,8 @@ class EYunMessageOperateService  extends EYunBaseService
                             throw_info('方式匹配为空，请按正确格式输入', CommonBaseService::CODE_FOR_USER);
                         }
 
+                        $replyMethodName = PlayMethodService::getReplyMethodName($method['name']);
+                        $oneBetContent = "\n".$replyMethodName.'：'.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
                         $Bets = new BetsBackend();
                         $setData = [
                             'user_id' => $this->user_id,
@@ -587,6 +589,8 @@ class EYunMessageOperateService  extends EYunBaseService
                             'lottery_type' => $lottery_type,
                             'lottery_name' => $lottery_name,
                             'bet_desc' => $text,
+                            'reply_type' => $this->wechatUser['reply_type'],
+                            'reply_content' => $oneBetContent,
                             'api_code_datas' => $playMethods['apiCodeDatas']?Json::encode($playMethods['apiCodeDatas']):'',
                             'created_at' => $now_time,
                             'updated_at' => $now_time,
@@ -602,8 +606,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         $oneAllMoneys += $method['all_moneys']; # 总投
                         $oneAllCounts += $method['count']; # 总投
 
-                        $replyMethodName = PlayMethodService::getReplyMethodName($method['name']);
-                        $betContent .= "\n".$replyMethodName.'：'.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
+                        $betContent .= $oneBetContent;
 
                         # 推送网盘任务：
                         $pushSiteDatas[] = ['betRowId'=>$Bets->id, 'orderId'=>$Bets->order_id, 'business_id'=>$Bets->order_id];

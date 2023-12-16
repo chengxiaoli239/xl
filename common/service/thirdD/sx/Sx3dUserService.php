@@ -65,19 +65,18 @@ class Sx3dUserService extends CommonBaseService
         $domain = $TzSystemsUser->ssc_domain;
         $cookie = $TzSystemsUser->cookie;
         $tz_system_id = $TzSystemsUser->tz_system_id;
-        $flag = true;
+        $flag = false;
         $headers = [
             'Cookie' => $cookie,
             'X-Requested-With' => 'XMLHttpRequest',
         ];
         $result = \common\open\thirdD\api\SiteUserApi::getUserInfo($domain, $headers);
         $logArr = ['tz_system_id'=>$tz_system_id, 'uid'=>$TzSystemsUser->uid];
-        if(empty($result) OR strpos($result['m'], '登录') !== false){
-            $flag = false;
+        if(!empty($result) && strpos($result['m'], '登录') === false){
+            $flag = true;
             //$logArr['result'] = $result;
-        }else{
-            $siteUserInfo = $result;
         }
+        $siteUserInfo = $result;
         $logArr['flag'] = $flag;
         $result2 = \common\open\thirdD\api\SiteUserApi::getAppNews($domain, $headers);
         //$logArr['result2'] = $result2;
