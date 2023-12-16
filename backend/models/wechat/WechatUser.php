@@ -5,7 +5,7 @@ namespace backend\models\wechat;
 use Yii;
 
 /**
- * This is the model class for table "lt_wechat_user".
+ * This is the model class for table "{{%wechat_user}}".
  *
  * @property int $id
  * @property int $user_id user.id,系统用户id
@@ -19,6 +19,7 @@ use Yii;
  * @property int $is_private 私
  * @property int $is_cha 查
  * @property int $is_bind 绑定
+ * @property int $is_reply_package 打包回
  * @property string $all_bet_money 投分
  * @property string $today_profits_loss 今盈亏
  * @property string $all_profits_loss 总盈亏
@@ -41,7 +42,7 @@ class WechatUser extends \common\models\base\BaseModel
      */
     public static function tableName()
     {
-        return 'lt_wechat_user';
+        return '{{%wechat_user}}';
     }
 
     /**
@@ -50,7 +51,7 @@ class WechatUser extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['user_id', 'status', 'is_tuo', 'is_chi', 'is_private', 'is_cha', 'is_bind', 'is_credit', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['user_id', 'status', 'is_tuo', 'is_chi', 'is_private', 'is_cha', 'is_bind', 'is_reply_package', 'is_credit', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'all_bet_money', 'today_profits_loss', 'all_profits_loss'], 'number'],
             [['created_at', 'updated_at'], 'required'],
             [['update_at'], 'safe'],
@@ -79,6 +80,7 @@ class WechatUser extends \common\models\base\BaseModel
             'is_private' => Yii::t('app', '私'),
             'is_cha' => Yii::t('app', '查'),
             'is_bind' => Yii::t('app', '绑定'),
+            'is_reply_package' => Yii::t('app', '打包回'),
             'all_bet_money' => Yii::t('app', '投分'),
             'today_profits_loss' => Yii::t('app', '今盈亏'),
             'all_profits_loss' => Yii::t('app', '总盈亏'),

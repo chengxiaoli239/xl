@@ -47,11 +47,11 @@ class Sx3dUserService extends CommonBaseService
             }else{
                 $TzSystemsUser->balance = $siteUserInfo['credits_remaining'];
                 $TzSystemsUser->save();
-                var_dump('已是登陆状态');
+                //var_dump('已是登陆状态', date('Y-m-d H:i:s'));
                 $result = ['TzSystemsUserId'=>$TzSystemsUser->id, 'msg'=>'已是登陆状态'];
             }
         }catch (\Exception $e){
-            var_dump('异常：'.$e->getMessage().'_'.$e->getFile().'_'.$e->getLine());
+            #var_dump('异常：'.$e->getMessage().'_'.$e->getFile().'_'.$e->getLine());
             Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '登陆异常', ['err_msg'=>$e->getMessage()]);
             $result = ['TzSystemsUserId'=>$TzSystemsUser->id, 'msg'=>$e->getMessage()];
         }

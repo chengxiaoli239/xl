@@ -29,7 +29,7 @@ class  CrontabIndexService{
                 }else{
                     $r = BaseService::login($TzSystemsUser['id']);
                 }
-                var_dump($r);
+                var_dump($TzSystemsUser['username'].' '.$TzSystemsUser['account'].' '.$r['msg'] . ' ' . date('Y-m-d H:i:s'));
                 $rst[$TzSystemsUser['id']] = ['tz_system_id'=>$tz_system_id];
             }catch (\Exception $e){
                 $rst[$TzSystemsUser['id']] = ['tz_system_id'=>$tz_system_id, 'err_msg'=>$e->getMessage()];

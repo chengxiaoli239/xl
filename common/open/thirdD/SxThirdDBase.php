@@ -155,12 +155,12 @@ class SxThirdDBase extends Component
                 $result = $e->data;
             }
 
-            self::resetResult($result);
             Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, /*'data'=>$result ?? [],*/ 'code'=>$code, 'msg'=>$errorMsg ]);
             throw_info($errorMsg, $code);
         } finally {
             $status = $status ?? SsxxRequestLog::REQUEST_STATUS_FAIL;
             $endtime = microtime(true) * 10000;
+            self::resetResult($result);
             // 记录请求日志
             $result = $result ? Json::encode($result) : '';
             $logData = [
