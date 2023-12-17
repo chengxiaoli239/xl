@@ -24,7 +24,7 @@ class ErrorLogStaticsJobs extends CommonJob {
             $errorMsg = $params['err_msg'];
             \common\open\thirdD\api\SiteOrderApi::pushToLog(['err_msg'=>$errorMsg]);
 
-            Tool_Common::log('/err_log/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params, 'data'=>$data]);
+            Tool_Common::log('/err_log/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params]);
         }catch (\Exception $e){
             Tool_Common::log('/err_log/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['params'=>$params, 'err_msg'=>$e->getMessage()]);
             throw_info($e->getMessage());
