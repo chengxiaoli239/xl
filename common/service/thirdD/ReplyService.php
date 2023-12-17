@@ -35,7 +35,7 @@ class ReplyService extends CommonBaseService
                 $transaction = \Yii::$app->db->beginTransaction();
                 $where = ['AND',
                     ['=', 'wechat_user_id', $wechatUserId],
-                    ['=', 'has_reply', BetsBackend::HAS_REPLY_NO],
+                    ['=', 'has_reply', BetsBackend::HAS_REPLY_YES],
                     ['=', 'push_status', BetsBackend::PUSH_STATUS_SUCCESS],
                     ['=', 'reply_type', BetsBackend::REPLY_TYPE_PACKAGE], # BetsBackend::REPLY_TYPE_PACKAGE
                     ['>', 'created_at', $now_time-$beforeTime],
@@ -51,30 +51,55 @@ class ReplyService extends CommonBaseService
                 $order_ids = [];
                 $allMoney = 0.00;
                 $allCount = 0;
-                foreach ($Bets as $bet){
+                $tmpRecordOrderIds = [];
+                foreach ($Bets as $k=>$bet){
                     $replyContent = Json::decode($bet['reply_content']);
+                    if(empty($tmpRecordOrderIds[$bet['order_id']])){
+                        $oneUserReplyTxts .= "\n原文：".$bet['bet_desc'].":\n~~~~~~~~~~~~~~~~~~~~~~~~~~\n识别：\n";
+                    }
+                    $tmpRecordOrderIds[$bet['order_id']] = true;
                     $oneUserReplyTxts .= '单'.$bet['order_id'].' '.$replyContent['replyTxt']."\n";
                     $user_id = $bet['user_id'];
                     $order_ids[] = $bet['order_id'];
 
                     $allCount += $bet['count'];
                     $allMoney += $bet['bet_money'];
+                    if(isset($Bets[$k+1]) && $bet['order_id'] != $Bets[$k+1]['order_id']){
+                        $oneUserReplyTxts .= "\n----------------------------\n";
+                    }
                 }
                 $oneUserReplyTxts .= ("\n【成功】√  共".$allCount."组，共".$allMoney.'咪');
+                $date = date('Ymd');
+                $dir = \Yii::$aliases['@backend'].'/web/statics/tmp/'.$date; //p($dir);
+                //p($oneUserReplyTxts);
 
                 # 微信回复用户
                 $MessageService = new EYunMessageOperateService($user_id);
                 if(!empty($replyContent['fromGroup'])){
+                    # 群里发，文件 + @
                     $oneUserReplyTxts = '@'.$replyContent['fromNickName']."\n".$oneUserReplyTxts;
                     $wcId = $replyContent['fromGroup'];
                     $atIds[] = $replyContent['fromUser'];
                 }else{
+                    # 私发，打包回复
                     $wcId = $replyContent['fromUser'];
                 }
 
                 $logArr = ['wechatUserId'=>$wechatUserId, 'order_id'=>$order_ids, $oneUserReplyTxts, 'atIds'=>$atIds];
-                #p($logArr);
-                $result = $MessageService->send($wcId, $oneUserReplyTxts, $atIds); # 谁发就给谁回
+                //p($logArr);
+                if(!empty($replyContent['fromGroup'])){
+                    $fileName = $replyContent['fromNickName'].'_'.date('ymdHis').'.txt';
+
+                    //p([$dir.'/'.$fileName]);
+                    Tool_Common::recordFile($dir, $fileName, $oneUserReplyTxts);
+                    $filePath = \Yii::$app->params['domain'].'/statics/tmp/'.$date.'/'.$fileName;
+                    $result = $MessageService->sendFile($wcId, $filePath, $fileName); # 谁发就给谁回 text
+                    $logArr['filePath'] = $filePath;
+                    $logArr['fileName'] = $fileName;
+                }else{
+                    $result = $MessageService->send($wcId, $oneUserReplyTxts, $atIds); # 谁发就给谁回 text
+                }
+
                 $logArr['result'] = $result;
                 if($result['code'] != 1000){
                     throw_info($rst['message']??'回复异常', 30001);

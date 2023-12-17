@@ -665,9 +665,8 @@ class EYunMessageOperateService  extends EYunBaseService
      * 发送前校验
      * @param string $wcId
      * @param string $content
-     * @param array $atIds
      */
-    private function validatePreSend($wcId='', $content='', $atIds=[]){
+    private function validatePreSend(string $wcId='', $content=''){
         if(empty($wcId)){
             throw_info('发送消息接口wcId微信原始id不能为空');
         }
@@ -696,6 +695,35 @@ class EYunMessageOperateService  extends EYunBaseService
             if(!empty($atIds)){
                 $params['at'] = implode(',', $atIds);
             }
+            $response = $this->request($url, $params, $this->headers);
+        }catch (\Exception $e){
+            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '发送文本消息-异常', ['url'=>$url, 'params'=>$params, 'err_msg'=>$e->getMessage()]);
+            return ['code'=>30001, 'message'=>$e->getMessage()];
+        }
+
+        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '发送文本消息', ['url'=>$url, 'params'=>$params, 'response'=>$response]);
+
+        return $response;
+    }
+
+    /**
+     * 文本消息发送
+     * @param string $wcId 私聊则位用户的微信id，群里则位群里id
+     * @param string $content
+     * @param array $atIds 私聊不传，群里at传用户微信id
+     * @return bool|mixed|null
+     */
+    public function sendFile($wcId='', $filePath='', $fileName=''){
+
+        try {
+            //$this->validatePreSend($wcId, $content);
+            $url = $this->base_url . '/sendFile';
+            $params = [
+                'wId' => $this->wId,
+                'wcId' => trim($wcId), # 好友微信id/群id,多个好友/群 以","分隔每次最多支持20个微信/群号,记得本接口随机间隔300ms-1500ms，频繁调用容易导致掉线
+                'path' => $filePath,
+                'fileName' => $fileName,
+            ];
             $response = $this->request($url, $params, $this->headers);
         }catch (\Exception $e){
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '发送文本消息-异常', ['url'=>$url, 'params'=>$params, 'err_msg'=>$e->getMessage()]);

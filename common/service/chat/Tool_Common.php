@@ -642,6 +642,23 @@ class Tool_Common
             return true;
         }
     }
+
+    public static function recordFile($dir='', $fileName='', $text=''){
+        if (!file_exists($dir)) {
+            // 如果目录不存在，创建它
+            mkdir($dir, 0777, true); // 第一个参数是目录路径，第二个参数是权限（这里是最大权限），第三个参数表示创建多级目录
+        }
+        $fullName = $dir.'/'.$fileName;
+        $fp = fopen($fullName, "a");
+        flock($fp, LOCK_EX);
+        $r =fwrite($fp, $text . "\r\n");
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        chmod($fullName, 0755);
+
+        var_dump('r:', $r);
+        var_dump($fullName);
+    }
     
     /**
      * @desc 获取配置中心实例
