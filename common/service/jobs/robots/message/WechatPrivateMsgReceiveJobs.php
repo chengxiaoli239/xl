@@ -66,8 +66,9 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
                 throw_info($msg, $code);
             }
             $replyTxts = $vdata['replyTxts'];
-
-            self::reply($user_id, $replyTxts, $data); # 回复消息
+            if(!empty($replyTxts)){
+                self::reply($user_id, $replyTxts, $data); # 回复消息
+            }
         }catch (\Exception $e){
             $err_msg =  ($e->getCode() == CommonBaseService::CODE_FOR_USER) ? $e->getMessage() : '处理异常，请正确输入';
             if($e->getCode()>50000){ # 大于50000
