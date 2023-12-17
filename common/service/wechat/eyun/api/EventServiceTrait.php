@@ -2,6 +2,7 @@
 namespace common\service\wechat\eyun\api;
 
 use common\models\eyun\EYunMessage;
+use common\service\jobs\log\ErrorLogStaticsJobs;
 use common\service\jobs\robots\message\WechatPrivateMsgReceiveJobs;
 use common\service\jobs\robots\user\WechatFriendsInfoJobs;
 use common\service\jobs\robots\user\WechatUserStatusJobs;
@@ -101,7 +102,7 @@ trait EventServiceTrait
 
         }catch (\Exception $e){
             Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '消息内容保存异常', ['data'=>$data, 'err_msg'=>$e->getMessage()]);
-            \common\open\thirdD\api\SiteOrderApi::pushToLog();
+            push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>'消息内容保存异常']);
             return [30001, [], $e->getMessage()];
         }
         $dd = [

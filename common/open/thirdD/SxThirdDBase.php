@@ -3,6 +3,7 @@ namespace common\open\thirdD;
 
 use common\models\open\SsxxRequestLog;
 use common\open\thirdD\api\SiteOauthApi;
+use common\service\jobs\log\ErrorLogStaticsJobs;
 use common\tools\Tool_Common;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
@@ -149,8 +150,7 @@ class SxThirdDBase extends Component
             $status = SsxxRequestLog::REQUEST_STATUS_FAIL;
             $errorMsg = $e->getMessage();
             $code = $e->getCode();
-            \common\open\thirdD\api\SiteOrderApi::pushToLog(['err_msg'=>$errorMsg]);
-
+            push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>$errorMsg]);
             if (($e instanceof \common\exceptions\InfoException)) {
                 $result = $e->data;
             }
