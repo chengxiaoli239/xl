@@ -155,11 +155,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=reply_type&val=0'; # 点击关闭
                                 if($model->reply_type == 1){
                                     $txt = "<font color='green'>√</font>" ;
-                                    return Html::a($txt, $url1, ['title' => '点击关闭']);
+                                    return Html::a($txt, $url1, ['title' => '打包回']);
                                 }
                                 if(!$model->reply_type){
                                     $txt = "<font color='red'>X</font>";
-                                    return Html::a($txt, $url0, ['title' => '点击开启']);
+                                    return Html::a($txt, $url0, ['title' => '即时回']);
                                 }
                                 return '';
                             }

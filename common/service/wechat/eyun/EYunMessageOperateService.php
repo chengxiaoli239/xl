@@ -574,7 +574,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         }
 
                         $replyMethodName = PlayMethodService::getReplyMethodName($method['name']);
-                        $oneBetContent = $replyMethodName.'：'.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
+                        $oneBetContent = $replyMethodName.':'.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
                         $replyContent = [
                             'replyTxt' => $oneBetContent,
                             'fromUser' => $fromUser,
