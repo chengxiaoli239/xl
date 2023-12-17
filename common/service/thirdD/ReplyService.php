@@ -6,6 +6,7 @@ use backend\models\thirdD\BetsBackend;
 use backend\models\wechat\Bets;
 use common\service\chat\Tool_Common;
 use common\service\wechat\eyun\EYunMessageOperateService;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
 class ReplyService extends CommonBaseService
@@ -35,7 +36,7 @@ class ReplyService extends CommonBaseService
                 $transaction = \Yii::$app->db->beginTransaction();
                 $where = ['AND',
                     ['=', 'wechat_user_id', $wechatUserId],
-                    ['=', 'has_reply', BetsBackend::HAS_REPLY_NO],
+                    ['=', 'has_reply', BetsBackend::HAS_REPLY_YES],
                     ['=', 'push_status', BetsBackend::PUSH_STATUS_SUCCESS],
                     ['=', 'reply_type', BetsBackend::REPLY_TYPE_PACKAGE], # BetsBackend::REPLY_TYPE_PACKAGE
                     ['>', 'created_at', $now_time-$beforeTime],
@@ -47,8 +48,9 @@ class ReplyService extends CommonBaseService
                     throw_info('记录为空');
                 }
                 $count = count($Bets);
+                $countOrderIds = count(ArrayHelper::index($Bets, 'order_id'));
                 //p([$Bets, $wechatUserId, $sql], 0);
-                $oneUserReplyTxts = "本次打包共 %s 条：\n";
+                $oneUserReplyTxts = "本次打包共 ".$countOrderIds." 条：\n";
                 $order_ids = [];
                 $allMoney = 0.00;
                 $allCount = 0;
@@ -87,7 +89,7 @@ class ReplyService extends CommonBaseService
                     # 私发，打包回复
                     $wcId = $replyContent['fromUser'];
                 }
-                $oneUserReplyTxts = printf($oneUserReplyTxts, count($order_ids));
+                //$oneUserReplyTxts = printf($oneUserReplyTxts, count($order_ids));
                 //p($oneUserReplyTxts);
 
                 $logArr = ['wechatUserId'=>$wechatUserId, 'order_id'=>$order_ids, $oneUserReplyTxts, 'atIds'=>$atIds];
