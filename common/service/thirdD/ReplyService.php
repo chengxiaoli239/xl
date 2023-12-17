@@ -68,7 +68,7 @@ class ReplyService extends CommonBaseService
                     $allCount += $bet['count'];
                     $allMoney += $bet['bet_money'];
                     if(isset($Bets[$k+1]) && $bet['order_id'] != $Bets[$k+1]['order_id']){
-                        $oneUserReplyTxts .= "\n===============黄金分割线===============\n";
+                        $oneUserReplyTxts .= "\n==============黄金分割线==============\n";
                     }
                 }
                 $oneUserReplyTxts .= ("\n===========================\n【成功】√  共".$allCount."组，共".$allMoney.'咪');
