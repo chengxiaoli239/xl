@@ -1,6 +1,7 @@
 <?php
 namespace common\service\jobs\robots\message;
 
+use backend\models\thirdD\BetsBackend;
 use common\models\eyun\RobotUser;
 use common\service\chat\Tool_Common;
 use common\service\jobs\CommonJob;
@@ -38,9 +39,18 @@ class SendWechatMsgJobs extends CommonJob {
 
             $text = $params['content'];
             $MessageService = new EYunMessageOperateService($user_id);
-            $MessageService->send($wcId, $text, $atIds); # 谁发就给谁回
+            $rst = $MessageService->send($wcId, $text, $atIds); # 谁发就给谁回
+            if($rst['code'] != 1000){
+                throw_info($rst['message']??'回复异常', 30001);
+            }
+            if(!empty($params['order_ids'])){
+                BetsBackend::updateAll(['has_reply'=>BetsBackend::HAS_REPLY_YES], ['order_id'=>$params['order_ids']]);
+            }
 
         }catch (\Exception $e){
+            if(30000<$e->getCode() && $e->getCode()<40000){
+                throw_info($e->getMessage());
+            }
             return $e->getMessage();
         }
 

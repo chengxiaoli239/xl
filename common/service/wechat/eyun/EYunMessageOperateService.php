@@ -521,9 +521,9 @@ class EYunMessageOperateService  extends EYunBaseService
      * 消息处理后的业务处理
      * @param string $text
      * @param string $fromUser 发送者的微信id
-     * @return array
+     * @param string $messageData 消息体内容
      */
-    public function receive(string $text='', string $fromUser=''): array
+    public function receive(string $text='', string $fromUser='', $messageData=[]): array
     {
         try {
             $transaction = static::getDb()->beginTransaction();
@@ -574,7 +574,13 @@ class EYunMessageOperateService  extends EYunBaseService
                         }
 
                         $replyMethodName = PlayMethodService::getReplyMethodName($method['name']);
-                        $oneBetContent = "\n".$replyMethodName.'：'.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
+                        $oneBetContent = $replyMethodName.'：'.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
+                        $replyContent = [
+                            'replyTxt' => $oneBetContent,
+                            'fromUser' => $fromUser,
+                            'fromNickName' => $this->wechatUser['nickName'],
+                            'fromGroup' => $messageData['fromGroup'],
+                        ];
                         $Bets = new BetsBackend();
                         $setData = [
                             'user_id' => $this->user_id,
@@ -590,7 +596,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             'lottery_name' => $lottery_name,
                             'bet_desc' => $text,
                             'reply_type' => $this->wechatUser['reply_type'],
-                            'reply_content' => $oneBetContent,
+                            'reply_content' => Json::encode($replyContent),
                             'api_code_datas' => $playMethods['apiCodeDatas']?Json::encode($playMethods['apiCodeDatas']):'',
                             'created_at' => $now_time,
                             'updated_at' => $now_time,
@@ -606,7 +612,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         $oneAllMoneys += $method['all_moneys']; # 总投
                         $oneAllCounts += $method['count']; # 总投
 
-                        $betContent .= $oneBetContent;
+                        $betContent .= "\n".$oneBetContent;
 
                         # 推送网盘任务：
                         $pushSiteDatas[] = ['betRowId'=>$Bets->id, 'orderId'=>$Bets->order_id, 'business_id'=>$Bets->order_id];
@@ -618,7 +624,11 @@ class EYunMessageOperateService  extends EYunBaseService
                 $oneReplyTxt .= ("\n【单号】".$betOrderId);
                 $oneReplyTxt .= ("\n【成功】√  共".$oneAllCounts."组，共".$oneAllMoneys.'咪');
                 $oneReplyTxt .= ("\n【剩余】".$vData['balance'].'咪');
-                $replyTxts[] = $oneReplyTxt;
+
+                if($this->wechatUser['reply_type']==BetsBackend::REPLY_TYPE_QUICK){
+                    # 即时回复
+                    $replyTxts[] = ['order_ids'=>[$betOrderId], 'replyTxt'=>$oneReplyTxt];
+                }
 
                 $allMoneys += $oneAllMoneys;
             }

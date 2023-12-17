@@ -60,7 +60,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
 
 
             $text = $data['content'];
-            list($code, $vdata, $msg) = $MessageService->receive($text, $fromUser);
+            list($code, $vdata, $msg) = $MessageService->receive($text, $fromUser, $data);
             Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name.'01', ['user_id'=>$user_id, 'wcId'=>$wcId, 'code'=>$code, 'text'=>$text, 'vdata'=>$vdata, 'msg'=>$msg]);
             if($code>0){
                 throw_info($msg, $code);
@@ -110,6 +110,13 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
             throw_info('回复消息replyTxts为空');
         }
         foreach ($replyTxts as $replyTxt){
+            if(is_string($replyTxt)){
+                $content = $replyTxt;
+                $order_ids = [];
+            }else{
+                $order_ids = $replyTxt['order_ids'];
+                $content = $replyTxt['replyTxt'];
+            }
             if(empty($replyTxt)){
                 throw_info('回复消息replyTxt为空');
             }
@@ -117,9 +124,12 @@ class WechatPrivateMsgReceiveJobs extends CommonJob {
                 'user_id' => $user_id,
                 'fromUser' => $fromUser, # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
                 //'queue_delay_time' => rand(2, 4), # self::$waitSeconds,
-                'content' => $replyTxt, # 测试阶段调试信息 - 用户下注完回复
+                'content' => $content, # 测试阶段调试信息 - 用户下注完回复
                 'business_id' => $user_id,
             ];
+            if(!empty($order_ids)){
+                $sendData['order_ids'] = $order_ids;
+            }
             if(!empty($data['fromGroup'])){
                 $sendData['fromGroup'] = $data['fromGroup'];
                 $sendData['content'] = '@'.$data['fromUserNickName'].' '. $sendData['content']."\n";
