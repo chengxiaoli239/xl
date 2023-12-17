@@ -46,18 +46,18 @@ class ReplyService extends CommonBaseService
                 if(empty($Bets)){
                     throw_info('记录为空');
                 }
+                $count = count($Bets);
                 //p([$Bets, $wechatUserId, $sql], 0);
-                $oneUserReplyTxts = "打包自动回复：\n".$Bets[0]['lottery_name'].$Bets[0]['qihao']."\n";
+                $oneUserReplyTxts = "打包自动回复共".$count."条：\n";
                 $order_ids = [];
                 $allMoney = 0.00;
                 $allCount = 0;
                 $qihao = '';
-                $count = count($Bets);
                 $tmpRecordOrderIds = [];
                 foreach ($Bets as $k=>$bet){
                     $replyContent = Json::decode($bet['reply_content']);
                     if(empty($tmpRecordOrderIds[$bet['order_id']])){
-                        $oneUserReplyTxts .= "\n原文：\n".$bet['bet_desc'].":\n~~~~~~~~~~~~~~~~~~~~~~~~~~\n识别：\n";
+                        $oneUserReplyTxts .= "\n原文：\n".$bet['bet_desc'].":\n~~~~~~~~~~~~~~~~~~~~~~~~~~\n识别：\n".$bet['lottery_name'].$bet['qihao']."\n";;
                     }
                     $qihao = $bet['qihao'];
                     $tmpRecordOrderIds[$bet['order_id']] = true;
