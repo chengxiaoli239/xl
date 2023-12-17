@@ -89,7 +89,7 @@ class MatchCodeService extends CommonBaseService
             }
             //p($dataGroups);
         }catch (\Exception $e){
-            return [CommonBaseService::CODE_FOR_USER, [], '匹配异常，请重新输入0'];
+            return [CommonBaseService::CODE_FOR_USER, [], '匹配异常，请重新输入'];
         }finally{
             //return [CommonBaseService::CODE_FOR_USER, [], '匹配异常，请重新输入00'];
         }

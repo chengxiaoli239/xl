@@ -356,7 +356,7 @@ class EYunMessageOperateService  extends EYunBaseService
                     if($switch==1){
                         list($code, $data, $msg) = MatchCodeService::getCodeDatas($text);
                         if($code!=0 OR empty($data['dataGroups'])){
-                            return [CommonBaseService::CODE_FOR_USER, [], $msg??'匹配异常'];
+                            return [CommonBaseService::CODE_FOR_USER, [], ($msg??'匹配异常')."\n原文：".$text];
                         }
                         $dataGroups = $data['dataGroups'];
                     }else{
