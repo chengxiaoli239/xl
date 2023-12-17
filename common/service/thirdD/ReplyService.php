@@ -94,7 +94,7 @@ class ReplyService extends CommonBaseService
                     # 回复两次
                     $fileName = $replyContent['fromNickName'].'_'.date('ymdHis').'.txt';
                     $replyTxt = "@".$replyContent['fromNickName']."\n打包自动回复本次共".$count."条，期号：".$qihao;
-                    $result = $MessageService->send($wcId, $replyTxt, $atIds); # 谁发就给谁回 text
+                    //$result = $MessageService->send($wcId, $replyTxt, $atIds); # 谁发就给谁回 text
 
                     //p([$dir.'/'.$fileName]);
                     Tool_Common::recordFile($dir, $fileName, $oneUserReplyTxts);
