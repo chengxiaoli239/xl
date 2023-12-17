@@ -59,11 +59,11 @@ class ReplyService extends CommonBaseService
                 foreach ($Bets as $k=>$bet){
                     $replyContent = Json::decode($bet['reply_content']);
                     if(empty($tmpRecordOrderIds[$bet['order_id']])){
-                        $oneUserReplyTxts .= "\n原文：\n".$bet['bet_desc'].":\n~~~~~~~~~~~~~~~~~~~~~~~~~~\n识别：\n".$bet['lottery_name'].$bet['qihao']."\n";;
+                        $oneUserReplyTxts .= "\n原文：\n".$bet['bet_desc'].":\n~~~~~~~~~~~~~~~~~~~~~~~~~~\n识别：\n";//.$bet['lottery_name'].$bet['qihao']."\n";;
                     }
                     $qihao = $bet['qihao'];
                     $tmpRecordOrderIds[$bet['order_id']] = true;
-                    $oneUserReplyTxts .= '单'.$bet['order_id'].' '.$replyContent['replyTxt']."\n";
+                    $oneUserReplyTxts .= $bet['lottery_name'].'单'.$bet['order_id'].' '.$replyContent['replyTxt']."\n";
                     $user_id = $bet['user_id'];
                     $order_ids[] = $bet['order_id'];
 
