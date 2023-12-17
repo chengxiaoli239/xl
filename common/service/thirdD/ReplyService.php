@@ -35,7 +35,7 @@ class ReplyService extends CommonBaseService
                 $transaction = \Yii::$app->db->beginTransaction();
                 $where = ['AND',
                     ['=', 'wechat_user_id', $wechatUserId],
-                    ['=', 'has_reply', BetsBackend::HAS_REPLY_YES],
+                    ['=', 'has_reply', BetsBackend::HAS_REPLY_NO],
                     ['=', 'push_status', BetsBackend::PUSH_STATUS_SUCCESS],
                     ['=', 'reply_type', BetsBackend::REPLY_TYPE_PACKAGE], # BetsBackend::REPLY_TYPE_PACKAGE
                     ['>', 'created_at', $now_time-$beforeTime],
