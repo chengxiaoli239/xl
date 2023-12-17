@@ -55,7 +55,7 @@ class ReplyService extends CommonBaseService
                 foreach ($Bets as $k=>$bet){
                     $replyContent = Json::decode($bet['reply_content']);
                     if(empty($tmpRecordOrderIds[$bet['order_id']])){
-                        $oneUserReplyTxts .= "\n原文：".$bet['bet_desc'].":\n~~~~~~~~~~~~~~~~~~~~~~~~~~\n识别：\n";
+                        $oneUserReplyTxts .= "\n原文：\n".$bet['bet_desc'].":\n~~~~~~~~~~~~~~~~~~~~~~~~~~\n识别：\n";
                     }
                     $tmpRecordOrderIds[$bet['order_id']] = true;
                     $oneUserReplyTxts .= '单'.$bet['order_id'].' '.$replyContent['replyTxt']."\n";
