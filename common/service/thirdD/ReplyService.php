@@ -68,7 +68,7 @@ class ReplyService extends CommonBaseService
                         $oneUserReplyTxts .= "\n----------------------------\n";
                     }
                 }
-                $oneUserReplyTxts .= ("\n【成功】√  共".$allCount."组，共".$allMoney.'咪');
+                $oneUserReplyTxts .= ("\n===========================\n【成功】√  共".$allCount."组，共".$allMoney.'咪');
                 $date = date('Ymd');
                 $dir = \Yii::$aliases['@backend'].'/web/statics/tmp/'.$date; //p($dir);
                 //p($oneUserReplyTxts);
