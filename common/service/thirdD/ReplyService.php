@@ -43,6 +43,9 @@ class ReplyService extends CommonBaseService
                 $BetsQuery = BetsBackend::find()->where($where);
                 //$sql = $BetsQuery->createCommand()->getRawSql();p($sql);
                 $Bets = $BetsQuery->asArray()->all();
+                if(empty($Bets)){
+                    throw_info('记录为空');
+                }
                 //p([$Bets, $wechatUserId, $sql], 0);
                 $oneUserReplyTxts = "打包回复：\n".$Bets[0]['lottery_name'].$Bets[0]['qihao']."\n";
                 $order_ids = [];
