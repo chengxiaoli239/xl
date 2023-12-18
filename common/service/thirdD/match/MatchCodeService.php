@@ -92,6 +92,7 @@ class MatchCodeService extends CommonBaseService
             }
             //p($dataGroups);
         }catch (\Exception $e){
+            Tool_Common::log('/matchCode/'.__FUNCTION__, 'ERR', '匹配错误11', ['text'=>$betText, 'err_msg'=>$e->getMessage()]);
             return [CommonBaseService::CODE_FOR_USER, [], '匹配异常，请重新输入'];
         }finally{
             //return [CommonBaseService::CODE_FOR_USER, [], '匹配异常，请重新输入00'];
