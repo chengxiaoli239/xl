@@ -21,11 +21,14 @@ class MatchCodeService extends CommonBaseService
     public static function getExplainData($text=''): array
     {
         try {
+            $start_time = microtime(true);
             $params = ['textfield' => $text];
             Tool_Common::log('/matchCode/'.__FUNCTION__, 'INFO', '号码数据匹配0', ['text'=>$text]);
             $domain = \Yii::$app->params['EXPLAIN_CODE_API'];
             $result = \common\open\thirdD\api\MatchCodeApi::push($domain, $params);
-            Tool_Common::log('/matchCode/'.__FUNCTION__, 'INFO', '号码数据匹配', ['text'=>$text, 'result'=>$result]);
+            $end_time = microtime(true);
+            $time_consume = ($end_time-$start_time).'s';
+            Tool_Common::log('/matchCode/'.__FUNCTION__, 'INFO', '号码数据匹配', ['text'=>$text, 'result'=>$result, 'time_consume'=>$time_consume]);
         }catch (\Exception $e){
             return ['code'=>$e->getCode(), 'msg'=>$e->getMessage()];
         }
