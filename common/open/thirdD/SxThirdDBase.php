@@ -155,7 +155,7 @@ class SxThirdDBase extends Component
                 $result = $e->data;
             }
 
-            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, /*'data'=>$result ?? [],*/ 'code'=>$code, 'msg'=>$errorMsg ]);
+            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'data'=>$result ?? [], 'code'=>$code, 'msg'=>$errorMsg ]);
             throw_info($errorMsg, $code);
         } finally {
             $status = $status ?? SsxxRequestLog::REQUEST_STATUS_FAIL;
