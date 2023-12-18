@@ -341,7 +341,7 @@ class EYunMessageOperateService  extends EYunBaseService
      */
     public function matchData(string $text=''): array
     {
-        $text = str_replace(' ', ' ', trim($text)); # 中文空格替换成英文空格
+        //$text = str_replace(' ', ' ', trim($text)); # 中文空格替换成英文空格
         try {
             switch (true){
                 case strpos($text, '查') !== false: // 撤单
