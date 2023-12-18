@@ -144,6 +144,7 @@ class MatchCodeService extends CommonBaseService
             if (($e instanceof \common\exceptions\InfoException)) {
                 $result = $e->data;
             }
+            Tool_Common::log('/matchCode/'.__FUNCTION__, 'ERR', '匹配错误12', ['text'=>$betText, 'err_msg'=>$e->getMessage()]);
             return [CommonBaseService::CODE_FOR_USER, [], '匹配异常，请重新输入'];
         }finally{
 
