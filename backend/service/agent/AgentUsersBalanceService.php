@@ -97,8 +97,8 @@ class AgentUsersBalanceService extends BaseService {
             Tool_Common::log('upOrDownBalance', 'INFO', '用户上下分',$logArr);
             $msg = $desc;
             $transaction->commit();
-            //push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$agent_id, 'type'=>$type, 'wechat_user_id'=>$wechatUser['id']]);
-            Tool_Common::log('/wechat/'.__FUNCTION__, 'ERR', '消息接收处理', ['text'=>$text, 'data'=>$data]);
+            push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$agent_id, 'type'=>$type, 'wechat_user_id'=>$wechatUser['id']]);
+            //Tool_Common::log('/wechat/'.__FUNCTION__, 'ERR', '消息接收处理', ['text'=>$text, 'data'=>$setData]);
         }catch (\Exception $e){
             $transaction->rollBack();
             $data = [ ];
