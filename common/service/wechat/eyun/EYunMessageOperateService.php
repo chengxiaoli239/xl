@@ -631,7 +631,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 $allMoneys += $oneAllMoneys;
             }
             $transaction->commit();
-            push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$this->user_id, 'type'=>$vdata['type'], 'msg'=>'下单/撤单之后计算', 'wechat_user_id'=>$this->member_id]);
+            push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$this->user_id, 'type'=>$data['type'], 'msg'=>'下单/撤单之后计算', 'wechat_user_id'=>$this->member_id]);
         }catch (\Exception $e){
             $transaction->rollBack();
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-异常', ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'err_msg'=>$e->getMessage().$e->getFile().$e->getLine()]);
