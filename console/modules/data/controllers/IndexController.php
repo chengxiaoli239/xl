@@ -30,8 +30,9 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 时时彩：逐期获取开奖数据
-     * /www/server/php/74/bin/php yii data/index/grab-kj-data     * @return array
+     * @desc 逐期获取开奖数据
+     * /www/server/php/74/bin/php yii data/index/grab-kj-data
+     * @return array
      */
     public function actionGrabKjData(): array
     {
@@ -176,7 +177,7 @@ class IndexController extends Controller
     /**
      * @desc 批量插入投注任务
      * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii data/index/insert-plans-task
-     * @return array     * @return array
+     * @return array
      */
     public function actionInsertPlansTask(){
         self::_init();
