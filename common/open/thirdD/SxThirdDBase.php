@@ -114,7 +114,7 @@ class SxThirdDBase extends Component
         $this->setHeaders($headers);
 
         try {
-            $client = new Client();
+            $client = new Client(['timeout'=>10]);
             $options = array_merge(['headers' => $headers], $params);
             #p([$method, $url, $options]);
             $response = $client->request($method, $url, $options);
