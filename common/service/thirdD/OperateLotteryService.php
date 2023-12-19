@@ -391,7 +391,7 @@ class OperateLotteryService extends CommonBaseService
                 $posKjCode = $kjCodeArr[2];
                 $betCodeStr = str_replace('个:', '', $code);
             }else{
-                throw_info('匹配位置异常');
+                throw_info('一定匹配位置异常[id:'.$betRow->id.']');
             }
             $betCodesArr = ThirdD::getArrayCodesByString($betCodeStr);
             $betCount = array_count_values($betCodesArr); # 所有元素的次数
@@ -454,7 +454,7 @@ class OperateLotteryService extends CommonBaseService
                         $posKjCodes[] = $kjCodeArr[2];
                         $betCodesArr[] = str_replace('个:', '', $code);
                     }else{
-                        throw_info('匹配位置异常');
+                        throw_info('二定匹配位置异常[id:'.$betRow->id.']');
                     }
 
                 }
@@ -676,7 +676,7 @@ class OperateLotteryService extends CommonBaseService
             foreach ($betCodes as $oneCode) {
                 $f = preg_match_all('/(\d{1})拖(\d{2,})/', $oneCode, $matches);
                 if(empty($f)){
-                    throw_info('一码拖匹配异常');
+                    throw_info('一码拖组六匹配异常[id:'.$betRow->id.']');
                 }
                 $one = $matches[1][0];
                 if(in_array($one, $kjCodeArr)){
@@ -722,7 +722,7 @@ class OperateLotteryService extends CommonBaseService
             foreach ($betCodes as $oneCode) {
                 $f = preg_match_all('/(\d{1})拖(\d{2,})/', $oneCode, $matches);
                 if(empty($f)){
-                    throw_info('一码拖匹配异常');
+                    throw_info('一码拖组三匹配异常[id:'.$betRow->id.']');
                 }
                 $one = $matches[1][0];
                 if(in_array($one, $kjCodeArr)){
