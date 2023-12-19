@@ -365,11 +365,7 @@ class EYunMessageOperateService  extends EYunBaseService
                         Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-00', ['switch'=>$switch, 'text'=>$text, 'betTexts'=>$betTexts, 'counts'=>count($betTexts)]);
                         $dataGroups = [];
                         foreach ($betTexts as $k1=>$betText){
-                            if($switch==1){
-                                list($code, $data, $msg) = MatchCodeService::getCodeData($betText);
-                            }else{
-                                list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($betText); # 单个规则文本匹配处理
-                            }
+                            list($code, $data, $msg) = EYunMessageOperateService::getOnePlayMethodG($betText); # 单个规则文本匹配处理
                             Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '解析日志-001', ['betText'=>$betText, 'code'=>$code, 'msg'=>$msg]);
                             if($code>0){
                                 if($code == CommonBaseService::CODE_FOR_USER){
