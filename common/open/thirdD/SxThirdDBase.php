@@ -147,15 +147,15 @@ class SxThirdDBase extends Component
             $status = SsxxRequestLog::REQUEST_STATUS_SUCCESS;
             return $result;
         } catch(\Exception $e) {
-            $status = SsxxRequestLog::REQUEST_STATUS_FAIL;
-            $errorMsg = $e->getMessage();
             $code = $e->getCode();
-            push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>$errorMsg]);
+            $errorMsg = $e->getMessage();
+            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'data'=>$result ?? [], 'code'=>$code, 'content'=>$content, 'msg'=>$errorMsg ]);
+            $status = SsxxRequestLog::REQUEST_STATUS_FAIL;
+            push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>$errorMsg, 'data'=>$result ?? [], 'url'=>$url, 'req'=>$params]);
             if (($e instanceof \common\exceptions\InfoException)) {
                 $result = $e->data;
             }
 
-            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'data'=>$result ?? [], 'code'=>$code, 'content'=>$content, 'msg'=>$errorMsg ]);
             throw_info($errorMsg, $code);
         } finally {
             $status = $status ?? SsxxRequestLog::REQUEST_STATUS_FAIL;
