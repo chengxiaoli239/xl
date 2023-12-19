@@ -127,6 +127,7 @@ class SxThirdDBase extends Component
                 return $cookie ? ['cookie'=>$cookie] : [];
             }
             $content = $response->getBody()->getContents();
+            $statusCode = $response->getStatusCode();  // 获取成功响应的状态码
             #p(['content'=>$content]);
             if($apiMethod == SiteOauthApi::API_GET_CAPTCHA){
                 $fileContent = $content;
@@ -143,15 +144,16 @@ class SxThirdDBase extends Component
                 throw_info('异常', 30000);
             }
 
-            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, /*'result'=>$result*/]);
+            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'statusCode'=>$statusCode, /*'result'=>$result*/]);
             $status = SsxxRequestLog::REQUEST_STATUS_SUCCESS;
             return $result;
         } catch(\Exception $e) {
             $code = $e->getCode();
             $errorMsg = $e->getMessage();
-            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'result'=>$result ?? [], 'code'=>$code, 'content'=>$content, 'msg'=>$errorMsg ]);
+            $statusCode = $response->getStatusCode();  // 获取成功响应的状态码
+            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'result'=>$result ?? [], 'code'=>$code, 'content'=>$content, 'msg'=>$errorMsg, 'statusCode'=>$statusCode]);
             $status = SsxxRequestLog::REQUEST_STATUS_FAIL;
-            push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>$errorMsg, 'result'=>$result ?? [], 'url'=>$url, 'req'=>$params]);
+            push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>$errorMsg, 'statusCode'=>$statusCode, 'result'=>$result ?? [], 'url'=>$url, 'req'=>$params]);
             if (($e instanceof \common\exceptions\InfoException)) {
                 $result = $e->data;
             }
