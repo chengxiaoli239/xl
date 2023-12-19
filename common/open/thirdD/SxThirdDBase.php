@@ -181,7 +181,7 @@ class SxThirdDBase extends Component
 
     private static function resetResult(&$result)
     {
-        if(is_array($result)){
+        if(is_array($result) && isset($result['username'])){
             $result = [
                 'username'=>$result['username'],
                 'credits'=>$result['credits'],
