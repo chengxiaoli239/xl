@@ -149,9 +149,9 @@ class SxThirdDBase extends Component
         } catch(\Exception $e) {
             $code = $e->getCode();
             $errorMsg = $e->getMessage();
-            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'data'=>$result ?? [], 'code'=>$code, 'content'=>$content, 'msg'=>$errorMsg ]);
+            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'result'=>$result ?? [], 'code'=>$code, 'content'=>$content, 'msg'=>$errorMsg ]);
             $status = SsxxRequestLog::REQUEST_STATUS_FAIL;
-            push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>$errorMsg, 'data'=>$result ?? [], 'url'=>$url, 'req'=>$params]);
+            push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>$errorMsg, 'result'=>$result ?? [], 'url'=>$url, 'req'=>$params]);
             if (($e instanceof \common\exceptions\InfoException)) {
                 $result = $e->data;
             }
