@@ -19,11 +19,15 @@ class MatchCodeService extends CommonBaseService
             $result = \common\open\thirdD\api\MatchCodeApi::push($domain, $params);
             $end_time = microtime(true);
             $time_consume = ($end_time-$start_time).'s';
-            $resultData = (!empty($result[0]) && !empty($result[0]['data'])) ? $result[0]['data'] : [];
-            //p(['dd'=>$result[0]['data']]);
+            $resultData = $result[0] ?? [];
+            if($resultData['code'] != 200 OR empty($resultData['data'])){
+                throw_info($resultData['msg']??'识别错误.');
+            }
             Tool_Common::log('/matchCode/'.__FUNCTION__, 'INFO', '号码数据匹配', ['text'=>$text, 'result'=>$result, 'time_consume'=>$time_consume]);
+            $resultData = $resultData['data'];
         }catch (\Exception $e){
-            return ['code'=>$e->getCode(), 'msg'=>$e->getMessage()];
+            Tool_Common::log('/matchCode/'.__FUNCTION__, 'INFO', '号码数据匹配-异常', ['text'=>$text, 'result'=>$result, 'time_consume'=>$time_consume]);
+            throw_info($e->getMessage());
         }
 
         return $resultData;

@@ -76,7 +76,7 @@ class IndexController extends Controller
             $text = '福 二码定百234个456 各10';
             $text = '福直027 072 026 062 025 052 各2倍';
             $text = '单032.302=十五倍，';
-            $text = '福 6拖12347 组三各9元';
+            $text = '福 6拖12347 各9元';
             //$text = "123456789直2倍";
             //$text = "福组467 各3元";
             #$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
