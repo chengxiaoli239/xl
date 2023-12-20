@@ -127,6 +127,7 @@ class OperateApiDataService extends CommonBaseService
         if(empty($code)){
             throw_info('号码不能为空');
         }
+        $code = trim(str_replace(['跨度', '跨'], '', $code));
     }
 
     /**
