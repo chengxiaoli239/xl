@@ -92,10 +92,16 @@ class CommonBaseService extends BaseService
         return $data;
     }
 
+    /**
+     * 接口玩法映射本地玩法id
+     * @param $method_id
+     * @param $system_type_id
+     * @return array|mixed|\yii\db\ActiveRecord|\yii\db\ActiveRecord[]
+     */
     public static function getSiteToLocalMethods($method_id=0, $system_type_id=15){
         $m = \Yii::$app->cache;
         $mkey = CommonBaseService::getSiteToLocalMethodsMkey($method_id);
-        if(true OR !$data = $m->get($mkey)){
+        if(!$data = $m->get($mkey)){
             $data = LocalToSiteMethod::find()
                 ->select(['id', 'system_type_id', 'method_id', 'site_method_id', 'name'])
                 ->indexBy('method_id')
@@ -105,5 +111,7 @@ class CommonBaseService extends BaseService
         if(isset($data[$method_id])){
             return $data[$method_id];
         }
+
+        return $data;
     }
 }
