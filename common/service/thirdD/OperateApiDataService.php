@@ -192,7 +192,8 @@ class OperateApiDataService extends CommonBaseService
         if(empty($code)){
             throw_info('记录不能为空');
         }
-        $code = trim(str_replace(['大', '小', '单', '双'], '', $code));
+        #$code = trim(str_replace(['大', '小', '单', '双'], '', $code));
+        $code = trim($code);
     }
 
     /**

@@ -80,7 +80,7 @@ class IndexController extends Controller
             $text = '福 6拖12347组三 各9元';
             $text = '复式 123 ，2345，23456，3456789 各100元';
             //$text = "123456789直2倍";
-            //$text = "福组467 各3元";
+            $text = "福 单=20";
             #$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本
             //$betText = EYunMessageOperateService::resetText($text); p($betText);# 重置匹配文本
             //preg_match('/各([' . MethodMatchService::CN_SINGLE_TEXT . ']{1,3})/u', $text, $matches); p($matches);
