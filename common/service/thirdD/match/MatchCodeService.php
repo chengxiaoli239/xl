@@ -58,7 +58,7 @@ class MatchCodeService extends CommonBaseService
 
                 $playMethod = [];
                 $codes = $codeData['code'];
-                #p([$lottery_type, $codes]);
+                //p([$lottery_type, $codeData]);
                 $allMoney = 0.00;
                 foreach ($codes as $code){
                     list($localToSiteMethodInfo, $codeData) = MatchCodeService::apiMethodDataToLocalMethodData($code);
@@ -284,9 +284,10 @@ class MatchCodeService extends CommonBaseService
                     break;
             }
             $resultData = ['code'=>$code, 'method_id'=>$method_id, 'err_msg'=>'处理结束'];
+            //var_dump($codeData,'：', $resultData);
             Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理结束99', $resultData);
         }catch (\Exception $e){
-            $logArr = ['code'=>$code, 'method_id'=>$method_id, 'err_msg'=>$e->getMessage()];
+            $logArr = ['code'=>$code, 'codeData'=>$codeData, 'method_id'=>$method_id, 'err_msg'=>$e->getMessage()];
             Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常11', $logArr);
             var_dump($e->getMessage());
             return [10004, $logArr, $e->getMessage()];

@@ -11,7 +11,7 @@ class OperateApiDataService extends CommonBaseService
      */
     public static function runZhiXuan(string &$code='')
     {
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('号码不能为空');
         }
     }
@@ -21,7 +21,7 @@ class OperateApiDataService extends CommonBaseService
      * @param string $code
      */
     public static function runZuXuan(string $code=''){
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('号码不能为空');
         }
     }
@@ -31,7 +31,7 @@ class OperateApiDataService extends CommonBaseService
      * @param string $code
      */
     public static function runDuDan(string $code=''){
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('号码不能为空');
         }
 
@@ -39,7 +39,7 @@ class OperateApiDataService extends CommonBaseService
 
     public static function runShuangFen(string &$code='')
     {
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('记录不能为空');
         }
     }
@@ -49,7 +49,7 @@ class OperateApiDataService extends CommonBaseService
      * @param string $code
      */
     public static function runYiMaDing(string &$code=''){
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('记录不能为空');
         }
     }
@@ -71,7 +71,7 @@ class OperateApiDataService extends CommonBaseService
      * @param string $code
      */
     public static function runBaoZiQB(string &$code=''){
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('记录不能为空');
         }
         $code = '豹子全包';
@@ -83,7 +83,7 @@ class OperateApiDataService extends CommonBaseService
      */
     public static function runDuiZiQB(string $code='')
     {
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('记录不能为空');
         }
     }
@@ -93,7 +93,7 @@ class OperateApiDataService extends CommonBaseService
      * @param string $code
      */
     public static function runZuLiuXMa(string &$code=''){
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('号码不能为空');
         }
 
@@ -104,7 +104,7 @@ class OperateApiDataService extends CommonBaseService
      * @param string $code
      */
     public static function runZuSanXMa(string &$code=''){
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('号码不能为空');
         }
 
@@ -115,7 +115,7 @@ class OperateApiDataService extends CommonBaseService
      * @param string $code
      */
     public static function runZuXuanQuanBao(string &$code=''){
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('号码不能为空');
         }
     }
@@ -124,7 +124,7 @@ class OperateApiDataService extends CommonBaseService
      * 跨度
      */
     public static function runKuaDu(string &$code=''){
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('号码不能为空');
         }
         $code = trim(str_replace(['跨度', '跨'], '', $code));
@@ -136,7 +136,7 @@ class OperateApiDataService extends CommonBaseService
      */
     public static function runYiTuoZuLiu(string &$code='')
     {
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('号码不能为空');
         }
         if(preg_match('/\((\d)\)(\d+)/', $code, $ms)){
@@ -151,7 +151,7 @@ class OperateApiDataService extends CommonBaseService
      */
     public static function runYiTuoZuSan(string &$code='')
     {
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('号码不能为空');
         }
         if(preg_match('/\((\d)\)(\d+)/', $code, $ms)){
@@ -165,7 +165,7 @@ class OperateApiDataService extends CommonBaseService
      * @return string
      */
     public static function runFuShiX(string &$code=''){
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('记录不能为空');
         }
         $code = trim(str_replace(['跨度', '跨'], '', $code));
@@ -176,7 +176,7 @@ class OperateApiDataService extends CommonBaseService
      * @param string $code
      */
     public static function runHeZhi(string &$code=''){
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('记录不能为空');
         }
 
@@ -189,7 +189,7 @@ class OperateApiDataService extends CommonBaseService
      */
     public static function runHeZhiDxDs(string &$code='')
     {
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('记录不能为空');
         }
         #$code = trim(str_replace(['大', '小', '单', '双'], '', $code));
@@ -201,7 +201,7 @@ class OperateApiDataService extends CommonBaseService
      * @param string $code
      */
     public static function runHeZhiXuanFuShiDw(string $code=''){
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('记录不能为空');
         }
 
@@ -212,7 +212,7 @@ class OperateApiDataService extends CommonBaseService
      * @param string $code
      */
     public static function runQuanDao(string &$code=''){
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('记录不能为空');
         }
     }
@@ -222,7 +222,7 @@ class OperateApiDataService extends CommonBaseService
      * @param string $kjCode 2,3,4
      */
     public static function runZhiXuanFuShi(string $code=''){
-        if(empty($code)){
+        if(empty($code) && $code !== '0'){
             throw_info('记录不能为空');
         }
     }
