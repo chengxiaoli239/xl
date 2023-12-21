@@ -71,7 +71,7 @@ class OperateApiDataService extends CommonBaseService
      * @param string $code
      */
     public static function runBaoZiQB(string &$code=''){
-        if(empty($betRow)){
+        if(empty($code)){
             throw_info('记录不能为空');
         }
         $code = '豹子全包';
@@ -165,7 +165,7 @@ class OperateApiDataService extends CommonBaseService
      * @return string
      */
     public static function runFuShiX(string &$code=''){
-        if(empty($betRow)){
+        if(empty($code)){
             throw_info('记录不能为空');
         }
         $code = trim(str_replace(['跨度', '跨'], '', $code));

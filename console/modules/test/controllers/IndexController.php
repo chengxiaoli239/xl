@@ -29,7 +29,9 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            list($localToSiteMethodInfo, $codeData) = MatchCodeService::apiMethodDataToLocalMethodData($code);
+            #$code = Json::decode('{"playedId":200,"playedName":"u76f4u9009","actionData":"213,234,879,342,324,456","bonusProp":900,"actionNum":6,"mode":"18"}');
+            #list($localToSiteMethodInfo, $codeData) = MatchCodeService::apiMethodDataToLocalMethodData($code);
+            #p([$localToSiteMethodInfo, $codeData]);
             #$betRow = Bets::findOne(6362);
             #list($code, $data, $msg) = OperateLotteryService::operateOne($betRow, $kjCode='2,5,4');p([$code, $data, $msg]);
             //$plan = UserSysPlans::findOne(7653);
@@ -74,9 +76,9 @@ class IndexController extends Controller
             ########### 组六、组三 #############
 
             $text = '福 二码定百234个456 各10';
-            $text = '福直027 072 026 062 025 052 各2倍';
             $text = '单032.302=十五倍，';
-            $text = '福 6拖12347 各9元';
+            $text = '福 6拖12347组三 各9元';
+            $text = '复式 123 ，2345，23456，3456789 各100元';
             //$text = "123456789直2倍";
             //$text = "福组467 各3元";
             #$betTexts = EYunMessageOperateService::resetMethodText($text); p($betTexts);# 重置匹配文本

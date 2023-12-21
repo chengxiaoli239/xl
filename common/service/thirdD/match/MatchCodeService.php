@@ -25,6 +25,7 @@ class MatchCodeService extends CommonBaseService
             }
             Tool_Common::log('/matchCode/'.__FUNCTION__, 'INFO', '号码数据匹配', ['text'=>$text, 'result'=>$result, 'time_consume'=>$time_consume]);
             $resultData = $resultData['data'];
+            #p($resultData);
         }catch (\Exception $e){
             Tool_Common::log('/matchCode/'.__FUNCTION__, 'INFO', '号码数据匹配-异常', ['text'=>$text, 'result'=>$result, 'time_consume'=>$time_consume]);
             throw_info($e->getMessage());
@@ -61,6 +62,7 @@ class MatchCodeService extends CommonBaseService
                 $allMoney = 0.00;
                 foreach ($codes as $code){
                     list($localToSiteMethodInfo, $codeData) = MatchCodeService::apiMethodDataToLocalMethodData($code);
+                    //p([$localToSiteMethodInfo, $codeData]);
                     $single = $code['mode'];
                     $count = $code['actionNum'];
 
