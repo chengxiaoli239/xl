@@ -570,6 +570,9 @@ class EYunMessageOperateService  extends EYunBaseService
                         if(empty($method['id'])){
                             throw_info('方式匹配为空，请按正确格式输入', CommonBaseService::CODE_FOR_USER);
                         }
+                        if(empty($method['single']) OR empty($method['count'])){
+                            throw_info('金额或号码数量解析异常，请按正确格式输入', CommonBaseService::CODE_FOR_USER);
+                        }
 
                         $replyMethodName = PlayMethodService::getReplyMethodName($method['name']);
                         $oneBetContent = $replyMethodName.':'.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
