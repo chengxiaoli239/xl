@@ -449,7 +449,7 @@ class Ssxx3dBetService extends CommonBaseService
             $result = Ssxx3dBetService::postToSite($bet['id']);
             Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '异常数据补上盘', ['id'=>$bet['id'], 'order_id'=>$bet['order_id'], 'result'=>$result]);
         }
-        var_dump('执行结束 '.date('Y-m-d H:i:s'));
+        var_dump('执行结束 '.date('Y-m-d H:i:s').' 补打'.count($Bets).'条');
 
         return [0, '操作成功'];
     }
