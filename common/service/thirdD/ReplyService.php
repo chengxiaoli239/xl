@@ -19,8 +19,8 @@ class ReplyService extends CommonBaseService
     public static function packageReply(): array
     {
         $now_time = time();
-        $beforeTime = 180 * 60; # 多少分钟内没回复的
-        var_dump('打包回复', 'dddd');
+        $beforeTime = 30 * 60; # 多少分钟内没回复的
+        //var_dump('打包回复', 'dddd');
         $wechatUserIds = BetsBackend::find()
             ->select(['wechat_user_id'])
             ->where(['has_reply'=>BetsBackend::HAS_REPLY_NO])
@@ -28,10 +28,10 @@ class ReplyService extends CommonBaseService
             ->andWhere(['>', 'created_at', $now_time-$beforeTime])
             //->orWhere(['=', 'wechat_user_id', 19]) //->createCommand()->getRawSql();
             ->groupBy(['wechat_user_id'])->column();
-        //p($wechatUserIds);
 
-        print_r($wechatUserIds);
+        //print_r($wechatUserIds);
         foreach ($wechatUserIds as $wechatUserId){
+            //if($wechatUserId != 371) continue;
             try {
                 $transaction = \Yii::$app->db->beginTransaction();
                 $mkey = CacheKeyService::package($wechatUserId);
@@ -64,7 +64,8 @@ class ReplyService extends CommonBaseService
                 $qihao = '';
                 $tmpRecordOrderIds = [];
                 foreach ($Bets as $k=>$bet){
-                    $row = BetsBackend::find()->select(['push_status'=>[BetsBackend::PUSH_STATUS_WAIT, BetsBackend::PUSH_STATUS_FAIL]])->one();
+                    $row = BetsBackend::find()->where(['push_status'=>[BetsBackend::PUSH_STATUS_WAIT, BetsBackend::PUSH_STATUS_FAIL]])
+                        ->andWhere(['order_id'=>$bet['order_id']])->one();
                     if(!empty($row)){
                         continue;
                     }
