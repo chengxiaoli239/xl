@@ -94,7 +94,7 @@ class ReplyService extends CommonBaseService
                 $MessageService = new EYunMessageOperateService($user_id);
                 if(!empty($replyContent['fromGroup'])){
                     # 群里发，文件 + @
-                    $oneUserReplyTxts = '@'.$replyContent['fromNickName']."\n".$oneUserReplyTxts;
+                    $oneUserReplyTxts = '@'.$replyContent['fromNickName'].' '.date('Y-m-d H:i:s')."\n".$oneUserReplyTxts;
                     $wcId = $replyContent['fromGroup'];
                     $atIds[] = $replyContent['fromUser'];
                 }else{
