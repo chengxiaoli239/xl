@@ -38,6 +38,8 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
         $message = '消息处理成功';
         try {
             $user_id = $params['user_id']; # 代理用户id，系统用户id
+            $wcId = $params['wcId']; # 微信原始id
+
             $data = $params['data']; # 消息内容体
             $fromUser = $data['fromUser'];
             $content = $data['content'];
@@ -59,7 +61,6 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
             self::preValiate($params); # 校验关盘
 
             $MessageService = new EYunMessageOperateService($user_id);
-            $wcId = $params['wcId']; # 微信原始id
             Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name.'0', ['wcId'=>$wcId, 'params'=>$params, 'data'=>$data, 'type'=>gettype($data)]);
 
 
