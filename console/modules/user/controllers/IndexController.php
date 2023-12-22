@@ -1,24 +1,12 @@
 <?php
 namespace console\modules\user\controllers;
 
-use backend\models\SystemConfig;
-use backend\models\TzSystemsUsers;
-use backend\service\baota\BaoTaService;
-use backend\service\BaseService;
-use backend\service\datas\DatasClearService;
-use backend\service\SscDataService;
 use common\service\index\CrontabIndexService;
-use common\service\proxy\ProxyBaseService;
-use common\service\thirdD\CommonBaseService;
-use common\service\thirdD\OperateLotteryService;
 use common\service\thirdD\ReplyService;
+use common\service\thirdD\sx\Ssxx3dBetService;
 use Yii;
-use backend\service\OpKjService;
-use common\tools\KjDataGet;
 use yii\base\Controller;
 use common\tools\Tool_Common;
-use backend\service\BetService;
-use backend\service\StaticService;
 
 
 class IndexController extends Controller
@@ -44,4 +32,16 @@ class IndexController extends Controller
 
         return $rst;
     }
+
+    /**
+     * @desc 上盘口
+     * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii user/index/post-to-site
+     */
+    public function actionPostToSite(): array
+    {
+        $rst = Ssxx3dBetService::postRecordToSite();
+
+        return $rst;
+    }
+
 }

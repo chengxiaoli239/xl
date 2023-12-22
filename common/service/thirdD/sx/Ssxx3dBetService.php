@@ -2,6 +2,7 @@
 
 namespace common\service\thirdD\sx;
 
+use backend\models\thirdD\BetsBackend;
 use backend\models\wechat\Bets;
 use common\helpers\RequestHelper;
 use common\models\wechat\WechatUser;
@@ -48,22 +49,26 @@ class Ssxx3dBetService extends CommonBaseService
 
     /**
      * 推向盘口
-     * @param object $betRow
+     * @param int $betRowId
      * @return array
      */
-    public static function postToSite(object $betRow): array
+    public static function postToSite(object $betRowId): array
     {
-        if(empty($betRow)){
+        if(empty($betRowId)){
             return [];
         }
-        $lottery_type = $betRow->lottery_type;
-        $qihao = $betRow->qihao;
-        $user_id = $betRow->user_id;
-        $method_id = $betRow->play_method;
-
-        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算22', ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'method_id'=>$method_id]);
-        //p($method_id);
         try {
+            list($code, $data, $msg) = Ssxx3dBetService::preBetValidate($betRowId);
+            if($code>0){
+                throw_info($msg, $code);
+            }
+            $betRow = $data['betRow']; # object
+            $lottery_type = $betRow->lottery_type;
+            $qihao = $betRow->qihao;
+            $user_id = $betRow->user_id;
+            $method_id = $betRow->play_method;
+            Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算22', ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'method_id'=>$method_id]);
+
             self::$siteSystemInfo = CommonBaseService::getSystemBaseInfo($user_id, $lottery_type); # 盘口信息
             self::$localToSiteMethodInfo = CommonBaseService::getLocalToSiteMethods($method_id, self::$siteSystemInfo['system_type_id']); #
             $logArr = ['method_id'=>$method_id, 'siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo];
@@ -216,23 +221,28 @@ class Ssxx3dBetService extends CommonBaseService
                     break;
                 default:
                     $err_msg = '未知玩法ID:'.$method_id;
-                    $logArr = ['lottery_type'=>$lottery_type, 'betRowId'=>$betRow->id, 'err_msg'=>$err_msg];
-                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '推送盘口处理异常10', $logArr);
-                    return [10003, $logArr, $err_msg];
+                    throw_info($err_msg, 10003);
             }
-
             $postRst = self::postBet($betRow, $betCodes);
 
             $resultData = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'postRst'=>$postRst, 'err_msg'=>'处理结束'];
             Tool_Common::log('/bet_sx/'.__FUNCTION__, 'ERR', '推送盘口处理结束99', $resultData);
             var_dump(date('Y-m-d H:i:s ').'处理成功：betRowId:'.$betRow->id.'_method_id:'.$method_id);
         }catch (\Exception $e){
-            $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()];
+            $err_msg = $e->getMessage();
+            $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$err_msg];
             Tool_Common::log('/bet_sx/'.__FUNCTION__, 'ERR', '推送盘口处理异常11', $logArr);
-            var_dump($e->getMessage());
+            var_dump($err_msg);
+            $betRow->push_status = ($e->getCode() > SsxxBetJobs::INVALID_STATUS_CODE) ? BetsBackend::PUSH_STATUS_CANNOT : BetsBackend::PUSH_STATUS_FAIL;
+            $betRow->push_desc = $err_msg;
+            $betRow->save();
             throw_info($e->getMessage(), $e->getCode());
             //return [10004, $logArr, $e->getMessage()];
         }
+
+        $betRow->push_status = BetsBackend::PUSH_STATUS_SUCCESS;
+        $betRow->save();
+
 
         return [0, ['resultData'=>$resultData], '推送成功'];
     }
@@ -420,6 +430,22 @@ class Ssxx3dBetService extends CommonBaseService
             $logArr['result'] = $result;
             Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);
             throw_info($result['m']??'推送盘口异常', 30001);
+        }
+
+        return true;
+    }
+
+    public static function postRecordToSite(): bool
+    {
+        $where = [
+            'AND',
+            ['=', 'push_status', BetsBackend::PUSH_STATUS_FAIL],
+            ['>=', 'created_at', time()-1800]
+        ];
+        $Bets = BetsBackend::find()->select(['id', 'order_id'])->where($where)->asArray()->all();
+        foreach ($Bets as $bet){
+            $result = Ssxx3dBetService::postToSite($bet['id']);
+            Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '异常数据补上盘', ['id'=>$bet['id'], 'order_id'=>$bet['order_id'], 'result'=>$result]);
         }
 
         return true;

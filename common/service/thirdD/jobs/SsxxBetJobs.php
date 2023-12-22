@@ -28,29 +28,13 @@ class SsxxBetJobs extends CommonJob {
                 throw_info('下注记录ID为空');
             }
 
-            list($code, $data, $msg) = Ssxx3dBetService::preBetValidate($betRowId);
+            list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRowId);
             if($code>0){
                 throw_info($msg, $code);
             }
-            $betRow = $data['betRow']; # object
-            list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);
-            if($code>0){
-                throw_info($msg, $code);
-            }
-            $betRow->push_status = BetsBackend::PUSH_STATUS_SUCCESS;
-            $betRow->save();
-
             Tool_Common::log('/statics_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params, 'data'=>$data]);
         }catch (\Exception $e){
-            $err_msg = $e->getMessage();
-            $push_status = BetsBackend::PUSH_STATUS_FAIL;
             Tool_Common::log('/statics_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['params'=>$params, 'err_msg'=>$e->getMessage()]);
-            if($e->getCode() > SsxxBetJobs::INVALID_STATUS_CODE){
-                $push_status = BetsBackend::PUSH_STATUS_CANNOT;
-            }
-            $betRow->push_status = $push_status;
-            $betRow->push_desc = $err_msg;
-            $betRow->save();
             throw_info($e->getMessage());
         }
 

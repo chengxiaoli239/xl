@@ -33,6 +33,7 @@ class ReplyService extends CommonBaseService
         print_r($wechatUserIds);
         foreach ($wechatUserIds as $wechatUserId){
             try {
+                $transaction = \Yii::$app->db->beginTransaction();
                 $mkey = CacheKeyService::package($wechatUserId);
                 $exist = \Yii::$app->commonRedis->sadd($mkey, $wechatUserId);
                 if(!$exist){
@@ -40,7 +41,6 @@ class ReplyService extends CommonBaseService
                 }
                 \Yii::$app->commonRedis->expire($mkey, 120);
 
-                $transaction = \Yii::$app->db->beginTransaction();
                 $where = ['AND',
                     ['=', 'wechat_user_id', $wechatUserId],
                     ['=', 'has_reply', BetsBackend::HAS_REPLY_NO],
@@ -64,6 +64,10 @@ class ReplyService extends CommonBaseService
                 $qihao = '';
                 $tmpRecordOrderIds = [];
                 foreach ($Bets as $k=>$bet){
+                    $row = BetsBackend::find()->select(['push_status'=>[BetsBackend::PUSH_STATUS_WAIT, BetsBackend::PUSH_STATUS_FAIL]])->one();
+                    if(!empty($row)){
+                        continue;
+                    }
                     $replyContent = Json::decode($bet['reply_content']);
                     if(empty($tmpRecordOrderIds[$bet['order_id']])){
                         $oneUserReplyTxts .= "\n原文：\n".$bet['bet_desc'].":\n~~~~~~~~~~~~~~~~~~~~~~~~~~\n识别：\n";//.$bet['lottery_name'].$bet['qihao']."\n";;
@@ -126,7 +130,7 @@ class ReplyService extends CommonBaseService
                 }
 
                 $transaction->commit();
-                Tool_Common::log('/reply/'.__FUNCTION__, 'ERR', '打包回复异常', $logArr);
+                Tool_Common::log('/reply/'.__FUNCTION__, 'INFO', '打包回复结束', $logArr);
                 \Yii::$app->commonRedis->srem($mkey, $wechatUserId);
             }catch (\Exception $e){
                 Tool_Common::log('/reply/'.__FUNCTION__, 'ERR', '打包回复异常', ['wechatUserId'=>$wechatUserId, 'err_msg'=>$e->getMessage()]);

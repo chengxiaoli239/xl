@@ -145,14 +145,14 @@ class SxThirdDBase extends Component
                 throw_info('异常', 30000);
             }
 
-            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'statusCode'=>$statusCode, /*'result'=>$result*/]);
+            Tool_Common::log('/out_site/request', 'INFO', '接口请求', ['url'=>$url, 'req'=>$params, 'statusCode'=>$statusCode, /*'result'=>$result*/]);
             $status = SsxxRequestLog::REQUEST_STATUS_SUCCESS;
             return $result;
         } catch(\Exception $e) {
             $code = $e->getCode();
             $errorMsg = $e->getMessage();
-            $statusCode = $response->getStatusCode();  // 获取成功响应的状态码
-            Tool_Common::log('/out_site/request', 'ERR', '接口请求', ['url'=>$url, 'req'=>$params, 'result'=>$result ?? [], 'code'=>$code, 'content'=>$content, 'msg'=>$errorMsg, 'statusCode'=>$statusCode]);
+            //$statusCode = $response->getStatusCode();  // 获取成功响应的状态码
+            Tool_Common::log('/out_site/request', 'ERR', '接口请求-异常', ['url'=>$url, 'req'=>$params, 'result'=>$result ?? [], 'code'=>$code, 'content'=>$content, 'msg'=>$errorMsg, 'statusCode'=>$statusCode]);
             $status = SsxxRequestLog::REQUEST_STATUS_FAIL;
             push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>$errorMsg, 'statusCode'=>$statusCode, 'result'=>$result ?? [], 'url'=>$url, 'req'=>$params]);
             if (($e instanceof \common\exceptions\InfoException)) {
