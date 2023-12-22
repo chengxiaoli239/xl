@@ -52,7 +52,7 @@ class Ssxx3dBetService extends CommonBaseService
      * @param int $betRowId
      * @return array
      */
-    public static function postToSite(object $betRowId): array
+    public static function postToSite(int $betRowId): array
     {
         if(empty($betRowId)){
             return [];
