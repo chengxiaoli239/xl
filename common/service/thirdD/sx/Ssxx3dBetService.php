@@ -443,7 +443,7 @@ class Ssxx3dBetService extends CommonBaseService
             ['>=', 'created_at', time()-1800]
         ];
         $BetsQuery = BetsBackend::find()->select(['id', 'order_id'])->where($where)->limit(100)->orderBy(['id'=>SORT_DESC]);
-        $sql = $BetsQuery->createCommand()->getRawSql();var_dump($sql);
+        //$sql = $BetsQuery->createCommand()->getRawSql();var_dump($sql);
         $Bets = $BetsQuery->asArray()->all();
         foreach ($Bets as $bet){
             $result = Ssxx3dBetService::postToSite($bet['id']);
