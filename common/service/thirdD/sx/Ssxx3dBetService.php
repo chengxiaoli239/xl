@@ -435,20 +435,20 @@ class Ssxx3dBetService extends CommonBaseService
         return true;
     }
 
-    public static function postRecordToSite(): bool
+    public static function postRecordToSite(): array
     {
         $where = [
             'AND',
             ['=', 'push_status', BetsBackend::PUSH_STATUS_FAIL],
             ['>=', 'created_at', time()-1800]
         ];
-        $Bets = BetsBackend::find()->select(['id', 'order_id'])->where($where)->asArray()->all();
+        $Bets = BetsBackend::find()->select(['id', 'order_id'])->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->limit(100)->all();
         foreach ($Bets as $bet){
             $result = Ssxx3dBetService::postToSite($bet['id']);
             Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '异常数据补上盘', ['id'=>$bet['id'], 'order_id'=>$bet['order_id'], 'result'=>$result]);
         }
 
-        return true;
+        return [0, '操作成功'];
     }
 
     /**
