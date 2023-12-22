@@ -39,7 +39,7 @@ class ReplyService extends CommonBaseService
                 if(!$exist){
                     throw_info('短时间处理，请稍后');
                 }
-                \Yii::$app->commonRedis->expire($mkey, 120);
+                \Yii::$app->commonRedis->expire($mkey, 100);
 
                 $where = ['AND',
                     ['=', 'wechat_user_id', $wechatUserId],
@@ -52,7 +52,7 @@ class ReplyService extends CommonBaseService
                 //$sql = $BetsQuery->createCommand()->getRawSql();p($sql);
                 $Bets = $BetsQuery->asArray()->all();
                 if(empty($Bets)){
-                    throw_info('记录为空');
+                    throw_info('记录为空', 20001);
                 }
                 $count = count($Bets);
                 $countOrderIds = count(ArrayHelper::index($Bets, 'order_id'));
@@ -134,7 +134,11 @@ class ReplyService extends CommonBaseService
                 Tool_Common::log('/reply/'.__FUNCTION__, 'INFO', '打包回复结束', $logArr);
                 \Yii::$app->commonRedis->srem($mkey, $wechatUserId);
             }catch (\Exception $e){
-                Tool_Common::log('/reply/'.__FUNCTION__, 'ERR', '打包回复异常', ['wechatUserId'=>$wechatUserId, 'err_msg'=>$e->getMessage(), 'msg'=>$e->getFile().'_'.$e->getLine()]);
+                $logArr = ['wechatUserId'=>$wechatUserId, 'err_msg'=>$e->getMessage()];
+                if($e->getCode()>20000 && $e->getCode()<30000){
+                    $logArr['msg'] = $e->getFile().'_'.$e->getLine();
+                }
+                Tool_Common::log('/reply/'.__FUNCTION__, 'ERR', '打包回复异常', $logArr);
                 $transaction->rollBack();;
             }
         }
