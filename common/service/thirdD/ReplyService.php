@@ -133,7 +133,7 @@ class ReplyService extends CommonBaseService
                 Tool_Common::log('/reply/'.__FUNCTION__, 'INFO', '打包回复结束', $logArr);
                 \Yii::$app->commonRedis->srem($mkey, $wechatUserId);
             }catch (\Exception $e){
-                Tool_Common::log('/reply/'.__FUNCTION__, 'ERR', '打包回复异常', ['wechatUserId'=>$wechatUserId, 'err_msg'=>$e->getMessage()]);
+                Tool_Common::log('/reply/'.__FUNCTION__, 'ERR', '打包回复异常', ['wechatUserId'=>$wechatUserId, 'err_msg'=>$e->getMessage(), 'msg'=>$e->getFile().'_'.$e->getLine()]);
                 $transaction->rollBack();;
             }
         }
