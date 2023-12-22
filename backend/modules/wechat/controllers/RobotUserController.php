@@ -5,6 +5,7 @@ use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
 use backend\models\TzSystemsUsers;
 use common\models\eyun\HistoryRobots;
 use common\service\wechat\RobotUserService;
+use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
 use Yii;
 use backend\models\wechat\RobotUser;
@@ -108,6 +109,20 @@ class RobotUserController extends BaseController
         #return ['status'=>200, 'msg'=>'ddd'];
 
         $rst = RobotUserService::actWechatLogin($this->_user_id, $post);
+        Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '执行微信登录', ['post'=>$post, 'rst'=>$rst]);
+
+        return $rst;
+    }
+
+    /**
+     * 同步微信好友
+     * @return array
+     */
+    public function actionSyncWechatFriends(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+
+        $rst = WechatUserService::syncWechatFriends($this->_user_id);
         Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '执行微信登录', ['post'=>$post, 'rst'=>$rst]);
 
         return $rst;

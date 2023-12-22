@@ -14,7 +14,7 @@ class MatchCodeService extends CommonBaseService
         try {
             $start_time = microtime(true);
             $params = ['textfield' => $text];
-            Tool_Common::log('/matchCode/'.__FUNCTION__, 'INFO', '号码数据匹配0', ['text'=>$text]);
+            //Tool_Common::log('/matchCode/'.__FUNCTION__, 'INFO', '号码数据匹配0', ['text'=>$text]);
             $domain = \Yii::$app->params['EXPLAIN_CODE_API'];
             $result = \common\open\thirdD\api\MatchCodeApi::push($domain, $params);
             $end_time = microtime(true);
@@ -27,7 +27,7 @@ class MatchCodeService extends CommonBaseService
             $resultData = $resultData['data'];
             #p($resultData);
         }catch (\Exception $e){
-            Tool_Common::log('/matchCode/'.__FUNCTION__, 'INFO', '号码数据匹配-异常', ['text'=>$text, 'result'=>$result, 'time_consume'=>$time_consume]);
+            Tool_Common::log('/matchCode/'.__FUNCTION__, 'ERR', '号码数据匹配-异常', ['text'=>$text, 'result'=>$result, 'time_consume'=>$time_consume]);
             throw_info($e->getMessage());
         }
 

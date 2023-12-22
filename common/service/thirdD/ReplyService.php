@@ -3,7 +3,7 @@
 namespace common\service\thirdD;
 
 use backend\models\thirdD\BetsBackend;
-use backend\models\wechat\Bets;
+use common\service\cache\CacheKeyService;
 use common\service\chat\Tool_Common;
 use common\service\wechat\eyun\EYunMessageOperateService;
 use yii\helpers\ArrayHelper;
@@ -33,6 +33,13 @@ class ReplyService extends CommonBaseService
         print_r($wechatUserIds);
         foreach ($wechatUserIds as $wechatUserId){
             try {
+                $mkey = CacheKeyService::package($wechatUserId);
+                $exist = \Yii::$app->commonRedis->sadd($mkey, $wechatUserId);
+                if(!$exist){
+                    throw_info('短时间处理，请稍后');
+                }
+                \Yii::$app->commonRedis->expire($mkey, 120);
+
                 $transaction = \Yii::$app->db->beginTransaction();
                 $where = ['AND',
                     ['=', 'wechat_user_id', $wechatUserId],
@@ -120,6 +127,7 @@ class ReplyService extends CommonBaseService
 
                 $transaction->commit();
                 Tool_Common::log('/reply/'.__FUNCTION__, 'ERR', '打包回复异常', $logArr);
+                \Yii::$app->commonRedis->srem($mkey, $wechatUserId);
             }catch (\Exception $e){
                 Tool_Common::log('/reply/'.__FUNCTION__, 'ERR', '打包回复异常', ['wechatUserId'=>$wechatUserId, 'err_msg'=>$e->getMessage()]);
                 $transaction->rollBack();;

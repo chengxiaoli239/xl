@@ -24,7 +24,7 @@ use Yii;
  * @property array $container Values given in terms of name-value pairs. This property is write-only.
  * @property \yii\db\Connection $db The database connection. This property is read-only.
  * @property \yii\redis\Connection $redis The database connection. This property is read-only.
- * @property \yii\web\ErrorHandler|\yii\console\ErrorHandler $errorHandler The error handler application
+ * @property \yii\redis\Connection $commonRedis The database connection. This property is read-only. * @property \yii\web\ErrorHandler|\yii\console\ErrorHandler $errorHandler The error handler application
  * component. This property is read-only.
  * @property \yii\i18n\Formatter $formatter The formatter application component. This property is read-only.
  * @property \yii\i18n\I18N $i18n The internationalization application component. This property is read-only.

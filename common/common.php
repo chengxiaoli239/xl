@@ -14,6 +14,11 @@ function d($data, $exit = true){
 
 }
 
+function commonCache()
+{
+    return \Yii::$app->commonCache;
+}
+
 
 function is_mobile()
 {

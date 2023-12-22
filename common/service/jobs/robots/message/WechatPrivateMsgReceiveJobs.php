@@ -9,8 +9,11 @@ use common\service\wechat\eyun\EYunMessageOperateService;
 use common\service\wechat\WechatUserService;
 use yii\helpers\Json;
 
-class WechatPrivateMsgReceiveJobs extends CommonJob {
-    public static function getName($params) {
+class WechatPrivateMsgReceiveJobs extends CommonJob
+{
+
+    public static function getName($params): string
+    {
         self::$name = '11微信私聊消息处理';
         return self::$name;
     }

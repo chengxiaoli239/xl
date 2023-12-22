@@ -3,9 +3,11 @@
 namespace common\service\wechat;
 
 use backend\models\AgentUsersBalanceFlows;
+use common\models\eyun\RobotUser;
 use common\models\wechat\WechatUser;
 use common\service\BaseService;
 use common\service\thirdD\ThirdDTypeService;
+use common\service\wechat\eyun\EYunBaseService;
 use common\tools\Tool_Common;
 
 class WechatUserService extends BaseService
@@ -104,6 +106,28 @@ class WechatUserService extends BaseService
         }
 
         return $data;
+    }
+
+    public static function syncWechatFriends($user_id=0){
+
+        try {
+
+            $RobotUser = RobotUser::findOne(['user_id'=>$user_id]);
+            if(empty($RobotUser)){
+                throw_info('找不到机器人记录');
+            }
+            if(empty($RobotUser->wechat_status)){
+                throw_info('机器人不在线不能同步好友');
+            }
+            # 登录成功之后 - 初始化通讯录
+            $e = new EYunBaseService($user_id);
+            # 初始化通讯录列表（第四步）
+            $initAddressListRst = $e->initAddressList();
+            # 获取通讯录列表（第五步）
+            $response = $e->getAddressList($RobotUser->wcId);
+        }catch (\Exception $e){
+            return ['code'=>300, 'msg'=>$e->getMessage()];
+        }
     }
 
 }
