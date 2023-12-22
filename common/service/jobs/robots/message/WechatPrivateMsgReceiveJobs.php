@@ -76,8 +76,8 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
         }catch (\Exception $e){
             $err_msg =  ($e->getCode() == CommonBaseService::CODE_FOR_USER) ? $e->getMessage() : '处理异常，请正确输入';
             if($e->getCode()>50000){ # 大于50000
-                Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name.'11', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'err_msg'=>$err_msg, 'code'=>$e->getCode()]);
-                return '忽略回复：'.$err_msg;
+                Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name.'11', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'err_msg'=>$e->getMessage(), 'code'=>$e->getCode()]);
+                return '忽略回复：'.$e->getMessage();
             }
             $r = self::reply($user_id, [$err_msg], $data); # 回复消息
             Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$user_id, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r, 'err_msg'=>$e->getMessage(), 'file'=>$e->getFile().'_'.$e->getLine()]);

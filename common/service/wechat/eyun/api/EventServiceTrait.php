@@ -102,7 +102,7 @@ trait EventServiceTrait
 
         }catch (\Exception $e){
             Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '消息内容保存异常', ['data'=>$data, 'err_msg'=>$e->getMessage()]);
-            push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>'消息内容保存异常']);
+            push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>'消息内容保存异常：'.$e->getMessage()]);
             return [30001, [], $e->getMessage()];
         }
         $dd = [
