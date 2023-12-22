@@ -91,8 +91,7 @@ class IndexController extends Controller
             $rst = $MessageService->receive($text, $fromUser='wxid_875i1kgd38x122'); p($rst);
             $betCodes = Ssxx3dBetService::resetOneZhiXuanFuShi($betCodes='1246;5678');p($betCodes);
             $qihao = Util::getBeforeNumQihao($dateString, $n=2);
-            $betRow = BetsBackend::findOne('4183');
-            list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRow);p([$code, $data, $msg]);
+            list($code, $data, $msg) = Ssxx3dBetService::postToSite($betRowId=4183);p([$code, $data, $msg]);
             echo $qihao;
         } catch (\Exception $e) {
             p($e->getMessage());
