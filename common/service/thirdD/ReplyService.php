@@ -104,7 +104,7 @@ class ReplyService extends CommonBaseService
                     # 私发，打包回复
                     $wcId = $replyContent['fromUser'];
                 }
-                $oneUserReplyTxts = "本次打包共 ".count($message_ids)." 条：\n".$oneUserReplyTxts;
+                $oneUserReplyTxts = "本次打包共 ".count(array_unique($message_ids))." 条：\n".$oneUserReplyTxts;
                 //p(['$oneUserReplyTxts'=>$oneUserReplyTxts]);
 
                 $logArr = ['wechatUserId'=>$wechatUserId, 'message_ids'=>$message_ids, $oneUserReplyTxts, 'atIds'=>$atIds];
