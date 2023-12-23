@@ -29,7 +29,7 @@ class ReplyService extends CommonBaseService
             //->orWhere(['=', 'wechat_user_id', 19]) //->createCommand()->getRawSql();
             ->groupBy(['wechat_user_id'])->column();
 
-        //print_r($wechatUserIds);
+        //p($wechatUserIds);
         foreach ($wechatUserIds as $wechatUserId){
             //if($wechatUserId != 371) continue;
             try {
@@ -48,9 +48,9 @@ class ReplyService extends CommonBaseService
                     ['=', 'reply_type', BetsBackend::REPLY_TYPE_PACKAGE], # BetsBackend::REPLY_TYPE_PACKAGE
                     ['>', 'created_at', $now_time-$beforeTime],
                 ];
-                $BetsQuery = BetsBackend::find()->where($where);
-                //$sql = $BetsQuery->createCommand()->getRawSql();p($sql);
-                $Bets = $BetsQuery->orderBy(['new_msg_id'])->asArray()->all();
+                $BetsQuery = BetsBackend::find()->where($where)->orderBy(['new_msg_id'=>SORT_DESC]);
+                $sql = $BetsQuery->createCommand()->getRawSql();p($sql);
+                $Bets = $BetsQuery->asArray()->all();
                 if(empty($Bets)){
                     throw_info('记录为空', 20001);
                 }
