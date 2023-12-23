@@ -49,7 +49,7 @@ class ReplyService extends CommonBaseService
                     ['>', 'created_at', $now_time-$beforeTime],
                 ];
                 $BetsQuery = BetsBackend::find()->where($where)->orderBy(['new_msg_id'=>SORT_DESC]);
-                $sql = $BetsQuery->createCommand()->getRawSql();p($sql);
+                //$sql = $BetsQuery->createCommand()->getRawSql();p($sql);
                 $Bets = $BetsQuery->asArray()->all();
                 if(empty($Bets)){
                     throw_info('记录为空', 20001);
