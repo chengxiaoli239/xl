@@ -58,7 +58,7 @@ class ReplyService extends CommonBaseService
                 $countMsgIds = count(ArrayHelper::index($Bets, 'new_msg_id'));
                 //p([$Bets, $wechatUserId, $sql], 0);
                 $oneUserReplyTxts = "本次打包共 ".$countMsgIds." 条：\n";
-                $order_ids = [];
+                $message_ids = [];
                 $allMoney = 0.00;
                 $allCount = 0;
                 $qihao = '';
@@ -79,7 +79,7 @@ class ReplyService extends CommonBaseService
                     $qihao = $bet['qihao'];
                     $tmpRecordOrderIds[$bet['order_id']] = true;
                     $oneUserReplyTxts .= $bet['lottery_name'].'单'.$bet['order_id'].' '.$replyContent['replyTxt']."\n";
-                    $order_ids[] = $bet['order_id'];
+                    $message_ids[] = $bet['new_msg_id'];
 
                     $allCount += $bet['count'];
                     $allMoney += $bet['bet_money'];
@@ -90,7 +90,7 @@ class ReplyService extends CommonBaseService
                 $oneUserReplyTxts .= ("\n===========================\n【成功】√  共".$allCount."组，共".$allMoney.'咪');
                 $date = date('Ymd');
                 $dir = \Yii::$aliases['@backend'].'/web/statics/tmp/'.$date; //p($dir);
-                //p($oneUserReplyTxts);
+                p($oneUserReplyTxts);
 
                 //p(['user_id'=>$user_id]);
                 # 微信回复用户
@@ -104,10 +104,10 @@ class ReplyService extends CommonBaseService
                     # 私发，打包回复
                     $wcId = $replyContent['fromUser'];
                 }
-                //$oneUserReplyTxts = printf($oneUserReplyTxts, count($order_ids));
+                $oneUserReplyTxts = printf($oneUserReplyTxts, count($message_ids));
                 //p($oneUserReplyTxts);
 
-                $logArr = ['wechatUserId'=>$wechatUserId, 'order_id'=>$order_ids, $oneUserReplyTxts, 'atIds'=>$atIds];
+                $logArr = ['wechatUserId'=>$wechatUserId, 'message_ids'=>$message_ids, $oneUserReplyTxts, 'atIds'=>$atIds];
                 //p($logArr);
                 if(!empty($replyContent['fromGroup'])){
                     # 回复两次
@@ -129,8 +129,8 @@ class ReplyService extends CommonBaseService
                 if($result['code'] != 1000){
                     throw_info($rst['message']??'回复异常', 30001);
                 }
-                if(!empty($order_ids)){
-                    BetsBackend::updateAll(['has_reply'=>BetsBackend::HAS_REPLY_YES], ['order_id'=>$order_ids]);
+                if(!empty($message_ids)){
+                    BetsBackend::updateAll(['has_reply'=>BetsBackend::HAS_REPLY_YES], ['new_msg_id'=>$message_ids, 'wechat_user_id'=>$wechatUserId]);
                 }
 
                 $transaction->commit();
