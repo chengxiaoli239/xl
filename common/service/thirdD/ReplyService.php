@@ -90,7 +90,7 @@ class ReplyService extends CommonBaseService
                 $oneUserReplyTxts .= ("\n===========================\n【成功】√  共".$allCount."组，共".$allMoney.'咪');
                 $date = date('Ymd');
                 $dir = \Yii::$aliases['@backend'].'/web/statics/tmp/'.$date; //p($dir);
-                p($oneUserReplyTxts);
+                //p($oneUserReplyTxts);
 
                 //p(['user_id'=>$user_id]);
                 # 微信回复用户
