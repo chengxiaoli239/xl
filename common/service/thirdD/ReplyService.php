@@ -104,8 +104,8 @@ class ReplyService extends CommonBaseService
                     # 私发，打包回复
                     $wcId = $replyContent['fromUser'];
                 }
-                $oneUserReplyTxts = printf($oneUserReplyTxts, count($message_ids));
-                //p($oneUserReplyTxts);
+                //$oneUserReplyTxts = printf($oneUserReplyTxts, count($message_ids));
+                //p(['$oneUserReplyTxts'=>$oneUserReplyTxts]);
 
                 $logArr = ['wechatUserId'=>$wechatUserId, 'message_ids'=>$message_ids, $oneUserReplyTxts, 'atIds'=>$atIds];
                 //p($logArr);
