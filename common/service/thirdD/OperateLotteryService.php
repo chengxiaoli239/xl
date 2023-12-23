@@ -240,7 +240,7 @@ class OperateLotteryService extends CommonBaseService
         }catch (\Exception $e){
             $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()];
             Tool_Common::log('/data_kj/'.__FUNCTION__, 'ERR', '开奖处理异常11', $logArr);
-            var_dump($e->getMessage());
+            var_dump($e->getMessage().' qihao:'.$betRow->qihao.' '.date('Y-m-d H:i:s'));
             return [10004, $logArr, $e->getMessage()];
         }
         return [0, $resultData, '处理成功'];
