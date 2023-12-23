@@ -688,6 +688,9 @@ class EYunMessageOperateService  extends EYunBaseService
     public function send($wcId='', $content='', $atIds=[]){
 
         try {
+            if(empty($content)){
+                throw_info('发送消息不能为空');
+            }
             $this->validatePreSend($wcId, $content, $atIds);
             $url = $this->base_url . '/sendText';
             $params = [
