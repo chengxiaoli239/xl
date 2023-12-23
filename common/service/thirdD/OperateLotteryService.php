@@ -2,7 +2,7 @@
 
 namespace common\service\thirdD;
 
-use backend\models\SscKjData;
+use backend\models\thirdD\BetsBackend;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\OpKjService;
 use common\models\thirdD\BetOrderId;
@@ -377,28 +377,43 @@ class OperateLotteryService extends CommonBaseService
         $betCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, trim($codes)); # 下注号码
 
         $kjCodeArr = explode(',', $kjCode);
+        $tmpKjCodeArr = $kjCodeArr;
 
-        $zjCount = 0;
-        $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
-        foreach ($betCodes as $code){
-            if(strpos($code, '百') !== false){
-                $posKjCode = $kjCodeArr[0];
-                $betCodeStr = str_replace('百:', '', $code);
-            }elseif (strpos($code, '十') !== false){
-                $posKjCode = $kjCodeArr[1];
-                $betCodeStr = str_replace('十:', '', $code);
-            }elseif (strpos($code, '个') !== false){
-                $posKjCode = $kjCodeArr[2];
-                $betCodeStr = str_replace('个:', '', $code);
-            }else{
-                throw_info('一定匹配位置异常[id:'.$betRow->id.']');
+        // todo 一定待处理
+        //p([$kjCode, $betCodes, $kjCodeArr]);
+        if(strpos($codes, 'X') !== false){
+            $p = strpos($codes, 'X');
+            $allBetCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, $codes);
+            if(isset($tmpKjCodeArr[$p])){
+                $tmpKjCodeArr[$p] = 'X';
             }
-            $betCodesArr = ThirdD::getArrayCodesByString($betCodeStr);
-            $betCount = array_count_values($betCodesArr); # 所有元素的次数
-            #p(['$betCodesArr'=>$betCodesArr, 'betCount'=>$betCount, 'posKjCode'=>$posKjCode], 0);
+            $kjCodeArrStr = implode('', $tmpKjCodeArr);
+            $betCoudeCounts = array_count_values($allBetCodes);
+            $zjCount = $betCoudeCounts[$kjCodeArrStr] ? : 0;
+            //p([$codes, $p, $kjCodeArr, $tmpKjCodeArr, $kjCodeArrStr, $allBetCodes, $betCoudeCounts, $zjCount]);
+        }else {
+            $zjCount = 0;
+            $betCodes = array_unique($betCodes); # 统计次数之后，去重，防止多次计算中奖
+            foreach ($betCodes as $code) {
+                if (strpos($code, '百') !== false) {
+                    $posKjCode = $kjCodeArr[0];
+                    $betCodeStr = str_replace('百:', '', $code);
+                } elseif (strpos($code, '十') !== false) {
+                    $posKjCode = $kjCodeArr[1];
+                    $betCodeStr = str_replace('十:', '', $code);
+                } elseif (strpos($code, '个') !== false) {
+                    $posKjCode = $kjCodeArr[2];
+                    $betCodeStr = str_replace('个:', '', $code);
+                } else {
+                    throw_info('一定匹配位置异常[id:' . $betRow->id . ']');
+                }
+                $betCodesArr = ThirdD::getArrayCodesByString($betCodeStr);
+                $betCount = array_count_values($betCodesArr); # 所有元素的次数
+                #p(['$betCodesArr'=>$betCodesArr, 'betCount'=>$betCount, 'posKjCode'=>$posKjCode], 0);
 
-            if(!isset($betCount[$posKjCode])) continue;
-            $zjCount += (int)($betCount[$posKjCode]);
+                if (!isset($betCount[$posKjCode])) continue;
+                $zjCount += (int)($betCount[$posKjCode]);
+            }
         }
         #p(['betCodes'=>$betCodes, 'kjCodeArr'=>$kjCodeArr, 'zjCount'=>$zjCount]);
         self::endCaculate($betRow, $zjCount, $Odds, $kjCode);
@@ -997,9 +1012,14 @@ class OperateLotteryService extends CommonBaseService
                 'status' => $status,
                 'bonus' => $bonus,
                 'profits' => $profits,
-                'kj_codes' => $kjCode,
                 'updated_at' => time(),
             ];
+            if($betRow->push_status == BetsBackend::PUSH_STATUS_WAIT){
+                $updateDatas = array_merge($updateDatas, [
+                    'push_status' => BetsBackend::PUSH_STATUS_FAIL,
+                    'push_desc' => '已开奖未推盘口记录不再推送',
+                ]);
+            }
             #p(['id'=>$betRow->id, 'betCodes'=>$betCodes, 'kj_code_3n'=>$kj_code_3n, 'betCounts'=>$betCounts, $updateDatas]);
             $betRow->setAttributes($updateDatas);
             $flag = $betRow->save();

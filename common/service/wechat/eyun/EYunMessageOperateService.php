@@ -596,6 +596,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             'lottery_type' => $lottery_type,
                             'lottery_name' => $lottery_name,
                             'bet_desc' => $text,
+                            'new_msg_id' => $messageData['newMsgId'],
                             'reply_type' => $this->wechatUser['reply_type'],
                             'reply_content' => Json::encode($replyContent),
                             'api_code_datas' => $playMethods['apiCodeDatas']?Json::encode($playMethods['apiCodeDatas']):'',

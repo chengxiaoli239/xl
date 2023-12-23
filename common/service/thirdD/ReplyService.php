@@ -50,7 +50,7 @@ class ReplyService extends CommonBaseService
                 ];
                 $BetsQuery = BetsBackend::find()->where($where);
                 //$sql = $BetsQuery->createCommand()->getRawSql();p($sql);
-                $Bets = $BetsQuery->asArray()->all();
+                $Bets = $BetsQuery->orderBy(['new_msg_id'])->asArray()->all();
                 if(empty($Bets)){
                     throw_info('记录为空', 20001);
                 }
@@ -65,7 +65,7 @@ class ReplyService extends CommonBaseService
                 $tmpRecordOrderIds = [];
                 foreach ($Bets as $k=>$bet){
                     $row = BetsBackend::find()->where(['push_status'=>[BetsBackend::PUSH_STATUS_WAIT, BetsBackend::PUSH_STATUS_FAIL]])
-                        ->andWhere(['order_id'=>$bet['order_id']])->one();
+                        ->andWhere(['new_msg_id'=>$bet['new_msg_id'], 'wechat_user_id'=>$bet['wechat_user_id']])->one();
                     if(!empty($row)){
                         continue;
                     }
