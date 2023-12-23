@@ -64,7 +64,7 @@ class ReplyService extends CommonBaseService
                 $tmpRecordOrderIds = [];
                 //p($Bets);
                 $user_id = $Bets[0]['user_id'];
-                $oneUserReplyTxts = "本次打包共 %d 条：\n";
+                $oneUserReplyTxts = "";
                 foreach ($Bets as $k=>$bet){
                     $row = BetsBackend::find()->where(['push_status'=>[BetsBackend::PUSH_STATUS_WAIT, BetsBackend::PUSH_STATUS_FAIL]])
                         ->andWhere(['new_msg_id'=>$bet['new_msg_id'], 'wechat_user_id'=>$bet['wechat_user_id']])->one();
@@ -104,7 +104,7 @@ class ReplyService extends CommonBaseService
                     # 私发，打包回复
                     $wcId = $replyContent['fromUser'];
                 }
-                $oneUserReplyTxts = printf($oneUserReplyTxts, count($message_ids));
+                $oneUserReplyTxts = "本次打包共 ".count($message_ids)." 条：\n".$oneUserReplyTxts;
                 //p(['$oneUserReplyTxts'=>$oneUserReplyTxts]);
 
                 $logArr = ['wechatUserId'=>$wechatUserId, 'message_ids'=>$message_ids, $oneUserReplyTxts, 'atIds'=>$atIds];
