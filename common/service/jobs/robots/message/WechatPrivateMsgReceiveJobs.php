@@ -43,7 +43,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
             $data = $params['data']; # 消息内容体
             $fromUser = $data['fromUser'];
             $content = $data['content'];
-            $mkey = md5(self::class_basename(__CLASS__).'_'.$user_id.'_'.$fromUser.'_'.$content);
+            $mkey = md5(self::class_basename(__CLASS__).'_'.$user_id.'_'.$fromUser.'_'.json_encode($content));
             $num = \Yii::$app->redis->incr($mkey);
             if($num>1){
                 throw_info('短时间内重复操作，忽略处理', 50002);
