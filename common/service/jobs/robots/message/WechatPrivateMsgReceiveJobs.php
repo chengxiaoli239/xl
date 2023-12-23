@@ -47,7 +47,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
             //p([$mkey, self::class_basename(__CLASS__).'_'.$user_id.'_'.$fromUser.'_'.$content]);
             $num = \Yii::$app->redis->incr($mkey);
             if($num>1){
-                throw_info('短时间内重复操作，忽略处理', 50002);
+                //throw_info('短时间内重复操作，忽略处理', 50002);
             }
             \Yii::$app->redis->expire($mkey, 2);
 
