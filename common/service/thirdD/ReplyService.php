@@ -22,7 +22,7 @@ class ReplyService extends CommonBaseService
         $beforeTime = 30 * 60; # 多少分钟内没回复的
         //var_dump('打包回复', 'dddd');
         $wechatUserIds = BetsBackend::find()
-            ->select(['wechat_user_id'])
+            ->select(['wechat_user_id', 'new_msg_id'])
             ->where(['has_reply'=>BetsBackend::HAS_REPLY_NO])
             ->where(['reply_type'=>BetsBackend::REPLY_TYPE_PACKAGE])
             ->andWhere(['>', 'created_at', $now_time-$beforeTime])
@@ -37,7 +37,7 @@ class ReplyService extends CommonBaseService
                 $mkey = CacheKeyService::package($wechatUserId);
                 $exist = \Yii::$app->commonRedis->sadd($mkey, $wechatUserId);
                 if(!$exist){
-                    throw_info('短时间处理，请稍后');
+                    //throw_info('短时间处理，请稍后');
                 }
                 \Yii::$app->commonRedis->expire($mkey, 100);
 
@@ -55,14 +55,16 @@ class ReplyService extends CommonBaseService
                     throw_info('记录为空', 20001);
                 }
                 $count = count($Bets);
-                $countOrderIds = count(ArrayHelper::index($Bets, 'order_id'));
+                $countMsgIds = count(ArrayHelper::index($Bets, 'new_msg_id'));
                 //p([$Bets, $wechatUserId, $sql], 0);
-                $oneUserReplyTxts = "本次打包共 ".$countOrderIds." 条：\n";
+                $oneUserReplyTxts = "本次打包共 ".$countMsgIds." 条：\n";
                 $order_ids = [];
                 $allMoney = 0.00;
                 $allCount = 0;
                 $qihao = '';
                 $tmpRecordOrderIds = [];
+                //p($Bets);
+                $user_id = $Bets[0]['user_id'];
                 foreach ($Bets as $k=>$bet){
                     $row = BetsBackend::find()->where(['push_status'=>[BetsBackend::PUSH_STATUS_WAIT, BetsBackend::PUSH_STATUS_FAIL]])
                         ->andWhere(['new_msg_id'=>$bet['new_msg_id'], 'wechat_user_id'=>$bet['wechat_user_id']])->one();
@@ -76,7 +78,6 @@ class ReplyService extends CommonBaseService
                     $qihao = $bet['qihao'];
                     $tmpRecordOrderIds[$bet['order_id']] = true;
                     $oneUserReplyTxts .= $bet['lottery_name'].'单'.$bet['order_id'].' '.$replyContent['replyTxt']."\n";
-                    $user_id = $bet['user_id'];
                     $order_ids[] = $bet['order_id'];
 
                     $allCount += $bet['count'];
@@ -90,6 +91,7 @@ class ReplyService extends CommonBaseService
                 $dir = \Yii::$aliases['@backend'].'/web/statics/tmp/'.$date; //p($dir);
                 //p($oneUserReplyTxts);
 
+                //p(['user_id'=>$user_id]);
                 # 微信回复用户
                 $MessageService = new EYunMessageOperateService($user_id);
                 if(!empty($replyContent['fromGroup'])){
