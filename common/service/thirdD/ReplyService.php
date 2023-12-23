@@ -68,6 +68,7 @@ class ReplyService extends CommonBaseService
                 foreach ($Bets as $k=>$bet){
                     $row = BetsBackend::find()->where(['push_status'=>[BetsBackend::PUSH_STATUS_WAIT, BetsBackend::PUSH_STATUS_FAIL]])
                         ->andWhere(['new_msg_id'=>$bet['new_msg_id'], 'wechat_user_id'=>$bet['wechat_user_id']])->one();
+                    //p(['row'=>$row, 'new_msg_id'=>$bet['new_msg_id']]);
                     if(!empty($row)){
                         continue;
                     }

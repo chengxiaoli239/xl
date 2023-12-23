@@ -76,7 +76,7 @@ trait EventServiceTrait
             }
             $now_time = time();
             $EYunMessage = new EYunMessage();
-            $wechatUserId = EYunBaseService::getWechatUserId($fromUser);
+            $wechatUserId = EYunBaseService::getWechatUserId($fromUser, $user_id);
             if(empty($user_id)){
                 throw_info('机器人系统user_id不能为空');
             }

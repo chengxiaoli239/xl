@@ -256,8 +256,8 @@ class EYunBaseService  extends BaseService
      * @param string $wcId
      * @return string
      */
-    public static function getWechatUserIdKey($wcId=''){
-        return 'getUserIdByFromUserKey_x1_'.$wcId;
+    public static function getWechatUserIdKey($wcId='', $user_id=0){
+        return 'getUserIdByFromUserKey_x1_'.$wcId.'_'.$user_id;
     }
 
     /**
@@ -282,12 +282,12 @@ class EYunBaseService  extends BaseService
      * @param string $fromUser wxid_ckgr7i2q9fr522
      * @return int
      */
-    public static function getWechatUserId($fromUser='', $is_auto=1){
+    public static function getWechatUserId($fromUser='', $user_id=0, $is_auto=1){
         $m = \Yii::$app->cache;
-        $mkey = self::getWechatUserIdKey($fromUser);
+        $mkey = self::getWechatUserIdKey($fromUser, $user_id);
         $data = $m->get($mkey);
         if(empty($data) OR $is_auto==2){
-            $data = WechatUser::find()->where(['userName'=>$fromUser])->asArray()->limit(1)->one();;
+            $data = WechatUser::find()->where(['userName'=>$fromUser, 'user_id'=>$user_id])->asArray()->limit(1)->one();;
             $m->set($mkey, $data, 1800);
         }
 
