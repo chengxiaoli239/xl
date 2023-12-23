@@ -138,7 +138,7 @@ class ReplyService extends CommonBaseService
                 \Yii::$app->commonRedis->srem($mkey, $wechatUserId);
             }catch (\Exception $e){
                 $logArr = ['wechatUserId'=>$wechatUserId, 'err_msg'=>$e->getMessage()];
-                if($e->getCode()>20000 && $e->getCode()<30000){
+                if($e->getCode()<20000 && $e->getCode()>30000){
                     $logArr['msg'] = $e->getFile().'_'.$e->getLine();
                 }
                 Tool_Common::log('/reply/'.__FUNCTION__, 'ERR', '打包回复异常', $logArr);
