@@ -110,15 +110,15 @@ class Static3dUserProfitsDayAllController extends BaseController
      * @desc 更新是否接收用户消息状态
      * @param $id
      * @param $status
-     * @return \yii\web\Response
+     * @return array
      */
-    public function actionReCalculate($id, $field='', $val=0){
+    public function actionReCalculate(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
 
         push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$this->_user_id, 'msg'=>'报表重新计算', 'wechat_user_id'=>$post['wechatUserId']]);
 
-        return $this->redirect(['index']);
+        return ['status'=>200, 'msg'=>'操作成功，请稍候刷新...'];
     }
 
     /**
