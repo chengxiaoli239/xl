@@ -114,14 +114,11 @@ $this->params['breadcrumbs'][] = $this->title;
 <script src="/statics/datetimepicker/jquery.js"></script>
 <script>
 $(function (){
-    function reCalculate(wechatUserId, date) {
+    function reCalculate(wechatUserId, date, nickName) {
         var data = {wechatUserId:wechatUserId, date:date, 'nickName':nickName};
         console.log(data)
         // 弹出确认对话框
         Ewin.confirm({ message: '确认重新新计算 "'+nickName+'" 报表'}).on(function (e) {
-            rid = $(this).data('rid');
-            console.log(rid)
-            data = {rid:rid}
             url = '/statics/static3d-user-profits-day-all/re-calculate'
             $.post(url, data, function(rst) {
                 Ewin.confirm({ message: rst.msg}).on(function (e) {});
