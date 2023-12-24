@@ -110,19 +110,24 @@ class ReplyService extends CommonBaseService
                 $logArr = ['wechatUserId'=>$wechatUserId, 'message_ids'=>$message_ids, $oneUserReplyTxts, 'atIds'=>$atIds];
                 //p($logArr);
                 if(!empty($replyContent['fromGroup'])){
-                    # 回复两次
-                    $fileName = $replyContent['fromNickName'].'_'.date('ymdHis').'.txt';
-                    $replyTxt = "@".$replyContent['fromNickName']."\n打包自动回复本次共".$count."条，期号：".$qihao;
+                    //$replyTxt = "@".$replyContent['fromNickName']."\n打包自动回复本次共".$count."条，期号：".$qihao;
                     //$result = $MessageService->send($wcId, $replyTxt, $atIds); # 谁发就给谁回 text
 
                     //p([$dir.'/'.$fileName]);
+                    $fileName = $replyContent['fromNickName'].'_'.date('ymdHis').'.txt';
                     Tool_Common::recordFile($dir, $fileName, $oneUserReplyTxts);
                     $filePath = \Yii::$app->params['domain'].'/statics/tmp/'.$date.'/'.$fileName;
                     $result = $MessageService->sendFile($wcId, $filePath, $fileName); # 回复 file
                     $logArr['filePath'] = $filePath;
                     $logArr['fileName'] = $fileName;
                 }else{
-                    $result = $MessageService->send($wcId, $oneUserReplyTxts, $atIds); # 谁发就给谁回 text
+                    $fileName = $replyContent['fromNickName'].'_'.date('ymdHis').'.txt';
+                    Tool_Common::recordFile($dir, $fileName, $oneUserReplyTxts);
+                    $filePath = \Yii::$app->params['domain'].'/statics/tmp/'.$date.'/'.$fileName;
+                    $result = $MessageService->sendFile($wcId, $filePath, $fileName); # 回复 file
+                    $logArr['filePath'] = $filePath;
+                    $logArr['fileName'] = $fileName;
+                    //$result = $MessageService->send($wcId, $oneUserReplyTxts, $atIds); # 谁发就给谁回 text
                 }
 
                 $logArr['result'] = $result;

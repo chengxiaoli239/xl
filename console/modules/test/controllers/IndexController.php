@@ -3,6 +3,7 @@ namespace console\modules\test\controllers;
 
 use backend\models\searchs\wechat\Bets;
 use backend\models\thirdD\BetsBackend;
+use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\NumService;
 use common\service\helpers\ThirdD;
@@ -10,6 +11,7 @@ use common\service\thirdD\match\MatchCodeService;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\OperateLotteryService;
 use common\service\thirdD\sx\Ssxx3dBetService;
+use common\service\thirdD\sx\Sx3dUserService;
 use common\service\thirdD\ThirdDTypeService;
 use common\service\wechat\eyun\EYunMessageOperateService;
 use common\tools\Util;
@@ -29,6 +31,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $TzSystemsUser = TzSystemsUsers::findOne(42);
+            $rst = Sx3dUserService::login($TzSystemsUser);p($rst);
             $betRow = Bets::findOne(22400);
             list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);
             p([$code, $data, $msg]);

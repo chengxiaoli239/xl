@@ -16,6 +16,7 @@ class Sx3dUserService extends CommonBaseService
             #p([dirname(__FILE__), $runtimePath]);
             $domain = $TzSystemsUser->ssc_domain;
             if(!self::checkIsLogin($TzSystemsUser, $siteUserInfo)){
+                //p(['siteUserInfo1'=>$siteUserInfo]);
                 # 1、获取cookie
                 $result = SiteOauthApi::loginPage($domain);
                 if(empty($result['cookie'])){
@@ -41,14 +42,16 @@ class Sx3dUserService extends CommonBaseService
                     'password' => $TzSystemsUser->password,
                     'loginseccodeverify' => 0,
                 ];
-                SiteOauthApi::actLogin($domain, $headers, $params);
+                $loginRst = SiteOauthApi::actLogin($domain, $headers, $params);
+                //p(['params'=>$params, 'loginRst'=>$loginRst, 'date'=>date('Y-m-d H:i:s')], 0);
 
-                $result = ['TzSystemsUserId'=>$TzSystemsUser->id, 'msg'=>'登陆成功'];
+                $result = ['TzSystemsUserId'=>$TzSystemsUser->id, 'username'=>$TzSystemsUser->account, 'password'=>$TzSystemsUser->password, 'msg'=>$loginRst['msg']??'登陆成功'];
             }else{
+                //p(['siteUserInfo2'=>$siteUserInfo]);
                 $TzSystemsUser->balance = $siteUserInfo['credits_remaining'];
                 $TzSystemsUser->save();
                 //var_dump('已是登陆状态', date('Y-m-d H:i:s'));
-                $result = ['TzSystemsUserId'=>$TzSystemsUser->id, 'msg'=>'已是登陆状态'];
+                $result = ['TzSystemsUserId'=>$TzSystemsUser->id, 'username'=>$TzSystemsUser->account, 'msg'=>'已是登陆状态'];
             }
         }catch (\Exception $e){
             #var_dump('异常：'.$e->getMessage().'_'.$e->getFile().'_'.$e->getLine());
