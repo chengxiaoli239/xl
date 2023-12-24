@@ -123,8 +123,7 @@ $(function (){
             data = {rid:rid}
             url = '/statics/static3d-user-profits-day-all/re-calculate'
             $.post(url, data, function(rst) {
-                message = (rst.status) === 200 ? '重置成功' : rst.msg;
-                Ewin.confirm({ message: message}).on(function (e) {});
+                Ewin.confirm({ message: rst.msg}).on(function (e) {});
             });
         });
     }

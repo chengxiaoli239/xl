@@ -116,7 +116,7 @@ class Static3dUserProfitsDayAllController extends BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
 
-        push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$this->_user_id, 'msg'=>'报表重新计算', 'wechat_user_id'=>$post['wechatUserId']]);
+        push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$this->_user_id, 'msg'=>'报表重新计算', 'date'=>$post['date'], 'wechat_user_id'=>$post['wechatUserId']]);
 
         return ['status'=>200, 'msg'=>'操作成功，请稍候刷新...'];
     }
