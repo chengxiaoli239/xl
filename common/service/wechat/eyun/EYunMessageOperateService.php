@@ -515,6 +515,22 @@ class EYunMessageOperateService  extends EYunBaseService
         return [CommonBaseService::CODE_FOR_USER, ['type'=>WechatUserService::TYPE_ORDER_CANCEL], $orderId.'撤单成功，余分：'.$vData['balance']];
     }
 
+    public static function preValidateTime($lottery_type=26){
+        $dataHI = date('H:i');
+        switch ($lottery_type){
+            case 26: # 福
+                if('21:10'<=$dataHI && $dataHI<='23:59'){
+                    throw_info('停盘时间', CommonBaseService::CODE_FOR_USER);
+                }
+                break;
+            case 27: # 排
+                if('21:20'<=$dataHI && $dataHI<='23:59'){
+                    throw_info('停盘时间', CommonBaseService::CODE_FOR_USER);
+                }
+                break;
+        }
+    }
+
     /**
      * 消息处理后的业务处理
      * @param string $text
@@ -557,6 +573,9 @@ class EYunMessageOperateService  extends EYunBaseService
             $replyTxts = [];
             $pushSiteDatas = [];
             foreach ($betCodeContents as $lottery_type=>$contents){
+                # 校验开盘关盘
+                self::preValidateTime($lottery_type);
+
                 $qihao = (string)HN0898Service::getQihao($lottery_type);
                 $oneReplyTxt = '【课号】'.$contents[0]['lottery_name'].$qihao;
                 $betContent = "\n【内容】";
