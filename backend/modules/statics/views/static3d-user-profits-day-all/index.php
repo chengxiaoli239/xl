@@ -111,6 +111,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<script src="/statics/datetimepicker/jquery.js"></script>
 <script>
 $(function (){
     function reCalculate(wechatUserId, date) {
