@@ -25,7 +25,7 @@ class Thirdd extends BaseKj {
         try {
             $lottery_type = self::$lottery_type;
             $dateHI = date('H:i');
-            $seconds = ('00:00'<$dateHI && $dateHI<'21:00') ? 1800 : 300;
+            $seconds = ('00:00'<$dateHI && $dateHI<'21:00') ? 300 : 120;
             if($is_auto==1){
                 self::lockGrab($lottery_type, $seconds);
             }
