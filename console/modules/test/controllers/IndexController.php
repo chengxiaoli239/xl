@@ -15,6 +15,7 @@ use common\service\thirdD\sx\Ssxx3dBetService;
 use common\service\thirdD\sx\Sx3dUserService;
 use common\service\thirdD\ThirdDTypeService;
 use common\service\wechat\eyun\EYunMessageOperateService;
+use common\tools\KjDataGet;
 use common\tools\Util;
 use DateTime;
 use Yii;
@@ -32,15 +33,16 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $betRow = Bets::findOne(26244	);
+            list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);
+            p([$code, $data, $msg]);
+            $rst = KjDataGet::grabOneLotteryKjData($lottery_type=27);p($rst); # 开奖
             $str = 'http://47.107.58.222:8090/wechat/bets/index.html?Bets%5BwechatUserName%5D=wxid_ckgr7i2q9fr522&Bets%5Border_id%5D=&Bets%5Bplay_method%5D=&Bets%5Bqihao%5D=&Bets%5Bstatus%5D=&Bets%5Bpush_status%5D=&Bets%5Blottery_type%5D=';
             p(urldecode($str));
             list($code, $data, $msg) = Statics3dUserDataService::calculateUserDayData($wechat_user_id=250, $date='2023-12-23', [27, 26]);
             p([$code, $data, $msg]);
             $TzSystemsUser = TzSystemsUsers::findOne(42);
             $rst = Sx3dUserService::login($TzSystemsUser);p($rst);
-            $betRow = Bets::findOne(22400);
-            list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);
-            p([$code, $data, $msg]);
             #$code = Json::decode('{"playedId":200,"playedName":"u76f4u9009","actionData":"213,234,879,342,324,456","bonusProp":900,"actionNum":6,"mode":"18"}');
             #list($localToSiteMethodInfo, $codeData) = MatchCodeService::apiMethodDataToLocalMethodData($code);
             #p([$localToSiteMethodInfo, $codeData]);

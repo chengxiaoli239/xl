@@ -154,7 +154,7 @@ class KjDataGet
      * @param int $is_grab_history
      * @return array|null
      */
-    public static function grabOneLotteryKjData(int $lottery_type=DEFAULT_LOTTERY_TYPE, int $is_grab_history=0)
+    public static function grabOneLotteryKjData(int $lottery_type=DEFAULT_LOTTERY_TYPE)
     {
         $m = \Yii::$app->cache;
         $RedisLock = new RedisLock();
