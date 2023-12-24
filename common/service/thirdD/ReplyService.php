@@ -95,9 +95,9 @@ class ReplyService extends CommonBaseService
                 //p(['user_id'=>$user_id]);
                 # 微信回复用户
                 $MessageService = new EYunMessageOperateService($user_id);
+                $oneUserReplyTxts = '@'.$replyContent['fromNickName'].' '.date('Y-m-d H:i:s')."\n".$oneUserReplyTxts;
                 if(!empty($replyContent['fromGroup'])){
                     # 群里发，文件 + @
-                    $oneUserReplyTxts = '@'.$replyContent['fromNickName'].' '.date('Y-m-d H:i:s')."\n".$oneUserReplyTxts;
                     $wcId = $replyContent['fromGroup'];
                     $atIds[] = $replyContent['fromUser'];
                 }else{
@@ -108,27 +108,13 @@ class ReplyService extends CommonBaseService
                 //p(['$oneUserReplyTxts'=>$oneUserReplyTxts]);
 
                 $logArr = ['wechatUserId'=>$wechatUserId, 'message_ids'=>$message_ids, $oneUserReplyTxts, 'atIds'=>$atIds];
+                $fileName = $replyContent['fromNickName'].'_'.date('ymdHis').'.txt';
+                Tool_Common::recordFile($dir, $fileName, $oneUserReplyTxts);
+                $filePath = \Yii::$app->params['domain'].'/statics/tmp/'.$date.'/'.$fileName;
+                $result = $MessageService->sendFile($wcId, $filePath, $fileName); # 回复 file
+                $logArr['filePath'] = $filePath;
+                $logArr['fileName'] = $fileName;
                 //p($logArr);
-                if(!empty($replyContent['fromGroup'])){
-                    //$replyTxt = "@".$replyContent['fromNickName']."\n打包自动回复本次共".$count."条，期号：".$qihao;
-                    //$result = $MessageService->send($wcId, $replyTxt, $atIds); # 谁发就给谁回 text
-
-                    //p([$dir.'/'.$fileName]);
-                    $fileName = $replyContent['fromNickName'].'_'.date('ymdHis').'.txt';
-                    Tool_Common::recordFile($dir, $fileName, $oneUserReplyTxts);
-                    $filePath = \Yii::$app->params['domain'].'/statics/tmp/'.$date.'/'.$fileName;
-                    $result = $MessageService->sendFile($wcId, $filePath, $fileName); # 回复 file
-                    $logArr['filePath'] = $filePath;
-                    $logArr['fileName'] = $fileName;
-                }else{
-                    $fileName = $replyContent['fromNickName'].'_'.date('ymdHis').'.txt';
-                    Tool_Common::recordFile($dir, $fileName, $oneUserReplyTxts);
-                    $filePath = \Yii::$app->params['domain'].'/statics/tmp/'.$date.'/'.$fileName;
-                    $result = $MessageService->sendFile($wcId, $filePath, $fileName); # 回复 file
-                    $logArr['filePath'] = $filePath;
-                    $logArr['fileName'] = $fileName;
-                    //$result = $MessageService->send($wcId, $oneUserReplyTxts, $atIds); # 谁发就给谁回 text
-                }
 
                 $logArr['result'] = $result;
                 if($result['code'] != 1000){
