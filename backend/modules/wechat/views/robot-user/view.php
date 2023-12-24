@@ -122,7 +122,12 @@ $this->registerJs($js);
                         'dataProvider' => $systemDataProvider,
                         'columns' => [
                             ['class' => 'yii\grid\SerialColumn'],
-                            'sys_name',
+                            //'sys_name',
+                            [ 'attribute'=>'sys_name','label'=>'系统','format'=>'raw',
+                                'value'=>function($model){
+                                    return $model->sys_name;
+                                }
+                            ],
                             [ 'attribute'=>'account','label'=>'账号','format'=>'raw',
                                 'value'=>function($model){
                                     return "<span id='site_".$model->id."'>".$model->account."</span>";
@@ -147,21 +152,21 @@ $this->registerJs($js);
                                     return  $model->ssc_domain;
                                 },
                             ],
-                            [ 'attribute'=>'status','label'=>'账号状态',
+                            [ 'attribute'=>'status','label'=>'状态',
                                 'format'=>'raw',
                                 'value'=>function($model){
                                     return $model->status ? '<font color="green">已激活</font>' : '<font color="red">已禁用</font>';
                                 }
                             ],
-                            [ 'attribute'=>'is_auto_bet','label'=>'下注开关',
-                                'format'=>'raw',
-                                'value'=>function($model){
-                                    $txt = $model->is_auto_bet ? '<font color="green">已开启</font>' : '<font color="red">已关闭</font>';
-                                    $url = '/forum/user/switch-auto-bet-status?id='.$model->id.'&status='.($model->is_auto_bet?0:1);
-                                    return Html::a($txt, $url, ['title' => '点击切换','alt'=>'点击切换']);
-                                }
-                            ],
-                            [ 'attribute'=>'is_auto_bet','label'=>'自动登陆',
+                            //[ 'attribute'=>'is_auto_bet','label'=>'下注开关',
+                            //    'format'=>'raw',
+                            //    'value'=>function($model){
+                            //        $txt = $model->is_auto_bet ? '<font color="green">已开启</font>' : '<font color="red">已关闭</font>';
+                            //        $url = '/forum/user/switch-auto-bet-status?id='.$model->id.'&status='.($model->is_auto_bet?0:1);
+                            //        return Html::a($txt, $url, ['title' => '点击切换','alt'=>'点击切换']);
+                            //    }
+                            //],
+                            [ 'attribute'=>'is_auto_bet','label'=>'自动登',
                                 'format'=>'raw',
                                 'value'=>function($model){
                                     $txt = $model->is_auto_login ? '<font color="green">已开启</font>' : '<font color="red">已关闭</font>';

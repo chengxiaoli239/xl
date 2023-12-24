@@ -91,7 +91,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         'profits',
-                        'qihao',
+                        //'qihao',
+                        ['attribute' => 'qihao','label'=>'期号',//'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $txt = '<a href="/wechat/bets/index.html?Bets[qihao]='.$model->qihao.'" title="'.$model->qihao.'">'.$model->qihao.'</a>';
+                                return $txt;
+                            }
+                        ],
                         ['attribute' => 'kj_codes','label'=>'开奖', //'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
@@ -104,7 +111,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value' => function($model) {
                                 $WechatUser = \common\models\wechat\WechatUser::findOne($model->wechat_user_id);
-                                $txt = '<img src="'.$WechatUser->smallHead.'" width="30" height="30" title="'.$WechatUser->userName.'"> <a href="javascript:;" title="'.$WechatUser->userName.'">'.$WechatUser->nickName.'</a>';
+                                $txt = '<a href="/wechat/bets/index.html?Bets[wechatUserName]='.$WechatUser->userName.'" title="'.$WechatUser->userName.'"><img src="'.$WechatUser->smallHead.'" width="30" height="30" title="'.$WechatUser->userName.'"> '.$WechatUser->nickName.'</a>';
                                 return $txt;
                             }
                         ],
@@ -137,7 +144,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'updated_at',
                         ['attribute' => 'update_at','label'=>'时间',//'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
-                                return substr($model->update_at, 5, 11);
+                                return substr(date('m-d H:i'), 0, 11);
                             }
                         ],
                         //['class' => 'yii\grid\ActionColumn'],

@@ -32,6 +32,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $str = 'http://47.107.58.222:8090/wechat/bets/index.html?Bets%5BwechatUserName%5D=wxid_ckgr7i2q9fr522&Bets%5Border_id%5D=&Bets%5Bplay_method%5D=&Bets%5Bqihao%5D=&Bets%5Bstatus%5D=&Bets%5Bpush_status%5D=&Bets%5Blottery_type%5D=';
+            p(urldecode($str));
             list($code, $data, $msg) = Statics3dUserDataService::calculateUserDayData($wechat_user_id=250, $date='2023-12-23', [27, 26]);
             p([$code, $data, $msg]);
             $TzSystemsUser = TzSystemsUsers::findOne(42);
