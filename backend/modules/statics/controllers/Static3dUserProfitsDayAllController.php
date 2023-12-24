@@ -107,7 +107,7 @@ class Static3dUserProfitsDayAllController extends BaseController
     }
 
     /**
-     * @desc ¸üÐÂÊÇ·ñ½ÓÊÕÓÃ»§ÏûÏ¢×´Ì¬
+     * @desc æ›´æ–°æ˜¯å¦æŽ¥æ”¶ç”¨æˆ·æ¶ˆæ¯çŠ¶æ€
      * @param $id
      * @param $status
      * @return array
@@ -116,9 +116,9 @@ class Static3dUserProfitsDayAllController extends BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
 
-        push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$this->_user_id, 'msg'=>'±¨±íÖØÐÂ¼ÆËã', 'wechat_user_id'=>$post['wechatUserId']]);
+        push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$this->_user_id, 'msg'=>'æŠ¥è¡¨é‡æ–°è®¡ç®—', 'wechat_user_id'=>$post['wechatUserId']]);
 
-        return ['status'=>200, 'msg'=>'²Ù×÷³É¹¦£¬ÇëÉÔºòË¢ÐÂ...'];
+        return ['status'=>200, 'msg'=>'æ“ä½œæˆåŠŸï¼Œè¯·ç¨å€™åˆ·æ–°...'];
     }
 
     /**
