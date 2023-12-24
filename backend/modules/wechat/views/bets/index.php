@@ -142,9 +142,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //'created_at',
                         //'updated_at',
-                        ['attribute' => 'update_at','label'=>'时间',//'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'create_at','label'=>'时间',//'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
-                                return substr(date('m-d H:i'), 0, 11);
+                                return substr(date('m-d H:i', $model->created_at), 0, 11);
                             }
                         ],
                         //['class' => 'yii\grid\ActionColumn'],
