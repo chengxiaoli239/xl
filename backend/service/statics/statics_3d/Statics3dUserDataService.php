@@ -52,10 +52,12 @@ class Statics3dUserDataService extends BaseService {
                 ['=', 'wechat_user_id', $wechat_user_id],
                 ['=', 'user_id', $user_id],
                 ['=', 'lottery_type', $lottery_type],
-                ['=', 'status', CommonBaseService::VALID_STATUS],
+                ['IN', 'status', CommonBaseService::VALID_STATUS],
                 ['between', 'created_at', strtotime($date.' 00:00:00'), strtotime($date.' 23:59:59')],
             ];
-            $Bet = Bets::find()->where($baseWhere)->limit(1)->one();
+            $BetQuery = Bets::find()->where($baseWhere)->limit(1);
+            //p($BetQuery->createCommand()->getRawSql());
+            $Bet = $BetQuery->one();
             if(empty($Bet)){
                 continue;
             }
@@ -117,7 +119,7 @@ class Statics3dUserDataService extends BaseService {
                 'AND',
                 ['=', 'wechat_user_id', $wechat_user_id],
                 ['=', 'user_id', $user_id],
-                ['=', 'status', CommonBaseService::VALID_STATUS], # 待处理和
+                ['IN', 'status', CommonBaseService::VALID_STATUS], # 待处理和
                 ['between', 'created_at', strtotime($date.' 00:00:00'), strtotime($date.' 23:59:59')],
             ];
             $Bet = Bets::find()->where($baseWhere)->limit(1)->one();

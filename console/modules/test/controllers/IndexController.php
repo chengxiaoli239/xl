@@ -6,6 +6,7 @@ use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\NumService;
+use backend\service\statics\statics_3d\Statics3dUserDataService;
 use common\service\helpers\ThirdD;
 use common\service\thirdD\match\MatchCodeService;
 use common\service\thirdD\MethodMatchService;
@@ -31,6 +32,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            list($code, $data, $msg) = Statics3dUserDataService::calculateUserDayData($wechat_user_id=250, $date='2023-12-23', [27, 26]);
+            p([$code, $data, $msg]);
             $TzSystemsUser = TzSystemsUsers::findOne(42);
             $rst = Sx3dUserService::login($TzSystemsUser);p($rst);
             $betRow = Bets::findOne(22400);

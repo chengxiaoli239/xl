@@ -233,7 +233,8 @@ class IndexController extends Controller
 
     /**
      * @description 本地处理开奖数据
-     * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii data/index/op-kj     * @return array
+     * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii data/index/op-kj
+     * @return array
      */
     public function actionOpKj(){
         self::_init();

@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\searchs\statics\Static3dUserProfitsDayAll */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = '日报表';
+$this->title = '日报表-总';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <link rel="stylesheet" href="/vendors/layui/2.5.4/css/layui.css?v=2020">
