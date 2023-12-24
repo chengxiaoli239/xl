@@ -2,6 +2,9 @@
 
 namespace backend\modules\statics\controllers;
 
+use backend\service\HN0898Service;
+use common\service\jobs\statics_3d\UserDayStaticsJobs;
+use common\service\wechat\WechatUserService;
 use Yii;
 use backend\models\statics\Static3dUserProfitsDayAll;
 use backend\models\searchs\statics\Static3dUserProfitsDayAll as Static3dUserProfitsDayAllSearch;
@@ -101,6 +104,21 @@ class Static3dUserProfitsDayAllController extends BaseController
         return $this->render('update', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * @desc 更新是否接收用户消息状态
+     * @param $id
+     * @param $status
+     * @return \yii\web\Response
+     */
+    public function actionReCalculate($id, $field='', $val=0){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+
+        push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$this->_user_id, 'msg'=>'报表重新计算', 'wechat_user_id'=>$post['wechatUserId']]);
+
+        return $this->redirect(['index']);
     }
 
     /**

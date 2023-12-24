@@ -1,3 +1,12 @@
+<link rel="stylesheet" href="/vendors/layui/2.4.5/css/modules/layer/default/layer.css?v=3.1.1">
+<link rel="stylesheet" href="/vendors/layui/2.5.4/css/layui.css?v=2020">
+<link rel="stylesheet" href="/css/layui/global.css?v={{STATIC_VERSION}}">
+<script type="text/javascript" src="/vendors/layui/2.4.5/layui.js"></script>
+<script type="text/javascript" src="/vendors/layui-layer/3.1.1/layer.js"></script>
+<script type="text/javascript" src="/vendors/atrtemplate/4.13.2/template-web.js"></script>
+<script type="text/javascript" src="/statics/js/jquery-2.0.3.js"></script>
+<script type="text/javascript" src="/js/layui/global.js?v={{STATIC_VERSION}}"></script>
+<script type="text/javascript" src="/js/common.js?v={{STATIC_VERSION}}"></script>
 <?php
 
 use yii\helpers\Html;
@@ -10,15 +19,6 @@ use yii\grid\GridView;
 $this->title = '日报表-总';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<link rel="stylesheet" href="/vendors/layui/2.5.4/css/layui.css?v=2020">
-<link rel="stylesheet" href="/css/layui/global.css?v={{STATIC_VERSION}}">
-<script type="text/javascript" src="/vendors/layui/2.4.5/layui.js"></script>
-<script type="text/javascript" src="/vendors/layui-layer/3.1.1/layer.js"></script>
-<script type="text/javascript" src="/vendors/atrtemplate/4.13.2/template-web.js"></script>
-<script type="text/javascript" src="/statics/js/jquery-2.0.3.js"></script>
-<script type="text/javascript" src="/js/layui/global.js?v={{STATIC_VERSION}}"></script>
-<script type="text/javascript" src="/js/common.js?v={{STATIC_VERSION}}"></script>
-
 <section class="static3d-user-profits-day-all-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
@@ -95,6 +95,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return substr($model->update_time, 5, 11);
                             },
                         ],
+                        ['attribute' => 'profits', 'label'=>'操作', //'headerOptions' => ['width' => '5%'],
+                            'format' => 'raw',
+                            'value'=> function($model){
+                                $WechatUser = \common\models\wechat\WechatUser::findOne($model->wechat_user_id);
+                                return '<div class="btn btn-success btn-xs" id="reCalculateConfirm" data-nickName="'.$WechatUser->nickName.'" data-wechatUserId="'.$model->wechat_user_id.'" data-date="'.$model->date.'">重新计算</div>';
+                            },
+                        ],
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
@@ -104,3 +111,29 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<script>
+$(function (){
+    function reCalculate(wechatUserId, date) {
+        var data = {wechatUserId:wechatUserId, date:date, 'nickName':nickName};
+        console.log(data)
+        // 弹出确认对话框
+        Ewin.confirm({ message: '确认重新新计算 "'+nickName+'" 报表'}).on(function (e) {
+            rid = $(this).data('rid');
+            console.log(rid)
+            data = {rid:rid}
+            url = '/statics/static3d-user-profits-day-all/re-calculate'
+            $.post(url, data, function(rst) {
+                message = (rst.status) === 200 ? '重置成功' : rst.msg;
+                Ewin.confirm({ message: message}).on(function (e) {});
+            });
+        });
+    }
+
+    $(document).on('click', '[id="reCalculateConfirm"]', function () {
+        wechatUserId = $(this).attr('data-wechatUserId');
+        date = $(this).data('date');
+        nickName = $(this).attr('data-nickName');
+        reCalculate(wechatUserId, date, nickName)
+    });
+})
+</script>

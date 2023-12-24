@@ -80,6 +80,7 @@ class WechatUserController extends BaseController
 
         return $this->redirect(['index']);
     }
+
     /**
      * Creates a new WechatUser model.
      * If creation is successful, the browser will be redirected to the 'view' page.

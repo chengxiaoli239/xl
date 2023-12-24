@@ -344,28 +344,6 @@ $this->registerJs($js);
     </div>
 </div>
 
-<div class="modal fade" id="tipModalResetProfits" tabindex="-1" role="dialog" aria-labelledby="ModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span></button>
-                <h4 class="modal-title" id="tip_msg_profits_title"></h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-group up-reason">
-                    <span id="tip_msg_profits"></span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" id="opConfirmProfits">确定</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
     $(function () {
@@ -407,61 +385,6 @@ $this->registerJs($js);
             $('#tip_msg_profits').html('确定归零所有盈利')
             $('#tipModalResetProfits').modal('show');
         });
-        // 盈利归零
-        $('#opConfirmProfits').click(function () {
-            $url = "/forum/user-sys-plans/re-calculate-profits?type=2"; // 归零盈利
-            $.get($url, function(rst) {
-                console.log(rst)
-                if(rst.status === 200) {
-                    window.location.href = '/forum/user/view.html';
-                }
-            },'JSON');
-        });
-
-        // 止盈止损
-        $('#setProfits').click(function () {
-            $('#set_msg_title').html('设置止盈止损');
-            $('#setProfitsModal').modal('show');
-        });
-        // 网盘跟买
-        $('#setWpFollow').click(function () {
-            //$('#set_follow_msg_title').html('设置跟买');
-            $('#setFollowModal').modal('show');
-        });
-
-        // 止盈止损
-        $('#setProfitsBtn').click(function () {
-            profits = $('#take_profits').val()
-            loss = $('#stop_loss').val()
-            var data = {take_profits:profits, stop_loss:loss};
-            $.post("/forum/user/set-profits",data,function(rst) {
-                console.log(rst)
-                if(rst.status == 200) {
-                    window.href.reload()
-                }
-            },'JSON');
-        });
-
-        // 跟买
-        $('#setFollowBtn').click(function () {
-            flow_wp_accounts = $('#flow_wp_accounts').val()
-            flow_wp_player_bs = $('#flow_wp_player_bs').val()
-            flow_op_accounts = $('#flow_op_accounts').val()
-            flow_op_player_bs = $('#flow_op_player_bs').val()
-            var data = {
-                flow_wp_accounts:flow_wp_accounts,
-                flow_wp_player_bs:flow_wp_player_bs,
-                flow_op_accounts:flow_op_accounts,
-                flow_op_player_bs:flow_op_player_bs,
-            };
-            $.post("/forum/user/set-follow-buy",data,function(rst) {
-                console.log(rst)
-                if(rst.status == 200) {
-                    window.href.reload()
-                }
-            },'JSON');
-        });
-
     });
 </script>
 
