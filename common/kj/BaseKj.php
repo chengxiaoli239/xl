@@ -35,7 +35,7 @@ class BaseKj extends BaseService {
      */
     public static function lockGrab(int $lotery_type=26, int $seconds=300): bool
     {
-        $exist_key = 'grab_lottery_data_'.$lotery_type;
+        $exist_key = 'grab_lottery_data_x0_'.$lotery_type;
         $exist = \Yii::$app->redis->sadd($exist_key, $lotery_type);
         if(!$exist){
             throw_info('短时间内多次处理key:'.$exist_key, 30002);
