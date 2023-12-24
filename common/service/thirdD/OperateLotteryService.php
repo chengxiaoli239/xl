@@ -382,14 +382,16 @@ class OperateLotteryService extends CommonBaseService
         // todo 一定待处理
         //p([$kjCode, $betCodes, $kjCodeArr]);
         if(strpos($codes, 'X') !== false){
-            $p = strpos($codes, 'X');
             $allBetCodes = explode(MethodMatchService::ZU_SPLIT_FLAG, $codes);
-            if(isset($tmpKjCodeArr[$p])){
-                $tmpKjCodeArr[$p] = 'X';
-            }
-            $kjCodeArrStr = implode('', $tmpKjCodeArr);
             $betCoudeCounts = array_count_values($allBetCodes);
-            $zjCount = $betCoudeCounts[$kjCodeArrStr] ? : 0;
+
+            $kjYdDatas = ThirdD::getYiDingCode($kjCodeArr);
+            //p([$allBetCodes, $betCoudeCounts, $kjCodeArr, $kjCode, $kjYdDatas]);
+
+            $zjCount = 0;
+            foreach ($kjYdDatas as $kjYdData){
+                $zjCount += $betCoudeCounts[$kjYdData] ? : 0;
+            }
             //p([$codes, $p, $kjCodeArr, $tmpKjCodeArr, $kjCodeArrStr, $allBetCodes, $betCoudeCounts, $zjCount]);
         }else {
             $zjCount = 0;
@@ -1012,6 +1014,7 @@ class OperateLotteryService extends CommonBaseService
                 'status' => $status,
                 'bonus' => $bonus,
                 'profits' => $profits,
+                'kj_codes' => $kjCode,
                 'updated_at' => time(),
             ];
             if($betRow->push_status == BetsBackend::PUSH_STATUS_WAIT){

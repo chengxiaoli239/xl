@@ -123,13 +123,13 @@ $this->registerJs($js);
                         'columns' => [
                             ['class' => 'yii\grid\SerialColumn'],
                             'sys_name',
-                            [ 'attribute'=>'account','label'=>'系统余额','format'=>'raw',
+                            [ 'attribute'=>'account','label'=>'账号','format'=>'raw',
                                 'value'=>function($model){
                                     return "<span id='site_".$model->id."'>".$model->account."</span>";
                                 }
                             ],
                             //'balance',
-                            [ 'attribute'=>'balance','label'=>'系统余额','format'=>'raw',
+                            [ 'attribute'=>'balance','label'=>'余额','format'=>'raw',
                                 'value'=>function($model){
                                     return "<span id='balance_".$model->id."'>".$model->balance."</span>";
                                 }

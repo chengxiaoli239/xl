@@ -10,6 +10,8 @@ use common\open\thirdD\SxThirdDBase;
 class SiteOrderApi extends SxThirdDBase
 {
 
+    # 忽略code
+    const IGNORE_CODE = 40000;
     const PAY_STATUS_UN_PAY = 1;
     const PAY_STATUS_PAID = 2;
     const PAY_STATUS_OPTIONS = [

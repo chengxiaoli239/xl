@@ -221,6 +221,30 @@ class ThirdD extends BaseService
     }
 
     /**
+     * @param array $codes
+     * @return array
+     */
+    public static function getYiDingCode(array $codes=[]): array
+    {
+        $data = [];
+        foreach ($codes as $key=>$code){
+            switch (true){
+                case $key == 0:
+                    $data[] = $code.'XX';
+                    break;
+                case $key == 1:
+                    $data[] = 'X'.$code.'X';
+                    break;
+                case $key == 2:
+                    $data[] = 'XX'.$code;
+                    break;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * 匹配百位置以及号码
      * @param string $text
      * @return array

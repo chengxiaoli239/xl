@@ -1,7 +1,6 @@
 <?php
 /**
  * Created by PhpStorm.
- * User:wangyegao
  * Date: 18/02/04
  * Time: 下午23:55
  */

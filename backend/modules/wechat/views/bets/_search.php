@@ -34,7 +34,7 @@ $playMethodOptions = $datas;
 
     <div class="row">
         <div class="col-lg-2 col-xs-4">
-            <?= $form->field($model, 'wechat_user_id')
+            <?= $form->field($model, 'wechatUserName')
                 ->label('微信ID', ['class' => 'control-label hidden-xs'])->textInput(['placeholder' => '微信ID'])
             ?>
         </div>
@@ -56,8 +56,13 @@ $playMethodOptions = $datas;
         </div>
         <div class="col-lg-2 col-xs-4">
             <?php echo $form->field($model, 'status')->dropDownList(
-        CommonBaseService::STATUS_OPTIONS, ['prompt'=>'-选择状态-']
+                CommonBaseService::STATUS_OPTIONS, ['prompt'=>'-选择状态-']
             )->label('状态', ['class' => 'control-label hidden-xs']); ?>
+        </div>
+        <div class="col-lg-2 col-xs-4">
+            <?php echo $form->field($model, 'push_status')->dropDownList(
+        \backend\models\thirdD\BetsBackend::PUSH_STATUS_OPTIONS, ['prompt'=>'-选择状态-']
+            )->label('盘口', ['class' => 'control-label hidden-xs']); ?>
         </div>
         <div class="col-lg-2 col-xs-4">
             <?php echo $form->field($model, 'lottery_type')->dropDownList(

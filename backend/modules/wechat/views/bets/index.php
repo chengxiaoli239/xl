@@ -95,15 +95,16 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'kj_codes','label'=>'开奖', //'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                return $model->status==3? '<strong><font color="red">已撤单</font></strong>' :
+                                $txt = $model->status==3? '<strong><font color="red">已撤单</font></strong>' :
                                     (($model->status===0) ? '<strong><font color="green">待开奖</font></strong>' : $model->kj_codes);
+                                return $txt;
                             }
                         ],
                         ['attribute' => 'wechat_user_id','label'=>'微信',//'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 $WechatUser = \common\models\wechat\WechatUser::findOne($model->wechat_user_id);
-                                $txt = '<img src="'.$WechatUser->smallHead.'" width="30" height="30"> '.$WechatUser->nickName;
+                                $txt = '<img src="'.$WechatUser->smallHead.'" width="30" height="30" title="'.$WechatUser->userName.'"> <a href="javascript:;" title="'.$WechatUser->userName.'">'.$WechatUser->nickName.'</a>';
                                 return $txt;
                             }
                         ],

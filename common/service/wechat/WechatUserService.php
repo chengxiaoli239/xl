@@ -108,8 +108,8 @@ class WechatUserService extends BaseService
         return $data;
     }
 
-    public static function syncWechatFriends($user_id=0){
-
+    public static function syncWechatFriends($user_id=0): array
+    {
         try {
 
             $RobotUser = RobotUser::findOne(['user_id'=>$user_id]);
@@ -122,12 +122,13 @@ class WechatUserService extends BaseService
             # 登录成功之后 - 初始化通讯录
             $e = new EYunBaseService($user_id);
             # 初始化通讯录列表（第四步）
-            $initAddressListRst = $e->initAddressList();
+            $e->initAddressList();
             # 获取通讯录列表（第五步）
             $response = $e->getAddressList($RobotUser->wcId);
         }catch (\Exception $e){
             return ['code'=>300, 'msg'=>$e->getMessage()];
         }
+        return ['code'=>200, 'data'=>$response, 'msg'=>'操作成功'];
     }
 
 }

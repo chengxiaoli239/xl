@@ -115,20 +115,6 @@ class RobotUserController extends BaseController
     }
 
     /**
-     * 同步微信好友
-     * @return array
-     */
-    public function actionSyncWechatFriends(){
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $post = \Yii::$app->request->post();
-
-        $rst = WechatUserService::syncWechatFriends($this->_user_id);
-        Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '执行微信登录', ['post'=>$post, 'rst'=>$rst]);
-
-        return $rst;
-    }
-
-    /**
      * Creates a new RobotUser model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed

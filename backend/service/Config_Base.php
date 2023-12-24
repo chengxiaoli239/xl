@@ -1,7 +1,7 @@
 <?php
 /**
  *  核心配置
- * author: wangyegao
+ *
  * Date: 2018-02-16
  */
 namespace backend\service;

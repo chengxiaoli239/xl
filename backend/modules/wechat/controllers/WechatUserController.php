@@ -4,6 +4,7 @@ namespace backend\modules\wechat\controllers;
 
 use backend\service\HN0898Service;
 use common\service\wechat\WechatUserService;
+use common\tools\Tool_Common;
 use Yii;
 use backend\models\wechat\WechatUser;
 use backend\models\searchs\wechat\WechatUser as WechatUserSearch;
@@ -63,7 +64,7 @@ class WechatUserController extends BaseController
 
 
     /**
-     * @desc �����Ƿ�����û���Ϣ״̬
+     * @desc 更新是否接收用户消息状态
      * @param $id
      * @param $status
      * @return \yii\web\Response
@@ -115,6 +116,26 @@ class WechatUserController extends BaseController
         return $this->render('update', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * 同步微信好友
+     * @return array
+     */
+    public function actionSyncFriends(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        $mkey = __FUNCTION__.'_'.$this->_user_id;
+        $num = \Yii::$app->redis->incr($mkey);
+        if($num>1){
+            return ['status'=>300, 'msg'=>'请求太频繁请稍后重试'];
+        }
+        \Yii::$app->redis->expire($mkey, 120);
+
+        $rst = WechatUserService::syncWechatFriends($this->_user_id);
+        Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '同步微信好友', ['post'=>$post, 'rst'=>$rst]);
+
+        return $rst;
     }
 
     /**

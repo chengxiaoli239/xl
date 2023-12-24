@@ -44,6 +44,12 @@ class Bets extends \common\models\base\BaseModel
         return 'lt_bets';
     }
 
+    // 定义与wechat_user表的关联关系
+    public function getWechatUser()
+    {
+        return $this->hasOne(WechatUser::class, ['id' => 'wechat_user_id']);
+    }
+
     /**
      * @inheritdoc
      */

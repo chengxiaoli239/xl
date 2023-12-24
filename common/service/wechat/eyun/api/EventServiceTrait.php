@@ -2,6 +2,8 @@
 namespace common\service\wechat\eyun\api;
 
 use common\models\eyun\EYunMessage;
+use common\open\thirdD\api\SiteOrderApi;
+use common\service\cache\CacheKeyService;
 use common\service\jobs\log\ErrorLogStaticsJobs;
 use common\service\jobs\robots\message\WechatPrivateMsgReceiveJobs;
 use common\service\jobs\robots\user\WechatFriendsInfoJobs;
@@ -21,6 +23,9 @@ trait EventServiceTrait
         $messageType = $data['messageType'];
         $wcId = $data['wcId'];
         list($code, $dd, $msg) = self::saveMessage($data);
+        if($code == SiteOrderApi::IGNORE_CODE){
+            return ['code'=>'1000', 'message'=>'消息接收成功'];
+        }
         Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '接收e云消息', ['messageType'=>$messageType, 'dd'=>$dd, 'data'=>$data]);
         $user_id = $dd['user_id'];
 
@@ -69,7 +74,12 @@ trait EventServiceTrait
             $newMsgId = $params['newMsgId'];
             $fromGroup = $params['fromGroup']??'';
             $where = ['toUser'=>$toUser, 'msgId'=>$msgId, 'newMsgId'=>$newMsgId];
-            //p($where);
+            $mkey = CacheKeyService::eyun($toUser, $msgId, $newMsgId);
+            $num = \Yii::$app->commonRedis->incr($mkey);
+            if($num>1){
+                throw_info('消息接收成功', SiteOrderApi::IGNORE_CODE);
+            }
+            \Yii::$app->commonRedis->expire($mkey, 5);
             $EYunMessage = EYunMessage::findOne($where);
             if(!empty($EYunMessage)){
                 return ['code'=>'1000', 'message'=>'消息接收成功'];
@@ -102,8 +112,10 @@ trait EventServiceTrait
 
         }catch (\Exception $e){
             Tool_Common::log('/eyun/'.__FUNCTION__, 'ERR', '消息内容保存异常', ['data'=>$data, 'err_msg'=>$e->getMessage()]);
-            push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>'消息内容保存异常：'.$e->getMessage()]);
-            return [30001, [], $e->getMessage()];
+            if($e->getCode()==SiteOrderApi::IGNORE_CODE){
+                push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>'消息内容保存异常：'.$e->getMessage()]);
+            }
+            return [$e->getCode()==SiteOrderApi::IGNORE_CODE ? SiteOrderApi::IGNORE_CODE : 30001, [], $e->getMessage()];
         }
         $dd = [
             'params' => $params,

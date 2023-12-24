@@ -1,7 +1,6 @@
 <?php
 /**
  * Created by PhpStorm.
- * User:wangyegao
  * Date: 18/02/04
  * Time: 下午23:55
  */
@@ -131,6 +130,12 @@ class IndexController extends Controller
     public function actionApiLog(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
+        $mkey = 'err_log_'.__FUNCTION__;
+        $num = \Yii::$app->redis->incr($mkey);
+        if($num>2){
+            return ['status'=>200, 'msg'=>'接收成功'];
+        }
+        \Yii::$app->redis->expire($mkey, 900);
 
         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '用信息接口', ['post'=>$post]);
 
@@ -398,7 +403,6 @@ class IndexController extends Controller
         #$rst = $e->getAddressList(); p($rst); # 第四步
 
         $e = new EYunMessageOperateService($user_id);
-        $rst = $e->send($wcId='wangyegao2012', $content='嗯，知道了'); p($rst); # 第四步 高子：wangyegao2012  破局：wxid_875i1kgd38x122
         $rst = $e->send($wcId='wxid_875i1kgd38x122', $content='晚上好，早点睡，明天再聊'); p($rst); # 第四步 wangyegao2012
 
         p(['rst'=>$rst]);

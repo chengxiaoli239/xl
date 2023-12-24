@@ -2,11 +2,13 @@
 namespace common\service\cache;
 
 use common\service\BaseService;
+use common\service\cache\keys\message\MessageCacheKeyTrait;
 use common\service\cache\keys\message\MessageReplyCacheKeyTrait;
 
 class CacheKeyService extends BaseService
 {
     use MessageReplyCacheKeyTrait;
+    use MessageCacheKeyTrait;
 
     /**
      * 获取缓存

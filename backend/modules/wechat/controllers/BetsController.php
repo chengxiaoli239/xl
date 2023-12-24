@@ -2,6 +2,7 @@
 
 namespace backend\modules\wechat\controllers;
 
+use backend\models\thirdD\BetsBackend;
 use Yii;
 use backend\models\wechat\Bets;
 use backend\models\searchs\wechat\Bets as BetsSearch;
@@ -117,12 +118,12 @@ class BetsController extends BaseController
      * Finds the Bets model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Bets the loaded model
+     * @return BetsBackend|Bets
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Bets::findOne($id)) !== null) {
+        if (($model = BetsBackend::findOne($id)) !== null) {
             return $model;
         }
 

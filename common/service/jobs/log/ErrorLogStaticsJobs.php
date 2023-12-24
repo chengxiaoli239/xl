@@ -22,6 +22,12 @@ class ErrorLogStaticsJobs extends CommonJob {
     {
         try {
             $errorMsg = $params['err_msg'];
+            $mkey = 'get_error_log_static';
+            $num = \Yii::$app->redis->incr($mkey);
+            if($num>2){
+                return '短时间重复忽略处理';
+            }
+            \Yii::$app->redis->expire($mkey, 900);
             \common\open\thirdD\api\SiteOrderApi::pushToLog(['err_msg'=>$errorMsg]);
 
             Tool_Common::log('/err_log/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params]);

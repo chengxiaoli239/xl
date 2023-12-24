@@ -12,15 +12,18 @@ use backend\models\wechat\Bets as BetsModel;
  */
 class Bets extends BetsModel
 {
+    public $wechatUserName;  // 添加这一行
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['id', 'user_id', 'wechat_user_id', 'order_id', 'play_method', 'count', 'status', 'cancel_status', 'is_simulate', 'lottery_type', 'is_profits_record', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'user_id', 'wechat_user_id', 'order_id', 'play_method', 'count', 'status', 'push_status', 'cancel_status', 'is_simulate', 'lottery_type', 'is_profits_record', 'created_at', 'updated_at'], 'integer'],
             [['codes', 'qihao', 'kj_codes', 'lottery_name', 'bet_desc', 'update_at'], 'safe'],
             [['bet_money', 'bonus', 'single', 'ratio', 'profits'], 'number'],
+            [['wechatUserName'], 'string'],  // 适当地添加其他规则
         ];
     }
 
@@ -42,9 +45,13 @@ class Bets extends BetsModel
      */
     public function search($params)
     {
-        $query = BetsModel::find();
-
+        #$query = BetsModel::find()->alias('b')->joinWith(['wechatUser' => function($query) {
+        #    $query->from(['wechat_user' => 'lt_wechat_user']);  // 添加这一行，使用别名
+        #}]);
         // add conditions that should always apply here
+
+        $query = BetsModel::find()->alias('b');
+        $query->joinWith(['wechatUser']); // 这里的 'wechatUser' 是你在 BetsModel 中定义的关联关系
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -61,34 +68,40 @@ class Bets extends BetsModel
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
-            'user_id' => $this->user_id,
-            'wechat_user_id' => $this->wechat_user_id,
-            'order_id' => $this->order_id,
-            'play_method' => $this->play_method,
-            'bet_money' => $this->bet_money,
-            'bonus' => $this->bonus,
-            'single' => $this->single,
-            'count' => $this->count,
-            'ratio' => $this->ratio,
-            'profits' => $this->profits,
-            'status' => $this->status,
-            'push_status' => $this->push_status,
-            'cancel_status' => $this->cancel_status,
-            'is_simulate' => $this->is_simulate,
-            'lottery_type' => $this->lottery_type,
-            'is_profits_record' => $this->is_profits_record,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'update_at' => $this->update_at,
+            'b.id' => $this->id,
+            'b.user_id' => $this->user_id,
+            'b.wechat_user_id' => $this->wechat_user_id,
+            'b.order_id' => $this->order_id,
+            'b.play_method' => $this->play_method,
+            'b.bet_money' => $this->bet_money,
+            'b.bonus' => $this->bonus,
+            'b.single' => $this->single,
+            'b.count' => $this->count,
+            'b.ratio' => $this->ratio,
+            'b.profits' => $this->profits,
+            'b.status' => $this->status,
+            'b.push_status' => $this->push_status,
+            'b.cancel_status' => $this->cancel_status,
+            'b.is_simulate' => $this->is_simulate,
+            'b.lottery_type' => $this->lottery_type,
+            'b.is_profits_record' => $this->is_profits_record,
+            'b.created_at' => $this->created_at,
+            'b.updated_at' => $this->updated_at,
+            'b.update_at' => $this->update_at,
         ]);
 
-        $query->andFilterWhere(['like', 'codes', $this->codes])
-            ->andFilterWhere(['like', 'qihao', $this->qihao])
-            ->andFilterWhere(['like', 'kj_codes', $this->kj_codes])
-            ->andFilterWhere(['like', 'push_desc', $this->push_desc])
-            ->andFilterWhere(['like', 'lottery_name', $this->lottery_name])
-            ->andFilterWhere(['like', 'bet_desc', $this->bet_desc]);
+        $query->andFilterWhere(['like', 'b.codes', $this->codes])
+            ->andFilterWhere(['like', 'b.qihao', $this->qihao])
+            ->andFilterWhere(['like', 'b.kj_codes', $this->kj_codes])
+            ->andFilterWhere(['like', 'b.push_desc', $this->push_desc])
+            ->andFilterWhere(['like', 'b.lottery_name', $this->lottery_name])
+            ->andFilterWhere(['like', 'b.bet_desc', $this->bet_desc]);
+        // 在 grid filtering conditions 中使用关联表的字段
+        $query->andFilterWhere(['like', 'lt_wechat_user.userName', $this->wechatUserName]);
+        $query->addSelect(['b.*', 'lt_wechat_user.userName']);
+
+        //p([$this->wechatUserName, $query->createCommand()->getRawSql()]);
+        #\Yii::info($query->createCommand()->getRawSql(), 'sql');
 
         return $dataProvider;
     }
