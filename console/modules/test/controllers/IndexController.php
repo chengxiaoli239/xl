@@ -34,6 +34,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $MessageService = new EYunMessageOperateService($user_id=22);
+            $rst = $MessageService->searchUser(''); p($rst);
             $lottery_types = StaticService::getGrabDataLotteryTypes($useCache=0);
             p($lottery_types);
             $betRow = Bets::findOne(26244	);

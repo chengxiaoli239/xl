@@ -40,6 +40,7 @@ class AfterWechatLoginJobs extends CommonJob {
             $RobotUser->wId = $m->get($wIdKey); # 登录成功，从第二步获取二维码的同时返回的实例存缓存，这里从缓存取
             $RobotUser->wechat_status = $wechatStatus;
             $RobotUser->nickName = $params['nickName'];
+            $RobotUser->desc = '登陆成功...'.date('Y-m-d H:i:s');
             $RobotUser->save();
 
             # 记录历史登陆记录

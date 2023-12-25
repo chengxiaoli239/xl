@@ -732,6 +732,30 @@ class EYunMessageOperateService  extends EYunBaseService
     }
 
     /**
+     * 搜索好友
+     * @param string $wcId
+     * @return bool|mixed|null
+     */
+    public function searchUser($wcId=''){
+
+        try {
+            $url = $this->base_url . '/searchUser';
+            $params = [
+                'wId' => $this->wId,
+                'wcId' => trim($wcId), # 好友微信id/群id,多个好友/群 以","分隔每次最多支持20个微信/群号,记得本接口随机间隔300ms-1500ms，频繁调用容易导致掉线
+            ];
+            $response = $this->request($url, $params, $this->headers);
+        }catch (\Exception $e){
+            Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '发送文本消息-异常', ['url'=>$url, 'params'=>$params, 'err_msg'=>$e->getMessage()]);
+            return ['code'=>30001, 'message'=>$e->getMessage()];
+        }
+
+        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '发送文本消息', ['url'=>$url, 'params'=>$params, 'response'=>$response]);
+
+        return $response;
+    }
+
+    /**
      * 文本消息发送
      * @param string $wcId 私聊则位用户的微信id，群里则位群里id
      * @param string $content

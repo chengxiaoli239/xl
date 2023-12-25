@@ -37,27 +37,31 @@ class EYunUserJobs extends CommonJob {
             if($response['code'] == 1000 && !empty($response['data'])) {
                 $datas = $response['data'];
                 foreach ($datas as $data){
-                    $where = ['user_id'=>$user_id, 'userName'=>$data['userName']];
-                    $WechatUser = WechatUser::findOne($where);
-                    $setData = [];
-                    if(empty($WechatUser)){
-                        $WechatUser = new WechatUser();
-                        $setData = array_merge($setData, [
-                            'user_id'=>$user_id,
-                            'userName'=>$data['userName'],
-                            'created_at' => $now_time,
-                        ]);
-                    }
+                    try {
+                        $where = ['user_id'=>$user_id, 'userName'=>$data['userName']];
+                        $WechatUser = WechatUser::findOne($where);
+                        $setData = [];
+                        if(empty($WechatUser)){
+                            $WechatUser = new WechatUser();
+                            $setData = array_merge($setData, [
+                                'user_id'=>$user_id,
+                                'userName'=>$data['userName'],
+                                'created_at' => $now_time,
+                            ]);
+                        }
 
-                    $data['aliasName'] = $data['aliasName']??'';
-                    $data['nickName'] = \common\tools\Common::filterEmoji($data['nickName']);
-                    $data['remark'] = \common\tools\Common::filterEmoji($data['remark']);//base64_encode($data['remark']);
-                    $setData['updated_at'] = $now_time;
-                    $setData = array_merge($setData, $data);
-                    Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', '微信用户信息更新', ['setData'=>$setData]);
-                    $WechatUser->setAttributes($setData, false);
-                    if(!$WechatUser->save()){
-                        throw_info(Json::encode($WechatUser->getErrors(), 320));
+                        $data['aliasName'] = $data['aliasName']??'';
+                        $data['nickName'] = \common\tools\Common::filterEmoji($data['nickName']);
+                        $data['remark'] = \common\tools\Common::filterEmoji($data['remark']);//base64_encode($data['remark']);
+                        $setData['updated_at'] = $now_time;
+                        $setData = array_merge($setData, $data);
+                        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', '微信用户信息更新', ['setData'=>$setData]);
+                        $WechatUser->setAttributes($setData, false);
+                        if(!$WechatUser->save()){
+                            throw_info(Json::encode($WechatUser->getErrors(), 320));
+                        }
+                    }catch (\Exception $e){
+                        Tool_Common::log('/eyun/'.self::class_basename(__CLASS__), 'INFO', '微信用户信息异常', ['setData'=>$setData, 'err_msg'=>$e->getMessage()]);
                     }
                 }
             }
