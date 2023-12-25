@@ -128,7 +128,7 @@ class QxcTcw extends BaseKj{
                 Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '获取九九期号', ['lottery_type'=>$lottery_type, 'rst'=>$rstData]);
                 if(isset($rstData['code'])  && $rstData['code']==200 && isset($rstData['data'][0])){
                     $qihao = $rstData['data'][0]['issue'];
-                    $m->set($mkey, $qihao, 1800);
+                    $m->set($mkey, $qihao, 600);
                 }
             }
         }catch (\Exception $e){

@@ -8,6 +8,7 @@ use backend\models\UserSysPlans;
 use backend\service\NumService;
 use backend\service\statics\statics_3d\Statics3dUserDataService;
 use backend\service\StaticService;
+use common\kj\qxc\QxcTcw;
 use common\service\helpers\ThirdD;
 use common\service\thirdD\match\MatchCodeService;
 use common\service\thirdD\MethodMatchService;
@@ -34,6 +35,9 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $qihao = substr(QxcTcw::getNineNineQihao($lottery_type=26, 2), 2);p($qihao);# 期号
+            $kjData = \common\kj\ssc\Thirdd::getCurrentKjData($lottery_type=26, $current_qihao);
+            p([$kjData, $current_qihao]);
             $MessageService = new EYunMessageOperateService($user_id=22);
             $rst = $MessageService->searchUser(''); p($rst);
             $lottery_types = StaticService::getGrabDataLotteryTypes($useCache=0);
