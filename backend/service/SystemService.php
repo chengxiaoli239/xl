@@ -17,17 +17,18 @@ class SystemService{
      * @param int $lottery_type
      * @return string
      */
-    public static function getInitLotteryDataKey($lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function getInitLotteryDataKey(int $lottery_type=DEFAULT_LOTTERY_TYPE): string
+    {
         return 'getInitLotteryDataKey_x1_'.$lottery_type;
     }
 
     /**
      * @desc 数据统计key
-     * @param $key
      * @param int $lottery_type
-     * @return string
+     * @return array
      */
-    public static function initLottery($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function initLottery(int $lottery_type = DEFAULT_LOTTERY_TYPE): array
+    {
         $m = \Yii::$app->cache;
         $mkey = SystemService::getInitLotteryDataKey($lottery_type);
         $flag = $m->get($mkey);

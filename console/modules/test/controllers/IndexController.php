@@ -7,6 +7,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\NumService;
 use backend\service\statics\statics_3d\Statics3dUserDataService;
+use backend\service\StaticService;
 use common\service\helpers\ThirdD;
 use common\service\thirdD\match\MatchCodeService;
 use common\service\thirdD\MethodMatchService;
@@ -33,6 +34,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $lottery_types = StaticService::getGrabDataLotteryTypes($useCache=0);
+            p($lottery_types);
             $betRow = Bets::findOne(26244	);
             list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);
             p([$code, $data, $msg]);

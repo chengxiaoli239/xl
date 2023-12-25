@@ -14,9 +14,9 @@ function d($data, $exit = true){
 
 }
 
-function commonCache()
+function commonRedis()
 {
-    return \Yii::$app->commonCache;
+    return \Yii::$app->commonRedis;
 }
 
 

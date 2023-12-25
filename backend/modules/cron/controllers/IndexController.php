@@ -9,17 +9,11 @@
 namespace backend\modules\cron\controllers;
 
 use backend\models\SystemConfig;
-use backend\models\SystemType;
-use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
-use backend\models\User;
 use backend\service\baota\BaoTaService;
 use backend\service\BaseService;
 use backend\service\datas\DatasClearService;
-use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\Juhua\JuHuaBaseService;
-use backend\service\KuaiLe8Service;
-use backend\service\plans\BetErrorPlansTaskService;
 use backend\service\sports\TennisSportsService;
 use backend\service\SscDataService;
 use backend\service\WxService;
@@ -42,35 +36,6 @@ class IndexController extends Controller
     {
         self::$staticStatus = SystemConfig::findOne(['key'=>'static_status'])->value;
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-    }
-
-    /**
-     * @desc 时时彩：抓取全量开奖数据
-     * @return bool
-     */
-    public function actionGrabKjData()
-    {
-        ini_set('memory_limit','1024M'); //升级为1024M内存
-        self::_init();
-        $rst = KjDataGet::grab($date_start = '20180101');
-
-        return $rst;
-    }
-
-    /**
-     * @desc 时时彩：逐期获取开奖数据
-     * @return array
-     */
-    public function actionGrabKjDatas(){
-        self::_init();
-        $post = \Yii::$app->request->post();
-        for($i=0; $i<3; $i++){
-            $lottery_types = $post['lottery_types'] ?? [];
-            $rst['kj'] = KjDataGet::grabKjData($lottery_types);
-            sleep(15);
-        }
-
-        return $rst;
     }
 
     /**

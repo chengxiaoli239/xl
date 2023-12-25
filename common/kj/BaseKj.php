@@ -2,6 +2,7 @@
 namespace common\kj;
 use backend\models\KjConfig;
 use backend\service\HN0898Service;
+use common\exceptions\InfoException;
 use common\service\BaseService;
 use common\tools\Tool_Common;
 use  yii;
@@ -27,16 +28,16 @@ class BaseKj extends BaseService {
     }
 
     /**
-     * 用于控制短时间内重复处理
-     * @param int $lotery_type
+     * @decipion 用于控制短时间内重复处理
+     * @param int $lottery_type
      * @param int $seconds
      * @return bool
-     * @throws \common\exceptions\InfoException
+     * @throws InfoException
      */
-    public static function lockGrab(int $lotery_type=26, int $seconds=300): bool
+    public static function lockGrab(int $lottery_type=26, int $seconds=300): bool
     {
-        $exist_key = 'grab_lottery_data_x1_'.$lotery_type;
-        $exist = \Yii::$app->redis->sadd($exist_key, $lotery_type);
+        $exist_key = 'grab_lottery_data_x1_'.$lottery_type;
+        $exist = \Yii::$app->redis->sadd($exist_key, $lottery_type);
         if(!$exist){
             throw_info('短时间内多次处理key:'.$exist_key, 30002);
         }

@@ -72,7 +72,7 @@ class LotteryTypeController extends BaseController
         $field = $get['field'];
         $val = $get['val'];
         $rst = HN0898Service::updateStatus($id, '\backend\models\LotteryType', $field, $val);
-        StaticService::getGrabDataLotteryTypes($lottery_types=[], $useCache=0);
+        StaticService::getGrabDataLotteryTypes($useCache=0);
 
         return $this->redirect(['index']);
     }

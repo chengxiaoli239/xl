@@ -108,13 +108,13 @@ class KjDataGet
      * @description 时时彩逐期抓取(以此方法为主抓取时时彩数据)
      * @return bool
      */
-    public static function grabKjData($lottery_types = []): bool
+    public static function grabKjData(): bool
     {
         $m = \Yii::$app->cache;
-        $lottery_types = StaticService::getGrabDataLotteryTypes($lottery_types);
+        $lottery_types = StaticService::getGrabDataLotteryTypes();
         foreach ($lottery_types as $lotteryData){
             try {
-                $lottery_type = $lotteryData['lottery_type'];
+                $lottery_type = (int)$lotteryData['lottery_type'];
                 $initLotteryKey = SystemService::getInitLotteryDataKey($lottery_type);
                 #KjDataGet::grabOneLotteryKjData($lottery_type);
 
@@ -123,7 +123,7 @@ class KjDataGet
                 // 防止并发售后消息通知
                 $exist = \Yii::$app->redis->sadd($exist_key, $lottery_type);
                 if(!$exist OR $flag){
-                    throw_info('并发消息处理'.$lottery_type, 30001);
+                    //throw_info('并发消息处理'.$lottery_type, 30001);
                 }
                 \Yii::$app->redis->expire($exist_key, 120);
                 $cacheTime = (strpos($lotteryData['typeGroupName'], '高频') !== false) ? 10 : 1800;
@@ -134,12 +134,14 @@ class KjDataGet
                     throw_info('该时间点不可抓取');
                 }
 
-                $params = ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title'], 'business_id'=>$lottery_type];
-                $params['is_grab_history'] = 1;
+                $params = ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title'], 'business_id'=>$lottery_type, 'is_grab_history'=>1];
+                var_dump('lottery_type:'.$lottery_type.' '.date('Y-m-d H:i:s'));
+
                 push_queue(GrabKjDatasJob::class, $params);
                 Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'cacheTime'=>$cacheTime, 'flag'=>$flag]);
                 \Yii::$app->redis->srem($exist_key, $lottery_type);
             }catch (\Exception $e){
+                var_dump('lottery_type:'.$lottery_type.' '.$e->getMessage().' '.date('Y-m-d H:i:s'));
                 Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'err_msg'=>$e->getMessage()]);
                 \Yii::$app->redis->srem($exist_key, $lottery_type);
             }
@@ -151,10 +153,9 @@ class KjDataGet
     /**
      * 单个彩种号码抓取
      * @param int $lottery_type
-     * @param int $is_grab_history
      * @return array|null
      */
-    public static function grabOneLotteryKjData(int $lottery_type=DEFAULT_LOTTERY_TYPE)
+    public static function grabOneLotteryKjData(int $lottery_type=DEFAULT_LOTTERY_TYPE): ?array
     {
         $m = \Yii::$app->cache;
         $RedisLock = new RedisLock();
@@ -172,7 +173,7 @@ class KjDataGet
 
                 $url = $kjConfig->host.$kjConfig->path;
                 $data = CurlService::httpGet($url);
-                Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '开奖任务获取', ['lottery_type'=>$lottery_type, 'url'=>$url, 'data'=>$data]);
+                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖任务获取', ['lottery_type'=>$lottery_type, 'url'=>$url, 'data'=>$data]);
                 if(isset($data['status']) && $data['status'] != 200){
                     throw_info($data['msg']??'开奖数据抓取异常');
                 }
@@ -262,7 +263,8 @@ class KjDataGet
      * @param boolean $isCanGrab
      * @return bool
      */
-    public static function isCanGrab($lottery_type = DEFAULT_LOTTERY_TYPE, &$isCanGrab = true) {
+    public static function isCanGrab($lottery_type = DEFAULT_LOTTERY_TYPE, &$isCanGrab = true): bool
+    {
         $flag = true;
         $isCanGrab = true;
         $date_time = date('H:i');
@@ -304,6 +306,10 @@ class KjDataGet
         }elseif(in_array($lottery_type, [18])){ # 台湾快五
             if ('02:10' < $date_time && $date_time < '07:00') {
                 $isCanGrab = $flag = false;
+            }
+        }elseif(in_array($lottery_type, [26, 27])){ # 福彩3d、排列3
+            if ('00:00' < $date_time && $date_time < '21:00') {
+                //$isCanGrab = $flag = false;
             }
         }
 

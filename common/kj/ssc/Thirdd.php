@@ -88,14 +88,16 @@ class Thirdd extends BaseKj {
                     }
 
                     $kjData = ['expect'=>$qihao, 'opencode'=>$opencode, 'opentime'=>substr($kjData['date'], 0, 10).' 21:30:00'];
-                    Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '号码网盘抓取-3d网1', ['domain'=>$domain, 'kjData'=>$kjData]);
+                    Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, 'domain'=>$domain, 'kjData'=>$kjData]);
                 }catch (\Exception $e){
-                    Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '开奖数据获取-异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
+                    Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
                 }
+            }else{
+                Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '3d数据抓取-缓存', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData]);
             }
         }catch (\Exception $e){
-            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据抓取异常', ['err_msg'=>$e->getMessage()]);
             $kjData = Thirdd::getCurrentKjData($lottery_type);
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '3d数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
         }
         return self::extracted($kjData, $lottery_type, $returnType, $is_auto);
     }

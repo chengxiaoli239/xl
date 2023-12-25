@@ -41,6 +41,7 @@ use backend\models\TzTypes;
 use backend\models\UserSysPlans;
 use backend\tools\Util;
 use common\service\CommonService;
+use common\service\lottery\LotteryTypeService;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use common\tools\Tools;
@@ -2391,36 +2392,13 @@ class StaticService extends BaseService {
     }
 
     /**
-     * 开奖彩种缓存key
-     * @param array $where
-     * @return string
-     */
-    public static function buildGrabDataLotteryTypesKey($where=[]){
-        $mkey = 'buildGrabDataLotteryTypesKey'.yii\helpers\Json::encode($where, 320);
-
-        return $mkey;
-    }
-
-    /**
      * @desc 需要抓取开奖号码的彩种
-     * @param array $lottery_types
      * @param int $useCache
-     * @return array|LotteryType[]|mixed
+     * @return array|LotteryType[]
      */
-    public static function getGrabDataLotteryTypes(array $lottery_types=[], int $useCache=1){
-        $where = ['grabDataStatus'=>1];
-        if(!empty($lottery_types)){
-            $where['lottery_type'] = $lottery_types;
-        }
-        $m = \Yii::$app->cache;
-        $mkey = self::buildGrabDataLotteryTypesKey($where);
-        $lotteryTypeDatas = $m->get($mkey);
-        if(true OR empty($lotteryTypeDatas) OR !$useCache){
-            $lotteryTypeDatas = LotteryType::find()->where($where)->asArray()->all();
-            $m->set($mkey, $lotteryTypeDatas, 1800);
-        }
-
-        return $lotteryTypeDatas;
+    public static function getGrabDataLotteryTypes(int $useCache=1): array
+    {
+        return LotteryTypeService::getLotteryTypeData($grabDataStatus=1);
     }
 
 

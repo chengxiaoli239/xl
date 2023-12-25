@@ -40,7 +40,7 @@ return [
             'connectionTimeout'=>3
         ],
         'commonRedis' => [
-            'class' => '\yii\redis\Connection',
+            'class' => 'common\framework\Redis',
             'hostname' => '127.0.0.1',
             'port' => 6379,
             'database' => 1,
@@ -48,9 +48,7 @@ return [
         ],
 
         'queue'  => [
-            //Redis ���з���
             'class' => \yii\queue\redis\Queue::class,
-            // �����������������
             'redis' => 'redis',
             // Queue channel key
             'channel' => 'lottery:queue',
