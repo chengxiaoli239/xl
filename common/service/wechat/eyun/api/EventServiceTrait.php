@@ -22,11 +22,11 @@ trait EventServiceTrait
     {
         $messageType = $data['messageType'];
         $wcId = $data['wcId'];
+        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '接收e云消息', ['messageType'=>$messageType, 'data'=>$data]);
         list($code, $dd, $msg) = self::saveMessage($data);
         if($code == SiteOrderApi::IGNORE_CODE){
             return ['code'=>'1000', 'message'=>'消息接收成功'];
         }
-        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '接收e云消息', ['messageType'=>$messageType, 'dd'=>$dd, 'data'=>$data]);
         $user_id = $dd['user_id'];
 
         $data['user_id'] = $user_id;
