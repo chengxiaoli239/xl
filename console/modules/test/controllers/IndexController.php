@@ -35,12 +35,16 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $data = QxcTcw::getNineNineLottery($type='json', $is_auto=2, $lottery_type=27);
+            $Thirdd = new \common\kj\ssc\Thirdd();
+            $data = $Thirdd->getFuCai3d($type='json', 2);p($data);
+            $rst = KjDataGet::grabOneLotteryKjData($lottery_type=26);p($rst); # 开奖
+            $kjData = \common\kj\ssc\Thirdd::getCurrentKjData($lottery_type=26, $current_qihao);
+            p([$kjData, $current_qihao]);
             $plan = UserSysPlans::findOne(7635);
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, [147]);p(count($codes));
             $kdCodes = \backend\service\NumService::getKuduCodes([2,5,8,7], $kd=3);p($kdCodes);
             $qihao = substr(QxcTcw::getNineNineQihao($lottery_type=26, 2), 2);p($qihao);# 期号
-            $kjData = \common\kj\ssc\Thirdd::getCurrentKjData($lottery_type=26, $current_qihao);
-            p([$kjData, $current_qihao]);
             $MessageService = new EYunMessageOperateService($user_id=22);
             $rst = $MessageService->searchUser(''); p($rst);
             $lottery_types = StaticService::getGrabDataLotteryTypes($useCache=0);
@@ -48,7 +52,6 @@ class IndexController extends Controller
             $betRow = Bets::findOne(26244	);
             list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);
             p([$code, $data, $msg]);
-            $rst = KjDataGet::grabOneLotteryKjData($lottery_type=27);p($rst); # 开奖
             $str = 'http://47.107.58.222:8090/wechat/bets/index.html?Bets%5BwechatUserName%5D=wxid_ckgr7i2q9fr522&Bets%5Border_id%5D=&Bets%5Bplay_method%5D=&Bets%5Bqihao%5D=&Bets%5Bstatus%5D=&Bets%5Bpush_status%5D=&Bets%5Blottery_type%5D=';
             p(urldecode($str));
             list($code, $data, $msg) = Statics3dUserDataService::calculateUserDayData($wechat_user_id=250, $date='2023-12-23', [27, 26]);

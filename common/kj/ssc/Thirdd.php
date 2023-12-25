@@ -30,7 +30,7 @@ class Thirdd extends BaseKj {
                 self::lockGrab($lottery_type, $seconds);
             }
 
-            if(!$kjData = Thirdd::getCurrentKjData($lottery_type, $current_qihao) OR $is_auto==2) {
+            if(true OR !$kjData = Thirdd::getCurrentKjData($lottery_type, $current_qihao) OR $is_auto==2) {
                 try {
                     $domain = BaseKj::getApiHostByRoute('/kj/thirdd/fu-cai');
                     // 设置请求头

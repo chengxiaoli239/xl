@@ -89,7 +89,7 @@ class QxcTcw extends BaseKj{
      */
     public static function getNineNineLottery(string $returnType = 'json', $is_auto = 1, $lottery_type = 1){
 
-        if($is_auto == 2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
+        if($is_auto == 2 OR !$kjData = self::getCurrentKjData($lottery_type) OR true) {
             $domain = BaseKj::getApiHostByRoute('/kj/qxc/nine-nine-plw');
             $lotNames = [1=>'hnqxc', 17=>'plw', 26=>'fcsd', '27'=>'plw'];
             $url = $domain.'/cloud-lottery-service-server/gameInfo/lotteryissue/lastTen/'.$lotNames[$lottery_type];
