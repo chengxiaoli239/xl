@@ -48,6 +48,8 @@ class EYunUserJobs extends CommonJob {
                             'created_at' => $now_time,
                         ]);
                     }
+
+                    $data['aliasName'] = $data['aliasName']??'';
                     $data['nickName'] = \common\tools\Common::filterEmoji($data['nickName']);
                     $data['remark'] = \common\tools\Common::filterEmoji($data['remark']);//base64_encode($data['remark']);
                     $setData['updated_at'] = $now_time;
