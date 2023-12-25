@@ -35,6 +35,9 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $plan = UserSysPlans::findOne(7635);
+            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, [147]);p(count($codes));
+            $kdCodes = \backend\service\NumService::getKuduCodes([2,5,8,7], $kd=3);p($kdCodes);
             $qihao = substr(QxcTcw::getNineNineQihao($lottery_type=26, 2), 2);p($qihao);# 期号
             $kjData = \common\kj\ssc\Thirdd::getCurrentKjData($lottery_type=26, $current_qihao);
             p([$kjData, $current_qihao]);

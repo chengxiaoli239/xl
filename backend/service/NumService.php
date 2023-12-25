@@ -263,6 +263,7 @@ class NumService extends BaseService {
         145=>'过滤大前天同期每两个号码及双重(四定)',
 
         146=>'过滤上期同合分及双重(四定)', # 同97、98
+        147=>'胆码2跨1-2个(四定)', # 0的2跨是2、1的2跨就只是3、8的2跨是6、9的2跨是7
     ];
 
     /**
@@ -556,6 +557,29 @@ class NumService extends BaseService {
         }
 
         return $codesData;
+    }
+
+    /**
+     * 指定号码数组获取跨度数组
+     * @param array $codes
+     * @param int $kd
+     * @return array
+     */
+    public static function getKuduCodes(array $codes=[], int $kd=2): array
+    {
+
+        $kdCodes = [];
+        foreach ($codes as $code){
+            $code_d = $code - $kd;
+            $code_p = $code + $kd;
+            foreach ([$code_d, $code_p] as $c){
+                if($c>-1 && $c<10){
+                    $kdCodes[] = $c;
+                }
+            }
+        }
+
+        return array_values(array_unique($kdCodes));
     }
 
     /**
@@ -3277,6 +3301,9 @@ class NumService extends BaseService {
                 case 146: # 过滤上期同值及双重(四定)
                     $codes = NumService::getBeforeKjCodesDynamic118($plan, $dateNum=0, $d_type=2);
                     break;
+                case 147: # 胆码2跨1-2个(四定)# 0的2跨是2、1的2跨就只是3、8的2跨是6、9的2跨是7
+                    $codes = NumService::getBeforeKjCodesDynamic119($plan, $kd=2, $kdNumType=1);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -5432,6 +5459,63 @@ class NumService extends BaseService {
             ->andWhere(['NOT', $tmpNotWhere]);
         $sql = $query->createCommand()->getRawSql();//p($sql);
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤昨日同期/上期每两个号码及对数', ['date_num'=>$date_num,'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        #p(['count'=>count($codes), 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - # 胆码2跨1-2个(四定)# 0的2跨是2、1的2跨就只是3、8的2跨是6、9的2跨是7
+     * @param object $plan
+     * @param int $kd 跨度
+     * @param int $kdNumType 跨度数量  1:1-2各
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic119(object $plan, int $kd=2, int $kdNumType=1): array
+    {
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao']; # 当期已经开奖的期号
+        $lottery_type = $plan->lottery_type;
+        $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+        $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = $DataDealStatus['qihao'];
+        }
+        $filterQihao = $current_kj_qihao;
+
+        $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'qihao', $filterQihao]];
+        $historyKjDatasQuery = SscKjData::find()->select(['code1', 'code2', 'code3', 'code4', 'code_str', 'qihao'])
+            ->where($historyWhere)->limit(1)->orderBy(['id'=>SORT_DESC]);
+        $sql = $historyKjDatasQuery->createCommand()->getRawSql();//p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤上期每两个号码及对数', ['date_num'=>$date_num,'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
+        $historyKjData = $historyKjDatasQuery->asArray()->one();
+        $kjCodes = [$historyKjData['code1'], $historyKjData['code2'], $historyKjData['code3'], $historyKjData['code4']];
+        $kdCodes = self::getKuduCodes($kjCodes, $kd);
+        //p([$kjCodes, $kdCodes, $kd]);
+        $kdWhere = ['OR'];
+        # 跨度x，出现1个情况：
+        $kdWhere[] = ['AND', ['IN', 'code_1', $kdCodes], ['NOT IN', 'code_2', $kdCodes], ['NOT IN', 'code_3', $kdCodes], ['NOT IN', 'code_4', $kdCodes]];
+        $kdWhere[] = ['AND', ['IN', 'code_2', $kdCodes], ['NOT IN', 'code_1', $kdCodes], ['NOT IN', 'code_3', $kdCodes], ['NOT IN', 'code_4', $kdCodes]];
+        $kdWhere[] = ['AND', ['IN', 'code_3', $kdCodes], ['NOT IN', 'code_1', $kdCodes], ['NOT IN', 'code_2', $kdCodes], ['NOT IN', 'code_4', $kdCodes]];
+        $kdWhere[] = ['AND', ['IN', 'code_4', $kdCodes], ['NOT IN', 'code_1', $kdCodes], ['NOT IN', 'code_2', $kdCodes], ['NOT IN', 'code_3', $kdCodes]];
+        # 跨度x，出现2个情况：
+        $kdWhere[] = ['AND', ['IN', 'code_1', $kdCodes], ['IN', 'code_2', $kdCodes], ['NOT IN', 'code_3', $kdCodes], ['NOT IN', 'code_4', $kdCodes]];
+        $kdWhere[] = ['AND', ['IN', 'code_1', $kdCodes], ['IN', 'code_3', $kdCodes], ['NOT IN', 'code_2', $kdCodes], ['NOT IN', 'code_4', $kdCodes]];
+        $kdWhere[] = ['AND', ['IN', 'code_1', $kdCodes], ['IN', 'code_4', $kdCodes], ['NOT IN', 'code_2', $kdCodes], ['NOT IN', 'code_3', $kdCodes]];
+        $kdWhere[] = ['AND', ['IN', 'code_2', $kdCodes], ['IN', 'code_3', $kdCodes], ['NOT IN', 'code_1', $kdCodes], ['NOT IN', 'code_4', $kdCodes]];
+        $kdWhere[] = ['AND', ['IN', 'code_2', $kdCodes], ['IN', 'code_4', $kdCodes], ['NOT IN', 'code_1', $kdCodes], ['NOT IN', 'code_3', $kdCodes]];
+        $kdWhere[] = ['AND', ['IN', 'code_3', $kdCodes], ['IN', 'code_4', $kdCodes], ['NOT IN', 'code_1', $kdCodes], ['NOT IN', 'code_2', $kdCodes]];
+
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => 4])
+            ->andWhere($kdWhere);
+        #$sql = $query->createCommand()->getRawSql();p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '跨度'.$kd.'_'.$kdNumType, ['date_num'=>$date_num,'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
