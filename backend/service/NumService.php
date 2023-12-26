@@ -264,6 +264,7 @@ class NumService extends BaseService {
 
         146=>'过滤上期同合分及双重(四定)', # 同97、98
         147=>'胆码2跨1-2个(四定)', # 0的2跨是2、1的2跨就只是3、8的2跨是6、9的2跨是7
+        148=>'随机对数1对、合分9个(四定)', # 0的2跨是2、1的2跨就只是3、8的2跨是6、9的2跨是7
     ];
 
     /**
@@ -3304,6 +3305,9 @@ class NumService extends BaseService {
                 case 147: # 胆码2跨1-2个(四定)# 0的2跨是2、1的2跨就只是3、8的2跨是6、9的2跨是7
                     $codes = NumService::getBeforeKjCodesDynamic119($plan, $kd=2, $kdNumType=1);
                     break;
+                case 148: # 随机对数1对、合分9个(四定)
+                    $codes = NumService::getBeforeKjCodesDynamic120($plan, $kd=2, $kdNumType=1);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -5519,6 +5523,41 @@ class NumService extends BaseService {
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
+        #p(['count'=>count($codes), 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - # 随机对数1对、合分9个(四定)
+     * @param object $plan
+     * @param int $ls 对数随机对数
+     * @param int $hfs 合分随机个数
+     * @return array
+     */
+    private static function getBeforeKjCodesDynamic120(object $plan, int $ls=1, int $hfs=9): array
+    {
+        $hzArr = yii\helpers\Json::decode($plan->hz_Arr, true);
+        $current_kj_qihao = $hzArr['filters']['current_kj_qihao']; # 当期已经开奖的期号
+        $lottery_type = $plan->lottery_type;
+        $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+        $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+        if(empty($current_kj_qihao)){
+            $current_kj_qihao = $DataDealStatus['qihao'];
+        }
+        $hzArr = Json::decode($plan->hz_Arr);
+        # 随机内容添加："log_sel":1,"log_1":"05","fixed_pos_hefen_sel":2,"hefen_pos1":"1,2,3","hefen1":"012356789"
+        //p($hzArr, 0);
+        $hzArr = array_merge((array)$hzArr, [
+            'log_sel' => 1,
+            'log_1' => ['05', '16', '27', '38', '49'][rand(0,4)],
+            'fixed_pos_hefen_sel' => 2,
+            'hefen_pos1' => '1,2,3',
+            'hefen1' => str_replace(rand(0, 9), '', '0123456789'),
+        ]);
+        # {"ps_sel":2,"ps_2":"34689","ps_3":"01257","log_sel":1,"log_1":"05","fixed_pos_hefen_sel":2,"hefen_pos1":"1,2,3","hefen1":"012356789","arise_in_sel":2,"arise_in":"02356","filters":{"playway":"3","start_qihao":"20231226281","lottery_type":"8"}}
+        $codes = NumService::getCodesKuaiXuan($hzArr);
+
         #p(['count'=>count($codes), 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
 
         return $codes;

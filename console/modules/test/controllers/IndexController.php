@@ -41,8 +41,6 @@ class IndexController extends Controller
             $rst = KjDataGet::grabOneLotteryKjData($lottery_type=26);p($rst); # 开奖
             $kjData = \common\kj\ssc\Thirdd::getCurrentKjData($lottery_type=26, $current_qihao);
             p([$kjData, $current_qihao]);
-            $plan = UserSysPlans::findOne(7635);
-            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, [147]);p(count($codes));
             $kdCodes = \backend\service\NumService::getKuduCodes([2,5,8,7], $kd=3);p($kdCodes);
             $qihao = substr(QxcTcw::getNineNineQihao($lottery_type=26, 2), 2);p($qihao);# 期号
             $MessageService = new EYunMessageOperateService($user_id=22);
@@ -127,5 +125,15 @@ class IndexController extends Controller
         }
 
         return [];
+    }
+
+    /**
+     * 测试5x
+     * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii test/index/dw1
+     * @return void
+     **/
+    public function actionDw1(){
+        $plan = UserSysPlans::findOne(7709);
+        $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, [148]);p(count($codes));
     }
 }
