@@ -12,6 +12,7 @@ use backend\models\wechat\Bets as BetsModel;
  */
 class Bets extends BetsModel
 {
+    public $wechatUserName;  // 添加这一行
     /**
      * @inheritdoc
      */
