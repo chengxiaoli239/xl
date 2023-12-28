@@ -1,12 +1,6 @@
 <?php
-/**
- * 通用处理类
- * Enter description here ...
- * @author sam
- * @authors wudean(bj) 乔迁标识
- *
- */
 namespace common\tools;
+
 use DateTime;
 use yii;
 
@@ -79,20 +73,14 @@ class Util
     /**
      * 图片转换为oss获取图片
      * @param string $img 图片url
-     * @param number $h 图片高度，默认400
-     * @param number $w 图片宽度，默认400
+     * @param int $h 图片高度，默认400
+     * @param int $w 图片宽度，默认400
      * @return string
      * @Ps 此处由武德安（北京技术）乔迁，原内容有调整
      */
-    public static function convertImgae($img, $h = 400, $w = 400)
+    public static function convertImgae(string $img, int $h = 400, int $w = 400): string
     {
-        $goods_img = strpos($img, 'http') === false ? 'https://img.mianshui365.com' . $img : $img;
-//        $goods_img .= "@{$h}h_{$w}w_95q_1wh";
-        $goods_img = str_replace("cdn.mianshui365.com", "img.mianshui365.com", $goods_img);
-        $goods_img = str_replace("cdn2.mianshui365.com", "img.mianshui365.com", $goods_img);
-        $goods_img = str_replace("cdn2.mianshui365.net", "img.mianshui365.com", $goods_img);
-        $goods_img = str_replace("cdn.mianshui365.net", "img.mianshui365.com", $goods_img);
-        $goods_img = str_replace("images.mianshui365.com", "img.mianshui365.com", $goods_img);
+        $goods_img = strpos($img, 'http') === false ? 'https://img.xxx.com' . $img : $img;
         if (strpos($goods_img, "@") === false) {
             $goods_img .= "@" . $h . "h_" . $w . "w_95q_1wh";
         }
@@ -129,7 +117,7 @@ class Util
      * @param mixed $str
      * @return boolean
      */
-    public static function int($str)
+    public static function int($str): bool
     {
         if (!is_scalar($str)) return false;
         # 修正bug。否则当$str === true时，该函数返回true：问题出在preg_match函数。
@@ -145,7 +133,7 @@ class Util
      * @param int $num
      * @return string
      */
-    private static function num2char($num)
+    private static function num2char($num): string
     {
         $str = '';
         $num = (string)$num;
@@ -158,9 +146,9 @@ class Util
     /**
      * 确保是传入变量一定是数组
      */
-    public static function checkArray($arr)
+    public static function checkArray($arr): array
     {
-        if (is_array($arr) == false)
+        if (!is_array($arr))
             return array();
         return $arr;
     }
@@ -168,9 +156,9 @@ class Util
     /*
      *确保窜入变量一定是字符串
      */
-    public static function checkString($str)
+    public static function checkString($str): string
     {
-        if (is_string($str) == false)
+        if (!is_string($str))
             return '';
         return $str;
     }
@@ -178,8 +166,9 @@ class Util
     /*
      * 查询子串是否出现过
      */
-    public static function isStringsInStr($str,$arr){
-        if(is_string($str) == false || is_array($arr) == false)
+    public static function isStringsInStr($str, $arr)
+    {
+        if (!is_string($str) || !is_array($arr))
             return false;
     }
 
@@ -197,7 +186,7 @@ class Util
     /*
      *  设置缓存
      */
-    public static function setCache($key, $data, $cachetime = 3600)
+    public static function setCache($key, $data, $cachetime = 3600): bool
     {
         if (defined('DISABLE_CACHE'))
             return false;
@@ -221,16 +210,16 @@ class Util
      * $$itemkey  数组中一个元素的key
      * $isQuotation  查找到的元素是否是字符串,true 返回字符串;false 返回原内容
      */
-    public static function arr_allSubItems($arr, $itemkey, $isQuotation = false)
+    public static function arrAllSubItems($arr, $itemkey, $isQuotation = false)
     {
-        if (is_array($arr) == false)
+        if (!is_array($arr))
             return false;
         $allItems = array();
         foreach ($arr as $onerow) {
             if ($onerow[$itemkey]) {
                 $tmp = trim($onerow[$itemkey]);
                 if ($isQuotation)
-                    $allItems[] = "'" . $tmp. "'";
+                    $allItems[] = "'" . $tmp . "'";
                 else
                     $allItems[] = $tmp;
             }
@@ -243,7 +232,7 @@ class Util
     */
     public static function arr_subItemToArray($arr, $itemkey, $glue, $isQuotation = false)
     {
-        if (is_array($arr) == false || $glue == null)
+        if (!is_array($arr) || $glue == null)
             return false;
         $allItems = self::arr_allSubItems($arr, $itemkey, $isQuotation);
         $allItems = array_unique($allItems);
@@ -255,7 +244,7 @@ class Util
     /*
     * 将数组的中的元素组按照间字符组成用于SQL查询的字符串
     */
-    public static function arr_subItemToSql($arr, $itemkey)
+    public static function arrSubItemToSql($arr, $itemkey): string
     {
         $str = self::arr_subItemToArray($arr, $itemkey, ',', true);
         if ($str)
@@ -268,9 +257,9 @@ class Util
      */
 
 
-    public static function randomItems($arr, $count)
+    public static function randomItems($arr, $count): array
     {
-        if (is_array($arr) == false)
+        if (!is_array($arr))
             return array();
         shuffle($arr);
         $re = array_slice($arr, 0, $count);
@@ -278,12 +267,9 @@ class Util
     }
 
 
-    /*
-    *
-    */
-    public static function arr_sortItemByRule($arrRule, $arr, $itemkey)
+    public static function arrSortItemByRule($arrRule, $arr, $itemkey)
     {
-        if (is_array($arr) == false || $itemkey == null || is_array($arrRule) == false)
+        if (!is_array($arr) || $itemkey == null || !is_array($arrRule))
             return false;
     }
 
@@ -291,7 +277,7 @@ class Util
     /*
     * 安全的截获数组
     */
-    public static function arr_slice($arr, $start, $length): array
+    public static function arrSlice($arr, $start, $length): array
     {
         if (!is_array($arr))
             return array();
@@ -302,7 +288,7 @@ class Util
     /*
      * 合并两个数组
      */
-    public static function arr_merge($arr1, $arr2)
+    public static function arrMerge($arr1, $arr2): array
     {
         $arr1 = self::checkArray($arr1);
         $arr2 = self::checkArray($arr2);
@@ -312,7 +298,7 @@ class Util
     /*
      * 合并一组数组
      */
-    public static function arr_mergeFromArr($arr)
+    public static function arrMergeFromArr($arr): array
     {
         $re = array();
         foreach ($arr as $item)
@@ -323,9 +309,9 @@ class Util
     /*
      *  获取数组的长度
      */
-    public static function arr_count($arr)
+    public static function arrCount($arr): int
     {
-        if (is_array($arr) == false)
+        if (!is_array($arr))
             return 0;
         return count($arr);
     }
@@ -338,7 +324,7 @@ class Util
      */
     public static function arr_getItem($arr, $strkeys)
     {
-        if (is_array($arr) == false || is_string($strkeys) == false)
+        if (!is_array($arr) || !is_string($strkeys))
             return null;
         $ar = explode(".", $strkeys);
         $lastItem = $arr;
@@ -374,7 +360,7 @@ class Util
      *      'c':{'name':'c','barcode':'3'}
      * }
      */
-    public static function arr_remapArrayBykey($arrkey, $arrToRemap, $isRemoveRepeat = false)
+    public static function arr_remapArrayBykey($arrkey, $arrToRemap, $isRemoveRepeat = false): array
     {
         $arrRetuern = [];
         foreach (self::checkArray($arrToRemap) as $item) {
@@ -388,7 +374,7 @@ class Util
                     if ($isRemoveRepeat && in_array($item, $arrRetuern[$value]))
                         continue;
                 }
-                array_push($arrRetuern[$value], $item);
+                $arrRetuern[$value][] = $item;
             }
         }
         return $arrRetuern;
@@ -397,9 +383,9 @@ class Util
     /*
      * 获取元素某个下标的值,避免越界
      */
-    public static function arr_itemByIndex($arr, $index)
+    public static function arrItemByIndex($arr, $index)
     {
-        if (is_array($arr) == false || $index < 0 || $index >= count($arr))
+        if (!is_array($arr) || $index < 0 || $index >= count($arr))
             return array();
         return $arr[$index];
     }
@@ -407,7 +393,7 @@ class Util
     /*
     *  向数组添加一个元素
     */
-    public static function arr_push($arr, $item)
+    public static function arrPush($arr, $item)
     {
         $arr = self::checkArray($arr);
         array_push($arr, $item);
@@ -417,9 +403,9 @@ class Util
     /*
     * 去掉字符左右空格后,比较两个字符
     */
-    public static function isStrEqualWithTrim($str1, $str2)
+    public static function isStrEqualWithTrim($str1, $str2): bool
     {
-        if (is_string($str1) == false || is_string($str2) == false)
+        if (!is_string($str1) || !is_string($str2))
             return false;
         if (trim($str1) == trim($str2))
             return true;
@@ -429,7 +415,7 @@ class Util
     /*
     * 在数组中查找指定键值对的元素
     */
-    public static function arr_searchItem($sources, $comparekey, $comparevalue)
+    public static function arrSearchItem($sources, $comparekey, $comparevalue)
     {
         if (count($sources) == 0 || $comparekey == null || $comparevalue == null)
             return null;
@@ -453,7 +439,7 @@ class Util
     /*
     * 是否是本机地址
     */
-    public static function islocalAddr()
+    public static function islocalAddr(): bool
     {
         $addr = $_SERVER['REMOTE_ADDR'];
         if (($addr == '127.0.0.1') || ($addr == 'localhost')) {
@@ -484,9 +470,9 @@ class Util
     /*
      * 判断商品ID是否合法
      */
-    public static function isValidGoodID($goodid)
+    public static function isValidGoodID($goodid): bool
     {
-        if (empty($goodid) || is_numeric($goodid) == false)
+        if (empty($goodid) || !is_numeric($goodid))
             return false;
         return true;
     }
@@ -496,16 +482,16 @@ class Util
      */
     public static function isMobile()
     {
-        $is_mobile = (IS_MOBILE_USER OR strstr($_SERVER['HTTP_HOST'], 'mitem')) ? true : false;    // mobile:1、 PC:0
+        $is_mobile = (IS_MOBILE_USER or strstr($_SERVER['HTTP_HOST'], 'mitem')) ? true : false;    // mobile:1、 PC:0
         return $is_mobile;
     }
 
     /*
      *数组过滤,去掉空元素
      */
-    public static function arr_filter($arr)
+    public static function arr_filter($arr): array
     {
-        if (is_array($arr) == false || count($arr) == 0)
+        if (!is_array($arr) || count($arr) == 0)
             return array();
         $ar = array_filter($arr);
         $ar = array_merge($ar);
@@ -516,7 +502,7 @@ class Util
     /*
      * 删除数组里的元素
      */
-    public static function arr_del($arr, $rules)
+    public static function arr_del($arr, $rules): array
     {
         foreach ($arr as &$item) {
             foreach ($rules as $key => $ru) {
@@ -563,7 +549,7 @@ class Util
     /*
      * 运行一个SQL语句
      */
-    public static function getSQLCommand($sql)
+    public static function getSQLCommand($sql): yii\db\Command
     {
         $res = Yii::$app->db->createCommand($sql);
         return $res;
@@ -572,12 +558,12 @@ class Util
     /*
      * 检测数组里的一些元素是否为空
      */
-    public static function checkArrayItemNotEmpty($arr, $arrkeys)
+    public static function checkArrayItemNotEmpty($arr, $arrkeys): bool
     {
         foreach ($arrkeys as $item) {
             if (empty($item))
                 continue;
-            if (key_exists($item, $arr) == false)
+            if (!key_exists($item, $arr))
                 return false;
             if (empty($arr[$item]))
                 return false;
@@ -588,8 +574,9 @@ class Util
     /*
      * 赋值变量,如果新值不为空,则将新值赋值给value
      */
-    public static function setValueIfNotEmpty(&$value, $newvalue){
-        if($value == null || is_string($newvalue) == false )
+    public static function setValueIfNotEmpty(&$value, $newvalue)
+    {
+        if ($value == null || !is_string($newvalue))
             return;
         if (isset($newvalue))
             $value = trim($newvalue);
@@ -619,7 +606,7 @@ class Util
      * @return string
      * @throws \Exception
      */
-    public static function getBeforeNumQihao($filterQihao, $n=1,  $dateLen=8): string
+    public static function getBeforeNumQihao($filterQihao, $n = 1, $dateLen = 8): string
     {
         $dateString = substr($filterQihao, 0, $dateLen);
         $sortQihao = substr($filterQihao, $dateLen, 3);
@@ -631,6 +618,158 @@ class Util
         $qihao = $beforeNDate . $sortQihao;
 
         return $qihao;
+    }
+
+    /**
+     * 多个价格相加
+     * @param  [type] $aAmounts [description]
+     * @param bool $format 是否字符串格式化
+     * @return float|string [type]           [description]
+     */
+    public static function getFloatSum($aAmounts, $format = false)
+    {
+        $amount = 0;
+        foreach ($aAmounts as $key => $value) {
+            $amount = floatval($value) + $amount;
+        }
+        $amount = round($amount, 2);
+
+        return $format ? self::formatMoney($amount) : $amount;
+    }
+
+    public static function formatMoney($money): string
+    {
+        return sprintf("%1\$.2f", $money);
+    }
+
+    /**
+     * 获取某个时间戳所属月份的开始和结束日期
+     * @param int $iTime
+     * @return array
+     */
+    public static function monthDate(int $iTime)
+    {
+        if (empty($iTime)) {
+            return '';
+        }
+
+        $iTime = self::getSubTime($iTime);
+
+        return [
+            date('Y-m-01', $iTime),
+            date('Y-m-t', $iTime)
+        ];
+    }
+
+    /**
+     * 格式化时间|支持毫秒级格式化
+     * @param int $iTime
+     * @return false|string [type]
+     */
+    public static function formatTime($iTime)
+    {
+        if (empty($iTime)) {
+            return '';
+        }
+        $iTime = self::getSubTime($iTime);
+        return date("Y-m-d H:i:s", $iTime);
+    }
+
+    /**
+     * 截取毫秒级时间戳
+     * @param $iTime
+     * @return false|int|string [type] [description]
+     */
+    public static function getSubTime($iTime)
+    {
+        if (empty($iTime)) {
+            return 0;
+        }
+        return substr((string)$iTime, 0, 10);
+    }
+
+
+    /**
+     * 以某字段作为键名返回数据
+     * @param array $data
+     * @param string $field
+     * @return array
+     */
+    public static function getFieldKey(array $data, string $field): array
+    {
+        return \common\tools\UtilArray::getFieldKey($data, $field);
+    }
+
+    /**
+     * 以某字段作为键名返回数据:多个
+     * @param array $data
+     * @param string $field
+     * @return array
+     */
+    public static function getFieldKeys($data, $field): array
+    {
+        return \common\tools\UtilArray::getFieldKeys($data, $field);
+    }
+
+    /**
+     * 正常状态:逻辑删除
+     */
+    const DEL_FLAG_N = 0;
+
+    /**
+     * 删除状态:逻辑删除
+     */
+    const DEL_FLAG_Y = 1;
+
+    public static  $s = array();
+    /**
+     * @author
+     * 获取静态选项信息
+     * 如如获取状态信息
+     * $mVal参数不传时获取全部数据(值=>名称)：array(
+     *     1 => '正常',
+     *     2 => '停用',
+     *     ...
+     * )
+     * $mVal参数传空字符串时获取全部值: array( 1, 2, ... )
+     * $mVal参数传数字时返回对应的名称,没有对应信息时返回空字符串
+     * $mVal参数传名称时返回对应的数字,没有对应信息时返回-1
+     * @param array $sField 关键字段
+     * @param mixed $mVal
+     */
+    public static function getS( string $sField,  $mVal = null )
+    {
+        $a_static = static::$s[$sField]??[];
+
+        if ( $mVal === null ) {
+            return $a_static;
+        } elseif ( $mVal === '' ) {
+            return array_keys( $a_static );
+        } elseif ( is_numeric( $mVal ) || is_string( $mVal ) ) {
+            return $a_static[$mVal] ?? '';
+        } else {
+            return array_flip( $a_static )[$mVal] ?? -1;
+        }
+    }
+    /**
+     * 用于下拉选中的时候
+     * @param  string $sField 字段
+     * @param string $v      值
+     * @return array
+     */
+    public static function getSS(string $sField, string $v): array
+    {
+        $data = self::getS($sField);
+        $l_data = [];
+
+        foreach ($data as $key => $value) {
+            $l_data[] = [
+                'name'=>$value,
+                'value'=>$key,
+                'checked'=> $v!=''&&$key==$v
+            ];
+        }
+        return $l_data;
     }
 }
 

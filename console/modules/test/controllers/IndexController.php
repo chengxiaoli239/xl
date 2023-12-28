@@ -133,6 +133,7 @@ class IndexController extends Controller
      * @return void
      **/
     public function actionDw1(){
+        $lottery_types = StaticService::getLotteryTypes();p($lottery_types);
         $plan = UserSysPlans::findOne(7709);
         $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, [148]);p(count($codes));
     }

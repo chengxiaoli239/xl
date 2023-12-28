@@ -1,0 +1,128 @@
+
+      <style type="text/css">
+        .layui-form-label{
+           width:85px;
+        }
+        .alert-item{
+           margin-right: 20px;
+           font-weight: bold;
+        }
+        .layui-table td,
+        .layui-table th
+        {
+          border-right-color: #e6e6e6;
+          border-left-color: #e6e6e6;
+        }
+        .layui-table-view .layui-table th
+        {
+           padding: 0px;
+        }
+      </style>
+    <div class="duty-container" >
+             <form class="layui-form  layuiadmin-card-header-auto" action="" 
+             data-auto-get style="padding:10px;padding-bottom: 0px;">
+
+                   <div class="layui-form-item" >
+
+                             <div class="layui-inline">
+                               <div class="layui-input-inline">
+                                 <input type="text" name="name" placeholder="分组名称"  autocomplete="off" class="layui-input">
+                               </div>
+                             </div>
+
+
+                            <div class="layui-inline">
+                                  <button type="submit" class="layui-btn layui-btn-normal layuiadmin-btn-useradmin" lay-submit="" lay-filter="LAY-user-front-search">
+                                    <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                                    搜索
+                                  </button>
+
+                                  <button type="reset" class="layui-btn layui-btn-primary layuiadmin-btn-useradmin" lay-submit="" lay-filter="LAY-user-front-search">
+                                    重置
+                                  </button>
+
+                            </div>
+
+
+
+                   </div>
+                 
+                  
+           </form>
+           <div  class="layui-toolbox" style="padding:10px 10px;padding-top: 0px;">
+
+                <button 
+                type="button" 
+                data-modal=""
+                data-width="500px"
+                data-height="300px"
+                data-url="/index.php?r=config/config/group-create" 
+                class="layui-btn layui-btn-sm layui-btn-primary" >
+                 + 添加分组
+                </button>
+
+                <button type="button" 
+                data-confirm=""
+                data-field="id"
+                data-batch="true"
+                data-url="/index.php?r=config/config/post-group-delete" 
+                class="layui-btn layui-btn-sm layui-btn-primary" >
+                <i class="layui-icon layui-icon-delete"></i>
+                  批量删除
+                </button>
+               
+            </div>
+
+             <table class="layui-hide table-grid" lay-filter="main" id="main-table"></table>
+    </div>
+    
+    <script>
+
+
+         
+        
+        $(function(){
+
+               
+                layui.use(['table','form','laydate','laytpl'], function(){
+                           var table = layui.table;
+                           window.Tnmc.tableIns=table.render({
+                            elem: '#main-table',
+                            cellMinWidth:'80',
+                            url:'/index.php?r=/config/config/get-group-list',
+                            cols: [[
+                                 {type:'checkbox'},
+                                 // {field:'id', align:'center', title: 'ID'},
+                                 {field:'name', align:'center', title: '分组名称'},
+                                 {field:'key', align:'center', title: '键名'},
+                                 {field:'sort', align:'center', title: '排序'},
+                                 {field:'admin_name', align:'center', title: '创建人'},
+                                 // {field:'create_time', align:'center', title: '创建时间'},
+                                 // {field:'update_time', align:'center', title: '更新时间'},
+                           
+                                 {
+                                   field:'name', 
+                                   title: '操作',
+                                   width:80,
+                                   fixed: 'right',
+                                   templet:function( d ){
+                                       var html=''
+                                       html+='<button type="button" data-modal=""  data-height="300px" data-width="500px"  data-url="/index.php?r=config/config/group-create&id='+d.id+'" class="layui-btn layui-btn-primary layui-btn-sm">编辑</button>'
+                                       return html;
+                                   }
+                                 }
+                            ]
+                            
+                            ],
+                            page: true,
+                            limit:30,
+                            autoSort: false,
+                            height:window.Tnmc.getTableHeight(),
+                            where: window.Tnmc.getUrlFormArgs()
+                          });
+
+                        
+
+                });
+        })
+    </script>

@@ -40,7 +40,7 @@ class OpKjService extends BaseService {
                 foreach ($data['idData'] as $d){
                     $params = ['user_id'=>$d['user_id'], 'type'=>WechatUserService::TYPE_ORDER_BET, 'queue_delay_time'=>30, 'msg'=>'开奖后报表计算', 'wechat_user_id'=>$d['wechat_user_id']];
                     push_queue_fast(UserDayStaticsJobs::class, $params); # 处理数据入列
-                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据入列01', $params);
+                    Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据-3d', $params);
                 }
             }
             $rst = ['code'=>$code, 'data'=>$data, 'msg'=>$msg];
@@ -50,8 +50,8 @@ class OpKjService extends BaseService {
             foreach ($bettingRecords as $BettingRecord){
                 $rst['data'][$BettingRecord->id] = OpKjService::opOneBettingRecord($BettingRecord->id, $BettingRecord);
             }
+            Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据-5x', ['rst'=>$rst]);
         }
-        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖处理', ['rst'=>$rst]);
 
         return $rst;
     }

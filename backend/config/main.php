@@ -67,6 +67,9 @@ return [
         'statics' => [
             'class' => 'backend\modules\statics\Module',
         ],
+        'config' => [
+            'class' => 'backend\modules\config\Module',
+        ],
     ],
     'components' => [
         'request' => [

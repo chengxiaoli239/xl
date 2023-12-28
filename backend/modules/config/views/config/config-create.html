@@ -1,0 +1,135 @@
+<style type="text/css">
+  .layui-form-label
+  {
+    width: 110px;
+  }
+  
+</style>
+
+<form class="layui-form" action="/index.php?r=/config/config/post-config-create" 
+data-auto-submit 
+data-reload="true" style="padding: 20px 0px;">
+    <input type="hidden" name="id"  autocomplete="off" placeholder="" value="{{data.id}}" class="layui-input">
+  <div class="layui-form-item">
+      <div class="layui-inline">
+          <label class="layui-form-label">配置分组</label>
+          <div class="layui-input-inline">
+              <select class="" name="group_id">
+                 {% for key, item in grouplist %}
+                 <option value={{ item.id }} {% if data.group_id == item.id %}selected{% endif %}>{{ item.name }}</option>
+                 {% endfor %}
+              </select>
+          </div>
+      </div>
+      <div class="layui-inline">
+          <label class="layui-form-label">配置类型</label>
+          <div class="layui-input-inline">
+             <select class="" name="type">
+                {% for key, item in typelist %}
+                <option value={{ key }} {% if data.type == key %}selected{% endif %}>{{ item }}</option>
+                {% endfor %}
+             </select>
+          </div>
+      </div>
+  </div>
+  <div class="layui-form-item">
+      <div class="layui-inline">
+          <label class="layui-form-label">标题</label>
+          <div class="layui-input-inline">
+            <input type="text" name="name" autocomplete="off" placeholder="请输入配置标题" value="{{data.name}}" class="layui-input">
+          </div>
+      </div>
+      <div class="layui-inline">
+          <label class="layui-form-label">配置键名</label>
+          <div class="layui-input-inline">
+            <input type="text" name="key" autocomplete="off" placeholder="请输入配置名称" value="{{data.key}}" class="layui-input">
+          </div>
+      </div>
+  </div>
+
+  <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label">键值</label>
+        <div class="layui-input-inline" style="width: 513px;" >
+           <textarea  name="value" style="height: 200px;" id="value" class="layui-textarea">{{data.value}}</textarea>
+        </div>
+      </div>
+  </div>
+
+  <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-inline" style="width: 513px;" >
+           <textarea  name="note" id="note" class="layui-textarea">{{data.note}}</textarea>
+        </div>
+      </div>
+  </div>
+
+  <div class="layui-form-item">
+      <div class="layui-inline">
+          <label class="layui-form-label">状态</label>
+          <div class="layui-input-inline">
+              <input type="radio" name="status" value="1" title="禁用"  {% if data.status == 1 %}checked{% endif %}>
+              <input type="radio" name="status" value="2" title="启用" {% if data.status == 2 %}checked{% endif %}>
+          </div>
+      </div>
+      <div class="layui-inline">
+          <label class="layui-form-label">排序</label>
+          <div class="layui-input-inline">
+            <input type="text" name="sort" autocomplete="off" placeholder="请输入数值，越小越前" value="{{data.sort}}" class="layui-input">
+          </div>
+      </div>
+  </div>
+
+  <div class="layui-form-item">
+      <div class="layui-inline">
+          <label class="layui-form-label"></label>
+          <div class="layui-input-inline" style="width: 130px;margin-right: 0px;">
+              <div class="layui-upload">
+                <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="buildurl">上传并获取文件链接</button>
+              </div> 
+          </div>
+          <div class="layui-inline">
+              <div class="layui-input-inline" style="width: 383px;" >
+                  <input type="text" name="preview" readonly="" style="height: 30px;border-left: 0px;" autocomplete="off" placeholder="" value="" class="layui-input">
+              </div>
+          </div>
+      </div>
+  </div>
+
+
+
+  <script type="text/javascript">
+     layui.use(['upload'],function(){
+         var $ = layui.jquery;
+         var upload = layui.upload;
+         var uploadInst = upload.render({
+            elem: '#buildurl',
+            accept: 'file',
+            url: '/index.php?r=config/config/upload-file', //改成您自己的上传接口
+            done: function(res){
+              //如果上传失败
+              if(res.code > 0){
+                return layer.msg('上传失败');
+              }
+              $('input[name="preview"]').val(res.data.url[0])
+
+
+              //上传成功
+            }
+            
+          });
+     })
+  </script>
+  
+
+
+
+
+
+
+
+ 
+</form>
+
+

@@ -1,0 +1,157 @@
+<style type="text/css">
+    .layui-form-label
+    {
+        width: 110px;
+    }
+
+    .layui-form-select dl{
+        z-index: 99999;
+    }
+
+</style>
+
+<form class="layui-form" action="/index.php?r=/config/config/post-config-create"
+      data-auto-submit
+      data-reload="true" style="padding: 20px 0px;">
+    <input type="hidden" name="id"  autocomplete="off" placeholder="" value="{{data.id}}" class="layui-input">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">配置分组</label>
+            <div class="layui-input-inline">
+                <select class="" name="group_id">
+                    {% for key, item in grouplist %}
+                    <option value={{ item.id }} {% if data.group_id == item.id %}selected{% endif %}>{{ item.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">配置类型</label>
+            <div class="layui-input-inline">
+                <select class="" name="type">
+                    {% for key, item in typelist %}
+                    <option value={{ key }} {% if data.type == key %}selected{% endif %}>{{ item }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">标题</label>
+            <div class="layui-input-inline">
+                <input type="text" name="name" autocomplete="off" placeholder="请输入配置标题" value="{{data.name}}" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">配置键名</label>
+            <div class="layui-input-inline">
+                <input type="text" name="key" autocomplete="off" placeholder="请输入配置名称" value="{{data.key}}" class="layui-input">
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">键值</label>
+            <div class="layui-input-inline" style="width: 513px;" >
+                <div id="editor"></div>
+                <textarea  name="value" style="opacity: 0;position: absolute;left: 0;top: 0;" id="value" class="layui-textarea">{{data.value}}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-inline" style="width: 513px;" >
+                <textarea  name="note" id="note" class="layui-textarea">{{data.note}}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="status" value="1" title="禁用"  {% if data.status == 1 %}checked{% endif %}>
+                <input type="radio" name="status" value="2" title="启用" {% if data.status == 2 %}checked{% endif %}>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">排序</label>
+            <div class="layui-input-inline">
+                <input type="text" name="sort" autocomplete="off" placeholder="请输入数值，越小越前" value="{{data.sort}}" class="layui-input">
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- <script
+            type="text/javascript"
+            src="https://cdn.jsdelivr.net/npm/wangeditor@latest/dist/wangEditor.min.js"
+    ></script> -->
+    <script
+            type="text/javascript"
+            src="/js/wangeditor.min.js"
+    ></script>
+    <script type="text/javascript">
+       $(function () {
+           const E = window.wangEditor
+           const editor = new E('#editor')
+           editor.config.uploadImgShowBase64 = true
+           editor.config.uploadImgServer = '/index.php?r=common/upload'// 服务器端地址
+           editor.config.uploadFileName = 'file'
+            editor.config.uploadImgHooks = {
+                fail: (xhr, editor, result) => {
+                    // 插入图片失败回调
+                },
+
+                success: (xhr, editor, result) => {
+                    // 图片上传成功回调
+
+                },
+                
+                error: (xhr, editor) => {
+                    // 图片上传错误的回调
+                },
+
+                customInsert: (insertImg, result, editor) => {
+                    console.log('aaaaa',result)
+                    // 图片上传成功，插入图片的回调
+                    // result为上传图片成功的时候返回的数据，根据自己后台返回的数据格式来取值
+                    let url = "" + result.data.url[0]
+                    insertImg(url)
+
+                }
+
+            }
+
+           editor.config.onchangeTimeout = 500; // 修改为 500ms
+           editor.create()
+
+            if ($('input[name="id"]').val()) {
+                editor.txt.html($('#value').val())
+            }
+
+           // 配置 onchange 回调函数
+           editor.config.onchange = function (newHtml) {
+               console.log("change 之后最新的 html", newHtml);
+               $('#value').val(newHtml)
+           };
+       })
+
+    </script>
+
+
+
+
+
+
+
+
+
+</form>
+
+

@@ -1,0 +1,73 @@
+      <link rel="stylesheet" href="/vendors/layui/2.5.4/css/layui.css?v=2020">
+      <link rel="stylesheet" href="/css/layui/global.css?v={{STATIC_VERSION}}">
+      <script type="text/javascript" src="/vendors/layui-layer/3.1.1/layer.js"></script>
+      <script type="text/javascript" src="/vendors/layui/2.4.5/layui.js"></script>
+      <script type="text/javascript" src="/vendors/atrtemplate/4.13.2/template-web.js"></script>
+      <script type="text/javascript" src="/js/layui/global.js?v={{STATIC_VERSION}}"></script>
+
+     <form class="layui-form" action="/index.php?r=/config/config/post-update-config" method="POST" 
+     data-auto-submit style="padding-top: 50px;">
+           
+           <style type="text/css">
+             .layui-form-label{
+               width: 120px;
+             }
+             .layui-form-item .layui-input-inline{
+               width: 370px;
+             }
+             .region-container  .layui-input-inline{
+               width: 112px !important;
+             }
+           </style>
+          <!-- <fieldset class="layui-elem-field layui-field-title" style="margin-top: 15px;">
+            <legend>首页</legend>
+          </fieldset> -->
+           <div class="layui-form-item">
+             <div class="layui-inline">
+               <label class="layui-form-label">1、首页缓存</label>
+               <div class="layui-input-inline" style="width: 120px;">
+                   <button type="button" 
+                   data-confirm="确定清除首页缓存吗？"
+                   data-url="/index.php?r=config/config/post-cache-delete" 
+                   data-unreload="true"
+                   class="layui-btn layui-btn-sm layui-btn-primary" >
+                   <i class="layui-icon layui-icon-delete"></i>
+                     清除首页缓存
+                   </button>
+               </div>
+               <div class="layui-input-inline">
+                 <div class="alert alert-warning" style="padding: 3px 15px;">
+                    <span class="layui-icon-help layui-icon"></span>
+                    清除首页所有模块的缓存，同时更新缓存，异步更新，可能要等待1-2分钟左右
+                 </div>
+               </div>
+             </div>
+           </div>
+
+           
+
+         
+  
+       
+        
+     </form>
+
+<script type="text/javascript">
+  layui.use('upload', function(){
+       var $ = layui.jquery
+       ,upload = layui.upload;
+      //普通图片上传
+        var uploadInst = upload.render({
+          elem: '#upload-bottom-image',
+          auto:false,
+          field:'bottom_image',
+          choose: function(obj){
+            console.log(obj)
+                obj.preview(function(index, file, result){
+                   $('#preview').attr('src',result)
+               });
+          }
+        });
+  })
+  
+</script>   

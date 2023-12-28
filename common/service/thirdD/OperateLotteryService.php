@@ -8,6 +8,7 @@ use backend\service\OpKjService;
 use common\models\thirdD\BetOrderId;
 use common\service\CommonService;
 use common\service\helpers\ThirdD;
+use common\service\jobs\statics_3d\UserDayStaticsJobs;
 use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
 use yii\helpers\Json;
@@ -49,12 +50,19 @@ class OperateLotteryService extends CommonBaseService
             Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算00', ['lottery_type'=>$lottery_type, 'counts'=>count($BetRows), 'sql'=>$sql]);
 
             $idData = [];
+            $wechatUserDatas = [];
             foreach ($BetRows as $betRow){
                 list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);
                 Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖计算01', ['code'=>$code, 'data'=>$data, 'msg'=>$msg]);
                 if($code==0){
                     $idData[] = $data['idData'];
                 }
+                $wechatUserDatas[] = ['user_id'=>$betRow->user_id, 'wechat_user_id'=>$betRow['wechat_user_id']];
+            }
+            $wechatUserDatas = array_unique($wechatUserDatas);
+            foreach ($wechatUserDatas as $d){
+                $params = ['user_id'=>$d['user_id'], 'type'=>WechatUserService::TYPE_ORDER_BET, 'queue_delay_time'=>30, 'msg'=>'开奖后报表计算', 'wechat_user_id'=>$d['wechat_user_id']];
+                push_queue_fast(UserDayStaticsJobs::class, $params); # 处理数据入列
             }
         }catch (\Exception $e){
             return [10001, ['lottery_type'=>$lottery_type], $e->getMessage()];

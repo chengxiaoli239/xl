@@ -1,0 +1,154 @@
+<link rel="stylesheet" href="/vendors/layui/2.5.4/css/layui.css?v=2020">
+<link rel="stylesheet" href="/css/layui/global.css?v={{STATIC_VERSION}}">
+<script type="text/javascript" src="/vendors/layui-layer/3.1.1/layer.js"></script>
+<script type="text/javascript" src="/vendors/layui/2.4.5/layui.js"></script>
+<script type="text/javascript" src="/vendors/atrtemplate/4.13.2/template-web.js"></script>
+<script type="text/javascript" src="/js/layui/global.js?v={{STATIC_VERSION}}"></script>
+
+<style type="text/css">
+    .layui-form-label{
+        width:85px;
+    }
+    .alert-item{
+        margin-right: 20px;
+        font-weight: bold;
+    }
+    .layui-table td,
+    .layui-table th
+    {
+        border-right-color: #e6e6e6;
+        border-left-color: #e6e6e6;
+    }
+    .layui-table-view .layui-table th
+    {
+        padding: 0px;
+    }
+</style>
+<div class="duty-container" >
+    <form class="layui-form  layuiadmin-card-header-auto" action=""
+          data-auto-get style="padding-top: 5px;">
+
+        <div class="layui-form-item" >
+
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                    <input type="text" name="name" placeholder="名称/键名" value="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+
+            <div class="layui-inline">
+                <button type="submit" class="layui-btn layui-btn-normal layuiadmin-btn-useradmin" lay-submit="" lay-filter="LAY-user-front-search">
+                    <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                    搜索
+                </button>
+
+                <button type="reset" class="layui-btn layui-btn-primary layuiadmin-btn-useradmin" lay-submit="" lay-filter="LAY-user-front-search">
+                    重置
+                </button>
+
+            </div>
+
+
+
+        </div>
+
+
+    </form>
+    <div  class="layui-toolbox" >
+
+        <button type="button"
+                data-modal=""
+                data-width="800px"
+                data-height="80%"
+                data-url="/index.php?r=config/config/doc-create"
+                class="layui-btn layui-btn-sm layui-btn-primary" >
+            + 添加配置
+        </button>
+
+        <button type="button"
+                data-confirm=""
+                data-field="id"
+                data-batch="true"
+                data-url="/index.php?r=config/config/post-config-delete"
+                class="layui-btn layui-btn-sm layui-btn-primary" >
+            <i class="layui-icon layui-icon-delete"></i>
+            批量删除
+        </button>
+
+
+    </div>
+
+    <table class="layui-hide table-grid" lay-filter="main" id="main-table"></table>
+</div>
+
+<script>
+
+
+
+
+    $(function(){
+
+
+        layui.use(['table','form','laydate','laytpl'], function(){
+            var table = layui.table;
+            window.Tnmc.tableIns=table.render({
+                elem: '#main-table',
+                cellMinWidth:'80',
+                url:'/index.php?r=/config/config/get-doc-list',
+                cols: [[
+                    {type:'checkbox'},
+                    {field:'id', width:100, align:'center', title: 'ID'},
+                    {field:'group_name', align:'center', title: '分组'},
+                    {field:'name', align:'center', title: '配置名称'},
+                    {field:'key', align:'center', title: '键名'},
+                    // {field:'value', align:'center', title: '配置值'},
+                    {field:'note', align:'center', title: '说明'},
+                    {field:'status', align:'center', title: '状态'},
+                    {field:'admin_name', align:'center', title: '创建人'},
+                    {field:'create_time', align:'center', title: '创建时间'},
+                    {field:'update_time', align:'center', title: '更新时间'},
+
+                    {
+                        field:'name',
+                        title: '操作',
+                        width:80,
+                        fixed: 'right',
+                        templet:function( d ){
+                            var html=''
+                            html+='<button type="button" data-modal=""  data-height="80%" data-width="800px"  data-url="/index.php?r=config/config/doc-create&id='+d.id+'" class="layui-btn layui-btn-primary layui-btn-sm">编辑</button>'
+                            return html;
+                        }
+                    }
+                ]
+
+                ],
+                page: true,
+                limit:30,
+                autoSort: false,
+                height:window.Tnmc.getTableHeight(),
+                where: window.Tnmc.getUrlFormArgs()
+            });
+
+            table.on('sort(main)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+                //尽管我们的 table 自带排序功能，但并没有请求服务端。
+                //有些时候，你可能需要根据当前排序的字段，重新向服务端发送请求，从而实现服务端排序，如：
+                window.Tnmc.tableIns.reload({
+                    initSort:obj,
+                    where: window.Tnmc.getUrlFormArgs( {
+                        order_field: obj.field,
+                        order_by: obj.type //排序方式
+                    } )
+                })
+            });
+
+
+            //日期范围
+            layui.laydate.render({
+                elem: '#date_range'
+                ,range: true
+            })
+
+        });
+    })
+</script>

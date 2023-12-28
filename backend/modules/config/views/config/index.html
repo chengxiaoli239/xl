@@ -1,0 +1,299 @@
+      <link rel="stylesheet" href="/vendors/layui/2.5.4/css/layui.css?v=2020">
+      <link rel="stylesheet" href="/css/layui/global.css?v={{STATIC_VERSION}}">
+      <script type="text/javascript" src="/vendors/layui-layer/3.1.1/layer.js"></script>
+      <script type="text/javascript" src="/vendors/layui/2.4.5/layui.js"></script>
+      <script type="text/javascript" src="/vendors/atrtemplate/4.13.2/template-web.js"></script>
+      <script type="text/javascript" src="/js/layui/global.js?v={{STATIC_VERSION}}"></script>
+
+     <form class="layui-form" action="/index.php?r=/config/config/post-update-config" method="POST" 
+     data-auto-submit style="padding-top: 20px;">
+           
+           <style type="text/css">
+             .layui-form-label{
+               width: 120px;
+             }
+             .layui-form-item .layui-input-inline{
+               width: 370px;
+             }
+             .region-container  .layui-input-inline{
+               width: 112px !important;
+             }
+           </style>
+          <fieldset class="layui-elem-field layui-field-title" style="margin-top: 15px;">
+            <legend>个人中心-底部设置</legend>
+          </fieldset>
+           <div class="layui-form-item">
+             <div class="layui-inline">
+               <label class="layui-form-label">是否开启</label>
+               <div class="layui-input-inline">
+                 {% if data.user_center_bottom==1 %}
+                   <input type="checkbox" checked="" name="user_center_bottom" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                 {% else %}
+                   <input type="checkbox" name="user_center_bottom" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                 {% endif %}
+               </div>
+             </div>
+           </div>
+           
+           <div class="layui-form-item">
+             <div class="layui-inline">
+               <label class="layui-form-label">图片</label>
+               <div class="layui-input-inline">
+                   <div class="layui-upload">
+                     <button type="button"  
+                     class="layui-btn layui-btn-sm layui-btn-primary" id="upload-bottom-image"><i class="layui-icon"></i>上传图片</button>
+                     <div class="layui-upload-list">
+                       <img class="layui-upload-img" style="width: 350px;background: #333;" src="{{data.user_center_bottom_image}}" id="preview">
+                     </div>
+                   </div>
+               </div>
+             </div>
+             
+           </div>
+
+           <fieldset class="layui-elem-field layui-field-title" style="margin-top: 15px;">
+             <legend>邮寄功能</legend>
+           </fieldset>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                  <label class="layui-form-label">线下门店邮寄</label>
+                  <div class="layui-input-inline">
+                    {% if data.offline_post_open==1 %}
+                      <input type="checkbox" checked="" name="offline_post_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% else %}
+                      <input type="checkbox" name="offline_post_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="layui-inline">
+                    <label class="layui-form-label">代寄功能</label>
+                    <div class="layui-input-inline">
+                      {% if data.offline_replace_post_open==1 %}
+                        <input type="checkbox" checked="" name="offline_replace_post_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                      {% else %}
+                        <input type="checkbox" name="offline_replace_post_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                      {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                  <label class="layui-form-label">线上邮寄</label>
+                  <div class="layui-input-inline">
+                    {% if data.online_post_open==1 %}
+                      <input type="checkbox" checked="" name="online_post_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% else %}
+                      <input type="checkbox" name="online_post_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="layui-inline">
+                  <label class="layui-form-label">允许邮寄时间</label>
+                  <div class="layui-input-inline" style="width: 100px;">
+                     <input type="number"  placeholder="请输入时间：单位分钟" class="layui-input" name="mail_canbe_post_time" value="{{data.mail_canbe_post_time}}">
+                  </div>
+                  <div class="layui-form-mid layui-word-aux">分钟</div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                  <label class="layui-form-label">人脸H5</label>
+                  <div class="layui-input-inline">
+                    {% if data.mail_lifeface_h5_open==1 %}
+                      <input type="checkbox" checked="" name="mail_lifeface_h5_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% else %}
+                      <input type="checkbox" name="mail_lifeface_h5_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% endif %}
+                  </div>
+                </div>
+
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">人脸小程序</label>
+                  <div class="layui-input-inline">
+                    {% if data.mail_lifeface_mini_open==1 %}
+                      <input type="checkbox" checked="" name="mail_lifeface_mini_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% else %}
+                      <input type="checkbox" name="mail_lifeface_mini_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">人脸安卓-APP</label>
+                  <div class="layui-input-inline">
+                    {% if data.mail_lifeface_android_open==1 %}
+                      <input type="checkbox" checked="" name="mail_lifeface_android_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% else %}
+                      <input type="checkbox" name="mail_lifeface_android_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">人脸IOS-APP</label>
+                  <div class="layui-input-inline">
+                    {% if data.mail_lifeface_ios_open==1 %}
+                      <input type="checkbox" checked="" name="mail_lifeface_ios_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% else %}
+                      <input type="checkbox" name="mail_lifeface_ios_open" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% endif %}
+                  </div>
+                </div> 
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">人脸缓存时间</label>
+                  <div class="layui-input-inline" style="width: 100px;">
+                     <input type="number"  placeholder="请输入时间：单位分钟" class="layui-input" name="mail_lifeface_cache_time" value="{{data.mail_lifeface_cache_time}}">
+                  </div>
+                  <div class="layui-form-mid layui-word-aux">分钟</div>
+                </div>
+                <div class="layui-inline">
+                  <label class="layui-form-label">校验失败是否允许邮寄</label>
+                  <div class="layui-input-inline">
+                    {% if data.mail_lifeface_nopass_canbe_send==1 %}
+                      <input type="checkbox" checked="" name="mail_lifeface_nopass_canbe_send" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% else %}
+                      <input type="checkbox" name="mail_lifeface_nopass_canbe_send" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% endif %}
+                  </div>
+                </div>
+
+               
+            </div>
+
+
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 15px;">
+              <legend>下单模块</legend>
+            </fieldset>
+             <div class="layui-form-item">
+                 <div class="layui-inline">
+                   <label class="layui-form-label">开启积分</label>
+                   <div class="layui-input-inline">
+                     {% if data.submit_use_integral==1 %}
+                       <input type="checkbox" checked="" name="submit_use_integral" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                     {% else %}
+                       <input type="checkbox" name="submit_use_integral" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                     {% endif %}
+                   </div>
+                 </div>
+
+              <div class="layui-form-item">
+
+                <div class="layui-inline">
+                  <label class="layui-form-label">自有商城航班校验开关</label>
+                  <div class="layui-input-inline">
+                    {% if data.trip_verify==1 %}
+                      <input type="checkbox" checked="" name="trip_verify" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% else %}
+                      <input type="checkbox" name="trip_verify" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                    {% endif %}
+                  </div>
+                </div>
+
+              <div class="layui-inline">
+                <label class="layui-form-label">抖音航班校验开关</label>
+                <div class="layui-input-inline">
+                  {% if data.byte_trip_verify==1 %}
+                    <input type="checkbox" checked="" name="byte_trip_verify" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                  {% else %}
+                    <input type="checkbox" name="byte_trip_verify" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                  {% endif %}
+                </div>
+              </div>
+                  
+                  <div class="layui-inline">
+                <label class="layui-form-label">快手航班校验开关</label>
+                <div class="layui-input-inline">
+                  {% if data.kuaishou_trip_verify==1 %}
+                    <input type="checkbox" checked="" name="kuaishou_trip_verify" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                  {% else %}
+                    <input type="checkbox" name="kuaishou_trip_verify" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                  {% endif %}
+                </div>
+              </div>
+
+              <!---支付成功群二维码 开始--->
+              <fieldset class="layui-elem-field layui-field-title" style="margin-top: 15px;">
+                  <legend>支付成功页-群二维码</legend>
+              </fieldset>
+              <div class="layui-form-item">
+                  <div class="layui-inline">
+                      <label class="layui-form-label">是否开启</label>
+                      <div class="layui-input-inline">
+                          {% if data.pay_success_group_qr_code_status==1 %}
+                          <input type="checkbox" checked="" name="pay_success_group_qr_code_status" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                          {% else %}
+                          <input type="checkbox" name="pay_success_group_qr_code_status" value="1" lay-skin="switch" lay-text="已开启|已关闭">
+                          {% endif %}
+                      </div>
+                  </div>
+              </div>
+
+              <div class="layui-form-item">
+                  <div class="layui-inline">
+                      <label class="layui-form-label">图片</label>
+                      <div class="layui-input-inline">
+                          <div class="layui-upload">
+                              <button type="button"
+                                      class="layui-btn layui-btn-sm layui-btn-primary" id="upload-pay-success-group-qr-code-btn"><i class="layui-icon"></i>上传图片</button>
+                              <div class="layui-upload-list">
+                                  <img class="layui-upload-img" style="width: 350px;background: #333;" src="{{data.pay_success_group_qr_code}}" id="preview1">
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <!---支付成功群二维码 结束--->
+
+         
+
+         
+
+         
+         
+
+           <div class="layui-form-item" style="margin-top: 50px;">
+                  <label class="layui-form-label"></label>
+                  <div class="layui-input-inline">
+                      <button type="submit" class="layui-btn layui-btn-normal layui-btn-radius">提交保存</button>
+                  </div>
+            </div>
+       
+        
+     </form>
+
+<script type="text/javascript">
+  layui.use('upload', function(){
+       var $ = layui.jquery
+       ,upload = layui.upload;
+      //普通图片上传
+        var uploadInst = upload.render({
+          elem: '#upload-bottom-image',
+          auto:false,
+          field:'bottom_image',
+          choose: function(obj){
+            console.log(obj)
+                obj.preview(function(index, file, result){
+                   $('#preview').attr('src',result)
+               });
+          }
+        });
+
+      var uploadQrCode = upload.render({
+          elem: '#upload-pay-success-group-qr-code-btn',
+          auto:false,
+          field:'group_qr_code',
+          choose: function(obj){
+              console.log(obj)
+              obj.preview(function(index, file, result){
+                  $('#preview1').attr('src',result)
+              });
+          }
+      });
+  })
+  
+</script>   
