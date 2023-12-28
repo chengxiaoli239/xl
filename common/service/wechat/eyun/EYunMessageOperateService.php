@@ -643,11 +643,15 @@ class EYunMessageOperateService  extends EYunBaseService
                     }
                 }
 
-                $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $oneAllMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
                 $oneReplyTxt .= str_replace(';', ',', $betContent);
                 $oneReplyTxt .= ("\n【单号】".$betOrderId);
                 $oneReplyTxt .= ("\n【成功】√  共".$oneAllCounts."组，共".$oneAllMoneys.'咪');
-                $oneReplyTxt .= ("\n【剩余】".$vData['balance'].'咪');
+                if($this->wechatUser['is_need_confirm']){
+                    $oneReplyTxt .= '等待确认...';
+                }else{
+                    $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $oneAllMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
+                    $oneReplyTxt .= ("\n【剩余】".$vData['balance'].'咪');
+                }
 
                 if($this->wechatUser['reply_type']==BetsBackend::REPLY_TYPE_QUICK){
                     # 即时回复
