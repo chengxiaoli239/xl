@@ -18,7 +18,7 @@ class WechatUser extends WechatUserModel
     public function rules()
     {
         return [
-            [['id', 'user_id', 'status', 'is_tuo', 'is_chi', 'is_private', 'is_cha', 'is_bind', 'is_credit', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'user_id', 'status', 'is_tuo', 'is_chi', 'is_private', 'is_cha', 'is_bind', 'is_need_confirm', 'reply_type', 'is_credit', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['userName', 'nickName', 'aliasName', 'bet_url', 'token', 'bigHead', 'smallHead', 'labelList', 'remark', 'update_at'], 'safe'],
             [['balance', 'all_bet_money', 'today_profits_loss', 'all_profits_loss'], 'number'],
         ];
@@ -48,7 +48,6 @@ class WechatUser extends WechatUserModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort' => ['defaultOrder'=>['id'=>SORT_DESC]],
         ]);
 
         $this->load($params);
@@ -70,6 +69,8 @@ class WechatUser extends WechatUserModel
             'is_private' => $this->is_private,
             'is_cha' => $this->is_cha,
             'is_bind' => $this->is_bind,
+            'is_need_confirm' => $this->is_need_confirm,
+            'reply_type' => $this->reply_type,
             'all_bet_money' => $this->all_bet_money,
             'today_profits_loss' => $this->today_profits_loss,
             'all_profits_loss' => $this->all_profits_loss,

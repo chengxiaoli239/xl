@@ -574,7 +574,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $pushSiteDatas = [];
             foreach ($betCodeContents as $lottery_type=>$contents){
                 # 校验开盘关盘
-                self::preValidateTime($lottery_type);
+                //self::preValidateTime($lottery_type);
 
                 $qihao = (string)HN0898Service::getQihao($lottery_type);
                 $oneReplyTxt = '【课号】'.$contents[0]['lottery_name'].$qihao;
