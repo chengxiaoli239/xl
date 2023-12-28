@@ -617,6 +617,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             'bet_desc' => $text,
                             'new_msg_id' => $messageData['newMsgId'],
                             'reply_type' => $this->wechatUser['reply_type'],
+                            'is_need_confirm' => $this->wechatUser['is_need_confirm'],
                             'reply_content' => Json::encode($replyContent),
                             'api_code_datas' => $playMethods['apiCodeDatas']?Json::encode($playMethods['apiCodeDatas']):'',
                             'created_at' => $now_time,
@@ -635,8 +636,10 @@ class EYunMessageOperateService  extends EYunBaseService
 
                         $betContent .= "\n".$oneBetContent;
 
-                        # 推送网盘任务：
-                        $pushSiteDatas[] = ['betRowId'=>$Bets->id, 'orderId'=>$Bets->order_id, 'business_id'=>$Bets->order_id];
+                        if(!$this->wechatUser['is_need_confirm']){ # 无需确认即可直接上盘口
+                            # 推送网盘任务：
+                            $pushSiteDatas[] = ['betRowId'=>$Bets->id, 'orderId'=>$Bets->order_id, 'business_id'=>$Bets->order_id];
+                        }
                     }
                 }
 
