@@ -141,18 +141,34 @@ $this->params['breadcrumbs'][] = $this->title;
                         //        //return $model->snid;
                         //    }
                         //],
-                        ['attribute'=>'is_cha','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                        //['attribute'=>'is_cha','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                        //    'format'=>'raw',
+                        //    'value'=>function($model){
+                        //        $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_cha&val=1'; # 点击开启
+                        //        $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_cha&val=0'; # 点击关闭
+                        //        if($model->is_cha == 1){
+                        //            $txt = "<font color='green'>√</font>" ;
+                        //            return Html::a($txt, $url1, ['title' => '点击关闭']);
+                        //        }
+                        //        if(!$model->is_cha){
+                        //            $txt = "<font color='red'>X</font>";
+                        //            return Html::a($txt, $url0, ['title' => '点击开启']);
+                        //        }
+                        //        return '';
+                        //    }
+                        //],
+                        ['attribute'=>'is_need_confirm','label'=>'需确认','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value'=>function($model){
-                                $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_cha&val=1'; # 点击开启
-                                $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_cha&val=0'; # 点击关闭
-                                if($model->is_cha == 1){
+                                $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_need_confirm&val=1'; # 点击开启
+                                $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_need_confirm&val=0'; # 点击关闭
+                                if($model->is_need_confirm == 1){
                                     $txt = "<font color='green'>√</font>" ;
-                                    return Html::a($txt, $url1, ['title' => '点击关闭']);
+                                    return Html::a($txt, $url1, ['title' => '需确认才上盘口']);
                                 }
-                                if(!$model->is_cha){
+                                if(!$model->is_need_confirm){
                                     $txt = "<font color='red'>X</font>";
-                                    return Html::a($txt, $url0, ['title' => '点击开启']);
+                                    return Html::a($txt, $url0, ['title' => '无需确认上盘口']);
                                 }
                                 return '';
                             }
