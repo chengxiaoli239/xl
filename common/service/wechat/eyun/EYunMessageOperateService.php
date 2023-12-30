@@ -719,7 +719,8 @@ class EYunMessageOperateService  extends EYunBaseService
             switch (true){
                 case strpos($text, '全部代购') !== false:
                     $BetsQuery = BetsBackend::find()->where($betWhere);
-                    //$sql = $BetsQuery->createCommand()->getRawSql();p($sql);
+                    $sql = $BetsQuery->createCommand()->getRawSql();//p($sql);
+                    Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复01', ['sql'=>$sql]);
                     $Bets = $BetsQuery->asArray()->all();
                     foreach ($Bets as $Bet){
                         # 推送网盘任务：
