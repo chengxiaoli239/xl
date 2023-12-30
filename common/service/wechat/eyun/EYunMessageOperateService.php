@@ -705,7 +705,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $wechatUserId = $this->wechatUser['id'];
             $user_id = $this->wechatUser['user_id'];
             //p($this->wechatUser);
-            $text = $messageData['text'];
+            $text = $messageData['content'];
             $pushSiteData = []; # 即将推送盘口的记录
             $betWhere = [
                 'status' => BetsBackend::PUSH_STATUS_WAIT,
