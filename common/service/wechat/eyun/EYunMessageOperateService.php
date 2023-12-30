@@ -501,7 +501,11 @@ class EYunMessageOperateService  extends EYunBaseService
                     $vData = AgentUsersBalanceService::updateBalance((string)$orderId, $orderBetMoney, $wechatUser['id'], WechatUserService::TYPE_ORDER_CANCEL); # 撤单返还
                 }
                 #$Bets->status = 3; # 已撤单
-                BetsBackend::updateAll(['status'=>CommonBaseService::STATUS_LT_CANCEL], ['order_id'=>$orderId]);
+                $params = ['status'=>CommonBaseService::STATUS_LT_CANCEL];
+                if($Bets->push_status == BetsBackend::PUSH_STATUS_WAIT){
+                    $params['push_status'] = BetsBackend::PUSH_STATUS_CANNOT;
+                }
+                BetsBackend::updateAll($params, ['order_id'=>$orderId]);
                 if(!$Bets->save()){
                     throw_info(Json::encode($Bets->getErrors()));
                 }
