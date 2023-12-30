@@ -98,10 +98,10 @@ class ReplyService extends CommonBaseService
 
                 $logArr = ['wechatUserId'=>$wechatUserId, 'message_ids'=>$message_ids, $oneUserReplyTxts, 'atIds'=>$atIds];
                 list($code, $vData, $msg) = ReplyService::getFileNameInfo($replyContent['fromNickName']);
-                list($dir, $filePath, $fileName) = $vData;
+                list($dir, $fileName, $filePath) = $vData;
 
-                $result = $MessageService->sendFile($wcId, $filePath, $fileName); # 回复 file
                 Tool_Common::recordFile($dir, $fileName, $oneUserReplyTxts);
+                $result = $MessageService->sendFile($wcId, $filePath, $fileName); # 回复 file
 
                 $logArr = array_merge($logArr, [
                     'filePath' => $filePath,
@@ -213,11 +213,11 @@ class ReplyService extends CommonBaseService
 
                 $logArr = ['wechatUserId'=>$wechatUserId, 'message_ids'=>$message_ids, $oneUserReplyTxts, 'atIds'=>$atIds];
                 list($code, $vData, $msg) = ReplyService::getFileNameInfo($replyContent['fromNickName']);
-                p($vData);
-                list($dir, $filePath, $fileName) = $vData;
+                //p($vData);
+                list($dir, $fileName, $filePath) = $vData;
 
-                $result = $MessageService->sendFile($wcId, $filePath, $fileName); # 回复 file
                 Tool_Common::recordFile($dir, $fileName, $oneUserReplyTxts);
+                $result = $MessageService->sendFile($wcId, $filePath, $fileName); # 回复 file
                 $logArr = array_merge($logArr, [
                     'filePath' => $filePath,
                     'fileName' => $fileName,
