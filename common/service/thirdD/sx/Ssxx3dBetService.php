@@ -446,8 +446,12 @@ class Ssxx3dBetService extends CommonBaseService
         //$sql = $BetsQuery->createCommand()->getRawSql();var_dump($sql);
         $Bets = $BetsQuery->asArray()->all();
         foreach ($Bets as $bet){
-            $result = Ssxx3dBetService::postToSite($bet['id']);
-            Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '异常数据补上盘', ['id'=>$bet['id'], 'order_id'=>$bet['order_id'], 'result'=>$result]);
+            try {
+                $result = Ssxx3dBetService::postToSite($bet['id']);
+                Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '异常数据补上盘', ['id'=>$bet['id'], 'order_id'=>$bet['order_id'], 'result'=>$result]);
+            }catch (\Exception $e){
+                Tool_Common::log('/bet_3d/'.__FUNCTION__, 'ERR', '异常数据补上盘-异常', ['id'=>$bet['id'], 'order_id'=>$bet['order_id'], 'err_msg'=>$e->getMessage()]);
+            }
         }
         var_dump('执行结束 '.date('Y-m-d H:i:s').' 补打'.count($Bets).'条');
 

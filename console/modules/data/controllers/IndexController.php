@@ -236,7 +236,8 @@ class IndexController extends Controller
      * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii data/index/op-kj
      * @return array
      */
-    public function actionOpKj(){
+    public function actionOpKj(): array
+    {
         self::_init();
         $time = date("H:i");
         if(\Yii::$app->params['ssc_kj_time_start'] < $time && $time < \Yii::$app->params['ssc_kj_time_start'] ){
@@ -253,7 +254,7 @@ class IndexController extends Controller
             }
         }
 
-        return $rst;
+        return $rst??[];
     }
 
     /**

@@ -34,6 +34,17 @@ class IndexController extends Controller
     }
 
     /**
+     * @desc 打包回复散客
+     * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii user/index/package-reply-user
+     */
+    public function actionPackageReplyUser(): array
+    {
+        $rst = ReplyService::packageReplyUser();
+
+        return $rst;
+    }
+
+    /**
      * @desc 上盘口
      * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii user/index/post-to-site
      */

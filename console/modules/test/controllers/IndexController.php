@@ -133,6 +133,20 @@ class IndexController extends Controller
      * @return void
      **/
     public function actionDw1(){
+        $next_qihao = KjDataGet::getNextQihaoByQihao($qihao='20231229288', $lottery_type=8);
+        p($next_qihao);
+        /**
+         * 确认订单：
+         * 1、全部确认（除撤单的），管理员输入：全部代购
+         * 2、指定单个订单确认，管理员输入：单号+已代购、已代购+单号
+         *
+         * 撤单：
+         * 用户：单号+撤、撤+单号
+         * 管理员：单号+撤、撤+单号
+         */
+        $MessageService = new EYunMessageOperateService($user_id=21);
+        $data = ["toUser"=>"wxid_875i1kgd38x122", 'targetUser'=>'wxid_875i1kgd38x122','text'=>'全部代购',];
+        $rst = $MessageService->receiveFromMyself($data);p($rst);
         $lottery_types = StaticService::getLotteryTypes();p($lottery_types);
         $plan = UserSysPlans::findOne(7709);
         $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, [148]);p(count($codes));

@@ -8,7 +8,6 @@ use backend\service\agent\AgentUsersService;
 use backend\service\BetService;
 use backend\service\HN0898Service;
 use common\models\eyun\RobotUser;
-use common\models\thirdD\BetOrderId;
 use common\models\wechat\WechatUser;
 use common\service\BaseService;
 use common\service\chat\Tool_Common;
@@ -45,10 +44,10 @@ class EYunMessageOperateService  extends EYunBaseService
         self::MESSAGE_FRIEND_INFO_CODE,
     ];
 
-    public static $methodDatas = [];
-    public static $aliasNameToOriginName = [];
-    public static $gLotteryType = 26;
-    public static $gLotteryName = '福';
+    public static array $methodDatas = [];
+    public static array $aliasNameToOriginName = [];
+    public static int $gLotteryType = 26;
+    public static string $gLotteryName = '福';
 
     public static function tableName()
     {
@@ -495,10 +494,12 @@ class EYunMessageOperateService  extends EYunBaseService
                 if($Bets->status==CommonBaseService::STATUS_LT_CANCEL){
                     throw_info($orderId.'订单已是撤单状态，无需重复处理', CommonBaseService::CODE_FOR_USER);
                 }
-                $orderBetMoney = BetsBackend::find()->select(['orderBetMoney'=>'SUM(bet_money)'])
-                    ->where(['order_id'=>$orderId, 'wechat_user_id'=>$wechatUser['id']])
-                    ->groupBy(['order_id'])->scalar();
-                $vData = AgentUsersBalanceService::updateBalance((string)$orderId, $orderBetMoney, $wechatUser['id'], WechatUserService::TYPE_ORDER_CANCEL); # 撤单返还
+                if(!$wechatUser['is_need_confirm']){ # 无需确认用户
+                    $orderBetMoney = BetsBackend::find()->select(['orderBetMoney'=>'SUM(bet_money)'])
+                        ->where(['order_id'=>$orderId, 'wechat_user_id'=>$wechatUser['id']])
+                        ->groupBy(['order_id'])->scalar();
+                    $vData = AgentUsersBalanceService::updateBalance((string)$orderId, $orderBetMoney, $wechatUser['id'], WechatUserService::TYPE_ORDER_CANCEL); # 撤单返还
+                }
                 #$Bets->status = 3; # 已撤单
                 BetsBackend::updateAll(['status'=>CommonBaseService::STATUS_LT_CANCEL], ['order_id'=>$orderId]);
                 if(!$Bets->save()){
@@ -533,13 +534,14 @@ class EYunMessageOperateService  extends EYunBaseService
 
     /**
      * 消息处理后的业务处理
-     * @param string $text
-     * @param string $fromUser 发送者的微信id
      * @param string $messageData 消息体内容
-     */
-    public function receive(string $text='', string $fromUser='', $messageData=[]): array
+     * @return array
+     **/
+    public function receive($messageData=[]): array
     {
         try {
+            $fromUser = $messageData['fromUser']; # 来自
+            $text = $messageData['content']; # 文本
             $transaction = static::getDb()->beginTransaction();
             # 校验
             list($code, $vdata, $msg) = self::validateReceive($this->user_id, $text);
@@ -571,7 +573,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $allMoneys = 0.00;
             $allCounts = 0;
             $replyTxts = [];
-            $pushSiteDatas = [];
+            $pushSiteData = [];
             foreach ($betCodeContents as $lottery_type=>$contents){
                 # 校验开盘关盘
                 self::preValidateTime($lottery_type);
@@ -638,7 +640,7 @@ class EYunMessageOperateService  extends EYunBaseService
 
                         if(!$this->wechatUser['is_need_confirm']){ # 无需确认即可直接上盘口
                             # 推送网盘任务：
-                            $pushSiteDatas[] = ['betRowId'=>$Bets->id, 'orderId'=>$Bets->order_id, 'business_id'=>$Bets->order_id];
+                            $pushSiteData[] = ['betRowId'=>$Bets->id, 'orderId'=>$Bets->order_id, 'business_id'=>$Bets->order_id];
                         }
                     }
                 }
@@ -673,18 +675,96 @@ class EYunMessageOperateService  extends EYunBaseService
             throw_info($e->getMessage());
         }
 
-        $logArr = ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData, 'replyTxts'=>$replyTxts, 'pushSiteDatas'=>$pushSiteDatas];
+        $logArr = ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$fromUser, 'setData'=>$setData, 'replyTxts'=>$replyTxts, 'pushSiteData'=>$pushSiteData];
         Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-成功', $logArr);
-        foreach ($pushSiteDatas as $pushSiteData){
+        foreach ($pushSiteData as $pushData){
             $second = BetService::getConfig('HOLD_ORDER_SECONDS')??120;
-            $pushSiteData['queue_delay_time'] = $second;
-            push_queue_open(SsxxBetJobs::class, $pushSiteData);
+            $pushData['queue_delay_time'] = $second;
+            push_queue_open(SsxxBetJobs::class, $pushData);
         }
         $data = [
             'type' => WechatUserService::TYPE_ORDER_BET,
             'text' => $text,
             'replyTxts' => $replyTxts,
             'allMoneys' => $allMoneys,
+        ];
+
+        return [0, $data, '接收成功'];
+    }
+
+    /**
+     * 自己给用户发送的消息处理
+     * @param array $messageData 消息体内容
+     * @return array
+     */
+    public function receiveFromMyself(array $messageData=[]): array
+    {
+        try {
+            $targetUser = $messageData['targetUser'];
+            $this->setMemberInfo($targetUser);
+            $wechatUserId = $this->wechatUser['id'];
+            $user_id = $this->wechatUser['user_id'];
+            //p($this->wechatUser);
+            $text = $messageData['text'];
+            $pushSiteData = []; # 即将推送盘口的记录
+            $betWhere = [
+                'status' => BetsBackend::PUSH_STATUS_WAIT,
+                'wechat_user_id' => $wechatUserId,
+                'user_id' => $user_id,
+                'is_need_confirm' => BetsBackend::NEED_CONFIRM_YES,
+            ];
+            $operateOrderIds = []; # 操作单号
+            $b_type = WechatUserService::TYPE_ORDER_BET;
+            switch (true){
+                case strpos($text, '全部代购') !== false:
+                    $BetsQuery = BetsBackend::find()->where($betWhere);
+                    //$sql = $BetsQuery->createCommand()->getRawSql();p($sql);
+                    $Bets = $BetsQuery->asArray()->all();
+                    foreach ($Bets as $Bet){
+                        # 推送网盘任务：
+                        $pushSiteData[] = ['betRowId'=>$Bet['id'], 'orderId'=>$Bet['order_id'], 'business_id'=>$Bet['order_id']];
+                        $operateOrderIds[] = $Bet['order_id'];
+                    }
+                    break;
+                case strpos($text, '已代购') !== false && preg_match_all('/(\d+)/u', $text, $matches):
+                    foreach ($matches[0] as $matchOrderId){
+                        $betWhere['order_id'] = $matchOrderId;
+                        $BetsQuery = BetsBackend::find()->where($betWhere);
+                        $Bets = $BetsQuery->asArray()->all();
+                        foreach ($Bets as $Bet){
+                            # 推送网盘任务：
+                            $pushSiteData[] = ['betRowId'=>$Bet['id'], 'orderId'=>$Bet['order_id'], 'business_id'=>$Bet['order_id']];
+                        }
+                        $operateOrderIds[] = $matchOrderId;
+                    }
+                    break;
+                case strpos($text, '撤') !== false && preg_match_all('/(\d+)/u', $text, $matches):
+                    foreach ($matches as $matchOrderId){
+                        EYunMessageOperateService::operateCancel($text, $this->wechatUser);
+                        $operateOrderIds[] = $matchOrderId;
+                    }
+                    $b_type = WechatUserService::TYPE_ORDER_CANCEL;
+                    break;
+            }
+        }catch (\Exception $e){
+
+        }
+        if(!empty($pushSiteData) && $b_type == WechatUserService::TYPE_ORDER_BET){
+            foreach ($pushSiteData as $pushData){
+                push_queue_open(SsxxBetJobs::class, $pushData);
+            }
+        }
+
+        $replyTxts = ($b_type==WechatUserService::TYPE_ORDER_CANCEL)? '已撤单:' : '已代购';
+        if(!empty($operateOrderIds)){
+            $operateOrderIds = array_unique($operateOrderIds);
+            $replyTxts .= '单号：'.implode(' ', $operateOrderIds);
+        }
+        $data = [
+            'type' => WechatUserService::TYPE_ORDER_BET,
+            'text' => $text,
+            'replyTxts' => [$replyTxts],
+            //'allMoneys' => $allMoneys,
         ];
 
         return [0, $data, '接收成功'];

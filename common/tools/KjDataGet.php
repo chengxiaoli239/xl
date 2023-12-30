@@ -331,7 +331,7 @@ class KjDataGet
                 OperateLotteryService::operate($lottery_type);  # 3D 处理3D下注记录
             }else{
 
-            $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
+                $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
                 # 队列处理
                 #$rst['TzService'] = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
                 $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);

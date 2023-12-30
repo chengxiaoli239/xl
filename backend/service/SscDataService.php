@@ -5243,8 +5243,8 @@ class SscDataService extends BaseService {
      * @param string $qihao
      * @return array
      */
-    public static function insertDealDataTask($lottery_type, $qihao=''){
-
+    public static function insertDealDataTask($lottery_type, $qihao=''): array
+    {
         try {
 
             if(empty($qihao)){

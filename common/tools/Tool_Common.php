@@ -500,8 +500,7 @@ class Tool_Common
      */
     public static function log($file, $priority, $title, $logArr = '')
     {
-        static $logSwitch = null;
-        $priorities = array('DEBUG', 'INFO', 'WARN', 'ERR', 'CRIT', 'ALERT', 'EMERG');
+        $priorities = ['DEBUG', 'INFO', 'WARN', 'ERR', 'CRIT', 'ALERT', 'EMERG'];
         // 日志分隔符
         $split = ' || ';
     
@@ -510,19 +509,6 @@ class Tool_Common
             $priority = 'ERR';
         }
         
-        // 可在后台控制开关 后台设置的为关闭的
-//        if (in_array($priority, array('DEBUG', 'INFO', 'WARN'))) {
-//            
-//            if ($logSwitch === null) {
-//                $logSwitch = self::getAdminConfig('pay_log_switch');
-//            }
-//
-//            if (!empty($logSwitch) && !empty($logSwitch[0]) && in_array($priority, $logSwitch)) {
-//                return false;
-//            }
-//            
-//        }
-    
         if (strpos($file, '/') !== false) { // 有包含路劲的
             $dir = dirname($file);
             $file = basename($file);
@@ -530,11 +516,17 @@ class Tool_Common
         } else {
             $dir = '/www/log/'.\Yii::$app->params['LOG_PATH'].'/' . date('Ymd');
         }
-    
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
+
+        try {
+            if (!is_dir($dir)) {
+                mkdir($dir, 0777, true);
+            }
+        }catch (\Exception $e){
+            try {
+                chmod($dir, 0777);
+            }catch (\Exception $e1){}
         }
-    
+
         // 获取IP
         if (php_sapi_name() == 'cli') {
             $ip = '127.0.0.1';  // 脚本模式，也记录一下占个位置
@@ -596,47 +588,22 @@ class Tool_Common
 
         return true;
     }
-    
-    /**
-     * 设置或读取js、css版本号
-     * 
-     * @param string $method
-     * @param string $values
-     * @return array|bool
-     */
-    public static function staticVer($method = 'get', $value = null)
-    {
-        /* 返回：
-        array(
-            'cssVer' => '1.1',
-            'jsVer'  => '1.1'
-        );*/
-        return true;
-        $key = 'pay_static_ver';
-        
-        //$redis = Server_Redis::factory('pay_master');
 
-        if ($method == 'get') {
-            
-            $value = $redis->get($key);
-            if ($value) {
-                $value = json_decode($value, true);
-            }
-            if (!$value) {  // 没取到的话，返回当天的
-                $value = array(
-                    'cssVer' => date('Ymd'),
-                    'jsVer'  => date('Ymd'),
-                );
-            }
-            return $value;
-            
-        } else {
-            $rs = $redis->set($key, json_encode($value));
-            if (!$rs) {
-                return false;
-            }
-            return true;
+    public static function recordFile($dir='', $fileName='', $text=''){
+        if (!file_exists($dir)) {
+            // 如果目录不存在，创建它
+            mkdir($dir, 0777, true); // 第一个参数是目录路径，第二个参数是权限（这里是最大权限），第三个参数表示创建多级目录
         }
+        $fullName = $dir.'/'.$fileName;
+        $fp = fopen($fullName, "a");
+        flock($fp, LOCK_EX);
+        $r =fwrite($fp, $text . "\r\n");
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        chmod($fullName, 0755);
+
+        var_dump('r:', $r);
+        var_dump($fullName);
     }
     
     /**

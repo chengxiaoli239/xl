@@ -1,6 +1,7 @@
 <?php
 namespace common\service\jobs\robots\message;
 
+use common\exceptions\InfoException;
 use common\service\chat\Tool_Common;
 use common\service\jobs\CommonJob;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
@@ -25,13 +26,21 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
     public static function preValiate($params=[]){
 
         $dataHI = date('H:i');
-        if('21:15'<$dataHI && $dataHI<'23:59'){
-            #throw_info('本堂已关');
+        if('21:17'<$dataHI && $dataHI<'23:59'){
+            throw_info('本堂已关');
         }
 
         if('00:00'<$dataHI && $dataHI<'08:00'){
             //throw_info('本堂未开');
         }
+    }
+
+    public static function validateWechatUser($wechatUser=[]){
+        # 1、好友判断
+        if(!$wechatUser['status'] OR empty($wechatUser)){
+            throw_info($wechatUser['nickName'].'好友接受消息状态未开启', 50001);
+        }
+
     }
 
     public static function handle($params){
@@ -51,23 +60,35 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
             }
             \Yii::$app->redis->expire($mkey, 2);
 
-            $wechatUser = WechatUserService::getWechatUsers($user_id)[$fromUser];
-            # 1、好友判断
-            if(!$wechatUser['status'] OR empty($wechatUser)){
-                throw_info($wechatUser['nickName'].'好友接受消息状态未开启', 50001);
-            }
-            $data['fromUserNickName'] = $wechatUser['nickName'];
-
             # 2、盘口判断
             self::preValiate($params); # 校验关盘
 
+            /**
+             * 确认订单：
+             * 1、全部确认（除撤单的），管理员输入：全部代购
+             * 2、指定单个订单确认，管理员输入：单号+已代购、已代购+单号
+             *
+             * 撤单：
+             * 用户：单号+撤、撤+单号
+             * 管理员：单号+撤、撤+单号
+             */
+
             $MessageService = new EYunMessageOperateService($user_id);
-            Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name.'0', ['wcId'=>$wcId, 'params'=>$params, 'data'=>$data, 'type'=>gettype($data)]);
+            $wechatUser = WechatUserService::getWechatUsers($user_id)[($fromUser==$wcId?$data['toUser']:$fromUser)];
+            self::validateWechatUser($wechatUser);
 
-
-            $text = $data['content'];
-            list($code, $vdata, $msg) = $MessageService->receive($text, $fromUser, $data);
-            Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name.'01', ['user_id'=>$user_id, 'wcId'=>$wcId, 'code'=>$code, 'text'=>$text, 'vdata'=>$vdata, 'msg'=>$msg]);
+            $data['fromUserNickName'] = $wechatUser['nickName'];
+            Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name.'00', ['wcId'=>$wcId, 'params'=>$params]);
+            if ($fromUser == $wcId && $fromUser != $data['toUser']){
+                // todo 自己发给用户的消息，针对订单确认或撤单处理
+                $data['targetUser'] = $data['toUser'];  # 目标用户
+                list($code, $vdata, $msg) = $MessageService->receiveFromMyself($data);
+            }else{
+                $data['targetUser'] = $data['fromUser'];  # 目标用户
+                list($code, $vdata, $msg) = $MessageService->receive($data);
+            }
+            $rstData = [$code, $vdata, $msg];
+            Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name.'01', ['user_id'=>$user_id, 'wcId'=>$wcId, 'rstData'=>$rstData]);
             if($code>0){
                 throw_info($msg, $code);
             }
@@ -88,7 +109,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
         }
         //push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$user_id, 'type'=>$vdata['type'], 'msg'=>'', 'wechat_user_id'=>$wechatUser['id']]);
 
-        Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name.'13', ['wcId'=>$wcId, 'text'=>$text, 'replyTxts'=>$replyTxts]);
+        Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name.'13', ['wcId'=>$wcId, 'text'=>$data['text'], 'replyTxts'=>$replyTxts]);
 
         return $message;
     }
@@ -96,21 +117,21 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
     /**
      * 消息回复前处理
      * @param $user_id
-     * @param $wcId
-     * @param string $replyTxts ['你好', '您好，您的申请已通过']
+     * @param array $replyTxts ['你好', '您好，您的申请已通过']
      * @param array $data ['fromUser'=>'wxid_875i1kgd38x122'];
      * @return bool
+     * @throws InfoException
      */
     public static function reply($user_id, $replyTxts=[], array $data=[]){
-        $mkey = md5(__FUNCTION__.'_x1_'.$user_id.'_'.Json::encode($replyTxts).'_'.$data['fromUser']);
+        $targetUser = $data['targetUser']??$data['fromUser']; # 目标微信好友
+        $mkey = md5(__FUNCTION__.'_x1_'.$user_id.'_'.Json::encode($replyTxts).'_'.$targetUser);
         $incr = \Yii::$app->redis->incr($mkey);
         Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '消息回复前处理', ['user_id'=>$user_id, 'replyTxts'=>$replyTxts, 'data'=>$data]);
         if($incr>1){
             return false;
         }
         \Yii::$app->redis->expire($mkey, 2);
-        $fromUser = $data['fromUser'];
-        if(empty($fromUser)){
+        if(empty($targetUser)){
             return '接收的微信好友Id不能为空0';
         }
         if(empty($replyTxts)){
@@ -129,7 +150,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
             }
             $sendData = [
                 'user_id' => $user_id,
-                'fromUser' => $fromUser, # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
+                'targetUser' => $targetUser, # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
                 //'queue_delay_time' => rand(2, 4), # self::$waitSeconds,
                 'content' => $content, # 测试阶段调试信息 - 用户下注完回复
                 'business_id' => $user_id,
