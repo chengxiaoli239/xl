@@ -622,7 +622,7 @@ class EYunMessageOperateService  extends EYunBaseService
                             'lottery_name' => $lottery_name,
                             'bet_desc' => $text,
                             'new_msg_id' => $messageData['newMsgId'],
-                            'reply_type' => $this->wechatUser['reply_type'],
+                            'reply_type' => $this->wechatUser['is_need_confirm']?0:$this->wechatUser['reply_type'],
                             'is_need_confirm' => $this->wechatUser['is_need_confirm'],
                             'reply_content' => Json::encode($replyContent),
                             'api_code_datas' => $playMethods['apiCodeDatas']?Json::encode($playMethods['apiCodeDatas']):'',
@@ -660,7 +660,7 @@ class EYunMessageOperateService  extends EYunBaseService
                     $oneReplyTxt .= ("\n【剩余】".$vData['balance'].'咪');
                 }
 
-                if($this->wechatUser['reply_type']==BetsBackend::REPLY_TYPE_QUICK){
+                if($this->wechatUser['is_need_confirm']==BetsBackend::NEED_CONFIRM_YES OR $this->wechatUser['reply_type']==BetsBackend::REPLY_TYPE_QUICK){
                     # 即时回复
                     $replyTxts[] = ['order_ids'=>[$betOrderId], 'replyTxt'=>$oneReplyTxt];
                 }
