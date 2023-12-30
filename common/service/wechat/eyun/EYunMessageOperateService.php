@@ -478,7 +478,7 @@ class EYunMessageOperateService  extends EYunBaseService
      * @param string $text
      * @return array
      */
-    public static function operateCancel(string $text='', $wechatUser=[]): array
+    public static function operateCancel(string $text='', $wechatUser=[], object &$Bets=null): array
     {
         try {
             if (preg_match('/(\d+)/', $text, $matches)) {
@@ -504,10 +504,7 @@ class EYunMessageOperateService  extends EYunBaseService
                     $vData = AgentUsersBalanceService::updateBalance((string)$orderId, $orderBetMoney, $wechatUser['id'], WechatUserService::TYPE_ORDER_CANCEL); # 撤单返还
                 }
                 #$Bets->status = 3; # 已撤单
-                $params = ['status'=>CommonBaseService::STATUS_LT_CANCEL];
-                if($Bets->push_status == BetsBackend::PUSH_STATUS_WAIT){
-                    $params['push_status'] = BetsBackend::PUSH_STATUS_CANNOT;
-                }
+                $params = ['status'=>CommonBaseService::STATUS_LT_CANCEL, 'push_status'=>BetsBackend::PUSH_STATUS_CANNOT];
                 BetsBackend::updateAll($params, ['order_id'=>$orderId]);
                 if(!$Bets->save()){
                     throw_info(Json::encode($Bets->getErrors()));
@@ -751,7 +748,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 case strpos($text, '撤') !== false && preg_match_all('/(\d+)/u', $text, $matches):
                     $b_type = WechatUserService::TYPE_ORDER_CANCEL;
                     foreach ($matches[0] as $matchOrderId){
-                        EYunMessageOperateService::operateCancel($text, $this->wechatUser);
+                        EYunMessageOperateService::operateCancel($text, $this->wechatUser, $bet);
                         $operateOrderIds[] = $matchOrderId;
                     }
                     break;
@@ -762,8 +759,10 @@ class EYunMessageOperateService  extends EYunBaseService
                     Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复04', ['sql'=>$sql]);
                     $Bets = $BetsQuery->asArray()->all();
                     foreach ($Bets as $Bet){
-                        EYunMessageOperateService::operateCancel($Bet['order_id'], $this->wechatUser);
-                        $operateOrderIds[] = $Bet['order_id'];
+                        if(!in_array($Bet->push_status, [BetsBackend::PUSH_STATUS_WAIT, BetsBackend::PUSH_STATUS_FAIL])){
+                            EYunMessageOperateService::operateCancel($Bet['order_id'], $this->wechatUser);
+                            $operateOrderIds[] = $Bet['order_id'];
+                        }
                     }
                     break;
             }
