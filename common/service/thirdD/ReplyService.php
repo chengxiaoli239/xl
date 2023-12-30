@@ -213,6 +213,7 @@ class ReplyService extends CommonBaseService
 
                 $logArr = ['wechatUserId'=>$wechatUserId, 'message_ids'=>$message_ids, $oneUserReplyTxts, 'atIds'=>$atIds];
                 list($code, $vData, $msg) = ReplyService::getFileNameInfo($replyContent['fromNickName']);
+                p($vData);
                 list($dir, $filePath, $fileName) = $vData;
 
                 $result = $MessageService->sendFile($wcId, $filePath, $fileName); # 回复 file
@@ -274,11 +275,11 @@ class ReplyService extends CommonBaseService
         $date = date('Ymd');
         $dir = \Yii::$aliases['@backend'].'/web/statics/tmp/'.$date; //p($dir);
 
-        $fileName = $fromNickName.'_'.date('ymdHis').'.txt';
+        $fileName = $fromNickName.'_'.date('mdHis').'.txt';
         $filePath = \Yii::$app->params['domain'].'/statics/tmp/'.$date.'/'.$fileName;
 
         $data = [$dir, $fileName, $filePath];
 
-        return [0, 'data'=>$data, '成功'];
+        return [0, $data, '成功'];
     }
 }
