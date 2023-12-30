@@ -30,7 +30,7 @@ class SendWechatMsgJobs extends CommonJob {
             }else{
                 $wcId = $params['targetUser']; # 要回复的目标好友微信id
             }
-            $fromUser = !empty($params['fromGroup']) ? $params['fromGroup'] : $params['replyToUser']; # 发送者
+            $fromUser = !empty($params['fromGroup']) ? $params['fromGroup'] : $params['targetUser']; # 发送者
             if(empty($fromUser)){
                 throw_info('接收的微信好友Id不能为空');
             }
