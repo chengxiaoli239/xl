@@ -648,7 +648,8 @@ class EYunMessageOperateService  extends EYunBaseService
                 $oneReplyTxt .= str_replace(';', ',', $betContent);
                 $oneReplyTxt .= ("\n【单号】".$betOrderId);
                 if($this->wechatUser['is_need_confirm']){
-                    $oneReplyTxt .= ("\n【待确认】 共".$oneAllCounts."组，共".$oneAllMoneys.'咪');
+                    $oneReplyTxt .= ("\n【合计】 共".$oneAllCounts."组，共".$oneAllMoneys.'咪');
+                    $oneReplyTxt .= ("\n【状态】 待确认");
                 }else{
                     $oneReplyTxt .= ("\n【成功】√  共".$oneAllCounts."组，共".$oneAllMoneys.'咪');
                     $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $oneAllMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
