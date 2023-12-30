@@ -715,7 +715,7 @@ class EYunMessageOperateService  extends EYunBaseService
             ];
             $operateOrderIds = []; # 操作单号
             $b_type = WechatUserService::TYPE_ORDER_BET;
-            Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复', ['messageData'=>$messageData, 'betWhere'=>$betWhere]);
+            Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复00', ['messageData'=>$messageData, 'betWhere'=>$betWhere]);
             switch (true){
                 case strpos($text, '全部代购') !== false:
                     $BetsQuery = BetsBackend::find()->where($betWhere);
@@ -748,8 +748,9 @@ class EYunMessageOperateService  extends EYunBaseService
                     break;
             }
         }catch (\Exception $e){
-
+            Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复-异常01', ['messageData'=>$messageData, 'err_msg'=>$e->getMessage()]);
         }
+        Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复03', ['pushSiteData'=>$pushSiteData, 'b_type'=>$b_type]);
         if(!empty($pushSiteData) && $b_type == WechatUserService::TYPE_ORDER_BET){
             foreach ($pushSiteData as $pushData){
                 push_queue_open(SsxxBetJobs::class, $pushData);
