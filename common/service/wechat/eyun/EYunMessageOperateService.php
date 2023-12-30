@@ -488,6 +488,9 @@ class EYunMessageOperateService  extends EYunBaseService
                 if(empty($Bets)){
                     throw_info('单号：'.$orderId.'无记录', CommonBaseService::CODE_FOR_USER);
                 }
+                if($Bets->push_status==BetsBackend::PUSH_STATUS_SUCCESS){
+                    throw_info($orderId.'订单已上盘口，无法撤单', CommonBaseService::CODE_FOR_USER);
+                }
                 if($Bets->status==CommonBaseService::STATUS_LT_SUCCESS){
                     throw_info($orderId.'订单已完成，无法撤单', CommonBaseService::CODE_FOR_USER);
                 }
