@@ -117,14 +117,14 @@ class ReplyService extends CommonBaseService
                 }
 
                 $transaction->commit();
-                Tool_Common::log('/reply/'.__FUNCTION__, 'INFO', '打包回复结束', $logArr);
+                Tool_Common::log('/reply/'.__FUNCTION__, 'INFO', '0打包回复结束', $logArr);
                 \Yii::$app->commonRedis->srem($mkey, $wechatUserId);
             }catch (\Exception $e){
                 $logArr = ['wechatUserId'=>$wechatUserId, 'err_msg'=>$e->getMessage()];
                 if($e->getCode()<20000 && $e->getCode()>30000){
                     $logArr['msg'] = $e->getFile().'_'.$e->getLine();
                 }
-                Tool_Common::log('/reply/'.__FUNCTION__, 'ERR', '打包回复异常', $logArr);
+                Tool_Common::log('/reply/'.__FUNCTION__, 'ERR', '0打包回复异常', $logArr);
                 $transaction->rollBack();;
             }
         }
@@ -231,14 +231,14 @@ class ReplyService extends CommonBaseService
                 }
 
                 $transaction->commit();
-                Tool_Common::log('/reply/'.__FUNCTION__, 'INFO', '打包回复结束', $logArr);
+                Tool_Common::log('/reply/'.__FUNCTION__, 'INFO', '1打包回复结束', $logArr);
                 \Yii::$app->commonRedis->srem($mkey, $wechatUserId);
             }catch (\Exception $e){
                 $logArr = ['wechatUserId'=>$wechatUserId, 'err_msg'=>$e->getMessage()];
-                if($e->getCode()<20000 && $e->getCode()>30000){
+                if($e->getCode()<20000 OR $e->getCode()>30000){
                     $logArr['msg'] = $e->getFile().'_'.$e->getLine();
                 }
-                Tool_Common::log('/reply/'.__FUNCTION__, 'ERR', '打包回复异常', $logArr);
+                Tool_Common::log('/reply/'.__FUNCTION__, 'ERR', '1打包回复异常', $logArr);
                 $transaction->rollBack();;
             }
         }
