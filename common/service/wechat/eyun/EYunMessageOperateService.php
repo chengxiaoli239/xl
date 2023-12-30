@@ -755,15 +755,15 @@ class EYunMessageOperateService  extends EYunBaseService
             }
         }
 
-        $replyTxts = ($b_type==WechatUserService::TYPE_ORDER_CANCEL)? '已撤单:' : '已代购';
-        if(!empty($operateOrderIds)){
+        #$replyTxts = ($b_type==WechatUserService::TYPE_ORDER_CANCEL)? '已撤单:' : '已代购';
+        if($b_type==WechatUserService::TYPE_ORDER_CANCEL && !empty($operateOrderIds)){
             $operateOrderIds = array_unique($operateOrderIds);
-            $replyTxts .= '单号：'.implode(' ', $operateOrderIds);
+            $replyTxts = '单号：'.implode(' ', $operateOrderIds);
         }
         $data = [
             'type' => WechatUserService::TYPE_ORDER_BET,
             'text' => $text,
-            'replyTxts' => [$replyTxts],
+            'replyTxts' => $replyTxts?[$replyTxts]:[],
             //'allMoneys' => $allMoneys,
         ];
 
