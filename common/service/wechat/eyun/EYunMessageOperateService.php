@@ -748,8 +748,12 @@ class EYunMessageOperateService  extends EYunBaseService
                 case strpos($text, '撤') !== false && preg_match_all('/(\d+)/u', $text, $matches):
                     $b_type = WechatUserService::TYPE_ORDER_CANCEL;
                     foreach ($matches[0] as $matchOrderId){
-                        EYunMessageOperateService::operateCancel($text, $this->wechatUser, $bet);
-                        $operateOrderIds[] = $matchOrderId;
+                        list($code, $vdata, $msg) = EYunMessageOperateService::operateCancel($text, $this->wechatUser, $bet);
+                        if(in_array($bet->status, [CommonBaseService::STATUS_LT_SUCCESS, CommonBaseService::STATUS_LT_FAIL]) OR $bet->push_status==BetsBackend::PUSH_STATUS_SUCCESS){
+                            $replyTxts = $msg;
+                        }else{
+                            $operateOrderIds[] = $matchOrderId;
+                        }
                     }
                     break;
                 case strpos($text, '清空') !== false:
