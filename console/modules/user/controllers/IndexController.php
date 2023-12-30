@@ -28,7 +28,7 @@ class IndexController extends Controller
      */
     public function actionPackageReply(): array
     {
-        #$rst1 = ReplyService::packageReply();
+        $rst1 = ReplyService::packageReply();
         $rst2 = ReplyService::packageReplyUser();
 
         return [$rst1, $rst2];
