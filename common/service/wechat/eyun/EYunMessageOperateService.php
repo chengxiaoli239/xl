@@ -767,7 +767,7 @@ class EYunMessageOperateService  extends EYunBaseService
             #$replyTxts = ($b_type==WechatUserService::TYPE_ORDER_CANCEL)? '已撤单:' : '已代购';
             if($b_type==WechatUserService::TYPE_ORDER_CANCEL && !empty($operateOrderIds)){
                 $operateOrderIds = array_unique($operateOrderIds);
-                $replyTxts = '撤单单号：'.implode(' ', $operateOrderIds);
+                $replyTxts = '已撤单号：'.implode('、', $operateOrderIds);
             }
             Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复03', ['pushSiteData'=>$pushSiteData, 'b_type'=>$b_type]);
         }catch (\Exception $e){
