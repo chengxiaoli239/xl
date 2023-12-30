@@ -746,13 +746,14 @@ class EYunMessageOperateService  extends EYunBaseService
                     }
                     break;
                 case strpos($text, '撤') !== false && preg_match_all('/(\d+)/u', $text, $matches):
+                    $b_type = WechatUserService::TYPE_ORDER_CANCEL;
                     foreach ($matches[0] as $matchOrderId){
                         EYunMessageOperateService::operateCancel($text, $this->wechatUser);
                         $operateOrderIds[] = $matchOrderId;
                     }
-                    $b_type = WechatUserService::TYPE_ORDER_CANCEL;
                     break;
                 case strpos($text, '清空') !== false:
+                    $b_type = WechatUserService::TYPE_ORDER_CANCEL;
                     $BetsQuery = BetsBackend::find()->where($betWhere);
                     $sql = $BetsQuery->createCommand()->getRawSql();//p($sql);
                     Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复04', ['sql'=>$sql]);
