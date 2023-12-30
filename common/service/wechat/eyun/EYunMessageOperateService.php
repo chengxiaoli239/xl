@@ -742,28 +742,38 @@ class EYunMessageOperateService  extends EYunBaseService
                     }
                     break;
                 case strpos($text, '撤') !== false && preg_match_all('/(\d+)/u', $text, $matches):
-                    foreach ($matches as $matchOrderId){
+                    foreach ($matches[0] as $matchOrderId){
                         EYunMessageOperateService::operateCancel($text, $this->wechatUser);
                         $operateOrderIds[] = $matchOrderId;
                     }
                     $b_type = WechatUserService::TYPE_ORDER_CANCEL;
                     break;
+                case strpos($text, '清空') !== false:
+                    $BetsQuery = BetsBackend::find()->where($betWhere);
+                    $sql = $BetsQuery->createCommand()->getRawSql();//p($sql);
+                    Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复04', ['sql'=>$sql]);
+                    $Bets = $BetsQuery->asArray()->all();
+                    foreach ($Bets as $Bet){
+                        EYunMessageOperateService::operateCancel($Bet['order_id'], $this->wechatUser);
+                        $operateOrderIds[] = $Bet['order_id'];
+                    }
+                    break;
             }
+            #$replyTxts = ($b_type==WechatUserService::TYPE_ORDER_CANCEL)? '已撤单:' : '已代购';
+            if($b_type==WechatUserService::TYPE_ORDER_CANCEL && !empty($operateOrderIds)){
+                $operateOrderIds = array_unique($operateOrderIds);
+                $replyTxts = '撤单单号：'.implode(' ', $operateOrderIds);
+            }
+            Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复03', ['pushSiteData'=>$pushSiteData, 'b_type'=>$b_type]);
         }catch (\Exception $e){
             Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复-异常01', ['messageData'=>$messageData, 'err_msg'=>$e->getMessage()]);
         }
-        Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复03', ['pushSiteData'=>$pushSiteData, 'b_type'=>$b_type]);
         if(!empty($pushSiteData) && $b_type == WechatUserService::TYPE_ORDER_BET){
             foreach ($pushSiteData as $pushData){
                 push_queue_open(SsxxBetJobs::class, $pushData);
             }
         }
 
-        #$replyTxts = ($b_type==WechatUserService::TYPE_ORDER_CANCEL)? '已撤单:' : '已代购';
-        if($b_type==WechatUserService::TYPE_ORDER_CANCEL && !empty($operateOrderIds)){
-            $operateOrderIds = array_unique($operateOrderIds);
-            $replyTxts = '单号：'.implode(' ', $operateOrderIds);
-        }
         $data = [
             'type' => WechatUserService::TYPE_ORDER_BET,
             'text' => $text,
