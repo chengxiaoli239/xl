@@ -715,6 +715,7 @@ class EYunMessageOperateService  extends EYunBaseService
             ];
             $operateOrderIds = []; # 操作单号
             $b_type = WechatUserService::TYPE_ORDER_BET;
+            Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复', ['messageData'=>$messageData, 'betWhere'=>$betWhere]);
             switch (true){
                 case strpos($text, '全部代购') !== false:
                     $BetsQuery = BetsBackend::find()->where($betWhere);
