@@ -722,7 +722,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $b_type = WechatUserService::TYPE_ORDER_BET;
             Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复00', ['messageData'=>$messageData, 'betWhere'=>$betWhere]);
             switch (true){
-                case strpos($text, '全部代购') !== false:
+                case strpos($text, '全部代购') !== false OR strpos($text, '已购') !== false:
                     $BetsQuery = BetsBackend::find()->where($betWhere);
                     $sql = $BetsQuery->createCommand()->getRawSql();//p($sql);
                     Tool_Common::log('/data_3d/'.__FUNCTION__, 'INFO', '机器人回复01', ['sql'=>$sql]);
