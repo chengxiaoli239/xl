@@ -36,13 +36,20 @@ $this->params['breadcrumbs'][] = $this->title;
                 -->
 
                 <?php echo $this->render('_search', ['model' => $searchModel]); ?>
-                <div class="btn btn-warning btn-xs" id="syncFriends">同步好友</div>
+
+                <?= Html::button('同步好友', ['class' => 'btn btn-warning btn-xs', 'id' => 'syncFriends']) ?> &nbsp;
+                <!--
+                <?= Html::button("批量关闭 '状态'", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchCloseStatus']) ?> &nbsp;
+                <?= Html::button("批量开启 '状态'", ['class' => 'btn btn-success btn-xs', 'id' => 'batchOpenStatus']) ?> &nbsp;
+                <?= Html::button("批量关闭 '需确认'", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchCloseConfirm']) ?>
+                <?= Html::button("批量开启 '需确认'", ['class' => 'btn btn-success btn-xs', 'id' => 'batchOpenConfirm']) ?>
+                -->
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     #'filterModel' => $searchModel,
                     'columns' => [
-                        ['class' => 'yii\grid\SerialColumn', 'headerOptions'=>['width'=>'2%']],
+                        ['class' => 'yii\grid\CheckboxColumn', 'headerOptions'=>['width'=>'2%']],
 
                         //'id',
                         //'user_id',
@@ -527,13 +534,6 @@ $(function () {
 
     });
 
-    function copyUrl2(id){
-        var Url2=document.getElementById(id);
-        Url2.select(); // 选择对象
-        document.execCommand("Copy"); // 执行浏览器复制命令
-        alert("已复制好，可贴粘。");
-    }
-
     $(document).on('click', '[id="syncFriends"]', function () {
         console.log('dddd');
         syncFriends()
@@ -548,6 +548,62 @@ $(function () {
                 layer.msg(rst.msg, {icon: 7});
             }
         },'JSON');
+    }
+
+    // Batch update status
+    $('#batchOpenStatus').click(function () {
+        var selectedIds = $('input[name="selection[]"]:checked').map(function () {
+            return this.value;
+        }).get();
+
+        batchUpdate('status', selectedIds, 1);
+    });
+
+    // Batch update status
+    $('#batchCloseStatus').click(function () {
+        var selectedIds = $('input[name="selection[]"]:checked').map(function () {
+            return this.value;
+        }).get();
+
+        batchUpdate('status', selectedIds, 0);
+    });
+
+    // Batch update confirmation requirement
+    $('#batchOpenConfirm').click(function () {
+        var selectedIds = $('input[name="selection[]"]:checked').map(function () {
+            return this.value;
+        }).get();
+
+        batchUpdate('is_need_confirm', selectedIds, 1);
+    });
+
+    // Batch update confirmation requirement
+    $('#batchCloseConfirm').click(function () {
+        var selectedIds = $('input[name="selection[]"]:checked').map(function () {
+            return this.value;
+        }).get();
+
+        batchUpdate('is_need_confirm', selectedIds, 0);
+    });
+
+    function batchUpdate(field, ids, val) {
+        console.log(field, ids, val)
+        if (ids.length <= 0) {
+            layer.alert('至少选择一项')
+        }
+        // Perform AJAX request to update the selected items
+        $.post('/wechat/wechat-user/batch-switch-status', { field: field, ids: ids , val: val}, function (response) {
+            if (response.status === 200) {
+                layer.alert('更新成功', function(index){
+                    layer.close(index); // Close the alert
+                    setTimeout(function(){
+                        location.reload(); // Reload the current page after 2 seconds
+                    }, 1000); // 2000 milliseconds (2 seconds)
+                });
+            } else {
+                layer.alert('Batch update failed.');
+            }
+        }, 'json');
     }
 });
 </script>

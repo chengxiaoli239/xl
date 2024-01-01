@@ -605,6 +605,37 @@ class HN0898Service extends BaseTZService {
     }
 
     /**
+     * @description 批量更新状态
+     * @param $ids
+     * @param string $model
+     * @param string $field
+     * @param null $val
+     * @return array
+     */
+    public static function batchSwitchStatus($ids, $model='UserSysPlans', $field='status', $val=null, $admin_id=0): array
+    {
+        try {
+            $transaction = \Yii::$app->db->beginTransaction();
+            $table = $model::tablename();
+            #$rst = $model::updateAll([$field=>(int)$val], ['id'=>$ids, 'user_id'=>$admin_id]); p($rst);
+            $sql = 'UPDATE '.$table.' SET '.$field.'='. $val .' WHERE id IN('.implode(',', $ids).') AND user_id='.$admin_id;
+
+            $result = \Yii::$app->db->createCommand($sql)->execute();
+            if(!$result){
+                throw_info('批量更新失败');
+            }
+
+            TzSystemUsersService::delTzsystemUserData();
+            $transaction->commit();
+        }catch (\Exception $exception){
+            $transaction->rollBack();;
+            return ['status'=>300, 'msg'=>$exception->getMessage()];
+        }
+
+        return ['status'=>200, 'msg'=>'状态更新成功~', 'data'=>[]];
+    }
+
+    /**
      * @description 更新计划表状态
      * @param $id
      * @param $account

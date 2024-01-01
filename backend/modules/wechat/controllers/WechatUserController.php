@@ -62,7 +62,6 @@ class WechatUserController extends BaseController
         ]);
     }
 
-
     /**
      * @desc 更新是否接收用户消息状态
      * @param $id
@@ -79,6 +78,27 @@ class WechatUserController extends BaseController
         }
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @desc 批量更新状态
+     * @param $id
+     * @param $status
+     * @return array
+     */
+    public function actionBatchSwitchStatus(): array
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+
+        try {
+            HN0898Service::batchSwitchStatus($post['ids'], $model = '\backend\models\wechat\WechatUser', $post['field'], $post['val'], $this->_user_id);
+            WechatUserService::getWechatUsers($this->_user_id, false);
+        }catch (\Exception $e){
+            return ['status'=>300, 'msg'=>$e->getMessage()];
+        }
+
+        return ['status'=>200, 'msg'=>'操作成功'];
     }
 
     /**
