@@ -19,7 +19,7 @@ class WechatUser extends WechatUserModel
     {
         return [
             [['id', 'user_id', 'status', 'is_tuo', 'is_chi', 'is_private', 'is_cha', 'is_bind', 'is_need_confirm', 'reply_type', 'is_credit', 'expire_time', 'created_at', 'updated_at'], 'integer'],
-            [['userName', 'nickName', 'aliasName', 'bet_url', 'token', 'bigHead', 'smallHead', 'labelList', 'remark', 'update_at'], 'safe'],
+            [['robot_wechat', 'userName', 'nickName', 'aliasName', 'bet_url', 'token', 'bigHead', 'smallHead', 'labelList', 'remark', 'update_at'], 'safe'],
             [['balance', 'all_bet_money', 'today_profits_loss', 'all_profits_loss'], 'number'],
         ];
     }
@@ -82,7 +82,8 @@ class WechatUser extends WechatUserModel
             'update_at' => $this->update_at,
         ]);
 
-        $query->andFilterWhere(['like', 'userName', $this->userName])
+        $query->andFilterWhere(['like', 'robot_wechat', $this->robot_wechat])
+            ->andFilterWhere(['like', 'userName', $this->userName])
             ->andFilterWhere(['like', 'nickName', $this->nickName])
             ->andFilterWhere(['like', 'aliasName', $this->aliasName])
             ->andFilterWhere(['like', 'bet_url', $this->bet_url])

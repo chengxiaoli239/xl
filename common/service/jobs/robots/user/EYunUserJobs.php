@@ -38,13 +38,14 @@ class EYunUserJobs extends CommonJob {
                 $datas = $response['data'];
                 foreach ($datas as $data){
                     try {
-                        $where = ['user_id'=>$user_id, 'userName'=>$data['userName']];
+                        $where = ['user_id'=>$user_id, 'robot_wechat'=>$wcId, 'userName'=>$data['userName']];
                         $WechatUser = WechatUser::findOne($where);
                         $setData = [];
                         if(empty($WechatUser)){
                             $WechatUser = new WechatUser();
                             $setData = array_merge($setData, [
                                 'user_id'=>$user_id,
+                                'robot_wechat'=>$wcId,
                                 'userName'=>$data['userName'],
                                 'created_at' => $now_time,
                             ]);

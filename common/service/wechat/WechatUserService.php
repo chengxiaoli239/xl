@@ -131,4 +131,19 @@ class WechatUserService extends BaseService
         return ['code'=>200, 'data'=>$response, 'msg'=>'操作成功'];
     }
 
+    /**
+     * 获取最后微信id
+     * @param int $user_id
+     * @return string
+     */
+    public static function getCurrentRobotWechat(int $user_id=0): string
+    {
+        $wcId = '';
+        if($RobotUser = RobotUser::findOne(['user_id'=>$user_id])){
+            $wcId = $RobotUser->wcId;
+        }
+
+        return $wcId;
+    }
+
 }

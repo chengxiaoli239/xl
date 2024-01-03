@@ -41,6 +41,7 @@ class WechatUserController extends BaseController
         $searchModel = new WechatUserSearch();
         $queryParams = Yii::$app->request->queryParams;
         $queryParams['WechatUser']['user_id'] = $this->_user_id;
+        $queryParams['WechatUser']['robot_wechat'] = $queryParams['WechatUser']['robot_wechat']?:WechatUserService::getCurrentRobotWechat($this->_user_id);
         $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [

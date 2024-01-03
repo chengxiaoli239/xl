@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property int $user_id user.id,系统用户id
+ * @property string $robot_wechat 所属微信
  * @property string $userName 微信id，唯一
  * @property string $nickName 昵称
  * @property string $aliasName 微信号
@@ -56,6 +57,7 @@ class WechatUser extends \common\models\base\BaseModel
             [['balance', 'all_bet_money', 'today_profits_loss', 'all_profits_loss'], 'number'],
             [['created_at', 'updated_at'], 'required'],
             [['update_at'], 'safe'],
+            [['robot_wechat'], 'string', 'max' => 32],
             [['userName', 'nickName', 'aliasName', 'bet_url', 'labelList', 'remark'], 'string', 'max' => 255],
             [['token'], 'string', 'max' => 64],
             [['bigHead', 'smallHead'], 'string', 'max' => 640],
@@ -71,6 +73,7 @@ class WechatUser extends \common\models\base\BaseModel
         return [
             'id' => Yii::t('app', 'ID'),
             'user_id' => Yii::t('app', 'user.id,系统用户id'),
+            'robot_wechat' => Yii::t('app', '所属微信'),
             'userName' => Yii::t('app', '微信id，唯一'),
             'nickName' => Yii::t('app', '昵称'),
             'aliasName' => Yii::t('app', '微信号'),

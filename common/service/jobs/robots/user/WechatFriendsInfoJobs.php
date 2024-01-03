@@ -22,9 +22,13 @@ class WechatFriendsInfoJobs extends CommonJob {
             $data = $params['data'];
             $userName = $data['userName']; # 微信id
             $wcId = $params['wcId']; # 微信原始id
-            $WechatUser = WechatUser::findOne(['user_id'=>$user_id, 'userName'=>$userName]);
+            $WechatUser = WechatUser::findOne(['user_id'=>$user_id, 'userName'=>$userName, 'robot_wechat'=>$wcId]);
             if(empty($WechatUser)){
-                throw_info('wechat_user找不到记录');
+                //throw_info('wechat_user找不到记录');
+                $WechatUser = new WechatUser();
+                $WechatUser->robot_wechat = $wcId;
+                $WechatUser->userName = $userName;
+                $WechatUser->user_id = $user_id;
             }
             $WechatUser->nickName = $data['nickName'];
             $WechatUser->remark = $data['remarkName'];
