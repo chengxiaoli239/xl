@@ -144,7 +144,7 @@ class WechatUserService extends BaseService
             $wcId = $robot_wechat;
         }else{
             $wcId = commonRedis()->get($mkey);
-            if(empty($wcId) && $RobotUser = RobotUser::find()->where(['user_id'=>$user_id])->orderBy(['robot_wechat'=>SORT_DESC])->one()){
+            if(empty($wcId) && $RobotUser = RobotUser::find()->where(['user_id'=>$user_id])->orderBy(['wechat_status'=>SORT_DESC])->one()){
                 $wcId = $RobotUser->wcId;
             }
         }
