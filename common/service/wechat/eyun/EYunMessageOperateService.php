@@ -355,7 +355,9 @@ class EYunMessageOperateService  extends EYunBaseService
                     $stepText = ['originText'=>$text];
                     if($switch==1){
                         list($code, $data, $msg) = MatchCodeService::getCodeDatas($text);
-                        if($code!=0 OR empty($data['dataGroups'])){
+                        if($code == CommonBaseService::CODE_FOR_IGNORE_U){
+                            return [CommonBaseService::CODE_FOR_IGNORE_U, [], ''];
+                        }elseif($code!=0 OR empty($data['dataGroups'])){
                             $oText = "\n\nXXXXXX原文XXXXXX\n".$text."\nXXXXXXXXXXXXXXX";
                             return [CommonBaseService::CODE_FOR_USER, [], ($msg??'匹配异常').$oText];
                         }
@@ -554,7 +556,7 @@ class EYunMessageOperateService  extends EYunBaseService
             $text = $vdata['text'];
             Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '消息处理-01', ['user_id'=>$this->user_id, 'text'=>$text]);
             list($code, $data, $msg) = $this->matchData($text);
-            if($code == CommonBaseService::CODE_FOR_USER){
+            if($code == CommonBaseService::CODE_FOR_USER OR $code == CommonBaseService::CODE_FOR_IGNORE_U){
                 $transaction->commit();
                 return [$code, $data, $msg];
             }
