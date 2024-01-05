@@ -592,11 +592,13 @@ class Tool_Common
         // 以下为日志示例：
         // 2014-03-04 15:35:12 [ERR] trace:25145 Model_Payment_AlipayApp::request 192.168.52.189 [查询失败] == pay_sn:XXX || pay_type:XXX || ...
 
-        $fp = fopen($fullFile, "a");
-        flock($fp, LOCK_EX);
-        fwrite($fp, $str . "\r\n");
-        flock($fp, LOCK_UN);
-        fclose($fp);
+        try {
+            $fp = fopen($fullFile, "a");
+            flock($fp, LOCK_EX);
+            fwrite($fp, $str . "\r\n");
+            flock($fp, LOCK_UN);
+            fclose($fp);
+        }catch (\Exception $e){}
 
         return true;
     }
