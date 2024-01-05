@@ -6,6 +6,7 @@ use backend\models\AgentUsersBalanceFlows;
 use common\models\eyun\RobotUser;
 use common\models\wechat\WechatUser;
 use common\service\BaseService;
+use common\service\cache\CacheKeyService;
 use common\service\thirdD\ThirdDTypeService;
 use common\service\wechat\eyun\EYunBaseService;
 use common\tools\Tool_Common;
@@ -136,12 +137,18 @@ class WechatUserService extends BaseService
      * @param int $user_id
      * @return string
      */
-    public static function getCurrentRobotWechat(int $user_id=0): string
+    public static function getCurrentRobotWechat(int $user_id=0, $robot_wechat=''): string
     {
-        $wcId = '';
-        if($RobotUser = RobotUser::findOne(['user_id'=>$user_id])){
-            $wcId = $RobotUser->wcId;
+        if($robot_wechat){
+            $wcId = $robot_wechat;
+        }else{
+            $mkey = CacheKeyService::userCurrentWechat();
+            $wcId = commonRedis()->get($mkey);
+            if(empty($wcId) && $RobotUser = RobotUser::findOne(['user_id'=>$user_id])){
+                $wcId = $RobotUser->wcId;
+            }
         }
+        commonRedis()->setnx($mkey, $wcId);
 
         return $wcId;
     }

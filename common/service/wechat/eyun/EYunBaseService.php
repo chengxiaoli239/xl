@@ -215,7 +215,7 @@ class EYunBaseService  extends BaseService
         }
 
 
-        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '初始化通讯录列表（第五步）', ['url'=>$url, 'params'=>$params, 'response'=>$response]);
+        Tool_Common::log('/eyun/'.__FUNCTION__, 'INFO', '初始化通讯录列表（第五步）', ['user_id'=>$this->user_id, 'url'=>$url, 'params'=>$params, 'response'=>$response]);
 
         return $response;
     }

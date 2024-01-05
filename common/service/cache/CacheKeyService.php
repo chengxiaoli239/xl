@@ -5,12 +5,14 @@ use common\service\BaseService;
 use common\service\cache\keys\lottery\LotteryCacheKeyTrait;
 use common\service\cache\keys\message\MessageCacheKeyTrait;
 use common\service\cache\keys\message\MessageReplyCacheKeyTrait;
+use common\service\cache\keys\wechat\WechatCacheKeyTrait;
 
 class CacheKeyService extends BaseService
 {
     use MessageReplyCacheKeyTrait;
     use MessageCacheKeyTrait;
     use LotteryCacheKeyTrait;
+    use WechatCacheKeyTrait;
 
     /**
      * 获取缓存

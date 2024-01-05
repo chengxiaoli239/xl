@@ -17,6 +17,7 @@ use common\service\thirdD\sx\Ssxx3dBetService;
 use common\service\thirdD\sx\Sx3dUserService;
 use common\service\thirdD\ThirdDTypeService;
 use common\service\wechat\eyun\EYunMessageOperateService;
+use common\service\wechat\WechatUserService;
 use common\tools\KjDataGet;
 use common\tools\Util;
 use DateTime;
@@ -133,6 +134,8 @@ class IndexController extends Controller
      * @return void
      **/
     public function actionDw1(){
+        $wcId = WechatUserService::getCurrentRobotWechat($user_id=22, $robot_wechat='wxid_v44jhsu1852p22');
+        $rst = WechatUserService::syncWechatFriends($user_id=22);p($rst);
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao='20231229288', $lottery_type=8);
         p($next_qihao);
         /**
