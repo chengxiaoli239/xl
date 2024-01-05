@@ -6,6 +6,12 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model backend\models\searchs\wechat\WechatUser */
 /* @var $form yii\widgets\ActiveForm */
+$robotUsers = \common\models\eyun\HistoryRobots::find()->where(['user_id'=>$model->user_id])->asArray()->asArray()->all();
+$robotData = [];
+foreach ($robotUsers as $robotUser){
+    $robotData[$robotUser['wcId']] = $robotUser['nickName']."(".($robotUser['wechat_status']?'在线':'离线').")";
+}
+
 ?>
 <style>
     .form-control{
@@ -50,6 +56,11 @@ use yii\widgets\ActiveForm;
             <?php echo $form->field($model, 'status')->dropDownList(
                 ['0'=>'禁用', '1'=>'启用'], ['prompt'=>'-状态-']
             )->label('状态', ['class' => 'control-label hidden-xs']); ?>
+        </div>
+        <div class="col-lg-2 col-xs-4">
+            <?php echo $form->field($model, 'robot_wechat')->dropDownList(
+                $robotData, ['prompt'=>'-机器人-']
+            )->label('机器人', ['class' => 'control-label hidden-xs']); ?>
         </div>
 
         <?php //$form->field($model, 'aliasName') ?>

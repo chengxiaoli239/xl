@@ -139,16 +139,16 @@ class WechatUserService extends BaseService
      */
     public static function getCurrentRobotWechat(int $user_id=0, $robot_wechat=''): string
     {
+        $mkey = CacheKeyService::userCurrentWechat($user_id);
         if($robot_wechat){
             $wcId = $robot_wechat;
         }else{
-            $mkey = CacheKeyService::userCurrentWechat();
             $wcId = commonRedis()->get($mkey);
-            if(empty($wcId) && $RobotUser = RobotUser::findOne(['user_id'=>$user_id])){
+            if(empty($wcId) && $RobotUser = RobotUser::find()->where(['user_id'=>$user_id])->orderBy(['robot_wechat'=>SORT_DESC])->one()){
                 $wcId = $RobotUser->wcId;
             }
         }
-        commonRedis()->setnx($mkey, $wcId);
+        commonRedis()->setex($mkey, 1800, $wcId);
 
         return $wcId;
     }
