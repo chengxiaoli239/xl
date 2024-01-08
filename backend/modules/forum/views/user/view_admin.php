@@ -24,6 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 </div-->
 
+                <?php include(dirname(__FILE__).'/index_tab.php'); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([

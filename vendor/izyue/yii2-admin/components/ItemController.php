@@ -72,13 +72,22 @@ class ItemController extends Controller
     {
         $model = new AuthItem(null);
         $model->type = $this->type;
-        if ($model->load(Yii::$app->getRequest()->post()) && $model->save()) {
-            Helper::invalidate();
 
-            return $this->redirect(['view', 'id' => $model->name]);
-        } else {
-            return $this->render('create', ['model' => $model]);
+        if ($model->load(Yii::$app->getRequest()->post()) && $model->validate()) {
+            // 添加调试信息
+            Yii::info('Loaded POST data: ' . print_r($model->attributes, true), 'auth');
+
+            if ($model->save()) {
+                Helper::invalidate();
+
+                return $this->redirect(['view', 'id' => $model->name]);
+            } else {
+                // 添加调试信息
+                Yii::error('Failed to save model: ' . print_r($model->getErrors(), true), 'auth');
+            }
         }
+
+        return $this->render('create', ['model' => $model]);
     }
 
     /**

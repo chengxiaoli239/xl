@@ -2,6 +2,7 @@
 namespace common\service\cache;
 
 use common\service\BaseService;
+use common\service\cache\keys\admin\AdminCacheKeyTrait;
 use common\service\cache\keys\lottery\LotteryCacheKeyTrait;
 use common\service\cache\keys\message\MessageCacheKeyTrait;
 use common\service\cache\keys\message\MessageReplyCacheKeyTrait;
@@ -13,6 +14,7 @@ class CacheKeyService extends BaseService
     use MessageCacheKeyTrait;
     use LotteryCacheKeyTrait;
     use WechatCacheKeyTrait;
+    use AdminCacheKeyTrait;
 
     /**
      * 获取缓存

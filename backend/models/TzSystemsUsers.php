@@ -47,6 +47,7 @@ use Yii;
  * @property int $is_use_proxy 使用代理
  * @property int $is_local_bet 是否本地
  * @property int $proxy_type 代理类型
+ * @property int $user_type 用户类型:0:管理员;1:七星;2:3d代理;3:3d总管
  * @property int $expire_time 到期时间
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
@@ -70,8 +71,8 @@ class TzSystemsUsers extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['uid', 'is_agent', 'tz_system_id', 'status', 'follow_status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'is_local_bet', 'proxy_type', 'expire_time', 'created_at', 'updated_at'], 'integer'],
-            [['balance', 'flow_wp_player_bs', 'flow_op_player_bs', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
+            [['uid', 'is_agent', 'tz_system_id', 'status', 'follow_status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'user_type', 'is_local_bet', 'proxy_type', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['balance', 'flow_wp_player_bs', 'flow_op_player_bs', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['cookie', 'cookie_wx_web'], 'string'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
@@ -80,6 +81,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             [['password', 'sys_password', 'sys_repassword'], 'string', 'max' => 20],
             ['sys_repassword', 'compare', 'compareAttribute' => 'sys_password', 'message' => '请再正确输入重复密码'],
             [['user_agent', 'desc'], 'string', 'max' => 640],
+            [['flow_wp_accounts', 'flow_op_accounts'], 'string', 'max' => 120],
             [['warn_val'], 'string', 'max' => 11],
         ];
     }
@@ -159,6 +161,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'is_use_proxy' => Yii::t('app', '使用代理'),
             'is_local_bet' => Yii::t('app', '本地下注'),
             'proxy_type' => Yii::t('app', '代理类型'),
+            'user_type' => Yii::t('app', '用户类型:0:管理员;1:七星;2:3d代理;3:3d总管'),
             'expire_time' => Yii::t('app', '到期时间'),
             'created_at' => Yii::t('app', '创建时间'),
             'updated_at' => Yii::t('app', '更新时间'),

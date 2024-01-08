@@ -14,6 +14,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use common\models\AdminModel;
 use common\models\AuthAssignment;
+use common\service\cache\CacheKeyService;
 use common\tools\Tool_Common;
 use backend\models\User;
 use backend\models\UserFollowData;
@@ -31,7 +32,9 @@ class UserService extends BaseService {
     }
 
     public static function opUser($admin_id, $action, $role){
+        $rst = true;
         $model = User::findOne(['admin_id'=>$admin_id]);
+        $now_time = time();
         if($action == 'add'){
             # 添加赔率记录
             if(!$model){
@@ -42,39 +45,23 @@ class UserService extends BaseService {
                     'email'=>$AdminModel->email,
                     'account'=>$AdminModel->username,
                     'username'=>$AdminModel->username,
-                    'created_at'=> time(),
-                    'updated_at'=> time(),
+                    'user_type' => UserService::is3dAdmin(\Yii::$app->user->identity) ? AdminModel::USER_TYPE_3D :  AdminModel::USER_TYPE_QX,
+                    'created_at'=> $now_time,
+                    'updated_at'=> $now_time,
                 ];
                 $User->setAttributes($insertData);
                 $rst = $User->save();
+                //p(['3d'=>UserService::is3dAdmin(\Yii::$app->user->identity), 'attr'=>$User->attributes]);
 
                 $AuthAssignment = new AuthAssignment();
                 $insertData = [
                     'item_name' => $role,
                     'user_id'=>$admin_id,
-                    'created_at'=>time(),
+                    'created_at'=>$now_time,
+                    'updated_at'=>$now_time,
                 ];
                 $AuthAssignment->setAttributes($insertData);
                 $rst = $AuthAssignment->save(false);
-
-                /*
-                $TzSystems = TzSystems::findAll([1=>1]);
-                foreach ($TzSystems as $TzSystem){
-                    $TzSystemsUsers = new TzSystemsUsers();
-                    $insertData = [
-                        'uid' => $admin_id,
-                        'tz_system_id' => $TzSystem->id,
-                        'account' => $AdminModel->username,
-                        'sys_name' => $TzSystem->name,
-                        'status' => 3, # 0 禁用 1启用 3隐藏
-                        'updated_at' => time(),
-                        'created_at' => time(),
-                    ];
-                    $TzSystemsUsers->setAttributes($insertData);
-                    $TzSystemsUsers->save();
-                }
-                */
-                //p([$insertData,$AuthAssignment->attributes,$rst,$AuthAssignment->getErrors()]);
             }
         }else{
             # 删除用户记录
@@ -582,5 +569,102 @@ class UserService extends BaseService {
         }
 
         return $is_3d;
+    }
+
+    /**
+     * 判断是否为3d总管
+     * @param $user
+     * @return bool
+     */
+    public static function is3dAdmin($user): bool
+    {
+        $is_3d_admin = false;
+        if(array_key_exists('3D总管', Yii::$app->authManager->getRolesByUser($user->id)) OR $user->user_type == AdminModel::USER_TYPE_3D_ADMIN){
+            $is_3d_admin = true;
+        }
+
+        return $is_3d_admin;
+    }
+
+    /**
+     * 判断是否为3d代理
+     * @param $user
+     * @return bool
+     */
+    public static function is3dProxy($user): bool
+    {
+        $is_3d_proxy = false;
+        if(array_key_exists('3D代理', Yii::$app->authManager->getRolesByUser($user->id)) OR $user->user_type == AdminModel::USER_TYPE_3D){
+            $is_3d_proxy = true;
+        }
+
+        return $is_3d_proxy;
+    }
+
+    /**
+     * 获取管理员管理可以管理的user_types
+     * @param $user
+     * @return array
+     */
+    public static function getAdminUserTypes($user, $act=0): array
+    {
+        $user_types = [];
+        if($user->id==1){
+            foreach (AdminModel::USER_TYPE_OPTIONS as $user_type=>$name){
+                if($user_type==AdminModel::USER_TYPE_ADMIN) continue;
+                if($act==1 && $user_type==AdminModel::USER_TYPE_3D_ADMIN) continue; # 详细信息
+                $user_types[] = ['user_type'=>$user_type, 'name'=>$name];
+            }
+        }else if(array_key_exists('3D总管', Yii::$app->authManager->getRolesByUser($user->id)) OR $user->user_type == AdminModel::USER_TYPE_3D_ADMIN){
+            $user_types[] = ['user_type'=>AdminModel::USER_TYPE_3D, 'name'=>AdminModel::USER_TYPE_OPTIONS[AdminModel::USER_TYPE_3D]];
+        }
+
+        return $user_types;
+    }
+
+    /**
+     * 获取当前user_type
+     * @param $user
+     * @param array $queryParams
+     * @return int
+     */
+    public static function getUserType($user, array $queryParams=[], $modelName='Assignment'): int
+    {
+        if($user->id==1){
+            $mkey = CacheKeyService::userType($user->id);
+            if(isset($queryParams[$modelName]['user_type'])){
+                $user_type = (int)$queryParams[$modelName]['user_type'];
+            }else{
+                $user_type = commonRedis()->get($mkey) ? : AdminModel::USER_TYPE_QX;
+            }
+            commonRedis()->setex($mkey, 1800, $user_type);
+        }else if(UserService::is3dAdmin($user)){
+            $user_type = AdminModel::USER_TYPE_3D;
+        }else if(UserService::is3dProxy($user)){
+            $user_type = AdminModel::USER_TYPE_3D_CHILD;
+        }else{
+            $user_type = 99;
+        }
+
+        return (int)$user_type;
+    }
+
+    /**
+     * 获取当前创建账号默认的user_type
+     * @param $user
+     */
+    public static function getCreateDefaultRole($user): string
+    {
+        if($user->id==1){
+            $role = '收费会员';
+        }else if(UserService::is3dAdmin($user)){
+            $role = '3D代理';
+        }else if(UserService::is3dProxy($user)){
+            $role = '3D代理下级';
+        }else{
+            $role = '';
+        }
+
+        return $role;
     }
 }

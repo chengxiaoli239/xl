@@ -1,0 +1,166 @@
+<?php
+
+use yii\helpers\Html;
+use yii\grid\GridView;
+use yii\widgets\Pjax;
+/* @var $this yii\web\View */
+/* @var $searchModel backend\models\searchs\User */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = Yii::t('app', 'Users');
+$this->params['breadcrumbs'][] = $this->title;
+?>
+<section class="user-index wrapper site-min-height">
+    <!-- page start-->
+    <section class="panel">
+        <header class="panel-heading">
+            <?= Html::encode($this->title) ?>
+            <?= Html::a(Yii::t('rbac-admin', 'Create User').' <i class="fa fa-plus"></i>', ['create-my-child'], ['class' => 'btn btn-success btn-xs']) ?>
+        </header>
+        <div class="panel-body">
+            <div class="adv-table editable-table ">
+    <?php //Pjax::begin(); ?>
+                <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+                <?= GridView::widget([
+                    'dataProvider' => $dataProvider,
+                    //'filterModel' => $searchModel,
+                    'columns' => [
+                        ['class' => 'yii\grid\SerialColumn'],
+
+                        //'id',
+                        //'admin_id',
+                        //'username',
+                        ['attribute' => 'username', 'label'=>'账号', # 'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model){
+                                return $model->username;
+                            }
+                        ],
+                        ['attribute' => 'status','label'=>'账号状态', # 'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if($model->status == 1){
+                                    $txt = '<font color="red">已禁用</font>';
+                                    $alt = '点击启用';
+                                    $val = 10;
+                                }else{
+                                    $txt = '<font color="green">已启用</font>';
+                                    $val = 1;
+                                    $alt = '点击禁用';
+                                }
+                                $url = "/forum/user/switch-status?id=".$model->id."&status=".$val; #
+                                return Html::a($txt, $url, ['title' => '开启','alt'=>$alt]);
+                            }
+                        ],
+                        //'updated_at:datetime',
+                        ['attribute' => 'id', 'label'=>'更新时间', # 'headerOptions'=>['width'=>'5%'],
+                            'value' => function($model){
+                                return date('Y-m-d H:i:s', $model->updated_at);
+                            }
+                        ],
+                        ['attribute'=>'desc','label'=>'描述',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                $TzSystemsUsers = \backend\models\TzSystemsUsers::findOne(['uid'=>$model->id]);
+                                $options = [
+                                    'class'=>'act-user-copy',
+                                    'data-id'=>$model->id,
+                                    'data-username'=>$model->username,
+                                    'data-desc'=>$model->desc,
+                                    'data-access_token'=>$TzSystemsUsers->access_token??'',
+                                ];
+                                return Html::a($model->desc, 'javascript:;', $options);
+                            }
+                        ],
+                        ['class' => 'yii\grid\ActionColumn'],
+                    ],
+                ]); ?>
+    <?php //Pjax::end(); ?>
+            </div>
+        </div>
+    </section>
+    <!-- page end-->
+</section>
+
+<!--复制提示框-->
+<div class="modal fade" id="COPY_TipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
+     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
+">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="copy_tip_msg_title"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group up-reason">
+                    <input type="hidden" id="tz_user_id" value="0">
+                    <label id="copy_tip_msg" for="copy_tip_msg"></label><span></span>
+                    <label id="copy_access_token" for="copy_access_token"></label>
+                    <span>&nbsp;&nbsp; <a class="btn btn-xs" id="reset_token" href="javascript:;">重置token</a></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" data-clipboard-target="#copy_tip_msg" id="CopyConfirm">复制</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script>
+<script src="/chat_statics/js/clipboard.min.js"></script>
+<script>
+$(function () {
+    $('.act-user-copy').click(function () {
+        var desc = $(this).data('desc');
+        var username = $(this).data('username');
+        var access_token = $(this).data('access_token');
+        $("#copy_tip_msg_title").html("用户[<strong>" + username + "</strong>]");
+        $("#copy_tip_msg").html('http://' + window.location.host + '\r\n' + desc);
+        $("#tz_user_id").val($(this).data('id'))
+        $("#copy_access_token").html("access_token：[<strong>" + access_token + "</strong>]");
+        $("#act").val('act-user-copy');
+        $("#COPY_TipModal").modal('show');
+    });
+
+    var clipboard;
+    $("#CopyConfirm").click(function () {
+        if (clipboard) {
+            clipboard.destroy();
+        }
+
+        var copyBtn = new ClipboardJS('#CopyConfirm');
+
+        var flag = 0;
+        var txt = '';
+        copyBtn.on("success", function (e) {
+            // 复制成功
+            txt = e.text;
+            //alert(e.text);
+            $("#copyTxt").val(e.text);
+            e.clearSelection();
+        });
+
+        $("#tip_msg_title").html('复制结果');
+        //$("#tip_msg_rst").html($("#copyTxt").val());
+        $("#tip_msg_rst").html("复制成功");
+        $("#rstTipModal").modal('show');
+    });
+
+    $('#reset_token').click(function(){
+        user_id = $('#tz_user_id').val();
+        data = {'user_id':user_id}
+        $.post("/forum/user/reset-token",data,function(rst) {
+            if(rst.status == 200) {
+                Ewin.confirm({ message: '新access_token：'+rst.data.access_token}).on(function (e) {});
+            } else {
+                Ewin.confirm({ message: '操作失败：'+rst.msg}).on(function (e) {});
+            }
+            //showTips(null, rst.msg, tip_title); // 同步完无需弹框，暂且注释
+        },'JSON');
+    });
+});
+</script>

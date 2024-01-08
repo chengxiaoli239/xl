@@ -3,6 +3,7 @@
 namespace backend\modules\statics\controllers;
 
 use backend\service\HN0898Service;
+use common\models\AdminModel;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
 use common\service\wechat\WechatUserService;
 use Yii;
@@ -45,7 +46,12 @@ class Static3dUserProfitsDayAllController extends BaseController
         }
 
         if($this->_user_id != 1){
-            $queryParams['Static3dUserProfitsDayAll']['user_id'] = $this->_user_id;
+            $user = \Yii::$app->user->identity;
+            $user_id = $this->_user_id;;
+            if($user->user_type == AdminModel::USER_TYPE_3D_CHILD) {
+                $user_id = $user->parent_id;
+            }
+            $queryParams['Static3dUserProfitsDayAll']['user_id'] = $user_id;
         }
 
         $dataProvider = $searchModel->search($queryParams);

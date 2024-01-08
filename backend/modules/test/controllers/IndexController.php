@@ -410,7 +410,7 @@ class IndexController extends Controller
 
     public function actionDw()
     {
-        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%wechat_user}}'); p($r);
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}'); p($r);
         $d = Thirdd::getCurrentKjData($lottery_type=26);p($d);
         $Thirdd = new Thirdd();
         $data = $Thirdd->getFuCai3d($type='json', 2);p($data);

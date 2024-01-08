@@ -4,7 +4,7 @@ namespace common\service\cache\keys\lottery;
 trait LotteryCacheKeyTrait
 {
     /**
-     * ¿ª½±²ÊÖÖ»º´ækey
+     * ç®¡ç†å‘˜lottery key
      * @param int $grabDataStatus
      * @return string
      */

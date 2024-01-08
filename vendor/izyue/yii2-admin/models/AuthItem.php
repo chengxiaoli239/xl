@@ -65,9 +65,9 @@ class AuthItem extends \yii\base\Model
                 'range' => array_keys(Yii::$app->authManager->getRules()),
                 'message' => 'Rule not exists'],
             [['name', 'type'], 'required'],
-            [['name'], 'unique', 'when' => function() {
-                return $this->isNewRecord || ($this->_item->name != $this->name);
-            }],
+            //[['name'], 'unique', 'when' => function() {
+            //    return $this->isNewRecord || ($this->_item->name != $this->name);
+            //}],
             [['type'], 'integer'],
             [['description', 'data', 'ruleName'], 'default'],
             [['name'], 'string', 'max' => 64]
@@ -119,7 +119,7 @@ class AuthItem extends \yii\base\Model
     public static function find($id='')
     {
         $item = Yii::$app->authManager->getRole($id);
-        if ($item !== null) {
+        if (!$id OR $item !== null) {
             return new self($item);
         }
 

@@ -14,6 +14,7 @@ use backend\service\PoxyIPService;
 use backend\service\UserService;
 use common\models\AdminModel;
 use common\service\CommonService;
+use izyue\admin\models\searchs\Assignment as AssignmentSearch;
 use Yii;
 use backend\models\User;
 //use backend\models\searchs\User as UserSearch;
@@ -28,6 +29,12 @@ use backend\service\HN0898Service;
  */
 class UserController extends BaseController
 {
+    public $userClassName;
+    public $idField = 'id';
+    public $usernameField = 'username';
+    public $fullnameField;
+    public $searchClass;
+    public $extraColumns = [];
     /**
      * @inheritdoc
      */
@@ -41,6 +48,15 @@ class UserController extends BaseController
                 ],
             ],
         ];
+    }
+
+    public function init()
+    {
+        parent::init();
+        if ($this->userClassName === null) {
+            $this->userClassName = Yii::$app->getUser()->identityClass;
+            $this->userClassName = $this->userClassName ? : 'common\models\AdminModel';
+        }
     }
 
     /**
@@ -147,14 +163,23 @@ class UserController extends BaseController
      */
     public function actionView()
     {
-        $uid = \Yii::$app->user->id;
+        $user = \Yii::$app->user->identity;
+        $uid = $user->id;
         if($uid == 1) {
             $searchModel = new TzSystemsUsersSearch();
-            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+            $queryParams = Yii::$app->request->queryParams;
+
+            $user_type = UserService::getUserType($user, $queryParams, 'TzSystemsUsers');
+            $userTypes = UserService::getAdminUserTypes($user, $act=1);
+
+            $queryParams['TzSystemsUsers']['user_type'] = $user_type;
+            $dataProvider = $searchModel->search($queryParams);
 
             return $this->render('view_admin', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
+                'userTypes' => $userTypes,
+                'user_type' => $user_type,
             ]);
 
         }else {
@@ -449,6 +474,123 @@ class UserController extends BaseController
         return $this->redirect(['view']);
     }
 
+    public function actionMyChild(): string
+    {
+        $user = \Yii::$app->user->identity;
+        $queryParams = Yii::$app->getRequest()->getQueryParams();
+
+        //p(['queryParams'=>$queryParams, 'user'=>$user, 'roles'=>$roles, 'permissions'=>$permissions]);
+        $user_type = UserService::getUserType($user, $queryParams);
+
+        $searchModel = new AssignmentSearch;
+        $dataProvider = $searchModel->search($queryParams, $this->userClassName, $this->usernameField);
+        $dataProvider->query->where(['user_type'=>$user_type]);
+        $dataProvider->query->andWhere(['parent_id'=>\Yii::$app->user->id]); # 取自己下级
+
+        $userTypes = UserService::getAdminUserTypes($user);
+        return $this->render('index_my_child', [
+            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
+            'idField' => $this->idField,
+            'userTypes' => $userTypes,
+            'user_type' => $user_type,
+            'usernameField' => $this->usernameField,
+            'extraColumns' => $this->extraColumns,
+        ]);
+    }
+
+    /**
+     * Creates a new Menu model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreateMyChild()
+    {
+        $model = new $this->userClassName;
+        $model->setScenario('create');
+        $YiiUser = \Yii::$app->user->identity;
+        //p([$this->userClassName, UserService::is3dAdmin(\Yii::$app->user->identity), \Yii::$app->request->post(), $className]);
+        if ($model->load(Yii::$app->request->post())) {
+            try {
+                $flag = false;
+                $transaction = \Yii::$app->db->beginTransaction();
+                $model->user_type = AdminModel::USER_TYPE_3D_CHILD;
+                $model->parent_id = \Yii::$app->user->id;
+
+                if ($user = $model->signup()) {
+                    # 创建账号之后触发
+                    CommonService::opUser($user->id, 'add', UserService::getCreateDefaultRole($YiiUser));
+                    $flag = true;
+                }
+                if(!$flag){
+                    throw_info('处理异常');
+                }
+                $transaction->commit();
+            }catch (\Exception $e){
+                $transaction->rollBack();
+            }
+            return $this->redirect(['my-child']);
+        }
+
+        return $this->render('create_my_child', [
+            'model' => $model,
+        ]);
+
+    }
+
+    /**
+     * Updates an existing Menu model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param  integer $id
+     * @return mixed
+     */
+    public function actionUpdateMyChild($id)
+    {
+        $post = Yii::$app->request->post();
+        $model = $this->findModel($id);
+        $model->setScenario('update');
+        if($model->load($post)){
+            if($model->password){
+                $pwd = $model->password;
+                $model->desc = '账号：'.$model->username.' 密码：'.$pwd;
+                $model->setPassword($pwd);
+                $model->generateAuthKey();
+
+                $now_time = time();
+                $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$id]);
+                if(empty($TzSystemsUsers)){
+                    $TzSystemsUsers = new TzSystemsUsers();
+                    $TzSystemsUsers->uid = $id;
+                    $TzSystemsUsers->created_at = $now_time;
+                    $access_token = md5($id.'_'.$pwd);
+                    $TzSystemsUsers->access_token = $access_token;
+                }
+                $TzSystemsUsers->username = $model->username;
+                $TzSystemsUsers->updated_at = $now_time;
+                if(!$TzSystemsUsers->save()){
+                    p($TzSystemsUsers->getErrors());
+                }
+            }
+
+            if ($model->save()) {
+                //MenuHelper::invalidate();
+                $user = \Yii::$app->user->identity;
+                $rst = UserService::opUser($id, 'add', UserService::getCreateDefaultRole($user));
+                return $this->redirect(['index']);
+            } else {
+                return $this->render('update', [
+                    'model' => $model,
+                ]);
+            }
+        }else{
+            return $this->render('update', [
+                'model' => $model,
+            ]);
+        }
+
+
+    }
+
     /**
      * Finds the User model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -473,10 +615,14 @@ class UserController extends BaseController
      * @return User the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel()
+    protected function findModel($id)
     {
         $admin_id = \Yii::$app->user->id;
-        if (($model = AdminModel::findOne($admin_id)) !== null) {
+        $where = ['id'=>$admin_id];
+        if($admin_id != 1){
+            $where = ['parent_id'=>$admin_id, 'id'=>$id];
+        }
+        if (($model = AdminModel::find()->where($where)->one()) !== null) {
             return $model;
         }
 

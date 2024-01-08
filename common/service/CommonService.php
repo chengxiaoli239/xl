@@ -28,12 +28,13 @@ class  CommonService{
 
     /**
      * @description 用户设置成代理、删除用户代理时候处理业务
-     * @param $admin_user_id
+     * @param $admin_id
      * @param $action
-     * @param $member 默认权限
+     * @param string $role
      * @return bool
      */
-    public static function opUser($admin_id, $action, $role = '收费会员'){
+    public static function opUser($admin_id, $action, $role = '收费会员'): bool
+    {
         # 1、时时彩用户记录添加
         $rst1 = UserService::opUser($admin_id, $action, $role);
         //$rst1 = UserService::opTzSystemsUsers($admin_id, $action, $role);

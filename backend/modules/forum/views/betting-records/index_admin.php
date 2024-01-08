@@ -35,8 +35,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <section class="panel">
         <header class="panel-heading">
             <?= Html::encode($this->title);echo '['.$newRecord['qihao'].':'.$newRecord['code_str'].']'; ?>
-            <?= Html::a(Yii::t('app', 'playway 2 Plans'), ['index', 'BettingRecords[playway]'=>2], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-            <?= Html::a(Yii::t('app', 'playway 3 Plans'), ['index', 'BettingRecords[playway]'=>3], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
@@ -67,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->qihao;
                             }
                         ],
-                        ['attribute' => 'codes','headerOptions'=>['width'=>'25%'],
+                        ['attribute' => 'codes','headerOptions'=>['width'=>'20%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = BaseStringHelper::truncate($model->codes,15);
@@ -106,7 +104,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         */
                         //'kj_codes',
-                        ['attribute' => 'kj_codes','headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'kj_codes', 'label'=>'号码','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
                                 return $model->kj_codes ? $model->kj_codes : '待开奖';

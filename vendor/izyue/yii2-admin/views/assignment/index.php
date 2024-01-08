@@ -12,18 +12,38 @@ use yii\widgets\Pjax;
 
 $this->title = Yii::t('rbac-admin', 'Assignments');
 $this->params['breadcrumbs'][] = $this->title;
+$extraColumns = array_merge($extraColumns, [
+    [
+        'attribute' => 'updated_at',
+        'label' => '更新',
+        'format' => 'raw',
+        'value' => function ($model) {
+            return Yii::$app->formatter->asDatetime($model->updated_at);
+        },
+    ],
+    [
+        'attribute' => 'created_at',
+        'label' => '创建',
+        'format' => 'raw',
+        'value' => function ($model) {
+            return Yii::$app->formatter->asDatetime($model->created_at);
+        },
+    ],
+]);
 
 $columns = array_merge(
     [
-    ['class' => 'yii\grid\SerialColumn'],
+        ['class' => 'yii\grid\SerialColumn'],
+        [
+            'class' => 'yii\grid\DataColumn',
+            'attribute' => $usernameField,
+        ],
+    ], 
+    $extraColumns, 
     [
-        'class' => 'yii\grid\DataColumn',
-        'attribute' => $usernameField,
-    ],
-    ], $extraColumns, [
-    [
-        'class' => 'yii\grid\ActionColumn',
-    ],
+        [
+            'class' => 'yii\grid\ActionColumn',
+        ],
     ]
 );
 ?>
@@ -33,20 +53,17 @@ $columns = array_merge(
     <section class="panel">
         <header class="panel-heading">
             <?=$this->title?>
+            <?= Html::a(Yii::t('rbac-admin', 'Create User').' <i class="fa fa-plus"></i>', ['create'], ['class' => 'btn btn-success btn-xs']) ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <div class="clearfix">
-                    <div class="btn-group">
-                        <?= Html::a(Yii::t('rbac-admin', 'Create User').' <i class="fa fa-plus"></i>', ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-                    </div>
-                </div>
+                <?php include(dirname(__FILE__).'/index_tab.php'); ?>
                 <div class="space15"></div>
                 <?php Pjax::begin(); ?>
                 <?=
                 GridView::widget([
                     'dataProvider' => $dataProvider,
-                    'filterModel' => $searchModel,
+                    #'filterModel' => $searchModel,
                     'tableOptions' => [
                         'class' => 'table table-striped table-hover table-bordered',
                         'id' => 'editable-sample',

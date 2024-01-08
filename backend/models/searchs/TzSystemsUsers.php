@@ -18,9 +18,9 @@ class TzSystemsUsers extends TzSystemsUsersModel
     public function rules()
     {
         return [
-            [['id', 'uid', 'is_agent', 'tz_system_id', 'follow_status', 'status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'is_local_bet', 'expire_time', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'sys_name', 'account', 'flow_wp_accounts', 'flow_op_accounts', 'password', 'ssc_domain', 'cookie', 'user_agent', 'cookie_wx_web', 'access_token', 'warn_val', 'desc', 'update_time'], 'safe'],
-            [['balance', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d'], 'number'],
+            [['id', 'uid', 'is_agent', 'tz_system_id', 'status', 'is_auto_login', 'follow_status', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'is_local_bet', 'proxy_type', 'user_type', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['username', 'sys_name', 'account', 'password', 'ssc_domain', 'cookie', 'user_agent', 'cookie_wx_web', 'access_token', 'flow_wp_accounts', 'flow_op_accounts', 'warn_val', 'desc', 'update_time'], 'safe'],
+            [['balance', 'flow_wp_player_bs', 'flow_op_player_bs', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
         ];
     }
 
@@ -82,6 +82,8 @@ class TzSystemsUsers extends TzSystemsUsersModel
             'is_use_proxy' => $this->is_use_proxy,
             'is_local_bet' => $this->is_local_bet,
             'access_token' => $this->access_token,
+            'proxy_type' => $this->proxy_type,
+            'user_type' => $this->user_type,
             'expire_time' => $this->expire_time,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

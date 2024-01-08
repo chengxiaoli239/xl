@@ -5,6 +5,9 @@ namespace izyue\admin\controllers;
 use backend\models\SignupForm;
 use backend\models\TzSystemsUsers;
 use backend\service\UserService;
+use backend\service\UserSysPlansService;
+use common\models\AdminModel;
+use common\tools\Util;
 use izyue\admin\components\MenuHelper;
 use Yii;
 use izyue\admin\models\searchs\Assignment as AssignmentSearch;
@@ -62,22 +65,35 @@ class AssignmentController extends Controller
      */
     public function actionIndex()
     {
+        $user = \Yii::$app->user->identity;
+        $roles = Yii::$app->authManager->getRolesByUser($user->id);
+        $permissions = Yii::$app->authManager->getPermissionsByUser($user->id);
+        $queryParams = Yii::$app->getRequest()->getQueryParams();
 
+        //p(['queryParams'=>$queryParams, 'user'=>$user, 'roles'=>$roles, 'permissions'=>$permissions]);
+        $user_type = UserService::getUserType($user, $queryParams);
         if ($this->searchClass === null) {
             $searchModel = new AssignmentSearch;
-            $dataProvider = $searchModel->search(Yii::$app->getRequest()->getQueryParams(), $this->userClassName, $this->usernameField);
+            $dataProvider = $searchModel->search($queryParams, $this->userClassName, $this->usernameField);
+            $dataProvider->query->where(['user_type'=>$user_type]);
+            if(\Yii::$app->user->id != 1){
+                $dataProvider->query->andWhere(['parent_id'=>\Yii::$app->user->id]); # 取自己下级
+            }
         } else {
             $class = $this->searchClass;
             $searchModel = new $class;
-            $dataProvider = $searchModel->search(Yii::$app->getRequest()->getQueryParams());
+            $dataProvider = $searchModel->search($queryParams);
         }
-
+        
+        $userTypes = UserService::getAdminUserTypes($user);
         return $this->render('index', [
-                'dataProvider' => $dataProvider,
-                'searchModel' => $searchModel,
-                'idField' => $this->idField,
-                'usernameField' => $this->usernameField,
-                'extraColumns' => $this->extraColumns,
+            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
+            'idField' => $this->idField,
+            'userTypes' => $userTypes,
+            'user_type' => $user_type,
+            'usernameField' => $this->usernameField,
+            'extraColumns' => $this->extraColumns,
         ]);
     }
 
@@ -134,9 +150,10 @@ class AssignmentController extends Controller
             }
         }
 
-        # 添加/删除代理赔率记录 by wangyegao
-        if(in_array('收费会员',$roles) OR in_array('member',$roles)){
-            CommonService::opUser($id, $action);
+        # 添加/删除代理赔率记录
+        if(in_array('收费会员',$roles) OR in_array('member',$roles) OR in_array('3D代理', $roles)){
+            $user = \Yii::$app->user->identity;
+            CommonService::opUser($id, $action, UserService::getCreateDefaultRole($user));
         }
         Helper::invalidate();
         Yii::$app->response->format = 'json';
@@ -232,15 +249,31 @@ class AssignmentController extends Controller
      */
     public function actionCreate()
     {
-
         $model = new $this->userClassName;
         $model->setScenario('create');
+        $YiiUser = \Yii::$app->user->identity;
+        $className = Util::class_basename($this->userClassName);
+        //p([$this->userClassName, UserService::is3dAdmin(\Yii::$app->user->identity), \Yii::$app->request->post(), $className]);
         if ($model->load(Yii::$app->request->post())) {
-            if ($user = $model->signup()) {
-                # 创建账号之后触发
-                CommonService::opUser($user->id, 'add');
-                return $this->redirect(['index']);
+            try {
+                $flag = false;
+                $transaction = \Yii::$app->db->beginTransaction();
+                $model->user_type = UserService::is3dAdmin(\Yii::$app->user->identity) ? AdminModel::USER_TYPE_3D :  AdminModel::USER_TYPE_QX;
+                $model->parent_id = \Yii::$app->user->id;
+                
+                if ($user = $model->signup()) {
+                    # 创建账号之后触发
+                    CommonService::opUser($user->id, 'add', UserService::getCreateDefaultRole($YiiUser));
+                    $flag = true;
+                }
+                if(!$flag){
+                    throw_info('处理异常');
+                }
+                $transaction->commit();
+            }catch (\Exception $e){
+                $transaction->rollBack();
             }
+            return $this->redirect(['index']);
         }
 
         return $this->render('create', [
@@ -285,7 +318,8 @@ class AssignmentController extends Controller
 
             if ($model->save()) {
                 //MenuHelper::invalidate();
-                $rst = UserService::opUser($id, 'add', '收费会员');
+                $user = \Yii::$app->user->identity;
+                $rst = UserService::opUser($id, 'add', UserService::getCreateDefaultRole($user));
                 return $this->redirect(['index']);
             } else {
                 return $this->render('update', [

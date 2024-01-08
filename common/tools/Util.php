@@ -771,6 +771,11 @@ class Util
         }
         return $l_data;
     }
+
+    static function class_basename($class) {
+        $path = explode('\\', $class);
+        return end($path);
+    }
 }
 
 
