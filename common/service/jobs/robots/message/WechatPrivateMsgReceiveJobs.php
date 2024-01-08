@@ -23,15 +23,15 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
         return self::handle($params);
     }
 
-    public static function preValiate($params=[]){
+    public static function preValidate($params=[]){
 
         $dataHI = date('H:i');
         if('21:17'<$dataHI && $dataHI<'23:59'){
-            throw_info('本堂已关');
+            throw_info('本堂已关', CommonBaseService::CODE_FOR_USER);
         }
 
         if('00:00'<$dataHI && $dataHI<'08:00'){
-            //throw_info('本堂未开');
+            //throw_info('本堂未开', CommonBaseService::CODE_FOR_USER);
         }
     }
 
@@ -60,9 +60,6 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
             }
             \Yii::$app->redis->expire($mkey, 2);
 
-            # 2、盘口判断
-            self::preValiate($params); # 校验关盘
-
             /**
              * 确认订单：
              * 1、全部确认（除撤单的），管理员输入：全部代购
@@ -76,6 +73,9 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
             $MessageService = new EYunMessageOperateService($user_id);
             $wechatUser = WechatUserService::getWechatUsers($user_id)[($fromUser==$wcId?$data['toUser']:$fromUser)];
             self::validateWechatUser($wechatUser);
+
+            # 2、盘口判断
+            self::preValidate($params); # 校验关盘
 
             $data['fromUserNickName'] = $wechatUser['nickName'];
             Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name.'00', ['wcId'=>$wcId, 'params'=>$params, 'wechatUser'=>$wechatUser, 'fromUser'=>$fromUser]);
