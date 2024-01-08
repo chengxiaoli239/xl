@@ -29,6 +29,8 @@ class LoginForm extends Model
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()
             ['password', 'validatePassword'],
+            [['password', 're_password'], 'string', 'max' => 20, 'on'=>'updatePassword'],
+            ['password', 'compare', 'compareAttribute' => 're_password', 'message' => '请再正确输入重复密码', 'on'=>'updatePassword'],
         ];
     }
 

@@ -78,7 +78,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
             self::validateWechatUser($wechatUser);
 
             $data['fromUserNickName'] = $wechatUser['nickName'];
-            Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name.'00', ['wcId'=>$wcId, 'params'=>$params]);
+            Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name.'00', ['wcId'=>$wcId, 'params'=>$params, 'wechatUser'=>$wechatUser, 'fromUser'=>$fromUser]);
             if ($fromUser == $wcId && $fromUser != $data['toUser']){
                 // todo 自己发给用户的消息，针对订单确认或撤单处理
                 $data['targetUser'] = $data['toUser'];  # 目标用户

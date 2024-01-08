@@ -68,13 +68,28 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            UserService::setUserLoginInfo(\Yii::$app->user->id); # 设置用户登陆的session信息
+            UserService::setUserLoginInfo(\Yii::$app->user->id);
             return $this->goBack();
         } else {
             return $this->render('login', [
                 'model' => $model,
             ]);
         }
+    }
+
+    public function actionUpdatePassword()
+    {
+        $model = new LoginForm();
+        $model->setScenario('updatePassword');
+        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            p('kjkjkkkk');
+            //UserService::setUserLoginInfo(\Yii::$app->user->id);
+            //return $this->goBack();
+        }
+
+        return $this->renderAjax('update_password', [
+            'model' => $model,
+        ]);
     }
 
     public function actionLogout()

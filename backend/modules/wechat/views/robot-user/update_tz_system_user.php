@@ -8,12 +8,6 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 $this->title = '盘口信息修改:'.$model->sys_name;
 ?>
-<style>
-    .panel{
-
-    }
-</style>
-
 <div class="user-update tz-systems-users-form row">
     <section class="user-update user panel">
         <header class="panel-heading">

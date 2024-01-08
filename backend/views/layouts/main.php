@@ -368,9 +368,10 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
                     </a>
                     <ul class="dropdown-menu extended logout">
                         <div class="log-arrow-up"></div>
-                        <li><a href="#"><i class=" fa fa-suitcase"></i>Profile</a></li>
-                        <li><a href="#"><i class="fa fa-cog"></i> Settings</a></li>
-                        <li><a href="#"><i class="fa fa-bell-o"></i> Notification</a></li>
+                        <li><a href="/forum/ssc-kj-data/index"><i class=" fa fa-suitcase"></i>数据</a></li>
+                        <!--li><a href="#"><i class="fa fa-cog"></i> Settings</a></li-->
+                        <li><a href="javascript:;" id="updatePassword"><i class="fa fa-edit"></i> 改密</a></li>
+                        <!--li><a href="#"><i class="fa fa-bell-o"></i> Notification</a></li-->
                         <li><a href="<?=Url::toRoute('/site/logout')?>" data-method="post"><i class="fa fa-key"></i> Log Out</a></li>
                     </ul>
                 </li>
@@ -578,6 +579,19 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
     <!--footer end-->
 </section>
 
+<script src="/statics/js/jquery-2.0.3.js"></script>
+<script>
+$(function (){
+    $('#updatePassword').click(function (){
+        console.log('lllll')
+
+        $.post("/site/update-password",{},function(rst) {
+
+            console.log('kkkk')
+        })
+    });
+});
+</script>
 <?php $this->endBody() ?>
 </body>
 </html>
