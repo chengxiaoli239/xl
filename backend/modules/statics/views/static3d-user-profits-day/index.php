@@ -39,6 +39,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         'date',
                         //'user_id',
                         #'wechat_user_id',
+                        ['attribute' => 'user_id', 'label'=>'代理', //'headerOptions' => ['width' => '5%'],
+                            'format' => 'raw',
+                            'value'=> function($model){
+                                return $model->proxy->username;
+                            },
+                        ],
                         ['attribute' => 'wechat_user_name', 'label'=>'客户', //'headerOptions' => ['width' => '5%'],
                             'format' => 'raw',
                             'value'=> function($model){

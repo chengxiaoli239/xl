@@ -2,6 +2,7 @@
 
 namespace backend\modules\statics\controllers;
 
+use backend\service\UserService;
 use common\models\AdminModel;
 use Yii;
 use backend\models\statics\Static3dUserProfitsDay;
@@ -39,10 +40,11 @@ class Static3dUserProfitsDayController extends BaseController
         $searchModel = new Static3dUserProfitsDaySearch();
         $queryParams = Yii::$app->request->queryParams;
         if(!empty($queryParams) && empty($queryParams['Static3dUserProfitsDay']['date'])){
-            $queryParams['Static3dUserProfitsDay']['date'] = date('Y-m-d');
+            //$queryParams['Static3dUserProfitsDay']['date'] = date('Y-m-d');
         }
 
-        if($this->_user_id != 1){
+        $is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
+        if($this->_user_id != 1 && !$is3dAdmin){
             $user = \Yii::$app->user->identity;
             $user_id = $this->_user_id;;
             if($user->user_type == AdminModel::USER_TYPE_3D_CHILD) {

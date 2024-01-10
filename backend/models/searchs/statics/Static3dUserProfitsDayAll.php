@@ -12,6 +12,7 @@ use backend\models\statics\Static3dUserProfitsDayAll as Static3dUserProfitsDayAl
  */
 class Static3dUserProfitsDayAll extends Static3dUserProfitsDayAllModel
 {
+    public $username;  // 代理账号
     /**
      * @inheritdoc
      */
@@ -21,6 +22,7 @@ class Static3dUserProfitsDayAll extends Static3dUserProfitsDayAllModel
             [['id', 'user_id', 'wechat_user_id', 'created_at', 'updated_at'], 'integer'],
             [['date', 'wechat_user_name', 'update_time'], 'safe'],
             [['bet_money', 'bonus', 'up_money', 'down_money', 'profits'], 'number'],
+            [['username'], 'string'],  // 代理系统账号
         ];
     }
 
@@ -42,7 +44,8 @@ class Static3dUserProfitsDayAll extends Static3dUserProfitsDayAllModel
      */
     public function search($params)
     {
-        $query = Static3dUserProfitsDayAllModel::find();
+        $query = Static3dUserProfitsDayAllModel::find()->alias('a');
+        $query->joinWith('proxy');
 
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
@@ -60,21 +63,25 @@ class Static3dUserProfitsDayAll extends Static3dUserProfitsDayAllModel
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
-            'date' => $this->date,
-            'user_id' => $this->user_id,
-            'wechat_user_id' => $this->wechat_user_id,
-            'bet_money' => $this->bet_money,
-            'bonus' => $this->bonus,
-            'up_money' => $this->up_money,
-            'down_money' => $this->down_money,
-            'profits' => $this->profits,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'update_time' => $this->update_time,
+            'a.id' => $this->id,
+            'a.date' => $this->date,
+            'a.user_id' => $this->user_id,
+            'a.wechat_user_id' => $this->wechat_user_id,
+            'a.bet_money' => $this->bet_money,
+            'a.bonus' => $this->bonus,
+            'a.up_money' => $this->up_money,
+            'a.down_money' => $this->down_money,
+            'a.profits' => $this->profits,
+            'a.created_at' => $this->created_at,
+            'a.updated_at' => $this->updated_at,
+            'a.update_time' => $this->update_time,
+            'lt_admin.username' => trim($this->username),
         ]);
 
-        $query->andFilterWhere(['like', 'wechat_user_name', $this->wechat_user_name]);
+        $query->andFilterWhere(['like', 'a.wechat_user_name', $this->wechat_user_name]);
+        //$query->andFilterWhere(['like', 'lt_admin.username', $this->username]);
+        $query->addSelect(['a.*', 'lt_admin.username']);
+        //$sql = $query->createCommand()->getRawSql(); //p($sql);
 
         return $dataProvider;
     }

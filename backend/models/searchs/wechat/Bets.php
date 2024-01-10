@@ -12,7 +12,7 @@ use backend\models\wechat\Bets as BetsModel;
  */
 class Bets extends BetsModel
 {
-    public $wechatUserName;  // Ìí¼ÓÕâÒ»ÐÐ
+    public $wechatUserName;  // å¾®ä¿¡id
     /**
      * @inheritdoc
      */
@@ -22,7 +22,7 @@ class Bets extends BetsModel
             [['id', 'user_id', 'wechat_user_id', 'order_id', 'play_method', 'count', 'status', 'push_status', 'cancel_status', 'is_need_confirm', 'reply_type', 'has_reply', 'is_simulate', 'lottery_type', 'is_profits_record', 'created_at', 'updated_at'], 'integer'],
             [['codes', 'qihao', 'kj_codes', 'push_desc', 'new_msg_id', 'reply_content', 'lottery_name', 'bet_desc', 'api_code_datas', 'update_at'], 'safe'],
             [['bet_money', 'bonus', 'single', 'ratio', 'profits'], 'number'],
-            [['wechatUserName'], 'string'],  // ÊÊµ±µØÌí¼ÓÆäËû¹æÔò
+            [['wechatUserName'], 'string'],  // å¾®ä¿¡å¥½å‹å¾®ä¿¡è´¦å·
         ];
     }
 
@@ -45,12 +45,12 @@ class Bets extends BetsModel
     public function search($params)
     {
         #$query = BetsModel::find()->alias('b')->joinWith(['wechatUser' => function($query) {
-        #    $query->from(['wechat_user' => 'lt_wechat_user']);  // Ìí¼ÓÕâÒ»ÐÐ£¬Ê¹ÓÃ±ðÃû
+        #    $query->from(['wechat_user' => 'lt_wechat_user']);  // ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Ð£ï¿½Ê¹ï¿½Ã±ï¿½ï¿½ï¿½
         #}]);
         // add conditions that should always apply here
 
         $query = BetsModel::find()->alias('b');
-        $query->joinWith(['wechatUser']); // ÕâÀïµÄ 'wechatUser' ÊÇÄãÔÚ BetsModel ÖÐ¶¨ÒåµÄ¹ØÁª¹ØÏµ
+        $query->joinWith(['wechatUser']); // ï¿½ï¿½ï¿½ï¿½ï¿½ 'wechatUser' ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ BetsModel ï¿½Ð¶ï¿½ï¿½ï¿½Ä¹ï¿½ï¿½ï¿½ï¿½ï¿½Ïµ
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -101,7 +101,7 @@ class Bets extends BetsModel
             ->andFilterWhere(['like', 'b.lottery_name', $this->lottery_name])
             ->andFilterWhere(['like', 'b.bet_desc', $this->bet_desc])
             ->andFilterWhere(['like', 'b.api_code_datas', $this->api_code_datas]);
-        // ÔÚ grid filtering conditions ÖÐÊ¹ÓÃ¹ØÁª±íµÄ×Ö¶Î
+        // ï¿½ï¿½ grid filtering conditions ï¿½ï¿½Ê¹ï¿½Ã¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½
         $query->andFilterWhere(['like', 'lt_wechat_user.userName', $this->wechatUserName]);
         $query->addSelect(['b.*', 'lt_wechat_user.userName']);
 

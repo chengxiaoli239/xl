@@ -19,6 +19,9 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'date')->label('日期')->textInput(['id' => 'date-picker'])?>
         </div>
         <div class="col-lg-2 col-xs-3">
+            <?= $form->field($model, 'username')->label('代理') ?>
+        </div>
+        <div class="col-lg-2 col-xs-3">
             <?= $form->field($model, 'wechat_user_name')->label('微信id') ?>
         </div>
         <div class="col-lg-2 col-xs-6">

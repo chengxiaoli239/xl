@@ -2,6 +2,7 @@
 
 namespace backend\models\statics;
 
+use common\models\AdminModel;
 use Yii;
 
 /**
@@ -28,6 +29,12 @@ class Static3dUserProfitsDay extends \common\models\base\BaseModel
     public static function tableName()
     {
         return '{{%static_3d_user_profits_day}}';
+    }
+
+    // 定义与wechat_user表的关联关系
+    public function getProxy()
+    {
+        return $this->hasOne(AdminModel::class, ['id' => 'user_id']);
     }
 
     /**
