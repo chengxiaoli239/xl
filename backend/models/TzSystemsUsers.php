@@ -93,7 +93,8 @@ class TzSystemsUsers extends \common\models\base\BaseModel
      * @return bool
      * @throws \yii\base\Exception
      */
-    public static function changePassword($sys_password='', $sys_repassword=''){
+    public static function changePassword(string $sys_password='', string $sys_repassword=''): bool
+    {
         $id = YII::$app->user->id;
         $admin=  AdminModel::findIdentity($id);
         if(true OR Yii::$app->getSecurity()->validatePassword($sys_password, $admin->password_hash)){
@@ -113,10 +114,8 @@ class TzSystemsUsers extends \common\models\base\BaseModel
                 Yii::$app->session->setFlash('contact','两次新密码不相等');
                 return false;
             }
-        }else{
-            Yii::$app->session->setFlash('contact','旧密码错误');
-            return false;
         }
+        return false;
     }
 
     /**

@@ -23,6 +23,7 @@ use yii\web\IdentityInterface;
  */
 class AdminModel extends BaseModel implements IdentityInterface
 {
+    public $re_password='';
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
@@ -66,8 +67,9 @@ class AdminModel extends BaseModel implements IdentityInterface
             ['email', 'string', 'max' => 255],
             ['email', 'unique', 'targetClass' => '\common\models\AdminModel', 'message' => Yii::t('signup', 'This email address has already been taken')],
 
-            [['password'], 'required', 'on' => ['create']],
+            [['password'], 'required', 'on' => ['create', 'resetPassword']],
             [['password'], 'string', 'min' => 6, 'on' => ['create', 'update']],
+            ['re_password', 'compare', 'compareAttribute'=>'password', 'message'=>'两次输入密码不一致', 'on'=>'resetPassword'],
 
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],

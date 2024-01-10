@@ -4,6 +4,7 @@
 /* @var $content string */
 
 use backend\assets\AppAsset;
+use yii\bootstrap\Modal;
 use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
@@ -579,17 +580,19 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
     <!--footer end-->
 </section>
 
+<?php Modal::begin([
+    'id' => 'update-password-modal',
+    'size' => 'modal-md',
+    'header' => '<h4 class="modal-title">修改密码</h4>',
+]); ?>
+<div id="update-password-content">
+<?php Modal::end(); ?>
+
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
-$(function (){
-    $('#updatePassword').click(function (){
-        console.log('lllll')
-
-        $.post("/site/update-password",{},function(rst) {
-
-            console.log('kkkk')
-        })
-    });
+$('#updatePassword').click(function () {
+    $('#update-password-modal').modal('show');
+    $('#update-password-content').load("/forum/user/act-update-password-page");
 });
 </script>
 <?php $this->endBody() ?>

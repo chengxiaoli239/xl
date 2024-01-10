@@ -99,6 +99,12 @@ $this->registerJs($js);
                                     ],
                                     'desc',
                                     'expire_time:datetime',
+                                    ['attribute' => 'desc','label'=>'操作','headerOptions'=>['width'=>'5%'],
+                                        'format'=>'raw',
+                                        'value' => function($model) {
+                                            return '<a href="javascript:;" id="updatePassword">修改密码</a>';
+                                        }
+                                    ],
                                     #'created_at',
                                     #'updated_at',
                                     'update_at',
@@ -492,6 +498,21 @@ $this->registerJs($js);
     })
 </script>
 
+<?php Modal::begin([
+    'id' => 'update-password-modal',
+    'size' => 'modal-md',
+    'header' => '<h4 class="modal-title">修改密码</h4>',
+]); ?>
+<div id="update-password-content">
+<?php Modal::end(); ?>
+<script>
+$(function (){
+    $('#updatePassword').on('click', function () {
+        $('#update-password-modal').modal('show');
+        $('#update-password-content').load("/forum/user/act-update-password-page");
+    });
+})
+</script>
 
 <!-- 模态框 -->
 <?php Modal::begin([

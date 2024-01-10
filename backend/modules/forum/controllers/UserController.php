@@ -269,6 +269,37 @@ class UserController extends BaseController
         ]);
     }
 
+    public function actionActUpdatePasswordPage()
+    {
+        $model = new AdminModel();
+
+        return $this->renderAjax('update_password', [
+            'model' => $model,
+        ]);
+
+    }
+
+    public function actionUpdatePassword(): array
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $model = AdminModel::findOne(\Yii::$app->user->id);
+        $model->setScenario('resetPassword');
+
+        $post = $this->_post;
+        if ($model->load($post) && $model->save()) {
+            //UserService::setUserLoginInfo(\Yii::$app->user->id);
+            $rst = TzSystemsUsers::changePassword($post['AdminModel']['password'], $post['AdminModel']['re_password']);
+            if($rst){
+                UserService::clearUserLoginInfo(YII::$app->user->id);
+            }
+            $result = ['status'=>200, 'msg'=>'更新成功'];
+        }else{
+            $result = ['status'=>300, 'msg'=>current($model->getFirstErrors())];
+        }
+
+        return $result;
+    }
+
     /**
      * Deletes an existing User model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
