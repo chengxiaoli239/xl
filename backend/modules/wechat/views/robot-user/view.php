@@ -498,6 +498,15 @@ $this->registerJs($js);
     })
 </script>
 
+
+<!-- 模态框 -->
+<?php Modal::begin([
+    'id' => 'tz-system-user-modal',
+    'size' => 'modal-lg',
+]); ?>
+<?php Modal::end(); ?>
+
+
 <?php Modal::begin([
     'id' => 'update-password-modal',
     'size' => 'modal-md',
@@ -513,13 +522,6 @@ $(function (){
     });
 })
 </script>
-
-<!-- 模态框 -->
-<?php Modal::begin([
-    'id' => 'tz-system-user-modal',
-    'size' => 'modal-lg',
-]); ?>
-<?php Modal::end(); ?>
 
 
 
