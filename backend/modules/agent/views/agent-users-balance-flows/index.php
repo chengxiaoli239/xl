@@ -9,6 +9,99 @@ use yii\widgets\Pjax;
 
 $this->title = Yii::t('app', 'Agent Users Balance Flows');
 $this->params['breadcrumbs'][] = $this->title;
+$columns = array_merge(
+    [
+        ['class' => 'yii\grid\SerialColumn'],
+    ],
+    !$is3dAdmin ? [] :
+    [
+        ['attribute' => 'agent_id', 'label'=>'代理', //'headerOptions' => ['width' => '5%'],
+            'format' => 'raw',
+            'value'=> function($model){
+                return $model->proxy->username;
+            },
+        ],
+    ],
+    [
+        //'id',
+        //'agent_id',
+        //'member_id',
+        'member_account',
+        //'type',
+        ['attribute'=>'type','label'=>'类型',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value'=>function($model){
+                return '<strong><font color="'.($model->type==\common\service\wechat\WechatUserService::TYPE_BALANCE_UP?'green':'red').'">'.\backend\service\agent\AgentUsersService::getFlowTypeTxt($model->type).'</font></strong>';
+            },
+            'filter' => \backend\service\agent\AgentUsersService::getFlowtypes(),
+        ],
+        'balance',
+        'balance_now',
+        'balance_after',
+        'desc',
+        //'status',
+        ['attribute'=>'status','label'=>'操作',//'headerOptions'=>['width'=>'5%'],// #'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value'=>function($model){
+                if($model->status == 0){ # 未审核
+                    $url1 = "/agent/agent-users-balance-flows/switch-status?id=".$model->id.'&status=0'; # 点击关闭
+                    $url2 = "/agent/agent-users-balance-flows/switch-status?id=".$model->id.'&status=0'; # 点击关闭
+                    //$txt = "<font color='blue'>待审核</font>" ;
+                    //$txt1 =  Html::button($txt, $url1, ['title' => '点击审核']);
+                    $options1 = [
+                        'type'=>'button',
+                        'data-type'=>$model->type,
+                        'data-id' => $model->id,
+                        'data-balance' => $model->balance,
+                        'data-name' => $model->member_account,
+                        'class'=>'min-btn btn-xs btn-success act-check btn',
+                        'data-status' => 1,
+                    ];
+                    $txt1 = Html::button('通过', $options1);
+
+                    $options2 = [
+                        'type'=>'button',
+                        'data-type'=>$model->type,
+                        'data-id' => $model->id,
+                        'data-balance' => $model->balance,
+                        'data-name' => $model->member_account,
+                        'class'=>'min-btn btn-xs btn-danger act-check btn',
+                        'data-status' => 2,
+                    ];
+                    $txt2 = Html::button('</strong>拒绝</strong>', $options2);
+
+                    return $txt1 ."&nbsp;&nbsp;". $txt2;
+                }
+                if($model->status == 1){
+                    $txt = "<font color='green'>审核通过 √</font>" ;
+                    return Html::a($txt, "#", ['title' => '审核通过']);
+                }
+                if($model->status == 2){
+                    $txt = "<font color='red'>已拒绝 X</font>";
+                    return Html::a($txt, "#", ['title' => '已拒绝']);
+                }
+                return '';
+            }
+        ],
+        //'created_at',
+        ['attribute'=>'created_at','label'=>'申请时间',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value'=>function($model){
+                return date('Y-m-d H:i:s', $model->created_at);
+            }
+        ],
+        ['attribute'=>'created_at','label'=>'审核时间',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value'=>function($model){
+                return $model->check_time ? date('Y-m-d H:i:s', $model->check_time) : "";
+            }
+        ],
+        //'updated_at',
+        //'update_time',
+
+        //['class' => 'yii\grid\ActionColumn'],
+    ],
+);
 ?>
 
 <section class="agent-users-balance-flows-index wrapper site-min-height">
@@ -19,101 +112,15 @@ $this->params['breadcrumbs'][] = $this->title;
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <!--div class="clearfix">
-                    <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'Create Agent Users Balance Flows'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-                    </div>
-                </div-->
-
-    <?php Pjax::begin(); ?>
+                <?php Pjax::begin(); ?>
                 <?php echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     #'filterModel' => $searchModel,
-                    'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
-
-                        //'id',
-                        //'agent_id',
-                        //'member_id',
-                        'member_account',
-                        //'type',
-                        ['attribute'=>'type','label'=>'类型',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                return '<strong><font color="'.($model->type==\common\service\wechat\WechatUserService::TYPE_BALANCE_UP?'green':'red').'">'.\backend\service\agent\AgentUsersService::getFlowTypeTxt($model->type).'</font></strong>';
-                            },
-                            'filter' => \backend\service\agent\AgentUsersService::getFlowtypes(),
-                        ],
-                        'balance',
-                        'balance_now',
-                        'balance_after',
-                        'desc',
-                        //'status',
-                        ['attribute'=>'status','label'=>'操作',//'headerOptions'=>['width'=>'5%'],// #'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                if($model->status == 0){ # 未审核
-                                    $url1 = "/agent/agent-users-balance-flows/switch-status?id=".$model->id.'&status=0'; # 点击关闭
-                                    $url2 = "/agent/agent-users-balance-flows/switch-status?id=".$model->id.'&status=0'; # 点击关闭
-                                    //$txt = "<font color='blue'>待审核</font>" ;
-                                    //$txt1 =  Html::button($txt, $url1, ['title' => '点击审核']);
-                                    $options1 = [
-                                        'type'=>'button',
-                                        'data-type'=>$model->type,
-                                        'data-id' => $model->id,
-                                        'data-balance' => $model->balance,
-                                        'data-name' => $model->member_account,
-                                        'class'=>'min-btn btn-xs btn-success act-check btn',
-                                        'data-status' => 1,
-                                    ];
-                                    $txt1 = Html::button('通过', $options1);
-
-                                    $options2 = [
-                                        'type'=>'button',
-                                        'data-type'=>$model->type,
-                                        'data-id' => $model->id,
-                                        'data-balance' => $model->balance,
-                                        'data-name' => $model->member_account,
-                                        'class'=>'min-btn btn-xs btn-danger act-check btn',
-                                        'data-status' => 2,
-                                    ];
-                                    $txt2 = Html::button('</strong>拒绝</strong>', $options2);
-
-                                    return $txt1 ."&nbsp;&nbsp;". $txt2;
-                                }
-                                if($model->status == 1){
-                                    $txt = "<font color='green'>审核通过 √</font>" ;
-                                    return Html::a($txt, "#", ['title' => '审核通过']);
-                                }
-                                if($model->status == 2){
-                                    $txt = "<font color='red'>已拒绝 X</font>";
-                                    return Html::a($txt, "#", ['title' => '已拒绝']);
-                                }
-                                return '';
-                            }
-                        ],
-                        //'created_at',
-                        ['attribute'=>'created_at','label'=>'申请时间',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                return date('Y-m-d H:i:s', $model->created_at);
-                            }
-                        ],
-                        ['attribute'=>'created_at','label'=>'审核时间',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                return $model->check_time ? date('Y-m-d H:i:s', $model->check_time) : "";
-                            }
-                        ],
-                        //'updated_at',
-                        //'update_time',
-
-                        //['class' => 'yii\grid\ActionColumn'],
-                    ],
+                    'columns' => $columns,
                 ]); ?>
-    <?php Pjax::end(); ?>
+                <?php Pjax::end(); ?>
             </div>
         </div>
     </section>

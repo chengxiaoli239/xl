@@ -3,6 +3,7 @@
 namespace backend\modules\wechat\controllers;
 
 use backend\models\thirdD\BetsBackend;
+use backend\service\UserService;
 use Yii;
 use backend\models\wechat\Bets;
 use backend\models\searchs\wechat\Bets as BetsSearch;
@@ -38,7 +39,8 @@ class BetsController extends BaseController
     {
         $searchModel = new BetsSearch();
         $queryParams = Yii::$app->request->queryParams;
-        if($this->_user_id != 1){
+        $is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
+        if($this->_user_id != 1 && !$is3dAdmin){
             $queryParams['Bets']['user_id'] = $this->_user_id;
         }
         $dataProvider = $searchModel->search($queryParams);
@@ -46,6 +48,7 @@ class BetsController extends BaseController
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'is3dAdmin' => $is3dAdmin,
         ]);
     }
 

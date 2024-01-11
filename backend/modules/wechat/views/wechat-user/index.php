@@ -18,6 +18,267 @@ use yii\grid\GridView;
 
 $this->title = '客户列表';
 $this->params['breadcrumbs'][] = $this->title;
+$columns = array_merge(
+    [
+        ['class' => 'yii\grid\CheckboxColumn', 'headerOptions'=>['width'=>'2%']],
+
+        //'id',
+        //'user_id',
+        //'userName',
+        ['attribute' => 'smallHead', 'label'=>'头像','headerOptions'=>['width'=>'3%'], // 图片字段的属性
+            'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
+            'value' => function ($model) {
+                return Html::img($model->smallHead, ['width' => '30px']);
+            },
+        ],
+
+    ],
+    !$is3dAdmin ? [] :
+    [
+        ['attribute' => 'user_id', 'label'=>'代理', //'headerOptions' => ['width' => '5%'],
+            'format' => 'raw',
+            'value'=> function($model){
+                return $model->proxy->username;
+            },
+        ],
+    ],
+    [
+        ['attribute' => 'nickName','label'=>'昵称','headerOptions'=>['width'=>'10%'], //'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value' => function($model) {
+                return BaseStringHelper::truncate($model->nickName,10);
+            }
+        ],
+        ['attribute' => 'userName', 'label'=>'微信ID','headerOptions'=>['width'=>'3%'], // 图片字段的属性
+            'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
+            'value' => function ($model) {
+                return $model->userName;
+            },
+        ],
+        ['attribute'=>'balance', 'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+            'contentOptions' => function($model){
+                return ['id' => 'balance_'.$model->id];
+            },
+            'format'=>'raw',
+            'value'=>function($model){
+                return $model->balance;
+            }
+        ],
+        ['attribute'=>'status','label'=>'状态','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value'=>function($model){
+                $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=status&val=1'; # 点击开启
+                $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=status&val=0'; # 点击关闭
+                if($model->status == 1){
+                    $txt = "<font color='green'>√</font>" ;
+                    return Html::a($txt, $url1, ['title' => '点击关闭消息接收', 'alt'=>'点击关闭消息接收']);
+                }
+                if(!$model->status){
+                    $txt = "<font color='red'>X</font>";
+                    return Html::a($txt, $url0, ['title' => '点击开启消息接收', 'alt'=>'点击开启消息接收']);
+                }
+                return '';
+            }
+        ],
+        //['attribute'=>'is_tuo', 'headerOptions'=>['width'=>'5%'], // 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+        //    'format'=>'raw',
+        //    'value'=>function($model){
+        //        $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_tuo&val=1'; # 点击开启
+        //        $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_tuo&val=0'; # 点击关闭
+        //        if($model->is_tuo == 1){
+        //            $txt = "<font color='green'>√</font>" ;
+        //            return Html::a($txt, $url1, ['title' => '点击关闭']);
+        //        }
+        //        if(!$model->is_tuo){
+        //            $txt = "<font color='red'>X</font>";
+        //            return Html::a($txt, $url0, ['title' => '点击开启']);
+        //        }
+        //        //return $model->snid;
+        //    }
+        //],
+        //'is_chi',
+        ['attribute'=>'is_chi','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value'=>function($model){
+                $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_chi&val=1'; # 点击开启
+                $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_chi&val=0'; # 点击关闭
+                if($model->is_chi == 1){
+                    $txt = "<font color='green'>√</font>" ;
+                    return Html::a($txt, $url1, ['title' => '点击关闭']);
+                }
+                if(!$model->is_chi){
+                    $txt = "<font color='red'>X</font>";
+                    return Html::a($txt, $url0, ['title' => '点击开启']);
+                }
+                return '';
+            }
+        ],
+        //'is_cha',
+        //['attribute'=>'is_private','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+        //    'format'=>'raw',
+        //    'value'=>function($model){
+        //        $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_private&val=1'; # 点击开启
+        //        $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_private&val=0'; # 点击关闭
+        //        if($model->is_private == 1){
+        //            $txt = "<font color='green'>√</font>" ;
+        //            return Html::a($txt, $url1, ['title' => '点击关闭']);
+        //        }
+        //        if(!$model->is_private){
+        //            $txt = "<font color='red'>X</font>";
+        //            return Html::a($txt, $url0, ['title' => '点击开启']);
+        //        }
+        //        //return $model->snid;
+        //    }
+        //],
+        //['attribute'=>'is_cha','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+        //    'format'=>'raw',
+        //    'value'=>function($model){
+        //        $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_cha&val=1'; # 点击开启
+        //        $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_cha&val=0'; # 点击关闭
+        //        if($model->is_cha == 1){
+        //            $txt = "<font color='green'>√</font>" ;
+        //            return Html::a($txt, $url1, ['title' => '点击关闭']);
+        //        }
+        //        if(!$model->is_cha){
+        //            $txt = "<font color='red'>X</font>";
+        //            return Html::a($txt, $url0, ['title' => '点击开启']);
+        //        }
+        //        return '';
+        //    }
+        //],
+        ['attribute'=>'is_need_confirm','label'=>'需确认','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value'=>function($model){
+                $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_need_confirm&val=1'; # 点击开启
+                $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_need_confirm&val=0'; # 点击关闭
+                if($model->is_need_confirm == 1){
+                    $txt = "<font color='green'>√</font>" ;
+                    return Html::a($txt, $url1, ['title' => '需确认才上盘口']);
+                }
+                if(!$model->is_need_confirm){
+                    $txt = "<font color='red'>X</font>";
+                    return Html::a($txt, $url0, ['title' => '无需确认上盘口']);
+                }
+                return '';
+            }
+        ],
+        ['attribute'=>'reply_type','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value'=>function($model){
+                $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=reply_type&val=1'; # 点击开启
+                $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=reply_type&val=0'; # 点击关闭
+                if($model->reply_type == 1){
+                    $txt = "<font color='green'>√</font>" ;
+                    return Html::a($txt, $url1, ['title' => '打包回']);
+                }
+                if(!$model->reply_type){
+                    $txt = "<font color='red'>X</font>";
+                    return Html::a($txt, $url0, ['title' => '即时回']);
+                }
+                return '';
+            }
+        ],
+        //'status',
+        //'all_bet_money',
+        ['attribute'=>'all_bet_money','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value'=>function($model){
+                return $model->all_bet_money;
+            }
+        ],
+        ['attribute'=>'today_profits_loss','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value'=>function($model){
+                return $model->today_profits_loss;
+            }
+        ],
+        ['attribute'=>'all_profits_loss','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value'=>function($model){
+                return $model->all_profits_loss;
+            }
+        ],
+        ['attribute' => 'remark','label'=>'备注',//'headerOptions'=>['width'=>'20%'], //'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value' => function($model) {
+                return $model->remark;
+            }
+        ],
+        [
+            'class' => 'yii\grid\ActionColumn', 'headerOptions'=>['width'=>'25%'],
+            'template'=>'{act-up-balance} {act-down-balance} {act-user-edit} {act-user-balance-flows} {act-user-copy-url} {act-user-del}',
+            'buttons' => [
+                // 下面代码来自于 yii\grid\ActionColumn 简单修改了下
+                'act-up-balance' => function ($url, $model, $key) {
+                    $options = [
+                        'type'=>'button',
+                        'class'=>'btn-xs min-btn btn-info act-up-balance btn btn-default',
+                        'data-id' => $model->id,
+                        'data-name' => $model->nickName,
+                    ];
+                    return Html::button('上', $options);
+                },
+                'act-down-balance' => function ($url, $model, $key) {
+                    $options = [
+                        'type'=>'button',
+                        'class'=>'btn-xs min-btn btn-info act-down-balance btn btn-default',
+                        'data-id'=>$model->id,
+                        'data-name' => $model->nickName,
+                    ];
+                    return Html::button('下', $options);
+                },
+                'act-user-balance-flows' => function ($url, $model, $key) {
+                    $options = [
+                        'type'=>'button',
+                        'class'=>'btn-xs min-btn btn-info act-user-balance-flows btn btn-default',
+                        'data-id'=>$model->id,
+                        'data-name' => $model->nickName,
+                    ];
+                    return Html::button('查', $options);
+                }
+                //'act-user-del' => function ($url, $model, $key) {
+                //    $options = [
+                //        'type'=>'button',
+                //        'class'=>'btn-xs min-btn btn-info act-user-del btn btn-default',
+                //        'data-id'=>$model->id,
+                //        'data-name' => $model->name,
+                //    ];
+                //    return Html::button('删', $options);
+                //},
+                //'act-user-copy-url' => function ($url, $model, $key) {
+                //    $options = [
+                //        'type'=>'button',
+                //        'class'=>'btn-xs min-btn btn-info act-user-copy-url btn btn-default',
+                //        'data-id'=>$model->id,
+                //        'data-token'=>$model->token,
+                //        'data-name' => $model->name,
+                //    ];
+                //    return Html::button('地址', $options);
+                //},
+                //'act-user-edit' => function ($url, $model, $key) {
+                //    $options = [
+                //        'type'=>'button',
+                //        'class'=>'btn-xs min-btn btn-info act-user-edit btn btn-default',
+                //        'data-id'=>$model->id,
+                //        'data-token'=>$model->token,
+                //        'data-name' => $model->name,
+                //    ];
+                //    return Html::button('改', $options);
+                //},
+            ],
+        ],
+        #'expire_time:datetime',
+        //'created_at',
+        //'updated_at',
+        ['attribute' => 'update_at','label'=>'时间',//'headerOptions'=>['width'=>'20%'], //'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value' => function($model) {
+                return substr($model->update_at, 5, 11);
+            }
+        ],
+        //['class' => 'yii\grid\ActionColumn'],
+    ]
+);
 ?>
 <section class="wechat-user-index wrapper site-min-height">
     <!-- page start-->
@@ -46,255 +307,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     #'filterModel' => $searchModel,
-                    'columns' => [
-                        ['class' => 'yii\grid\CheckboxColumn', 'headerOptions'=>['width'=>'2%']],
-
-                        //'id',
-                        //'user_id',
-                        //'userName',
-                        ['attribute' => 'smallHead', 'label'=>'头像','headerOptions'=>['width'=>'3%'], // 图片字段的属性
-                            'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
-                            'value' => function ($model) {
-                                return Html::img($model->smallHead, ['width' => '30px']);
-                            },
-                        ],
-
-                        ['attribute' => 'nickName','label'=>'昵称','headerOptions'=>['width'=>'10%'], //'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                return BaseStringHelper::truncate($model->nickName,10);
-                            }
-                        ],
-                        ['attribute' => 'userName', 'label'=>'微信ID','headerOptions'=>['width'=>'3%'], // 图片字段的属性
-                            'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
-                            'value' => function ($model) {
-                                return $model->userName;
-                            },
-                        ],
-                        ['attribute'=>'balance', 'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                            'contentOptions' => function($model){
-                                return ['id' => 'balance_'.$model->id];
-                            },
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                return $model->balance;
-                            }
-                        ],
-                        ['attribute'=>'status','label'=>'状态','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=status&val=1'; # 点击开启
-                                $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=status&val=0'; # 点击关闭
-                                if($model->status == 1){
-                                    $txt = "<font color='green'>√</font>" ;
-                                    return Html::a($txt, $url1, ['title' => '点击关闭消息接收', 'alt'=>'点击关闭消息接收']);
-                                }
-                                if(!$model->status){
-                                    $txt = "<font color='red'>X</font>";
-                                    return Html::a($txt, $url0, ['title' => '点击开启消息接收', 'alt'=>'点击开启消息接收']);
-                                }
-                                return '';
-                            }
-                        ],
-                        //['attribute'=>'is_tuo', 'headerOptions'=>['width'=>'5%'], // 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                        //    'format'=>'raw',
-                        //    'value'=>function($model){
-                        //        $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_tuo&val=1'; # 点击开启
-                        //        $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_tuo&val=0'; # 点击关闭
-                        //        if($model->is_tuo == 1){
-                        //            $txt = "<font color='green'>√</font>" ;
-                        //            return Html::a($txt, $url1, ['title' => '点击关闭']);
-                        //        }
-                        //        if(!$model->is_tuo){
-                        //            $txt = "<font color='red'>X</font>";
-                        //            return Html::a($txt, $url0, ['title' => '点击开启']);
-                        //        }
-                        //        //return $model->snid;
-                        //    }
-                        //],
-                        //'is_chi',
-                        ['attribute'=>'is_chi','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_chi&val=1'; # 点击开启
-                                $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_chi&val=0'; # 点击关闭
-                                if($model->is_chi == 1){
-                                    $txt = "<font color='green'>√</font>" ;
-                                    return Html::a($txt, $url1, ['title' => '点击关闭']);
-                                }
-                                if(!$model->is_chi){
-                                    $txt = "<font color='red'>X</font>";
-                                    return Html::a($txt, $url0, ['title' => '点击开启']);
-                                }
-                                return '';
-                            }
-                        ],
-                        //'is_cha',
-                        //['attribute'=>'is_private','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                        //    'format'=>'raw',
-                        //    'value'=>function($model){
-                        //        $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_private&val=1'; # 点击开启
-                        //        $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_private&val=0'; # 点击关闭
-                        //        if($model->is_private == 1){
-                        //            $txt = "<font color='green'>√</font>" ;
-                        //            return Html::a($txt, $url1, ['title' => '点击关闭']);
-                        //        }
-                        //        if(!$model->is_private){
-                        //            $txt = "<font color='red'>X</font>";
-                        //            return Html::a($txt, $url0, ['title' => '点击开启']);
-                        //        }
-                        //        //return $model->snid;
-                        //    }
-                        //],
-                        //['attribute'=>'is_cha','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                        //    'format'=>'raw',
-                        //    'value'=>function($model){
-                        //        $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_cha&val=1'; # 点击开启
-                        //        $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_cha&val=0'; # 点击关闭
-                        //        if($model->is_cha == 1){
-                        //            $txt = "<font color='green'>√</font>" ;
-                        //            return Html::a($txt, $url1, ['title' => '点击关闭']);
-                        //        }
-                        //        if(!$model->is_cha){
-                        //            $txt = "<font color='red'>X</font>";
-                        //            return Html::a($txt, $url0, ['title' => '点击开启']);
-                        //        }
-                        //        return '';
-                        //    }
-                        //],
-                        ['attribute'=>'is_need_confirm','label'=>'需确认','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_need_confirm&val=1'; # 点击开启
-                                $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_need_confirm&val=0'; # 点击关闭
-                                if($model->is_need_confirm == 1){
-                                    $txt = "<font color='green'>√</font>" ;
-                                    return Html::a($txt, $url1, ['title' => '需确认才上盘口']);
-                                }
-                                if(!$model->is_need_confirm){
-                                    $txt = "<font color='red'>X</font>";
-                                    return Html::a($txt, $url0, ['title' => '无需确认上盘口']);
-                                }
-                                return '';
-                            }
-                        ],
-                        ['attribute'=>'reply_type','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=reply_type&val=1'; # 点击开启
-                                $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=reply_type&val=0'; # 点击关闭
-                                if($model->reply_type == 1){
-                                    $txt = "<font color='green'>√</font>" ;
-                                    return Html::a($txt, $url1, ['title' => '打包回']);
-                                }
-                                if(!$model->reply_type){
-                                    $txt = "<font color='red'>X</font>";
-                                    return Html::a($txt, $url0, ['title' => '即时回']);
-                                }
-                                return '';
-                            }
-                        ],
-                        //'status',
-                        //'all_bet_money',
-                        ['attribute'=>'all_bet_money','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                return $model->all_bet_money;
-                            }
-                        ],
-                        ['attribute'=>'today_profits_loss','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                return $model->today_profits_loss;
-                            }
-                        ],
-                        ['attribute'=>'all_profits_loss','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                return $model->all_profits_loss;
-                            }
-                        ],
-                        ['attribute' => 'remark','label'=>'备注',//'headerOptions'=>['width'=>'20%'], //'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                return $model->remark;
-                            }
-                        ],
-                        [
-                            'class' => 'yii\grid\ActionColumn', 'headerOptions'=>['width'=>'25%'],
-                            'template'=>'{act-up-balance} {act-down-balance} {act-user-edit} {act-user-balance-flows} {act-user-copy-url} {act-user-del}',
-                            'buttons' => [
-                                // 下面代码来自于 yii\grid\ActionColumn 简单修改了下
-                                'act-up-balance' => function ($url, $model, $key) {
-                                    $options = [
-                                        'type'=>'button',
-                                        'class'=>'btn-xs min-btn btn-info act-up-balance btn btn-default',
-                                        'data-id' => $model->id,
-                                        'data-name' => $model->nickName,
-                                    ];
-                                    return Html::button('上', $options);
-                                },
-                                'act-down-balance' => function ($url, $model, $key) {
-                                    $options = [
-                                        'type'=>'button',
-                                        'class'=>'btn-xs min-btn btn-info act-down-balance btn btn-default',
-                                        'data-id'=>$model->id,
-                                        'data-name' => $model->nickName,
-                                    ];
-                                    return Html::button('下', $options);
-                                },
-                                'act-user-balance-flows' => function ($url, $model, $key) {
-                                    $options = [
-                                        'type'=>'button',
-                                        'class'=>'btn-xs min-btn btn-info act-user-balance-flows btn btn-default',
-                                        'data-id'=>$model->id,
-                                        'data-name' => $model->nickName,
-                                    ];
-                                    return Html::button('查', $options);
-                                }
-                                //'act-user-del' => function ($url, $model, $key) {
-                                //    $options = [
-                                //        'type'=>'button',
-                                //        'class'=>'btn-xs min-btn btn-info act-user-del btn btn-default',
-                                //        'data-id'=>$model->id,
-                                //        'data-name' => $model->name,
-                                //    ];
-                                //    return Html::button('删', $options);
-                                //},
-                                //'act-user-copy-url' => function ($url, $model, $key) {
-                                //    $options = [
-                                //        'type'=>'button',
-                                //        'class'=>'btn-xs min-btn btn-info act-user-copy-url btn btn-default',
-                                //        'data-id'=>$model->id,
-                                //        'data-token'=>$model->token,
-                                //        'data-name' => $model->name,
-                                //    ];
-                                //    return Html::button('地址', $options);
-                                //},
-                                //'act-user-edit' => function ($url, $model, $key) {
-                                //    $options = [
-                                //        'type'=>'button',
-                                //        'class'=>'btn-xs min-btn btn-info act-user-edit btn btn-default',
-                                //        'data-id'=>$model->id,
-                                //        'data-token'=>$model->token,
-                                //        'data-name' => $model->name,
-                                //    ];
-                                //    return Html::button('改', $options);
-                                //},
-                            ],
-                        ],
-                        #'expire_time:datetime',
-                        //'created_at',
-                        //'updated_at',
-                        ['attribute' => 'update_at','label'=>'时间',//'headerOptions'=>['width'=>'20%'], //'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                return substr($model->update_at, 5, 11);
-                            }
-                        ],
-
-                        //['class' => 'yii\grid\ActionColumn'],
-                    ],
+                    'columns' => $columns,
                     'pager' => [
                         'firstPageLabel' => '首页',  // 您可以根据需要自定义文本
                         'lastPageLabel' => '尾页',  // 您可以根据需要自定义文本

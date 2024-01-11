@@ -11,6 +11,124 @@ use yii\grid\GridView;
 
 $this->title = '3D记录';
 $this->params['breadcrumbs'][] = $this->title;
+$columns = array_merge(
+[
+            ['class' => 'yii\grid\SerialColumn'],
+            'id',
+            'order_id',
+        ],
+        !$is3dAdmin ? [] :
+        [
+            ['attribute' => 'user_id', 'label'=>'代理', //'headerOptions' => ['width' => '5%'],
+                'format' => 'raw',
+                'value'=> function($model){
+                    return $model->proxy->username;
+                },
+            ],
+        ],
+        [
+            #'wechat_user_id',
+            #'codes:ntext',
+            ['attribute' => 'codes','label'=>'号码', //'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value' => function($model) {
+                    $txt = ($model->codes OR $model->codes===0 OR $model->codes==='0') ? $model->codes : '';
+                    return Html::a(BaseStringHelper::truncate($txt,25), 'javascript:;', [
+                        'class'=>'act-post-desc',
+                        'title'=>$model->codes,
+                        'alt'=>str_replace('@', ',',str_replace(',', '',$model->codes)),
+                    ]);
+                }
+            ],
+            #'single',
+            ['attribute' => 'single','label'=>'倍[元]',//'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value' => function($model) {
+                    return $model->single;
+                }
+            ],
+            ['attribute' => 'count','label'=>'组数',//'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value' => function($model) {
+                    return $model->count;
+                }
+            ],
+            ['attribute' => 'push_status','label'=>'盘口',//'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value' => function($model) {
+                    $title = $model->push_status==BetsBackend::PUSH_STATUS_WAIT ? '2分钟自动推盘口' : '';
+                    $title = $model->push_status==BetsBackend::PUSH_STATUS_FAIL ? $model->push_desc : $title;
+                    return '<a href="javascript:;" title="'.$title.'"><strong><font color="'.BetsBackend::PUSH_STATUS_CLASSES[$model->push_status].'">'.BetsBackend::PUSH_STATUS_OPTIONS[$model->push_status].'</font></strong></a>';
+                }
+            ],
+            'bet_money',
+            //'ratio',
+            ['attribute' => 'bonus','label'=>'中奖',//'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value' => function($model) {
+                    return ($model->bonus>0) ? '<font color="green">'.$model->bonus.'</font>' : ' ';
+                }
+            ],
+            'profits',
+            //'qihao',
+            ['attribute' => 'qihao','label'=>'期号',//'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value' => function($model) {
+                    $txt = '<a href="/wechat/bets/index.html?Bets[qihao]='.$model->qihao.'" title="'.$model->qihao.'">'.$model->qihao.'</a>';
+                    return $txt;
+                }
+            ],
+            ['attribute' => 'kj_codes','label'=>'开奖', //'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value' => function($model) {
+                    $txt = $model->status==3? '<strong><font color="red">已撤单</font></strong>' :
+                        (($model->status===0) ? '<strong><font color="green">待开奖</font></strong>' : $model->kj_codes);
+                    return $txt;
+                }
+            ],
+            ['attribute' => 'wechat_user_id','label'=>'微信',//'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value' => function($model) {
+                    $WechatUser = \common\models\wechat\WechatUser::findOne($model->wechat_user_id);
+                    $txt = '<a href="/wechat/bets/index.html?Bets[wechatUserName]='.$WechatUser->userName.'" title="'.$WechatUser->userName.'"><img src="'.$WechatUser->smallHead.'" width="30" height="30" title="'.$WechatUser->userName.'"> '.$WechatUser->nickName.'</a>';
+                    return $txt;
+                }
+            ],
+            #'play_method',
+            ['attribute' => 'lottery_name','label'=>'玩法', //'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value' => function($model) {
+                    $playMethod = \common\service\CommonService::getPlayMethods()[$model->play_method];
+                    return \common\service\CommonService::getLotteryName($model->lottery_type).'['.$playMethod.']';
+                }
+            ],
+            //'status',
+            //'cancel_status',
+            //'is_simulate',
+            //'lottery_name',
+            //'lottery_type',
+            //'is_profits_record',
+            #'bet_desc:ntext',
+            ['attribute' => 'bet_desc','label'=>'文本', //'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value' => function($model) {
+                    return Html::a(BaseStringHelper::truncate($model->bet_desc,25), 'javascript:;', [
+                        'class'=>'act-post-desc',
+                        'title'=>$model->bet_desc,
+                        'alt'=>$model->api_code_datas,
+                    ]);
+                }
+            ],
+            //'created_at',
+            //'updated_at',
+            ['attribute' => 'create_at','label'=>'时间',//'headerOptions'=>['width'=>'5%'],
+                'value' => function($model) {
+                    return substr(date('m-d H:i', $model->created_at), 0, 11);
+                }
+            ],
+            //['class' => 'yii\grid\ActionColumn'],
+        ]
+    );
 ?>
 <style>
     /* 默认的弹框大小 */
@@ -42,117 +160,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     #'filterModel' => $searchModel,
-                    'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
-
-                        'id',
-                        #'user_id',
-                        'order_id',
-                        #'wechat_user_id',
-                        #'codes:ntext',
-                        ['attribute' => 'codes','label'=>'号码', //'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                $txt = ($model->codes OR $model->codes===0 OR $model->codes==='0') ? $model->codes : '';
-                                return Html::a(BaseStringHelper::truncate($txt,25), 'javascript:;', [
-                                    'class'=>'act-post-desc',
-                                    'title'=>$model->codes,
-                                    'alt'=>str_replace('@', ',',str_replace(',', '',$model->codes)),
-                                ]);
-                            }
-                        ],
-                        #'single',
-                        ['attribute' => 'single','label'=>'倍[元]',//'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                return $model->single;
-                            }
-                        ],
-                        ['attribute' => 'count','label'=>'组数',//'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                return $model->count;
-                            }
-                        ],
-                        ['attribute' => 'push_status','label'=>'盘口',//'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                $title = $model->push_status==BetsBackend::PUSH_STATUS_WAIT ? '2分钟自动推盘口' : '';
-                                $title = $model->push_status==BetsBackend::PUSH_STATUS_FAIL ? $model->push_desc : $title;
-                                return '<a href="javascript:;" title="'.$title.'"><strong><font color="'.BetsBackend::PUSH_STATUS_CLASSES[$model->push_status].'">'.BetsBackend::PUSH_STATUS_OPTIONS[$model->push_status].'</font></strong></a>';
-                            }
-                        ],
-                        'bet_money',
-                        //'ratio',
-                        ['attribute' => 'bonus','label'=>'中奖',//'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                return ($model->bonus>0) ? '<font color="green">'.$model->bonus.'</font>' : ' ';
-                            }
-                        ],
-                        'profits',
-                        //'qihao',
-                        ['attribute' => 'qihao','label'=>'期号',//'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                $txt = '<a href="/wechat/bets/index.html?Bets[qihao]='.$model->qihao.'" title="'.$model->qihao.'">'.$model->qihao.'</a>';
-                                return $txt;
-                            }
-                        ],
-                        ['attribute' => 'kj_codes','label'=>'开奖', //'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                $txt = $model->status==3? '<strong><font color="red">已撤单</font></strong>' :
-                                    (($model->status===0) ? '<strong><font color="green">待开奖</font></strong>' : $model->kj_codes);
-                                return $txt;
-                            }
-                        ],
-                        ['attribute' => 'wechat_user_id','label'=>'微信',//'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                $WechatUser = \common\models\wechat\WechatUser::findOne($model->wechat_user_id);
-                                $txt = '<a href="/wechat/bets/index.html?Bets[wechatUserName]='.$WechatUser->userName.'" title="'.$WechatUser->userName.'"><img src="'.$WechatUser->smallHead.'" width="30" height="30" title="'.$WechatUser->userName.'"> '.$WechatUser->nickName.'</a>';
-                                return $txt;
-                            }
-                        ],
-                        #'play_method',
-                        ['attribute' => 'lottery_name','label'=>'玩法', //'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                $playMethod = \common\service\CommonService::getPlayMethods()[$model->play_method];
-                                return \common\service\CommonService::getLotteryName($model->lottery_type).'['.$playMethod.']';
-                            }
-                        ],
-                        //'status',
-                        //'cancel_status',
-                        //'is_simulate',
-                        //'lottery_name',
-                        //'lottery_type',
-                        //'is_profits_record',
-                        #'bet_desc:ntext',
-                        ['attribute' => 'bet_desc','label'=>'文本', //'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                return Html::a(BaseStringHelper::truncate($model->bet_desc,25), 'javascript:;', [
-                                    'class'=>'act-post-desc',
-                                    'title'=>$model->bet_desc,
-                                    'alt'=>$model->api_code_datas,
-                                ]);
-                            }
-                        ],
-                        //'created_at',
-                        //'updated_at',
-                        ['attribute' => 'create_at','label'=>'时间',//'headerOptions'=>['width'=>'5%'],
-                            'value' => function($model) {
-                                return substr(date('m-d H:i', $model->created_at), 0, 11);
-                            }
-                        ],
-                        //['class' => 'yii\grid\ActionColumn'],
-                    ],
+                    'columns' => $columns,
                     'pager' => [
                         'firstPageLabel' => '首页',  // 您可以根据需要自定义文本
                         'lastPageLabel' => '尾页',  // 您可以根据需要自定义文本
-                    ],
+                    ]
                 ]); ?>
             </div>
         </div>

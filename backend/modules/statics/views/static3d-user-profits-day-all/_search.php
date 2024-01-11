@@ -1,11 +1,13 @@
 <?php
 
+use backend\service\UserService;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model backend\models\searchs\statics\Static3dUserProfitsDayAll */
 /* @var $form yii\widgets\ActiveForm */
+$is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
 ?>
 
 <div class="static3d-user-profits-day-search">
@@ -18,9 +20,11 @@ use yii\widgets\ActiveForm;
         <div class="col-lg-2 col-xs-3">
             <?= $form->field($model, 'date')->label('日期')->textInput(['id' => 'date-picker'])?>
         </div>
+        <?php if($is3dAdmin){?>
         <div class="col-lg-2 col-xs-3">
             <?= $form->field($model, 'username')->label('代理') ?>
         </div>
+        <?}?>
         <div class="col-lg-2 col-xs-3">
             <?= $form->field($model, 'wechat_user_name')->label('微信id') ?>
         </div>

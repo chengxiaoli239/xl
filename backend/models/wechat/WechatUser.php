@@ -2,6 +2,7 @@
 
 namespace backend\models\wechat;
 
+use common\models\AdminModel;
 use Yii;
 
 /**
@@ -45,6 +46,10 @@ class WechatUser extends \common\models\base\BaseModel
     public static function tableName()
     {
         return '{{%wechat_user}}';
+    }
+    public function getProxy()
+    {
+        return $this->hasOne(AdminModel::class, ['id' => 'user_id']);
     }
 
     /**

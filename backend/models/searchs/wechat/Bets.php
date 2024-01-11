@@ -12,6 +12,7 @@ use backend\models\wechat\Bets as BetsModel;
  */
 class Bets extends BetsModel
 {
+    public $username;  // 代理账号
     public $wechatUserName;  // 微信id
     /**
      * @inheritdoc
@@ -22,7 +23,7 @@ class Bets extends BetsModel
             [['id', 'user_id', 'wechat_user_id', 'order_id', 'play_method', 'count', 'status', 'push_status', 'cancel_status', 'is_need_confirm', 'reply_type', 'has_reply', 'is_simulate', 'lottery_type', 'is_profits_record', 'created_at', 'updated_at'], 'integer'],
             [['codes', 'qihao', 'kj_codes', 'push_desc', 'new_msg_id', 'reply_content', 'lottery_name', 'bet_desc', 'api_code_datas', 'update_at'], 'safe'],
             [['bet_money', 'bonus', 'single', 'ratio', 'profits'], 'number'],
-            [['wechatUserName'], 'string'],  // 微信好友微信账号
+            [['wechatUserName', 'username'], 'string'],  // 微信好友微信账号
         ];
     }
 
@@ -50,7 +51,8 @@ class Bets extends BetsModel
         // add conditions that should always apply here
 
         $query = BetsModel::find()->alias('b');
-        $query->joinWith(['wechatUser']); // ����� 'wechatUser' ������ BetsModel �ж���Ĺ�����ϵ
+        $query->joinWith(['wechatUser']); // 'wechatUser'
+        $query->joinWith(['proxy']); // 'wechatUser'
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -90,6 +92,7 @@ class Bets extends BetsModel
             'b.created_at' => $this->created_at,
             'b.updated_at' => $this->updated_at,
             'b.update_at' => $this->update_at,
+            'lt_admin.username' => trim($this->username),
         ]);
 
         $query->andFilterWhere(['like', 'b.codes', $this->codes])
@@ -103,7 +106,7 @@ class Bets extends BetsModel
             ->andFilterWhere(['like', 'b.api_code_datas', $this->api_code_datas]);
         // �� grid filtering conditions ��ʹ�ù�������ֶ�
         $query->andFilterWhere(['like', 'lt_wechat_user.userName', $this->wechatUserName]);
-        $query->addSelect(['b.*', 'lt_wechat_user.userName']);
+        $query->addSelect(['b.*', 'lt_wechat_user.userName', 'lt_admin.username']);
 
         return $dataProvider;
     }

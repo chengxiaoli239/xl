@@ -3,6 +3,7 @@
 namespace backend\modules\agent\controllers;
 
 use backend\service\agent\AgentUsersService;
+use backend\service\UserService;
 use common\service\wechat\WechatUserService;
 use Yii;
 use backend\models\AgentUsersBalanceFlows;
@@ -39,14 +40,18 @@ class AgentUsersBalanceFlowsController extends BaseController
     {
         $searchModel = new AgentUsersBalanceFlowsSearch();
         $queryParams = Yii::$app->request->queryParams;
-        if(\Yii::$app->user->id != 1){
+
+        $is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
+        if(\Yii::$app->user->id != 1 && !$is3dAdmin){
             $queryParams['AgentUsersBalanceFlows']['agent_id'] = \Yii::$app->user->id;
         }
         $dataProvider = $searchModel->search($queryParams);
+        $dataProvider->query->andWhere(['type'=>[WechatUserService::TYPE_BALANCE_DOWN, WechatUserService::TYPE_BALANCE_UP]]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'is3dAdmin' => $is3dAdmin,
         ]);
     }
 

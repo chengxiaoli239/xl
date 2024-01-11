@@ -1,5 +1,6 @@
 <?php
 
+use backend\service\UserService;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -11,6 +12,7 @@ $robotData = [];
 foreach ($robotUsers as $robotUser){
     $robotData[$robotUser['wcId']] = $robotUser['nickName']."(".($robotUser['wechat_status']?'在线':'离线').")";
 }
+$is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
 
 ?>
 <style>
@@ -35,6 +37,11 @@ foreach ($robotUsers as $robotUser){
     ]); ?>
 
     <div class="row">
+        <?php if($is3dAdmin){?>
+        <div class="col-lg-2 col-xs-3">
+            <?= $form->field($model, 'username')->label('代理') ?>
+        </div>
+        <?}?>
         <div class="col-lg-2 col-xs-4">
             <?= $form->field($model, 'userName')
                 ->label('微信ID', ['class' => 'control-label hidden-xs'])->textInput(['placeholder' => '微信ID'])

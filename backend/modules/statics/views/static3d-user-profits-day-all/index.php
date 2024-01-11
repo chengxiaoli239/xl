@@ -18,6 +18,91 @@ use yii\grid\GridView;
 
 $this->title = '日报表-总';
 $this->params['breadcrumbs'][] = $this->title;
+$columns = array_merge(
+    [
+        ['class' => 'yii\grid\SerialColumn'],
+
+        //'id',
+        'date',
+        //'user_id',
+    ],
+    !$is3dAdmin ? [] :
+    [
+        ['attribute' => 'user_id', 'label'=>'代理', //'headerOptions' => ['width' => '5%'],
+            'format' => 'raw',
+            'value'=> function($model){
+                return $model->proxy->username;
+            },
+        ],
+    ],
+    [
+        #'wechat_user_id',
+        ['attribute' => 'wechat_user_name', 'label'=>'客户', //'headerOptions' => ['width' => '5%'],
+            'format' => 'raw',
+            'value'=> function($model){
+                $WechatUser = \common\models\wechat\WechatUser::findOne($model->wechat_user_id);
+                return Html::img($WechatUser->smallHead, ['width' => '30px']) . $WechatUser->nickName;
+            },
+        ],
+        ['attribute' => 'wechat_user_name', 'label'=>'微信ID', //'headerOptions' => ['width' => '5%'],
+            'format' => 'raw',
+            'value'=> function($model){
+                $WechatUser = \common\models\wechat\WechatUser::findOne($model->wechat_user_id);
+                return $model->wechat_user_name.($WechatUser->remark?'【'.$WechatUser->remark.'】':'');
+            },
+        ],
+        #'bet_money',
+        ['attribute' => 'up_money', 'label'=>'上分', //'headerOptions' => ['width' => '5%'],
+            'format' => 'raw',
+            'value'=> function($model){
+                return $model->up_money;
+            },
+        ],
+        ['attribute' => 'down_money', 'label'=>'下分', //'headerOptions' => ['width' => '5%'],
+            'format' => 'raw',
+            'value'=> function($model){
+                return $model->down_money;
+            },
+        ],
+        ['attribute' => 'bet_money', 'label'=>'投分', //'headerOptions' => ['width' => '5%'],
+            'format' => 'raw',
+            'value'=> function($model){
+                return $model->bet_money;
+            },
+        ],
+        //'bonus',
+        ['attribute' => 'bonus', 'label'=>'中奖', //'headerOptions' => ['width' => '5%'],
+            'format' => 'raw',
+            'value'=> function($model){
+                return $model->bonus;
+            },
+        ],
+        //'profits',
+        ['attribute' => 'profits', 'label'=>'利润', //'headerOptions' => ['width' => '5%'],
+            'format' => 'raw',
+            'value'=> function($model){
+                return '<strong>'.($model->profits>0?'<font color="red">'.$model->profits.'</font>':'<font color="green">'.$model->profits.'</font>').'</strong>';
+            },
+        ],
+        //'created_at',
+        //'updated_at',
+        //'update_time',
+        ['attribute' => 'update_time', 'label'=>'时间', //'headerOptions' => ['width' => '5%'],
+            'format' => 'raw',
+            'value'=> function($model){
+                return substr($model->update_time, 5, 11);
+            },
+        ],
+        ['attribute' => 'profits', 'label'=>'操作', //'headerOptions' => ['width' => '5%'],
+            'format' => 'raw',
+            'value'=> function($model){
+                $WechatUser = \common\models\wechat\WechatUser::findOne($model->wechat_user_id);
+                return '<div class="btn btn-success btn-xs" id="reCalculateConfirm" data-nickName="'.$WechatUser->nickName.'" data-wechatUserId="'.$model->wechat_user_id.'" data-date="'.$model->date.'">重新计算</div>';
+            },
+        ],
+    ]
+    //['class' => 'yii\grid\ActionColumn'],
+);
 ?>
 <section class="static3d-user-profits-day-all-index wrapper site-min-height">
     <!-- page start-->
@@ -32,85 +117,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     #'filterModel' => $searchModel,
-                    'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
-
-                        //'id',
-                        'date',
-                        //'user_id',
-                        ['attribute' => 'user_id', 'label'=>'代理', //'headerOptions' => ['width' => '5%'],
-                            'format' => 'raw',
-                            'value'=> function($model){
-                                return $model->proxy->username;
-                            },
-                        ],
-                        #'wechat_user_id',
-                        ['attribute' => 'wechat_user_name', 'label'=>'客户', //'headerOptions' => ['width' => '5%'],
-                            'format' => 'raw',
-                            'value'=> function($model){
-                                $WechatUser = \common\models\wechat\WechatUser::findOne($model->wechat_user_id);
-                                return Html::img($WechatUser->smallHead, ['width' => '30px']) . $WechatUser->nickName;
-                            },
-                        ],
-                        ['attribute' => 'wechat_user_name', 'label'=>'微信ID', //'headerOptions' => ['width' => '5%'],
-                            'format' => 'raw',
-                            'value'=> function($model){
-                                $WechatUser = \common\models\wechat\WechatUser::findOne($model->wechat_user_id);
-                                return $model->wechat_user_name.($WechatUser->remark?'【'.$WechatUser->remark.'】':'');
-                            },
-                        ],
-                        #'bet_money',
-                        ['attribute' => 'up_money', 'label'=>'上分', //'headerOptions' => ['width' => '5%'],
-                            'format' => 'raw',
-                            'value'=> function($model){
-                                return $model->up_money;
-                            },
-                        ],
-                        ['attribute' => 'down_money', 'label'=>'下分', //'headerOptions' => ['width' => '5%'],
-                            'format' => 'raw',
-                            'value'=> function($model){
-                                return $model->down_money;
-                            },
-                        ],
-                        ['attribute' => 'bet_money', 'label'=>'投分', //'headerOptions' => ['width' => '5%'],
-                            'format' => 'raw',
-                            'value'=> function($model){
-                                return $model->bet_money;
-                            },
-                        ],
-                        //'bonus',
-                        ['attribute' => 'bonus', 'label'=>'中奖', //'headerOptions' => ['width' => '5%'],
-                            'format' => 'raw',
-                            'value'=> function($model){
-                                return $model->bonus;
-                            },
-                        ],
-                        //'profits',
-                        ['attribute' => 'profits', 'label'=>'利润', //'headerOptions' => ['width' => '5%'],
-                            'format' => 'raw',
-                            'value'=> function($model){
-                                return '<strong>'.($model->profits>0?'<font color="red">'.$model->profits.'</font>':'<font color="green">'.$model->profits.'</font>').'</strong>';
-                            },
-                        ],
-                        //'created_at',
-                        //'updated_at',
-                        //'update_time',
-                        ['attribute' => 'update_time', 'label'=>'时间', //'headerOptions' => ['width' => '5%'],
-                            'format' => 'raw',
-                            'value'=> function($model){
-                                return substr($model->update_time, 5, 11);
-                            },
-                        ],
-                        ['attribute' => 'profits', 'label'=>'操作', //'headerOptions' => ['width' => '5%'],
-                            'format' => 'raw',
-                            'value'=> function($model){
-                                $WechatUser = \common\models\wechat\WechatUser::findOne($model->wechat_user_id);
-                                return '<div class="btn btn-success btn-xs" id="reCalculateConfirm" data-nickName="'.$WechatUser->nickName.'" data-wechatUserId="'.$model->wechat_user_id.'" data-date="'.$model->date.'">重新计算</div>';
-                            },
-                        ],
-
-                        //['class' => 'yii\grid\ActionColumn'],
-                    ],
+                    'columns' => $columns
                 ]); ?>
             </div>
         </div>

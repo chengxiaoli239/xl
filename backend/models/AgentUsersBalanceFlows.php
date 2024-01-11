@@ -2,6 +2,8 @@
 
 namespace backend\models;
 
+use backend\models\wechat\WechatUser;
+use common\models\AdminModel;
 use Yii;
 
 /**
@@ -30,6 +32,16 @@ class AgentUsersBalanceFlows extends \common\models\base\BaseModel
     public static function tableName()
     {
         return '{{%agent_users_balance_flows}}';
+    }
+
+    public function getProxy(): \yii\db\ActiveQuery
+    {
+        return $this->hasOne(AdminModel::class, ['id' => 'agent_id']);
+    }
+
+    public function getWechatUser(): \yii\db\ActiveQuery
+    {
+        return $this->hasOne(WechatUser::class, ['id' => 'member_id']);
     }
 
     /**

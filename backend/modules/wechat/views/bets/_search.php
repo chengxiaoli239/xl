@@ -1,5 +1,6 @@
 <?php
 
+use backend\service\UserService;
 use common\service\thirdD\CommonBaseService;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -11,6 +12,7 @@ use yii\widgets\ActiveForm;
 $PlayMethods = \common\models\thirdD\PlayMethod::find()->where(['status'=>1])->asArray()->all();
 $datas = array_column($PlayMethods, 'name', 'id');
 $playMethodOptions = $datas;
+$is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
 ?>
 <style>
 .form-control{
@@ -33,6 +35,11 @@ $playMethodOptions = $datas;
     ]); ?>
 
     <div class="row">
+        <?php if($is3dAdmin){?>
+        <div class="col-lg-2 col-xs-3">
+            <?= $form->field($model, 'username')->label('代理') ?>
+        </div>
+        <?}?>
         <div class="col-lg-2 col-xs-4">
             <?= $form->field($model, 'wechatUserName')
                 ->label('微信ID', ['class' => 'control-label hidden-xs'])->textInput(['placeholder' => '微信ID'])

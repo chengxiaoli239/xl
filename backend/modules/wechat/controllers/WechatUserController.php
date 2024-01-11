@@ -3,6 +3,7 @@
 namespace backend\modules\wechat\controllers;
 
 use backend\service\HN0898Service;
+use backend\service\UserService;
 use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
 use Yii;
@@ -40,13 +41,18 @@ class WechatUserController extends BaseController
     {
         $searchModel = new WechatUserSearch();
         $queryParams = Yii::$app->request->queryParams;
-        $queryParams['WechatUser']['user_id'] = $this->_user_id;
+
+        $is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
+        if($this->_user_id != 1 && !$is3dAdmin){
+            $queryParams['WechatUser']['user_id'] = $this->_user_id;
+        }
         $queryParams['WechatUser']['robot_wechat'] = WechatUserService::getCurrentRobotWechat($this->_user_id, $queryParams['WechatUser']['robot_wechat']);
         $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'is3dAdmin' => $is3dAdmin,
         ]);
     }
 

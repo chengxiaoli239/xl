@@ -12,6 +12,9 @@ use backend\models\AgentUsersBalanceFlows as AgentUsersBalanceFlowsModel;
  */
 class AgentUsersBalanceFlows extends AgentUsersBalanceFlowsModel
 {
+
+    public $username;  // 代理账号
+    public $wechatUserName;  // 微信id
     /**
      * @inheritdoc
      */
@@ -21,6 +24,7 @@ class AgentUsersBalanceFlows extends AgentUsersBalanceFlowsModel
             [['id', 'agent_id', 'type', 'status', 'created_at', 'updated_at'], 'integer'],
             [['member_id', 'member_account', 'desc', 'update_time'], 'safe'],
             [['balance', 'balance_now', 'balance_after'], 'number'],
+            [['wechatUserName', 'username'], 'string'],  // 微信好友微信账号
         ];
     }
 
@@ -42,7 +46,9 @@ class AgentUsersBalanceFlows extends AgentUsersBalanceFlowsModel
      */
     public function search($params)
     {
-        $query = AgentUsersBalanceFlowsModel::find();
+        $query = AgentUsersBalanceFlowsModel::find()->alias('a');
+        $query->joinWith(['wechatUser']); // 'wechatUser'
+        $query->joinWith(['proxy']); // lt_admin
 
         // add conditions that should always apply here
 
@@ -61,20 +67,24 @@ class AgentUsersBalanceFlows extends AgentUsersBalanceFlowsModel
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
-            'agent_id' => $this->agent_id,
-            'type' => $this->type,
-            'balance' => $this->balance,
-            'balance_now' => $this->balance_now,
-            'status' => $this->status,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'update_time' => $this->update_time,
+            'a.id' => $this->id,
+            'a.agent_id' => $this->agent_id,
+            'a.type' => $this->type,
+            'a.balance' => $this->balance,
+            'a.balance_now' => $this->balance_now,
+            'a.status' => $this->status,
+            'a.created_at' => $this->created_at,
+            'a.updated_at' => $this->updated_at,
+            'a.update_time' => $this->update_time,
+            'lt_admin.username' => trim($this->username),
         ]);
 
         $query->andFilterWhere(['like', 'member_id', $this->member_id])
             ->andFilterWhere(['like', 'member_account', $this->member_account])
             ->andFilterWhere(['like', 'desc', $this->desc]);
+        $query->andFilterWhere(['like', 'lt_wechat_user.userName', $this->wechatUserName]);
+        $query->addSelect(['a.*', 'lt_wechat_user.userName', 'lt_admin.username']);
+        //$sql = $query->createCommand()->getRawSql(); p($sql);
 
         return $dataProvider;
     }

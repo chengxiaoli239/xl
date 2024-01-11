@@ -1,11 +1,13 @@
 <?php
 
+use backend\service\UserService;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model backend\models\searchs\AgentUsersBalanceFlows */
 /* @var $form yii\widgets\ActiveForm */
+$is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
 ?>
 <style>
     .form-control{
@@ -28,6 +30,11 @@ use yii\widgets\ActiveForm;
     ]); ?>
 
     <div class="row">
+        <?php if($is3dAdmin){?>
+            <div class="col-lg-2 col-xs-3">
+                <?= $form->field($model, 'username')->label('代理') ?>
+            </div>
+        <?}?>
         <div class="col-lg-2 col-xs-4">
             <?= $form->field($model, 'type')->dropDownList(
                 [1=>'上分', 2=>'下分'], // Provide the options here

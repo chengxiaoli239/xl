@@ -2,6 +2,7 @@
 
 namespace backend\models\wechat;
 
+use common\models\AdminModel;
 use Yii;
 
 /**
@@ -48,6 +49,12 @@ class Bets extends \common\models\base\BaseModel
     public static function tableName()
     {
         return '{{%bets}}';
+    }
+
+    // 定义与wechat_user表的关联关系
+    public function getProxy()
+    {
+        return $this->hasOne(AdminModel::class, ['id' => 'user_id']);
     }
 
     // 定义与wechat_user表的关联关系

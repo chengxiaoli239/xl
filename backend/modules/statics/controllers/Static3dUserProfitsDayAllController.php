@@ -60,6 +60,7 @@ class Static3dUserProfitsDayAllController extends BaseController
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'is3dAdmin' => $is3dAdmin,
         ]);
     }
 
