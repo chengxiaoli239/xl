@@ -5,10 +5,10 @@ namespace backend\models\searchs;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use backend\models\EyunAuth as EyunAuthModel;
+use common\models\eyun\EyunAuth as EyunAuthModel;
 
 /**
- * EyunAuth represents the model behind the search form of `backend\models\EyunAuth`.
+ * EyunAuth represents the model behind the search form of `common\models\eyun\EyunAuth`.
  */
 class EyunAuth extends EyunAuthModel
 {
