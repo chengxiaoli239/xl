@@ -157,7 +157,10 @@ class RobotUserController extends BaseController
     {
         $model = (new TzSystemsUsers())->findOne($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $post = $this->_post;
+        if (!empty($post)) {
+            $post['TzSystemsUsers']['ssc_domain'] = trim($post['TzSystemsUsers']['ssc_domain'], '/');
+            $model->load($post) && $model->save();
             return $this->redirect(['view']);
         }
 
