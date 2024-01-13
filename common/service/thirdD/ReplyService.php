@@ -18,7 +18,7 @@ class ReplyService extends CommonBaseService
     public static function packageReply(): array
     {
         $now_time = time();
-        $beforeTime = 3600; # 多少分钟内没回复的
+        $beforeTime = 7200; # 多少分钟内没回复的
         //var_dump('打包回复', 'dddd');
         $wechatUserIds = BetsBackend::find()
             ->select(['wechat_user_id', 'new_msg_id'])
@@ -138,7 +138,7 @@ class ReplyService extends CommonBaseService
     public static function packageReplyUser(): array
     {
         $now_time = time();
-        $beforeTime = 3600; # 多少分钟内没回复的
+        $beforeTime = 7200; # 多少分钟内没回复的
         //var_dump('打包回复', 'dddd');
         $wechatUserIds = BetsBackend::find()
             ->select(['wechat_user_id', 'new_msg_id'])
