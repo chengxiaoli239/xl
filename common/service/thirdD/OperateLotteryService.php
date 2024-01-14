@@ -59,11 +59,11 @@ class OperateLotteryService extends CommonBaseService
                 }
                 $wechatUserDatas[] = $betRow->user_id.'_'.$betRow['wechat_user_id'];
             }
-            foreach ($wechatUserDatas as $d){
-                list($user_id, $wechatUserId) = explode('_', $d);
-                $params = ['user_id'=>$user_id, 'type'=>WechatUserService::TYPE_ORDER_BET, 'queue_delay_time'=>30, 'msg'=>'开奖后报表计算', 'wechat_user_id'=>$wechatUserId];
-                push_queue_fast(UserDayStaticsJobs::class, $params); # 处理数据入列
-            }
+            //foreach ($wechatUserDatas as $d){
+            //    list($user_id, $wechatUserId) = explode('_', $d);
+            //    $params = ['user_id'=>$user_id, 'type'=>WechatUserService::TYPE_ORDER_BET, 'queue_delay_time'=>30, 'msg'=>'开奖后报表计算', 'wechat_user_id'=>$wechatUserId];
+            //    push_queue_fast(UserDayStaticsJobs::class, $params); # 处理数据入列
+            //}
         }catch (\Exception $e){
             return [10001, ['lottery_type'=>$lottery_type], $e->getMessage()];
         }

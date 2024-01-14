@@ -3,10 +3,12 @@ namespace backend\service\statics\statics_3d;
 use backend\models\AgentUsersBalanceFlows;
 use backend\models\statics\Static3dUserProfitsDay;
 use backend\models\statics\Static3dUserProfitsDayAll;
+use backend\models\thirdD\BetsBackend;
 use backend\models\wechat\Bets;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\BaseService;
 use common\models\wechat\WechatUser;
+use common\service\jobs\statics_3d\UserDayStaticsJobs;
 use common\service\thirdD\CommonBaseService;
 use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
@@ -201,4 +203,36 @@ class Statics3dUserDataService extends BaseService {
         return [$BetMoneys, $BonusMoneys, $ProfitsMoneys];
     }
 
+    /**
+     * 最新下单用户
+     * @return array
+     */
+    public static function getBetRecentWechatUserIds(): array
+    {
+        $now_time = time();
+        $beforeTime = 3600; # 多少分钟内没回复的
+        //var_dump('打包回复', 'dddd');
+        $wechatUserIds = BetsBackend::find()
+            ->select(['user_id', 'wechat_user_id'])
+            ->andWhere(['>', 'created_at', $now_time-$beforeTime])
+            //->orWhere(['=', 'wechat_user_id', 19]) //->createCommand()->getRawSql();
+            ->groupBy(['user_id', 'wechat_user_id'])->asArray()->all();
+
+        return $wechatUserIds;
+    }
+
+    public static function staticsRecently()
+    {
+        $wechatUserIds = self::getBetRecentWechatUserIds();
+        if(empty($wechatUserIds)) return false;
+
+        foreach ($wechatUserIds as $wechatUserId){
+            $params = ['user_id'=>$wechatUserId['user_id'], 'type'=>WechatUserService::TYPE_ORDER_BET, 'msg'=>'定时搅拌后报表计算', 'wechat_user_id'=>$wechatUserId['wechat_user_id']];
+            push_queue_fast(UserDayStaticsJobs::class, $params); # 处理数据入列
+        }
+        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据-3d', ['wechatUserIds'=>$wechatUserIds]);
+        p($wechatUserIds, 0);
+
+        return [0, 'data'=>['wechatUserIds'=>$wechatUserIds], 'msg'=>'处理完成'];
+    }
 }

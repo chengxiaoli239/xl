@@ -22,14 +22,14 @@ class MatchCodeService extends CommonBaseService
             $time_consume = ($end_time-$start_time).'s';
             $resultData = $result[0] ?? [];
             if($resultData['code'] != 200 OR empty($resultData['data'])){
-                throw_info($resultData['msg']??'识别错误.');
+                throw_info($resultData['msg']??'识别错误.', $resultData['code']);
             }
             Tool_Common::log('/matchCode/'.__FUNCTION__, 'INFO', '号码数据匹配', ['text'=>$text, 'result'=>$result, 'time_consume'=>$time_consume]);
             $resultData = $resultData['data'];
             #p($resultData);
         }catch (\Exception $e){
             Tool_Common::log('/matchCode/'.__FUNCTION__, 'ERR', '号码数据匹配-异常', ['text'=>$text, 'result'=>$result, 'time_consume'=>$time_consume]);
-            throw_info($e->getMessage());
+            throw_info($e->getMessage(),  $resultData['code']??self::CODE_FOR_USER);
         }
 
         return $resultData;

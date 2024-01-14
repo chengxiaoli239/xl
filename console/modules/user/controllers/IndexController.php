@@ -1,6 +1,7 @@
 <?php
 namespace console\modules\user\controllers;
 
+use backend\service\statics\statics_3d\Statics3dUserDataService;
 use common\service\index\CrontabIndexService;
 use common\service\thirdD\ReplyService;
 use common\service\thirdD\sx\Ssxx3dBetService;
@@ -56,4 +57,14 @@ class IndexController extends Controller
         return $rst;
     }
 
+    /**
+     * @desc 数据统计
+     * /www/server/php/74/bin/php /www/wwwroot/third/yii user/index/static-recently
+     */
+    public function actionStaticRecently(): array
+    {
+        $rst = Statics3dUserDataService::staticsRecently();
+
+        return $rst;
+    }
 }
