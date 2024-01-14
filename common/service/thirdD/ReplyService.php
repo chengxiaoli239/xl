@@ -68,7 +68,7 @@ class ReplyService extends CommonBaseService
                         $oneUserReplyTxts .= "\n原文：\n".$bet['bet_desc'].":\n~~~~~~~~~~~~~~~~~~~~~~~~~~\n识别：\n";//.$bet['lottery_name'].$bet['qihao']."\n";;
                     }
                     $tmpRecordOrderIds[$bet['order_id']] = true;
-                    $oneUserReplyTxts .= $bet['lottery_name'].'单'.$bet['order_id'].' '.$replyContent['replyTxt']."\n";
+                    $oneUserReplyTxts .= $bet['lottery_name'].'单号:'.$bet['order_id'].' '.$replyContent['replyTxt']."\n";
                     $message_ids[] = $bet['new_msg_id'];
 
                     $allCount += $bet['count'];
@@ -184,7 +184,7 @@ class ReplyService extends CommonBaseService
                         $oneUserReplyTxts .= "\n原文：\n".$bet['bet_desc'].":\n~~~~~~~~~~~~~~~~~~~~~~~~~~\n识别：\n";//.$bet['lottery_name'].$bet['qihao']."\n";;
                     }
                     $tmpRecordOrderIds[$bet['order_id']] = true;
-                    $oneUserReplyTxts .= $bet['lottery_name'].'单'.$bet['order_id'].' '.$replyContent['replyTxt']."\n";
+                    $oneUserReplyTxts .= $bet['lottery_name'].'单号:'.$bet['order_id'].' '.$replyContent['replyTxt']."\n";
                     $message_ids[] = $bet['new_msg_id'];
 
                     $allCount += $bet['count'];

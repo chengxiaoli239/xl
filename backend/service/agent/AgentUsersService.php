@@ -5,6 +5,7 @@ use backend\models\AgentUsersBalanceFlows;
 use backend\models\statics\Static3dUserProfitsDayAll;
 use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
+use backend\service\UserService;
 use common\models\wechat\WechatUser;
 use common\service\CommonService;
 use common\service\jobs\robots\message\WechatPrivateMsgReceiveJobs;
@@ -86,7 +87,12 @@ class AgentUsersService extends BaseService {
                 if(!$balance = trim($post['balance'])){
                     throw_info('积分不能为空');
                 }else{
-                    $WechatUser = WechatUser::findOne(['user_id'=>$agent_id, 'id'=>$id]);
+                    $where = ['id'=>$id];
+                    $is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
+                    if(\Yii::$app->user->id != 1 && !$is3dAdmin){
+                        $where['user_id'] = $agent_id;
+                    }
+                    $WechatUser = WechatUser::findOne($where);
                     if(empty($WechatUser)) {
                         throw_info('未找到用户记录1');
                     }

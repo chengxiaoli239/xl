@@ -1,6 +1,7 @@
 <?php
 namespace common\service\thirdD\match;
 
+use backend\service\BetService;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\OperateApiDataService;
@@ -15,7 +16,7 @@ class MatchCodeService extends CommonBaseService
             $start_time = microtime(true);
             $params = ['textfield' => $text];
             //Tool_Common::log('/matchCode/'.__FUNCTION__, 'INFO', '号码数据匹配0', ['text'=>$text]);
-            $domain = \Yii::$app->params['EXPLAIN_CODE_API'];
+            $domain = BetService::getConfig('EXPLAIN_CODE_API')?:\Yii::$app->params['EXPLAIN_CODE_API'];
             $result = \common\open\thirdD\api\MatchCodeApi::push($domain, $params);
             $end_time = microtime(true);
             $time_consume = ($end_time-$start_time).'s';
