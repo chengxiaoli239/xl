@@ -524,15 +524,16 @@ class EYunMessageOperateService  extends EYunBaseService
 
     public static function preValidateTime($lottery_type=26){
         $dataHI = date('H:i');
+        $lockSiteTime = BetService::getConfig('lock_site_'.$lottery_type)?:'21:20';
         switch ($lottery_type){
             case 26: # 福
-                if('21:10'<=$dataHI && $dataHI<='23:59'){
-                    throw_info('停盘时间', CommonBaseService::CODE_FOR_USER);
+                if($lockSiteTime<=$dataHI && $dataHI<='23:59'){
+                    //throw_info('停盘时间', CommonBaseService::CODE_FOR_USER);
                 }
                 break;
             case 27: # 排
-                if('21:20'<=$dataHI && $dataHI<='23:59'){
-                    throw_info('停盘时间', CommonBaseService::CODE_FOR_USER);
+                if($lockSiteTime<=$dataHI && $dataHI<='23:59'){
+                    //throw_info('停盘时间', CommonBaseService::CODE_FOR_USER);
                 }
                 break;
         }
