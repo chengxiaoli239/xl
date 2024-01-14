@@ -35,7 +35,14 @@ trait EventServiceTrait
             case EYunMessageOperateService::MESSAGE_P_TEXT_CODE: # 私聊
             case EYunMessageOperateService::MESSAGE_G_TEXT_CODE: # 群聊
                 if($wcId != $data['toUser']){ # 只处理别人发给机器人
-                    push_queue_open(WechatPrivateMsgReceiveJobs::class, $data);
+                    $paramData = $data['data']; # 消息内容体
+                    $fromUser = $paramData['fromUser'];
+                    if ($fromUser == $wcId && $fromUser != $paramData['toUser']) {
+                        # 回复用户
+                        push_queue_open(WechatPrivateMsgReceiveJobs::class, $data);
+                    }else{
+                        push_queue_fast(WechatPrivateMsgReceiveJobs::class, $data);
+                    }
                 }
                 break;
             case EYunMessageOperateService::MESSAGE_P_TEXT_CANCEL: # 私聊撤回

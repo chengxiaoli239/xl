@@ -74,9 +74,6 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
             $wechatUser = WechatUserService::getWechatUsers($user_id)[($fromUser==$wcId?$data['toUser']:$fromUser)];
             self::validateWechatUser($wechatUser);
 
-            # 2、盘口判断
-            self::preValidate($params); # 校验关盘
-
             $data['fromUserNickName'] = $wechatUser['nickName'];
             Tool_Common::log('/bet_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name.'00', ['wcId'=>$wcId, 'params'=>$params, 'wechatUser'=>$wechatUser, 'fromUser'=>$fromUser]);
             if ($fromUser == $wcId && $fromUser != $data['toUser']){
@@ -84,6 +81,9 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
                 $data['targetUser'] = $data['toUser'];  # 目标用户
                 list($code, $vdata, $msg) = $MessageService->receiveFromMyself($data);
             }else{
+                # 2、盘口判断
+                self::preValidate($params); # 校验关盘
+
                 $data['targetUser'] = $data['fromUser'];  # 目标用户
                 list($code, $vdata, $msg) = $MessageService->receive($data);
             }
