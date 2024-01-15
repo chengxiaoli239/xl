@@ -4,9 +4,12 @@ namespace common\kj\qxc;
 use backend\service\CurlService;
 use backend\service\NineNine\NineNineNewService;
 use common\kj\BaseKj;
+use common\kj\ssc\Thirdd;
 use common\service\thirdD\CommonBaseService;
 use common\tools\Tool_Common;
+use GuzzleHttp\Client;
 use  yii;
+use yii\helpers\Json;
 
 class QxcTcw extends BaseKj{
     public static $lottery_type = 1; # 七星彩
@@ -264,5 +267,74 @@ class QxcTcw extends BaseKj{
         Tool_Common::log('qxc_batch', 'INFO', '号码抓取-体彩网-0', $logArr);
 
         return $rstData;
+    }
+
+    /**
+     * 排列3号码抓取
+     * @param string $returnType
+     * @param int $is_auto
+     * @param int $lottery_type 26 福、27 排
+     * @return array|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public static function getOfficialCode(string $returnType = 'json', int $is_auto = 1, int $lottery_type=27): ?array
+    {
+        try {
+            $lottery_type = self::$lottery_type;
+            $dateHI = date('H:i');
+            $seconds = ('00:00'<$dateHI && $dateHI<'21:00') ? 1800 : 120;
+            if($is_auto==1){
+                self::lockGrab($lottery_type, $seconds);
+            }
+            if(!$kjData = Thirdd::getCurrentKjData($lottery_type, $current_qihao) OR $is_auto==2) {
+                $domain = BaseKj::getApiHostByRoute($route='/kj/qxc/pl3-official');
+                $url = $domain."/gateway/lottery/getHistoryPageListV1.qry";
+                $params = [
+                    'query' => [
+                        'gameNo' => 35,
+                        'provinceId' => 0,
+                        'pageSize' => 5,
+                        'isVerify' => 1,
+                        'pageNo' => 1
+                    ]
+                ];
+
+                $headers = [
+                    'headers' => [
+                        'authority' => 'webapi.sporttery.cn',
+                        'accept' => 'application/json, text/javascript, */*; q=0.01',
+                        'accept-language' => 'zh-CN,zh;q=0.9',
+                        'origin' => 'https://static.sporttery.cn',
+                        'referer' => 'https://static.sporttery.cn/',
+                        'sec-ch-ua' => '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+                        'sec-ch-ua-mobile' => '?0',
+                        'sec-ch-ua-platform' => '"Windows"',
+                        'sec-fetch-dest' => 'empty',
+                        'sec-fetch-mode' => 'cors',
+                        'sec-fetch-site' => 'same-site',
+                        'user-agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                    ]
+                ];
+
+                $client = new Client();
+                $response = $client->request('GET', $url, $params + $headers);
+
+                $data = $response->getBody()->getContents();
+                $content = Json::decode($data);
+                if($content['errorCode']==0 && $content['success']){
+                    $latestData = $content['value']['list'][0];
+                    $kjData['expect'] = $latestData['lotteryDrawNum'];
+                    $kjData['opencode'] = trim(str_replace(' ', ',', $latestData['lotteryUnsortDrawresult']));
+                    $kjData['opentime'] = $latestData['lotterySaleBeginTime'];
+                }
+                //p(['data'=>$data]);
+            }
+        }catch (\Exception $e){
+            $kjData = Thirdd::getCurrentKjData($lottery_type);
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '3d数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$current_qihao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
+        }
+        $data =  self::extracted($kjData, $lottery_type, $returnType, $is_auto);
+
+        return $data;
     }
 }

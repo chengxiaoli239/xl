@@ -149,4 +149,19 @@ class QxcController extends Controller
         $data = QxcTcw::getNineNineLottery($type, $post['is_auto'], $lottery_type=27);
         return $data;
     }
+
+    /**
+     * 官方获取号码
+     * @param string $type
+     * @return array|bool
+     */
+    public function actionPl3Official(string $type = 'json')
+    {
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $post = \Yii::$app->request->post();
+
+        $data = QxcTcw::getOfficialCode($type, $post['is_auto'], $lottery_type=27);
+
+        return $data;
+    }
 }

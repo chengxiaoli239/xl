@@ -36,6 +36,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $data = QxcTcw::getOfficialCode($type='json', $is_auto=2, $lottery_type=27);p($data);
             $data = QxcTcw::getNineNineLottery($type='json', $is_auto=2, $lottery_type=27);
             $Thirdd = new \common\kj\ssc\Thirdd();
             $data = $Thirdd->getFuCai3d($type='json', 2);p($data);
