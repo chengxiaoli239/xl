@@ -280,7 +280,6 @@ class QxcTcw extends BaseKj{
     public static function getOfficialCode(string $returnType = 'json', int $is_auto = 1, int $lottery_type=27): ?array
     {
         try {
-            $lottery_type = self::$lottery_type;
             $dateHI = date('H:i');
             $seconds = ('00:00'<$dateHI && $dateHI<'21:00') ? 1800 : 120;
             if($is_auto==1){
@@ -321,17 +320,20 @@ class QxcTcw extends BaseKj{
 
                 $data = $response->getBody()->getContents();
                 $content = Json::decode($data);
+                Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '3d数据抓取-官网', ['lottery_type'=>$lottery_type, 'cq'=>$current_qihao, 'content'=>$content]);
                 if($content['errorCode']==0 && $content['success']){
                     $latestData = $content['value']['list'][0];
-                    $kjData['expect'] = $latestData['lotteryDrawNum'];
+                    $kjData['expect'] = '20'.$latestData['lotteryDrawNum'];
                     $kjData['opencode'] = trim(str_replace(' ', ',', $latestData['lotteryUnsortDrawresult']));
                     $kjData['opentime'] = $latestData['lotterySaleBeginTime'];
+                }else{
+                    throw_info('号码抓取异常');
                 }
                 //p(['data'=>$data]);
             }
         }catch (\Exception $e){
             $kjData = Thirdd::getCurrentKjData($lottery_type);
-            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '3d数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$current_qihao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '3d数据抓取-异常', ['lottery_type'=>$lottery_type, 'cq'=>$current_qihao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
         }
         $data =  self::extracted($kjData, $lottery_type, $returnType, $is_auto);
 
