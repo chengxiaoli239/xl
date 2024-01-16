@@ -35,7 +35,7 @@ class WechatMessageController extends Controller
 
         Tool_Common::log('chatBet','INFO', '聊天消息接收', ['post'=>$post]);
 
-        return ['status'=>200, 'msg'];
+        return ['status'=>200, 'msg'=>'消息接收成功'];
     }
 
 }
