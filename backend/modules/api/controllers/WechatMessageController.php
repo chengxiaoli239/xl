@@ -1,6 +1,7 @@
 <?php
 namespace backend\modules\api\controllers;
 
+use common\service\wechat\eyun\api\EventServiceTrait;
 use common\tools\Tool_Common;
 use Yii;
 use yii\web\Controller;
@@ -33,7 +34,8 @@ class WechatMessageController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
 
-        Tool_Common::log('chatBet','INFO', '聊天消息接收', ['post'=>$post]);
+        $result = EventServiceTrait::eventHandler($post);
+        Tool_Common::log('chatBet','INFO', '聊天消息接收', ['post'=>$post, 'result'=>$result]);
 
         return ['status'=>200, 'msg'=>'消息接收成功'];
     }
