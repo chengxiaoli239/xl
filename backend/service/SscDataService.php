@@ -36,6 +36,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\models\WxFriends;
 use common\service\CommonService;
+use common\service\thirdD\CommonBaseService;
 use common\tools\KjDataGet;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
@@ -5280,6 +5281,13 @@ class SscDataService extends BaseService {
                 'created_at' => $now_time,
                 'updated_at' => $now_time,
             ];
+            if(in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)){
+                $nextQihao = (int)$qihao + 1;
+                $setDatas = array_merge($setDatas, [
+                    'next_qihao' => (string) $nextQihao,
+                    'status' => SscDataService::DEAL_DATA_STATUS_SUCCESS
+                ]);
+            }
             $DataDealStatus = new DataDealStatus();
             $DataDealStatus->setAttributes($setDatas);
             if(!$DataDealStatus->save()){

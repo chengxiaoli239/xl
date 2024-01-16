@@ -165,7 +165,9 @@ class UserController extends BaseController
     {
         $user = \Yii::$app->user->identity;
         $uid = $user->id;
-        if($uid == 1) {
+
+        $is3dAdmin = UserService::is3dAdmin($user);
+        if($uid == 1 OR $is3dAdmin) {
             $searchModel = new TzSystemsUsersSearch();
             $queryParams = Yii::$app->request->queryParams;
 

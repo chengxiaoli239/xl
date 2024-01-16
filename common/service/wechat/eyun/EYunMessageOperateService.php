@@ -2,11 +2,13 @@
 
 namespace common\service\wechat\eyun;
 
+use backend\models\DataDealStatus;
 use backend\models\thirdD\BetsBackend;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\agent\AgentUsersService;
 use backend\service\BetService;
 use backend\service\HN0898Service;
+use backend\service\SscDataService;
 use common\models\eyun\RobotUser;
 use common\models\wechat\WechatUser;
 use common\service\BaseService;
@@ -547,9 +549,9 @@ class EYunMessageOperateService  extends EYunBaseService
     public function receive($messageData=[]): array
     {
         try {
+            $transaction = static::getDb()->beginTransaction();
             $fromUser = $messageData['fromUser']; # 来自
             $text = $messageData['content']; # 文本
-            $transaction = static::getDb()->beginTransaction();
             # 校验
             list($code, $vdata, $msg) = self::validateReceive($this->user_id, $text);
             $this->setMemberInfo($fromUser);
@@ -584,8 +586,19 @@ class EYunMessageOperateService  extends EYunBaseService
             foreach ($betCodeContents as $lottery_type=>$contents){
                 # 校验开盘关盘
                 self::preValidateTime($lottery_type);
-
-                $qihao = (string)HN0898Service::getQihao($lottery_type);
+                if(in_array($this->user_id, [21, 38])){ # 做账账号
+                    $where = [
+                        'AND',
+                        ['=', 'lottery_type', $lottery_type],
+                        ['=', 'status', SscDataService::DEAL_DATA_STATUS_SUCCESS],
+                        ['<=', 'FROM_UNIXTIME(created_at, "%Y-%m-%d")', date('Y-m-d', time()-86400)]
+                    ];
+                    $DataDealStatusQuery = DataDealStatus::find()->select(['next_qihao'])->where($where)->orderBy(['id'=>SORT_DESC]);
+                    //$sql = $DataDealStatusQuery->createCommand()->getRawSql();p($sql);
+                    $qihao = $DataDealStatusQuery->asArray()->one()['next_qihao'];
+                }else{
+                    $qihao = (string)HN0898Service::getQihao($lottery_type);
+                }
                 $oneReplyTxt = '【课号】'.$contents[0]['lottery_name'].$qihao;
                 $betContent = "\n【内容】";
 

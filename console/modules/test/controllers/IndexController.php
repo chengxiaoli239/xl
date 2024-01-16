@@ -136,6 +136,12 @@ class IndexController extends Controller
      * @return void
      **/
     public function actionDw1(){
+        try {
+            $MessageService = new EYunMessageOperateService($user_id=21);
+            $rst = $MessageService->receive(['content'=>'体组六组三 1拖2345、23456 各10元', 'fromUser'=>'wxid_875i1kgd38x122']); p($rst);
+        }catch (\Exception $e){
+            p($e->getMessage());
+        }
         $wcId = WechatUserService::getCurrentRobotWechat($user_id=22, $robot_wechat='wxid_v44jhsu1852p22');
         $rst = WechatUserService::syncWechatFriends($user_id=22);p($rst);
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao='20231229288', $lottery_type=8);

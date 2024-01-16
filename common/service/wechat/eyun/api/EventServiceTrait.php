@@ -27,9 +27,9 @@ trait EventServiceTrait
         if($code == SiteOrderApi::IGNORE_CODE){
             return ['code'=>'1000', 'message'=>'消息接收成功'];
         }
-        $user_id = $dd['user_id'];
+        $userId = $dd['user_id'];
 
-        $data['user_id'] = $user_id;
+        $data['user_id'] = $userId;
         $data['business_id'] = $wcId;
         switch ($messageType){
             case EYunMessageOperateService::MESSAGE_P_TEXT_CODE: # 私聊

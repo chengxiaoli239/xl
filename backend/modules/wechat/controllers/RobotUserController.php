@@ -159,7 +159,11 @@ class RobotUserController extends BaseController
 
         $post = $this->_post;
         if (!empty($post)) {
-            $post['TzSystemsUsers']['ssc_domain'] = trim($post['TzSystemsUsers']['ssc_domain'], '/');
+            $domain = trim($post['TzSystemsUsers']['ssc_domain'], '/');
+            if(strpos($domain, 'http://') === false){
+                $domain = 'http://'.$domain;
+            }
+            $post['TzSystemsUsers']['ssc_domain'] = $domain;
             $model->load($post) && $model->save();
             return $this->redirect(['view']);
         }
