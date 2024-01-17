@@ -183,7 +183,7 @@ class TzSystemUsersController extends Controller
     }
 
     /**
-     * @desc 获取激活任务
+     * @desc 获取激活期号
      * @return array|bool
      */
     public function actionGetActiveQihao(){
