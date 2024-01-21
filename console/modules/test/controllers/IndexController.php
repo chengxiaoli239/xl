@@ -137,6 +137,8 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
+            $plan = UserSysPlans::findOne(7812);
+            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, [151]);p(count($codes));
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive(['content'=>'体组六组三 1拖2345、23456 各10元', 'fromUser'=>'wxid_875i1kgd38x122']); p($rst);
         }catch (\Exception $e){
@@ -159,7 +161,5 @@ class IndexController extends Controller
         $data = ["toUser"=>"wxid_875i1kgd38x122", 'targetUser'=>'wxid_875i1kgd38x122','text'=>'全部代购',];
         $rst = $MessageService->receiveFromMyself($data);p($rst);
         $lottery_types = StaticService::getLotteryTypes();p($lottery_types);
-        $plan = UserSysPlans::findOne(7709);
-        $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, [148]);p(count($codes));
     }
 }

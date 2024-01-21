@@ -13,7 +13,7 @@ return [
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
     'language' => 'zh-CN',
-    'timeZone' => 'Asia/Shanghai',      // ÉèÖÃÊ±Çø
+    'timeZone' => 'Asia/Shanghai',      // ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
     'modules' => [
         'admin' => [
             'class' => 'izyue\admin\Module',

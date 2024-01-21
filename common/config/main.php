@@ -66,6 +66,7 @@ return [
             'redis' => 'redis', // Redis connection component or its config
             'channel' => 'wechat:queue_open', // Queue channel key
             'as log' => \yii\queue\LogBehavior::class,
+            //'as jobRetry' => 'yii\queue\RetryBehavior',
             'ttr' => 3600,
         ],
     ]

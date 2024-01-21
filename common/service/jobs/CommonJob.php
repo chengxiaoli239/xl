@@ -6,9 +6,17 @@ use common\tools\Tool_Common;
 use yii\base\BaseObject;
 use yii\db\Expression;
 use yii\queue\JobInterface;
+use yii\queue\RetryableJobInterface;
 
-abstract class CommonJob extends BaseObject implements JobInterface
+abstract class CommonJob extends BaseObject implements JobInterface, RetryableJobInterface
 {
+    public $retryCount = 3; // 最大重试次数
+
+    // 重试间隔时间（秒）
+    public function getTtr(): int
+    {
+        return 30;
+    }
     protected $queueId;
     protected $errorMessage;
 
@@ -24,8 +32,15 @@ abstract class CommonJob extends BaseObject implements JobInterface
 //        //注册自定义错误处理方法
     }
 
-    public function canRetry($attempt, $error)
+    /**
+     * 判断是否需要重试
+     * @param $attempt
+     * @param $error
+     * @return bool
+     */
+    public function canRetry($attempt, $error): bool
     {
+        #return $attempt < $this->retryCount;
         return false;
     }
 
