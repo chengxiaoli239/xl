@@ -160,7 +160,7 @@ class QxcController extends Controller
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
 
-        $data = QxcTcw::getOfficialCode($type, $post['is_auto'], $lottery_type=27);
+        $data = QxcTcw::getOfficialCode($type, $post['is_auto']??1, $lottery_type=27);
 
         return $data;
     }
