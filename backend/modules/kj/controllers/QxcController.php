@@ -86,7 +86,7 @@ class QxcController extends Controller
     public function actionTcwOne($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
-        $data = QxcTcw::getTcwOne($type, $post['is_auto']);
+        $data = QxcTcw::getTcwOne($type, $post['is_auto']??1);
         return $data;
     }
 
@@ -98,7 +98,7 @@ class QxcController extends Controller
     public function actionPl5One($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
-        $data = QxcTcw::getTcwOne($type, $post['is_auto'], $lottery_type=17);
+        $data = QxcTcw::getTcwOne($type, $post['is_auto']??1, $lottery_type=17);
         return $data;
     }
 
@@ -110,7 +110,7 @@ class QxcController extends Controller
     public function actionNineNineQxc($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
-        $data = QxcTcw::getNineNineLottery($type, $post['is_auto'], $lottery_type=1);
+        $data = QxcTcw::getNineNineLottery($type, $post['is_auto']??1, $lottery_type=1);
         return $data;
     }
 
@@ -122,7 +122,7 @@ class QxcController extends Controller
     public function actionNineNinePlw($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
-        $data = QxcTcw::getNineNineLottery($type, $post['is_auto'], $lottery_type=17);
+        $data = QxcTcw::getNineNineLottery($type, $post['is_auto']??1, $lottery_type=17);
         return $data;
     }
 
@@ -134,7 +134,7 @@ class QxcController extends Controller
     public function actionFcSd(string $type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
-        $data = QxcTcw::getNineNineLottery($type, $post['is_auto'], $lottery_type=26);
+        $data = QxcTcw::getNineNineLottery($type, $post['is_auto']??1, $lottery_type=26);
         return $data;
     }
 
@@ -146,7 +146,7 @@ class QxcController extends Controller
     public function actionPl3(string $type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
-        $data = QxcTcw::getNineNineLottery($type, $post['is_auto'], $lottery_type=27);
+        $data = QxcTcw::getNineNineLottery($type, $post['is_auto']??1, $lottery_type=27);
         return $data;
     }
 
