@@ -615,13 +615,18 @@ class HN0898Service extends BaseTZService {
     public static function batchSwitchStatus($ids, string $model='UserSysPlans', string $field='status', $val=null, $admin_id=0): array
     {
         try {
+
+            $userType = \Yii::$app->user->identity['user_type'];
             $user_id_field = 'user_id';
             if(strpos($model, 'UserSysPlans') !== false){
                 $user_id_field = 'uid';
             }
             $transaction = \Yii::$app->db->beginTransaction();
             $table = $model::tablename();
-            $sql = 'UPDATE '.$table.' SET '.$field.'='. $val .' WHERE id IN('.implode(',', $ids).') AND '.$user_id_field.'='.$admin_id;
+            $sql = 'UPDATE '.$table.' SET '.$field.'='. $val .' WHERE id IN('.implode(',', $ids).')';
+            if($userType != AdminModel::USER_TYPE_SUPER_ADMIN){
+                $sql.= ' AND '.$user_id_field.'='.$admin_id;
+            }
 
             $result = \Yii::$app->db->createCommand($sql)->execute();
             if(!$result){

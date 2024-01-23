@@ -611,7 +611,7 @@ class UserService extends BaseService {
         $user_types = [];
         if($user->id==1){
             foreach (AdminModel::USER_TYPE_OPTIONS as $user_type=>$name){
-                if($user_type==AdminModel::USER_TYPE_ADMIN) continue;
+                if($user_type==AdminModel::USER_TYPE_SUPER_ADMIN) continue;
                 if($act==1 && $user_type==AdminModel::USER_TYPE_3D_ADMIN) continue; # 详细信息
                 $user_types[] = ['user_type'=>$user_type, 'name'=>$name];
             }

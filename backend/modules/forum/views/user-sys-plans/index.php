@@ -141,7 +141,7 @@ $columns = array_merge(
             }
         ]
     ],
-    \Yii::$app->user->id!=1?[]:[
+    \Yii::$app->user->identity['user_type']!=\common\models\AdminModel::USER_TYPE_SUPER_ADMIN?[]:[
         ['attribute' => 'account','headerOptions'=>['width'=>'5%'],'label'=>'账号',
             'format'=>'raw',
             'value' => function($model) {

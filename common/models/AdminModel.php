@@ -27,13 +27,13 @@ class AdminModel extends BaseModel implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
-    const USER_TYPE_ADMIN = 0;
+    const USER_TYPE_SUPER_ADMIN = 0;
     const USER_TYPE_QX = 1;
     const USER_TYPE_3D_ADMIN = 2;
     const USER_TYPE_3D = 3;
     const USER_TYPE_3D_CHILD = 4;
     const USER_TYPE_OPTIONS = [
-        self::USER_TYPE_ADMIN => '超级管理员',
+        self::USER_TYPE_SUPER_ADMIN => '超级管理员',
         self::USER_TYPE_QX => '七星',
         self::USER_TYPE_3D_ADMIN => '3d总管',
         self::USER_TYPE_3D => '3d代理',
